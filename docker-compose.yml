@@ -1,0 +1,142 @@
+name: skycom_development
+services:
+  # web:
+  #   build: .
+  #   command: bash -c "sleep 5 && rm -f tmp/pids/server.pid && bundle exec rails db:prepare && bundle exec rails assets:precompile && bundle exec thrust bin/rails s"
+  #   environment:
+  #     RAILS_ENV: development
+  #     RAILS_MASTER_KEY: ${RAILS_MASTER_KEY}
+  #   volumes:
+  #     - .:/rails
+  #   ports:
+  #     - "80:80"
+  #     - "443:443"
+  #   stdin_open: true
+  #   tty: true
+  #   depends_on:
+  #     - postgres
+  #     - mongo
+  #     - opensearch
+  #     - opensearch_dashboards
+
+  # job:
+  #   build: .
+  #   command: bash -c "sleep 30 && bundle exec rails db:prepare && bin/jobs"
+  #   environment:
+  #     RAILS_ENV: development
+  #     RAILS_MASTER_KEY: ${RAILS_MASTER_KEY}
+  #   volumes:
+  #     - .:/rails
+  #   depends_on:
+  #     - web
+
+  postgres:
+    image: bitnamilegacy/postgresql:17.6.0-debian-12-r4
+    environment:
+      POSTGRESQL_USERNAME: postgres
+      POSTGRESQL_PASSWORD: password
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  mongo:
+    image: mongo
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+
+  opensearch:
+    image: opensearchproject/opensearch:3
+    environment:
+      OPENSEARCH_INITIAL_ADMIN_PASSWORD: OpensearchPassword@1234
+      discovery.type: single-node
+      plugins.security.disabled: "true"
+      # DISABLE_SECURITY_PLUGIN: "true" # Disables Security plugin
+    ports:
+      - "9200:9200"
+      - "9600:9600"
+    volumes:
+      - es_data:/usr/share/opensearch/data
+
+  opensearch_dashboards:
+    image: opensearchproject/opensearch-dashboards:3
+    environment:
+      - 'OPENSEARCH_HOSTS=["http://opensearch:9200"]'
+      - "DISABLE_SECURITY_DASHBOARDS_PLUGIN=true"
+    ports:
+      - "5601:5601"
+    depends_on:
+      - opensearch
+
+  grafana:
+    # username: admin
+    # password: admin
+    image: grafana/otel-lgtm
+    volumes:
+      - grafana_data:/data
+    ports:
+      - "3000:3000" # Grafana
+      - "4317:4317" # OpenTelemetry
+      - "4318:4318" # OpenTelemetry
+      - "9090:9090" # Prometheus
+      - "3100:3100" # Loki
+
+  # For Selenium test
+  selenium-chromium:
+    image: selenium/standalone-chromium:latest
+    shm_size: '2gb'
+    ports:
+      - "4444:4444"
+      - "5900:5900"
+      - "7900:7900"
+ 
+  # MinIO Service
+  minio:
+    image: minio/minio:latest
+    ports:
+      # MinIO API port
+      - "9000:9000" 
+      # MinIO Console/UI port
+      - "9001:9001" 
+    environment:
+      # MinIO root user credentials
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin
+    volumes:
+      # Data persistence
+      - minio_data:/data 
+    command: server /data --console-address ":9001"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 30s
+      timeout: 20s
+      retries: 3
+
+  create_buckets:
+    image: minio/mc
+    depends_on:
+      minio:
+        condition: service_healthy # Wait for MinIO to be fully ready
+    # Wait for the MinIO API to be available and then execute the command
+    entrypoint: >
+      /bin/sh -c "
+      /usr/bin/mc alias set minio_host http://minio:9000 minioadmin minioadmin;
+      /usr/bin/mc mb minio_host/development-bucket;
+      /usr/bin/mc policy set download minio_host/development-bucket;
+      /usr/bin/mc mb minio_host/production-bucket;
+      /usr/bin/mc policy set download minio_host/production-bucket;
+      /usr/bin/mc exit
+      "
+    # This service runs once and exits successfully
+    # profiles: ["no-start"] # Optional: Prevents this service from running on 'docker compose up' by default, if you only want it on explicit 'docker compose run'
+
+    
+volumes:
+  postgres_data:
+  mongo_data:
+  es_data:
+  grafana_data:
+  minio_data:
+  
