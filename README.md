@@ -32,6 +32,8 @@ Things you may want to cover:
   docker compose up -d
   RAILS_MASTER_KEY=$(cat config/master.key) docker compose up -d
 
+  Seed::ApplicationService.run
+
   bin/rubocop --autocorrect-all 
 
 
