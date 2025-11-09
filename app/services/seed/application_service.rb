@@ -3,7 +3,7 @@ class Seed::ApplicationService
     Seed::UserService.run
     Seed::CompanyService.run
     Seed::EmployeeService.run
-
+    Seed::EmployeeGroupService.run
 
 
 

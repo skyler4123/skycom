@@ -40,6 +40,8 @@ Things you may want to cover:
   bundle exec rails g scaffold User email
   bundle exec rails g scaffold Company name user:references
   bundle exec rails g scaffold Employee name user:references company:references
+  bundle exec rails g scaffold EmployeeGroup name company:references
+
 
 
   bundle exec rails g scaffold Role name

@@ -1,4 +1,5 @@
 Rails.application.routes.draw do
+  resources :employee_groups
   resources :employees
   resources :companies
   get  "sign_in", to: "sessions#new"
