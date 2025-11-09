@@ -27,6 +27,8 @@ Things you may want to cover:
 ##
   rails new skycom --database=postgresql --css=tailwind
 
+  rails generate authentication --omniauthable --passwordless --invitable
+
   docker compose up -d
   RAILS_MASTER_KEY=$(cat config/master.key) docker compose up -d
 ##
