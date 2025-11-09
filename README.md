@@ -33,7 +33,16 @@ Things you may want to cover:
   RAILS_MASTER_KEY=$(cat config/master.key) docker compose up -d
 
   bin/rubocop --autocorrect-all 
-  bundle exec rails scaffold Role name user:references
+
+
+
+  
+  bundle exec rails scaffold Role name
+  bundle exec rails scaffold UserRole user:references role:references
+  bundle exec rails scaffold Policy name resource action
+  bundle exec rails scaffold RolePolicy role:references policy:references
+
+
   bundle exec rails scaffold RoleAppointment user:references appoint_to:references{polymorphic} role:references
 
   bundle exec rails scaffold Address
