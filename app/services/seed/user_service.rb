@@ -6,7 +6,7 @@ class Seed::UserService
   end
 
   def self.create_demo_user
-    10.times do |n|
+    3.times do |n|
       user = User.create!(
         email: "user#{n}@example.com",
         password: "Password@1234",

@@ -3,7 +3,7 @@ class Seed::CompanyService
     User.all.each do |user|
       2.times do |n|
         company = Company.create!(
-          name: "Company Name #{n}",
+          name: "Company #{n}",
           user: user
         )
       end

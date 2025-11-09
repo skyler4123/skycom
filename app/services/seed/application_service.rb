@@ -2,7 +2,7 @@ class Seed::ApplicationService
   def self.run(seed_number: 0)
     Seed::UserService.run
     Seed::CompanyService.run
-
+    Seed::EmployeeService.run
 
 
 
