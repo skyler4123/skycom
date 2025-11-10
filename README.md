@@ -32,66 +32,77 @@ Things you may want to cover:
   docker compose up -d
   RAILS_MASTER_KEY=$(cat config/master.key) docker compose up -d
 
+  Seed::ApplicationService.run
+
   bin/rubocop --autocorrect-all 
 
 
+  bundle exec rails g scaffold User email
 
-  
-  bundle exec rails scaffold Role name
-  bundle exec rails scaffold UserRole user:references role:references
-  bundle exec rails scaffold Policy name resource action
-  bundle exec rails scaffold RolePolicy role:references policy:references
+  bundle exec rails g scaffold CompanyGroup name user:references
+  bundle exec rails g scaffold Company name user:references company_group:references
+  bundle exec rails g scaffold Tag name description company_group:references
+  bundle exec rails g scaffold TagMembership tag:references taggable:references{polymorphic} value description
+
+  bundle exec rails g scaffold EmployeeGroup name company:references
+  bundle exec rails g scaffold Employee name user:references company:references
 
 
-  bundle exec rails scaffold RoleAppointment user:references appoint_to:references{polymorphic} role:references
+  bundle exec rails g scaffold Role name
+  bundle exec rails g scaffold UserRole user:references role:references
+  bundle exec rails g scaffold Policy name resource action
+  bundle exec rails g scaffold RolePolicy role:references policy:references
 
-  bundle exec rails scaffold Address
-  bundle exec rails scaffold Category name user:references
-  bundle exec rails scaffold CategoryAppointment user:references appoint_to:references{polymorphic} category:references
 
-  bundle exec rails scaffold Session
-  bundle exec rails scaffold Event
+  bundle exec rails g scaffold RoleAppointment user:references appoint_to:references{polymorphic} role:references
 
-  bundle exec rails scaffold CompanyOwner user:references
-  bundle exec rails scaffold CompanyEntity name company_owner:references
-  bundle exec rails scaffold CompanyCategory
-  bundle exec rails scaffold CompanyEmployee
-  bundle exec rails scaffold CompanyRole
-  bundle exec rails scaffold CompanyPolicy
-  bundle exec rails scaffold CompanyCustomer
-  bundle exec rails scaffold CompanyFacility
-  bundle exec rails scaffold CompanyService
+  bundle exec rails g scaffold Address
+  bundle exec rails g scaffold Category name user:references
+  bundle exec rails g scaffold CategoryAppointment user:references appoint_to:references{polymorphic} category:references
 
-  bundle exec rails scaffold ShopOwner
+  bundle exec rails g scaffold Session
+  bundle exec rails g scaffold Event
 
-  bundle exec rails scaffold RestaurantOwner
+  bundle exec rails g scaffold CompanyOwner user:references
+  bundle exec rails g scaffold CompanyEntity name company_owner:references
+  bundle exec rails g scaffold CompanyCategory
+  bundle exec rails g scaffold CompanyEmployee
+  bundle exec rails g scaffold CompanyRole
+  bundle exec rails g scaffold CompanyPolicy
+  bundle exec rails g scaffold CompanyCustomer
+  bundle exec rails g scaffold CompanyFacility
+  bundle exec rails g scaffold CompanyService
 
-  bundle exec rails scaffold AttendanceOwner
-  bundle exec rails scaffold AttendanceCategory
-  bundle exec rails scaffold AttendanceChecker
-  bundle exec rails scaffold AttendanceCheck
-  bundle exec rails scaffold AttendanceSummary
+  bundle exec rails g scaffold ShopOwner
 
-  bundle exec rails scaffold ProductOwner
-  bundle exec rails scaffold ProductCategory
-  bundle exec rails scaffold ProductBrand
-  bundle exec rails scaffold ProductItem
-  bundle exec rails scaffold ProductCart
+  bundle exec rails g scaffold RestaurantOwner
 
-  bundle exec rails scaffold NotificationOwner
-  bundle exec rails scaffold NotificationCategory
-  bundle exec rails scaffold NotificationEvent
-  bundle exec rails scaffold NotificationPolicy
+  bundle exec rails g scaffold AttendanceOwner
+  bundle exec rails g scaffold AttendanceCategory
+  bundle exec rails g scaffold AttendanceChecker
+  bundle exec rails g scaffold AttendanceCheck
+  bundle exec rails g scaffold AttendanceSummary
 
-  bundle exec rails scaffold BookingOwner
-  bundle exec rails scaffold BookingCategory
-  bundle exec rails scaffold BookingItem
-  bundle exec rails scaffold BookingCustomer
+  bundle exec rails g scaffold ProductOwner
+  bundle exec rails g scaffold ProductCategory
+  bundle exec rails g scaffold ProductBrand
+  bundle exec rails g scaffold ProductItem
+  bundle exec rails g scaffold ProductCart
 
-  bundle exec rails scaffold Calendar
-  bundle exec rails scaffold Chat
-  bundle exec rails scaffold Article
-  bundle exec rails scaffold Payment
-  bundle exec rails scaffold Project
-  bundle exec rails scaffold Report
+  bundle exec rails g scaffold NotificationOwner
+  bundle exec rails g scaffold NotificationCategory
+  bundle exec rails g scaffold NotificationEvent
+  bundle exec rails g scaffold NotificationPolicy
+
+  bundle exec rails g scaffold BookingOwner
+  bundle exec rails g scaffold BookingCategory
+  bundle exec rails g scaffold BookingItem
+  bundle exec rails g scaffold BookingCustomer
+
+  bundle exec rails g scaffold Calendar
+  bundle exec rails g scaffold Chat
+  bundle exec rails g scaffold Article
+  bundle exec rails g scaffold Payment
+  bundle exec rails g scaffold Project
+  bundle exec rails g scaffold Report
 ##
