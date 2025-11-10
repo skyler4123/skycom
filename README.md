@@ -38,10 +38,14 @@ Things you may want to cover:
 
 
   bundle exec rails g scaffold User email
-  bundle exec rails g scaffold Company name user:references
-  bundle exec rails g scaffold Employee name user:references company:references
-  bundle exec rails g scaffold EmployeeGroup name company:references
 
+  bundle exec rails g scaffold CompanyGroup name user:references
+  bundle exec rails g scaffold Company name user:references company_group:references
+  bundle exec rails g scaffold Tag name description company_group:references
+  bundle exec rails g scaffold TagMembership tag:references taggable:references{polymorphic} value description
+
+  bundle exec rails g scaffold EmployeeGroup name company:references
+  bundle exec rails g scaffold Employee name user:references company:references
 
 
   bundle exec rails g scaffold Role name
