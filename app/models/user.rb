@@ -25,4 +25,12 @@ class User < ApplicationRecord
   after_update if: :password_digest_previously_changed? do
     sessions.where.not(id: Current.session).delete_all
   end
+
+
+
+
+
+
+
+  has_many :companies, dependent: :destroy
 end

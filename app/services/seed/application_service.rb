@@ -1,6 +1,8 @@
 class Seed::ApplicationService
   def self.run(seed_number: 0)
     Seed::UserService.run
+    Seed::CompanyService.run
+
 
     self.puts_count
     puts "Seeding is doneeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee!"
