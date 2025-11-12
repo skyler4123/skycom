@@ -37,22 +37,8 @@ Things you may want to cover:
   bin/rubocop --autocorrect-all 
 
 
-  bundle exec rails g scaffold User email
-
-  bundle exec rails g scaffold Company name description user:references parent_company_id
-  bundle exec rails g scaffold Tag name description company_group:references
-  bundle exec rails g scaffold TagMembership tag:references taggable:references{polymorphic} value description
-
-  bundle exec rails g scaffold EmployeeGroup name company:references
-  bundle exec rails g scaffold Employee name user:references company:references
-
-
-  bundle exec rails g scaffold Role name
-  bundle exec rails g scaffold UserRole user:references role:references
-  bundle exec rails g scaffold Policy name resource action
-  bundle exec rails g scaffold RolePolicy role:references policy:references
-
-
+  bundle exec rails g scaffold User
+  bundle exec rails g scaffold Role name user:references
   bundle exec rails g scaffold RoleAppointment user:references appoint_to:references{polymorphic} role:references
 
   bundle exec rails g scaffold Address
