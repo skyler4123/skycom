@@ -6,7 +6,9 @@ RSpec.describe "companies/edit", type: :view do
       user: nil,
       parent_company: nil,
       name: "MyString",
-      description: "MyString"
+      description: "MyString",
+      status: 1,
+      kind: 1
     )
   }
 
@@ -26,6 +28,10 @@ RSpec.describe "companies/edit", type: :view do
       assert_select "input[name=?]", "company[name]"
 
       assert_select "input[name=?]", "company[description]"
+
+      assert_select "input[name=?]", "company[status]"
+
+      assert_select "input[name=?]", "company[kind]"
     end
   end
 end

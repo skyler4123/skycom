@@ -5,6 +5,8 @@ class CreateCompanies < ActiveRecord::Migration[8.0]
       t.references :parent_company, null: true, foreign_key: { to_table: :companies }
       t.string :name
       t.string :description
+      t.integer :status
+      t.integer :kind
 
       t.timestamps
     end
