@@ -1,37 +1,50 @@
 class Seed::ApplicationService
   def self.run(seed_number: 0)
+    puts "\n\n🚀 Starting Full Database Seeding..."
+    puts "========================================================="
+
     Seed::UserService.run
     Seed::CompanyService.run
     Seed::TagService.run
     Seed::EmployeeGroupService.run
 
-
-
     self.puts_count
-    puts "Seeding is doneeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee!"
+    
+    puts "\n========================================================="
+    puts "🎉 Seeding is complete! Database is ready to use. 🎉"
+    puts "========================================================="
     true
   end
 
+  # Prints a cleanly formatted summary of record counts for all models.
   def self.puts_count
-    count_array = []
+    puts "\n📊 Seeding Summary (Record Counts)"
+    puts "----------------------------------------"
+    
     skip_models = [ ApplicationRecord, Current ]
+
+    # Iterate through all model files
     Dir[Rails.root.to_s + "/app/**/models/*.rb"].each do |file|
-      # Given string
-      file_name = file.split("/").last
+      begin
+        file_name = file.split("/").last
+        class_name = file_name.sub(".rb", "").camelize
+        
+        # Safely get the model class
+        model_class = class_name.constantize
+        
+        # Skip base classes and models that don't respond to count
+        next if skip_models.include?(model_class) || !model_class.respond_to?(:count)
 
-      # Step 1: Remove the file extension
-      class_name = file_name.sub(".rb", "")
-
-      # Step 2: Convert the string to CamelCase
-      class_name = class_name.camelize
-
-      # Step 3: Use `constantize` to get the model class
-      model_class = class_name.constantize
-      next if skip_models.include?(model_class)
-
-      # Push model class count to count_array
-      count_array << { model_class.to_s => model_class.count }
+        # Print the count with aligned text
+        # Using ljust to align the class names beautifully
+        puts "  👉 #{model_class.to_s.ljust(25)}: #{model_class.count}"
+      rescue NameError
+        # Silently skip files that aren't valid class constants (e.g., concerns)
+        next
+      rescue => e
+        puts "  ❌ Error processing #{class_name}: #{e.message}"
+      end
     end
-    puts count_array
+    puts "----------------------------------------"
   end
 end
