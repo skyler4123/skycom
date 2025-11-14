@@ -1,0 +1,2 @@
+module TagAppointmentsHelper
+end
