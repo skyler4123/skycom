@@ -42,28 +42,21 @@ Things you may want to cover:
 
   bundle exec rails g scaffold Address alpha2:string:index alpha3:string:index continent:string:index nationality:string:index region:string:index longitude:decimal latitude:decimal level_total:integer level_1:string:index level_2:string:index level_3:string:index level_4:string:index level_5:string:index level_6:string:index level_7:string:index level_8:string:index level_9:string:index level_10:string:index discarded_at:datetime --force
 
-  bundle exec rails g scaffold Company user:references parent_company:references name description status:integer kind:integer --force
+  bundle exec rails g scaffold Company user:references parent_company:references name description status:integer kind:integer discarded_at:datetime:index --force
   bundle exec rails g scaffold Tag company:references name description --force
   bundle exec rails g scaffold TagAppointment tag:references appoint_to:references{polymorphic} value description --force
 
-  bundle exec rails g scaffold EmployeeGroup company:references name description --force
-  bundle exec rails g scaffold Employee user:references company:references name description --force
+  bundle exec rails g scaffold EmployeeGroup company:references name description status:integer kind:integer  discarded_at:datetime:index --force
+  bundle exec rails g scaffold Employee user:references company:references name description kind:integer  discarded_at:datetime:index --force --force
   bundle exec rails g scaffold EmployeeGroupAppointment company_group:references employee:references name description --force
 
 
 
-  bundle exec rails g scaffold Role name description --force
-  bundle exec rails g scaffold Policy name description resource action --force
+  bundle exec rails g scaffold Role name description kind:integer  discarded_at:datetime:index --force --force
+  bundle exec rails g scaffold Policy name description resource action kind:integer  discarded_at:datetime:index --force --force
   bundle exec rails g scaffold PolicyRoleAppointment role:references policy:references --force
   bundle exec rails g scaffold RoleAppointment user:references appoint_to:references{polymorphic} role:references --force
 
-  bundle exec rails g scaffold CompanyOwner user:references
-  bundle exec rails g scaffold CompanyEntity name company_owner:references
-  bundle exec rails g scaffold CompanyCategory
-  bundle exec rails g scaffold CompanyEmployee
-  bundle exec rails g scaffold CompanyRole
-  bundle exec rails g scaffold CompanyPolicy
-  bundle exec rails g scaffold CompanyCustomer
   bundle exec rails g scaffold CompanyFacility
   bundle exec rails g scaffold CompanyService
 
