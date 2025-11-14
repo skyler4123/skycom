@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_11_14_105245) do
+ActiveRecord::Schema[8.0].define(version: 2025_11_14_111821) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -66,6 +66,15 @@ ActiveRecord::Schema[8.0].define(version: 2025_11_14_105245) do
     t.index ["user_id"], name: "index_companies_on_user_id"
   end
 
+  create_table "employee_groups", force: :cascade do |t|
+    t.bigint "company_id", null: false
+    t.string "name"
+    t.string "description"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["company_id"], name: "index_employee_groups_on_company_id"
+  end
+
   create_table "sessions", force: :cascade do |t|
     t.bigint "user_id", null: false
     t.string "user_agent"
@@ -78,6 +87,18 @@ ActiveRecord::Schema[8.0].define(version: 2025_11_14_105245) do
   create_table "sign_in_tokens", force: :cascade do |t|
     t.bigint "user_id", null: false
     t.index ["user_id"], name: "index_sign_in_tokens_on_user_id"
+  end
+
+  create_table "tag_appointments", force: :cascade do |t|
+    t.bigint "tag_id", null: false
+    t.string "appoint_to_type", null: false
+    t.bigint "appoint_to_id", null: false
+    t.string "value"
+    t.string "description"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["appoint_to_type", "appoint_to_id"], name: "index_tag_appointments_on_appoint_to"
+    t.index ["tag_id"], name: "index_tag_appointments_on_tag_id"
   end
 
   create_table "tags", force: :cascade do |t|
@@ -102,7 +123,9 @@ ActiveRecord::Schema[8.0].define(version: 2025_11_14_105245) do
 
   add_foreign_key "companies", "companies", column: "parent_company_id"
   add_foreign_key "companies", "users"
+  add_foreign_key "employee_groups", "companies"
   add_foreign_key "sessions", "users"
   add_foreign_key "sign_in_tokens", "users"
+  add_foreign_key "tag_appointments", "tags"
   add_foreign_key "tags", "companies"
 end

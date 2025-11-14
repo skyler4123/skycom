@@ -3,6 +3,9 @@ class Seed::ApplicationService
     Seed::UserService.run
     Seed::CompanyService.run
     Seed::TagService.run
+    Seed::EmployeeGroupService.run
+
+
 
     self.puts_count
     puts "Seeding is doneeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee!"
