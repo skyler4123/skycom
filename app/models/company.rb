@@ -1,6 +1,9 @@
 class Company < ApplicationRecord
   belongs_to :user
 
-  has_many :child_companies, class_name: "Company", foreign_key: "parent_company_id"
+  has_many :tags, dependent: :destroy
+
+  has_many :child_companies, class_name: "Company", foreign_key: "parent_company_id", dependent: :destroy
   belongs_to :parent_company, class_name: "Company", optional: true
+
 end

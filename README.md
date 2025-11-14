@@ -40,8 +40,8 @@ Things you may want to cover:
   bundle exec rails g scaffold User email
   bundle exec rails g scaffold Address alpha2:string:index alpha3:string:index continent:string:index nationality:string:index region:string:index longitude:decimal latitude:decimal level_total:integer level_1:string:index level_2:string:index level_3:string:index level_4:string:index level_5:string:index level_6:string:index level_7:string:index level_8:string:index level_9:string:index level_10:string:index discarded_at:datetime --force
 
-  bundle exec rails g scaffold Company user:references parent_company:references name description
-  bundle exec rails g scaffold Tag company_group:references name description
+  bundle exec rails g scaffold Company user:references parent_company:references name description status:integer kind:integer --force
+  bundle exec rails g scaffold Tag company:references name description --force
   bundle exec rails g scaffold TagAppointment tag:references appoint_to:references{polymorphic} value description
 
   bundle exec rails g scaffold EmployeeGroup company:references name description

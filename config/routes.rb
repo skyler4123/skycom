@@ -1,4 +1,5 @@
 Rails.application.routes.draw do
+  resources :tags
   resources :companies
   resources :addresses
   get  "sign_in", to: "sessions#new"
