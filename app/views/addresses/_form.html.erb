@@ -1,0 +1,112 @@
+<%= form_with(model: address, class: "contents") do |form| %>
+  <% if address.errors.any? %>
+    <div id="error_explanation" class="bg-red-50 text-red-500 px-3 py-2 font-medium rounded-md mt-3">
+      <h2><%= pluralize(address.errors.count, "error") %> prohibited this address from being saved:</h2>
+
+      <ul class="list-disc ml-6">
+        <% address.errors.each do |error| %>
+          <li><%= error.full_message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="my-5">
+    <%= form.label :alpha2 %>
+    <%= form.text_field :alpha2, class: ["block shadow-sm rounded-md border px-3 py-2 mt-2 w-full", {"border-gray-400 focus:outline-blue-600": address.errors[:alpha2].none?, "border-red-400 focus:outline-red-600": address.errors[:alpha2].any?}] %>
+  </div>
+
+  <div class="my-5">
+    <%= form.label :alpha3 %>
+    <%= form.text_field :alpha3, class: ["block shadow-sm rounded-md border px-3 py-2 mt-2 w-full", {"border-gray-400 focus:outline-blue-600": address.errors[:alpha3].none?, "border-red-400 focus:outline-red-600": address.errors[:alpha3].any?}] %>
+  </div>
+
+  <div class="my-5">
+    <%= form.label :continent %>
+    <%= form.text_field :continent, class: ["block shadow-sm rounded-md border px-3 py-2 mt-2 w-full", {"border-gray-400 focus:outline-blue-600": address.errors[:continent].none?, "border-red-400 focus:outline-red-600": address.errors[:continent].any?}] %>
+  </div>
+
+  <div class="my-5">
+    <%= form.label :nationality %>
+    <%= form.text_field :nationality, class: ["block shadow-sm rounded-md border px-3 py-2 mt-2 w-full", {"border-gray-400 focus:outline-blue-600": address.errors[:nationality].none?, "border-red-400 focus:outline-red-600": address.errors[:nationality].any?}] %>
+  </div>
+
+  <div class="my-5">
+    <%= form.label :region %>
+    <%= form.text_field :region, class: ["block shadow-sm rounded-md border px-3 py-2 mt-2 w-full", {"border-gray-400 focus:outline-blue-600": address.errors[:region].none?, "border-red-400 focus:outline-red-600": address.errors[:region].any?}] %>
+  </div>
+
+  <div class="my-5">
+    <%= form.label :longitude %>
+    <%= form.text_field :longitude, class: ["block shadow-sm rounded-md border px-3 py-2 mt-2 w-full", {"border-gray-400 focus:outline-blue-600": address.errors[:longitude].none?, "border-red-400 focus:outline-red-600": address.errors[:longitude].any?}] %>
+  </div>
+
+  <div class="my-5">
+    <%= form.label :latitude %>
+    <%= form.text_field :latitude, class: ["block shadow-sm rounded-md border px-3 py-2 mt-2 w-full", {"border-gray-400 focus:outline-blue-600": address.errors[:latitude].none?, "border-red-400 focus:outline-red-600": address.errors[:latitude].any?}] %>
+  </div>
+
+  <div class="my-5">
+    <%= form.label :level_total %>
+    <%= form.number_field :level_total, class: ["block shadow-sm rounded-md border px-3 py-2 mt-2 w-full", {"border-gray-400 focus:outline-blue-600": address.errors[:level_total].none?, "border-red-400 focus:outline-red-600": address.errors[:level_total].any?}] %>
+  </div>
+
+  <div class="my-5">
+    <%= form.label :level_1 %>
+    <%= form.text_field :level_1, class: ["block shadow-sm rounded-md border px-3 py-2 mt-2 w-full", {"border-gray-400 focus:outline-blue-600": address.errors[:level_1].none?, "border-red-400 focus:outline-red-600": address.errors[:level_1].any?}] %>
+  </div>
+
+  <div class="my-5">
+    <%= form.label :level_2 %>
+    <%= form.text_field :level_2, class: ["block shadow-sm rounded-md border px-3 py-2 mt-2 w-full", {"border-gray-400 focus:outline-blue-600": address.errors[:level_2].none?, "border-red-400 focus:outline-red-600": address.errors[:level_2].any?}] %>
+  </div>
+
+  <div class="my-5">
+    <%= form.label :level_3 %>
+    <%= form.text_field :level_3, class: ["block shadow-sm rounded-md border px-3 py-2 mt-2 w-full", {"border-gray-400 focus:outline-blue-600": address.errors[:level_3].none?, "border-red-400 focus:outline-red-600": address.errors[:level_3].any?}] %>
+  </div>
+
+  <div class="my-5">
+    <%= form.label :level_4 %>
+    <%= form.text_field :level_4, class: ["block shadow-sm rounded-md border px-3 py-2 mt-2 w-full", {"border-gray-400 focus:outline-blue-600": address.errors[:level_4].none?, "border-red-400 focus:outline-red-600": address.errors[:level_4].any?}] %>
+  </div>
+
+  <div class="my-5">
+    <%= form.label :level_5 %>
+    <%= form.text_field :level_5, class: ["block shadow-sm rounded-md border px-3 py-2 mt-2 w-full", {"border-gray-400 focus:outline-blue-600": address.errors[:level_5].none?, "border-red-400 focus:outline-red-600": address.errors[:level_5].any?}] %>
+  </div>
+
+  <div class="my-5">
+    <%= form.label :level_6 %>
+    <%= form.text_field :level_6, class: ["block shadow-sm rounded-md border px-3 py-2 mt-2 w-full", {"border-gray-400 focus:outline-blue-600": address.errors[:level_6].none?, "border-red-400 focus:outline-red-600": address.errors[:level_6].any?}] %>
+  </div>
+
+  <div class="my-5">
+    <%= form.label :level_7 %>
+    <%= form.text_field :level_7, class: ["block shadow-sm rounded-md border px-3 py-2 mt-2 w-full", {"border-gray-400 focus:outline-blue-600": address.errors[:level_7].none?, "border-red-400 focus:outline-red-600": address.errors[:level_7].any?}] %>
+  </div>
+
+  <div class="my-5">
+    <%= form.label :level_8 %>
+    <%= form.text_field :level_8, class: ["block shadow-sm rounded-md border px-3 py-2 mt-2 w-full", {"border-gray-400 focus:outline-blue-600": address.errors[:level_8].none?, "border-red-400 focus:outline-red-600": address.errors[:level_8].any?}] %>
+  </div>
+
+  <div class="my-5">
+    <%= form.label :level_9 %>
+    <%= form.text_field :level_9, class: ["block shadow-sm rounded-md border px-3 py-2 mt-2 w-full", {"border-gray-400 focus:outline-blue-600": address.errors[:level_9].none?, "border-red-400 focus:outline-red-600": address.errors[:level_9].any?}] %>
+  </div>
+
+  <div class="my-5">
+    <%= form.label :level_10 %>
+    <%= form.text_field :level_10, class: ["block shadow-sm rounded-md border px-3 py-2 mt-2 w-full", {"border-gray-400 focus:outline-blue-600": address.errors[:level_10].none?, "border-red-400 focus:outline-red-600": address.errors[:level_10].any?}] %>
+  </div>
+
+  <div class="my-5">
+    <%= form.label :discarded_at %>
+    <%= form.datetime_field :discarded_at, class: ["block shadow-sm rounded-md border px-3 py-2 mt-2 w-full", {"border-gray-400 focus:outline-blue-600": address.errors[:discarded_at].none?, "border-red-400 focus:outline-red-600": address.errors[:discarded_at].any?}] %>
+  </div>
+
+  <div class="inline">
+    <%= form.submit class: "w-full sm:w-auto rounded-md px-3.5 py-2.5 bg-blue-600 hover:bg-blue-500 text-white inline-block font-medium cursor-pointer" %>
+  </div>
+<% end %>

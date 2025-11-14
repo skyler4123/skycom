@@ -10,9 +10,48 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_11_11_144936) do
+ActiveRecord::Schema[8.0].define(version: 2025_11_14_095802) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
+
+  create_table "addresses", force: :cascade do |t|
+    t.string "alpha2"
+    t.string "alpha3"
+    t.string "continent"
+    t.string "nationality"
+    t.string "region"
+    t.decimal "longitude"
+    t.decimal "latitude"
+    t.integer "level_total"
+    t.string "level_1"
+    t.string "level_2"
+    t.string "level_3"
+    t.string "level_4"
+    t.string "level_5"
+    t.string "level_6"
+    t.string "level_7"
+    t.string "level_8"
+    t.string "level_9"
+    t.string "level_10"
+    t.datetime "discarded_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["alpha2"], name: "index_addresses_on_alpha2"
+    t.index ["alpha3"], name: "index_addresses_on_alpha3"
+    t.index ["continent"], name: "index_addresses_on_continent"
+    t.index ["level_1"], name: "index_addresses_on_level_1"
+    t.index ["level_10"], name: "index_addresses_on_level_10"
+    t.index ["level_2"], name: "index_addresses_on_level_2"
+    t.index ["level_3"], name: "index_addresses_on_level_3"
+    t.index ["level_4"], name: "index_addresses_on_level_4"
+    t.index ["level_5"], name: "index_addresses_on_level_5"
+    t.index ["level_6"], name: "index_addresses_on_level_6"
+    t.index ["level_7"], name: "index_addresses_on_level_7"
+    t.index ["level_8"], name: "index_addresses_on_level_8"
+    t.index ["level_9"], name: "index_addresses_on_level_9"
+    t.index ["nationality"], name: "index_addresses_on_nationality"
+    t.index ["region"], name: "index_addresses_on_region"
+  end
 
   create_table "companies", force: :cascade do |t|
     t.string "name"
