@@ -19,8 +19,8 @@ class Company < ApplicationRecord
   }
   
   enum :ownership_type, { 
-    publicly_traded?: 0, 
-    private: 1 
+    publicly_traded: 0, 
+    privately_held: 1 
   }
   
   # Grouped business types with 1000-unit gaps for future expansion
@@ -90,7 +90,7 @@ class Company < ApplicationRecord
   validates :status, presence: true
   
   # Validation for new administrative fields
-  validates :registration_number, presence: true, uniqueness: true, if: :private? # Typically required for private companies
+  validates :registration_number, presence: true, uniqueness: true, if: :privately_held? # Typically required for private companies
   validates :vat_id, length: { maximum: 50 }, allow_blank: true
   validates :employee_count, numericality: { greater_than_or_equal_to: 0 }, allow_nil: true
   
@@ -104,6 +104,6 @@ class Company < ApplicationRecord
   validates :city, presence: true
   
   # Validation for operational fields
-  validates :fiscal_year_end_month, presence: true, numericality: { in: 1..12 }
+  # validates :fiscal_year_end_month, presence: true, numericality: { in: 1..12 }
 
 end

@@ -8,7 +8,7 @@ class Seed::CompanyService
   
   # Business types to cycle through when seeding, focusing on the Education sector.
   # Add or remove types here to control the seeded data mix.
-  BUSINESS_TYPE_CYCLE = %i[school university english_center training_provider].freeze
+  BUSINESS_TYPE_CYCLE = %i[school].freeze
   
   def self.run
     puts "Seeding Company records..."
@@ -16,7 +16,7 @@ class Seed::CompanyService
     # Get all available enum keys for random assignment
     statuses = Company.statuses.keys
     ownership_types = Company.ownership_types.keys
-    fiscal_months = Company.fiscal_year_end_month.keys
+    fiscal_months = Company.fiscal_year_end_months.keys
     
     total_companies_created = 0
 
