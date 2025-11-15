@@ -24,4 +24,8 @@ class Employee < ApplicationRecord
   # --- Validations (Optional but recommended) ---
   validates :name, presence: true
   validates :kind, presence: true
+
+  has_many :employee_group_appointments, dependent: :destroy, as: :appoint_to
+  has_many :employee_groups, through: :employee_group_appointments
+
 end

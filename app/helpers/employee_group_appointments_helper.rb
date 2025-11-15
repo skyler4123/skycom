@@ -1,0 +1,2 @@
+module EmployeeGroupAppointmentsHelper
+end

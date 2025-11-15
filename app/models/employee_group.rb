@@ -4,4 +4,7 @@ class EmployeeGroup < ApplicationRecord
   has_many :tag_appointments, as: :appoint_to, dependent: :destroy
   has_many :tags, through: :tag_appointments
 
+  has_many :employee_group_appointments, dependent: :destroy
+  has_many :employees, through: :employee_group_appointments, source: :appoint_to, source_type: "Employee"
+
 end

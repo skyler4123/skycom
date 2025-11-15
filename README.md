@@ -47,8 +47,8 @@ Things you may want to cover:
   bundle exec rails g scaffold TagAppointment tag:references appoint_to:references{polymorphic} value description --force
 
   bundle exec rails g scaffold EmployeeGroup company:references name description status:integer kind:integer  discarded_at:datetime:index --force
-  bundle exec rails g scaffold Employee user:references company:references name description kind:integer  discarded_at:datetime:index --force --force
-  bundle exec rails g scaffold EmployeeGroupAppointment company_group:references employee:references name description --force
+  bundle exec rails g scaffold Employee user:references company:references name description status:integer kind:integer  discarded_at:datetime:index --force
+  bundle exec rails g scaffold EmployeeGroupAppointment employee_group:references appoint_to:references{polymorphic} name description --force
 
 
 

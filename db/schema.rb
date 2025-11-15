@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_11_14_233907) do
+ActiveRecord::Schema[8.0].define(version: 2025_11_15_013632) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -64,6 +64,18 @@ ActiveRecord::Schema[8.0].define(version: 2025_11_14_233907) do
     t.datetime "updated_at", null: false
     t.index ["parent_company_id"], name: "index_companies_on_parent_company_id"
     t.index ["user_id"], name: "index_companies_on_user_id"
+  end
+
+  create_table "employee_group_appointments", force: :cascade do |t|
+    t.bigint "employee_group_id", null: false
+    t.string "appoint_to_type", null: false
+    t.bigint "appoint_to_id", null: false
+    t.string "name"
+    t.string "description"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["appoint_to_type", "appoint_to_id"], name: "index_employee_group_appointments_on_appoint_to"
+    t.index ["employee_group_id"], name: "index_employee_group_appointments_on_employee_group_id"
   end
 
   create_table "employee_groups", force: :cascade do |t|
@@ -138,6 +150,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_11_14_233907) do
 
   add_foreign_key "companies", "companies", column: "parent_company_id"
   add_foreign_key "companies", "users"
+  add_foreign_key "employee_group_appointments", "employee_groups"
   add_foreign_key "employee_groups", "companies"
   add_foreign_key "employees", "companies"
   add_foreign_key "employees", "users"

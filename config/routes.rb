@@ -1,4 +1,5 @@
 Rails.application.routes.draw do
+  resources :employee_group_appointments
   resources :employees
   resources :employee_groups
   resources :tag_appointments
