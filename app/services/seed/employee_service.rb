@@ -20,7 +20,7 @@ class Seed::EmployeeService
           # discarded_at: should_discard ? Time.zone.now - rand(1..30).days : nil
         )
 
-        employee.attach_tag(name: "Employee #{employee} Tag")
+        employee.attach_tag(name: "Employee #{employee.id} Tag")
       end
     end
   end
