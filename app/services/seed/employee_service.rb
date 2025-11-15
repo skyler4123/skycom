@@ -9,7 +9,7 @@ class Seed::EmployeeService
     Company.all.each do |company|
       EMPLOYEES_PER_COMPANY.times do |index|
         assigned_user = Seed::UserService.create(username: "company_#{company.id}_employee", index: index)
-        Employee.create!(
+        employee = Employee.create!(
           user: assigned_user,
           company: company,
           name: Faker::Name.name,

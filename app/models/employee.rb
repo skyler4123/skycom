@@ -28,4 +28,6 @@ class Employee < ApplicationRecord
   has_many :employee_group_appointments, dependent: :destroy, as: :appoint_to
   has_many :employee_groups, through: :employee_group_appointments
 
+  has_many :tag_appointments, dependent: :destroy, as: :appoint_to
+  has_many :tags, through: :tag_appointments
 end
