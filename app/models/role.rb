@@ -31,6 +31,6 @@ class Role < ApplicationRecord
             scope: :company_id, 
             message: "A role with this name already exists." 
           }
-  # validates :status, presence: true
-  # validates :kind, presence: true
+  validates :status, presence: true
+  validates :kind, presence: true
 end

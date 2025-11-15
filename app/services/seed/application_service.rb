@@ -10,6 +10,11 @@ class Seed::ApplicationService
     Seed::EmployeeService.run
     Seed::EmployeeGroupAppointmentService.run
     Seed::RoleService.run
+    Seed::PolicyService.run
+
+
+
+
 
     self.puts_count
     

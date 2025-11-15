@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_11_15_053445) do
+ActiveRecord::Schema[8.0].define(version: 2025_11_15_055155) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -102,6 +102,21 @@ ActiveRecord::Schema[8.0].define(version: 2025_11_15_053445) do
     t.index ["user_id"], name: "index_employees_on_user_id"
   end
 
+  create_table "policies", force: :cascade do |t|
+    t.bigint "company_id", null: false
+    t.string "name"
+    t.string "description"
+    t.string "resource"
+    t.string "action"
+    t.integer "status"
+    t.integer "kind"
+    t.datetime "discarded_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["company_id"], name: "index_policies_on_company_id"
+    t.index ["discarded_at"], name: "index_policies_on_discarded_at"
+  end
+
   create_table "roles", force: :cascade do |t|
     t.bigint "company_id", null: false
     t.string "name"
@@ -167,6 +182,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_11_15_053445) do
   add_foreign_key "employee_groups", "companies"
   add_foreign_key "employees", "companies"
   add_foreign_key "employees", "users"
+  add_foreign_key "policies", "companies"
   add_foreign_key "roles", "companies"
   add_foreign_key "sessions", "users"
   add_foreign_key "sign_in_tokens", "users"
