@@ -37,13 +37,68 @@
   </div>
 
   <div class="my-5">
-    <%= form.label :kind %>
-    <%= form.number_field :kind, class: ["block shadow-sm rounded-md border px-3 py-2 mt-2 w-full", {"border-gray-400 focus:outline-blue-600": company.errors[:kind].none?, "border-red-400 focus:outline-red-600": company.errors[:kind].any?}] %>
+    <%= form.label :ownership_type %>
+    <%= form.number_field :ownership_type, class: ["block shadow-sm rounded-md border px-3 py-2 mt-2 w-full", {"border-gray-400 focus:outline-blue-600": company.errors[:ownership_type].none?, "border-red-400 focus:outline-red-600": company.errors[:ownership_type].any?}] %>
   </div>
 
   <div class="my-5">
     <%= form.label :business_type %>
     <%= form.number_field :business_type, class: ["block shadow-sm rounded-md border px-3 py-2 mt-2 w-full", {"border-gray-400 focus:outline-blue-600": company.errors[:business_type].none?, "border-red-400 focus:outline-red-600": company.errors[:business_type].any?}] %>
+  </div>
+
+  <div class="my-5">
+    <%= form.label :registration_number %>
+    <%= form.text_field :registration_number, class: ["block shadow-sm rounded-md border px-3 py-2 mt-2 w-full", {"border-gray-400 focus:outline-blue-600": company.errors[:registration_number].none?, "border-red-400 focus:outline-red-600": company.errors[:registration_number].any?}] %>
+  </div>
+
+  <div class="my-5">
+    <%= form.label :vat_id %>
+    <%= form.text_field :vat_id, class: ["block shadow-sm rounded-md border px-3 py-2 mt-2 w-full", {"border-gray-400 focus:outline-blue-600": company.errors[:vat_id].none?, "border-red-400 focus:outline-red-600": company.errors[:vat_id].any?}] %>
+  </div>
+
+  <div class="my-5">
+    <%= form.label :address_line_1 %>
+    <%= form.text_field :address_line_1, class: ["block shadow-sm rounded-md border px-3 py-2 mt-2 w-full", {"border-gray-400 focus:outline-blue-600": company.errors[:address_line_1].none?, "border-red-400 focus:outline-red-600": company.errors[:address_line_1].any?}] %>
+  </div>
+
+  <div class="my-5">
+    <%= form.label :city %>
+    <%= form.text_field :city, class: ["block shadow-sm rounded-md border px-3 py-2 mt-2 w-full", {"border-gray-400 focus:outline-blue-600": company.errors[:city].none?, "border-red-400 focus:outline-red-600": company.errors[:city].any?}] %>
+  </div>
+
+  <div class="my-5">
+    <%= form.label :postal_code %>
+    <%= form.text_field :postal_code, class: ["block shadow-sm rounded-md border px-3 py-2 mt-2 w-full", {"border-gray-400 focus:outline-blue-600": company.errors[:postal_code].none?, "border-red-400 focus:outline-red-600": company.errors[:postal_code].any?}] %>
+  </div>
+
+  <div class="my-5">
+    <%= form.label :country %>
+    <%= form.text_field :country, class: ["block shadow-sm rounded-md border px-3 py-2 mt-2 w-full", {"border-gray-400 focus:outline-blue-600": company.errors[:country].none?, "border-red-400 focus:outline-red-600": company.errors[:country].any?}] %>
+  </div>
+
+  <div class="my-5">
+    <%= form.label :email %>
+    <%= form.text_field :email, class: ["block shadow-sm rounded-md border px-3 py-2 mt-2 w-full", {"border-gray-400 focus:outline-blue-600": company.errors[:email].none?, "border-red-400 focus:outline-red-600": company.errors[:email].any?}] %>
+  </div>
+
+  <div class="my-5">
+    <%= form.label :phone_number %>
+    <%= form.text_field :phone_number, class: ["block shadow-sm rounded-md border px-3 py-2 mt-2 w-full", {"border-gray-400 focus:outline-blue-600": company.errors[:phone_number].none?, "border-red-400 focus:outline-red-600": company.errors[:phone_number].any?}] %>
+  </div>
+
+  <div class="my-5">
+    <%= form.label :website %>
+    <%= form.text_field :website, class: ["block shadow-sm rounded-md border px-3 py-2 mt-2 w-full", {"border-gray-400 focus:outline-blue-600": company.errors[:website].none?, "border-red-400 focus:outline-red-600": company.errors[:website].any?}] %>
+  </div>
+
+  <div class="my-5">
+    <%= form.label :employee_count %>
+    <%= form.number_field :employee_count, class: ["block shadow-sm rounded-md border px-3 py-2 mt-2 w-full", {"border-gray-400 focus:outline-blue-600": company.errors[:employee_count].none?, "border-red-400 focus:outline-red-600": company.errors[:employee_count].any?}] %>
+  </div>
+
+  <div class="my-5">
+    <%= form.label :fiscal_year_end_month %>
+    <%= form.number_field :fiscal_year_end_month, class: ["block shadow-sm rounded-md border px-3 py-2 mt-2 w-full", {"border-gray-400 focus:outline-blue-600": company.errors[:fiscal_year_end_month].none?, "border-red-400 focus:outline-red-600": company.errors[:fiscal_year_end_month].any?}] %>
   </div>
 
   <div class="my-5">

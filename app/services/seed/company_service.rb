@@ -1,12 +1,94 @@
+# This service seeds the database with Company records, ensuring each company
+# is associated with an existing User and populating all new fields 
+# (enums, addresses, registration info).
+
 class Seed::CompanyService
+  # Configuration for the number of companies per user
+  COMPANIES_PER_USER = 3
+  
+  # Business types to cycle through when seeding, focusing on the Education sector.
+  # Add or remove types here to control the seeded data mix.
+  BUSINESS_TYPE_CYCLE = %i[school university english_center training_provider].freeze
+  
   def self.run
+    puts "Seeding Company records..."
+    
+    # Get all available enum keys for random assignment
+    statuses = Company.statuses.keys
+    ownership_types = Company.ownership_types.keys
+    fiscal_months = Company.fiscal_year_end_month.keys
+    
+    total_companies_created = 0
+
     User.all.each do |user|
-      3.times do |n|
+      # Collect all companies created by this user so far to serve as potential parents
+      user_companies = [] 
+
+      COMPANIES_PER_USER.times do |n|
+        # Determine the business type by cycling through the defined array
+        cycled_business_type = BUSINESS_TYPE_CYCLE[n % BUSINESS_TYPE_CYCLE.length]
+        
+        # 1. Randomly pick enum values
+        random_status = statuses.sample
+        random_ownership = ownership_types.sample
+        random_fiscal_month = fiscal_months.sample
+
+        # 2. Randomly select a parent company from those already created by this user
+        parent = user_companies.sample 
+        
+        # 3. Randomly discard about 1 in 10 records
+        should_discard = rand(10) == 0
+        
+        # Generate a consistent name base for URL/Email, and a friendly name tag
+        base_name = Faker::Company.unique.name
+        company_name_tag = "#{base_name} #{cycled_business_type.to_s.titleize} ##{user.id}-#{n + 1}"
+        
+        # Determine domain extension based on type
+        domain_suffix = (cycled_business_type == :university || cycled_business_type == :school) ? ".edu" : ".com"
+        
         company = user.companies.create!(
-          name: "Company #{n}",
-          parent_company: user.companies.sample
+          # Associations
+          parent_company: parent,
+          
+          # Core Attributes
+          name: company_name_tag,
+          description: Faker::Company.catch_phrase,
+          
+          # Enums
+          status: random_status,
+          ownership_type: random_ownership,
+          business_type: cycled_business_type, # <-- NOW CYCLED
+          
+          # Administrative Fields
+          registration_number: Faker::Company.ein,
+          vat_id: Faker::Code.npi,
+          employee_count: rand(10..5000),
+
+          # Contact & Address Fields
+          address_line_1: Faker::Address.street_address,
+          city: Faker::Address.city,
+          postal_code: Faker::Address.postcode,
+          country: Faker::Address.country,
+          email: Faker::Internet.email(name: base_name),
+          phone_number: Faker::PhoneNumber.phone_number,
+          website: Faker::Internet.url(host: base_name.parameterize + domain_suffix),
+          
+          # Operational Fields
+          fiscal_year_end_month: random_fiscal_month,
+          
+          # Soft Deletion
+          discarded_at: should_discard ? Time.zone.now - rand(1..365).days : nil
         )
+        
+        user_companies << company # Add to list for potential parent assignment
+        total_companies_created += 1
       end
     end
+    
+    puts "Successfully created #{total_companies_created} Company records."
+  rescue => e
+    puts "Error during Company seeding: #{e.message}"
+    # Re-raise the error to halt the seed process if needed
+    raise
   end
 end
