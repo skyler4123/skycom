@@ -30,4 +30,8 @@ class Employee < ApplicationRecord
 
   has_many :tag_appointments, dependent: :destroy, as: :appoint_to
   has_many :tags, through: :tag_appointments
+
+  has_many :role_appointments, as: :appoint_to, dependent: :destroy
+  has_many :roles, through: :role_appointments
+
 end

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_11_15_061258) do
+ActiveRecord::Schema[8.0].define(version: 2025_11_15_065012) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -133,6 +133,22 @@ ActiveRecord::Schema[8.0].define(version: 2025_11_15_061258) do
     t.index ["policy_id"], name: "index_policy_appointments_on_policy_id"
   end
 
+  create_table "role_appointments", force: :cascade do |t|
+    t.bigint "role_id", null: false
+    t.string "appoint_to_type", null: false
+    t.bigint "appoint_to_id", null: false
+    t.string "name"
+    t.string "description"
+    t.integer "status"
+    t.integer "kind"
+    t.datetime "discarded_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["appoint_to_type", "appoint_to_id"], name: "index_role_appointments_on_appoint_to"
+    t.index ["discarded_at"], name: "index_role_appointments_on_discarded_at"
+    t.index ["role_id"], name: "index_role_appointments_on_role_id"
+  end
+
   create_table "roles", force: :cascade do |t|
     t.bigint "company_id", null: false
     t.string "name"
@@ -200,6 +216,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_11_15_061258) do
   add_foreign_key "employees", "users"
   add_foreign_key "policies", "companies"
   add_foreign_key "policy_appointments", "policies"
+  add_foreign_key "role_appointments", "roles"
   add_foreign_key "roles", "companies"
   add_foreign_key "sessions", "users"
   add_foreign_key "sign_in_tokens", "users"

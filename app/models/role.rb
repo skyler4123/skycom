@@ -8,6 +8,14 @@ class Role < ApplicationRecord
   has_many :tag_appointments, dependent: :destroy, as: :appoint_to
   has_many :tags, through: :tag_appointments
 
+  has_many :employee_group_appointments, dependent: :destroy, as: :appoint_to
+  has_many :employee_groups, through: :employee_group_appointments
+
+  has_many :role_appointments, dependent: :destroy, as: :appoint_to
+  has_many :employee_groups, through: :role_appointments, source: :appoint_to, source_type: "EmployeeGroup"
+  has_many :employees, through: :role_appointments, source: :appoint_to, source_type: "Employee"
+
+
   # --- Soft Deletion (Discard) ---
   # If you are using a gem like 'Discard' or similar for soft deletion:
   # include Discard::Model 
