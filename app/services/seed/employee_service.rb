@@ -19,6 +19,8 @@ class Seed::EmployeeService
           # Set a random discarded_at time if the record should be discarded
           # discarded_at: should_discard ? Time.zone.now - rand(1..30).days : nil
         )
+
+        employee.attach_tag(name: "Employee #{employee} Tag")
       end
     end
   end
