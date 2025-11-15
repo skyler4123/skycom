@@ -8,7 +8,7 @@ class Seed::ApplicationService
     Seed::TagService.run
     Seed::EmployeeGroupService.run
     Seed::EmployeeService.run
-
+    Seed::EmployeeGroupAppointmentService.run
 
 
     self.puts_count
