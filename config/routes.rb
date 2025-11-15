@@ -1,4 +1,5 @@
 Rails.application.routes.draw do
+  resources :roles
   resources :employee_group_appointments
   resources :employees
   resources :employee_groups

@@ -9,7 +9,7 @@ class Seed::ApplicationService
     Seed::EmployeeGroupService.run
     Seed::EmployeeService.run
     Seed::EmployeeGroupAppointmentService.run
-
+    Seed::RoleService.run
 
     self.puts_count
     

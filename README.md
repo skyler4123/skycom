@@ -53,8 +53,8 @@ Things you may want to cover:
 
 
 
-  bundle exec rails g scaffold Role name description kind:integer  discarded_at:datetime:index --force --force
-  bundle exec rails g scaffold Policy name description resource action kind:integer  discarded_at:datetime:index --force --force
+  bundle exec rails g scaffold Role company:references name description status:integer kind:integer discarded_at:datetime:index --force
+  bundle exec rails g scaffold Policy name description resource action kind:integer  discarded_at:datetime:index --force
   bundle exec rails g scaffold PolicyRoleAppointment role:references policy:references --force
   bundle exec rails g scaffold RoleAppointment user:references appoint_to:references{polymorphic} role:references --force
 
