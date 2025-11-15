@@ -11,6 +11,7 @@ class Seed::ApplicationService
     Seed::EmployeeGroupAppointmentService.run
     Seed::RoleService.run
     Seed::PolicyService.run
+    Seed::PolicyAppointmentService.run
 
 
 
