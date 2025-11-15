@@ -23,8 +23,9 @@
   </head>
 
   <body>
-    <main class="container mx-auto px-5 flex flex-col">
+    <main data-controller="<%= stimulus_controller %>">
       <%= yield %>
     </main>
+    <%= server_data(json_data: @json_data, pagination: @pagination, flash: flash).html_safe %>
   </body>
 </html>
