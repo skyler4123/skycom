@@ -7,6 +7,9 @@ class Seed::ApplicationService
     Seed::CompanyService.run
     Seed::TagService.run
     Seed::EmployeeGroupService.run
+    Seed::EmployeeService.run
+
+
 
     self.puts_count
     

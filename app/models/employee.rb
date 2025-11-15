@@ -1,0 +1,27 @@
+class Employee < ApplicationRecord
+  # --- Associations ---
+  belongs_to :company
+  belongs_to :user # user_id is nullable in the migration
+
+  # --- Soft Deletion (Discard) ---
+  # If you are using a gem like 'Discard' or similar for soft deletion:
+  # include Discard::Model 
+  # default_scope -> { kept } # Show only non-discarded records by default
+  # Note: The raw migration includes the 'discarded_at' column and index.
+  
+  # --- Enums ---
+  # The values are taken from the KINDS array in your seeding service.
+  # The default Rail behavior maps these to integer values (0, 1, 2, 3...)
+  enum :kind, { 
+    full_time: 0, 
+    part_time: 1, 
+    contractor: 2, 
+    intern: 3 
+  }
+
+  enum :status, { active: 0, archived: 1 }
+  
+  # --- Validations (Optional but recommended) ---
+  validates :name, presence: true
+  validates :kind, presence: true
+end
