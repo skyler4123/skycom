@@ -8,7 +8,8 @@ RSpec.describe "companies/show", type: :view do
       name: "Name",
       description: "Description",
       status: 2,
-      kind: 3
+      kind: 3,
+      business_type: 4
     ))
   end
 
@@ -20,5 +21,6 @@ RSpec.describe "companies/show", type: :view do
     expect(rendered).to match(/Description/)
     expect(rendered).to match(/2/)
     expect(rendered).to match(/3/)
+    expect(rendered).to match(/4/)
   end
 end

@@ -9,7 +9,8 @@ RSpec.describe "companies/index", type: :view do
         name: "Name",
         description: "Description",
         status: 2,
-        kind: 3
+        kind: 3,
+        business_type: 4
       ),
       Company.create!(
         user: nil,
@@ -17,7 +18,8 @@ RSpec.describe "companies/index", type: :view do
         name: "Name",
         description: "Description",
         status: 2,
-        kind: 3
+        kind: 3,
+        business_type: 4
       )
     ])
   end
@@ -31,5 +33,6 @@ RSpec.describe "companies/index", type: :view do
     assert_select cell_selector, text: Regexp.new("Description".to_s), count: 2
     assert_select cell_selector, text: Regexp.new(2.to_s), count: 2
     assert_select cell_selector, text: Regexp.new(3.to_s), count: 2
+    assert_select cell_selector, text: Regexp.new(4.to_s), count: 2
   end
 end
