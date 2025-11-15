@@ -1,6 +1,6 @@
 class Seed::EmployeeService
-  # Define the available kinds for the 'kind' attribute (assuming an enum structure)
-  KINDS = Employee.kinds.keys
+  # Define the available business_types for the 'business_type' attribute (assuming an enum structure)
+  BUSINESS_TYPES = Employee.business_types.keys
   
   # Configuration for the number of employees per company
   EMPLOYEES_PER_COMPANY = 5
@@ -15,7 +15,7 @@ class Seed::EmployeeService
           name: Faker::Name.name,
           # Generate a short, relevant description
           description: Faker::Job.title + ' in ' + Faker::Commerce.department, 
-          kind: KINDS.sample, 
+          business_type: BUSINESS_TYPES.sample, 
           # Set a random discarded_at time if the record should be discarded
           # discarded_at: should_discard ? Time.zone.now - rand(1..30).days : nil
         )

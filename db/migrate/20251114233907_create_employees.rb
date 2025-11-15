@@ -6,7 +6,7 @@ class CreateEmployees < ActiveRecord::Migration[8.0]
       t.string :name
       t.string :description
       t.integer :status
-      t.integer :kind
+      t.integer :business_type
       t.datetime :discarded_at
 
       t.timestamps

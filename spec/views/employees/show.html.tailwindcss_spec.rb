@@ -8,7 +8,7 @@ RSpec.describe "employees/show", type: :view do
       name: "Name",
       description: "Description",
       status: 2,
-      kind: 3
+      business_type: 3
     ))
   end
 

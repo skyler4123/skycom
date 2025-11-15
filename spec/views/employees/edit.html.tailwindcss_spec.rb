@@ -8,7 +8,7 @@ RSpec.describe "employees/edit", type: :view do
       name: "MyString",
       description: "MyString",
       status: 1,
-      kind: 1
+      business_type: 1
     )
   }
 
@@ -31,7 +31,7 @@ RSpec.describe "employees/edit", type: :view do
 
       assert_select "input[name=?]", "employee[status]"
 
-      assert_select "input[name=?]", "employee[kind]"
+      assert_select "input[name=?]", "employee[business_type]"
     end
   end
 end

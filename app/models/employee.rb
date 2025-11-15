@@ -12,7 +12,7 @@ class Employee < ApplicationRecord
   # --- Enums ---
   # The values are taken from the KINDS array in your seeding service.
   # The default Rail behavior maps these to integer values (0, 1, 2, 3...)
-  enum :kind, { 
+  enum :business_type, { 
     full_time: 0, 
     part_time: 1, 
     contractor: 2, 
@@ -23,7 +23,7 @@ class Employee < ApplicationRecord
   
   # --- Validations (Optional but recommended) ---
   validates :name, presence: true
-  validates :kind, presence: true
+  validates :business_type, presence: true
 
   has_many :employee_group_appointments, dependent: :destroy, as: :appoint_to
   has_many :employee_groups, through: :employee_group_appointments
