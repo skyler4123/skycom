@@ -34,7 +34,7 @@ export default class LayoutController extends ApplicationController {
   openProfileDropdown() {
     this.isOpenProfileDropdownValue = !this.isOpenProfileDropdownValue
   }
-  
+
   isOpenProfileDropdownValueChanged(value, previousValue) {
     if (value) {
       this.profileDropdownTarget.innerHTML = this.profileDropdownHTML()
@@ -58,18 +58,23 @@ export default class LayoutController extends ApplicationController {
     if (isSignedIn()) {
       return `
         <div
-          class="relative w-10 h-10 overflow-hidden bg-gray-100 rounded-full dark:bg-gray-600 cursor-pointer"
+          class="w-10 h-10 overflow-hidden bg-gray-100 rounded-full dark:bg-gray-600 cursor-pointer"
           data-action="click->${this.identifier}#openProfileDropdown"
         >
-          ${avatar() ? 
-            `<img class="w-10 h-10 rounded-full" src="${avatar()}" alt="Rounded avatar">`
+          ${avatar() ?
+          `<img class="w-10 h-10 rounded-full" src="${avatar()}" alt="Rounded avatar">`
           :
-            `<svg class="absolute w-12 h-12 text-gray-400 -left-1" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"></path></svg>`
-          }
+          `<svg class="absolute w-12 h-12 text-gray-400 -left-1" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"></path></svg>`
+        }
           <div
             data-${this.identifier}-target="profileDropdown"
-            class="absolute"
+            class="absolute right-0 z-90 border-2 border-black bg-red-700"
           >
+            <div class="flex flex-col gap-y-2 p-2 w-full">
+              <div>${Cookie("email")}</div>
+              <a href="/users/${Cookie("id")}">Profile</a>
+              <a href="/sign_out">Sign Out</a>
+            </div>
           </div>
         </div>
       `
