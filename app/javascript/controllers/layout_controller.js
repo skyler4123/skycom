@@ -23,6 +23,10 @@ export default class LayoutController extends ApplicationController {
     this.element.innerHTML = this.layoutHTML()
   }
 
+  contentHTML() {
+    return this.serverHTML
+  }
+
   layoutHTML() {
     return `
     <!-- Header: Sticky, White Background, Shadow, Responsive -->
@@ -64,7 +68,7 @@ export default class LayoutController extends ApplicationController {
     <!-- Main Content: Takes up remaining vertical space -->
     <main class="flex-grow bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100">
       <article class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        ${this.serverHTML}
+        ${this.contentHTML()}
       </article>
     </main>
 
