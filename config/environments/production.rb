@@ -88,3 +88,13 @@ Rails.application.configure do
   # Skip DNS rebinding protection for the default health check endpoint.
   # config.host_authorization = { exclude: ->(request) { request.path == "/up" } }
 end
+
+
+
+Rails.application.configure do
+  # Change to :null_store to avoid any caching.
+  config.cache_store = :solid_cache_store
+
+  # Store uploaded files on the local file system (see config/storage.yml for options).
+  config.active_storage.service = :minio
+end

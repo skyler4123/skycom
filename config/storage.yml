@@ -32,3 +32,12 @@ local:
 #   service: Mirror
 #   primary: local
 #   mirrors: [ amazon, google, microsoft ]
+
+minio:
+  service: S3
+  access_key_id: <%= Rails.application.credentials.dig(:minio_access_key_id) || "minioadmin" %>
+  secret_access_key: <%= Rails.application.credentials.dig(:minio_secret_access_key) || "minioadmin" %>
+  bucket: <%= Rails.application.credentials.dig(:minio_bucket_name) || "skycom-development" %>
+  region: us-east-1
+  endpoint: <%= Rails.application.credentials.dig(:minio_endpoint) || "http://localhost:9000" %> # Internal endpoint for Rails to connect to MinIO
+  force_path_style: true
