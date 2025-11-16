@@ -26,7 +26,7 @@ export default class LayoutController extends ApplicationController {
   layoutHTML() {
     return `
     <!-- Header: Sticky, White Background, Shadow, Responsive -->
-    <header class="sticky top-0 z-10 bg-white shadow-md border-b border-gray-200">
+    <header class="sticky top-0 z-10 bg-white dark:bg-gray-800 shadow-md border-b border-gray-200 dark:border-gray-700">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex justify-between items-center h-16">
         
         <!-- Logo -->
@@ -39,10 +39,10 @@ export default class LayoutController extends ApplicationController {
         <!-- Navigation (Desktop) -->
         <nav class="hidden sm:flex">
           <ul class="flex space-x-8">
-            <li><a href="#" class="text-gray-700 hover:text-indigo-600 font-medium transition duration-150">Home</a></li>
-            <li><a href="#" class="text-gray-700 hover:text-indigo-600 font-medium transition duration-150">Product</a></li>
-            <li><a href="#" class="text-gray-700 hover:text-indigo-600 font-medium transition duration-150">Pricing</a></li>
-            <li><a href="#" class="text-gray-700 hover:text-indigo-600 font-medium transition duration-150">What's new</a></li>
+            <li><a href="#" class="text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 font-medium transition duration-150">Home</a></li>
+            <li><a href="#" class="text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 font-medium transition duration-150">Product</a></li>
+            <li><a href="#" class="text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 font-medium transition duration-150">Pricing</a></li>
+            <li><a href="#" class="text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 font-medium transition duration-150">What's new</a></li>
           </ul>
         </nav>
         
@@ -53,7 +53,7 @@ export default class LayoutController extends ApplicationController {
             Log in
           </a>
           <!-- Placeholder for Mobile Menu Button (if needed) -->
-          <button class="md:hidden text-gray-700 hover:text-indigo-600">
+          <button class="md:hidden text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400">
             <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
           </button>
         </div>
@@ -62,7 +62,7 @@ export default class LayoutController extends ApplicationController {
     </header>
     
     <!-- Main Content: Takes up remaining vertical space -->
-    <main class="flex-grow">
+    <main class="flex-grow bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100">
       <article class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         ${this.serverHTML}
       </article>
