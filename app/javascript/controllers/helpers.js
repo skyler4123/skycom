@@ -29,3 +29,44 @@ export const isString = (x) => {
 export const isNumber = (x) => {
   return typeof x === "number"
 }
+
+
+
+// get Cookie object
+export const Cookie = (name) => {
+  let cookie = {}
+  document.cookie.split(';').forEach(function(el) {
+    let [k,v] = el.split('=');
+    let value = decodeURIComponent(v);
+    value = value.replace("+", ' ');
+    cookie[k.trim()] = value;
+  })
+  if (name) {
+    return cookie[name]
+  } else {
+    return cookie
+  }
+}
+
+// set Cookie object
+export const setCookie = (name, value, days) => {
+  let expires = ""
+  if (days) {
+    let date = new Date()
+    date.setTime(date.getTime() + (days*24*60*60*1000))
+    expires = "; expires=" + date.toUTCString()
+  }
+  document.cookie = name + "=" + value + expires + "; path=/"
+}
+
+// check isSignedIn by check is_signed_in in cookie
+export const isSignedIn = () => {
+  return Cookie('is_signed_in') && Cookie('is_signed_in') === 'true'
+}
+
+export const avatar = () => {
+  return Cookie('avatar')
+}
+export const email = () => {
+  return Cookie('email')
+}

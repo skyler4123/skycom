@@ -1,6 +1,7 @@
 import PaginationController from "controllers/pagination_controller"
 import ApplicationController from "controllers/application_controller"
 import DarkmodeController from "controllers/darkmode_controller"
+import { isSignedIn, avatar } from "controllers/helpers"
 
 export default class LayoutController extends ApplicationController {
   static values = {
@@ -10,6 +11,7 @@ export default class LayoutController extends ApplicationController {
   }
 
   initBinding() {
+    console.log(isSignedIn())
     this.serverHTML = this.element.innerHTML
     this.paginationController = PaginationController
     this.flashValue = ServerData.flash || {}
@@ -25,6 +27,23 @@ export default class LayoutController extends ApplicationController {
 
   contentHTML() {
     return this.serverHTML
+  }
+
+  authSectionHTML() {
+    // avatar()
+    if (isSignedIn()) {
+      return `
+        <div>
+          <img class="w-10 h-10 rounded-full" src="${avatar()}" alt="Rounded avatar">
+        </div>
+      `
+    } else {
+      return `
+        <a href="/sign_in" class="px-4 py-2 border border-transparent text-sm font-medium rounded-lg shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition duration-150">
+          Log in
+        </a>
+      `
+    }
   }
 
   layoutHTML() {
@@ -53,9 +72,7 @@ export default class LayoutController extends ApplicationController {
         <!-- Action/Login -->
         <div class="flex items-center space-x-4">
           <div class="flex flex-row" data-controller="${DarkmodeController.identifier}"></div>
-          <a href="/sign_in" class="px-4 py-2 border border-transparent text-sm font-medium rounded-lg shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition duration-150">
-            Log in
-          </a>
+          ${this.authSectionHTML()}
           <!-- Placeholder for Mobile Menu Button (if needed) -->
           <button class="md:hidden text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400">
             <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
@@ -66,7 +83,7 @@ export default class LayoutController extends ApplicationController {
     </header>
     
     <!-- Main Content: Takes up remaining vertical space -->
-    <main class="flex-grow bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100">
+    <main class="flex grow bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100">
       <article class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         ${this.contentHTML()}
       </article>
