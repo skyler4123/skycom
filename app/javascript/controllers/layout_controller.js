@@ -1,5 +1,6 @@
 import PaginationController from "controllers/pagination_controller"
 import ApplicationController from "controllers/application_controller"
+import DarkmodeController from "controllers/darkmode_controller"
 
 export default class LayoutController extends ApplicationController {
   static values = {
@@ -29,7 +30,7 @@ export default class LayoutController extends ApplicationController {
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex justify-between items-center h-16">
         
         <!-- Logo -->
-        <div class="flex-shrink-0">
+        <div class="flex shrink-0">
           <a href="/" class="text-2xl font-extrabold text-indigo-600 tracking-wider hover:text-indigo-800 transition duration-150">
             SKYCOM
           </a>
@@ -47,6 +48,7 @@ export default class LayoutController extends ApplicationController {
         
         <!-- Action/Login -->
         <div class="flex items-center space-x-4">
+          <div class="flex flex-row" data-controller="${DarkmodeController.identifier}"></div>
           <a href="/sign_in" class="px-4 py-2 border border-transparent text-sm font-medium rounded-lg shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition duration-150">
             Log in
           </a>
