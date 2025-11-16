@@ -22,10 +22,12 @@
     <%= javascript_importmap_tags %>
   </head>
 
-  <body>
-    <main data-controller="<%= stimulus_controller %>">
+  <body
+    data-controller="responsive language svg darkmode img authentication authorization"
+  >
+    <div data-controller="<%= stimulus_controller %>">
       <%= yield %>
-    </main>
-    <%= server_data(json_data: @json_data, pagination: @pagination, flash: flash).html_safe %>
+    </div>
+    <%= server_data(data: @json_data, pagination: @pagination, flash: flash).html_safe %>
   </body>
 </html>

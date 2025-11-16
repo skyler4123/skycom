@@ -1,8 +1,8 @@
-import ApplicationController from "controllers/application_controller"
+import LayoutController from "controllers/layout_controller"
 
-export default class Home_IndexController extends ApplicationController {
+export default class Home_IndexController extends LayoutController {
 
-  initialize() {
-    console.log("initialize")
-  }
+  // initialize() {
+  //   console.log("initialize")
+  // }
 }
