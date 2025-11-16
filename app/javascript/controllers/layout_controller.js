@@ -1,13 +1,15 @@
 import PaginationController from "controllers/pagination_controller"
 import ApplicationController from "controllers/application_controller"
 import DarkmodeController from "controllers/darkmode_controller"
-import { isSignedIn, avatar, openPopover, Cookie } from "controllers/helpers"
+import { isSignedIn, avatar, Cookie } from "controllers/helpers"
 
 export default class LayoutController extends ApplicationController {
+  static targets = ["profileDropdown"]
   static values = {
     pagination: { type: Object, default: {} },
     flash: { type: Object, default: {} },
     data: { type: Object, default: {} },
+    isOpenProfileDropdown: { type: Boolean, default: false },
   }
 
   initBinding() {
@@ -29,15 +31,16 @@ export default class LayoutController extends ApplicationController {
     return this.serverHTML
   }
 
-  openProfileDropdown(event) {
-    if (!isSignedIn()) return
-    const target = event.currentTarget
-    openPopover({
-      parentElement: target,
-      html: this.profileDropdownHTML(),
-      position: 'bottom-left',
-      popupClass: 'bg-white !border !border-gray-200 !w-75 -translate-x-full'
-    })
+  openProfileDropdown() {
+    this.isOpenProfileDropdownValue = !this.isOpenProfileDropdownValue
+  }
+  
+  isOpenProfileDropdownValueChanged(value, previousValue) {
+    if (value) {
+      this.profileDropdownTarget.innerHTML = this.profileDropdownHTML()
+    } else {
+      this.profileDropdownTarget.innerHTML = ''
+    }
   }
 
   profileDropdownHTML() {
@@ -63,6 +66,11 @@ export default class LayoutController extends ApplicationController {
           :
             `<svg class="absolute w-12 h-12 text-gray-400 -left-1" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"></path></svg>`
           }
+          <div
+            data-${this.identifier}-target="profileDropdown"
+            class="absolute"
+          >
+          </div>
         </div>
       `
     } else {
@@ -91,7 +99,17 @@ export default class LayoutController extends ApplicationController {
         <nav class="hidden sm:flex">
           <ul class="flex space-x-8">
             <li><a href="#" class="text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 font-medium transition duration-150">Home</a></li>
-            <li><a href="#" class="text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 font-medium transition duration-150">Product</a></li>
+            <li
+              class="flex flex-row gap-x-1 cursor-pointer group"
+              data-action="click->${this.identifier}#openProductMenu"
+            >
+              <div class="text-gray-700 dark:text-gray-300 group-hover:text-indigo-600 group-hover:hover:text-indigo-400 font-medium transition duration-150">Product</div>
+              <div class="flex justify-center items-center cl">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-5 group-hover:stroke-indigo-600 group-hover:hover:stroke-indigo-400">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" />
+                </svg>
+              </div>
+            </li>
             <li><a href="#" class="text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 font-medium transition duration-150">Pricing</a></li>
             <li><a href="#" class="text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 font-medium transition duration-150">What's new</a></li>
           </ul>
@@ -100,7 +118,7 @@ export default class LayoutController extends ApplicationController {
         <!-- Action/Login -->
         <div class="flex items-center space-x-4">
           <div class="flex flex-row" data-controller="${DarkmodeController.identifier}"></div>
-          ${this.authSectionHTML()}
+            ${this.authSectionHTML()}
           <!-- Placeholder for Mobile Menu Button (if needed) -->
           <button class="md:hidden text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400">
             <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
