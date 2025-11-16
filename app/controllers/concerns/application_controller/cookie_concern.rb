@@ -9,9 +9,5 @@ module ApplicationController::CookieConcern
       cookies.permanent[:avatar] = user.avatar || user.avatar_path
       cookies.permanent[:is_signed_in] = true
     end
-
-    def clear_cookie_for_sign_out
-      cookies.clear
-    end
   end
 end

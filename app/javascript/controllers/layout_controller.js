@@ -1,7 +1,7 @@
 import PaginationController from "controllers/pagination_controller"
 import ApplicationController from "controllers/application_controller"
 import DarkmodeController from "controllers/darkmode_controller"
-import { isSignedIn, avatar } from "controllers/helpers"
+import { isSignedIn, avatar, openPopover, Cookie } from "controllers/helpers"
 
 export default class LayoutController extends ApplicationController {
   static values = {
@@ -29,11 +29,35 @@ export default class LayoutController extends ApplicationController {
     return this.serverHTML
   }
 
+  openProfileDropdown(event) {
+    if (!isSignedIn()) return
+    const target = event.currentTarget
+    openPopover({
+      parentElement: target,
+      html: this.profileDropdownHTML(),
+      position: 'bottom-left',
+      popupClass: 'bg-white !border !border-gray-200 !w-75 -translate-x-full'
+    })
+  }
+
+  profileDropdownHTML() {
+    return `
+      <div class="flex flex-col gap-y-2 p-2 w-full">
+        <div>${Cookie("email")}</div>
+        <a href="/users/${Cookie("id")}">Profile</a>
+        <a href="/sign_out">Sign Out</a>
+      </div>
+    `
+  }
+
   authSectionHTML() {
     // avatar()
     if (isSignedIn()) {
       return `
-        <div class="relative w-10 h-10 overflow-hidden bg-gray-100 rounded-full dark:bg-gray-600">
+        <div
+          class="relative w-10 h-10 overflow-hidden bg-gray-100 rounded-full dark:bg-gray-600 cursor-pointer"
+          data-action="click->${this.identifier}#openProfileDropdown"
+        >
           ${avatar() ? 
             `<img class="w-10 h-10 rounded-full" src="${avatar()}" alt="Rounded avatar">`
           :

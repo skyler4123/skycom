@@ -70,9 +70,6 @@ export const isSignedIn = () => {
 export const avatar = () => {
   return Cookie('avatar')
 }
-export const email = () => {
-  return Cookie('email')
-}
 
 
 
