@@ -32,6 +32,11 @@ class User < ApplicationRecord
 
 
 
+
+
+  
+  include User::AvatarConcern
+
   has_many :companies, dependent: :destroy
   has_many :employees, dependent: :destroy
 end

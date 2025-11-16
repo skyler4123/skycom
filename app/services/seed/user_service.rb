@@ -9,11 +9,12 @@ class Seed::UserService
   end
 
   def self.create(username: "user", index: "")
-    User.create!(
+    user = User.create!(
       email: "#{username}#{index}@example.com",
       password: "Password@1234",
       password_confirmation: "Password@1234",
       verified: true
     )
+    Seeding::AttachmentService.attach(record: user, relation: :avatar_attachment, number: 1)
   end
 end
