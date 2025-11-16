@@ -8,8 +8,9 @@ class Company < ApplicationRecord
   has_many :roles, dependent: :destroy
   has_many :policies, dependent: :destroy
 
-  has_many :child_companies, class_name: "Company", foreign_key: "parent_company_id", dependent: :destroy
+  # Self-referencing association for company hierarchy
   belongs_to :parent_company, class_name: "Company", optional: true
+  has_many :child_companies, class_name: "Company", foreign_key: "parent_company_id", dependent: :destroy, inverse_of: :parent_company
 
   # --- Enums ---
   enum :status, { 
