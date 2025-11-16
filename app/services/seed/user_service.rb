@@ -15,6 +15,7 @@ class Seed::UserService
       password_confirmation: "Password@1234",
       verified: true
     )
-    Seeding::AttachmentService.attach(record: user, relation: :avatar_attachment, number: 1)
+    Seed::AttachmentService.attach(record: user, relation: :avatar_attachment, number: 1)
+    user
   end
 end

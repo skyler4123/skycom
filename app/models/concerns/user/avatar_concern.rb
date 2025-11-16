@@ -2,7 +2,7 @@ module User::AvatarConcern
   extend ActiveSupport::Concern
 
   included do
-    has_one_attached :avatar_attachment  do |attachable|
+    has_one_attached :avatar_attachment, dependent: :purge_later do |attachable|
       attachable.variant :full, resize_to_limit: [ 300, 300 ]
       attachable.variant :thumb, resize_to_limit: [ 50, 50 ]
     end

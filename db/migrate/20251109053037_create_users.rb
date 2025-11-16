@@ -9,7 +9,17 @@ class CreateUsers < ActiveRecord::Migration[8.0]
       t.string :provider
       t.string :uid
 
+      t.string :username
+      t.string :first_name
+      t.string :last_name
+      t.string :avatar
+      t.string :phone_number
+      t.string :country_code
+      t.references :address, null: true, foreign_key: true
+      t.datetime :discarded_at
+  
       t.timestamps
     end
+    add_index :users, :discarded_at
   end
 end
