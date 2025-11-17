@@ -4,12 +4,13 @@ import DarkmodeController from "controllers/darkmode_controller"
 import { isSignedIn, avatar, Cookie } from "controllers/helpers"
 
 export default class LayoutController extends ApplicationController {
-  static targets = ["profileDropdown"]
+  static targets = ["profileDropdown", "headerSubmenu"]
   static values = {
     pagination: { type: Object, default: {} },
     flash: { type: Object, default: {} },
     data: { type: Object, default: {} },
     isOpenProfileDropdown: { type: Boolean, default: false },
+    isOpenProductDropdown: { type: Boolean, default: false },
   }
 
   initBinding() {
@@ -35,6 +36,10 @@ export default class LayoutController extends ApplicationController {
     this.isOpenProfileDropdownValue = !this.isOpenProfileDropdownValue
   }
 
+  openProductDropdown() {
+    this.isOpenProductDropdownValue = !this.isOpenProductDropdownValue
+  }
+
   isOpenProfileDropdownValueChanged(value, previousValue) {
     if (value) {
       this.profileDropdownTarget.innerHTML = this.profileDropdownHTML()
@@ -43,9 +48,31 @@ export default class LayoutController extends ApplicationController {
     }
   }
 
+  isOpenProductDropdownValueChanged(value, previousValue) {
+    if (value) {
+      this.headerSubmenuTarget.innerHTML = this.productDropdownHTML()
+    } else {
+      this.headerSubmenuTarget.innerHTML = ''
+    }
+  }
+
+  productDropdownHTML() {
+    return `
+      <div>
+        <a href="/companies/new">Create Company</a>
+        <a href="/companies/new">Create School/University</a>
+        <a href="/companies/new">Create Shop</a>
+        <a href="/companies/new">Create Restaurant</a>
+        <a href="/companies/new">Create Hospital</a>
+        <a href="/companies/new">Create Service Company</a>
+
+      </div>
+    `
+  }
+
   profileDropdownHTML() {
     return `
-      <div class="flex flex-col gap-y-2 p-2 w-full">
+      <div class="flex flex-col gap-y-2 p-2 w-full border-2 border-black rounded-xl">
         <div>${Cookie("email")}</div>
         <a href="/users/${Cookie("id")}">Profile</a>
         <a href="/sign_out">Sign Out</a>
@@ -58,7 +85,7 @@ export default class LayoutController extends ApplicationController {
     if (isSignedIn()) {
       return `
         <div
-          class="w-10 h-10 overflow-hidden bg-gray-100 rounded-full dark:bg-gray-600 cursor-pointer"
+          class="relative w-10 h-10 bg-gray-100 rounded-full dark:bg-gray-600 cursor-pointer"
           data-action="click->${this.identifier}#openProfileDropdown"
         >
           ${avatar() ?
@@ -68,7 +95,7 @@ export default class LayoutController extends ApplicationController {
         }
           <div
             data-${this.identifier}-target="profileDropdown"
-            class="absolute right-0 z-90 border-2 border-black bg-red-700"
+            class="absolute right-0 -bottom-2 translate-y-full z-20"
           >
             <div class="flex flex-col gap-y-2 p-2 w-full">
               <div>${Cookie("email")}</div>
@@ -90,7 +117,7 @@ export default class LayoutController extends ApplicationController {
   layoutHTML() {
     return `
     <!-- Header: Sticky, White Background, Shadow, Responsive -->
-    <header class="sticky top-0 z-10 bg-white dark:bg-gray-800 shadow-md border-b border-gray-200 dark:border-gray-700">
+    <header class="relative bg-white dark:bg-gray-800 shadow-md border-b border-gray-200 dark:border-gray-700">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex justify-between items-center h-16">
         
         <!-- Logo -->
@@ -106,7 +133,7 @@ export default class LayoutController extends ApplicationController {
             <li><a href="#" class="text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 font-medium transition duration-150">Home</a></li>
             <li
               class="flex flex-row gap-x-1 cursor-pointer group"
-              data-action="click->${this.identifier}#openProductMenu"
+              data-action="click->${this.identifier}#openProductDropdown"
             >
               <div class="text-gray-700 dark:text-gray-300 group-hover:text-indigo-600 group-hover:hover:text-indigo-400 font-medium transition duration-150">Product</div>
               <div class="flex justify-center items-center cl">
@@ -130,6 +157,11 @@ export default class LayoutController extends ApplicationController {
           </button>
         </div>
 
+      </div>
+      <div
+        data-${this.identifier}-target="headerSubmenu"
+        class="absolute w-full bottom-0 translate-y-full"
+      >
       </div>
     </header>
     
