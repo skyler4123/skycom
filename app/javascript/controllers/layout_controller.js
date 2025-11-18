@@ -2,19 +2,21 @@ import PaginationController from "controllers/pagination_controller"
 import ApplicationController from "controllers/application_controller"
 import DarkmodeController from "controllers/darkmode_controller"
 import { isSignedIn, avatar, Cookie } from "controllers/helpers"
+import { useClickOutside } from 'stimulus-use'
 
 export default class LayoutController extends ApplicationController {
-  static targets = ["profileDropdown", "headerSubmenu"]
+  static targets = ["profileDropdown", "headerSubmenuContainer", "headerSubmenuContent"]
   static values = {
     pagination: { type: Object, default: {} },
     flash: { type: Object, default: {} },
     data: { type: Object, default: {} },
     isOpenProfileDropdown: { type: Boolean, default: false },
-    isOpenProductDropdown: { type: Boolean, default: false },
+    isOpenHeaderSubmenu: { type: Boolean, default: false },
+    currentHeaderSubmenuName: { type: String, default: "" },
   }
 
   initBinding() {
-    console.log(isSignedIn())
+    console.log(this)
     this.serverHTML = this.element.innerHTML
     this.paginationController = PaginationController
     this.flashValue = ServerData.flash || {}
@@ -36,8 +38,11 @@ export default class LayoutController extends ApplicationController {
     this.isOpenProfileDropdownValue = !this.isOpenProfileDropdownValue
   }
 
-  openProductDropdown() {
-    this.isOpenProductDropdownValue = !this.isOpenProductDropdownValue
+  toggleHeaderSubmenu(event) {
+    console.log(event.target)
+    event.preventDefault()
+    this.currentHeaderSubmenuNameValue = event.params.headerSubmenuName
+    this.isOpenHeaderSubmenuValue = !this.isOpenHeaderSubmenuValue
   }
 
   isOpenProfileDropdownValueChanged(value, previousValue) {
@@ -48,26 +53,54 @@ export default class LayoutController extends ApplicationController {
     }
   }
 
-  isOpenProductDropdownValueChanged(value, previousValue) {
+  isOpenHeaderSubmenuValueChanged(value, previousValue) {
+    console.log(value)
     if (value) {
-      this.headerSubmenuTarget.innerHTML = this.productDropdownHTML()
+      this.headerSubmenuContainerTarget.innerHTML = ''
+      this.headerSubmenuContainerTarget.innerHTML = this.headerSubmenuHTML()[this.currentHeaderSubmenuNameValue]
+      useClickOutside(this, { element: this.headerSubmenuContentTarget })
     } else {
-      this.headerSubmenuTarget.innerHTML = ''
+      this.currentHeaderSubmenuNameValue = ""
+      this.headerSubmenuContainerTarget.innerHTML = ''
     }
   }
 
-  productDropdownHTML() {
-    return `
-      <div>
-        <a href="/companies/new">Create Company</a>
-        <a href="/companies/new">Create School/University</a>
-        <a href="/companies/new">Create Shop</a>
-        <a href="/companies/new">Create Restaurant</a>
-        <a href="/companies/new">Create Hospital</a>
-        <a href="/companies/new">Create Service Company</a>
+  close(event) {
+    console.log(event, 1111111)
+    event.preventDefault()
+    this.isOpenHeaderSubmenuValue = false
+  }
 
-      </div>
-    `
+  disconnect() {
+    this.element.innerHTML = this.serverHTML
+  }
+
+  headerSubmenuHTML() {
+    return {
+      "home": `
+        <div
+          data-${this.identifier}-target="headerSubmenuContent"
+          data-action="${this.identifier}:click:outside->${this.identifier}#close"
+        >
+          <a href="/companies/new">About us</a>
+          <a href="/companies/new">Contact</a>
+          <a href="/companies/new">Policy</a>
+        </div>
+      `,
+      "product": `
+        <div
+          data-${this.identifier}-target="headerSubmenuContent"
+          data-action="${this.identifier}:click:outside->${this.identifier}#close"
+        >
+          <a href="/companies/new">Company</a>
+          <a href="/companies/new">School/University</a>
+          <a href="/companies/new">Shop</a>
+          <a href="/companies/new">Restaurant</a>
+          <a href="/companies/new">Hospital</a>
+          <a href="/companies/new">Service Company</a>
+        </div>
+      `
+    }
   }
 
   profileDropdownHTML() {
@@ -130,10 +163,16 @@ export default class LayoutController extends ApplicationController {
         <!-- Navigation (Desktop) -->
         <nav class="hidden sm:flex">
           <ul class="flex space-x-8">
-            <li><a href="#" class="text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 font-medium transition duration-150">Home</a></li>
+            <li
+              data-action="click->${this.identifier}#toggleHeaderSubmenu"
+              data-${this.identifier}-header-submenu-name-param="home"
+            >
+              <div class="text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 font-medium transition duration-150 cursor-pointer">Home</div>
+            </li>
             <li
               class="flex flex-row gap-x-1 cursor-pointer group"
-              data-action="click->${this.identifier}#openProductDropdown"
+              data-action="click->${this.identifier}#toggleHeaderSubmenu"
+              data-${this.identifier}-header-submenu-name-param="product"
             >
               <div class="text-gray-700 dark:text-gray-300 group-hover:text-indigo-600 group-hover:hover:text-indigo-400 font-medium transition duration-150">Product</div>
               <div class="flex justify-center items-center cl">
@@ -142,8 +181,12 @@ export default class LayoutController extends ApplicationController {
                 </svg>
               </div>
             </li>
-            <li><a href="#" class="text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 font-medium transition duration-150">Pricing</a></li>
-            <li><a href="#" class="text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 font-medium transition duration-150">What's new</a></li>
+            <li>
+              <a href="#" class="text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 font-medium transition duration-150">Pricing</a>
+            </li>
+            <li>
+              <a href="#" class="text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 font-medium transition duration-150">What's new</a>
+              </li>
           </ul>
         </nav>
         
@@ -159,7 +202,7 @@ export default class LayoutController extends ApplicationController {
 
       </div>
       <div
-        data-${this.identifier}-target="headerSubmenu"
+        data-${this.identifier}-target="headerSubmenuContainer"
         class="absolute w-full bottom-0 translate-y-full"
       >
       </div>

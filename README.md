@@ -65,37 +65,30 @@ bundle exec rails g scaffold Company user:references parent_company:references n
   bundle exec rails g scaffold PolicyAppointment policy:references appoint_to:references{polymorphic} name description status:integer business_type:integer discarded_at:datetime:index --force
   bundle exec rails g scaffold RoleAppointment role:references appoint_to:references{polymorphic} name description status:integer business_type:integer discarded_at:datetime:index --force
 
-  bundle exec rails g scaffold Facility
-  bundle exec rails g scaffold Service
-  bundle exec rails g scaffold Product
+  bundle exec rails g scaffold Facility company:references name description status:integer business_type:integer discarded_at:datetime:index --force
+  bundle exec rails g scaffold Service company:references name description status:integer business_type:integer discarded_at:datetime:index --force
 
+  bundle exec rails g scaffold ProductBrand company:references name description status:integer business_type:integer discarded_at:datetime:index --force
+  bundle exec rails g scaffold Product company:references product_brand:references name description status:integer business_type:integer discarded_at:datetime:index --force
 
-  bundle exec rails g scaffold AttendanceOwner
-  bundle exec rails g scaffold AttendanceCategory
-  bundle exec rails g scaffold AttendanceChecker
-  bundle exec rails g scaffold AttendanceCheck
-  bundle exec rails g scaffold AttendanceSummary
+  bundle exec rails g scaffold AttendanceCheck company:references name description status:integer business_type:integer discarded_at:datetime:index --force
+  bundle exec rails g scaffold AttendanceSummary company:references name description status:integer business_type:integer discarded_at:datetime:index from:datetime to:datetime --force
 
-  bundle exec rails g scaffold ProductOwner
-  bundle exec rails g scaffold ProductCategory
-  bundle exec rails g scaffold ProductBrand
-  bundle exec rails g scaffold ProductItem
-  bundle exec rails g scaffold ProductCart
+  bundle exec rails g scaffold Cart company:references name description status:integer business_type:integer discarded_at:datetime:index --force
+  bundle exec rails g scaffold CartAppointment cart:references appoint_to:references{polymorphic} name description status:integer business_type:integer discarded_at:datetime:index --force
 
-  bundle exec rails g scaffold NotificationOwner
-  bundle exec rails g scaffold NotificationCategory
-  bundle exec rails g scaffold NotificationEvent
-  bundle exec rails g scaffold NotificationPolicy
+  bundle exec rails g scaffold Notification company:references name description status:integer business_type:integer discarded_at:datetime:index --force
+  bundle exec rails g scaffold NotificationAppointment notification:references appoint_from:references{polymorphic} appoint_to:references{polymorphic} name description status:integer business_type:integer discarded_at:datetime:index --force
 
-  bundle exec rails g scaffold BookingOwner
-  bundle exec rails g scaffold BookingCategory
-  bundle exec rails g scaffold BookingItem
-  bundle exec rails g scaffold BookingCustomer
+  bundle exec rails g scaffold Booking company:references appoint_from:references{polymorphic} appoint_to:references{polymorphic} name description status:integer business_type:integer discarded_at:datetime:index --force
 
-  bundle exec rails g scaffold Calendar
+  bundle exec rails g scaffold CalendarSchedule company:references name description status:integer business_type:integer discarded_at:datetime:index --force
+  bundle exec rails g scaffold CalendarEvent company:references name description status:integer business_type:integer discarded_at:datetime:index --force
   bundle exec rails g scaffold Chat
   bundle exec rails g scaffold Article
   bundle exec rails g scaffold Payment
   bundle exec rails g scaffold Project
+  bundle exec rails g scaffold Task
   bundle exec rails g scaffold Report
 ##
+
