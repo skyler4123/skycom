@@ -8,6 +8,7 @@ class Company < ApplicationRecord
   has_many :roles, dependent: :destroy
   has_many :policies, dependent: :destroy
   has_many :facilities, dependent: :destroy
+  has_many :services, dependent: :destroy
 
 
   # Self-referencing association for company hierarchy
