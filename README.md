@@ -68,7 +68,7 @@ bundle exec rails g scaffold Company user:references parent_company:references n
   bundle exec rails g scaffold Facility company:references name description status:integer business_type:integer discarded_at:datetime:index --force
   bundle exec rails g scaffold Service company:references name description status:integer business_type:integer discarded_at:datetime:index --force
 
-  bundle exec rails g scaffold ProductBrand company:references name description status:integer business_type:integer discarded_at:datetime:index --force
+  bundle exec rails g scaffold ProductBrand name description status:integer business_type:integer discarded_at:datetime:index --force
   bundle exec rails g scaffold Product company:references product_brand:references name description status:integer business_type:integer discarded_at:datetime:index --force
 
   bundle exec rails g scaffold AttendanceCheck company:references name description status:integer business_type:integer discarded_at:datetime:index --force
