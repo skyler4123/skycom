@@ -13,6 +13,7 @@ class Seed::ApplicationService
     Seed::PolicyService.run
     Seed::PolicyAppointmentService.run
     Seed::RoleAppointmentService.run
+    Seed::FacilityService.run
 
 
 
