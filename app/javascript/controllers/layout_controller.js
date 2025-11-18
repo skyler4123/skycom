@@ -11,8 +11,8 @@ export default class LayoutController extends ApplicationController {
     flash: { type: Object, default: {} },
     data: { type: Object, default: {} },
     isOpenProfileDropdown: { type: Boolean, default: false },
-    isOpenHeaderSubmenu: { type: Boolean, default: false },
-    currentHeaderSubmenuName: { type: String, default: "" },
+    openHeaderSubmenuName: { type: String, default: "" },
+    
   }
 
   initBinding() {
@@ -33,26 +33,8 @@ export default class LayoutController extends ApplicationController {
     return this.serverHTML
   }
 
-  openProfileDropdown() {
+  clickProfileDropdown() {
     this.isOpenProfileDropdownValue = !this.isOpenProfileDropdownValue
-  }
-
-  closeProfileDropdown(event) {
-    event.preventDefault()
-    this.currentHeaderSubmenuNameValue = ""
-    this.isOpenProfileDropdownValue = false
-  }
-
-  openHeaderSubmenu(event) {
-    event.preventDefault()
-    this.currentHeaderSubmenuNameValue = event.params.headerSubmenuName
-    this.isOpenHeaderSubmenuValue = true
-  }
-
-  toggleHeaderSubmenu(event) {
-    event.preventDefault()
-    this.currentHeaderSubmenuNameValue = event.params.headerSubmenuName
-    this.isOpenHeaderSubmenuValue = !this.isOpenHeaderSubmenuValue
   }
 
   isOpenProfileDropdownValueChanged(value, previousValue) {
@@ -61,22 +43,6 @@ export default class LayoutController extends ApplicationController {
     } else {
       this.profileDropdownTarget.innerHTML = ''
     }
-  }
-
-  isOpenHeaderSubmenuValueChanged(value, previousValue) {
-    if (value) {
-      this.headerSubmenuContainerTarget.innerHTML = ''
-      this.headerSubmenuContainerTarget.innerHTML = this.headerSubmenuHTML()[this.currentHeaderSubmenuNameValue]
-      useClickOutside(this, { element: this.headerSubmenuContentTarget })
-    } else {
-      this.currentHeaderSubmenuNameValue = ""
-      this.headerSubmenuContainerTarget.innerHTML = ''
-    }
-  }
-
-  clickOutsideHeaderSubmenu(event) {
-    event.preventDefault()
-    this.isOpenHeaderSubmenuValue = false
   }
 
   disconnect() {
@@ -127,7 +93,7 @@ export default class LayoutController extends ApplicationController {
       return `
         <div
           class="relative w-10 h-10 bg-gray-100 rounded-full dark:bg-gray-600 cursor-pointer"
-          data-action="click->${this.identifier}#openProfileDropdown"
+          data-action="click->${this.identifier}#clickProfileDropdown"
         >
           ${avatar() ?
           `<img class="w-10 h-10 rounded-full" src="${avatar()}" alt="Rounded avatar">`
