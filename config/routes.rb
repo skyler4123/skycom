@@ -1,4 +1,5 @@
 Rails.application.routes.draw do
+  resources :services
   resources :facilities
   resources :role_appointments
   resources :policy_appointments
