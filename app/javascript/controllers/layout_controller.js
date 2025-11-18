@@ -16,7 +16,6 @@ export default class LayoutController extends ApplicationController {
   }
 
   initBinding() {
-    console.log(this)
     this.serverHTML = this.element.innerHTML
     this.paginationController = PaginationController
     this.flashValue = ServerData.flash || {}
@@ -38,8 +37,19 @@ export default class LayoutController extends ApplicationController {
     this.isOpenProfileDropdownValue = !this.isOpenProfileDropdownValue
   }
 
+  closeProfileDropdown(event) {
+    event.preventDefault()
+    this.currentHeaderSubmenuNameValue = ""
+    this.isOpenProfileDropdownValue = false
+  }
+
+  openHeaderSubmenu(event) {
+    event.preventDefault()
+    this.currentHeaderSubmenuNameValue = event.params.headerSubmenuName
+    this.isOpenHeaderSubmenuValue = true
+  }
+
   toggleHeaderSubmenu(event) {
-    console.log(event.target)
     event.preventDefault()
     this.currentHeaderSubmenuNameValue = event.params.headerSubmenuName
     this.isOpenHeaderSubmenuValue = !this.isOpenHeaderSubmenuValue
@@ -54,7 +64,6 @@ export default class LayoutController extends ApplicationController {
   }
 
   isOpenHeaderSubmenuValueChanged(value, previousValue) {
-    console.log(value)
     if (value) {
       this.headerSubmenuContainerTarget.innerHTML = ''
       this.headerSubmenuContainerTarget.innerHTML = this.headerSubmenuHTML()[this.currentHeaderSubmenuNameValue]
@@ -65,8 +74,7 @@ export default class LayoutController extends ApplicationController {
     }
   }
 
-  close(event) {
-    console.log(event, 1111111)
+  clickOutsideHeaderSubmenu(event) {
     event.preventDefault()
     this.isOpenHeaderSubmenuValue = false
   }
@@ -80,7 +88,7 @@ export default class LayoutController extends ApplicationController {
       "home": `
         <div
           data-${this.identifier}-target="headerSubmenuContent"
-          data-action="${this.identifier}:click:outside->${this.identifier}#close"
+          data-action="${this.identifier}:click:outside->${this.identifier}#clickOutsideHeaderSubmenu"
         >
           <a href="/companies/new">About us</a>
           <a href="/companies/new">Contact</a>
@@ -90,7 +98,7 @@ export default class LayoutController extends ApplicationController {
       "product": `
         <div
           data-${this.identifier}-target="headerSubmenuContent"
-          data-action="${this.identifier}:click:outside->${this.identifier}#close"
+          data-action="${this.identifier}:click:outside->${this.identifier}#clickOutsideHeaderSubmenu"
         >
           <a href="/companies/new">Company</a>
           <a href="/companies/new">School/University</a>
