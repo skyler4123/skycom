@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_11_18_234802) do
+ActiveRecord::Schema[8.0].define(version: 2025_11_18_235212) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -186,6 +186,17 @@ ActiveRecord::Schema[8.0].define(version: 2025_11_18_234802) do
     t.index ["appoint_to_type", "appoint_to_id"], name: "index_policy_appointments_on_appoint_to"
     t.index ["discarded_at"], name: "index_policy_appointments_on_discarded_at"
     t.index ["policy_id"], name: "index_policy_appointments_on_policy_id"
+  end
+
+  create_table "product_brands", force: :cascade do |t|
+    t.string "name"
+    t.string "description"
+    t.integer "status"
+    t.integer "business_type"
+    t.datetime "discarded_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["discarded_at"], name: "index_product_brands_on_discarded_at"
   end
 
   create_table "role_appointments", force: :cascade do |t|
