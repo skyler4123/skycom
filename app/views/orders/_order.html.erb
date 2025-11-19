@@ -1,0 +1,34 @@
+<div id="<%= dom_id order %>" class="w-full sm:w-auto my-5 space-y-5">
+  <div>
+    <strong class="block font-medium mb-1">Company:</strong>
+    <%= order.company_id %>
+  </div>
+  <div>
+    <strong class="block font-medium mb-1">Customer:</strong>
+    <%= order.customer_id %>
+  </div>
+  <div>
+    <strong class="block font-medium mb-1">Name:</strong>
+    <%= order.name %>
+  </div>
+  <div>
+    <strong class="block font-medium mb-1">Description:</strong>
+    <%= order.description %>
+  </div>
+  <div>
+    <strong class="block font-medium mb-1">Currency:</strong>
+    <%= order.currency %>
+  </div>
+  <div>
+    <strong class="block font-medium mb-1">Status:</strong>
+    <%= order.status %>
+  </div>
+  <div>
+    <strong class="block font-medium mb-1">Business type:</strong>
+    <%= order.business_type %>
+  </div>
+  <div>
+    <strong class="block font-medium mb-1">Discarded at:</strong>
+    <%= order.discarded_at %>
+  </div>
+</div>
