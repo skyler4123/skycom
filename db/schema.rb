@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_11_19_000020) do
+ActiveRecord::Schema[8.0].define(version: 2025_11_19_001325) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -106,6 +106,19 @@ ActiveRecord::Schema[8.0].define(version: 2025_11_19_000020) do
     t.index ["discarded_at"], name: "index_companies_on_discarded_at"
     t.index ["parent_company_id"], name: "index_companies_on_parent_company_id"
     t.index ["user_id"], name: "index_companies_on_user_id"
+  end
+
+  create_table "customers", force: :cascade do |t|
+    t.bigint "company_id"
+    t.string "name"
+    t.string "description"
+    t.integer "status"
+    t.integer "business_type"
+    t.datetime "discarded_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["company_id"], name: "index_customers_on_company_id"
+    t.index ["discarded_at"], name: "index_customers_on_discarded_at"
   end
 
   create_table "employee_group_appointments", force: :cascade do |t|
@@ -316,6 +329,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_11_19_000020) do
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
   add_foreign_key "companies", "companies", column: "parent_company_id"
   add_foreign_key "companies", "users"
+  add_foreign_key "customers", "companies"
   add_foreign_key "employee_group_appointments", "employee_groups"
   add_foreign_key "employee_groups", "companies"
   add_foreign_key "employees", "companies"

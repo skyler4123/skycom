@@ -17,6 +17,7 @@ class Seed::ApplicationService
     Seed::ServiceService.run
     Seed::ProductBrandService.run
     Seed::ProductService.run
+    Seed::CustomerService.run
 
 
 
