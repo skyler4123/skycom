@@ -43,7 +43,7 @@ Things you may want to cover:
 
   bundle exec rails g scaffold Address alpha2:string:index alpha3:string:index continent:string:index nationality:string:index region:string:index longitude:decimal latitude:decimal level_total:integer level_1:string:index level_2:string:index level_3:string:index level_4:string:index level_5:string:index level_6:string:index level_7:string:index level_8:string:index level_9:string:index level_10:string:index discarded_at:datetime --force
 
-bundle exec rails g scaffold Company user:references parent_company:references name description \
+  bundle exec rails g scaffold Company user:references parent_company:references name description \
   status:integer ownership_type:integer business_type:integer \
   registration_number:string vat_id:string \
   address_line_1:string city:string postal_code:string country:string \
@@ -58,8 +58,6 @@ bundle exec rails g scaffold Company user:references parent_company:references n
   bundle exec rails g scaffold Employee user:references company:references name description status:integer business_type:integer  discarded_at:datetime:index --force
   bundle exec rails g scaffold EmployeeGroupAppointment employee_group:references appoint_to:references{polymorphic} name description --force
 
-
-
   bundle exec rails g scaffold Role company:references name description status:integer business_type:integer discarded_at:datetime:index --force
   bundle exec rails g scaffold Policy company:references name description resource action status:integer business_type:integer discarded_at:datetime:index --force
   bundle exec rails g scaffold PolicyAppointment policy:references appoint_to:references{polymorphic} name description status:integer business_type:integer discarded_at:datetime:index --force
@@ -71,8 +69,7 @@ bundle exec rails g scaffold Company user:references parent_company:references n
   bundle exec rails g scaffold ProductBrand name description status:integer business_type:integer discarded_at:datetime:index --force
   bundle exec rails g scaffold Product company:references product_brand:references name description status:integer business_type:integer discarded_at:datetime:index --force
 
-  bundle exec rails g scaffold AttendanceCheck company:references name description status:integer business_type:integer discarded_at:datetime:index --force
-  bundle exec rails g scaffold AttendanceSummary company:references name description status:integer business_type:integer discarded_at:datetime:index from:datetime to:datetime --force
+  bundle exec rails g scaffold Customer company:references name description status:integer business_type:integer discarded_at:datetime:index --force
 
   bundle exec rails g scaffold Cart company:references name description status:integer business_type:integer discarded_at:datetime:index --force
   bundle exec rails g scaffold CartAppointment cart:references appoint_to:references{polymorphic} name description status:integer business_type:integer discarded_at:datetime:index --force
@@ -84,6 +81,10 @@ bundle exec rails g scaffold Company user:references parent_company:references n
 
   bundle exec rails g scaffold CalendarSchedule company:references name description status:integer business_type:integer discarded_at:datetime:index --force
   bundle exec rails g scaffold CalendarEvent company:references name description status:integer business_type:integer discarded_at:datetime:index --force
+
+  bundle exec rails g scaffold AttendanceCheck company:references name description status:integer business_type:integer discarded_at:datetime:index --force
+  bundle exec rails g scaffold AttendanceSummary company:references name description status:integer business_type:integer discarded_at:datetime:index from:datetime to:datetime --force
+
   bundle exec rails g scaffold Chat
   bundle exec rails g scaffold Article
   bundle exec rails g scaffold Payment
@@ -91,4 +92,3 @@ bundle exec rails g scaffold Company user:references parent_company:references n
   bundle exec rails g scaffold Task
   bundle exec rails g scaffold Report
 ##
-
