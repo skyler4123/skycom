@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_11_18_235212) do
+ActiveRecord::Schema[8.0].define(version: 2025_11_19_000020) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -199,6 +199,21 @@ ActiveRecord::Schema[8.0].define(version: 2025_11_18_235212) do
     t.index ["discarded_at"], name: "index_product_brands_on_discarded_at"
   end
 
+  create_table "products", force: :cascade do |t|
+    t.bigint "company_id", null: false
+    t.bigint "product_brand_id"
+    t.string "name"
+    t.string "description"
+    t.integer "status"
+    t.integer "business_type"
+    t.datetime "discarded_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["company_id"], name: "index_products_on_company_id"
+    t.index ["discarded_at"], name: "index_products_on_discarded_at"
+    t.index ["product_brand_id"], name: "index_products_on_product_brand_id"
+  end
+
   create_table "role_appointments", force: :cascade do |t|
     t.bigint "role_id", null: false
     t.string "appoint_to_type", null: false
@@ -308,6 +323,8 @@ ActiveRecord::Schema[8.0].define(version: 2025_11_18_235212) do
   add_foreign_key "facilities", "companies"
   add_foreign_key "policies", "companies"
   add_foreign_key "policy_appointments", "policies"
+  add_foreign_key "products", "companies"
+  add_foreign_key "products", "product_brands"
   add_foreign_key "role_appointments", "roles"
   add_foreign_key "roles", "companies"
   add_foreign_key "services", "companies"
