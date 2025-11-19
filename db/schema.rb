@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_11_19_001325) do
+ActiveRecord::Schema[8.0].define(version: 2025_11_19_164841) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -168,6 +168,22 @@ ActiveRecord::Schema[8.0].define(version: 2025_11_19_001325) do
     t.datetime "updated_at", null: false
     t.index ["company_id"], name: "index_facilities_on_company_id"
     t.index ["discarded_at"], name: "index_facilities_on_discarded_at"
+  end
+
+  create_table "orders", force: :cascade do |t|
+    t.bigint "company_id", null: false
+    t.bigint "customer_id"
+    t.string "name"
+    t.string "description"
+    t.string "currency"
+    t.integer "status"
+    t.integer "business_type"
+    t.datetime "discarded_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["company_id"], name: "index_orders_on_company_id"
+    t.index ["customer_id"], name: "index_orders_on_customer_id"
+    t.index ["discarded_at"], name: "index_orders_on_discarded_at"
   end
 
   create_table "policies", force: :cascade do |t|
@@ -335,6 +351,8 @@ ActiveRecord::Schema[8.0].define(version: 2025_11_19_001325) do
   add_foreign_key "employees", "companies"
   add_foreign_key "employees", "users"
   add_foreign_key "facilities", "companies"
+  add_foreign_key "orders", "companies"
+  add_foreign_key "orders", "customers"
   add_foreign_key "policies", "companies"
   add_foreign_key "policy_appointments", "policies"
   add_foreign_key "products", "companies"

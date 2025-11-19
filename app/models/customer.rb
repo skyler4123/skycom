@@ -2,6 +2,7 @@ class Customer < ApplicationRecord
   # --- Associations ---
   belongs_to :company, optional: true
 
+  has_many :orders, dependent: :destroy
   # --- Enums ---
   enum :status, {
     active: 0,
