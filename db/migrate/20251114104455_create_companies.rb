@@ -8,6 +8,7 @@ class CreateCompanies < ActiveRecord::Migration[8.0]
       t.integer :status
       t.integer :ownership_type
       t.integer :business_type
+      t.string :currency
       t.string :registration_number
       t.string :vat_id
       t.string :address_line_1

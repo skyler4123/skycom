@@ -10,6 +10,7 @@ RSpec.describe "companies/show", type: :view do
       status: 2,
       ownership_type: 3,
       business_type: 4,
+      currency: "Currency",
       registration_number: "Registration Number",
       vat_id: "Vat",
       address_line_1: "Address Line 1",
@@ -33,6 +34,7 @@ RSpec.describe "companies/show", type: :view do
     expect(rendered).to match(/2/)
     expect(rendered).to match(/3/)
     expect(rendered).to match(/4/)
+    expect(rendered).to match(/Currency/)
     expect(rendered).to match(/Registration Number/)
     expect(rendered).to match(/Vat/)
     expect(rendered).to match(/Address Line 1/)

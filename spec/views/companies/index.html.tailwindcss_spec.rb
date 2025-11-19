@@ -11,6 +11,7 @@ RSpec.describe "companies/index", type: :view do
         status: 2,
         ownership_type: 3,
         business_type: 4,
+        currency: "Currency",
         registration_number: "Registration Number",
         vat_id: "Vat",
         address_line_1: "Address Line 1",
@@ -31,6 +32,7 @@ RSpec.describe "companies/index", type: :view do
         status: 2,
         ownership_type: 3,
         business_type: 4,
+        currency: "Currency",
         registration_number: "Registration Number",
         vat_id: "Vat",
         address_line_1: "Address Line 1",
@@ -56,6 +58,7 @@ RSpec.describe "companies/index", type: :view do
     assert_select cell_selector, text: Regexp.new(2.to_s), count: 2
     assert_select cell_selector, text: Regexp.new(3.to_s), count: 2
     assert_select cell_selector, text: Regexp.new(4.to_s), count: 2
+    assert_select cell_selector, text: Regexp.new("Currency".to_s), count: 2
     assert_select cell_selector, text: Regexp.new("Registration Number".to_s), count: 2
     assert_select cell_selector, text: Regexp.new("Vat".to_s), count: 2
     assert_select cell_selector, text: Regexp.new("Address Line 1".to_s), count: 2

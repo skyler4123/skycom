@@ -10,6 +10,7 @@ RSpec.describe "companies/new", type: :view do
       status: 1,
       ownership_type: 1,
       business_type: 1,
+      currency: "MyString",
       registration_number: "MyString",
       vat_id: "MyString",
       address_line_1: "MyString",
@@ -42,6 +43,8 @@ RSpec.describe "companies/new", type: :view do
       assert_select "input[name=?]", "company[ownership_type]"
 
       assert_select "input[name=?]", "company[business_type]"
+
+      assert_select "input[name=?]", "company[currency]"
 
       assert_select "input[name=?]", "company[registration_number]"
 
