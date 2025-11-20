@@ -20,6 +20,7 @@ class Seed::ApplicationService
     Seed::CustomerService.run
     Seed::OrderService.run
     Seed::OrderItemAppointmentService.run
+    Seed::InvoiceService.run
 
 
 
