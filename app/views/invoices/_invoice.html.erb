@@ -1,0 +1,42 @@
+<div id="<%= dom_id invoice %>" class="w-full sm:w-auto my-5 space-y-5">
+  <div>
+    <strong class="block font-medium mb-1">Order:</strong>
+    <%= invoice.order_id %>
+  </div>
+  <div>
+    <strong class="block font-medium mb-1">Name:</strong>
+    <%= invoice.name %>
+  </div>
+  <div>
+    <strong class="block font-medium mb-1">Description:</strong>
+    <%= invoice.description %>
+  </div>
+  <div>
+    <strong class="block font-medium mb-1">Currency:</strong>
+    <%= invoice.currency %>
+  </div>
+  <div>
+    <strong class="block font-medium mb-1">Number:</strong>
+    <%= invoice.number %>
+  </div>
+  <div>
+    <strong class="block font-medium mb-1">Total:</strong>
+    <%= invoice.total %>
+  </div>
+  <div>
+    <strong class="block font-medium mb-1">Due date:</strong>
+    <%= invoice.due_date %>
+  </div>
+  <div>
+    <strong class="block font-medium mb-1">Status:</strong>
+    <%= invoice.status %>
+  </div>
+  <div>
+    <strong class="block font-medium mb-1">Business type:</strong>
+    <%= invoice.business_type %>
+  </div>
+  <div>
+    <strong class="block font-medium mb-1">Discarded at:</strong>
+    <%= invoice.discarded_at %>
+  </div>
+</div>
