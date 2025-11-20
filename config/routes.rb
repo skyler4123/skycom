@@ -1,4 +1,5 @@
 Rails.application.routes.draw do
+  resources :bookings
   resources :customer_group_appointments
   resources :customer_groups
   resources :service_group_appointments
