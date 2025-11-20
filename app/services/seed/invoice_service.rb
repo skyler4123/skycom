@@ -3,6 +3,7 @@
 # and simulates soft deletion for a portion of the records.
 
 class Seed::InvoiceService
+
   # Configuration for the number of invoices to create per order
   INVOICES_PER_ORDER = 1
 
@@ -10,6 +11,8 @@ class Seed::InvoiceService
     # Get enum keys once before the loop for efficiency.
     statuses = Invoice.statuses.keys
     business_types = Invoice.business_types.keys
+
+    puts "Seeding Invoice records..."
 
     Order.all.each do |order|
       INVOICES_PER_ORDER.times do |i|
@@ -35,5 +38,7 @@ class Seed::InvoiceService
         )
       end
     end
+
+    puts "Successfully created #{Invoice.count} Invoice records."
   end
 end

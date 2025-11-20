@@ -1,4 +1,5 @@
 class Seed::UserService
+
   def self.run
     User.destroy_all
 
@@ -18,4 +19,5 @@ class Seed::UserService
     Seed::AttachmentService.attach(record: user, relation: :avatar_attachment, number: 1)
     user
   end
+
 end

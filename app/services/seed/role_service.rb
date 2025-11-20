@@ -3,6 +3,7 @@
 # and simulates soft deletion.
 
 class Seed::RoleService
+
   # Configuration for the number of roles per company
   ROLES_PER_COMPANY = 4
   
@@ -10,6 +11,8 @@ class Seed::RoleService
     # Get the defined enum keys for random assignment
     statuses = Role.statuses.keys
     kinds = Role.kinds.keys
+
+    puts "Seeding Role records..."
     
     Company.all.each do |company|
       ROLES_PER_COMPANY.times do |i|
@@ -31,5 +34,7 @@ class Seed::RoleService
         )
       end
     end
+
+    puts "Successfully created #{Role.count} Role records."
   end
 end

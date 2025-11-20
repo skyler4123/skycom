@@ -3,6 +3,7 @@
 # in the Facility model and simulates soft deletion for a portion of the records.
 
 class Seed::FacilityService
+
   # Configuration for the number of facilities to create per company
   FACILITIES_PER_COMPANY = 3
 
@@ -12,6 +13,8 @@ class Seed::FacilityService
     # You can replace them with static arrays like %w[active inactive] if needed.
     statuses = Facility.statuses.keys
     business_types = Facility.business_types.keys
+
+    puts "Seeding Facility records..."
 
     Company.all.each do |company|
       FACILITIES_PER_COMPANY.times do |i|
@@ -29,5 +32,7 @@ class Seed::FacilityService
         )
       end
     end
+
+    puts "Successfully created #{Facility.count} Facility records."
   end
 end

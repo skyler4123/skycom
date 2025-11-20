@@ -3,6 +3,7 @@
 # It uses enums from the Product model and simulates soft deletion for some records.
 
 class Seed::ProductService
+
   # Configuration for the number of products to create per company
   PRODUCTS_PER_COMPANY = 5
 
@@ -12,6 +13,8 @@ class Seed::ProductService
     business_types = Product.business_types.keys
     # Include nil to allow for products without a brand
     product_brand_ids = ProductBrand.pluck(:id) + [nil]
+
+    puts "Seeding Product records..."
 
     Company.all.each do |company|
       PRODUCTS_PER_COMPANY.times do |i|
@@ -30,5 +33,7 @@ class Seed::ProductService
         )
       end
     end
+
+    puts "Successfully created #{Product.count} Product records."
   end
 end

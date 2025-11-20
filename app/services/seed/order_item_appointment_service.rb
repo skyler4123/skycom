@@ -3,12 +3,15 @@
 # to either a Product or a Service that belongs to the same company as the order.
 
 class Seed::OrderItemAppointmentService
+
   # Configuration for the number of items to create per order
   ITEMS_PER_ORDER = 3
 
   def self.run
     # Get enum keys once before the loop for efficiency.
     statuses = OrderItemAppointment.statuses.keys
+
+    puts "Seeding OrderItemAppointment records..."
 
     Order.all.each do |order|
       company = order.company
@@ -39,5 +42,7 @@ class Seed::OrderItemAppointmentService
         )
       end
     end
+
+    puts "Successfully created #{OrderItemAppointment.count} OrderItemAppointment records."
   end
 end

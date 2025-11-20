@@ -1,4 +1,5 @@
 class Seed::EmployeeService
+
   # Define the available business_types for the 'business_type' attribute (assuming an enum structure)
   BUSINESS_TYPES = Employee.business_types.keys
   
@@ -6,6 +7,8 @@ class Seed::EmployeeService
   EMPLOYEES_PER_COMPANY = 5
   
   def self.run
+    puts "Seeding Employee records..."
+
     Company.all.each do |company|
       EMPLOYEES_PER_COMPANY.times do |index|
         assigned_user = Seed::UserService.create(username: "company_#{company.id}_employee", index: index)
@@ -23,5 +26,7 @@ class Seed::EmployeeService
         employee.attach_tag(name: "Employee #{employee.id} Tag")
       end
     end
+
+    puts "Successfully created #{Employee.count} Employee records."
   end
 end

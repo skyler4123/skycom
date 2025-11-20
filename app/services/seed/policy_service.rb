@@ -3,6 +3,7 @@
 # and simulates soft deletion.
 
 class Seed::PolicyService
+
   # Configuration for the number of policies per company
   POLICIES_PER_COMPANY = 6
 
@@ -13,6 +14,8 @@ class Seed::PolicyService
   def self.run
     # Get the defined enum keys for random assignment
     statuses = Policy.statuses.keys
+
+    puts "Seeding Policy records..."
     kinds = Policy.kinds.keys
     
     Company.all.each do |company|
@@ -43,5 +46,7 @@ class Seed::PolicyService
         )
       end
     end
+
+    puts "Successfully created #{Policy.count} Policy records."
   end
 end

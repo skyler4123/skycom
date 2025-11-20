@@ -3,6 +3,7 @@
 # model and simulates soft deletion for a portion of the records.
 
 class Seed::ServiceService
+
   # Configuration for the number of services to create per company
   SERVICES_PER_COMPANY = 3
 
@@ -10,6 +11,8 @@ class Seed::ServiceService
     # It's efficient to get enum keys once before the loop.
     statuses = Service.statuses.keys
     business_types = Service.business_types.keys
+
+    puts "Seeding Service records..."
 
     Company.all.each do |company|
       SERVICES_PER_COMPANY.times do |i|
@@ -27,5 +30,7 @@ class Seed::ServiceService
         )
       end
     end
+
+    puts "Successfully created #{Service.count} Service records."
   end
 end

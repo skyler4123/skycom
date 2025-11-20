@@ -3,6 +3,7 @@
 # in the ProductBrand model and simulates soft deletion for some records.
 
 class Seed::ProductBrandService
+
   # Configuration for the total number of product brands to create
   PRODUCT_BRANDS_TO_CREATE = 15
 
@@ -12,6 +13,8 @@ class Seed::ProductBrandService
     # Get enum keys once before the loop for efficiency.
     statuses = ProductBrand.statuses.keys
     business_types = ProductBrand.business_types.keys
+
+    puts "Seeding ProductBrand records..."
 
     PRODUCT_BRANDS_TO_CREATE.times do |index|
       # Randomly decide whether to mark the record as discarded
@@ -26,5 +29,7 @@ class Seed::ProductBrandService
         discarded_at: should_discard ? Time.zone.now - rand(1..180).days : nil
       )
     end
+
+    puts "Successfully created #{ProductBrand.count} ProductBrand records."
   end
 end

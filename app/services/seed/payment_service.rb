@@ -3,6 +3,7 @@
 # and simulates soft deletion for a portion of the records.
 
 class Seed::PaymentService
+
   # Configuration for the number of payments to create per invoice
   PAYMENTS_PER_INVOICE = 1
 
@@ -11,6 +12,8 @@ class Seed::PaymentService
     statuses = Payment.statuses.keys
     business_types = Payment.business_types.keys
     payment_methods = Payment.payment_methods.keys
+
+    puts "Seeding Payment records..."
 
     Invoice.all.each do |invoice|
       # Skip creating payments for draft or cancelled invoices
@@ -36,5 +39,7 @@ class Seed::PaymentService
         )
       end
     end
+
+    puts "Successfully created #{Payment.count} Payment records."
   end
 end

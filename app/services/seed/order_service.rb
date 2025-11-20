@@ -3,6 +3,7 @@
 # Order model and simulates soft deletion for a portion of the records.
 
 class Seed::OrderService
+
   # Configuration for the number of orders to create per company
   ORDERS_PER_COMPANY = 5
 
@@ -10,6 +11,8 @@ class Seed::OrderService
     # Get enum keys once before the loop for efficiency.
     statuses = Order.statuses.keys
     business_types = Order.business_types.keys
+
+    puts "Seeding Order records..."
 
     Company.all.each do |company|
       # Get customers for the current company. Skip if there are none.
@@ -33,5 +36,7 @@ class Seed::OrderService
         )
       end
     end
+
+    puts "Successfully created #{Order.count} Order records."
   end
 end

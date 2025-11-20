@@ -3,6 +3,7 @@
 # simulates soft deletion for a portion of the records.
 
 class Seed::CustomerService
+
   # Configuration for the number of customers to create per company
   CUSTOMERS_PER_COMPANY = 10
 
@@ -10,6 +11,8 @@ class Seed::CustomerService
     # Get enum keys once before the loop for efficiency.
     statuses = Customer.statuses.keys
     business_types = Customer.business_types.keys
+
+    puts "Seeding Customer records..."
 
     Company.all.each do |company|
       CUSTOMERS_PER_COMPANY.times do
@@ -27,5 +30,7 @@ class Seed::CustomerService
         )
       end
     end
+
+    puts "Successfully created #{Customer.count} Customer records."
   end
 end
