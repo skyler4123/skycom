@@ -1,0 +1,2 @@
+module PaymentMethodAppointmentsHelper
+end
