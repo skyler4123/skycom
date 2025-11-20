@@ -33,6 +33,7 @@ class Seed::ApplicationService
     Seed::TaskGroupService.run
     Seed::TaskService.run
     Seed::ProjectGroupService.run
+    Seed::ProjectService.run
 
 
 
