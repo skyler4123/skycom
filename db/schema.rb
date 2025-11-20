@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_11_20_153141) do
+ActiveRecord::Schema[8.0].define(version: 2025_11_20_154248) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -224,6 +224,19 @@ ActiveRecord::Schema[8.0].define(version: 2025_11_20_153141) do
     t.index ["discarded_at"], name: "index_orders_on_discarded_at"
   end
 
+  create_table "payment_methods", force: :cascade do |t|
+    t.string "name"
+    t.string "description"
+    t.string "code"
+    t.integer "currency"
+    t.integer "status"
+    t.integer "business_type"
+    t.datetime "discarded_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["discarded_at"], name: "index_payment_methods_on_discarded_at"
+  end
+
   create_table "payments", force: :cascade do |t|
     t.bigint "invoice_id", null: false
     t.string "name"
@@ -240,6 +253,20 @@ ActiveRecord::Schema[8.0].define(version: 2025_11_20_153141) do
     t.datetime "updated_at", null: false
     t.index ["discarded_at"], name: "index_payments_on_discarded_at"
     t.index ["invoice_id"], name: "index_payments_on_invoice_id"
+  end
+
+  create_table "period_appointments", force: :cascade do |t|
+    t.bigint "period_id", null: false
+    t.string "appoint_to_type", null: false
+    t.bigint "appoint_to_id", null: false
+    t.string "name"
+    t.string "description"
+    t.string "code"
+    t.string "value"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["appoint_to_type", "appoint_to_id"], name: "index_period_appointments_on_appoint_to"
+    t.index ["period_id"], name: "index_period_appointments_on_period_id"
   end
 
   create_table "periods", force: :cascade do |t|
@@ -428,6 +455,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_11_20_153141) do
   add_foreign_key "orders", "companies"
   add_foreign_key "orders", "customers"
   add_foreign_key "payments", "invoices"
+  add_foreign_key "period_appointments", "periods"
   add_foreign_key "periods", "companies"
   add_foreign_key "policies", "companies"
   add_foreign_key "policy_appointments", "policies"
