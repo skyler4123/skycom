@@ -10,6 +10,7 @@ class Seed::ApplicationService
     Seed::EmployeeService.run
     Seed::EmployeeGroupAppointmentService.run
     Seed::RoleService.run
+    Seed::PaymentMethodService.run # Ensure global payment methods are seeded first
     Seed::PeriodService.run
     Seed::PolicyService.run
     Seed::PolicyAppointmentService.run
@@ -22,7 +23,7 @@ class Seed::ApplicationService
     Seed::OrderService.run
     Seed::OrderItemAppointmentService.run
     Seed::InvoiceService.run
-    Seed::PaymentService.run
+    Seed::PaymentMethodAppointmentService.run # Now appoint them to companies
 
 
 

@@ -1,7 +1,8 @@
 class PaymentMethod < ApplicationRecord
   # --- Associations ---
   # This model is intended to be global, so it does not belong to a company.
-  # has_many :payments # This association can be added if you refactor the Payment model
+  has_many :payment_method_appointments, dependent: :destroy
+  has_many :companies, through: :payment_method_appointments
 
   # --- Enums ---
   enum :status, {

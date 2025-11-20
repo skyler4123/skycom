@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_11_20_154248) do
+ActiveRecord::Schema[8.0].define(version: 2025_11_20_155427) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -222,6 +222,22 @@ ActiveRecord::Schema[8.0].define(version: 2025_11_20_154248) do
     t.index ["company_id"], name: "index_orders_on_company_id"
     t.index ["customer_id"], name: "index_orders_on_customer_id"
     t.index ["discarded_at"], name: "index_orders_on_discarded_at"
+  end
+
+  create_table "payment_method_appointments", force: :cascade do |t|
+    t.bigint "payment_method_id", null: false
+    t.bigint "company_id", null: false
+    t.string "name"
+    t.string "description"
+    t.string "code"
+    t.integer "status"
+    t.integer "business_type"
+    t.datetime "discarded_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["company_id"], name: "index_payment_method_appointments_on_company_id"
+    t.index ["discarded_at"], name: "index_payment_method_appointments_on_discarded_at"
+    t.index ["payment_method_id"], name: "index_payment_method_appointments_on_payment_method_id"
   end
 
   create_table "payment_methods", force: :cascade do |t|
@@ -454,6 +470,8 @@ ActiveRecord::Schema[8.0].define(version: 2025_11_20_154248) do
   add_foreign_key "order_item_appointments", "orders"
   add_foreign_key "orders", "companies"
   add_foreign_key "orders", "customers"
+  add_foreign_key "payment_method_appointments", "companies"
+  add_foreign_key "payment_method_appointments", "payment_methods"
   add_foreign_key "payments", "invoices"
   add_foreign_key "period_appointments", "periods"
   add_foreign_key "periods", "companies"
