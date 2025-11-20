@@ -30,6 +30,7 @@ class Seed::ApplicationService
     Seed::PaymentMethodAppointmentService.run # Now appoint them to companies
     Seed::BookingService.run
     Seed::AssessmentService.run
+    Seed::TaskGroupService.run
 
 
 
