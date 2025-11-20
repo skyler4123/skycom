@@ -2,6 +2,7 @@ class CustomerGroup < ApplicationRecord
   # --- Associations ---
   belongs_to :company
   has_many :customer_group_appointments, dependent: :destroy
+  has_many :customers, through: :customer_group_appointments, source: :appoint_to, source_type: "Customer"
 
   # --- Enums ---
   enum :status, {

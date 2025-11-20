@@ -3,6 +3,8 @@ class Customer < ApplicationRecord
   belongs_to :company, optional: true
 
   has_many :orders, dependent: :destroy
+  has_many :customer_group_appointments, as: :appoint_to, dependent: :destroy
+  has_many :customer_groups, through: :customer_group_appointments
   # --- Enums ---
   enum :status, {
     active: 0,
