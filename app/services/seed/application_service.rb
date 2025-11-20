@@ -22,6 +22,7 @@ class Seed::ApplicationService
     Seed::ProductBrandService.run
     Seed::ProductGroupService.run
     Seed::ProductService.run
+    Seed::CustomerGroupService.run
     Seed::CustomerService.run
     Seed::OrderService.run
     Seed::OrderItemAppointmentService.run
