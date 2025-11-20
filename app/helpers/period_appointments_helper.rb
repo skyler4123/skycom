@@ -1,0 +1,2 @@
+module PeriodAppointmentsHelper
+end

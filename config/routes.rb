@@ -1,4 +1,5 @@
 Rails.application.routes.draw do
+  resources :period_appointments
   resources :periods
   resources :payments
   resources :invoices

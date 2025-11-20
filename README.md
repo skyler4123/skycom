@@ -56,7 +56,7 @@ Things you may want to cover:
   bundle exec rails g scaffold Tag company:references name description code --force
   bundle exec rails g scaffold TagAppointment tag:references appoint_to:references{polymorphic} value description --force
 
-  bundle exec rails g scaffold Period company:references name description code duration:integer start_at:datetime end_at:datetime expire_at:datetime iscarded_at:datetime:index  --force
+  bundle exec rails g scaffold Period company:references name description code duration:integer start_at:datetime end_at:datetime expire_at:datetime discarded_at:datetime:index --force
   bundle exec rails g scaffold PeriodAppointment period:references appoint_to:references{polymorphic} name description code value --force
 
   bundle exec rails g scaffold EmployeeGroup company:references name description code status:integer business_type:integer discarded_at:datetime:index --force
