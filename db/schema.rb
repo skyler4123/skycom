@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_11_20_155427) do
+ActiveRecord::Schema[8.0].define(version: 2025_11_20_165153) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -170,6 +170,20 @@ ActiveRecord::Schema[8.0].define(version: 2025_11_20_155427) do
     t.datetime "updated_at", null: false
     t.index ["company_id"], name: "index_facilities_on_company_id"
     t.index ["discarded_at"], name: "index_facilities_on_discarded_at"
+  end
+
+  create_table "facility_groups", force: :cascade do |t|
+    t.bigint "company_id", null: false
+    t.string "name"
+    t.string "description"
+    t.string "code"
+    t.integer "status"
+    t.integer "business_type"
+    t.datetime "discarded_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["company_id"], name: "index_facility_groups_on_company_id"
+    t.index ["discarded_at"], name: "index_facility_groups_on_discarded_at"
   end
 
   create_table "invoices", force: :cascade do |t|
@@ -466,6 +480,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_11_20_155427) do
   add_foreign_key "employees", "companies"
   add_foreign_key "employees", "users"
   add_foreign_key "facilities", "companies"
+  add_foreign_key "facility_groups", "companies"
   add_foreign_key "invoices", "orders"
   add_foreign_key "order_item_appointments", "orders"
   add_foreign_key "orders", "companies"

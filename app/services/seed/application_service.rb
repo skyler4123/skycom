@@ -16,6 +16,7 @@ class Seed::ApplicationService
     Seed::PolicyAppointmentService.run
     Seed::RoleAppointmentService.run
     Seed::FacilityService.run
+    Seed::FacilityGroupService.run
     Seed::ServiceService.run
     Seed::ProductBrandService.run
     Seed::ProductService.run
