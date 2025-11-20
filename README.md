@@ -90,12 +90,6 @@ Things you may want to cover:
   bundle exec rails g scaffold Invoice order:references name description code currency:integer duration:integer number total due_date:datetime status:integer business_type:integer discarded_at:datetime:index --force
   bundle exec rails g scaffold Payment invoice:references name description code currency:integer duration:integer exchange_rate:decimal amount:decimal payment_method gateway_details status:integer business_type:integer discarded_at:datetime:index --force
 
-  bundle exec rails g scaffold Cart company:references customer:references name description code status:integer business_type:integer discarded_at:datetime:index --force
-  bundle exec rails g scaffold CartAppointment cart:references appoint_to:references{polymorphic} name description code status:integer business_type:integer discarded_at:datetime:index --force
-
-  bundle exec rails g scaffold Notification company:references name description code status:integer business_type:integer discarded_at:datetime:index --force
-  bundle exec rails g scaffold NotificationAppointment notification:references appoint_from:references{polymorphic} appoint_to:references{polymorphic} name description code status:integer business_type:integer discarded_at:datetime:index --force
-
   bundle exec rails g scaffold Booking company:references appoint_from:references{polymorphic} appoint_to:references{polymorphic} name description code status:integer business_type:integer discarded_at:datetime:index --force
 
   bundle exec rails g scaffold CalendarSchedule company:references name description code status:integer business_type:integer discarded_at:datetime:index --force
@@ -111,13 +105,21 @@ Things you may want to cover:
   bundle exec rails g scaffold Assessment company:references name description code status:integer business_type:integer discarded_at:datetime:index --force
   bundle exec rails g scaffold AssessmentAppointment assessment:references appoint_from:references{polymorphic} appoint_to:references{polymorphic} name description code status:integer business_type:integer discarded_at:datetime:index --force
 
-  bundle exec rails g scaffold ProjectGroup
-  bundle exec rails g scaffold ProjectGroupAppointment
-  bundle exec rails g scaffold Project
-
   bundle exec rails g scaffold TaskGroup company:references name description code status:integer business_type:integer discarded_at:datetime:index --force
   bundle exec rails g scaffold Task company:references task_group:references name description code currency:integer status:integer business_type:integer discarded_at:datetime:index --force
   bundle exec rails g scaffold TaskGroupAppointment assessment:references appoint_from:references{polymorphic} appoint_to:references{polymorphic} appoint_for:references{polymorphic} name description code status:integer business_type:integer discarded_at:datetime:index --force
+
+  bundle exec rails g scaffold ProjectGroup company:references name description code status:integer business_type:integer discarded_at:datetime:index --force
+  bundle exec rails g scaffold Project company:references project_group:references name description code status:integer business_type:integer discarded_at:datetime:index --force
+  bundle exec rails g scaffold ProjectGroupAppointment project_group:references appoint_from:references{polymorphic} appoint_to:references{polymorphic} appoint_for:references{polymorphic} name description code status:integer business_type:integer discarded_at:datetime:index --force
+
+  
+
+  bundle exec rails g scaffold Cart company:references customer:references name description code status:integer business_type:integer discarded_at:datetime:index --force
+  bundle exec rails g scaffold CartAppointment cart:references appoint_to:references{polymorphic} name description code status:integer business_type:integer discarded_at:datetime:index --force
+
+  bundle exec rails g scaffold Notification company:references name description code status:integer business_type:integer discarded_at:datetime:index --force
+  bundle exec rails g scaffold NotificationAppointment notification:references appoint_from:references{polymorphic} appoint_to:references{polymorphic} name description code status:integer business_type:integer discarded_at:datetime:index --force
 
   bundle exec rails g scaffold Chat
   bundle exec rails g scaffold Article

@@ -1,4 +1,5 @@
 Rails.application.routes.draw do
+  resources :project_groups
   resources :task_group_appointments
   resources :tasks
   resources :task_groups
