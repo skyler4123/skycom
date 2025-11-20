@@ -19,6 +19,7 @@ class Seed::ApplicationService
     Seed::FacilityGroupService.run
     Seed::ServiceService.run
     Seed::ProductBrandService.run
+    Seed::ProductGroupService.run
     Seed::ProductService.run
     Seed::CustomerService.run
     Seed::OrderService.run
