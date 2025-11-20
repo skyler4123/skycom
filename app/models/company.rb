@@ -9,6 +9,7 @@ class Company < ApplicationRecord
   has_many :policies, dependent: :destroy
   has_many :facility_groups, dependent: :destroy
   has_many :facilities, dependent: :destroy
+  has_many :service_groups, dependent: :destroy
   has_many :services, dependent: :destroy
   has_many :product_groups, dependent: :destroy
   has_many :products, dependent: :destroy
