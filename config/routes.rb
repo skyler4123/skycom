@@ -1,4 +1,5 @@
 Rails.application.routes.draw do
+  resources :cart_groups
   resources :projects
   resources :project_groups
   resources :task_group_appointments
