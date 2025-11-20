@@ -20,6 +20,7 @@ class Company < ApplicationRecord
   has_many :payment_method_appointments, dependent: :destroy
   has_many :assessments, dependent: :destroy
   has_many :task_groups, dependent: :destroy
+  has_many :project_groups, dependent: :destroy
   has_many :payment_methods, through: :payment_method_appointments
 
 

@@ -32,6 +32,7 @@ class Seed::ApplicationService
     Seed::AssessmentService.run
     Seed::TaskGroupService.run
     Seed::TaskService.run
+    Seed::ProjectGroupService.run
 
 
 
