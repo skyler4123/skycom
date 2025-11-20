@@ -2,6 +2,7 @@ class ServiceGroup < ApplicationRecord
   # --- Associations ---
   belongs_to :company
   has_many :service_group_appointments, dependent: :destroy
+  has_many :services, through: :service_group_appointments, source: :appoint_to, source_type: "Service"
 
   # --- Enums ---
   enum :status, {

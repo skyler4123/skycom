@@ -4,6 +4,9 @@ class Service < ApplicationRecord
   has_many :order_item_appointments, as: :appoint_to, dependent: :destroy
   has_many :orders, through: :order_item_appointments
 
+  has_many :service_group_appointments, dependent: :destroy, as: :appoint_to
+  has_many :service_groups, through: :service_group_appointments
+
   # --- Enums ---
   enum :status, { 
     active: 0, 
