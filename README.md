@@ -119,9 +119,6 @@ Things you may want to cover:
   bundle exec rails g scaffold TaskGroupAppointment
   bundle exec rails g scaffold Task
 
-  bundle exec rails g scaffold Assessment
-  bundle exec rails g scaffold AssessmentAppointment
-
   bundle exec rails g scaffold Chat
   bundle exec rails g scaffold Article
   bundle exec rails g scaffold Report

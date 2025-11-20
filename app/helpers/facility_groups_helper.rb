@@ -1,0 +1,2 @@
+module FacilityGroupsHelper
+end
