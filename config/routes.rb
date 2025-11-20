@@ -1,4 +1,5 @@
 Rails.application.routes.draw do
+  resources :product_groups
   resources :facility_group_appointments
   resources :facility_groups
   resources :payment_method_appointments
