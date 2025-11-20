@@ -1,0 +1,2 @@
+module AssessmentAppointmentsHelper
+end
