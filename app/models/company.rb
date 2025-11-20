@@ -30,6 +30,14 @@ class Company < ApplicationRecord
     privately_held: 1 
   }
   
+  enum :currency, { 
+    usd: 840, 
+    eur: 1,
+    gbp: 826,
+    vnd: 704,
+    jpy: 392
+  }
+  
   # Grouped business types with 1000-unit gaps for future expansion
   enum :business_type, { 
     # Group 1: General & Retail (0-999)

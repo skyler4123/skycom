@@ -7,10 +7,11 @@ RSpec.describe "companies/show", type: :view do
       parent_company: nil,
       name: "Name",
       description: "Description",
+      code: "Code",
       status: 2,
       ownership_type: 3,
       business_type: 4,
-      currency: "Currency",
+      currency: 5,
       registration_number: "Registration Number",
       vat_id: "Vat",
       address_line_1: "Address Line 1",
@@ -20,8 +21,8 @@ RSpec.describe "companies/show", type: :view do
       email: "Email",
       phone_number: "Phone Number",
       website: "Website",
-      employee_count: 5,
-      fiscal_year_end_month: 6
+      employee_count: 6,
+      fiscal_year_end_month: 7
     ))
   end
 
@@ -31,10 +32,11 @@ RSpec.describe "companies/show", type: :view do
     expect(rendered).to match(//)
     expect(rendered).to match(/Name/)
     expect(rendered).to match(/Description/)
+    expect(rendered).to match(/Code/)
     expect(rendered).to match(/2/)
     expect(rendered).to match(/3/)
     expect(rendered).to match(/4/)
-    expect(rendered).to match(/Currency/)
+    expect(rendered).to match(/5/)
     expect(rendered).to match(/Registration Number/)
     expect(rendered).to match(/Vat/)
     expect(rendered).to match(/Address Line 1/)
@@ -44,7 +46,7 @@ RSpec.describe "companies/show", type: :view do
     expect(rendered).to match(/Email/)
     expect(rendered).to match(/Phone Number/)
     expect(rendered).to match(/Website/)
-    expect(rendered).to match(/5/)
     expect(rendered).to match(/6/)
+    expect(rendered).to match(/7/)
   end
 end

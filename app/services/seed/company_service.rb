@@ -17,7 +17,8 @@ class Seed::CompanyService
     statuses = Company.statuses.keys
     ownership_types = Company.ownership_types.keys
     fiscal_months = Company.fiscal_year_end_months.keys
-    
+    currencies = Company.currencies.keys
+  
     total_companies_created = 0
 
     User.all.each do |user|
@@ -32,7 +33,8 @@ class Seed::CompanyService
         random_status = statuses.sample
         random_ownership = ownership_types.sample
         random_fiscal_month = fiscal_months.sample
-
+        random_currency = currencies.sample
+        
         # 2. Randomly select a parent company from those already created by this user
         parent = user_companies.sample 
         
@@ -58,6 +60,9 @@ class Seed::CompanyService
           status: random_status,
           ownership_type: random_ownership,
           business_type: cycled_business_type, # <-- NOW CYCLED
+          
+          # Currency
+          currency: random_currency,
           
           # Administrative Fields
           registration_number: Faker::Company.ein,

@@ -8,10 +8,11 @@ RSpec.describe "companies/index", type: :view do
         parent_company: nil,
         name: "Name",
         description: "Description",
+        code: "Code",
         status: 2,
         ownership_type: 3,
         business_type: 4,
-        currency: "Currency",
+        currency: 5,
         registration_number: "Registration Number",
         vat_id: "Vat",
         address_line_1: "Address Line 1",
@@ -21,18 +22,19 @@ RSpec.describe "companies/index", type: :view do
         email: "Email",
         phone_number: "Phone Number",
         website: "Website",
-        employee_count: 5,
-        fiscal_year_end_month: 6
+        employee_count: 6,
+        fiscal_year_end_month: 7
       ),
       Company.create!(
         user: nil,
         parent_company: nil,
         name: "Name",
         description: "Description",
+        code: "Code",
         status: 2,
         ownership_type: 3,
         business_type: 4,
-        currency: "Currency",
+        currency: 5,
         registration_number: "Registration Number",
         vat_id: "Vat",
         address_line_1: "Address Line 1",
@@ -42,8 +44,8 @@ RSpec.describe "companies/index", type: :view do
         email: "Email",
         phone_number: "Phone Number",
         website: "Website",
-        employee_count: 5,
-        fiscal_year_end_month: 6
+        employee_count: 6,
+        fiscal_year_end_month: 7
       )
     ])
   end
@@ -55,10 +57,11 @@ RSpec.describe "companies/index", type: :view do
     assert_select cell_selector, text: Regexp.new(nil.to_s), count: 2
     assert_select cell_selector, text: Regexp.new("Name".to_s), count: 2
     assert_select cell_selector, text: Regexp.new("Description".to_s), count: 2
+    assert_select cell_selector, text: Regexp.new("Code".to_s), count: 2
     assert_select cell_selector, text: Regexp.new(2.to_s), count: 2
     assert_select cell_selector, text: Regexp.new(3.to_s), count: 2
     assert_select cell_selector, text: Regexp.new(4.to_s), count: 2
-    assert_select cell_selector, text: Regexp.new("Currency".to_s), count: 2
+    assert_select cell_selector, text: Regexp.new(5.to_s), count: 2
     assert_select cell_selector, text: Regexp.new("Registration Number".to_s), count: 2
     assert_select cell_selector, text: Regexp.new("Vat".to_s), count: 2
     assert_select cell_selector, text: Regexp.new("Address Line 1".to_s), count: 2
@@ -68,7 +71,7 @@ RSpec.describe "companies/index", type: :view do
     assert_select cell_selector, text: Regexp.new("Email".to_s), count: 2
     assert_select cell_selector, text: Regexp.new("Phone Number".to_s), count: 2
     assert_select cell_selector, text: Regexp.new("Website".to_s), count: 2
-    assert_select cell_selector, text: Regexp.new(5.to_s), count: 2
     assert_select cell_selector, text: Regexp.new(6.to_s), count: 2
+    assert_select cell_selector, text: Regexp.new(7.to_s), count: 2
   end
 end

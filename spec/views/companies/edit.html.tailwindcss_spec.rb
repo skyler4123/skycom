@@ -7,10 +7,11 @@ RSpec.describe "companies/edit", type: :view do
       parent_company: nil,
       name: "MyString",
       description: "MyString",
+      code: "MyString",
       status: 1,
       ownership_type: 1,
       business_type: 1,
-      currency: "MyString",
+      currency: 1,
       registration_number: "MyString",
       vat_id: "MyString",
       address_line_1: "MyString",
@@ -41,6 +42,8 @@ RSpec.describe "companies/edit", type: :view do
       assert_select "input[name=?]", "company[name]"
 
       assert_select "input[name=?]", "company[description]"
+
+      assert_select "input[name=?]", "company[code]"
 
       assert_select "input[name=?]", "company[status]"
 
