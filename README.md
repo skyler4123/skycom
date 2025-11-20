@@ -115,9 +115,9 @@ Things you may want to cover:
   bundle exec rails g scaffold ProjectGroupAppointment
   bundle exec rails g scaffold Project
 
-  bundle exec rails g scaffold TaskGroup
-  bundle exec rails g scaffold TaskGroupAppointment
-  bundle exec rails g scaffold Task
+  bundle exec rails g scaffold TaskGroup company:references name description code status:integer business_type:integer discarded_at:datetime:index --force
+  bundle exec rails g scaffold Task ompany:references name description code currency:integer status:integer business_type:integer discarded_at:datetime:index --force
+  bundle exec rails g scaffold TaskGroupAppointment assessment:references appoint_from:references{polymorphic} appoint_to:references{polymorphic} name description code status:integer business_type:integer discarded_at:datetime:index --force
 
   bundle exec rails g scaffold Chat
   bundle exec rails g scaffold Article

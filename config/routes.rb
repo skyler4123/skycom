@@ -1,4 +1,5 @@
 Rails.application.routes.draw do
+  resources :task_groups
   resources :assessment_appointments
   resources :assessments
   resources :bookings
