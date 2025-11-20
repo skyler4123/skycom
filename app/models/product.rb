@@ -6,6 +6,9 @@ class Product < ApplicationRecord
   has_many :order_item_appointments, as: :appoint_to, dependent: :destroy
   has_many :orders, through: :order_item_appointments
 
+  has_many :product_group_appointments, dependent: :destroy, as: :appoint_to
+  has_many :product_groups, through: :product_group_appointments
+
   # --- Enums ---
   enum :status, {
     draft: 0,

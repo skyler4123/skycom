@@ -76,10 +76,10 @@ Things you may want to cover:
   bundle exec rails g scaffold ServiceGroupAppointment service_group:references appoint_to:references{polymorphic} name description code status:integer duration:integer start_at:datetime business_type:integer discarded_at:datetime:index --force
   bundle exec rails g scaffold Service company:references name description code status:integer duration:integer start_at:datetime business_type:integer discarded_at:datetime:index --force
 
-  bundle exec rails g scaffold ProductGroup company:references name description code status:integer business_type:integer discarded_at:datetime:index --force
-  bundle exec rails g scaffold ProductGroupAppointment product_group:references appoint_to:references{polymorphic} name description code status:integer business_type:integer discarded_at:datetime:index --force
   bundle exec rails g scaffold ProductBrand name description code status:integer business_type:integer discarded_at:datetime:index --force
+  bundle exec rails g scaffold ProductGroup company:references name description code status:integer business_type:integer discarded_at:datetime:index --force
   bundle exec rails g scaffold Product company:references product_brand:references name description code status:integer business_type:integer discarded_at:datetime:index --force
+  bundle exec rails g scaffold ProductGroupAppointment product_group:references appoint_to:references{polymorphic} name description code status:integer business_type:integer discarded_at:datetime:index --force
 
   bundle exec rails g scaffold CustomerGroup company:references name description code status:integer business_type:integer discarded_at:datetime:index --force
   bundle exec rails g scaffold CustomerGroupAppointment customer_group:references appoint_to:references{polymorphic} name description code status:integer business_type:integer discarded_at:datetime:index --force
