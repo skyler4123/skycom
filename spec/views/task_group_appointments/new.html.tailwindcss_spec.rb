@@ -1,0 +1,42 @@
+require 'rails_helper'
+
+RSpec.describe "task_group_appointments/new", type: :view do
+  before(:each) do
+    assign(:task_group_appointment, TaskGroupAppointment.new(
+      assessment: nil,
+      appoint_from: nil,
+      appoint_to: nil,
+      appoint_for: nil,
+      name: "MyString",
+      description: "MyString",
+      code: "MyString",
+      status: 1,
+      business_type: 1
+    ))
+  end
+
+  it "renders new task_group_appointment form" do
+    render
+
+    assert_select "form[action=?][method=?]", task_group_appointments_path, "post" do
+
+      assert_select "input[name=?]", "task_group_appointment[assessment_id]"
+
+      assert_select "input[name=?]", "task_group_appointment[appoint_from_id]"
+
+      assert_select "input[name=?]", "task_group_appointment[appoint_to_id]"
+
+      assert_select "input[name=?]", "task_group_appointment[appoint_for_id]"
+
+      assert_select "input[name=?]", "task_group_appointment[name]"
+
+      assert_select "input[name=?]", "task_group_appointment[description]"
+
+      assert_select "input[name=?]", "task_group_appointment[code]"
+
+      assert_select "input[name=?]", "task_group_appointment[status]"
+
+      assert_select "input[name=?]", "task_group_appointment[business_type]"
+    end
+  end
+end
