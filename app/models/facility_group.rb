@@ -1,7 +1,8 @@
 class FacilityGroup < ApplicationRecord
   # --- Associations ---
   belongs_to :company
-  # has_many :facility_group_appointments, dependent: :destroy
+  has_many :facility_group_appointments, dependent: :destroy
+  has_many :facilities, through: :facility_group_appointments, source: :appoint_to, source_type: "Facility"
 
   # --- Enums ---
   enum :status, {
