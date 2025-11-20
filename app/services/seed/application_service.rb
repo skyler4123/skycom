@@ -10,6 +10,7 @@ class Seed::ApplicationService
     Seed::EmployeeService.run
     Seed::EmployeeGroupAppointmentService.run
     Seed::RoleService.run
+    Seed::PeriodService.run
     Seed::PolicyService.run
     Seed::PolicyAppointmentService.run
     Seed::RoleAppointmentService.run

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_11_20_005600) do
+ActiveRecord::Schema[8.0].define(version: 2025_11_20_153141) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -242,6 +242,22 @@ ActiveRecord::Schema[8.0].define(version: 2025_11_20_005600) do
     t.index ["invoice_id"], name: "index_payments_on_invoice_id"
   end
 
+  create_table "periods", force: :cascade do |t|
+    t.bigint "company_id", null: false
+    t.string "name"
+    t.string "description"
+    t.string "code"
+    t.integer "duration"
+    t.datetime "start_at"
+    t.datetime "end_at"
+    t.datetime "expire_at"
+    t.datetime "discarded_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["company_id"], name: "index_periods_on_company_id"
+    t.index ["discarded_at"], name: "index_periods_on_discarded_at"
+  end
+
   create_table "policies", force: :cascade do |t|
     t.bigint "company_id", null: false
     t.string "name"
@@ -412,6 +428,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_11_20_005600) do
   add_foreign_key "orders", "companies"
   add_foreign_key "orders", "customers"
   add_foreign_key "payments", "invoices"
+  add_foreign_key "periods", "companies"
   add_foreign_key "policies", "companies"
   add_foreign_key "policy_appointments", "policies"
   add_foreign_key "products", "companies"
