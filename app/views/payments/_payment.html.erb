@@ -1,0 +1,46 @@
+<div id="<%= dom_id payment %>" class="w-full sm:w-auto my-5 space-y-5">
+  <div>
+    <strong class="block font-medium mb-1">Invoice:</strong>
+    <%= payment.invoice_id %>
+  </div>
+  <div>
+    <strong class="block font-medium mb-1">Name:</strong>
+    <%= payment.name %>
+  </div>
+  <div>
+    <strong class="block font-medium mb-1">Description:</strong>
+    <%= payment.description %>
+  </div>
+  <div>
+    <strong class="block font-medium mb-1">Currency:</strong>
+    <%= payment.currency %>
+  </div>
+  <div>
+    <strong class="block font-medium mb-1">Exchange rate:</strong>
+    <%= payment.exchange_rate %>
+  </div>
+  <div>
+    <strong class="block font-medium mb-1">Amount:</strong>
+    <%= payment.amount %>
+  </div>
+  <div>
+    <strong class="block font-medium mb-1">Payment method:</strong>
+    <%= payment.payment_method %>
+  </div>
+  <div>
+    <strong class="block font-medium mb-1">Gateway details:</strong>
+    <%= payment.gateway_details %>
+  </div>
+  <div>
+    <strong class="block font-medium mb-1">Status:</strong>
+    <%= payment.status %>
+  </div>
+  <div>
+    <strong class="block font-medium mb-1">Business type:</strong>
+    <%= payment.business_type %>
+  </div>
+  <div>
+    <strong class="block font-medium mb-1">Discarded at:</strong>
+    <%= payment.discarded_at %>
+  </div>
+</div>
