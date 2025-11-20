@@ -18,6 +18,7 @@ class Company < ApplicationRecord
   has_many :orders, dependent: :destroy
   has_many :periods, dependent: :destroy
   has_many :payment_method_appointments, dependent: :destroy
+  has_many :assessments, dependent: :destroy
   has_many :payment_methods, through: :payment_method_appointments
 
 
