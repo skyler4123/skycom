@@ -31,6 +31,7 @@ class Seed::ApplicationService
     Seed::BookingService.run
     Seed::AssessmentService.run
     Seed::TaskGroupService.run
+    Seed::TaskService.run
 
 
 
