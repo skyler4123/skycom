@@ -3,6 +3,9 @@ class Product < ApplicationRecord
   belongs_to :company
   belongs_to :product_brand, optional: true
 
+  has_many :order_item_appointments, as: :appoint_to, dependent: :destroy
+  has_many :orders, through: :order_item_appointments
+
   # --- Enums ---
   enum :status, {
     draft: 0,

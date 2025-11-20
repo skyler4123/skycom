@@ -3,6 +3,11 @@ class Order < ApplicationRecord
   belongs_to :company
   belongs_to :customer, optional: true
 
+  has_many :order_item_appointments, dependent: :destroy
+  has_many :products, through: :order_item_appointments, source: :appoint_to, source_type: "Product"
+  has_many :services, through: :order_item_appointments, source: :appoint_to, source_type: "Service"
+
+
   # --- Enums ---
   enum :status, {
     pending: 0,
