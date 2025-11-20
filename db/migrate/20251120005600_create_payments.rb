@@ -4,7 +4,7 @@ class CreatePayments < ActiveRecord::Migration[8.0]
       t.references :invoice, null: false, foreign_key: true
       t.string :name
       t.string :description
-      t.string :currency
+      t.integer :currency
       t.decimal :exchange_rate
       t.decimal :amount
       t.string :payment_method

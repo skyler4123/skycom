@@ -2,6 +2,8 @@ class Invoice < ApplicationRecord
   # --- Associations ---
   belongs_to :order
 
+  has_many :payments, dependent: :destroy
+
   # --- Enums ---
   enum :status, {
     draft: 0,

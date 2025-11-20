@@ -21,6 +21,7 @@ class Seed::ApplicationService
     Seed::OrderService.run
     Seed::OrderItemAppointmentService.run
     Seed::InvoiceService.run
+    Seed::PaymentService.run
 
 
 

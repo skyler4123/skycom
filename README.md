@@ -45,7 +45,7 @@ Things you may want to cover:
 
   bundle exec rails g scaffold Company user:references parent_company:references name description \
   status:integer ownership_type:integer business_type:integer \
-  currency registration_number:string vat_id:string \
+  currency:integer registration_number:string vat_id:string \
   address_line_1:string city:string postal_code:string country:string \
   email:string phone_number:string website:string \
   employee_count:integer fiscal_year_end_month:integer \
@@ -71,10 +71,10 @@ Things you may want to cover:
 
   bundle exec rails g scaffold Customer company:references name description status:integer business_type:integer discarded_at:datetime:index --force
 
-  bundle exec rails g scaffold Order company:references customer:references name description currency status:integer business_type:integer discarded_at:datetime:index --force
+  bundle exec rails g scaffold Order company:references customer:references name description currency:integer status:integer business_type:integer discarded_at:datetime:index --force
   bundle exec rails g scaffold OrderItemAppointment order:references appoint_to:references{polymorphic} unit_price:decimal quantity:integer total_price:decimal name description status:integer business_type:integer discarded_at:datetime:index --force
-  bundle exec rails g scaffold Invoice order:references name description currency number total due_date:datetime status:integer business_type:integer discarded_at:datetime:index --force
-  bundle exec rails g scaffold Payment invoice:references name description currency exchange_rate:decimal amount:decimal payment_method gateway_details status:integer business_type:integer discarded_at:datetime:index --force
+  bundle exec rails g scaffold Invoice order:references name description currency:integer number total due_date:datetime status:integer business_type:integer discarded_at:datetime:index --force
+  bundle exec rails g scaffold Payment invoice:references name description currency:integer exchange_rate:decimal amount:decimal payment_method gateway_details status:integer business_type:integer discarded_at:datetime:index --force
 
 
   bundle exec rails g scaffold Cart company:references customer:references name description status:integer business_type:integer discarded_at:datetime:index --force
