@@ -2,6 +2,7 @@ class Facility < ApplicationRecord
   belongs_to :company
   has_many :facility_group_appointments, as: :appoint_to, dependent: :destroy
   has_many :facility_groups, through: :facility_group_appointments
+  has_many :bookings, as: :appoint_to, dependent: :destroy, class_name: "Booking"
 
   enum :status, { 
     active: 0, 

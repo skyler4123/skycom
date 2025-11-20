@@ -34,4 +34,6 @@ class Employee < ApplicationRecord
   has_many :role_appointments, as: :appoint_to, dependent: :destroy
   has_many :roles, through: :role_appointments
 
+  has_many :bookings, as: :appoint_from, dependent: :destroy, class_name: "Booking"
+
 end

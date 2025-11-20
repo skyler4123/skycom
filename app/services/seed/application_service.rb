@@ -28,6 +28,7 @@ class Seed::ApplicationService
     Seed::OrderItemAppointmentService.run
     Seed::InvoiceService.run
     Seed::PaymentMethodAppointmentService.run # Now appoint them to companies
+    Seed::BookingService.run
 
 
 

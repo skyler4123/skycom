@@ -2,6 +2,9 @@ class Period < ApplicationRecord
   # --- Associations ---
   belongs_to :company
 
+  has_one :period_appointment, as: :appoint_to, dependent: :destroy
+  has_one :booking, through: :period_appointment
+
   # --- Validations ---
   validates :name, presence: true, length: { maximum: 255 }
   validates :start_at, presence: true
