@@ -1,0 +1,2 @@
+module FacilityGroupAppointmentsHelper
+end
