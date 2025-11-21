@@ -129,9 +129,7 @@ Things you may want to cover:
   bundle exec rails g scaffold Report
   bundle exec rails g scaffold Log name
 
-  ### Assessments & Exams
-  bundle exec rails g scaffold Assessment company:references name description code status:integer business_type:integer discarded_at:datetime:index --force
-  bundle exec rails g scaffold AssessmentAppointment assessment:references appoint_from:references{polymorphic} appoint_to:references{polymorphic} appoint_for:references{polymorphic} appoint_by:references{polymorphic} name description code status:integer business_type:integer discarded_at:datetime:index --force
+  ### Exams
   bundle exec rails g scaffold ExamGroup company:references name description code status:integer business_type:integer discarded_at:datetime:index --force
   bundle exec rails g scaffold Exam exam_group:references company:references name description code status:integer business_type:integer discarded_at:datetime:index --force
   bundle exec rails g scaffold Question company:references name description code status:integer business_type:integer discarded_at:datetime:index --force
