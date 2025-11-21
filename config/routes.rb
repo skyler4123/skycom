@@ -29,7 +29,6 @@ Rails.application.routes.draw do
   resources :orders
   resources :customers
   resources :products
-  resources :product_brands
   resources :services
   resources :facilities
   resources :role_appointments
