@@ -92,12 +92,6 @@ Things you may want to cover:
 
   bundle exec rails g scaffold Booking company:references appoint_from:references{polymorphic} appoint_to:references{polymorphic} name description code status:integer business_type:integer discarded_at:datetime:index --force
 
-  bundle exec rails g scaffold CalendarSchedule company:references name description code status:integer business_type:integer discarded_at:datetime:index --force
-  bundle exec rails g scaffold CalendarEvent company:references name description code status:integer business_type:integer discarded_at:datetime:index --force
-
-  bundle exec rails g scaffold AttendanceCheck company:references name description code status:integer business_type:integer discarded_at:datetime:index --force
-  bundle exec rails g scaffold AttendanceSummary company:references name description code status:integer business_type:integer discarded_at:datetime:index from:datetime to:datetime --force
-
   bundle exec rails g scaffold PaymentMethod name description code currency:integer status:integer business_type:integer discarded_at:datetime:index --force
   bundle exec rails g scaffold Payment company:references name description code currency:integer status:integer business_type:integer discarded_at:datetime:index --force
   bundle exec rails g scaffold PaymentMethodAppointment payment_method:references company:references name description code status:integer business_type:integer discarded_at:datetime:index --force
