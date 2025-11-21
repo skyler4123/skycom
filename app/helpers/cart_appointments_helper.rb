@@ -1,0 +1,2 @@
+module CartAppointmentsHelper
+end

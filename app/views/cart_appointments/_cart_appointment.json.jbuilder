@@ -1,0 +1,2 @@
+json.extract! cart_appointment, :id, :cart_id, :appoint_from_id, :appoint_from_type, :appoint_to_id, :appoint_to_type, :appoint_for_id, :appoint_for_type, :name, :description, :code, :status, :business_type, :discarded_at, :created_at, :updated_at
+json.url cart_appointment_url(cart_appointment, format: :json)
