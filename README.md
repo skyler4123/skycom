@@ -52,6 +52,8 @@ Things you may want to cover:
   bundle exec rails g scaffold EmployeeGroupAppointment employee_group:references appoint_from:references{polymorphic} appoint_to:references{polymorphic} appoint_for:references{polymorphic} appoint_by:references{polymorphic} name description code --force
   bundle exec rails g scaffold Role company:references name description code status:integer business_type:integer discarded_at:datetime:index --force
   bundle exec rails g scaffold EmployeeAppointment employee:references appoint_from:references{polymorphic} appoint_to:references{polymorphic} appoint_for:references{polymorphic} appoint_by:references{polymorphic} name description code --force
+
+  ### HR / Permission Management
   bundle exec rails g scaffold Role company:references name description code status:integer business_type:integer discarded_at:datetime:index --force
   bundle exec rails g scaffold Policy company:references name description code resource action status:integer business_type:integer discarded_at:datetime:index --force
   bundle exec rails g scaffold PolicyAppointment policy:references appoint_to:references{polymorphic} name description code status:integer business_type:integer discarded_at:datetime:index --force
