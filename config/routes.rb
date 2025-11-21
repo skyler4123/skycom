@@ -1,4 +1,5 @@
 Rails.application.routes.draw do
+  resources :notifications
   resources :notification_groups
   resources :cart_appointments
   resources :carts
