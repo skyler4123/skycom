@@ -117,7 +117,8 @@ Things you may want to cover:
   bundle exec rails g scaffold Cart company:references cart_group:references name description code status:integer business_type:integer discarded_at:datetime:index --force
   bundle exec rails g scaffold CartAppointment cart:references appoint_from:references{polymorphic} appoint_to:references{polymorphic} appoint_for:references{polymorphic} name description code status:integer business_type:integer discarded_at:datetime:index --force
 
-  bundle exec rails g scaffold Notification company:references name description code status:integer business_type:integer discarded_at:datetime:index --force
+  bundle exec rails g scaffold NotificationGroup company:references name description code status:integer business_type:integer discarded_at:datetime:index --force
+  bundle exec rails g scaffold Notification notification:references company:references name description code status:integer business_type:integer discarded_at:datetime:index --force
   bundle exec rails g scaffold NotificationAppointment notification:references appoint_from:references{polymorphic} appoint_to:references{polymorphic} appoint_for:references{polymorphic} name description code status:integer business_type:integer discarded_at:datetime:index --force
 
   bundle exec rails g scaffold Chat
