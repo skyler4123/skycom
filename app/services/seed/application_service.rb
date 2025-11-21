@@ -36,6 +36,7 @@ class Seed::ApplicationService
     Seed::ProjectService.run
     Seed::CartGroupService.run
     Seed::CartService.run
+    Seed::NotificationGroupService.run
 
 
 
