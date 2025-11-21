@@ -10,8 +10,6 @@ Rails.application.routes.draw do
   resources :task_group_appointments
   resources :tasks
   resources :task_groups
-  resources :assessment_appointments
-  resources :assessments
   resources :bookings
   resources :customer_group_appointments
   resources :customer_groups
