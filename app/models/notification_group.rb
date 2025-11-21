@@ -1,7 +1,7 @@
 class NotificationGroup < ApplicationRecord
   # --- Associations ---
   belongs_to :company
-  # has_many :notification_group_appointments, dependent: :destroy # Can be added later
+  has_many :notifications, dependent: :destroy
 
   # --- Enums ---
   enum :status, {
