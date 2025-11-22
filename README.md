@@ -72,16 +72,16 @@ Things you may want to cover:
   bundle exec rails g scaffold CustomerAppointment customer:references appoint_from:references{polymorphic} appoint_to:references{polymorphic} appoint_for:references{polymorphic} appoint_by:references{polymorphic} name description code status:integer business_type:integer discarded_at:datetime:index --force
 
   ### Inventory
-  bundle exec rails g scaffold InventoryItem company:references name description code status:integer business_type:integer discarded_at:datetime:index --force
+  bundle exec rails g scaffold InventoryItem company:references name description code sku:string:index barcode:string:index upc:string:index ean:string:index manufacturer_code:string serial_number:string:index batch_number:string expiration_date:datetime status:integer business_type:integer discarded_at:datetime:index --force
   bundle exec rails g scaffold InventoryItemAppointment facility_group:references appoint_from:references{polymorphic} appoint_to:references{polymorphic} appoint_for:references{polymorphic} appoint_by:references{polymorphic} name description code status:integer business_type:integer discarded_at:datetime:index --force
 
-  bundle exec rails g scaffold InventoryTransaction name
-  bundle exec rails g scaffold Recipe name
+  bundle exec rails g scaffold InventoryTransaction company:references name description code status:integer business_type:integer discarded_at:datetime:index --force
+  bundle exec rails g scaffold InventoryTransactionAppointment inventory_transaction:references appoint_from:references{polymorphic} appoint_to:references{polymorphic} appoint_for:references{polymorphic} appoint_by:references{polymorphic} name description code status:integer business_type:integer discarded_at:datetime:index --force
 
   ### Product Management
   bundle exec rails g scaffold Brand name description code status:integer business_type:integer discarded_at:datetime:index --force
   bundle exec rails g scaffold ProductGroup company:references name description code status:integer business_type:integer discarded_at:datetime:index --force
-  bundle exec rails g scaffold Product company:references product_brand:references name description code status:integer business_type:integer discarded_at:datetime:index --force
+  bundle exec rails g scaffold Product company:references product_brand:references name description code sku:string:index barcode:string:index upc:string:index ean:string:index manufacturer_code:string serial_number:string:index batch_number:string expiration_date:datetime status:integer business_type:integer discarded_at:datetime:index --force
   bundle exec rails g scaffold ProductGroupAppointment product_group:references appoint_from:references{polymorphic} appoint_to:references{polymorphic} appoint_for:references{polymorphic} appoint_by:references{polymorphic} name description code status:integer business_type:integer discarded_at:datetime:index --force
   bundle exec rails g scaffold ProductAppointment product:references appoint_from:references{polymorphic} appoint_to:references{polymorphic} appoint_for:references{polymorphic} appoint_by:references{polymorphic} name description code status:integer business_type:integer discarded_at:datetime:index --force
 
@@ -93,18 +93,18 @@ Things you may want to cover:
 
   ### Orders
   bundle exec rails g scaffold OrderGroup company:references customer:references name description code currency:integer duration:integer status:integer business_type:integer discarded_at:datetime:index --force
-  bundle exec rails g scaffold Order company:references customer:references name description code currency:integer duration:integer status:integer business_type:integer discarded_at:datetime:index --force
+  bundle exec rails g scaffold Order company:references customer:references name description code sku:string:index barcode:string:index upc:string:index ean:string:index manufacturer_code:string serial_number:string:index batch_number:string expiration_date:datetime currency:integer duration:integer status:integer business_type:integer discarded_at:datetime:index --force
   bundle exec rails g scaffold OrderGroupAppointment order_group:references appoint_from:references{polymorphic} appoint_to:references{polymorphic} appoint_for:references{polymorphic} appoint_by:references{polymorphic} unit_price:decimal quantity:integer total_price:decimal name description code status:integer business_type:integer discarded_at:datetime:index --force
   bundle exec rails g scaffold OrderAppointment order:references appoint_from:references{polymorphic} appoint_to:references{polymorphic} appoint_for:references{polymorphic} appoint_by:references{polymorphic} unit_price:decimal quantity:integer total_price:decimal name description code status:integer business_type:integer discarded_at:datetime:index --force
 
   ### Carts
   bundle exec rails g scaffold CartGroup company:references name description code status:integer business_type:integer discarded_at:datetime:index --force
-  bundle exec rails g scaffold Cart company:references cart_group:references name description code status:integer business_type:integer discarded_at:datetime:index --force
+  bundle exec rails g scaffold Cart company:references cart_group:references name description code sku:string:index barcode:string:index upc:string:index ean:string:index manufacturer_code:string serial_number:string:index batch_number:string expiration_date:datetime status:integer business_type:integer discarded_at:datetime:index --force
   bundle exec rails g scaffold CartAppointment cart:references appoint_from:references{polymorphic} appoint_to:references{polymorphic} appoint_for:references{polymorphic} appoint_by:references{polymorphic} name description code status:integer business_type:integer discarded_at:datetime:index --force
 
   ### Carts
   bundle exec rails g scaffold Purchase company:references name description code status:integer business_type:integer discarded_at:datetime:index --force
-  bundle exec rails g scaffold PurchaseItem purchase:references name description code status:integer business_type:integer discarded_at:datetime:index --force
+  bundle exec rails g scaffold PurchaseItem purchase:references name description code sku:string:index barcode:string:index upc:string:index ean:string:index manufacturer_code:string serial_number:string:index batch_number:string expiration_date:datetime status:integer business_type:integer discarded_at:datetime:index --force
   bundle exec rails g scaffold Promotion name
 
   ### Billing & Payments
