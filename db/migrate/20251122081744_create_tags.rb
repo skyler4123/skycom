@@ -4,6 +4,7 @@ class CreateTags < ActiveRecord::Migration[8.0]
       t.references :company, null: false, foreign_key: true
       t.string :name
       t.string :description
+      t.string :code
 
       t.timestamps
     end

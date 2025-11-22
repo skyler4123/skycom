@@ -5,7 +5,8 @@ RSpec.describe "tags/edit", type: :view do
     Tag.create!(
       company: nil,
       name: "MyString",
-      description: "MyString"
+      description: "MyString",
+      code: "MyString"
     )
   }
 
@@ -23,6 +24,8 @@ RSpec.describe "tags/edit", type: :view do
       assert_select "input[name=?]", "tag[name]"
 
       assert_select "input[name=?]", "tag[description]"
+
+      assert_select "input[name=?]", "tag[code]"
     end
   end
 end

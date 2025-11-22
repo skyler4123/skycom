@@ -5,7 +5,8 @@ RSpec.describe "tags/new", type: :view do
     assign(:tag, Tag.new(
       company: nil,
       name: "MyString",
-      description: "MyString"
+      description: "MyString",
+      code: "MyString"
     ))
   end
 
@@ -19,6 +20,8 @@ RSpec.describe "tags/new", type: :view do
       assert_select "input[name=?]", "tag[name]"
 
       assert_select "input[name=?]", "tag[description]"
+
+      assert_select "input[name=?]", "tag[code]"
     end
   end
 end
