@@ -102,8 +102,11 @@ Things you may want to cover:
   bundle exec rails g scaffold FacilityGroup company:references name description code status:integer business_type:integer discarded_at:datetime:index --force
   bundle exec rails g scaffold Facility company:references name description code status:integer business_type:integer discarded_at:datetime:index --force
   bundle exec rails g scaffold FacilityGroupAppointment facility_group:references appoint_from:references{polymorphic} appoint_to:references{polymorphic} appoint_for:references{polymorphic} appoint_by:references{polymorphic} name description code status:integer business_type:integer discarded_at:datetime:index --force
-  bundle exec rails g scaffold Inventory company:references name description code status:integer business_type:integer discarded_at:datetime:index --force
-  bundle exec rails g scaffold InventoryItem inventory:references name description code status:integer business_type:integer discarded_at:datetime:index --force
+  bundle exec rails g scaffold FacilityAppointment facility:references appoint_from:references{polymorphic} appoint_to:references{polymorphic} appoint_for:references{polymorphic} appoint_by:references{polymorphic} name description code status:integer business_type:integer discarded_at:datetime:index --force
+
+  ### Inventory
+  bundle exec rails g scaffold InventoryItem company:references name description code status:integer business_type:integer discarded_at:datetime:index --force
+  bundle exec rails g scaffold InventoryItemAppointment facility_group:references appoint_from:references{polymorphic} appoint_to:references{polymorphic} appoint_for:references{polymorphic} appoint_by:references{polymorphic} name description code status:integer business_type:integer discarded_at:datetime:index --force
   bundle exec rails g scaffold InventoryTransaction name
   bundle exec rails g scaffold Recipe name
 

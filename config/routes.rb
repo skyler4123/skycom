@@ -25,7 +25,6 @@ Rails.application.routes.draw do
   resources :periods
   resources :payments
   resources :invoices
-  resources :order_item_appointments
   resources :orders
   resources :customers
   resources :products
