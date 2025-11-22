@@ -25,3 +25,10 @@ module Skycom
     # config.eager_load_paths << Rails.root.join("extras")
   end
 end
+
+# Custom configuration
+module Skycom
+  class Application < Rails::Application
+    config.generators.orm :active_record, primary_key_type: :uuid
+  end
+end

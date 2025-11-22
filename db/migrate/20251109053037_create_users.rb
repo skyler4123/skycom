@@ -1,6 +1,6 @@
 class CreateUsers < ActiveRecord::Migration[8.0]
   def change
-    create_table :users do |t|
+    create_table :users, id: :uuid do |t|
       t.string :email,           null: false, index: { unique: true }
       t.string :password_digest, null: false
 
@@ -15,7 +15,7 @@ class CreateUsers < ActiveRecord::Migration[8.0]
       t.string :avatar
       t.string :phone_number
       t.string :country_code
-      t.references :address, null: true, foreign_key: true
+      t.references :address, null: true, foreign_key: true, type: :uuid
       t.datetime :discarded_at
   
       t.timestamps
