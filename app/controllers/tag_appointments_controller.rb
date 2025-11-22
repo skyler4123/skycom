@@ -65,6 +65,6 @@ class TagAppointmentsController < ApplicationController
 
     # Only allow a list of trusted parameters through.
     def tag_appointment_params
-      params.expect(tag_appointment: [ :tag_id, :appoint_to_id, :appoint_to_type, :value, :description ])
+      params.expect(tag_appointment: [ :tag_id, :appoint_from_id, :appoint_from_type, :appoint_to_id, :appoint_to_type, :appoint_for_id, :appoint_for_type, :appoint_by_id, :appoint_by_type, :value, :description ])
     end
 end

@@ -4,7 +4,10 @@ RSpec.describe "tag_appointments/edit", type: :view do
   let(:tag_appointment) {
     TagAppointment.create!(
       tag: nil,
+      appoint_from: nil,
       appoint_to: nil,
+      appoint_for: nil,
+      appoint_by: nil,
       value: "MyString",
       description: "MyString"
     )
@@ -21,7 +24,13 @@ RSpec.describe "tag_appointments/edit", type: :view do
 
       assert_select "input[name=?]", "tag_appointment[tag_id]"
 
+      assert_select "input[name=?]", "tag_appointment[appoint_from_id]"
+
       assert_select "input[name=?]", "tag_appointment[appoint_to_id]"
+
+      assert_select "input[name=?]", "tag_appointment[appoint_for_id]"
+
+      assert_select "input[name=?]", "tag_appointment[appoint_by_id]"
 
       assert_select "input[name=?]", "tag_appointment[value]"
 
