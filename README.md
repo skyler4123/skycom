@@ -68,7 +68,7 @@ Things you may want to cover:
 
   ### CRM / Customer Management
   bundle exec rails g scaffold CustomerGroup company:references name description code status:integer business_type:integer discarded_at:datetime:index --force
-  bundle exec rails g scaffold Customer company:references name description code status:integer business_type:integer discarded_at:datetime:index --force
+  bundle exec rails g scaffold Customer user:references company:references name description code status:integer business_type:integer discarded_at:datetime:index --force
   bundle exec rails g scaffold CustomerGroupAppointment customer_group:references appoint_from:references{polymorphic} appoint_to:references{polymorphic} appoint_for:references{polymorphic} appoint_by:references{polymorphic} name description code status:integer business_type:integer discarded_at:datetime:index --force
   bundle exec rails g scaffold CustomerAppointment customer:references appoint_from:references{polymorphic} appoint_to:references{polymorphic} appoint_for:references{polymorphic} appoint_by:references{polymorphic} name description code status:integer business_type:integer discarded_at:datetime:index --force
 

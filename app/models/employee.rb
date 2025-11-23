@@ -3,6 +3,9 @@ class Employee < ApplicationRecord
   belongs_to :company
   belongs_to :user # user_id is nullable in the migration
 
+  has_many :role_appointments, as: :appoint_to, dependent: :destroy
+  has_many :roles, through: :role_appointments
+  
   # --- Soft Deletion (Discard) ---
   # If you are using a gem like 'Discard' or similar for soft deletion:
   # include Discard::Model 

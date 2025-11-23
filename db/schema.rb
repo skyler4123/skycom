@@ -293,6 +293,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_11_23_012412) do
   end
 
   create_table "customers", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "user_id"
     t.uuid "company_id", null: false
     t.string "name"
     t.string "description"
@@ -304,6 +305,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_11_23_012412) do
     t.datetime "updated_at", null: false
     t.index ["company_id"], name: "index_customers_on_company_id"
     t.index ["discarded_at"], name: "index_customers_on_discarded_at"
+    t.index ["user_id"], name: "index_customers_on_user_id"
   end
 
   create_table "employee_appointments", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -1478,6 +1480,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_11_23_012412) do
   add_foreign_key "customer_group_appointments", "customer_groups"
   add_foreign_key "customer_groups", "companies"
   add_foreign_key "customers", "companies"
+  add_foreign_key "customers", "users"
   add_foreign_key "employee_appointments", "employees"
   add_foreign_key "employee_group_appointments", "employee_groups"
   add_foreign_key "employee_groups", "companies"

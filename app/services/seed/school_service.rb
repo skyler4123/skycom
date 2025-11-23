@@ -3,6 +3,16 @@ class Seed::SchoolService
   # Define the standard roles to be created for each school
   SCHOOL_ROLES = %w[Principal Admin Teacher Student Accountant Cleaner Guard].freeze
 
+  # Define the number of employees to create for each role
+  EMPLOYEE_ROLES = {
+    'Principal' => 1,
+    'Admin' => 2,
+    'Teacher' => 5,
+    'Accountant' => 2,
+    'Cleaner' => 3,
+    'Guard' => 3
+  }.freeze
+
   def initialize
     @school_owners = []
     @school_admin = []
@@ -78,6 +88,44 @@ class Seed::SchoolService
             status: :active,
             business_type: Role.business_types.keys.sample # Use a valid business_type
           )
+        end
+
+        # --- 4. Create Employees for each School and Assign Roles ---
+        puts "  Creating employees for #{school.name}..."
+        EMPLOYEE_ROLES.each do |role_name, count|
+          role = school.roles.find_by(name: role_name)
+          unless role
+            puts "    [Warning] Role '#{role_name}' not found for #{school.name}. Skipping."
+            next
+          end
+
+          count.times do |k|
+            user = Seed::UserService.create(username: "#{role_name.parameterize}_#{school.id.to_s.first(4)}_#{k + 1}")
+            employee = school.employees.create!(
+              user: user,
+              name: user.name,
+              business_type: Employee.business_types.keys.sample,
+              status: :active
+            )
+            employee.roles << role
+            @teachers << employee if role_name == 'Teacher'
+            @school_admin << employee if role_name == 'Admin'
+          end
+        end
+
+        # --- 5. Create Students (Customers) and Assign Student Role ---
+        puts "  Creating #{@customer_count} students for #{school.name}..."
+        student_role = school.roles.find_by(name: 'Student')
+        unless student_role
+          puts "    [Warning] 'Student' role not found for #{school.name}. Skipping student creation."
+          next
+        end
+
+        @customer_count.times do |k|
+          user = Seed::UserService.create(username: "student_#{school.id.to_s.first(4)}_#{k + 1}")
+          customer = school.customers.create!(user: user, name: user.name, status: :active)
+          customer.roles << student_role
+          @customers << customer
         end
       end
     end
