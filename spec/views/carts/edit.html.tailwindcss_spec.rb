@@ -8,6 +8,13 @@ RSpec.describe "carts/edit", type: :view do
       name: "MyString",
       description: "MyString",
       code: "MyString",
+      sku: "MyString",
+      barcode: "MyString",
+      upc: "MyString",
+      ean: "MyString",
+      manufacturer_code: "MyString",
+      serial_number: "MyString",
+      batch_number: "MyString",
       status: 1,
       business_type: 1
     )
@@ -31,6 +38,20 @@ RSpec.describe "carts/edit", type: :view do
       assert_select "input[name=?]", "cart[description]"
 
       assert_select "input[name=?]", "cart[code]"
+
+      assert_select "input[name=?]", "cart[sku]"
+
+      assert_select "input[name=?]", "cart[barcode]"
+
+      assert_select "input[name=?]", "cart[upc]"
+
+      assert_select "input[name=?]", "cart[ean]"
+
+      assert_select "input[name=?]", "cart[manufacturer_code]"
+
+      assert_select "input[name=?]", "cart[serial_number]"
+
+      assert_select "input[name=?]", "cart[batch_number]"
 
       assert_select "input[name=?]", "cart[status]"
 

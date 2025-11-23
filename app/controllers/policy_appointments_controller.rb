@@ -65,6 +65,6 @@ class PolicyAppointmentsController < ApplicationController
 
     # Only allow a list of trusted parameters through.
     def policy_appointment_params
-      params.expect(policy_appointment: [ :policy_id, :appoint_to_id, :appoint_to_type, :name, :description, :status, :kind, :discarded_at ])
+      params.expect(policy_appointment: [ :policy_id, :appoint_to_id, :appoint_to_type, :name, :description, :code, :status, :business_type, :discarded_at ])
     end
 end

@@ -7,7 +7,16 @@ RSpec.describe "orders/new", type: :view do
       customer: nil,
       name: "MyString",
       description: "MyString",
-      currency: "MyString",
+      code: "MyString",
+      sku: "MyString",
+      barcode: "MyString",
+      upc: "MyString",
+      ean: "MyString",
+      manufacturer_code: "MyString",
+      serial_number: "MyString",
+      batch_number: "MyString",
+      currency: 1,
+      duration: 1,
       status: 1,
       business_type: 1
     ))
@@ -26,7 +35,25 @@ RSpec.describe "orders/new", type: :view do
 
       assert_select "input[name=?]", "order[description]"
 
+      assert_select "input[name=?]", "order[code]"
+
+      assert_select "input[name=?]", "order[sku]"
+
+      assert_select "input[name=?]", "order[barcode]"
+
+      assert_select "input[name=?]", "order[upc]"
+
+      assert_select "input[name=?]", "order[ean]"
+
+      assert_select "input[name=?]", "order[manufacturer_code]"
+
+      assert_select "input[name=?]", "order[serial_number]"
+
+      assert_select "input[name=?]", "order[batch_number]"
+
       assert_select "input[name=?]", "order[currency]"
+
+      assert_select "input[name=?]", "order[duration]"
 
       assert_select "input[name=?]", "order[status]"
 

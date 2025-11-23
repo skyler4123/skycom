@@ -7,8 +7,9 @@ RSpec.describe "role_appointments/edit", type: :view do
       appoint_to: nil,
       name: "MyString",
       description: "MyString",
+      code: "MyString",
       status: 1,
-      kind: 1
+      business_type: 1
     )
   }
 
@@ -29,9 +30,11 @@ RSpec.describe "role_appointments/edit", type: :view do
 
       assert_select "input[name=?]", "role_appointment[description]"
 
+      assert_select "input[name=?]", "role_appointment[code]"
+
       assert_select "input[name=?]", "role_appointment[status]"
 
-      assert_select "input[name=?]", "role_appointment[kind]"
+      assert_select "input[name=?]", "role_appointment[business_type]"
     end
   end
 end

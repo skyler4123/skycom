@@ -6,10 +6,11 @@ RSpec.describe "policies/show", type: :view do
       company: nil,
       name: "Name",
       description: "Description",
+      code: "Code",
       resource: "Resource",
       action: "Action",
       status: 2,
-      kind: 3
+      business_type: 3
     ))
   end
 
@@ -18,6 +19,7 @@ RSpec.describe "policies/show", type: :view do
     expect(rendered).to match(//)
     expect(rendered).to match(/Name/)
     expect(rendered).to match(/Description/)
+    expect(rendered).to match(/Code/)
     expect(rendered).to match(/Resource/)
     expect(rendered).to match(/Action/)
     expect(rendered).to match(/2/)

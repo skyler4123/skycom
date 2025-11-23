@@ -1,0 +1,16 @@
+class CreateEmployeeAppointments < ActiveRecord::Migration[8.0]
+  def change
+    create_table :employee_appointments, id: :uuid do |t|
+      t.references :employee, null: false, foreign_key: true, type: :uuid
+      t.references :appoint_from, polymorphic: true, null: false, type: :uuid
+      t.references :appoint_to, polymorphic: true, null: false, type: :uuid
+      t.references :appoint_for, polymorphic: true, null: false, type: :uuid
+      t.references :appoint_by, polymorphic: true, null: false, type: :uuid
+      t.string :name
+      t.string :description
+      t.string :code
+
+      t.timestamps
+    end
+  end
+end

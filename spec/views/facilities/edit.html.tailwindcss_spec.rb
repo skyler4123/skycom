@@ -6,6 +6,7 @@ RSpec.describe "facilities/edit", type: :view do
       company: nil,
       name: "MyString",
       description: "MyString",
+      code: "MyString",
       status: 1,
       business_type: 1
     )
@@ -25,6 +26,8 @@ RSpec.describe "facilities/edit", type: :view do
       assert_select "input[name=?]", "facility[name]"
 
       assert_select "input[name=?]", "facility[description]"
+
+      assert_select "input[name=?]", "facility[code]"
 
       assert_select "input[name=?]", "facility[status]"
 

@@ -32,6 +32,11 @@
   </div>
 
   <div class="my-5">
+    <%= form.label :appoint_by_id %>
+    <%= form.text_field :appoint_by_id, class: ["block shadow-sm rounded-md border px-3 py-2 mt-2 w-full", {"border-gray-400 focus:outline-blue-600": cart_appointment.errors[:appoint_by_id].none?, "border-red-400 focus:outline-red-600": cart_appointment.errors[:appoint_by_id].any?}] %>
+  </div>
+
+  <div class="my-5">
     <%= form.label :name %>
     <%= form.text_field :name, class: ["block shadow-sm rounded-md border px-3 py-2 mt-2 w-full", {"border-gray-400 focus:outline-blue-600": cart_appointment.errors[:name].none?, "border-red-400 focus:outline-red-600": cart_appointment.errors[:name].any?}] %>
   </div>

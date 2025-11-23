@@ -6,7 +6,9 @@ RSpec.describe "invoices/new", type: :view do
       order: nil,
       name: "MyString",
       description: "MyString",
-      currency: "MyString",
+      code: "MyString",
+      currency: 1,
+      duration: 1,
       number: "MyString",
       total: "MyString",
       status: 1,
@@ -25,7 +27,11 @@ RSpec.describe "invoices/new", type: :view do
 
       assert_select "input[name=?]", "invoice[description]"
 
+      assert_select "input[name=?]", "invoice[code]"
+
       assert_select "input[name=?]", "invoice[currency]"
+
+      assert_select "input[name=?]", "invoice[duration]"
 
       assert_select "input[name=?]", "invoice[number]"
 

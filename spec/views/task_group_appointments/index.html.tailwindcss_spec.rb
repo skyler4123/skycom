@@ -4,10 +4,11 @@ RSpec.describe "task_group_appointments/index", type: :view do
   before(:each) do
     assign(:task_group_appointments, [
       TaskGroupAppointment.create!(
-        assessment: nil,
+        task_group: nil,
         appoint_from: nil,
         appoint_to: nil,
         appoint_for: nil,
+        appoint_by: nil,
         name: "Name",
         description: "Description",
         code: "Code",
@@ -15,10 +16,11 @@ RSpec.describe "task_group_appointments/index", type: :view do
         business_type: 3
       ),
       TaskGroupAppointment.create!(
-        assessment: nil,
+        task_group: nil,
         appoint_from: nil,
         appoint_to: nil,
         appoint_for: nil,
+        appoint_by: nil,
         name: "Name",
         description: "Description",
         code: "Code",
@@ -31,6 +33,7 @@ RSpec.describe "task_group_appointments/index", type: :view do
   it "renders a list of task_group_appointments" do
     render
     cell_selector = 'div>p'
+    assert_select cell_selector, text: Regexp.new(nil.to_s), count: 2
     assert_select cell_selector, text: Regexp.new(nil.to_s), count: 2
     assert_select cell_selector, text: Regexp.new(nil.to_s), count: 2
     assert_select cell_selector, text: Regexp.new(nil.to_s), count: 2

@@ -12,8 +12,8 @@
   <% end %>
 
   <div class="my-5">
-    <%= form.label :assessment_id %>
-    <%= form.text_field :assessment_id, class: ["block shadow-sm rounded-md border px-3 py-2 mt-2 w-full", {"border-gray-400 focus:outline-blue-600": task_group_appointment.errors[:assessment_id].none?, "border-red-400 focus:outline-red-600": task_group_appointment.errors[:assessment_id].any?}] %>
+    <%= form.label :task_group_id %>
+    <%= form.text_field :task_group_id, class: ["block shadow-sm rounded-md border px-3 py-2 mt-2 w-full", {"border-gray-400 focus:outline-blue-600": task_group_appointment.errors[:task_group_id].none?, "border-red-400 focus:outline-red-600": task_group_appointment.errors[:task_group_id].any?}] %>
   </div>
 
   <div class="my-5">
@@ -29,6 +29,11 @@
   <div class="my-5">
     <%= form.label :appoint_for_id %>
     <%= form.text_field :appoint_for_id, class: ["block shadow-sm rounded-md border px-3 py-2 mt-2 w-full", {"border-gray-400 focus:outline-blue-600": task_group_appointment.errors[:appoint_for_id].none?, "border-red-400 focus:outline-red-600": task_group_appointment.errors[:appoint_for_id].any?}] %>
+  </div>
+
+  <div class="my-5">
+    <%= form.label :appoint_by_id %>
+    <%= form.text_field :appoint_by_id, class: ["block shadow-sm rounded-md border px-3 py-2 mt-2 w-full", {"border-gray-400 focus:outline-blue-600": task_group_appointment.errors[:appoint_by_id].none?, "border-red-400 focus:outline-red-600": task_group_appointment.errors[:appoint_by_id].any?}] %>
   </div>
 
   <div class="my-5">

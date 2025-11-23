@@ -1,0 +1,1 @@
+json.partial! "inventory_transaction_appointments/inventory_transaction_appointment", inventory_transaction_appointment: @inventory_transaction_appointment

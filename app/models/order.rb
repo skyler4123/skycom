@@ -1,7 +1,6 @@
 class Order < ApplicationRecord
   # --- Associations ---
   belongs_to :company
-  belongs_to :customer, optional: true
 
   has_many :invoices, dependent: :destroy
   has_many :order_item_appointments, dependent: :destroy

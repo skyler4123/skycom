@@ -4,7 +4,10 @@ RSpec.describe "product_group_appointments/new", type: :view do
   before(:each) do
     assign(:product_group_appointment, ProductGroupAppointment.new(
       product_group: nil,
+      appoint_from: nil,
       appoint_to: nil,
+      appoint_for: nil,
+      appoint_by: nil,
       name: "MyString",
       description: "MyString",
       code: "MyString",
@@ -20,7 +23,13 @@ RSpec.describe "product_group_appointments/new", type: :view do
 
       assert_select "input[name=?]", "product_group_appointment[product_group_id]"
 
+      assert_select "input[name=?]", "product_group_appointment[appoint_from_id]"
+
       assert_select "input[name=?]", "product_group_appointment[appoint_to_id]"
+
+      assert_select "input[name=?]", "product_group_appointment[appoint_for_id]"
+
+      assert_select "input[name=?]", "product_group_appointment[appoint_by_id]"
 
       assert_select "input[name=?]", "product_group_appointment[name]"
 

@@ -4,7 +4,10 @@ RSpec.describe "customer_group_appointments/edit", type: :view do
   let(:customer_group_appointment) {
     CustomerGroupAppointment.create!(
       customer_group: nil,
+      appoint_from: nil,
       appoint_to: nil,
+      appoint_for: nil,
+      appoint_by: nil,
       name: "MyString",
       description: "MyString",
       code: "MyString",
@@ -24,7 +27,13 @@ RSpec.describe "customer_group_appointments/edit", type: :view do
 
       assert_select "input[name=?]", "customer_group_appointment[customer_group_id]"
 
+      assert_select "input[name=?]", "customer_group_appointment[appoint_from_id]"
+
       assert_select "input[name=?]", "customer_group_appointment[appoint_to_id]"
+
+      assert_select "input[name=?]", "customer_group_appointment[appoint_for_id]"
+
+      assert_select "input[name=?]", "customer_group_appointment[appoint_by_id]"
 
       assert_select "input[name=?]", "customer_group_appointment[name]"
 

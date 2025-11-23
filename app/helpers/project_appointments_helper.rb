@@ -1,0 +1,2 @@
+module ProjectAppointmentsHelper
+end

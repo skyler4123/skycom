@@ -4,7 +4,7 @@ RSpec.describe "notifications/index", type: :view do
   before(:each) do
     assign(:notifications, [
       Notification.create!(
-        notification: nil,
+        notification_group: nil,
         company: nil,
         name: "Name",
         description: "Description",
@@ -13,7 +13,7 @@ RSpec.describe "notifications/index", type: :view do
         business_type: 3
       ),
       Notification.create!(
-        notification: nil,
+        notification_group: nil,
         company: nil,
         name: "Name",
         description: "Description",

@@ -7,8 +7,9 @@ RSpec.describe "policy_appointments/new", type: :view do
       appoint_to: nil,
       name: "MyString",
       description: "MyString",
+      code: "MyString",
       status: 1,
-      kind: 1
+      business_type: 1
     ))
   end
 
@@ -25,9 +26,11 @@ RSpec.describe "policy_appointments/new", type: :view do
 
       assert_select "input[name=?]", "policy_appointment[description]"
 
+      assert_select "input[name=?]", "policy_appointment[code]"
+
       assert_select "input[name=?]", "policy_appointment[status]"
 
-      assert_select "input[name=?]", "policy_appointment[kind]"
+      assert_select "input[name=?]", "policy_appointment[business_type]"
     end
   end
 end

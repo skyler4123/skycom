@@ -3,7 +3,7 @@ require 'rails_helper'
 RSpec.describe "notifications/show", type: :view do
   before(:each) do
     assign(:notification, Notification.create!(
-      notification: nil,
+      notification_group: nil,
       company: nil,
       name: "Name",
       description: "Description",

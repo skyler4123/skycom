@@ -6,7 +6,9 @@ RSpec.describe "payments/edit", type: :view do
       invoice: nil,
       name: "MyString",
       description: "MyString",
-      currency: "MyString",
+      code: "MyString",
+      currency: 1,
+      duration: 1,
       exchange_rate: "9.99",
       amount: "9.99",
       payment_method: "MyString",
@@ -31,7 +33,11 @@ RSpec.describe "payments/edit", type: :view do
 
       assert_select "input[name=?]", "payment[description]"
 
+      assert_select "input[name=?]", "payment[code]"
+
       assert_select "input[name=?]", "payment[currency]"
+
+      assert_select "input[name=?]", "payment[duration]"
 
       assert_select "input[name=?]", "payment[exchange_rate]"
 

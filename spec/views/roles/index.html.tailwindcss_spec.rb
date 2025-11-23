@@ -7,15 +7,17 @@ RSpec.describe "roles/index", type: :view do
         company: nil,
         name: "Name",
         description: "Description",
+        code: "Code",
         status: 2,
-        kind: 3
+        business_type: 3
       ),
       Role.create!(
         company: nil,
         name: "Name",
         description: "Description",
+        code: "Code",
         status: 2,
-        kind: 3
+        business_type: 3
       )
     ])
   end
@@ -26,6 +28,7 @@ RSpec.describe "roles/index", type: :view do
     assert_select cell_selector, text: Regexp.new(nil.to_s), count: 2
     assert_select cell_selector, text: Regexp.new("Name".to_s), count: 2
     assert_select cell_selector, text: Regexp.new("Description".to_s), count: 2
+    assert_select cell_selector, text: Regexp.new("Code".to_s), count: 2
     assert_select cell_selector, text: Regexp.new(2.to_s), count: 2
     assert_select cell_selector, text: Regexp.new(3.to_s), count: 2
   end

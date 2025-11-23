@@ -4,9 +4,13 @@ RSpec.describe "employee_group_appointments/show", type: :view do
   before(:each) do
     assign(:employee_group_appointment, EmployeeGroupAppointment.create!(
       employee_group: nil,
+      appoint_from: nil,
       appoint_to: nil,
+      appoint_for: nil,
+      appoint_by: nil,
       name: "Name",
-      description: "Description"
+      description: "Description",
+      code: "Code"
     ))
   end
 
@@ -14,7 +18,11 @@ RSpec.describe "employee_group_appointments/show", type: :view do
     render
     expect(rendered).to match(//)
     expect(rendered).to match(//)
+    expect(rendered).to match(//)
+    expect(rendered).to match(//)
+    expect(rendered).to match(//)
     expect(rendered).to match(/Name/)
     expect(rendered).to match(/Description/)
+    expect(rendered).to match(/Code/)
   end
 end

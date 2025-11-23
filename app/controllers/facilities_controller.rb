@@ -65,6 +65,6 @@ class FacilitiesController < ApplicationController
 
     # Only allow a list of trusted parameters through.
     def facility_params
-      params.expect(facility: [ :company_id, :name, :description, :status, :business_type, :discarded_at ])
+      params.expect(facility: [ :company_id, :name, :description, :code, :status, :business_type, :discarded_at ])
     end
 end

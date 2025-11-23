@@ -5,15 +5,23 @@ RSpec.describe "employee_group_appointments/index", type: :view do
     assign(:employee_group_appointments, [
       EmployeeGroupAppointment.create!(
         employee_group: nil,
+        appoint_from: nil,
         appoint_to: nil,
+        appoint_for: nil,
+        appoint_by: nil,
         name: "Name",
-        description: "Description"
+        description: "Description",
+        code: "Code"
       ),
       EmployeeGroupAppointment.create!(
         employee_group: nil,
+        appoint_from: nil,
         appoint_to: nil,
+        appoint_for: nil,
+        appoint_by: nil,
         name: "Name",
-        description: "Description"
+        description: "Description",
+        code: "Code"
       )
     ])
   end
@@ -23,7 +31,11 @@ RSpec.describe "employee_group_appointments/index", type: :view do
     cell_selector = 'div>p'
     assert_select cell_selector, text: Regexp.new(nil.to_s), count: 2
     assert_select cell_selector, text: Regexp.new(nil.to_s), count: 2
+    assert_select cell_selector, text: Regexp.new(nil.to_s), count: 2
+    assert_select cell_selector, text: Regexp.new(nil.to_s), count: 2
+    assert_select cell_selector, text: Regexp.new(nil.to_s), count: 2
     assert_select cell_selector, text: Regexp.new("Name".to_s), count: 2
     assert_select cell_selector, text: Regexp.new("Description".to_s), count: 2
+    assert_select cell_selector, text: Regexp.new("Code".to_s), count: 2
   end
 end

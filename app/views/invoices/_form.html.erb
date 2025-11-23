@@ -27,8 +27,18 @@
   </div>
 
   <div class="my-5">
+    <%= form.label :code %>
+    <%= form.text_field :code, class: ["block shadow-sm rounded-md border px-3 py-2 mt-2 w-full", {"border-gray-400 focus:outline-blue-600": invoice.errors[:code].none?, "border-red-400 focus:outline-red-600": invoice.errors[:code].any?}] %>
+  </div>
+
+  <div class="my-5">
     <%= form.label :currency %>
-    <%= form.text_field :currency, class: ["block shadow-sm rounded-md border px-3 py-2 mt-2 w-full", {"border-gray-400 focus:outline-blue-600": invoice.errors[:currency].none?, "border-red-400 focus:outline-red-600": invoice.errors[:currency].any?}] %>
+    <%= form.number_field :currency, class: ["block shadow-sm rounded-md border px-3 py-2 mt-2 w-full", {"border-gray-400 focus:outline-blue-600": invoice.errors[:currency].none?, "border-red-400 focus:outline-red-600": invoice.errors[:currency].any?}] %>
+  </div>
+
+  <div class="my-5">
+    <%= form.label :duration %>
+    <%= form.number_field :duration, class: ["block shadow-sm rounded-md border px-3 py-2 mt-2 w-full", {"border-gray-400 focus:outline-blue-600": invoice.errors[:duration].none?, "border-red-400 focus:outline-red-600": invoice.errors[:duration].any?}] %>
   </div>
 
   <div class="my-5">

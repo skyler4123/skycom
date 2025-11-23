@@ -3,10 +3,11 @@ require 'rails_helper'
 RSpec.describe "task_group_appointments/new", type: :view do
   before(:each) do
     assign(:task_group_appointment, TaskGroupAppointment.new(
-      assessment: nil,
+      task_group: nil,
       appoint_from: nil,
       appoint_to: nil,
       appoint_for: nil,
+      appoint_by: nil,
       name: "MyString",
       description: "MyString",
       code: "MyString",
@@ -20,13 +21,15 @@ RSpec.describe "task_group_appointments/new", type: :view do
 
     assert_select "form[action=?][method=?]", task_group_appointments_path, "post" do
 
-      assert_select "input[name=?]", "task_group_appointment[assessment_id]"
+      assert_select "input[name=?]", "task_group_appointment[task_group_id]"
 
       assert_select "input[name=?]", "task_group_appointment[appoint_from_id]"
 
       assert_select "input[name=?]", "task_group_appointment[appoint_to_id]"
 
       assert_select "input[name=?]", "task_group_appointment[appoint_for_id]"
+
+      assert_select "input[name=?]", "task_group_appointment[appoint_by_id]"
 
       assert_select "input[name=?]", "task_group_appointment[name]"
 

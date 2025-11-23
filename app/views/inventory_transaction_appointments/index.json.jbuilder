@@ -1,0 +1,1 @@
+json.array! @inventory_transaction_appointments, partial: "inventory_transaction_appointments/inventory_transaction_appointment", as: :inventory_transaction_appointment

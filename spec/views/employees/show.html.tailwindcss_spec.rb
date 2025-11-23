@@ -7,6 +7,7 @@ RSpec.describe "employees/show", type: :view do
       company: nil,
       name: "Name",
       description: "Description",
+      code: "Code",
       status: 2,
       business_type: 3
     ))
@@ -18,6 +19,7 @@ RSpec.describe "employees/show", type: :view do
     expect(rendered).to match(//)
     expect(rendered).to match(/Name/)
     expect(rendered).to match(/Description/)
+    expect(rendered).to match(/Code/)
     expect(rendered).to match(/2/)
     expect(rendered).to match(/3/)
   end

@@ -3,7 +3,7 @@ require 'rails_helper'
 RSpec.describe "notifications/new", type: :view do
   before(:each) do
     assign(:notification, Notification.new(
-      notification: nil,
+      notification_group: nil,
       company: nil,
       name: "MyString",
       description: "MyString",
@@ -18,7 +18,7 @@ RSpec.describe "notifications/new", type: :view do
 
     assert_select "form[action=?][method=?]", notifications_path, "post" do
 
-      assert_select "input[name=?]", "notification[notification_id]"
+      assert_select "input[name=?]", "notification[notification_group_id]"
 
       assert_select "input[name=?]", "notification[company_id]"
 

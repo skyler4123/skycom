@@ -4,7 +4,10 @@ RSpec.describe "facility_group_appointments/show", type: :view do
   before(:each) do
     assign(:facility_group_appointment, FacilityGroupAppointment.create!(
       facility_group: nil,
+      appoint_from: nil,
       appoint_to: nil,
+      appoint_for: nil,
+      appoint_by: nil,
       name: "Name",
       description: "Description",
       code: "Code",
@@ -15,6 +18,9 @@ RSpec.describe "facility_group_appointments/show", type: :view do
 
   it "renders attributes in <p>" do
     render
+    expect(rendered).to match(//)
+    expect(rendered).to match(//)
+    expect(rendered).to match(//)
     expect(rendered).to match(//)
     expect(rendered).to match(//)
     expect(rendered).to match(/Name/)

@@ -65,6 +65,6 @@ class PeriodAppointmentsController < ApplicationController
 
     # Only allow a list of trusted parameters through.
     def period_appointment_params
-      params.expect(period_appointment: [ :period_id, :appoint_to_id, :appoint_to_type, :name, :description, :code, :value ])
+      params.expect(period_appointment: [ :period_id, :appoint_from_id, :appoint_from_type, :appoint_to_id, :appoint_to_type, :appoint_for_id, :appoint_for_type, :appoint_by_id, :appoint_by_type, :name, :description, :code, :value ])
     end
 end

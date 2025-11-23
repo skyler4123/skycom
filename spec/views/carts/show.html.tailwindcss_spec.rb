@@ -8,6 +8,13 @@ RSpec.describe "carts/show", type: :view do
       name: "Name",
       description: "Description",
       code: "Code",
+      sku: "Sku",
+      barcode: "Barcode",
+      upc: "Upc",
+      ean: "Ean",
+      manufacturer_code: "Manufacturer Code",
+      serial_number: "Serial Number",
+      batch_number: "Batch Number",
       status: 2,
       business_type: 3
     ))
@@ -20,6 +27,13 @@ RSpec.describe "carts/show", type: :view do
     expect(rendered).to match(/Name/)
     expect(rendered).to match(/Description/)
     expect(rendered).to match(/Code/)
+    expect(rendered).to match(/Sku/)
+    expect(rendered).to match(/Barcode/)
+    expect(rendered).to match(/Upc/)
+    expect(rendered).to match(/Ean/)
+    expect(rendered).to match(/Manufacturer Code/)
+    expect(rendered).to match(/Serial Number/)
+    expect(rendered).to match(/Batch Number/)
     expect(rendered).to match(/2/)
     expect(rendered).to match(/3/)
   end

@@ -5,17 +5,33 @@ RSpec.describe "products/index", type: :view do
     assign(:products, [
       Product.create!(
         company: nil,
-        product_brand: nil,
+        brand: nil,
         name: "Name",
         description: "Description",
+        code: "Code",
+        sku: "Sku",
+        barcode: "Barcode",
+        upc: "Upc",
+        ean: "Ean",
+        manufacturer_code: "Manufacturer Code",
+        serial_number: "Serial Number",
+        batch_number: "Batch Number",
         status: 2,
         business_type: 3
       ),
       Product.create!(
         company: nil,
-        product_brand: nil,
+        brand: nil,
         name: "Name",
         description: "Description",
+        code: "Code",
+        sku: "Sku",
+        barcode: "Barcode",
+        upc: "Upc",
+        ean: "Ean",
+        manufacturer_code: "Manufacturer Code",
+        serial_number: "Serial Number",
+        batch_number: "Batch Number",
         status: 2,
         business_type: 3
       )
@@ -29,6 +45,14 @@ RSpec.describe "products/index", type: :view do
     assert_select cell_selector, text: Regexp.new(nil.to_s), count: 2
     assert_select cell_selector, text: Regexp.new("Name".to_s), count: 2
     assert_select cell_selector, text: Regexp.new("Description".to_s), count: 2
+    assert_select cell_selector, text: Regexp.new("Code".to_s), count: 2
+    assert_select cell_selector, text: Regexp.new("Sku".to_s), count: 2
+    assert_select cell_selector, text: Regexp.new("Barcode".to_s), count: 2
+    assert_select cell_selector, text: Regexp.new("Upc".to_s), count: 2
+    assert_select cell_selector, text: Regexp.new("Ean".to_s), count: 2
+    assert_select cell_selector, text: Regexp.new("Manufacturer Code".to_s), count: 2
+    assert_select cell_selector, text: Regexp.new("Serial Number".to_s), count: 2
+    assert_select cell_selector, text: Regexp.new("Batch Number".to_s), count: 2
     assert_select cell_selector, text: Regexp.new(2.to_s), count: 2
     assert_select cell_selector, text: Regexp.new(3.to_s), count: 2
   end

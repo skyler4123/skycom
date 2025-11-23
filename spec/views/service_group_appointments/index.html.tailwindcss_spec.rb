@@ -5,7 +5,10 @@ RSpec.describe "service_group_appointments/index", type: :view do
     assign(:service_group_appointments, [
       ServiceGroupAppointment.create!(
         service_group: nil,
+        appoint_from: nil,
         appoint_to: nil,
+        appoint_for: nil,
+        appoint_by: nil,
         name: "Name",
         description: "Description",
         code: "Code",
@@ -15,7 +18,10 @@ RSpec.describe "service_group_appointments/index", type: :view do
       ),
       ServiceGroupAppointment.create!(
         service_group: nil,
+        appoint_from: nil,
         appoint_to: nil,
+        appoint_for: nil,
+        appoint_by: nil,
         name: "Name",
         description: "Description",
         code: "Code",
@@ -29,6 +35,9 @@ RSpec.describe "service_group_appointments/index", type: :view do
   it "renders a list of service_group_appointments" do
     render
     cell_selector = 'div>p'
+    assert_select cell_selector, text: Regexp.new(nil.to_s), count: 2
+    assert_select cell_selector, text: Regexp.new(nil.to_s), count: 2
+    assert_select cell_selector, text: Regexp.new(nil.to_s), count: 2
     assert_select cell_selector, text: Regexp.new(nil.to_s), count: 2
     assert_select cell_selector, text: Regexp.new(nil.to_s), count: 2
     assert_select cell_selector, text: Regexp.new("Name".to_s), count: 2

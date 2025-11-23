@@ -65,6 +65,6 @@ class CustomerGroupAppointmentsController < ApplicationController
 
     # Only allow a list of trusted parameters through.
     def customer_group_appointment_params
-      params.expect(customer_group_appointment: [ :customer_group_id, :appoint_to_id, :appoint_to_type, :name, :description, :code, :status, :business_type, :discarded_at ])
+      params.expect(customer_group_appointment: [ :customer_group_id, :appoint_from_id, :appoint_from_type, :appoint_to_id, :appoint_to_type, :appoint_for_id, :appoint_for_type, :appoint_by_id, :appoint_by_type, :name, :description, :code, :status, :business_type, :discarded_at ])
     end
 end

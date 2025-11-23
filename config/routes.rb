@@ -1,4 +1,29 @@
 Rails.application.routes.draw do
+  resources :exam_appointments
+  resources :answers
+  resources :questions
+  resources :exams
+  resources :exam_groups
+  resources :notification_group_appointments
+  resources :task_appointments
+  resources :project_appointments
+  resources :project_group_appointments
+  resources :facility_appointments
+  resources :purchase_items
+  resources :purchases
+  resources :order_appointments
+  resources :order_group_appointments
+  resources :order_groups
+  resources :service_appointments
+  resources :product_appointments
+  resources :brands
+  resources :inventory_transaction_appointments
+  resources :inventory_transactions
+  resources :inventory_item_appointments
+  resources :inventory_items
+  resources :inventories
+  resources :customer_appointments
+  resources :employee_appointments
   resources :notification_appointments
   resources :notifications
   resources :notification_groups

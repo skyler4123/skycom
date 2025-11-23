@@ -6,11 +6,13 @@ RSpec.describe "invoices/show", type: :view do
       order: nil,
       name: "Name",
       description: "Description",
-      currency: "Currency",
+      code: "Code",
+      currency: 2,
+      duration: 3,
       number: "Number",
       total: "Total",
-      status: 2,
-      business_type: 3
+      status: 4,
+      business_type: 5
     ))
   end
 
@@ -19,10 +21,12 @@ RSpec.describe "invoices/show", type: :view do
     expect(rendered).to match(//)
     expect(rendered).to match(/Name/)
     expect(rendered).to match(/Description/)
-    expect(rendered).to match(/Currency/)
-    expect(rendered).to match(/Number/)
-    expect(rendered).to match(/Total/)
+    expect(rendered).to match(/Code/)
     expect(rendered).to match(/2/)
     expect(rendered).to match(/3/)
+    expect(rendered).to match(/Number/)
+    expect(rendered).to match(/Total/)
+    expect(rendered).to match(/4/)
+    expect(rendered).to match(/5/)
   end
 end

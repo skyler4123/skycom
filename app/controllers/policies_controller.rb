@@ -65,6 +65,6 @@ class PoliciesController < ApplicationController
 
     # Only allow a list of trusted parameters through.
     def policy_params
-      params.expect(policy: [ :company_id, :name, :description, :resource, :action, :status, :kind, :discarded_at ])
+      params.expect(policy: [ :company_id, :name, :description, :code, :resource, :action, :status, :business_type, :discarded_at ])
     end
 end

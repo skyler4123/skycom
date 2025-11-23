@@ -6,10 +6,11 @@ RSpec.describe "policies/edit", type: :view do
       company: nil,
       name: "MyString",
       description: "MyString",
+      code: "MyString",
       resource: "MyString",
       action: "MyString",
       status: 1,
-      kind: 1
+      business_type: 1
     )
   }
 
@@ -28,13 +29,15 @@ RSpec.describe "policies/edit", type: :view do
 
       assert_select "input[name=?]", "policy[description]"
 
+      assert_select "input[name=?]", "policy[code]"
+
       assert_select "input[name=?]", "policy[resource]"
 
       assert_select "input[name=?]", "policy[action]"
 
       assert_select "input[name=?]", "policy[status]"
 
-      assert_select "input[name=?]", "policy[kind]"
+      assert_select "input[name=?]", "policy[business_type]"
     end
   end
 end

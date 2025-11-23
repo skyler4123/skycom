@@ -6,8 +6,9 @@ RSpec.describe "roles/new", type: :view do
       company: nil,
       name: "MyString",
       description: "MyString",
+      code: "MyString",
       status: 1,
-      kind: 1
+      business_type: 1
     ))
   end
 
@@ -22,9 +23,11 @@ RSpec.describe "roles/new", type: :view do
 
       assert_select "input[name=?]", "role[description]"
 
+      assert_select "input[name=?]", "role[code]"
+
       assert_select "input[name=?]", "role[status]"
 
-      assert_select "input[name=?]", "role[kind]"
+      assert_select "input[name=?]", "role[business_type]"
     end
   end
 end

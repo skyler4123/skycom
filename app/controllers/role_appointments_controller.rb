@@ -65,6 +65,6 @@ class RoleAppointmentsController < ApplicationController
 
     # Only allow a list of trusted parameters through.
     def role_appointment_params
-      params.expect(role_appointment: [ :role_id, :appoint_to_id, :appoint_to_type, :name, :description, :status, :kind, :discarded_at ])
+      params.expect(role_appointment: [ :role_id, :appoint_to_id, :appoint_to_type, :name, :description, :code, :status, :business_type, :discarded_at ])
     end
 end

@@ -5,7 +5,10 @@ RSpec.describe "period_appointments/index", type: :view do
     assign(:period_appointments, [
       PeriodAppointment.create!(
         period: nil,
+        appoint_from: nil,
         appoint_to: nil,
+        appoint_for: nil,
+        appoint_by: nil,
         name: "Name",
         description: "Description",
         code: "Code",
@@ -13,7 +16,10 @@ RSpec.describe "period_appointments/index", type: :view do
       ),
       PeriodAppointment.create!(
         period: nil,
+        appoint_from: nil,
         appoint_to: nil,
+        appoint_for: nil,
+        appoint_by: nil,
         name: "Name",
         description: "Description",
         code: "Code",
@@ -25,6 +31,9 @@ RSpec.describe "period_appointments/index", type: :view do
   it "renders a list of period_appointments" do
     render
     cell_selector = 'div>p'
+    assert_select cell_selector, text: Regexp.new(nil.to_s), count: 2
+    assert_select cell_selector, text: Regexp.new(nil.to_s), count: 2
+    assert_select cell_selector, text: Regexp.new(nil.to_s), count: 2
     assert_select cell_selector, text: Regexp.new(nil.to_s), count: 2
     assert_select cell_selector, text: Regexp.new(nil.to_s), count: 2
     assert_select cell_selector, text: Regexp.new("Name".to_s), count: 2

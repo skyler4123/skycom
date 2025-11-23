@@ -4,7 +4,10 @@ RSpec.describe "period_appointments/new", type: :view do
   before(:each) do
     assign(:period_appointment, PeriodAppointment.new(
       period: nil,
+      appoint_from: nil,
       appoint_to: nil,
+      appoint_for: nil,
+      appoint_by: nil,
       name: "MyString",
       description: "MyString",
       code: "MyString",
@@ -19,7 +22,13 @@ RSpec.describe "period_appointments/new", type: :view do
 
       assert_select "input[name=?]", "period_appointment[period_id]"
 
+      assert_select "input[name=?]", "period_appointment[appoint_from_id]"
+
       assert_select "input[name=?]", "period_appointment[appoint_to_id]"
+
+      assert_select "input[name=?]", "period_appointment[appoint_for_id]"
+
+      assert_select "input[name=?]", "period_appointment[appoint_by_id]"
 
       assert_select "input[name=?]", "period_appointment[name]"
 
