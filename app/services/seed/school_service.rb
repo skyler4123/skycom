@@ -14,7 +14,7 @@ class Seed::SchoolService
   }.freeze
 
   def initialize
-    @school_owners = []
+    @school_owner = nil
     @school_admin = []
     @schools = []
     @customers = [] # Mapping students to customers
@@ -22,7 +22,6 @@ class Seed::SchoolService
     @classrooms = []
     @courses = []
 
-    @school_owner_count = 2
     @school_admin_count = 3
     @school_count = 3
     @customer_count = 10 # Students per school
@@ -38,12 +37,32 @@ class Seed::SchoolService
     puts "========================================================="
 
     # --- 1. Create School Owners ---
-    puts "Creating #{@school_owner_count} school owners..."
-    @school_owner_count.times do |i|
-      @school_owners << Seed::UserService.create(email: "school_owner_#{i + 1}@example.com")
+    puts "Creating 1 school owner..."
+    @school_owner = Seed::UserService.create(email: "school_owner_1@example.com")
+
+    #--- 2. Create Schools ---
+    puts "Creating #{@school_count} schools..."
+    @school_count.times do |i|
+      school = Seed::CompanyService.create(
+        user: @school_owner,
+        name: "School #{i + 1}",
+        description: "Description for School #{i + 1}",
+        parent_company: nil
+      )
+      @schools << school
     end
-
-
+    puts "Created #{@schools.count} schools."
+    
+    # --- 3. Create School Roles ---
+    SCHOOL_ROLES.each do |role_name|
+      @schools.each do |school|
+        Seed::RoleService.create(
+          company: school,
+          name: role_name,
+          description: "#{role_name} role for #{school.name}"
+        )
+      end
+    end
 
     puts "\n========================================================="
     puts "🏫 School Seeding Complete!"

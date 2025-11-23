@@ -42,8 +42,8 @@ class Seed::RoleService
     company:,
     name: "Role",
     description: Faker::Lorem.sentence(word_count: 8),
-    kind: nil,
-    status: nil,
+    business_type: Role.business_types.keys.sample,
+    status: Role.statuses.keys.sample,
     discarded_at: nil
   )
     should_discard = rand(8) == 0
@@ -53,8 +53,8 @@ class Seed::RoleService
       company: company,
       name: name,
       description: description,
-      kind: kind || Role.kinds.keys.sample,
-      status: status || Role.statuses.keys.sample,
+      business_type: business_type,
+      status: status,
       discarded_at: discarded_at
     )
   end
