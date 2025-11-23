@@ -40,7 +40,9 @@ class Seed::ApplicationService
     # Seed::NotificationService.run
 
     User.destroy_all
-    
+    PaymentMethod.destroy_all
+
+    Seed::PaymentMethodService.run # Ensure global payment methods are seeded first
     Seed::SchoolService.new
 
 
