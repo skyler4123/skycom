@@ -20,8 +20,8 @@ class Policy < ApplicationRecord
     archived: 2 
   }
   
-  # Policy kinds based on common organizational categories
-  enum :kind, { 
+  # Policy business_types based on common organizational categories
+  enum :business_type, { 
     security: 0, 
     regulatory: 1, 
     operational: 2, 

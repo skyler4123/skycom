@@ -30,7 +30,7 @@ class Role < ApplicationRecord
   }
   
   # Standardized role kinds for categorization
-  enum :kind, { 
+  enum :business_type, { 
     administrative: 0, 
     management: 1, 
     technical: 2, 
@@ -46,5 +46,5 @@ class Role < ApplicationRecord
             message: "A role with this name already exists." 
           }
   validates :status, presence: true
-  validates :kind, presence: true
+  validates :business_type, presence: true
 end
