@@ -1,45 +1,47 @@
 class Seed::ApplicationService
   def self.run(seed_number: 0)
-    puts "\n\n🚀 Starting Full Database Seeding..."
-    puts "========================================================="
+    # puts "\n\n🚀 Starting Full Database Seeding..."
+    # puts "========================================================="
 
-    Seed::UserService.run
-    Seed::CompanyService.run
-    Seed::TagService.run
-    Seed::EmployeeGroupService.run
-    Seed::EmployeeService.run
-    Seed::EmployeeGroupAppointmentService.run
-    Seed::RoleService.run
-    Seed::PaymentMethodService.run # Ensure global payment methods are seeded first
-    Seed::PeriodService.run
-    Seed::PolicyService.run
-    Seed::PolicyAppointmentService.run
-    Seed::RoleAppointmentService.run
-    Seed::FacilityService.run
-    Seed::FacilityGroupService.run
-    Seed::ServiceGroupService.run
-    Seed::ServiceService.run
-    Seed::ProductBrandService.run
-    Seed::ProductGroupService.run
-    Seed::ProductService.run
-    Seed::CustomerGroupService.run
-    Seed::CustomerService.run
-    Seed::OrderService.run
-    Seed::OrderItemAppointmentService.run
-    Seed::InvoiceService.run
-    Seed::PaymentMethodAppointmentService.run # Now appoint them to companies
-    Seed::BookingService.run
-    Seed::AssessmentService.run
-    Seed::TaskGroupService.run
-    Seed::TaskService.run
-    Seed::ProjectGroupService.run
-    Seed::ProjectService.run
-    Seed::CartGroupService.run
-    Seed::CartService.run
-    Seed::NotificationGroupService.run
-    Seed::NotificationService.run
+    # Seed::UserService.run
+    # Seed::CompanyService.run
+    # Seed::TagService.run
+    # Seed::EmployeeGroupService.run
+    # Seed::EmployeeService.run
+    # Seed::EmployeeGroupAppointmentService.run
+    # Seed::RoleService.run
+    # Seed::PaymentMethodService.run # Ensure global payment methods are seeded first
+    # Seed::PeriodService.run
+    # Seed::PolicyService.run
+    # Seed::PolicyAppointmentService.run
+    # Seed::RoleAppointmentService.run
+    # Seed::FacilityService.run
+    # Seed::FacilityGroupService.run
+    # Seed::ServiceGroupService.run
+    # Seed::ServiceService.run
+    # Seed::ProductBrandService.run
+    # Seed::ProductGroupService.run
+    # Seed::ProductService.run
+    # Seed::CustomerGroupService.run
+    # Seed::CustomerService.run
+    # Seed::OrderService.run
+    # Seed::OrderItemAppointmentService.run
+    # Seed::InvoiceService.run
+    # Seed::PaymentMethodAppointmentService.run # Now appoint them to companies
+    # Seed::BookingService.run
+    # Seed::AssessmentService.run
+    # Seed::TaskGroupService.run
+    # Seed::TaskService.run
+    # Seed::ProjectGroupService.run
+    # Seed::ProjectService.run
+    # Seed::CartGroupService.run
+    # Seed::CartService.run
+    # Seed::NotificationGroupService.run
+    # Seed::NotificationService.run
 
-
+    User.destroy_all
+    
+    Seed::SchoolService.new
 
 
     self.puts_count
