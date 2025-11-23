@@ -39,7 +39,7 @@ class Seed::RoleService
   end
 
   def self.create(
-    company: Company.all.sample,
+    company:,
     name: "Role",
     description: Faker::Lorem.sentence(word_count: 8),
     kind: nil,

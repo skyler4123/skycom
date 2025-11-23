@@ -43,7 +43,7 @@ class Seed::InvoiceService
   end
 
   def self.create(
-    order: Order.all.sample,
+    order:,
     name: nil,
     description: Faker::Lorem.sentence(word_count: 10),
     currency: nil,

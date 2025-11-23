@@ -31,7 +31,7 @@ class Seed::EmployeeService
   end
 
   def self.create(
-    company: Company.all.sample,
+    company:,
     user: nil,
     name: Faker::Name.name,
     description: "#{Faker::Job.title} in #{Faker::Commerce.department}",

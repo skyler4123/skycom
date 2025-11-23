@@ -37,7 +37,8 @@ class Seed::CartService
   end
 
   def self.create(
-    cart_group: CartGroup.all.sample,
+    company:,
+    cart_group: nil,
     name: nil,
     description: nil,
     code: nil,
@@ -45,8 +46,6 @@ class Seed::CartService
     business_type: nil,
     discarded_at: nil
   )
-    raise "Cannot create a cart: No cart groups exist." if cart_group.nil?
-    company = cart_group.company
 
     should_discard = rand(10) == 0
     discarded_at ||= should_discard ? Time.zone.now - rand(1..180).days : nil

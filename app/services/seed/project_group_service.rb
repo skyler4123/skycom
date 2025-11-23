@@ -34,7 +34,7 @@ class Seed::ProjectGroupService
   end
 
   def self.create(
-    company: Company.all.sample,
+    company:,
     name: "#{Faker::App.name} Project Group",
     description: "A group for projects related to #{Faker::Commerce.department}.",
     code: nil,

@@ -43,7 +43,7 @@ class Seed::PaymentMethodAppointmentService
   end
 
   def self.create(
-    company: Company.all.sample,
+    company:,
     payment_method: PaymentMethod.all.sample,
     name: nil,
     description: nil,

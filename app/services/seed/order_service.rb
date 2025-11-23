@@ -41,7 +41,7 @@ class Seed::OrderService
   end
 
   def self.create(
-    company: Company.all.sample,
+    company:,
     customer: nil,
     name: nil,
     description: Faker::Lorem.sentence(word_count: 15),

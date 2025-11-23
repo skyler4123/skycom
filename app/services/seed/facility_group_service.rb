@@ -34,7 +34,7 @@ class Seed::FacilityGroupService
   end
 
   def self.create(
-    company: Company.all.sample,
+    company:,
     name: "#{Faker::Address.community} Group",
     description: "A group for facilities in the #{Faker::Address.city_prefix} area.",
     code: nil,

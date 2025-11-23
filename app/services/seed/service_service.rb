@@ -35,7 +35,7 @@ class Seed::ServiceService
   end
 
   def self.create(
-    company: Company.all.sample,
+    company:,
     name: nil,
     description: Faker::Lorem.sentence(word_count: 10),
     status: nil,

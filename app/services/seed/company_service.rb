@@ -98,7 +98,7 @@ class Seed::CompanyService
   end
 
   def self.create(
-    user: User.all.sample,
+    user:,
     parent_company: nil,
     name: nil,
     description: Faker::Company.catch_phrase,

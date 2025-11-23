@@ -34,7 +34,7 @@ class Seed::ProductGroupService
   end
 
   def self.create(
-    company: Company.all.sample,
+    company:,
     name: "#{Faker::Commerce.department} Group",
     description: "A group for products in the #{Faker::Commerce.material} category.",
     code: nil,

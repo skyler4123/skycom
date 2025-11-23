@@ -34,7 +34,7 @@ class Seed::TaskGroupService
   end
 
   def self.create(
-    company: Company.all.sample,
+    company:,
     name: "#{Faker::Verb.base.capitalize} Tasks",
     description: "A group for #{Faker::Hacker.ingverb} tasks.",
     code: nil,

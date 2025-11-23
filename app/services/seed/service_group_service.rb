@@ -39,7 +39,7 @@ class Seed::ServiceGroupService
   end
 
   def self.create(
-    company: Company.all.sample,
+    company:,
     name: "#{Faker::App.name} Service Group",
     description: "A group for #{Faker::Company.bs} services.",
     code: nil,

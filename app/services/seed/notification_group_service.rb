@@ -34,7 +34,7 @@ class Seed::NotificationGroupService
   end
 
   def self.create(
-    company: Company.all.sample,
+    company:,
     name: "#{Faker::App.name} Notifications",
     description: "A group for #{Faker::Marketing.buzzwords} notifications.",
     code: nil,

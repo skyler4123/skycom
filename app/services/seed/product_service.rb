@@ -38,7 +38,7 @@ class Seed::ProductService
   end
 
   def self.create(
-    company: Company.all.sample,
+    company:,
     product_brand: (ProductBrand.all + [nil]).sample,
     name: Faker::Commerce.product_name,
     description: Faker::Lorem.sentence(word_count: 12),

@@ -51,7 +51,7 @@ class Seed::PolicyService
   end
 
   def self.create(
-    company: Company.all.sample,
+    company:,
     name: nil,
     description: nil,
     resource: COMMON_RESOURCES.sample,

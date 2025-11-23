@@ -37,7 +37,7 @@ class Seed::PeriodService
   end
 
   def self.create(
-    company: Company.all.sample,
+    company:,
     name: "Time Period",
     description: Faker::Lorem.sentence(word_count: 8),
     code: nil,
