@@ -41,4 +41,38 @@ class Seed::InvoiceService
 
     puts "Successfully created #{Invoice.count} Invoice records."
   end
+
+  def self.create(
+    order: Order.all.sample,
+    name: nil,
+    description: Faker::Lorem.sentence(word_count: 10),
+    currency: nil,
+    number: nil,
+    total: nil,
+    due_date: Faker::Date.forward(days: 30),
+    status: nil,
+    business_type: nil,
+    discarded_at: nil
+  )
+    raise "Cannot create an invoice: No orders exist." if order.nil?
+
+    calculated_total = order.order_item_appointments.sum(:total_price)
+    invoice_total = total || (calculated_total > 0 ? calculated_total : Faker::Commerce.price(range: 50..2000.0))
+
+    should_discard = rand(10) == 0
+    discarded_at ||= should_discard ? Time.zone.now - rand(1..180).days : nil
+
+    Invoice.create!(
+      order: order,
+      name: name || "Invoice for Order ##{order.id}",
+      description: description,
+      currency: currency || Invoice.currencies.keys.sample,
+      number: number || "INV-#{order.id}-#{SecureRandom.hex(4).upcase}",
+      total: invoice_total,
+      due_date: due_date,
+      status: status || Invoice.statuses.keys.sample,
+      business_type: business_type || Invoice.business_types.keys.sample,
+      discarded_at: discarded_at
+    )
+  end
 end

@@ -32,4 +32,27 @@ class Seed::FacilityGroupService
 
     puts "Successfully created #{FacilityGroup.count} FacilityGroup records."
   end
+
+  def self.create(
+    company: Company.all.sample,
+    name: "#{Faker::Address.community} Group",
+    description: "A group for facilities in the #{Faker::Address.city_prefix} area.",
+    code: nil,
+    status: nil,
+    business_type: nil,
+    discarded_at: nil
+  )
+    should_discard = rand(10) == 0
+    discarded_at ||= should_discard ? Time.zone.now - rand(1..180).days : nil
+
+    FacilityGroup.create!(
+      company: company,
+      name: name,
+      description: description,
+      code: code || "FG-#{company.id}-#{SecureRandom.hex(3).upcase}",
+      status: status || FacilityGroup.statuses.keys.sample,
+      business_type: business_type || FacilityGroup.business_types.keys.sample,
+      discarded_at: discarded_at
+    )
+  end
 end

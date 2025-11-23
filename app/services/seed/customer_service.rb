@@ -33,4 +33,25 @@ class Seed::CustomerService
 
     puts "Successfully created #{Customer.count} Customer records."
   end
+
+  def self.create(
+    company: Company.all.sample,
+    name: Faker::Name.name,
+    description: Faker::Lorem.sentence(word_count: 10),
+    status: nil,
+    business_type: nil,
+    discarded_at: nil
+  )
+    should_discard = rand(10) == 0
+    discarded_at ||= should_discard ? Time.zone.now - rand(1..180).days : nil
+
+    Customer.create!(
+      company: company,
+      name: name,
+      description: description,
+      status: status || Customer.statuses.keys.sample,
+      business_type: business_type || Customer.business_types.keys.sample,
+      discarded_at: discarded_at
+    )
+  end
 end

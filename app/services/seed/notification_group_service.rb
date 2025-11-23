@@ -32,4 +32,27 @@ class Seed::NotificationGroupService
 
     puts "Successfully created #{NotificationGroup.count} NotificationGroup records."
   end
+
+  def self.create(
+    company: Company.all.sample,
+    name: "#{Faker::App.name} Notifications",
+    description: "A group for #{Faker::Marketing.buzzwords} notifications.",
+    code: nil,
+    status: nil,
+    business_type: nil,
+    discarded_at: nil
+  )
+    should_discard = rand(10) == 0
+    discarded_at ||= should_discard ? Time.zone.now - rand(1..180).days : nil
+
+    NotificationGroup.create!(
+      company: company,
+      name: name,
+      description: description,
+      code: code || "NOTIF-G-#{company.id}-#{SecureRandom.hex(3).upcase}",
+      status: status || NotificationGroup.statuses.keys.sample,
+      business_type: business_type || NotificationGroup.business_types.keys.sample,
+      discarded_at: discarded_at
+    )
+  end
 end

@@ -39,4 +39,32 @@ class Seed::OrderService
 
     puts "Successfully created #{Order.count} Order records."
   end
+
+  def self.create(
+    company: Company.all.sample,
+    customer: nil,
+    name: nil,
+    description: Faker::Lorem.sentence(word_count: 15),
+    currency: Faker::Currency.code,
+    status: nil,
+    business_type: nil,
+    discarded_at: nil
+  )
+    customer ||= company.customers.sample
+    raise "Cannot create an order: Company '#{company.name}' has no customers." if customer.nil?
+
+    should_discard = rand(10) == 0
+    discarded_at ||= should_discard ? Time.zone.now - rand(1..180).days : nil
+
+    Order.create!(
+      company: company,
+      customer: customer,
+      name: name || "Order for #{customer.name}",
+      description: description,
+      currency: currency,
+      status: status || Order.statuses.keys.sample,
+      business_type: business_type || Order.business_types.keys.sample,
+      discarded_at: discarded_at
+    )
+  end
 end

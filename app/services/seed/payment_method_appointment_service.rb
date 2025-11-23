@@ -41,4 +41,31 @@ class Seed::PaymentMethodAppointmentService
 
     puts "Successfully created #{PaymentMethodAppointment.count} PaymentMethodAppointment records."
   end
+
+  def self.create(
+    company: Company.all.sample,
+    payment_method: PaymentMethod.all.sample,
+    name: nil,
+    description: nil,
+    code: nil,
+    status: nil,
+    business_type: nil,
+    discarded_at: nil
+  )
+    raise "Cannot create appointment: No companies or payment methods exist." if company.nil? || payment_method.nil?
+
+    should_discard = rand(10) == 0
+    discarded_at ||= should_discard ? Time.zone.now - rand(1..180).days : nil
+
+    PaymentMethodAppointment.create!(
+      company: company,
+      payment_method: payment_method,
+      name: name || "#{payment_method.name} for #{company.name}",
+      description: description || "Company-specific configuration for #{payment_method.name}.",
+      code: code || "#{payment_method.code}_#{company.id}",
+      status: status || PaymentMethodAppointment.statuses.keys.sample,
+      business_type: business_type || PaymentMethodAppointment.business_types.keys.sample,
+      discarded_at: discarded_at
+    )
+  end
 end

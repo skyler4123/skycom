@@ -45,4 +45,35 @@ class Seed::OrderItemAppointmentService
 
     puts "Successfully created #{OrderItemAppointment.count} OrderItemAppointment records."
   end
+
+  def self.create(
+    order: Order.all.sample,
+    appoint_to: nil,
+    name: nil,
+    description: Faker::Lorem.sentence,
+    quantity: rand(1..5),
+    unit_price: Faker::Commerce.price(range: 10..500.0),
+    status: nil
+  )
+    raise "Cannot create an order item: No orders exist." if order.nil?
+    company = order.company
+
+    unless appoint_to
+      products = company.products.to_a
+      services = company.services.to_a
+      appointable_items = products + services
+      raise "Cannot create order item: Company '#{company.name}' has no products or services." if appointable_items.empty?
+      appoint_to = appointable_items.sample
+    end
+
+    OrderItemAppointment.create!(
+      order: order,
+      appoint_to: appoint_to,
+      name: name || "Order Item for #{appoint_to.class.name} ##{appoint_to.id}",
+      description: description,
+      quantity: quantity,
+      unit_price: unit_price,
+      status: status || OrderItemAppointment.statuses.keys.sample
+    )
+  end
 end

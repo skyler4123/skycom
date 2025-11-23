@@ -36,4 +36,27 @@ class Seed::ProductService
 
     puts "Successfully created #{Product.count} Product records."
   end
+
+  def self.create(
+    company: Company.all.sample,
+    product_brand: (ProductBrand.all + [nil]).sample,
+    name: Faker::Commerce.product_name,
+    description: Faker::Lorem.sentence(word_count: 12),
+    status: nil,
+    business_type: nil,
+    discarded_at: nil
+  )
+    should_discard = rand(10) == 0
+    discarded_at ||= should_discard ? Time.zone.now - rand(1..180).days : nil
+
+    Product.create!(
+      company: company,
+      product_brand: product_brand,
+      name: name,
+      description: description,
+      status: status || Product.statuses.keys.sample,
+      business_type: business_type || Product.business_types.keys.sample,
+      discarded_at: discarded_at
+    )
+  end
 end

@@ -42,4 +42,37 @@ class Seed::PaymentService
 
     puts "Successfully created #{Payment.count} Payment records."
   end
+
+  def self.create(
+    invoice: Invoice.where.not(status: %w[draft cancelled]).sample,
+    name: nil,
+    description: nil,
+    currency: nil,
+    exchange_rate: 1.0,
+    amount: nil,
+    payment_method: nil,
+    gateway_details: { transaction_id: SecureRandom.uuid, timestamp: Time.zone.now }.to_json,
+    status: nil,
+    business_type: nil,
+    discarded_at: nil
+  )
+    raise "Cannot create a payment: No suitable invoices exist." if invoice.nil?
+
+    should_discard = rand(10) == 0
+    discarded_at ||= should_discard ? Time.zone.now - rand(1..180).days : nil
+
+    Payment.create!(
+      invoice: invoice,
+      name: name || "Payment for Invoice ##{invoice.number}",
+      description: description || "Payment received for invoice #{invoice.number}.",
+      currency: currency || invoice.currency,
+      exchange_rate: exchange_rate,
+      amount: amount || invoice.total,
+      payment_method: payment_method || Payment.payment_methods.keys.sample,
+      gateway_details: gateway_details,
+      status: status || Payment.statuses.keys.sample,
+      business_type: business_type || Payment.business_types.keys.sample,
+      discarded_at: discarded_at
+    )
+  end
 end

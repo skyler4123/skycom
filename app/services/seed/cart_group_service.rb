@@ -32,4 +32,28 @@ class Seed::CartGroupService
 
     puts "Successfully created #{CartGroup.count} CartGroup records."
   end
+
+  def self.create(
+    company: Company.all.sample,
+    name: "#{Faker::Commerce.department} Carts",
+    description: "A group for carts related to #{Faker::Marketing.buzzwords}.",
+    code: nil,
+    status: nil,
+    business_type: nil,
+    discarded_at: nil
+  )
+    # Randomly decide whether to mark the record as discarded if not specified
+    should_discard = rand(10) == 0
+    discarded_at ||= should_discard ? Time.zone.now - rand(1..180).days : nil
+
+    CartGroup.create!(
+      company: company,
+      name: name,
+      description: description,
+      code: code || "CART-G-#{company.id}-#{SecureRandom.hex(3).upcase}",
+      status: status || CartGroup.statuses.keys.sample,
+      business_type: business_type || CartGroup.business_types.keys.sample,
+      discarded_at: discarded_at
+    )
+  end
 end

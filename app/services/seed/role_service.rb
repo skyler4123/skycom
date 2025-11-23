@@ -37,4 +37,25 @@ class Seed::RoleService
 
     puts "Successfully created #{Role.count} Role records."
   end
+
+  def self.create(
+    company: Company.all.sample,
+    name: "Role",
+    description: Faker::Lorem.sentence(word_count: 8),
+    kind: nil,
+    status: nil,
+    discarded_at: nil
+  )
+    should_discard = rand(8) == 0
+    discarded_at ||= should_discard ? Time.zone.now - rand(1..60).days : nil
+
+    Role.create!(
+      company: company,
+      name: name,
+      description: description,
+      kind: kind || Role.kinds.keys.sample,
+      status: status || Role.statuses.keys.sample,
+      discarded_at: discarded_at
+    )
+  end
 end

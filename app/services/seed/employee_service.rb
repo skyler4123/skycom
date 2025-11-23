@@ -8,7 +8,7 @@ class Seed::EmployeeService
   
   def self.run
     puts "Seeding Employee records..."
-
+ 
     Company.all.each do |company|
       EMPLOYEES_PER_COMPANY.times do |index|
         assigned_user = Seed::UserService.create(username: "company_#{company.id}_employee", index: index)
@@ -26,7 +26,31 @@ class Seed::EmployeeService
         employee.attach_tag(name: "Employee #{employee.id} Tag")
       end
     end
-
+ 
     puts "Successfully created #{Employee.count} Employee records."
+  end
+
+  def self.create(
+    company: Company.all.sample,
+    user: nil,
+    name: Faker::Name.name,
+    description: "#{Faker::Job.title} in #{Faker::Commerce.department}",
+    business_type: nil,
+    discarded_at: nil,
+    index: 0
+  )
+    user ||= Seed::UserService.create(username: "company_#{company.id}_employee", index: index)
+
+    employee = Employee.create!(
+      user: user,
+      company: company,
+      name: name,
+      description: description,
+      business_type: business_type || Employee.business_types.keys.sample,
+      discarded_at: discarded_at
+    )
+
+    employee.attach_tag(name: "Employee #{employee.id} Tag")
+    employee
   end
 end

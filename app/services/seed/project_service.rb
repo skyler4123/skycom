@@ -35,4 +35,31 @@ class Seed::ProjectService
 
     puts "Successfully created #{Project.count} Project records."
   end
+
+  def self.create(
+    project_group: ProjectGroup.all.sample,
+    name: nil,
+    description: nil,
+    code: nil,
+    status: nil,
+    business_type: nil,
+    discarded_at: nil
+  )
+    raise "Cannot create a project: No project groups exist." if project_group.nil?
+    company = project_group.company
+
+    should_discard = rand(10) == 0
+    discarded_at ||= should_discard ? Time.zone.now - rand(1..180).days : nil
+
+    Project.create!(
+      company: company,
+      project_group: project_group,
+      name: name || "#{Faker::App.name} Project",
+      description: description || "Project for group '#{project_group.name}'.",
+      code: code || "PROJ-#{company.id}-#{project_group.id}-#{SecureRandom.hex(2).upcase}",
+      status: status || Project.statuses.keys.sample,
+      business_type: business_type || Project.business_types.keys.sample,
+      discarded_at: discarded_at
+    )
+  end
 end

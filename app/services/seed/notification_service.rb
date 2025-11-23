@@ -35,4 +35,31 @@ class Seed::NotificationService
 
     puts "Successfully created #{Notification.count} Notification records."
   end
+
+  def self.create(
+    notification_group: NotificationGroup.all.sample,
+    name: nil,
+    description: nil,
+    code: nil,
+    status: nil,
+    business_type: nil,
+    discarded_at: nil
+  )
+    raise "Cannot create a notification: No notification groups exist." if notification_group.nil?
+    company = notification_group.company
+
+    should_discard = rand(10) == 0
+    discarded_at ||= should_discard ? Time.zone.now - rand(1..180).days : nil
+
+    Notification.create!(
+      company: company,
+      notification_group: notification_group,
+      name: name || "Notification for #{company.name}",
+      description: description || "A notification for group '#{notification_group.name}'.",
+      code: code || "NOTIF-#{company.id}-#{notification_group.id}-#{SecureRandom.hex(2).upcase}",
+      status: status || Notification.statuses.keys.sample,
+      business_type: business_type || Notification.business_types.keys.sample,
+      discarded_at: discarded_at
+    )
+  end
 end

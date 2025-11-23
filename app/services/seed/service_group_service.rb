@@ -37,4 +37,31 @@ class Seed::ServiceGroupService
 
     puts "Successfully created #{ServiceGroup.count} ServiceGroup records."
   end
+
+  def self.create(
+    company: Company.all.sample,
+    name: "#{Faker::App.name} Service Group",
+    description: "A group for #{Faker::Company.bs} services.",
+    code: nil,
+    status: nil,
+    duration: rand(7..365),
+    start_at: Faker::Date.between(from: 1.year.ago, to: Date.today).to_datetime,
+    business_type: nil,
+    discarded_at: nil
+  )
+    should_discard = rand(10) == 0
+    discarded_at ||= should_discard ? Time.zone.now - rand(1..180).days : nil
+
+    ServiceGroup.create!(
+      company: company,
+      name: name,
+      description: description,
+      code: code || "SG-#{company.id}-#{SecureRandom.hex(3).upcase}",
+      status: status || ServiceGroup.statuses.keys.sample,
+      duration: duration,
+      start_at: start_at,
+      business_type: business_type || ServiceGroup.business_types.keys.sample,
+      discarded_at: discarded_at
+    )
+  end
 end

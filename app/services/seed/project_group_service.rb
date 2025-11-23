@@ -32,4 +32,27 @@ class Seed::ProjectGroupService
 
     puts "Successfully created #{ProjectGroup.count} ProjectGroup records."
   end
+
+  def self.create(
+    company: Company.all.sample,
+    name: "#{Faker::App.name} Project Group",
+    description: "A group for projects related to #{Faker::Commerce.department}.",
+    code: nil,
+    status: nil,
+    business_type: nil,
+    discarded_at: nil
+  )
+    should_discard = rand(10) == 0
+    discarded_at ||= should_discard ? Time.zone.now - rand(1..180).days : nil
+
+    ProjectGroup.create!(
+      company: company,
+      name: name,
+      description: description,
+      code: code || "PROJ-G-#{company.id}-#{SecureRandom.hex(3).upcase}",
+      status: status || ProjectGroup.statuses.keys.sample,
+      business_type: business_type || ProjectGroup.business_types.keys.sample,
+      discarded_at: discarded_at
+    )
+  end
 end

@@ -37,4 +37,33 @@ class Seed::TaskService
 
     puts "Successfully created #{Task.count} Task records."
   end
+
+  def self.create(
+    task_group: TaskGroup.all.sample,
+    name: "#{Faker::Verb.base.capitalize} the #{Faker::Hacker.noun}",
+    description: nil,
+    code: nil,
+    currency: nil,
+    status: nil,
+    business_type: nil,
+    discarded_at: nil
+  )
+    raise "Cannot create a task: No task groups exist." if task_group.nil?
+    company = task_group.company
+
+    should_discard = rand(10) == 0
+    discarded_at ||= should_discard ? Time.zone.now - rand(1..180).days : nil
+
+    Task.create!(
+      company: company,
+      task_group: task_group,
+      name: name,
+      description: description || "Task for group '#{task_group.name}'.",
+      code: code || "TASK-#{company.id}-#{task_group.id}-#{SecureRandom.hex(2).upcase}",
+      currency: currency || Task.currencies.keys.sample,
+      status: status || Task.statuses.keys.sample,
+      business_type: business_type || Task.business_types.keys.sample,
+      discarded_at: discarded_at
+    )
+  end
 end

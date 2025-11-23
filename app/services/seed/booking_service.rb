@@ -44,4 +44,31 @@ class Seed::BookingService
 
     puts "Successfully created #{Booking.count} Booking records."
   end
+
+  def self.create(
+    company:,
+    appoint_from: nil,
+    appoint_to:,
+    name: Faker::Book.title,
+    description: Faker::Lorem.sentence,
+    code: nil,
+    status: nil,
+    business_type: nil,
+    discarded_at: nil
+  )
+    appoint_from ||= company.employees.sample
+    appoint_to ||= company.facilities.sample
+
+    Booking.create!(
+      company: company,
+      appoint_from: appoint_from,
+      appoint_to: appoint_to,
+      name: name,
+      description: description,
+      code: code || "BOOK-#{company.id}-#{SecureRandom.hex(3).upcase}",
+      status: status || Booking.statuses.keys.sample,
+      business_type: business_type || Booking.business_types.keys.sample,
+      discarded_at: discarded_at
+    )
+  end
 end

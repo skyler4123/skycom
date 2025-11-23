@@ -35,4 +35,25 @@ class Seed::FacilityService
 
     puts "Successfully created #{Facility.count} Facility records."
   end
+
+  def self.create(
+    company: Company.all.sample,
+    name: nil,
+    description: Faker::Lorem.sentence(word_count: 10),
+    status: nil,
+    business_type: nil,
+    discarded_at: nil
+  )
+    should_discard = rand(10) == 0
+    discarded_at ||= should_discard ? Time.zone.now - rand(1..180).days : nil
+
+    Facility.create!(
+      company: company,
+      name: name || "#{company.name} Facility",
+      description: description,
+      status: status || Facility.statuses.keys.sample,
+      business_type: business_type || Facility.business_types.keys.sample,
+      discarded_at: discarded_at
+    )
+  end
 end
