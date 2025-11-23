@@ -55,6 +55,7 @@ Things you may want to cover:
   bundle exec rails g scaffold Policy company:references name description code resource action status:integer business_type:integer discarded_at:datetime:index --force
   bundle exec rails g scaffold PolicyAppointment policy:references appoint_to:references{polymorphic} name description code status:integer business_type:integer discarded_at:datetime:index --force
   bundle exec rails g scaffold RoleAppointment role:references appoint_to:references{polymorphic} name description code status:integer business_type:integer discarded_at:datetime:index --force
+  
   bundle exec rails g scaffold Position name
   bundle exec rails g scaffold PaySlip name
   bundle exec rails g scaffold Attendance name
