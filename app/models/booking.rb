@@ -1,6 +1,6 @@
 class Booking < ApplicationRecord
   belongs_to :company
-  belongs_to :appoint_from, polymorphic: true
+  belongs_to :appoint_from, polymorphic: true, optional: true
   belongs_to :appoint_to, polymorphic: true
 
   has_one :period_appointment, as: :appoint_to, dependent: :destroy

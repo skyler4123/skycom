@@ -98,8 +98,8 @@ ActiveRecord::Schema[8.0].define(version: 2025_11_23_012412) do
 
   create_table "bookings", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.uuid "company_id", null: false
-    t.string "appoint_from_type", null: false
-    t.uuid "appoint_from_id", null: false
+    t.string "appoint_from_type"
+    t.uuid "appoint_from_id"
     t.string "appoint_to_type", null: false
     t.uuid "appoint_to_id", null: false
     t.string "name"
@@ -130,14 +130,14 @@ ActiveRecord::Schema[8.0].define(version: 2025_11_23_012412) do
 
   create_table "cart_appointments", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.uuid "cart_id", null: false
-    t.string "appoint_from_type", null: false
-    t.uuid "appoint_from_id", null: false
+    t.string "appoint_from_type"
+    t.uuid "appoint_from_id"
     t.string "appoint_to_type", null: false
     t.uuid "appoint_to_id", null: false
-    t.string "appoint_for_type", null: false
-    t.uuid "appoint_for_id", null: false
-    t.string "appoint_by_type", null: false
-    t.uuid "appoint_by_id", null: false
+    t.string "appoint_for_type"
+    t.uuid "appoint_for_id"
+    t.string "appoint_by_type"
+    t.uuid "appoint_by_id"
     t.string "name"
     t.string "description"
     t.string "code"
@@ -228,14 +228,14 @@ ActiveRecord::Schema[8.0].define(version: 2025_11_23_012412) do
 
   create_table "customer_appointments", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.uuid "customer_id", null: false
-    t.string "appoint_from_type", null: false
-    t.uuid "appoint_from_id", null: false
+    t.string "appoint_from_type"
+    t.uuid "appoint_from_id"
     t.string "appoint_to_type", null: false
     t.uuid "appoint_to_id", null: false
-    t.string "appoint_for_type", null: false
-    t.uuid "appoint_for_id", null: false
-    t.string "appoint_by_type", null: false
-    t.uuid "appoint_by_id", null: false
+    t.string "appoint_for_type"
+    t.uuid "appoint_for_id"
+    t.string "appoint_by_type"
+    t.uuid "appoint_by_id"
     t.string "name"
     t.string "description"
     t.string "code"
@@ -254,14 +254,14 @@ ActiveRecord::Schema[8.0].define(version: 2025_11_23_012412) do
 
   create_table "customer_group_appointments", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.uuid "customer_group_id", null: false
-    t.string "appoint_from_type", null: false
-    t.uuid "appoint_from_id", null: false
+    t.string "appoint_from_type"
+    t.uuid "appoint_from_id"
     t.string "appoint_to_type", null: false
     t.uuid "appoint_to_id", null: false
-    t.string "appoint_for_type", null: false
-    t.uuid "appoint_for_id", null: false
-    t.string "appoint_by_type", null: false
-    t.uuid "appoint_by_id", null: false
+    t.string "appoint_for_type"
+    t.uuid "appoint_for_id"
+    t.string "appoint_by_type"
+    t.uuid "appoint_by_id"
     t.string "name"
     t.string "description"
     t.string "code"
@@ -308,14 +308,14 @@ ActiveRecord::Schema[8.0].define(version: 2025_11_23_012412) do
 
   create_table "employee_appointments", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.uuid "employee_id", null: false
-    t.string "appoint_from_type", null: false
-    t.uuid "appoint_from_id", null: false
+    t.string "appoint_from_type"
+    t.uuid "appoint_from_id"
     t.string "appoint_to_type", null: false
     t.uuid "appoint_to_id", null: false
-    t.string "appoint_for_type", null: false
-    t.uuid "appoint_for_id", null: false
-    t.string "appoint_by_type", null: false
-    t.uuid "appoint_by_id", null: false
+    t.string "appoint_for_type"
+    t.uuid "appoint_for_id"
+    t.string "appoint_by_type"
+    t.uuid "appoint_by_id"
     t.string "name"
     t.string "description"
     t.string "code"
@@ -330,14 +330,14 @@ ActiveRecord::Schema[8.0].define(version: 2025_11_23_012412) do
 
   create_table "employee_group_appointments", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.uuid "employee_group_id", null: false
-    t.string "appoint_from_type", null: false
-    t.uuid "appoint_from_id", null: false
+    t.string "appoint_from_type"
+    t.uuid "appoint_from_id"
     t.string "appoint_to_type", null: false
     t.uuid "appoint_to_id", null: false
-    t.string "appoint_for_type", null: false
-    t.uuid "appoint_for_id", null: false
-    t.string "appoint_by_type", null: false
-    t.uuid "appoint_by_id", null: false
+    t.string "appoint_for_type"
+    t.uuid "appoint_for_id"
+    t.string "appoint_by_type"
+    t.uuid "appoint_by_id"
     t.string "name"
     t.string "description"
     t.string "code"
@@ -382,14 +382,14 @@ ActiveRecord::Schema[8.0].define(version: 2025_11_23_012412) do
 
   create_table "exam_appointments", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.uuid "exam_id", null: false
-    t.string "appoint_from_type", null: false
-    t.uuid "appoint_from_id", null: false
+    t.string "appoint_from_type"
+    t.uuid "appoint_from_id"
     t.string "appoint_to_type", null: false
     t.uuid "appoint_to_id", null: false
-    t.string "appoint_for_type", null: false
-    t.uuid "appoint_for_id", null: false
-    t.string "appoint_by_type", null: false
-    t.uuid "appoint_by_id", null: false
+    t.string "appoint_for_type"
+    t.uuid "appoint_for_id"
+    t.string "appoint_by_type"
+    t.uuid "appoint_by_id"
     t.string "name"
     t.string "description"
     t.string "code"
@@ -452,14 +452,14 @@ ActiveRecord::Schema[8.0].define(version: 2025_11_23_012412) do
 
   create_table "facility_appointments", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.uuid "facility_id", null: false
-    t.string "appoint_from_type", null: false
-    t.uuid "appoint_from_id", null: false
+    t.string "appoint_from_type"
+    t.uuid "appoint_from_id"
     t.string "appoint_to_type", null: false
     t.uuid "appoint_to_id", null: false
-    t.string "appoint_for_type", null: false
-    t.uuid "appoint_for_id", null: false
-    t.string "appoint_by_type", null: false
-    t.uuid "appoint_by_id", null: false
+    t.string "appoint_for_type"
+    t.uuid "appoint_for_id"
+    t.string "appoint_by_type"
+    t.uuid "appoint_by_id"
     t.string "name"
     t.string "description"
     t.string "code"
@@ -478,14 +478,14 @@ ActiveRecord::Schema[8.0].define(version: 2025_11_23_012412) do
 
   create_table "facility_group_appointments", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.uuid "facility_group_id", null: false
-    t.string "appoint_from_type", null: false
-    t.uuid "appoint_from_id", null: false
+    t.string "appoint_from_type"
+    t.uuid "appoint_from_id"
     t.string "appoint_to_type", null: false
     t.uuid "appoint_to_id", null: false
-    t.string "appoint_for_type", null: false
-    t.uuid "appoint_for_id", null: false
-    t.string "appoint_by_type", null: false
-    t.uuid "appoint_by_id", null: false
+    t.string "appoint_for_type"
+    t.uuid "appoint_for_id"
+    t.string "appoint_by_type"
+    t.uuid "appoint_by_id"
     t.string "name"
     t.string "description"
     t.string "code"
@@ -532,14 +532,14 @@ ActiveRecord::Schema[8.0].define(version: 2025_11_23_012412) do
 
   create_table "inventory_item_appointments", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.uuid "inventory_item_id", null: false
-    t.string "appoint_from_type", null: false
-    t.uuid "appoint_from_id", null: false
+    t.string "appoint_from_type"
+    t.uuid "appoint_from_id"
     t.string "appoint_to_type", null: false
     t.uuid "appoint_to_id", null: false
-    t.string "appoint_for_type", null: false
-    t.uuid "appoint_for_id", null: false
-    t.string "appoint_by_type", null: false
-    t.uuid "appoint_by_id", null: false
+    t.string "appoint_for_type"
+    t.uuid "appoint_for_id"
+    t.string "appoint_by_type"
+    t.uuid "appoint_by_id"
     t.string "name"
     t.string "description"
     t.string "code"
@@ -585,14 +585,14 @@ ActiveRecord::Schema[8.0].define(version: 2025_11_23_012412) do
 
   create_table "inventory_transaction_appointments", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.uuid "inventory_transaction_id", null: false
-    t.string "appoint_from_type", null: false
-    t.uuid "appoint_from_id", null: false
+    t.string "appoint_from_type"
+    t.uuid "appoint_from_id"
     t.string "appoint_to_type", null: false
     t.uuid "appoint_to_id", null: false
-    t.string "appoint_for_type", null: false
-    t.uuid "appoint_for_id", null: false
-    t.string "appoint_by_type", null: false
-    t.uuid "appoint_by_id", null: false
+    t.string "appoint_for_type"
+    t.uuid "appoint_for_id"
+    t.string "appoint_by_type"
+    t.uuid "appoint_by_id"
     t.string "name"
     t.string "description"
     t.string "code"
@@ -611,14 +611,14 @@ ActiveRecord::Schema[8.0].define(version: 2025_11_23_012412) do
 
   create_table "inventory_transactions", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.uuid "company_id", null: false
-    t.string "appoint_from_type", null: false
-    t.uuid "appoint_from_id", null: false
+    t.string "appoint_from_type"
+    t.uuid "appoint_from_id"
     t.string "appoint_to_type", null: false
     t.uuid "appoint_to_id", null: false
-    t.string "appoint_for_type", null: false
-    t.uuid "appoint_for_id", null: false
-    t.string "appoint_by_type", null: false
-    t.uuid "appoint_by_id", null: false
+    t.string "appoint_for_type"
+    t.uuid "appoint_for_id"
+    t.string "appoint_by_type"
+    t.uuid "appoint_by_id"
     t.string "name"
     t.string "description"
     t.string "code"
@@ -656,14 +656,14 @@ ActiveRecord::Schema[8.0].define(version: 2025_11_23_012412) do
 
   create_table "notification_appointments", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.uuid "notification_id", null: false
-    t.string "appoint_from_type", null: false
-    t.uuid "appoint_from_id", null: false
+    t.string "appoint_from_type"
+    t.uuid "appoint_from_id"
     t.string "appoint_to_type", null: false
     t.uuid "appoint_to_id", null: false
-    t.string "appoint_for_type", null: false
-    t.uuid "appoint_for_id", null: false
-    t.string "appoint_by_type", null: false
-    t.uuid "appoint_by_id", null: false
+    t.string "appoint_for_type"
+    t.uuid "appoint_for_id"
+    t.string "appoint_by_type"
+    t.uuid "appoint_by_id"
     t.string "name"
     t.string "description"
     t.string "code"
@@ -682,14 +682,14 @@ ActiveRecord::Schema[8.0].define(version: 2025_11_23_012412) do
 
   create_table "notification_group_appointments", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.uuid "notification_group_id", null: false
-    t.string "appoint_from_type", null: false
-    t.uuid "appoint_from_id", null: false
+    t.string "appoint_from_type"
+    t.uuid "appoint_from_id"
     t.string "appoint_to_type", null: false
     t.uuid "appoint_to_id", null: false
-    t.string "appoint_for_type", null: false
-    t.uuid "appoint_for_id", null: false
-    t.string "appoint_by_type", null: false
-    t.uuid "appoint_by_id", null: false
+    t.string "appoint_for_type"
+    t.uuid "appoint_for_id"
+    t.string "appoint_by_type"
+    t.uuid "appoint_by_id"
     t.string "name"
     t.string "description"
     t.string "code"
@@ -738,14 +738,14 @@ ActiveRecord::Schema[8.0].define(version: 2025_11_23_012412) do
 
   create_table "order_appointments", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.uuid "order_id", null: false
-    t.string "appoint_from_type", null: false
-    t.uuid "appoint_from_id", null: false
+    t.string "appoint_from_type"
+    t.uuid "appoint_from_id"
     t.string "appoint_to_type", null: false
     t.uuid "appoint_to_id", null: false
-    t.string "appoint_for_type", null: false
-    t.uuid "appoint_for_id", null: false
-    t.string "appoint_by_type", null: false
-    t.uuid "appoint_by_id", null: false
+    t.string "appoint_for_type"
+    t.uuid "appoint_for_id"
+    t.string "appoint_by_type"
+    t.uuid "appoint_by_id"
     t.decimal "unit_price"
     t.integer "quantity"
     t.decimal "total_price"
@@ -767,14 +767,14 @@ ActiveRecord::Schema[8.0].define(version: 2025_11_23_012412) do
 
   create_table "order_group_appointments", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.uuid "order_group_id", null: false
-    t.string "appoint_from_type", null: false
-    t.uuid "appoint_from_id", null: false
+    t.string "appoint_from_type"
+    t.uuid "appoint_from_id"
     t.string "appoint_to_type", null: false
     t.uuid "appoint_to_id", null: false
-    t.string "appoint_for_type", null: false
-    t.uuid "appoint_for_id", null: false
-    t.string "appoint_by_type", null: false
-    t.uuid "appoint_by_id", null: false
+    t.string "appoint_for_type"
+    t.uuid "appoint_for_id"
+    t.string "appoint_by_type"
+    t.uuid "appoint_by_id"
     t.decimal "unit_price"
     t.integer "quantity"
     t.decimal "total_price"
@@ -894,14 +894,14 @@ ActiveRecord::Schema[8.0].define(version: 2025_11_23_012412) do
 
   create_table "period_appointments", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.uuid "period_id", null: false
-    t.string "appoint_from_type", null: false
-    t.uuid "appoint_from_id", null: false
+    t.string "appoint_from_type"
+    t.uuid "appoint_from_id"
     t.string "appoint_to_type", null: false
     t.uuid "appoint_to_id", null: false
-    t.string "appoint_for_type", null: false
-    t.uuid "appoint_for_id", null: false
-    t.string "appoint_by_type", null: false
-    t.uuid "appoint_by_id", null: false
+    t.string "appoint_for_type"
+    t.uuid "appoint_for_id"
+    t.string "appoint_by_type"
+    t.uuid "appoint_by_id"
     t.string "name"
     t.string "description"
     t.string "code"
@@ -966,14 +966,14 @@ ActiveRecord::Schema[8.0].define(version: 2025_11_23_012412) do
 
   create_table "product_appointments", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.uuid "product_id", null: false
-    t.string "appoint_from_type", null: false
-    t.uuid "appoint_from_id", null: false
+    t.string "appoint_from_type"
+    t.uuid "appoint_from_id"
     t.string "appoint_to_type", null: false
     t.uuid "appoint_to_id", null: false
-    t.string "appoint_for_type", null: false
-    t.uuid "appoint_for_id", null: false
-    t.string "appoint_by_type", null: false
-    t.uuid "appoint_by_id", null: false
+    t.string "appoint_for_type"
+    t.uuid "appoint_for_id"
+    t.string "appoint_by_type"
+    t.uuid "appoint_by_id"
     t.string "name"
     t.string "description"
     t.string "code"
@@ -992,14 +992,14 @@ ActiveRecord::Schema[8.0].define(version: 2025_11_23_012412) do
 
   create_table "product_group_appointments", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.uuid "product_group_id", null: false
-    t.string "appoint_from_type", null: false
-    t.uuid "appoint_from_id", null: false
+    t.string "appoint_from_type"
+    t.uuid "appoint_from_id"
     t.string "appoint_to_type", null: false
     t.uuid "appoint_to_id", null: false
-    t.string "appoint_for_type", null: false
-    t.uuid "appoint_for_id", null: false
-    t.string "appoint_by_type", null: false
-    t.uuid "appoint_by_id", null: false
+    t.string "appoint_for_type"
+    t.uuid "appoint_for_id"
+    t.string "appoint_by_type"
+    t.uuid "appoint_by_id"
     t.string "name"
     t.string "description"
     t.string "code"
@@ -1061,14 +1061,14 @@ ActiveRecord::Schema[8.0].define(version: 2025_11_23_012412) do
 
   create_table "project_appointments", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.uuid "project_id", null: false
-    t.string "appoint_from_type", null: false
-    t.uuid "appoint_from_id", null: false
+    t.string "appoint_from_type"
+    t.uuid "appoint_from_id"
     t.string "appoint_to_type", null: false
     t.uuid "appoint_to_id", null: false
-    t.string "appoint_for_type", null: false
-    t.uuid "appoint_for_id", null: false
-    t.string "appoint_by_type", null: false
-    t.uuid "appoint_by_id", null: false
+    t.string "appoint_for_type"
+    t.uuid "appoint_for_id"
+    t.string "appoint_by_type"
+    t.uuid "appoint_by_id"
     t.string "name"
     t.string "description"
     t.string "code"
@@ -1087,14 +1087,14 @@ ActiveRecord::Schema[8.0].define(version: 2025_11_23_012412) do
 
   create_table "project_group_appointments", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.uuid "project_group_id", null: false
-    t.string "appoint_from_type", null: false
-    t.uuid "appoint_from_id", null: false
+    t.string "appoint_from_type"
+    t.uuid "appoint_from_id"
     t.string "appoint_to_type", null: false
     t.uuid "appoint_to_id", null: false
-    t.string "appoint_for_type", null: false
-    t.uuid "appoint_for_id", null: false
-    t.string "appoint_by_type", null: false
-    t.uuid "appoint_by_id", null: false
+    t.string "appoint_for_type"
+    t.uuid "appoint_for_id"
+    t.string "appoint_by_type"
+    t.uuid "appoint_by_id"
     t.string "name"
     t.string "description"
     t.string "code"
@@ -1229,14 +1229,14 @@ ActiveRecord::Schema[8.0].define(version: 2025_11_23_012412) do
 
   create_table "service_appointments", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.uuid "service_id", null: false
-    t.string "appoint_from_type", null: false
-    t.uuid "appoint_from_id", null: false
+    t.string "appoint_from_type"
+    t.uuid "appoint_from_id"
     t.string "appoint_to_type", null: false
     t.uuid "appoint_to_id", null: false
-    t.string "appoint_for_type", null: false
-    t.uuid "appoint_for_id", null: false
-    t.string "appoint_by_type", null: false
-    t.uuid "appoint_by_id", null: false
+    t.string "appoint_for_type"
+    t.uuid "appoint_for_id"
+    t.string "appoint_by_type"
+    t.uuid "appoint_by_id"
     t.string "name"
     t.string "description"
     t.string "code"
@@ -1257,14 +1257,14 @@ ActiveRecord::Schema[8.0].define(version: 2025_11_23_012412) do
 
   create_table "service_group_appointments", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.uuid "service_group_id", null: false
-    t.string "appoint_from_type", null: false
-    t.uuid "appoint_from_id", null: false
+    t.string "appoint_from_type"
+    t.uuid "appoint_from_id"
     t.string "appoint_to_type", null: false
     t.uuid "appoint_to_id", null: false
-    t.string "appoint_for_type", null: false
-    t.uuid "appoint_for_id", null: false
-    t.string "appoint_by_type", null: false
-    t.uuid "appoint_by_id", null: false
+    t.string "appoint_for_type"
+    t.uuid "appoint_for_id"
+    t.string "appoint_by_type"
+    t.uuid "appoint_by_id"
     t.string "name"
     t.string "description"
     t.string "code"
@@ -1331,14 +1331,14 @@ ActiveRecord::Schema[8.0].define(version: 2025_11_23_012412) do
 
   create_table "tag_appointments", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.uuid "tag_id", null: false
-    t.string "appoint_from_type", null: false
-    t.uuid "appoint_from_id", null: false
+    t.string "appoint_from_type"
+    t.uuid "appoint_from_id"
     t.string "appoint_to_type", null: false
     t.uuid "appoint_to_id", null: false
-    t.string "appoint_for_type", null: false
-    t.uuid "appoint_for_id", null: false
-    t.string "appoint_by_type", null: false
-    t.uuid "appoint_by_id", null: false
+    t.string "appoint_for_type"
+    t.uuid "appoint_for_id"
+    t.string "appoint_by_type"
+    t.uuid "appoint_by_id"
     t.string "value"
     t.string "description"
     t.datetime "created_at", null: false
@@ -1362,14 +1362,14 @@ ActiveRecord::Schema[8.0].define(version: 2025_11_23_012412) do
 
   create_table "task_appointments", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.uuid "task_id", null: false
-    t.string "appoint_from_type", null: false
-    t.uuid "appoint_from_id", null: false
+    t.string "appoint_from_type"
+    t.uuid "appoint_from_id"
     t.string "appoint_to_type", null: false
     t.uuid "appoint_to_id", null: false
-    t.string "appoint_for_type", null: false
-    t.uuid "appoint_for_id", null: false
-    t.string "appoint_by_type", null: false
-    t.uuid "appoint_by_id", null: false
+    t.string "appoint_for_type"
+    t.uuid "appoint_for_id"
+    t.string "appoint_by_type"
+    t.uuid "appoint_by_id"
     t.string "name"
     t.string "description"
     t.string "code"
@@ -1388,14 +1388,14 @@ ActiveRecord::Schema[8.0].define(version: 2025_11_23_012412) do
 
   create_table "task_group_appointments", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.uuid "task_group_id", null: false
-    t.string "appoint_from_type", null: false
-    t.uuid "appoint_from_id", null: false
+    t.string "appoint_from_type"
+    t.uuid "appoint_from_id"
     t.string "appoint_to_type", null: false
     t.uuid "appoint_to_id", null: false
-    t.string "appoint_for_type", null: false
-    t.uuid "appoint_for_id", null: false
-    t.string "appoint_by_type", null: false
-    t.uuid "appoint_by_id", null: false
+    t.string "appoint_for_type"
+    t.uuid "appoint_for_id"
+    t.string "appoint_by_type"
+    t.uuid "appoint_by_id"
     t.string "name"
     t.string "description"
     t.string "code"
