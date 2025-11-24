@@ -13,6 +13,11 @@ class Seed::SchoolService
     'Guard' => 3
   }.freeze
 
+  # Define the number of customers (students) to create for each school
+  CUSTOMER_ROLES = {
+    'Student' => 10
+  }
+
   def initialize
     @school_owner = nil
     @school_admin = []
@@ -54,8 +59,18 @@ class Seed::SchoolService
     end
     puts "Created #{@schools.count} schools."
     
-    # --- 3. Create School Roles ---
+    # --- 3. Create School Roles + Custom Roles ---
     SCHOOL_ROLES.each do |role_name|
+      @schools.each do |school|
+        Seed::RoleService.create(
+          company: school,
+          name: role_name,
+          description: "#{role_name} role for #{school.name}"
+        )
+      end
+    end
+
+    CUSTOMER_ROLES.each do |role_name, count|
       @schools.each do |school|
         Seed::RoleService.create(
           company: school,
@@ -81,6 +96,40 @@ class Seed::SchoolService
       end
       puts "Created #{@employees.count} employees for #{school.name}."
     end
+
+    # --- 5. Create Customers (Students) for Each School ---
+    @schools.each do |school|
+      puts "Creating customers (students) for #{school.name}..."
+      CUSTOMER_ROLES.each do |role_name, count|
+        count.times do |i|
+          user = Seed::UserService.create(email: "student_#{i + 1}_#{school.id}@example.com")
+          customer = Seed::CustomerService.create(
+            user: user,
+            company: school
+          )
+          customer.attach_role(role_name)
+          @customers << customer
+        end
+      end
+      puts "Created #{@customers.count} customers (students) for #{school.name}."
+    end
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
     puts "\n========================================================="
     puts "🏫 School Seeding Complete!"
     puts "========================================================="
