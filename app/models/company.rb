@@ -108,7 +108,7 @@ class Company < ApplicationRecord
   }
   
   # --- Validations ---
-  validates :name, presence: true, uniqueness: true, length: { maximum: 255 }
+  validates :name, presence: true, uniqueness: { scope: :user_id }, length: { maximum: 255 }
   validates :description, length: { maximum: 5000 }, allow_blank: true
 
   validates :business_type, presence: true

@@ -43,7 +43,9 @@ class Seed::ApplicationService
     PaymentMethod.destroy_all
 
     Seed::PaymentMethodService.run # Ensure global payment methods are seeded first
-    Seed::SchoolService.new
+    Seed::SchoolService.new(owner_email: "school_owner_1@example.com")
+    Seed::SchoolService.new(owner_email: "school_owner_2@example.com")
+
 
 
     self.puts_count

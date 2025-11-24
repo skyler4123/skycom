@@ -18,7 +18,8 @@ class Seed::SchoolService
   }.freeze
 
 
-  def initialize
+  def initialize(owner_email:)
+    @owner_email = owner_email
     @school_owner = nil
     @school_admin = []
     @schools = []
@@ -46,7 +47,7 @@ class Seed::SchoolService
 
     # --- 1. Create School Owners (User) ---
     puts "Creating 1 school owner..."
-    @school_owner = Seed::UserService.create(email: "school_owner_1@example.com")
+    @school_owner = Seed::UserService.create(email: @owner_email)
 
     #--- 2. Create Schools (Company) ---
     puts "Creating #{@school_count} schools..."
