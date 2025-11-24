@@ -36,6 +36,7 @@ class Seed::CustomerService
 
   def self.create(
     company:,
+    user: nil,
     name: Faker::Name.name,
     description: Faker::Lorem.sentence(word_count: 10),
     status: nil,
@@ -47,6 +48,7 @@ class Seed::CustomerService
 
     Customer.create!(
       company: company,
+      user: user,
       name: name,
       description: description,
       status: status || Customer.statuses.keys.sample,

@@ -1,7 +1,7 @@
 class Seed::ApplicationService
   def self.run(seed_number: 0)
-    # puts "\n\n🚀 Starting Full Database Seeding..."
-    # puts "========================================================="
+    puts "\n\n🚀 Starting Full Database Seeding..."
+    puts "========================================================="
 
     # Seed::UserService.run
     # Seed::CompanyService.run
