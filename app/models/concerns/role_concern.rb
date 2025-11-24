@@ -25,5 +25,9 @@ module RoleConcern
       Rails.logger.error "Role assignment failed for #{self.class} #{self.id} with role '#{name}': #{e.message}"
       raise e # Re-raise the error for standard Rails handling
     end
+
+    def has_role?(role_name)
+      roles.exists?(name: role_name)
+    end
   end
 end

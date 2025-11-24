@@ -62,7 +62,7 @@ class Seed::PaymentMethodAppointmentService
       payment_method: payment_method,
       name: name || "#{payment_method.name} for #{company.name}",
       description: description || "Company-specific configuration for #{payment_method.name}.",
-      code: code || "#{payment_method.code}_#{company.id}",
+      code: code || "#{payment_method.code}_#{company.id}_#{SecureRandom.hex(4)}", # Ensure unique code
       status: status || PaymentMethodAppointment.statuses.keys.sample,
       business_type: business_type || PaymentMethodAppointment.business_types.keys.sample,
       discarded_at: discarded_at

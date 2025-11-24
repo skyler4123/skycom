@@ -1,4 +1,6 @@
 class Employee < ApplicationRecord
+  include RoleConcern
+
   # --- Associations ---
   belongs_to :company
   belongs_to :user # user_id is nullable in the migration
@@ -38,5 +40,4 @@ class Employee < ApplicationRecord
   has_many :roles, through: :role_appointments
 
   has_many :bookings, as: :appoint_from, dependent: :destroy, class_name: "Booking"
-
 end

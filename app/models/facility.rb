@@ -4,6 +4,9 @@ class Facility < ApplicationRecord
   has_many :facility_groups, through: :facility_group_appointments
   has_many :bookings, as: :appoint_to, dependent: :destroy, class_name: "Booking"
 
+  has_many :tag_appointments, dependent: :destroy, as: :appoint_to
+  has_many :tags, through: :tag_appointments
+
   enum :status, { 
     active: 0, 
     pending: 1, 

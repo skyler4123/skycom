@@ -26,13 +26,15 @@ class Seed::SchoolService
     @customers = [] # Mapping students to customers
     @teachers = []
     @classrooms = []
+    @classes = []
     @courses = []
 
-    @school_admin_count = 3
-    @school_count = 3
+    @school_admin_count = 2
+    @school_count = 2
     @customer_count = 10 # Students per school
-    @teacher_count = 5
+    @teacher_count = 3
     @classroom_count = 3
+    @class_count = 3
     @course_count = 4
 
     seed
@@ -42,11 +44,11 @@ class Seed::SchoolService
     puts "\n\n🏫 Starting School Seeding..."
     puts "========================================================="
 
-    # --- 1. Create School Owners ---
+    # --- 1. Create School Owners (User) ---
     puts "Creating 1 school owner..."
     @school_owner = Seed::UserService.create(email: "school_owner_1@example.com")
 
-    #--- 2. Create Schools ---
+    #--- 2. Create Schools (Company) ---
     puts "Creating #{@school_count} schools..."
     @school_count.times do |i|
       school = Seed::CompanyService.create(
@@ -59,7 +61,17 @@ class Seed::SchoolService
     end
     puts "Created #{@schools.count} schools."
     
-    # --- 3. Create School Roles + Custom Roles ---
+    # --- 3. Create Payment Method Appointments for Schools (Companies) ---
+    @schools.each do |school|
+      2.times do
+        Seed::PaymentMethodAppointmentService.create(
+          company: school
+        )
+      end
+    end
+    puts "Appointed some payment methods to each school."
+
+    # --- 4. Create School Roles + Custom Roles ---
     SCHOOL_ROLES.each do |role_name|
       @schools.each do |school|
         Seed::RoleService.create(
@@ -70,7 +82,7 @@ class Seed::SchoolService
       end
     end
 
-    # --- 4. Create Employees for Each School ---
+    # --- 5. Create Employees for Each School ---
     @schools.each do |school|
       puts "Creating employees for #{school.name}..."
       EMPLOYEE_COUNTS.each do |role_name, count|
@@ -80,6 +92,7 @@ class Seed::SchoolService
             user: user,
             company: school
           )
+          employee.attach_tag(name: "Employee #{employee.id} Tag")
           employee.attach_role(role_name)
           @employees << employee
         end
@@ -87,7 +100,7 @@ class Seed::SchoolService
       puts "Created #{@employees.count} employees for #{school.name}."
     end
 
-    # --- 5. Create Customers (Students) for Each School ---
+    # --- 6. Create Customers (Students) for Each School (Company) ---
     @schools.each do |school|
       puts "Creating customers (students) for #{school.name}..."
       CUSTOMER_COUNTS.each do |role_name, count|
@@ -97,6 +110,7 @@ class Seed::SchoolService
             user: user,
             company: school
           )
+          customer.attach_tag(name: "Customer #{customer.id} Tag")
           customer.attach_role(role_name)
           @customers << customer
         end
@@ -104,6 +118,75 @@ class Seed::SchoolService
       puts "Created #{@customers.count} customers (students) for #{school.name}."
     end
 
+    # --- 7. Create Classes (Customer Groups) and Enroll Students (Customers) ---
+    @schools.each do |school|
+      puts "Enrolling students in classes for #{school.name}..."
+      @class_count.times do |i|
+        klass = Seed::CustomerGroupService.create(
+          company: school,
+          name: "Class #{i + 1} - #{school.name}",
+          description: "Description for Class #{i + 1} in #{school.name}"
+        )
+        klass.attach_tag(name: "Class #{klass.id} Tag")
+        # Enroll 5 random students per class
+        students = @customers.select { |c| c.company_id == school.id }
+        enrolled_students = students.sample(5)
+        enrolled_students.each do |student|
+          Seed::CustomerGroupAppointmentService.create(
+            customer_group: klass,
+            appoint_to: student
+          )
+        end
+        @classes << klass
+      end
+      puts "Created #{@classes.count} classes and enrolled students for #{school.name}."
+
+      # --- 8. Enroll Classes (Customer Groups) in Courses (Services) ---
+      puts "Creating courses and enrolling classes for #{school.name}..."
+      @course_count.times do |i|
+        course = Seed::ServiceService.create(
+          company: school,
+          name: "Course #{i + 1} - #{school.name}",
+          description: "Description for Course #{i + 1} in #{school.name}"
+        )
+        course.attach_tag(name: "Course #{course.id} Tag")
+        # Enroll all classes in this course
+        @classes.each do |klass|
+          Seed::ServiceAppointmentService.create(
+            service: course,
+            appoint_to: klass
+          )
+        end
+        @courses << course
+      end
+      puts "Created #{@courses.count} courses for #{school.name}."
+
+      # --- 9. Assign Teachers (Employees) to Courses (Services) ---
+      puts "Assigning teachers to courses for #{school.name}..."
+      teachers = @employees.select { |e| e.has_role?('Teacher') && e.company_id == school.id }
+      @courses.each do |course|
+        assigned_teacher = teachers.sample
+        Seed::ServiceAppointmentService.create(
+          service: course,
+          appoint_to: assigned_teacher
+        )
+      end
+      puts "Assigned teachers to courses for #{school.name}."
+
+      # --- 10. Create some Rooms (Facilities) for Each School ---
+      puts "Creating rooms for #{school.name}..."
+      5.times do |i|
+        room = Seed::FacilityService.create(
+          company: school,
+          name: "Room #{i + 1} - #{school.name}",
+          description: "Description for Room #{i + 1} in #{school.name}"
+        )
+        room.attach_tag(name: "Room #{room.id} Tag")
+      end
+      puts "Created some rooms for #{school.name}."
+
+
+    end
 
 
 

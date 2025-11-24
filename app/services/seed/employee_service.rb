@@ -49,8 +49,5 @@ class Seed::EmployeeService
       business_type: business_type || Employee.business_types.keys.sample,
       discarded_at: discarded_at
     )
-
-    employee.attach_tag(name: "Employee #{employee.id} Tag")
-    employee
   end
 end

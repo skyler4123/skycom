@@ -11,7 +11,7 @@ class Role < ApplicationRecord
   has_many :employee_group_appointments, dependent: :destroy, as: :appoint_to
   has_many :employee_groups, through: :employee_group_appointments
 
-  has_many :role_appointments, dependent: :destroy, as: :appoint_to
+  has_many :role_appointments, dependent: :destroy
   has_many :employee_groups, through: :role_appointments, source: :appoint_to, source_type: "EmployeeGroup"
   has_many :employees, through: :role_appointments, source: :appoint_to, source_type: "Employee"
   has_many :customer_groups, through: :role_appointments, source: :appoint_to, source_type: "CustomerGroup"

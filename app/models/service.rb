@@ -1,11 +1,17 @@
 class Service < ApplicationRecord
   belongs_to :company
 
-  has_many :order_item_appointments, as: :appoint_to, dependent: :destroy
-  has_many :orders, through: :order_item_appointments
+  has_many :order_appointments, as: :appoint_to, dependent: :destroy
+  has_many :orders, through: :order_appointments
 
   has_many :service_group_appointments, dependent: :destroy, as: :appoint_to
   has_many :service_groups, through: :service_group_appointments
+
+  has_many :service_appointments, dependent: :destroy
+  has_many :customer_groups, through: :service_appointments, source: :appoint_to, source_type: 'CustomerGroup'
+
+  has_many :tag_appointments, dependent: :destroy, as: :appoint_to
+  has_many :tags, through: :tag_appointments
 
   # --- Enums ---
   enum :status, { 
