@@ -58,8 +58,13 @@ class CompaniesController < ApplicationController
   end
 
   def dashboard
-    @companies = Current.user.companies
-    render html: "", layout: true
+    @companies = Current.company_owner.companies
+
+    # render html: "", layout: true
+    respond_to do |format|
+      format.html { render html: "", layout: true }
+      format.json { render json: @companies }
+    end
   end
 
   private
