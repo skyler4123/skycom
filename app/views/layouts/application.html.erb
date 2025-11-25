@@ -21,8 +21,10 @@
     <%= stylesheet_link_tag :app, "data-turbo-track": "reload" %>
     <%= javascript_importmap_tags %>
 
+    <%# ------------------------------Custom Tags------------------------------------ %>
     <%# Disables Turbo Drive's link prefetching behavior site-wide. %>
     <meta name="turbo-prefetch" content="false">
+    <%= render "layouts/custom_header" %>
   </head>
 
   <body

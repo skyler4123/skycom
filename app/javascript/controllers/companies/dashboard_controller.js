@@ -8,7 +8,7 @@ export default class Companies_DashboardController extends Controller {
 
   defaultHTML() {
     return `
-      <body class="bg-background-light font-display text-gray-800">
+      <body class="bg-gray-50 font-sans text-gray-800">
         <div class="flex h-screen">
           <aside class="w-64 flex-shrink-0 bg-white border-r border-gray-200 flex flex-col">
             <div class="flex flex-col h-full p-4">
@@ -25,8 +25,8 @@ export default class Companies_DashboardController extends Controller {
               <nav class="flex-grow">
                 <ul class="flex flex-col gap-2 text-gray-600">
                   <li>
-                    <a class="flex items-center gap-3 px-3 py-2 rounded-lg bg-primary/10 text-primary" href="#">
-                      <span class="material-symbols-outlined text-primary">dashboard</span>
+                    <a class="flex items-center gap-3 px-3 py-2 rounded-lg bg-blue-100 text-blue-600" href="#">
+                      <span class="material-symbols-outlined text-blue-600">dashboard</span>
                       <p class="text-sm font-medium leading-normal">Dashboard</p>
                     </a>
                   </li>
@@ -106,7 +106,7 @@ export default class Companies_DashboardController extends Controller {
           </aside>
           <main class="flex-1 flex flex-col overflow-y-auto">
             <header
-              class="flex justify-between items-center gap-2 px-6 py-3 border-b border-gray-200 bg-background-light/80 backdrop-blur-sm sticky top-0">
+              class="flex justify-between items-center gap-2 px-6 py-3 border-b border-gray-200 bg-gray-50/80 backdrop-blur-sm sticky top-0">
               <div class="flex items-center gap-2">
                 <button class="p-2 text-gray-500 hover:text-gray-900 rounded-full hover:bg-gray-100">
                   <span class="material-symbols-outlined">search</span>
@@ -117,7 +117,7 @@ export default class Companies_DashboardController extends Controller {
                   <span class="material-symbols-outlined">notifications</span>
                 </button>
                 <button
-                  class="flex items-center justify-center gap-2 h-10 px-4 rounded-lg bg-primary text-white text-sm font-bold leading-normal tracking-wide hover:bg-primary/90">
+                  class="flex items-center justify-center gap-2 h-10 px-4 rounded-lg bg-blue-600 text-white text-sm font-bold leading-normal tracking-wide hover:bg-blue-700">
                   <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1, 'wght' 700;">add</span>
                   <span class="truncate">Add New</span>
                 </button>
@@ -131,7 +131,7 @@ export default class Companies_DashboardController extends Controller {
                 </div>
                 <div class="relative w-full sm:w-auto sm:min-w-[240px]">
                   <select
-                    class="w-full appearance-none pl-4 pr-10 py-2.5 text-base text-gray-800 bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary"
+                    class="w-full appearance-none pl-4 pr-10 py-2.5 text-base text-gray-800 bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                     id="school-filter">
                     <option>All Schools</option>
                     <option selected="">Northwood High</option>
@@ -151,7 +151,7 @@ export default class Companies_DashboardController extends Controller {
                   <p class="text-green-500 text-sm font-medium leading-normal mt-1">+1.5%</p>
                 </div>
                 <div class="flex flex-col gap-2 rounded-xl p-6 bg-white border border-gray-200">
-                  <p class="text-gray-600 text-base font-medium leading-normal">Teachers &amp; Staff</p>
+                  <p class="text-gray-600 text-base font-medium leading-normal">Teachers & Staff</p>
                   <p class="text-gray-900 tracking-tight text-3xl font-bold leading-tight">86</p>
                   <p class="text-green-500 text-sm font-medium leading-normal mt-1">+0.5%</p>
                 </div>
@@ -182,7 +182,7 @@ export default class Companies_DashboardController extends Controller {
                     <ul class="space-y-4">
                       <li class="flex items-start gap-4 p-2">
                         <div
-                          class="flex flex-col items-center justify-center h-12 w-12 rounded-lg bg-primary/10 text-primary shrink-0">
+                          class="flex flex-col items-center justify-center h-12 w-12 rounded-lg bg-blue-100 text-blue-600 shrink-0">
                           <span class="text-sm font-bold">OCT</span>
                           <span class="text-lg font-black">28</span>
                         </div>
@@ -193,7 +193,7 @@ export default class Companies_DashboardController extends Controller {
                       </li>
                       <li class="flex items-start gap-4 p-2">
                         <div
-                          class="flex flex-col items-center justify-center h-12 w-12 rounded-lg bg-primary/10 text-primary shrink-0">
+                          class="flex flex-col items-center justify-center h-12 w-12 rounded-lg bg-blue-100 text-blue-600 shrink-0">
                           <span class="text-sm font-bold">NOV</span>
                           <span class="text-lg font-black">02</span>
                         </div>
@@ -204,7 +204,7 @@ export default class Companies_DashboardController extends Controller {
                       </li>
                       <li class="flex items-start gap-4 p-2">
                         <div
-                          class="flex flex-col items-center justify-center h-12 w-12 rounded-lg bg-primary/10 text-primary shrink-0">
+                          class="flex flex-col items-center justify-center h-12 w-12 rounded-lg bg-blue-100 text-blue-600 shrink-0">
                           <span class="text-sm font-bold">NOV</span>
                           <span class="text-lg font-black">05</span>
                         </div>
