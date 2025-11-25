@@ -52,7 +52,7 @@ export default class LayoutController extends ApplicationController {
 <div class="font-sans bg-gray-50 dark:bg-gray-950 text-gray-800 dark:text-gray-200">
   <div class="flex h-screen">
     <aside
-      class="w-64 flex-shrink-0 bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800 flex flex-col">
+      class="w-64 shrink-0 bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800 flex flex-col">
       <div class="p-6 flex items-center gap-3 border-b border-gray-200 dark:border-gray-800">
         <div class="bg-blue-100 text-blue-600 p-2 rounded-lg">
           <span class="material-symbols-outlined font-normal">school</span>
@@ -62,7 +62,7 @@ export default class LayoutController extends ApplicationController {
           <p class="text-gray-500 dark:text-gray-400 text-sm font-normal leading-normal">School Admin</p>
         </div>
       </div>
-      <nav class="flex-grow p-4">
+      <nav class="grow p-4">
         <div class="flex flex-col gap-2">
           <a class="flex items-center gap-3 px-3 py-2 rounded-lg bg-blue-100 text-blue-600" href="#">
             <span class="material-symbols-outlined font-normal">dashboard</span>
@@ -113,9 +113,9 @@ export default class LayoutController extends ApplicationController {
     </aside>
     <main class="flex-1 flex flex-col overflow-auto">
       <header
-        class="flex-shrink-0 flex items-center justify-between whitespace-nowrap border-b border-gray-200 dark:border-gray-800 px-8 py-4 bg-white dark:bg-gray-900">
+        class="shrink-0 flex items-center justify-between whitespace-nowrap border-b border-gray-200 dark:border-gray-800 px-8 py-4 bg-white dark:bg-gray-900">
         <div class="flex items-center gap-8">
-          <label class="flex flex-col min-w-40 !h-10 w-80">
+          <label class="flex flex-col min-w-40 h-10! w-80">
             <div class="flex w-full flex-1 items-stretch rounded-lg h-full">
               <div
                 class="text-gray-500 flex bg-gray-100 dark:bg-gray-800 items-center justify-center pl-4 rounded-l-lg border-r-0">
@@ -297,7 +297,7 @@ export default class LayoutController extends ApplicationController {
               <div class="flex flex-col gap-4">
                 <div class="flex gap-4">
                   <div
-                    class="flex flex-col items-center justify-center bg-blue-50 dark:bg-blue-900/40 text-blue-600 rounded-lg p-2 w-16 h-16 flex-shrink-0">
+                    class="flex flex-col items-center justify-center bg-blue-50 dark:bg-blue-900/40 text-blue-600 rounded-lg p-2 w-16 h-16 shrink-0">
                     <span class="text-sm font-medium">JUL</span>
                     <span class="text-2xl font-bold">25</span>
                   </div>
@@ -308,7 +308,7 @@ export default class LayoutController extends ApplicationController {
                 </div>
                 <div class="flex gap-4">
                   <div
-                    class="flex flex-col items-center justify-center bg-gray-100 dark:bg-gray-800 rounded-lg p-2 w-16 h-16 flex-shrink-0">
+                    class="flex flex-col items-center justify-center bg-gray-100 dark:bg-gray-800 rounded-lg p-2 w-16 h-16 shrink-0">
                     <span class="text-sm font-medium">AUG</span>
                     <span class="text-2xl font-bold">02</span>
                   </div>
@@ -319,7 +319,7 @@ export default class LayoutController extends ApplicationController {
                 </div>
                 <div class="flex gap-4">
                   <div
-                    class="flex flex-col items-center justify-center bg-gray-100 dark:bg-gray-800 rounded-lg p-2 w-16 h-16 flex-shrink-0">
+                    class="flex flex-col items-center justify-center bg-gray-100 dark:bg-gray-800 rounded-lg p-2 w-16 h-16 shrink-0">
                     <span class="text-sm font-medium">AUG</span>
                     <span class="text-2xl font-bold">15</span>
                   </div>
