@@ -1451,6 +1451,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_11_23_012412) do
     t.boolean "verified", default: false, null: false
     t.string "provider"
     t.string "uid"
+    t.uuid "parent_user_id"
     t.string "username"
     t.string "first_name"
     t.string "last_name"
@@ -1464,6 +1465,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_11_23_012412) do
     t.index ["address_id"], name: "index_users_on_address_id"
     t.index ["discarded_at"], name: "index_users_on_discarded_at"
     t.index ["email"], name: "index_users_on_email", unique: true
+    t.index ["parent_user_id"], name: "index_users_on_parent_user_id"
   end
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
@@ -1547,4 +1549,5 @@ ActiveRecord::Schema[8.0].define(version: 2025_11_23_012412) do
   add_foreign_key "tasks", "companies"
   add_foreign_key "tasks", "task_groups"
   add_foreign_key "users", "addresses"
+  add_foreign_key "users", "users", column: "parent_user_id"
 end

@@ -88,7 +88,7 @@ class Seed::SchoolService
       puts "Creating employees for #{school.name}..."
       EMPLOYEE_COUNTS.each do |role_name, count|
         count.times do |i|
-          user = Seed::UserService.create(email: "#{role_name.downcase}_#{i + 1}_#{school.id}@example.com")
+          user = Seed::UserService.create(parent_user: @school_owner, email: "#{role_name.downcase}_#{i + 1}_#{school.id}@example.com")
           employee = Seed::EmployeeService.create(
             user: user,
             company: school
@@ -106,7 +106,7 @@ class Seed::SchoolService
       puts "Creating customers (students) for #{school.name}..."
       CUSTOMER_COUNTS.each do |role_name, count|
         count.times do |i|
-          user = Seed::UserService.create(email: "student_#{i + 1}_#{school.id}@example.com")
+          user = Seed::UserService.create(parent_user: @school_owner, email: "student_#{i + 1}_#{school.id}@example.com")
           customer = Seed::CustomerService.create(
             user: user,
             company: school

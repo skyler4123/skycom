@@ -10,6 +10,7 @@ class Seed::UserService
   end
 
   def self.create(
+    parent_user: nil,
     email:,
     password: "Password@1234",
     password_confirmation: "Password@1234",
@@ -18,6 +19,7 @@ class Seed::UserService
   )
     email ||= "#{email}#{index}@example.com"
     user = User.create!(
+      parent_user: parent_user,
       email: email,
       password: password,
       password_confirmation: password_confirmation,
