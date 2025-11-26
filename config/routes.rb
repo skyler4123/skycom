@@ -68,11 +68,7 @@ Rails.application.routes.draw do
   resources :employee_groups
   resources :tag_appointments
   resources :tags
-  resources :companies do
-    collection do
-      get :dashboard
-    end
-  end
+  resources :companies
   resources :addresses
   get "sign_out", to: "sessions#sign_out"
 
