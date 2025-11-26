@@ -15,15 +15,18 @@ class Seed::UserService
     password: "Password@1234",
     password_confirmation: "Password@1234",
     verified: true,
-    index: nil
+    index: nil,
+    company_business_type: nil
   )
+    company_business_type ||= parent_user&.company_business_type
     email ||= "#{email}#{index}@example.com"
     user = User.create!(
       parent_user: parent_user,
       email: email,
       password: password,
       password_confirmation: password_confirmation,
-      verified: verified
+      verified: verified,
+      company_business_type: company_business_type
     )
     Seed::AttachmentService.attach(record: user, relation: :avatar_attachment, number: 1)
     user

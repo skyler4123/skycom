@@ -1,4 +1,8 @@
 Rails.application.routes.draw do
+  namespace :school do
+    resources :schools
+    resources :courses
+  end
   resources :exam_appointments
   resources :answers
   resources :questions

@@ -104,7 +104,7 @@ class Seed::CompanyService
     description: Faker::Company.catch_phrase,
     status: nil,
     ownership_type: nil,
-    business_type: BUSINESS_TYPE_CYCLE.sample,
+    # business_type: BUSINESS_TYPE_CYCLE.sample,
     currency: nil,
     registration_number: Faker::Company.ein,
     vat_id: Faker::Code.npi,
@@ -120,7 +120,7 @@ class Seed::CompanyService
     discarded_at: nil
   )
     raise "Cannot create a company: No users exist to own it." if user.nil?
-
+    business_type = user.company_business_type
     base_name = Faker::Company.unique.name
     name ||= "#{base_name} #{business_type.to_s.titleize}"
     domain_suffix = (business_type == :university || business_type == :school) ? ".edu" : ".com"

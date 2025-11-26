@@ -47,7 +47,7 @@ class Seed::SchoolService
 
     # --- 1. Create School Owners (User) ---
     puts "Creating 1 school owner..."
-    @school_owner = Seed::UserService.create(email: @owner_email)
+    @school_owner = Seed::UserService.create(email: @owner_email, company_business_type: User.company_business_types[:school])
 
     #--- 2. Create Schools (Company) ---
     puts "Creating #{@school_count} schools..."

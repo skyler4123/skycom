@@ -9,4 +9,8 @@ class Current < ActiveSupport::CurrentAttributes
   def self.company_owner
     Current.user&.company_owner
   end
+
+  def self.companies
+    company_owner&.companies
+  end
 end

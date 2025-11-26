@@ -48,11 +48,17 @@ export default class LayoutController extends ApplicationController {
             </div>
             <nav class="grow p-4">
               <div class="flex flex-col gap-2">
-                <a class="flex items-center gap-3 px-3 py-2 rounded-lg bg-blue-100 text-blue-600" href="#">
+                <a 
+                  class="flex items-center gap-3 px-3 py-2 rounded-lg bg-blue-100 text-blue-600"
+                  href="/school/schools"
+                >
                   <span class="material-symbols-outlined font-normal">dashboard</span>
                   <p class="text-sm font-medium leading-normal">Dashboard</p>
                 </a>
-                <a class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800" href="#">
+                <a
+                  class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800"
+                  href="/school/courses"
+                >
                   <span class="material-symbols-outlined font-normal">menu_book</span>
                   <p class="text-sm font-medium leading-normal">Course</p>
                 </a>
