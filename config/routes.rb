@@ -1,4 +1,5 @@
 Rails.application.routes.draw do
+  resources :company_groups
   namespace :school do
     resources :schools
     resources :courses
