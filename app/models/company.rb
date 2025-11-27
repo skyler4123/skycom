@@ -1,6 +1,5 @@
 class Company < ApplicationRecord
-  # --- Associations ---
-  belongs_to :user # Assuming this is the creator/primary owner user
+  belongs_to :company_group
 
   has_many :tags, dependent: :destroy
   has_many :employee_groups, dependent: :destroy

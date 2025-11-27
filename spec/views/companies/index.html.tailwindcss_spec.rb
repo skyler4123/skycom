@@ -4,7 +4,7 @@ RSpec.describe "companies/index", type: :view do
   before(:each) do
     assign(:companies, [
       Company.create!(
-        user: nil,
+        company_group: nil,
         parent_company: nil,
         name: "Name",
         description: "Description",
@@ -26,7 +26,7 @@ RSpec.describe "companies/index", type: :view do
         fiscal_year_end_month: 7
       ),
       Company.create!(
-        user: nil,
+        company_group: nil,
         parent_company: nil,
         name: "Name",
         description: "Description",

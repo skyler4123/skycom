@@ -3,7 +3,7 @@ require 'rails_helper'
 RSpec.describe "companies/show", type: :view do
   before(:each) do
     assign(:company, Company.create!(
-      user: nil,
+      company_group: nil,
       parent_company: nil,
       name: "Name",
       description: "Description",
