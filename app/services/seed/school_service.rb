@@ -1,8 +1,4 @@
 class Seed::SchoolService
-
-  # Define the standard roles to be created for each school
-  SCHOOL_ROLES = %w[Principal Admin Teacher Student Accountant Cleaner Guard].freeze
-
   # Define the number of employees to create for each role
   EMPLOYEE_COUNTS = {
     'Principal' => 1,
@@ -17,6 +13,8 @@ class Seed::SchoolService
     'Student' => 10
   }.freeze
 
+  # Define the standard roles to be created for each school
+  SCHOOL_ROLES = (EMPLOYEE_COUNTS.keys + CUSTOMER_COUNTS.keys).freeze
 
   def initialize(owner_email:)
     @owner_email = owner_email
@@ -47,7 +45,8 @@ class Seed::SchoolService
 
     # --- 1. Create School Owners (User) ---
     puts "Creating 1 school owner..."
-    @school_owner = Seed::UserService.create(email: @owner_email, company_business_type: User.company_business_types[:school])
+    @company_business_type = User.company_business_types[:school]
+    @school_owner = Seed::UserService.create(email: @owner_email, company_business_type: @company_business_type)
 
     #--- 2. Create Schools (Company) ---
     puts "Creating #{@school_count} schools..."
@@ -83,7 +82,7 @@ class Seed::SchoolService
       end
     end
 
-    # --- 5. Create Employees for Each School ---
+    # --- 5. Create Employees for Each School (Company) ---
     @schools.each do |school|
       puts "Creating employees for #{school.name}..."
       EMPLOYEE_COUNTS.each do |role_name, count|

@@ -60,6 +60,12 @@ Things you may want to cover:
   bundle exec rails g scaffold PaySlip name
   bundle exec rails g scaffold Attendance name
 
+  ### Departments
+  bundle exec rails g scaffold DepartmentGroup company:references name description code status:integer business_type:integer discarded_at:datetime:index --force
+  bundle exec rails g scaffold Department company:references name description code status:integer business_type:integer discarded_at:datetime:index --force
+  bundle exec rails g scaffold DepartmentGroupAppointment department_group:references appoint_from:references{polymorphic} appoint_to:references{polymorphic} appoint_for:references{polymorphic} appoint_by:references{polymorphic} name description code --force
+  bundle exec rails g scaffold DepartmentAppointment employee:references appoint_from:references{polymorphic} appoint_to:references{polymorphic} appoint_for:references{polymorphic} appoint_by:references{polymorphic} name description code --force
+
   ### HR / Employee Management
   bundle exec rails g scaffold EmployeeGroup company:references name description code status:integer business_type:integer discarded_at:datetime:index --force
   bundle exec rails g scaffold Employee user:references company:references name description code status:integer business_type:integer discarded_at:datetime:index --force
@@ -153,6 +159,19 @@ Things you may want to cover:
   bundle exec rails g scaffold Question company:references name description code status:integer business_type:integer discarded_at:datetime:index --force
   bundle exec rails g scaffold Answer question:references name description code status:integer business_type:integer discarded_at:datetime:index --force
   bundle exec rails g scaffold ExamAppointment exam:references appoint_from:references{polymorphic} appoint_to:references{polymorphic} appoint_for:references{polymorphic} appoint_by:references{polymorphic} name description code status:integer business_type:integer discarded_at:datetime:index --force
+
+  ### Event
+  bundle exec rails g scaffold EventGroup company:references name description code status:integer business_type:integer discarded_at:datetime:index --force
+  bundle exec rails g scaffold Event event_group:references company:references name description code status:integer business_type:integer discarded_at:datetime:index --force
+  bundle exec rails g scaffold EventGroupAppointment event_group:references appoint_from:references{polymorphic} appoint_to:references{polymorphic} appoint_for:references{polymorphic} appoint_by:references{polymorphic} name description code status:integer business_type:integer discarded_at:datetime:index --force
+  bundle exec rails g scaffold EventAppointment event:references appoint_from:references{polymorphic} appoint_to:references{polymorphic} appoint_for:references{polymorphic} appoint_by:references{polymorphic} name description code status:integer business_type:integer discarded_at:datetime:index --force
+
+  ### Subscriptions
+  bundle exec rails g scaffold SubscriptionGroup company:references name description code status:integer business_type:integer discarded_at:datetime:index --force
+  bundle exec rails g scaffold Subscription subscription_group:references company:references name description code status:integer business_type:integer discarded_at:datetime:index --force
+  bundle exec rails g scaffold SubscriptionGroupAppointment subscription_group:references appoint_from:references{polymorphic} appoint_to:references{polymorphic} appoint_for:references{polymorphic} appoint_by:references{polymorphic} name description code status:integer business_type:integer discarded_at:datetime:index --force
+  bundle exec rails g scaffold SubscriptionAppointment subscription:references appoint_from:references{polymorphic} appoint_to:references{polymorphic} appoint_for:references{polymorphic} appoint_by:references{polymorphic} name description code status:integer business_type:integer discarded_at:datetime:index --force
+  bundle exec rails g scaffold Pricing
 
   ### Content & Knowledge Management
   bundle exec rails g scaffold Article
