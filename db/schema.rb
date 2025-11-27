@@ -198,7 +198,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_11_23_012412) do
   end
 
   create_table "companies", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
-    t.uuid "user_id", null: false
+    t.uuid "company_group_id", null: false
     t.uuid "parent_company_id"
     t.string "name"
     t.string "description"
@@ -221,9 +221,36 @@ ActiveRecord::Schema[8.0].define(version: 2025_11_23_012412) do
     t.datetime "discarded_at"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["company_group_id"], name: "index_companies_on_company_group_id"
     t.index ["discarded_at"], name: "index_companies_on_discarded_at"
     t.index ["parent_company_id"], name: "index_companies_on_parent_company_id"
-    t.index ["user_id"], name: "index_companies_on_user_id"
+  end
+
+  create_table "company_groups", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "user_id", null: false
+    t.string "name"
+    t.string "description"
+    t.string "code"
+    t.integer "status"
+    t.integer "ownership_type"
+    t.integer "business_type"
+    t.integer "currency"
+    t.string "registration_number"
+    t.string "vat_id"
+    t.string "address_line_1"
+    t.string "city"
+    t.string "postal_code"
+    t.string "country"
+    t.string "email"
+    t.string "phone_number"
+    t.string "website"
+    t.integer "employee_count"
+    t.integer "fiscal_year_end_month"
+    t.datetime "discarded_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["discarded_at"], name: "index_company_groups_on_discarded_at"
+    t.index ["user_id"], name: "index_company_groups_on_user_id"
   end
 
   create_table "customer_appointments", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -1478,7 +1505,8 @@ ActiveRecord::Schema[8.0].define(version: 2025_11_23_012412) do
   add_foreign_key "carts", "cart_groups"
   add_foreign_key "carts", "companies"
   add_foreign_key "companies", "companies", column: "parent_company_id"
-  add_foreign_key "companies", "users"
+  add_foreign_key "companies", "company_groups"
+  add_foreign_key "company_groups", "users"
   add_foreign_key "customer_appointments", "customers"
   add_foreign_key "customer_group_appointments", "customer_groups"
   add_foreign_key "customer_groups", "companies"

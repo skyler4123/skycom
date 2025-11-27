@@ -410,8 +410,6 @@ GEM
     unicode-emoji (4.1.0)
     uri (1.1.1)
     useragent (0.16.11)
-    uuid7 (0.2.0)
-      zeitwerk (~> 2.4)
     web-console (4.2.1)
       actionview (>= 6.0.0)
       activemodel (>= 6.0.0)
@@ -467,7 +465,6 @@ DEPENDENCIES
   thruster
   turbo-rails
   tzinfo-data
-  uuid7
   web-console
 
 BUNDLED WITH
