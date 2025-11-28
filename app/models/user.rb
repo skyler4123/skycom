@@ -32,7 +32,7 @@ class User < ApplicationRecord
 
   # --- Business Logic Associations ---
   # A user can own multiple companies. If the user is deleted, their companies are also destroyed.
-  has_many :companies, dependent: :destroy
+  has_many :company_groups, dependent: :destroy
   has_one :employee, dependent: :destroy
   has_one :customer, dependent: :destroy
   

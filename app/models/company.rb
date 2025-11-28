@@ -63,11 +63,6 @@ class Company < ApplicationRecord
   validates :description, length: { maximum: 5000 }, allow_blank: true
 
   validates :business_type, presence: true
-  # Ensure the company's business_type matches the owning user's company_business_type (if set)
-  validate :business_type_matches_user, if: -> { user.present? }
-  # After creating a company, if the owning user's company_business_type is nil,
-  # set it to this company's business_type (stored as integer on the user).
-  after_create :set_user_company_business_type_if_nil
   validates :ownership_type, presence: true
   validates :status, presence: true
   
@@ -87,47 +82,4 @@ class Company < ApplicationRecord
   
   # Validation for operational fields
   # validates :fiscal_year_end_month, presence: true, numericality: { in: 1..12 }
-
-  private
-
-  # Compares the company's enum-backed business_type to the integer stored on the user
-  # - If the user has no `company_business_type` set, this validation is skipped.
-  # - If the company's business_type is nil/blank, the presence validation will cover it.
-  def business_type_matches_user
-    return if user.company_business_type.nil?
-
-    # company.business_type is the enum value as a string (eg. 'school').
-    # Company.business_types maps string keys to integer values. Compare integers.
-    company_business_type_value = Company.business_types[business_type] if business_type.present?
-
-    if business_type.nil?
-      errors.add(:business_type, "is not a valid business type")
-      return
-    end
-
-    unless business_type == user.company_business_type
-      expected_key = user.company_business_type
-      errors.add(:business_type, "must match the owner's company_business_type (expected: #{expected_key})")
-    end
-  end
-
-  # If the owning user's `company_business_type` is not set, persist this
-  # company's business_type integer value to the user record.
-  def set_user_company_business_type_if_nil
-    return unless user.present?
-    return unless user.company_business_type.nil?
-
-    # Resolve integer value for this company's business_type enum
-    business_type_value = Company.business_types[business_type] if business_type.present?
-    return if business_type_value.nil?
-
-    # Use update_column to avoid triggering user validations/callbacks in case
-    # they would prevent the write. This is a small seed-like sync and is safe.
-    begin
-      user.update_column(:company_business_type, business_type_value)
-    rescue => e
-      Rails.logger.error("Failed to sync user.company_business_type for User##{user.id}: #{e.message}")
-    end
-  end
-
 end

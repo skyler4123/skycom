@@ -46,11 +46,11 @@ class Seed::ApplicationService
     # Global Payment Methods
     Seed::PaymentMethodService.run # Ensure global payment methods are seeded first
 
-    Seed::SchoolService.new(owner_email: "school_owner_1@example.com")
-    Seed::SchoolService.new(owner_email: "school_owner_2@example.com")
-    Seed::HospitalService.new(owner_email: "hospital_owner_1@example.com")
-    Seed::HospitalService.new(owner_email: "hospital_owner_2@example.com")
-
+    # Seed::SchoolService.new(owner_email: "school_owner_1@example.com")
+    # Seed::SchoolService.new(owner_email: "school_owner_2@example.com")
+    # Seed::HospitalService.new(owner_email: "hospital_owner_1@example.com")
+    # Seed::HospitalService.new(owner_email: "hospital_owner_2@example.com")
+    Seed::MultiCompanyGroupService.new(owner_email: "multi_company_owner_1@example.com")
 
     self.puts_count
     
