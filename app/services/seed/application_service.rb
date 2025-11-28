@@ -50,7 +50,7 @@ class Seed::ApplicationService
     # Seed::SchoolService.new(owner_email: "school_owner_2@example.com")
     # Seed::HospitalService.new(owner_email: "hospital_owner_1@example.com")
     # Seed::HospitalService.new(owner_email: "hospital_owner_2@example.com")
-    Seed::MultiCompanyGroupService.new(owner_email: "multi_company_owner_1@example.com")
+    Seed::MultiCompanyGroupService.new(owner_email: "multi_company_group_owner_1@example.com")
 
     self.puts_count
     

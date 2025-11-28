@@ -2,32 +2,8 @@ class CompanyGroup < ApplicationRecord
   belongs_to :user
   has_many :companies, dependent: :destroy
 
-  has_many :tags, dependent: :destroy
-  has_many :employee_groups, dependent: :destroy
-  has_many :employees, dependent: :destroy
-  has_many :roles, dependent: :destroy
-  has_many :policies, dependent: :destroy
-  has_many :facility_groups, dependent: :destroy
-  has_many :facilities, dependent: :destroy
-  has_many :service_groups, dependent: :destroy
-  has_many :services, dependent: :destroy
-  has_many :product_groups, dependent: :destroy
-  has_many :products, dependent: :destroy
-  has_many :customers, dependent: :destroy
-  has_many :customer_groups, dependent: :destroy
-  has_many :orders, dependent: :destroy
-  has_many :periods, dependent: :destroy
-  has_many :payment_method_appointments, dependent: :destroy
-  has_many :task_groups, dependent: :destroy
-  has_many :project_groups, dependent: :destroy
-  has_many :cart_groups, dependent: :destroy
-  has_many :notification_groups, dependent: :destroy
-  has_many :payment_methods, through: :payment_method_appointments
-
-
-  # Self-referencing association for company hierarchy
-  belongs_to :parent_company, class_name: "Company", optional: true
-  has_many :child_companies, class_name: "Company", foreign_key: "parent_company_id", dependent: :destroy, inverse_of: :parent_company
+  has_many :tag_appointments, as: :appoint_to, dependent: :destroy
+  has_many :tags, through: :tag_appointments
 
   # --- Enums ---
   enum :status, { 
@@ -50,7 +26,7 @@ class CompanyGroup < ApplicationRecord
   }
   
   # Grouped business types with 1000-unit gaps for future expansion
-  enum :business_type, COMPANY_BUSINESS_TYPES
+  enum :business_type, COMPANY_GROUP_BUSINESS_TYPES
 
   # Enum for the new fiscal_year_end_month column (1=January, 12=December)
   enum :fiscal_year_end_month, { 

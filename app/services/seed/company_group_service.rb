@@ -33,7 +33,8 @@ class Seed::CompanyGroupService
     should_discard = rand(10) == 0
     discarded_at ||= should_discard ? Time.zone.now - rand(1..365).days : nil
 
-    user.companies.create!(
+    CompanyGroup.create!(
+      user: user,
       name: name,
       description: description,
       status: status || Company.statuses.keys.sample,

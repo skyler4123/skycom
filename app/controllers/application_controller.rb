@@ -1,10 +1,14 @@
 class ApplicationController < ActionController::Base
-  include ApplicationController::CookieConcern
   # Only allow modern browsers supporting webp images, web push, badges, import maps, CSS nesting, and CSS :has.
   allow_browser versions: :modern
 
   before_action :set_current_request_details
   before_action :authenticate
+
+  # ------------------------------------------------------------------------
+  include ApplicationController::CookieConcern
+  include ApplicationController::CurrentConcern
+  # ------------------------------------------------------------------------
 
   private
     def authenticate

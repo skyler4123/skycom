@@ -1,7 +1,9 @@
 class Company < ApplicationRecord
   belongs_to :company_group
 
-  has_many :tags, dependent: :destroy
+  has_many :tag_appointments, as: :appoint_to, dependent: :destroy
+  has_many :tags, through: :tag_appointments
+
   has_many :employee_groups, dependent: :destroy
   has_many :employees, dependent: :destroy
   has_many :roles, dependent: :destroy
@@ -22,7 +24,6 @@ class Company < ApplicationRecord
   has_many :cart_groups, dependent: :destroy
   has_many :notification_groups, dependent: :destroy
   has_many :payment_methods, through: :payment_method_appointments
-
 
   # Self-referencing association for company hierarchy
   belongs_to :parent_company, class_name: "Company", optional: true
@@ -49,7 +50,7 @@ class Company < ApplicationRecord
   }
   
   # Grouped business types with 1000-unit gaps for future expansion
-  enum :business_type, COMPANY_BUSINESS_TYPES
+  enum :business_type, COMPANY_GROUP_BUSINESS_TYPES
 
   # Enum for the new fiscal_year_end_month column (1=January, 12=December)
   enum :fiscal_year_end_month, { 
@@ -59,7 +60,7 @@ class Company < ApplicationRecord
   }
   
   # --- Validations ---
-  validates :name, presence: true, uniqueness: { scope: :user_id }, length: { maximum: 255 }
+  validates :name, presence: true, uniqueness: { scope: :company_group_id }, length: { maximum: 255 }
   validates :description, length: { maximum: 5000 }, allow_blank: true
 
   validates :business_type, presence: true

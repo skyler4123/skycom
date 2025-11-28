@@ -42,7 +42,7 @@ class Seed::HospitalService
 
     # --- 1. Create Hospital Owner (User) ---
     puts "Creating 1 hospital owner..."
-    @company_business_type = User.company_business_types[:hospital]
+    @company_business_type = User.COMPANY_GROUP_BUSINESS_TYPES[:hospital]
     @hospital_owner = Seed::UserService.create(email: @owner_email, company_business_type: @company_business_type)
 
     #--- 2. Create Hospitals (Company) ---

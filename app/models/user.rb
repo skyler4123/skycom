@@ -26,21 +26,20 @@ class User < ApplicationRecord
     sessions.where.not(id: Current.session).delete_all
   end
 
+  # ----------------------------------------------------------------------------------------------------
   # --- Concerns ---
   # Includes functionality for handling user avatars, likely from `app/models/user/avatar_concern.rb`.
   include User::AvatarConcern
 
   # --- Business Logic Associations ---
   # A user can own multiple companies. If the user is deleted, their companies are also destroyed.
+  has_many :tags, dependent: :destroy
   has_many :company_groups, dependent: :destroy
   has_one :employee, dependent: :destroy
   has_one :customer, dependent: :destroy
   
   belongs_to :parent_user, class_name: "User", optional: true
   has_many :child_users, class_name: "User", foreign_key: "parent_user_id", dependent: :destroy
-
-  # Grouped business types with 1000-unit gaps for future expansion
-  enum :company_business_type, COMPANY_BUSINESS_TYPES
 
   # --- Custom Methods ---
   # Alias for `parent_user` to provide a more descriptive name for the owner of a company.
@@ -53,4 +52,5 @@ class User < ApplicationRecord
   def employee_users
     child_users
   end
+  # ----------------------------------------------------------------------------------------------------
 end

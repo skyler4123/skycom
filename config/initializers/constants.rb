@@ -1,4 +1,4 @@
-COMPANY_BUSINESS_TYPES =  { 
+COMPANY_GROUP_BUSINESS_TYPES =  { 
   # Group 1: General & Retail (0-999)
   retail: 0, 
   service: 1, 
