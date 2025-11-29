@@ -102,7 +102,7 @@ class Seed::SchoolService
       puts "Creating employees for #{school.name}..."
       EMPLOYEE_COUNTS.each do |role_name, count|
         count.times do |i|
-          user = Seed::UserService.create(parent_user: @school_owner, email: "#{role_name.downcase}_#{i + 1}_#{school.id}@example.com")
+          user = Seed::UserService.create(parent_user: @multi_company_group_owner, email: "#{role_name.downcase}_#{i + 1}_#{school.id}@example.com")
           employee = Seed::EmployeeService.create(
             user: user,
             company_group: @school_group,
@@ -141,7 +141,7 @@ class Seed::SchoolService
       puts "Creating customers (students) for #{school.name}..."
       CUSTOMER_COUNTS.each do |role_name, count|
         count.times do |i|
-          user = Seed::UserService.create(parent_user: @school_owner, email: "student_#{i + 1}_#{school.id}@example.com")
+          user = Seed::UserService.create(parent_user: @multi_company_group_owner, email: "student_#{i + 1}_#{school.id}@example.com")
           student = Seed::CustomerService.create(
             user: user,
             company_group: @school_group,
@@ -265,7 +265,7 @@ class Seed::SchoolService
   end
   # def initialize(owner_email:)
   #   @owner_email = owner_email
-  #   @school_owner = nil
+  #   @multi_company_group_owner = nil
   #   @school_admin = []
   #   @schools = []
   #   @employees = []
@@ -293,13 +293,13 @@ class Seed::SchoolService
   #   # --- 1. Create School Owners (User) ---
   #   puts "Creating 1 school owner..."
   #   @company_business_type = User.COMPANY_GROUP_BUSINESS_TYPES[:school]
-  #   @school_owner = Seed::UserService.create(email: @owner_email, company_business_type: @company_business_type)
+  #   @multi_company_group_owner = Seed::UserService.create(email: @owner_email, company_business_type: @company_business_type)
 
   #   #--- 2. Create Schools (Company) ---
   #   puts "Creating #{@school_count} schools..."
   #   @school_count.times do |i|
   #     school = Seed::CompanyService.create(
-  #       user: @school_owner,
+  #       user: @multi_company_group_owner,
   #       name: "School #{i + 1}",
   #       description: "Description for School #{i + 1}",
   #       parent_company: nil
@@ -334,7 +334,7 @@ class Seed::SchoolService
   #     puts "Creating employees for #{school.name}..."
   #     EMPLOYEE_COUNTS.each do |role_name, count|
   #       count.times do |i|
-  #         user = Seed::UserService.create(parent_user: @school_owner, email: "#{role_name.downcase}_#{i + 1}_#{school.id}@example.com")
+  #         user = Seed::UserService.create(parent_user: @multi_company_group_owner, email: "#{role_name.downcase}_#{i + 1}_#{school.id}@example.com")
   #         employee = Seed::EmployeeService.create(
   #           user: user,
   #           company: school
@@ -352,7 +352,7 @@ class Seed::SchoolService
   #     puts "Creating customers (students) for #{school.name}..."
   #     CUSTOMER_COUNTS.each do |role_name, count|
   #       count.times do |i|
-  #         user = Seed::UserService.create(parent_user: @school_owner, email: "student_#{i + 1}_#{school.id}@example.com")
+  #         user = Seed::UserService.create(parent_user: @multi_company_group_owner, email: "student_#{i + 1}_#{school.id}@example.com")
   #         customer = Seed::CustomerService.create(
   #           user: user,
   #           company: school
