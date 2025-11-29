@@ -1,6 +1,7 @@
 class Product < ApplicationRecord
   # --- Associations ---
-  belongs_to :company
+  belongs_to :company_group
+  belongs_to :company, optional: true
   belongs_to :product_brand, optional: true
 
   has_many :order_item_appointments, as: :appoint_to, dependent: :destroy

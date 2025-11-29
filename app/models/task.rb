@@ -1,6 +1,7 @@
 class Task < ApplicationRecord
   # --- Associations ---
-  belongs_to :company
+  belongs_to :company_group
+  belongs_to :company, optional: true
   belongs_to :task_group
 
   # --- Enums ---

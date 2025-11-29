@@ -1,6 +1,7 @@
 class ProjectGroup < ApplicationRecord
   # --- Associations ---
-  belongs_to :company
+  belongs_to :company_group
+  belongs_to :company, optional: true
   has_many :project_group_appointments, dependent: :destroy
 
   # --- Enums ---

@@ -1,6 +1,7 @@
 class Period < ApplicationRecord
   # --- Associations ---
-  belongs_to :company
+  belongs_to :company_group
+  belongs_to :company, optional: true
 
   has_one :period_appointment, as: :appoint_to, dependent: :destroy
   has_one :booking, through: :period_appointment

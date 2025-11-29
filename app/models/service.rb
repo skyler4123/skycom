@@ -1,5 +1,6 @@
 class Service < ApplicationRecord
-  belongs_to :company
+  belongs_to :company_group
+  belongs_to :company, optional: true
 
   has_many :order_appointments, as: :appoint_to, dependent: :destroy
   has_many :orders, through: :order_appointments

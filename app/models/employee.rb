@@ -2,7 +2,8 @@ class Employee < ApplicationRecord
   include RoleConcern
 
   # --- Associations ---
-  belongs_to :company
+  belongs_to :company_group
+  belongs_to :company, optional: true
   belongs_to :user # user_id is nullable in the migration
 
   has_many :role_appointments, as: :appoint_to, dependent: :destroy
