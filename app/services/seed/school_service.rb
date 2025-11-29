@@ -102,7 +102,9 @@ class Seed::SchoolService
           employee = Seed::EmployeeService.create(
             user: user,
             company_group: @school_group,
-            company: school
+            company: school,
+            name: "Employee #{i + 1} - #{role_name.to_s.capitalize}",
+            description: "Description for Employee #{i + 1} - #{role_name.to_s.capitalize}"
           )
           employee.attach_tag(user: @multi_company_group_owner, name: "Employee #{employee.id} Tag")
           employee.attach_role(role_name)
@@ -116,7 +118,19 @@ class Seed::SchoolService
     end
     puts "Creaed employees for all schools."
 
-    # --- 7. Enroll 
+    # --- 7. Enroll Teachers (Employees) to Departments (Employee Groups) ---
+    @departments.each do |department|
+      puts "Enrolling teachers to #{department.name}..."
+      teachers = @teachers.select { |t| t.company_id == department.company_id }
+      assigned_teachers = teachers.sample(3)
+      assigned_teachers.each do |teacher|
+        Seed::EmployeeGroupAppointmentService.create(
+          employee_group: department,
+          appoint_to: teacher
+        )
+      end
+    end
+    puts "Enrolled teachers to all departments."
 
     # --- 8. Create Students (Customers) for Each School (Company) ---
     @schools.each do |school|
