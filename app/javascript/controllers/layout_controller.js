@@ -62,36 +62,36 @@ export default class LayoutController extends ApplicationController {
                   href="/school/courses"
                 >
                   <span class="material-symbols-outlined font-normal">menu_book</span>
-                  <p class="text-sm font-medium leading-normal">Course</p>
+                  <p class="text-sm font-medium leading-normal">Courses</p>
                 </a>
                 <a
                   class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:!bg-blue-100 open:!text-blue-600"
                   data-link-target="openByPathname"
-                  href="#"
+                  
                 >
                   <span class="material-symbols-outlined font-normal">class</span>
-                  <p class="text-sm font-medium leading-normal">Class</p>
+                  <p class="text-sm font-medium leading-normal">Classes</p>
                 </a>
                 <a
                   class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:!bg-blue-100 open:!text-blue-600"
                   data-link-target="openByPathname"
-                  href="#"
+                  
                 >
                   <span class="material-symbols-outlined font-normal">school</span>
-                  <p class="text-sm font-medium leading-normal">Student</p>
+                  <p class="text-sm font-medium leading-normal">Students</p>
                 </a>
                 <a
                   class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:!bg-blue-100 open:!text-blue-600"
                   data-link-target="openByPathname"
-                  href="#"
+                  
                 >
                   <span class="material-symbols-outlined font-normal">co_present</span>
-                  <p class="text-sm font-medium leading-normal">Teacher</p>
+                  <p class="text-sm font-medium leading-normal">Teachers</p>
                 </a>
                 <a
                   class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:!bg-blue-100 open:!text-blue-600"
                   data-link-target="openByPathname"
-                  href="#"
+                  
                 >
                   <span class="material-symbols-outlined font-normal">groups</span>
                   <p class="text-sm font-medium leading-normal">Staffs/Employees</p>
@@ -99,7 +99,7 @@ export default class LayoutController extends ApplicationController {
                 <a
                   class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:!bg-blue-100 open:!text-blue-600"
                   data-link-target="openByPathname"
-                  href="#"
+                  
                 >
                   <span class="material-symbols-outlined font-normal">domain</span>
                   <p class="text-sm font-medium leading-normal">Facilities</p>
@@ -107,20 +107,20 @@ export default class LayoutController extends ApplicationController {
                 <a
                   class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:!bg-blue-100 open:!text-blue-600"
                   data-link-target="openByPathname"
-                  href="#"
+                  
                 >
                   <span class="material-symbols-outlined font-normal">payments</span>
-                  <p class="text-sm font-medium leading-normal">Payment/Invoice</p>
+                  <p class="text-sm font-medium leading-normal">Payments</p>
                 </a>
               </div>
             </nav>
             <div class="p-4 border-t border-gray-200 dark:border-gray-800">
               <div class="flex flex-col gap-2">
-                <a class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:!bg-blue-100 open:!text-blue-600" href="#">
+                <a class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:!bg-blue-100 open:!text-blue-600" >
                   <span class="material-symbols-outlined font-normal">settings</span>
                   <p class="text-sm font-medium leading-normal">Setting</p>
                 </a>
-                <a class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:!bg-blue-100 open:!text-blue-600" href="#">
+                <a class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:!bg-blue-100 open:!text-blue-600" >
                   <span class="material-symbols-outlined font-normal">admin_panel_settings</span>
                   <p class="text-sm font-medium leading-normal">Administrator</p>
                 </a>

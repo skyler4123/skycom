@@ -52,5 +52,9 @@ class User < ApplicationRecord
   def employee_users
     child_users
   end
+
+  def first_company_group_business_type
+    company_groups.first&.business_type
+  end
   # ----------------------------------------------------------------------------------------------------
 end

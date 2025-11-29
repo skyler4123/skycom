@@ -8,7 +8,7 @@ export default class LinkController extends Controller {
       this.addLinkTargets()
       // this.updateLinkStyles()
       this.updateOpenByPathnameTargets()
-    }, 1000)
+    }, 100)
   }
 
   addLinkTargets() {
@@ -19,29 +19,22 @@ export default class LinkController extends Controller {
     })
   }
 
-
-  // updateLinkStyles() {
-  //   const currentPath = window.location.pathname
-
-  //   this.linkTargets.forEach((linkElement) => {
-  //     const linkPath = new URL(linkElement.href).pathname
-
-  //     if (linkPath === currentPath) {
-  //       // linkElement.className = this.selectedClasses()
-  //     } else {
-  //       // linkElement.className = this.unselectedClasses()
-  //     }
-  //   })
-  // }
   updateOpenByPathnameTargets() {
     const currentPath = window.location.pathname
 
     this.openByPathnameTargets.forEach((linkElement) => {
+      // If the link doesn't have an href, skip to the next iteration.
+      if (!linkElement.href) {
+        // console the text inside "Link element has no href:" and the linkElement
+        console.log("Link element has no href:", linkElement.innerText)
+        return; // Acts like 'continue' in a forEach loop
+      }
+
       const linkPath = new URL(linkElement.href).pathname
-      console.log('linkPath', linkPath)
-      console.log('currentPath', currentPath)
       if (linkPath === currentPath) {
         linkElement.setAttribute("open", "")
+      } else {
+        linkElement.removeAttribute("open")
       }
     })
   }
