@@ -51,6 +51,29 @@ class Seed::SchoolService
       @school_companies << school
     end
     puts "Created #{@school_companies.count} schools under the company group."
+
+    #--- 3. Create Payment Method Appointments for Schools (Companies) ---
+    @school_companies.each do |school|
+      2.times do
+        Seed::PaymentMethodAppointmentService.create(
+          company_group: @school_company_group,
+        )
+      end
+    end
+    puts "Appointed some payment methods to each school."
+
+    # --- 4. Create School Roles + Custom Roles ---
+    SCHOOL_ROLES.each do |role_name|
+      Seed::RoleService.create(
+        company_group: @school_company_group,
+        name: role_name,
+        description: "#{role_name} role for #{@school_company_group.name}"
+      )
+    end
+
+
+
+
   end
   # def initialize(owner_email:)
   #   @owner_email = owner_email

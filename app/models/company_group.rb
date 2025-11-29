@@ -5,6 +5,28 @@ class CompanyGroup < ApplicationRecord
   has_many :tag_appointments, as: :appoint_to, dependent: :destroy
   has_many :tags, through: :tag_appointments
 
+
+  has_many :employee_groups, dependent: :destroy
+  has_many :employees, dependent: :destroy
+  has_many :roles, dependent: :destroy
+  has_many :policies, dependent: :destroy
+  has_many :facility_groups, dependent: :destroy
+  has_many :facilities, dependent: :destroy
+  has_many :service_groups, dependent: :destroy
+  has_many :services, dependent: :destroy
+  has_many :product_groups, dependent: :destroy
+  has_many :products, dependent: :destroy
+  has_many :customers, dependent: :destroy
+  has_many :customer_groups, dependent: :destroy
+  has_many :orders, dependent: :destroy
+  has_many :periods, dependent: :destroy
+  has_many :payment_method_appointments, dependent: :destroy
+  has_many :task_groups, dependent: :destroy
+  has_many :project_groups, dependent: :destroy
+  has_many :cart_groups, dependent: :destroy
+  has_many :notification_groups, dependent: :destroy
+  has_many :payment_methods, through: :payment_method_appointments
+
   # --- Enums ---
   enum :status, { 
     active: 0, 
