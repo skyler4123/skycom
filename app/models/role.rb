@@ -46,7 +46,7 @@ class Role < ApplicationRecord
           presence: true,
           length: { maximum: 100 },
           uniqueness: { 
-            scope: :company_id, 
+            scope: :company_group_id, 
             message: "A role with this name already exists." 
           }
   validates :status, presence: true

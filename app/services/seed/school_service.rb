@@ -41,7 +41,7 @@ class Seed::SchoolService
     puts "Creating 1 school company group..."
     @school_group = Seed::CompanyGroupService.create(
       user: @multi_company_group_owner,
-      name: "School Company Group",
+      name: "School Company Group #{rand(1000..9999)}",
       description: "A group for multiple school companies",
       business_type: COMPANY_GROUP_BUSINESS_TYPE
     )
