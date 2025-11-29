@@ -8,8 +8,10 @@ class Service < ApplicationRecord
   has_many :service_group_appointments, dependent: :destroy, as: :appoint_to
   has_many :service_groups, through: :service_group_appointments
 
-  has_many :service_appointments, dependent: :destroy
-  has_many :customer_groups, through: :service_appointments, source: :appoint_to, source_type: 'CustomerGroup'
+  # has_many :service_appointments, dependent: :destroy
+  # has_many :customer_groups, through: :service_appointments, source: :appoint_to, source_type: 'CustomerGroup'
+  has_many :customer_group_appointments, dependent: :destroy, as: :appoint_to
+  has_many :customer_groups, through: :customer_group_appointments
 
   has_many :tag_appointments, dependent: :destroy, as: :appoint_to
   has_many :tags, through: :tag_appointments

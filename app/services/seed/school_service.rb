@@ -232,6 +232,23 @@ class Seed::SchoolService
     end
     puts "Assigned teachers to courses."
 
+    # --- 12. Enroll Classes (Customer Group) to Courses (Service)
+    @schools.each do |school|
+      puts "Enrolling classes to courses for #{school.name}..."
+      school_courses = @courses.select { |c| c.company_id == school.id }
+      school_classes = @school_classes.select { |cg| cg.company_id == school.id }
+      school_courses.each do |course|
+        school_classes.each do |klass|
+          Seed::CustomerGroupAppointmentService.create(
+            customer_group: klass,
+            appoint_to: course
+          )
+        end
+      end
+      puts "Enrolled classes to courses for #{school.name}."
+    end
+
+
 
 
 
