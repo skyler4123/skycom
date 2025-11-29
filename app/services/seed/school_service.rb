@@ -1,16 +1,16 @@
 class Seed::SchoolService
   # Define the number of employees to create for each role
   EMPLOYEE_COUNTS = {
-    'Principal' => 1,
-    'Admin' => 2,
-    'Teacher' => 5,
-    'Accountant' => 2,
-    'Cleaner' => 3,
-    'Guard' => 3,
+    principal: 1,
+    admin: 2,
+    teacher: 5,
+    accountant: 2,
+    cleaner: 3,
+    guard: 3,
   }.freeze
 
   CUSTOMER_COUNTS = {
-    'Student' => 10
+    student: 10
   }.freeze
 
   # Define the standard roles to be created for each school
@@ -22,6 +22,8 @@ class Seed::SchoolService
     @multi_company_group_owner = user
     @school_group = nil
     @schools = []
+    @departments = []
+    @teachers = []
     @employees = []
     @students = []
     seeding
@@ -85,6 +87,7 @@ class Seed::SchoolService
           description: "Department: #{dept_name} in #{school.name}"
         )
         department.attach_tag(user: @multi_company_group_owner, name: "Department #{department.id} Tag")
+        @departments << department
       end
       puts "Created departments for #{school.name}."
     end
@@ -104,13 +107,18 @@ class Seed::SchoolService
           employee.attach_tag(user: @multi_company_group_owner, name: "Employee #{employee.id} Tag")
           employee.attach_role(role_name)
           @employees << employee
+          if role_name == :teacher
+            @teachers << employee
+          end
         end
       end
       puts "Created #{@employees.count} employees for #{school.name}."
     end
     puts "Creaed employees for all schools."
 
-    # --- 7. Create Students (Customers) for Each School (Company) ---
+    # --- 7. Enroll 
+
+    # --- 8. Create Students (Customers) for Each School (Company) ---
     @schools.each do |school|
       puts "Creating customers (students) for #{school.name}..."
       CUSTOMER_COUNTS.each do |role_name, count|
@@ -131,7 +139,7 @@ class Seed::SchoolService
       puts "Created #{@students.count} students (customers) for #{school.name}."
     end
 
-    # --- Create Class (Customer Groups) and Enroll Students ---
+    # --- 9. Create Class (Customer Groups) and Enroll Students (Customers) ---
     @schools.each do |school|
       puts "Creating classes and enrolling students for #{school.name}..."
       3.times do |i|
