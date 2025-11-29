@@ -23,6 +23,7 @@ class Seed::SchoolService
     @school_group = nil
     @schools = []
     @employees = []
+    @students = []
     seeding
   end
 
@@ -107,6 +108,30 @@ class Seed::SchoolService
       end
       puts "Created #{@employees.count} employees for #{school.name}."
     end
+    puts "Creaed employees for all schools."
+
+    # --- 7. Create Students (Customers) for Each School (Company) ---
+    @schools.each do |school|
+      puts "Creating customers (students) for #{school.name}..."
+      CUSTOMER_COUNTS.each do |role_name, count|
+        count.times do |i|
+          user = Seed::UserService.create(parent_user: @school_owner, email: "student_#{i + 1}_#{school.id}@example.com")
+          student = Seed::CustomerService.create(
+            user: user,
+            company_group: @school_group,
+            company: school,
+            name: "Student #{i + 1}",
+            description: "Description for Student #{i + 1}"
+          )
+          student.attach_tag(user: @multi_company_group_owner, name: "Student #{student.id} Tag")
+          student.attach_role(role_name)
+          @students << student
+        end
+      end
+      puts "Created #{@students.count} students (customers) for #{school.name}."
+    end
+
+
 
 
   end
