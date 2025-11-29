@@ -48,7 +48,7 @@ Things you may want to cover:
   bundle exec rails g scaffold Address alpha2:string:index alpha3:string:index continent:string:index nationality:string:index region:string:index longitude:decimal latitude:decimal level_total:integer level_1:string:index level_2:string:index level_3:string:index level_4:string:index level_5:string:index level_6:string:index level_7:string:index level_8:string:index level_9:string:index level_10:string:index discarded_at:datetime --force
   
   ### Generic / Tagging
-  bundle exec rails g scaffold Tag user:references name description code --force
+  bundle exec rails g scaffold Tag company_group:references name description code --force
   bundle exec rails g scaffold TagAppointment tag:references appoint_from:references{polymorphic} appoint_to:references{polymorphic} appoint_for:references{polymorphic} appoint_by:references{polymorphic} value description --force
 
   ### HR / Permission Management

@@ -1,5 +1,5 @@
 class Tag < ApplicationRecord
-  belongs_to :user
+  belongs_to :company_group
 
   has_many :tag_appointments, dependent: :destroy
   has_many :company_groups, through: :tag_appointments, source: :appoint_to, source_type: "CompanyGroup"
@@ -13,4 +13,5 @@ class Tag < ApplicationRecord
   has_many :facility_groups, through: :tag_appointments, source: :appoint_to, source_type: "FacilityGroup"
   has_many :facilities, through: :tag_appointments, source: :appoint_to, source_type: "Facility"
 
+  validates :name, presence: true, uniqueness: { scope: :company_group_id }
 end

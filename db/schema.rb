@@ -1438,13 +1438,13 @@ ActiveRecord::Schema[8.0].define(version: 2025_11_23_012412) do
   end
 
   create_table "tags", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
-    t.uuid "user_id", null: false
+    t.uuid "company_group_id", null: false
     t.string "name"
     t.string "description"
     t.string "code"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["user_id"], name: "index_tags_on_user_id"
+    t.index ["company_group_id"], name: "index_tags_on_company_group_id"
   end
 
   create_table "task_appointments", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -1661,7 +1661,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_11_23_012412) do
   add_foreign_key "sessions", "users"
   add_foreign_key "sign_in_tokens", "users"
   add_foreign_key "tag_appointments", "tags"
-  add_foreign_key "tags", "users"
+  add_foreign_key "tags", "company_groups"
   add_foreign_key "task_appointments", "tasks"
   add_foreign_key "task_group_appointments", "task_groups"
   add_foreign_key "task_groups", "companies"

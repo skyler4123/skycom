@@ -2,9 +2,7 @@ class CompanyGroup < ApplicationRecord
   belongs_to :user
   has_many :companies, dependent: :destroy
 
-  has_many :tag_appointments, as: :appoint_to, dependent: :destroy
-  has_many :tags, through: :tag_appointments
-
+  has_many :tags, dependent: :destroy
 
   has_many :employee_groups, dependent: :destroy
   has_many :employees, dependent: :destroy

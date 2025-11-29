@@ -57,7 +57,7 @@ class Seed::SchoolService
         parent_company: nil,
         company_group: @school_group
       )
-      school.attach_tag(user: @multi_company_group_owner, name: "School #{school.id} Tag")
+      school.attach_tag(name: "School #{school.id} Tag")
       @schools << school
     end
     puts "Created #{@schools.count} schools under the company group."
@@ -90,7 +90,7 @@ class Seed::SchoolService
           name: dept_name,
           description: "Department: #{dept_name} in #{school.name}"
         )
-        department.attach_tag(user: @multi_company_group_owner, name: "Department #{department.id} Tag")
+        department.attach_tag(name: "Department #{department.id} Tag")
         @departments << department
       end
       puts "Created departments for #{school.name}."
@@ -110,7 +110,7 @@ class Seed::SchoolService
             name: "Employee #{i + 1} - #{role_name.to_s.capitalize}",
             description: "Description for Employee #{i + 1} - #{role_name.to_s.capitalize}"
           )
-          employee.attach_tag(user: @multi_company_group_owner, name: "Employee #{employee.id} Tag")
+          employee.attach_tag(name: "Employee #{employee.id} Tag")
           employee.attach_role(role_name)
           @employees << employee
           if role_name == :teacher
@@ -149,7 +149,7 @@ class Seed::SchoolService
             name: "Student #{i + 1}",
             description: "Description for Student #{i + 1}"
           )
-          student.attach_tag(user: @multi_company_group_owner, name: "Student #{student.id} Tag")
+          student.attach_tag(name: "Student #{student.id} Tag")
           student.attach_role(role_name)
           @students << student
         end
@@ -167,7 +167,7 @@ class Seed::SchoolService
           name: "Class #{i + 1} - #{school.name}",
           description: "Description for Class #{i + 1} in #{school.name}"
         )
-        klass.attach_tag(user: @multi_company_group_owner, name: "Class #{klass.id} Tag")
+        klass.attach_tag(name: "Class #{klass.id} Tag")
         @school_classes << klass
         # Enroll 5 random students per class
         students = @students.select { |s| s.company_id == school.id }
@@ -192,7 +192,7 @@ class Seed::SchoolService
           name: "Room #{i + 1} - #{school.name}",
           description: "Description for Room #{i + 1} in #{school.name}"
         )
-        room.attach_tag(user: @multi_company_group_owner, name: "Room #{room.id} Tag")
+        room.attach_tag(name: "Room #{room.id} Tag")
       end
       puts "Created some rooms for #{school.name}."
     end
@@ -207,7 +207,7 @@ class Seed::SchoolService
           name: "Course #{i + 1} - #{school.name}",
           description: "Description for Course #{i + 1} in #{school.name}"
         )
-        course.attach_tag(user: @multi_company_group_owner, name: "Course #{course.id} Tag")
+        course.attach_tag(name: "Course #{course.id} Tag")
         @courses << course
         # Enroll all classes in this course
         @school_classes.each do |klass|
