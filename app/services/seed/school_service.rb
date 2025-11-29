@@ -79,15 +79,11 @@ class Seed::SchoolService
       ['Science Department', 'Math Department', 'Arts Department', 'Sports Department'].each do |dept_name|
         department = Seed::EmployeeGroupService.create(
           company_group: @school_group,
+          company: school,
           name: dept_name,
           description: "Department: #{dept_name} in #{school.name}"
         )
         department.attach_tag(user: @multi_company_group_owner, name: "Department #{department.id} Tag")
-        # Assign department to school via appointment
-        Seed::EmployeeGroupAppointmentService.create(
-          employee_group: department,
-          appoint_to: school
-        )
       end
       puts "Created departments for #{school.name}."
     end
