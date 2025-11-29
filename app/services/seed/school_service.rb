@@ -22,6 +22,10 @@ class Seed::SchoolService
     @multi_company_group_owner = user
     @school_group = nil
     @schools = []
+    @school_classes = []
+    @courses = []
+    @rooms = []
+    @school_admins = []
     @departments = []
     @teachers = []
     @employees = []
@@ -164,6 +168,7 @@ class Seed::SchoolService
           description: "Description for Class #{i + 1} in #{school.name}"
         )
         klass.attach_tag(user: @multi_company_group_owner, name: "Class #{klass.id} Tag")
+        @school_classes << klass
         # Enroll 5 random students per class
         students = @students.select { |s| s.company_id == school.id }
         enrolled_students = students.sample(5)
@@ -177,10 +182,69 @@ class Seed::SchoolService
       puts "Created classes and enrolled students for #{school.name}."
     end
 
+    # --- 10. Create some Rooms (Facilities) for Each School ---
+    @schools.each do |school|
+      puts "Creating rooms for #{school.name}..."
+      5.times do |i|
+        room = Seed::FacilityService.create(
+          company_group: @school_group,
+          company: school,
+          name: "Room #{i + 1} - #{school.name}",
+          description: "Description for Room #{i + 1} in #{school.name}"
+        )
+        room.attach_tag(user: @multi_company_group_owner, name: "Room #{room.id} Tag")
+      end
+      puts "Created some rooms for #{school.name}."
+    end
+
+    # --- 10. Create some Courses (Services) for Each School ---
+    @schools.each do |school|
+      puts "Creating courses for #{school.name}..."
+      4.times do |i|
+        course = Seed::ServiceService.create(
+          company_group: @school_group,
+          company: school,
+          name: "Course #{i + 1} - #{school.name}",
+          description: "Description for Course #{i + 1} in #{school.name}"
+        )
+        course.attach_tag(user: @multi_company_group_owner, name: "Course #{course.id} Tag")
+        @courses << course
+        # Enroll all classes in this course
+        @school_classes.each do |klass|
+          if klass.company_id == school.id
+            Seed::ServiceAppointmentService.create(
+              service: course,
+              appoint_to: klass
+            )
+          end
+        end
+      end
+      puts "Created courses for #{school.name}."
+    end
+
+    # --- 11. Assign Teachers (Employees) to Courses (Services) ---
+    @courses.each do |course|
+      assigned_teacher = @teachers.sample
+      Seed::ServiceAppointmentService.create(
+        service: course,
+        appoint_to: assigned_teacher
+      )
+    end
+    puts "Assigned teachers to courses."
 
 
 
 
+
+
+
+
+
+
+    puts "\n========================================================="
+    puts "🏫 School Company Group Seeding Complete!"
+    puts "========================================================="
+    true
   end
   # def initialize(owner_email:)
   #   @owner_email = owner_email

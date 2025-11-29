@@ -14,6 +14,10 @@ class Service < ApplicationRecord
   has_many :tag_appointments, dependent: :destroy, as: :appoint_to
   has_many :tags, through: :tag_appointments
 
+  has_many :service_appointments, dependent: :destroy
+  has_many :customers, through: :service_appointments, source: :appoint_to, source_type: 'Customer'
+  has_many :employees, through: :service_appointments, source: :appoint_to, source_type: 'Employee'
+
   # --- Enums ---
   enum :status, { 
     active: 0, 
