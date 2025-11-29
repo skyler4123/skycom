@@ -50,7 +50,13 @@ class Company < ApplicationRecord
   }
   
   # Grouped business types with 1000-unit gaps for future expansion
-  enum :business_type, COMPANY_GROUP_BUSINESS_TYPES
+  enum :business_type, {
+    headquarters: 0,
+    regional_office: 1,
+    branch: 2,
+    franchise: 3,
+    subsidiary: 4
+  }
 
   # Enum for the new fiscal_year_end_month column (1=January, 12=December)
   enum :fiscal_year_end_month, { 

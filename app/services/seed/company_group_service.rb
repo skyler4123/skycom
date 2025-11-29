@@ -25,7 +25,6 @@ class Seed::CompanyGroupService
     fiscal_year_end_month: nil,
     discarded_at: nil
   )
-    business_type = CompanyGroup.business_types.keys.sample
     base_name = Faker::Company.unique.name
     name ||= "#{base_name} #{business_type.to_s.titleize}"
     domain_suffix = (business_type == :university || business_type == :school) ? ".edu" : ".com"

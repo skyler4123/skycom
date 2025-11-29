@@ -27,6 +27,7 @@ class Seed::SchoolService
   end
 
   def seeding
+    # debugger
     puts "\n\n🏫 Starting School Company Group Seeding..."
     puts "========================================================="
 
