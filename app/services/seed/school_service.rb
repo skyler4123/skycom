@@ -27,7 +27,6 @@ class Seed::SchoolService
   end
 
   def seeding
-    # debugger
     puts "\n\n🏫 Starting School Company Group Seeding..."
     puts "========================================================="
 
@@ -39,6 +38,7 @@ class Seed::SchoolService
       description: "A group for multiple school companies",
       business_type: COMPANY_GROUP_BUSINESS_TYPE
     )
+    puts "Created school company group: #{@school_group.name}"
 
     #--- 2. Create Schools (Companies) under the Company Group ---
     school_count = 2
@@ -50,6 +50,7 @@ class Seed::SchoolService
         parent_company: nil,
         company_group: @school_group
       )
+      school.attach_tag(user: @multi_company_group_owner, name: "School #{school.id} Tag")
       @schools << school
     end
     puts "Created #{@schools.count} schools under the company group."
@@ -72,8 +73,27 @@ class Seed::SchoolService
         description: "#{role_name} role for #{@school_group.name}"
       )
     end
+    # --- 5. Create Departments (Empoylee Groups) for Each School (Company) ---
+    @schools.each do |school|
+      puts "Creating departments for #{school.name}..."
+      ['Science Department', 'Math Department', 'Arts Department', 'Sports Department'].each do |dept_name|
+        department = Seed::EmployeeGroupService.create(
+          company_group: @school_group,
+          name: dept_name,
+          description: "Department: #{dept_name} in #{school.name}"
+        )
+        department.attach_tag(user: @multi_company_group_owner, name: "Department #{department.id} Tag")
+        # Assign department to school via appointment
+        Seed::EmployeeGroupAppointmentService.create(
+          employee_group: department,
+          appoint_to: school
+        )
+      end
+      puts "Created departments for #{school.name}."
+    end
+    puts "Created departments for all schools."
 
-    # --- 5. Create Employees for Each School (Company) ---
+    # --- 6. Create Employees for Each School (Company) ---
     @schools.each do |school|
       puts "Creating employees for #{school.name}..."
       EMPLOYEE_COUNTS.each do |role_name, count|
@@ -81,7 +101,8 @@ class Seed::SchoolService
           user = Seed::UserService.create(parent_user: @school_owner, email: "#{role_name.downcase}_#{i + 1}_#{school.id}@example.com")
           employee = Seed::EmployeeService.create(
             user: user,
-            company_group: @school_group
+            company_group: @school_group,
+            company: school
           )
           employee.attach_tag(user: @multi_company_group_owner, name: "Employee #{employee.id} Tag")
           employee.attach_role(role_name)

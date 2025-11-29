@@ -1,6 +1,7 @@
 class Seed::EmployeeService
   def self.create(
     company_group:,
+    company: nil,
     user: nil,
     name: Faker::Name.name,
     description: "#{Faker::Job.title} in #{Faker::Commerce.department}",
@@ -13,6 +14,7 @@ class Seed::EmployeeService
     employee = Employee.create!(
       user: user,
       company_group: company_group,
+      company: company,
       name: name,
       description: description,
       business_type: business_type || Employee.business_types.keys.sample,
