@@ -11,14 +11,13 @@ module TagConcern
     # @param value [String, nil] The value to assign to the tag.
     # @param description [String, nil] An optional description for the appointment.
     # @return [TagAppointment] The created or updated TagAppointment instance.
-    def attach_tag(name:, value: nil, description: nil)
+    def attach_tag(user:, name:, value: nil, description: nil)
       # Ensure the object has a 'company' association for proper tag scoping
-      raise "Model must belong to a company to attach a tag." unless respond_to?(:company) && company
+      raise "Model must belong to a company group to attach a tag." unless respond_to?(:company_group) && company_group
 
       ApplicationRecord.transaction do
         # 1. Find or create the Tag (the Key) scoped to the company
-        tag = company.tags.find_or_create_by!(name: name)
-
+        tag = company_group.tags.find_or_create_by!(user: user, name: name)
         # 2. Find or initialize the TagAppointment (the Assignment).
         # This handles the uniqueness constraint: only one Appointment per (Tag + Resource).
         appointment = tag_appointments.find_or_initialize_by(tag: tag)
