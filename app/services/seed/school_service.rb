@@ -131,6 +131,31 @@ class Seed::SchoolService
       puts "Created #{@students.count} students (customers) for #{school.name}."
     end
 
+    # --- Create Class (Customer Groups) and Enroll Students ---
+    @schools.each do |school|
+      puts "Creating classes and enrolling students for #{school.name}..."
+      3.times do |i|
+        klass = Seed::CustomerGroupService.create(
+          company_group: @school_group,
+          company: school,
+          name: "Class #{i + 1} - #{school.name}",
+          description: "Description for Class #{i + 1} in #{school.name}"
+        )
+        klass.attach_tag(user: @multi_company_group_owner, name: "Class #{klass.id} Tag")
+        # Enroll 5 random students per class
+        students = @students.select { |s| s.company_id == school.id }
+        enrolled_students = students.sample(5)
+        enrolled_students.each do |student|
+          Seed::CustomerGroupAppointmentService.create(
+            customer_group: klass,
+            appoint_to: student
+          )
+        end
+      end
+      puts "Created classes and enrolled students for #{school.name}."
+    end
+
+
 
 
 
