@@ -3,59 +3,21 @@ class Seed::ApplicationService
     puts "\n\n🚀 Starting Full Database Seeding..."
     puts "========================================================="
 
-    # Seed::UserService.run
-    # Seed::CompanyService.run
-    # Seed::TagService.run
-    # Seed::EmployeeGroupService.run
-    # Seed::EmployeeService.run
-    # Seed::EmployeeGroupAppointmentService.run
-    # Seed::RoleService.run
-    # Seed::PaymentMethodService.run # Ensure global payment methods are seeded first
-    # Seed::PeriodService.run
-    # Seed::PolicyService.run
-    # Seed::PolicyAppointmentService.run
-    # Seed::RoleAppointmentService.run
-    # Seed::FacilityService.run
-    # Seed::FacilityGroupService.run
-    # Seed::ServiceGroupService.run
-    # Seed::ServiceService.run
-    # Seed::ProductBrandService.run
-    # Seed::ProductGroupService.run
-    # Seed::ProductService.run
-    # Seed::CustomerGroupService.run
-    # Seed::CustomerService.run
-    # Seed::OrderService.run
-    # Seed::OrderItemAppointmentService.run
-    # Seed::InvoiceService.run
-    # Seed::PaymentMethodAppointmentService.run # Now appoint them to companies
-    # Seed::BookingService.run
-    # Seed::AssessmentService.run
-    # Seed::TaskGroupService.run
-    # Seed::TaskService.run
-    # Seed::ProjectGroupService.run
-    # Seed::ProjectService.run
-    # Seed::CartGroupService.run
-    # Seed::CartService.run
-    # Seed::NotificationGroupService.run
-    # Seed::NotificationService.run
-
     # Clear global data before seeding
     User.destroy_all
     PaymentMethod.destroy_all
+    Brand.destroy_all
 
     # Global Payment Methods
-    Seed::PaymentMethodService.run # Ensure global payment methods are seeded first
+    Seed::PaymentMethodService.create # Ensure global payment methods are seeded first
+    Seed::BrandService.create # Seed global brands
 
-    # Seed::SchoolService.new(owner_email: "school_owner_1@example.com")
-    # Seed::SchoolService.new(owner_email: "school_owner_2@example.com")
-    # Seed::HospitalService.new(owner_email: "hospital_owner_1@example.com")
-    # Seed::HospitalService.new(owner_email: "hospital_owner_2@example.com")
+    # Create company groups
     multi_company_group_owner = Seed::UserService.create(email: "multi_company_group_owner_1@example.com")
     Seed::MultiCompanyGroupService.new(user: multi_company_group_owner)
 
-
-    multi_company_group_owner = Seed::UserService.create(email: "multi_company_group_owner_2@example.com")
-    Seed::MultiCompanyGroupService.new(user: multi_company_group_owner)
+    # multi_company_group_owner = Seed::UserService.create(email: "multi_company_group_owner_2@example.com")
+    # Seed::MultiCompanyGroupService.new(user: multi_company_group_owner)
 
 
     self.puts_count

@@ -20,7 +20,7 @@ class Seed::InvoiceService
         should_discard = rand(10) == 0 # 10% chance of being discarded
 
         # Calculate total from order items if available, otherwise use a random price
-        calculated_total = order.order_item_appointments.sum(:total_price)
+        calculated_total = order.order_appointments.sum(:total_price)
         invoice_total = calculated_total > 0 ? calculated_total : Faker::Commerce.price(range: 50..2000.0)
 
         Invoice.create!(
@@ -56,7 +56,7 @@ class Seed::InvoiceService
   )
     raise "Cannot create an invoice: No orders exist." if order.nil?
 
-    calculated_total = order.order_item_appointments.sum(:total_price)
+    calculated_total = order.order_appointments.sum(:total_price)
     invoice_total = total || (calculated_total > 0 ? calculated_total : Faker::Commerce.price(range: 50..2000.0))
 
     should_discard = rand(10) == 0

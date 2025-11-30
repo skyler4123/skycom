@@ -4,9 +4,9 @@ class Order < ApplicationRecord
   belongs_to :company, optional: true
 
   has_many :invoices, dependent: :destroy
-  has_many :order_item_appointments, dependent: :destroy
-  has_many :products, through: :order_item_appointments, source: :appoint_to, source_type: "Product"
-  has_many :services, through: :order_item_appointments, source: :appoint_to, source_type: "Service"
+  has_many :order_appointments, dependent: :destroy
+  has_many :products, through: :order_appointments, source: :appoint_to, source_type: "Product"
+  has_many :services, through: :order_appointments, source: :appoint_to, source_type: "Service"
 
 
   # --- Enums ---

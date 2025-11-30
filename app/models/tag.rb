@@ -12,6 +12,8 @@ class Tag < ApplicationRecord
   has_many :services, through: :tag_appointments, source: :appoint_to, source_type: "Service"
   has_many :facility_groups, through: :tag_appointments, source: :appoint_to, source_type: "FacilityGroup"
   has_many :facilities, through: :tag_appointments, source: :appoint_to, source_type: "Facility"
+  has_many :product_groups, through: :tag_appointments, source: :appoint_to, source_type: "ProductGroup"
+  has_many :products, through: :tag_appointments, source: :appoint_to, source_type: "Product"
 
   validates :name, presence: true, uniqueness: { scope: :company_group_id }
 end

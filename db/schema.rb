@@ -1104,7 +1104,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_11_23_012412) do
   create_table "products", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.uuid "company_group_id", null: false
     t.uuid "company_id"
-    t.uuid "brand_id", null: false
+    t.uuid "brand_id"
     t.string "name"
     t.string "description"
     t.string "code"
