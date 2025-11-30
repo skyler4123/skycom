@@ -1,5 +1,6 @@
 class Facility < ApplicationRecord
-  belongs_to :company
+  belongs_to :company_group
+  belongs_to :company, optional: true
   has_many :facility_group_appointments, as: :appoint_to, dependent: :destroy
   has_many :facility_groups, through: :facility_group_appointments
   has_many :bookings, as: :appoint_to, dependent: :destroy, class_name: "Booking"

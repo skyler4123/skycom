@@ -1,6 +1,7 @@
 class ProductGroup < ApplicationRecord
   # --- Associations ---
-  belongs_to :company
+  belongs_to :company_group
+  belongs_to :company, optional: true
   has_many :product_group_appointments, dependent: :destroy
   has_many :products, through: :product_group_appointments, source: :appoint_to, source_type: "Product"
 

@@ -1,6 +1,7 @@
 class Policy < ApplicationRecord
   # --- Associations ---
-  belongs_to :company
+  belongs_to :company_group
+  belongs_to :company, optional: true
 
   has_many :policy_appointments, dependent: :destroy
   has_many :roles, through: :policy_appointments, source: :appoint_to, source_type: "Role"

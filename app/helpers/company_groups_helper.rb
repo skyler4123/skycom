@@ -1,0 +1,2 @@
+module CompanyGroupsHelper
+end

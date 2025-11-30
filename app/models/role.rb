@@ -1,6 +1,7 @@
 class Role < ApplicationRecord
   # --- Associations ---
-  belongs_to :company
+  belongs_to :company_group
+  belongs_to :company, optional: true
 
   has_many :policy_appointments, dependent: :destroy, as: :appoint_to
   has_many :policies, through: :policy_appointments
@@ -45,7 +46,7 @@ class Role < ApplicationRecord
           presence: true,
           length: { maximum: 100 },
           uniqueness: { 
-            scope: :company_id, 
+            scope: :company_group_id, 
             message: "A role with this name already exists." 
           }
   validates :status, presence: true

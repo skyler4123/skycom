@@ -3,6 +3,7 @@ class Customer < ApplicationRecord
 
   # --- Associations ---
   belongs_to :user, optional: true
+  belongs_to :company_group, optional: true
   belongs_to :company, optional: true
 
   has_many :orders, dependent: :destroy
@@ -17,6 +18,10 @@ class Customer < ApplicationRecord
 
   has_many :customer_group_appointments, as: :appoint_to, dependent: :destroy
   has_many :customer_groups, through: :customer_group_appointments
+
+  has_many :service_appointments, dependent: :destroy, as: :appoint_to
+  has_many :services, through: :service_appointments
+
   # --- Enums ---
   enum :status, {
     active: 0,

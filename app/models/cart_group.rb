@@ -1,6 +1,7 @@
 class CartGroup < ApplicationRecord
   # --- Associations ---
-  belongs_to :company
+  belongs_to :company_group
+  belongs_to :company, optional: true
   # has_many :cart_group_appointments, dependent: :destroy # This can be added later
 
   # --- Enums ---

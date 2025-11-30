@@ -14,7 +14,7 @@ class Seed::PaymentMethodService
     { name: "Stripe", code: "STRIPE", business_type: :online, status: :restricted }
   ].freeze
 
-  def self.run
+  def self.create
     puts "Seeding PaymentMethod records..."
 
     # Use find_or_create_by to avoid duplicates on subsequent runs.

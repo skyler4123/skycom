@@ -2,12 +2,16 @@ class Employee < ApplicationRecord
   include RoleConcern
 
   # --- Associations ---
-  belongs_to :company
+  belongs_to :company_group
+  belongs_to :company, optional: true
   belongs_to :user # user_id is nullable in the migration
 
   has_many :role_appointments, as: :appoint_to, dependent: :destroy
   has_many :roles, through: :role_appointments
   
+  has_many :service_appointments, dependent: :destroy, as: :appoint_to
+  has_many :services, through: :service_appointments
+
   # --- Soft Deletion (Discard) ---
   # If you are using a gem like 'Discard' or similar for soft deletion:
   # include Discard::Model 

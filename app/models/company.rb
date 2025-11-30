@@ -1,8 +1,9 @@
 class Company < ApplicationRecord
-  # --- Associations ---
-  belongs_to :user # Assuming this is the creator/primary owner user
+  belongs_to :company_group
 
-  has_many :tags, dependent: :destroy
+  has_many :tag_appointments, as: :appoint_to, dependent: :destroy
+  has_many :tags, through: :tag_appointments
+
   has_many :employee_groups, dependent: :destroy
   has_many :employees, dependent: :destroy
   has_many :roles, dependent: :destroy
@@ -23,7 +24,6 @@ class Company < ApplicationRecord
   has_many :cart_groups, dependent: :destroy
   has_many :notification_groups, dependent: :destroy
   has_many :payment_methods, through: :payment_method_appointments
-
 
   # Self-referencing association for company hierarchy
   belongs_to :parent_company, class_name: "Company", optional: true
@@ -50,54 +50,12 @@ class Company < ApplicationRecord
   }
   
   # Grouped business types with 1000-unit gaps for future expansion
-  enum :business_type, { 
-    # Group 1: General & Retail (0-999)
-    retail: 0, 
-    service: 1, 
-    
-    # Group 2: Food & Hospitality (1000-1999)
-    food_service: 1000, 
-    hospitality: 1001,
-    
-    # Group 3: Education (2000-2999)
-    school: 2000,
-    university: 2001,
-    english_center: 2002,
-    training_provider: 2003,
-    
-    # Group 4: Specialized & Knowledge Services (3000-3999)
-    technology: 3000,
-    finance: 3001,
-    healthcare: 3002,
-    media: 3003,
-    real_estate: 3004,
-    
-    # Group 5: Professional Services (4000-4999)
-    legal: 4000,
-    consulting: 4001,
-    accounting: 4002,
-    marketing_agency: 4003,
-    human_resources: 4004,
-
-    # Group 6: Physical & Production (5000-5999)
-    manufacturing: 5000,
-    construction: 5001,
-    transportation: 5002,
-    agriculture: 5003,
-    energy: 5004,
-    utilities: 5005,
-
-    # Group 7: Public Sector & Non-Profit (6000-6999)
-    government_federal: 6000,
-    government_state_local: 6001,
-    military: 6002,
-    non_profit: 6003,
-    charity: 6004,
-    
-    # Group 8: Arts, Entertainment & Leisure (7000-7999)
-    entertainment: 7000,
-    arts_culture: 7001,
-    sports_fitness: 7002
+  enum :business_type, {
+    headquarters: 0,
+    regional_office: 1,
+    branch: 2,
+    franchise: 3,
+    subsidiary: 4
   }
 
   # Enum for the new fiscal_year_end_month column (1=January, 12=December)
@@ -108,7 +66,7 @@ class Company < ApplicationRecord
   }
   
   # --- Validations ---
-  validates :name, presence: true, uniqueness: { scope: :user_id }, length: { maximum: 255 }
+  validates :name, presence: true, uniqueness: { scope: :company_group_id }, length: { maximum: 255 }
   validates :description, length: { maximum: 5000 }, allow_blank: true
 
   validates :business_type, presence: true
@@ -131,5 +89,4 @@ class Company < ApplicationRecord
   
   # Validation for operational fields
   # validates :fiscal_year_end_month, presence: true, numericality: { in: 1..12 }
-
 end

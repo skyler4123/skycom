@@ -1,6 +1,7 @@
 class NotificationGroup < ApplicationRecord
   # --- Associations ---
-  belongs_to :company
+  belongs_to :company_group
+  belongs_to :company, optional: true
   has_many :notifications, dependent: :destroy
 
   # --- Enums ---

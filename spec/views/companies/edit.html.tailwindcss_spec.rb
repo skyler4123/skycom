@@ -3,7 +3,7 @@ require 'rails_helper'
 RSpec.describe "companies/edit", type: :view do
   let(:company) {
     Company.create!(
-      user: nil,
+      company_group: nil,
       parent_company: nil,
       name: "MyString",
       description: "MyString",
@@ -35,7 +35,7 @@ RSpec.describe "companies/edit", type: :view do
 
     assert_select "form[action=?][method=?]", company_path(company), "post" do
 
-      assert_select "input[name=?]", "company[user_id]"
+      assert_select "input[name=?]", "company[company_group_id]"
 
       assert_select "input[name=?]", "company[parent_company_id]"
 

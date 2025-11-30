@@ -1,6 +1,7 @@
 class ServiceGroup < ApplicationRecord
   # --- Associations ---
-  belongs_to :company
+  belongs_to :company_group
+  belongs_to :company, optional: true
   has_many :service_group_appointments, dependent: :destroy
   has_many :services, through: :service_group_appointments, source: :appoint_to, source_type: "Service"
 

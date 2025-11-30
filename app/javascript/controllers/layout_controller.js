@@ -1,8 +1,4 @@
-import PaginationController from "controllers/pagination_controller"
 import ApplicationController from "controllers/application_controller"
-import DarkmodeController from "controllers/darkmode_controller"
-import { isSignedIn, avatar, Cookie } from "controllers/helpers"
-import { useClickOutside } from 'stimulus-use'
 
 export default class LayoutController extends ApplicationController {
   static targets = ["profileDropdown", "headerSubmenuContainer", "headerSubmenuContent"]
@@ -15,192 +11,158 @@ export default class LayoutController extends ApplicationController {
     
   }
 
-  initBinding() {
-    this.serverHTML = this.element.innerHTML
-    this.paginationController = PaginationController
-    this.flashValue = ServerData.flash || {}
-    this.paginationValue = ServerData.pagination || {}
-    this.dataValue = ServerData.data || {}
-  }
+  initBinding() {}
 
   initLayout() {
-    // Ensure the main element (which wraps the layout) is set up for sticky footer
+    // add headTags to head
+    document.head.insertAdjacentHTML("beforeend", this.headTags())
+
+    // set body class and innerHTML
     this.element.className = 'min-h-screen flex flex-col'
     this.element.innerHTML = this.layoutHTML()
   }
-
-  contentHTML() {
-    return this.serverHTML
-  }
-
-  clickProfileDropdown() {
-    this.isOpenProfileDropdownValue = !this.isOpenProfileDropdownValue
-  }
-
-  isOpenProfileDropdownValueChanged(value, previousValue) {
-    if (value) {
-      this.profileDropdownTarget.innerHTML = this.profileDropdownHTML()
-    } else {
-      this.profileDropdownTarget.innerHTML = ''
-    }
-  }
-
-  disconnect() {
-    this.element.innerHTML = this.serverHTML
-  }
-
-  headerSubmenuHTML() {
-    return {
-      "home": `
-        <div
-          data-${this.identifier}-target="headerSubmenuContent"
-          data-action="${this.identifier}:click:outside->${this.identifier}#clickOutsideHeaderSubmenu"
-        >
-          <a href="/companies/new">About us</a>
-          <a href="/companies/new">Contact</a>
-          <a href="/companies/new">Policy</a>
-        </div>
-      `,
-      "product": `
-        <div
-          data-${this.identifier}-target="headerSubmenuContent"
-          data-action="${this.identifier}:click:outside->${this.identifier}#clickOutsideHeaderSubmenu"
-        >
-          <a href="/companies/new">Company</a>
-          <a href="/companies/new">School/University</a>
-          <a href="/companies/new">Shop</a>
-          <a href="/companies/new">Restaurant</a>
-          <a href="/companies/new">Hospital</a>
-          <a href="/companies/new">Service Company</a>
-        </div>
-      `
-    }
-  }
-
-  profileDropdownHTML() {
+  
+  headTags() {
     return `
-      <div class="flex flex-col gap-y-2 p-2 w-full border-2 border-black rounded-xl">
-        <div>${Cookie("email")}</div>
-        <a href="/users/${Cookie("id")}">Profile</a>
-        <a href="/sign_out">Sign Out</a>
-      </div>
+      <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@100..900&amp;display=swap" rel="stylesheet" />
+      <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"
+        rel="stylesheet" />
     `
   }
-
-  authSectionHTML() {
-    // avatar()
-    if (isSignedIn()) {
-      return `
-        <div
-          class="relative w-10 h-10 bg-gray-100 rounded-full dark:bg-gray-600 cursor-pointer"
-          data-action="click->${this.identifier}#clickProfileDropdown"
-        >
-          ${avatar() ?
-          `<img class="w-10 h-10 rounded-full" src="${avatar()}" alt="Rounded avatar">`
-          :
-          `<svg class="absolute w-12 h-12 text-gray-400 -left-1" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"></path></svg>`
-        }
-          <div
-            data-${this.identifier}-target="profileDropdown"
-            class="absolute right-0 -bottom-2 translate-y-full z-20"
-          >
-            <div class="flex flex-col gap-y-2 p-2 w-full">
-              <div>${Cookie("email")}</div>
-              <a href="/users/${Cookie("id")}">Profile</a>
-              <a href="/sign_out">Sign Out</a>
-            </div>
-          </div>
-        </div>
-      `
-    } else {
-      return `
-        <a href="/sign_in" class="px-4 py-2 border border-transparent text-sm font-medium rounded-lg shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition duration-150">
-          Log in
-        </a>
-      `
-    }
-  }
-
+  
   layoutHTML() {
     return `
-    <!-- Header: Sticky, White Background, Shadow, Responsive -->
-    <header class="relative bg-white dark:bg-gray-800 shadow-md border-b border-gray-200 dark:border-gray-700">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex justify-between items-center h-16">
-        
-        <!-- Logo -->
-        <div class="flex shrink-0">
-          <a href="/" class="text-2xl font-extrabold text-indigo-600 tracking-wider hover:text-indigo-800 transition duration-150">
-            SKYCOM
-          </a>
-        </div>
-        
-        <!-- Navigation (Desktop) -->
-        <nav class="hidden sm:flex">
-          <ul class="flex space-x-8">
-            <li
-              data-action="click->${this.identifier}#toggleHeaderSubmenu"
-              data-${this.identifier}-header-submenu-name-param="home"
-            >
-              <div class="text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 font-medium transition duration-150 cursor-pointer">Home</div>
-            </li>
-            <li
-              class="flex flex-row gap-x-1 cursor-pointer group"
-              data-action="click->${this.identifier}#toggleHeaderSubmenu"
-              data-${this.identifier}-header-submenu-name-param="product"
-            >
-              <div class="text-gray-700 dark:text-gray-300 group-hover:text-indigo-600 group-hover:hover:text-indigo-400 font-medium transition duration-150">Product</div>
-              <div class="flex justify-center items-center cl">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-5 group-hover:stroke-indigo-600 group-hover:hover:stroke-indigo-400">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" />
-                </svg>
+      <div class="font-sans bg-gray-50 dark:bg-gray-950 text-gray-800 dark:text-gray-200">
+        <div class="flex h-screen">
+          <aside
+            class="w-64 shrink-0 bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800 flex flex-col">
+            <div class="p-6 flex items-center gap-3 border-b border-gray-200 dark:border-gray-800">
+              <div class="bg-blue-100 text-blue-600 p-2 rounded-lg">
+                <span class="material-symbols-outlined font-normal">school</span>
               </div>
-            </li>
-            <li>
-              <a href="#" class="text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 font-medium transition duration-150">Pricing</a>
-            </li>
-            <li>
-              <a href="#" class="text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 font-medium transition duration-150">What's new</a>
-              </li>
-          </ul>
-        </nav>
-        
-        <!-- Action/Login -->
-        <div class="flex items-center space-x-4">
-          <div class="flex flex-row" data-controller="${DarkmodeController.identifier}"></div>
-            ${this.authSectionHTML()}
-          <!-- Placeholder for Mobile Menu Button (if needed) -->
-          <button class="md:hidden text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400">
-            <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
-          </button>
+              <div class="flex flex-col">
+                <h1 class="text-gray-900 dark:text-white text-base font-medium leading-normal">Greenwood High</h1>
+                <p class="text-gray-500 dark:text-gray-400 text-sm font-normal leading-normal">School Admin</p>
+              </div>
+            </div>
+            <nav class="grow p-4">
+              <div class="flex flex-col gap-2">
+                <a 
+                  class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:!bg-blue-100 open:!text-blue-600 open:!bg-blue-100 open:!text-blue-600"
+                  data-link-target="openByPathname"
+                  href="/school/schools"
+                >
+                  <span class="material-symbols-outlined font-normal">dashboard</span>
+                  <p class="text-sm font-medium leading-normal">Dashboard</p>
+                </a>
+                <a
+                  class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:!bg-blue-100 open:!text-blue-600"
+                  data-link-target="openByPathname"
+                  href="/school/courses"
+                >
+                  <span class="material-symbols-outlined font-normal">menu_book</span>
+                  <p class="text-sm font-medium leading-normal">Courses</p>
+                </a>
+                <a
+                  class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:!bg-blue-100 open:!text-blue-600"
+                  data-link-target="openByPathname"
+                  
+                >
+                  <span class="material-symbols-outlined font-normal">class</span>
+                  <p class="text-sm font-medium leading-normal">Classes</p>
+                </a>
+                <a
+                  class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:!bg-blue-100 open:!text-blue-600"
+                  data-link-target="openByPathname"
+                  
+                >
+                  <span class="material-symbols-outlined font-normal">school</span>
+                  <p class="text-sm font-medium leading-normal">Students</p>
+                </a>
+                <a
+                  class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:!bg-blue-100 open:!text-blue-600"
+                  data-link-target="openByPathname"
+                  
+                >
+                  <span class="material-symbols-outlined font-normal">co_present</span>
+                  <p class="text-sm font-medium leading-normal">Teachers</p>
+                </a>
+                <a
+                  class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:!bg-blue-100 open:!text-blue-600"
+                  data-link-target="openByPathname"
+                  
+                >
+                  <span class="material-symbols-outlined font-normal">groups</span>
+                  <p class="text-sm font-medium leading-normal">Staffs/Employees</p>
+                </a>
+                <a
+                  class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:!bg-blue-100 open:!text-blue-600"
+                  data-link-target="openByPathname"
+                  
+                >
+                  <span class="material-symbols-outlined font-normal">domain</span>
+                  <p class="text-sm font-medium leading-normal">Facilities</p>
+                </a>
+                <a
+                  class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:!bg-blue-100 open:!text-blue-600"
+                  data-link-target="openByPathname"
+                  
+                >
+                  <span class="material-symbols-outlined font-normal">payments</span>
+                  <p class="text-sm font-medium leading-normal">Payments</p>
+                </a>
+              </div>
+            </nav>
+            <div class="p-4 border-t border-gray-200 dark:border-gray-800">
+              <div class="flex flex-col gap-2">
+                <a class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:!bg-blue-100 open:!text-blue-600" >
+                  <span class="material-symbols-outlined font-normal">settings</span>
+                  <p class="text-sm font-medium leading-normal">Setting</p>
+                </a>
+                <a class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:!bg-blue-100 open:!text-blue-600" >
+                  <span class="material-symbols-outlined font-normal">admin_panel_settings</span>
+                  <p class="text-sm font-medium leading-normal">Administrator</p>
+                </a>
+              </div>
+            </div>
+          </aside>
+          <main class="flex-1 flex flex-col overflow-auto">
+            <header
+              class="shrink-0 flex items-center justify-between whitespace-nowrap border-b border-gray-200 dark:border-gray-800 px-8 py-4 bg-white dark:bg-gray-900">
+              <div class="flex items-center gap-8">
+                <label class="flex flex-col min-w-40 h-10! w-80">
+                  <div class="flex w-full flex-1 items-stretch rounded-lg h-full">
+                    <div
+                      class="text-gray-500 flex bg-gray-100 dark:bg-gray-800 items-center justify-center pl-4 rounded-l-lg border-r-0">
+                      <span class="material-symbols-outlined font-normal">search</span>
+                    </div>
+                    <input
+                      class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-gray-900 dark:text-white focus:outline-0 focus:ring-0 border-none bg-gray-100 dark:bg-gray-800 h-full placeholder:text-gray-500 px-4 rounded-l-none border-l-0 pl-2 text-base font-normal leading-normal"
+                      placeholder="Search for students, teachers..." value="" />
+                  </div>
+                </label>
+              </div>
+              <div class="flex flex-1 justify-end gap-4 items-center">
+                <button
+                  class="flex cursor-pointer items-center justify-center overflow-hidden rounded-full h-10 w-10 hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-600 dark:text-gray-300">
+                  <span class="material-symbols-outlined font-normal">notifications</span>
+                </button>
+                <button
+                  class="flex cursor-pointer items-center justify-center overflow-hidden rounded-full h-10 w-10 hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-600 dark:text-gray-300">
+                  <span class="material-symbols-outlined font-normal">settings</span>
+                </button>
+                <div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full w-10 h-10"
+                  data-alt="User profile picture"
+                  style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuBYk6_5wqHwhOUyfqIOzuw7uF6nG1B2aHcNfqPXgheh0TJNM9wgrKtU__k7USaOwDZLXPpvIrYvaXBnMbO7rmZHK15vMirHZqrK0UBZ18vJdiQZlmTrGe8wch8p3G7GXSetuz5njKmy7Hb6XGw18g0stonxhwtIcuuEqzZVHxbviNLuy4i_B8JHC1x_JlbUrZoIV2QQqyAprbH-jems99h8nqDZ6D6FBmq8JDrKIfaBYkl3mR0cYldl3c0gaNynjiRNKDKfaUcIKBc");'>
+                </div>
+              </div>
+            </header>
+            ${this.contentHTML()}
+          </main>
         </div>
-
       </div>
-      <div
-        data-${this.identifier}-target="headerSubmenuContainer"
-        class="absolute w-full bottom-0 translate-y-full"
-      >
-      </div>
-    </header>
-    
-    <!-- Main Content: Takes up remaining vertical space -->
-    <main class="flex grow bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100">
-      <article class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        ${this.contentHTML()}
-      </article>
-    </main>
-
-    <!-- Footer: Dark Background, Centered Content -->
-    <footer class="bg-gray-900 mt-12">
-      <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8 text-center">
-        <div class="text-sm text-gray-400 space-x-4">
-          <a href="#" class="hover:text-white transition duration-150">About</a>
-          <span class="text-gray-600">|</span>
-          <a href="#" class="hover:text-white transition duration-150">Contact</a>
-          <span class="text-gray-600">|</span>
-          <p class="inline text-gray-500">&copy; ${new Date().getFullYear()} Skycom. All rights reserved.</p>
-        </div>
-      </div>
-    </footer>
     `
   }
+
 }
