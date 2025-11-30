@@ -166,6 +166,8 @@ Things you may want to cover:
   bundle exec rails g scaffold Subscription subscription_group:references company_group:references company:references name description code status:integer business_type:integer discarded_at:datetime:index --force
   bundle exec rails g scaffold SubscriptionGroupAppointment subscription_group:references appoint_from:references{polymorphic} appoint_to:references{polymorphic} appoint_for:references{polymorphic} appoint_by:references{polymorphic} name description code status:integer business_type:integer discarded_at:datetime:index --force
   bundle exec rails g scaffold SubscriptionAppointment subscription:references appoint_from:references{polymorphic} appoint_to:references{polymorphic} appoint_for:references{polymorphic} appoint_by:references{polymorphic} name description code status:integer business_type:integer discarded_at:datetime:index --force
+
+  ### Pricing
   bundle exec rails g scaffold Pricing
 
   ### Content & Knowledge Management
