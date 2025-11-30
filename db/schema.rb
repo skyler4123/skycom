@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_11_23_012412) do
+ActiveRecord::Schema[8.0].define(version: 2025_11_30_133659) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pgcrypto"
@@ -421,6 +421,92 @@ ActiveRecord::Schema[8.0].define(version: 2025_11_23_012412) do
     t.index ["company_id"], name: "index_employees_on_company_id"
     t.index ["discarded_at"], name: "index_employees_on_discarded_at"
     t.index ["user_id"], name: "index_employees_on_user_id"
+  end
+
+  create_table "event_appointments", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "event_id", null: false
+    t.string "appoint_from_type", null: false
+    t.uuid "appoint_from_id", null: false
+    t.string "appoint_to_type", null: false
+    t.uuid "appoint_to_id", null: false
+    t.string "appoint_for_type", null: false
+    t.uuid "appoint_for_id", null: false
+    t.string "appoint_by_type", null: false
+    t.uuid "appoint_by_id", null: false
+    t.string "name"
+    t.string "description"
+    t.string "code"
+    t.integer "status"
+    t.integer "business_type"
+    t.datetime "discarded_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["appoint_by_type", "appoint_by_id"], name: "index_event_appointments_on_appoint_by"
+    t.index ["appoint_for_type", "appoint_for_id"], name: "index_event_appointments_on_appoint_for"
+    t.index ["appoint_from_type", "appoint_from_id"], name: "index_event_appointments_on_appoint_from"
+    t.index ["appoint_to_type", "appoint_to_id"], name: "index_event_appointments_on_appoint_to"
+    t.index ["discarded_at"], name: "index_event_appointments_on_discarded_at"
+    t.index ["event_id"], name: "index_event_appointments_on_event_id"
+  end
+
+  create_table "event_group_appointments", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "event_group_id", null: false
+    t.string "appoint_from_type", null: false
+    t.uuid "appoint_from_id", null: false
+    t.string "appoint_to_type", null: false
+    t.uuid "appoint_to_id", null: false
+    t.string "appoint_for_type", null: false
+    t.uuid "appoint_for_id", null: false
+    t.string "appoint_by_type", null: false
+    t.uuid "appoint_by_id", null: false
+    t.string "name"
+    t.string "description"
+    t.string "code"
+    t.integer "status"
+    t.integer "business_type"
+    t.datetime "discarded_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["appoint_by_type", "appoint_by_id"], name: "index_event_group_appointments_on_appoint_by"
+    t.index ["appoint_for_type", "appoint_for_id"], name: "index_event_group_appointments_on_appoint_for"
+    t.index ["appoint_from_type", "appoint_from_id"], name: "index_event_group_appointments_on_appoint_from"
+    t.index ["appoint_to_type", "appoint_to_id"], name: "index_event_group_appointments_on_appoint_to"
+    t.index ["discarded_at"], name: "index_event_group_appointments_on_discarded_at"
+    t.index ["event_group_id"], name: "index_event_group_appointments_on_event_group_id"
+  end
+
+  create_table "event_groups", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "company_group_id", null: false
+    t.uuid "company_id", null: false
+    t.string "name"
+    t.string "description"
+    t.string "code"
+    t.integer "status"
+    t.integer "business_type"
+    t.datetime "discarded_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["company_group_id"], name: "index_event_groups_on_company_group_id"
+    t.index ["company_id"], name: "index_event_groups_on_company_id"
+    t.index ["discarded_at"], name: "index_event_groups_on_discarded_at"
+  end
+
+  create_table "events", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "event_group_id", null: false
+    t.uuid "company_group_id", null: false
+    t.uuid "company_id", null: false
+    t.string "name"
+    t.string "description"
+    t.string "code"
+    t.integer "status"
+    t.integer "business_type"
+    t.datetime "discarded_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["company_group_id"], name: "index_events_on_company_group_id"
+    t.index ["company_id"], name: "index_events_on_company_id"
+    t.index ["discarded_at"], name: "index_events_on_discarded_at"
+    t.index ["event_group_id"], name: "index_events_on_event_group_id"
   end
 
   create_table "exam_appointments", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -1416,6 +1502,92 @@ ActiveRecord::Schema[8.0].define(version: 2025_11_23_012412) do
     t.index ["user_id"], name: "index_sign_in_tokens_on_user_id"
   end
 
+  create_table "subscription_appointments", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "subscription_id", null: false
+    t.string "appoint_from_type", null: false
+    t.uuid "appoint_from_id", null: false
+    t.string "appoint_to_type", null: false
+    t.uuid "appoint_to_id", null: false
+    t.string "appoint_for_type", null: false
+    t.uuid "appoint_for_id", null: false
+    t.string "appoint_by_type", null: false
+    t.uuid "appoint_by_id", null: false
+    t.string "name"
+    t.string "description"
+    t.string "code"
+    t.integer "status"
+    t.integer "business_type"
+    t.datetime "discarded_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["appoint_by_type", "appoint_by_id"], name: "index_subscription_appointments_on_appoint_by"
+    t.index ["appoint_for_type", "appoint_for_id"], name: "index_subscription_appointments_on_appoint_for"
+    t.index ["appoint_from_type", "appoint_from_id"], name: "index_subscription_appointments_on_appoint_from"
+    t.index ["appoint_to_type", "appoint_to_id"], name: "index_subscription_appointments_on_appoint_to"
+    t.index ["discarded_at"], name: "index_subscription_appointments_on_discarded_at"
+    t.index ["subscription_id"], name: "index_subscription_appointments_on_subscription_id"
+  end
+
+  create_table "subscription_group_appointments", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "subscription_group_id", null: false
+    t.string "appoint_from_type", null: false
+    t.uuid "appoint_from_id", null: false
+    t.string "appoint_to_type", null: false
+    t.uuid "appoint_to_id", null: false
+    t.string "appoint_for_type", null: false
+    t.uuid "appoint_for_id", null: false
+    t.string "appoint_by_type", null: false
+    t.uuid "appoint_by_id", null: false
+    t.string "name"
+    t.string "description"
+    t.string "code"
+    t.integer "status"
+    t.integer "business_type"
+    t.datetime "discarded_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["appoint_by_type", "appoint_by_id"], name: "index_subscription_group_appointments_on_appoint_by"
+    t.index ["appoint_for_type", "appoint_for_id"], name: "index_subscription_group_appointments_on_appoint_for"
+    t.index ["appoint_from_type", "appoint_from_id"], name: "index_subscription_group_appointments_on_appoint_from"
+    t.index ["appoint_to_type", "appoint_to_id"], name: "index_subscription_group_appointments_on_appoint_to"
+    t.index ["discarded_at"], name: "index_subscription_group_appointments_on_discarded_at"
+    t.index ["subscription_group_id"], name: "index_subscription_group_appointments_on_subscription_group_id"
+  end
+
+  create_table "subscription_groups", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "company_group_id", null: false
+    t.uuid "company_id", null: false
+    t.string "name"
+    t.string "description"
+    t.string "code"
+    t.integer "status"
+    t.integer "business_type"
+    t.datetime "discarded_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["company_group_id"], name: "index_subscription_groups_on_company_group_id"
+    t.index ["company_id"], name: "index_subscription_groups_on_company_id"
+    t.index ["discarded_at"], name: "index_subscription_groups_on_discarded_at"
+  end
+
+  create_table "subscriptions", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "subscription_group_id", null: false
+    t.uuid "company_group_id", null: false
+    t.uuid "company_id", null: false
+    t.string "name"
+    t.string "description"
+    t.string "code"
+    t.integer "status"
+    t.integer "business_type"
+    t.datetime "discarded_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["company_group_id"], name: "index_subscriptions_on_company_group_id"
+    t.index ["company_id"], name: "index_subscriptions_on_company_id"
+    t.index ["discarded_at"], name: "index_subscriptions_on_discarded_at"
+    t.index ["subscription_group_id"], name: "index_subscriptions_on_subscription_group_id"
+  end
+
   create_table "tag_appointments", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.uuid "tag_id", null: false
     t.string "appoint_from_type"
@@ -1585,6 +1757,13 @@ ActiveRecord::Schema[8.0].define(version: 2025_11_23_012412) do
   add_foreign_key "employees", "companies"
   add_foreign_key "employees", "company_groups"
   add_foreign_key "employees", "users"
+  add_foreign_key "event_appointments", "events"
+  add_foreign_key "event_group_appointments", "event_groups"
+  add_foreign_key "event_groups", "companies"
+  add_foreign_key "event_groups", "company_groups"
+  add_foreign_key "events", "companies"
+  add_foreign_key "events", "company_groups"
+  add_foreign_key "events", "event_groups"
   add_foreign_key "exam_appointments", "exams"
   add_foreign_key "exam_groups", "companies"
   add_foreign_key "exam_groups", "company_groups"
@@ -1660,6 +1839,13 @@ ActiveRecord::Schema[8.0].define(version: 2025_11_23_012412) do
   add_foreign_key "services", "company_groups"
   add_foreign_key "sessions", "users"
   add_foreign_key "sign_in_tokens", "users"
+  add_foreign_key "subscription_appointments", "subscriptions"
+  add_foreign_key "subscription_group_appointments", "subscription_groups"
+  add_foreign_key "subscription_groups", "companies"
+  add_foreign_key "subscription_groups", "company_groups"
+  add_foreign_key "subscriptions", "companies"
+  add_foreign_key "subscriptions", "company_groups"
+  add_foreign_key "subscriptions", "subscription_groups"
   add_foreign_key "tag_appointments", "tags"
   add_foreign_key "tags", "company_groups"
   add_foreign_key "task_appointments", "tasks"
