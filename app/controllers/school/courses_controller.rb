@@ -1,5 +1,5 @@
 class School::CoursesController < School::ApplicationController
-  before_action :set_service, only: %i[ show edit update destroy ]
+  # before_action :set_service, only: %i[ show edit update destroy ]
 
   # GET /services or /services.json
   def index
