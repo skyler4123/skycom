@@ -1,9 +1,42 @@
 Rails.application.routes.draw do
+  resources :subscription_appointments
+  resources :subscription_group_appointments
+  resources :subscriptions
+  resources :subscription_groups
+  resources :event_appointments
+  resources :event_group_appointments
+  resources :events
+  resources :event_groups
   resources :company_groups
+  namespace :retail do
+    resources :stores
+    resources :departments
+    resources :employees
+    resources :customers
+    resources :products
+    resources :loyalty_programs
+    resources :sales
+    resources :promotions
+    resources :inventories
+    resources :suppliers
+    resources :orders
+    resources :shipments
+    resources :returns
+    resources :reports
+    resources :settings
+    resources :roles
+    resources :tags
+    resources :companies
+    resources :addresses
+    resources :payments
+    resources :invoices
+  end
+
   namespace :school do
     resources :schools
     resources :courses
   end
+
   resources :exam_appointments
   resources :answers
   resources :questions
