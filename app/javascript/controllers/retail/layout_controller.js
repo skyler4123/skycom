@@ -68,7 +68,27 @@ export default class Retail_LayoutController extends ApplicationController {
                   <span class="material-symbols-outlined">groups</span>
                   <p class="text-sm font-medium leading-normal">Employee</p>
                 </a>
-              </div>
+                <a class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800" href="#">
+                  <span class="material-symbols-outlined">inventory</span>
+                  <p class="text-sm font-medium leading-normal">Inventory</p>
+                </a>
+                <a class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800" href="#">
+                  <span class="material-symbols-outlined">add_shopping_cart</span>
+                  <p class="text-sm font-medium leading-normal">Sales</p>
+                </a>
+                <a class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800" href="#">
+                  <span class="material-symbols-outlined">person_add</span>
+                  <p class="text-sm font-medium leading-normal">Customer</p>
+                </a>
+                <a class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800" href="#">
+                  <span class="material-symbols-outlined">receipt_long</span>
+                  <p class="text-sm font-medium leading-normal">Invoices</p>
+                </a>
+                <a class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800" href="#">
+                  <span class="material-symbols-outlined">bar_chart</span>
+                  <p class="text-sm font-medium leading-normal">Reports</p>
+                </a>
+                </div>
             </nav>
             <div class="p-4 border-t border-gray-200 dark:border-gray-800">
               <div class="flex flex-col gap-2">
