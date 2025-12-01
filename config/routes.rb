@@ -1,7 +1,4 @@
 Rails.application.routes.draw do
-  resources :setting_appointments
-  resources :setting_group_appointments
-  resources :setting_groups
 
   # Routes for Retail Management
   resources :retail do
@@ -49,6 +46,9 @@ Rails.application.routes.draw do
   end
 
   # General Application Routes
+  resources :setting_appointments
+  resources :setting_group_appointments
+  resources :setting_groups
   resources :subscription_appointments
   resources :subscription_group_appointments
   resources :subscriptions

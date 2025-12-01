@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_11_30_133659) do
+ActiveRecord::Schema[8.0].define(version: 2025_12_01_153048) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pgcrypto"
@@ -1497,6 +1497,94 @@ ActiveRecord::Schema[8.0].define(version: 2025_11_30_133659) do
     t.index ["user_id"], name: "index_sessions_on_user_id"
   end
 
+  create_table "setting_appointments", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "setting_id", null: false
+    t.string "appoint_from_type", null: false
+    t.uuid "appoint_from_id", null: false
+    t.string "appoint_to_type", null: false
+    t.uuid "appoint_to_id", null: false
+    t.string "appoint_for_type", null: false
+    t.uuid "appoint_for_id", null: false
+    t.string "appoint_by_type", null: false
+    t.uuid "appoint_by_id", null: false
+    t.string "name"
+    t.string "description"
+    t.string "code"
+    t.integer "status"
+    t.integer "business_type"
+    t.datetime "discarded_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["appoint_by_type", "appoint_by_id"], name: "index_setting_appointments_on_appoint_by"
+    t.index ["appoint_for_type", "appoint_for_id"], name: "index_setting_appointments_on_appoint_for"
+    t.index ["appoint_from_type", "appoint_from_id"], name: "index_setting_appointments_on_appoint_from"
+    t.index ["appoint_to_type", "appoint_to_id"], name: "index_setting_appointments_on_appoint_to"
+    t.index ["discarded_at"], name: "index_setting_appointments_on_discarded_at"
+    t.index ["setting_id"], name: "index_setting_appointments_on_setting_id"
+  end
+
+  create_table "setting_group_appointments", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "setting_group_id", null: false
+    t.string "appoint_from_type", null: false
+    t.uuid "appoint_from_id", null: false
+    t.string "appoint_to_type", null: false
+    t.uuid "appoint_to_id", null: false
+    t.string "appoint_for_type", null: false
+    t.uuid "appoint_for_id", null: false
+    t.string "appoint_by_type", null: false
+    t.uuid "appoint_by_id", null: false
+    t.string "name"
+    t.string "description"
+    t.string "code"
+    t.integer "status"
+    t.integer "business_type"
+    t.datetime "discarded_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["appoint_by_type", "appoint_by_id"], name: "index_setting_group_appointments_on_appoint_by"
+    t.index ["appoint_for_type", "appoint_for_id"], name: "index_setting_group_appointments_on_appoint_for"
+    t.index ["appoint_from_type", "appoint_from_id"], name: "index_setting_group_appointments_on_appoint_from"
+    t.index ["appoint_to_type", "appoint_to_id"], name: "index_setting_group_appointments_on_appoint_to"
+    t.index ["discarded_at"], name: "index_setting_group_appointments_on_discarded_at"
+    t.index ["setting_group_id"], name: "index_setting_group_appointments_on_setting_group_id"
+  end
+
+  create_table "setting_groups", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "company_group_id", null: false
+    t.uuid "company_id", null: false
+    t.json "content"
+    t.string "name"
+    t.string "description"
+    t.string "code"
+    t.integer "status"
+    t.integer "business_type"
+    t.datetime "discarded_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["company_group_id"], name: "index_setting_groups_on_company_group_id"
+    t.index ["company_id"], name: "index_setting_groups_on_company_id"
+    t.index ["discarded_at"], name: "index_setting_groups_on_discarded_at"
+  end
+
+  create_table "settings", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "setting_group_id", null: false
+    t.uuid "company_group_id", null: false
+    t.uuid "company_id", null: false
+    t.json "content"
+    t.string "name"
+    t.string "description"
+    t.string "code"
+    t.integer "status"
+    t.integer "business_type"
+    t.datetime "discarded_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["company_group_id"], name: "index_settings_on_company_group_id"
+    t.index ["company_id"], name: "index_settings_on_company_id"
+    t.index ["discarded_at"], name: "index_settings_on_discarded_at"
+    t.index ["setting_group_id"], name: "index_settings_on_setting_group_id"
+  end
+
   create_table "sign_in_tokens", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.uuid "user_id", null: false
     t.index ["user_id"], name: "index_sign_in_tokens_on_user_id"
@@ -1838,6 +1926,13 @@ ActiveRecord::Schema[8.0].define(version: 2025_11_30_133659) do
   add_foreign_key "services", "companies"
   add_foreign_key "services", "company_groups"
   add_foreign_key "sessions", "users"
+  add_foreign_key "setting_appointments", "settings"
+  add_foreign_key "setting_group_appointments", "setting_groups"
+  add_foreign_key "setting_groups", "companies"
+  add_foreign_key "setting_groups", "company_groups"
+  add_foreign_key "settings", "companies"
+  add_foreign_key "settings", "company_groups"
+  add_foreign_key "settings", "setting_groups"
   add_foreign_key "sign_in_tokens", "users"
   add_foreign_key "subscription_appointments", "subscriptions"
   add_foreign_key "subscription_group_appointments", "subscription_groups"
