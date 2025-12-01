@@ -49,7 +49,7 @@ export default class LayoutController extends ApplicationController {
             <nav class="grow p-4">
               <div class="flex flex-col gap-2">
                 <a 
-                  class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:!bg-blue-100 open:!text-blue-600 open:!bg-blue-100 open:!text-blue-600"
+                  class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:bg-blue-100! open:text-blue-600!"
                   data-link-target="openByPathname"
                   href="/school/schools"
                 >
@@ -57,7 +57,7 @@ export default class LayoutController extends ApplicationController {
                   <p class="text-sm font-medium leading-normal">Dashboard</p>
                 </a>
                 <a
-                  class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:!bg-blue-100 open:!text-blue-600"
+                  class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:bg-blue-100! open:text-blue-600!"
                   data-link-target="openByPathname"
                   href="/school/courses"
                 >
@@ -65,7 +65,7 @@ export default class LayoutController extends ApplicationController {
                   <p class="text-sm font-medium leading-normal">Courses</p>
                 </a>
                 <a
-                  class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:!bg-blue-100 open:!text-blue-600"
+                  class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:bg-blue-100! open:text-blue-600!"
                   data-link-target="openByPathname"
                   
                 >
@@ -73,7 +73,7 @@ export default class LayoutController extends ApplicationController {
                   <p class="text-sm font-medium leading-normal">Classes</p>
                 </a>
                 <a
-                  class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:!bg-blue-100 open:!text-blue-600"
+                  class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:bg-blue-100! open:text-blue-600!"
                   data-link-target="openByPathname"
                   
                 >
@@ -81,7 +81,7 @@ export default class LayoutController extends ApplicationController {
                   <p class="text-sm font-medium leading-normal">Students</p>
                 </a>
                 <a
-                  class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:!bg-blue-100 open:!text-blue-600"
+                  class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:bg-blue-100! open:text-blue-600!"
                   data-link-target="openByPathname"
                   
                 >
@@ -89,7 +89,7 @@ export default class LayoutController extends ApplicationController {
                   <p class="text-sm font-medium leading-normal">Teachers</p>
                 </a>
                 <a
-                  class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:!bg-blue-100 open:!text-blue-600"
+                  class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:bg-blue-100! open:text-blue-600!"
                   data-link-target="openByPathname"
                   
                 >
@@ -97,7 +97,7 @@ export default class LayoutController extends ApplicationController {
                   <p class="text-sm font-medium leading-normal">Staffs/Employees</p>
                 </a>
                 <a
-                  class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:!bg-blue-100 open:!text-blue-600"
+                  class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:bg-blue-100! open:text-blue-600!"
                   data-link-target="openByPathname"
                   
                 >
@@ -105,7 +105,7 @@ export default class LayoutController extends ApplicationController {
                   <p class="text-sm font-medium leading-normal">Facilities</p>
                 </a>
                 <a
-                  class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:!bg-blue-100 open:!text-blue-600"
+                  class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:bg-blue-100! open:text-blue-600!"
                   data-link-target="openByPathname"
                   
                 >
@@ -116,11 +116,11 @@ export default class LayoutController extends ApplicationController {
             </nav>
             <div class="p-4 border-t border-gray-200 dark:border-gray-800">
               <div class="flex flex-col gap-2">
-                <a class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:!bg-blue-100 open:!text-blue-600" >
+                <a class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:bg-blue-100! open:text-blue-600!" >
                   <span class="material-symbols-outlined font-normal">settings</span>
                   <p class="text-sm font-medium leading-normal">Setting</p>
                 </a>
-                <a class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:!bg-blue-100 open:!text-blue-600" >
+                <a class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:bg-blue-100! open:text-blue-600!" >
                   <span class="material-symbols-outlined font-normal">admin_panel_settings</span>
                   <p class="text-sm font-medium leading-normal">Administrator</p>
                 </a>

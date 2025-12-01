@@ -36,7 +36,7 @@ export default class Retail_LayoutController extends ApplicationController {
       <div class="font-display bg-background-light dark:bg-background-dark text-gray-800 dark:text-gray-200">
         <div class="flex h-screen">
           <aside
-            class="w-64 flex-shrink-0 bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800 flex flex-col">
+            class="w-64 shrink-0 bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800 flex flex-col">
             <div class="p-6 flex items-center gap-3 border-b border-gray-200 dark:border-gray-800">
               <div class="bg-primary/20 text-primary p-2 rounded-lg">
                 <span class="material-symbols-outlined">storefront</span>
@@ -46,7 +46,7 @@ export default class Retail_LayoutController extends ApplicationController {
                 <p class="text-gray-500 dark:text-gray-400 text-sm font-normal leading-normal">Retail Admin</p>
               </div>
             </div>
-            <nav class="flex-grow p-4">
+            <nav class="flex grow p-4">
               <div class="flex flex-col gap-2">
                 <a class="flex items-center gap-3 px-3 py-2 rounded-lg bg-primary/20 text-primary" href="#">
                   <span class="material-symbols-outlined">dashboard</span>
@@ -105,9 +105,9 @@ export default class Retail_LayoutController extends ApplicationController {
           </aside>
           <main class="flex-1 flex flex-col overflow-auto">
             <header
-              class="flex-shrink-0 flex items-center justify-between whitespace-nowrap border-b border-gray-200 dark:border-gray-800 px-8 py-4 bg-white dark:bg-gray-900">
+              class="shrink-0 flex items-center justify-between whitespace-nowrap border-b border-gray-200 dark:border-gray-800 px-8 py-4 bg-white dark:bg-gray-900">
               <div class="flex items-center gap-8">
-                <label class="flex flex-col min-w-40 !h-10 w-80">
+                <label class="flex flex-col min-w-40 h-10! w-80">
                   <div class="flex w-full flex-1 items-stretch rounded-lg h-full">
                     <div
                       class="text-gray-500 flex bg-gray-100 dark:bg-gray-800 items-center justify-center pl-4 rounded-l-lg border-r-0">

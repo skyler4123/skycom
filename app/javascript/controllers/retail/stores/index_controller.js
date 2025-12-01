@@ -158,7 +158,7 @@ export default class Retail_Stores_IndexController extends Retail_LayoutControll
                 Products</h2>
               <div class="flex flex-col gap-4">
                 <div class="flex gap-4 items-center">
-                  <div class="w-16 h-16 rounded-lg bg-gray-100 dark:bg-gray-800 flex-shrink-0 bg-cover bg-center"
+                  <div class="w-16 h-16 rounded-lg bg-gray-100 dark:bg-gray-800 flex shrink-0 bg-cover bg-center"
                     style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuBKqYQ-lFCKRgrfI4EPnefW878hsy7gNRqQPqj8s8E5Ge1-_XBtng98qY0IAC49HZtbBQbq_Xmm4WmqZTwnBA_u537-Oo3_Bo4ROEj9ufUtCi4z9_rT-JasRis5CI7aU-r4EgoVDyUSSL43L90Fx5kY6QLXVMw6PuhYB_Wpdku2jGXGTXlkeOHm_Q2XgxRygRF4fkXUKJxzjygS0_ITnoHauhzBh15UCG0VN28rIU4wC0Q1FFpiLqZxefa17HrnD0ReSRauHALa7YI")'>
                   </div>
                   <div>
@@ -167,7 +167,7 @@ export default class Retail_Stores_IndexController extends Retail_LayoutControll
                   </div>
                 </div>
                 <div class="flex gap-4 items-center">
-                  <div class="w-16 h-16 rounded-lg bg-gray-100 dark:bg-gray-800 flex-shrink-0 bg-cover bg-center"
+                  <div class="w-16 h-16 rounded-lg bg-gray-100 dark:bg-gray-800 flex shrink-0 bg-cover bg-center"
                     style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuAbXVPxwq9gR05ET4Kg0zCkBedYQjSJZmR3DH8SdyUnxZGoM_metNxBWCUUuSnCOssD-X8VxfXiG9Yn8EfI7K0CBy89bmtD6VOri4Otu7fyWyW17ze__SksK4FO4Nm3RhWu-tuH6YoqZe3BrXGRN0eEcf4YPYy9ZVCVUjpcTsQ7vITeB-vBntfVqWXHEoBs6-F3MNAfRrD6TPd_ulew3ZSwkPOR99c991viv5iDIKdMeoP5NnXZHRFkvdpt45KCw-xhpWJaokfXO-4")'>
                   </div>
                   <div>
@@ -176,7 +176,7 @@ export default class Retail_Stores_IndexController extends Retail_LayoutControll
                   </div>
                 </div>
                 <div class="flex gap-4 items-center">
-                  <div class="w-16 h-16 rounded-lg bg-gray-100 dark:bg-gray-800 flex-shrink-0 bg-cover bg-center"
+                  <div class="w-16 h-16 rounded-lg bg-gray-100 dark:bg-gray-800 flex shrink-0 bg-cover bg-center"
                     style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuC0-OZADNa-IOAewhuFRea32GhnTvSizf8IS7oJQCoW7uVPOToTNdbnfTGSgQdK2_aazL5e3yrXwWx9ytQRzabYngl2KRa100dLvLcWHTf8YH24sSOeI_cUDKZTq154ssb9O_ltPlYsH_elSHIo5jkwQ8hYYdKSESjp5-M_aY2blXiJ1y-xpC-Q0x7GWNq3JGWv52TwBe_bbUyVrAmWaRkl5zg1G8ld4KFLDZxeB_IGkorYr_4N8EAD49G9_7E9KOu9S0MyWLhLHXs")'>
                   </div>
                   <div>

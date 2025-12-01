@@ -1,34 +1,48 @@
 Rails.application.routes.draw do
 
   # Routes for Retail Management
-  namespace :retail do
-    resources :stores
-    resources :departments
-    resources :employees
-    resources :customers
-    resources :products
-    resources :loyalty_programs
-    resources :sales
-    resources :promotions
-    resources :inventories
-    resources :suppliers
-    resources :orders
-    resources :shipments
-    resources :returns
-    resources :reports
-    resources :settings
-    resources :roles
-    resources :tags
-    resources :companies
-    resources :addresses
-    resources :payments
-    resources :invoices
+  resources :retail do
+    # We use 'scope module: :retail' to tell Rails that the controllers
+    # for these resources are located inside the "Retail::" namespace
+    # (e.g., app/controllers/retail/stores_controller.rb).
+    scope module: :retail do
+      resources :stores
+      resources :departments
+      resources :employees
+      resources :customers
+      resources :products
+      resources :loyalty_programs
+      resources :sales
+      resources :promotions
+      resources :inventories
+      resources :suppliers
+      resources :orders
+      resources :shipments
+      resources :returns
+      resources :reports
+      resources :settings
+      resources :roles
+      resources :tags
+      resources :companies
+      resources :addresses
+      resources :payments
+      resources :invoices
+    end
   end
 
   # Routes for School Management
-  namespace :school do
-    resources :schools
-    resources :courses
+  resources :school do
+    # We use 'scope module: :school' to tell Rails that the controllers
+    # for these resources are located inside the "School::" namespace
+    # (e.g., app/controllers/school/schools_controller.rb).
+    scope module: :school do
+      resources :schools
+      resources :courses
+      resources :students
+      resources :teachers
+      resources :classes
+      resources :schedules
+    end
   end
 
   # General Application Routes
