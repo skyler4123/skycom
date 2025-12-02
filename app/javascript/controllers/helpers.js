@@ -91,3 +91,20 @@ export const origin = () => {
 export const timeFormat = (time, format = "DD/MM/YYYY") => {
   return dayjs(time).format(format)
 }
+
+export const openModal = ({html = "Model!", customClass = {}, options = {}}) => {
+  Swal.fire({
+    html: html,
+    showConfirmButton: false,
+    showCloseButton: false,
+    backdrop: true,
+    target: document.querySelector('main'), // Default target
+    customClass: {
+      container: '!bg-transparent',
+      popup: '!p-0 !bg-transparent !w-full',
+      htmlContainer: '!p-0 !overflow-visible',
+      ...customClass
+    },
+    ...options,
+  });
+}
