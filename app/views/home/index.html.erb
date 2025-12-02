@@ -24,6 +24,10 @@
 
 <br>
 <a href="/school/schools">School Management System</a>
+<% Current.company_groups.each do |retail| %>
+  <br>
+  <%= link_to retail.name, retail_stores_path(retail) %>
+<% end %>
 <br>
 
 <%= button_to "Log out", Current.session, method: :delete %>

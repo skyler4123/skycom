@@ -79,6 +79,8 @@ export default class ImgController extends Controller {
     if (previousValue) {
       console.log(`Breakpoint changed from ${previousValue} to ${value}`)
     }
+    if (!this.hasImgTarget) return
+    
     this.initImgTargets().forEach((imgElement) => {
       const srcSet = imgElement.getAttribute("data-srcset")
       if (srcSet) {
