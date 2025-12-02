@@ -13,8 +13,10 @@ export default class LanguageController extends ApplicationController {
   }
 
   initialize() {
-    this.initDictionary();
-    this.initTargets();
+    setTimeout(() => {
+      this.initDictionary();
+      this.initTargets();
+    }, 500);
   }
 
   initDictionary() {
@@ -236,6 +238,146 @@ export default class LanguageController extends ApplicationController {
         fr: "Supprimer",
         de: "Löschen",
         vi: "Xóa",
+      },
+      "Edit": {
+        en: "Edit",
+        es: "Editar",
+        fr: "Éditer",
+        de: "Bearbeiten",
+        vi: "Chỉnh sửa",
+      },
+      "Update": {
+        en: "Update",
+        es: "Actualizar",
+        fr: "Mettre à jour",
+        de: "Aktualisieren",
+        vi: "Cập nhật",
+      },
+      "View": {
+        en: "View",
+        es: "Ver",
+        fr: "Voir",
+        de: "Ansehen",
+        vi: "Xem",
+      },
+      "Back": {
+        en: "Back",
+        es: "Atrás",
+        fr: "Retour",
+        de: "Zurück",
+        vi: "Quay lại",
+      },
+      "Next": {
+        en: "Next",
+        es: "Siguiente",
+        fr: "Suivant",
+        de: "Weiter",
+        vi: "Tiếp theo",
+      },
+      "Previous": {
+        en: "Previous",
+        es: "Anterior",
+        fr: "Précédent",
+        de: "Vorherige",
+        vi: "Trước",
+      },
+      "Submit": {
+        en: "Submit",
+        es: "Enviar",
+        fr: "Soumettre",
+        de: "Einreichen",
+        vi: "Gửi",
+      },
+      "Reset": {
+        en: "Reset",
+        es: "Restablecer",
+        fr: "Réinitialiser",
+        de: "Zurücksetzen",
+        vi: "Đặt lại",
+      },
+      "Language": {
+        en: "Language",
+        es: "Idioma",
+        fr: "Langue",
+        de: "Sprache",
+        vi: "Ngôn ngữ",
+      },
+      "Change Password": {
+        en: "Change Password",
+        es: "Cambiar contraseña",
+        fr: "Changer le mot de passe",
+        de: "Passwort ändern",
+        vi: "Đổi mật khẩu",
+      },
+      "Old Password": {
+        en: "Old Password",
+        es: "Contraseña antigua",
+        fr: "Ancien mot de passe",
+        de: "Altes Passwort",
+        vi: "Mật khẩu cũ",
+      },
+      "New Password": {
+        en: "New Password",
+        es: "Nueva contraseña",
+        fr: "Nouveau mot de passe",
+        de: "Neues Passwort",
+        vi: "Mật khẩu mới",
+      },
+      "Confirm Password": {
+        en: "Confirm Password",
+        es: "Confirmar contraseña",
+        fr: "Confirmer le mot de passe",
+        de: "Passwort bestätigen",
+        vi: "Xác nhận mật khẩu",
+      },
+      "Password": {
+        en: "Password",
+        es: "Contraseña",
+        fr: "Mot de passe",
+        de: "Passwort",
+        vi: "Mật khẩu",
+      },
+      "Username": {
+        en: "Username",
+        es: "Nombre de usuario",
+        fr: "Nom d'utilisateur",
+        de: "Benutzername",
+        vi: "Tên đăng nhập",
+      },
+      "Email": {
+        en: "Email",
+        es: "Correo electrónico",
+        fr: "Email",
+        de: "E-Mail",
+        vi: "Email",
+      },
+      "Phone": {
+        en: "Phone",
+        es: "Teléfono",
+        fr: "Téléphone",
+        de: "Telefon",
+        vi: "Điện thoại",
+      },
+      "Address": {
+        en: "Address",
+        es: "Dirección",
+        fr: "Adresse",
+        de: "Adresse",
+        vi: "Địa chỉ",
+      },
+      "City": {
+        en: "City",
+        es: "Ciudad",
+        fr: "Ville",
+        de: "Stadt",
+        vi: "Thành phố",
+      },
+      "Country": {
+        en: "Country",
+        es: "País",
+        fr: "Pays",
+        de: "Land",
+        vi: "Quốc gia",
       },
     }
   }
