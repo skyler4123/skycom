@@ -133,4 +133,5 @@ class CompanyGroup < ApplicationRecord
   # Validation for operational fields
   # validates :fiscal_year_end_month, presence: true, numericality: { in: 1..12 }
 
+  include CompanyGroup::RetailConcern
 end
