@@ -24,6 +24,8 @@ export default class Retail_LayoutController extends ApplicationController {
   
   headTags() {
     return `
+      <!-- Disable Turbo Prefetching -->
+      <meta name="turbo-prefetch" content="false">
       <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@100..900&amp;display=swap" rel="stylesheet" />
       <link
         href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"
@@ -49,43 +51,43 @@ export default class Retail_LayoutController extends ApplicationController {
             </div>
             <nav class="flex grow p-4">
               <div class="flex flex-col gap-2">
-                <a class="flex items-center gap-3 px-3 py-2 rounded-lg bg-primary/20 text-primary" href="/retail/${currentCompanyGroupId}/stores"/>
+                <a class="flex items-center gap-3 px-3 py-2 rounded-lg bg-primary/20 text-primary" href="/retail/${currentCompanyGroupId()}/stores" ${this.openByPathname()}/>
                   <span class="material-symbols-outlined">dashboard</span>
                   <p class="text-sm font-medium leading-normal">Dashboard</p>
                 </a>
-                <a class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800" href="/retail/${currentCompanyGroupId}/products"/>
+                <a class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800" href="/retail/${currentCompanyGroupId()}/products" ${this.openByPathname()}/>
                   <span class="material-symbols-outlined">inventory_2</span>
                   <p class="text-sm font-medium leading-normal">Product</p>
                 </a>
-                <a class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800" href="/retail/${currentCompanyGroupId}/bookings"/>
+                <a class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800" href="/retail/${currentCompanyGroupId()}/bookings" ${this.openByPathname()}/>
                   <span class="material-symbols-outlined">calendar_month</span>
                   <p class="text-sm font-medium leading-normal">Booking</p>
                 </a>
-                <a class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800" href="/retail/${currentCompanyGroupId}/payments"/>
+                <a class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800" href="/retail/${currentCompanyGroupId()}/payments" ${this.openByPathname()}/>
                   <span class="material-symbols-outlined">payments</span>
                   <p class="text-sm font-medium leading-normal">Payment</p>
                 </a>
-                <a class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800" href="/retail/${currentCompanyGroupId}/employees"/>
+                <a class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800" href="/retail/${currentCompanyGroupId()}/employees" ${this.openByPathname()}/>
                   <span class="material-symbols-outlined">groups</span>
                   <p class="text-sm font-medium leading-normal">Employee</p>
                 </a>
-                <a class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800" href="/retail/${currentCompanyGroupId}/inventory"/>
+                <a class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800" href="/retail/${currentCompanyGroupId()}/inventory" ${this.openByPathname()}/>
                   <span class="material-symbols-outlined">inventory</span>
                   <p class="text-sm font-medium leading-normal">Inventory</p>
                 </a>
-                <a class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800" href="/retail/${currentCompanyGroupId}/sales"/>
+                <a class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800" href="/retail/${currentCompanyGroupId()}/sales" ${this.openByPathname()}/>
                   <span class="material-symbols-outlined">add_shopping_cart</span>
                   <p class="text-sm font-medium leading-normal">Sales</p>
                 </a>
-                <a class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800" href="/retail/${currentCompanyGroupId}/customers"/>
+                <a class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800" href="/retail/${currentCompanyGroupId()}/customers" ${this.openByPathname()}/>
                   <span class="material-symbols-outlined">person_add</span>
                   <p class="text-sm font-medium leading-normal">Customer</p>
                 </a>
-                <a class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800" href="/retail/${currentCompanyGroupId}/invoices"/>
+                <a class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800" href="/retail/${currentCompanyGroupId()}/invoices" ${this.openByPathname()}/>
                   <span class="material-symbols-outlined">receipt_long</span>
                   <p class="text-sm font-medium leading-normal">Invoices</p>
                 </a>
-                <a class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800" href="/retail/${currentCompanyGroupId}/reports"/>
+                <a class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800" href="/retail/${currentCompanyGroupId()}/reports" ${this.openByPathname()}/>
                   <span class="material-symbols-outlined">bar_chart</span>
                   <p class="text-sm font-medium leading-normal">Reports</p>
                 </a>

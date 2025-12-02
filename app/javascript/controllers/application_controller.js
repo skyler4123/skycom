@@ -21,5 +21,14 @@ export default class ApplicationController extends Controller {
     if (isDefined(this.initLayout)) { this.initLayout() }
     if (isDefined(this.init)) { this.init() }
   }
+
+  openByPathname() {
+    // to be implemented in LinkController
+    return `data-link-target="openByPathname"`
+  }
+
+  translate(key) {
+    return `data-language-key="${key}"`
+  }
   
 }
