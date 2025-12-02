@@ -40,7 +40,31 @@ class Role < ApplicationRecord
     technical: 2, 
     support: 3 
   }
-  
+  # --- Model Types Enum ---
+  enum :model_type, {
+    global: 0,
+    company_group: 1,
+    comapny: 2,
+    employee_group: 3,
+    employee: 4,
+    facility_group: 5,
+    facility: 6,
+    service_group: 7,
+    service: 8,
+    product_group: 9,
+    product: 10,
+    customer_group: 11,
+    customer: 12,
+    order: 13,
+    period: 14,
+    payment_method_appointment: 15,
+    task_group: 16,
+    project_group: 17,
+    cart_group: 18,
+    notification_group: 19,
+    payment_method: 20
+  }
+
   # --- Validations ---
   validates :name,
           presence: true,

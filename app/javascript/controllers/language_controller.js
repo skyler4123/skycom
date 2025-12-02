@@ -55,96 +55,187 @@ export default class LanguageController extends ApplicationController {
 
   dictionary() {
     return {
-      hello: {
+      "Hello": {
         en: "Hello",
         es: "Hola",
         fr: "Bonjour",
         de: "Hallo",
         vi: "Xin chào",
       },
-      welcome_message: {
+      "Hello!": {
+        en: "Hello!",
+        es: "¡Hola!",
+        fr: "Bonjour!",
+        de: "Hallo!",
+        vi: "Xin chào!",
+      },
+      "Welcome to our application!": {
         en: "Welcome to our application!",
         es: "¡Bienvenido a nuestra aplicación!",
         fr: "Bienvenue dans notre application!",
         de: "Willkommen in unserer Anwendung!",
         vi: "Chào mừng bạn đến với ứng dụng của chúng tôi!",
       },
-      logout: {
+      "Logout": {
         en: "Logout",
         es: "Cerrar sesión",
         fr: "Se déconnecter",
         de: "Abmelden",
         vi: "Đăng xuất",
       },
-      login: {
+      "Login": {
         en: "Login",
         es: "Iniciar sesión",
         fr: "Se connecter",
         de: "Anmelden",
         vi: "Đăng nhập",
       },
-      product: {
+      "Product": {
         en: "Product",
         es: "Producto",
         fr: "Produit",
         de: "Produkt",
         vi: "Sản phẩm",
       },
-      dashboard: {
+      "Dashboard": {
         en: "Dashboard",
         es: "Tablero",
         fr: "Tableau de bord",
         de: "Instrumententafel",
         vi: "Bảng điều khiển",
       },
-      employees: {
+      "Employees": {
         en: "Employees",
         es: "Empleados",
         fr: "Employés",
         de: "Mitarbeiter",
         vi: "Nhân viên",
       },
-      bookings: {
+      "Bookings": {
         en: "Bookings",
         es: "Reservas",
         fr: "Réservations",
         de: "Buchungen",
         vi: "Đặt chỗ",
       },
-      payments: {
+      "Payments": {
         en: "Payments",
         es: "Pagos",
         fr: "Paiements",
         de: "Zahlungen",
         vi: "Thanh toán",
       },
-      invoices: {
+      "Invoices": {
         en: "Invoices",
         es: "Facturas",
         fr: "Factures",
         de: "Rechnungen",
         vi: "Hóa đơn",
       },
-      reports: {
+      "Reports": {
         en: "Reports",
         es: "Informes",
         fr: "Rapports",
         de: "Berichte",
         vi: "Báo cáo",
       },
-      settings: {
+      "Settings": {
         en: "Settings",
         es: "Configuraciones",
         fr: "Paramètres",
         de: "Einstellungen",
         vi: "Cài đặt",
       },
-      categories: {
+      "Categories": {
         en: "Categories",
         es: "Categorías",
         fr: "Catégories",
         de: "Kategorien",
         vi: "Danh mục",
+      },
+      "Customers": {
+        en: "Customers",
+        es: "Clientes",
+        fr: "Clients",
+        de: "Kunden",
+        vi: "Khách hàng",
+      },
+      "Sales": {
+        en: "Sales",
+        es: "Ventas",
+        fr: "Ventes",
+        de: "Verkäufe",
+        vi: "Bán hàng",
+      },
+      "Inventory": {
+        en: "Inventory",
+        es: "Inventario",
+        fr: "Inventaire",
+        de: "Inventar",
+        vi: "Hàng tồn kho",
+      },
+      "Add New": {
+        en: "Add New",
+        es: "Agregar nuevo",
+        fr: "Ajouter nouveau",
+        de: "Neu hinzufügen",
+        vi: "Thêm mới",
+      },
+      "Search": {
+        en: "Search",
+        es: "Buscar",
+        fr: "Chercher",
+        de: "Suchen",
+        vi: "Tìm kiếm",
+      },
+      "Profile": {
+        en: "Profile",
+        es: "Perfil",
+        fr: "Profil",
+        de: "Profil",
+        vi: "Hồ sơ",
+      },
+      "Notifications": {
+        en: "Notifications",
+        es: "Notificaciones",
+        fr: "Notifications",
+        de: "Benachrichtigungen",
+        vi: "Thông báo",
+      },
+      "Help": {
+        en: "Help",
+        es: "Ayuda",
+        fr: "Aide",
+        de: "Hilfe",
+        vi: "Trợ giúp",
+      },
+      "Contact Support": {
+        en: "Contact Support",
+        es: "Contactar soporte",
+        fr: "Contacter le support",
+        de: "Support kontaktieren",
+        vi: "Liên hệ hỗ trợ",
+      },
+      "Save": {
+        en: "Save",
+        es: "Guardar",
+        fr: "Enregistrer",
+        de: "Speichern",
+        vi: "Lưu",
+      },
+      "Cancel": {
+        en: "Cancel",
+        es: "Cancelar",
+        fr: "Annuler",
+        de: "Abbrechen",
+        vi: "Hủy",
+      },
+      "Delete": {
+        en: "Delete",
+        es: "Eliminar",
+        fr: "Supprimer",
+        de: "Löschen",
+        vi: "Xóa",
       },
     }
   }

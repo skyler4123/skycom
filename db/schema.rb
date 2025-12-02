@@ -784,7 +784,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_12_01_153048) do
     t.integer "currency"
     t.integer "duration"
     t.string "number"
-    t.string "total"
+    t.decimal "total_price"
     t.datetime "due_date"
     t.integer "status"
     t.integer "business_type"
@@ -1383,6 +1383,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_12_01_153048) do
   create_table "roles", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.uuid "company_group_id", null: false
     t.uuid "company_id"
+    t.integer "model_type"
     t.string "name"
     t.string "description"
     t.string "code"

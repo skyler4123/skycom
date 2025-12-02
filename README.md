@@ -52,7 +52,7 @@ Things you may want to cover:
   bundle exec rails g scaffold TagAppointment tag:references appoint_from:references{polymorphic} appoint_to:references{polymorphic} appoint_for:references{polymorphic} appoint_by:references{polymorphic} value description --force
 
   ### HR / Permission Management
-  bundle exec rails g scaffold Role company_group:references company:references name description code status:integer business_type:integer discarded_at:datetime:index --force
+  bundle exec rails g scaffold Role company_group:references company:references model_type:integer name description code status:integer business_type:integer discarded_at:datetime:index --force
   bundle exec rails g scaffold Policy company_group:references company:references name description code resource action status:integer business_type:integer discarded_at:datetime:index --force
   bundle exec rails g scaffold PolicyAppointment policy:references appoint_to:references{polymorphic} name description code status:integer business_type:integer discarded_at:datetime:index --force
   bundle exec rails g scaffold RoleAppointment role:references appoint_to:references{polymorphic} name description code status:integer business_type:integer discarded_at:datetime:index --force
@@ -111,7 +111,7 @@ Things you may want to cover:
   bundle exec rails g scaffold Promotion name
 
   ### Billing & Payments
-  bundle exec rails g scaffold Invoice order:references name description code currency:integer duration:integer number total due_date:datetime status:integer business_type:integer discarded_at:datetime:index --force
+  bundle exec rails g scaffold Invoice order:references name description code currency:integer duration:integer number total_price:decimal due_date:datetime status:integer business_type:integer discarded_at:datetime:index --force
   bundle exec rails g scaffold Payment invoice:references name description code currency:integer duration:integer exchange_rate:decimal amount:decimal payment_method gateway_details status:integer business_type:integer discarded_at:datetime:index --force
   bundle exec rails g scaffold PaymentMethod name description code currency:integer status:integer business_type:integer discarded_at:datetime:index --force
   bundle exec rails g scaffold PaymentMethodAppointment payment_method:references company_group:references company:references name description code status:integer business_type:integer discarded_at:datetime:index --force
@@ -174,7 +174,9 @@ Things you may want to cover:
   bundle exec rails g scaffold SettingAppointment setting:references appoint_from:references{polymorphic} appoint_to:references{polymorphic} appoint_for:references{polymorphic} appoint_by:references{polymorphic} name description code status:integer business_type:integer discarded_at:datetime:index --force
 
   ### Pricing
-  bundle exec rails g scaffold Pricing
+  bundle exec rails g scaffold Pricing country:integer region:integer nation:integer name description price:decimal code status:integer business_type:integer discarded_at:datetime:index --force
+  bundle exec rails g scaffold PricingAppointment pricing:references appoint_from:references{polymorphic} appoint_to:references{polymorphic} appoint_for:references{polymorphic} appoint_by:references{polymorphic} name description code status:integer business_type:integer discarded_at:datetime:index --force
+
 
   ### Content & Knowledge Management
   bundle exec rails g scaffold Article

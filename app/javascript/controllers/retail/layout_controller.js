@@ -35,6 +35,7 @@ export default class Retail_LayoutController extends ApplicationController {
     return `
       <div class="font-display bg-background-light dark:bg-background-dark text-gray-800 dark:text-gray-200">
         <div class="flex h-screen">
+          <!-- Sidebar -->
           <aside
             class="w-64 shrink-0 bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800 flex flex-col">
             <div class="p-6 flex items-center gap-3 border-b border-gray-200 dark:border-gray-800">
@@ -103,7 +104,10 @@ export default class Retail_LayoutController extends ApplicationController {
               </div>
             </div>
           </aside>
+          <!-- End Sidebar -->
+          <!-- Main Content -->
           <main class="flex-1 flex flex-col overflow-auto">
+            <!-- Header -->
             <header
               class="shrink-0 flex items-center justify-between whitespace-nowrap border-b border-gray-200 dark:border-gray-800 px-8 py-4 bg-white dark:bg-gray-900">
               <div class="flex items-center gap-8">
@@ -134,8 +138,12 @@ export default class Retail_LayoutController extends ApplicationController {
                 </div>
               </div>
             </header>
+            <!-- End Header -->
+            <!-- Main Content -->
             ${this.contentHTML()}
+            <!-- End Main Content -->
           </main>
+          <!-- End Main Content -->
         </div>
       </div>
     `
