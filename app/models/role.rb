@@ -63,7 +63,7 @@ class Role < ApplicationRecord
     cart_group: 18,
     notification_group: 19,
     payment_method: 20
-  }
+  }, prefix: :model_type
 
   # --- Validations ---
   validates :name,

@@ -71,6 +71,10 @@ export const avatar = () => {
   return Cookie('avatar')
 }
 
+export const currentCompanyGroupId = () => {
+  return Cookie('current_company_group_id')
+}
+
 
 export const pathname = () => {
   return window.location.pathname
