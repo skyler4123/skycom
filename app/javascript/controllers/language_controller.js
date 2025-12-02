@@ -13,8 +13,10 @@ export default class LanguageController extends ApplicationController {
   }
 
   initialize() {
+    // Initialize dictionary early because updateTranslations need it, so the another controller can override it before connect
+    this.initDictionary();
+
     setTimeout(() => {
-      this.initDictionary();
       this.initTargets();
     }, 500);
   }
