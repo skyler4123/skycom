@@ -127,6 +127,10 @@ export default class Retail_LayoutController extends ApplicationController {
               </div>
               <div class="flex flex-1 justify-end gap-4 items-center">
                 <button
+                  class="flex cursor-pointer items-center justify-center overflow-hidden rounded-full h-10 w-10 p-2 hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-600 dark:text-gray-300"
+                  ${this.darkmode()}
+                </button>
+                <button
                   class="flex cursor-pointer items-center justify-center overflow-hidden rounded-full h-10 w-10 hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-600 dark:text-gray-300">
                   <span>EN</span>
                 </button>

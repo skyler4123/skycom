@@ -31,4 +31,7 @@ export default class ApplicationController extends Controller {
     return `data-language-key="${key}"`
   }
   
+  darkmode() {
+    return `data-controller="darkmode"`
+  }
 }
