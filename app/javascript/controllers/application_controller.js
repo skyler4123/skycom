@@ -22,15 +22,17 @@ export default class ApplicationController extends Controller {
     if (isDefined(this.init)) { this.init() }
   }
 
+  // to be implemented in LinkController
   openByPathname() {
-    // to be implemented in LinkController
     return `data-link-target="openByPathname"`
   }
 
+  // to be implemented in LanguageController
   translate(key) {
     return `data-language-key="${key}"`
   }
   
+  // to be implemented in DarkmodeController
   darkmode() {
     return `data-controller="darkmode"`
   }

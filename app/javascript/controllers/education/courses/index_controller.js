@@ -1,6 +1,6 @@
 import LayoutController from "controllers/layout_controller"
 
-export default class School_Courses_IndexController extends LayoutController {
+export default class Education_Courses_IndexController extends LayoutController {
 
 
   contentHTML() {

@@ -31,17 +31,37 @@ Rails.application.routes.draw do
   end
 
   # Routes for School Management
-  resources :school do
-    # We use 'scope module: :school' to tell Rails that the controllers
-    # for these resources are located inside the "School::" namespace
-    # (e.g., app/controllers/school/schools_controller.rb).
-    scope module: :school do
+  resources :education do
+    # We use 'scope module: :education' to tell Rails that the controllers
+    # for these resources are located inside the "Education::" namespace
+    # (e.g., app/controllers/education/schools_controller.rb).
+    scope module: :education do
       resources :schools
       resources :courses
       resources :students
       resources :teachers
       resources :classes
       resources :schedules
+    end
+  end
+
+  # Routes for Hospital Management
+  resources :hospital do
+    # We use 'scope module: :hospital' to tell Rails that the controllers
+    # for these resources are located inside the "Hospital::" namespace
+    # (e.g., app/controllers/hospital/patients_controller.rb).
+    scope module: :hospital do
+      resources :patients
+      resources :doctors
+      resources :appointments
+      resources :medical_records
+      resources :prescriptions
+      resources :departments
+      resources :staffs
+      resources :billings
+      resources :insurances
+      resources :labs
+      resources :pharmacies
     end
   end
 

@@ -62,7 +62,7 @@ class CompanyGroup < ApplicationRecord
   clinic: 2003,
   
   # Group 4: Education (3000-3999)
-  school: 3000,
+  education: 3000,
   university: 3001,
   english_center: 3002,
   
@@ -134,4 +134,7 @@ class CompanyGroup < ApplicationRecord
   # validates :fiscal_year_end_month, presence: true, numericality: { in: 1..12 }
 
   include CompanyGroup::RetailConcern
+  include CompanyGroup::EducationConcern
+  include CompanyGroup::HospitalConcern
+  include CompanyGroup::RestaurantConcern
 end

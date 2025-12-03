@@ -1,4 +1,4 @@
-class Seed::SchoolService
+class Seed::EducationService
   # Define the number of employees to create for each role
   EMPLOYEE_COUNTS = {
     principal: 1,
@@ -13,14 +13,14 @@ class Seed::SchoolService
     student: 10
   }.freeze
 
-  # Define the standard roles to be created for each school
-  SCHOOL_ROLES = (EMPLOYEE_COUNTS.keys + CUSTOMER_COUNTS.keys).freeze
+  # Define the standard roles to be created for each education
+  EDUCATION_ROLES = (EMPLOYEE_COUNTS.keys + CUSTOMER_COUNTS.keys).freeze
 
-  COMPANY_GROUP_BUSINESS_TYPE = :school
+  COMPANY_GROUP_BUSINESS_TYPE = :education
 
   def initialize(user:)
     @multi_company_group_owner = user
-    @school_group = nil
+    @education = nil
     @schools = []
     @school_classes = []
     @courses = []
@@ -34,50 +34,48 @@ class Seed::SchoolService
   end
 
   def seeding
-    puts "\n\n🏫 Starting School Company Group Seeding..."
+    puts "\n\n🏫 Starting Education Seeding..."
     puts "========================================================="
 
-    # --- 1. Create School Company Group ---
-    puts "Creating 1 school company group..."
-    @school_group = Seed::CompanyGroupService.create(
+    # --- 1. Create Education ---
+    puts "Creating 1 education..."
+    @education = Seed::CompanyGroupService.create(
       user: @multi_company_group_owner,
-      name: "School Company Group #{rand(1000..9999)}",
-      description: "A group for multiple school companies",
+      name: "Education #{rand(1000..9999)}",
+      description: "A group for multiple schools and educational institutions.",
       business_type: COMPANY_GROUP_BUSINESS_TYPE
     )
-    puts "Created school company group: #{@school_group.name}"
+    puts "Created education: #{@education.name}"
 
-    #--- 2. Create Schools (Companies) under the Company Group ---
+    #--- 2. Create Schools (Companies) under the Education ---
     school_count = 2
-    puts "Creating #{school_count} schools under the company group..."
+    puts "Creating #{school_count} schools under the education..."
     school_count.times do |i|
       school = Seed::CompanyService.create(
         name: "School #{i + 1}",
         description: "Description for School #{i + 1}",
         parent_company: nil,
-        company_group: @school_group
+        company_group: @education
       )
       school.attach_tag(name: "School #{school.id} Tag")
       @schools << school
     end
-    puts "Created #{@schools.count} schools under the company group."
+    puts "Created #{@schools.count} schools under the education."
 
-    #--- 3. Create Payment Method Appointments for Schools (Companies) ---
-    @schools.each do |school|
-      2.times do
-        Seed::PaymentMethodAppointmentService.create(
-          company_group: @school_group,
-        )
-      end
+    #--- 3. Create Payment Method Appointments for Education (CompanyGroup) ---
+    2.times do
+      Seed::PaymentMethodAppointmentService.create(
+        company_group: @education,
+      )
     end
-    puts "Appointed some payment methods to each school."
+    puts "Appointed some payment methods to education"
 
-    # --- 4. Create School Roles + Custom Roles ---
-    SCHOOL_ROLES.each do |role_name|
+    # --- 4. Create Education Roless ---
+    EDUCATION_ROLES.each do |role_name|
       Seed::RoleService.create(
-        company_group: @school_group,
+        company_group: @education,
         name: role_name,
-        description: "#{role_name} role for #{@school_group.name}"
+        description: "#{role_name} role for #{@education.name}"
       )
     end
     # --- 5. Create Departments (Empoylee Groups) for Each School (Company) ---
@@ -85,7 +83,7 @@ class Seed::SchoolService
       puts "Creating departments for #{school.name}..."
       ['Science Department', 'Math Department', 'Arts Department', 'Sports Department'].each do |dept_name|
         department = Seed::EmployeeGroupService.create(
-          company_group: @school_group,
+          company_group: @education,
           company: school,
           name: dept_name,
           description: "Department: #{dept_name} in #{school.name}"
@@ -105,7 +103,7 @@ class Seed::SchoolService
           user = Seed::UserService.create(parent_user: @multi_company_group_owner, email: "#{role_name.downcase}_#{i + 1}_#{school.id}@example.com")
           employee = Seed::EmployeeService.create(
             user: user,
-            company_group: @school_group,
+            company_group: @education,
             company: school,
             name: "Employee #{i + 1} - #{role_name.to_s.capitalize}",
             description: "Description for Employee #{i + 1} - #{role_name.to_s.capitalize}"
@@ -144,7 +142,7 @@ class Seed::SchoolService
           user = Seed::UserService.create(parent_user: @multi_company_group_owner, email: "student_#{i + 1}_#{school.id}@example.com")
           student = Seed::CustomerService.create(
             user: user,
-            company_group: @school_group,
+            company_group: @education,
             company: school,
             name: "Student #{i + 1}",
             description: "Description for Student #{i + 1}"
@@ -162,7 +160,7 @@ class Seed::SchoolService
       puts "Creating classes and enrolling students for #{school.name}..."
       3.times do |i|
         klass = Seed::CustomerGroupService.create(
-          company_group: @school_group,
+          company_group: @education,
           company: school,
           name: "Class #{i + 1} - #{school.name}",
           description: "Description for Class #{i + 1} in #{school.name}"
@@ -182,12 +180,12 @@ class Seed::SchoolService
       puts "Created classes and enrolled students for #{school.name}."
     end
 
-    # --- 10. Create some Rooms (Facilities) for Each School ---
+    # --- 10. Create some Rooms (Facilities) for Each School (Company) ---
     @schools.each do |school|
       puts "Creating rooms for #{school.name}..."
       5.times do |i|
         room = Seed::FacilityService.create(
-          company_group: @school_group,
+          company_group: @education,
           company: school,
           name: "Room #{i + 1} - #{school.name}",
           description: "Description for Room #{i + 1} in #{school.name}"
@@ -197,12 +195,12 @@ class Seed::SchoolService
       puts "Created some rooms for #{school.name}."
     end
 
-    # --- 10. Create some Courses (Services) for Each School ---
+    # --- 10. Create some Courses (Services) for Each School (Company) ---
     @schools.each do |school|
       puts "Creating courses for #{school.name}..."
       4.times do |i|
         course = Seed::ServiceService.create(
-          company_group: @school_group,
+          company_group: @education,
           company: school,
           name: "Course #{i + 1} - #{school.name}",
           description: "Description for Course #{i + 1} in #{school.name}"
@@ -259,7 +257,7 @@ class Seed::SchoolService
 
 
     puts "\n========================================================="
-    puts "🏫 School Company Group Seeding Complete!"
+    puts "🏫 Education Seeding Complete!"
     puts "========================================================="
     true
   end
@@ -287,28 +285,28 @@ class Seed::SchoolService
   # end
 
   # def seed
-  #   puts "\n\n🏫 Starting School Seeding..."
+  #   puts "\n\n🏫 Starting Education Seeding..."
   #   puts "========================================================="
 
-  #   # --- 1. Create School Owners (User) ---
+  #   # --- 1. Create Education Owners (User) ---
   #   puts "Creating 1 school owner..."
   #   @company_business_type = User.COMPANY_GROUP_BUSINESS_TYPES[:school]
   #   @multi_company_group_owner = Seed::UserService.create(email: @owner_email, company_business_type: @company_business_type)
 
-  #   #--- 2. Create Schools (Company) ---
+  #   #--- 2. Create Educations (Company) ---
   #   puts "Creating #{@school_count} schools..."
   #   @school_count.times do |i|
   #     school = Seed::CompanyService.create(
   #       user: @multi_company_group_owner,
-  #       name: "School #{i + 1}",
-  #       description: "Description for School #{i + 1}",
+  #       name: "Education #{i + 1}",
+  #       description: "Description for Education #{i + 1}",
   #       parent_company: nil
   #     )
   #     @schools << school
   #   end
   #   puts "Created #{@schools.count} schools."
     
-  #   # --- 3. Create Payment Method Appointments for Schools (Companies) ---
+  #   # --- 3. Create Payment Method Appointments for Educations (Companies) ---
   #   @schools.each do |school|
   #     2.times do
   #       Seed::PaymentMethodAppointmentService.create(
@@ -318,7 +316,7 @@ class Seed::SchoolService
   #   end
   #   puts "Appointed some payment methods to each school."
 
-  #   # --- 4. Create School Roles + Custom Roles ---
+  #   # --- 4. Create Education Roles + Custom Roles ---
   #   SCHOOL_ROLES.each do |role_name|
   #     @schools.each do |school|
   #       Seed::RoleService.create(
@@ -329,7 +327,7 @@ class Seed::SchoolService
   #     end
   #   end
 
-  #   # --- 5. Create Employees for Each School (Company) ---
+  #   # --- 5. Create Employees for Each Education (Company) ---
   #   @schools.each do |school|
   #     puts "Creating employees for #{school.name}..."
   #     EMPLOYEE_COUNTS.each do |role_name, count|
@@ -347,7 +345,7 @@ class Seed::SchoolService
   #     puts "Created #{@employees.count} employees for #{school.name}."
   #   end
 
-  #   # --- 6. Create Customers (Students) for Each School (Company) ---
+  #   # --- 6. Create Customers (Students) for Each Education (Company) ---
   #   @schools.each do |school|
   #     puts "Creating customers (students) for #{school.name}..."
   #     CUSTOMER_COUNTS.each do |role_name, count|
@@ -420,7 +418,7 @@ class Seed::SchoolService
   #     end
   #     puts "Assigned teachers to courses for #{school.name}."
 
-  #     # --- 10. Create some Rooms (Facilities) for Each School ---
+  #     # --- 10. Create some Rooms (Facilities) for Each Education ---
   #     puts "Creating rooms for #{school.name}..."
   #     5.times do |i|
   #       room = Seed::FacilityService.create(
@@ -451,7 +449,7 @@ class Seed::SchoolService
 
 
   #   puts "\n========================================================="
-  #   puts "🏫 School Seeding Complete!"
+  #   puts "🏫 Education Seeding Complete!"
   #   puts "========================================================="
   #   true
   # end

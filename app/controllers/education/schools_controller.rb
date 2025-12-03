@@ -1,4 +1,4 @@
-class School::SchoolsController < School::ApplicationController
+class Education::SchoolsController < Education::ApplicationController
   # before_action :set_company, only: %i[ show edit update destroy ]
 
   # GET /companies or /companies.json

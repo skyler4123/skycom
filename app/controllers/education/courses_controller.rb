@@ -1,4 +1,4 @@
-class School::CoursesController < School::ApplicationController
+class Education::CoursesController < Education::ApplicationController
   # before_action :set_service, only: %i[ show edit update destroy ]
 
   # GET /services or /services.json

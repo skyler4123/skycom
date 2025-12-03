@@ -1,9 +1,45 @@
 import Retail_LayoutController from "controllers/retail/layout_controller"
+// import { computePosition } from "@floating-ui/dom";
+import {computePosition} from 'https://cdn.jsdelivr.net/npm/@floating-ui/dom@1.7.4/+esm';
 
 export default class Retail_Stores_IndexController extends Retail_LayoutController {
 
+  init() {
+    const button = document.querySelector('#button');
+    const tooltip = document.querySelector('#tooltip');
+    computePosition(button, tooltip, {
+      placement: 'right',
+    }).then(({ x, y }) => {
+      Object.assign(tooltip.style, {
+        left: `${x}px`,
+        top: `${y}px`,
+      });
+    });
+  }
+
   contentHTML() {
     return `
+    <button id="button">Click Me for Tooltip</button>
+
+<div id="tooltip" style="display: none;">
+  Tooltip Content
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
       <div class="p-8 overflow-y-auto">
         <div class="flex flex-wrap justify-between gap-3 mb-8">
           <div class="flex flex-col gap-1">
