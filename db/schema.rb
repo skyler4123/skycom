@@ -103,6 +103,11 @@ ActiveRecord::Schema[8.0].define(version: 2025_12_01_153048) do
     t.uuid "appoint_from_id"
     t.string "appoint_to_type", null: false
     t.uuid "appoint_to_id", null: false
+    t.integer "education_type"
+    t.integer "hospital_type"
+    t.integer "hotel_type"
+    t.integer "restaurant_type"
+    t.integer "retail_type"
     t.string "name"
     t.string "description"
     t.string "code"
@@ -159,6 +164,11 @@ ActiveRecord::Schema[8.0].define(version: 2025_12_01_153048) do
   create_table "cart_groups", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.uuid "company_group_id", null: false
     t.uuid "company_id"
+    t.integer "education_type"
+    t.integer "hospital_type"
+    t.integer "hotel_type"
+    t.integer "restaurant_type"
+    t.integer "retail_type"
     t.string "name"
     t.string "description"
     t.string "code"
@@ -176,6 +186,11 @@ ActiveRecord::Schema[8.0].define(version: 2025_12_01_153048) do
     t.uuid "company_group_id", null: false
     t.uuid "company_id"
     t.uuid "cart_group_id", null: false
+    t.integer "education_type"
+    t.integer "hospital_type"
+    t.integer "hotel_type"
+    t.integer "restaurant_type"
+    t.integer "retail_type"
     t.string "name"
     t.string "description"
     t.string "code"
@@ -572,6 +587,11 @@ ActiveRecord::Schema[8.0].define(version: 2025_12_01_153048) do
   create_table "facilities", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.uuid "company_group_id", null: false
     t.uuid "company_id"
+    t.integer "education_type"
+    t.integer "hospital_type"
+    t.integer "hotel_type"
+    t.integer "restaurant_type"
+    t.integer "retail_type"
     t.string "name"
     t.string "description"
     t.string "code"
@@ -640,6 +660,11 @@ ActiveRecord::Schema[8.0].define(version: 2025_12_01_153048) do
   create_table "facility_groups", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.uuid "company_group_id", null: false
     t.uuid "company_id"
+    t.integer "education_type"
+    t.integer "hospital_type"
+    t.integer "hotel_type"
+    t.integer "restaurant_type"
+    t.integer "retail_type"
     t.string "name"
     t.string "description"
     t.string "code"
@@ -656,6 +681,11 @@ ActiveRecord::Schema[8.0].define(version: 2025_12_01_153048) do
   create_table "inventories", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.uuid "company_group_id", null: false
     t.uuid "company_id"
+    t.integer "education_type"
+    t.integer "hospital_type"
+    t.integer "hotel_type"
+    t.integer "restaurant_type"
+    t.integer "retail_type"
     t.string "name"
     t.string "description"
     t.string "code"
@@ -697,6 +727,11 @@ ActiveRecord::Schema[8.0].define(version: 2025_12_01_153048) do
 
   create_table "inventory_items", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.uuid "inventory_id", null: false
+    t.integer "education_type"
+    t.integer "hospital_type"
+    t.integer "hotel_type"
+    t.integer "restaurant_type"
+    t.integer "retail_type"
     t.string "name"
     t.string "description"
     t.string "code"
@@ -759,6 +794,11 @@ ActiveRecord::Schema[8.0].define(version: 2025_12_01_153048) do
     t.uuid "appoint_for_id"
     t.string "appoint_by_type"
     t.uuid "appoint_by_id"
+    t.integer "education_type"
+    t.integer "hospital_type"
+    t.integer "hotel_type"
+    t.integer "restaurant_type"
+    t.integer "retail_type"
     t.string "name"
     t.string "description"
     t.string "code"
@@ -778,6 +818,11 @@ ActiveRecord::Schema[8.0].define(version: 2025_12_01_153048) do
 
   create_table "invoices", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.uuid "order_id", null: false
+    t.integer "education_type"
+    t.integer "hospital_type"
+    t.integer "hotel_type"
+    t.integer "restaurant_type"
+    t.integer "retail_type"
     t.string "name"
     t.string "description"
     t.string "code"
@@ -943,6 +988,11 @@ ActiveRecord::Schema[8.0].define(version: 2025_12_01_153048) do
     t.uuid "company_group_id", null: false
     t.uuid "company_id"
     t.uuid "customer_id", null: false
+    t.integer "education_type"
+    t.integer "hospital_type"
+    t.integer "hotel_type"
+    t.integer "restaurant_type"
+    t.integer "retail_type"
     t.string "name"
     t.string "description"
     t.string "code"
@@ -963,6 +1013,11 @@ ActiveRecord::Schema[8.0].define(version: 2025_12_01_153048) do
     t.uuid "company_group_id", null: false
     t.uuid "company_id"
     t.uuid "customer_id", null: false
+    t.integer "education_type"
+    t.integer "hospital_type"
+    t.integer "hotel_type"
+    t.integer "restaurant_type"
+    t.integer "retail_type"
     t.string "name"
     t.string "description"
     t.string "code"
@@ -1025,6 +1080,11 @@ ActiveRecord::Schema[8.0].define(version: 2025_12_01_153048) do
 
   create_table "payments", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.uuid "invoice_id", null: false
+    t.integer "education_type"
+    t.integer "hospital_type"
+    t.integer "hotel_type"
+    t.integer "restaurant_type"
+    t.integer "retail_type"
     t.string "name"
     t.string "description"
     t.string "code"
@@ -1174,6 +1234,11 @@ ActiveRecord::Schema[8.0].define(version: 2025_12_01_153048) do
   create_table "product_groups", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.uuid "company_group_id", null: false
     t.uuid "company_id"
+    t.integer "education_type"
+    t.integer "hospital_type"
+    t.integer "hotel_type"
+    t.integer "restaurant_type"
+    t.integer "retail_type"
     t.string "name"
     t.string "description"
     t.string "code"
@@ -1191,6 +1256,11 @@ ActiveRecord::Schema[8.0].define(version: 2025_12_01_153048) do
     t.uuid "company_group_id", null: false
     t.uuid "company_id"
     t.uuid "brand_id"
+    t.integer "education_type"
+    t.integer "hospital_type"
+    t.integer "hotel_type"
+    t.integer "restaurant_type"
+    t.integer "retail_type"
     t.string "name"
     t.string "description"
     t.string "code"
@@ -1273,6 +1343,11 @@ ActiveRecord::Schema[8.0].define(version: 2025_12_01_153048) do
   create_table "project_groups", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.uuid "company_group_id", null: false
     t.uuid "company_id"
+    t.integer "education_type"
+    t.integer "hospital_type"
+    t.integer "hotel_type"
+    t.integer "restaurant_type"
+    t.integer "retail_type"
     t.string "name"
     t.string "description"
     t.string "code"
@@ -1290,6 +1365,11 @@ ActiveRecord::Schema[8.0].define(version: 2025_12_01_153048) do
     t.uuid "company_group_id", null: false
     t.uuid "company_id"
     t.uuid "project_group_id", null: false
+    t.integer "education_type"
+    t.integer "hospital_type"
+    t.integer "hotel_type"
+    t.integer "restaurant_type"
+    t.integer "retail_type"
     t.string "name"
     t.string "description"
     t.string "code"
@@ -1306,6 +1386,11 @@ ActiveRecord::Schema[8.0].define(version: 2025_12_01_153048) do
 
   create_table "purchase_items", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.uuid "purchase_id", null: false
+    t.integer "education_type"
+    t.integer "hospital_type"
+    t.integer "hotel_type"
+    t.integer "restaurant_type"
+    t.integer "retail_type"
     t.string "name"
     t.string "description"
     t.string "code"
@@ -1334,6 +1419,11 @@ ActiveRecord::Schema[8.0].define(version: 2025_12_01_153048) do
   create_table "purchases", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.uuid "company_group_id", null: false
     t.uuid "company_id"
+    t.integer "education_type"
+    t.integer "hospital_type"
+    t.integer "hotel_type"
+    t.integer "restaurant_type"
+    t.integer "retail_type"
     t.string "name"
     t.string "description"
     t.string "code"
@@ -1456,6 +1546,11 @@ ActiveRecord::Schema[8.0].define(version: 2025_12_01_153048) do
   create_table "service_groups", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.uuid "company_group_id", null: false
     t.uuid "company_id"
+    t.integer "education_type"
+    t.integer "hospital_type"
+    t.integer "hotel_type"
+    t.integer "restaurant_type"
+    t.integer "retail_type"
     t.string "name"
     t.string "description"
     t.string "code"
@@ -1474,6 +1569,11 @@ ActiveRecord::Schema[8.0].define(version: 2025_12_01_153048) do
   create_table "services", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.uuid "company_group_id", null: false
     t.uuid "company_id"
+    t.integer "education_type"
+    t.integer "hospital_type"
+    t.integer "hotel_type"
+    t.integer "restaurant_type"
+    t.integer "retail_type"
     t.string "name"
     t.string "description"
     t.string "code"
@@ -1763,6 +1863,11 @@ ActiveRecord::Schema[8.0].define(version: 2025_12_01_153048) do
   create_table "task_groups", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.uuid "company_group_id", null: false
     t.uuid "company_id"
+    t.integer "education_type"
+    t.integer "hospital_type"
+    t.integer "hotel_type"
+    t.integer "restaurant_type"
+    t.integer "retail_type"
     t.string "name"
     t.string "description"
     t.string "code"
@@ -1780,6 +1885,11 @@ ActiveRecord::Schema[8.0].define(version: 2025_12_01_153048) do
     t.uuid "company_group_id", null: false
     t.uuid "company_id"
     t.uuid "task_group_id", null: false
+    t.integer "education_type"
+    t.integer "hospital_type"
+    t.integer "hotel_type"
+    t.integer "restaurant_type"
+    t.integer "retail_type"
     t.string "name"
     t.string "description"
     t.string "code"

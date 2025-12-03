@@ -108,3 +108,75 @@ export const openModal = ({html = "Model!", customClass = {}, options = {}}) => 
     ...options,
   });
 }
+
+
+// Function to open SweetAlert2 dialog based on a parent element
+export const openPopover = ({parentElement, html = "Dialog content", position = 'bottom-center', className = ""}) => {
+  // Get the parent element's position and dimensions
+  const parentRect = parentElement.getBoundingClientRect();
+  const parentTop = parentRect.top;
+  const parentBottom = parentRect.bottom;
+  const parentLeft = parentRect.left;
+  const parentRight = parentRect.right;
+  const parentWidth = parentRect.width;
+  const parentHeight = parentRect.height;
+    
+  // Customize SweetAlert2 dialog
+  Swal.fire({
+    html: html,
+    position: 'top-start', // Use 'top-start' to position the dialog at the top-left corner, will adjust later by className
+    showConfirmButton: false,
+    showCloseButton: false,
+    // backdrop: false,
+    customClass: {
+      container: '!bg-transparent',
+      popup: 'swal2-container-custom ' + className,
+      htmlContainer: '!p-0',
+    },
+    didOpen: (popupElement) => {
+      // Adjust the dialog's position based on the parent element
+      const swalContainer = document.querySelector('.swal2-container-custom');
+      swalContainer.style.position = 'absolute';
+      switch (position) {
+        case 'top-left':
+          swalContainer.style.top = `${parentTop}px`;
+          swalContainer.style.left = `${parentLeft}px`;
+          break;
+        case 'top-right':
+          swalContainer.style.top = `${parentTop}px`;
+          swalContainer.style.left = `${parentRight}px`;
+          break;
+        case 'top-center':
+          swalContainer.style.top = `${parentTop}px`;
+          swalContainer.style.left = `${parentLeft + parentWidth/2}px`;
+          break;
+
+        case 'bottom-left':
+          swalContainer.style.top = `${parentBottom}px`;
+          swalContainer.style.left = `${parentLeft}px`;
+          break;
+        case 'bottom-right':
+          swalContainer.style.top = `${parentBottom}px`;
+          swalContainer.style.left = `${parentRight}px`;
+          break;
+        case 'bottom-center':
+          swalContainer.style.top = `${parentBottom}px`;
+          swalContainer.style.left = `${parentLeft + parentWidth/2}px`;
+          break;
+
+        case 'left-center':
+          swalContainer.style.top = `${parentTop + parentHeight/2}px`;
+          swalContainer.style.left = `${parentLeft}px`;
+          break;
+        case 'right-center':
+          swalContainer.style.top = `${parentTop + parentHeight/2}px`;
+          swalContainer.style.left = `${parentRight}px`;
+          break;
+        case 'center-center':
+          swalContainer.style.top = `${parentTop + parentHeight/2}px`;
+          swalContainer.style.left = `${parentLeft + parentWidth/2}px`;
+          break;
+      }
+    },
+  });
+}

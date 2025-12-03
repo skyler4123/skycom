@@ -4,6 +4,12 @@ class CreateFacilityGroups < ActiveRecord::Migration[8.0]
       t.references :company_group, null: false, foreign_key: true, type: :uuid
       t.references :company, null: true, foreign_key: true, type: :uuid
 
+      t.integer :education_type
+      t.integer :hospital_type
+      t.integer :hotel_type
+      t.integer :restaurant_type
+      t.integer :retail_type
+
       t.string :name
       t.string :description
       t.string :code
