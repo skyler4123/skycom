@@ -22,6 +22,22 @@ export default class Retail_LayoutController extends ApplicationController {
     this.element.innerHTML = this.layoutHTML()
   }
   
+  toggleLanguageDropdown(event) {
+    event.preventDefault()
+    // Implement language dropdown toggle logic here
+    console.log("Language dropdown toggled")
+  }
+
+  LanguageDropdownHTML() {
+    return `
+      <div class="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md shadow-lg z-50">
+        <a href="#" class="block px-4 py-2 text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700">English</a>
+        <a href="#" class="block px-4 py-2 text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700">Spanish</a>
+        <a href="#" class="block px-4 py-2 text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700">French</a>
+      </div>
+    `
+  }
+
   headTags() {
     return `
       <!-- Disable Turbo Prefetching -->
@@ -131,7 +147,9 @@ export default class Retail_LayoutController extends ApplicationController {
                   ${this.darkmode()}
                 </button>
                 <button
-                  class="flex cursor-pointer items-center justify-center overflow-hidden rounded-full h-10 w-10 hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-600 dark:text-gray-300">
+                  class="flex cursor-pointer items-center justify-center overflow-hidden rounded-full h-10 w-10 hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-600 dark:text-gray-300"
+                  data-action="click->${this.identifier}#toggleLanguageDropdown"
+                >
                   <span>EN</span>
                 </button>
                 <button
