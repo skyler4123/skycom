@@ -1,5 +1,5 @@
 
-module CompanyGroup::ReatilConcern
+module CompanyGroup::RetailConcern
   extend ActiveSupport::Concern
 
   included do
