@@ -1,8 +1,7 @@
-import Retail_LayoutController from "controllers/retail/layout_controller"
-// import { computePosition } from "@floating-ui/dom";
+import Retail_Pos_LayoutController from "controllers/retail/pos/layout_controller"
 import {computePosition} from 'https://cdn.jsdelivr.net/npm/@floating-ui/dom@1.7.4/+esm';
 
-export default class Retail_Stores_IndexController extends Retail_LayoutController {
+export default class Retail_Pos_Products_IndexController extends Retail_Pos_LayoutController {
 
   init() {
     const button = document.querySelector('#button');

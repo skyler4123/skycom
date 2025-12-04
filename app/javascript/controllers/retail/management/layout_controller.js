@@ -1,6 +1,6 @@
 import ApplicationController from "controllers/application_controller"
 import { currentCompanyGroupId } from "controllers/helpers"
-export default class Retail_LayoutController extends ApplicationController {
+export default class Retail_Management_LayoutController extends ApplicationController {
   static targets = ["profileDropdown", "headerSubmenuContainer", "headerSubmenuContent"]
   static values = {
     pagination: { type: Object, default: {} },

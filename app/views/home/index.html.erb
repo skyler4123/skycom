@@ -22,11 +22,26 @@
   <%= link_to "Devices & Sessions", sessions_path %>
 </div>
 
-<br>
-<a href="/school/schools">School Management System</a>
-<% Current.company_groups.each do |retail| %>
+<% Current.company_groups.each do |company_group| %>
+  <% retail = company_group if company_group.retail? %>
+  <% education = company_group if company_group.education? %>
   <br>
-  <%= link_to retail.name, retail_stores_path(retail) %>
+
+  <% if retail %>
+    <p>Retail:</p>
+    <%= link_to retail.name, retail_management_stores_path(retail) %>
+    <% retail.stores.each do |store| %>
+      <br>
+      &nbsp;&nbsp;&nbsp;
+      <%= link_to store.name, retail_pos_store_products_path(retail, store) %>
+    <% end %>
+  <% end %>
+
+  <% if education %>
+    <p>Education:</p>
+    <%= link_to education.name, education_schools_path(education) %>
+  <% end %>
+
 <% end %>
 <br>
 

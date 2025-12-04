@@ -1,32 +1,19 @@
 Rails.application.routes.draw do
 
   # Routes for Retail Management
-  resources :retail do
+  resources :retail, only: [] do
     # We use 'scope module: :retail' to tell Rails that the controllers
     # for these resources are located inside the "Retail::" namespace
     # (e.g., app/controllers/retail/stores_controller.rb).
     scope module: :retail do
-      resources :stores
-      resources :departments
-      resources :employees
-      resources :customers
-      resources :products
-      resources :loyalty_programs
-      resources :sales
-      resources :promotions
-      resources :inventories
-      resources :suppliers
-      resources :orders
-      resources :shipments
-      resources :returns
-      resources :reports
-      resources :settings
-      resources :roles
-      resources :tags
-      resources :companies
-      resources :addresses
-      resources :payments
-      resources :invoices
+      namespace :management do
+        resources :stores
+      end
+      namespace :pos do
+        resources :stores, only: [] do
+          resources :products
+        end
+      end
     end
   end
 
