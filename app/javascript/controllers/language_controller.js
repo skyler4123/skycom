@@ -64,7 +64,7 @@ export default class LanguageController extends ApplicationController {
       parentElement: event.currentTarget,
       html: this.languageDropdownHTML(),
       position: "bottom-right",
-      className: "w-fit! -translate-x-full mt-2",
+      className: "w-fit! -translate-x-full p-0!",
     })
   }
 
@@ -75,7 +75,7 @@ export default class LanguageController extends ApplicationController {
 
   languageDropdownHTML() {
     return `
-      <div class="mt-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md shadow-lg z-50">
+      <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md shadow-lg z-50">
         <a data-language-${this.identifier}-code-param="en" data-action="click->${this.identifier}#changeLanguage" class="block px-4 py-2 text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer">English</a>
         <a data-language-${this.identifier}-code-param="es" data-action="click->${this.identifier}#changeLanguage" class="block px-4 py-2 text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer">Spanish</a>
         <a data-language-${this.identifier}-code-param="fr" data-action="click->${this.identifier}#changeLanguage" class="block px-4 py-2 text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer">French</a>

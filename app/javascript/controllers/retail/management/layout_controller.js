@@ -35,7 +35,7 @@ export default class Retail_Management_LayoutController extends ApplicationContr
   
   layoutHTML() {
     return `
-      <div class="font-display bg-background-light dark:bg-background-dark text-gray-800 dark:text-gray-200">
+      <div class="font-display bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200">
         <div class="flex h-screen">
           <!-- Sidebar -->
           <aside
@@ -134,7 +134,7 @@ export default class Retail_Management_LayoutController extends ApplicationContr
                   class="flex cursor-pointer items-center justify-center overflow-hidden rounded-full h-10 w-10 hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-600 dark:text-gray-300"
                   ${this.triggerLanguageDropdown()}
                 >
-                  <span ${this.languageCodeTextTarget()}>EN</span>
+                  <span ${this.languageCodeTextTarget()}></span>
                 </button>
                 <button
                   class="flex cursor-pointer items-center justify-center overflow-hidden rounded-full h-10 w-10 hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-600 dark:text-gray-300">
