@@ -1,45 +1,14 @@
 import Retail_Management_LayoutController from "controllers/retail/management/layout_controller"
-// import { computePosition } from "@floating-ui/dom";
-import {computePosition} from 'https://cdn.jsdelivr.net/npm/@floating-ui/dom@1.7.4/+esm';
+import { Cookie } from "controllers/helpers"
 
 export default class Retail_Management_Stores_IndexController extends Retail_Management_LayoutController {
 
   init() {
-    const button = document.querySelector('#button');
-    const tooltip = document.querySelector('#tooltip');
-    computePosition(button, tooltip, {
-      placement: 'right',
-    }).then(({ x, y }) => {
-      Object.assign(tooltip.style, {
-        left: `${x}px`,
-        top: `${y}px`,
-      });
-    });
+    console.log(Cookie("company_groups"))
   }
 
   contentHTML() {
     return `
-    <button id="button">Click Me for Tooltip</button>
-
-<div id="tooltip" style="display: none;">
-  Tooltip Content
-</div>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
       <div class="p-8 overflow-y-auto">
         <div class="flex flex-wrap justify-between gap-3 mb-8">
           <div class="flex flex-col gap-1">

@@ -58,8 +58,6 @@ export default class LanguageController extends ApplicationController {
   openDropdown(event) {
     // No need to implement anything here, just to have action to open dropdown
     event.preventDefault();
-    console.log("Dropdown clicked");
-    console.log(event.params)
     openPopover({
       parentElement: event.currentTarget,
       html: this.languageDropdownHTML(),
@@ -67,11 +65,6 @@ export default class LanguageController extends ApplicationController {
       className: "w-fit! -translate-x-full p-0!",
     })
   }
-
-  // changeLanguage(event) {
-  //   console.log("Change language clicked");
-  //   console.log(event);
-  // }
 
   languageDropdownHTML() {
     return `
@@ -100,6 +93,7 @@ export default class LanguageController extends ApplicationController {
   }
 
   updateLanguageCodeText() {
+    if (!this.hasCodeTextTarget) return;
     this.codeTextTarget.textContent = this.languageCodeText()[this.languageCodeValue];
   }
 
