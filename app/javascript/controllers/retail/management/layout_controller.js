@@ -1,7 +1,8 @@
 import ApplicationController from "controllers/application_controller"
-import { currentCompanyGroupId, openPopover } from "controllers/helpers"
+import { currentCompanyGroupId, companyGroups } from "controllers/helpers"
+
 export default class Retail_Management_LayoutController extends ApplicationController {
-  static targets = ["profileDropdown", "headerSubmenuContainer", "headerSubmenuContent"]
+  static targets = ["profileDropdown"]
   static values = {
     pagination: { type: Object, default: {} },
     flash: { type: Object, default: {} },

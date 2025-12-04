@@ -75,6 +75,9 @@ export const currentCompanyGroupId = () => {
   return Cookie('current_company_group_id')
 }
 
+export const companyGroups = () => {
+  return Cookie('company_groups')
+}
 
 export const pathname = () => {
   return window.location.pathname

@@ -1,11 +1,6 @@
 import Retail_Management_LayoutController from "controllers/retail/management/layout_controller"
-import { Cookie } from "controllers/helpers"
 
 export default class Retail_Management_Stores_IndexController extends Retail_Management_LayoutController {
-
-  init() {
-    console.log(Cookie("company_groups"))
-  }
 
   contentHTML() {
     return `
