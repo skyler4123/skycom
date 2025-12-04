@@ -27,13 +27,21 @@ export default class ApplicationController extends Controller {
     return `data-link-target="openByPathname"`
   }
 
+  // to be implemented in DarkmodeController
+  darkmode() {
+    return `data-controller="darkmode"`
+  }
+
   // to be implemented in LanguageController
   translate(key) {
     return `data-language-key="${key}"`
   }
   
-  // to be implemented in DarkmodeController
-  darkmode() {
-    return `data-controller="darkmode"`
+  triggerLanguageDropdown() {
+    return `data-language-target="triggerDropdown"`
+  }
+
+  languageCodeTextTarget() {
+    return `data-language-target="codeText"`
   }
 }

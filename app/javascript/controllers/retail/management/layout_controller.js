@@ -1,5 +1,5 @@
 import ApplicationController from "controllers/application_controller"
-import { currentCompanyGroupId } from "controllers/helpers"
+import { currentCompanyGroupId, openPopover } from "controllers/helpers"
 export default class Retail_Management_LayoutController extends ApplicationController {
   static targets = ["profileDropdown", "headerSubmenuContainer", "headerSubmenuContent"]
   static values = {
@@ -20,22 +20,6 @@ export default class Retail_Management_LayoutController extends ApplicationContr
     // set body class and innerHTML
     this.element.className = 'min-h-screen flex flex-col'
     this.element.innerHTML = this.layoutHTML()
-  }
-  
-  toggleLanguageDropdown(event) {
-    event.preventDefault()
-    // Implement language dropdown toggle logic here
-    console.log("Language dropdown toggled")
-  }
-
-  LanguageDropdownHTML() {
-    return `
-      <div class="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md shadow-lg z-50">
-        <a href="#" class="block px-4 py-2 text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700">English</a>
-        <a href="#" class="block px-4 py-2 text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700">Spanish</a>
-        <a href="#" class="block px-4 py-2 text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700">French</a>
-      </div>
-    `
   }
 
   headTags() {
@@ -148,9 +132,9 @@ export default class Retail_Management_LayoutController extends ApplicationContr
                 </button>
                 <button
                   class="flex cursor-pointer items-center justify-center overflow-hidden rounded-full h-10 w-10 hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-600 dark:text-gray-300"
-                  data-action="click->${this.identifier}#toggleLanguageDropdown"
+                  ${this.triggerLanguageDropdown()}
                 >
-                  <span>EN</span>
+                  <span ${this.languageCodeTextTarget()}>EN</span>
                 </button>
                 <button
                   class="flex cursor-pointer items-center justify-center overflow-hidden rounded-full h-10 w-10 hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-600 dark:text-gray-300">

@@ -3,13 +3,18 @@
 // Ex: data-language-key="hello" will be inserted "Hello" text in English language by a dictionary object based on pathname
 // This Stimulus controller also listen to change event of languageCodeValue to update all targets' text content
 // This Stimulus controller require targets contain only text content, not HTML content
+// Use methods from "this" from ApplicationController
+//   translate(key)
+//   triggerLanguageDropdown()
+//   languageCodeTextTarget()
 
 import ApplicationController from "controllers/application_controller";
+import { Cookie, setCookie, openPopover, closeSwal } from "controllers/helpers";
 
 export default class LanguageController extends ApplicationController {
-  static targets = ["word"];
+  static targets = ["codeText", "word", "triggerDropdown"];
   static values = {
-    languageCode: { type: String, default: "en" },
+    languageCode: { type: String },
   }
 
   initialize() {
@@ -17,22 +22,89 @@ export default class LanguageController extends ApplicationController {
     this.initDictionary();
 
     setTimeout(() => {
+      this.initValues();
       this.initTargets();
-    }, 500);
+      this.initActions();
+    }, 200);
   }
 
   initDictionary() {
     window.LanguageDictionary = this.dictionary();
   }
 
+  // Get languageCode from Cookie > default to "en"
+  initValues() {
+    this.languageCodeValue = Cookie('languageCode') || "en";
+  }
+
   initTargets() {
     this.element.querySelectorAll("[data-language-key]").forEach((element) => {
       element.setAttribute(`data-${this.identifier}-target`, "word");
     });
+
+    // trigger dropdown target already added by another controller
+  }
+
+  initActions() {
+    // Add action to dropdown to change language code value
+    if (this.hasTriggerDropdownTarget) {
+      this.triggerDropdownTarget.setAttribute(
+        `data-action`,
+        `click->${this.identifier}#openDropdown`
+      );
+    }
+  }
+
+  openDropdown(event) {
+    // No need to implement anything here, just to have action to open dropdown
+    event.preventDefault();
+    console.log("Dropdown clicked");
+    console.log(event.params)
+    openPopover({
+      parentElement: event.currentTarget,
+      html: this.languageDropdownHTML(),
+      position: "bottom-right",
+      className: "w-fit! -translate-x-full mt-2",
+    })
+  }
+
+  // changeLanguage(event) {
+  //   console.log("Change language clicked");
+  //   console.log(event);
+  // }
+
+  languageDropdownHTML() {
+    return `
+      <div class="mt-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md shadow-lg z-50">
+        <a data-language-${this.identifier}-code-param="en" data-action="click->${this.identifier}#changeLanguage" class="block px-4 py-2 text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer">English</a>
+        <a data-language-${this.identifier}-code-param="es" data-action="click->${this.identifier}#changeLanguage" class="block px-4 py-2 text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer">Spanish</a>
+        <a data-language-${this.identifier}-code-param="fr" data-action="click->${this.identifier}#changeLanguage" class="block px-4 py-2 text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer">French</a>
+        <a data-language-${this.identifier}-code-param="de" data-action="click->${this.identifier}#changeLanguage" class="block px-4 py-2 text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer">German</a>
+        <a data-language-${this.identifier}-code-param="vi" data-action="click->${this.identifier}#changeLanguage" class="block px-4 py-2 text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer">Vietnamese</a>
+      </div>
+    `
+  }
+
+  changeLanguage(event) {
+    const languageCode = event.params.languageCode
+    this.languageCodeValue = languageCode;
   }
 
   languageCodeValueChanged(value, previousValue) {
+    if (previousValue === undefined) return;
     this.updateTranslations();
+    // this.element.innerHTML = this.languageCodeText()[value]
+    this.updateLanguageCodeText();
+    setCookie('languageCode', value, 365);
+    closeSwal();
+  }
+
+  updateLanguageCodeText() {
+    this.codeTextTarget.textContent = this.languageCodeText()[this.languageCodeValue];
+  }
+
+  setLanguageCode(value) {
+    this.languageCodeValue = value;
   }
 
   updateTranslations() {
@@ -57,6 +129,15 @@ export default class LanguageController extends ApplicationController {
     this.updateTranslations();
   }
 
+  languageCodeText() {
+    return {
+      en: "EN",
+      es: "ES",
+      fr: "FR",
+      de: "DE",
+      vi: "VI",
+    }
+  }
   dictionary() {
     return {
       "Hello": {

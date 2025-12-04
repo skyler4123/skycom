@@ -180,3 +180,7 @@ export const openPopover = ({parentElement, html = "Dialog content", position = 
     },
   });
 }
+
+export const closeSwal = () => {
+  Swal.close()
+}
