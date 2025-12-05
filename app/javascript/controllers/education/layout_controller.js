@@ -1,7 +1,8 @@
 import ApplicationController from "controllers/application_controller"
-import { currentCompanyGroup } from "controllers/helpers"
-export default class Retail_Pos_LayoutController extends ApplicationController {
-  static targets = ["profileDropdown", "headerSubmenuContainer", "headerSubmenuContent"]
+import { currentCompanyGroup, companyGroups, capitalize, openPopover } from "controllers/helpers"
+
+export default class Education_LayoutController extends ApplicationController {
+  static targets = ["profileDropdown"]
   static values = {
     pagination: { type: Object, default: {} },
     flash: { type: Object, default: {} },
@@ -12,7 +13,8 @@ export default class Retail_Pos_LayoutController extends ApplicationController {
   }
 
   initBinding() {
-    this.currentCompanyGroup = JSON.parse(currentCompanyGroup())
+    this.currentCompanyGroup = currentCompanyGroup();
+    this.companyGroups = companyGroups();
   }
 
   initLayout() {
@@ -23,19 +25,21 @@ export default class Retail_Pos_LayoutController extends ApplicationController {
     this.element.className = 'min-h-screen flex flex-col'
     this.element.innerHTML = this.layoutHTML()
   }
-  
-  toggleLanguageDropdown(event) {
-    event.preventDefault()
-    // Implement language dropdown toggle logic here
-    console.log("Language dropdown toggled")
+
+  openCompanyGroupDropdown(event) {
+   event.preventDefault();
+    openPopover({
+      parentElement: event.currentTarget,
+      html: this.companyGroupDropdownHTML(),
+      position: "bottom-right",
+      className: "",
+    })
   }
 
-  LanguageDropdownHTML() {
+  companyGroupDropdownHTML() {
     return `
-      <div class="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md shadow-lg z-50">
-        <a href="#" class="block px-4 py-2 text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700">English</a>
-        <a href="#" class="block px-4 py-2 text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700">Spanish</a>
-        <a href="#" class="block px-4 py-2 text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700">French</a>
+      <div class="flex flex-col dark:bg-gray-700 p-2">
+        ${this.companyGroups.map((companyGroup) => `<a href="${companyGroup.url}">${companyGroup.name}</a>`).join("")}
       </div>
     `
   }
@@ -53,7 +57,7 @@ export default class Retail_Pos_LayoutController extends ApplicationController {
   
   layoutHTML() {
     return `
-      <div class="font-display bg-background-light dark:bg-background-dark text-gray-800 dark:text-gray-200">
+      <div class="font-display bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200">
         <div class="flex h-screen">
           <!-- Sidebar -->
           <aside
@@ -63,13 +67,13 @@ export default class Retail_Pos_LayoutController extends ApplicationController {
                 <span class="material-symbols-outlined">storefront</span>
               </div>
               <div class="flex flex-col">
-                <h1 class="text-gray-900 dark:text-white text-base font-medium leading-normal">Urban Trends</h1>
-                <p class="text-gray-500 dark:text-gray-400 text-sm font-normal leading-normal">Retail Admin</p>
+                <h1 data-action="click->${this.identifier}#openCompanyGroupDropdown" class="text-gray-900 dark:text-white text-base font-medium leading-normal cursor-pointer">${this.currentCompanyGroup.name}</h1>
+                <p class="text-gray-500 dark:text-gray-400 text-sm font-normal leading-normal">${capitalize(this.currentCompanyGroup.business_type)}</p>
               </div>
             </div>
             <nav class="w-full p-4">
               <div class="flex flex-col gap-2">
-                <a class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:bg-blue-100 open:text-blue-600" href="/retailsssss/${this.currentCompanyGroup.id}/stores" ${this.openByPathname()}/>
+                <a class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:bg-blue-100 open:text-blue-600" href="/retail/${this.currentCompanyGroup.id}/stores" ${this.openByPathname()}/>
                   <span class="material-symbols-outlined">dashboard</span>
                   <p class="text-sm font-medium leading-normal" ${this.translate("Dashboard")}>Dashboard</p>
                 </a>
@@ -150,9 +154,9 @@ export default class Retail_Pos_LayoutController extends ApplicationController {
                 </button>
                 <button
                   class="flex cursor-pointer items-center justify-center overflow-hidden rounded-full h-10 w-10 hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-600 dark:text-gray-300"
-                  data-action="click->${this.identifier}#toggleLanguageDropdown"
+                  ${this.triggerLanguageDropdown()}
                 >
-                  <span>EN</span>
+                  <span ${this.languageCodeTextTarget()}></span>
                 </button>
                 <button
                   class="flex cursor-pointer items-center justify-center overflow-hidden rounded-full h-10 w-10 hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-600 dark:text-gray-300">

@@ -1,7 +1,7 @@
 Rails.application.routes.draw do
 
   # Routes for Retail Management
-  resources :retail, only: [] do
+  resources :retail, only: [:show] do
     # We use 'scope module: :retail' to tell Rails that the controllers
     # for these resources are located inside the "Retail::" namespace
     # (e.g., app/controllers/retail/stores_controller.rb).
@@ -18,7 +18,7 @@ Rails.application.routes.draw do
   end
 
   # Routes for School Management
-  resources :education do
+  resources :education, only: [:show] do
     # We use 'scope module: :education' to tell Rails that the controllers
     # for these resources are located inside the "Education::" namespace
     # (e.g., app/controllers/education/schools_controller.rb).

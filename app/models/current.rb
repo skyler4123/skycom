@@ -17,7 +17,7 @@ class Current < ActiveSupport::CurrentAttributes
   end
 
   def self.company_group
-    company_groups.first
+    CompanyGroup.find(company_group_id) if company_group_id.present?
   end
 
   def self.companies

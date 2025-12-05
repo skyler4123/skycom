@@ -33,6 +33,10 @@ export const isNumber = (x) => {
   return typeof x === "number"
 }
 
+export const capitalize = (string) => {
+  return string.charAt(0).toUpperCase() + string.slice(1);
+}
+
 
 
 // get Cookie object
@@ -62,21 +66,33 @@ export const setCookie = (name, value, days) => {
   document.cookie = name + "=" + value + expires + "; path=/"
 }
 
+export const currentUser = () => {
+  return JSON.parse(Cookie('current_user'));
+}
+
 // check isSignedIn by check is_signed_in in cookie
 export const isSignedIn = () => {
   return Cookie('is_signed_in') && Cookie('is_signed_in') === 'true'
 }
 
-export const avatar = () => {
-  return Cookie('avatar')
-}
-
-export const currentCompanyGroupId = () => {
-  return Cookie('current_company_group_id')
-}
 
 export const companyGroups = () => {
-  return Cookie('company_groups')
+  return JSON.parse(Cookie('company_groups'));
+}
+
+// currentCompanyGroup will be an element of companyGroups array when this element.id included in pathname
+export const currentCompanyGroup = () => {
+  const groups = companyGroups();
+  const currentPath = pathname();
+
+  // 1. Safety check: Ensure we actually have an array to iterate over
+  if (!Array.isArray(groups)) {
+    return null;
+  }
+
+  // 2. Find the element where the ID is included in the path
+  // We wrap group.id in String() to ensure type safety (in case id is a number)
+  return groups.find(group => currentPath.includes(String(group.id)));
 }
 
 export const pathname = () => {
@@ -133,8 +149,22 @@ export const openPopover = ({parentElement, html = "Dialog content", position = 
     // backdrop: false,
     customClass: {
       container: '!bg-transparent',
-      popup: 'swal2-container-custom ' + className,
+      popup: 'swal2-container-custom w-fit! h-fit! p-0! rounded-none! bg-transparent!' + className,
       htmlContainer: '!p-0',
+    },
+    showClass: {
+      popup: `
+        animate__animated
+        animate__fadeInUp
+        animate__faster
+      `
+    },
+    hideClass: {
+      popup: `
+        animate__animated
+        animate__fadeOutDown
+        animate__faster
+      `
     },
     didOpen: (popupElement) => {
       // Adjust the dialog's position based on the parent element
