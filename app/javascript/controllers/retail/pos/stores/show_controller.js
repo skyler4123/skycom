@@ -40,7 +40,7 @@ export default class Retail_Pos_Stores_ShowController extends Retail_Pos_LayoutC
           <div
             class="flex flex-col bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 overflow-hidden cursor-pointer hover:shadow-lg transition-shadow">
             <div class="w-full h-40 bg-cover bg-center"
-              style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuA4IWByrtQ-5Ij5dTMeV31i7FEL05iwtalIkvftbSKga9B6BveW7V6Om9l8aEtUljTZ6qtvV3ZunRmrYwSqNU3KGFsEKuZs9q1_FeQRXBv4KuDvO7e8m-uCmyecyMbLrc2HJrSfqs2XOGIDRcuu3iMZIasJpCUXv2tD_5veU8Lbh3n3dc_cAYr7_DFSvQYjhnMwopg0sUveVmBPiwlBWyFd00WePLtxjmwjnkoFqVurxYlqHC45rvreo97vc78EZb3Bp4v7q3NNFH8")'>
+              style='background-image: url("${product.image_urls[0]}")'>
             </div>
             <div class="p-4 flex-1 flex flex-col justify-between">
               <h3 class="font-semibold text-gray-800 dark:text-gray-100 mb-1">${product.name}</h3>

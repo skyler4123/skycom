@@ -3,7 +3,7 @@ module ApplicationController::CookieConcern
 
   included do
     def set_sign_in_cookie(session:, user:)
-      current_user = { id: user.id, email: user.email, avatar: user.avatar || user.avatar_path }
+      current_user = { id: user.id, email: user.email, avatar: user.avatar_url }
       company_groups = user.company_groups.map do |company_group|
         business_type = company_group.business_type
         url = retail_management_stores_path(retail_id: company_group.id) if business_type == 'retail'

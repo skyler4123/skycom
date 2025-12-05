@@ -17,7 +17,7 @@ class Seed::ProductService
     should_discard = rand(10) == 0
     discarded_at ||= should_discard ? Time.zone.now - rand(1..180).days : nil
 
-    Product.create!(
+    product = Product.create!(
       company_group: company_group,
       company: company,
       brand: brand,
@@ -28,5 +28,7 @@ class Seed::ProductService
       business_type: business_type || Product.business_types.keys.sample,
       discarded_at: discarded_at
     )
+    Seed::AttachmentService.attach(record: product, relation: :image_attachments, number: 2)
+    product
   end
 end

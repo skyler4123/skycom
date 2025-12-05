@@ -11,7 +11,7 @@ class Retail::Pos::StoresController < Retail::Pos::ApplicationController
   def products
     @products = @store.products
     respond_to do |format|
-      format.json { render json: @products  }
+      format.json { render json: @products.to_json(methods: [:image_urls])  }
     end
   end
 end
