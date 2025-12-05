@@ -11,7 +11,11 @@ Rails.application.routes.draw do
         resources :products
       end
       namespace :pos do
-        resources :stores, only: [:show]
+        resources :stores, only: [:show] do
+          member do
+            get :products
+          end
+        end
       end
     end
   end

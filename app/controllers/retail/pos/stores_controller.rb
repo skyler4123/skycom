@@ -7,4 +7,11 @@ class Retail::Pos::StoresController < Retail::Pos::ApplicationController
       format.json { render json: { retail: @retail, stores: @stores } }
     end
   end
+
+  def products
+    @products = @store.products
+    respond_to do |format|
+      format.json { render json: @products  }
+    end
+  end
 end

@@ -11,6 +11,7 @@ class CreateProducts < ActiveRecord::Migration[8.0]
       t.integer :retail_type
       t.string :name
       t.string :description
+      t.decimal :price
       t.string :code
       t.string :sku
       t.string :barcode
