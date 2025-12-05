@@ -33,7 +33,7 @@
     <% retail.stores.each do |store| %>
       <br>
       &nbsp;&nbsp;&nbsp;
-      <%= link_to store.name, retail_pos_store_products_path(retail, store) %>
+      <%= link_to store.name, retail_pos_store_path(retail, store) %>
     <% end %>
   <% end %>
 

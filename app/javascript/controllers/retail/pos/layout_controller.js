@@ -1,18 +1,9 @@
 import ApplicationController from "controllers/application_controller"
 import { currentCompanyGroup } from "controllers/helpers"
 export default class Retail_Pos_LayoutController extends ApplicationController {
-  static targets = ["profileDropdown", "headerSubmenuContainer", "headerSubmenuContent"]
-  static values = {
-    pagination: { type: Object, default: {} },
-    flash: { type: Object, default: {} },
-    data: { type: Object, default: {} },
-    isOpenProfileDropdown: { type: Boolean, default: false },
-    openHeaderSubmenuName: { type: String, default: "" },
-    
-  }
-
+  
   initBinding() {
-    this.currentCompanyGroup = JSON.parse(currentCompanyGroup())
+
   }
 
   initLayout() {
@@ -24,21 +15,6 @@ export default class Retail_Pos_LayoutController extends ApplicationController {
     this.element.innerHTML = this.layoutHTML()
   }
   
-  toggleLanguageDropdown(event) {
-    event.preventDefault()
-    // Implement language dropdown toggle logic here
-    console.log("Language dropdown toggled")
-  }
-
-  LanguageDropdownHTML() {
-    return `
-      <div class="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md shadow-lg z-50">
-        <a href="#" class="block px-4 py-2 text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700">English</a>
-        <a href="#" class="block px-4 py-2 text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700">Spanish</a>
-        <a href="#" class="block px-4 py-2 text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700">French</a>
-      </div>
-    `
-  }
 
   headTags() {
     return `
@@ -53,129 +29,7 @@ export default class Retail_Pos_LayoutController extends ApplicationController {
   
   layoutHTML() {
     return `
-      <div class="font-display bg-background-light dark:bg-background-dark text-gray-800 dark:text-gray-200">
-        <div class="flex h-screen">
-          <!-- Sidebar -->
-          <aside
-            class="w-64 shrink-0 bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800 flex flex-col">
-            <div class="p-6 flex items-center gap-3 border-b border-gray-200 dark:border-gray-800">
-              <div class="bg-primary/20 text-primary p-2 rounded-lg">
-                <span class="material-symbols-outlined">storefront</span>
-              </div>
-              <div class="flex flex-col">
-                <h1 class="text-gray-900 dark:text-white text-base font-medium leading-normal">Urban Trends</h1>
-                <p class="text-gray-500 dark:text-gray-400 text-sm font-normal leading-normal">Retail Admin</p>
-              </div>
-            </div>
-            <nav class="w-full p-4">
-              <div class="flex flex-col gap-2">
-                <a class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:bg-blue-100 open:text-blue-600" href="/retailsssss/${this.currentCompanyGroup.id}/stores" ${this.openByPathname()}/>
-                  <span class="material-symbols-outlined">dashboard</span>
-                  <p class="text-sm font-medium leading-normal" ${this.translate("Dashboard")}>Dashboard</p>
-                </a>
-                <a class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:bg-blue-100 open:text-blue-600" href="/retail/${this.currentCompanyGroup.id}/products" ${this.openByPathname()}/>
-                  <span class="material-symbols-outlined">inventory_2</span>
-                  <p class="text-sm font-medium leading-normal">Product</p>
-                </a>
-                <a class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:bg-blue-100 open:text-blue-600" href="/retail/${this.currentCompanyGroup.id}/bookings" ${this.openByPathname()}/>
-                  <span class="material-symbols-outlined">calendar_month</span>
-                  <p class="text-sm font-medium leading-normal">Booking</p>
-                </a>
-                <a class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:bg-blue-100 open:text-blue-600" href="/retail/${this.currentCompanyGroup.id}/payments" ${this.openByPathname()}/>
-                  <span class="material-symbols-outlined">payments</span>
-                  <p class="text-sm font-medium leading-normal">Payment</p>
-                </a>
-                <a class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:bg-blue-100 open:text-blue-600" href="/retail/${this.currentCompanyGroup.id}/employees" ${this.openByPathname()}/>
-                  <span class="material-symbols-outlined">groups</span>
-                  <p class="text-sm font-medium leading-normal">Employee</p>
-                </a>
-                <a class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:bg-blue-100 open:text-blue-600" href="/retail/${this.currentCompanyGroup.id}/inventory" ${this.openByPathname()}/>
-                  <span class="material-symbols-outlined">inventory</span>
-                  <p class="text-sm font-medium leading-normal">Inventory</p>
-                </a>
-                <a class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:bg-blue-100 open:text-blue-600" href="/retail/${this.currentCompanyGroup.id}/sales" ${this.openByPathname()}/>
-                  <span class="material-symbols-outlined">add_shopping_cart</span>
-                  <p class="text-sm font-medium leading-normal">Sales</p>
-                </a>
-                <a class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:bg-blue-100 open:text-blue-600" href="/retail/${this.currentCompanyGroup.id}/customers" ${this.openByPathname()}/>
-                  <span class="material-symbols-outlined">person_add</span>
-                  <p class="text-sm font-medium leading-normal">Customer</p>
-                </a>
-                <a class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:bg-blue-100 open:text-blue-600" href="/retail/${this.currentCompanyGroup.id}/invoices" ${this.openByPathname()}/>
-                  <span class="material-symbols-outlined">receipt_long</span>
-                  <p class="text-sm font-medium leading-normal">Invoices</p>
-                </a>
-                <a class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:bg-blue-100 open:text-blue-600" href="/retail/${this.currentCompanyGroup.id}/reports" ${this.openByPathname()}/>
-                  <span class="material-symbols-outlined">bar_chart</span>
-                  <p class="text-sm font-medium leading-normal">Reports</p>
-                </a>
-                </div>
-            </nav>
-            <div class="p-4 border-t border-gray-200 dark:border-gray-800">
-              <div class="flex flex-col gap-2">
-                <a class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:bg-blue-100 open:text-blue-600" href="#">
-                  <span class="material-symbols-outlined">settings</span>
-                  <p class="text-sm font-medium leading-normal">Setting</p>
-                </a>
-                <a class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:bg-blue-100 open:text-blue-600" href="#">
-                  <span class="material-symbols-outlined">admin_panel_settings</span>
-                  <p class="text-sm font-medium leading-normal">Administrator</p>
-                </a>
-              </div>
-            </div>
-          </aside>
-          <!-- End Sidebar -->
-          <!-- Main Content -->
-          <main class="flex-1 flex flex-col overflow-auto">
-            <!-- Header -->
-            <header
-              class="shrink-0 flex items-center justify-between whitespace-nowrap border-b border-gray-200 dark:border-gray-800 px-8 py-4 bg-white dark:bg-gray-900">
-              <div class="flex items-center gap-8">
-                <label class="flex flex-col min-w-40 h-10! w-80">
-                  <div class="flex w-full flex-1 items-stretch rounded-lg h-full">
-                    <div
-                      class="text-gray-500 flex bg-gray-100 dark:bg-gray-800 items-center justify-center pl-4 rounded-l-lg border-r-0">
-                      <span class="material-symbols-outlined">search</span>
-                    </div>
-                    <input
-                      class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-gray-900 dark:text-white focus:outline-0 focus:ring-0 border-none bg-gray-100 dark:bg-gray-800 h-full placeholder:text-gray-500 px-4 rounded-l-none border-l-0 pl-2 text-base font-normal leading-normal"
-                      placeholder="Search for products, customers..." value="" />
-                  </div>
-                </label>
-              </div>
-              <div class="flex flex-1 justify-end gap-4 items-center">
-                <button
-                  class="flex cursor-pointer items-center justify-center overflow-hidden rounded-full h-10 w-10 p-2 hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-600 dark:text-gray-300"
-                  ${this.darkmode()}
-                </button>
-                <button
-                  class="flex cursor-pointer items-center justify-center overflow-hidden rounded-full h-10 w-10 hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-600 dark:text-gray-300"
-                  data-action="click->${this.identifier}#toggleLanguageDropdown"
-                >
-                  <span>EN</span>
-                </button>
-                <button
-                  class="flex cursor-pointer items-center justify-center overflow-hidden rounded-full h-10 w-10 hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-600 dark:text-gray-300">
-                  <span class="material-symbols-outlined">notifications</span>
-                </button>
-                <button
-                  class="flex cursor-pointer items-center justify-center overflow-hidden rounded-full h-10 w-10 hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-600 dark:text-gray-300">
-                  <span class="material-symbols-outlined">settings</span>
-                </button>
-                <div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10"
-                  data-alt="User profile picture"
-                  style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuBYk6_5wqHwhOUyfqIOzuw7uF6nG1B2aHcNfqPXgheh0TJNM9wgrKtU__k7USaOwDZLXPpvIrYvaXBnMbO7rmZHK15vMirHZqrK0UBZ18vJdiQZlmTrGe8wch8p3G7GXSetuz5njKmy7Hb6XGw18g0stonxhwtIcuuEqzZVHxbviNLuy4i_B8JHC1x_JlbUrZoIV2QQqyAprbH-jems99h8nqDZ6D6FBmq8JDrKIfaBYkl3mR0cYldl3c0gaNynjiRNKDKfaUcIKBc");'>
-                </div>
-              </div>
-            </header>
-            <!-- End Header -->
-            <!-- Main Content -->
-            ${this.contentHTML()}
-            <!-- End Main Content -->
-          </main>
-          <!-- End Main Content -->
-        </div>
-      </div>
+      
     `
   }
 

@@ -8,11 +8,10 @@ Rails.application.routes.draw do
     scope module: :retail do
       namespace :management do
         resources :stores
+        resources :products
       end
       namespace :pos do
-        resources :stores, only: [] do
-          resources :products
-        end
+        resources :stores, only: [:show]
       end
     end
   end
