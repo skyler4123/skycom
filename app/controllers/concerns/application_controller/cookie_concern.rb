@@ -10,7 +10,7 @@ module ApplicationController::CookieConcern
       cookies.permanent[:is_signed_in] = true
 
       company_groups = user.company_groups.map do |company_group|
-        { id: company_group.id, name: company_group.name, business_type: company_group.business_type }
+        { name: company_group.name, url: company_group_path(company_group) }
       end
       cookies.permanent[:company_groups] = company_groups.to_json
 
