@@ -1263,6 +1263,8 @@ ActiveRecord::Schema[8.0].define(version: 2025_12_01_153048) do
     t.integer "retail_type"
     t.string "name"
     t.string "description"
+    t.decimal "price"
+    t.integer "currency"
     t.string "code"
     t.string "sku"
     t.string "barcode"

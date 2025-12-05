@@ -44,7 +44,7 @@ export default class Retail_Pos_Stores_ShowController extends Retail_Pos_LayoutC
             </div>
             <div class="p-4 flex-1 flex flex-col justify-between">
               <h3 class="font-semibold text-gray-800 dark:text-gray-100 mb-1">${product.name}</h3>
-              <p class="text-sm text-indigo-600 font-medium">$35.00</p>
+              <p class="text-sm text-indigo-600 font-medium">$${product.price}</p>
             </div>
           </div>
         `
