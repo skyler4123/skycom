@@ -217,3 +217,7 @@ export const openPopover = ({parentElement, html = "Dialog content", position = 
 export const closeSwal = () => {
   Swal.close()
 }
+
+export const randomId = () => {
+  return Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+}
