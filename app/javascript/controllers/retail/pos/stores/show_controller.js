@@ -95,7 +95,7 @@ export default class Retail_Pos_Stores_ShowController extends Retail_Pos_LayoutC
   }
 
   totalSelectedProductsPriceValueChanged(value, previousValue) {
-    this.totalSelectedProductsPriceTarget.innerHTML = `$${value}`
+    this.totalSelectedProductsPriceTarget.innerHTML = `$${value.toFixed(2)}`
   }
 
   increaseQuantityByOne(event) {
@@ -178,7 +178,7 @@ export default class Retail_Pos_Stores_ShowController extends Retail_Pos_LayoutC
             data-${this.identifier}-product-id-param="${product.id}"
           >+</button>
         </div>
-        <p class="font-semibold text-sm w-16 text-right">$${product.price * product.quantity}</p>
+        <p class="font-semibold text-sm w-16 text-right">$${(product.price * product.quantity).toFixed(2)}</p>
       </div>
     `
   }
