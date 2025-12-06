@@ -39,13 +39,11 @@ export default class Retail_Pos_Stores_ShowController extends Retail_Pos_LayoutC
     return this.productsValue.find(product => product.id === id)
   }
 
-  findSlectedProductById(id) {
+  findSelectedProductById(id) {
     return this.selectedProductsValue.find(product => product.id === id)
   }
 
   toggleOrder(event) {
-    const element = event.currentTarget
-    this.toggleOpenAttribute(element)
     const { productId } = event.params
     const product = this.findProductById(productId)
     if (!product) return
@@ -62,6 +60,15 @@ export default class Retail_Pos_Stores_ShowController extends Retail_Pos_LayoutC
 
   selectedProductsValueChanged(value, previousValue) {
     if (previousValue === undefined) return
+    this.productTargets.forEach((productTarget) => {
+      const productTargetId = productTarget.getAttribute(`data-${this.identifier}-product-id-param`)
+      const product = this.findSelectedProductById(productTargetId)
+      if (product) {
+        productTarget.setAttribute('open', '')
+      } else {
+        productTarget.removeAttribute('open')
+      }
+    })
     this.selectedProductsTarget.innerHTML = this.selectedProductsHTML()
     this.totalSelectedProductsPriceValue = this.totalSelectedProductsPrice()
   }
@@ -93,7 +100,7 @@ export default class Retail_Pos_Stores_ShowController extends Retail_Pos_LayoutC
 
   increaseQuantityByOne(event) {
     const { productId } = event.params
-    const product = this.findSlectedProductById(productId)
+    const product = this.findSelectedProductById(productId)
     if (!product) return
 
     const index = this.selectedProductsValue.findIndex(p => p.id === product.id)
@@ -108,7 +115,7 @@ export default class Retail_Pos_Stores_ShowController extends Retail_Pos_LayoutC
 
   decreaseQuantityByOne(event) {
     const { productId } = event.params
-    const product = this.findSlectedProductById(productId)
+    const product = this.findSelectedProductById(productId)
     if (!product) return
 
     const index = this.selectedProductsValue.findIndex(p => p.id === product.id)
@@ -133,6 +140,7 @@ export default class Retail_Pos_Stores_ShowController extends Retail_Pos_LayoutC
             class="flex flex-col bg-white dark:bg-gray-900 rounded-xl border-4 border-gray-200 open:border-blue-500 dark:border-gray-800 overflow-hidden cursor-pointer hover:shadow-xl hover:shadow-gray-500/50 transition-shadow"
             data-action="click->${this.identifier}#toggleOrder"
             data-${this.identifier}-product-id-param="${product.id}"
+            data-${this.identifier}-target="product"
           >
             <div class="w-full h-64">
               <img class="w-full h-full object-cover" data-srcset="${product.image_urls[0]}">
