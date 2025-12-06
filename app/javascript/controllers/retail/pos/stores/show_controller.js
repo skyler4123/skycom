@@ -115,7 +115,8 @@ export default class Retail_Pos_Stores_ShowController extends Retail_Pos_LayoutC
     if (index > -1) {
       const updatedProducts = [...this.selectedProductsValue]
       const productToUpdate = { ...updatedProducts[index] }
-      productToUpdate.quantity--
+
+      productToUpdate.quantity = Math.max(0, productToUpdate.quantity - 1)
       updatedProducts[index] = productToUpdate
       this.selectedProductsValue = updatedProducts
     }
