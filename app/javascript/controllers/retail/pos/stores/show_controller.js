@@ -34,8 +34,22 @@ export default class Retail_Pos_Stores_ShowController extends Retail_Pos_LayoutC
     this.productsTarget.innerHTML = this.productsHTML()
   }
 
+  addOrder(event) {
+    console.log(event)
+  }
+
   findProductById(id) {
     return this.productsValue.find(product => product.id === id)
+  }
+
+  toggleOpenAttribute(event) {
+    const element = event.currentTarget
+    // add/remove attribute "open", not classList
+    if (element.hasAttribute('open')) {
+      element.removeAttribute('open')
+    } else {
+      element.setAttribute('open', '')
+    }
   }
 
   productsHTML() {
@@ -43,7 +57,10 @@ export default class Retail_Pos_Stores_ShowController extends Retail_Pos_LayoutC
       ${this.productsValue.map(product => {
         return `
           <div
-            class="flex flex-col bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 overflow-hidden cursor-pointer hover:shadow-lg transition-shadow">
+            class="flex flex-col bg-white dark:bg-gray-900 rounded-xl border border-gray-200 open:border-4 open:border-blue-500 dark:border-gray-800 overflow-hidden cursor-pointer hover:shadow-lg transition-shadow"
+            data-action="click->${this.identifier}#addOrder click->${this.identifier}#toggleOpenAttribute"
+            data-${this.identifier}-product-id-param="${product.id}"
+          >
             <div class="w-full h-40">
               <img class="w-full h-full object-cover" data-srcset="${product.image_urls[0]}">
             </div>
@@ -57,7 +74,28 @@ export default class Retail_Pos_Stores_ShowController extends Retail_Pos_LayoutC
     `
   }
 
-  
+  selectedProductHTML() {
+    return `
+      <div class="flex items-center gap-4">
+        <div class="w-16 h-16 rounded-lg bg-gray-100 dark:bg-gray-800 flex-shrink-0 bg-cover bg-center"
+          style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuBKqYQ-lFCKRgrfI4EPnefW878hsy7gNRqQPqj8s8E5Ge1-_XBtng98qY0IAC49HZtbBQbq_Xmm4WmqZTwnBA_u537-Oo3_Bo4ROEj9ufUtCi4z9_rT-JasRis5CI7aU-r4EgoVDyUSSL43L90Fx5kY6QLXVMw6PuhYB_Wpdku2jGXGTXlkeOHm_Q2XgxRygRF4fkXUKJxzjygS0_ITnoHauhzBh15UCG0VN28rIU4wC0Q1FFpiLqZxefa17HrnD0ReSRauHALa7YI")'>
+        </div>
+        <div class="flex-1">
+          <h3 class="font-medium text-gray-800 dark:text-gray-100 text-sm">Vintage Leather Jacket</h3>
+          <p class="text-xs text-gray-500 dark:text-gray-400">$120.00</p>
+        </div>
+        <div class="flex items-center gap-2">
+          <button
+            class="w-7 h-7 rounded-md border border-gray-200 dark:border-gray-700 flex items-center justify-center hover:bg-gray-100 dark:hover:bg-gray-800">-</button>
+          <span class="font-medium w-4 text-center">1</span>
+          <button
+            class="w-7 h-7 rounded-md border border-gray-200 dark:border-gray-700 flex items-center justify-center hover:bg-gray-100 dark:hover:bg-gray-800">+</button>
+        </div>
+        <p class="font-semibold text-sm w-16 text-right">$120.00</p>
+      </div>
+    `
+  }
+
   layoutHTML() {
     return `
       <div class="bg-gray-50 dark:bg-gray-950 text-gray-800 dark:text-gray-200">
@@ -136,6 +174,8 @@ export default class Retail_Pos_Stores_ShowController extends Retail_Pos_LayoutC
                 </div>
                 <div class="flex-1 p-6 overflow-y-auto">
                   <div class="flex flex-col gap-4">
+                    ${this.selectedProductHTML()}
+                  
                     <div class="flex items-center gap-4">
                       <div class="w-16 h-16 rounded-lg bg-gray-100 dark:bg-gray-800 flex-shrink-0 bg-cover bg-center"
                         style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuBKqYQ-lFCKRgrfI4EPnefW878hsy7gNRqQPqj8s8E5Ge1-_XBtng98qY0IAC49HZtbBQbq_Xmm4WmqZTwnBA_u537-Oo3_Bo4ROEj9ufUtCi4z9_rT-JasRis5CI7aU-r4EgoVDyUSSL43L90Fx5kY6QLXVMw6PuhYB_Wpdku2jGXGTXlkeOHm_Q2XgxRygRF4fkXUKJxzjygS0_ITnoHauhzBh15UCG0VN28rIU4wC0Q1FFpiLqZxefa17HrnD0ReSRauHALa7YI")'>
