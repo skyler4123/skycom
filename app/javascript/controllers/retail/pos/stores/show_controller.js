@@ -2,10 +2,11 @@ import Retail_Pos_LayoutController from "controllers/retail/pos/layout_controlle
 import { pathname } from "controllers/helpers"
 
 export default class Retail_Pos_Stores_ShowController extends Retail_Pos_LayoutController {
-  static targets = ['products', "product", "selectedProduct", "selectedProducts"]
+  static targets = ['products', "product", "selectedProduct", "selectedProducts", "totalSelectedProductsPrice"]
   static values = {
     products: { type: Array, default: [] },
     selectedProducts: { type: Array, default: [] },
+    totalSelectedProductsPrice: { type: Number, default: 0 },
   }
 
   init() {
@@ -38,6 +39,10 @@ export default class Retail_Pos_Stores_ShowController extends Retail_Pos_LayoutC
     return this.productsValue.find(product => product.id === id)
   }
 
+  findSlectedProductById(id) {
+    return this.selectedProductsValue.find(product => product.id === id)
+  }
+
   toggleOrder(event) {
     const element = event.currentTarget
     this.toggleOpenAttribute(element)
@@ -56,10 +61,9 @@ export default class Retail_Pos_Stores_ShowController extends Retail_Pos_LayoutC
   }
 
   selectedProductsValueChanged(value, previousValue) {
-    // this.selectedProductTarget.innerHTML = this.selectedProductHTML()
-    console.log(value)
-    console.log(this.selectedProductsTarget)
+    if (previousValue === undefined) return
     this.selectedProductsTarget.innerHTML = this.selectedProductsHTML()
+    this.totalSelectedProductsPriceValue = this.totalSelectedProductsPrice()
   }
 
   selectedProductsHTML() {
@@ -74,6 +78,46 @@ export default class Retail_Pos_Stores_ShowController extends Retail_Pos_LayoutC
       element.removeAttribute('open')
     } else {
       element.setAttribute('open', '')
+    }
+  }
+
+  totalSelectedProductsPrice() {
+    return this.selectedProductsValue.reduce((total, product) => {
+      return  (total + product.price * product.quantity)
+    }, 0)
+  }
+
+  totalSelectedProductsPriceValueChanged(value, previousValue) {
+    this.totalSelectedProductsPriceTarget.innerHTML = `$${value}`
+  }
+
+  increaseQuantityByOne(event) {
+    const { productId } = event.params
+    const product = this.findSlectedProductById(productId)
+    if (!product) return
+
+    const index = this.selectedProductsValue.findIndex(p => p.id === product.id)
+    if (index > -1) {
+      const updatedProducts = [...this.selectedProductsValue]
+      const productToUpdate = { ...updatedProducts[index] }
+      productToUpdate.quantity++
+      updatedProducts[index] = productToUpdate
+      this.selectedProductsValue = updatedProducts
+    }
+  }
+
+  decreaseQuantityByOne(event) {
+    const { productId } = event.params
+    const product = this.findSlectedProductById(productId)
+    if (!product) return
+
+    const index = this.selectedProductsValue.findIndex(p => p.id === product.id)
+    if (index > -1) {
+      const updatedProducts = [...this.selectedProductsValue]
+      const productToUpdate = { ...updatedProducts[index] }
+      productToUpdate.quantity--
+      updatedProducts[index] = productToUpdate
+      this.selectedProductsValue = updatedProducts
     }
   }
 
@@ -103,20 +147,26 @@ export default class Retail_Pos_Stores_ShowController extends Retail_Pos_LayoutC
     return `
       <div class="flex items-center gap-4">
         <div class="w-16 h-16 rounded-lg bg-gray-100 dark:bg-gray-800 flex-shrink-0 bg-cover bg-center"
-          style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuBKqYQ-lFCKRgrfI4EPnefW878hsy7gNRqQPqj8s8E5Ge1-_XBtng98qY0IAC49HZtbBQbq_Xmm4WmqZTwnBA_u537-Oo3_Bo4ROEj9ufUtCi4z9_rT-JasRis5CI7aU-r4EgoVDyUSSL43L90Fx5kY6QLXVMw6PuhYB_Wpdku2jGXGTXlkeOHm_Q2XgxRygRF4fkXUKJxzjygS0_ITnoHauhzBh15UCG0VN28rIU4wC0Q1FFpiLqZxefa17HrnD0ReSRauHALa7YI")'>
+          style='background-image: url("${product.image_urls[0]}")'>
         </div>
         <div class="flex-1">
-          <h3 class="font-medium text-gray-800 dark:text-gray-100 text-sm">Vintage Leather Jacket</h3>
-          <p class="text-xs text-gray-500 dark:text-gray-400">$120.00</p>
+          <h3 class="font-medium text-gray-800 dark:text-gray-100 text-sm">${product.name}</h3>
+          <p class="text-xs text-gray-500 dark:text-gray-400">$${product.price}</p>
         </div>
         <div class="flex items-center gap-2">
           <button
-            class="w-7 h-7 rounded-md border border-gray-200 dark:border-gray-700 flex items-center justify-center hover:bg-gray-100 dark:hover:bg-gray-800">-</button>
-          <span class="font-medium w-4 text-center">1</span>
+            class="w-7 h-7 rounded-md border border-gray-200 dark:border-gray-700 flex items-center justify-center hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer"
+            data-action="click->${this.identifier}#decreaseQuantityByOne"
+            data-${this.identifier}-product-id-param="${product.id}"
+          >-</button>
+          <span class="font-medium w-4 text-center">${product.quantity}</span>
           <button
-            class="w-7 h-7 rounded-md border border-gray-200 dark:border-gray-700 flex items-center justify-center hover:bg-gray-100 dark:hover:bg-gray-800">+</button>
+            class="w-7 h-7 rounded-md border border-gray-200 dark:border-gray-700 flex items-center justify-center hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer"
+            data-action="click->${this.identifier}#increaseQuantityByOne"
+            data-${this.identifier}-product-id-param="${product.id}"
+          >+</button>
         </div>
-        <p class="font-semibold text-sm w-16 text-right">$${product?.price}</p>
+        <p class="font-semibold text-sm w-16 text-right">$${product.price * product.quantity}</p>
       </div>
     `
   }
@@ -202,66 +252,14 @@ export default class Retail_Pos_Stores_ShowController extends Retail_Pos_LayoutC
                     data-${this.identifier}-target="selectedProducts"
                     class="flex flex-col gap-4"
                   >
-                    ${this.selectedProductHTML()}
-                  
-                    <div class="flex items-center gap-4">
-                      <div class="w-16 h-16 rounded-lg bg-gray-100 dark:bg-gray-800 flex-shrink-0 bg-cover bg-center"
-                        style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuBKqYQ-lFCKRgrfI4EPnefW878hsy7gNRqQPqj8s8E5Ge1-_XBtng98qY0IAC49HZtbBQbq_Xmm4WmqZTwnBA_u537-Oo3_Bo4ROEj9ufUtCi4z9_rT-JasRis5CI7aU-r4EgoVDyUSSL43L90Fx5kY6QLXVMw6PuhYB_Wpdku2jGXGTXlkeOHm_Q2XgxRygRF4fkXUKJxzjygS0_ITnoHauhzBh15UCG0VN28rIU4wC0Q1FFpiLqZxefa17HrnD0ReSRauHALa7YI")'>
-                      </div>
-                      <div class="flex-1">
-                        <h3 class="font-medium text-gray-800 dark:text-gray-100 text-sm">Vintage Leather Jacket</h3>
-                        <p class="text-xs text-gray-500 dark:text-gray-400">$120.00</p>
-                      </div>
-                      <div class="flex items-center gap-2">
-                        <button
-                          class="w-7 h-7 rounded-md border border-gray-200 dark:border-gray-700 flex items-center justify-center hover:bg-gray-100 dark:hover:bg-gray-800">-</button>
-                        <span class="font-medium w-4 text-center">1</span>
-                        <button
-                          class="w-7 h-7 rounded-md border border-gray-200 dark:border-gray-700 flex items-center justify-center hover:bg-gray-100 dark:hover:bg-gray-800">+</button>
-                      </div>
-                      <p class="font-semibold text-sm w-16 text-right">$120.00</p>
-                    </div>
-                    <div class="flex items-center gap-4">
-                      <div class="w-16 h-16 rounded-lg bg-gray-100 dark:bg-gray-800 flex-shrink-0 bg-cover bg-center"
-                        style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuA4IWByrtQ-5Ij5dTMeV31i7FEL05iwtalIkvftbSKga9B6BveW7V6Om9l8aEtUljTZ6qtvV3ZunRmrYwSqNU3KGFsEKuZs9q1_FeQRXBv4KuDvO7e8m-uCmyecyMbLrc2HJrSfqs2XOGIDRcuu3iMZIasJpCUXv2tD_5veU8Lbh3n3dc_cAYr7_DFSvQYjhnMwopg0sUveVmBPiwlBWyFd00WePLtxjmwjnkoFqVurxYlqHC45rvreo97vc78EZb3Bp4v7q3NNFH8")'>
-                      </div>
-                      <div class="flex-1">
-                        <h3 class="font-medium text-gray-800 dark:text-gray-100 text-sm">Minimalist Watch</h3>
-                        <p class="text-xs text-gray-500 dark:text-gray-400">$150.00</p>
-                      </div>
-                      <div class="flex items-center gap-2">
-                        <button
-                          class="w-7 h-7 rounded-md border border-gray-200 dark:border-gray-700 flex items-center justify-center hover:bg-gray-100 dark:hover:bg-gray-800">-</button>
-                        <span class="font-medium w-4 text-center">1</span>
-                        <button
-                          class="w-7 h-7 rounded-md border border-gray-200 dark:border-gray-700 flex items-center justify-center hover:bg-gray-100 dark:hover:bg-gray-800">+</button>
-                      </div>
-                      <p class="font-semibold text-sm w-16 text-right">$150.00</p>
-                    </div>
-                    <div class="flex items-center gap-4">
-                      <div class="w-16 h-16 rounded-lg bg-gray-100 dark:bg-gray-800 flex-shrink-0 bg-cover bg-center"
-                        style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuA4IWByrtQ-5Ij5dTMeV31i7FEL05iwtalIkvftbSKga9B6BveW7V6Om9l8aEtUljTZ6qtvV3ZunRmrYwSqNU3KGFsEKuZs9q1_FeQRXBv4KuDvO7e8m-uCmyecyMbLrc2HJrSfqs2XOGIDRcuu3iMZIasJpCUXv2tD_5veU8Lbh3n3dc_cAYr7_DFSvQYjhnMwopg0sUveVmBPiwlBWyFd00WePLtxjmwjnkoFqVurxYlqHC45rvreo97vc78EZb3Bp4v7q3NNFH8")'>
-                      </div>
-                      <div class="flex-1">
-                        <h3 class="font-medium text-gray-800 dark:text-gray-100 text-sm">Striped Cotton Shirt</h3>
-                        <p class="text-xs text-gray-500 dark:text-gray-400">$55.00</p>
-                      </div>
-                      <div class="flex items-center gap-2">
-                        <button
-                          class="w-7 h-7 rounded-md border border-gray-200 dark:border-gray-700 flex items-center justify-center hover:bg-gray-100 dark:hover:bg-gray-800">-</button>
-                        <span class="font-medium w-4 text-center">2</span>
-                        <button
-                          class="w-7 h-7 rounded-md border border-gray-200 dark:border-gray-700 flex items-center justify-center hover:bg-gray-100 dark:hover:bg-gray-800">+</button>
-                      </div>
-                      <p class="font-semibold text-sm w-16 text-right">$110.00</p>
-                    </div>
+                    
                   </div>
                 </div>
                 <div class="p-6 border-t border-gray-200 dark:border-gray-800">
                   <div class="flex flex-col gap-3 mb-6">
                     <div class="flex justify-between text-sm">
                       <span class="text-gray-600 dark:text-gray-300">Subtotal</span>
-                      <span class="font-medium">$380.00</span>
+                      <span class="font-medium" data-${this.identifier}-target="totalSelectedProductsPrice">$0</span>
                     </div>
                     <div class="flex justify-between text-sm">
                       <span class="text-gray-600 dark:text-gray-300">Discount</span>
