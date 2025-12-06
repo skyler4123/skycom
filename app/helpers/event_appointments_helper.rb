@@ -1,0 +1,2 @@
+module EventAppointmentsHelper
+end

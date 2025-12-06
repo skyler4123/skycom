@@ -1,9 +1,73 @@
 Rails.application.routes.draw do
-  resources :company_groups
-  namespace :school do
-    resources :schools
-    resources :courses
+
+  # Routes for Retail Management
+  resources :retail, only: [:show] do
+    # We use 'scope module: :retail' to tell Rails that the controllers
+    # for these resources are located inside the "Retail::" namespace
+    # (e.g., app/controllers/retail/stores_controller.rb).
+    scope module: :retail do
+      namespace :management do
+        resources :stores
+        resources :products
+      end
+      namespace :pos do
+        resources :stores, only: [:show] do
+          member do
+            get :products
+          end
+        end
+      end
+    end
   end
+
+  # Routes for School Management
+  resources :education, only: [:show] do
+    # We use 'scope module: :education' to tell Rails that the controllers
+    # for these resources are located inside the "Education::" namespace
+    # (e.g., app/controllers/education/schools_controller.rb).
+    scope module: :education do
+      resources :schools
+      resources :courses
+      resources :students
+      resources :teachers
+      resources :classes
+      resources :schedules
+    end
+  end
+
+  # Routes for Hospital Management
+  resources :hospital do
+    # We use 'scope module: :hospital' to tell Rails that the controllers
+    # for these resources are located inside the "Hospital::" namespace
+    # (e.g., app/controllers/hospital/patients_controller.rb).
+    scope module: :hospital do
+      resources :patients
+      resources :doctors
+      resources :appointments
+      resources :medical_records
+      resources :prescriptions
+      resources :departments
+      resources :staffs
+      resources :billings
+      resources :insurances
+      resources :labs
+      resources :pharmacies
+    end
+  end
+
+  # General Application Routes
+  resources :setting_appointments
+  resources :setting_group_appointments
+  resources :setting_groups
+  resources :subscription_appointments
+  resources :subscription_group_appointments
+  resources :subscriptions
+  resources :subscription_groups
+  resources :event_appointments
+  resources :event_group_appointments
+  resources :events
+  resources :event_groups
+  resources :company_groups
   resources :exam_appointments
   resources :answers
   resources :questions

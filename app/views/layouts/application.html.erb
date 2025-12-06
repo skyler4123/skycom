@@ -20,15 +20,10 @@
     <%# Includes all stylesheet files in app/assets/stylesheets %>
     <%= stylesheet_link_tag :app, "data-turbo-track": "reload" %>
     <%= javascript_importmap_tags %>
-
-    <%# ------------------------------Custom Tags------------------------------------ %>
-    <%# Disables Turbo Drive's link prefetching behavior site-wide. %>
-    <meta name="turbo-prefetch" content="false">
-
   </head>
 
   <body
-    data-controller="responsive language svg img link"
+    data-controller="responsive language svg img link notification"
   >
     <div class="w-full">
       <% if notice.present? %>

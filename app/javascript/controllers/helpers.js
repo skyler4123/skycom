@@ -33,6 +33,10 @@ export const isNumber = (x) => {
   return typeof x === "number"
 }
 
+export const capitalize = (string) => {
+  return string.charAt(0).toUpperCase() + string.slice(1);
+}
+
 
 
 // get Cookie object
@@ -62,15 +66,34 @@ export const setCookie = (name, value, days) => {
   document.cookie = name + "=" + value + expires + "; path=/"
 }
 
+export const currentUser = () => {
+  return JSON.parse(Cookie('current_user'));
+}
+
 // check isSignedIn by check is_signed_in in cookie
 export const isSignedIn = () => {
   return Cookie('is_signed_in') && Cookie('is_signed_in') === 'true'
 }
 
-export const avatar = () => {
-  return Cookie('avatar')
+
+export const companyGroups = () => {
+  return JSON.parse(Cookie('company_groups'));
 }
 
+// currentCompanyGroup will be an element of companyGroups array when this element.id included in pathname
+export const currentCompanyGroup = () => {
+  const groups = companyGroups();
+  const currentPath = pathname();
+
+  // 1. Safety check: Ensure we actually have an array to iterate over
+  if (!Array.isArray(groups)) {
+    return null;
+  }
+
+  // 2. Find the element where the ID is included in the path
+  // We wrap group.id in String() to ensure type safety (in case id is a number)
+  return groups.find(group => currentPath.includes(String(group.id)));
+}
 
 export const pathname = () => {
   return window.location.pathname
@@ -86,4 +109,115 @@ export const origin = () => {
 
 export const timeFormat = (time, format = "DD/MM/YYYY") => {
   return dayjs(time).format(format)
+}
+
+export const openModal = ({html = "Model!", customClass = {}, options = {}}) => {
+  Swal.fire({
+    html: html,
+    showConfirmButton: false,
+    showCloseButton: false,
+    backdrop: true,
+    target: document.querySelector('main'), // Default target
+    customClass: {
+      container: '!bg-transparent',
+      popup: '!p-0 !bg-transparent !w-full',
+      htmlContainer: '!p-0 !overflow-visible',
+      ...customClass
+    },
+    ...options,
+  });
+}
+
+
+// Function to open SweetAlert2 dialog based on a parent element
+export const openPopover = ({parentElement, html = "Dialog content", position = 'bottom-center', className = ""}) => {
+  // Get the parent element's position and dimensions
+  const parentRect = parentElement.getBoundingClientRect();
+  const parentTop = parentRect.top;
+  const parentBottom = parentRect.bottom;
+  const parentLeft = parentRect.left;
+  const parentRight = parentRect.right;
+  const parentWidth = parentRect.width;
+  const parentHeight = parentRect.height;
+    
+  // Customize SweetAlert2 dialog
+  Swal.fire({
+    html: html,
+    position: 'top-start', // Use 'top-start' to position the dialog at the top-left corner, will adjust later by className
+    showConfirmButton: false,
+    showCloseButton: false,
+    // backdrop: false,
+    customClass: {
+      container: '!bg-transparent',
+      popup: 'swal2-container-custom w-fit! h-fit! p-0! rounded-none! bg-transparent!' + className,
+      htmlContainer: '!p-0',
+    },
+    showClass: {
+      popup: `
+        animate__animated
+        animate__fadeInUp
+        animate__faster
+      `
+    },
+    hideClass: {
+      popup: `
+        animate__animated
+        animate__fadeOutDown
+        animate__faster
+      `
+    },
+    didOpen: (popupElement) => {
+      // Adjust the dialog's position based on the parent element
+      const swalContainer = document.querySelector('.swal2-container-custom');
+      swalContainer.style.position = 'absolute';
+      switch (position) {
+        case 'top-left':
+          swalContainer.style.top = `${parentTop}px`;
+          swalContainer.style.left = `${parentLeft}px`;
+          break;
+        case 'top-right':
+          swalContainer.style.top = `${parentTop}px`;
+          swalContainer.style.left = `${parentRight}px`;
+          break;
+        case 'top-center':
+          swalContainer.style.top = `${parentTop}px`;
+          swalContainer.style.left = `${parentLeft + parentWidth/2}px`;
+          break;
+
+        case 'bottom-left':
+          swalContainer.style.top = `${parentBottom}px`;
+          swalContainer.style.left = `${parentLeft}px`;
+          break;
+        case 'bottom-right':
+          swalContainer.style.top = `${parentBottom}px`;
+          swalContainer.style.left = `${parentRight}px`;
+          break;
+        case 'bottom-center':
+          swalContainer.style.top = `${parentBottom}px`;
+          swalContainer.style.left = `${parentLeft + parentWidth/2}px`;
+          break;
+
+        case 'left-center':
+          swalContainer.style.top = `${parentTop + parentHeight/2}px`;
+          swalContainer.style.left = `${parentLeft}px`;
+          break;
+        case 'right-center':
+          swalContainer.style.top = `${parentTop + parentHeight/2}px`;
+          swalContainer.style.left = `${parentRight}px`;
+          break;
+        case 'center-center':
+          swalContainer.style.top = `${parentTop + parentHeight/2}px`;
+          swalContainer.style.left = `${parentLeft + parentWidth/2}px`;
+          break;
+      }
+    },
+  });
+}
+
+export const closeSwal = () => {
+  Swal.close()
+}
+
+export const randomId = () => {
+  return Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
 }

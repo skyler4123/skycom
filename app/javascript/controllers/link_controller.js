@@ -1,3 +1,6 @@
+// How to add "open" attribute to links that match the current pathname
+// data-link-target="openByPathname"
+
 import { Controller } from "@hotwired/stimulus"
 
 export default class LinkController extends Controller {

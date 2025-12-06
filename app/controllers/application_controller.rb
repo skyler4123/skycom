@@ -7,7 +7,6 @@ class ApplicationController < ActionController::Base
 
   # ------------------------------------------------------------------------
   include ApplicationController::CookieConcern
-  include ApplicationController::CurrentConcern
   # ------------------------------------------------------------------------
 
   private
