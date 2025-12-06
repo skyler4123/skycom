@@ -113,12 +113,15 @@ export default class Retail_Pos_Stores_ShowController extends Retail_Pos_LayoutC
 
     const index = this.selectedProductsValue.findIndex(p => p.id === product.id)
     if (index > -1) {
-      const updatedProducts = [...this.selectedProductsValue]
-      const productToUpdate = { ...updatedProducts[index] }
-
-      productToUpdate.quantity = Math.max(0, productToUpdate.quantity - 1)
-      updatedProducts[index] = productToUpdate
-      this.selectedProductsValue = updatedProducts
+      const product = this.selectedProductsValue[index]
+      if (product.quantity - 1 <= 0) {
+        this.selectedProductsValue = [...this.selectedProductsValue.slice(0, index), ...this.selectedProductsValue.slice(index + 1)]
+      } else {
+        const updatedProducts = [...this.selectedProductsValue]
+        const productToUpdate = { ...product, quantity: product.quantity - 1 }
+        updatedProducts[index] = productToUpdate
+        this.selectedProductsValue = updatedProducts
+      }
     }
   }
 
