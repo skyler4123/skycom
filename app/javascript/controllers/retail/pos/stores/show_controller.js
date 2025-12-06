@@ -248,16 +248,31 @@ export default class Retail_Pos_Stores_ShowController extends Retail_Pos_LayoutC
                 class="w-96 flex-shrink-0 bg-white dark:bg-gray-900 border-l border-gray-200 dark:border-gray-800 flex flex-col">
                 <div class="p-6 border-b border-gray-200 dark:border-gray-800">
                   <h2 class="text-xl font-bold text-gray-900 dark:text-white mb-4">Current Order</h2>
-                  <div class="flex items-center gap-3">
-                    <div class="flex-1 flex items-center bg-gray-100 dark:bg-gray-800 rounded-lg p-2">
-                      <span class="material-symbols-outlined text-gray-500 mr-2">person</span>
-                      <p class="text-sm font-medium">Guest</p>
+                  <div class="flex items-center gap-2 border-b border-gray-200 dark:border-gray-800">
+                    <div class="flex justify-center items-center gap-x-4">
+                      <button class="text-sm font-medium text-indigo-600 border-b-2 border-indigo-600">
+                        <span class="flex items-center gap-2">
+                          <span class="material-symbols-outlined text-base">person</span>
+                          <span>Customer 1</span>
+                        </span>
+                      </button>
+                      <button
+                        class="text-sm font-medium text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800/50">
+                        <span class="flex items-center gap-2">
+                          <span class="material-symbols-outlined text-base">person</span>
+                          <span>Customer 2</span>
+                        </span>
+                      </button>
                     </div>
                     <button
-                      class="flex items-center justify-center h-10 w-10 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-lg transition-colors">
-                      <span class="material-symbols-outlined">person_add</span>
+                      class="h-full px-3 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-md ml-auto">
+                      <span class="material-symbols-outlined">add</span>
                     </button>
                   </div>
+
+
+
+
                 </div>
                 <div class="flex-1 p-6 overflow-y-auto">
                   <div
