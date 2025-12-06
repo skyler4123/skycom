@@ -34,16 +34,41 @@ export default class Retail_Pos_Stores_ShowController extends Retail_Pos_LayoutC
     this.productsTarget.innerHTML = this.productsHTML()
   }
 
-  addOrder(event) {
-    console.log(event)
-  }
-
   findProductById(id) {
     return this.productsValue.find(product => product.id === id)
   }
 
-  toggleOpenAttribute(event) {
+  toggleOrder(event) {
     const element = event.currentTarget
+    this.toggleOpenAttribute(element)
+    const { productId } = event.params
+    const product = this.findProductById(productId)
+    if (!product) return
+
+    const index = this.selectedProductsValue.findIndex(p => p.id === product.id)
+
+    if (index > -1) {
+      // Product is already selected, so remove it.
+      this.selectedProductsValue = [...this.selectedProductsValue.slice(0, index), ...this.selectedProductsValue.slice(index + 1)]
+    } else {
+      this.selectedProductsValue = [...this.selectedProductsValue, { ...product, quantity: 1 }]
+    }
+  }
+
+  selectedProductsValueChanged(value, previousValue) {
+    // this.selectedProductTarget.innerHTML = this.selectedProductHTML()
+    console.log(value)
+    console.log(this.selectedProductsTarget)
+    this.selectedProductsTarget.innerHTML = this.selectedProductsHTML()
+  }
+
+  selectedProductsHTML() {
+    return this.selectedProductsValue.map(product => {
+      return this.selectedProductHTML(product)
+    }).join('')
+  }
+
+  toggleOpenAttribute(element) {
     // add/remove attribute "open", not classList
     if (element.hasAttribute('open')) {
       element.removeAttribute('open')
@@ -57,11 +82,11 @@ export default class Retail_Pos_Stores_ShowController extends Retail_Pos_LayoutC
       ${this.productsValue.map(product => {
         return `
           <div
-            class="flex flex-col bg-white dark:bg-gray-900 rounded-xl border border-gray-200 open:border-4 open:border-blue-500 dark:border-gray-800 overflow-hidden cursor-pointer hover:shadow-lg transition-shadow"
-            data-action="click->${this.identifier}#addOrder click->${this.identifier}#toggleOpenAttribute"
+            class="flex flex-col bg-white dark:bg-gray-900 rounded-xl border-4 border-gray-200 open:border-blue-500 dark:border-gray-800 overflow-hidden cursor-pointer hover:shadow-xl hover:shadow-gray-500/50 transition-shadow"
+            data-action="click->${this.identifier}#toggleOrder"
             data-${this.identifier}-product-id-param="${product.id}"
           >
-            <div class="w-full h-40">
+            <div class="w-full h-64">
               <img class="w-full h-full object-cover" data-srcset="${product.image_urls[0]}">
             </div>
             <div class="p-4 flex-1 flex flex-col justify-between">
@@ -74,7 +99,7 @@ export default class Retail_Pos_Stores_ShowController extends Retail_Pos_LayoutC
     `
   }
 
-  selectedProductHTML() {
+  selectedProductHTML(product) {
     return `
       <div class="flex items-center gap-4">
         <div class="w-16 h-16 rounded-lg bg-gray-100 dark:bg-gray-800 flex-shrink-0 bg-cover bg-center"
@@ -91,7 +116,7 @@ export default class Retail_Pos_Stores_ShowController extends Retail_Pos_LayoutC
           <button
             class="w-7 h-7 rounded-md border border-gray-200 dark:border-gray-700 flex items-center justify-center hover:bg-gray-100 dark:hover:bg-gray-800">+</button>
         </div>
-        <p class="font-semibold text-sm w-16 text-right">$120.00</p>
+        <p class="font-semibold text-sm w-16 text-right">$${product?.price}</p>
       </div>
     `
   }
@@ -151,7 +176,7 @@ export default class Retail_Pos_Stores_ShowController extends Retail_Pos_LayoutC
                 </nav>
 
                 <div
-                  class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6"
+                  class="grid grid-cols-2 md:grid-cols-3 gap-6"
                   data-${this.identifier}-target="products"
                 >
                 </div>
@@ -173,7 +198,10 @@ export default class Retail_Pos_Stores_ShowController extends Retail_Pos_LayoutC
                   </div>
                 </div>
                 <div class="flex-1 p-6 overflow-y-auto">
-                  <div class="flex flex-col gap-4">
+                  <div
+                    data-${this.identifier}-target="selectedProducts"
+                    class="flex flex-col gap-4"
+                  >
                     ${this.selectedProductHTML()}
                   
                     <div class="flex items-center gap-4">
