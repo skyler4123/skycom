@@ -102,7 +102,6 @@ export default class Retail_Pos_Stores_ShowController extends Retail_Pos_LayoutC
 
   // update cartsValue from currentCartValue
   currentCartValueChanged(value, previousValue) {
-    if (previousValue === undefined) return
     const index = this.cartsValue.findIndex(cart => cart.id === value.id)
     if (index > -1) {
       // this.cartsValue[index] = value
@@ -112,6 +111,16 @@ export default class Retail_Pos_Stores_ShowController extends Retail_Pos_LayoutC
     } else {
       this.cartsValue = [...this.cartsValue, value]
     }
+    this.cartTargets.forEach((cartTarget) => {
+      const cartTargetId = cartTarget.getAttribute(`data-${this.identifier}-cart-id-param`)
+      if (cartTargetId === value.id) {
+        cartTarget.setAttribute('open', '')
+      } else {
+        cartTarget.removeAttribute('open')
+      }
+    })
+
+    this.selectedProductsValue = value.products
   }
 
   selectedProductsHTML() {
@@ -173,12 +182,22 @@ export default class Retail_Pos_Stores_ShowController extends Retail_Pos_LayoutC
     }
   }
 
+  selectCart(event) {
+    const { cartId } = event.params
+    const cart = this.cartsValue.find(cart => cart.id === cartId)
+    if (!cart) return
+    this.currentCartValue = cart
+  }
+
   cartsHTML() {
     return `
       ${this.cartsValue.map(cart => {
         return `
           <div>
             <button
+              data-${this.identifier}-cart-id-param="${cart.id}"
+              data-${this.identifier}-target="cart"
+              data-action="click->${this.identifier}#selectCart"
               class="py-3 px-4 text-sm font-medium text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800/50 cursor-pointer open:text-indigo-600 open:border-indigo-600">
               <span class="flex items-center gap-2">
                 <span class="material-symbols-outlined text-base">person</span>
