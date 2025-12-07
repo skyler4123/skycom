@@ -1,5 +1,6 @@
 import Retail_Pos_LayoutController from "controllers/retail/pos/layout_controller"
-import { pathname, randomId } from "controllers/helpers"
+import { pathname, randomId, openModal } from "controllers/helpers"
+import Retail_Pos_Stores_SettingController from "controllers/retail/pos/stores/setting_controller"
 
 export default class Retail_Pos_Stores_ShowController extends Retail_Pos_LayoutController {
   static targets = ['products', "product", "selectedProduct", "selectedProducts", "totalSelectedProductsPrice", "carts", "cart"]
@@ -189,6 +190,16 @@ export default class Retail_Pos_Stores_ShowController extends Retail_Pos_LayoutC
     this.currentCartValue = cart
   }
 
+  openSetting(event) {
+    openModal({
+      html: `<div data-controller="${Retail_Pos_Stores_SettingController.identifier}"></div>`
+    })
+  }
+
+  cartsValueChanged(value, previousValue) {
+    this.cartsTarget.innerHTML = this.cartsHTML()
+  }
+
   cartsHTML() {
     return `
       ${this.cartsValue.map(cart => {
@@ -271,6 +282,7 @@ export default class Retail_Pos_Stores_ShowController extends Retail_Pos_LayoutC
                 <header class="flex-shrink-0 flex items-center justify-between whitespace-nowrap mb-6">
                   <div class="flex items-center gap-4">
                     <button
+                      data-action="click->${this.identifier}#openSetting"
                       class="flex cursor-pointer items-center justify-center overflow-hidden rounded-md h-10 w-10 border border-gray-200 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-600 dark:text-gray-300">
                       <span class="material-symbols-outlined">menu</span>
                     </button>
