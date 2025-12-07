@@ -1,20 +1,46 @@
 import Retail_Pos_LayoutController from "controllers/retail/pos/layout_controller"
-import { pathname } from "controllers/helpers"
+import { pathname, randomId } from "controllers/helpers"
 
 export default class Retail_Pos_Stores_ShowController extends Retail_Pos_LayoutController {
-  static targets = ['products', "product", "selectedProduct", "selectedProducts", "totalSelectedProductsPrice"]
+  static targets = ['products', "product", "selectedProduct", "selectedProducts", "totalSelectedProductsPrice", "carts", "cart"]
   static values = {
     products: { type: Array, default: [] },
     selectedProducts: { type: Array, default: [] },
     totalSelectedProductsPrice: { type: Number, default: 0 },
+    carts: { type: Array, default: [] },
+    currentCart: { type: Object, default: {} }
   }
 
   init() {
     this.initValues()
+    this.initCarts()
+    this.initTargetsHTML()
   }
 
   async initValues() {
     this.productsValue = await this.fetchProducts()
+  }
+
+  initCarts() {
+    this.cartsValue = [
+      {
+        id: randomId(),
+        customerName: 'Customer 1',
+        products: []
+      },
+      {
+        id: randomId(),
+        customerName: 'Customer 2222',
+        products: []
+      }
+    ];
+    this.currentCartValue = this.cartsValue[0]
+  }
+
+  initTargetsHTML() {
+    if (this.hasCartsTarget) {
+      this.cartsTarget.innerHTML = this.cartsHTML()
+    }
   }
 
   async fetchProducts() {
@@ -71,6 +97,21 @@ export default class Retail_Pos_Stores_ShowController extends Retail_Pos_LayoutC
     })
     this.selectedProductsTarget.innerHTML = this.selectedProductsHTML()
     this.totalSelectedProductsPriceValue = this.totalSelectedProductsPrice()
+    this.currentCartValue = {...this.currentCartValue, products: value}
+  }
+
+  // update cartsValue from currentCartValue
+  currentCartValueChanged(value, previousValue) {
+    if (previousValue === undefined) return
+    const index = this.cartsValue.findIndex(cart => cart.id === value.id)
+    if (index > -1) {
+      // this.cartsValue[index] = value
+      const updatedCarts = [...this.cartsValue]
+      updatedCarts[index] = value
+      this.cartsValue = updatedCarts
+    } else {
+      this.cartsValue = [...this.cartsValue, value]
+    }
   }
 
   selectedProductsHTML() {
@@ -130,6 +171,24 @@ export default class Retail_Pos_Stores_ShowController extends Retail_Pos_LayoutC
         this.selectedProductsValue = updatedProducts
       }
     }
+  }
+
+  cartsHTML() {
+    return `
+      ${this.cartsValue.map(cart => {
+        return `
+          <div>
+            <button
+              class="py-3 px-4 text-sm font-medium text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800/50 cursor-pointer open:text-indigo-600 open:border-indigo-600">
+              <span class="flex items-center gap-2">
+                <span class="material-symbols-outlined text-base">person</span>
+                ${cart.customerName}
+              </span>
+            </button>
+          </div>
+        `
+      }).join('')}
+    `
   }
 
   productsHTML() {
@@ -246,34 +305,28 @@ export default class Retail_Pos_Stores_ShowController extends Retail_Pos_LayoutC
               </div>
               <aside
                 class="w-96 flex-shrink-0 bg-white dark:bg-gray-900 border-l border-gray-200 dark:border-gray-800 flex flex-col">
+
                 <div class="p-6 border-b border-gray-200 dark:border-gray-800">
                   <h2 class="text-xl font-bold text-gray-900 dark:text-white mb-4">Current Order</h2>
-                  <div class="flex items-center gap-2 border-b border-gray-200 dark:border-gray-800">
-                    <div class="flex justify-center items-center gap-x-4">
-                      <button class="text-sm font-medium text-indigo-600 border-b-2 border-indigo-600">
-                        <span class="flex items-center gap-2">
-                          <span class="material-symbols-outlined text-base">person</span>
-                          <span>Customer 1</span>
-                        </span>
-                      </button>
-                      <button
-                        class="text-sm font-medium text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800/50">
-                        <span class="flex items-center gap-2">
-                          <span class="material-symbols-outlined text-base">person</span>
-                          <span>Customer 2</span>
-                        </span>
-                      </button>
+                  <!--
+                  <div class="relative mb-4">
+                    <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+                      <span class="material-symbols-outlined text-gray-400">person_search</span>
                     </div>
+                    <input
+                      class="block w-full rounded-lg border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 pl-10 pr-4 py-2 text-sm focus:border-indigo-600 focus:ring-indigo-600 dark:text-white dark:placeholder-gray-400"
+                      placeholder="Search or add customer..." type="text" />
+                  </div>
+                  -->
+                  <div class="flex flex-col items-center gap-2 border-gray-200 dark:border-gray-800">
+                    <div class="flex flex-col w-full border-b-2" data-${this.identifier}-target="carts"></div>
                     <button
-                      class="h-full px-3 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-md ml-auto">
+                      class="flex justify-center items-center w-full px-3 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-md ml-auto">
                       <span class="material-symbols-outlined">add</span>
                     </button>
                   </div>
-
-
-
-
                 </div>
+
                 <div class="flex-1 p-6 overflow-y-auto">
                   <div
                     data-${this.identifier}-target="selectedProducts"
