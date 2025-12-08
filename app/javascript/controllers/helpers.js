@@ -95,6 +95,44 @@ export const subtractArraysByKey = (arrayA, arrayB, key) => {
   return resultArray;
 }
 
+/**
+ * Queries an array of objects based on an object of conditions (key-value pairs).
+ * An element is included in the result only if ALL conditions match.
+ *
+ * @param {Array<Object>} array The array of objects to query.
+ * @param {Object} conditions An object where keys are the properties to check (e.g., 'id', 'gender')
+ * and values are the required values.
+ * @returns {Array<Object>} A new array containing only the objects that match all conditions.
+ * const people = [
+ *  { id: 1, name: "Alice", gender: "female", age: 30, city: "Paris" },
+ *  { id: 2, name: "Bob", gender: "male", age: 25, city: "London" },
+ *  { id: 3, name: "Charlie", gender: "male", age: 30, city: "Paris" },
+ *  { id: 4, name: "Diana", gender: "female", age: 35, city: "London" },
+ *  { id: 5, name: "Eve", gender: "female", age: 25, city: "Paris" }
+ * ];
+ * Query for people who are 'male' AND 'age' is 30
+ * const resultA = queryArray(people, { gender: "male", age: 30 });
+ * console.log("Result A:", resultA);
+ * /*
+ * Result A: [
+ *   { id: 3, name: "Charlie", gender: "male", age: 30, city: "Paris" }
+ * ]
+ */
+export const queryArray = (array, conditions) => {
+  // Get an array of the keys (property names) from the conditions object
+  const keys = Object.keys(conditions);
+
+  // Return the filtered array
+  return array.filter(item => {
+    // Check if ALL conditions pass for the current item
+    return keys.every(key => {
+      // The condition passes if the item's property value matches
+      // the value specified in the conditions object.
+      return item[key] === conditions[key];
+    });
+  });
+}
+
 // get Cookie object
 export const Cookie = (name) => {
   let cookie = {}
