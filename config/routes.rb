@@ -9,6 +9,7 @@ Rails.application.routes.draw do
       namespace :management do
         resources :stores
         resources :products
+        resources :employees
       end
       namespace :pos do
         resources :stores, only: [:show] do
