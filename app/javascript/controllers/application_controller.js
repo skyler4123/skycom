@@ -17,7 +17,7 @@ export default class ApplicationController extends Controller {
   }
 
   initialize() {
-    if (isDefined(this.initBinding)) { this.initBinding()}
+    if (isDefined(this.initBindings)) { this.initBindings()}
     if (isDefined(this.initLayout)) { this.initLayout() }
     if (isDefined(this.init)) { this.init() }
   }

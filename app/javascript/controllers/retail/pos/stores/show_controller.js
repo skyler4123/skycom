@@ -5,43 +5,45 @@ import Retail_Pos_Stores_SettingController from "controllers/retail/pos/stores/s
 export default class Retail_Pos_Stores_ShowController extends Retail_Pos_LayoutController {
   static targets = ['products', "product", "selectedProduct", "selectedProducts", "totalSelectedProductsPrice", "carts", "cart"]
   static values = {
-    products: { type: Array, default: [] },
-    selectedProducts: { type: Array, default: [] },
+    // products: { type: Array, default: [] },
+    productIds: { type: Array, default: [] },
+    // selectedProducts: { type: Array, default: [] },
+    selectedProductIds: { type: Array, default: [] },
     totalSelectedProductsPrice: { type: Number, default: 0 },
-    carts: { type: Array, default: [] },
-    currentCart: { type: Object, default: {} }
+    // carts: { type: Array, default: [] },
+    cartIds: { type: Array, default: [] },
+    // currentCart: { type: Object, default: {} }
+    currentCartId: { type: String, default: "" }
+  }
+
+  async initBindings() {
+    this.products = []
+    this.selectedProducts = []
+    this.carts = []
+
+    this.products = await this.fetchProducts()
+    this.carts = [
+      {
+        id: randomId(),
+        customerName: 'Customer 1',
+        selectedProducts: []
+      },
+      {
+        id: randomId(),
+        customerName: 'Customer 2',
+        selectedProducts: []
+      }
+    ];
   }
 
   init() {
     this.initValues()
-    this.initCarts()
     this.initTargetsHTML()
   }
 
   async initValues() {
-    this.productsValue = await this.fetchProducts()
-  }
-
-  initCarts() {
-    this.cartsValue = [
-      {
-        id: randomId(),
-        customerName: 'Customer 1',
-        products: []
-      },
-      {
-        id: randomId(),
-        customerName: 'Customer 2222',
-        products: []
-      }
-    ];
-    this.currentCartValue = this.cartsValue[0]
-  }
-
-  initTargetsHTML() {
-    if (this.hasCartsTarget) {
-      this.cartsTarget.innerHTML = this.cartsHTML()
-    }
+    this.productIdsValue = this.products.map(product => product.id)
+    this.currentCartIdValue = this.carts[0].id
   }
 
   async fetchProducts() {
@@ -58,16 +60,16 @@ export default class Retail_Pos_Stores_ShowController extends Retail_Pos_LayoutC
     }
   }
 
-  productsValueChanged(value, previousValue) {
+  productIdsValueChanged(value, previousValue) {
     this.productsTarget.innerHTML = this.productsHTML()
   }
 
   findProductById(id) {
-    return this.productsValue.find(product => product.id === id)
+    return this.products.find(product => product.id === id)
   }
 
   findSelectedProductById(id) {
-    return this.selectedProductsValue.find(product => product.id === id)
+    return this.selectedProducts.find(product => product.id === id)
   }
 
   toggleOrder(event) {
@@ -75,22 +77,31 @@ export default class Retail_Pos_Stores_ShowController extends Retail_Pos_LayoutC
     const product = this.findProductById(productId)
     if (!product) return
 
-    const index = this.selectedProductsValue.findIndex(p => p.id === product.id)
+    const selectedIndex = this.selectedProductIdsValue.findIndex(selectedProductId => selectedProductId === productId)
 
-    if (index > -1) {
+    if (selectedIndex > -1) {
       // Product is already selected, so remove it.
-      this.selectedProductsValue = [...this.selectedProductsValue.slice(0, index), ...this.selectedProductsValue.slice(index + 1)]
+      this.selectedProductIdsValue = [...this.selectedProductIdsValue.slice(0, selectedIndex), ...this.selectedProductIdsValue.slice(selectedIndex + 1)]
     } else {
-      this.selectedProductsValue = [...this.selectedProductsValue, { ...product, quantity: 1 }]
+      this.selectedProductIdsValue = [...this.selectedProductIdsValue, productId]
     }
   }
 
-  selectedProductsValueChanged(value, previousValue) {
+  selectedProductIdsValueChanged(value, previousValue) {
+    // Sync to this.selectedProducts
+    const newSelectedProducts = value.map(selectedId => {
+      const selectedProduct = this.products.find(product => product.id === selectedId)
+      const selectedQuantity = this.findSelectedProductById(selectedId)?.quantity || 1
+      selectedProduct = { ...selectedProduct, quantity: selectedQuantity}
+      return selectedProduct
+    }).filter(product => product)
+    this.selectedProducts = newSelectedProducts
+
     if (previousValue === undefined) return
     this.productTargets.forEach((productTarget) => {
       const productTargetId = productTarget.getAttribute(`data-${this.identifier}-product-id-param`)
-      const product = this.findSelectedProductById(productTargetId)
-      if (product) {
+      const selectedProduct = this.findSelectedProductById(productTargetId)
+      if (selectedProduct) {
         productTarget.setAttribute('open', '')
       } else {
         productTarget.removeAttribute('open')
@@ -98,35 +109,31 @@ export default class Retail_Pos_Stores_ShowController extends Retail_Pos_LayoutC
     })
     this.selectedProductsTarget.innerHTML = this.selectedProductsHTML()
     this.totalSelectedProductsPriceValue = this.totalSelectedProductsPrice()
-    this.currentCartValue = {...this.currentCartValue, products: value}
+
+    // TODO
+    this.currentCart = {...this.currentCart, selectedProducts: this.selectedProducts}
   }
 
   // update cartsValue from currentCartValue
-  currentCartValueChanged(value, previousValue) {
-    const index = this.cartsValue.findIndex(cart => cart.id === value.id)
-    if (index > -1) {
-      // this.cartsValue[index] = value
-      const updatedCarts = [...this.cartsValue]
-      updatedCarts[index] = value
-      this.cartsValue = updatedCarts
-    } else {
-      this.cartsValue = [...this.cartsValue, value]
-    }
+  currentCartIdValueChanged(value, previousValue) {
     this.cartTargets.forEach((cartTarget) => {
       const cartTargetId = cartTarget.getAttribute(`data-${this.identifier}-cart-id-param`)
-      if (cartTargetId === value.id) {
+      if (cartTargetId === value) {
         cartTarget.setAttribute('open', '')
       } else {
         cartTarget.removeAttribute('open')
       }
     })
+    this.selectedProducts = this.currentCart().selectedProducts
+  }
 
-    this.selectedProductsValue = value.products
+  currentCart() {
+    return this.carts.find(cart => cart.id === this.currentCartIdValue)
   }
 
   selectedProductsHTML() {
-    return this.selectedProductsValue.map(product => {
-      return this.selectedProductHTML(product)
+    return this.selectedProducts.map(selectedProduct => {
+      return this.selectedProductHTML(selectedProduct)
     }).join('')
   }
 
@@ -140,8 +147,8 @@ export default class Retail_Pos_Stores_ShowController extends Retail_Pos_LayoutC
   }
 
   totalSelectedProductsPrice() {
-    return this.selectedProductsValue.reduce((total, product) => {
-      return  (total + product.price * product.quantity)
+    return this.selectedProducts.reduce((total, selectedProduct) => {
+      return  (total + proselectedProductduct.price * selectedProduct.quantity)
     }, 0)
   }
 
@@ -154,13 +161,13 @@ export default class Retail_Pos_Stores_ShowController extends Retail_Pos_LayoutC
     const product = this.findSelectedProductById(productId)
     if (!product) return
 
-    const index = this.selectedProductsValue.findIndex(p => p.id === product.id)
-    if (index > -1) {
-      const updatedProducts = [...this.selectedProductsValue]
-      const productToUpdate = { ...updatedProducts[index] }
+    const selectedIndex = this.selectedProducts.findIndex(p => p.id === product.id)
+    if (selectedIndex > -1) {
+      const updatedProducts = [...this.selectedProducts]
+      const productToUpdate = { ...updatedProducts[selectedIndex] }
       productToUpdate.quantity++
-      updatedProducts[index] = productToUpdate
-      this.selectedProductsValue = updatedProducts
+      updatedProducts[selectedIndex] = productToUpdate
+      this.selectedProducts = updatedProducts
     }
   }
 
@@ -169,16 +176,16 @@ export default class Retail_Pos_Stores_ShowController extends Retail_Pos_LayoutC
     const product = this.findSelectedProductById(productId)
     if (!product) return
 
-    const index = this.selectedProductsValue.findIndex(p => p.id === product.id)
-    if (index > -1) {
-      const product = this.selectedProductsValue[index]
+    const selectedIndex = this.selectedProducts.findIndex(p => p.id === product.id)
+    if (selectedIndex > -1) {
+      const product = this.selectedProducts[selectedIndex]
       if (product.quantity - 1 <= 0) {
-        this.selectedProductsValue = [...this.selectedProductsValue.slice(0, index), ...this.selectedProductsValue.slice(index + 1)]
+        this.selectedProducts = [...this.selectedProducts.slice(0, selectedIndex), ...this.selectedProducts.slice(selectedIndex + 1)]
       } else {
-        const updatedProducts = [...this.selectedProductsValue]
+        const updatedProducts = [...this.selectedProducts]
         const productToUpdate = { ...product, quantity: product.quantity - 1 }
-        updatedProducts[index] = productToUpdate
-        this.selectedProductsValue = updatedProducts
+        updatedProducts[selectedIndex] = productToUpdate
+        this.selectedProducts = updatedProducts
       }
     }
   }
@@ -187,7 +194,7 @@ export default class Retail_Pos_Stores_ShowController extends Retail_Pos_LayoutC
     const { cartId } = event.params
     const cart = this.cartsValue.find(cart => cart.id === cartId)
     if (!cart) return
-    this.currentCartValue = cart
+    this.currentCartIdValue = cartId
   }
 
   openSetting(event) {
@@ -196,13 +203,14 @@ export default class Retail_Pos_Stores_ShowController extends Retail_Pos_LayoutC
     })
   }
 
-  cartsValueChanged(value, previousValue) {
+  cartIdsValueChanged(value, previousValue) {
     this.cartsTarget.innerHTML = this.cartsHTML()
   }
 
   cartsHTML() {
     return `
-      ${this.cartsValue.map(cart => {
+      ${this.cartIdsValue.map(id => {
+        const cart = this.carts.find(c => c.id === id)
         return `
           <div>
             <button
@@ -223,7 +231,8 @@ export default class Retail_Pos_Stores_ShowController extends Retail_Pos_LayoutC
 
   productsHTML() {
     return `
-      ${this.productsValue.map(product => {
+      ${this.productIdsValue.map(productId => {
+        const product = this.findProductById(productId)
         return `
           <div
             class="flex flex-col bg-white dark:bg-gray-900 rounded-xl border-4 border-gray-200 open:border-blue-500 dark:border-gray-800 overflow-hidden cursor-pointer hover:shadow-xl hover:shadow-gray-500/50 transition-shadow"

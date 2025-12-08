@@ -12,7 +12,7 @@ export default class Education_LayoutController extends ApplicationController {
     
   }
 
-  initBinding() {
+  initBindings() {
     this.currentCompanyGroup = currentCompanyGroup();
     this.companyGroups = companyGroups();
   }

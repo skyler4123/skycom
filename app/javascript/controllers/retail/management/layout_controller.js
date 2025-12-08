@@ -12,7 +12,7 @@ export default class Retail_Management_LayoutController extends ApplicationContr
     
   }
 
-  initBinding() {
+  initBindings() {
     this.currentCompanyGroup = currentCompanyGroup();
     this.companyGroups = companyGroups()
   }
