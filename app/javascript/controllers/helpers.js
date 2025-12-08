@@ -37,7 +37,63 @@ export const capitalize = (string) => {
   return string.charAt(0).toUpperCase() + string.slice(1);
 }
 
+/**
+ * Merges two arrays of objects based on a specified key.
+ * Elements in arrayB override elements in arrayA if the key matches.
+ * New elements in arrayB are appended.
+ *
+ * @param {Array<Object>} arrayA The primary array (will be overwritten by B).
+ * @param {Array<Object>} arrayB The array with merging/new elements.
+ * @param {string} key The property key to use for matching elements (e.g., 'id').
+ * @returns {Array<Object>} The merged array.
+ * const A = [{id: 1, name: "a"},{id: 2, name: "b"}];
+ * const B = [{id: 2, name: "bb"},{id: 3, name: "c"}];
+ * const mergedArray = mergeArraysByKey(A, B, "id");
+ * console.log(mergedArray);
+ * Expected Result: [ { id: 1, name: 'a' }, { id: 2, name: 'bb' }, { id: 3, name: 'c' } ]
+ */
+export const mergeArraysByKey = (arrayA, arrayB, key) => {
+  // 1. Create a Map from arrayA for O(1) lookup
+  // The Map will store the key value as the map key and the object as the map value.
+  const mapA = new Map(arrayA.map(item => [item[key], item]));
 
+  // 2. Iterate through arrayB and update the map
+  arrayB.forEach(itemB => {
+    // itemB[key] is the value of the 'id' (or specified key) property.
+    // .set() will override the existing value if the key exists (the merge/override logic)
+    // or add a new entry if the key doesn't exist (the append logic).
+    mapA.set(itemB[key], itemB);
+  });
+
+  // 3. Convert the Map values back to an array
+  return Array.from(mapA.values());
+}
+
+/**
+ * Filters arrayA to remove elements whose key matches any key in arrayB.
+ * This is a set difference operation (A - B).
+ *
+ * @param {Array<Object>} arrayA The array to be filtered (the minuend).
+ * @param {Array<Object>} arrayB The array containing keys to exclude (the subtrahend).
+ * @param {string} key The property key to use for matching elements (e.g., 'id').
+ * @returns {Array<Object>} The resulting array (A - B).
+ * const A = [{id: 1, name: "a"},{id: 2, name: "b"}];
+ * const B = [{id: 2, name: "bb"},{id: 3, name: "c"}];
+ * const resultArray = subtractArraysByKey(A, B, "id");
+ * console.log(resultArray);
+ *  Expected Result: [ { id: 1, name: 'a' } ]
+ */
+export const subtractArraysByKey = (arrayA, arrayB, key) => {
+  // 1. Create a Set of all key values from arrayB for O(1) existence check.
+  // Set is used because checking Set.has(value) is much faster than array.includes(value).
+  const keysToExclude = new Set(arrayB.map(item => item[key]));
+
+  // 2. Filter arrayA
+  // Keep only the elements from arrayA whose key value IS NOT in the keysToExclude Set.
+  const resultArray = arrayA.filter(itemA => !keysToExclude.has(itemA[key]));
+
+  return resultArray;
+}
 
 // get Cookie object
 export const Cookie = (name) => {
