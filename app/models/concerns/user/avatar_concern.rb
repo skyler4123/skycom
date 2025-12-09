@@ -27,7 +27,7 @@ module User::AvatarConcern
     end
 
     def update_avatar
-      self.update(avatar: avatar_path)
+      self.update(avatar: avatar_url)
     end
   end
 end

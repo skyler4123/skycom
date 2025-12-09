@@ -1,5 +1,5 @@
 import Retail_Pos_LayoutController from "controllers/retail/pos/layout_controller"
-import { pathname, randomId, openModal, queryArray, findArray, findById, pluck, mergeArrays, subtractArrays } from "controllers/helpers"
+import { pathname, randomId, openModal, queryArray, findById, pluck, mergeObjectArrays, mergeArrays, subtractObjectArrays, subtractArrays } from "controllers/helpers"
 import Retail_Pos_Stores_SettingController from "controllers/retail/pos/stores/setting_controller"
 
 export default class Retail_Pos_Stores_ShowController extends Retail_Pos_LayoutController {
@@ -13,11 +13,10 @@ export default class Retail_Pos_Stores_ShowController extends Retail_Pos_LayoutC
   }
 
   async init() {
-    console.log(this)
-
     this.products = []
     this.selectedProducts = []
     this.carts = []
+
     this.products = await this.fetchProducts()
     this.carts = [
       {
@@ -35,7 +34,8 @@ export default class Retail_Pos_Stores_ShowController extends Retail_Pos_LayoutC
   }
 
   initValues() {
-    this.productIdsValue = this.products.map(product => product.id)
+    this.productIdsValue = pluck(this.products)
+    this.cartIdsValue = pluck(this.carts)
     this.currentCartIdValue = this.carts[0].id
   }
 
@@ -54,81 +54,58 @@ export default class Retail_Pos_Stores_ShowController extends Retail_Pos_LayoutC
   }
 
   productIdsValueChanged(value, previousValue) {
-    this.productsTarget.innerHTML = this.productsHTML()
-  }
-
-  findProductById(id) {
-    return this.products.find(product => product.id === id)
-  }
-
-  findSelectedProductById(id) {
-    return this.selectedProducts.find(product => product.id === id)
+    this.renderProducts()
   }
 
   toggleOrder(event) {
     const { productId } = event.params
-    const product = this.findProductById(productId)
-    if (!product) return
-
-    const selectedIndex = this.selectedProductIdsValue.findIndex(selectedProductId => selectedProductId === productId)
-
-    if (selectedIndex > -1) {
-      // Product is already selected, so remove it.
-      this.selectedProductIdsValue = [...this.selectedProductIdsValue.slice(0, selectedIndex), ...this.selectedProductIdsValue.slice(selectedIndex + 1)]
+    const selectedProduct = findById(this.selectedProducts, productId)
+    if (selectedProduct) {
+      this.selectedProductIdsValue = subtractArrays(this.selectedProductIdsValue, [productId])
     } else {
-      this.selectedProductIdsValue = [...this.selectedProductIdsValue, productId]
+      this.selectedProductIdsValue = mergeArrays(this.selectedProductIdsValue, [productId])
     }
   }
 
   selectedProductIdsValueChanged(value, previousValue) {
-    const selectedProductIds = value
-    const newSelectedProducts = queryArray(this.products, { id: selectedProductIds })
-    const newSelectedProductsWithQuantity = newSelectedProducts.map(product => {
-      return {
-        ...product,
-        quantity: 1
-      }
-    })
-    this.selectedProducts = newSelectedProductsWithQuantity
-
     if (previousValue === undefined) return
+    this.selectedProducts = queryArray(this.products, {id: value}).map(product => ({...product, quantity: 1}))
+    this.renderHighLightProducts()
+    this.renderSelectedProducts()
+    this.totalSelectedProductsPriceValue = this.totalSelectedProductsPrice()
+    const currentCart = this.currentCart()
+    currentCart.selectedProducts = this.selectedProducts
+    this.carts = mergeObjectArrays(this.carts, [currentCart])
+  }
+
+  renderHighLightProducts() {
     this.productTargets.forEach((productTarget) => {
       const productTargetId = productTarget.getAttribute(`data-${this.identifier}-product-id-param`)
-      const selectedProduct = this.findSelectedProductById(productTargetId)
-      if (selectedProduct) {
+      if (this.selectedProductIdsValue.includes(productTargetId)) {
         productTarget.setAttribute('open', '')
       } else {
         productTarget.removeAttribute('open')
       }
     })
-    this.renderSelectedProducts()
-    this.renderTotalSelectedProductsPrice()
   }
 
-  renderTotalSelectedProductsPrice() {
-    this.totalSelectedProductsPriceValue = this.totalSelectedProductsPrice()
-    this.totalSelectedProductsPriceTarget.innerHTML = `$${this.totalSelectedProductsPriceValue.toFixed(2)}`
-  }
-
-  renderSelectedProducts() {
-    this.selectedProductsTarget.innerHTML = this.selectedProducts.map(selectedProduct => {
-      return this.selectedProductHTML(selectedProduct)
-    }).join('')
-  }
-
-  // update cartsValue from currentCartValue
   currentCartIdValueChanged(value, previousValue) {
     if (previousValue === undefined) return
 
+    this.renderHighLightCurrentCart()
+    this.selectedProducts = this.currentCart().selectedProducts
+    this.selectedProductIdsValue = pluck(this.selectedProducts)
+  }
+
+  renderHighLightCurrentCart() {
     this.cartTargets.forEach((cartTarget) => {
       const cartTargetId = cartTarget.getAttribute(`data-${this.identifier}-cart-id-param`)
-      if (cartTargetId === value) {
+      if (cartTargetId === this.currentCartIdValue) {
         cartTarget.setAttribute('open', '')
       } else {
         cartTarget.removeAttribute('open')
       }
     })
-    this.selectedProducts = this.currentCart().selectedProducts
   }
 
   currentCart() {
@@ -142,47 +119,45 @@ export default class Retail_Pos_Stores_ShowController extends Retail_Pos_LayoutC
   }
 
   totalSelectedProductsPriceValueChanged(value, previousValue) {
-    this.totalSelectedProductsPriceTarget.innerHTML = `$${value.toFixed(2)}`
+    this.renderTotalSelectedProductsPrice()
+  }
+
+  renderTotalSelectedProductsPrice() {
+    this.totalSelectedProductsPriceTarget.innerHTML = `$${this.totalSelectedProductsPriceValue.toFixed(2)}`
   }
 
   increaseQuantityByOne(event) {
     const { productId } = event.params
-    
     const selectedProduct = findById(this.selectedProducts, productId)
-    if (!selectedProduct) return
-
     const newSelectedProduct = {
       ...selectedProduct,
       quantity: selectedProduct.quantity + 1
     }
-    this.selectedProducts = mergeArrays(this.selectedProducts, [newSelectedProduct])
+    this.selectedProducts = mergeObjectArrays(this.selectedProducts, [newSelectedProduct])
     this.renderSelectedProducts()
-    this.renderTotalSelectedProductsPrice()
+    this.totalSelectedProductsPriceValue = this.totalSelectedProductsPrice()
   }
 
   decreaseQuantityByOne(event) {
     const { productId } = event.params
-
     const selectedProduct = findById(this.selectedProducts, productId)
-    if (!selectedProduct) return
-
     const newSelectedProduct = {
       ...selectedProduct,
       quantity: Math.max(0, selectedProduct.quantity - 1)
     }
     if (newSelectedProduct.quantity === 0) {
-      this.selectedProducts = subtractArrays(this.selectedProducts, [newSelectedProduct])
+      this.selectedProducts = subtractObjectArrays(this.selectedProducts, [newSelectedProduct])
     } else {
-      this.selectedProducts = mergeArrays(this.selectedProducts, [newSelectedProduct])
+      this.selectedProducts = mergeObjectArrays(this.selectedProducts, [newSelectedProduct])
     }
     this.selectedProductIdsValue = pluck(this.selectedProducts, 'id')
     this.renderSelectedProducts()
-    this.renderTotalSelectedProductsPrice()
+    this.totalSelectedProductsPriceValue = this.totalSelectedProductsPrice()
   }
 
   selectCart(event) {
     const { cartId } = event.params
-    const cart = this.cartsValue.find(cart => cart.id === cartId)
+    const cart = findById(this.carts, cartId)
     if (!cart) return
     this.currentCartIdValue = cartId
   }
@@ -194,13 +169,12 @@ export default class Retail_Pos_Stores_ShowController extends Retail_Pos_LayoutC
   }
 
   cartIdsValueChanged(value, previousValue) {
-    this.cartsTarget.innerHTML = this.cartsHTML()
+    this.renderCarts()
   }
 
-  cartsHTML() {
-    return `
-      ${this.cartIdsValue.map(id => {
-        const cart = this.carts.find(c => c.id === id)
+  renderCarts() {
+    this.cartsTarget.innerHTML = `
+      ${this.carts.map(cart => {
         return `
           <div>
             <button
@@ -219,10 +193,10 @@ export default class Retail_Pos_Stores_ShowController extends Retail_Pos_LayoutC
     `
   }
 
-  productsHTML() {
-    return `
+  renderProducts() {
+    this.productsTarget.innerHTML = `
       ${this.productIdsValue.map(productId => {
-        const product = this.findProductById(productId)
+        const product = findById(this.products, productId)
         return `
           <div
             class="flex flex-col bg-white dark:bg-gray-900 rounded-xl border-4 border-gray-200 open:border-blue-500 dark:border-gray-800 overflow-hidden cursor-pointer hover:shadow-xl hover:shadow-gray-500/50 transition-shadow"
@@ -243,32 +217,34 @@ export default class Retail_Pos_Stores_ShowController extends Retail_Pos_LayoutC
     `
   }
 
-  selectedProductHTML(product) {
-    return `
-      <div class="flex items-center gap-4">
-        <div class="w-16 h-16 rounded-lg bg-gray-100 dark:bg-gray-800 flex-shrink-0 bg-cover bg-center"
-          style='background-image: url("${product.image_urls[0]}")'>
+  renderSelectedProducts() {
+    this.selectedProductsTarget.innerHTML = this.selectedProducts.map(product => {
+      return `
+        <div class="flex items-center gap-4">
+          <div class="w-16 h-16 rounded-lg bg-gray-100 dark:bg-gray-800 flex-shrink-0 bg-cover bg-center"
+            style='background-image: url("${product.image_urls[0]}")'>
+          </div>
+          <div class="flex-1">
+            <h3 class="font-medium text-gray-800 dark:text-gray-100 text-sm">${product.name}</h3>
+            <p class="text-xs text-gray-500 dark:text-gray-400">$${product.price}</p>
+          </div>
+          <div class="flex items-center gap-2">
+            <button
+              class="w-7 h-7 rounded-md border border-gray-200 dark:border-gray-700 flex items-center justify-center hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer"
+              data-action="click->${this.identifier}#decreaseQuantityByOne"
+              data-${this.identifier}-product-id-param="${product.id}"
+            >-</button>
+            <span class="font-medium w-4 text-center">${product.quantity}</span>
+            <button
+              class="w-7 h-7 rounded-md border border-gray-200 dark:border-gray-700 flex items-center justify-center hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer"
+              data-action="click->${this.identifier}#increaseQuantityByOne"
+              data-${this.identifier}-product-id-param="${product.id}"
+            >+</button>
+          </div>
+          <p class="font-semibold text-sm w-16 text-right">$${(product.price * product.quantity).toFixed(2)}</p>
         </div>
-        <div class="flex-1">
-          <h3 class="font-medium text-gray-800 dark:text-gray-100 text-sm">${product.name}</h3>
-          <p class="text-xs text-gray-500 dark:text-gray-400">$${product.price}</p>
-        </div>
-        <div class="flex items-center gap-2">
-          <button
-            class="w-7 h-7 rounded-md border border-gray-200 dark:border-gray-700 flex items-center justify-center hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer"
-            data-action="click->${this.identifier}#decreaseQuantityByOne"
-            data-${this.identifier}-product-id-param="${product.id}"
-          >-</button>
-          <span class="font-medium w-4 text-center">${product.quantity}</span>
-          <button
-            class="w-7 h-7 rounded-md border border-gray-200 dark:border-gray-700 flex items-center justify-center hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer"
-            data-action="click->${this.identifier}#increaseQuantityByOne"
-            data-${this.identifier}-product-id-param="${product.id}"
-          >+</button>
-        </div>
-        <p class="font-semibold text-sm w-16 text-right">$${(product.price * product.quantity).toFixed(2)}</p>
-      </div>
-    `
+      `
+    }).join('')
   }
 
   layoutHTML() {

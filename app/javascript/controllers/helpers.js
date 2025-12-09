@@ -48,11 +48,11 @@ export const capitalize = (string) => {
  * @returns {Array<Object>} The merged array.
  * const A = [{id: 1, name: "a"},{id: 2, name: "b"}];
  * const B = [{id: 2, name: "bb"},{id: 3, name: "c"}];
- * const mergedArray = mergeArraysByKey(A, B, "id");
+ * const mergedArray = mergeObjectArraysByKey(A, B, "id");
  * console.log(mergedArray);
  * Expected Result: [ { id: 1, name: 'a' }, { id: 2, name: 'bb' }, { id: 3, name: 'c' } ]
  */
-export const mergeArraysByKey = (arrayA, arrayB, key) => {
+export const mergeObjectArrays = (arrayA, arrayB, key = "id") => {
   // 1. Create a Map from arrayA for O(1) lookup
   // The Map will store the key value as the map key and the object as the map value.
   const mapA = new Map(arrayA.map(item => [item[key], item]));
@@ -69,8 +69,25 @@ export const mergeArraysByKey = (arrayA, arrayB, key) => {
   return Array.from(mapA.values());
 }
 
+/**
+ * Merges arrayB into arrayA without duplicates.
+ * Mutates arrayA and returns it.
+ */
 export const mergeArrays = (arrayA, arrayB) => {
-  return mergeArraysByKey(arrayA, arrayB, "id");
+  // Create a Set from arrayA for instant O(1) lookup
+  const seen = new Set(arrayA);
+
+  arrayB.forEach(element => {
+    // Only append if the element is not already in the Set
+    if (!seen.has(element)) {
+      arrayA.push(element);
+      
+      // Update the Set to prevent duplicates if arrayB has repeats
+      seen.add(element); 
+    }
+  });
+
+  return arrayA;
 }
 
 /**
@@ -83,11 +100,11 @@ export const mergeArrays = (arrayA, arrayB) => {
  * @returns {Array<Object>} The resulting array (A - B).
  * const A = [{id: 1, name: "a"},{id: 2, name: "b"}];
  * const B = [{id: 2, name: "bb"},{id: 3, name: "c"}];
- * const resultArray = subtractArraysByKey(A, B, "id");
+ * const resultArray = subtractObjectArraysByKey(A, B, "id");
  * console.log(resultArray);
  *  Expected Result: [ { id: 1, name: 'a' } ]
  */
-export const subtractArraysByKey = (arrayA, arrayB, key) => {
+export const subtractObjectArrays = (arrayA, arrayB, key = "id") => {
   // 1. Create a Set of all key values from arrayB for O(1) existence check.
   // Set is used because checking Set.has(value) is much faster than array.includes(value).
   const keysToExclude = new Set(arrayB.map(item => item[key]));
@@ -99,8 +116,25 @@ export const subtractArraysByKey = (arrayA, arrayB, key) => {
   return resultArray;
 }
 
+/**
+ * Removes elements from arrayA that exist in arrayB.
+ * Mutates arrayA and returns it.
+ */
 export const subtractArrays = (arrayA, arrayB) => {
-  return subtractArraysByKey(arrayA, arrayB, "id");
+  // 1. Create a Set from arrayB for instant O(1) lookup
+  const exclude = new Set(arrayB);
+
+  // 2. Loop backwards through arrayA
+  // We loop backwards so removing an item doesn't mess up the indices of upcoming items
+  for (let i = arrayA.length - 1; i >= 0; i--) {
+    
+    // 3. If the element exists in the exclusion set, remove it
+    if (exclude.has(arrayA[i])) {
+      arrayA.splice(i, 1);
+    }
+  }
+
+  return arrayA;
 }
 
 /**
@@ -170,13 +204,12 @@ export const findArray = (array, conditions) => {
  * for a specified key.
  *
  * @param {Array<Object>} array The array of objects to search through.
- * @param {any} idValue The ID value to match (e.g., 1, "abc", etc.).
- * @param {string} key The property key to check for the ID (defaults to 'id').
+ * @param {any} id The ID value to match (e.g., 1, "abc", etc.).
  * @returns {Object | undefined} The first matching object, or undefined if no match is found.
  */
 
-export const findById = (array, idValue, key = 'id') => {
-  return array.find(item => item[key] === idValue);
+export const findById = (array, id) => {
+  return array.find(item => item["id"] === id);
 }
 
 /**
@@ -186,7 +219,7 @@ export const findById = (array, idValue, key = 'id') => {
  * @param {string} key The property name whose values should be extracted.
  * @returns {Array<any>} A new array containing only the values of the specified key.
  */
-export const pluck = (array, key) => {
+export const pluck = (array, key = "id") => {
   // The map function iterates over every item and returns the result of the
   // function applied to it (item[key]).
   return array.map(item => item[key]);
