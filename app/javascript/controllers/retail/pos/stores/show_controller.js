@@ -1,26 +1,23 @@
 import Retail_Pos_LayoutController from "controllers/retail/pos/layout_controller"
-import { pathname, randomId, openModal } from "controllers/helpers"
+import { pathname, randomId, openModal, queryArray, findArray, findById, pluck, mergeArrays, subtractArrays } from "controllers/helpers"
 import Retail_Pos_Stores_SettingController from "controllers/retail/pos/stores/setting_controller"
 
 export default class Retail_Pos_Stores_ShowController extends Retail_Pos_LayoutController {
   static targets = ['products', "product", "selectedProduct", "selectedProducts", "totalSelectedProductsPrice", "carts", "cart"]
   static values = {
-    // products: { type: Array, default: [] },
     productIds: { type: Array, default: [] },
-    // selectedProducts: { type: Array, default: [] },
     selectedProductIds: { type: Array, default: [] },
     totalSelectedProductsPrice: { type: Number, default: 0 },
-    // carts: { type: Array, default: [] },
     cartIds: { type: Array, default: [] },
-    // currentCart: { type: Object, default: {} }
     currentCartId: { type: String, default: "" }
   }
 
-  async initBindings() {
+  async init() {
+    console.log(this)
+
     this.products = []
     this.selectedProducts = []
     this.carts = []
-
     this.products = await this.fetchProducts()
     this.carts = [
       {
@@ -34,14 +31,10 @@ export default class Retail_Pos_Stores_ShowController extends Retail_Pos_LayoutC
         selectedProducts: []
       }
     ];
-  }
-
-  init() {
     this.initValues()
-    this.initTargetsHTML()
   }
 
-  async initValues() {
+  initValues() {
     this.productIdsValue = this.products.map(product => product.id)
     this.currentCartIdValue = this.carts[0].id
   }
@@ -88,14 +81,15 @@ export default class Retail_Pos_Stores_ShowController extends Retail_Pos_LayoutC
   }
 
   selectedProductIdsValueChanged(value, previousValue) {
-    // Sync to this.selectedProducts
-    const newSelectedProducts = value.map(selectedId => {
-      const selectedProduct = this.products.find(product => product.id === selectedId)
-      const selectedQuantity = this.findSelectedProductById(selectedId)?.quantity || 1
-      selectedProduct = { ...selectedProduct, quantity: selectedQuantity}
-      return selectedProduct
-    }).filter(product => product)
-    this.selectedProducts = newSelectedProducts
+    const selectedProductIds = value
+    const newSelectedProducts = queryArray(this.products, { id: selectedProductIds })
+    const newSelectedProductsWithQuantity = newSelectedProducts.map(product => {
+      return {
+        ...product,
+        quantity: 1
+      }
+    })
+    this.selectedProducts = newSelectedProductsWithQuantity
 
     if (previousValue === undefined) return
     this.productTargets.forEach((productTarget) => {
@@ -107,15 +101,25 @@ export default class Retail_Pos_Stores_ShowController extends Retail_Pos_LayoutC
         productTarget.removeAttribute('open')
       }
     })
-    this.selectedProductsTarget.innerHTML = this.selectedProductsHTML()
-    this.totalSelectedProductsPriceValue = this.totalSelectedProductsPrice()
+    this.renderSelectedProducts()
+    this.renderTotalSelectedProductsPrice()
+  }
 
-    // TODO
-    this.currentCart = {...this.currentCart, selectedProducts: this.selectedProducts}
+  renderTotalSelectedProductsPrice() {
+    this.totalSelectedProductsPriceValue = this.totalSelectedProductsPrice()
+    this.totalSelectedProductsPriceTarget.innerHTML = `$${this.totalSelectedProductsPriceValue.toFixed(2)}`
+  }
+
+  renderSelectedProducts() {
+    this.selectedProductsTarget.innerHTML = this.selectedProducts.map(selectedProduct => {
+      return this.selectedProductHTML(selectedProduct)
+    }).join('')
   }
 
   // update cartsValue from currentCartValue
   currentCartIdValueChanged(value, previousValue) {
+    if (previousValue === undefined) return
+
     this.cartTargets.forEach((cartTarget) => {
       const cartTargetId = cartTarget.getAttribute(`data-${this.identifier}-cart-id-param`)
       if (cartTargetId === value) {
@@ -131,24 +135,9 @@ export default class Retail_Pos_Stores_ShowController extends Retail_Pos_LayoutC
     return this.carts.find(cart => cart.id === this.currentCartIdValue)
   }
 
-  selectedProductsHTML() {
-    return this.selectedProducts.map(selectedProduct => {
-      return this.selectedProductHTML(selectedProduct)
-    }).join('')
-  }
-
-  toggleOpenAttribute(element) {
-    // add/remove attribute "open", not classList
-    if (element.hasAttribute('open')) {
-      element.removeAttribute('open')
-    } else {
-      element.setAttribute('open', '')
-    }
-  }
-
   totalSelectedProductsPrice() {
     return this.selectedProducts.reduce((total, selectedProduct) => {
-      return  (total + proselectedProductduct.price * selectedProduct.quantity)
+      return  (total + selectedProduct.price * selectedProduct.quantity)
     }, 0)
   }
 
@@ -158,36 +147,37 @@ export default class Retail_Pos_Stores_ShowController extends Retail_Pos_LayoutC
 
   increaseQuantityByOne(event) {
     const { productId } = event.params
-    const product = this.findSelectedProductById(productId)
-    if (!product) return
+    
+    const selectedProduct = findById(this.selectedProducts, productId)
+    if (!selectedProduct) return
 
-    const selectedIndex = this.selectedProducts.findIndex(p => p.id === product.id)
-    if (selectedIndex > -1) {
-      const updatedProducts = [...this.selectedProducts]
-      const productToUpdate = { ...updatedProducts[selectedIndex] }
-      productToUpdate.quantity++
-      updatedProducts[selectedIndex] = productToUpdate
-      this.selectedProducts = updatedProducts
+    const newSelectedProduct = {
+      ...selectedProduct,
+      quantity: selectedProduct.quantity + 1
     }
+    this.selectedProducts = mergeArrays(this.selectedProducts, [newSelectedProduct])
+    this.renderSelectedProducts()
+    this.renderTotalSelectedProductsPrice()
   }
 
   decreaseQuantityByOne(event) {
     const { productId } = event.params
-    const product = this.findSelectedProductById(productId)
-    if (!product) return
 
-    const selectedIndex = this.selectedProducts.findIndex(p => p.id === product.id)
-    if (selectedIndex > -1) {
-      const product = this.selectedProducts[selectedIndex]
-      if (product.quantity - 1 <= 0) {
-        this.selectedProducts = [...this.selectedProducts.slice(0, selectedIndex), ...this.selectedProducts.slice(selectedIndex + 1)]
-      } else {
-        const updatedProducts = [...this.selectedProducts]
-        const productToUpdate = { ...product, quantity: product.quantity - 1 }
-        updatedProducts[selectedIndex] = productToUpdate
-        this.selectedProducts = updatedProducts
-      }
+    const selectedProduct = findById(this.selectedProducts, productId)
+    if (!selectedProduct) return
+
+    const newSelectedProduct = {
+      ...selectedProduct,
+      quantity: Math.max(0, selectedProduct.quantity - 1)
     }
+    if (newSelectedProduct.quantity === 0) {
+      this.selectedProducts = subtractArrays(this.selectedProducts, [newSelectedProduct])
+    } else {
+      this.selectedProducts = mergeArrays(this.selectedProducts, [newSelectedProduct])
+    }
+    this.selectedProductIdsValue = pluck(this.selectedProducts, 'id')
+    this.renderSelectedProducts()
+    this.renderTotalSelectedProductsPrice()
   }
 
   selectCart(event) {

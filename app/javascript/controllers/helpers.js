@@ -69,6 +69,10 @@ export const mergeArraysByKey = (arrayA, arrayB, key) => {
   return Array.from(mapA.values());
 }
 
+export const mergeArrays = (arrayA, arrayB) => {
+  return mergeArraysByKey(arrayA, arrayB, "id");
+}
+
 /**
  * Filters arrayA to remove elements whose key matches any key in arrayB.
  * This is a set difference operation (A - B).
@@ -95,42 +99,97 @@ export const subtractArraysByKey = (arrayA, arrayB, key) => {
   return resultArray;
 }
 
+export const subtractArrays = (arrayA, arrayB) => {
+  return subtractArraysByKey(arrayA, arrayB, "id");
+}
+
 /**
  * Queries an array of objects based on an object of conditions (key-value pairs).
+ * Supports both single value matches (e.g., { gender: "male" }) and
+ * array value matches (e.g., { id: [1, 2, 3] }).
  * An element is included in the result only if ALL conditions match.
  *
  * @param {Array<Object>} array The array of objects to query.
- * @param {Object} conditions An object where keys are the properties to check (e.g., 'id', 'gender')
- * and values are the required values.
+ * @param {Object} conditions An object where keys are the properties to check
+ * and values are the required value OR an array of required values.
  * @returns {Array<Object>} A new array containing only the objects that match all conditions.
- * const people = [
- *  { id: 1, name: "Alice", gender: "female", age: 30, city: "Paris" },
- *  { id: 2, name: "Bob", gender: "male", age: 25, city: "London" },
- *  { id: 3, name: "Charlie", gender: "male", age: 30, city: "Paris" },
- *  { id: 4, name: "Diana", gender: "female", age: 35, city: "London" },
- *  { id: 5, name: "Eve", gender: "female", age: 25, city: "Paris" }
- * ];
- * Query for people who are 'male' AND 'age' is 30
- * const resultA = queryArray(people, { gender: "male", age: 30 });
- * console.log("Result A:", resultA);
- * /*
- * Result A: [
- *   { id: 3, name: "Charlie", gender: "male", age: 30, city: "Paris" }
- * ]
  */
 export const queryArray = (array, conditions) => {
-  // Get an array of the keys (property names) from the conditions object
   const keys = Object.keys(conditions);
 
-  // Return the filtered array
   return array.filter(item => {
-    // Check if ALL conditions pass for the current item
+    // Use .every() to ensure ALL conditions must pass
     return keys.every(key => {
-      // The condition passes if the item's property value matches
-      // the value specified in the conditions object.
-      return item[key] === conditions[key];
+      const conditionValue = conditions[key];
+      const itemValue = item[key];
+
+      // Check if the condition value is an array (the new functionality)
+      if (Array.isArray(conditionValue)) {
+        // Condition for IN LIST:
+        // Check if the item's value is included in the list of allowed values
+        return conditionValue.includes(itemValue);
+      } else {
+        // Condition for EQUALS:
+        // Default behavior: check for a simple equality match
+        return itemValue === conditionValue;
+      }
     });
   });
+}
+
+/**
+ * Finds the first object in an array that matches ALL conditions.
+ * This is the most efficient approach as it stops searching upon the first match.
+ *
+ * @param {Array<Object>} array The array of objects to search through.
+ * @param {Object} conditions An object containing the required key-value matches (including array matching).
+ * @returns {Object | undefined} The first matching object, or undefined if no match is found.
+ */
+export const findArray = (array, conditions) => {
+  const keys = Object.keys(conditions);
+
+  return array.find(item => { // Changed from .filter() to .find()
+    // Use .every() to ensure ALL conditions must pass
+    return keys.every(key => {
+      const conditionValue = conditions[key];
+      const itemValue = item[key];
+
+      // Check if the condition value is an array (IN LIST condition)
+      if (Array.isArray(conditionValue)) {
+        return conditionValue.includes(itemValue);
+      } else {
+        // Simple EQUALS condition
+        return itemValue === conditionValue;
+      }
+    });
+  });
+};
+
+/**
+ * Finds and returns the first object in an array that matches the given ID value
+ * for a specified key.
+ *
+ * @param {Array<Object>} array The array of objects to search through.
+ * @param {any} idValue The ID value to match (e.g., 1, "abc", etc.).
+ * @param {string} key The property key to check for the ID (defaults to 'id').
+ * @returns {Object | undefined} The first matching object, or undefined if no match is found.
+ */
+
+export const findById = (array, idValue, key = 'id') => {
+  return array.find(item => item[key] === idValue);
+}
+
+/**
+ * Extracts (plucks) the value of a specified key from every object in an array.
+ *
+ * @param {Array<Object>} array The array of objects to process.
+ * @param {string} key The property name whose values should be extracted.
+ * @returns {Array<any>} A new array containing only the values of the specified key.
+ */
+export const pluck = (array, key) => {
+  // The map function iterates over every item and returns the result of the
+  // function applied to it (item[key]).
+  return array.map(item => item[key]);
 }
 
 // get Cookie object
@@ -314,4 +373,13 @@ export const closeSwal = () => {
 
 export const randomId = () => {
   return Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+}
+
+export const toggleOpenAttribute = (element) => {
+  // add/remove attribute "open", not classList
+  if (element.hasAttribute('open')) {
+    element.removeAttribute('open')
+  } else {
+    element.setAttribute('open', '')
+  }
 }
