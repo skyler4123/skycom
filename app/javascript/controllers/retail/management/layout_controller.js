@@ -82,8 +82,20 @@ export default class Retail_Management_LayoutController extends ApplicationContr
                   <p class="text-sm font-medium leading-normal" ${this.translate("Dashboard")}>Dashboard</p>
                 </a>
                 <a class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:bg-blue-100 open:text-blue-600" href="/retail/${this.currentCompanyGroup.id}/management/products" ${this.openByPathname()}/>
+                  <span class="material-symbols-outlined">apartment</span>
+                  <p class="text-sm font-medium leading-normal">Branch</p>
+                </a>
+                <a class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:bg-blue-100 open:text-blue-600" href="/retail/${this.currentCompanyGroup.id}/management/products" ${this.openByPathname()}/>
+                  <span class="material-symbols-outlined">family_group</span>
+                  <p class="text-sm font-medium leading-normal">Department</p>
+                </a>
+                <a class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:bg-blue-100 open:text-blue-600" href="/retail/${this.currentCompanyGroup.id}/management/products" ${this.openByPathname()}/>
                   <span class="material-symbols-outlined">inventory_2</span>
                   <p class="text-sm font-medium leading-normal">Product</p>
+                </a>
+                <a class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:bg-blue-100 open:text-blue-600" href="/retail/${this.currentCompanyGroup.id}/management/products" ${this.openByPathname()}/>
+                  <span class="material-symbols-outlined">order_approve</span>
+                  <p class="text-sm font-medium leading-normal">Order</p>
                 </a>
                 <a class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:bg-blue-100 open:text-blue-600" href="/retail/${this.currentCompanyGroup.id}/management/bookings" ${this.openByPathname()}/>
                   <span class="material-symbols-outlined">calendar_month</span>
@@ -113,9 +125,21 @@ export default class Retail_Management_LayoutController extends ApplicationContr
                   <span class="material-symbols-outlined">receipt_long</span>
                   <p class="text-sm font-medium leading-normal">Invoices</p>
                 </a>
+                <a class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:bg-blue-100 open:text-blue-600" href="/retail/${this.currentCompanyGroup.id}/management/invoices" ${this.openByPathname()}/>
+                  <span class="material-symbols-outlined">calendar_month</span>
+                  <p class="text-sm font-medium leading-normal">Schedule</p>
+                </a>
+                <a class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:bg-blue-100 open:text-blue-600" href="/retail/${this.currentCompanyGroup.id}/management/invoices" ${this.openByPathname()}/>
+                  <span class="material-symbols-outlined">fact_check</span>
+                  <p class="text-sm font-medium leading-normal">Attendance</p>
+                </a>
                 <a class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:bg-blue-100 open:text-blue-600" href="/retail/${this.currentCompanyGroup.id}/management/reports" ${this.openByPathname()}/>
                   <span class="material-symbols-outlined">bar_chart</span>
                   <p class="text-sm font-medium leading-normal">Reports</p>
+                </a>
+                <a class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:bg-blue-100 open:text-blue-600" href="/retail/${this.currentCompanyGroup.id}/management/reports" ${this.openByPathname()}/>
+                  <span class="material-symbols-outlined">attribution</span>
+                  <p class="text-sm font-medium leading-normal">Adminitraition</p>
                 </a>
                 </div>
             </nav>
