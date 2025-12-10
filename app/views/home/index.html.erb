@@ -10,18 +10,42 @@
                 Skycom
               </h2>
             </div>
-            <div class="flex flex-1 justify-end gap-2">
-              <button
-                data-home--index-target="signInButton"
-                class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-4 bg-slate-200 dark:bg-slate-700 text-slate-900 dark:text-slate-100 text-sm font-bold leading-normal tracking-[0.015em]">
-                <span class="truncate">Sign In</span>
-              </button>
-              <button
-                data-home--index-target="signUpButton"
-                class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-4 bg-indigo-600 text-white text-sm font-bold leading-normal tracking-[0.015em]">
-                <span class="truncate">Sign Up</span>
-              </button>
-            </div>
+            <% if Current.user %>
+              <div class="flex flex-1 justify-end gap-2 items-center">
+                <div class="flex items-center gap-2">
+                  <div
+                    class="bg-center bg-no-repeat aspect-square bg-cover rounded-full h-10 w-10 border border-slate-200 dark:border-slate-700"
+                    style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuDmCMcaKuxM-L3kekIel30wVgf_J-ssrf86FqOelUJrmeAHwneIxkCor7hKn3SzOtbLg3DrSVpbI77hxo-i174Ll7V-lQ8CTCQB3H9YEA5_LSG8vyi_FynSf8l4w3lgYkc2uFLpD4U1w_DzdTIiCUzYkrAkVoZumb-iT_CjUsLofbZCfryp_hfJBATT8XUgqjbHSZdKEhdoREZiwf1ZCevLreCxK463hwZhGxwb6xu2NoSIYjbWxlfEmD5ABwPppLeyiUqyCCWWVw0");'>
+                  </div>
+                  <%
+=begin%>
+ <div class="flex flex-col">
+                    <p class="text-slate-900 dark:text-slate-100 text-sm font-bold leading-tight">
+                      <%= Current.user.name || "Your Name" %>
+                    </p>
+                  </div> 
+<%
+=end%>
+                </div>
+                <button
+                  class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-4 bg-slate-200 dark:bg-slate-700 text-slate-900 dark:text-slate-100 text-sm font-bold leading-normal tracking-[0.015em]">
+                  <span class="truncate">Sign Out</span>
+                </button>
+              </div>
+            <% else %>
+              <div class="flex flex-1 justify-end gap-2">
+                <button
+                  data-home--index-target="signInButton"
+                  class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-4 bg-slate-200 dark:bg-slate-700 text-slate-900 dark:text-slate-100 text-sm font-bold leading-normal tracking-[0.015em]">
+                  <span class="truncate">Sign In</span>
+                </button>
+                <button
+                  data-home--index-target="signUpButton"
+                  class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-4 bg-indigo-600 text-white text-sm font-bold leading-normal tracking-[0.015em]">
+                  <span class="truncate">Sign Up</span>
+                </button>
+              </div>
+            <% end %>
           </header>
           <main class="w-full">
             <div class="@container">
