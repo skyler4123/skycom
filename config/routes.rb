@@ -1,4 +1,8 @@
 Rails.application.routes.draw do
+  resources :document_appointments
+  resources :document_group_appointments
+  resources :documents
+  resources :document_groups
 
   # Routes for Retail Management
   resources :retail, only: [:show] do

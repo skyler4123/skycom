@@ -1,0 +1,2 @@
+module DocumentAppointmentsHelper
+end

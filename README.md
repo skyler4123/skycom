@@ -177,6 +177,11 @@ Things you may want to cover:
   bundle exec rails g scaffold Pricing country:integer region:integer nation:integer name description price:decimal code status:integer business_type:integer discarded_at:datetime:index --force
   bundle exec rails g scaffold PricingAppointment pricing:references appoint_from:references{polymorphic} appoint_to:references{polymorphic} appoint_for:references{polymorphic} appoint_by:references{polymorphic} name description code status:integer business_type:integer discarded_at:datetime:index --force
 
+  ### Document
+  bundle exec rails g scaffold DocumentGroup company_group:references company:references title content:json name description code status:integer business_type:integer discarded_at:datetime:index --force
+  bundle exec rails g scaffold Document document_group:references company_group:references company:references title content:json name description code status:integer business_type:integer discarded_at:datetime:index --force
+  bundle exec rails g scaffold DocumentGroupAppointment document_group:references appoint_from:references{polymorphic} appoint_to:references{polymorphic} appoint_for:references{polymorphic} appoint_by:references{polymorphic} name description code status:integer business_type:integer discarded_at:datetime:index --force
+  bundle exec rails g scaffold DocumentAppointment document:references appoint_from:references{polymorphic} appoint_to:references{polymorphic} appoint_for:references{polymorphic} appoint_by:references{polymorphic} name description code status:integer business_type:integer discarded_at:datetime:index --force
 
   ### Content & Knowledge Management
   bundle exec rails g scaffold Article
