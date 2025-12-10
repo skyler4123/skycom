@@ -96,7 +96,10 @@ export default class Home_IndexController extends ApplicationController {
             </button>
             <p class="text-center text-sm text-slate-600 dark:text-slate-400">
               Don't have an account?
-              <a class="font-medium text-indigo-600 hover:underline" href="#">Sign Up</a>
+              <button
+                data-action="click->${this.identifier}#openSignUpModal"
+                class="font-medium text-indigo-600 hover:underline cursor-pointer">Sign Up
+              </button>
             </p>
           </div>
         </div>
@@ -172,7 +175,10 @@ export default class Home_IndexController extends ApplicationController {
             </button>
             <p class="text-center text-sm text-slate-600 dark:text-slate-400">
               Already have an account?
-              <a class="font-medium text-indigo-600 hover:underline" href="#">Sign In</a>
+              <button
+                data-action="click->${this.identifier}#openSignInModal"
+                class="font-medium text-indigo-600 hover:underline cursor-pointer">Sign Up
+              </button>
             </p>
           </div>
         </div>
