@@ -44,4 +44,11 @@ export default class ApplicationController extends Controller {
   languageCodeTextTarget() {
     return `data-language-target="codeText"`
   }
+
+  // Append new action
+  addAction(element, action) {
+    const existingActions = element.getAttribute("data-action") || ""
+    const newActions = [existingActions, action].filter(Boolean).join(" ")
+    element.setAttribute("data-action", newActions)
+  }
 }
