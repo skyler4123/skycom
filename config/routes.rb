@@ -1,4 +1,8 @@
 Rails.application.routes.draw do
+  resources :article_appointments
+  resources :article_group_appointments
+  resources :articles
+  resources :article_groups
   resources :document_appointments
   resources :document_group_appointments
   resources :documents

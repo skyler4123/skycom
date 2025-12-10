@@ -1,0 +1,1 @@
+json.partial! "article_group_appointments/article_group_appointment", article_group_appointment: @article_group_appointment

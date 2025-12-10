@@ -183,6 +183,12 @@ Things you may want to cover:
   bundle exec rails g scaffold DocumentGroupAppointment document_group:references appoint_from:references{polymorphic} appoint_to:references{polymorphic} appoint_for:references{polymorphic} appoint_by:references{polymorphic} name description code status:integer business_type:integer discarded_at:datetime:index --force
   bundle exec rails g scaffold DocumentAppointment document:references appoint_from:references{polymorphic} appoint_to:references{polymorphic} appoint_for:references{polymorphic} appoint_by:references{polymorphic} name description code status:integer business_type:integer discarded_at:datetime:index --force
 
+  ### Article
+  bundle exec rails g scaffold ArticleGroup company_group:references company:references title content:json name description code status:integer business_type:integer discarded_at:datetime:index --force
+  bundle exec rails g scaffold Article article_group:references company_group:references company:references title content:json name description code status:integer business_type:integer discarded_at:datetime:index --force
+  bundle exec rails g scaffold ArticleGroupAppointment article_group:references appoint_from:references{polymorphic} appoint_to:references{polymorphic} appoint_for:references{polymorphic} appoint_by:references{polymorphic} name description code status:integer business_type:integer discarded_at:datetime:index --force
+  bundle exec rails g scaffold ArticleAppointment article:references appoint_from:references{polymorphic} appoint_to:references{polymorphic} appoint_for:references{polymorphic} appoint_by:references{polymorphic} name description code status:integer business_type:integer discarded_at:datetime:index --force
+
   ### Content & Knowledge Management
   bundle exec rails g scaffold Article
   bundle exec rails g scaffold Report

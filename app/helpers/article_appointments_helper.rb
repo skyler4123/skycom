@@ -1,0 +1,2 @@
+module ArticleAppointmentsHelper
+end
