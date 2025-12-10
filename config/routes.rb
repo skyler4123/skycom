@@ -7,10 +7,24 @@ Rails.application.routes.draw do
     # (e.g., app/controllers/retail/stores_controller.rb).
     scope module: :retail do
       namespace :management do
-        resources :stores
+        resources :dashboard
+        resources :branches
         resources :products
+        resources :orders
+        resources :bookings
+        resources :payments
         resources :employees
+        resources :inventories
+        resources :sales
+        resources :customers
+        resources :invoices
+        resources :schedules
+        resources :attendances
+        resources :reports
+        resources :settings
+        resources :administrators
       end
+
       namespace :pos do
         resources :stores, only: [:show] do
           member do

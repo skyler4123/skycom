@@ -1,6 +1,6 @@
 import Retail_Management_LayoutController from "controllers/retail/management/layout_controller"
 
-export default class Retail_Management_Stores_IndexController extends Retail_Management_LayoutController {
+export default class Retail_Management_Branches_IndexController extends Retail_Management_LayoutController {
 
   contentHTML() {
     return `
