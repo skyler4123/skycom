@@ -5,13 +5,19 @@ export default class LayoutController extends ApplicationController {
     this.element.innerHTML = this.layoutHTML()
   }
 
+  contentHTML() {
+    return `
+      <!-- ContentHTML -->
+    `
+  }
+
   layoutHTML() {
     return `
       <div class="bg-gray-50 dark:bg-gray-950">
         <div class="relative flex h-auto min-h-screen w-full flex-col group/design-root overflow-x-hidden">
           <div class="layout-container flex h-full grow flex-col">
             <div class="flex flex-1 justify-center">
-              <div class="layout-content-container flex flex-col max-w-[960px] flex-1">
+              <div class="layout-content-container flex flex-col flex-1">
                 <header class="flex items-center justify-between whitespace-nowrap px-10 py-3">
                   <div class="flex items-center gap-4 text-slate-900 dark:text-slate-100">
                     <span class="material-symbols-outlined text-2xl text-indigo-600">all_inclusive</span>
@@ -35,76 +41,9 @@ export default class LayoutController extends ApplicationController {
                     </button>
                   </div>
                 </header>
-                <main class="w-full flex justify-center py-12 px-4">
-                  <div
-                    class="flex flex-col w-full max-w-[600px] gap-8 bg-white dark:bg-slate-900 rounded-xl p-8 border border-slate-200 dark:border-slate-800 shadow-sm">
-                    <div class="flex flex-col gap-2">
-                      <h1 class="text-slate-900 dark:text-slate-100 text-3xl font-bold leading-tight tracking-[-0.015em]">
-                        Create Your Retail Company</h1>
-                      <p class="text-slate-600 dark:text-slate-400 text-base font-normal">Set up your
-                        workspace to manage inventory, sales, and more.</p>
-                    </div>
-                    <form class="flex flex-col gap-6">
-                      <div class="flex flex-col gap-2">
-                        <label class="text-slate-900 dark:text-slate-100 text-sm font-bold leading-tight"
-                          for="companyName">Company Name</label>
-                        <input
-                          class="flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-slate-900 dark:text-slate-100 focus:outline-0 focus:ring-0 border border-slate-300 dark:border-slate-700 bg-white dark:bg-gray-950 focus:border-indigo-600 h-12 px-4 text-base font-normal leading-normal placeholder:text-slate-400"
-                          id="companyName" placeholder="e.g. Skyline Boutique" type="text" />
-                      </div>
-                      <div class="flex flex-col gap-2">
-                        <label class="text-slate-900 dark:text-slate-100 text-sm font-bold leading-tight"
-                          for="companyAddress">Company Address</label>
-                        <input
-                          class="flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-slate-900 dark:text-slate-100 focus:outline-0 focus:ring-0 border border-slate-300 dark:border-slate-700 bg-white dark:bg-gray-950 focus:border-indigo-600 h-12 px-4 text-base font-normal leading-normal placeholder:text-slate-400"
-                          id="companyAddress" placeholder="123 Retail Ave, Commerce City" type="text" />
-                      </div>
-                      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div class="flex flex-col gap-2">
-                          <label class="text-slate-900 dark:text-slate-100 text-sm font-bold leading-tight"
-                            for="retailCategory">Retail Category</label>
-                          <div class="relative">
-                            <select
-                              class="flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-slate-900 dark:text-slate-100 focus:outline-0 focus:ring-0 border border-slate-300 dark:border-slate-700 bg-white dark:bg-gray-950 focus:border-indigo-600 h-12 px-4 text-base font-normal leading-normal appearance-none"
-                              id="retailCategory">
-                              <option disabled="" selected="" value="">Select a category</option>
-                              <option value="fashion">Fashion & Apparel</option>
-                              <option value="electronics">Electronics & Gadgets</option>
-                              <option value="grocery">Grocery & Supermarket</option>
-                              <option value="home">Home & Garden</option>
-                              <option value="beauty">Health & Beauty</option>
-                              <option value="other">Other</option>
-                            </select>
-                            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-slate-500">
-                              <span class="material-symbols-outlined">expand_more</span>
-                            </div>
-                          </div>
-                        </div>
-                        <div class="flex flex-col gap-2">
-                          <label class="text-slate-900 dark:text-slate-100 text-sm font-bold leading-tight"
-                            for="storeCount">Number of Locations</label>
-                          <input
-                            class="flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-slate-900 dark:text-slate-100 focus:outline-0 focus:ring-0 border border-slate-300 dark:border-slate-700 bg-white dark:bg-gray-950 focus:border-indigo-600 h-12 px-4 text-base font-normal leading-normal placeholder:text-slate-400"
-                            id="storeCount" min="1" placeholder="1" type="number" />
-                        </div>
-                      </div>
-                      <div class="flex flex-col gap-2">
-                        <label class="text-slate-900 dark:text-slate-100 text-sm font-bold leading-tight"
-                          for="description">Additional Details</label>
-                        <textarea
-                          class="flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-slate-900 dark:text-slate-100 focus:outline-0 focus:ring-0 border border-slate-300 dark:border-slate-700 bg-white dark:bg-gray-950 focus:border-indigo-600 min-h-[100px] p-4 text-base font-normal leading-normal placeholder:text-slate-400"
-                          id="description" placeholder="Describe your store or any specific needs..."></textarea>
-                      </div>
-                      <div class="pt-4">
-                        <button
-                          class="flex w-full cursor-pointer items-center justify-center overflow-hidden rounded-lg h-12 px-5 bg-indigo-600 hover:bg-blue-600 transition-colors text-white text-base font-bold leading-normal tracking-[0.015em]"
-                          type="button">
-                          Create Company
-                        </button>
-                      </div>
-                    </form>
-                  </div>
-                </main>
+
+                ${this.contentHTML()}
+
                 <footer class="flex flex-col gap-6 px-5 py-10 text-center @container mt-auto">
                   <div class="flex flex-wrap items-center justify-center gap-6 @[480px]:flex-row @[480px]:justify-around">
                     <a class="text-slate-600 dark:text-slate-400 text-base font-normal leading-normal min-w-40" href="#">About
