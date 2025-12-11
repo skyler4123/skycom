@@ -10,8 +10,24 @@
                 Skycom
               </h2>
             </div>
+
+            <nav class="flex flex-1 justify-around items-center px-4">
+              <a class="text-sm font-medium text-slate-700 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-600 transition-colors"
+                href="/home/retail">Retail</a>
+              <a class="text-sm font-medium text-slate-700 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-600 transition-colors"
+                href="/home/education">Education</a>
+              <a class="text-sm font-medium text-slate-700 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-600 transition-colors"
+                href="/home/hospital">Hospital</a>
+              <a class="text-sm font-medium text-slate-700 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-600 transition-colors"
+                href="/home/restaurant">Restaurant</a>
+              <a class="text-sm font-medium text-slate-700 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-600 transition-colors whitespace-nowrap"
+                href="/home/food_service">Food Service</a>
+              <a class="text-sm font-medium text-slate-700 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-600 transition-colors whitespace-nowrap"
+                href="home/sport_fitness">Sport & Fitness</a>
+            </nav>
+
             <% if Current.user %>
-              <div class="flex flex-1 justify-end gap-2 items-center">
+              <div class="flex justify-end gap-2 items-center">
                 <div class="flex items-center gap-2">
                   <div
                     class="bg-center bg-no-repeat aspect-square bg-cover rounded-full h-10 w-10 border border-slate-200 dark:border-slate-700"
