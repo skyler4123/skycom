@@ -6,7 +6,7 @@ module ApplicationController::CookieConcern
       current_user = { id: user.id, email: user.email, avatar: user.avatar_url }
       company_groups = user.company_groups.map do |company_group|
         business_type = company_group.business_type
-        url = retail_management_stores_path(retail_id: company_group.id) if business_type == 'retail'
+        url = retail_management_branches_path(retail_id: company_group.id) if business_type == 'retail'
         url = education_schools_path(education_id: company_group.id) if business_type == 'education'
         url = hospital_patients_path(hospital_id: company_group.id) if business_type == 'hospital'
         { id: company_group.id, name: company_group.name, business_type: business_type, url: url }
