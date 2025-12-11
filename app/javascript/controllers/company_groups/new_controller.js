@@ -28,14 +28,14 @@ export default class CompanyGroup_NewController extends LayoutController {
                   Name <span class="text-red-500">*</span></label>
                 <input
                   class="flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-slate-900 dark:text-slate-100 focus:outline-0 focus:ring-0 border border-slate-300 dark:border-slate-700 bg-white dark:bg-gray-950 focus:border-indigo-600 h-12 px-4 text-base font-normal leading-normal placeholder:text-slate-400"
-                  id="companyName" name="company_name" placeholder="e.g. Skyline Boutique" type="text" />
+                  id="companyName" name="company_group[name]" placeholder="e.g. Skyline Boutique" type="text" />
               </div>
               <div class="flex flex-col gap-2">
                 <label class="text-slate-900 dark:text-slate-100 text-sm font-bold leading-tight" for="phoneNumber">Phone
                   Number <span class="text-red-500">*</span></label>
                 <input
                   class="flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-slate-900 dark:text-slate-100 focus:outline-0 focus:ring-0 border border-slate-300 dark:border-slate-700 bg-white dark:bg-gray-950 focus:border-indigo-600 h-12 px-4 text-base font-normal leading-normal placeholder:text-slate-400"
-                  id="phoneNumber" name="phone_number" placeholder="+1 (555) 123-4567" type="tel" />
+                  id="phoneNumber" name="company_group[phone_number]" placeholder="+1 (555) 123-4567" type="tel" />
               </div>
             </div>
 
@@ -44,7 +44,7 @@ export default class CompanyGroup_NewController extends LayoutController {
                 Address <span class="text-red-500">*</span></label>
               <input
                 class="flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-slate-900 dark:text-slate-100 focus:outline-0 focus:ring-0 border border-slate-300 dark:border-slate-700 bg-white dark:bg-gray-950 focus:border-indigo-600 h-12 px-4 text-base font-normal leading-normal placeholder:text-slate-400"
-                id="companyAddress" name="address" placeholder="123 Retail Ave, Commerce City" type="text" />
+                id="companyAddress" name="company_group[address]" placeholder="123 Retail Ave, Commerce City" type="text" />
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -54,7 +54,7 @@ export default class CompanyGroup_NewController extends LayoutController {
                 <div class="relative">
                   <select
                     class="flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-slate-900 dark:text-slate-100 focus:outline-0 focus:ring-0 border border-slate-300 dark:border-slate-700 bg-white dark:bg-gray-950 focus:border-indigo-600 h-12 px-4 text-base font-normal leading-normal appearance-none"
-                    id="retailCategory" name="category">
+                    id="retailCategory" name="company_group[business_type]">
                     <option disabled="" selected="" value="">Select a category</option>
                     <option value="fashion">Fashion & Apparel</option>
                     <option value="electronics">Electronics & Gadgets</option>
@@ -73,7 +73,7 @@ export default class CompanyGroup_NewController extends LayoutController {
                   Locations <span class="text-red-500">*</span></label>
                 <input
                   class="flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-slate-900 dark:text-slate-100 focus:outline-0 focus:ring-0 border border-slate-300 dark:border-slate-700 bg-white dark:bg-gray-950 focus:border-indigo-600 h-12 px-4 text-base font-normal leading-normal placeholder:text-slate-400"
-                  id="storeCount" name="store_count" min="1" placeholder="1" type="number" />
+                  id="storeCount" name="company_group[company_count]" min="1" placeholder="1" type="number" />
               </div>
             </div>
 
@@ -84,7 +84,7 @@ export default class CompanyGroup_NewController extends LayoutController {
                 <div class="relative">
                   <select
                     class="flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-slate-900 dark:text-slate-100 focus:outline-0 focus:ring-0 border border-slate-300 dark:border-slate-700 bg-white dark:bg-gray-950 focus:border-indigo-600 h-12 px-4 text-base font-normal leading-normal appearance-none"
-                    id="currencyCode" name="currency_code">
+                    id="currencyCode" name="company_group[currency]">
                     <option disabled="" selected="" value="">Select currency</option>
                     <option value="USD">USD - U.S. Dollar</option>
                     <option value="EUR">EUR - Euro</option>
@@ -102,7 +102,7 @@ export default class CompanyGroup_NewController extends LayoutController {
                   Number</label>
                 <input
                   class="flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-slate-900 dark:text-slate-100 focus:outline-0 focus:ring-0 border border-slate-300 dark:border-slate-700 bg-white dark:bg-gray-950 focus:border-indigo-600 h-12 px-4 text-base font-normal leading-normal placeholder:text-slate-400"
-                  id="taxId" name="tax_id" placeholder="e.g. 12-3456789" type="text" />
+                  id="taxId" name="company_group[tax_id]" placeholder="e.g. 12-3456789" type="text" />
               </div>
 
               <div class="flex flex-col gap-2">
@@ -111,7 +111,7 @@ export default class CompanyGroup_NewController extends LayoutController {
                 <div class="relative">
                   <select
                     class="flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-slate-900 dark:text-slate-100 focus:outline-0 focus:ring-0 border border-slate-300 dark:border-slate-700 bg-white dark:bg-gray-950 focus:border-indigo-600 h-12 px-4 text-base font-normal leading-normal appearance-none"
-                    id="timezone" name="timezone">
+                    id="timezone" name="company_group[timezone]">
                     <option disabled="" selected="" value="">Select timezone</option>
                     <option value="America/New_York">Eastern Time (EST)</option>
                     <option value="Europe/London">London Time (GMT)</option>
@@ -129,7 +129,7 @@ export default class CompanyGroup_NewController extends LayoutController {
                 Details</label>
               <textarea
                 class="flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-slate-900 dark:text-slate-100 focus:outline-0 focus:ring-0 border border-slate-300 dark:border-slate-700 bg-white dark:bg-gray-950 focus:border-indigo-600 min-h-[100px] p-4 text-base font-normal leading-normal placeholder:text-slate-400"
-                id="description" name="description" placeholder="Describe your store or any specific needs..."></textarea>
+                id="description" name="company_group[description" placeholder="Describe your store or any specific needs..."></textarea>
             </div>
 
             <div class="pt-4">

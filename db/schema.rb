@@ -348,6 +348,8 @@ ActiveRecord::Schema[8.0].define(version: 2025_12_10_103114) do
     t.integer "currency"
     t.string "registration_number"
     t.string "vat_id"
+    t.string "tax_id"
+    t.uuid "timezone_id", null: false
     t.string "address_line_1"
     t.string "city"
     t.string "postal_code"
@@ -361,6 +363,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_12_10_103114) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["discarded_at"], name: "index_company_groups_on_discarded_at"
+    t.index ["timezone_id"], name: "index_company_groups_on_timezone_id"
     t.index ["user_id"], name: "index_company_groups_on_user_id"
   end
 
@@ -2087,6 +2090,14 @@ ActiveRecord::Schema[8.0].define(version: 2025_12_10_103114) do
     t.index ["task_group_id"], name: "index_tasks_on_task_group_id"
   end
 
+  create_table "timezones", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.string "name"
+    t.string "description"
+    t.integer "utc_offset"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
   create_table "users", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.string "email", null: false
     t.string "password_digest", null: false
@@ -2130,6 +2141,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_12_10_103114) do
   add_foreign_key "carts", "company_groups"
   add_foreign_key "companies", "companies", column: "parent_company_id"
   add_foreign_key "companies", "company_groups"
+  add_foreign_key "company_groups", "timezones"
   add_foreign_key "company_groups", "users"
   add_foreign_key "customer_appointments", "customers"
   add_foreign_key "customer_group_appointments", "customer_groups"

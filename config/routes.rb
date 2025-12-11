@@ -1,4 +1,5 @@
 Rails.application.routes.draw do
+  resources :timezones
   resources :article_appointments
   resources :article_group_appointments
   resources :articles
