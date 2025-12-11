@@ -24,6 +24,8 @@ class CompanyGroupsController < ApplicationController
 
   # POST /company_groups or /company_groups.json
   def create
+    debugger
+    return
     @company_group = CompanyGroup.new(company_group_params)
 
     respond_to do |format|

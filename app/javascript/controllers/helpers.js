@@ -420,3 +420,21 @@ export const toggleOpenAttribute = (element) => {
     element.setAttribute('open', '')
   }
 }
+
+export const csrfToken = () => {
+  const csrf = document.querySelector('meta[name="csrf-token"]')
+  return csrf.content
+}
+
+export const addCsrfToken = () => {
+  const csrf = csrfToken()
+  return `
+    <input type="hidden" name="authenticity_token" value="${csrf}" autocomplete="off">
+  `
+}
+
+export const pathFormTag = () => {
+  return `
+    <input type="hidden" name="_method" value="patch" autocomplete="off">
+  `
+}

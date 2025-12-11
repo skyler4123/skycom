@@ -1,4 +1,5 @@
 import LayoutController from "controllers/layout_controller"
+import { addCsrfToken } from "controllers/helpers"
 
 export default class CompanyGroup_NewController extends LayoutController {
 
@@ -15,124 +16,129 @@ export default class CompanyGroup_NewController extends LayoutController {
           </div>
 
           <!-- Form -->
-          <form class="flex flex-col gap-6">
-              <div class="grid grid-cols-1 md:grid-cols-2 gap-6 h-18">
-                  <div class="flex flex-col gap-2">
-                      <label class="text-slate-900 dark:text-slate-100 text-sm font-bold leading-tight"
-                          for="companyName">Company Name <span class="text-red-500">*</span></label>
-                      <input
-                          class="flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-slate-900 dark:text-slate-100 focus:outline-0 focus:ring-0 border border-slate-300 dark:border-slate-700 bg-white dark:bg-gray-950 focus:border-indigo-600 h-12 px-4 text-base font-normal leading-normal placeholder:text-slate-400"
-                          id="companyName" name="company_name" placeholder="e.g. Skyline Boutique" type="text" />
-                  </div>
-                  <div class="flex flex-col gap-2">
-                      <label class="text-slate-900 dark:text-slate-100 text-sm font-bold leading-tight"
-                          for="phoneNumber">Phone Number <span class="text-red-500">*</span></label>
-                      <input
-                          class="flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-slate-900 dark:text-slate-100 focus:outline-0 focus:ring-0 border border-slate-300 dark:border-slate-700 bg-white dark:bg-gray-950 focus:border-indigo-600 h-12 px-4 text-base font-normal leading-normal placeholder:text-slate-400"
-                          id="phoneNumber" name="phone_number" placeholder="+1 (555) 123-4567" type="tel" />
-                  </div>
+          <form
+          action="/company_groups"
+            accept-charset="UTF-8"
+            method="post"
+            class="flex flex-col gap-6">
+            ${addCsrfToken()}
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 h-18">
+              <div class="flex flex-col gap-2">
+                <label class="text-slate-900 dark:text-slate-100 text-sm font-bold leading-tight" for="companyName">Company
+                  Name <span class="text-red-500">*</span></label>
+                <input
+                  class="flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-slate-900 dark:text-slate-100 focus:outline-0 focus:ring-0 border border-slate-300 dark:border-slate-700 bg-white dark:bg-gray-950 focus:border-indigo-600 h-12 px-4 text-base font-normal leading-normal placeholder:text-slate-400"
+                  id="companyName" name="company_name" placeholder="e.g. Skyline Boutique" type="text" />
               </div>
-
-              <div class="flex flex-col gap-2 h-18">
-                  <label class="text-slate-900 dark:text-slate-100 text-sm font-bold leading-tight"
-                      for="companyAddress">Company Address <span class="text-red-500">*</span></label>
-                  <input
-                      class="flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-slate-900 dark:text-slate-100 focus:outline-0 focus:ring-0 border border-slate-300 dark:border-slate-700 bg-white dark:bg-gray-950 focus:border-indigo-600 h-12 px-4 text-base font-normal leading-normal placeholder:text-slate-400"
-                      id="companyAddress" name="address" placeholder="123 Retail Ave, Commerce City" type="text" />
+              <div class="flex flex-col gap-2">
+                <label class="text-slate-900 dark:text-slate-100 text-sm font-bold leading-tight" for="phoneNumber">Phone
+                  Number <span class="text-red-500">*</span></label>
+                <input
+                  class="flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-slate-900 dark:text-slate-100 focus:outline-0 focus:ring-0 border border-slate-300 dark:border-slate-700 bg-white dark:bg-gray-950 focus:border-indigo-600 h-12 px-4 text-base font-normal leading-normal placeholder:text-slate-400"
+                  id="phoneNumber" name="phone_number" placeholder="+1 (555) 123-4567" type="tel" />
               </div>
+            </div>
 
-              <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div class="flex flex-col gap-2">
-                      <label class="text-slate-900 dark:text-slate-100 text-sm font-bold leading-tight"
-                          for="retailCategory">Retail Category <span class="text-red-500">*</span></label>
-                      <div class="relative">
-                          <select
-                              class="flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-slate-900 dark:text-slate-100 focus:outline-0 focus:ring-0 border border-slate-300 dark:border-slate-700 bg-white dark:bg-gray-950 focus:border-indigo-600 h-12 px-4 text-base font-normal leading-normal appearance-none"
-                              id="retailCategory" name="category">
-                              <option disabled="" selected="" value="">Select a category</option>
-                              <option value="fashion">Fashion & Apparel</option>
-                              <option value="electronics">Electronics & Gadgets</option>
-                              <option value="grocery">Grocery & Supermarket</option>
-                              <option value="home">Home & Garden</option>
-                              <option value="beauty">Health & Beauty</option>
-                              <option value="other">Other</option>
-                          </select>
-                          <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-slate-500">
-                              <span class="material-symbols-outlined">expand_more</span>
-                          </div>
-                      </div>
+            <div class="flex flex-col gap-2 h-18">
+              <label class="text-slate-900 dark:text-slate-100 text-sm font-bold leading-tight" for="companyAddress">Company
+                Address <span class="text-red-500">*</span></label>
+              <input
+                class="flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-slate-900 dark:text-slate-100 focus:outline-0 focus:ring-0 border border-slate-300 dark:border-slate-700 bg-white dark:bg-gray-950 focus:border-indigo-600 h-12 px-4 text-base font-normal leading-normal placeholder:text-slate-400"
+                id="companyAddress" name="address" placeholder="123 Retail Ave, Commerce City" type="text" />
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div class="flex flex-col gap-2">
+                <label class="text-slate-900 dark:text-slate-100 text-sm font-bold leading-tight" for="retailCategory">Retail
+                  Category <span class="text-red-500">*</span></label>
+                <div class="relative">
+                  <select
+                    class="flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-slate-900 dark:text-slate-100 focus:outline-0 focus:ring-0 border border-slate-300 dark:border-slate-700 bg-white dark:bg-gray-950 focus:border-indigo-600 h-12 px-4 text-base font-normal leading-normal appearance-none"
+                    id="retailCategory" name="category">
+                    <option disabled="" selected="" value="">Select a category</option>
+                    <option value="fashion">Fashion & Apparel</option>
+                    <option value="electronics">Electronics & Gadgets</option>
+                    <option value="grocery">Grocery & Supermarket</option>
+                    <option value="home">Home & Garden</option>
+                    <option value="beauty">Health & Beauty</option>
+                    <option value="other">Other</option>
+                  </select>
+                  <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-slate-500">
+                    <span class="material-symbols-outlined">expand_more</span>
                   </div>
-                  <div class="flex flex-col gap-2">
-                      <label class="text-slate-900 dark:text-slate-100 text-sm font-bold leading-tight"
-                          for="storeCount">Number of Locations <span class="text-red-500">*</span></label>
-                      <input
-                          class="flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-slate-900 dark:text-slate-100 focus:outline-0 focus:ring-0 border border-slate-300 dark:border-slate-700 bg-white dark:bg-gray-950 focus:border-indigo-600 h-12 px-4 text-base font-normal leading-normal placeholder:text-slate-400"
-                          id="storeCount" name="store_count" min="1" placeholder="1" type="number" />
-                  </div>
+                </div>
               </div>
+              <div class="flex flex-col gap-2">
+                <label class="text-slate-900 dark:text-slate-100 text-sm font-bold leading-tight" for="storeCount">Number of
+                  Locations <span class="text-red-500">*</span></label>
+                <input
+                  class="flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-slate-900 dark:text-slate-100 focus:outline-0 focus:ring-0 border border-slate-300 dark:border-slate-700 bg-white dark:bg-gray-950 focus:border-indigo-600 h-12 px-4 text-base font-normal leading-normal placeholder:text-slate-400"
+                  id="storeCount" name="store_count" min="1" placeholder="1" type="number" />
+              </div>
+            </div>
 
-              <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                  <div class="flex flex-col gap-2">
-                      <label class="text-slate-900 dark:text-slate-100 text-sm font-bold leading-tight"
-                          for="currencyCode">Default Currency <span class="text-red-500">*</span></label>
-                      <div class="relative">
-                          <select
-                              class="flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-slate-900 dark:text-slate-100 focus:outline-0 focus:ring-0 border border-slate-300 dark:border-slate-700 bg-white dark:bg-gray-950 focus:border-indigo-600 h-12 px-4 text-base font-normal leading-normal appearance-none"
-                              id="currencyCode" name="currency_code">
-                              <option disabled="" selected="" value="">Select currency</option>
-                              <option value="USD">USD - U.S. Dollar</option>
-                              <option value="EUR">EUR - Euro</option>
-                              <option value="GBP">GBP - British Pound</option>
-                              <option value="VND">VND - Vietnamese Dong</option>
-                              </select>
-                          <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-slate-500">
-                              <span class="material-symbols-outlined">expand_more</span>
-                          </div>
-                      </div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div class="flex flex-col gap-2">
+                <label class="text-slate-900 dark:text-slate-100 text-sm font-bold leading-tight" for="currencyCode">Default
+                  Currency <span class="text-red-500">*</span></label>
+                <div class="relative">
+                  <select
+                    class="flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-slate-900 dark:text-slate-100 focus:outline-0 focus:ring-0 border border-slate-300 dark:border-slate-700 bg-white dark:bg-gray-950 focus:border-indigo-600 h-12 px-4 text-base font-normal leading-normal appearance-none"
+                    id="currencyCode" name="currency_code">
+                    <option disabled="" selected="" value="">Select currency</option>
+                    <option value="USD">USD - U.S. Dollar</option>
+                    <option value="EUR">EUR - Euro</option>
+                    <option value="GBP">GBP - British Pound</option>
+                    <option value="VND">VND - Vietnamese Dong</option>
+                  </select>
+                  <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-slate-500">
+                    <span class="material-symbols-outlined">expand_more</span>
                   </div>
-
-                  <div class="flex flex-col gap-2">
-                      <label class="text-slate-900 dark:text-slate-100 text-sm font-bold leading-tight"
-                          for="taxId">Tax ID / VAT Number</label>
-                      <input
-                          class="flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-slate-900 dark:text-slate-100 focus:outline-0 focus:ring-0 border border-slate-300 dark:border-slate-700 bg-white dark:bg-gray-950 focus:border-indigo-600 h-12 px-4 text-base font-normal leading-normal placeholder:text-slate-400"
-                          id="taxId" name="tax_id" placeholder="e.g. 12-3456789" type="text" />
-                  </div>
-                  
-                  <div class="flex flex-col gap-2">
-                      <label class="text-slate-900 dark:text-slate-100 text-sm font-bold leading-tight"
-                          for="timezone">Timezone <span class="text-red-500">*</span></label>
-                      <div class="relative">
-                          <select
-                              class="flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-slate-900 dark:text-slate-100 focus:outline-0 focus:ring-0 border border-slate-300 dark:border-slate-700 bg-white dark:bg-gray-950 focus:border-indigo-600 h-12 px-4 text-base font-normal leading-normal appearance-none"
-                              id="timezone" name="timezone">
-                              <option disabled="" selected="" value="">Select timezone</option>
-                              <option value="America/New_York">Eastern Time (EST)</option>
-                              <option value="Europe/London">London Time (GMT)</option>
-                              <option value="Asia/Ho_Chi_Minh">Ho Chi Minh Time (ICT)</option>
-                              </select>
-                          <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-slate-500">
-                              <span class="material-symbols-outlined">expand_more</span>
-                          </div>
-                      </div>
-                  </div>
+                </div>
               </div>
 
               <div class="flex flex-col gap-2">
-                  <label class="text-slate-900 dark:text-slate-100 text-sm font-bold leading-tight"
-                      for="description">Additional Details</label>
-                  <textarea
-                      class="flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-slate-900 dark:text-slate-100 focus:outline-0 focus:ring-0 border border-slate-300 dark:border-slate-700 bg-white dark:bg-gray-950 focus:border-indigo-600 min-h-[100px] p-4 text-base font-normal leading-normal placeholder:text-slate-400"
-                      id="description" name="description" placeholder="Describe your store or any specific needs..."></textarea>
+                <label class="text-slate-900 dark:text-slate-100 text-sm font-bold leading-tight" for="taxId">Tax ID / VAT
+                  Number</label>
+                <input
+                  class="flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-slate-900 dark:text-slate-100 focus:outline-0 focus:ring-0 border border-slate-300 dark:border-slate-700 bg-white dark:bg-gray-950 focus:border-indigo-600 h-12 px-4 text-base font-normal leading-normal placeholder:text-slate-400"
+                  id="taxId" name="tax_id" placeholder="e.g. 12-3456789" type="text" />
               </div>
 
-              <div class="pt-4">
-                  <button
-                      class="flex w-full cursor-pointer items-center justify-center overflow-hidden rounded-lg h-12 px-5 bg-indigo-600 hover:bg-blue-600 transition-colors text-white text-base font-bold leading-normal tracking-[0.015em]"
-                      type="button">
-                      Create Company
-                  </button>
+              <div class="flex flex-col gap-2">
+                <label class="text-slate-900 dark:text-slate-100 text-sm font-bold leading-tight" for="timezone">Timezone
+                  <span class="text-red-500">*</span></label>
+                <div class="relative">
+                  <select
+                    class="flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-slate-900 dark:text-slate-100 focus:outline-0 focus:ring-0 border border-slate-300 dark:border-slate-700 bg-white dark:bg-gray-950 focus:border-indigo-600 h-12 px-4 text-base font-normal leading-normal appearance-none"
+                    id="timezone" name="timezone">
+                    <option disabled="" selected="" value="">Select timezone</option>
+                    <option value="America/New_York">Eastern Time (EST)</option>
+                    <option value="Europe/London">London Time (GMT)</option>
+                    <option value="Asia/Ho_Chi_Minh">Ho Chi Minh Time (ICT)</option>
+                  </select>
+                  <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-slate-500">
+                    <span class="material-symbols-outlined">expand_more</span>
+                  </div>
+                </div>
               </div>
+            </div>
+
+            <div class="flex flex-col gap-2">
+              <label class="text-slate-900 dark:text-slate-100 text-sm font-bold leading-tight" for="description">Additional
+                Details</label>
+              <textarea
+                class="flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-slate-900 dark:text-slate-100 focus:outline-0 focus:ring-0 border border-slate-300 dark:border-slate-700 bg-white dark:bg-gray-950 focus:border-indigo-600 min-h-[100px] p-4 text-base font-normal leading-normal placeholder:text-slate-400"
+                id="description" name="description" placeholder="Describe your store or any specific needs..."></textarea>
+            </div>
+
+            <div class="pt-4">
+              <button
+                class="flex w-full cursor-pointer items-center justify-center overflow-hidden rounded-lg h-12 px-5 bg-indigo-600 hover:bg-blue-600 transition-colors text-white text-base font-bold leading-normal tracking-[0.015em]"
+                type="submit">
+                Create Company
+              </button>
+            </div>
           </form>
           <!-- Form -->
 
