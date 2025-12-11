@@ -1,5 +1,7 @@
 class CompanyGroup < ApplicationRecord
   belongs_to :user
+  belongs_to :timezone
+  
   has_many :companies, dependent: :destroy
 
   has_many :tags, dependent: :destroy

@@ -8,7 +8,6 @@ class Seed::ApplicationService
     PaymentMethod.destroy_all
     Brand.destroy_all
     Timezone.destroy_all
-    MultiCompanyGroup.destroy_all
 
 
     # Global Payment Methods

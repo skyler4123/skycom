@@ -23,6 +23,7 @@ class Seed::CompanyGroupService
     phone_number: Faker::PhoneNumber.phone_number,
     website: nil,
     fiscal_year_end_month: nil,
+    timezone: Timezone.all.sample,
     discarded_at: nil
   )
     base_name = Faker::Company.unique.name
@@ -42,6 +43,7 @@ class Seed::CompanyGroupService
       currency: currency || Company.currencies.keys.sample,
       registration_number: registration_number,
       vat_id: vat_id,
+      timezone: timezone,
       employee_count: employee_count,
       address_line_1: address_line_1,
       city: city,
