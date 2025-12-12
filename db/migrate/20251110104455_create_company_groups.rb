@@ -12,7 +12,7 @@ class CreateCompanyGroups < ActiveRecord::Migration[8.0]
       t.string :registration_number
       t.string :vat_id
       t.string :tax_id
-      t.references :timezone, null: false, foreign_key: true, type: :uuid
+      t.integer :timezone
       t.string :address_line_1
       t.string :city
       t.string :postal_code

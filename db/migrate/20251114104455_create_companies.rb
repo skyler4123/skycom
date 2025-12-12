@@ -12,6 +12,8 @@ class CreateCompanies < ActiveRecord::Migration[8.0]
       t.integer :currency
       t.string :registration_number
       t.string :vat_id
+      t.string :tax_id
+      t.integer :timezone
       t.string :address_line_1
       t.string :city
       t.string :postal_code

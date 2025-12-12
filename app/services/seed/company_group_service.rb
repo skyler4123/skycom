@@ -23,13 +23,12 @@ class Seed::CompanyGroupService
     phone_number: Faker::PhoneNumber.phone_number,
     website: nil,
     fiscal_year_end_month: nil,
-    timezone: Timezone.all.sample,
     discarded_at: nil
   )
     base_name = Faker::Company.unique.name
     name ||= "#{base_name} #{business_type.to_s.titleize}"
     domain_suffix = (business_type == :university || business_type == :school) ? ".edu" : ".com"
-
+    timezone = CompanyGroup.timezones.keys.sample
     should_discard = rand(10) == 0
     discarded_at ||= should_discard ? Time.zone.now - rand(1..365).days : nil
 

@@ -40,10 +40,6 @@ Things you may want to cover:
 ##
 
 ##
-  ### Timezone
-  bundle exec rails g scaffold Timezone name description utc_offset:integer --force
-  
-
   ### Core Models
   bundle exec rails g scaffold User email
   bundle exec rails g migration AddDiscardedAtToUsers discarded_at:datetime:index

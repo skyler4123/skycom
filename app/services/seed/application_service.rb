@@ -7,13 +7,10 @@ class Seed::ApplicationService
     User.destroy_all
     PaymentMethod.destroy_all
     Brand.destroy_all
-    Timezone.destroy_all
-
 
     # Global Payment Methods
     Seed::PaymentMethodService.create # Ensure global payment methods are seeded first
     Seed::BrandService.create # Seed global brands
-    Seed::TimezoneService.create
 
     # Create company groups
     multi_company_group_owner = Seed::UserService.create(email: "multi_company_group_owner_1@example.com")

@@ -1,7 +1,5 @@
 class CompanyGroup < ApplicationRecord
   belongs_to :user
-  belongs_to :timezone
-  
   has_many :companies, dependent: :destroy
 
   has_many :tags, dependent: :destroy
@@ -109,6 +107,9 @@ class CompanyGroup < ApplicationRecord
     may: 5, june: 6, july: 7, august: 8, 
     september: 9, october: 10, november: 11, december: 12
   }
+  
+  # Enum for Timezone
+  enum :timezone, TIMEZONE
   
   # --- Validations ---
   validates :name, presence: true, uniqueness: { scope: :user_id }, length: { maximum: 255 }
