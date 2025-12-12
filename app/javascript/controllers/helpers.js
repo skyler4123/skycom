@@ -426,7 +426,7 @@ export const csrfToken = () => {
   return csrf.content
 }
 
-export const addCsrfToken = () => {
+export const csrfTokenTag = () => {
   const csrf = csrfToken()
   return `
     <input type="hidden" name="authenticity_token" value="${csrf}" autocomplete="off">
@@ -437,4 +437,16 @@ export const pathFormTag = () => {
   return `
     <input type="hidden" name="_method" value="patch" autocomplete="off">
   `
+}
+
+export const signInPath = () => {
+  return `/sign_in`
+}
+
+export const signUpPath = () => {
+  return `/sign_up`
+}
+
+export const signOutPath = () => {
+  return `/sign_out`
 }

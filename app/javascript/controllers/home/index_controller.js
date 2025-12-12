@@ -1,5 +1,5 @@
 import ApplicationController from "controllers/application_controller"
-import { openModal, closeModal } from "controllers/helpers"
+import { openModal, closeModal, csrfTokenTag, signInPath } from "controllers/helpers"
 
 export default class Home_IndexController extends ApplicationController {
   static targets = ["signInButton", "signUpButton"]
@@ -74,26 +74,36 @@ export default class Home_IndexController extends ApplicationController {
                 email</span>
               <div class="flex-grow border-t border-slate-200 dark:border-slate-700"></div>
             </div>
-            <div class="space-y-4">
-              <div>
-                <label class="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300 text-left"
-                  for="email">Email</label>
-                <input
-                  class="block w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-slate-900 placeholder-slate-400 focus:border-indigo-600 focus:outline-none focus:ring-1 focus:ring-indigo-600 dark:border-slate-600 dark:bg-slate-700 dark:text-white dark:placeholder-slate-400"
-                  id="email" placeholder="name@company.com" type="email" />
+            
+            <!-- Sign In Form -->
+            <form
+              action="${signInPath()}"
+              method="POST"
+              class="">
+              ${csrfTokenTag()}
+              <div class="space-y-4">
+                <div>
+                  <label class="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300 text-left"
+                    for="email">Email</label>
+                  <input
+                    class="block w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-slate-900 placeholder-slate-400 focus:border-indigo-600 focus:outline-none focus:ring-1 focus:ring-indigo-600 dark:border-slate-600 dark:bg-slate-700 dark:text-white dark:placeholder-slate-400"
+                    id="email" name="email" placeholder="name@company.com" type="email" />
+                </div>
+                <div>
+                  <label class="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300 text-left"
+                    for="password">Password</label>
+                  <input
+                    class="block w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-slate-900 placeholder-slate-400 focus:border-indigo-600 focus:outline-none focus:ring-1 focus:ring-indigo-600 dark:border-slate-600 dark:bg-slate-700 dark:text-white dark:placeholder-slate-400"
+                    id="password" name="password" placeholder="••••••••" type="password" />
+                </div>
               </div>
-              <div>
-                <label class="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300 text-left"
-                  for="password">Password</label>
-                <input
-                  class="block w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-slate-900 placeholder-slate-400 focus:border-indigo-600 focus:outline-none focus:ring-1 focus:ring-indigo-600 dark:border-slate-600 dark:bg-slate-700 dark:text-white dark:placeholder-slate-400"
-                  id="password" placeholder="••••••••" type="password" />
-              </div>
-            </div>
-            <button
-              class="mt-2 w-full rounded-lg bg-indigo-600 px-4 py-2.5 text-sm font-bold text-white shadow-sm hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-indigo-600 focus:ring-offset-2">
-              Sign In
-            </button>
+              <button
+                class="mt-2 w-full rounded-lg bg-indigo-600 px-4 py-2.5 text-sm font-bold text-white shadow-sm hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-indigo-600 focus:ring-offset-2">
+                Sign In
+              </button>
+            </form>
+            <!-- Sign In Form -->
+
             <p class="text-center text-sm text-slate-600 dark:text-slate-400">
               Don't have an account?
               <button

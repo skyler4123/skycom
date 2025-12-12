@@ -41,14 +41,6 @@ class Company < ApplicationRecord
     privately_held: 1 
   }
   
-  enum :currency, { 
-    usd: 840, 
-    eur: 1,
-    gbp: 826,
-    vnd: 704,
-    jpy: 392
-  }
-  
   # Grouped business types with 1000-unit gaps for future expansion
   enum :business_type, {
     headquarters: 0,
@@ -57,6 +49,9 @@ class Company < ApplicationRecord
     franchise: 3,
     subsidiary: 4
   }
+
+  enum :timezone, TIMEZONE, prefix: true
+  enum :currency, CURRENCY, prefix: true
 
   # Enum for the new fiscal_year_end_month column (1=January, 12=December)
   enum :fiscal_year_end_month, { 
@@ -89,4 +84,15 @@ class Company < ApplicationRecord
   
   # Validation for operational fields
   # validates :fiscal_year_end_month, presence: true, numericality: { in: 1..12 }
+
+  after_initialize :set_defaults_from_company_group, if: :new_record?
+
+  private
+
+  def set_defaults_from_company_group
+    return unless company_group
+
+    self.timezone ||= company_group.timezone
+    self.currency ||= company_group.currency
+  end
 end

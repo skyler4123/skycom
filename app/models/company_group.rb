@@ -36,14 +36,9 @@ class CompanyGroup < ApplicationRecord
     publicly_traded: 0, 
     privately_held: 1 
   }
-  
-  enum :currency, { 
-    usd: 840, 
-    eur: 1,
-    gbp: 826,
-    vnd: 704,
-    jpy: 392
-  }
+
+  enum :timezone, TIMEZONE, prefix: true
+  enum :currency, CURRENCY, prefix: true
   
   # Grouped business types with 1000-unit gaps for future expansion
   enum :business_type, { 
@@ -107,9 +102,6 @@ class CompanyGroup < ApplicationRecord
     may: 5, june: 6, july: 7, august: 8, 
     september: 9, october: 10, november: 11, december: 12
   }
-  
-  # Enum for Timezone
-  enum :timezone, TIMEZONE
   
   # --- Validations ---
   validates :name, presence: true, uniqueness: { scope: :user_id }, length: { maximum: 255 }
