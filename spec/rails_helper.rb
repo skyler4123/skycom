@@ -75,6 +75,6 @@ end
 # ----------------------------------------------------------------------------------------------------
 require "factory_bot_rails_helper"
 require "shoulda_matchers_helper"
-require "retry_helper"
+# require "retry_helper"
 require "selenium_helper"
 # ----------------------------------------------------------------------------------------------------

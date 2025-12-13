@@ -12,19 +12,20 @@ RSpec.feature "Authentication", type: :feature, js: true do
 
   context "Sign up with normal user" do
     it "signs me in" do
-      # visit sign_up_path
-      # fill_in 'email', with: params[:email]
-      # fill_in 'password', with: params[:password]
-      # fill_in 'password_confirmation', with: params[:password_confirmation]
-      # fill_in 'name', with: params[:name]
-      # # select params[:education_role], from: 'education_role'
-      # submit_button = find('input[type="submit"]')
-      # submit_button.click
-      # expect(page).to have_current_path('/')
-      # expect(created_user).to be_truthy
-      # expect(page).to have_content(SIGN_UP_SUCCESS_MESSAGE)
       visit root_path
-      sleep 10
+
+      click_on "Sign Up"
+
+      within('form[role="Sign Up Form"]') do
+        fill_in "Email", with: new_user_params[:email]
+        fill_in "Password", with: new_user_params[:password]
+        fill_in "Password confirmation", with: new_user_params[:password_confirmation]
+        click_button "Sign Up"
+      end
+
+      expect(page).to have_button("Sign Out")
+      expect(page).to have_selector('[role="avatar"]')
+      expect(created_user).to be_truthy
     end
   end
 end

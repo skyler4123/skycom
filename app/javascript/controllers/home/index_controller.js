@@ -79,6 +79,7 @@ export default class Home_IndexController extends ApplicationController {
             
             <!-- Sign In Form -->
             <form
+              role="Sign In Form"
               action="${signInPath()}"
               method="POST"
               class="">
@@ -161,6 +162,7 @@ export default class Home_IndexController extends ApplicationController {
 
             <!-- Form -->
             <form
+              role="Sign Up Form"
               action="${signUpPath()}"
               method="POST"
               class="">
@@ -182,7 +184,7 @@ export default class Home_IndexController extends ApplicationController {
                 </div>
                 <div>
                   <label class="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300 text-left"
-                    for="confirm-password">Confirm Password</label>
+                    for="confirm-password">Password confirmation</label>
                   <input
                     class="block w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-slate-900 placeholder-slate-400 focus:border-indigo-600 focus:outline-none focus:ring-1 focus:ring-indigo-600 dark:border-slate-600 dark:bg-slate-700 dark:text-white dark:placeholder-slate-400"
                     id="confirm-password" name="password_confirmation" placeholder="••••••••" type="password" />
@@ -199,7 +201,7 @@ export default class Home_IndexController extends ApplicationController {
               Already have an account?
               <button
                 data-action="click->${this.identifier}#openSignInModal"
-                class="font-medium text-indigo-600 hover:underline cursor-pointer">Sign Up
+                class="font-medium text-indigo-600 hover:underline cursor-pointer">Sign In
               </button>
             </p>
           </div>
