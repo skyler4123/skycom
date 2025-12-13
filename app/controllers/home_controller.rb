@@ -5,6 +5,8 @@ class HomeController < ApplicationController
   end
 
   def retail
+    retail = Current.user.retail
+    redirect_to retail_management_dashboard_index_path(retail)
   end
 
   def education

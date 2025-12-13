@@ -57,5 +57,8 @@ class User < ApplicationRecord
   def first_company_group_business_type
     company_groups.first&.business_type
   end
+
+  include User::RetailConcern
+
   # ----------------------------------------------------------------------------------------------------
 end
