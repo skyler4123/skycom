@@ -20,7 +20,6 @@ RSpec.describe "project_groups/edit", type: :view do
     render
 
     assert_select "form[action=?][method=?]", project_group_path(project_group), "post" do
-
       assert_select "input[name=?]", "project_group[company_id]"
 
       assert_select "input[name=?]", "project_group[name]"

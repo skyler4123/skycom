@@ -17,19 +17,19 @@ class Service < ApplicationRecord
   has_many :tags, through: :tag_appointments
 
   has_many :service_appointments, dependent: :destroy
-  has_many :customers, through: :service_appointments, source: :appoint_to, source_type: 'Customer'
-  has_many :employees, through: :service_appointments, source: :appoint_to, source_type: 'Employee'
+  has_many :customers, through: :service_appointments, source: :appoint_to, source_type: "Customer"
+  has_many :employees, through: :service_appointments, source: :appoint_to, source_type: "Employee"
 
   # --- Enums ---
-  enum :status, { 
-    active: 0, 
-    pending: 1, 
-    archived: 2 
+  enum :status, {
+    active: 0,
+    pending: 1,
+    archived: 2
   }
 
-  enum :business_type, { 
-    b2b: 0, 
-    b2c: 1 
+  enum :business_type, {
+    b2b: 0,
+    b2c: 1
   }
 
   # --- Validations ---

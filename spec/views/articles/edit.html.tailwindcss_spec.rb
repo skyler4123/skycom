@@ -24,7 +24,6 @@ RSpec.describe "articles/edit", type: :view do
     render
 
     assert_select "form[action=?][method=?]", article_path(article), "post" do
-
       assert_select "input[name=?]", "article[article_group_id]"
 
       assert_select "input[name=?]", "article[company_group_id]"

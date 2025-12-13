@@ -13,7 +13,6 @@ require 'rails_helper'
 # sticking to rails and rspec-rails APIs to keep things simple and stable.
 
 RSpec.describe "/settings", type: :request do
-  
   # This should return the minimal set of attributes required to create a valid
   # Setting. As you add validations to Setting, be sure to
   # adjust the attributes here as well.

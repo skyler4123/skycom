@@ -20,7 +20,6 @@ RSpec.describe "payment_methods/edit", type: :view do
     render
 
     assert_select "form[action=?][method=?]", payment_method_path(payment_method), "post" do
-
       assert_select "input[name=?]", "payment_method[name]"
 
       assert_select "input[name=?]", "payment_method[description]"

@@ -17,7 +17,6 @@ RSpec.describe "notifications/new", type: :view do
     render
 
     assert_select "form[action=?][method=?]", notifications_path, "post" do
-
       assert_select "input[name=?]", "notification[notification_group_id]"
 
       assert_select "input[name=?]", "notification[company_id]"

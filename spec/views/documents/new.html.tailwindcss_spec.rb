@@ -20,7 +20,6 @@ RSpec.describe "documents/new", type: :view do
     render
 
     assert_select "form[action=?][method=?]", documents_path, "post" do
-
       assert_select "input[name=?]", "document[document_group_id]"
 
       assert_select "input[name=?]", "document[company_group_id]"

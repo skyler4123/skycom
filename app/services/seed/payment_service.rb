@@ -3,7 +3,6 @@
 # and simulates soft deletion for a portion of the records.
 
 class Seed::PaymentService
-
   # Configuration for the number of payments to create per invoice
   PAYMENTS_PER_INVOICE = 1
 

@@ -22,7 +22,6 @@ RSpec.describe "employee_group_appointments/edit", type: :view do
     render
 
     assert_select "form[action=?][method=?]", employee_group_appointment_path(employee_group_appointment), "post" do
-
       assert_select "input[name=?]", "employee_group_appointment[employee_group_id]"
 
       assert_select "input[name=?]", "employee_group_appointment[appoint_from_id]"

@@ -22,7 +22,6 @@ RSpec.describe "events/edit", type: :view do
     render
 
     assert_select "form[action=?][method=?]", event_path(event), "post" do
-
       assert_select "input[name=?]", "event[event_group_id]"
 
       assert_select "input[name=?]", "event[company_group_id]"

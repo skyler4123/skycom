@@ -19,7 +19,6 @@ RSpec.describe "settings/new", type: :view do
     render
 
     assert_select "form[action=?][method=?]", settings_path, "post" do
-
       assert_select "input[name=?]", "setting[setting_group_id]"
 
       assert_select "input[name=?]", "setting[company_group_id]"

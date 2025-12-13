@@ -13,7 +13,6 @@ require 'rails_helper'
 # sticking to rails and rspec-rails APIs to keep things simple and stable.
 
 RSpec.describe "/customer_appointments", type: :request do
-  
   # This should return the minimal set of attributes required to create a valid
   # CustomerAppointment. As you add validations to CustomerAppointment, be sure to
   # adjust the attributes here as well.

@@ -24,7 +24,6 @@ RSpec.describe "notification_group_appointments/edit", type: :view do
     render
 
     assert_select "form[action=?][method=?]", notification_group_appointment_path(notification_group_appointment), "post" do
-
       assert_select "input[name=?]", "notification_group_appointment[notification_group_id]"
 
       assert_select "input[name=?]", "notification_group_appointment[appoint_from_id]"

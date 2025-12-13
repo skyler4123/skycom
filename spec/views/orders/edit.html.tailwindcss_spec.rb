@@ -30,7 +30,6 @@ RSpec.describe "orders/edit", type: :view do
     render
 
     assert_select "form[action=?][method=?]", order_path(order), "post" do
-
       assert_select "input[name=?]", "order[company_id]"
 
       assert_select "input[name=?]", "order[customer_id]"

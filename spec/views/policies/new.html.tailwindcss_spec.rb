@@ -18,7 +18,6 @@ RSpec.describe "policies/new", type: :view do
     render
 
     assert_select "form[action=?][method=?]", policies_path, "post" do
-
       assert_select "input[name=?]", "policy[company_id]"
 
       assert_select "input[name=?]", "policy[name]"

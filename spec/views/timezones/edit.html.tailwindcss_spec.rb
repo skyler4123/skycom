@@ -17,7 +17,6 @@ RSpec.describe "timezones/edit", type: :view do
     render
 
     assert_select "form[action=?][method=?]", timezone_path(timezone), "post" do
-
       assert_select "input[name=?]", "timezone[name]"
 
       assert_select "input[name=?]", "timezone[description]"

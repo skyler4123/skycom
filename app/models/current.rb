@@ -24,5 +24,4 @@ class Current < ActiveSupport::CurrentAttributes
     company_group&.companies
   end
   # ------------------------------------------------------------------------
-
 end

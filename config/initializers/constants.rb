@@ -26,8 +26,8 @@ TIMEZONE = {
   "+12": 12
 }.freeze
 
-CURRENCY = { 
-  usd: 840, 
+CURRENCY = {
+  usd: 840,
   eur: 1,
   gbp: 826,
   vnd: 704,

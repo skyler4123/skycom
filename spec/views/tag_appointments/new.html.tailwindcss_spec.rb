@@ -17,7 +17,6 @@ RSpec.describe "tag_appointments/new", type: :view do
     render
 
     assert_select "form[action=?][method=?]", tag_appointments_path, "post" do
-
       assert_select "input[name=?]", "tag_appointment[tag_id]"
 
       assert_select "input[name=?]", "tag_appointment[appoint_from_id]"

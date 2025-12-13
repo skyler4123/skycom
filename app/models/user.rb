@@ -38,7 +38,7 @@ class User < ApplicationRecord
   has_many :company_groups, dependent: :destroy
   has_one :employee, dependent: :destroy
   has_one :customer, dependent: :destroy
-  
+
   belongs_to :parent_user, class_name: "User", optional: true
   has_many :child_users, class_name: "User", foreign_key: "parent_user_id", dependent: :destroy
 

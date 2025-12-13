@@ -17,7 +17,6 @@ RSpec.describe "service_groups/new", type: :view do
     render
 
     assert_select "form[action=?][method=?]", service_groups_path, "post" do
-
       assert_select "input[name=?]", "service_group[company_id]"
 
       assert_select "input[name=?]", "service_group[name]"

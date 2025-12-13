@@ -6,7 +6,7 @@ class Seed::EducationService
     teacher: 5,
     accountant: 2,
     cleaner: 3,
-    guard: 3,
+    guard: 3
   }.freeze
 
   CUSTOMER_COUNTS = {
@@ -81,7 +81,7 @@ class Seed::EducationService
     # --- 5. Create Departments (Empoylee Groups) for Each School (Company) ---
     @schools.each do |school|
       puts "Creating departments for #{school.name}..."
-      ['Science Department', 'Math Department', 'Arts Department', 'Sports Department'].each do |dept_name|
+      [ "Science Department", "Math Department", "Arts Department", "Sports Department" ].each do |dept_name|
         department = Seed::EmployeeGroupService.create(
           company_group: @education,
           company: school,
@@ -305,7 +305,7 @@ class Seed::EducationService
   #     @schools << school
   #   end
   #   puts "Created #{@schools.count} schools."
-    
+
   #   # --- 3. Create Payment Method Appointments for Educations (Companies) ---
   #   @schools.each do |school|
   #     2.times do

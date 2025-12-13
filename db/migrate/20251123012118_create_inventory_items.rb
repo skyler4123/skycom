@@ -2,7 +2,7 @@ class CreateInventoryItems < ActiveRecord::Migration[8.0]
   def change
     create_table :inventory_items, id: :uuid do |t|
       t.references :inventory, null: false, foreign_key: true, type: :uuid
-      
+
       t.integer :education_type
       t.integer :hospital_type
       t.integer :hotel_type

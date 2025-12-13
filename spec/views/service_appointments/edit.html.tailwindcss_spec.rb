@@ -25,7 +25,6 @@ RSpec.describe "service_appointments/edit", type: :view do
     render
 
     assert_select "form[action=?][method=?]", service_appointment_path(service_appointment), "post" do
-
       assert_select "input[name=?]", "service_appointment[service_id]"
 
       assert_select "input[name=?]", "service_appointment[appoint_from_id]"

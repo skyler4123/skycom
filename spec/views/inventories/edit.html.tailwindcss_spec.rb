@@ -20,7 +20,6 @@ RSpec.describe "inventories/edit", type: :view do
     render
 
     assert_select "form[action=?][method=?]", inventory_path(inventory), "post" do
-
       assert_select "input[name=?]", "inventory[company_id]"
 
       assert_select "input[name=?]", "inventory[name]"

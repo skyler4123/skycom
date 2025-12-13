@@ -24,8 +24,8 @@ module Kernel
     # 4. Fetch from Rails Cache
     Rails.cache.fetch(cache_key, expires_in: expires_in) do
       Rails.logger.info "⚡️ Cache Miss: Executing SQL for #{cache_key}"
-      
-      # IMPORTANT: We must call .to_a to execute the query 
+
+      # IMPORTANT: We must call .to_a to execute the query
       # and store the actual Array of records, not the Relation object.
       relation.to_a
     end

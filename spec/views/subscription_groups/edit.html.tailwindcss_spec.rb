@@ -21,7 +21,6 @@ RSpec.describe "subscription_groups/edit", type: :view do
     render
 
     assert_select "form[action=?][method=?]", subscription_group_path(subscription_group), "post" do
-
       assert_select "input[name=?]", "subscription_group[company_group_id]"
 
       assert_select "input[name=?]", "subscription_group[company_id]"

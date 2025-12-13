@@ -15,7 +15,6 @@ RSpec.describe "brands/new", type: :view do
     render
 
     assert_select "form[action=?][method=?]", brands_path, "post" do
-
       assert_select "input[name=?]", "brand[name]"
 
       assert_select "input[name=?]", "brand[description]"

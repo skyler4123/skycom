@@ -18,7 +18,6 @@ RSpec.describe "subscriptions/new", type: :view do
     render
 
     assert_select "form[action=?][method=?]", subscriptions_path, "post" do
-
       assert_select "input[name=?]", "subscription[subscription_group_id]"
 
       assert_select "input[name=?]", "subscription[company_group_id]"

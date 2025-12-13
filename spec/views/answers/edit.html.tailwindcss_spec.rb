@@ -20,7 +20,6 @@ RSpec.describe "answers/edit", type: :view do
     render
 
     assert_select "form[action=?][method=?]", answer_path(answer), "post" do
-
       assert_select "input[name=?]", "answer[question_id]"
 
       assert_select "input[name=?]", "answer[name]"

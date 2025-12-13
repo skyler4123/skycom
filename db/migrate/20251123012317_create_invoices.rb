@@ -7,7 +7,7 @@ class CreateInvoices < ActiveRecord::Migration[8.0]
       t.integer :hotel_type
       t.integer :restaurant_type
       t.integer :retail_type
-      
+
       t.string :name
       t.string :description
       t.string :code

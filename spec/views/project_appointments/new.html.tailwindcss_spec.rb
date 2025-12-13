@@ -20,7 +20,6 @@ RSpec.describe "project_appointments/new", type: :view do
     render
 
     assert_select "form[action=?][method=?]", project_appointments_path, "post" do
-
       assert_select "input[name=?]", "project_appointment[project_id]"
 
       assert_select "input[name=?]", "project_appointment[appoint_from_id]"

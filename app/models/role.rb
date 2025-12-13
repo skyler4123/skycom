@@ -22,23 +22,23 @@ class Role < ApplicationRecord
 
   # --- Soft Deletion (Discard) ---
   # If you are using a gem like 'Discard' or similar for soft deletion:
-  # include Discard::Model 
-  # default_scope -> { kept } 
+  # include Discard::Model
+  # default_scope -> { kept }
 
   # --- Enums ---
   # Using full path to avoid potential method clashes, as seen in Employee model
-  enum :status, { 
-    active: 0, 
-    pending: 1, 
-    archived: 2 
+  enum :status, {
+    active: 0,
+    pending: 1,
+    archived: 2
   }
-  
+
   # Standardized role kinds for categorization
-  enum :business_type, { 
-    administrative: 0, 
-    management: 1, 
-    technical: 2, 
-    support: 3 
+  enum :business_type, {
+    administrative: 0,
+    management: 1,
+    technical: 2,
+    support: 3
   }
   # --- Model Types Enum ---
   enum :model_type, {
@@ -69,9 +69,9 @@ class Role < ApplicationRecord
   validates :name,
           presence: true,
           length: { maximum: 100 },
-          uniqueness: { 
-            scope: :company_group_id, 
-            message: "A role with this name already exists." 
+          uniqueness: {
+            scope: :company_group_id,
+            message: "A role with this name already exists."
           }
   validates :status, presence: true
   validates :business_type, presence: true

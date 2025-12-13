@@ -3,7 +3,6 @@
 # Order model and simulates soft deletion for a portion of the records.
 
 class Seed::OrderService
-
   # Configuration for the number of orders to create per company
   ORDERS_PER_COMPANY = 5
 

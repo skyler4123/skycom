@@ -13,7 +13,6 @@ require 'rails_helper'
 # sticking to rails and rspec-rails APIs to keep things simple and stable.
 
 RSpec.describe "/notification_group_appointments", type: :request do
-  
   # This should return the minimal set of attributes required to create a valid
   # NotificationGroupAppointment. As you add validations to NotificationGroupAppointment, be sure to
   # adjust the attributes here as well.

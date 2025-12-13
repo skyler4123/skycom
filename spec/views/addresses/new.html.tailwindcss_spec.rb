@@ -28,7 +28,6 @@ RSpec.describe "addresses/new", type: :view do
     render
 
     assert_select "form[action=?][method=?]", addresses_path, "post" do
-
       assert_select "input[name=?]", "address[alpha2]"
 
       assert_select "input[name=?]", "address[alpha3]"

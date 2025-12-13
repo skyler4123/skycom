@@ -24,7 +24,6 @@ RSpec.describe "inventory_item_appointments/edit", type: :view do
     render
 
     assert_select "form[action=?][method=?]", inventory_item_appointment_path(inventory_item_appointment), "post" do
-
       assert_select "input[name=?]", "inventory_item_appointment[inventory_item_id]"
 
       assert_select "input[name=?]", "inventory_item_appointment[appoint_from_id]"
