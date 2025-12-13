@@ -81,7 +81,7 @@ export default class ImgController extends Controller {
    */
   breakPointValueChanged(value, previousValue) {
     if (previousValue) {
-      console.log(`Breakpoint changed from ${previousValue} to ${value}`)
+      // console.log(`Breakpoint changed from ${previousValue} to ${value}`)
     }
     if (!this.hasImgTarget) return
     this.imgTargets.forEach((imgElement) => {

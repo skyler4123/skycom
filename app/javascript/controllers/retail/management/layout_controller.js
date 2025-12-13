@@ -1,5 +1,5 @@
 import ApplicationController from "controllers/application_controller"
-import { currentCompanyGroup, companyGroups, capitalize, openPopover } from "controllers/helpers"
+import { currentCompanyGroup, companyGroups, capitalize, openPopover, poll } from "controllers/helpers"
 
 export default class Retail_Management_LayoutController extends ApplicationController {
   static targets = ["profileDropdown"]
@@ -13,14 +13,23 @@ export default class Retail_Management_LayoutController extends ApplicationContr
   }
 
   initBindings() {
-    this.currentCompanyGroup = currentCompanyGroup();
     this.companyGroups = companyGroups()
+    // this.currentCompanyGroup
   }
 
   initLayout() {
-    // set body class and innerHTML
-    this.element.className = 'min-h-screen flex flex-col'
-    this.element.innerHTML = this.layoutHTML()
+    // Poll until the currentCompanyGroup can be determined from the URL.
+    // This handles race conditions during redirects where the JS loads
+    // before the URL is updated.
+    poll(() => {
+      this.currentCompanyGroup = currentCompanyGroup();
+      if (this.currentCompanyGroup) {
+        this.element.className = 'min-h-screen flex flex-col';
+        this.element.innerHTML = this.layoutHTML();
+        return true; // Stop polling
+      }
+      return false; // Continue polling
+    });
   }
 
   openCompanyGroupDropdown(event) {
