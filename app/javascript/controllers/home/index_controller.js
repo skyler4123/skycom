@@ -1,5 +1,5 @@
 import ApplicationController from "controllers/application_controller"
-import { openModal, closeModal, csrfTokenTag, signInPath } from "controllers/helpers"
+import { openModal, closeModal, csrfTokenTag, signInPath, poll } from "controllers/helpers"
 
 export default class Home_IndexController extends ApplicationController {
   static targets = ["signInButton", "signUpButton"]
@@ -9,12 +9,14 @@ export default class Home_IndexController extends ApplicationController {
   }
 
   initActions() {
-    if (this.hasSignInButtonTarget) {
-      this.addAction(this.signInButtonTarget, `click->${this.identifier}#openSignInModal`)
-    }
-    if (this.hasSignUpButtonTarget) {
-      this.addAction(this.signUpButtonTarget, `click->${this.identifier}#openSignUpModal`)
-    }
+    poll(() => {
+      if (this.hasSignInButtonTarget) {
+        this.addAction(this.signInButtonTarget, `click->${this.identifier}#openSignInModal`)
+      }
+      if (this.hasSignUpButtonTarget) {
+        this.addAction(this.signUpButtonTarget, `click->${this.identifier}#openSignUpModal`)
+      }
+    })
   }
 
   openSignInModal(event) {

@@ -1,5 +1,5 @@
 import LayoutController from "controllers/layout_controller"
-import { addCsrfToken } from "controllers/helpers"
+import { csrfTokenTag } from "controllers/helpers"
 
 export default class CompanyGroup_NewController extends LayoutController {
 
@@ -21,7 +21,7 @@ export default class CompanyGroup_NewController extends LayoutController {
             accept-charset="UTF-8"
             method="post"
             class="flex flex-col gap-6">
-            ${addCsrfToken()}
+            ${csrfTokenTag()}
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6 h-18">
               <div class="flex flex-col gap-2">
                 <label class="text-slate-900 dark:text-slate-100 text-sm font-bold leading-tight" for="companyName">Company

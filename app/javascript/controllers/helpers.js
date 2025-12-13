@@ -450,3 +450,31 @@ export const signUpPath = () => {
 export const signOutPath = () => {
   return `/sign_out`
 }
+
+/**
+ * Executes a callback function repeatedly until it returns true or a maximum number of attempts is reached.
+ *
+ * @param {Function} callback The function to execute. It should return `true` to stop polling.
+ * @param {Object} options Configuration for the polling.
+ * @param {number} [options.interval=200] The time in milliseconds between each attempt.
+ * @param {number} [options.maxAttempts=10] The maximum number of attempts before stopping.
+ *
+ * Example:
+ * poll(() => {
+ *   const element = document.getElementById('my-element');
+ *   if (element) {
+ *     console.log('Element found!');
+ *     return true; // Stop polling
+ *   }
+ *   return false; // Continue polling
+ * });
+ */
+export const poll = (callback, { interval = 100, maxAttempts = 10 } = {}) => {
+  let attempts = 0;
+  const intervalId = setInterval(() => {
+    attempts++;
+    if (callback() === true || attempts >= maxAttempts) {
+      clearInterval(intervalId);
+    }
+  }, interval);
+};
