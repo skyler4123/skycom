@@ -3,4 +3,22 @@ class HomeController < ApplicationController
 
   def index
   end
+
+  def retail
+  end
+
+  def education
+  end
+
+  def hospital
+  end
+
+  def restaurant
+  end
+
+  def shop
+  end
+
+  def fitness
+  end
 end

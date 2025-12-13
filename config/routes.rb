@@ -158,6 +158,16 @@ Rails.application.routes.draw do
   resources :tags
   resources :companies
   resources :addresses
+  resources :home, only: [:index] do
+    collection do
+      get :retail
+      get :education
+      get :hospital
+      get :restaurant
+      get :shop
+      get :fitness
+    end
+  end
   get "sign_out", to: "sessions#sign_out"
 
 
