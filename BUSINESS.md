@@ -2,7 +2,7 @@
 
 ## 1. Vision & Overview
 
-Skycom is a comprehensive, multi-purpose Rails application designed to serve as a centralized management system for a wide variety of business verticals. The core vision is to provide a single, flexible, and scalable platform that can be adapted to the specific needs of different industries, such as retail, education, and healthcare.
+Skycom is a comprehensive, multi-purpose Rails application designed to serve as a centralized management system for a wide variety of business verticals. The core vision is to provide a single, flexible, and scalable platform that can be adapted to the specific needs of different industries, such as retail, education, hospital, restaurant, and fitness.
 
 The application is built upon a highly flexible database architecture that leverages polymorphic associations extensively. This allows core business concepts like "Customers," "Products," "Appointments," and "Invoices" to be shared and reused across different business domains, minimizing code duplication and maximizing adaptability.
 
@@ -54,6 +54,22 @@ This module provides functionality for managing healthcare facilities.
 *   **Namespace:** `Hospital`
 *   **Controllers:** `Hospital::*`
 *   **Key Resources:** `Patients`, `Doctors`, `Appointments`, `Medical_Records`, `Prescriptions`, `Departments`, `Billings`, `Labs`, `Pharmacies`.
+
+#### d. Restaurant Management (`/restaurant`)
+
+This module is for managing food and beverage businesses.
+
+*   **Namespace:** `Restaurant`
+*   **Controllers:** `Restaurant::*`
+*   **Key Resources:** `Menus`, `Tables`, `Reservations`, `Orders`, `Customers`, `Employees`, `Billings`.
+
+#### e. Fitness Management (`/fitness`)
+
+This module is tailored for gyms, fitness centers, and studios.
+
+*   **Namespace:** `Fitness`
+*   **Controllers:** `Fitness::*`
+*   **Key Resources:** `Members`, `Classes`, `Schedules`, `Trainers`, `Bookings`, `Memberships`.
 
 ## 3. Technical Stack & Configuration
 

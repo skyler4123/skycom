@@ -10,7 +10,7 @@ export default class CompanyGroup_NewController extends LayoutController {
           class="flex flex-col w-4/5 p-8 gap-8 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm">
           <div class="flex flex-col gap-2">
             <h1 class="text-slate-900 dark:text-slate-100 text-3xl font-bold leading-tight tracking-[-0.015em]">
-              Create Your Retail Company</h1>
+              Create Your Company</h1>
             <p class="text-slate-600 dark:text-slate-400 text-base font-normal">Set up your
               workspace to manage inventory, sales, and more.</p>
           </div>
@@ -49,19 +49,18 @@ export default class CompanyGroup_NewController extends LayoutController {
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div class="flex flex-col gap-2">
-                <label class="text-slate-900 dark:text-slate-100 text-sm font-bold leading-tight" for="retailCategory">Retail
+                <label class="text-slate-900 dark:text-slate-100 text-sm font-bold leading-tight" for="retailCategory">
                   Category <span class="text-red-500">*</span></label>
                 <div class="relative">
                   <select
                     class="flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-slate-900 dark:text-slate-100 focus:outline-0 focus:ring-0 border border-slate-300 dark:border-slate-700 bg-white dark:bg-gray-950 focus:border-indigo-600 h-12 px-4 text-base font-normal leading-normal appearance-none"
                     id="retailCategory" name="company_group[business_type]">
                     <option disabled="" selected="" value="">Select a category</option>
-                    <option value="fashion">Fashion & Apparel</option>
-                    <option value="electronics">Electronics & Gadgets</option>
-                    <option value="grocery">Grocery & Supermarket</option>
-                    <option value="home">Home & Garden</option>
-                    <option value="beauty">Health & Beauty</option>
-                    <option value="other">Other</option>
+                    <option value="retail">Retail</option>
+                    <option value="education">Education</option>
+                    <option value="hospital">Hospital</option>
+                    <option value="restaurant">Restaurant</option>
+                    <option value="fitness">Fitness</option>
                   </select>
                   <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-slate-500">
                     <span class="material-symbols-outlined">expand_more</span>

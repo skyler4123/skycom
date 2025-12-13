@@ -24,22 +24,27 @@ export default class LayoutController extends ApplicationController {
                     <h2 class="text-slate-900 dark:text-slate-100 text-lg font-bold leading-tight tracking-[-0.015em]">
                       Skycom</h2>
                   </div>
-                  <div class="flex flex-1 justify-end gap-2 items-center">
-                    <div class="flex items-center gap-2">
-                      <div
-                        class="bg-center bg-no-repeat aspect-square bg-cover rounded-full h-10 w-10 border border-slate-200 dark:border-slate-700"
-                        style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuDmCMcaKuxM-L3kekIel30wVgf_J-ssrf86FqOelUJrmeAHwneIxkCor7hKn3SzOtbLg3DrSVpbI77hxo-i174Ll7V-lQ8CTCQB3H9YEA5_LSG8vyi_FynSf8l4w3lgYkc2uFLpD4U1w_DzdTIiCUzYkrAkVoZumb-iT_CjUsLofbZCfryp_hfJBATT8XUgqjbHSZdKEhdoREZiwf1ZCevLreCxK463hwZhGxwb6xu2NoSIYjbWxlfEmD5ABwPppLeyiUqyCCWWVw0");'>
-                      </div>
-                      <div class="flex flex-col">
-                        <p class="text-slate-900 dark:text-slate-100 text-sm font-bold leading-tight">Alice
-                          Smith</p>
-                      </div>
-                    </div>
-                    <button
-                      class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-4 bg-slate-200 dark:bg-slate-700 text-slate-900 dark:text-slate-100 text-sm font-bold leading-normal tracking-[0.015em]">
-                      <span class="truncate">Sign Out</span>
-                    </button>
-                  </div>
+
+                  <!-- Navbar start -->
+                  <nav class="flex flex-1 justify-around items-center px-4">
+                    <a class="text-sm font-medium text-slate-700 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-600 transition-colors"
+                      href="/home/retail">Retail</a>
+                    <a class="text-sm font-medium text-slate-700 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-600 transition-colors"
+                      href="/home/education">Education</a>
+                    <a class="text-sm font-medium text-slate-700 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-600 transition-colors"
+                      href="/home/hospital">Hospital</a>
+                    <a class="text-sm font-medium text-slate-700 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-600 transition-colors"
+                      href="/home/restaurant">Restaurant</a>
+                    <a class="text-sm font-medium text-slate-700 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-600 transition-colors whitespace-nowrap"
+                      href="/home/food_service">Food Service</a>
+                    <a class="text-sm font-medium text-slate-700 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-600 transition-colors whitespace-nowrap"
+                      href="home/sport_fitness">Sport & Fitness</a>
+                  </nav>
+                  <!-- Nabar end -->
+
+                  <!-- Authentication start -->
+                  <div class="flex justify-end gap-2 items-center" data-controller="header--authentication"></div>
+                  <!-- Authentication end -->
                 </header>
 
                 ${this.contentHTML()}

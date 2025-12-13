@@ -17,6 +17,7 @@ Rails.application.routes.draw do
       namespace :management do
         resources :dashboard
         resources :branches
+        resources :departments
         resources :products
         resources :orders
         resources :bookings
