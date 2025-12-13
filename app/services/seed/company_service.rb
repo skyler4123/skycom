@@ -1,5 +1,5 @@
 # This service seeds the database with Company records, ensuring each company
-# is associated with an existing User and populating all new fields 
+# is associated with an existing User and populating all new fields
 # (enums, addresses, registration info).
 
 class Seed::CompanyService

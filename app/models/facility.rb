@@ -8,15 +8,15 @@ class Facility < ApplicationRecord
   has_many :tag_appointments, dependent: :destroy, as: :appoint_to
   has_many :tags, through: :tag_appointments
 
-  enum :status, { 
-    active: 0, 
-    pending: 1, 
-    archived: 2 
+  enum :status, {
+    active: 0,
+    pending: 1,
+    archived: 2
   }
 
-  enum :business_type, { 
-    publicly_traded: 0, 
-    privately_held: 1 
+  enum :business_type, {
+    publicly_traded: 0,
+    privately_held: 1
   }
 
   validates :name, presence: true, length: { maximum: 255 }

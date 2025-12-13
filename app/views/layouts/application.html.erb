@@ -21,21 +21,26 @@
     <%= stylesheet_link_tag :app, "data-turbo-track": "reload" %>
     <%= javascript_importmap_tags %>
 
-    <%# ------------------------------Custom Tags------------------------------------ %>
-    <%# Disables Turbo Drive's link prefetching behavior site-wide. %>
+    <!-- ---------------------------------------------------------------------------------------------------- -->
+    <!-- Disable Turbo Prefetching -->
     <meta name="turbo-prefetch" content="false">
+    <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@100..900&amp;display=swap" rel="stylesheet" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"
+      rel="stylesheet" />
+    <!-- ---------------------------------------------------------------------------------------------------- -->
 
   </head>
 
   <body
-    data-controller="responsive language svg img link"
+    data-controller="responsive language svg img link notification"
   >
-    <div class="w-full">
+    <div class="w-full flex justify-center items-center">
       <% if notice.present? %>
-        <p class="py-2 px-3 bg-green-50 mb-5 text-green-500 font-medium rounded-md inline-block" id="notice"><%= notice %></p>
+        <p class="w-full text-center py-2 px-3 bg-green-50 mb-5 text-green-500 font-medium rounded-md inline-block" id="notice"><%= notice %></p>
       <% end %>
       <% if alert.present? %>
-        <p class="py-2 px-3 bg-red-50 mb-5 text-red-500 font-medium rounded-md inline-block" id="alert"><%= alert %></p>
+        <p class="w-full text-center py-2 px-3 bg-red-50 mb-5 text-red-500 font-medium rounded-md inline-block" id="alert"><%= alert %></p>
       <% end %>
     </div>
     <div data-controller="<%= stimulus_controller %>">

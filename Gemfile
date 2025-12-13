@@ -65,12 +65,18 @@ group :test do
 end
 
 
-###############################################################################################
+# ----------------------------------------------------------------------------------------------------
 
 # Use sqlite3 as the database for Active Record
 gem "sqlite3", ">= 2.1"
-group :development, :test do
-  gem "rspec-rails", "~> 8.0.0"
+group :test do
+  gem "factory_bot_rails"
+  gem "rspec-rails"
+  gem "shoulda-matchers"
+  gem "simplecov", require: false
+  gem "rack-test"
+  gem "vcr"
+  gem "rspec-retry"
 end
 gem "authentication-zero"
 # Use OmniAuth to support multi-provider authentication [https://github.com/omniauth/omniauth]
@@ -79,4 +85,5 @@ gem "omniauth"
 gem "omniauth-rails_csrf_protection"
 gem "faker"
 gem "aws-sdk-s3", require: false
-gem "factory_bot_rails"
+
+# ----------------------------------------------------------------------------------------------------

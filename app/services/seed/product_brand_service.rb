@@ -3,7 +3,6 @@
 # in the ProductBrand model and simulates soft deletion for some records.
 
 class Seed::ProductBrandService
-
   # Configuration for the total number of product brands to create
   PRODUCT_BRANDS_TO_CREATE = 15
 

@@ -1,5 +1,4 @@
 class Seed::ServiceService
-
   def self.create(
     company_group:,
     company:,

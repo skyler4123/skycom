@@ -1,7 +1,7 @@
 class Brand < ApplicationRecord
   # --- Associations ---
   has_many :products, dependent: :nullify
-  
+
   # --- Enums ---
   # Defines the possible statuses for a brand.
   enum :status, {

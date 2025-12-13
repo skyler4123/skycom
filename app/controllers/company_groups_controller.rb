@@ -12,7 +12,10 @@ class CompanyGroupsController < ApplicationController
 
   # GET /company_groups/new
   def new
-    @company_group = CompanyGroup.new
+    # @company_group = CompanyGroup.new
+    respond_to do |format|
+      format.html { render html: "", layout: true }
+    end
   end
 
   # GET /company_groups/1/edit
@@ -21,6 +24,8 @@ class CompanyGroupsController < ApplicationController
 
   # POST /company_groups or /company_groups.json
   def create
+    debugger
+    return
     @company_group = CompanyGroup.new(company_group_params)
 
     respond_to do |format|

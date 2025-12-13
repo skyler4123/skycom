@@ -19,7 +19,7 @@ class CreateUsers < ActiveRecord::Migration[8.0]
       t.string :country_code
       t.references :address, null: true, foreign_key: true, type: :uuid
       t.datetime :discarded_at
-  
+
       t.timestamps
     end
     add_index :users, :discarded_at

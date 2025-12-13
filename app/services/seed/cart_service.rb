@@ -46,7 +46,6 @@ class Seed::CartService
     business_type: nil,
     discarded_at: nil
   )
-
     should_discard = rand(10) == 0
     discarded_at ||= should_discard ? Time.zone.now - rand(1..180).days : nil
 

@@ -3,7 +3,6 @@
 # and simulates soft deletion for a portion of the records.
 
 class Seed::InvoiceService
-
   # Configuration for the number of invoices to create per order
   INVOICES_PER_ORDER = 1
 

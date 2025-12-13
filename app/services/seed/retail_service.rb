@@ -82,7 +82,7 @@ class Seed::RetailService
     # --- 5. Create Departments (Employee Groups) for Each Store (Company) ---
     @stores.each do |store|
       puts "Creating departments for #{store.name}..."
-      ['Electronics', 'Clothing', 'Home Goods', 'Customer Service'].each do |dept_name|
+      [ "Electronics", "Clothing", "Home Goods", "Customer Service" ].each do |dept_name|
         department = Seed::EmployeeGroupService.create(
           company_group: @retail_group,
           company: store,
