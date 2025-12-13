@@ -24,13 +24,13 @@ class SessionsController < ApplicationController
   def destroy
     @session.destroy
     cookies.clear
-    redirect_to(sessions_path, notice: "That session has been logged out")
+    redirect_to(root_path, notice: "That session has been logged out")
   end
 
-    def sign_out
+  def sign_out
     Current.session.destroy
     cookies.clear
-    redirect_to(sessions_path, notice: "That session has been logged out")
+    redirect_to(root_path, notice: "That session has been logged out")
   end
 
   private
