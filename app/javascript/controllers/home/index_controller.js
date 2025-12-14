@@ -79,7 +79,7 @@ export default class Home_IndexController extends ApplicationController {
             
             <!-- Sign In Form -->
             <form
-              role="Sign In Form"
+              role="sign-in-form"
               action="${signInPath()}"
               method="POST"
               class="">
@@ -162,7 +162,7 @@ export default class Home_IndexController extends ApplicationController {
 
             <!-- Form -->
             <form
-              role="Sign Up Form"
+              role="sign-up-form"
               action="${signUpPath()}"
               method="POST"
               class="">

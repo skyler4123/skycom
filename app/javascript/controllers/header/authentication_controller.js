@@ -38,6 +38,7 @@ export default class Header_AuthenticationController extends ApplicationControll
       </div>
       <a href="${signOutPath()}">
         <button
+          role="sign-out-button"
           class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-4 bg-slate-200 dark:bg-slate-700 text-slate-900 dark:text-slate-100 text-sm font-bold leading-normal tracking-[0.015em]">
           <span class="truncate">Sign Out</span>
         </button>
@@ -48,12 +49,14 @@ export default class Header_AuthenticationController extends ApplicationControll
   renderSignedOut() {
     this.element.innerHTML = `
       <button
+        role="sign-in-button"
         data-${Home_IndexController.identifier}-target="signInButton"
         data-home--index-target="signInButton"
         class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-4 bg-slate-200 dark:bg-slate-700 text-slate-900 dark:text-slate-100 text-sm font-bold leading-normal tracking-[0.015em]">
         <span class="truncate">Sign In</span>
       </button>
       <button
+        role="sign-up-button"
         data-${Home_IndexController.identifier}-target="signUpButton"
         data-home--index-target="signUpButton"
         class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-4 bg-indigo-600 text-white text-sm font-bold leading-normal tracking-[0.015em]">
