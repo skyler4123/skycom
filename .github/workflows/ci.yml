@@ -124,7 +124,8 @@ jobs:
       - name: Run Docker Compose and fail on test failure
         env:
           RAILS_MASTER_KEY: ${{ secrets.RAILS_MASTER_KEY }}
-        run: RAILS_MASTER_KEY=${{ secrets.RAILS_MASTER_KEY }} docker compose -p skycom-seed-test -f docker-compose.yml -f docker-compose.seed-test.yml up --abort-on-container-exit --exit-code-from web --attach web
+        run: |
+          RAILS_MASTER_KEY=$RAILS_MASTER_KEY docker compose -p skycom-seed-test -f docker-compose.yml -f docker-compose.seed-test.yml up --abort-on-container-exit --exit-code-from web --attach web
 
       - name: Show running containers
         run: docker ps -a
