@@ -117,7 +117,7 @@ jobs:
       - name: Run Docker Compose and fail on test failure
         env:
           RAILS_MASTER_KEY: ${{ secrets.RAILS_MASTER_KEY }}
-        run: docker compose -p skyceer-seed-test -f docker-compose.yml -f docker-compose.seed-test.yml up --abort-on-container-exit --exit-code-from web --attach web
+        run: docker compose -p skycom-seed-test -f docker-compose.yml -f docker-compose.seed-test.yml up --abort-on-container-exit --exit-code-from web --attach web
 
       - name: Show running containers
         run: docker ps -a
@@ -125,4 +125,4 @@ jobs:
       # Optional: Tear down after test
       - name: Stop and remove containers
         if: always()
-        run: docker compose -p skyceer-seed-test -f docker-compose.yml -f docker-compose.seed-test.yml down
+        run: docker compose -p skycom-seed-test -f docker-compose.yml -f docker-compose.seed-test.yml down

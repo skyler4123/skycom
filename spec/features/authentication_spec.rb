@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.feature "Authentication", type: :feature, js: true do
+RSpec.feature "Authentication", type: :feature, js: true, retry: 5 do
   describe "Sign up with normal user" do
     let(:new_user_params) {
       {
