@@ -1,34 +1,34 @@
 name: skycom_development
 services:
-  # web:
-  #   build: .
-  #   command: bash -c "sleep 5 && rm -f tmp/pids/server.pid && bundle exec rails db:prepare && bundle exec rails assets:precompile && bundle exec thrust bin/rails s"
-  #   environment:
-  #     RAILS_ENV: development
-  #     RAILS_MASTER_KEY: ${RAILS_MASTER_KEY}
-  #   volumes:
-  #     - .:/rails
-  #   ports:
-  #     - "80:80"
-  #     - "443:443"
-  #   stdin_open: true
-  #   tty: true
-  #   depends_on:
-  #     - postgres
-  #     - mongo
-  #     - opensearch
-  #     - opensearch_dashboards
+  web:
+    build: .
+    command: bash -c "sleep 5 && rm -f tmp/pids/server.pid && bundle exec rails db:prepare && bundle exec rails assets:precompile && bundle exec thrust bin/rails s"
+    environment:
+      RAILS_ENV: development
+      RAILS_MASTER_KEY: ${RAILS_MASTER_KEY}
+    volumes:
+      - .:/rails
+    ports:
+      - "80:80"
+      - "443:443"
+    stdin_open: true
+    tty: true
+    depends_on:
+      - postgres
+      # - mongo
+      # - opensearch
+      # - opensearch_dashboards
 
-  # job:
-  #   build: .
-  #   command: bash -c "sleep 30 && bundle exec rails db:prepare && bin/jobs"
-  #   environment:
-  #     RAILS_ENV: development
-  #     RAILS_MASTER_KEY: ${RAILS_MASTER_KEY}
-  #   volumes:
-  #     - .:/rails
-  #   depends_on:
-  #     - web
+  job:
+    build: .
+    command: bash -c "sleep 30 && bundle exec rails db:prepare && bin/jobs"
+    environment:
+      RAILS_ENV: development
+      RAILS_MASTER_KEY: ${RAILS_MASTER_KEY}
+    volumes:
+      - .:/rails
+    depends_on:
+      - web
 
   postgres:
     image: bitnamilegacy/postgresql:17.6.0-debian-12-r4
@@ -40,48 +40,48 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
 
-  mongo:
-    image: mongo
-    ports:
-      - "27017:27017"
-    volumes:
-      - mongo_data:/data/db
+  # mongo:
+  #   image: mongo
+  #   ports:
+  #     - "27017:27017"
+  #   volumes:
+  #     - mongo_data:/data/db
 
-  opensearch:
-    image: opensearchproject/opensearch:3
-    environment:
-      OPENSEARCH_INITIAL_ADMIN_PASSWORD: OpensearchPassword@1234
-      discovery.type: single-node
-      plugins.security.disabled: "true"
-      # DISABLE_SECURITY_PLUGIN: "true" # Disables Security plugin
-    ports:
-      - "9200:9200"
-      - "9600:9600"
-    volumes:
-      - es_data:/usr/share/opensearch/data
+  # opensearch:
+  #   image: opensearchproject/opensearch:3
+  #   environment:
+  #     OPENSEARCH_INITIAL_ADMIN_PASSWORD: OpensearchPassword@1234
+  #     discovery.type: single-node
+  #     plugins.security.disabled: "true"
+  #     # DISABLE_SECURITY_PLUGIN: "true" # Disables Security plugin
+  #   ports:
+  #     - "9200:9200"
+  #     - "9600:9600"
+  #   volumes:
+  #     - es_data:/usr/share/opensearch/data
 
-  opensearch_dashboards:
-    image: opensearchproject/opensearch-dashboards:3
-    environment:
-      - 'OPENSEARCH_HOSTS=["http://opensearch:9200"]'
-      - "DISABLE_SECURITY_DASHBOARDS_PLUGIN=true"
-    ports:
-      - "5601:5601"
-    depends_on:
-      - opensearch
+  # opensearch_dashboards:
+  #   image: opensearchproject/opensearch-dashboards:3
+  #   environment:
+  #     - 'OPENSEARCH_HOSTS=["http://opensearch:9200"]'
+  #     - "DISABLE_SECURITY_DASHBOARDS_PLUGIN=true"
+  #   ports:
+  #     - "5601:5601"
+  #   depends_on:
+  #     - opensearch
 
-  grafana:
-    # username: admin
-    # password: admin
-    image: grafana/otel-lgtm
-    volumes:
-      - grafana_data:/data
-    ports:
-      - "3000:3000" # Grafana
-      - "4317:4317" # OpenTelemetry
-      - "4318:4318" # OpenTelemetry
-      - "9090:9090" # Prometheus
-      - "3100:3100" # Loki
+  # grafana:
+  #   # username: admin
+  #   # password: admin
+  #   image: grafana/otel-lgtm
+  #   volumes:
+  #     - grafana_data:/data
+  #   ports:
+  #     - "3000:3000" # Grafana
+  #     - "4317:4317" # OpenTelemetry
+  #     - "4318:4318" # OpenTelemetry
+  #     - "9090:9090" # Prometheus
+  #     - "3100:3100" # Loki
 
   # For Selenium test
   selenium-chromium:
