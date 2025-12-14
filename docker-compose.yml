@@ -84,13 +84,13 @@ services:
   #     - "3100:3100" # Loki
 
   # For Selenium test
-  selenium-chromium:
-    image: selenium/standalone-chromium:latest
-    shm_size: '2gb'
-    ports:
-      - "4444:4444"
-      - "5900:5900"
-      - "7900:7900"
+  # selenium-chromium:
+  #   image: selenium/standalone-chromium:latest
+  #   shm_size: '2gb'
+  #   ports:
+  #     - "4444:4444"
+  #     - "5900:5900"
+  #     - "7900:7900"
  
   # MinIO Service
   minio:

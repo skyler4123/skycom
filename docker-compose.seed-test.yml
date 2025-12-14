@@ -1,0 +1,30 @@
+name: skycom_seed_test
+services:
+  web:
+    command: bash -c "sleep 5 && rm -f tmp/pids/server.pid && bundle exec rails db:drop db:create db:migrate db:seed"
+    environment:
+      RAILS_ENV: test
+    volumes: !reset null
+    depends_on: !reset
+      - postgres
+      # - mongo
+      # - opensearch
+
+  job: !reset null
+
+  postgres:
+    volumes: !reset null
+
+  # mongo:
+  #   volumes: !reset null
+
+  # opensearch:
+  #   volumes: !reset null
+
+  # opensearch_dashboards: !reset null
+
+  # grafana: !reset null
+  
+  minio: !reset null
+
+  create_buckets: !reset null
