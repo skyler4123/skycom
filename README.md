@@ -34,6 +34,8 @@ Things you may want to cover:
 
   RAILS_MASTER_KEY=$(cat config/master.key) docker compose -f docker-compose.yml -f docker-compose.seed-test.yml up --abort-on-container-exit --exit-code-from web --attach web
   
+  RAILS_MASTER_KEY=$(cat config/master.key) docker compose -f docker-compose.yml -f docker-compose.rspec-test.yml up --abort-on-container-exit --exit-code-from web --attach web
+
   Seed::ApplicationService.run
   Seed::ApplicationService.put_count
   

@@ -1,0 +1,46 @@
+name: skycom_rspec_test
+services:
+  web:
+    command: bash -c "sleep 5 && rm -f tmp/pids/server.pid && bundle exec rails db:create db:migrate && bundle exec rails assets:precompile && bundle exec rspec"
+    environment:
+      RAILS_ENV: test
+    # volumes: !reset null
+    depends_on: !reset
+      - postgres
+      - selenium-chromium
+
+  job:
+    command: bash -c "sleep 10 && bundle exec rails db:create db:migrate && bin/jobs"
+    environment:
+      RAILS_ENV: test
+    # volumes:
+    #   - .:/rails
+    volumes: !reset null
+    depends_on:
+      - web
+
+  postgres:
+    volumes: !reset null
+
+  # mongo:
+  #   volumes: !reset null
+
+  # opensearch:
+  #   volumes: !reset null
+
+  # opensearch_dashboards: !reset null
+
+  # grafana: !reset null
+  
+  minio: !reset null
+
+  create_buckets: !reset null
+
+  # For Selenium test
+  selenium-chromium:
+    image: selenium/standalone-chromium:latest
+    shm_size: '2gb'
+    ports:
+      - "4444:4444"
+      - "5900:5900"
+      - "7900:7900"
