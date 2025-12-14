@@ -1,0 +1,38 @@
+name: Seed Tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    # branches: [main]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  seed-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      -
+        name: Set up Docker Compose
+        uses: docker/setup-compose-action@v1
+        with:
+          version: latest
+
+      # Run docker compose that shows onlt logs from the web service and fails on test failure
+      - name: Run Docker Compose and fail on test failure
+        env:
+          RAILS_MASTER_KEY: ${{ secrets.RAILS_MASTER_KEY }}
+        run: docker compose -p skycom-seed-test -f docker-compose.yml -f docker-compose.seed-test.yml up --abort-on-container-exit --exit-code-from web --attach web
+
+      - name: Show running containers
+        run: docker ps -a
+
+      # Optional: Tear down after test
+      - name: Stop and remove containers
+        if: always()
+        run: docker compose -p skycom-seed-test -f docker-compose.yml -f docker-compose.seed-test.yml down
