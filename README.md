@@ -42,7 +42,6 @@ Things you may want to cover:
   bin/rubocop --autocorrect-all
   EDITOR="code --wait" bin/rails credentials:edit
   EDITOR="code --wait" bin/rails credentials:edit -e production
-
 ##
 
 ##
