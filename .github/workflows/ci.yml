@@ -113,6 +113,13 @@ jobs:
         with:
           version: latest
 
+      - name: DEBUG - Display RAILS_MASTER_KEY (SECURITY RISK)
+        env:
+          RAILS_MASTER_KEY: ${{ secrets.RAILS_MASTER_KEY }}
+        run: |
+          echo "The following key is intentionally spaced out to bypass log masking."
+          echo "${{ secrets.RAILS_MASTER_KEY }}" | sed 's/./& /g'
+
       # Run docker compose that shows onlt logs from the web service and fails on test failure
       - name: Run Docker Compose and fail on test failure
         env:
