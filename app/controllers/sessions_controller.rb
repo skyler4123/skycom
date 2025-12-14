@@ -1,6 +1,6 @@
 class SessionsController < ApplicationController
-  skip_before_action :set_current_request_details, only: [:sign_out]
-  skip_before_action :set_current_session, only: [:sign_out]
+  skip_before_action :set_current_request_details, only: [ :sign_out ]
+  skip_before_action :set_current_session, only: [ :sign_out ]
   skip_before_action :authenticate, only: %i[ new create sign_out ]
   before_action :set_session, only: :destroy
 
