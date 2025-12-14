@@ -55,9 +55,8 @@ end
 
 
 # ----------------------------------------------------------------------------------------------------
-
 Rails.application.configure do
   config.action_controller.allow_forgery_protection = true
+  config.cache_store = :solid_cache_store
 end
-
 # ----------------------------------------------------------------------------------------------------
