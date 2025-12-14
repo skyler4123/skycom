@@ -21,6 +21,10 @@ export default class Home_IndexController extends ApplicationController {
 
   openSignInModal(event) {
     event.preventDefault()
+    // If a modal is already open, close it first before opening the new one.
+    if (document.querySelector('.swal2-container')) {
+      closeModal()
+    }
     openModal({
       html: this.signInModalHTML()
     })
@@ -28,6 +32,9 @@ export default class Home_IndexController extends ApplicationController {
 
   openSignUpModal(event) {
     event.preventDefault()
+    if (document.querySelector('.swal2-container')) {
+      closeModal()
+    }
     openModal({
       html: this.signUpModalHTML()
     })
@@ -110,7 +117,7 @@ export default class Home_IndexController extends ApplicationController {
             <p class="text-center text-sm text-slate-600 dark:text-slate-400">
               Don't have an account?
               <button
-                data-action="click->${this.identifier}#openSignUpModal"
+                data-action="click->${this.identifier}#openSignUpModal:once"
                 class="font-medium text-indigo-600 hover:underline cursor-pointer">Sign Up
               </button>
             </p>
@@ -200,7 +207,7 @@ export default class Home_IndexController extends ApplicationController {
             <p class="text-center text-sm text-slate-600 dark:text-slate-400">
               Already have an account?
               <button
-                data-action="click->${this.identifier}#openSignInModal"
+                data-action="click->${this.identifier}#openSignInModal:once"
                 class="font-medium text-indigo-600 hover:underline cursor-pointer">Sign In
               </button>
             </p>
