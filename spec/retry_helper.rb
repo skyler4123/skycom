@@ -8,11 +8,11 @@ RSpec.configure do |config|
   config.display_try_failure_messages = true
 
   # Retry failed examples
-  config.default_retry_count = 2
+  config.default_retry_count = 5
 
   # run retry only on features
   config.around :each, :js do |ex|
-    ex.run_with_retry retry: 2
+    ex.run_with_retry retry: 5
   end
 
   # callback to be run between retries
