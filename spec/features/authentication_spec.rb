@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.feature "Authentication", type: :feature, js: true, retry: 5 do
+RSpec.feature "Authentication", type: :feature, js: true do
   describe "Sign up with normal user" do
     let(:new_user_params) {
       {
@@ -43,10 +43,11 @@ RSpec.feature "Authentication", type: :feature, js: true, retry: 5 do
   describe "Sign in with normal user" do
     let(:user) { create(:user, password: 'Password@1234', password_confirmation: 'Password@1234') }
 
-    it "signs me in" do
+    it "signs me in", retry: 3, retry_wait: 10 do
       visit root_path
 
       # First attempt: click to open the sign-in form (modal/drawer/etc.)
+      click_on "Sign In"
       click_on "Sign In"
 
       # Try to find the form — Capybara will wait and retry automatically (up to ~2-5 seconds)
