@@ -1,7 +1,7 @@
 name: skycom_seed_test
 services:
   web:
-    command: bash -c "sleep 5 && rm -f tmp/pids/server.pid && bundle exec rails db:drop db:create db:migrate db:seed"
+    command: bash -c "sleep 5 && rm -f tmp/pids/server.pid && bundle exec rails db:prepare"
     environment:
       RAILS_ENV: test
       RAILS_MASTER_KEY: ${RAILS_MASTER_KEY}
