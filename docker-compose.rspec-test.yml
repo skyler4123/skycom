@@ -2,7 +2,7 @@ name: skycom_rspec_test
 services:
   web:
     # sleep 5s for waiting postgres
-    command: bash -c "sleep 5 && rm -f tmp/pids/server.pid && bundle exec rails db:prepare && bundle exec rails assets:precompile && bundle exec rspec"
+    command: bash -c "sleep 5 && rm -f tmp/pids/server.pid && bundle exec rails db:migrate && bundle exec rails assets:precompile && bundle exec rspec"
     environment:
       RAILS_ENV: test
     volumes:
