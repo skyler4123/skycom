@@ -104,7 +104,7 @@ jobs:
 
   seed-test:
     runs-on: ubuntu-latest
-    environment: development
+    # environment: development
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -131,7 +131,7 @@ jobs:
 
   rspec-test:
     runs-on: ubuntu-latest
-    environment: development
+    # environment: development
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
