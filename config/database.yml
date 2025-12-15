@@ -143,8 +143,8 @@ test:
     <<: *postgresql
     database: skycom_test
   queue:
-    <<: *sqlite3
-    database: storage/test_queue.sqlite3
+    <<: *queue
+    database: queue_test
   cable:
     <<: *cable
     database: storage/test_cable.sqlite3
