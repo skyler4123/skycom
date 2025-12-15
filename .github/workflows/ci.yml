@@ -153,3 +153,6 @@ jobs:
 
       # Optional: Tear down after test
       - name: Stop and remove containers
+        if: always()
+        run: docker compose -p skycom-seed-test -f docker-compose.yml -f docker-compose.rspec-test.yml down
+
