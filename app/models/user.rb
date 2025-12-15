@@ -30,13 +30,15 @@ class User < ApplicationRecord
   # --- Concerns ---
   # Includes functionality for handling user avatars, likely from `app/models/user/avatar_concern.rb`.
   include User::AvatarConcern
+  include User::ChatImagesConcern
+
 
   # --- Business Logic Associations ---
   # A user can own multiple companies. If the user is deleted, their companies are also destroyed.
   has_many :company_groups, dependent: :destroy
   has_one :employee, dependent: :destroy
   has_one :customer, dependent: :destroy
-  
+
   belongs_to :parent_user, class_name: "User", optional: true
   has_many :child_users, class_name: "User", foreign_key: "parent_user_id", dependent: :destroy
 
@@ -55,5 +57,8 @@ class User < ApplicationRecord
   def first_company_group_business_type
     company_groups.first&.business_type
   end
+
+  include User::RetailConcern
+
   # ----------------------------------------------------------------------------------------------------
 end

@@ -21,7 +21,7 @@ class Seed::ApplicationService
 
 
     self.puts_count
-    
+
     puts "\n========================================================="
     puts "🎉 Seeding is complete! Database is ready to use. 🎉"
     puts "========================================================="
@@ -32,7 +32,7 @@ class Seed::ApplicationService
   def self.puts_count
     puts "\n📊 Seeding Summary (Record Counts)"
     puts "----------------------------------------"
-    
+
     skip_models = [ ApplicationRecord, Current ]
 
     # Iterate through all model files
@@ -40,10 +40,10 @@ class Seed::ApplicationService
       begin
         file_name = file.split("/").last
         class_name = file_name.sub(".rb", "").camelize
-        
+
         # Safely get the model class
         model_class = class_name.constantize
-        
+
         # Skip base classes and models that don't respond to count
         next if skip_models.include?(model_class) || !model_class.respond_to?(:count)
 

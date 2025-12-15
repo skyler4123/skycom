@@ -140,8 +140,8 @@ development:
     
 test:
   primary:
-    <<: *sqlite3
-    database: storage/skycom_test.sqlite3
+    <<: *postgresql
+    database: skycom_test
   queue:
     <<: *sqlite3
     database: storage/test_queue.sqlite3

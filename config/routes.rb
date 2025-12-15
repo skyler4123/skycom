@@ -1,9 +1,97 @@
 Rails.application.routes.draw do
-  resources :company_groups
-  namespace :school do
-    resources :schools
-    resources :courses
+  resources :article_appointments
+  resources :article_group_appointments
+  resources :articles
+  resources :article_groups
+  resources :document_appointments
+  resources :document_group_appointments
+  resources :documents
+  resources :document_groups
+
+  # Routes for Retail Management
+  resources :retail, only: [ :show ] do
+    # We use 'scope module: :retail' to tell Rails that the controllers
+    # for these resources are located inside the "Retail::" namespace
+    # (e.g., app/controllers/retail/stores_controller.rb).
+    scope module: :retail do
+      namespace :management do
+        resources :dashboard
+        resources :branches
+        resources :departments
+        resources :products
+        resources :orders
+        resources :bookings
+        resources :payments
+        resources :employees
+        resources :inventories
+        resources :sales
+        resources :customers
+        resources :invoices
+        resources :schedules
+        resources :attendances
+        resources :reports
+        resources :settings
+        resources :administrators
+      end
+
+      namespace :pos do
+        resources :stores, only: [ :show ] do
+          member do
+            get :products
+          end
+        end
+      end
+    end
   end
+
+  # Routes for School Management
+  resources :education, only: [ :show ] do
+    # We use 'scope module: :education' to tell Rails that the controllers
+    # for these resources are located inside the "Education::" namespace
+    # (e.g., app/controllers/education/schools_controller.rb).
+    scope module: :education do
+      resources :schools
+      resources :courses
+      resources :students
+      resources :teachers
+      resources :classes
+      resources :schedules
+    end
+  end
+
+  # Routes for Hospital Management
+  resources :hospital do
+    # We use 'scope module: :hospital' to tell Rails that the controllers
+    # for these resources are located inside the "Hospital::" namespace
+    # (e.g., app/controllers/hospital/patients_controller.rb).
+    scope module: :hospital do
+      resources :patients
+      resources :doctors
+      resources :appointments
+      resources :medical_records
+      resources :prescriptions
+      resources :departments
+      resources :staffs
+      resources :billings
+      resources :insurances
+      resources :labs
+      resources :pharmacies
+    end
+  end
+
+  # General Application Routes
+  resources :setting_appointments
+  resources :setting_group_appointments
+  resources :setting_groups
+  resources :subscription_appointments
+  resources :subscription_group_appointments
+  resources :subscriptions
+  resources :subscription_groups
+  resources :event_appointments
+  resources :event_group_appointments
+  resources :events
+  resources :event_groups
+  resources :company_groups
   resources :exam_appointments
   resources :answers
   resources :questions
@@ -71,6 +159,16 @@ Rails.application.routes.draw do
   resources :tags
   resources :companies
   resources :addresses
+  resources :home, only: [ :index ] do
+    collection do
+      get :retail
+      get :education
+      get :hospital
+      get :restaurant
+      get :shop
+      get :fitness
+    end
+  end
   get "sign_out", to: "sessions#sign_out"
 
 

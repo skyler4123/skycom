@@ -1,9 +1,8 @@
 # This service seeds the database with Company records, ensuring each company
-# is associated with an existing User and populating all new fields 
+# is associated with an existing User and populating all new fields
 # (enums, addresses, registration info).
 
 class Seed::CompanyGroupService
-  
   def self.create(
     user:,
     name: nil,
@@ -28,7 +27,7 @@ class Seed::CompanyGroupService
     base_name = Faker::Company.unique.name
     name ||= "#{base_name} #{business_type.to_s.titleize}"
     domain_suffix = (business_type == :university || business_type == :school) ? ".edu" : ".com"
-
+    timezone = CompanyGroup.timezones.keys.sample
     should_discard = rand(10) == 0
     discarded_at ||= should_discard ? Time.zone.now - rand(1..365).days : nil
 
@@ -42,6 +41,7 @@ class Seed::CompanyGroupService
       currency: currency || Company.currencies.keys.sample,
       registration_number: registration_number,
       vat_id: vat_id,
+      timezone: timezone,
       employee_count: employee_count,
       address_line_1: address_line_1,
       city: city,

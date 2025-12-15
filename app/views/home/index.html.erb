@@ -1,29 +1,173 @@
-<p style="color: green"><%= notice %></p>
+<div class="bg-gray-50 dark:bg-gray-950">
+  <div class="relative flex h-auto min-h-screen w-full flex-col group/design-root overflow-x-hidden">
+    <div class="layout-container flex h-full grow flex-col">
+      <div class="flex flex-1 justify-center">
+        <div class="flex flex-col max-w-[960px] h-screen justify-between">
+          <header class="flex items-center justify-between whitespace-nowrap px-10 py-3">
+            <div class="flex items-center gap-4 text-slate-900 dark:text-slate-100">
+              <span class="material-symbols-outlined text-2xl text-indigo-600">all_inclusive</span>
+              <h2 class="text-slate-900 dark:text-slate-100 text-lg font-bold leading-tight tracking-[-0.015em]">
+                Skycom
+              </h2>
+            </div>
 
-<p>Signed as <%= Current.user.email %></p>
+            <nav class="flex flex-1 justify-around items-center px-4">
+              <a class="text-sm font-medium text-slate-700 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-600 transition-colors"
+                href="/home/retail">Retail</a>
+              <a class="text-sm font-medium text-slate-700 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-600 transition-colors"
+                href="/home/education">Education</a>
+              <a class="text-sm font-medium text-slate-700 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-600 transition-colors"
+                href="/home/hospital">Hospital</a>
+              <a class="text-sm font-medium text-slate-700 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-600 transition-colors"
+                href="/home/restaurant">Restaurant</a>
+              <a class="text-sm font-medium text-slate-700 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-600 transition-colors whitespace-nowrap"
+                href="/home/food_service">Food Service</a>
+              <a class="text-sm font-medium text-slate-700 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-600 transition-colors whitespace-nowrap"
+                href="home/sport_fitness">Sport & Fitness</a>
+            </nav>
 
-<h2>Login and verification</h2>
+            <div class="flex justify-end gap-2 items-center" data-controller="header--authentication"></div>
 
-<div>
-  <%= link_to "Change password", edit_password_path %>
+          </header>
+          <main class="w-full h-full">
+            <div class="">
+              <div class="flex flex-row gap-6 px-4 py-16">
+                <div class="flex flex-col gap-6 w-1/2">
+                  <div class="flex flex-col gap-2 text-left">
+                    <h1 class="text-slate-900 dark:text-slate-100 text-4xl font-black leading-tight tracking-[-0.033em] @[480px]:text-5xl @[480px]:font-black @[480px]:leading-tight @[480px]:tracking-[-0.033em]">
+                      One Platform, Limitless Potential</h1>
+                    <h2 class="text-slate-600 dark:text-slate-400 text-xl font-normal leading-normal">
+                      Skycom is a flexible multi-vertical business management platform. From retail
+                      and education to
+                      healthcare and fitness, our adaptable system streamlines your operations.
+                    </h2>
+                  </div>
+                  <div class="flex-wrap gap-3 flex">
+                    <button class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-4 @[480px]:h-12 @[480px]:px-5 bg-indigo-600 text-white text-sm font-bold leading-normal tracking-[0.015em] @[480px]:text-base @[480px]:font-bold @[480px]:leading-normal @[480px]:tracking-[0.015em]">
+                      <span class="truncate">Get Started for Free</span>
+                    </button>
+                  </div>
+                </div>
+                <div class="w-1/2 bg-center bg-no-repeat aspect-video bg-cover rounded-lg @[480px]:h-auto @[480px]:min-w-[400px] @[864px]:w-full" data-alt="Abstract blue and white geometric shapes" style='background-image: url("https://plus.unsplash.com/premium_vector-1732570528832-68eaef3f17ed?q=80&w=1702&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D");'>
+                </div>
+              </div>
+            </div>
+            <div class="text-center px-4 pb-3 pt-5">
+              <h2 class="text-slate-900 dark:text-slate-100 text-[22px] font-bold leading-tight tracking-[-0.015em]">
+                Create a Tailored Experience for Your Business</h2>
+              <p class="text-slate-600 dark:text-slate-400 text-base mt-1">Select your business type to
+                begin your
+                journey with a system configured for your needs.</p>
+            </div>
+            <div class="grid grid-cols-2 gap-4 p-4">
+              <div class="flex flex-col gap-3 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-gray-950 overflow-hidden hover:border-indigo-600 hover:shadow-lg transition-all cursor-pointer">
+                <a href="/home/retail">
+                  <img alt="Retail store interior" class="h-FULL w-full object-cover" src="https://images.unsplash.com/photo-1556740738-b6a63e27c4df?q=80&w=1470&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDF8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" />
+                  <div class="flex flex-col gap-1 p-4">
+                    <h2 class="text-slate-900 dark:text-slate-100 text-base font-bold leading-tight">
+                      Retail</h2>
+                    <p class="text-slate-600 dark:text-slate-400 text-sm font-normal leading-normal">
+                      Track inventory,
+                      sales, and customer relationships.</p>
+                  </div>
+                </a>
+              </div>
+              <div class="flex flex-col gap-3 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-gray-950 overflow-hidden hover:border-indigo-600 hover:shadow-lg transition-all cursor-pointer">
+                <a href="/home/education">
+                  <img alt="Classroom with students" class="h-FULL w-full object-cover" src="https://images.unsplash.com/photo-1588075592446-265fd1e6e76f?q=80&w=1472&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" />
+                  <div class="flex flex-col gap-1 p-4">
+                    <h2 class="text-slate-900 dark:text-slate-100 text-base font-bold leading-tight">
+                      Education</h2>
+                    <p class="text-slate-600 dark:text-slate-400 text-sm font-normal leading-normal">
+                      Manage records,
+                      scheduling, and communication.</p>
+                  </div>
+                </a>
+              </div>
+              <div class="flex flex-col gap-3 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-gray-950 overflow-hidden hover:border-indigo-600 hover:shadow-lg transition-all cursor-pointer">
+                <a href="/home/hospital">
+                  <img alt="Hospital hallway" class="h-FULL w-full object-cover" src="https://plus.unsplash.com/premium_photo-1681995277879-42e0d91897e0?q=80&w=1470&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" />
+                  <div class="flex flex-col gap-1 p-4">
+                    <h2 class="text-slate-900 dark:text-slate-100 text-base font-bold leading-tight">
+                      Hospital</h2>
+                    <p class="text-slate-600 dark:text-slate-400 text-sm font-normal leading-normal">
+                      Optimize patient
+                      flow, staff, and resources.</p>
+                  </div>
+                </a>
+              </div>
+              <div class="flex flex-col gap-3 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-gray-950 overflow-hidden hover:border-indigo-600 hover:shadow-lg transition-all cursor-pointer">
+                <a href="/home/restaurant">
+                  <img alt="Modern restaurant interior" class="h-FULL w-full object-cover" src="https://images.unsplash.com/photo-1414235077428-338989a2e8c0?q=80&w=1470&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" />
+                  <div class="flex flex-col gap-1 p-4">
+                    <h2 class="text-slate-900 dark:text-slate-100 text-base font-bold leading-tight">
+                      Restaurant</h2>
+                    <p class="text-slate-600 dark:text-slate-400 text-sm font-normal leading-normal">
+                      Handle reservations,
+                      orders, and staff scheduling.</p>
+                  </div>
+                </a>
+              </div>
+              <div class="flex flex-col gap-3 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-gray-950 overflow-hidden hover:border-indigo-600 hover:shadow-lg transition-all cursor-pointer">
+                <a href="/home/shop">
+                  <img alt="Boutique clothing shop" class="h-FULL w-full object-cover" src="https://plus.unsplash.com/premium_photo-1673977133409-b5c2ff90c9b6?q=80&w=1491&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" />
+                  <div class="flex flex-col gap-1 p-4">
+                    <h2 class="text-slate-900 dark:text-slate-100 text-base font-bold leading-tight">
+                      Shop</h2>
+                    <p class="text-slate-600 dark:text-slate-400 text-sm font-normal leading-normal">
+                      Manage products,
+                      sales, and loyalty programs.</p>
+                  </div>
+                </a>
+              </div>
+              <div class="flex flex-col gap-3 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-gray-950 overflow-hidden hover:border-indigo-600 hover:shadow-lg transition-all cursor-pointer">
+                <a href="/home/fitness">
+                  <img alt="Gym with fitness equipment" class="h-FULL w-full object-cover" src="https://images.unsplash.com/photo-1518611012118-696072aa579a?q=80&w=1470&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" />
+                  <div class="flex flex-col gap-1 p-4">
+                    <h2 class="text-slate-900 dark:text-slate-100 text-base font-bold leading-tight">
+                      Sport & Fitness
+                    </h2>
+                    <p class="text-slate-600 dark:text-slate-400 text-sm font-normal leading-normal">
+                      Organize classes,
+                      memberships, and facilities.</p>
+                  </div>
+                </a>
+              </div>
+            </div>
+          </main>
+          <footer class="flex flex-col gap-6 px-5 py-10 text-center @container mt-16">
+            <div class="flex flex-wrap items-center justify-center gap-6 @[480px]:flex-row @[480px]:justify-around">
+              <a class="text-slate-600 dark:text-slate-400 text-base font-normal leading-normal min-w-40" href="#">About
+                Us</a>
+              <a class="text-slate-600 dark:text-slate-400 text-base font-normal leading-normal min-w-40" href="#">Contact</a>
+              <a class="text-slate-600 dark:text-slate-400 text-base font-normal leading-normal min-w-40" href="#">Privacy Policy</a>
+            </div>
+            <div class="flex flex-wrap justify-center gap-4">
+              <a href="#">
+                <svg class="text-slate-600 dark:text-slate-400" fill="none" height="24" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path>
+                </svg>
+              </a>
+              <a href="#">
+                <svg class="text-slate-600 dark:text-slate-400" fill="none" height="24" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M22 4s-.7 2.1-2 3.4c1.6 1.4 3.3 4.9 3.3 4.9-6.1-1.4-6.1-1.4-6.1-1.4-.4 5.4-1.3 6.6-1.3 6.6s-1.3-.8-3.1-2.8c-2.8-3.1-8.3-4-8.3-4s.9 2.1 2.8 3.7c-2.5-.9-5.1-3.1-5.1-3.1s2.1.8 4.2 2.2c-1.4-.5-2.8-1.5-2.8-1.5s4.1 4.2 7.7 4.6c-1.3-1.3-1.3-3.3-1.3-3.3s-3.1-.1-4.9-2.5c2.3.1 4.2.8 4.2.8s-.9-1.9-2.8-3.7c2.5.5 4.9 1.4 4.9 1.4s-.5-2.1-2.8-4.2c2.3.5 4.2 1.4 4.2 1.4s-.8-2.5-3.1-4.2c2.5.8 4.9 1.4 4.9 1.4s-.9-2.8-3.7-4.9c2.5.8 4.9 1.9 4.9 1.9s-.9-2.8-3.7-4.9c2.5.8 4.9 1.9 4.9 1.9s-1-2.8-3.7-4.9c2.5.8 4.9 1.9 4.9 1.9z">
+                  </path>
+                </svg>
+              </a>
+              <a href="#">
+                <svg class="text-slate-600 dark:text-slate-400" fill="none" height="24" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path>
+                  <rect height="12" width="4" x="2" y="9"></rect>
+                  <circle cx="4" cy="4" r="2"></circle>
+                </svg>
+              </a>
+            </div>
+            <p class="text-slate-600 dark:text-slate-400 text-base font-normal leading-normal">© 2024
+              Skycom, Inc. All
+              rights reserved.</p>
+          </footer>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
-
-<div>
-  <%= link_to "Change email address", edit_identity_email_path %>
-</div>
-
-<div>
-  <%= link_to "Send invitation", new_invitation_path %>
-</div>
-
-<h2>Access history</h2>
-
-<div>
-  <%= link_to "Devices & Sessions", sessions_path %>
-</div>
-
-<br>
-<a href="/school/schools">School Management System</a>
-<br>
-
-<%= button_to "Log out", Current.session, method: :delete %>

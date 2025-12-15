@@ -1,6 +1,7 @@
 class SessionsController < ApplicationController
-  skip_before_action :authenticate, only: %i[ new create ]
-
+  skip_before_action :set_current_request_details, only: [ :sign_out ]
+  skip_before_action :set_current_session, only: [ :sign_out ]
+  skip_before_action :authenticate, only: %i[ new create sign_out ]
   before_action :set_session, only: :destroy
 
   def index
@@ -25,13 +26,13 @@ class SessionsController < ApplicationController
   def destroy
     @session.destroy
     cookies.clear
-    redirect_to(sessions_path, notice: "That session has been logged out")
+    redirect_to(root_path, notice: "That session has been logged out")
   end
 
-    def sign_out
-    Current.session.destroy
+  def sign_out
+    Current.session&.destroy
     cookies.clear
-    redirect_to(sessions_path, notice: "That session has been logged out")
+    redirect_to(root_path, notice: "That session has been logged out")
   end
 
   private

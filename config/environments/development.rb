@@ -72,7 +72,7 @@ Rails.application.configure do
 end
 
 
-
+# ----------------------------------------------------------------------------------------------------
 Rails.application.configure do
   # Change to :null_store to avoid any caching.
   config.cache_store = :solid_cache_store
@@ -80,3 +80,4 @@ Rails.application.configure do
   # Store uploaded files on the local file system (see config/storage.yml for options).
   config.active_storage.service = :minio
 end
+# ----------------------------------------------------------------------------------------------------

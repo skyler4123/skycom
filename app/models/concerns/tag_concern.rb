@@ -21,14 +21,14 @@ module TagConcern
         # 2. Find or initialize the TagAppointment (the Assignment).
         # This handles the uniqueness constraint: only one Appointment per (Tag + Resource).
         appointment = tag_appointments.find_or_initialize_by(tag: tag)
-        
+
         # 3. Update the fields
         appointment.value = value
         appointment.description = description
 
         # 4. Save the appointment (creates if new, updates if existing)
         appointment.save!
-        
+
         appointment # Return the resulting appointment
       end
     rescue ActiveRecord::RecordInvalid => e

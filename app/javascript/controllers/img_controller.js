@@ -3,14 +3,17 @@ import { Controller } from "@hotwired/stimulus"
 export default class ImgController extends Controller {
   static targets = ["img"]
   static values = {
-    breakPoint: String, // Will be one of 'xs', 'sm', 'md', 'lg', 'xl', '2xl'
+    breakPoint: { type: String, default: "sm" }, // Will be one of '
   }
 
   initialize() {
-    this.checkWidth()
-    this.resizeListener = this.checkWidth.bind(this)
-    window.addEventListener("resize", this.resizeListener)
-    this.initImgTargets()
+    setTimeout(() => {
+      this.checkWidth()
+      this.resizeListener = this.checkWidth.bind(this)
+      window.addEventListener("resize", this.resizeListener)
+      this.initImgTargets()
+    }, 1000)
+
   }
 
   disconnect() {
@@ -42,6 +45,8 @@ export default class ImgController extends Controller {
   initImgTargets() {
     this.element.querySelectorAll('img').forEach((imgElement) => {
       imgElement.setAttribute(`data-${this.identifier}-target`, (imgElement.getAttribute(`data-${this.identifier}-target`) || '') + ' img')
+      // add lazy load for this img target
+      imgElement.setAttribute('loading', 'lazy')
     })
   }
 
@@ -75,26 +80,43 @@ export default class ImgController extends Controller {
    *    directly from the DOM.
    */
   breakPointValueChanged(value, previousValue) {
-    if (!previousValue) return
     if (previousValue) {
-      console.log(`Breakpoint changed from ${previousValue} to ${value}`)
+      // console.log(`Breakpoint changed from ${previousValue} to ${value}`)
     }
-    this.initImgTargets().forEach((imgElement) => {
-      const srcSet = imgElement.getAttribute("data-srcset")
-      if (srcSet) {
-        const srcSetItems = srcSet.split(",").map(item => item.trim())
-        let selectedSrc = null
+    if (!this.hasImgTarget) return
+    this.imgTargets.forEach((imgElement) => {
+      const srcSetAttr = imgElement.getAttribute("data-srcset")
+      if (!srcSetAttr) return
 
-        srcSetItems.forEach(item => {
-          const [url, condition] = item.split(" ")
-          if (condition === value) {
-            selectedSrc = url
-          }
-        })
+      const srcSetItems = srcSetAttr.split(",").map(item => item.trim())
+      const sources = {}
+      let defaultSrc = null
 
-        if (selectedSrc) {
-          imgElement.src = selectedSrc
+      srcSetItems.forEach(item => {
+        const parts = item.split(" ")
+        if (parts.length === 1) {
+          defaultSrc = parts[0]
+        } else if (parts.length > 1) {
+          const url = parts.slice(0, -1).join(' ')
+          const bp = parts[parts.length - 1]
+          sources[bp] = url
         }
+      })
+
+      const breakpoints = ['xs', 'sm', 'md', 'lg', 'xl', '2xl']
+      let selectedSrc = defaultSrc
+      const currentIndex = breakpoints.indexOf(value)
+
+      for (let i = currentIndex; i >= 0; i--) {
+        const bp = breakpoints[i]
+        if (sources[bp]) {
+          selectedSrc = sources[bp]
+          break
+        }
+      }
+
+      if (selectedSrc && imgElement.src !== selectedSrc) {
+        imgElement.src = selectedSrc
       }
     })
   }

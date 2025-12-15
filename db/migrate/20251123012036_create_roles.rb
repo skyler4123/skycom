@@ -4,6 +4,7 @@ class CreateRoles < ActiveRecord::Migration[8.0]
       t.references :company_group, null: false, foreign_key: true, type: :uuid
       t.references :company, null: true, foreign_key: true, type: :uuid
 
+      t.integer :model_type
       t.string :name
       t.string :description
       t.string :code

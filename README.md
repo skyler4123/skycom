@@ -31,12 +31,17 @@ Things you may want to cover:
 
   docker compose up -d
   RAILS_MASTER_KEY=$(cat config/master.key) docker compose up -d
- 
+
+  RAILS_MASTER_KEY=$(cat config/master.key) docker compose -f docker-compose.yml -f docker-compose.seed-test.yml up --abort-on-container-exit --exit-code-from web --attach web
+  
+  RAILS_MASTER_KEY=$(cat config/master.key) docker compose -f docker-compose.yml -f docker-compose.rspec-test.yml up --abort-on-container-exit --exit-code-from web --attach web
+
   Seed::ApplicationService.run
   Seed::ApplicationService.put_count
   
-  bin/rubocop --autocorrect-all 
-
+  bin/rubocop --autocorrect-all
+  EDITOR="code --wait" bin/rails credentials:edit
+  EDITOR="code --wait" bin/rails credentials:edit -e production
 ##
 
 ##
@@ -52,7 +57,7 @@ Things you may want to cover:
   bundle exec rails g scaffold TagAppointment tag:references appoint_from:references{polymorphic} appoint_to:references{polymorphic} appoint_for:references{polymorphic} appoint_by:references{polymorphic} value description --force
 
   ### HR / Permission Management
-  bundle exec rails g scaffold Role company_group:references company:references name description code status:integer business_type:integer discarded_at:datetime:index --force
+  bundle exec rails g scaffold Role company_group:references company:references model_type:integer name description code status:integer business_type:integer discarded_at:datetime:index --force
   bundle exec rails g scaffold Policy company_group:references company:references name description code resource action status:integer business_type:integer discarded_at:datetime:index --force
   bundle exec rails g scaffold PolicyAppointment policy:references appoint_to:references{polymorphic} name description code status:integer business_type:integer discarded_at:datetime:index --force
   bundle exec rails g scaffold RoleAppointment role:references appoint_to:references{polymorphic} name description code status:integer business_type:integer discarded_at:datetime:index --force
@@ -74,28 +79,28 @@ Things you may want to cover:
   bundle exec rails g scaffold CustomerAppointment customer:references appoint_from:references{polymorphic} appoint_to:references{polymorphic} appoint_for:references{polymorphic} appoint_by:references{polymorphic} name description code status:integer business_type:integer discarded_at:datetime:index --force
 
   ### Inventory
-  bundle exec rails g scaffold Inventory company_group:references company:references name description code status:integer business_type:integer discarded_at:datetime:index --force
-  bundle exec rails g scaffold InventoryItem inventory:references name description code sku:string:index barcode:string:index upc:string:index ean:string:index manufacturer_code:string serial_number:string:index batch_number:string expiration_date:datetime status:integer business_type:integer discarded_at:datetime:index --force
+  bundle exec rails g scaffold Inventory company_group:references company:references education_type:integer hospital_type:integer hotel_type:integer restaurant_type:integer retail_type:integer name description code status:integer business_type:integer discarded_at:datetime:index --force
+  bundle exec rails g scaffold InventoryItem inventory:references education_type:integer hospital_type:integer hotel_type:integer restaurant_type:integer retail_type:integer name description code sku:string:index barcode:string:index upc:string:index ean:string:index manufacturer_code:string serial_number:string:index batch_number:string expiration_date:datetime status:integer business_type:integer discarded_at:datetime:index --force
   bundle exec rails g scaffold InventoryItemAppointment inventory_item:references appoint_from:references{polymorphic} appoint_to:references{polymorphic} appoint_for:references{polymorphic} appoint_by:references{polymorphic} name description code status:integer business_type:integer discarded_at:datetime:index --force
   bundle exec rails g scaffold InventoryTransaction company_group:references company:references appoint_from:references{polymorphic} appoint_to:references{polymorphic} appoint_for:references{polymorphic} appoint_by:references{polymorphic} name description code status:integer business_type:integer discarded_at:datetime:index --force
   bundle exec rails g scaffold InventoryTransactionAppointment inventory_transaction:references appoint_from:references{polymorphic} appoint_to:references{polymorphic} appoint_for:references{polymorphic} appoint_by:references{polymorphic} name description code status:integer business_type:integer discarded_at:datetime:index --force
 
   ### Product Management
   bundle exec rails g scaffold Brand name description code status:integer business_type:integer discarded_at:datetime:index --force
-  bundle exec rails g scaffold ProductGroup company_group:references company:references name description code status:integer business_type:integer discarded_at:datetime:index --force
-  bundle exec rails g scaffold Product company_group:references company:references brand:references name description code sku:string:index barcode:string:index upc:string:index ean:string:index manufacturer_code:string serial_number:string:index batch_number:string expiration_date:datetime status:integer business_type:integer discarded_at:datetime:index --force
+  bundle exec rails g scaffold ProductGroup company_group:references company:references education_type:integer hospital_type:integer hotel_type:integer restaurant_type:integer retail_type:integer name description code status:integer business_type:integer discarded_at:datetime:index --force
+  bundle exec rails g scaffold Product company_group:references company:references brand:references education_type:integer hospital_type:integer hotel_type:integer restaurant_type:integer retail_type:integer name description code price:decimal currency:integer sku:string:index barcode:string:index upc:string:index ean:string:index manufacturer_code:string serial_number:string:index batch_number:string expiration_date:datetime status:integer business_type:integer discarded_at:datetime:index --force
   bundle exec rails g scaffold ProductGroupAppointment product_group:references appoint_from:references{polymorphic} appoint_to:references{polymorphic} appoint_for:references{polymorphic} appoint_by:references{polymorphic} name description code status:integer business_type:integer discarded_at:datetime:index --force
   bundle exec rails g scaffold ProductAppointment product:references appoint_from:references{polymorphic} appoint_to:references{polymorphic} appoint_for:references{polymorphic} appoint_by:references{polymorphic} name description code status:integer business_type:integer discarded_at:datetime:index --force
 
   ### Service Management
-  bundle exec rails g scaffold ServiceGroup company_group:references company:references name description code status:integer duration:integer start_at:datetime business_type:integer discarded_at:datetime:index --force
-  bundle exec rails g scaffold Service company_group:references company:references name description code status:integer duration:integer start_at:datetime business_type:integer discarded_at:datetime:index --force
+  bundle exec rails g scaffold ServiceGroup company_group:references company:references education_type:integer hospital_type:integer hotel_type:integer restaurant_type:integer retail_type:integer name description code status:integer duration:integer start_at:datetime business_type:integer discarded_at:datetime:index --force
+  bundle exec rails g scaffold Service company_group:references company:references education_type:integer hospital_type:integer hotel_type:integer restaurant_type:integer retail_type:integer name description code status:integer duration:integer start_at:datetime business_type:integer discarded_at:datetime:index --force
   bundle exec rails g scaffold ServiceGroupAppointment service_group:references appoint_from:references{polymorphic} appoint_to:references{polymorphic} appoint_for:references{polymorphic} appoint_by:references{polymorphic} name description code status:integer duration:integer start_at:datetime business_type:integer discarded_at:datetime:index --force
   bundle exec rails g scaffold ServiceAppointment service:references appoint_from:references{polymorphic} appoint_to:references{polymorphic} appoint_for:references{polymorphic} appoint_by:references{polymorphic} name description code status:integer duration:integer start_at:datetime business_type:integer discarded_at:datetime:index --force
 
   ### Orders
-  bundle exec rails g scaffold OrderGroup company_group:references company:references customer:references name description code currency:integer duration:integer status:integer business_type:integer discarded_at:datetime:index --force
-  bundle exec rails g scaffold Order company_group:references company:references customer:references name description code sku:string:index barcode:string:index upc:string:index ean:string:index manufacturer_code:string serial_number:string:index batch_number:string expiration_date:datetime currency:integer duration:integer status:integer business_type:integer discarded_at:datetime:index --force
+  bundle exec rails g scaffold OrderGroup company_group:references company:references customer:references education_type:integer hospital_type:integer hotel_type:integer restaurant_type:integer retail_type:integer name description code currency:integer duration:integer status:integer business_type:integer discarded_at:datetime:index --force
+  bundle exec rails g scaffold Order company_group:references company:references customer:references education_type:integer hospital_type:integer hotel_type:integer restaurant_type:integer retail_type:integer name description code sku:string:index barcode:string:index upc:string:index ean:string:index manufacturer_code:string serial_number:string:index batch_number:string expiration_date:datetime currency:integer duration:integer status:integer business_type:integer discarded_at:datetime:index --force
   bundle exec rails g scaffold OrderGroupAppointment order_group:references appoint_from:references{polymorphic} appoint_to:references{polymorphic} appoint_for:references{polymorphic} appoint_by:references{polymorphic} unit_price:decimal quantity:integer total_price:decimal name description code status:integer business_type:integer discarded_at:datetime:index --force
   bundle exec rails g scaffold OrderAppointment order:references appoint_from:references{polymorphic} appoint_to:references{polymorphic} appoint_for:references{polymorphic} appoint_by:references{polymorphic} unit_price:decimal quantity:integer total_price:decimal name description code status:integer business_type:integer discarded_at:datetime:index --force
 
@@ -111,7 +116,7 @@ Things you may want to cover:
   bundle exec rails g scaffold Promotion name
 
   ### Billing & Payments
-  bundle exec rails g scaffold Invoice order:references name description code currency:integer duration:integer number total due_date:datetime status:integer business_type:integer discarded_at:datetime:index --force
+  bundle exec rails g scaffold Invoice order:references name description code currency:integer duration:integer number total_price:decimal due_date:datetime status:integer business_type:integer discarded_at:datetime:index --force
   bundle exec rails g scaffold Payment invoice:references name description code currency:integer duration:integer exchange_rate:decimal amount:decimal payment_method gateway_details status:integer business_type:integer discarded_at:datetime:index --force
   bundle exec rails g scaffold PaymentMethod name description code currency:integer status:integer business_type:integer discarded_at:datetime:index --force
   bundle exec rails g scaffold PaymentMethodAppointment payment_method:references company_group:references company:references name description code status:integer business_type:integer discarded_at:datetime:index --force
@@ -120,24 +125,24 @@ Things you may want to cover:
   bundle exec rails g scaffold Transaction name
 
   ### Operations & Logistics
-  bundle exec rails g scaffold FacilityGroup company_group:references company:references name description code status:integer business_type:integer discarded_at:datetime:index --force
-  bundle exec rails g scaffold Facility company_group:references company:references name description code status:integer business_type:integer discarded_at:datetime:index --force
+  bundle exec rails g scaffold FacilityGroup company_group:references company:references education_type:integer hospital_type:integer hotel_type:integer restaurant_type:integer retail_type:integer name description code status:integer business_type:integer discarded_at:datetime:index --force
+  bundle exec rails g scaffold Facility company_group:references company:references education_type:integer hospital_type:integer hotel_type:integer restaurant_type:integer retail_type:integer name description code status:integer business_type:integer discarded_at:datetime:index --force
   bundle exec rails g scaffold FacilityGroupAppointment facility_group:references appoint_from:references{polymorphic} appoint_to:references{polymorphic} appoint_for:references{polymorphic} appoint_by:references{polymorphic} name description code status:integer business_type:integer discarded_at:datetime:index --force
   bundle exec rails g scaffold FacilityAppointment facility:references appoint_from:references{polymorphic} appoint_to:references{polymorphic} appoint_for:references{polymorphic} appoint_by:references{polymorphic} name description code status:integer business_type:integer discarded_at:datetime:index --force
 
   ### Project & Task Management
-  bundle exec rails g scaffold ProjectGroup company_group:references company:references name description code status:integer business_type:integer discarded_at:datetime:index --force
-  bundle exec rails g scaffold Project company_group:references company:references project_group:references name description code status:integer business_type:integer discarded_at:datetime:index --force
+  bundle exec rails g scaffold ProjectGroup company_group:references company:references education_type:integer hospital_type:integer hotel_type:integer restaurant_type:integer retail_type:integer name description code status:integer business_type:integer discarded_at:datetime:index --force
+  bundle exec rails g scaffold Project company_group:references company:references project_group:references education_type:integer hospital_type:integer hotel_type:integer restaurant_type:integer retail_type:integer name description code status:integer business_type:integer discarded_at:datetime:index --force
   bundle exec rails g scaffold ProjectGroupAppointment project_group:references appoint_from:references{polymorphic} appoint_to:references{polymorphic} appoint_for:references{polymorphic} appoint_by:references{polymorphic} name description code status:integer business_type:integer discarded_at:datetime:index --force
   bundle exec rails g scaffold ProjectAppointment project:references appoint_from:references{polymorphic} appoint_to:references{polymorphic} appoint_for:references{polymorphic} appoint_by:references{polymorphic} name description code status:integer business_type:integer discarded_at:datetime:index --force
-  bundle exec rails g scaffold TaskGroup company_group:references company:references name description code status:integer business_type:integer discarded_at:datetime:index --force
-  bundle exec rails g scaffold Task company_group:references company:references task_group:references name description code currency:integer status:integer business_type:integer discarded_at:datetime:index --force
+  bundle exec rails g scaffold TaskGroup company_group:references company:references education_type:integer hospital_type:integer hotel_type:integer restaurant_type:integer retail_type:integer name description code status:integer business_type:integer discarded_at:datetime:index --force
+  bundle exec rails g scaffold Task company_group:references company:references task_group:references education_type:integer hospital_type:integer hotel_type:integer restaurant_type:integer retail_type:integer name description code currency:integer status:integer business_type:integer discarded_at:datetime:index --force
   bundle exec rails g scaffold TaskGroupAppointment task_group:references appoint_from:references{polymorphic} appoint_to:references{polymorphic} appoint_for:references{polymorphic} appoint_by:references{polymorphic} name description code status:integer business_type:integer discarded_at:datetime:index --force
   bundle exec rails g scaffold TaskAppointment task:references appoint_from:references{polymorphic} appoint_to:references{polymorphic} appoint_for:references{polymorphic} appoint_by:references{polymorphic} name description code status:integer business_type:integer discarded_at:datetime:index --force
 
   ### Booking & Scheduling
-  bundle exec rails g scaffold Booking company_group:references company:references appoint_from:references{polymorphic} appoint_to:references{polymorphic} name description code status:integer business_type:integer discarded_at:datetime:index --force
-  bundle exec rails g scaffold Period company_group:references company:references name description code duration:integer start_at:datetime end_at:datetime expire_at:datetime discarded_at:datetime:index --force
+  bundle exec rails g scaffold Booking company_group:references company:references appoint_from:references{polymorphic} appoint_to:references{polymorphic} education_type:integer hospital_type:integer hotel_type:integer restaurant_type:integer retail_type:integer name description code status:integer business_type:integer discarded_at:datetime:index --force
+  bundle exec rails g scaffold Period company_group:references company:references education_type:integer hospital_type:integer hotel_type:integer restaurant_type:integer retail_type:integer name description code duration:integer start_at:datetime end_at:datetime expire_at:datetime discarded_at:datetime:index --force
   bundle exec rails g scaffold PeriodAppointment period:references appoint_from:references{polymorphic} appoint_to:references{polymorphic} appoint_for:references{polymorphic} appoint_by:references{polymorphic} name description code value --force
 
   ### Communication & Notifications
@@ -166,7 +171,28 @@ Things you may want to cover:
   bundle exec rails g scaffold Subscription subscription_group:references company_group:references company:references name description code status:integer business_type:integer discarded_at:datetime:index --force
   bundle exec rails g scaffold SubscriptionGroupAppointment subscription_group:references appoint_from:references{polymorphic} appoint_to:references{polymorphic} appoint_for:references{polymorphic} appoint_by:references{polymorphic} name description code status:integer business_type:integer discarded_at:datetime:index --force
   bundle exec rails g scaffold SubscriptionAppointment subscription:references appoint_from:references{polymorphic} appoint_to:references{polymorphic} appoint_for:references{polymorphic} appoint_by:references{polymorphic} name description code status:integer business_type:integer discarded_at:datetime:index --force
-  bundle exec rails g scaffold Pricing
+
+  ### Setting
+  bundle exec rails g scaffold SettingGroup company_group:references company:references content:json name description code status:integer business_type:integer discarded_at:datetime:index --force
+  bundle exec rails g scaffold Setting setting_group:references company_group:references company:references content:json name description code status:integer business_type:integer discarded_at:datetime:index --force
+  bundle exec rails g scaffold SettingGroupAppointment setting_group:references appoint_from:references{polymorphic} appoint_to:references{polymorphic} appoint_for:references{polymorphic} appoint_by:references{polymorphic} name description code status:integer business_type:integer discarded_at:datetime:index --force
+  bundle exec rails g scaffold SettingAppointment setting:references appoint_from:references{polymorphic} appoint_to:references{polymorphic} appoint_for:references{polymorphic} appoint_by:references{polymorphic} name description code status:integer business_type:integer discarded_at:datetime:index --force
+
+  ### Pricing
+  bundle exec rails g scaffold Pricing country:integer region:integer nation:integer name description price:decimal code status:integer business_type:integer discarded_at:datetime:index --force
+  bundle exec rails g scaffold PricingAppointment pricing:references appoint_from:references{polymorphic} appoint_to:references{polymorphic} appoint_for:references{polymorphic} appoint_by:references{polymorphic} name description code status:integer business_type:integer discarded_at:datetime:index --force
+
+  ### Document
+  bundle exec rails g scaffold DocumentGroup company_group:references company:references title content:json name description code status:integer business_type:integer discarded_at:datetime:index --force
+  bundle exec rails g scaffold Document document_group:references company_group:references company:references title content:json name description code status:integer business_type:integer discarded_at:datetime:index --force
+  bundle exec rails g scaffold DocumentGroupAppointment document_group:references appoint_from:references{polymorphic} appoint_to:references{polymorphic} appoint_for:references{polymorphic} appoint_by:references{polymorphic} name description code status:integer business_type:integer discarded_at:datetime:index --force
+  bundle exec rails g scaffold DocumentAppointment document:references appoint_from:references{polymorphic} appoint_to:references{polymorphic} appoint_for:references{polymorphic} appoint_by:references{polymorphic} name description code status:integer business_type:integer discarded_at:datetime:index --force
+
+  ### Article
+  bundle exec rails g scaffold ArticleGroup company_group:references company:references title content:json name description code status:integer business_type:integer discarded_at:datetime:index --force
+  bundle exec rails g scaffold Article article_group:references company_group:references company:references title content:json name description code status:integer business_type:integer discarded_at:datetime:index --force
+  bundle exec rails g scaffold ArticleGroupAppointment article_group:references appoint_from:references{polymorphic} appoint_to:references{polymorphic} appoint_for:references{polymorphic} appoint_by:references{polymorphic} name description code status:integer business_type:integer discarded_at:datetime:index --force
+  bundle exec rails g scaffold ArticleAppointment article:references appoint_from:references{polymorphic} appoint_to:references{polymorphic} appoint_for:references{polymorphic} appoint_by:references{polymorphic} name description code status:integer business_type:integer discarded_at:datetime:index --force
 
   ### Content & Knowledge Management
   bundle exec rails g scaffold Article

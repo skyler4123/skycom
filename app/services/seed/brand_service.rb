@@ -3,7 +3,6 @@
 # simulates soft deletion for some records.
 
 class Seed::BrandService
-
   # An array of popular company/brand names for seeding.
   POPULAR_BRANDS = [
     "Apple", "Samsung", "Google", "Microsoft", "Amazon", "Facebook", "Tesla",
