@@ -136,6 +136,9 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Fix workspace permissions for Docker bind mounts
+        run: sudo chmod -R 777 .
+
       - name: Set up Docker Compose
         uses: docker/setup-compose-action@v1
         with:
