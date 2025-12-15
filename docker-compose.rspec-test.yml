@@ -7,6 +7,7 @@ services:
       RAILS_ENV: test
     volumes:
       - .:/rails
+      - sqlite_storage:/rails/storage
     depends_on: !reset
       - postgres
       - selenium-chromium
@@ -18,6 +19,7 @@ services:
       RAILS_ENV: test
     volumes:
       - .:/rails
+      - sqlite_storage:/rails/storage
     depends_on:
       - web
 
