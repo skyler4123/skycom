@@ -48,6 +48,7 @@ RSpec.feature "Authentication", type: :feature, js: true do
 
       # First attempt: click to open the sign-in form (modal/drawer/etc.)
       click_on "Sign In"
+      click_on "Sign In"
 
       # Try to find the form — Capybara will wait and retry automatically (up to ~2-5 seconds)
       begin
