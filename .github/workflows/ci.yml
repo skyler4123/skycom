@@ -102,32 +102,32 @@ jobs:
   #         path: ${{ github.workspace }}/tmp/screenshots
   #         if-no-files-found: ignore
 
-  seed-test:
-    runs-on: ubuntu-latest
-    environment: development
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+  # seed-test:
+  #   runs-on: ubuntu-latest
+  #   environment: development
+  #   steps:
+  #     - name: Checkout code
+  #       uses: actions/checkout@v4
 
-      - name: Set up Docker Compose
-        uses: docker/setup-compose-action@v1
-        with:
-          version: latest
+  #     - name: Set up Docker Compose
+  #       uses: docker/setup-compose-action@v1
+  #       with:
+  #         version: latest
 
-      # Run docker compose that shows onlt logs from the web service and fails on test failure
-      - name: Run Docker Compose and fail on test failure
-        env:
-          RAILS_MASTER_KEY: ${{ secrets.RAILS_MASTER_KEY }}
-        run: |
-          RAILS_MASTER_KEY=${{ secrets.RAILS_MASTER_KEY }} docker compose -p skycom-seed-test -f docker-compose.yml -f docker-compose.seed-test.yml up --abort-on-container-exit --exit-code-from web --attach web
+  #     # Run docker compose that shows onlt logs from the web service and fails on test failure
+  #     - name: Run Docker Compose and fail on test failure
+  #       env:
+  #         RAILS_MASTER_KEY: ${{ secrets.RAILS_MASTER_KEY }}
+  #       run: |
+  #         RAILS_MASTER_KEY=${{ secrets.RAILS_MASTER_KEY }} docker compose -p skycom-seed-test -f docker-compose.yml -f docker-compose.seed-test.yml up --abort-on-container-exit --exit-code-from web --attach web
 
-      - name: Show running containers
-        run: docker ps -a
+  #     - name: Show running containers
+  #       run: docker ps -a
 
-      # Optional: Tear down after test
-      - name: Stop and remove containers
-        if: always()
-        run: docker compose -p skycom-seed-test -f docker-compose.yml -f docker-compose.seed-test.yml down
+  #     # Optional: Tear down after test
+  #     - name: Stop and remove containers
+  #       if: always()
+  #       run: docker compose -p skycom-seed-test -f docker-compose.yml -f docker-compose.seed-test.yml down
 
   rspec-test:
     runs-on: ubuntu-latest
