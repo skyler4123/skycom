@@ -1,5 +1,6 @@
 import LayoutController from "controllers/layout_controller"
 import { csrfTokenTag } from "controllers/helpers"
+import { CURRENCY, TIMEZONE } from "controllers/constants"
 
 export default class CompanyGroup_NewController extends LayoutController {
 
@@ -85,10 +86,8 @@ export default class CompanyGroup_NewController extends LayoutController {
                     class="flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-slate-900 dark:text-slate-100 focus:outline-0 focus:ring-0 border border-slate-300 dark:border-slate-700 bg-white dark:bg-gray-950 focus:border-indigo-600 h-12 px-4 text-base font-normal leading-normal appearance-none"
                     id="currencyCode" name="company_group[currency]">
                     <option disabled="" selected="" value="">Select currency</option>
-                    <option value="USD">USD - U.S. Dollar</option>
-                    <option value="EUR">EUR - Euro</option>
-                    <option value="GBP">GBP - British Pound</option>
-                    <option value="VND">VND - Vietnamese Dong</option>
+                    <option value="${CURRENCY.usd}">USD - U.S. Dollar</option>
+                    <option value="${CURRENCY.vnd}">VND - Vietnamese Dong</option>
                   </select>
                   <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-slate-500">
                     <span class="material-symbols-outlined">expand_more</span>
@@ -112,9 +111,9 @@ export default class CompanyGroup_NewController extends LayoutController {
                     class="flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-slate-900 dark:text-slate-100 focus:outline-0 focus:ring-0 border border-slate-300 dark:border-slate-700 bg-white dark:bg-gray-950 focus:border-indigo-600 h-12 px-4 text-base font-normal leading-normal appearance-none"
                     id="timezone" name="company_group[timezone]">
                     <option disabled="" selected="" value="">Select timezone</option>
-                    <option value="America/New_York">Eastern Time (EST)</option>
-                    <option value="Europe/London">London Time (GMT)</option>
-                    <option value="Asia/Ho_Chi_Minh">Ho Chi Minh Time (ICT)</option>
+                    ${Object.entries(TIMEZONE).map(([key, value]) => {
+                      return `<option value="${value}">UTC ${key}</option>`
+                    }).join('')}
                   </select>
                   <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-slate-500">
                     <span class="material-symbols-outlined">expand_more</span>
