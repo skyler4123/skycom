@@ -170,8 +170,7 @@ Rails.application.routes.draw do
     end
   end
   get "sign_out", to: "sessions#sign_out"
-
-
+  # ----------------------------------------------------------------------------------------------------
   # DEFAULTS
   get  "sign_in", to: "sessions#new"
   post "sign_in", to: "sessions#create"
@@ -204,4 +203,5 @@ Rails.application.routes.draw do
 
   # Defines the root path route ("/")
   # root "posts#index"
+  # ----------------------------------------------------------------------------------------------------
 end
