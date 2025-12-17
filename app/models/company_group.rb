@@ -37,8 +37,8 @@ class CompanyGroup < ApplicationRecord
     privately_held: 1
   }
 
-  enum :timezone, TIMEZONE, prefix: true
-  enum :currency, CURRENCY, prefix: true
+  enum :timezone, TIMEZONES, prefix: true
+  enum :currency, CURRENCIES, prefix: true
 
   # Grouped business types with 1000-unit gaps for future expansion
   enum :business_type, {
@@ -108,8 +108,8 @@ class CompanyGroup < ApplicationRecord
   validates :description, length: { maximum: 5000 }, allow_blank: true
 
   validates :business_type, presence: true
-  validates :ownership_type, presence: true
-  validates :status, presence: true
+  # validates :ownership_type, presence: true
+  # validates :status, presence: true
 
   # Validation for new administrative fields
   validates :registration_number, presence: true, uniqueness: true, if: :privately_held? # Typically required for private companies
@@ -123,7 +123,7 @@ class CompanyGroup < ApplicationRecord
 
   # Validation for address fields
   validates :country, presence: true
-  validates :city, presence: true
+  # validates :city, presence: true
 
   # Validation for operational fields
   # validates :fiscal_year_end_month, presence: true, numericality: { in: 1..12 }

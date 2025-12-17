@@ -27,6 +27,7 @@ class CompanyGroupsController < ApplicationController
     debugger
     return
     @company_group = CompanyGroup.new(company_group_params)
+    @company_group.user = Current.user
 
     respond_to do |format|
       if @company_group.save

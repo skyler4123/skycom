@@ -1,4 +1,4 @@
-export const TIMEZONE = {
+export const TIMEZONES = {
   "-12": -12,
   "-11": -11,
   "-10": -10,
@@ -26,15 +26,17 @@ export const TIMEZONE = {
   "+12": 12
 }
 
-export const CURRENCY = {
-  "usd": 840,
-  "eur": 1,
-  "gbp": 826,
-  "vnd": 704,
-  "jpy": 392
+export const CURRENCIES = {
+  "usd": "United States Dollar - USD",
+  "vnd": "Vietnamese Dong - VND",
 }
 
 export const SUBSCRIPTION_LIMIT = {
   "max_of_companies": 3,
   "max_of_employees": 5
+}
+
+export const COUNTRIES = {
+  "us": "United States",
+  "vn": "Vietnam"
 }

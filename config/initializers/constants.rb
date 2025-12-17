@@ -1,4 +1,4 @@
-TIMEZONE = {
+TIMEZONES = {
   "-12": -12,
   "-11": -11,
   "-10": -10,
@@ -26,15 +26,17 @@ TIMEZONE = {
   "+12": 12
 }.freeze
 
-CURRENCY = {
+CURRENCIES = {
   usd: 840,
-  eur: 1,
-  gbp: 826,
   vnd: 704,
-  jpy: 392
 }
 
-SUBSCRIPTION_LIMIT = {
+SUBSCRIPTION_LIMITS = {
   max_of_companies: 3,
   max_of_employees: 5
+}
+
+COUNTRIES = {
+  us: 840,
+  vn: 704,
 }
