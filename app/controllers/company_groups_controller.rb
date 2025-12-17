@@ -24,14 +24,14 @@ class CompanyGroupsController < ApplicationController
 
   # POST /company_groups or /company_groups.json
   def create
-    debugger
-    return
     @company_group = CompanyGroup.new(company_group_params)
     @company_group.user = Current.user
 
     respond_to do |format|
       if @company_group.save
-        format.html { redirect_to @company_group, notice: "Company group was successfully created." }
+        @company_group.create_first_cloned_company
+        update_cookie(session: Current.session, user: Current.user)
+        format.html { redirect_to redirect_path_after_create_company_group, notice: "Company group was successfully created." }
         format.json { render :show, status: :created, location: @company_group }
       else
         format.html { render :new, status: :unprocessable_entity }
@@ -72,5 +72,11 @@ class CompanyGroupsController < ApplicationController
     # Only allow a list of trusted parameters through.
     def company_group_params
       params.expect(company_group: [ :user_id, :name, :description, :code, :status, :ownership_type, :business_type, :currency, :registration_number, :vat_id, :address_line_1, :city, :postal_code, :country, :email, :phone_number, :website, :employee_count, :fiscal_year_end_month, :discarded_at, :timezone ])
+    end
+
+    def redirect_path_after_create_company_group
+      return retail_management_dashboard_index_path(@company_group) if @company_group.business_type_retail?
+
+      @company_group
     end
 end

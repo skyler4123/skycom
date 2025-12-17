@@ -1,4 +1,5 @@
 import ApplicationController from "controllers/application_controller"
+import { ROUTES } from "controllers/routes"
 
 export default class LayoutController extends ApplicationController {
   initLayout() {
@@ -19,11 +20,13 @@ export default class LayoutController extends ApplicationController {
             <div class="flex flex-1 justify-center">
               <div class="layout-content-container flex flex-col flex-1">
                 <header class="flex items-center justify-between whitespace-nowrap px-10 py-3">
-                  <div class="flex items-center gap-4 text-slate-900 dark:text-slate-100">
+                  <a
+                    href="${ROUTES.rootPath}"
+                    class="flex items-center gap-4 text-slate-900 dark:text-slate-100">
                     <span class="material-symbols-outlined text-2xl text-indigo-600">all_inclusive</span>
                     <h2 class="text-slate-900 dark:text-slate-100 text-lg font-bold leading-tight tracking-[-0.015em]">
                       Skycom</h2>
-                  </div>
+                  </a>
 
                   <!-- Navbar start -->
                   <nav class="flex flex-1 justify-around items-center px-4">

@@ -42,13 +42,7 @@ class Company < ApplicationRecord
   }
 
   # Grouped business types with 1000-unit gaps for future expansion
-  enum :business_type, {
-    headquarters: 0,
-    regional_office: 1,
-    branch: 2,
-    franchise: 3,
-    subsidiary: 4
-  }
+  enum :business_type, BUSINESS_TYPES, prefix: true
 
   enum :timezone, TIMEZONES, prefix: true
   enum :currency, CURRENCIES, prefix: true

@@ -2,7 +2,7 @@ module ApplicationController::CookieConcern
   extend ActiveSupport::Concern
 
   included do
-    def set_sign_in_cookie(session:, user:)
+    def update_cookie(session:, user:)
       current_user = { id: user.id, email: user.email, avatar: user.avatar_url }
       company_groups = user.company_groups.map do |company_group|
         business_type = company_group.business_type
