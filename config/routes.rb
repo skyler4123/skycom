@@ -169,6 +169,7 @@ Rails.application.routes.draw do
       get :fitness
     end
   end
+  mount MissionControl::Jobs::Engine, at: "/jobs"
   get "sign_out", to: "sessions#sign_out"
   # ----------------------------------------------------------------------------------------------------
   # DEFAULTS
