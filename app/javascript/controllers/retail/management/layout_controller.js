@@ -86,7 +86,7 @@ export default class Retail_Management_LayoutController extends ApplicationContr
                   ${this.openByPathname()}/
                 >
                   <span class="material-symbols-outlined">apartment</span>
-                  <p class="text-sm font-medium leading-normal">Branch</p>
+                  <p class="text-sm font-medium leading-normal">Branches</p>
                 </a>
                 <a
                   class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:bg-blue-100 open:text-blue-600"
@@ -94,7 +94,7 @@ export default class Retail_Management_LayoutController extends ApplicationContr
                   ${this.openByPathname()}/
                 >
                   <span class="material-symbols-outlined">family_group</span>
-                  <p class="text-sm font-medium leading-normal">Department</p>
+                  <p class="text-sm font-medium leading-normal">Departments</p>
                 </a>
                 <a
                   class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:bg-blue-100 open:text-blue-600"
@@ -102,7 +102,7 @@ export default class Retail_Management_LayoutController extends ApplicationContr
                   ${this.openByPathname()}/
                 >
                   <span class="material-symbols-outlined">inventory_2</span>
-                  <p class="text-sm font-medium leading-normal">Product</p>
+                  <p class="text-sm font-medium leading-normal">Products</p>
                 </a>
                 <a
                   class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:bg-blue-100 open:text-blue-600"
@@ -110,7 +110,7 @@ export default class Retail_Management_LayoutController extends ApplicationContr
                   ${this.openByPathname()}/
                 >
                   <span class="material-symbols-outlined">order_approve</span>
-                  <p class="text-sm font-medium leading-normal">Order</p>
+                  <p class="text-sm font-medium leading-normal">Orders</p>
                 </a>
                 <a
                   class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:bg-blue-100 open:text-blue-600"
@@ -118,7 +118,7 @@ export default class Retail_Management_LayoutController extends ApplicationContr
                   ${this.openByPathname()}/
                 >
                   <span class="material-symbols-outlined">calendar_month</span>
-                  <p class="text-sm font-medium leading-normal">Booking</p>
+                  <p class="text-sm font-medium leading-normal">Bookings</p>
                 </a>
                 <a
                   class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:bg-blue-100 open:text-blue-600"
@@ -126,7 +126,7 @@ export default class Retail_Management_LayoutController extends ApplicationContr
                   ${this.openByPathname()}/
                 >
                   <span class="material-symbols-outlined">payments</span>
-                  <p class="text-sm font-medium leading-normal">Payment</p>
+                  <p class="text-sm font-medium leading-normal">Payments</p>
                 </a>
                 <a
                   class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:bg-blue-100 open:text-blue-600"
@@ -134,7 +134,7 @@ export default class Retail_Management_LayoutController extends ApplicationContr
                   ${this.openByPathname()}/
                 >
                   <span class="material-symbols-outlined">groups</span>
-                  <p class="text-sm font-medium leading-normal">Employee</p>
+                  <p class="text-sm font-medium leading-normal">Employees</p>
                 </a>
                 <a
                   class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:bg-blue-100 open:text-blue-600"
@@ -142,7 +142,7 @@ export default class Retail_Management_LayoutController extends ApplicationContr
                   ${this.openByPathname()}/
                 >
                   <span class="material-symbols-outlined">inventory</span>
-                  <p class="text-sm font-medium leading-normal">Inventory</p>
+                  <p class="text-sm font-medium leading-normal">Inventories</p>
                 </a>
                 <a
                   class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:bg-blue-100 open:text-blue-600"
@@ -158,7 +158,7 @@ export default class Retail_Management_LayoutController extends ApplicationContr
                   ${this.openByPathname()}/
                 >
                   <span class="material-symbols-outlined">person_add</span>
-                  <p class="text-sm font-medium leading-normal">Customer</p>
+                  <p class="text-sm font-medium leading-normal">Customers</p>
                 </a>
                 <a
                   class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:bg-blue-100 open:text-blue-600"
@@ -174,7 +174,7 @@ export default class Retail_Management_LayoutController extends ApplicationContr
                   ${this.openByPathname()}/
                 >
                   <span class="material-symbols-outlined">calendar_month</span>
-                  <p class="text-sm font-medium leading-normal">Schedule</p>
+                  <p class="text-sm font-medium leading-normal">Schedules</p>
                 </a>
                 <a
                   class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:bg-blue-100 open:text-blue-600"
@@ -182,7 +182,7 @@ export default class Retail_Management_LayoutController extends ApplicationContr
                   ${this.openByPathname()}/
                 >
                   <span class="material-symbols-outlined">fact_check</span>
-                  <p class="text-sm font-medium leading-normal">Attendance</p>
+                  <p class="text-sm font-medium leading-normal">Attendances</p>
                 </a>
                 <a
                   class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:bg-blue-100 open:text-blue-600"
@@ -201,7 +201,7 @@ export default class Retail_Management_LayoutController extends ApplicationContr
                   href="/retail/${this.currentCompanyGroup.id}/management/settings"
                 >
                   <span class="material-symbols-outlined">settings</span>
-                  <p class="text-sm font-medium leading-normal">Setting</p>
+                  <p class="text-sm font-medium leading-normal">Settings</p>
                 </a>
                 <a
                   class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:bg-blue-100 open:text-blue-600"
