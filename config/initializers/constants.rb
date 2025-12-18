@@ -99,7 +99,7 @@ COUNTRIES = {
 LIFECYCLE_STATUS = {
   active: 0,
   inactive: 1,
-  archived: 2
+  archived: 2,
   suspended: 3,
   deleted: 4
 }
