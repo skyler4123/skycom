@@ -4,6 +4,8 @@ class CreateDocuments < ActiveRecord::Migration[8.0]
       t.references :document_group, null: false, foreign_key: true, type: :uuid
       t.references :company_group, null: false, foreign_key: true, type: :uuid
       t.references :company, null: false, foreign_key: true, type: :uuid
+      t.references :category, null: true, foreign_key: true, type: :uuid
+
       t.string :title
       t.json :content
       t.string :name

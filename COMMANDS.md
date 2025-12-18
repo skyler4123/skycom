@@ -28,7 +28,8 @@
   bundle exec rails g scaffold Company company_group:references parent_company:references name description code status:integer ownership_type:integer business_type:integer currency:integer registration_number:string vat_id:string address_line_1:string city:string postal_code:string country:string email:string phone_number:string website:string employee_count:integer fiscal_year_end_month:integer discarded_at:datetime:index --force
   bundle exec rails g scaffold Address alpha2:string:index alpha3:string:index continent:string:index nationality:string:index region:string:index longitude:decimal latitude:decimal level_total:integer level_1:string:index level_2:string:index level_3:string:index level_4:string:index level_5:string:index level_6:string:index level_7:string:index level_8:string:index level_9:string:index level_10:string:index discarded_at:datetime --force
   
-  ### Generic / Tagging
+  ### Generic / Category + Tagging
+  bundle exec rails g scaffold Category company_group:references name description --force
   bundle exec rails g scaffold Tag company_group:references name description code --force
   bundle exec rails g scaffold TagAppointment tag:references appoint_from:references{polymorphic} appoint_to:references{polymorphic} appoint_for:references{polymorphic} appoint_by:references{polymorphic} value description --force
 

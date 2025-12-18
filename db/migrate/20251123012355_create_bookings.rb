@@ -7,11 +7,7 @@ class CreateBookings < ActiveRecord::Migration[8.0]
       t.references :appoint_from, polymorphic: true, null: true, type: :uuid
       t.references :appoint_to, polymorphic: true, null: false, type: :uuid
 
-      t.integer :education_type
-      t.integer :hospital_type
-      t.integer :hotel_type
-      t.integer :restaurant_type
-      t.integer :retail_type
+      t.references :category, null: true, foreign_key: true, type: :uuid
 
       t.string :name
       t.string :description

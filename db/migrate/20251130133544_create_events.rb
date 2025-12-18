@@ -4,6 +4,8 @@ class CreateEvents < ActiveRecord::Migration[8.0]
       t.references :event_group, null: false, foreign_key: true, type: :uuid
       t.references :company_group, null: false, foreign_key: true, type: :uuid
       t.references :company, null: false, foreign_key: true, type: :uuid
+      t.references :category, null: true, foreign_key: true, type: :uuid
+
       t.string :name
       t.string :description
       t.string :code

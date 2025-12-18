@@ -3,6 +3,7 @@ class CreateNotificationGroups < ActiveRecord::Migration[8.0]
     create_table :notification_groups, id: :uuid do |t|
       t.references :company_group, null: false, foreign_key: true, type: :uuid
       t.references :company, null: true, foreign_key: true, type: :uuid
+      t.references :category, null: true, foreign_key: true, type: :uuid
 
       t.string :name
       t.string :description
