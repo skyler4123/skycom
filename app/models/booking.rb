@@ -8,12 +8,8 @@ class Booking < ApplicationRecord
   has_one :period, through: :period_appointment
 
   # --- Enums ---
-  enum :status, {
-    confirmed: 0,
-    pending: 1,
-    cancelled: 2,
-    completed: 3
-  }
+  enum :lifecycle_status, LIFECYCLE_STATUS
+  enum :workflow_status, WORKFLOW_STATUS
 
   enum :business_type, {
     internal_meeting: 0,

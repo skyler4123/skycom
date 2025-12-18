@@ -6,11 +6,8 @@ class ServiceGroup < ApplicationRecord
   has_many :services, through: :service_group_appointments, source: :appoint_to, source_type: "Service"
 
   # --- Enums ---
-  enum :status, {
-    active: 0,
-    inactive: 1,
-    archived: 2
-  }
+  enum :lifecycle_status, LIFECYCLE_STATUS
+  enum :workflow_status, WORKFLOW_STATUS
 
   enum :business_type, {
     consulting: 0,

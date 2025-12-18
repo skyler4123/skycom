@@ -5,12 +5,8 @@ class ProjectGroup < ApplicationRecord
   has_many :project_group_appointments, dependent: :destroy
 
   # --- Enums ---
-  enum :status, {
-    active: 0,
-    on_hold: 1,
-    completed: 2,
-    archived: 3
-  }
+  enum :lifecycle_status, LIFECYCLE_STATUS
+  enum :workflow_status, WORKFLOW_STATUS
 
   enum :business_type, {
     internal: 0,

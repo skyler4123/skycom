@@ -18,7 +18,8 @@ class CreateOrders < ActiveRecord::Migration[8.0]
       t.datetime :expiration_date
       t.integer :currency
       t.integer :duration
-      t.integer :status
+      t.integer :lifecycle_status
+      t.integer :workflow_status
       t.integer :business_type
       t.datetime :discarded_at
 

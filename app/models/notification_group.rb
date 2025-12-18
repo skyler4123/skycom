@@ -5,11 +5,8 @@ class NotificationGroup < ApplicationRecord
   has_many :notifications, dependent: :destroy
 
   # --- Enums ---
-  enum :status, {
-    active: 0,
-    inactive: 1,
-    archived: 2
-  }
+  enum :lifecycle_status, LIFECYCLE_STATUS
+  enum :workflow_status, WORKFLOW_STATUS
 
   enum :business_type, {
     marketing: 0,

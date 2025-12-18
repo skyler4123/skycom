@@ -5,12 +5,8 @@ class Task < ApplicationRecord
   belongs_to :task_group
 
   # --- Enums ---
-  enum :status, {
-    to_do: 0,
-    in_progress: 1,
-    done: 2,
-    archived: 3
-  }
+  enum :lifecycle_status, LIFECYCLE_STATUS
+  enum :workflow_status, WORKFLOW_STATUS
 
   enum :business_type, {
     general: 0,

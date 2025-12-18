@@ -11,11 +11,8 @@ class CustomerGroup < ApplicationRecord
   has_many :tags, through: :tag_appointments
 
   # --- Enums ---
-  enum :status, {
-    active: 0,
-    inactive: 1,
-    archived: 2
-  }
+  enum :lifecycle_status, LIFECYCLE_STATUS
+  enum :workflow_status, WORKFLOW_STATUS
 
   enum :business_type, {
     vip: 0,

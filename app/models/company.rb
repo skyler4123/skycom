@@ -30,11 +30,8 @@ class Company < ApplicationRecord
   has_many :child_companies, class_name: "Company", foreign_key: "parent_company_id", dependent: :destroy, inverse_of: :parent_company
 
   # --- Enums ---
-  enum :status, {
-    active: 0,
-    pending: 1,
-    archived: 2
-  }
+  enum :lifecycle_status, LIFECYCLE_STATUS
+  enum :workflow_status, WORKFLOW_STATUS
 
   enum :ownership_type, {
     publicly_traded: 0,

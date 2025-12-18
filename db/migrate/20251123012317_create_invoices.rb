@@ -12,7 +12,8 @@ class CreateInvoices < ActiveRecord::Migration[8.0]
       t.string :number
       t.decimal :total_price
       t.datetime :due_date
-      t.integer :status
+      t.integer :lifecycle_status
+      t.integer :workflow_status
       t.integer :business_type
       t.datetime :discarded_at
 

@@ -26,11 +26,8 @@ class CompanyGroup < ApplicationRecord
   has_many :payment_methods, through: :payment_method_appointments
 
   # --- Enums ---
-  enum :status, {
-    active: 0,
-    pending: 1,
-    archived: 2
-  }
+  enum :lifecycle_status, LIFECYCLE_STATUS
+  enum :workflow_status, WORKFLOW_STATUS
 
   enum :ownership_type, {
     publicly_traded: 0,

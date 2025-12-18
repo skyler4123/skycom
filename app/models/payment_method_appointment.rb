@@ -5,11 +5,8 @@ class PaymentMethodAppointment < ApplicationRecord
   belongs_to :company, optional: true
 
   # --- Enums ---
-  enum :status, {
-    active: 0,
-    inactive: 1,
-    pending_approval: 2
-  }
+  enum :lifecycle_status, LIFECYCLE_STATUS
+  enum :workflow_status, WORKFLOW_STATUS
 
   enum :business_type, {
     online: 0,

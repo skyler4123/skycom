@@ -15,11 +15,8 @@ class Policy < ApplicationRecord
 
   # --- Enums ---
   # Using full path to avoid potential method clashes
-  enum :status, {
-    active: 0,
-    pending: 1,
-    archived: 2
-  }
+  enum :lifecycle_status, LIFECYCLE_STATUS
+  enum :workflow_status, WORKFLOW_STATUS
 
   # Policy business_types based on common organizational categories
   enum :business_type, {

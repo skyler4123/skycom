@@ -28,7 +28,8 @@ class Employee < ApplicationRecord
     intern: 3
   }
 
-  enum :status, { active: 0, archived: 1 }
+  enum :lifecycle_status, LIFECYCLE_STATUS
+  enum :workflow_status, WORKFLOW_STATUS
 
   # --- Validations (Optional but recommended) ---
   validates :name, presence: true

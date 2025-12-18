@@ -6,11 +6,8 @@ class ProductGroup < ApplicationRecord
   has_many :products, through: :product_group_appointments, source: :appoint_to, source_type: "Product"
 
   # --- Enums ---
-  enum :status, {
-    active: 0,
-    inactive: 1,
-    discontinued: 2
-  }
+  enum :lifecycle_status, LIFECYCLE_STATUS
+  enum :workflow_status, WORKFLOW_STATUS
 
   enum :business_type, {
     category: 0,

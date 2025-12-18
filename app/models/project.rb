@@ -5,13 +5,8 @@ class Project < ApplicationRecord
   belongs_to :project_group
 
   # --- Enums ---
-  enum :status, {
-    planning: 0,
-    in_progress: 1,
-    completed: 2,
-    on_hold: 3,
-    cancelled: 4
-  }
+  enum :lifecycle_status, LIFECYCLE_STATUS
+  enum :workflow_status, WORKFLOW_STATUS
 
   enum :business_type, {
     internal: 0,

@@ -3,12 +3,8 @@ class Payment < ApplicationRecord
   belongs_to :invoice
 
   # --- Enums ---
-  enum :status, {
-    pending: 0,
-    completed: 1,
-    failed: 2,
-    refunded: 3
-  }
+  enum :lifecycle_status, LIFECYCLE_STATUS
+  enum :workflow_status, WORKFLOW_STATUS
 
   enum :payment_method, {
     credit_card: 0,

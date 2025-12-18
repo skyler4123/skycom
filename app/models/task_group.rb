@@ -5,11 +5,8 @@ class TaskGroup < ApplicationRecord
   has_many :task_group_appointments, dependent: :destroy
 
   # --- Enums ---
-  enum :status, {
-    active: 0,
-    inactive: 1,
-    archived: 2
-  }
+  enum :lifecycle_status, LIFECYCLE_STATUS
+  enum :workflow_status, WORKFLOW_STATUS
 
   enum :business_type, {
     project_management: 0,

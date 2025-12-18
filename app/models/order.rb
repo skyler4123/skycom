@@ -10,13 +10,8 @@ class Order < ApplicationRecord
 
 
   # --- Enums ---
-  enum :status, {
-    pending: 0,
-    processing: 1,
-    shipped: 2,
-    completed: 3,
-    cancelled: 4
-  }
+  enum :lifecycle_status, LIFECYCLE_STATUS
+  enum :workflow_status, WORKFLOW_STATUS
 
   enum :business_type, {
     online: 0,

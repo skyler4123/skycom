@@ -12,7 +12,8 @@ class CreatePayments < ActiveRecord::Migration[8.0]
       t.decimal :amount
       t.string :payment_method
       t.string :gateway_details
-      t.integer :status
+      t.integer :lifecycle_status
+      t.integer :workflow_status
       t.integer :business_type
       t.datetime :discarded_at
 

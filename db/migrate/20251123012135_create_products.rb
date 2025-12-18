@@ -19,7 +19,8 @@ class CreateProducts < ActiveRecord::Migration[8.0]
       t.string :serial_number
       t.string :batch_number
       t.datetime :expiration_date
-      t.integer :status
+      t.integer :lifecycle_status
+      t.integer :workflow_status
       t.integer :business_type
       t.datetime :discarded_at
 

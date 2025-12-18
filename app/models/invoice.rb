@@ -5,13 +5,8 @@ class Invoice < ApplicationRecord
   has_many :payments, dependent: :destroy
 
   # --- Enums ---
-  enum :status, {
-    draft: 0,
-    sent: 1,
-    paid: 2,
-    overdue: 3,
-    cancelled: 4
-  }
+  enum :lifecycle_status, LIFECYCLE_STATUS
+  enum :workflow_status, WORKFLOW_STATUS
 
   enum :business_type, {
     sales: 0,

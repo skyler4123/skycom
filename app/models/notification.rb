@@ -5,12 +5,8 @@ class Notification < ApplicationRecord
   belongs_to :notification_group
 
   # --- Enums ---
-  enum :status, {
-    draft: 0,
-    sent: 1,
-    delivered: 2,
-    failed: 3
-  }
+  enum :lifecycle_status, LIFECYCLE_STATUS
+  enum :workflow_status, WORKFLOW_STATUS
 
   enum :business_type, {
     email: 0,

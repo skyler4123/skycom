@@ -5,11 +5,8 @@ class CartGroup < ApplicationRecord
   # has_many :cart_group_appointments, dependent: :destroy # This can be added later
 
   # --- Enums ---
-  enum :status, {
-    active: 0,
-    inactive: 1,
-    archived: 2
-  }
+  enum :lifecycle_status, LIFECYCLE_STATUS
+  enum :workflow_status, WORKFLOW_STATUS
 
   enum :business_type, {
     abandoned: 0,
