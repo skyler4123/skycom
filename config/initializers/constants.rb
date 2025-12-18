@@ -83,7 +83,7 @@ TIMEZONES = {
 
 CURRENCIES = {
   usd: 840,
-  vnd: 704,
+  vnd: 704
 }
 
 SUBSCRIPTION_LIMITS = {
@@ -93,5 +93,5 @@ SUBSCRIPTION_LIMITS = {
 
 COUNTRIES = {
   us: 840,
-  vn: 704,
+  vn: 704
 }
