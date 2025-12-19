@@ -9,7 +9,8 @@ class Seed::NotificationService
     puts "Seeding Notification records..."
 
     # Get enum keys once before the loop for efficiency.
-    statuses = Notification.statuses.keys
+    lifecycle_statuses = Notification.lifecycle_statuses.keys
+    workflow_statuses = Notification.workflow_statuses.keys
     business_types = Notification.business_types.keys
 
     NotificationGroup.all.each do |notification_group|
@@ -25,7 +26,8 @@ class Seed::NotificationService
           name: "Notification ##{i + 1} for #{company.name}",
           description: "A notification for group '#{notification_group.name}'.",
           code: "NOTIF-#{company.id}-#{notification_group.id}-#{SecureRandom.hex(2).upcase}",
-          status: statuses.sample,
+          lifecycle_status: lifecycle_statuses.sample,
+          workflow_status: workflow_statuses.sample,
           business_type: business_types.sample,
           # Set a past timestamp for discarded_at if the record is to be soft-deleted
           discarded_at: should_discard ? Time.zone.now - rand(1..180).days : nil
@@ -41,7 +43,8 @@ class Seed::NotificationService
     name: nil,
     description: nil,
     code: nil,
-    status: nil,
+    lifecycle_status: nil,
+    workflow_status: nil,
     business_type: nil,
     discarded_at: nil
   )
@@ -57,7 +60,8 @@ class Seed::NotificationService
       name: name || "Notification for #{company.name}",
       description: description || "A notification for group '#{notification_group.name}'.",
       code: code || "NOTIF-#{company.id}-#{notification_group.id}-#{SecureRandom.hex(2).upcase}",
-      status: status || Notification.statuses.keys.sample,
+      lifecycle_status: lifecycle_status || Notification.lifecycle_statuses.keys.sample,
+      workflow_status: workflow_status || Notification.workflow_statuses.keys.sample,
       business_type: business_type || Notification.business_types.keys.sample,
       discarded_at: discarded_at
     )

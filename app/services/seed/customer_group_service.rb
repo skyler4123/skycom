@@ -8,7 +8,8 @@ class Seed::CustomerGroupService
     name: "#{Faker::Commerce.department} Customers",
     description: "A group for #{Faker::Marketing.buzzwords} customers.",
     code: nil,
-    status: nil,
+    lifecycle_status: nil,
+    workflow_status: nil,
     business_type: nil,
     discarded_at: nil
   )
@@ -21,7 +22,8 @@ class Seed::CustomerGroupService
       name: name,
       description: description,
       code: code || "CG-#{company_group.id}-#{SecureRandom.hex(3).upcase}",
-      status: status || CustomerGroup.statuses.keys.sample,
+      lifecycle_status: lifecycle_status || CustomerGroup.lifecycle_statuses.keys.sample,
+      workflow_status: workflow_status || CustomerGroup.workflow_statuses.keys.sample,
       business_type: business_type || CustomerGroup.business_types.keys.sample,
       discarded_at: discarded_at
     )

@@ -16,7 +16,8 @@ class Seed::BrandService
 
   def self.create
     # Get enum keys once before the loop for efficiency.
-    statuses = Brand.statuses.keys
+    lifecycle_statuses = Brand.lifecycle_statuses.keys
+    workflow_statuses = Brand.workflow_statuses.keys
     business_types = Brand.business_types.keys
 
     puts "Seeding #{POPULAR_BRANDS.count} Brand records..."
@@ -29,7 +30,8 @@ class Seed::BrandService
         name: brand_name,
         description: "Official brand page for #{brand_name}.",
         code: "BR-#{SecureRandom.hex(4).upcase}",
-        status: statuses.sample,
+        lifecycle_status: lifecycle_statuses.sample,
+        workflow_status: workflow_statuses.sample,
         business_type: business_types.sample,
         # Set a past timestamp for discarded_at if the record is to be soft-deleted
         discarded_at: should_discard ? Time.zone.now - rand(1..180).days : nil

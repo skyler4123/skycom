@@ -10,7 +10,8 @@ class Seed::BookingService
     puts "Seeding Booking records..."
 
     # Get enum keys once before the loop for efficiency.
-    statuses = Booking.statuses.keys
+    lifecycle_statuses = Booking.lifecycle_statuses.keys
+    workflow_statuses = Booking.workflow_statuses.keys
     business_types = Booking.business_types.keys
 
     Company.all.each do |company|
@@ -35,7 +36,8 @@ class Seed::BookingService
           name: "Booking for #{bookable.name} by #{booker.name}",
           description: "Booking ##{i + 1} for company #{company.name}.",
           code: "BOOK-#{company.id}-#{SecureRandom.hex(3).upcase}",
-          status: statuses.sample,
+          lifecycle_status: lifecycle_statuses.sample,
+          workflow_status: workflow_statuses.sample,
           business_type: business_types.sample,
           discarded_at: should_discard ? Time.zone.now - rand(1..180).days : nil
         )
@@ -52,7 +54,8 @@ class Seed::BookingService
     name: Faker::Book.title,
     description: Faker::Lorem.sentence,
     code: nil,
-    status: nil,
+    lifecycle_status: nil,
+    workflow_status: nil,
     business_type: nil,
     discarded_at: nil
   )
@@ -66,7 +69,8 @@ class Seed::BookingService
       name: name,
       description: description,
       code: code || "BOOK-#{company.id}-#{SecureRandom.hex(3).upcase}",
-      status: status || Booking.statuses.keys.sample,
+      lifecycle_status: lifecycle_status || Booking.lifecycle_statuses.keys.sample,
+      workflow_status: workflow_status || Booking.workflow_statuses.keys.sample,
       business_type: business_type || Booking.business_types.keys.sample,
       discarded_at: discarded_at
     )
