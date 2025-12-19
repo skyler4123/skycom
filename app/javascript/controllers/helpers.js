@@ -478,3 +478,21 @@ export const poll = (callback, { interval = 100, maxAttempts = 10 } = {}) => {
     }
   }, interval);
 };
+
+// Append new action
+export const addAction = (element, action) => {
+  const existingActions = element.getAttribute("data-action") || "";
+  // Use a Set to ensure all actions are unique.
+  const actionSet = new Set(existingActions.split(" ").filter(Boolean));
+  actionSet.add(action);
+  element.setAttribute("data-action", Array.from(actionSet).join(" "));
+}
+
+// Append new attribute
+export const addAttribute = (element, attribute, value) => {
+  // element.setAttribute(attribute, value);
+  const existingAttributes = element.getAttribute(attribute) || "";
+  const attributeSet = new Set(existingAttributes.split(" ").filter(Boolean));
+  attributeSet.add(value);
+  element.setAttribute(attribute, Array.from(attributeSet).join(" "));
+}
