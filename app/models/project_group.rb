@@ -17,6 +17,6 @@ class ProjectGroup < ApplicationRecord
   # --- Validations ---
   validates :name, presence: true, length: { maximum: 255 }
   validates :code, presence: true, uniqueness: { scope: :company_id }
-  validates :status, presence: true
+
   validates :business_type, presence: true
 end

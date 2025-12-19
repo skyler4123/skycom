@@ -25,6 +25,6 @@ class Invoice < ApplicationRecord
   validates :currency, presence: true
   validates :number, presence: true, uniqueness: true
   validates :total, presence: true, numericality: { greater_than_or_equal_to: 0 }
-  validates :status, presence: true
+
   validates :business_type, presence: true
 end

@@ -25,7 +25,7 @@ class Product < ApplicationRecord
 
   # --- Validations ---
   validates :name, presence: true, length: { maximum: 255 }
-  validates :status, presence: true
+
   validates :business_type, presence: true
 
   include Product::ImageConcern

@@ -19,7 +19,7 @@ class ServiceGroup < ApplicationRecord
   # --- Validations ---
   validates :name, presence: true, length: { maximum: 255 }
   validates :code, presence: true, uniqueness: { scope: :company_id }
-  validates :status, presence: true
+
   validates :business_type, presence: true
   validates :duration, numericality: { greater_than_or_equal_to: 0 }, allow_nil: true
   validates :start_at, presence: true

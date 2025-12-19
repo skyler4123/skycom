@@ -39,6 +39,6 @@ class Policy < ApplicationRecord
               message: "A policy with this name already exists in this company."
             }
 
-  validates :status, presence: true
+
   validates :kind, presence: true
 end

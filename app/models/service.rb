@@ -32,6 +32,6 @@ class Service < ApplicationRecord
   # --- Validations ---
   validates :name, presence: true, length: { maximum: 255 }
   validates :description, length: { maximum: 5000 }, allow_blank: true
-  validates :status, presence: true
+
   validates :business_type, presence: true
 end

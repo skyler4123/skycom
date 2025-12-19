@@ -70,6 +70,6 @@ class Role < ApplicationRecord
             scope: :company_group_id,
             message: "A role with this name already exists."
           }
-  validates :status, presence: true
+
   validates :business_type, presence: true
 end

@@ -23,7 +23,7 @@ class Seed::PaymentMethodService
         pm.name = method_attrs[:name]
         pm.description = "Payment method for #{method_attrs[:name]} transactions."
         pm.business_type = method_attrs[:business_type]
-        pm.status = method_attrs[:status]
+        # pm.status = method_attrs[:status]
         # Currency can be left nil for global methods or set to a default
         # pm.currency = :usd
       end

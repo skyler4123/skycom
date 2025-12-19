@@ -10,7 +10,8 @@ class Seed::ProductService
     name: Faker::Commerce.product_name,
     description: Faker::Lorem.sentence(word_count: 12),
     price: nil,
-    status: nil,
+    lifecycle_status: Product.lifecycle_statuses.keys.sample,
+    workflow_status: Product.workflow_statuses.keys.sample,
     business_type: nil,
     discarded_at: nil
   )
@@ -24,7 +25,9 @@ class Seed::ProductService
       name: name,
       description: description,
       price: price || Faker::Commerce.price(range: 50..2000.0),
-      status: status || Product.statuses.keys.sample,
+      # status: status || Product.statuses.keys.sample,
+      lifecycle_status: lifecycle_status,
+      workflow_status: workflow_status,
       business_type: business_type || Product.business_types.keys.sample,
       discarded_at: discarded_at
     )
