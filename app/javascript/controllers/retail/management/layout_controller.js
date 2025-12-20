@@ -181,7 +181,7 @@ export default class Retail_Management_LayoutController extends ApplicationContr
                   href="/retail/${this.currentCompanyGroup.id}/management/reports"
                   ${this.openByPathname()}/
                 >
-                  <span class="material-symbols-outlined">bar_chart</span>
+                  <span class="material-symbols-outlined">report_problem</span>
                   <p class="text-sm font-medium leading-normal">Reports</p>
                 </a>
                 </div>
