@@ -190,6 +190,7 @@ export default class Retail_Management_LayoutController extends ApplicationContr
               <div class="flex flex-col gap-2">
                 <a
                   class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:bg-blue-100 open:text-blue-600"
+                  ${this.openByPathname()}
                   href="/retail/${this.currentCompanyGroup.id}/management/settings"
                 >
                   <span class="material-symbols-outlined">settings</span>
@@ -197,6 +198,7 @@ export default class Retail_Management_LayoutController extends ApplicationContr
                 </a>
                 <a
                   class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:bg-blue-100 open:text-blue-600"
+                  ${this.openByPathname()}
                   href="/retail/${this.currentCompanyGroup.id}/management/administrators"
                 >
                   <span class="material-symbols-outlined">admin_panel_settings</span>
