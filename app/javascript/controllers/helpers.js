@@ -496,3 +496,11 @@ export const addAttribute = (element, attribute, value) => {
   attributeSet.add(value);
   element.setAttribute(attribute, Array.from(attributeSet).join(" "));
 }
+
+export const addOpenTrigger = (key, index) => {
+  return `data-open-target="trigger" data-action="click->open#click" data-open-key-param="${key}" data-open-index-param="${index}"`
+}
+
+export const addOpenListener = (key, index) => {
+  return `data-open-target="listener" data-open-key-param="${key}" data-open-index-param="${index}"`
+}
