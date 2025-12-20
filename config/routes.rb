@@ -30,6 +30,11 @@ Rails.application.routes.draw do
         resources :schedules
         resources :attendances
         resources :reports
+        resources :documents
+        resources :announcements
+        resources :discounts
+        resources :events
+        resources :payslips
         resources :settings
         resources :administrators
       end
