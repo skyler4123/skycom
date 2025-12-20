@@ -35,6 +35,8 @@ Rails.application.routes.draw do
         resources :discounts
         resources :events
         resources :payslips
+        resources :tasks
+        resources :facilities
         resources :settings
         resources :administrators
       end

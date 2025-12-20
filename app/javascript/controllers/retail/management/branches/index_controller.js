@@ -8,7 +8,6 @@ export default class Retail_Management_Branches_IndexController extends Retail_M
         <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 flex flex-col">
           <div
             class="p-6 border-b border-slate-200 dark:border-slate-800 flex flex-col xl:flex-row xl:items-center justify-between gap-4">
-            <h2 class="text-slate-900 dark:text-white text-xl font-bold leading-tight tracking-tight">All Branches</h2>
             <div class="flex flex-wrap items-center gap-3">
               <select
                 class="pl-3 pr-10 py-2 text-sm border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 focus:border-blue-600 focus:ring-blue-600 w-full sm:w-auto">
