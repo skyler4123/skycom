@@ -7,7 +7,7 @@
 // if their'key dont match with trigger's key, do nothing
 
 // Example code:
-//  <div data-controller="open">
+//  <div data-controller="open"> --> This already added at server html
 //    <a data-open-target="trigger" data-action="click->open#click" data-open-key-param="`key1`" data-open-index-param="`index1`">Trigger 1</a>
 //    <a data-open-target="trigger" data-action="click->open#click" data-open-key-param="`key1`" data-open-index-param="`index2`">Trigger 2</a>
 //    <a data-open-target="trigger" data-action="click->open#click" data-open-key-param="`key1`" data-open-index-param="`index3`">Trigger 3</a>
