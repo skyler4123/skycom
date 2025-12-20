@@ -25,7 +25,6 @@ Rails.application.routes.draw do
         resources :payments
         resources :employees
         resources :inventories
-        resources :sales
         resources :customers
         resources :invoices
         resources :schedules
