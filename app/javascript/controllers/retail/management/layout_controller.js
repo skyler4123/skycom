@@ -232,7 +232,15 @@ export default class Retail_Management_LayoutController extends ApplicationContr
                   <span class="material-symbols-outlined">receipt</span>
                   <p class="text-sm font-medium leading-normal">Payslips</p>
                 </a>
-                </div>
+                <a
+                  class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:bg-blue-100 open:text-blue-600"
+                  href="/retail/${this.currentCompanyGroup.id}/management/facilities"
+                  ${this.openByPathname()}/
+                >
+                  <span class="material-symbols-outlined">warehouse</span>
+                  <p class="text-sm font-medium leading-normal">Facilities</p>
+                </a>
+              </div>
             </nav>
             <div class="p-4 border-t border-gray-200 dark:border-gray-800">
               <div class="flex flex-col gap-2">
