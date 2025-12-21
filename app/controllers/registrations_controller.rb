@@ -1,4 +1,6 @@
 class RegistrationsController < ApplicationController
+  rate_limit to: 3, within: 1.minute, only: :create
+
   skip_before_action :authenticate
 
   def new
