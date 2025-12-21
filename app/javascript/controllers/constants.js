@@ -40,3 +40,23 @@ export const COUNTRIES = {
   "us": "United States",
   "vn": "Vietnam"
 }
+
+export const LIFECYCLE_STATUS = {
+  active: 0,
+  inactive: 1,
+  archived: 2,
+  suspended: 3,
+  deleted: 4
+}
+
+export const WORKFLOW_STATUS = {
+  draft: 0,
+  pending: 1,
+  confirmed: 2,
+  in_progress: 3,
+  completed: 4,
+  paid: 5,
+  cancelled: 6,
+  refunded: 7,
+  failed: 8
+}

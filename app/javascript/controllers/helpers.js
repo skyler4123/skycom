@@ -602,3 +602,64 @@ export const fetchJson = async (url, options = {}) => {
     throw error
   }
 }
+
+export const statusBadge = (status) => {
+  if (!status) return ""
+
+  const statusKey = String(status).toLowerCase()
+  let color = "slate"
+
+  switch (statusKey) {
+    case "active":
+    case "confirmed":
+    case "completed":
+    case "paid":
+      color = "green"
+      break
+    case "in_progress":
+      color = "blue"
+      break
+    case "pending":
+    case "suspended":
+      color = "yellow"
+      break
+    case "deleted":
+    case "failed":
+    case "refunded":
+    case "cancelled":
+      color = "red"
+      break
+  }
+
+  const styles = {
+    green: {
+      badge: "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400 border border-green-200 dark:border-green-800",
+      dot: "bg-green-600"
+    },
+    slate: {
+      badge: "bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-400 border border-slate-200 dark:border-slate-700",
+      dot: "bg-slate-500"
+    },
+    yellow: {
+      badge: "bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400 border border-yellow-200 dark:border-yellow-800",
+      dot: "bg-yellow-600"
+    },
+    red: {
+      badge: "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400 border border-red-200 dark:border-red-800",
+      dot: "bg-red-600"
+    },
+    blue: {
+      badge: "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400 border border-blue-200 dark:border-blue-800",
+      dot: "bg-blue-600"
+    }
+  }
+
+  const style = styles[color] || styles.slate
+  const label = capitalize(statusKey.replace(/_/g, " "))
+
+  return `
+    <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium ${style.badge}">
+      <span class="w-1.5 h-1.5 rounded-full ${style.dot}"></span> ${label}
+    </span>
+  `
+}

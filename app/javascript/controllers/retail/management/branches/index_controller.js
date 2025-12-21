@@ -1,4 +1,4 @@
-import { pathname, randomId, openModal, queryArray, findById, pluck, mergeObjectArrays, mergeArrays, subtractObjectArrays, subtractArrays, fetchJson } from "controllers/helpers"
+import { pathname, randomId, openModal, queryArray, findById, pluck, mergeObjectArrays, mergeArrays, subtractObjectArrays, subtractArrays, fetchJson, statusBadge } from "controllers/helpers"
 import Retail_Management_LayoutController from "controllers/retail/management/layout_controller"
 
 export default class Retail_Management_Branches_IndexController extends Retail_Management_LayoutController {
@@ -8,7 +8,6 @@ export default class Retail_Management_Branches_IndexController extends Retail_M
   branches = []
 
   async init() {
-    console.log(this)
     const response = await fetchJson({ params: { page: 1, active: true } });
     this.branches = response.branches || []
     this.render()
@@ -83,7 +82,6 @@ export default class Retail_Management_Branches_IndexController extends Retail_M
     if (this.branches.length === 0) {
       return `<tr><td colspan="6" class="text-center py-4 text-slate-500">No branches found</td></tr>`
     }
-    console.log(this.branches)
     return this.branches.map(branch => `
       <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
         <td class="py-4 px-6 text-sm">
@@ -118,9 +116,7 @@ export default class Retail_Management_Branches_IndexController extends Retail_M
           </div>
         </td>
         <td class="py-4 px-6 text-sm">
-          <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium ${branch.lifecycle_status === 'active' ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400 border border-green-200 dark:border-green-800' : 'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-400 border border-slate-200 dark:border-slate-700'}">
-            <span class="w-1.5 h-1.5 rounded-full ${branch.lifecycle_status === 'active' ? 'bg-green-600' : 'bg-slate-500'}"></span> ${branch.lifecycle_status}
-          </span>
+          ${statusBadge(branch.lifecycle_status)}
         </td>
         <td class="py-4 px-6 text-sm text-right">
           <div class="flex items-center justify-end gap-2">
