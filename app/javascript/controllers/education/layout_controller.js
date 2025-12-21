@@ -1,5 +1,5 @@
 import ApplicationController from "controllers/application_controller"
-import { currentCompanyGroup, companyGroups, capitalize, openPopover } from "controllers/helpers"
+import { currentCompanyGroup, companyGroups, capitalize, openPopover, darkmode, openByPathname, translate, triggerLanguageDropdown, languageCodeTextTarget } from "controllers/helpers"
 
 export default class Education_LayoutController extends ApplicationController {
   static targets = ["profileDropdown"]
@@ -59,43 +59,43 @@ export default class Education_LayoutController extends ApplicationController {
             </div>
             <nav class="w-full p-4">
               <div class="flex flex-col gap-2">
-                <a class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:bg-blue-100 open:text-blue-600" href="/retail/${this.currentCompanyGroup.id}/stores" ${this.openByPathname()}/>
+                <a class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:bg-blue-100 open:text-blue-600" href="/retail/${this.currentCompanyGroup.id}/stores" ${openByPathname()}/>
                   <span class="material-symbols-outlined">dashboard</span>
-                  <p class="text-sm font-medium leading-normal" ${this.translate("Dashboard")}>Dashboard</p>
+                  <p class="text-sm font-medium leading-normal" ${translate("Dashboard")}>Dashboard</p>
                 </a>
-                <a class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:bg-blue-100 open:text-blue-600" href="/retail/${this.currentCompanyGroup.id}/products" ${this.openByPathname()}/>
+                <a class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:bg-blue-100 open:text-blue-600" href="/retail/${this.currentCompanyGroup.id}/products" ${openByPathname()}/>
                   <span class="material-symbols-outlined">inventory_2</span>
                   <p class="text-sm font-medium leading-normal">Product</p>
                 </a>
-                <a class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:bg-blue-100 open:text-blue-600" href="/retail/${this.currentCompanyGroup.id}/bookings" ${this.openByPathname()}/>
+                <a class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:bg-blue-100 open:text-blue-600" href="/retail/${this.currentCompanyGroup.id}/bookings" ${openByPathname()}/>
                   <span class="material-symbols-outlined">calendar_month</span>
                   <p class="text-sm font-medium leading-normal">Booking</p>
                 </a>
-                <a class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:bg-blue-100 open:text-blue-600" href="/retail/${this.currentCompanyGroup.id}/payments" ${this.openByPathname()}/>
+                <a class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:bg-blue-100 open:text-blue-600" href="/retail/${this.currentCompanyGroup.id}/payments" ${openByPathname()}/>
                   <span class="material-symbols-outlined">payments</span>
                   <p class="text-sm font-medium leading-normal">Payment</p>
                 </a>
-                <a class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:bg-blue-100 open:text-blue-600" href="/retail/${this.currentCompanyGroup.id}/employees" ${this.openByPathname()}/>
+                <a class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:bg-blue-100 open:text-blue-600" href="/retail/${this.currentCompanyGroup.id}/employees" ${openByPathname()}/>
                   <span class="material-symbols-outlined">groups</span>
                   <p class="text-sm font-medium leading-normal">Employee</p>
                 </a>
-                <a class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:bg-blue-100 open:text-blue-600" href="/retail/${this.currentCompanyGroup.id}/inventory" ${this.openByPathname()}/>
+                <a class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:bg-blue-100 open:text-blue-600" href="/retail/${this.currentCompanyGroup.id}/inventory" ${openByPathname()}/>
                   <span class="material-symbols-outlined">inventory</span>
                   <p class="text-sm font-medium leading-normal">Inventory</p>
                 </a>
-                <a class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:bg-blue-100 open:text-blue-600" href="/retail/${this.currentCompanyGroup.id}/sales" ${this.openByPathname()}/>
+                <a class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:bg-blue-100 open:text-blue-600" href="/retail/${this.currentCompanyGroup.id}/sales" ${openByPathname()}/>
                   <span class="material-symbols-outlined">add_shopping_cart</span>
                   <p class="text-sm font-medium leading-normal">Sales</p>
                 </a>
-                <a class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:bg-blue-100 open:text-blue-600" href="/retail/${this.currentCompanyGroup.id}/customers" ${this.openByPathname()}/>
+                <a class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:bg-blue-100 open:text-blue-600" href="/retail/${this.currentCompanyGroup.id}/customers" ${openByPathname()}/>
                   <span class="material-symbols-outlined">person_add</span>
                   <p class="text-sm font-medium leading-normal">Customer</p>
                 </a>
-                <a class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:bg-blue-100 open:text-blue-600" href="/retail/${this.currentCompanyGroup.id}/invoices" ${this.openByPathname()}/>
+                <a class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:bg-blue-100 open:text-blue-600" href="/retail/${this.currentCompanyGroup.id}/invoices" ${openByPathname()}/>
                   <span class="material-symbols-outlined">receipt_long</span>
                   <p class="text-sm font-medium leading-normal">Invoices</p>
                 </a>
-                <a class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:bg-blue-100 open:text-blue-600" href="/retail/${this.currentCompanyGroup.id}/reports" ${this.openByPathname()}/>
+                <a class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:bg-blue-100 open:text-blue-600" href="/retail/${this.currentCompanyGroup.id}/reports" ${openByPathname()}/>
                   <span class="material-symbols-outlined">bar_chart</span>
                   <p class="text-sm font-medium leading-normal">Reports</p>
                 </a>
@@ -136,13 +136,13 @@ export default class Education_LayoutController extends ApplicationController {
               <div class="flex flex-1 justify-end gap-4 items-center">
                 <button
                   class="flex cursor-pointer items-center justify-center overflow-hidden rounded-full h-10 w-10 p-2 hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-600 dark:text-gray-300"
-                  ${this.darkmode()}
+                  ${darkmode()}
                 </button>
                 <button
                   class="flex cursor-pointer items-center justify-center overflow-hidden rounded-full h-10 w-10 hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-600 dark:text-gray-300"
-                  ${this.triggerLanguageDropdown()}
+                  ${triggerLanguageDropdown()}
                 >
-                  <span ${this.languageCodeTextTarget()}></span>
+                  <span ${languageCodeTextTarget()}></span>
                 </button>
                 <button
                   class="flex cursor-pointer items-center justify-center overflow-hidden rounded-full h-10 w-10 hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-600 dark:text-gray-300">

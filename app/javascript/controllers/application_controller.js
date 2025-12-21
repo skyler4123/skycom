@@ -26,27 +26,4 @@ export default class ApplicationController extends Controller {
     if (isDefined(this.init)) { this.init() }
     this.initializedValue = true
   }
-
-  // to be implemented in LinkController
-  openByPathname() {
-    return `data-link-target="openByPathname"`
-  }
-
-  // to be implemented in DarkmodeController
-  darkmode() {
-    return `data-controller="darkmode"`
-  }
-
-  // to be implemented in LanguageController
-  translate(key) {
-    return `data-language-key="${key}"`
-  }
-  
-  triggerLanguageDropdown() {
-    return `data-language-target="triggerDropdown"`
-  }
-
-  languageCodeTextTarget() {
-    return `data-language-target="codeText"`
-  }
 }

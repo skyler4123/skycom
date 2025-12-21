@@ -663,3 +663,27 @@ export const statusBadge = (status) => {
     </span>
   `
 }
+
+// to be implemented in DarkmodeController
+export const darkmode = () => {
+  return `data-controller="darkmode"`
+}
+
+// to be implemented in LinkController
+export const openByPathname = () => {
+  return `data-link-target="openByPathname"`
+}
+
+// to be implemented in LanguageController
+export const translate = (key) => {
+  return `data-language-key="${key}"`
+}
+
+export const triggerLanguageDropdown = () => {
+  return `data-language-target="triggerDropdown"`
+}
+
+
+export const languageCodeTextTarget = () => {
+  return `data-language-target="codeText"`
+}
