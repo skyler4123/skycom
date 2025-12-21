@@ -504,3 +504,101 @@ export const addOpenTrigger = (key, index) => {
 export const addOpenListener = (key, index) => {
   return `data-open-target="listener" data-open-key-param="${key}" data-open-index-param="${index}"`
 }
+
+/**
+ * Fetches JSON data from a URL with support for query parameters, headers, and automatic body serialization.
+ * Automatically adds CSRF token (for same-origin requests) and Accept headers.
+ *
+ * @param {string|Object} [url] - The URL to fetch, or options object if fetching from current location.
+ * @param {Object} [options={}] - Configuration options for the fetch request.
+ * @param {Object} [options.params] - Query parameters to append to the URL.
+ * @param {Object} [options.headers] - Additional headers to include in the request.
+ * @param {Object|FormData} [options.body] - The body of the request. If an object is passed (and not FormData), it is stringified and Content-Type is set to application/json.
+ * @param {string} [options.method="GET"] - The HTTP method to use.
+ * @returns {Promise<any>} - A promise that resolves to the JSON response or null if status is 204.
+ * @throws {Error} - Throws an error if the response status is not OK.
+ *
+ * @example
+ * // GET request with params
+ * const data = await fetchJson('/api/users', { params: { page: 1, active: true } });
+ *
+ * @example
+ * // POST request with JSON body
+ * await fetchJson('/api/users', {
+ *   method: 'POST',
+ *   body: { name: 'John', email: 'john@example.com' }
+ * });
+ *
+ * @example
+ * // Request with custom headers
+ * await fetchJson('/api/secure-data', {
+ *   headers: { 'Authorization': 'Bearer token' }
+ * });
+ *
+ * @example
+ * // External API request (CSRF token is automatically omitted)
+ * await fetchJson('https://api.external.com/data', {
+ *   params: { q: 'search' }
+ * });
+ *
+ * @example
+ * // Fetch from current URL
+ * const data = await fetchJson();
+ *
+ * @example
+ * // Fetch from current URL with params
+ * const data = await fetchJson({ params: { page: 2 } });
+ */
+export const fetchJson = async (url, options = {}) => {
+  if (typeof url === 'object' && url !== null) {
+    options = url
+    url = window.location.href
+  } else if (!url) {
+    url = window.location.href
+  }
+
+  const { params, headers = {}, body, method = "GET", ...rest } = options
+
+  const requestUrl = new URL(url, window.location.origin)
+  if (params) {
+    Object.entries(params).forEach(([key, value]) => {
+      if (isDefined(value) && value !== null) {
+        requestUrl.searchParams.append(key, value)
+      }
+    })
+  }
+
+  const defaultHeaders = {
+    "Accept": "application/json"
+  }
+
+  // Only add CSRF token for same-origin requests to avoid CORS issues
+  if (requestUrl.origin === window.location.origin) {
+    defaultHeaders["X-CSRF-Token"] = csrfToken()
+  }
+
+  let requestBody = body
+  if (body && !(body instanceof FormData) && typeof body === 'object') {
+    defaultHeaders["Content-Type"] = "application/json"
+    requestBody = JSON.stringify(body)
+  }
+
+  const config = {
+    method,
+    headers: { ...defaultHeaders, ...headers },
+    body: requestBody,
+    ...rest
+  }
+
+  try {
+    const response = await fetch(requestUrl, config)
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`)
+    }
+    if (response.status === 204) return null
+    return await response.json()
+  } catch (error) {
+    console.error("fetchJson error:", error)
+    throw error
+  }
+}

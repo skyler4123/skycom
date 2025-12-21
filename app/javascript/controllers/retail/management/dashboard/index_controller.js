@@ -212,18 +212,6 @@ export default class Retail_Management_Dashboard_IndexController extends Retail_
           </div>
         </div>
       </div>
-
-
-
-  <div>
-    <a data-open-target="trigger" data-action="click->open#click" data-open-key-param="key1" data-open-index-param="index1">Trigger 1</a>
-    <a data-open-target="trigger" data-action="click->open#click" data-open-key-param="key1" data-open-index-param="index2">Trigger 2</a>
-    <a data-open-target="trigger" data-action="click->open#click" data-open-key-param="key1" data-open-index-param="index3">Trigger 3</a>
-    
-    <div data-open-target="listener" data-open-key-param="key1" data-open-index-param="index1">Listener 1</div>
-    <div data-open-target="listener" data-open-key-param="key1" data-open-index-param="index2">Listener 2</div>
-    <div data-open-target="listener" data-open-key-param="key1" data-open-index-param="index3">Listener 3</div>
-  </div>
     `
   }
 
