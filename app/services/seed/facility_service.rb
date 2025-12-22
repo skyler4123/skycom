@@ -8,7 +8,8 @@ class Seed::FacilityService
     company:,
     name: nil,
     description: Faker::Lorem.sentence(word_count: 10),
-    status: nil,
+    lifecycle_status: nil,
+    workflow_status: nil,
     business_type: nil,
     discarded_at: nil
   )
@@ -20,7 +21,8 @@ class Seed::FacilityService
       company: company,
       name: name || "#{company.name} Facility",
       description: description,
-      status: status || Facility.statuses.keys.sample,
+      lifecycle_status: lifecycle_status || Facility.lifecycle_statuses.keys.sample,
+      workflow_status: workflow_status || Facility.workflow_statuses.keys.sample,
       business_type: business_type || Facility.business_types.keys.sample,
       discarded_at: discarded_at
     )

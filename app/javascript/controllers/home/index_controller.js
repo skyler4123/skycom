@@ -1,5 +1,5 @@
 import ApplicationController from "controllers/application_controller"
-import { openModal, closeModal, csrfTokenTag, signInPath, signUpPath, poll } from "controllers/helpers"
+import { openModal, closeModal, formPostSecurityTags, signInPath, signUpPath, poll, addAction } from "controllers/helpers"
 
 export default class Home_IndexController extends ApplicationController {
   static targets = ["signInButton", "signUpButton"]
@@ -11,10 +11,10 @@ export default class Home_IndexController extends ApplicationController {
   initActions() {
     poll(() => {
       if (this.hasSignInButtonTarget) {
-        this.addAction(this.signInButtonTarget, `click->${this.identifier}#openSignInModal`)
+        addAction(this.signInButtonTarget, `click->${this.identifier}#openSignInModal`)
       }
       if (this.hasSignUpButtonTarget) {
-        this.addAction(this.signUpButtonTarget, `click->${this.identifier}#openSignUpModal`)
+        addAction(this.signUpButtonTarget, `click->${this.identifier}#openSignUpModal`)
       }
     })
   }
@@ -90,7 +90,7 @@ export default class Home_IndexController extends ApplicationController {
               action="${signInPath()}"
               method="POST"
               class="">
-              ${csrfTokenTag()}
+              ${formPostSecurityTags()}
               <div class="space-y-4">
                 <div>
                   <label class="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300 text-left"
@@ -173,7 +173,7 @@ export default class Home_IndexController extends ApplicationController {
               action="${signUpPath()}"
               method="POST"
               class="">
-              ${csrfTokenTag()}
+              ${formPostSecurityTags()}
               <div class="space-y-4">
                 <div>
                   <label class="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300 text-left"

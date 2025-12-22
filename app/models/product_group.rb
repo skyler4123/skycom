@@ -6,11 +6,8 @@ class ProductGroup < ApplicationRecord
   has_many :products, through: :product_group_appointments, source: :appoint_to, source_type: "Product"
 
   # --- Enums ---
-  enum :status, {
-    active: 0,
-    inactive: 1,
-    discontinued: 2
-  }
+  enum :lifecycle_status, LIFECYCLE_STATUS
+  enum :workflow_status, WORKFLOW_STATUS
 
   enum :business_type, {
     category: 0,
@@ -21,6 +18,6 @@ class ProductGroup < ApplicationRecord
   # --- Validations ---
   validates :name, presence: true, length: { maximum: 255 }
   validates :code, presence: true, uniqueness: { scope: :company_id }
-  validates :status, presence: true
+
   validates :business_type, presence: true
 end

@@ -5,11 +5,8 @@ class TaskGroup < ApplicationRecord
   has_many :task_group_appointments, dependent: :destroy
 
   # --- Enums ---
-  enum :status, {
-    active: 0,
-    inactive: 1,
-    archived: 2
-  }
+  enum :lifecycle_status, LIFECYCLE_STATUS
+  enum :workflow_status, WORKFLOW_STATUS
 
   enum :business_type, {
     project_management: 0,
@@ -20,6 +17,6 @@ class TaskGroup < ApplicationRecord
   # --- Validations ---
   validates :name, presence: true, length: { maximum: 255 }
   validates :code, presence: true, uniqueness: { scope: :company_id }
-  validates :status, presence: true
+
   validates :business_type, presence: true
 end

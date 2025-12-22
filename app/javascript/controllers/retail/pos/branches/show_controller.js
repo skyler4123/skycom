@@ -1,8 +1,8 @@
 import Retail_Pos_LayoutController from "controllers/retail/pos/layout_controller"
-import { pathname, randomId, openModal, queryArray, findById, pluck, mergeObjectArrays, mergeArrays, subtractObjectArrays, subtractArrays } from "controllers/helpers"
-import Retail_Pos_Stores_SettingController from "controllers/retail/pos/stores/setting_controller"
+import * as Helpers from "controllers/helpers"
+import Retail_Pos_Branches_SettingController from "controllers/retail/pos/branches/setting_controller"
 
-export default class Retail_Pos_Stores_ShowController extends Retail_Pos_LayoutController {
+export default class Retail_Pos_Branches_ShowController extends Retail_Pos_LayoutController {
   static targets = ['products', "product", "selectedProduct", "selectedProducts", "totalSelectedProductsPrice", "carts", "cart"]
   static values = {
     productIds: { type: Array, default: [] },
@@ -20,12 +20,12 @@ export default class Retail_Pos_Stores_ShowController extends Retail_Pos_LayoutC
     this.products = await this.fetchProducts()
     this.carts = [
       {
-        id: randomId(),
+        id: Helpers.randomId(), // Changed
         customerName: 'Customer 1',
         selectedProducts: []
       },
       {
-        id: randomId(),
+        id: Helpers.randomId(), // Changed
         customerName: 'Customer 2',
         selectedProducts: []
       }
@@ -34,13 +34,13 @@ export default class Retail_Pos_Stores_ShowController extends Retail_Pos_LayoutC
   }
 
   initValues() {
-    this.productIdsValue = pluck(this.products)
-    this.cartIdsValue = pluck(this.carts)
+    this.productIdsValue = Helpers.pluck(this.products) // Changed
+    this.cartIdsValue = Helpers.pluck(this.carts)       // Changed
     this.currentCartIdValue = this.carts[0].id
   }
 
   async fetchProducts() {
-    const productsUrl = pathname() + '/products'
+    const productsUrl = Helpers.pathname() + '/products' // Changed
     try {
       const response = await fetch(productsUrl)
       if (!response.ok) {
@@ -59,23 +59,23 @@ export default class Retail_Pos_Stores_ShowController extends Retail_Pos_LayoutC
 
   toggleOrder(event) {
     const { productId } = event.params
-    const selectedProduct = findById(this.selectedProducts, productId)
+    const selectedProduct = Helpers.findById(this.selectedProducts, productId) // Changed
     if (selectedProduct) {
-      this.selectedProductIdsValue = subtractArrays(this.selectedProductIdsValue, [productId])
+      this.selectedProductIdsValue = Helpers.subtractArrays(this.selectedProductIdsValue, [productId]) // Changed
     } else {
-      this.selectedProductIdsValue = mergeArrays(this.selectedProductIdsValue, [productId])
+      this.selectedProductIdsValue = Helpers.mergeArrays(this.selectedProductIdsValue, [productId])    // Changed
     }
   }
 
   selectedProductIdsValueChanged(value, previousValue) {
     if (previousValue === undefined) return
-    this.selectedProducts = queryArray(this.products, {id: value}).map(product => ({...product, quantity: 1}))
+    this.selectedProducts = Helpers.queryArray(this.products, {id: value}).map(product => ({...product, quantity: 1})) // Changed
     this.renderHighLightProducts()
     this.renderSelectedProducts()
     this.totalSelectedProductsPriceValue = this.totalSelectedProductsPrice()
     const currentCart = this.currentCart()
     currentCart.selectedProducts = this.selectedProducts
-    this.carts = mergeObjectArrays(this.carts, [currentCart])
+    this.carts = Helpers.mergeObjectArrays(this.carts, [currentCart]) // Changed
   }
 
   renderHighLightProducts() {
@@ -94,7 +94,7 @@ export default class Retail_Pos_Stores_ShowController extends Retail_Pos_LayoutC
 
     this.renderHighLightCurrentCart()
     this.selectedProducts = this.currentCart().selectedProducts
-    this.selectedProductIdsValue = pluck(this.selectedProducts)
+    this.selectedProductIdsValue = Helpers.pluck(this.selectedProducts) // Changed
   }
 
   renderHighLightCurrentCart() {
@@ -128,75 +128,43 @@ export default class Retail_Pos_Stores_ShowController extends Retail_Pos_LayoutC
 
   increaseQuantityByOne(event) {
     const { productId } = event.params
-    const selectedProduct = findById(this.selectedProducts, productId)
+    const selectedProduct = Helpers.findById(this.selectedProducts, productId) // Changed
     const newSelectedProduct = {
       ...selectedProduct,
       quantity: selectedProduct.quantity + 1
     }
-    this.selectedProducts = mergeObjectArrays(this.selectedProducts, [newSelectedProduct])
+    this.selectedProducts = Helpers.mergeObjectArrays(this.selectedProducts, [newSelectedProduct]) // Changed
     this.renderSelectedProducts()
     this.totalSelectedProductsPriceValue = this.totalSelectedProductsPrice()
   }
 
   decreaseQuantityByOne(event) {
     const { productId } = event.params
-    const selectedProduct = findById(this.selectedProducts, productId)
+    const selectedProduct = Helpers.findById(this.selectedProducts, productId) // Changed
     const newSelectedProduct = {
       ...selectedProduct,
       quantity: Math.max(0, selectedProduct.quantity - 1)
     }
     if (newSelectedProduct.quantity === 0) {
-      this.selectedProducts = subtractObjectArrays(this.selectedProducts, [newSelectedProduct])
+      this.selectedProducts = Helpers.subtractObjectArrays(this.selectedProducts, [newSelectedProduct]) // Changed
     } else {
-      this.selectedProducts = mergeObjectArrays(this.selectedProducts, [newSelectedProduct])
+      this.selectedProducts = Helpers.mergeObjectArrays(this.selectedProducts, [newSelectedProduct])    // Changed
     }
-    this.selectedProductIdsValue = pluck(this.selectedProducts, 'id')
+    this.selectedProductIdsValue = Helpers.pluck(this.selectedProducts, 'id') // Changed
     this.renderSelectedProducts()
     this.totalSelectedProductsPriceValue = this.totalSelectedProductsPrice()
   }
 
-  selectCart(event) {
-    const { cartId } = event.params
-    const cart = findById(this.carts, cartId)
-    if (!cart) return
-    this.currentCartIdValue = cartId
-  }
-
   openSetting(event) {
-    openModal({
-      html: `<div data-controller="${Retail_Pos_Stores_SettingController.identifier}"></div>`
+    Helpers.openModal({ // Changed
+      html: `<div data-controller="${Retail_Pos_Branches_SettingController.identifier}"></div>`
     })
-  }
-
-  cartIdsValueChanged(value, previousValue) {
-    this.renderCarts()
-  }
-
-  renderCarts() {
-    this.cartsTarget.innerHTML = `
-      ${this.carts.map(cart => {
-        return `
-          <div>
-            <button
-              data-${this.identifier}-cart-id-param="${cart.id}"
-              data-${this.identifier}-target="cart"
-              data-action="click->${this.identifier}#selectCart"
-              class="py-3 px-4 text-sm font-medium text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800/50 cursor-pointer open:text-indigo-600 open:border-indigo-600">
-              <span class="flex items-center gap-2">
-                <span class="material-symbols-outlined text-base">person</span>
-                ${cart.customerName}
-              </span>
-            </button>
-          </div>
-        `
-      }).join('')}
-    `
   }
 
   renderProducts() {
     this.productsTarget.innerHTML = `
       ${this.productIdsValue.map(productId => {
-        const product = findById(this.products, productId)
+        const product = Helpers.findById(this.products, productId) // Changed
         return `
           <div
             class="flex flex-col bg-white dark:bg-gray-900 rounded-xl border-4 border-gray-200 open:border-blue-500 dark:border-gray-800 overflow-hidden cursor-pointer hover:shadow-xl hover:shadow-gray-500/50 transition-shadow"
@@ -313,24 +281,7 @@ export default class Retail_Pos_Stores_ShowController extends Retail_Pos_LayoutC
                 class="w-96 flex-shrink-0 bg-white dark:bg-gray-900 border-l border-gray-200 dark:border-gray-800 flex flex-col">
 
                 <div class="p-6 border-b border-gray-200 dark:border-gray-800">
-                  <h2 class="text-xl font-bold text-gray-900 dark:text-white mb-4">Current Order</h2>
-                  <!--
-                  <div class="relative mb-4">
-                    <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-                      <span class="material-symbols-outlined text-gray-400">person_search</span>
-                    </div>
-                    <input
-                      class="block w-full rounded-lg border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 pl-10 pr-4 py-2 text-sm focus:border-indigo-600 focus:ring-indigo-600 dark:text-white dark:placeholder-gray-400"
-                      placeholder="Search or add customer..." type="text" />
-                  </div>
-                  -->
-                  <div class="flex flex-col items-center gap-2 border-gray-200 dark:border-gray-800">
-                    <div class="flex flex-col w-full border-b-2" data-${this.identifier}-target="carts"></div>
-                    <button
-                      class="flex justify-center items-center w-full px-3 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-md ml-auto">
-                      <span class="material-symbols-outlined">add</span>
-                    </button>
-                  </div>
+                  <h2 class="text-xl font-bold text-gray-900 dark:text-white">Current Order</h2>
                 </div>
 
                 <div class="flex-1 p-6 overflow-y-auto">

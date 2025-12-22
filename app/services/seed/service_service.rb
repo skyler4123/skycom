@@ -4,7 +4,9 @@ class Seed::ServiceService
     company:,
     name: nil,
     description: Faker::Lorem.sentence(word_count: 10),
-    status: nil,
+    # status: nil,
+    lifecycle_status: Service.lifecycle_statuses.keys.sample,
+    workflow_status: Service.workflow_statuses.keys.sample,
     business_type: nil,
     discarded_at: nil
   )
@@ -16,7 +18,8 @@ class Seed::ServiceService
       company: company,
       name: name || "#{company.name} Service",
       description: description,
-      status: status || Service.statuses.keys.sample,
+      lifecycle_status: lifecycle_status,
+      workflow_status: workflow_status,
       business_type: business_type || Service.business_types.keys.sample,
       discarded_at: discarded_at
     )

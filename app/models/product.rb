@@ -14,11 +14,8 @@ class Product < ApplicationRecord
   has_many :tags, through: :tag_appointments
 
   # --- Enums ---
-  enum :status, {
-    draft: 0,
-    available: 1,
-    discontinued: 2
-  }
+  enum :lifecycle_status, LIFECYCLE_STATUS
+  enum :workflow_status, WORKFLOW_STATUS
 
   enum :business_type, {
     physical: 0,
@@ -28,7 +25,7 @@ class Product < ApplicationRecord
 
   # --- Validations ---
   validates :name, presence: true, length: { maximum: 255 }
-  validates :status, presence: true
+
   validates :business_type, presence: true
 
   include Product::ImageConcern

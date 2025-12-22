@@ -23,12 +23,8 @@ class Customer < ApplicationRecord
   has_many :services, through: :service_appointments
 
   # --- Enums ---
-  enum :status, {
-    active: 0,
-    prospect: 1,
-    inactive: 2
-  }
-
+  enum :lifecycle_status, LIFECYCLE_STATUS
+  enum :workflow_status, WORKFLOW_STATUS
   enum :business_type, {
     individual: 0,
     small_business: 1,
@@ -37,6 +33,6 @@ class Customer < ApplicationRecord
 
   # --- Validations ---
   validates :name, presence: true, length: { maximum: 255 }
-  validates :status, presence: true
+
   validates :business_type, presence: true
 end

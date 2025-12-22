@@ -3,12 +3,8 @@ class Brand < ApplicationRecord
   has_many :products, dependent: :nullify
 
   # --- Enums ---
-  # Defines the possible statuses for a brand.
-  enum :status, {
-    active: 0,
-    inactive: 1,
-    archived: 2
-  }
+  enum :lifecycle_status, LIFECYCLE_STATUS
+  enum :workflow_status, WORKFLOW_STATUS
 
   # Defines the general business category of the brand.
   enum :business_type, {
@@ -22,6 +18,6 @@ class Brand < ApplicationRecord
   validates :name, presence: true, uniqueness: true, length: { maximum: 255 }
   validates :code, presence: true, uniqueness: true
   validates :description, length: { maximum: 5000 }, allow_blank: true
-  validates :status, presence: true
+
   validates :business_type, presence: true
 end

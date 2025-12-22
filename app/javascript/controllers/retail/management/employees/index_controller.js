@@ -5,240 +5,205 @@ export default class Retail_Management_Employees_IndexController extends Retail_
   contentHTML() {
     return `
       <div class="p-8 overflow-y-auto">
-        <div class="flex flex-col md:flex-row items-center justify-between gap-4 mb-6">
-          <div class="flex-1 w-full md:w-auto">
-            <div class="flex flex-col md:flex-row items-center gap-4">
-              <div class="relative w-full md:w-auto flex-grow">
-                <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-                  <span class="material-symbols-outlined text-gray-500">search</span>
-                </div>
-                <input
-                  class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-indigo-600 focus:border-indigo-600 dark:bg-gray-800 dark:border-gray-600 dark:text-white h-10"
-                  placeholder="Search employees..." type="text" />
-              </div>
-              <div class="flex items-center gap-4 w-full md:w-auto">
-                <div class="relative w-full md:w-auto">
-                  <select
-                    class="appearance-none w-full md:w-auto pl-3 pr-8 py-2 border border-gray-300 rounded-lg focus:ring-indigo-600 focus:border-indigo-600 dark:bg-gray-800 dark:border-gray-600 dark:text-white">
-                    <option>Department</option>
-                    <option>Sales</option>
-                    <option>Marketing</option>
-                    <option>Engineering</option>
-                    <option>Support</option>
-                  </select>
-                </div>
-                <div class="relative w-full md:w-auto">
-                  <select
-                    class="appearance-none w-full md:w-auto pl-3 pr-8 py-2 border border-gray-300 rounded-lg focus:ring-indigo-600 focus:border-indigo-600 dark:bg-gray-800 dark:border-gray-600 dark:text-white">
-                    <option>Role</option>
-                    <option>Manager</option>
-                    <option>Associate</option>
-                    <option>Specialist</option>
-                    <option>Intern</option>
-                  </select>
-                </div>
-                <div class="relative w-full md:w-auto">
-                  <select
-                    class="appearance-none w-full md:w-auto pl-3 pr-8 py-2 border border-gray-300 rounded-lg focus:ring-indigo-600 focus:border-indigo-600 dark:bg-gray-800 dark:border-gray-600 dark:text-white">
-                    <option>Employment Status</option>
-                    <option>Full-time</option>
-                    <option>Part-time</option>
-                    <option>Contract</option>
-                  </select>
-                </div>
-              </div>
+        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
+          <div class="flex flex-wrap items-center gap-3 w-full sm:w-auto">
+            <div class="relative min-w-[140px]">
+              <select
+                class="form-select w-full pl-3 pr-8 py-2 text-sm border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 focus:ring-blue-600 focus:border-blue-600">
+                <option>Department</option>
+                <option>Sales</option>
+                <option>Logistics</option>
+                <option>Management</option>
+                <option>Customer Support</option>
+              </select>
+            </div>
+            <div class="relative min-w-[140px]">
+              <select
+                class="form-select w-full pl-3 pr-8 py-2 text-sm border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 focus:ring-blue-600 focus:border-blue-600">
+                <option>Role</option>
+                <option>Manager</option>
+                <option>Associate</option>
+                <option>Intern</option>
+                <option>Supervisor</option>
+              </select>
+            </div>
+            <div class="relative min-w-[140px]">
+              <select
+                class="form-select w-full pl-3 pr-8 py-2 text-sm border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 focus:ring-blue-600 focus:border-blue-600">
+                <option>Employment Status</option>
+                <option>Full-time</option>
+                <option>Part-time</option>
+                <option>Contract</option>
+                <option>On Leave</option>
+              </select>
             </div>
           </div>
-          <div class="flex-shrink-0">
-            <button
-              class="inline-flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-600 h-10">
-              <span class="material-symbols-outlined">add</span>
-              <span>Add New Employee</span>
-            </button>
-          </div>
+          <button
+            class="flex items-center justify-center gap-2 px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors font-medium text-sm shadow-sm whitespace-nowrap">
+            <span class="material-symbols-outlined text-[20px]">add</span>
+            Add New Employee
+          </button>
         </div>
-        <div class="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 overflow-hidden">
+
+        <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 flex flex-col">
           <div class="overflow-x-auto">
-            <table class="w-full text-left">
+            <table class="w-full text-left border-collapse">
               <thead>
                 <tr
-                  class="text-sm text-gray-500 dark:text-gray-400 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50">
-                  <th class="py-3 px-6 font-medium">Name</th>
-                  <th class="py-3 px-6 font-medium">Employee ID</th>
-                  <th class="py-3 px-6 font-medium">Department</th>
-                  <th class="py-3 px-6 font-medium">Role</th>
-                  <th class="py-3 px-6 font-medium">Contact Information</th>
-                  <th class="py-3 px-6 font-medium text-right">Actions</th>
+                  class="text-sm text-slate-500 dark:text-slate-400 bg-slate-50 dark:bg-slate-800/50 border-b border-slate-200 dark:border-slate-700">
+                  <th class="py-4 px-6 font-medium whitespace-nowrap">Employee Name</th>
+                  <th class="py-4 px-6 font-medium whitespace-nowrap">Employee ID</th>
+                  <th class="py-4 px-6 font-medium whitespace-nowrap">Department</th>
+                  <th class="py-4 px-6 font-medium whitespace-nowrap">Role</th>
+                  <th class="py-4 px-6 font-medium whitespace-nowrap">Contact Information</th>
+                  <th class="py-4 px-6 font-medium whitespace-nowrap">Status</th>
+                  <th class="py-4 px-6 font-medium text-right whitespace-nowrap">Actions</th>
                 </tr>
               </thead>
-              <tbody>
-                <tr class="border-b border-gray-200 dark:border-gray-800 text-sm">
-                  <td class="py-4 px-6 flex items-center gap-4">
-                    <div class="w-12 h-12 rounded-full bg-gray-100 dark:bg-gray-800 flex-shrink-0 bg-cover bg-center"
-                      style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuBKqYQ-lFCKRgrfI4EPnefW878hsy7gNRqQPqj8s8E5Ge1-_XBtng98qY0IAC49HZtbBQbq_Xmm4WmqZTwnBA_u537-Oo3_Bo4ROEj9ufUtCi4z9_rT-JasRis5CI7aU-r4EgoVDyUSSL43L90Fx5kY6QLXVMw6PuhYB_Wpdku2jGXGTXlkeOHm_Q2XgxRygRF4fkXUKJxzjygS0_ITnoHauhzBh15UCG0VN28rIU4wC0Q1FFpiLqZxefa17HrnD0ReSRauHALa7YI")'>
-                    </div>
-                    <div>
-                      <div class="font-medium text-gray-900 dark:text-white">John Doe</div>
-                      <div class="text-xs text-gray-500 dark:text-gray-400">john.doe@example.com
+              <tbody class="divide-y divide-slate-200 dark:divide-slate-800">
+                <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
+                  <td class="py-4 px-6 text-sm">
+                    <div class="flex items-center gap-4">
+                      <div
+                        class="w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-800 bg-cover bg-center border border-slate-200 dark:border-slate-700">
+                      </div>
+                      <div>
+                        <p class="font-medium text-slate-900 dark:text-white text-base">Sarah Johnson</p>
+                        <p class="text-xs text-slate-500 mt-0.5">Joined Jan 2023</p>
                       </div>
                     </div>
                   </td>
-                  <td class="py-4 px-6">EMP-001</td>
-                  <td class="py-4 px-6">Sales</td>
-                  <td class="py-4 px-6">Sales Manager</td>
-                  <td class="py-4 px-6">123-456-7890</td>
-                  <td class="py-4 px-6 text-right">
-                    <div class="flex justify-end gap-2">
+                  <td class="py-4 px-6 text-sm text-slate-600 dark:text-slate-300 font-mono">EMP-0012</td>
+                  <td class="py-4 px-6 text-sm text-slate-900 dark:text-white">Sales</td>
+                  <td class="py-4 px-6 text-sm text-slate-600 dark:text-slate-300">Senior Associate</td>
+                  <td class="py-4 px-6 text-sm text-slate-600 dark:text-slate-300">sarah.j@skycom.com</td>
+                  <td class="py-4 px-6 text-sm">
+                    <span
+                      class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400 border border-green-200 dark:border-green-800">
+                      <span class="w-1.5 h-1.5 rounded-full bg-green-600 dark:bg-green-400"></span> Active
+                    </span>
+                  </td>
+                  <td class="py-4 px-6 text-sm text-right">
+                    <div class="flex items-center justify-end gap-2">
                       <button
-                        class="p-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-500 dark:text-gray-400"><span
-                          class="material-symbols-outlined text-xl">edit</span></button>
+                        class="p-2 text-slate-500 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"><span
+                          class="material-symbols-outlined text-[20px]">edit</span></button>
                       <button
-                        class="p-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-500 dark:text-gray-400"><span
-                          class="material-symbols-outlined text-xl">delete</span></button>
+                        class="p-2 text-slate-500 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"><span
+                          class="material-symbols-outlined text-[20px]">delete</span></button>
                     </div>
                   </td>
                 </tr>
-                <tr class="border-b border-gray-200 dark:border-gray-800 text-sm">
-                  <td class="py-4 px-6 flex items-center gap-4">
-                    <div class="w-12 h-12 rounded-full bg-gray-100 dark:bg-gray-800 flex-shrink-0 bg-cover bg-center"
-                      style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuAbXVPxwq9gR05ET4Kg0zCkBedYQjSJZmR3DH8SdyUnxZGoM_metNxBWCUUuSnCOssD-X8VxfXiG9Yn8EfI7K0CBy89bmtD6VOri4Otu7fyWyW17ze__SksK4FO4Nm3RhWu-tuH6YoqZe3BrXGRN0eEcf4YPYy9ZVCVUjpcTsQ7vITeB-vBntfVqWXHEoBs6-F3MNAfRrD6TPd_ulew3ZSwkPOR99c991viv5iDIKdMeoP5NnXZHRFkvdpt45KCw-xhpWJaokfXO-4")'>
-                    </div>
-                    <div>
-                      <div class="font-medium text-gray-900 dark:text-white">Jane Smith</div>
-                      <div class="text-xs text-gray-500 dark:text-gray-400">jane.smith@example.com
+                <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
+                  <td class="py-4 px-6 text-sm">
+                    <div class="flex items-center gap-4">
+                      <div
+                        class="w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-800 bg-cover bg-center border border-slate-200 dark:border-slate-700">
+                      </div>
+                      <div>
+                        <p class="font-medium text-slate-900 dark:text-white text-base">Michael Chen</p>
+                        <p class="text-xs text-slate-500 mt-0.5">Joined Mar 2022</p>
                       </div>
                     </div>
                   </td>
-                  <td class="py-4 px-6">EMP-002</td>
-                  <td class="py-4 px-6">Marketing</td>
-                  <td class="py-4 px-6">Marketing Specialist</td>
-                  <td class="py-4 px-6">987-654-3210</td>
-                  <td class="py-4 px-6 text-right">
-                    <div class="flex justify-end gap-2">
+                  <td class="py-4 px-6 text-sm text-slate-600 dark:text-slate-300 font-mono">EMP-0045</td>
+                  <td class="py-4 px-6 text-sm text-slate-900 dark:text-white">Management</td>
+                  <td class="py-4 px-6 text-sm text-slate-600 dark:text-slate-300">Store Manager</td>
+                  <td class="py-4 px-6 text-sm text-slate-600 dark:text-slate-300">michael.c@skycom.com</td>
+                  <td class="py-4 px-6 text-sm">
+                    <span
+                      class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400 border border-green-200 dark:border-green-800">
+                      <span class="w-1.5 h-1.5 rounded-full bg-green-600 dark:bg-green-400"></span> Active
+                    </span>
+                  </td>
+                  <td class="py-4 px-6 text-sm text-right">
+                    <div class="flex items-center justify-end gap-2">
                       <button
-                        class="p-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-500 dark:text-gray-400"><span
-                          class="material-symbols-outlined text-xl">edit</span></button>
+                        class="p-2 text-slate-500 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"><span
+                          class="material-symbols-outlined text-[20px]">edit</span></button>
                       <button
-                        class="p-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-500 dark:text-gray-400"><span
-                          class="material-symbols-outlined text-xl">delete</span></button>
+                        class="p-2 text-slate-500 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"><span
+                          class="material-symbols-outlined text-[20px]">delete</span></button>
                     </div>
                   </td>
                 </tr>
-                <tr class="border-b border-gray-200 dark:border-gray-800 text-sm">
-                  <td class="py-4 px-6 flex items-center gap-4">
-                    <div class="w-12 h-12 rounded-full bg-gray-100 dark:bg-gray-800 flex-shrink-0 bg-cover bg-center"
-                      style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuC0-OZADNa-IOAewhuFRea32GhnTvSizf8IS7oJQCoW7uVPOToTNdbnfTGSgQdK2_aazL5e3yrXwWx9ytQRzabYngl2KRa100dLvLcWHTf8YH24sSOeI_cUDKZTq154ssb9O_ltPlYsH_elSHIo5jkwQ8hYYdKSESjp5-M_aY2blXiJ1y-xpC-Q0x7GWNq3JGWv52TwBe_bbUyVrAmWaRkl5zg1G8ld4KFLDZxeB_IGkorYr_4N8EAD49G9_7E9KOu9S0MyWLhLHXs")'>
-                    </div>
-                    <div>
-                      <div class="font-medium text-gray-900 dark:text-white">Mike Johnson</div>
-                      <div class="text-xs text-gray-500 dark:text-gray-400">mike.j@example.com
+                <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
+                  <td class="py-4 px-6 text-sm">
+                    <div class="flex items-center gap-4">
+                      <div
+                        class="w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-800 bg-cover bg-center border border-slate-200 dark:border-slate-700">
+                      </div>
+                      <div>
+                        <p class="font-medium text-slate-900 dark:text-white text-base">Emily Rodriguez</p>
+                        <p class="text-xs text-slate-500 mt-0.5">Joined Aug 2023</p>
                       </div>
                     </div>
                   </td>
-                  <td class="py-4 px-6">EMP-003</td>
-                  <td class="py-4 px-6">Engineering</td>
-                  <td class="py-4 px-6">Software Engineer</td>
-                  <td class="py-4 px-6">555-123-4567</td>
-                  <td class="py-4 px-6 text-right">
-                    <div class="flex justify-end gap-2">
+                  <td class="py-4 px-6 text-sm text-slate-600 dark:text-slate-300 font-mono">EMP-0089</td>
+                  <td class="py-4 px-6 text-sm text-slate-900 dark:text-white">Customer Support</td>
+                  <td class="py-4 px-6 text-sm text-slate-600 dark:text-slate-300">Specialist</td>
+                  <td class="py-4 px-6 text-sm text-slate-600 dark:text-slate-300">emily.r@skycom.com</td>
+                  <td class="py-4 px-6 text-sm">
+                    <span
+                      class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400 border border-yellow-200 dark:border-yellow-800">
+                      <span class="w-1.5 h-1.5 rounded-full bg-yellow-500 dark:bg-yellow-400"></span> On Leave
+                    </span>
+                  </td>
+                  <td class="py-4 px-6 text-sm text-right">
+                    <div class="flex items-center justify-end gap-2">
                       <button
-                        class="p-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-500 dark:text-gray-400"><span
-                          class="material-symbols-outlined text-xl">edit</span></button>
+                        class="p-2 text-slate-500 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"><span
+                          class="material-symbols-outlined text-[20px]">edit</span></button>
                       <button
-                        class="p-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-500 dark:text-gray-400"><span
-                          class="material-symbols-outlined text-xl">delete</span></button>
+                        class="p-2 text-slate-500 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"><span
+                          class="material-symbols-outlined text-[20px]">delete</span></button>
                     </div>
                   </td>
                 </tr>
-                <tr class="border-b border-gray-200 dark:border-gray-800 text-sm">
-                  <td class="py-4 px-6 flex items-center gap-4">
-                    <div class="w-12 h-12 rounded-full bg-gray-100 dark:bg-gray-800 flex-shrink-0 bg-cover bg-center"
-                      style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuAbXVPxwq9gR05ET4Kg0zCkBedYQjSJZmR3DH8SdyUnxZGoM_metNxBWCUUuSnCOssD-X8VxfXiG9Yn8EfI7K0CBy89bmtD6VOri4Otu7fyWyW17ze__SksK4FO4Nm3RhWu-tuH6YoqZe3BrXGRN0eEcf4YPYy9ZVCVUjpcTsQ7vITeB-vBntfVqWXHEoBs6-F3MNAfRrD6TPd_ulew3ZSwkPOR99c991viv5iDIKdMeoP5NnXZHRFkvdpt45KCw-xhpWJaokfXO-4")'>
-                    </div>
-                    <div>
-                      <div class="font-medium text-gray-900 dark:text-white">Emily Davis</div>
-                      <div class="text-xs text-gray-500 dark:text-gray-400">emily.d@example.com
+                <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
+                  <td class="py-4 px-6 text-sm">
+                    <div class="flex items-center gap-4">
+                      <div
+                        class="w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-800 bg-cover bg-center border border-slate-200 dark:border-slate-700">
+                      </div>
+                      <div>
+                        <p class="font-medium text-slate-900 dark:text-white text-base">David Kim</p>
+                        <p class="text-xs text-slate-500 mt-0.5">Joined Nov 2023</p>
                       </div>
                     </div>
                   </td>
-                  <td class="py-4 px-6">EMP-004</td>
-                  <td class="py-4 px-6">Support</td>
-                  <td class="py-4 px-6">Support Associate</td>
-                  <td class="py-4 px-6">222-333-4444</td>
-                  <td class="py-4 px-6 text-right">
-                    <div class="flex justify-end gap-2">
-                      <button
-                        class="p-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-500 dark:text-gray-400"><span
-                          class="material-symbols-outlined text-xl">edit</span></button>
-                      <button
-                        class="p-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-500 dark:text-gray-400"><span
-                          class="material-symbols-outlined text-xl">delete</span></button>
-                    </div>
+                  <td class="py-4 px-6 text-sm text-slate-600 dark:text-slate-300 font-mono">EMP-0102</td>
+                  <td class="py-4 px-6 text-sm text-slate-900 dark:text-white">Logistics</td>
+                  <td class="py-4 px-6 text-sm text-slate-600 dark:text-slate-300">Inventory Clerk</td>
+                  <td class="py-4 px-6 text-sm text-slate-600 dark:text-slate-300">david.k@skycom.com</td>
+                  <td class="py-4 px-6 text-sm">
+                    <span
+                      class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-400 border border-slate-200 dark:border-slate-700">
+                      <span class="w-1.5 h-1.5 rounded-full bg-slate-500 dark:bg-slate-400"></span> Probation
+                    </span>
                   </td>
-                </tr>
-                <tr class="border-b border-gray-200 dark:border-gray-800 text-sm">
-                  <td class="py-4 px-6 flex items-center gap-4">
-                    <div class="w-12 h-12 rounded-full bg-gray-100 dark:bg-gray-800 flex-shrink-0 bg-cover bg-center"
-                      style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuC_yRDDWRHorUiz0qbFEELV1j4CH5u7Pi8lNcqwN_NtNOzzmmXcLVj1axHQygvNQtzXQuDy_WkVr48kqu5bnmVmaRknP1wRgyFHJ0ERmHZ1ExwN-9Wqgojlr03kwVw9G0tQZ1LAdNn1qJJqPVvUwb4YiQRrkrevxFplJFS3LWtv2j3JA8GtCWs8wVtXw44pdWfb7d68qYZ-F37TizWABbG75ItHnbVZC8XlKJTD_otQmgkGtRdNZeoKOiYLoBJNe3JIPJHtx766U-8")'>
-                    </div>
-                    <div>
-                      <div class="font-medium text-gray-900 dark:text-white">Chris Wilson</div>
-                      <div class="text-xs text-gray-500 dark:text-gray-400">chris.w@example.com
-                      </div>
-                    </div>
-                  </td>
-                  <td class="py-4 px-6">EMP-005</td>
-                  <td class="py-4 px-6">Sales</td>
-                  <td class="py-4 px-6">Sales Associate</td>
-                  <td class="py-4 px-6">777-888-9999</td>
-                  <td class="py-4 px-6 text-right">
-                    <div class="flex justify-end gap-2">
+                  <td class="py-4 px-6 text-sm text-right">
+                    <div class="flex items-center justify-end gap-2">
                       <button
-                        class="p-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-500 dark:text-gray-400"><span
-                          class="material-symbols-outlined text-xl">edit</span></button>
+                        class="p-2 text-slate-500 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"><span
+                          class="material-symbols-outlined text-[20px]">edit</span></button>
                       <button
-                        class="p-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-500 dark:text-gray-400"><span
-                          class="material-symbols-outlined text-xl">delete</span></button>
-                    </div>
-                  </td>
-                </tr>
-                <tr class="text-sm">
-                  <td class="py-4 px-6 flex items-center gap-4">
-                    <div class="w-12 h-12 rounded-full bg-gray-100 dark:bg-gray-800 flex-shrink-0 bg-cover bg-center"
-                      style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuBKqYQ-lFCKRgrfI4EPnefW878hsy7gNRqQPqj8s8E5Ge1-_XBtng98qY0IAC49HZtbBQbq_Xmm4WmqZTwnBA_u537-Oo3_Bo4ROEj9ufUtCi4z9_rT-JasRis5CI7aU-r4EgoVDyUSSL43L90Fx5kY6QLXVMw6PuhYB_Wpdku2jGXGTXlkeOHm_Q2XgxRygRF4fkXUKJxzjygS0_ITnoHauhzBh15UCG0VN28rIU4wC0Q1FFpiLqZxefa17HrnD0ReSRauHALa7YI")'>
-                    </div>
-                    <div>
-                      <div class="font-medium text-gray-900 dark:text-white">Sarah Brown</div>
-                      <div class="text-xs text-gray-500 dark:text-gray-400">sarah.b@example.com
-                      </div>
-                    </div>
-                  </td>
-                  <td class="py-4 px-6">EMP-006</td>
-                  <td class="py-4 px-6">Engineering</td>
-                  <td class="py-4 px-6">Intern</td>
-                  <td class="py-4 px-6">111-222-3333</td>
-                  <td class="py-4 px-6 text-right">
-                    <div class="flex justify-end gap-2">
-                      <button
-                        class="p-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-500 dark:text-gray-400"><span
-                          class="material-symbols-outlined text-xl">edit</span></button>
-                      <button
-                        class="p-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-500 dark:text-gray-400"><span
-                          class="material-symbols-outlined text-xl">delete</span></button>
+                        class="p-2 text-slate-500 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"><span
+                          class="material-symbols-outlined text-[20px]">delete</span></button>
                     </div>
                   </td>
                 </tr>
               </tbody>
             </table>
           </div>
-          <div class="flex items-center justify-between p-4 border-t border-gray-200 dark:border-gray-700">
-            <span class="text-sm text-gray-600 dark:text-gray-400">Showing 1 to 6 of 50 employees</span>
+          <div class="p-4 border-t border-slate-200 dark:border-slate-800 flex items-center justify-between">
+            <span class="text-sm text-slate-500 dark:text-slate-400">Showing 1 to 4 of 128 employees</span>
             <div class="flex items-center gap-2">
               <button
-                class="px-3 py-1 text-sm border border-gray-300 dark:border-gray-600 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800 disabled:opacity-50"
+                class="px-3 py-1 text-sm border border-slate-200 dark:border-slate-700 rounded-lg text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 disabled:opacity-50"
                 disabled="">Previous</button>
               <button
-                class="px-3 py-1 text-sm border border-gray-300 dark:border-gray-600 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800">Next</button>
+                class="px-3 py-1 text-sm border border-slate-200 dark:border-slate-700 rounded-lg text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800">Next</button>
             </div>
           </div>
         </div>

@@ -5,12 +5,8 @@ class Task < ApplicationRecord
   belongs_to :task_group
 
   # --- Enums ---
-  enum :status, {
-    to_do: 0,
-    in_progress: 1,
-    done: 2,
-    archived: 3
-  }
+  enum :lifecycle_status, LIFECYCLE_STATUS
+  enum :workflow_status, WORKFLOW_STATUS
 
   enum :business_type, {
     general: 0,
@@ -26,6 +22,6 @@ class Task < ApplicationRecord
 
   # --- Validations ---
   validates :name, presence: true, length: { maximum: 255 }
-  validates :status, presence: true
+
   validates :business_type, presence: true
 end

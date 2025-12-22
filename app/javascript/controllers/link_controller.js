@@ -2,26 +2,25 @@
 // data-link-target="openByPathname"
 
 import { Controller } from "@hotwired/stimulus"
+import { poll, addAttribute } from "controllers/helpers"
 
 export default class LinkController extends Controller {
   static targets = ["link", "openByPathname"]
 
   initialize() {
-    setTimeout(() => {
+    poll(() => {
       this.addLinkTargets()
-      // this.updateLinkStyles()
       this.updateOpenByPathnameTargets()
-    }, 100)
+    })
   }
 
   addLinkTargets() {
     this.element.querySelectorAll('a').forEach((linkElement) => {
-      // linkElement.setAttribute(`data-${this.identifier}-target`, 'link')
-      // append "link" to existing targets at attribute data-link-target
-      linkElement.setAttribute(`data-${this.identifier}-target`, (linkElement.getAttribute(`data-${this.identifier}-target`) || '') + ' link')
+      addAttribute(linkElement, `data-${this.identifier}-target`, 'link')
     })
   }
 
+  // Make sure openByPathname targets were added 
   updateOpenByPathnameTargets() {
     const currentPath = window.location.pathname
 

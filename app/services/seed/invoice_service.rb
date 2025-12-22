@@ -8,7 +8,8 @@ class Seed::InvoiceService
 
   def self.run
     # Get enum keys once before the loop for efficiency.
-    statuses = Invoice.statuses.keys
+    lifecycle_statuses = Invoice.lifecycle_statuses.keys
+    workflow_statuses = Invoice.workflow_statuses.keys
     business_types = Invoice.business_types.keys
 
     puts "Seeding Invoice records..."
@@ -30,7 +31,8 @@ class Seed::InvoiceService
           number: "INV-#{order.id}-#{i + 1}-#{SecureRandom.hex(4).upcase}", # Unique invoice number
           total: invoice_total,
           due_date: Faker::Date.forward(days: 30),
-          status: statuses.sample,
+          lifecycle_status: lifecycle_statuses.sample,
+          workflow_status: workflow_statuses.sample,
           business_type: business_types.sample,
           # Set a past timestamp for discarded_at if the record is to be soft-deleted
           discarded_at: should_discard ? Time.zone.now - rand(1..180).days : nil
@@ -49,7 +51,8 @@ class Seed::InvoiceService
     number: nil,
     total: nil,
     due_date: Faker::Date.forward(days: 30),
-    status: nil,
+    lifecycle_status: nil,
+    workflow_status: nil,
     business_type: nil,
     discarded_at: nil
   )
@@ -69,7 +72,8 @@ class Seed::InvoiceService
       number: number || "INV-#{order.id}-#{SecureRandom.hex(4).upcase}",
       total: invoice_total,
       due_date: due_date,
-      status: status || Invoice.statuses.keys.sample,
+      lifecycle_status: lifecycle_status || Invoice.lifecycle_statuses.keys.sample,
+      workflow_status: workflow_status || Invoice.workflow_statuses.keys.sample,
       business_type: business_type || Invoice.business_types.keys.sample,
       discarded_at: discarded_at
     )

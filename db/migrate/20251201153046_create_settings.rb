@@ -4,11 +4,14 @@ class CreateSettings < ActiveRecord::Migration[8.0]
       t.references :setting_group, null: false, foreign_key: true, type: :uuid
       t.references :company_group, null: false, foreign_key: true, type: :uuid
       t.references :company, null: false, foreign_key: true, type: :uuid
+      t.references :category, null: true, foreign_key: true, type: :uuid
+
       t.json :content
       t.string :name
       t.string :description
       t.string :code
-      t.integer :status
+      t.integer :lifecycle_status
+      t.integer :workflow_status
       t.integer :business_type
       t.datetime :discarded_at
 

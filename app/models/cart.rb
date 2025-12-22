@@ -5,12 +5,8 @@ class Cart < ApplicationRecord
   belongs_to :cart_group
 
   # --- Enums ---
-  enum :status, {
-    active: 0,
-    abandoned: 1,
-    converted: 2,
-    archived: 3
-  }
+  enum :lifecycle_status, LIFECYCLE_STATUS
+  enum :workflow_status, WORKFLOW_STATUS
 
   enum :business_type, {
     shopping: 0,
@@ -20,6 +16,6 @@ class Cart < ApplicationRecord
 
   # --- Validations ---
   validates :name, presence: true, length: { maximum: 255 }
-  validates :status, presence: true
+
   validates :business_type, presence: true
 end

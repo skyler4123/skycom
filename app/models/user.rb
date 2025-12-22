@@ -59,6 +59,8 @@ class User < ApplicationRecord
   end
 
   include User::RetailConcern
+  include IdentityCache
 
+  cache_index :email, unique: true
   # ----------------------------------------------------------------------------------------------------
 end

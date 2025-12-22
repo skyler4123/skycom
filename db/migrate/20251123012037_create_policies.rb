@@ -9,7 +9,8 @@ class CreatePolicies < ActiveRecord::Migration[8.0]
       t.string :code
       t.string :resource
       t.string :action
-      t.integer :status
+      t.integer :lifecycle_status
+      t.integer :workflow_status
       t.integer :business_type
       t.datetime :discarded_at
 

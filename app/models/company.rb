@@ -30,11 +30,8 @@ class Company < ApplicationRecord
   has_many :child_companies, class_name: "Company", foreign_key: "parent_company_id", dependent: :destroy, inverse_of: :parent_company
 
   # --- Enums ---
-  enum :status, {
-    active: 0,
-    pending: 1,
-    archived: 2
-  }
+  enum :lifecycle_status, LIFECYCLE_STATUS
+  enum :workflow_status, WORKFLOW_STATUS
 
   enum :ownership_type, {
     publicly_traded: 0,
@@ -42,16 +39,10 @@ class Company < ApplicationRecord
   }
 
   # Grouped business types with 1000-unit gaps for future expansion
-  enum :business_type, {
-    headquarters: 0,
-    regional_office: 1,
-    branch: 2,
-    franchise: 3,
-    subsidiary: 4
-  }
+  enum :business_type, BUSINESS_TYPES, prefix: true
 
-  enum :timezone, TIMEZONE, prefix: true
-  enum :currency, CURRENCY, prefix: true
+  enum :timezone, TIMEZONES, prefix: true
+  enum :currency, CURRENCIES, prefix: true
 
   # Enum for the new fiscal_year_end_month column (1=January, 12=December)
   enum :fiscal_year_end_month, {
@@ -65,8 +56,8 @@ class Company < ApplicationRecord
   validates :description, length: { maximum: 5000 }, allow_blank: true
 
   validates :business_type, presence: true
-  validates :ownership_type, presence: true
-  validates :status, presence: true
+  # validates :ownership_type, presence: true
+  # validates :status, presence: true
 
   # Validation for new administrative fields
   validates :registration_number, presence: true, uniqueness: true, if: :privately_held? # Typically required for private companies
@@ -80,7 +71,7 @@ class Company < ApplicationRecord
 
   # Validation for address fields
   validates :country, presence: true
-  validates :city, presence: true
+  # validates :city, presence: true
 
   # Validation for operational fields
   # validates :fiscal_year_end_month, presence: true, numericality: { in: 1..12 }

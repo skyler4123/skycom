@@ -1,4 +1,6 @@
 class RegistrationsController < ApplicationController
+  rate_limit to: 3, within: 1.minute, only: :create
+
   skip_before_action :authenticate
 
   def new
@@ -11,7 +13,7 @@ class RegistrationsController < ApplicationController
     if @user.save
       session_record = @user.sessions.create!
       cookies.signed.permanent[:session_token] = { value: session_record.id, httponly: true }
-      set_sign_in_cookie(session: session_record, user: @user)
+      update_cookie(session: session_record, user: @user)
 
       send_email_verification
       redirect_to root_path, notice: "Welcome! You have signed up successfully"

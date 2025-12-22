@@ -5,14 +5,7 @@ export default class Retail_Management_Dashboard_IndexController extends Retail_
   contentHTML() {
     return `
       <div class="p-8 overflow-y-auto">
-        <div class="flex flex-wrap justify-between gap-3 mb-8">
-          <div class="flex flex-col gap-1">
-            <p class="text-gray-900 dark:text-white text-3xl font-bold leading-tight tracking-tight">Welcome back,
-              Manager!</p>
-            <p class="text-gray-500 dark:text-gray-400 text-base font-normal leading-normal">Here's what's happening at
-              your store today.</p>
-          </div>
-        </div>
+
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           <div
             class="flex flex-col gap-2 rounded-xl p-6 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800">

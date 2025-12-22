@@ -27,11 +27,8 @@ class Role < ApplicationRecord
 
   # --- Enums ---
   # Using full path to avoid potential method clashes, as seen in Employee model
-  enum :status, {
-    active: 0,
-    pending: 1,
-    archived: 2
-  }
+  enum :lifecycle_status, LIFECYCLE_STATUS
+  enum :workflow_status, WORKFLOW_STATUS
 
   # Standardized role kinds for categorization
   enum :business_type, {
@@ -73,6 +70,6 @@ class Role < ApplicationRecord
             scope: :company_group_id,
             message: "A role with this name already exists."
           }
-  validates :status, presence: true
+
   validates :business_type, presence: true
 end

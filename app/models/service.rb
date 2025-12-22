@@ -21,11 +21,8 @@ class Service < ApplicationRecord
   has_many :employees, through: :service_appointments, source: :appoint_to, source_type: "Employee"
 
   # --- Enums ---
-  enum :status, {
-    active: 0,
-    pending: 1,
-    archived: 2
-  }
+  enum :lifecycle_status, LIFECYCLE_STATUS
+  enum :workflow_status, WORKFLOW_STATUS
 
   enum :business_type, {
     b2b: 0,
@@ -35,6 +32,6 @@ class Service < ApplicationRecord
   # --- Validations ---
   validates :name, presence: true, length: { maximum: 255 }
   validates :description, length: { maximum: 5000 }, allow_blank: true
-  validates :status, presence: true
+
   validates :business_type, presence: true
 end

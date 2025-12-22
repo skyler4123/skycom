@@ -5,13 +5,8 @@ class Invoice < ApplicationRecord
   has_many :payments, dependent: :destroy
 
   # --- Enums ---
-  enum :status, {
-    draft: 0,
-    sent: 1,
-    paid: 2,
-    overdue: 3,
-    cancelled: 4
-  }
+  enum :lifecycle_status, LIFECYCLE_STATUS
+  enum :workflow_status, WORKFLOW_STATUS
 
   enum :business_type, {
     sales: 0,
@@ -30,6 +25,6 @@ class Invoice < ApplicationRecord
   validates :currency, presence: true
   validates :number, presence: true, uniqueness: true
   validates :total, presence: true, numericality: { greater_than_or_equal_to: 0 }
-  validates :status, presence: true
+
   validates :business_type, presence: true
 end

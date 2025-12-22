@@ -1,5 +1,7 @@
 import LayoutController from "controllers/layout_controller"
-import { csrfTokenTag } from "controllers/helpers"
+import { formPostSecurityTags } from "controllers/helpers"
+import { CURRENCIES, TIMEZONES, COUNTRIES } from "controllers/constants"
+import { ROUTES } from "controllers/routes"
 
 export default class CompanyGroup_NewController extends LayoutController {
 
@@ -17,34 +19,45 @@ export default class CompanyGroup_NewController extends LayoutController {
 
           <!-- Form -->
           <form
-          action="/company_groups"
+            action="${ROUTES.createCompanyGroupPath}"
+            data-method="post
             accept-charset="UTF-8"
             method="post"
             class="flex flex-col gap-6">
-            ${csrfTokenTag()}
+            ${formPostSecurityTags()}
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6 h-18">
               <div class="flex flex-col gap-2">
                 <label class="text-slate-900 dark:text-slate-100 text-sm font-bold leading-tight" for="companyName">Company
                   Name <span class="text-red-500">*</span></label>
                 <input
                   class="flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-slate-900 dark:text-slate-100 focus:outline-0 focus:ring-0 border border-slate-300 dark:border-slate-700 bg-white dark:bg-gray-950 focus:border-indigo-600 h-12 px-4 text-base font-normal leading-normal placeholder:text-slate-400"
-                  id="companyName" name="company_group[name]" placeholder="e.g. Skyline Boutique" type="text" />
+                  id="companyName" name="company_group[name]" placeholder="e.g. Skyline Boutique" type="text" required />
               </div>
               <div class="flex flex-col gap-2">
                 <label class="text-slate-900 dark:text-slate-100 text-sm font-bold leading-tight" for="phoneNumber">Phone
                   Number <span class="text-red-500">*</span></label>
                 <input
                   class="flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-slate-900 dark:text-slate-100 focus:outline-0 focus:ring-0 border border-slate-300 dark:border-slate-700 bg-white dark:bg-gray-950 focus:border-indigo-600 h-12 px-4 text-base font-normal leading-normal placeholder:text-slate-400"
-                  id="phoneNumber" name="company_group[phone_number]" placeholder="+1 (555) 123-4567" type="tel" />
+                  id="phoneNumber" name="company_group[phone_number]" placeholder="+1 (555) 123-4567" type="tel" required />
               </div>
             </div>
 
-            <div class="flex flex-col gap-2 h-18">
-              <label class="text-slate-900 dark:text-slate-100 text-sm font-bold leading-tight" for="companyAddress">Company
-                Address <span class="text-red-500">*</span></label>
-              <input
-                class="flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-slate-900 dark:text-slate-100 focus:outline-0 focus:ring-0 border border-slate-300 dark:border-slate-700 bg-white dark:bg-gray-950 focus:border-indigo-600 h-12 px-4 text-base font-normal leading-normal placeholder:text-slate-400"
-                id="companyAddress" name="company_group[address]" placeholder="123 Retail Ave, Commerce City" type="text" />
+            <div class="flex flex-col gap-2">
+              <label class="text-slate-900 dark:text-slate-100 text-sm font-bold leading-tight" for="country">Country
+                <span class="text-red-500">*</span></label>
+              <div class="relative">
+                <select
+                  class="flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-slate-900 dark:text-slate-100 focus:outline-0 focus:ring-0 border border-slate-300 dark:border-slate-700 bg-white dark:bg-gray-950 focus:border-indigo-600 h-12 px-4 text-base font-normal leading-normal appearance-none"
+                  id="country" name="company_group[country]" required>
+                  <option disabled="" selected="" value="">Select a country</option>
+                  ${Object.entries(COUNTRIES).map(([code, name]) => {
+                    return `<option value="${code}">${name}</option>`
+                  }).join('')}
+                </select>
+                <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-slate-500">
+                  <span class="material-symbols-outlined">expand_more</span>
+                </div>
+              </div>
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -54,7 +67,7 @@ export default class CompanyGroup_NewController extends LayoutController {
                 <div class="relative">
                   <select
                     class="flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-slate-900 dark:text-slate-100 focus:outline-0 focus:ring-0 border border-slate-300 dark:border-slate-700 bg-white dark:bg-gray-950 focus:border-indigo-600 h-12 px-4 text-base font-normal leading-normal appearance-none"
-                    id="retailCategory" name="company_group[business_type]">
+                    id="retailCategory" name="company_group[business_type]" required>
                     <option disabled="" selected="" value="">Select a category</option>
                     <option value="retail">Retail</option>
                     <option value="education">Education</option>
@@ -67,28 +80,38 @@ export default class CompanyGroup_NewController extends LayoutController {
                   </div>
                 </div>
               </div>
+              
               <div class="flex flex-col gap-2">
-                <label class="text-slate-900 dark:text-slate-100 text-sm font-bold leading-tight" for="storeCount">Number of
-                  Locations <span class="text-red-500">*</span></label>
-                <input
-                  class="flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-slate-900 dark:text-slate-100 focus:outline-0 focus:ring-0 border border-slate-300 dark:border-slate-700 bg-white dark:bg-gray-950 focus:border-indigo-600 h-12 px-4 text-base font-normal leading-normal placeholder:text-slate-400"
-                  id="storeCount" name="company_group[company_count]" min="1" placeholder="1" type="number" />
+                <label class="text-slate-900 dark:text-slate-100 text-sm font-bold leading-tight" for="timezone">Timezone
+                  <span class="text-red-500">*</span></label>
+                <div class="relative">
+                  <select
+                    class="flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-slate-900 dark:text-slate-100 focus:outline-0 focus:ring-0 border border-slate-300 dark:border-slate-700 bg-white dark:bg-gray-950 focus:border-indigo-600 h-12 px-4 text-base font-normal leading-normal appearance-none"
+                    id="timezone" name="company_group[timezone]" required>
+                    <option disabled="" selected="" value="">Select timezone</option>
+                    ${Object.entries(TIMEZONES).map(([key, value]) => {
+                      return `<option value="${value}">UTC ${key}</option>`
+                    }).join('')}
+                  </select>
+                  <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-slate-500">
+                    <span class="material-symbols-outlined">expand_more</span>
+                  </div>
+                </div>
               </div>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div class="flex flex-col gap-2">
                 <label class="text-slate-900 dark:text-slate-100 text-sm font-bold leading-tight" for="currencyCode">Default
                   Currency <span class="text-red-500">*</span></label>
                 <div class="relative">
                   <select
                     class="flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-slate-900 dark:text-slate-100 focus:outline-0 focus:ring-0 border border-slate-300 dark:border-slate-700 bg-white dark:bg-gray-950 focus:border-indigo-600 h-12 px-4 text-base font-normal leading-normal appearance-none"
-                    id="currencyCode" name="company_group[currency]">
+                    id="currencyCode" name="company_group[currency]" required>
                     <option disabled="" selected="" value="">Select currency</option>
-                    <option value="USD">USD - U.S. Dollar</option>
-                    <option value="EUR">EUR - Euro</option>
-                    <option value="GBP">GBP - British Pound</option>
-                    <option value="VND">VND - Vietnamese Dong</option>
+                    ${Object.entries(CURRENCIES).map(([key, value]) => {
+                      return `<option value="${key}">${value}</option>`
+                    }).join('')}
                   </select>
                   <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-slate-500">
                     <span class="material-symbols-outlined">expand_more</span>
@@ -104,23 +127,6 @@ export default class CompanyGroup_NewController extends LayoutController {
                   id="taxId" name="company_group[tax_id]" placeholder="e.g. 12-3456789" type="text" />
               </div>
 
-              <div class="flex flex-col gap-2">
-                <label class="text-slate-900 dark:text-slate-100 text-sm font-bold leading-tight" for="timezone">Timezone
-                  <span class="text-red-500">*</span></label>
-                <div class="relative">
-                  <select
-                    class="flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-slate-900 dark:text-slate-100 focus:outline-0 focus:ring-0 border border-slate-300 dark:border-slate-700 bg-white dark:bg-gray-950 focus:border-indigo-600 h-12 px-4 text-base font-normal leading-normal appearance-none"
-                    id="timezone" name="company_group[timezone]">
-                    <option disabled="" selected="" value="">Select timezone</option>
-                    <option value="America/New_York">Eastern Time (EST)</option>
-                    <option value="Europe/London">London Time (GMT)</option>
-                    <option value="Asia/Ho_Chi_Minh">Ho Chi Minh Time (ICT)</option>
-                  </select>
-                  <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-slate-500">
-                    <span class="material-symbols-outlined">expand_more</span>
-                  </div>
-                </div>
-              </div>
             </div>
 
             <div class="flex flex-col gap-2">

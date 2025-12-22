@@ -6,11 +6,8 @@ class FacilityGroup < ApplicationRecord
   has_many :facilities, through: :facility_group_appointments, source: :appoint_to, source_type: "Facility"
 
   # --- Enums ---
-  enum :status, {
-    active: 0,
-    inactive: 1,
-    under_maintenance: 2
-  }
+  enum :lifecycle_status, LIFECYCLE_STATUS
+  enum :workflow_status, WORKFLOW_STATUS
 
   enum :business_type, {
     building: 0,
@@ -21,6 +18,6 @@ class FacilityGroup < ApplicationRecord
   # --- Validations ---
   validates :name, presence: true, length: { maximum: 255 }
   validates :code, presence: true, uniqueness: { scope: :company_id }
-  validates :status, presence: true
+
   validates :business_type, presence: true
 end

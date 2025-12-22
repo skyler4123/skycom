@@ -1,4 +1,5 @@
 Rails.application.routes.draw do
+  resources :categories
   resources :article_appointments
   resources :article_group_appointments
   resources :articles
@@ -24,18 +25,24 @@ Rails.application.routes.draw do
         resources :payments
         resources :employees
         resources :inventories
-        resources :sales
         resources :customers
         resources :invoices
         resources :schedules
         resources :attendances
         resources :reports
+        resources :documents
+        resources :announcements
+        resources :discounts
+        resources :events
+        resources :payslips
+        resources :tasks
+        resources :facilities
         resources :settings
         resources :administrators
       end
 
       namespace :pos do
-        resources :stores, only: [ :show ] do
+        resources :branches, only: [ :show ] do
           member do
             get :products
           end
@@ -169,9 +176,9 @@ Rails.application.routes.draw do
       get :fitness
     end
   end
+  mount MissionControl::Jobs::Engine, at: "/jobs"
   get "sign_out", to: "sessions#sign_out"
-
-
+  # ----------------------------------------------------------------------------------------------------
   # DEFAULTS
   get  "sign_in", to: "sessions#new"
   post "sign_in", to: "sessions#create"
@@ -204,4 +211,5 @@ Rails.application.routes.draw do
 
   # Defines the root path route ("/")
   # root "posts#index"
+  # ----------------------------------------------------------------------------------------------------
 end

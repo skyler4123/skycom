@@ -9,7 +9,8 @@ class CreateProductGroupAppointments < ActiveRecord::Migration[8.0]
       t.string :name
       t.string :description
       t.string :code
-      t.integer :status
+      t.integer :lifecycle_status
+      t.integer :workflow_status
       t.integer :business_type
       t.datetime :discarded_at
 

@@ -1,4 +1,4 @@
-class Retail::Management::SalesController < Retail::Management::ApplicationController
+class Retail::Management::TasksController < Retail::Management::ApplicationController
   def index
     respond_to do |format|
       format.html { render html: "", layout: true }

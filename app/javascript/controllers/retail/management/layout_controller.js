@@ -1,5 +1,5 @@
 import ApplicationController from "controllers/application_controller"
-import { currentCompanyGroup, companyGroups, capitalize, openPopover, poll } from "controllers/helpers"
+import { currentCompanyGroup, companyGroups, capitalize, openPopover, poll, darkmode, openByPathname, translate, triggerLanguageDropdown, languageCodeTextTarget } from "controllers/helpers"
 
 export default class Retail_Management_LayoutController extends ApplicationController {
   static targets = ["profileDropdown"]
@@ -75,95 +75,87 @@ export default class Retail_Management_LayoutController extends ApplicationContr
                 <a
                   class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:bg-blue-100 open:text-blue-600"
                   href="/retail/${this.currentCompanyGroup.id}/management/dashboard"
-                  ${this.openByPathname()}/
+                  ${openByPathname()}/
                 >
                   <span class="material-symbols-outlined">dashboard</span>
-                  <p class="text-sm font-medium leading-normal" ${this.translate("Dashboard")}>Dashboard</p>
+                  <p class="text-sm font-medium leading-normal" ${translate("Dashboard")}>Dashboard</p>
                 </a>
                 <a
                   class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:bg-blue-100 open:text-blue-600"
                   href="/retail/${this.currentCompanyGroup.id}/management/branches"
-                  ${this.openByPathname()}/
+                  ${openByPathname()}/
                 >
                   <span class="material-symbols-outlined">apartment</span>
-                  <p class="text-sm font-medium leading-normal">Branch</p>
+                  <p class="text-sm font-medium leading-normal">Branches</p>
                 </a>
                 <a
                   class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:bg-blue-100 open:text-blue-600"
                   href="/retail/${this.currentCompanyGroup.id}/management/departments"
-                  ${this.openByPathname()}/
+                  ${openByPathname()}/
                 >
                   <span class="material-symbols-outlined">family_group</span>
-                  <p class="text-sm font-medium leading-normal">Department</p>
+                  <p class="text-sm font-medium leading-normal">Departments</p>
                 </a>
                 <a
                   class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:bg-blue-100 open:text-blue-600"
                   href="/retail/${this.currentCompanyGroup.id}/management/products"
-                  ${this.openByPathname()}/
+                  ${openByPathname()}/
                 >
                   <span class="material-symbols-outlined">inventory_2</span>
-                  <p class="text-sm font-medium leading-normal">Product</p>
+                  <p class="text-sm font-medium leading-normal">Products</p>
                 </a>
                 <a
                   class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:bg-blue-100 open:text-blue-600"
                   href="/retail/${this.currentCompanyGroup.id}/management/orders"
-                  ${this.openByPathname()}/
+                  ${openByPathname()}/
                 >
                   <span class="material-symbols-outlined">order_approve</span>
-                  <p class="text-sm font-medium leading-normal">Order</p>
+                  <p class="text-sm font-medium leading-normal">Orders</p>
                 </a>
                 <a
                   class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:bg-blue-100 open:text-blue-600"
                   href="/retail/${this.currentCompanyGroup.id}/management/bookings"
-                  ${this.openByPathname()}/
+                  ${openByPathname()}/
                 >
                   <span class="material-symbols-outlined">calendar_month</span>
-                  <p class="text-sm font-medium leading-normal">Booking</p>
+                  <p class="text-sm font-medium leading-normal">Bookings</p>
                 </a>
                 <a
                   class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:bg-blue-100 open:text-blue-600"
                   href="/retail/${this.currentCompanyGroup.id}/management/payments"
-                  ${this.openByPathname()}/
+                  ${openByPathname()}/
                 >
                   <span class="material-symbols-outlined">payments</span>
-                  <p class="text-sm font-medium leading-normal">Payment</p>
+                  <p class="text-sm font-medium leading-normal">Payments</p>
                 </a>
                 <a
                   class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:bg-blue-100 open:text-blue-600"
                   href="/retail/${this.currentCompanyGroup.id}/management/employees"
-                  ${this.openByPathname()}/
+                  ${openByPathname()}/
                 >
                   <span class="material-symbols-outlined">groups</span>
-                  <p class="text-sm font-medium leading-normal">Employee</p>
+                  <p class="text-sm font-medium leading-normal">Employees</p>
                 </a>
                 <a
                   class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:bg-blue-100 open:text-blue-600"
                   href="/retail/${this.currentCompanyGroup.id}/management/inventories"
-                  ${this.openByPathname()}/
+                  ${openByPathname()}/
                 >
                   <span class="material-symbols-outlined">inventory</span>
-                  <p class="text-sm font-medium leading-normal">Inventory</p>
-                </a>
-                <a
-                  class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:bg-blue-100 open:text-blue-600"
-                  href="/retail/${this.currentCompanyGroup.id}/management/sales"
-                  ${this.openByPathname()}/
-                >
-                  <span class="material-symbols-outlined">add_shopping_cart</span>
-                  <p class="text-sm font-medium leading-normal">Sales</p>
+                  <p class="text-sm font-medium leading-normal">Inventories</p>
                 </a>
                 <a
                   class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:bg-blue-100 open:text-blue-600"
                   href="/retail/${this.currentCompanyGroup.id}/management/customers"
-                  ${this.openByPathname()}/
+                  ${openByPathname()}/
                 >
                   <span class="material-symbols-outlined">person_add</span>
-                  <p class="text-sm font-medium leading-normal">Customer</p>
+                  <p class="text-sm font-medium leading-normal">Customers</p>
                 </a>
                 <a
                   class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:bg-blue-100 open:text-blue-600"
                   href="/retail/${this.currentCompanyGroup.id}/management/invoices"
-                  ${this.openByPathname()}/
+                  ${openByPathname()}/
                 >
                   <span class="material-symbols-outlined">receipt_long</span>
                   <p class="text-sm font-medium leading-normal">Invoices</p>
@@ -171,40 +163,98 @@ export default class Retail_Management_LayoutController extends ApplicationContr
                 <a
                   class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:bg-blue-100 open:text-blue-600"
                   href="/retail/${this.currentCompanyGroup.id}/management/schedules"
-                  ${this.openByPathname()}/
+                  ${openByPathname()}/
                 >
                   <span class="material-symbols-outlined">calendar_month</span>
-                  <p class="text-sm font-medium leading-normal">Schedule</p>
+                  <p class="text-sm font-medium leading-normal">Schedules</p>
                 </a>
                 <a
                   class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:bg-blue-100 open:text-blue-600"
                   href="/retail/${this.currentCompanyGroup.id}/management/attendances"
-                  ${this.openByPathname()}/
+                  ${openByPathname()}/
                 >
                   <span class="material-symbols-outlined">fact_check</span>
-                  <p class="text-sm font-medium leading-normal">Attendance</p>
+                  <p class="text-sm font-medium leading-normal">Attendances</p>
                 </a>
                 <a
                   class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:bg-blue-100 open:text-blue-600"
                   href="/retail/${this.currentCompanyGroup.id}/management/reports"
-                  ${this.openByPathname()}/
+                  ${openByPathname()}/
                 >
-                  <span class="material-symbols-outlined">bar_chart</span>
+                  <span class="material-symbols-outlined">report_problem</span>
                   <p class="text-sm font-medium leading-normal">Reports</p>
                 </a>
-                </div>
+                <a
+                  class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:bg-blue-100 open:text-blue-600"
+                  href="/retail/${this.currentCompanyGroup.id}/management/documents"
+                  ${openByPathname()}/
+                >
+                  <span class="material-symbols-outlined">description</span>
+                  <p class="text-sm font-medium leading-normal">Documents</p>
+                </a>
+                <a
+                  class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:bg-blue-100 open:text-blue-600"
+                  href="/retail/${this.currentCompanyGroup.id}/management/announcements"
+                  ${openByPathname()}/
+                >
+                  <span class="material-symbols-outlined">campaign</span>
+                  <p class="text-sm font-medium leading-normal">Announcements</p>
+                </a>
+                <a
+                  class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:bg-blue-100 open:text-blue-600"
+                  href="/retail/${this.currentCompanyGroup.id}/management/events"
+                  ${openByPathname()}/
+                >
+                  <span class="material-symbols-outlined">event</span>
+                  <p class="text-sm font-medium leading-normal">Events</p>
+                </a>
+                <a
+                  class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:bg-blue-100 open:text-blue-600"
+                  href="/retail/${this.currentCompanyGroup.id}/management/discounts"
+                  ${openByPathname()}/
+                >
+                  <span class="material-symbols-outlined">percent</span>
+                  <p class="text-sm font-medium leading-normal">Discounts</p>
+                </a>
+                                <a
+                  class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:bg-blue-100 open:text-blue-600"
+                  href="/retail/${this.currentCompanyGroup.id}/management/tasks"
+                  ${openByPathname()}/
+                >
+                  <span class="material-symbols-outlined">check_box</span>
+                  <p class="text-sm font-medium leading-normal">Tasks</p>
+                </a>
+                <a
+                  class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:bg-blue-100 open:text-blue-600"
+                  href="/retail/${this.currentCompanyGroup.id}/management/payslips"
+                  ${openByPathname()}/
+                >
+                  <span class="material-symbols-outlined">receipt</span>
+                  <p class="text-sm font-medium leading-normal">Payslips</p>
+                </a>
+                <a
+                  class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:bg-blue-100 open:text-blue-600"
+                  href="/retail/${this.currentCompanyGroup.id}/management/facilities"
+                  ${openByPathname()}/
+                >
+                  <span class="material-symbols-outlined">warehouse</span>
+                  <p class="text-sm font-medium leading-normal">Facilities</p>
+                </a>
+              </div>
             </nav>
             <div class="p-4 border-t border-gray-200 dark:border-gray-800">
               <div class="flex flex-col gap-2">
                 <a
                   class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:bg-blue-100 open:text-blue-600"
+                  ${openByPathname()}
                   href="/retail/${this.currentCompanyGroup.id}/management/settings"
                 >
                   <span class="material-symbols-outlined">settings</span>
-                  <p class="text-sm font-medium leading-normal">Setting</p>
+                  <p class="text-sm font-medium leading-normal">Settings</p>
                 </a>
                 <a
                   class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:bg-blue-100 open:text-blue-600"
+                  ${openByPathname()}
                   href="/retail/${this.currentCompanyGroup.id}/management/administrators"
                 >
                   <span class="material-symbols-outlined">admin_panel_settings</span>
@@ -235,13 +285,13 @@ export default class Retail_Management_LayoutController extends ApplicationContr
               <div class="flex flex-1 justify-end gap-4 items-center">
                 <button
                   class="flex cursor-pointer items-center justify-center overflow-hidden rounded-full h-10 w-10 p-2 hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-600 dark:text-gray-300"
-                  ${this.darkmode()}
+                  ${darkmode()}
                 </button>
                 <button
                   class="flex cursor-pointer items-center justify-center overflow-hidden rounded-full h-10 w-10 hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-600 dark:text-gray-300"
-                  ${this.triggerLanguageDropdown()}
+                  ${triggerLanguageDropdown()}
                 >
-                  <span ${this.languageCodeTextTarget()}></span>
+                  <span ${languageCodeTextTarget()}></span>
                 </button>
                 <button
                   class="flex cursor-pointer items-center justify-center overflow-hidden rounded-full h-10 w-10 hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-600 dark:text-gray-300">

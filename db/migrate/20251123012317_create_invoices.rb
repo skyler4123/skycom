@@ -2,11 +2,7 @@ class CreateInvoices < ActiveRecord::Migration[8.0]
   def change
     create_table :invoices, id: :uuid do |t|
       t.references :order, null: false, foreign_key: true, type: :uuid
-      t.integer :education_type
-      t.integer :hospital_type
-      t.integer :hotel_type
-      t.integer :restaurant_type
-      t.integer :retail_type
+      t.references :category, null: true, foreign_key: true, type: :uuid
 
       t.string :name
       t.string :description
@@ -16,7 +12,8 @@ class CreateInvoices < ActiveRecord::Migration[8.0]
       t.string :number
       t.decimal :total_price
       t.datetime :due_date
-      t.integer :status
+      t.integer :lifecycle_status
+      t.integer :workflow_status
       t.integer :business_type
       t.datetime :discarded_at
 
