@@ -40,12 +40,30 @@ export const setCookie = (name, value, days) => {
 
 // --- User & Auth ---
 /**
- * Retrieves the current user from the 'current_user' cookie.
- * @returns {object|null} The current user object, or null if not found.
+ * Helper object to access current session context like user and company group.
  */
-export const currentUser = () => {
-  const c = Cookie('current_user');
-  return c ? JSON.parse(c) : null;
+export const Current = {
+  /**
+   * Retrieves the current user from the 'current_user' cookie.
+   * @returns {object|null} The current user object, or null if not found.
+   */
+  user() {
+    const c = Cookie('current_user');
+    return c ? JSON.parse(c) : null;
+  },
+  /**
+   * Determines the current company group based on the URL path.
+   * @returns {object|undefined|null} The current company group object if found in the path.
+   */
+  companyGroup() {
+    const groups = companyGroups();
+    const currentPath = pathname();
+
+    if (!Array.isArray(groups)) {
+      return null;
+    }
+    return groups.find(group => currentPath.includes(String(group.id)));
+  }
 }
 
 /**
@@ -65,19 +83,6 @@ export const companyGroups = () => {
   return c ? JSON.parse(c) : [];
 }
 
-/**
- * Determines the current company group based on the URL path.
- * @returns {object|undefined|null} The current company group object if found in the path.
- */
-export const currentCompanyGroup = () => {
-  const groups = companyGroups();
-  const currentPath = pathname();
-
-  if (!Array.isArray(groups)) {
-    return null;
-  }
-  return groups.find(group => currentPath.includes(String(group.id)));
-}
 
 // --- Paths ---
 /**

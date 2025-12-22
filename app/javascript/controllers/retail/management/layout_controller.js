@@ -1,5 +1,5 @@
 import ApplicationController from "controllers/application_controller"
-import { currentCompanyGroup, companyGroups, capitalize, openPopover, poll, darkmode, openByPathname, translate, triggerLanguageDropdown, languageCodeTextTarget } from "controllers/helpers"
+import { companyGroups, capitalize, openPopover, poll, darkmode, openByPathname, translate, triggerLanguageDropdown, languageCodeTextTarget, Current } from "controllers/helpers"
 
 export default class Retail_Management_LayoutController extends ApplicationController {
   static targets = ["profileDropdown"]
@@ -22,7 +22,7 @@ export default class Retail_Management_LayoutController extends ApplicationContr
     // This handles race conditions during redirects where the JS loads
     // before the URL is updated.
     poll(() => {
-      this.currentCompanyGroup = currentCompanyGroup();
+      this.currentCompanyGroup = Current.companyGroup();
       if (this.currentCompanyGroup) {
         this.element.className = 'min-h-screen flex flex-col';
         this.element.innerHTML = this.layoutHTML();

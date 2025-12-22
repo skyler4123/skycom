@@ -13,7 +13,7 @@ export default class Education_LayoutController extends ApplicationController {
   }
 
   initBindings() {
-    this.currentCompanyGroup = Helpers.currentCompanyGroup();
+    this.currentCompanyGroup = Helpers.Current.companyGroup();
     this.companyGroups = Helpers.companyGroups();
   }
 
