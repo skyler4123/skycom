@@ -149,3 +149,15 @@ export const triggerLanguageDropdown = () => `data-language-target="triggerDropd
 export const languageCodeTextTarget = () => `data-language-target="codeText"`
 export const addOpenTrigger = (key, index) => `data-open-target="trigger" data-action="click->open#click" data-open-key-param="${key}" data-open-index-param="${index}"`
 export const addOpenListener = (key, index) => `data-open-target="listener" data-open-key-param="${key}" data-open-index-param="${index}"`
+export const identifier = (controller) => {
+  let identifier
+  identifier = controller.name
+  identifier = identifier.replace('Controller', '')
+  identifier = identifier.replaceAll('_', 'NAMESPACE')
+  identifier = identifier
+  .match(/[A-Z]{2,}(?=[A-Z][a-z]+[0-9]*|\b)|[A-Z]?[a-z]+[0-9]*|[A-Z]|[0-9]+/g)
+  .map(x => x.toLowerCase())
+  .join('-');
+  identifier = identifier.replaceAll('namespace', '')
+  return identifier
+}
