@@ -97,11 +97,3 @@ export const signUpPath = () => `/sign_up`
  * @returns {string} "/sign_out"
  */
 export const signOutPath = () => `/sign_out`
-
-/**
- * Generates the path for a specific retail POS branch.
- * @param {string|number} retailId - The ID of the retail company group.
- * @param {string|number} branchId - The ID of the branch.
- * @returns {string} The formatted path.
- */
-export const retailPosBranchPath = (retailId, branchId) => `/retail/${retailId}/pos/branches/${branchId}`
