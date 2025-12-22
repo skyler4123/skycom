@@ -2,11 +2,22 @@ import Swal from 'sweetalert2';
 import dayjs from 'dayjs';
 import { capitalize } from "controllers/helpers/data_helpers" 
 
-// --- Formatting & Badges ---
+/**
+ * Formats a given time using dayjs.
+ * @param {string | number | Date | dayjs.Dayjs} time - The time to format.
+ * @param {string} [format="DD/MM/YYYY"] - The format string for dayjs.
+ * @returns {string} The formatted time string.
+ */
 export const timeFormat = (time, format = "DD/MM/YYYY") => {
   return dayjs(time).format(format)
 }
 
+/**
+ * Generates an HTML string for a status badge.
+ * The color of the badge is determined by the status string.
+ * @param {string} status - The status string (e.g., "active", "pending").
+ * @returns {string} The HTML string for the badge, or an empty string if status is falsy.
+ */
 export const statusBadge = (status) => {
   if (!status) return ""
   const statusKey = String(status).toLowerCase()
@@ -48,7 +59,11 @@ export const statusBadge = (status) => {
   `
 }
 
-// --- DOM Manipulation ---
+/**
+ * Toggles the 'open' attribute on a given DOM element.
+ * If the element has the attribute, it's removed. If not, it's added.
+ * @param {HTMLElement} element - The element to toggle the attribute on.
+ */
 export const toggleOpenAttribute = (element) => {
   if (element.hasAttribute('open')) {
     element.removeAttribute('open')
@@ -57,6 +72,11 @@ export const toggleOpenAttribute = (element) => {
   }
 }
 
+/**
+ * Adds a Stimulus action to an element's 'data-action' attribute, preventing duplicates.
+ * @param {HTMLElement} element - The element to add the action to.
+ * @param {string} action - The action string to add (e.g., "click->controller#action").
+ */
 export const addAction = (element, action) => {
   const existingActions = element.getAttribute("data-action") || "";
   const actionSet = new Set(existingActions.split(" ").filter(Boolean));
@@ -64,6 +84,12 @@ export const addAction = (element, action) => {
   element.setAttribute("data-action", Array.from(actionSet).join(" "));
 }
 
+/**
+ * Adds a value to a space-separated attribute on an element, preventing duplicates.
+ * @param {HTMLElement} element - The element to modify.
+ * @param {string} attribute - The attribute name (e.g., "data-my-attribute").
+ * @param {string} value - The value to add to the attribute.
+ */
 export const addAttribute = (element, attribute, value) => {
   const existingAttributes = element.getAttribute(attribute) || "";
   const attributeSet = new Set(existingAttributes.split(" ").filter(Boolean));
@@ -71,7 +97,13 @@ export const addAttribute = (element, attribute, value) => {
   element.setAttribute(attribute, Array.from(attributeSet).join(" "));
 }
 
-// --- Modals & Popovers ---
+/**
+ * Opens a SweetAlert2 modal.
+ * @param {object} config - The configuration for the modal.
+ * @param {string} [config.html="Model!"] - The HTML content of the modal.
+ * @param {object} [config.customClass={}] - Custom classes for the modal elements.
+ * @param {object} [config.options={}] - Other SweetAlert2 options.
+ */
 export const openModal = ({html = "Model!", customClass = {}, options = {}}) => {
   Swal.fire({
     html: html,
@@ -89,6 +121,14 @@ export const openModal = ({html = "Model!", customClass = {}, options = {}}) => 
   });
 }
 
+/**
+ * Opens a SweetAlert2 popover positioned relative to a parent element.
+ * @param {object} config - The configuration for the popover.
+ * @param {HTMLElement} config.parentElement - The element to position the popover against.
+ * @param {string} [config.html="Dialog content"] - The HTML content of the popover.
+ * @param {('top-left'|'top-right'|'top-center'|'bottom-left'|'bottom-right'|'bottom-center'|'left-center'|'right-center'|'center-center')} [config.position='bottom-center'] - The position of the popover relative to the parent.
+ * @param {string} [config.className=""] - Additional CSS classes for the popover.
+ */
 export const openPopover = ({parentElement, html = "Dialog content", position = 'bottom-center', className = ""}) => {
   const parentRect = parentElement.getBoundingClientRect();
   const parentTop = parentRect.top;
@@ -138,20 +178,72 @@ export const openPopover = ({parentElement, html = "Dialog content", position = 
   });
 }
 
+/**
+ * Closes any open SweetAlert2 modal or popover.
+ */
 export const closeSwal = () => Swal.close()
+
+/**
+ * Closes any open SweetAlert2 modal or popover. Alias for closeSwal.
+ */
 export const closeModal = () => Swal.close()
 
-// --- Stimulus Attributes ---
+/**
+ * Returns the data-controller attribute string for the darkmode controller.
+ * @returns {string} `data-controller="darkmode"`
+ */
 export const darkmode = () => `data-controller="darkmode"`
+
+/**
+ * Returns the data-link-target attribute string for opening links by pathname.
+ * @returns {string} `data-link-target="openByPathname"`
+ */
 export const openByPathname = () => `data-link-target="openByPathname"`
+
+/**
+ * Returns a data-language-key attribute string for translation.
+ * @param {string} key - The translation key.
+ * @returns {string} `data-language-key="..."`
+ */
 export const translate = (key) => `data-language-key="${key}"`
+
+/**
+ * Returns the data-language-target attribute string for the language dropdown trigger.
+ * @returns {string} `data-language-target="triggerDropdown"`
+ */
 export const triggerLanguageDropdown = () => `data-language-target="triggerDropdown"`
+
+/**
+ * Returns the data-language-target attribute string for the language code text.
+ * @returns {string} `data-language-target="codeText"`
+ */
 export const languageCodeTextTarget = () => `data-language-target="codeText"`
+
+/**
+ * Returns the data attributes for a Stimulus 'open' controller trigger.
+ * @param {string} key - The key to identify a group of listeners.
+ * @param {string|number} index - The index to identify a specific listener within the group.
+ * @returns {string} The full data attribute string for an open trigger.
+ */
 export const addOpenTrigger = (key, index) => `data-open-target="trigger" data-action="click->open#click" data-open-key-param="${key}" data-open-index-param="${index}"`
+
+/**
+ * Returns the data attributes for a Stimulus 'open' controller listener.
+ * @param {string} key - The key to identify this listener group.
+ * @param {string|number} index - The index to uniquely identify this listener.
+ * @returns {string} The full data attribute string for an open listener.
+ */
 export const addOpenListener = (key, index) => `data-open-target="listener" data-open-key-param="${key}" data-open-index-param="${index}"`
-export const identifier = (controller) => {
+
+/**
+ * Generates a kebab-case Stimulus controller identifier from a controller object/class.
+ * It takes the controller's name, removes "Controller", and converts it to kebab-case.
+ * @param {{name: string}} controllerObject - The Stimulus controller instance or class.
+ * @returns {string} The kebab-case identifier.
+ */
+export const identifier = (controllerObject) => {
   let identifier
-  identifier = controller.name
+  identifier = controllerObject.name
   identifier = identifier.replace('Controller', '')
   identifier = identifier.replaceAll('_', 'NAMESPACE')
   identifier = identifier
