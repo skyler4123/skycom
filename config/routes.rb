@@ -42,7 +42,7 @@ Rails.application.routes.draw do
       end
 
       namespace :pos do
-        resources :stores, only: [ :show ] do
+        resources :branches, only: [ :show ] do
           member do
             get :products
           end

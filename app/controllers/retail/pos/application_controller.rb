@@ -1,10 +1,10 @@
 class Retail::Pos::ApplicationController < Retail::ApplicationController
-  before_action :set_store
+  before_action :set_branch
 
   private
 
-  def set_store
-    store_id = params[:id]
-    @store = Company.find(store_id) if store_id.present?
+  def set_branch
+    branch_id = params[:id]
+    @branch = Company.find(branch_id) if branch_id.present?
   end
 end
