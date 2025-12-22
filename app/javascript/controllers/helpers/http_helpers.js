@@ -78,17 +78,21 @@ export const csrfToken = () => {
  * Useful for injecting into forms.
  * @returns {string} The HTML string for the hidden input.
  */
-export const csrfTokenTag = () => {
+export const formPostSecurityTags = () => {
   const csrf = csrfToken()
   return `<input type="hidden" name="authenticity_token" value="${csrf}" autocomplete="off">`
 }
 
 /**
- * Generates an HTML string for a hidden input field to simulate a PATCH method.
- * @returns {string} The HTML string for the hidden input.
+ * Generates HTML strings for hidden input fields to simulate a PATCH method and include the CSRF token.
+ * @returns {string} The HTML string for the hidden inputs.
  */
-export const pathFormTag = () => {
-  return `<input type="hidden" name="_method" value="patch" autocomplete="off">`
+export const formPatchSecurityTags = () => {
+  const csrf = csrfToken()
+  return `
+    <input type="hidden" name="_method" value="patch" autocomplete="off">
+    <input type="hidden" name="authenticity_token" value="${csrf}" autocomplete="off">
+  `
 }
 
 /**
