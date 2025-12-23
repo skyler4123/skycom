@@ -9,6 +9,7 @@ class CreateSubscriptionAppointments < ActiveRecord::Migration[8.0]
       t.string :name
       t.string :description
       t.string :code
+      t.string :value
       t.integer :lifecycle_status
       t.integer :workflow_status
       t.integer :business_type
