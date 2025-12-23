@@ -91,9 +91,7 @@ Rails.application.routes.draw do
   resources :setting_group_appointments
   resources :setting_groups
   resources :subscription_appointments
-  resources :subscription_group_appointments
   resources :subscriptions
-  resources :subscription_groups
   resources :event_appointments
   resources :event_group_appointments
   resources :events

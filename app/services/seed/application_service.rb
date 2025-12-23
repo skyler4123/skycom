@@ -13,8 +13,8 @@ class Seed::ApplicationService
     Seed::BrandService.create # Seed global brands
 
     # Create company groups
-    multi_company_group_owner = Seed::UserService.create(email: "multi_company_group_owner_1@example.com")
-    Seed::MultiCompanyGroupService.new(user: multi_company_group_owner)
+    # multi_company_group_owner = Seed::UserService.create(email: "multi_company_group_owner_1@example.com")
+    # Seed::MultiCompanyGroupService.new(user: multi_company_group_owner)
 
     # multi_company_group_owner = Seed::UserService.create(email: "multi_company_group_owner_2@example.com")
     # Seed::MultiCompanyGroupService.new(user: multi_company_group_owner)
