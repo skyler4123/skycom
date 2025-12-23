@@ -1,4 +1,3 @@
-# db/migrate/2024XXXXXX_create_periods.rb
 class CreatePeriods < ActiveRecord::Migration[8.0]
   def change
     create_table :periods, id: :uuid do |t|
@@ -15,8 +14,7 @@ class CreatePeriods < ActiveRecord::Migration[8.0]
     # Enforce unique period per start/end/offset combination
     add_index :periods, 
               [:start_at, :end_at, :time_zone], 
-              unique: true, 
-              name: 'idx_periods_unique_start_end_offset',
+              unique: true,
               nulls_not_distinct: true
   end
 end

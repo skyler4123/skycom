@@ -17,7 +17,6 @@ class CreateUsers < ActiveRecord::Migration[8.0]
       t.string :avatar
       t.string :phone_number
       t.string :country_code
-      t.references :address, null: true, foreign_key: true, type: :uuid
       t.datetime :discarded_at
 
       t.timestamps

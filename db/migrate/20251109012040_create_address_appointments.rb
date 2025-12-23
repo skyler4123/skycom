@@ -1,7 +1,7 @@
-class CreatePriceAppointments < ActiveRecord::Migration[8.0]
+class CreateAddressAppointments < ActiveRecord::Migration[8.0]
   def change
-    create_table :price_appointments, id: :uuid do |t|
-      t.references :price, null: false, foreign_key: true, type: :uuid
+    create_table :address_appointments, id: :uuid do |t|
+      t.references :address, null: false, foreign_key: true, type: :uuid
       t.references :appoint_from, polymorphic: true, null: false, type: :uuid
       t.references :appoint_to, polymorphic: true, null: false, type: :uuid
       t.references :appoint_for, polymorphic: true, null: false, type: :uuid
@@ -17,6 +17,6 @@ class CreatePriceAppointments < ActiveRecord::Migration[8.0]
 
       t.timestamps
     end
-    add_index :price_appointments, :discarded_at
+    add_index :address_appointments, :discarded_at
   end
 end

@@ -1,4 +1,3 @@
-# db/migrate/2024XXXXXX_create_addresses.rb
 class CreateAddresses < ActiveRecord::Migration[8.0]
   def change
     create_table :addresses, id: :uuid do |t|

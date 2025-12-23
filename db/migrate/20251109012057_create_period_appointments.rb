@@ -17,5 +17,6 @@ class CreatePeriodAppointments < ActiveRecord::Migration[8.0]
 
       t.timestamps
     end
+    add_index :period_appointments, :discarded_at
   end
 end
