@@ -12,7 +12,7 @@ class Address < ApplicationRecord
   before_validation :generate_fingerprint
 
   # 3. Reusable Logic
-  def self.reusable_address(line_1:, city:, country_code:, line_2: nil, state: nil, zip: nil)
+  def self.reusable_create(line_1:, city:, country_code:, line_2: nil, state: nil, zip: nil)
     # create a temporary instance to calculate the hash
     temp = new(
       line_1: line_1, 

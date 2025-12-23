@@ -28,7 +28,7 @@ class Price < ApplicationRecord
 
   # 3. Reusable Logic
   # We downcase the currency input to ensure it matches the enum keys
-  def self.reusable_price(amount:, currency: :usd)
+  def self.reusable_create(amount:, currency: :usd)
     # The currency argument can be a string "USD", symbol :usd, or integer 0
     # Rails handles the conversion automatically if we pass it to find_or_create_by
     find_or_create_by(

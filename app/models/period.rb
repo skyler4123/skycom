@@ -41,7 +41,7 @@ class Period < ApplicationRecord
   }
 
   # 3. Reusable Logic
-  def self.reusable_period(start_at:, end_at: nil, time_zone: 0)
+  def self.reusable_create(start_at:, end_at: nil, time_zone: 0)
     # You can pass the integer (7) or the key (:plus_7)
     find_or_create_by(
       start_at: start_at,

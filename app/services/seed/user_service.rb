@@ -1,12 +1,4 @@
 class Seed::UserService
-  def self.run
-    User.destroy_all
-
-    3.times do |index|
-      self.create(index: index)
-    end
-  end
-
   def self.create(
     parent_user: nil,
     email:,
