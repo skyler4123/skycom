@@ -21,7 +21,10 @@ class CreateSubscriptions < ActiveRecord::Migration[8.0]
       # default: 0 (Pending Action)
       t.integer :workflow_status, default: 0, null: false
 
-      # 4. Settings
+      # 4. Region
+      t.string :country_code
+
+      # 5. Settings
       t.boolean :auto_renew, default: true, null: false
 
       t.timestamps

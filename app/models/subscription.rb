@@ -34,6 +34,9 @@ class Subscription < ApplicationRecord
 
   # --- Validations ---
   validates :lifecycle_status, :workflow_status, :plan_name, presence: true
+  validates :country_code, presence: true, length: { is: 2 }
+
+  normalizes :country_code, with: -> { _1.strip.upcase }
 
   # --- Delegations (Shortcuts) ---
   delegate :amount, :currency, to: :price

@@ -17,6 +17,7 @@ class Seed::ApplicationService
     user_2 = Seed::UserService.create(email: "user_2@example.com")
     user_3 = Seed::UserService.create(email: "user_3@example.com")
     Seed::AddressService.create
+    Seed::SubscriptionService.create(user: user_1)
     # Create company groups
     # multi_company_group_owner = Seed::UserService.create(email: "multi_company_group_owner_1@example.com")
     # Seed::MultiCompanyGroupService.new(user: multi_company_group_owner)
