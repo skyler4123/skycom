@@ -37,6 +37,7 @@ class User < ApplicationRecord
   # A user can own multiple companies. If the user is deleted, their companies are also destroyed.
   has_one :address_appointment, as: :appoint_to, dependent: :destroy
   has_one :address, dependent: :destroy, through: :address_appointment
+  has_one :subscription, dependent: :destroy
 
   has_many :company_groups, dependent: :destroy
   has_one :employee, dependent: :destroy
