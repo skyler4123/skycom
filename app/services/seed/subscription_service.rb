@@ -8,14 +8,21 @@ class Seed::SubscriptionService
       return
     end
 
-    # 2. Setup Price (Find or Create to avoid duplicates)
-    # Using typical SaaS price points
+    # 2. Determine Country and Plan
+    # Prefer user's country, otherwise random from supported list
+    country_code = user.country_code.presence || SUBSCRIPTION_PRICING_PLANS.keys.sample
+    country_code = "US" unless SUBSCRIPTION_PRICING_PLANS.key?(country_code) # Fallback
+
+    plan_name = Subscription.plan_names.keys.sample
+    price_info = SUBSCRIPTION_PRICING_PLANS[country_code][plan_name.to_sym]
+
+    # 3. Setup Price (Find or Create to avoid duplicates)
     price = Price.find_or_create_by!(
-      amount: [ 0.0, 9.99, 29.99, 99.99 ].sample,
-      currency: 0 # Assuming 0 maps to USD/Default
+      amount: price_info[:amount],
+      currency: price_info[:currency]
     )
 
-    # 3. Setup Period (Current Month)
+    # 4. Setup Period (Current Month)
     # Using beginning_of_hour to ensure clean timestamps for finding existing records
     start_at = Time.current.beginning_of_hour
     end_at   = 1.month.from_now.beginning_of_hour
@@ -26,15 +33,15 @@ class Seed::SubscriptionService
       time_zone: 0
     )
 
-    # 4. Create Subscription
+    # 5. Create Subscription
     Subscription.create!(
       user: user,
       period: period,
       price: price,
-      plan_name: Subscription.plan_names.keys.sample,
+      plan_name: plan_name,
       lifecycle_status: :live,
       workflow_status: :active,
-      country_code: Faker::Address.country_code,
+      country_code: country_code,
       auto_renew: [ true, false ].sample
     )
   end
