@@ -1,5 +1,8 @@
+# How to use: Dont update records, always find_or_create to reuse existing periods.
 # app/models/period.rb
 class Period < ApplicationRecord
+  include ImmutableRecordConcern
+
   # 1. Define the Enum with Valid Method Names
   # We map safe names (e.g., :plus_7) to your values (7).
   enum :time_zone, {
@@ -35,8 +38,8 @@ class Period < ApplicationRecord
   validates :time_zone, presence: true
 
   # Uniqueness constraint
-  validates :start_at, uniqueness: { 
-    scope: [:end_at, :time_zone],
+  validates :start_at, uniqueness: {
+    scope: [ :end_at, :time_zone ],
     message: "already exists with this time and offset"
   }
 
@@ -53,7 +56,7 @@ class Period < ApplicationRecord
   # 4. Helper: Format the offset for display (e.g., returns "+07:00")
   def formatted_offset
     # time_zone returns the string key (e.g., "plus_7"), so we fetch the integer value
-    val = Period.time_zones[time_zone] 
+    val = Period.time_zones[time_zone]
     sign = val >= 0 ? "+" : "-"
     "#{sign}#{val.abs.to_s.rjust(2, '0')}:00"
   end
@@ -79,5 +82,5 @@ end
 # puts p1.offset_minus_5?    # => false
 
 # # Display
-# puts "Time: #{p1.start_at} (UTC#{p1.formatted_offset})" 
+# puts "Time: #{p1.start_at} (UTC#{p1.formatted_offset})"
 # # => "Time: 2024-12-25 10:00:00 (UTC+07:00)"

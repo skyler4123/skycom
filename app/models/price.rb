@@ -1,27 +1,31 @@
+# How to use: Dont update records, always find_or_create to reuse existing periods.
+
 # app/models/price.rb
 class Price < ApplicationRecord
+  include ImmutableRecordConcern
+
   # 1. Define the Enum
   # Map integers to currency codes. Add new currencies to the END of the list.
   # DO NOT change the integer value of existing currencies once you have data.
-  enum :currency, { 
-    usd: 0, 
-    eur: 1, 
-    gbp: 2, 
-    jpy: 3, 
-    aud: 4, 
+  enum :currency, {
+    usd: 0,
+    eur: 1,
+    gbp: 2,
+    jpy: 3,
+    aud: 4,
     cad: 5,
     vnd: 6
     # add more here...
   }, default: :usd
 
   # 2. Validations
-  # Rails enum validation happens automatically on assignment, 
+  # Rails enum validation happens automatically on assignment,
   # but presence ensures we don't save nils.
   validates :amount, presence: true, numericality: { greater_than_or_equal_to: 0 }
   validates :currency, presence: true
 
   # Enforce Uniqueness
-  validates :amount, uniqueness: { 
+  validates :amount, uniqueness: {
     scope: :currency,
     message: "already exists for this currency"
   }

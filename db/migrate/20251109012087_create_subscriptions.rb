@@ -12,11 +12,11 @@ class CreateSubscriptions < ActiveRecord::Migration[8.0]
       t.integer :plan_name, default: 0, null: false
 
       # 3. Two-Dimensional Status (Integer Enums)
-      
+
       # Lifecycle: Is this record technically alive in the system?
       # default: 0 (Draft/Initialized)
       t.integer :lifecycle_status, default: 0, null: false
-      
+
       # Workflow: Where is the user in the payment journey?
       # default: 0 (Pending Action)
       t.integer :workflow_status, default: 0, null: false
@@ -32,7 +32,7 @@ class CreateSubscriptions < ActiveRecord::Migration[8.0]
 
     # Indexes for high-performance queries
     # e.g. "Find all Live subscriptions that are Past Due"
-    add_index :subscriptions, [:lifecycle_status, :workflow_status]
-    add_index :subscriptions, [:user_id, :lifecycle_status]
+    add_index :subscriptions, [ :lifecycle_status, :workflow_status ]
+    add_index :subscriptions, [ :user_id, :lifecycle_status ]
   end
 end

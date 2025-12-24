@@ -2010,6 +2010,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_12_10_103114) do
     t.integer "plan_name", default: 0, null: false
     t.integer "lifecycle_status", default: 0, null: false
     t.integer "workflow_status", default: 0, null: false
+    t.string "country_code"
     t.boolean "auto_renew", default: true, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false

@@ -86,6 +86,5 @@ gem "omniauth-rails_csrf_protection"
 gem "faker"
 gem "aws-sdk-s3", require: false
 gem "mission_control-jobs"
-gem "identity_cache"
-gem "cityhash"        # optional, for faster hashing (C-Ruby only)
+
 # ----------------------------------------------------------------------------------------------------

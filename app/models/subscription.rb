@@ -5,12 +5,12 @@ class Subscription < ApplicationRecord
   belongs_to :price
 
   # --- 1. Plan Enum ---
-  enum :plan_name, { 
-    free: 0, 
-    basic: 10, 
-    pro: 20, 
-    enterprise: 30 
-  }, suffix: true # usage: sub.pro_plan_name?
+  enum :plan_name, {
+    free: 0,
+    basic: 10,
+    pro: 20,
+    enterprise: 30
+  }, prefix: true # usage: sub.plan_name_pro?
 
   # --- 2. Lifecycle Status (The Container) ---
   # Controls if the record is "Real" or "Trash/Hidden"
@@ -19,7 +19,7 @@ class Subscription < ApplicationRecord
     live: 10,        # The standard active state
     suspended: 20,   # Admin paused it (fraud/ban)
     archived: 30     # Soft deleted / Historical record
-  }, suffix: true
+  }, prefix: true # usage: sub.lifecycle_status_live?
 
   # --- 3. Workflow Status (The Journey) ---
   # Controls the financial/access logic
@@ -30,7 +30,7 @@ class Subscription < ApplicationRecord
     past_due: 30,      # Payment failed, but in grace period
     cancelled: 40,     # User requested cancel (might still have access until end date)
     expired: 50        # Time runs out, access revoked
-  }, suffix: true
+  }, prefix: true # usage: sub.workflow_status_active?
 
   # --- Validations ---
   validates :lifecycle_status, :workflow_status, :plan_name, presence: true
@@ -46,9 +46,10 @@ class Subscription < ApplicationRecord
   # Does the user actually get the features?
   def usable?
     # 1. System Check: Must be 'live' (not suspended or archived)
-    return false unless live_lifecycle_status?
+    # UPDATED: Was live_lifecycle_status? (suffix style)
+    return false unless lifecycle_status_live?
 
-    # 2. Business Check: 
+    # 2. Business Check:
     # They get access if Active, Trialing, or even Past Due (Grace Period).
     # They ALSO get access if Cancelled, provided the Period hasn't ended yet.
     case workflow_status

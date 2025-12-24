@@ -32,12 +32,12 @@ class User < ApplicationRecord
   include User::AvatarConcern
   include User::ChatImagesConcern
 
-
   # --- Business Logic Associations ---
   # A user can own multiple companies. If the user is deleted, their companies are also destroyed.
   has_one :address_appointment, as: :appoint_to, dependent: :destroy
   has_one :address, dependent: :destroy, through: :address_appointment
-  has_one :subscription, dependent: :destroy
+  has_many :subscriptions, dependent: :destroy
+  has_one :latest_subscription, -> { order(created_at: :desc) }, class_name: "Subscription"
 
   has_many :company_groups, dependent: :destroy
   has_one :employee, dependent: :destroy
@@ -63,8 +63,17 @@ class User < ApplicationRecord
   end
 
   include User::RetailConcern
-  include IdentityCache
 
-  cache_index :email, unique: true
+  def subscription_expired?
+    # If no subscription exists, they are technically not "active",
+    # but specific logic depends on if you treat "never subscribed" as "expired".
+    return true unless latest_subscription
+
+    latest_subscription.workflow_status_expired?
+  end
+
+  def active_subscriber?
+    latest_subscription.present? && !latest_subscription.workflow_status_expired?
+  end
   # ----------------------------------------------------------------------------------------------------
 end

@@ -17,7 +17,6 @@ class CompanyGroup < ApplicationRecord
   has_many :customers, dependent: :destroy
   has_many :customer_groups, dependent: :destroy
   has_many :orders, dependent: :destroy
-  has_many :periods, dependent: :destroy
   has_many :payment_method_appointments, dependent: :destroy
   has_many :task_groups, dependent: :destroy
   has_many :project_groups, dependent: :destroy
