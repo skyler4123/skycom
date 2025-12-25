@@ -5,6 +5,12 @@ class Seed::UserService
     password: "Password@1234",
     password_confirmation: "Password@1234",
     verified: true,
+    system_role: 0,
+    username: nil,
+    first_name: nil,
+    last_name: nil,
+    phone_number: nil,
+    country_code: nil,
     index: nil
   )
     email ||= "#{email}#{index}@example.com"
@@ -13,6 +19,12 @@ class Seed::UserService
       email: email,
       password: password,
       password_confirmation: password_confirmation,
+      system_role: system_role,
+      username: username,
+      first_name: first_name,
+      last_name: last_name,
+      phone_number: phone_number,
+      country_code: country_code,
       verified: verified
     )
     Seed::AttachmentService.attach(record: user, relation: :avatar_attachment, number: 1)

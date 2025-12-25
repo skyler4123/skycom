@@ -13,6 +13,9 @@ class Seed::ApplicationService
     Seed::BrandService.create # Seed global brands
 
     # User
+    admin_1 = Seed::UserService.create(email: "admin_1@example.com", system_role: 1)
+    admin_2 = Seed::UserService.create(email: "admin_2@example.com", system_role: 1)
+
     user_1 = Seed::UserService.create(email: "user_1@example.com")
     user_2 = Seed::UserService.create(email: "user_2@example.com")
     user_3 = Seed::UserService.create(email: "user_3@example.com")

@@ -46,6 +46,14 @@ class User < ApplicationRecord
   belongs_to :parent_user, class_name: "User", optional: true
   has_many :child_users, class_name: "User", foreign_key: "parent_user_id", dependent: :destroy
 
+  enum :system_role, {
+    super_admin: 0,
+    admin: 1,
+    company_owner: 2,
+    company_employee: 3,
+    company_customer: 4
+  }, prefix: true
+
   # --- Custom Methods ---
   # Alias for `parent_user` to provide a more descriptive name for the owner of a company.
   def company_owner

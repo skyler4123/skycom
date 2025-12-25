@@ -2154,6 +2154,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_12_10_103114) do
     t.string "provider"
     t.string "uid"
     t.uuid "parent_user_id"
+    t.integer "system_role"
     t.string "username"
     t.string "first_name"
     t.string "last_name"

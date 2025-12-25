@@ -22,7 +22,7 @@
 
 ##
   ### Core Models
-  bundle exec rails g scaffold User email
+  bundle exec rails g scaffold User email system_role
   bundle exec rails g migration AddDiscardedAtToUsers discarded_at:datetime:index
   bundle exec rails g scaffold CompanyGroup user:references name description code status:integer ownership_type:integer business_type:integer currency:integer registration_number:string vat_id:string address_line_1:string city:string postal_code:string country:string email:string phone_number:string website:string employee_count:integer fiscal_year_end_month:integer discarded_at:datetime:index --force
   bundle exec rails g scaffold Company company_group:references parent_company:references name description code status:integer ownership_type:integer business_type:integer currency:integer registration_number:string vat_id:string address_line_1:string city:string postal_code:string country:string email:string phone_number:string website:string employee_count:integer fiscal_year_end_month:integer discarded_at:datetime:index --force
