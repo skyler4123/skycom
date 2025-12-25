@@ -54,7 +54,7 @@ class Subscription < ApplicationRecord
   }
 
   # Clear the cache when a subscription changes so the user gets access immediately
-  after_commit { Rails.cache.delete("subscripted_user_ids") }
+  after_commit { Rails.cache.delete(["users", user_id, "active_subscription_status"]) }
 
   # --- The "Golden Rule" Access Check ---
   # Does the user actually get the features?

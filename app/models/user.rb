@@ -71,14 +71,15 @@ class User < ApplicationRecord
   def active_subscriber?
     return true if system_role_super_admin? || system_role_admin?
 
-    id.in?(User.subscripted_user_ids) || parent_user&.id&.in?(User.subscripted_user_ids)
+    # Check self or parent efficiently using granular caching
+    check_subscription_status(id) || (parent_user_id.present? && check_subscription_status(parent_user_id))
   end
 
   scope :with_active_subscription, -> { joins(:subscriptions).merge(Subscription.active_and_usable).distinct }
 
-  def self.subscripted_user_ids
-    Rails.cache.fetch("subscripted_user_ids", expires_in: 1.hour) do
-      with_active_subscription.pluck(:id)
+  def check_subscription_status(check_user_id)
+    Rails.cache.fetch(["users", check_user_id, "active_subscription_status"], expires_in: 1.hour) do
+      Subscription.where(user_id: check_user_id).active_and_usable.exists?
     end
   end
   # ----------------------------------------------------------------------------------------------------
