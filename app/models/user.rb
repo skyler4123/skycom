@@ -37,7 +37,6 @@ class User < ApplicationRecord
   has_one :address_appointment, as: :appoint_to, dependent: :destroy
   has_one :address, dependent: :destroy, through: :address_appointment
   has_many :subscriptions, dependent: :destroy
-  has_one :latest_subscription, -> { order(created_at: :desc) }, class_name: "Subscription"
 
   has_many :company_groups, dependent: :destroy
   has_one :employee, dependent: :destroy
@@ -66,22 +65,21 @@ class User < ApplicationRecord
     child_users
   end
 
-  def first_company_group_business_type
-    company_groups.first&.business_type
-  end
-
   include User::RetailConcern
 
-  def subscription_expired?
-    # If no subscription exists, they are technically not "active",
-    # but specific logic depends on if you treat "never subscribed" as "expired".
-    return true unless latest_subscription
+  # An user is "subscribed" if thier id/their parent_user_in included in User.subscripted_user_ids
+  def active_subscriber?
+    return true if system_role_super_admin? || system_role_admin?
 
-    latest_subscription.workflow_status_expired?
+    id.in?(User.subscripted_user_ids) || parent_user&.id&.in?(User.subscripted_user_ids)
   end
 
-  def active_subscriber?
-    latest_subscription.present? && !latest_subscription.workflow_status_expired?
+  scope :with_active_subscription, -> { joins(:subscriptions).merge(Subscription.active_and_usable).distinct }
+
+  def self.subscripted_user_ids
+    Rails.cache.fetch("subscripted_user_ids", expires_in: 1.hour) do
+      with_active_subscription.pluck(:id)
+    end
   end
   # ----------------------------------------------------------------------------------------------------
 end

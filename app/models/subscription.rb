@@ -42,6 +42,20 @@ class Subscription < ApplicationRecord
   delegate :amount, :currency, to: :price
   delegate :start_at, :end_at, :time_zone, to: :period
 
+  scope :active_and_usable, -> {
+    lifecycle_status_live
+      .joins(:period)
+      .where(
+        "subscriptions.workflow_status IN (?) OR (subscriptions.workflow_status = ? AND (periods.end_at IS NULL OR periods.end_at > ?))",
+        workflow_statuses.values_at(:trialing, :active, :past_due),
+        workflow_statuses[:cancelled],
+        Time.current
+      )
+  }
+
+  # Clear the cache when a subscription changes so the user gets access immediately
+  after_commit { Rails.cache.delete("subscripted_user_ids") }
+
   # --- The "Golden Rule" Access Check ---
   # Does the user actually get the features?
   def usable?
