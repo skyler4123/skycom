@@ -7,6 +7,9 @@ Rails.application.routes.draw do
     # to tell Rails that the controllers for these resources are located inside the "Admin
     # namespace (e.g., app/controllers/admin/users_controller.rb).
     resources :dashboard
+    resources :company_groups
+    resources :companies
+    resources :users
     resources :subscriptions
   end
 

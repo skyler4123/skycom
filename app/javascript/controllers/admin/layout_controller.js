@@ -1,3 +1,4 @@
+import * as Helpers from "controllers/helpers"
 import { Controller } from "@hotwired/stimulus"
 
 export default class Admin_LayoutController extends Controller {
@@ -27,15 +28,30 @@ export default class Admin_LayoutController extends Controller {
                 </div>
               </div>
               <div class="flex flex-col gap-1">
-                <a class="flex items-center gap-3 px-3 py-2.5 rounded-lg bg-blue-600/10 text-blue-600 group transition-colors"
-                  href="#">
-                  <span class="material-symbols-outlined fill">dashboard</span>
-                  <span class="text-sm font-semibold">System Overview</span>
+                <a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white transition-colors"
+                  href="/admin/dashboard">
+                  <span class="material-symbols-outlined">dashboard</span>
+                  <span class="text-sm font-medium">System Overview</span>
                 </a>
                 <a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white transition-colors"
-                  href="#">
+                  href="/admin/company_groups">
+                  <span class="material-symbols-outlined">domain</span>
+                  <span class="text-sm font-medium">Companies</span>
+                </a>
+                <a class="flex items-center gap-3 px-3 py-2.5 rounded-lg bg-blue-600/10 text-blue-600 group transition-colors"
+                  href="/admin/companies">
+                  <span class="material-symbols-outlined fill">store</span>
+                  <span class="text-sm font-semibold">Branches</span>
+                </a>
+                <a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white transition-colors"
+                  href="/admin/users">
                   <span class="material-symbols-outlined">group</span>
                   <span class="text-sm font-medium">User Accounts</span>
+                </a>
+                <a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white transition-colors"
+                  href="/admin/subscriptions">
+                  <span class="material-symbols-outlined">loyalty</span>
+                  <span class="text-sm font-medium">Subscriptions</span>
                 </a>
                 <a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white transition-colors"
                   href="#">
@@ -91,6 +107,20 @@ export default class Admin_LayoutController extends Controller {
                 </div>
               </div>
               <div class="flex items-center gap-4">
+
+
+                <button
+                  class="flex cursor-pointer items-center justify-center overflow-hidden rounded-full h-10 w-10 p-2 hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-600 dark:text-gray-300"
+                  ${Helpers.darkmode()}
+                </button>
+                <button
+                  class="flex cursor-pointer items-center justify-center overflow-hidden rounded-full h-10 w-10 hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-600 dark:text-gray-300"
+                  ${Helpers.triggerLanguageDropdown()}
+                >
+                  <span ${Helpers.languageCodeTextTarget()}></span>
+                </button>
+
+
                 <button
                   class="relative p-2 text-slate-500 hover:text-blue-600 transition-colors rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800">
                   <span class="material-symbols-outlined">notifications</span>

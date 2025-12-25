@@ -145,7 +145,7 @@ export const openPopover = ({parentElement, html = "Dialog content", position = 
     showCloseButton: false,
     customClass: {
       container: '!bg-transparent',
-      popup: 'swal2-container-custom w-fit! h-fit! p-0! rounded-none! bg-transparent!' + className,
+      popup: ' swal2-container-custom w-fit! h-fit! p-0! rounded-none! bg-transparent! ' + className,
       htmlContainer: '!p-0',
     },
     showClass: { popup: `animate__animated animate__fadeInUp animate__faster` },
