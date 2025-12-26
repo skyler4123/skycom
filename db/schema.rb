@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_12_26_095204) do
+ActiveRecord::Schema[8.0].define(version: 2025_12_26_231623) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pgcrypto"
@@ -67,6 +67,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_12_26_095204) do
     t.index ["appoint_by_type", "appoint_by_id"], name: "index_address_appointments_on_appoint_by"
     t.index ["appoint_for_type", "appoint_for_id"], name: "index_address_appointments_on_appoint_for"
     t.index ["appoint_from_type", "appoint_from_id"], name: "index_address_appointments_on_appoint_from"
+    t.index ["appoint_to_type", "appoint_to_id"], name: "idx_on_appoint_to_type_appoint_to_id_9dbaa804bc"
     t.index ["appoint_to_type", "appoint_to_id"], name: "index_address_appointments_on_appoint_to"
     t.index ["discarded_at"], name: "index_address_appointments_on_discarded_at"
   end
@@ -123,6 +124,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_12_26_095204) do
     t.index ["appoint_by_type", "appoint_by_id"], name: "index_article_appointments_on_appoint_by"
     t.index ["appoint_for_type", "appoint_for_id"], name: "index_article_appointments_on_appoint_for"
     t.index ["appoint_from_type", "appoint_from_id"], name: "index_article_appointments_on_appoint_from"
+    t.index ["appoint_to_type", "appoint_to_id"], name: "idx_on_appoint_to_type_appoint_to_id_aae71362ee"
     t.index ["appoint_to_type", "appoint_to_id"], name: "index_article_appointments_on_appoint_to"
     t.index ["article_id"], name: "index_article_appointments_on_article_id"
     t.index ["discarded_at"], name: "index_article_appointments_on_discarded_at"
@@ -150,6 +152,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_12_26_095204) do
     t.index ["appoint_by_type", "appoint_by_id"], name: "index_article_group_appointments_on_appoint_by"
     t.index ["appoint_for_type", "appoint_for_id"], name: "index_article_group_appointments_on_appoint_for"
     t.index ["appoint_from_type", "appoint_from_id"], name: "index_article_group_appointments_on_appoint_from"
+    t.index ["appoint_to_type", "appoint_to_id"], name: "idx_on_appoint_to_type_appoint_to_id_3810e29801"
     t.index ["appoint_to_type", "appoint_to_id"], name: "index_article_group_appointments_on_appoint_to"
     t.index ["article_group_id"], name: "index_article_group_appointments_on_article_group_id"
     t.index ["discarded_at"], name: "index_article_group_appointments_on_discarded_at"
@@ -414,6 +417,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_12_26_095204) do
     t.index ["appoint_by_type", "appoint_by_id"], name: "index_customer_appointments_on_appoint_by"
     t.index ["appoint_for_type", "appoint_for_id"], name: "index_customer_appointments_on_appoint_for"
     t.index ["appoint_from_type", "appoint_from_id"], name: "index_customer_appointments_on_appoint_from"
+    t.index ["appoint_to_type", "appoint_to_id"], name: "idx_on_appoint_to_type_appoint_to_id_1b496b2c03"
     t.index ["appoint_to_type", "appoint_to_id"], name: "index_customer_appointments_on_appoint_to"
     t.index ["customer_id"], name: "index_customer_appointments_on_customer_id"
     t.index ["discarded_at"], name: "index_customer_appointments_on_discarded_at"
@@ -441,6 +445,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_12_26_095204) do
     t.index ["appoint_by_type", "appoint_by_id"], name: "index_customer_group_appointments_on_appoint_by"
     t.index ["appoint_for_type", "appoint_for_id"], name: "index_customer_group_appointments_on_appoint_for"
     t.index ["appoint_from_type", "appoint_from_id"], name: "index_customer_group_appointments_on_appoint_from"
+    t.index ["appoint_to_type", "appoint_to_id"], name: "idx_on_appoint_to_type_appoint_to_id_a6c19edb35"
     t.index ["appoint_to_type", "appoint_to_id"], name: "index_customer_group_appointments_on_appoint_to"
     t.index ["customer_group_id"], name: "index_customer_group_appointments_on_customer_group_id"
     t.index ["discarded_at"], name: "index_customer_group_appointments_on_discarded_at"
@@ -508,6 +513,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_12_26_095204) do
     t.index ["appoint_by_type", "appoint_by_id"], name: "index_document_appointments_on_appoint_by"
     t.index ["appoint_for_type", "appoint_for_id"], name: "index_document_appointments_on_appoint_for"
     t.index ["appoint_from_type", "appoint_from_id"], name: "index_document_appointments_on_appoint_from"
+    t.index ["appoint_to_type", "appoint_to_id"], name: "idx_on_appoint_to_type_appoint_to_id_fcaa395aab"
     t.index ["appoint_to_type", "appoint_to_id"], name: "index_document_appointments_on_appoint_to"
     t.index ["discarded_at"], name: "index_document_appointments_on_discarded_at"
     t.index ["document_id"], name: "index_document_appointments_on_document_id"
@@ -535,6 +541,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_12_26_095204) do
     t.index ["appoint_by_type", "appoint_by_id"], name: "index_document_group_appointments_on_appoint_by"
     t.index ["appoint_for_type", "appoint_for_id"], name: "index_document_group_appointments_on_appoint_for"
     t.index ["appoint_from_type", "appoint_from_id"], name: "index_document_group_appointments_on_appoint_from"
+    t.index ["appoint_to_type", "appoint_to_id"], name: "idx_on_appoint_to_type_appoint_to_id_a5029e226f"
     t.index ["appoint_to_type", "appoint_to_id"], name: "index_document_group_appointments_on_appoint_to"
     t.index ["discarded_at"], name: "index_document_group_appointments_on_discarded_at"
     t.index ["document_group_id"], name: "index_document_group_appointments_on_document_group_id"
@@ -602,6 +609,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_12_26_095204) do
     t.index ["appoint_by_type", "appoint_by_id"], name: "index_employee_appointments_on_appoint_by"
     t.index ["appoint_for_type", "appoint_for_id"], name: "index_employee_appointments_on_appoint_for"
     t.index ["appoint_from_type", "appoint_from_id"], name: "index_employee_appointments_on_appoint_from"
+    t.index ["appoint_to_type", "appoint_to_id"], name: "idx_on_appoint_to_type_appoint_to_id_a39c78be55"
     t.index ["appoint_to_type", "appoint_to_id"], name: "index_employee_appointments_on_appoint_to"
     t.index ["employee_id"], name: "index_employee_appointments_on_employee_id"
   end
@@ -624,6 +632,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_12_26_095204) do
     t.index ["appoint_by_type", "appoint_by_id"], name: "index_employee_group_appointments_on_appoint_by"
     t.index ["appoint_for_type", "appoint_for_id"], name: "index_employee_group_appointments_on_appoint_for"
     t.index ["appoint_from_type", "appoint_from_id"], name: "index_employee_group_appointments_on_appoint_from"
+    t.index ["appoint_to_type", "appoint_to_id"], name: "idx_on_appoint_to_type_appoint_to_id_57b6eaae20"
     t.index ["appoint_to_type", "appoint_to_id"], name: "index_employee_group_appointments_on_appoint_to"
     t.index ["employee_group_id"], name: "index_employee_group_appointments_on_employee_group_id"
   end
@@ -691,6 +700,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_12_26_095204) do
     t.index ["appoint_for_type", "appoint_for_id"], name: "index_event_appointments_on_appoint_for"
     t.index ["appoint_from_type", "appoint_from_id"], name: "index_event_appointments_on_appoint_from"
     t.index ["appoint_to_type", "appoint_to_id"], name: "index_event_appointments_on_appoint_to"
+    t.index ["appoint_to_type", "appoint_to_id"], name: "index_event_appointments_on_appoint_to_type_and_appoint_to_id"
     t.index ["discarded_at"], name: "index_event_appointments_on_discarded_at"
     t.index ["event_id"], name: "index_event_appointments_on_event_id"
   end
@@ -717,6 +727,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_12_26_095204) do
     t.index ["appoint_by_type", "appoint_by_id"], name: "index_event_group_appointments_on_appoint_by"
     t.index ["appoint_for_type", "appoint_for_id"], name: "index_event_group_appointments_on_appoint_for"
     t.index ["appoint_from_type", "appoint_from_id"], name: "index_event_group_appointments_on_appoint_from"
+    t.index ["appoint_to_type", "appoint_to_id"], name: "idx_on_appoint_to_type_appoint_to_id_941fb608a2"
     t.index ["appoint_to_type", "appoint_to_id"], name: "index_event_group_appointments_on_appoint_to"
     t.index ["discarded_at"], name: "index_event_group_appointments_on_discarded_at"
     t.index ["event_group_id"], name: "index_event_group_appointments_on_event_group_id"
@@ -785,6 +796,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_12_26_095204) do
     t.index ["appoint_for_type", "appoint_for_id"], name: "index_exam_appointments_on_appoint_for"
     t.index ["appoint_from_type", "appoint_from_id"], name: "index_exam_appointments_on_appoint_from"
     t.index ["appoint_to_type", "appoint_to_id"], name: "index_exam_appointments_on_appoint_to"
+    t.index ["appoint_to_type", "appoint_to_id"], name: "index_exam_appointments_on_appoint_to_type_and_appoint_to_id"
     t.index ["discarded_at"], name: "index_exam_appointments_on_discarded_at"
     t.index ["exam_id"], name: "index_exam_appointments_on_exam_id"
   end
@@ -1372,6 +1384,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_12_26_095204) do
     t.index ["appoint_for_type", "appoint_for_id"], name: "index_period_appointments_on_appoint_for"
     t.index ["appoint_from_type", "appoint_from_id"], name: "index_period_appointments_on_appoint_from"
     t.index ["appoint_to_type", "appoint_to_id"], name: "index_period_appointments_on_appoint_to"
+    t.index ["appoint_to_type", "appoint_to_id"], name: "index_period_appointments_on_appoint_to_type_and_appoint_to_id"
     t.index ["discarded_at"], name: "index_period_appointments_on_discarded_at"
     t.index ["period_id"], name: "index_period_appointments_on_period_id"
   end
@@ -1418,6 +1431,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_12_26_095204) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["appoint_to_type", "appoint_to_id"], name: "index_policy_appointments_on_appoint_to"
+    t.index ["appoint_to_type", "appoint_to_id"], name: "index_policy_appointments_on_appoint_to_type_and_appoint_to_id"
     t.index ["discarded_at"], name: "index_policy_appointments_on_discarded_at"
     t.index ["policy_id"], name: "index_policy_appointments_on_policy_id"
   end
@@ -1446,6 +1460,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_12_26_095204) do
     t.index ["appoint_for_type", "appoint_for_id"], name: "index_price_appointments_on_appoint_for"
     t.index ["appoint_from_type", "appoint_from_id"], name: "index_price_appointments_on_appoint_from"
     t.index ["appoint_to_type", "appoint_to_id"], name: "index_price_appointments_on_appoint_to"
+    t.index ["appoint_to_type", "appoint_to_id"], name: "index_price_appointments_on_appoint_to_type_and_appoint_to_id"
     t.index ["discarded_at"], name: "index_price_appointments_on_discarded_at"
     t.index ["price_id"], name: "index_price_appointments_on_price_id"
   end
@@ -1743,6 +1758,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_12_26_095204) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["appoint_to_type", "appoint_to_id"], name: "index_role_appointments_on_appoint_to"
+    t.index ["appoint_to_type", "appoint_to_id"], name: "index_role_appointments_on_appoint_to_type_and_appoint_to_id"
     t.index ["discarded_at"], name: "index_role_appointments_on_discarded_at"
     t.index ["role_id"], name: "index_role_appointments_on_role_id"
   end
@@ -1896,6 +1912,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_12_26_095204) do
     t.index ["appoint_by_type", "appoint_by_id"], name: "index_setting_appointments_on_appoint_by"
     t.index ["appoint_for_type", "appoint_for_id"], name: "index_setting_appointments_on_appoint_for"
     t.index ["appoint_from_type", "appoint_from_id"], name: "index_setting_appointments_on_appoint_from"
+    t.index ["appoint_to_type", "appoint_to_id"], name: "idx_on_appoint_to_type_appoint_to_id_2604430405"
     t.index ["appoint_to_type", "appoint_to_id"], name: "index_setting_appointments_on_appoint_to"
     t.index ["discarded_at"], name: "index_setting_appointments_on_discarded_at"
     t.index ["setting_id"], name: "index_setting_appointments_on_setting_id"
@@ -1923,6 +1940,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_12_26_095204) do
     t.index ["appoint_by_type", "appoint_by_id"], name: "index_setting_group_appointments_on_appoint_by"
     t.index ["appoint_for_type", "appoint_for_id"], name: "index_setting_group_appointments_on_appoint_for"
     t.index ["appoint_from_type", "appoint_from_id"], name: "index_setting_group_appointments_on_appoint_from"
+    t.index ["appoint_to_type", "appoint_to_id"], name: "idx_on_appoint_to_type_appoint_to_id_2769e0ab46"
     t.index ["appoint_to_type", "appoint_to_id"], name: "index_setting_group_appointments_on_appoint_to"
     t.index ["discarded_at"], name: "index_setting_group_appointments_on_discarded_at"
     t.index ["setting_group_id"], name: "index_setting_group_appointments_on_setting_group_id"
@@ -1990,18 +2008,17 @@ ActiveRecord::Schema[8.0].define(version: 2025_12_26_095204) do
 
   create_table "subscription_appointments", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.uuid "subscription_id", null: false
-    t.string "appoint_from_type"
-    t.uuid "appoint_from_id"
-    t.string "appoint_to_type", null: false
-    t.uuid "appoint_to_id", null: false
-    t.string "appoint_for_type"
-    t.uuid "appoint_for_id"
+    t.string "appoint_from_type", null: false
+    t.uuid "appoint_from_id", null: false
+    t.string "appoint_to_type"
+    t.uuid "appoint_to_id"
+    t.string "appoint_for_type", null: false
+    t.uuid "appoint_for_id", null: false
     t.string "appoint_by_type"
     t.uuid "appoint_by_id"
     t.string "name"
     t.string "description"
     t.string "code"
-    t.string "value"
     t.integer "lifecycle_status"
     t.integer "workflow_status"
     t.integer "business_type"
@@ -2011,27 +2028,78 @@ ActiveRecord::Schema[8.0].define(version: 2025_12_26_095204) do
     t.index ["appoint_by_type", "appoint_by_id"], name: "index_subscription_appointments_on_appoint_by"
     t.index ["appoint_for_type", "appoint_for_id"], name: "index_subscription_appointments_on_appoint_for"
     t.index ["appoint_from_type", "appoint_from_id"], name: "index_subscription_appointments_on_appoint_from"
+    t.index ["appoint_to_type", "appoint_to_id"], name: "idx_on_appoint_to_type_appoint_to_id_639db4b6da"
     t.index ["appoint_to_type", "appoint_to_id"], name: "index_subscription_appointments_on_appoint_to"
     t.index ["discarded_at"], name: "index_subscription_appointments_on_discarded_at"
     t.index ["subscription_id"], name: "index_subscription_appointments_on_subscription_id"
   end
 
-  create_table "subscriptions", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
-    t.uuid "user_id", null: false
-    t.uuid "period_id", null: false
-    t.uuid "price_id", null: false
-    t.integer "plan_name", default: 0, null: false
-    t.integer "lifecycle_status", default: 0, null: false
-    t.integer "workflow_status", default: 0, null: false
-    t.string "country_code"
-    t.boolean "auto_renew", default: true, null: false
+  create_table "subscription_group_appointments", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "subscription_group_id", null: false
+    t.string "appoint_from_type", null: false
+    t.uuid "appoint_from_id", null: false
+    t.string "appoint_to_type"
+    t.uuid "appoint_to_id"
+    t.string "appoint_for_type", null: false
+    t.uuid "appoint_for_id", null: false
+    t.string "appoint_by_type"
+    t.uuid "appoint_by_id"
+    t.string "name"
+    t.string "description"
+    t.string "code"
+    t.integer "lifecycle_status"
+    t.integer "workflow_status"
+    t.integer "business_type"
+    t.datetime "discarded_at"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["lifecycle_status", "workflow_status"], name: "index_subscriptions_on_lifecycle_status_and_workflow_status"
+    t.index ["appoint_by_type", "appoint_by_id"], name: "index_subscription_group_appointments_on_appoint_by"
+    t.index ["appoint_for_type", "appoint_for_id"], name: "index_subscription_group_appointments_on_appoint_for"
+    t.index ["appoint_from_type", "appoint_from_id"], name: "index_subscription_group_appointments_on_appoint_from"
+    t.index ["appoint_to_type", "appoint_to_id"], name: "idx_on_appoint_to_type_appoint_to_id_2de5df1e0a"
+    t.index ["appoint_to_type", "appoint_to_id"], name: "index_subscription_group_appointments_on_appoint_to"
+    t.index ["discarded_at"], name: "index_subscription_group_appointments_on_discarded_at"
+    t.index ["subscription_group_id"], name: "index_subscription_group_appointments_on_subscription_group_id"
+  end
+
+  create_table "subscription_groups", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "price_id", null: false
+    t.uuid "period_id", null: false
+    t.string "name"
+    t.string "description"
+    t.string "code"
+    t.integer "lifecycle_status"
+    t.integer "workflow_status"
+    t.integer "business_type"
+    t.string "country_code"
+    t.boolean "auto_renew"
+    t.datetime "discarded_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["discarded_at"], name: "index_subscription_groups_on_discarded_at"
+    t.index ["period_id"], name: "index_subscription_groups_on_period_id"
+    t.index ["price_id"], name: "index_subscription_groups_on_price_id"
+  end
+
+  create_table "subscriptions", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "subscription_group_id", null: false
+    t.uuid "price_id", null: false
+    t.uuid "period_id", null: false
+    t.string "name"
+    t.string "description"
+    t.string "code"
+    t.integer "lifecycle_status"
+    t.integer "workflow_status"
+    t.integer "business_type"
+    t.string "country_code"
+    t.boolean "auto_renew"
+    t.datetime "discarded_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["discarded_at"], name: "index_subscriptions_on_discarded_at"
     t.index ["period_id"], name: "index_subscriptions_on_period_id"
     t.index ["price_id"], name: "index_subscriptions_on_price_id"
-    t.index ["user_id", "lifecycle_status"], name: "index_subscriptions_on_user_id_and_lifecycle_status"
-    t.index ["user_id"], name: "index_subscriptions_on_user_id"
+    t.index ["subscription_group_id"], name: "index_subscriptions_on_subscription_group_id"
   end
 
   create_table "tag_appointments", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -2052,6 +2120,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_12_26_095204) do
     t.index ["appoint_for_type", "appoint_for_id"], name: "index_tag_appointments_on_appoint_for"
     t.index ["appoint_from_type", "appoint_from_id"], name: "index_tag_appointments_on_appoint_from"
     t.index ["appoint_to_type", "appoint_to_id"], name: "index_tag_appointments_on_appoint_to"
+    t.index ["appoint_to_type", "appoint_to_id"], name: "index_tag_appointments_on_appoint_to_type_and_appoint_to_id"
     t.index ["tag_id"], name: "index_tag_appointments_on_tag_id"
   end
 
@@ -2356,9 +2425,12 @@ ActiveRecord::Schema[8.0].define(version: 2025_12_26_095204) do
   add_foreign_key "settings", "setting_groups"
   add_foreign_key "sign_in_tokens", "users"
   add_foreign_key "subscription_appointments", "subscriptions"
+  add_foreign_key "subscription_group_appointments", "subscription_groups"
+  add_foreign_key "subscription_groups", "periods"
+  add_foreign_key "subscription_groups", "prices"
   add_foreign_key "subscriptions", "periods"
   add_foreign_key "subscriptions", "prices"
-  add_foreign_key "subscriptions", "users"
+  add_foreign_key "subscriptions", "subscription_groups"
   add_foreign_key "tag_appointments", "tags"
   add_foreign_key "tags", "company_groups"
   add_foreign_key "task_appointments", "tasks"

@@ -17,5 +17,6 @@ class CreateEventAppointments < ActiveRecord::Migration[8.0]
       t.timestamps
     end
     add_index :event_appointments, :discarded_at
+    add_index :event_appointments, [:appoint_to_type, :appoint_to_id]
   end
 end

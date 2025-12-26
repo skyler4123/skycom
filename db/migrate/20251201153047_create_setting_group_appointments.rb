@@ -17,5 +17,6 @@ class CreateSettingGroupAppointments < ActiveRecord::Migration[8.0]
       t.timestamps
     end
     add_index :setting_group_appointments, :discarded_at
+    add_index :setting_group_appointments, [:appoint_to_type, :appoint_to_id]
   end
 end

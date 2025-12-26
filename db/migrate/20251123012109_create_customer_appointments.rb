@@ -17,5 +17,6 @@ class CreateCustomerAppointments < ActiveRecord::Migration[8.0]
       t.timestamps
     end
     add_index :customer_appointments, :discarded_at
+    add_index :customer_appointments, [:appoint_to_type, :appoint_to_id]
   end
 end
