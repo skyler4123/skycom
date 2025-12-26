@@ -24,12 +24,13 @@ class Company < ApplicationRecord
   has_many :cart_groups, dependent: :destroy
   has_many :notification_groups, dependent: :destroy
   has_many :payment_methods, through: :payment_method_appointments
+  has_many :statistics, as: :owner
 
   # Self-referencing association for company hierarchy
   belongs_to :parent_company, class_name: "Company", optional: true
   has_many :child_companies, class_name: "Company", foreign_key: "parent_company_id", dependent: :destroy, inverse_of: :parent_company
 
-  # --- Enums ---
+  # --- Enums --- 
   enum :lifecycle_status, LIFECYCLE_STATUS
   enum :workflow_status, WORKFLOW_STATUS
 

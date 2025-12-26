@@ -171,6 +171,10 @@
   bundle exec rails g scaffold ArticleGroupAppointment article_group:references appoint_from:references{polymorphic} appoint_to:references{polymorphic} appoint_for:references{polymorphic} appoint_by:references{polymorphic} name description code status:integer business_type:integer discarded_at:datetime:index --force
   bundle exec rails g scaffold ArticleAppointment article:references appoint_from:references{polymorphic} appoint_to:references{polymorphic} appoint_for:references{polymorphic} appoint_by:references{polymorphic} name description code status:integer business_type:integer discarded_at:datetime:index --force
 
+  ### Content & Statistic
+  bundle exec rails g scaffold Statistic owner:references{polymorphic} name description data:json recorded_at:datetime:index --force
+
+
   ### Content & Knowledge Management
   bundle exec rails g scaffold Article
   bundle exec rails g scaffold Report

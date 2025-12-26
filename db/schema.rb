@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_12_10_103114) do
+ActiveRecord::Schema[8.0].define(version: 2025_12_26_095204) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pgcrypto"
@@ -1973,6 +1973,19 @@ ActiveRecord::Schema[8.0].define(version: 2025_12_10_103114) do
   create_table "sign_in_tokens", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.uuid "user_id", null: false
     t.index ["user_id"], name: "index_sign_in_tokens_on_user_id"
+  end
+
+  create_table "statistics", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.string "owner_type", null: false
+    t.uuid "owner_id", null: false
+    t.string "name"
+    t.string "description"
+    t.json "data"
+    t.datetime "recorded_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["owner_type", "owner_id"], name: "index_statistics_on_owner"
+    t.index ["recorded_at"], name: "index_statistics_on_recorded_at"
   end
 
   create_table "subscription_appointments", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
