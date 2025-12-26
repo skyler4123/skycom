@@ -1,0 +1,17 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  owner: one
+  owner_type: Owner
+  name: MyString
+  description: MyString
+  data: 
+  recorded_at: 2025-12-26 16:52:04
+
+two:
+  owner: two
+  owner_type: Owner
+  name: MyString
+  description: MyString
+  data: 
+  recorded_at: 2025-12-26 16:52:04
