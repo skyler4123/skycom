@@ -36,7 +36,6 @@ class User < ApplicationRecord
   # A user can own multiple companies. If the user is deleted, their companies are also destroyed.
   has_one :address_appointment, as: :appoint_to, dependent: :destroy
   has_one :address, dependent: :destroy, through: :address_appointment
-  has_many :subscriptions, dependent: :destroy
 
   has_many :company_groups, dependent: :destroy
   has_one :employee, dependent: :destroy
@@ -66,21 +65,5 @@ class User < ApplicationRecord
   end
 
   include User::RetailConcern
-
-  # An user is "subscribed" if thier id/their parent_user_in included in User.subscripted_user_ids
-  def active_subscriber?
-    return true if system_role_super_admin? || system_role_admin?
-
-    # Check self or parent efficiently using granular caching
-    check_subscription_status(id) || (parent_user_id.present? && check_subscription_status(parent_user_id))
-  end
-
-  scope :with_active_subscription, -> { joins(:subscriptions).merge(Subscription.active_and_usable).distinct }
-
-  def check_subscription_status(check_user_id)
-    Rails.cache.fetch(["users", check_user_id, "active_subscription_status"], expires_in: 1.hour) do
-      Subscription.where(user_id: check_user_id).active_and_usable.exists?
-    end
-  end
   # ----------------------------------------------------------------------------------------------------
 end

@@ -5,7 +5,6 @@ class ApplicationController < ActionController::Base
   before_action :set_current_request_details
   before_action :set_current_session
   before_action :authenticate
-  before_action :require_active_subscription!
 
   # ------------------------------------------------------------------------
   include ApplicationController::CookieConcern
@@ -25,15 +24,5 @@ class ApplicationController < ActionController::Base
   def authenticate
     # redirect_to sign_in_path if !Current.session
     redirect_to root_path if !Current.session
-  end
-
-  def require_active_subscription!
-    # Ensure we have a user (skip if not logged in, or handle authentication first)
-    return unless Current.user
-
-    unless Current.user.active_subscriber?
-      # Adjust 'pricing_path' to your actual route helper
-      redirect_to pricing_path, alert: "You need an active subscription to access this page."
-    end
   end
 end

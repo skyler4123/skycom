@@ -1,12 +1,6 @@
 class Seed::SubscriptionService
   def self.create(user: nil)
-    # 1. Ensure we have a user to attach the subscription to
-    user ||= User.order("RANDOM()").first
 
-    unless user
-      puts "⚠️ Skipping Subscription seed: No users available."
-      return
-    end
 
     # 2. Determine Country and Plan
     # Prefer user's country, otherwise random from supported list

@@ -1,6 +1,5 @@
 class HomeController < ApplicationController
   skip_before_action :authenticate, only: [ :index ]
-  skip_before_action :require_active_subscription!, only: [ :index ]
 
   def index
      cookies.clear if !Current.session

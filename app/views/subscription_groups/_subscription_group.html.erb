@@ -1,50 +1,46 @@
-<div id="<%= dom_id subscription %>" class="w-full sm:w-auto my-5 space-y-5">
-  <div>
-    <strong class="block font-medium mb-1">Subscription group:</strong>
-    <%= subscription.subscription_group_id %>
-  </div>
+<div id="<%= dom_id subscription_group %>" class="w-full sm:w-auto my-5 space-y-5">
   <div>
     <strong class="block font-medium mb-1">Price:</strong>
-    <%= subscription.price_id %>
+    <%= subscription_group.price_id %>
   </div>
   <div>
     <strong class="block font-medium mb-1">Period:</strong>
-    <%= subscription.period_id %>
+    <%= subscription_group.period_id %>
   </div>
   <div>
     <strong class="block font-medium mb-1">Name:</strong>
-    <%= subscription.name %>
+    <%= subscription_group.name %>
   </div>
   <div>
     <strong class="block font-medium mb-1">Description:</strong>
-    <%= subscription.description %>
+    <%= subscription_group.description %>
   </div>
   <div>
     <strong class="block font-medium mb-1">Code:</strong>
-    <%= subscription.code %>
+    <%= subscription_group.code %>
   </div>
   <div>
     <strong class="block font-medium mb-1">Lifecycle status:</strong>
-    <%= subscription.lifecycle_status %>
+    <%= subscription_group.lifecycle_status %>
   </div>
   <div>
     <strong class="block font-medium mb-1">Workflow status:</strong>
-    <%= subscription.workflow_status %>
+    <%= subscription_group.workflow_status %>
   </div>
   <div>
     <strong class="block font-medium mb-1">Business type:</strong>
-    <%= subscription.business_type %>
+    <%= subscription_group.business_type %>
   </div>
   <div>
     <strong class="block font-medium mb-1">Country code:</strong>
-    <%= subscription.country_code %>
+    <%= subscription_group.country_code %>
   </div>
   <div>
     <strong class="block font-medium mb-1">Auto renew:</strong>
-    <%= subscription.auto_renew? ? "Yes" : "No" %>
+    <%= subscription_group.auto_renew? ? "Yes" : "No" %>
   </div>
   <div>
     <strong class="block font-medium mb-1">Discarded at:</strong>
-    <%= subscription.discarded_at %>
+    <%= subscription_group.discarded_at %>
   </div>
 </div>
