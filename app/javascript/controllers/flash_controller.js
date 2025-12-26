@@ -1,6 +1,6 @@
 import Swal from 'sweetalert2'
 
-import { isEmpty } from "controllers/helpers";
+import * as Helpers from "controllers/helpers";
 import ApplicationController from "controllers/application_controller";
 
 
@@ -17,7 +17,7 @@ export default class FlashController extends ApplicationController {
   }
 
   hasFlash() {
-    return !isEmpty(ServerData.flash)
+    return !Helpers.isEmpty(ServerData.flash)
   }
 
   initValue() {

@@ -111,7 +111,7 @@ export default class Admin_LayoutController extends Controller {
 
                 <button
                   class="flex cursor-pointer items-center justify-center overflow-hidden rounded-full h-10 w-10 p-2 hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-600 dark:text-gray-300"
-                  ${Helpers.darkmode()}
+                  ${Helpers.darkmodeTrigger()}
                 </button>
                 <button
                   class="flex cursor-pointer items-center justify-center overflow-hidden rounded-full h-10 w-10 hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-600 dark:text-gray-300"

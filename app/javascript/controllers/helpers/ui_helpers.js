@@ -192,7 +192,7 @@ export const closeModal = () => Swal.close()
  * Returns the data-controller attribute string for the darkmode controller.
  * @returns {string} `data-controller="darkmode"`
  */
-export const darkmode = () => `data-controller="darkmode"`
+export const darkmodeTrigger = () => `data-darkmode-target="trigger"`
 
 /**
  * Returns the data-link-target attribute string for opening links by pathname.
