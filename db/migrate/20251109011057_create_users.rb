@@ -18,10 +18,15 @@ class CreateUsers < ActiveRecord::Migration[8.0]
       t.string :avatar
       t.string :phone_number
       t.string :country_code
+      t.string :exclusive_token
       t.datetime :discarded_at
 
       t.timestamps
     end
     add_index :users, :discarded_at
+    add_index :users, :email, unique: true
+    add_index :users, :username, unique: true
+    add_index :users, :uid, unique: true
+    add_index :users, :exclusive_token, unique: true
   end
 end
