@@ -3,56 +3,37 @@ module SingleSessionAccessConcern
   extend ActiveSupport::Concern
 
   included do
-    # No automatic before_actions — we want explicit opt-in
+    # No automatic activation
   end
 
   private
 
-  # Call this via before_action in controllers that need single-session protection
   def enable_single_session_access
-    prepare_exclusive_token
-    enforce_exclusive_session
+    prepare_single_access_token
+    enforce_single_access_session
   end
 
-  def prepare_exclusive_token
-    return unless Current.session
-    return if cookies.signed[:exclusive_token].present?
+  def prepare_single_access_token
+    # Ensure sign_access_token present at user, session and cookie first
+    return if Current.user.single_access_token.present? && Current.session.single_access_token.present? && cookies.signed[:single_access_token].present?
 
-    token = SecureRandom.hex(20)
-    Current.session.update!(exclusive_token: token)
-
-    update_cookie(session: Current.session, user: Current.user, exclusive_token: token)
+    new_global_token = SecureRandom.hex(20)
+    Current.user.update!(single_access_token: new_global_token) if Current.user.single_access_token.nil?
+    Current.session.update!(single_access_token: new_global_token) if Current.session.single_access_token.nil?
+    update_cookie(session: Current.session, user: Current.user, single_access_token: new_global_token) if !cookies.signed[:single_access_token].present?
   end
 
-  def enforce_exclusive_session
-    return unless Current.session
-
-    client_token = cookies.signed[:exclusive_token]
-
-    unless client_token && Current.session.exclusive_token == client_token
-      invalidate_current_session
-      return
-    end
-
-    # Take over: make this the only valid session
-    new_token = SecureRandom.hex(20)
-
-    Current.user.update!(exclusive_token: new_token)
-    Current.session.update!(exclusive_token: new_token)
-
-    update_cookie(session: Current.session, user: Current.user, exclusive_token: new_token)
+  def enforce_single_access_session
+    invalidate_current_session if Current.user.single_access_token.nil? || Current.session.single_access_token.nil? || !cookies.signed[:single_access_token].present?
+    invalidate_current_session if Current.session.single_access_token != Current.user.single_access_token
+    invalidate_current_session if Current.user.single_access_token != cookies.signed[:single_access_token]
+    invalidate_current_session if Current.user.single_access_token != Current.session.single_access_token
   end
 
   def invalidate_current_session
-    Current.session&.destroy
-
-    cookies.delete(:session_token)
-    cookies.delete(:exclusive_token)
-    cookies.delete(:current_user)
-    cookies.delete(:company_groups)
-    cookies.delete(:is_signed_in)
+    cookies.clear
 
     redirect_to main_app.root_path,
-      alert: "Your session has been invalidated — another device has taken over. Please sign in again."
+      alert: "Your session has been taken over by another device. Please sign in again."
   end
 end

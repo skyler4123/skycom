@@ -2,7 +2,7 @@
 module ApplicationController::CookieConcern
   extend ActiveSupport::Concern
 
-  def update_cookie(session:, user:, exclusive_token: nil)
+  def update_cookie(session:, user:, single_access_token: nil)
     current_user = { id: user.id, email: user.email, avatar: user.avatar_url }
 
     company_groups = user.company_groups.map do |company_group|
@@ -18,11 +18,11 @@ module ApplicationController::CookieConcern
 
     cookies.signed.permanent[:session_token] = { value: session.id, httponly: true }
 
-    # Only set exclusive_token if provided
-    if exclusive_token.present?
-      cookies.signed.permanent[:exclusive_token] = { value: exclusive_token, httponly: true }
+    # Only set single_access_token if provided
+    if single_access_token.present?
+      cookies.signed.permanent[:single_access_token] = { value: single_access_token, httponly: true }
     else
-      cookies.delete(:exclusive_token) # Clear it if not needed (e.g. normal login)
+      cookies.delete(:single_access_token) # Clear it if not needed (e.g. normal login)
     end
 
     cookies.permanent[:is_signed_in] = true

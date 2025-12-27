@@ -1885,10 +1885,10 @@ ActiveRecord::Schema[8.0].define(version: 2025_12_26_231623) do
     t.uuid "user_id", null: false
     t.string "user_agent"
     t.string "ip_address"
-    t.string "exclusive_token"
+    t.string "single_access_token"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["exclusive_token"], name: "index_sessions_on_exclusive_token", unique: true
+    t.index ["single_access_token"], name: "index_sessions_on_single_access_token", unique: true
     t.index ["user_id"], name: "index_sessions_on_user_id"
   end
 
@@ -2243,14 +2243,14 @@ ActiveRecord::Schema[8.0].define(version: 2025_12_26_231623) do
     t.string "avatar"
     t.string "phone_number"
     t.string "country_code"
-    t.string "exclusive_token"
+    t.string "single_access_token"
     t.datetime "discarded_at"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["discarded_at"], name: "index_users_on_discarded_at"
     t.index ["email"], name: "index_users_on_email", unique: true
-    t.index ["exclusive_token"], name: "index_users_on_exclusive_token", unique: true
     t.index ["parent_user_id"], name: "index_users_on_parent_user_id"
+    t.index ["single_access_token"], name: "index_users_on_single_access_token", unique: true
     t.index ["uid"], name: "index_users_on_uid", unique: true
     t.index ["username"], name: "index_users_on_username", unique: true
   end
