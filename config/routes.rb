@@ -48,6 +48,7 @@ Rails.application.routes.draw do
         resources :facilities
         resources :settings
         resources :administrators
+        resources :subscriptions
       end
 
       namespace :pos do

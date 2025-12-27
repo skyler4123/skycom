@@ -22,7 +22,8 @@ class ApplicationController < ActionController::Base
   end
 
   def authenticate
-    # redirect_to sign_in_path if !Current.session
-    redirect_to root_path if !Current.session
+    # Use main_app to ensure we redirect to the main application's root_path,
+    # avoiding issues where 3rd party engines (like MissionControl) might override root_path.
+    redirect_to main_app.root_path if !Current.session
   end
 end
