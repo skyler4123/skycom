@@ -23,7 +23,6 @@ class Seed::ApplicationService
     user_2.address = Seed::AddressService.create
     user_3.address = Seed::AddressService.create
 
-    Seed::SubscriptionService.create(user: user_1)
     # Create company groups
     Seed::MultiCompanyGroupService.new(user: user_1)
     # Seed::MultiCompanyGroupService.new(user: user_2)

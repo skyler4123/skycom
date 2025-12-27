@@ -15,8 +15,6 @@ class StatisticsTest < ApplicationSystemTestCase
     click_on "New statistic"
 
     fill_in "Data", with: @statistic.data
-    fill_in "Description", with: @statistic.description
-    fill_in "Name", with: @statistic.name
     fill_in "Owner", with: @statistic.owner_id
     fill_in "Owner type", with: @statistic.owner_type
     fill_in "Recorded at", with: @statistic.recorded_at
@@ -31,8 +29,6 @@ class StatisticsTest < ApplicationSystemTestCase
     click_on "Edit this statistic", match: :first
 
     fill_in "Data", with: @statistic.data
-    fill_in "Description", with: @statistic.description
-    fill_in "Name", with: @statistic.name
     fill_in "Owner", with: @statistic.owner_id
     fill_in "Owner type", with: @statistic.owner_type
     fill_in "Recorded at", with: @statistic.recorded_at.to_s

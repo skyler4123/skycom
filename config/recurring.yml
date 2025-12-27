@@ -21,6 +21,10 @@ default: &default
     class: DemoJob
     queue: demo_job
     schedule: every 1 minutes
+  statistic_job:
+    class: StatisticJob
+    queue: statistic_job
+    schedule: every 1 hours
 
 development:
   <<: *default

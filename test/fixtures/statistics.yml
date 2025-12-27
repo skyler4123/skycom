@@ -3,15 +3,11 @@
 one:
   owner: one
   owner_type: Owner
-  name: MyString
-  description: MyString
   data: 
-  recorded_at: 2025-12-26 16:52:04
+  recorded_at: 2025-12-27 08:44:10
 
 two:
   owner: two
   owner_type: Owner
-  name: MyString
-  description: MyString
   data: 
-  recorded_at: 2025-12-26 16:52:04
+  recorded_at: 2025-12-27 08:44:10

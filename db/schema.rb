@@ -1996,8 +1996,6 @@ ActiveRecord::Schema[8.0].define(version: 2025_12_26_231623) do
   create_table "statistics", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.string "owner_type", null: false
     t.uuid "owner_id", null: false
-    t.string "name"
-    t.string "description"
     t.json "data"
     t.datetime "recorded_at"
     t.datetime "created_at", null: false

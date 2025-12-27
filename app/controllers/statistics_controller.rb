@@ -65,6 +65,6 @@ class StatisticsController < ApplicationController
 
     # Only allow a list of trusted parameters through.
     def statistic_params
-      params.expect(statistic: [ :owner_id, :owner_type, :name, :description, :data, :recorded_at ])
+      params.expect(statistic: [ :owner_id, :owner_type, :data, :recorded_at ])
     end
 end
