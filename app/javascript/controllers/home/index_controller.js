@@ -1,5 +1,5 @@
 import ApplicationController from "controllers/application_controller"
-import { openModal, closeModal, formPostSecurityTags, signInPath, signUpPath, poll, addAction } from "controllers/helpers"
+import * as Helpers from "controllers/helpers"
 
 export default class Home_IndexController extends ApplicationController {
   static targets = ["signInButton", "signUpButton"]
@@ -9,12 +9,12 @@ export default class Home_IndexController extends ApplicationController {
   }
 
   initActions() {
-    poll(() => {
+    Helpers.poll(() => {
       if (this.hasSignInButtonTarget) {
-        addAction(this.signInButtonTarget, `click->${this.identifier}#openSignInModal`)
+        Helpers.addAction(this.signInButtonTarget, `click->${this.identifier}#openSignInModal`)
       }
       if (this.hasSignUpButtonTarget) {
-        addAction(this.signUpButtonTarget, `click->${this.identifier}#openSignUpModal`)
+        Helpers.addAction(this.signUpButtonTarget, `click->${this.identifier}#openSignUpModal`)
       }
     })
   }
@@ -23,9 +23,9 @@ export default class Home_IndexController extends ApplicationController {
     event.preventDefault()
     // If a modal is already open, close it first before opening the new one.
     if (document.querySelector('.swal2-container')) {
-      closeModal()
+      Helpers.closeModal()
     }
-    openModal({
+    Helpers.openModal({
       html: this.signInModalHTML()
     })
   }
@@ -33,16 +33,16 @@ export default class Home_IndexController extends ApplicationController {
   openSignUpModal(event) {
     event.preventDefault()
     if (document.querySelector('.swal2-container')) {
-      closeModal()
+      Helpers.closeModal()
     }
-    openModal({
+    Helpers.openModal({
       html: this.signUpModalHTML()
     })
   }
 
   closeModal(event) {
     event.preventDefault()
-    closeModal()
+    Helpers.closeModal()
   }
 
   signInModalHTML() {
@@ -87,10 +87,10 @@ export default class Home_IndexController extends ApplicationController {
             <!-- Sign In Form -->
             <form
               role="sign-in-form"
-              action="${signInPath()}"
+              action="${Helpers.signInPath()}"
               method="POST"
               class="">
-              ${formPostSecurityTags()}
+              ${Helpers.formPostSecurityTags()}
               <div class="space-y-4">
                 <div>
                   <label class="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300 text-left"
@@ -170,10 +170,10 @@ export default class Home_IndexController extends ApplicationController {
             <!-- Form -->
             <form
               role="sign-up-form"
-              action="${signUpPath()}"
+              action="${Helpers.signUpPath()}"
               method="POST"
               class="">
-              ${formPostSecurityTags()}
+              ${Helpers.formPostSecurityTags()}
               <div class="space-y-4">
                 <div>
                   <label class="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300 text-left"

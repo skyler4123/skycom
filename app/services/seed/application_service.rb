@@ -12,12 +12,20 @@ class Seed::ApplicationService
     Seed::PaymentMethodService.create # Ensure global payment methods are seeded first
     Seed::BrandService.create # Seed global brands
 
-    # Create company groups
-    multi_company_group_owner = Seed::UserService.create(email: "multi_company_group_owner_1@example.com")
-    Seed::MultiCompanyGroupService.new(user: multi_company_group_owner)
+    # User
+    admin_1 = Seed::UserService.create(email: "admin_1@example.com", system_role: 1)
+    admin_2 = Seed::UserService.create(email: "admin_2@example.com", system_role: 1)
 
-    # multi_company_group_owner = Seed::UserService.create(email: "multi_company_group_owner_2@example.com")
-    # Seed::MultiCompanyGroupService.new(user: multi_company_group_owner)
+    user_1 = Seed::UserService.create(email: "user_1@example.com")
+    user_2 = Seed::UserService.create(email: "user_2@example.com")
+    user_3 = Seed::UserService.create(email: "user_3@example.com")
+    user_1.address = Seed::AddressService.create
+    user_2.address = Seed::AddressService.create
+    user_3.address = Seed::AddressService.create
+
+    # Create company groups
+    Seed::MultiCompanyGroupService.new(user: user_1)
+    # Seed::MultiCompanyGroupService.new(user: user_2)
 
 
     self.puts_count

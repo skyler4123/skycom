@@ -1,4 +1,4 @@
-import { isEmpty } from "controllers/helpers"
+import * as Helpers from "controllers/helpers"
 import ApplicationController from "controllers/application_controller"
 
 
@@ -14,7 +14,7 @@ export default class PaginationController extends ApplicationController {
   }
 
   dataValueChanged(value, previousValue) {
-    if (isEmpty(value)) { return }
+    if (Helpers.isEmpty(value)) { return }
     this.render()
   }
 

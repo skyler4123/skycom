@@ -9,7 +9,7 @@
 //   languageCodeTextTarget()
 
 import ApplicationController from "controllers/application_controller";
-import { Cookie, setCookie, openPopover, closeSwal } from "controllers/helpers";
+import * as Helpers from "controllers/helpers";
 
 export default class LanguageController extends ApplicationController {
   static targets = ["codeText", "word", "triggerDropdown"];
@@ -34,7 +34,7 @@ export default class LanguageController extends ApplicationController {
 
   // Get languageCode from Cookie > default to "en"
   initValues() {
-    this.languageCodeValue = Cookie('languageCode') || "en";
+    this.languageCodeValue = Helpers.Cookie('languageCode') || "en";
   }
 
   initTargets() {
@@ -58,7 +58,7 @@ export default class LanguageController extends ApplicationController {
   openDropdown(event) {
     // No need to implement anything here, just to have action to open dropdown
     event.preventDefault();
-    openPopover({
+    Helpers.openPopover({
       parentElement: event.currentTarget,
       html: this.languageDropdownHTML(),
       position: "bottom-right",
@@ -88,8 +88,8 @@ export default class LanguageController extends ApplicationController {
     this.updateTranslations();
     // this.element.innerHTML = this.languageCodeText()[value]
     this.updateLanguageCodeText();
-    setCookie('languageCode', value, 365);
-    closeSwal();
+    Helpers.setCookie('languageCode', value, 365);
+    Helpers.closeSwal();
   }
 
   updateLanguageCodeText() {

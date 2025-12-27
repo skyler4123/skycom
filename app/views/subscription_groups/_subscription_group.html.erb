@@ -1,11 +1,11 @@
 <div id="<%= dom_id subscription_group %>" class="w-full sm:w-auto my-5 space-y-5">
   <div>
-    <strong class="block font-medium mb-1">Company group:</strong>
-    <%= subscription_group.company_group_id %>
+    <strong class="block font-medium mb-1">Price:</strong>
+    <%= subscription_group.price_id %>
   </div>
   <div>
-    <strong class="block font-medium mb-1">Company:</strong>
-    <%= subscription_group.company_id %>
+    <strong class="block font-medium mb-1">Period:</strong>
+    <%= subscription_group.period_id %>
   </div>
   <div>
     <strong class="block font-medium mb-1">Name:</strong>
@@ -20,12 +20,24 @@
     <%= subscription_group.code %>
   </div>
   <div>
-    <strong class="block font-medium mb-1">Status:</strong>
-    <%= subscription_group.status %>
+    <strong class="block font-medium mb-1">Lifecycle status:</strong>
+    <%= subscription_group.lifecycle_status %>
+  </div>
+  <div>
+    <strong class="block font-medium mb-1">Workflow status:</strong>
+    <%= subscription_group.workflow_status %>
   </div>
   <div>
     <strong class="block font-medium mb-1">Business type:</strong>
     <%= subscription_group.business_type %>
+  </div>
+  <div>
+    <strong class="block font-medium mb-1">Country code:</strong>
+    <%= subscription_group.country_code %>
+  </div>
+  <div>
+    <strong class="block font-medium mb-1">Auto renew:</strong>
+    <%= subscription_group.auto_renew? ? "Yes" : "No" %>
   </div>
   <div>
     <strong class="block font-medium mb-1">Discarded at:</strong>

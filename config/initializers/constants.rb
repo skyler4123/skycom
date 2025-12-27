@@ -115,3 +115,18 @@ WORKFLOW_STATUS = {
   refunded: 7,
   failed: 8
 }
+
+SUBSCRIPTION_PRICING_PLANS = {
+  "US" => {
+    free:       { amount: 0.00,   currency: :usd },
+    basic:      { amount: 5.00,   currency: :usd },
+    pro:        { amount: 29.99,  currency: :usd },
+    enterprise: { amount: 99.99,  currency: :usd }
+  },
+  "VN" => {
+    free:       { amount: 0,         currency: :vnd },
+    basic:      { amount: 250_000,   currency: :vnd },
+    pro:        { amount: 600_000,   currency: :vnd },
+    enterprise: { amount: 2_000_000, currency: :vnd }
+  }
+}.freeze

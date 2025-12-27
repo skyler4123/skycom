@@ -32,15 +32,25 @@ class User < ApplicationRecord
   include User::AvatarConcern
   include User::ChatImagesConcern
 
-
   # --- Business Logic Associations ---
   # A user can own multiple companies. If the user is deleted, their companies are also destroyed.
+  has_one :address_appointment, as: :appoint_to, dependent: :destroy
+  has_one :address, dependent: :destroy, through: :address_appointment
+
   has_many :company_groups, dependent: :destroy
   has_one :employee, dependent: :destroy
   has_one :customer, dependent: :destroy
 
   belongs_to :parent_user, class_name: "User", optional: true
   has_many :child_users, class_name: "User", foreign_key: "parent_user_id", dependent: :destroy
+
+  enum :system_role, {
+    super_admin: 0,
+    admin: 1,
+    company_owner: 2,
+    company_employee: 3,
+    company_customer: 4
+  }, prefix: true
 
   # --- Custom Methods ---
   # Alias for `parent_user` to provide a more descriptive name for the owner of a company.
@@ -54,13 +64,6 @@ class User < ApplicationRecord
     child_users
   end
 
-  def first_company_group_business_type
-    company_groups.first&.business_type
-  end
-
   include User::RetailConcern
-  include IdentityCache
-
-  cache_index :email, unique: true
   # ----------------------------------------------------------------------------------------------------
 end

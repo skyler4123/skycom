@@ -1,5 +1,4 @@
 import ApplicationController from "controllers/application_controller"
-import { currentCompanyGroup } from "controllers/helpers"
 export default class Retail_Pos_LayoutController extends ApplicationController {
 
   initLayout() {

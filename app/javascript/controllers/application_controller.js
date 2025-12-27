@@ -1,4 +1,4 @@
-import { isDefined } from "controllers/helpers"
+import * as Helpers from "controllers/helpers"
 import { Controller } from "@hotwired/stimulus"
 
 export default class ApplicationController extends Controller {
@@ -7,9 +7,9 @@ export default class ApplicationController extends Controller {
   }
 
   initialize() {
-    if (isDefined(this.initBindings)) { this.initBindings()}
-    if (isDefined(this.initLayout)) { this.initLayout() }
-    if (isDefined(this.init)) { this.init() }
+    if (Helpers.isDefined(this.initBindings)) { this.initBindings()}
+    if (Helpers.isDefined(this.initLayout)) { this.initLayout() }
+    if (Helpers.isDefined(this.init)) { this.init() }
     this.initializedValue = true
   }
 }

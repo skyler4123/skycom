@@ -145,7 +145,7 @@ export const openPopover = ({parentElement, html = "Dialog content", position = 
     showCloseButton: false,
     customClass: {
       container: '!bg-transparent',
-      popup: 'swal2-container-custom w-fit! h-fit! p-0! rounded-none! bg-transparent!' + className,
+      popup: ' swal2-container-custom w-fit! h-fit! p-0! rounded-none! bg-transparent! ' + className,
       htmlContainer: '!p-0',
     },
     showClass: { popup: `animate__animated animate__fadeInUp animate__faster` },
@@ -192,7 +192,7 @@ export const closeModal = () => Swal.close()
  * Returns the data-controller attribute string for the darkmode controller.
  * @returns {string} `data-controller="darkmode"`
  */
-export const darkmode = () => `data-controller="darkmode"`
+export const darkmodeTrigger = () => `data-darkmode-target="trigger"`
 
 /**
  * Returns the data-link-target attribute string for opening links by pathname.

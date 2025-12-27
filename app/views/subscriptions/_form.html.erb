@@ -17,13 +17,13 @@
   </div>
 
   <div class="my-5">
-    <%= form.label :company_group_id %>
-    <%= form.text_field :company_group_id, class: ["block shadow-sm rounded-md border px-3 py-2 mt-2 w-full", {"border-gray-400 focus:outline-blue-600": subscription.errors[:company_group_id].none?, "border-red-400 focus:outline-red-600": subscription.errors[:company_group_id].any?}] %>
+    <%= form.label :price_id %>
+    <%= form.text_field :price_id, class: ["block shadow-sm rounded-md border px-3 py-2 mt-2 w-full", {"border-gray-400 focus:outline-blue-600": subscription.errors[:price_id].none?, "border-red-400 focus:outline-red-600": subscription.errors[:price_id].any?}] %>
   </div>
 
   <div class="my-5">
-    <%= form.label :company_id %>
-    <%= form.text_field :company_id, class: ["block shadow-sm rounded-md border px-3 py-2 mt-2 w-full", {"border-gray-400 focus:outline-blue-600": subscription.errors[:company_id].none?, "border-red-400 focus:outline-red-600": subscription.errors[:company_id].any?}] %>
+    <%= form.label :period_id %>
+    <%= form.text_field :period_id, class: ["block shadow-sm rounded-md border px-3 py-2 mt-2 w-full", {"border-gray-400 focus:outline-blue-600": subscription.errors[:period_id].none?, "border-red-400 focus:outline-red-600": subscription.errors[:period_id].any?}] %>
   </div>
 
   <div class="my-5">
@@ -42,13 +42,28 @@
   </div>
 
   <div class="my-5">
-    <%= form.label :status %>
-    <%= form.number_field :status, class: ["block shadow-sm rounded-md border px-3 py-2 mt-2 w-full", {"border-gray-400 focus:outline-blue-600": subscription.errors[:status].none?, "border-red-400 focus:outline-red-600": subscription.errors[:status].any?}] %>
+    <%= form.label :lifecycle_status %>
+    <%= form.number_field :lifecycle_status, class: ["block shadow-sm rounded-md border px-3 py-2 mt-2 w-full", {"border-gray-400 focus:outline-blue-600": subscription.errors[:lifecycle_status].none?, "border-red-400 focus:outline-red-600": subscription.errors[:lifecycle_status].any?}] %>
+  </div>
+
+  <div class="my-5">
+    <%= form.label :workflow_status %>
+    <%= form.number_field :workflow_status, class: ["block shadow-sm rounded-md border px-3 py-2 mt-2 w-full", {"border-gray-400 focus:outline-blue-600": subscription.errors[:workflow_status].none?, "border-red-400 focus:outline-red-600": subscription.errors[:workflow_status].any?}] %>
   </div>
 
   <div class="my-5">
     <%= form.label :business_type %>
     <%= form.number_field :business_type, class: ["block shadow-sm rounded-md border px-3 py-2 mt-2 w-full", {"border-gray-400 focus:outline-blue-600": subscription.errors[:business_type].none?, "border-red-400 focus:outline-red-600": subscription.errors[:business_type].any?}] %>
+  </div>
+
+  <div class="my-5">
+    <%= form.label :country_code %>
+    <%= form.text_field :country_code, class: ["block shadow-sm rounded-md border px-3 py-2 mt-2 w-full", {"border-gray-400 focus:outline-blue-600": subscription.errors[:country_code].none?, "border-red-400 focus:outline-red-600": subscription.errors[:country_code].any?}] %>
+  </div>
+
+  <div class="my-5 flex items-center gap-2">
+    <%= form.label :auto_renew %>
+    <%= form.checkbox :auto_renew, class: ["block shadow-sm rounded-md border order-first h-5 w-5", {"border-gray-400 focus:outline-blue-600": subscription.errors[:auto_renew].none?, "border-red-400 focus:outline-red-600": subscription.errors[:auto_renew].any?}] %>
   </div>
 
   <div class="my-5">
