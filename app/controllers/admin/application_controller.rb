@@ -9,5 +9,5 @@ class Admin::ApplicationController < ApplicationController
   # end
   def only_admin_can_access
     redirect_to root_path unless Current.user.system_role_super_admin? || Current.user.system_role_admin?
-  end    
+  end
 end

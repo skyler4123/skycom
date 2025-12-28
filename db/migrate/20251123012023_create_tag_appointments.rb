@@ -11,6 +11,6 @@ class CreateTagAppointments < ActiveRecord::Migration[8.0]
 
       t.timestamps
     end
-    add_index :tag_appointments, [:appoint_to_type, :appoint_to_id]
+    add_index :tag_appointments, [ :appoint_to_type, :appoint_to_id ]
   end
 end

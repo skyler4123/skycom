@@ -15,7 +15,7 @@ module SingleSessionAccessConcern
   def invalidate_current_session
     cookies.clear
 
-    return redirect_to main_app.root_path,
+    redirect_to main_app.root_path,
       alert: "Your session has been taken over by another device. Please sign in again."
   end
 end

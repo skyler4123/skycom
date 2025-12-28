@@ -30,7 +30,7 @@ class Company < ApplicationRecord
   belongs_to :parent_company, class_name: "Company", optional: true
   has_many :child_companies, class_name: "Company", foreign_key: "parent_company_id", dependent: :destroy, inverse_of: :parent_company
 
-  # --- Enums --- 
+  # --- Enums ---
   enum :lifecycle_status, LIFECYCLE_STATUS
   enum :workflow_status, WORKFLOW_STATUS
 

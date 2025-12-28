@@ -8,10 +8,10 @@ module ApplicationController::CookieConcern
     company_groups = user.company_groups.map do |company_group|
       business_type = company_group.business_type
       url = case business_type
-            when "retail"    then retail_management_branches_path(retail_id: company_group.id)
-            when "education" then education_schools_path(education_id: company_group.id)
-            when "hospital"  then hospital_patients_path(hospital_id: company_group.id)
-            end
+      when "retail"    then retail_management_branches_path(retail_id: company_group.id)
+      when "education" then education_schools_path(education_id: company_group.id)
+      when "hospital"  then hospital_patients_path(hospital_id: company_group.id)
+      end
 
       { id: company_group.id, name: company_group.name, business_type: business_type, url: url }
     end

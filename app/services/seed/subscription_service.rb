@@ -1,7 +1,5 @@
 class Seed::SubscriptionService
   def self.create(user: nil)
-
-
     # 2. Determine Country and Plan
     # Prefer user's country, otherwise random from supported list
     country_code = user.country_code.presence || SUBSCRIPTION_PRICING_PLANS.keys.sample
