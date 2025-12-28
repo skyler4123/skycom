@@ -1,4 +1,5 @@
 Rails.application.routes.draw do
+  resources :category_appointments
   resources :subscription_group_appointments
   resources :subscription_groups
   resources :statistics
