@@ -1,4 +1,6 @@
 class SubscriptionGroup < ApplicationRecord
-  belongs_to :company_group
-  belongs_to :company
+  include ImmutableRecordConcern
+
+  belongs_to :price
+  belongs_to :period
 end

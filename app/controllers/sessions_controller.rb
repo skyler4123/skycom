@@ -13,9 +13,13 @@ class SessionsController < ApplicationController
 
   def create
     if user = User.authenticate_by(email: params[:email], password: params[:password])
-      @session = user.sessions.create!
-      # cookies.signed.permanent[:session_token] = { value: @session.id, httponly: true }
-      update_cookie(session: @session, user: user)
+      @session = user.sessions.create!(single_access_token: SecureRandom.hex(20))
+      user.update!(single_access_token: @session.single_access_token)
+
+      update_cookie(
+        session: @session,
+        user: user
+      )
 
       redirect_to root_path, notice: "Signed in successfully"
     else

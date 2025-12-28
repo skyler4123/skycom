@@ -11,17 +11,21 @@ class CreateUsers < ActiveRecord::Migration[8.0]
 
       # t.references :parent_company, null: true, foreign_key: { to_table: :companies }, type: :uuid
       t.references :parent_user, null: true, foreign_key: { to_table: :users }, type: :uuid
+      t.integer :system_role
       t.string :username
       t.string :first_name
       t.string :last_name
       t.string :avatar
       t.string :phone_number
       t.string :country_code
-      t.references :address, null: true, foreign_key: true, type: :uuid
+      t.string :single_access_token
       t.datetime :discarded_at
 
       t.timestamps
     end
     add_index :users, :discarded_at
+    add_index :users, :username, unique: true
+    add_index :users, :uid, unique: true
+    add_index :users, :single_access_token, unique: true
   end
 end

@@ -1,0 +1,37 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  subscription_group: one
+  appoint_from: one
+  appoint_from_type: Appoint from
+  appoint_to: one
+  appoint_to_type: Appoint to
+  appoint_for: one
+  appoint_for_type: Appoint for
+  appoint_by: one
+  appoint_by_type: Appoint by
+  name: MyString
+  description: MyString
+  code: MyString
+  lifecycle_status: 1
+  workflow_status: 1
+  business_type: 1
+  discarded_at: 2025-12-27 06:16:21
+
+two:
+  subscription_group: two
+  appoint_from: two
+  appoint_from_type: Appoint from
+  appoint_to: two
+  appoint_to_type: Appoint to
+  appoint_for: two
+  appoint_for_type: Appoint for
+  appoint_by: two
+  appoint_by_type: Appoint by
+  name: MyString
+  description: MyString
+  code: MyString
+  lifecycle_status: 1
+  workflow_status: 1
+  business_type: 1
+  discarded_at: 2025-12-27 06:16:21

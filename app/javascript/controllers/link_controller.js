@@ -2,13 +2,13 @@
 // data-link-target="openByPathname"
 
 import { Controller } from "@hotwired/stimulus"
-import { poll, addAttribute } from "controllers/helpers"
+import * as Helpers from "controllers/helpers"
 
 export default class LinkController extends Controller {
   static targets = ["link", "openByPathname"]
 
   initialize() {
-    poll(() => {
+    Helpers.poll(() => {
       this.addLinkTargets()
       this.updateOpenByPathnameTargets()
     })
@@ -16,7 +16,7 @@ export default class LinkController extends Controller {
 
   addLinkTargets() {
     this.element.querySelectorAll('a').forEach((linkElement) => {
-      addAttribute(linkElement, `data-${this.identifier}-target`, 'link')
+      Helpers.addAttribute(linkElement, `data-${this.identifier}-target`, 'link')
     })
   }
 

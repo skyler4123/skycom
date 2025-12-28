@@ -269,9 +269,40 @@ export default class Retail_Pos_Branches_ShowController extends Retail_Pos_Layou
                       class="px-4 py-2 rounded-full bg-white dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 text-sm font-medium whitespace-nowrap">Sale</button>
                   </div>
                 </nav>
+                
+                <div class="w-ful bg-white flex flex-row justify-between items-center">
+                  <div class="flex items-end gap-1 overflow-x-auto no-scrollbar -mb-px px-1">
+                    <button
+                      class="relative bg-white dark:bg-gray-900 text-blue-600 border border-gray-200 dark:border-gray-800 border-b-white dark:border-b-gray-900 rounded-t-lg px-4 py-2.5 text-md animate-bounce font-medium flex items-center gap-2 z-10 shadow-sm">
+                      <span class="material-symbols-outlined text-lg">shopping_cart</span>
+                      <span class="max-w-[120px] truncate">Sarah M.</span>
+                      <span
+                        class="ml-1 text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-full p-0.5 transition-colors cursor-pointer">
+                        <span class="material-symbols-outlined text-base block">close</span>
+                      </span>
+                    </button>
+                    <button
+                      class="bg-transparent hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-500 dark:text-gray-400 border border-transparent hover:border-gray-200 dark:hover:border-gray-700 border-b-transparent rounded-t-lg px-4 py-2.5 text-sm font-medium flex items-center gap-2 mb-px transition-colors">
+                      <span>Walk-in #3</span>
+                    </button>
+                    <button
+                      class="ml-1 p-2 mb-1.5 text-gray-400 hover:text-blue-600 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-md transition-colors"
+                      title="Add new order">
+                      <span class="material-symbols-outlined text-xl">add</span>
+                    </button>
+                  </div>
+                  <div class="relative w-full sm:w-72 mb-3">
+                    <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+                      <span class="material-symbols-outlined text-gray-400">person_search</span>
+                    </div>
+                    <input
+                      class="block w-full rounded-lg border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 pl-10 pr-4 py-2 text-sm focus:border-blue-600 focus:ring-blue-600 dark:text-white dark:placeholder-gray-400 transition-colors"
+                      placeholder="Search or add customer..." type="text" />
+                  </div>
+                </div>
 
                 <div
-                  class="grid grid-cols-2 md:grid-cols-3 gap-6"
+                  class="grid grid-cols-2 md:grid-cols-3 gap-6 bg-white dark:bg-gray-900 pt-2"
                   data-${this.identifier}-target="products"
                 >
                 </div>

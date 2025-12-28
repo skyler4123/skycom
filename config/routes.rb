@@ -1,13 +1,22 @@
 Rails.application.routes.draw do
-  resources :categories
-  resources :article_appointments
-  resources :article_group_appointments
-  resources :articles
-  resources :article_groups
-  resources :document_appointments
-  resources :document_group_appointments
-  resources :documents
-  resources :document_groups
+  resources :subscription_group_appointments
+  resources :subscription_groups
+  resources :statistics
+
+
+  # Routes for Admin Management
+  namespace :admin do
+    # We use 'scope module: :admin
+    # to tell Rails that the controllers for these resources are located inside the "Admin
+    # namespace (e.g., app/controllers/admin/users_controller.rb).
+    resources :dashboard
+    resources :company_groups
+    resources :companies
+    resources :users
+    resources :subscriptions
+  end
+
+
 
   # Routes for Retail Management
   resources :retail, only: [ :show ] do
@@ -39,6 +48,7 @@ Rails.application.routes.draw do
         resources :facilities
         resources :settings
         resources :administrators
+        resources :subscriptions
       end
 
       namespace :pos do
@@ -87,13 +97,20 @@ Rails.application.routes.draw do
   end
 
   # General Application Routes
+  resources :categories
+  resources :article_appointments
+  resources :article_group_appointments
+  resources :articles
+  resources :article_groups
+  resources :document_appointments
+  resources :document_group_appointments
+  resources :documents
+  resources :document_groups
   resources :setting_appointments
   resources :setting_group_appointments
   resources :setting_groups
   resources :subscription_appointments
-  resources :subscription_group_appointments
   resources :subscriptions
-  resources :subscription_groups
   resources :event_appointments
   resources :event_group_appointments
   resources :events

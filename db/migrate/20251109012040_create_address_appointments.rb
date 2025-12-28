@@ -1,7 +1,7 @@
-class CreatePeriodAppointments < ActiveRecord::Migration[8.0]
+class CreateAddressAppointments < ActiveRecord::Migration[8.0]
   def change
-    create_table :period_appointments, id: :uuid do |t|
-      t.references :period, null: false, foreign_key: true, type: :uuid
+    create_table :address_appointments, id: :uuid do |t|
+      t.references :address, null: false, foreign_key: true, type: :uuid
       t.references :appoint_from, polymorphic: true, null: true, type: :uuid
       t.references :appoint_to, polymorphic: true, null: false, type: :uuid
       t.references :appoint_for, polymorphic: true, null: true, type: :uuid
@@ -10,8 +10,14 @@ class CreatePeriodAppointments < ActiveRecord::Migration[8.0]
       t.string :description
       t.string :code
       t.string :value
+      t.integer :lifecycle_status
+      t.integer :workflow_status
+      t.integer :business_type
+      t.datetime :discarded_at
 
       t.timestamps
     end
+    add_index :address_appointments, :discarded_at
+    add_index :address_appointments, [ :appoint_to_type, :appoint_to_id ]
   end
 end

@@ -4,12 +4,12 @@
     <%= subscription.subscription_group_id %>
   </div>
   <div>
-    <strong class="block font-medium mb-1">Company group:</strong>
-    <%= subscription.company_group_id %>
+    <strong class="block font-medium mb-1">Price:</strong>
+    <%= subscription.price_id %>
   </div>
   <div>
-    <strong class="block font-medium mb-1">Company:</strong>
-    <%= subscription.company_id %>
+    <strong class="block font-medium mb-1">Period:</strong>
+    <%= subscription.period_id %>
   </div>
   <div>
     <strong class="block font-medium mb-1">Name:</strong>
@@ -24,12 +24,24 @@
     <%= subscription.code %>
   </div>
   <div>
-    <strong class="block font-medium mb-1">Status:</strong>
-    <%= subscription.status %>
+    <strong class="block font-medium mb-1">Lifecycle status:</strong>
+    <%= subscription.lifecycle_status %>
+  </div>
+  <div>
+    <strong class="block font-medium mb-1">Workflow status:</strong>
+    <%= subscription.workflow_status %>
   </div>
   <div>
     <strong class="block font-medium mb-1">Business type:</strong>
     <%= subscription.business_type %>
+  </div>
+  <div>
+    <strong class="block font-medium mb-1">Country code:</strong>
+    <%= subscription.country_code %>
+  </div>
+  <div>
+    <strong class="block font-medium mb-1">Auto renew:</strong>
+    <%= subscription.auto_renew? ? "Yes" : "No" %>
   </div>
   <div>
     <strong class="block font-medium mb-1">Discarded at:</strong>

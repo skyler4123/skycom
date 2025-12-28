@@ -1,0 +1,27 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  price: one
+  period: one
+  name: MyString
+  description: MyString
+  code: MyString
+  lifecycle_status: 1
+  workflow_status: 1
+  business_type: 1
+  country_code: MyString
+  auto_renew: false
+  discarded_at: 2025-12-27 06:16:20
+
+two:
+  price: two
+  period: two
+  name: MyString
+  description: MyString
+  code: MyString
+  lifecycle_status: 1
+  workflow_status: 1
+  business_type: 1
+  country_code: MyString
+  auto_renew: false
+  discarded_at: 2025-12-27 06:16:20
