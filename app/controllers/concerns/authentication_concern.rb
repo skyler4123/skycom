@@ -21,6 +21,6 @@ module AuthenticationConcern
   end
 
   def authenticate
-    redirect_to main_app.root_path if !Current.session
+    return redirect_to main_app.root_path if !Current.session
   end
 end
