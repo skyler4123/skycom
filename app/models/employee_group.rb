@@ -1,6 +1,7 @@
 class EmployeeGroup < ApplicationRecord
   belongs_to :company_group
   belongs_to :company, optional: true
+  belongs_to :category, optional: true
 
   has_many :tag_appointments, as: :appoint_to, dependent: :destroy
   has_many :tags, through: :tag_appointments
@@ -10,7 +11,4 @@ class EmployeeGroup < ApplicationRecord
 
   has_many :role_appointments, as: :appoint_to, dependent: :destroy
   has_many :roles, through: :role_appointments
-
-  has_one :category_appointment, as: :appoint_to, dependent: :destroy
-  has_one :category, through: :category_appointment
 end

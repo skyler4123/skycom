@@ -332,28 +332,6 @@ ActiveRecord::Schema[8.0].define(version: 2025_12_26_231623) do
     t.index ["name"], name: "index_categories_on_name"
   end
 
-  create_table "category_appointments", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
-    t.uuid "category_id", null: false
-    t.string "appoint_from_type"
-    t.uuid "appoint_from_id"
-    t.string "appoint_to_type", null: false
-    t.uuid "appoint_to_id", null: false
-    t.string "appoint_for_type"
-    t.uuid "appoint_for_id"
-    t.string "appoint_by_type"
-    t.uuid "appoint_by_id"
-    t.string "name"
-    t.string "description"
-    t.string "code"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.index ["appoint_by_type", "appoint_by_id"], name: "index_category_appointments_on_appoint_by"
-    t.index ["appoint_for_type", "appoint_for_id"], name: "index_category_appointments_on_appoint_for"
-    t.index ["appoint_from_type", "appoint_from_id"], name: "index_category_appointments_on_appoint_from"
-    t.index ["appoint_to_type", "appoint_to_id"], name: "index_category_appointments_on_appoint_to"
-    t.index ["category_id"], name: "index_category_appointments_on_category_id"
-  end
-
   create_table "companies", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.uuid "company_group_id", null: false
     t.uuid "parent_company_id"
@@ -2305,7 +2283,6 @@ ActiveRecord::Schema[8.0].define(version: 2025_12_26_231623) do
   add_foreign_key "carts", "companies"
   add_foreign_key "carts", "company_groups"
   add_foreign_key "categories", "company_groups"
-  add_foreign_key "category_appointments", "categories"
   add_foreign_key "companies", "categories"
   add_foreign_key "companies", "companies", column: "parent_company_id"
   add_foreign_key "companies", "company_groups"

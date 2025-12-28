@@ -30,6 +30,7 @@
   
   ### Generic / Category + Tagging
   bundle exec rails g scaffold Category company_group:references name description --force
+  bundle exec rails g scaffold CategoryAppointment category:references appoint_from:references{polymorphic} appoint_to:references{polymorphic} appoint_for:references{polymorphic} appoint_by:references{polymorphic} name description code --force
   bundle exec rails g scaffold Tag company_group:references name description code --force
   bundle exec rails g scaffold TagAppointment tag:references appoint_from:references{polymorphic} appoint_to:references{polymorphic} appoint_for:references{polymorphic} appoint_by:references{polymorphic} value description --force
 

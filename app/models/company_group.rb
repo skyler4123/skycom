@@ -24,6 +24,7 @@ class CompanyGroup < ApplicationRecord
   has_many :notification_groups, dependent: :destroy
   has_many :payment_methods, through: :payment_method_appointments
   has_many :statistics, as: :owner
+  has_many :categories, dependent: :destroy
 
   # --- Enums ---
   enum :lifecycle_status, LIFECYCLE_STATUS
