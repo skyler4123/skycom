@@ -17,7 +17,7 @@ class CreateUsers < ActiveRecord::Migration[8.0]
       t.string :last_name
       t.string :avatar
       t.string :phone_number
-      t.string :country_code
+      t.integer :country_code
       t.string :single_access_token
       t.datetime :discarded_at
 

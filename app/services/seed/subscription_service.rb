@@ -1,40 +1,37 @@
+# This service seeds the database with Subscription records based on SUBSCRIPTION_PRICING_PLANS.
+
 class Seed::SubscriptionService
-  def self.create(user: nil)
-    # 2. Determine Country and Plan
-    # Prefer user's country, otherwise random from supported list
-    country_code = user.country_code.presence || SUBSCRIPTION_PRICING_PLANS.keys.sample
-    country_code = "US" unless SUBSCRIPTION_PRICING_PLANS.key?(country_code) # Fallback
+  def self.run
+    puts "Seeding Subscription records..."
 
-    plan_name = Subscription.plan_names.keys.sample
-    price_info = SUBSCRIPTION_PRICING_PLANS[country_code][plan_name.to_sym]
+    SUBSCRIPTION_PRICING_PLANS.each do |country, plans|
+      plans.each do |plan_name, plan_details|
+        amount = plan_details[:amount]
+        currency = plan_details[:currency]
 
-    # 3. Setup Price (Find or Create to avoid duplicates)
-    price = Price.find_or_create_by!(
-      amount: price_info[:amount],
-      currency: price_info[:currency]
-    )
+        # Create or find the price
+        price = Price.find_or_create_by(amount: amount, currency: currency)
 
-    # 4. Setup Period (Current Month)
-    # Using beginning_of_hour to ensure clean timestamps for finding existing records
-    start_at = Time.current.beginning_of_hour
-    end_at   = 1.month.from_now.beginning_of_hour
+        # Create a period for this subscription (assuming monthly)
+        start_at = Time.current
+        end_at = start_at + 1.month
+        period = Period.find_or_create_by(
+          start_at: start_at,
+          end_at: end_at,
+          time_zone: 0 # UTC
+        )
 
-    period = Period.find_or_create_by!(
-      start_at: start_at,
-      end_at: end_at,
-      time_zone: 0
-    )
+        # Create the subscription
+        Subscription.find_or_create_by(
+          code: "#{plan_name.upcase}-#{country}",
+          name: "#{plan_name.capitalize} Plan (#{country})",
+          price: price,
+          period: period,
+          country_code: country
+        )
+      end
+    end
 
-    # 5. Create Subscription
-    Subscription.create!(
-      user: user,
-      period: period,
-      price: price,
-      plan_name: plan_name,
-      lifecycle_status: :live,
-      workflow_status: :active,
-      country_code: country_code,
-      auto_renew: [ true, false ].sample
-    )
+    puts "Successfully created #{Subscription.count} Subscription records."
   end
 end

@@ -43,16 +43,6 @@ class Period < ApplicationRecord
     message: "already exists with this time and offset"
   }
 
-  # 3. Reusable Logic
-  def self.reusable_create(start_at:, end_at: nil, time_zone: 0)
-    # You can pass the integer (7) or the key (:plus_7)
-    find_or_create_by(
-      start_at: start_at,
-      end_at: end_at,
-      time_zone: time_zone
-    )
-  end
-
   # 4. Helper: Format the offset for display (e.g., returns "+07:00")
   def formatted_offset
     # time_zone returns the string key (e.g., "plus_7"), so we fetch the integer value

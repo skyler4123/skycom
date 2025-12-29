@@ -16,31 +16,6 @@ class Address < ApplicationRecord
   # Calculate fingerprint before checking validation or saving
   before_validation :generate_fingerprint
 
-  # 3. Reusable Logic
-  def self.reusable_create(line_1:, city:, country_code:, line_2: nil, state_or_province: nil, postal_code: nil)
-    # create a temporary instance to calculate the hash
-    temp = new(
-      line_1: line_1,
-      line_2: line_2,
-      city: city,
-      state_or_province: state_or_province,
-      postal_code: postal_code,
-      country_code: country_code
-    )
-    temp.generate_fingerprint
-
-    # Find existing by fingerprint, or create the new one
-    find_or_create_by(fingerprint: temp.fingerprint) do |addr|
-      # If creating new, set the attributes
-      addr.line_1 = line_1
-      addr.line_2 = line_2
-      addr.city = city
-      addr.state_or_province = state_or_province
-      addr.postal_code = postal_code
-      addr.country_code = country_code
-    end
-  end
-
   # 4. Fingerprint Generator
   # Normalizes text (downcase, strip) and hashes it
   def generate_fingerprint

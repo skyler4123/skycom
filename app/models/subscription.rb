@@ -12,9 +12,10 @@ class Subscription < ApplicationRecord
   has_many :subscription_appointments, dependent: :restrict_with_error
 
   # --- Validations ---
-  validates :name, presence: true
-  validates :code, uniqueness: true, allow_blank: true
+  validates :tier, presence: true
 
   # Ensure the definition components are always present
   validates :price, :period, presence: true
+
+
 end
