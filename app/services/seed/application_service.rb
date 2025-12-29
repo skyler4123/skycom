@@ -9,7 +9,7 @@ class Seed::ApplicationService
     Brand.destroy_all
 
     # Identify the platform by a hardcoded CODE, not ID.
-    System.find_or_create_by!(code: 'System') do |sa|
+    System.find_or_create_by!(code: "System") do |sa|
       sa.name = "System"
       sa.balance_cents = 0
       sa.currency = "USD"

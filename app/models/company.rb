@@ -1,4 +1,6 @@
 class Company < ApplicationRecord
+  include SubscribableConcern
+
   belongs_to :company_group
 
   has_many :tag_appointments, as: :appoint_to, dependent: :destroy

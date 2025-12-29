@@ -2105,10 +2105,11 @@ ActiveRecord::Schema[8.0].define(version: 2025_12_26_231623) do
     t.string "code", null: false, comment: "System"
     t.integer "balance_cents", default: 0, null: false
     t.string "currency", default: "USD", null: false
+    t.integer "country_code"
     t.boolean "active", default: true, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["code"], name: "index_systems_on_code", unique: true
+    t.index ["name"], name: "index_systems_on_name", unique: true
   end
 
   create_table "tag_appointments", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|

@@ -3,13 +3,13 @@ class SubscriptionGroupAppointment < ApplicationRecord
 
   # --- Associations ---
   belongs_to :subscription
-  
+
   # The Seller (System/Company)
   belongs_to :appoint_from, polymorphic: true
   # The Buyer (User/Customer)
   belongs_to :appoint_to, polymorphic: true
   # The Context (e.g. The specific Service or Product Group being subscribed to)
-  belongs_to :appoint_for, polymorphic: true, optional: true 
+  belongs_to :appoint_for, polymorphic: true, optional: true
   # The Admin/System who created it
   belongs_to :appoint_by, polymorphic: true, optional: true
 
@@ -21,7 +21,7 @@ class SubscriptionGroupAppointment < ApplicationRecord
   # These match the integer columns in your new migration
   enum :lifecycle_status, LIFECYCLE_STATUS, default: :active
   enum :workflow_status, WORKFLOW_STATUS, default: :draft
-  
+
   # You might need specific business types for subscriptions (e.g. :recurring, :one_time)
   # or reuse your global constant.
   enum :business_type, {
@@ -41,9 +41,9 @@ class SubscriptionGroupAppointment < ApplicationRecord
 
   # --- Logic Helper ---
   def active?
-    lifecycle_status == 'active'
+    lifecycle_status == "active"
   end
-  
+
   # Helper to calculate expiry based on the associated period definition
   def calculate_end_date
     # logic using self.period.duration

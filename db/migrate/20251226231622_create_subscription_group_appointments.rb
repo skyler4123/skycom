@@ -2,16 +2,16 @@ class CreateSubscriptionGroupAppointments < ActiveRecord::Migration[8.0]
   def change
     create_table :subscription_group_appointments, id: :uuid do |t|
       t.references :subscription_group, null: false, foreign_key: true, type: :uuid
-      
+
       # The entity selling the subscription (e.g., Company)
       t.references :appoint_from, polymorphic: true, null: false, type: :uuid
-      
+
       # The entity owning/using the subscription (e.g., User or Customer)
       t.references :appoint_to, polymorphic: true, null: false, type: :uuid
-      
+
       # The specific resource the subscription applies to (if applicable)
       t.references :appoint_for, polymorphic: true, null: true, type: :uuid
-      
+
       # Who processed the subscription (e.g., Admin/System)
       t.references :appoint_by, polymorphic: true, null: true, type: :uuid
 
@@ -30,7 +30,7 @@ class CreateSubscriptionGroupAppointments < ActiveRecord::Migration[8.0]
     end
     add_index :subscription_group_appointments, :discarded_at
     add_index :subscription_group_appointments, [ :appoint_to_type, :appoint_to_id ]
-    
+
     # Helpful index for finding active subscriptions quickly
     add_index :subscription_group_appointments, :lifecycle_status
   end
