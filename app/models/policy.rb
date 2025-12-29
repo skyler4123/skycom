@@ -39,6 +39,13 @@ class Policy < ApplicationRecord
               message: "A policy with this name already exists in this company."
             }
 
+  # If you edit the Policy name/action/resource, notify the Roles.
+  after_update :touch_roles
 
-  validates :kind, presence: true
+  private
+
+  def touch_roles
+    # We iterate and touch to trigger the Role's `after_touch` callback defined above.
+    roles.each(&:touch)
+  end
 end

@@ -180,4 +180,5 @@
   bundle exec rails g scaffold Article
   bundle exec rails g scaffold Report
   bundle exec rails g scaffold Log name
+  bundle exec rails g migration CreateSystem name code balance:integer currency status
 ##

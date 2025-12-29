@@ -7,6 +7,6 @@ class CreateCategories < ActiveRecord::Migration[8.0]
 
       t.timestamps
     end
-    add_index :categories, :name
+    add_index :categories, [ :company_group_id, :name ]
   end
 end

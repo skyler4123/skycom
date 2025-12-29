@@ -79,6 +79,12 @@ class Seed::RetailService
     end
     puts "Created #{RETAIL_ROLES.count} roles for the retail group."
 
+    # --- 4.5. [NEW] Configure Permissions (Policies) for Roles ---
+    # This setup ensures specific roles have CRUD access to specific resources
+    configure_retail_permissions
+    puts "configured policies/permissions for retail roles."
+
+
     # --- 5. Create Departments (Employee Groups) for Each Store (Company) ---
     @stores.each do |store|
       puts "Creating departments for #{store.name}..."
@@ -114,7 +120,11 @@ class Seed::RetailService
             description: "Description for Employee #{i + 1} - #{role_name.to_s.titleize}"
           )
           employee.attach_tag(name: "Employee #{employee.id} Tag")
+
+          # This attaches the Role record created in step 4
+          # Because we ran step 4.5, this role now carries Policies (Permissions)
           employee.attach_role(role_name)
+
           current_employees << employee
         end
       end
@@ -203,5 +213,77 @@ class Seed::RetailService
     puts "🛍️  Retail Company Group Seeding Complete!"
     puts "========================================================="
     true
+  end
+
+  private
+
+  # --------------------------------------------------------------------------
+  # PERMISSION LOGIC (RBAC)
+  # --------------------------------------------------------------------------
+  def configure_retail_permissions
+    # Define capabilities for each role
+    # Actions: create, read, update, delete
+
+    role_definitions = {
+      store_manager: {
+        "Order" => [ "create", "read", "update", "delete" ],
+        "Product" => [ "create", "read", "update", "delete" ],
+        "Employee" => [ "create", "read", "update", "delete" ],
+        "Customer" => [ "create", "read", "update", "delete" ]
+      },
+      cashier: {
+        "Order" => [ "create", "read", "update" ], # Can process sales, maybe returns
+        "Product" => [ "read" ],                    # Needs to see prices
+        "Customer" => [ "read", "create" ]          # Can lookup or add customers
+      },
+      sales_associate: {
+        "Order" => [ "create", "read" ],            # Can help create quotes/orders
+        "Product" => [ "read" ],
+        "Customer" => [ "read" ]
+      },
+      stock_clerk: {
+        "Product" => [ "create", "read", "update", "delete" ], # Full control of inventory
+        "Order" => [] # No access to orders
+      },
+      customer: {
+        "Order" => [ "read" ], # Can see their own orders (logic handled in policy scope usually)
+        "Product" => [ "read" ]
+      }
+    }
+
+    role_definitions.each do |role_name, resources|
+      # 1. Find the Role object created in Step 4
+      role = Role.find_by(name: role_name, company_group: @retail_group)
+      next unless role
+
+      resources.each do |resource_name, actions|
+        actions.each do |action|
+          # 2. Create the Policy (The Permission)
+          # We check uniqueness by name/company_group to avoid duplicates if re-seeded
+          policy_name = "Can #{action} #{resource_name}"
+
+          # Using raw ActiveRecord here. If you have Seed::PolicyService, use that instead.
+          policy = Policy.find_or_create_by!(
+            name: policy_name,
+            company_group: @retail_group,
+            resource: resource_name,
+            action: action
+          ) do |p|
+            p.description = "Allows #{action} operations on #{resource_name}"
+            p.business_type = :operational
+            p.lifecycle_status = :active
+            # Company ID is required by your schema validation, picking the first store as reference
+            # or the group owner's context.
+            p.company_id = @stores.first.id
+          end
+
+          # 3. Link Policy to Role via PolicyAppointment
+          PolicyAppointment.find_or_create_by!(
+            policy: policy,
+            appoint_to: role
+          )
+        end
+      end
+    end
   end
 end

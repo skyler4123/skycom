@@ -1,5 +1,5 @@
-# app/controllers/concerns/single_session_access_concern.rb
-module SingleSessionAccessConcern
+# app/controllers/concerns/application_controller/single_session_access_concern.rb
+module ApplicationController::SingleSessionAccessConcern
   extend ActiveSupport::Concern
 
   included do
