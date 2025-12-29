@@ -16,6 +16,8 @@ class Address < ApplicationRecord
   # Calculate fingerprint before checking validation or saving
   before_validation :generate_fingerprint
 
+  enum :country_code, COUNTRIE_CODES, prefix: true
+
   # 4. Fingerprint Generator
   # Normalizes text (downcase, strip) and hashes it
   def generate_fingerprint

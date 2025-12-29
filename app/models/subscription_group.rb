@@ -16,4 +16,6 @@ class SubscriptionGroup < ApplicationRecord
 
   # Ensure the definition components are always present
   validates :price, :period, presence: true
+
+  enum :country_code, COUNTRIE_CODES, prefix: true
 end

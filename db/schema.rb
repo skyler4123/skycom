@@ -78,7 +78,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_12_26_231623) do
     t.string "city", null: false
     t.string "state_or_province"
     t.string "postal_code"
-    t.string "country_code", limit: 2, null: false
+    t.integer "country_code"
     t.string "fingerprint", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
@@ -2071,10 +2071,10 @@ ActiveRecord::Schema[8.0].define(version: 2025_12_26_231623) do
   create_table "subscription_groups", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.uuid "price_id", null: false
     t.uuid "period_id", null: false
-    t.string "name"
+    t.string "tier"
     t.string "description"
     t.string "code"
-    t.string "country_code"
+    t.integer "country_code"
     t.datetime "discarded_at"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
@@ -2087,10 +2087,9 @@ ActiveRecord::Schema[8.0].define(version: 2025_12_26_231623) do
     t.uuid "subscription_group_id"
     t.uuid "price_id", null: false
     t.uuid "period_id", null: false
-    t.string "name"
+    t.string "tier"
     t.string "description"
-    t.string "code"
-    t.string "country_code"
+    t.integer "country_code"
     t.datetime "discarded_at"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
@@ -2252,7 +2251,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_12_26_231623) do
     t.string "last_name"
     t.string "avatar"
     t.string "phone_number"
-    t.string "country_code"
+    t.integer "country_code"
     t.string "single_access_token"
     t.datetime "discarded_at"
     t.datetime "created_at", null: false

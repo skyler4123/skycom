@@ -10,7 +10,7 @@ class Seed::UserService
     first_name: nil,
     last_name: nil,
     phone_number: nil,
-    country_code: nil,
+    country_code: User.country_codes.keys.sample,
     index: nil
   )
     email ||= "#{email}#{index}@example.com"

@@ -81,7 +81,7 @@ TIMEZONES = {
   "+12": 12
 }.freeze
 
-CURRENCIES = {
+CURRENCIE_CODES = {
   usd: 840,
   vnd: 704
 }
@@ -91,7 +91,7 @@ SUBSCRIPTION_LIMITS = {
   max_of_employees: 5
 }
 
-COUNTRIES = {
+COUNTRIE_CODES = {
   us: 840,
   vn: 704
 }

@@ -5,10 +5,10 @@ class Seed::AddressService
     city: Faker::Address.city,
     state_or_province: Faker::Address.state,
     postal_code: Faker::Address.postcode,
-    country_code: Faker::Address.country_code
+    country_code: Address.country_codes.keys.sample
   )
     # The Address model is expected to handle fingerprint generation (e.g., before_validation)
-    Address.find_or_create_by(
+    Address.find_or_create_by!(
       line_1: line_1,
       line_2: line_2,
       city: city,

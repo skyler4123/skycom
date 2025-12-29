@@ -36,7 +36,7 @@ class CompanyGroup < ApplicationRecord
   }
 
   enum :timezone, TIMEZONES, prefix: true
-  enum :currency, CURRENCIES, prefix: true
+  enum :currency, CURRENCIE_CODES, prefix: true
 
   # Grouped business types with 1000-unit gaps for future expansion
   enum :business_type, BUSINESS_TYPES, prefix: true

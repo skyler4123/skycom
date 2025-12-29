@@ -52,6 +52,8 @@ class User < ApplicationRecord
     company_customer: 4
   }, prefix: true
 
+  enum :country_code, COUNTRIE_CODES, prefix: true
+
   # --- Custom Methods ---
   # Alias for `parent_user` to provide a more descriptive name for the owner of a company.
   def company_owner

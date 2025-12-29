@@ -44,7 +44,7 @@ class Company < ApplicationRecord
   enum :business_type, BUSINESS_TYPES, prefix: true
 
   enum :timezone, TIMEZONES, prefix: true
-  enum :currency, CURRENCIES, prefix: true
+  enum :currency, CURRENCIE_CODES, prefix: true
 
   # Enum for the new fiscal_year_end_month column (1=January, 12=December)
   enum :fiscal_year_end_month, {
