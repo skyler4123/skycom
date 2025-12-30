@@ -4,11 +4,11 @@ module Subscription::ResourceConcern
   included do
     has_many :subscriptions, as: :resource, dependent: :destroy
 
-    def subscribe(
-      tier:,
+    def subscribe!(
+      plan_name:,
       seller: System.find_by(name: "System"),
-      buyer: self,
-      resource: nil,
+      buyer: self.subscription_buyer,
+      resource: self,
       processer: System.find_by(name: "System"),
       name: nil,
       country_code: :us,
@@ -16,8 +16,8 @@ module Subscription::ResourceConcern
       workflow_status: :pending,
       renew: false
       )
-      name ||= tier.to_s.humanize
-      plan = SUBSCRIPTION_PRICING_PLANS.dig(country_code.to_sym, tier.to_sym)
+      name ||= plan_name.to_s.humanize
+      plan = SUBSCRIPTION_PRICING_PLANS.dig(country_code.to_sym, plan_name.to_sym)
       return unless plan
 
       price = Price.find_or_create_by!(
@@ -37,7 +37,7 @@ module Subscription::ResourceConcern
         resource: resource,
         processer: processer,
         name: name,
-        tier: tier,
+        plan_name: plan_name,
         country_code: country_code,
         price: price,
         period: period,
@@ -46,26 +46,26 @@ module Subscription::ResourceConcern
       )
     end
 
-    def subscribe_temporary(country_code: :us)
-      subscribe(tier: :temporary, country_code: country_code)
+    def subscribe_temporary!(country_code: :us)
+      subscribe!(plan_name: :temporary, country_code: country_code)
     end
 
-    def subscribe_free(country_code: :us)
-      subscribe(tier: :free, country_code: country_code)
+    def subscribe_free!(country_code: :us)
+      subscribe!(plan_name: :free, country_code: country_code)
     end
 
-    # A flexible method to subscribe to any tier.
-    # Example: user.subscribe_to(tier: :basic_6m, country_code: :us)
-    def subscribe_to(tier:, country_code: :us, renew: false)
-      subscribe(tier: tier, country_code: country_code)
+    # A flexible method to subscribe to any plan_name.
+    # Example: user.subscribe_to(plan_name: :basic_6m, country_code: :us)
+    def subscribe_to(plan_name:, country_code: :us, renew: false)
+      subscribe!(plan_name: plan_name, country_code: country_code)
     end
 
-    def unsubscribe
-      latest_subscription&.update(lifecycle_status: :inactive, workflow_status: :cancelled)
+    def unsubscribe!
+      latest_subscription&.update!(lifecycle_status: :inactive, workflow_status: :cancelled)
     end
 
-    def unrenew
-      # latest_subscription&.update(renew: false)
+    def unrenew!
+      latest_subscription&.update!(renew: false)
     end
 
     def latest_subscription

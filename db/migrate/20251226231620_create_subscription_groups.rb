@@ -16,7 +16,7 @@ class CreateSubscriptionGroups < ActiveRecord::Migration[8.0]
       
       t.string :name
       t.string :description
-      t.integer :tier
+      t.integer :plan_name
       t.integer :country_code
 
       # --- State Columns (Moved Here) ---

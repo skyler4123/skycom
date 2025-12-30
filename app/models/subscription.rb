@@ -12,13 +12,13 @@ class Subscription < ApplicationRecord
   belongs_to :processer, polymorphic: true, optional: true
 
   # --- Validations ---
-  validates :tier, presence: true
+  validates :plan_name, presence: true
 
   # Ensure the definition components are always present
   validates :price, :period, presence: true
 
   enum :country_code, COUNTRIE_CODES, prefix: true
-  enum :tier, SUBSCRIPTION_ENUM_PLAN, prefix: true
+  enum :plan_name, SUBSCRIPTION_ENUM_PLAN, prefix: true
   enum :lifecycle_status, LIFECYCLE_STATUS
   enum :workflow_status, WORKFLOW_STATUS
   enum :business_type, { b2b: 0, b2c: 1 } 

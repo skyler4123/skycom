@@ -80,6 +80,10 @@ class Company < ApplicationRecord
 
   after_initialize :set_defaults_from_company_group, if: :new_record?
 
+  def subscription_buyer
+    self.company_group.user
+  end
+
   private
 
   def set_defaults_from_company_group

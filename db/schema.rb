@@ -2020,7 +2020,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_12_26_231621) do
     t.uuid "processed_by_id"
     t.string "name"
     t.string "description"
-    t.integer "tier"
+    t.integer "plan_name"
     t.integer "country_code"
     t.integer "lifecycle_status"
     t.integer "workflow_status"
@@ -2052,7 +2052,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_12_26_231621) do
     t.uuid "processer_id"
     t.string "name"
     t.string "description"
-    t.integer "tier", null: false
+    t.integer "plan_name", null: false
     t.integer "country_code", null: false
     t.integer "lifecycle_status"
     t.integer "workflow_status"
@@ -2061,12 +2061,16 @@ ActiveRecord::Schema[8.0].define(version: 2025_12_26_231621) do
     t.datetime "discarded_at"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["buyer_id", "buyer_type"], name: "index_subscriptions_on_buyer_id_and_buyer_type"
     t.index ["buyer_type", "buyer_id"], name: "index_subscriptions_on_buyer"
     t.index ["discarded_at"], name: "index_subscriptions_on_discarded_at"
     t.index ["period_id"], name: "index_subscriptions_on_period_id"
     t.index ["price_id"], name: "index_subscriptions_on_price_id"
+    t.index ["processer_id", "processer_type"], name: "index_subscriptions_on_processer_id_and_processer_type"
     t.index ["processer_type", "processer_id"], name: "index_subscriptions_on_processer"
+    t.index ["resource_id", "resource_type"], name: "index_subscriptions_on_resource_id_and_resource_type"
     t.index ["resource_type", "resource_id"], name: "index_subscriptions_on_resource"
+    t.index ["seller_id", "seller_type"], name: "index_subscriptions_on_seller_id_and_seller_type"
     t.index ["seller_type", "seller_id"], name: "index_subscriptions_on_seller"
     t.index ["subscription_group_id"], name: "index_subscriptions_on_subscription_group_id"
   end
