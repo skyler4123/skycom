@@ -21,5 +21,5 @@ class Subscription < ApplicationRecord
   enum :plan_name, SUBSCRIPTION_ENUM_PLAN, prefix: true
   enum :lifecycle_status, LIFECYCLE_STATUS
   enum :workflow_status, WORKFLOW_STATUS
-  enum :business_type, { b2b: 0, b2c: 1 } 
+  enum :business_type, { b2b: 0, b2c: 1 }
 end

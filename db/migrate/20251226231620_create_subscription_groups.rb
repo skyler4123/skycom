@@ -13,7 +13,7 @@ class CreateSubscriptionGroups < ActiveRecord::Migration[8.0]
 
       # Who processed the subscription (e.g., Admin/System)
       t.references :processed_by, polymorphic: true, null: true, type: :uuid
-      
+
       t.string :name
       t.string :description
       t.integer :plan_name

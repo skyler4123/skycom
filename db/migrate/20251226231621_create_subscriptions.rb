@@ -16,7 +16,7 @@ class CreateSubscriptions < ActiveRecord::Migration[8.0]
 
       # Who processed the subscription (e.g., Admin/System)
       t.references :processer, polymorphic: true, null: true, type: :uuid
-      
+
       t.string :name
       t.string :description
       t.integer :plan_name, null: false
@@ -32,9 +32,9 @@ class CreateSubscriptions < ActiveRecord::Migration[8.0]
       t.timestamps
     end
     add_index :subscriptions, :discarded_at
-    add_index :subscriptions, [:seller_id, :seller_type]
-    add_index :subscriptions, [:buyer_id, :buyer_type]
-    add_index :subscriptions, [:resource_id, :resource_type]
-    add_index :subscriptions, [:processer_id, :processer_type]
+    add_index :subscriptions, [ :seller_id, :seller_type ]
+    add_index :subscriptions, [ :buyer_id, :buyer_type ]
+    add_index :subscriptions, [ :resource_id, :resource_type ]
+    add_index :subscriptions, [ :processer_id, :processer_type ]
   end
 end
