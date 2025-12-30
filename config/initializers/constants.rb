@@ -86,14 +86,14 @@ CURRENCIE_CODES = {
   vnd: 704
 }
 
-SUBSCRIPTION_LIMITS = {
-  max_of_companies: 3,
-  max_of_employees: 5
-}
-
 COUNTRIE_CODES = {
   us: 840,
   vn: 704
+}
+
+SUBSCRIPTION_LIMITS = {
+  max_of_companies: 3,
+  max_of_employees: 5
 }
 
 LIFECYCLE_STATUS = {
@@ -116,17 +116,53 @@ WORKFLOW_STATUS = {
   failed: 8
 }
 
+SUBSCRIPTION_ENUM_PLAN = {
+  temporary: 0,
+  free: 1000,
+  basic: 2000,
+  basic_3m: 2001,
+  basic_6m: 2002,
+  basic_1y: 2003,
+  pro: 3000,
+  pro_3m: 3003,
+  pro_6m: 3001,
+  pro_1y: 3002,
+  enterprise: 4000,
+  enterprise_3m: 4001,
+  enterprise_6m: 4002,
+  enterprise_1y: 4003
+}
 SUBSCRIPTION_PRICING_PLANS = {
-  "US" => {
-    free:       { amount: 0.00,   currency: :usd },
-    basic:      { amount: 5.00,   currency: :usd },
-    pro:        { amount: 29.99,  currency: :usd },
-    enterprise: { amount: 99.99,  currency: :usd }
+  us: {
+    temporary:     { amount: 0.00,    currency: :usd, duration: 1.day },
+    free:          { amount: 0.00,    currency: :usd, duration: 1.months },
+    basic:         { amount: 5.00,    currency: :usd, duration: 1.months }, # Default monthly
+    basic_3m:      { amount: 14.00,   currency: :usd, duration: 3.months }, # ~7% discount
+    basic_6m:      { amount: 27.00,   currency: :usd, duration: 6.months }, # ~10% discount
+    basic_1y:      { amount: 50.00,   currency: :usd, duration: 1.year }, # ~17% discount
+    pro:           { amount: 29.99,   currency: :usd, duration: 1.months }, # Default monthly
+    pro_3m:        { amount: 85.00,   currency: :usd, duration: 3.months },
+    pro_6m:        { amount: 170.00,  currency: :usd, duration: 6.months }, # ~5% discount
+    pro_1y:        { amount: 325.00,  currency: :usd, duration: 1.year }, # ~10% discount
+    enterprise:    { amount: 99.99,   currency: :usd, duration: 1.months },  # Default monthly
+    enterprise_3m: { amount: 285.00,  currency: :usd, duration: 3.months },
+    enterprise_6m: { amount: 570.00,  currency: :usd, duration: 6.months },
+    enterprise_1y: { amount: 1100.00, currency: :usd, duration: 1.year }
   },
-  "VN" => {
-    free:       { amount: 0,         currency: :vnd },
-    basic:      { amount: 250_000,   currency: :vnd },
-    pro:        { amount: 600_000,   currency: :vnd },
-    enterprise: { amount: 2_000_000, currency: :vnd }
+  vn: {
+    temporary:     { amount: 0.00,       currency: :vnd, duration: 1.day },
+    free:          { amount: 0,          currency: :vnd, duration: 1.months },
+    basic:         { amount: 250_000,    currency: :vnd, duration: 1.months }, # Default monthly
+    basic_3m:      { amount: 700_000,    currency: :vnd, duration: 3.months },
+    basic_6m:      { amount: 1_350_000,  currency: :vnd, duration: 6.months },
+    basic_1y:      { amount: 2_500_000,  currency: :vnd, duration: 1.year },
+    pro:           { amount: 600_000,    currency: :vnd, duration: 1.months }, # Default monthly
+    pro_3m:        { amount: 1_700_000,  currency: :vnd, duration: 3.months },
+    pro_6m:        { amount: 3_400_000,  currency: :vnd, duration: 6.months },
+    pro_1y:        { amount: 6_500_000,  currency: :vnd, duration: 1.year },
+    enterprise:    { amount: 2_000_000,  currency: :vnd, duration: 1.months }, # Default monthly
+    enterprise_3m: { amount: 5_700_000,  currency: :vnd, duration: 3.months },
+    enterprise_6m: { amount: 11_000_000, currency: :vnd, duration: 6.months },
+    enterprise_1y: { amount: 21_000_000, currency: :vnd, duration: 1.year }
   }
 }.freeze

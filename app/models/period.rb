@@ -31,7 +31,7 @@ class Period < ApplicationRecord
     plus_10:  10,
     plus_11:  11,
     plus_12:  12
-  }, prefix: :offset # Optional: creates methods like 'offset_plus_7?'
+  }, prefix: true, default: -12
 
   # 2. Validations
   validates :start_at, presence: true

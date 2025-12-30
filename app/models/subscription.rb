@@ -1,5 +1,4 @@
 class Subscription < ApplicationRecord
-  include ImmutableRecordConcern
   # Assuming you use Discard for the 'discarded_at' column in migration
   # include Discard::Model
 
@@ -7,9 +6,10 @@ class Subscription < ApplicationRecord
   belongs_to :subscription_group, optional: true
   belongs_to :price
   belongs_to :period
-
-  # A plan has many instances (appointments)
-  has_many :subscription_appointments, dependent: :restrict_with_error
+  belongs_to :seller, polymorphic: true
+  belongs_to :buyer, polymorphic: true
+  belongs_to :resource, polymorphic: true, optional: true
+  belongs_to :processer, polymorphic: true, optional: true
 
   # --- Validations ---
   validates :tier, presence: true
@@ -18,5 +18,8 @@ class Subscription < ApplicationRecord
   validates :price, :period, presence: true
 
   enum :country_code, COUNTRIE_CODES, prefix: true
-
+  enum :tier, SUBSCRIPTION_ENUM_PLAN, prefix: true
+  enum :lifecycle_status, LIFECYCLE_STATUS
+  enum :workflow_status, WORKFLOW_STATUS
+  enum :business_type, { b2b: 0, b2c: 1 } 
 end

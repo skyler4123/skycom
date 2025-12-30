@@ -14,7 +14,7 @@ class Seed::AddressService
       city: city,
       state_or_province: state_or_province,
       postal_code: postal_code,
-      country_code: country_code.to_s.first(2).upcase
+      country_code: country_code
     )
   end
 end

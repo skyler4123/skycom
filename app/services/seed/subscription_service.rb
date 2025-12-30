@@ -1,37 +1,45 @@
-# This service seeds the database with Subscription records based on SUBSCRIPTION_PRICING_PLANS.
-
 class Seed::SubscriptionService
   def self.run
     puts "Seeding Subscription records..."
 
-    SUBSCRIPTION_PRICING_PLANS.each do |country, plans|
-      plans.each do |plan_name, plan_details|
-        amount = plan_details[:amount]
-        currency = plan_details[:currency]
+    SUBSCRIPTION_PRICING_PLANS.each do |country_key, plans|
+      plans.each do |tier_key, plan_details|
+        
+        # 1. Handle Price
+        price = Price.find_or_create_by!(
+          amount: plan_details[:amount], 
+          currency: plan_details[:currency]
+        )
 
-        # Create or find the price
-        price = Price.find_or_create_by!(amount: amount, currency: currency)
+        # 2. Handle Period
+        # NOTE: Using Time.current in a seed means running this tomorrow will create NEW records.
+        # To make it idempotent (repeatable), we anchor to the beginning of the current day and the ending of 1 month later.
+        start_at = Time.current.beginning_of_day
+        duration = plan_details[:duration] || 1.month
+        end_at   = (start_at + duration).end_of_day
 
-        # Create a period for this subscription (assuming monthly)
-        start_at = Time.current
-        end_at = start_at + 1.month
         period = Period.find_or_create_by!(
           start_at: start_at,
           end_at: end_at,
-          time_zone: 0 # UTC
+          time_zone: -12
         )
 
-        # Create the subscription
-        Subscription.find_or_create_by!(
-          code: "#{plan_name.upcase}-#{country}",
-          name: "#{plan_name.capitalize} Plan (#{country})",
-          price: price,
-          period: period,
-          country_code: country
+        # 3. Create or Update Subscription
+        # We identify the subscription by Country and Tier.
+        # If the Price or Period (duration) in the config changes, we update the record.
+        subscription = Subscription.find_or_initialize_by(
+          country_code: country_key, # Maps to enum :us, :vn
+          tier: tier_key             # Maps to enum :free, :basic, etc.
         )
+        
+        subscription.price = price
+        subscription.period = period
+        subscription.save!
+
+        puts "  -> Created/Found [#{country_key.upcase}] #{tier_key.to_s.humanize}: #{price.amount} #{price.currency}"
       end
     end
 
-    puts "Successfully created #{Subscription.count} Subscription records."
+    puts "Done. Total Subscriptions: #{Subscription.count}"
   end
 end

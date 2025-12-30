@@ -1,5 +1,8 @@
 # app/models/system.rb
 class System < ApplicationRecord
+  include SubscriptionSellerConcern
+  include SubscriptionProcesserConcern
+
   # --- Associations ---
   has_many :subscription_appointments, as: :appoint_from
   has_many :subscriptions, through: :subscription_appointments
