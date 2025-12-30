@@ -31,6 +31,7 @@ class User < ApplicationRecord
   # Includes functionality for handling user avatars, likely from `app/models/user/avatar_concern.rb`.
   include User::AvatarConcern
   include User::ChatImagesConcern
+  include Subscription::BuyerConcern
 
   # --- Business Logic Associations ---
   # A user can own multiple companies. If the user is deleted, their companies are also destroyed.

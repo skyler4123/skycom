@@ -1,4 +1,4 @@
-module SubscriptionProcesserConcern
+module Subscription::ProcesserConcern
   extend ActiveSupport::Concern
 
   included do

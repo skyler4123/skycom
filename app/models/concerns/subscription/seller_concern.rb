@@ -1,4 +1,4 @@
-module SubscriptionSellerConcern
+module Subscription::SellerConcern
   extend ActiveSupport::Concern
 
   included do

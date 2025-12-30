@@ -1,8 +1,8 @@
-module SubscriptionBuyerConcern
+module Subscription::ResourceConcern
   extend ActiveSupport::Concern
 
   included do
-    has_many :subscriptions, as: :buyer, dependent: :destroy
+    has_many :subscriptions, as: :resource, dependent: :destroy
 
     def subscribe(
       tier:,

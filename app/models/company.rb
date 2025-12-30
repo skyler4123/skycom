@@ -1,5 +1,5 @@
 class Company < ApplicationRecord
-  include SubscriptionBuyerConcern
+  include Subscription::ResourceConcern
 
   belongs_to :company_group
 
