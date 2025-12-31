@@ -1,5 +1,6 @@
 import * as Helpers from "controllers/helpers"
 import { Controller } from "@hotwired/stimulus"
+
 export default class DarkmodeController extends Controller {
   static targets = ['trigger']
   static values = {

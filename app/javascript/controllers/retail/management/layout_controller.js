@@ -1,7 +1,7 @@
-import ApplicationController from "controllers/application_controller"
+import { Controller } from "@hotwired/stimulus"
 import * as Helpers from "controllers/helpers"
 
-export default class Retail_Management_LayoutController extends ApplicationController {
+export default class Retail_Management_LayoutController extends Controller {
   static targets = ["profileDropdown"]
   static values = {
     pagination: { type: Object, default: {} },
@@ -12,6 +12,11 @@ export default class Retail_Management_LayoutController extends ApplicationContr
     
   }
 
+  initialize() {
+    this.initBindings()
+    this.initLayout()
+  }
+    
   initBindings() {
     this.companyGroups = Helpers.companyGroups()
     // this.currentCompanyGroup

@@ -11,13 +11,17 @@ class CreateSubscriptionGroups < ActiveRecord::Migration[8.0]
       # The entity owning/using the subscription (e.g., User, Company Group, Company, Customer)
       t.references :buyer, polymorphic: true, null: false, type: :uuid
 
+      # The specific resource the subscription applies to (if applicable)
+      t.references :resource, polymorphic: true, null: true, type: :uuid
+
       # Who processed the subscription (e.g., Admin/System)
-      t.references :processed_by, polymorphic: true, null: true, type: :uuid
+      t.references :processer, polymorphic: true, null: true, type: :uuid
 
       t.string :name
       t.string :description
-      t.integer :plan_name
-      t.integer :country_code
+      t.integer :plan_name, null: false
+      t.integer :country_code, null: false
+      t.integer :timezone
 
       # --- State Columns (Moved Here) ---
       t.integer :lifecycle_status  # e.g., active, expired, canceled
@@ -29,5 +33,9 @@ class CreateSubscriptionGroups < ActiveRecord::Migration[8.0]
       t.timestamps
     end
     add_index :subscription_groups, :discarded_at
+    add_index :subscription_groups, [ :seller_id, :seller_type ]
+    add_index :subscription_groups, [ :buyer_id, :buyer_type ]
+    add_index :subscription_groups, [ :resource_id, :resource_type ]
+    add_index :subscription_groups, [ :processer_id, :processer_type ]
   end
 end

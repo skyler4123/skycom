@@ -1,7 +1,7 @@
-import ApplicationController from "controllers/application_controller";
+import { Controller } from "@hotwired/stimulus";
 
-export default class Retail_Pos_Branches_SettingController extends ApplicationController {
-  init() {
+export default class Retail_Pos_Branches_SettingController extends Controller {
+  initialize() {
     this.initHTML()
   }
 

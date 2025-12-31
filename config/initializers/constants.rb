@@ -116,7 +116,7 @@ WORKFLOW_STATUS = {
   failed: 8
 }
 
-SUBSCRIPTION_ENUM_PLAN = {
+SUBSCRIPTION_ENUM_PLANS = {
   temporary: 0,
   free: 1000,
   basic: 2000,
@@ -132,6 +132,24 @@ SUBSCRIPTION_ENUM_PLAN = {
   enterprise_6m: 4002,
   enterprise_1y: 4003
 }
+
+SUBSCRIPTION_LIMITS = {
+  temporary:     { employee: 3, company_group: 1, company: 2 },
+  free:          { employee: 3, company_group: 1, company: 2 },
+  basic:         { employee: 3, company_group: 1, company: 2 },
+  basic_3m:      { employee: 3, company_group: 1, company: 2 },
+  basic_6m:      { employee: 3, company_group: 1, company: 2 },
+  basic_1y:      { employee: 3, company_group: 1, company: 2 },
+  pro:           { employee: 3, company_group: 1, company: 2 },
+  pro_3m:        { employee: 3, company_group: 1, company: 2 },
+  pro_6m:        { employee: 3, company_group: 1, company: 2 },
+  pro_1y:        { employee: 3, company_group: 1, company: 2 },
+  enterprise:    { employee: 3, company_group: 1, company: 2 },
+  enterprise_3m: { employee: 3, company_group: 1, company: 2 },
+  enterprise_6m: { employee: 3, company_group: 1, company: 2 },
+  enterprise_1y: { employee: 3, company_group: 1, company: 2 }
+}
+
 SUBSCRIPTION_PRICING_PLANS = {
   us: {
     temporary:     { amount: 0.00,    currency: :usd, duration: 1.day },

@@ -21,6 +21,7 @@ class CreateSubscriptions < ActiveRecord::Migration[8.0]
       t.string :description
       t.integer :plan_name, null: false
       t.integer :country_code, null: false
+      t.integer :timezone
 
       # --- State Columns (Moved Here) ---
       t.integer :lifecycle_status  # e.g., active, expired, canceled

@@ -1,4 +1,5 @@
 class Employee < ApplicationRecord
+  include AddressConcern
   include RoleConcern
   include PermissionConcern
 

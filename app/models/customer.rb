@@ -1,5 +1,6 @@
 class Customer < ApplicationRecord
   include RoleConcern
+  include AddressConcern
 
   # --- Associations ---
   belongs_to :user, optional: true

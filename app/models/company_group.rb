@@ -1,4 +1,6 @@
 class CompanyGroup < ApplicationRecord
+  include AddressConcern
+
   belongs_to :user
   has_many :companies, dependent: :destroy
 

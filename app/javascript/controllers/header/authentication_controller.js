@@ -1,19 +1,16 @@
-import ApplicationController from "controllers/application_controller";
+import { Controller } from "@hotwired/stimulus";
 import * as Helpers from "controllers/helpers"
 import Home_IndexController from "controllers/home/index_controller";
 
-export default class Header_AuthenticationController extends ApplicationController {
+export default class Header_AuthenticationController extends Controller {
   static targets = ["signInButton", "signUpButton"]
   static values = {
     isSignedIn: { type: Boolean, default: false }
   }
 
-  init() {
-    this.initBindings()
+  initialize() {
     this.initValues()
   }
-
-  initBindings() {}
 
   initValues() {
     this.isSignedInValue = Helpers.isSignedIn()

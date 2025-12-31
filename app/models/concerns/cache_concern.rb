@@ -1,4 +1,3 @@
-# Provides instance methods for attaching and managing Tags on a resource
 module CacheConcern
   extend ActiveSupport::Concern
 
