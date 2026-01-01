@@ -1,4 +1,7 @@
 class Product < ApplicationRecord
+  include TagConcern
+  include Subscription::ResourceConcern
+
   # --- Associations ---
   belongs_to :company_group
   belongs_to :company, optional: true
@@ -9,9 +12,6 @@ class Product < ApplicationRecord
 
   has_many :product_group_appointments, dependent: :destroy, as: :appoint_to
   has_many :product_groups, through: :product_group_appointments
-
-  has_many :tag_appointments, as: :appoint_to, dependent: :destroy
-  has_many :tags, through: :tag_appointments
 
   # --- Enums ---
   enum :lifecycle_status, LIFECYCLE_STATUS

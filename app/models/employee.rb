@@ -2,6 +2,7 @@ class Employee < ApplicationRecord
   include AddressConcern
   include RoleConcern
   include PermissionConcern
+  include TagConcern
 
   # --- Associations ---
   belongs_to :company_group

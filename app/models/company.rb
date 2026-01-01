@@ -1,11 +1,9 @@
 class Company < ApplicationRecord
   include AddressConcern
+  include TagConcern
   include Subscription::ResourceConcern
 
   belongs_to :company_group
-
-  has_many :tag_appointments, as: :appoint_to, dependent: :destroy
-  has_many :tags, through: :tag_appointments
 
   has_many :employee_groups, dependent: :destroy
   has_many :employees, dependent: :destroy

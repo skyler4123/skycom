@@ -1,6 +1,8 @@
 class Customer < ApplicationRecord
   include RoleConcern
   include AddressConcern
+  include TagConcern
+  include Subscription::BuyerConcern
 
   # --- Associations ---
   belongs_to :user, optional: true
@@ -13,9 +15,6 @@ class Customer < ApplicationRecord
 
   has_many :role_appointments, as: :appoint_to, dependent: :destroy
   has_many :roles, through: :role_appointments
-
-  has_many :tag_appointments, as: :appoint_to, dependent: :destroy
-  has_many :tags, through: :tag_appointments
 
   has_many :customer_group_appointments, as: :appoint_to, dependent: :destroy
   has_many :customer_groups, through: :customer_group_appointments

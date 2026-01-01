@@ -1,4 +1,5 @@
 class SubscriptionGroup < ApplicationRecord
+  include TagConcern
   include ImmutableRecordConcern
   # Assuming you use Discard for the 'discarded_at' column in migration
   # include Discard::Model

@@ -1,4 +1,6 @@
 class Invoice < ApplicationRecord
+  include TagConcern
+
   # --- Associations ---
   belongs_to :order
 
