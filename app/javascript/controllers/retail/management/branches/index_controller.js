@@ -7,8 +7,9 @@ export default class Retail_Management_Branches_IndexController extends Retail_M
   /** @type {Branch[]} */
   branches = []
 
-  async init() {
-    const response = await Helpers.fetchJson({ params: { page: 1, active: true } });
+  async initialize() {
+    super.initialize()
+    const response = await Helpers.fetchJson();
     this.branches = response.branches || []
     this.render()
   }

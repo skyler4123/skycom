@@ -422,6 +422,11 @@
 
 /**
  * @global
+ * @typedef {EmployeeGroup} Department
+ */
+
+/**
+ * @global
  * @typedef {PolymorphicAppointment & { id: string, event_id: string }} EventAppointment
  */
 

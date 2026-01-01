@@ -4,7 +4,7 @@ export default class Retail_Management_Departments_IndexController extends Retai
 
   contentHTML() {
     return `
-<div class="p-8 overflow-y-auto">
+      <div class="p-8 overflow-y-auto">
         <div class="flex flex-col md:flex-row items-center justify-between gap-4 mb-6">
           <div class="flex flex-1 items-center gap-4 w-full max-w-2xl">
             <div class="relative flex-1">
