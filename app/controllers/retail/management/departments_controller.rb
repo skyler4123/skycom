@@ -3,7 +3,7 @@ class Retail::Management::DepartmentsController < Retail::Management::Applicatio
     respond_to do |format|
       format.html { render html: "", layout: true }
       format.json do
-        @departments  = @retail.departments
+        @departments  = @retail.cached_departments
         render json: { departments: @departments }
       end
     end
