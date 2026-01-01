@@ -21,5 +21,14 @@ module CompanyGroup::RetailConcern
         scope.to_a
       end
     end
+
+    def cached_products
+      # Similar caching approach for products
+      scope = self.products
+      cache_key = scope.cache_key_with_version
+      Rails.cache.fetch([ "products", cache_key ]) do
+        scope.to_a
+      end
+    end
   end
 end

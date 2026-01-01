@@ -7,3 +7,5 @@
 export const retail_pos_branches_path = (retailId, branchId) => `/retail/${retailId}/pos/branches/${branchId}`
 export const retail_management_branches_path = (retailId) => `/retail/${retailId}/management/branches`
 export const edit_retail_management_branches_path = (retailId, branchId) => `/retail/${retailId}/management/branches/${branchId}`
+export const retail_management_departments_path = (retailId) => `/retail/${retailId}/management/departments`
+export const retail_management_products_path = (retailId) => `/retail/${retailId}/management/products`
