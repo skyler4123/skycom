@@ -26,6 +26,7 @@ class Seed::RetailService
     @customers = []
     @loyalty_programs = []
     @products = []
+    @services = []
 
     seeding
   end
@@ -214,6 +215,22 @@ class Seed::RetailService
         @products << product
       end
       puts "Created 15 products for #{branch.name}."
+    end
+
+    # --- 11. Create some Services for Each Branch ---
+    @branches.each do |branch|
+      puts "Creating services for #{branch.name}..."
+      10.times do |i|
+        service = Seed::ServiceService.create(
+          company_group: @retail_group,
+          company: branch,
+          name: "#{Faker::Company.buzzword} Service #{i + 1}",
+          description: "A professional service offered by #{branch.name}"
+        )
+        service.attach_tag(name: "Service #{service.id} Tag")
+        @services << service
+      end
+      puts "Created 10 services for #{branch.name}."
     end
 
     puts "\n========================================================="
