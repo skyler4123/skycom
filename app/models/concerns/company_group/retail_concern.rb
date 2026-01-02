@@ -58,6 +58,15 @@ module CompanyGroup::RetailConcern
       end
     end
 
+    def cached_customers
+      # Similar caching approach for customers
+      scope = self.customers
+      cache_key = scope.cache_key_with_version
+      Rails.cache.fetch([ "customers", cache_key ]) do
+        scope.to_a
+      end
+    end
+
     def cached_services
       # Similar caching approach for services
       scope = self.services
