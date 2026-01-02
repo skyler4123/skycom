@@ -31,6 +31,24 @@ module CompanyGroup::RetailConcern
       end
     end
 
+    def cached_services
+      # Similar caching approach for services
+      scope = self.services
+      cache_key = scope.cache_key_with_version
+      Rails.cache.fetch([ "services", cache_key ]) do
+        scope.to_a
+      end
+    end
+
+    def cached_employees
+      # Similar caching approach for employees
+      scope = self.employees
+      cache_key = scope.cache_key_with_version
+      Rails.cache.fetch([ "employees", cache_key ]) do
+        scope.to_a
+      end
+    end
+
     def cached_orders
       # Similar caching approach for orders
       scope = self.orders
