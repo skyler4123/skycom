@@ -21,6 +21,7 @@ class Seed::RetailService
     @multi_company_group_owner = user
     @retail = nil
     @branches = []
+    @facilities = []
     @departments = []
     @employees = []
     @customers = []
@@ -65,6 +66,23 @@ class Seed::RetailService
       branch.subscribe!(
         plan_name: Subscription.plan_names.keys.sample
       )
+    end
+
+    # --- 2.6. Create Facilities for Each Branch (Company) ---
+    @branches.each do |branch|
+      puts "Creating facilities for #{branch.name}..."
+      facility_count = rand(1..3) # Each branch gets 1-3 facilities
+      facility_count.times do |i|
+        facility = Seed::FacilityService.create(
+          company_group: @retail,
+          company: branch,
+          name: "#{branch.name} Facility #{i + 1}",
+          description: "A facility location for #{branch.name}"
+        )
+        facility.attach_tag(name: "Facility #{facility.id} Tag")
+        @facilities << facility
+      end
+      puts "Created #{facility_count} facilities for #{branch.name}."
     end
 
     #--- 3. Create Payment Method Appointments for Branches (Companies) ---

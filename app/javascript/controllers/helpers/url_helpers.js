@@ -11,5 +11,6 @@ export const retail_management_departments_path = (retailId) => `/retail/${retai
 export const retail_management_products_path = (retailId) => `/retail/${retailId}/management/products`
 export const retail_management_services_path = (retailId) => `/retail/${retailId}/management/services`
 export const retail_management_customers_path = (retailId) => `/retail/${retailId}/management/customers`
+export const retail_management_facilities_path = (retailId) => `/retail/${retailId}/management/facilities`
 export const retail_management_employees_path = (retailId) => `/retail/${retailId}/management/employees`
 export const retail_management_orders_path = (retailId) => `/retail/${retailId}/management/orders`

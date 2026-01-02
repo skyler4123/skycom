@@ -67,6 +67,15 @@ module CompanyGroup::RetailConcern
       end
     end
 
+    def cached_facilities
+      # Similar caching approach for facilities
+      scope = self.facilities
+      cache_key = scope.cache_key_with_version
+      Rails.cache.fetch([ "facilities", cache_key ]) do
+        scope.to_a
+      end
+    end
+
     def cached_services
       # Similar caching approach for services
       scope = self.services
