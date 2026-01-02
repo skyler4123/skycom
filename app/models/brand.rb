@@ -1,4 +1,6 @@
 class Brand < ApplicationRecord
+    include TagConcern
+
   # --- Associations ---
   has_many :products, dependent: :nullify
 

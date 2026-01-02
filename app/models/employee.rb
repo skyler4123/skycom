@@ -1,10 +1,13 @@
 class Employee < ApplicationRecord
+  include AddressConcern
   include RoleConcern
+  include PermissionConcern
+  include TagConcern
 
   # --- Associations ---
   belongs_to :company_group
   belongs_to :company, optional: true
-  belongs_to :user # user_id is nullable in the migration
+  belongs_to :user
 
   has_many :role_appointments, as: :appoint_to, dependent: :destroy
   has_many :roles, through: :role_appointments
@@ -12,37 +15,25 @@ class Employee < ApplicationRecord
   has_many :service_appointments, dependent: :destroy, as: :appoint_to
   has_many :services, through: :service_appointments
 
-  # --- Soft Deletion (Discard) ---
-  # If you are using a gem like 'Discard' or similar for soft deletion:
-  # include Discard::Model
-  # default_scope -> { kept } # Show only non-discarded records by default
-  # Note: The raw migration includes the 'discarded_at' column and index.
-
-  # --- Enums ---
-  # The values are taken from the KINDS array in your seeding service.
-  # The default Rail behavior maps these to integer values (0, 1, 2, 3...)
-  enum :business_type, {
-    full_time: 0,
-    part_time: 1,
-    contractor: 2,
-    intern: 3
-  }
-
-  enum :lifecycle_status, LIFECYCLE_STATUS
-  enum :workflow_status, WORKFLOW_STATUS
-
-  # --- Validations (Optional but recommended) ---
-  validates :name, presence: true
-  validates :business_type, presence: true
-
   has_many :employee_group_appointments, dependent: :destroy, as: :appoint_to
   has_many :employee_groups, through: :employee_group_appointments
 
   has_many :tag_appointments, dependent: :destroy, as: :appoint_to
   has_many :tags, through: :tag_appointments
 
-  has_many :role_appointments, as: :appoint_to, dependent: :destroy
-  has_many :roles, through: :role_appointments
-
   has_many :bookings, as: :appoint_from, dependent: :destroy, class_name: "Booking"
+
+  # --- Enums ---
+  enum :business_type, {
+    full_time: 0,
+    part_time: 1,
+    contractor: 2,
+    intern: 3
+  }
+  enum :lifecycle_status, LIFECYCLE_STATUS
+  enum :workflow_status, WORKFLOW_STATUS
+
+  # --- Validations ---
+  validates :name, presence: true
+  validates :business_type, presence: true
 end

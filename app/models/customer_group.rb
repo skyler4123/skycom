@@ -1,4 +1,7 @@
 class CustomerGroup < ApplicationRecord
+  include AddressConcern
+  include TagConcern
+
   # --- Associations ---
   belongs_to :company_group
   belongs_to :company, optional: true

@@ -1,4 +1,6 @@
 class CompanyGroup < ApplicationRecord
+  include AddressConcern
+
   belongs_to :user
   has_many :companies, dependent: :destroy
 
@@ -24,6 +26,7 @@ class CompanyGroup < ApplicationRecord
   has_many :notification_groups, dependent: :destroy
   has_many :payment_methods, through: :payment_method_appointments
   has_many :statistics, as: :owner
+  has_many :categories, dependent: :destroy
 
   # --- Enums ---
   enum :lifecycle_status, LIFECYCLE_STATUS
@@ -35,7 +38,7 @@ class CompanyGroup < ApplicationRecord
   }
 
   enum :timezone, TIMEZONES, prefix: true
-  enum :currency, CURRENCIES, prefix: true
+  enum :currency, CURRENCIE_CODES, prefix: true
 
   # Grouped business types with 1000-unit gaps for future expansion
   enum :business_type, BUSINESS_TYPES, prefix: true

@@ -1,10 +1,10 @@
-import ApplicationController from "controllers/application_controller"
+import { Controller } from "@hotwired/stimulus"
 import * as Helpers from "controllers/helpers"
 
-export default class Home_IndexController extends ApplicationController {
+export default class Home_IndexController extends Controller {
   static targets = ["signInButton", "signUpButton"]
 
-  init() {
+  initialize() {
     this.initActions()
   }
 

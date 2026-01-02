@@ -1,7 +1,9 @@
-import ApplicationController from "controllers/application_controller"
+//  https://fonts.google.com/icons
+
+import { Controller } from "@hotwired/stimulus"
 import * as Helpers from "controllers/helpers"
 
-export default class Retail_Management_LayoutController extends ApplicationController {
+export default class Retail_Management_LayoutController extends Controller {
   static targets = ["profileDropdown"]
   static values = {
     pagination: { type: Object, default: {} },
@@ -12,6 +14,11 @@ export default class Retail_Management_LayoutController extends ApplicationContr
     
   }
 
+  initialize() {
+    this.initBindings()
+    this.initLayout()
+  }
+    
   initBindings() {
     this.companyGroups = Helpers.companyGroups()
     // this.currentCompanyGroup
@@ -103,6 +110,14 @@ export default class Retail_Management_LayoutController extends ApplicationContr
                 >
                   <span class="material-symbols-outlined">inventory_2</span>
                   <p class="text-sm font-medium leading-normal">Products</p>
+                </a>
+                <a
+                  class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:bg-blue-100 open:text-blue-600"
+                  href="/retail/${this.currentCompanyGroup.id}/management/services"
+                  ${Helpers.openByPathname()}/
+                >
+                  <span class="material-symbols-outlined">concierge</span>
+                  <p class="text-sm font-medium leading-normal">Services</p>
                 </a>
                 <a
                   class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:bg-blue-100 open:text-blue-600"

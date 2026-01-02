@@ -1,7 +1,11 @@
-import ApplicationController from "controllers/application_controller"
+import { Controller } from "@hotwired/stimulus"
 import { ROUTES } from "controllers/routes"
 
-export default class LayoutController extends ApplicationController {
+export default class LayoutController extends Controller {
+  initialize() {
+    this.initLayout()
+  }
+  
   initLayout() {
     this.element.innerHTML = this.layoutHTML()
   }

@@ -31,7 +31,7 @@ class Period < ApplicationRecord
     plus_10:  10,
     plus_11:  11,
     plus_12:  12
-  }, prefix: :offset # Optional: creates methods like 'offset_plus_7?'
+  }, prefix: true, default: -12
 
   # 2. Validations
   validates :start_at, presence: true
@@ -42,16 +42,6 @@ class Period < ApplicationRecord
     scope: [ :end_at, :time_zone ],
     message: "already exists with this time and offset"
   }
-
-  # 3. Reusable Logic
-  def self.reusable_create(start_at:, end_at: nil, time_zone: 0)
-    # You can pass the integer (7) or the key (:plus_7)
-    find_or_create_by(
-      start_at: start_at,
-      end_at: end_at,
-      time_zone: time_zone
-    )
-  end
 
   # 4. Helper: Format the offset for display (e.g., returns "+07:00")
   def formatted_offset

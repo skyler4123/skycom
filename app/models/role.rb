@@ -1,4 +1,6 @@
 class Role < ApplicationRecord
+  include TagConcern
+
   # --- Associations ---
   belongs_to :company_group
   belongs_to :company, optional: true
@@ -18,7 +20,8 @@ class Role < ApplicationRecord
   has_many :customer_groups, through: :role_appointments, source: :appoint_to, source_type: "CustomerGroup"
   has_many :customers, through: :role_appointments, source: :appoint_to, source_type: "Customer"
 
-
+  # This fires whenever the Role is touched (e.g., by a PolicyAppointment change)
+  after_touch :invalidate_employee_caches
 
   # --- Soft Deletion (Discard) ---
   # If you are using a gem like 'Discard' or similar for soft deletion:
@@ -72,4 +75,14 @@ class Role < ApplicationRecord
           }
 
   validates :business_type, presence: true
+
+  # This fires whenever the Role is touched (e.g., by a PolicyAppointment change)
+  after_touch :invalidate_employee_caches
+  private
+
+  def invalidate_employee_caches
+    # Efficiently update the timestamp of all associated employees
+    # without loading them into memory or running their callbacks.
+    employees.update_all(updated_at: Time.current)
+  end
 end

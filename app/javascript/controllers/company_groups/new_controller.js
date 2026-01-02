@@ -1,6 +1,6 @@
 import LayoutController from "controllers/layout_controller"
 import * as Helpers from "controllers/helpers"
-import { CURRENCIES, TIMEZONES, COUNTRIES } from "controllers/constants"
+import { CURRENCIE_CODES, TIMEZONES, COUNTRIE_CODES } from "controllers/constants"
 import { ROUTES } from "controllers/routes"
 
 export default class CompanyGroup_NewController extends LayoutController {
@@ -50,7 +50,7 @@ export default class CompanyGroup_NewController extends LayoutController {
                   class="flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-slate-900 dark:text-slate-100 focus:outline-0 focus:ring-0 border border-slate-300 dark:border-slate-700 bg-white dark:bg-gray-950 focus:border-indigo-600 h-12 px-4 text-base font-normal leading-normal appearance-none"
                   id="country" name="company_group[country]" required>
                   <option disabled="" selected="" value="">Select a country</option>
-                  ${Object.entries(COUNTRIES).map(([code, name]) => {
+                  ${Object.entries(COUNTRIE_CODES).map(([code, name]) => {
                     return `<option value="${code}">${name}</option>`
                   }).join('')}
                 </select>
@@ -109,7 +109,7 @@ export default class CompanyGroup_NewController extends LayoutController {
                     class="flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-slate-900 dark:text-slate-100 focus:outline-0 focus:ring-0 border border-slate-300 dark:border-slate-700 bg-white dark:bg-gray-950 focus:border-indigo-600 h-12 px-4 text-base font-normal leading-normal appearance-none"
                     id="currencyCode" name="company_group[currency]" required>
                     <option disabled="" selected="" value="">Select currency</option>
-                    ${Object.entries(CURRENCIES).map(([key, value]) => {
+                    ${Object.entries(CURRENCIE_CODES).map(([key, value]) => {
                       return `<option value="${key}">${value}</option>`
                     }).join('')}
                   </select>

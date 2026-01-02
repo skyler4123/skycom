@@ -16,5 +16,6 @@ class CreateEmployeeGroups < ActiveRecord::Migration[8.0]
       t.timestamps
     end
     add_index :employee_groups, :discarded_at
+    add_index :employee_groups, [ :company_group_id, :updated_at ]
   end
 end

@@ -3,10 +3,10 @@ class ApplicationController < ActionController::Base
   allow_browser versions: :modern
 
   # Core authentication for all controllers
-  include AuthenticationConcern
+  include ApplicationController::AuthenticationConcern
 
   # Provides single-session protection methods (opt-in only)
-  include SingleSessionAccessConcern
+  include ApplicationController::SingleSessionAccessConcern
 
   # Cookie management helpers
   include ApplicationController::CookieConcern

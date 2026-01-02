@@ -1,7 +1,6 @@
+import { Controller } from "@hotwired/stimulus"
 
-import ApplicationController from "controllers/application_controller";
-
-export default class NotificationController extends ApplicationController {
+export default class NotificationController extends Controller {
   static targets = ["notificationList", "notificationBell"];
   static values = {
     notifications: { type: Array, default: [] },

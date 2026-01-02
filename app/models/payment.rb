@@ -1,4 +1,6 @@
 class Payment < ApplicationRecord
+  include TagConcern
+
   # --- Associations ---
   belongs_to :invoice
 

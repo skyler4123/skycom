@@ -1,8 +1,9 @@
 class Company < ApplicationRecord
-  belongs_to :company_group
+  include AddressConcern
+  include TagConcern
+  include Subscription::ResourceConcern
 
-  has_many :tag_appointments, as: :appoint_to, dependent: :destroy
-  has_many :tags, through: :tag_appointments
+  belongs_to :company_group
 
   has_many :employee_groups, dependent: :destroy
   has_many :employees, dependent: :destroy
@@ -17,7 +18,6 @@ class Company < ApplicationRecord
   has_many :customers, dependent: :destroy
   has_many :customer_groups, dependent: :destroy
   has_many :orders, dependent: :destroy
-  has_many :periods, dependent: :destroy
   has_many :payment_method_appointments, dependent: :destroy
   has_many :task_groups, dependent: :destroy
   has_many :project_groups, dependent: :destroy
@@ -43,7 +43,7 @@ class Company < ApplicationRecord
   enum :business_type, BUSINESS_TYPES, prefix: true
 
   enum :timezone, TIMEZONES, prefix: true
-  enum :currency, CURRENCIES, prefix: true
+  enum :currency, CURRENCIE_CODES, prefix: true
 
   # Enum for the new fiscal_year_end_month column (1=January, 12=December)
   enum :fiscal_year_end_month, {
@@ -78,6 +78,10 @@ class Company < ApplicationRecord
   # validates :fiscal_year_end_month, presence: true, numericality: { in: 1..12 }
 
   after_initialize :set_defaults_from_company_group, if: :new_record?
+
+  def subscription_buyer
+    self.company_group.user
+  end
 
   private
 

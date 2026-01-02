@@ -7,7 +7,7 @@ class CreateAddresses < ActiveRecord::Migration[8.0]
       t.string :city, null: false
       t.string :state_or_province         # Optional (some countries don't use states)
       t.string :postal_code               # Optional (some places don't have zips)
-      t.string :country_code, limit: 2, null: false # ISO 3166-1 alpha-2 (e.g., "US", "VN")
+      t.integer :country_code
 
       # The Uniqueness Enforcer
       # Stores a hash (SHA256) of the fields above

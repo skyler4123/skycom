@@ -8,7 +8,13 @@ class Seed::ApplicationService
     PaymentMethod.destroy_all
     Brand.destroy_all
 
-    # Global Payment Methods
+    # Global Data
+    # Identify the platform by a hardcoded CODE, not ID.
+    System.find_or_create_by!(code: "System") do |sa|
+      sa.name = "System"
+      sa.balance_cents = 0
+      sa.currency = "USD"
+    end
     Seed::PaymentMethodService.create # Ensure global payment methods are seeded first
     Seed::BrandService.create # Seed global brands
 

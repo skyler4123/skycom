@@ -6,5 +6,83 @@ module CompanyGroup::RetailConcern
     def branches
       companies
     end
+
+    def cached_departments
+      # 1. Define the relation
+      scope = employee_groups.joins(:category).where(categories: { name: "Department" })
+
+      # 2. Generate a key based on the collection's state
+      # Rails' `cache_key_with_version` automatically runs a light query:
+      # SELECT COUNT(*) AND MAX(updated_at)
+      cache_key = scope.cache_key_with_version
+
+      # 3. Fetch using that specific key
+      Rails.cache.fetch([ "departments", cache_key ]) do
+        scope.to_a
+      end
+    end
+
+    def cached_products
+      # Similar caching approach for products
+      scope = self.products
+      cache_key = scope.cache_key_with_version
+      Rails.cache.fetch([ "products", cache_key ]) do
+        scope.to_a
+      end
+    end
+
+    def cached_services
+      # Similar caching approach for services
+      scope = self.services
+      cache_key = scope.cache_key_with_version
+      Rails.cache.fetch([ "services", cache_key ]) do
+        scope.to_a
+      end
+    end
+
+    def cached_employees
+      # Similar caching approach for employees
+      scope = self.employees
+      cache_key = scope.cache_key_with_version
+      Rails.cache.fetch([ "employees", cache_key ]) do
+        scope.to_a
+      end
+    end
+
+    def cached_orders
+      # Similar caching approach for orders
+      scope = self.orders
+      cache_key = scope.cache_key_with_version
+      Rails.cache.fetch([ "orders", cache_key ]) do
+        scope.to_a
+      end
+    end
+
+    def cached_customers
+      # Similar caching approach for customers
+      scope = self.customers
+      cache_key = scope.cache_key_with_version
+      Rails.cache.fetch([ "customers", cache_key ]) do
+        scope.to_a
+      end
+    end
+
+    def cached_facilities
+      # Similar caching approach for facilities
+      scope = self.facilities
+      cache_key = scope.cache_key_with_version
+      Rails.cache.fetch([ "facilities", cache_key ]) do
+        scope.to_a
+      end
+    end
+
+    def cached_services
+      # Similar caching approach for services
+      scope = self.services
+      cache_key = scope.cache_key_with_version
+      Rails.cache.fetch([ "services", cache_key ]) do
+        scope.to_a
+      end
+    end
   end
 end

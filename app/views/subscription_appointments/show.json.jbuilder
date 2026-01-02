@@ -1,1 +1,0 @@
-json.partial! "subscription_appointments/subscription_appointment", subscription_appointment: @subscription_appointment

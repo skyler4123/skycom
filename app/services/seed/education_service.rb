@@ -88,6 +88,10 @@ class Seed::EducationService
           name: dept_name,
           description: "Department: #{dept_name} in #{school.name}"
         )
+        department.update!(category: Seed::CategoryService.create(
+          company_group: @education,
+          name: "Department"
+        ))
         department.attach_tag(name: "Department #{department.id} Tag")
         @departments << department
       end

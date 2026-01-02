@@ -1,14 +1,19 @@
-import ApplicationController from "controllers/application_controller"
+import * as Helpers from "controllers/helpers"
+import { Controller } from "@hotwired/stimulus"
 
-export default class DarkmodeController extends ApplicationController {
+export default class DarkmodeController extends Controller {
   static targets = ['trigger']
   static values = {
     darkmode: { type: Boolean, default: false },
   }
 
   initialize() {
-    this.initHTML()
-    this.initDarkmode()
+    Helpers.poll(() => {
+      this.initHTML()
+      this.initDarkmode()
+      // Ensure trigger target exists that mean initHTML has run
+      if (this.hasTriggerTarget) { return true }
+    })
   }
 
   initDarkmode() {

@@ -7,16 +7,7 @@ class Price < ApplicationRecord
   # 1. Define the Enum
   # Map integers to currency codes. Add new currencies to the END of the list.
   # DO NOT change the integer value of existing currencies once you have data.
-  enum :currency, {
-    usd: 0,
-    eur: 1,
-    gbp: 2,
-    jpy: 3,
-    aud: 4,
-    cad: 5,
-    vnd: 6
-    # add more here...
-  }, default: :usd
+  enum :currency, CURRENCIE_CODES, prefix: true, default: :usd
 
   # 2. Validations
   # Rails enum validation happens automatically on assignment,
@@ -30,23 +21,11 @@ class Price < ApplicationRecord
     message: "already exists for this currency"
   }
 
-  # 3. Reusable Logic
-  # We downcase the currency input to ensure it matches the enum keys
-  def self.reusable_create(amount:, currency: :usd)
-    # The currency argument can be a string "USD", symbol :usd, or integer 0
-    # Rails handles the conversion automatically if we pass it to find_or_create_by
-    find_or_create_by(
-      amount: amount,
-      currency: currency.to_s.downcase
-    )
-  end
-
   # Helper: distinct display string since 'currency' now returns a string like "usd"
   def display_currency
     currency.upcase
   end
 end
-
 
 # # 1. Create/Find a Price (using a symbol)
 # # Behind the scenes, Rails queries: SELECT * FROM prices WHERE amount = 50 AND currency = 1
