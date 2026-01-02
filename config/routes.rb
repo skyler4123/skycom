@@ -28,6 +28,7 @@ Rails.application.routes.draw do
         resources :branches
         resources :departments
         resources :products
+        resources :services
         resources :orders
         resources :bookings
         resources :payments
