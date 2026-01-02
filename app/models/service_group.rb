@@ -1,5 +1,6 @@
 class ServiceGroup < ApplicationRecord
   include TagConcern
+  include OrderConcern
 
   # --- Associations ---
   belongs_to :company_group

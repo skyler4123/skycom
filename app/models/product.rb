@@ -1,5 +1,6 @@
 class Product < ApplicationRecord
   include TagConcern
+  include OrderConcern
   include Subscription::ResourceConcern
 
   # --- Associations ---

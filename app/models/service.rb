@@ -1,5 +1,6 @@
 class Service < ApplicationRecord
   include TagConcern
+  include OrderConcern
 
   belongs_to :company_group
   belongs_to :company, optional: true

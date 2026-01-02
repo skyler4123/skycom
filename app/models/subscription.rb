@@ -23,6 +23,6 @@ class Subscription < ApplicationRecord
   enum :plan_name, SUBSCRIPTION_ENUM_PLANS, prefix: true
   enum :lifecycle_status, LIFECYCLE_STATUS, prefix: true
   enum :workflow_status, WORKFLOW_STATUS, prefix: true
-  enum :timezone, TIMEZONES, prefix: true, prefix: true
+  enum :timezone, TIMEZONES, prefix: true
   enum :business_type, { system_to_business: 0, business_to_business: 1, business_to_customer: 2 }, prefix: true
 end

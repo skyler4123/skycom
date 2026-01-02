@@ -4,6 +4,7 @@ class Order < ApplicationRecord
   # --- Associations ---
   belongs_to :company_group
   belongs_to :company, optional: true
+  belongs_to :customer, optional: true
 
   has_many :invoices, dependent: :destroy
   has_many :order_appointments, dependent: :destroy

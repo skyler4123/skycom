@@ -91,11 +91,6 @@ COUNTRIE_CODES = {
   vn: 704
 }
 
-SUBSCRIPTION_LIMITS = {
-  max_of_companies: 3,
-  max_of_employees: 5
-}
-
 LIFECYCLE_STATUS = {
   active: 0,
   inactive: 1,

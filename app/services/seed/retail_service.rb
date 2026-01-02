@@ -19,7 +19,7 @@ class Seed::RetailService
 
   def initialize(user:)
     @multi_company_group_owner = user
-    @retail_group = nil
+    @retail = nil
     @branches = []
     @departments = []
     @employees = []
@@ -37,13 +37,13 @@ class Seed::RetailService
 
     # --- 1. Create Retail Company Group ---
     puts "Creating 1 retail company group..."
-    @retail_group = Seed::CompanyGroupService.create(
+    @retail = Seed::CompanyGroupService.create(
       user: @multi_company_group_owner,
       name: "Retail Company Group #{rand(1000..9999)}",
       description: "A group for multiple retail branch companies",
       business_type: COMPANY_GROUP_BUSINESS_TYPE
     )
-    puts "Created retail company group: #{@retail_group.name}"
+    puts "Created retail company group: #{@retail.name}"
 
     #--- 2. Create Branches (Companies) under the Company Group ---
     branch_count = 2
@@ -53,7 +53,7 @@ class Seed::RetailService
         name: "Branch #{i + 1}",
         description: "Description for Branch #{i + 1}",
         parent_company: nil,
-        company_group: @retail_group
+        company_group: @retail
       )
       branch.attach_tag(name: "Branch #{branch.id} Tag")
       @branches << branch
@@ -71,7 +71,7 @@ class Seed::RetailService
     @branches.each do |branch|
       3.times do
         Seed::PaymentMethodAppointmentService.create(
-          company_group: @retail_group
+          company_group: @retail
         )
       end
     end
@@ -80,9 +80,9 @@ class Seed::RetailService
     # --- 4. Create Retail Roles ---
     RETAIL_ROLES.each do |role_name|
       Seed::RoleService.create(
-        company_group: @retail_group,
+        company_group: @retail,
         name: role_name,
-        description: "#{role_name} role for #{@retail_group.name}"
+        description: "#{role_name} role for #{@retail.name}"
       )
     end
     puts "Created #{RETAIL_ROLES.count} roles for the retail group."
@@ -98,13 +98,13 @@ class Seed::RetailService
       puts "Creating departments for #{branch.name}..."
       [ "Electronics", "Clothing", "Home Goods", "Customer Service" ].each do |dept_name|
         department = Seed::EmployeeGroupService.create(
-          company_group: @retail_group,
+          company_group: @retail,
           company: branch,
           name: dept_name,
           description: "Department: #{dept_name} in #{branch.name}"
         )
         department.update!(category: Seed::CategoryService.create(
-          company_group: @retail_group,
+          company_group: @retail,
           name: "Department"
         ))
         department.attach_tag(name: "Department #{department.id} Tag")
@@ -122,7 +122,7 @@ class Seed::RetailService
           user = Seed::UserService.create(parent_user: @multi_company_group_owner, email: "#{role_name.downcase}_#{i + 1}_#{branch.id}@example.com")
           employee = Seed::EmployeeService.create(
             user: user,
-            company_group: @retail_group,
+            company_group: @retail,
             company: branch,
             name: "Employee #{i + 1} - #{role_name.to_s.titleize}",
             description: "Description for Employee #{i + 1} - #{role_name.to_s.titleize}"
@@ -161,7 +161,7 @@ class Seed::RetailService
           user = Seed::UserService.create(parent_user: @multi_company_group_owner, email: "customer_#{i + 1}_#{branch.id}@example.com")
           customer = Seed::CustomerService.create(
             user: user,
-            company_group: @retail_group,
+            company_group: @retail,
             company: branch,
             name: "Customer #{i + 1}",
             description: "A customer of #{branch.name}"
@@ -180,7 +180,7 @@ class Seed::RetailService
       puts "Creating loyalty programs and enrolling customers for #{branch.name}..."
       2.times do |i|
         loyalty_program = Seed::CustomerGroupService.create(
-          company_group: @retail_group,
+          company_group: @retail,
           company: branch,
           name: "Loyalty Program #{i + 1} - #{branch.name}",
           description: "Exclusive benefits for members."
@@ -206,7 +206,7 @@ class Seed::RetailService
       puts "Creating products for #{branch.name}..."
       15.times do |i|
         product = Seed::ProductService.create(
-          company_group: @retail_group,
+          company_group: @retail,
           company: branch,
           name: "#{Faker::Commerce.product_name} #{i + 1}",
           description: "A quality product from #{branch.name}"
@@ -222,7 +222,7 @@ class Seed::RetailService
       puts "Creating services for #{branch.name}..."
       10.times do |i|
         service = Seed::ServiceService.create(
-          company_group: @retail_group,
+          company_group: @retail,
           company: branch,
           name: "#{Faker::Company.buzzword} Service #{i + 1}",
           description: "A professional service offered by #{branch.name}"
@@ -232,6 +232,60 @@ class Seed::RetailService
       end
       puts "Created 10 services for #{branch.name}."
     end
+
+    # --- 12. Create Orders for Customers and Attach Products/Services ---
+    puts "Creating orders for customers and attaching products/services..."
+    @branches.each do |branch|
+      # Create 5 orders per branch
+      5.times do |i|
+        # Pick a random customer from this branch
+        branch_customers = @customers.select { |c| c.company_id == branch.id }
+        customer = branch_customers.sample
+        next unless customer # Skip if no customers
+
+        # Create an order
+        order = Seed::OrderService.create(
+          company_group: @retail,
+          company: branch,
+          customer: customer,
+          name: "Order #{i + 1} for #{customer.name}",
+          description: "Retail order for #{customer.name} at #{branch.name}"
+        )
+
+        # Attach 2-3 products to the order
+        branch_products = @products.select { |p| p.company_id == branch.id }
+        products_to_attach = branch_products.sample(rand(2..3))
+        products_to_attach.each do |product|
+          OrderAppointment.create!(
+            order: order,
+            appoint_to: product,
+            quantity: rand(1..5),
+            unit_price: rand(10.0..100.0).round(2),
+            total_price: 0, # Will be calculated if needed
+            name: "Appointment of #{product.name} to Order #{order.name}",
+            description: "Product appointment for order"
+          )
+        end
+
+        # Attach 1-2 services to the order
+        branch_services = @services.select { |s| s.company_id == branch.id }
+        services_to_attach = branch_services.sample(rand(1..2))
+        services_to_attach.each do |service|
+          OrderAppointment.create!(
+            order: order,
+            appoint_to: service,
+            quantity: 1,
+            unit_price: rand(50.0..200.0).round(2),
+            total_price: 0, # Will be calculated if needed
+            name: "Appointment of #{service.name} to Order #{order.name}",
+            description: "Service appointment for order"
+          )
+        end
+
+        puts "Created order #{order.name} with #{products_to_attach.count} products and #{services_to_attach.count} services."
+      end
+    end
+    puts "Created orders and attached products/services."
 
     puts "\n========================================================="
     puts "🛍️  Retail Company Group Seeding Complete!"
@@ -277,7 +331,7 @@ class Seed::RetailService
 
     role_definitions.each do |role_name, resources|
       # 1. Find the Role object created in Step 4
-      role = Role.find_by(name: role_name, company_group: @retail_group)
+      role = Role.find_by(name: role_name, company_group: @retail)
       next unless role
 
       resources.each do |resource_name, actions|
@@ -289,7 +343,7 @@ class Seed::RetailService
           # Using raw ActiveRecord here. If you have Seed::PolicyService, use that instead.
           policy = Policy.find_or_create_by!(
             name: policy_name,
-            company_group: @retail_group,
+            company_group: @retail,
             resource: resource_name,
             action: action
           ) do |p|
