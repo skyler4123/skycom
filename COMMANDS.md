@@ -39,10 +39,6 @@
   bundle exec rails g scaffold Policy company_group:references company:references name description code resource action lifecycle_status:integer workflow_status:integer business_type:integer discarded_at:datetime:index --force
   bundle exec rails g scaffold PolicyAppointment policy:references appoint_to:references{polymorphic} name description code lifecycle_status:integer workflow_status:integer business_type:integer discarded_at:datetime:index --force
   bundle exec rails g scaffold RoleAppointment role:references appoint_to:references{polymorphic} name description code lifecycle_status:integer workflow_status:integer business_type:integer discarded_at:datetime:index --force
-  
-  bundle exec rails g scaffold Position name
-  bundle exec rails g scaffold PaySlip name
-  bundle exec rails g scaffold Attendance name
 
   ### HR / Employee Management
   bundle exec rails g scaffold EmployeeGroup company_group:references company:references name description code lifecycle_status:integer workflow_status:integer business_type:integer discarded_at:datetime:index --force
@@ -91,16 +87,12 @@
   bundle exec rails g scaffold Purchase company_group:references company:references name description code lifecycle_status:integer workflow_status:integer business_type:integer discarded_at:datetime:index --force
   bundle exec rails g scaffold PurchaseItem purchase:references name description code sku:string:index barcode:string:index upc:string:index ean:string:index manufacturer_code:string serial_number:string:index batch_number:string expiration_date:datetime lifecycle_status:integer workflow_status:integer business_type:integer discarded_at:datetime:index --force
 
-  bundle exec rails g scaffold Promotion name
 
   ### Billing & Payments
   bundle exec rails g scaffold Invoice order:references name description code currency:integer duration:integer number total_price:decimal due_date:datetime lifecycle_status:integer workflow_status:integer business_type:integer discarded_at:datetime:index --force
   bundle exec rails g scaffold Payment invoice:references name description code currency:integer duration:integer exchange_rate:decimal amount:decimal payment_method gateway_details lifecycle_status:integer workflow_status:integer business_type:integer discarded_at:datetime:index --force
   bundle exec rails g scaffold PaymentMethod name description code currency:integer lifecycle_status:integer workflow_status:integer business_type:integer discarded_at:datetime:index --force
   bundle exec rails g scaffold PaymentMethodAppointment payment_method:references company_group:references company:references name description code lifecycle_status:integer workflow_status:integer business_type:integer discarded_at:datetime:index --force
-
-  bundle exec rails g scaffold Refund name
-  bundle exec rails g scaffold Transaction name
 
   ### Operations & Logistics
   bundle exec rails g scaffold FacilityGroup company_group:references company:references education_type:integer hospital_type:integer hotel_type:integer restaurant_type:integer retail_type:integer name description code lifecycle_status:integer workflow_status:integer business_type:integer discarded_at:datetime:index --force
@@ -129,7 +121,6 @@
   bundle exec rails g scaffold NotificationGroupAppointment notification_group:references appoint_from:references{polymorphic} appoint_to:references{polymorphic} appoint_for:references{polymorphic} appoint_by:references{polymorphic} name description code lifecycle_status:integer workflow_status:integer business_type:integer discarded_at:datetime:index --force
   bundle exec rails g scaffold NotificationAppointment notification:references appoint_from:references{polymorphic} appoint_to:references{polymorphic} appoint_for:references{polymorphic} appoint_by:references{polymorphic} name description code lifecycle_status:integer workflow_status:integer business_type:integer discarded_at:datetime:index --force
   
-  bundle exec rails g scaffold Chat
 
   ### Exams
   bundle exec rails g scaffold ExamGroup company_group:references company:references name description code lifecycle_status:integer workflow_status:integer business_type:integer discarded_at:datetime:index --force
@@ -177,8 +168,21 @@
 
 
   ### Content & Knowledge Management
+  bundle exec rails g scaffold Shift company_group:references company:references name:string description:text start_time:time end_time:time break_duration_minutes:integer is_active:boolean shift_type:integer work_days:jsonb color:string notes:text created_by:references updated_by:references
+  bundle exec rails g scaffold Break attendance_day:references break_type:integer start_time:datetime end_time:datetime duration_seconds:integer is_paid:boolean notes:string created_by:references
+  bundle exec rails g scaffold AttendanceLog company_group:references company:references customer:references logable:references{polymorphic} location id_address device_info notes:text
+  bundle exec rails g scaffold AttendanceDay company_group:references company:references employee:references logable:references{polymorphic} attendance_date:date check_in:datetime check_out:datetime break_start:datetime break_end:datetime total_seconds_present:integer total_seconds_break:integer total_seconds_worked:integer total_seconds_overtime:integer shift_id:integer attendance_status:integer recorded_method:integer ip_address:string device_id:string location_lat:decimal location_lng:decimal notes:text approved_by:references approved_at:datetime edited_by:references edited_at:datetime
+  bundle exec rails g scaffold AttendanceMonth company_group:references company:references customer:references logable:references{polymorphic}
+
   bundle exec rails g scaffold Article
   bundle exec rails g scaffold Report
   bundle exec rails g scaffold Log name
   bundle exec rails g migration CreateSystem name code balance:integer currency status
+  bundle exec rails g scaffold Position name
+  bundle exec rails g scaffold PaySlip name
+  bundle exec rails g scaffold Chat
+  bundle exec rails g scaffold Promotion name
+  bundle exec rails g scaffold Refund name
+  bundle exec rails g scaffold Transaction name
+
 ##
