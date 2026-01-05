@@ -3,6 +3,9 @@
 class Period < ApplicationRecord
   include ImmutableRecordConcern
 
+  has_many :price_periods, dependent: :destroy
+
+  # --- Enums ---
   # 1. Define the Enum with Valid Method Names
   # We map safe names (e.g., :plus_7) to your values (7).
   enum :time_zone, {
