@@ -164,19 +164,14 @@
 
 
   ### Shift & Attendance
-  bundle exec rails g scaffold Shift company_group:references company:references name:string description:text start_time:time end_time:time break_duration_minutes:integer is_active:boolean shift_type:integer work_days:jsonb color:string notes:text created_by:references updated_by:references
-  bundle exec rails g scaffold AttendanceLog company_group:references company:references customer:references logable:references{polymorphic} location id_address device_info notes:text
-  bundle exec rails g scaffold AttendanceDay company_group:references company:references employee:references logable:references{polymorphic} attendance_date:date check_in:datetime check_out:datetime break_start:datetime break_end:datetime total_seconds_present:integer total_seconds_break:integer total_seconds_worked:integer total_seconds_overtime:integer shift_id:integer attendance_status:integer recorded_method:integer ip_address:string device_id:string location_lat:decimal location_lng:decimal notes:text approved_by:references approved_at:datetime edited_by:references edited_at:datetime
-  bundle exec rails g scaffold AttendanceMonth company_group:references company:references customer:references logable:references{polymorphic}
+  bundle exec rails g scaffold Shift company_group:references company:references period:references name description
+  bundle exec rails g scaffold AttendanceLog company_group:references company:references customer:references logable:references{polymorphic} period:references location id_address device_info notes:text
+  bundle exec rails g scaffold AttendanceDay company_group:references company:references employee:references logable:references{polymorphic} period:references attendance_date:date check_in:datetime check_out:datetime break_start:datetime break_end:datetime total_seconds_present:integer total_seconds_break:integer total_seconds_worked:integer total_seconds_overtime:integer shift_id:integer attendance_status:integer recorded_method:integer ip_address:string device_id:string location_lat:decimal location_lng:decimal notes:text approved_by:references approved_at:datetime edited_by:references edited_at:datetime
+  bundle exec rails g scaffold AttendanceMonth company_group:references company:references customer:references logable:references{polymorphic} period:references
 
   ### Booking
   bundle exec rails g scaffold BookingResource company_group:references company:references booking_resourceable:references{polymorphic} name:string description:text lifecycle_status:integer workflow_status:integer business_type:integer discarded_at:datetime:index --force (has_many price_period as price_periodable)
-  bundle exec rails g scaffold BookingPeriod \
-    booking_resource:references \
-    start_at:datetime:index \
-    end_at:datetime:index \
-    status:integer \   # 0: Available, 1: Booked, 2: Blocked
-    booking_id:integer # Optional: Link to the booking if status is 'booked'
+  bundle exec rails g scaffold BookingPeriod booking_resource:references period:references lifecycle_status:integer workflow_status:integer business_type:integer
   bundle exec rails g scaffold Booking company_group:references company:references booking_resource:references price:references appoint_from:references{polymorphic} appoint_to:references{polymorphic} appoint_for:references{polymorphic} appoint_by:references{polymorphic} name:string description:text price:references lifecycle_status:integer workflow_status:integer business_type:integer discarded_at:datetime:index --force
 
 

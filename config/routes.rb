@@ -1,4 +1,10 @@
 Rails.application.routes.draw do
+  resources :booking_periods
+  resources :attendance_months
+  resources :attendance_days
+  resources :attendance_logs
+  resources :shifts
+  resources :price_periods
   resources :subscription_groups
   resources :statistics
 
