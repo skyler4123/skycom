@@ -4,7 +4,7 @@
 class Price < ApplicationRecord
   include ImmutableRecordConcern
 
-  has_many :price_periods, dependent: :destroy
+  has_many :period_prices, dependent: :destroy
 
   # 1. Define the Enum
   # Map integers to currency codes. Add new currencies to the END of the list.

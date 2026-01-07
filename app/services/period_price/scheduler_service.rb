@@ -1,11 +1,11 @@
-class PricePeriodSchedulerService
-  def initialize(price_periodable)
-    @price_periodable = price_periodable # This is the 'appoint_to' polymorphic record
+class PeriodPrice::SchedulerService
+  def initialize(period_priceable)
+    @period_priceable = period_priceable # This is the 'appoint_to' polymorphic record
   end
 
   # Defaults to nil (Infinity) if arguments are missing
   def schedule(amount:, start_at: nil, end_at: nil, currency: 0, time_zone: 0)
-    PricePeriodAppointment.transaction do
+    PeriodPriceAppointment.transaction do
       target_price = find_or_create_price(amount, currency)
 
       # CASE 1: The "Global Reset" (Infinite Start AND Infinite End)
@@ -30,12 +30,12 @@ class PricePeriodSchedulerService
 
   def reset_to_forever_price(price_record, time_zone)
     # 1. Clear ALL existing price appointments for this product
-    PricePeriodAppointment.where(appoint_to: @product).destroy_all
+    PeriodPriceAppointment.where(appoint_to: @product).destroy_all
 
     # 2. Create one single "Forever" record
     period_record = find_or_create_period(nil, nil, time_zone) # nil, nil = Forever
 
-    PricePeriodAppointment.create!(
+    PeriodPriceAppointment.create!(
       appoint_to: @product,
       price: price_record,
       period: period_record
@@ -47,7 +47,7 @@ class PricePeriodSchedulerService
     # Logic: (StartA < EndB) AND (EndA > StartB)
     # In SQL, NULL usually acts as "Infinity" for logic if we handle it explicitly.
     
-    overlaps = PricePeriodAppointment.joins(:period).where(appoint_to: @product)
+    overlaps = PeriodPriceAppointment.joins(:period).where(appoint_to: @product)
 
     # We filter in Ruby or strict SQL depending on DB. 
     # For safety with NULLs, specific SQL is required:
@@ -86,7 +86,7 @@ class PricePeriodSchedulerService
 
     period_record = find_or_create_period(start_time, end_time, tz)
     
-    PricePeriodAppointment.create!(
+    PeriodPriceAppointment.create!(
       appoint_to: @product,
       price: price_record,
       period: period_record

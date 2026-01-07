@@ -1,6 +1,6 @@
 require "test_helper"
 
-class PricePeriodTest < ActiveSupport::TestCase
+class PeriodPriceTest < ActiveSupport::TestCase
   # test "the truth" do
   #   assert true
   # end

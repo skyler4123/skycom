@@ -1,4 +1,4 @@
-module CacheConcern
+module Cache::ClassMethodConcern
   extend ActiveSupport::Concern
 
   included do

@@ -3,7 +3,7 @@
 class Period < ApplicationRecord
   include ImmutableRecordConcern
 
-  has_many :price_periods, dependent: :destroy
+  has_many :period_prices, dependent: :destroy
 
   # --- Enums ---
   # 1. Define the Enum with Valid Method Names

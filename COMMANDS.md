@@ -31,7 +31,7 @@
   ### Pricing & Period
   bundle exec rails g scaffold Price amount:decimal currency:integer --force
   bundle exec rails g scaffold Period start_at:datetime end_at:datetime time_zone:integer --force
-  bundle exec rails g scaffold PricePeriod price_periodable:references{polymorphic} period:references price:references --force
+  bundle exec rails g scaffold PeriodPrice period_priceable:references{polymorphic} period:references price:references --force
 
   ### Generic / Category + Tagging
   bundle exec rails g scaffold Category company_group:references name description --force
@@ -170,7 +170,7 @@
   bundle exec rails g scaffold AttendanceMonth company_group:references company:references customer:references logable:references{polymorphic} period:references
 
   ### Booking
-  bundle exec rails g scaffold BookingResource company_group:references company:references booking_resourceable:references{polymorphic} name:string description:text lifecycle_status:integer workflow_status:integer business_type:integer discarded_at:datetime:index --force (has_many price_period as price_periodable)
+  bundle exec rails g scaffold BookingResource company_group:references company:references booking_resourceable:references{polymorphic} name:string description:text lifecycle_status:integer workflow_status:integer business_type:integer discarded_at:datetime:index --force
   bundle exec rails g scaffold BookingPeriod booking_resource:references period:references lifecycle_status:integer workflow_status:integer business_type:integer
   bundle exec rails g scaffold Booking company_group:references company:references booking_resource:references price:references appoint_from:references{polymorphic} appoint_to:references{polymorphic} appoint_for:references{polymorphic} appoint_by:references{polymorphic} name:string description:text price:references lifecycle_status:integer workflow_status:integer business_type:integer discarded_at:datetime:index --force
 
