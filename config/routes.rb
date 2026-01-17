@@ -1,4 +1,5 @@
 Rails.application.routes.draw do
+  resources :subscription_plans
   resources :period_prices
   resources :booking_resources
   resources :booking_periods

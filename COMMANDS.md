@@ -136,6 +136,7 @@
   bundle exec rails g scaffold EventAppointment event:references appoint_from:references{polymorphic} appoint_to:references{polymorphic} appoint_for:references{polymorphic} appoint_by:references{polymorphic} name description code lifecycle_status:integer workflow_status:integer business_type:integer discarded_at:datetime:index --force
 
   ### Subscriptions
+  bundle exec rails g scaffold SubscriptionPlan company_group:references company:references price:references period:references name description code lifecycle_status:integer workflow_status:integer business_type:integer country_code auto_renew:boolean discarded_at:datetime:index --force
   bundle exec rails g scaffold SubscriptionGroup price:references period:references name description code lifecycle_status:integer workflow_status:integer business_type:integer country_code auto_renew:boolean discarded_at:datetime:index --force
   bundle exec rails g scaffold Subscription subscription_group:references price:references period:references name description code lifecycle_status:integer workflow_status:integer business_type:integer country_code auto_renew:boolean discarded_at:datetime:index --force
   bundle exec rails g scaffold SubscriptionGroupAppointment subscription_group:references appoint_from:references{polymorphic} appoint_to:references{polymorphic} appoint_for:references{polymorphic} appoint_by:references{polymorphic} name description code lifecycle_status:integer workflow_status:integer business_type:integer discarded_at:datetime:index --force
