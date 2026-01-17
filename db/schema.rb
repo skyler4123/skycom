@@ -2187,6 +2187,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
   create_table "subscriptions", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.uuid "subscription_group_id"
     t.uuid "period_id", null: false
+    t.uuid "price_id", null: false
     t.string "seller_type", null: false
     t.uuid "seller_id", null: false
     t.string "buyer_type", null: false
@@ -2211,6 +2212,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.index ["buyer_type", "buyer_id"], name: "index_subscriptions_on_buyer"
     t.index ["discarded_at"], name: "index_subscriptions_on_discarded_at"
     t.index ["period_id"], name: "index_subscriptions_on_period_id"
+    t.index ["price_id"], name: "index_subscriptions_on_price_id"
     t.index ["processer_id", "processer_type"], name: "index_subscriptions_on_processer_id_and_processer_type"
     t.index ["processer_type", "processer_id"], name: "index_subscriptions_on_processer"
     t.index ["resource_id", "resource_type"], name: "index_subscriptions_on_resource_id_and_resource_type"
@@ -2583,6 +2585,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
   add_foreign_key "subscription_groups", "periods"
   add_foreign_key "subscription_groups", "subscription_groups"
   add_foreign_key "subscriptions", "periods"
+  add_foreign_key "subscriptions", "prices"
   add_foreign_key "subscriptions", "subscription_groups"
   add_foreign_key "tag_appointments", "tags"
   add_foreign_key "tags", "company_groups"
