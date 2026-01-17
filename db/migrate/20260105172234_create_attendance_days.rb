@@ -23,9 +23,9 @@ class CreateAttendanceDays < ActiveRecord::Migration[8.0]
       t.decimal :location_lat
       t.decimal :location_lng
       t.text :notes
-      t.references :approved_by, null: false, foreign_key: true, type: :uuid
+      t.references :approved_by, polymorphic: true, null: false, type: :uuid
       t.datetime :approved_at
-      t.references :edited_by, null: false, foreign_key: true, type: :uuid
+      t.references :edited_by, polymorphic: true, null: false, type: :uuid
       t.datetime :edited_at
 
       t.timestamps

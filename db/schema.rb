@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_12_26_231621) do
+ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pgcrypto"
@@ -202,29 +202,144 @@ ActiveRecord::Schema[8.0].define(version: 2025_12_26_231621) do
     t.index ["discarded_at"], name: "index_articles_on_discarded_at"
   end
 
-  create_table "bookings", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+  create_table "attendance_days", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.uuid "company_group_id", null: false
-    t.uuid "company_id"
-    t.string "appoint_from_type"
-    t.uuid "appoint_from_id"
-    t.string "appoint_to_type", null: false
-    t.uuid "appoint_to_id", null: false
-    t.uuid "category_id"
+    t.uuid "company_id", null: false
+    t.uuid "employee_id", null: false
+    t.string "logable_type", null: false
+    t.uuid "logable_id", null: false
+    t.uuid "period_id", null: false
+    t.date "attendance_date"
+    t.datetime "check_in"
+    t.datetime "check_out"
+    t.datetime "break_start"
+    t.datetime "break_end"
+    t.integer "total_seconds_present"
+    t.integer "total_seconds_break"
+    t.integer "total_seconds_worked"
+    t.integer "total_seconds_overtime"
+    t.integer "shift_id"
+    t.integer "attendance_status"
+    t.integer "recorded_method"
+    t.string "ip_address"
+    t.string "device_id"
+    t.decimal "location_lat"
+    t.decimal "location_lng"
+    t.text "notes"
+    t.string "approved_by_type", null: false
+    t.uuid "approved_by_id", null: false
+    t.datetime "approved_at"
+    t.string "edited_by_type", null: false
+    t.uuid "edited_by_id", null: false
+    t.datetime "edited_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["approved_by_type", "approved_by_id"], name: "index_attendance_days_on_approved_by"
+    t.index ["company_group_id"], name: "index_attendance_days_on_company_group_id"
+    t.index ["company_id"], name: "index_attendance_days_on_company_id"
+    t.index ["edited_by_type", "edited_by_id"], name: "index_attendance_days_on_edited_by"
+    t.index ["employee_id"], name: "index_attendance_days_on_employee_id"
+    t.index ["logable_type", "logable_id"], name: "index_attendance_days_on_logable"
+    t.index ["period_id"], name: "index_attendance_days_on_period_id"
+  end
+
+  create_table "attendance_logs", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "company_group_id", null: false
+    t.uuid "company_id", null: false
+    t.uuid "customer_id", null: false
+    t.string "logable_type", null: false
+    t.uuid "logable_id", null: false
+    t.uuid "period_id", null: false
+    t.string "location"
+    t.string "id_address"
+    t.string "device_info"
+    t.text "notes"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["company_group_id"], name: "index_attendance_logs_on_company_group_id"
+    t.index ["company_id"], name: "index_attendance_logs_on_company_id"
+    t.index ["customer_id"], name: "index_attendance_logs_on_customer_id"
+    t.index ["logable_type", "logable_id"], name: "index_attendance_logs_on_logable"
+    t.index ["period_id"], name: "index_attendance_logs_on_period_id"
+  end
+
+  create_table "attendance_months", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "company_group_id", null: false
+    t.uuid "company_id", null: false
+    t.uuid "customer_id", null: false
+    t.string "logable_type", null: false
+    t.uuid "logable_id", null: false
+    t.uuid "period_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["company_group_id"], name: "index_attendance_months_on_company_group_id"
+    t.index ["company_id"], name: "index_attendance_months_on_company_id"
+    t.index ["customer_id"], name: "index_attendance_months_on_customer_id"
+    t.index ["logable_type", "logable_id"], name: "index_attendance_months_on_logable"
+    t.index ["period_id"], name: "index_attendance_months_on_period_id"
+  end
+
+  create_table "booking_periods", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "booking_resource_id", null: false
+    t.uuid "period_id", null: false
+    t.integer "lifecycle_status"
+    t.integer "workflow_status"
+    t.integer "business_type"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["booking_resource_id"], name: "index_booking_periods_on_booking_resource_id"
+    t.index ["period_id"], name: "index_booking_periods_on_period_id"
+  end
+
+  create_table "booking_resources", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "company_group_id", null: false
+    t.uuid "company_id", null: false
+    t.string "booking_resourceable_type", null: false
+    t.uuid "booking_resourceable_id", null: false
     t.string "name"
-    t.string "description"
-    t.string "code"
+    t.text "description"
     t.integer "lifecycle_status"
     t.integer "workflow_status"
     t.integer "business_type"
     t.datetime "discarded_at"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["booking_resourceable_type", "booking_resourceable_id"], name: "index_booking_resources_on_booking_resourceable"
+    t.index ["company_group_id"], name: "index_booking_resources_on_company_group_id"
+    t.index ["company_id"], name: "index_booking_resources_on_company_id"
+    t.index ["discarded_at"], name: "index_booking_resources_on_discarded_at"
+  end
+
+  create_table "bookings", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "company_group_id", null: false
+    t.uuid "company_id", null: false
+    t.uuid "booking_resource_id", null: false
+    t.uuid "price_id", null: false
+    t.string "appoint_from_type", null: false
+    t.uuid "appoint_from_id", null: false
+    t.string "appoint_to_type", null: false
+    t.uuid "appoint_to_id", null: false
+    t.string "appoint_for_type", null: false
+    t.uuid "appoint_for_id", null: false
+    t.string "appoint_by_type", null: false
+    t.uuid "appoint_by_id", null: false
+    t.string "name"
+    t.text "description"
+    t.integer "lifecycle_status"
+    t.integer "workflow_status"
+    t.integer "business_type"
+    t.datetime "discarded_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["appoint_by_type", "appoint_by_id"], name: "index_bookings_on_appoint_by"
+    t.index ["appoint_for_type", "appoint_for_id"], name: "index_bookings_on_appoint_for"
     t.index ["appoint_from_type", "appoint_from_id"], name: "index_bookings_on_appoint_from"
     t.index ["appoint_to_type", "appoint_to_id"], name: "index_bookings_on_appoint_to"
-    t.index ["category_id"], name: "index_bookings_on_category_id"
+    t.index ["booking_resource_id"], name: "index_bookings_on_booking_resource_id"
     t.index ["company_group_id"], name: "index_bookings_on_company_group_id"
     t.index ["company_id"], name: "index_bookings_on_company_id"
     t.index ["discarded_at"], name: "index_bookings_on_discarded_at"
+    t.index ["price_id"], name: "index_bookings_on_price_id"
   end
 
   create_table "brands", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -1391,6 +1506,18 @@ ActiveRecord::Schema[8.0].define(version: 2025_12_26_231621) do
     t.index ["period_id"], name: "index_period_appointments_on_period_id"
   end
 
+  create_table "period_prices", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.string "period_priceable_type", null: false
+    t.uuid "period_priceable_id", null: false
+    t.uuid "period_id", null: false
+    t.uuid "price_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["period_id"], name: "index_period_prices_on_period_id"
+    t.index ["period_priceable_type", "period_priceable_id"], name: "index_period_prices_on_period_priceable"
+    t.index ["price_id"], name: "index_period_prices_on_price_id"
+  end
+
   create_table "periods", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.datetime "start_at", null: false
     t.datetime "end_at"
@@ -1992,6 +2119,19 @@ ActiveRecord::Schema[8.0].define(version: 2025_12_26_231621) do
     t.index ["setting_group_id"], name: "index_settings_on_setting_group_id"
   end
 
+  create_table "shifts", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "company_group_id", null: false
+    t.uuid "company_id", null: false
+    t.uuid "period_id", null: false
+    t.string "name"
+    t.string "description"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["company_group_id"], name: "index_shifts_on_company_group_id"
+    t.index ["company_id"], name: "index_shifts_on_company_id"
+    t.index ["period_id"], name: "index_shifts_on_period_id"
+  end
+
   create_table "sign_in_tokens", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.uuid "user_id", null: false
     t.index ["user_id"], name: "index_sign_in_tokens_on_user_id"
@@ -2010,7 +2150,6 @@ ActiveRecord::Schema[8.0].define(version: 2025_12_26_231621) do
 
   create_table "subscription_groups", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.uuid "subscription_group_id"
-    t.uuid "price_id", null: false
     t.uuid "period_id", null: false
     t.string "seller_type", null: false
     t.uuid "seller_id", null: false
@@ -2036,7 +2175,6 @@ ActiveRecord::Schema[8.0].define(version: 2025_12_26_231621) do
     t.index ["buyer_type", "buyer_id"], name: "index_subscription_groups_on_buyer"
     t.index ["discarded_at"], name: "index_subscription_groups_on_discarded_at"
     t.index ["period_id"], name: "index_subscription_groups_on_period_id"
-    t.index ["price_id"], name: "index_subscription_groups_on_price_id"
     t.index ["processer_id", "processer_type"], name: "index_subscription_groups_on_processer_id_and_processer_type"
     t.index ["processer_type", "processer_id"], name: "index_subscription_groups_on_processer"
     t.index ["resource_id", "resource_type"], name: "index_subscription_groups_on_resource_id_and_resource_type"
@@ -2048,7 +2186,6 @@ ActiveRecord::Schema[8.0].define(version: 2025_12_26_231621) do
 
   create_table "subscriptions", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.uuid "subscription_group_id"
-    t.uuid "price_id", null: false
     t.uuid "period_id", null: false
     t.string "seller_type", null: false
     t.uuid "seller_id", null: false
@@ -2074,7 +2211,6 @@ ActiveRecord::Schema[8.0].define(version: 2025_12_26_231621) do
     t.index ["buyer_type", "buyer_id"], name: "index_subscriptions_on_buyer"
     t.index ["discarded_at"], name: "index_subscriptions_on_discarded_at"
     t.index ["period_id"], name: "index_subscriptions_on_period_id"
-    t.index ["price_id"], name: "index_subscriptions_on_price_id"
     t.index ["processer_id", "processer_type"], name: "index_subscriptions_on_processer_id_and_processer_type"
     t.index ["processer_type", "processer_id"], name: "index_subscriptions_on_processer"
     t.index ["resource_id", "resource_type"], name: "index_subscriptions_on_resource_id_and_resource_type"
@@ -2263,9 +2399,26 @@ ActiveRecord::Schema[8.0].define(version: 2025_12_26_231621) do
   add_foreign_key "articles", "categories"
   add_foreign_key "articles", "companies"
   add_foreign_key "articles", "company_groups"
-  add_foreign_key "bookings", "categories"
+  add_foreign_key "attendance_days", "companies"
+  add_foreign_key "attendance_days", "company_groups"
+  add_foreign_key "attendance_days", "employees"
+  add_foreign_key "attendance_days", "periods"
+  add_foreign_key "attendance_logs", "companies"
+  add_foreign_key "attendance_logs", "company_groups"
+  add_foreign_key "attendance_logs", "customers"
+  add_foreign_key "attendance_logs", "periods"
+  add_foreign_key "attendance_months", "companies"
+  add_foreign_key "attendance_months", "company_groups"
+  add_foreign_key "attendance_months", "customers"
+  add_foreign_key "attendance_months", "periods"
+  add_foreign_key "booking_periods", "booking_resources"
+  add_foreign_key "booking_periods", "periods"
+  add_foreign_key "booking_resources", "companies"
+  add_foreign_key "booking_resources", "company_groups"
+  add_foreign_key "bookings", "booking_resources"
   add_foreign_key "bookings", "companies"
   add_foreign_key "bookings", "company_groups"
+  add_foreign_key "bookings", "prices"
   add_foreign_key "brands", "categories"
   add_foreign_key "cart_appointments", "carts"
   add_foreign_key "cart_groups", "categories"
@@ -2370,6 +2523,8 @@ ActiveRecord::Schema[8.0].define(version: 2025_12_26_231621) do
   add_foreign_key "payments", "categories"
   add_foreign_key "payments", "invoices"
   add_foreign_key "period_appointments", "periods"
+  add_foreign_key "period_prices", "periods"
+  add_foreign_key "period_prices", "prices"
   add_foreign_key "policies", "companies"
   add_foreign_key "policies", "company_groups"
   add_foreign_key "policy_appointments", "policies"
@@ -2421,12 +2576,13 @@ ActiveRecord::Schema[8.0].define(version: 2025_12_26_231621) do
   add_foreign_key "settings", "companies"
   add_foreign_key "settings", "company_groups"
   add_foreign_key "settings", "setting_groups"
+  add_foreign_key "shifts", "companies"
+  add_foreign_key "shifts", "company_groups"
+  add_foreign_key "shifts", "periods"
   add_foreign_key "sign_in_tokens", "users"
   add_foreign_key "subscription_groups", "periods"
-  add_foreign_key "subscription_groups", "prices"
   add_foreign_key "subscription_groups", "subscription_groups"
   add_foreign_key "subscriptions", "periods"
-  add_foreign_key "subscriptions", "prices"
   add_foreign_key "subscriptions", "subscription_groups"
   add_foreign_key "tag_appointments", "tags"
   add_foreign_key "tags", "company_groups"
