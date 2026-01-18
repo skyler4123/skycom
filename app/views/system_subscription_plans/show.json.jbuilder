@@ -1,0 +1,1 @@
+json.partial! "system_subscription_plans/system_subscription_plan", system_subscription_plan: @system_subscription_plan

@@ -1,6 +1,7 @@
 class CreateSubscriptionGroups < ActiveRecord::Migration[8.0]
   def change
     create_table :subscription_groups, id: :uuid do |t|
+      t.references :subscription_plan, null: true, foreign_key: true, type: :uuid
       t.references :subscription_group, null: true, foreign_key: true, type: :uuid
       t.references :period, null: false, foreign_key: true, type: :uuid
 

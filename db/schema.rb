@@ -2149,6 +2149,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
   end
 
   create_table "subscription_groups", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "subscription_plan_id"
     t.uuid "subscription_group_id"
     t.uuid "period_id", null: false
     t.string "seller_type", null: false
@@ -2182,12 +2183,36 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.index ["seller_id", "seller_type"], name: "index_subscription_groups_on_seller_id_and_seller_type"
     t.index ["seller_type", "seller_id"], name: "index_subscription_groups_on_seller"
     t.index ["subscription_group_id"], name: "index_subscription_groups_on_subscription_group_id"
+    t.index ["subscription_plan_id"], name: "index_subscription_groups_on_subscription_plan_id"
+  end
+
+  create_table "subscription_plans", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "company_group_id", null: false
+    t.uuid "company_id", null: false
+    t.uuid "price_id", null: false
+    t.uuid "period_id", null: false
+    t.string "name"
+    t.string "description"
+    t.string "code"
+    t.integer "lifecycle_status"
+    t.integer "workflow_status"
+    t.integer "business_type"
+    t.string "country_code"
+    t.boolean "auto_renew"
+    t.datetime "discarded_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["company_group_id"], name: "index_subscription_plans_on_company_group_id"
+    t.index ["company_id"], name: "index_subscription_plans_on_company_id"
+    t.index ["discarded_at"], name: "index_subscription_plans_on_discarded_at"
+    t.index ["period_id"], name: "index_subscription_plans_on_period_id"
+    t.index ["price_id"], name: "index_subscription_plans_on_price_id"
   end
 
   create_table "subscriptions", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "subscription_plan_id"
     t.uuid "subscription_group_id"
     t.uuid "period_id", null: false
-    t.uuid "price_id", null: false
     t.string "seller_type", null: false
     t.uuid "seller_id", null: false
     t.string "buyer_type", null: false
@@ -2212,7 +2237,6 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.index ["buyer_type", "buyer_id"], name: "index_subscriptions_on_buyer"
     t.index ["discarded_at"], name: "index_subscriptions_on_discarded_at"
     t.index ["period_id"], name: "index_subscriptions_on_period_id"
-    t.index ["price_id"], name: "index_subscriptions_on_price_id"
     t.index ["processer_id", "processer_type"], name: "index_subscriptions_on_processer_id_and_processer_type"
     t.index ["processer_type", "processer_id"], name: "index_subscriptions_on_processer"
     t.index ["resource_id", "resource_type"], name: "index_subscriptions_on_resource_id_and_resource_type"
@@ -2220,6 +2244,73 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.index ["seller_id", "seller_type"], name: "index_subscriptions_on_seller_id_and_seller_type"
     t.index ["seller_type", "seller_id"], name: "index_subscriptions_on_seller"
     t.index ["subscription_group_id"], name: "index_subscriptions_on_subscription_group_id"
+    t.index ["subscription_plan_id"], name: "index_subscriptions_on_subscription_plan_id"
+  end
+
+  create_table "system_subscription_groups", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "system_subscription_plan_id", null: false
+    t.uuid "company_group_id", null: false
+    t.uuid "company_id", null: false
+    t.uuid "period_id", null: false
+    t.string "name"
+    t.string "description"
+    t.string "code"
+    t.integer "lifecycle_status"
+    t.integer "workflow_status"
+    t.integer "business_type"
+    t.string "country_code"
+    t.boolean "auto_renew"
+    t.datetime "discarded_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["company_group_id"], name: "index_system_subscription_groups_on_company_group_id"
+    t.index ["company_id"], name: "index_system_subscription_groups_on_company_id"
+    t.index ["discarded_at"], name: "index_system_subscription_groups_on_discarded_at"
+    t.index ["period_id"], name: "index_system_subscription_groups_on_period_id"
+    t.index ["system_subscription_plan_id"], name: "idx_on_system_subscription_plan_id_2f2a083a8b"
+  end
+
+  create_table "system_subscription_plans", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "price_id", null: false
+    t.string "name"
+    t.string "description"
+    t.string "code"
+    t.integer "lifecycle_status"
+    t.integer "workflow_status"
+    t.integer "business_type"
+    t.string "country_code"
+    t.datetime "discarded_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["discarded_at"], name: "index_system_subscription_plans_on_discarded_at"
+    t.index ["price_id"], name: "index_system_subscription_plans_on_price_id"
+  end
+
+  create_table "system_subscriptions", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "system_subscription_plan_id", null: false
+    t.uuid "system_subscription_group_id", null: false
+    t.uuid "company_group_id", null: false
+    t.uuid "company_id", null: false
+    t.uuid "price_id", null: false
+    t.uuid "period_id", null: false
+    t.string "name"
+    t.string "description"
+    t.string "code"
+    t.integer "lifecycle_status"
+    t.integer "workflow_status"
+    t.integer "business_type"
+    t.string "country_code"
+    t.boolean "auto_renew"
+    t.datetime "discarded_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["company_group_id"], name: "index_system_subscriptions_on_company_group_id"
+    t.index ["company_id"], name: "index_system_subscriptions_on_company_id"
+    t.index ["discarded_at"], name: "index_system_subscriptions_on_discarded_at"
+    t.index ["period_id"], name: "index_system_subscriptions_on_period_id"
+    t.index ["price_id"], name: "index_system_subscriptions_on_price_id"
+    t.index ["system_subscription_group_id"], name: "index_system_subscriptions_on_system_subscription_group_id"
+    t.index ["system_subscription_plan_id"], name: "index_system_subscriptions_on_system_subscription_plan_id"
   end
 
   create_table "systems", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -2584,9 +2675,25 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
   add_foreign_key "sign_in_tokens", "users"
   add_foreign_key "subscription_groups", "periods"
   add_foreign_key "subscription_groups", "subscription_groups"
+  add_foreign_key "subscription_groups", "subscription_plans"
+  add_foreign_key "subscription_plans", "companies"
+  add_foreign_key "subscription_plans", "company_groups"
+  add_foreign_key "subscription_plans", "periods"
+  add_foreign_key "subscription_plans", "prices"
   add_foreign_key "subscriptions", "periods"
-  add_foreign_key "subscriptions", "prices"
   add_foreign_key "subscriptions", "subscription_groups"
+  add_foreign_key "subscriptions", "subscription_plans"
+  add_foreign_key "system_subscription_groups", "companies"
+  add_foreign_key "system_subscription_groups", "company_groups"
+  add_foreign_key "system_subscription_groups", "periods"
+  add_foreign_key "system_subscription_groups", "system_subscription_plans"
+  add_foreign_key "system_subscription_plans", "prices"
+  add_foreign_key "system_subscriptions", "companies"
+  add_foreign_key "system_subscriptions", "company_groups"
+  add_foreign_key "system_subscriptions", "periods"
+  add_foreign_key "system_subscriptions", "prices"
+  add_foreign_key "system_subscriptions", "system_subscription_groups"
+  add_foreign_key "system_subscriptions", "system_subscription_plans"
   add_foreign_key "tag_appointments", "tags"
   add_foreign_key "tags", "company_groups"
   add_foreign_key "task_appointments", "tasks"
