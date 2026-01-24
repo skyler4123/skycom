@@ -1,5 +1,10 @@
 class CompanyGroup < ApplicationRecord
   include AddressConcern
+  include CompanyGroup::RetailConcern
+  include CompanyGroup::EducationConcern
+  include CompanyGroup::HospitalConcern
+  include CompanyGroup::RestaurantConcern
+  include Subscription::SellerConcern
 
   belongs_to :user
   has_many :companies, dependent: :destroy
@@ -74,11 +79,6 @@ class CompanyGroup < ApplicationRecord
 
   # Validation for operational fields
   # validates :fiscal_year_end_month, presence: true, numericality: { in: 1..12 }
-
-  include CompanyGroup::RetailConcern
-  include CompanyGroup::EducationConcern
-  include CompanyGroup::HospitalConcern
-  include CompanyGroup::RestaurantConcern
 
   def create_first_cloned_company
     return if companies.size > 1

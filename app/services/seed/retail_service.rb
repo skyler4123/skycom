@@ -1,5 +1,4 @@
 class Seed::RetailService
-  # Define the number of employees to create for each role in each branch
   EMPLOYEE_COUNTS = {
     branch_manager: 1,
     cashier: 3,
@@ -7,14 +6,8 @@ class Seed::RetailService
     stock_clerk: 2
   }.freeze
 
-  # Define the number of customers to create for each branch
-  CUSTOMER_COUNTS = {
-    customer: 20
-  }.freeze
-
-  # Define the standard roles to be created for the retail group
+  CUSTOMER_COUNTS = { customer: 20 }.freeze
   RETAIL_ROLES = (EMPLOYEE_COUNTS.keys + CUSTOMER_COUNTS.keys).freeze
-
   COMPANY_GROUP_BUSINESS_TYPE = :retail
 
   def initialize(user:)
@@ -33,23 +26,51 @@ class Seed::RetailService
   end
 
   def seeding
+    print_header
+
+    create_retail_company_group
+    create_branches(count: 2)
+    subscribe_branches_to_plans
+    create_facilities_for_branches
+    appoint_payment_methods
+    setup_roles_and_permissions
+    create_departments_for_branches
+    create_employees_and_assign_departments
+    create_customers_and_subscriptions
+    setup_loyalty_programs
+    create_inventory # Products and Services
+    create_customer_orders
+
+    print_footer
+    true
+  end
+
+  private
+
+  def print_header
     puts "\n\n🛍️  Starting Retail Company Group Seeding..."
     puts "========================================================="
+  end
 
-    # --- 1. Create Retail Company Group ---
-    puts "Creating 1 retail company group..."
+  def print_footer
+    puts "\n========================================================="
+    puts "🛍️  Retail Company Group Seeding Complete!"
+    puts "========================================================="
+  end
+
+  def create_retail_company_group
+    puts "Creating retail company group..."
     @retail = Seed::CompanyGroupService.create(
       user: @multi_company_group_owner,
       name: "Retail Company Group #{rand(1000..9999)}",
       description: "A group for multiple retail branch companies",
       business_type: COMPANY_GROUP_BUSINESS_TYPE
     )
-    puts "Created retail company group: #{@retail.name}"
+  end
 
-    #--- 2. Create Branches (Companies) under the Company Group ---
-    branch_count = 2
-    puts "Creating #{branch_count} branches under the company group..."
-    branch_count.times do |i|
+  def create_branches(count:)
+    puts "Creating #{count} branches..."
+    count.times do |i|
       branch = Seed::CompanyService.create(
         name: "Branch #{i + 1}",
         description: "Description for Branch #{i + 1}",
@@ -59,19 +80,17 @@ class Seed::RetailService
       branch.attach_tag(name: "Branch #{branch.id} Tag")
       @branches << branch
     end
-    puts "Created #{@branches.count} branches under the company group."
+  end
 
-    # --- 2.5. [NEW] Subscribe the Company to a Subscription Tier ---
-    @branches.map do |branch|
-      branch.subscribe!(
-        plan_name: Subscription.plan_names.keys.sample
-      )
-    end
-
-    # --- 2.6. Create Facilities for Each Branch (Company) ---
+  def subscribe_branches_to_plans
     @branches.each do |branch|
-      puts "Creating facilities for #{branch.name}..."
-      facility_count = rand(1..3) # Each branch gets 1-3 facilities
+      branch.subscribe!(plan_name: Subscription.plan_names.keys.sample)
+    end
+  end
+
+  def create_facilities_for_branches
+    @branches.each do |branch|
+      facility_count = rand(1..3)
       facility_count.times do |i|
         facility = Seed::FacilityService.create(
           company_group: @retail,
@@ -82,20 +101,16 @@ class Seed::RetailService
         facility.attach_tag(name: "Facility #{facility.id} Tag")
         @facilities << facility
       end
-      puts "Created #{facility_count} facilities for #{branch.name}."
     end
+  end
 
-    #--- 3. Create Payment Method Appointments for Branches (Companies) ---
+  def appoint_payment_methods
     @branches.each do |branch|
-      3.times do
-        Seed::PaymentMethodAppointmentService.create(
-          company_group: @retail
-        )
-      end
+      3.times { Seed::PaymentMethodAppointmentService.create(company_group: @retail) }
     end
-    puts "Appointed some payment methods to each branch."
+  end
 
-    # --- 4. Create Retail Roles ---
+  def setup_roles_and_permissions
     RETAIL_ROLES.each do |role_name|
       Seed::RoleService.create(
         company_group: @retail,
@@ -103,17 +118,11 @@ class Seed::RetailService
         description: "#{role_name} role for #{@retail.name}"
       )
     end
-    puts "Created #{RETAIL_ROLES.count} roles for the retail group."
-
-    # --- 4.5. [NEW] Configure Permissions (Policies) for Roles ---
-    # This setup ensures specific roles have CRUD access to specific resources
     configure_retail_permissions
-    puts "configured policies/permissions for retail roles."
+  end
 
-
-    # --- 5. Create Departments (Employee Groups) for Each Branch (Company) ---
+  def create_departments_for_branches
     @branches.each do |branch|
-      puts "Creating departments for #{branch.name}..."
       [ "Electronics", "Clothing", "Home Goods", "Customer Service" ].each do |dept_name|
         department = Seed::EmployeeGroupService.create(
           company_group: @retail,
@@ -121,245 +130,129 @@ class Seed::RetailService
           name: dept_name,
           description: "Department: #{dept_name} in #{branch.name}"
         )
-        department.update!(category: Seed::CategoryService.create(
-          company_group: @retail,
-          name: "Department"
-        ))
+        department.update!(category: Seed::CategoryService.create(company_group: @retail, name: "Department"))
         department.attach_tag(name: "Department #{department.id} Tag")
         @departments << department
       end
-      puts "Created departments for #{branch.name}."
     end
+  end
 
-    # --- 6. Create Employees for Each Branch (Company) ---
+  def create_employees_and_assign_departments
     @branches.each do |branch|
-      puts "Creating employees for #{branch.name}..."
-      current_employees = []
+      branch_employees = []
+      
       EMPLOYEE_COUNTS.each do |role_name, count|
         count.times do |i|
-          user = Seed::UserService.create(parent_user: @multi_company_group_owner, email: "#{role_name.downcase}_#{i + 1}_#{branch.id}@example.com")
+          user = Seed::UserService.create(parent_user: @multi_company_group_owner, email: "#{role_name}_#{i + 1}_#{branch.id}@example.com")
           employee = Seed::EmployeeService.create(
-            user: user,
-            company_group: @retail,
-            company: branch,
-            name: "Employee #{i + 1} - #{role_name.to_s.titleize}",
-            description: "Description for Employee #{i + 1} - #{role_name.to_s.titleize}"
+            user: user, company_group: @retail, company: branch,
+            name: "Employee #{i + 1} - #{role_name.to_s.titleize}"
           )
-          employee.attach_tag(name: "Employee #{employee.id} Tag")
-
-          # This attaches the Role record created in step 4
-          # Because we ran step 4.5, this role now carries Policies (Permissions)
           employee.attach_role(role_name)
-
-          current_employees << employee
+          branch_employees << employee
         end
       end
-      @employees.concat(current_employees)
-      puts "Created #{current_employees.count} employees for #{branch.name}."
-
-      # --- 7. Assign Employees to Departments ---
-      branch_departments = @departments.select { |d| d.company_id == branch.id }
-      current_employees.each do |employee|
-        # Assign each employee to a random department in their branch
-        department = branch_departments.sample
-        Seed::EmployeeGroupAppointmentService.create(
-          employee_group: department,
-          appoint_to: employee
-        )
-      end
-      puts "Assigned employees to departments for #{branch.name}."
+      
+      @employees.concat(branch_employees)
+      assign_employees_to_random_dept(branch, branch_employees)
     end
+  end
 
-    # --- 8. Create Customers for Each Branch (Company) ---
+  def assign_employees_to_random_dept(branch, employees)
+    branch_depts = @departments.select { |d| d.company_id == branch.id }
+    employees.each do |employee|
+      Seed::EmployeeGroupAppointmentService.create(employee_group: branch_depts.sample, appoint_to: employee)
+    end
+  end
+
+  def create_customers_and_subscriptions
     @branches.each do |branch|
-      puts "Creating customers for #{branch.name}..."
-      current_customers = []
       CUSTOMER_COUNTS.each do |role_name, count|
         count.times do |i|
           user = Seed::UserService.create(parent_user: @multi_company_group_owner, email: "customer_#{i + 1}_#{branch.id}@example.com")
           customer = Seed::CustomerService.create(
-            user: user,
-            company_group: @retail,
-            company: branch,
-            name: "Customer #{i + 1}",
-            description: "A customer of #{branch.name}"
+            user: user, company_group: @retail, company: branch, name: "Customer #{i + 1}"
           )
-          customer.attach_tag(name: "Customer #{customer.id} Tag")
           customer.attach_role(role_name)
-          current_customers << customer
-        end
-      end
-      @customers.concat(current_customers)
-      puts "Created #{current_customers.count} customers for #{branch.name}."
-    end
-
-    # --- 8. Create Subscription for Customers ---
-      # t.references :subscription_group, null: true, foreign_key: true, type: :uuid
-      # t.references :period, null: false, foreign_key: true, type: :uuid
-      # t.references :price, null: false, foreign_key: true, type: :uuid
-
-      # # The entity selling the subscription (e.g., System, Company)
-      # t.references :seller, polymorphic: true, null: false, type: :uuid
-
-      # # The entity owning/using the subscription (e.g., User, Company Group, Company, Customer)
-      # t.references :buyer, polymorphic: true, null: false, type: :uuid
-
-      # # The specific resource the subscription applies to (if applicable)
-      # t.references :resource, polymorphic: true, null: true, type: :uuid
-
-      # # Who processed the subscription (e.g., Admin/System)
-      # t.references :processer, polymorphic: true, null: true, type: :uuid
-
-      # t.string :name
-      # t.string :description
-      # t.integer :plan_name, null: false
-      # t.integer :country_code, null: false
-      # t.integer :timezone
-
-      # # --- State Columns (Moved Here) ---
-      # t.integer :lifecycle_status  # e.g., active, expired, canceled
-      # t.integer :workflow_status   # e.g., pending_payment, active
-      # t.integer :business_type     # e.g., b2b, b2c (context specific)
-      # t.boolean :auto_renew        # Instance specific setting
-      # t.datetime :discarded_at
-    @customers.each do |customer|
-      customer.subscribe!(
-        plan_name: :basic_6m,
-        seller: System.find_by(name: "System"),
-        buyer: customer,
-        resource: customer,
-        processer: System.find_by(name: "System"),
-        name: "Basic 6-Month Subscription for #{customer.name}",
-        country_code: :us,
-        lifecycle_status: :active,
-        workflow_status: :active
-      )
-    end
-    puts "Subscribed each customer to a basic 6-month subscription."
-
-    # --- 9. Create Loyalty Programs (Customer Groups) and Enroll Customers ---
-    @branches.each do |branch|
-      puts "Creating loyalty programs and enrolling customers for #{branch.name}..."
-      2.times do |i|
-        loyalty_program = Seed::CustomerGroupService.create(
-          company_group: @retail,
-          company: branch,
-          name: "Loyalty Program #{i + 1} - #{branch.name}",
-          description: "Exclusive benefits for members."
-        )
-        loyalty_program.attach_tag(name: "Loyalty #{loyalty_program.id} Tag")
-        @loyalty_programs << loyalty_program
-
-        # Enroll 10 random customers from this branch
-        branch_customers = @customers.select { |c| c.company_id == branch.id }
-        enrolled_customers = branch_customers.sample(10)
-        enrolled_customers.each do |customer|
-          Seed::CustomerGroupAppointmentService.create(
-            customer_group: loyalty_program,
-            appoint_to: customer
+          
+          customer.subscribe!(
+            plan_name: :basic_6m,
+            seller: System.find_by(name: "System"),
+            buyer: customer,
+            resource: customer,
+            processer: System.find_by(name: "System"),
+            country_code: :us,
+            lifecycle_status: :active,
+            workflow_status: :active
           )
+          @customers << customer
         end
       end
-      puts "Created loyalty programs and enrolled customers for #{branch.name}."
     end
-
-    # --- 10. Create some Products for Each Branch ---
-    @branches.each do |branch|
-      puts "Creating products for #{branch.name}..."
-      15.times do |i|
-        product = Seed::ProductService.create(
-          company_group: @retail,
-          company: branch,
-          name: "#{Faker::Commerce.product_name} #{i + 1}",
-          description: "A quality product from #{branch.name}"
-        )
-        product.attach_tag(name: "Product #{product.id} Tag")
-        @products << product
-      end
-      puts "Created 15 products for #{branch.name}."
-    end
-
-    # --- 11. Create some Services for Each Branch ---
-    @branches.each do |branch|
-      puts "Creating services for #{branch.name}..."
-      10.times do |i|
-        service = Seed::ServiceService.create(
-          company_group: @retail,
-          company: branch,
-          name: "#{Faker::Company.buzzword} Service #{i + 1}",
-          description: "A professional service offered by #{branch.name}"
-        )
-        service.attach_tag(name: "Service #{service.id} Tag")
-        @services << service
-      end
-      puts "Created 10 services for #{branch.name}."
-    end
-
-    # --- 12. Create Orders for Customers and Attach Products/Services ---
-    puts "Creating orders for customers and attaching products/services..."
-    @branches.each do |branch|
-      # Create 5 orders per branch
-      5.times do |i|
-        # Pick a random customer from this branch
-        branch_customers = @customers.select { |c| c.company_id == branch.id }
-        customer = branch_customers.sample
-        next unless customer # Skip if no customers
-
-        # Create an order
-        order = Seed::OrderService.create(
-          company_group: @retail,
-          company: branch,
-          customer: customer,
-          name: "Order #{i + 1} for #{customer.name}",
-          description: "Retail order for #{customer.name} at #{branch.name}"
-        )
-
-        # Attach 2-3 products to the order
-        branch_products = @products.select { |p| p.company_id == branch.id }
-        products_to_attach = branch_products.sample(rand(2..3))
-        products_to_attach.each do |product|
-          OrderAppointment.create!(
-            order: order,
-            appoint_to: product,
-            quantity: rand(1..5),
-            unit_price: rand(10.0..100.0).round(2),
-            total_price: 0, # Will be calculated if needed
-            name: "Appointment of #{product.name} to Order #{order.name}",
-            description: "Product appointment for order"
-          )
-        end
-
-        # Attach 1-2 services to the order
-        branch_services = @services.select { |s| s.company_id == branch.id }
-        services_to_attach = branch_services.sample(rand(1..2))
-        services_to_attach.each do |service|
-          OrderAppointment.create!(
-            order: order,
-            appoint_to: service,
-            quantity: 1,
-            unit_price: rand(50.0..200.0).round(2),
-            total_price: 0, # Will be calculated if needed
-            name: "Appointment of #{service.name} to Order #{order.name}",
-            description: "Service appointment for order"
-          )
-        end
-
-        puts "Created order #{order.name} with #{products_to_attach.count} products and #{services_to_attach.count} services."
-      end
-    end
-    puts "Created orders and attached products/services."
-
-    puts "\n========================================================="
-    puts "🛍️  Retail Company Group Seeding Complete!"
-    puts "========================================================="
-    true
   end
 
-  private
+  def setup_loyalty_programs
+    @branches.each do |branch|
+      2.times do |i|
+        lp = Seed::CustomerGroupService.create(
+          company_group: @retail, company: branch, name: "Loyalty Program #{i + 1} - #{branch.name}"
+        )
+        @loyalty_programs << lp
+        
+        branch_customers = @customers.select { |c| c.company_id == branch.id }
+        branch_customers.sample(10).each do |customer|
+          Seed::CustomerGroupAppointmentService.create(customer_group: lp, appoint_to: customer)
+        end
+      end
+    end
+  end
 
-  # --------------------------------------------------------------------------
-  # PERMISSION LOGIC (RBAC)
-  # --------------------------------------------------------------------------
+  def create_inventory
+    @branches.each do |branch|
+      # Products
+      15.times do |i|
+        @products << Seed::ProductService.create(
+          company_group: @retail, company: branch, name: "#{Faker::Commerce.product_name} #{i + 1}"
+        )
+      end
+      # Services
+      10.times do |i|
+        @services << Seed::ServiceService.create(
+          company_group: @retail, company: branch, name: "#{Faker::Company.buzzword} Service #{i + 1}"
+        )
+      end
+    end
+  end
+
+  def create_customer_orders
+    @branches.each do |branch|
+      branch_customers = @customers.select { |c| c.company_id == branch.id }
+      next if branch_customers.empty?
+
+      5.times do |i|
+        customer = branch_customers.sample
+        order = Seed::OrderService.create(
+          company_group: @retail, company: branch, customer: customer, name: "Order #{i + 1} for #{customer.name}"
+        )
+        attach_items_to_order(branch, order)
+      end
+    end
+  end
+
+  def attach_items_to_order(branch, order)
+    # Attach Products
+    branch_products = @products.select { |p| p.company_id == branch.id }
+    branch_products.sample(rand(2..3)).each do |product|
+      OrderAppointment.create!(order: order, appoint_to: product, quantity: rand(1..5), unit_price: rand(10.0..100.0).round(2), total_price: 0)
+    end
+
+    # Attach Services
+    branch_services = @services.select { |s| s.company_id == branch.id }
+    branch_services.sample(rand(1..2)).each do |service|
+      OrderAppointment.create!(order: order, appoint_to: service, quantity: 1, unit_price: rand(50.0..200.0).round(2), total_price: 0)
+    end
+  end
+
   def configure_retail_permissions
     # Define capabilities for each role
     # Actions: create, read, update, delete

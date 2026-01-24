@@ -31,7 +31,6 @@ class User < ApplicationRecord
   # Includes functionality for handling user avatars, likely from `app/models/user/avatar_concern.rb`.
   include User::AvatarConcern
   include User::ChatImagesConcern
-  include Subscription::BuyerConcern
   include AddressConcern
 
   # --- Business Logic Associations ---

@@ -1,7 +1,7 @@
 class Company < ApplicationRecord
   include AddressConcern
   include TagConcern
-  include Subscription::ResourceConcern
+  include Subscription::SellerConcern
 
   belongs_to :company_group
 
