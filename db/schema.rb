@@ -2275,10 +2275,13 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.string "name"
     t.string "description"
     t.string "code"
+    t.integer "duration_days"
     t.integer "lifecycle_status"
     t.integer "workflow_status"
     t.integer "business_type"
-    t.string "country_code"
+    t.integer "country_code"
+    t.jsonb "features", default: {}
+    t.jsonb "limits", default: {}
     t.datetime "discarded_at"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
