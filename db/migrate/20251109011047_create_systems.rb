@@ -13,6 +13,7 @@ class CreateSystems < ActiveRecord::Migration[8.0]
 
       # Status
       t.boolean :active, default: true, null: false
+      t.jsonb :metadata, default: {}
 
       t.timestamps
     end

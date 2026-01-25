@@ -29,6 +29,7 @@ class CreateSubscriptionGroups < ActiveRecord::Migration[8.0]
       t.integer :business_type     # e.g., b2b, b2c (context specific)
       t.boolean :auto_renew        # Instance specific setting
       t.datetime :discarded_at
+      t.jsonb :metadata, default: {}
 
       t.timestamps
     end

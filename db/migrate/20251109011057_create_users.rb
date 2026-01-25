@@ -20,6 +20,7 @@ class CreateUsers < ActiveRecord::Migration[8.0]
       t.integer :country_code
       t.string :single_access_token
       t.datetime :discarded_at
+      t.jsonb :metadata, default: {}
 
       t.timestamps
     end

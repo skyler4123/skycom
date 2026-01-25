@@ -23,6 +23,7 @@ class CreateProducts < ActiveRecord::Migration[8.0]
       t.integer :workflow_status
       t.integer :business_type
       t.datetime :discarded_at
+      t.jsonb :metadata, default: {}
 
       t.timestamps
     end

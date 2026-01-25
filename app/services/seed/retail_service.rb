@@ -30,16 +30,17 @@ class Seed::RetailService
 
     create_retail_company_group
     create_branches(count: 2)
-    subscribe_branches_to_plans
-    create_facilities_for_branches
-    appoint_payment_methods
-    setup_roles_and_permissions
-    create_departments_for_branches
-    create_employees_and_assign_departments
-    create_customers_and_subscriptions
-    setup_loyalty_programs
-    create_inventory # Products and Services
-    create_customer_orders
+    create_subscriptions_for_company_group
+    # subscribe_branches_to_plans
+    # create_facilities_for_branches
+    # appoint_payment_methods
+    # setup_roles_and_permissions
+    # create_departments_for_branches
+    # create_employees_and_assign_departments
+    # create_customers_and_subscriptions
+    # setup_loyalty_programs
+    # create_inventory # Products and Services
+    # create_customer_orders
 
     print_footer
     true
@@ -68,6 +69,16 @@ class Seed::RetailService
     )
   end
 
+  def create_subscriptions_for_company_group(count: 3)
+    count.times do |i|
+      Seed::SubscriptionService.create(
+        company_group: @retail,
+        name: "Retail Company Group Subscription #{i + 1}",
+        description: "Subscription plan #{i + 1} for #{@retail.name}"
+      )
+    end
+  end
+
   def create_branches(count:)
     puts "Creating #{count} branches..."
     count.times do |i|
@@ -86,6 +97,7 @@ class Seed::RetailService
     @branches.each do |branch|
       branch.subscribe!(plan_name: Subscription.plan_names.keys.sample)
     end
+    
   end
 
   def create_facilities_for_branches

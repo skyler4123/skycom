@@ -14,6 +14,7 @@ class CreateSystemSubscriptionGroups < ActiveRecord::Migration[8.0]
       t.string :country_code
       t.boolean :auto_renew
       t.datetime :discarded_at
+      t.jsonb :metadata, default: {}
 
       t.timestamps
     end

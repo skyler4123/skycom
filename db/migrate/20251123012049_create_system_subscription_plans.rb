@@ -13,6 +13,7 @@ class CreateSystemSubscriptionPlans < ActiveRecord::Migration[8.0]
       t.jsonb :features, default: {}
       t.jsonb :limits, default: {}
       t.datetime :discarded_at
+      t.jsonb :metadata, default: {}
 
       t.timestamps
     end

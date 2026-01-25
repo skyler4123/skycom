@@ -8,11 +8,13 @@ class CreateSubscriptionPlans < ActiveRecord::Migration[8.0]
       t.string :name
       t.string :description
       t.string :code
+      t.integer :duration_days
       t.integer :lifecycle_status
       t.integer :workflow_status
       t.integer :business_type
-      t.string :country_code
-      t.boolean :auto_renew
+      t.integer :country_code
+      t.jsonb :features, default: {}
+      t.jsonb :limits, default: {}
       t.datetime :discarded_at
 
       t.timestamps

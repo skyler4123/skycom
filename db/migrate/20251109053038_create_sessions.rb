@@ -5,6 +5,7 @@ class CreateSessions < ActiveRecord::Migration[8.0]
       t.string :user_agent
       t.string :ip_address
       t.string :single_access_token
+      t.jsonb :metadata, default: {}
 
       t.timestamps
     end

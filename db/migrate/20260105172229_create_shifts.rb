@@ -6,6 +6,7 @@ class CreateShifts < ActiveRecord::Migration[8.0]
       t.references :period, null: false, foreign_key: true, type: :uuid
       t.string :name
       t.string :description
+      t.jsonb :metadata, default: {}
 
       t.timestamps
     end

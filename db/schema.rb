@@ -95,6 +95,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.integer "workflow_status"
     t.integer "business_type"
     t.datetime "discarded_at"
+    t.jsonb "metadata", default: {}
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["category_id"], name: "index_answers_on_category_id"
@@ -171,6 +172,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.integer "workflow_status"
     t.integer "business_type"
     t.datetime "discarded_at"
+    t.jsonb "metadata", default: {}
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["category_id"], name: "index_article_groups_on_category_id"
@@ -193,6 +195,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.integer "workflow_status"
     t.integer "business_type"
     t.datetime "discarded_at"
+    t.jsonb "metadata", default: {}
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["article_group_id"], name: "index_articles_on_article_group_id"
@@ -285,6 +288,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.integer "lifecycle_status"
     t.integer "workflow_status"
     t.integer "business_type"
+    t.jsonb "metadata", default: {}
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["booking_resource_id"], name: "index_booking_periods_on_booking_resource_id"
@@ -302,6 +306,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.integer "workflow_status"
     t.integer "business_type"
     t.datetime "discarded_at"
+    t.jsonb "metadata", default: {}
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["booking_resourceable_type", "booking_resourceable_id"], name: "index_booking_resources_on_booking_resourceable"
@@ -329,6 +334,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.integer "workflow_status"
     t.integer "business_type"
     t.datetime "discarded_at"
+    t.jsonb "metadata", default: {}
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["appoint_by_type", "appoint_by_id"], name: "index_bookings_on_appoint_by"
@@ -351,6 +357,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.integer "workflow_status"
     t.integer "business_type"
     t.datetime "discarded_at"
+    t.jsonb "metadata", default: {}
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["category_id"], name: "index_brands_on_category_id"
@@ -395,6 +402,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.integer "workflow_status"
     t.integer "business_type"
     t.datetime "discarded_at"
+    t.jsonb "metadata", default: {}
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["category_id"], name: "index_cart_groups_on_category_id"
@@ -423,6 +431,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.integer "workflow_status"
     t.integer "business_type"
     t.datetime "discarded_at"
+    t.jsonb "metadata", default: {}
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["barcode"], name: "index_carts_on_barcode"
@@ -441,6 +450,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.uuid "company_group_id", null: false
     t.string "name"
     t.string "description"
+    t.jsonb "metadata", default: {}
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["company_group_id", "name"], name: "index_categories_on_company_group_id_and_name"
@@ -473,6 +483,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.integer "employee_count"
     t.integer "fiscal_year_end_month"
     t.datetime "discarded_at"
+    t.jsonb "metadata", default: {}
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["category_id"], name: "index_companies_on_category_id"
@@ -505,6 +516,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.integer "employee_count"
     t.integer "fiscal_year_end_month"
     t.datetime "discarded_at"
+    t.jsonb "metadata", default: {}
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["discarded_at"], name: "index_company_groups_on_discarded_at"
@@ -578,6 +590,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.integer "workflow_status"
     t.integer "business_type"
     t.datetime "discarded_at"
+    t.jsonb "metadata", default: {}
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["category_id"], name: "index_customer_groups_on_category_id"
@@ -598,6 +611,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.integer "workflow_status"
     t.integer "business_type"
     t.datetime "discarded_at"
+    t.jsonb "metadata", default: {}
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["category_id"], name: "index_customers_on_category_id"
@@ -676,6 +690,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.integer "workflow_status"
     t.integer "business_type"
     t.datetime "discarded_at"
+    t.jsonb "metadata", default: {}
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["category_id"], name: "index_document_groups_on_category_id"
@@ -698,6 +713,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.integer "workflow_status"
     t.integer "business_type"
     t.datetime "discarded_at"
+    t.jsonb "metadata", default: {}
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["category_id"], name: "index_documents_on_category_id"
@@ -764,6 +780,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.integer "workflow_status"
     t.integer "business_type"
     t.datetime "discarded_at"
+    t.jsonb "metadata", default: {}
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["category_id"], name: "index_employee_groups_on_category_id"
@@ -785,6 +802,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.integer "workflow_status"
     t.integer "business_type"
     t.datetime "discarded_at"
+    t.jsonb "metadata", default: {}
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["category_id"], name: "index_employees_on_category_id"
@@ -861,6 +879,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.integer "workflow_status"
     t.integer "business_type"
     t.datetime "discarded_at"
+    t.jsonb "metadata", default: {}
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["category_id"], name: "index_event_groups_on_category_id"
@@ -881,6 +900,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.integer "workflow_status"
     t.integer "business_type"
     t.datetime "discarded_at"
+    t.jsonb "metadata", default: {}
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["category_id"], name: "index_events_on_category_id"
@@ -929,6 +949,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.integer "workflow_status"
     t.integer "business_type"
     t.datetime "discarded_at"
+    t.jsonb "metadata", default: {}
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["category_id"], name: "index_exam_groups_on_category_id"
@@ -949,6 +970,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.integer "workflow_status"
     t.integer "business_type"
     t.datetime "discarded_at"
+    t.jsonb "metadata", default: {}
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["category_id"], name: "index_exams_on_category_id"
@@ -969,6 +991,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.integer "workflow_status"
     t.integer "business_type"
     t.datetime "discarded_at"
+    t.jsonb "metadata", default: {}
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["category_id"], name: "index_facilities_on_category_id"
@@ -1042,6 +1065,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.integer "workflow_status"
     t.integer "business_type"
     t.datetime "discarded_at"
+    t.jsonb "metadata", default: {}
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["category_id"], name: "index_facility_groups_on_category_id"
@@ -1061,6 +1085,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.integer "workflow_status"
     t.integer "business_type"
     t.datetime "discarded_at"
+    t.jsonb "metadata", default: {}
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["category_id"], name: "index_inventories_on_category_id"
@@ -1114,6 +1139,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.integer "workflow_status"
     t.integer "business_type"
     t.datetime "discarded_at"
+    t.jsonb "metadata", default: {}
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["barcode"], name: "index_inventory_items_on_barcode"
@@ -1172,6 +1198,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.integer "workflow_status"
     t.integer "business_type"
     t.datetime "discarded_at"
+    t.jsonb "metadata", default: {}
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["appoint_by_type", "appoint_by_id"], name: "index_inventory_transactions_on_appoint_by"
@@ -1199,6 +1226,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.integer "workflow_status"
     t.integer "business_type"
     t.datetime "discarded_at"
+    t.jsonb "metadata", default: {}
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["category_id"], name: "index_invoices_on_category_id"
@@ -1271,6 +1299,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.integer "workflow_status"
     t.integer "business_type"
     t.datetime "discarded_at"
+    t.jsonb "metadata", default: {}
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["category_id"], name: "index_notification_groups_on_category_id"
@@ -1291,6 +1320,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.integer "workflow_status"
     t.integer "business_type"
     t.datetime "discarded_at"
+    t.jsonb "metadata", default: {}
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["category_id"], name: "index_notifications_on_category_id"
@@ -1374,6 +1404,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.integer "workflow_status"
     t.integer "business_type"
     t.datetime "discarded_at"
+    t.jsonb "metadata", default: {}
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["category_id"], name: "index_order_groups_on_category_id"
@@ -1405,6 +1436,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.integer "workflow_status"
     t.integer "business_type"
     t.datetime "discarded_at"
+    t.jsonb "metadata", default: {}
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["barcode"], name: "index_orders_on_barcode"
@@ -1448,6 +1480,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.integer "workflow_status"
     t.integer "business_type"
     t.datetime "discarded_at"
+    t.jsonb "metadata", default: {}
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["category_id"], name: "index_payment_methods_on_category_id"
@@ -1470,6 +1503,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.integer "workflow_status"
     t.integer "business_type"
     t.datetime "discarded_at"
+    t.jsonb "metadata", default: {}
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["category_id"], name: "index_payments_on_category_id"
@@ -1667,6 +1701,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.integer "workflow_status"
     t.integer "business_type"
     t.datetime "discarded_at"
+    t.jsonb "metadata", default: {}
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["category_id"], name: "index_product_groups_on_category_id"
@@ -1697,6 +1732,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.integer "workflow_status"
     t.integer "business_type"
     t.datetime "discarded_at"
+    t.jsonb "metadata", default: {}
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["barcode"], name: "index_products_on_barcode"
@@ -1776,6 +1812,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.integer "workflow_status"
     t.integer "business_type"
     t.datetime "discarded_at"
+    t.jsonb "metadata", default: {}
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["category_id"], name: "index_project_groups_on_category_id"
@@ -1796,6 +1833,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.integer "workflow_status"
     t.integer "business_type"
     t.datetime "discarded_at"
+    t.jsonb "metadata", default: {}
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["category_id"], name: "index_projects_on_category_id"
@@ -1823,6 +1861,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.integer "workflow_status"
     t.integer "business_type"
     t.datetime "discarded_at"
+    t.jsonb "metadata", default: {}
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["barcode"], name: "index_purchase_items_on_barcode"
@@ -1846,6 +1885,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.integer "workflow_status"
     t.integer "business_type"
     t.datetime "discarded_at"
+    t.jsonb "metadata", default: {}
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["category_id"], name: "index_purchases_on_category_id"
@@ -1865,6 +1905,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.integer "workflow_status"
     t.integer "business_type"
     t.datetime "discarded_at"
+    t.jsonb "metadata", default: {}
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["category_id"], name: "index_questions_on_category_id"
@@ -1981,6 +2022,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.datetime "start_at"
     t.integer "business_type"
     t.datetime "discarded_at"
+    t.jsonb "metadata", default: {}
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["category_id"], name: "index_service_groups_on_category_id"
@@ -2002,6 +2044,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.datetime "start_at"
     t.integer "business_type"
     t.datetime "discarded_at"
+    t.jsonb "metadata", default: {}
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["category_id"], name: "index_services_on_category_id"
@@ -2015,6 +2058,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.string "user_agent"
     t.string "ip_address"
     t.string "single_access_token"
+    t.jsonb "metadata", default: {}
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["single_access_token"], name: "index_sessions_on_single_access_token", unique: true
@@ -2089,6 +2133,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.integer "workflow_status"
     t.integer "business_type"
     t.datetime "discarded_at"
+    t.jsonb "metadata", default: {}
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["category_id"], name: "index_setting_groups_on_category_id"
@@ -2110,6 +2155,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.integer "workflow_status"
     t.integer "business_type"
     t.datetime "discarded_at"
+    t.jsonb "metadata", default: {}
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["category_id"], name: "index_settings_on_category_id"
@@ -2125,6 +2171,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.uuid "period_id", null: false
     t.string "name"
     t.string "description"
+    t.jsonb "metadata", default: {}
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["company_group_id"], name: "index_shifts_on_company_group_id"
@@ -2142,6 +2189,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.uuid "owner_id", null: false
     t.json "data"
     t.datetime "recorded_at"
+    t.jsonb "metadata", default: {}
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["owner_type", "owner_id"], name: "index_statistics_on_owner"
@@ -2170,6 +2218,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.integer "business_type"
     t.boolean "auto_renew"
     t.datetime "discarded_at"
+    t.jsonb "metadata", default: {}
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["buyer_id", "buyer_type"], name: "index_subscription_groups_on_buyer_id_and_buyer_type"
@@ -2194,11 +2243,13 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.string "name"
     t.string "description"
     t.string "code"
+    t.integer "duration_days"
     t.integer "lifecycle_status"
     t.integer "workflow_status"
     t.integer "business_type"
-    t.string "country_code"
-    t.boolean "auto_renew"
+    t.integer "country_code"
+    t.jsonb "features", default: {}
+    t.jsonb "limits", default: {}
     t.datetime "discarded_at"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
@@ -2231,6 +2282,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.integer "business_type"
     t.boolean "auto_renew"
     t.datetime "discarded_at"
+    t.jsonb "metadata", default: {}
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["buyer_id", "buyer_type"], name: "index_subscriptions_on_buyer_id_and_buyer_type"
@@ -2261,6 +2313,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.string "country_code"
     t.boolean "auto_renew"
     t.datetime "discarded_at"
+    t.jsonb "metadata", default: {}
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["company_group_id"], name: "index_system_subscription_groups_on_company_group_id"
@@ -2283,6 +2336,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.jsonb "features", default: {}
     t.jsonb "limits", default: {}
     t.datetime "discarded_at"
+    t.jsonb "metadata", default: {}
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["discarded_at"], name: "index_system_subscription_plans_on_discarded_at"
@@ -2305,6 +2359,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.string "country_code"
     t.boolean "auto_renew"
     t.datetime "discarded_at"
+    t.jsonb "metadata", default: {}
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["company_group_id"], name: "index_system_subscriptions_on_company_group_id"
@@ -2323,6 +2378,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.integer "currency"
     t.integer "country_code"
     t.boolean "active", default: true, null: false
+    t.jsonb "metadata", default: {}
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["name"], name: "index_systems_on_name", unique: true
@@ -2425,6 +2481,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.integer "workflow_status"
     t.integer "business_type"
     t.datetime "discarded_at"
+    t.jsonb "metadata", default: {}
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["category_id"], name: "index_task_groups_on_category_id"
@@ -2446,6 +2503,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.integer "workflow_status"
     t.integer "business_type"
     t.datetime "discarded_at"
+    t.jsonb "metadata", default: {}
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["category_id"], name: "index_tasks_on_category_id"
@@ -2471,6 +2529,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.integer "country_code"
     t.string "single_access_token"
     t.datetime "discarded_at"
+    t.jsonb "metadata", default: {}
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["discarded_at"], name: "index_users_on_discarded_at"

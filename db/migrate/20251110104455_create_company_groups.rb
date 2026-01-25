@@ -24,6 +24,7 @@ class CreateCompanyGroups < ActiveRecord::Migration[8.0]
       t.integer :employee_count
       t.integer :fiscal_year_end_month
       t.datetime :discarded_at
+      t.jsonb :metadata, default: {}
 
       t.timestamps
     end
