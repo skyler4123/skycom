@@ -3,50 +3,6 @@
 # within the context of a Company.
 
 class Seed::BookingService
-  # Configuration for the number of bookings to create per company
-  BOOKINGS_PER_COMPANY = 5
-
-  def self.run
-    puts "Seeding Booking records..."
-
-    # Get enum keys once before the loop for efficiency.
-    lifecycle_statuses = Booking.lifecycle_statuses.keys
-    workflow_statuses = Booking.workflow_statuses.keys
-    business_types = Booking.business_types.keys
-
-    Company.all.each do |company|
-      # Get potential bookers (employees) and bookable items (facilities) for the company
-      bookers = company.employees
-      bookable_items = company.facilities
-
-      # Skip if there's nothing to book or no one to book
-      next if bookers.empty? || bookable_items.empty?
-
-      BOOKINGS_PER_COMPANY.times do |i|
-        # Randomly decide whether to mark the record as discarded
-        should_discard = rand(10) == 0 # 10% chance of being discarded
-
-        booker = bookers.sample
-        bookable = bookable_items.sample
-
-        Booking.create!(
-          company: company,
-          appoint_from: booker,
-          appoint_to: bookable,
-          name: "Booking for #{bookable.name} by #{booker.name}",
-          description: "Booking ##{i + 1} for company #{company.name}.",
-          code: "BOOK-#{company.id}-#{SecureRandom.hex(3).upcase}",
-          lifecycle_status: lifecycle_statuses.sample,
-          workflow_status: workflow_statuses.sample,
-          business_type: business_types.sample,
-          discarded_at: should_discard ? Time.zone.now - rand(1..180).days : nil
-        )
-      end
-    end
-
-    puts "Successfully created #{Booking.count} Booking records."
-  end
-
   def self.create(
     company:,
     appoint_from: nil,
@@ -54,13 +10,12 @@ class Seed::BookingService
     name: Faker::Book.title,
     description: Faker::Lorem.sentence,
     code: nil,
-    lifecycle_status: nil,
-    workflow_status: nil,
-    business_type: nil,
+    lifecycle_status: Booking.lifecycle_statuses.keys.sample,
+    workflow_status: Booking.workflow_statuses.keys.sample,
+    business_type: Booking.business_types.keys.sample,
     discarded_at: nil
   )
     appoint_from ||= company.employees.sample
-    appoint_to ||= company.facilities.sample
 
     Booking.create!(
       company: company,
@@ -69,9 +24,9 @@ class Seed::BookingService
       name: name,
       description: description,
       code: code || "BOOK-#{company.id}-#{SecureRandom.hex(3).upcase}",
-      lifecycle_status: lifecycle_status || Booking.lifecycle_statuses.keys.sample,
-      workflow_status: workflow_status || Booking.workflow_statuses.keys.sample,
-      business_type: business_type || Booking.business_types.keys.sample,
+      lifecycle_status: lifecycle_status,
+      workflow_status: workflow_status,
+      business_type: business_type,
       discarded_at: discarded_at
     )
   end

@@ -8,9 +8,9 @@ class Seed::CustomerGroupService
     name: "#{Faker::Commerce.department} Customers",
     description: "A group for #{Faker::Marketing.buzzwords} customers.",
     code: nil,
-    lifecycle_status: nil,
-    workflow_status: nil,
-    business_type: nil,
+    lifecycle_status: CustomerGroup.lifecycle_statuses.keys.sample,
+    workflow_status: CustomerGroup.workflow_statuses.keys.sample,
+    business_type: CustomerGroup.business_types.keys.sample,
     discarded_at: nil
   )
     should_discard = rand(10) == 0
@@ -22,9 +22,9 @@ class Seed::CustomerGroupService
       name: name,
       description: description,
       code: code || "CG-#{company_group.id}-#{SecureRandom.hex(3).upcase}",
-      lifecycle_status: lifecycle_status || CustomerGroup.lifecycle_statuses.keys.sample,
-      workflow_status: workflow_status || CustomerGroup.workflow_statuses.keys.sample,
-      business_type: business_type || CustomerGroup.business_types.keys.sample,
+      lifecycle_status: lifecycle_status,
+      workflow_status: workflow_status,
+      business_type: business_type,
       discarded_at: discarded_at
     )
   end

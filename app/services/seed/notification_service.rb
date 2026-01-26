@@ -2,50 +2,14 @@
 # associated with a NotificationGroup and a Company.
 
 class Seed::NotificationService
-  # Configuration for the number of notifications to create per group
-  NOTIFICATIONS_PER_GROUP = 5
-
-  def self.run
-    puts "Seeding Notification records..."
-
-    # Get enum keys once before the loop for efficiency.
-    lifecycle_statuses = Notification.lifecycle_statuses.keys
-    workflow_statuses = Notification.workflow_statuses.keys
-    business_types = Notification.business_types.keys
-
-    NotificationGroup.all.each do |notification_group|
-      company = notification_group.company
-
-      NOTIFICATIONS_PER_GROUP.times do |i|
-        # Randomly decide whether to mark the record as discarded
-        should_discard = rand(10) == 0 # 10% chance of being discarded
-
-        Notification.create!(
-          company: company,
-          notification_group: notification_group,
-          name: "Notification ##{i + 1} for #{company.name}",
-          description: "A notification for group '#{notification_group.name}'.",
-          code: "NOTIF-#{company.id}-#{notification_group.id}-#{SecureRandom.hex(2).upcase}",
-          lifecycle_status: lifecycle_statuses.sample,
-          workflow_status: workflow_statuses.sample,
-          business_type: business_types.sample,
-          # Set a past timestamp for discarded_at if the record is to be soft-deleted
-          discarded_at: should_discard ? Time.zone.now - rand(1..180).days : nil
-        )
-      end
-    end
-
-    puts "Successfully created #{Notification.count} Notification records."
-  end
-
   def self.create(
     notification_group: NotificationGroup.all.sample,
     name: nil,
     description: nil,
     code: nil,
-    lifecycle_status: nil,
-    workflow_status: nil,
-    business_type: nil,
+    lifecycle_status: Notification.lifecycle_statuses.keys.sample,
+    workflow_status: Notification.workflow_statuses.keys.sample,
+    business_type: Notification.business_types.keys.sample,
     discarded_at: nil
   )
     raise "Cannot create a notification: No notification groups exist." if notification_group.nil?
@@ -60,9 +24,9 @@ class Seed::NotificationService
       name: name || "Notification for #{company.name}",
       description: description || "A notification for group '#{notification_group.name}'.",
       code: code || "NOTIF-#{company.id}-#{notification_group.id}-#{SecureRandom.hex(2).upcase}",
-      lifecycle_status: lifecycle_status || Notification.lifecycle_statuses.keys.sample,
-      workflow_status: workflow_status || Notification.workflow_statuses.keys.sample,
-      business_type: business_type || Notification.business_types.keys.sample,
+      lifecycle_status: lifecycle_status,
+      workflow_status: workflow_status,
+      business_type: business_type,
       discarded_at: discarded_at
     )
   end

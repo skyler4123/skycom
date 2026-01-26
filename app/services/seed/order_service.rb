@@ -10,9 +10,9 @@ class Seed::OrderService
     name: nil,
     description: Faker::Lorem.sentence(word_count: 15),
     currency: Faker::Currency.code,
-    lifecycle_status: nil,
-    workflow_status: nil,
-    business_type: nil,
+    lifecycle_status: Order.lifecycle_statuses.keys.sample,
+    workflow_status: Order.workflow_statuses.keys.sample,
+    business_type: Order.business_types.keys.sample,
     discarded_at: nil
   )
     customer ||= company.customers.sample
@@ -28,9 +28,9 @@ class Seed::OrderService
       name: name || "Order for #{customer.name}",
       description: description,
       currency: currency,
-      lifecycle_status: lifecycle_status || Order.lifecycle_statuses.keys.sample,
-      workflow_status: workflow_status || Order.workflow_statuses.keys.sample,
-      business_type: business_type || Order.business_types.keys.sample,
+      lifecycle_status: lifecycle_status,
+      workflow_status: workflow_status,
+      business_type: business_type,
       discarded_at: discarded_at
     )
   end

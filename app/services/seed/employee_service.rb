@@ -5,7 +5,7 @@ class Seed::EmployeeService
     user: nil,
     name: Faker::Name.name,
     description: "#{Faker::Job.title} in #{Faker::Commerce.department}",
-    business_type: nil,
+    business_type: Employee.business_types.keys.sample,
     discarded_at: nil,
     index: 0
   )
@@ -17,7 +17,7 @@ class Seed::EmployeeService
       company: company,
       name: name,
       description: description,
-      business_type: business_type || Employee.business_types.keys.sample,
+      business_type: business_type,
       discarded_at: discarded_at
     )
   end
