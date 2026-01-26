@@ -20,11 +20,11 @@ class Seed::CompanyGroupService
     city: Faker::Address.city,
     postal_code: Faker::Address.postcode,
     country_code: CompanyGroup.country_codes.keys.sample,
-    email: Faker::Internet.email(name: base_name),
+    email: Faker::Internet.email,
     phone_number: Faker::PhoneNumber.phone_number,
-    website: Faker::Internet.url(host: base_name.parameterize + domain_suffix),
+    website: Faker::Internet.url,
     fiscal_year_end_month: CompanyGroup.fiscal_year_end_months.keys.sample,
-    discarded_at: nil,
+    discarded_at: nil
   )
     CompanyGroup.create!(
       user: user,
@@ -47,7 +47,7 @@ class Seed::CompanyGroupService
       phone_number: phone_number,
       website: website,
       fiscal_year_end_month: fiscal_year_end_month,
-      discarded_at: discarded_atr
+      discarded_at: discarded_at
     )
   end
 end
