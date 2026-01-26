@@ -15,8 +15,8 @@ class Policy < ApplicationRecord
 
   # --- Enums ---
   # Using full path to avoid potential method clashes
-  enum :lifecycle_status, LIFECYCLE_STATUS
-  enum :workflow_status, WORKFLOW_STATUS
+  enum :lifecycle_status, LIFECYCLE_STATUS, prefix: true
+  enum :workflow_status, WORKFLOW_STATUS, prefix: true
 
   # Policy business_types based on common organizational categories
   enum :business_type, {

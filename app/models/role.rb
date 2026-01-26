@@ -30,8 +30,8 @@ class Role < ApplicationRecord
 
   # --- Enums ---
   # Using full path to avoid potential method clashes, as seen in Employee model
-  enum :lifecycle_status, LIFECYCLE_STATUS
-  enum :workflow_status, WORKFLOW_STATUS
+  enum :lifecycle_status, LIFECYCLE_STATUS, prefix: true
+  enum :workflow_status, WORKFLOW_STATUS, prefix: true
 
   # Standardized role kinds for categorization
   enum :business_type, {

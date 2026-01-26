@@ -2,7 +2,7 @@ class CreateSystemSubscriptionPlans < ActiveRecord::Migration[8.0]
   def change
     create_table :system_subscription_plans, id: :uuid do |t|
       t.references :price, null: false, foreign_key: true, type: :uuid
-      t.string :name
+      t.string :name, null: false
       t.string :description
       t.string :code
       t.integer :duration_days

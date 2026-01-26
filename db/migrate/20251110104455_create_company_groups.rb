@@ -9,7 +9,7 @@ class CreateCompanyGroups < ActiveRecord::Migration[8.0]
       t.integer :workflow_status
       t.integer :ownership_type
       t.integer :business_type
-      t.integer :currency
+      t.integer :currency_code
       t.string :registration_number
       t.string :vat_id
       t.string :tax_id
@@ -17,7 +17,7 @@ class CreateCompanyGroups < ActiveRecord::Migration[8.0]
       t.string :address_line_1
       t.string :city
       t.string :postal_code
-      t.string :country
+      t.integer :country_code
       t.string :email
       t.string :phone_number
       t.string :website

@@ -1,6 +1,7 @@
 class Company < ApplicationRecord
   include AddressConcern
   include TagConcern
+  include SystemSubscription::ResourceConcern
   include Subscription::SellerConcern
 
   belongs_to :company_group
@@ -31,19 +32,16 @@ class Company < ApplicationRecord
   has_many :child_companies, class_name: "Company", foreign_key: "parent_company_id", dependent: :destroy, inverse_of: :parent_company
 
   # --- Enums ---
-  enum :lifecycle_status, LIFECYCLE_STATUS
-  enum :workflow_status, WORKFLOW_STATUS
-
+  enum :country_code, COUNTRIE_CODES, prefix: true
+  enum :business_type, BUSINESS_TYPES, prefix: true
+  enum :timezone, TIMEZONES, prefix: true
+  enum :currency_code, CURRENCIE_CODES, prefix: true
+  enum :lifecycle_status, LIFECYCLE_STATUS, prefix: true
+  enum :workflow_status, WORKFLOW_STATUS, prefix: true
   enum :ownership_type, {
     publicly_traded: 0,
     privately_held: 1
   }
-
-  # Grouped business types with 1000-unit gaps for future expansion
-  enum :business_type, BUSINESS_TYPES, prefix: true
-
-  enum :timezone, TIMEZONES, prefix: true
-  enum :currency, CURRENCIE_CODES, prefix: true
 
   # Enum for the new fiscal_year_end_month column (1=January, 12=December)
   enum :fiscal_year_end_month, {
@@ -70,8 +68,6 @@ class Company < ApplicationRecord
   validates :phone_number, length: { maximum: 20 }, allow_blank: true
   validates :website, format: URI.regexp(%w[http https]), allow_blank: true
 
-  # Validation for address fields
-  validates :country, presence: true
   # validates :city, presence: true
 
   # Validation for operational fields

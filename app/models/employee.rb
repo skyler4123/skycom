@@ -30,8 +30,8 @@ class Employee < ApplicationRecord
     contractor: 2,
     intern: 3
   }
-  enum :lifecycle_status, LIFECYCLE_STATUS
-  enum :workflow_status, WORKFLOW_STATUS
+  enum :lifecycle_status, LIFECYCLE_STATUS, prefix: true
+  enum :workflow_status, WORKFLOW_STATUS, prefix: true
 
   # --- Validations ---
   validates :name, presence: true

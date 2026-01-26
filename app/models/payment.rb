@@ -5,8 +5,8 @@ class Payment < ApplicationRecord
   belongs_to :invoice
 
   # --- Enums ---
-  enum :lifecycle_status, LIFECYCLE_STATUS
-  enum :workflow_status, WORKFLOW_STATUS
+  enum :lifecycle_status, LIFECYCLE_STATUS, prefix: true
+  enum :workflow_status, WORKFLOW_STATUS, prefix: true
 
   enum :payment_method, {
     credit_card: 0,

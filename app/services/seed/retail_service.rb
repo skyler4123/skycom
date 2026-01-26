@@ -29,8 +29,9 @@ class Seed::RetailService
     print_header
 
     create_retail_company_group
-    create_branches(count: 2)
-    create_subscriptions_for_company_group
+    create_branches
+    subscribe_companies_to_system_subscription_plane
+    create_subscription_plans_for_company_group
     # subscribe_branches_to_plans
     # create_facilities_for_branches
     # appoint_payment_methods
@@ -60,26 +61,16 @@ class Seed::RetailService
   end
 
   def create_retail_company_group
-    puts "Creating retail company group..."
+    puts "Creating retail group..."
     @retail = Seed::CompanyGroupService.create(
       user: @multi_company_group_owner,
-      name: "Retail Company Group #{rand(1000..9999)}",
+      name: "Retail Group #{rand(1000..9999)}",
       description: "A group for multiple retail branch companies",
       business_type: COMPANY_GROUP_BUSINESS_TYPE
     )
   end
 
-  def create_subscriptions_for_company_group(count: 3)
-    count.times do |i|
-      Seed::SubscriptionService.create(
-        company_group: @retail,
-        name: "Retail Company Group Subscription #{i + 1}",
-        description: "Subscription plan #{i + 1} for #{@retail.name}"
-      )
-    end
-  end
-
-  def create_branches(count:)
+  def create_branches(count: 2)
     puts "Creating #{count} branches..."
     count.times do |i|
       branch = Seed::CompanyService.create(
@@ -90,6 +81,33 @@ class Seed::RetailService
       )
       branch.attach_tag(name: "Branch #{branch.id} Tag")
       @branches << branch
+    end
+  end
+
+  def subscribe_companies_to_system_subscription_plane
+    @branches.each do |branch|
+      plan_name = SystemSubscriptionPlan.pluck(:name).sample
+      branch.system_subscribe!(plan_name: plan_name)
+    end
+  end
+
+  def create_subscription_plans_for_company_group(count: 3)
+    count.times do |i|
+      Seed::SubscriptionPlanService.create(
+        company_group: @retail,
+        name: "Plan #{i + 1}",
+        description: "Subscription plan #{i + 1} for #{@retail.name}"
+      )
+    end
+  end
+
+  def create_subscriptions_for_company_group(count: 3)
+    count.times do |i|
+      Seed::SubscriptionService.create(
+        company_group: @retail,
+        name: "Retail Company Group Subscription #{i + 1}",
+        description: "Subscription plan #{i + 1} for #{@retail.name}"
+      )
     end
   end
 

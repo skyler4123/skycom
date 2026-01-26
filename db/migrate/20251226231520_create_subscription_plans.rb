@@ -5,7 +5,7 @@ class CreateSubscriptionPlans < ActiveRecord::Migration[8.0]
       t.references :company, null: false, foreign_key: true, type: :uuid
       t.references :price, null: false, foreign_key: true, type: :uuid
       t.references :period, null: false, foreign_key: true, type: :uuid
-      t.string :name
+      t.string :name, null: false
       t.string :description
       t.string :code
       t.integer :duration_days

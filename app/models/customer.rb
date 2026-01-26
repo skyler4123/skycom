@@ -23,8 +23,8 @@ class Customer < ApplicationRecord
   has_many :services, through: :service_appointments
 
   # --- Enums ---
-  enum :lifecycle_status, LIFECYCLE_STATUS
-  enum :workflow_status, WORKFLOW_STATUS
+  enum :lifecycle_status, LIFECYCLE_STATUS, prefix: true
+  enum :workflow_status, WORKFLOW_STATUS, prefix: true
   enum :business_type, {
     individual: 0,
     small_business: 1,

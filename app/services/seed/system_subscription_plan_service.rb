@@ -84,7 +84,7 @@ module Seed
           business_type = SystemSubscriptionPlan.business_types.keys.sample
           plan.update!(
             price: price,
-            name: plan_code.to_s.titleize,
+            name: plan_code,
             description: "#{plan_code.to_s.humanize} plan for #{country_code.upcase}",
             duration_days: total_days,
             lifecycle_status: lifecycle_status,

@@ -9,8 +9,8 @@ class ProductGroup < ApplicationRecord
   has_many :products, through: :product_group_appointments, source: :appoint_to, source_type: "Product"
 
   # --- Enums ---
-  enum :lifecycle_status, LIFECYCLE_STATUS
-  enum :workflow_status, WORKFLOW_STATUS
+  enum :lifecycle_status, LIFECYCLE_STATUS, prefix: true
+  enum :workflow_status, WORKFLOW_STATUS, prefix: true
 
   enum :business_type, {
     category: 0,
