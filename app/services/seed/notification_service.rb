@@ -17,13 +17,16 @@ class Seed::NotificationService
 
     should_discard = rand(10) == 0
     discarded_at ||= should_discard ? Time.zone.now - rand(1..180).days : nil
+    name ||= "Notification for #{company.name}"
+    description ||= "A notification for group '#{notification_group.name}'."
+    code ||= "NOTIF-#{company.id}-#{notification_group.id}-#{SecureRandom.hex(2).upcase}"
 
     Notification.create!(
       company: company,
       notification_group: notification_group,
-      name: name || "Notification for #{company.name}",
-      description: description || "A notification for group '#{notification_group.name}'.",
-      code: code || "NOTIF-#{company.id}-#{notification_group.id}-#{SecureRandom.hex(2).upcase}",
+      name: name,
+      description: description,
+      code: code,
       lifecycle_status: lifecycle_status,
       workflow_status: workflow_status,
       business_type: business_type,

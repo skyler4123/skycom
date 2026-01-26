@@ -15,12 +15,13 @@ class Seed::CartGroupService
     # Randomly decide whether to mark the record as discarded if not specified
     should_discard = rand(10) == 0
     discarded_at ||= should_discard ? Time.zone.now - rand(1..180).days : nil
+    code ||= "CART-G-#{company.id}-#{SecureRandom.hex(3).upcase}"
 
     CartGroup.create!(
       company: company,
       name: name,
       description: description,
-      code: code || "CART-G-#{company.id}-#{SecureRandom.hex(3).upcase}",
+      code: code,
       lifecycle_status: lifecycle_status,
       workflow_status: workflow_status,
       business_type: business_type,

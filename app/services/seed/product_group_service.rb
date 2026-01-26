@@ -13,14 +13,17 @@ class Seed::ProductGroupService
   )
     should_discard = rand(10) == 0
     discarded_at ||= should_discard ? Time.zone.now - rand(1..180).days : nil
+    code ||= "PG-#{company.id}-#{SecureRandom.hex(3).upcase}"
+    status ||= ProductGroup.statuses.keys.sample
+    business_type ||= ProductGroup.business_types.keys.sample
 
     ProductGroup.create!(
       company: company,
       name: name,
       description: description,
-      code: code || "PG-#{company.id}-#{SecureRandom.hex(3).upcase}",
-      status: status || ProductGroup.statuses.keys.sample,
-      business_type: business_type || ProductGroup.business_types.keys.sample,
+      code: code,
+      status: status,
+      business_type: business_type,
       discarded_at: discarded_at
     )
   end

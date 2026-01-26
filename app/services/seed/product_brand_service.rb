@@ -12,12 +12,14 @@ class Seed::ProductBrandService
   )
     should_discard = rand(10) == 0
     discarded_at ||= should_discard ? Time.zone.now - rand(1..180).days : nil
+    status ||= ProductBrand.statuses.keys.sample
+    business_type ||= ProductBrand.business_types.keys.sample
 
     ProductBrand.create!(
       name: name,
       description: description,
-      status: status || ProductBrand.statuses.keys.sample,
-      business_type: business_type || ProductBrand.business_types.keys.sample,
+      status: status,
+      business_type: business_type,
       discarded_at: discarded_at
     )
   end

@@ -20,12 +20,13 @@ class Seed::OrderService
 
     should_discard = rand(10) == 0
     discarded_at ||= should_discard ? Time.zone.now - rand(1..180).days : nil
+    name ||= "Order for #{customer.name}"
 
     Order.create!(
       company_group: company_group,
       company: company,
       customer: customer,
-      name: name || "Order for #{customer.name}",
+      name: name,
       description: description,
       currency: currency,
       lifecycle_status: lifecycle_status,

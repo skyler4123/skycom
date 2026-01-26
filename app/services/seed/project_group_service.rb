@@ -13,12 +13,13 @@ class Seed::ProjectGroupService
   )
     should_discard = rand(10) == 0
     discarded_at ||= should_discard ? Time.zone.now - rand(1..180).days : nil
+    code ||= "PROJ-G-#{company.id}-#{SecureRandom.hex(3).upcase}"
 
     ProjectGroup.create!(
       company: company,
       name: name,
       description: description,
-      code: code || "PROJ-G-#{company.id}-#{SecureRandom.hex(3).upcase}",
+      code: code,
       status: status,
       business_type: business_type,
       discarded_at: discarded_at

@@ -18,13 +18,16 @@ class Seed::PaymentMethodAppointmentService
 
     should_discard = rand(10) == 0
     discarded_at ||= should_discard ? Time.zone.now - rand(1..180).days : nil
+    name ||= "#{payment_method.name} for #{company_group.name}"
+    description ||= "Company-specific configuration for #{payment_method.name}."
+    code ||= "#{payment_method.code}_#{company_group.id}_#{SecureRandom.hex(4)}" # Ensure unique code
 
     PaymentMethodAppointment.create!(
       company_group: company_group,
       payment_method: payment_method,
-      name: name || "#{payment_method.name} for #{company_group.name}",
-      description: description || "Company-specific configuration for #{payment_method.name}.",
-      code: code || "#{payment_method.code}_#{company_group.id}_#{SecureRandom.hex(4)}", # Ensure unique code
+      name: name,
+      description: description,
+      code: code,
       lifecycle_status: lifecycle_status,
       workflow_status: workflow_status,
       business_type: business_type,

@@ -17,16 +17,18 @@ class Seed::PeriodService
 
     should_discard = rand(10) == 0
     discarded_at ||= should_discard ? Time.zone.now - rand(1..180).days : nil
+    code ||= "PER-#{SecureRandom.hex(3).upcase}"
+    expire_at = end_at + 30.days
 
     Period.create!(
       company: company,
       name: name,
       description: description,
-      code: code || "PER-#{SecureRandom.hex(3).upcase}",
+      code: code,
       duration: duration_in_days,
       start_at: start_at,
       end_at: end_at,
-      expire_at: end_at + 30.days,
+      expire_at: expire_at,
       discarded_at: discarded_at
     )
   end

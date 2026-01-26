@@ -15,13 +15,16 @@ class Seed::CartService
   )
     should_discard = rand(10) == 0
     discarded_at ||= should_discard ? Time.zone.now - rand(1..180).days : nil
+    name ||= "Cart for #{company.name}"
+    description ||= "A cart for group '#{cart_group.name}'."
+    code ||= "CART-#{company.id}-#{cart_group.id}-#{SecureRandom.hex(2).upcase}"
 
     Cart.create!(
       company: company,
       cart_group: cart_group,
-      name: name || "Cart for #{company.name}",
-      description: description || "A cart for group '#{cart_group.name}'.",
-      code: code || "CART-#{company.id}-#{cart_group.id}-#{SecureRandom.hex(2).upcase}",
+      name: name,
+      description: description,
+      code: code,
       lifecycle_status: lifecycle_status,
       workflow_status: workflow_status,
       business_type: business_type,

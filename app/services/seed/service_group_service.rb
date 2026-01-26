@@ -15,13 +15,13 @@ class Seed::ServiceGroupService
   )
     should_discard = rand(10) == 0
     discarded_at ||= should_discard ? Time.zone.now - rand(1..180).days : nil
+    code ||= "SG-#{company.id}-#{SecureRandom.hex(3).upcase}"
 
     ServiceGroup.create!(
       company: company,
       name: name,
       description: description,
-      code: code || "SG-#{company.id}-#{SecureRandom.hex(3).upcase}",
-      status: status,
+      code: codeatus,
       duration: duration,
       start_at: start_at,
       business_type: business_type,

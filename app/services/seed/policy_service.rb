@@ -16,15 +16,19 @@ class Seed::PolicyService
   )
     should_discard = rand(10) == 0
     discarded_at ||= should_discard ? Time.zone.now - rand(1..90).days : nil
+    name ||= "#{action.capitalize} #{resource.titleize} Access Policy #{index + 1}"
+    description ||= "Policy governing the #{action} access to #{resource}."
+    kind ||= Policy.kinds.keys.sample
+    status ||= Policy.statuses.keys.sample
 
     Policy.create!(
       company: company,
-      name: name || "#{action.capitalize} #{resource.titleize} Access Policy #{index + 1}",
-      description: description || "Policy governing the #{action} access to #{resource}.",
+      name: name,
+      description: description,
       resource: resource.singularize,
       action: action,
-      kind: kind || Policy.kinds.keys.sample,
-      status: status || Policy.statuses.keys.sample,
+      kind: kind,
+      status: status,
       discarded_at: discarded_at
     )
   end

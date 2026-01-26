@@ -20,14 +20,18 @@ class Seed::PaymentService
 
     should_discard = rand(10) == 0
     discarded_at ||= should_discard ? Time.zone.now - rand(1..180).days : nil
+    name ||= "Payment for Invoice ##{invoice.number}"
+    description ||= "Payment received for invoice #{invoice.number}."
+    currency ||= invoice.currency
+    amount ||= invoice.total
 
     Payment.create!(
       invoice: invoice,
-      name: name || "Payment for Invoice ##{invoice.number}",
-      description: description || "Payment received for invoice #{invoice.number}.",
-      currency: currency || invoice.currency,
+      name: name,
+      description: description,
+      currency: currency,
       exchange_rate: exchange_rate,
-      amount: amount || invoice.total,
+      amount: amount,
       payment_method: payment_method,
       gateway_details: gateway_details,
       status: status,

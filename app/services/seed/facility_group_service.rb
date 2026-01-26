@@ -14,12 +14,13 @@ class Seed::FacilityGroupService
   )
     should_discard = rand(10) == 0
     discarded_at ||= should_discard ? Time.zone.now - rand(1..180).days : nil
+    code ||= "FG-#{company.id}-#{SecureRandom.hex(3).upcase}"
 
     FacilityGroup.create!(
       company: company,
       name: name,
       description: description,
-      code: code || "FG-#{company.id}-#{SecureRandom.hex(3).upcase}",
+      code: code,
       lifecycle_status: lifecycle_status,
       workflow_status: workflow_status,
       business_type: business_type,

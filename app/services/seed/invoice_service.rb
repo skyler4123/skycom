@@ -19,18 +19,20 @@ class Seed::InvoiceService
     raise "Cannot create an invoice: No orders exist." if order.nil?
 
     calculated_total = order.order_appointments.sum(:total_price)
-    invoice_total = total || (calculated_total > 0 ? calculated_total : Faker::Commerce.price(range: 50..2000.0))
+    total ||= (calculated_total > 0 ? calculated_total : Faker::Commerce.price(range: 50..2000.0))
 
     should_discard = rand(10) == 0
     discarded_at ||= should_discard ? Time.zone.now - rand(1..180).days : nil
+    name ||= "Invoice for Order ##{order.id}"
+    number ||= "INV-#{order.id}-#{SecureRandom.hex(4).upcase}"
 
     Invoice.create!(
       order: order,
-      name: name || "Invoice for Order ##{order.id}",
+      name: name,
       description: description,
       currency: currency,
-      number: number || "INV-#{order.id}-#{SecureRandom.hex(4).upcase}",
-      total: invoice_total,
+      number: number,
+      total: total,
       due_date: due_date,
       lifecycle_status: lifecycle_status,
       workflow_status: workflow_status,

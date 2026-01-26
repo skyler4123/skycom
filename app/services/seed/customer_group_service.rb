@@ -15,13 +15,14 @@ class Seed::CustomerGroupService
   )
     should_discard = rand(10) == 0
     discarded_at ||= should_discard ? Time.zone.now - rand(1..180).days : nil
+    code ||= "CG-#{company_group.id}-#{SecureRandom.hex(3).upcase}"
 
     CustomerGroup.create!(
       company_group: company_group,
       company: company,
       name: name,
       description: description,
-      code: code || "CG-#{company_group.id}-#{SecureRandom.hex(3).upcase}",
+      code: code,
       lifecycle_status: lifecycle_status,
       workflow_status: workflow_status,
       business_type: business_type,

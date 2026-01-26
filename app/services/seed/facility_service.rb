@@ -15,11 +15,12 @@ class Seed::FacilityService
   )
     should_discard = rand(10) == 0
     discarded_at ||= should_discard ? Time.zone.now - rand(1..180).days : nil
+    name ||= "#{company.name} Facility"
 
     Facility.create!(
       company_group: company_group,
       company: company,
-      name: name || "#{company.name} Facility",
+      name: name,
       description: description,
       lifecycle_status: lifecycle_status,
       workflow_status: workflow_status,
