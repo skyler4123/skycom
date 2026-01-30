@@ -37,8 +37,8 @@
   </div>
 
   <div class="my-5">
-    <%= form.label :currency %>
-    <%= form.number_field :currency, class: ["block shadow-sm rounded-md border px-3 py-2 mt-2 w-full", {"border-gray-400 focus:outline-blue-600": task.errors[:currency].none?, "border-red-400 focus:outline-red-600": task.errors[:currency].any?}] %>
+    <%= form.label :currency_code %>
+    <%= form.number_field :currency_code, class: ["block shadow-sm rounded-md border px-3 py-2 mt-2 w-full", {"border-gray-400 focus:outline-blue-600": task.errors[:currency_code].none?, "border-red-400 focus:outline-red-600": task.errors[:currency_code].any?}] %>
   </div>
 
   <div class="my-5">

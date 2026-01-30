@@ -6,12 +6,12 @@ class CreatePrices < ActiveRecord::Migration[8.0]
 
       # Changed to integer for enum usage.
       # default: 0 usually maps to your primary currency (e.g., USD)
-      t.integer :currency, default: 0, null: false
+      t.integer :currency_code, default: 0, null: false
 
       t.timestamps
     end
 
     # Unique index now uses the integer currency column
-    add_index :prices, [ :amount, :currency ], unique: true
+    add_index :prices, [ :amount, :currency_code ], unique: true
   end
 end

@@ -3,5 +3,5 @@ class Setting < ApplicationRecord
 
   belongs_to :setting_group
   belongs_to :company_group
-  belongs_to :company
+  belongs_to :company, optional: true
 end

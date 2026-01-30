@@ -161,7 +161,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
 
   create_table "article_groups", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.uuid "company_group_id", null: false
-    t.uuid "company_id", null: false
+    t.uuid "company_id"
     t.uuid "category_id"
     t.string "title"
     t.json "content"
@@ -184,7 +184,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
   create_table "articles", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.uuid "article_group_id", null: false
     t.uuid "company_group_id", null: false
-    t.uuid "company_id", null: false
+    t.uuid "company_id"
     t.uuid "category_id"
     t.string "title"
     t.json "content"
@@ -207,7 +207,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
 
   create_table "attendance_days", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.uuid "company_group_id", null: false
-    t.uuid "company_id", null: false
+    t.uuid "company_id"
     t.uuid "employee_id", null: false
     t.string "logable_type", null: false
     t.uuid "logable_id", null: false
@@ -248,7 +248,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
 
   create_table "attendance_logs", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.uuid "company_group_id", null: false
-    t.uuid "company_id", null: false
+    t.uuid "company_id"
     t.uuid "customer_id", null: false
     t.string "logable_type", null: false
     t.uuid "logable_id", null: false
@@ -268,7 +268,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
 
   create_table "attendance_months", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.uuid "company_group_id", null: false
-    t.uuid "company_id", null: false
+    t.uuid "company_id"
     t.uuid "customer_id", null: false
     t.string "logable_type", null: false
     t.uuid "logable_id", null: false
@@ -297,7 +297,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
 
   create_table "booking_resources", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.uuid "company_group_id", null: false
-    t.uuid "company_id", null: false
+    t.uuid "company_id"
     t.string "booking_resourceable_type", null: false
     t.uuid "booking_resourceable_id", null: false
     t.string "name"
@@ -317,7 +317,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
 
   create_table "bookings", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.uuid "company_group_id", null: false
-    t.uuid "company_id", null: false
+    t.uuid "company_id"
     t.uuid "booking_resource_id", null: false
     t.uuid "price_id", null: false
     t.string "appoint_from_type", null: false
@@ -679,7 +679,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
 
   create_table "document_groups", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.uuid "company_group_id", null: false
-    t.uuid "company_id", null: false
+    t.uuid "company_id"
     t.uuid "category_id"
     t.string "title"
     t.json "content"
@@ -702,7 +702,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
   create_table "documents", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.uuid "document_group_id", null: false
     t.uuid "company_group_id", null: false
-    t.uuid "company_id", null: false
+    t.uuid "company_id"
     t.uuid "category_id"
     t.string "title"
     t.json "content"
@@ -870,7 +870,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
 
   create_table "event_groups", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.uuid "company_group_id", null: false
-    t.uuid "company_id", null: false
+    t.uuid "company_id"
     t.uuid "category_id"
     t.string "name"
     t.string "description"
@@ -891,7 +891,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
   create_table "events", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.uuid "event_group_id", null: false
     t.uuid "company_group_id", null: false
-    t.uuid "company_id", null: false
+    t.uuid "company_id"
     t.uuid "category_id"
     t.string "name"
     t.string "description"
@@ -1217,7 +1217,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.string "name"
     t.string "description"
     t.string "code"
-    t.integer "currency"
+    t.integer "currency_code"
     t.integer "duration"
     t.string "number"
     t.decimal "total_price"
@@ -1398,7 +1398,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.string "name"
     t.string "description"
     t.string "code"
-    t.integer "currency"
+    t.integer "currency_code"
     t.integer "duration"
     t.integer "lifecycle_status"
     t.integer "workflow_status"
@@ -1430,7 +1430,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.string "serial_number"
     t.string "batch_number"
     t.datetime "expiration_date"
-    t.integer "currency"
+    t.integer "currency_code"
     t.integer "duration"
     t.integer "lifecycle_status"
     t.integer "workflow_status"
@@ -1475,7 +1475,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.string "name"
     t.string "description"
     t.string "code"
-    t.integer "currency"
+    t.integer "currency_code"
     t.integer "lifecycle_status"
     t.integer "workflow_status"
     t.integer "business_type"
@@ -1493,7 +1493,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.string "name"
     t.string "description"
     t.string "code"
-    t.integer "currency"
+    t.integer "currency_code"
     t.integer "duration"
     t.decimal "exchange_rate"
     t.decimal "amount"
@@ -1555,10 +1555,10 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
   create_table "periods", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.datetime "start_at", null: false
     t.datetime "end_at"
-    t.integer "time_zone", default: 0, null: false
+    t.integer "timezone", default: 0, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["start_at", "end_at", "time_zone"], name: "index_periods_on_start_at_and_end_at_and_time_zone", unique: true, nulls_not_distinct: true
+    t.index ["start_at", "end_at", "timezone"], name: "index_periods_on_start_at_and_end_at_and_timezone", unique: true, nulls_not_distinct: true
   end
 
   create_table "policies", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -1630,10 +1630,10 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
 
   create_table "prices", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.decimal "amount", precision: 19, scale: 4, null: false
-    t.integer "currency", default: 0, null: false
+    t.integer "currency_code", default: 0, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["amount", "currency"], name: "index_prices_on_amount_and_currency", unique: true
+    t.index ["amount", "currency_code"], name: "index_prices_on_amount_and_currency_code", unique: true
   end
 
   create_table "product_appointments", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -1718,7 +1718,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.string "name"
     t.string "description"
     t.decimal "price"
-    t.integer "currency"
+    t.integer "currency_code"
     t.string "code"
     t.string "sku"
     t.string "barcode"
@@ -2123,7 +2123,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
 
   create_table "setting_groups", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.uuid "company_group_id", null: false
-    t.uuid "company_id", null: false
+    t.uuid "company_id"
     t.uuid "category_id"
     t.json "content"
     t.string "name"
@@ -2145,7 +2145,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
   create_table "settings", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.uuid "setting_group_id", null: false
     t.uuid "company_group_id", null: false
-    t.uuid "company_id", null: false
+    t.uuid "company_id"
     t.uuid "category_id"
     t.json "content"
     t.string "name"
@@ -2167,7 +2167,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
 
   create_table "shifts", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.uuid "company_group_id", null: false
-    t.uuid "company_id", null: false
+    t.uuid "company_id"
     t.uuid "period_id", null: false
     t.string "name"
     t.string "description"
@@ -2238,9 +2238,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
 
   create_table "subscription_plans", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.uuid "company_group_id", null: false
-    t.uuid "company_id", null: false
+    t.uuid "company_id"
     t.uuid "price_id", null: false
-    t.uuid "period_id", null: false
     t.string "name", null: false
     t.string "description"
     t.string "code"
@@ -2257,7 +2256,6 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.index ["company_group_id"], name: "index_subscription_plans_on_company_group_id"
     t.index ["company_id"], name: "index_subscription_plans_on_company_id"
     t.index ["discarded_at"], name: "index_subscription_plans_on_discarded_at"
-    t.index ["period_id"], name: "index_subscription_plans_on_period_id"
     t.index ["price_id"], name: "index_subscription_plans_on_price_id"
   end
 
@@ -2403,7 +2401,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.string "name", default: "System", null: false
     t.string "code", null: false, comment: "System"
     t.integer "balance_cents", default: 0, null: false
-    t.integer "currency"
+    t.integer "currency_code"
     t.integer "country_code"
     t.boolean "active", default: true, null: false
     t.jsonb "metadata", default: {}
@@ -2526,7 +2524,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.string "name"
     t.string "description"
     t.string "code"
-    t.integer "currency"
+    t.integer "currency_code"
     t.integer "lifecycle_status"
     t.integer "workflow_status"
     t.integer "business_type"
@@ -2769,7 +2767,6 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
   add_foreign_key "subscription_groups", "subscription_plans"
   add_foreign_key "subscription_plans", "companies"
   add_foreign_key "subscription_plans", "company_groups"
-  add_foreign_key "subscription_plans", "periods"
   add_foreign_key "subscription_plans", "prices"
   add_foreign_key "subscriptions", "periods"
   add_foreign_key "subscriptions", "prices"

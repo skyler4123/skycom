@@ -24,7 +24,7 @@ class Order < ApplicationRecord
 
   # --- Validations ---
   validates :name, presence: true, length: { maximum: 255 }
-  validates :currency, presence: true
+  validates :currency_code, presence: true
 
   validates :business_type, presence: true
 end

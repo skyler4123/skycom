@@ -85,6 +85,6 @@ class Company < ApplicationRecord
     return unless company_group
 
     self.timezone ||= company_group.timezone
-    self.currency ||= company_group.currency
+    self.currency_code ||= company_group.currency_code
   end
 end

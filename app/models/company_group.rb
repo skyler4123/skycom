@@ -33,6 +33,7 @@ class CompanyGroup < ApplicationRecord
   has_many :payment_methods, through: :payment_method_appointments
   has_many :statistics, as: :owner
   has_many :categories, dependent: :destroy
+  has_many :subscription_plans, dependent: :destroy
 
   # --- Enums ---
   enum :country_code, COUNTRIE_CODES, prefix: true
@@ -81,7 +82,7 @@ class CompanyGroup < ApplicationRecord
     companies.create(
       name: name,
       phone_number: phone_number,
-      currency: currency,
+      currency_code: currency_code,
       country: country,
       business_type: business_type,
       timezone: timezone

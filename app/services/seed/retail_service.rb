@@ -32,13 +32,12 @@ class Seed::RetailService
     create_branches
     subscribe_companies_to_system_subscription_plane
     create_subscription_plans_for_company_group
-    # subscribe_branches_to_plans
-    # create_facilities_for_branches
-    # appoint_payment_methods
-    # setup_roles_and_permissions
-    # create_departments_for_branches
-    # create_employees_and_assign_departments
-    # create_customers_and_subscriptions
+    create_facilities_for_branches
+    appoint_payment_methods_to_company_group
+    setup_roles_and_permissions
+    create_departments_for_branches
+    create_employees_and_assign_departments
+    create_customers_and_subscriptions
     # setup_loyalty_programs
     # create_inventory # Products and Services
     # create_customer_orders
@@ -93,10 +92,15 @@ class Seed::RetailService
 
   def create_subscription_plans_for_company_group(count: 3)
     count.times do |i|
+      price = Seed::PriceService.create(
+        amount: rand(10..100),
+        currency_code: @retail.currency_code
+      )
       Seed::SubscriptionPlanService.create(
         company_group: @retail,
         name: "Plan #{i + 1}",
-        description: "Subscription plan #{i + 1} for #{@retail.name}"
+        price: price,
+        duration_days: rand(30..365)
       )
     end
   end
@@ -134,7 +138,7 @@ class Seed::RetailService
     end
   end
 
-  def appoint_payment_methods
+  def appoint_payment_methods_to_company_group
     @branches.each do |branch|
       3.times { Seed::PaymentMethodAppointmentService.create(company_group: @retail) }
     end
@@ -204,21 +208,21 @@ class Seed::RetailService
             user: user, company_group: @retail, company: branch, name: "Customer #{i + 1}"
           )
           customer.attach_role(role_name)
-          
-          customer.subscribe!(
-            plan_name: :basic_6m,
-            seller: System.find_by(name: "System"),
-            buyer: customer,
-            resource: customer,
-            processer: System.find_by(name: "System"),
-            country_code: :us,
-            lifecycle_status: :active,
-            workflow_status: :active
-          )
           @customers << customer
         end
       end
     end
+  end
+
+  def subscribe_for_customers
+    # @customers.each do |customer|
+    #   Seed::SubscriptionService.create(
+    #     subscription_plan: @retail.subscription_plans.sample,
+    #     period:,
+    #     seller:,
+    #     buyer:,
+    #   )
+        
   end
 
   def setup_loyalty_programs

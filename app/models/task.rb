@@ -16,7 +16,7 @@ class Task < ApplicationRecord
     administrative: 2
   }
 
-  enum :currency, {
+  enum :currency_code, {
     usd: 0,
     eur: 1,
     gbp: 2

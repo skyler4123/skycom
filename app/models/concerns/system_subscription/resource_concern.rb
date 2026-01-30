@@ -16,10 +16,10 @@ module SystemSubscription::ResourceConcern
       renew: false
     )
       system_subscription_plan = SystemSubscriptionPlan.find_by!(name: plan_name, country_code: country_code)
-      period = Period.find_or_create_by!(
+      period = Seed::PeriodService.create(
         start_at: Time.current.beginning_of_day,
         end_at: Time.current.end_of_day + system_subscription_plan.duration_days.days,
-        time_zone: -12
+        timezone: -12
       )
       SystemSubscription.create!(
         company_group: self.company_group,

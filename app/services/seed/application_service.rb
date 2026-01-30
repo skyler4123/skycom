@@ -14,7 +14,7 @@ class Seed::ApplicationService
     System.find_or_create_by!(code: "System") do |sa|
       sa.name = "System"
       sa.balance_cents = 0
-      sa.currency = "USD"
+      sa.currency_code = :usd
     end
     Seed::PaymentMethodService.create # Ensure global payment methods are seeded first
     Seed::BrandService.create # Seed global brands

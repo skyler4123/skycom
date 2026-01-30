@@ -19,36 +19,36 @@ module Seed
 
     PRICING = {
       us: {
-        temporary:     { amount: 0.00,    currency: :usd },
-        free:          { amount: 0.00,    currency: :usd },
-        basic:         { amount: 5.00,    currency: :usd },
-        basic_3m:      { amount: 14.00,   currency: :usd },
-        basic_6m:      { amount: 27.00,   currency: :usd },
-        basic_1y:      { amount: 50.00,   currency: :usd },
-        pro:           { amount: 29.99,   currency: :usd },
-        pro_3m:        { amount: 85.00,   currency: :usd },
-        pro_6m:        { amount: 170.00,  currency: :usd },
-        pro_1y:        { amount: 325.00,  currency: :usd },
-        enterprise:    { amount: 99.99,   currency: :usd },
-        enterprise_3m: { amount: 285.00,  currency: :usd },
-        enterprise_6m: { amount: 570.00,  currency: :usd },
-        enterprise_1y: { amount: 1100.00, currency: :usd }
+        temporary:     { amount: 0.00,    currency_code: :usd },
+        free:          { amount: 0.00,    currency_code: :usd },
+        basic:         { amount: 5.00,    currency_code: :usd },
+        basic_3m:      { amount: 14.00,   currency_code: :usd },
+        basic_6m:      { amount: 27.00,   currency_code: :usd },
+        basic_1y:      { amount: 50.00,   currency_code: :usd },
+        pro:           { amount: 29.99,   currency_code: :usd },
+        pro_3m:        { amount: 85.00,   currency_code: :usd },
+        pro_6m:        { amount: 170.00,  currency_code: :usd },
+        pro_1y:        { amount: 325.00,  currency_code: :usd },
+        enterprise:    { amount: 99.99,   currency_code: :usd },
+        enterprise_3m: { amount: 285.00,  currency_code: :usd },
+        enterprise_6m: { amount: 570.00,  currency_code: :usd },
+        enterprise_1y: { amount: 1100.00, currency_code: :usd }
       },
       vn: {
-        temporary:     { amount: 0.00,       currency: :vnd },
-        free:          { amount: 0,          currency: :vnd },
-        basic:         { amount: 250_000,    currency: :vnd },
-        basic_3m:      { amount: 700_000,    currency: :vnd },
-        basic_6m:      { amount: 1_350_000,  currency: :vnd },
-        basic_1y:      { amount: 2_500_000,  currency: :vnd },
-        pro:           { amount: 600_000,    currency: :vnd },
-        pro_3m:        { amount: 1_700_000,  currency: :vnd },
-        pro_6m:        { amount: 3_400_000,  currency: :vnd },
-        pro_1y:        { amount: 6_500_000,  currency: :vnd },
-        enterprise:    { amount: 2_000_000,  currency: :vnd },
-        enterprise_3m: { amount: 5_700_000,  currency: :vnd },
-        enterprise_6m: { amount: 11_000_000, currency: :vnd },
-        enterprise_1y: { amount: 21_000_000, currency: :vnd }
+        temporary:     { amount: 0.00,       currency_code: :vnd },
+        free:          { amount: 0,          currency_code: :vnd },
+        basic:         { amount: 250_000,    currency_code: :vnd },
+        basic_3m:      { amount: 700_000,    currency_code: :vnd },
+        basic_6m:      { amount: 1_350_000,  currency_code: :vnd },
+        basic_1y:      { amount: 2_500_000,  currency_code: :vnd },
+        pro:           { amount: 600_000,    currency_code: :vnd },
+        pro_3m:        { amount: 1_700_000,  currency_code: :vnd },
+        pro_6m:        { amount: 3_400_000,  currency_code: :vnd },
+        pro_1y:        { amount: 6_500_000,  currency_code: :vnd },
+        enterprise:    { amount: 2_000_000,  currency_code: :vnd },
+        enterprise_3m: { amount: 5_700_000,  currency_code: :vnd },
+        enterprise_6m: { amount: 11_000_000, currency_code: :vnd },
+        enterprise_1y: { amount: 21_000_000, currency_code: :vnd }
       }
     }.freeze
 
@@ -65,9 +65,9 @@ module Seed
           total_days = (plan_config[:duration] / 1.day).to_i
 
           # 2. Find/Create Price
-          price = Price.find_or_create_by!(
+          price = Seed::PriceService.create(
             amount: pricing_details[:amount],
-            currency: pricing_details[:currency]
+            currency_code: pricing_details[:currency_code]
           )
 
           # 3. Find/Initialize Plan (Idempotent by code + country)

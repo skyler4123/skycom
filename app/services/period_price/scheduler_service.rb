@@ -4,14 +4,14 @@ class PeriodPrice::SchedulerService
   end
 
   # Defaults to nil (Infinity) if arguments are missing
-  def schedule(amount:, start_at: nil, end_at: nil, currency: 0, time_zone: 0)
+  def schedule(amount:, start_at: nil, end_at: nil, currency_code: 0, timezone: 0)
     PeriodPriceAppointment.transaction do
       target_price = find_or_create_price(amount, currency)
 
       # CASE 1: The "Global Reset" (Infinite Start AND Infinite End)
       # User wants this price to be the ONLY price forever.
       if start_at.nil? && end_at.nil?
-        reset_to_forever_price(target_price, time_zone)
+        reset_to_forever_price(target_price, timezone)
       
       # CASE 2: Standard Range (or partial infinity)
       else
@@ -21,19 +21,19 @@ class PeriodPrice::SchedulerService
         safe_end   = end_at   || DateTime::Infinity.new
 
         handle_overlaps(safe_start, safe_end)
-        create_appointment(target_price, start_at, end_at, time_zone)
+        create_appointment(target_price, start_at, end_at, timezone)
       end
     end
   end
 
   private
 
-  def reset_to_forever_price(price_record, time_zone)
+  def reset_to_forever_price(price_record, timezone)
     # 1. Clear ALL existing price appointments for this product
     PeriodPriceAppointment.where(appoint_to: @product).destroy_all
 
     # 2. Create one single "Forever" record
-    period_record = find_or_create_period(nil, nil, time_zone) # nil, nil = Forever
+    period_record = find_or_create_period(nil, nil, timezone) # nil, nil = Forever
 
     PeriodPriceAppointment.create!(
       appoint_to: @product,
@@ -66,12 +66,12 @@ class PeriodPrice::SchedulerService
       
       # 1. Create Head (Only if the old start is before the new start)
       if p_start < new_start
-        create_appointment(appt.price, appt.period.start_at, new_start, appt.period.time_zone)
+        create_appointment(appt.price, appt.period.start_at, new_start, appt.period.timezone)
       end
 
       # 2. Create Tail (Only if the old end is after the new end)
       if p_end > new_end
-        create_appointment(appt.price, new_end, appt.period.end_at, appt.period.time_zone)
+        create_appointment(appt.price, new_end, appt.period.end_at, appt.period.timezone)
       end
 
       # 3. Destroy original
@@ -95,15 +95,15 @@ class PeriodPrice::SchedulerService
 
   # Database Optimization: Reuse existing Prices
   def find_or_create_price(amount, currency)
-    Price.find_or_create_by!(amount: amount, currency: currency)
+    Seed::PriceService.create(amount: amount, currency_code: currency)
   end
 
   # Database Optimization: Reuse existing Periods
-  def find_or_create_period(start_at, end_at, time_zone)
+  def find_or_create_period(start_at, end_at, timezone)
     Period.find_or_create_by!(
       start_at: start_at, 
       end_at: end_at, 
-      time_zone: time_zone
+      timezone: timezone
     )
   end
 end

@@ -65,6 +65,6 @@ class TasksController < ApplicationController
 
     # Only allow a list of trusted parameters through.
     def task_params
-      params.expect(task: [ :company_id, :task_group_id, :name, :description, :code, :currency, :status, :business_type, :discarded_at ])
+      params.expect(task: [ :company_id, :task_group_id, :name, :description, :code, :currency_code, :status, :business_type, :discarded_at ])
     end
 end

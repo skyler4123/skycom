@@ -7,7 +7,7 @@ class Seed::TaskService
     name: "#{Faker::Verb.base.capitalize} the #{Faker::Hacker.noun}",
     description: nil,
     code: nil,
-    currency: nil,
+    currency_code: nil,
     status: nil,
     business_type: nil,
     discarded_at: nil
@@ -24,7 +24,7 @@ class Seed::TaskService
       name: name,
       description: description || "Task for group '#{task_group.name}'.",
       code: code || "TASK-#{company.id}-#{task_group.id}-#{SecureRandom.hex(2).upcase}",
-      currency: currency || Task.currencies.keys.sample,
+      currency_code: currency || Task.currencies.keys.sample,
       status: status || Task.statuses.keys.sample,
       business_type: business_type || Task.business_types.keys.sample,
       discarded_at: discarded_at

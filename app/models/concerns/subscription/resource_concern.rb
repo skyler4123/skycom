@@ -20,15 +20,15 @@ module Subscription::ResourceConcern
       plan = SUBSCRIPTION_PRICING_PLANS.dig(country_code.to_sym, plan_name.to_sym)
       return unless plan
 
-      price = Price.find_or_create_by!(
+      price = Seed::PriceService.create(
         amount: plan[:amount],
-        currency: plan[:currency]
+        currency_code: plan[:currency_code]
       )
 
       period = Period.find_or_create_by!(
         start_at: Time.current.beginning_of_day,
         end_at: Time.current.end_of_day + (plan[:duration] || 1.month),
-        time_zone: -12
+        timezone: -12
       )
 
       subscriptions.create!(

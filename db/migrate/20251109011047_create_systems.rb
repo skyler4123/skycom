@@ -8,7 +8,7 @@ class CreateSystems < ActiveRecord::Migration[8.0]
       # Financials (Optional but recommended)
       # Using integers for money (cents) is safer than floats
       t.integer :balance_cents, default: 0, null: false
-      t.integer :currency
+      t.integer :currency_code
       t.integer :country_code
 
       # Status

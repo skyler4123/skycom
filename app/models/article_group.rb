@@ -2,5 +2,5 @@ class ArticleGroup < ApplicationRecord
   include TagConcern
 
   belongs_to :company_group
-  belongs_to :company
+  belongs_to :company, optional: true
 end

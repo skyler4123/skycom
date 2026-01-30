@@ -852,7 +852,7 @@ _ * @property {string|null} description
  * @property {string} id - The unique identifier for the period (UUID).
  * @property {string} start_at
  * @property {string|null} end_at
- * @property {number} time_zone
+ * @property {number} timezone
  * @property {string} created_at
  * @property {string} updated_at
  */

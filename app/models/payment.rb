@@ -23,6 +23,6 @@ class Payment < ApplicationRecord
 
   # --- Validations ---
   validates :amount, presence: true, numericality: { greater_than: 0 }
-  validates :currency, presence: true
+  validates :currency_code, presence: true
   validates :payment_method, presence: true
 end

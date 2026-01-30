@@ -7,7 +7,7 @@ class CreateInvoices < ActiveRecord::Migration[8.0]
       t.string :name
       t.string :description
       t.string :code
-      t.integer :currency
+      t.integer :currency_code
       t.integer :duration
       t.string :number
       t.decimal :total_price
