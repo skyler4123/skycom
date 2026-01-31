@@ -600,9 +600,9 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
   end
 
   create_table "customers", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
-    t.uuid "user_id"
     t.uuid "company_group_id", null: false
     t.uuid "company_id"
+    t.uuid "user_id"
     t.uuid "category_id"
     t.string "name"
     t.string "description"
@@ -791,9 +791,9 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
   end
 
   create_table "employees", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
-    t.uuid "user_id", null: false
     t.uuid "company_group_id", null: false
     t.uuid "company_id"
+    t.uuid "user_id"
     t.uuid "category_id"
     t.string "name"
     t.string "description"
@@ -1122,6 +1122,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
   end
 
   create_table "inventory_items", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "company_group_id", null: false
+    t.uuid "company_id"
     t.uuid "inventory_id", null: false
     t.uuid "category_id"
     t.string "name"
@@ -1144,6 +1146,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.datetime "updated_at", null: false
     t.index ["barcode"], name: "index_inventory_items_on_barcode"
     t.index ["category_id"], name: "index_inventory_items_on_category_id"
+    t.index ["company_group_id"], name: "index_inventory_items_on_company_group_id"
+    t.index ["company_id"], name: "index_inventory_items_on_company_id"
     t.index ["discarded_at"], name: "index_inventory_items_on_discarded_at"
     t.index ["ean"], name: "index_inventory_items_on_ean"
     t.index ["inventory_id"], name: "index_inventory_items_on_inventory_id"
@@ -1212,6 +1216,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
   end
 
   create_table "invoices", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "company_group_id", null: false
+    t.uuid "company_id"
     t.uuid "order_id", null: false
     t.uuid "category_id"
     t.string "name"
@@ -1230,6 +1236,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["category_id"], name: "index_invoices_on_category_id"
+    t.index ["company_group_id"], name: "index_invoices_on_company_group_id"
+    t.index ["company_id"], name: "index_invoices_on_company_id"
     t.index ["discarded_at"], name: "index_invoices_on_discarded_at"
     t.index ["order_id"], name: "index_invoices_on_order_id"
   end
@@ -1488,6 +1496,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
   end
 
   create_table "payments", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "company_group_id", null: false
+    t.uuid "company_id"
     t.uuid "invoice_id", null: false
     t.uuid "category_id"
     t.string "name"
@@ -1507,6 +1517,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["category_id"], name: "index_payments_on_category_id"
+    t.index ["company_group_id"], name: "index_payments_on_company_group_id"
+    t.index ["company_id"], name: "index_payments_on_company_id"
     t.index ["discarded_at"], name: "index_payments_on_discarded_at"
     t.index ["invoice_id"], name: "index_payments_on_invoice_id"
   end
@@ -1844,6 +1856,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
   end
 
   create_table "purchase_items", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "company_group_id", null: false
+    t.uuid "company_id"
     t.uuid "purchase_id", null: false
     t.uuid "category_id"
     t.string "name"
@@ -1866,6 +1880,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.datetime "updated_at", null: false
     t.index ["barcode"], name: "index_purchase_items_on_barcode"
     t.index ["category_id"], name: "index_purchase_items_on_category_id"
+    t.index ["company_group_id"], name: "index_purchase_items_on_company_group_id"
+    t.index ["company_id"], name: "index_purchase_items_on_company_id"
     t.index ["discarded_at"], name: "index_purchase_items_on_discarded_at"
     t.index ["ean"], name: "index_purchase_items_on_ean"
     t.index ["purchase_id"], name: "index_purchase_items_on_purchase_id"
@@ -2197,6 +2213,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
   end
 
   create_table "subscription_groups", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "company_group_id", null: false
+    t.uuid "company_id"
     t.uuid "subscription_plan_id"
     t.uuid "subscription_group_id"
     t.uuid "price_id", null: false
@@ -2223,6 +2241,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.datetime "updated_at", null: false
     t.index ["buyer_id", "buyer_type"], name: "index_subscription_groups_on_buyer_id_and_buyer_type"
     t.index ["buyer_type", "buyer_id"], name: "index_subscription_groups_on_buyer"
+    t.index ["company_group_id"], name: "index_subscription_groups_on_company_group_id"
+    t.index ["company_id"], name: "index_subscription_groups_on_company_id"
     t.index ["discarded_at"], name: "index_subscription_groups_on_discarded_at"
     t.index ["period_id"], name: "index_subscription_groups_on_period_id"
     t.index ["price_id"], name: "index_subscription_groups_on_price_id"
@@ -2260,6 +2280,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
   end
 
   create_table "subscriptions", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "company_group_id", null: false
+    t.uuid "company_id"
     t.uuid "subscription_plan_id"
     t.uuid "subscription_group_id"
     t.uuid "price_id", null: false
@@ -2286,6 +2308,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.datetime "updated_at", null: false
     t.index ["buyer_id", "buyer_type"], name: "index_subscriptions_on_buyer_id_and_buyer_type"
     t.index ["buyer_type", "buyer_id"], name: "index_subscriptions_on_buyer"
+    t.index ["company_group_id"], name: "index_subscriptions_on_company_group_id"
+    t.index ["company_id"], name: "index_subscriptions_on_company_id"
     t.index ["discarded_at"], name: "index_subscriptions_on_discarded_at"
     t.index ["period_id"], name: "index_subscriptions_on_period_id"
     t.index ["price_id"], name: "index_subscriptions_on_price_id"
@@ -2671,12 +2695,16 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
   add_foreign_key "inventories", "company_groups"
   add_foreign_key "inventory_item_appointments", "inventory_items"
   add_foreign_key "inventory_items", "categories"
+  add_foreign_key "inventory_items", "companies"
+  add_foreign_key "inventory_items", "company_groups"
   add_foreign_key "inventory_items", "inventories"
   add_foreign_key "inventory_transaction_appointments", "inventory_transactions"
   add_foreign_key "inventory_transactions", "categories"
   add_foreign_key "inventory_transactions", "companies"
   add_foreign_key "inventory_transactions", "company_groups"
   add_foreign_key "invoices", "categories"
+  add_foreign_key "invoices", "companies"
+  add_foreign_key "invoices", "company_groups"
   add_foreign_key "invoices", "orders"
   add_foreign_key "notification_appointments", "notifications"
   add_foreign_key "notification_group_appointments", "notification_groups"
@@ -2702,6 +2730,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
   add_foreign_key "payment_method_appointments", "payment_methods"
   add_foreign_key "payment_methods", "categories"
   add_foreign_key "payments", "categories"
+  add_foreign_key "payments", "companies"
+  add_foreign_key "payments", "company_groups"
   add_foreign_key "payments", "invoices"
   add_foreign_key "period_appointments", "periods"
   add_foreign_key "period_prices", "periods"
@@ -2729,6 +2759,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
   add_foreign_key "projects", "company_groups"
   add_foreign_key "projects", "project_groups"
   add_foreign_key "purchase_items", "categories"
+  add_foreign_key "purchase_items", "companies"
+  add_foreign_key "purchase_items", "company_groups"
   add_foreign_key "purchase_items", "purchases"
   add_foreign_key "purchases", "categories"
   add_foreign_key "purchases", "companies"
@@ -2761,6 +2793,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
   add_foreign_key "shifts", "company_groups"
   add_foreign_key "shifts", "periods"
   add_foreign_key "sign_in_tokens", "users"
+  add_foreign_key "subscription_groups", "companies"
+  add_foreign_key "subscription_groups", "company_groups"
   add_foreign_key "subscription_groups", "periods"
   add_foreign_key "subscription_groups", "prices"
   add_foreign_key "subscription_groups", "subscription_groups"
@@ -2768,6 +2802,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
   add_foreign_key "subscription_plans", "companies"
   add_foreign_key "subscription_plans", "company_groups"
   add_foreign_key "subscription_plans", "prices"
+  add_foreign_key "subscriptions", "companies"
+  add_foreign_key "subscriptions", "company_groups"
   add_foreign_key "subscriptions", "periods"
   add_foreign_key "subscriptions", "prices"
   add_foreign_key "subscriptions", "subscription_groups"

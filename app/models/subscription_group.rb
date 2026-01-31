@@ -5,6 +5,8 @@ class SubscriptionGroup < ApplicationRecord
   # include Discard::Model
 
   # --- Associations ---
+  belongs_to :company_group
+  belongs_to :company, optional: true
   belongs_to :price
   belongs_to :period
   belongs_to :seller, polymorphic: true

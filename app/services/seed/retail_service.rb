@@ -218,6 +218,7 @@ class Seed::RetailService
   def subscribe_for_customers
     @customers.each do |customer|
       Seed::SubscriptionService.create(
+        company_group: @retail,
         subscription_plan: @retail.subscription_plans.sample,
         period: Seed::PeriodService.create,
         seller: @retail,

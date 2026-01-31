@@ -1,5 +1,7 @@
 class Seed::SubscriptionService
   def self.create(
+    company_group:,
+    company: nil,
     subscription_plan:,
     subscription_group: nil,
     price: nil,
@@ -20,6 +22,8 @@ class Seed::SubscriptionService
     metadata: {}
   )
     Subscription.create!(
+      company_group: company_group,
+      company: company,
       subscription_plan: subscription_plan,
       subscription_group: subscription_group,
       price: price || subscription_plan.price,

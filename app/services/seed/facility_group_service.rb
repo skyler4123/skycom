@@ -3,20 +3,18 @@
 
 class Seed::FacilityGroupService
   def self.create(
-    company:,
-    name: "#{Faker::Address.community} Group",
-    description: "A group for facilities in the #{Faker::Address.city_prefix} area.",
-    code: nil,
+    company_group:,
+    company: nil,
+    name: Faker::Commerce.department,
+    description: Faker::Lorem.sentence(word_count: 10),
+    code: Faker::Code.npi,
     lifecycle_status: FacilityGroup.lifecycle_statuses.keys.sample,
     workflow_status: FacilityGroup.workflow_statuses.keys.sample,
     business_type: FacilityGroup.business_types.keys.sample,
     discarded_at: nil
   )
-    should_discard = rand(10) == 0
-    discarded_at ||= should_discard ? Time.zone.now - rand(1..180).days : nil
-    code ||= "FG-#{company.id}-#{SecureRandom.hex(3).upcase}"
-
     FacilityGroup.create!(
+      company_group: company_group,
       company: company,
       name: name,
       description: description,

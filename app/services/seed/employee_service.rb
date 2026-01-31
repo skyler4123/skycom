@@ -6,11 +6,8 @@ class Seed::EmployeeService
     name: Faker::Name.name,
     description: "#{Faker::Job.title} in #{Faker::Commerce.department}",
     business_type: Employee.business_types.keys.sample,
-    discarded_at: nil,
-    index: 0
+    discarded_at: nil
   )
-    user ||= Seed::UserService.create(username: "company_group_#{company_group.id}_employee", index: index)
-
     employee = Employee.create!(
       user: user,
       company_group: company_group,
