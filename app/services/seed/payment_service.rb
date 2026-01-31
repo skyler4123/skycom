@@ -29,7 +29,7 @@ class Seed::PaymentService
       invoice: invoice,
       name: name,
       description: description,
-      currency_code: currency,
+      currency_code: currency_code,
       exchange_rate: exchange_rate,
       amount: amount,
       payment_method: payment_method,

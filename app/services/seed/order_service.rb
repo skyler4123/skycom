@@ -7,28 +7,21 @@ class Seed::OrderService
     company_group:,
     company: nil,
     customer: nil,
-    name: nil,
+    name: Faker::Company.buzzword,
     description: Faker::Lorem.sentence(word_count: 15),
-    currency_code: Faker::currency_code.code,
+    currency_code: Order.currency_codes.keys.sample,
     lifecycle_status: Order.lifecycle_statuses.keys.sample,
     workflow_status: Order.workflow_statuses.keys.sample,
     business_type: Order.business_types.keys.sample,
     discarded_at: nil
   )
-    customer ||= company.customers.sample
-    raise "Cannot create an order: Company '#{company.name}' has no customers." if customer.nil?
-
-    should_discard = rand(10) == 0
-    discarded_at ||= should_discard ? Time.zone.now - rand(1..180).days : nil
-    name ||= "Order for #{customer.name}"
-
     Order.create!(
       company_group: company_group,
       company: company,
       customer: customer,
       name: name,
       description: description,
-      currency_code: currency,
+      currency_code: currency_code,
       lifecycle_status: lifecycle_status,
       workflow_status: workflow_status,
       business_type: business_type,

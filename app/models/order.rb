@@ -15,7 +15,7 @@ class Order < ApplicationRecord
   # --- Enums ---
   enum :lifecycle_status, LIFECYCLE_STATUS, prefix: true
   enum :workflow_status, WORKFLOW_STATUS, prefix: true
-
+  enum :currency_code, CURRENCIE_CODES, prefix: true
   enum :business_type, {
     online: 0,
     in_store: 1,

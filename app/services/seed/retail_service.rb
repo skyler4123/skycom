@@ -39,9 +39,9 @@ class Seed::RetailService
     create_employees_and_assign_departments
     create_customers_for_company_group
     subscribe_for_customers
-    # setup_loyalty_programs
-    # create_inventory # Products and Services
-    # create_customer_orders
+    setup_loyalty_programs
+    create_inventory # Products and Services
+    create_customer_orders
 
     print_footer
     true
