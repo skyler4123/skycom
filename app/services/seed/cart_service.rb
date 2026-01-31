@@ -5,20 +5,14 @@ class Seed::CartService
   def self.create(
     company:,
     cart_group: nil,
-    name: nil,
-    description: nil,
-    code: nil,
+    name: Faker::Book.title,
+    description: Faker::Lorem.sentence,
+    code: Faker::Code.npi,
     lifecycle_status: Cart.lifecycle_statuses.keys.sample,
     workflow_status: Cart.workflow_statuses.keys.sample,
     business_type: Cart.business_types.keys.sample,
     discarded_at: nil
   )
-    should_discard = rand(10) == 0
-    discarded_at ||= should_discard ? Time.zone.now - rand(1..180).days : nil
-    name ||= "Cart for #{company.name}"
-    description ||= "A cart for group '#{cart_group.name}'."
-    code ||= "CART-#{company.id}-#{cart_group.id}-#{SecureRandom.hex(2).upcase}"
-
     Cart.create!(
       company: company,
       cart_group: cart_group,

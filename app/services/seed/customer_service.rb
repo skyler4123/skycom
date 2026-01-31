@@ -5,7 +5,7 @@
 class Seed::CustomerService
   def self.create(
     company_group:,
-    company:,
+    company: nil,
     user: nil,
     name: Faker::Name.name,
     description: Faker::Lorem.sentence(word_count: 10),
@@ -14,9 +14,6 @@ class Seed::CustomerService
     business_type: Customer.business_types.keys.sample,
     discarded_at: nil
   )
-    should_discard = rand(10) == 0
-    discarded_at ||= should_discard ? Time.zone.now - rand(1..180).days : nil
-
     Customer.create!(
       company_group: company_group,
       company: company,

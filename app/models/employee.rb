@@ -7,7 +7,8 @@ class Employee < ApplicationRecord
   # --- Associations ---
   belongs_to :company_group
   belongs_to :company, optional: true
-  belongs_to :user
+  belongs_to :user, optional: true
+
 
   has_many :role_appointments, as: :appoint_to, dependent: :destroy
   has_many :roles, through: :role_appointments
