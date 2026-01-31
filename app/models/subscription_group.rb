@@ -23,7 +23,6 @@ class SubscriptionGroup < ApplicationRecord
   validates :price, :period, presence: true
 
   enum :country_code, COUNTRIE_CODES, prefix: true
-  enum :plan_name, SUBSCRIPTION_ENUM_PLANS, prefix: true
   enum :lifecycle_status, LIFECYCLE_STATUS, prefix: true
   enum :workflow_status, WORKFLOW_STATUS, prefix: true
   enum :timezone, TIMEZONES, prefix: true

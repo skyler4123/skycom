@@ -37,7 +37,8 @@ class Seed::RetailService
     setup_roles_and_permissions
     create_departments_for_branches
     create_employees_and_assign_departments
-    create_customers_and_subscriptions
+    create_customers_for_company_group
+    subscribe_for_customers
     # setup_loyalty_programs
     # create_inventory # Products and Services
     # create_customer_orders
@@ -199,7 +200,7 @@ class Seed::RetailService
     end
   end
 
-  def create_customers_and_subscriptions
+  def create_customers_for_company_group
     @branches.each do |branch|
       CUSTOMER_COUNTS.each do |role_name, count|
         count.times do |i|
@@ -215,14 +216,14 @@ class Seed::RetailService
   end
 
   def subscribe_for_customers
-    # @customers.each do |customer|
-    #   Seed::SubscriptionService.create(
-    #     subscription_plan: @retail.subscription_plans.sample,
-    #     period:,
-    #     seller:,
-    #     buyer:,
-    #   )
-        
+    @customers.each do |customer|
+      Seed::SubscriptionService.create(
+        subscription_plan: @retail.subscription_plans.sample,
+        period: Seed::PeriodService.create,
+        seller: @retail,
+        buyer: customer
+      )
+    end 
   end
 
   def setup_loyalty_programs

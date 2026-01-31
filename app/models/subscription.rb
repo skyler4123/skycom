@@ -5,6 +5,7 @@ class Subscription < ApplicationRecord
   # include Discard::Model
 
   # --- Associations ---
+  belongs_to :subscription_plan
   belongs_to :subscription_group, optional: true
   belongs_to :price
   belongs_to :period
@@ -12,9 +13,6 @@ class Subscription < ApplicationRecord
   belongs_to :buyer, polymorphic: true
   belongs_to :resource, polymorphic: true, optional: true
   belongs_to :processer, polymorphic: true, optional: true
-
-  # --- Validations ---
-  validates :plan_name, presence: true
 
   # Ensure the definition components are always present
   validates :price, :period, presence: true
