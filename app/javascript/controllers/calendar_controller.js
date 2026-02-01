@@ -20,10 +20,13 @@ export default class extends Controller {
     this.events    = []
     this.isLoading = false
 
-    this.renderAll()       // empty calendar first
-    this.fetchEvents()     // then load data
+    this.renderAll()
+    this.fetchEvents()
   }
 
+  // ──────────────────────────────────────
+  // Data fetching
+  // ──────────────────────────────────────
   async fetchEvents() {
     if (this.isLoading) return
     this.isLoading = true
@@ -33,10 +36,7 @@ export default class extends Controller {
       const range = this.getCurrentRange()
       const url = `${this.apiUrlValue}?start=${range.start}&end=${range.end}`
 
-      const response = await fetch(url, {
-        headers: { "Accept": "application/json" }
-      })
-
+      const response = await fetch(url, { headers: { "Accept": "application/json" } })
       if (!response.ok) throw new Error(`HTTP ${response.status}`)
 
       this.events = await response.json() || []
@@ -82,6 +82,9 @@ export default class extends Controller {
     }
   }
 
+  // ──────────────────────────────────────
+  // Navigation
+  // ──────────────────────────────────────
   prev()  { this.move(-1); this.refresh() }
   next()  { this.move(+1); this.refresh() }
 
@@ -104,106 +107,107 @@ export default class extends Controller {
     this.fetchEvents()
   }
 
+  // ──────────────────────────────────────
+  // Render entry points (clean & short)
+  // ──────────────────────────────────────
   renderAll() {
-    this.element.innerHTML = `
+    this.element.innerHTML = this.mainContainerHTML()
+  }
+
+  renderContent() {
+    switch (this.viewValue) {
+      case "year":  return this.yearViewHTML()
+      case "month": return this.monthViewHTML()
+      case "week":  return this.weekViewHTML()
+      case "day":   return this.dayViewHTML()
+      default:      return "<p class='text-center py-20 text-gray-500'>Unknown view</p>"
+    }
+  }
+
+  // ──────────────────────────────────────
+  // HTML Templates – fully separated
+  // ──────────────────────────────────────
+
+  mainContainerHTML() {
+    return `
       <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-200 relative">
 
-          <!-- Header -->
-          <div class="px-6 py-5 border-b bg-gradient-to-r from-indigo-50 to-blue-50">
-            <div class="flex flex-col sm:flex-row justify-between items-center gap-4">
-              <div class="flex flex-row items-center gap-4">
-                <button data-action="click->calendar#prev" class="hover:cursor-pointer">
-                  <svg class="h-6 w-6"><use href="#arrow-left"></use></svg>
-                </button>
-                <h1 class="text-2xl font-bold text-gray-900">${this.getTitle()}</h1>
-                <button data-action="click->calendar#next" class="hover:cursor-pointer">
-                  <svg class="h-6 w-6"><use href="#arrow-right"></use></svg>
-                </button>
-              </div>
-              <div class="flex gap-2 flex-wrap">
-                <button data-action="click->calendar#month" class="px-4 py-2 text-sm rounded-lg transition ${this.viewValue==='month' ? 'bg-indigo-600 text-white shadow' : 'bg-white border hover:bg-gray-50'}">Month</button>
-                <button data-action="click->calendar#week"  class="px-4 py-2 text-sm rounded-lg transition ${this.viewValue==='week'  ? 'bg-indigo-600 text-white shadow' : 'bg-white border hover:bg-gray-50'}">Week</button>
-                <button data-action="click->calendar#day"   class="px-4 py-2 text-sm rounded-lg transition ${this.viewValue==='day'   ? 'bg-indigo-600 text-white shadow' : 'bg-white border hover:bg-gray-50'}">Day</button>
-                <button data-action="click->calendar#year"  class="px-4 py-2 text-sm rounded-lg transition ${this.viewValue==='year'  ? 'bg-indigo-600 text-white shadow' : 'bg-white border hover:bg-gray-50'}">Year</button>
-              </div>
-            </div>
-          </div>
+          ${this.headerHTML()}
 
-          <!-- Content area -->
           <div class="p-5 md:p-6 min-h-[500px] relative">
-            ${this.isLoading ? `
-              <div class="absolute inset-0 bg-white/60 flex items-center justify-center z-10">
-                <div class="animate-spin h-12 w-12 border-4 border-indigo-500 rounded-full border-t-transparent"></div>
-              </div>
-            ` : ""}
+            ${this.loadingSpinnerHTML()}
             ${this.renderContent()}
           </div>
         </div>
 
-        <!-- Selection feedback -->
-        <div class="mt-4 text-center text-sm text-gray-600">
-          Selected: <strong class="text-indigo-700">${this.formatSelection()}</strong>
+        ${this.selectionFeedbackHTML()}
+      </div>
+    `
+  }
+
+  headerHTML() {
+    return `
+      <div class="px-6 py-5 border-b bg-gradient-to-r from-indigo-50 to-blue-50">
+        <div class="flex flex-col sm:flex-row justify-between items-center gap-4">
+          <div class="flex items-center gap-6">
+            <button data-action="click->calendar#prev" class="flex items-center justify-center w-12 h-12 rounded-lg hover:bg-white/80 transition">
+              <svg class="h-6 w-6"><use href="#arrow-left"></use></svg>
+            </button>
+            <h1 class="text-2xl font-bold text-gray-900">${this.getTitle()}</h1>
+            <button data-action="click->calendar#next" class="flex items-center justify-center w-12 h-12 rounded-lg hover:bg-white/80 transition">
+              <svg class="h-6 w-6"><use href="#arrow-right"></use></svg>
+            </button>
+          </div>
+          <div class="flex gap-2 flex-wrap">
+            <button data-action="click->calendar#month" class="px-4 py-2 text-sm rounded-lg transition ${this.viewValue==='month' ? 'bg-indigo-600 text-white shadow' : 'bg-white border hover:bg-gray-50'}">Month</button>
+            <button data-action="click->calendar#week"  class="px-4 py-2 text-sm rounded-lg transition ${this.viewValue==='week'  ? 'bg-indigo-600 text-white shadow' : 'bg-white border hover:bg-gray-50'}">Week</button>
+            <button data-action="click->calendar#day"   class="px-4 py-2 text-sm rounded-lg transition ${this.viewValue==='day'   ? 'bg-indigo-600 text-white shadow' : 'bg-white border hover:bg-gray-50'}">Day</button>
+            <button data-action="click->calendar#year"  class="px-4 py-2 text-sm rounded-lg transition ${this.viewValue==='year'  ? 'bg-indigo-600 text-white shadow' : 'bg-white border hover:bg-gray-50'}">Year</button>
+          </div>
         </div>
       </div>
     `
   }
 
-  formatSelection() {
-    if (!this.startDateValue) return "—"
-    if (this.modeValue === "single" || !this.endDateValue) return this.startDateValue
-    return `${this.startDateValue} → ${this.endDateValue}`
+  loadingSpinnerHTML() {
+    if (!this.isLoading) return ''
+    return `
+      <div class="absolute inset-0 bg-white/60 flex items-center justify-center z-10">
+        <div class="animate-spin h-12 w-12 border-4 border-indigo-500 rounded-full border-t-transparent"></div>
+      </div>
+    `
   }
 
-  getTitle() {
-    const d = new Date(this.anchorValue)
-    switch (this.viewValue) {
-      case "month": return d.toLocaleDateString("en-US", { month: "long", year: "numeric" })
-      case "week": {
-        const s = new Date(d); s.setDate(s.getDate() - (s.getDay()||7) + 1)
-        const e = new Date(s); e.setDate(e.getDate() + 6)
-        return s.toLocaleDateString("en-US", { month: "short", day: "numeric" }) + " – " +
-               e.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })
-      }
-      case "day": return d.toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric", year: "numeric" })
-      case "year": return d.getFullYear()
-      default: return "Calendar"
-    }
+  selectionFeedbackHTML() {
+    return `
+      <div class="mt-4 text-center text-sm text-gray-600">
+        Selected: <strong class="text-indigo-700">${this.formatSelection()}</strong>
+      </div>
+    `
   }
 
-  renderContent() {
-    switch (this.viewValue) {
-      case "year":  return this.renderYear()
-      case "month": return this.renderMonth()
-      case "week":  return this.renderWeek()
-      case "day":   return this.renderDay()
-      default:      return "<p class='text-center py-20 text-gray-500'>Unknown view</p>"
-    }
-  }
+  // ──────────────────────────────────────
+  // Views
+  // ──────────────────────────────────────
 
-  // ────────────────────────────────────────────────
-  // YEAR VIEW – mini calendars + event dots
-  // ────────────────────────────────────────────────
-  renderYear() {
+  yearViewHTML() {
     const currentYear = new Date(this.anchorValue).getFullYear()
     const todayStr = this.today
 
-    let html = '<div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">'
-
+    let monthCards = ''
     for (let month = 0; month < 12; month++) {
       const firstDay = new Date(currentYear, month, 1)
       const monthName = firstDay.toLocaleString("en-US", { month: "long" })
       const daysInMonth = new Date(currentYear, month + 1, 0).getDate()
-      const startWeekday = firstDay.getDay() || 7  // Mon=1 ... Sun=7
+      const startWeekday = firstDay.getDay() || 7
 
-      // Events for this month
       const monthEvents = this.events.filter(ev => {
         if (!ev.start) return false
         const evDate = new Date(ev.start)
         return evDate.getFullYear() === currentYear && evDate.getMonth() === month
       })
 
-      // Group by day
       const eventsByDay = {}
       monthEvents.forEach(ev => {
         const day = new Date(ev.start).getDate()
@@ -218,12 +222,10 @@ export default class extends Controller {
         <div class="grid grid-cols-7 gap-0.5">
       `
 
-      // Empty cells before day 1
       for (let i = 1; i < startWeekday; i++) {
         miniGrid += '<div class="h-7 bg-gray-50/40 rounded"></div>'
       }
 
-      // Days of the month
       for (let day = 1; day <= daysInMonth; day++) {
         const dateStr = `${currentYear}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`
         const isToday = dateStr === todayStr
@@ -235,7 +237,7 @@ export default class extends Controller {
             <div class="w-1.5 h-1.5 rounded-full mx-auto" style="background: ${ev.backgroundColor || ev.color || '#6366f1'}"></div>
           `).join('')
           if (dayEvents.length > 3) {
-            dotsHtml += '<div class="text-[9px] leading-none text-gray-400 text-center">+' + (dayEvents.length - 3) + '</div>'
+            dotsHtml += `<div class="text-[9px] text-gray-400 text-center">+${dayEvents.length - 3}</div>`
           }
         }
 
@@ -248,7 +250,6 @@ export default class extends Controller {
         `
       }
 
-      // Fill remaining cells
       const totalCells = startWeekday - 1 + daysInMonth
       const remaining = (7 - totalCells % 7) % 7
       for (let i = 0; i < remaining; i++) {
@@ -257,7 +258,7 @@ export default class extends Controller {
 
       miniGrid += '</div>'
 
-      html += `
+      monthCards += `
         <button data-action="click->calendar#jumpToMonth" data-month="${month}"
                 class="border border-gray-200 rounded-xl p-4 hover:shadow-lg hover:border-indigo-300 transition-all duration-200 w-full text-left bg-white">
           <div class="font-semibold text-lg mb-3 text-gray-800">${monthName}</div>
@@ -266,21 +267,213 @@ export default class extends Controller {
       `
     }
 
+    return `<div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">${monthCards}</div>`
+  }
+
+  monthViewHTML() {
+    const d = new Date(this.anchorValue)
+    const y = d.getFullYear(), m = d.getMonth()
+    const first = new Date(y, m, 1)
+    const daysInMonth = new Date(y, m + 1, 0).getDate()
+    const startWeekday = first.getDay() || 7
+
+    let html = this.weekdayHeaderHTML()
+    html += '<div class="grid grid-cols-7 gap-2">'
+
+    for (let i = 1; i < startWeekday; i++) html += '<div class="h-32 bg-gray-50/30 rounded-lg"></div>'
+
+    for (let day = 1; day <= daysInMonth; day++) {
+      const date = `${y}-${String(m+1).padStart(2,'0')}-${String(day).padStart(2,'0')}`
+      html += this.dayCellHTML(date, day, "h-32")
+    }
+
+    const used = startWeekday - 1 + daysInMonth
+    for (let i = used % 7; i > 0 && i < 7; i++) html += '<div class="h-32 bg-gray-50/30 rounded-lg"></div>'
+
     html += '</div>'
     return html
   }
 
-  jumpToMonth(e) {
-    const month = parseInt(e.currentTarget.dataset.month)
+  weekViewHTML() {
     const d = new Date(this.anchorValue)
-    d.setMonth(month)
-    d.setDate(1)
-    this.anchorValue = d.toISOString().split("T")[0]
-    this.viewValue = "month"
-    this.refresh()
+    d.setDate(d.getDate() - (d.getDay() || 7) + 1)
+
+    const days = []
+    for (let i = 0; i < 7; i++) {
+      const dayDate = new Date(d)
+      dayDate.setDate(dayDate.getDate() + i)
+      days.push({
+        dateStr: dayDate.toISOString().split("T")[0],
+        dayNumber: dayDate.getDate(),
+        isToday: dayDate.toISOString().split("T")[0] === this.today
+      })
+    }
+
+    const eventsByDay = {}
+    days.forEach(day => {
+      eventsByDay[day.dateStr] = this.events.filter(ev => ev.start?.split("T")[0] === day.dateStr)
+    })
+
+    let allDayHtml = ''
+    days.forEach(day => {
+      const allDayEvents = eventsByDay[day.dateStr].filter(ev => ev.allDay)
+      if (allDayEvents.length > 0) {
+        allDayHtml += `
+          <div class="bg-gray-100 border-b border-gray-300 p-1.5 min-h-[60px] flex flex-col gap-1">
+            ${allDayEvents.map(ev => `
+              <div class="text-xs font-medium rounded px-2 py-1 truncate" style="background: ${ev.backgroundColor || ev.color || '#e5e7eb'}; color: white;">
+                ${ev.title}
+              </div>
+            `).join('')}
+          </div>
+        `
+      } else {
+        allDayHtml += '<div class="bg-gray-100 border-b border-gray-300 p-1.5 min-h-[60px]"></div>'
+      }
+    })
+
+    const timeSlots = []
+    for (let hour = 0; hour < 24; hour++) {
+      const timeLabel = `${hour.toString().padStart(2, '0')}:00`
+      let rowHtml = `<div class="text-right text-xs text-gray-500 pr-3 pt-1 border-t border-gray-200">${timeLabel}</div>`
+
+      days.forEach(day => {
+        const dayEvents = eventsByDay[day.dateStr].filter(ev => !ev.allDay)
+        const overlapping = dayEvents.filter(ev => {
+          if (!ev.start || !ev.end) return false
+          const start = new Date(ev.start)
+          const end = new Date(ev.end)
+          const slotStart = new Date(day.dateStr + 'T' + timeLabel + ':00')
+          const slotEnd = new Date(slotStart.getTime() + 60*60*1000)
+          return start < slotEnd && end > slotStart
+        })
+
+        let cellContent = ''
+        if (overlapping.length > 0) {
+          cellContent = overlapping.map(ev => {
+            const start = new Date(ev.start)
+            const duration = (new Date(ev.end) - start) / (1000 * 60)
+            const heightPercent = Math.min(duration / 60 * 100, 100)
+            return `
+              <div class="absolute inset-x-1 top-0 rounded-md shadow-sm p-1 text-xs text-white flex flex-col justify-between overflow-hidden"
+                   style="background: ${ev.backgroundColor || ev.color || '#6366f1'}; height: ${heightPercent}%; min-height: 40px;">
+                <div class="font-medium truncate">${ev.title}</div>
+                <div class="text-xs opacity-90">${start.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</div>
+              </div>
+            `
+          }).join('')
+        }
+
+        rowHtml += `
+          <div class="relative border-l border-gray-200 min-h-[60px] bg-white hover:bg-gray-50 transition">
+            ${cellContent}
+          </div>
+        `
+      })
+
+      timeSlots.push(`<div class="grid grid-cols-8 gap-0">${rowHtml}</div>`)
+    }
+
+    return `
+      <div class="border rounded-lg overflow-hidden">
+        <div class="grid grid-cols-8 bg-gray-100 border-b">
+          <div class="p-3 text-sm font-semibold text-gray-600 text-right">Time</div>
+          ${days.map(day => `
+            <div class="p-3 text-center text-sm font-semibold ${day.isToday ? 'bg-blue-100 text-blue-800' : ''}">
+              ${new Date(day.dateStr).toLocaleString('en-US', { weekday: 'short' })} ${day.dayNumber}
+            </div>
+          `).join('')}
+        </div>
+
+        <div class="grid grid-cols-8">
+          <div class="p-2 text-xs text-gray-600 font-medium border-r border-gray-200 bg-gray-50">All-day</div>
+          ${allDayHtml}
+        </div>
+
+        ${timeSlots.join('')}
+      </div>
+    `
   }
 
-  weekdayHeader() {
+  dayViewHTML() {
+    const dateStr = this.anchorValue
+    const dateObj = new Date(dateStr)
+    const isToday = dateStr === this.today
+
+    const dayEvents = this.events.filter(ev => ev.start?.split("T")[0] === dateStr)
+
+    const allDayEvents = dayEvents.filter(ev => ev.allDay)
+    let allDayHtml = ''
+    if (allDayEvents.length > 0) {
+      allDayHtml = `
+        <div class="bg-gray-100 border-b border-gray-300 p-3 flex flex-wrap gap-2 min-h-[60px]">
+          ${allDayEvents.map(ev => `
+            <div class="text-sm font-medium rounded px-3 py-1.5" style="background: ${ev.backgroundColor || ev.color || '#e5e7eb'}; color: white;">
+              ${ev.title}
+            </div>
+          `).join('')}
+        </div>
+      `
+    } else {
+      allDayHtml = '<div class="bg-gray-100 border-b border-gray-300 p-3 min-h-[60px]"></div>'
+    }
+
+    const timeSlots = []
+    for (let hour = 0; hour < 24; hour++) {
+      const timeLabel = `${hour.toString().padStart(2, '0')}:00`
+      const slotStart = new Date(dateStr + 'T' + timeLabel + ':00')
+      const slotEnd = new Date(slotStart.getTime() + 60*60*1000)
+
+      const overlapping = dayEvents.filter(ev => !ev.allDay && ev.start && ev.end).filter(ev => {
+        const evStart = new Date(ev.start)
+        const evEnd = new Date(ev.end)
+        return evStart < slotEnd && evEnd > slotStart
+      })
+
+      let cellContent = ''
+      if (overlapping.length > 0) {
+        cellContent = overlapping.map(ev => {
+          const evStart = new Date(ev.start)
+          const duration = (new Date(ev.end) - evStart) / (1000 * 60)
+          const heightPercent = Math.min(duration / 60 * 100, 100)
+          return `
+            <div class="absolute inset-x-2 top-0 rounded-lg shadow-md p-2 text-sm text-white flex flex-col justify-between overflow-hidden"
+                 style="background: ${ev.backgroundColor || ev.color || '#6366f1'}; height: ${heightPercent}%; min-height: 50px;">
+              <div class="font-semibold truncate">${ev.title}</div>
+              <div class="text-xs opacity-90">
+                ${evStart.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
+                ${ev.end ? ` – ${new Date(ev.end).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}` : ''}
+              </div>
+            </div>
+          `
+        }).join('')
+      }
+
+      timeSlots.push(`
+        <div class="grid grid-cols-[80px_1fr] border-t border-gray-200">
+          <div class="text-right pr-4 pt-2 text-xs text-gray-600 font-medium bg-gray-50">${timeLabel}</div>
+          <div class="relative min-h-[60px] bg-white hover:bg-gray-50 transition">
+            ${cellContent}
+          </div>
+        </div>
+      `)
+    }
+
+    return `
+      <div class="border rounded-lg overflow-hidden">
+        <div class="bg-gray-100 p-4 border-b text-center font-bold text-lg ${isToday ? 'bg-blue-100 text-blue-800' : ''}">
+          ${dateObj.toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric", year: "numeric" })}
+          ${isToday ? '<span class="ml-2 text-blue-600">(Today)</span>' : ''}
+        </div>
+
+        ${allDayHtml}
+
+        ${timeSlots.join('')}
+      </div>
+    `
+  }
+
+  weekdayHeaderHTML() {
     return `
       <div class="grid grid-cols-7 text-center text-sm font-semibold text-gray-600 py-3 bg-gray-50 rounded-t-lg">
         <div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div>
@@ -289,13 +482,13 @@ export default class extends Controller {
     `
   }
 
-  dayCell(dateStr, dayNumber, height = "h-28", extra = "") {
+  dayCellHTML(dateStr, dayNumber, height = "h-28", extra = "") {
     const isToday   = dateStr === this.today
     const selected  = this.isSelected(dateStr)
     const isStart   = dateStr === (this.dragStartValue || this.startDateValue)
     const isEnd     = dateStr === (this.dragEndValue   || this.endDateValue)
 
-    let cellStyle = "bg-white hover:bg-indigo-50/60 border border-gray-200 relative overflow-hidden"
+    let cellStyle = "bg-white hover:bg-indigo-50/60 border border-gray-200 relative overflow-hidden rounded-lg"
     if (isToday)   cellStyle += " bg-blue-50 border-2 border-blue-400 font-bold"
     if (selected)  cellStyle += " bg-indigo-100/70 border-indigo-200"
     if (isStart || isEnd) cellStyle += " bg-indigo-600 text-white shadow-md hover:bg-indigo-700"
@@ -341,6 +534,41 @@ export default class extends Controller {
     `
   }
 
+  // ──────────────────────────────────────
+  // Helpers
+  // ──────────────────────────────────────
+  formatSelection() {
+    if (!this.startDateValue) return "—"
+    if (this.modeValue === "single" || !this.endDateValue) return this.startDateValue
+    return `${this.startDateValue} → ${this.endDateValue}`
+  }
+
+  getTitle() {
+    const d = new Date(this.anchorValue)
+    switch (this.viewValue) {
+      case "month": return d.toLocaleDateString("en-US", { month: "long", year: "numeric" })
+      case "week": {
+        const s = new Date(d); s.setDate(s.getDate() - (s.getDay()||7) + 1)
+        const e = new Date(s); e.setDate(e.getDate() + 6)
+        return s.toLocaleDateString("en-US", { month: "short", day: "numeric" }) + " – " +
+               e.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })
+      }
+      case "day": return d.toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric", year: "numeric" })
+      case "year": return d.getFullYear()
+      default: return "Calendar"
+    }
+  }
+
+  jumpToMonth(e) {
+    const month = parseInt(e.currentTarget.dataset.month)
+    const d = new Date(this.anchorValue)
+    d.setMonth(month)
+    d.setDate(1)
+    this.anchorValue = d.toISOString().split("T")[0]
+    this.viewValue = "month"
+    this.refresh()
+  }
+
   isSelected(dateStr) {
     if (!this.startDateValue) return false
     if (this.modeValue === "single") return dateStr === this.startDateValue
@@ -351,213 +579,9 @@ export default class extends Controller {
     return (dateStr >= a && dateStr <= b) || (dateStr >= b && dateStr <= a)
   }
 
-  renderMonth() {
-    const d = new Date(this.anchorValue)
-    const y = d.getFullYear(), m = d.getMonth()
-    const first = new Date(y, m, 1)
-    const daysInMonth = new Date(y, m + 1, 0).getDate()
-    const startWeekday = first.getDay() || 7
-
-    let html = this.weekdayHeader()
-    html += '<div class="grid grid-cols-7 gap-2">'
-
-    for (let i = 1; i < startWeekday; i++) html += '<div class="h-32 bg-gray-50/30"></div>'
-
-    for (let day = 1; day <= daysInMonth; day++) {
-      const date = `${y}-${String(m+1).padStart(2,'0')}-${String(day).padStart(2,'0')}`
-      html += this.dayCell(date, day, "h-32")
-    }
-
-    const used = startWeekday - 1 + daysInMonth
-    for (let i = used % 7; i > 0 && i < 7; i++) html += '<div class="h-32 bg-gray-50/30"></div>'
-
-    html += '</div>'
-    return html
-  }
-
-  renderWeek() {
-    const d = new Date(this.anchorValue)
-    d.setDate(d.getDate() - (d.getDay() || 7) + 1)
-
-    const days = []
-    for (let i = 0; i < 7; i++) {
-      const dayDate = new Date(d)
-      dayDate.setDate(dayDate.getDate() + i)
-      days.push({
-        dateStr: dayDate.toISOString().split("T")[0],
-        dayNumber: dayDate.getDate(),
-        isToday: dayDate.toISOString().split("T")[0] === this.today
-      })
-    }
-
-    const eventsByDay = {}
-    days.forEach(day => {
-      eventsByDay[day.dateStr] = this.events.filter(ev => ev.start?.split("T")[0] === day.dateStr)
-    })
-
-    let allDayHtml = ''
-    days.forEach(day => {
-      const allDayEvents = eventsByDay[day.dateStr].filter(ev => ev.allDay)
-      if (allDayEvents.length > 0) {
-        allDayHtml += `
-          <div class="bg-gray-100 border-b border-gray-300 p-1.5 min-h-[60px] flex flex-col gap-1">
-            ${allDayEvents.map(ev => `
-              <div class="text-xs font-medium rounded px-2 py-1 truncate" style="background: ${ev.backgroundColor || ev.color || '#e5e7eb'}; color: white;">
-                ${ev.title}
-              </div>
-            `).join('')}
-          </div>
-        `
-      } else {
-        allDayHtml += '<div class="bg-gray-100 border-b border-gray-300 p-1.5 min-h-[60px]"></div>'
-      }
-    })
-
-    const timeSlots = []
-    for (let hour = 0; hour < 24; hour++) {
-      const timeLabel = `${hour.toString().padStart(2, '0')}:00`
-      let rowHtml = `<div class="text-right text-xs text-gray-500 pr-3 pt-1 border-t border-gray-200">${timeLabel}</div>`
-
-      days.forEach(day => {
-        const dayEvents = eventsByDay[day.dateStr].filter(ev => !ev.allDay)
-
-        const overlapping = dayEvents.filter(ev => {
-          if (!ev.start || !ev.end) return false
-          const start = new Date(ev.start)
-          const end = new Date(ev.end)
-          const slotStart = new Date(day.dateStr + 'T' + timeLabel + ':00')
-          const slotEnd = new Date(slotStart.getTime() + 60*60*1000)
-          return start < slotEnd && end > slotStart
-        })
-
-        let cellContent = ''
-        if (overlapping.length > 0) {
-          cellContent = overlapping.map(ev => {
-            const start = new Date(ev.start)
-            const duration = (new Date(ev.end) - start) / (1000 * 60)
-            const heightPercent = Math.min(duration / 60 * 100, 100)
-            return `
-              <div class="absolute inset-x-1 top-0 bottom-0 rounded-md shadow-sm p-1 text-xs overflow-hidden text-white flex flex-col justify-between" 
-                   style="background: ${ev.backgroundColor || ev.color || '#6366f1'}; height: ${heightPercent}%; min-height: 40px;">
-                <div class="font-medium truncate">${ev.title}</div>
-                <div class="text-xs opacity-90">
-                  ${start.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
-                </div>
-              </div>
-            `
-          }).join('')
-        }
-
-        rowHtml += `
-          <div class="relative border-l border-gray-200 min-h-[60px] bg-white hover:bg-gray-50 transition">
-            ${cellContent}
-          </div>
-        `
-      })
-
-      timeSlots.push(`<div class="grid grid-cols-8 gap-0">${rowHtml}</div>`)
-    }
-
-    return `
-      <div class="border rounded-lg overflow-hidden">
-        <div class="grid grid-cols-8 bg-gray-100 border-b">
-          <div class="p-3 text-sm font-semibold text-gray-600 text-right">Time</div>
-          ${days.map(day => `
-            <div class="p-3 text-center text-sm font-semibold ${day.isToday ? 'bg-blue-100 text-blue-800' : ''}">
-              ${new Date(day.dateStr).toLocaleString('en-US', { weekday: 'short' })} ${day.dayNumber}
-            </div>
-          `).join('')}
-        </div>
-
-        <div class="grid grid-cols-8">
-          <div class="p-2 text-xs text-gray-600 font-medium border-r border-gray-200 bg-gray-50">All-day</div>
-          ${allDayHtml}
-        </div>
-
-        ${timeSlots.join('')}
-      </div>
-    `
-  }
-
-  renderDay() {
-    const dateStr = this.anchorValue
-    const dateObj = new Date(dateStr)
-    const dayNumber = dateObj.getDate()
-    const isToday = dateStr === this.today
-
-    const dayEvents = this.events.filter(ev => ev.start?.split("T")[0] === dateStr)
-
-    const allDayEvents = dayEvents.filter(ev => ev.allDay)
-    let allDayHtml = ''
-    if (allDayEvents.length > 0) {
-      allDayHtml = `
-        <div class="bg-gray-100 border-b border-gray-300 p-2 min-h-[60px] flex flex-wrap gap-2">
-          ${allDayEvents.map(ev => `
-            <div class="text-sm font-medium rounded px-3 py-1.5" style="background: ${ev.backgroundColor || ev.color || '#e5e7eb'}; color: white;">
-              ${ev.title}
-            </div>
-          `).join('')}
-        </div>
-      `
-    } else {
-      allDayHtml = '<div class="bg-gray-100 border-b border-gray-300 p-2 min-h-[60px]"></div>'
-    }
-
-    const timeSlots = []
-    for (let hour = 0; hour < 24; hour++) {
-      const timeLabel = `${hour.toString().padStart(2, '0')}:00`
-      const slotStart = new Date(dateStr + 'T' + timeLabel + ':00')
-      const slotEnd = new Date(slotStart.getTime() + 60*60*1000)
-
-      const overlapping = dayEvents.filter(ev => !ev.allDay && ev.start && ev.end).filter(ev => {
-        const evStart = new Date(ev.start)
-        const evEnd = new Date(ev.end)
-        return evStart < slotEnd && evEnd > slotStart
-      })
-
-      let cellContent = ''
-      if (overlapping.length > 0) {
-        cellContent = overlapping.map(ev => {
-          const evStart = new Date(ev.start)
-          const duration = (new Date(ev.end) - evStart) / (1000 * 60)
-          const heightPercent = Math.min(duration / 60 * 100, 100)
-          return `
-            <div class="absolute inset-x-2 top-0 bottom-0 rounded-lg shadow-md p-2 text-sm text-white flex flex-col justify-between overflow-hidden"
-                 style="background: ${ev.backgroundColor || ev.color || '#6366f1'}; height: ${heightPercent}%; min-height: 50px;">
-              <div class="font-semibold truncate">${ev.title}</div>
-              <div class="text-xs opacity-90">
-                ${evStart.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
-                ${ev.end ? ` – ${new Date(ev.end).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}` : ''}
-              </div>
-            </div>
-          `
-        }).join('')
-      }
-
-      timeSlots.push(`
-        <div class="grid grid-cols-[80px_1fr] border-t border-gray-200">
-          <div class="text-right pr-4 pt-2 text-xs text-gray-600 font-medium bg-gray-50">${timeLabel}</div>
-          <div class="relative min-h-[60px] bg-white hover:bg-gray-50 transition">
-            ${cellContent}
-          </div>
-        </div>
-      `)
-    }
-
-    return `
-      <div class="border rounded-lg overflow-hidden">
-        <div class="bg-gray-100 p-4 border-b text-center font-bold text-lg ${isToday ? 'bg-blue-100 text-blue-800' : ''}">
-          ${dateObj.toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric", year: "numeric" })}
-          ${isToday ? '<span class="ml-2 text-blue-600">(Today)</span>' : ''}
-        </div>
-
-        ${allDayHtml}
-
-        ${timeSlots.join('')}
-      </div>
-    `
-  }
-
+  // ──────────────────────────────────────
+  // Drag & click selection
+  // ──────────────────────────────────────
   onMouseDown(e) {
     const date = e.currentTarget.dataset.date
     if (!date) return
@@ -629,15 +653,5 @@ export default class extends Controller {
       el.classList.toggle("hover:bg-indigo-700", isStart || isEnd)
       el.classList.toggle("hover:bg-indigo-50/60", !(isStart || isEnd))
     })
-  }
-
-  isSelected(dateStr) {
-    if (!this.startDateValue) return false
-    if (this.modeValue === "single") return dateStr === this.startDateValue
-
-    const a = this.dragStartValue || this.startDateValue
-    const b = this.dragEndValue   || this.endDateValue || a
-    if (!a || !b) return false
-    return (dateStr >= a && dateStr <= b) || (dateStr >= b && dateStr <= a)
   }
 }

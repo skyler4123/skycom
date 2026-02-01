@@ -1,3 +1,4 @@
+import * as Helpers from "controllers/helpers"
 import Retail_Management_LayoutController from "controllers/retail/management/layout_controller"
 
 export default class Retail_Management_Schedules_IndexController extends Retail_Management_LayoutController {
@@ -80,6 +81,7 @@ export default class Retail_Management_Schedules_IndexController extends Retail_
           </div>
         </div>
 
+        <div ${Helpers.calendarController()}></div>
         <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 flex flex-col">
           <div
             class="p-6 border-b border-slate-200 dark:border-slate-800 flex flex-col xl:flex-row xl:items-center justify-between gap-4">
