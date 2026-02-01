@@ -130,7 +130,7 @@ export default class extends Controller {
 
   mainContainerHTML() {
     return `
-      <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="mx-auto">
         <div class="bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-200 relative">
 
           ${this.headerHTML()}
@@ -148,7 +148,7 @@ export default class extends Controller {
 
   headerHTML() {
     return `
-      <div class="px-6 py-5 border-b bg-gradient-to-r from-indigo-50 to-blue-50">
+      <div class="px-6 py-5 border-b border-gray-200">
         <div class="flex flex-col sm:flex-row justify-between items-center gap-4">
           <div class="flex items-center gap-6">
             <button data-action="click->calendar#prev" class="flex items-center justify-center w-12 h-12 rounded-lg hover:bg-white/80 transition">
