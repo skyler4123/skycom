@@ -109,6 +109,7 @@ export default class extends Controller {
       <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-200 relative">
 
+          <!-- Header -->
           <div class="px-6 py-5 border-b bg-gradient-to-r from-indigo-50 to-blue-50">
             <div class="flex flex-col sm:flex-row justify-between items-center gap-4">
               <div class="flex items-center gap-4">
@@ -125,6 +126,7 @@ export default class extends Controller {
             </div>
           </div>
 
+          <!-- Content area -->
           <div class="p-5 md:p-6 min-h-[500px] relative">
             ${this.isLoading ? `
               <div class="absolute inset-0 bg-white/60 flex items-center justify-center z-10">
@@ -135,6 +137,7 @@ export default class extends Controller {
           </div>
         </div>
 
+        <!-- Selection feedback -->
         <div class="mt-4 text-center text-sm text-gray-600">
           Selected: <strong class="text-indigo-700">${this.formatSelection()}</strong>
         </div>
@@ -174,18 +177,91 @@ export default class extends Controller {
     }
   }
 
+  // ────────────────────────────────────────────────
+  // YEAR VIEW – mini calendars + event dots
+  // ────────────────────────────────────────────────
   renderYear() {
-    const year = new Date(this.anchorValue).getFullYear()
-    let html = '<div class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-4">'
-    for (let m = 0; m < 12; m++) {
+    const currentYear = new Date(this.anchorValue).getFullYear()
+    const todayStr = this.today
+
+    let html = '<div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">'
+
+    for (let month = 0; month < 12; month++) {
+      const firstDay = new Date(currentYear, month, 1)
+      const monthName = firstDay.toLocaleString("en-US", { month: "long" })
+      const daysInMonth = new Date(currentYear, month + 1, 0).getDate()
+      const startWeekday = firstDay.getDay() || 7  // Mon=1 ... Sun=7
+
+      // Events for this month
+      const monthEvents = this.events.filter(ev => {
+        if (!ev.start) return false
+        const evDate = new Date(ev.start)
+        return evDate.getFullYear() === currentYear && evDate.getMonth() === month
+      })
+
+      // Group by day
+      const eventsByDay = {}
+      monthEvents.forEach(ev => {
+        const day = new Date(ev.start).getDate()
+        if (!eventsByDay[day]) eventsByDay[day] = []
+        eventsByDay[day].push(ev)
+      })
+
+      let miniGrid = `
+        <div class="grid grid-cols-7 gap-0.5 text-xs font-medium text-gray-500 mb-1.5">
+          <div class="text-center">M</div><div>T</div><div>W</div><div>T</div><div>F</div><div>S</div><div class="text-red-500">S</div>
+        </div>
+        <div class="grid grid-cols-7 gap-0.5">
+      `
+
+      // Empty cells before day 1
+      for (let i = 1; i < startWeekday; i++) {
+        miniGrid += '<div class="h-7 bg-gray-50/40 rounded"></div>'
+      }
+
+      // Days of the month
+      for (let day = 1; day <= daysInMonth; day++) {
+        const dateStr = `${currentYear}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`
+        const isToday = dateStr === todayStr
+        const dayEvents = eventsByDay[day] || []
+
+        let dotsHtml = ''
+        if (dayEvents.length > 0) {
+          dotsHtml = dayEvents.slice(0, 3).map(ev => `
+            <div class="w-1.5 h-1.5 rounded-full mx-auto" style="background: ${ev.backgroundColor || ev.color || '#6366f1'}"></div>
+          `).join('')
+          if (dayEvents.length > 3) {
+            dotsHtml += '<div class="text-[9px] leading-none text-gray-400 text-center">+' + (dayEvents.length - 3) + '</div>'
+          }
+        }
+
+        miniGrid += `
+          <div class="h-7 flex flex-col items-center justify-center text-sm relative ${isToday ? 'font-bold text-blue-600' : 'text-gray-700'} hover:bg-indigo-50/50 rounded transition">
+            ${day}
+            <div class="flex flex-col gap-0.5 mt-0.5 w-4">${dotsHtml}</div>
+            ${isToday ? '<div class="absolute -top-0.5 -right-0.5 w-2 h-2 bg-blue-600 rounded-full border-2 border-white"></div>' : ''}
+          </div>
+        `
+      }
+
+      // Fill remaining cells
+      const totalCells = startWeekday - 1 + daysInMonth
+      const remaining = (7 - totalCells % 7) % 7
+      for (let i = 0; i < remaining; i++) {
+        miniGrid += '<div class="h-7 bg-gray-50/40 rounded"></div>'
+      }
+
+      miniGrid += '</div>'
+
       html += `
-        <button data-action="click->calendar#jumpToMonth" data-month="${m}"
-                class="p-6 border rounded-xl hover:bg-indigo-50 hover:border-indigo-300 transition text-center">
-          <div class="font-semibold text-lg">${new Date(year, m).toLocaleString("en-US", { month: "long" })}</div>
-          <div class="text-sm text-gray-500 mt-1">${year}</div>
+        <button data-action="click->calendar#jumpToMonth" data-month="${month}"
+                class="border border-gray-200 rounded-xl p-4 hover:shadow-lg hover:border-indigo-300 transition-all duration-200 w-full text-left bg-white">
+          <div class="font-semibold text-lg mb-3 text-gray-800">${monthName}</div>
+          ${miniGrid}
         </button>
       `
     }
+
     html += '</div>'
     return html
   }
@@ -222,7 +298,6 @@ export default class extends Controller {
 
     const dayEvents = this.events.filter(ev => ev.start?.split("T")[0] === dateStr)
 
-    // Show up to 3 events with title + time
     const eventItems = dayEvents.slice(0, 3).map(ev => {
       let timeStr = ev.allDay ? "All day" : "";
       if (!ev.allDay && ev.start) {
@@ -300,27 +375,181 @@ export default class extends Controller {
     const d = new Date(this.anchorValue)
     d.setDate(d.getDate() - (d.getDay() || 7) + 1)
 
-    let html = this.weekdayHeader()
-    html += '<div class="grid grid-cols-7 gap-2">'
-
+    const days = []
     for (let i = 0; i < 7; i++) {
-      const dd = new Date(d)
-      dd.setDate(dd.getDate() + i)
-      const ds = dd.toISOString().split("T")[0]
-      html += this.dayCell(ds, dd.getDate(), "h-64 md:h-80")
+      const dayDate = new Date(d)
+      dayDate.setDate(dayDate.getDate() + i)
+      days.push({
+        dateStr: dayDate.toISOString().split("T")[0],
+        dayNumber: dayDate.getDate(),
+        isToday: dayDate.toISOString().split("T")[0] === this.today
+      })
     }
 
-    html += '</div>'
-    return html
+    const eventsByDay = {}
+    days.forEach(day => {
+      eventsByDay[day.dateStr] = this.events.filter(ev => ev.start?.split("T")[0] === day.dateStr)
+    })
+
+    let allDayHtml = ''
+    days.forEach(day => {
+      const allDayEvents = eventsByDay[day.dateStr].filter(ev => ev.allDay)
+      if (allDayEvents.length > 0) {
+        allDayHtml += `
+          <div class="bg-gray-100 border-b border-gray-300 p-1.5 min-h-[60px] flex flex-col gap-1">
+            ${allDayEvents.map(ev => `
+              <div class="text-xs font-medium rounded px-2 py-1 truncate" style="background: ${ev.backgroundColor || ev.color || '#e5e7eb'}; color: white;">
+                ${ev.title}
+              </div>
+            `).join('')}
+          </div>
+        `
+      } else {
+        allDayHtml += '<div class="bg-gray-100 border-b border-gray-300 p-1.5 min-h-[60px]"></div>'
+      }
+    })
+
+    const timeSlots = []
+    for (let hour = 0; hour < 24; hour++) {
+      const timeLabel = `${hour.toString().padStart(2, '0')}:00`
+      let rowHtml = `<div class="text-right text-xs text-gray-500 pr-3 pt-1 border-t border-gray-200">${timeLabel}</div>`
+
+      days.forEach(day => {
+        const dayEvents = eventsByDay[day.dateStr].filter(ev => !ev.allDay)
+
+        const overlapping = dayEvents.filter(ev => {
+          if (!ev.start || !ev.end) return false
+          const start = new Date(ev.start)
+          const end = new Date(ev.end)
+          const slotStart = new Date(day.dateStr + 'T' + timeLabel + ':00')
+          const slotEnd = new Date(slotStart.getTime() + 60*60*1000)
+          return start < slotEnd && end > slotStart
+        })
+
+        let cellContent = ''
+        if (overlapping.length > 0) {
+          cellContent = overlapping.map(ev => {
+            const start = new Date(ev.start)
+            const duration = (new Date(ev.end) - start) / (1000 * 60)
+            const heightPercent = Math.min(duration / 60 * 100, 100)
+            return `
+              <div class="absolute inset-x-1 top-0 bottom-0 rounded-md shadow-sm p-1 text-xs overflow-hidden text-white flex flex-col justify-between" 
+                   style="background: ${ev.backgroundColor || ev.color || '#6366f1'}; height: ${heightPercent}%; min-height: 40px;">
+                <div class="font-medium truncate">${ev.title}</div>
+                <div class="text-xs opacity-90">
+                  ${start.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
+                </div>
+              </div>
+            `
+          }).join('')
+        }
+
+        rowHtml += `
+          <div class="relative border-l border-gray-200 min-h-[60px] bg-white hover:bg-gray-50 transition">
+            ${cellContent}
+          </div>
+        `
+      })
+
+      timeSlots.push(`<div class="grid grid-cols-8 gap-0">${rowHtml}</div>`)
+    }
+
+    return `
+      <div class="border rounded-lg overflow-hidden">
+        <div class="grid grid-cols-8 bg-gray-100 border-b">
+          <div class="p-3 text-sm font-semibold text-gray-600 text-right">Time</div>
+          ${days.map(day => `
+            <div class="p-3 text-center text-sm font-semibold ${day.isToday ? 'bg-blue-100 text-blue-800' : ''}">
+              ${new Date(day.dateStr).toLocaleString('en-US', { weekday: 'short' })} ${day.dayNumber}
+            </div>
+          `).join('')}
+        </div>
+
+        <div class="grid grid-cols-8">
+          <div class="p-2 text-xs text-gray-600 font-medium border-r border-gray-200 bg-gray-50">All-day</div>
+          ${allDayHtml}
+        </div>
+
+        ${timeSlots.join('')}
+      </div>
+    `
   }
 
   renderDay() {
-    const ds = this.anchorValue
-    const d = new Date(ds)
+    const dateStr = this.anchorValue
+    const dateObj = new Date(dateStr)
+    const dayNumber = dateObj.getDate()
+    const isToday = dateStr === this.today
+
+    const dayEvents = this.events.filter(ev => ev.start?.split("T")[0] === dateStr)
+
+    const allDayEvents = dayEvents.filter(ev => ev.allDay)
+    let allDayHtml = ''
+    if (allDayEvents.length > 0) {
+      allDayHtml = `
+        <div class="bg-gray-100 border-b border-gray-300 p-2 min-h-[60px] flex flex-wrap gap-2">
+          ${allDayEvents.map(ev => `
+            <div class="text-sm font-medium rounded px-3 py-1.5" style="background: ${ev.backgroundColor || ev.color || '#e5e7eb'}; color: white;">
+              ${ev.title}
+            </div>
+          `).join('')}
+        </div>
+      `
+    } else {
+      allDayHtml = '<div class="bg-gray-100 border-b border-gray-300 p-2 min-h-[60px]"></div>'
+    }
+
+    const timeSlots = []
+    for (let hour = 0; hour < 24; hour++) {
+      const timeLabel = `${hour.toString().padStart(2, '0')}:00`
+      const slotStart = new Date(dateStr + 'T' + timeLabel + ':00')
+      const slotEnd = new Date(slotStart.getTime() + 60*60*1000)
+
+      const overlapping = dayEvents.filter(ev => !ev.allDay && ev.start && ev.end).filter(ev => {
+        const evStart = new Date(ev.start)
+        const evEnd = new Date(ev.end)
+        return evStart < slotEnd && evEnd > slotStart
+      })
+
+      let cellContent = ''
+      if (overlapping.length > 0) {
+        cellContent = overlapping.map(ev => {
+          const evStart = new Date(ev.start)
+          const duration = (new Date(ev.end) - evStart) / (1000 * 60)
+          const heightPercent = Math.min(duration / 60 * 100, 100)
+          return `
+            <div class="absolute inset-x-2 top-0 bottom-0 rounded-lg shadow-md p-2 text-sm text-white flex flex-col justify-between overflow-hidden"
+                 style="background: ${ev.backgroundColor || ev.color || '#6366f1'}; height: ${heightPercent}%; min-height: 50px;">
+              <div class="font-semibold truncate">${ev.title}</div>
+              <div class="text-xs opacity-90">
+                ${evStart.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
+                ${ev.end ? ` – ${new Date(ev.end).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}` : ''}
+              </div>
+            </div>
+          `
+        }).join('')
+      }
+
+      timeSlots.push(`
+        <div class="grid grid-cols-[80px_1fr] border-t border-gray-200">
+          <div class="text-right pr-4 pt-2 text-xs text-gray-600 font-medium bg-gray-50">${timeLabel}</div>
+          <div class="relative min-h-[60px] bg-white hover:bg-gray-50 transition">
+            ${cellContent}
+          </div>
+        </div>
+      `)
+    }
+
     return `
-      ${this.weekdayHeader()}
-      <div class="grid grid-cols-1 gap-2">
-        ${this.dayCell(ds, d.getDate(), "min-h-[32rem]", "flex-col items-start justify-start p-6 text-left text-3xl font-bold")}
+      <div class="border rounded-lg overflow-hidden">
+        <div class="bg-gray-100 p-4 border-b text-center font-bold text-lg ${isToday ? 'bg-blue-100 text-blue-800' : ''}">
+          ${dateObj.toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric", year: "numeric" })}
+          ${isToday ? '<span class="ml-2 text-blue-600">(Today)</span>' : ''}
+        </div>
+
+        ${allDayHtml}
+
+        ${timeSlots.join('')}
       </div>
     `
   }
@@ -396,5 +625,15 @@ export default class extends Controller {
       el.classList.toggle("hover:bg-indigo-700", isStart || isEnd)
       el.classList.toggle("hover:bg-indigo-50/60", !(isStart || isEnd))
     })
+  }
+
+  isSelected(dateStr) {
+    if (!this.startDateValue) return false
+    if (this.modeValue === "single") return dateStr === this.startDateValue
+
+    const a = this.dragStartValue || this.startDateValue
+    const b = this.dragEndValue   || this.endDateValue || a
+    if (!a || !b) return false
+    return (dateStr >= a && dateStr <= b) || (dateStr >= b && dateStr <= a)
   }
 }

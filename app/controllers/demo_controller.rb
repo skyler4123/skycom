@@ -3,90 +3,111 @@ class DemoController < ApplicationController
   end
 
   def calendar_events
-    # Get the requested range from params (fallback to current month)
+    # Get requested range (or fallback)
     start_date = params[:start]&.to_date || Date.current.beginning_of_month
     end_date   = params[:end]&.to_date   || Date.current.end_of_month
 
-    # For testing: force events into THIS WEEK only
-    # (Monday → Sunday of the current week)
-    today = Date.current
-    week_start = today.beginning_of_week(:monday)
-    week_end   = today.end_of_week(:sunday)
+    # Demo window: last 2 months + next 3 months (so navigation shows data)
+    demo_start = Date.current - 2.months
+    demo_end   = Date.current + 3.months
 
-    # We'll generate events only inside this week
     events = []
 
-    # Sample titles & colors
-    titles_and_colors = [
-      { title: "Daily Standup",           color: "#3b82f6", all_day: false },
-      { title: "Code Review",              color: "#6366f1", all_day: false },
-      { title: "Client Meeting",           color: "#2563eb", all_day: false },
-      { title: "Gym Session",              color: "#10b981", all_day: false },
-      { title: "Team Lunch",               color: "#f59e0b", all_day: false },
-      { title: "Doctor Appointment",       color: "#ef4444", all_day: true  },
-      { title: "Project Planning",         color: "#8b5cf6", all_day: false },
-      { title: "Weekend Hiking",           color: "#f97316", all_day: true  },
-      { title: "Family Dinner",            color: "#ec4899", all_day: false },
-      { title: "Public Holiday (mock)",    color: "#f87171", all_day: true  }
+    # Realistic event templates
+    event_templates = [
+      { category: "work",     title_prefix: "Team ",     color: "#3b82f6", all_day_prob: 0.1 },
+      { category: "work",     title_prefix: "Meeting with ", color: "#6366f1", all_day_prob: 0.2 },
+      { category: "work",     title_prefix: "Review: ",  color: "#2563eb", all_day_prob: 0.05 },
+      { category: "personal", title_prefix: "Gym - ",    color: "#10b981", all_day_prob: 0.05 },
+      { category: "personal", title_prefix: "Doctor ",   color: "#ef4444", all_day_prob: 0.8 },
+      { category: "personal", title_prefix: "Dinner with ", color: "#f59e0b", all_day_prob: 0.3 },
+      { category: "personal", title_prefix: "Family ",   color: "#ec4899", all_day_prob: 0.4 },
+      { category: "holiday",  title_prefix: "",          color: "#f87171", all_day_prob: 1.0 },
     ]
 
-    # Generate ~10–15 events spread across the current week
-    (0..14).each do |i|
-      # Pick random day in the current week
-      day_offset = rand(0..6)
-      event_date = week_start + day_offset.days
+    events_per_month_target = 25..45
 
-      # Pick random sample
-      sample = titles_and_colors.sample
+    (demo_start..demo_end).select { |d| d.day == 1 }.each do |month_start|
+      month_end = month_start.end_of_month
 
-      # Random start hour (9–18) for non-all-day events
-      start_hour = rand(9..17)
-      start_time = event_date.to_time + start_hour.hours + rand(0..50).minutes
+      rand(events_per_month_target).times do
+        event_date = Faker::Date.between(from: month_start, to: month_end)
+        template   = event_templates.sample
+        is_all_day = rand < template[:all_day_prob]
 
-      # Duration: 30min to 3 hours
-      duration_minutes = [30, 45, 60, 90, 120, 180].sample
-
-      event = {
-        id: "evt-#{1000 + i}",
-        title: sample[:title],
-        backgroundColor: sample[:color],
-        borderColor: sample[:color],
-        textColor: "#ffffff",
-        allDay: sample[:all_day],
-        extendedProps: {
-          department: ["Engineering", "Design", "Product", "Marketing"].sample,
-          participants: ["@SkylerPTP", "@alice_dev", "@bob_pm", "@jane"].sample(2 + rand(0..2)),
-          priority: ["low", "medium", "high"].sample,
-          status: ["confirmed", "tentative", "cancelled"].sample
+        event = {
+          id:              "evt-#{SecureRandom.hex(6)}",
+          title:           generate_title(template, event_date),
+          backgroundColor: template[:color],
+          borderColor:     template[:color],
+          textColor:       "#ffffff",
+          allDay:          is_all_day,
+          extendedProps: {
+            department:   Faker::Job.field,
+            participants: Faker::Lorem.words(number: rand(2..5)).map { |w| "@#{w}" },
+            priority:     %w[low medium high].sample,
+            status:       %w[confirmed tentative cancelled].sample,
+            category:     template[:category]
+          }
         }
-      }
 
-      if sample[:all_day]
-        # All-day event → use date only (no time)
-        event[:start] = event_date.iso8601
-        # Optional: multi-day all-day event (sometimes)
-        if rand < 0.2
-          event[:end] = (event_date + rand(1..2).days).iso8601
+        if is_all_day
+          event[:start] = event_date.iso8601
+          event[:end]   = (event_date + rand(1..3).days).iso8601 if rand < 0.15
+        else
+          start_hour   = rand(8..19)
+          start_minute = [0, 15, 30, 45].sample
+          start_time   = event_date.to_time.change(hour: start_hour, min: start_minute)
+
+          duration_min = [30, 45, 60, 90, 120, 150, 180, 210].sample
+
+          event[:start] = start_time.iso8601
+          event[:end]   = (start_time + duration_min.minutes).iso8601
         end
-      else
-        # Timed event
-        event[:start] = start_time.iso8601
-        event[:end]   = (start_time + duration_minutes.minutes).iso8601
-      end
 
-      events << event
+        events << event
+      end
     end
 
-    # Optional: always add one multi-day holiday-like event
+    # Always include a visible multi-day holiday block near now
     events << {
-      id: "evt-holiday-001",
-      title: "Mock Holiday Period",
-      start: week_start.iso8601,
-      end: (week_start + 2.days).iso8601,
+      id: "evt-holiday-demo",
+      title: "Lunar New Year Holiday (mock)",
+      start: (Date.current - 3.days).iso8601,
+      end:   (Date.current + 4.days).iso8601,
       backgroundColor: "#f87171",
       allDay: true
     }
 
     render json: events
+  end
+
+  private
+
+  def generate_title(template, date)
+    prefix = template[:title_prefix]
+
+    case template[:category]
+    when "work"
+      [
+        "#{prefix}#{Faker::Company.industry} Sync",
+        "#{prefix}#{Faker::Job.position} Review",
+        "#{Faker::Job.title} with #{Faker::Name.first_name}",
+        "Sprint Planning – #{Faker::App.name}",
+        "1:1 with #{Faker::Name.name}"
+      ].sample
+    when "personal"
+      [
+        "#{prefix}#{Faker::Hobby.activity}",
+        "Dinner with #{Faker::Name.first_name}",
+        "Gym - #{Faker::Team.creature} workout",
+        "Doctor – #{Faker::Job.field}",                    # ← fixed: use real Faker method
+        "Movie night: #{Faker::Movie.title}"
+      ].sample
+    when "holiday"
+      ["Public Holiday", "National Day", "Company Shutdown", "Festival"].sample
+    else
+      "#{prefix}#{Faker::Lorem.words(number: 2..4).join(' ')}"
+    end
   end
 end
