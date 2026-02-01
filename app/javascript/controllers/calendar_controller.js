@@ -112,10 +112,14 @@ export default class extends Controller {
           <!-- Header -->
           <div class="px-6 py-5 border-b bg-gradient-to-r from-indigo-50 to-blue-50">
             <div class="flex flex-col sm:flex-row justify-between items-center gap-4">
-              <div class="flex items-center gap-4">
-                <button data-action="click->calendar#prev" class="p-3 rounded-lg hover:bg-white/80 text-gray-700">←</button>
+              <div class="flex flex-row items-center gap-4">
+                <button data-action="click->calendar#prev" class="hover:cursor-pointer">
+                  <svg class="h-6 w-6"><use href="#arrow-left"></use></svg>
+                </button>
                 <h1 class="text-2xl font-bold text-gray-900">${this.getTitle()}</h1>
-                <button data-action="click->calendar#next" class="p-3 rounded-lg hover:bg-white/80 text-gray-700">→</button>
+                <button data-action="click->calendar#next" class="hover:cursor-pointer">
+                  <svg class="h-6 w-6"><use href="#arrow-right"></use></svg>
+                </button>
               </div>
               <div class="flex gap-2 flex-wrap">
                 <button data-action="click->calendar#month" class="px-4 py-2 text-sm rounded-lg transition ${this.viewValue==='month' ? 'bg-indigo-600 text-white shadow' : 'bg-white border hover:bg-gray-50'}">Month</button>
