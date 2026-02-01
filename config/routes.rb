@@ -1,5 +1,9 @@
 Rails.application.routes.draw do
-  resources :demo, only: [:index]
+  resources :demo, only: [:index] do
+    collection do
+      get :calendar_events
+    end
+  end
   resources :system_subscriptions
   resources :system_subscription_groups
   resources :system_subscription_plans
