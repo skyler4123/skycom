@@ -84,5 +84,14 @@ module CompanyGroup::RetailConcern
         scope.to_a
       end
     end
+
+    def cached_subscriptions
+      # Similar caching approach for subscriptions
+      scope = self.subscriptions
+      cache_key = scope.cache_key_with_version
+      Rails.cache.fetch([ "subscriptions", cache_key ]) do
+        scope.to_a
+      end
+    end
   end
 end
