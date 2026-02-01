@@ -22,6 +22,7 @@ export default class DarkmodeController extends Controller {
   }
   
   darkmodeValueChanged(value, previousValue) {
+    if (previousValue === undefined) return;
     if (value) {
       this.turnOnDarkmode()
     } else {

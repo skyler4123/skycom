@@ -11,7 +11,6 @@ export default class Retail_Management_Subscriptions_IndexController extends Ret
   async load() {
     const data = await Helpers.fetchJson()
     const subscriptions = data.subscriptions || []
-    console.log(subscriptions)
     this.render(subscriptions)
   }
 
