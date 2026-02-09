@@ -234,22 +234,3 @@ export const addOpenTrigger = (key, index) => `data-open-target="trigger" data-a
  * @returns {string} The full data attribute string for an open listener.
  */
 export const addOpenListener = (key, index) => `data-open-target="listener" data-open-key-param="${key}" data-open-index-param="${index}"`
-
-/**
- * Generates a kebab-case Stimulus controller identifier from a controller object/class.
- * It takes the controller's name, removes "Controller", and converts it to kebab-case.
- * @param {{name: string}} controllerObject - The Stimulus controller instance or class.
- * @returns {string} The kebab-case identifier.
- */
-export const identifier = (controllerObject) => {
-  let identifier
-  identifier = controllerObject.name
-  identifier = identifier.replace('Controller', '')
-  identifier = identifier.replaceAll('_', 'NAMESPACE')
-  identifier = identifier
-  .match(/[A-Z]{2,}(?=[A-Z][a-z]+[0-9]*|\b)|[A-Z]?[a-z]+[0-9]*|[A-Z]|[0-9]+/g)
-  .map(x => x.toLowerCase())
-  .join('-');
-  identifier = identifier.replaceAll('namespace', '')
-  return identifier
-}

@@ -1,4 +1,4 @@
-module PermissionConcern
+module Employee::PermissionConcern
   extend ActiveSupport::Concern
 
   included do
