@@ -16,27 +16,39 @@ export default class Retail_Management_LayoutController extends Controller {
 
   initialize() {
     this.initBindings()
+  }
+
+  connect() {
     this.initLayout()
   }
-    
+
   initBindings() {
     this.companyGroups = Helpers.companyGroups()
-    // this.currentCompanyGroup
   }
 
   initLayout() {
-    // Poll until the currentCompanyGroup can be determined from the URL.
-    // This handles race conditions during redirects where the JS loads
-    // before the URL is updated.
     Helpers.poll(() => {
       this.currentCompanyGroup = Helpers.Current.companyGroup();
       if (this.currentCompanyGroup) {
-        this.element.className = 'min-h-screen flex flex-col';
-        this.element.innerHTML = this.layoutHTML();
-        return true; // Stop polling
+        // Initial render once data is ready
+        this.render();
+        return true; 
       }
-      return false; // Continue polling
+      return false;
     });
+  }
+
+  // --- The Centralized Render Method ---
+  render() {
+    // 1. Update top-level attributes if necessary
+    this.element.className = 'min-h-screen flex flex-col';
+    
+    // 2. Replace the inner HTML with the latest state
+    this.element.innerHTML = this.layoutHTML();
+
+    // 3. Optional: Re-trigger any post-render logic 
+    // (e.g., highlighting active links if Helpers.openByPathname doesn't do it via strings)
+    // console.log("UI Synchronized");
   }
 
   openCompanyGroupDropdown(event) {
