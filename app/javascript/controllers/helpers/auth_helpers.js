@@ -47,7 +47,7 @@ export const Current = {
    * Retrieves the current user from the 'current_user' cookie.
    * @returns {object|null} The current user object, or null if not found.
    */
-  user() {
+  get user() {
     const c = Cookie('current_user');
     return c ? JSON.parse(c) : null;
   },
@@ -55,7 +55,7 @@ export const Current = {
    * Determines the current company group based on the URL path.
    * @returns {object|undefined|null} The current company group object if found in the path.
    */
-  companyGroup() {
+  get companyGroup() {
     const groups = companyGroups();
     const currentPath = pathname();
 
@@ -63,6 +63,10 @@ export const Current = {
       return null;
     }
     return groups.find(group => currentPath.includes(String(group.id)));
+  },
+
+  get retail() {
+    return this.companyGroup
   }
 }
 

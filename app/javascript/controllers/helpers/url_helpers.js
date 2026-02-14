@@ -14,3 +14,7 @@ export const retail_management_customers_path = (retailId) => `/retail/${retailI
 export const retail_management_facilities_path = (retailId) => `/retail/${retailId}/management/facilities`
 export const retail_management_employees_path = (retailId) => `/retail/${retailId}/management/employees`
 export const retail_management_orders_path = (retailId) => `/retail/${retailId}/management/orders`
+export const retail_management_permissions_path = (retailId) => `/retail/${retailId}/management/permissions`
+export const retail_management_roles_path = (retailId) => `/retail/${retailId}/management/roles`
+export const retail_management_settings_path = (retailId) => `/retail/${retailId}/management/settings`
+export const retail_management_users_path = (retailId) => `/retail/${retailId}/management/users`
