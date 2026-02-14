@@ -6,6 +6,7 @@ class CompanyGroup < ApplicationRecord
   include CompanyGroup::RestaurantConcern
   include SystemSubscription::BuyerConcern
   include Subscription::SellerConcern
+  include CompanyGroup::PermissionConcern
 
   belongs_to :user
   has_many :companies, dependent: :destroy

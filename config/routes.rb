@@ -65,6 +65,7 @@ Rails.application.routes.draw do
         resources :settings
         resources :administrators
         resources :subscriptions
+        resources :permissions
       end
 
       namespace :pos do
