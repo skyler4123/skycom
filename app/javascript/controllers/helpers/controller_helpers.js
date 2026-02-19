@@ -18,3 +18,7 @@ export const identifier = (controllerObject) => {
   identifier = identifier.replaceAll('namespace', '')
   return identifier
 }
+
+export const openTrigger = (group, key) => `data-open-target="trigger" data-action="click->open#click" data-open-group-param="${group}" data-open-key-param="${key}"`
+
+export const openListener = (group, key) => `data-open-target="listener" data-open-group-param="${group}" data-open-key-param="${key}"`
