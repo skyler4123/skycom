@@ -1,16 +1,50 @@
+import * as Helpers from "controllers/helpers"
 import Retail_Management_LayoutController from "controllers/retail/management/layout_controller"
 
 export default class Retail_Management_Administrators_IndexController extends Retail_Management_LayoutController {
-  initBindings() {
-    super.initBindings()
-    // this.permissions = ...
+
+  connect() {
+    // 1. Let the parent class setup retail/companyGroups
+    super.connect();
+
+    // 2. Fetch the permissions only once when the controller connects
+    if (this.retail) {
+      this.fetchData();
+    }
   }
 
-  permissions() {
-    // const url = Helpers.
+  // STOP: Do NOT override the render() method. 
+  // The parent class render() already calls this.contentHTML()
+
+  async fetchData() {
+    try {
+      const url = Helpers.retail_management_permissions_path(this.retail.id);
+      const response = await window.fetchJson(url);
+      
+      // Store the data
+      this.permissions = response?.permissions || [];
+      
+      // 3. Trigger a re-render now that the data is loaded
+      this.render(); 
+    } catch (error) {
+      console.error("Failed to load permissions:", error);
+      this.permissions = [];
+      this.render();
+    }
   }
 
   contentHTML() {
+    // 4. Handle the "Wait" state. If data hasn't arrived, show a loader.
+    if (!this.permissions) {
+      return `
+        <div class="p-8 flex items-center justify-center h-full">
+          <div class="animate-pulse text-slate-500 font-medium">Loading RBAC Policies...</div>
+        </div>
+      `;
+    }
+
+    // 5. Data is ready! Render your full template
+
     return `
       <div class="p-8 h-full flex flex-col">
         <div class="flex flex-wrap justify-between items-end gap-4 mb-8">
@@ -41,17 +75,21 @@ export default class Retail_Management_Administrators_IndexController extends Re
               <h2 class="text-xs font-bold uppercase text-slate-500 tracking-wider">Defined Roles</h2>
             </div>
             <div class="overflow-y-auto flex-1 p-2 space-y-1">
-              <button
-                class="w-full flex items-center justify-between p-3 rounded-lg bg-blue-50 dark:bg-blue-900/20 border border-blue-100 dark:border-blue-800/50 text-blue-600">
-                <div class="flex items-center gap-3">
-                  <span class="material-symbols-outlined">shield_person</span>
-                  <div class="text-left">
-                    <p class="font-medium text-sm">Manager</p>
-                    <p class="text-xs opacity-70">14 Active Users</p>
-                  </div>
-                </div>
-                <span class="material-symbols-outlined text-[18px]">chevron_right</span>
-              </button>
+              ${
+                Object.entries(this.permissions).map(([key, value]) => `
+                  <button
+                    class="w-full flex items-center justify-between p-3 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300">
+                    <div class="flex items-center gap-3">
+                      <span class="material-symbols-outlined">shield_person</span>
+                      <div class="text-left">
+                        <p class="font-medium text-sm">${key}</p>
+                        <p class="text-xs opacity-70">14 Active Users</p>
+                      </div>
+                    </div>
+                    <span class="material-symbols-outlined text-[18px]">chevron_right</span>
+                  </button>
+                `).join("")
+              }
               <button
                 class="w-full flex items-center justify-between p-3 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300">
                 <div class="flex items-center gap-3"><span

@@ -14,29 +14,38 @@ export default class Retail_Management_LayoutController extends Controller {
     
   }
 
-  initialize() {
-    window.Current = Helpers.Current
-    this.initBindings()
-  }
-
   connect() {
-    this.initLayout()
+    window.Current = Helpers.Current
+    window.fetchJson = Helpers.fetchJson
+    // 1. Pull all data immediately from Helpers
+    const groups = Helpers.companyGroups();
+    const currentRetail = Helpers.Current.retail;
+
+    // 2. Validate data existence BEFORE rendering
+    if (currentRetail && groups && groups.length > 0) {
+      // Bind data to the instance so templates can see it
+      this.retail = currentRetail;
+      this.companyGroups = groups;
+      
+      this.render();
+    } else {
+      // Fallback: If data is missing, handle the "Unauthorized" or "Loading" state
+      this.handleMissingData();
+    }
   }
 
-  initBindings() {
-    this.companyGroups = Helpers.companyGroups()
-  }
-
-  initLayout() {
-    Helpers.poll(() => {
-      this.retail = Current.retail;
-      if (this.retail) {
-        // Initial render once data is ready
-        this.render();
-        return true; 
-      }
-      return false;
-    });
+  handleMissingData() {
+    // If we reach here, cookies/helpers failed to provide data.
+    // We can redirect to sign_in or show a simple error.
+    console.warn("Data binding failed: Check cookies or URL structure.");
+    this.element.innerHTML = `
+      <div class="flex items-center justify-center h-screen">
+        <p class="text-gray-500">Initializing workspace...</p>
+      </div>
+    `;
+    
+    // Optional: Retry once after a tiny delay if you suspect a race condition
+    setTimeout(() => this.connect(), 100);
   }
 
   // --- The Centralized Render Method ---
@@ -62,6 +71,9 @@ export default class Retail_Management_LayoutController extends Controller {
   }
 
   companyGroupDropdownHTML() {
+    // If retail isn't loaded yet, return an empty string or a loader
+    if (!this.retail) return `<div class="p-4">Loading...</div>`;
+
     return `
       <div class="flex flex-col gap-y-6 w-64 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md shadow-lg z-50 p-2">
         ${this.companyGroups.map((companyGroup) => `
@@ -75,6 +87,9 @@ export default class Retail_Management_LayoutController extends Controller {
   }
   
   layoutHTML() {
+    // If retail isn't loaded yet, return an empty string or a loader
+    if (!this.retail) return `<div class="p-4">Loading...</div>`;
+    
     return `
       <div class="font-display bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200">
         <div class="flex h-screen">
