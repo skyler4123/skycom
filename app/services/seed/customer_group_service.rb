@@ -5,26 +5,23 @@ class Seed::CustomerGroupService
   def self.create(
     company_group:,
     company: nil,
-    name: "#{Faker::Commerce.department} Customers",
-    description: "A group for #{Faker::Marketing.buzzwords} customers.",
-    code: nil,
-    lifecycle_status: nil,
-    workflow_status: nil,
-    business_type: nil,
+    name: Faker::Name.name,
+    description: Faker::Lorem.sentence(word_count: 10),
+    code: Faker::Code.npi,
+    lifecycle_status: CustomerGroup.lifecycle_statuses.keys.sample,
+    workflow_status: CustomerGroup.workflow_statuses.keys.sample,
+    business_type: CustomerGroup.business_types.keys.sample,
     discarded_at: nil
   )
-    should_discard = rand(10) == 0
-    discarded_at ||= should_discard ? Time.zone.now - rand(1..180).days : nil
-
     CustomerGroup.create!(
       company_group: company_group,
       company: company,
       name: name,
       description: description,
-      code: code || "CG-#{company_group.id}-#{SecureRandom.hex(3).upcase}",
-      lifecycle_status: lifecycle_status || CustomerGroup.lifecycle_statuses.keys.sample,
-      workflow_status: workflow_status || CustomerGroup.workflow_statuses.keys.sample,
-      business_type: business_type || CustomerGroup.business_types.keys.sample,
+      code: code,
+      lifecycle_status: lifecycle_status,
+      workflow_status: workflow_status,
+      business_type: business_type,
       discarded_at: discarded_at
     )
   end

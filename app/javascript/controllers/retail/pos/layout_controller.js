@@ -1,6 +1,11 @@
-import ApplicationController from "controllers/application_controller"
-export default class Retail_Pos_LayoutController extends ApplicationController {
+import { Controller } from "@hotwired/stimulus"
 
+export default class Retail_Pos_LayoutController extends Controller {
+
+  initialize() {
+    this.initLayout()
+  }
+    
   initLayout() {
     // set body class and innerHTML
     this.element.className = 'min-h-screen flex flex-col'

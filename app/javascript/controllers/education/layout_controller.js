@@ -1,7 +1,7 @@
-import ApplicationController from "controllers/application_controller"
+import { Controller } from "@hotwired/stimulus"
 import * as Helpers from "controllers/helpers"
 
-export default class Education_LayoutController extends ApplicationController {
+export default class Education_LayoutController extends Controller {
   static targets = ["profileDropdown"]
   static values = {
     pagination: { type: Object, default: {} },
@@ -10,6 +10,11 @@ export default class Education_LayoutController extends ApplicationController {
     isOpenProfileDropdown: { type: Boolean, default: false },
     openHeaderSubmenuName: { type: String, default: "" },
     
+  }
+
+  initialize() {
+    this.initBindings()
+    this.initLayout()
   }
 
   initBindings() {

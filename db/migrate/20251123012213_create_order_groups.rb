@@ -8,12 +8,13 @@ class CreateOrderGroups < ActiveRecord::Migration[8.0]
       t.string :name
       t.string :description
       t.string :code
-      t.integer :currency
+      t.integer :currency_code
       t.integer :duration
       t.integer :lifecycle_status
       t.integer :workflow_status
       t.integer :business_type
       t.datetime :discarded_at
+      t.jsonb :metadata, default: {}
 
       t.timestamps
     end

@@ -1,5 +1,3 @@
-# Provides instance methods for attaching and managing Tags on a resource
-# that uses a polymorphic TagAppointment association (AWS-style tagging).
 module RoleConcern
   extend ActiveSupport::Concern
 

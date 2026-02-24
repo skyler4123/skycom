@@ -1,12 +1,14 @@
 class Task < ApplicationRecord
+  include TagConcern
+
   # --- Associations ---
   belongs_to :company_group
   belongs_to :company, optional: true
   belongs_to :task_group
 
   # --- Enums ---
-  enum :lifecycle_status, LIFECYCLE_STATUS
-  enum :workflow_status, WORKFLOW_STATUS
+  enum :lifecycle_status, LIFECYCLE_STATUS, prefix: true
+  enum :workflow_status, WORKFLOW_STATUS, prefix: true
 
   enum :business_type, {
     general: 0,
@@ -14,7 +16,7 @@ class Task < ApplicationRecord
     administrative: 2
   }
 
-  enum :currency, {
+  enum :currency_code, {
     usd: 0,
     eur: 1,
     gbp: 2

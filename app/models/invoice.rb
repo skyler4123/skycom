@@ -1,12 +1,16 @@
 class Invoice < ApplicationRecord
+  include TagConcern
+
   # --- Associations ---
+  belongs_to :company_group
+  belongs_to :company, optional: true
   belongs_to :order
 
   has_many :payments, dependent: :destroy
 
   # --- Enums ---
-  enum :lifecycle_status, LIFECYCLE_STATUS
-  enum :workflow_status, WORKFLOW_STATUS
+  enum :lifecycle_status, LIFECYCLE_STATUS, prefix: true
+  enum :workflow_status, WORKFLOW_STATUS, prefix: true
 
   enum :business_type, {
     sales: 0,
@@ -14,7 +18,7 @@ class Invoice < ApplicationRecord
     subscription: 2
   }
 
-  enum :currency, {
+  enum :currency_code, {
     usd: 0,
     eur: 1,
     gbp: 2
@@ -22,7 +26,7 @@ class Invoice < ApplicationRecord
 
   # --- Validations ---
   validates :name, presence: true, length: { maximum: 255 }
-  validates :currency, presence: true
+  validates :currency_code, presence: true
   validates :number, presence: true, uniqueness: true
   validates :total, presence: true, numericality: { greater_than_or_equal_to: 0 }
 

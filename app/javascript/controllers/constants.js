@@ -26,7 +26,7 @@ export const TIMEZONES = {
   "+12": 12
 }
 
-export const CURRENCIES = {
+export const CURRENCIE_CODES = {
   "usd": "United States Dollar - USD",
   "vnd": "Vietnamese Dong - VND",
 }
@@ -36,7 +36,7 @@ export const SUBSCRIPTION_LIMIT = {
   "max_of_employees": 5
 }
 
-export const COUNTRIES = {
+export const COUNTRIE_CODES = {
   "us": "United States",
   "vn": "Vietnam"
 }

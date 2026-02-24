@@ -14,6 +14,7 @@ class CreateServices < ActiveRecord::Migration[8.0]
       t.datetime :start_at
       t.integer :business_type
       t.datetime :discarded_at
+      t.jsonb :metadata, default: {}
 
       t.timestamps
     end

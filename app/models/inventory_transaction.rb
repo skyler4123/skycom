@@ -1,4 +1,6 @@
 class InventoryTransaction < ApplicationRecord
+  include TagConcern
+
   belongs_to :company_group
   belongs_to :company, optional: true
   belongs_to :appoint_from, polymorphic: true, optional: true

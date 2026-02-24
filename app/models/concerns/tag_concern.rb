@@ -4,6 +4,9 @@ module TagConcern
   extend ActiveSupport::Concern
 
   included do
+    has_many :tag_appointments, as: :appoint_to, dependent: :destroy
+    has_many :tags, through: :tag_appointments
+
     # Assigns a new tag or updates the value of an existing tag key on the resource.
     # This method is transactional to ensure atomic creation/update.
     #

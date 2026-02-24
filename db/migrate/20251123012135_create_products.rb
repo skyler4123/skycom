@@ -9,7 +9,7 @@ class CreateProducts < ActiveRecord::Migration[8.0]
       t.string :name
       t.string :description
       t.decimal :price
-      t.integer :currency
+      t.integer :currency_code
       t.string :code
       t.string :sku
       t.string :barcode
@@ -23,6 +23,7 @@ class CreateProducts < ActiveRecord::Migration[8.0]
       t.integer :workflow_status
       t.integer :business_type
       t.datetime :discarded_at
+      t.jsonb :metadata, default: {}
 
       t.timestamps
     end

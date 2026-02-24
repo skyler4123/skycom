@@ -1,4 +1,6 @@
 class FacilityGroup < ApplicationRecord
+  include TagConcern
+
   # --- Associations ---
   belongs_to :company_group
   belongs_to :company, optional: true
@@ -6,8 +8,8 @@ class FacilityGroup < ApplicationRecord
   has_many :facilities, through: :facility_group_appointments, source: :appoint_to, source_type: "Facility"
 
   # --- Enums ---
-  enum :lifecycle_status, LIFECYCLE_STATUS
-  enum :workflow_status, WORKFLOW_STATUS
+  enum :lifecycle_status, LIFECYCLE_STATUS, prefix: true
+  enum :workflow_status, WORKFLOW_STATUS, prefix: true
 
   enum :business_type, {
     building: 0,

@@ -1,10 +1,12 @@
 class Brand < ApplicationRecord
+    include TagConcern
+
   # --- Associations ---
   has_many :products, dependent: :nullify
 
   # --- Enums ---
-  enum :lifecycle_status, LIFECYCLE_STATUS
-  enum :workflow_status, WORKFLOW_STATUS
+  enum :lifecycle_status, LIFECYCLE_STATUS, prefix: true
+  enum :workflow_status, WORKFLOW_STATUS, prefix: true
 
   # Defines the general business category of the brand.
   enum :business_type, {

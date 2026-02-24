@@ -1,5 +1,20 @@
 Rails.application.routes.draw do
-  resources :subscription_group_appointments
+  resources :demo, only: [:index] do
+    collection do
+      get :calendar_events
+    end
+  end
+  resources :system_subscriptions
+  resources :system_subscription_groups
+  resources :system_subscription_plans
+  resources :subscription_plans
+  resources :period_prices
+  resources :booking_resources
+  resources :booking_periods
+  resources :attendance_months
+  resources :attendance_days
+  resources :attendance_logs
+  resources :shifts
   resources :subscription_groups
   resources :statistics
 
@@ -29,6 +44,7 @@ Rails.application.routes.draw do
         resources :branches
         resources :departments
         resources :products
+        resources :services
         resources :orders
         resources :bookings
         resources :payments
@@ -49,6 +65,7 @@ Rails.application.routes.draw do
         resources :settings
         resources :administrators
         resources :subscriptions
+        resources :permissions
       end
 
       namespace :pos do
@@ -109,7 +126,6 @@ Rails.application.routes.draw do
   resources :setting_appointments
   resources :setting_group_appointments
   resources :setting_groups
-  resources :subscription_appointments
   resources :subscriptions
   resources :event_appointments
   resources :event_group_appointments

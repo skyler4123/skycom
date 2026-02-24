@@ -1,4 +1,7 @@
 class ServiceGroup < ApplicationRecord
+  include TagConcern
+  include OrderConcern
+
   # --- Associations ---
   belongs_to :company_group
   belongs_to :company, optional: true
@@ -6,8 +9,8 @@ class ServiceGroup < ApplicationRecord
   has_many :services, through: :service_group_appointments, source: :appoint_to, source_type: "Service"
 
   # --- Enums ---
-  enum :lifecycle_status, LIFECYCLE_STATUS
-  enum :workflow_status, WORKFLOW_STATUS
+  enum :lifecycle_status, LIFECYCLE_STATUS, prefix: true
+  enum :workflow_status, WORKFLOW_STATUS, prefix: true
 
   enum :business_type, {
     consulting: 0,

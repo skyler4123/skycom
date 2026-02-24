@@ -65,6 +65,6 @@ class InvoicesController < ApplicationController
 
     # Only allow a list of trusted parameters through.
     def invoice_params
-      params.expect(invoice: [ :order_id, :name, :description, :code, :currency, :duration, :number, :total, :due_date, :status, :business_type, :discarded_at ])
+      params.expect(invoice: [ :order_id, :name, :description, :code, :currency_code, :duration, :number, :total, :due_date, :status, :business_type, :discarded_at ])
     end
 end

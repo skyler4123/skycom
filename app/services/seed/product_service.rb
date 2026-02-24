@@ -17,6 +17,8 @@ class Seed::ProductService
   )
     should_discard = rand(10) == 0
     discarded_at ||= should_discard ? Time.zone.now - rand(1..180).days : nil
+    price ||= Faker::Commerce.price(range: 50..2000.0)
+    business_type ||= Product.business_types.keys.sample
 
     product = Product.create!(
       company_group: company_group,
@@ -24,11 +26,10 @@ class Seed::ProductService
       brand: brand,
       name: name,
       description: description,
-      price: price || Faker::Commerce.price(range: 50..2000.0),
-      # status: status || Product.statuses.keys.sample,
+      price: price,
       lifecycle_status: lifecycle_status,
       workflow_status: workflow_status,
-      business_type: business_type || Product.business_types.keys.sample,
+      business_type: business_type,
       discarded_at: discarded_at
     )
     Seed::AttachmentService.attach(record: product, relation: :image_attachments, number: 2)

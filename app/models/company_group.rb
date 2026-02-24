@@ -1,4 +1,13 @@
 class CompanyGroup < ApplicationRecord
+  include AddressConcern
+  include CompanyGroup::RetailConcern
+  include CompanyGroup::EducationConcern
+  include CompanyGroup::HospitalConcern
+  include CompanyGroup::RestaurantConcern
+  include SystemSubscription::BuyerConcern
+  include Subscription::SellerConcern
+  include CompanyGroup::PermissionConcern
+
   belongs_to :user
   has_many :companies, dependent: :destroy
 
@@ -24,21 +33,20 @@ class CompanyGroup < ApplicationRecord
   has_many :notification_groups, dependent: :destroy
   has_many :payment_methods, through: :payment_method_appointments
   has_many :statistics, as: :owner
+  has_many :categories, dependent: :destroy
+  has_many :subscription_plans, dependent: :destroy
 
   # --- Enums ---
-  enum :lifecycle_status, LIFECYCLE_STATUS
-  enum :workflow_status, WORKFLOW_STATUS
-
+  enum :country_code, COUNTRIE_CODES, prefix: true
+  enum :business_type, BUSINESS_TYPES, prefix: true
+  enum :lifecycle_status, LIFECYCLE_STATUS, prefix: true
+  enum :workflow_status, WORKFLOW_STATUS, prefix: true
+  enum :timezone, TIMEZONES, prefix: true
+  enum :currency_code, CURRENCIE_CODES, prefix: true
   enum :ownership_type, {
     publicly_traded: 0,
     privately_held: 1
   }
-
-  enum :timezone, TIMEZONES, prefix: true
-  enum :currency, CURRENCIES, prefix: true
-
-  # Grouped business types with 1000-unit gaps for future expansion
-  enum :business_type, BUSINESS_TYPES, prefix: true
 
   # Enum for the new fiscal_year_end_month column (1=January, 12=December)
   enum :fiscal_year_end_month, {
@@ -65,24 +73,17 @@ class CompanyGroup < ApplicationRecord
   validates :phone_number, length: { maximum: 20 }, allow_blank: true
   validates :website, format: URI.regexp(%w[http https]), allow_blank: true
 
-  # Validation for address fields
-  validates :country, presence: true
   # validates :city, presence: true
 
   # Validation for operational fields
   # validates :fiscal_year_end_month, presence: true, numericality: { in: 1..12 }
-
-  include CompanyGroup::RetailConcern
-  include CompanyGroup::EducationConcern
-  include CompanyGroup::HospitalConcern
-  include CompanyGroup::RestaurantConcern
 
   def create_first_cloned_company
     return if companies.size > 1
     companies.create(
       name: name,
       phone_number: phone_number,
-      currency: currency,
+      currency_code: currency_code,
       country: country,
       business_type: business_type,
       timezone: timezone

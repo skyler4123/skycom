@@ -1,4 +1,7 @@
 class Service < ApplicationRecord
+  include TagConcern
+  include OrderConcern
+
   belongs_to :company_group
   belongs_to :company, optional: true
 
@@ -21,8 +24,8 @@ class Service < ApplicationRecord
   has_many :employees, through: :service_appointments, source: :appoint_to, source_type: "Employee"
 
   # --- Enums ---
-  enum :lifecycle_status, LIFECYCLE_STATUS
-  enum :workflow_status, WORKFLOW_STATUS
+  enum :lifecycle_status, LIFECYCLE_STATUS, prefix: true
+  enum :workflow_status, WORKFLOW_STATUS, prefix: true
 
   enum :business_type, {
     b2b: 0,

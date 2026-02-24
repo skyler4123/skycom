@@ -1,6 +1,130 @@
+import * as Helpers from "controllers/helpers"
 import Retail_Management_LayoutController from "controllers/retail/management/layout_controller"
 
 export default class Retail_Management_Subscriptions_IndexController extends Retail_Management_LayoutController {
+
+  connect() {
+    super.connect()
+    this.load()
+  }
+
+  async load() {
+    const data = await Helpers.fetchJson()
+    const subscriptions = data.subscriptions || []
+    this.render(subscriptions)
+  }
+
+  render(items) {
+    const tbody = this.element.querySelector("tbody")
+    if (!tbody) return
+
+    if (!items || items.length === 0) {
+      tbody.innerHTML = `
+        <tr>
+          <td colspan="6" class="p-8 text-center text-gray-500 dark:text-gray-400">
+            No subscriptions found
+          </td>
+        </tr>
+      `
+      return
+    }
+
+    tbody.innerHTML = items.map(item => this.rowHTML(item)).join("")
+  }
+
+  rowHTML(item) {
+    const entityType = item.seller_type || item.buyer_type || "Unknown"
+    const entityName = item.name || "Unnamed"
+    const entityDesc = item.description || entityType
+
+    return `
+      <tr class="hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors group">
+        <td class="p-4">
+          <div class="flex items-center gap-3">
+            ${this.entityIconHTML(entityType)}
+            <div class="flex flex-col">
+              <span class="text-sm font-medium text-gray-900 dark:text-white">${entityName}</span>
+              <span class="text-xs text-gray-500 dark:text-gray-400">${entityDesc}</span>
+            </div>
+          </div>
+        </td>
+        <td class="p-4 text-sm text-gray-700 dark:text-gray-300">
+          ${item.subscription_plan_id ? `Plan #${item.subscription_plan_id.slice(0,8)}` : "—"}
+        </td>
+        <td class="p-4 text-sm text-gray-500 dark:text-gray-400">
+          ${item.created_at ? new Date(item.created_at).toLocaleDateString() : "—"}
+        </td>
+        <td class="p-4 text-sm text-gray-500 dark:text-gray-400">—</td>
+        <td class="p-4">
+          ${this.statusHTML(item.lifecycle_status, item.workflow_status)}
+        </td>
+        <td class="p-4 text-right">
+          <div class="flex items-center justify-end gap-2">
+            <button
+              class="p-1.5 text-gray-500 hover:text-blue-600 hover:bg-blue-600/10 rounded-lg transition-colors"
+              title="View Details">
+              <span class="material-symbols-outlined text-[20px]">visibility</span>
+            </button>
+            <button
+              class="p-1.5 text-gray-500 hover:text-blue-600 hover:bg-blue-600/10 rounded-lg transition-colors"
+              title="Edit Subscription">
+              <span class="material-symbols-outlined text-[20px]">edit</span>
+            </button>
+            <button
+              class="p-1.5 text-gray-500 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
+              title="Cancel Subscription">
+              <span class="material-symbols-outlined text-[20px]">cancel</span>
+            </button>
+          </div>
+        </td>
+      </tr>
+    `
+  }
+
+  entityIconHTML(type) {
+    const icons = {
+      "CompanyGroup": "business",
+      "Customer":     "person",
+      "Company":      "domain",
+      "Branch":       "store"
+    }
+    const icon = icons[type] || "business"
+    const color = type.includes("Company") ? "purple" : "blue"
+
+    return `
+      <div class="bg-${color}-100 dark:bg-${color}-900/30 text-${color}-600 dark:text-${color}-400 p-2 rounded-lg">
+        <span class="material-symbols-outlined">${icon}</span>
+      </div>
+    `
+  }
+
+  statusHTML(lifecycle, workflow) {
+    const status = lifecycle || workflow || "unknown"
+    const styles = {
+      "active":    "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400 border-green-200 dark:border-green-800",
+      "draft":     "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400 border-yellow-200 dark:border-yellow-800",
+      "cancelled": "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400 border-red-200 dark:border-red-800",
+      "expired":   "bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300 border-gray-200 dark:border-gray-600",
+      "unknown":   "bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300 border-gray-200 dark:border-gray-600"
+    }
+    const dots = {
+      "active":    "bg-green-500",
+      "draft":     "bg-yellow-500",
+      "cancelled": "bg-red-500",
+      "expired":   "bg-gray-500",
+      "unknown":   "bg-gray-500"
+    }
+
+    const style = styles[status.toLowerCase()] || styles["unknown"]
+    const dot   = dots[status.toLowerCase()]   || dots["unknown"]
+
+    return `
+      <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium border ${style}">
+        <div class="w-1.5 h-1.5 rounded-full ${dot}"></div>
+        ${status.charAt(0).toUpperCase() + status.slice(1)}
+      </span>
+    `
+  }
 
   contentHTML() {
     return `
@@ -82,210 +206,11 @@ export default class Retail_Management_Subscriptions_IndexController extends Ret
                 </tr>
               </thead>
               <tbody class="divide-y divide-gray-200 dark:divide-gray-800">
-                <tr class="hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors group">
-                  <td class="p-4">
-                    <div class="flex items-center gap-3">
-                      <div class="bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 p-2 rounded-lg">
-                        <span class="material-symbols-outlined">business</span>
-                      </div>
-                      <div class="flex flex-col">
-                        <span class="text-sm font-medium text-gray-900 dark:text-white">Skycom Retail HQ</span>
-                        <span class="text-xs text-gray-500">Company</span>
-                      </div>
-                    </div>
-                  </td>
-                  <td class="p-4 text-sm text-gray-700 dark:text-gray-300">Enterprise Gold</td>
-                  <td class="p-4 text-sm text-gray-500 dark:text-gray-400">Jan 01, 2023</td>
-                  <td class="p-4 text-sm text-gray-500 dark:text-gray-400">Dec 31, 2023</td>
-                  <td class="p-4">
-                    <span
-                      class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400 border border-green-200 dark:border-green-800">
-                      <div class="w-1.5 h-1.5 rounded-full bg-green-500"></div> Active
-                    </span>
-                  </td>
-                  <td class="p-4 text-right">
-                    <div class="flex items-center justify-end gap-2">
-                      <button
-                        class="p-1.5 text-gray-500 hover:text-blue-600 hover:bg-blue-600/10 rounded-lg transition-colors"
-                        title="View Details">
-                        <span class="material-symbols-outlined text-[20px]">visibility</span>
-                      </button>
-                      <button
-                        class="p-1.5 text-gray-500 hover:text-blue-600 hover:bg-blue-600/10 rounded-lg transition-colors"
-                        title="Edit Subscription">
-                        <span class="material-symbols-outlined text-[20px]">edit</span>
-                      </button>
-                      <button
-                        class="p-1.5 text-gray-500 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
-                        title="Cancel Subscription">
-                        <span class="material-symbols-outlined text-[20px]">cancel</span>
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-                <tr class="hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors group">
-                  <td class="p-4">
-                    <div class="flex items-center gap-3">
-                      <div
-                        class="bg-purple-100 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400 p-2 rounded-lg">
-                        <span class="material-symbols-outlined">store</span>
-                      </div>
-                      <div class="flex flex-col">
-                        <span class="text-sm font-medium text-gray-900 dark:text-white">Downtown Outlet</span>
-                        <span class="text-xs text-gray-500">Branch (Skycom Retail)</span>
-                      </div>
-                    </div>
-                  </td>
-                  <td class="p-4 text-sm text-gray-700 dark:text-gray-300">Retail Starter</td>
-                  <td class="p-4 text-sm text-gray-500 dark:text-gray-400">Oct 01, 2023</td>
-                  <td class="p-4 text-sm text-gray-500 dark:text-gray-400">Nov 01, 2023</td>
-                  <td class="p-4">
-                    <span
-                      class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400 border border-blue-200 dark:border-blue-800">
-                      <div class="w-1.5 h-1.5 rounded-full bg-blue-500"></div> Trial
-                    </span>
-                  </td>
-                  <td class="p-4 text-right">
-                    <div class="flex items-center justify-end gap-2">
-                      <button
-                        class="p-1.5 text-gray-500 hover:text-blue-600 hover:bg-blue-600/10 rounded-lg transition-colors"
-                        title="View Details">
-                        <span class="material-symbols-outlined text-[20px]">visibility</span>
-                      </button>
-                      <button
-                        class="p-1.5 text-gray-500 hover:text-blue-600 hover:bg-blue-600/10 rounded-lg transition-colors"
-                        title="Edit Subscription">
-                        <span class="material-symbols-outlined text-[20px]">edit</span>
-                      </button>
-                      <button
-                        class="p-1.5 text-gray-500 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
-                        title="Cancel Subscription">
-                        <span class="material-symbols-outlined text-[20px]">cancel</span>
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-                <tr class="hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors group">
-                  <td class="p-4">
-                    <div class="flex items-center gap-3">
-                      <div class="bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 p-2 rounded-lg">
-                        <span class="material-symbols-outlined">business</span>
-                      </div>
-                      <div class="flex flex-col">
-                        <span class="text-sm font-medium text-gray-900 dark:text-white">Northwest Educare</span>
-                        <span class="text-xs text-gray-500">Company</span>
-                      </div>
-                    </div>
-                  </td>
-                  <td class="p-4 text-sm text-gray-700 dark:text-gray-300">Education Plus</td>
-                  <td class="p-4 text-sm text-gray-500 dark:text-gray-400">Sep 15, 2022</td>
-                  <td class="p-4 text-sm text-gray-500 dark:text-gray-400">Sep 15, 2023</td>
-                  <td class="p-4">
-                    <span
-                      class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400 border border-red-200 dark:border-red-800">
-                      <div class="w-1.5 h-1.5 rounded-full bg-red-500"></div> Expired
-                    </span>
-                  </td>
-                  <td class="p-4 text-right">
-                    <div class="flex items-center justify-end gap-2">
-                      <button
-                        class="p-1.5 text-gray-500 hover:text-blue-600 hover:bg-blue-600/10 rounded-lg transition-colors"
-                        title="View Details">
-                        <span class="material-symbols-outlined text-[20px]">visibility</span>
-                      </button>
-                      <button
-                        class="p-1.5 text-gray-500 hover:text-blue-600 hover:bg-blue-600/10 rounded-lg transition-colors"
-                        title="Renew Subscription">
-                        <span class="material-symbols-outlined text-[20px]">autorenew</span>
-                      </button>
-                      <button
-                        class="p-1.5 text-gray-500 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
-                        title="Remove">
-                        <span class="material-symbols-outlined text-[20px]">delete</span>
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-                <tr class="hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors group">
-                  <td class="p-4">
-                    <div class="flex items-center gap-3">
-                      <div
-                        class="bg-purple-100 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400 p-2 rounded-lg">
-                        <span class="material-symbols-outlined">store</span>
-                      </div>
-                      <div class="flex flex-col">
-                        <span class="text-sm font-medium text-gray-900 dark:text-white">City Center Spa</span>
-                        <span class="text-xs text-gray-500">Branch (Urban Wellness)</span>
-                      </div>
-                    </div>
-                  </td>
-                  <td class="p-4 text-sm text-gray-700 dark:text-gray-300">Service Pro</td>
-                  <td class="p-4 text-sm text-gray-500 dark:text-gray-400">Mar 10, 2023</td>
-                  <td class="p-4 text-sm text-gray-500 dark:text-gray-400">Mar 09, 2024</td>
-                  <td class="p-4">
-                    <span
-                      class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400 border border-green-200 dark:border-green-800">
-                      <div class="w-1.5 h-1.5 rounded-full bg-green-500"></div> Active
-                    </span>
-                  </td>
-                  <td class="p-4 text-right">
-                    <div class="flex items-center justify-end gap-2">
-                      <button
-                        class="p-1.5 text-gray-500 hover:text-blue-600 hover:bg-blue-600/10 rounded-lg transition-colors"
-                        title="View Details">
-                        <span class="material-symbols-outlined text-[20px]">visibility</span>
-                      </button>
-                      <button
-                        class="p-1.5 text-gray-500 hover:text-blue-600 hover:bg-blue-600/10 rounded-lg transition-colors"
-                        title="Edit Subscription">
-                        <span class="material-symbols-outlined text-[20px]">edit</span>
-                      </button>
-                      <button
-                        class="p-1.5 text-gray-500 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
-                        title="Cancel Subscription">
-                        <span class="material-symbols-outlined text-[20px]">cancel</span>
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-                <tr class="hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors group">
-                  <td class="p-4">
-                    <div class="flex items-center gap-3">
-                      <div class="bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 p-2 rounded-lg">
-                        <span class="material-symbols-outlined">business</span>
-                      </div>
-                      <div class="flex flex-col">
-                        <span class="text-sm font-medium text-gray-900 dark:text-white">Metro Hospital</span>
-                        <span class="text-xs text-gray-500">Company</span>
-                      </div>
-                    </div>
-                  </td>
-                  <td class="p-4 text-sm text-gray-700 dark:text-gray-300">Health Connect</td>
-                  <td class="p-4 text-sm text-gray-500 dark:text-gray-400">Aug 01, 2023</td>
-                  <td class="p-4 text-sm text-gray-500 dark:text-gray-400">Jul 31, 2024</td>
-                  <td class="p-4">
-                    <span
-                      class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400 border border-green-200 dark:border-green-800">
-                      <div class="w-1.5 h-1.5 rounded-full bg-green-500"></div> Active
-                    </span>
-                  </td>
-                  <td class="p-4 text-right">
-                    <div class="flex items-center justify-end gap-2">
-                      <button
-                        class="p-1.5 text-gray-500 hover:text-blue-600 hover:bg-blue-600/10 rounded-lg transition-colors"
-                        title="View Details">
-                        <span class="material-symbols-outlined text-[20px]">visibility</span>
-                      </button>
-                      <button
-                        class="p-1.5 text-gray-500 hover:text-blue-600 hover:bg-blue-600/10 rounded-lg transition-colors"
-                        title="Edit Subscription">
-                        <span class="material-symbols-outlined text-[20px]">edit</span>
-                      </button>
-                      <button
-                        class="p-1.5 text-gray-500 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
-                        title="Cancel Subscription">
-                        <span class="material-symbols-outlined text-[20px]">cancel</span>
-                      </button>
+                <tr>
+                  <td colspan="6" class="p-8 text-center text-gray-500 dark:text-gray-400">
+                    <div class="flex flex-col items-center justify-center gap-2">
+                      <span class="material-symbols-outlined animate-spin text-3xl">progress_activity</span>
+                      <span>Loading subscriptions...</span>
                     </div>
                   </td>
                 </tr>

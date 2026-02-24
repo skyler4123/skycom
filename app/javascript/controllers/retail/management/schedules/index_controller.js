@@ -1,3 +1,4 @@
+import * as Helpers from "controllers/helpers"
 import Retail_Management_LayoutController from "controllers/retail/management/layout_controller"
 
 export default class Retail_Management_Schedules_IndexController extends Retail_Management_LayoutController {
@@ -14,71 +15,7 @@ export default class Retail_Management_Schedules_IndexController extends Retail_
           </div>
         </div>
 
-        <div
-          class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 flex flex-col mb-8">
-          <div class="p-6 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between">
-            <h2 class="text-slate-900 dark:text-white text-xl font-bold leading-tight">Calendar Overview</h2>
-            <div class="flex gap-2">
-              <button class="p-2 text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg">
-                <span class="material-symbols-outlined">chevron_left</span>
-              </button>
-              <span class="flex items-center px-2 font-medium text-slate-700 dark:text-slate-300">Oct 23 - Oct 29,
-                2023</span>
-              <button class="p-2 text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg">
-                <span class="material-symbols-outlined">chevron_right</span>
-              </button>
-            </div>
-          </div>
-          <div class="p-6 overflow-x-auto">
-            <div class="min-w-[800px] grid grid-cols-7 gap-4">
-              <div class="text-center mb-2"><span class="block text-sm font-medium text-slate-500">Mon 23</span></div>
-              <div class="text-center mb-2"><span class="block text-sm font-medium text-slate-900 dark:text-white">Tue
-                  24</span></div>
-              <div class="text-center mb-2"><span class="block text-sm font-medium text-slate-500">Wed 25</span></div>
-              <div class="text-center mb-2"><span class="block text-sm font-medium text-slate-500">Thu 26</span></div>
-              <div class="text-center mb-2"><span class="block text-sm font-medium text-slate-500">Fri 27</span></div>
-              <div class="text-center mb-2"><span class="block text-sm font-medium text-slate-500">Sat 28</span></div>
-              <div class="text-center mb-2"><span class="block text-sm font-medium text-slate-500">Sun 29</span></div>
-
-              <div
-                class="h-48 bg-slate-50 dark:bg-slate-800/50 rounded-lg p-2 flex flex-col gap-2 border border-slate-100 dark:border-slate-700">
-              </div>
-              <div
-                class="h-48 bg-slate-50 dark:bg-slate-800/50 rounded-lg p-2 flex flex-col gap-2 border border-slate-100 dark:border-slate-700">
-                <div
-                  class="p-2 rounded bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200 text-xs font-medium border-l-4 border-blue-500 cursor-pointer hover:opacity-80">
-                  09:00 AM - Team Sync</div>
-                <div
-                  class="p-2 rounded bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200 text-xs font-medium border-l-4 border-green-500 cursor-pointer hover:opacity-80">
-                  02:00 PM - Interview</div>
-              </div>
-              <div
-                class="h-48 bg-slate-50 dark:bg-slate-800/50 rounded-lg p-2 flex flex-col gap-2 border border-slate-100 dark:border-slate-700">
-                <div
-                  class="p-2 rounded bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200 text-xs font-medium border-l-4 border-purple-500 cursor-pointer hover:opacity-80">
-                  11:00 AM - Client Mtg</div>
-              </div>
-              <div
-                class="h-48 bg-slate-50 dark:bg-slate-800/50 rounded-lg p-2 flex flex-col gap-2 border border-slate-100 dark:border-slate-700">
-                <div
-                  class="p-2 rounded bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-200 text-xs font-medium border-l-4 border-amber-500 cursor-pointer hover:opacity-80">
-                  01:00 PM - Lunch Shift</div>
-              </div>
-              <div
-                class="h-48 bg-slate-50 dark:bg-slate-800/50 rounded-lg p-2 flex flex-col gap-2 border border-slate-100 dark:border-slate-700">
-                <div
-                  class="p-2 rounded bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200 text-xs font-medium border-l-4 border-blue-500 cursor-pointer hover:opacity-80">
-                  09:30 AM - Review</div>
-              </div>
-              <div
-                class="h-48 bg-slate-50 dark:bg-slate-800/50 rounded-lg p-2 flex flex-col gap-2 border border-slate-100 dark:border-slate-700">
-              </div>
-              <div
-                class="h-48 bg-slate-50 dark:bg-slate-800/50 rounded-lg p-2 flex flex-col gap-2 border border-slate-100 dark:border-slate-700">
-              </div>
-            </div>
-          </div>
-        </div>
+        <div ${Helpers.calendarController()}></div>
 
         <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 flex flex-col">
           <div

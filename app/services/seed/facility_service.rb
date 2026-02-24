@@ -5,25 +5,22 @@
 class Seed::FacilityService
   def self.create(
     company_group:,
-    company:,
-    name: nil,
+    company: nil,
+    name: Faker::Commerce.department,
     description: Faker::Lorem.sentence(word_count: 10),
-    lifecycle_status: nil,
-    workflow_status: nil,
-    business_type: nil,
+    lifecycle_status: Facility.lifecycle_statuses.keys.sample,
+    workflow_status: Facility.workflow_statuses.keys.sample,
+    business_type: Facility.business_types.keys.sample,
     discarded_at: nil
   )
-    should_discard = rand(10) == 0
-    discarded_at ||= should_discard ? Time.zone.now - rand(1..180).days : nil
-
     Facility.create!(
       company_group: company_group,
       company: company,
-      name: name || "#{company.name} Facility",
+      name: name,
       description: description,
-      lifecycle_status: lifecycle_status || Facility.lifecycle_statuses.keys.sample,
-      workflow_status: workflow_status || Facility.workflow_statuses.keys.sample,
-      business_type: business_type || Facility.business_types.keys.sample,
+      lifecycle_status: lifecycle_status,
+      workflow_status: workflow_status,
+      business_type: business_type,
       discarded_at: discarded_at
     )
   end

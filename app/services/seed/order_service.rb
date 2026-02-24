@@ -3,70 +3,28 @@
 # Order model and simulates soft deletion for a portion of the records.
 
 class Seed::OrderService
-  # Configuration for the number of orders to create per company
-  ORDERS_PER_COMPANY = 5
-
-  def self.run
-    # Get enum keys once before the loop for efficiency.
-    lifecycle_statuses = Order.lifecycle_statuses.keys
-    workflow_statuses = Order.workflow_statuses.keys
-    business_types = Order.business_types.keys
-
-    puts "Seeding Order records..."
-
-    Company.all.each do |company|
-      # Get customers for the current company. Skip if there are none.
-      customer_ids = company.customer_ids
-      next if customer_ids.empty?
-
-      ORDERS_PER_COMPANY.times do |i|
-        # Randomly decide whether to mark the record as discarded
-        should_discard = rand(10) == 0 # 10% chance of being discarded
-
-        Order.create!(
-          company: company,
-          customer_id: customer_ids.sample,
-          name: "Order ##{company.id}-#{i + 1}",
-          description: Faker::Lorem.sentence(word_count: 15),
-          currency: Faker::Currency.code,
-          lifecycle_status: lifecycle_statuses.sample,
-          workflow_status: workflow_statuses.sample,
-          business_type: business_types.sample,
-          # Set a past timestamp for discarded_at if the record is to be soft-deleted
-          discarded_at: should_discard ? Time.zone.now - rand(1..180).days : nil
-        )
-      end
-    end
-
-    puts "Successfully created #{Order.count} Order records."
-  end
-
   def self.create(
-    company:,
+    company_group:,
+    company: nil,
     customer: nil,
-    name: nil,
+    name: Faker::Company.buzzword,
     description: Faker::Lorem.sentence(word_count: 15),
-    currency: Faker::Currency.code,
-    lifecycle_status: nil,
-    workflow_status: nil,
-    business_type: nil,
+    currency_code: Order.currency_codes.keys.sample,
+    lifecycle_status: Order.lifecycle_statuses.keys.sample,
+    workflow_status: Order.workflow_statuses.keys.sample,
+    business_type: Order.business_types.keys.sample,
     discarded_at: nil
   )
-    customer ||= company.customers.sample
-    raise "Cannot create an order: Company '#{company.name}' has no customers." if customer.nil?
-
-    should_discard = rand(10) == 0
-    discarded_at ||= should_discard ? Time.zone.now - rand(1..180).days : nil
-
     Order.create!(
+      company_group: company_group,
       company: company,
       customer: customer,
-      name: name || "Order for #{customer.name}",
+      name: name,
       description: description,
-      currency: currency,
-      lifecycle_status: lifecycle_status || Order.lifecycle_statuses.keys.sample,
-      workflow_status: workflow_status || Order.workflow_statuses.keys.sample,
-      business_type: business_type || Order.business_types.keys.sample,
+      currency_code: currency_code,
+      lifecycle_status: lifecycle_status,
+      workflow_status: workflow_status,
+      business_type: business_type,
       discarded_at: discarded_at
     )
   end

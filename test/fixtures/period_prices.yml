@@ -1,0 +1,13 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  period_priceable: one
+  period_priceable_type: Period priceable
+  period: one
+  price: one
+
+two:
+  period_priceable: two
+  period_priceable_type: Period priceable
+  period: two
+  price: two

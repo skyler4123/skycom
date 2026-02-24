@@ -1,40 +1,47 @@
 class Seed::SubscriptionService
-  def self.create(user: nil)
-    # 2. Determine Country and Plan
-    # Prefer user's country, otherwise random from supported list
-    country_code = user.country_code.presence || SUBSCRIPTION_PRICING_PLANS.keys.sample
-    country_code = "US" unless SUBSCRIPTION_PRICING_PLANS.key?(country_code) # Fallback
-
-    plan_name = Subscription.plan_names.keys.sample
-    price_info = SUBSCRIPTION_PRICING_PLANS[country_code][plan_name.to_sym]
-
-    # 3. Setup Price (Find or Create to avoid duplicates)
-    price = Price.find_or_create_by!(
-      amount: price_info[:amount],
-      currency: price_info[:currency]
-    )
-
-    # 4. Setup Period (Current Month)
-    # Using beginning_of_hour to ensure clean timestamps for finding existing records
-    start_at = Time.current.beginning_of_hour
-    end_at   = 1.month.from_now.beginning_of_hour
-
-    period = Period.find_or_create_by!(
-      start_at: start_at,
-      end_at: end_at,
-      time_zone: 0
-    )
-
-    # 5. Create Subscription
+  def self.create(
+    company_group:,
+    company: nil,
+    subscription_plan:,
+    subscription_group: nil,
+    price: nil,
+    period:,
+    seller:,
+    buyer:,
+    resource: nil,
+    processer: nil,
+    name: Faker::Company.name,
+    description: Faker::Lorem.sentence(word_count: 10),
+    country_code: Subscription.country_codes.keys.sample,
+    timezone: Subscription.timezones.keys.sample,
+    lifecycle_status: Subscription.lifecycle_statuses.keys.sample,
+    workflow_status: Subscription.workflow_statuses.keys.sample,
+    business_type: Subscription.business_types.keys.sample,
+    auto_renew: false,
+    discarded_at: nil,
+    metadata: {}
+  )
     Subscription.create!(
-      user: user,
+      company_group: company_group,
+      company: company,
+      subscription_plan: subscription_plan,
+      subscription_group: subscription_group,
+      price: price || subscription_plan.price,
       period: period,
-      price: price,
-      plan_name: plan_name,
-      lifecycle_status: :live,
-      workflow_status: :active,
+      seller: seller,
+      buyer: buyer,
+      resource: resource,
+      processer: processer,
+      name: name,
+      description: description,
       country_code: country_code,
-      auto_renew: [ true, false ].sample
+      timezone: timezone,
+      lifecycle_status: lifecycle_status,
+      workflow_status: workflow_status,
+      business_type: business_type,
+      auto_renew: auto_renew,
+      discarded_at: discarded_at,
+      metadata: metadata
     )
   end
 end

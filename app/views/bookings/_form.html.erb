@@ -12,8 +12,23 @@
   <% end %>
 
   <div class="my-5">
+    <%= form.label :company_group_id %>
+    <%= form.text_field :company_group_id, class: ["block shadow-sm rounded-md border px-3 py-2 mt-2 w-full", {"border-gray-400 focus:outline-blue-600": booking.errors[:company_group_id].none?, "border-red-400 focus:outline-red-600": booking.errors[:company_group_id].any?}] %>
+  </div>
+
+  <div class="my-5">
     <%= form.label :company_id %>
     <%= form.text_field :company_id, class: ["block shadow-sm rounded-md border px-3 py-2 mt-2 w-full", {"border-gray-400 focus:outline-blue-600": booking.errors[:company_id].none?, "border-red-400 focus:outline-red-600": booking.errors[:company_id].any?}] %>
+  </div>
+
+  <div class="my-5">
+    <%= form.label :booking_resource_id %>
+    <%= form.text_field :booking_resource_id, class: ["block shadow-sm rounded-md border px-3 py-2 mt-2 w-full", {"border-gray-400 focus:outline-blue-600": booking.errors[:booking_resource_id].none?, "border-red-400 focus:outline-red-600": booking.errors[:booking_resource_id].any?}] %>
+  </div>
+
+  <div class="my-5">
+    <%= form.label :price_id %>
+    <%= form.text_field :price_id, class: ["block shadow-sm rounded-md border px-3 py-2 mt-2 w-full", {"border-gray-400 focus:outline-blue-600": booking.errors[:price_id].none?, "border-red-400 focus:outline-red-600": booking.errors[:price_id].any?}] %>
   </div>
 
   <div class="my-5">
@@ -27,23 +42,38 @@
   </div>
 
   <div class="my-5">
+    <%= form.label :appoint_for_id %>
+    <%= form.text_field :appoint_for_id, class: ["block shadow-sm rounded-md border px-3 py-2 mt-2 w-full", {"border-gray-400 focus:outline-blue-600": booking.errors[:appoint_for_id].none?, "border-red-400 focus:outline-red-600": booking.errors[:appoint_for_id].any?}] %>
+  </div>
+
+  <div class="my-5">
+    <%= form.label :appoint_by_id %>
+    <%= form.text_field :appoint_by_id, class: ["block shadow-sm rounded-md border px-3 py-2 mt-2 w-full", {"border-gray-400 focus:outline-blue-600": booking.errors[:appoint_by_id].none?, "border-red-400 focus:outline-red-600": booking.errors[:appoint_by_id].any?}] %>
+  </div>
+
+  <div class="my-5">
     <%= form.label :name %>
     <%= form.text_field :name, class: ["block shadow-sm rounded-md border px-3 py-2 mt-2 w-full", {"border-gray-400 focus:outline-blue-600": booking.errors[:name].none?, "border-red-400 focus:outline-red-600": booking.errors[:name].any?}] %>
   </div>
 
   <div class="my-5">
     <%= form.label :description %>
-    <%= form.text_field :description, class: ["block shadow-sm rounded-md border px-3 py-2 mt-2 w-full", {"border-gray-400 focus:outline-blue-600": booking.errors[:description].none?, "border-red-400 focus:outline-red-600": booking.errors[:description].any?}] %>
+    <%= form.textarea :description, rows: 4, class: ["block shadow-sm rounded-md border px-3 py-2 mt-2 w-full", {"border-gray-400 focus:outline-blue-600": booking.errors[:description].none?, "border-red-400 focus:outline-red-600": booking.errors[:description].any?}] %>
   </div>
 
   <div class="my-5">
-    <%= form.label :code %>
-    <%= form.text_field :code, class: ["block shadow-sm rounded-md border px-3 py-2 mt-2 w-full", {"border-gray-400 focus:outline-blue-600": booking.errors[:code].none?, "border-red-400 focus:outline-red-600": booking.errors[:code].any?}] %>
+    <%= form.label :price_id %>
+    <%= form.text_field :price_id, class: ["block shadow-sm rounded-md border px-3 py-2 mt-2 w-full", {"border-gray-400 focus:outline-blue-600": booking.errors[:price_id].none?, "border-red-400 focus:outline-red-600": booking.errors[:price_id].any?}] %>
   </div>
 
   <div class="my-5">
-    <%= form.label :status %>
-    <%= form.number_field :status, class: ["block shadow-sm rounded-md border px-3 py-2 mt-2 w-full", {"border-gray-400 focus:outline-blue-600": booking.errors[:status].none?, "border-red-400 focus:outline-red-600": booking.errors[:status].any?}] %>
+    <%= form.label :lifecycle_status %>
+    <%= form.number_field :lifecycle_status, class: ["block shadow-sm rounded-md border px-3 py-2 mt-2 w-full", {"border-gray-400 focus:outline-blue-600": booking.errors[:lifecycle_status].none?, "border-red-400 focus:outline-red-600": booking.errors[:lifecycle_status].any?}] %>
+  </div>
+
+  <div class="my-5">
+    <%= form.label :workflow_status %>
+    <%= form.number_field :workflow_status, class: ["block shadow-sm rounded-md border px-3 py-2 mt-2 w-full", {"border-gray-400 focus:outline-blue-600": booking.errors[:workflow_status].none?, "border-red-400 focus:outline-red-600": booking.errors[:workflow_status].any?}] %>
   </div>
 
   <div class="my-5">

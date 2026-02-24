@@ -1,16 +1,16 @@
 class Seed::UserService
   def self.create(
     parent_user: nil,
-    email:,
+    email: Faker::Internet.unique.email,
     password: "Password@1234",
     password_confirmation: "Password@1234",
     verified: true,
     system_role: 0,
-    username: nil,
-    first_name: nil,
-    last_name: nil,
-    phone_number: nil,
-    country_code: nil,
+    username: Faker::Internet.unique.username(specifier: 5..8),
+    first_name: Faker::Name.first_name,
+    last_name: Faker::Name.last_name,
+    phone_number: Faker::PhoneNumber.phone_number,
+    country_code: User.country_codes.keys.sample,
     index: nil
   )
     email ||= "#{email}#{index}@example.com"

@@ -1,5 +1,5 @@
 class Retail::Pos::ApplicationController < Retail::ApplicationController
-  before_action :enable_single_session_access
+  # before_action :enable_single_session_access
   before_action :set_branch
 
   private

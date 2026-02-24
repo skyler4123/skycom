@@ -54,44 +54,39 @@ BUSINESS_TYPES = {
 }
 
 TIMEZONES = {
-  "-12": -12,
-  "-11": -11,
-  "-10": -10,
-  "-9":  -9,
-  "-8":  -8,
-  "-7":  -7,
-  "-6":  -6,
-  "-5":  -5,
-  "-4":  -4,
-  "-3":  -3,
-  "-2":  -2,
-  "-1":  -1,
-  "0":   0,
-  "+1":  1,
-  "+2":  2,
-  "+3":  3,
-  "+4":  4,
-  "+5":  5,
-  "+6":  6,
-  "+7":  7,
-  "+8":  8,
-  "+9":  9,
-  "+10": 10,
-  "+11": 11,
-  "+12": 12
+  minus_12: -12,
+  minus_11: -11,
+  minus_10: -10,
+  minus_9:  -9,
+  minus_8:  -8,
+  minus_7:  -7,
+  minus_6:  -6,
+  minus_5:  -5,
+  minus_4:  -4,
+  minus_3:  -3,
+  minus_2:  -2,
+  minus_1:  -1,
+  utc:      0,
+  plus_1:   1,
+  plus_2:   2,
+  plus_3:   3,
+  plus_4:   4,
+  plus_5:   5,
+  plus_6:   6,
+  plus_7:   7,
+  plus_8:   8,
+  plus_9:   9,
+  plus_10:  10,
+  plus_11:  11,
+  plus_12:  12
 }.freeze
 
-CURRENCIES = {
+CURRENCIE_CODES = {
   usd: 840,
   vnd: 704
 }
 
-SUBSCRIPTION_LIMITS = {
-  max_of_companies: 3,
-  max_of_employees: 5
-}
-
-COUNTRIES = {
+COUNTRIE_CODES = {
   us: 840,
   vn: 704
 }
@@ -115,18 +110,3 @@ WORKFLOW_STATUS = {
   refunded: 7,
   failed: 8
 }
-
-SUBSCRIPTION_PRICING_PLANS = {
-  "US" => {
-    free:       { amount: 0.00,   currency: :usd },
-    basic:      { amount: 5.00,   currency: :usd },
-    pro:        { amount: 29.99,  currency: :usd },
-    enterprise: { amount: 99.99,  currency: :usd }
-  },
-  "VN" => {
-    free:       { amount: 0,         currency: :vnd },
-    basic:      { amount: 250_000,   currency: :vnd },
-    pro:        { amount: 600_000,   currency: :vnd },
-    enterprise: { amount: 2_000_000, currency: :vnd }
-  }
-}.freeze

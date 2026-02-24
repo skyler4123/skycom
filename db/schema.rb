@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_12_26_231623) do
+ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pgcrypto"
@@ -78,7 +78,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_12_26_231623) do
     t.string "city", null: false
     t.string "state_or_province"
     t.string "postal_code"
-    t.string "country_code", limit: 2, null: false
+    t.integer "country_code"
     t.string "fingerprint", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
@@ -95,6 +95,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_12_26_231623) do
     t.integer "workflow_status"
     t.integer "business_type"
     t.datetime "discarded_at"
+    t.jsonb "metadata", default: {}
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["category_id"], name: "index_answers_on_category_id"
@@ -160,7 +161,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_12_26_231623) do
 
   create_table "article_groups", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.uuid "company_group_id", null: false
-    t.uuid "company_id", null: false
+    t.uuid "company_id"
     t.uuid "category_id"
     t.string "title"
     t.json "content"
@@ -171,6 +172,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_12_26_231623) do
     t.integer "workflow_status"
     t.integer "business_type"
     t.datetime "discarded_at"
+    t.jsonb "metadata", default: {}
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["category_id"], name: "index_article_groups_on_category_id"
@@ -182,7 +184,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_12_26_231623) do
   create_table "articles", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.uuid "article_group_id", null: false
     t.uuid "company_group_id", null: false
-    t.uuid "company_id", null: false
+    t.uuid "company_id"
     t.uuid "category_id"
     t.string "title"
     t.json "content"
@@ -193,6 +195,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_12_26_231623) do
     t.integer "workflow_status"
     t.integer "business_type"
     t.datetime "discarded_at"
+    t.jsonb "metadata", default: {}
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["article_group_id"], name: "index_articles_on_article_group_id"
@@ -202,29 +205,147 @@ ActiveRecord::Schema[8.0].define(version: 2025_12_26_231623) do
     t.index ["discarded_at"], name: "index_articles_on_discarded_at"
   end
 
-  create_table "bookings", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+  create_table "attendance_days", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.uuid "company_group_id", null: false
     t.uuid "company_id"
-    t.string "appoint_from_type"
-    t.uuid "appoint_from_id"
-    t.string "appoint_to_type", null: false
-    t.uuid "appoint_to_id", null: false
-    t.uuid "category_id"
+    t.uuid "employee_id", null: false
+    t.string "logable_type", null: false
+    t.uuid "logable_id", null: false
+    t.uuid "period_id", null: false
+    t.date "attendance_date"
+    t.datetime "check_in"
+    t.datetime "check_out"
+    t.datetime "break_start"
+    t.datetime "break_end"
+    t.integer "total_seconds_present"
+    t.integer "total_seconds_break"
+    t.integer "total_seconds_worked"
+    t.integer "total_seconds_overtime"
+    t.integer "shift_id"
+    t.integer "attendance_status"
+    t.integer "recorded_method"
+    t.string "ip_address"
+    t.string "device_id"
+    t.decimal "location_lat"
+    t.decimal "location_lng"
+    t.text "notes"
+    t.string "approved_by_type", null: false
+    t.uuid "approved_by_id", null: false
+    t.datetime "approved_at"
+    t.string "edited_by_type", null: false
+    t.uuid "edited_by_id", null: false
+    t.datetime "edited_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["approved_by_type", "approved_by_id"], name: "index_attendance_days_on_approved_by"
+    t.index ["company_group_id"], name: "index_attendance_days_on_company_group_id"
+    t.index ["company_id"], name: "index_attendance_days_on_company_id"
+    t.index ["edited_by_type", "edited_by_id"], name: "index_attendance_days_on_edited_by"
+    t.index ["employee_id"], name: "index_attendance_days_on_employee_id"
+    t.index ["logable_type", "logable_id"], name: "index_attendance_days_on_logable"
+    t.index ["period_id"], name: "index_attendance_days_on_period_id"
+  end
+
+  create_table "attendance_logs", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "company_group_id", null: false
+    t.uuid "company_id"
+    t.uuid "customer_id", null: false
+    t.string "logable_type", null: false
+    t.uuid "logable_id", null: false
+    t.uuid "period_id", null: false
+    t.string "location"
+    t.string "id_address"
+    t.string "device_info"
+    t.text "notes"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["company_group_id"], name: "index_attendance_logs_on_company_group_id"
+    t.index ["company_id"], name: "index_attendance_logs_on_company_id"
+    t.index ["customer_id"], name: "index_attendance_logs_on_customer_id"
+    t.index ["logable_type", "logable_id"], name: "index_attendance_logs_on_logable"
+    t.index ["period_id"], name: "index_attendance_logs_on_period_id"
+  end
+
+  create_table "attendance_months", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "company_group_id", null: false
+    t.uuid "company_id"
+    t.uuid "customer_id", null: false
+    t.string "logable_type", null: false
+    t.uuid "logable_id", null: false
+    t.uuid "period_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["company_group_id"], name: "index_attendance_months_on_company_group_id"
+    t.index ["company_id"], name: "index_attendance_months_on_company_id"
+    t.index ["customer_id"], name: "index_attendance_months_on_customer_id"
+    t.index ["logable_type", "logable_id"], name: "index_attendance_months_on_logable"
+    t.index ["period_id"], name: "index_attendance_months_on_period_id"
+  end
+
+  create_table "booking_periods", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "booking_resource_id", null: false
+    t.uuid "period_id", null: false
+    t.integer "lifecycle_status"
+    t.integer "workflow_status"
+    t.integer "business_type"
+    t.jsonb "metadata", default: {}
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["booking_resource_id"], name: "index_booking_periods_on_booking_resource_id"
+    t.index ["period_id"], name: "index_booking_periods_on_period_id"
+  end
+
+  create_table "booking_resources", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "company_group_id", null: false
+    t.uuid "company_id"
+    t.string "booking_resourceable_type", null: false
+    t.uuid "booking_resourceable_id", null: false
     t.string "name"
-    t.string "description"
-    t.string "code"
+    t.text "description"
     t.integer "lifecycle_status"
     t.integer "workflow_status"
     t.integer "business_type"
     t.datetime "discarded_at"
+    t.jsonb "metadata", default: {}
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["booking_resourceable_type", "booking_resourceable_id"], name: "index_booking_resources_on_booking_resourceable"
+    t.index ["company_group_id"], name: "index_booking_resources_on_company_group_id"
+    t.index ["company_id"], name: "index_booking_resources_on_company_id"
+    t.index ["discarded_at"], name: "index_booking_resources_on_discarded_at"
+  end
+
+  create_table "bookings", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "company_group_id", null: false
+    t.uuid "company_id"
+    t.uuid "booking_resource_id", null: false
+    t.uuid "price_id", null: false
+    t.string "appoint_from_type", null: false
+    t.uuid "appoint_from_id", null: false
+    t.string "appoint_to_type", null: false
+    t.uuid "appoint_to_id", null: false
+    t.string "appoint_for_type", null: false
+    t.uuid "appoint_for_id", null: false
+    t.string "appoint_by_type", null: false
+    t.uuid "appoint_by_id", null: false
+    t.string "name"
+    t.text "description"
+    t.integer "lifecycle_status"
+    t.integer "workflow_status"
+    t.integer "business_type"
+    t.datetime "discarded_at"
+    t.jsonb "metadata", default: {}
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["appoint_by_type", "appoint_by_id"], name: "index_bookings_on_appoint_by"
+    t.index ["appoint_for_type", "appoint_for_id"], name: "index_bookings_on_appoint_for"
     t.index ["appoint_from_type", "appoint_from_id"], name: "index_bookings_on_appoint_from"
     t.index ["appoint_to_type", "appoint_to_id"], name: "index_bookings_on_appoint_to"
-    t.index ["category_id"], name: "index_bookings_on_category_id"
+    t.index ["booking_resource_id"], name: "index_bookings_on_booking_resource_id"
     t.index ["company_group_id"], name: "index_bookings_on_company_group_id"
     t.index ["company_id"], name: "index_bookings_on_company_id"
     t.index ["discarded_at"], name: "index_bookings_on_discarded_at"
+    t.index ["price_id"], name: "index_bookings_on_price_id"
   end
 
   create_table "brands", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -236,6 +357,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_12_26_231623) do
     t.integer "workflow_status"
     t.integer "business_type"
     t.datetime "discarded_at"
+    t.jsonb "metadata", default: {}
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["category_id"], name: "index_brands_on_category_id"
@@ -280,6 +402,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_12_26_231623) do
     t.integer "workflow_status"
     t.integer "business_type"
     t.datetime "discarded_at"
+    t.jsonb "metadata", default: {}
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["category_id"], name: "index_cart_groups_on_category_id"
@@ -308,6 +431,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_12_26_231623) do
     t.integer "workflow_status"
     t.integer "business_type"
     t.datetime "discarded_at"
+    t.jsonb "metadata", default: {}
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["barcode"], name: "index_carts_on_barcode"
@@ -326,8 +450,10 @@ ActiveRecord::Schema[8.0].define(version: 2025_12_26_231623) do
     t.uuid "company_group_id", null: false
     t.string "name"
     t.string "description"
+    t.jsonb "metadata", default: {}
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["company_group_id", "name"], name: "index_categories_on_company_group_id_and_name"
     t.index ["company_group_id"], name: "index_categories_on_company_group_id"
   end
 
@@ -342,7 +468,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_12_26_231623) do
     t.integer "workflow_status"
     t.integer "ownership_type"
     t.integer "business_type"
-    t.integer "currency"
+    t.integer "currency_code"
     t.string "registration_number"
     t.string "vat_id"
     t.string "tax_id"
@@ -350,13 +476,14 @@ ActiveRecord::Schema[8.0].define(version: 2025_12_26_231623) do
     t.string "address_line_1"
     t.string "city"
     t.string "postal_code"
-    t.string "country"
+    t.integer "country_code"
     t.string "email"
     t.string "phone_number"
     t.string "website"
     t.integer "employee_count"
     t.integer "fiscal_year_end_month"
     t.datetime "discarded_at"
+    t.jsonb "metadata", default: {}
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["category_id"], name: "index_companies_on_category_id"
@@ -374,7 +501,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_12_26_231623) do
     t.integer "workflow_status"
     t.integer "ownership_type"
     t.integer "business_type"
-    t.integer "currency"
+    t.integer "currency_code"
     t.string "registration_number"
     t.string "vat_id"
     t.string "tax_id"
@@ -382,13 +509,14 @@ ActiveRecord::Schema[8.0].define(version: 2025_12_26_231623) do
     t.string "address_line_1"
     t.string "city"
     t.string "postal_code"
-    t.string "country"
+    t.integer "country_code"
     t.string "email"
     t.string "phone_number"
     t.string "website"
     t.integer "employee_count"
     t.integer "fiscal_year_end_month"
     t.datetime "discarded_at"
+    t.jsonb "metadata", default: {}
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["discarded_at"], name: "index_company_groups_on_discarded_at"
@@ -462,6 +590,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_12_26_231623) do
     t.integer "workflow_status"
     t.integer "business_type"
     t.datetime "discarded_at"
+    t.jsonb "metadata", default: {}
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["category_id"], name: "index_customer_groups_on_category_id"
@@ -471,9 +600,9 @@ ActiveRecord::Schema[8.0].define(version: 2025_12_26_231623) do
   end
 
   create_table "customers", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
-    t.uuid "user_id"
     t.uuid "company_group_id", null: false
     t.uuid "company_id"
+    t.uuid "user_id"
     t.uuid "category_id"
     t.string "name"
     t.string "description"
@@ -482,6 +611,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_12_26_231623) do
     t.integer "workflow_status"
     t.integer "business_type"
     t.datetime "discarded_at"
+    t.jsonb "metadata", default: {}
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["category_id"], name: "index_customers_on_category_id"
@@ -549,7 +679,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_12_26_231623) do
 
   create_table "document_groups", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.uuid "company_group_id", null: false
-    t.uuid "company_id", null: false
+    t.uuid "company_id"
     t.uuid "category_id"
     t.string "title"
     t.json "content"
@@ -560,6 +690,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_12_26_231623) do
     t.integer "workflow_status"
     t.integer "business_type"
     t.datetime "discarded_at"
+    t.jsonb "metadata", default: {}
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["category_id"], name: "index_document_groups_on_category_id"
@@ -571,7 +702,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_12_26_231623) do
   create_table "documents", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.uuid "document_group_id", null: false
     t.uuid "company_group_id", null: false
-    t.uuid "company_id", null: false
+    t.uuid "company_id"
     t.uuid "category_id"
     t.string "title"
     t.json "content"
@@ -582,6 +713,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_12_26_231623) do
     t.integer "workflow_status"
     t.integer "business_type"
     t.datetime "discarded_at"
+    t.jsonb "metadata", default: {}
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["category_id"], name: "index_documents_on_category_id"
@@ -648,18 +780,20 @@ ActiveRecord::Schema[8.0].define(version: 2025_12_26_231623) do
     t.integer "workflow_status"
     t.integer "business_type"
     t.datetime "discarded_at"
+    t.jsonb "metadata", default: {}
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["category_id"], name: "index_employee_groups_on_category_id"
+    t.index ["company_group_id", "updated_at"], name: "index_employee_groups_on_company_group_id_and_updated_at"
     t.index ["company_group_id"], name: "index_employee_groups_on_company_group_id"
     t.index ["company_id"], name: "index_employee_groups_on_company_id"
     t.index ["discarded_at"], name: "index_employee_groups_on_discarded_at"
   end
 
   create_table "employees", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
-    t.uuid "user_id", null: false
     t.uuid "company_group_id", null: false
     t.uuid "company_id"
+    t.uuid "user_id"
     t.uuid "category_id"
     t.string "name"
     t.string "description"
@@ -668,6 +802,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_12_26_231623) do
     t.integer "workflow_status"
     t.integer "business_type"
     t.datetime "discarded_at"
+    t.jsonb "metadata", default: {}
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["category_id"], name: "index_employees_on_category_id"
@@ -735,7 +870,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_12_26_231623) do
 
   create_table "event_groups", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.uuid "company_group_id", null: false
-    t.uuid "company_id", null: false
+    t.uuid "company_id"
     t.uuid "category_id"
     t.string "name"
     t.string "description"
@@ -744,6 +879,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_12_26_231623) do
     t.integer "workflow_status"
     t.integer "business_type"
     t.datetime "discarded_at"
+    t.jsonb "metadata", default: {}
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["category_id"], name: "index_event_groups_on_category_id"
@@ -755,7 +891,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_12_26_231623) do
   create_table "events", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.uuid "event_group_id", null: false
     t.uuid "company_group_id", null: false
-    t.uuid "company_id", null: false
+    t.uuid "company_id"
     t.uuid "category_id"
     t.string "name"
     t.string "description"
@@ -764,6 +900,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_12_26_231623) do
     t.integer "workflow_status"
     t.integer "business_type"
     t.datetime "discarded_at"
+    t.jsonb "metadata", default: {}
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["category_id"], name: "index_events_on_category_id"
@@ -812,6 +949,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_12_26_231623) do
     t.integer "workflow_status"
     t.integer "business_type"
     t.datetime "discarded_at"
+    t.jsonb "metadata", default: {}
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["category_id"], name: "index_exam_groups_on_category_id"
@@ -832,6 +970,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_12_26_231623) do
     t.integer "workflow_status"
     t.integer "business_type"
     t.datetime "discarded_at"
+    t.jsonb "metadata", default: {}
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["category_id"], name: "index_exams_on_category_id"
@@ -852,6 +991,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_12_26_231623) do
     t.integer "workflow_status"
     t.integer "business_type"
     t.datetime "discarded_at"
+    t.jsonb "metadata", default: {}
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["category_id"], name: "index_facilities_on_category_id"
@@ -925,6 +1065,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_12_26_231623) do
     t.integer "workflow_status"
     t.integer "business_type"
     t.datetime "discarded_at"
+    t.jsonb "metadata", default: {}
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["category_id"], name: "index_facility_groups_on_category_id"
@@ -944,6 +1085,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_12_26_231623) do
     t.integer "workflow_status"
     t.integer "business_type"
     t.datetime "discarded_at"
+    t.jsonb "metadata", default: {}
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["category_id"], name: "index_inventories_on_category_id"
@@ -980,6 +1122,8 @@ ActiveRecord::Schema[8.0].define(version: 2025_12_26_231623) do
   end
 
   create_table "inventory_items", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "company_group_id", null: false
+    t.uuid "company_id"
     t.uuid "inventory_id", null: false
     t.uuid "category_id"
     t.string "name"
@@ -997,10 +1141,13 @@ ActiveRecord::Schema[8.0].define(version: 2025_12_26_231623) do
     t.integer "workflow_status"
     t.integer "business_type"
     t.datetime "discarded_at"
+    t.jsonb "metadata", default: {}
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["barcode"], name: "index_inventory_items_on_barcode"
     t.index ["category_id"], name: "index_inventory_items_on_category_id"
+    t.index ["company_group_id"], name: "index_inventory_items_on_company_group_id"
+    t.index ["company_id"], name: "index_inventory_items_on_company_id"
     t.index ["discarded_at"], name: "index_inventory_items_on_discarded_at"
     t.index ["ean"], name: "index_inventory_items_on_ean"
     t.index ["inventory_id"], name: "index_inventory_items_on_inventory_id"
@@ -1055,6 +1202,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_12_26_231623) do
     t.integer "workflow_status"
     t.integer "business_type"
     t.datetime "discarded_at"
+    t.jsonb "metadata", default: {}
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["appoint_by_type", "appoint_by_id"], name: "index_inventory_transactions_on_appoint_by"
@@ -1068,12 +1216,14 @@ ActiveRecord::Schema[8.0].define(version: 2025_12_26_231623) do
   end
 
   create_table "invoices", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "company_group_id", null: false
+    t.uuid "company_id"
     t.uuid "order_id", null: false
     t.uuid "category_id"
     t.string "name"
     t.string "description"
     t.string "code"
-    t.integer "currency"
+    t.integer "currency_code"
     t.integer "duration"
     t.string "number"
     t.decimal "total_price"
@@ -1082,9 +1232,12 @@ ActiveRecord::Schema[8.0].define(version: 2025_12_26_231623) do
     t.integer "workflow_status"
     t.integer "business_type"
     t.datetime "discarded_at"
+    t.jsonb "metadata", default: {}
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["category_id"], name: "index_invoices_on_category_id"
+    t.index ["company_group_id"], name: "index_invoices_on_company_group_id"
+    t.index ["company_id"], name: "index_invoices_on_company_id"
     t.index ["discarded_at"], name: "index_invoices_on_discarded_at"
     t.index ["order_id"], name: "index_invoices_on_order_id"
   end
@@ -1154,6 +1307,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_12_26_231623) do
     t.integer "workflow_status"
     t.integer "business_type"
     t.datetime "discarded_at"
+    t.jsonb "metadata", default: {}
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["category_id"], name: "index_notification_groups_on_category_id"
@@ -1174,6 +1328,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_12_26_231623) do
     t.integer "workflow_status"
     t.integer "business_type"
     t.datetime "discarded_at"
+    t.jsonb "metadata", default: {}
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["category_id"], name: "index_notifications_on_category_id"
@@ -1251,12 +1406,13 @@ ActiveRecord::Schema[8.0].define(version: 2025_12_26_231623) do
     t.string "name"
     t.string "description"
     t.string "code"
-    t.integer "currency"
+    t.integer "currency_code"
     t.integer "duration"
     t.integer "lifecycle_status"
     t.integer "workflow_status"
     t.integer "business_type"
     t.datetime "discarded_at"
+    t.jsonb "metadata", default: {}
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["category_id"], name: "index_order_groups_on_category_id"
@@ -1282,12 +1438,13 @@ ActiveRecord::Schema[8.0].define(version: 2025_12_26_231623) do
     t.string "serial_number"
     t.string "batch_number"
     t.datetime "expiration_date"
-    t.integer "currency"
+    t.integer "currency_code"
     t.integer "duration"
     t.integer "lifecycle_status"
     t.integer "workflow_status"
     t.integer "business_type"
     t.datetime "discarded_at"
+    t.jsonb "metadata", default: {}
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["barcode"], name: "index_orders_on_barcode"
@@ -1326,11 +1483,12 @@ ActiveRecord::Schema[8.0].define(version: 2025_12_26_231623) do
     t.string "name"
     t.string "description"
     t.string "code"
-    t.integer "currency"
+    t.integer "currency_code"
     t.integer "lifecycle_status"
     t.integer "workflow_status"
     t.integer "business_type"
     t.datetime "discarded_at"
+    t.jsonb "metadata", default: {}
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["category_id"], name: "index_payment_methods_on_category_id"
@@ -1338,12 +1496,14 @@ ActiveRecord::Schema[8.0].define(version: 2025_12_26_231623) do
   end
 
   create_table "payments", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "company_group_id", null: false
+    t.uuid "company_id"
     t.uuid "invoice_id", null: false
     t.uuid "category_id"
     t.string "name"
     t.string "description"
     t.string "code"
-    t.integer "currency"
+    t.integer "currency_code"
     t.integer "duration"
     t.decimal "exchange_rate"
     t.decimal "amount"
@@ -1353,9 +1513,12 @@ ActiveRecord::Schema[8.0].define(version: 2025_12_26_231623) do
     t.integer "workflow_status"
     t.integer "business_type"
     t.datetime "discarded_at"
+    t.jsonb "metadata", default: {}
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["category_id"], name: "index_payments_on_category_id"
+    t.index ["company_group_id"], name: "index_payments_on_company_group_id"
+    t.index ["company_id"], name: "index_payments_on_company_id"
     t.index ["discarded_at"], name: "index_payments_on_discarded_at"
     t.index ["invoice_id"], name: "index_payments_on_invoice_id"
   end
@@ -1389,13 +1552,25 @@ ActiveRecord::Schema[8.0].define(version: 2025_12_26_231623) do
     t.index ["period_id"], name: "index_period_appointments_on_period_id"
   end
 
+  create_table "period_prices", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.string "period_priceable_type", null: false
+    t.uuid "period_priceable_id", null: false
+    t.uuid "period_id", null: false
+    t.uuid "price_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["period_id"], name: "index_period_prices_on_period_id"
+    t.index ["period_priceable_type", "period_priceable_id"], name: "index_period_prices_on_period_priceable"
+    t.index ["price_id"], name: "index_period_prices_on_price_id"
+  end
+
   create_table "periods", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.datetime "start_at", null: false
     t.datetime "end_at"
-    t.integer "time_zone", default: 0, null: false
+    t.integer "timezone", default: 0, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["start_at", "end_at", "time_zone"], name: "index_periods_on_start_at_and_end_at_and_time_zone", unique: true, nulls_not_distinct: true
+    t.index ["start_at", "end_at", "timezone"], name: "index_periods_on_start_at_and_end_at_and_timezone", unique: true, nulls_not_distinct: true
   end
 
   create_table "policies", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -1467,10 +1642,10 @@ ActiveRecord::Schema[8.0].define(version: 2025_12_26_231623) do
 
   create_table "prices", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.decimal "amount", precision: 19, scale: 4, null: false
-    t.integer "currency", default: 0, null: false
+    t.integer "currency_code", default: 0, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["amount", "currency"], name: "index_prices_on_amount_and_currency", unique: true
+    t.index ["amount", "currency_code"], name: "index_prices_on_amount_and_currency_code", unique: true
   end
 
   create_table "product_appointments", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -1538,6 +1713,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_12_26_231623) do
     t.integer "workflow_status"
     t.integer "business_type"
     t.datetime "discarded_at"
+    t.jsonb "metadata", default: {}
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["category_id"], name: "index_product_groups_on_category_id"
@@ -1554,7 +1730,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_12_26_231623) do
     t.string "name"
     t.string "description"
     t.decimal "price"
-    t.integer "currency"
+    t.integer "currency_code"
     t.string "code"
     t.string "sku"
     t.string "barcode"
@@ -1568,6 +1744,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_12_26_231623) do
     t.integer "workflow_status"
     t.integer "business_type"
     t.datetime "discarded_at"
+    t.jsonb "metadata", default: {}
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["barcode"], name: "index_products_on_barcode"
@@ -1647,6 +1824,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_12_26_231623) do
     t.integer "workflow_status"
     t.integer "business_type"
     t.datetime "discarded_at"
+    t.jsonb "metadata", default: {}
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["category_id"], name: "index_project_groups_on_category_id"
@@ -1667,6 +1845,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_12_26_231623) do
     t.integer "workflow_status"
     t.integer "business_type"
     t.datetime "discarded_at"
+    t.jsonb "metadata", default: {}
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["category_id"], name: "index_projects_on_category_id"
@@ -1677,6 +1856,8 @@ ActiveRecord::Schema[8.0].define(version: 2025_12_26_231623) do
   end
 
   create_table "purchase_items", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "company_group_id", null: false
+    t.uuid "company_id"
     t.uuid "purchase_id", null: false
     t.uuid "category_id"
     t.string "name"
@@ -1694,10 +1875,13 @@ ActiveRecord::Schema[8.0].define(version: 2025_12_26_231623) do
     t.integer "workflow_status"
     t.integer "business_type"
     t.datetime "discarded_at"
+    t.jsonb "metadata", default: {}
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["barcode"], name: "index_purchase_items_on_barcode"
     t.index ["category_id"], name: "index_purchase_items_on_category_id"
+    t.index ["company_group_id"], name: "index_purchase_items_on_company_group_id"
+    t.index ["company_id"], name: "index_purchase_items_on_company_id"
     t.index ["discarded_at"], name: "index_purchase_items_on_discarded_at"
     t.index ["ean"], name: "index_purchase_items_on_ean"
     t.index ["purchase_id"], name: "index_purchase_items_on_purchase_id"
@@ -1717,6 +1901,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_12_26_231623) do
     t.integer "workflow_status"
     t.integer "business_type"
     t.datetime "discarded_at"
+    t.jsonb "metadata", default: {}
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["category_id"], name: "index_purchases_on_category_id"
@@ -1736,6 +1921,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_12_26_231623) do
     t.integer "workflow_status"
     t.integer "business_type"
     t.datetime "discarded_at"
+    t.jsonb "metadata", default: {}
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["category_id"], name: "index_questions_on_category_id"
@@ -1852,6 +2038,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_12_26_231623) do
     t.datetime "start_at"
     t.integer "business_type"
     t.datetime "discarded_at"
+    t.jsonb "metadata", default: {}
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["category_id"], name: "index_service_groups_on_category_id"
@@ -1873,6 +2060,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_12_26_231623) do
     t.datetime "start_at"
     t.integer "business_type"
     t.datetime "discarded_at"
+    t.jsonb "metadata", default: {}
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["category_id"], name: "index_services_on_category_id"
@@ -1886,6 +2074,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_12_26_231623) do
     t.string "user_agent"
     t.string "ip_address"
     t.string "single_access_token"
+    t.jsonb "metadata", default: {}
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["single_access_token"], name: "index_sessions_on_single_access_token", unique: true
@@ -1950,7 +2139,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_12_26_231623) do
 
   create_table "setting_groups", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.uuid "company_group_id", null: false
-    t.uuid "company_id", null: false
+    t.uuid "company_id"
     t.uuid "category_id"
     t.json "content"
     t.string "name"
@@ -1960,6 +2149,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_12_26_231623) do
     t.integer "workflow_status"
     t.integer "business_type"
     t.datetime "discarded_at"
+    t.jsonb "metadata", default: {}
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["category_id"], name: "index_setting_groups_on_category_id"
@@ -1971,7 +2161,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_12_26_231623) do
   create_table "settings", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.uuid "setting_group_id", null: false
     t.uuid "company_group_id", null: false
-    t.uuid "company_id", null: false
+    t.uuid "company_id"
     t.uuid "category_id"
     t.json "content"
     t.string "name"
@@ -1981,6 +2171,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_12_26_231623) do
     t.integer "workflow_status"
     t.integer "business_type"
     t.datetime "discarded_at"
+    t.jsonb "metadata", default: {}
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["category_id"], name: "index_settings_on_category_id"
@@ -1988,6 +2179,20 @@ ActiveRecord::Schema[8.0].define(version: 2025_12_26_231623) do
     t.index ["company_id"], name: "index_settings_on_company_id"
     t.index ["discarded_at"], name: "index_settings_on_discarded_at"
     t.index ["setting_group_id"], name: "index_settings_on_setting_group_id"
+  end
+
+  create_table "shifts", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "company_group_id", null: false
+    t.uuid "company_id"
+    t.uuid "period_id", null: false
+    t.string "name"
+    t.string "description"
+    t.jsonb "metadata", default: {}
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["company_group_id"], name: "index_shifts_on_company_group_id"
+    t.index ["company_id"], name: "index_shifts_on_company_id"
+    t.index ["period_id"], name: "index_shifts_on_period_id"
   end
 
   create_table "sign_in_tokens", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -2000,106 +2205,233 @@ ActiveRecord::Schema[8.0].define(version: 2025_12_26_231623) do
     t.uuid "owner_id", null: false
     t.json "data"
     t.datetime "recorded_at"
+    t.jsonb "metadata", default: {}
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["owner_type", "owner_id"], name: "index_statistics_on_owner"
     t.index ["recorded_at"], name: "index_statistics_on_recorded_at"
   end
 
-  create_table "subscription_appointments", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
-    t.uuid "subscription_id", null: false
-    t.string "appoint_from_type", null: false
-    t.uuid "appoint_from_id", null: false
-    t.string "appoint_to_type"
-    t.uuid "appoint_to_id"
-    t.string "appoint_for_type", null: false
-    t.uuid "appoint_for_id", null: false
-    t.string "appoint_by_type"
-    t.uuid "appoint_by_id"
-    t.string "name"
-    t.string "description"
-    t.string "code"
-    t.integer "lifecycle_status"
-    t.integer "workflow_status"
-    t.integer "business_type"
-    t.datetime "discarded_at"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.index ["appoint_by_type", "appoint_by_id"], name: "index_subscription_appointments_on_appoint_by"
-    t.index ["appoint_for_type", "appoint_for_id"], name: "index_subscription_appointments_on_appoint_for"
-    t.index ["appoint_from_type", "appoint_from_id"], name: "index_subscription_appointments_on_appoint_from"
-    t.index ["appoint_to_type", "appoint_to_id"], name: "idx_on_appoint_to_type_appoint_to_id_639db4b6da"
-    t.index ["appoint_to_type", "appoint_to_id"], name: "index_subscription_appointments_on_appoint_to"
-    t.index ["discarded_at"], name: "index_subscription_appointments_on_discarded_at"
-    t.index ["subscription_id"], name: "index_subscription_appointments_on_subscription_id"
-  end
-
-  create_table "subscription_group_appointments", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
-    t.uuid "subscription_group_id", null: false
-    t.string "appoint_from_type", null: false
-    t.uuid "appoint_from_id", null: false
-    t.string "appoint_to_type"
-    t.uuid "appoint_to_id"
-    t.string "appoint_for_type", null: false
-    t.uuid "appoint_for_id", null: false
-    t.string "appoint_by_type"
-    t.uuid "appoint_by_id"
-    t.string "name"
-    t.string "description"
-    t.string "code"
-    t.integer "lifecycle_status"
-    t.integer "workflow_status"
-    t.integer "business_type"
-    t.datetime "discarded_at"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.index ["appoint_by_type", "appoint_by_id"], name: "index_subscription_group_appointments_on_appoint_by"
-    t.index ["appoint_for_type", "appoint_for_id"], name: "index_subscription_group_appointments_on_appoint_for"
-    t.index ["appoint_from_type", "appoint_from_id"], name: "index_subscription_group_appointments_on_appoint_from"
-    t.index ["appoint_to_type", "appoint_to_id"], name: "idx_on_appoint_to_type_appoint_to_id_2de5df1e0a"
-    t.index ["appoint_to_type", "appoint_to_id"], name: "index_subscription_group_appointments_on_appoint_to"
-    t.index ["discarded_at"], name: "index_subscription_group_appointments_on_discarded_at"
-    t.index ["subscription_group_id"], name: "index_subscription_group_appointments_on_subscription_group_id"
-  end
-
   create_table "subscription_groups", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "company_group_id", null: false
+    t.uuid "company_id"
+    t.uuid "subscription_plan_id"
+    t.uuid "subscription_group_id"
     t.uuid "price_id", null: false
     t.uuid "period_id", null: false
+    t.string "seller_type", null: false
+    t.uuid "seller_id", null: false
+    t.string "buyer_type", null: false
+    t.uuid "buyer_id", null: false
+    t.string "resource_type"
+    t.uuid "resource_id"
+    t.string "processer_type"
+    t.uuid "processer_id"
     t.string "name"
     t.string "description"
-    t.string "code"
+    t.integer "country_code", null: false
+    t.integer "timezone"
     t.integer "lifecycle_status"
     t.integer "workflow_status"
     t.integer "business_type"
-    t.string "country_code"
     t.boolean "auto_renew"
     t.datetime "discarded_at"
+    t.jsonb "metadata", default: {}
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["buyer_id", "buyer_type"], name: "index_subscription_groups_on_buyer_id_and_buyer_type"
+    t.index ["buyer_type", "buyer_id"], name: "index_subscription_groups_on_buyer"
+    t.index ["company_group_id"], name: "index_subscription_groups_on_company_group_id"
+    t.index ["company_id"], name: "index_subscription_groups_on_company_id"
     t.index ["discarded_at"], name: "index_subscription_groups_on_discarded_at"
     t.index ["period_id"], name: "index_subscription_groups_on_period_id"
     t.index ["price_id"], name: "index_subscription_groups_on_price_id"
+    t.index ["processer_id", "processer_type"], name: "index_subscription_groups_on_processer_id_and_processer_type"
+    t.index ["processer_type", "processer_id"], name: "index_subscription_groups_on_processer"
+    t.index ["resource_id", "resource_type"], name: "index_subscription_groups_on_resource_id_and_resource_type"
+    t.index ["resource_type", "resource_id"], name: "index_subscription_groups_on_resource"
+    t.index ["seller_id", "seller_type"], name: "index_subscription_groups_on_seller_id_and_seller_type"
+    t.index ["seller_type", "seller_id"], name: "index_subscription_groups_on_seller"
+    t.index ["subscription_group_id"], name: "index_subscription_groups_on_subscription_group_id"
+    t.index ["subscription_plan_id"], name: "index_subscription_groups_on_subscription_plan_id"
+  end
+
+  create_table "subscription_plans", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "company_group_id", null: false
+    t.uuid "company_id"
+    t.uuid "price_id", null: false
+    t.string "name", null: false
+    t.string "description"
+    t.string "code"
+    t.integer "duration_days"
+    t.integer "lifecycle_status"
+    t.integer "workflow_status"
+    t.integer "business_type"
+    t.integer "country_code"
+    t.jsonb "features", default: {}
+    t.jsonb "limits", default: {}
+    t.datetime "discarded_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["company_group_id"], name: "index_subscription_plans_on_company_group_id"
+    t.index ["company_id"], name: "index_subscription_plans_on_company_id"
+    t.index ["discarded_at"], name: "index_subscription_plans_on_discarded_at"
+    t.index ["price_id"], name: "index_subscription_plans_on_price_id"
   end
 
   create_table "subscriptions", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
-    t.uuid "subscription_group_id", null: false
+    t.uuid "company_group_id", null: false
+    t.uuid "company_id"
+    t.uuid "subscription_plan_id"
+    t.uuid "subscription_group_id"
     t.uuid "price_id", null: false
     t.uuid "period_id", null: false
+    t.string "seller_type", null: false
+    t.uuid "seller_id", null: false
+    t.string "buyer_type", null: false
+    t.uuid "buyer_id", null: false
+    t.string "resource_type"
+    t.uuid "resource_id"
+    t.string "processer_type"
+    t.uuid "processer_id"
+    t.string "name"
+    t.string "description"
+    t.integer "country_code", null: false
+    t.integer "timezone"
+    t.integer "lifecycle_status"
+    t.integer "workflow_status"
+    t.integer "business_type"
+    t.boolean "auto_renew"
+    t.datetime "discarded_at"
+    t.jsonb "metadata", default: {}
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["buyer_id", "buyer_type"], name: "index_subscriptions_on_buyer_id_and_buyer_type"
+    t.index ["buyer_type", "buyer_id"], name: "index_subscriptions_on_buyer"
+    t.index ["company_group_id"], name: "index_subscriptions_on_company_group_id"
+    t.index ["company_id"], name: "index_subscriptions_on_company_id"
+    t.index ["discarded_at"], name: "index_subscriptions_on_discarded_at"
+    t.index ["period_id"], name: "index_subscriptions_on_period_id"
+    t.index ["price_id"], name: "index_subscriptions_on_price_id"
+    t.index ["processer_id", "processer_type"], name: "index_subscriptions_on_processer_id_and_processer_type"
+    t.index ["processer_type", "processer_id"], name: "index_subscriptions_on_processer"
+    t.index ["resource_id", "resource_type"], name: "index_subscriptions_on_resource_id_and_resource_type"
+    t.index ["resource_type", "resource_id"], name: "index_subscriptions_on_resource"
+    t.index ["seller_id", "seller_type"], name: "index_subscriptions_on_seller_id_and_seller_type"
+    t.index ["seller_type", "seller_id"], name: "index_subscriptions_on_seller"
+    t.index ["subscription_group_id"], name: "index_subscriptions_on_subscription_group_id"
+    t.index ["subscription_plan_id"], name: "index_subscriptions_on_subscription_plan_id"
+  end
+
+  create_table "system_subscription_groups", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "system_subscription_plan_id", null: false
+    t.uuid "company_group_id", null: false
+    t.uuid "company_id"
+    t.uuid "price_id", null: false
+    t.uuid "period_id", null: false
+    t.string "seller_type", null: false
+    t.uuid "seller_id", null: false
+    t.string "buyer_type", null: false
+    t.uuid "buyer_id", null: false
+    t.string "resource_type"
+    t.uuid "resource_id"
+    t.string "processer_type"
+    t.uuid "processer_id"
     t.string "name"
     t.string "description"
     t.string "code"
     t.integer "lifecycle_status"
     t.integer "workflow_status"
     t.integer "business_type"
-    t.string "country_code"
+    t.integer "country_code"
     t.boolean "auto_renew"
     t.datetime "discarded_at"
+    t.jsonb "metadata", default: {}
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["discarded_at"], name: "index_subscriptions_on_discarded_at"
-    t.index ["period_id"], name: "index_subscriptions_on_period_id"
-    t.index ["price_id"], name: "index_subscriptions_on_price_id"
-    t.index ["subscription_group_id"], name: "index_subscriptions_on_subscription_group_id"
+    t.index ["buyer_type", "buyer_id"], name: "index_system_subscription_groups_on_buyer"
+    t.index ["company_group_id"], name: "index_system_subscription_groups_on_company_group_id"
+    t.index ["company_id"], name: "index_system_subscription_groups_on_company_id"
+    t.index ["discarded_at"], name: "index_system_subscription_groups_on_discarded_at"
+    t.index ["period_id"], name: "index_system_subscription_groups_on_period_id"
+    t.index ["price_id"], name: "index_system_subscription_groups_on_price_id"
+    t.index ["processer_type", "processer_id"], name: "index_system_subscription_groups_on_processer"
+    t.index ["resource_type", "resource_id"], name: "index_system_subscription_groups_on_resource"
+    t.index ["seller_type", "seller_id"], name: "index_system_subscription_groups_on_seller"
+    t.index ["system_subscription_plan_id"], name: "idx_on_system_subscription_plan_id_2f2a083a8b"
+  end
+
+  create_table "system_subscription_plans", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "price_id", null: false
+    t.string "name", null: false
+    t.string "description"
+    t.string "code"
+    t.integer "duration_days"
+    t.integer "lifecycle_status"
+    t.integer "workflow_status"
+    t.integer "business_type"
+    t.integer "country_code"
+    t.jsonb "features", default: {}
+    t.jsonb "limits", default: {}
+    t.datetime "discarded_at"
+    t.jsonb "metadata", default: {}
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["discarded_at"], name: "index_system_subscription_plans_on_discarded_at"
+    t.index ["price_id"], name: "index_system_subscription_plans_on_price_id"
+  end
+
+  create_table "system_subscriptions", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "system_subscription_plan_id", null: false
+    t.uuid "system_subscription_group_id"
+    t.uuid "company_group_id", null: false
+    t.uuid "company_id"
+    t.uuid "price_id", null: false
+    t.uuid "period_id", null: false
+    t.string "seller_type", null: false
+    t.uuid "seller_id", null: false
+    t.string "buyer_type", null: false
+    t.uuid "buyer_id", null: false
+    t.string "resource_type"
+    t.uuid "resource_id"
+    t.string "processer_type"
+    t.uuid "processer_id"
+    t.string "name"
+    t.string "description"
+    t.string "code"
+    t.integer "lifecycle_status"
+    t.integer "workflow_status"
+    t.integer "business_type"
+    t.integer "country_code"
+    t.boolean "auto_renew"
+    t.datetime "discarded_at"
+    t.jsonb "metadata", default: {}
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["buyer_type", "buyer_id"], name: "index_system_subscriptions_on_buyer"
+    t.index ["company_group_id"], name: "index_system_subscriptions_on_company_group_id"
+    t.index ["company_id"], name: "index_system_subscriptions_on_company_id"
+    t.index ["discarded_at"], name: "index_system_subscriptions_on_discarded_at"
+    t.index ["period_id"], name: "index_system_subscriptions_on_period_id"
+    t.index ["price_id"], name: "index_system_subscriptions_on_price_id"
+    t.index ["processer_type", "processer_id"], name: "index_system_subscriptions_on_processer"
+    t.index ["resource_type", "resource_id"], name: "index_system_subscriptions_on_resource"
+    t.index ["seller_type", "seller_id"], name: "index_system_subscriptions_on_seller"
+    t.index ["system_subscription_group_id"], name: "index_system_subscriptions_on_system_subscription_group_id"
+    t.index ["system_subscription_plan_id"], name: "index_system_subscriptions_on_system_subscription_plan_id"
+  end
+
+  create_table "systems", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.string "name", default: "System", null: false
+    t.string "code", null: false, comment: "System"
+    t.integer "balance_cents", default: 0, null: false
+    t.integer "currency_code"
+    t.integer "country_code"
+    t.boolean "active", default: true, null: false
+    t.jsonb "metadata", default: {}
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["name"], name: "index_systems_on_name", unique: true
   end
 
   create_table "tag_appointments", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -2199,6 +2531,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_12_26_231623) do
     t.integer "workflow_status"
     t.integer "business_type"
     t.datetime "discarded_at"
+    t.jsonb "metadata", default: {}
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["category_id"], name: "index_task_groups_on_category_id"
@@ -2215,11 +2548,12 @@ ActiveRecord::Schema[8.0].define(version: 2025_12_26_231623) do
     t.string "name"
     t.string "description"
     t.string "code"
-    t.integer "currency"
+    t.integer "currency_code"
     t.integer "lifecycle_status"
     t.integer "workflow_status"
     t.integer "business_type"
     t.datetime "discarded_at"
+    t.jsonb "metadata", default: {}
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["category_id"], name: "index_tasks_on_category_id"
@@ -2242,9 +2576,10 @@ ActiveRecord::Schema[8.0].define(version: 2025_12_26_231623) do
     t.string "last_name"
     t.string "avatar"
     t.string "phone_number"
-    t.string "country_code"
+    t.integer "country_code"
     t.string "single_access_token"
     t.datetime "discarded_at"
+    t.jsonb "metadata", default: {}
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["discarded_at"], name: "index_users_on_discarded_at"
@@ -2269,9 +2604,26 @@ ActiveRecord::Schema[8.0].define(version: 2025_12_26_231623) do
   add_foreign_key "articles", "categories"
   add_foreign_key "articles", "companies"
   add_foreign_key "articles", "company_groups"
-  add_foreign_key "bookings", "categories"
+  add_foreign_key "attendance_days", "companies"
+  add_foreign_key "attendance_days", "company_groups"
+  add_foreign_key "attendance_days", "employees"
+  add_foreign_key "attendance_days", "periods"
+  add_foreign_key "attendance_logs", "companies"
+  add_foreign_key "attendance_logs", "company_groups"
+  add_foreign_key "attendance_logs", "customers"
+  add_foreign_key "attendance_logs", "periods"
+  add_foreign_key "attendance_months", "companies"
+  add_foreign_key "attendance_months", "company_groups"
+  add_foreign_key "attendance_months", "customers"
+  add_foreign_key "attendance_months", "periods"
+  add_foreign_key "booking_periods", "booking_resources"
+  add_foreign_key "booking_periods", "periods"
+  add_foreign_key "booking_resources", "companies"
+  add_foreign_key "booking_resources", "company_groups"
+  add_foreign_key "bookings", "booking_resources"
   add_foreign_key "bookings", "companies"
   add_foreign_key "bookings", "company_groups"
+  add_foreign_key "bookings", "prices"
   add_foreign_key "brands", "categories"
   add_foreign_key "cart_appointments", "carts"
   add_foreign_key "cart_groups", "categories"
@@ -2343,12 +2695,16 @@ ActiveRecord::Schema[8.0].define(version: 2025_12_26_231623) do
   add_foreign_key "inventories", "company_groups"
   add_foreign_key "inventory_item_appointments", "inventory_items"
   add_foreign_key "inventory_items", "categories"
+  add_foreign_key "inventory_items", "companies"
+  add_foreign_key "inventory_items", "company_groups"
   add_foreign_key "inventory_items", "inventories"
   add_foreign_key "inventory_transaction_appointments", "inventory_transactions"
   add_foreign_key "inventory_transactions", "categories"
   add_foreign_key "inventory_transactions", "companies"
   add_foreign_key "inventory_transactions", "company_groups"
   add_foreign_key "invoices", "categories"
+  add_foreign_key "invoices", "companies"
+  add_foreign_key "invoices", "company_groups"
   add_foreign_key "invoices", "orders"
   add_foreign_key "notification_appointments", "notifications"
   add_foreign_key "notification_group_appointments", "notification_groups"
@@ -2374,8 +2730,12 @@ ActiveRecord::Schema[8.0].define(version: 2025_12_26_231623) do
   add_foreign_key "payment_method_appointments", "payment_methods"
   add_foreign_key "payment_methods", "categories"
   add_foreign_key "payments", "categories"
+  add_foreign_key "payments", "companies"
+  add_foreign_key "payments", "company_groups"
   add_foreign_key "payments", "invoices"
   add_foreign_key "period_appointments", "periods"
+  add_foreign_key "period_prices", "periods"
+  add_foreign_key "period_prices", "prices"
   add_foreign_key "policies", "companies"
   add_foreign_key "policies", "company_groups"
   add_foreign_key "policy_appointments", "policies"
@@ -2399,6 +2759,8 @@ ActiveRecord::Schema[8.0].define(version: 2025_12_26_231623) do
   add_foreign_key "projects", "company_groups"
   add_foreign_key "projects", "project_groups"
   add_foreign_key "purchase_items", "categories"
+  add_foreign_key "purchase_items", "companies"
+  add_foreign_key "purchase_items", "company_groups"
   add_foreign_key "purchase_items", "purchases"
   add_foreign_key "purchases", "categories"
   add_foreign_key "purchases", "companies"
@@ -2427,14 +2789,37 @@ ActiveRecord::Schema[8.0].define(version: 2025_12_26_231623) do
   add_foreign_key "settings", "companies"
   add_foreign_key "settings", "company_groups"
   add_foreign_key "settings", "setting_groups"
+  add_foreign_key "shifts", "companies"
+  add_foreign_key "shifts", "company_groups"
+  add_foreign_key "shifts", "periods"
   add_foreign_key "sign_in_tokens", "users"
-  add_foreign_key "subscription_appointments", "subscriptions"
-  add_foreign_key "subscription_group_appointments", "subscription_groups"
+  add_foreign_key "subscription_groups", "companies"
+  add_foreign_key "subscription_groups", "company_groups"
   add_foreign_key "subscription_groups", "periods"
   add_foreign_key "subscription_groups", "prices"
+  add_foreign_key "subscription_groups", "subscription_groups"
+  add_foreign_key "subscription_groups", "subscription_plans"
+  add_foreign_key "subscription_plans", "companies"
+  add_foreign_key "subscription_plans", "company_groups"
+  add_foreign_key "subscription_plans", "prices"
+  add_foreign_key "subscriptions", "companies"
+  add_foreign_key "subscriptions", "company_groups"
   add_foreign_key "subscriptions", "periods"
   add_foreign_key "subscriptions", "prices"
   add_foreign_key "subscriptions", "subscription_groups"
+  add_foreign_key "subscriptions", "subscription_plans"
+  add_foreign_key "system_subscription_groups", "companies"
+  add_foreign_key "system_subscription_groups", "company_groups"
+  add_foreign_key "system_subscription_groups", "periods"
+  add_foreign_key "system_subscription_groups", "prices"
+  add_foreign_key "system_subscription_groups", "system_subscription_plans"
+  add_foreign_key "system_subscription_plans", "prices"
+  add_foreign_key "system_subscriptions", "companies"
+  add_foreign_key "system_subscriptions", "company_groups"
+  add_foreign_key "system_subscriptions", "periods"
+  add_foreign_key "system_subscriptions", "prices"
+  add_foreign_key "system_subscriptions", "system_subscription_groups"
+  add_foreign_key "system_subscriptions", "system_subscription_plans"
   add_foreign_key "tag_appointments", "tags"
   add_foreign_key "tags", "company_groups"
   add_foreign_key "task_appointments", "tasks"

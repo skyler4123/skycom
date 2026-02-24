@@ -6,7 +6,7 @@ class Seed::CustomerGroupAppointmentService
     customer_group:,
     appoint_to:,
     name: Faker::Commerce.department,
-    description: "Appointment of #{appoint_to.class.name} to #{customer_group.name}"
+    description: Faker::Lorem.sentence(word_count: 15)
   )
     CustomerGroupAppointment.create!(
       customer_group: customer_group,

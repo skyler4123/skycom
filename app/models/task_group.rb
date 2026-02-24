@@ -1,12 +1,14 @@
 class TaskGroup < ApplicationRecord
+  include TagConcern
+
   # --- Associations ---
   belongs_to :company_group
   belongs_to :company, optional: true
   has_many :task_group_appointments, dependent: :destroy
 
   # --- Enums ---
-  enum :lifecycle_status, LIFECYCLE_STATUS
-  enum :workflow_status, WORKFLOW_STATUS
+  enum :lifecycle_status, LIFECYCLE_STATUS, prefix: true
+  enum :workflow_status, WORKFLOW_STATUS, prefix: true
 
   enum :business_type, {
     project_management: 0,

@@ -1,10 +1,14 @@
 class Payment < ApplicationRecord
+  include TagConcern
+
   # --- Associations ---
+  belongs_to :company_group
+  belongs_to :company, optional: true
   belongs_to :invoice
 
   # --- Enums ---
-  enum :lifecycle_status, LIFECYCLE_STATUS
-  enum :workflow_status, WORKFLOW_STATUS
+  enum :lifecycle_status, LIFECYCLE_STATUS, prefix: true
+  enum :workflow_status, WORKFLOW_STATUS, prefix: true
 
   enum :payment_method, {
     credit_card: 0,
@@ -21,6 +25,6 @@ class Payment < ApplicationRecord
 
   # --- Validations ---
   validates :amount, presence: true, numericality: { greater_than: 0 }
-  validates :currency, presence: true
+  validates :currency_code, presence: true
   validates :payment_method, presence: true
 end

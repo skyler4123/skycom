@@ -8,10 +8,10 @@
 //   triggerLanguageDropdown()
 //   languageCodeTextTarget()
 
-import ApplicationController from "controllers/application_controller";
+import { Controller } from "@hotwired/stimulus"
 import * as Helpers from "controllers/helpers";
 
-export default class LanguageController extends ApplicationController {
+export default class LanguageController extends Controller {
   static targets = ["codeText", "word", "triggerDropdown"];
   static values = {
     languageCode: { type: String },

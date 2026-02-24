@@ -1,5 +1,6 @@
 class ApplicationRecord < ActiveRecord::Base
   primary_abstract_class
 
-  include TagConcern
+  include CreatedAtDefaultOrderingConcern
+  include Cache::ClassMethodConcern
 end

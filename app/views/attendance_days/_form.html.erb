@@ -1,0 +1,147 @@
+<%= form_with(model: attendance_day, class: "contents") do |form| %>
+  <% if attendance_day.errors.any? %>
+    <div id="error_explanation" class="bg-red-50 text-red-500 px-3 py-2 font-medium rounded-md mt-3">
+      <h2><%= pluralize(attendance_day.errors.count, "error") %> prohibited this attendance_day from being saved:</h2>
+
+      <ul class="list-disc ml-6">
+        <% attendance_day.errors.each do |error| %>
+          <li><%= error.full_message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="my-5">
+    <%= form.label :company_group_id %>
+    <%= form.text_field :company_group_id, class: ["block shadow-sm rounded-md border px-3 py-2 mt-2 w-full", {"border-gray-400 focus:outline-blue-600": attendance_day.errors[:company_group_id].none?, "border-red-400 focus:outline-red-600": attendance_day.errors[:company_group_id].any?}] %>
+  </div>
+
+  <div class="my-5">
+    <%= form.label :company_id %>
+    <%= form.text_field :company_id, class: ["block shadow-sm rounded-md border px-3 py-2 mt-2 w-full", {"border-gray-400 focus:outline-blue-600": attendance_day.errors[:company_id].none?, "border-red-400 focus:outline-red-600": attendance_day.errors[:company_id].any?}] %>
+  </div>
+
+  <div class="my-5">
+    <%= form.label :employee_id %>
+    <%= form.text_field :employee_id, class: ["block shadow-sm rounded-md border px-3 py-2 mt-2 w-full", {"border-gray-400 focus:outline-blue-600": attendance_day.errors[:employee_id].none?, "border-red-400 focus:outline-red-600": attendance_day.errors[:employee_id].any?}] %>
+  </div>
+
+  <div class="my-5">
+    <%= form.label :logable_id %>
+    <%= form.text_field :logable_id, class: ["block shadow-sm rounded-md border px-3 py-2 mt-2 w-full", {"border-gray-400 focus:outline-blue-600": attendance_day.errors[:logable_id].none?, "border-red-400 focus:outline-red-600": attendance_day.errors[:logable_id].any?}] %>
+  </div>
+
+  <div class="my-5">
+    <%= form.label :period_id %>
+    <%= form.text_field :period_id, class: ["block shadow-sm rounded-md border px-3 py-2 mt-2 w-full", {"border-gray-400 focus:outline-blue-600": attendance_day.errors[:period_id].none?, "border-red-400 focus:outline-red-600": attendance_day.errors[:period_id].any?}] %>
+  </div>
+
+  <div class="my-5">
+    <%= form.label :attendance_date %>
+    <%= form.date_field :attendance_date, class: ["block shadow-sm rounded-md border px-3 py-2 mt-2 w-full", {"border-gray-400 focus:outline-blue-600": attendance_day.errors[:attendance_date].none?, "border-red-400 focus:outline-red-600": attendance_day.errors[:attendance_date].any?}] %>
+  </div>
+
+  <div class="my-5">
+    <%= form.label :check_in %>
+    <%= form.datetime_field :check_in, class: ["block shadow-sm rounded-md border px-3 py-2 mt-2 w-full", {"border-gray-400 focus:outline-blue-600": attendance_day.errors[:check_in].none?, "border-red-400 focus:outline-red-600": attendance_day.errors[:check_in].any?}] %>
+  </div>
+
+  <div class="my-5">
+    <%= form.label :check_out %>
+    <%= form.datetime_field :check_out, class: ["block shadow-sm rounded-md border px-3 py-2 mt-2 w-full", {"border-gray-400 focus:outline-blue-600": attendance_day.errors[:check_out].none?, "border-red-400 focus:outline-red-600": attendance_day.errors[:check_out].any?}] %>
+  </div>
+
+  <div class="my-5">
+    <%= form.label :break_start %>
+    <%= form.datetime_field :break_start, class: ["block shadow-sm rounded-md border px-3 py-2 mt-2 w-full", {"border-gray-400 focus:outline-blue-600": attendance_day.errors[:break_start].none?, "border-red-400 focus:outline-red-600": attendance_day.errors[:break_start].any?}] %>
+  </div>
+
+  <div class="my-5">
+    <%= form.label :break_end %>
+    <%= form.datetime_field :break_end, class: ["block shadow-sm rounded-md border px-3 py-2 mt-2 w-full", {"border-gray-400 focus:outline-blue-600": attendance_day.errors[:break_end].none?, "border-red-400 focus:outline-red-600": attendance_day.errors[:break_end].any?}] %>
+  </div>
+
+  <div class="my-5">
+    <%= form.label :total_seconds_present %>
+    <%= form.number_field :total_seconds_present, class: ["block shadow-sm rounded-md border px-3 py-2 mt-2 w-full", {"border-gray-400 focus:outline-blue-600": attendance_day.errors[:total_seconds_present].none?, "border-red-400 focus:outline-red-600": attendance_day.errors[:total_seconds_present].any?}] %>
+  </div>
+
+  <div class="my-5">
+    <%= form.label :total_seconds_break %>
+    <%= form.number_field :total_seconds_break, class: ["block shadow-sm rounded-md border px-3 py-2 mt-2 w-full", {"border-gray-400 focus:outline-blue-600": attendance_day.errors[:total_seconds_break].none?, "border-red-400 focus:outline-red-600": attendance_day.errors[:total_seconds_break].any?}] %>
+  </div>
+
+  <div class="my-5">
+    <%= form.label :total_seconds_worked %>
+    <%= form.number_field :total_seconds_worked, class: ["block shadow-sm rounded-md border px-3 py-2 mt-2 w-full", {"border-gray-400 focus:outline-blue-600": attendance_day.errors[:total_seconds_worked].none?, "border-red-400 focus:outline-red-600": attendance_day.errors[:total_seconds_worked].any?}] %>
+  </div>
+
+  <div class="my-5">
+    <%= form.label :total_seconds_overtime %>
+    <%= form.number_field :total_seconds_overtime, class: ["block shadow-sm rounded-md border px-3 py-2 mt-2 w-full", {"border-gray-400 focus:outline-blue-600": attendance_day.errors[:total_seconds_overtime].none?, "border-red-400 focus:outline-red-600": attendance_day.errors[:total_seconds_overtime].any?}] %>
+  </div>
+
+  <div class="my-5">
+    <%= form.label :shift_id %>
+    <%= form.number_field :shift_id, class: ["block shadow-sm rounded-md border px-3 py-2 mt-2 w-full", {"border-gray-400 focus:outline-blue-600": attendance_day.errors[:shift_id].none?, "border-red-400 focus:outline-red-600": attendance_day.errors[:shift_id].any?}] %>
+  </div>
+
+  <div class="my-5">
+    <%= form.label :attendance_status %>
+    <%= form.number_field :attendance_status, class: ["block shadow-sm rounded-md border px-3 py-2 mt-2 w-full", {"border-gray-400 focus:outline-blue-600": attendance_day.errors[:attendance_status].none?, "border-red-400 focus:outline-red-600": attendance_day.errors[:attendance_status].any?}] %>
+  </div>
+
+  <div class="my-5">
+    <%= form.label :recorded_method %>
+    <%= form.number_field :recorded_method, class: ["block shadow-sm rounded-md border px-3 py-2 mt-2 w-full", {"border-gray-400 focus:outline-blue-600": attendance_day.errors[:recorded_method].none?, "border-red-400 focus:outline-red-600": attendance_day.errors[:recorded_method].any?}] %>
+  </div>
+
+  <div class="my-5">
+    <%= form.label :ip_address %>
+    <%= form.text_field :ip_address, class: ["block shadow-sm rounded-md border px-3 py-2 mt-2 w-full", {"border-gray-400 focus:outline-blue-600": attendance_day.errors[:ip_address].none?, "border-red-400 focus:outline-red-600": attendance_day.errors[:ip_address].any?}] %>
+  </div>
+
+  <div class="my-5">
+    <%= form.label :device_id %>
+    <%= form.text_field :device_id, class: ["block shadow-sm rounded-md border px-3 py-2 mt-2 w-full", {"border-gray-400 focus:outline-blue-600": attendance_day.errors[:device_id].none?, "border-red-400 focus:outline-red-600": attendance_day.errors[:device_id].any?}] %>
+  </div>
+
+  <div class="my-5">
+    <%= form.label :location_lat %>
+    <%= form.text_field :location_lat, class: ["block shadow-sm rounded-md border px-3 py-2 mt-2 w-full", {"border-gray-400 focus:outline-blue-600": attendance_day.errors[:location_lat].none?, "border-red-400 focus:outline-red-600": attendance_day.errors[:location_lat].any?}] %>
+  </div>
+
+  <div class="my-5">
+    <%= form.label :location_lng %>
+    <%= form.text_field :location_lng, class: ["block shadow-sm rounded-md border px-3 py-2 mt-2 w-full", {"border-gray-400 focus:outline-blue-600": attendance_day.errors[:location_lng].none?, "border-red-400 focus:outline-red-600": attendance_day.errors[:location_lng].any?}] %>
+  </div>
+
+  <div class="my-5">
+    <%= form.label :notes %>
+    <%= form.textarea :notes, rows: 4, class: ["block shadow-sm rounded-md border px-3 py-2 mt-2 w-full", {"border-gray-400 focus:outline-blue-600": attendance_day.errors[:notes].none?, "border-red-400 focus:outline-red-600": attendance_day.errors[:notes].any?}] %>
+  </div>
+
+  <div class="my-5">
+    <%= form.label :approved_by_id %>
+    <%= form.text_field :approved_by_id, class: ["block shadow-sm rounded-md border px-3 py-2 mt-2 w-full", {"border-gray-400 focus:outline-blue-600": attendance_day.errors[:approved_by_id].none?, "border-red-400 focus:outline-red-600": attendance_day.errors[:approved_by_id].any?}] %>
+  </div>
+
+  <div class="my-5">
+    <%= form.label :approved_at %>
+    <%= form.datetime_field :approved_at, class: ["block shadow-sm rounded-md border px-3 py-2 mt-2 w-full", {"border-gray-400 focus:outline-blue-600": attendance_day.errors[:approved_at].none?, "border-red-400 focus:outline-red-600": attendance_day.errors[:approved_at].any?}] %>
+  </div>
+
+  <div class="my-5">
+    <%= form.label :edited_by_id %>
+    <%= form.text_field :edited_by_id, class: ["block shadow-sm rounded-md border px-3 py-2 mt-2 w-full", {"border-gray-400 focus:outline-blue-600": attendance_day.errors[:edited_by_id].none?, "border-red-400 focus:outline-red-600": attendance_day.errors[:edited_by_id].any?}] %>
+  </div>
+
+  <div class="my-5">
+    <%= form.label :edited_at %>
+    <%= form.datetime_field :edited_at, class: ["block shadow-sm rounded-md border px-3 py-2 mt-2 w-full", {"border-gray-400 focus:outline-blue-600": attendance_day.errors[:edited_at].none?, "border-red-400 focus:outline-red-600": attendance_day.errors[:edited_at].any?}] %>
+  </div>
+
+  <div class="inline">
+    <%= form.submit class: "w-full sm:w-auto rounded-md px-3.5 py-2.5 bg-blue-600 hover:bg-blue-500 text-white inline-block font-medium cursor-pointer" %>
+  </div>
+<% end %>
