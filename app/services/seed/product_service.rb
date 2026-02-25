@@ -5,7 +5,7 @@
 class Seed::ProductService
   def self.create(
     company_group:,
-    company: nil,
+    branch: nil,
     brand: (Brand.all + [ nil ]).sample,
     name: Faker::Commerce.product_name,
     description: Faker::Lorem.sentence(word_count: 12),
@@ -22,7 +22,7 @@ class Seed::ProductService
 
     product = Product.create!(
       company_group: company_group,
-      company: company,
+      branch: branch,
       brand: brand,
       name: name,
       description: description,

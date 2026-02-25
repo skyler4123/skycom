@@ -2,5 +2,5 @@ class ExamGroup < ApplicationRecord
   include TagConcern
 
   belongs_to :company_group
-  belongs_to :company, optional: true
+  belongs_to :branch, optional: true
 end

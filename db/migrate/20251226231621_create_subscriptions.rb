@@ -2,7 +2,7 @@ class CreateSubscriptions < ActiveRecord::Migration[8.0]
   def change
     create_table :subscriptions, id: :uuid do |t|
       t.references :company_group, null: false, foreign_key: true, type: :uuid
-      t.references :company, null: true, foreign_key: true, type: :uuid
+      t.references :branch, null: true, foreign_key: true, type: :uuid
       t.references :subscription_plan, null: true, foreign_key: true, type: :uuid
       t.references :subscription_group, null: true, foreign_key: true, type: :uuid
       t.references :price, null: false, foreign_key: true, type: :uuid

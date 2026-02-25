@@ -1,6 +1,6 @@
 class AttendanceDay < ApplicationRecord
   belongs_to :company_group
-  belongs_to :company, optional: true
+  belongs_to :branch, optional: true
   belongs_to :employee
   belongs_to :logable, polymorphic: true
   belongs_to :period

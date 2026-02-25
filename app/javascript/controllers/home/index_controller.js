@@ -97,7 +97,7 @@ export default class Home_IndexController extends Controller {
                     for="email">Email</label>
                   <input
                     class="block w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-slate-900 placeholder-slate-400 focus:border-indigo-600 focus:outline-none focus:ring-1 focus:ring-indigo-600 dark:border-slate-600 dark:bg-slate-700 dark:text-white dark:placeholder-slate-400"
-                    id="email" name="email" placeholder="name@company.com" type="email" />
+                    id="email" name="email" placeholder="name@branch.com" type="email" />
                 </div>
                 <div>
                   <label class="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300 text-left"
@@ -180,7 +180,7 @@ export default class Home_IndexController extends Controller {
                     for="email">Email</label>
                   <input
                     class="block w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-slate-900 placeholder-slate-400 focus:border-indigo-600 focus:outline-none focus:ring-1 focus:ring-indigo-600 dark:border-slate-600 dark:bg-slate-700 dark:text-white dark:placeholder-slate-400"
-                    id="email" name="email" placeholder="name@company.com" type="email" />
+                    id="email" name="email" placeholder="name@branch.com" type="email" />
                 </div>
                 <div>
                   <label class="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300 text-left"

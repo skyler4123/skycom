@@ -3,7 +3,7 @@ class NotificationGroup < ApplicationRecord
 
   # --- Associations ---
   belongs_to :company_group
-  belongs_to :company, optional: true
+  belongs_to :branch, optional: true
   has_many :notifications, dependent: :destroy
 
   # --- Enums ---

@@ -1,5 +1,5 @@
 # This service seeds the database with Brand records. These are not tied
-# to a specific company. It uses enums defined in the Brand model and
+# to a specific branch. It uses enums defined in the Brand model and
 # simulates soft deletion for some records.
 
 class Seed::BrandService

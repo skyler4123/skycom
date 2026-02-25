@@ -18,10 +18,10 @@ class Seed::ProjectService
     discarded_at ||= should_discard ? Time.zone.now - rand(1..180).days : nil
     name ||= "#{Faker::App.name} Project"
     description ||= "Project for group '#{project_group.name}'."
-    code ||= "PROJ-#{company.id}-#{project_group.id}-#{SecureRandom.hex(2).upcase}"
+    code ||= "PROJ-#{branch.id}-#{project_group.id}-#{SecureRandom.hex(2).upcase}"
 
     Project.create!(
-      company: company,
+      branch: branch,
       project_group: project_group,
       name: name,
       description: description,

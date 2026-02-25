@@ -1,5 +1,5 @@
 # This service seeds the database with PaymentMethodAppointment records,
-# linking global PaymentMethods to specific Companies. This allows companies
+# linking global PaymentMethods to specific Branches. This allows branches
 # to have their own configurations or subsets of available payment methods.
 
 class Seed::PaymentMethodAppointmentService

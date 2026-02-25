@@ -2,7 +2,7 @@
 
 one:
   company_group: one
-  company: one
+  branch: one
   customer: one
   logable: one
   logable_type: Logable
@@ -10,7 +10,7 @@ one:
 
 two:
   company_group: two
-  company: two
+  branch: two
   customer: two
   logable: two
   logable_type: Logable

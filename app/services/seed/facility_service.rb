@@ -5,7 +5,7 @@
 class Seed::FacilityService
   def self.create(
     company_group:,
-    company: nil,
+    branch: nil,
     name: Faker::Commerce.department,
     description: Faker::Lorem.sentence(word_count: 10),
     lifecycle_status: Facility.lifecycle_statuses.keys.sample,
@@ -15,7 +15,7 @@ class Seed::FacilityService
   )
     Facility.create!(
       company_group: company_group,
-      company: company,
+      branch: branch,
       name: name,
       description: description,
       lifecycle_status: lifecycle_status,

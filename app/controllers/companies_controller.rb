@@ -1,58 +1,58 @@
-class CompaniesController < ApplicationController
+class BranchesController < ApplicationController
   before_action :set_company, only: %i[ show edit update destroy ]
 
-  # GET /companies or /companies.json
+  # GET /branches or /branches.json
   def index
-    @companies = Company.all
+    @branches = Company.all
   end
 
-  # GET /companies/1 or /companies/1.json
+  # GET /branches/1 or /branches/1.json
   def show
   end
 
-  # GET /companies/new
+  # GET /branches/new
   def new
     @company = Company.new
   end
 
-  # GET /companies/1/edit
+  # GET /branches/1/edit
   def edit
   end
 
-  # POST /companies or /companies.json
+  # POST /branches or /branches.json
   def create
     @company = Company.new(company_params)
 
     respond_to do |format|
-      if @company.save
+      if @branch.save
         format.html { redirect_to @company, notice: "Company was successfully created." }
         format.json { render :show, status: :created, location: @company }
       else
         format.html { render :new, status: :unprocessable_entity }
-        format.json { render json: @company.errors, status: :unprocessable_entity }
+        format.json { render json: @branch.errors, status: :unprocessable_entity }
       end
     end
   end
 
-  # PATCH/PUT /companies/1 or /companies/1.json
+  # PATCH/PUT /branches/1 or /branches/1.json
   def update
     respond_to do |format|
-      if @company.update(company_params)
+      if @branch.update(company_params)
         format.html { redirect_to @company, notice: "Company was successfully updated.", status: :see_other }
         format.json { render :show, status: :ok, location: @company }
       else
         format.html { render :edit, status: :unprocessable_entity }
-        format.json { render json: @company.errors, status: :unprocessable_entity }
+        format.json { render json: @branch.errors, status: :unprocessable_entity }
       end
     end
   end
 
-  # DELETE /companies/1 or /companies/1.json
+  # DELETE /branches/1 or /branches/1.json
   def destroy
-    @company.destroy!
+    @branch.destroy!
 
     respond_to do |format|
-      format.html { redirect_to companies_path, notice: "Company was successfully destroyed.", status: :see_other }
+      format.html { redirect_to branches_path, notice: "Company was successfully destroyed.", status: :see_other }
       format.json { head :no_content }
     end
   end
@@ -65,6 +65,6 @@ class CompaniesController < ApplicationController
 
     # Only allow a list of trusted parameters through.
     def company_params
-      params.expect(company: [ :company_group_id, :parent_company_id, :name, :description, :code, :status, :ownership_type, :business_type, :currency_code, :registration_number, :vat_id, :address_line_1, :city, :postal_code, :country, :email, :phone_number, :website, :employee_count, :fiscal_year_end_month, :discarded_at ])
+      params.expect(branch: [ :company_group_id, :parent_company_id, :name, :description, :code, :status, :ownership_type, :business_type, :currency_code, :registration_number, :vat_id, :address_line_1, :city, :postal_code, :country, :email, :phone_number, :website, :employee_count, :fiscal_year_end_month, :discarded_at ])
     end
 end

@@ -1,20 +1,20 @@
 module Seed
   class SystemSubscriptionPlanService
     LIMITS = {
-      temporary:     { employee: 3, company_group: 1, company: 2, duration: 1.day },
-      free:          { employee: 3, company_group: 1, company: 2, duration: 30.days },
-      basic:         { employee: 3, company_group: 1, company: 2, duration: 30.days },
-      basic_3m:      { employee: 3, company_group: 1, company: 2, duration: 90.days },
-      basic_6m:      { employee: 3, company_group: 1, company: 2, duration: 180.days },
-      basic_1y:      { employee: 3, company_group: 1, company: 2, duration: 365.days },
-      pro:           { employee: 3, company_group: 1, company: 2, duration: 30.days },
-      pro_3m:        { employee: 3, company_group: 1, company: 2, duration: 90.days },
-      pro_6m:        { employee: 3, company_group: 1, company: 2, duration: 180.days },
-      pro_1y:        { employee: 3, company_group: 1, company: 2, duration: 365.days },
-      enterprise:    { employee: 3, company_group: 1, company: 2, duration: 30.days },
-      enterprise_3m: { employee: 3, company_group: 1, company: 2, duration: 90.days },
-      enterprise_6m: { employee: 3, company_group: 1, company: 2, duration: 180.days },
-      enterprise_1y: { employee: 3, company_group: 1, company: 2, duration: 365.days }
+      temporary:     { employee: 3, company_group: 1, branch: 2, duration: 1.day },
+      free:          { employee: 3, company_group: 1, branch: 2, duration: 30.days },
+      basic:         { employee: 3, company_group: 1, branch: 2, duration: 30.days },
+      basic_3m:      { employee: 3, company_group: 1, branch: 2, duration: 90.days },
+      basic_6m:      { employee: 3, company_group: 1, branch: 2, duration: 180.days },
+      basic_1y:      { employee: 3, company_group: 1, branch: 2, duration: 365.days },
+      pro:           { employee: 3, company_group: 1, branch: 2, duration: 30.days },
+      pro_3m:        { employee: 3, company_group: 1, branch: 2, duration: 90.days },
+      pro_6m:        { employee: 3, company_group: 1, branch: 2, duration: 180.days },
+      pro_1y:        { employee: 3, company_group: 1, branch: 2, duration: 365.days },
+      enterprise:    { employee: 3, company_group: 1, branch: 2, duration: 30.days },
+      enterprise_3m: { employee: 3, company_group: 1, branch: 2, duration: 90.days },
+      enterprise_6m: { employee: 3, company_group: 1, branch: 2, duration: 180.days },
+      enterprise_1y: { employee: 3, company_group: 1, branch: 2, duration: 365.days }
     }.freeze
 
     PRICING = {

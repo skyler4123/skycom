@@ -9,7 +9,7 @@ class CompanyGroup < ApplicationRecord
   include CompanyGroup::PermissionConcern
 
   belongs_to :user
-  has_many :companies, dependent: :destroy
+  has_many :branches, dependent: :destroy
 
   has_many :tags, dependent: :destroy
 
@@ -64,7 +64,7 @@ class CompanyGroup < ApplicationRecord
   # validates :status, presence: true
 
   # Validation for new administrative fields
-  validates :registration_number, presence: true, uniqueness: true, if: :privately_held? # Typically required for private companies
+  validates :registration_number, presence: true, uniqueness: true, if: :privately_held? # Typically required for private branches
   validates :vat_id, length: { maximum: 50 }, allow_blank: true
   validates :employee_count, numericality: { greater_than_or_equal_to: 0 }, allow_nil: true
 
@@ -79,8 +79,8 @@ class CompanyGroup < ApplicationRecord
   # validates :fiscal_year_end_month, presence: true, numericality: { in: 1..12 }
 
   def create_first_cloned_company
-    return if companies.size > 1
-    companies.create(
+    return if branches.size > 1
+    branches.create(
       name: name,
       phone_number: phone_number,
       currency_code: currency_code,

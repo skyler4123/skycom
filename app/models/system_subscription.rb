@@ -2,7 +2,7 @@ class SystemSubscription < ApplicationRecord
   belongs_to :system_subscription_plan
   belongs_to :system_subscription_group, optional: true
   belongs_to :company_group
-  belongs_to :company, optional: true
+  belongs_to :branch, optional: true
 
   belongs_to :price
   belongs_to :period

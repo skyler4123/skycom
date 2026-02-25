@@ -3,7 +3,7 @@ class Education::CoursesController < Education::ApplicationController
 
   # GET /services or /services.json
   def index
-    @schools = Current.companies
+    @schools = Current.branches
 
     # render html: "", layout: true
     respond_to do |format|

@@ -3,7 +3,7 @@
 
 class Seed::ServiceGroupService
   def self.create(
-    company:,
+    branch:,
     name: "#{Faker::App.name} Service Group",
     description: "A group for #{Faker::Company.bs} services.",
     code: nil,
@@ -15,10 +15,10 @@ class Seed::ServiceGroupService
   )
     should_discard = rand(10) == 0
     discarded_at ||= should_discard ? Time.zone.now - rand(1..180).days : nil
-    code ||= "SG-#{company.id}-#{SecureRandom.hex(3).upcase}"
+    code ||= "SG-#{branch.id}-#{SecureRandom.hex(3).upcase}"
 
     ServiceGroup.create!(
-      company: company,
+      branch: branch,
       name: name,
       description: description,
       code: codeatus,

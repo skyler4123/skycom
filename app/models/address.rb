@@ -5,7 +5,7 @@ class Address < ApplicationRecord
   has_many :address_appointments, dependent: :destroy
   has_many :users, through: :address_appointments, source: :appoint_to, source_type: "User"
   has_many :company_groups, through: :address_appointments, source: :appoint_to, source_type: "CompanyGroup"
-  has_many :companies, through: :address_appointments, source: :appoint_to, source_type: "Company"
+  has_many :branches, through: :address_appointments, source: :appoint_to, source_type: "Company"
   has_many :employees, through: :address_appointments, source: :appoint_to, source_type: "Employee"
   has_many :employee_groups, through: :address_appointments, source: :appoint_to, source_type: "EmployeeGroup"
   has_many :customers, through: :address_appointments, source: :appoint_to, source_type: "Customer"

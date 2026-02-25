@@ -4,7 +4,7 @@
 
 class Seed::PolicyService
   def self.create(
-    company:,
+    branch:,
     name: nil,
     description: nil,
     resource: COMMON_RESOURCES.sample,
@@ -22,7 +22,7 @@ class Seed::PolicyService
     status ||= Policy.statuses.keys.sample
 
     Policy.create!(
-      company: company,
+      branch: branch,
       name: name,
       description: description,
       resource: resource.singularize,

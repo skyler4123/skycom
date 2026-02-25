@@ -2,7 +2,7 @@
 
 one:
   company_group: one
-  company: one
+  branch: one
   price: one
   period: one
   name: MyString
@@ -17,7 +17,7 @@ one:
 
 two:
   company_group: two
-  company: two
+  branch: two
   price: two
   period: two
   name: MyString

@@ -4,7 +4,7 @@ module CompanyGroup::EducationConcern
 
   included do
     def schools
-      companies
+      branches
     end
   end
 end

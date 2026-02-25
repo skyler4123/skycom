@@ -47,7 +47,7 @@ class Seed::EducationService
     )
     puts "Created education: #{@education.name}"
 
-    #--- 2. Create Schools (Companies) under the Education ---
+    #--- 2. Create Schools (Branches) under the Education ---
     school_count = 2
     puts "Creating #{school_count} schools under the education..."
     school_count.times do |i|
@@ -84,7 +84,7 @@ class Seed::EducationService
       [ "Science Department", "Math Department", "Arts Department", "Sports Department" ].each do |dept_name|
         department = Seed::EmployeeGroupService.create(
           company_group: @education,
-          company: school,
+          branch: school,
           name: dept_name,
           description: "Department: #{dept_name} in #{school.name}"
         )
@@ -108,7 +108,7 @@ class Seed::EducationService
           employee = Seed::EmployeeService.create(
             user: user,
             company_group: @education,
-            company: school,
+            branch: school,
             name: "Employee #{i + 1} - #{role_name.to_s.capitalize}",
             description: "Description for Employee #{i + 1} - #{role_name.to_s.capitalize}"
           )
@@ -147,7 +147,7 @@ class Seed::EducationService
           student = Seed::CustomerService.create(
             user: user,
             company_group: @education,
-            company: school,
+            branch: school,
             name: "Student #{i + 1}",
             description: "Description for Student #{i + 1}"
           )
@@ -165,7 +165,7 @@ class Seed::EducationService
       3.times do |i|
         klass = Seed::CustomerGroupService.create(
           company_group: @education,
-          company: school,
+          branch: school,
           name: "Class #{i + 1} - #{school.name}",
           description: "Description for Class #{i + 1} in #{school.name}"
         )
@@ -190,7 +190,7 @@ class Seed::EducationService
       5.times do |i|
         room = Seed::FacilityService.create(
           company_group: @education,
-          company: school,
+          branch: school,
           name: "Room #{i + 1} - #{school.name}",
           description: "Description for Room #{i + 1} in #{school.name}"
         )
@@ -205,7 +205,7 @@ class Seed::EducationService
       4.times do |i|
         course = Seed::ServiceService.create(
           company_group: @education,
-          company: school,
+          branch: school,
           name: "Course #{i + 1} - #{school.name}",
           description: "Description for Course #{i + 1} in #{school.name}"
         )
@@ -310,11 +310,11 @@ class Seed::EducationService
   #   end
   #   puts "Created #{@schools.count} schools."
 
-  #   # --- 3. Create Payment Method Appointments for Educations (Companies) ---
+  #   # --- 3. Create Payment Method Appointments for Educations (Branches) ---
   #   @schools.each do |school|
   #     2.times do
   #       Seed::PaymentMethodAppointmentService.create(
-  #         company: school
+  #         branch: school
   #       )
   #     end
   #   end
@@ -324,7 +324,7 @@ class Seed::EducationService
   #   SCHOOL_ROLES.each do |role_name|
   #     @schools.each do |school|
   #       Seed::RoleService.create(
-  #         company: school,
+  #         branch: school,
   #         name: role_name,
   #         description: "#{role_name} role for #{school.name}"
   #       )
@@ -339,7 +339,7 @@ class Seed::EducationService
   #         user = Seed::UserService.create(parent_user: @multi_company_group_owner, email: "#{role_name.downcase}_#{i + 1}_#{school.id}@example.com")
   #         employee = Seed::EmployeeService.create(
   #           user: user,
-  #           company: school
+  #           branch: school
   #         )
   #         employee.attach_tag(name: "Employee #{employee.id} Tag")
   #         employee.attach_role(role_name)
@@ -357,7 +357,7 @@ class Seed::EducationService
   #         user = Seed::UserService.create(parent_user: @multi_company_group_owner, email: "student_#{i + 1}_#{school.id}@example.com")
   #         customer = Seed::CustomerService.create(
   #           user: user,
-  #           company: school
+  #           branch: school
   #         )
   #         customer.attach_tag(name: "Customer #{customer.id} Tag")
   #         customer.attach_role(role_name)
@@ -372,7 +372,7 @@ class Seed::EducationService
   #     puts "Enrolling students in classes for #{school.name}..."
   #     @class_count.times do |i|
   #       klass = Seed::CustomerGroupService.create(
-  #         company: school,
+  #         branch: school,
   #         name: "Class #{i + 1} - #{school.name}",
   #         description: "Description for Class #{i + 1} in #{school.name}"
   #       )
@@ -394,7 +394,7 @@ class Seed::EducationService
   #     puts "Creating courses and enrolling classes for #{school.name}..."
   #     @course_count.times do |i|
   #       course = Seed::ServiceService.create(
-  #         company: school,
+  #         branch: school,
   #         name: "Course #{i + 1} - #{school.name}",
   #         description: "Description for Course #{i + 1} in #{school.name}"
   #       )
@@ -426,7 +426,7 @@ class Seed::EducationService
   #     puts "Creating rooms for #{school.name}..."
   #     5.times do |i|
   #       room = Seed::FacilityService.create(
-  #         company: school,
+  #         branch: school,
   #         name: "Room #{i + 1} - #{school.name}",
   #         description: "Description for Room #{i + 1} in #{school.name}"
   #       )

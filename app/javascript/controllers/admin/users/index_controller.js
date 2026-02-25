@@ -56,7 +56,7 @@ export default class Admin_Users_IndexController extends Admin_LayoutController 
             <div class="relative">
               <select
                 class="w-full bg-slate-50 dark:bg-slate-800 border-none text-sm rounded-lg py-2.5 pl-3 pr-10 text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-600/50 cursor-pointer">
-                <option value="">All Companies</option>
+                <option value="">All Branches</option>
                 <option value="retail">Retail</option>
                 <option value="education">Education</option>
                 <option value="hospital">Hospital</option>

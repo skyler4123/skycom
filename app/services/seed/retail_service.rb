@@ -30,7 +30,7 @@ class Seed::RetailService
 
     create_retail_company_group
     create_branches
-    subscribe_companies_to_system_subscription_plane
+    subscribe_branches_to_system_subscription_plane
     create_subscription_plans_for_company_group
     create_facilities_for_branches
     appoint_payment_methods_to_company_group
@@ -65,7 +65,7 @@ class Seed::RetailService
     @retail = Seed::CompanyGroupService.create(
       user: @multi_company_group_owner,
       name: "Retail Group #{rand(1000..9999)}",
-      description: "A group for multiple retail branch companies",
+      description: "A group for multiple retail branch branches",
       business_type: COMPANY_GROUP_BUSINESS_TYPE
     )
   end
@@ -84,7 +84,7 @@ class Seed::RetailService
     end
   end
 
-  def subscribe_companies_to_system_subscription_plane
+  def subscribe_branches_to_system_subscription_plane
     @branches.each do |branch|
       plan_name = SystemSubscriptionPlan.pluck(:name).sample
       branch.system_subscribe!(plan_name: plan_name)
@@ -129,7 +129,7 @@ class Seed::RetailService
       facility_count.times do |i|
         facility = Seed::FacilityService.create(
           company_group: @retail,
-          company: branch,
+          branch: branch,
           name: "#{branch.name} Facility #{i + 1}",
           description: "A facility location for #{branch.name}"
         )
@@ -161,7 +161,7 @@ class Seed::RetailService
       [ "Electronics", "Clothing", "Home Goods", "Customer Service" ].each do |dept_name|
         department = Seed::EmployeeGroupService.create(
           company_group: @retail,
-          company: branch,
+          branch: branch,
           name: dept_name,
           description: "Department: #{dept_name} in #{branch.name}"
         )
@@ -180,7 +180,7 @@ class Seed::RetailService
         count.times do |i|
           user = Seed::UserService.create(parent_user: @multi_company_group_owner, email: "#{role_name}_#{i + 1}_#{branch.id}@example.com")
           employee = Seed::EmployeeService.create(
-            user: user, company_group: @retail, company: branch,
+            user: user, company_group: @retail, branch: branch,
             name: "Employee #{i + 1} - #{role_name.to_s.titleize}"
           )
           employee.attach_role(role_name)
@@ -206,7 +206,7 @@ class Seed::RetailService
         count.times do |i|
           user = Seed::UserService.create(parent_user: @multi_company_group_owner, email: "customer_#{i + 1}_#{branch.id}@example.com")
           customer = Seed::CustomerService.create(
-            user: user, company_group: @retail, company: branch, name: "Customer #{i + 1}"
+            user: user, company_group: @retail, branch: branch, name: "Customer #{i + 1}"
           )
           customer.attach_role(role_name)
           @customers << customer
@@ -231,7 +231,7 @@ class Seed::RetailService
     @branches.each do |branch|
       2.times do |i|
         lp = Seed::CustomerGroupService.create(
-          company_group: @retail, company: branch, name: "Loyalty Program #{i + 1} - #{branch.name}"
+          company_group: @retail, branch: branch, name: "Loyalty Program #{i + 1} - #{branch.name}"
         )
         @loyalty_programs << lp
         
@@ -248,13 +248,13 @@ class Seed::RetailService
       # Products
       15.times do |i|
         @products << Seed::ProductService.create(
-          company_group: @retail, company: branch, name: "#{Faker::Commerce.product_name} #{i + 1}"
+          company_group: @retail, branch: branch, name: "#{Faker::Commerce.product_name} #{i + 1}"
         )
       end
       # Services
       10.times do |i|
         @services << Seed::ServiceService.create(
-          company_group: @retail, company: branch, name: "#{Faker::Company.buzzword} Service #{i + 1}"
+          company_group: @retail, branch: branch, name: "#{Faker::Company.buzzword} Service #{i + 1}"
         )
       end
     end
@@ -268,7 +268,7 @@ class Seed::RetailService
       5.times do |i|
         customer = branch_customers.sample
         order = Seed::OrderService.create(
-          company_group: @retail, company: branch, customer: customer, name: "Order #{i + 1} for #{customer.name}"
+          company_group: @retail, branch: branch, customer: customer, name: "Order #{i + 1} for #{customer.name}"
         )
         attach_items_to_order(branch, order)
       end

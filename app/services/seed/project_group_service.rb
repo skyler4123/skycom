@@ -3,7 +3,7 @@
 
 class Seed::ProjectGroupService
   def self.create(
-    company:,
+    branch:,
     name: "#{Faker::App.name} Project Group",
     description: "A group for projects related to #{Faker::Commerce.department}.",
     code: nil,
@@ -13,10 +13,10 @@ class Seed::ProjectGroupService
   )
     should_discard = rand(10) == 0
     discarded_at ||= should_discard ? Time.zone.now - rand(1..180).days : nil
-    code ||= "PROJ-G-#{company.id}-#{SecureRandom.hex(3).upcase}"
+    code ||= "PROJ-G-#{branch.id}-#{SecureRandom.hex(3).upcase}"
 
     ProjectGroup.create!(
-      company: company,
+      branch: branch,
       name: name,
       description: description,
       code: code,

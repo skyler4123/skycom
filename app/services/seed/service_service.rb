@@ -1,7 +1,7 @@
 class Seed::ServiceService
   def self.create(
     company_group:,
-    company:,
+    branch:,
     name: nil,
     description: Faker::Lorem.sentence(word_count: 10),
     # status: nil,
@@ -15,8 +15,8 @@ class Seed::ServiceService
 
     Service.create!(
       company_group: company_group,
-      company: company,
-      name: name || "#{company.name} Service",
+      branch: branch,
+      name: name || "#{branch.name} Service",
       description: description,
       lifecycle_status: lifecycle_status,
       workflow_status: workflow_status,

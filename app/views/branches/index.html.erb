@@ -1,4 +1,4 @@
-<% content_for :title, "Companies" %>
+<% content_for :title, "Branches" %>
 
 <div class="w-full">
   <% if notice.present? %>
@@ -6,13 +6,13 @@
   <% end %>
 
   <div class="flex justify-between items-center">
-    <h1 class="font-bold text-4xl">Companies</h1>
+    <h1 class="font-bold text-4xl">Branches</h1>
     <%= link_to "New company", new_company_path, class: "rounded-md px-3.5 py-2.5 bg-blue-600 hover:bg-blue-500 text-white block font-medium" %>
   </div>
 
-  <div id="companies" class="min-w-full divide-y divide-gray-200 space-y-5">
-    <% if @companies.any? %>
-      <% @companies.each do |company| %>
+  <div id="branches" class="min-w-full divide-y divide-gray-200 space-y-5">
+    <% if @branches.any? %>
+      <% @branches.each do |company| %>
         <div class="flex flex-col sm:flex-row justify-between items-center pb-5 sm:pb-0">
           <%= render company %>
           <div class="w-full sm:w-auto flex flex-col sm:flex-row space-x-2 space-y-2">
@@ -23,7 +23,7 @@
         </div>
       <% end %>
     <% else %>
-      <p class="text-center my-10">No companies found.</p>
+      <p class="text-center my-10">No branches found.</p>
     <% end %>
   </div>
 </div>

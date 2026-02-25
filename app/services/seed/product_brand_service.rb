@@ -1,5 +1,5 @@
 # This service seeds the database with ProductBrand records. Unlike other
-# seeders, these are not tied to a specific company. It uses enums defined
+# seeders, these are not tied to a specific branch. It uses enums defined
 # in the ProductBrand model and simulates soft deletion for some records.
 
 class Seed::ProductBrandService

@@ -3,7 +3,7 @@ class Role < ApplicationRecord
 
   # --- Associations ---
   belongs_to :company_group
-  belongs_to :company, optional: true
+  belongs_to :branch, optional: true
 
   has_many :policy_appointments, dependent: :destroy, as: :appoint_to
   has_many :policies, through: :policy_appointments

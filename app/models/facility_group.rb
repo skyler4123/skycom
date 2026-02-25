@@ -3,7 +3,7 @@ class FacilityGroup < ApplicationRecord
 
   # --- Associations ---
   belongs_to :company_group
-  belongs_to :company, optional: true
+  belongs_to :branch, optional: true
   has_many :facility_group_appointments, dependent: :destroy
   has_many :facilities, through: :facility_group_appointments, source: :appoint_to, source_type: "Facility"
 

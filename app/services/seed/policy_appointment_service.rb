@@ -1,8 +1,8 @@
 class Seed::PolicyAppointmentService
   def self.run
     Company.all.each_with_index do |company, index|
-      roles = company.roles
-      policies = company.policies
+      roles = branch.roles
+      policies = branch.policies
       policies.each do |policy|
         policy.roles << roles.sample
       end

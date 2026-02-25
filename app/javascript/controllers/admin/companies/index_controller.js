@@ -1,6 +1,6 @@
 import Admin_LayoutController from "controllers/admin/layout_controller"
 
-export default class Admin_Companies_IndexController extends Admin_LayoutController {
+export default class Admin_Branches_IndexController extends Admin_LayoutController {
 
   contentHTML() {
     return `
@@ -9,7 +9,7 @@ export default class Admin_Companies_IndexController extends Admin_LayoutControl
           <div>
             <h1 class="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">Branch Management</h1>
             <p class="text-sm text-slate-500 dark:text-slate-400 mt-1">Manage physical locations, associate them with
-              parent companies, and monitor status.</p>
+              parent branches, and monitor status.</p>
           </div>
           <button
             class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2.5 rounded-lg flex items-center gap-2 transition-all shadow-sm hover:shadow-md font-medium text-sm">
@@ -41,7 +41,7 @@ export default class Admin_Companies_IndexController extends Admin_LayoutControl
             <div class="relative">
               <select
                 class="w-full bg-slate-50 dark:bg-slate-800 border-none text-sm rounded-lg py-2.5 pl-3 pr-10 text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-600/50 cursor-pointer">
-                <option value="">All Companies</option>
+                <option value="">All Branches</option>
                 <option value="tech_retail">TechRetail Solutions</option>
                 <option value="learn_fast">LearnFast Academy</option>
                 <option value="city_gen">City General Hospital</option>

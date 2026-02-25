@@ -4,7 +4,7 @@
 
 class Seed::BookingService
   def self.create(
-    company:,
+    branch:,
     appoint_from: nil,
     appoint_to:,
     name: Faker::Book.title,
@@ -15,10 +15,10 @@ class Seed::BookingService
     business_type: Booking.business_types.keys.sample,
     discarded_at: nil
   )
-    appoint_from ||= company.employees.sample
+    appoint_from ||= branch.employees.sample
 
     Booking.create!(
-      company: company,
+      branch: branch,
       appoint_from: appoint_from,
       appoint_to: appoint_to,
       name: name,

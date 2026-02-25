@@ -53,7 +53,7 @@ class User < ApplicationRecord
   enum :country_code, COUNTRIE_CODES, prefix: true
 
   # --- Custom Methods ---
-  # Alias for `parent_user` to provide a more descriptive name for the owner of a company.
+  # Alias for `parent_user` to provide a more descriptive name for the owner of a branch.
   def company_owner
     return self if parent_user.nil?
     parent_user

@@ -4,7 +4,7 @@ module Seed
     # Helper method for individual creation
     def self.create(
       company_group:,
-      company: nil,
+      branch: nil,
       price:,
       duration_days:,
       name:,
@@ -14,7 +14,7 @@ module Seed
       )
       SubscriptionPlan.create!(
         company_group: company_group,
-        company: company,
+        branch: branch,
         price: price,
         duration_days: duration_days,
         name: name,

@@ -1,9 +1,9 @@
 class Education::SchoolsController < Education::ApplicationController
   # before_action :set_company, only: %i[ show edit update destroy ]
 
-  # GET /companies or /companies.json
+  # GET /branches or /branches.json
   def index
-    @schools = Current.companies
+    @schools = Current.branches
 
     # render html: "", layout: true
     respond_to do |format|
@@ -20,6 +20,6 @@ class Education::SchoolsController < Education::ApplicationController
 
     # Only allow a list of trusted parameters through.
     def company_params
-      params.expect(company: [ :user_id, :parent_company_id, :name, :description, :code, :status, :ownership_type, :business_type, :currency_code, :registration_number, :vat_id, :address_line_1, :city, :postal_code, :country, :email, :phone_number, :website, :employee_count, :fiscal_year_end_month, :discarded_at ])
+      params.expect(branch: [ :user_id, :parent_company_id, :name, :description, :code, :status, :ownership_type, :business_type, :currency_code, :registration_number, :vat_id, :address_line_1, :city, :postal_code, :country, :email, :phone_number, :website, :employee_count, :fiscal_year_end_month, :discarded_at ])
     end
 end

@@ -21,7 +21,7 @@ class Retail::Management::EmployeesController < Retail::Management::ApplicationC
   def create
     @employee = Employee.new(employee_params)
     @employee.company_group = @retail
-    @employee.company = @retail.companies.first # Default to first company, can be made configurable
+    @employee.company = @retail.branches.first # Default to first company, can be made configurable
 
     respond_to do |format|
       if @employee.save

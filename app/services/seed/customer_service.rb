@@ -5,7 +5,7 @@
 class Seed::CustomerService
   def self.create(
     company_group:,
-    company: nil,
+    branch: nil,
     user: nil,
     name: Faker::Name.name,
     description: Faker::Lorem.sentence(word_count: 10),
@@ -16,7 +16,7 @@ class Seed::CustomerService
   )
     Customer.create!(
       company_group: company_group,
-      company: company,
+      branch: branch,
       user: user,
       name: name,
       description: description,

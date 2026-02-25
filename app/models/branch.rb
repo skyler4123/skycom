@@ -1,4 +1,4 @@
-class Company < ApplicationRecord
+class Branch < ApplicationRecord
   include AddressConcern
   include TagConcern
   include SystemSubscription::ResourceConcern
@@ -28,8 +28,8 @@ class Company < ApplicationRecord
   has_many :statistics, as: :owner
 
   # Self-referencing association for company hierarchy
-  belongs_to :parent_company, class_name: "Company", optional: true
-  has_many :child_companies, class_name: "Company", foreign_key: "parent_company_id", dependent: :destroy, inverse_of: :parent_company
+  # belongs_to :parent_company, class_name: "Company", optional: true
+  # has_many :child_branches, class_name: "Company", foreign_key: "parent_company_id", dependent: :destroy, inverse_of: :parent_company
 
   # --- Enums ---
   enum :country_code, COUNTRIE_CODES, prefix: true
@@ -59,7 +59,7 @@ class Company < ApplicationRecord
   # validates :status, presence: true
 
   # Validation for new administrative fields
-  validates :registration_number, presence: true, uniqueness: true, if: :privately_held? # Typically required for private companies
+  validates :registration_number, presence: true, uniqueness: true, if: :privately_held? # Typically required for private branches
   validates :vat_id, length: { maximum: 50 }, allow_blank: true
   validates :employee_count, numericality: { greater_than_or_equal_to: 0 }, allow_nil: true
 

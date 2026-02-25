@@ -3,7 +3,7 @@
 
 class Seed::ProductGroupService
   def self.create(
-    company:,
+    branch:,
     name: "#{Faker::Commerce.department} Group",
     description: "A group for products in the #{Faker::Commerce.material} category.",
     code: nil,
@@ -13,12 +13,12 @@ class Seed::ProductGroupService
   )
     should_discard = rand(10) == 0
     discarded_at ||= should_discard ? Time.zone.now - rand(1..180).days : nil
-    code ||= "PG-#{company.id}-#{SecureRandom.hex(3).upcase}"
+    code ||= "PG-#{branch.id}-#{SecureRandom.hex(3).upcase}"
     status ||= ProductGroup.statuses.keys.sample
     business_type ||= ProductGroup.business_types.keys.sample
 
     ProductGroup.create!(
-      company: company,
+      branch: branch,
       name: name,
       description: description,
       code: code,

@@ -172,7 +172,7 @@ export default class Retail_Management_Subscriptions_IndexController extends Ret
                 <select
                   class="pl-10 pr-8 py-2 bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700 rounded-lg text-sm text-gray-700 dark:text-gray-200 focus:ring-blue-600 focus:border-blue-600">
                   <option>All Entities</option>
-                  <option>Companies Only</option>
+                  <option>Branches Only</option>
                   <option>Branches Only</option>
                 </select>
               </div>

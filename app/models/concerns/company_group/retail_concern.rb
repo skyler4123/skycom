@@ -4,7 +4,7 @@ module CompanyGroup::RetailConcern
 
   included do
     def branches
-      companies
+      branches
     end
 
     def cached_departments

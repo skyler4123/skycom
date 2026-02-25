@@ -2,7 +2,7 @@
 
 one:
   company_group: one
-  company: one
+  branch: one
   booking_resource: one
   price: one
   appoint_from: one
@@ -23,7 +23,7 @@ one:
 
 two:
   company_group: two
-  company: two
+  branch: two
   booking_resource: two
   price: two
   appoint_from: two

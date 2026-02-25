@@ -3,7 +3,7 @@
 one:
   system_subscription_plan: one
   company_group: one
-  company: one
+  branch: one
   period: one
   name: MyString
   description: MyString
@@ -18,7 +18,7 @@ one:
 two:
   system_subscription_plan: two
   company_group: two
-  company: two
+  branch: two
   period: two
   name: MyString
   description: MyString

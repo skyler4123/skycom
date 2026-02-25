@@ -26,7 +26,7 @@ Rails.application.routes.draw do
     # namespace (e.g., app/controllers/admin/users_controller.rb).
     resources :dashboard
     resources :company_groups
-    resources :companies
+    resources :branches
     resources :users
     resources :subscriptions
   end
@@ -197,7 +197,7 @@ Rails.application.routes.draw do
   resources :employee_groups
   resources :tag_appointments
   resources :tags
-  resources :companies
+  resources :branches
   resources :addresses
   resources :home, only: [ :index ] do
     collection do
