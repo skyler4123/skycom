@@ -3,8 +3,8 @@ class EmployeeGroup < ApplicationRecord
   include TagConcern
 
   # --- Associations ---
-  belongs_to :company_group
-  belongs_to :company, optional: true
+  belongs_to :company
+  belongs_to :branch, optional: true
   belongs_to :category, optional: true
 
   has_many :employee_group_appointments, dependent: :destroy

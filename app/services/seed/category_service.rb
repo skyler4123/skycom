@@ -1,10 +1,10 @@
 class Seed::CategoryService
   def self.create(
-    company_group:,
+    company:,
     name: Faker::Commerce.department
   )
     Category.first_or_create!(
-      company_group: company_group,
+      company: company,
       name: name
     )
   end

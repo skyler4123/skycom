@@ -17,8 +17,8 @@ class SystemSubscriptionGroupsTest < ApplicationSystemTestCase
     check "Auto renew" if @system_subscription_group.auto_renew
     fill_in "Business type", with: @system_subscription_group.business_type
     fill_in "Code", with: @system_subscription_group.code
-    fill_in "Company group", with: @system_subscription_group.company_group_id
-    fill_in "Company", with: @system_subscription_group.company_id
+    fill_in "Company group", with: @system_subscription_group.company_id
+    fill_in "Company", with: @system_subscription_group.branch_id
     fill_in "Country code", with: @system_subscription_group.country_code
     fill_in "Description", with: @system_subscription_group.description
     fill_in "Discarded at", with: @system_subscription_group.discarded_at
@@ -40,8 +40,8 @@ class SystemSubscriptionGroupsTest < ApplicationSystemTestCase
     check "Auto renew" if @system_subscription_group.auto_renew
     fill_in "Business type", with: @system_subscription_group.business_type
     fill_in "Code", with: @system_subscription_group.code
-    fill_in "Company group", with: @system_subscription_group.company_group_id
-    fill_in "Company", with: @system_subscription_group.company_id
+    fill_in "Company group", with: @system_subscription_group.company_id
+    fill_in "Company", with: @system_subscription_group.branch_id
     fill_in "Country code", with: @system_subscription_group.country_code
     fill_in "Description", with: @system_subscription_group.description
     fill_in "Discarded at", with: @system_subscription_group.discarded_at.to_s

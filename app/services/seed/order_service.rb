@@ -1,11 +1,11 @@
 # This service seeds the database with Order records. Each order is associated
-# with a Company and a Customer from that same company. It uses enums from the
+# with a Company and a Customer from that same branch. It uses enums from the
 # Order model and simulates soft deletion for a portion of the records.
 
 class Seed::OrderService
   def self.create(
-    company_group:,
-    company: nil,
+    company:,
+    branch: nil,
     customer: nil,
     name: Faker::Company.buzzword,
     description: Faker::Lorem.sentence(word_count: 15),
@@ -16,8 +16,8 @@ class Seed::OrderService
     discarded_at: nil
   )
     Order.create!(
-      company_group: company_group,
       company: company,
+      branch: branch,
       customer: customer,
       name: name,
       description: description,

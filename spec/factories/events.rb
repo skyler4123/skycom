@@ -1,7 +1,7 @@
 FactoryBot.define do
   factory :event do
     event_group { nil }
-    company_group { nil }
+    company { nil }
     company { nil }
     name { "MyString" }
     description { "MyString" }

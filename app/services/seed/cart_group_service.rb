@@ -3,7 +3,7 @@
 
 class Seed::CartGroupService
   def self.create(
-    company: Company.all.sample,
+    branch: Branch.all.sample,
     name: "#{Faker::Commerce.department} Carts",
     description: "A group for carts related to #{Faker::Marketing.buzzwords}.",
     code: Faker::Code.npi,
@@ -13,7 +13,7 @@ class Seed::CartGroupService
     discarded_at: nil
   )
     CartGroup.create!(
-      company: company,
+      branch: branch,
       name: name,
       description: description,
       code: code,

@@ -1,4 +1,4 @@
-class Admin::CompanyGroupsController < Admin::ApplicationController
+class Admin::CompaniesController < Admin::ApplicationController
   def index
     respond_to do |format|
       format.html { render html: "", layout: true }

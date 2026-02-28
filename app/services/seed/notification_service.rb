@@ -1,5 +1,5 @@
 # This service seeds the database with Notification records. Each notification is
-# associated with a NotificationGroup and a Company.
+# associated with a NotificationGroup and a Branch.
 
 class Seed::NotificationService
   def self.create(
@@ -17,12 +17,12 @@ class Seed::NotificationService
 
     should_discard = rand(10) == 0
     discarded_at ||= should_discard ? Time.zone.now - rand(1..180).days : nil
-    name ||= "Notification for #{company.name}"
+    name ||= "Notification for #{branch.name}"
     description ||= "A notification for group '#{notification_group.name}'."
-    code ||= "NOTIF-#{company.id}-#{notification_group.id}-#{SecureRandom.hex(2).upcase}"
+    code ||= "NOTIF-#{branch.id}-#{notification_group.id}-#{SecureRandom.hex(2).upcase}"
 
     Notification.create!(
-      company: company,
+      branch: branch,
       notification_group: notification_group,
       name: name,
       description: description,

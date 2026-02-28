@@ -65,6 +65,6 @@ class ProjectGroupsController < ApplicationController
 
     # Only allow a list of trusted parameters through.
     def project_group_params
-      params.expect(project_group: [ :company_id, :name, :description, :code, :status, :business_type, :discarded_at ])
+      params.expect(project_group: [ :branch_id, :name, :description, :code, :status, :business_type, :discarded_at ])
     end
 end

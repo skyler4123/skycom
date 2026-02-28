@@ -34,12 +34,12 @@ export default class Admin_LayoutController extends Controller {
                   <span class="text-sm font-medium">System Overview</span>
                 </a>
                 <a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white transition-colors"
-                  href="/admin/company_groups">
+                  href="/admin/companies">
                   <span class="material-symbols-outlined">domain</span>
-                  <span class="text-sm font-medium">Companies</span>
+                  <span class="text-sm font-medium">Branches</span>
                 </a>
                 <a class="flex items-center gap-3 px-3 py-2.5 rounded-lg bg-blue-600/10 text-blue-600 group transition-colors"
-                  href="/admin/companies">
+                  href="/admin/branches">
                   <span class="material-symbols-outlined fill">store</span>
                   <span class="text-sm font-semibold">Branches</span>
                 </a>

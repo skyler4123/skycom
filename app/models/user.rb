@@ -35,7 +35,7 @@ class User < ApplicationRecord
 
   # --- Business Logic Associations ---
 
-  has_many :company_groups, dependent: :destroy
+  has_many :companies, dependent: :destroy
   has_one :employee, dependent: :destroy
   has_one :customer, dependent: :destroy
 
@@ -53,7 +53,7 @@ class User < ApplicationRecord
   enum :country_code, COUNTRIE_CODES, prefix: true
 
   # --- Custom Methods ---
-  # Alias for `parent_user` to provide a more descriptive name for the owner of a company.
+  # Alias for `parent_user` to provide a more descriptive name for the owner of a branch.
   def company_owner
     return self if parent_user.nil?
     parent_user

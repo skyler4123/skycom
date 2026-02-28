@@ -2,8 +2,8 @@ class CreateNotifications < ActiveRecord::Migration[8.0]
   def change
     create_table :notifications, id: :uuid do |t|
       t.references :notification_group, null: false, foreign_key: true, type: :uuid
-      t.references :company_group, null: false, foreign_key: true, type: :uuid
-      t.references :company, null: true, foreign_key: true, type: :uuid
+      t.references :company, null: false, foreign_key: true, type: :uuid
+      t.references :branch, null: true, foreign_key: true, type: :uuid
       t.references :category, null: true, foreign_key: true, type: :uuid
 
       t.string :name

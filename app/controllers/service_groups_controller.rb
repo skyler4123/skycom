@@ -65,6 +65,6 @@ class ServiceGroupsController < ApplicationController
 
     # Only allow a list of trusted parameters through.
     def service_group_params
-      params.expect(service_group: [ :company_id, :name, :description, :code, :status, :duration, :start_at, :business_type, :discarded_at ])
+      params.expect(service_group: [ :branch_id, :name, :description, :code, :status, :duration, :start_at, :business_type, :discarded_at ])
     end
 end

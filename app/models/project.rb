@@ -2,8 +2,8 @@ class Project < ApplicationRecord
   include TagConcern
 
   # --- Associations ---
-  belongs_to :company_group
-  belongs_to :company, optional: true
+  belongs_to :company
+  belongs_to :branch, optional: true
   belongs_to :project_group
 
   # --- Enums ---

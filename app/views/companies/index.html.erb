@@ -1,4 +1,4 @@
-<% content_for :title, "Companies" %>
+<% content_for :title, "Company groups" %>
 
 <div class="w-full">
   <% if notice.present? %>
@@ -6,8 +6,8 @@
   <% end %>
 
   <div class="flex justify-between items-center">
-    <h1 class="font-bold text-4xl">Companies</h1>
-    <%= link_to "New company", new_company_path, class: "rounded-md px-3.5 py-2.5 bg-blue-600 hover:bg-blue-500 text-white block font-medium" %>
+    <h1 class="font-bold text-4xl">Company groups</h1>
+    <%= link_to "New company group", new_company_path, class: "rounded-md px-3.5 py-2.5 bg-blue-600 hover:bg-blue-500 text-white block font-medium" %>
   </div>
 
   <div id="companies" class="min-w-full divide-y divide-gray-200 space-y-5">
@@ -23,7 +23,7 @@
         </div>
       <% end %>
     <% else %>
-      <p class="text-center my-10">No companies found.</p>
+      <p class="text-center my-10">No company groups found.</p>
     <% end %>
   </div>
 </div>

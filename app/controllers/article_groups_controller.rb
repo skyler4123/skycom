@@ -65,6 +65,6 @@ class ArticleGroupsController < ApplicationController
 
     # Only allow a list of trusted parameters through.
     def article_group_params
-      params.expect(article_group: [ :company_group_id, :company_id, :title, :content, :name, :description, :code, :status, :business_type, :discarded_at ])
+      params.expect(article_group: [ :company_id, :branch_id, :title, :content, :name, :description, :code, :status, :business_type, :discarded_at ])
     end
 end

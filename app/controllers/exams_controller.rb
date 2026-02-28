@@ -65,6 +65,6 @@ class ExamsController < ApplicationController
 
     # Only allow a list of trusted parameters through.
     def exam_params
-      params.expect(exam: [ :exam_group_id, :company_id, :name, :description, :code, :status, :business_type, :discarded_at ])
+      params.expect(exam: [ :exam_group_id, :branch_id, :name, :description, :code, :status, :business_type, :discarded_at ])
     end
 end

@@ -79,11 +79,11 @@ export const isSignedIn = () => {
 }
 
 /**
- * Retrieves the list of company groups from the 'company_groups' cookie.
+ * Retrieves the list of company groups from the 'companies' cookie.
  * @returns {Array<object>} An array of company group objects.
  */
 export const companyGroups = () => {
-  const c = Cookie('company_groups');
+  const c = Cookie('companies');
   return c ? JSON.parse(c) : [];
 }
 

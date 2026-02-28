@@ -17,7 +17,7 @@ class AttendanceLogsControllerTest < ActionDispatch::IntegrationTest
 
   test "should create attendance_log" do
     assert_difference("AttendanceLog.count") do
-      post attendance_logs_url, params: { attendance_log: { company_group_id: @attendance_log.company_group_id, company_id: @attendance_log.company_id, customer_id: @attendance_log.customer_id, device_info: @attendance_log.device_info, id_address: @attendance_log.id_address, location: @attendance_log.location, logable_id: @attendance_log.logable_id, logable_type: @attendance_log.logable_type, notes: @attendance_log.notes, period_id: @attendance_log.period_id } }
+      post attendance_logs_url, params: { attendance_log: { company_id: @attendance_log.company_id, branch_id: @attendance_log.branch_id, customer_id: @attendance_log.customer_id, device_info: @attendance_log.device_info, id_address: @attendance_log.id_address, location: @attendance_log.location, logable_id: @attendance_log.logable_id, logable_type: @attendance_log.logable_type, notes: @attendance_log.notes, period_id: @attendance_log.period_id } }
     end
 
     assert_redirected_to attendance_log_url(AttendanceLog.last)
@@ -34,7 +34,7 @@ class AttendanceLogsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "should update attendance_log" do
-    patch attendance_log_url(@attendance_log), params: { attendance_log: { company_group_id: @attendance_log.company_group_id, company_id: @attendance_log.company_id, customer_id: @attendance_log.customer_id, device_info: @attendance_log.device_info, id_address: @attendance_log.id_address, location: @attendance_log.location, logable_id: @attendance_log.logable_id, logable_type: @attendance_log.logable_type, notes: @attendance_log.notes, period_id: @attendance_log.period_id } }
+    patch attendance_log_url(@attendance_log), params: { attendance_log: { company_id: @attendance_log.company_id, branch_id: @attendance_log.branch_id, customer_id: @attendance_log.customer_id, device_info: @attendance_log.device_info, id_address: @attendance_log.id_address, location: @attendance_log.location, logable_id: @attendance_log.logable_id, logable_type: @attendance_log.logable_type, notes: @attendance_log.notes, period_id: @attendance_log.period_id } }
     assert_redirected_to attendance_log_url(@attendance_log)
   end
 

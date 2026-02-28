@@ -3,8 +3,8 @@ class CreateSystemSubscriptions < ActiveRecord::Migration[8.0]
     create_table :system_subscriptions, id: :uuid do |t|
       t.references :system_subscription_plan, null: false, foreign_key: true, type: :uuid
       t.references :system_subscription_group, null: true, foreign_key: true, type: :uuid
-      t.references :company_group, null: false, foreign_key: true, type: :uuid
-      t.references :company, null: true, foreign_key: true, type: :uuid
+      t.references :company, null: false, foreign_key: true, type: :uuid
+      t.references :branch, null: true, foreign_key: true, type: :uuid
       t.references :price, null: false, foreign_key: true, type: :uuid
       t.references :period, null: false, foreign_key: true, type: :uuid
       # The entity selling the subscription (e.g., System, Company)

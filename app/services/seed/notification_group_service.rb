@@ -3,7 +3,7 @@
 
 class Seed::NotificationGroupService
   def self.create(
-    company:,
+    branch:,
     name: "#{Faker::App.name} Notifications",
     description: "A group for #{Faker::Marketing.buzzwords} notifications.",
     code: nil,
@@ -14,10 +14,10 @@ class Seed::NotificationGroupService
   )
     should_discard = rand(10) == 0
     discarded_at ||= should_discard ? Time.zone.now - rand(1..180).days : nil
-    code ||= "NOTIF-G-#{company.id}-#{SecureRandom.hex(3).upcase}"
+    code ||= "NOTIF-G-#{branch.id}-#{SecureRandom.hex(3).upcase}"
 
     NotificationGroup.create!(
-      company: company,
+      branch: branch,
       name: name,
       description: description,
       code: code,

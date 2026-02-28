@@ -4,11 +4,11 @@ module RoleConcern
   included do
     def attach_role(name)
       # Ensure the object has a 'company' association for proper tag scoping
-      raise "Model must belong to a company to attach a tag." unless respond_to?(:company_group) && company_group
+      raise "Model must belong to a company to attach a tag." unless respond_to?(:company) && company
 
       ApplicationRecord.transaction do
         # 1. Find or create the Role scoped to the company group
-        role = company_group.roles.find_or_create_by!(name: name)
+        role = company.roles.find_or_create_by!(name: name)
 
         # 2. Assign the role to the resource if not already assigned
         unless roles.include?(role)

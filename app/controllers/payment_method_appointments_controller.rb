@@ -65,6 +65,6 @@ class PaymentMethodAppointmentsController < ApplicationController
 
     # Only allow a list of trusted parameters through.
     def payment_method_appointment_params
-      params.expect(payment_method_appointment: [ :payment_method_id, :company_id, :name, :description, :code, :status, :business_type, :discarded_at ])
+      params.expect(payment_method_appointment: [ :payment_method_id, :branch_id, :name, :description, :code, :status, :business_type, :discarded_at ])
     end
 end

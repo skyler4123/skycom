@@ -2,8 +2,8 @@ class Service < ApplicationRecord
   include TagConcern
   include OrderConcern
 
-  belongs_to :company_group
-  belongs_to :company, optional: true
+  belongs_to :company
+  belongs_to :branch, optional: true
 
   has_many :order_appointments, as: :appoint_to, dependent: :destroy
   has_many :orders, through: :order_appointments

@@ -1,9 +1,9 @@
 class Tag < ApplicationRecord
-  belongs_to :company_group
+  belongs_to :company
 
   has_many :tag_appointments, dependent: :destroy
-  has_many :company_groups, through: :tag_appointments, source: :appoint_to, source_type: "CompanyGroup"
   has_many :companies, through: :tag_appointments, source: :appoint_to, source_type: "Company"
+  has_many :branches, through: :tag_appointments, source: :appoint_to, source_type: "Company"
   has_many :employee_groups, through: :tag_appointments, source: :appoint_to, source_type: "EmployeeGroup"
   has_many :employees, through: :tag_appointments, source: :appoint_to, source_type: "Employee"
   has_many :customer_groups, through: :tag_appointments, source: :appoint_to, source_type: "CustomerGroup"
@@ -14,6 +14,7 @@ class Tag < ApplicationRecord
   has_many :facilities, through: :tag_appointments, source: :appoint_to, source_type: "Facility"
   has_many :product_groups, through: :tag_appointments, source: :appoint_to, source_type: "ProductGroup"
   has_many :products, through: :tag_appointments, source: :appoint_to, source_type: "Product"
+  has_many :departments, through: :address_appointments, source: :appoint_to, source_type: "Department"
 
-  validates :name, presence: true, uniqueness: { scope: :company_group_id }
+  validates :name, presence: true, uniqueness: { scope: :company_id }
 end

@@ -32,7 +32,7 @@ export const CURRENCIE_CODES = {
 }
 
 export const SUBSCRIPTION_LIMIT = {
-  "max_of_companies": 3,
+  "max_of_branches": 3,
   "max_of_employees": 5
 }
 

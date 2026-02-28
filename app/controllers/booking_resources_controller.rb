@@ -65,6 +65,6 @@ class BookingResourcesController < ApplicationController
 
     # Only allow a list of trusted parameters through.
     def booking_resource_params
-      params.expect(booking_resource: [ :company_group_id, :company_id, :booking_resourceable_id, :booking_resourceable_type, :name, :description, :lifecycle_status, :workflow_status, :business_type, :discarded_at ])
+      params.expect(booking_resource: [ :company_id, :branch_id, :booking_resourceable_id, :booking_resourceable_type, :name, :description, :lifecycle_status, :workflow_status, :business_type, :discarded_at ])
     end
 end

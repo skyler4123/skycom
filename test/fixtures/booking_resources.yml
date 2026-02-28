@@ -1,8 +1,8 @@
 # Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
 
 one:
-  company_group: one
   company: one
+  branch: one
   booking_resourceable: one
   booking_resourceable_type: Booking resourceable
   name: MyString
@@ -13,8 +13,8 @@ one:
   discarded_at: 2026-01-06 09:13:29
 
 two:
-  company_group: two
   company: two
+  branch: two
   booking_resourceable: two
   booking_resourceable_type: Booking resourceable
   name: MyString

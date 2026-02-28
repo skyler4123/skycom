@@ -17,7 +17,7 @@ class ShiftsControllerTest < ActionDispatch::IntegrationTest
 
   test "should create shift" do
     assert_difference("Shift.count") do
-      post shifts_url, params: { shift: { company_group_id: @shift.company_group_id, company_id: @shift.company_id, description: @shift.description, name: @shift.name, period_id: @shift.period_id } }
+      post shifts_url, params: { shift: { company_id: @shift.company_id, branch_id: @shift.branch_id, description: @shift.description, name: @shift.name, period_id: @shift.period_id } }
     end
 
     assert_redirected_to shift_url(Shift.last)
@@ -34,7 +34,7 @@ class ShiftsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "should update shift" do
-    patch shift_url(@shift), params: { shift: { company_group_id: @shift.company_group_id, company_id: @shift.company_id, description: @shift.description, name: @shift.name, period_id: @shift.period_id } }
+    patch shift_url(@shift), params: { shift: { company_id: @shift.company_id, branch_id: @shift.branch_id, description: @shift.description, name: @shift.name, period_id: @shift.period_id } }
     assert_redirected_to shift_url(@shift)
   end
 

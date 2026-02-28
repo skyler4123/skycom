@@ -14,8 +14,8 @@ class AttendanceLogsTest < ApplicationSystemTestCase
     visit attendance_logs_url
     click_on "New attendance log"
 
-    fill_in "Company group", with: @attendance_log.company_group_id
-    fill_in "Company", with: @attendance_log.company_id
+    fill_in "Company group", with: @attendance_log.company_id
+    fill_in "Company", with: @attendance_log.branch_id
     fill_in "Customer", with: @attendance_log.customer_id
     fill_in "Device info", with: @attendance_log.device_info
     fill_in "Id address", with: @attendance_log.id_address
@@ -34,8 +34,8 @@ class AttendanceLogsTest < ApplicationSystemTestCase
     visit attendance_log_url(@attendance_log)
     click_on "Edit this attendance log", match: :first
 
-    fill_in "Company group", with: @attendance_log.company_group_id
-    fill_in "Company", with: @attendance_log.company_id
+    fill_in "Company group", with: @attendance_log.company_id
+    fill_in "Company", with: @attendance_log.branch_id
     fill_in "Customer", with: @attendance_log.customer_id
     fill_in "Device info", with: @attendance_log.device_info
     fill_in "Id address", with: @attendance_log.id_address

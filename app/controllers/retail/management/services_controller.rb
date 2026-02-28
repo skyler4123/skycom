@@ -20,8 +20,8 @@ class Retail::Management::ServicesController < Retail::Management::ApplicationCo
   # POST /retail/:retail_id/management/services
   def create
     @service = Service.new(service_params)
-    @service.company_group = @retail
-    @service.company = @retail.companies.first # Default to first company, can be made configurable
+    @service.company = @retail
+    @service.company = @retail.branches.first # Default to first company, can be made configurable
 
     respond_to do |format|
       if @service.save

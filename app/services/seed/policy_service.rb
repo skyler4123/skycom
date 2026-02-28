@@ -1,10 +1,10 @@
 # This service seeds the database with Policy records, ensuring each policy
-# is associated with an existing Company. It uses the enums defined in the Policy model
+# is associated with an existing Branch. It uses the enums defined in the Policy model
 # and simulates soft deletion.
 
 class Seed::PolicyService
   def self.create(
-    company:,
+    branch:,
     name: nil,
     description: nil,
     resource: COMMON_RESOURCES.sample,
@@ -22,7 +22,7 @@ class Seed::PolicyService
     status ||= Policy.statuses.keys.sample
 
     Policy.create!(
-      company: company,
+      branch: branch,
       name: name,
       description: description,
       resource: resource.singularize,

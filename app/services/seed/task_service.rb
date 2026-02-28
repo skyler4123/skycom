@@ -1,5 +1,5 @@
 # This service seeds the database with Task records. Each task is
-# associated with a TaskGroup and a Company.
+# associated with a TaskGroup and a Branch.
 
 class Seed::TaskService
   def self.create(
@@ -19,11 +19,11 @@ class Seed::TaskService
     discarded_at ||= should_discard ? Time.zone.now - rand(1..180).days : nil
 
     Task.create!(
-      company: company,
+      branch: branch,
       task_group: task_group,
       name: name,
       description: description || "Task for group '#{task_group.name}'.",
-      code: code || "TASK-#{company.id}-#{task_group.id}-#{SecureRandom.hex(2).upcase}",
+      code: code || "TASK-#{branch.id}-#{task_group.id}-#{SecureRandom.hex(2).upcase}",
       currency_code: currency || Task.currency_codes.keys.sample,
       status: status || Task.statuses.keys.sample,
       business_type: business_type || Task.business_types.keys.sample,

@@ -3,8 +3,8 @@ class CustomerGroup < ApplicationRecord
   include TagConcern
 
   # --- Associations ---
-  belongs_to :company_group
-  belongs_to :company, optional: true
+  belongs_to :company
+  belongs_to :branch, optional: true
 
   has_many :customer_group_appointments, dependent: :destroy
   has_many :customers, through: :customer_group_appointments, source: :appoint_to, source_type: "Customer"
@@ -26,7 +26,7 @@ class CustomerGroup < ApplicationRecord
 
   # --- Validations ---
   validates :name, presence: true, length: { maximum: 255 }
-  validates :code, presence: true, uniqueness: { scope: :company_id }
+  validates :code, presence: true, uniqueness: { scope: :branch_id }
 
   validates :business_type, presence: true
 end

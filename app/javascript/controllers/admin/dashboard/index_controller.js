@@ -9,7 +9,7 @@ export default class Admin_Dashboard_IndexController extends Admin_LayoutControl
           <div
             class="bg-white dark:bg-slate-900 p-6 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col gap-1">
             <div class="flex items-center justify-between mb-2">
-              <p class="text-slate-500 dark:text-slate-400 text-sm font-medium">Active Companies</p>
+              <p class="text-slate-500 dark:text-slate-400 text-sm font-medium">Active Branches</p>
               <span
                 class="bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400 text-xs font-bold px-2 py-0.5 rounded-full">+1.2%</span>
             </div>

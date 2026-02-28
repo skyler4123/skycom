@@ -65,6 +65,6 @@ class DocumentsController < ApplicationController
 
     # Only allow a list of trusted parameters through.
     def document_params
-      params.expect(document: [ :document_group_id, :company_group_id, :company_id, :title, :content, :name, :description, :code, :status, :business_type, :discarded_at ])
+      params.expect(document: [ :document_group_id, :company_id, :branch_id, :title, :content, :name, :description, :code, :status, :business_type, :discarded_at ])
     end
 end

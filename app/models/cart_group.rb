@@ -1,7 +1,7 @@
 class CartGroup < ApplicationRecord
   # --- Associations ---
-  belongs_to :company_group
-  belongs_to :company, optional: true
+  belongs_to :company
+  belongs_to :branch, optional: true
   # has_many :cart_group_appointments, dependent: :destroy # This can be added later
 
   # --- Enums ---
@@ -16,7 +16,7 @@ class CartGroup < ApplicationRecord
 
   # --- Validations ---
   validates :name, presence: true, length: { maximum: 255 }
-  validates :code, presence: true, uniqueness: { scope: :company_id }
+  validates :code, presence: true, uniqueness: { scope: :branch_id }
 
   validates :business_type, presence: true
 end

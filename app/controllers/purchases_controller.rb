@@ -65,6 +65,6 @@ class PurchasesController < ApplicationController
 
     # Only allow a list of trusted parameters through.
     def purchase_params
-      params.expect(purchase: [ :company_id, :name, :description, :code, :status, :business_type, :discarded_at ])
+      params.expect(purchase: [ :branch_id, :name, :description, :code, :status, :business_type, :discarded_at ])
     end
 end

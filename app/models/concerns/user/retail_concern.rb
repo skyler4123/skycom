@@ -3,7 +3,7 @@ module User::RetailConcern
 
   included do
     def retails
-      company_groups.where(business_type: :retail)
+      companies.where(business_type: :retail)
     end
 
     def retail

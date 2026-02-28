@@ -160,8 +160,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
   end
 
   create_table "article_groups", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
-    t.uuid "company_group_id", null: false
-    t.uuid "company_id"
+    t.uuid "company_id", null: false
+    t.uuid "branch_id"
     t.uuid "category_id"
     t.string "title"
     t.json "content"
@@ -175,16 +175,16 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.jsonb "metadata", default: {}
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["branch_id"], name: "index_article_groups_on_branch_id"
     t.index ["category_id"], name: "index_article_groups_on_category_id"
-    t.index ["company_group_id"], name: "index_article_groups_on_company_group_id"
     t.index ["company_id"], name: "index_article_groups_on_company_id"
     t.index ["discarded_at"], name: "index_article_groups_on_discarded_at"
   end
 
   create_table "articles", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.uuid "article_group_id", null: false
-    t.uuid "company_group_id", null: false
-    t.uuid "company_id"
+    t.uuid "company_id", null: false
+    t.uuid "branch_id"
     t.uuid "category_id"
     t.string "title"
     t.json "content"
@@ -199,15 +199,15 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["article_group_id"], name: "index_articles_on_article_group_id"
+    t.index ["branch_id"], name: "index_articles_on_branch_id"
     t.index ["category_id"], name: "index_articles_on_category_id"
-    t.index ["company_group_id"], name: "index_articles_on_company_group_id"
     t.index ["company_id"], name: "index_articles_on_company_id"
     t.index ["discarded_at"], name: "index_articles_on_discarded_at"
   end
 
   create_table "attendance_days", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
-    t.uuid "company_group_id", null: false
-    t.uuid "company_id"
+    t.uuid "company_id", null: false
+    t.uuid "branch_id"
     t.uuid "employee_id", null: false
     t.string "logable_type", null: false
     t.uuid "logable_id", null: false
@@ -238,7 +238,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["approved_by_type", "approved_by_id"], name: "index_attendance_days_on_approved_by"
-    t.index ["company_group_id"], name: "index_attendance_days_on_company_group_id"
+    t.index ["branch_id"], name: "index_attendance_days_on_branch_id"
     t.index ["company_id"], name: "index_attendance_days_on_company_id"
     t.index ["edited_by_type", "edited_by_id"], name: "index_attendance_days_on_edited_by"
     t.index ["employee_id"], name: "index_attendance_days_on_employee_id"
@@ -247,8 +247,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
   end
 
   create_table "attendance_logs", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
-    t.uuid "company_group_id", null: false
-    t.uuid "company_id"
+    t.uuid "company_id", null: false
+    t.uuid "branch_id"
     t.uuid "customer_id", null: false
     t.string "logable_type", null: false
     t.uuid "logable_id", null: false
@@ -259,7 +259,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.text "notes"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["company_group_id"], name: "index_attendance_logs_on_company_group_id"
+    t.index ["branch_id"], name: "index_attendance_logs_on_branch_id"
     t.index ["company_id"], name: "index_attendance_logs_on_company_id"
     t.index ["customer_id"], name: "index_attendance_logs_on_customer_id"
     t.index ["logable_type", "logable_id"], name: "index_attendance_logs_on_logable"
@@ -267,15 +267,15 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
   end
 
   create_table "attendance_months", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
-    t.uuid "company_group_id", null: false
-    t.uuid "company_id"
+    t.uuid "company_id", null: false
+    t.uuid "branch_id"
     t.uuid "customer_id", null: false
     t.string "logable_type", null: false
     t.uuid "logable_id", null: false
     t.uuid "period_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["company_group_id"], name: "index_attendance_months_on_company_group_id"
+    t.index ["branch_id"], name: "index_attendance_months_on_branch_id"
     t.index ["company_id"], name: "index_attendance_months_on_company_id"
     t.index ["customer_id"], name: "index_attendance_months_on_customer_id"
     t.index ["logable_type", "logable_id"], name: "index_attendance_months_on_logable"
@@ -296,8 +296,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
   end
 
   create_table "booking_resources", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
-    t.uuid "company_group_id", null: false
-    t.uuid "company_id"
+    t.uuid "company_id", null: false
+    t.uuid "branch_id"
     t.string "booking_resourceable_type", null: false
     t.uuid "booking_resourceable_id", null: false
     t.string "name"
@@ -310,14 +310,14 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["booking_resourceable_type", "booking_resourceable_id"], name: "index_booking_resources_on_booking_resourceable"
-    t.index ["company_group_id"], name: "index_booking_resources_on_company_group_id"
+    t.index ["branch_id"], name: "index_booking_resources_on_branch_id"
     t.index ["company_id"], name: "index_booking_resources_on_company_id"
     t.index ["discarded_at"], name: "index_booking_resources_on_discarded_at"
   end
 
   create_table "bookings", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
-    t.uuid "company_group_id", null: false
-    t.uuid "company_id"
+    t.uuid "company_id", null: false
+    t.uuid "branch_id"
     t.uuid "booking_resource_id", null: false
     t.uuid "price_id", null: false
     t.string "appoint_from_type", null: false
@@ -342,10 +342,43 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.index ["appoint_from_type", "appoint_from_id"], name: "index_bookings_on_appoint_from"
     t.index ["appoint_to_type", "appoint_to_id"], name: "index_bookings_on_appoint_to"
     t.index ["booking_resource_id"], name: "index_bookings_on_booking_resource_id"
-    t.index ["company_group_id"], name: "index_bookings_on_company_group_id"
+    t.index ["branch_id"], name: "index_bookings_on_branch_id"
     t.index ["company_id"], name: "index_bookings_on_company_id"
     t.index ["discarded_at"], name: "index_bookings_on_discarded_at"
     t.index ["price_id"], name: "index_bookings_on_price_id"
+  end
+
+  create_table "branches", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "company_id", null: false
+    t.uuid "category_id"
+    t.string "name"
+    t.string "description"
+    t.string "code"
+    t.integer "lifecycle_status"
+    t.integer "workflow_status"
+    t.integer "ownership_type"
+    t.integer "business_type"
+    t.integer "currency_code"
+    t.string "registration_number"
+    t.string "vat_id"
+    t.string "tax_id"
+    t.integer "timezone"
+    t.string "address_line_1"
+    t.string "city"
+    t.string "postal_code"
+    t.integer "country_code"
+    t.string "email"
+    t.string "phone_number"
+    t.string "website"
+    t.integer "employee_count"
+    t.integer "fiscal_year_end_month"
+    t.datetime "discarded_at"
+    t.jsonb "metadata", default: {}
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["category_id"], name: "index_branches_on_category_id"
+    t.index ["company_id"], name: "index_branches_on_company_id"
+    t.index ["discarded_at"], name: "index_branches_on_discarded_at"
   end
 
   create_table "brands", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -392,8 +425,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
   end
 
   create_table "cart_groups", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
-    t.uuid "company_group_id", null: false
-    t.uuid "company_id"
+    t.uuid "company_id", null: false
+    t.uuid "branch_id"
     t.uuid "category_id"
     t.string "name"
     t.string "description"
@@ -405,15 +438,15 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.jsonb "metadata", default: {}
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["branch_id"], name: "index_cart_groups_on_branch_id"
     t.index ["category_id"], name: "index_cart_groups_on_category_id"
-    t.index ["company_group_id"], name: "index_cart_groups_on_company_group_id"
     t.index ["company_id"], name: "index_cart_groups_on_company_id"
     t.index ["discarded_at"], name: "index_cart_groups_on_discarded_at"
   end
 
   create_table "carts", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
-    t.uuid "company_group_id", null: false
-    t.uuid "company_id"
+    t.uuid "company_id", null: false
+    t.uuid "branch_id"
     t.uuid "cart_group_id", null: false
     t.uuid "category_id"
     t.string "name"
@@ -435,9 +468,9 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["barcode"], name: "index_carts_on_barcode"
+    t.index ["branch_id"], name: "index_carts_on_branch_id"
     t.index ["cart_group_id"], name: "index_carts_on_cart_group_id"
     t.index ["category_id"], name: "index_carts_on_category_id"
-    t.index ["company_group_id"], name: "index_carts_on_company_group_id"
     t.index ["company_id"], name: "index_carts_on_company_id"
     t.index ["discarded_at"], name: "index_carts_on_discarded_at"
     t.index ["ean"], name: "index_carts_on_ean"
@@ -447,52 +480,17 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
   end
 
   create_table "categories", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
-    t.uuid "company_group_id", null: false
+    t.uuid "company_id", null: false
     t.string "name"
     t.string "description"
     t.jsonb "metadata", default: {}
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["company_group_id", "name"], name: "index_categories_on_company_group_id_and_name"
-    t.index ["company_group_id"], name: "index_categories_on_company_group_id"
+    t.index ["company_id", "name"], name: "index_categories_on_company_id_and_name"
+    t.index ["company_id"], name: "index_categories_on_company_id"
   end
 
   create_table "companies", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
-    t.uuid "company_group_id", null: false
-    t.uuid "parent_company_id"
-    t.uuid "category_id"
-    t.string "name"
-    t.string "description"
-    t.string "code"
-    t.integer "lifecycle_status"
-    t.integer "workflow_status"
-    t.integer "ownership_type"
-    t.integer "business_type"
-    t.integer "currency_code"
-    t.string "registration_number"
-    t.string "vat_id"
-    t.string "tax_id"
-    t.integer "timezone"
-    t.string "address_line_1"
-    t.string "city"
-    t.string "postal_code"
-    t.integer "country_code"
-    t.string "email"
-    t.string "phone_number"
-    t.string "website"
-    t.integer "employee_count"
-    t.integer "fiscal_year_end_month"
-    t.datetime "discarded_at"
-    t.jsonb "metadata", default: {}
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.index ["category_id"], name: "index_companies_on_category_id"
-    t.index ["company_group_id"], name: "index_companies_on_company_group_id"
-    t.index ["discarded_at"], name: "index_companies_on_discarded_at"
-    t.index ["parent_company_id"], name: "index_companies_on_parent_company_id"
-  end
-
-  create_table "company_groups", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.uuid "user_id", null: false
     t.string "name"
     t.string "description"
@@ -519,8 +517,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.jsonb "metadata", default: {}
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["discarded_at"], name: "index_company_groups_on_discarded_at"
-    t.index ["user_id"], name: "index_company_groups_on_user_id"
+    t.index ["discarded_at"], name: "index_companies_on_discarded_at"
+    t.index ["user_id"], name: "index_companies_on_user_id"
   end
 
   create_table "customer_appointments", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -580,8 +578,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
   end
 
   create_table "customer_groups", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
-    t.uuid "company_group_id", null: false
-    t.uuid "company_id"
+    t.uuid "company_id", null: false
+    t.uuid "branch_id"
     t.uuid "category_id"
     t.string "name"
     t.string "description"
@@ -593,15 +591,15 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.jsonb "metadata", default: {}
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["branch_id"], name: "index_customer_groups_on_branch_id"
     t.index ["category_id"], name: "index_customer_groups_on_category_id"
-    t.index ["company_group_id"], name: "index_customer_groups_on_company_group_id"
     t.index ["company_id"], name: "index_customer_groups_on_company_id"
     t.index ["discarded_at"], name: "index_customer_groups_on_discarded_at"
   end
 
   create_table "customers", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
-    t.uuid "company_group_id", null: false
-    t.uuid "company_id"
+    t.uuid "company_id", null: false
+    t.uuid "branch_id"
     t.uuid "user_id"
     t.uuid "category_id"
     t.string "name"
@@ -614,11 +612,57 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.jsonb "metadata", default: {}
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["branch_id"], name: "index_customers_on_branch_id"
     t.index ["category_id"], name: "index_customers_on_category_id"
-    t.index ["company_group_id"], name: "index_customers_on_company_group_id"
     t.index ["company_id"], name: "index_customers_on_company_id"
     t.index ["discarded_at"], name: "index_customers_on_discarded_at"
     t.index ["user_id"], name: "index_customers_on_user_id"
+  end
+
+  create_table "department_appointments", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "department_id", null: false
+    t.string "appoint_from_type"
+    t.uuid "appoint_from_id"
+    t.string "appoint_to_type", null: false
+    t.uuid "appoint_to_id", null: false
+    t.string "appoint_for_type"
+    t.uuid "appoint_for_id"
+    t.string "appoint_by_type"
+    t.uuid "appoint_by_id"
+    t.string "name"
+    t.string "description"
+    t.string "code"
+    t.integer "lifecycle_status"
+    t.integer "workflow_status"
+    t.integer "business_type"
+    t.datetime "discarded_at"
+    t.jsonb "metadata", default: {}
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["appoint_by_type", "appoint_by_id"], name: "index_department_appointments_on_appoint_by"
+    t.index ["appoint_for_type", "appoint_for_id"], name: "index_department_appointments_on_appoint_for"
+    t.index ["appoint_from_type", "appoint_from_id"], name: "index_department_appointments_on_appoint_from"
+    t.index ["appoint_to_type", "appoint_to_id"], name: "idx_on_appoint_to_type_appoint_to_id_8ea813e354"
+    t.index ["appoint_to_type", "appoint_to_id"], name: "index_department_appointments_on_appoint_to"
+    t.index ["department_id"], name: "index_department_appointments_on_department_id"
+  end
+
+  create_table "departments", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "company_id", null: false
+    t.uuid "category_id"
+    t.string "name"
+    t.string "description"
+    t.string "code"
+    t.integer "lifecycle_status"
+    t.integer "workflow_status"
+    t.integer "business_type"
+    t.datetime "discarded_at"
+    t.jsonb "metadata", default: {}
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["category_id"], name: "index_departments_on_category_id"
+    t.index ["company_id"], name: "index_departments_on_company_id"
+    t.index ["discarded_at"], name: "index_departments_on_discarded_at"
   end
 
   create_table "document_appointments", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -678,8 +722,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
   end
 
   create_table "document_groups", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
-    t.uuid "company_group_id", null: false
-    t.uuid "company_id"
+    t.uuid "company_id", null: false
+    t.uuid "branch_id"
     t.uuid "category_id"
     t.string "title"
     t.json "content"
@@ -693,16 +737,16 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.jsonb "metadata", default: {}
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["branch_id"], name: "index_document_groups_on_branch_id"
     t.index ["category_id"], name: "index_document_groups_on_category_id"
-    t.index ["company_group_id"], name: "index_document_groups_on_company_group_id"
     t.index ["company_id"], name: "index_document_groups_on_company_id"
     t.index ["discarded_at"], name: "index_document_groups_on_discarded_at"
   end
 
   create_table "documents", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.uuid "document_group_id", null: false
-    t.uuid "company_group_id", null: false
-    t.uuid "company_id"
+    t.uuid "company_id", null: false
+    t.uuid "branch_id"
     t.uuid "category_id"
     t.string "title"
     t.json "content"
@@ -716,8 +760,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.jsonb "metadata", default: {}
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["branch_id"], name: "index_documents_on_branch_id"
     t.index ["category_id"], name: "index_documents_on_category_id"
-    t.index ["company_group_id"], name: "index_documents_on_company_group_id"
     t.index ["company_id"], name: "index_documents_on_company_id"
     t.index ["discarded_at"], name: "index_documents_on_discarded_at"
     t.index ["document_group_id"], name: "index_documents_on_document_group_id"
@@ -770,8 +814,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
   end
 
   create_table "employee_groups", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
-    t.uuid "company_group_id", null: false
-    t.uuid "company_id"
+    t.uuid "company_id", null: false
+    t.uuid "branch_id"
     t.uuid "category_id"
     t.string "name"
     t.string "description"
@@ -783,16 +827,16 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.jsonb "metadata", default: {}
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["branch_id"], name: "index_employee_groups_on_branch_id"
     t.index ["category_id"], name: "index_employee_groups_on_category_id"
-    t.index ["company_group_id", "updated_at"], name: "index_employee_groups_on_company_group_id_and_updated_at"
-    t.index ["company_group_id"], name: "index_employee_groups_on_company_group_id"
+    t.index ["company_id", "updated_at"], name: "index_employee_groups_on_company_id_and_updated_at"
     t.index ["company_id"], name: "index_employee_groups_on_company_id"
     t.index ["discarded_at"], name: "index_employee_groups_on_discarded_at"
   end
 
   create_table "employees", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
-    t.uuid "company_group_id", null: false
-    t.uuid "company_id"
+    t.uuid "company_id", null: false
+    t.uuid "branch_id"
     t.uuid "user_id"
     t.uuid "category_id"
     t.string "name"
@@ -805,8 +849,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.jsonb "metadata", default: {}
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["branch_id"], name: "index_employees_on_branch_id"
     t.index ["category_id"], name: "index_employees_on_category_id"
-    t.index ["company_group_id"], name: "index_employees_on_company_group_id"
     t.index ["company_id"], name: "index_employees_on_company_id"
     t.index ["discarded_at"], name: "index_employees_on_discarded_at"
     t.index ["user_id"], name: "index_employees_on_user_id"
@@ -869,8 +913,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
   end
 
   create_table "event_groups", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
-    t.uuid "company_group_id", null: false
-    t.uuid "company_id"
+    t.uuid "company_id", null: false
+    t.uuid "branch_id"
     t.uuid "category_id"
     t.string "name"
     t.string "description"
@@ -882,16 +926,16 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.jsonb "metadata", default: {}
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["branch_id"], name: "index_event_groups_on_branch_id"
     t.index ["category_id"], name: "index_event_groups_on_category_id"
-    t.index ["company_group_id"], name: "index_event_groups_on_company_group_id"
     t.index ["company_id"], name: "index_event_groups_on_company_id"
     t.index ["discarded_at"], name: "index_event_groups_on_discarded_at"
   end
 
   create_table "events", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.uuid "event_group_id", null: false
-    t.uuid "company_group_id", null: false
-    t.uuid "company_id"
+    t.uuid "company_id", null: false
+    t.uuid "branch_id"
     t.uuid "category_id"
     t.string "name"
     t.string "description"
@@ -903,8 +947,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.jsonb "metadata", default: {}
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["branch_id"], name: "index_events_on_branch_id"
     t.index ["category_id"], name: "index_events_on_category_id"
-    t.index ["company_group_id"], name: "index_events_on_company_group_id"
     t.index ["company_id"], name: "index_events_on_company_id"
     t.index ["discarded_at"], name: "index_events_on_discarded_at"
     t.index ["event_group_id"], name: "index_events_on_event_group_id"
@@ -939,8 +983,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
   end
 
   create_table "exam_groups", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
-    t.uuid "company_group_id", null: false
-    t.uuid "company_id"
+    t.uuid "company_id", null: false
+    t.uuid "branch_id"
     t.uuid "category_id"
     t.string "name"
     t.string "description"
@@ -952,16 +996,16 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.jsonb "metadata", default: {}
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["branch_id"], name: "index_exam_groups_on_branch_id"
     t.index ["category_id"], name: "index_exam_groups_on_category_id"
-    t.index ["company_group_id"], name: "index_exam_groups_on_company_group_id"
     t.index ["company_id"], name: "index_exam_groups_on_company_id"
     t.index ["discarded_at"], name: "index_exam_groups_on_discarded_at"
   end
 
   create_table "exams", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.uuid "exam_group_id", null: false
-    t.uuid "company_group_id", null: false
-    t.uuid "company_id"
+    t.uuid "company_id", null: false
+    t.uuid "branch_id"
     t.uuid "category_id"
     t.string "name"
     t.string "description"
@@ -973,16 +1017,16 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.jsonb "metadata", default: {}
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["branch_id"], name: "index_exams_on_branch_id"
     t.index ["category_id"], name: "index_exams_on_category_id"
-    t.index ["company_group_id"], name: "index_exams_on_company_group_id"
     t.index ["company_id"], name: "index_exams_on_company_id"
     t.index ["discarded_at"], name: "index_exams_on_discarded_at"
     t.index ["exam_group_id"], name: "index_exams_on_exam_group_id"
   end
 
   create_table "facilities", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
-    t.uuid "company_group_id", null: false
-    t.uuid "company_id"
+    t.uuid "company_id", null: false
+    t.uuid "branch_id"
     t.uuid "category_id"
     t.string "name"
     t.string "description"
@@ -994,8 +1038,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.jsonb "metadata", default: {}
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["branch_id"], name: "index_facilities_on_branch_id"
     t.index ["category_id"], name: "index_facilities_on_category_id"
-    t.index ["company_group_id"], name: "index_facilities_on_company_group_id"
     t.index ["company_id"], name: "index_facilities_on_company_id"
     t.index ["discarded_at"], name: "index_facilities_on_discarded_at"
   end
@@ -1055,8 +1099,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
   end
 
   create_table "facility_groups", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
-    t.uuid "company_group_id", null: false
-    t.uuid "company_id"
+    t.uuid "company_id", null: false
+    t.uuid "branch_id"
     t.uuid "category_id"
     t.string "name"
     t.string "description"
@@ -1068,15 +1112,15 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.jsonb "metadata", default: {}
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["branch_id"], name: "index_facility_groups_on_branch_id"
     t.index ["category_id"], name: "index_facility_groups_on_category_id"
-    t.index ["company_group_id"], name: "index_facility_groups_on_company_group_id"
     t.index ["company_id"], name: "index_facility_groups_on_company_id"
     t.index ["discarded_at"], name: "index_facility_groups_on_discarded_at"
   end
 
   create_table "inventories", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
-    t.uuid "company_group_id", null: false
-    t.uuid "company_id"
+    t.uuid "company_id", null: false
+    t.uuid "branch_id"
     t.uuid "category_id"
     t.string "name"
     t.string "description"
@@ -1088,8 +1132,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.jsonb "metadata", default: {}
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["branch_id"], name: "index_inventories_on_branch_id"
     t.index ["category_id"], name: "index_inventories_on_category_id"
-    t.index ["company_group_id"], name: "index_inventories_on_company_group_id"
     t.index ["company_id"], name: "index_inventories_on_company_id"
     t.index ["discarded_at"], name: "index_inventories_on_discarded_at"
   end
@@ -1122,8 +1166,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
   end
 
   create_table "inventory_items", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
-    t.uuid "company_group_id", null: false
-    t.uuid "company_id"
+    t.uuid "company_id", null: false
+    t.uuid "branch_id"
     t.uuid "inventory_id", null: false
     t.uuid "category_id"
     t.string "name"
@@ -1145,8 +1189,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["barcode"], name: "index_inventory_items_on_barcode"
+    t.index ["branch_id"], name: "index_inventory_items_on_branch_id"
     t.index ["category_id"], name: "index_inventory_items_on_category_id"
-    t.index ["company_group_id"], name: "index_inventory_items_on_company_group_id"
     t.index ["company_id"], name: "index_inventory_items_on_company_id"
     t.index ["discarded_at"], name: "index_inventory_items_on_discarded_at"
     t.index ["ean"], name: "index_inventory_items_on_ean"
@@ -1184,8 +1228,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
   end
 
   create_table "inventory_transactions", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
-    t.uuid "company_group_id", null: false
-    t.uuid "company_id"
+    t.uuid "company_id", null: false
+    t.uuid "branch_id"
     t.string "appoint_from_type"
     t.uuid "appoint_from_id"
     t.string "appoint_to_type", null: false
@@ -1209,15 +1253,15 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.index ["appoint_for_type", "appoint_for_id"], name: "index_inventory_transactions_on_appoint_for"
     t.index ["appoint_from_type", "appoint_from_id"], name: "index_inventory_transactions_on_appoint_from"
     t.index ["appoint_to_type", "appoint_to_id"], name: "index_inventory_transactions_on_appoint_to"
+    t.index ["branch_id"], name: "index_inventory_transactions_on_branch_id"
     t.index ["category_id"], name: "index_inventory_transactions_on_category_id"
-    t.index ["company_group_id"], name: "index_inventory_transactions_on_company_group_id"
     t.index ["company_id"], name: "index_inventory_transactions_on_company_id"
     t.index ["discarded_at"], name: "index_inventory_transactions_on_discarded_at"
   end
 
   create_table "invoices", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
-    t.uuid "company_group_id", null: false
-    t.uuid "company_id"
+    t.uuid "company_id", null: false
+    t.uuid "branch_id"
     t.uuid "order_id", null: false
     t.uuid "category_id"
     t.string "name"
@@ -1235,8 +1279,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.jsonb "metadata", default: {}
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["branch_id"], name: "index_invoices_on_branch_id"
     t.index ["category_id"], name: "index_invoices_on_category_id"
-    t.index ["company_group_id"], name: "index_invoices_on_company_group_id"
     t.index ["company_id"], name: "index_invoices_on_company_id"
     t.index ["discarded_at"], name: "index_invoices_on_discarded_at"
     t.index ["order_id"], name: "index_invoices_on_order_id"
@@ -1297,8 +1341,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
   end
 
   create_table "notification_groups", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
-    t.uuid "company_group_id", null: false
-    t.uuid "company_id"
+    t.uuid "company_id", null: false
+    t.uuid "branch_id"
     t.uuid "category_id"
     t.string "name"
     t.string "description"
@@ -1310,16 +1354,16 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.jsonb "metadata", default: {}
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["branch_id"], name: "index_notification_groups_on_branch_id"
     t.index ["category_id"], name: "index_notification_groups_on_category_id"
-    t.index ["company_group_id"], name: "index_notification_groups_on_company_group_id"
     t.index ["company_id"], name: "index_notification_groups_on_company_id"
     t.index ["discarded_at"], name: "index_notification_groups_on_discarded_at"
   end
 
   create_table "notifications", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.uuid "notification_group_id", null: false
-    t.uuid "company_group_id", null: false
-    t.uuid "company_id"
+    t.uuid "company_id", null: false
+    t.uuid "branch_id"
     t.uuid "category_id"
     t.string "name"
     t.string "description"
@@ -1331,8 +1375,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.jsonb "metadata", default: {}
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["branch_id"], name: "index_notifications_on_branch_id"
     t.index ["category_id"], name: "index_notifications_on_category_id"
-    t.index ["company_group_id"], name: "index_notifications_on_company_group_id"
     t.index ["company_id"], name: "index_notifications_on_company_id"
     t.index ["discarded_at"], name: "index_notifications_on_discarded_at"
     t.index ["notification_group_id"], name: "index_notifications_on_notification_group_id"
@@ -1399,8 +1443,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
   end
 
   create_table "order_groups", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
-    t.uuid "company_group_id", null: false
-    t.uuid "company_id"
+    t.uuid "company_id", null: false
+    t.uuid "branch_id"
     t.uuid "customer_id", null: false
     t.uuid "category_id"
     t.string "name"
@@ -1415,16 +1459,16 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.jsonb "metadata", default: {}
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["branch_id"], name: "index_order_groups_on_branch_id"
     t.index ["category_id"], name: "index_order_groups_on_category_id"
-    t.index ["company_group_id"], name: "index_order_groups_on_company_group_id"
     t.index ["company_id"], name: "index_order_groups_on_company_id"
     t.index ["customer_id"], name: "index_order_groups_on_customer_id"
     t.index ["discarded_at"], name: "index_order_groups_on_discarded_at"
   end
 
   create_table "orders", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
-    t.uuid "company_group_id", null: false
-    t.uuid "company_id"
+    t.uuid "company_id", null: false
+    t.uuid "branch_id"
     t.uuid "customer_id", null: false
     t.uuid "category_id"
     t.string "name"
@@ -1448,8 +1492,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["barcode"], name: "index_orders_on_barcode"
+    t.index ["branch_id"], name: "index_orders_on_branch_id"
     t.index ["category_id"], name: "index_orders_on_category_id"
-    t.index ["company_group_id"], name: "index_orders_on_company_group_id"
     t.index ["company_id"], name: "index_orders_on_company_id"
     t.index ["customer_id"], name: "index_orders_on_customer_id"
     t.index ["discarded_at"], name: "index_orders_on_discarded_at"
@@ -1461,8 +1505,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
 
   create_table "payment_method_appointments", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.uuid "payment_method_id", null: false
-    t.uuid "company_group_id", null: false
-    t.uuid "company_id"
+    t.uuid "company_id", null: false
+    t.uuid "branch_id"
     t.string "name"
     t.string "description"
     t.string "code"
@@ -1472,7 +1516,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.datetime "discarded_at"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["company_group_id"], name: "index_payment_method_appointments_on_company_group_id"
+    t.index ["branch_id"], name: "index_payment_method_appointments_on_branch_id"
     t.index ["company_id"], name: "index_payment_method_appointments_on_company_id"
     t.index ["discarded_at"], name: "index_payment_method_appointments_on_discarded_at"
     t.index ["payment_method_id"], name: "index_payment_method_appointments_on_payment_method_id"
@@ -1496,8 +1540,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
   end
 
   create_table "payments", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
-    t.uuid "company_group_id", null: false
-    t.uuid "company_id"
+    t.uuid "company_id", null: false
+    t.uuid "branch_id"
     t.uuid "invoice_id", null: false
     t.uuid "category_id"
     t.string "name"
@@ -1516,8 +1560,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.jsonb "metadata", default: {}
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["branch_id"], name: "index_payments_on_branch_id"
     t.index ["category_id"], name: "index_payments_on_category_id"
-    t.index ["company_group_id"], name: "index_payments_on_company_group_id"
     t.index ["company_id"], name: "index_payments_on_company_id"
     t.index ["discarded_at"], name: "index_payments_on_discarded_at"
     t.index ["invoice_id"], name: "index_payments_on_invoice_id"
@@ -1574,8 +1618,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
   end
 
   create_table "policies", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
-    t.uuid "company_group_id", null: false
-    t.uuid "company_id"
+    t.uuid "company_id", null: false
+    t.uuid "branch_id"
     t.string "name"
     t.string "description"
     t.string "code"
@@ -1587,7 +1631,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.datetime "discarded_at"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["company_group_id"], name: "index_policies_on_company_group_id"
+    t.index ["branch_id"], name: "index_policies_on_branch_id"
     t.index ["company_id"], name: "index_policies_on_company_id"
     t.index ["discarded_at"], name: "index_policies_on_discarded_at"
   end
@@ -1703,8 +1747,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
   end
 
   create_table "product_groups", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
-    t.uuid "company_group_id", null: false
-    t.uuid "company_id"
+    t.uuid "company_id", null: false
+    t.uuid "branch_id"
     t.uuid "category_id"
     t.string "name"
     t.string "description"
@@ -1716,15 +1760,15 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.jsonb "metadata", default: {}
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["branch_id"], name: "index_product_groups_on_branch_id"
     t.index ["category_id"], name: "index_product_groups_on_category_id"
-    t.index ["company_group_id"], name: "index_product_groups_on_company_group_id"
     t.index ["company_id"], name: "index_product_groups_on_company_id"
     t.index ["discarded_at"], name: "index_product_groups_on_discarded_at"
   end
 
   create_table "products", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
-    t.uuid "company_group_id", null: false
-    t.uuid "company_id"
+    t.uuid "company_id", null: false
+    t.uuid "branch_id"
     t.uuid "brand_id"
     t.uuid "category_id"
     t.string "name"
@@ -1748,9 +1792,9 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["barcode"], name: "index_products_on_barcode"
+    t.index ["branch_id"], name: "index_products_on_branch_id"
     t.index ["brand_id"], name: "index_products_on_brand_id"
     t.index ["category_id"], name: "index_products_on_category_id"
-    t.index ["company_group_id"], name: "index_products_on_company_group_id"
     t.index ["company_id"], name: "index_products_on_company_id"
     t.index ["discarded_at"], name: "index_products_on_discarded_at"
     t.index ["ean"], name: "index_products_on_ean"
@@ -1814,8 +1858,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
   end
 
   create_table "project_groups", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
-    t.uuid "company_group_id", null: false
-    t.uuid "company_id"
+    t.uuid "company_id", null: false
+    t.uuid "branch_id"
     t.uuid "category_id"
     t.string "name"
     t.string "description"
@@ -1827,15 +1871,15 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.jsonb "metadata", default: {}
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["branch_id"], name: "index_project_groups_on_branch_id"
     t.index ["category_id"], name: "index_project_groups_on_category_id"
-    t.index ["company_group_id"], name: "index_project_groups_on_company_group_id"
     t.index ["company_id"], name: "index_project_groups_on_company_id"
     t.index ["discarded_at"], name: "index_project_groups_on_discarded_at"
   end
 
   create_table "projects", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
-    t.uuid "company_group_id", null: false
-    t.uuid "company_id"
+    t.uuid "company_id", null: false
+    t.uuid "branch_id"
     t.uuid "project_group_id", null: false
     t.uuid "category_id"
     t.string "name"
@@ -1848,16 +1892,16 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.jsonb "metadata", default: {}
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["branch_id"], name: "index_projects_on_branch_id"
     t.index ["category_id"], name: "index_projects_on_category_id"
-    t.index ["company_group_id"], name: "index_projects_on_company_group_id"
     t.index ["company_id"], name: "index_projects_on_company_id"
     t.index ["discarded_at"], name: "index_projects_on_discarded_at"
     t.index ["project_group_id"], name: "index_projects_on_project_group_id"
   end
 
   create_table "purchase_items", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
-    t.uuid "company_group_id", null: false
-    t.uuid "company_id"
+    t.uuid "company_id", null: false
+    t.uuid "branch_id"
     t.uuid "purchase_id", null: false
     t.uuid "category_id"
     t.string "name"
@@ -1879,8 +1923,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["barcode"], name: "index_purchase_items_on_barcode"
+    t.index ["branch_id"], name: "index_purchase_items_on_branch_id"
     t.index ["category_id"], name: "index_purchase_items_on_category_id"
-    t.index ["company_group_id"], name: "index_purchase_items_on_company_group_id"
     t.index ["company_id"], name: "index_purchase_items_on_company_id"
     t.index ["discarded_at"], name: "index_purchase_items_on_discarded_at"
     t.index ["ean"], name: "index_purchase_items_on_ean"
@@ -1891,8 +1935,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
   end
 
   create_table "purchases", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
-    t.uuid "company_group_id", null: false
-    t.uuid "company_id"
+    t.uuid "company_id", null: false
+    t.uuid "branch_id"
     t.uuid "category_id"
     t.string "name"
     t.string "description"
@@ -1904,15 +1948,15 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.jsonb "metadata", default: {}
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["branch_id"], name: "index_purchases_on_branch_id"
     t.index ["category_id"], name: "index_purchases_on_category_id"
-    t.index ["company_group_id"], name: "index_purchases_on_company_group_id"
     t.index ["company_id"], name: "index_purchases_on_company_id"
     t.index ["discarded_at"], name: "index_purchases_on_discarded_at"
   end
 
   create_table "questions", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
-    t.uuid "company_group_id", null: false
-    t.uuid "company_id"
+    t.uuid "company_id", null: false
+    t.uuid "branch_id"
     t.uuid "category_id"
     t.string "name"
     t.string "description"
@@ -1924,8 +1968,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.jsonb "metadata", default: {}
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["branch_id"], name: "index_questions_on_branch_id"
     t.index ["category_id"], name: "index_questions_on_category_id"
-    t.index ["company_group_id"], name: "index_questions_on_company_group_id"
     t.index ["company_id"], name: "index_questions_on_company_id"
     t.index ["discarded_at"], name: "index_questions_on_discarded_at"
   end
@@ -1950,8 +1994,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
   end
 
   create_table "roles", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
-    t.uuid "company_group_id", null: false
-    t.uuid "company_id"
+    t.uuid "company_id", null: false
+    t.uuid "branch_id"
     t.integer "model_type"
     t.string "name"
     t.string "description"
@@ -1962,7 +2006,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.datetime "discarded_at"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["company_group_id"], name: "index_roles_on_company_group_id"
+    t.index ["branch_id"], name: "index_roles_on_branch_id"
     t.index ["company_id"], name: "index_roles_on_company_id"
     t.index ["discarded_at"], name: "index_roles_on_discarded_at"
   end
@@ -2026,8 +2070,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
   end
 
   create_table "service_groups", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
-    t.uuid "company_group_id", null: false
-    t.uuid "company_id"
+    t.uuid "company_id", null: false
+    t.uuid "branch_id"
     t.uuid "category_id"
     t.string "name"
     t.string "description"
@@ -2041,15 +2085,15 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.jsonb "metadata", default: {}
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["branch_id"], name: "index_service_groups_on_branch_id"
     t.index ["category_id"], name: "index_service_groups_on_category_id"
-    t.index ["company_group_id"], name: "index_service_groups_on_company_group_id"
     t.index ["company_id"], name: "index_service_groups_on_company_id"
     t.index ["discarded_at"], name: "index_service_groups_on_discarded_at"
   end
 
   create_table "services", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
-    t.uuid "company_group_id", null: false
-    t.uuid "company_id"
+    t.uuid "company_id", null: false
+    t.uuid "branch_id"
     t.uuid "category_id"
     t.string "name"
     t.string "description"
@@ -2063,8 +2107,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.jsonb "metadata", default: {}
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["branch_id"], name: "index_services_on_branch_id"
     t.index ["category_id"], name: "index_services_on_category_id"
-    t.index ["company_group_id"], name: "index_services_on_company_group_id"
     t.index ["company_id"], name: "index_services_on_company_id"
     t.index ["discarded_at"], name: "index_services_on_discarded_at"
   end
@@ -2138,8 +2182,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
   end
 
   create_table "setting_groups", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
-    t.uuid "company_group_id", null: false
-    t.uuid "company_id"
+    t.uuid "company_id", null: false
+    t.uuid "branch_id"
     t.uuid "category_id"
     t.json "content"
     t.string "name"
@@ -2152,16 +2196,16 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.jsonb "metadata", default: {}
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["branch_id"], name: "index_setting_groups_on_branch_id"
     t.index ["category_id"], name: "index_setting_groups_on_category_id"
-    t.index ["company_group_id"], name: "index_setting_groups_on_company_group_id"
     t.index ["company_id"], name: "index_setting_groups_on_company_id"
     t.index ["discarded_at"], name: "index_setting_groups_on_discarded_at"
   end
 
   create_table "settings", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.uuid "setting_group_id", null: false
-    t.uuid "company_group_id", null: false
-    t.uuid "company_id"
+    t.uuid "company_id", null: false
+    t.uuid "branch_id"
     t.uuid "category_id"
     t.json "content"
     t.string "name"
@@ -2174,23 +2218,23 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.jsonb "metadata", default: {}
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["branch_id"], name: "index_settings_on_branch_id"
     t.index ["category_id"], name: "index_settings_on_category_id"
-    t.index ["company_group_id"], name: "index_settings_on_company_group_id"
     t.index ["company_id"], name: "index_settings_on_company_id"
     t.index ["discarded_at"], name: "index_settings_on_discarded_at"
     t.index ["setting_group_id"], name: "index_settings_on_setting_group_id"
   end
 
   create_table "shifts", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
-    t.uuid "company_group_id", null: false
-    t.uuid "company_id"
+    t.uuid "company_id", null: false
+    t.uuid "branch_id"
     t.uuid "period_id", null: false
     t.string "name"
     t.string "description"
     t.jsonb "metadata", default: {}
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["company_group_id"], name: "index_shifts_on_company_group_id"
+    t.index ["branch_id"], name: "index_shifts_on_branch_id"
     t.index ["company_id"], name: "index_shifts_on_company_id"
     t.index ["period_id"], name: "index_shifts_on_period_id"
   end
@@ -2213,8 +2257,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
   end
 
   create_table "subscription_groups", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
-    t.uuid "company_group_id", null: false
-    t.uuid "company_id"
+    t.uuid "company_id", null: false
+    t.uuid "branch_id"
     t.uuid "subscription_plan_id"
     t.uuid "subscription_group_id"
     t.uuid "price_id", null: false
@@ -2239,9 +2283,9 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.jsonb "metadata", default: {}
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["branch_id"], name: "index_subscription_groups_on_branch_id"
     t.index ["buyer_id", "buyer_type"], name: "index_subscription_groups_on_buyer_id_and_buyer_type"
     t.index ["buyer_type", "buyer_id"], name: "index_subscription_groups_on_buyer"
-    t.index ["company_group_id"], name: "index_subscription_groups_on_company_group_id"
     t.index ["company_id"], name: "index_subscription_groups_on_company_id"
     t.index ["discarded_at"], name: "index_subscription_groups_on_discarded_at"
     t.index ["period_id"], name: "index_subscription_groups_on_period_id"
@@ -2257,8 +2301,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
   end
 
   create_table "subscription_plans", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
-    t.uuid "company_group_id", null: false
-    t.uuid "company_id"
+    t.uuid "company_id", null: false
+    t.uuid "branch_id"
     t.uuid "price_id", null: false
     t.string "name", null: false
     t.string "description"
@@ -2273,15 +2317,15 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.datetime "discarded_at"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["company_group_id"], name: "index_subscription_plans_on_company_group_id"
+    t.index ["branch_id"], name: "index_subscription_plans_on_branch_id"
     t.index ["company_id"], name: "index_subscription_plans_on_company_id"
     t.index ["discarded_at"], name: "index_subscription_plans_on_discarded_at"
     t.index ["price_id"], name: "index_subscription_plans_on_price_id"
   end
 
   create_table "subscriptions", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
-    t.uuid "company_group_id", null: false
-    t.uuid "company_id"
+    t.uuid "company_id", null: false
+    t.uuid "branch_id"
     t.uuid "subscription_plan_id"
     t.uuid "subscription_group_id"
     t.uuid "price_id", null: false
@@ -2306,9 +2350,9 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.jsonb "metadata", default: {}
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["branch_id"], name: "index_subscriptions_on_branch_id"
     t.index ["buyer_id", "buyer_type"], name: "index_subscriptions_on_buyer_id_and_buyer_type"
     t.index ["buyer_type", "buyer_id"], name: "index_subscriptions_on_buyer"
-    t.index ["company_group_id"], name: "index_subscriptions_on_company_group_id"
     t.index ["company_id"], name: "index_subscriptions_on_company_id"
     t.index ["discarded_at"], name: "index_subscriptions_on_discarded_at"
     t.index ["period_id"], name: "index_subscriptions_on_period_id"
@@ -2325,8 +2369,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
 
   create_table "system_subscription_groups", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.uuid "system_subscription_plan_id", null: false
-    t.uuid "company_group_id", null: false
-    t.uuid "company_id"
+    t.uuid "company_id", null: false
+    t.uuid "branch_id"
     t.uuid "price_id", null: false
     t.uuid "period_id", null: false
     t.string "seller_type", null: false
@@ -2349,8 +2393,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.jsonb "metadata", default: {}
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["branch_id"], name: "index_system_subscription_groups_on_branch_id"
     t.index ["buyer_type", "buyer_id"], name: "index_system_subscription_groups_on_buyer"
-    t.index ["company_group_id"], name: "index_system_subscription_groups_on_company_group_id"
     t.index ["company_id"], name: "index_system_subscription_groups_on_company_id"
     t.index ["discarded_at"], name: "index_system_subscription_groups_on_discarded_at"
     t.index ["period_id"], name: "index_system_subscription_groups_on_period_id"
@@ -2384,8 +2428,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
   create_table "system_subscriptions", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.uuid "system_subscription_plan_id", null: false
     t.uuid "system_subscription_group_id"
-    t.uuid "company_group_id", null: false
-    t.uuid "company_id"
+    t.uuid "company_id", null: false
+    t.uuid "branch_id"
     t.uuid "price_id", null: false
     t.uuid "period_id", null: false
     t.string "seller_type", null: false
@@ -2408,8 +2452,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.jsonb "metadata", default: {}
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["branch_id"], name: "index_system_subscriptions_on_branch_id"
     t.index ["buyer_type", "buyer_id"], name: "index_system_subscriptions_on_buyer"
-    t.index ["company_group_id"], name: "index_system_subscriptions_on_company_group_id"
     t.index ["company_id"], name: "index_system_subscriptions_on_company_id"
     t.index ["discarded_at"], name: "index_system_subscriptions_on_discarded_at"
     t.index ["period_id"], name: "index_system_subscriptions_on_period_id"
@@ -2457,13 +2501,13 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
   end
 
   create_table "tags", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
-    t.uuid "company_group_id", null: false
+    t.uuid "company_id", null: false
     t.string "name"
     t.string "description"
     t.string "code"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["company_group_id"], name: "index_tags_on_company_group_id"
+    t.index ["company_id"], name: "index_tags_on_company_id"
   end
 
   create_table "task_appointments", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -2521,8 +2565,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
   end
 
   create_table "task_groups", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
-    t.uuid "company_group_id", null: false
-    t.uuid "company_id"
+    t.uuid "company_id", null: false
+    t.uuid "branch_id"
     t.uuid "category_id"
     t.string "name"
     t.string "description"
@@ -2534,15 +2578,15 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.jsonb "metadata", default: {}
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["branch_id"], name: "index_task_groups_on_branch_id"
     t.index ["category_id"], name: "index_task_groups_on_category_id"
-    t.index ["company_group_id"], name: "index_task_groups_on_company_group_id"
     t.index ["company_id"], name: "index_task_groups_on_company_id"
     t.index ["discarded_at"], name: "index_task_groups_on_discarded_at"
   end
 
   create_table "tasks", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
-    t.uuid "company_group_id", null: false
-    t.uuid "company_id"
+    t.uuid "company_id", null: false
+    t.uuid "branch_id"
     t.uuid "task_group_id", null: false
     t.uuid "category_id"
     t.string "name"
@@ -2556,8 +2600,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.jsonb "metadata", default: {}
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["branch_id"], name: "index_tasks_on_branch_id"
     t.index ["category_id"], name: "index_tasks_on_category_id"
-    t.index ["company_group_id"], name: "index_tasks_on_company_group_id"
     t.index ["company_id"], name: "index_tasks_on_company_id"
     t.index ["discarded_at"], name: "index_tasks_on_discarded_at"
     t.index ["task_group_id"], name: "index_tasks_on_task_group_id"
@@ -2597,239 +2641,241 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
   add_foreign_key "answers", "questions"
   add_foreign_key "article_appointments", "articles"
   add_foreign_key "article_group_appointments", "article_groups"
+  add_foreign_key "article_groups", "branches"
   add_foreign_key "article_groups", "categories"
   add_foreign_key "article_groups", "companies"
-  add_foreign_key "article_groups", "company_groups"
   add_foreign_key "articles", "article_groups"
+  add_foreign_key "articles", "branches"
   add_foreign_key "articles", "categories"
   add_foreign_key "articles", "companies"
-  add_foreign_key "articles", "company_groups"
+  add_foreign_key "attendance_days", "branches"
   add_foreign_key "attendance_days", "companies"
-  add_foreign_key "attendance_days", "company_groups"
   add_foreign_key "attendance_days", "employees"
   add_foreign_key "attendance_days", "periods"
+  add_foreign_key "attendance_logs", "branches"
   add_foreign_key "attendance_logs", "companies"
-  add_foreign_key "attendance_logs", "company_groups"
   add_foreign_key "attendance_logs", "customers"
   add_foreign_key "attendance_logs", "periods"
+  add_foreign_key "attendance_months", "branches"
   add_foreign_key "attendance_months", "companies"
-  add_foreign_key "attendance_months", "company_groups"
   add_foreign_key "attendance_months", "customers"
   add_foreign_key "attendance_months", "periods"
   add_foreign_key "booking_periods", "booking_resources"
   add_foreign_key "booking_periods", "periods"
+  add_foreign_key "booking_resources", "branches"
   add_foreign_key "booking_resources", "companies"
-  add_foreign_key "booking_resources", "company_groups"
   add_foreign_key "bookings", "booking_resources"
+  add_foreign_key "bookings", "branches"
   add_foreign_key "bookings", "companies"
-  add_foreign_key "bookings", "company_groups"
   add_foreign_key "bookings", "prices"
+  add_foreign_key "branches", "categories"
+  add_foreign_key "branches", "companies"
   add_foreign_key "brands", "categories"
   add_foreign_key "cart_appointments", "carts"
+  add_foreign_key "cart_groups", "branches"
   add_foreign_key "cart_groups", "categories"
   add_foreign_key "cart_groups", "companies"
-  add_foreign_key "cart_groups", "company_groups"
+  add_foreign_key "carts", "branches"
   add_foreign_key "carts", "cart_groups"
   add_foreign_key "carts", "categories"
   add_foreign_key "carts", "companies"
-  add_foreign_key "carts", "company_groups"
-  add_foreign_key "categories", "company_groups"
-  add_foreign_key "companies", "categories"
-  add_foreign_key "companies", "companies", column: "parent_company_id"
-  add_foreign_key "companies", "company_groups"
-  add_foreign_key "company_groups", "users"
+  add_foreign_key "categories", "companies"
+  add_foreign_key "companies", "users"
   add_foreign_key "customer_appointments", "customers"
   add_foreign_key "customer_group_appointments", "customer_groups"
+  add_foreign_key "customer_groups", "branches"
   add_foreign_key "customer_groups", "categories"
   add_foreign_key "customer_groups", "companies"
-  add_foreign_key "customer_groups", "company_groups"
+  add_foreign_key "customers", "branches"
   add_foreign_key "customers", "categories"
   add_foreign_key "customers", "companies"
-  add_foreign_key "customers", "company_groups"
   add_foreign_key "customers", "users"
+  add_foreign_key "department_appointments", "departments"
+  add_foreign_key "departments", "categories"
+  add_foreign_key "departments", "companies"
   add_foreign_key "document_appointments", "documents"
   add_foreign_key "document_group_appointments", "document_groups"
+  add_foreign_key "document_groups", "branches"
   add_foreign_key "document_groups", "categories"
   add_foreign_key "document_groups", "companies"
-  add_foreign_key "document_groups", "company_groups"
+  add_foreign_key "documents", "branches"
   add_foreign_key "documents", "categories"
   add_foreign_key "documents", "companies"
-  add_foreign_key "documents", "company_groups"
   add_foreign_key "documents", "document_groups"
   add_foreign_key "employee_appointments", "employees"
   add_foreign_key "employee_group_appointments", "employee_groups"
+  add_foreign_key "employee_groups", "branches"
   add_foreign_key "employee_groups", "categories"
   add_foreign_key "employee_groups", "companies"
-  add_foreign_key "employee_groups", "company_groups"
+  add_foreign_key "employees", "branches"
   add_foreign_key "employees", "categories"
   add_foreign_key "employees", "companies"
-  add_foreign_key "employees", "company_groups"
   add_foreign_key "employees", "users"
   add_foreign_key "event_appointments", "events"
   add_foreign_key "event_group_appointments", "event_groups"
+  add_foreign_key "event_groups", "branches"
   add_foreign_key "event_groups", "categories"
   add_foreign_key "event_groups", "companies"
-  add_foreign_key "event_groups", "company_groups"
+  add_foreign_key "events", "branches"
   add_foreign_key "events", "categories"
   add_foreign_key "events", "companies"
-  add_foreign_key "events", "company_groups"
   add_foreign_key "events", "event_groups"
   add_foreign_key "exam_appointments", "exams"
+  add_foreign_key "exam_groups", "branches"
   add_foreign_key "exam_groups", "categories"
   add_foreign_key "exam_groups", "companies"
-  add_foreign_key "exam_groups", "company_groups"
+  add_foreign_key "exams", "branches"
   add_foreign_key "exams", "categories"
   add_foreign_key "exams", "companies"
-  add_foreign_key "exams", "company_groups"
   add_foreign_key "exams", "exam_groups"
+  add_foreign_key "facilities", "branches"
   add_foreign_key "facilities", "categories"
   add_foreign_key "facilities", "companies"
-  add_foreign_key "facilities", "company_groups"
   add_foreign_key "facility_appointments", "facilities"
   add_foreign_key "facility_group_appointments", "facility_groups"
+  add_foreign_key "facility_groups", "branches"
   add_foreign_key "facility_groups", "categories"
   add_foreign_key "facility_groups", "companies"
-  add_foreign_key "facility_groups", "company_groups"
+  add_foreign_key "inventories", "branches"
   add_foreign_key "inventories", "categories"
   add_foreign_key "inventories", "companies"
-  add_foreign_key "inventories", "company_groups"
   add_foreign_key "inventory_item_appointments", "inventory_items"
+  add_foreign_key "inventory_items", "branches"
   add_foreign_key "inventory_items", "categories"
   add_foreign_key "inventory_items", "companies"
-  add_foreign_key "inventory_items", "company_groups"
   add_foreign_key "inventory_items", "inventories"
   add_foreign_key "inventory_transaction_appointments", "inventory_transactions"
+  add_foreign_key "inventory_transactions", "branches"
   add_foreign_key "inventory_transactions", "categories"
   add_foreign_key "inventory_transactions", "companies"
-  add_foreign_key "inventory_transactions", "company_groups"
+  add_foreign_key "invoices", "branches"
   add_foreign_key "invoices", "categories"
   add_foreign_key "invoices", "companies"
-  add_foreign_key "invoices", "company_groups"
   add_foreign_key "invoices", "orders"
   add_foreign_key "notification_appointments", "notifications"
   add_foreign_key "notification_group_appointments", "notification_groups"
+  add_foreign_key "notification_groups", "branches"
   add_foreign_key "notification_groups", "categories"
   add_foreign_key "notification_groups", "companies"
-  add_foreign_key "notification_groups", "company_groups"
+  add_foreign_key "notifications", "branches"
   add_foreign_key "notifications", "categories"
   add_foreign_key "notifications", "companies"
-  add_foreign_key "notifications", "company_groups"
   add_foreign_key "notifications", "notification_groups"
   add_foreign_key "order_appointments", "orders"
   add_foreign_key "order_group_appointments", "order_groups"
+  add_foreign_key "order_groups", "branches"
   add_foreign_key "order_groups", "categories"
   add_foreign_key "order_groups", "companies"
-  add_foreign_key "order_groups", "company_groups"
   add_foreign_key "order_groups", "customers"
+  add_foreign_key "orders", "branches"
   add_foreign_key "orders", "categories"
   add_foreign_key "orders", "companies"
-  add_foreign_key "orders", "company_groups"
   add_foreign_key "orders", "customers"
+  add_foreign_key "payment_method_appointments", "branches"
   add_foreign_key "payment_method_appointments", "companies"
-  add_foreign_key "payment_method_appointments", "company_groups"
   add_foreign_key "payment_method_appointments", "payment_methods"
   add_foreign_key "payment_methods", "categories"
+  add_foreign_key "payments", "branches"
   add_foreign_key "payments", "categories"
   add_foreign_key "payments", "companies"
-  add_foreign_key "payments", "company_groups"
   add_foreign_key "payments", "invoices"
   add_foreign_key "period_appointments", "periods"
   add_foreign_key "period_prices", "periods"
   add_foreign_key "period_prices", "prices"
+  add_foreign_key "policies", "branches"
   add_foreign_key "policies", "companies"
-  add_foreign_key "policies", "company_groups"
   add_foreign_key "policy_appointments", "policies"
   add_foreign_key "price_appointments", "prices"
   add_foreign_key "product_appointments", "products"
   add_foreign_key "product_group_appointments", "product_groups"
+  add_foreign_key "product_groups", "branches"
   add_foreign_key "product_groups", "categories"
   add_foreign_key "product_groups", "companies"
-  add_foreign_key "product_groups", "company_groups"
+  add_foreign_key "products", "branches"
   add_foreign_key "products", "brands"
   add_foreign_key "products", "categories"
   add_foreign_key "products", "companies"
-  add_foreign_key "products", "company_groups"
   add_foreign_key "project_appointments", "projects"
   add_foreign_key "project_group_appointments", "project_groups"
+  add_foreign_key "project_groups", "branches"
   add_foreign_key "project_groups", "categories"
   add_foreign_key "project_groups", "companies"
-  add_foreign_key "project_groups", "company_groups"
+  add_foreign_key "projects", "branches"
   add_foreign_key "projects", "categories"
   add_foreign_key "projects", "companies"
-  add_foreign_key "projects", "company_groups"
   add_foreign_key "projects", "project_groups"
+  add_foreign_key "purchase_items", "branches"
   add_foreign_key "purchase_items", "categories"
   add_foreign_key "purchase_items", "companies"
-  add_foreign_key "purchase_items", "company_groups"
   add_foreign_key "purchase_items", "purchases"
+  add_foreign_key "purchases", "branches"
   add_foreign_key "purchases", "categories"
   add_foreign_key "purchases", "companies"
-  add_foreign_key "purchases", "company_groups"
+  add_foreign_key "questions", "branches"
   add_foreign_key "questions", "categories"
   add_foreign_key "questions", "companies"
-  add_foreign_key "questions", "company_groups"
   add_foreign_key "role_appointments", "roles"
+  add_foreign_key "roles", "branches"
   add_foreign_key "roles", "companies"
-  add_foreign_key "roles", "company_groups"
   add_foreign_key "service_appointments", "services"
   add_foreign_key "service_group_appointments", "service_groups"
+  add_foreign_key "service_groups", "branches"
   add_foreign_key "service_groups", "categories"
   add_foreign_key "service_groups", "companies"
-  add_foreign_key "service_groups", "company_groups"
+  add_foreign_key "services", "branches"
   add_foreign_key "services", "categories"
   add_foreign_key "services", "companies"
-  add_foreign_key "services", "company_groups"
   add_foreign_key "sessions", "users"
   add_foreign_key "setting_appointments", "settings"
   add_foreign_key "setting_group_appointments", "setting_groups"
+  add_foreign_key "setting_groups", "branches"
   add_foreign_key "setting_groups", "categories"
   add_foreign_key "setting_groups", "companies"
-  add_foreign_key "setting_groups", "company_groups"
+  add_foreign_key "settings", "branches"
   add_foreign_key "settings", "categories"
   add_foreign_key "settings", "companies"
-  add_foreign_key "settings", "company_groups"
   add_foreign_key "settings", "setting_groups"
+  add_foreign_key "shifts", "branches"
   add_foreign_key "shifts", "companies"
-  add_foreign_key "shifts", "company_groups"
   add_foreign_key "shifts", "periods"
   add_foreign_key "sign_in_tokens", "users"
+  add_foreign_key "subscription_groups", "branches"
   add_foreign_key "subscription_groups", "companies"
-  add_foreign_key "subscription_groups", "company_groups"
   add_foreign_key "subscription_groups", "periods"
   add_foreign_key "subscription_groups", "prices"
   add_foreign_key "subscription_groups", "subscription_groups"
   add_foreign_key "subscription_groups", "subscription_plans"
+  add_foreign_key "subscription_plans", "branches"
   add_foreign_key "subscription_plans", "companies"
-  add_foreign_key "subscription_plans", "company_groups"
   add_foreign_key "subscription_plans", "prices"
+  add_foreign_key "subscriptions", "branches"
   add_foreign_key "subscriptions", "companies"
-  add_foreign_key "subscriptions", "company_groups"
   add_foreign_key "subscriptions", "periods"
   add_foreign_key "subscriptions", "prices"
   add_foreign_key "subscriptions", "subscription_groups"
   add_foreign_key "subscriptions", "subscription_plans"
+  add_foreign_key "system_subscription_groups", "branches"
   add_foreign_key "system_subscription_groups", "companies"
-  add_foreign_key "system_subscription_groups", "company_groups"
   add_foreign_key "system_subscription_groups", "periods"
   add_foreign_key "system_subscription_groups", "prices"
   add_foreign_key "system_subscription_groups", "system_subscription_plans"
   add_foreign_key "system_subscription_plans", "prices"
+  add_foreign_key "system_subscriptions", "branches"
   add_foreign_key "system_subscriptions", "companies"
-  add_foreign_key "system_subscriptions", "company_groups"
   add_foreign_key "system_subscriptions", "periods"
   add_foreign_key "system_subscriptions", "prices"
   add_foreign_key "system_subscriptions", "system_subscription_groups"
   add_foreign_key "system_subscriptions", "system_subscription_plans"
   add_foreign_key "tag_appointments", "tags"
-  add_foreign_key "tags", "company_groups"
+  add_foreign_key "tags", "companies"
   add_foreign_key "task_appointments", "tasks"
   add_foreign_key "task_group_appointments", "task_groups"
+  add_foreign_key "task_groups", "branches"
   add_foreign_key "task_groups", "categories"
   add_foreign_key "task_groups", "companies"
-  add_foreign_key "task_groups", "company_groups"
+  add_foreign_key "tasks", "branches"
   add_foreign_key "tasks", "categories"
   add_foreign_key "tasks", "companies"
-  add_foreign_key "tasks", "company_groups"
   add_foreign_key "tasks", "task_groups"
   add_foreign_key "users", "users", column: "parent_user_id"
 end

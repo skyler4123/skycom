@@ -1,7 +1,7 @@
 class Seed::EmployeeService
   def self.create(
-    company_group:,
-    company: nil,
+    company:,
+    branch: nil,
     user: nil,
     name: Faker::Name.name,
     description: "#{Faker::Job.title} in #{Faker::Commerce.department}",
@@ -10,8 +10,8 @@ class Seed::EmployeeService
   )
     employee = Employee.create!(
       user: user,
-      company_group: company_group,
       company: company,
+      branch: branch,
       name: name,
       description: description,
       business_type: business_type,

@@ -3,7 +3,7 @@ class Education::CoursesController < Education::ApplicationController
 
   # GET /services or /services.json
   def index
-    @schools = Current.companies
+    @schools = Current.branches
 
     # render html: "", layout: true
     respond_to do |format|
@@ -20,6 +20,6 @@ class Education::CoursesController < Education::ApplicationController
 
     # Only allow a list of trusted parameters through.
     def service_params
-      params.expect(service: [ :company_id, :name, :description, :code, :status, :duration, :start_at, :business_type, :discarded_at ])
+      params.expect(service: [ :branch_id, :name, :description, :code, :status, :duration, :start_at, :business_type, :discarded_at ])
     end
 end

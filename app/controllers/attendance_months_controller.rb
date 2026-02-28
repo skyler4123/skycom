@@ -65,6 +65,6 @@ class AttendanceMonthsController < ApplicationController
 
     # Only allow a list of trusted parameters through.
     def attendance_month_params
-      params.expect(attendance_month: [ :company_group_id, :company_id, :customer_id, :logable_id, :logable_type, :period_id ])
+      params.expect(attendance_month: [ :company_id, :branch_id, :customer_id, :logable_id, :logable_type, :period_id ])
     end
 end

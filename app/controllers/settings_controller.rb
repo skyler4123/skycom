@@ -65,6 +65,6 @@ class SettingsController < ApplicationController
 
     # Only allow a list of trusted parameters through.
     def setting_params
-      params.expect(setting: [ :setting_group_id, :company_group_id, :company_id, :content, :name, :description, :code, :status, :business_type, :discarded_at ])
+      params.expect(setting: [ :setting_group_id, :company_id, :branch_id, :content, :name, :description, :code, :status, :business_type, :discarded_at ])
     end
 end

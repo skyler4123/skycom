@@ -18,7 +18,7 @@ export default class Education_LayoutController extends Controller {
   }
 
   initBindings() {
-    this.currentCompanyGroup = Helpers.Current.companyGroup();
+    this.currentCompany = Helpers.Current.companyGroup();
     this.companyGroups = Helpers.companyGroups();
   }
 
@@ -28,7 +28,7 @@ export default class Education_LayoutController extends Controller {
     this.element.innerHTML = this.layoutHTML()
   }
 
-  openCompanyGroupDropdown(event) {
+  openCompanyDropdown(event) {
    event.preventDefault();
     Helpers.openPopover({
       parentElement: event.currentTarget,
@@ -58,49 +58,49 @@ export default class Education_LayoutController extends Controller {
                 <span class="material-symbols-outlined">storefront</span>
               </div>
               <div class="flex flex-col">
-                <h1 data-action="click->${this.identifier}#openCompanyGroupDropdown" class="text-gray-900 dark:text-white text-base font-medium leading-normal cursor-pointer">${this.currentCompanyGroup.name}</h1>
-                <p class="text-gray-500 dark:text-gray-400 text-sm font-normal leading-normal">${Helpers.capitalize(this.currentCompanyGroup.business_type)}</p>
+                <h1 data-action="click->${this.identifier}#openCompanyDropdown" class="text-gray-900 dark:text-white text-base font-medium leading-normal cursor-pointer">${this.currentCompany.name}</h1>
+                <p class="text-gray-500 dark:text-gray-400 text-sm font-normal leading-normal">${Helpers.capitalize(this.currentCompany.business_type)}</p>
               </div>
             </div>
             <nav class="w-full p-4">
               <div class="flex flex-col gap-2">
-                <a class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:bg-blue-100 open:text-blue-600" href="/retail/${this.currentCompanyGroup.id}/stores" ${Helpers.openByPathname()}/>
+                <a class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:bg-blue-100 open:text-blue-600" href="/retail/${this.currentCompany.id}/stores" ${Helpers.openByPathname()}/>
                   <span class="material-symbols-outlined">dashboard</span>
                   <p class="text-sm font-medium leading-normal" ${Helpers.translate("Dashboard")}>Dashboard</p>
                 </a>
-                <a class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:bg-blue-100 open:text-blue-600" href="/retail/${this.currentCompanyGroup.id}/products" ${Helpers.openByPathname()}/>
+                <a class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:bg-blue-100 open:text-blue-600" href="/retail/${this.currentCompany.id}/products" ${Helpers.openByPathname()}/>
                   <span class="material-symbols-outlined">inventory_2</span>
                   <p class="text-sm font-medium leading-normal">Product</p>
                 </a>
-                <a class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:bg-blue-100 open:text-blue-600" href="/retail/${this.currentCompanyGroup.id}/bookings" ${Helpers.openByPathname()}/>
+                <a class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:bg-blue-100 open:text-blue-600" href="/retail/${this.currentCompany.id}/bookings" ${Helpers.openByPathname()}/>
                   <span class="material-symbols-outlined">calendar_month</span>
                   <p class="text-sm font-medium leading-normal">Booking</p>
                 </a>
-                <a class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:bg-blue-100 open:text-blue-600" href="/retail/${this.currentCompanyGroup.id}/payments" ${Helpers.openByPathname()}/>
+                <a class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:bg-blue-100 open:text-blue-600" href="/retail/${this.currentCompany.id}/payments" ${Helpers.openByPathname()}/>
                   <span class="material-symbols-outlined">payments</span>
                   <p class="text-sm font-medium leading-normal">Payment</p>
                 </a>
-                <a class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:bg-blue-100 open:text-blue-600" href="/retail/${this.currentCompanyGroup.id}/employees" ${Helpers.openByPathname()}/>
+                <a class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:bg-blue-100 open:text-blue-600" href="/retail/${this.currentCompany.id}/employees" ${Helpers.openByPathname()}/>
                   <span class="material-symbols-outlined">groups</span>
                   <p class="text-sm font-medium leading-normal">Employee</p>
                 </a>
-                <a class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:bg-blue-100 open:text-blue-600" href="/retail/${this.currentCompanyGroup.id}/inventory" ${Helpers.openByPathname()}/>
+                <a class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:bg-blue-100 open:text-blue-600" href="/retail/${this.currentCompany.id}/inventory" ${Helpers.openByPathname()}/>
                   <span class="material-symbols-outlined">inventory</span>
                   <p class="text-sm font-medium leading-normal">Inventory</p>
                 </a>
-                <a class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:bg-blue-100 open:text-blue-600" href="/retail/${this.currentCompanyGroup.id}/sales" ${Helpers.openByPathname()}/>
+                <a class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:bg-blue-100 open:text-blue-600" href="/retail/${this.currentCompany.id}/sales" ${Helpers.openByPathname()}/>
                   <span class="material-symbols-outlined">add_shopping_cart</span>
                   <p class="text-sm font-medium leading-normal">Sales</p>
                 </a>
-                <a class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:bg-blue-100 open:text-blue-600" href="/retail/${this.currentCompanyGroup.id}/customers" ${Helpers.openByPathname()}/>
+                <a class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:bg-blue-100 open:text-blue-600" href="/retail/${this.currentCompany.id}/customers" ${Helpers.openByPathname()}/>
                   <span class="material-symbols-outlined">person_add</span>
                   <p class="text-sm font-medium leading-normal">Customer</p>
                 </a>
-                <a class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:bg-blue-100 open:text-blue-600" href="/retail/${this.currentCompanyGroup.id}/invoices" ${Helpers.openByPathname()}/>
+                <a class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:bg-blue-100 open:text-blue-600" href="/retail/${this.currentCompany.id}/invoices" ${Helpers.openByPathname()}/>
                   <span class="material-symbols-outlined">receipt_long</span>
                   <p class="text-sm font-medium leading-normal">Invoices</p>
                 </a>
-                <a class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:bg-blue-100 open:text-blue-600" href="/retail/${this.currentCompanyGroup.id}/reports" ${Helpers.openByPathname()}/>
+                <a class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:bg-blue-100 open:text-blue-600" href="/retail/${this.currentCompany.id}/reports" ${Helpers.openByPathname()}/>
                   <span class="material-symbols-outlined">bar_chart</span>
                   <p class="text-sm font-medium leading-normal">Reports</p>
                 </a>

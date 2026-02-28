@@ -14,8 +14,8 @@ class ShiftsTest < ApplicationSystemTestCase
     visit shifts_url
     click_on "New shift"
 
-    fill_in "Company group", with: @shift.company_group_id
-    fill_in "Company", with: @shift.company_id
+    fill_in "Company group", with: @shift.company_id
+    fill_in "Company", with: @shift.branch_id
     fill_in "Description", with: @shift.description
     fill_in "Name", with: @shift.name
     fill_in "Period", with: @shift.period_id
@@ -29,8 +29,8 @@ class ShiftsTest < ApplicationSystemTestCase
     visit shift_url(@shift)
     click_on "Edit this shift", match: :first
 
-    fill_in "Company group", with: @shift.company_group_id
-    fill_in "Company", with: @shift.company_id
+    fill_in "Company group", with: @shift.company_id
+    fill_in "Company", with: @shift.branch_id
     fill_in "Description", with: @shift.description
     fill_in "Name", with: @shift.name
     fill_in "Period", with: @shift.period_id

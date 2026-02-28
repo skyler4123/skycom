@@ -1,10 +1,17 @@
 class Company < ApplicationRecord
   include AddressConcern
-  include TagConcern
-  include SystemSubscription::ResourceConcern
+  include Company::RetailConcern
+  include Company::EducationConcern
+  include Company::HospitalConcern
+  include Company::RestaurantConcern
+  include SystemSubscription::BuyerConcern
   include Subscription::SellerConcern
+  include Company::PermissionConcern
 
-  belongs_to :company_group
+  belongs_to :user
+  has_many :branches, dependent: :destroy
+
+  has_many :tags, dependent: :destroy
 
   has_many :employee_groups, dependent: :destroy
   has_many :employees, dependent: :destroy
@@ -26,18 +33,17 @@ class Company < ApplicationRecord
   has_many :notification_groups, dependent: :destroy
   has_many :payment_methods, through: :payment_method_appointments
   has_many :statistics, as: :owner
-
-  # Self-referencing association for company hierarchy
-  belongs_to :parent_company, class_name: "Company", optional: true
-  has_many :child_companies, class_name: "Company", foreign_key: "parent_company_id", dependent: :destroy, inverse_of: :parent_company
+  has_many :categories, dependent: :destroy
+  has_many :subscription_plans, dependent: :destroy
+  has_many :departments, dependent: :destroy
 
   # --- Enums ---
   enum :country_code, COUNTRIE_CODES, prefix: true
   enum :business_type, BUSINESS_TYPES, prefix: true
-  enum :timezone, TIMEZONES, prefix: true
-  enum :currency_code, CURRENCIE_CODES, prefix: true
   enum :lifecycle_status, LIFECYCLE_STATUS, prefix: true
   enum :workflow_status, WORKFLOW_STATUS, prefix: true
+  enum :timezone, TIMEZONES, prefix: true
+  enum :currency_code, CURRENCIE_CODES, prefix: true
   enum :ownership_type, {
     publicly_traded: 0,
     privately_held: 1
@@ -51,7 +57,7 @@ class Company < ApplicationRecord
   }
 
   # --- Validations ---
-  validates :name, presence: true, uniqueness: { scope: :company_group_id }, length: { maximum: 255 }
+  validates :name, presence: true, uniqueness: { scope: :user_id }, length: { maximum: 255 }
   validates :description, length: { maximum: 5000 }, allow_blank: true
 
   validates :business_type, presence: true
@@ -59,7 +65,7 @@ class Company < ApplicationRecord
   # validates :status, presence: true
 
   # Validation for new administrative fields
-  validates :registration_number, presence: true, uniqueness: true, if: :privately_held? # Typically required for private companies
+  validates :registration_number, presence: true, uniqueness: true, if: :privately_held? # Typically required for private branches
   validates :vat_id, length: { maximum: 50 }, allow_blank: true
   validates :employee_count, numericality: { greater_than_or_equal_to: 0 }, allow_nil: true
 
@@ -73,18 +79,15 @@ class Company < ApplicationRecord
   # Validation for operational fields
   # validates :fiscal_year_end_month, presence: true, numericality: { in: 1..12 }
 
-  after_initialize :set_defaults_from_company_group, if: :new_record?
-
-  def subscription_buyer
-    self.company_group.user
-  end
-
-  private
-
-  def set_defaults_from_company_group
-    return unless company_group
-
-    self.timezone ||= company_group.timezone
-    self.currency_code ||= company_group.currency_code
+  def create_first_cloned_company
+    return if branches.size > 1
+    branches.create(
+      name: name,
+      phone_number: phone_number,
+      currency_code: currency_code,
+      country: country,
+      business_type: business_type,
+      timezone: timezone
+    )
   end
 end

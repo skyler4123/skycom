@@ -6,6 +6,6 @@ class Retail::Pos::ApplicationController < Retail::ApplicationController
 
   def set_branch
     branch_id = params[:id]
-    @branch = Company.find(branch_id) if branch_id.present?
+    @branch = Branch.find(branch_id) if branch_id.present?
   end
 end

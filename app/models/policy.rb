@@ -1,7 +1,7 @@
 class Policy < ApplicationRecord
   # --- Associations ---
-  belongs_to :company_group
-  belongs_to :company, optional: true
+  belongs_to :company
+  belongs_to :branch, optional: true
 
   has_many :policy_appointments, dependent: :destroy
   has_many :roles, through: :policy_appointments, source: :appoint_to, source_type: "Role"
@@ -31,12 +31,12 @@ class Policy < ApplicationRecord
   validates :resource, presence: true
   validates :action, presence: true
 
-  # CRITICAL: Enforce uniqueness of the policy name scoped to the company.
+  # CRITICAL: Enforce uniqueness of the policy name scoped to the branch.
   # This prevents two policies within the same company from having the same name.
   validates :name,
             uniqueness: {
-              scope: :company_id,
-              message: "A policy with this name already exists in this company."
+              scope: :branch_id,
+              message: "A policy with this name already exists in this branch."
             }
 
   # If you edit the Policy name/action/resource, notify the Roles.

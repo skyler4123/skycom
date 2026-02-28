@@ -9,7 +9,7 @@ class CreateUsers < ActiveRecord::Migration[8.0]
       t.string :provider
       t.string :uid
 
-      # t.references :parent_company, null: true, foreign_key: { to_table: :companies }, type: :uuid
+      # t.references :parent_company, null: true, foreign_key: { to_table: :branches }, type: :uuid
       t.references :parent_user, null: true, foreign_key: { to_table: :users }, type: :uuid
       t.integer :system_role
       t.string :username
