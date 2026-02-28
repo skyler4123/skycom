@@ -25,12 +25,12 @@ class CompaniesController < ApplicationController
   # POST /companies or /companies.json
   def create
     @company = Company.new(company_params)
-    @company.user = Current.user
+    @company.user = current_user
 
     respond_to do |format|
       if @company.save
         @company.create_first_cloned_company
-        update_cookie(session: Current.session, user: Current.user)
+        update_cookie(session: current_session, user: current_user)
         format.html { redirect_to redirect_path_after_create_company, notice: "Company group was successfully created." }
         format.json { render :show, status: :created, location: @company }
       else
