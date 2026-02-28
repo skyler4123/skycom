@@ -8,7 +8,7 @@ class StatisticJob < ApplicationJob
     # 2. Find all branches that match their timezone with current UTC hour
     # Example: Timezone +7 will run when current UTC hour is 7
     # We also filter by discarded_at: nil to ensure we only process active branches
-    branches = Company.where(timezone: current_utc_hour, discarded_at: nil)
+    branches = Branch.where(timezone: current_utc_hour, discarded_at: nil)
 
     branches.find_each do |company|
       # 3. Calculate the total employees of this company

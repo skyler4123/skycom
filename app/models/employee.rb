@@ -5,7 +5,7 @@ class Employee < ApplicationRecord
   include TagConcern
 
   # --- Associations ---
-  belongs_to :company_group
+  belongs_to :company
   belongs_to :branch, optional: true
   belongs_to :user, optional: true
 
@@ -18,6 +18,9 @@ class Employee < ApplicationRecord
 
   has_many :employee_group_appointments, dependent: :destroy, as: :appoint_to
   has_many :employee_groups, through: :employee_group_appointments
+
+  has_many :department_appointments, dependent: :destroy, as: :appoint_to
+  has_many :departments, through: :department_appointments
 
   has_many :tag_appointments, dependent: :destroy, as: :appoint_to
   has_many :tags, through: :tag_appointments

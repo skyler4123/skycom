@@ -1,6 +1,6 @@
 class Seed::PolicyAppointmentService
   def self.run
-    Company.all.each_with_index do |company, index|
+    Branch.all.each_with_index do |company, index|
       roles = branch.roles
       policies = branch.policies
       policies.each do |policy|

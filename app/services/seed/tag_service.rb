@@ -1,6 +1,6 @@
 class Seed::TagService
   def self.run
-    Company.all.each_with_index do |company, index|
+    Branch.all.each_with_index do |company, index|
       branch.tags.create(
         name: "Tag #{index}",
         description: Faker::Movie.quote

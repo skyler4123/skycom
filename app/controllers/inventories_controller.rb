@@ -65,6 +65,6 @@ class InventoriesController < ApplicationController
 
     # Only allow a list of trusted parameters through.
     def inventory_params
-      params.expect(inventory: [ :company_id, :name, :description, :code, :status, :business_type, :discarded_at ])
+      params.expect(inventory: [ :branch_id, :name, :description, :code, :status, :business_type, :discarded_at ])
     end
 end

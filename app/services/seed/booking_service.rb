@@ -1,6 +1,6 @@
 # This service seeds the database with Booking records. Each booking connects
 # a "booker" (e.g., an Employee) to a "bookable" resource (e.g., a Facility)
-# within the context of a Company.
+# within the context of a Branch.
 
 class Seed::BookingService
   def self.create(

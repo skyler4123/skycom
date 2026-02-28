@@ -4,8 +4,7 @@
 
 class Seed::CompanyService
   def self.create(
-    company_group:,
-    parent_company: nil,
+    user:,
     name: Faker::Name.name,
     description: Faker::Company.catch_phrase,
     lifecycle_status: Company.lifecycle_statuses.keys.sample,
@@ -15,6 +14,7 @@ class Seed::CompanyService
     currency_code: Company.currency_codes.keys.sample,
     registration_number: Faker::Company.ein,
     vat_id: Faker::Code.npi,
+    timezone: Company.timezones.keys.sample,
     employee_count: rand(10..5000),
     address_line_1: Faker::Address.street_address,
     city: Faker::Address.city,
@@ -27,8 +27,7 @@ class Seed::CompanyService
     discarded_at: nil
   )
     Company.create!(
-      company_group: company_group,
-      parent_company: parent_company,
+      user: user,
       name: name,
       description: description,
       lifecycle_status: lifecycle_status,
@@ -38,6 +37,7 @@ class Seed::CompanyService
       currency_code: currency_code,
       registration_number: registration_number,
       vat_id: vat_id,
+      timezone: timezone,
       employee_count: employee_count,
       address_line_1: address_line_1,
       city: city,

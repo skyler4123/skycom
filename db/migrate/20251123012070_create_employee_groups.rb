@@ -1,7 +1,7 @@
 class CreateEmployeeGroups < ActiveRecord::Migration[8.0]
   def change
     create_table :employee_groups, id: :uuid do |t|
-      t.references :company_group, null: false, foreign_key: true, type: :uuid
+      t.references :company, null: false, foreign_key: true, type: :uuid
       t.references :branch, null: true, foreign_key: true, type: :uuid
       t.references :category, null: true, foreign_key: true, type: :uuid
 
@@ -17,6 +17,6 @@ class CreateEmployeeGroups < ActiveRecord::Migration[8.0]
       t.timestamps
     end
     add_index :employee_groups, :discarded_at
-    add_index :employee_groups, [ :company_group_id, :updated_at ]
+    add_index :employee_groups, [ :company_id, :updated_at ]
   end
 end

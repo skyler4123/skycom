@@ -1,6 +1,6 @@
 class Seed::ServiceService
   def self.create(
-    company_group:,
+    company:,
     branch:,
     name: nil,
     description: Faker::Lorem.sentence(word_count: 10),
@@ -14,7 +14,7 @@ class Seed::ServiceService
     discarded_at ||= should_discard ? Time.zone.now - rand(1..180).days : nil
 
     Service.create!(
-      company_group: company_group,
+      company: company,
       branch: branch,
       name: name || "#{branch.name} Service",
       description: description,

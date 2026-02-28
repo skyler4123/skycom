@@ -17,7 +17,7 @@ class AttendanceMonthsControllerTest < ActionDispatch::IntegrationTest
 
   test "should create attendance_month" do
     assert_difference("AttendanceMonth.count") do
-      post attendance_months_url, params: { attendance_month: { company_group_id: @attendance_month.company_group_id, company_id: @attendance_month.company_id, customer_id: @attendance_month.customer_id, logable_id: @attendance_month.logable_id, logable_type: @attendance_month.logable_type, period_id: @attendance_month.period_id } }
+      post attendance_months_url, params: { attendance_month: { company_id: @attendance_month.company_id, branch_id: @attendance_month.branch_id, customer_id: @attendance_month.customer_id, logable_id: @attendance_month.logable_id, logable_type: @attendance_month.logable_type, period_id: @attendance_month.period_id } }
     end
 
     assert_redirected_to attendance_month_url(AttendanceMonth.last)
@@ -34,7 +34,7 @@ class AttendanceMonthsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "should update attendance_month" do
-    patch attendance_month_url(@attendance_month), params: { attendance_month: { company_group_id: @attendance_month.company_group_id, company_id: @attendance_month.company_id, customer_id: @attendance_month.customer_id, logable_id: @attendance_month.logable_id, logable_type: @attendance_month.logable_type, period_id: @attendance_month.period_id } }
+    patch attendance_month_url(@attendance_month), params: { attendance_month: { company_id: @attendance_month.company_id, branch_id: @attendance_month.branch_id, customer_id: @attendance_month.customer_id, logable_id: @attendance_month.logable_id, logable_type: @attendance_month.logable_type, period_id: @attendance_month.period_id } }
     assert_redirected_to attendance_month_url(@attendance_month)
   end
 

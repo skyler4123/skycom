@@ -1,6 +1,6 @@
 FactoryBot.define do
   factory :branch do
-    company_group { nil }
+    company { nil }
     parent_company { nil }
     name { "MyString" }
     description { "MyString" }

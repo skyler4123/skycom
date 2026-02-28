@@ -83,7 +83,7 @@ export default class Retail_Management_Subscriptions_IndexController extends Ret
 
   entityIconHTML(type) {
     const icons = {
-      "CompanyGroup": "business",
+      "Company": "business",
       "Customer":     "person",
       "Company":      "domain",
       "Branch":       "store"

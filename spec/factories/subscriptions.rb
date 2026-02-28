@@ -1,7 +1,7 @@
 FactoryBot.define do
   factory :subscription do
     subscription_group { nil }
-    company_group { nil }
+    company { nil }
     company { nil }
     name { "MyString" }
     description { "MyString" }

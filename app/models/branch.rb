@@ -4,7 +4,7 @@ class Branch < ApplicationRecord
   include SystemSubscription::ResourceConcern
   include Subscription::SellerConcern
 
-  belongs_to :company_group
+  belongs_to :company
 
   has_many :employee_groups, dependent: :destroy
   has_many :employees, dependent: :destroy
@@ -29,7 +29,7 @@ class Branch < ApplicationRecord
 
   # Self-referencing association for company hierarchy
   # belongs_to :parent_company, class_name: "Company", optional: true
-  # has_many :child_branches, class_name: "Company", foreign_key: "parent_company_id", dependent: :destroy, inverse_of: :parent_company
+  # has_many :child_branches, class_name: "Company", foreign_key: "parent_branch_id", dependent: :destroy, inverse_of: :parent_company
 
   # --- Enums ---
   enum :country_code, COUNTRIE_CODES, prefix: true
@@ -51,7 +51,7 @@ class Branch < ApplicationRecord
   }
 
   # --- Validations ---
-  validates :name, presence: true, uniqueness: { scope: :company_group_id }, length: { maximum: 255 }
+  validates :name, presence: true, uniqueness: { scope: :company_id }, length: { maximum: 255 }
   validates :description, length: { maximum: 5000 }, allow_blank: true
 
   validates :business_type, presence: true
@@ -73,18 +73,18 @@ class Branch < ApplicationRecord
   # Validation for operational fields
   # validates :fiscal_year_end_month, presence: true, numericality: { in: 1..12 }
 
-  after_initialize :set_defaults_from_company_group, if: :new_record?
+  after_initialize :set_defaults_from_company, if: :new_record?
 
   def subscription_buyer
-    self.company_group.user
+    self.company.user
   end
 
   private
 
-  def set_defaults_from_company_group
-    return unless company_group
+  def set_defaults_from_company
+    return unless company
 
-    self.timezone ||= company_group.timezone
-    self.currency_code ||= company_group.currency_code
+    self.timezone ||= company.timezone
+    self.currency_code ||= company.currency_code
   end
 end

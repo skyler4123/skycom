@@ -42,7 +42,7 @@ export default class Retail_Management_Branches_IndexController extends Retail_M
             <p class="text-sm text-slate-600 dark:text-slate-300 mb-4"><strong>Contact Info:</strong> ${branch.phone_number || 'N/A'}</p>
             <p class="text-sm text-slate-600 dark:text-slate-300 mb-4"><strong>Manager:</strong> ${branch.manager_name || 'N/A'}</p>
             <p class="text-sm text-slate-600 dark:text-slate-300 mb-4"><strong>Status:</strong> ${Helpers.statusBadge(branch.lifecycle_status)}</p>
-            <p class="text-sm text-slate-600 dark:text-slate-300 mb-4"><strong>POS site:</strong> <a href="${Helpers.retail_pos_branches_path(branch.company_group_id, branch.id)}">POS site</a></p>
+            <p class="text-sm text-slate-600 dark:text-slate-300 mb-4"><strong>POS site:</strong> <a href="${Helpers.retail_pos_branches_path(branch.company_id, branch.id)}">POS site</a></p>
           </div>
           <div class="p-6 border-t border-slate-200 dark:border-slate-800 flex justify-end">
             <button

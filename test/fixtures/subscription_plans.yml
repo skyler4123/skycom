@@ -1,7 +1,7 @@
 # Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
 
 one:
-  company_group: one
+  company: one
   branch: one
   price: one
   period: one
@@ -16,7 +16,7 @@ one:
   discarded_at: 2026-01-17 21:09:07
 
 two:
-  company_group: two
+  company: two
   branch: two
   price: two
   period: two

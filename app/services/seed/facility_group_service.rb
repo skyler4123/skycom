@@ -3,7 +3,7 @@
 
 class Seed::FacilityGroupService
   def self.create(
-    company_group:,
+    company:,
     branch: nil,
     name: Faker::Commerce.department,
     description: Faker::Lorem.sentence(word_count: 10),
@@ -14,7 +14,7 @@ class Seed::FacilityGroupService
     discarded_at: nil
   )
     FacilityGroup.create!(
-      company_group: company_group,
+      company: company,
       branch: branch,
       name: name,
       description: description,

@@ -65,6 +65,6 @@ class ShiftsController < ApplicationController
 
     # Only allow a list of trusted parameters through.
     def shift_params
-      params.expect(shift: [ :company_group_id, :company_id, :period_id, :name, :description ])
+      params.expect(shift: [ :company_id, :branch_id, :period_id, :name, :description ])
     end
 end

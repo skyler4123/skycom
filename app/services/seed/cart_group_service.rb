@@ -3,7 +3,7 @@
 
 class Seed::CartGroupService
   def self.create(
-    branch: Company.all.sample,
+    branch: Branch.all.sample,
     name: "#{Faker::Commerce.department} Carts",
     description: "A group for carts related to #{Faker::Marketing.buzzwords}.",
     code: Faker::Code.npi,

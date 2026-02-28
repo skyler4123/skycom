@@ -35,7 +35,7 @@ class User < ApplicationRecord
 
   # --- Business Logic Associations ---
 
-  has_many :company_groups, dependent: :destroy
+  has_many :companies, dependent: :destroy
   has_one :employee, dependent: :destroy
   has_one :customer, dependent: :destroy
 

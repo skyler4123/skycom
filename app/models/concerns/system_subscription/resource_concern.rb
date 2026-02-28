@@ -8,7 +8,7 @@ module SystemSubscription::ResourceConcern
       plan_name:,
       country_code: self.country_code || :us,
       seller: System.find_by(name: "System"),
-      buyer: self.company_group,
+      buyer: self.company,
       resource: self,
       processer: System.find_by(name: "System"),
       lifecycle_status: :active,
@@ -22,7 +22,7 @@ module SystemSubscription::ResourceConcern
         timezone: -12
       )
       SystemSubscription.create!(
-        company_group: self.company_group,
+        company: self.company,
         system_subscription_plan: system_subscription_plan,
         seller: seller,
         buyer: buyer,

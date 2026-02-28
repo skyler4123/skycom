@@ -90,8 +90,8 @@
  * @global
  * @typedef {Object} ArticleGroup
  * @property {string} id - UUID
- * @property {string} company_group_id
  * @property {string} company_id
+ * @property {string} branch_id
  * @property {string|null} category_id
  * @property {string|null} title
  * @property {Object|null} content - JSON content
@@ -111,8 +111,8 @@
  * @typedef {Object} Article
  * @property {string} id - UUID
  * @property {string} article_group_id
- * @property {string} company_group_id
  * @property {string} company_id
+ * @property {string} branch_id
  * @property {string|null} category_id
  * @property {string|null} title
  * @property {Object|null} content - JSON content
@@ -131,8 +131,8 @@
  * @global
  * @typedef {Object} Booking
  * @property {string} id - UUID
- * @property {string} company_group_id
- * @property {string|null} company_id
+ * @property {string} company_id
+ * @property {string|null} branch_id
  * @property {string|null} appoint_from_type
  * @property {string|null} appoint_from_id
  * @property {string} appoint_to_type
@@ -174,8 +174,8 @@
  * @global
  * @typedef {Object} CartGroup
  * @property {string} id - UUID
- * @property {string} company_group_id
- * @property {string|null} company_id
+ * @property {string} company_id
+ * @property {string|null} branch_id
  * @property {string|null} category_id
  * @property {string|null} name
  * @property {string|null} description
@@ -192,8 +192,8 @@
  * @global
  * @typedef {Object} Cart
  * @property {string} id - UUID
- * @property {string} company_group_id
- * @property {string|null} company_id
+ * @property {string} company_id
+ * @property {string|null} branch_id
  * @property {string} cart_group_id
  * @property {string|null} category_id
  * @property {string|null} name
@@ -219,7 +219,7 @@
  * @global
  * @typedef {Object} Category
  * @property {string} id - UUID
- * @property {string} company_group_id
+ * @property {string} company_id
  * @property {string|null} name
  * @property {string|null} description
  * @property {string} created_at
@@ -230,8 +230,8 @@
  * @global
  * @typedef {Object} Company
  * @property {string} id - UUID
- * @property {string} company_group_id
- * @property {string|null} parent_company_id
+ * @property {string} company_id
+ * @property {string|null} parent_branch_id
  * @property {string|null} category_id
  * @property {string|null} name
  * @property {string|null} description
@@ -327,8 +327,8 @@
  * @global
  * @typedef {Object} CustomerGroup
  * @property {string} id - UUID
- * @property {string} company_group_id
- * @property {string|null} company_id
+ * @property {string} company_id
+ * @property {string|null} branch_id
  * @property {string|null} category_id
  * @property {string|null} name
  * @property {string|null} description
@@ -355,8 +355,8 @@
  * @global
  * @typedef {Object} DocumentGroup
  * @property {string} id - UUID
- * @property {string} company_group_id
  * @property {string} company_id
+ * @property {string} branch_id
  * @property {string|null} category_id
  * @property {string|null} title
  * @property {Object|null} content - JSON content
@@ -376,8 +376,8 @@
  * @typedef {Object} Document
  * @property {string} id - UUID
  * @property {string} document_group_id
- * @property {string} company_group_id
  * @property {string} company_id
+ * @property {string} branch_id
  * @property {string|null} category_id
  * @property {string|null} title
  * @property {Object|null} content - JSON content
@@ -406,8 +406,8 @@
  * @global
  * @typedef {Object} EmployeeGroup
  * @property {string} id - UUID
- * @property {string} company_group_id
- * @property {string|null} company_id
+ * @property {string} company_id
+ * @property {string|null} branch_id
  * @property {string|null} category_id
  * @property {string|null} name
  * @property {string|null} description
@@ -439,8 +439,8 @@
  * @global
  * @typedef {Object} EventGroup
  * @property {string} id - UUID
- * @property {string} company_group_id
  * @property {string} company_id
+ * @property {string} branch_id
  * @property {string|null} category_id
  * @property {string|null} name
  * @property {string|null} description
@@ -458,8 +458,8 @@
  * @typedef {Object} Event
  * @property {string} id - UUID
  * @property {string} event_group_id
- * @property {string} company_group_id
  * @property {string} company_id
+ * @property {string} branch_id
  * @property {string|null} category_id
  * @property {string|null} name
  * @property {string|null} description
@@ -481,8 +481,8 @@
  * @global
  * @typedef {Object} ExamGroup
  * @property {string} id - UUID
- * @property {string} company_group_id
- * @property {string|null} company_id
+ * @property {string} company_id
+ * @property {string|null} branch_id
  * @property {string|null} category_id
  * @property {string|null} name
  * @property {string|null} description
@@ -500,8 +500,8 @@
  * @typedef {Object} Exam
  * @property {string} id - UUID
  * @property {string} exam_group_id
- * @property {string} company_group_id
- * @property {string|null} company_id
+ * @property {string} company_id
+ * @property {string|null} branch_id
  * @property {string|null} category_id
  * @property {string|null} name
  * @property {string|null} description
@@ -518,8 +518,8 @@
  * @global
  * @typedef {Object} Facility
  * @property {string} id - UUID
- * @property {string} company_group_id
- * @property {string|null} company_id
+ * @property {string} company_id
+ * @property {string|null} branch_id
  * @property {string|null} category_id
  * @property {string|null} name
  * @property {string|null} description
@@ -546,8 +546,8 @@
  * @global
  * @typedef {Object} FacilityGroup
  * @property {string} id - UUID
- * @property {string} company_group_id
- * @property {string|null} company_id
+ * @property {string} company_id
+ * @property {string|null} branch_id
  * @property {string|null} category_id
  * @property {string|null} name
  * @property {string|null} description
@@ -564,8 +564,8 @@
  * @global
  * @typedef {Object} Inventory
  * @property {string} id - UUID
- * @property {string} company_group_id
- * @property {string|null} company_id
+ * @property {string} company_id
+ * @property {string|null} branch_id
  * @property {string|null} category_id
  * @property {string|null} name
  * @property {string|null} description
@@ -617,8 +617,8 @@
  * @global
  * @typedef {Object} InventoryTransaction
  * @property {string} id - UUID
- * @property {string} company_group_id
- * @property {string|null} company_id
+ * @property {string} company_id
+ * @property {string|null} branch_id
  * @property {string|null} appoint_from_type
  * @property {string|null} appoint_from_id
  * @property {string} appoint_to_type
@@ -675,8 +675,8 @@ _ * @property {string|null} description
  * @global
  * @typedef {Object} NotificationGroup
  * @property {string} id - UUID
- * @property {string} company_group_id
- * @property {string|null} company_id
+ * @property {string} company_id
+ * @property {string|null} branch_id
  * @property {string|null} category_id
  * @property {string|null} name
  * @property {string|null} description
@@ -694,8 +694,8 @@ _ * @property {string|null} description
  * @typedef {Object} Notification
  * @property {string} id - UUID
  * @property {string} notification_group_id
- * @property {string} company_group_id
- * @property {string|null} company_id
+ * @property {string} company_id
+ * @property {string|null} branch_id
  * @property {string|null} category_id
  * @property {string|null} name
  * @property {string|null} description
@@ -722,8 +722,8 @@ _ * @property {string|null} description
  * @global
  * @typedef {Object} OrderGroup
  * @property {string} id - UUID
- * @property {string} company_group_id
- * @property {string|null} company_id
+ * @property {string} company_id
+ * @property {string|null} branch_id
  * @property {string} customer_id
  * @property {string|null} category_id
  * @property {string|null} name
@@ -743,8 +743,8 @@ _ * @property {string|null} description
  * @global
  * @typedef {Object} Order
  * @property {string} id - UUID
- * @property {string} company_group_id
- * @property {string|null} company_id
+ * @property {string} company_id
+ * @property {string|null} branch_id
  * @property {string} customer_id
  * @property {string|null} category_id
  * @property {string|null} name
@@ -773,8 +773,8 @@ _ * @property {string|null} description
  * @typedef {Object} PaymentMethodAppointment
  * @property {string} id - UUID
  * @property {string} payment_method_id
- * @property {string} company_group_id
- * @property {string|null} company_id
+ * @property {string} company_id
+ * @property {string|null} branch_id
  * @property {string|null} name
  * @property {string|null} description
  * @property {string|null} code
@@ -861,8 +861,8 @@ _ * @property {string|null} description
  * @global
  * @typedef {Object} Policy
  * @property {string} id - UUID
- * @property {string} company_group_id
- * @property {string|null} company_id
+ * @property {string} company_id
+ * @property {string|null} branch_id
  * @property {string|null} name
  * @property {string|null} description
  * @property {string|null} code
@@ -895,8 +895,8 @@ _ * @property {string|null} description
  * @global
  * @typedef {Object} ProductGroup
  * @property {string} id - UUID
- * @property {string} company_group_id
- * @property {string|null} company_id
+ * @property {string} company_id
+ * @property {string|null} branch_id
  * @property {string|null} category_id
  * @property {string|null} name
  * @property {string|null} description
@@ -913,8 +913,8 @@ _ * @property {string|null} description
  * @global
  * @typedef {Object} Product
  * @property {string} id - UUID
- * @property {string} company_group_id
- * @property {string|null} company_id
+ * @property {string} company_id
+ * @property {string|null} branch_id
  * @property {string|null} brand_id
  * @property {string|null} category_id
  * @property {string|null} name
@@ -952,8 +952,8 @@ _ * @property {string|null} description
  * @global
  * @typedef {Object} ProjectGroup
  * @property {string} id - UUID
- * @property {string} company_group_id
- * @property {string|null} company_id
+ * @property {string} company_id
+ * @property {string|null} branch_id
  * @property {string|null} category_id
  * @property {string|null} name
  * @property {string|null} description
@@ -970,8 +970,8 @@ _ * @property {string|null} description
  * @global
  * @typedef {Object} Project
  * @property {string} id - UUID
- * @property {string} company_group_id
- * @property {string|null} company_id
+ * @property {string} company_id
+ * @property {string|null} branch_id
  * @property {string} project_group_id
  * @property {string|null} category_id
  * @property {string|null} name
@@ -1014,8 +1014,8 @@ _ * @property {string|null} description
  * @global
  * @typedef {Object} Purchase
  * @property {string} id - UUID
- * @property {string} company_group_id
- * @property {string|null} company_id
+ * @property {string} company_id
+ * @property {string|null} branch_id
  * @property {string|null} category_id
  * @property {string|null} name
  * @property {string|null} description
@@ -1032,8 +1032,8 @@ _ * @property {string|null} description
  * @global
  * @typedef {Object} Question
  * @property {string} id - UUID
- * @property {string} company_group_id
- * @property {string|null} company_id
+ * @property {string} company_id
+ * @property {string|null} branch_id
  * @property {string|null} category_id
  * @property {string|null} name
  * @property {string|null} description
@@ -1055,8 +1055,8 @@ _ * @property {string|null} description
  * @global
  * @typedef {Object} Role
  * @property {string} id - UUID
- * @property {string} company_group_id
- * @property {string|null} company_id
+ * @property {string} company_id
+ * @property {string|null} branch_id
  * @property {number|null} model_type
  * @property {string|null} name
  * @property {string|null} description
@@ -1083,8 +1083,8 @@ _ * @property {string|null} description
  * @global
  * @typedef {Object} ServiceGroup
  * @property {string} id - UUID
- * @property {string} company_group_id
- * @property {string|null} company_id
+ * @property {string} company_id
+ * @property {string|null} branch_id
  * @property {string|null} category_id
  * @property {string|null} name
  * @property {string|null} description
@@ -1103,8 +1103,8 @@ _ * @property {string|null} description
  * @global
  * @typedef {Object} Service
  * @property {string} id - UUID
- * @property {string} company_group_id
- * @property {string|null} company_id
+ * @property {string} company_id
+ * @property {string|null} branch_id
  * @property {string|null} category_id
  * @property {string|null} name
  * @property {string|null} description
@@ -1133,8 +1133,8 @@ _ * @property {string|null} description
  * @global
  * @typedef {Object} SettingGroup
  * @property {string} id - UUID
- * @property {string} company_group_id
  * @property {string} company_id
+ * @property {string} branch_id
  * @property {string|null} category_id
  * @property {Object|null} content - JSON content
  * @property {string|null} name
@@ -1153,8 +1153,8 @@ _ * @property {string|null} description
  * @typedef {Object} Setting
  * @property {string} id - UUID
  * @property {string} setting_group_id
- * @property {string} company_group_id
  * @property {string} company_id
+ * @property {string} branch_id
  * @property {string|null} category_id
  * @property {Object|null} content - JSON content
  * @property {string|null} name
@@ -1189,7 +1189,7 @@ _ * @property {string|null} description
  * @global
  * @typedef {Object} Tag
  * @property {string} id - UUID
- * @property {string} company_group_id
+ * @property {string} company_id
  * @property {string|null} name
  * @property {string|null} description
  * @property {string|null} code
@@ -1211,8 +1211,8 @@ _ * @property {string|null} description
  * @global
  * @typedef {Object} TaskGroup
  * @property {string} id - UUID
- * @property {string} company_group_id
- * @property {string|null} company_id
+ * @property {string} company_id
+ * @property {string|null} branch_id
  * @property {string|null} category_id
  * @property {string|null} name
  * @property {string|null} description
@@ -1229,8 +1229,8 @@ _ * @property {string|null} description
  * @global
  * @typedef {Object} Task
  * @property {string} id - UUID
- * @property {string} company_group_id
- * @property {string|null} company_id
+ * @property {string} company_id
+ * @property {string|null} branch_id
  * @property {string} task_group_id
  * @property {string|null} category_id
  * @property {string|null} name
@@ -1280,7 +1280,7 @@ _ * @property {WorkflowStatus|null} workflow_status
 
 /**
  * @global
- * @typedef {Object} CompanyGroup
+ * @typedef {Object} Company
  * @property {string} id - The unique identifier for the company group (UUID).
  * @property {string} user_id - The ID of the owning user.
  * @property {string|null} name
@@ -1314,8 +1314,8 @@ _ * @property {WorkflowStatus|null} workflow_status
  * @typedef {Object} Employee
  * @property {string} id - The unique identifier for the employee record (UUID).
  * @property {string} user_id - The ID of the associated user.
- * @property {string} company_group_id
- * @property {string|null} company_id
+ * @property {string} company_id
+ * @property {string|null} branch_id
  * @property {string|null} category_id
  * @property {string|null} name
  * @property {string|null} description
@@ -1333,8 +1333,8 @@ _ * @property {WorkflowStatus|null} workflow_status
  * @typedef {Object} Customer
  * @property {string} id - The unique identifier for the customer record (UUID).
  * @property {string|null} user_id - The ID of the associated user.
- * @property {string} company_group_id
- * @property {string|null} company_id
+ * @property {string} company_id
+ * @property {string|null} branch_id
  * @property {string|null} category_id
  * @property {string|null} name
  * @property {string|null} description

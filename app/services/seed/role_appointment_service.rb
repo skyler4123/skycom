@@ -1,6 +1,6 @@
 class Seed::RoleAppointmentService
   def self.run
-    Company.all.each_with_index do |company, index|
+    Branch.all.each_with_index do |company, index|
       roles = branch.roles
       employee_groups = branch.employee_groups
       employees = branch.employees

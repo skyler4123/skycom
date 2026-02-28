@@ -1,5 +1,5 @@
 # This service seeds the database with Task records. Each task is
-# associated with a TaskGroup and a Company.
+# associated with a TaskGroup and a Branch.
 
 class Seed::TaskService
   def self.create(

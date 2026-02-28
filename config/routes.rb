@@ -25,7 +25,7 @@ Rails.application.routes.draw do
     # to tell Rails that the controllers for these resources are located inside the "Admin
     # namespace (e.g., app/controllers/admin/users_controller.rb).
     resources :dashboard
-    resources :company_groups
+    resources :companies
     resources :branches
     resources :users
     resources :subscriptions
@@ -131,7 +131,7 @@ Rails.application.routes.draw do
   resources :event_group_appointments
   resources :events
   resources :event_groups
-  resources :company_groups
+  resources :companies
   resources :exam_appointments
   resources :answers
   resources :questions

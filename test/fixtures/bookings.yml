@@ -1,7 +1,7 @@
 # Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
 
 one:
-  company_group: one
+  company: one
   branch: one
   booking_resource: one
   price: one
@@ -22,7 +22,7 @@ one:
   discarded_at: 2026-01-06 00:25:09
 
 two:
-  company_group: two
+  company: two
   branch: two
   booking_resource: two
   price: two

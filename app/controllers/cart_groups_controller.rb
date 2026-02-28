@@ -65,6 +65,6 @@ class CartGroupsController < ApplicationController
 
     # Only allow a list of trusted parameters through.
     def cart_group_params
-      params.expect(cart_group: [ :company_id, :name, :description, :code, :status, :business_type, :discarded_at ])
+      params.expect(cart_group: [ :branch_id, :name, :description, :code, :status, :business_type, :discarded_at ])
     end
 end

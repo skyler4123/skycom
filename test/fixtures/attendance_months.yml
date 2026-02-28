@@ -1,7 +1,7 @@
 # Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
 
 one:
-  company_group: one
+  company: one
   branch: one
   customer: one
   logable: one
@@ -9,7 +9,7 @@ one:
   period: one
 
 two:
-  company_group: two
+  company: two
   branch: two
   customer: two
   logable: two

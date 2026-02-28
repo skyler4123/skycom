@@ -1,5 +1,5 @@
 FactoryBot.define do
-  factory :company_group do
+  factory :company do
     user { nil }
     name { "MyString" }
     description { "MyString" }

@@ -1,5 +1,5 @@
 # This service seeds the database with Project records. Each project is
-# associated with a ProjectGroup and a Company.
+# associated with a ProjectGroup and a Branch.
 
 class Seed::ProjectService
   def self.create(

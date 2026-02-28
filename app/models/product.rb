@@ -4,7 +4,7 @@ class Product < ApplicationRecord
   include Subscription::ResourceConcern
 
   # --- Associations ---
-  belongs_to :company_group
+  belongs_to :company
   belongs_to :branch, optional: true
   belongs_to :brand, optional: true
 

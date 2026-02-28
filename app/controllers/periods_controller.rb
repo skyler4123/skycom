@@ -65,6 +65,6 @@ class PeriodsController < ApplicationController
 
     # Only allow a list of trusted parameters through.
     def period_params
-      params.expect(period: [ :company_id, :name, :description, :code, :duration, :start_at, :end_at, :expire_at, :discarded_at ])
+      params.expect(period: [ :branch_id, :name, :description, :code, :duration, :start_at, :end_at, :expire_at, :discarded_at ])
     end
 end

@@ -5,23 +5,23 @@ class Current < ActiveSupport::CurrentAttributes
   delegate :user, to: :session, allow_nil: true
 
   # ------------------------------------------------------------------------
-  attribute :company_group_id
+  attribute :company_id
 
   # company_owner is User
   def self.company_owner
     Current.user&.company_owner
   end
 
-  def self.company_groups
-    company_owner&.company_groups
+  def self.companies
+    company_owner&.companies
   end
 
-  def self.company_group
-    CompanyGroup.find(company_group_id) if company_group_id.present?
+  def self.company
+    Company.find(company_id) if company_id.present?
   end
 
   def self.branches
-    company_group&.branches
+    company&.branches
   end
   # ------------------------------------------------------------------------
 end

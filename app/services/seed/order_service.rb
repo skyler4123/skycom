@@ -4,7 +4,7 @@
 
 class Seed::OrderService
   def self.create(
-    company_group:,
+    company:,
     branch: nil,
     customer: nil,
     name: Faker::Company.buzzword,
@@ -16,7 +16,7 @@ class Seed::OrderService
     discarded_at: nil
   )
     Order.create!(
-      company_group: company_group,
+      company: company,
       branch: branch,
       customer: customer,
       name: name,

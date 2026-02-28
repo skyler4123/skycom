@@ -1,10 +1,10 @@
 # This service seeds the database with Facility records, ensuring each facility
-# is associated with an existing Company. It uses enums if they are defined
+# is associated with an existing Branch. It uses enums if they are defined
 # in the Facility model and simulates soft deletion for a portion of the records.
 
 class Seed::FacilityService
   def self.create(
-    company_group:,
+    company:,
     branch: nil,
     name: Faker::Commerce.department,
     description: Faker::Lorem.sentence(word_count: 10),
@@ -14,7 +14,7 @@ class Seed::FacilityService
     discarded_at: nil
   )
     Facility.create!(
-      company_group: company_group,
+      company: company,
       branch: branch,
       name: name,
       description: description,

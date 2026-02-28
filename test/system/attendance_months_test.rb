@@ -14,8 +14,8 @@ class AttendanceMonthsTest < ApplicationSystemTestCase
     visit attendance_months_url
     click_on "New attendance month"
 
-    fill_in "Company group", with: @attendance_month.company_group_id
-    fill_in "Company", with: @attendance_month.company_id
+    fill_in "Company group", with: @attendance_month.company_id
+    fill_in "Company", with: @attendance_month.branch_id
     fill_in "Customer", with: @attendance_month.customer_id
     fill_in "Logable", with: @attendance_month.logable_id
     fill_in "Logable type", with: @attendance_month.logable_type
@@ -30,8 +30,8 @@ class AttendanceMonthsTest < ApplicationSystemTestCase
     visit attendance_month_url(@attendance_month)
     click_on "Edit this attendance month", match: :first
 
-    fill_in "Company group", with: @attendance_month.company_group_id
-    fill_in "Company", with: @attendance_month.company_id
+    fill_in "Company group", with: @attendance_month.company_id
+    fill_in "Company", with: @attendance_month.branch_id
     fill_in "Customer", with: @attendance_month.customer_id
     fill_in "Logable", with: @attendance_month.logable_id
     fill_in "Logable type", with: @attendance_month.logable_type

@@ -19,7 +19,7 @@ class Seed::EducationService
   COMPANY_GROUP_BUSINESS_TYPE = :education
 
   def initialize(user:)
-    @multi_company_group_owner = user
+    @multi_company_owner = user
     @education = nil
     @schools = []
     @school_classes = []
@@ -39,8 +39,8 @@ class Seed::EducationService
 
     # --- 1. Create Education ---
     puts "Creating 1 education..."
-    @education = Seed::CompanyGroupService.create(
-      user: @multi_company_group_owner,
+    @education = Seed::CompanyService.create(
+      user: @multi_company_owner,
       name: "Education #{rand(1000..9999)}",
       description: "A group for multiple schools and educational institutions.",
       business_type: COMPANY_GROUP_BUSINESS_TYPE
@@ -51,21 +51,20 @@ class Seed::EducationService
     school_count = 2
     puts "Creating #{school_count} schools under the education..."
     school_count.times do |i|
-      school = Seed::CompanyService.create(
+      school = Seed::BranchService.create(
         name: "School #{i + 1}",
         description: "Description for School #{i + 1}",
-        parent_company: nil,
-        company_group: @education
+        company: @education
       )
       school.attach_tag(name: "School #{school.id} Tag")
       @schools << school
     end
     puts "Created #{@schools.count} schools under the education."
 
-    #--- 3. Create Payment Method Appointments for Education (CompanyGroup) ---
+    #--- 3. Create Payment Method Appointments for Education (Company) ---
     2.times do
       Seed::PaymentMethodAppointmentService.create(
-        company_group: @education,
+        company: @education,
       )
     end
     puts "Appointed some payment methods to education"
@@ -73,7 +72,7 @@ class Seed::EducationService
     # --- 4. Create Education Roless ---
     EDUCATION_ROLES.each do |role_name|
       Seed::RoleService.create(
-        company_group: @education,
+        company: @education,
         name: role_name,
         description: "#{role_name} role for #{@education.name}"
       )
@@ -83,13 +82,13 @@ class Seed::EducationService
       puts "Creating departments for #{school.name}..."
       [ "Science Department", "Math Department", "Arts Department", "Sports Department" ].each do |dept_name|
         department = Seed::EmployeeGroupService.create(
-          company_group: @education,
+          company: @education,
           branch: school,
           name: dept_name,
           description: "Department: #{dept_name} in #{school.name}"
         )
         department.update!(category: Seed::CategoryService.create(
-          company_group: @education,
+          company: @education,
           name: "Department"
         ))
         department.attach_tag(name: "Department #{department.id} Tag")
@@ -104,10 +103,10 @@ class Seed::EducationService
       puts "Creating employees for #{school.name}..."
       EMPLOYEE_COUNTS.each do |role_name, count|
         count.times do |i|
-          user = Seed::UserService.create(parent_user: @multi_company_group_owner, email: "#{role_name.downcase}_#{i + 1}_#{school.id}@example.com")
+          user = Seed::UserService.create(parent_user: @multi_company_owner, email: "#{role_name.downcase}_#{i + 1}_#{school.id}@example.com")
           employee = Seed::EmployeeService.create(
             user: user,
-            company_group: @education,
+            company: @education,
             branch: school,
             name: "Employee #{i + 1} - #{role_name.to_s.capitalize}",
             description: "Description for Employee #{i + 1} - #{role_name.to_s.capitalize}"
@@ -127,7 +126,7 @@ class Seed::EducationService
     # --- 7. Enroll Teachers (Employees) to Departments (Employee Groups) ---
     @departments.each do |department|
       puts "Enrolling teachers to #{department.name}..."
-      teachers = @teachers.select { |t| t.company_id == department.company_id }
+      teachers = @teachers.select { |t| t.branch_id == department.branch_id }
       assigned_teachers = teachers.sample(3)
       assigned_teachers.each do |teacher|
         Seed::EmployeeGroupAppointmentService.create(
@@ -143,10 +142,10 @@ class Seed::EducationService
       puts "Creating customers (students) for #{school.name}..."
       CUSTOMER_COUNTS.each do |role_name, count|
         count.times do |i|
-          user = Seed::UserService.create(parent_user: @multi_company_group_owner, email: "student_#{i + 1}_#{school.id}@example.com")
+          user = Seed::UserService.create(parent_user: @multi_company_owner, email: "student_#{i + 1}_#{school.id}@example.com")
           student = Seed::CustomerService.create(
             user: user,
-            company_group: @education,
+            company: @education,
             branch: school,
             name: "Student #{i + 1}",
             description: "Description for Student #{i + 1}"
@@ -164,7 +163,7 @@ class Seed::EducationService
       puts "Creating classes and enrolling students for #{school.name}..."
       3.times do |i|
         klass = Seed::CustomerGroupService.create(
-          company_group: @education,
+          company: @education,
           branch: school,
           name: "Class #{i + 1} - #{school.name}",
           description: "Description for Class #{i + 1} in #{school.name}"
@@ -172,7 +171,7 @@ class Seed::EducationService
         klass.attach_tag(name: "Class #{klass.id} Tag")
         @school_classes << klass
         # Enroll 5 random students per class
-        students = @students.select { |s| s.company_id == school.id }
+        students = @students.select { |s| s.branch_id == school.id }
         enrolled_students = students.sample(5)
         enrolled_students.each do |student|
           Seed::CustomerGroupAppointmentService.create(
@@ -189,7 +188,7 @@ class Seed::EducationService
       puts "Creating rooms for #{school.name}..."
       5.times do |i|
         room = Seed::FacilityService.create(
-          company_group: @education,
+          company: @education,
           branch: school,
           name: "Room #{i + 1} - #{school.name}",
           description: "Description for Room #{i + 1} in #{school.name}"
@@ -204,7 +203,7 @@ class Seed::EducationService
       puts "Creating courses for #{school.name}..."
       4.times do |i|
         course = Seed::ServiceService.create(
-          company_group: @education,
+          company: @education,
           branch: school,
           name: "Course #{i + 1} - #{school.name}",
           description: "Description for Course #{i + 1} in #{school.name}"
@@ -213,7 +212,7 @@ class Seed::EducationService
         @courses << course
         # Enroll all classes in this course
         @school_classes.each do |klass|
-          if klass.company_id == school.id
+          if klass.branch_id == school.id
             Seed::ServiceAppointmentService.create(
               service: course,
               appoint_to: klass
@@ -237,8 +236,8 @@ class Seed::EducationService
     # --- 12. Enroll Classes (Customer Group) to Courses (Service)
     @schools.each do |school|
       puts "Enrolling classes to courses for #{school.name}..."
-      school_courses = @courses.select { |c| c.company_id == school.id }
-      school_classes = @school_classes.select { |cg| cg.company_id == school.id }
+      school_courses = @courses.select { |c| c.branch_id == school.id }
+      school_classes = @school_classes.select { |cg| cg.branch_id == school.id }
       school_courses.each do |course|
         school_classes.each do |klass|
           Seed::CustomerGroupAppointmentService.create(
@@ -267,7 +266,7 @@ class Seed::EducationService
   end
   # def initialize(owner_email:)
   #   @owner_email = owner_email
-  #   @multi_company_group_owner = nil
+  #   @multi_company_owner = nil
   #   @school_admin = []
   #   @schools = []
   #   @employees = []
@@ -295,13 +294,13 @@ class Seed::EducationService
   #   # --- 1. Create Education Owners (User) ---
   #   puts "Creating 1 school owner..."
   #   @company_business_type = User.COMPANY_GROUP_BUSINESS_TYPES[:school]
-  #   @multi_company_group_owner = Seed::UserService.create(email: @owner_email, company_business_type: @company_business_type)
+  #   @multi_company_owner = Seed::UserService.create(email: @owner_email, company_business_type: @company_business_type)
 
   #   #--- 2. Create Educations (Company) ---
   #   puts "Creating #{@school_count} schools..."
   #   @school_count.times do |i|
-  #     school = Seed::CompanyService.create(
-  #       user: @multi_company_group_owner,
+  #     school = Seed::BranchService.create(
+  #       user: @multi_company_owner,
   #       name: "Education #{i + 1}",
   #       description: "Description for Education #{i + 1}",
   #       parent_company: nil
@@ -336,7 +335,7 @@ class Seed::EducationService
   #     puts "Creating employees for #{school.name}..."
   #     EMPLOYEE_COUNTS.each do |role_name, count|
   #       count.times do |i|
-  #         user = Seed::UserService.create(parent_user: @multi_company_group_owner, email: "#{role_name.downcase}_#{i + 1}_#{school.id}@example.com")
+  #         user = Seed::UserService.create(parent_user: @multi_company_owner, email: "#{role_name.downcase}_#{i + 1}_#{school.id}@example.com")
   #         employee = Seed::EmployeeService.create(
   #           user: user,
   #           branch: school
@@ -354,7 +353,7 @@ class Seed::EducationService
   #     puts "Creating customers (students) for #{school.name}..."
   #     CUSTOMER_COUNTS.each do |role_name, count|
   #       count.times do |i|
-  #         user = Seed::UserService.create(parent_user: @multi_company_group_owner, email: "student_#{i + 1}_#{school.id}@example.com")
+  #         user = Seed::UserService.create(parent_user: @multi_company_owner, email: "student_#{i + 1}_#{school.id}@example.com")
   #         customer = Seed::CustomerService.create(
   #           user: user,
   #           branch: school
@@ -378,7 +377,7 @@ class Seed::EducationService
   #       )
   #       klass.attach_tag(name: "Class #{klass.id} Tag")
   #       # Enroll 5 random students per class
-  #       students = @customers.select { |c| c.company_id == school.id }
+  #       students = @customers.select { |c| c.branch_id == school.id }
   #       enrolled_students = students.sample(5)
   #       enrolled_students.each do |student|
   #         Seed::CustomerGroupAppointmentService.create(
@@ -412,7 +411,7 @@ class Seed::EducationService
 
   #     # --- 9. Assign Teachers (Employees) to Courses (Services) ---
   #     puts "Assigning teachers to courses for #{school.name}..."
-  #     teachers = @employees.select { |e| e.has_role?('Teacher') && e.company_id == school.id }
+  #     teachers = @employees.select { |e| e.has_role?('Teacher') && e.branch_id == school.id }
   #     @courses.each do |course|
   #       assigned_teacher = teachers.sample
   #       Seed::ServiceAppointmentService.create(

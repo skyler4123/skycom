@@ -1,6 +1,6 @@
 class Policy < ApplicationRecord
   # --- Associations ---
-  belongs_to :company_group
+  belongs_to :company
   belongs_to :branch, optional: true
 
   has_many :policy_appointments, dependent: :destroy
@@ -35,7 +35,7 @@ class Policy < ApplicationRecord
   # This prevents two policies within the same company from having the same name.
   validates :name,
             uniqueness: {
-              scope: :company_id,
+              scope: :branch_id,
               message: "A policy with this name already exists in this branch."
             }
 

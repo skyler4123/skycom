@@ -22,8 +22,8 @@ class AttendanceDaysTest < ApplicationSystemTestCase
     fill_in "Break start", with: @attendance_day.break_start
     fill_in "Check in", with: @attendance_day.check_in
     fill_in "Check out", with: @attendance_day.check_out
-    fill_in "Company group", with: @attendance_day.company_group_id
-    fill_in "Company", with: @attendance_day.company_id
+    fill_in "Company group", with: @attendance_day.company_id
+    fill_in "Company", with: @attendance_day.branch_id
     fill_in "Device", with: @attendance_day.device_id
     fill_in "Edited at", with: @attendance_day.edited_at
     fill_in "Edited by", with: @attendance_day.edited_by_id
@@ -59,8 +59,8 @@ class AttendanceDaysTest < ApplicationSystemTestCase
     fill_in "Break start", with: @attendance_day.break_start.to_s
     fill_in "Check in", with: @attendance_day.check_in.to_s
     fill_in "Check out", with: @attendance_day.check_out.to_s
-    fill_in "Company group", with: @attendance_day.company_group_id
-    fill_in "Company", with: @attendance_day.company_id
+    fill_in "Company group", with: @attendance_day.company_id
+    fill_in "Company", with: @attendance_day.branch_id
     fill_in "Device", with: @attendance_day.device_id
     fill_in "Edited at", with: @attendance_day.edited_at.to_s
     fill_in "Edited by", with: @attendance_day.edited_by_id

@@ -24,8 +24,8 @@ class BookingsTest < ApplicationSystemTestCase
     fill_in "Appoint to type", with: @booking.appoint_to_type
     fill_in "Booking resource", with: @booking.booking_resource_id
     fill_in "Business type", with: @booking.business_type
-    fill_in "Company group", with: @booking.company_group_id
-    fill_in "Company", with: @booking.company_id
+    fill_in "Company group", with: @booking.company_id
+    fill_in "Company", with: @booking.branch_id
     fill_in "Description", with: @booking.description
     fill_in "Discarded at", with: @booking.discarded_at
     fill_in "Lifecycle status", with: @booking.lifecycle_status
@@ -52,8 +52,8 @@ class BookingsTest < ApplicationSystemTestCase
     fill_in "Appoint to type", with: @booking.appoint_to_type
     fill_in "Booking resource", with: @booking.booking_resource_id
     fill_in "Business type", with: @booking.business_type
-    fill_in "Company group", with: @booking.company_group_id
-    fill_in "Company", with: @booking.company_id
+    fill_in "Company group", with: @booking.company_id
+    fill_in "Company", with: @booking.branch_id
     fill_in "Description", with: @booking.description
     fill_in "Discarded at", with: @booking.discarded_at.to_s
     fill_in "Lifecycle status", with: @booking.lifecycle_status

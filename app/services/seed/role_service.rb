@@ -1,10 +1,10 @@
 # This service seeds the database with Role records, ensuring each role
-# is associated with an existing Company. It uses the enums defined in the Role model
+# is associated with an existing Branch. It uses the enums defined in the Role model
 # and simulates soft deletion.
 
 class Seed::RoleService
   def self.create(
-    company_group:,
+    company:,
     name:,
     description: Faker::Lorem.sentence(word_count: 8),
     business_type: Role.business_types.keys.sample,
@@ -14,7 +14,7 @@ class Seed::RoleService
     discarded_at ||= should_discard ? Time.zone.now - rand(1..60).days : nil
 
     Role.create!(
-      company_group: company_group,
+      company: company,
       name: name,
       description: description,
       business_type: business_type,

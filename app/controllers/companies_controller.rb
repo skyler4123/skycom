@@ -3,7 +3,7 @@ class BranchesController < ApplicationController
 
   # GET /branches or /branches.json
   def index
-    @branches = Company.all
+    @branches = Branch.all
   end
 
   # GET /branches/1 or /branches/1.json
@@ -12,7 +12,7 @@ class BranchesController < ApplicationController
 
   # GET /branches/new
   def new
-    @company = Company.new
+    @company = Branch.new
   end
 
   # GET /branches/1/edit
@@ -21,7 +21,7 @@ class BranchesController < ApplicationController
 
   # POST /branches or /branches.json
   def create
-    @company = Company.new(company_params)
+    @company = Branch.new(company_params)
 
     respond_to do |format|
       if @branch.save
@@ -60,11 +60,11 @@ class BranchesController < ApplicationController
   private
     # Use callbacks to share common setup or constraints between actions.
     def set_company
-      @company = Company.find(params.expect(:id))
+      @company = Branch.find(params.expect(:id))
     end
 
     # Only allow a list of trusted parameters through.
     def company_params
-      params.expect(branch: [ :company_group_id, :parent_company_id, :name, :description, :code, :status, :ownership_type, :business_type, :currency_code, :registration_number, :vat_id, :address_line_1, :city, :postal_code, :country, :email, :phone_number, :website, :employee_count, :fiscal_year_end_month, :discarded_at ])
+      params.expect(branch: [ :company_id, :parent_branch_id, :name, :description, :code, :status, :ownership_type, :business_type, :currency_code, :registration_number, :vat_id, :address_line_1, :city, :postal_code, :country, :email, :phone_number, :website, :employee_count, :fiscal_year_end_month, :discarded_at ])
     end
 end

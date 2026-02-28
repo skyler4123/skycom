@@ -5,9 +5,9 @@ class OrderPolicy < ApplicationPolicy
     @user = user
     @record = record
     # Find the employee profile for the current context (Company Group)
-    # Assuming you have a method to access current_company_group or similar in your app context
-    # Often accessing: record.company_group or user.employees.find_by(company_group: ...)
-    @employee = user.employees.find_by(company_group_id: record.company_group_id)
+    # Assuming you have a method to access current_company or similar in your app context
+    # Often accessing: record.company or user.employees.find_by(company: ...)
+    @employee = user.employees.find_by(company_id: record.company_id)
   end
 
   # CRUD Mapping

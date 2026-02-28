@@ -65,6 +65,6 @@ class AttendanceDaysController < ApplicationController
 
     # Only allow a list of trusted parameters through.
     def attendance_day_params
-      params.expect(attendance_day: [ :company_group_id, :company_id, :employee_id, :logable_id, :logable_type, :period_id, :attendance_date, :check_in, :check_out, :break_start, :break_end, :total_seconds_present, :total_seconds_break, :total_seconds_worked, :total_seconds_overtime, :shift_id, :attendance_status, :recorded_method, :ip_address, :device_id, :location_lat, :location_lng, :notes, :approved_by_id, :approved_at, :edited_by_id, :edited_at ])
+      params.expect(attendance_day: [ :company_id, :branch_id, :employee_id, :logable_id, :logable_type, :period_id, :attendance_date, :check_in, :check_out, :break_start, :break_end, :total_seconds_present, :total_seconds_break, :total_seconds_worked, :total_seconds_overtime, :shift_id, :attendance_status, :recorded_method, :ip_address, :device_id, :location_lat, :location_lng, :notes, :approved_by_id, :approved_at, :edited_by_id, :edited_at ])
     end
 end

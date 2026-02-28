@@ -1,5 +1,5 @@
 # This service seeds the database with Notification records. Each notification is
-# associated with a NotificationGroup and a Company.
+# associated with a NotificationGroup and a Branch.
 
 class Seed::NotificationService
   def self.create(

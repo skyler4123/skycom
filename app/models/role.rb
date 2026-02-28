@@ -2,7 +2,7 @@ class Role < ApplicationRecord
   include TagConcern
 
   # --- Associations ---
-  belongs_to :company_group
+  belongs_to :company
   belongs_to :branch, optional: true
 
   has_many :policy_appointments, dependent: :destroy, as: :appoint_to
@@ -19,6 +19,7 @@ class Role < ApplicationRecord
   has_many :employees, through: :role_appointments, source: :appoint_to, source_type: "Employee"
   has_many :customer_groups, through: :role_appointments, source: :appoint_to, source_type: "CustomerGroup"
   has_many :customers, through: :role_appointments, source: :appoint_to, source_type: "Customer"
+  has_many :departments, through: :role_appointments, source: :appoint_to, source_type: "Department"
 
   # This fires whenever the Role is touched (e.g., by a PolicyAppointment change)
   after_touch :invalidate_employee_caches
@@ -43,7 +44,7 @@ class Role < ApplicationRecord
   # --- Model Types Enum ---
   enum :model_type, {
     global: 0,
-    company_group: 1,
+    company: 1,
     comapny: 2,
     employee_group: 3,
     employee: 4,
@@ -70,7 +71,7 @@ class Role < ApplicationRecord
           presence: true,
           length: { maximum: 100 },
           uniqueness: {
-            scope: :company_group_id,
+            scope: :company_id,
             message: "A role with this name already exists."
           }
 

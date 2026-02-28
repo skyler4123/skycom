@@ -1,7 +1,7 @@
 class PaymentMethodAppointment < ApplicationRecord
   # --- Associations ---
   belongs_to :payment_method
-  belongs_to :company_group
+  belongs_to :company
   belongs_to :branch, optional: true
 
   # --- Enums ---
@@ -16,7 +16,7 @@ class PaymentMethodAppointment < ApplicationRecord
 
   # --- Validations ---
   validates :name, presence: true, length: { maximum: 255 }
-  validates :code, presence: true, uniqueness: { scope: :company_id, message: "This payment method code is already assigned to this branch." }
+  validates :code, presence: true, uniqueness: { scope: :company_id, message: "This payment method code is already assigned to this company group." }
 
   validates :business_type, presence: true
 end

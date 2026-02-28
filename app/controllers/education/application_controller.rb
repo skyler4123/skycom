@@ -5,6 +5,6 @@ class Education::ApplicationController < ApplicationController
 
   def set_education
     education_id = params[:education_id]
-    @education = CompanyGroup.find(education_id) if education_id.present?
+    @education = Company.find(education_id) if education_id.present?
   end
 end

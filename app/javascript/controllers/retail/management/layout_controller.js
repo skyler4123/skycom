@@ -61,7 +61,7 @@ export default class Retail_Management_LayoutController extends Controller {
     // console.log("UI Synchronized");
   }
 
-  openCompanyGroupDropdown(event) {
+  openCompanyDropdown(event) {
    event.preventDefault();
     Helpers.openPopover({
       parentElement: event.currentTarget,
@@ -101,7 +101,7 @@ export default class Retail_Management_LayoutController extends Controller {
                 <span class="material-symbols-outlined">storefront</span>
               </div>
               <div class="flex flex-col">
-                <h1 data-action="click->${this.identifier}#openCompanyGroupDropdown" class="text-gray-900 dark:text-white text-base font-medium leading-normal cursor-pointer">${this.retail.name}</h1>
+                <h1 data-action="click->${this.identifier}#openCompanyDropdown" class="text-gray-900 dark:text-white text-base font-medium leading-normal cursor-pointer">${this.retail.name}</h1>
                 <p class="text-gray-500 dark:text-gray-400 text-sm font-normal leading-normal">${Helpers.capitalize(this.retail.business_type)}</p>
               </div>
             </div>

@@ -65,6 +65,6 @@ class AttendanceLogsController < ApplicationController
 
     # Only allow a list of trusted parameters through.
     def attendance_log_params
-      params.expect(attendance_log: [ :company_group_id, :company_id, :customer_id, :logable_id, :logable_type, :period_id, :location, :id_address, :device_info, :notes ])
+      params.expect(attendance_log: [ :company_id, :branch_id, :customer_id, :logable_id, :logable_type, :period_id, :location, :id_address, :device_info, :notes ])
     end
 end

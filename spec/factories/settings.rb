@@ -1,7 +1,7 @@
 FactoryBot.define do
   factory :setting do
     setting_group { nil }
-    company_group { nil }
+    company { nil }
     company { nil }
     content { "" }
     name { "MyString" }

@@ -2,7 +2,7 @@ class Task < ApplicationRecord
   include TagConcern
 
   # --- Associations ---
-  belongs_to :company_group
+  belongs_to :company
   belongs_to :branch, optional: true
   belongs_to :task_group
 

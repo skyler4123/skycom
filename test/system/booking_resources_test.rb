@@ -17,8 +17,8 @@ class BookingResourcesTest < ApplicationSystemTestCase
     fill_in "Booking resourceable", with: @booking_resource.booking_resourceable_id
     fill_in "Booking resourceable type", with: @booking_resource.booking_resourceable_type
     fill_in "Business type", with: @booking_resource.business_type
-    fill_in "Company group", with: @booking_resource.company_group_id
-    fill_in "Company", with: @booking_resource.company_id
+    fill_in "Company group", with: @booking_resource.company_id
+    fill_in "Company", with: @booking_resource.branch_id
     fill_in "Description", with: @booking_resource.description
     fill_in "Discarded at", with: @booking_resource.discarded_at
     fill_in "Lifecycle status", with: @booking_resource.lifecycle_status
@@ -37,8 +37,8 @@ class BookingResourcesTest < ApplicationSystemTestCase
     fill_in "Booking resourceable", with: @booking_resource.booking_resourceable_id
     fill_in "Booking resourceable type", with: @booking_resource.booking_resourceable_type
     fill_in "Business type", with: @booking_resource.business_type
-    fill_in "Company group", with: @booking_resource.company_group_id
-    fill_in "Company", with: @booking_resource.company_id
+    fill_in "Company group", with: @booking_resource.company_id
+    fill_in "Company", with: @booking_resource.branch_id
     fill_in "Description", with: @booking_resource.description
     fill_in "Discarded at", with: @booking_resource.discarded_at.to_s
     fill_in "Lifecycle status", with: @booking_resource.lifecycle_status
