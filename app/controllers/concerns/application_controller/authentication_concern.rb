@@ -8,11 +8,11 @@ module ApplicationController::AuthenticationConcern
   end
 
   def current_user
-    current_session&.user
+    @current_user ||= current_session&.user
   end
 
   def current_session
-    Current.session
+    @current_session ||= Current.session
   end
 
   def is_signed_in?

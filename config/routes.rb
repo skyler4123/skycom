@@ -1,10 +1,72 @@
 Rails.application.routes.draw do
+  resources :redirect do
+    collection do
+      get :companies
+    end
+  end
   resources :demo, only: [:index] do
     collection do
       get :calendar_events
     end
   end
-  # resources :system_subscriptions
+  resources :companies do
+    scope module: :companies do
+      resources :branches
+    end
+  end
+  
+  resources :home, only: [ :index ] do
+    collection do
+      get :retail
+      get :education
+      get :hospital
+      get :restaurant
+      get :shop
+      get :fitness
+    end
+  end
+  mount MissionControl::Jobs::Engine, at: "/jobs"
+  get "sign_out", to: "sessions#sign_out"
+  # ----------------------------------------------------------------------------------------------------
+  # DEFAULTS
+  get  "sign_in", to: "sessions#new"
+  post "sign_in", to: "sessions#create"
+  get  "sign_up", to: "registrations#new"
+  post "sign_up", to: "registrations#create"
+  resources :sessions, only: [ :index, :show, :destroy ]
+  resource  :password, only: [ :edit, :update ]
+  namespace :identity do
+    resource :email,              only: [ :edit, :update ]
+    resource :email_verification, only: [ :show, :create ]
+    resource :password_reset,     only: [ :new, :edit, :create, :update ]
+  end
+  get  "/auth/failure",            to: "sessions/omniauth#failure"
+  get  "/auth/:provider/callback", to: "sessions/omniauth#create"
+  post "/auth/:provider/callback", to: "sessions/omniauth#create"
+  namespace :sessions do
+    resource :passwordless, only: [ :new, :edit, :create ]
+  end
+  resource :invitation, only: [ :new, :create ]
+  root "home#index"
+  # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
+
+  # Reveal health status on /up that returns 200 if the app boots with no exceptions, otherwise 500.
+  # Can be used by load balancers and uptime monitors to verify that the app is live.
+  get "up" => "rails/health#show", as: :rails_health_check
+
+  # Render dynamic PWA files from app/views/pwa/* (remember to link manifest in application.html.erb)
+  # get "manifest" => "rails/pwa#manifest", as: :pwa_manifest
+  # get "service-worker" => "rails/pwa#service_worker", as: :pwa_service_worker
+
+  # Defines the root path route ("/")
+  # root "posts#index"
+  # ----------------------------------------------------------------------------------------------------
+end
+
+
+
+
+# resources :system_subscriptions
   # resources :system_subscription_groups
   # resources :system_subscription_plans
   # resources :subscription_plans
@@ -131,34 +193,7 @@ Rails.application.routes.draw do
   # resources :event_group_appointments
   # resources :events
   # resources :event_groups
-  resources :companies do
-    resources :dashboard
-    resources :branches
-    resources :departments
-    resources :products
-    resources :services
-    resources :orders
-    resources :bookings
-    resources :payments
-    resources :employees
-    resources :inventories
-    resources :customers
-    resources :invoices
-    resources :schedules
-    resources :attendances
-    resources :reports
-    resources :documents
-    resources :announcements
-    resources :discounts
-    resources :events
-    resources :payslips
-    resources :tasks
-    resources :facilities
-    resources :settings
-    resources :administrators
-    resources :subscriptions
-    resources :permissions
-  end
+  # resources :companies
   # resources :exam_appointments
   # resources :answers
   # resources :questions
@@ -226,50 +261,3 @@ Rails.application.routes.draw do
   # resources :tags
   # resources :branches
   # resources :addresses
-  resources :home, only: [ :index ] do
-    collection do
-      get :retail
-      get :education
-      get :hospital
-      get :restaurant
-      get :shop
-      get :fitness
-    end
-  end
-  mount MissionControl::Jobs::Engine, at: "/jobs"
-  get "sign_out", to: "sessions#sign_out"
-  # ----------------------------------------------------------------------------------------------------
-  # DEFAULTS
-  get  "sign_in", to: "sessions#new"
-  post "sign_in", to: "sessions#create"
-  get  "sign_up", to: "registrations#new"
-  post "sign_up", to: "registrations#create"
-  resources :sessions, only: [ :index, :show, :destroy ]
-  resource  :password, only: [ :edit, :update ]
-  namespace :identity do
-    resource :email,              only: [ :edit, :update ]
-    resource :email_verification, only: [ :show, :create ]
-    resource :password_reset,     only: [ :new, :edit, :create, :update ]
-  end
-  get  "/auth/failure",            to: "sessions/omniauth#failure"
-  get  "/auth/:provider/callback", to: "sessions/omniauth#create"
-  post "/auth/:provider/callback", to: "sessions/omniauth#create"
-  namespace :sessions do
-    resource :passwordless, only: [ :new, :edit, :create ]
-  end
-  resource :invitation, only: [ :new, :create ]
-  root "home#index"
-  # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
-
-  # Reveal health status on /up that returns 200 if the app boots with no exceptions, otherwise 500.
-  # Can be used by load balancers and uptime monitors to verify that the app is live.
-  get "up" => "rails/health#show", as: :rails_health_check
-
-  # Render dynamic PWA files from app/views/pwa/* (remember to link manifest in application.html.erb)
-  # get "manifest" => "rails/pwa#manifest", as: :pwa_manifest
-  # get "service-worker" => "rails/pwa#service_worker", as: :pwa_service_worker
-
-  # Defines the root path route ("/")
-  # root "posts#index"
-  # ----------------------------------------------------------------------------------------------------
-end
