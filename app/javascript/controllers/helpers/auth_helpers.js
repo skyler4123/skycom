@@ -38,37 +38,30 @@ export const setCookie = (name, value, days) => {
   document.cookie = name + "=" + value + expires + "; path=/"
 }
 
-// --- User & Auth ---
 /**
- * Helper object to access current session context like user and company group.
+ * Retrieves the list of companies from the 'companies' cookie.
+ * @returns {Array<object>} An array of company group objects.
  */
-export const Current = {
-  /**
-   * Retrieves the current user from the 'current_user' cookie.
-   * @returns {object|null} The current user object, or null if not found.
-   */
-  get user() {
-    const c = Cookie('current_user');
-    return c ? JSON.parse(c) : null;
-  },
-  /**
-   * Determines the current company group based on the URL path.
-   * @returns {object|undefined|null} The current company group object if found in the path.
-   */
-  get companyGroup() {
-    const groups = companyGroups();
-    const currentPath = pathname();
-
-    if (!Array.isArray(groups)) {
-      return null;
-    }
-    return groups.find(group => currentPath.includes(String(group.id)));
-  },
-
-  get retail() {
-    return this.companyGroup
-  }
+export const currentCompanies = () => {
+  const c = Cookie('companies');
+  return c ? JSON.parse(c) : [];
 }
+
+export const currentUser = () => {
+  const c = Cookie('current_user');
+  return c ? JSON.parse(c) : null;
+}
+
+export const currentCompany = () => {
+  const companies = currentCompanies();
+  const currentPath = pathname();
+
+  if (!Array.isArray(companies)) {
+    return null;
+  }
+  return companies.find(group => currentPath.includes(String(group.id)));
+}
+
 
 /**
  * Checks if the user is signed in based on the 'is_signed_in' cookie.
@@ -77,16 +70,6 @@ export const Current = {
 export const isSignedIn = () => {
   return Cookie('is_signed_in') && Cookie('is_signed_in') === 'true'
 }
-
-/**
- * Retrieves the list of company groups from the 'companies' cookie.
- * @returns {Array<object>} An array of company group objects.
- */
-export const companyGroups = () => {
-  const c = Cookie('companies');
-  return c ? JSON.parse(c) : [];
-}
-
 
 // --- Paths ---
 /**

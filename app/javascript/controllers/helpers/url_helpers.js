@@ -4,17 +4,17 @@
  * @param {string|number} branchId - The ID of the branch.
  * @returns {string} The formatted path.
  */
-export const retail_pos_branches_path = (retailId, branchId) => `/retail/${retailId}/pos/branches/${branchId}`
-export const retail_management_branches_path = (retailId) => `/retail/${retailId}/management/branches`
-export const edit_retail_management_branches_path = (retailId, branchId) => `/retail/${retailId}/management/branches/${branchId}`
-export const retail_management_departments_path = (retailId) => `/retail/${retailId}/management/departments`
-export const retail_management_products_path = (retailId) => `/retail/${retailId}/management/products`
-export const retail_management_services_path = (retailId) => `/retail/${retailId}/management/services`
-export const retail_management_customers_path = (retailId) => `/retail/${retailId}/management/customers`
-export const retail_management_facilities_path = (retailId) => `/retail/${retailId}/management/facilities`
-export const retail_management_employees_path = (retailId) => `/retail/${retailId}/management/employees`
-export const retail_management_orders_path = (retailId) => `/retail/${retailId}/management/orders`
-export const retail_management_permissions_path = (retailId) => `/retail/${retailId}/management/permissions`
-export const retail_management_roles_path = (retailId) => `/retail/${retailId}/management/roles`
-export const retail_management_settings_path = (retailId) => `/retail/${retailId}/management/settings`
-export const retail_management_users_path = (retailId) => `/retail/${retailId}/management/users`
+// export const retail_pos_branches_path = (retailId, branchId) => `/retail/${retailId}/pos/branches/${branchId}`
+// export const retail_management_branches_path = (retailId) => `/retail/${retailId}/management/branches`
+// export const edit_retail_management_branches_path = (retailId, branchId) => `/retail/${retailId}/management/branches/${branchId}`
+// export const retail_management_departments_path = (retailId) => `/retail/${retailId}/management/departments`
+// export const retail_management_products_path = (retailId) => `/retail/${retailId}/management/products`
+// export const retail_management_services_path = (retailId) => `/retail/${retailId}/management/services`
+// export const retail_management_customers_path = (retailId) => `/retail/${retailId}/management/customers`
+// export const retail_management_facilities_path = (retailId) => `/retail/${retailId}/management/facilities`
+// export const retail_management_employees_path = (retailId) => `/retail/${retailId}/management/employees`
+// export const retail_management_orders_path = (retailId) => `/retail/${retailId}/management/orders`
+// export const retail_management_permissions_path = (retailId) => `/retail/${retailId}/management/permissions`
+// export const retail_management_roles_path = (retailId) => `/retail/${retailId}/management/roles`
+// export const retail_management_settings_path = (retailId) => `/retail/${retailId}/management/settings`
+// export const retail_management_users_path = (retailId) => `/retail/${retailId}/management/users`
