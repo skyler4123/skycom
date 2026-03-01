@@ -12,6 +12,30 @@ Rails.application.routes.draw do
   resources :companies do
     scope module: :companies do
       resources :branches
+      resources :departments
+      resources :products
+      resources :services
+      resources :orders
+      resources :bookings
+      resources :payments
+      resources :employees
+      resources :inventories
+      resources :customers
+      resources :invoices
+      resources :schedules
+      resources :attendances
+      resources :reports
+      resources :documents
+      resources :announcements
+      resources :discounts
+      resources :events
+      resources :payslips
+      resources :tasks
+      resources :facilities
+      resources :settings
+      resources :administrators
+      resources :subscriptions
+      resources :permissions
     end
   end
   
