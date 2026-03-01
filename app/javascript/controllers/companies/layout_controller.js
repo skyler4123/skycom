@@ -4,7 +4,7 @@ import { Controller } from "@hotwired/stimulus"
 import * as Helpers from "controllers/helpers"
 
 export default class Companies_LayoutController extends Controller {
-  static targets = ["profileDropdown"]
+  static targets = ["content", "profileDropdown"]
   static values = {
     pagination: { type: Object, default: {} },
     flash: { type: Object, default: {} },
@@ -16,7 +16,6 @@ export default class Companies_LayoutController extends Controller {
 
   connect() {
     // For global method
-    window.Helpers = Helpers
     window.fetchJson = Helpers.fetchJson
     window.translate = Helpers.translate
     window.poll = Helpers.poll
@@ -38,17 +37,21 @@ export default class Companies_LayoutController extends Controller {
 
   // --- The Centralized Render Method ---
   render() {
-    // 1. Update top-level attributes if necessary
-    this.element.className = 'min-h-screen flex flex-col';
-    
-    // 2. Replace the inner HTML with the latest state
-    this.element.innerHTML = this.layoutHTML();
-
-    // 3. Optional: Re-trigger any post-render logic 
-    // (e.g., highlighting active links if Helpers.openByPathname doesn't do it via strings)
-    // console.log("UI Synchronized");
+    this.renderLayout();
+    this.renderContent();
   }
 
+  renderLayout() {
+    this.element.className = 'min-h-screen flex flex-col';
+    this.element.innerHTML = this.layoutHTML();
+  }
+
+  renderContent() {
+    if (!this.hasContentTarget) return;
+    this.contentTarget.innerHTML = this.contentHTML();
+  }
+
+  
   openCompanyDropdown(event) {
    event.preventDefault();
     Helpers.openPopover({
@@ -340,6 +343,7 @@ export default class Companies_LayoutController extends Controller {
                 <button
                   class="flex cursor-pointer items-center justify-center overflow-hidden rounded-full h-10 w-10 p-2 hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-600 dark:text-gray-300"
                   ${Helpers.darkmodeTrigger()}
+                >
                 </button>
                 <button
                   class="flex cursor-pointer items-center justify-center overflow-hidden rounded-full h-10 w-10 hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-600 dark:text-gray-300"
@@ -363,7 +367,7 @@ export default class Companies_LayoutController extends Controller {
             </header>
             <!-- End Header -->
             <!-- Main Content -->
-            ${this.contentHTML()}
+            <div data-${this.identifier}-target="content"></div>
             <!-- End Main Content -->
           </main>
           <!-- End Main Content -->
