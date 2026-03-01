@@ -18,3 +18,4 @@
 // export const retail_management_roles_path = (retailId) => `/retail/${retailId}/management/roles`
 // export const retail_management_settings_path = (retailId) => `/retail/${retailId}/management/settings`
 // export const retail_management_users_path = (retailId) => `/retail/${retailId}/management/users`
+export const company_branches_path = (companyId) => `/companies/${companyId}/branches`

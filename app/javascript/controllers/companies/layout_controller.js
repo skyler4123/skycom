@@ -31,7 +31,7 @@ export default class Companies_LayoutController extends Controller {
       if (currentCompany && currentCompanies) {
         return true; // Stop polling
       }
-      return false;
+      return false; // Keep polling
     }, { interval: 100, maxAttempts: 20 });
   }
 
@@ -64,7 +64,7 @@ export default class Companies_LayoutController extends Controller {
     return `
       <div class="flex flex-col gap-y-6 w-64 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md shadow-lg z-50 p-2">
         ${currentCompanies.map((company) => `
-          <a href="${company.url}" class="flex items-center gap-3 px-3 py-2 rounded-lg text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 ${currentCompany.id === company.id ? 'bg-gray-100 dark:bg-gray-700' : ''}">
+          <a href="${Helpers.company_branches_path(company.id)}" class="flex items-center gap-3 px-3 py-2 rounded-lg text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 ${currentCompany.id === company.id ? 'bg-gray-100 dark:bg-gray-700' : ''}">
             <div class="flex flex-col">
               <span class="text-sm font-medium">${company.name}</span>
             </div>

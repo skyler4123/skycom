@@ -1,5 +1,5 @@
 export const ROUTES = {
-  rootPath: "/",
-  companyGroupsPath: "/companies",
-  createCompanyPath: "/companies"
+  // rootPath: "/",
+  // companyGroupsPath: "/companies",
+  // createCompanyPath: "/companies"
 }
