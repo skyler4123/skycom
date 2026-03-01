@@ -15,11 +15,24 @@ export default class Companies_LayoutController extends Controller {
   }
 
   connect() {
-    window.Current = Helpers.Current
+    // For global method
     window.fetchJson = Helpers.fetchJson
-    this.currentCompany = Helpers.currentCompany()
-    this.currentCompanies = Helpers.currentCompanies();
-    this.render();
+    window.translate = Helpers.translate
+    window.poll = Helpers.poll
+    window.openByPathname = Helpers.openByPathname
+    window.currentCompanies = Helpers.currentCompanies()
+    window.currentCompany = Helpers.currentCompany()
+
+    // Initial render (will show loading state if data is null)
+    // Render HTML, re-call for re-render
+    // this.render();
+    poll(() => {
+      this.render();
+      if (currentCompany && currentCompanies) {
+        return true; // Stop polling
+      }
+      return false;
+    }, { interval: 100, maxAttempts: 20 });
   }
 
   // --- The Centralized Render Method ---
@@ -39,19 +52,19 @@ export default class Companies_LayoutController extends Controller {
    event.preventDefault();
     Helpers.openPopover({
       parentElement: event.currentTarget,
-      html: this.currentCompaniesDropdownHTML(),
+      html: this.companiesDropdownHTML(),
       position: "bottom-right",
     })
   }
 
   companiesDropdownHTML() {
     // If retail isn't loaded yet, return an empty string or a loader
-    if (!this.currentCompany) return `<div class="p-4">Loading...</div>`;
+    if (!currentCompany) return `<div class="p-4">Loading...</div>`;
 
     return `
       <div class="flex flex-col gap-y-6 w-64 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md shadow-lg z-50 p-2">
-        ${this.currentCompanies.map((company) => `
-          <a href="${company.url}" class="flex items-center gap-3 px-3 py-2 rounded-lg text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 ${this.currentCompany.id === companies.id ? 'bg-gray-100 dark:bg-gray-700' : ''}">
+        ${currentCompanies.map((company) => `
+          <a href="${company.url}" class="flex items-center gap-3 px-3 py-2 rounded-lg text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 ${currentCompany.id === company.id ? 'bg-gray-100 dark:bg-gray-700' : ''}">
             <div class="flex flex-col">
               <span class="text-sm font-medium">${company.name}</span>
             </div>
@@ -60,6 +73,7 @@ export default class Companies_LayoutController extends Controller {
     `
   }
   
+  // define contentHTML in subclasses (inheritance)
   contentHTML() {
     return `
       <div class="p-8">
@@ -76,7 +90,7 @@ export default class Companies_LayoutController extends Controller {
 
   layoutHTML() {
     // If retail isn't loaded yet, return an empty string or a loader
-    if (!this.currentCompany) return `<div class="p-4">Loading...</div>`;
+    if (!currentCompany) return `<div class="p-4">Loading...</div>`;
     
     return `
       <div class="font-display bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200">
@@ -89,192 +103,192 @@ export default class Companies_LayoutController extends Controller {
                 <span class="material-symbols-outlined">storefront</span>
               </div>
               <div class="flex flex-col">
-                <h1 data-action="click->${this.identifier}#openCompanyDropdown" class="text-gray-900 dark:text-white text-base font-medium leading-normal cursor-pointer">${this.currentCompany.name}</h1>
-                <p class="text-gray-500 dark:text-gray-400 text-sm font-normal leading-normal">${Helpers.capitalize(this.currentCompany.business_type)}</p>
+                <h1 data-action="click->${this.identifier}#openCompanyDropdown" class="text-gray-900 dark:text-white text-base font-medium leading-normal cursor-pointer">${currentCompany.name}</h1>
+                <p class="text-gray-500 dark:text-gray-400 text-sm font-normal leading-normal">${Helpers.capitalize(currentCompany.business_type)}</p>
               </div>
             </div>
             <nav class="w-full p-4">
               <div role="navigation" class="flex flex-col gap-2">
                 <a
                   class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:bg-blue-100 open:text-blue-600"
-                  href="/retail/${this.currentCompany.id}/management/dashboard"
-                  ${Helpers.openByPathname()}/
+                  href="/retail/${currentCompany.id}/management/dashboard"
+                  ${openByPathname()}/
                 >
                   <span class="material-symbols-outlined">dashboard</span>
-                  <p class="text-sm font-medium leading-normal" ${Helpers.translate("Dashboard")}>Dashboard</p>
+                  <p class="text-sm font-medium leading-normal" ${translate("Dashboard")}>Dashboard</p>
                 </a>
                 <a
                   class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:bg-blue-100 open:text-blue-600"
-                  href="/retail/${this.currentCompany.id}/management/branches"
-                  ${Helpers.openByPathname()}/
+                  href="/retail/${currentCompany.id}/management/branches"
+                  ${openByPathname()}/
                 >
                   <span class="material-symbols-outlined">apartment</span>
                   <p class="text-sm font-medium leading-normal">Branches</p>
                 </a>
                 <a
                   class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:bg-blue-100 open:text-blue-600"
-                  href="/retail/${this.currentCompany.id}/management/departments"
-                  ${Helpers.openByPathname()}/
+                  href="/retail/${currentCompany.id}/management/departments"
+                  ${openByPathname()}/
                 >
                   <span class="material-symbols-outlined">family_group</span>
                   <p class="text-sm font-medium leading-normal">Departments</p>
                 </a>
                 <a
                   class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:bg-blue-100 open:text-blue-600"
-                  href="/retail/${this.currentCompany.id}/management/products"
-                  ${Helpers.openByPathname()}/
+                  href="/retail/${currentCompany.id}/management/products"
+                  ${openByPathname()}/
                 >
                   <span class="material-symbols-outlined">inventory_2</span>
                   <p class="text-sm font-medium leading-normal">Products</p>
                 </a>
                 <a
                   class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:bg-blue-100 open:text-blue-600"
-                  href="/retail/${this.currentCompany.id}/management/services"
-                  ${Helpers.openByPathname()}/
+                  href="/retail/${currentCompany.id}/management/services"
+                  ${openByPathname()}/
                 >
                   <span class="material-symbols-outlined">concierge</span>
                   <p class="text-sm font-medium leading-normal">Services</p>
                 </a>
                 <a
                   class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:bg-blue-100 open:text-blue-600"
-                  href="/retail/${this.currentCompany.id}/management/orders"
-                  ${Helpers.openByPathname()}/
+                  href="/retail/${currentCompany.id}/management/orders"
+                  ${openByPathname()}/
                 >
                   <span class="material-symbols-outlined">order_approve</span>
                   <p class="text-sm font-medium leading-normal">Orders</p>
                 </a>
                 <a
                   class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:bg-blue-100 open:text-blue-600"
-                  href="/retail/${this.currentCompany.id}/management/bookings"
-                  ${Helpers.openByPathname()}/
+                  href="/retail/${currentCompany.id}/management/bookings"
+                  ${openByPathname()}/
                 >
                   <span class="material-symbols-outlined">calendar_month</span>
                   <p class="text-sm font-medium leading-normal">Bookings</p>
                 </a>
                 <a
                   class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:bg-blue-100 open:text-blue-600"
-                  href="/retail/${this.currentCompany.id}/management/payments"
-                  ${Helpers.openByPathname()}/
+                  href="/retail/${currentCompany.id}/management/payments"
+                  ${openByPathname()}/
                 >
                   <span class="material-symbols-outlined">payments</span>
                   <p class="text-sm font-medium leading-normal">Payments</p>
                 </a>
                 <a
                   class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:bg-blue-100 open:text-blue-600"
-                  href="/retail/${this.currentCompany.id}/management/employees"
-                  ${Helpers.openByPathname()}/
+                  href="/retail/${currentCompany.id}/management/employees"
+                  ${openByPathname()}/
                 >
                   <span class="material-symbols-outlined">groups</span>
                   <p class="text-sm font-medium leading-normal">Employees</p>
                 </a>
                 <a
                   class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:bg-blue-100 open:text-blue-600"
-                  href="/retail/${this.currentCompany.id}/management/inventories"
-                  ${Helpers.openByPathname()}/
+                  href="/retail/${currentCompany.id}/management/inventories"
+                  ${openByPathname()}/
                 >
                   <span class="material-symbols-outlined">inventory</span>
                   <p class="text-sm font-medium leading-normal">Inventories</p>
                 </a>
                 <a
                   class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:bg-blue-100 open:text-blue-600"
-                  href="/retail/${this.currentCompany.id}/management/customers"
-                  ${Helpers.openByPathname()}/
+                  href="/retail/${currentCompany.id}/management/customers"
+                  ${openByPathname()}/
                 >
                   <span class="material-symbols-outlined">person_add</span>
                   <p class="text-sm font-medium leading-normal">Customers</p>
                 </a>
                 <a
                   class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:bg-blue-100 open:text-blue-600"
-                  href="/retail/${this.currentCompany.id}/management/invoices"
-                  ${Helpers.openByPathname()}/
+                  href="/retail/${currentCompany.id}/management/invoices"
+                  ${openByPathname()}/
                 >
                   <span class="material-symbols-outlined">receipt_long</span>
                   <p class="text-sm font-medium leading-normal">Invoices</p>
                 </a>
                 <a
                   class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:bg-blue-100 open:text-blue-600"
-                  href="/retail/${this.currentCompany.id}/management/schedules"
-                  ${Helpers.openByPathname()}/
+                  href="/retail/${currentCompany.id}/management/schedules"
+                  ${openByPathname()}/
                 >
                   <span class="material-symbols-outlined">calendar_month</span>
                   <p class="text-sm font-medium leading-normal">Schedules</p>
                 </a>
                 <a
                   class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:bg-blue-100 open:text-blue-600"
-                  href="/retail/${this.currentCompany.id}/management/attendances"
-                  ${Helpers.openByPathname()}/
+                  href="/retail/${currentCompany.id}/management/attendances"
+                  ${openByPathname()}/
                 >
                   <span class="material-symbols-outlined">fact_check</span>
                   <p class="text-sm font-medium leading-normal">Attendances</p>
                 </a>
                 <a
                   class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:bg-blue-100 open:text-blue-600"
-                  href="/retail/${this.currentCompany.id}/management/reports"
-                  ${Helpers.openByPathname()}/
+                  href="/retail/${currentCompany.id}/management/reports"
+                  ${openByPathname()}/
                 >
                   <span class="material-symbols-outlined">report_problem</span>
                   <p class="text-sm font-medium leading-normal">Reports</p>
                 </a>
                 <a
                   class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:bg-blue-100 open:text-blue-600"
-                  href="/retail/${this.currentCompany.id}/management/documents"
-                  ${Helpers.openByPathname()}/
+                  href="/retail/${currentCompany.id}/management/documents"
+                  ${openByPathname()}/
                 >
                   <span class="material-symbols-outlined">description</span>
                   <p class="text-sm font-medium leading-normal">Documents</p>
                 </a>
                 <a
                   class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:bg-blue-100 open:text-blue-600"
-                  href="/retail/${this.currentCompany.id}/management/announcements"
-                  ${Helpers.openByPathname()}/
+                  href="/retail/${currentCompany.id}/management/announcements"
+                  ${openByPathname()}/
                 >
                   <span class="material-symbols-outlined">campaign</span>
                   <p class="text-sm font-medium leading-normal">Announcements</p>
                 </a>
                 <a
                   class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:bg-blue-100 open:text-blue-600"
-                  href="/retail/${this.currentCompany.id}/management/events"
-                  ${Helpers.openByPathname()}/
+                  href="/retail/${currentCompany.id}/management/events"
+                  ${openByPathname()}/
                 >
                   <span class="material-symbols-outlined">event</span>
                   <p class="text-sm font-medium leading-normal">Events</p>
                 </a>
                 <a
                   class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:bg-blue-100 open:text-blue-600"
-                  href="/retail/${this.currentCompany.id}/management/discounts"
-                  ${Helpers.openByPathname()}/
+                  href="/retail/${currentCompany.id}/management/discounts"
+                  ${openByPathname()}/
                 >
                   <span class="material-symbols-outlined">percent</span>
                   <p class="text-sm font-medium leading-normal">Discounts</p>
                 </a>
                 <a
                   class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:bg-blue-100 open:text-blue-600"
-                  href="/retail/${this.currentCompany.id}/management/subscriptions"
-                  ${Helpers.openByPathname()}/
+                  href="/retail/${currentCompany.id}/management/subscriptions"
+                  ${openByPathname()}/
                 >
                   <span class="material-symbols-outlined">loyalty</span>
                   <p class="text-sm font-medium leading-normal">Subscriptions</p>
                 </a>
                                 <a
                   class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:bg-blue-100 open:text-blue-600"
-                  href="/retail/${this.currentCompany.id}/management/tasks"
-                  ${Helpers.openByPathname()}/
+                  href="/retail/${currentCompany.id}/management/tasks"
+                  ${openByPathname()}/
                 >
                   <span class="material-symbols-outlined">check_box</span>
                   <p class="text-sm font-medium leading-normal">Tasks</p>
                 </a>
                 <a
                   class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:bg-blue-100 open:text-blue-600"
-                  href="/retail/${this.currentCompany.id}/management/payslips"
-                  ${Helpers.openByPathname()}/
+                  href="/retail/${currentCompany.id}/management/payslips"
+                  ${openByPathname()}/
                 >
                   <span class="material-symbols-outlined">receipt</span>
                   <p class="text-sm font-medium leading-normal">Payslips</p>
                 </a>
                 <a
                   class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:bg-blue-100 open:text-blue-600"
-                  href="/retail/${this.currentCompany.id}/management/facilities"
-                  ${Helpers.openByPathname()}/
+                  href="/retail/${currentCompany.id}/management/facilities"
+                  ${openByPathname()}/
                 >
                   <span class="material-symbols-outlined">warehouse</span>
                   <p class="text-sm font-medium leading-normal">Facilities</p>
@@ -285,16 +299,16 @@ export default class Companies_LayoutController extends Controller {
               <div class="flex flex-col gap-2">
                 <a
                   class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:bg-blue-100 open:text-blue-600"
-                  ${Helpers.openByPathname()}
-                  href="/retail/${this.currentCompany.id}/management/settings"
+                  ${openByPathname()}
+                  href="/retail/${currentCompany.id}/management/settings"
                 >
                   <span class="material-symbols-outlined">settings</span>
                   <p class="text-sm font-medium leading-normal">Settings</p>
                 </a>
                 <a
                   class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:bg-blue-100 open:text-blue-600"
-                  ${Helpers.openByPathname()}
-                  href="/retail/${this.currentCompany.id}/management/administrators"
+                  ${openByPathname()}
+                  href="/retail/${currentCompany.id}/management/administrators"
                 >
                   <span class="material-symbols-outlined">admin_panel_settings</span>
                   <p class="text-sm font-medium leading-normal">Administrator</p>

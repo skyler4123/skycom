@@ -112,20 +112,3 @@ export const href = () => window.location.href
  * @returns {string} window.location.origin
  */
 export const origin = () => window.location.origin
-
-/**
- * Polls a callback function repeatedly until it returns true or max attempts are reached.
- * @param {Function} callback - The function to execute. Return `true` to stop polling.
- * @param {object} [options] - Polling configuration.
- * @param {number} [options.interval=100] - Time in ms between attempts.
- * @param {number} [options.maxAttempts=10] - Maximum number of times to call the callback.
- */
-export const poll = (callback, { interval = 100, maxAttempts = 10 } = {}) => {
-  let attempts = 0;
-  const intervalId = setInterval(() => {
-    attempts++;
-    if (callback() === true || attempts >= maxAttempts) {
-      clearInterval(intervalId);
-    }
-  }, interval);
-};

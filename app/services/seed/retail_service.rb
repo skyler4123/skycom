@@ -65,7 +65,7 @@ class Seed::RetailService
     puts "Creating retail group..."
     @retail = Seed::CompanyService.create(
       user: @multi_company_owner,
-      name: "Retail Group #{rand(1000..9999)}",
+      name: "Company #{rand(1000..9999)}",
       description: "A group for multiple retail branch branches",
       business_type: COMPANY_GROUP_BUSINESS_TYPE
     )

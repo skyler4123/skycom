@@ -1,6 +1,8 @@
 class Seed::MultiCompanyService
   def initialize(user:)
     Seed::RetailService.new(user: user)
+    Seed::RetailService.new(user: user)
+
     # Seed::EducationService.new(user: user)
     # Seed::HealthcareService.new(user: user)
     # Seed::ManufacturingService.new(user: user)
