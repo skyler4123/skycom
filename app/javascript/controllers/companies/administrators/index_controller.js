@@ -6,7 +6,17 @@ export default class Companies_Administrators_IndexController extends Companies_
     super.connect()
     const response = await fetchJson();
     this.administrators = response.administrators || []
+    console.log(this.administrators)
+    window.administrators = this.administrators
+  }
+
+  render() {
+    super.render()
     this.renderContent()
+  }
+
+  roles() {
+    return keys(this.administrators)
   }
 
   contentHTML() {
@@ -58,6 +68,22 @@ export default class Companies_Administrators_IndexController extends Companies_
                   <p class="text-sm">Super Admin</p>
                 </div>
               </button>
+
+              ${this.roles().map(role => {
+                return `
+                  <button
+                    class="w-full flex items-center justify-between p-3 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300"
+                    ${Helpers.openTrigger(this.openPermissionGroup, key)}
+                  >
+                    <div class="flex items-center gap-3"><span
+                        class="material-symbols-outlined text-slate-400">admin_panel_settings</span>
+                      <p class="text-sm">${role}</p>
+                    </div>
+                  </button>
+                `
+              }).join('')}
+
+
               <button
                 class="w-full flex items-center justify-between p-3 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300">
                 <div class="flex items-center gap-3"><span
