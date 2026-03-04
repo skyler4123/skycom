@@ -14,26 +14,13 @@ export default class Companies_LayoutController extends Controller {
   }
 
   connect() {
-    // For global method
-    window.fetchJson = Helpers.fetchJson
-    window.translate = Helpers.translate
-    window.poll = Helpers.poll
-    window.openByPathname = Helpers.openByPathname
-    window.currentCompanies = Helpers.currentCompanies()
-    window.currentCompany = Helpers.currentCompany()
-    window.identifier = Helpers.identifier
-    
-
-    // Initial render (will show loading state if data is null)
-    // Render HTML, re-call for re-render
-    // this.render();
     poll(() => {
-      this.render();
-      if (currentCompany && currentCompanies) {
+      if (currentCompanies() && currentCompany()) {
+        this.render();
         return true; // Stop polling
       }
       return false; // Keep polling
-    }, { interval: 100, maxAttempts: 20 });
+    });
   }
 
   // --- The Centralized Render Method ---
@@ -64,12 +51,12 @@ export default class Companies_LayoutController extends Controller {
 
   companiesDropdownHTML() {
     // If retail isn't loaded yet, return an empty string or a loader
-    if (!currentCompany) return `<div class="p-4">Loading...</div>`;
+    if (!currentCompany()) return `<div class="p-4">Loading...</div>`;
 
     return `
       <div class="flex flex-col gap-y-6 w-64 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md shadow-lg z-50 p-2">
-        ${currentCompanies.map((company) => `
-          <a href="${Helpers.company_branches_path(company.id)}" class="flex items-center gap-3 px-3 py-2 rounded-lg text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 ${currentCompany.id === company.id ? 'bg-gray-100 dark:bg-gray-700' : ''}">
+        ${currentCompanies().map((company) => `
+          <a href="${Helpers.company_branches_path(company.id)}" class="flex items-center gap-3 px-3 py-2 rounded-lg text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 ${currentCompany().id === company.id ? 'bg-gray-100 dark:bg-gray-700' : ''}">
             <div class="flex flex-col">
               <span class="text-sm font-medium">${company.name}</span>
             </div>
@@ -95,7 +82,7 @@ export default class Companies_LayoutController extends Controller {
 
   layoutHTML() {
     // If retail isn't loaded yet, return an empty string or a loader
-    if (!currentCompany) return `<div class="p-4">Loading...</div>`;
+    if (!currentCompany()) return `<div class="p-4">Loading...</div>`;
     
     return `
       <div class="font-display bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200">
@@ -108,15 +95,15 @@ export default class Companies_LayoutController extends Controller {
                 <span class="material-symbols-outlined">storefront</span>
               </div>
               <div class="flex flex-col">
-                <h1 data-action="click->${this.identifier}#openCompanyDropdown" class="text-gray-900 dark:text-white text-base font-medium leading-normal cursor-pointer">${currentCompany.name}</h1>
-                <p class="text-gray-500 dark:text-gray-400 text-sm font-normal leading-normal">${Helpers.capitalize(currentCompany.business_type)}</p>
+                <h1 data-action="click->${this.identifier}#openCompanyDropdown" class="text-gray-900 dark:text-white text-base font-medium leading-normal cursor-pointer">${currentCompany().name}</h1>
+                <p class="text-gray-500 dark:text-gray-400 text-sm font-normal leading-normal">${Helpers.capitalize(currentCompany().business_type)}</p>
               </div>
             </div>
             <nav class="w-full p-4">
               <div role="navigation" class="flex flex-col gap-2">
                 <a
                   class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:bg-blue-100 open:text-blue-600"
-                  href="${Helpers.company_dashboards_path(currentCompany.id)}"
+                  href="${Helpers.company_dashboards_path(currentCompany().id)}"
                   ${openByPathname()}/
                 >
                   <span class="material-symbols-outlined">dashboard</span>
@@ -124,7 +111,7 @@ export default class Companies_LayoutController extends Controller {
                 </a>
                 <a
                   class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:bg-blue-100 open:text-blue-600"
-                  href="${Helpers.company_branches_path(currentCompany.id)}"
+                  href="${Helpers.company_branches_path(currentCompany().id)}"
                   ${openByPathname()}/
                 >
                   <span class="material-symbols-outlined">apartment</span>
@@ -132,7 +119,7 @@ export default class Companies_LayoutController extends Controller {
                 </a>
                 <a
                   class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:bg-blue-100 open:text-blue-600"
-                  href="${Helpers.company_departments_path(currentCompany.id)}"
+                  href="${Helpers.company_departments_path(currentCompany().id)}"
                   ${openByPathname()}/
                 >
                   <span class="material-symbols-outlined">family_group</span>
@@ -140,7 +127,7 @@ export default class Companies_LayoutController extends Controller {
                 </a>
                 <a
                   class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:bg-blue-100 open:text-blue-600"
-                  href="${Helpers.company_products_path(currentCompany.id)}"
+                  href="${Helpers.company_products_path(currentCompany().id)}"
                   ${openByPathname()}/
                 >
                   <span class="material-symbols-outlined">inventory_2</span>
@@ -148,7 +135,7 @@ export default class Companies_LayoutController extends Controller {
                 </a>
                 <a
                   class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:bg-blue-100 open:text-blue-600"
-                  href="${Helpers.company_services_path(currentCompany.id)}"
+                  href="${Helpers.company_services_path(currentCompany().id)}"
                   ${openByPathname()}/
                 >
                   <span class="material-symbols-outlined">concierge</span>
@@ -156,7 +143,7 @@ export default class Companies_LayoutController extends Controller {
                 </a>
                 <a
                   class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:bg-blue-100 open:text-blue-600"
-                  href="${Helpers.company_orders_path(currentCompany.id)}"
+                  href="${Helpers.company_orders_path(currentCompany().id)}"
                   ${openByPathname()}/
                 >
                   <span class="material-symbols-outlined">order_approve</span>
@@ -164,7 +151,7 @@ export default class Companies_LayoutController extends Controller {
                 </a>
                 <a
                   class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:bg-blue-100 open:text-blue-600"
-                  href="${Helpers.company_bookings_path(currentCompany.id)}"
+                  href="${Helpers.company_bookings_path(currentCompany().id)}"
                   ${openByPathname()}/
                 >
                   <span class="material-symbols-outlined">calendar_month</span>
@@ -172,7 +159,7 @@ export default class Companies_LayoutController extends Controller {
                 </a>
                 <a
                   class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:bg-blue-100 open:text-blue-600"
-                  href="${Helpers.company_payments_path(currentCompany.id)}"
+                  href="${Helpers.company_payments_path(currentCompany().id)}"
                   ${openByPathname()}/
                 >
                   <span class="material-symbols-outlined">payments</span>
@@ -180,7 +167,7 @@ export default class Companies_LayoutController extends Controller {
                 </a>
                 <a
                   class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:bg-blue-100 open:text-blue-600"
-                  href="${Helpers.company_employees_path(currentCompany.id)}"
+                  href="${Helpers.company_employees_path(currentCompany().id)}"
                   ${openByPathname()}/
                 >
                   <span class="material-symbols-outlined">groups</span>
@@ -188,7 +175,7 @@ export default class Companies_LayoutController extends Controller {
                 </a>
                 <a
                   class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:bg-blue-100 open:text-blue-600"
-                  href="${Helpers.company_inventories_path(currentCompany.id)}"
+                  href="${Helpers.company_inventories_path(currentCompany().id)}"
                   ${openByPathname()}/
                 >
                   <span class="material-symbols-outlined">inventory</span>
@@ -196,7 +183,7 @@ export default class Companies_LayoutController extends Controller {
                 </a>
                 <a
                   class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:bg-blue-100 open:text-blue-600"
-                  href="${Helpers.company_customers_path(currentCompany.id)}"
+                  href="${Helpers.company_customers_path(currentCompany().id)}"
                   ${openByPathname()}/
                 >
                   <span class="material-symbols-outlined">person_add</span>
@@ -204,7 +191,7 @@ export default class Companies_LayoutController extends Controller {
                 </a>
                 <a
                   class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:bg-blue-100 open:text-blue-600"
-                  href="${Helpers.company_invoices_path(currentCompany.id)}"
+                  href="${Helpers.company_invoices_path(currentCompany().id)}"
                   ${openByPathname()}/
                 >
                   <span class="material-symbols-outlined">receipt_long</span>
@@ -212,7 +199,7 @@ export default class Companies_LayoutController extends Controller {
                 </a>
                 <a
                   class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:bg-blue-100 open:text-blue-600"
-                  href="${Helpers.company_schedules_path(currentCompany.id)}"
+                  href="${Helpers.company_schedules_path(currentCompany().id)}"
                   ${openByPathname()}/
                 >
                   <span class="material-symbols-outlined">calendar_month</span>
@@ -220,7 +207,7 @@ export default class Companies_LayoutController extends Controller {
                 </a>
                 <a
                   class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:bg-blue-100 open:text-blue-600"
-                  href="${Helpers.company_attendances_path(currentCompany.id)}"
+                  href="${Helpers.company_attendances_path(currentCompany().id)}"
                   ${openByPathname()}/
                 >
                   <span class="material-symbols-outlined">fact_check</span>
@@ -228,7 +215,7 @@ export default class Companies_LayoutController extends Controller {
                 </a>
                 <a
                   class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:bg-blue-100 open:text-blue-600"
-                  href="${Helpers.company_reports_path(currentCompany.id)}"
+                  href="${Helpers.company_reports_path(currentCompany().id)}"
                   ${openByPathname()}/
                 >
                   <span class="material-symbols-outlined">report_problem</span>
@@ -236,7 +223,7 @@ export default class Companies_LayoutController extends Controller {
                 </a>
                 <a
                   class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:bg-blue-100 open:text-blue-600"
-                  href="${Helpers.company_documents_path(currentCompany.id)}
+                  href="${Helpers.company_documents_path(currentCompany().id)}
                   ${openByPathname()}/
                 >
                   <span class="material-symbols-outlined">description</span>
@@ -244,7 +231,7 @@ export default class Companies_LayoutController extends Controller {
                 </a>
                 <a
                   class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:bg-blue-100 open:text-blue-600"
-                  href="${Helpers.company_announcements_path(currentCompany.id)}"
+                  href="${Helpers.company_announcements_path(currentCompany().id)}"
                   ${openByPathname()}/
                 >
                   <span class="material-symbols-outlined">campaign</span>
@@ -252,7 +239,7 @@ export default class Companies_LayoutController extends Controller {
                 </a>
                 <a
                   class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:bg-blue-100 open:text-blue-600"
-                  href="${Helpers.company_events_path(currentCompany.id)}"
+                  href="${Helpers.company_events_path(currentCompany().id)}"
                   ${openByPathname()}/
                 >
                   <span class="material-symbols-outlined">event</span>
@@ -260,7 +247,7 @@ export default class Companies_LayoutController extends Controller {
                 </a>
                 <a
                   class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:bg-blue-100 open:text-blue-600"
-                  href="${Helpers.company_discounts_path(currentCompany.id)}"
+                  href="${Helpers.company_discounts_path(currentCompany().id)}"
                   ${openByPathname()}/
                 >
                   <span class="material-symbols-outlined">percent</span>
@@ -268,7 +255,7 @@ export default class Companies_LayoutController extends Controller {
                 </a>
                 <a
                   class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:bg-blue-100 open:text-blue-600"
-                  href="${Helpers.company_subscriptions_path(currentCompany.id)}"
+                  href="${Helpers.company_subscriptions_path(currentCompany().id)}"
                   ${openByPathname()}/
                 >
                   <span class="material-symbols-outlined">loyalty</span>
@@ -276,7 +263,7 @@ export default class Companies_LayoutController extends Controller {
                 </a>
                                 <a
                   class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:bg-blue-100 open:text-blue-600"
-                  href="${Helpers.company_tasks_path(currentCompany.id)}"
+                  href="${Helpers.company_tasks_path(currentCompany().id)}"
                   ${openByPathname()}/
                 >
                   <span class="material-symbols-outlined">check_box</span>
@@ -284,7 +271,7 @@ export default class Companies_LayoutController extends Controller {
                 </a>
                 <a
                   class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:bg-blue-100 open:text-blue-600"
-                  href="${Helpers.company_payslips_path(currentCompany.id)}"
+                  href="${Helpers.company_payslips_path(currentCompany().id)}"
                   ${openByPathname()}/
                 >
                   <span class="material-symbols-outlined">receipt</span>
@@ -292,7 +279,7 @@ export default class Companies_LayoutController extends Controller {
                 </a>
                 <a
                   class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:bg-blue-100 open:text-blue-600"
-                  href="${Helpers.company_facilities_path(currentCompany.id)}"
+                  href="${Helpers.company_facilities_path(currentCompany().id)}"
                   ${openByPathname()}/
                 >
                   <span class="material-symbols-outlined">warehouse</span>
@@ -305,7 +292,7 @@ export default class Companies_LayoutController extends Controller {
                 <a
                   class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:bg-blue-100 open:text-blue-600"
                   ${openByPathname()}
-                  href="${Helpers.company_settings_path(currentCompany.id)}"
+                  href="${Helpers.company_settings_path(currentCompany().id)}"
                 >
                   <span class="material-symbols-outlined">settings</span>
                   <p class="text-sm font-medium leading-normal">Settings</p>
@@ -313,7 +300,7 @@ export default class Companies_LayoutController extends Controller {
                 <a
                   class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:bg-blue-100 open:text-blue-600"
                   ${openByPathname()}
-                  href="${Helpers.company_administrators_path(currentCompany.id)}"
+                  href="${Helpers.company_administrators_path(currentCompany().id)}"
                 >
                   <span class="material-symbols-outlined">admin_panel_settings</span>
                   <p class="text-sm font-medium leading-normal">Administrator</p>

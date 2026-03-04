@@ -30,7 +30,12 @@ export default class Companies_Branches_NewBranchModalController extends Control
                 </span>
                 Add New Branch
               </h2>
-              <div class="cursor-pointer" data-action="click->modal#close">x</div>
+              <button 
+                class="flex items-center justify-center w-8 h-8 rounded-full hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-500 transition-colors cursor-pointer" 
+                ${Helpers.closeModalAction()}
+              >
+                <span class="material-symbols-outlined text-2xl">close</span>
+              </button>
             </div>
 
             <!-- Form Body -->
@@ -177,7 +182,7 @@ export default class Companies_Branches_NewBranchModalController extends Control
               <button
                 type="button"
                 class="px-6 py-3 text-slate-700 dark:text-slate-300 bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-xl font-medium hover:bg-slate-100 dark:hover:bg-slate-600 transition-all"
-                data-action="click->modal#close"
+                ${Helpers.closeModalAction()}
               >
                 Cancel
               </button>

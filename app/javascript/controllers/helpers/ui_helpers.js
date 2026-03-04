@@ -188,6 +188,8 @@ export const closeSwal = () => Swal.close()
  */
 export const closeModal = () => Swal.close()
 
+export const closeModalAction = () => `data-action="click->modal#close"`
+
 /**
  * Returns the data-controller attribute string for the darkmode controller.
  * @returns {string} `data-controller="darkmode"`

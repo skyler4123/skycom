@@ -52,7 +52,7 @@ export default class Companies_Departments_IndexController extends Companies_Lay
           </div>
 
           <div class="p-4 border-t border-slate-200 dark:border-slate-800 flex items-center justify-between">
-            <span class="text-sm text-slate-500 dark:text-slate-400">Showing ${this.departments.length} departments</span>
+            <span class="text-sm text-slate-500 dark:text-slate-400">Showing ${this.departments?.length} departments</span>
             <div class="flex items-center gap-2">
               <button class="px-3 py-1 text-sm border border-slate-200 dark:border-slate-700 rounded-lg text-slate-400 cursor-not-allowed" disabled>Previous</button>
               <button class="px-3 py-1 text-sm border border-slate-200 dark:border-slate-700 rounded-lg text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">Next</button>
@@ -64,7 +64,7 @@ export default class Companies_Departments_IndexController extends Companies_Lay
   }
 
   departmentsHTML() {
-    if (this.departments.length === 0) {
+    if (!this.departments || this.departments?.length === 0) {
       return `<tr><td colspan="5" class="text-center py-4 text-slate-500">No departments found</td></tr>`
     }
     return this.departments.map(department => `
