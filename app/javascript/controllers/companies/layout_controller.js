@@ -1,7 +1,6 @@
 //  https://fonts.google.com/icons
 
 import { Controller } from "@hotwired/stimulus"
-import * as Helpers from "controllers/helpers"
 
 export default class Companies_LayoutController extends Controller {
   static targets = ["content", "profileDropdown"]
@@ -22,6 +21,8 @@ export default class Companies_LayoutController extends Controller {
     window.openByPathname = Helpers.openByPathname
     window.currentCompanies = Helpers.currentCompanies()
     window.currentCompany = Helpers.currentCompany()
+    window.identifier = Helpers.identifier
+    
 
     // Initial render (will show loading state if data is null)
     // Render HTML, re-call for re-render
