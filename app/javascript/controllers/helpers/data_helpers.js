@@ -315,7 +315,8 @@ export const map = (collection, callback) => {
   if (isArray(collection)) {
     return collection.map((item, index) => callback(item, index))
   } else if (isObject(collection)) {
-    return Object.entries(collection).map(([key, value]) => callback(key, value))
+    // entry is [key, value], i is the 0-based index
+    return Object.entries(collection).map(([key, value], i) => callback(key, value, i))
   }
   return []
 }

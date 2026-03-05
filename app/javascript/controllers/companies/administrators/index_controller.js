@@ -153,7 +153,7 @@ export default class Companies_Administrators_IndexController extends Companies_
           </div>
 
           <!-- Resources with Actions Tab Group -->
-          ${map(this.administrators, (role, permission) => {
+          ${map(this.administrators, (role, permission, index) => {
             // 1. Prepare the data for this specific role
             const groupData = this.groupedResources(permission.policies);
             
@@ -161,6 +161,7 @@ export default class Companies_Administrators_IndexController extends Companies_
               <div
                 class="lg:col-span-3 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 hidden open:flex flex-col overflow-hidden shadow-sm"
                 ${Helpers.openListener(this.tabRoleGroupName, role)}
+                ${index === 0 ? 'open' : ''}
               >
                 <div class="p-4 border-b border-slate-200 dark:border-slate-800 flex justify-between items-center bg-slate-50 dark:bg-slate-800/50">
                   <div class="flex items-center gap-2">
