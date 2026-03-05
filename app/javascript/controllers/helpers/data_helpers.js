@@ -62,6 +62,14 @@ export const isEmpty = (x) => {
   return true
 }
 
+/**
+ * Checks if a value is NOT empty.
+ * Similar to Object#present? in Rails.
+ * @param {*} x - The value to check.
+ * @returns {boolean} True if present, false otherwise.
+ */
+export const isPresent = (x) => !isEmpty(x)
+
 // --- String ---
 /**
  * Capitalizes the first letter of a string.

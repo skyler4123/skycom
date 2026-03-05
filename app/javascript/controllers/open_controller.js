@@ -24,20 +24,35 @@ export default class OpenController extends Controller {
 
   click(event) {
     event.preventDefault()
-    const triggerGroup = event.params.group
-    const triggerKey = event.params.key
-    if (!this.hasListenerTarget) { return }
 
-    this.listenerTargets.forEach((listener) => {
-      const listenerGroup = listener.dataset.openGroupParam
-      const listenerKey = listener.dataset.openKeyParam
-      if (listenerGroup !== triggerGroup) { return }
-      
-      listener.removeAttribute("open")
-      if (String(listenerKey) === String(triggerKey)) {
-        listener.setAttribute("open", true)
-      }
-    })
+    const activeTriggerGroup = event.params.group
+    const activeTriggerKey = event.params.key
+
+    if (this.hasTriggerTarget) {
+      this.triggerTargets.forEach((trigger) => {
+        const triggerGroup = trigger.dataset.openGroupParam
+        const triggerKey = trigger.dataset.openKeyParam
+        if (String(triggerGroup) === String(activeTriggerGroup)) {
+          trigger.removeAttribute("open")
+        }
+        if (String(triggerKey) === String(activeTriggerKey)) {
+          trigger.setAttribute("open", true)
+        }
+      })
+    }
+
+    if (this.hasListenerTarget) {
+      this.listenerTargets.forEach((listener) => {
+        const listenerGroup = listener.dataset.openGroupParam
+        const listenerKey = listener.dataset.openKeyParam
+        if (listenerGroup !== activeTriggerGroup) { return }
+        
+        listener.removeAttribute("open")
+        if (String(listenerKey) === String(activeTriggerKey)) {
+          listener.setAttribute("open", true)
+        }
+      })
+    }
   }
 
 }
