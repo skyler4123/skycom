@@ -1,7 +1,6 @@
 FactoryBot.define do
-  factory :branch do
-    company { nil }
-    parent_company { nil }
+  factory :company do
+    user { nil }
     name { "MyString" }
     description { "MyString" }
     code { "MyString" }
@@ -20,6 +19,6 @@ FactoryBot.define do
     website { "MyString" }
     employee_count { 1 }
     fiscal_year_end_month { 1 }
-    discarded_at { "2025-11-27 22:13:37" }
+    discarded_at { "2025-11-27 21:34:20" }
   end
 end

@@ -3,9 +3,20 @@ module ApplicationController::AuthenticationConcern
   extend ActiveSupport::Concern
 
   included do
-    # before_action :set_current_request_details
-    # before_action :set_current_session
-    # before_action :authenticate
+    # This makes the methods available in your views
+    helper_method :current_user, :is_signed_in?
+  end
+
+  def current_user
+    @current_user ||= current_session&.user
+  end
+
+  def current_session
+    @current_session ||= Current.session
+  end
+
+  def is_signed_in?
+    current_session.present?
   end
 
   private
@@ -37,6 +48,6 @@ module ApplicationController::AuthenticationConcern
   end
 
   def authenticate
-    redirect_to main_app.root_path if !Current.session
+    redirect_to main_app.root_path if !is_signed_in?
   end
 end

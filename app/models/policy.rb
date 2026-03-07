@@ -1,6 +1,8 @@
 class Policy < ApplicationRecord
   # --- Associations ---
-  belongs_to :company
+  # REASON: If a global Policy definition (like its name or resource type) is edited, we touch the Company to invalidate any cached permission sets that include this policy.
+  belongs_to :company, touch: true
+
   belongs_to :branch, optional: true
 
   has_many :policy_appointments, dependent: :destroy

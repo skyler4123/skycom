@@ -1,6 +1,6 @@
 <p style="color: red"><%= alert %></p>
 
-<% if Current.user.verified? %>
+<% if current_user.verified? %>
   <h1>Change your email</h1>
 <% else %>
   <h1>Verify your email</h1>

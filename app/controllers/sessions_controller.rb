@@ -5,7 +5,7 @@ class SessionsController < ApplicationController
   before_action :set_session, only: :destroy
 
   def index
-    @sessions = Current.user.sessions.order(created_at: :desc)
+    @sessions = current_user.sessions.order(created_at: :desc)
   end
 
   def new
@@ -34,13 +34,13 @@ class SessionsController < ApplicationController
   end
 
   def sign_out
-    Current.session&.destroy
+    current_session&.destroy
     cookies.clear
     redirect_to(root_path, notice: "That session has been logged out")
   end
 
   private
     def set_session
-      @session = Current.user.sessions.find(params[:id])
+      @session = current_user.sessions.find(params[:id])
     end
 end

@@ -62,6 +62,14 @@ export const isEmpty = (x) => {
   return true
 }
 
+/**
+ * Checks if a value is NOT empty.
+ * Similar to Object#present? in Rails.
+ * @param {*} x - The value to check.
+ * @returns {boolean} True if present, false otherwise.
+ */
+export const isPresent = (x) => !isEmpty(x)
+
 // --- String ---
 /**
  * Capitalizes the first letter of a string.
@@ -252,4 +260,131 @@ export const min = (arr, key = null) => {
     // Return the item (object or number) corresponding to the smaller value
     return (currentValue < bestValue) ? current : best;
   });
+}
+
+
+// --- Object Helpers (Rails-like) ---
+
+/**
+ * Returns an array of an object's keys.
+ * Similar to Hash#keys in Ruby.
+ */
+export const keys = (object) => Object.keys(object)
+
+/**
+ * Returns an array of an object's values.
+ * Similar to Hash#values in Ruby.
+ */
+export const values = (object) => Object.values(object)
+
+/**
+ * Returns an array of [key, value] pairs.
+ * Similar to Hash#to_a in Ruby.
+ */
+export const entries = (object) => Object.entries(object)
+
+// --- Collection Helpers (Enumerable-like) ---
+
+/**
+ * Iterates over an array or object. 
+ * If object: callback(key, value)
+ * If array: callback(item, index)
+ */
+export const each = (collection, callback) => {
+  if (isArray(collection)) {
+    collection.forEach((item, index) => callback(item, index))
+  } else if (isObject(collection)) {
+    Object.entries(collection).forEach(([key, value]) => callback(key, value))
+  }
+}
+
+/**
+ * Iterates with index.
+ * callback(item, index)
+ */
+export const eachWithIndex = (array, callback) => {
+  if (!isArray(array)) return
+  array.forEach((item, index) => callback(item, index))
+}
+
+/**
+ * Maps over a collection. Supports both Arrays and Objects.
+ * If Object: callback(key, value) -> returns array of results
+ */
+export const map = (collection, callback) => {
+  if (isArray(collection)) {
+    return collection.map((item, index) => callback(item, index))
+  } else if (isObject(collection)) {
+    // entry is [key, value], i is the 0-based index
+    return Object.entries(collection).map(([key, value], i) => callback(key, value, i))
+  }
+  return []
+}
+
+/**
+ * Returns a new object with the same keys, but transformed values.
+ * Similar to Hash#transform_values in Rails.
+ */
+export const transformValues = (object, callback) => {
+  return Object.fromEntries(
+    Object.entries(object).map(([key, value]) => [key, callback(value)])
+  )
+}
+
+/**
+ * Returns a new object with only the specified keys.
+ * Similar to Hash#slice in Rails.
+ */
+export const slice = (object, ...allowedKeys) => {
+  const result = {}
+  allowedKeys.flat().forEach(key => {
+    if (key in object) result[key] = object[key]
+  })
+  return result
+}
+
+/**
+ * Returns elements that are not null or undefined.
+ * Like Array#compact in Ruby.
+ */
+export const compact = (array) => {
+  if (!Array.isArray(array)) return []
+  return array.filter(item => item !== null && typeof item !== 'undefined' && item !== "")
+}
+
+/**
+ * Flattens nested arrays.
+ * Like Array#flatten in Ruby.
+ */
+export const flatten = (array) => {
+  if (!Array.isArray(array)) return []
+  return array.flat(Infinity)
+}
+
+/**
+ * Returns a unique version of the array.
+ * Like Array#uniq in Ruby.
+ */
+export const uniq = (array) => [...new Set(array)]
+
+/**
+ * Sorts either an Array of strings or an Object by its keys.
+ * Returns a sorted Array of strings (if input was Array) 
+ * or a sorted Array of { key, value } (if input was Object).
+ */
+export const sort = (data, direction = 'asc') => {
+  const dir = direction === 'asc' ? 1 : -1;
+
+  // Handle Array
+  if (Array.isArray(data)) {
+    return [...data].sort((a, b) => a.localeCompare(b) * dir);
+  }
+
+  // Handle Object
+  return Object.keys(data)
+    .sort((a, b) => a.localeCompare(b) * dir)
+    .reduce((acc, key) => {
+      acc[key] = data[key];
+      return acc;
+    }, {});
 }

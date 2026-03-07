@@ -1,11 +1,8 @@
 
-module Company::RetailConcern
+module Company::CacheConcern
   extend ActiveSupport::Concern
 
   included do
-    def branches
-      branches
-    end
 
     def cached_departments
       # 1. Define the relation

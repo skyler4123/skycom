@@ -9,7 +9,7 @@ module ApplicationController::SingleSessionAccessConcern
   private
 
   def enable_single_session_access
-    invalidate_current_session if Current.user.single_access_token !=Current.session.single_access_token
+    invalidate_current_session if current_user.single_access_token != current_session.single_access_token
   end
 
   def invalidate_current_session

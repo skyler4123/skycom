@@ -1,6 +1,6 @@
 class Company < ApplicationRecord
   include AddressConcern
-  include Company::RetailConcern
+  include Company::CacheConcern
   include Company::EducationConcern
   include Company::HospitalConcern
   include Company::RestaurantConcern
