@@ -12,11 +12,8 @@ class Companies::AdministratorsController < Companies::ApplicationController
   end
 
   def update_permission
-    # 1. Find the role strictly within this company
     role = current_company.roles.find(params[:role_id])
     
-    # 2. Find or create the Policy template
-    # We use 'action' and 'resource' to uniquely identify what the policy does
     policy = current_company.policies.find_or_create_by!(
       resource: params[:resource],
       action: params[:permission_action]
@@ -25,14 +22,23 @@ class Companies::AdministratorsController < Companies::ApplicationController
       p.business_type = :operational
     end
 
-    # 3. Toggle the relationship
+    # 3. Toggle with "Minimum 1" Safety Check
     if params[:status] == true
       role.policy_appointments.find_or_create_by!(policy: policy)
     else
-      role.policy_appointments.where(policy: policy).destroy_all
+      # Check how many policies this role has for THIS specific resource
+      resource_policy_count = role.policies.where(resource: params[:resource]).count
+
+      if resource_policy_count > 1
+        role.policy_appointments.where(policy: policy).destroy_all
+      else
+        # Return a 422 Unprocessable Entity if it's the last one
+        return render json: { 
+          error: "Cannot remove the last permission for '#{params[:resource]}'. At least one action must remain to keep the resource visible." 
+        }, status: :unprocessable_entity
+      end
     end
 
-    # 4. Success response
     render json: { status: :ok }
   rescue ActiveRecord::RecordNotFound => e
     render json: { error: "Role not found" }, status: :not_found
