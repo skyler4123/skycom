@@ -14,7 +14,8 @@ class Companies::EmployeesController < Companies::ApplicationController
           )
         end
 
-        render json: { employees: @employees }
+        @pagy, @employees = pagy(:offset, @employees, jsonapi: true)
+        render json: { employees: @employees, pagination: @pagy.data_hash }
       end
     end
   end

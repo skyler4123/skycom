@@ -1,5 +1,5 @@
 import Companies_LayoutController from "controllers/companies/layout_controller"
-
+import PaginationController from "controllers/pagination_controller";
 
 export default class Companies_Branches_EmployeesController extends Companies_LayoutController {
   static targets = ["employeesList"]
@@ -8,6 +8,7 @@ export default class Companies_Branches_EmployeesController extends Companies_La
       super.connect()
       const response = await fetchJson();
       this.employees = response.employees || []
+      this.pagination = response.pagination || {}
       poll(() => {
         if (isPresent(this.employees)) {
           this.renderContent();
@@ -127,6 +128,12 @@ export default class Companies_Branches_EmployeesController extends Companies_La
               <button class="px-3 py-1 text-sm border border-slate-200 dark:border-slate-700 rounded-lg text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">Next</button>
             </div>
           </div>
+        </div>
+
+        <div
+          data-controller="${identifier(PaginationController)}"
+          data-${identifier(PaginationController)}-data-value='${JSON.stringify(this.pagination)}' 
+        >
         </div>
       </div>
     `
