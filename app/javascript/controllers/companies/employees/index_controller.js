@@ -21,8 +21,8 @@ export default class Companies_Branches_EmployeesController extends Companies_La
 
   contentHTML() {
     return `
-      <div class="p-8 overflow-y-auto">
-        <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 flex flex-col">
+      <div class="p-4 overflow-y-auto">
+        <div class="p-4 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 flex flex-col">
 
           <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
             <div class="flex flex-wrap items-center gap-3 w-full sm:w-auto">
@@ -54,6 +54,7 @@ export default class Companies_Branches_EmployeesController extends Companies_La
                 <tr class="text-sm text-slate-500 dark:text-slate-400 bg-slate-50 dark:bg-slate-800/50 border-b border-slate-200 dark:border-slate-700">
                   <th class="py-4 px-6 font-medium whitespace-nowrap">Employee Name</th>
                   <th class="py-4 px-6 font-medium whitespace-nowrap">Email</th>
+                  <th class="py-4 px-6 font-medium whitespace-nowrap">Roles</th>
                   <th class="py-4 px-6 font-medium whitespace-nowrap">Code</th>
                   <th class="py-4 px-6 font-medium whitespace-nowrap">Employment Type</th>
                   <th class="py-4 px-6 font-medium whitespace-nowrap">Status</th>
@@ -82,6 +83,15 @@ export default class Companies_Branches_EmployeesController extends Companies_La
                       <div class="flex items-center gap-4">
                           <p class="text-xs text-blue-600 dark:text-blue-400 font-medium">${employee.user.email || 'N/A'}</p>
                         </div>
+                      </div>
+                    </td>
+                    <td class="py-4 px-6">
+                      <div class="flex flex-wrap gap-1">
+                        ${employee.roles.map(role => `
+                          <span class="px-2 py-0.5 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 text-[10px] font-bold rounded border border-slate-200 dark:border-slate-700">
+                            ${role.name}
+                          </span>
+                        `).join('')}
                       </div>
                     </td>
                     <td class="py-4 px-6 text-sm text-slate-600 dark:text-slate-300 font-mono">${employee.code || 'N/A'}</td>

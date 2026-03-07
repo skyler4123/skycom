@@ -6,10 +6,15 @@ class Companies::EmployeesController < Companies::ApplicationController
     respond_to do |format|
       format.html { render html: "", layout: true }
       format.json do
-        @employees = @company.employees.includes(:user) # Use includes to avoid N+1 queries
-        render json: { 
-          employees: @employees.as_json(include: { user: { only: :email } }) 
-        }
+        # Eager load both user (for email) and roles to prevent N+1 queries
+        @employees = @company.employees.includes(:user, :roles).map do |employee|
+          employee.as_json(include: { user: { only: :email } }).merge(
+            # Extract only the names of the roles into a flat array
+            roles: employee.roles.map { |role| { id: role.id, name: role.name } }
+          )
+        end
+
+        render json: { employees: @employees }
       end
     end
   end

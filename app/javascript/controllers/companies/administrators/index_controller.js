@@ -69,8 +69,8 @@ export default class Companies_Administrators_IndexController extends Companies_
     if (isEmpty(this.administrators)) { return `<div class="p-4">Loading...</div>` }
 
     return `
-      <div class="p-8 h-full flex flex-col">
-        <div class="flex flex-wrap justify-between items-end gap-4 mb-8">
+      <div class="p-4 h-full flex flex-col">
+        <div class="p-4 flex flex-wrap justify-between items-end gap-4 mb-8">
           <div class="flex flex-col gap-1">
             <h1 class="text-slate-900 dark:text-white text-3xl font-bold tracking-tight">Role & Policy Management</h1>
             <p class="text-slate-500 dark:text-slate-400 text-base">Configure RBAC rules and permissions.</p>
