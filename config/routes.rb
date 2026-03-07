@@ -35,7 +35,7 @@ Rails.application.routes.draw do
       resources :settings
       resources :administrators do
         collection do
-          patch :update_permissions
+          patch :update_permission
         end
       end
       resources :subscriptions

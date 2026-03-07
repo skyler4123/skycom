@@ -46,6 +46,8 @@ export default class Companies_Administrators_IndexController extends Companies_
       ? "rounded border-slate-200 bg-slate-100 h-5 w-5"
       : "rounded border-slate-300 text-blue-600 h-5 w-5 cursor-pointer";
     const controlerIdentifier = identifier(Companies_Administrators_UpdatePermissionController)
+    const roleId = this.administrators[roleName].id
+    
     return `
       <td class="p-4 text-center">
         <input
@@ -55,8 +57,8 @@ export default class Companies_Administrators_IndexController extends Companies_
           type="checkbox"
           data-controller="${controlerIdentifier}"
           data-action="change->${controlerIdentifier}#change"
-          data-${controlerIdentifier}-role-param="${roleName}"
-          data-${controlerIdentifier}-resource-param="${resourceName}"
+          data-${controlerIdentifier}-role-id-param="${roleId}"
+          data-${controlerIdentifier}-resource-name-param="${resourceName}"
           data-${controlerIdentifier}-action-param="${action}"
           class="${inputClass}" />
       </td>
