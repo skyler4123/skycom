@@ -1,4 +1,3 @@
-import * as Helpers from "controllers/helpers"
 import { Controller } from "@hotwired/stimulus"
 
 
