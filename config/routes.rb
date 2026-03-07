@@ -33,7 +33,11 @@ Rails.application.routes.draw do
       resources :tasks
       resources :facilities
       resources :settings
-      resources :administrators
+      resources :administrators do
+        collection do
+          patch :update_permissions
+        end
+      end
       resources :subscriptions
       resources :permissions
     end

@@ -1,5 +1,5 @@
 import Companies_LayoutController from "controllers/companies/layout_controller"
-
+import Companies_Administrators_UpdatePermissionController from "controllers/companies/administrators/update_permission_controller";
 export default class Companies_Administrators_IndexController extends Companies_LayoutController {
 
   async connect() {
@@ -17,7 +17,7 @@ export default class Companies_Administrators_IndexController extends Companies_
     });
   }
 
-  roles() {
+  roleNames() {
     return keys(this.administrators)
   }
 
@@ -37,24 +37,27 @@ export default class Companies_Administrators_IndexController extends Companies_
   /**
    * Generates the HTML for a single checkbox <td>.
    */
-  renderCheck(resourceName, action, currentGroupedResources) {
+  renderCheck(resourceName, action, currentGroupedResources, roleName) {
     const isChecked = currentGroupedResources[resourceName]?.[action];
     
     // Optional: Add a disabled state for specific actions that don't apply
-    const isDisabled = action === 'execute' && ['Product', 'Order'].includes(resourceName);
+    const isDisabled = false
     const inputClass = isDisabled 
       ? "rounded border-slate-200 bg-slate-100 h-5 w-5"
       : "rounded border-slate-300 text-blue-600 h-5 w-5 cursor-pointer";
-
+    const controlerIdentifier = identifier(Companies_Administrators_UpdatePermissionController)
     return `
       <td class="p-4 text-center">
-        <input 
+        <input
+          name="${resourceName}"
           ${isChecked ? 'checked' : ''} 
           ${isDisabled ? 'disabled' : ''}
           type="checkbox"
-          data-action="change->your-controller#updatePermission"
-          data-resource="${resourceName}"
-          data-permission-action="${action}"
+          data-controller="${controlerIdentifier}"
+          data-action="change->${controlerIdentifier}#change"
+          data-${controlerIdentifier}-role-param="${roleName}"
+          data-${controlerIdentifier}-resource-param="${resourceName}"
+          data-${controlerIdentifier}-action-param="${action}"
           class="${inputClass}" />
       </td>
     `;
@@ -95,16 +98,16 @@ export default class Companies_Administrators_IndexController extends Companies_
             <div class="overflow-y-auto flex-1 p-2 space-y-1">
 
               <!-- Roles Tab Group -->
-              ${map(this.roles(), (role, index) => {
+              ${map(this.roleNames(), (roleName, index) => {
                 return `
                   <button
                     class="w-full flex items-center justify-between p-3 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 cursor-pointer open:bg-blue-50 dark:open:bg-blue-900/20 open:border open:border-blue-100 dark:open:border-blue-800/50 open:text-blue-600"
-                    ${Helpers.openTrigger(this.tabRoleGroupName, role)}
+                    ${Helpers.openTrigger(this.tabRoleGroupName, roleName)}
                     ${index === 0 ? 'open' : ''}
                   >
                     <div class="flex items-center gap-3">
                       <span class="material-symbols-outlined text-slate-400">admin_panel_settings</span>
-                      <p class="text-sm">${role}</p>
+                      <p class="text-sm">${roleName}</p>
                     </div>
                     <span class="material-symbols-outlined text-[18px]">chevron_right</span>
                   </button>
@@ -116,20 +119,20 @@ export default class Companies_Administrators_IndexController extends Companies_
           </div>
 
           <!-- Resources with Actions Tab Group -->
-          ${map(this.administrators, (role, permission, index) => {
-            // 1. Prepare the data for this specific role
+          ${map(this.administrators, (roleName, permission, index) => {
+            // 1. Prepare the data for this specific roleName
             const groupData = this.groupedResources(permission.policies);
             
             return `
               <div
                 class="lg:col-span-3 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 hidden open:flex flex-col overflow-hidden shadow-sm"
-                ${Helpers.openListener(this.tabRoleGroupName, role)}
+                ${Helpers.openListener(this.tabRoleGroupName, roleName)}
                 ${index === 0 ? 'open' : ''}
               >
                 <div class="p-4 border-b border-slate-200 dark:border-slate-800 flex justify-between items-center bg-slate-50 dark:bg-slate-800/50">
                   <div class="flex items-center gap-2">
                     <h2 class="text-base font-bold text-slate-900 dark:text-white">
-                      Permissions for: <span class="text-blue-600">${role}</span>
+                      Permissions for: <span class="text-blue-600">${roleName}</span>
                     </h2>
                   </div>
                   <div class="flex gap-3">
@@ -158,11 +161,11 @@ export default class Companies_Administrators_IndexController extends Companies_
                           <td class="p-4 text-sm font-medium flex items-center gap-2">
                             ${resourceName}s
                           </td>
-                          ${this.renderCheck(resourceName, 'create', groupData)}
-                          ${this.renderCheck(resourceName, 'read', groupData)}
-                          ${this.renderCheck(resourceName, 'update', groupData)}
-                          ${this.renderCheck(resourceName, 'delete', groupData)}
-                          ${this.renderCheck(resourceName, 'execute', groupData)}
+                          ${this.renderCheck(resourceName, 'create', groupData, roleName)}
+                          ${this.renderCheck(resourceName, 'read', groupData, roleName)}
+                          ${this.renderCheck(resourceName, 'update', groupData, roleName)}
+                          ${this.renderCheck(resourceName, 'delete', groupData, roleName)}
+                          ${this.renderCheck(resourceName, 'execute', groupData, roleName)}
                         </tr>
                       `).join('')}
                     </tbody>
