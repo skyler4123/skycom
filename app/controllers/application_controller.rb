@@ -11,6 +11,8 @@ class ApplicationController < ActionController::Base
   # Cookie management helpers
   include ApplicationController::CookieConcern
 
+  include Pagy::Method
+
   # Universal filters
   before_action :set_current_request_details
   before_action :set_current_session

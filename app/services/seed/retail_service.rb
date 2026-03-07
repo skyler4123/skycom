@@ -2,7 +2,7 @@ class Seed::RetailService
   EMPLOYEE_COUNTS = {
     manager: 1,
     cashier: 3,
-    sales_associate: 5,
+    sales_associate: 210,
     stock_clerk: 2
   }.freeze
 
