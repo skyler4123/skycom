@@ -61,7 +61,51 @@ export default class Companies_Branches_EmployeesController extends Companies_La
                 </tr>
               </thead>
               <tbody data-${this.identifier}-target="employeesList" class="divide-y divide-slate-200 dark:divide-slate-800">
-                ${this.employeesHTML()}
+                ${this.employees.map(employee => `
+                  <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
+                    <td class="py-4 px-6 text-sm">
+                      <div class="flex items-center gap-4">
+                        <div class="w-12 h-12 rounded-lg bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex items-center justify-center">
+                          <span class="material-symbols-outlined text-slate-400">person</span>
+                        </div>
+                        <div>
+                          <p
+                            class="font-medium text-slate-900 dark:text-white cursor-pointer hover:underline"
+                            data-action="click->${this.identifier}#showEmployeeDetails"
+                          >
+                            ${employee.name}
+                          </p>
+                        </div>
+                      </div>
+                    </td>
+                    <td class="py-4 px-6 text-sm">
+                      <div class="flex items-center gap-4">
+                          <p class="text-xs text-blue-600 dark:text-blue-400 font-medium">${employee.user.email || 'N/A'}</p>
+                        </div>
+                      </div>
+                    </td>
+                    <td class="py-4 px-6 text-sm text-slate-600 dark:text-slate-300 font-mono">${employee.code || 'N/A'}</td>
+                    <td class="py-4 px-6 text-sm">
+                      <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                        employee.business_type === 'full_time' ? 'bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-300' :
+                        employee.business_type === 'part_time' ? 'bg-blue-100 text-blue-800 dark:bg-blue-900/50 dark:text-blue-300' :
+                        employee.business_type === 'contractor' ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/50 dark:text-yellow-300' :
+                        'bg-purple-100 text-purple-800 dark:bg-purple-900/50 dark:text-purple-300'
+                      }">
+                        ${Helpers.capitalize(employee.business_type.replace('_', ' '))}
+                      </span>
+                    </td>
+                    <td class="py-4 px-6 text-sm">
+                      ${Helpers.statusBadge(employee.lifecycle_status)}
+                    </td>
+                    <td class="py-4 px-6 text-sm text-right">
+                      <div class="flex items-center justify-end gap-2">
+                        <button class="p-2 text-slate-500 hover:text-blue-600 hover:bg-blue-50 rounded-lg"><span
+                            class="material-symbols-outlined text-[20px]">edit</span></button>
+                      </div>
+                    </td>
+                  </tr>
+                `).join('')}
               </tbody>
             </table>
           </div>
@@ -76,56 +120,5 @@ export default class Companies_Branches_EmployeesController extends Companies_La
         </div>
       </div>
     `
-  }
-
-  employeesHTML() {
-    if (this.employees.length === 0) {
-      return `<tr><td colspan="5" class="text-center py-4 text-slate-500">No employees found</td></tr>`
-    }
-    return this.employees.map(employee => `
-      <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
-        <td class="py-4 px-6 text-sm">
-          <div class="flex items-center gap-4">
-            <div class="w-12 h-12 rounded-lg bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex items-center justify-center">
-              <span class="material-symbols-outlined text-slate-400">person</span>
-            </div>
-            <div>
-              <p
-                 class="font-medium text-slate-900 dark:text-white cursor-pointer hover:underline"
-                 data-action="click->${this.identifier}#showEmployeeDetails"
-              >
-                ${employee.name}
-              </p>
-            </div>
-          </div>
-        </td>
-        <td class="py-4 px-6 text-sm">
-          <div class="flex items-center gap-4">
-              <p class="text-xs text-blue-600 dark:text-blue-400 font-medium">${employee.user.email || 'N/A'}</p>
-            </div>
-          </div>
-        </td>
-        <td class="py-4 px-6 text-sm text-slate-600 dark:text-slate-300 font-mono">${employee.code || 'N/A'}</td>
-        <td class="py-4 px-6 text-sm">
-          <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-            employee.business_type === 'full_time' ? 'bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-300' :
-            employee.business_type === 'part_time' ? 'bg-blue-100 text-blue-800 dark:bg-blue-900/50 dark:text-blue-300' :
-            employee.business_type === 'contractor' ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/50 dark:text-yellow-300' :
-            'bg-purple-100 text-purple-800 dark:bg-purple-900/50 dark:text-purple-300'
-          }">
-            ${Helpers.capitalize(employee.business_type.replace('_', ' '))}
-          </span>
-        </td>
-        <td class="py-4 px-6 text-sm">
-          ${Helpers.statusBadge(employee.lifecycle_status)}
-        </td>
-        <td class="py-4 px-6 text-sm text-right">
-          <div class="flex items-center justify-end gap-2">
-            <button class="p-2 text-slate-500 hover:text-blue-600 hover:bg-blue-50 rounded-lg"><span
-                class="material-symbols-outlined text-[20px]">edit</span></button>
-          </div>
-        </td>
-      </tr>
-    `).join('')
   }
 }
