@@ -26,6 +26,7 @@ window.slice = Helpers.slice
 window.transformValues = Helpers.transformValues
 window.isPresent = Helpers.isPresent
 window.isEmpty = Helpers.isEmpty
+window.sort = Helpers.sort
 
 // 4. Data Getters (Safe from Race Conditions)
 // This allows you to use 'currentCompany()' as a variable that always fetches fresh data

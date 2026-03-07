@@ -5,7 +5,8 @@ export default class Companies_Administrators_IndexController extends Companies_
   async connect() {
     super.connect()
     const response = await fetchJson();
-    this.administrators = response.administrators || []
+    const administrators = response.administrators || []
+    this.administrators = sort(administrators)
     this.tabRoleGroupName = "administratorsRolesTabGroup"
 
     poll(() => {
@@ -123,7 +124,7 @@ export default class Companies_Administrators_IndexController extends Companies_
           <!-- Resources with Actions Tab Group -->
           ${map(this.administrators, (roleName, permission, index) => {
             // 1. Prepare the data for this specific roleName
-            const groupData = this.groupedResources(permission.policies);
+            const groupData = sort(this.groupedResources(permission.policies));
             
             return `
               <div

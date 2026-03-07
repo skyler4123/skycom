@@ -366,3 +366,25 @@ export const flatten = (array) => {
  * Like Array#uniq in Ruby.
  */
 export const uniq = (array) => [...new Set(array)]
+
+/**
+ * Sorts either an Array of strings or an Object by its keys.
+ * Returns a sorted Array of strings (if input was Array) 
+ * or a sorted Array of { key, value } (if input was Object).
+ */
+export const sort = (data, direction = 'asc') => {
+  const dir = direction === 'asc' ? 1 : -1;
+
+  // Handle Array
+  if (Array.isArray(data)) {
+    return [...data].sort((a, b) => a.localeCompare(b) * dir);
+  }
+
+  // Handle Object
+  return Object.keys(data)
+    .sort((a, b) => a.localeCompare(b) * dir)
+    .reduce((acc, key) => {
+      acc[key] = data[key];
+      return acc;
+    }, {});
+}
