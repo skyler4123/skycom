@@ -2,7 +2,8 @@ class Role < ApplicationRecord
   include TagConcern
 
   # --- Associations ---
-  belongs_to :company
+  # REASON: When a Role's timestamp is updated (either directly or via PolicyAppointment), it touches the Company. This ensures the Company's cache_key changes.
+  belongs_to :company, touch: true
   belongs_to :branch, optional: true
 
   has_many :policy_appointments, dependent: :destroy, as: :appoint_to
