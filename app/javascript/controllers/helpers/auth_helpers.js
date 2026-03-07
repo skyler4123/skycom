@@ -9,12 +9,16 @@ import { pathname } from "controllers/helpers/http_helpers"
 export const Cookie = (name) => {
   let cookie = {}
   document.cookie.split(';').forEach(function(el) {
-    let [k,v] = el.split('=');
-    if (!k) return;
-    let value = decodeURIComponent(v);
-    value = value.replace("+", ' ');
+    let [k, v] = el.split('=');
+    if (!k || v === undefined) return;
+    
+    // 1. Replace ALL '+' with spaces first
+    // 2. Then decode the URI components
+    let value = decodeURIComponent(v.replace(/\+/g, ' '));
+    
     cookie[k.trim()] = value;
   })
+  
   if (name) {
     return cookie[name]
   } else {
