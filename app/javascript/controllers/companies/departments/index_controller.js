@@ -1,4 +1,3 @@
-import * as Helpers from "controllers/helpers"
 import Companies_LayoutController from "controllers/companies/layout_controller"
 
 export default class Companies_Departments_IndexController extends Companies_LayoutController {
@@ -8,7 +7,13 @@ export default class Companies_Departments_IndexController extends Companies_Lay
     super.connect()
     const response = await fetchJson();
     this.departments = response.departments || []
-    this.renderContent()
+    poll(() => {
+      if (isPresent(this.departments)) {
+        this.renderContent();
+        return true; // Stop polling
+        }
+      return false; // Keep polling
+    });
   }
   
   contentHTML() {

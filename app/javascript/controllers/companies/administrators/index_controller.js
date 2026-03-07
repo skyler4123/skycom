@@ -8,7 +8,6 @@ export default class Companies_Administrators_IndexController extends Companies_
     const administrators = response.administrators || []
     this.administrators = sort(administrators)
     this.tabRoleGroupName = "administratorsRolesTabGroup"
-
     poll(() => {
       if (isPresent(this.administrators)) {
         this.renderContent();

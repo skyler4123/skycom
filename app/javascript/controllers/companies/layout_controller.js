@@ -16,17 +16,11 @@ export default class Companies_LayoutController extends Controller {
   connect() {
     poll(() => {
       if (currentCompanies() && currentCompany()) {
-        this.render();
+        this.renderLayout();
         return true; // Stop polling
       }
       return false; // Keep polling
     });
-  }
-
-  // --- The Centralized Render Method ---
-  render() {
-    this.renderLayout();
-    this.renderContent();
   }
 
   renderLayout() {
@@ -63,21 +57,6 @@ export default class Companies_LayoutController extends Controller {
           </a>`).join("")}
       </div>
     `
-  }
-  
-  // define contentHTML in subclasses (inheritance)
-  contentHTML() {
-    return `
-      <div class="p-8">
-        <div class="animate-pulse flex space-y-4 flex-col">
-          <div class="h-4 bg-gray-200 rounded w-3/4"></div>
-          <div class="space-y-3">
-            <div class="h-4 bg-gray-200 rounded"></div>
-            <div class="h-4 bg-gray-200 rounded w-5/6"></div>
-          </div>
-        </div>
-      </div>
-    `;
   }
 
   layoutHTML() {

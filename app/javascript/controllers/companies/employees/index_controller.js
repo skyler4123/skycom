@@ -8,7 +8,6 @@ export default class Companies_Branches_EmployeesController extends Companies_La
       super.connect()
       const response = await fetchJson();
       this.employees = response.employees || []
-
       poll(() => {
         if (isPresent(this.employees)) {
           this.renderContent();
@@ -16,7 +15,7 @@ export default class Companies_Branches_EmployeesController extends Companies_La
           }
         return false; // Keep polling
       });
-      console.log(this.employees)
+      console.log(this)
     }
   
 
@@ -54,6 +53,7 @@ export default class Companies_Branches_EmployeesController extends Companies_La
               <thead>
                 <tr class="text-sm text-slate-500 dark:text-slate-400 bg-slate-50 dark:bg-slate-800/50 border-b border-slate-200 dark:border-slate-700">
                   <th class="py-4 px-6 font-medium whitespace-nowrap">Employee Name</th>
+                  <th class="py-4 px-6 font-medium whitespace-nowrap">Email</th>
                   <th class="py-4 px-6 font-medium whitespace-nowrap">Code</th>
                   <th class="py-4 px-6 font-medium whitespace-nowrap">Employment Type</th>
                   <th class="py-4 px-6 font-medium whitespace-nowrap">Status</th>
@@ -96,7 +96,12 @@ export default class Companies_Branches_EmployeesController extends Companies_La
               >
                 ${employee.name}
               </p>
-              <p class="text-xs text-slate-500">${employee.description ? employee.description.substring(0, 50) + (employee.description.length > 50 ? '...' : '') : 'No description'}</p>
+            </div>
+          </div>
+        </td>
+        <td class="py-4 px-6 text-sm">
+          <div class="flex items-center gap-4">
+              <p class="text-xs text-blue-600 dark:text-blue-400 font-medium">${employee.user.email || 'N/A'}</p>
             </div>
           </div>
         </td>
