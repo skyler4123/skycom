@@ -121,19 +121,12 @@ export default class Companies_Branches_EmployeesController extends Companies_La
             </table>
           </div>
 
-          <div class="p-4 border-t border-slate-200 dark:border-slate-800 flex items-center justify-between">
-            <span class="text-sm text-slate-500 dark:text-slate-400">Showing ${this.employees.length} employees</span>
-            <div class="flex items-center gap-2">
-              <button class="px-3 py-1 text-sm border border-slate-200 dark:border-slate-700 rounded-lg text-slate-400 cursor-not-allowed" disabled>Previous</button>
-              <button class="px-3 py-1 text-sm border border-slate-200 dark:border-slate-700 rounded-lg text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">Next</button>
-            </div>
+          <div
+            class="flex pt-4"
+            data-controller="${identifier(PaginationController)}"
+            data-${identifier(PaginationController)}-data-value='${JSON.stringify(this.pagination)}' 
+          >
           </div>
-        </div>
-
-        <div
-          data-controller="${identifier(PaginationController)}"
-          data-${identifier(PaginationController)}-data-value='${JSON.stringify(this.pagination)}' 
-        >
         </div>
       </div>
     `

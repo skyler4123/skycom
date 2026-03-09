@@ -20,8 +20,8 @@ export default class PaginationController extends Controller {
 
     this.element.innerHTML = `
       <div class="flex items-center justify-between w-full">
-        <div class="flex items-center gap-1">
-          ${this.linkHTML(p.page > 1, 1, 'first_page')}
+        <div class="flex justify-center items-center gap-1 w-full">
+          <!-- ${this.linkHTML(p.page > 1, 1, 'first_page')} -->
           ${this.linkHTML(p.page > 1, p.page - 1, 'chevron_left')}
           
           <div class="flex items-center gap-1 mx-2">
@@ -34,7 +34,7 @@ export default class PaginationController extends Controller {
           </div>
 
           ${this.linkHTML(p.page < p.last, p.page + 1, 'chevron_right')}
-          ${this.linkHTML(p.page < p.last, p.last, 'last_page')}
+          <!-- ${this.linkHTML(p.page < p.last, p.last, 'last_page')} -->
         </div>
       </div>
     `
