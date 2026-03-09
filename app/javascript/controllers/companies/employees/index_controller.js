@@ -120,12 +120,8 @@ export default class Companies_Branches_EmployeesController extends Companies_La
               </tbody>
             </table>
           </div>
-
-          <div
-            class="flex pt-4"
-            data-controller="${identifier(PaginationController)}"
-            data-${identifier(PaginationController)}-data-value='${JSON.stringify(this.pagination)}' 
-          >
+          <div class="flex justify-center pt-4">
+            ${pagination(this.pagination)}
           </div>
         </div>
       </div>

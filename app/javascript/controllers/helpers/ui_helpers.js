@@ -236,3 +236,12 @@ export const addOpenTrigger = (key, index) => `data-open-target="trigger" data-a
  * @returns {string} The full data attribute string for an open listener.
  */
 export const addOpenListener = (key, index) => `data-open-target="listener" data-open-key-param="${key}" data-open-index-param="${index}"`
+
+export const pagination = (dataValue, classNames = "") => `
+  <div
+    class="${classNames}"
+    data-controller="pagination"
+    data-pagination-data-value='${JSON.stringify(dataValue)}' 
+  >
+  </div>
+`
