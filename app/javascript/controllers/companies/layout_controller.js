@@ -14,6 +14,9 @@ export default class Companies_LayoutController extends Controller {
   }
 
   connect() {
+    this.id = randomId()
+    this.element.id = this.id
+    
     poll(() => {
       if (currentCompanies() && currentCompany()) {
         this.renderLayout();

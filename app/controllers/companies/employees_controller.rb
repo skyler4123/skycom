@@ -6,11 +6,12 @@ class Companies::EmployeesController < Companies::ApplicationController
     respond_to do |format|
       format.html { render html: "", layout: true }
       format.json do
-        # Eager load both user (for email) and roles to prevent N+1 queries
-        @employees = current_company.employees.includes(:user, :roles).map do |employee|
+        # Eager load departments through the appointment table
+        @employees = current_company.employees.includes(:user, :roles, :departments).map do |employee|
           employee.as_json(include: { user: { only: :email } }).merge(
-            # Extract only the names of the roles into a flat array
-            roles: employee.roles.map { |role| { id: role.id, name: role.name } }
+            roles: employee.roles.map { |r| { id: r.id, name: r.name } },
+            # Map departments to a flat array of names or objects
+            departments: employee.departments.map { |d| { id: d.id, name: d.name } }
           )
         end
 

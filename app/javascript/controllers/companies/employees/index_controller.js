@@ -27,7 +27,12 @@ export default class Companies_Branches_EmployeesController extends Companies_La
 
           <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
             <div class="flex flex-wrap items-center gap-3 w-full sm:w-auto">
-              <select class="pl-3 pr-10 py-2 text-sm border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 focus:border-blue-600 focus:ring-blue-600 w-full sm:w-auto">
+              <select
+                class="pl-3 pr-10 py-2 text-sm border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 focus:border-blue-600 focus:ring-blue-600 w-full sm:w-auto"
+                data-controller="filter"
+                data-filer-receiver-id-value="${this.id}"
+                data-action="change->filter#change"
+              >
                 <option selected="">Department: All</option>
                 <option value="sales">Sales</option>
                 <option value="hr">HR</option>
@@ -55,6 +60,7 @@ export default class Companies_Branches_EmployeesController extends Companies_La
                 <tr class="text-sm text-slate-500 dark:text-slate-400 bg-slate-50 dark:bg-slate-800/50 border-b border-slate-200 dark:border-slate-700">
                   <th class="py-4 px-6 font-medium whitespace-nowrap">Employee Name</th>
                   <th class="py-4 px-6 font-medium whitespace-nowrap">Email</th>
+                  <th class="py-4 px-6 font-medium whitespace-nowrap">Departments</th>
                   <th class="py-4 px-6 font-medium whitespace-nowrap">Roles</th>
                   <th class="py-4 px-6 font-medium whitespace-nowrap">Code</th>
                   <th class="py-4 px-6 font-medium whitespace-nowrap">Employment Type</th>
@@ -84,6 +90,18 @@ export default class Companies_Branches_EmployeesController extends Companies_La
                       <div class="flex items-center gap-4">
                           <p class="text-xs text-blue-600 dark:text-blue-400 font-medium">${employee.user.email || 'N/A'}</p>
                         </div>
+                      </div>
+                    </td>
+                    <td class="py-4 px-6">
+                      <div class="flex flex-wrap gap-1">
+                        ${employee.departments.length > 0 
+                          ? employee.departments.map(dept => `
+                              <span class="px-2 py-0.5 bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 text-[10px] font-bold rounded border border-blue-100 dark:border-blue-800">
+                                ${dept.name}
+                              </span>
+                            `).join('')
+                          : '<span class="text-slate-400 text-xs italic">No Department</span>'
+                        }
                       </div>
                     </td>
                     <td class="py-4 px-6">
