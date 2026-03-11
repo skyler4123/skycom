@@ -4,25 +4,39 @@ import PaginationController from "controllers/pagination_controller";
 export default class Companies_Branches_EmployeesController extends Companies_LayoutController {
   static targets = ["employeesList"]
 
-    async connect() {
-      super.connect()
-      const response = await fetchJson();
-      this.employees = response.employees || []
-      this.pagination = response.pagination || {}
-      poll(() => {
-        if (isPresent(this.employees)) {
-          this.renderContent();
-          return true; // Stop polling
-          }
-        return false; // Keep polling
-      });
-      console.log(this)
-    }
+  async connect() {
+    super.connect()
+    const response = await fetchJson();
+    this.employees = response.employees || []
+    this.pagination = response.pagination || {}
+    poll(() => {
+      if (isPresent(this.employees)) {
+        this.renderContent();
+        return true; // Stop polling
+        }
+      return false; // Keep polling
+    });
+    console.log(this)
+    // this.element.setAttribute("data-action", `filter:copy@window->${this.identifier}#flash`)
+  }
   
+  handleFilter(event) {
+    event.preventDefault();
+    console.log(event)
+    const { url, receiverId } = event.detail
+    
+    // Only act if the ID matches this controller instance
+    if (receiverId === this.id) { 
+      this.flash({ detail: { url } })
+    }
+  }
 
   contentHTML() {
     return `
-      <div class="p-4 overflow-y-auto">
+      <div
+        class="p-4 overflow-y-auto"
+        data-action="filter:changed@window->${this.identifier}#handleFilter"
+      >
         <div class="p-4 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 flex flex-col">
 
           <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
@@ -32,6 +46,7 @@ export default class Companies_Branches_EmployeesController extends Companies_La
                 data-controller="filter"
                 data-filer-receiver-id-value="${this.id}"
                 data-action="change->filter#change"
+                
               >
                 <option selected="">Department: All</option>
                 <option value="sales">Sales</option>

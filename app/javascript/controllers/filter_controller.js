@@ -8,9 +8,12 @@ export default class FilterController extends Controller {
   
   // Triggered by data-action="change->filter#change" on the container
   change(event) {
-    event.preventDefault()
-    console.log(event)
-
-    this.dispatch("change", { detail: { url: randomId() } })
+    // Dispatch a generic 'filter-changed' event
+    this.dispatch("changed", { 
+      detail: { 
+        url: randomId(),
+        receiverId: this.receiverIdValue // Pass the ID in the detail
+      } 
+    })
   }
 }
