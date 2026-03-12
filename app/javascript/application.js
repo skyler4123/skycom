@@ -10,6 +10,8 @@ window.Helpers = Helpers;
 
 // 2. Core Utilities
 window.fetchJson = Helpers.fetchJson
+window.pathname = Helpers.pathname
+window.addAttribute = Helpers.addAttribute
 window.translate = Helpers.translate
 window.poll = Helpers.poll
 window.openByPathname = Helpers.openByPathname
