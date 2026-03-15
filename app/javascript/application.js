@@ -12,6 +12,7 @@ window.Helpers = Helpers;
 window.fetchJson = Helpers.fetchJson
 window.pathname = Helpers.pathname
 window.addAttribute = Helpers.addAttribute
+window.addAction = Helpers.addAction
 window.translate = Helpers.translate
 window.poll = Helpers.poll
 window.openByPathname = Helpers.openByPathname
@@ -31,6 +32,8 @@ window.isEmpty = Helpers.isEmpty
 window.sort = Helpers.sort
 window.pagination = Helpers.pagination
 window.randomId = Helpers.randomId
+window.openModal = Helpers.openModal
+window.closeModal = Helpers.closeModal
 
 // 4. Data Getters (Safe from Race Conditions)
 // This allows you to use 'currentCompany()' as a variable that always fetches fresh data

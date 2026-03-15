@@ -1,5 +1,5 @@
 import Companies_LayoutController from "controllers/companies/layout_controller"
-import PaginationController from "controllers/pagination_controller";
+import Companies_Employees_NewModalController from "controllers/companies/employees/new_modal_controller";
 
 export default class Companies_Branches_EmployeesController extends Companies_LayoutController {
   static targets = ["employeesList"]
@@ -17,13 +17,10 @@ export default class Companies_Branches_EmployeesController extends Companies_La
         }
       return false; // Keep polling
     });
-    console.log(this)
-    // this.element.setAttribute("data-action", `filter:copy@window->${this.identifier}#flash`)
   }
 
   // Helper to render select options
   renderOptions(options = [], selectedValue, defaultText) {
-    console.log(options, selectedValue, defaultText)
     let html = `<option value="">${defaultText}</option>`;
     options.forEach(opt => {
       const isSelected = String(opt.value) === String(selectedValue) ? 'selected' : '';
@@ -87,10 +84,10 @@ export default class Companies_Branches_EmployeesController extends Companies_La
 
               <button
                 type="button"
-                data-action="click->${this.identifier}#openAddEmployeeModal"
-                class="flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors font-medium text-sm whitespace-nowrap">
+                data-controller="${identifier(Companies_Employees_NewModalController)}"
+                class="flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors font-medium text-sm whitespace-nowrap cursor-pointer">
                 <span class="material-symbols-outlined text-[20px]">add</span>
-                Add New Employee
+                Add
               </button>
             </form>
           </div>
@@ -177,11 +174,5 @@ export default class Companies_Branches_EmployeesController extends Companies_La
         </div>
       </div>
     `
-  }
-
-  // Example handler for the modal
-  openAddEmployeeModal() {
-    console.log("Opening modal...")
-    // Your modal logic here
   }
 }

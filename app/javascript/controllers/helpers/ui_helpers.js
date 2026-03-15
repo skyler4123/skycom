@@ -113,7 +113,7 @@ export const openModal = ({html = "Model!", customClass = {}, options = {}}) => 
     target: document.querySelector('main'),
     customClass: {
       container: '!bg-transparent',
-      popup: '!p-0 !bg-transparent !w-full',
+      popup: '!p-0 !bg-transparent !w-fit',
       htmlContainer: '!p-0 !overflow-visible',
       ...customClass
     },
