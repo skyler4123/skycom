@@ -112,3 +112,51 @@ export const href = () => window.location.href
  * @returns {string} window.location.origin
  */
 export const origin = () => window.location.origin
+
+/**
+ * Generates a Rails-compatible form wrapper.
+ * * @param {object} options
+ * @param {string} [options.action=pathname()] - Form action URL.
+ * @param {string} [options.method="POST"] - HTTP method (GET, POST, PATCH, DELETE).
+ * @param {string} [options.dataAction=""] - Stimulus actions (e.g. "submit->controller#submit").
+ * @param {string} [options.className=""] - CSS classes.
+ * @param {string} [options.html=""] - Inner HTML content (fields).
+ * @returns {string} The HTML form string.
+ */
+export const form = ({ 
+  action = pathname(), 
+  method = "POST", 
+  dataAction = "", 
+  className = "", 
+  html = "" 
+}) => {
+  const upperMethod = method.toUpperCase()
+  const isGet = upperMethod === "GET"
+  
+  // Rails method spoofing
+  let methodTags = ""
+  let formMethod = upperMethod
+
+  if (!isGet) {
+    formMethod = "POST" // Browser forms only support GET/POST
+    if (upperMethod === "PATCH") {
+      methodTags = formPatchSecurityTags()
+    } else if (upperMethod === "DELETE") {
+      methodTags = `<input type="hidden" name="_method" value="delete" autocomplete="off">` + formPostSecurityTags()
+    } else {
+      methodTags = formPostSecurityTags()
+    }
+  }
+
+  return `
+    <form 
+      action="${action}" 
+      method="${formMethod}" 
+      data-action="${dataAction}" 
+      class="${className}"
+    >
+      ${methodTags}
+      ${html}
+    </form>
+  `
+}
