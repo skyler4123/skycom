@@ -34,7 +34,7 @@ export default class LanguageController extends Controller {
 
   // Get languageCode from Cookie > default to "en"
   initValues() {
-    this.languageCodeValue = Helpers.Cookie('languageCode') || "en";
+    this.languageCodeValue = localStorage.getItem('languageCode') || "en";
   }
 
   initTargets() {
@@ -58,7 +58,7 @@ export default class LanguageController extends Controller {
   openDropdown(event) {
     // No need to implement anything here, just to have action to open dropdown
     event.preventDefault();
-    Helpers.openPopover({
+    openPopover({
       parentElement: event.currentTarget,
       html: this.languageDropdownHTML(),
       position: "bottom-right",
@@ -88,8 +88,9 @@ export default class LanguageController extends Controller {
     this.updateTranslations();
     // this.element.innerHTML = this.languageCodeText()[value]
     this.updateLanguageCodeText();
-    Helpers.setCookie('languageCode', value, 365);
-    Helpers.closeSwal();
+    localStorage.setItem('languageCode', value);
+    // Helpers.closeSwal();
+    closeModal();
   }
 
   updateLanguageCodeText() {

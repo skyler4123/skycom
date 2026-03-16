@@ -35,6 +35,7 @@ window.pagination = Helpers.pagination
 window.randomId = Helpers.randomId
 window.openModal = Helpers.openModal
 window.closeModal = Helpers.closeModal
+window.openPopover = Helpers.openPopover
 window.form = Helpers.form
 
 // 4. Data Getters (Safe from Race Conditions)

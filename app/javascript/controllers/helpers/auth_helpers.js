@@ -70,12 +70,8 @@ export const currentUser = () => {
   return cache.user || null;
 }
 
-/**
- * Checks if the user is signed in based on the 'is_signed_in' cookie.
- * @returns {boolean} True if signed in, false otherwise.
- */
 export const isSignedIn = () => {
-  return Cookie('is_signed_in') && Cookie('is_signed_in') === 'true'
+  return !!currentUser(); // Returns true if user data exists in LocalStorage
 }
 
 // --- Paths ---
