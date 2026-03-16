@@ -9,6 +9,7 @@ import * as Helpers from "controllers/helpers"
 window.Helpers = Helpers;
 
 // 2. Core Utilities
+window.Cookie = Helpers.Cookie
 window.fetchJson = Helpers.fetchJson
 window.pathname = Helpers.pathname
 window.addAttribute = Helpers.addAttribute
@@ -40,3 +41,4 @@ window.form = Helpers.form
 // This allows you to use 'currentCompany()' as a variable that always fetches fresh data
 window.currentCompanies = Helpers.currentCompanies
 window.currentCompany = Helpers.currentCompany
+window.currentUser = Helpers.currentUser

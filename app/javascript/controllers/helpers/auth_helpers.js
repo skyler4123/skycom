@@ -42,30 +42,33 @@ export const setCookie = (name, value, days) => {
   document.cookie = name + "=" + value + expires + "; path=/"
 }
 
-/**
- * Retrieves the list of companies from the 'companies' cookie.
- * @returns {Array<object>} An array of company group objects.
- */
-export const currentCompanies = () => {
-  const c = Cookie('companies');
-  return c ? JSON.parse(c) : [];
+export const getCache = () => {
+  const raw = localStorage.getItem('client_cache_data')
+  return raw ? JSON.parse(raw) : {}
 }
 
-export const currentUser = () => {
-  const c = Cookie('current_user');
-  return c ? JSON.parse(c) : null;
+export const currentCompanies = () => {
+  return getCache().companies || []
 }
 
 export const currentCompany = () => {
-  const companies = currentCompanies();
-  const currentPath = pathname();
-
-  if (!Array.isArray(companies)) {
-    return null;
-  }
-  return companies.find(group => currentPath.includes(String(group.id)));
+  const companies = currentCompanies()
+  const path = window.location.pathname
+  return companies.find(c => path.includes(String(c.id))) || null
 }
 
+export const currentBranches = () => {
+  return currentCompany()?.branches || []
+}
+
+/**
+ * Retrieves the current user profile from the client cache.
+ * @returns {object|null} The user object (id, email, avatar, etc.) or null if not found.
+ */
+export const currentUser = () => {
+  const cache = getCache(); // Uses the getCache helper we defined earlier
+  return cache.user || null;
+}
 
 /**
  * Checks if the user is signed in based on the 'is_signed_in' cookie.
