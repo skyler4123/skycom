@@ -12,7 +12,7 @@ export default class Companies_Employees_NewModalController extends Controller {
   open(event) {
     event.preventDefault()
     // You can pass dynamic data here if needed
-    const branches = JSON.parse(this.element.dataset.branches || "[]")
+    const branches = currentBranches()
     openModal({ html: this.modalHTML(branches) })
   }
 
