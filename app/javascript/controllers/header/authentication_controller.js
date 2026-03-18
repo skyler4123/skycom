@@ -1,5 +1,5 @@
 import { Controller } from "@hotwired/stimulus";
-import * as Helpers from "controllers/helpers"
+
 import Home_IndexController from "controllers/home/index_controller";
 
 export default class Header_AuthenticationController extends Controller {

@@ -1,7 +1,7 @@
 //  https://fonts.google.com/icons
 
 import { Controller } from "@hotwired/stimulus"
-import * as Helpers from "controllers/helpers"
+
 
 export default class Retail_Management_LayoutController extends Controller {
   static targets = ["profileDropdown"]

@@ -1,5 +1,5 @@
 import { Controller } from "@hotwired/stimulus"
-import * as Helpers from "controllers/helpers"
+
 
 export default class Home_IndexController extends Controller {
   static targets = ["signInButton", "signUpButton"]

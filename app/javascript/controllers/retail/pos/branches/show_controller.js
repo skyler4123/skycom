@@ -1,5 +1,5 @@
 import Retail_Pos_LayoutController from "controllers/retail/pos/layout_controller"
-import * as Helpers from "controllers/helpers"
+
 import Retail_Pos_Branches_SettingController from "controllers/retail/pos/branches/setting_controller"
 
 export default class Retail_Pos_Branches_ShowController extends Retail_Pos_LayoutController {

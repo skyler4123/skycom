@@ -9,7 +9,7 @@
 //   languageCodeTextTarget()
 
 import { Controller } from "@hotwired/stimulus"
-import * as Helpers from "controllers/helpers";
+
 
 export default class LanguageController extends Controller {
   static targets = ["codeText", "word", "triggerDropdown"];

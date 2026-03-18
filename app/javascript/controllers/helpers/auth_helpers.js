@@ -71,7 +71,7 @@ export const currentUser = () => {
 }
 
 export const isSignedIn = () => {
-  return !!currentUser(); // Returns true if user data exists in LocalStorage
+  return Cookie('is_signed_in') && Cookie('is_signed_in') === 'true'
 }
 
 // --- Paths ---
