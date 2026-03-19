@@ -3,7 +3,7 @@ import { Controller } from "@hotwired/stimulus";
 import Home_SigninModalController from "controllers/home/signin_modal_controller";
 import Home_SignupModalController from "controllers/home/signup_modal_controller";
 
-export default class Header_AuthenticationController extends Controller {
+export default class Home_Header_AuthenticationController extends Controller {
   static targets = ["signInButton", "signUpButton"]
   static values = {
     isSignedIn: { type: Boolean, default: false }
