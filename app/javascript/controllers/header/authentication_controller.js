@@ -1,7 +1,7 @@
 import { Controller } from "@hotwired/stimulus";
 
-import Home_IndexController from "controllers/home/index_controller";
 import Home_SigninModalController from "controllers/home/signin_modal_controller";
+import Home_SignupModalController from "controllers/home/signup_modal_controller";
 
 export default class Header_AuthenticationController extends Controller {
   static targets = ["signInButton", "signUpButton"]
@@ -29,6 +29,13 @@ export default class Header_AuthenticationController extends Controller {
     event.preventDefault()
     openModal({
       html: `<div data-controller="${identifier(Home_SigninModalController)}"></div>`
+    })
+  }
+
+  openSignUpModal(event) {
+    event.preventDefault()
+    openModal({
+      html: `<div data-controller="${identifier(Home_SignupModalController)}"></div>`
     })
   }
 
@@ -61,7 +68,7 @@ export default class Header_AuthenticationController extends Controller {
       </button>
       <button
         role="sign-up-button"
-        data-${Helpers.identifier(Home_IndexController)}-target="signUpButton"
+        data-action="click->${this.identifier}#openSignUpModal"
         data-home--index-target="signUpButton"
         class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-4 bg-indigo-600 text-white text-sm font-bold leading-normal tracking-[0.015em]">
         <span class="truncate">Sign Up</span>
