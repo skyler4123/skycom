@@ -1,6 +1,7 @@
 import { Controller } from "@hotwired/stimulus";
 
 import Home_IndexController from "controllers/home/index_controller";
+import Home_SigninModalController from "controllers/home/signin_modal_controller";
 
 export default class Header_AuthenticationController extends Controller {
   static targets = ["signInButton", "signUpButton"]
@@ -47,8 +48,7 @@ export default class Header_AuthenticationController extends Controller {
     this.element.innerHTML = `
       <button
         role="sign-in-button"
-        data-${Helpers.identifier(Home_IndexController)}-target="signInButton"
-        data-home--index-target="signInButton"
+        data-controller="${identifier(Home_SigninModalController)}"
         class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-4 bg-slate-200 dark:bg-slate-700 text-slate-900 dark:text-slate-100 text-sm font-bold leading-normal tracking-[0.015em]">
         <span class="truncate">Sign In</span>
       </button>
