@@ -25,6 +25,13 @@ export default class Header_AuthenticationController extends Controller {
     }
   }
 
+  openSignInModal(event) {
+    event.preventDefault()
+    openModal({
+      html: `<div data-controller="${identifier(Home_SigninModalController)}"></div>`
+    })
+  }
+
   renderSignedIn() {
     this.element.innerHTML = `
       <div class="flex items-center gap-2">
@@ -48,7 +55,7 @@ export default class Header_AuthenticationController extends Controller {
     this.element.innerHTML = `
       <button
         role="sign-in-button"
-        data-controller="${identifier(Home_SigninModalController)}"
+        data-action="click->${this.identifier}#openSignInModal"
         class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-4 bg-slate-200 dark:bg-slate-700 text-slate-900 dark:text-slate-100 text-sm font-bold leading-normal tracking-[0.015em]">
         <span class="truncate">Sign In</span>
       </button>

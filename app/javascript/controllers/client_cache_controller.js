@@ -5,7 +5,6 @@ export default class ClientCacheController extends Controller {
   static values = { version: String }
 
   connect() {
-    console.log(this)
     this.sync()
   }
 

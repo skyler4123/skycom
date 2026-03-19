@@ -2,22 +2,11 @@ import { Controller } from "@hotwired/stimulus"
 
 export default class Home_SigninModalController extends Controller {
   connect() {
-    this.initActions()
-  }
-
-  initActions() {
-    addAction(this.element, `click->${this.identifier}#openModal`)
-  }
-
-  openModal(event) {
-    event.preventDefault()
-    openModal({
-      html: this.modalHTML()
-    })
+    console.log(this)
+    this.element.innerHTML = this.modalHTML()
   }
 
   closeModal(event) {
-    console.log(event)
     event.preventDefault()
     closeModal()
   }
@@ -27,7 +16,6 @@ export default class Home_SigninModalController extends Controller {
       <div class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 backdrop-blur-sm p-4">
         <div class="relative w-full max-w-[480px] rounded-xl bg-white p-6 shadow-2xl md:p-8 dark:bg-slate-800">
           <button
-            
             class="absolute right-4 top-4 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 cursor-pointer">
             <span data-action="click->${this.identifier}#closeModal" class="material-symbols-outlined">close</span>
           </button>
