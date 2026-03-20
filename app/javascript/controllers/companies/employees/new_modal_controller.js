@@ -2,18 +2,7 @@ import { Controller } from "@hotwired/stimulus"
 
 export default class Companies_Employees_NewModalController extends Controller {
   connect() {
-    this.initActions()
-  }
-
-  initActions() {
-    addAction(this.element, `click->${this.identifier}#open`)
-  }
-
-  open(event) {
-    event.preventDefault()
-    // You can pass dynamic data here if needed
-    const branches = currentBranches()
-    openModal({ html: this.modalHTML(branches) })
+    this.element.innerHTML = this.modalHTML()
   }
 
   modalHTML(branches = []) {

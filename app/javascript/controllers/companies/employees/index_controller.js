@@ -29,6 +29,10 @@ export default class Companies_Branches_EmployeesController extends Companies_La
     return html;
   }
 
+  openNewModal() {
+    openModal({ html: `<div data-controller="${identifier(Companies_Employees_NewModalController)}"></div>` })
+  }
+
   contentHTML() {
     // Local aliases for cleaner template interpolation
     const departmentFilter = this.filterData.departments;
@@ -84,7 +88,7 @@ export default class Companies_Branches_EmployeesController extends Companies_La
 
               <button
                 type="button"
-                data-controller="${identifier(Companies_Employees_NewModalController)}"
+                data-action="click->${this.identifier}#openNewModal"
                 class="flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors font-medium text-sm whitespace-nowrap cursor-pointer">
                 <span class="material-symbols-outlined text-[20px]">add</span>
                 Add
@@ -169,7 +173,7 @@ export default class Companies_Branches_EmployeesController extends Companies_La
           </div>
           
           <div class="flex justify-center pt-6">
-            ${typeof pagination === 'function' ? pagination(this.pagination) : ''}
+            ${pagination(this.pagination)}
           </div>
         </div>
       </div>

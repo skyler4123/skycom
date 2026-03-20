@@ -2,7 +2,6 @@ import { Controller } from "@hotwired/stimulus"
 
 export default class Home_SigninModalController extends Controller {
   connect() {
-    console.log(this)
     this.element.innerHTML = this.modalHTML()
   }
 
