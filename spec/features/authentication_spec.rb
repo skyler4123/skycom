@@ -42,31 +42,14 @@ RSpec.feature "Authentication", type: :feature, js: true do
 
   describe "Sign in with normal user" do
     let(:user) { create(:user, password: 'Password@1234', password_confirmation: 'Password@1234') }
-
+    let!(:before_session_count) { user.sessions.count }
+    
     it "signs me in", retry: 3, retry_wait: 10 do
-      visit root_path
-
-      # First attempt: click to open the sign-in form (modal/drawer/etc.)
-      click_on "Sign In"
-      click_on "Sign In"
-
-      # Try to find the form — Capybara will wait and retry automatically (up to ~2-5 seconds)
-      begin
-        sign_in_form = find('form[role="sign-in-form"]', wait: 0.2) # explicit short wait
-      rescue Capybara::ElementNotFound
-        # If not found/visible after waiting, click "Sign In" again (handles toggle bugs)
-        click_on "Sign In"
-        sign_in_form = find('form[role="sign-in-form"]') # will wait again with default timeout
-      end
-
-      within(sign_in_form) do
-        fill_in "Email", with: user.email
-        fill_in "Password", with: 'Password@1234'
-        click_button "Sign In"
-      end
+      sign_in(user)
 
       expect(page).to have_button("Sign Out")
       expect(page).to have_selector('[role="avatar"]')
+      expect(user.sessions.count - before_session_count).to equal 1
     end
   end
 end
