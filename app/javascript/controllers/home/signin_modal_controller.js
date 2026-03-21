@@ -51,7 +51,7 @@ export default class Home_SigninModalController extends Controller {
             <!-- Sign In Form -->
             <form
               role="sign-in-form"
-              action="${Helpers.signInPath()}"
+              action="${Helpers.sign_in_path()}"
               method="POST"
               class="">
               ${Helpers.formPostSecurityTags()}

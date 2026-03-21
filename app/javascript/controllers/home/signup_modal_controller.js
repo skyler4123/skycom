@@ -53,7 +53,7 @@ export default class Home_SignupModalController extends Controller {
             <!-- Form -->
             <form
               role="sign-up-form"
-              action="${Helpers.signUpPath()}"
+              action="${Helpers.sign_up_path()}"
               method="POST"
               class="">
               ${Helpers.formPostSecurityTags()}

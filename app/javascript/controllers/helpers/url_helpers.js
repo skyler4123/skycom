@@ -13,6 +13,12 @@
 // export const retail_management_roles_path = (retailId) => `/retail/${retailId}/management/roles`
 // export const retail_management_settings_path = (retailId) => `/retail/${retailId}/management/settings`
 // export const retail_management_users_path = (retailId) => `/retail/${retailId}/management/users`
+
+// --- Paths ---
+export const sign_in_path = () => `/sign_in`
+export const sign_up_path = () => `/sign_up`
+export const sign_out_path = () => `/sign_out`
+
 export const company_dashboards_path = (companyId) => `/companies/${companyId}/dashboards`
 
 export const company_branches_path = (companyId) => `/companies/${companyId}/branches`

@@ -73,22 +73,3 @@ export const currentUser = () => {
 export const isSignedIn = () => {
   return Cookie('is_signed_in') && Cookie('is_signed_in') === 'true'
 }
-
-// --- Paths ---
-/**
- * Returns the sign-in path.
- * @returns {string} "/sign_in"
- */
-export const signInPath = () => `/sign_in`
-
-/**
- * Returns the sign-up path.
- * @returns {string} "/sign_up"
- */
-export const signUpPath = () => `/sign_up`
-
-/**
- * Returns the sign-out path.
- * @returns {string} "/sign_out"
- */
-export const signOutPath = () => `/sign_out`
