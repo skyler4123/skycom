@@ -9,12 +9,16 @@ import { pathname } from "controllers/helpers/http_helpers"
 export const Cookie = (name) => {
   let cookie = {}
   document.cookie.split(';').forEach(function(el) {
-    let [k,v] = el.split('=');
-    if (!k) return;
-    let value = decodeURIComponent(v);
-    value = value.replace("+", ' ');
+    let [k, v] = el.split('=');
+    if (!k || v === undefined) return;
+    
+    // 1. Replace ALL '+' with spaces first
+    // 2. Then decode the URI components
+    let value = decodeURIComponent(v.replace(/\+/g, ' '));
+    
     cookie[k.trim()] = value;
   })
+  
   if (name) {
     return cookie[name]
   } else {
@@ -39,53 +43,43 @@ export const setCookie = (name, value, days) => {
 }
 
 /**
- * Retrieves the list of companies from the 'companies' cookie.
- * @returns {Array<object>} An array of company group objects.
+ * Removes a cookie by setting its expiration date to the past.
+ * @param {string} name - The name of the cookie to remove.
  */
-export const currentCompanies = () => {
-  const c = Cookie('companies');
-  return c ? JSON.parse(c) : [];
+export const removeCookie = (name) => {
+  // We set the date to Epoch (Jan 1, 1970) to ensure it is expired
+  console.log(name)
+  document.cookie = name + "=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;"
 }
 
-export const currentUser = () => {
-  const c = Cookie('current_user');
-  return c ? JSON.parse(c) : null;
+export const getCache = () => {
+  const raw = localStorage.getItem('client_cache_data')
+  return raw ? JSON.parse(raw) : {}
+}
+
+export const currentCompanies = () => {
+  return getCache().companies || []
 }
 
 export const currentCompany = () => {
-  const companies = currentCompanies();
-  const currentPath = pathname();
-
-  if (!Array.isArray(companies)) {
-    return null;
-  }
-  return companies.find(group => currentPath.includes(String(group.id)));
+  const companies = currentCompanies()
+  const path = window.location.pathname
+  return companies.find(c => path.includes(String(c.id))) || null
 }
 
+export const currentBranches = () => {
+  return currentCompany()?.branches || []
+}
 
 /**
- * Checks if the user is signed in based on the 'is_signed_in' cookie.
- * @returns {boolean} True if signed in, false otherwise.
+ * Retrieves the current user profile from the client cache.
+ * @returns {object|null} The user object (id, email, avatar, etc.) or null if not found.
  */
+export const currentUser = () => {
+  const cache = getCache(); // Uses the getCache helper we defined earlier
+  return cache.user || null;
+}
+
 export const isSignedIn = () => {
   return Cookie('is_signed_in') && Cookie('is_signed_in') === 'true'
 }
-
-// --- Paths ---
-/**
- * Returns the sign-in path.
- * @returns {string} "/sign_in"
- */
-export const signInPath = () => `/sign_in`
-
-/**
- * Returns the sign-up path.
- * @returns {string} "/sign_up"
- */
-export const signUpPath = () => `/sign_up`
-
-/**
- * Returns the sign-out path.
- * @returns {string} "/sign_out"
- */
-export const signOutPath = () => `/sign_out`

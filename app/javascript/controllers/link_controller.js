@@ -2,7 +2,7 @@
 // data-link-target="openByPathname"
 
 import { Controller } from "@hotwired/stimulus"
-import * as Helpers from "controllers/helpers"
+
 
 export default class LinkController extends Controller {
   static targets = ["link", "openByPathname"]

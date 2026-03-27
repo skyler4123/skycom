@@ -1,5 +1,5 @@
 import { Controller } from "@hotwired/stimulus"
-import * as Helpers from "controllers/helpers"
+
 
 export default class Education_LayoutController extends Controller {
   static targets = ["profileDropdown"]

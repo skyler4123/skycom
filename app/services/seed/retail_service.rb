@@ -1,8 +1,8 @@
 class Seed::RetailService
   EMPLOYEE_COUNTS = {
-    branch_manager: 1,
+    manager: 1,
     cashier: 3,
-    sales_associate: 5,
+    sales_associate: 210,
     stock_clerk: 2
   }.freeze
 
@@ -10,7 +10,7 @@ class Seed::RetailService
   RETAIL_ROLES = (EMPLOYEE_COUNTS.keys + CUSTOMER_COUNTS.keys).freeze
   COMPANY_GROUP_BUSINESS_TYPE = :retail
 
-  def initialize(user:)
+  def initialize(user:, email: Faker::Internet.email)
     @multi_company_owner = user
     @retail = nil
     @branches = []
@@ -21,7 +21,8 @@ class Seed::RetailService
     @loyalty_programs = []
     @products = []
     @services = []
-
+    @email = email
+    @company_email_full_domain = EmailService.new(email).full_domain
     seeding
   end
 
@@ -65,7 +66,8 @@ class Seed::RetailService
     puts "Creating retail group..."
     @retail = Seed::CompanyService.create(
       user: @multi_company_owner,
-      name: "Company #{rand(1000..9999)}",
+      name: "Company #{Company.count + 1}",
+      email: @email,
       description: "A group for multiple retail branch branches",
       business_type: COMPANY_GROUP_BUSINESS_TYPE
     )
@@ -172,12 +174,12 @@ class Seed::RetailService
   end
 
   def create_employees
-    @branches.each do |branch|
+    @branches.each_with_index do |branch, index|
       branch_employees = []
       
       EMPLOYEE_COUNTS.each do |role_name, count|
         count.times do |i|
-          user = Seed::UserService.create(parent_user: @multi_company_owner, email: "#{role_name}_#{i + 1}_#{branch.id}@example.com")
+          user = Seed::UserService.create(parent_user: @multi_company_owner, email: "#{role_name}_#{i + 1}_branch_#{index + 1}@#{@company_email_full_domain}")
           employee = Seed::EmployeeService.create(
             user: user, company: @retail, branch: branch,
             name: "Employee #{i + 1} - #{role_name.to_s.titleize}"
@@ -192,24 +194,6 @@ class Seed::RetailService
   end
 
   def assign_employees_to_departments
-    # @branches.each do |branch|
-    #   branch_employees = []
-      
-    #   EMPLOYEE_COUNTS.each do |role_name, count|
-    #     count.times do |i|
-    #       user = Seed::UserService.create(parent_user: @multi_company_owner, email: "#{role_name}_#{i + 1}_#{branch.id}@example.com")
-    #       employee = Seed::EmployeeService.create(
-    #         user: user, company: @retail, branch: branch,
-    #         name: "Employee #{i + 1} - #{role_name.to_s.titleize}"
-    #       )
-    #       employee.attach_role(role_name)
-    #       branch_employees << employee
-    #     end
-    #   end
-      
-    #   @employees.concat(branch_employees)
-    #   assign_employees_to_random_dept(branch, branch_employees)
-    # end
     @employees.each do |employee|
       Seed::DepartmentAppointmentService.create(
         department: @departments.sample,
@@ -217,13 +201,6 @@ class Seed::RetailService
       )
     end
   end
-
-  # def assign_employees_to_random_dept(branch, employees)
-  #   branch_depts = @departments.select { |d| d.branch_id == branch.id }
-  #   employees.each do |employee|
-  #     Seed::EmployeeGroupAppointmentService.create(employee_group: branch_depts.sample, appoint_to: employee)
-  #   end
-  # end
 
   def create_customers_for_company
     @branches.each do |branch|
@@ -319,7 +296,7 @@ class Seed::RetailService
     # Actions: create, read, update, delete
 
     role_definitions = {
-      branch_manager: {
+      manager: {
         "Order" => [ "create", "read", "update", "delete" ],
         "Product" => [ "create", "read", "update", "delete" ],
         "Employee" => [ "create", "read", "update", "delete" ],

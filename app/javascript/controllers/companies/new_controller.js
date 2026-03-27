@@ -1,5 +1,4 @@
 import LayoutController from "controllers/layout_controller"
-import * as Helpers from "controllers/helpers"
 import { CURRENCIE_CODES, TIMEZONES, COUNTRIE_CODES } from "controllers/constants"
 import { ROUTES } from "controllers/routes"
 

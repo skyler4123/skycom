@@ -9,7 +9,13 @@ import * as Helpers from "controllers/helpers"
 window.Helpers = Helpers;
 
 // 2. Core Utilities
+window.Cookie = Helpers.Cookie
+window.setCookie = Helpers.setCookie
+window.removeCookie = Helpers.removeCookie
 window.fetchJson = Helpers.fetchJson
+window.pathname = Helpers.pathname
+window.addAttribute = Helpers.addAttribute
+window.addAction = Helpers.addAction
 window.translate = Helpers.translate
 window.poll = Helpers.poll
 window.openByPathname = Helpers.openByPathname
@@ -27,8 +33,17 @@ window.transformValues = Helpers.transformValues
 window.isPresent = Helpers.isPresent
 window.isEmpty = Helpers.isEmpty
 window.sort = Helpers.sort
+window.pagination = Helpers.pagination
+window.randomId = Helpers.randomId
+window.openModal = Helpers.openModal
+window.closeModal = Helpers.closeModal
+window.openPopover = Helpers.openPopover
+window.form = Helpers.form
 
 // 4. Data Getters (Safe from Race Conditions)
 // This allows you to use 'currentCompany()' as a variable that always fetches fresh data
 window.currentCompanies = Helpers.currentCompanies
 window.currentCompany = Helpers.currentCompany
+window.currentBranches = Helpers.currentBranches
+window.currentUser = Helpers.currentUser
+window.isSignedIn = Helpers.isSignedIn

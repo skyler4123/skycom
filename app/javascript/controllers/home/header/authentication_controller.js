@@ -1,8 +1,9 @@
 import { Controller } from "@hotwired/stimulus";
-import * as Helpers from "controllers/helpers"
-import Home_IndexController from "controllers/home/index_controller";
 
-export default class Header_AuthenticationController extends Controller {
+import Home_SigninModalController from "controllers/home/signin_modal_controller";
+import Home_SignupModalController from "controllers/home/signup_modal_controller";
+
+export default class Home_Header_AuthenticationController extends Controller {
   static targets = ["signInButton", "signUpButton"]
   static values = {
     isSignedIn: { type: Boolean, default: false }
@@ -24,6 +25,20 @@ export default class Header_AuthenticationController extends Controller {
     }
   }
 
+  openSignInModal(event) {
+    event.preventDefault()
+    openModal({
+      html: `<div data-controller="${identifier(Home_SigninModalController)}"></div>`
+    })
+  }
+
+  openSignUpModal(event) {
+    event.preventDefault()
+    openModal({
+      html: `<div data-controller="${identifier(Home_SignupModalController)}"></div>`
+    })
+  }
+
   renderSignedIn() {
     this.element.innerHTML = `
       <div class="flex items-center gap-2">
@@ -33,7 +48,7 @@ export default class Header_AuthenticationController extends Controller {
           style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuDmCMcaKuxM-L3kekIel30wVgf_J-ssrf86FqOelUJrmeAHwneIxkCor7hKn3SzOtbLg3DrSVpbI77hxo-i174Ll7V-lQ8CTCQB3H9YEA5_LSG8vyi_FynSf8l4w3lgYkc2uFLpD4U1w_DzdTIiCUzYkrAkVoZumb-iT_CjUsLofbZCfryp_hfJBATT8XUgqjbHSZdKEhdoREZiwf1ZCevLreCxK463hwZhGxwb6xu2NoSIYjbWxlfEmD5ABwPppLeyiUqyCCWWVw0");'>
         </div>
       </div>
-      <a href="${Helpers.signOutPath()}">
+      <a href="${Helpers.sign_out_path()}">
         <button
           role="sign-out-button"
           class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-4 bg-slate-200 dark:bg-slate-700 text-slate-900 dark:text-slate-100 text-sm font-bold leading-normal tracking-[0.015em]">
@@ -47,14 +62,13 @@ export default class Header_AuthenticationController extends Controller {
     this.element.innerHTML = `
       <button
         role="sign-in-button"
-        data-${Helpers.identifier(Home_IndexController)}-target="signInButton"
-        data-home--index-target="signInButton"
+        data-action="click->${this.identifier}#openSignInModal"
         class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-4 bg-slate-200 dark:bg-slate-700 text-slate-900 dark:text-slate-100 text-sm font-bold leading-normal tracking-[0.015em]">
         <span class="truncate">Sign In</span>
       </button>
       <button
         role="sign-up-button"
-        data-${Helpers.identifier(Home_IndexController)}-target="signUpButton"
+        data-action="click->${this.identifier}#openSignUpModal"
         data-home--index-target="signUpButton"
         class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-4 bg-indigo-600 text-white text-sm font-bold leading-normal tracking-[0.015em]">
         <span class="truncate">Sign Up</span>

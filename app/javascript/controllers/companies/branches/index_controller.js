@@ -1,4 +1,3 @@
-import * as Helpers from "controllers/helpers"
 import Companies_LayoutController from "controllers/companies/layout_controller"
 import Companies_Branches_NewBranchModalController from "controllers/companies/branches/new_branch_modal_controller"
 
@@ -10,7 +9,13 @@ export default class Companies_Branches_IndexController extends Companies_Layout
       super.connect()
       const response = await fetchJson();
       this.branches = response.branches || []
-      this.renderContent()
+      poll(() => {
+        if (isPresent(this.branches)) {
+          this.renderContent();
+          return true; // Stop polling
+          }
+        return false; // Keep polling
+      });
     }
   
 

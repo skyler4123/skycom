@@ -1,4 +1,3 @@
-import * as Helpers from "controllers/helpers"
 import Companies_LayoutController from "controllers/companies/layout_controller"
 
 export default class Companies_Products_IndexController extends Companies_LayoutController {
