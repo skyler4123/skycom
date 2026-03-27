@@ -15,6 +15,7 @@
 // export const retail_management_users_path = (retailId) => `/retail/${retailId}/management/users`
 
 // --- Paths ---
+export const root_path = () => `/`
 export const sign_in_path = () => `/sign_in`
 export const sign_up_path = () => `/sign_up`
 export const sign_out_path = () => `/sign_out`

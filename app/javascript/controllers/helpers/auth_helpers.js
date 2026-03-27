@@ -42,6 +42,16 @@ export const setCookie = (name, value, days) => {
   document.cookie = name + "=" + value + expires + "; path=/"
 }
 
+/**
+ * Removes a cookie by setting its expiration date to the past.
+ * @param {string} name - The name of the cookie to remove.
+ */
+export const removeCookie = (name) => {
+  // We set the date to Epoch (Jan 1, 1970) to ensure it is expired
+  console.log(name)
+  document.cookie = name + "=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;"
+}
+
 export const getCache = () => {
   const raw = localStorage.getItem('client_cache_data')
   return raw ? JSON.parse(raw) : {}
