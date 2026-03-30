@@ -16,6 +16,7 @@ module ApplicationController::AuthenticationConcern
   end
 
   def is_signed_in?
+    return false unless cookies[:is_signed_in]
     current_session.present?
   end
 

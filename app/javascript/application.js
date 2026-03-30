@@ -10,6 +10,8 @@ window.Helpers = Helpers;
 
 // 2. Core Utilities
 window.Cookie = Helpers.Cookie
+window.setCookie = Helpers.setCookie
+window.removeCookie = Helpers.removeCookie
 window.fetchJson = Helpers.fetchJson
 window.pathname = Helpers.pathname
 window.addAttribute = Helpers.addAttribute
@@ -44,3 +46,4 @@ window.currentCompanies = Helpers.currentCompanies
 window.currentCompany = Helpers.currentCompany
 window.currentBranches = Helpers.currentBranches
 window.currentUser = Helpers.currentUser
+window.isSignedIn = Helpers.isSignedIn
