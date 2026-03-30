@@ -1,1 +1,0 @@
-json.partial! "system_subscription_groups/system_subscription_group", system_subscription_group: @system_subscription_group
