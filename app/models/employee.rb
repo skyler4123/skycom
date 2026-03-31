@@ -1,3 +1,5 @@
+# app/models/employee.rb
+
 class Employee < ApplicationRecord
   include AddressConcern
   include RoleConcern

@@ -1,0 +1,68 @@
+name: My Local Ollama Setup
+version: 1.0.0
+schema: v1
+
+models:
+  - name: Qwen2.5 Coder 7B
+    provider: ollama
+    model: qwen2.5-coder:7b
+    defaultCompletionOptions:
+      temperature: 0.2
+
+  # Main model for Chat, Edit, Apply, Agent mode (best quality/speed balance for you)
+  - name: Qwen2.5 Coder 14B
+    provider: ollama
+    model: qwen2.5-coder:14b-instruct
+    # Optional: tune these if needed
+    # contextLength: 32768
+    # temperature: 0.2
+
+  # Alternative strong reasoning model (uncomment if you prefer it over 14B)
+  # - name: DeepSeek R1 32B
+  #   provider: ollama
+  #   model: deepseek-r1:32b
+
+  # Fast autocomplete model (critical for good UX)
+  - name: Qwen2.5 Coder 1.5B (Autocomplete)
+    provider: ollama
+    model: qwen2.5-coder:1.5b
+    roles:
+      - autocomplete
+
+  # Optional extra models (you can switch between them in Continue UI)
+  - name: DeepSeek Coder V2 16B
+    provider: ollama
+    model: deepseek-coder-v2:16b-lite-instruct-q8_0
+
+  - name: Gemma2 27B
+    provider: ollama
+    model: gemma2:27b
+
+  - name: Llama 3.1
+    provider: ollama
+    model: llama3.1:latest
+
+# Optional: Set default tab autocomplete model explicitly
+tabAutocompleteModel:
+  name: Qwen2.5 Coder 1.5B (Autocomplete)
+  provider: ollama
+  model: qwen2.5-coder:1.5b
+
+# Embeddings (already have nomic-embed-text — great for @codebase / RAG features)
+embeddings:
+  provider: ollama
+  model: nomic-embed-text:latest
+
+# MCP Servers (you can expand this later)
+# mcpServers:
+#   - uses: anthropic/memory-mcp
+    # Add more here, e.g. filesystem, browser, git, etc. when you need them
+
+# Codebase indexing settings (optional but helpful for large Rails apps)
+codebase:
+  # You can limit the number of files if indexing is too slow
+  # maxFiles: 15000
+
+  # Chunking settings (good defaults for Ruby)
+  chunkSize: 512
+  # overlap: 100   # uncomment if needed
