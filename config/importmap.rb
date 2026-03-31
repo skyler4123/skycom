@@ -10,3 +10,4 @@ pin "dayjs" # @1.11.19
 pin "stimulus-use" # @0.52.3
 pin "apexcharts" # @5.3.6
 pin "swiper" # @12.0.3
+pin "toastify-js" # @1.12.0

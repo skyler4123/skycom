@@ -1,5 +1,6 @@
 import Swal from 'sweetalert2';
 import dayjs from 'dayjs';
+import Toastify from 'toastify-js';
 import { capitalize } from "controllers/helpers/data_helpers" 
 
 /**
@@ -245,3 +246,22 @@ export const pagination = (dataValue, classNames = "") => `
   >
   </div>
 `
+
+export const toast = (options = {}) => {
+Toastify({
+  text: options.text || "This is a toast",
+  className: options.className || "",
+  duration: options.duration || 3000,
+  destination: options.destination || "https://github.com/apvarun/toastify-js",
+  newWindow: options.newWindow || true,
+  close: options.close || true,
+  gravity: options.gravity || "top", // `top` or `bottom`
+  position: options.position || "right", // `left`, `center` or `right`
+  stopOnFocus: options.stopOnFocus || true, // Prevents dismissing of toast on hover
+  style: {
+    background: "linear-gradient(to right, #00b09b, #96c93d)",
+    ...options.style
+  },
+  onClick: options.onClick || function(){} // Callback after click
+}).showToast();
+}

@@ -39,6 +39,7 @@ window.openModal = Helpers.openModal
 window.closeModal = Helpers.closeModal
 window.openPopover = Helpers.openPopover
 window.form = Helpers.form
+window.toast = Helpers.toast
 
 // 4. Data Getters (Safe from Race Conditions)
 // This allows you to use 'currentCompany()' as a variable that always fetches fresh data
