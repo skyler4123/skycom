@@ -1,0 +1,11 @@
+vendor/
+node_modules/
+log/
+tmp/
+public/assets/
+public/packs/
+storage/
+coverage/
+.git/
+*.log
+*.sqlite3
