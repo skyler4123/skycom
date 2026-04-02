@@ -137,3 +137,56 @@ class Employee < ApplicationRecord
   enum :lifecycle_status, LIFECYCLE_STATUS, prefix: true
   enum :workflow_status, WORKFLOW_STATUS, prefix: true
 end
+```
+
+### Global JavaScript Helpers from application.js (CRITICAL)
+
+In addition to the helpers above, `application.js` exposes many **global helper functions** on the `window` object. 
+
+**AI MUST know and prioritize all these global methods** because the user asks about them frequently.
+
+```javascript
+// Core Utilities
+window.Helpers = Helpers;
+window.fetchJson = Helpers.fetchJson
+window.form = Helpers.form
+window.pathname = Helpers.pathname
+window.href = Helpers.href
+window.identifier = Helpers.identifier
+
+// Security
+window.csrfToken = Helpers.csrfToken
+window.formPostSecurityTags = Helpers.formPostSecurityTags
+window.formPatchSecurityTags = Helpers.formPatchSecurityTags
+
+// Collection & Utility Helpers
+window.keys = Helpers.keys
+window.values = Helpers.values
+window.entries = Helpers.entries
+window.each = Helpers.each
+window.eachWithIndex = Helpers.eachWithIndex
+window.map = Helpers.map
+window.isPresent = Helpers.isPresent
+window.isEmpty = Helpers.isEmpty
+window.sort = Helpers.sort
+window.pagination = Helpers.pagination
+window.randomId = Helpers.randomId
+
+// UI Helpers
+window.openModal = Helpers.openModal
+window.closeModal = Helpers.closeModal
+window.openPopover = Helpers.openPopover
+window.toast = Helpers.toast
+
+// Current Context Helpers
+window.currentCompany = Helpers.currentCompany
+window.currentCompanies = Helpers.currentCompanies
+window.currentBranches = Helpers.currentBranches
+window.currentUser = Helpers.currentUser
+window.isSignedIn = Helpers.isSignedIn
+
+// Cookie Helpers
+window.Cookie = Helpers.Cookie
+window.setCookie = Helpers.setCookie
+window.removeCookie = Helpers.removeCookie
+```
