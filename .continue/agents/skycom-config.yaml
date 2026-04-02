@@ -1,16 +1,16 @@
-name: Skycom - All Models Setup
+name: Skycom - Clean Setup
 version: 1.0.0
 schema: v1
 
 models:
-  # === Fast Autocomplete (kept as you requested) ===
-  - name: Qwen2.5 Coder 1.5B (Autocomplete)
+  # ── Fast Autocomplete ──
+  - name: Qwen2.5 Coder 1.5B
     provider: ollama
     model: qwen2.5-coder:1.5b
     roles:
       - autocomplete
 
-  # === Main Models for Chat / Edit / Apply ===
+  # ── Main Models for Chat / Edit / Apply ──
   - name: Qwen2.5 Coder 7B
     provider: ollama
     model: qwen2.5-coder:7b
@@ -19,40 +19,24 @@ models:
     provider: ollama
     model: qwen2.5-coder:3b
 
-  - name: Qwen2.5 Coder 14B
-    provider: ollama
-    model: qwen2.5-coder:14b-instruct
-
   - name: Llama 3.1 8B
     provider: ollama
-    model: llama3.1:latest
+    model: llama3.1:8b
 
-  - name: Gemma2 27B
+  - name: Qwen2.5 7B (General)
     provider: ollama
-    model: gemma2:27b
+    model: qwen2.5:7b
 
-  - name: DeepSeek Coder V2 16B Lite
-    provider: ollama
-    model: deepseek-coder-v2:16b-lite-instruct-q8_0
-
-  - name: DeepSeek R1 32B
-    provider: ollama
-    model: deepseek-r1:32b
-
-  - name: Command-R
-    provider: ollama
-    model: command-r:latest
-
-# Tab Autocomplete (unchanged as per your request)
+# ── Tab Autocomplete (Very Important) ──
 tabAutocompleteModel:
-  name: Qwen2.5 Coder 1.5B (Autocomplete)
+  name: Qwen2.5 Coder 3B
   provider: ollama
-  model: qwen2.5-coder:1.5b
+  model: qwen2.5-coder:3b
 
-# Embeddings (good for @codebase)
+# ── Embeddings for @codebase ──
 embeddings:
   provider: ollama
   model: nomic-embed-text:latest
 
-# Optional: Remove or comment out if you still see "Memory" error
+# Disable MCP to avoid Memory error
 mcpServers: []

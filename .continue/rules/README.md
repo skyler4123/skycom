@@ -13,11 +13,12 @@ This is a standard Ruby on Rails application (likely Rails 7+).
 - `app/models/` - ActiveRecord models
 - `app/controllers/` - Controllers (JSON API style)
 - `app/views/` - ERB or other templates
-- `app/services/` or `app/interactors/` - Business logic
+- `app/services/` - Service objects for business logic
+- `app/interactors/` - Interactors (if used)
 - `app/jobs/` - Background jobs (Sidekiq, etc.)
 - `app/mailers/` - Mailers
 - `config/routes.rb` - All routes
-- `db/schema.rb` or `db/structure.sql` - Database schema
+- `db/schema.rb` or `db/structure.sql` - Database schema (always check this first)
 - `app/api/` or `app/graphql/` - If using Grape, GraphQL, etc.
 
 ### Coding Conventions
@@ -26,17 +27,20 @@ This is a standard Ruby on Rails application (likely Rails 7+).
 - Prefer service objects for complex logic
 - Write tests in `test/` or `spec/` (RSpec/Minitest)
 - Use `frozen_string_literal: true` when possible
+- Prefer explicit and readable code over clever one-liners
 
 ### Database & Models
-- Always check `db/schema.rb` for current columns and indexes
+- Always check `db/schema.rb` for current columns and indexes before writing queries
 - Models inherit from `ApplicationRecord`
 - Use scopes for common queries
 - Prefer `includes` / `eager_load` / `preload` to avoid N+1 queries
+- Use `find_by!` and `find!` when the record is expected to exist
 
 ### When Editing Code
-- Always respect existing style and patterns
+- Always respect existing style and patterns in the file
 - Prefer `find_by!` / `find!` when record must exist
-- Use `present?` / `blank?` instead of checking nil + empty
+- Use `present?` / `blank?` instead of checking `nil` + `empty?`
+- Keep models lean by moving logic into concerns or services when appropriate
 
 ---
 
@@ -46,7 +50,7 @@ Skycom is a **multi-tenant business management platform**. It uses a non-traditi
 
 ### Core Principles
 1. **Shell-First Rendering**: Initial HTML returns an empty shell; Stimulus hydrates the page.
-2. **JSON-Only Data Flow**: Rails Controllers handle `.json` requests for data.
+2. **JSON-Only Data Flow**: Rails Controllers handle `.json` requests for data only.
 3. **Client-Side Templating**: Rendering happens in `contentHTML()` via ES6 Template Literals.
 
 ### Tech Stack
@@ -69,9 +73,11 @@ Skycom is a **multi-tenant business management platform**. It uses a non-traditi
 ### Stimulus Naming & Inheritance (CRITICAL)
 1. **Class Naming**: Use **Pascal_Snake_Case** (e.g., `Companies_Branches_EmployeesController`).
 2. **Identifier**: `Companies_LayoutController` → `companies--layout`. Use `window.identifier(Class)` to generate.
-3. **Inheritance**: Child controllers inherit all `static targets` from parents. Do **not** redefine them.
+3. **Inheritance**: Child controllers inherit all `static targets` from parents. **Do not** redefine them.
 
 ### Advanced Global Helpers (window.*) — AI MUST Prioritize These
+**Never suggest native `fetch()`, `$.ajax`, or plain `<form>` tags.**
+
 1. **`fetchJson(url|options, options)`**:
    - **Smart Default**: If `url` is omitted, it fetches from the CURRENT `window.location.href`.
    - **Security**: Automatically injects `X-CSRF-Token`.
