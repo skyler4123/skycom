@@ -368,25 +368,25 @@ export const pagination = (dataValue, classNames = "") => `
  */
 export const toast = ({ type = "normal", message = "" }) => {
   const themes = {
-    success: "bg-green-600 text-white border-green-700 shadow-lg",
-    error:   "bg-red-600 text-white border-red-700 shadow-lg",
-    info:    "bg-blue-600 text-white border-blue-700 shadow-lg",
-    warning: "bg-amber-500 text-white border-amber-600 shadow-lg",
-    normal:  "bg-slate-800 text-white border-slate-900 shadow-lg"
+    success: "!bg-green-600 text-white border-green-700 shadow-lg",
+    error:   "!bg-red-600 text-white border-red-700 shadow-lg",
+    info:    "!bg-blue-600 text-white border-blue-700 shadow-lg",
+    warning: "!bg-amber-500 text-white border-amber-600 shadow-lg",
+    normal:  "!bg-slate-800 text-white border-slate-900 shadow-lg"
   }
 
   const themeClasses = themes[type] || themes.normal
 
   Toastify({
     text: message || (type === "success" ? "Success!" : "Notice"),
-    duration: 3000,
+    duration: 300000,
     gravity: "top",
     position: "right",
     stopOnFocus: true,
     // Inject Tailwind classes here. Note: we reset 'style' to empty 
     // to prevent Toastify's default vanilla styles from interfering.
-    className: `rounded-lg px-4 py-3 border font-medium ${themeClasses}`,
-    style: { background: "unset" } 
+    className: `rounded-lg px-4 py-3 !bg-none border font-medium ${themeClasses}`,
+    // style: { background: "unset" } 
   }).showToast();
 }
 
@@ -429,7 +429,7 @@ export const form = ({
   }
 
   // Conditional Controller & Action strings
-  const controllerAttr = dataController ? `data-controller="${dataController}"` : ""
+  const controllerAttr = dataController ? `data-controller="${dataController}" data-action="submit->${dataController}#submit"` : ""
   const actionAttr = (dataController && dataAction) ? `data-action="${dataAction}"` : ""
 
   return `

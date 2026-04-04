@@ -19,20 +19,20 @@ export default class extends Controller {
 
     try {
       // Use your global fetchJson (which handles CSRF)
-      const response = await window.fetchJson(url, {
+      const response = await fetchJson(url, {
         method: method,
         body: body
       })
 
       // Success Response handling
-      window.toast({ 
+      toast({ 
         type: "success", 
         message: response?.message || "Successfully saved" 
       })
 
       // If the form is inside a SweetAlert modal, close it
       if (document.querySelector('.swal2-container')) {
-        window.closeModal()
+        closeModal()
       }
 
       // Dispatch a success event so parent controllers can refresh UI (e.g. reload lists)
@@ -40,7 +40,7 @@ export default class extends Controller {
 
     } catch (error) {
       // Error Response handling
-      window.toast({ 
+      toast({ 
         type: "error", 
         message: error.message || "Failed to process request" 
       })
