@@ -4,6 +4,7 @@
 class Seed::CustomerGroupService
   def self.create(
     company:,
+    email: "customer_group_#{SecureRandom.hex}@gmail.com",
     branch: nil,
     name: Faker::Name.name,
     description: Faker::Lorem.sentence(word_count: 10),
@@ -16,6 +17,7 @@ class Seed::CustomerGroupService
     CustomerGroup.create!(
       company: company,
       branch: branch,
+      email: email,
       name: name,
       description: description,
       code: code,

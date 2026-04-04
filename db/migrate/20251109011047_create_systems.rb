@@ -1,6 +1,7 @@
 class CreateSystems < ActiveRecord::Migration[8.0]
   def change
     create_table :systems, id: :uuid do |t|
+      t.string :email
       # Identity
       t.string :name, null: false, default: "System"
       t.string :code, null: false, comment: "System"

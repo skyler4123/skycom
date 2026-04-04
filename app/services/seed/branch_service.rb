@@ -5,6 +5,7 @@
 class Seed::BranchService
   def self.create(
     company:,
+    email: "branch_#{SecureRandom.hex}@gmail.com",
     name: Faker::Name.name,
     description: Faker::Company.catch_phrase,
     lifecycle_status: Branch.lifecycle_statuses.keys.sample,
@@ -19,7 +20,6 @@ class Seed::BranchService
     city: Faker::Address.city,
     postal_code: Faker::Address.postcode,
     country_code: Branch.country_codes.keys.sample,
-    email: Faker::Internet.email,
     phone_number: Faker::PhoneNumber.phone_number,
     website: Faker::Internet.url,
     fiscal_year_end_month: Branch.fiscal_year_end_months.keys.sample,

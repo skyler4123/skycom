@@ -1,7 +1,7 @@
 class Seed::UserService
   def self.create(
     parent_user: nil,
-    email: Faker::Internet.unique.email,
+    email: "user_#{SecureRandom.hex}@gmail.com",
     password: "Password@1234",
     password_confirmation: "Password@1234",
     verified: true,
