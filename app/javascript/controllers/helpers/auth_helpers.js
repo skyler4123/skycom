@@ -1,4 +1,4 @@
-import { pathname } from "controllers/helpers/http_helpers"
+import { pathname } from "controllers/helpers/ui_helpers"
 
 // --- Cookie Logic ---
 /**

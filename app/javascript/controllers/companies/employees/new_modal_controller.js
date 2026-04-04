@@ -1,12 +1,55 @@
+// app/javascript/controllers/companies/employees/new_modal_controller.js
+
 import { Controller } from "@hotwired/stimulus"
 
 export default class Companies_Employees_NewModalController extends Controller {
   connect() {
-    this.element.innerHTML = this.modalHTML()
+    // We assume branches might be passed via data attributes on the element
+    const branches = JSON.parse(this.element.dataset.branches || "[]")
+    this.element.innerHTML = this.modalHTML(branches)
+  }
+
+  /**
+   * Handles the form submission using Skycom global helpers.
+   */
+  async submit(event) {
+    event.preventDefault()
+    const formElement = event.target
+    const formData = new FormData(formElement)
+
+    // Construct the payload matching your Rails employee_params
+    const payload = {
+      employee: {
+        name: formData.get("employee[name]"),
+        business_type: formData.get("employee[business_type]"),
+        branch_id: formData.get("employee[branch_id]"),
+        description: formData.get("employee[description]")
+      }
+    }
+
+    try {
+      // fetchJson automatically handles CSRF tokens and JSON headers
+      const response = await fetchJson(formElement.action, {
+        method: "POST",
+        body: payload
+      })
+
+      if (response && response.status === "success") {
+        toast({ text: response.message })
+        closeModal()
+        
+        // Custom Event to notify the IndexController to refresh its list
+        this.dispatch("created", { detail: { employee: response.employee } })
+      }
+    } catch (error) {
+      toast({ 
+        text: "Could not save employee. Please check your connection.",
+        style: { background: "linear-gradient(to right, #ff5f6d, #ffc371)" } 
+      })
+    }
   }
 
   modalHTML(branches = []) {
-    // Generate Branch options from the data-attribute
     const branchOptions = branches.map(b => 
       `<option value="${b.id}">${b.name}</option>`
     ).join('')
@@ -62,9 +105,11 @@ export default class Companies_Employees_NewModalController extends Controller {
       </div>
     `
 
+    // UPDATED: Added dataAction to point to the submit method of THIS controller
     return form({
-      action: pathname(), // Submits to current index path (POST /employees)
+      action: pathname(),
       method: "POST",
+      dataAction: `submit->${this.identifier}#submit`,
       className: "p-8 bg-white dark:bg-slate-900 rounded-2xl w-[500px] shadow-2xl border border-slate-100 dark:border-slate-800",
       html: fields
     })

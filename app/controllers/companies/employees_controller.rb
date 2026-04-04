@@ -32,7 +32,56 @@ class Companies::EmployeesController < Companies::ApplicationController
     end
   end
 
+  def create
+    respond_to do |format|
+      format.json do
+        begin
+          # Using your Seed::EmployeeService to handle the creation logic
+          @employee = Seed::EmployeeService.create(
+            company: current_company,
+            name: employee_params[:name],
+            description: employee_params[:description],
+            business_type: employee_params[:business_type],
+            # Optionally pass branch or user if provided in params
+            branch: current_company.branches.find_by(id: params[:branch_id]),
+            user: User.find_by(id: params[:user_id])
+          )
+
+          render json: {
+            status: "success",
+            message: "Employee created successfully.",
+            employee: format_single_employee(@employee)
+          }, status: :created
+
+        rescue ActiveRecord::RecordInvalid => e
+          render json: {
+            status: "error",
+            message: "Validation failed",
+            errors: e.record.errors.full_messages
+          }, status: :unprocessable_entity
+        rescue => e
+          render json: {
+            status: "error",
+            message: e.message
+          }, status: :internal_server_error
+        end
+      end
+    end
+  end
+
   private
+
+  def employee_params
+    params.require(:employee).permit(:name, :description, :business_type)
+  end
+
+  # Helper to format a single employee response, following your index pattern
+  def format_single_employee(employee)
+    employee.as_json(include: { user: { only: :email } }).merge(
+      roles: employee.roles.map { |r| { id: r.id, name: r.name } },
+      departments: employee.departments.map { |d| { id: d.id, name: d.name } }
+    )
+  end
 
   def format_employees(employees)
     employees.map do |employee|

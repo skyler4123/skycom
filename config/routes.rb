@@ -1,3 +1,5 @@
+# config/routes.rb
+
 Rails.application.routes.draw do
   resources :client_cache, only: [ :index ]
   resources :redirect do

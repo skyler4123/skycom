@@ -1,7 +1,120 @@
 import Swal from 'sweetalert2';
 import dayjs from 'dayjs';
 import Toastify from 'toastify-js';
-import { capitalize } from "controllers/helpers/data_helpers" 
+import { capitalize, isDefined } from "controllers/helpers/data_helpers" 
+
+/**
+ * Fetches JSON data from a URL with built-in support for query params, CSRF tokens, and JSON bodies.
+ * Can be called as `fetchJson(url, options)` or `fetchJson(options)` (uses current URL).
+ *
+ * @param {string|object} url - The URL to fetch or the options object.
+ * @param {object} [options={}] - Configuration options for the fetch request.
+ * @param {object} [options.params] - Key-value pairs to be appended as query parameters.
+ * @param {object} [options.headers] - Custom headers to include in the request.
+ * @param {any} [options.body] - The request body. If an object (and not FormData), it's JSON stringified.
+ * @returns {Promise<any>} A promise resolving to the JSON response or null (for 204).
+ */
+export const fetchJson = async (url, options = {}) => {
+  if (typeof url === 'object' && url !== null) {
+    options = url
+    url = window.location.href
+  } else if (!url) {
+    url = window.location.href
+  }
+
+  const { params, headers = {}, body, method = "GET", ...rest } = options
+
+  const requestUrl = new URL(url, window.location.origin)
+  if (params) {
+    Object.entries(params).forEach(([key, value]) => {
+      if (isDefined(value) && value !== null) {
+        requestUrl.searchParams.append(key, value)
+      }
+    })
+  }
+
+  const defaultHeaders = {
+    "Accept": "application/json"
+  }
+
+  if (requestUrl.origin === window.location.origin) {
+    defaultHeaders["X-CSRF-Token"] = csrfToken()
+  }
+
+  let requestBody = body
+  if (body && !(body instanceof FormData) && typeof body === 'object') {
+    defaultHeaders["Content-Type"] = "application/json"
+    requestBody = JSON.stringify(body)
+  }
+
+  const config = {
+    method,
+    headers: { ...defaultHeaders, ...headers },
+    body: requestBody,
+    ...rest
+  }
+
+  try {
+    const response = await fetch(requestUrl, config)
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`)
+    }
+    if (response.status === 204) return null
+    return await response.json()
+  } catch (error) {
+    console.error("fetchJson error:", error)
+    throw error
+  }
+}
+
+/**
+ * Retrieves the CSRF token from the meta tag in the document head.
+ * @returns {string} The CSRF token or an empty string if not found.
+ */
+export const csrfToken = () => {
+  const csrf = document.querySelector('meta[name="csrf-token"]')
+  return csrf ? csrf.content : ""
+}
+
+/**
+ * Generates an HTML string for a hidden input field containing the CSRF token.
+ * Useful for injecting into forms.
+ * @returns {string} The HTML string for the hidden input.
+ */
+export const formPostSecurityTags = () => {
+  const csrf = csrfToken()
+  return `<input type="hidden" name="authenticity_token" value="${csrf}" autocomplete="off">`
+}
+
+/**
+ * Generates HTML strings for hidden input fields to simulate a PATCH method and include the CSRF token.
+ * @returns {string} The HTML string for the hidden inputs.
+ */
+export const formPatchSecurityTags = () => {
+  const csrf = csrfToken()
+  return `
+    <input type="hidden" name="_method" value="patch" autocomplete="off">
+    <input type="hidden" name="authenticity_token" value="${csrf}" autocomplete="off">
+  `
+}
+
+/**
+ * Returns the current window pathname.
+ * @returns {string} window.location.pathname
+ */
+export const pathname = () => window.location.pathname
+
+/**
+ * Returns the current window href.
+ * @returns {string} window.location.href
+ */
+export const href = () => window.location.href
+
+/**
+ * Returns the current window origin.
+ * @returns {string} window.location.origin
+ */
+export const origin = () => window.location.origin
 
 /**
  * Formats a given time using dayjs.
@@ -247,21 +360,88 @@ export const pagination = (dataValue, classNames = "") => `
   </div>
 `
 
-export const toast = (options = {}) => {
-Toastify({
-  text: options.text || "This is a toast",
-  className: options.className || "",
-  duration: options.duration || 3000,
-  destination: options.destination || "https://github.com/apvarun/toastify-js",
-  newWindow: options.newWindow || true,
-  close: options.close || true,
-  gravity: options.gravity || "top", // `top` or `bottom`
-  position: options.position || "right", // `left`, `center` or `right`
-  stopOnFocus: options.stopOnFocus || true, // Prevents dismissing of toast on hover
-  style: {
-    background: "linear-gradient(to right, #00b09b, #96c93d)",
-    ...options.style
-  },
-  onClick: options.onClick || function(){} // Callback after click
-}).showToast();
+/**
+ * Displays a themed toast notification using Tailwind CSS classes.
+ * @param {object} options 
+ * @param {('success'|'error'|'info'|'warning'|'normal')} options.type - The status type.
+ * @param {string} options.message - The text to display.
+ */
+export const toast = ({ type = "normal", message = "" }) => {
+  const themes = {
+    success: "bg-green-600 text-white border-green-700 shadow-lg",
+    error:   "bg-red-600 text-white border-red-700 shadow-lg",
+    info:    "bg-blue-600 text-white border-blue-700 shadow-lg",
+    warning: "bg-amber-500 text-white border-amber-600 shadow-lg",
+    normal:  "bg-slate-800 text-white border-slate-900 shadow-lg"
+  }
+
+  const themeClasses = themes[type] || themes.normal
+
+  Toastify({
+    text: message || (type === "success" ? "Success!" : "Notice"),
+    duration: 3000,
+    gravity: "top",
+    position: "right",
+    stopOnFocus: true,
+    // Inject Tailwind classes here. Note: we reset 'style' to empty 
+    // to prevent Toastify's default vanilla styles from interfering.
+    className: `rounded-lg px-4 py-3 border font-medium ${themeClasses}`,
+    style: { background: "unset" } 
+  }).showToast();
+}
+
+/**
+ * Generates a Rails-compatible form wrapper.
+ * @param {object} options
+ * @param {string} [options.action=pathname()] - Form action URL.
+ * @param {string} [options.method="POST"] - HTTP method.
+ * @param {string} [options.dataController="form"] - The Stimulus controller to attach. Pass null to skip.
+ * @param {string} [options.dataAction="submit->form#submit"] - Stimulus actions.
+ * @param {string} [options.className="flex flex-col gap-4"] - Tailwind CSS classes.
+ * @param {string} [options.html=""] - Inner HTML content.
+ * @returns {string} The HTML form string.
+ */
+export const form = ({ 
+  action = pathname(), 
+  method = "POST", 
+  dataController = "form",
+  dataAction = "submit->form#submit", 
+  // className = "flex flex-col gap-4",
+  className = "", 
+  html = "" 
+}) => {
+  const upperMethod = method.toUpperCase()
+  const isGet = upperMethod === "GET"
+  
+  let methodTags = ""
+  let formMethod = upperMethod
+
+  // Rails method spoofing & CSRF
+  if (!isGet) {
+    formMethod = "POST"
+    if (upperMethod === "PATCH") {
+      methodTags = formPatchSecurityTags()
+    } else if (upperMethod === "DELETE") {
+      methodTags = `<input type="hidden" name="_method" value="delete" autocomplete="off">` + formPostSecurityTags()
+    } else {
+      methodTags = formPostSecurityTags()
+    }
+  }
+
+  // Conditional Controller & Action strings
+  const controllerAttr = dataController ? `data-controller="${dataController}"` : ""
+  const actionAttr = (dataController && dataAction) ? `data-action="${dataAction}"` : ""
+
+  return `
+    <form 
+      action="${action}" 
+      method="${formMethod}" 
+      ${controllerAttr}
+      ${actionAttr}
+      class="${className}"
+    >
+      ${methodTags}
+      ${html}
+    </form>
+  `
 }
