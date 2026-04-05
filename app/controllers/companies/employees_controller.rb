@@ -9,9 +9,9 @@ class Companies::EmployeesController < Companies::ApplicationController
         # 1. Apply Filtering Logic
         scope = current_company.employees.includes(:user, :roles, :departments)
         scope = scope.where(departments: { id: params[:department_id] }) if params[:department_id].present?
-        scope = scope.joins(:roles).where(roles: { id: params[:role_id] }) if params[:role_id].present?
+        scope = scope.where(roles: { id: params[:role_id] }) if params[:role_id].present?
         scope = scope.where(business_type: params[:business_type]) if params[:business_type].present?
-        scope = scope.where(lifecycle_status: params[:status]) if params[:status].present?
+        scope = scope.where(workflow_status: params[:workflow_status]) if params[:workflow_status].present?
 
         @pagy, @employees_results = pagy(:offset, scope, jsonapi: true)
 

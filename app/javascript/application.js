@@ -35,6 +35,7 @@ window.isEmpty = Helpers.isEmpty
 window.sort = Helpers.sort
 window.pagination = Helpers.pagination
 window.randomId = Helpers.randomId
+window.cloneNewKey = Helpers.cloneNewKey
 window.openModal = Helpers.openModal
 window.closeModal = Helpers.closeModal
 window.openPopover = Helpers.openPopover

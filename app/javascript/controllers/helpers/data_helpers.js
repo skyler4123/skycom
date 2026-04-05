@@ -388,3 +388,17 @@ export const sort = (data, direction = 'asc') => {
       return acc;
     }, {});
 }
+
+/**
+ * Clones a specific key's value into a new key for every object in an array.
+ * @param {Array} array - The source array of objects.
+ * @param {String} sourceKey - The existing key (e.g., "id").
+ * @param {String} newKey - The name for the new key (e.g., "value").
+ * @returns {Array} A new array with the transformed objects.
+ */
+export const cloneNewKey = (array = [], sourceKey = "id", newKey = "value") => {
+  return array.map(item => ({
+    ...item,
+    [newKey]: item[sourceKey]
+  }));
+}

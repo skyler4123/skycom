@@ -36,7 +36,7 @@ class Seed::RetailService
     create_facilities_for_branches
     appoint_payment_methods_to_company
     setup_roles_and_permissions
-    create_departments_for_branches
+    create_departments_for_company
     create_employees
     assign_employees_to_departments
     create_customers_for_company
@@ -158,18 +158,16 @@ class Seed::RetailService
     configure_retail_permissions
   end
 
-  def create_departments_for_branches
-    @branches.each do |branch|
-      [ "Electronics", "Clothing", "Home Goods", "Customer Service" ].each do |dept_name|
-        department = Seed::DepartmentService.create(
-          company: @retail,
-          name: dept_name,
-          description: "Department: #{dept_name} in #{branch.name}"
-        )
-        department.update!(category: Seed::CategoryService.create(company: @retail, name: "Department"))
-        department.attach_tag(name: "Department #{department.id} Tag")
-        @departments << department
-      end
+  def create_departments_for_company
+    [ "Electronics", "Clothing", "Home Goods", "Customer Service" ].each do |dept_name|
+      department = Seed::DepartmentService.create(
+        company: @retail,
+        name: dept_name,
+        description: "Department: #{dept_name}"
+      )
+      department.update!(category: Seed::CategoryService.create(company: @retail, name: "Department"))
+      department.attach_tag(name: "Department #{department.id} Tag")
+      @departments << department
     end
   end
 

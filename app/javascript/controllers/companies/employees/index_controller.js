@@ -37,7 +37,7 @@ export default class Companies_Branches_EmployeesController extends Companies_La
     // Local aliases for cleaner template interpolation
     const departmentFilter = Helpers.currentDepartments();
     const roleFilter = Helpers.currentRoles();
-    const statusFilter = Helpers.employee().enum.workflow_statuses;
+    const workflowStatusFilter = Helpers.employee().enum.workflow_statuses;
     const typeFilter = Helpers.employee().enum.business_types;
     
     const urlParams = new URLSearchParams(window.location.search);
@@ -53,21 +53,21 @@ export default class Companies_Branches_EmployeesController extends Companies_La
                 <div class="flex flex-col gap-1">
                   <label class="text-[10px] font-bold text-slate-400 uppercase ml-1">Department</label>
                   <select name="department_id" class="pl-3 pr-10 py-2 text-sm border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300">
-                    ${this.renderOptions(departmentFilter, urlParams.get('department_id'), "All Departments")}
+                    ${this.renderOptions(cloneNewKey(departmentFilter, "id", "value"), urlParams.get('department_id'), "All Departments")}
                   </select>
                 </div>
 
                 <div class="flex flex-col gap-1">
                   <label class="text-[10px] font-bold text-slate-400 uppercase ml-1">Role</label>
                   <select name="role_id" class="pl-3 pr-10 py-2 text-sm border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300">
-                    ${this.renderOptions(roleFilter, urlParams.get('role_id'), "All Roles")}
+                    ${this.renderOptions(cloneNewKey(roleFilter, "id", "value"), urlParams.get('role_id'), "All Roles")}
                   </select>
                 </div>
 
                 <div class="flex flex-col gap-1">
                   <label class="text-[10px] font-bold text-slate-400 uppercase ml-1">Status</label>
                   <select name="status" class="pl-3 pr-10 py-2 text-sm border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300">
-                    ${this.renderOptions(statusFilter, urlParams.get('workflow_status'), "All Statuses")}
+                    ${this.renderOptions(workflowStatusFilter, urlParams.get('workflow_status'), "All Statuses")}
                   </select>
                 </div>
 
@@ -159,7 +159,7 @@ export default class Companies_Branches_EmployeesController extends Companies_La
                       </span>
                     </td>
                     <td class="py-4 px-6 text-sm">
-                      ${Helpers.statusBadge(employee.lifecycle_status)}
+                      ${Helpers.statusBadge(employee.workflow_status)}
                     </td>
                     <td class="py-4 px-6 text-sm text-right">
                       <button class="p-2 text-slate-500 hover:text-blue-600 hover:bg-blue-50 rounded-lg">
