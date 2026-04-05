@@ -6,7 +6,7 @@ class ClientCacheController < ApplicationController
         # debugger
         render json: {
           user: current_user.as_json,
-          companies: current_user.companies.as_json(include: :branches),
+          companies: current_user.companies.as_json(include: [:branches, :departments, :roles]),
           # Future expansions:
           # settings: current_user.settings,
           # permissions: current_user.all_permissions

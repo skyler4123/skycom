@@ -43,7 +43,9 @@ class Companies::EmployeesController < Companies::ApplicationController
             description: employee_params[:description],
             business_type: employee_params[:business_type],
             # Optionally pass branch or user if provided in params
-            branch: current_company.branches.find_by(id: params[:branch_id]),
+            branch: current_company.branches.find_by(id: employee_params[:branch_id]),
+            departments: current_company.departments.where(id: employee_params[:department_id]),
+            roles: current_company.roles.where(id: employee_params[:role_id]),
             user: User.find_by(id: params[:user_id])
           )
 
@@ -72,7 +74,7 @@ class Companies::EmployeesController < Companies::ApplicationController
   private
 
   def employee_params
-    params.require(:employee).permit(:name, :description, :business_type)
+    params.require(:employee).permit(:name, :description, :business_type, :branch_id, :department_id, :role_id)
   end
 
   # Helper to format a single employee response, following your index pattern

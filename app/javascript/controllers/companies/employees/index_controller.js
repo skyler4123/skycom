@@ -126,7 +126,7 @@ export default class Companies_Branches_EmployeesController extends Companies_La
                       </div>
                     </td>
                     <td class="py-4 px-6 text-sm">
-                      <p class="text-blue-600 dark:text-blue-400 font-medium">${employee.user?.email || 'N/A'}</p>
+                      <p class="text-blue-600 dark:text-blue-400 font-medium">${employee.email || 'N/A'}</p>
                     </td>
                     <td class="py-4 px-6">
                       <div class="flex flex-wrap gap-1">

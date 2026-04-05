@@ -71,6 +71,14 @@ export const currentBranches = () => {
   return currentCompany()?.branches || []
 }
 
+export const currentDepartments = () => {
+  return currentCompany().departments
+}
+
+export const currentRoles = () => {
+  return currentCompany().roles
+}
+
 /**
  * Retrieves the current user profile from the client cache.
  * @returns {object|null} The user object (id, email, avatar, etc.) or null if not found.

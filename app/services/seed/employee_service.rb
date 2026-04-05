@@ -2,6 +2,8 @@ class Seed::EmployeeService
   def self.create(
     company:,
     branch: nil,
+    departments: [],
+    roles: [],
     user: nil,
     email: "employee_#{SecureRandom.hex}@gmail.com",
     name: Faker::Name.name,
@@ -13,6 +15,8 @@ class Seed::EmployeeService
       user: user,
       company: company,
       branch: branch,
+      departments: departments,
+      roles: roles,
       email: email,
       name: name,
       description: description,

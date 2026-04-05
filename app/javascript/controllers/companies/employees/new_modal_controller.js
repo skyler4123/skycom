@@ -9,8 +9,17 @@ export default class Companies_Employees_NewModalController extends Controller {
 
   modalHTML() {
     const branches = currentBranches() || []
-    const branchOptions = branches.map(b => 
-      `<option value="${b.id}">${b.name}</option>`
+    const departments = Helpers.currentDepartments() || []
+    const roles = Helpers.currentRoles() || []
+
+    const branchOptions = branches.map(branch => 
+      `<option value="${branch.id}">${branch.name}</option>`
+    ).join('')
+    const departmentOptions = departments.map(department => 
+      `<option value="${department.id}">${department.name}</option>`
+    ).join('')
+    const roleOptions = roles.map(role => 
+      `<option value="${role.id}">${role.name}</option>`
     ).join('')
 
     // UI Updates:
@@ -44,6 +53,24 @@ export default class Companies_Employees_NewModalController extends Controller {
               class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-sm text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none">
               <option value="">Select a Branch (Optional)</option>
               ${branchOptions}
+            </select>
+          </div>
+
+          <div class="space-y-1">
+            <label class="text-[10px] font-bold text-slate-400 dark:text-slate-300 uppercase tracking-wider">Branch</label>
+            <select name="employee[department_id]"
+              class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-sm text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none">
+              <option value="">Select a Department (Optional)</option>
+              ${departmentOptions}
+            </select>
+          </div>
+
+          <div class="space-y-1">
+            <label class="text-[10px] font-bold text-slate-400 dark:text-slate-300 uppercase tracking-wider">Branch</label>
+            <select name="employee[role_id]"
+              class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-sm text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none">
+              <option value="">Select a Role</option>
+              ${roleOptions}
             </select>
           </div>
         </div>
