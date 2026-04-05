@@ -16,17 +16,17 @@ class Companies::EmployeesController < Companies::ApplicationController
         @pagy, @employees_results = pagy(:offset, scope, jsonapi: true)
 
         # 2. Always provide filter options so the form stays populated
-        filter_options = {
-          departments: current_company.departments.map { |d| { name: d.name, value: d.id} },
-          roles: current_company.roles.map { |r| { name: r.name, value: r.id } },
-          statuses: Employee.lifecycle_statuses.keys.map { |s| { name: s.humanize, value: s } },
-          types: Employee.business_types.keys.map { |t| { name: t.humanize, value: t } }
-        }
+        # filter_options = {
+        #   departments: current_company.departments.map { |d| { name: d.name, value: d.id} },
+        #   roles: current_company.roles.map { |r| { name: r.name, value: r.id } },
+        #   statuses: Employee.lifecycle_statuses.keys.map { |s| { name: s.humanize, value: s } },
+        #   types: Employee.business_types.keys.map { |t| { name: t.humanize, value: t } }
+        # }
 
         render json: { 
           employees: format_employees(@employees_results), 
           pagination: @pagy.data_hash,
-          filter_options: filter_options
+          # filter_options: filter_options
         }
       end
     end

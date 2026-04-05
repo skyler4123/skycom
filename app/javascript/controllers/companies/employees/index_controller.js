@@ -35,10 +35,10 @@ export default class Companies_Branches_EmployeesController extends Companies_La
 
   contentHTML() {
     // Local aliases for cleaner template interpolation
-    const departmentFilter = this.filterData.departments;
-    const roleFilter = this.filterData.roles;
-    const statusFilter = this.filterData.statuses;
-    const typeFilter = this.filterData.types;
+    const departmentFilter = Helpers.currentDepartments();
+    const roleFilter = Helpers.currentRoles();
+    const statusFilter = Helpers.employee().enum.workflow_statuses;
+    const typeFilter = Helpers.employee().enum.business_types;
     
     const urlParams = new URLSearchParams(window.location.search);
 

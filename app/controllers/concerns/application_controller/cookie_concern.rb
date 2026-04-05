@@ -14,6 +14,7 @@ module ApplicationController::CookieConcern
     cookies.permanent[:client_cache_version] = cache_version(user: current_user)
   end
 
+  # To update the cache_version, just update new updated_at for user or any companies
   def cache_version(user:)
     # If a company name changes or a branch is added, this hash changes.
     latest_update = [
