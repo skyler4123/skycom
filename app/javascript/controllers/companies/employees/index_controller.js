@@ -5,18 +5,27 @@ export default class Companies_Branches_EmployeesController extends Companies_La
   static targets = ["employeesList"]
 
   async connect() {
-    super.connect()
-    const response = await fetchJson();
-    this.employees = response.employees || []
-    this.pagination = response.pagination || {}
-    this.filterData = response.filter_options || {}
-    poll(() => {
-      if (isPresent(this.employees)) {
-        this.renderContent();
-        return true; // Stop polling
+    super.connect() // Start parent layout logic
+    
+    try {
+      const response = await window.fetchJson()
+      
+      // 1. Save the data to the instance immediately
+      this.employees = response.employees || []
+      this.pagination = response.pagination || {}
+  
+      // 2. Wait for the Layout to actually put the 'content' div into the DOM
+      window.poll(() => {
+        if (this.hasContentTarget) {
+          this.renderContent()
+          return true // Success! Stop polling.
         }
-      return false; // Keep polling
-    });
+        return false // Layout isn't ready yet, keep waiting.
+      })
+  
+    } catch (error) {
+      toast({ type: "error", message: "Failed to load employees" })
+    }
   }
 
   // Helper to render select options
@@ -66,7 +75,7 @@ export default class Companies_Branches_EmployeesController extends Companies_La
 
                 <div class="flex flex-col gap-1">
                   <label class="text-[10px] font-bold text-slate-400 uppercase ml-1">Status</label>
-                  <select name="status" class="pl-3 pr-10 py-2 text-sm border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300">
+                  <select name="workflow_status" class="pl-3 pr-10 py-2 text-sm border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300">
                     ${this.renderOptions(workflowStatusFilter, urlParams.get('workflow_status'), "All Statuses")}
                   </select>
                 </div>

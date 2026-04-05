@@ -14,7 +14,6 @@ class Companies::EmployeesController < Companies::ApplicationController
         scope = scope.where(workflow_status: params[:workflow_status]) if params[:workflow_status].present?
 
         @pagy, @employees_results = pagy(:offset, scope, jsonapi: true)
-
         # 2. Always provide filter options so the form stays populated
         # filter_options = {
         #   departments: current_company.departments.map { |d| { name: d.name, value: d.id} },
