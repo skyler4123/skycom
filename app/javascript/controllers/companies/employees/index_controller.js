@@ -28,16 +28,6 @@ export default class Companies_Branches_EmployeesController extends Companies_La
     }
   }
 
-  // Helper to render select options
-  renderOptions(options = [], selectedValue, defaultText) {
-    let html = `<option value="">${defaultText}</option>`;
-    options.forEach(opt => {
-      const isSelected = String(opt.value) === String(selectedValue) ? 'selected' : '';
-      html += `<option value="${opt.value}" ${isSelected}>${opt.name}</option>`;
-    });
-    return html;
-  }
-
   openNewModal() {
     openModal({ html: `<div data-controller="${identifier(Companies_Employees_NewModalController)}"></div>` })
   }
@@ -62,28 +52,28 @@ export default class Companies_Branches_EmployeesController extends Companies_La
                 <div class="flex flex-col gap-1">
                   <label class="text-[10px] font-bold text-slate-400 uppercase ml-1">Department</label>
                   <select name="department_id" class="pl-3 pr-10 py-2 text-sm border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300">
-                    ${this.renderOptions(cloneNewKey(departmentFilter, "id", "value"), urlParams.get('department_id'), "All Departments")}
+                    ${selectOptionsHTML(cloneNewKey(departmentFilter, "id", "value"), urlParams.get('department_id'), "All Departments")}
                   </select>
                 </div>
 
                 <div class="flex flex-col gap-1">
                   <label class="text-[10px] font-bold text-slate-400 uppercase ml-1">Role</label>
                   <select name="role_id" class="pl-3 pr-10 py-2 text-sm border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300">
-                    ${this.renderOptions(cloneNewKey(roleFilter, "id", "value"), urlParams.get('role_id'), "All Roles")}
+                    ${selectOptionsHTML(cloneNewKey(roleFilter, "id", "value"), urlParams.get('role_id'), "All Roles")}
                   </select>
                 </div>
 
                 <div class="flex flex-col gap-1">
                   <label class="text-[10px] font-bold text-slate-400 uppercase ml-1">Status</label>
                   <select name="workflow_status" class="pl-3 pr-10 py-2 text-sm border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300">
-                    ${this.renderOptions(workflowStatusFilter, urlParams.get('workflow_status'), "All Statuses")}
+                    ${selectOptionsHTML(workflowStatusFilter, urlParams.get('workflow_status'), "All Statuses")}
                   </select>
                 </div>
 
                 <div class="flex flex-col gap-1">
                   <label class="text-[10px] font-bold text-slate-400 uppercase ml-1">Type</label>
                   <select name="business_type" class="pl-3 pr-10 py-2 text-sm border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300">
-                    ${this.renderOptions(typeFilter, urlParams.get('business_type'), "All Types")}
+                    ${selectOptionsHTML(typeFilter, urlParams.get('business_type'), "All Types")}
                   </select>
                 </div>
 
