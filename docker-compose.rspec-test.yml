@@ -1,22 +1,28 @@
 name: skycom_rspec_test
+
 services:
   web:
-    # sleep 5s for waiting postgres
-    command: bash -c "sleep 5 && rm -f tmp/pids/server.pid && bundle exec rails db:migrate && bundle exec rails assets:precompile && bundle exec rspec"
+    build: .
+    # command optimized for test environment
+    command: bash -c "sleep 5 && rm -f tmp/pids/server.pid && bundle exec rails db:prepare && bundle exec rspec"
     environment:
       RAILS_ENV: test
+      SKIP_TEST_RUN_SEED: false
+      TEST_RUN_INSIDE_DOCKER: true
+      RAILS_MASTER_KEY: ${RAILS_MASTER_KEY}
     volumes:
       - .:/rails
       - sqlite_storage:/rails/storage
-    depends_on: !reset
+    depends_on:
       - postgres
       - selenium-chromium
 
   job:
-    # Wait for web prepared DB
+    build: .
     command: bash -c "sleep 20 && bundle exec rails db:prepare && bin/jobs"
     environment:
       RAILS_ENV: test
+      RAILS_MASTER_KEY: ${RAILS_MASTER_KEY}
     volumes:
       - .:/rails
       - sqlite_storage:/rails/storage
@@ -24,23 +30,14 @@ services:
       - web
 
   postgres:
-    volumes: !reset null
+    image: bitnamilegacy/postgresql:17.6.0-debian-12-r4
+    environment:
+      POSTGRESQL_USERNAME: postgres
+      POSTGRESQL_PASSWORD: password
+    # No volume mapping here to ensure a fresh DB state for every test run
+    ports:
+      - "5432:5432"
 
-  # mongo:
-  #   volumes: !reset null
-
-  # opensearch:
-  #   volumes: !reset null
-
-  # opensearch_dashboards: !reset null
-
-  # grafana: !reset null
-  
-  minio: !reset null
-
-  create_buckets: !reset null
-
-  # For Selenium test
   selenium-chromium:
     image: selenium/standalone-chromium:latest
     shm_size: '2gb'
@@ -48,3 +45,6 @@ services:
       - "4444:4444"
       - "5900:5900"
       - "7900:7900"
+
+volumes:
+  sqlite_storage:

@@ -8,14 +8,10 @@ require 'capybara/rails'
 require 'capybara/rspec'
 require 'selenium-webdriver'
 
-RSPEC_LOCAL = false
+TEST_RUN_INSIDE_DOCKER = ENV.fetch("TEST_RUN_INSIDE_DOCKER") { false }
 
-if RSPEC_LOCAL
-  # Run native local
-  Capybara.default_max_wait_time = 5
-  Capybara.default_driver = :selenium_chrome
-  Capybara.javascript_driver = :selenium_chrome
-else
+
+if TEST_RUN_INSIDE_DOCKER
   # Run inside docker
   # Configure Capybara to use a remote browser
   Capybara.configure do |config|
@@ -52,6 +48,11 @@ else
     config.javascript_driver = :remote_selenium_chrome
     # config.javascript_driver = :selenium_chrome
   end
+else
+  # Run native local
+  Capybara.default_max_wait_time = 5
+  Capybara.default_driver = :selenium_chrome
+  Capybara.javascript_driver = :selenium_chrome
 end
 
 # 🛑 ADD THIS LINE TO SUPPRESS DEBUG/INFO LOGS

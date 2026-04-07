@@ -21,7 +21,7 @@ module SessionHelpers
     # expect(page).to have_link("Sign Out")
 
     # Matching your specific role selector
-    # expect(page).to have_selector('[role="avatar"]')
+    expect(page).to have_selector('[role="avatar"]')
   end
 end
 
