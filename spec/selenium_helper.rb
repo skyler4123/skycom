@@ -8,7 +8,7 @@ require 'capybara/rails'
 require 'capybara/rspec'
 require 'selenium-webdriver'
 
-RSPEC_LOCAL = true
+RSPEC_LOCAL = false
 
 if RSPEC_LOCAL
   # Run native local
