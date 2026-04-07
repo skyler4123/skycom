@@ -214,24 +214,29 @@ export const addAttribute = (element, attribute, value) => {
 /**
  * Opens a SweetAlert2 modal.
  * @param {object} config - The configuration for the modal.
- * @param {string} [config.html="Model!"] - The HTML content of the modal.
- * @param {object} [config.customClass={}] - Custom classes for the modal elements.
- * @param {object} [config.options={}] - Other SweetAlert2 options.
+ * @param {string} [config.html="Model!"] - The HTML content.
+ * @param {object} [config.customClass={}] - Custom classes.
+ * @param {object} [rest] - Any other SweetAlert2 options (backdrop, timer, etc.)
  */
-export const openModal = ({html = "Model!", customClass = {}, options = {}}) => {
+export const openModal = ({ html = "Model!", customClass = {}, ...rest }) => {
   Swal.fire({
-    html: html,
+    // 1. Default Settings (Can be overridden by ...rest)
     showConfirmButton: false,
     showCloseButton: false,
     backdrop: true,
     target: document.querySelector('main'),
+    
+    // 2. Spread the rest of the arguments (This makes backdrop: false work!)
+    ...rest,
+
+    // 3. Forced/Hardcoded Settings (Static for Skycom UI)
+    html: html,
     customClass: {
       container: '!bg-transparent',
       popup: '!p-0 !bg-transparent !w-fit',
       htmlContainer: '!p-0 !overflow-visible',
       ...customClass
-    },
-    ...options,
+    }
   });
 }
 

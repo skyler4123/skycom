@@ -28,14 +28,16 @@ export default class Home_Header_AuthenticationController extends Controller {
   openSignInModal(event) {
     event.preventDefault()
     openModal({
-      html: `<div data-controller="${identifier(Home_SigninModalController)}"></div>`
+      html: `<div data-controller="${identifier(Home_SigninModalController)}"></div>`,
+      backdrop: false,
     })
   }
 
   openSignUpModal(event) {
     event.preventDefault()
     openModal({
-      html: `<div data-controller="${identifier(Home_SignupModalController)}"></div>`
+      html: `<div data-controller="${identifier(Home_SignupModalController)}"></div>`,
+      backdrop: false,
     })
   }
 
