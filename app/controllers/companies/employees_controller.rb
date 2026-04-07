@@ -1,7 +1,6 @@
 # app/controllers/companies/employees_controller.rb
 
 class Companies::EmployeesController < Companies::ApplicationController
-
   def index
     respond_to do |format|
       format.html { render html: "", layout: true }
@@ -22,9 +21,9 @@ class Companies::EmployeesController < Companies::ApplicationController
         #   types: Employee.business_types.keys.map { |t| { name: t.humanize, value: t } }
         # }
 
-        render json: { 
-          employees: format_employees(@employees_results), 
-          pagination: @pagy.data_hash,
+        render json: {
+          employees: format_employees(@employees_results),
+          pagination: @pagy.data_hash
           # filter_options: filter_options
         }
       end

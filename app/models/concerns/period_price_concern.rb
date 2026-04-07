@@ -3,7 +3,7 @@ module PeriodPriceConcern
 
   included do
     has_many :period_prices, as: :period_priceable, dependent: :destroy
-    
+
     # FIX: These must be plural (:period_prices) to match the association above
     has_many :periods, through: :period_prices
     has_many :prices, through: :period_prices

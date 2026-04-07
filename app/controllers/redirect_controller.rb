@@ -1,5 +1,4 @@
 class RedirectController < ApplicationController
-
   def companies
     companies = current_user.companies
     redirect_to root_path if companies.empty?

@@ -7,7 +7,7 @@ Rails.application.routes.draw do
       get :companies
     end
   end
-  resources :demo, only: [:index] do
+  resources :demo, only: [ :index ] do
     collection do
       get :calendar_events
     end
@@ -45,7 +45,7 @@ Rails.application.routes.draw do
       resources :permissions
     end
   end
-  
+
   resources :home, only: [ :index ] do
     collection do
       get :retail
@@ -98,197 +98,197 @@ end
 
 
 # resources :system_subscriptions
-  # resources :system_subscription_groups
-  # resources :system_subscription_plans
-  # resources :subscription_plans
-  # resources :period_prices
-  # resources :booking_resources
-  # resources :booking_periods
-  # resources :attendance_months
-  # resources :attendance_days
-  # resources :attendance_logs
-  # resources :shifts
-  # resources :subscription_groups
-  # resources :statistics
+# resources :system_subscription_groups
+# resources :system_subscription_plans
+# resources :subscription_plans
+# resources :period_prices
+# resources :booking_resources
+# resources :booking_periods
+# resources :attendance_months
+# resources :attendance_days
+# resources :attendance_logs
+# resources :shifts
+# resources :subscription_groups
+# resources :statistics
 
 
-  # # Routes for Admin Management
-  # namespace :admin do
-  #   # We use 'scope module: :admin
-  #   # to tell Rails that the controllers for these resources are located inside the "Admin
-  #   # namespace (e.g., app/controllers/admin/users_controller.rb).
-  #   resources :dashboard
-  #   resources :companies
-  #   resources :branches
-  #   resources :users
-  #   resources :subscriptions
-  # end
+# # Routes for Admin Management
+# namespace :admin do
+#   # We use 'scope module: :admin
+#   # to tell Rails that the controllers for these resources are located inside the "Admin
+#   # namespace (e.g., app/controllers/admin/users_controller.rb).
+#   resources :dashboard
+#   resources :companies
+#   resources :branches
+#   resources :users
+#   resources :subscriptions
+# end
 
 
 
-  # # Routes for Retail Management
-  # resources :retail, only: [ :show ] do
-  #   # We use 'scope module: :retail' to tell Rails that the controllers
-  #   # for these resources are located inside the "Retail::" namespace
-  #   # (e.g., app/controllers/retail/stores_controller.rb).
-  #   scope module: :retail do
-  #     namespace :management do
-  #       resources :dashboard
-  #       resources :branches
-  #       resources :departments
-  #       resources :products
-  #       resources :services
-  #       resources :orders
-  #       resources :bookings
-  #       resources :payments
-  #       resources :employees
-  #       resources :inventories
-  #       resources :customers
-  #       resources :invoices
-  #       resources :schedules
-  #       resources :attendances
-  #       resources :reports
-  #       resources :documents
-  #       resources :announcements
-  #       resources :discounts
-  #       resources :events
-  #       resources :payslips
-  #       resources :tasks
-  #       resources :facilities
-  #       resources :settings
-  #       resources :administrators
-  #       resources :subscriptions
-  #       resources :permissions
-  #     end
+# # Routes for Retail Management
+# resources :retail, only: [ :show ] do
+#   # We use 'scope module: :retail' to tell Rails that the controllers
+#   # for these resources are located inside the "Retail::" namespace
+#   # (e.g., app/controllers/retail/stores_controller.rb).
+#   scope module: :retail do
+#     namespace :management do
+#       resources :dashboard
+#       resources :branches
+#       resources :departments
+#       resources :products
+#       resources :services
+#       resources :orders
+#       resources :bookings
+#       resources :payments
+#       resources :employees
+#       resources :inventories
+#       resources :customers
+#       resources :invoices
+#       resources :schedules
+#       resources :attendances
+#       resources :reports
+#       resources :documents
+#       resources :announcements
+#       resources :discounts
+#       resources :events
+#       resources :payslips
+#       resources :tasks
+#       resources :facilities
+#       resources :settings
+#       resources :administrators
+#       resources :subscriptions
+#       resources :permissions
+#     end
 
-  #     namespace :pos do
-  #       resources :branches, only: [ :show ] do
-  #         member do
-  #           get :products
-  #         end
-  #       end
-  #     end
-  #   end
-  # end
+#     namespace :pos do
+#       resources :branches, only: [ :show ] do
+#         member do
+#           get :products
+#         end
+#       end
+#     end
+#   end
+# end
 
-  # # Routes for School Management
-  # resources :education, only: [ :show ] do
-  #   # We use 'scope module: :education' to tell Rails that the controllers
-  #   # for these resources are located inside the "Education::" namespace
-  #   # (e.g., app/controllers/education/schools_controller.rb).
-  #   scope module: :education do
-  #     resources :schools
-  #     resources :courses
-  #     resources :students
-  #     resources :teachers
-  #     resources :classes
-  #     resources :schedules
-  #   end
-  # end
+# # Routes for School Management
+# resources :education, only: [ :show ] do
+#   # We use 'scope module: :education' to tell Rails that the controllers
+#   # for these resources are located inside the "Education::" namespace
+#   # (e.g., app/controllers/education/schools_controller.rb).
+#   scope module: :education do
+#     resources :schools
+#     resources :courses
+#     resources :students
+#     resources :teachers
+#     resources :classes
+#     resources :schedules
+#   end
+# end
 
-  # # Routes for Hospital Management
-  # resources :hospital do
-  #   # We use 'scope module: :hospital' to tell Rails that the controllers
-  #   # for these resources are located inside the "Hospital::" namespace
-  #   # (e.g., app/controllers/hospital/patients_controller.rb).
-  #   scope module: :hospital do
-  #     resources :patients
-  #     resources :doctors
-  #     resources :appointments
-  #     resources :medical_records
-  #     resources :prescriptions
-  #     resources :departments
-  #     resources :staffs
-  #     resources :billings
-  #     resources :insurances
-  #     resources :labs
-  #     resources :pharmacies
-  #   end
-  # end
+# # Routes for Hospital Management
+# resources :hospital do
+#   # We use 'scope module: :hospital' to tell Rails that the controllers
+#   # for these resources are located inside the "Hospital::" namespace
+#   # (e.g., app/controllers/hospital/patients_controller.rb).
+#   scope module: :hospital do
+#     resources :patients
+#     resources :doctors
+#     resources :appointments
+#     resources :medical_records
+#     resources :prescriptions
+#     resources :departments
+#     resources :staffs
+#     resources :billings
+#     resources :insurances
+#     resources :labs
+#     resources :pharmacies
+#   end
+# end
 
-  # General Application Routes
-  # resources :categories
-  # resources :article_appointments
-  # resources :article_group_appointments
-  # resources :articles
-  # resources :article_groups
-  # resources :document_appointments
-  # resources :document_group_appointments
-  # resources :documents
-  # resources :document_groups
-  # resources :setting_appointments
-  # resources :setting_group_appointments
-  # resources :setting_groups
-  # resources :subscriptions
-  # resources :event_appointments
-  # resources :event_group_appointments
-  # resources :events
-  # resources :event_groups
-  # resources :companies
-  # resources :exam_appointments
-  # resources :answers
-  # resources :questions
-  # resources :exams
-  # resources :exam_groups
-  # resources :notification_group_appointments
-  # resources :task_appointments
-  # resources :project_appointments
-  # resources :project_group_appointments
-  # resources :facility_appointments
-  # resources :purchase_items
-  # resources :purchases
-  # resources :order_appointments
-  # resources :order_group_appointments
-  # resources :order_groups
-  # resources :service_appointments
-  # resources :product_appointments
-  # resources :brands
-  # resources :inventory_transaction_appointments
-  # resources :inventory_transactions
-  # resources :inventory_item_appointments
-  # resources :inventory_items
-  # resources :inventories
-  # resources :customer_appointments
-  # resources :employee_appointments
-  # resources :notification_appointments
-  # resources :notifications
-  # resources :notification_groups
-  # resources :cart_appointments
-  # resources :carts
-  # resources :cart_groups
-  # resources :projects
-  # resources :project_groups
-  # resources :task_group_appointments
-  # resources :tasks
-  # resources :task_groups
-  # resources :bookings
-  # resources :customer_group_appointments
-  # resources :customer_groups
-  # resources :service_group_appointments
-  # resources :service_groups
-  # resources :product_group_appointments
-  # resources :product_groups
-  # resources :facility_group_appointments
-  # resources :facility_groups
-  # resources :payment_method_appointments
-  # resources :payment_methods
-  # resources :period_appointments
-  # resources :periods
-  # resources :payments
-  # resources :invoices
-  # resources :orders
-  # resources :customers
-  # resources :products
-  # resources :services
-  # resources :facilities
-  # resources :role_appointments
-  # resources :policy_appointments
-  # resources :policies
-  # resources :roles
-  # resources :employee_group_appointments
-  # resources :employees
-  # resources :employee_groups
-  # resources :tag_appointments
-  # resources :tags
-  # resources :branches
-  # resources :addresses
+# General Application Routes
+# resources :categories
+# resources :article_appointments
+# resources :article_group_appointments
+# resources :articles
+# resources :article_groups
+# resources :document_appointments
+# resources :document_group_appointments
+# resources :documents
+# resources :document_groups
+# resources :setting_appointments
+# resources :setting_group_appointments
+# resources :setting_groups
+# resources :subscriptions
+# resources :event_appointments
+# resources :event_group_appointments
+# resources :events
+# resources :event_groups
+# resources :companies
+# resources :exam_appointments
+# resources :answers
+# resources :questions
+# resources :exams
+# resources :exam_groups
+# resources :notification_group_appointments
+# resources :task_appointments
+# resources :project_appointments
+# resources :project_group_appointments
+# resources :facility_appointments
+# resources :purchase_items
+# resources :purchases
+# resources :order_appointments
+# resources :order_group_appointments
+# resources :order_groups
+# resources :service_appointments
+# resources :product_appointments
+# resources :brands
+# resources :inventory_transaction_appointments
+# resources :inventory_transactions
+# resources :inventory_item_appointments
+# resources :inventory_items
+# resources :inventories
+# resources :customer_appointments
+# resources :employee_appointments
+# resources :notification_appointments
+# resources :notifications
+# resources :notification_groups
+# resources :cart_appointments
+# resources :carts
+# resources :cart_groups
+# resources :projects
+# resources :project_groups
+# resources :task_group_appointments
+# resources :tasks
+# resources :task_groups
+# resources :bookings
+# resources :customer_group_appointments
+# resources :customer_groups
+# resources :service_group_appointments
+# resources :service_groups
+# resources :product_group_appointments
+# resources :product_groups
+# resources :facility_group_appointments
+# resources :facility_groups
+# resources :payment_method_appointments
+# resources :payment_methods
+# resources :period_appointments
+# resources :periods
+# resources :payments
+# resources :invoices
+# resources :orders
+# resources :customers
+# resources :products
+# resources :services
+# resources :facilities
+# resources :role_appointments
+# resources :policy_appointments
+# resources :policies
+# resources :roles
+# resources :employee_group_appointments
+# resources :employees
+# resources :employee_groups
+# resources :tag_appointments
+# resources :tags
+# resources :branches
+# resources :addresses

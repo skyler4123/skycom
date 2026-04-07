@@ -22,7 +22,7 @@ class DemoController < ApplicationController
       { category: "personal", title_prefix: "Doctor ",   color: "#ef4444", all_day_prob: 0.8 },
       { category: "personal", title_prefix: "Dinner with ", color: "#f59e0b", all_day_prob: 0.3 },
       { category: "personal", title_prefix: "Family ",   color: "#ec4899", all_day_prob: 0.4 },
-      { category: "holiday",  title_prefix: "",          color: "#f87171", all_day_prob: 1.0 },
+      { category: "holiday",  title_prefix: "",          color: "#f87171", all_day_prob: 1.0 }
     ]
 
     events_per_month_target = 25..45
@@ -56,10 +56,10 @@ class DemoController < ApplicationController
           event[:end]   = (event_date + rand(1..3).days).iso8601 if rand < 0.15
         else
           start_hour   = rand(8..19)
-          start_minute = [0, 15, 30, 45].sample
+          start_minute = [ 0, 15, 30, 45 ].sample
           start_time   = event_date.to_time.change(hour: start_hour, min: start_minute)
 
-          duration_min = [30, 45, 60, 90, 120, 150, 180, 210].sample
+          duration_min = [ 30, 45, 60, 90, 120, 150, 180, 210 ].sample
 
           event[:start] = start_time.iso8601
           event[:end]   = (start_time + duration_min.minutes).iso8601
@@ -105,7 +105,7 @@ class DemoController < ApplicationController
         "Movie night: #{Faker::Movie.title}"
       ].sample
     when "holiday"
-      ["Public Holiday", "National Day", "Company Shutdown", "Festival"].sample
+      [ "Public Holiday", "National Day", "Company Shutdown", "Festival" ].sample
     else
       "#{prefix}#{Faker::Lorem.words(number: 2..4).join(' ')}"
     end

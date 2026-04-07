@@ -105,9 +105,9 @@ module Seed
 
     def self.generate_features(plan_code)
       {
-        priority_support: plan_code.to_s.include?('enterprise'),
-        custom_branding: !plan_code.to_s.include?('free') && !plan_code.to_s.include?('temporary'),
-        api_access: plan_code.to_s.include?('pro') || plan_code.to_s.include?('enterprise')
+        priority_support: plan_code.to_s.include?("enterprise"),
+        custom_branding: !plan_code.to_s.include?("free") && !plan_code.to_s.include?("temporary"),
+        api_access: plan_code.to_s.include?("pro") || plan_code.to_s.include?("enterprise")
       }
     end
   end

@@ -122,7 +122,6 @@ class Seed::RetailService
     @branches.each do |branch|
       branch.subscribe!(plan_name: Subscription.plan_names.keys.sample)
     end
-    
   end
 
   def create_facilities_for_branches
@@ -174,7 +173,7 @@ class Seed::RetailService
   def create_employees
     @branches.each_with_index do |branch, index|
       branch_employees = []
-      
+
       EMPLOYEE_COUNTS.each do |role_name, count|
         count.times do |i|
           user = Seed::UserService.create(parent_user: @multi_company_owner, email: "#{role_name}_#{i + 1}_branch_#{index + 1}@#{@company_email_full_domain}")
@@ -186,7 +185,7 @@ class Seed::RetailService
           branch_employees << employee
         end
       end
-      
+
       @employees.concat(branch_employees)
     end
   end
@@ -224,7 +223,7 @@ class Seed::RetailService
         seller: @retail,
         buyer: customer
       )
-    end 
+    end
   end
 
   def setup_loyalty_programs
@@ -234,7 +233,7 @@ class Seed::RetailService
           company: @retail, branch: branch, name: "Loyalty Program #{i + 1} - #{branch.name}"
         )
         @loyalty_programs << lp
-        
+
         branch_customers = @customers.select { |c| c.branch_id == branch.id }
         branch_customers.sample(10).each do |customer|
           Seed::CustomerGroupAppointmentService.create(customer_group: lp, appoint_to: customer)

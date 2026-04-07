@@ -15,7 +15,7 @@ module SessionHelpers
     end
 
     # 3. Assertions
-    # Note: Since you are using a Shell + JSON architecture, 
+    # Note: Since you are using a Shell + JSON architecture,
     # ensure your 'notification' controller has rendered the message.
     # expect(page).to have_content("Signed in successfully", wait: 5)
     # expect(page).to have_link("Sign Out")

@@ -5,7 +5,7 @@ class Companies::AdministratorsController < Companies::ApplicationController
       format.html { render html: "", layout: true }
       format.json do
         # Assuming current_company.permissions returns a Hash like: { "Admin" => { policies: [...] } }
-        @administrators = current_company.permissions 
+        @administrators = current_company.permissions
         render json: { administrators: @administrators }
       end
     end
@@ -13,7 +13,7 @@ class Companies::AdministratorsController < Companies::ApplicationController
 
   def update_permission
     role = current_company.roles.find(params[:role_id])
-    
+
     policy = current_company.policies.find_or_create_by!(
       resource: params[:resource],
       action: params[:permission_action]
@@ -33,8 +33,8 @@ class Companies::AdministratorsController < Companies::ApplicationController
         role.policy_appointments.where(policy: policy).destroy_all
       else
         # Return a 422 Unprocessable Entity if it's the last one
-        return render json: { 
-          error: "Cannot remove the last permission for '#{params[:resource]}'. At least one action must remain to keep the resource visible." 
+        return render json: {
+          error: "Cannot remove the last permission for '#{params[:resource]}'. At least one action must remain to keep the resource visible."
         }, status: :unprocessable_entity
       end
     end

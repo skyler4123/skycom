@@ -9,13 +9,13 @@ class EmailService
   private
 
   def parse_email
-    return unless @email.include?('@')
+    return unless @email.include?("@")
 
     # Destructuring the split array
-    @username, @full_domain = @email.split('@')
+    @username, @full_domain = @email.split("@")
 
     if @full_domain
-      domain_parts = @full_domain.split('.')
+      domain_parts = @full_domain.split(".")
       @domain = domain_parts.first
       @top_level_domain = domain_parts.last
     end

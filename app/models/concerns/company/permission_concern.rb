@@ -8,7 +8,7 @@ module Company::PermissionConcern
 
     def permissions
       # REASON: cache_key_with_version includes the 'updated_at' timestamp.
-      # If any Role or PolicyAppointment is touched, this key changes, 
+      # If any Role or PolicyAppointment is touched, this key changes,
       # forcing Rails to skip the cache and re-run the heavy database query.
       cache_key = "#{cache_key_with_version}/permissions"
 
@@ -39,7 +39,7 @@ module Company::PermissionConcern
           role_permissions = role.policies.group_by(&:resource).transform_values do |policies|
             policies.map(&:action)
           end
-          
+
           hash[role.name] = role_permissions
         end
       end

@@ -12,12 +12,12 @@ class PeriodPrice::SchedulerService
       # User wants this price to be the ONLY price forever.
       if start_at.nil? && end_at.nil?
         reset_to_forever_price(target_price, timezone)
-      
+
       # CASE 2: Standard Range (or partial infinity)
       else
         # We need "Safe Dates" for comparison logic, but we save 'nil' to DB
         # If start_at is nil, treat as VERY OLD date. If end_at is nil, treat as FAR FUTURE.
-        safe_start = start_at || DateTime.new(0) 
+        safe_start = start_at || DateTime.new(0)
         safe_end   = end_at   || DateTime::Infinity.new
 
         handle_overlaps(safe_start, safe_end)
@@ -46,24 +46,24 @@ class PeriodPrice::SchedulerService
     # Query for Overlaps handling NULLs correctly
     # Logic: (StartA < EndB) AND (EndA > StartB)
     # In SQL, NULL usually acts as "Infinity" for logic if we handle it explicitly.
-    
+
     overlaps = PeriodPriceAppointment.joins(:period).where(appoint_to: @product)
 
-    # We filter in Ruby or strict SQL depending on DB. 
+    # We filter in Ruby or strict SQL depending on DB.
     # For safety with NULLs, specific SQL is required:
     overlaps = overlaps.where("
-      (periods.start_at IS NULL OR periods.start_at < ?) 
-      AND 
+      (periods.start_at IS NULL OR periods.start_at < ?)
+      AND
       (periods.end_at IS NULL OR periods.end_at > ?)
     ", new_end, new_start)
 
     overlaps.each do |appt|
       # ... (Logic from previous answer to split head/tail) ...
       # Be careful: existing period.start_at might be nil!
-      
+
       p_start = appt.period.start_at || DateTime.new(0) # Handle -Infinity
       p_end   = appt.period.end_at   || DateTime::Infinity.new # Handle +Infinity
-      
+
       # 1. Create Head (Only if the old start is before the new start)
       if p_start < new_start
         create_appointment(appt.price, appt.period.start_at, new_start, appt.period.timezone)
@@ -85,7 +85,7 @@ class PeriodPrice::SchedulerService
     return if start_time && end_time && start_time >= end_time
 
     period_record = find_or_create_period(start_time, end_time, tz)
-    
+
     PeriodPriceAppointment.create!(
       appoint_to: @product,
       price: price_record,
@@ -101,8 +101,8 @@ class PeriodPrice::SchedulerService
   # Database Optimization: Reuse existing Periods
   def find_or_create_period(start_at, end_at, timezone)
     Period.find_or_create_by!(
-      start_at: start_at, 
-      end_at: end_at, 
+      start_at: start_at,
+      end_at: end_at,
       timezone: timezone
     )
   end

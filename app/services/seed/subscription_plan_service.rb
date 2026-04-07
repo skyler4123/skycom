@@ -1,6 +1,5 @@
 module Seed
   class SubscriptionPlanService
-
     # Helper method for individual creation
     def self.create(
       company:,

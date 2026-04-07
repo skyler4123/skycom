@@ -43,7 +43,7 @@ RSpec.feature "Authentication", type: :feature, js: true do
   describe "Sign in with normal user" do
     let(:user) { create(:user, password: 'Password@1234', password_confirmation: 'Password@1234') }
     let!(:before_session_count) { user.sessions.count }
-    
+
     it "signs me in", retry: 3, retry_wait: 10 do
       sign_in(user)
 

@@ -12,7 +12,7 @@ module Cache::VersionConcern
   def cache_key_for(scope)
     # Get the version for this scope, defaulting to 1 if never set
     version = (self.cache_versions[scope.to_s] || 1)
-    
+
     # We combine model name, id, scope, and the specific version
     "#{model_name.cache_key}/#{id}/#{scope}-#{version}"
   end
@@ -21,14 +21,14 @@ module Cache::VersionConcern
   # Usage: @user.bump_cache_version(:profile, :settings)
   def bump_cache_version(*scopes)
     updates = {}
-    
+
     scopes.each do |scope|
       current_ver = (self.cache_versions[scope.to_s] || 0).to_i
       updates[scope.to_s] = current_ver + 1
     end
 
     # Merge updates into the existing hash
-    # We use update_column to avoid triggering 'updated_at' 
+    # We use update_column to avoid triggering 'updated_at'
     # and causing a "Russian Doll" invalidation of everything else!
     new_versions = self.cache_versions.merge(updates)
     update_column(:cache_versions, new_versions)
@@ -55,7 +55,7 @@ end
 #     if notifications_changed?
 #       bump_cache_version(:settings)
 #     end
-    
+
 #     # Note: If 'last_login_at' changes, we do NOTHING here.
 #     # This effectively saves the other caches from breaking.
 #   end
@@ -96,7 +96,7 @@ end
 #   def bump_user_stats_cache
 #     # If the views count changed, tell the User model to bump the :stats version
 #     if saved_change_to_views_count? || id_previously_changed?
-#       user.bump_cache_version(:stats) 
+#       user.bump_cache_version(:stats)
 #     end
 #   end
 # end
