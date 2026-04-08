@@ -12,7 +12,7 @@ TEST_RUN_INSIDE_DOCKER = ENV.fetch("TEST_RUN_INSIDE_DOCKER") { false }
 
 if TEST_RUN_INSIDE_DOCKER
   Capybara.default_driver = :selenium_chrome_headless
-  Capybara.javascript_driver = :selenium_chrome_headless  
+  Capybara.javascript_driver = :selenium_chrome_headless
 else
   Capybara.default_driver = :selenium_chrome
   Capybara.javascript_driver = :selenium_chrome
