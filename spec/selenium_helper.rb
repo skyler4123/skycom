@@ -11,6 +11,7 @@ require 'selenium-webdriver'
 TEST_RUN_INSIDE_DOCKER = ENV.fetch("TEST_RUN_INSIDE_DOCKER") { false }
 
 if TEST_RUN_INSIDE_DOCKER
+  # Github action resource is slow, we must disbale many things to Selenium work
   Capybara.register_driver :selenium_chrome_docker do |app|
     options = Selenium::WebDriver::Options.chrome(
       args: [

@@ -15,9 +15,6 @@ services:
       - sqlite_storage:/rails/storage
     depends_on:
       - postgres
-    shm_size: 2g
-    ulimits:
-      memlock: -1
 
   job:
     build: .
