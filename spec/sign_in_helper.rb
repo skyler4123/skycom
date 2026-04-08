@@ -1,6 +1,7 @@
 module SessionHelpers
   def sign_in(user)
     visit root_path
+    expect(page).to have_selector('button[role="sign-in-button"]', wait: 8)
     find('button[role="sign-in-button"]').click
     within 'div[data-controller="home--signin-modal"]' do
       fill_in "Email", with: user.email
