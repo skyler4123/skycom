@@ -15,7 +15,6 @@ services:
       - sqlite_storage:/rails/storage
     depends_on:
       - postgres
-      - selenium-chromium
 
   job:
     build: .
@@ -37,16 +36,6 @@ services:
     # No volume mapping here to ensure a fresh DB state for every test run
     ports:
       - "5432:5432"
-
-  selenium-chromium:
-    image: selenium/standalone-chromium:latest
-    shm_size: '2gb'
-    environment:
-      - SE_VNC_NO_PASSWORD=1        # This is the key for newer Selenium images
-    ports:
-      - "4444:4444"
-      - "5900:5900"                 # Port for VNC Viewer apps
-      - "7900:7900"                 # Port for Browser-based noVNC (recommended)
 
 volumes:
   sqlite_storage:
