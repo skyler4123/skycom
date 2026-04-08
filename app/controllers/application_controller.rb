@@ -18,7 +18,7 @@ class ApplicationController < ActionController::Base
   before_action :set_current_session
   before_action :authenticate
   before_action :sync_client_cache_version, if: :current_user
-  
+
   # --------------------------------------------------------------------------
   # SINGLE-SESSION MODE
   #

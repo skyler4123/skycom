@@ -5,28 +5,27 @@ export default class Companies_Branches_EmployeesController extends Companies_La
   static targets = ["employeesList"]
 
   async connect() {
-    super.connect()
-    const response = await fetchJson();
-    this.employees = response.employees || []
-    this.pagination = response.pagination || {}
-    this.filterData = response.filter_options || {}
-    poll(() => {
-      if (isPresent(this.employees)) {
-        this.renderContent();
-        return true; // Stop polling
+    super.connect() // Start parent layout logic
+    
+    try {
+      const response = await window.fetchJson()
+      
+      // 1. Save the data to the instance immediately
+      this.employees = response.employees || []
+      this.pagination = response.pagination || {}
+  
+      // 2. Wait for the Layout to actually put the 'content' div into the DOM
+      window.poll(() => {
+        if (this.hasContentTarget) {
+          this.renderContent()
+          return true // Success! Stop polling.
         }
-      return false; // Keep polling
-    });
-  }
-
-  // Helper to render select options
-  renderOptions(options = [], selectedValue, defaultText) {
-    let html = `<option value="">${defaultText}</option>`;
-    options.forEach(opt => {
-      const isSelected = String(opt.value) === String(selectedValue) ? 'selected' : '';
-      html += `<option value="${opt.value}" ${isSelected}>${opt.name}</option>`;
-    });
-    return html;
+        return false // Layout isn't ready yet, keep waiting.
+      })
+  
+    } catch (error) {
+      toast({ type: "error", message: "Failed to load employees" })
+    }
   }
 
   openNewModal() {
@@ -35,10 +34,10 @@ export default class Companies_Branches_EmployeesController extends Companies_La
 
   contentHTML() {
     // Local aliases for cleaner template interpolation
-    const departmentFilter = this.filterData.departments;
-    const roleFilter = this.filterData.roles;
-    const statusFilter = this.filterData.statuses;
-    const typeFilter = this.filterData.types;
+    const departmentFilter = Helpers.currentDepartments();
+    const roleFilter = Helpers.currentRoles();
+    const workflowStatusFilter = Helpers.employee().enum.workflow_statuses;
+    const typeFilter = Helpers.employee().enum.business_types;
     
     const urlParams = new URLSearchParams(window.location.search);
 
@@ -53,28 +52,28 @@ export default class Companies_Branches_EmployeesController extends Companies_La
                 <div class="flex flex-col gap-1">
                   <label class="text-[10px] font-bold text-slate-400 uppercase ml-1">Department</label>
                   <select name="department_id" class="pl-3 pr-10 py-2 text-sm border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300">
-                    ${this.renderOptions(departmentFilter, urlParams.get('department_id'), "All Departments")}
+                    ${selectOptionsHTML(cloneNewKey(departmentFilter, "id", "value"), urlParams.get('department_id'), "All Departments")}
                   </select>
                 </div>
 
                 <div class="flex flex-col gap-1">
                   <label class="text-[10px] font-bold text-slate-400 uppercase ml-1">Role</label>
                   <select name="role_id" class="pl-3 pr-10 py-2 text-sm border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300">
-                    ${this.renderOptions(roleFilter, urlParams.get('role_id'), "All Roles")}
+                    ${selectOptionsHTML(cloneNewKey(roleFilter, "id", "value"), urlParams.get('role_id'), "All Roles")}
                   </select>
                 </div>
 
                 <div class="flex flex-col gap-1">
                   <label class="text-[10px] font-bold text-slate-400 uppercase ml-1">Status</label>
-                  <select name="status" class="pl-3 pr-10 py-2 text-sm border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300">
-                    ${this.renderOptions(statusFilter, urlParams.get('status'), "All Statuses")}
+                  <select name="workflow_status" class="pl-3 pr-10 py-2 text-sm border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300">
+                    ${selectOptionsHTML(workflowStatusFilter, urlParams.get('workflow_status'), "All Statuses")}
                   </select>
                 </div>
 
                 <div class="flex flex-col gap-1">
                   <label class="text-[10px] font-bold text-slate-400 uppercase ml-1">Type</label>
                   <select name="business_type" class="pl-3 pr-10 py-2 text-sm border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300">
-                    ${this.renderOptions(typeFilter, urlParams.get('business_type'), "All Types")}
+                    ${selectOptionsHTML(typeFilter, urlParams.get('business_type'), "All Types")}
                   </select>
                 </div>
 
@@ -126,7 +125,7 @@ export default class Companies_Branches_EmployeesController extends Companies_La
                       </div>
                     </td>
                     <td class="py-4 px-6 text-sm">
-                      <p class="text-blue-600 dark:text-blue-400 font-medium">${employee.user?.email || 'N/A'}</p>
+                      <p class="text-blue-600 dark:text-blue-400 font-medium">${employee.email || 'N/A'}</p>
                     </td>
                     <td class="py-4 px-6">
                       <div class="flex flex-wrap gap-1">
@@ -159,7 +158,7 @@ export default class Companies_Branches_EmployeesController extends Companies_La
                       </span>
                     </td>
                     <td class="py-4 px-6 text-sm">
-                      ${Helpers.statusBadge(employee.lifecycle_status)}
+                      ${Helpers.statusBadge(employee.workflow_status)}
                     </td>
                     <td class="py-4 px-6 text-sm text-right">
                       <button class="p-2 text-slate-500 hover:text-blue-600 hover:bg-blue-50 rounded-lg">

@@ -11,5 +11,4 @@ class Department < ApplicationRecord
 
   has_many :department_appointments, dependent: :destroy
   has_many :employees, through: :department_appointments, source: :appoint_to, source_type: "Employee"
-
 end

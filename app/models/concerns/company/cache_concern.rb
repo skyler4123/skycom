@@ -3,7 +3,6 @@ module Company::CacheConcern
   extend ActiveSupport::Concern
 
   included do
-
     def cached_departments
       # 1. Define the relation
       scope = employee_groups.joins(:category).where(categories: { name: "Department" })

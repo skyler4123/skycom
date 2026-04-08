@@ -35,11 +35,13 @@ window.isEmpty = Helpers.isEmpty
 window.sort = Helpers.sort
 window.pagination = Helpers.pagination
 window.randomId = Helpers.randomId
+window.cloneNewKey = Helpers.cloneNewKey
 window.openModal = Helpers.openModal
 window.closeModal = Helpers.closeModal
 window.openPopover = Helpers.openPopover
 window.form = Helpers.form
-
+window.toast = Helpers.toast
+window.selectOptionsHTML = Helpers.selectOptionsHTML
 // 4. Data Getters (Safe from Race Conditions)
 // This allows you to use 'currentCompany()' as a variable that always fetches fresh data
 window.currentCompanies = Helpers.currentCompanies

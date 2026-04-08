@@ -36,7 +36,7 @@ class Seed::RetailService
     create_facilities_for_branches
     appoint_payment_methods_to_company
     setup_roles_and_permissions
-    create_departments_for_branches
+    create_departments_for_company
     create_employees
     assign_employees_to_departments
     create_customers_for_company
@@ -122,7 +122,6 @@ class Seed::RetailService
     @branches.each do |branch|
       branch.subscribe!(plan_name: Subscription.plan_names.keys.sample)
     end
-    
   end
 
   def create_facilities_for_branches
@@ -158,25 +157,23 @@ class Seed::RetailService
     configure_retail_permissions
   end
 
-  def create_departments_for_branches
-    @branches.each do |branch|
-      [ "Electronics", "Clothing", "Home Goods", "Customer Service" ].each do |dept_name|
-        department = Seed::DepartmentService.create(
-          company: @retail,
-          name: dept_name,
-          description: "Department: #{dept_name} in #{branch.name}"
-        )
-        department.update!(category: Seed::CategoryService.create(company: @retail, name: "Department"))
-        department.attach_tag(name: "Department #{department.id} Tag")
-        @departments << department
-      end
+  def create_departments_for_company
+    [ "Electronics", "Clothing", "Home Goods", "Customer Service" ].each do |dept_name|
+      department = Seed::DepartmentService.create(
+        company: @retail,
+        name: dept_name,
+        description: "Department: #{dept_name}"
+      )
+      department.update!(category: Seed::CategoryService.create(company: @retail, name: "Department"))
+      department.attach_tag(name: "Department #{department.id} Tag")
+      @departments << department
     end
   end
 
   def create_employees
     @branches.each_with_index do |branch, index|
       branch_employees = []
-      
+
       EMPLOYEE_COUNTS.each do |role_name, count|
         count.times do |i|
           user = Seed::UserService.create(parent_user: @multi_company_owner, email: "#{role_name}_#{i + 1}_branch_#{index + 1}@#{@company_email_full_domain}")
@@ -188,7 +185,7 @@ class Seed::RetailService
           branch_employees << employee
         end
       end
-      
+
       @employees.concat(branch_employees)
     end
   end
@@ -226,7 +223,7 @@ class Seed::RetailService
         seller: @retail,
         buyer: customer
       )
-    end 
+    end
   end
 
   def setup_loyalty_programs
@@ -236,7 +233,7 @@ class Seed::RetailService
           company: @retail, branch: branch, name: "Loyalty Program #{i + 1} - #{branch.name}"
         )
         @loyalty_programs << lp
-        
+
         branch_customers = @customers.select { |c| c.branch_id == branch.id }
         branch_customers.sample(10).each do |customer|
           Seed::CustomerGroupAppointmentService.create(customer_group: lp, appoint_to: customer)

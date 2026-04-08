@@ -65,5 +65,6 @@ class User < ApplicationRecord
   end
 
   include User::RetailConcern
+
   # ----------------------------------------------------------------------------------------------------
 end

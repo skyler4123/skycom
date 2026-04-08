@@ -581,6 +581,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.uuid "company_id", null: false
     t.uuid "branch_id"
     t.uuid "category_id"
+    t.string "email"
     t.string "name"
     t.string "description"
     t.string "code"
@@ -602,6 +603,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.uuid "branch_id"
     t.uuid "user_id"
     t.uuid "category_id"
+    t.string "email"
     t.string "name"
     t.string "description"
     t.string "code"
@@ -650,6 +652,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
   create_table "departments", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.uuid "company_id", null: false
     t.uuid "category_id"
+    t.string "email", null: false
     t.string "name"
     t.string "description"
     t.string "code"
@@ -663,6 +666,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.index ["category_id"], name: "index_departments_on_category_id"
     t.index ["company_id"], name: "index_departments_on_company_id"
     t.index ["discarded_at"], name: "index_departments_on_discarded_at"
+    t.index ["email"], name: "index_departments_on_email", unique: true
   end
 
   create_table "document_appointments", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -817,6 +821,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.uuid "company_id", null: false
     t.uuid "branch_id"
     t.uuid "category_id"
+    t.string "email"
     t.string "name"
     t.string "description"
     t.string "code"
@@ -839,6 +844,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.uuid "branch_id"
     t.uuid "user_id"
     t.uuid "category_id"
+    t.string "email"
     t.string "name"
     t.string "description"
     t.string "code"
@@ -2466,6 +2472,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
   end
 
   create_table "systems", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.string "email"
     t.string "name", default: "System", null: false
     t.string "code", null: false, comment: "System"
     t.integer "balance_cents", default: 0, null: false

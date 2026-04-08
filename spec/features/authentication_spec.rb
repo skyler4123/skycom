@@ -13,18 +13,11 @@ RSpec.feature "Authentication", type: :feature, js: true do
 
     it "successfully signs up and signs me in" do
       visit root_path
-
-      # First click to open the sign-up form/modal
+      sleep 1
+      expect(page).to have_selector('button[role="sign-up-button"]', text: "Sign Up", visible: true)
       click_on "Sign Up"
-
-      # Wait for the form to appear; if not found/visible, click again (handles flaky toggle/modal)
-      begin
-        sign_up_form = find('form[role="sign-up-form"]', wait: 0.2)
-      rescue Capybara::ElementNotFound
-        # Second attempt: click again in case the first one didn't fully trigger the modal/drawer
-        click_on "Sign Up"
-        sign_up_form = find('form[role="sign-up-form"]') # uses default wait time
-      end
+      sign_up_form = find('form[role="sign-up-form"]', wait: 1)
+      expect(page).to have_selector('form[role="sign-up-form"]', visible: true)
 
       within(sign_up_form) do
         fill_in "Email", with: new_user_params[:email]
@@ -43,7 +36,7 @@ RSpec.feature "Authentication", type: :feature, js: true do
   describe "Sign in with normal user" do
     let(:user) { create(:user, password: 'Password@1234', password_confirmation: 'Password@1234') }
     let!(:before_session_count) { user.sessions.count }
-    
+
     it "signs me in", retry: 3, retry_wait: 10 do
       sign_in(user)
 

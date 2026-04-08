@@ -6,6 +6,7 @@ class CreateEmployees < ActiveRecord::Migration[8.0]
       t.references :user, null: true, foreign_key: true, type: :uuid
       t.references :category, null: true, foreign_key: true, type: :uuid
 
+      t.string :email
       t.string :name
       t.string :description
       t.string :code

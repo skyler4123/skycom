@@ -1,7 +1,6 @@
 # app/controllers/companies/branches_controller.rb
 
 class Companies::BranchesController < Companies::ApplicationController
-
   def index
     # debugger
     respond_to do |format|

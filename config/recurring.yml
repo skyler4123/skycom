@@ -17,10 +17,10 @@
 # ----------------------------------------------------------------------------------------------------
 
 default: &default
-  demo_job:
-    class: DemoJob
-    queue: demo_job
-    schedule: every 1 minutes
+  # demo_job:
+  #   class: DemoJob
+  #   queue: demo_job
+  #   schedule: every 1 minutes
   statistic_job:
     class: StatisticJob
     queue: statistic_job

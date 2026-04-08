@@ -8,51 +8,27 @@ require 'capybara/rails'
 require 'capybara/rspec'
 require 'selenium-webdriver'
 
-RSPEC_LOCAL = true
+TEST_RUN_INSIDE_DOCKER = ENV.fetch("TEST_RUN_INSIDE_DOCKER") { false }
 
-if RSPEC_LOCAL
-  # Run native local
-  Capybara.default_max_wait_time = 5
+if TEST_RUN_INSIDE_DOCKER
+  Capybara.register_driver :selenium_chrome_docker do |app|
+    options = Selenium::WebDriver::Options.chrome(
+      args: [
+        "--headless=new",         # The updated headless engine
+        "--no-sandbox",           # Required to run as root/non-privileged in Docker
+        "--disable-dev-shm-usage", # Prevents crashes in limited Docker memory
+        "--disable-gpu",
+        "--remote-debugging-pipe", # CRITICAL: Fixes the "Chrome instance exited" error
+        "--window-size=1400,1000"
+      ],
+      binary: "/usr/bin/chromium"
+    )
+
+    Capybara::Selenium::Driver.new(app, browser: :chrome, options: options)
+  end
+
+  Capybara.javascript_driver = :selenium_chrome_docker
+else
   Capybara.default_driver = :selenium_chrome
   Capybara.javascript_driver = :selenium_chrome
-else
-  # Run inside docker
-  # Configure Capybara to use a remote browser
-  Capybara.configure do |config|
-    # Set the app host to the name of the Rails service in your docker-compose file.
-    # This allows the Selenium container to find the Rails application.
-    # Capybara will prepend this to your `visit` calls.
-    # config.app_host = 'http://192.168.0.100:3000'
-    config.app_host = 'http://web:3000'
-
-    config.server_host = '0.0.0.0' # Allow Rails test server to accept external connections
-    config.server_port = 3000 # Match your Rails server port
-    # Register a custom driver for remote Selenium
-    Capybara.register_driver :remote_selenium_chrome do |app|
-      # A standard Capybara configuration block that tells Capybara how to
-      # communicate with the Selenium Hub.
-      Capybara::Selenium::Driver.new(
-        app,
-        browser: :remote,
-        # The URL for the Selenium Hub is based on the service name from docker-compose.yml.
-        # The host `selenium-chromium` is the name of the service, and `4444` is the exposed port.
-        url: "http://selenium-chromium:4444/wd/hub",
-        # url: "http://localhost:4444/wd/hub",
-
-        # Add capabilities for the browser (e.g., to run headless)
-        capabilities: Selenium::WebDriver::Options.chrome(
-          "goog:chromeOptions": { "args": [ "--headless", "--disable-gpu", "--no-sandbox" ] }
-          # "goog:chromeOptions": { "args": ["--disable-gpu", "--no-sandbox"] }
-
-        )
-      )
-    end
-
-    # # Use the custom registered driver as the default for JavaScript tests
-    config.javascript_driver = :remote_selenium_chrome
-    # config.javascript_driver = :selenium_chrome
-  end
 end
-
-# 🛑 ADD THIS LINE TO SUPPRESS DEBUG/INFO LOGS
-Selenium::WebDriver.logger.level = :warn

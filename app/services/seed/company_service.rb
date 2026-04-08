@@ -5,6 +5,7 @@
 class Seed::CompanyService
   def self.create(
     user:,
+    email: "company_#{SecureRandom.hex}@gmail.com",
     name: Faker::Name.name,
     description: Faker::Company.catch_phrase,
     lifecycle_status: Company.lifecycle_statuses.keys.sample,
@@ -20,7 +21,6 @@ class Seed::CompanyService
     city: Faker::Address.city,
     postal_code: Faker::Address.postcode,
     country_code: Company.country_codes.keys.sample,
-    email: Faker::Internet.email,
     phone_number: Faker::PhoneNumber.phone_number,
     website: Faker::Internet.url,
     fiscal_year_end_month: Company.fiscal_year_end_months.keys.sample,

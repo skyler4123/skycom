@@ -1,4 +1,4 @@
-import { pathname } from "controllers/helpers/http_helpers"
+import { pathname } from "controllers/helpers/ui_helpers"
 
 // --- Cookie Logic ---
 /**
@@ -69,6 +69,18 @@ export const currentCompany = () => {
 
 export const currentBranches = () => {
   return currentCompany()?.branches || []
+}
+
+export const currentDepartments = () => {
+  return currentCompany().departments
+}
+
+export const currentRoles = () => {
+  return currentCompany().roles
+}
+
+export const employee = () => {
+  return getCache().employee || []
 }
 
 /**
