@@ -2,32 +2,29 @@ module SessionHelpers
   def sign_in(user)
     visit root_path
 
-    # === Wait for the authentication controller to fully render the signed-out state ===
-    # This is the key: we wait until the button is present AND the controller has stabilized
-    expect(page).to have_selector('button[role="sign-in-button"]', wait: 12)
-
-    # Extra safety: wait until the authentication controller has finished its valueChanged cycle
-    # (We can detect this by waiting for the button that has the correct data-action)
+    page.execute_script("document.documentElement.style.setProperty('transition', 'none', 'important')")
+    
+    # 1. Wait for header controller to fully render signed-out state
     expect(page).to have_selector(
       'button[role="sign-in-button"][data-action*="openSignInModal"]',
-      wait: 10
+      wait: 12
     )
 
     find('button[role="sign-in-button"]').click
 
-    # Wait for the modal (SweetAlert2 + Stimulus modal controller)
-    expect(page).to have_selector('.swal2-container, form[role="sign-in-form"]', wait: 12)
+    # 2. Wait for the modal form to appear
+    expect(page).to have_selector('form[role="sign-in-form"]', wait: 12)
 
-    # Now interact with the form using fresh lookups
-    within find('form[role="sign-in-form"]', wait: 10) do
-      find('input[name="email"]', wait: 5).set(user.email)
-      find('input[name="password"]', wait: 5).set(user.password)
+    # 3. Fill fields with fresh finds every time (safer than within for dynamic content)
+    find('input[name="email"]', wait: 8).set(user.email)
+    find('input[name="password"]', wait: 8).set(user.password)
 
-      find('button[type="submit"]', text: /Sign In/i, wait: 5).click
-    end
+    # 4. Click submit with fresh lookup right before action
+    find('button[type="submit"]', text: /Sign In/i, wait: 8).click
 
-    # Final assertion
-    expect(page).to have_selector('[role="avatar"]', wait: 15)
+    # 5. Wait for the modal to close and signed-in state to appear
+    expect(page).to have_selector('[role="avatar"]', wait: 18)
+    expect(page).to have_no_selector('form[role="sign-in-form"]', wait: 8) # optional but helpful
   end
 end
 
