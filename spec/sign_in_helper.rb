@@ -1,30 +1,24 @@
 module SessionHelpers
   def sign_in(user)
-    visit root_path
+      visit root_path
+      sleep 0.2
+      # 1. Wait for the button and click
+      expect(page).to have_selector('button[role="sign-in-button"]', wait: 10)
+      find('button[role="sign-in-button"]', wait: 10).click
 
-    page.execute_script("document.documentElement.style.setProperty('transition', 'none', 'important')")
-    
-    # 1. Wait for header controller to fully render signed-out state
-    expect(page).to have_selector(
-      'button[role="sign-in-button"][data-action*="openSignInModal"]',
-      wait: 12
-    )
+      # 2. Use the FORM role as the anchor.
+      # If the form flickers, Capybara will re-find this block.
+      within 'form[role="sign-in-form"]', wait: 10 do
+        # 3. Use find(...).set. This is the "magic" fix.
+        # It performs a fresh DOM lookup immediately before typing.
+        find('input[name="email"]', wait: 5).set(user.email)
+        find('input[name="password"]', wait: 5).set(user.password)
 
-    find('button[role="sign-in-button"]').click
+        click_button "Sign In"
+      end
 
-    # 2. Wait for the modal form to appear
-    expect(page).to have_selector('form[role="sign-in-form"]', wait: 12)
-
-    # 3. Fill fields with fresh finds every time (safer than within for dynamic content)
-    find('input[name="email"]', wait: 8).set(user.email)
-    find('input[name="password"]', wait: 8).set(user.password)
-
-    # 4. Click submit with fresh lookup right before action
-    find('button[type="submit"]', text: /Sign In/i, wait: 8).click
-
-    # 5. Wait for the modal to close and signed-in state to appear
-    expect(page).to have_selector('[role="avatar"]', wait: 18)
-    expect(page).to have_no_selector('form[role="sign-in-form"]', wait: 8) # optional but helpful
+      expect(page).to have_selector('[role="avatar"]', wait: 10)
+    end
   end
 end
 

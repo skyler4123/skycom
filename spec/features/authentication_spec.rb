@@ -13,7 +13,7 @@ RSpec.feature "Authentication", type: :feature, js: true do
 
     it "successfully signs up and signs me in" do
       visit root_path
-      sleep 0.5
+      sleep 0.2
       expect(page).to have_selector('button[role="sign-up-button"]', text: "Sign Up", visible: true)
       click_on "Sign Up"
       sign_up_form = find('form[role="sign-up-form"]', wait: 1)
