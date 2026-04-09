@@ -29,6 +29,7 @@ if TEST_RUN_INSIDE_DOCKER
   end
 
   Capybara.javascript_driver = :selenium_chrome_docker
+  Capybara.default_max_wait_time = 15
 else
   Capybara.default_driver = :selenium_chrome
   Capybara.javascript_driver = :selenium_chrome
