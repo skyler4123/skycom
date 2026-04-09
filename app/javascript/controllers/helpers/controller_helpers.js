@@ -30,7 +30,7 @@ export const openListener = (group, key) => `data-open-target="listener" data-op
  * @param {number} [options.interval=100] - Time in ms between attempts.
  * @param {number} [options.maxAttempts=10] - Maximum number of times to call the callback.
  */
-export const poll = (callback, { interval = 100, maxAttempts = 10 } = {}) => {
+export const poll = (callback, { interval = 10, maxAttempts = 10 } = {}) => {
   let attempts = 0;
   const intervalId = setInterval(() => {
     attempts++;
