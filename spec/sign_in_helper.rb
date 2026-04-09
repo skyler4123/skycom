@@ -1,7 +1,7 @@
 module SessionHelpers
   def sign_in(user)
     visit root_path
-    sleep 0.1
+    sleep 0.5
     # 1. Wait for the button and click
     expect(page).to have_selector('button[role="sign-in-button"]', wait: 10)
     find('button[role="sign-in-button"]', wait: 10).click
