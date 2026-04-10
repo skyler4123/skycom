@@ -1,1383 +1,162 @@
-/**
- * @global
- * @typedef {Object} User
- * @property {string} id - The unique identifier for the user (UUID).
- * @property {string} email
- * @property {boolean} verified
- * @property {SystemRole} system_role
- * @property {string|null} username
- * @property {string|null} first_name
- * @property {string|null} last_name
- * @property {string|null} avatar
- * @property {string|null} phone_number
- * @property {CountryCode|null} country_code
- * @property {string|null} parent_user_id
- * @property {string|null} discarded_at
- * @property {string} created_at
- * @property {string} updated_at
- */
-
-/**
- * @global
- * @typedef {Object} Address
- * @property {string} id - The unique identifier for the address (UUID).
- * @property {string} line_1
- * @property {string|null} line_2
- * @property {string} city
- * @property {string|null} state_or_province
- * @property {string|null} postal_code
- * @property {CountryCode|null} country_code
- * @property {string} fingerprint - A unique hash of the address components.
- * @property {string} created_at
- * @property {string} updated_at
- */
-
-/**
- * @typedef {Object} PolymorphicAppointment
- * @property {string|null} appoint_from_type
- * @property {string|null} appoint_from_id
- * @property {string} appoint_to_type
- * @property {string} appoint_to_id
- * @property {string|null} appoint_for_type
- * @property {string|null} appoint_for_id
- * @property {string|null} appoint_by_type
- * @property {string|null} appoint_by_id
- * @property {string|null} name
- * @property {string|null} description
- * @property {string|null} code
- * @property {string|null} value
- * @property {LifecycleStatus|null} lifecycle_status
- * @property {WorkflowStatus|null} workflow_status
- * @property {BusinessType|null} business_type
- * @property {string|null} discarded_at
- * @property {string} created_at
- * @property {string} updated_at
- */
-
-/**
- * @global
- * @typedef {PolymorphicAppointment & { id: string, address_id: string }} AddressAppointment
- */
-
-/**
- * @global
- * @typedef {Object} Answer
- * @property {string} id - UUID
- * @property {string} question_id
- * @property {string|null} category_id
- * @property {string|null} name
- * @property {string|null} description
- * @property {string|null} code
- * @property {LifecycleStatus|null} lifecycle_status
- * @property {WorkflowStatus|null} workflow_status
- * @property {BusinessType|null} business_type
- * @property {string|null} discarded_at
- * @property {string} created_at
- * @property {string} updated_at
- */
-
-/**
- * @global
- * @typedef {PolymorphicAppointment & { id: string, article_id: string }} ArticleAppointment
- */
-
-/**
- * @global
- * @typedef {PolymorphicAppointment & { id: string, article_group_id: string }} ArticleGroupAppointment
- */
-
-/**
- * @global
- * @typedef {Object} ArticleGroup
- * @property {string} id - UUID
- * @property {string} company_id
- * @property {string} branch_id
- * @property {string|null} category_id
- * @property {string|null} title
- * @property {Object|null} content - JSON content
- * @property {string|null} name
- * @property {string|null} description
- * @property {string|null} code
- * @property {LifecycleStatus|null} lifecycle_status
- * @property {WorkflowStatus|null} workflow_status
- * @property {BusinessType|null} business_type
- * @property {string|null} discarded_at
- * @property {string} created_at
- * @property {string} updated_at
- */
-
-/**
- * @global
- * @typedef {Object} Article
- * @property {string} id - UUID
- * @property {string} article_group_id
- * @property {string} company_id
- * @property {string} branch_id
- * @property {string|null} category_id
- * @property {string|null} title
- * @property {Object|null} content - JSON content
- * @property {string|null} name
- * @property {string|null} description
- * @property {string|null} code
- * @property {LifecycleStatus|null} lifecycle_status
- * @property {WorkflowStatus|null} workflow_status
- * @property {BusinessType|null} business_type
- * @property {string|null} discarded_at
- * @property {string} created_at
- * @property {string} updated_at
- */
-
-/**
- * @global
- * @typedef {Object} Booking
- * @property {string} id - UUID
- * @property {string} company_id
- * @property {string|null} branch_id
- * @property {string|null} appoint_from_type
- * @property {string|null} appoint_from_id
- * @property {string} appoint_to_type
- * @property {string} appoint_to_id
- * @property {string|null} category_id
- * @property {string|null} name
- * @property {string|null} description
- * @property {string|null} code
- * @property {LifecycleStatus|null} lifecycle_status
- * @property {WorkflowStatus|null} workflow_status
- * @property {BusinessType|null} business_type
- * @property {string|null} discarded_at
- * @property {string} created_at
- * @property {string} updated_at
- */
-
-/**
- * @global
- * @typedef {Object} Brand
- * @property {string} id - UUID
- * @property {string|null} category_id
- * @property {string|null} name
- * @property {string|null} description
- * @property {string|null} code
- * @property {LifecycleStatus|null} lifecycle_status
- * @property {WorkflowStatus|null} workflow_status
- * @property {BusinessType|null} business_type
- * @property {string|null} discarded_at
- * @property {string} created_at
- * @property {string} updated_at
- */
-
-/**
- * @global
- * @typedef {PolymorphicAppointment & { id: string, cart_id: string }} CartAppointment
- */
-
-/**
- * @global
- * @typedef {Object} CartGroup
- * @property {string} id - UUID
- * @property {string} company_id
- * @property {string|null} branch_id
- * @property {string|null} category_id
- * @property {string|null} name
- * @property {string|null} description
- * @property {string|null} code
- * @property {LifecycleStatus|null} lifecycle_status
- * @property {WorkflowStatus|null} workflow_status
- * @property {BusinessType|null} business_type
- * @property {string|null} discarded_at
- * @property {string} created_at
- * @property {string} updated_at
- */
-
-/**
- * @global
- * @typedef {Object} Cart
- * @property {string} id - UUID
- * @property {string} company_id
- * @property {string|null} branch_id
- * @property {string} cart_group_id
- * @property {string|null} category_id
- * @property {string|null} name
- * @property {string|null} description
- * @property {string|null} code
- * @property {string|null} sku
- * @property {string|null} barcode
- * @property {string|null} upc
- * @property {string|null} ean
- * @property {string|null} manufacturer_code
- * @property {string|null} serial_number
- * @property {string|null} batch_number
- * @property {string|null} expiration_date
- * @property {LifecycleStatus|null} lifecycle_status
- * @property {WorkflowStatus|null} workflow_status
- * @property {BusinessType|null} business_type
- * @property {string|null} discarded_at
- * @property {string} created_at
- * @property {string} updated_at
- */
-
-/**
- * @global
- * @typedef {Object} Category
- * @property {string} id - UUID
- * @property {string} company_id
- * @property {string|null} name
- * @property {string|null} description
- * @property {string} created_at
- * @property {string} updated_at
- */
-
-/**
- * @global
- * @typedef {Object} Company
- * @property {string} id - UUID
- * @property {string} company_id
- * @property {string|null} parent_branch_id
- * @property {string|null} category_id
- * @property {string|null} name
- * @property {string|null} description
- * @property {string|null} code
- * @property {LifecycleStatus|null} lifecycle_status
- * @property {WorkflowStatus|null} workflow_status
- * @property {number|null} ownership_type
- * @property {BusinessType|null} business_type
- * @property {Currency|null} currency
- * @property {string|null} registration_number
- * @property {string|null} vat_id
- * @property {string|null} tax_id
- * @property {number|null} timezone
- * @property {string|null} address_line_1
- * @property {string|null} city
- * @property {string|null} postal_code
- * @property {string|null} country
- * @property {string|null} email
- * @property {string|null} phone_number
- * @property {string|null} website
- * @property {number|null} employee_count
- * @property {number|null} fiscal_year_end_month
- * @property {string|null} discarded_at
- * @property {string} created_at
- * @property {string} updated_at
- */
-
-/**
- * @global
- * @typedef {Object} Subscription
- * @property {string} id - The unique identifier for the subscription (UUID).
- * @property {string|null} subscription_group_id
- * @property {string} price_id
- * @property {string} period_id
- * @property {string} seller_id
- * @property {string} seller_type - e.g., 'System', 'Company'
- * @property {string} buyer_id
- * @property {string} buyer_type - e.g., 'User', 'Company'
- * @property {string|null} resource_id
- * @property {string|null} resource_type
- * @property {string|null} processer_id
- * @property {string|null} processer_type
- * @property {string|null} name
- * @property {string|null} description
- * @property {CountryCode} country_code
- * @property {SubscriptionPlanName} plan_name
- * @property {LifecycleStatus|null} lifecycle_status
- * @property {WorkflowStatus|null} workflow_status
- * @property {BusinessType|null} business_type
- * @property {boolean|null} auto_renew
- * @property {string|null} discarded_at
- * @property {string} created_at
- * @property {string} updated_at
- */
-
-/**
- * @global
- * @typedef {Object} SubscriptionGroup
- * @property {string} id - The unique identifier for the subscription group (UUID).
- * @property {string|null} subscription_group_id
- * @property {string} price_id
- * @property {string} period_id
- * @property {string} seller_type
- * @property {string} seller_id
- * @property {string} buyer_type
- * @property {string} buyer_id
- * @property {string|null} processed_by_type
- * @property {string|null} processed_by_id
- * @property {string|null} name
- * @property {string|null} description
- * @property {CountryCode} country_code
- * @property {SubscriptionPlanName} plan_name
- * @property {LifecycleStatus|null} lifecycle_status
- * @property {WorkflowStatus|null} workflow_status
- * @property {BusinessType|null} business_type
- * @property {boolean|null} auto_renew
- * @property {string|null} discarded_at
- * @property {string} created_at
- * @property {string} updated_at
- */
-
-/**
- * @global
- * @typedef {PolymorphicAppointment & { id: string, customer_id: string }} CustomerAppointment
- */
-
-/**
- * @global
- * @typedef {PolymorphicAppointment & { id: string, customer_group_id: string }} CustomerGroupAppointment
- */
-
-/**
- * @global
- * @typedef {Object} CustomerGroup
- * @property {string} id - UUID
- * @property {string} company_id
- * @property {string|null} branch_id
- * @property {string|null} category_id
- * @property {string|null} name
- * @property {string|null} description
- * @property {string|null} code
- * @property {LifecycleStatus|null} lifecycle_status
- * @property {WorkflowStatus|null} workflow_status
- * @property {BusinessType|null} business_type
- * @property {string|null} discarded_at
- * @property {string} created_at
- * @property {string} updated_at
- */
-
-/**
- * @global
- * @typedef {PolymorphicAppointment & { id: string, document_id: string }} DocumentAppointment
- */
-
-/**
- * @global
- * @typedef {PolymorphicAppointment & { id: string, document_group_id: string }} DocumentGroupAppointment
- */
-
-/**
- * @global
- * @typedef {Object} DocumentGroup
- * @property {string} id - UUID
- * @property {string} company_id
- * @property {string} branch_id
- * @property {string|null} category_id
- * @property {string|null} title
- * @property {Object|null} content - JSON content
- * @property {string|null} name
- * @property {string|null} description
- * @property {string|null} code
- * @property {LifecycleStatus|null} lifecycle_status
- * @property {WorkflowStatus|null} workflow_status
- * @property {BusinessType|null} business_type
- * @property {string|null} discarded_at
- * @property {string} created_at
- * @property {string} updated_at
- */
-
-/**
- * @global
- * @typedef {Object} Document
- * @property {string} id - UUID
- * @property {string} document_group_id
- * @property {string} company_id
- * @property {string} branch_id
- * @property {string|null} category_id
- * @property {string|null} title
- * @property {Object|null} content - JSON content
- * @property {string|null} name
- * @property {string|null} description
- * @property {string|null} code
- * @property {LifecycleStatus|null} lifecycle_status
- * @property {WorkflowStatus|null} workflow_status
- * @property {BusinessType|null} business_type
- * @property {string|null} discarded_at
- * @property {string} created_at
- * @property {string} updated_at
- */
-
-/**
- * @global
- * @typedef {PolymorphicAppointment & { id: string, employee_id: string }} EmployeeAppointment
- */
-
-/**
- * @global
- * @typedef {PolymorphicAppointment & { id: string, employee_group_id: string }} EmployeeGroupAppointment
- */
-
-/**
- * @global
- * @typedef {Object} EmployeeGroup
- * @property {string} id - UUID
- * @property {string} company_id
- * @property {string|null} branch_id
- * @property {string|null} category_id
- * @property {string|null} name
- * @property {string|null} description
- * @property {string|null} code
- * @property {LifecycleStatus|null} lifecycle_status
- * @property {WorkflowStatus|null} workflow_status
- * @property {BusinessType|null} business_type
- * @property {string|null} discarded_at
- * @property {string} created_at
- * @property {string} updated_at
- */
-
-/**
- * @global
- * @typedef {EmployeeGroup} Department
- */
-
-/**
- * @global
- * @typedef {PolymorphicAppointment & { id: string, event_id: string }} EventAppointment
- */
-
-/**
- * @global
- * @typedef {PolymorphicAppointment & { id: string, event_group_id: string }} EventGroupAppointment
- */
-
-/**
- * @global
- * @typedef {Object} EventGroup
- * @property {string} id - UUID
- * @property {string} company_id
- * @property {string} branch_id
- * @property {string|null} category_id
- * @property {string|null} name
- * @property {string|null} description
- * @property {string|null} code
- * @property {LifecycleStatus|null} lifecycle_status
- * @property {WorkflowStatus|null} workflow_status
- * @property {BusinessType|null} business_type
- * @property {string|null} discarded_at
- * @property {string} created_at
- * @property {string} updated_at
- */
-
-/**
- * @global
- * @typedef {Object} Event
- * @property {string} id - UUID
- * @property {string} event_group_id
- * @property {string} company_id
- * @property {string} branch_id
- * @property {string|null} category_id
- * @property {string|null} name
- * @property {string|null} description
- * @property {string|null} code
- * @property {LifecycleStatus|null} lifecycle_status
- * @property {WorkflowStatus|null} workflow_status
- * @property {BusinessType|null} business_type
- * @property {string|null} discarded_at
- * @property {string} created_at
- * @property {string} updated_at
- */
-
-/**
- * @global
- * @typedef {PolymorphicAppointment & { id: string, exam_id: string }} ExamAppointment
- */
-
-/**
- * @global
- * @typedef {Object} ExamGroup
- * @property {string} id - UUID
- * @property {string} company_id
- * @property {string|null} branch_id
- * @property {string|null} category_id
- * @property {string|null} name
- * @property {string|null} description
- * @property {string|null} code
- * @property {LifecycleStatus|null} lifecycle_status
- * @property {WorkflowStatus|null} workflow_status
- * @property {BusinessType|null} business_type
- * @property {string|null} discarded_at
- * @property {string} created_at
- * @property {string} updated_at
- */
-
-/**
- * @global
- * @typedef {Object} Exam
- * @property {string} id - UUID
- * @property {string} exam_group_id
- * @property {string} company_id
- * @property {string|null} branch_id
- * @property {string|null} category_id
- * @property {string|null} name
- * @property {string|null} description
- * @property {string|null} code
- * @property {LifecycleStatus|null} lifecycle_status
- * @property {WorkflowStatus|null} workflow_status
- * @property {BusinessType|null} business_type
- * @property {string|null} discarded_at
- * @property {string} created_at
- * @property {string} updated_at
- */
-
-/**
- * @global
- * @typedef {Object} Facility
- * @property {string} id - UUID
- * @property {string} company_id
- * @property {string|null} branch_id
- * @property {string|null} category_id
- * @property {string|null} name
- * @property {string|null} description
- * @property {string|null} code
- * @property {LifecycleStatus|null} lifecycle_status
- * @property {WorkflowStatus|null} workflow_status
- * @property {BusinessType|null} business_type
- * @property {string|null} discarded_at
- * @property {string} created_at
- * @property {string} updated_at
- */
-
-/**
- * @global
- * @typedef {PolymorphicAppointment & { id: string, facility_id: string }} FacilityAppointment
- */
-
-/**
- * @global
- * @typedef {PolymorphicAppointment & { id: string, facility_group_id: string }} FacilityGroupAppointment
- */
-
-/**
- * @global
- * @typedef {Object} FacilityGroup
- * @property {string} id - UUID
- * @property {string} company_id
- * @property {string|null} branch_id
- * @property {string|null} category_id
- * @property {string|null} name
- * @property {string|null} description
- * @property {string|null} code
- * @property {LifecycleStatus|null} lifecycle_status
- * @property {WorkflowStatus|null} workflow_status
- * @property {BusinessType|null} business_type
- * @property {string|null} discarded_at
- * @property {string} created_at
- * @property {string} updated_at
- */
-
-/**
- * @global
- * @typedef {Object} Inventory
- * @property {string} id - UUID
- * @property {string} company_id
- * @property {string|null} branch_id
- * @property {string|null} category_id
- * @property {string|null} name
- * @property {string|null} description
- * @property {string|null} code
- * @property {LifecycleStatus|null} lifecycle_status
- * @property {WorkflowStatus|null} workflow_status
- * @property {BusinessType|null} business_type
- * @property {string|null} discarded_at
- * @property {string} created_at
- * @property {string} updated_at
- */
-
-/**
- * @global
- * @typedef {PolymorphicAppointment & { id: string, inventory_item_id: string }} InventoryItemAppointment
- */
-
-/**
- * @global
- * @typedef {Object} InventoryItem
- * @property {string} id - UUID
- * @property {string} inventory_id
- * @property {string|null} category_id
- * @property {string|null} name
- * @property {string|null} description
- * @property {string|null} code
- * @property {string|null} sku
- * @property {string|null} barcode
- * @property {string|null} upc
- * @property {string|null} ean
- * @property {string|null} manufacturer_code
- * @property {string|null} serial_number
- * @property {string|null} batch_number
- * @property {string|null} expiration_date
- * @property {LifecycleStatus|null} lifecycle_status
- * @property {WorkflowStatus|null} workflow_status
- * @property {BusinessType|null} business_type
- * @property {string|null} discarded_at
- * @property {string} created_at
- * @property {string} updated_at
- */
-
-/**
- * @global
- * @typedef {PolymorphicAppointment & { id: string, inventory_transaction_id: string }} InventoryTransactionAppointment
- */
-
-/**
- * @global
- * @typedef {Object} InventoryTransaction
- * @property {string} id - UUID
- * @property {string} company_id
- * @property {string|null} branch_id
- * @property {string|null} appoint_from_type
- * @property {string|null} appoint_from_id
- * @property {string} appoint_to_type
- * @property {string} appoint_to_id
- * @property {string|null} appoint_for_type
- * @property {string|null} appoint_for_id
- * @property {string|null} appoint_by_type
- * @property {string|null} appoint_by_id
- * @property {string|null} category_id
- * @property {string|null} name
- * @property {string|null} description
- * @property {string|null} code
- * @property {LifecycleStatus|null} lifecycle_status
- * @property {WorkflowStatus|null} workflow_status
- * @property {BusinessType|null} business_type
- * @property {string|null} discarded_at
- * @property {string} created_at
- * @property {string} updated_at
- */
-
-/**
- * @global
- * @typedef {Object} Invoice
- * @property {string} id - UUID
- * @property {string} order_id
- * @property {string|null} category_id
- * @property {string|null} name
-_ * @property {string|null} description
- * @property {string|null} code
- * @property {Currency|null} currency
- * @property {number|null} duration
- * @property {string|null} number
- * @property {number|null} total_price
- * @property {string|null} due_date
- * @property {LifecycleStatus|null} lifecycle_status
- * @property {WorkflowStatus|null} workflow_status
- * @property {BusinessType|null} business_type
- * @property {string|null} discarded_at
- * @property {string} created_at
- * @property {string} updated_at
- */
-
-/**
- * @global
- * @typedef {PolymorphicAppointment & { id: string, notification_id: string }} NotificationAppointment
- */
-
-/**
- * @global
- * @typedef {PolymorphicAppointment & { id: string, notification_group_id: string }} NotificationGroupAppointment
- */
-
-/**
- * @global
- * @typedef {Object} NotificationGroup
- * @property {string} id - UUID
- * @property {string} company_id
- * @property {string|null} branch_id
- * @property {string|null} category_id
- * @property {string|null} name
- * @property {string|null} description
- * @property {string|null} code
- * @property {LifecycleStatus|null} lifecycle_status
- * @property {WorkflowStatus|null} workflow_status
- * @property {BusinessType|null} business_type
- * @property {string|null} discarded_at
- * @property {string} created_at
- * @property {string} updated_at
- */
-
-/**
- * @global
- * @typedef {Object} Notification
- * @property {string} id - UUID
- * @property {string} notification_group_id
- * @property {string} company_id
- * @property {string|null} branch_id
- * @property {string|null} category_id
- * @property {string|null} name
- * @property {string|null} description
- * @property {string|null} code
- * @property {LifecycleStatus|null} lifecycle_status
- * @property {WorkflowStatus|null} workflow_status
- * @property {BusinessType|null} business_type
- * @property {string|null} discarded_at
- * @property {string} created_at
- * @property {string} updated_at
- */
-
-/**
- * @global
- * @typedef {PolymorphicAppointment & { id: string, order_id: string, unit_price: number, quantity: number, total_price: number }} OrderAppointment
- */
-
-/**
- * @global
- * @typedef {PolymorphicAppointment & { id: string, order_group_id: string, unit_price: number, quantity: number, total_price: number }} OrderGroupAppointment
- */
-
-/**
- * @global
- * @typedef {Object} OrderGroup
- * @property {string} id - UUID
- * @property {string} company_id
- * @property {string|null} branch_id
- * @property {string} customer_id
- * @property {string|null} category_id
- * @property {string|null} name
- * @property {string|null} description
- * @property {string|null} code
- * @property {Currency|null} currency
- * @property {number|null} duration
- * @property {LifecycleStatus|null} lifecycle_status
- * @property {WorkflowStatus|null} workflow_status
- * @property {BusinessType|null} business_type
- * @property {string|null} discarded_at
- * @property {string} created_at
- * @property {string} updated_at
- */
-
-/**
- * @global
- * @typedef {Object} Order
- * @property {string} id - UUID
- * @property {string} company_id
- * @property {string|null} branch_id
- * @property {string} customer_id
- * @property {string|null} category_id
- * @property {string|null} name
- * @property {string|null} description
- * @property {string|null} code
- * @property {string|null} sku
- * @property {string|null} barcode
- * @property {string|null} upc
- * @property {string|null} ean
- * @property {string|null} manufacturer_code
- * @property {string|null} serial_number
- * @property {string|null} batch_number
- * @property {string|null} expiration_date
- * @property {Currency|null} currency
- * @property {number|null} duration
- * @property {LifecycleStatus|null} lifecycle_status
- * @property {WorkflowStatus|null} workflow_status
- * @property {BusinessType|null} business_type
- * @property {string|null} discarded_at
- * @property {string} created_at
- * @property {string} updated_at
- */
-
-/**
- * @global
- * @typedef {Object} PaymentMethodAppointment
- * @property {string} id - UUID
- * @property {string} payment_method_id
- * @property {string} company_id
- * @property {string|null} branch_id
- * @property {string|null} name
- * @property {string|null} description
- * @property {string|null} code
- * @property {LifecycleStatus|null} lifecycle_status
- * @property {WorkflowStatus|null} workflow_status
- * @property {BusinessType|null} business_type
- * @property {string|null} discarded_at
- * @property {string} created_at
- * @property {string} updated_at
- */
-
-/**
- * @global
- * @typedef {Object} PaymentMethod
- * @property {string} id - UUID
- * @property {string|null} category_id
- * @property {string|null} name
- * @property {string|null} description
- * @property {string|null} code
- * @property {Currency|null} currency
- * @property {LifecycleStatus|null} lifecycle_status
- * @property {WorkflowStatus|null} workflow_status
- * @property {BusinessType|null} business_type
- * @property {string|null} discarded_at
- * @property {string} created_at
- * @property {string} updated_at
- */
-
-/**
- * @global
- * @typedef {Object} Payment
- * @property {string} id - UUID
- * @property {string} invoice_id
- * @property {string|null} category_id
- * @property {string|null} name
- * @property {string|null} description
- * @property {string|null} code
- * @property {Currency|null} currency
- * @property {number|null} duration
- * @property {number|null} exchange_rate
- * @property {number|null} amount
- * @property {string|null} payment_method
- * @property {string|null} gateway_details
- * @property {LifecycleStatus|null} lifecycle_status
- * @property {WorkflowStatus|null} workflow_status
- * @property {BusinessType|null} business_type
- * @property {string|null} discarded_at
- * @property {string} created_at
- * @property {string} updated_at
- */
-
-/**
- * @global
- * @typedef {PolymorphicAppointment & { id: string, period_id: string }} PeriodAppointment
- */
-
-/**
- * @global
- * @typedef {Object} Price
- * @property {string} id - The unique identifier for the price (UUID).
- * @property {number} amount - The monetary amount (decimal).
- * @property {Currency} currency
- * @property {string} created_at
- * @property {string} updated_at
- */
-
-/**
- * @global
- * @typedef {PolymorphicAppointment & { id: string, price_id: string }} PriceAppointment
- */
-
-/**
- * @global
- * @typedef {Object} Period
- * @property {string} id - The unique identifier for the period (UUID).
- * @property {string} start_at
- * @property {string|null} end_at
- * @property {number} timezone
- * @property {string} created_at
- * @property {string} updated_at
- */
-
-/**
- * @global
- * @typedef {Object} Policy
- * @property {string} id - UUID
- * @property {string} company_id
- * @property {string|null} branch_id
- * @property {string|null} name
- * @property {string|null} description
- * @property {string|null} code
- * @property {string|null} resource
- * @property {string|null} action
- * @property {LifecycleStatus|null} lifecycle_status
- * @property {WorkflowStatus|null} workflow_status
- * @property {BusinessType|null} business_type
- * @property {string|null} discarded_at
- * @property {string} created_at
- * @property {string} updated_at
- */
-
-/**
- * @global
- * @typedef {PolymorphicAppointment & { id: string, policy_id: string }} PolicyAppointment
- */
-
-/**
- * @global
- * @typedef {PolymorphicAppointment & { id: string, product_id: string }} ProductAppointment
- */
-
-/**
- * @global
- * @typedef {PolymorphicAppointment & { id: string, product_group_id: string }} ProductGroupAppointment
- */
-
-/**
- * @global
- * @typedef {Object} ProductGroup
- * @property {string} id - UUID
- * @property {string} company_id
- * @property {string|null} branch_id
- * @property {string|null} category_id
- * @property {string|null} name
- * @property {string|null} description
- * @property {string|null} code
- * @property {LifecycleStatus|null} lifecycle_status
- * @property {WorkflowStatus|null} workflow_status
- * @property {BusinessType|null} business_type
- * @property {string|null} discarded_at
- * @property {string} created_at
- * @property {string} updated_at
- */
-
-/**
- * @global
- * @typedef {Object} Product
- * @property {string} id - UUID
- * @property {string} company_id
- * @property {string|null} branch_id
- * @property {string|null} brand_id
- * @property {string|null} category_id
- * @property {string|null} name
- * @property {string|null} description
- * @property {number|null} price
- * @property {Currency|null} currency
- * @property {string|null} code
- * @property {string|null} sku
- * @property {string|null} barcode
- * @property {string|null} upc
- * @property {string|null} ean
- * @property {string|null} manufacturer_code
- * @property {string|null} serial_number
- * @property {string|null} batch_number
- * @property {string|null} expiration_date
- * @property {LifecycleStatus|null} lifecycle_status
- * @property {WorkflowStatus|null} workflow_status
- * @property {BusinessType|null} business_type
- * @property {string|null} discarded_at
- * @property {string} created_at
- * @property {string} updated_at
- */
-
-/**
- * @global
- * @typedef {PolymorphicAppointment & { id: string, project_id: string }} ProjectAppointment
- */
-
-/**
- * @global
- * @typedef {PolymorphicAppointment & { id: string, project_group_id: string }} ProjectGroupAppointment
- */
-
-/**
- * @global
- * @typedef {Object} ProjectGroup
- * @property {string} id - UUID
- * @property {string} company_id
- * @property {string|null} branch_id
- * @property {string|null} category_id
- * @property {string|null} name
- * @property {string|null} description
- * @property {string|null} code
- * @property {LifecycleStatus|null} lifecycle_status
- * @property {WorkflowStatus|null} workflow_status
- * @property {BusinessType|null} business_type
- * @property {string|null} discarded_at
- * @property {string} created_at
- * @property {string} updated_at
- */
-
-/**
- * @global
- * @typedef {Object} Project
- * @property {string} id - UUID
- * @property {string} company_id
- * @property {string|null} branch_id
- * @property {string} project_group_id
- * @property {string|null} category_id
- * @property {string|null} name
- * @property {string|null} description
- * @property {string|null} code
- * @property {LifecycleStatus|null} lifecycle_status
- * @property {WorkflowStatus|null} workflow_status
- * @property {BusinessType|null} business_type
- * @property {string|null} discarded_at
- * @property {string} created_at
- * @property {string} updated_at
- */
-
-/**
- * @global
- * @typedef {Object} PurchaseItem
- * @property {string} id - UUID
- * @property {string} purchase_id
- * @property {string|null} category_id
- * @property {string|null} name
- * @property {string|null} description
- * @property {string|null} code
- * @property {string|null} sku
- * @property {string|null} barcode
- * @property {string|null} upc
- * @property {string|null} ean
- * @property {string|null} manufacturer_code
- * @property {string|null} serial_number
- * @property {string|null} batch_number
- * @property {string|null} expiration_date
- * @property {LifecycleStatus|null} lifecycle_status
- * @property {WorkflowStatus|null} workflow_status
- * @property {BusinessType|null} business_type
- * @property {string|null} discarded_at
- * @property {string} created_at
- * @property {string} updated_at
- */
-
-/**
- * @global
- * @typedef {Object} Purchase
- * @property {string} id - UUID
- * @property {string} company_id
- * @property {string|null} branch_id
- * @property {string|null} category_id
- * @property {string|null} name
- * @property {string|null} description
- * @property {string|null} code
- * @property {LifecycleStatus|null} lifecycle_status
- * @property {WorkflowStatus|null} workflow_status
- * @property {BusinessType|null} business_type
- * @property {string|null} discarded_at
- * @property {string} created_at
- * @property {string} updated_at
- */
-
-/**
- * @global
- * @typedef {Object} Question
- * @property {string} id - UUID
- * @property {string} company_id
- * @property {string|null} branch_id
- * @property {string|null} category_id
- * @property {string|null} name
- * @property {string|null} description
- * @property {string|null} code
- * @property {LifecycleStatus|null} lifecycle_status
- * @property {WorkflowStatus|null} workflow_status
- * @property {BusinessType|null} business_type
- * @property {string|null} discarded_at
- * @property {string} created_at
- * @property {string} updated_at
- */
-
-/**
- * @global
- * @typedef {PolymorphicAppointment & { id: string, role_id: string }} RoleAppointment
- */
-
-/**
- * @global
- * @typedef {Object} Role
- * @property {string} id - UUID
- * @property {string} company_id
- * @property {string|null} branch_id
- * @property {number|null} model_type
- * @property {string|null} name
- * @property {string|null} description
- * @property {string|null} code
- * @property {LifecycleStatus|null} lifecycle_status
- * @property {WorkflowStatus|null} workflow_status
- * @property {BusinessType|null} business_type
- * @property {string|null} discarded_at
- * @property {string} created_at
- * @property {string} updated_at
- */
-
-/**
- * @global
- * @typedef {PolymorphicAppointment & { id: string, service_id: string, duration: number, start_at: string }} ServiceAppointment
- */
-
-/**
- * @global
- * @typedef {PolymorphicAppointment & { id: string, service_group_id: string, duration: number, start_at: string }} ServiceGroupAppointment
- */
-
-/**
- * @global
- * @typedef {Object} ServiceGroup
- * @property {string} id - UUID
- * @property {string} company_id
- * @property {string|null} branch_id
- * @property {string|null} category_id
- * @property {string|null} name
- * @property {string|null} description
- * @property {string|null} code
- * @property {LifecycleStatus|null} lifecycle_status
- * @property {WorkflowStatus|null} workflow_status
- * @property {number|null} duration
- * @property {string|null} start_at
- * @property {BusinessType|null} business_type
- * @property {string|null} discarded_at
- * @property {string} created_at
- * @property {string} updated_at
- */
-
-/**
- * @global
- * @typedef {Object} Service
- * @property {string} id - UUID
- * @property {string} company_id
- * @property {string|null} branch_id
- * @property {string|null} category_id
- * @property {string|null} name
- * @property {string|null} description
- * @property {string|null} code
- * @property {LifecycleStatus|null} lifecycle_status
- * @property {WorkflowStatus|null} workflow_status
- * @property {number|null} duration
- * @property {string|null} start_at
- * @property {BusinessType|null} business_type
- * @property {string|null} discarded_at
- * @property {string} created_at
- * @property {string} updated_at
- */
-
-/**
- * @global
- * @typedef {PolymorphicAppointment & { id: string, setting_id: string }} SettingAppointment
- */
-
-/**
- * @global
- * @typedef {PolymorphicAppointment & { id: string, setting_group_id: string }} SettingGroupAppointment
- */
-
-/**
- * @global
- * @typedef {Object} SettingGroup
- * @property {string} id - UUID
- * @property {string} company_id
- * @property {string} branch_id
- * @property {string|null} category_id
- * @property {Object|null} content - JSON content
- * @property {string|null} name
- * @property {string|null} description
- * @property {string|null} code
- * @property {LifecycleStatus|null} lifecycle_status
- * @property {WorkflowStatus|null} workflow_status
- * @property {BusinessType|null} business_type
- * @property {string|null} discarded_at
- * @property {string} created_at
- * @property {string} updated_at
- */
-
-/**
- * @global
- * @typedef {Object} Setting
- * @property {string} id - UUID
- * @property {string} setting_group_id
- * @property {string} company_id
- * @property {string} branch_id
- * @property {string|null} category_id
- * @property {Object|null} content - JSON content
- * @property {string|null} name
- * @property {string|null} description
- * @property {string|null} code
- * @property {LifecycleStatus|null} lifecycle_status
- * @property {WorkflowStatus|null} workflow_status
- * @property {BusinessType|null} business_type
- * @property {string|null} discarded_at
- * @property {string} created_at
- * @property {string} updated_at
- */
-
-/**
- * @global
- * @typedef {Object} Statistic
- * @property {string} id - UUID
- * @property {string} owner_type
- * @property {string} owner_id
- * @property {Object|null} data - JSON content
- * @property {string|null} recorded_at
- * @property {string} created_at
- * @property {string} updated_at
- */
-
-/**
- * @global
- * @typedef {PolymorphicAppointment & { id: string, tag_id: string }} TagAppointment
- */
-
-/**
- * @global
- * @typedef {Object} Tag
- * @property {string} id - UUID
- * @property {string} company_id
- * @property {string|null} name
- * @property {string|null} description
- * @property {string|null} code
- * @property {string} created_at
- * @property {string} updated_at
- */
-
-/**
- * @global
- * @typedef {PolymorphicAppointment & { id: string, task_id: string }} TaskAppointment
- */
-
-/**
- * @global
- * @typedef {PolymorphicAppointment & { id: string, task_group_id: string }} TaskGroupAppointment
- */
-
-/**
- * @global
- * @typedef {Object} TaskGroup
- * @property {string} id - UUID
- * @property {string} company_id
- * @property {string|null} branch_id
- * @property {string|null} category_id
- * @property {string|null} name
- * @property {string|null} description
- * @property {string|null} code
- * @property {LifecycleStatus|null} lifecycle_status
- * @property {WorkflowStatus|null} workflow_status
- * @property {BusinessType|null} business_type
- * @property {string|null} discarded_at
- * @property {string} created_at
- * @property {string} updated_at
- */
-
-/**
- * @global
- * @typedef {Object} Task
- * @property {string} id - UUID
- * @property {string} company_id
- * @property {string|null} branch_id
- * @property {string} task_group_id
- * @property {string|null} category_id
- * @property {string|null} name
- * @property {string|null} description
- * @property {string|null} code
- * @property {Currency|null} currency
- * @property {LifecycleStatus|null} lifecycle_status
-_ * @property {WorkflowStatus|null} workflow_status
- * @property {BusinessType|null} business_type
- * @property {string|null} discarded_at
- * @property {string} created_at
- * @property {string} updated_at
- */
-
-/**
- * @global
- * @typedef {Object} System
- * @property {string} id - The unique identifier for the system record (UUID).
- * @property {string} name
- * @property {string} code
- * @property {number} balance_cents
- * @property {Currency|null} currency
- * @property {CountryCode|null} country_code
- * @property {boolean} active
- * @property {string} created_at
- * @property {string} updated_at
- */
-
-/**
- * @global
- * @typedef {Object} Session
- * @property {string} id - The unique identifier for the session (UUID).
- * @property {string} user_id
- * @property {string|null} user_agent
- * @property {string|null} ip_address
- * @property {string|null} single_access_token
- * @property {string} created_at
- * @property {string} updated_at
- */
-
-/**
- * @global
- * @typedef {Object} SignInToken
- * @property {string} id - The unique identifier for the token (UUID).
- * @property {string} user_id
- */
-
-/**
- * @global
- * @typedef {Object} Company
- * @property {string} id - The unique identifier for the company group (UUID).
- * @property {string} user_id - The ID of the owning user.
- * @property {string|null} name
- * @property {string|null} description
- * @property {string|null} code
- * @property {LifecycleStatus|null} lifecycle_status
- * @property {WorkflowStatus|null} workflow_status
- * @property {number|null} ownership_type
- * @property {BusinessType|null} business_type
- * @property {Currency|null} currency
- * @property {string|null} registration_number
- * @property {string|null} vat_id
- * @property {string|null} tax_id
- * @property {number|null} timezone
- * @property {string|null} address_line_1
- * @property {string|null} city
- * @property {string|null} postal_code
- * @property {string|null} country
- * @property {string|null} email
- * @property {string|null} phone_number
- * @property {string|null} website
- * @property {number|null} employee_count
- * @property {number|null} fiscal_year_end_month
- * @property {string|null} discarded_at
- * @property {string} created_at
- * @property {string} updated_at
- */
-
-/**
- * @global
- * @typedef {Object} Employee
- * @property {string} id - The unique identifier for the employee record (UUID).
- * @property {string} user_id - The ID of the associated user.
- * @property {string} company_id
- * @property {string|null} branch_id
- * @property {string|null} category_id
- * @property {string|null} name
- * @property {string|null} description
- * @property {string|null} code
- * @property {LifecycleStatus|null} lifecycle_status
- * @property {WorkflowStatus|null} workflow_status
- * @property {BusinessType|null} business_type
- * @property {string|null} discarded_at
- * @property {string} created_at
- * @property {string} updated_at
- */
-
-/**
- * @global
- * @typedef {Object} Customer
- * @property {string} id - The unique identifier for the customer record (UUID).
- * @property {string|null} user_id - The ID of the associated user.
- * @property {string} company_id
- * @property {string|null} branch_id
- * @property {string|null} category_id
- * @property {string|null} name
- * @property {string|null} description
- * @property {string|null} code
- * @property {LifecycleStatus|null} lifecycle_status
- * @property {WorkflowStatus|null} workflow_status
- * @property {BusinessType|null} business_type
- * @property {string|null} discarded_at
- * @property {string} created_at
- * @property {string} updated_at
- */
-
-/**
- * @global
- * @typedef {'super_admin'|'admin'|'company_owner'|'company_employee'|'company_customer'} SystemRole
- */
-
-/**
- * @global
- * @typedef {'us'|'vn'} CountryCode
- */
-
-/**
- * @global
- * @typedef {'active'|'inactive'|'archived'|'suspended'|'deleted'} LifecycleStatus
- */
-
-/**
- * @global
- * @typedef {'draft'|'pending'|'confirmed'|'in_progress'|'completed'|'paid'|'cancelled'|'refunded'|'failed'} WorkflowStatus
- */
-
-/**
- * @global
- * @typedef {'system_to_business'|'business_to_business'|'business_to_customer'|number} BusinessType
- */
-
-/**
- * @global
- * @typedef {string} SubscriptionPlanName - The name of the subscription plan (e.g., 'free', 'pro', 'enterprise').
- */
-
-/**
- * @global
- * @typedef {'usd'|'vnd'|number} Currency
- */
+/** * @typedef {Object} Metadata - Generic for JSONB columns
+ * @property {Object} [key] 
+ */
+
+// --- 1. CORE SYSTEM & AUTHENTICATION ---
+/** @typedef {Object} User @property {string} id @property {string} email @property {string} password_digest @property {boolean} verified @property {string} provider @property {string} uid @property {string} parent_user_id @property {number} system_role @property {string} username @property {string} first_name @property {string} last_name @property {string} avatar @property {string} phone_number @property {number} country_code @property {string} single_access_token @property {string} discarded_at @property {Metadata} metadata @property {string} created_at @property {string} updated_at */
+/** @typedef {Object} Session @property {string} id @property {string} user_id @property {string} user_agent @property {string} ip_address @property {string} single_access_token @property {Metadata} metadata @property {string} created_at @property {string} updated_at */
+/** @typedef {Object} SignInToken @property {string} id @property {string} user_id */
+/** @typedef {Object} System @property {string} id @property {string} email @property {string} name @property {string} code @property {number} balance_cents @property {number} currency_code @property {number} country_code @property {boolean} active @property {Metadata} metadata @property {string} created_at @property {string} updated_at */
+
+// --- 2. ORGANIZATION STRUCTURE ---
+/** @typedef {Object} Company @property {string} id @property {string} user_id @property {string} name @property {string} description @property {string} code @property {number} lifecycle_status @property {number} workflow_status @property {number} ownership_type @property {number} business_type @property {number} currency_code @property {string} registration_number @property {string} vat_id @property {string} tax_id @property {number} timezone @property {string} address_line_1 @property {string} city @property {string} postal_code @property {number} country_code @property {string} email @property {string} phone_number @property {string} website @property {number} employee_count @property {number} fiscal_year_end_month @property {string} discarded_at @property {Metadata} metadata @property {string} created_at @property {string} updated_at */
+/** @typedef {Object} Branch @property {string} id @property {string} company_id @property {string} category_id @property {string} name @property {string} description @property {string} code @property {number} lifecycle_status @property {number} workflow_status @property {number} ownership_type @property {number} business_type @property {number} currency_code @property {string} registration_number @property {string} vat_id @property {string} tax_id @property {number} timezone @property {string} address_line_1 @property {string} city @property {string} postal_code @property {number} country_code @property {string} email @property {string} phone_number @property {string} website @property {number} employee_count @property {number} fiscal_year_end_month @property {string} discarded_at @property {Metadata} metadata @property {string} created_at @property {string} updated_at */
+/** @typedef {Object} Department @property {string} id @property {string} company_id @property {string} category_id @property {string} email @property {string} name @property {string} description @property {string} code @property {number} lifecycle_status @property {number} workflow_status @property {number} business_type @property {string} discarded_at @property {Metadata} metadata @property {string} created_at @property {string} updated_at */
+/** @typedef {Object} Role @property {string} id @property {string} company_id @property {string} branch_id @property {number} model_type @property {string} name @property {string} description @property {string} code @property {number} lifecycle_status @property {number} workflow_status @property {number} business_type @property {string} discarded_at @property {string} created_at @property {string} updated_at */
+/** @typedef {Object} Policy @property {string} id @property {string} company_id @property {string} branch_id @property {string} name @property {string} description @property {string} code @property {string} resource @property {string} action @property {number} lifecycle_status @property {number} workflow_status @property {number} business_type @property {string} discarded_at @property {string} created_at @property {string} updated_at */
+
+// --- 3. PEOPLE & ATTENDANCE ---
+/** @typedef {Object} Employee @property {string} id @property {string} company_id @property {string} branch_id @property {string} user_id @property {string} category_id @property {string} email @property {string} name @property {string} description @property {string} code @property {number} lifecycle_status @property {number} workflow_status @property {number} business_type @property {string} discarded_at @property {Metadata} metadata @property {string} created_at @property {string} updated_at */
+/** @typedef {Object} EmployeeGroup @property {string} id @property {string} company_id @property {string} branch_id @property {string} category_id @property {string} email @property {string} name @property {string} description @property {string} code @property {number} lifecycle_status @property {number} workflow_status @property {number} business_type @property {string} discarded_at @property {Metadata} metadata @property {string} created_at @property {string} updated_at */
+/** @typedef {Object} AttendanceDay @property {string} id @property {string} company_id @property {string} branch_id @property {string} employee_id @property {string} logable_type @property {string} logable_id @property {string} period_id @property {string} attendance_date @property {string} check_in @property {string} check_out @property {string} break_start @property {string} break_end @property {number} total_seconds_present @property {number} total_seconds_break @property {number} total_seconds_worked @property {number} total_seconds_overtime @property {number} shift_id @property {number} attendance_status @property {number} recorded_method @property {string} ip_address @property {string} device_id @property {number} location_lat @property {number} location_lng @property {string} notes @property {string} approved_by_type @property {string} approved_by_id @property {string} approved_at @property {string} edited_by_type @property {string} edited_by_id @property {string} edited_at */
+/** @typedef {Object} AttendanceLog @property {string} id @property {string} company_id @property {string} branch_id @property {string} customer_id @property {string} logable_type @property {string} logable_id @property {string} period_id @property {string} location @property {string} id_address @property {string} device_info @property {string} notes */
+/** @typedef {Object} AttendanceMonth @property {string} id @property {string} company_id @property {string} branch_id @property {string} customer_id @property {string} logable_type @property {string} logable_id @property {string} period_id */
+/** @typedef {Object} Shift @property {string} id @property {string} company_id @property {string} branch_id @property {string} period_id @property {string} name @property {string} description @property {Metadata} metadata */
+
+// --- 4. CUSTOMERS & CRM ---
+/** @typedef {Object} Customer @property {string} id @property {string} company_id @property {string} branch_id @property {string} user_id @property {string} category_id @property {string} email @property {string} name @property {string} description @property {string} code @property {number} lifecycle_status @property {number} workflow_status @property {number} business_type @property {string} discarded_at @property {Metadata} metadata @property {string} created_at @property {string} updated_at */
+/** @typedef {Object} CustomerGroup @property {string} id @property {string} company_id @property {string} branch_id @property {string} category_id @property {string} email @property {string} name @property {string} description @property {string} code @property {number} lifecycle_status @property {number} workflow_status @property {number} business_type @property {string} discarded_at @property {Metadata} metadata @property {string} created_at @property {string} updated_at */
+
+// --- 5. COMMERCE (PRODUCTS, ORDERS, INVOICES) ---
+/** @typedef {Object} Product @property {string} id @property {string} company_id @property {string} branch_id @property {string} brand_id @property {string} category_id @property {string} name @property {string} description @property {number} price @property {number} currency_code @property {string} code @property {string} sku @property {string} barcode @property {string} upc @property {string} ean @property {string} manufacturer_code @property {string} serial_number @property {string} batch_number @property {string} expiration_date @property {number} lifecycle_status @property {number} workflow_status @property {number} business_type @property {string} discarded_at @property {Metadata} metadata */
+/** @typedef {Object} ProductGroup @property {string} id @property {string} company_id @property {string} branch_id @property {string} category_id @property {string} name @property {string} description @property {string} code @property {number} lifecycle_status @property {number} workflow_status @property {number} business_type @property {string} discarded_at @property {Metadata} metadata */
+/** @typedef {Object} Order @property {string} id @property {string} company_id @property {string} branch_id @property {string} customer_id @property {string} category_id @property {string} name @property {string} description @property {string} code @property {string} sku @property {string} barcode @property {string} upc @property {string} ean @property {string} manufacturer_code @property {string} serial_number @property {string} batch_number @property {string} expiration_date @property {number} currency_code @property {number} duration @property {number} lifecycle_status @property {number} workflow_status @property {number} business_type @property {string} discarded_at @property {Metadata} metadata */
+/** @typedef {Object} OrderGroup @property {string} id @property {string} company_id @property {string} branch_id @property {string} customer_id @property {string} category_id @property {string} name @property {string} description @property {string} code @property {number} currency_code @property {number} duration @property {number} lifecycle_status @property {number} workflow_status @property {number} business_type @property {string} discarded_at @property {Metadata} metadata */
+/** @typedef {Object} Invoice @property {string} id @property {string} company_id @property {string} branch_id @property {string} order_id @property {string} category_id @property {string} name @property {string} description @property {string} code @property {number} currency_code @property {number} duration @property {string} number @property {number} total_price @property {string} due_date @property {number} lifecycle_status @property {number} workflow_status @property {number} business_type @property {string} discarded_at @property {Metadata} metadata */
+/** @typedef {Object} Payment @property {string} id @property {string} company_id @property {string} branch_id @property {string} invoice_id @property {string} category_id @property {string} name @property {string} description @property {string} code @property {number} currency_code @property {number} duration @property {number} exchange_rate @property {number} amount @property {string} payment_method @property {string} gateway_details @property {number} lifecycle_status @property {number} workflow_status @property {number} business_type @property {string} discarded_at @property {Metadata} metadata */
+/** @typedef {Object} PaymentMethod @property {string} id @property {string} category_id @property {string} name @property {string} description @property {string} code @property {number} currency_code @property {number} lifecycle_status @property {number} workflow_status @property {number} business_type @property {string} discarded_at @property {Metadata} metadata */
+/** @typedef {Object} Price @property {string} id @property {number} amount @property {number} currency_code */
+
+// --- 6. INVENTORY & LOGISTICS ---
+/** @typedef {Object} Inventory @property {string} id @property {string} company_id @property {string} branch_id @property {string} category_id @property {string} name @property {string} description @property {string} code @property {number} lifecycle_status @property {number} workflow_status @property {number} business_type @property {string} discarded_at @property {Metadata} metadata */
+/** @typedef {Object} InventoryItem @property {string} id @property {string} company_id @property {string} branch_id @property {string} inventory_id @property {string} category_id @property {string} name @property {string} description @property {string} code @property {string} sku @property {string} barcode @property {string} upc @property {string} ean @property {string} manufacturer_code @property {string} serial_number @property {string} batch_number @property {string} expiration_date @property {number} lifecycle_status @property {number} workflow_status @property {number} business_type @property {string} discarded_at @property {Metadata} metadata */
+/** @typedef {Object} InventoryTransaction @property {string} id @property {string} company_id @property {string} branch_id @property {string} appoint_from_type @property {string} appoint_from_id @property {string} appoint_to_type @property {string} appoint_to_id @property {string} appoint_for_type @property {string} appoint_for_id @property {string} appoint_by_type @property {string} appoint_by_id @property {string} category_id @property {string} name @property {string} description @property {string} code @property {number} lifecycle_status @property {number} workflow_status @property {number} business_type @property {string} discarded_at @property {Metadata} metadata */
+/** @typedef {Object} Purchase @property {string} id @property {string} company_id @property {string} branch_id @property {string} category_id @property {string} name @property {string} description @property {string} code @property {number} lifecycle_status @property {number} workflow_status @property {number} business_type @property {string} discarded_at @property {Metadata} metadata */
+/** @typedef {Object} PurchaseItem @property {string} id @property {string} company_id @property {string} branch_id @property {string} purchase_id @property {string} category_id @property {string} name @property {string} description @property {string} code @property {string} sku @property {string} barcode @property {string} upc @property {string} ean @property {string} manufacturer_code @property {string} serial_number @property {string} batch_number @property {string} expiration_date @property {number} lifecycle_status @property {number} workflow_status @property {number} business_type @property {string} discarded_at @property {Metadata} metadata */
+/** @typedef {Object} Cart @property {string} id @property {string} company_id @property {string} branch_id @property {string} cart_group_id @property {string} category_id @property {string} name @property {string} description @property {string} code @property {string} sku @property {string} barcode @property {string} upc @property {string} ean @property {string} manufacturer_code @property {string} serial_number @property {string} batch_number @property {string} expiration_date @property {number} lifecycle_status @property {number} workflow_status @property {number} business_type @property {string} discarded_at @property {Metadata} metadata */
+/** @typedef {Object} CartGroup @property {string} id @property {string} company_id @property {string} branch_id @property {string} category_id @property {string} name @property {string} description @property {string} code @property {number} lifecycle_status @property {number} workflow_status @property {number} business_type @property {string} discarded_at @property {Metadata} metadata */
+
+// --- 7. PROJECTS, TASKS & SERVICES ---
+/** @typedef {Object} Project @property {string} id @property {string} company_id @property {string} branch_id @property {string} project_group_id @property {string} category_id @property {string} name @property {string} description @property {string} code @property {number} lifecycle_status @property {number} workflow_status @property {number} business_type @property {string} discarded_at @property {Metadata} metadata */
+/** @typedef {Object} ProjectGroup @property {string} id @property {string} company_id @property {string} branch_id @property {string} category_id @property {string} name @property {string} description @property {string} code @property {number} lifecycle_status @property {number} workflow_status @property {number} business_type @property {string} discarded_at @property {Metadata} metadata */
+/** @typedef {Object} Task @property {string} id @property {string} company_id @property {string} branch_id @property {string} task_group_id @property {string} category_id @property {string} name @property {string} description @property {string} code @property {number} currency_code @property {number} lifecycle_status @property {number} workflow_status @property {number} business_type @property {string} discarded_at @property {Metadata} metadata */
+/** @typedef {Object} TaskGroup @property {string} id @property {string} company_id @property {string} branch_id @property {string} category_id @property {string} name @property {string} description @property {string} code @property {number} lifecycle_status @property {number} workflow_status @property {number} business_type @property {string} discarded_at @property {Metadata} metadata */
+/** @typedef {Object} Service @property {string} id @property {string} company_id @property {string} branch_id @property {string} category_id @property {string} name @property {string} description @property {string} code @property {number} lifecycle_status @property {number} workflow_status @property {number} duration @property {string} start_at @property {number} business_type @property {string} discarded_at @property {Metadata} metadata */
+/** @typedef {Object} ServiceGroup @property {string} id @property {string} company_id @property {string} branch_id @property {string} category_id @property {string} name @property {string} description @property {string} code @property {number} lifecycle_status @property {number} workflow_status @property {number} duration @property {string} start_at @property {number} business_type @property {string} discarded_at @property {Metadata} metadata */
+
+// --- 8. BOOKINGS & EVENTS ---
+/** @typedef {Object} Booking @property {string} id @property {string} company_id @property {string} branch_id @property {string} booking_resource_id @property {string} price_id @property {string} appoint_from_type @property {string} appoint_from_id @property {string} appoint_to_type @property {string} appoint_to_id @property {string} appoint_for_type @property {string} appoint_for_id @property {string} appoint_by_type @property {string} appoint_by_id @property {string} name @property {string} description @property {number} lifecycle_status @property {number} workflow_status @property {number} business_type @property {string} discarded_at @property {Metadata} metadata */
+/** @typedef {Object} BookingResource @property {string} id @property {string} company_id @property {string} branch_id @property {string} booking_resourceable_type @property {string} booking_resourceable_id @property {string} name @property {string} description @property {number} lifecycle_status @property {number} workflow_status @property {number} business_type @property {string} discarded_at @property {Metadata} metadata */
+/** @typedef {Object} BookingPeriod @property {string} id @property {string} booking_resource_id @property {string} period_id @property {number} lifecycle_status @property {number} workflow_status @property {number} business_type @property {Metadata} metadata */
+/** @typedef {Object} Event @property {string} id @property {string} event_group_id @property {string} company_id @property {string} branch_id @property {string} category_id @property {string} name @property {string} description @property {string} code @property {number} lifecycle_status @property {number} workflow_status @property {number} business_type @property {string} discarded_at @property {Metadata} metadata */
+/** @typedef {Object} EventGroup @property {string} id @property {string} company_id @property {string} branch_id @property {string} category_id @property {string} name @property {string} description @property {string} code @property {number} lifecycle_status @property {number} workflow_status @property {number} business_type @property {string} discarded_at @property {Metadata} metadata */
+/** @typedef {Object} Exam @property {string} id @property {string} exam_group_id @property {string} company_id @property {string} branch_id @property {string} category_id @property {string} name @property {string} description @property {string} code @property {number} lifecycle_status @property {number} workflow_status @property {number} business_type @property {string} discarded_at @property {Metadata} metadata */
+/** @typedef {Object} ExamGroup @property {string} id @property {string} company_id @property {string} branch_id @property {string} category_id @property {string} name @property {string} description @property {string} code @property {number} lifecycle_status @property {number} workflow_status @property {number} business_type @property {string} discarded_at @property {Metadata} metadata */
+
+// --- 9. FACILITIES & INFRASTRUCTURE ---
+/** @typedef {Object} Facility @property {string} id @property {string} company_id @property {string} branch_id @property {string} category_id @property {string} name @property {string} description @property {string} code @property {number} lifecycle_status @property {number} workflow_status @property {number} business_type @property {string} discarded_at @property {Metadata} metadata */
+/** @typedef {Object} FacilityGroup @property {string} id @property {string} company_id @property {string} branch_id @property {string} category_id @property {string} name @property {string} description @property {string} code @property {number} lifecycle_status @property {number} workflow_status @property {number} business_type @property {string} discarded_at @property {Metadata} metadata */
+/** @typedef {Object} Address @property {string} id @property {string} line_1 @property {string} line_2 @property {string} city @property {string} state_or_province @property {string} postal_code @property {number} country_code @property {string} fingerprint */
+
+// --- 10. CMS & DOCUMENTS ---
+/** @typedef {Object} Article @property {string} id @property {string} article_group_id @property {string} company_id @property {string} branch_id @property {string} category_id @property {string} title @property {Object} content @property {string} name @property {string} description @property {string} code @property {number} lifecycle_status @property {number} workflow_status @property {number} business_type @property {string} discarded_at @property {Metadata} metadata */
+/** @typedef {Object} ArticleGroup @property {string} id @property {string} company_id @property {string} branch_id @property {string} category_id @property {string} title @property {Object} content @property {string} name @property {string} description @property {string} code @property {number} lifecycle_status @property {number} workflow_status @property {number} business_type @property {string} discarded_at @property {Metadata} metadata */
+/** @typedef {Object} Document @property {string} id @property {string} document_group_id @property {string} company_id @property {string} branch_id @property {string} category_id @property {string} title @property {Object} content @property {string} name @property {string} description @property {string} code @property {number} lifecycle_status @property {number} workflow_status @property {number} business_type @property {string} discarded_at @property {Metadata} metadata */
+/** @typedef {Object} DocumentGroup @property {string} id @property {string} company_id @property {string} branch_id @property {string} category_id @property {string} title @property {Object} content @property {string} name @property {string} description @property {string} code @property {number} lifecycle_status @property {number} workflow_status @property {number} business_type @property {string} discarded_at @property {Metadata} metadata */
+
+// --- 11. COMMUNICATION & NOTIFICATIONS ---
+/** @typedef {Object} Notification @property {string} id @property {string} notification_group_id @property {string} company_id @property {string} branch_id @property {string} category_id @property {string} name @property {string} description @property {string} code @property {number} lifecycle_status @property {number} workflow_status @property {number} business_type @property {string} discarded_at @property {Metadata} metadata */
+/** @typedef {Object} NotificationGroup @property {string} id @property {string} company_id @property {string} branch_id @property {string} category_id @property {string} name @property {string} description @property {string} code @property {number} lifecycle_status @property {number} workflow_status @property {number} business_type @property {string} discarded_at @property {Metadata} metadata */
+
+// --- 12. SUBSCRIPTIONS & PLANS ---
+/** @typedef {Object} Subscription @property {string} id @property {string} company_id @property {string} branch_id @property {string} subscription_plan_id @property {string} subscription_group_id @property {string} price_id @property {string} period_id @property {string} seller_type @property {string} seller_id @property {string} buyer_type @property {string} buyer_id @property {string} resource_type @property {string} resource_id @property {string} processer_type @property {string} processer_id @property {string} name @property {string} description @property {number} country_code @property {number} timezone @property {number} lifecycle_status @property {number} workflow_status @property {number} business_type @property {boolean} auto_renew @property {string} discarded_at @property {Metadata} metadata */
+/** @typedef {Object} SubscriptionGroup @property {string} id @property {string} company_id @property {string} branch_id @property {string} subscription_plan_id @property {string} subscription_group_id @property {string} price_id @property {string} period_id @property {string} seller_type @property {string} seller_id @property {string} buyer_type @property {string} buyer_id @property {string} resource_type @property {string} resource_id @property {string} processer_type @property {string} processer_id @property {string} name @property {string} description @property {number} country_code @property {number} timezone @property {number} lifecycle_status @property {number} workflow_status @property {number} business_type @property {boolean} auto_renew @property {string} discarded_at @property {Metadata} metadata */
+/** @typedef {Object} SubscriptionPlan @property {string} id @property {string} company_id @property {string} branch_id @property {string} price_id @property {string} name @property {string} description @property {string} code @property {number} duration_days @property {number} lifecycle_status @property {number} workflow_status @property {number} business_type @property {number} country_code @property {Object} features @property {Object} limits @property {string} discarded_at */
+/** @typedef {Object} SystemSubscription @property {string} id @property {string} system_subscription_plan_id @property {string} system_subscription_group_id @property {string} company_id @property {string} branch_id @property {string} price_id @property {string} period_id @property {string} seller_type @property {string} seller_id @property {string} buyer_type @property {string} buyer_id @property {string} resource_type @property {string} resource_id @property {string} processer_type @property {string} processer_id @property {string} name @property {string} description @property {string} code @property {number} lifecycle_status @property {number} workflow_status @property {number} business_type @property {number} country_code @property {boolean} auto_renew @property {string} discarded_at @property {Metadata} metadata */
+/** @typedef {Object} SystemSubscriptionGroup @property {string} id @property {string} system_subscription_plan_id @property {string} company_id @property {string} branch_id @property {string} price_id @property {string} period_id @property {string} seller_type @property {string} seller_id @property {string} buyer_type @property {string} buyer_id @property {string} resource_type @property {string} resource_id @property {string} processer_type @property {string} processer_id @property {string} name @property {string} description @property {string} code @property {number} lifecycle_status @property {number} workflow_status @property {number} business_type @property {number} country_code @property {boolean} auto_renew @property {string} discarded_at @property {Metadata} metadata */
+/** @typedef {Object} SystemSubscriptionPlan @property {string} id @property {string} price_id @property {string} name @property {string} description @property {string} code @property {number} duration_days @property {number} lifecycle_status @property {number} workflow_status @property {number} business_type @property {number} country_code @property {Object} features @property {Object} limits @property {string} discarded_at @property {Metadata} metadata */
+
+// --- 13. TAXONOMY (TAGS, CATEGORIES, BRANDS) ---
+/** @typedef {Object} Category @property {string} id @property {string} company_id @property {string} name @property {string} description @property {Metadata} metadata */
+/** @typedef {Object} Tag @property {string} id @property {string} company_id @property {string} name @property {string} description @property {string} code */
+/** @typedef {Object} Brand @property {string} id @property {string} category_id @property {string} name @property {string} description @property {string} code @property {number} lifecycle_status @property {number} workflow_status @property {number} business_type @property {string} discarded_at @property {Metadata} metadata */
+
+// --- 14. QA & FEEDBACK ---
+/** @typedef {Object} Question @property {string} id @property {string} company_id @property {string} branch_id @property {string} category_id @property {string} name @property {string} description @property {string} code @property {number} lifecycle_status @property {number} workflow_status @property {number} business_type @property {string} discarded_at @property {Metadata} metadata */
+/** @typedef {Object} Answer @property {string} id @property {string} question_id @property {string} category_id @property {string} name @property {string} description @property {string} code @property {number} lifecycle_status @property {number} workflow_status @property {number} business_type @property {string} discarded_at @property {Metadata} metadata */
+
+// --- 15. SETTINGS & STATS ---
+/** @typedef {Object} Setting @property {string} id @property {string} setting_group_id @property {string} company_id @property {string} branch_id @property {string} category_id @property {Object} content @property {string} name @property {string} description @property {string} code @property {number} lifecycle_status @property {number} workflow_status @property {number} business_type @property {string} discarded_at @property {Metadata} metadata */
+/** @typedef {Object} SettingGroup @property {string} id @property {string} company_id @property {string} branch_id @property {string} category_id @property {Object} content @property {string} name @property {string} description @property {string} code @property {number} lifecycle_status @property {number} workflow_status @property {number} business_type @property {string} discarded_at @property {Metadata} metadata */
+/** @typedef {Object} Statistic @property {string} id @property {string} owner_type @property {string} owner_id @property {Object} data @property {string} recorded_at @property {Metadata} metadata */
+
+// --- 16. TIME & PERIODS ---
+/** @typedef {Object} Period @property {string} id @property {string} start_at @property {string} end_at @property {number} timezone */
+/** @typedef {Object} PeriodPrice @property {string} id @property {string} period_priceable_type @property {string} period_priceable_id @property {string} period_id @property {string} price_id */
+
+// --- 17. STORAGE (ACTIVE STORAGE) ---
+/** @typedef {Object} ActiveStorageAttachment @property {string} id @property {string} name @property {string} record_type @property {string} record_id @property {string} blob_id @property {string} created_at */
+/** @typedef {Object} ActiveStorageBlob @property {string} id @property {string} key @property {string} filename @property {string} content_type @property {string} metadata @property {string} service_name @property {number} byte_size @property {string} checksum @property {string} created_at */
+/** @typedef {Object} ActiveStorageVariantRecord @property {string} id @property {string} blob_id @property {string} variation_digest */
+
+// --- 18. APPOINTMENTS (POLYMORPHIC RELATIONS) ---
+/** @typedef {Object} Appointment @property {string} id @property {string} appoint_from_type @property {string} appoint_from_id @property {string} appoint_to_type @property {string} appoint_to_id @property {string} appoint_for_type @property {string} appoint_for_id @property {string} appoint_by_type @property {string} appoint_by_id @property {string} name @property {string} description @property {string} code @property {number} lifecycle_status @property {number} workflow_status @property {number} business_type @property {string} discarded_at @property {string} created_at @property {string} updated_at */
+/** @typedef {Appointment} AddressAppointment */
+/** @typedef {Appointment} ArticleAppointment */
+/** @typedef {Appointment} ArticleGroupAppointment */
+/** @typedef {Appointment} CartAppointment */
+/** @typedef {Appointment} CustomerAppointment */
+/** @typedef {Appointment} CustomerGroupAppointment */
+/** @typedef {Appointment} DepartmentAppointment */
+/** @typedef {Appointment} DocumentAppointment */
+/** @typedef {Appointment} DocumentGroupAppointment */
+/** @typedef {Appointment} EmployeeAppointment */
+/** @typedef {Appointment} EmployeeGroupAppointment */
+/** @typedef {Appointment} EventAppointment */
+/** @typedef {Appointment} EventGroupAppointment */
+/** @typedef {Appointment} ExamAppointment */
+/** @typedef {Appointment} FacilityAppointment */
+/** @typedef {Appointment} FacilityGroupAppointment */
+/** @typedef {Appointment} InventoryItemAppointment */
+/** @typedef {Appointment} InventoryTransactionAppointment */
+/** @typedef {Appointment} NotificationAppointment */
+/** @typedef {Appointment} NotificationGroupAppointment */
+/** @typedef {Appointment} OrderAppointment */
+/** @typedef {Appointment} OrderGroupAppointment */
+/** @typedef {Appointment} PaymentMethodAppointment */
+/** @typedef {Appointment} PeriodAppointment */
+/** @typedef {Appointment} PolicyAppointment */
+/** @typedef {Appointment} PriceAppointment */
+/** @typedef {Appointment} ProductAppointment */
+/** @typedef {Appointment} ProductGroupAppointment */
+/** @typedef {Appointment} ProjectAppointment */
+/** @typedef {Appointment} ProjectGroupAppointment */
+/** @typedef {Appointment} ServiceAppointment */
+/** @typedef {Appointment} ServiceGroupAppointment */
+/** @typedef {Appointment} SettingAppointment */
+/** @typedef {Appointment} SettingGroupAppointment */
+/** @typedef {Appointment} TagAppointment */
+/** @typedef {Appointment} TaskAppointment */
+/** @typedef {Appointment} TaskGroupAppointment */
+
+// --- UI HELPERS ---
+/** @typedef {Object} Pagination @property {number} current_page @property {number} next_page @property {number} prev_page @property {number} total_pages @property {number} total_count */
+
+/** @type {Object} */ var Helpers;
+/** @type {function(): string} */ var pathname;
+/** @type {function({html: string}): void} */ var openModal;
+/** @type {function(any): string} */ var identifier;
+/** @type {function(any[], any, string): string} */ var selectOptionsHTML;
+/** @type {function(any, string, string): any} */ var cloneNewKey;
+/** @type {function(Pagination): string} */ var pagination;
+/** @type {function(): Promise<any>} */ var fetchJson;

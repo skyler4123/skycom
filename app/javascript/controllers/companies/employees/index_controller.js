@@ -5,11 +5,15 @@ import Companies_Employees_ShowModalController from "controllers/companies/emplo
 export default class Companies_Branches_EmployeesController extends Companies_LayoutController {
   static targets = ["employeesList"]
 
+  /** @type {Employee[]} */
+  employees = []
+
   async connect() {
     super.connect() // Start parent layout logic
     
     try {
-      const response = await window.fetchJson()
+      /** @type {{ employees: Employee[], pagination: any }} */
+      const response = await fetchJson()
       
       // 1. Save the data to the instance immediately
       this.employees = response.employees || []
@@ -105,7 +109,6 @@ export default class Companies_Branches_EmployeesController extends Companies_La
               <thead>
                 <tr class="text-sm text-slate-500 dark:text-slate-400 bg-slate-50 dark:bg-slate-800/50 border-b border-slate-200 dark:border-slate-700">
                   <th class="py-4 px-6 font-medium whitespace-nowrap">Employee Name</th>
-                  <th class="py-4 px-6 font-medium whitespace-nowrap">Email</th>
                   <th class="py-4 px-6 font-medium whitespace-nowrap">Departments</th>
                   <th class="py-4 px-6 font-medium whitespace-nowrap">Roles</th>
                   <th class="py-4 px-6 font-medium whitespace-nowrap">Code</th>
@@ -128,9 +131,6 @@ export default class Companies_Branches_EmployeesController extends Companies_La
                           </p>
                         </div>
                       </div>
-                    </td>
-                    <td class="py-4 px-6 text-sm">
-                      <p class="text-blue-600 dark:text-blue-400 font-medium">${employee.email || 'N/A'}</p>
                     </td>
                     <td class="py-4 px-6">
                       <div class="flex flex-wrap gap-1">
