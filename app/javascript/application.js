@@ -43,6 +43,7 @@ window.form = Helpers.form
 window.toast = Helpers.toast
 window.selectOptionsHTML = Helpers.selectOptionsHTML
 window.findById = Helpers.findById
+window.Enums = Helpers.Enums
 
 // 4. Data Getters (Safe from Race Conditions)
 // This allows you to use 'currentCompany()' as a variable that always fetches fresh data

@@ -37,7 +37,10 @@ export default class Companies_Branches_EmployeesController extends Companies_La
     openModal({ html: `<div data-controller="${identifier(Companies_Employees_NewModalController)}"></div>` })
   }
 
-  openShowModal() {
+  openShowModal(event) {
+    event.preventDefault()
+    const { employeeId } = event.params
+    window.currentEmployee = findById(this.employees, employeeId)
     openModal({ html: `<div data-controller="${identifier(Companies_Employees_ShowModalController)}"></div>` })
   }
 
@@ -45,8 +48,8 @@ export default class Companies_Branches_EmployeesController extends Companies_La
     // Local aliases for cleaner template interpolation
     const departmentFilter = Helpers.currentDepartments();
     const roleFilter = Helpers.currentRoles();
-    const workflowStatusFilter = Helpers.employee().enum.workflow_statuses;
-    const typeFilter = Helpers.employee().enum.business_types;
+    const workflowStatusFilter = Enums().employee.workflow_statuses;
+    const typeFilter = Enums().employee.business_types;
     
     const urlParams = new URLSearchParams(window.location.search);
 
@@ -169,6 +172,7 @@ export default class Companies_Branches_EmployeesController extends Companies_La
                       <button
                         class="p-2 text-slate-500 hover:text-blue-600 hover:bg-blue-50 rounded-lg cursor-pointer"
                         data-action="click->${this.identifier}#openShowModal"
+                        data-${this.identifier}-employee-id-param="${employee.id}"
                       >
                         <span class="material-symbols-outlined text-[20px]">edit</span>
                       </button>
