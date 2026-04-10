@@ -6,7 +6,7 @@ class Companies::EmployeesController < Companies::ApplicationController
       format.html { render html: "", layout: true }
       format.json do
         # 1. Apply Filtering Logic
-        scope = current_company.employees.includes(:user, :roles, :departments)
+        scope = current_company.employees.includes(:user, :roles, :departments, :branch)
         scope = scope.where(departments: { id: params[:department_id] }) if params[:department_id].present?
         scope = scope.where(roles: { id: params[:role_id] }) if params[:role_id].present?
         scope = scope.where(business_type: params[:business_type]) if params[:business_type].present?
@@ -85,7 +85,7 @@ class Companies::EmployeesController < Companies::ApplicationController
 
   def format_employees(employees)
     employees.map do |employee|
-      employee.as_json(include: { user: { only: :email } }).merge(
+      employee.as_json(include: { user: { only: :email }, branch: { only: [:id, :name] } }).merge(
         roles: employee.roles.map { |r| { id: r.id, name: r.name } },
         departments: employee.departments.map { |d| { id: d.id, name: d.name } }
       )

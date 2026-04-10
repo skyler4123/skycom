@@ -102,3 +102,30 @@ The following are available globally via the `Helpers` object:
 - **Rendering**: Happens client-side in `contentHTML()` using ES6 Template Literals.
 - **Encapsulation**: Use `new_modal_controller.js` to isolate logic for creation forms, ensuring they point back to the correct Rails RESTful action.
 - **Identifiers**: Always use the underscored naming convention for file structure that matches the Pascal_Snake_Case class names.
+
+
+# 4. JavaScript Type Definitions (JSDoc)
+
+To maintain a "Desktop-App" feel with high reliability, Skycom uses **JSDoc** for static type checking and IDE autocompletion. All core business entities and shared structures are defined in a central location.
+
+### Central Type Registry
+- **Path**: `app/javascript/types.js`
+- **Purpose**: This file contains only JSDoc `@typedef` blocks. It is not imported at runtime (since Importmap handles logic), but it is used by the AI and IDEs to understand the data structures returned by the Rails JSON API.
+
+### Standard Type Definitions
+1.  **Core Entities**: Models like `Employee`, `Branch`, `Department`, and `Role` must match the Rails `db/schema.rb` columns exactly.
+2.  **Intersection Types (Hydration)**: When a controller returns a record with associations, use inline intersections or named types to represent the "Hydrated" state.
+    - *Pattern*: `/** @type {Employee & { branch: Branch, roles: Role[] }} */`
+3.  **Enums**: The `Enums()` helper structure must be typed to ensure valid lookup keys.
+    - *Example*: `/** @type {keyof EmployeeEnums} */`
+
+### Type Usage in Stimulus
+1.  **Property Annotations**: Always annotate the initial state of a controller property.
+    - *Correct*: `/** @type {Employee | null} */ employee = null`
+2.  **Response Casting**: When using `fetchJson()`, explicitly cast the response to the expected type to ensure downstream logic is type-safe.
+    - *Example*: `/** @type {{ employees: Employee[] }} */ const data = await fetchJson()`
+3.  **Global Objects**: Global variables like `window.currentEmployee` or `window.client_cache_data` must be cast to their respective types from `types.js` before use.
+
+### Coding Standard
+- **Null-Safety**: Initialize object properties as `null` rather than `{}`.
+- **Optional Chaining**: Use `?.` when accessing associations (e.g., `this.employee?.branch?.name`) to prevent UI crashes if data is missing or eager loading failed.

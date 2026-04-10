@@ -5,7 +5,7 @@ import Companies_Employees_ShowModalController from "controllers/companies/emplo
 export default class Companies_Branches_EmployeesController extends Companies_LayoutController {
   static targets = ["employeesList"]
 
-  /** @type {Employee[]} */
+  /** @type {(Employee & { departments: Department[], roles: Role[], branch: Branch })[]} */
   employees = []
 
   async connect() {
