@@ -1,5 +1,6 @@
 import Companies_LayoutController from "controllers/companies/layout_controller"
 import Companies_Employees_NewModalController from "controllers/companies/employees/new_modal_controller";
+import Companies_Employees_ShowModalController from "controllers/companies/employees/show_modal_controller";
 
 export default class Companies_Branches_EmployeesController extends Companies_LayoutController {
   static targets = ["employeesList"]
@@ -30,6 +31,10 @@ export default class Companies_Branches_EmployeesController extends Companies_La
 
   openNewModal() {
     openModal({ html: `<div data-controller="${identifier(Companies_Employees_NewModalController)}"></div>` })
+  }
+
+  openShowModal() {
+    openModal({ html: `<div data-controller="${identifier(Companies_Employees_ShowModalController)}"></div>` })
   }
 
   contentHTML() {
@@ -161,7 +166,10 @@ export default class Companies_Branches_EmployeesController extends Companies_La
                       ${Helpers.statusBadge(employee.workflow_status)}
                     </td>
                     <td class="py-4 px-6 text-sm text-right">
-                      <button class="p-2 text-slate-500 hover:text-blue-600 hover:bg-blue-50 rounded-lg">
+                      <button
+                        class="p-2 text-slate-500 hover:text-blue-600 hover:bg-blue-50 rounded-lg cursor-pointer"
+                        data-action="click->${this.identifier}#openShowModal"
+                      >
                         <span class="material-symbols-outlined text-[20px]">edit</span>
                       </button>
                     </td>
