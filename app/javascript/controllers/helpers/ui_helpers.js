@@ -384,13 +384,13 @@ export const toast = ({ type = "normal", message = "" }) => {
 
   Toastify({
     text: message || (type === "success" ? "Success!" : "Notice"),
-    duration: 300000,
+    duration: 3000,
     gravity: "top",
     position: "right",
     stopOnFocus: true,
     // Inject Tailwind classes here. Note: we reset 'style' to empty 
     // to prevent Toastify's default vanilla styles from interfering.
-    className: `rounded-lg px-4 py-3 !bg-none border font-medium ${themeClasses}`,
+    className: `!rounded-lg px-4 py-3 !bg-none border font-medium ${themeClasses}`,
     // style: { background: "unset" } 
   }).showToast();
 }

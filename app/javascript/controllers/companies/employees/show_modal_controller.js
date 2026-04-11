@@ -47,7 +47,6 @@ export default class Companies_Employees_ShowModalController extends Controller 
                 <img class="h-full w-full object-cover" src="${e.metadata?.avatar_url || 'https://lh3.googleusercontent.com/aida-public/AB6AXuCdl33Dx4Q4diQVh50H-7KAkXuzdatYq7KrBZOTTGLU0DeGklEda8V-NSs8PsfUx86lb_NW5SVSKPhAIUVFftXhbbcHXKiedlL_xcI-4G7YkcGkgf-S-hIDHDRq1Lw6E6STx6JzNq-UOJfa6m4c0jpuwMoSRM0lfdc1R3iF1AOXhod-vEyMZWMawCQoPrHuFMOmddzo7qRXdHmZ-ZdE9xmsu6_OzsjNmbn3WTjPYf4AKbj0OIfHNq41EMeVwOkRDCnZHOvUCGzSBgo'}" alt="${name}" />
               </div>
               <div class="flex flex-1 flex-col text-center sm:text-left">
-                <h2 class="text-2xl font-black text-slate-900 dark:text-white">${name}</h2>
                 ${editable({
                   dispatch: "updateEmployee",
                   resource: "employee",
@@ -55,7 +54,7 @@ export default class Companies_Employees_ShowModalController extends Controller 
                   id: e.id,
                   value: e.name,
                   url: Helpers.edit_company_employee_path(currentCompany().id, e.id),
-                  html: `<h2 class="text-3xl font-black text-blue-600">${e.name}</h2>`
+                  html: `<h2 class="text-2xl font-black text-slate-900 dark:text-white">${name}</h2>`
                 })}
                 <p class="font-semibold text-blue-600 dark:text-blue-400">${e.description || 'Employee'}</p>
                 <div class="mt-4 flex flex-wrap justify-center gap-2 sm:justify-start">
