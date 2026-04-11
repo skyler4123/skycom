@@ -48,6 +48,20 @@ export default class Companies_Employees_ShowModalController extends Controller 
               </div>
               <div class="flex flex-1 flex-col text-center sm:text-left">
                 <h2 class="text-2xl font-black text-slate-900 dark:text-white">${name}</h2>
+
+                <div 
+                  data-controller="editable" 
+                  data-editable-confirm-value="true"
+                  data-editable-name-value="name" 
+                  data-editable-value-value="${e.name}" 
+                  data-editable-url-value="${Helpers.edit_company_employee_path(currentCompany().id, e.id)}"
+                >
+                  <span class="text-2xl font-black text-slate-900 dark:text-white">
+                    ${e.name}
+                  </span>
+                </div>
+
+
                 <p class="font-semibold text-blue-600 dark:text-blue-400">${e.description || 'Employee'}</p>
                 <div class="mt-4 flex flex-wrap justify-center gap-2 sm:justify-start">
                   <span class="inline-flex items-center rounded-lg bg-blue-100 dark:bg-blue-900/40 px-3 py-1 text-xs font-bold text-blue-700 dark:text-blue-300 uppercase">${lifecycleLabel}</span>

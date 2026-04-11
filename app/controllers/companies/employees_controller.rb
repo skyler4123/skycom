@@ -69,10 +69,45 @@ class Companies::EmployeesController < Companies::ApplicationController
     end
   end
 
+  def update
+    @employee = current_company.employees.find(params[:id])
+
+    respond_to do |format|
+      format.json do
+        if @employee.update(update_employee_params)
+          render json: {
+            status: "success",
+            message: "Updated successfully",
+            employee: format_single_employee(@employee)
+          }
+        else
+          render json: {
+            status: "error",
+            errors: @employee.errors.full_messages
+          }, status: :unprocessable_entity
+        end
+      end
+    end
+  rescue ActiveRecord::RecordNotFound
+    render json: { status: "error", message: "Employee not found" }, status: :not_found
+  end
+
   private
 
   def employee_params
     params.require(:employee).permit(:name, :description, :business_type, :branch_id, :department_id, :role_id)
+  end
+
+  def update_employee_params
+    params.permit(
+      :name, 
+      :description, 
+      :business_type, 
+      :branch_id, 
+      :department_id, 
+      :role_id,
+      :workflow_status # Added this since it's likely a target for editing
+    )
   end
 
   # Helper to format a single employee response, following your index pattern
