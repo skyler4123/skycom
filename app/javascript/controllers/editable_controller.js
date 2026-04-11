@@ -28,7 +28,10 @@ export default class EditableController extends Controller {
     type: { type: String, default: "text" }, 
     options: Array,  // For selects: [{ name: "Sales", value: "1" }]
     confirm: { type: Boolean, default: true },
-    dispatch: String
+    dispatch: String,
+    successMessage: { type: String, default: "Updated successfully!" },
+    errorMessage: { type: String, default: "Update failed." },
+    confirmMessage: { type: String, default: "Update to \"{{value}}\"?" }
   }
 
   connect() {
@@ -71,13 +74,16 @@ export default class EditableController extends Controller {
     const newValue = input.value
     const previousValue = this.valueValue // Capture the state before updating
 
-    // 1. Skip if value hasn't changed
+    // Skip if value hasn't changed
     if (String(newValue) === String(previousValue)) {
       return this.cancel()
     }
 
-    // 2. Confirmation
-    if (this.confirmValue && !confirm(`Update to "${newValue}"?`)) return
+    // Dynamic Confirmation Message
+    if (this.confirmValue) {
+      const msg = this.confirmMessageValue.replace("{{value}}", newValue)
+      if (!confirm(msg)) return
+    }
 
     try {
       const response = await fetchJson(this.urlValue, {
@@ -96,9 +102,9 @@ export default class EditableController extends Controller {
         } 
       })
       
-      toast({ type: "success", message: "Updated successfully!" })
+      toast({ type: "success", message: this.successMessageValue })
     } catch (error) {
-      toast({ type: "error", message: "Update failed." })
+      toast({ type: "error", message: this.errorMessageValue })
       this.cancel()
     }
   }

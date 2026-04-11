@@ -479,7 +479,10 @@ export const editable = ({
   html, // This can now be `<h1 class="...">...</h1>` or `<p>...</p>`
   dispatch = "updated", 
   confirm = true,
-  type = "text"
+  type = "text",
+  successMessage,
+  errorMessage,
+  confirmMessage
 }) => {
   return `
     <div 
@@ -492,6 +495,9 @@ export const editable = ({
       data-editable-dispatch-value="${dispatch}"
       data-editable-confirm-value="${confirm}"
       data-editable-type-value="${type}"
+      ${successMessage ? `data-editable-success-message-value="${successMessage}"` : ''}
+      ${errorMessage ? `data-editable-error-message-value="${errorMessage}"` : ''}
+      ${confirmMessage ? `data-editable-confirm-message-value="${confirmMessage}"` : ''}
     >
       ${html}
     </div>

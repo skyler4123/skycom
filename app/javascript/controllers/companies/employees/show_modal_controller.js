@@ -54,7 +54,10 @@ export default class Companies_Employees_ShowModalController extends Controller 
                   id: e.id,
                   value: e.name,
                   url: Helpers.edit_company_employee_path(currentCompany().id, e.id),
-                  html: `<h2 class="text-2xl font-black text-slate-900 dark:text-white">${name}</h2>`
+                  html: `<h2 class="text-2xl font-black text-slate-900 dark:text-white">${name}</h2>`,
+                  confirmMessage: "Are you sure you want to change this employee's name to '{{value}}'?",
+                  successMessage: "Employee name updated successfully!",
+                  errorMessage: "Failed to update employee name!"
                 })}
                 <p class="font-semibold text-blue-600 dark:text-blue-400">${e.description || 'Employee'}</p>
                 <div class="mt-4 flex flex-wrap justify-center gap-2 sm:justify-start">
