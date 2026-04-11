@@ -10,7 +10,7 @@ export default class Companies_Branches_EmployeesController extends Companies_La
 
   async connect() {
     super.connect() // Start parent layout logic
-    
+    addAction(this.element, `editable:updateEmployee@window->${this.identifier}#handleUpdate`)
     try {
       /** @type {{ employees: Employee[], pagination: any }} */
       const response = await fetchJson()
@@ -42,6 +42,26 @@ export default class Companies_Branches_EmployeesController extends Companies_La
     const { employeeId } = event.params
     window.currentEmployee = findById(this.employees, employeeId)
     openModal({ html: `<div data-controller="${identifier(Companies_Employees_ShowModalController)}"></div>` })
+  }
+
+  handleUpdate(event) {
+    const { data } = event.detail
+    const newEmployee = data.employee
+
+    if (!newEmployee) return
+
+    // mergeObjectArrays(baseArray, arrayWithNewItems, key)
+    // This will find the employee by 'id' in this.employees and overwrite it 
+    // with the data from newEmployee.
+    this.employees = mergeObjectArrays(this.employees, [newEmployee], "id")
+
+    // Sync the global reference for the Modal/Show logic
+    if (window.currentEmployee?.id === newEmployee.id) {
+      window.currentEmployee = newEmployee
+    }
+
+    // Refresh the table UI
+    this.renderContent()
   }
 
   contentHTML() {

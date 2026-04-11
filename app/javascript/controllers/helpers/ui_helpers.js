@@ -460,3 +460,40 @@ export const selectOptionsHTML = (options = [], selectedValue, defaultText) => {
   });
   return html;
 }
+
+/**
+ * Generates the HTML wrapper for the Stimulus Editable Controller.
+ * @param {Object} options
+ * @param {string} options.resource - The model name (e.g., 'employee')
+ * @param {string} options.name - The field name (e.g., 'name' or 'email')
+ * @param {string|number} options.id - The record ID
+ * @param {string} options.value - The current value to display
+ * @param {string} options.url - The PATCH endpoint
+ * @param {string} [options.html] - Optional custom internal HTML (defaults to span)
+ * @param {string} [options.dispatch] - Custom dispatch event name
+ * @param {boolean} [options.confirm=true] - Whether to show a confirmation dialog
+ * @param {string} [options.type='text'] - Input type (text, select, etc.)
+ */
+export const editable = ({ 
+  resource, name, id, value, url, 
+  html, // This can now be `<h1 class="...">...</h1>` or `<p>...</p>`
+  dispatch = "updated", 
+  confirm = true,
+  type = "text"
+}) => {
+  return `
+    <div 
+      data-controller="editable"
+      data-editable-resource-value="${resource}"
+      data-editable-name-value="${name}"
+      data-editable-id-value="${id}"
+      data-editable-value-value="${value}"
+      data-editable-url-value="${url}"
+      data-editable-dispatch-value="${dispatch}"
+      data-editable-confirm-value="${confirm}"
+      data-editable-type-value="${type}"
+    >
+      ${html}
+    </div>
+  `.trim()
+}

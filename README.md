@@ -129,3 +129,57 @@ To maintain a "Desktop-App" feel with high reliability, Skycom uses **JSDoc** fo
 ### Coding Standard
 - **Null-Safety**: Initialize object properties as `null` rather than `{}`.
 - **Optional Chaining**: Use `?.` when accessing associations (e.g., `this.employee?.branch?.name`) to prevent UI crashes if data is missing or eager loading failed.
+
+# 5. Reactive UI & Inline Editing Pattern
+
+Skycom utilizes a **State-to-Template** reactivity model. Instead of manual DOM manipulation (finding IDs and updating innerText), we update the local instance state and trigger a re-render of the component. This provides a React-like experience while staying within the Stimulus/Rails ecosystem.
+
+### 5.1 The `editable` Helper
+To maintain clean templates, use the `editable` helper. This helper is **tag-agnostic** and wraps any HTML element in a Stimulus `editable` controller. It ensures that typography and styling are preserved when switching between view and edit modes.
+
+**Implementation Example:**
+```javascript
+${Helpers.editable({
+  resource: "employee",
+  name: "name",
+  id: employee.id,
+  value: employee.name,
+  url: Helpers.edit_company_employee_path(currentCompany().id, employee.id),
+  dispatch: "updateEmployee",
+  html: `<span class="text-xl font-bold text-slate-900">${employee.name}</span>`
+})}
+```
+### 5.2 Event-Driven Synchronization
+When an update is successful, the `editable` controller dispatches a custom event. The parent controller (e.g., an Index or Table controller) must listen for this event to update its local data store.
+
+**Global Event Protocol:**
+* **Event Name:** `editable:[dispatchName]` (e.g., `editable:updateEmployee`).
+* **Payload (`event.detail`):**
+    * `resource`: The name of the resource (e.g., "employee").
+    * `data`: The full JSON response from the server (Source of Truth).
+    * `value`: The new value updated.
+    * `previousValue`: The value before the edit (useful for rollbacks).
+
+### 5.3 Data Merging & Re-rendering
+Parent controllers must use the `mergeObjectArrays` helper to synchronize local state. This ensures that nested data (like roles or departments) is updated automatically in the UI without a full page refresh.
+
+**Standard Update Handler:**
+```javascript
+handleUpdate(event) {
+  const { resource, data } = event.detail
+  const newObject = data[resource] || data // Source of Truth
+
+  if (!newObject) return
+
+  // 1. Merge into the local collection (replaces item with same ID)
+  this.employees = mergeObjectArrays(this.employees, [newObject], "id")
+
+  // 2. Refresh the UI via the Shell-First render pattern
+  this.renderContent()
+}
+```
+### 5.4 Design Principles for Inline Editing
+1.  **Tag Agnosticism**: The controller does not hardcode `<span>` or `<div>`. It targets the `firstElementChild` of the wrapper to preserve the developer's intended HTML structure.
+2.  **Typography Inheritance**: The generated `input` or `select` element must inherit the CSS classes from the original display element (e.g., `text-2xl`, `font-black`) to prevent layout "jumps" during editing.
+3.  **Explicit Resource Mapping**: Always pass the `resource` name via the helper to ensure the event payload is correctly mapped to the parent's data arrays.
+4.  **Optimistic Logic**: While the UI updates after the server response, the `previousValue` is maintained in the event detail to allow for audit logging or error recovery.
