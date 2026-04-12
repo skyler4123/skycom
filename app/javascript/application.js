@@ -55,3 +55,5 @@ window.currentCompany = Helpers.currentCompany
 window.currentBranches = Helpers.currentBranches
 window.currentUser = Helpers.currentUser
 window.isSignedIn = Helpers.isSignedIn
+window.currentDepartments = Helpers.currentDepartments
+window.currentRoles = Helpers.currentRoles
