@@ -100,11 +100,11 @@ class Companies::EmployeesController < Companies::ApplicationController
 
   def update_employee_params
     params.permit(
-      :name, 
-      :description, 
-      :business_type, 
-      :branch_id, 
-      :department_id, 
+      :name,
+      :description,
+      :business_type,
+      :branch_id,
+      :department_id,
       :role_id,
       :workflow_status # Added this since it's likely a target for editing
     )
@@ -120,7 +120,7 @@ class Companies::EmployeesController < Companies::ApplicationController
 
   def format_employees(employees)
     employees.map do |employee|
-      employee.as_json(include: { user: { only: :email }, branch: { only: [:id, :name] } }).merge(
+      employee.as_json(include: { user: { only: :email }, branch: { only: [ :id, :name ] } }).merge(
         roles: employee.roles.map { |r| { id: r.id, name: r.name } },
         departments: employee.departments.map { |d| { id: d.id, name: d.name } }
       )
