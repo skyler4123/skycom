@@ -32,6 +32,7 @@ export const company_services_path = (companyId) => `/companies/${companyId}/ser
 export const company_customers_path = (companyId) => `/companies/${companyId}/customers`
 export const company_facilities_path = (companyId) => `/companies/${companyId}/facilities`
 export const company_employees_path = (companyId) => `/companies/${companyId}/employees`
+export const edit_company_employee_path = (companyId, employeeId) => `/companies/${companyId}/employees/${employeeId}`
 export const company_orders_path = (companyId) => `/companies/${companyId}/orders`
 export const company_permissions_path = (companyId) => `/companies/${companyId}/permissions`
 export const company_roles_path = (companyId) => `/companies/${companyId}/roles`

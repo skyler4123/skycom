@@ -1,14 +1,19 @@
 import Companies_LayoutController from "controllers/companies/layout_controller"
 import Companies_Employees_NewModalController from "controllers/companies/employees/new_modal_controller";
+import Companies_Employees_ShowModalController from "controllers/companies/employees/show_modal_controller";
 
 export default class Companies_Branches_EmployeesController extends Companies_LayoutController {
   static targets = ["employeesList"]
 
+  /** @type {(Employee & { departments: Department[], roles: Role[], branch: Branch })[]} */
+  employees = []
+
   async connect() {
     super.connect() // Start parent layout logic
-    
+    addAction(this.element, `editable:updateEmployee@window->${this.identifier}#handleUpdate`)
     try {
-      const response = await window.fetchJson()
+      /** @type {{ employees: Employee[], pagination: any }} */
+      const response = await fetchJson()
       
       // 1. Save the data to the instance immediately
       this.employees = response.employees || []
@@ -32,12 +37,39 @@ export default class Companies_Branches_EmployeesController extends Companies_La
     openModal({ html: `<div data-controller="${identifier(Companies_Employees_NewModalController)}"></div>` })
   }
 
+  openShowModal(event) {
+    event.preventDefault()
+    const { employeeId } = event.params
+    window.currentEmployee = findById(this.employees, employeeId)
+    openModal({ html: `<div data-controller="${identifier(Companies_Employees_ShowModalController)}"></div>` })
+  }
+
+  handleUpdate(event) {
+    const { data } = event.detail
+    const newEmployee = data.employee
+
+    if (!newEmployee) return
+
+    // mergeObjectArrays(baseArray, arrayWithNewItems, key)
+    // This will find the employee by 'id' in this.employees and overwrite it 
+    // with the data from newEmployee.
+    this.employees = mergeObjectArrays(this.employees, [newEmployee], "id")
+
+    // Sync the global reference for the Modal/Show logic
+    if (window.currentEmployee?.id === newEmployee.id) {
+      window.currentEmployee = newEmployee
+    }
+
+    // Refresh the table UI
+    this.renderContent()
+  }
+
   contentHTML() {
     // Local aliases for cleaner template interpolation
     const departmentFilter = Helpers.currentDepartments();
     const roleFilter = Helpers.currentRoles();
-    const workflowStatusFilter = Helpers.employee().enum.workflow_statuses;
-    const typeFilter = Helpers.employee().enum.business_types;
+    const workflowStatusFilter = Enums().employee.workflow_statuses;
+    const typeFilter = Enums().employee.business_types;
     
     const urlParams = new URLSearchParams(window.location.search);
 
@@ -100,7 +132,6 @@ export default class Companies_Branches_EmployeesController extends Companies_La
               <thead>
                 <tr class="text-sm text-slate-500 dark:text-slate-400 bg-slate-50 dark:bg-slate-800/50 border-b border-slate-200 dark:border-slate-700">
                   <th class="py-4 px-6 font-medium whitespace-nowrap">Employee Name</th>
-                  <th class="py-4 px-6 font-medium whitespace-nowrap">Email</th>
                   <th class="py-4 px-6 font-medium whitespace-nowrap">Departments</th>
                   <th class="py-4 px-6 font-medium whitespace-nowrap">Roles</th>
                   <th class="py-4 px-6 font-medium whitespace-nowrap">Code</th>
@@ -123,9 +154,6 @@ export default class Companies_Branches_EmployeesController extends Companies_La
                           </p>
                         </div>
                       </div>
-                    </td>
-                    <td class="py-4 px-6 text-sm">
-                      <p class="text-blue-600 dark:text-blue-400 font-medium">${employee.email || 'N/A'}</p>
                     </td>
                     <td class="py-4 px-6">
                       <div class="flex flex-wrap gap-1">
@@ -161,7 +189,11 @@ export default class Companies_Branches_EmployeesController extends Companies_La
                       ${Helpers.statusBadge(employee.workflow_status)}
                     </td>
                     <td class="py-4 px-6 text-sm text-right">
-                      <button class="p-2 text-slate-500 hover:text-blue-600 hover:bg-blue-50 rounded-lg">
+                      <button
+                        class="p-2 text-slate-500 hover:text-blue-600 hover:bg-blue-50 rounded-lg cursor-pointer"
+                        data-action="click->${this.identifier}#openShowModal"
+                        data-${this.identifier}-employee-id-param="${employee.id}"
+                      >
                         <span class="material-symbols-outlined text-[20px]">edit</span>
                       </button>
                     </td>

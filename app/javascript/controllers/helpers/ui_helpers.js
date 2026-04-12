@@ -384,13 +384,13 @@ export const toast = ({ type = "normal", message = "" }) => {
 
   Toastify({
     text: message || (type === "success" ? "Success!" : "Notice"),
-    duration: 300000,
+    duration: 3000,
     gravity: "top",
     position: "right",
     stopOnFocus: true,
     // Inject Tailwind classes here. Note: we reset 'style' to empty 
     // to prevent Toastify's default vanilla styles from interfering.
-    className: `rounded-lg px-4 py-3 !bg-none border font-medium ${themeClasses}`,
+    className: `!rounded-lg px-4 py-3 !bg-none border font-medium ${themeClasses}`,
     // style: { background: "unset" } 
   }).showToast();
 }
@@ -459,4 +459,88 @@ export const selectOptionsHTML = (options = [], selectedValue, defaultText) => {
     html += `<option value="${opt.value}" ${isSelected}>${opt.name}</option>`;
   });
   return html;
+}
+
+/**
+ * Generates the HTML wrapper for the Stimulus Editable Controller.
+ * @param {Object} options
+ * @param {string} options.resource - The model name (e.g., 'employee')
+ * @param {string} options.name - The field name (e.g., 'name' or 'email')
+ * @param {string|number} options.id - The record ID
+ * @param {string} options.value - The current value to display
+ * @param {string} options.url - The PATCH endpoint
+ * @param {string} [options.html] - Optional custom internal HTML (defaults to span)
+ * @param {string} [options.dispatch] - Custom dispatch event name
+ * @param {boolean} [options.confirm=true] - Whether to show a confirmation dialog
+ * @param {string} [options.type='text'] - Input type (text, select, etc.)
+ */
+export const editable = ({ 
+  resource, name, id, value, url, 
+  html, // This can now be `<h1 class="...">...</h1>` or `<p>...</p>`
+  dispatch = "updated", 
+  confirm = true,
+  type = "text",
+  successMessage,
+  errorMessage,
+  confirmMessage
+}) => {
+  return `
+    <div 
+      data-controller="editable"
+      data-editable-resource-value="${resource}"
+      data-editable-name-value="${name}"
+      data-editable-id-value="${id}"
+      data-editable-value-value="${value}"
+      data-editable-url-value="${url}"
+      data-editable-dispatch-value="${dispatch}"
+      data-editable-confirm-value="${confirm}"
+      data-editable-type-value="${type}"
+      ${successMessage ? `data-editable-success-message-value="${successMessage}"` : ''}
+      ${errorMessage ? `data-editable-error-message-value="${errorMessage}"` : ''}
+      ${confirmMessage ? `data-editable-confirm-message-value="${confirmMessage}"` : ''}
+    >
+      ${html}
+    </div>
+  `.trim()
+}
+
+/**
+ * Wraps content with the Stimulus Tooltip Controller.
+ * @param {Object} options
+ * @param {string} options.message - Text or HTML content for the tooltip.
+ * @param {string} options.html - The trigger element's inner HTML.
+ * @param {string} [options.tag='div'] - The wrapper tag.
+ * @param {string} [options.position='top'] - top, bottom, left, right.
+ * @param {boolean} [options.arrow=true] - Show the little pointer arrow.
+ * @param {string} [options.classes=''] - Custom Tailwind overrides for the tooltip box.
+ * @param {number} [options.delay=200] - Delay before appearing (ms).
+ * @param {number} [options.duration=10000] - Auto-hide timeout (ms).
+ * @param {string} [options.className='inline-block'] - Classes for the trigger element itself.
+ */
+export const tooltip = (options) => {
+  // 1. Handle Simple Case: ${tooltip("Message")}
+  if (typeof options === "string") {
+    options = { message: options }
+  }
+
+  // 2. Set Defaults for the Object Case
+  const {
+    message = "",
+    position = "top",
+    arrow = true,
+    classes = "",
+    delay = 200,
+    duration = 10000
+  } = options
+
+  // 3. Return only the data attributes string
+  return `
+    data-controller="tooltip"
+    data-tooltip-message-value="${message.replace(/"/g, '&quot;')}"
+    data-tooltip-position-value="${position}"
+    data-tooltip-arrow-value="${arrow}"
+    data-tooltip-classes-value="${classes}"
+    data-tooltip-delay-value="${delay}"
+    data-tooltip-duration-value="${duration}"
+  `.trim()
 }

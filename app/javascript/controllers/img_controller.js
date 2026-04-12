@@ -1,3 +1,34 @@
+/**
+ * ImgController
+ * * Purpose: Dynamic image swapping based on JS breakpoints.
+ * * --- NOTE ON PERFORMANCE ---
+ * For simple responsive images, WE SHOULD USE THE NATIVE <picture> TAG:
+ * <picture>
+ * <source media="(min-width: 1024px)" srcset="large.jpg">
+ * <source media="(min-width: 768px)" srcset="medium.jpg">
+ * <img src="small.jpg" loading="lazy">
+ * </picture>
+ * ----------------------------
+ * * Use THIS Controller ONLY when:
+ * 1. You need to trigger JS logic when the image changes.
+ * 2. You are loading images inside a complex Stimulus-rendered template where 
+ * native <picture> behavior is inconsistent with your state.
+ * 3. You need the specific 'fallback-to-smaller-breakpoint' logic defined below.
+ *
+ * BREAKPOINTS:
+ * xs: < 640px | sm: 640-767px | md: 768-1023px | lg: 1024-1279px | xl: 1280-1535px | 2xl: > 1536px
+ * * USAGE:
+ * <div data-controller="img">
+ * <img 
+ * data-srcset="mobile.jpg xs, tablet.jpg md, desktop.jpg xl, default.jpg" 
+ * class="w-full"
+ * />
+ * </div>
+ * * NOTE: 
+ * - The controller automatically registers all <img> tags inside it as targets.
+ * - It defaults to the nearest smaller breakpoint if an exact match isn't found.
+ */
+
 import { Controller } from "@hotwired/stimulus"
 
 export default class ImgController extends Controller {

@@ -42,6 +42,12 @@ window.openPopover = Helpers.openPopover
 window.form = Helpers.form
 window.toast = Helpers.toast
 window.selectOptionsHTML = Helpers.selectOptionsHTML
+window.findById = Helpers.findById
+window.Enums = Helpers.Enums
+window.mergeObjectArrays = Helpers.mergeObjectArrays
+window.editable = Helpers.editable
+window.tooltip = Helpers.tooltip
+
 // 4. Data Getters (Safe from Race Conditions)
 // This allows you to use 'currentCompany()' as a variable that always fetches fresh data
 window.currentCompanies = Helpers.currentCompanies

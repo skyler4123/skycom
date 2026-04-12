@@ -1,4 +1,32 @@
 // app/javascript/controllers/form_controller.js
+
+/**
+ * FormController
+ * * Purpose: The centralized handler for all Skycom AJAX form submissions.
+ * * --- HOW IT WORKS ---
+ * 1. Hijacks the standard browser submit event via 'preventDefault()'.
+ * 2. Scrapes the form using the native 'FormData' API.
+ * 3. NESTING: This is the critical step. It converts flat HTML inputs 
+ * (e.g., name="employee[name]") into nested JSON objects: { employee: { name: '...' } }.
+ * This ensures Rails 'strong_parameters' can parse the request without modification.
+ * 4. Submission: Sends the nested object via the global 'fetchJson' helper.
+ * 5. Feedback: 
+ * - Success: Shows a success toast, closes any open modal, and dispatches 
+ * a 'success' event to notify Index/Table controllers to refresh.
+ * - Error: Catches validation errors or server crashes and shows an error toast.
+ * * * USAGE (with Helper):
+ * ${form({
+ * action: "/employees",
+ * method: "POST",
+ * html: `... fields ...`
+ * })}
+ * * * MANUAL USAGE:
+ * <form data-controller="form" data-action="submit->form#submit" action="/path">
+ * <input name="user[email]" type="email">
+ * <button type="submit">Save</button>
+ * </form>
+ */
+
 import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {

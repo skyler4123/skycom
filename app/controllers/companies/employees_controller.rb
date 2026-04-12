@@ -6,7 +6,7 @@ class Companies::EmployeesController < Companies::ApplicationController
       format.html { render html: "", layout: true }
       format.json do
         # 1. Apply Filtering Logic
-        scope = current_company.employees.includes(:user, :roles, :departments)
+        scope = current_company.employees.includes(:user, :roles, :departments, :branch)
         scope = scope.where(departments: { id: params[:department_id] }) if params[:department_id].present?
         scope = scope.where(roles: { id: params[:role_id] }) if params[:role_id].present?
         scope = scope.where(business_type: params[:business_type]) if params[:business_type].present?
@@ -69,10 +69,45 @@ class Companies::EmployeesController < Companies::ApplicationController
     end
   end
 
+  def update
+    @employee = current_company.employees.find(params[:id])
+
+    respond_to do |format|
+      format.json do
+        if @employee.update(update_employee_params)
+          render json: {
+            status: "success",
+            message: "Updated successfully",
+            employee: format_single_employee(@employee)
+          }
+        else
+          render json: {
+            status: "error",
+            errors: @employee.errors.full_messages
+          }, status: :unprocessable_entity
+        end
+      end
+    end
+  rescue ActiveRecord::RecordNotFound
+    render json: { status: "error", message: "Employee not found" }, status: :not_found
+  end
+
   private
 
   def employee_params
     params.require(:employee).permit(:name, :description, :business_type, :branch_id, :department_id, :role_id)
+  end
+
+  def update_employee_params
+    params.permit(
+      :name,
+      :description,
+      :business_type,
+      :branch_id,
+      :department_id,
+      :role_id,
+      :workflow_status # Added this since it's likely a target for editing
+    )
   end
 
   # Helper to format a single employee response, following your index pattern
@@ -85,7 +120,7 @@ class Companies::EmployeesController < Companies::ApplicationController
 
   def format_employees(employees)
     employees.map do |employee|
-      employee.as_json(include: { user: { only: :email } }).merge(
+      employee.as_json(include: { user: { only: :email }, branch: { only: [ :id, :name ] } }).merge(
         roles: employee.roles.map { |r| { id: r.id, name: r.name } },
         departments: employee.departments.map { |d| { id: d.id, name: d.name } }
       )

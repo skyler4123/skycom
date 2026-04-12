@@ -87,6 +87,7 @@ export default class Companies_LayoutController extends Controller {
                   class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:bg-blue-100 open:text-blue-600"
                   href="${Helpers.company_dashboards_path(currentCompany().id)}"
                   ${openByPathname()}/
+                  ${tooltip("Dashboard link")}
                 >
                   <span class="material-symbols-outlined">dashboard</span>
                   <p class="text-sm font-medium leading-normal" ${translate("Dashboard")}>Dashboard</p>
