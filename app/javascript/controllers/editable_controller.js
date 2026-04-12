@@ -133,7 +133,15 @@ export default class EditableController extends Controller {
       input?.remove()
       
       this.displayElement.classList.remove("hidden")
-      this.displayElement.innerText = this.valueValue || "..."
+      
+      // For select types, look up the display name from options
+      let displayValue = this.valueValue
+      if (this.typeValue === "select" && this.optionsValue) {
+        const match = this.optionsValue.find(o => String(o.value) === String(this.valueValue))
+        if (match) displayValue = match.name
+      }
+      
+      this.displayElement.innerText = displayValue || "..."
     }
   }
 

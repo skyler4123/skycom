@@ -473,6 +473,7 @@ export const selectOptionsHTML = (options = [], selectedValue, defaultText) => {
  * @param {string} [options.dispatch] - Custom dispatch event name
  * @param {boolean} [options.confirm=true] - Whether to show a confirmation dialog
  * @param {string} [options.type='text'] - Input type (text, select, etc.)
+ * @param {Array} [options.options=[]] - Options for select type [{ name: "Label", value: "id" }]
  */
 export const editable = ({ 
   resource, name, id, value, url, 
@@ -480,6 +481,7 @@ export const editable = ({
   dispatch = "updated", 
   confirm = true,
   type = "text",
+  options = [],
   successMessage,
   errorMessage,
   confirmMessage
@@ -495,6 +497,7 @@ export const editable = ({
       data-editable-dispatch-value="${dispatch}"
       data-editable-confirm-value="${confirm}"
       data-editable-type-value="${type}"
+      data-editable-options-value="${JSON.stringify(options).replace(/"/g, '&quot;')}"
       ${successMessage ? `data-editable-success-message-value="${successMessage}"` : ''}
       ${errorMessage ? `data-editable-error-message-value="${errorMessage}"` : ''}
       ${confirmMessage ? `data-editable-confirm-message-value="${confirmMessage}"` : ''}

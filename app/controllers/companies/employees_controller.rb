@@ -112,7 +112,10 @@ class Companies::EmployeesController < Companies::ApplicationController
 
   # Helper to format a single employee response, following your index pattern
   def format_single_employee(employee)
-    employee.as_json(include: { user: { only: :email } }).merge(
+    employee.as_json(include: {
+      user: { only: :email },
+      branch: { only: [ :id, :name ] }
+    }).merge(
       roles: employee.roles.map { |r| { id: r.id, name: r.name } },
       departments: employee.departments.map { |d| { id: d.id, name: d.name } }
     )

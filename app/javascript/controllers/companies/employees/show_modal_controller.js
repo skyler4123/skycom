@@ -78,15 +78,32 @@ export default class Companies_Employees_ShowModalController extends Controller 
               </div>
             </div>
 
-            <div class="grid grid-cols-1 gap-6 border-t border-slate-200 dark:border-gray-800 pt-8 sm:grid-cols-2">
-              
+<div class="grid grid-cols-1 gap-6 border-t border-slate-200 dark:border-gray-800 pt-8 sm:grid-cols-2">
+               
               <div class="flex items-center gap-3">
                 <div class="flex size-10 items-center justify-center rounded-lg bg-slate-100 dark:bg-gray-800 text-blue-600 dark:text-blue-400">
                   <span class="material-symbols-outlined">location_on</span>
                 </div>
                 <div>
                   <p class="text-xs font-medium text-slate-500 dark:text-gray-400">Work Branch</p>
-                  <p class="text-sm font-semibold text-slate-900 dark:text-white">${branchName}</p>
+                  ${(() => {
+                    const branches = currentBranches() || []
+                    const options = branches.map(b => ({ name: b.name, value: b.id }))
+                    return editable({
+                      dispatch: "updateEmployee",
+                      resource: "employee",
+                      name: "branch_id",
+                      id: e.id,
+                      value: e.branch?.id || e.branch_id,
+                      url: Helpers.edit_company_employee_path(currentCompany().id, e.id),
+                      type: "select",
+                      options: options,
+                      html: `<p class="text-sm font-semibold text-slate-900 dark:text-white">${branchName}</p>`,
+                      confirmMessage: "Change branch to '{{value}}'?",
+                      successMessage: "Branch updated!",
+                      errorMessage: "Failed to update branch!"
+                    })
+                  })()}
                 </div>
               </div>
 
