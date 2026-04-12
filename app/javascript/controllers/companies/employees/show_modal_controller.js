@@ -59,7 +59,18 @@ export default class Companies_Employees_ShowModalController extends Controller 
                   successMessage: "Employee name updated successfully!",
                   errorMessage: "Failed to update employee name!"
                 })}
-                <p class="font-semibold text-blue-600 dark:text-blue-400">${e.description || 'Employee'}</p>
+                ${editable({
+                  dispatch: "updateEmployee",
+                  resource: "employee",
+                  name: "description",
+                  id: e.id,
+                  value: e.description || '',
+                  url: Helpers.edit_company_employee_path(currentCompany().id, e.id),
+                  html: `<p class="font-semibold text-blue-600 dark:text-blue-400">${e.description || 'Employee'}</p>`,
+                  confirmMessage: "Change description to '{{value}}'?",
+                  successMessage: "Description updated!",
+                  errorMessage: "Failed to update description!"
+                })}
                 <div class="mt-4 flex flex-wrap justify-center gap-2 sm:justify-start">
                   <span class="inline-flex items-center rounded-lg bg-blue-100 dark:bg-blue-900/40 px-3 py-1 text-xs font-bold text-blue-700 dark:text-blue-300 uppercase">${lifecycleLabel}</span>
                   <span class="inline-flex items-center rounded-lg bg-slate-100 dark:bg-gray-800 px-3 py-1 text-xs font-medium text-slate-600 dark:text-gray-400">ID: ${e.code || e.id.substring(0, 8)}</span>
