@@ -183,3 +183,51 @@ handleUpdate(event) {
 2.  **Typography Inheritance**: The generated `input` or `select` element must inherit the CSS classes from the original display element (e.g., `text-2xl`, `font-black`) to prevent layout "jumps" during editing.
 3.  **Explicit Resource Mapping**: Always pass the `resource` name via the helper to ensure the event payload is correctly mapped to the parent's data arrays.
 4.  **Optimistic Logic**: While the UI updates after the server response, the `previousValue` is maintained in the event detail to allow for audit logging or error recovery.
+
+# 6. Tooltip System (Zero-Dependency)
+
+Skycom uses a custom, lightweight Stimulus controller for tooltips to avoid the overhead and dependency issues of external libraries like Tippy.js. It supports smart positioning, collision detection (auto-flipping), and rich HTML content.
+
+### 6.1 The `tooltip` Helper
+The `tooltip` helper is a **Polymorphic Attribute Generator**. It does not wrap HTML; instead, it returns a string of `data-` attributes to be spread directly onto an existing element.
+
+**Usage Patterns:**
+1.  **Simple (String Only)**: `${tooltip("Message Text")}`
+    - Defaults to `top` position, `200ms` delay, and `10s` duration.
+2.  **Advanced (Object)**: `${tooltip({ message: "HTML String", position: "right", delay: 500 })}`
+    - Use this for custom positioning, styling, or timing.
+
+### 6.2 Implementation in Templates
+Always inject the helper directly inside the opening tag of the trigger element.
+
+```javascript
+// Example in a Sidebar or Menu
+<a href="/dashboard" ${tooltip("Return to Home")}>
+  <span class="material-symbols-outlined">dashboard</span>
+</a>
+
+// Example with HTML and Custom Position
+<button ${tooltip({ 
+  message: "<strong>Warning:</strong> This action is permanent.", 
+  position: "right",
+  classes: "!bg-rose-600 border-rose-700" 
+})}>
+  Delete
+</button>
+```
+### 6.3 Technical Specifications
+- **Controller**: `tooltip_controller.js`
+- **Smart Positioning**: Uses native `getBoundingClientRect()` for collision detection. If a tooltip is set to `top` but hits the top of the browser window, it automatically flips to `bottom`.
+- **HTML Support**: The `message` value is injected via `.innerHTML`. The helper uses `.replace(/"/g, '&quot;')` to ensure HTML strings don't break the data-attribute structure.
+- **Styling**: 
+    - **Default**: Slate-900 (Light Mode) / White (Dark Mode).
+    - **Custom**: Use the `classes` value to pass Tailwind overrides (e.g., `!bg-rose-600` for destructive actions).
+- **Lifecycle**: Tooltips are created dynamically on `mouseenter` and destroyed on `mouseleave` or `disconnect()`.
+
+### 6.4 Best Practices
+- **Icon-Only Buttons**: Always provide a tooltip for icons that don't have accompanying text labels.
+- **Polymorphic Usage**:
+    - Use `tooltip("Simple Text")` for 90% of cases.
+    - Use `tooltip({ message: "...", position: "right" })` only when layout constraints require it.
+- **Z-Index**: The controller uses `z-[9999]` by default. Ensure your Modals or Overlays do not exceed this value, or adjust the controller accordingly.
+- **Delay**: The default `200ms` delay is intentional to prevent "UI flickering" when a user moves the cursor across a list of items.

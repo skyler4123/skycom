@@ -503,3 +503,44 @@ export const editable = ({
     </div>
   `.trim()
 }
+
+/**
+ * Wraps content with the Stimulus Tooltip Controller.
+ * @param {Object} options
+ * @param {string} options.message - Text or HTML content for the tooltip.
+ * @param {string} options.html - The trigger element's inner HTML.
+ * @param {string} [options.tag='div'] - The wrapper tag.
+ * @param {string} [options.position='top'] - top, bottom, left, right.
+ * @param {boolean} [options.arrow=true] - Show the little pointer arrow.
+ * @param {string} [options.classes=''] - Custom Tailwind overrides for the tooltip box.
+ * @param {number} [options.delay=200] - Delay before appearing (ms).
+ * @param {number} [options.duration=10000] - Auto-hide timeout (ms).
+ * @param {string} [options.className='inline-block'] - Classes for the trigger element itself.
+ */
+export const tooltip = (options) => {
+  // 1. Handle Simple Case: ${tooltip("Message")}
+  if (typeof options === "string") {
+    options = { message: options }
+  }
+
+  // 2. Set Defaults for the Object Case
+  const {
+    message = "",
+    position = "top",
+    arrow = true,
+    classes = "",
+    delay = 200,
+    duration = 10000
+  } = options
+
+  // 3. Return only the data attributes string
+  return `
+    data-controller="tooltip"
+    data-tooltip-message-value="${message.replace(/"/g, '&quot;')}"
+    data-tooltip-position-value="${position}"
+    data-tooltip-arrow-value="${arrow}"
+    data-tooltip-classes-value="${classes}"
+    data-tooltip-delay-value="${delay}"
+    data-tooltip-duration-value="${duration}"
+  `.trim()
+}
