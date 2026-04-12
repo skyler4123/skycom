@@ -474,6 +474,7 @@ export const selectOptionsHTML = (options = [], selectedValue, defaultText) => {
  * @param {boolean} [options.confirm=true] - Whether to show a confirmation dialog
  * @param {string} [options.type='text'] - Input type (text, select, etc.)
  * @param {Array} [options.options=[]] - Options for select type [{ name: "Label", value: "id" }]
+ * @param {string} [options.className=''] - Additional CSS classes for the input/select element
  */
 export const editable = ({ 
   resource, name, id, value, url, 
@@ -482,6 +483,7 @@ export const editable = ({
   confirm = true,
   type = "text",
   options = [],
+  className = "",
   successMessage,
   errorMessage,
   confirmMessage
@@ -498,6 +500,7 @@ export const editable = ({
       data-editable-confirm-value="${confirm}"
       data-editable-type-value="${type}"
       data-editable-options-value="${JSON.stringify(options).replace(/"/g, '&quot;')}"
+      data-editable-class-name-value="${className}"
       ${successMessage ? `data-editable-success-message-value="${successMessage}"` : ''}
       ${errorMessage ? `data-editable-error-message-value="${errorMessage}"` : ''}
       ${confirmMessage ? `data-editable-confirm-message-value="${confirmMessage}"` : ''}

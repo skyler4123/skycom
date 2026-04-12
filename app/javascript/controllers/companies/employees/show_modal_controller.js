@@ -98,6 +98,7 @@ export default class Companies_Employees_ShowModalController extends Controller 
                       url: Helpers.edit_company_employee_path(currentCompany().id, e.id),
                       type: "select",
                       options: options,
+                      className: "dark:bg-gray-800 dark:text-white",
                       html: `<p class="text-sm font-semibold text-slate-900 dark:text-white">${branchName}</p>`,
                       confirmMessage: "Change branch to '{{value}}'?",
                       successMessage: "Branch updated!",

@@ -27,6 +27,7 @@ export default class EditableController extends Controller {
     url: String,     // The PATCH endpoint
     type: { type: String, default: "text" }, 
     options: Array,  // For selects: [{ name: "Sales", value: "1" }]
+    className: String, // Additional CSS classes for input/select
     confirm: { type: Boolean, default: true },
     dispatch: String,
     successMessage: { type: String, default: "Updated successfully!" },
@@ -163,7 +164,7 @@ export default class EditableController extends Controller {
   editHTML() {
     // Use the classes captured from the original tag (h1, p, span, etc.)
     const baseClasses = "editable-input bg-transparent border-none p-0 m-0 focus:ring-0 outline-none w-full"
-    const combinedClasses = `${this.textClasses} ${baseClasses}`
+    const combinedClasses = `${this.textClasses} ${this.classNameValue} ${baseClasses}`
 
     if (this.typeValue === "select") {
       const options = (this.optionsValue || []).map(opt => `
