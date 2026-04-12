@@ -231,3 +231,65 @@ Always inject the helper directly inside the opening tag of the trigger element.
     - Use `tooltip({ message: "...", position: "right" })` only when layout constraints require it.
 - **Z-Index**: The controller uses `z-[9999]` by default. Ensure your Modals or Overlays do not exceed this value, or adjust the controller accordingly.
 - **Delay**: The default `200ms` delay is intentional to prevent "UI flickering" when a user moves the cursor across a list of items.
+
+# 7. Global Form Engine
+
+Skycom uses a centralized Form Engine to handle AJAX submissions for all business modules. This system replicates the behavior of Rails `form_with` while allowing for fully dynamic, JSON-based SPA interactions.
+
+### 7.1 The `form` Helper
+Instead of writing raw `<form>` tags, always use the `form()` helper. This ensures that security headers, Rails method spoofing (PATCH/DELETE), and Stimulus hooks are applied consistently.
+
+**Key Features:**
+- **Method Spoofing**: Automatically injects hidden `_method` tags for `PATCH` and `DELETE` requests.
+- **CSRF Protection**: Injects required security tokens via `formPostSecurityTags()`.
+- **Stimulus Integration**: Defaults to `data-controller="form"`, which intercepts the native submit event.
+
+### 7.2 The `form_controller.js` Logic
+This controller acts as the "Submission Pipeline" for the entire platform.
+
+**1. Rails-Compatible Nesting**: 
+Standard `FormData` produces a flat list of keys. The controller uses a `nestFormData` logic to convert bracket-notation names into nested objects.
+- *Input*: `name="employee[email]"` with value `"skyler@example.com"`
+- *Output*: `{ employee: { email: "skyler@example.com" } }`
+- *Why*: This allows Rails **Strong Params** to work out-of-the-box without manual mapping in the backend.
+
+**2. The Submission Lifecycle**:
+- **Intercept**: `event.preventDefault()` stops the page from reloading.
+- **Request**: Uses the global `fetchJson` helper to send the nested object to the server.
+- **Success Handling**: 
+    - Displays a "Success" `toast`.
+    - Closes active modals via `closeModal()`.
+    - **Dispatch**: Fires a `success` event. This is critical for refreshing parent UI components (like tables or stat cards) without a full page refresh.
+- **Error Handling**: Catches 422/500 errors and displays the server's error message in a "Warning" or "Error" `toast`.
+
+### 7.3 Usage Example
+
+```javascript
+// Inside a Modal or Page Template
+const fields = `
+  <input name="employee[name]" value="${e.name}" class="input-primary" />
+  <input name="employee[role]" value="${e.role}" class="input-primary" />
+  <button type="submit">Save Changes</button>
+`;
+
+return form({
+  action: Helpers.employee_path(e.id),
+  method: "PATCH",
+  className: "p-6 space-y-4",
+  html: fields
+});
+```
+### 7.4 Implementation Rules
+- **Naming Convention**: Always use bracket notation for inputs (e.g., `resource[attribute]`). This is mandatory for the `nestFormData` logic to map values to Rails Strong Params correctly.
+- **Triggering Success**: If a parent Index Controller needs to refresh after a form submission, listen for the dispatch event on the form element: 
+    - `data-action="form:success->index#refresh"`
+- **Button Types**: Ensure the primary action button is explicitly `type="submit"`. The controller intercepts the `submit` event of the form, not the `click` event of a button.
+- **Manual Overrides**: If a specific form requires custom handling (e.g., a multi-step wizard), set `data-controller` to your custom controller name in the `form()` helper options.
+
+### 7.5 Security & Method Spoofing
+Since standard HTML forms only support `GET` and `POST`, the `form()` helper automatically handles Rails-specific requirements:
+- **PATCH/DELETE**: Injects a hidden `<input name="_method">` tag.
+- **CSRF**: Injects the authenticity token required by Rails to prevent `InvalidAuthenticityToken` errors.
+
+---
+*Note: This system is designed to keep the Skycom "Shell-First" architecture fast by moving form logic into the background, allowing for a seamless, SPA-like user experience.*
