@@ -23,11 +23,12 @@ export default class EditableController extends Controller {
     resource: String,
     id: String,
     name: String,    // The parameter key (e.g., "name", "description")
-    value: String,   // The current value
+    value: [String, Array],   // The current value (string or array for multi-select)
     url: String,     // The PATCH endpoint
     type: { type: String, default: "text" }, 
     options: Array,  // For selects: [{ name: "Sales", value: "1" }]
     className: String, // Additional CSS classes for input/select
+    multiple: { type: Boolean, default: false }, // For multi-select
     confirm: { type: Boolean, default: true },
     dispatch: String,
     successMessage: { type: String, default: "Updated successfully!" },
@@ -72,17 +73,28 @@ export default class EditableController extends Controller {
     }
 
     const input = this.element.querySelector(".editable-input")
-    const newValue = input.value
-    const previousValue = this.valueValue // Capture the state before updating
+    let newValue
+    let previousValue
+
+    // Handle multi-select vs single select
+    if (this.multipleValue && input.multiple) {
+      // Multi-select: get array of selected values
+      newValue = Array.from(input.selectedOptions).map(opt => opt.value)
+      previousValue = Array.isArray(this.valueValue) ? this.valueValue : []
+    } else {
+      // Single select or text input
+      newValue = input.value
+      previousValue = this.valueValue
+    }
 
     // Skip if value hasn't changed
-    if (String(newValue) === String(previousValue)) {
+    if (JSON.stringify(newValue) === JSON.stringify(previousValue)) {
       return this.cancel()
     }
 
     // Dynamic Confirmation Message
     if (this.confirmValue) {
-      const msg = this.confirmMessageValue.replace("{{value}}", newValue)
+      const msg = this.confirmMessageValue.replace("{{value}}", this.formatValueForDisplay(newValue))
       if (!confirm(msg)) return
     }
 
@@ -136,23 +148,14 @@ export default class EditableController extends Controller {
       this.displayElement.classList.remove("hidden")
       
       // For select types, look up the display name from options
-      let displayValue = this.valueValue
-      if (this.typeValue === "select" && this.optionsValue) {
-        const match = this.optionsValue.find(o => String(o.value) === String(this.valueValue))
-        if (match) displayValue = match.name
-      }
+      const displayValue = this.formatValueForDisplay(this.valueValue)
       
       this.displayElement.innerText = displayValue || "..."
     }
   }
 
   viewHTML() {
-    let displayText = this.valueValue || "..."
-    
-    if (this.typeValue === "select" && this.optionsValue) {
-      const match = this.optionsValue.find(o => String(o.value) === String(this.valueValue))
-      if (match) displayText = match.name
-    }
+    const displayText = this.formatValueForDisplay(this.valueValue) || "..."
 
     // Inject the value into the saved template
     // This preserves ALL your Tailwind classes exactly as they were in the helper
@@ -161,20 +164,36 @@ export default class EditableController extends Controller {
       .replace(/>.*<\/span>/, ` data-action="click->editable#toggle">${displayText}</span>`) 
   }
 
+  formatValueForDisplay(value) {
+    if (Array.isArray(value)) {
+      return value.map(v => {
+        const match = (this.optionsValue || []).find(o => String(o.value) === String(v))
+        return match ? match.name : v
+      }).join(", ")
+    }
+    // Single value
+    const match = (this.optionsValue || []).find(o => String(o.value) === String(value))
+    return match ? match.name : value
+  }
+
   editHTML() {
     // Use the classes captured from the original tag (h1, p, span, etc.)
     const baseClasses = "editable-input bg-transparent border-none p-0 m-0 focus:ring-0 outline-none w-full"
     const combinedClasses = `${this.textClasses} ${this.classNameValue} ${baseClasses}`
 
     if (this.typeValue === "select") {
+      const currentValues = Array.isArray(this.valueValue) ? this.valueValue : [this.valueValue]
       const options = (this.optionsValue || []).map(opt => `
-        <option value="${opt.value}" ${String(opt.value) === String(this.valueValue) ? 'selected' : ''}>
+        <option value="${opt.value}" ${currentValues.includes(opt.value) ? 'selected' : ''}>
           ${opt.name}
         </option>
       `).join("")
 
+      const multipleAttr = this.multipleValue ? 'multiple' : ''
+      const sizeAttr = this.multipleValue ? 'size="4"' : ''
+
       return `
-        <select class="${combinedClasses} cursor-pointer" 
+        <select class="${combinedClasses} cursor-pointer" ${multipleAttr} ${sizeAttr}
                 data-action="change->editable#save blur->editable#cancel keydown->editable#save">
           ${options}
         </select>

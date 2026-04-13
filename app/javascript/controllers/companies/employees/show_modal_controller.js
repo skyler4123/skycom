@@ -124,7 +124,27 @@ export default class Companies_Employees_ShowModalController extends Controller 
                 </div>
                 <div>
                   <p class="text-xs font-medium text-slate-500 dark:text-gray-400">Roles</p>
-                  <p class="text-sm font-semibold text-slate-900 dark:text-white">${rolesList}</p>
+                  ${(() => {
+                    const allRoles = Helpers.currentRoles() || []
+                    const options = allRoles.map(r => ({ name: r.name, value: r.id }))
+                    const selectedIds = e.roles?.map(r => r.id) || []
+                    return editable({
+                      dispatch: "updateEmployee",
+                      resource: "employee",
+                      name: "role_ids",
+                      id: e.id,
+                      value: selectedIds,
+                      url: Helpers.edit_company_employee_path(currentCompany().id, e.id),
+                      type: "select",
+                      multiple: true,
+                      options: options,
+                      className: "dark:bg-gray-800 dark:text-white",
+                      html: `<p class="text-sm font-semibold text-slate-900 dark:text-white">${rolesList}</p>`,
+                      confirmMessage: "Change roles to '{{value}}'?",
+                      successMessage: "Roles updated!",
+                      errorMessage: "Failed to update roles!"
+                    })
+                  })()}
                 </div>
               </div>
 
