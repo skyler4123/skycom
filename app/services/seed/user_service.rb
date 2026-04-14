@@ -5,7 +5,7 @@ class Seed::UserService
     password: "Password@1234",
     password_confirmation: "Password@1234",
     verified: true,
-    system_role: 0,
+    system_role:,
     username: Faker::Internet.unique.username(specifier: 5..8),
     first_name: Faker::Name.first_name,
     last_name: Faker::Name.last_name,

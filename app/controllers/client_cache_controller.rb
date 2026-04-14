@@ -6,7 +6,7 @@ class ClientCacheController < ApplicationController
         # debugger
         render json: {
           user: current_user.as_json,
-          companies: current_user.companies.as_json(include: [ :branches, :departments, :roles ]),
+          companies: current_user.accessible_companies.as_json(include: [ :branches, :departments, :roles ]),
           employee: {
             enum: {
               lifecycle_statuses: Employee.lifecycle_statuses.keys.map { |s| { name: s.humanize, value: s } },

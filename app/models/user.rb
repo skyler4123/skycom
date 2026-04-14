@@ -65,6 +65,23 @@ class User < ApplicationRecord
   end
 
   include User::RetailConcern
-
+  def accessible_companies
+    case system_role.to_sym
+    when :super_admin
+      Company.all # Or [] if you want to keep them separated
+    when :admin
+      Company.all # Or [] if you want to keep them separated
+    when :company_owner
+      companies # Uses the association directly
+    when :company_employee
+      # Use &. to avoid errors if an employee record is missing
+      [employee&.company].compact 
+    when :company_customer
+      # Customers might see companies they have orders with
+      [customer&.company].compact
+    else
+      []
+    end
+  end
   # ----------------------------------------------------------------------------------------------------
 end

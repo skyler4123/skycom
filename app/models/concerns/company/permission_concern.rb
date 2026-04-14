@@ -44,5 +44,15 @@ module Company::PermissionConcern
         end
       end
     end
+
+    def clear_permissions_cache
+      # Manual deletion from the Rails cache store
+      Rails.cache.delete("#{cache_key_with_version}/permissions")
+      Rails.cache.delete("#{cache_key_with_version}/permissions_by_resource")
+      
+      # Optional: 'touch' the record to change the version, 
+      # which naturally invalidates any future calls using cache_key_with_version
+      touch 
+    end
   end
 end

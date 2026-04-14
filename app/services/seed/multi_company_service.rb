@@ -1,6 +1,6 @@
 class Seed::MultiCompanyService
   def initialize(user:)
-    Seed::RetailService.new(user: user, email: "company@company1.com")
+    Seed::RetailService.new(user: user, email: "retail1@company1.com")
     # Seed::RetailService.new(user: user, email: "company@company2.com")
 
     # Seed::EducationService.new(user: user)

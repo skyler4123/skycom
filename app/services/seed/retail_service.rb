@@ -176,7 +176,11 @@ class Seed::RetailService
 
       EMPLOYEE_COUNTS.each do |role_name, count|
         count.times do |i|
-          user = Seed::UserService.create(parent_user: @multi_company_owner, email: "#{role_name}_#{i + 1}_branch_#{index + 1}@#{@company_email_full_domain}")
+          user = Seed::UserService.create(
+            parent_user: @multi_company_owner,
+            email: "#{role_name}_#{i + 1}_branch_#{index + 1}@#{@company_email_full_domain}",
+            system_role: :company_employee
+          )
           employee = Seed::EmployeeService.create(
             user: user, company: @retail, branch: branch,
             name: "Employee #{i + 1} - #{role_name.to_s.titleize}"
@@ -203,7 +207,11 @@ class Seed::RetailService
     @branches.each do |branch|
       CUSTOMER_COUNTS.each do |role_name, count|
         count.times do |i|
-          user = Seed::UserService.create(parent_user: @multi_company_owner, email: "customer_#{i + 1}_#{branch.id}@example.com")
+          user = Seed::UserService.create(
+            parent_user: @multi_company_owner,
+            email: "customer_#{i + 1}_#{branch.id}@example.com",
+            system_role: :company_customer  
+          )
           customer = Seed::CustomerService.create(
             user: user, company: @retail, branch: branch, name: "Customer #{i + 1}"
           )

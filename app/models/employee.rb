@@ -3,7 +3,7 @@
 class Employee < ApplicationRecord
   include AddressConcern
   include RoleConcern
-  include PermissionConcern
+  include Employee::PermissionConcern
   include TagConcern
 
   # --- Associations ---
