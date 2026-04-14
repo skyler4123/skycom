@@ -1,15 +1,13 @@
+# spec/factories/articles.rb
 FactoryBot.define do
   factory :article do
-    article_group { nil }
-    company { nil }
-    company { nil }
-    title { "MyString" }
-    content { "" }
-    name { "MyString" }
-    description { "MyString" }
-    code { "MyString" }
-    status { 1 }
-    business_type { 1 }
-    discarded_at { "2025-12-10 17:31:12" }
+    association :company
+    association :article_group
+
+    initialize_with do
+      Seed::ArticleService.create(company: company, article_group: article_group)
+    end
+
+    skip_create
   end
 end

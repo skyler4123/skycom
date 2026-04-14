@@ -1,14 +1,13 @@
+# spec/factories/settings.rb
 FactoryBot.define do
   factory :setting do
-    setting_group { nil }
-    company { nil }
-    company { nil }
-    content { "" }
-    name { "MyString" }
-    description { "MyString" }
-    code { "MyString" }
-    status { 1 }
-    business_type { 1 }
-    discarded_at { "2025-12-01 22:30:46" }
+    association :company
+    association :setting_group
+
+    initialize_with do
+      Seed::SettingService.create(setting_group: setting_group, company: company)
+    end
+
+    skip_create
   end
 end

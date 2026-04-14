@@ -1,12 +1,12 @@
+# spec/factories/event_groups.rb
 FactoryBot.define do
   factory :event_group do
-    company { nil }
-    company { nil }
-    name { "MyString" }
-    description { "MyString" }
-    code { "MyString" }
-    status { 1 }
-    business_type { 1 }
-    discarded_at { "2025-11-30 20:35:43" }
+    association :company
+
+    initialize_with do
+      Seed::EventGroupService.create(company: company)
+    end
+
+    skip_create
   end
 end

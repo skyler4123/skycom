@@ -1,10 +1,13 @@
 class Seed::TagService
-  def self.run
-    Branch.all.each_with_index do |company, index|
-      branch.tags.create(
-        name: "Tag #{index}",
-        description: Faker::Movie.quote
-      )
-    end
+  def self.create(
+    company:,
+    name: nil,
+    description: Faker::Movie.quote
+  )
+    Tag.create!(
+      company: company,
+      name: name || Faker::Lorem.word,
+      description: description
+    )
   end
 end

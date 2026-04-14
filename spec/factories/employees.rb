@@ -19,7 +19,7 @@ FactoryBot.define do
         branch: branch,
         user: user,
         # If specific arrays aren't passed, the service defaults to []
-        departments: departments, 
+        departments: departments,
         roles: roles
       )
     end
