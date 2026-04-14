@@ -3,6 +3,22 @@ name: Skycom Project Guidelines - Part 1
 description: Ruby on Rails Project Guidelines & Backend Standards
 ---
 
+# 0. AI Discovery Protocol (CRITICAL)
+
+Before suggesting any JavaScript code, helpers, or UI components, the AI Agent **MUST** read the following files to understand the custom Skycom DSL. This prevents the hallucination of native APIs where global helpers already exist.
+
+### Core Logic & Global Helpers
+- `app/javascript/application.js`: Entry point and global `window.*` exposure.
+- `app/javascript/controllers/helpers.js`: Main helper registry (AJAX, Cookies, UI).
+- `app/javascript/controllers/helpers/*`: specialized helper modules (Formatters, DOM, etc.).
+
+### Component Specifications
+- `app/javascript/controllers/form_controller.js`: The submission engine.
+- `app/javascript/controllers/tooltip_controller.js`: The positioning engine.
+- `app/javascript/controllers/editable_controller.js`: The inline-editing engine.
+
+**Rule**: If a task can be accomplished using an existing helper in these files, the AI **MUST** use that helper instead of writing raw JavaScript or importing external libraries.
+
 # 1. Ruby on Rails Project Guidelines
 
 This is a standard Ruby on Rails 7+ application configured as a multi-tenant business management platform.

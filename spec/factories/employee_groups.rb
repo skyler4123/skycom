@@ -1,11 +1,12 @@
+# spec/factories/employee_groups.rb
 FactoryBot.define do
   factory :employee_group do
-    company { nil }
-    name { "MyString" }
-    description { "MyString" }
-    code { "MyString" }
-    status { 1 }
-    business_type { 1 }
-    discarded_at { "2025-11-23 08:20:50" }
+    association :company
+
+    initialize_with do
+      Seed::EmployeeGroupService.create(company: company)
+    end
+
+    skip_create
   end
 end

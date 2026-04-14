@@ -473,6 +473,9 @@ export const selectOptionsHTML = (options = [], selectedValue, defaultText) => {
  * @param {string} [options.dispatch] - Custom dispatch event name
  * @param {boolean} [options.confirm=true] - Whether to show a confirmation dialog
  * @param {string} [options.type='text'] - Input type (text, select, etc.)
+ * @param {Array} [options.options=[]] - Options for select type [{ name: "Label", value: "id" }]
+ * @param {string} [options.className=''] - Additional CSS classes for the input/select element
+ * @param {boolean} [options.multiple=false] - Enable multi-select
  */
 export const editable = ({ 
   resource, name, id, value, url, 
@@ -480,6 +483,9 @@ export const editable = ({
   dispatch = "updated", 
   confirm = true,
   type = "text",
+  options = [],
+  className = "",
+  multiple = false,
   successMessage,
   errorMessage,
   confirmMessage
@@ -490,11 +496,14 @@ export const editable = ({
       data-editable-resource-value="${resource}"
       data-editable-name-value="${name}"
       data-editable-id-value="${id}"
-      data-editable-value-value="${value}"
+      data-editable-value-value="${JSON.stringify(value).replace(/"/g, '&quot;')}"
       data-editable-url-value="${url}"
       data-editable-dispatch-value="${dispatch}"
       data-editable-confirm-value="${confirm}"
       data-editable-type-value="${type}"
+      data-editable-options-value="${JSON.stringify(options).replace(/"/g, '&quot;')}"
+      data-editable-class-name-value="${className}"
+      data-editable-multiple-value="${multiple}"
       ${successMessage ? `data-editable-success-message-value="${successMessage}"` : ''}
       ${errorMessage ? `data-editable-error-message-value="${errorMessage}"` : ''}
       ${confirmMessage ? `data-editable-confirm-message-value="${confirmMessage}"` : ''}

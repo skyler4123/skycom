@@ -1,11 +1,13 @@
+# spec/factories/cart_groups.rb
 FactoryBot.define do
   factory :cart_group do
-    company { nil }
-    name { "MyString" }
-    description { "MyString" }
-    code { "MyString" }
-    status { 1 }
-    business_type { 1 }
-    discarded_at { "2025-11-23 08:22:26" }
+    association :company
+    association :branch, company: company
+
+    initialize_with do
+      Seed::CartGroupService.create(branch: branch)
+    end
+
+    skip_create
   end
 end

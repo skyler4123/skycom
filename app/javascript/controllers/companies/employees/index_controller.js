@@ -149,7 +149,7 @@ export default class Companies_Branches_EmployeesController extends Companies_La
                           <span class="material-symbols-outlined text-slate-400">person</span>
                         </div>
                         <div>
-                          <p class="font-medium text-slate-900 dark:text-white cursor-pointer hover:underline" data-action="click->${this.identifier}#showEmployeeDetails">
+                          <p class="font-medium text-slate-900 dark:text-white cursor-pointer hover:underline">
                             ${employee.name}
                           </p>
                         </div>

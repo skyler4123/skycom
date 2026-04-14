@@ -1,11 +1,17 @@
+# spec/factories/roles.rb
 FactoryBot.define do
   factory :role do
-    company { nil }
-    name { "MyString" }
-    description { "MyString" }
-    code { "MyString" }
-    status { 1 }
-    business_type { 1 }
-    discarded_at { "2025-11-23 08:20:36" }
+    association :company
+    name { Faker::Job.title } # Default name if none is provided
+
+    initialize_with do
+      # We pass name explicitly because the service requires it
+      Seed::RoleService.create(
+        company: company,
+        name: name
+      )
+    end
+
+    skip_create
   end
 end

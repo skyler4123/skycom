@@ -1,12 +1,12 @@
+# spec/factories/subscription_groups.rb
 FactoryBot.define do
   factory :subscription_group do
-    company { nil }
-    company { nil }
-    name { "MyString" }
-    description { "MyString" }
-    code { "MyString" }
-    status { 1 }
-    business_type { 1 }
-    discarded_at { "2025-11-30 20:36:56" }
+    association :company
+
+    initialize_with do
+      Seed::SubscriptionGroupService.create(company: company)
+    end
+
+    skip_create
   end
 end

@@ -59,7 +59,18 @@ export default class Companies_Employees_ShowModalController extends Controller 
                   successMessage: "Employee name updated successfully!",
                   errorMessage: "Failed to update employee name!"
                 })}
-                <p class="font-semibold text-blue-600 dark:text-blue-400">${e.description || 'Employee'}</p>
+                ${editable({
+                  dispatch: "updateEmployee",
+                  resource: "employee",
+                  name: "description",
+                  id: e.id,
+                  value: e.description || '',
+                  url: Helpers.edit_company_employee_path(currentCompany().id, e.id),
+                  html: `<p class="font-semibold text-blue-600 dark:text-blue-400">${e.description || 'Employee'}</p>`,
+                  confirmMessage: "Change description to '{{value}}'?",
+                  successMessage: "Description updated!",
+                  errorMessage: "Failed to update description!"
+                })}
                 <div class="mt-4 flex flex-wrap justify-center gap-2 sm:justify-start">
                   <span class="inline-flex items-center rounded-lg bg-blue-100 dark:bg-blue-900/40 px-3 py-1 text-xs font-bold text-blue-700 dark:text-blue-300 uppercase">${lifecycleLabel}</span>
                   <span class="inline-flex items-center rounded-lg bg-slate-100 dark:bg-gray-800 px-3 py-1 text-xs font-medium text-slate-600 dark:text-gray-400">ID: ${e.code || e.id.substring(0, 8)}</span>
@@ -67,15 +78,33 @@ export default class Companies_Employees_ShowModalController extends Controller 
               </div>
             </div>
 
-            <div class="grid grid-cols-1 gap-6 border-t border-slate-200 dark:border-gray-800 pt-8 sm:grid-cols-2">
-              
+<div class="grid grid-cols-1 gap-6 border-t border-slate-200 dark:border-gray-800 pt-8 sm:grid-cols-2">
+               
               <div class="flex items-center gap-3">
                 <div class="flex size-10 items-center justify-center rounded-lg bg-slate-100 dark:bg-gray-800 text-blue-600 dark:text-blue-400">
                   <span class="material-symbols-outlined">location_on</span>
                 </div>
                 <div>
                   <p class="text-xs font-medium text-slate-500 dark:text-gray-400">Work Branch</p>
-                  <p class="text-sm font-semibold text-slate-900 dark:text-white">${branchName}</p>
+                  ${(() => {
+                    const branches = currentBranches() || []
+                    const options = branches.map(b => ({ name: b.name, value: b.id }))
+                    return editable({
+                      dispatch: "updateEmployee",
+                      resource: "employee",
+                      name: "branch_id",
+                      id: e.id,
+                      value: e.branch?.id || e.branch_id,
+                      url: Helpers.edit_company_employee_path(currentCompany().id, e.id),
+                      type: "select",
+                      options: options,
+                      className: "dark:bg-gray-800 dark:text-white",
+                      html: `<p class="text-sm font-semibold text-slate-900 dark:text-white">${branchName}</p>`,
+                      confirmMessage: "Change branch to '{{value}}'?",
+                      successMessage: "Branch updated!",
+                      errorMessage: "Failed to update branch!"
+                    })
+                  })()}
                 </div>
               </div>
 
@@ -95,7 +124,27 @@ export default class Companies_Employees_ShowModalController extends Controller 
                 </div>
                 <div>
                   <p class="text-xs font-medium text-slate-500 dark:text-gray-400">Roles</p>
-                  <p class="text-sm font-semibold text-slate-900 dark:text-white">${rolesList}</p>
+                  ${(() => {
+                    const allRoles = Helpers.currentRoles() || []
+                    const options = allRoles.map(r => ({ name: r.name, value: r.id }))
+                    const selectedIds = e.roles?.map(r => r.id) || []
+                    return editable({
+                      dispatch: "updateEmployee",
+                      resource: "employee",
+                      name: "role_ids",
+                      id: e.id,
+                      value: selectedIds,
+                      url: Helpers.edit_company_employee_path(currentCompany().id, e.id),
+                      type: "select",
+                      multiple: true,
+                      options: options,
+                      className: "dark:bg-gray-800 dark:text-white",
+                      html: `<p class="text-sm font-semibold text-slate-900 dark:text-white">${rolesList}</p>`,
+                      confirmMessage: "Change roles to '{{value}}'?",
+                      successMessage: "Roles updated!",
+                      errorMessage: "Failed to update roles!"
+                    })
+                  })()}
                 </div>
               </div>
 

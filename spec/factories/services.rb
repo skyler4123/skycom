@@ -1,13 +1,13 @@
+# spec/factories/services.rb
 FactoryBot.define do
   factory :service do
-    company { nil }
-    name { "MyString" }
-    description { "MyString" }
-    code { "MyString" }
-    status { 1 }
-    duration { 1 }
-    start_at { "2025-11-23 08:22:08" }
-    business_type { 1 }
-    discarded_at { "2025-11-23 08:22:08" }
+    association :company
+    association :branch, company: company
+
+    initialize_with do
+      Seed::ServiceService.create(company: company, branch: branch)
+    end
+
+    skip_create
   end
 end

@@ -6,7 +6,8 @@ RSpec.feature "Homepage", type: :feature, js: true do
 
     it "signs me in" do
       sign_in(user)
-      expect(page).to have_current_path("/")
+      visit root_path
+      expect(page).to have_current_path(root_path)
     end
   end
 end

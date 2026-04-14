@@ -1,15 +1,13 @@
+# spec/factories/documents.rb
 FactoryBot.define do
   factory :document do
-    document_group { nil }
-    company { nil }
-    company { nil }
-    title { "MyString" }
-    content { "" }
-    name { "MyString" }
-    description { "MyString" }
-    code { "MyString" }
-    status { 1 }
-    business_type { 1 }
-    discarded_at { "2025-12-10 17:23:48" }
+    association :company
+    association :document_group
+
+    initialize_with do
+      Seed::DocumentService.create(company: company, document_group: document_group)
+    end
+
+    skip_create
   end
 end

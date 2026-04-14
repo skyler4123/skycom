@@ -74,7 +74,11 @@ class Companies::EmployeesController < Companies::ApplicationController
 
     respond_to do |format|
       format.json do
-        if @employee.update(update_employee_params)
+        update_params = update_employee_params
+        if update_params[:role_ids]
+          @employee.role_ids = update_params.delete(:role_ids)
+        end
+        if @employee.update(update_params)
           render json: {
             status: "success",
             message: "Updated successfully",
@@ -105,14 +109,17 @@ class Companies::EmployeesController < Companies::ApplicationController
       :business_type,
       :branch_id,
       :department_id,
-      :role_id,
-      :workflow_status # Added this since it's likely a target for editing
+      :workflow_status,
+      role_ids: []
     )
   end
 
   # Helper to format a single employee response, following your index pattern
   def format_single_employee(employee)
-    employee.as_json(include: { user: { only: :email } }).merge(
+    employee.as_json(include: {
+      user: { only: :email },
+      branch: { only: [ :id, :name ] }
+    }).merge(
       roles: employee.roles.map { |r| { id: r.id, name: r.name } },
       departments: employee.departments.map { |d| { id: d.id, name: d.name } }
     )

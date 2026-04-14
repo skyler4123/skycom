@@ -1,11 +1,13 @@
+# spec/factories/product_groups.rb
 FactoryBot.define do
   factory :product_group do
-    company { nil }
-    name { "MyString" }
-    description { "MyString" }
-    code { "MyString" }
-    status { 1 }
-    business_type { 1 }
-    discarded_at { "2025-11-23 08:21:34" }
+    association :company
+    association :branch, company: company
+
+    initialize_with do
+      Seed::ProductGroupService.create(branch: branch)
+    end
+
+    skip_create
   end
 end
