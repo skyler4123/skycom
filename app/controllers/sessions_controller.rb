@@ -47,9 +47,9 @@ class SessionsController < ApplicationController
     end
 
     user = User.find_by(email: params[:email])
-    # No password check here to make it even faster, 
+    # No password check here to make it even faster,
     # but you can keep User.authenticate_by if you want strictness.
-    
+
     if user
       @session = user.sessions.create!(single_access_token: SecureRandom.hex(20))
       user.update!(single_access_token: @session.single_access_token)
