@@ -2,7 +2,7 @@ class Seed::RetailService
   EMPLOYEE_COUNTS = {
     manager: 1,
     cashier: 3,
-    sales_associate: 210,
+    sales_associate: 2,
     stock_clerk: 2
   }.freeze
 
@@ -210,7 +210,7 @@ class Seed::RetailService
           user = Seed::UserService.create(
             parent_user: @multi_company_owner,
             email: "customer_#{i + 1}_#{branch.id}@example.com",
-            system_role: :company_customer  
+            system_role: :company_customer
           )
           customer = Seed::CustomerService.create(
             user: user, company: @retail, branch: branch, name: "Customer #{i + 1}"
@@ -297,9 +297,37 @@ class Seed::RetailService
   end
 
   def configure_retail_permissions
-    # Define capabilities for each role
-    # Actions: create, read, update, delete
+    create_all_crud_policies
+    assign_policies_to_roles
+  end
 
+  def create_all_crud_policies
+    resources = %w[Order Product Employee Customer]
+    crud_actions = %w[create read update delete]
+
+    resources.each do |resource|
+      crud_actions.each do |action|
+        create_policy(resource: resource, action: action)
+      end
+    end
+  end
+
+  def create_policy(resource:, action:)
+    policy_name = "Can #{action} #{resource}"
+    Policy.find_or_create_by!(
+      name: policy_name,
+      company: @retail,
+      resource: resource,
+      action: action
+    ) do |p|
+      p.description = "Allows #{action} operations on #{resource}"
+      p.business_type = :operational
+      p.lifecycle_status = :active
+      p.branch_id = @branches.first.id
+    end
+  end
+
+  def assign_policies_to_roles
     role_definitions = {
       manager: {
         "Order" => [ "create", "read", "update", "delete" ],
@@ -308,56 +336,33 @@ class Seed::RetailService
         "Customer" => [ "create", "read", "update", "delete" ]
       },
       cashier: {
-        "Order" => [ "create", "read", "update" ], # Can process sales, maybe returns
-        "Product" => [ "read" ],                    # Needs to see prices
-        "Customer" => [ "read", "create" ]          # Can lookup or add customers
+        "Order" => [ "create", "read", "update" ],
+        "Product" => [ "read" ],
+        "Customer" => [ "read", "create" ]
       },
       sales_associate: {
-        "Order" => [ "create", "read" ],            # Can help create quotes/orders
+        "Order" => [ "create", "read" ],
         "Product" => [ "read" ],
         "Customer" => [ "read" ]
       },
       stock_clerk: {
-        "Product" => [ "create", "read", "update", "delete" ], # Full control of inventory
-        "Order" => [] # No access to orders
+        "Product" => [ "create", "read", "update", "delete" ],
+        "Order" => []
       },
       customer: {
-        "Order" => [ "read" ], # Can see their own orders (logic handled in policy scope usually)
+        "Order" => [ "read" ],
         "Product" => [ "read" ]
       }
     }
 
     role_definitions.each do |role_name, resources|
-      # 1. Find the Role object created in Step 4
       role = Role.find_by(name: role_name, company: @retail)
       next unless role
 
       resources.each do |resource_name, actions|
         actions.each do |action|
-          # 2. Create the Policy (The Permission)
-          # We check uniqueness by name/company to avoid duplicates if re-seeded
-          policy_name = "Can #{action} #{resource_name}"
-
-          # Using raw ActiveRecord here. If you have Seed::PolicyService, use that instead.
-          policy = Policy.find_or_create_by!(
-            name: policy_name,
-            company: @retail,
-            resource: resource_name,
-            action: action
-          ) do |p|
-            p.description = "Allows #{action} operations on #{resource_name}"
-            p.business_type = :operational
-            p.lifecycle_status = :active
-            # Company ID is required by your schema validation, picking the first branch as reference
-            # or the group owner's context.
-            p.branch_id = @branches.first.id
-          end
-
-          # 3. Link Policy to Role via PolicyAppointment
-          PolicyAppointment.find_or_create_by!(
-            policy: policy,
-            appoint_to: role
-          )
+          policy = Policy.find_by!(company: @retail, resource: resource_name, action: action)
+          PolicyAppointment.find_or_create_by!(policy: policy, appoint_to: role)
         end
       end
     end
