@@ -1631,6 +1631,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.string "code"
     t.string "resource"
     t.string "action"
+    t.jsonb "tag_conditions", default: {}
     t.integer "lifecycle_status"
     t.integer "workflow_status"
     t.integer "business_type"
@@ -2509,7 +2510,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
 
   create_table "tags", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.uuid "company_id", null: false
-    t.string "name"
+    t.string "key"
+    t.string "value"
     t.string "description"
     t.string "code"
     t.datetime "created_at", null: false

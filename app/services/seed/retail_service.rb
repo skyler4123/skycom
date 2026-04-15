@@ -81,7 +81,7 @@ class Seed::RetailService
         description: "Description for Branch #{i + 1}",
         company: @retail
       )
-      branch.attach_tag(name: "Branch #{branch.id} Tag")
+      branch.attach_tag(key: "Branch #{branch.id} Tag")
       @branches << branch
     end
   end
@@ -134,7 +134,7 @@ class Seed::RetailService
           name: "#{branch.name} Facility #{i + 1}",
           description: "A facility location for #{branch.name}"
         )
-        facility.attach_tag(name: "Facility #{facility.id} Tag")
+        facility.attach_tag(key: "Facility #{facility.id} Tag")
         @facilities << facility
       end
     end
@@ -165,7 +165,7 @@ class Seed::RetailService
         description: "Department: #{dept_name}"
       )
       department.update!(category: Seed::CategoryService.create(company: @retail, name: "Department"))
-      department.attach_tag(name: "Department #{department.id} Tag")
+      department.attach_tag(key: "Department #{department.id} Tag")
       @departments << department
     end
   end

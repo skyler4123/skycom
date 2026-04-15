@@ -16,5 +16,5 @@ class Tag < ApplicationRecord
   has_many :products, through: :tag_appointments, source: :appoint_to, source_type: "Product"
   has_many :departments, through: :address_appointments, source: :appoint_to, source_type: "Department"
 
-  validates :name, presence: true, uniqueness: { scope: :company_id }
+  validates :key, presence: true, uniqueness: { scope: :company_id }
 end

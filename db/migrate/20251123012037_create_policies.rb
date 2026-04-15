@@ -9,6 +9,7 @@ class CreatePolicies < ActiveRecord::Migration[8.0]
       t.string :code
       t.string :resource
       t.string :action
+      t.jsonb :tag_conditions, default: {}
       t.integer :lifecycle_status
       t.integer :workflow_status
       t.integer :business_type

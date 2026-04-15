@@ -1,12 +1,14 @@
 class Seed::TagService
   def self.create(
     company:,
-    name: nil,
+    key: nil,
+    value: true,
     description: Faker::Movie.quote
   )
     Tag.create!(
       company: company,
-      name: name || Faker::Lorem.word,
+      key: key || Faker::Lorem.word,
+      value: value,
       description: description
     )
   end
