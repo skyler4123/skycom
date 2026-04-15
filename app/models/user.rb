@@ -36,8 +36,8 @@ class User < ApplicationRecord
   # --- Business Logic Associations ---
 
   has_many :companies, dependent: :destroy
-  has_one :employee, dependent: :destroy
-  has_one :customer, dependent: :destroy
+  has_many :employees, dependent: :destroy
+  has_many :customers, dependent: :destroy
 
   belongs_to :parent_user, class_name: "User", optional: true
   has_many :child_users, class_name: "User", foreign_key: "parent_user_id", dependent: :destroy
@@ -81,6 +81,24 @@ class User < ApplicationRecord
       [customer&.company].compact
     else
       []
+    end
+  end
+
+  def permissions
+    case system_role.to_sym
+    when :super_admin
+      :all # Or [] if you want to keep them separated
+    when :admin
+      :all # Or [] if you want to keep them separated
+    when :company_owner
+      :all # Uses the association directly
+    when :company_employee
+      employee.permissions
+    when :company_customer
+      # Customers might see companies they have orders with
+      {}
+    else
+      {}
     end
   end
   # ----------------------------------------------------------------------------------------------------
