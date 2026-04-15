@@ -79,14 +79,8 @@ export const currentRoles = () => {
   return currentCompany().roles
 }
 
-export const employee = () => {
-  return getCache().employee || []
-}
-
 export const Enums =  () => {
-  return {
-    employee: getCache().employee.enum
-  }
+  return getCache().enums
 }
 /**
  * Retrieves the current user profile from the client cache.
