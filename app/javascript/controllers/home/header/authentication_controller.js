@@ -53,7 +53,9 @@ export default class Home_Header_AuthenticationController extends Controller {
       <a href="${Helpers.sign_out_path()}">
         <button
           role="sign-out-button"
-          class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-4 bg-slate-200 dark:bg-slate-700 text-slate-900 dark:text-slate-100 text-sm font-bold leading-normal tracking-[0.015em]">
+          class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-4 bg-slate-200 dark:bg-slate-700 text-slate-900 dark:text-slate-100 text-sm font-bold leading-normal tracking-[0.015em]"
+          data-action="click->client-cache#clearClientCache"
+        >
           <span class="truncate">Sign Out</span>
         </button>
       </a>

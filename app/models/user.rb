@@ -75,10 +75,10 @@ class User < ApplicationRecord
       companies # Uses the association directly
     when :company_employee
       # Use &. to avoid errors if an employee record is missing
-      [employee&.company].compact 
+      [employees&.map(&:company)].flatten.compact
     when :company_customer
       # Customers might see companies they have orders with
-      [customer&.company].compact
+      [customers&.map(&:company)].flatten.compact
     else
       []
     end

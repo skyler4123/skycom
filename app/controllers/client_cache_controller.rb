@@ -1,9 +1,10 @@
+# app/controllers/client_cache_controller.rb
+
 class ClientCacheController < ApplicationController
   def index
     respond_to do |format|
       format.html { render html: "", layout: true }
       format.json do
-        debugger
         render json: {
           user: current_user.as_json,
           companies: current_user.accessible_companies.as_json(include: [ :branches, :departments, :roles ]),
@@ -14,11 +15,7 @@ class ClientCacheController < ApplicationController
               business_types: Employee.business_types.keys.map { |t| { name: t.humanize, value: t } }
             }
           },
-          company_permissions: current_user.accessible_companies.map(&:permissions),
-          user_permissions: current_user.permissions
-          # Future expansions:
-          # settings: current_user.settings,
-          # permissions: current_user.all_permissions
+          employees: current_user.employees
         }
       end
     end
