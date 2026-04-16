@@ -43,6 +43,7 @@ Rails.application.routes.draw do
       end
       resources :subscriptions
       resources :permissions
+      resources :policies
     end
   end
 

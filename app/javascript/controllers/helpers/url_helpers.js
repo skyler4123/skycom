@@ -48,6 +48,7 @@ export const company_announcements_path = (companyId) => `/companies/${companyId
 export const company_events_path = (companyId) => `/companies/${companyId}/events`
 export const company_discounts_path = (companyId) => `/companies/${companyId}/discounts`
 export const company_subscriptions_path = (companyId) => `/companies/${companyId}/subscriptions`
+export const company_policies_path = (companyId) => `/companies/${companyId}/policies`
 export const company_tasks_path = (companyId) => `/companies/${companyId}/tasks`
 export const company_payslips_path = (companyId) => `/companies/${companyId}/payslips`
 
