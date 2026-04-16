@@ -36,11 +36,6 @@ Rails.application.routes.draw do
       resources :tasks
       resources :facilities
       resources :settings
-      resources :administrators do
-        collection do
-          patch :update_permission
-        end
-      end
       resources :subscriptions
       resources :permissions
       resources :policies

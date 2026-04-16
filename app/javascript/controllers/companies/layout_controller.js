@@ -288,14 +288,6 @@ export default class Companies_LayoutController extends Controller {
                   <span class="material-symbols-outlined">settings</span>
                   <p class="text-sm font-medium leading-normal">Settings</p>
                 </a>
-                <a
-                  class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:bg-blue-100 open:text-blue-600"
-                  ${openByPathname()}
-                  href="${Helpers.company_administrators_path(currentCompany().id)}"
-                >
-                  <span class="material-symbols-outlined">admin_panel_settings</span>
-                  <p class="text-sm font-medium leading-normal">Administrator</p>
-                </a>
               </div>
             </div>
           </aside>

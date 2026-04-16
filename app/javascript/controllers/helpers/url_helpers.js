@@ -52,8 +52,5 @@ export const company_policies_path = (companyId) => `/companies/${companyId}/pol
 export const company_tasks_path = (companyId) => `/companies/${companyId}/tasks`
 export const company_payslips_path = (companyId) => `/companies/${companyId}/payslips`
 
-export const company_administrators_path = (companyId) => `/companies/${companyId}/administrators`
-export const update_permission_company_administrators_path = (companyId) => `/companies/${companyId}/administrators/update_permission`
-
 export const company_invoices_path = (companyId) => `/companies/${companyId}/invoices`
 export const company_inventories_path = (companyId) => `/companies/${companyId}/inventories`
