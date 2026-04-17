@@ -115,6 +115,15 @@ export default class Companies_Permissions_IndexController extends Companies_Lay
     const isChecked = checkbox.checked
     const companyId = currentCompany().id
 
+    const message = isChecked
+      ? 'Are you sure you want to disable this permission?'
+      : 'Are you sure you want to enable this permission?'
+
+    if (!confirm(message)) {
+      checkbox.checked = !isChecked
+      return
+    }
+
     try {
       if (isChecked && !appointmentId) {
         await fetchJson({
