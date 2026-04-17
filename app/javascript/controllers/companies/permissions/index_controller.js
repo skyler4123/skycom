@@ -9,6 +9,7 @@ export default class Companies_Permissions_IndexController extends Companies_Lay
   async loadData() {
     const response = await fetchJson(Helpers.company_permissions_path(currentCompany().id))
     this.roles = response.roles || []
+    this.authorized = response.authorized || false
     this.renderContent()
   }
 
@@ -22,9 +23,21 @@ export default class Companies_Permissions_IndexController extends Companies_Lay
           </div>
 
           <div class="divide-y divide-slate-200 dark:divide-slate-800">
-            ${this.roles.length === 0 ? this.emptyStateHTML() : this.rolesHTML()}
+            ${!this.authorized ? this.noAccessHTML() : (this.roles.length === 0 ? this.emptyStateHTML() : this.rolesHTML())}
           </div>
         </div>
+      </div>
+    `
+  }
+
+  noAccessHTML() {
+    return `
+      <div class="p-12 text-center">
+        <div class="w-16 h-16 mx-auto mb-4 rounded-full bg-red-100 dark:bg-red-900/30 flex items-center justify-center">
+          <span class="material-symbols-outlined text-2xl text-red-500">block</span>
+        </div>
+        <h3 class="text-lg font-medium text-slate-900 dark:text-white mb-2">No Access</h3>
+        <p class="text-sm text-slate-500">You don't have permission to manage permissions</p>
       </div>
     `
   }
@@ -55,9 +68,10 @@ export default class Companies_Permissions_IndexController extends Companies_Lay
   policyCheckboxHTML(roleId, policy) {
     const isActive = policy.policy_appointment?.workflow_status === 'active'
     const appointmentId = policy.policy_appointment?.id || ''
+    const disabled = !this.authorized ? 'disabled' : ''
 
     return `
-      <label class="flex items-center gap-3 p-3 rounded-lg border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800/50 cursor-pointer transition-colors">
+      <label class="flex items-center gap-3 p-3 rounded-lg border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800/50 ${!this.authorized ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'} transition-colors">
         <input
           type="checkbox"
           class="w-4 h-4 text-blue-600 border-slate-300 rounded focus:ring-blue-600 dark:border-slate-600 dark:bg-slate-800"
@@ -66,6 +80,7 @@ export default class Companies_Permissions_IndexController extends Companies_Lay
           data-policy-id="${policy.id}"
           data-appointment-id="${appointmentId}"
           ${isActive ? 'checked' : ''}
+          ${disabled}
         >
         <div class="flex-1 min-w-0">
           <p class="text-sm font-medium text-slate-900 dark:text-white truncate">${policy.name}</p>
@@ -88,6 +103,11 @@ export default class Companies_Permissions_IndexController extends Companies_Lay
   }
 
   async togglePermission(event) {
+    if (!this.authorized) {
+      Helpers.toast('You do not have permission to manage permissions', 'error')
+      return
+    }
+
     const checkbox = event.target
     const roleId = checkbox.dataset.roleId
     const policyId = checkbox.dataset.policyId

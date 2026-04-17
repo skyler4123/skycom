@@ -8,6 +8,7 @@ class CreateTagAppointments < ActiveRecord::Migration[8.0]
       t.references :appoint_by, polymorphic: true, null: true, type: :uuid
       t.string :value
       t.string :description
+      t.string :permission_resource_name
 
       t.timestamps
     end

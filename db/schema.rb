@@ -61,6 +61,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.integer "workflow_status"
     t.integer "business_type"
     t.datetime "discarded_at"
+    t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["address_id"], name: "index_address_appointments_on_address_id"
@@ -120,6 +121,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.integer "workflow_status"
     t.integer "business_type"
     t.datetime "discarded_at"
+    t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["appoint_by_type", "appoint_by_id"], name: "index_article_appointments_on_appoint_by"
@@ -148,6 +150,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.integer "workflow_status"
     t.integer "business_type"
     t.datetime "discarded_at"
+    t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["appoint_by_type", "appoint_by_id"], name: "index_article_group_appointments_on_appoint_by"
@@ -416,6 +419,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.integer "workflow_status"
     t.integer "business_type"
     t.datetime "discarded_at"
+    t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["appoint_by_type", "appoint_by_id"], name: "index_cart_appointments_on_appoint_by"
@@ -544,6 +548,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.integer "workflow_status"
     t.integer "business_type"
     t.datetime "discarded_at"
+    t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["appoint_by_type", "appoint_by_id"], name: "index_customer_appointments_on_appoint_by"
@@ -572,6 +577,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.integer "workflow_status"
     t.integer "business_type"
     t.datetime "discarded_at"
+    t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["appoint_by_type", "appoint_by_id"], name: "index_customer_group_appointments_on_appoint_by"
@@ -647,6 +653,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.integer "business_type"
     t.datetime "discarded_at"
     t.jsonb "metadata", default: {}
+    t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["appoint_by_type", "appoint_by_id"], name: "index_department_appointments_on_appoint_by"
@@ -695,6 +702,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.integer "workflow_status"
     t.integer "business_type"
     t.datetime "discarded_at"
+    t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["appoint_by_type", "appoint_by_id"], name: "index_document_appointments_on_appoint_by"
@@ -723,6 +731,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.integer "workflow_status"
     t.integer "business_type"
     t.datetime "discarded_at"
+    t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["appoint_by_type", "appoint_by_id"], name: "index_document_group_appointments_on_appoint_by"
@@ -793,6 +802,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.string "name"
     t.string "description"
     t.string "code"
+    t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["appoint_by_type", "appoint_by_id"], name: "index_employee_appointments_on_appoint_by"
@@ -816,6 +826,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.string "name"
     t.string "description"
     t.string "code"
+    t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["appoint_by_type", "appoint_by_id"], name: "index_employee_group_appointments_on_appoint_by"
@@ -890,6 +901,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.integer "workflow_status"
     t.integer "business_type"
     t.datetime "discarded_at"
+    t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["appoint_by_type", "appoint_by_id"], name: "index_event_appointments_on_appoint_by"
@@ -918,6 +930,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.integer "workflow_status"
     t.integer "business_type"
     t.datetime "discarded_at"
+    t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["appoint_by_type", "appoint_by_id"], name: "index_event_group_appointments_on_appoint_by"
@@ -988,6 +1001,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.integer "workflow_status"
     t.integer "business_type"
     t.datetime "discarded_at"
+    t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["appoint_by_type", "appoint_by_id"], name: "index_exam_appointments_on_appoint_by"
@@ -1079,6 +1093,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.integer "workflow_status"
     t.integer "business_type"
     t.datetime "discarded_at"
+    t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["appoint_by_type", "appoint_by_id"], name: "index_facility_appointments_on_appoint_by"
@@ -1106,6 +1121,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.integer "workflow_status"
     t.integer "business_type"
     t.datetime "discarded_at"
+    t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["appoint_by_type", "appoint_by_id"], name: "index_facility_group_appointments_on_appoint_by"
@@ -1175,6 +1191,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.integer "workflow_status"
     t.integer "business_type"
     t.datetime "discarded_at"
+    t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["appoint_by_type", "appoint_by_id"], name: "index_inventory_item_appointments_on_appoint_by"
@@ -1238,6 +1255,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.integer "workflow_status"
     t.integer "business_type"
     t.datetime "discarded_at"
+    t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["appoint_by_type", "appoint_by_id"], name: "index_inventory_transaction_appointments_on_appoint_by"
@@ -1326,6 +1344,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.integer "workflow_status"
     t.integer "business_type"
     t.datetime "discarded_at"
+    t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["appoint_by_type", "appoint_by_id"], name: "index_notification_appointments_on_appoint_by"
@@ -1353,6 +1372,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.integer "workflow_status"
     t.integer "business_type"
     t.datetime "discarded_at"
+    t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["appoint_by_type", "appoint_by_id"], name: "index_notification_group_appointments_on_appoint_by"
@@ -1426,6 +1446,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.integer "workflow_status"
     t.integer "business_type"
     t.datetime "discarded_at"
+    t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["appoint_by_type", "appoint_by_id"], name: "index_order_appointments_on_appoint_by"
@@ -1456,6 +1477,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.integer "workflow_status"
     t.integer "business_type"
     t.datetime "discarded_at"
+    t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["appoint_by_type", "appoint_by_id"], name: "index_order_group_appointments_on_appoint_by"
@@ -1613,6 +1635,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.integer "workflow_status"
     t.integer "business_type"
     t.datetime "discarded_at"
+    t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["appoint_by_type", "appoint_by_id"], name: "index_period_appointments_on_appoint_by"
@@ -1677,6 +1700,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.integer "workflow_status"
     t.integer "business_type"
     t.datetime "discarded_at"
+    t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["appoint_to_type", "appoint_to_id"], name: "index_policy_appointments_on_appoint_to"
@@ -1703,6 +1727,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.integer "workflow_status"
     t.integer "business_type"
     t.datetime "discarded_at"
+    t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["appoint_by_type", "appoint_by_id"], name: "index_price_appointments_on_appoint_by"
@@ -1739,6 +1764,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.integer "workflow_status"
     t.integer "business_type"
     t.datetime "discarded_at"
+    t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["appoint_by_type", "appoint_by_id"], name: "index_product_appointments_on_appoint_by"
@@ -1766,6 +1792,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.integer "workflow_status"
     t.integer "business_type"
     t.datetime "discarded_at"
+    t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["appoint_by_type", "appoint_by_id"], name: "index_product_group_appointments_on_appoint_by"
@@ -1852,6 +1879,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.integer "workflow_status"
     t.integer "business_type"
     t.datetime "discarded_at"
+    t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["appoint_by_type", "appoint_by_id"], name: "index_project_appointments_on_appoint_by"
@@ -1879,6 +1907,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.integer "workflow_status"
     t.integer "business_type"
     t.datetime "discarded_at"
+    t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["appoint_by_type", "appoint_by_id"], name: "index_project_group_appointments_on_appoint_by"
@@ -2021,6 +2050,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.integer "workflow_status"
     t.integer "business_type"
     t.datetime "discarded_at"
+    t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["appoint_to_type", "appoint_to_id"], name: "index_role_appointments_on_appoint_to"
@@ -2067,6 +2097,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.datetime "start_at"
     t.integer "business_type"
     t.datetime "discarded_at"
+    t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["appoint_by_type", "appoint_by_id"], name: "index_service_appointments_on_appoint_by"
@@ -2096,6 +2127,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.datetime "start_at"
     t.integer "business_type"
     t.datetime "discarded_at"
+    t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["appoint_by_type", "appoint_by_id"], name: "index_service_group_appointments_on_appoint_by"
@@ -2181,6 +2213,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.integer "workflow_status"
     t.integer "business_type"
     t.datetime "discarded_at"
+    t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["appoint_by_type", "appoint_by_id"], name: "index_setting_appointments_on_appoint_by"
@@ -2209,6 +2242,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.integer "workflow_status"
     t.integer "business_type"
     t.datetime "discarded_at"
+    t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["appoint_by_type", "appoint_by_id"], name: "index_setting_group_appointments_on_appoint_by"
@@ -2531,6 +2565,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.uuid "appoint_by_id"
     t.string "value"
     t.string "description"
+    t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["appoint_by_type", "appoint_by_id"], name: "index_tag_appointments_on_appoint_by"
@@ -2570,6 +2605,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.integer "workflow_status"
     t.integer "business_type"
     t.datetime "discarded_at"
+    t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["appoint_by_type", "appoint_by_id"], name: "index_task_appointments_on_appoint_by"
@@ -2597,6 +2633,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.integer "workflow_status"
     t.integer "business_type"
     t.datetime "discarded_at"
+    t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["appoint_by_type", "appoint_by_id"], name: "index_task_group_appointments_on_appoint_by"

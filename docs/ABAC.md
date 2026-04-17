@@ -303,7 +303,7 @@ We use a Rails attribute with a lambda to automatically set the default value ba
 
 ```ruby
 # In all business entity models (Employee, Customer, Order, etc.)
-attribute :permission_resource_name, :string, default: -> { _1.class.name }
+attribute :permission_resource_name, :string, default: -> { self.name }
 ```
 
 ### How It Works
@@ -316,12 +316,12 @@ attribute :permission_resource_name, :string, default: -> { _1.class.name }
 ```ruby
 # app/models/employee.rb
 class Employee < ApplicationRecord
-  attribute :permission_resource_name, :string, default: -> { _1.class.name }
+  attribute :permission_resource_name, :string, default: -> { self.name }
 end
 
 # app/models/order.rb
 class Order < ApplicationRecord
-  attribute :permission_resource_name, :string, default: -> { _1.class.name }
+  attribute :permission_resource_name, :string, default: -> { self.name }
 end
 ```
 

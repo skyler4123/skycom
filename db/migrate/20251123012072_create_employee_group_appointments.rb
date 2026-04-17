@@ -9,6 +9,7 @@ class CreateEmployeeGroupAppointments < ActiveRecord::Migration[8.0]
       t.string :name
       t.string :description
       t.string :code
+      t.string :permission_resource_name
 
       t.timestamps
     end

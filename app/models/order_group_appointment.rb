@@ -1,4 +1,6 @@
 class OrderGroupAppointment < ApplicationRecord
+  attribute :permission_resource_name, :string, default: -> { self.name }
+
   belongs_to :order_group
   belongs_to :appoint_from, polymorphic: true, optional: true
   belongs_to :appoint_to, polymorphic: true
