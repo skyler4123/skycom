@@ -125,31 +125,24 @@ export default class Companies_Permissions_IndexController extends Companies_Lay
     }
 
     try {
-      if (isChecked && !appointmentId) {
-        await fetchJson({
-          url: Helpers.company_permissions_path(companyId),
-          method: 'POST',
-          data: {
-            policy_appointment: {
-              policy_id: policyId,
-              role_id: roleId,
-              workflow_status: 'active'
-            }
+      const newStatus = isChecked ? 'active' : 'inactive'
+
+      await fetchJson({
+        url: Helpers.company_policy_appointment_path(companyId, appointmentId),
+        method: 'PATCH',
+        data: {
+          policy_appointment: {
+            workflow_status: newStatus
           }
-        })
+        }
+      })
+
+      if (isChecked) {
         Helpers.toast('Permission enabled', 'success')
-      } else if (!isChecked && appointmentId) {
-        await fetchJson({
-          url: Helpers.company_policy_appointment_path(companyId, appointmentId),
-          method: 'PATCH',
-          data: {
-            policy_appointment: {
-              workflow_status: 'inactive'
-            }
-          }
-        })
+      } else {
         Helpers.toast('Permission disabled', 'success')
       }
+
       await this.loadData()
     } catch (error) {
       checkbox.checked = !isChecked
