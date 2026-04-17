@@ -1,32 +1,11 @@
 class Companies::PermissionsController < Companies::ApplicationController
-  before_action :authorize_permission_management, only: [ :create, :update ]
+  before_action :authorize_permission_management, only: [:update]
 
   # Shell First pattern - index action returns empty HTML, Stimulus renders content
   def index
     respond_to do |format|
       format.html { render html: "", layout: true }
       format.json { render json: { roles: current_company.permissions, authorized: can_manage_permissions? } }
-    end
-  end
-
-  def create
-    return render json: { error: "Unauthorized" }, status: :forbidden unless can_manage_permissions?
-
-    policy = current_company.policies.find(params[:policy_appointment][:policy_id])
-    role = current_company.roles.find(params[:policy_appointment][:role_id])
-
-    appointment = PolicyAppointment.find_or_initialize_by(
-      policy: policy,
-      appoint_to: role
-    )
-
-    appointment.workflow_status = :active
-
-    if appointment.save
-      current_company.clear_permissions_cache
-      render json: { policy_appointment: appointment }
-    else
-      render json: { errors: appointment.errors.full_messages }, status: :unprocessable_entity
     end
   end
 
