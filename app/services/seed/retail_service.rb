@@ -362,7 +362,7 @@ class Seed::RetailService
       resources.each do |resource_name, actions|
         actions.each do |action|
           policy = Policy.find_by!(company: @retail, resource: resource_name, action: action)
-          PolicyAppointment.find_or_create_by!(policy: policy, appoint_to: role)
+          PolicyAppointment.find_or_create_by!(policy: policy, appoint_to: role, workflow_status: PolicyAppointment.workflow_statuses.keys.sample)
         end
       end
     end

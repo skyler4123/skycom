@@ -15,16 +15,16 @@ module Employee::PermissionConcern
       # Handle both Class (Product) and Instance (@product)
       resource = target.is_a?(Class) ? target.name : target.class.name
 
-      # 1. Find all policies for this resource + action across all roles
+      # 1. Find all policies for this resource + action across all roles (active only)
       matching_policies = []
-      permissions.each_value do |role_data|
+      permissions_by_role.each_value do |role_data|
         role_data[:policies].each do |p|
           matching_policies << p if p[:resource] == resource && p[:action] == action
         end
       end
 
       return false if matching_policies.empty?
-      
+
       # 2. If it's just a Class check (e.g., can I see the page?), return true
       return true if target.is_a?(Class)
 
@@ -42,7 +42,7 @@ module Employee::PermissionConcern
 
       conditions.all? do |key, required_value|
         key_string = key.to_s
-        
+
         case required_value
         when true
           target_tags.key?(key_string)              # Must have tag key
@@ -54,7 +54,9 @@ module Employee::PermissionConcern
       end
     end
 
-    # 3. The Cache Layer (Remains the same)
+    # 3. Returns all roles with ALL company policies
+    # Each policy includes policy_appointment (if exists) with workflow_status
+    # Used for Permissions UI page
     def permissions
       cache_key = "#{cache_key_with_version}/permissions"
       Rails.cache.fetch(cache_key, expires_in: 24.hours) do
@@ -62,29 +64,68 @@ module Employee::PermissionConcern
       end
     end
 
-    # 4. Updated Database Logic to include tag_conditions
+    # 4. Database Logic - All roles with all policies and their policy_appointment
     def load_permissions_from_db
-      roles.includes(:policies).each_with_object({}) do |role, hash|
-        hash[role.name] = {
+      all_policies = company.policies.to_a
+
+      roles.map do |role|
+        role_policies = role.policy_appointments.includes(:policy).to_a
+
+        {
           id: role.id,
+          name: role.name,
           description: role.description,
-          policies: role.policies.map do |policy|
+          policies: all_policies.map do |policy|
+            appointment = role_policies.find { |a| a.policy_id == policy.id }
+
             {
               id: policy.id,
+              name: policy.name,
+              description: policy.description,
+              code: policy.code,
               resource: policy.resource,
               action: policy.action,
-              name: policy.name,
-              # Added the new ABAC column here
+              business_type: policy.business_type,
               tag_conditions: policy.tag_conditions || {},
-              business_type: policy.business_type
+              policy_appointment: appointment ? {
+                id: appointment.id,
+                workflow_status: appointment.workflow_status
+              } : nil
             }
           end
         }
       end
     end
 
+    # 5. Only active PolicyAppointments - used for can? checks
+    def permissions_by_role
+      cache_key = "#{cache_key_with_version}/permissions_by_role"
+      Rails.cache.fetch(cache_key, expires_in: 24.hours) do
+        roles.includes(:policy_appointments).each_with_object({}) do |role, hash|
+          active_appointments = role.policy_appointments.active.includes(:policy)
+
+          hash[role.name] = {
+            id: role.id,
+            description: role.description,
+            policies: active_appointments.map do |appointment|
+              {
+                id: appointment.policy.id,
+                policy_appointment_id: appointment.id,
+                resource: appointment.policy.resource,
+                action: appointment.policy.action,
+                name: appointment.policy.name,
+                tag_conditions: appointment.policy.tag_conditions || {},
+                business_type: appointment.policy.business_type
+              }
+            end
+          }
+        end
+      end
+    end
+
     def clear_permissions_cache
       Rails.cache.delete("#{cache_key_with_version}/permissions")
+      Rails.cache.delete("#{cache_key_with_version}/permissions_by_role")
       touch
     end
   end

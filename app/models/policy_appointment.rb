@@ -4,7 +4,7 @@ class PolicyAppointment < ApplicationRecord
   # appoint_to can be: role
   belongs_to :appoint_to, polymorphic: true, touch: true
   enum :workflow_status, {
-    unactive: 0,
+    inactive: 0,
     active: 1
   }
 end
