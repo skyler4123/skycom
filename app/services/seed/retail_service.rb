@@ -3,7 +3,8 @@ class Seed::RetailService
     manager: 1,
     cashier: 10,
     sales_associate: 10,
-    stock_clerk: 10
+    stock_clerk: 1,
+    admin: 1
   }.freeze
 
   CUSTOMER_COUNTS = { customer: 20 }.freeze
@@ -302,7 +303,7 @@ class Seed::RetailService
   end
 
   def create_all_crud_policies
-    resources = %w[Order Product Employee Customer]
+    resources = %w[Order Product Employee Customer PolicyAppointment]
     crud_actions = %w[create read update delete]
 
     resources.each do |resource|
@@ -329,11 +330,15 @@ class Seed::RetailService
 
   def assign_policies_to_roles
     role_definitions = {
+      admin: {
+        "PolicyAppointment" => [ "create", "read", "update", "delete" ]
+      },
       manager: {
         "Order" => [ "create", "read", "update", "delete" ],
         "Product" => [ "create", "read", "update", "delete" ],
         "Employee" => [ "create", "read", "update", "delete" ],
-        "Customer" => [ "create", "read", "update", "delete" ]
+        "Customer" => [ "create", "read", "update", "delete" ],
+        "PolicyAppointment" => [ "read", "update" ]
       },
       cashier: {
         "Order" => [ "create", "read", "update" ],
