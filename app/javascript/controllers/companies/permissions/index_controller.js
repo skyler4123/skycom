@@ -61,7 +61,7 @@ export default class Companies_Permissions_IndexController extends Companies_Lay
         <input
           type="checkbox"
           class="w-4 h-4 text-blue-600 border-slate-300 rounded focus:ring-blue-600 dark:border-slate-600 dark:bg-slate-800"
-          data-action="change->index#togglePermission"
+          data-action="change->${this.identifier}#togglePermission"
           data-role-id="${roleId}"
           data-policy-id="${policy.id}"
           data-appointment-id="${appointmentId}"

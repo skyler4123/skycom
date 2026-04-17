@@ -378,4 +378,33 @@ end
 - `index` action: Fetches JSON, renders all UI via `contentHTML()`
 - `create/update` actions: On success, dispatches refresh event to reload index data
 
+---
+
+## 13. Stimulus Controller Action Pattern
+
+Always use dynamic identifier for controller actions in HTML templates:
+
+```javascript
+// Correct - dynamic identifier (recommended)
+data-action="change->${this.identifier}#togglePermission"
+
+// Wrong - hardcoded controller name
+data-action="change->index#togglePermission"
+```
+
+### Why Use `${this.identifier}`?
+
+1. **Dynamic mapping** - The controller identifier is generated from the class name (e.g., `Companies_Permissions_IndexController` → `companies--permissions--index`)
+2. **Consistency** - Ensures actions connect to the correct controller instance
+3. **Reusability** - Template can be reused across different controllers without hardcoding
+
+### Pattern Usage
+
+In Stimulus controllers that render HTML via `contentHTML()`, always use:
+```javascript
+data-action="change->${this.identifier}#methodName"
+```
+
+This connects the action to the current controller instance's method.
+
 (End of file)
