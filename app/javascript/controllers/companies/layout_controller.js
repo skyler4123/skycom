@@ -240,19 +240,27 @@ export default class Companies_LayoutController extends Controller {
                   class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:bg-blue-100 open:text-blue-600"
                   href="${Helpers.company_subscriptions_path(currentCompany().id)}"
                   ${openByPathname()}/
-                 >
+                >
                    <span class="material-symbols-outlined">loyalty</span>
                    <p class="text-sm font-medium leading-normal">Subscriptions</p>
-                 </a>
-                 <a
-                   class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:bg-blue-100 open:text-blue-600"
-                   href="${Helpers.company_policies_path(currentCompany().id)}"
-                   ${openByPathname()}/
-                 >
-                   <span class="material-symbols-outlined">security</span>
-                   <p class="text-sm font-medium leading-normal">Policies</p>
-                 </a>
-                                 <a
+                </a>
+                  <a
+                    class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:bg-blue-100 open:text-blue-600"
+                    href="${Helpers.company_policies_path(currentCompany().id)}"
+                    ${openByPathname()}/
+                  >
+                    <span class="material-symbols-outlined">security</span>
+                    <p class="text-sm font-medium leading-normal">Policies</p>
+                  </a>
+                  <a
+                    class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:bg-blue-100 open:text-blue-600"
+                    href="${Helpers.company_permissions_path(currentCompany().id)}"
+                    ${openByPathname()}/
+                  >
+                    <span class="material-symbols-outlined">shield</span>
+                    <p class="text-sm font-medium leading-normal">Permissions</p>
+                  </a>
+                <a
                    class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:bg-blue-100 open:text-blue-600"
                    href="${Helpers.company_tasks_path(currentCompany().id)}"
                    ${openByPathname()}/

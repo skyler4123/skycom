@@ -330,4 +330,52 @@ end
 2. **Consistent**: All business entities follow the same pattern
 3. **Flexible**: Can be overridden if needed per-instance
 
+---
+
+## 12. Shell First Rendering Pattern
+
+This project follows a **Shell First** rendering approach for SPA-like experience.
+
+### Application Rules
+
+| Action Type | Pattern | Example |
+|-------------|---------|---------|
+| **Show data** (index, show) | Shell First | `respond_to do \|format\| format.html { render html: "", layout: true }` |
+| **Support actions** (create, update, destroy, show) | JSON only | Return JSON, let frontend handle UI refresh |
+
+> **Note:** Even `show` action is used to support `index` action - e.g., fetching single record details for modals, inline editing, etc.
+
+### Controller Example
+
+```ruby
+# Show data action - Shell First pattern
+def index
+  respond_to do |format|
+    format.html { render html: "", layout: true }  # Returns empty HTML, Stimulus renders content
+    format.json { render json: { roles: current_company.permissions } }
+  end
+end
+
+# Support actions - JSON only
+def create
+  # Handle create, return JSON for frontend to refresh
+end
+
+def show
+  # Used to support index - e.g., fetch single record for modal/edit
+end
+```
+
+### Why This Pattern?
+
+1. **Empty HTML shell** - Server returns minimal HTML
+2. **Stimulus hydrates** - JavaScript fetches JSON data and renders content
+3. **Fast UX** - No full page reloads, SPA-like experience
+4. **JSON for mutations** - create/update/destroy return JSON for frontend to handle success/failure
+
+### Frontend Responsibility
+
+- `index` action: Fetches JSON, renders all UI via `contentHTML()`
+- `create/update` actions: On success, dispatches refresh event to reload index data
+
 (End of file)

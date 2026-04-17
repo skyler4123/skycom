@@ -49,6 +49,9 @@ export const company_events_path = (companyId) => `/companies/${companyId}/event
 export const company_discounts_path = (companyId) => `/companies/${companyId}/discounts`
 export const company_subscriptions_path = (companyId) => `/companies/${companyId}/subscriptions`
 export const company_policies_path = (companyId) => `/companies/${companyId}/policies`
+export const company_policies_create_path = (companyId) => `/companies/${companyId}/policies`
+export const company_policy_appointment_path = (companyId, appointmentId) => `/companies/${companyId}/policy_appointments/${appointmentId}`
+export const company_role_permissions_path = (companyId, roleId) => `/companies/${companyId}/permissions?role_id=${roleId}`
 export const company_tasks_path = (companyId) => `/companies/${companyId}/tasks`
 export const company_payslips_path = (companyId) => `/companies/${companyId}/payslips`
 
