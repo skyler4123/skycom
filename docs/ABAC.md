@@ -84,3 +84,206 @@ Since the matcher iterates through a resource's tags, **always** eager-load the 
 **Tag Governance**: Access to create or modify `Tags` and `TagAppointments` should be restricted to high-level Administrative roles. In an ABAC system, the ability to change a tag is functionally equivalent to the ability to grant or revoke permissions.
 
 **Auditing**: Periodically audit policies with empty `tag_conditions` to ensure global access is still intended for those specific roles.
+
+---
+
+## 6. Role-Policy Association (Many-to-Many)
+
+Policies are assigned to Roles via the join table `PolicyAppointment`. This enables a many-to-many relationship where a single policy can be used by multiple roles.
+
+### E-commerce Example
+- **Policy**: "Create Order" (resource: `Order`, action: `create`)
+- **Assigned to**: `Manager` role, `Seller` role
+- **Effect**: Both Manager and Seller employees can create orders, but only for resources matching the policy's `tag_conditions`
+
+### Implementation (Ruby)
+```ruby
+# In Policy model
+has_many :policy_appointments, dependent: :destroy
+has_many :roles, through: :policy_appointments, source: :appoint_to
+
+# In Role model
+has_many :policy_appointments, dependent: :destroy, as: :appoint_to
+has_many :policies, through: :policy_appointments
+```
+
+### Cache Invalidation
+When a `PolicyAppointment` is created or destroyed, the Role's `updated_at` timestamp is touched (via `after_touch` callback), which propagates to the Company and invalidates the permissions cache automatically.
+
+---
+
+## 7. Client Cache System
+
+Skycom caches company data in the browser's `localStorage` for fast frontend access across all Stimulus controllers.
+
+### Storage Keys
+| Key | Description |
+|-----|------------|
+| `client_cache_data` | JSON blob containing `companies`, `employees`, `enums`, etc. |
+| `client_cache_version` | Timestamp version for cache invalidation |
+
+### Backend Endpoint
+`ClientCacheController#index` returns the cached data:
+
+```json
+{
+  "user": { "id": "...", "email": "..." },
+  "companies": [{ "id": "...", "name": "...", "branches": [], "departments": [], "roles": [] }],
+  "enums": { "employee": { "lifecycle_statuses": [{ "name": "Active", "value": "active" }] } },
+  "employees": [...]
+}
+```
+
+### Frontend Helpers (`auth_helpers.js`)
+```javascript
+// Get cached company data
+const companies = Helpers.currentCompanies()      // → Company[]
+const company = Helpers.currentCompany()           // → Company | null
+const branches = Helpers.currentBranches()           // → Branch[]
+const roles = Helpers.currentRoles()                   // → Role[]
+const enums = Helpers.Enums()                    // → Enums object
+
+// Full cache access
+const cache = Helpers.getCache()                   // → { user, companies, enums, employees }
+const currentUser = Helpers.currentUser()         // → User | null
+```
+
+### Usage in Stimulus Controllers
+```javascript
+import { currentCompany, currentRoles } from "controllers/helpers/auth_helpers"
+
+export default class Companies_ProductsIndexController extends Companies_LayoutController {
+  async loadData() {
+    const roles = currentRoles()
+    // Use roles for permission checks or UI filtering
+  }
+}
+```
+
+---
+
+## 8. Permissions UI Endpoint
+
+**Route**: `GET /companies/:id/permissions`
+
+### Purpose
+Manage the policy-to-role assignments (PolicyAppointments) via a role-grouped UI. Instead of a role-policy relationship table, this page groups policies by role and displays each policy as a checkbox.
+
+### UI Design Pattern
+1. **Group by Role**: Each role is a collapsible section or card
+2. **List All Actions**: Within each role, list all available policies (CRUD+, including custom actions)
+3. **Checkbox Toggle**:
+   - Checked = `workflow_status === 'active'` (policy is active for that role)
+   - Unchecked = `workflow_status` is not active (but appointment still exists)
+
+### Example JSON Response
+```json
+{
+  "roles": [
+    {
+      "id": "role-uuid-1",
+      "name": "Manager",
+      "policies": [
+        { "id": "policy-uuid-1", "name": "Create Order", "resource": "Order", "action": "create", "workflow_status": "active" },
+        { "id": "policy-uuid-2", "name": "Read Order", "resource": "Order", "action": "read", "workflow_status": "inactive" },
+        { "id": "policy-uuid-3", "name": "Update Order", "resource": "Order", "action": "update", "workflow_status": "active" },
+        { "id": "policy-uuid-4", "name": "Delete Order", "resource": "Order", "action": "delete", "workflow_status": "inactive" }
+      ]
+    }
+  ]
+}
+```
+
+---
+
+## 9. Backend Implementation Requirements
+
+### Controller Actions
+
+| Action | HTTP | Purpose |
+|--------|------|---------|
+| `index` | GET | Return all roles grouped with their policies (include `workflow_status` for checkbox state) |
+| `create` | POST | Create `PolicyAppointment` (assign policy to role) |
+| `destroy` | DELETE | Remove `PolicyAppointment` (revoke policy from role) |
+
+### Index Query
+- Load all roles for the company via `company.roles.includes(:policies)`
+- Eager-load policies to prevent N+1
+- Include `workflow_status` in the JSON output for checkbox checked state
+
+### Create Action
+```ruby
+# Params: { policy_appointment: { policy_id: "...", role_id: "..." } }
+policy = company.policies.find(params[:policy_id])
+role = company.roles.find(params[:role_id])
+
+# Create the appointment
+appointment = PolicyAppointment.find_or_create_by!(
+  policy: policy,
+  appoint_to: role
+)
+
+# Activate the policy
+policy.update!(workflow_status: :active)
+
+# Clear permissions cache
+company.clear_permissions_cache
+```
+
+### Destroy Action
+```ruby
+# Params: { id: "policy_appointment_id" }
+appointment = company.policy_appointments.find(params[:id])
+appointment.destroy!
+
+# Clear permissions cache
+company.clear_permissions_cache
+```
+
+### Cache Clearing
+After any create/destroy, call `company.clear_permissions_cache` to invalidate both:
+- `permissions` cache
+- `permissions_by_resource` cache
+
+This ensures the ABAC permission checks always use fresh data.
+
+---
+
+## 10. Frontend Implementation Pattern
+
+### Stimulus Controller
+`app/javascript/controllers/companies/permissions/index_controller.js`
+
+### Checkbox Toggle Logic
+```javascript
+${policy.workflow_status === 'active' ? 'checked' : ''}
+```
+
+### Form Submission
+Use `Helpers.form()` for toggle actions:
+
+```javascript
+// Toggle ON (create appointment)
+Helpers.form({
+  action: Helpers.company_permissions_path(companyId),
+  method: 'POST',
+  dataAction: 'create',
+  html: `
+    <input type="hidden" name="policy_appointment[policy_id]" value="${policyId}" />
+    <input type="hidden" name="policy_appointment[role_id]" value="${roleId}" />
+  `
+})
+
+// Toggle OFF (destroy appointment)
+Helpers.form({
+  action: Helpers.company_permissions_path(companyId, appointmentId),
+  method: 'DELETE'
+})
+```
+
+### Success Handling
+- Listen for `form:success` event
+- Dispatch `refresh` event to reload the permissions page
+- Show success toast notification
+
+(End of file)
