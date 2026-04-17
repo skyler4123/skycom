@@ -286,4 +286,48 @@ Helpers.form({
 - Dispatch `refresh` event to reload the permissions page
 - Show success toast notification
 
+---
+
+## 11. Permission Resource Name
+
+Each business entity has a `permission_resource_name` column to identify which resource type a policy applies to. This enables the permission system to know which records a role can access.
+
+### Database Column
+```ruby
+# In migration (no hardcoded default)
+t.string :permission_resource_name
+```
+
+### Model-Level Default
+We use a Rails attribute with a lambda to automatically set the default value based on the model class name:
+
+```ruby
+# In all business entity models (Employee, Customer, Order, etc.)
+attribute :permission_resource_name, :string, default: -> { _1.class.name }
+```
+
+### How It Works
+- When `Employee.new` is created, `_1.class.name` returns `"Employee"`
+- When `Order.new` is created, `_1.class.name` returns `"Order"`
+- The default is applied automatically at record creation time
+- No hardcoding required - DRY principle
+
+### Example Model Implementation
+```ruby
+# app/models/employee.rb
+class Employee < ApplicationRecord
+  attribute :permission_resource_name, :string, default: -> { _1.class.name }
+end
+
+# app/models/order.rb
+class Order < ApplicationRecord
+  attribute :permission_resource_name, :string, default: -> { _1.class.name }
+end
+```
+
+### Benefits
+1. **DRY**: No need to hardcode defaults for each model
+2. **Consistent**: All business entities follow the same pattern
+3. **Flexible**: Can be overridden if needed per-instance
+
 (End of file)
