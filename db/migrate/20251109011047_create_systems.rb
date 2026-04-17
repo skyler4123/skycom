@@ -15,6 +15,7 @@ class CreateSystems < ActiveRecord::Migration[8.0]
       # Status
       t.boolean :active, default: true, null: false
       t.jsonb :metadata, default: {}
+      t.string :permission_resource_name
 
       t.timestamps
     end

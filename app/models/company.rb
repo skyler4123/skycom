@@ -1,4 +1,6 @@
 class Company < ApplicationRecord
+  attribute :permission_resource_name, :string, default: -> { self.name }
+
   include AddressConcern
   include Company::CacheConcern
   include Company::EducationConcern

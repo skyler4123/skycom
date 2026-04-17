@@ -1,5 +1,7 @@
 class Brand < ApplicationRecord
-    include TagConcern
+  attribute :permission_resource_name, :string, default: -> { self.name }
+
+  include TagConcern
 
   # --- Associations ---
   has_many :products, dependent: :nullify

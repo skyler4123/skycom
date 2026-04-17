@@ -2,6 +2,8 @@ class CustomerGroup < ApplicationRecord
   include AddressConcern
   include TagConcern
 
+  attribute :permission_resource_name, :string, default: -> { self.name }
+
   # --- Associations ---
   belongs_to :company
   belongs_to :branch, optional: true

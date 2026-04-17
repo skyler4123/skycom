@@ -1,4 +1,6 @@
 class User < ApplicationRecord
+  attribute :permission_resource_name, :string, default: -> { self.name }
+
   has_secure_password
 
   generates_token_for :email_verification, expires_in: 2.days do
@@ -75,10 +77,10 @@ class User < ApplicationRecord
       companies # Uses the association directly
     when :company_employee
       # Use &. to avoid errors if an employee record is missing
-      [employees&.map(&:company)].flatten.compact
+      [ employees&.map(&:company) ].flatten.compact
     when :company_customer
       # Customers might see companies they have orders with
-      [customers&.map(&:company)].flatten.compact
+      [ customers&.map(&:company) ].flatten.compact
     else
       []
     end

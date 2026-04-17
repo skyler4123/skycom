@@ -6,6 +6,8 @@ class Employee < ApplicationRecord
   include Employee::PermissionConcern
   include TagConcern
 
+  attribute :permission_resource_name, :string, default: -> { self.name }
+
   # --- Associations ---
   belongs_to :company
   belongs_to :branch, optional: true

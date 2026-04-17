@@ -21,6 +21,7 @@ class CreateCarts < ActiveRecord::Migration[8.0]
       t.integer :business_type
       t.datetime :discarded_at
       t.jsonb :metadata, default: {}
+      t.string :permission_resource_name
 
       t.timestamps
     end

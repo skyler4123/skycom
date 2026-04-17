@@ -374,6 +374,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.integer "fiscal_year_end_month"
     t.datetime "discarded_at"
     t.jsonb "metadata", default: {}
+    t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["category_id"], name: "index_branches_on_category_id"
@@ -391,6 +392,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.integer "business_type"
     t.datetime "discarded_at"
     t.jsonb "metadata", default: {}
+    t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["category_id"], name: "index_brands_on_category_id"
@@ -436,6 +438,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.integer "business_type"
     t.datetime "discarded_at"
     t.jsonb "metadata", default: {}
+    t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["branch_id"], name: "index_cart_groups_on_branch_id"
@@ -465,6 +468,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.integer "business_type"
     t.datetime "discarded_at"
     t.jsonb "metadata", default: {}
+    t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["barcode"], name: "index_carts_on_barcode"
@@ -484,6 +488,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.string "name"
     t.string "description"
     t.jsonb "metadata", default: {}
+    t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["company_id", "name"], name: "index_categories_on_company_id_and_name"
@@ -515,6 +520,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.integer "fiscal_year_end_month"
     t.datetime "discarded_at"
     t.jsonb "metadata", default: {}
+    t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["discarded_at"], name: "index_companies_on_discarded_at"
@@ -590,6 +596,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.integer "business_type"
     t.datetime "discarded_at"
     t.jsonb "metadata", default: {}
+    t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["branch_id"], name: "index_customer_groups_on_branch_id"
@@ -612,6 +619,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.integer "business_type"
     t.datetime "discarded_at"
     t.jsonb "metadata", default: {}
+    t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["branch_id"], name: "index_customers_on_branch_id"
@@ -661,6 +669,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.integer "business_type"
     t.datetime "discarded_at"
     t.jsonb "metadata", default: {}
+    t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["category_id"], name: "index_departments_on_category_id"
@@ -830,6 +839,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.integer "business_type"
     t.datetime "discarded_at"
     t.jsonb "metadata", default: {}
+    t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["branch_id"], name: "index_employee_groups_on_branch_id"
@@ -853,6 +863,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.integer "business_type"
     t.datetime "discarded_at"
     t.jsonb "metadata", default: {}
+    t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["branch_id"], name: "index_employees_on_branch_id"
@@ -1042,6 +1053,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.integer "business_type"
     t.datetime "discarded_at"
     t.jsonb "metadata", default: {}
+    t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["branch_id"], name: "index_facilities_on_branch_id"
@@ -1116,6 +1128,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.integer "business_type"
     t.datetime "discarded_at"
     t.jsonb "metadata", default: {}
+    t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["branch_id"], name: "index_facility_groups_on_branch_id"
@@ -1136,6 +1149,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.integer "business_type"
     t.datetime "discarded_at"
     t.jsonb "metadata", default: {}
+    t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["branch_id"], name: "index_inventories_on_branch_id"
@@ -1192,6 +1206,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.integer "business_type"
     t.datetime "discarded_at"
     t.jsonb "metadata", default: {}
+    t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["barcode"], name: "index_inventory_items_on_barcode"
@@ -1253,6 +1268,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.integer "business_type"
     t.datetime "discarded_at"
     t.jsonb "metadata", default: {}
+    t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["appoint_by_type", "appoint_by_id"], name: "index_inventory_transactions_on_appoint_by"
@@ -1283,6 +1299,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.integer "business_type"
     t.datetime "discarded_at"
     t.jsonb "metadata", default: {}
+    t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["branch_id"], name: "index_invoices_on_branch_id"
@@ -1358,6 +1375,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.integer "business_type"
     t.datetime "discarded_at"
     t.jsonb "metadata", default: {}
+    t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["branch_id"], name: "index_notification_groups_on_branch_id"
@@ -1463,6 +1481,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.integer "business_type"
     t.datetime "discarded_at"
     t.jsonb "metadata", default: {}
+    t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["branch_id"], name: "index_order_groups_on_branch_id"
@@ -1495,6 +1514,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.integer "business_type"
     t.datetime "discarded_at"
     t.jsonb "metadata", default: {}
+    t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["barcode"], name: "index_orders_on_barcode"
@@ -1539,6 +1559,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.integer "business_type"
     t.datetime "discarded_at"
     t.jsonb "metadata", default: {}
+    t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["category_id"], name: "index_payment_methods_on_category_id"
@@ -1564,6 +1585,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.integer "business_type"
     t.datetime "discarded_at"
     t.jsonb "metadata", default: {}
+    t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["branch_id"], name: "index_payments_on_branch_id"
@@ -1636,6 +1658,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.integer "workflow_status"
     t.integer "business_type"
     t.datetime "discarded_at"
+    t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["branch_id"], name: "index_policies_on_branch_id"
@@ -1765,6 +1788,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.integer "business_type"
     t.datetime "discarded_at"
     t.jsonb "metadata", default: {}
+    t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["branch_id"], name: "index_product_groups_on_branch_id"
@@ -1796,6 +1820,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.integer "business_type"
     t.datetime "discarded_at"
     t.jsonb "metadata", default: {}
+    t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["barcode"], name: "index_products_on_barcode"
@@ -1876,6 +1901,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.integer "business_type"
     t.datetime "discarded_at"
     t.jsonb "metadata", default: {}
+    t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["branch_id"], name: "index_project_groups_on_branch_id"
@@ -1897,6 +1923,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.integer "business_type"
     t.datetime "discarded_at"
     t.jsonb "metadata", default: {}
+    t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["branch_id"], name: "index_projects_on_branch_id"
@@ -1927,6 +1954,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.integer "business_type"
     t.datetime "discarded_at"
     t.jsonb "metadata", default: {}
+    t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["barcode"], name: "index_purchase_items_on_barcode"
@@ -1953,6 +1981,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.integer "business_type"
     t.datetime "discarded_at"
     t.jsonb "metadata", default: {}
+    t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["branch_id"], name: "index_purchases_on_branch_id"
@@ -2011,6 +2040,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.integer "workflow_status"
     t.integer "business_type"
     t.datetime "discarded_at"
+    t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["branch_id"], name: "index_roles_on_branch_id"
@@ -2090,6 +2120,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.integer "business_type"
     t.datetime "discarded_at"
     t.jsonb "metadata", default: {}
+    t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["branch_id"], name: "index_service_groups_on_branch_id"
@@ -2112,6 +2143,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.integer "business_type"
     t.datetime "discarded_at"
     t.jsonb "metadata", default: {}
+    t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["branch_id"], name: "index_services_on_branch_id"
@@ -2481,6 +2513,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.integer "country_code"
     t.boolean "active", default: true, null: false
     t.jsonb "metadata", default: {}
+    t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["name"], name: "index_systems_on_name", unique: true
@@ -2514,6 +2547,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.string "value"
     t.string "description"
     t.string "code"
+    t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["company_id"], name: "index_tags_on_company_id"
@@ -2585,6 +2619,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.integer "business_type"
     t.datetime "discarded_at"
     t.jsonb "metadata", default: {}
+    t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["branch_id"], name: "index_task_groups_on_branch_id"
@@ -2607,6 +2642,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.integer "business_type"
     t.datetime "discarded_at"
     t.jsonb "metadata", default: {}
+    t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["branch_id"], name: "index_tasks_on_branch_id"
@@ -2633,6 +2669,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.string "single_access_token"
     t.datetime "discarded_at"
     t.jsonb "metadata", default: {}
+    t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["discarded_at"], name: "index_users_on_discarded_at"

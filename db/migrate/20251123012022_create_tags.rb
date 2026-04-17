@@ -6,6 +6,7 @@ class CreateTags < ActiveRecord::Migration[8.0]
       t.string :value
       t.string :description
       t.string :code
+      t.string :permission_resource_name
 
       t.timestamps
     end
