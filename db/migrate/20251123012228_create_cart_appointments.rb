@@ -1,6 +1,7 @@
 class CreateCartAppointments < ActiveRecord::Migration[8.0]
   def change
     create_table :cart_appointments, id: :uuid do |t|
+      t.references :company, null: false, foreign_key: true, type: :uuid
       t.references :cart, null: false, foreign_key: true, type: :uuid
       t.references :appoint_from, polymorphic: true, null: true, type: :uuid
       t.references :appoint_to, polymorphic: true, null: false, type: :uuid

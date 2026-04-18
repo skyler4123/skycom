@@ -28,6 +28,7 @@ module TagConcern
         # 3. Update the fields
         appointment.value = value
         appointment.description = description
+        appointment.company = company
 
         # 4. Save the appointment (creates if new, updates if existing)
         appointment.save!
