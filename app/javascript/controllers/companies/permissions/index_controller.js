@@ -65,7 +65,7 @@ export default class Companies_Permissions_IndexController extends Companies_Lay
     `
   }
 
-  policyCheckboxHTML(roleId, policy) {
+  policyCheckboxHTML(policy) {
     const isActive = policy.policy_appointment?.workflow_status === 'active'
     const appointmentId = policy.policy_appointment?.id
     return `
