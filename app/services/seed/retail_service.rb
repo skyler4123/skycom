@@ -313,6 +313,10 @@ class Seed::RetailService
     end
   end
 
+  def all_actions
+    %w[create read update delete]
+  end
+
   def create_policy(resource:, action:)
     policy_name = "Can #{action} #{resource}"
     Policy.find_or_create_by!(
@@ -331,32 +335,32 @@ class Seed::RetailService
   def assign_policies_to_roles
     role_definitions = {
       admin: {
-        "PolicyAppointment" => [ "create", "read", "update", "delete" ]
+        "PolicyAppointment" => { create: true, read: true, update: true, delete: true }
       },
       manager: {
-        "Order" => [ "create", "read", "update", "delete" ],
-        "Product" => [ "create", "read", "update", "delete" ],
-        "Employee" => [ "create", "read", "update", "delete" ],
-        "Customer" => [ "create", "read", "update", "delete" ],
-        "PolicyAppointment" => [ "read", "update" ]
+        "Order" => { create: true, read: true, update: true, delete: true },
+        "Product" => { create: true, read: true, update: true, delete: true },
+        "Employee" => { create: true, read: true, update: true, delete: true },
+        "Customer" => { create: true, read: true, update: true, delete: true },
+        "PolicyAppointment" => { create: false, read: true, update: true, delete: false }
       },
       cashier: {
-        "Order" => [ "create", "read", "update" ],
-        "Product" => [ "read" ],
-        "Customer" => [ "read", "create" ]
+        "Order" => { create: true, read: true, update: true, delete: false },
+        "Product" => { create: false, read: true, update: false, delete: false },
+        "Customer" => { create: true, read: true, update: false, delete: false }
       },
       sales_associate: {
-        "Order" => [ "create", "read" ],
-        "Product" => [ "read" ],
-        "Customer" => [ "read" ]
+        "Order" => { create: true, read: true, update: false, delete: false },
+        "Product" => { create: false, read: true, update: false, delete: false },
+        "Customer" => { create: false, read: true, update: false, delete: false }
       },
       stock_clerk: {
-        "Product" => [ "create", "read", "update", "delete" ],
-        "Order" => []
+        "Product" => { create: true, read: true, update: true, delete: true },
+        "Order" => { create: false, read: false, update: false, delete: false }
       },
       customer: {
-        "Order" => [ "read" ],
-        "Product" => [ "read" ]
+        "Order" => { create: false, read: true, update: false, delete: false },
+        "Product" => { create: false, read: true, update: false, delete: false }
       }
     }
 
@@ -364,10 +368,15 @@ class Seed::RetailService
       role = Role.find_by(name: role_name, company: @retail)
       next unless role
 
-      resources.each do |resource_name, actions|
-        actions.each do |action|
+      resources.each do |resource_name, actions_hash|
+        actions_hash.each do |action, is_active|
           policy = Policy.find_by!(company: @retail, resource: resource_name, action: action)
-          PolicyAppointment.find_or_create_by!(company: @retail, policy: policy, appoint_to: role, workflow_status: PolicyAppointment.workflow_statuses.keys.sample)
+          appointment = PolicyAppointment.find_or_create_by!(
+            company: @retail,
+            policy: policy,
+            appoint_to: role
+          )
+          appointment.update!(workflow_status: is_active ? :active : :inactive)
         end
       end
     end
