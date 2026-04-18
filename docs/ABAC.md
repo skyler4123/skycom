@@ -407,4 +407,83 @@ data-action="change->${this.identifier}#methodName"
 
 This connects the action to the current controller instance's method.
 
+---
+
+## 14. Frontend Data Fetching: form vs fetchJson
+
+This project has two patterns for handling API calls in Stimulus controllers:
+
+### Pattern 1: Helpers.form() (Preferred for User Actions)
+
+Used when there are HTML form elements that trigger actions:
+
+| Use Case | Example |
+|----------|---------|
+| Form submissions | Creating, updating, deleting records |
+| Button clicks | Toggle switches, checkboxes |
+| Any action with UI feedback | FormController handles toast automatically |
+
+**Benefits:**
+- Auto injects CSRF token
+- Auto handles method spoofing (PATCH, DELETE)
+- Auto shows toast on success/error
+- Event-driven: `form:success` and `form:error` events
+
+**Example:**
+```javascript
+// Checkbox wrapped in form
+${Helpers.form({
+  action: url,
+  method: 'PATCH',
+  dataAction: 'refresh',
+  html: `<input type="checkbox" data-action="change->form#submit" />`
+})}
+```
+
+---
+
+### Pattern 2: fetchJson (For Initial Data Loading)
+
+Used when there are no HTML elements or for controller initialization:
+
+| Use Case | Example |
+|----------|---------|
+| Initial data fetch | Loading data on controller connect |
+| Complex JSON API | No form UI involved |
+| Background requests | Polling, real-time updates |
+
+**Example:**
+```javascript
+async connect() {
+  const response = await fetchJson(url)
+  this.data = response.data
+}
+```
+
+---
+
+### Decision Flowchart
+
+```
+Is there an HTML element triggering the action?
+├── YES → Use Helpers.form()
+│   ├── FormController handles:
+│   │   ├── CSRF injection
+│   │   ├── Method spoofing
+│   │   ├── Toast notifications
+│   │   └── Success/error events
+│
+└── NO → Use fetchJson()
+    ├── For connect() initial data loading
+    └── For background/API-only operations
+```
+
+---
+
+### Key Principles
+
+1. **Prefer form** for any action that originates from UI elements (buttons, links, checkboxes)
+2. **Use fetchJson** for loading initial data or when no form element is involved
+3. **No direct fetch/ajax** - Always use Helpers.fetchJson or Helpers.form()
+
 (End of file)
