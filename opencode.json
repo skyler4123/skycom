@@ -3,6 +3,6 @@
   "instructions": [
     "AGENTS.md",
     "README.md",
-    "/docs/*"
+    "docs/*.md"
   ]
 }
