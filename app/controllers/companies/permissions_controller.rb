@@ -11,7 +11,6 @@ class Companies::PermissionsController < Companies::ApplicationController
 
   def update
     return render json: { error: "Unauthorized" }, status: :forbidden unless can_manage_permissions?
-
     appointment = current_company.policy_appointments.find(params[:id])
 
     if appointment.update(workflow_status: params[:policy_appointment][:workflow_status])
