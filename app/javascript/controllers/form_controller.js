@@ -42,6 +42,14 @@ export default class extends Controller {
     const url = formElement.action || pathname()
     const method = (formElement.getAttribute("method") || "POST").toUpperCase()
 
+    // Check for confirm attribute
+    if (formElement.dataset.confirm === "true") {
+      const message = formElement.dataset.confirmMessage || "Are you sure?"
+      if (!confirm(message)) {
+        return  // User cancelled - exit early
+      }
+    }
+
     // 1. Convert Flat FormData into a Nested Object (The Rails Way)
     const body = this.nestFormData(formData)
 

@@ -411,9 +411,10 @@ export const form = ({
   method = "POST", 
   dataController = "form",
   dataAction = "submit->form#submit", 
-  // className = "flex flex-col gap-4",
   className = "", 
-  html = "" 
+  html = "",
+  confirm = false,
+  confirmMessage = "Are you sure?"
 }) => {
   const upperMethod = method.toUpperCase()
   const isGet = upperMethod === "GET"
@@ -437,12 +438,18 @@ export const form = ({
   const controllerAttr = dataController ? `data-controller="${dataController}" data-action="submit->${dataController}#submit"` : ""
   const actionAttr = (dataController && dataAction) ? `data-action="${dataAction}"` : ""
 
+  // Confirm dialog attributes
+  const confirmAttr = confirm ? `data-confirm="true"` : ""
+  const confirmMessageAttr = confirm ? `data-confirm-message="${confirmMessage}"` : ""
+
   return `
     <form 
       action="${action}" 
       method="${formMethod}" 
       ${controllerAttr}
       ${actionAttr}
+      ${confirmAttr}
+      ${confirmMessageAttr}
       class="${className}"
     >
       ${methodTags}
