@@ -43,8 +43,8 @@ export default class extends Controller {
     const method = (formElement.getAttribute("method") || "POST").toUpperCase()
 
     // Check for confirm attribute
-    if (formElement.dataset.confirm === "true") {
-      const message = formElement.dataset.confirmMessage || "Are you sure?"
+    if (formElement.dataset.formConfirmValue === "true") {
+      const message = formElement.dataset.formConfirmMessageValue || "Are you sure?"
       if (!confirm(message)) {
         return  // User cancelled - exit early
       }

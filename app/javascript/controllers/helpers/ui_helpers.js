@@ -439,8 +439,8 @@ export const form = ({
   const actionAttr = (dataController && dataAction) ? `data-action="${dataAction}"` : ""
 
   // Confirm dialog attributes
-  const confirmAttr = confirm ? `data-confirm="true"` : ""
-  const confirmMessageAttr = confirm ? `data-confirm-message="${confirmMessage}"` : ""
+  const confirmAttr = confirm ? `data-form-confirm-value="true"` : ""
+  const confirmMessageAttr = confirm ? `data-form-confirm-message-value="${confirmMessage}"` : ""
 
   return `
     <form 
