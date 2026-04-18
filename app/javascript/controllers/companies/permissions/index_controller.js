@@ -70,14 +70,13 @@ export default class Companies_Permissions_IndexController extends Companies_Lay
     const appointmentId = policy.policy_appointment?.id
     const companyId = currentCompany().id
     const newStatus = isActive ? 'inactive' : 'active'
-    const actionUrl = Helpers.company_policy_appointment_path(companyId, appointmentId)
+    const actionUrl = Helpers.edit_company_permission_path(companyId, appointmentId)
 
     return `
       <label class="flex items-center gap-3 p-3 rounded-lg border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800/50 ${!this.authorized ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'} transition-colors">
         ${Helpers.form({
           action: actionUrl,
           method: 'PATCH',
-          dataAction: 'refresh',
           className: 'flex items-center gap-3',
           html: `
             <input type="hidden" name="policy_appointment[workflow_status]" value="${newStatus}" />
