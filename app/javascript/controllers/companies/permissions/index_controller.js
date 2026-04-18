@@ -67,21 +67,29 @@ export default class Companies_Permissions_IndexController extends Companies_Lay
 
   policyCheckboxHTML(roleId, policy) {
     const isActive = policy.policy_appointment?.workflow_status === 'active'
-    const appointmentId = policy.policy_appointment?.id || ''
-    const disabled = !this.authorized ? 'disabled' : ''
+    const appointmentId = policy.policy_appointment?.id
+    const companyId = currentCompany().id
+    const newStatus = isActive ? 'inactive' : 'active'
+    const actionUrl = Helpers.company_policy_appointment_path(companyId, appointmentId)
 
     return `
       <label class="flex items-center gap-3 p-3 rounded-lg border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800/50 ${!this.authorized ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'} transition-colors">
-        <input
-          type="checkbox"
-          class="w-4 h-4 text-blue-600 border-slate-300 rounded focus:ring-blue-600 dark:border-slate-600 dark:bg-slate-800"
-          data-action="change->${this.identifier}#togglePermission"
-          data-role-id="${roleId}"
-          data-policy-id="${policy.id}"
-          data-appointment-id="${appointmentId}"
-          ${isActive ? 'checked' : ''}
-          ${disabled}
-        >
+        ${Helpers.form({
+          action: actionUrl,
+          method: 'PATCH',
+          dataAction: 'refresh',
+          className: 'flex items-center gap-3',
+          html: `
+            <input type="hidden" name="policy_appointment[workflow_status]" value="${newStatus}" />
+            <input 
+              type="checkbox" 
+              class="w-4 h-4 text-blue-600 border-slate-300 rounded focus:ring-blue-600 dark:border-slate-600 dark:bg-slate-800"
+              data-action="change->form#submit"
+              ${isActive ? 'checked' : ''}
+              ${!this.authorized ? 'disabled' : ''}
+            />
+          `
+        })}
         <div class="flex-1 min-w-0">
           <p class="text-sm font-medium text-slate-900 dark:text-white truncate">${policy.name}</p>
           <p class="text-xs text-slate-500">${policy.resource} · ${policy.action}</p>
@@ -102,51 +110,7 @@ export default class Companies_Permissions_IndexController extends Companies_Lay
     `
   }
 
-  async togglePermission(event) {
-    if (!this.authorized) {
-      Helpers.toast('You do not have permission to manage permissions', 'error')
-      return
-    }
-
-    const checkbox = event.target
-    const roleId = checkbox.dataset.roleId
-    const policyId = checkbox.dataset.policyId
-    const appointmentId = checkbox.dataset.appointmentId
-    const isChecked = checkbox.checked
-    const companyId = currentCompany().id
-
-    const message = isChecked
-      ? 'Are you sure you want to disable this permission?'
-      : 'Are you sure you want to enable this permission?'
-
-    if (!confirm(message)) {
-      checkbox.checked = !isChecked
-      return
-    }
-
-    try {
-      const newStatus = isChecked ? 'active' : 'inactive'
-
-      await fetchJson({
-        url: Helpers.company_policy_appointment_path(companyId, appointmentId),
-        method: 'PATCH',
-        data: {
-          policy_appointment: {
-            workflow_status: newStatus
-          }
-        }
-      })
-
-      if (isChecked) {
-        Helpers.toast('Permission enabled', 'success')
-      } else {
-        Helpers.toast('Permission disabled', 'success')
-      }
-
-      await this.loadData()
-    } catch (error) {
-      checkbox.checked = !isChecked
-      Helpers.toast(error.message || 'Failed to update permission', 'error')
-    }
+  async refresh(event) {
+    await this.loadData()
   }
 }

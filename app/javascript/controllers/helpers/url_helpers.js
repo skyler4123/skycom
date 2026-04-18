@@ -34,7 +34,10 @@ export const company_facilities_path = (companyId) => `/companies/${companyId}/f
 export const company_employees_path = (companyId) => `/companies/${companyId}/employees`
 export const edit_company_employee_path = (companyId, employeeId) => `/companies/${companyId}/employees/${employeeId}`
 export const company_orders_path = (companyId) => `/companies/${companyId}/orders`
+
 export const company_permissions_path = (companyId) => `/companies/${companyId}/permissions`
+export const company_policy_appointment_path = (companyId, appointmentId) => `/companies/${companyId}/policy_appointments/${appointmentId}`
+
 export const company_roles_path = (companyId) => `/companies/${companyId}/roles`
 export const company_bookings_path = (companyId) => `/companies/${companyId}/bookings`
 export const company_settings_path = (companyId) => `/companies/${companyId}/settings`
@@ -49,9 +52,6 @@ export const company_events_path = (companyId) => `/companies/${companyId}/event
 export const company_discounts_path = (companyId) => `/companies/${companyId}/discounts`
 export const company_subscriptions_path = (companyId) => `/companies/${companyId}/subscriptions`
 export const company_policies_path = (companyId) => `/companies/${companyId}/policies`
-export const company_policies_create_path = (companyId) => `/companies/${companyId}/policies`
-export const company_policy_appointment_path = (companyId, appointmentId) => `/companies/${companyId}/policy_appointments/${appointmentId}`
-export const company_role_permissions_path = (companyId, roleId) => `/companies/${companyId}/permissions?role_id=${roleId}`
 export const company_tasks_path = (companyId) => `/companies/${companyId}/tasks`
 export const company_payslips_path = (companyId) => `/companies/${companyId}/payslips`
 
