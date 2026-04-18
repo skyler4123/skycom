@@ -438,18 +438,14 @@ export const form = ({
   const controllerAttr = dataController ? `data-controller="${dataController}" data-action="submit->${dataController}#submit"` : ""
   const actionAttr = (dataController && dataAction) ? `data-action="${dataAction}"` : ""
 
-  // Confirm dialog attributes
-  const confirmAttr = confirm ? `data-form-confirm-value="true"` : ""
-  const confirmMessageAttr = confirm ? `data-form-confirm-message-value="${confirmMessage}"` : ""
-
   return `
     <form 
       action="${action}" 
       method="${formMethod}" 
       ${controllerAttr}
       ${actionAttr}
-      ${confirmAttr}
-      ${confirmMessageAttr}
+      data-form-confirm-value="${confirm}"
+      data-form-confirm-message-value="${confirmMessage}"
       class="${className}"
     >
       ${methodTags}

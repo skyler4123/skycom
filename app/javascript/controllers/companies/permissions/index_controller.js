@@ -70,7 +70,7 @@ export default class Companies_Permissions_IndexController extends Companies_Lay
     const appointmentId = policy.policy_appointment?.id
     const companyId = currentCompany().id
     const newStatus = isActive ? 'inactive' : 'active'
-    const actionUrl = Helpers.company_policy_appointment_path(companyId, appointmentId)
+    const actionUrl = Helpers.edit_company_permission_path(companyId, appointmentId)
     const confirmMessage = isActive 
       ? 'Are you sure you want to disable this permission?' 
       : 'Are you sure you want to enable this permission?'
@@ -84,9 +84,11 @@ export default class Companies_Permissions_IndexController extends Companies_Lay
           confirmMessage: confirmMessage,
           className: 'flex items-center gap-3',
           html: `
-            <input type="hidden" name="policy_appointment[workflow_status]" value="${newStatus}" />
+            <input type="hidden" name="active" value="0" autocomplete="off" />
             <input 
-              type="checkbox" 
+              type="checkbox"
+              name="active"
+              value="1"
               class="w-4 h-4 text-blue-600 border-slate-300 rounded focus:ring-blue-600 dark:border-slate-600 dark:bg-slate-800"
               data-action="change->form#submit"
               ${isActive ? 'checked' : ''}

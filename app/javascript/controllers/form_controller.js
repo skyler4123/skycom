@@ -30,6 +30,10 @@
 import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
+  static values = {
+    confirm: { type: Boolean, default: true },
+    confirmMessage: { type: String, default: "Are you sure?" }
+  }
   /**
    * Handles the form submission for all Skycom forms.
    * Linked via data-action="submit->form#submit"
@@ -43,8 +47,8 @@ export default class extends Controller {
     const method = (formElement.getAttribute("method") || "POST").toUpperCase()
 
     // Check for confirm attribute
-    if (formElement.dataset.formConfirmValue === "true") {
-      const message = formElement.dataset.formConfirmMessageValue || "Are you sure?"
+    if (this.confirmValue) {
+      const message = this.confirmMessageValue
       if (!confirm(message)) {
         return  // User cancelled - exit early
       }
