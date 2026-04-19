@@ -111,7 +111,7 @@ export default class Companies_Permissions_IndexController extends Companies_Lay
           url: Helpers.edit_company_permission_path(currentCompany().id, appointmentId),
           name: "policy_appointment_workflow_status",
           value: isActive,
-          confirm: !isActive,
+          confirm: true,
           confirmMessage: `Are you sure you want this change?`
         })}
         <div class="flex-1 min-w-0">
