@@ -390,6 +390,62 @@ export const sort = (data, direction = 'asc') => {
 }
 
 /**
+ * Sorts a simple array of strings or numbers.
+ * @param {Array} array 
+ * @param {'asc'|'desc'} direction 
+ */
+export const sortArray = (array = [], direction = 'asc') => {
+  const dir = direction === 'asc' ? 1 : -1;
+  return [...array].sort((a, b) => {
+    // Handle potential null/undefined values safely
+    const valA = String(a || '');
+    const valB = String(b || '');
+    return valA.localeCompare(valB) * dir;
+  });
+};
+
+/**
+ * Sorts an array of objects based on a specific property key.
+ * Useful for sorting list of Employees by 'name' or Products by 'price'.
+ * @param {Array<Object>} array 
+ * @param {string} key 
+ * @param {'asc'|'desc'} direction 
+ */
+export const sortObjectArray = (array = [], key = "name", direction = 'asc') => {
+  if (!key) return array;
+  const dir = direction === 'asc' ? 1 : -1;
+
+  return [...array].sort((a, b) => {
+    const valA = a[key];
+    const valB = b[key];
+
+    // Numeric sort
+    if (typeof valA === 'number' && typeof valB === 'number') {
+      return (valA - valB) * dir;
+    }
+
+    // String sort (default)
+    const strA = String(valA || '');
+    const strB = String(valB || '');
+    return strA.localeCompare(strB) * dir;
+  });
+};
+
+/**
+ * Sorts an Object by its keys and returns a new Object.
+ * (Kept for compatibility with your existing Administrators logic)
+ */
+export const sortObjectByKeys = (obj = {}, direction = 'asc') => {
+  const dir = direction === 'asc' ? 1 : -1;
+  return Object.keys(obj)
+    .sort((a, b) => a.localeCompare(b) * dir)
+    .reduce((acc, key) => {
+      acc[key] = obj[key];
+      return acc;
+    }, {});
+};
+
+/**
  * Clones a specific key's value into a new key for every object in an array.
  * @param {Array} array - The source array of objects.
  * @param {String} sourceKey - The existing key (e.g., "id").

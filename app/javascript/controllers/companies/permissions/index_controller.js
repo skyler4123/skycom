@@ -9,6 +9,7 @@ export default class Companies_Permissions_IndexController extends Companies_Lay
   async loadData() {
     const response = await fetchJson(Helpers.company_permissions_path(currentCompany().id))
     this.roles = response.roles || []
+    this.roles = Helpers.sortObjectArray(this.roles)
     this.authorized = response.authorized || false
     this.renderContent()
   }
