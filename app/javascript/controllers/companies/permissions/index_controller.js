@@ -47,6 +47,9 @@ export default class Companies_Permissions_IndexController extends Companies_Lay
   }
 
   roleCardHTML(role) {
+    const groupedByResource = this.groupPoliciesByResource(role.policies)
+    const resources = Object.keys(groupedByResource).sort()
+
     return `
       <div class="role-section" data-role-id="${role.id}">
         <div class="px-6 py-4 bg-slate-50 dark:bg-slate-800/50 flex items-center justify-between">
@@ -58,9 +61,42 @@ export default class Companies_Permissions_IndexController extends Companies_Lay
             ${role.policies.filter(p => p.policy_appointment?.workflow_status === 'active').length} / ${role.policies.length} active
           </div>
         </div>
-        <div class="p-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          ${role.policies.map(policy => this.policyCheckboxHTML(policy)).join('')}
+        <div class="p-6 space-y-4">
+          ${resources.map(resourceName => this.resourceSectionHTML(resourceName, groupedByResource[resourceName])).join('')}
         </div>
+      </div>
+    `
+  }
+
+  groupPoliciesByResource(policies) {
+    return policies.reduce((groups, policy) => {
+      const resource = policy.resource || 'Unknown'
+      if (!groups[resource]) {
+        groups[resource] = []
+      }
+      groups[resource].push(policy)
+      return groups
+    }, {})
+  }
+
+  resourceSectionHTML(resourceName, policies) {
+    const activeCount = policies.filter(p => p.policy_appointment?.workflow_status === 'active').length
+    const totalCount = policies.length
+
+    return `
+      <div class="resource-section border border-slate-200 dark:border-slate-700 rounded-lg overflow-hidden">
+        <details class="resource-details group" open>
+          <summary class="px-4 py-3 bg-slate-100 dark:bg-slate-800 cursor-pointer flex items-center justify-between list-none hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors select-none">
+            <div class="flex items-center gap-2">
+              <span class="material-symbols-outlined text-lg text-slate-500 group-open:rotate-90 transition-transform">chevron_right</span>
+              <span class="text-sm font-semibold text-slate-900 dark:text-white">${resourceName}</span>
+            </div>
+            <span class="text-xs text-slate-500">${activeCount} / ${totalCount} active</span>
+          </summary>
+          <div class="p-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
+            ${policies.map(policy => this.policyCheckboxHTML(policy)).join('')}
+          </div>
+        </details>
       </div>
     `
   }
