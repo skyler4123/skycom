@@ -59,7 +59,7 @@ export default class Companies_Permissions_IndexController extends Companies_Lay
           </div>
         </div>
         <div class="p-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          ${role.policies.map(policy => this.policyCheckboxHTML(role.id, policy)).join('')}
+          ${role.policies.map(policy => this.policyCheckboxHTML(policy)).join('')}
         </div>
       </div>
     `
