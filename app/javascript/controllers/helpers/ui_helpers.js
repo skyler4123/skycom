@@ -561,7 +561,7 @@ export const tooltip = (options) => {
 export const checkbox = ({
   url = pathname(),
   method = "PATCH",
-  name = "status",
+  name = "some_param_name",
   value = false, // Initial state
   className = "",
   confirm = false,

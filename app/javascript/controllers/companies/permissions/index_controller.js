@@ -109,9 +109,9 @@ export default class Companies_Permissions_IndexController extends Companies_Lay
       <label class="flex items-center gap-3 p-3 rounded-lg border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800/50 ${!this.authorized ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'} transition-colors">
         ${Helpers.checkbox({
           url: Helpers.edit_company_permission_path(currentCompany().id, appointmentId),
-          name: "status",
+          name: "policy_appointment_workflow_status",
           value: isActive,
-          confirm: !isActive, // Only ask for confirmation when REVOKING access
+          confirm: !isActive,
           confirmMessage: `Are you sure you want this change?`
         })}
         <div class="flex-1 min-w-0">

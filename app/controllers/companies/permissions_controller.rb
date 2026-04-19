@@ -13,8 +13,8 @@ class Companies::PermissionsController < Companies::ApplicationController
     # This endpoint belongs to Permission but we dont create this model, in this endpoint, id is id of PolicyAppointment
     return render json: { error: "Unauthorized" }, status: :forbidden unless can_manage_permissions?
     appointment = current_company.policy_appointments.find(params[:id])
-
-    if appointment.update(workflow_status: params[:policy_appointment][:workflow_status])
+    workflow_status = params[:policy_appointment_workflow_status] ? :active : :inactive
+    if appointment.update!(workflow_status: workflow_status)
       current_company.clear_permissions_cache
       render json: { policy_appointment: appointment }
     else
