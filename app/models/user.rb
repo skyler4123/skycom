@@ -1,4 +1,6 @@
 class User < ApplicationRecord
+  attribute :permission_resource_name, :string, default: -> { self.name }
+
   has_secure_password
 
   generates_token_for :email_verification, expires_in: 2.days do
@@ -36,8 +38,8 @@ class User < ApplicationRecord
   # --- Business Logic Associations ---
 
   has_many :companies, dependent: :destroy
-  has_one :employee, dependent: :destroy
-  has_one :customer, dependent: :destroy
+  has_many :employees, dependent: :destroy
+  has_many :customers, dependent: :destroy
 
   belongs_to :parent_user, class_name: "User", optional: true
   has_many :child_users, class_name: "User", foreign_key: "parent_user_id", dependent: :destroy
@@ -65,6 +67,41 @@ class User < ApplicationRecord
   end
 
   include User::RetailConcern
+  def accessible_companies
+    case system_role&.to_sym
+    when :super_admin
+      Company.all # Or [] if you want to keep them separated
+    when :admin
+      Company.all # Or [] if you want to keep them separated
+    when :company_owner
+      companies # Uses the association directly
+    when :company_employee
+      # Use &. to avoid errors if an employee record is missing
+      [ employees&.map(&:company) ].flatten.compact
+    when :company_customer
+      # Customers might see companies they have orders with
+      [ customers&.map(&:company) ].flatten.compact
+    else
+      []
+    end
+  end
 
+  def permissions
+    case system_role&.to_sym
+    when :super_admin
+      :all # Or [] if you want to keep them separated
+    when :admin
+      :all # Or [] if you want to keep them separated
+    when :company_owner
+      :all # Uses the association directly
+    when :company_employee
+      employee.permissions
+    when :company_customer
+      # Customers might see companies they have orders with
+      {}
+    else
+      {}
+    end
+  end
   # ----------------------------------------------------------------------------------------------------
 end

@@ -21,6 +21,7 @@ class CreateUsers < ActiveRecord::Migration[8.0]
       t.string :single_access_token
       t.datetime :discarded_at
       t.jsonb :metadata, default: {}
+      t.string :permission_resource_name
 
       t.timestamps
     end

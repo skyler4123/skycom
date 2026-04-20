@@ -6,24 +6,63 @@ module Company::PermissionConcern
     # PERMISSIONS (RBAC)
     # =========================================================================
 
+    # Returns all roles with ALL company policies
+    # Each policy includes policy_appointment (if exists) with workflow_status
+    # Used for Permissions UI page - shows all policies with their assignment status
     def permissions
-      # REASON: cache_key_with_version includes the 'updated_at' timestamp.
-      # If any Role or PolicyAppointment is touched, this key changes,
-      # forcing Rails to skip the cache and re-run the heavy database query.
       cache_key = "#{cache_key_with_version}/permissions"
 
       Rails.cache.fetch(cache_key, expires_in: 24.hours) do
-        roles.includes(:policies).each_with_object({}) do |role, hash|
+        all_policies = policies.to_a
+
+        roles.map do |role|
+          role_policies = role.policy_appointments.includes(:policy).to_a
+
+          {
+            id: role.id,
+            name: role.name,
+            description: role.description,
+            policies: all_policies.map do |policy|
+              appointment = role_policies.find { |a| a.policy_id == policy.id }
+
+              {
+                id: policy.id,
+                name: policy.name,
+                description: policy.description,
+                code: policy.code,
+                resource: policy.resource,
+                action: policy.action,
+                business_type: policy.business_type,
+                policy_appointment: appointment ? {
+                  id: appointment.id,
+                  workflow_status: appointment.workflow_status
+                } : nil
+              }
+            end
+          }
+        end
+      end
+    end
+
+    # Only active PolicyAppointments - used for actual permission checks (can?)
+    def permissions_by_role
+      cache_key = "#{cache_key_with_version}/permissions_by_role"
+
+      Rails.cache.fetch(cache_key, expires_in: 24.hours) do
+        roles.includes(:policy_appointments).each_with_object({}) do |role, hash|
+          active_appointments = role.policy_appointments.active.includes(:policy)
+
           hash[role.name] = {
             id: role.id,
             description: role.description,
-            policies: role.policies.map do |policy|
+            policies: active_appointments.map do |appointment|
               {
-                id: policy.id,
-                resource: policy.resource,
-                action: policy.action,
-                name: policy.name,
-                business_type: policy.business_type
+                id: appointment.policy.id,
+                policy_appointment_id: appointment.id,
+                resource: appointment.policy.resource,
+                action: appointment.policy.action,
+                name: appointment.policy.name,
+                business_type: appointment.policy.business_type
               }
             end
           }
@@ -35,14 +74,23 @@ module Company::PermissionConcern
       cache_key = "#{cache_key_with_version}/permissions_by_resource"
 
       Rails.cache.fetch(cache_key, expires_in: 24.hours) do
-        roles.includes(:policies).each_with_object({}) do |role, hash|
-          role_permissions = role.policies.group_by(&:resource).transform_values do |policies|
-            policies.map(&:action)
+        roles.includes(:policy_appointments).each_with_object({}) do |role, hash|
+          active_appointments = role.policy_appointments.active.includes(:policy)
+          role_permissions = active_appointments.group_by { |a| a.policy.resource }.transform_values do |appointments|
+            appointments.map { |a| a.policy.action }
           end
 
           hash[role.name] = role_permissions
         end
       end
+    end
+
+    def clear_permissions_cache
+      Rails.cache.delete("#{cache_key_with_version}/permissions")
+      Rails.cache.delete("#{cache_key_with_version}/permissions_by_role")
+      Rails.cache.delete("#{cache_key_with_version}/permissions_by_resource")
+
+      touch
     end
   end
 end

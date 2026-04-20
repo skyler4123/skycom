@@ -1,9 +1,10 @@
 class Seed::RetailService
   EMPLOYEE_COUNTS = {
     manager: 1,
-    cashier: 3,
-    sales_associate: 210,
-    stock_clerk: 2
+    cashier: 10,
+    sales_associate: 10,
+    stock_clerk: 1,
+    admin: 1
   }.freeze
 
   CUSTOMER_COUNTS = { customer: 20 }.freeze
@@ -81,7 +82,7 @@ class Seed::RetailService
         description: "Description for Branch #{i + 1}",
         company: @retail
       )
-      branch.attach_tag(name: "Branch #{branch.id} Tag")
+      branch.attach_tag(key: "Branch #{branch.id} Tag")
       @branches << branch
     end
   end
@@ -134,7 +135,7 @@ class Seed::RetailService
           name: "#{branch.name} Facility #{i + 1}",
           description: "A facility location for #{branch.name}"
         )
-        facility.attach_tag(name: "Facility #{facility.id} Tag")
+        facility.attach_tag(key: "Facility #{facility.id} Tag")
         @facilities << facility
       end
     end
@@ -165,7 +166,7 @@ class Seed::RetailService
         description: "Department: #{dept_name}"
       )
       department.update!(category: Seed::CategoryService.create(company: @retail, name: "Department"))
-      department.attach_tag(name: "Department #{department.id} Tag")
+      department.attach_tag(key: "Department #{department.id} Tag")
       @departments << department
     end
   end
@@ -176,7 +177,11 @@ class Seed::RetailService
 
       EMPLOYEE_COUNTS.each do |role_name, count|
         count.times do |i|
-          user = Seed::UserService.create(parent_user: @multi_company_owner, email: "#{role_name}_#{i + 1}_branch_#{index + 1}@#{@company_email_full_domain}")
+          user = Seed::UserService.create(
+            parent_user: @multi_company_owner,
+            email: "#{role_name}_#{i + 1}_branch_#{index + 1}@#{@company_email_full_domain}",
+            system_role: :company_employee
+          )
           employee = Seed::EmployeeService.create(
             user: user, company: @retail, branch: branch,
             name: "Employee #{i + 1} - #{role_name.to_s.titleize}"
@@ -203,7 +208,11 @@ class Seed::RetailService
     @branches.each do |branch|
       CUSTOMER_COUNTS.each do |role_name, count|
         count.times do |i|
-          user = Seed::UserService.create(parent_user: @multi_company_owner, email: "customer_#{i + 1}_#{branch.id}@example.com")
+          user = Seed::UserService.create(
+            parent_user: @multi_company_owner,
+            email: "customer_#{i + 1}_#{branch.id}@example.com",
+            system_role: :company_customer
+          )
           customer = Seed::CustomerService.create(
             user: user, company: @retail, branch: branch, name: "Customer #{i + 1}"
           )
@@ -289,67 +298,85 @@ class Seed::RetailService
   end
 
   def configure_retail_permissions
-    # Define capabilities for each role
-    # Actions: create, read, update, delete
+    create_all_crud_policies
+    assign_policies_to_roles
+  end
 
+  def create_all_crud_policies
+    resources = %w[Order Product Employee Customer PolicyAppointment]
+    crud_actions = %w[create read update delete]
+
+    resources.each do |resource|
+      crud_actions.each do |action|
+        create_policy(resource: resource, action: action)
+      end
+    end
+  end
+
+  def all_actions
+    %w[create read update delete]
+  end
+
+  def create_policy(resource:, action:)
+    policy_name = "Can #{action} #{resource}"
+    Policy.find_or_create_by!(
+      name: policy_name,
+      company: @retail,
+      resource: resource,
+      action: action
+    ) do |p|
+      p.description = "Allows #{action} operations on #{resource}"
+      p.business_type = :operational
+      p.lifecycle_status = :active
+      p.branch_id = @branches.first.id
+    end
+  end
+
+  def assign_policies_to_roles
     role_definitions = {
+      admin: {
+        "PolicyAppointment" => { create: true, read: true, update: true, delete: true }
+      },
       manager: {
-        "Order" => [ "create", "read", "update", "delete" ],
-        "Product" => [ "create", "read", "update", "delete" ],
-        "Employee" => [ "create", "read", "update", "delete" ],
-        "Customer" => [ "create", "read", "update", "delete" ]
+        "Order" => { create: true, read: true, update: true, delete: true },
+        "Product" => { create: true, read: true, update: true, delete: true },
+        "Employee" => { create: true, read: true, update: true, delete: true },
+        "Customer" => { create: true, read: true, update: true, delete: true },
+        "PolicyAppointment" => { create: false, read: true, update: true, delete: false }
       },
       cashier: {
-        "Order" => [ "create", "read", "update" ], # Can process sales, maybe returns
-        "Product" => [ "read" ],                    # Needs to see prices
-        "Customer" => [ "read", "create" ]          # Can lookup or add customers
+        "Order" => { create: true, read: true, update: true, delete: false },
+        "Product" => { create: false, read: true, update: false, delete: false },
+        "Customer" => { create: true, read: true, update: false, delete: false }
       },
       sales_associate: {
-        "Order" => [ "create", "read" ],            # Can help create quotes/orders
-        "Product" => [ "read" ],
-        "Customer" => [ "read" ]
+        "Order" => { create: true, read: true, update: false, delete: false },
+        "Product" => { create: false, read: true, update: false, delete: false },
+        "Customer" => { create: false, read: true, update: false, delete: false }
       },
       stock_clerk: {
-        "Product" => [ "create", "read", "update", "delete" ], # Full control of inventory
-        "Order" => [] # No access to orders
+        "Product" => { create: true, read: true, update: true, delete: true },
+        "Order" => { create: false, read: false, update: false, delete: false }
       },
       customer: {
-        "Order" => [ "read" ], # Can see their own orders (logic handled in policy scope usually)
-        "Product" => [ "read" ]
+        "Order" => { create: false, read: true, update: false, delete: false },
+        "Product" => { create: false, read: true, update: false, delete: false }
       }
     }
 
     role_definitions.each do |role_name, resources|
-      # 1. Find the Role object created in Step 4
       role = Role.find_by(name: role_name, company: @retail)
       next unless role
 
-      resources.each do |resource_name, actions|
-        actions.each do |action|
-          # 2. Create the Policy (The Permission)
-          # We check uniqueness by name/company to avoid duplicates if re-seeded
-          policy_name = "Can #{action} #{resource_name}"
-
-          # Using raw ActiveRecord here. If you have Seed::PolicyService, use that instead.
-          policy = Policy.find_or_create_by!(
-            name: policy_name,
+      resources.each do |resource_name, actions_hash|
+        actions_hash.each do |action, is_active|
+          policy = Policy.find_by!(company: @retail, resource: resource_name, action: action)
+          appointment = PolicyAppointment.find_or_create_by!(
             company: @retail,
-            resource: resource_name,
-            action: action
-          ) do |p|
-            p.description = "Allows #{action} operations on #{resource_name}"
-            p.business_type = :operational
-            p.lifecycle_status = :active
-            # Company ID is required by your schema validation, picking the first branch as reference
-            # or the group owner's context.
-            p.branch_id = @branches.first.id
-          end
-
-          # 3. Link Policy to Role via PolicyAppointment
-          PolicyAppointment.find_or_create_by!(
             policy: policy,
             appoint_to: role
           )
+          appointment.update!(workflow_status: is_active ? :active : :inactive)
         end
       end
     end

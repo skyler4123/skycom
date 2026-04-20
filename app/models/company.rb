@@ -1,4 +1,6 @@
 class Company < ApplicationRecord
+  attribute :permission_resource_name, :string, default: -> { self.name }
+
   include AddressConcern
   include Company::CacheConcern
   include Company::EducationConcern
@@ -17,6 +19,7 @@ class Company < ApplicationRecord
   has_many :employees, dependent: :destroy
   has_many :roles, dependent: :destroy
   has_many :policies, dependent: :destroy
+  has_many :policy_appointments, dependent: :destroy
   has_many :facility_groups, dependent: :destroy
   has_many :facilities, dependent: :destroy
   has_many :service_groups, dependent: :destroy

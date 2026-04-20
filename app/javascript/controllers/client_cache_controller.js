@@ -8,12 +8,19 @@ export default class ClientCacheController extends Controller {
     this.sync()
   }
 
+  clearClientCache() {
+    Helpers.removeLocalStorage("client_cache_data")
+    Helpers.removeLocalStorage("client_cache_version")
+  }
+
   async sync() {
     const serverVersion = Cookie('client_cache_version')
     const localVersion = localStorage.getItem('client_cache_version')
 
-    if (serverVersion && serverVersion !== localVersion) {
-      await this.refreshCache(serverVersion)
+    const hasLocalCache = !!localStorage.getItem('client_cache_data')
+
+    if (!hasLocalCache || (serverVersion && serverVersion !== localVersion)) {
+      await this.refreshCache(serverVersion || 'initial')
     }
   }
 

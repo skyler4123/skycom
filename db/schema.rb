@@ -61,6 +61,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.integer "workflow_status"
     t.integer "business_type"
     t.datetime "discarded_at"
+    t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["address_id"], name: "index_address_appointments_on_address_id"
@@ -86,6 +87,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
   end
 
   create_table "answers", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "company_id", null: false
     t.uuid "question_id", null: false
     t.uuid "category_id"
     t.string "name"
@@ -99,11 +101,13 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["category_id"], name: "index_answers_on_category_id"
+    t.index ["company_id"], name: "index_answers_on_company_id"
     t.index ["discarded_at"], name: "index_answers_on_discarded_at"
     t.index ["question_id"], name: "index_answers_on_question_id"
   end
 
   create_table "article_appointments", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "company_id", null: false
     t.uuid "article_id", null: false
     t.string "appoint_from_type"
     t.uuid "appoint_from_id"
@@ -120,6 +124,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.integer "workflow_status"
     t.integer "business_type"
     t.datetime "discarded_at"
+    t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["appoint_by_type", "appoint_by_id"], name: "index_article_appointments_on_appoint_by"
@@ -128,10 +133,12 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.index ["appoint_to_type", "appoint_to_id"], name: "idx_on_appoint_to_type_appoint_to_id_aae71362ee"
     t.index ["appoint_to_type", "appoint_to_id"], name: "index_article_appointments_on_appoint_to"
     t.index ["article_id"], name: "index_article_appointments_on_article_id"
+    t.index ["company_id"], name: "index_article_appointments_on_company_id"
     t.index ["discarded_at"], name: "index_article_appointments_on_discarded_at"
   end
 
   create_table "article_group_appointments", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "company_id", null: false
     t.uuid "article_group_id", null: false
     t.string "appoint_from_type"
     t.uuid "appoint_from_id"
@@ -148,6 +155,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.integer "workflow_status"
     t.integer "business_type"
     t.datetime "discarded_at"
+    t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["appoint_by_type", "appoint_by_id"], name: "index_article_group_appointments_on_appoint_by"
@@ -156,6 +164,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.index ["appoint_to_type", "appoint_to_id"], name: "idx_on_appoint_to_type_appoint_to_id_3810e29801"
     t.index ["appoint_to_type", "appoint_to_id"], name: "index_article_group_appointments_on_appoint_to"
     t.index ["article_group_id"], name: "index_article_group_appointments_on_article_group_id"
+    t.index ["company_id"], name: "index_article_group_appointments_on_company_id"
     t.index ["discarded_at"], name: "index_article_group_appointments_on_discarded_at"
   end
 
@@ -374,6 +383,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.integer "fiscal_year_end_month"
     t.datetime "discarded_at"
     t.jsonb "metadata", default: {}
+    t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["category_id"], name: "index_branches_on_category_id"
@@ -391,6 +401,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.integer "business_type"
     t.datetime "discarded_at"
     t.jsonb "metadata", default: {}
+    t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["category_id"], name: "index_brands_on_category_id"
@@ -398,6 +409,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
   end
 
   create_table "cart_appointments", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "company_id", null: false
     t.uuid "cart_id", null: false
     t.string "appoint_from_type"
     t.uuid "appoint_from_id"
@@ -414,6 +426,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.integer "workflow_status"
     t.integer "business_type"
     t.datetime "discarded_at"
+    t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["appoint_by_type", "appoint_by_id"], name: "index_cart_appointments_on_appoint_by"
@@ -421,6 +434,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.index ["appoint_from_type", "appoint_from_id"], name: "index_cart_appointments_on_appoint_from"
     t.index ["appoint_to_type", "appoint_to_id"], name: "index_cart_appointments_on_appoint_to"
     t.index ["cart_id"], name: "index_cart_appointments_on_cart_id"
+    t.index ["company_id"], name: "index_cart_appointments_on_company_id"
     t.index ["discarded_at"], name: "index_cart_appointments_on_discarded_at"
   end
 
@@ -436,6 +450,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.integer "business_type"
     t.datetime "discarded_at"
     t.jsonb "metadata", default: {}
+    t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["branch_id"], name: "index_cart_groups_on_branch_id"
@@ -465,6 +480,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.integer "business_type"
     t.datetime "discarded_at"
     t.jsonb "metadata", default: {}
+    t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["barcode"], name: "index_carts_on_barcode"
@@ -484,6 +500,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.string "name"
     t.string "description"
     t.jsonb "metadata", default: {}
+    t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["company_id", "name"], name: "index_categories_on_company_id_and_name"
@@ -515,6 +532,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.integer "fiscal_year_end_month"
     t.datetime "discarded_at"
     t.jsonb "metadata", default: {}
+    t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["discarded_at"], name: "index_companies_on_discarded_at"
@@ -522,6 +540,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
   end
 
   create_table "customer_appointments", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "company_id", null: false
     t.uuid "customer_id", null: false
     t.string "appoint_from_type"
     t.uuid "appoint_from_id"
@@ -538,6 +557,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.integer "workflow_status"
     t.integer "business_type"
     t.datetime "discarded_at"
+    t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["appoint_by_type", "appoint_by_id"], name: "index_customer_appointments_on_appoint_by"
@@ -545,11 +565,13 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.index ["appoint_from_type", "appoint_from_id"], name: "index_customer_appointments_on_appoint_from"
     t.index ["appoint_to_type", "appoint_to_id"], name: "idx_on_appoint_to_type_appoint_to_id_1b496b2c03"
     t.index ["appoint_to_type", "appoint_to_id"], name: "index_customer_appointments_on_appoint_to"
+    t.index ["company_id"], name: "index_customer_appointments_on_company_id"
     t.index ["customer_id"], name: "index_customer_appointments_on_customer_id"
     t.index ["discarded_at"], name: "index_customer_appointments_on_discarded_at"
   end
 
   create_table "customer_group_appointments", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "company_id", null: false
     t.uuid "customer_group_id", null: false
     t.string "appoint_from_type"
     t.uuid "appoint_from_id"
@@ -566,6 +588,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.integer "workflow_status"
     t.integer "business_type"
     t.datetime "discarded_at"
+    t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["appoint_by_type", "appoint_by_id"], name: "index_customer_group_appointments_on_appoint_by"
@@ -573,6 +596,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.index ["appoint_from_type", "appoint_from_id"], name: "index_customer_group_appointments_on_appoint_from"
     t.index ["appoint_to_type", "appoint_to_id"], name: "idx_on_appoint_to_type_appoint_to_id_a6c19edb35"
     t.index ["appoint_to_type", "appoint_to_id"], name: "index_customer_group_appointments_on_appoint_to"
+    t.index ["company_id"], name: "index_customer_group_appointments_on_company_id"
     t.index ["customer_group_id"], name: "index_customer_group_appointments_on_customer_group_id"
     t.index ["discarded_at"], name: "index_customer_group_appointments_on_discarded_at"
   end
@@ -590,6 +614,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.integer "business_type"
     t.datetime "discarded_at"
     t.jsonb "metadata", default: {}
+    t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["branch_id"], name: "index_customer_groups_on_branch_id"
@@ -612,6 +637,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.integer "business_type"
     t.datetime "discarded_at"
     t.jsonb "metadata", default: {}
+    t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["branch_id"], name: "index_customers_on_branch_id"
@@ -622,6 +648,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
   end
 
   create_table "department_appointments", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "company_id", null: false
     t.uuid "department_id", null: false
     t.string "appoint_from_type"
     t.uuid "appoint_from_id"
@@ -639,6 +666,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.integer "business_type"
     t.datetime "discarded_at"
     t.jsonb "metadata", default: {}
+    t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["appoint_by_type", "appoint_by_id"], name: "index_department_appointments_on_appoint_by"
@@ -646,6 +674,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.index ["appoint_from_type", "appoint_from_id"], name: "index_department_appointments_on_appoint_from"
     t.index ["appoint_to_type", "appoint_to_id"], name: "idx_on_appoint_to_type_appoint_to_id_8ea813e354"
     t.index ["appoint_to_type", "appoint_to_id"], name: "index_department_appointments_on_appoint_to"
+    t.index ["company_id"], name: "index_department_appointments_on_company_id"
     t.index ["department_id"], name: "index_department_appointments_on_department_id"
   end
 
@@ -661,6 +690,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.integer "business_type"
     t.datetime "discarded_at"
     t.jsonb "metadata", default: {}
+    t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["category_id"], name: "index_departments_on_category_id"
@@ -670,6 +700,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
   end
 
   create_table "document_appointments", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "company_id", null: false
     t.uuid "document_id", null: false
     t.string "appoint_from_type"
     t.uuid "appoint_from_id"
@@ -686,6 +717,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.integer "workflow_status"
     t.integer "business_type"
     t.datetime "discarded_at"
+    t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["appoint_by_type", "appoint_by_id"], name: "index_document_appointments_on_appoint_by"
@@ -693,11 +725,13 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.index ["appoint_from_type", "appoint_from_id"], name: "index_document_appointments_on_appoint_from"
     t.index ["appoint_to_type", "appoint_to_id"], name: "idx_on_appoint_to_type_appoint_to_id_fcaa395aab"
     t.index ["appoint_to_type", "appoint_to_id"], name: "index_document_appointments_on_appoint_to"
+    t.index ["company_id"], name: "index_document_appointments_on_company_id"
     t.index ["discarded_at"], name: "index_document_appointments_on_discarded_at"
     t.index ["document_id"], name: "index_document_appointments_on_document_id"
   end
 
   create_table "document_group_appointments", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "company_id", null: false
     t.uuid "document_group_id", null: false
     t.string "appoint_from_type"
     t.uuid "appoint_from_id"
@@ -714,6 +748,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.integer "workflow_status"
     t.integer "business_type"
     t.datetime "discarded_at"
+    t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["appoint_by_type", "appoint_by_id"], name: "index_document_group_appointments_on_appoint_by"
@@ -721,6 +756,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.index ["appoint_from_type", "appoint_from_id"], name: "index_document_group_appointments_on_appoint_from"
     t.index ["appoint_to_type", "appoint_to_id"], name: "idx_on_appoint_to_type_appoint_to_id_a5029e226f"
     t.index ["appoint_to_type", "appoint_to_id"], name: "index_document_group_appointments_on_appoint_to"
+    t.index ["company_id"], name: "index_document_group_appointments_on_company_id"
     t.index ["discarded_at"], name: "index_document_group_appointments_on_discarded_at"
     t.index ["document_group_id"], name: "index_document_group_appointments_on_document_group_id"
   end
@@ -772,6 +808,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
   end
 
   create_table "employee_appointments", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "company_id", null: false
     t.uuid "employee_id", null: false
     t.string "appoint_from_type"
     t.uuid "appoint_from_id"
@@ -784,6 +821,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.string "name"
     t.string "description"
     t.string "code"
+    t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["appoint_by_type", "appoint_by_id"], name: "index_employee_appointments_on_appoint_by"
@@ -791,10 +829,12 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.index ["appoint_from_type", "appoint_from_id"], name: "index_employee_appointments_on_appoint_from"
     t.index ["appoint_to_type", "appoint_to_id"], name: "idx_on_appoint_to_type_appoint_to_id_a39c78be55"
     t.index ["appoint_to_type", "appoint_to_id"], name: "index_employee_appointments_on_appoint_to"
+    t.index ["company_id"], name: "index_employee_appointments_on_company_id"
     t.index ["employee_id"], name: "index_employee_appointments_on_employee_id"
   end
 
   create_table "employee_group_appointments", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "company_id", null: false
     t.uuid "employee_group_id", null: false
     t.string "appoint_from_type"
     t.uuid "appoint_from_id"
@@ -807,6 +847,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.string "name"
     t.string "description"
     t.string "code"
+    t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["appoint_by_type", "appoint_by_id"], name: "index_employee_group_appointments_on_appoint_by"
@@ -814,6 +855,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.index ["appoint_from_type", "appoint_from_id"], name: "index_employee_group_appointments_on_appoint_from"
     t.index ["appoint_to_type", "appoint_to_id"], name: "idx_on_appoint_to_type_appoint_to_id_57b6eaae20"
     t.index ["appoint_to_type", "appoint_to_id"], name: "index_employee_group_appointments_on_appoint_to"
+    t.index ["company_id"], name: "index_employee_group_appointments_on_company_id"
     t.index ["employee_group_id"], name: "index_employee_group_appointments_on_employee_group_id"
   end
 
@@ -830,6 +872,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.integer "business_type"
     t.datetime "discarded_at"
     t.jsonb "metadata", default: {}
+    t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["branch_id"], name: "index_employee_groups_on_branch_id"
@@ -853,6 +896,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.integer "business_type"
     t.datetime "discarded_at"
     t.jsonb "metadata", default: {}
+    t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["branch_id"], name: "index_employees_on_branch_id"
@@ -863,6 +907,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
   end
 
   create_table "event_appointments", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "company_id", null: false
     t.uuid "event_id", null: false
     t.string "appoint_from_type"
     t.uuid "appoint_from_id"
@@ -879,6 +924,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.integer "workflow_status"
     t.integer "business_type"
     t.datetime "discarded_at"
+    t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["appoint_by_type", "appoint_by_id"], name: "index_event_appointments_on_appoint_by"
@@ -886,11 +932,13 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.index ["appoint_from_type", "appoint_from_id"], name: "index_event_appointments_on_appoint_from"
     t.index ["appoint_to_type", "appoint_to_id"], name: "index_event_appointments_on_appoint_to"
     t.index ["appoint_to_type", "appoint_to_id"], name: "index_event_appointments_on_appoint_to_type_and_appoint_to_id"
+    t.index ["company_id"], name: "index_event_appointments_on_company_id"
     t.index ["discarded_at"], name: "index_event_appointments_on_discarded_at"
     t.index ["event_id"], name: "index_event_appointments_on_event_id"
   end
 
   create_table "event_group_appointments", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "company_id", null: false
     t.uuid "event_group_id", null: false
     t.string "appoint_from_type"
     t.uuid "appoint_from_id"
@@ -907,6 +955,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.integer "workflow_status"
     t.integer "business_type"
     t.datetime "discarded_at"
+    t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["appoint_by_type", "appoint_by_id"], name: "index_event_group_appointments_on_appoint_by"
@@ -914,6 +963,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.index ["appoint_from_type", "appoint_from_id"], name: "index_event_group_appointments_on_appoint_from"
     t.index ["appoint_to_type", "appoint_to_id"], name: "idx_on_appoint_to_type_appoint_to_id_941fb608a2"
     t.index ["appoint_to_type", "appoint_to_id"], name: "index_event_group_appointments_on_appoint_to"
+    t.index ["company_id"], name: "index_event_group_appointments_on_company_id"
     t.index ["discarded_at"], name: "index_event_group_appointments_on_discarded_at"
     t.index ["event_group_id"], name: "index_event_group_appointments_on_event_group_id"
   end
@@ -961,6 +1011,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
   end
 
   create_table "exam_appointments", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "company_id", null: false
     t.uuid "exam_id", null: false
     t.string "appoint_from_type"
     t.uuid "appoint_from_id"
@@ -977,6 +1028,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.integer "workflow_status"
     t.integer "business_type"
     t.datetime "discarded_at"
+    t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["appoint_by_type", "appoint_by_id"], name: "index_exam_appointments_on_appoint_by"
@@ -984,6 +1036,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.index ["appoint_from_type", "appoint_from_id"], name: "index_exam_appointments_on_appoint_from"
     t.index ["appoint_to_type", "appoint_to_id"], name: "index_exam_appointments_on_appoint_to"
     t.index ["appoint_to_type", "appoint_to_id"], name: "index_exam_appointments_on_appoint_to_type_and_appoint_to_id"
+    t.index ["company_id"], name: "index_exam_appointments_on_company_id"
     t.index ["discarded_at"], name: "index_exam_appointments_on_discarded_at"
     t.index ["exam_id"], name: "index_exam_appointments_on_exam_id"
   end
@@ -1042,6 +1095,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.integer "business_type"
     t.datetime "discarded_at"
     t.jsonb "metadata", default: {}
+    t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["branch_id"], name: "index_facilities_on_branch_id"
@@ -1051,6 +1105,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
   end
 
   create_table "facility_appointments", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "company_id", null: false
     t.uuid "facility_id", null: false
     t.string "appoint_from_type"
     t.uuid "appoint_from_id"
@@ -1067,17 +1122,20 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.integer "workflow_status"
     t.integer "business_type"
     t.datetime "discarded_at"
+    t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["appoint_by_type", "appoint_by_id"], name: "index_facility_appointments_on_appoint_by"
     t.index ["appoint_for_type", "appoint_for_id"], name: "index_facility_appointments_on_appoint_for"
     t.index ["appoint_from_type", "appoint_from_id"], name: "index_facility_appointments_on_appoint_from"
     t.index ["appoint_to_type", "appoint_to_id"], name: "index_facility_appointments_on_appoint_to"
+    t.index ["company_id"], name: "index_facility_appointments_on_company_id"
     t.index ["discarded_at"], name: "index_facility_appointments_on_discarded_at"
     t.index ["facility_id"], name: "index_facility_appointments_on_facility_id"
   end
 
   create_table "facility_group_appointments", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "company_id", null: false
     t.uuid "facility_group_id", null: false
     t.string "appoint_from_type"
     t.uuid "appoint_from_id"
@@ -1094,12 +1152,14 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.integer "workflow_status"
     t.integer "business_type"
     t.datetime "discarded_at"
+    t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["appoint_by_type", "appoint_by_id"], name: "index_facility_group_appointments_on_appoint_by"
     t.index ["appoint_for_type", "appoint_for_id"], name: "index_facility_group_appointments_on_appoint_for"
     t.index ["appoint_from_type", "appoint_from_id"], name: "index_facility_group_appointments_on_appoint_from"
     t.index ["appoint_to_type", "appoint_to_id"], name: "index_facility_group_appointments_on_appoint_to"
+    t.index ["company_id"], name: "index_facility_group_appointments_on_company_id"
     t.index ["discarded_at"], name: "index_facility_group_appointments_on_discarded_at"
     t.index ["facility_group_id"], name: "index_facility_group_appointments_on_facility_group_id"
   end
@@ -1116,6 +1176,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.integer "business_type"
     t.datetime "discarded_at"
     t.jsonb "metadata", default: {}
+    t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["branch_id"], name: "index_facility_groups_on_branch_id"
@@ -1136,6 +1197,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.integer "business_type"
     t.datetime "discarded_at"
     t.jsonb "metadata", default: {}
+    t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["branch_id"], name: "index_inventories_on_branch_id"
@@ -1145,6 +1207,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
   end
 
   create_table "inventory_item_appointments", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "company_id", null: false
     t.uuid "inventory_item_id", null: false
     t.string "appoint_from_type"
     t.uuid "appoint_from_id"
@@ -1161,12 +1224,14 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.integer "workflow_status"
     t.integer "business_type"
     t.datetime "discarded_at"
+    t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["appoint_by_type", "appoint_by_id"], name: "index_inventory_item_appointments_on_appoint_by"
     t.index ["appoint_for_type", "appoint_for_id"], name: "index_inventory_item_appointments_on_appoint_for"
     t.index ["appoint_from_type", "appoint_from_id"], name: "index_inventory_item_appointments_on_appoint_from"
     t.index ["appoint_to_type", "appoint_to_id"], name: "index_inventory_item_appointments_on_appoint_to"
+    t.index ["company_id"], name: "index_inventory_item_appointments_on_company_id"
     t.index ["discarded_at"], name: "index_inventory_item_appointments_on_discarded_at"
     t.index ["inventory_item_id"], name: "index_inventory_item_appointments_on_inventory_item_id"
   end
@@ -1192,6 +1257,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.integer "business_type"
     t.datetime "discarded_at"
     t.jsonb "metadata", default: {}
+    t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["barcode"], name: "index_inventory_items_on_barcode"
@@ -1207,6 +1273,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
   end
 
   create_table "inventory_transaction_appointments", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "company_id", null: false
     t.uuid "inventory_transaction_id", null: false
     t.string "appoint_from_type"
     t.uuid "appoint_from_id"
@@ -1223,12 +1290,14 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.integer "workflow_status"
     t.integer "business_type"
     t.datetime "discarded_at"
+    t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["appoint_by_type", "appoint_by_id"], name: "index_inventory_transaction_appointments_on_appoint_by"
     t.index ["appoint_for_type", "appoint_for_id"], name: "index_inventory_transaction_appointments_on_appoint_for"
     t.index ["appoint_from_type", "appoint_from_id"], name: "index_inventory_transaction_appointments_on_appoint_from"
     t.index ["appoint_to_type", "appoint_to_id"], name: "index_inventory_transaction_appointments_on_appoint_to"
+    t.index ["company_id"], name: "index_inventory_transaction_appointments_on_company_id"
     t.index ["discarded_at"], name: "index_inventory_transaction_appointments_on_discarded_at"
     t.index ["inventory_transaction_id"], name: "idx_on_inventory_transaction_id_49862a2fce"
   end
@@ -1253,6 +1322,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.integer "business_type"
     t.datetime "discarded_at"
     t.jsonb "metadata", default: {}
+    t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["appoint_by_type", "appoint_by_id"], name: "index_inventory_transactions_on_appoint_by"
@@ -1283,6 +1353,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.integer "business_type"
     t.datetime "discarded_at"
     t.jsonb "metadata", default: {}
+    t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["branch_id"], name: "index_invoices_on_branch_id"
@@ -1293,6 +1364,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
   end
 
   create_table "notification_appointments", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "company_id", null: false
     t.uuid "notification_id", null: false
     t.string "appoint_from_type"
     t.uuid "appoint_from_id"
@@ -1309,17 +1381,20 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.integer "workflow_status"
     t.integer "business_type"
     t.datetime "discarded_at"
+    t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["appoint_by_type", "appoint_by_id"], name: "index_notification_appointments_on_appoint_by"
     t.index ["appoint_for_type", "appoint_for_id"], name: "index_notification_appointments_on_appoint_for"
     t.index ["appoint_from_type", "appoint_from_id"], name: "index_notification_appointments_on_appoint_from"
     t.index ["appoint_to_type", "appoint_to_id"], name: "index_notification_appointments_on_appoint_to"
+    t.index ["company_id"], name: "index_notification_appointments_on_company_id"
     t.index ["discarded_at"], name: "index_notification_appointments_on_discarded_at"
     t.index ["notification_id"], name: "index_notification_appointments_on_notification_id"
   end
 
   create_table "notification_group_appointments", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "company_id", null: false
     t.uuid "notification_group_id", null: false
     t.string "appoint_from_type"
     t.uuid "appoint_from_id"
@@ -1336,12 +1411,14 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.integer "workflow_status"
     t.integer "business_type"
     t.datetime "discarded_at"
+    t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["appoint_by_type", "appoint_by_id"], name: "index_notification_group_appointments_on_appoint_by"
     t.index ["appoint_for_type", "appoint_for_id"], name: "index_notification_group_appointments_on_appoint_for"
     t.index ["appoint_from_type", "appoint_from_id"], name: "index_notification_group_appointments_on_appoint_from"
     t.index ["appoint_to_type", "appoint_to_id"], name: "index_notification_group_appointments_on_appoint_to"
+    t.index ["company_id"], name: "index_notification_group_appointments_on_company_id"
     t.index ["discarded_at"], name: "index_notification_group_appointments_on_discarded_at"
     t.index ["notification_group_id"], name: "index_notification_group_appointments_on_notification_group_id"
   end
@@ -1358,6 +1435,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.integer "business_type"
     t.datetime "discarded_at"
     t.jsonb "metadata", default: {}
+    t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["branch_id"], name: "index_notification_groups_on_branch_id"
@@ -1389,6 +1467,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
   end
 
   create_table "order_appointments", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "company_id", null: false
     t.uuid "order_id", null: false
     t.string "appoint_from_type"
     t.uuid "appoint_from_id"
@@ -1408,17 +1487,20 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.integer "workflow_status"
     t.integer "business_type"
     t.datetime "discarded_at"
+    t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["appoint_by_type", "appoint_by_id"], name: "index_order_appointments_on_appoint_by"
     t.index ["appoint_for_type", "appoint_for_id"], name: "index_order_appointments_on_appoint_for"
     t.index ["appoint_from_type", "appoint_from_id"], name: "index_order_appointments_on_appoint_from"
     t.index ["appoint_to_type", "appoint_to_id"], name: "index_order_appointments_on_appoint_to"
+    t.index ["company_id"], name: "index_order_appointments_on_company_id"
     t.index ["discarded_at"], name: "index_order_appointments_on_discarded_at"
     t.index ["order_id"], name: "index_order_appointments_on_order_id"
   end
 
   create_table "order_group_appointments", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "company_id", null: false
     t.uuid "order_group_id", null: false
     t.string "appoint_from_type"
     t.uuid "appoint_from_id"
@@ -1438,12 +1520,14 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.integer "workflow_status"
     t.integer "business_type"
     t.datetime "discarded_at"
+    t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["appoint_by_type", "appoint_by_id"], name: "index_order_group_appointments_on_appoint_by"
     t.index ["appoint_for_type", "appoint_for_id"], name: "index_order_group_appointments_on_appoint_for"
     t.index ["appoint_from_type", "appoint_from_id"], name: "index_order_group_appointments_on_appoint_from"
     t.index ["appoint_to_type", "appoint_to_id"], name: "index_order_group_appointments_on_appoint_to"
+    t.index ["company_id"], name: "index_order_group_appointments_on_company_id"
     t.index ["discarded_at"], name: "index_order_group_appointments_on_discarded_at"
     t.index ["order_group_id"], name: "index_order_group_appointments_on_order_group_id"
   end
@@ -1463,6 +1547,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.integer "business_type"
     t.datetime "discarded_at"
     t.jsonb "metadata", default: {}
+    t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["branch_id"], name: "index_order_groups_on_branch_id"
@@ -1495,6 +1580,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.integer "business_type"
     t.datetime "discarded_at"
     t.jsonb "metadata", default: {}
+    t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["barcode"], name: "index_orders_on_barcode"
@@ -1539,6 +1625,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.integer "business_type"
     t.datetime "discarded_at"
     t.jsonb "metadata", default: {}
+    t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["category_id"], name: "index_payment_methods_on_category_id"
@@ -1564,6 +1651,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.integer "business_type"
     t.datetime "discarded_at"
     t.jsonb "metadata", default: {}
+    t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["branch_id"], name: "index_payments_on_branch_id"
@@ -1591,6 +1679,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.integer "workflow_status"
     t.integer "business_type"
     t.datetime "discarded_at"
+    t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["appoint_by_type", "appoint_by_id"], name: "index_period_appointments_on_appoint_by"
@@ -1631,10 +1720,12 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.string "code"
     t.string "resource"
     t.string "action"
+    t.jsonb "tag_conditions", default: {}
     t.integer "lifecycle_status"
     t.integer "workflow_status"
     t.integer "business_type"
     t.datetime "discarded_at"
+    t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["branch_id"], name: "index_policies_on_branch_id"
@@ -1643,6 +1734,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
   end
 
   create_table "policy_appointments", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "company_id", null: false
     t.uuid "policy_id", null: false
     t.string "appoint_to_type", null: false
     t.uuid "appoint_to_id", null: false
@@ -1653,10 +1745,12 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.integer "workflow_status"
     t.integer "business_type"
     t.datetime "discarded_at"
+    t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["appoint_to_type", "appoint_to_id"], name: "index_policy_appointments_on_appoint_to"
     t.index ["appoint_to_type", "appoint_to_id"], name: "index_policy_appointments_on_appoint_to_type_and_appoint_to_id"
+    t.index ["company_id"], name: "index_policy_appointments_on_company_id"
     t.index ["discarded_at"], name: "index_policy_appointments_on_discarded_at"
     t.index ["policy_id"], name: "index_policy_appointments_on_policy_id"
   end
@@ -1679,6 +1773,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.integer "workflow_status"
     t.integer "business_type"
     t.datetime "discarded_at"
+    t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["appoint_by_type", "appoint_by_id"], name: "index_price_appointments_on_appoint_by"
@@ -1699,6 +1794,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
   end
 
   create_table "product_appointments", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "company_id", null: false
     t.uuid "product_id", null: false
     t.string "appoint_from_type"
     t.uuid "appoint_from_id"
@@ -1715,17 +1811,20 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.integer "workflow_status"
     t.integer "business_type"
     t.datetime "discarded_at"
+    t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["appoint_by_type", "appoint_by_id"], name: "index_product_appointments_on_appoint_by"
     t.index ["appoint_for_type", "appoint_for_id"], name: "index_product_appointments_on_appoint_for"
     t.index ["appoint_from_type", "appoint_from_id"], name: "index_product_appointments_on_appoint_from"
     t.index ["appoint_to_type", "appoint_to_id"], name: "index_product_appointments_on_appoint_to"
+    t.index ["company_id"], name: "index_product_appointments_on_company_id"
     t.index ["discarded_at"], name: "index_product_appointments_on_discarded_at"
     t.index ["product_id"], name: "index_product_appointments_on_product_id"
   end
 
   create_table "product_group_appointments", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "company_id", null: false
     t.uuid "product_group_id", null: false
     t.string "appoint_from_type"
     t.uuid "appoint_from_id"
@@ -1742,12 +1841,14 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.integer "workflow_status"
     t.integer "business_type"
     t.datetime "discarded_at"
+    t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["appoint_by_type", "appoint_by_id"], name: "index_product_group_appointments_on_appoint_by"
     t.index ["appoint_for_type", "appoint_for_id"], name: "index_product_group_appointments_on_appoint_for"
     t.index ["appoint_from_type", "appoint_from_id"], name: "index_product_group_appointments_on_appoint_from"
     t.index ["appoint_to_type", "appoint_to_id"], name: "index_product_group_appointments_on_appoint_to"
+    t.index ["company_id"], name: "index_product_group_appointments_on_company_id"
     t.index ["discarded_at"], name: "index_product_group_appointments_on_discarded_at"
     t.index ["product_group_id"], name: "index_product_group_appointments_on_product_group_id"
   end
@@ -1764,6 +1865,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.integer "business_type"
     t.datetime "discarded_at"
     t.jsonb "metadata", default: {}
+    t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["branch_id"], name: "index_product_groups_on_branch_id"
@@ -1795,6 +1897,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.integer "business_type"
     t.datetime "discarded_at"
     t.jsonb "metadata", default: {}
+    t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["barcode"], name: "index_products_on_barcode"
@@ -1810,6 +1913,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
   end
 
   create_table "project_appointments", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "company_id", null: false
     t.uuid "project_id", null: false
     t.string "appoint_from_type"
     t.uuid "appoint_from_id"
@@ -1826,17 +1930,20 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.integer "workflow_status"
     t.integer "business_type"
     t.datetime "discarded_at"
+    t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["appoint_by_type", "appoint_by_id"], name: "index_project_appointments_on_appoint_by"
     t.index ["appoint_for_type", "appoint_for_id"], name: "index_project_appointments_on_appoint_for"
     t.index ["appoint_from_type", "appoint_from_id"], name: "index_project_appointments_on_appoint_from"
     t.index ["appoint_to_type", "appoint_to_id"], name: "index_project_appointments_on_appoint_to"
+    t.index ["company_id"], name: "index_project_appointments_on_company_id"
     t.index ["discarded_at"], name: "index_project_appointments_on_discarded_at"
     t.index ["project_id"], name: "index_project_appointments_on_project_id"
   end
 
   create_table "project_group_appointments", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "company_id", null: false
     t.uuid "project_group_id", null: false
     t.string "appoint_from_type"
     t.uuid "appoint_from_id"
@@ -1853,12 +1960,14 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.integer "workflow_status"
     t.integer "business_type"
     t.datetime "discarded_at"
+    t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["appoint_by_type", "appoint_by_id"], name: "index_project_group_appointments_on_appoint_by"
     t.index ["appoint_for_type", "appoint_for_id"], name: "index_project_group_appointments_on_appoint_for"
     t.index ["appoint_from_type", "appoint_from_id"], name: "index_project_group_appointments_on_appoint_from"
     t.index ["appoint_to_type", "appoint_to_id"], name: "index_project_group_appointments_on_appoint_to"
+    t.index ["company_id"], name: "index_project_group_appointments_on_company_id"
     t.index ["discarded_at"], name: "index_project_group_appointments_on_discarded_at"
     t.index ["project_group_id"], name: "index_project_group_appointments_on_project_group_id"
   end
@@ -1875,6 +1984,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.integer "business_type"
     t.datetime "discarded_at"
     t.jsonb "metadata", default: {}
+    t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["branch_id"], name: "index_project_groups_on_branch_id"
@@ -1896,6 +2006,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.integer "business_type"
     t.datetime "discarded_at"
     t.jsonb "metadata", default: {}
+    t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["branch_id"], name: "index_projects_on_branch_id"
@@ -1926,6 +2037,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.integer "business_type"
     t.datetime "discarded_at"
     t.jsonb "metadata", default: {}
+    t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["barcode"], name: "index_purchase_items_on_barcode"
@@ -1952,6 +2064,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.integer "business_type"
     t.datetime "discarded_at"
     t.jsonb "metadata", default: {}
+    t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["branch_id"], name: "index_purchases_on_branch_id"
@@ -1981,6 +2094,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
   end
 
   create_table "role_appointments", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "company_id", null: false
     t.uuid "role_id", null: false
     t.string "appoint_to_type", null: false
     t.uuid "appoint_to_id", null: false
@@ -1991,10 +2105,12 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.integer "workflow_status"
     t.integer "business_type"
     t.datetime "discarded_at"
+    t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["appoint_to_type", "appoint_to_id"], name: "index_role_appointments_on_appoint_to"
     t.index ["appoint_to_type", "appoint_to_id"], name: "index_role_appointments_on_appoint_to_type_and_appoint_to_id"
+    t.index ["company_id"], name: "index_role_appointments_on_company_id"
     t.index ["discarded_at"], name: "index_role_appointments_on_discarded_at"
     t.index ["role_id"], name: "index_role_appointments_on_role_id"
   end
@@ -2010,6 +2126,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.integer "workflow_status"
     t.integer "business_type"
     t.datetime "discarded_at"
+    t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["branch_id"], name: "index_roles_on_branch_id"
@@ -2018,6 +2135,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
   end
 
   create_table "service_appointments", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "company_id", null: false
     t.uuid "service_id", null: false
     t.string "appoint_from_type"
     t.uuid "appoint_from_id"
@@ -2036,17 +2154,20 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.datetime "start_at"
     t.integer "business_type"
     t.datetime "discarded_at"
+    t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["appoint_by_type", "appoint_by_id"], name: "index_service_appointments_on_appoint_by"
     t.index ["appoint_for_type", "appoint_for_id"], name: "index_service_appointments_on_appoint_for"
     t.index ["appoint_from_type", "appoint_from_id"], name: "index_service_appointments_on_appoint_from"
     t.index ["appoint_to_type", "appoint_to_id"], name: "index_service_appointments_on_appoint_to"
+    t.index ["company_id"], name: "index_service_appointments_on_company_id"
     t.index ["discarded_at"], name: "index_service_appointments_on_discarded_at"
     t.index ["service_id"], name: "index_service_appointments_on_service_id"
   end
 
   create_table "service_group_appointments", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "company_id", null: false
     t.uuid "service_group_id", null: false
     t.string "appoint_from_type"
     t.uuid "appoint_from_id"
@@ -2065,12 +2186,14 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.datetime "start_at"
     t.integer "business_type"
     t.datetime "discarded_at"
+    t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["appoint_by_type", "appoint_by_id"], name: "index_service_group_appointments_on_appoint_by"
     t.index ["appoint_for_type", "appoint_for_id"], name: "index_service_group_appointments_on_appoint_for"
     t.index ["appoint_from_type", "appoint_from_id"], name: "index_service_group_appointments_on_appoint_from"
     t.index ["appoint_to_type", "appoint_to_id"], name: "index_service_group_appointments_on_appoint_to"
+    t.index ["company_id"], name: "index_service_group_appointments_on_company_id"
     t.index ["discarded_at"], name: "index_service_group_appointments_on_discarded_at"
     t.index ["service_group_id"], name: "index_service_group_appointments_on_service_group_id"
   end
@@ -2089,6 +2212,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.integer "business_type"
     t.datetime "discarded_at"
     t.jsonb "metadata", default: {}
+    t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["branch_id"], name: "index_service_groups_on_branch_id"
@@ -2111,6 +2235,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.integer "business_type"
     t.datetime "discarded_at"
     t.jsonb "metadata", default: {}
+    t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["branch_id"], name: "index_services_on_branch_id"
@@ -2132,6 +2257,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
   end
 
   create_table "setting_appointments", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "company_id", null: false
     t.uuid "setting_id", null: false
     t.string "appoint_from_type"
     t.uuid "appoint_from_id"
@@ -2148,6 +2274,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.integer "workflow_status"
     t.integer "business_type"
     t.datetime "discarded_at"
+    t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["appoint_by_type", "appoint_by_id"], name: "index_setting_appointments_on_appoint_by"
@@ -2155,11 +2282,13 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.index ["appoint_from_type", "appoint_from_id"], name: "index_setting_appointments_on_appoint_from"
     t.index ["appoint_to_type", "appoint_to_id"], name: "idx_on_appoint_to_type_appoint_to_id_2604430405"
     t.index ["appoint_to_type", "appoint_to_id"], name: "index_setting_appointments_on_appoint_to"
+    t.index ["company_id"], name: "index_setting_appointments_on_company_id"
     t.index ["discarded_at"], name: "index_setting_appointments_on_discarded_at"
     t.index ["setting_id"], name: "index_setting_appointments_on_setting_id"
   end
 
   create_table "setting_group_appointments", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "company_id", null: false
     t.uuid "setting_group_id", null: false
     t.string "appoint_from_type"
     t.uuid "appoint_from_id"
@@ -2176,6 +2305,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.integer "workflow_status"
     t.integer "business_type"
     t.datetime "discarded_at"
+    t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["appoint_by_type", "appoint_by_id"], name: "index_setting_group_appointments_on_appoint_by"
@@ -2183,6 +2313,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.index ["appoint_from_type", "appoint_from_id"], name: "index_setting_group_appointments_on_appoint_from"
     t.index ["appoint_to_type", "appoint_to_id"], name: "idx_on_appoint_to_type_appoint_to_id_2769e0ab46"
     t.index ["appoint_to_type", "appoint_to_id"], name: "index_setting_group_appointments_on_appoint_to"
+    t.index ["company_id"], name: "index_setting_group_appointments_on_company_id"
     t.index ["discarded_at"], name: "index_setting_group_appointments_on_discarded_at"
     t.index ["setting_group_id"], name: "index_setting_group_appointments_on_setting_group_id"
   end
@@ -2480,12 +2611,14 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.integer "country_code"
     t.boolean "active", default: true, null: false
     t.jsonb "metadata", default: {}
+    t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["name"], name: "index_systems_on_name", unique: true
   end
 
   create_table "tag_appointments", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "company_id", null: false
     t.uuid "tag_id", null: false
     t.string "appoint_from_type"
     t.uuid "appoint_from_id"
@@ -2497,6 +2630,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.uuid "appoint_by_id"
     t.string "value"
     t.string "description"
+    t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["appoint_by_type", "appoint_by_id"], name: "index_tag_appointments_on_appoint_by"
@@ -2504,20 +2638,24 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.index ["appoint_from_type", "appoint_from_id"], name: "index_tag_appointments_on_appoint_from"
     t.index ["appoint_to_type", "appoint_to_id"], name: "index_tag_appointments_on_appoint_to"
     t.index ["appoint_to_type", "appoint_to_id"], name: "index_tag_appointments_on_appoint_to_type_and_appoint_to_id"
+    t.index ["company_id"], name: "index_tag_appointments_on_company_id"
     t.index ["tag_id"], name: "index_tag_appointments_on_tag_id"
   end
 
   create_table "tags", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.uuid "company_id", null: false
-    t.string "name"
+    t.string "key"
+    t.string "value"
     t.string "description"
     t.string "code"
+    t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["company_id"], name: "index_tags_on_company_id"
   end
 
   create_table "task_appointments", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "company_id", null: false
     t.uuid "task_id", null: false
     t.string "appoint_from_type"
     t.uuid "appoint_from_id"
@@ -2534,17 +2672,20 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.integer "workflow_status"
     t.integer "business_type"
     t.datetime "discarded_at"
+    t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["appoint_by_type", "appoint_by_id"], name: "index_task_appointments_on_appoint_by"
     t.index ["appoint_for_type", "appoint_for_id"], name: "index_task_appointments_on_appoint_for"
     t.index ["appoint_from_type", "appoint_from_id"], name: "index_task_appointments_on_appoint_from"
     t.index ["appoint_to_type", "appoint_to_id"], name: "index_task_appointments_on_appoint_to"
+    t.index ["company_id"], name: "index_task_appointments_on_company_id"
     t.index ["discarded_at"], name: "index_task_appointments_on_discarded_at"
     t.index ["task_id"], name: "index_task_appointments_on_task_id"
   end
 
   create_table "task_group_appointments", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "company_id", null: false
     t.uuid "task_group_id", null: false
     t.string "appoint_from_type"
     t.uuid "appoint_from_id"
@@ -2561,12 +2702,14 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.integer "workflow_status"
     t.integer "business_type"
     t.datetime "discarded_at"
+    t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["appoint_by_type", "appoint_by_id"], name: "index_task_group_appointments_on_appoint_by"
     t.index ["appoint_for_type", "appoint_for_id"], name: "index_task_group_appointments_on_appoint_for"
     t.index ["appoint_from_type", "appoint_from_id"], name: "index_task_group_appointments_on_appoint_from"
     t.index ["appoint_to_type", "appoint_to_id"], name: "index_task_group_appointments_on_appoint_to"
+    t.index ["company_id"], name: "index_task_group_appointments_on_company_id"
     t.index ["discarded_at"], name: "index_task_group_appointments_on_discarded_at"
     t.index ["task_group_id"], name: "index_task_group_appointments_on_task_group_id"
   end
@@ -2583,6 +2726,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.integer "business_type"
     t.datetime "discarded_at"
     t.jsonb "metadata", default: {}
+    t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["branch_id"], name: "index_task_groups_on_branch_id"
@@ -2605,6 +2749,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.integer "business_type"
     t.datetime "discarded_at"
     t.jsonb "metadata", default: {}
+    t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["branch_id"], name: "index_tasks_on_branch_id"
@@ -2631,6 +2776,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.string "single_access_token"
     t.datetime "discarded_at"
     t.jsonb "metadata", default: {}
+    t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["discarded_at"], name: "index_users_on_discarded_at"
@@ -2645,9 +2791,12 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
   add_foreign_key "address_appointments", "addresses"
   add_foreign_key "answers", "categories"
+  add_foreign_key "answers", "companies"
   add_foreign_key "answers", "questions"
   add_foreign_key "article_appointments", "articles"
+  add_foreign_key "article_appointments", "companies"
   add_foreign_key "article_group_appointments", "article_groups"
+  add_foreign_key "article_group_appointments", "companies"
   add_foreign_key "article_groups", "branches"
   add_foreign_key "article_groups", "categories"
   add_foreign_key "article_groups", "companies"
@@ -2679,6 +2828,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
   add_foreign_key "branches", "companies"
   add_foreign_key "brands", "categories"
   add_foreign_key "cart_appointments", "carts"
+  add_foreign_key "cart_appointments", "companies"
   add_foreign_key "cart_groups", "branches"
   add_foreign_key "cart_groups", "categories"
   add_foreign_key "cart_groups", "companies"
@@ -2688,7 +2838,9 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
   add_foreign_key "carts", "companies"
   add_foreign_key "categories", "companies"
   add_foreign_key "companies", "users"
+  add_foreign_key "customer_appointments", "companies"
   add_foreign_key "customer_appointments", "customers"
+  add_foreign_key "customer_group_appointments", "companies"
   add_foreign_key "customer_group_appointments", "customer_groups"
   add_foreign_key "customer_groups", "branches"
   add_foreign_key "customer_groups", "categories"
@@ -2697,10 +2849,13 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
   add_foreign_key "customers", "categories"
   add_foreign_key "customers", "companies"
   add_foreign_key "customers", "users"
+  add_foreign_key "department_appointments", "companies"
   add_foreign_key "department_appointments", "departments"
   add_foreign_key "departments", "categories"
   add_foreign_key "departments", "companies"
+  add_foreign_key "document_appointments", "companies"
   add_foreign_key "document_appointments", "documents"
+  add_foreign_key "document_group_appointments", "companies"
   add_foreign_key "document_group_appointments", "document_groups"
   add_foreign_key "document_groups", "branches"
   add_foreign_key "document_groups", "categories"
@@ -2709,7 +2864,9 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
   add_foreign_key "documents", "categories"
   add_foreign_key "documents", "companies"
   add_foreign_key "documents", "document_groups"
+  add_foreign_key "employee_appointments", "companies"
   add_foreign_key "employee_appointments", "employees"
+  add_foreign_key "employee_group_appointments", "companies"
   add_foreign_key "employee_group_appointments", "employee_groups"
   add_foreign_key "employee_groups", "branches"
   add_foreign_key "employee_groups", "categories"
@@ -2718,7 +2875,9 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
   add_foreign_key "employees", "categories"
   add_foreign_key "employees", "companies"
   add_foreign_key "employees", "users"
+  add_foreign_key "event_appointments", "companies"
   add_foreign_key "event_appointments", "events"
+  add_foreign_key "event_group_appointments", "companies"
   add_foreign_key "event_group_appointments", "event_groups"
   add_foreign_key "event_groups", "branches"
   add_foreign_key "event_groups", "categories"
@@ -2727,6 +2886,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
   add_foreign_key "events", "categories"
   add_foreign_key "events", "companies"
   add_foreign_key "events", "event_groups"
+  add_foreign_key "exam_appointments", "companies"
   add_foreign_key "exam_appointments", "exams"
   add_foreign_key "exam_groups", "branches"
   add_foreign_key "exam_groups", "categories"
@@ -2738,7 +2898,9 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
   add_foreign_key "facilities", "branches"
   add_foreign_key "facilities", "categories"
   add_foreign_key "facilities", "companies"
+  add_foreign_key "facility_appointments", "companies"
   add_foreign_key "facility_appointments", "facilities"
+  add_foreign_key "facility_group_appointments", "companies"
   add_foreign_key "facility_group_appointments", "facility_groups"
   add_foreign_key "facility_groups", "branches"
   add_foreign_key "facility_groups", "categories"
@@ -2746,11 +2908,13 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
   add_foreign_key "inventories", "branches"
   add_foreign_key "inventories", "categories"
   add_foreign_key "inventories", "companies"
+  add_foreign_key "inventory_item_appointments", "companies"
   add_foreign_key "inventory_item_appointments", "inventory_items"
   add_foreign_key "inventory_items", "branches"
   add_foreign_key "inventory_items", "categories"
   add_foreign_key "inventory_items", "companies"
   add_foreign_key "inventory_items", "inventories"
+  add_foreign_key "inventory_transaction_appointments", "companies"
   add_foreign_key "inventory_transaction_appointments", "inventory_transactions"
   add_foreign_key "inventory_transactions", "branches"
   add_foreign_key "inventory_transactions", "categories"
@@ -2759,7 +2923,9 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
   add_foreign_key "invoices", "categories"
   add_foreign_key "invoices", "companies"
   add_foreign_key "invoices", "orders"
+  add_foreign_key "notification_appointments", "companies"
   add_foreign_key "notification_appointments", "notifications"
+  add_foreign_key "notification_group_appointments", "companies"
   add_foreign_key "notification_group_appointments", "notification_groups"
   add_foreign_key "notification_groups", "branches"
   add_foreign_key "notification_groups", "categories"
@@ -2768,7 +2934,9 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
   add_foreign_key "notifications", "categories"
   add_foreign_key "notifications", "companies"
   add_foreign_key "notifications", "notification_groups"
+  add_foreign_key "order_appointments", "companies"
   add_foreign_key "order_appointments", "orders"
+  add_foreign_key "order_group_appointments", "companies"
   add_foreign_key "order_group_appointments", "order_groups"
   add_foreign_key "order_groups", "branches"
   add_foreign_key "order_groups", "categories"
@@ -2791,9 +2959,12 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
   add_foreign_key "period_prices", "prices"
   add_foreign_key "policies", "branches"
   add_foreign_key "policies", "companies"
+  add_foreign_key "policy_appointments", "companies"
   add_foreign_key "policy_appointments", "policies"
   add_foreign_key "price_appointments", "prices"
+  add_foreign_key "product_appointments", "companies"
   add_foreign_key "product_appointments", "products"
+  add_foreign_key "product_group_appointments", "companies"
   add_foreign_key "product_group_appointments", "product_groups"
   add_foreign_key "product_groups", "branches"
   add_foreign_key "product_groups", "categories"
@@ -2802,7 +2973,9 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
   add_foreign_key "products", "brands"
   add_foreign_key "products", "categories"
   add_foreign_key "products", "companies"
+  add_foreign_key "project_appointments", "companies"
   add_foreign_key "project_appointments", "projects"
+  add_foreign_key "project_group_appointments", "companies"
   add_foreign_key "project_group_appointments", "project_groups"
   add_foreign_key "project_groups", "branches"
   add_foreign_key "project_groups", "categories"
@@ -2821,10 +2994,13 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
   add_foreign_key "questions", "branches"
   add_foreign_key "questions", "categories"
   add_foreign_key "questions", "companies"
+  add_foreign_key "role_appointments", "companies"
   add_foreign_key "role_appointments", "roles"
   add_foreign_key "roles", "branches"
   add_foreign_key "roles", "companies"
+  add_foreign_key "service_appointments", "companies"
   add_foreign_key "service_appointments", "services"
+  add_foreign_key "service_group_appointments", "companies"
   add_foreign_key "service_group_appointments", "service_groups"
   add_foreign_key "service_groups", "branches"
   add_foreign_key "service_groups", "categories"
@@ -2833,7 +3009,9 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
   add_foreign_key "services", "categories"
   add_foreign_key "services", "companies"
   add_foreign_key "sessions", "users"
+  add_foreign_key "setting_appointments", "companies"
   add_foreign_key "setting_appointments", "settings"
+  add_foreign_key "setting_group_appointments", "companies"
   add_foreign_key "setting_group_appointments", "setting_groups"
   add_foreign_key "setting_groups", "branches"
   add_foreign_key "setting_groups", "categories"
@@ -2873,9 +3051,12 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
   add_foreign_key "system_subscriptions", "prices"
   add_foreign_key "system_subscriptions", "system_subscription_groups"
   add_foreign_key "system_subscriptions", "system_subscription_plans"
+  add_foreign_key "tag_appointments", "companies"
   add_foreign_key "tag_appointments", "tags"
   add_foreign_key "tags", "companies"
+  add_foreign_key "task_appointments", "companies"
   add_foreign_key "task_appointments", "tasks"
+  add_foreign_key "task_group_appointments", "companies"
   add_foreign_key "task_group_appointments", "task_groups"
   add_foreign_key "task_groups", "branches"
   add_foreign_key "task_groups", "categories"

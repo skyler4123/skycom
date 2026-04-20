@@ -1,6 +1,10 @@
 class Role < ApplicationRecord
   include TagConcern
 
+  attribute :permission_resource_name, :string, default: -> { self.name }
+
+  CRUD_ACTIONS = %w[create read update delete].freeze
+
   # --- Associations ---
   # REASON: When a Role's timestamp is updated (either directly or via PolicyAppointment), it touches the Company. This ensures the Company's cache_key changes.
   belongs_to :company, touch: true
@@ -80,6 +84,31 @@ class Role < ApplicationRecord
 
   # This fires whenever the Role is touched (e.g., by a PolicyAppointment change)
   after_touch :invalidate_employee_caches
+
+  def setup_policies_for!(resource_name)
+    CRUD_ACTIONS.each do |action|
+      policy = Policy.find_or_create_by!(
+        name: "Can #{action} #{resource_name}",
+        company: company,
+        resource: resource_name,
+        action: action
+      ) do |p|
+        p.description = "Allows #{action} operations on #{resource_name}"
+        p.business_type = :operational
+        p.lifecycle_status = :active
+        p.branch_id = company.branches.first&.id
+      end
+
+      appointment = PolicyAppointment.find_or_create_by!(
+        company: company,
+        policy: policy,
+        appoint_to: self
+      )
+
+      appointment.update!(workflow_status: :inactive) if appointment.new_record?
+    end
+  end
+
   private
 
   def invalidate_employee_caches

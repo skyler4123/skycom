@@ -1,4 +1,6 @@
 class PaymentMethodAppointment < ApplicationRecord
+  attribute :permission_resource_name, :string, default: -> { self.name }
+
   # --- Associations ---
   belongs_to :payment_method
   belongs_to :company

@@ -411,9 +411,10 @@ export const form = ({
   method = "POST", 
   dataController = "form",
   dataAction = "submit->form#submit", 
-  // className = "flex flex-col gap-4",
   className = "", 
-  html = "" 
+  html = "",
+  confirm = false,
+  confirmMessage = "Are you sure?"
 }) => {
   const upperMethod = method.toUpperCase()
   const isGet = upperMethod === "GET"
@@ -443,6 +444,8 @@ export const form = ({
       method="${formMethod}" 
       ${controllerAttr}
       ${actionAttr}
+      data-form-confirm-value="${confirm}"
+      data-form-confirm-message-value="${confirmMessage}"
       class="${className}"
     >
       ${methodTags}
@@ -552,4 +555,34 @@ export const tooltip = (options) => {
     data-tooltip-delay-value="${delay}"
     data-tooltip-duration-value="${duration}"
   `.trim()
+}
+
+
+export const checkbox = ({
+  url = pathname(),
+  method = "PATCH",
+  name = "some_param_name",
+  value = false, // Initial state
+  className = "",
+  confirm = false,
+  confirmMessage = "Are you sure?"
+}) => {
+  const controller = "checkbox"
+  
+  const inputHtml = `
+    <input 
+      type="checkbox"
+      class="h-5 w-5 rounded border-slate-300 text-blue-600 cursor-pointer ${className}"
+      data-controller="${controller}"
+      data-${controller}-url-value="${url}"
+      data-${controller}-method-value="${method}"
+      data-${controller}-name-value="${name}"
+      data-${controller}-value-value="${value}"
+      data-${controller}-confirm-value="${confirm}"
+      data-${controller}-confirm-message-value="${confirmMessage}"
+      data-action="change->${controller}#toggle"
+    />
+  `
+
+  return inputHtml
 }

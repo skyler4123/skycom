@@ -30,6 +30,10 @@
 import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
+  static values = {
+    confirm: { type: Boolean, default: true },
+    confirmMessage: { type: String, default: "Are you sure?" }
+  }
   /**
    * Handles the form submission for all Skycom forms.
    * Linked via data-action="submit->form#submit"
@@ -41,6 +45,14 @@ export default class extends Controller {
     const formData = new FormData(formElement)
     const url = formElement.action || pathname()
     const method = (formElement.getAttribute("method") || "POST").toUpperCase()
+
+    // Check for confirm attribute
+    if (this.confirmValue) {
+      const message = this.confirmMessageValue
+      if (!confirm(message)) {
+        return  // User cancelled - exit early
+      }
+    }
 
     // 1. Convert Flat FormData into a Nested Object (The Rails Way)
     const body = this.nestFormData(formData)

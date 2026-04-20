@@ -1,6 +1,7 @@
 class CreateNotificationGroupAppointments < ActiveRecord::Migration[8.0]
   def change
     create_table :notification_group_appointments, id: :uuid do |t|
+      t.references :company, null: false, foreign_key: true, type: :uuid
       t.references :notification_group, null: false, foreign_key: true, type: :uuid
       t.references :appoint_from, polymorphic: true, null: true, type: :uuid
       t.references :appoint_to, polymorphic: true, null: false, type: :uuid
@@ -13,6 +14,7 @@ class CreateNotificationGroupAppointments < ActiveRecord::Migration[8.0]
       t.integer :workflow_status
       t.integer :business_type
       t.datetime :discarded_at
+      t.string :permission_resource_name
 
       t.timestamps
     end

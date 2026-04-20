@@ -1,4 +1,6 @@
 class Project < ApplicationRecord
+  attribute :permission_resource_name, :string, default: -> { self.name }
+
   include TagConcern
 
   # --- Associations ---

@@ -52,6 +52,18 @@ export const removeCookie = (name) => {
   document.cookie = name + "=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;"
 }
 
+/**
+ * Removes a specific item from localStorage by key.
+ * @param {string} key - The key of the item to remove.
+ */
+export const removeLocalStorage = (key) => {
+  if (!key) return;
+  localStorage.removeItem(key);
+}
+
+/**
+ * Retrieves the client cache from localStorage.
+ */
 export const getCache = () => {
   const raw = localStorage.getItem('client_cache_data')
   return raw ? JSON.parse(raw) : {}
@@ -79,14 +91,8 @@ export const currentRoles = () => {
   return currentCompany().roles
 }
 
-export const employee = () => {
-  return getCache().employee || []
-}
-
 export const Enums =  () => {
-  return {
-    employee: getCache().employee.enum
-  }
+  return getCache().enums
 }
 /**
  * Retrieves the current user profile from the client cache.

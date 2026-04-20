@@ -10,17 +10,17 @@ module TagConcern
     # Assigns a new tag or updates the value of an existing tag key on the resource.
     # This method is transactional to ensure atomic creation/update.
     #
-    # @param name [String] The name (key) of the tag.
+    # @param key [String] The key (key) of the tag.
     # @param value [String, nil] The value to assign to the tag.
     # @param description [String, nil] An optional description for the appointment.
     # @return [TagAppointment] The created or updated TagAppointment instance.
-    def attach_tag(name:, value: nil, description: nil)
+    def attach_tag(key:, value: nil, description: nil)
       # Ensure the object has a 'company' association for proper tag scoping
       raise "Model must belong to a company group to attach a tag." unless respond_to?(:company) && company
 
       ApplicationRecord.transaction do
         # 1. Find or create the Tag (the Key) scoped to the company
-        tag = company.tags.find_or_create_by!(name: name)
+        tag = company.tags.find_or_create_by!(key: key)
         # 2. Find or initialize the TagAppointment (the Assignment).
         # This handles the uniqueness constraint: only one Appointment per (Tag + Resource).
         appointment = tag_appointments.find_or_initialize_by(tag: tag)
@@ -28,6 +28,7 @@ module TagConcern
         # 3. Update the fields
         appointment.value = value
         appointment.description = description
+        appointment.company = company
 
         # 4. Save the appointment (creates if new, updates if existing)
         appointment.save!
@@ -36,7 +37,7 @@ module TagConcern
       end
     rescue ActiveRecord::RecordInvalid => e
       # Provides context for which record failed validation
-      Rails.logger.error "Tagging failed for #{self.class} #{self.id} with tag '#{name}': #{e.message}"
+      Rails.logger.error "Tagging failed for #{self.class} #{self.id} with tag '#{key}': #{e.message}"
       raise e # Re-raise the error for standard Rails handling
     end
   end

@@ -4,6 +4,8 @@ class Customer < ApplicationRecord
   include TagConcern
   include Subscription::BuyerConcern
 
+  attribute :permission_resource_name, :string, default: -> { self.name }
+
   # --- Associations ---
   belongs_to :user, optional: true
   belongs_to :company, optional: true

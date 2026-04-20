@@ -1,4 +1,6 @@
 class PaymentMethod < ApplicationRecord
+  attribute :permission_resource_name, :string, default: -> { self.name }
+
   # --- Associations ---
   # This model is intended to be global, so it does not belong to a branch.
   has_many :payment_method_appointments, dependent: :destroy

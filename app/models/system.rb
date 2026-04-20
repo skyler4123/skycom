@@ -1,5 +1,7 @@
 # app/models/system.rb
 class System < ApplicationRecord
+  attribute :permission_resource_name, :string, default: -> { self.name }
+
   include SystemSubscription::SellerConcern
 
   # --- Associations ---
