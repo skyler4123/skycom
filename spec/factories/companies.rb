@@ -1,7 +1,7 @@
 # spec/factories/companies.rb
 FactoryBot.define do
   factory :company do
-    association :user # Automatically triggers Seed::UserService via the factory above
+    user { create(:user, :company_owner) }
 
     initialize_with do
       Seed::CompanyService.create(user: user)

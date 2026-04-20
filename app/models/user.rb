@@ -68,7 +68,7 @@ class User < ApplicationRecord
 
   include User::RetailConcern
   def accessible_companies
-    case system_role.to_sym
+    case system_role&.to_sym
     when :super_admin
       Company.all # Or [] if you want to keep them separated
     when :admin
@@ -87,7 +87,7 @@ class User < ApplicationRecord
   end
 
   def permissions
-    case system_role.to_sym
+    case system_role&.to_sym
     when :super_admin
       :all # Or [] if you want to keep them separated
     when :admin

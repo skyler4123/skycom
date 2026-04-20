@@ -6,8 +6,8 @@ RSpec.describe User, type: :model do
     it { should have_many(:sessions).dependent(:destroy) }
     it { should have_many(:sign_in_tokens).dependent(:destroy) }
     it { should have_many(:companies).dependent(:destroy) }
-    it { should have_one(:employee).dependent(:destroy) }
-    it { should have_one(:customer).dependent(:destroy) }
+    it { should have_many(:employees).dependent(:destroy) }
+    it { should have_many(:customers).dependent(:destroy) }
     it { should belong_to(:parent_user).class_name("User").optional }
     it { should have_many(:child_users).class_name("User").with_foreign_key("parent_user_id").dependent(:destroy) }
   end
