@@ -18,9 +18,9 @@ FactoryBot.define do
         company: company,
         branch: branch,
         user: user,
-        # If specific arrays aren't passed, the service defaults to []
         departments: departments,
-        roles: roles
+        roles: roles,
+        business_type: business_type
       )
     end
 
