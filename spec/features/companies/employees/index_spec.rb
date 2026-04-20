@@ -14,8 +14,8 @@ RSpec.feature "Companies::Employees Management", type: :feature, js: true do
     create(:employee,
       company: company,
       branch: branch,
-      departments: [department],
-      roles: [role],
+      departments: [ department ],
+      roles: [ role ],
       business_type: "full_time"
     )
   end
@@ -24,8 +24,8 @@ RSpec.feature "Companies::Employees Management", type: :feature, js: true do
     create(:employee,
       company: company,
       branch: branch,
-      departments: [department2],
-      roles: [role2],
+      departments: [ department2 ],
+      roles: [ role2 ],
       business_type: "part_time"
     )
   end

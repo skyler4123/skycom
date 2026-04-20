@@ -1,5 +1,5 @@
 class Companies::PermissionsController < Companies::ApplicationController
-  before_action :authorize_permission_management, only: [:update]
+  before_action :authorize_permission_management, only: [ :update ]
 
   # Shell First pattern - index action returns empty HTML, Stimulus renders content
   def index
