@@ -38,7 +38,7 @@ export default class Companies_Employees_NewModalController extends Controller {
 
           <div class="space-y-1">
             <label class="text-[10px] font-bold text-slate-400 dark:text-slate-300 uppercase tracking-wider">Employment Type</label>
-            <select name="employee[business_type]" required
+            <select name="employee[business_type]"
               class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-sm text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none">
               <option value="full_time">Full Time</option>
               <option value="part_time">Part Time</option>

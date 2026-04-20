@@ -17,8 +17,10 @@ export default class ClientCacheController extends Controller {
     const serverVersion = Cookie('client_cache_version')
     const localVersion = localStorage.getItem('client_cache_version')
 
-    if (serverVersion && serverVersion !== localVersion) {
-      await this.refreshCache(serverVersion)
+    const hasLocalCache = !!localStorage.getItem('client_cache_data')
+
+    if (!hasLocalCache || (serverVersion && serverVersion !== localVersion)) {
+      await this.refreshCache(serverVersion || 'initial')
     }
   }
 
