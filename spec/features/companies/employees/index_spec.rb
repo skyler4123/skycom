@@ -61,8 +61,13 @@ RSpec.feature "Companies::Employees Management", type: :feature, js: true do
     fill_in 'employee[name]', with: 'New Test Employee'
     select 'Full Time', from: 'employee[business_type]'
 
-    click_button 'Save Employee'
-
+    begin
+      click_button "Save Employee"
+    rescue Selenium::WebDriver::Error::StaleElementReferenceError
+      # Give it a millisecond to settle and try one last time
+      sleep 0.5
+      click_button "Save Employee"
+    end
     expect(page).to have_selector('tbody tr', wait: 10)
 
     expect(Employee.find_by(name: "New Test Employee")).to be_present
