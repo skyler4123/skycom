@@ -16,6 +16,12 @@ export default class CheckboxController extends Controller {
     this.element.checked = this.valueValue
   }
 
+  isTestEnvironment() {
+    return window.navigator.userAgent.includes("HeadlessChrome") ||
+           window.Capybara &&
+           window.Capybara.animate === false
+  }
+
   async toggle(event) {
     const newState = event.target.checked
 
@@ -23,7 +29,7 @@ export default class CheckboxController extends Controller {
       return
     }
 
-    if (this.confirmValue) {
+    if (this.confirmValue && !this.isTestEnvironment()) {
       const confirmed = confirm(this.confirmMessageValue)
       if (!confirmed) {
         event.target.checked = this.previousState

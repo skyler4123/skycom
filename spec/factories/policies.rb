@@ -1,8 +1,7 @@
 # spec/factories/policies.rb
 FactoryBot.define do
   factory :policy do
-    association :company
-    association :branch, company: company
+    association :branch
 
     initialize_with do
       Seed::PolicyService.create(branch: branch)
