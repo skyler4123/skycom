@@ -3,33 +3,36 @@
 # and simulates soft deletion.
 
 class Seed::PolicyService
+  COMMON_RESOURCES = %w[Employee Customer Product Order Branch Department Role].freeze
+  COMMON_ACTIONS = %w[create read update delete].freeze
+
   def self.create(
     branch:,
     name: nil,
     description: nil,
     resource: COMMON_RESOURCES.sample,
     action: COMMON_ACTIONS.sample,
-    kind: nil,
-    status: nil,
-    discarded_at: nil,
+    business_type: nil,
+    lifecycle_status: nil,
+    workflow_status: nil,
     index: 1
   )
-    should_discard = rand(10) == 0
-    discarded_at ||= should_discard ? Time.zone.now - rand(1..90).days : nil
     name ||= "#{action.capitalize} #{resource.titleize} Access Policy #{index + 1}"
     description ||= "Policy governing the #{action} access to #{resource}."
-    kind ||= Policy.kinds.keys.sample
-    status ||= Policy.statuses.keys.sample
+    business_type ||= Policy.business_types.keys.sample
+    lifecycle_status ||= Policy.lifecycle_statuses.keys.sample
+    workflow_status ||= Policy.workflow_statuses.keys.sample
 
     Policy.create!(
+      company: branch.company,
       branch: branch,
       name: name,
       description: description,
       resource: resource.singularize,
       action: action,
-      kind: kind,
-      status: status,
-      discarded_at: discarded_at
+      business_type: business_type,
+      lifecycle_status: lifecycle_status,
+      workflow_status: workflow_status
     )
   end
 end
