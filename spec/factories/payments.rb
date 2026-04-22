@@ -1,17 +1,34 @@
+# spec/factories/payments.rb
 FactoryBot.define do
   factory :payment do
-    invoice { nil }
-    name { "MyString" }
-    description { "MyString" }
-    code { "MyString" }
-    currency { 1 }
-    duration { 1 }
-    exchange_rate { "9.99" }
-    amount { "9.99" }
-    payment_method { "MyString" }
-    gateway_details { "MyString" }
-    status { 1 }
-    business_type { 1 }
-    discarded_at { "2025-11-23 08:23:18" }
+    association :invoice
+    association :company, factory: :company
+
+    name { "Payment #{Faker::Lorem.sentence(word_count: 3)}" }
+    description { Faker::Lorem.sentence(word_count: 10) }
+    currency_code { Payment.currency_codes.keys.sample }
+    exchange_rate { 1.0 }
+    amount { Faker::Commerce.price }
+    payment_method { Payment.payment_methods.keys.sample }
+    status { Payment.statuses.keys.sample }
+    business_type { Payment.business_types.keys.sample }
+    discarded_at { nil }
+
+    initialize_with do
+      Seed::PaymentService.create(
+        invoice: invoice,
+        name: name,
+        description: description,
+        currency_code: currency_code,
+        exchange_rate: exchange_rate,
+        amount: amount,
+        payment_method: payment_method,
+        status: status,
+        business_type: business_type,
+        discarded_at: discarded_at
+      )
+    end
+
+    skip_create
   end
 end

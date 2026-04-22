@@ -1,15 +1,33 @@
+# spec/factories/article_appointments.rb
 FactoryBot.define do
   factory :article_appointment do
-    article { nil }
-    appoint_from { nil }
-    appoint_to { nil }
-    appoint_for { nil }
-    appoint_by { nil }
-    name { "MyString" }
-    description { "MyString" }
-    code { "MyString" }
-    status { 1 }
-    business_type { 1 }
-    discarded_at { "2025-12-10 17:31:13" }
+    association :company
+    association :article
+    association :appoint_to, factory: :employee
+
+    name { "#{article.name} Appointment" }
+    description { "Article appointment for #{article.name}." }
+    code { "ART-APT-#{SecureRandom.hex(4).upcase}" }
+    lifecycle_status { ArticleAppointment.lifecycle_statuses.keys.sample }
+    workflow_status { ArticleAppointment.workflow_statuses.keys.sample }
+    business_type { ArticleAppointment.business_types.keys.sample }
+    discarded_at { nil }
+
+    initialize_with do
+      Seed::ArticleAppointmentService.create(
+        company: company,
+        article: article,
+        appoint_to: appoint_to,
+        name: name,
+        description: description,
+        code: code,
+        lifecycle_status: lifecycle_status,
+        workflow_status: workflow_status,
+        business_type: business_type,
+        discarded_at: discarded_at
+      )
+    end
+
+    skip_create
   end
 end

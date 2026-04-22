@@ -1,12 +1,31 @@
+# spec/factories/payment_method_appointments.rb
 FactoryBot.define do
   factory :payment_method_appointment do
-    payment_method { nil }
-    company { nil }
-    name { "MyString" }
-    description { "MyString" }
-    code { "MyString" }
-    status { 1 }
-    business_type { 1 }
-    discarded_at { "2025-11-23 08:23:20" }
+    association :company
+    association :payment_method
+
+    name { "#{payment_method.name} Appointment" }
+    description { "Payment method appointment for #{payment_method.name}." }
+    code { "PM-APT-#{SecureRandom.hex(4).upcase}" }
+    lifecycle_status { PaymentMethodAppointment.lifecycle_statuses.keys.sample }
+    workflow_status { PaymentMethodAppointment.workflow_statuses.keys.sample }
+    business_type { PaymentMethodAppointment.business_types.keys.sample }
+    discarded_at { nil }
+
+    initialize_with do
+      Seed::PaymentMethodAppointmentService.create(
+        company: company,
+        payment_method: payment_method,
+        name: name,
+        description: description,
+        code: code,
+        lifecycle_status: lifecycle_status,
+        workflow_status: workflow_status,
+        business_type: business_type,
+        discarded_at: discarded_at
+      )
+    end
+
+    skip_create
   end
 end
