@@ -102,7 +102,7 @@ class Company < ApplicationRecord
     role = Seed::RoleService.create(
       company: self,
       name: "owner",
-      business_type: :administrative
+      business_type: :owner
     )
 
     policy = Seed::PolicyService.create(
