@@ -23,7 +23,7 @@ module Company::PermissionConcern
             id: role.id,
             name: role.name,
             description: role.description,
-            policies: all_policies.map do |policy|
+            policies: all_policies.select{ |policy| role_policies.find { |a| a.policy_id == policy.id } }.map do |policy|
               appointment = role_policies.find { |a| a.policy_id == policy.id }
 
               {
