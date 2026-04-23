@@ -110,7 +110,7 @@ class Company < ApplicationRecord
       name: "Owner All Access",
       resource: "all",
       action: "all",
-      business_type: :operational,
+      business_type: :owner,
       lifecycle_status: :active
     )
 
@@ -126,7 +126,7 @@ class Company < ApplicationRecord
       company: self,
       user: user,
       name: user.first_name || "Owner",
-      business_type: :full_time,
+      business_type: :owner,
       lifecycle_status: :active,
       workflow_status: :confirmed
     )

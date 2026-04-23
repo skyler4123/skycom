@@ -24,10 +24,11 @@ class Policy < ApplicationRecord
 
   # Policy business_types based on common organizational categories
   enum :business_type, {
-    security: 0,
-    regulatory: 1,
-    operational: 2,
-    compliance: 3
+    owner: 0,
+    security: 1,
+    regulatory: 2,
+    operational: 3,
+    compliance: 4
   }
 
   # --- Validations ---

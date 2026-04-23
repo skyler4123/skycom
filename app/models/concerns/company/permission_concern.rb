@@ -13,7 +13,7 @@ module Company::PermissionConcern
     def permissions
       cache_key = "#{cache_key_with_version}/permissions"
 
-      Rails.cache.fetch(cache_key, expires_in: 24.hours) do
+      Rails.cache.fetch(cache_key, expires_in: 1.minutes) do
         all_policies = policies.to_a
 
         roles.reject { |role| owner_role?(role) }.map do |role|

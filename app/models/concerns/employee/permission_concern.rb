@@ -67,7 +67,7 @@ module Employee::PermissionConcern
     # Used for Permissions UI page
     def permissions
       cache_key = "#{cache_key_with_version}/permissions"
-      Rails.cache.fetch(cache_key, expires_in: 24.hours) do
+      Rails.cache.fetch(cache_key, expires_in: 1.minutes) do
         load_permissions_from_db
       end
     end
