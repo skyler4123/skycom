@@ -6,6 +6,5 @@ FactoryBot.define do
     initialize_with do
       Seed::EmployeeGroupService.new(company: company)
     end
-
   end
 end

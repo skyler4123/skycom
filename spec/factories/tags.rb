@@ -6,6 +6,5 @@ FactoryBot.define do
     initialize_with do
       Seed::TagService.new(company: company)
     end
-
   end
 end

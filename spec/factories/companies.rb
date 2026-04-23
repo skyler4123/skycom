@@ -6,6 +6,5 @@ FactoryBot.define do
     initialize_with do
       Seed::CompanyService.new(user: user)
     end
-
   end
 end

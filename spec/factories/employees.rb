@@ -23,6 +23,5 @@ FactoryBot.define do
         business_type: business_type
       )
     end
-
   end
 end

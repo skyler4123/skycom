@@ -17,6 +17,5 @@ FactoryBot.define do
         description: description
       )
     end
-
   end
 end

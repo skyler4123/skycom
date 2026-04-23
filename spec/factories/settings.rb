@@ -7,6 +7,5 @@ FactoryBot.define do
     initialize_with do
       Seed::SettingService.new(setting_group: setting_group, company: company)
     end
-
   end
 end

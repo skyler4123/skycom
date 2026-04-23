@@ -7,6 +7,5 @@ FactoryBot.define do
     initialize_with do
       Seed::DocumentService.new(company: company, document_group: document_group)
     end
-
   end
 end

@@ -27,6 +27,5 @@ FactoryBot.define do
         discarded_at: discarded_at
       )
     end
-
   end
 end

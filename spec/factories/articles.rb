@@ -7,6 +7,5 @@ FactoryBot.define do
     initialize_with do
       Seed::ArticleService.new(company: company, article_group: article_group)
     end
-
   end
 end

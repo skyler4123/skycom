@@ -7,6 +7,5 @@ FactoryBot.define do
     initialize_with do
       Seed::EventService.new(company: company, event_group: event_group)
     end
-
   end
 end

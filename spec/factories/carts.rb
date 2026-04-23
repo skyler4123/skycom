@@ -7,6 +7,5 @@ FactoryBot.define do
     initialize_with do
       Seed::CartService.new(branch: branch)
     end
-
   end
 end

@@ -12,6 +12,5 @@ FactoryBot.define do
     initialize_with do
       Seed::BrandService.new
     end
-
   end
 end

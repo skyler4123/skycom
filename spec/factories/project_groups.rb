@@ -7,6 +7,5 @@ FactoryBot.define do
     initialize_with do
       Seed::ProjectGroupService.new(branch: branch)
     end
-
   end
 end

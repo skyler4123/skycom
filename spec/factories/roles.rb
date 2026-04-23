@@ -11,6 +11,5 @@ FactoryBot.define do
         name: name
       )
     end
-
   end
 end

@@ -12,6 +12,5 @@ FactoryBot.define do
         timezone: timezone
       )
     end
-
   end
 end

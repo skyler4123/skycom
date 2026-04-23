@@ -65,7 +65,17 @@ RSpec.feature "Companies::Employees Management", type: :feature, js: true do
       click_button "Save Employee"
     rescue Selenium::WebDriver::Error::StaleElementReferenceError
       # Give it a millisecond to settle and try one last time
-      sleep 0.5
+      visit company_employees_path(company)
+      sleep 1
+      expect(page).to have_selector('table', wait: 10)
+
+      find('[data-action*="openNewModal"]').click
+
+      expect(page).to have_selector('form[data-controller="form"]', wait: 10)
+
+      expect(page).to have_selector('input[name="employee[name]"]', wait: 5)
+      fill_in 'employee[name]', with: 'New Test Employee'
+      select 'Full Time', from: 'employee[business_type]'
       click_button "Save Employee"
     end
     expect(page).to have_selector('tbody tr', wait: 10)
