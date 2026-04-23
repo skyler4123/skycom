@@ -11,6 +11,9 @@ module Employee::PermissionConcern
     # 1. The Public Check
     # Now supports instance-level checks: current_employee.can?(:update, @product)
     def can?(action_name, target)
+      # Owner employee has all permissions - bypass normal checks
+      return true if owner_role?
+
       action   = action_name.to_s
       # Handle both Class (Product) and Instance (@product)
       resource = target.is_a?(Class) ? target.name : target.class.name
@@ -30,6 +33,11 @@ module Employee::PermissionConcern
 
       # 3. Instance-level check: Evaluate tag_conditions
       matching_policies.any? { |policy| evaluate_tag_conditions(target, policy[:tag_conditions]) }
+    end
+
+    # Check if employee has owner role (business_type = :owner)
+    def owner_role?
+      role_appointments.any? { |ra| ra.business_type == "owner" }
     end
 
     # 2. The ABAC Engine

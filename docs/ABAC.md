@@ -486,4 +486,150 @@ Is there an HTML element triggering the action?
 2. **Use fetchJson** for loading initial data or when no form element is involved
 3. **No direct fetch/ajax** - Always use Helpers.fetchJson or Helpers.form()
 
+---
+
+## 15. Owner Role & Immutable Records
+
+When a company is created, Skycom automatically sets up an owner role with full permissions. This section documents how owner records are protected.
+
+### A. Automatic Owner Setup
+
+When a company is created via `Company#setup_owner_records`, the following records are automatically created:
+
+1. **Owner Role** - Named "owner" with `business_type: :administrative`
+2. **Owner Policy** - Full access policy with `resource: "all"`, `action: "all"`
+3. **Owner Employee** - The user who created the company is linked as an employee
+
+```ruby
+# app/models/company.rb - setup_owner_records
+def setup_owner_records
+  role = Seed::RoleService.create(company: self, name: "owner", business_type: :administrative)
+
+  policy = Seed::PolicyService.create(
+    company: self,
+    name: "Owner All Access",
+    resource: "all",
+    action: "all",
+    business_type: :operational,
+    lifecycle_status: :active
+  )
+
+  # PolicyAppointment with business_type: :owner (immutable)
+  Seed::PolicyAppointmentService.create(
+    company: self,
+    policy: policy,
+    appoint_to: role,
+    workflow_status: :active,
+    business_type: :owner  # <-- marks as owner record
+  )
+
+  employee = Seed::EmployeeService.create(company: self, user: user, ...)
+
+  # RoleAppointment with business_type: :owner (immutable)
+  Seed::RoleAppointmentService.create(
+    company: self,
+    role: role,
+    appoint_to: employee,
+    workflow_status: :active,
+    business_type: :owner  # <-- marks as owner record
+  )
+end
+```
+
+### B. business_type Enum
+
+Both `RoleAppointment` and `PolicyAppointment` have a `business_type` enum:
+
+```ruby
+# app/models/role_appointment.rb
+enum :business_type, { owner: 0 }
+
+# app/models/policy_appointment.rb
+enum :business_type, { owner: 0 }
+```
+
+### C. Immutable Owner Records
+
+Records with `business_type: "owner"` are protected from modification/deletion:
+
+```ruby
+# app/models/role_appointment.rb
+before_update :prevent_modification_if_owner
+before_destroy :prevent_modification_if_owner
+
+private
+
+def prevent_modification_if_owner
+  return unless business_type == "owner"
+  raise ActiveRecord::ReadOnlyRecord, "Owner records cannot be modified."
+end
+```
+
+**Behavior:**
+- Attempting to update an owner record raises `ActiveRecord::ReadOnlyRecord`
+- Attempting to delete an owner record raises `ActiveRecord::ReadOnlyRecord`
+- The Permissions UI filters owner roles from display
+
+### D. Owner Employee Gets All Permissions
+
+Employees with owner role bypass normal permission checks:
+
+```ruby
+# app/models/concerns/employee/permission_concern.rb
+def can?(action_name, target)
+  # Owner employee has all permissions - bypass normal checks
+  return true if owner_role?
+
+  # ... rest of normal permission logic ...
+end
+
+def owner_role?
+  role_appointments.any? { |ra| ra.business_type == "owner" }
+end
+```
+
+### E. Permissions Page Filtering
+
+The Permissions UI (`GET /companies/:id/permissions`) excludes owner roles:
+
+```ruby
+# app/models/concerns/company/permission_concern.rb
+def permissions
+  # Excludes roles where any RoleAppointment has business_type: :owner
+  roles.reject { |role| owner_role?(role) }.map do |role|
+    # ...
+  end
+end
+
+def owner_role?(role)
+  role.role_appointments.any? { |ra| ra.business_type == :owner }
+end
+```
+
+### F. Error Handling
+
+When attempting to modify owner records via API:
+
+```ruby
+# app/controllers/companies/permissions_controller.rb
+def update
+  begin
+    appointment.update!(workflow_status: workflow_status)
+    # ...
+  rescue ActiveRecord::ReadOnlyRecord => e
+    render json: { error: e.message }, status: :forbidden
+  end
+end
+```
+
+### Summary
+
+| Feature | Implementation |
+|---------|----------------|
+| Owner role created | Automatically via `Company#setup_owner_records` |
+| Owner policy | `resource: "all"`, `action: "all"` |
+| Immutable protection | `business_type: :owner` + callbacks |
+| Full permissions | `owner_role?` check in `can?` method |
+| Hidden from UI | Filtered in `Company#permissions` |
+
 (End of file)

@@ -9,13 +9,14 @@ module Company::PermissionConcern
     # Returns all roles with ALL company policies
     # Each policy includes policy_appointment (if exists) with workflow_status
     # Used for Permissions UI page - shows all policies with their assignment status
+    # Excludes owner role (business_type = :owner)
     def permissions
       cache_key = "#{cache_key_with_version}/permissions"
 
       Rails.cache.fetch(cache_key, expires_in: 24.hours) do
         all_policies = policies.to_a
 
-        roles.map do |role|
+        roles.reject { |role| owner_role?(role) }.map do |role|
           role_policies = role.policy_appointments.includes(:policy).to_a
 
           {
@@ -42,6 +43,10 @@ module Company::PermissionConcern
           }
         end
       end
+    end
+
+    def owner_role?(role)
+      role.role_appointments.any? { |ra| ra.business_type == "owner" }
     end
 
     # Only active PolicyAppointments - used for actual permission checks (can?)

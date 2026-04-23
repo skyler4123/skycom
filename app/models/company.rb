@@ -118,7 +118,8 @@ class Company < ApplicationRecord
       company: self,
       policy: policy,
       appoint_to: role,
-      workflow_status: :active
+      workflow_status: :active,
+      business_type: :owner
     )
 
     employee = Seed::EmployeeService.create(
@@ -134,7 +135,8 @@ class Company < ApplicationRecord
       company: self,
       role: role,
       appoint_to: employee,
-      workflow_status: :active
+      workflow_status: :active,
+      business_type: :owner
     )
   end
 end
