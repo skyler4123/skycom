@@ -3,15 +3,27 @@ import Companies_LayoutController from "controllers/companies/layout_controller"
 export default class Companies_Permissions_IndexController extends Companies_LayoutController {
   async connect() {
     super.connect()
-    await this.loadData()
+    window.poll(() => {
+      if (this.hasContentTarget) {
+        this.loadData()
+        return true
+      }
+      return false
+    }, { interval: 50, maxAttempts: 100 })
   }
 
   async loadData() {
-    const response = await fetchJson(Helpers.company_permissions_path(currentCompany().id))
+    const companyId = currentCompany()?.id || this.extractCompanyIdFromUrl()
+    const response = await fetchJson(Helpers.company_permissions_path(companyId))
     this.roles = response.roles || []
     this.roles = Helpers.sortObjectArray(this.roles)
     this.authorized = response.authorized || false
     this.renderContent()
+  }
+
+  extractCompanyIdFromUrl() {
+    const match = window.location.pathname.match(/\/companies\/([^/]+)/)
+    return match ? match[1] : null
   }
 
   contentHTML() {
@@ -105,10 +117,11 @@ export default class Companies_Permissions_IndexController extends Companies_Lay
   policyCheckboxHTML(policy) {
     const isActive = policy.policy_appointment?.workflow_status === 'active'
     const appointmentId = policy.policy_appointment?.id
+    const companyId = currentCompany()?.id || this.extractCompanyIdFromUrl()
     return `
       <label class="flex items-center gap-3 p-3 rounded-lg border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800/50 ${!this.authorized ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'} transition-colors">
         ${Helpers.checkbox({
-          url: Helpers.edit_company_permission_path(currentCompany().id, appointmentId),
+          url: Helpers.edit_company_permission_path(companyId, appointmentId),
           name: "policy_appointment_workflow_status",
           value: isActive,
           confirm: true,

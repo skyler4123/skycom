@@ -3,14 +3,13 @@ FactoryBot.define do
   factory :employee do
     association :company
 
-    # Optional: Default to a user and branch from the same company
     user { association :user }
     branch { association :branch, company: company }
 
-    # Arrays for HABTM or HasManyThrough associations
     transient do
-      departments_count { 0 }
-      roles_count { 0 }
+      departments { [] }
+      roles { [] }
+      employee_business_type { nil }
     end
 
     initialize_with do
@@ -20,7 +19,7 @@ FactoryBot.define do
         user: user,
         departments: departments,
         roles: roles,
-        business_type: business_type
+        business_type: employee_business_type
       )
     end
   end
