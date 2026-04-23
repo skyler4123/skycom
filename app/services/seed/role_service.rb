@@ -2,12 +2,11 @@ class Seed::RoleService
   def self.new(
     company:,
     name:,
-    description: Faker::Lorem.sentence(word_count: 8),
-    business_type: Role.business_types.keys.sample,
+    description: nil,
+    business_type: nil,
     discarded_at: nil
   )
-    should_discard = rand(8) == 0
-    discarded_at ||= should_discard ? Time.zone.now - rand(1..60).days : nil
+    business_type ||= Role.business_types.keys.sample
 
     Role.new(
       company: company,
