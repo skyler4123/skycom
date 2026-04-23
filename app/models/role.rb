@@ -41,10 +41,11 @@ class Role < ApplicationRecord
 
   # Standardized role kinds for categorization
   enum :business_type, {
-    administrative: 0,
-    management: 1,
-    technical: 2,
-    support: 3
+    owner: 0,
+    administrative: 1,
+    management: 2,
+    technical: 3,
+    support: 4
   }
   # --- Model Types Enum ---
   enum :model_type, {

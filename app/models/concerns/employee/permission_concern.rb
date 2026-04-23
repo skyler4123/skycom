@@ -108,7 +108,7 @@ module Employee::PermissionConcern
     # 5. Only active PolicyAppointments - used for can? checks
     def permissions_by_role
       cache_key = "#{cache_key_with_version}/permissions_by_role"
-      Rails.cache.fetch(cache_key, expires_in: 24.hours) do
+      Rails.cache.fetch(cache_key, expires_in: 1.minutes) do
         roles.includes(:policy_appointments).each_with_object({}) do |role, hash|
           active_appointments = role.policy_appointments.active.includes(:policy)
 

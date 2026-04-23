@@ -33,10 +33,11 @@ class Employee < ApplicationRecord
 
   # --- Enums ---
   enum :business_type, {
-    full_time: 0,
-    part_time: 1,
-    contractor: 2,
-    intern: 3
+    owner: 0,
+    full_time: 1,
+    part_time: 2,
+    contractor: 3,
+    intern: 4
   }
   enum :lifecycle_status, LIFECYCLE_STATUS, prefix: true
   enum :workflow_status, WORKFLOW_STATUS, prefix: true

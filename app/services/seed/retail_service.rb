@@ -334,31 +334,31 @@ class Seed::RetailService
 
   def assign_policies_to_roles
     role_definitions = {
-      admin: {
+      Admin: {
         "PolicyAppointment" => { create: true, read: true, update: true, delete: true }
       },
-      manager: {
+      Manager: {
         "Order" => { create: true, read: true, update: true, delete: true },
         "Product" => { create: true, read: true, update: true, delete: true },
         "Employee" => { create: true, read: true, update: true, delete: true },
         "Customer" => { create: true, read: true, update: true, delete: true },
         "PolicyAppointment" => { create: false, read: true, update: true, delete: false }
       },
-      cashier: {
+      Cashier: {
         "Order" => { create: true, read: true, update: true, delete: false },
         "Product" => { create: false, read: true, update: false, delete: false },
         "Customer" => { create: true, read: true, update: false, delete: false }
       },
-      sales_associate: {
+      Seller: {
         "Order" => { create: true, read: true, update: false, delete: false },
         "Product" => { create: false, read: true, update: false, delete: false },
         "Customer" => { create: false, read: true, update: false, delete: false }
       },
-      stock_clerk: {
-        "Product" => { create: true, read: true, update: true, delete: true },
-        "Order" => { create: false, read: false, update: false, delete: false }
+      Security: {
+        "Product" => { create: false, read: true, update: false, delete: false },
+        "Order" => { create: false, read: true, update: false, delete: false }
       },
-      customer: {
+      Customer: {
         "Order" => { create: false, read: true, update: false, delete: false },
         "Product" => { create: false, read: true, update: false, delete: false }
       }
