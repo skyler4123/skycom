@@ -1,5 +1,5 @@
 class Seed::InventoryService
-  def self.create(
+  def self.new(
     company:,
     branch: nil,
     name: nil,
@@ -9,7 +9,7 @@ class Seed::InventoryService
     business_type: nil,
     discarded_at: nil
   )
-    Inventory.create!(
+    Inventory.new(
       company: company,
       branch: branch,
       name: name || "Inventory #{Faker::Lorem.sentence(word_count: 2)}",
@@ -19,5 +19,11 @@ class Seed::InventoryService
       business_type: business_type || Inventory.business_types.keys.sample,
       discarded_at: discarded_at
     )
+  end
+
+  def self.create(...)
+    inventory = new(...)
+    inventory.save!
+    inventory
   end
 end

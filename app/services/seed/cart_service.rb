@@ -1,8 +1,5 @@
-# This service seeds the database with Cart records. Each cart is
-# associated with a CartGroup and a Branch.
-
 class Seed::CartService
-  def self.create(
+  def self.new(
     branch:,
     cart_group: nil,
     name: Faker::Book.title,
@@ -13,7 +10,7 @@ class Seed::CartService
     business_type: Cart.business_types.keys.sample,
     discarded_at: nil
   )
-    Cart.create!(
+    Cart.new(
       branch: branch,
       cart_group: cart_group,
       name: name,
@@ -24,5 +21,11 @@ class Seed::CartService
       business_type: business_type,
       discarded_at: discarded_at
     )
+  end
+
+  def self.create(...)
+    cart = new(...)
+    cart.save!
+    cart
   end
 end

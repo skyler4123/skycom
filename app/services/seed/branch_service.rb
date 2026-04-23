@@ -1,9 +1,5 @@
-# This service seeds the database with Company records, ensuring each company
-# is associated with an existing User and populating all new fields
-# (enums, addresses, registration info).
-
 class Seed::BranchService
-  def self.create(
+  def self.new(
     company:,
     email: "branch_#{SecureRandom.hex}@gmail.com",
     name: Faker::Name.name,
@@ -25,7 +21,7 @@ class Seed::BranchService
     fiscal_year_end_month: Branch.fiscal_year_end_months.keys.sample,
     discarded_at: nil
   )
-    Branch.create!(
+    Branch.new(
       company: company,
       name: name,
       description: description,
@@ -47,5 +43,11 @@ class Seed::BranchService
       fiscal_year_end_month: fiscal_year_end_month,
       discarded_at: discarded_at
     )
+  end
+
+  def self.create(...)
+    branch = new(...)
+    branch.save!
+    branch
   end
 end

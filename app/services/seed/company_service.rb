@@ -1,9 +1,5 @@
-# This service seeds the database with Company records, ensuring each company
-# is associated with an existing User and populating all new fields
-# (enums, addresses, registration info).
-
 class Seed::CompanyService
-  def self.create(
+  def self.new(
     user:,
     email: "company_#{SecureRandom.hex}@gmail.com",
     name: Faker::Name.name,
@@ -26,7 +22,7 @@ class Seed::CompanyService
     fiscal_year_end_month: Company.fiscal_year_end_months.keys.sample,
     discarded_at: nil
   )
-    Company.create!(
+    Company.new(
       user: user,
       name: name,
       description: description,
@@ -49,5 +45,11 @@ class Seed::CompanyService
       fiscal_year_end_month: fiscal_year_end_month,
       discarded_at: discarded_at
     )
+  end
+
+  def self.create(...)
+    company = new(...)
+    company.save!
+    company
   end
 end

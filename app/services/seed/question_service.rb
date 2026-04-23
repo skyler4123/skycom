@@ -1,5 +1,5 @@
 class Seed::QuestionService
-  def self.create(
+  def self.new(
     company:,
     branch: nil,
     content: nil,
@@ -8,7 +8,7 @@ class Seed::QuestionService
     status: nil,
     discarded_at: nil
   )
-    Question.create!(
+    Question.new(
       company: company,
       branch: branch,
       content: content || Faker::Lorem.sentence(word_count: 10),
@@ -17,5 +17,11 @@ class Seed::QuestionService
       status: status || Question.statuses.keys.sample,
       discarded_at: discarded_at
     )
+  end
+
+  def self.create(...)
+    question = new(...)
+    question.save!
+    question
   end
 end

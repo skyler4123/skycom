@@ -6,12 +6,10 @@ FactoryBot.define do
 
     initialize_with do
       # We pass name explicitly because the service requires it
-      Seed::RoleService.create(
+      Seed::RoleService.new(
         company: company,
         name: name
       )
     end
-
-    skip_create
   end
 end

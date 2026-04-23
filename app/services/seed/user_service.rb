@@ -1,5 +1,5 @@
 class Seed::UserService
-  def self.create(
+  def self.new(
     parent_user: nil,
     email: "user_#{SecureRandom.hex}@gmail.com",
     password: "Password@1234",
@@ -14,7 +14,7 @@ class Seed::UserService
     index: nil
   )
     email ||= "#{email}#{index}@example.com"
-    user = User.create!(
+    User.new(
       parent_user: parent_user,
       email: email,
       password: password,
@@ -27,6 +27,11 @@ class Seed::UserService
       country_code: country_code,
       verified: verified
     )
+  end
+
+  def self.create(...)
+    user = new(...)
+    user.save!
     Seed::AttachmentService.attach(record: user, relation: :avatar_attachment, number: 1)
     user
   end

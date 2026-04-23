@@ -5,9 +5,7 @@ FactoryBot.define do
     association :branch, company: company
 
     initialize_with do
-      Seed::PolicyService.create(branch: branch)
+      Seed::PolicyService.new(branch: branch)
     end
-
-    skip_create
   end
 end

@@ -1,5 +1,5 @@
 class Seed::SettingService
-  def self.create(
+  def self.new(
     setting_group:,
     company: nil,
     branch: nil,
@@ -14,7 +14,7 @@ class Seed::SettingService
   )
     company ||= setting_group.company
 
-    Setting.create!(
+    Setting.new(
       setting_group: setting_group,
       company: company,
       branch: branch,
@@ -27,5 +27,11 @@ class Seed::SettingService
       business_type: business_type,
       discarded_at: discarded_at
     )
+  end
+
+  def self.create(...)
+    setting = new(...)
+    setting.save!
+    setting
   end
 end

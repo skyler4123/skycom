@@ -1,5 +1,5 @@
 class Seed::OrderGroupService
-  def self.create(
+  def self.new(
     company:,
     branch: nil,
     customer: nil,
@@ -11,7 +11,7 @@ class Seed::OrderGroupService
     business_type: nil,
     discarded_at: nil
   )
-    OrderGroup.create!(
+    OrderGroup.new(
       company: company,
       branch: branch,
       customer: customer,
@@ -23,5 +23,11 @@ class Seed::OrderGroupService
       business_type: business_type || OrderGroup.business_types.keys.sample,
       discarded_at: discarded_at
     )
+  end
+
+  def self.create(...)
+    group = new(...)
+    group.save!
+    group
   end
 end

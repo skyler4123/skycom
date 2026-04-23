@@ -1,11 +1,17 @@
 class Seed::DepartmentAppointmentService
-  def self.create(
+  def self.new(
     department:,
     appoint_to:
   )
-    appointment = DepartmentAppointment.create!(
+    DepartmentAppointment.new(
       department: department,
       appoint_to: appoint_to
     )
+  end
+
+  def self.create(...)
+    appointment = new(...)
+    appointment.save!
+    appointment
   end
 end

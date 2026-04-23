@@ -1,13 +1,16 @@
+# spec/factories/periods.rb
 FactoryBot.define do
   factory :period do
-    company { nil }
-    name { "MyString" }
-    description { "MyString" }
-    code { "MyString" }
-    duration { 1 }
-    start_at { "2025-11-23 08:23:56" }
-    end_at { "2025-11-23 08:23:56" }
-    expire_at { "2025-11-23 08:23:56" }
-    discarded_at { "2025-11-23 08:23:56" }
+    start_at { Time.current.beginning_of_day }
+    end_at { Time.current.end_of_day + 1.months }
+    timezone { -12 }
+
+    initialize_with do
+      Seed::PeriodService.new(
+        start_at: start_at,
+        end_at: end_at,
+        timezone: timezone
+      )
+    end
   end
 end

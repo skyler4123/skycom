@@ -1,11 +1,20 @@
+# spec/factories/answers.rb
 FactoryBot.define do
   factory :answer do
     question { nil }
-    name { "MyString" }
+    content { "MyString" }
     description { "MyString" }
-    code { "MyString" }
     status { 1 }
-    business_type { 1 }
     discarded_at { "2025-11-23 08:24:11" }
+
+    initialize_with do
+      Seed::AnswerService.new(
+        question: question,
+        content: content,
+        description: description,
+        status: status,
+        discarded_at: discarded_at
+      )
+    end
   end
 end

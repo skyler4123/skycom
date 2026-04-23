@@ -14,7 +14,7 @@ FactoryBot.define do
     end
 
     initialize_with do
-      Seed::EmployeeService.create(
+      Seed::EmployeeService.new(
         company: company,
         branch: branch,
         user: user,
@@ -23,7 +23,5 @@ FactoryBot.define do
         business_type: business_type
       )
     end
-
-    skip_create
   end
 end

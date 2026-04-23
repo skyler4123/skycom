@@ -5,9 +5,7 @@ FactoryBot.define do
     association :article_group
 
     initialize_with do
-      Seed::ArticleService.create(company: company, article_group: article_group)
+      Seed::ArticleService.new(company: company, article_group: article_group)
     end
-
-    skip_create
   end
 end

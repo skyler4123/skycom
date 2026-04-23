@@ -1,5 +1,5 @@
 class Seed::EmployeeService
-  def self.create(
+  def self.new(
     company:,
     branch: nil,
     departments: [],
@@ -13,7 +13,7 @@ class Seed::EmployeeService
     business_type: Employee.business_types.keys.sample,
     discarded_at: nil
   )
-    employee = Employee.create!(
+    Employee.new(
       user: user,
       company: company,
       branch: branch,
@@ -27,5 +27,11 @@ class Seed::EmployeeService
       business_type: business_type,
       discarded_at: discarded_at
     )
+  end
+
+  def self.create(...)
+    employee = new(...)
+    employee.save!
+    employee
   end
 end

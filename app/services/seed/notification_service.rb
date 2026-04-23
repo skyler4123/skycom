@@ -1,5 +1,5 @@
 class Seed::NotificationService
-  def self.create(
+  def self.new(
     company:,
     branch: nil,
     notification_group: nil,
@@ -18,7 +18,7 @@ class Seed::NotificationService
     should_discard = rand(10) == 0
     discarded_at ||= should_discard ? Time.zone.now - rand(1..180).days : nil
 
-    Notification.create!(
+    Notification.new(
       company: company,
       branch: branch,
       notification_group: notification_group,
@@ -30,5 +30,11 @@ class Seed::NotificationService
       business_type: business_type || Notification.business_types.keys.sample,
       discarded_at: discarded_at
     )
+  end
+
+  def self.create(...)
+    notification = new(...)
+    notification.save!
+    notification
   end
 end

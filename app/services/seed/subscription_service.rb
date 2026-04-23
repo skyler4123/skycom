@@ -1,5 +1,5 @@
 class Seed::SubscriptionService
-  def self.create(
+  def self.new(
     company:,
     branch: nil,
     subscription_plan:,
@@ -21,7 +21,7 @@ class Seed::SubscriptionService
     discarded_at: nil,
     metadata: {}
   )
-    Subscription.create!(
+    Subscription.new(
       company: company,
       branch: branch,
       subscription_plan: subscription_plan,
@@ -43,5 +43,11 @@ class Seed::SubscriptionService
       discarded_at: discarded_at,
       metadata: metadata
     )
+  end
+
+  def self.create(...)
+    subscription = new(...)
+    subscription.save!
+    subscription
   end
 end

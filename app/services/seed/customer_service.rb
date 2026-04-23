@@ -1,9 +1,5 @@
-# This service seeds the database with Customer records. Each customer is
-# associated with a Branch. It uses enums from the Customer model and
-# simulates soft deletion for a portion of the records.
-
 class Seed::CustomerService
-  def self.create(
+  def self.new(
     company:,
     branch: nil,
     user: nil,
@@ -15,7 +11,7 @@ class Seed::CustomerService
     business_type: Customer.business_types.keys.sample,
     discarded_at: nil
   )
-    Customer.create!(
+    Customer.new(
       company: company,
       branch: branch,
       user: user,
@@ -27,5 +23,11 @@ class Seed::CustomerService
       business_type: business_type,
       discarded_at: discarded_at
     )
+  end
+
+  def self.create(...)
+    customer = new(...)
+    customer.save!
+    customer
   end
 end
