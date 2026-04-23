@@ -82,6 +82,8 @@ class Company < ApplicationRecord
   # Validation for operational fields
   # validates :fiscal_year_end_month, presence: true, numericality: { in: 1..12 }
 
+  after_create :setup_owner_records
+
   def create_first_cloned_company
     return if branches.size > 1
     branches.create(
@@ -91,6 +93,48 @@ class Company < ApplicationRecord
       country: country,
       business_type: business_type,
       timezone: timezone
+    )
+  end
+
+  def setup_owner_records
+    return unless user
+
+    role = Seed::RoleService.create(
+      company: self,
+      name: "owner",
+      business_type: :administrative
+    )
+
+    policy = Seed::PolicyService.create(
+      company: self,
+      name: "Owner All Access",
+      resource: "all",
+      action: "all",
+      business_type: :operational,
+      lifecycle_status: :active
+    )
+
+    Seed::PolicyAppointmentService.create(
+      company: self,
+      policy: policy,
+      appoint_to: role,
+      workflow_status: :active
+    )
+
+    employee = Seed::EmployeeService.create(
+      company: self,
+      user: user,
+      name: user.first_name || "Owner",
+      business_type: :full_time,
+      lifecycle_status: :active,
+      workflow_status: :confirmed
+    )
+
+    Seed::RoleAppointmentService.create(
+      company: self,
+      role: role,
+      appoint_to: employee,
+      workflow_status: :active
     )
   end
 end
