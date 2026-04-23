@@ -8,7 +8,7 @@ FactoryBot.define do
     discarded_at { "2025-11-23 08:24:11" }
 
     initialize_with do
-      Seed::AnswerService.create(
+      Seed::AnswerService.new(
         question: question,
         content: content,
         description: description,
@@ -17,6 +17,5 @@ FactoryBot.define do
       )
     end
 
-    skip_create
   end
 end

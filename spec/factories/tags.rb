@@ -4,9 +4,8 @@ FactoryBot.define do
     association :company
 
     initialize_with do
-      Seed::TagService.create(company: company)
+      Seed::TagService.new(company: company)
     end
 
-    skip_create
   end
 end

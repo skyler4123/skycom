@@ -10,7 +10,7 @@ FactoryBot.define do
     discarded_at { "2025-11-23 08:24:10" }
 
     initialize_with do
-      Seed::QuestionService.create(
+      Seed::QuestionService.new(
         company: company,
         name: name,
         description: description,
@@ -21,6 +21,5 @@ FactoryBot.define do
       )
     end
 
-    skip_create
   end
 end

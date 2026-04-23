@@ -9,7 +9,7 @@ FactoryBot.define do
     description { "Tag appointment for #{tag.key}." }
 
     initialize_with do
-      Seed::TagAppointmentService.create(
+      Seed::TagAppointmentService.new(
         company: company,
         tag: tag,
         appoint_to: appoint_to,
@@ -18,6 +18,5 @@ FactoryBot.define do
       )
     end
 
-    skip_create
   end
 end

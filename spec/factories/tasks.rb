@@ -14,7 +14,7 @@ FactoryBot.define do
     discarded_at { nil }
 
     initialize_with do
-      Seed::TaskService.create(
+      Seed::TaskService.new(
         task_group: task_group,
         name: name,
         description: description,
@@ -27,6 +27,5 @@ FactoryBot.define do
       )
     end
 
-    skip_create
   end
 end

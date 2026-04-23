@@ -5,9 +5,8 @@ FactoryBot.define do
     association :branch, company: company
 
     initialize_with do
-      Seed::CartGroupService.create(branch: branch)
+      Seed::CartGroupService.new(branch: branch)
     end
 
-    skip_create
   end
 end

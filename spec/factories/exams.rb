@@ -12,7 +12,7 @@ FactoryBot.define do
     discarded_at { nil }
 
     initialize_with do
-      Seed::ExamService.create(
+      Seed::ExamService.new(
         company: company,
         exam_group: exam_group,
         name: name,
@@ -24,6 +24,5 @@ FactoryBot.define do
       )
     end
 
-    skip_create
   end
 end

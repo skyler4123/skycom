@@ -15,7 +15,7 @@ FactoryBot.define do
     discarded_at { nil }
 
     initialize_with do
-      Seed::PaymentService.create(
+      Seed::PaymentService.new(
         invoice: invoice,
         name: name,
         description: description,
@@ -29,6 +29,5 @@ FactoryBot.define do
       )
     end
 
-    skip_create
   end
 end

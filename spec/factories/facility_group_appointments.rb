@@ -14,7 +14,7 @@ FactoryBot.define do
     discarded_at { nil }
 
     initialize_with do
-      Seed::FacilityGroupAppointmentService.create(
+      Seed::FacilityGroupAppointmentService.new(
         company: company,
         facility_group: facility_group,
         appoint_to: appoint_to,
@@ -28,6 +28,5 @@ FactoryBot.define do
       )
     end
 
-    skip_create
   end
 end

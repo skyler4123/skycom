@@ -12,7 +12,7 @@ FactoryBot.define do
     discarded_at { nil }
 
     initialize_with do
-      Seed::InventoryTransactionService.create(
+      Seed::InventoryTransactionService.new(
         company: company,
         appoint_to: appoint_to,
         name: name,
@@ -24,6 +24,5 @@ FactoryBot.define do
       )
     end
 
-    skip_create
   end
 end

@@ -10,9 +10,8 @@ FactoryBot.define do
     discarded_at { nil }
 
     initialize_with do
-      Seed::BrandService.create
+      Seed::BrandService.new
     end
 
-    skip_create
   end
 end

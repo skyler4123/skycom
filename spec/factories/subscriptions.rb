@@ -20,7 +20,7 @@ FactoryBot.define do
     discarded_at { nil }
 
     initialize_with do
-      Seed::SubscriptionService.create(
+      Seed::SubscriptionService.new(
         company: company,
         subscription_plan: subscription_plan,
         subscription_group: subscription_group,
@@ -40,6 +40,5 @@ FactoryBot.define do
       )
     end
 
-    skip_create
   end
 end

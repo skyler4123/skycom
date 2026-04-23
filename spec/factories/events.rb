@@ -5,9 +5,8 @@ FactoryBot.define do
     association :event_group
 
     initialize_with do
-      Seed::EventService.create(company: company, event_group: event_group)
+      Seed::EventService.new(company: company, event_group: event_group)
     end
 
-    skip_create
   end
 end

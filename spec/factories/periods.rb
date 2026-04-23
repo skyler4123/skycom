@@ -6,13 +6,12 @@ FactoryBot.define do
     timezone { -12 }
 
     initialize_with do
-      Seed::PeriodService.create(
+      Seed::PeriodService.new(
         start_at: start_at,
         end_at: end_at,
         timezone: timezone
       )
     end
 
-    skip_create
   end
 end

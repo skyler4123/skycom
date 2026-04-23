@@ -11,7 +11,7 @@ FactoryBot.define do
     discarded_at { nil }
 
     initialize_with do
-      Seed::PurchaseService.create(
+      Seed::PurchaseService.new(
         company: company,
         name: name,
         description: description,
@@ -22,6 +22,5 @@ FactoryBot.define do
       )
     end
 
-    skip_create
   end
 end

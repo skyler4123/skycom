@@ -4,9 +4,8 @@ FactoryBot.define do
     user { create(:user, :company_owner) }
 
     initialize_with do
-      Seed::CompanyService.create(user: user)
+      Seed::CompanyService.new(user: user)
     end
 
-    skip_create
   end
 end
