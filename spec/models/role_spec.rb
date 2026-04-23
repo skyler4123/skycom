@@ -22,7 +22,7 @@ RSpec.describe Role, type: :model do
   describe "enums" do
     it { should define_enum_for(:lifecycle_status) }
     it { should define_enum_for(:workflow_status) }
-    it { should define_enum_for(:business_type).with_values(administrative: 0, management: 1, technical: 2, support: 3) }
+    it { should define_enum_for(:business_type).with_values(owner: 0, administrative: 1, management: 2, technical: 3, support: 4) }
     it { should define_enum_for(:model_type) }
   end
 end
