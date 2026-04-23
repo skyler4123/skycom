@@ -1,9 +1,5 @@
-# This service seeds the database with Policy records, ensuring each policy
-# is associated with an existing Branch. It uses the enums defined in the Policy model
-# and simulates soft deletion.
-
 class Seed::PolicyService
-  def self.create(
+  def self.new(
     branch:,
     name: nil,
     description: nil,
@@ -21,7 +17,7 @@ class Seed::PolicyService
     kind ||= Policy.kinds.keys.sample
     status ||= Policy.statuses.keys.sample
 
-    Policy.create!(
+    Policy.new(
       branch: branch,
       name: name,
       description: description,
@@ -31,5 +27,11 @@ class Seed::PolicyService
       status: status,
       discarded_at: discarded_at
     )
+  end
+
+  def self.create(...)
+    policy = new(...)
+    policy.save!
+    policy
   end
 end

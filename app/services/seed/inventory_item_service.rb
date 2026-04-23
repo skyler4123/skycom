@@ -1,5 +1,5 @@
 class Seed::InventoryItemService
-  def self.create(
+  def self.new(
     inventory:,
     name: nil,
     description: nil,
@@ -21,7 +21,7 @@ class Seed::InventoryItemService
     should_discard = rand(10) == 0
     discarded_at ||= should_discard ? Time.zone.now - rand(1..180).days : nil
 
-    InventoryItem.create!(
+    InventoryItem.new(
       inventory: inventory,
       company: inventory.company,
       branch: inventory.branch,
@@ -40,5 +40,11 @@ class Seed::InventoryItemService
       business_type: business_type || InventoryItem.business_types.keys.sample,
       discarded_at: discarded_at
     )
+  end
+
+  def self.create(...)
+    item = new(...)
+    item.save!
+    item
   end
 end

@@ -1,15 +1,21 @@
 class Seed::DepartmentService
-  def self.create(
+  def self.new(
     company:,
     email: "department_#{SecureRandom.hex}@gmail.com",
     name: "#{Faker::Job.field} Group",
     description: Faker::Movie.quote
   )
-    department = Department.create!(
+    Department.new(
       company: company,
       email: email,
       name: name,
       description: description
     )
+  end
+
+  def self.create(...)
+    department = new(...)
+    department.save!
+    department
   end
 end

@@ -1,5 +1,5 @@
 class Seed::EventAppointmentService
-  def self.create(
+  def self.new(
     company:,
     event:,
     appoint_from: nil,
@@ -20,7 +20,7 @@ class Seed::EventAppointmentService
     discarded_at ||= should_discard ? Time.zone.now - rand(1..180).days : nil
     name ||= "#{event.name} Appointment"
 
-    EventAppointment.create!(
+    EventAppointment.new(
       company: company,
       event: event,
       appoint_from: appoint_from,
@@ -35,5 +35,11 @@ class Seed::EventAppointmentService
       business_type: business_type || EventAppointment.business_types.keys.sample,
       discarded_at: discarded_at
     )
+  end
+
+  def self.create(...)
+    appointment = new(...)
+    appointment.save!
+    appointment
   end
 end

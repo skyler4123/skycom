@@ -1,9 +1,5 @@
-# This service seeds the database with Order records. Each order is associated
-# with a Company and a Customer from that same branch. It uses enums from the
-# Order model and simulates soft deletion for a portion of the records.
-
 class Seed::OrderService
-  def self.create(
+  def self.new(
     company:,
     branch: nil,
     customer: nil,
@@ -15,7 +11,7 @@ class Seed::OrderService
     business_type: Order.business_types.keys.sample,
     discarded_at: nil
   )
-    Order.create!(
+    Order.new(
       company: company,
       branch: branch,
       customer: customer,
@@ -27,5 +23,11 @@ class Seed::OrderService
       business_type: business_type,
       discarded_at: discarded_at
     )
+  end
+
+  def self.create(...)
+    order = new(...)
+    order.save!
+    order
   end
 end

@@ -1,5 +1,5 @@
 class Seed::ArticleService
-  def self.create(
+  def self.new(
     company:,
     branch: nil,
     article_group: nil,
@@ -16,7 +16,7 @@ class Seed::ArticleService
     branch ||= article_group.branch if article_group
     company ||= article_group.company if article_group
 
-    Article.create!(
+    Article.new(
       company: company,
       branch: branch,
       article_group: article_group,
@@ -29,5 +29,11 @@ class Seed::ArticleService
       business_type: business_type || Article.business_types.keys.sample,
       discarded_at: discarded_at
     )
+  end
+
+  def self.create(...)
+    article = new(...)
+    article.save!
+    article
   end
 end

@@ -1,8 +1,5 @@
-# This service seeds the database with NotificationGroup records. Each group is
-# associated with a Company and can be used to organize notifications.
-
 class Seed::NotificationGroupService
-  def self.create(
+  def self.new(
     branch:,
     name: "#{Faker::App.name} Notifications",
     description: "A group for #{Faker::Marketing.buzzwords} notifications.",
@@ -16,7 +13,7 @@ class Seed::NotificationGroupService
     discarded_at ||= should_discard ? Time.zone.now - rand(1..180).days : nil
     code ||= "NOTIF-G-#{branch.id}-#{SecureRandom.hex(3).upcase}"
 
-    NotificationGroup.create!(
+    NotificationGroup.new(
       branch: branch,
       name: name,
       description: description,
@@ -26,5 +23,11 @@ class Seed::NotificationGroupService
       business_type: business_type,
       discarded_at: discarded_at
     )
+  end
+
+  def self.create(...)
+    group = new(...)
+    group.save!
+    group
   end
 end

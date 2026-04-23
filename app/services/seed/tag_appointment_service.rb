@@ -1,5 +1,5 @@
 class Seed::TagAppointmentService
-  def self.create(
+  def self.new(
     company:,
     tag:,
     appoint_from: nil,
@@ -11,7 +11,7 @@ class Seed::TagAppointmentService
   )
     raise "Cannot create appointment: No company or tag provided." if company.nil? || tag.nil?
 
-    TagAppointment.create!(
+    TagAppointment.new(
       company: company,
       tag: tag,
       appoint_from: appoint_from,
@@ -21,5 +21,11 @@ class Seed::TagAppointmentService
       value: value || tag.value,
       description: description || "Tag appointment for #{tag.key}."
     )
+  end
+
+  def self.create(...)
+    appointment = new(...)
+    appointment.save!
+    appointment
   end
 end

@@ -1,8 +1,5 @@
-# This service seeds the database with TaskGroup records. Each group is
-# associated with a Company and can be used to organize tasks.
-
 class Seed::TaskGroupService
-  def self.create(
+  def self.new(
     branch:,
     name: "#{Faker::Verb.base.capitalize} Tasks",
     description: "A group for #{Faker::Hacker.ingverb} tasks.",
@@ -14,7 +11,7 @@ class Seed::TaskGroupService
     should_discard = rand(10) == 0
     discarded_at ||= should_discard ? Time.zone.now - rand(1..180).days : nil
 
-    TaskGroup.create!(
+    TaskGroup.new(
       branch: branch,
       name: name,
       description: description,
@@ -23,5 +20,11 @@ class Seed::TaskGroupService
       business_type: business_type || TaskGroup.business_types.keys.sample,
       discarded_at: discarded_at
     )
+  end
+
+  def self.create(...)
+    group = new(...)
+    group.save!
+    group
   end
 end

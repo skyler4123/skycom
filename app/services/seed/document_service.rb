@@ -1,5 +1,5 @@
 class Seed::DocumentService
-  def self.create(
+  def self.new(
     company:,
     branch: nil,
     document_group: nil,
@@ -16,7 +16,7 @@ class Seed::DocumentService
     branch ||= document_group.branch if document_group
     company ||= document_group.company if document_group
 
-    Document.create!(
+    Document.new(
       company: company,
       branch: branch,
       document_group: document_group,
@@ -29,5 +29,11 @@ class Seed::DocumentService
       business_type: business_type || Document.business_types.keys.sample,
       discarded_at: discarded_at
     )
+  end
+
+  def self.create(...)
+    document = new(...)
+    document.save!
+    document
   end
 end

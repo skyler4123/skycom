@@ -1,9 +1,5 @@
-# This service seeds the database with Product records. Each product is
-# associated with a Company and may optionally be linked to a ProductBrand.
-# It uses enums from the Product model and simulates soft deletion for some records.
-
 class Seed::ProductService
-  def self.create(
+  def self.new(
     company:,
     branch: nil,
     brand: (Brand.all + [ nil ]).sample,
@@ -20,7 +16,7 @@ class Seed::ProductService
     price ||= Faker::Commerce.price(range: 50..2000.0)
     business_type ||= Product.business_types.keys.sample
 
-    product = Product.create!(
+    Product.new(
       company: company,
       branch: branch,
       brand: brand,
@@ -32,6 +28,11 @@ class Seed::ProductService
       business_type: business_type,
       discarded_at: discarded_at
     )
+  end
+
+  def self.create(...)
+    product = new(...)
+    product.save!
     Seed::AttachmentService.attach(record: product, relation: :image_attachments, number: 2)
     product
   end

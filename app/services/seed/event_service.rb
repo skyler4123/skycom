@@ -1,5 +1,5 @@
 class Seed::EventService
-  def self.create(
+  def self.new(
     company:,
     branch: nil,
     event_group: nil,
@@ -16,7 +16,7 @@ class Seed::EventService
     branch ||= event_group.branch if event_group
     company ||= event_group.company if event_group
 
-    Event.create!(
+    Event.new(
       company: company,
       branch: branch,
       event_group: event_group,
@@ -29,5 +29,11 @@ class Seed::EventService
       business_type: business_type || Event.business_types.keys.sample,
       discarded_at: discarded_at
     )
+  end
+
+  def self.create(...)
+    event = new(...)
+    event.save!
+    event
   end
 end

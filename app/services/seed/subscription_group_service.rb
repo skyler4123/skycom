@@ -1,5 +1,5 @@
 class Seed::SubscriptionGroupService
-  def self.create(
+  def self.new(
     company:,
     branch: nil,
     name: nil,
@@ -10,7 +10,7 @@ class Seed::SubscriptionGroupService
     business_type: nil,
     discarded_at: nil
   )
-    SubscriptionGroup.create!(
+    SubscriptionGroup.new(
       company: company,
       branch: branch,
       name: name || "Subscription Group #{Faker::Lorem.sentence(word_count: 2)}",
@@ -21,5 +21,11 @@ class Seed::SubscriptionGroupService
       business_type: business_type || SubscriptionGroup.business_types.keys.sample,
       discarded_at: discarded_at
     )
+  end
+
+  def self.create(...)
+    group = new(...)
+    group.save!
+    group
   end
 end
