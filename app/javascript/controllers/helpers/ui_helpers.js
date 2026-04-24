@@ -519,7 +519,7 @@ export const editable = ({
 /**
  * Wraps content with the Stimulus Tooltip Controller.
  * @param {Object} options
- * @param {string} options.message - Text or HTML content for the tooltip.
+ * @param {string} options.html - Text or HTML content for the tooltip.
  * @param {string} options.html - The trigger element's inner HTML.
  * @param {string} [options.tag='div'] - The wrapper tag.
  * @param {string} [options.position='top'] - top, bottom, left, right.
@@ -533,12 +533,12 @@ export const editable = ({
 export const tooltip = (options) => {
   // 1. Handle Simple Case: ${tooltip("Message")}
   if (typeof options === "string") {
-    options = { message: options }
+    options = { html: options }
   }
 
   // 2. Set Defaults for the Object Case
   const {
-    message = "",
+    html = "",
     position = "top",
     action = "hover",
     arrow = true,
@@ -550,7 +550,7 @@ export const tooltip = (options) => {
   // 3. Return only the data attributes string
   return `
     data-controller="tooltip"
-    data-tooltip-message-value="${message.replace(/"/g, '&quot;')}"
+    data-tooltip-html-value="${html.replace(/"/g, '&quot;')}"
     data-tooltip-position-value="${position}"
     data-tooltip-action-value="${action}"
     data-tooltip-arrow-value="${arrow}"
@@ -566,11 +566,11 @@ export const tooltip = (options) => {
  */
 export const popover = (options) => {
   if (typeof options === "string") {
-    options = { message: options }
+    options = { html: options }
   }
 
   const {
-    message = "",
+    html = "",
     position = "bottom", // Popovers usually look better below the trigger
     arrow = true,
     classes = "bg-white dark:bg-slate-800 p-4 shadow-2xl border border-slate-200 dark:border-slate-700",
@@ -579,7 +579,7 @@ export const popover = (options) => {
 
   return `
     data-controller="popover"
-    data-popover-message-value="${message.replace(/"/g, '&quot;')}"
+    data-popover-html-value="${html.replace(/"/g, '&quot;')}"
     data-popover-position-value="${position}"
     data-popover-arrow-value="${arrow}"
     data-popover-classes-value="${classes}"

@@ -2,7 +2,7 @@ import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
   static values = {
-    message: String,
+    html: String,
     position: { type: String, default: "top" },
     action: { type: String, default: "hover" }, // 'hover' or 'click'
     arrow: { type: Boolean, default: false },
@@ -56,7 +56,7 @@ export default class extends Controller {
     const interactionClass = this.actionValue === "click" ? "pointer-events-auto" : "pointer-events-none"
     
     this.tooltip.className = `${defaultClasses} ${interactionClass} ${this.classesValue || themeClasses}`
-    this.tooltip.innerHTML = this.messageValue
+    this.tooltip.innerHTML = this.htmlValue
 
     if (this.arrowValue) {
       this.arrowElement = document.createElement("div")

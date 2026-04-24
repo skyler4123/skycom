@@ -2,7 +2,7 @@ import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
   static values = {
-    message: String,
+    html: String,
     position: { type: String, default: "bottom" },
     arrow: { type: Boolean, default: true },
     classes: String,
@@ -41,7 +41,7 @@ export default class extends Controller {
     // 2. Styles: removed 'pointer-events-none' so we can click inside!
     const defaultClasses = "fixed z-[9999] rounded-xl transition-all duration-200 opacity-0 translate-y-1 pointer-events-auto"
     this.popover.className = `${defaultClasses} ${this.classesValue}`
-    this.popover.innerHTML = this.messageValue
+    this.popover.innerHTML = this.htmlValue
 
     // 3. Arrow logic
     if (this.arrowValue) {
