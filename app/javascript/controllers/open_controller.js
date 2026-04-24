@@ -29,6 +29,7 @@ export default class OpenController extends Controller {
   connect() {
     poll(() => {
       this.updateOpenByPathnameTargets()
+      return this.openByPathnameTargets.every(target => target.hasAttribute("open"))
     })
   }
 
