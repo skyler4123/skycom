@@ -58,14 +58,14 @@ RSpec.feature "Companies::Permissions Management", type: :feature, js: true do
   # Use let! for employees
   let!(:admin_user) { create(:user, :company_employee) }
   let!(:admin_employee) do
-    create(:employee, company: company, branch: branch, user: admin_user, roles: [admin_role]).tap do |emp|
+    create(:employee, company: company, branch: branch, user: admin_user, roles: [ admin_role ]).tap do |emp|
       company.clear_permissions_cache
     end
   end
 
   let!(:unauthorized_user) { create(:user, :company_employee) }
   let!(:unauthorized_employee) do
-    create(:employee, company: company, branch: branch, user: unauthorized_user, roles: [manager_role])
+    create(:employee, company: company, branch: branch, user: unauthorized_user, roles: [ manager_role ])
   end
 
   def create_policy(resource:, action:, business_type: :operational)
@@ -185,7 +185,7 @@ RSpec.feature "Companies::Permissions Management", type: :feature, js: true do
     expect(page).to have_selector('.role-section', text: "admin", wait: 20)
 
     admin_section = find('.role-section', text: "admin")
-    
+
     policy_label = admin_section.all('label').find { |l| l.text.include?("Can create Product") }
     checkbox = policy_label.find('input[type="checkbox"]')
 
