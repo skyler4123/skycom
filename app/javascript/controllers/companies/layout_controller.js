@@ -56,7 +56,7 @@ export default class Companies_LayoutController extends Controller {
                   class="text-gray-900 dark:text-white text-base font-medium leading-normal cursor-pointer"
                   ${popover({
                     html: `
-                      <div class="flex flex-col gap-y-6 w-64 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md shadow-lg z-50 p-2">
+                      <div class="flex flex-col gap-y-6 w-64 bg-white dark:bg-gray-800">
                         ${currentCompanies().map((company) => `
                           <a href="${Helpers.company_branches_path(company.id)}" class="flex items-center gap-3 px-3 py-2 rounded-lg text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 ${currentCompany().id === company.id ? 'bg-gray-100 dark:bg-gray-700' : ''}">
                             <div class="flex flex-col">
@@ -333,8 +333,8 @@ export default class Companies_LayoutController extends Controller {
                   style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuBYk6_5wqHwhOUyfqIOzuw7uF6nG1B2aHcNfqPXgheh0TJNM9wgrKtU__k7USaOwDZLXPpvIrYvaXBnMbO7rmZHK15vMirHZqrK0UBZ18vJdiQZlmTrGe8wch8p3G7GXSetuz5njKmy7Hb6XGw18g0stonxhwtIcuuEqzZVHxbviNLuy4i_B8JHC1x_JlbUrZoIV2QQqyAprbH-jems99h8nqDZ6D6FBmq8JDrKIfaBYkl3mR0cYldl3c0gaNynjiRNKDKfaUcIKBc");'
                   ${popover({
                     html: `
-                      <div>
-                        <a href="/sign_out" class="cursor-pointer">Sign Out</a>
+                      <div class="flex flex-col gap-y-6 w-64 bg-white dark:bg-gray-800">
+                        <a class="flex items-center gap-3 px-3 py-2 rounded-lg text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700" href="/sign_out" class="cursor-pointer">Sign Out</a>
                       </div>
                     `
                   })}
