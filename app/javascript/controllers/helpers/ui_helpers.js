@@ -316,10 +316,10 @@ export const closeModalAction = () => `data-action="click->modal#close"`
 export const darkmodeTrigger = () => `data-darkmode-target="trigger"`
 
 /**
- * Returns the data-link-target attribute string for opening links by pathname.
- * @returns {string} `data-link-target="openByPathname"`
+ * Returns the data-open-target attribute string for opening links by pathname.
+ * @returns {string} `data-open-target="openByPathname"`
  */
-export const openByPathname = () => `data-link-target="openByPathname"`
+export const openByPathname = () => `data-open-target="openByPathname"`
 
 /**
  * Returns a data-language-key attribute string for translation.
