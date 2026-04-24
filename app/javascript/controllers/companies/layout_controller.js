@@ -94,8 +94,7 @@ export default class Companies_LayoutController extends Controller {
                 </a>
                 <a
                   class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:bg-blue-100 open:text-blue-600"
-                  href="${Helpers.company_branches_path(currentCompany().id)}"
-                  ${openByPathname()}/
+                  ${tooltip({message: `<div class="bg-amber-100 text-amber-600">Branches link</div>`, action: "click"})}
                 >
                   <span class="material-symbols-outlined">apartment</span>
                   <p class="text-sm font-medium leading-normal">Branches</p>
@@ -340,7 +339,16 @@ export default class Companies_LayoutController extends Controller {
                 </button>
                 <div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10"
                   data-alt="User profile picture"
-                  style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuBYk6_5wqHwhOUyfqIOzuw7uF6nG1B2aHcNfqPXgheh0TJNM9wgrKtU__k7USaOwDZLXPpvIrYvaXBnMbO7rmZHK15vMirHZqrK0UBZ18vJdiQZlmTrGe8wch8p3G7GXSetuz5njKmy7Hb6XGw18g0stonxhwtIcuuEqzZVHxbviNLuy4i_B8JHC1x_JlbUrZoIV2QQqyAprbH-jems99h8nqDZ6D6FBmq8JDrKIfaBYkl3mR0cYldl3c0gaNynjiRNKDKfaUcIKBc");'>
+                  style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuBYk6_5wqHwhOUyfqIOzuw7uF6nG1B2aHcNfqPXgheh0TJNM9wgrKtU__k7USaOwDZLXPpvIrYvaXBnMbO7rmZHK15vMirHZqrK0UBZ18vJdiQZlmTrGe8wch8p3G7GXSetuz5njKmy7Hb6XGw18g0stonxhwtIcuuEqzZVHxbviNLuy4i_B8JHC1x_JlbUrZoIV2QQqyAprbH-jems99h8nqDZ6D6FBmq8JDrKIfaBYkl3mR0cYldl3c0gaNynjiRNKDKfaUcIKBc");'
+                  ${popover({
+                    action: "click",
+                    message: `
+                      <div>
+                        <a href="/sign_out" class="cursor-pointer">Sign Out</a>
+                      </div>
+                    `
+                  })}
+                >
                 </div>
               </div>
             </header>

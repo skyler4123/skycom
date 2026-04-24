@@ -2,12 +2,13 @@ import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
   static values = {
-    message: String,        // HTML or Text
-    position: { type: String, default: "top" }, // top, bottom, left, right
+    message: String,
+    position: { type: String, default: "top" },
+    action: { type: String, default: "hover" }, // 'hover' or 'click'
     arrow: { type: Boolean, default: false },
-    classes: String,        // Override default Tailwind classes
-    delay: { type: Number, default: 200 },     // ms before show
-    duration: { type: Number, default: 10000 } // ms before auto-hide
+    classes: String,
+    delay: { type: Number, default: 200 },
+    duration: { type: Number, default: 10000 }
   }
 
   connect() {
@@ -15,9 +16,27 @@ export default class extends Controller {
     this.hideTimeout = null
     this.tooltip = null
     
-    // Bind events to the element this controller is attached to
-    this.element.addEventListener("mouseenter", () => this.prepareShow())
-    this.element.addEventListener("mouseleave", () => this.hide())
+    this.bindEvents()
+  }
+
+  bindEvents() {
+    if (this.actionValue === "click") {
+      this.element.addEventListener("click", this.toggle.bind(this))
+      // Handle closing when clicking outside
+      this.clickOutsideHandler = (e) => {
+        if (!this.element.contains(e.target) && this.tooltip && !this.tooltip.contains(e.target)) {
+          this.hide()
+        }
+      }
+    } else {
+      this.element.addEventListener("mouseenter", this.prepareShow.bind(this))
+      this.element.addEventListener("mouseleave", this.hide.bind(this))
+    }
+  }
+
+  toggle(e) {
+    e.preventDefault()
+    this.tooltip ? this.hide() : this.show()
   }
 
   prepareShow() {
@@ -28,18 +47,17 @@ export default class extends Controller {
   show() {
     if (this.tooltip) return
 
-    // 1. Create Tooltip Element
     this.tooltip = document.createElement("div")
     
-    // 2. Apply Styles (Default + Custom Overrides)
     const defaultClasses = "fixed z-[9999] px-3 py-2 text-sm font-medium rounded-lg shadow-xl transition-all duration-300 opacity-0 translate-y-2 pointer-events-none"
     const themeClasses = "bg-slate-900 text-slate-100 border border-slate-700 dark:bg-white dark:text-slate-900 dark:border-slate-200"
-    this.tooltip.className = `${defaultClasses} ${this.classesValue || themeClasses}`
     
-    // 3. Set Content
+    // If it's a click tooltip, we might want it to be interactive (pointer-events-auto)
+    const interactionClass = this.actionValue === "click" ? "pointer-events-auto" : "pointer-events-none"
+    
+    this.tooltip.className = `${defaultClasses} ${interactionClass} ${this.classesValue || themeClasses}`
     this.tooltip.innerHTML = this.messageValue
 
-    // 4. Handle Arrow
     if (this.arrowValue) {
       this.arrowElement = document.createElement("div")
       this.arrowElement.className = "absolute size-2 rotate-45 bg-inherit border-inherit border-b border-r"
@@ -47,18 +65,36 @@ export default class extends Controller {
     }
 
     document.body.appendChild(this.tooltip)
-
-    // 5. Position & Collision Detection
     this.updatePosition()
 
-    // 6. Animate In
     requestAnimationFrame(() => {
-      this.tooltip.classList.remove("opacity-0", "translate-y-2")
-      this.tooltip.classList.add("opacity-100", "translate-y-0")
+      this.tooltip?.classList.remove("opacity-0", "translate-y-2")
+      this.tooltip?.classList.add("opacity-100", "translate-y-0")
     })
 
-    // 7. Auto-hide duration
-    this.hideTimeout = setTimeout(() => this.hide(), this.durationValue)
+    if (this.actionValue === "click") {
+      document.addEventListener("click", this.clickOutsideHandler)
+    } else {
+      this.hideTimeout = setTimeout(() => this.hide(), this.durationValue)
+    }
+  }
+
+  hide() {
+    clearTimeout(this.showTimeout)
+    clearTimeout(this.hideTimeout)
+    
+    if (this.actionValue === "click") {
+      document.removeEventListener("click", this.clickOutsideHandler)
+    }
+
+    if (!this.tooltip) return
+
+    this.tooltip.classList.add("opacity-0")
+    
+    setTimeout(() => {
+      this.tooltip?.remove()
+      this.tooltip = null
+    }, 300)
   }
 
   updatePosition() {
@@ -114,20 +150,11 @@ export default class extends Controller {
     }
   }
 
-  hide() {
-    clearTimeout(this.showTimeout)
-    if (!this.tooltip) return
-
-    this.tooltip.classList.add("opacity-0")
-    
-    // Remove from DOM after animation finishes
-    setTimeout(() => {
-      this.tooltip?.remove()
-      this.tooltip = null
-    }, 300)
-  }
-
   disconnect() {
     this.hide()
+    // Ensure listeners are cleaned up
+    this.element.removeEventListener("click", this.toggle)
+    this.element.removeEventListener("mouseenter", this.prepareShow)
+    this.element.removeEventListener("mouseleave", this.hide)
   }
 }

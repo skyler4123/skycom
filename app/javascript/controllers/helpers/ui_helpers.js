@@ -523,6 +523,7 @@ export const editable = ({
  * @param {string} options.html - The trigger element's inner HTML.
  * @param {string} [options.tag='div'] - The wrapper tag.
  * @param {string} [options.position='top'] - top, bottom, left, right.
+ * @param {string} [options.action='hover'] - 'hover' or 'click'.
  * @param {boolean} [options.arrow=true] - Show the little pointer arrow.
  * @param {string} [options.classes=''] - Custom Tailwind overrides for the tooltip box.
  * @param {number} [options.delay=200] - Delay before appearing (ms).
@@ -539,6 +540,7 @@ export const tooltip = (options) => {
   const {
     message = "",
     position = "top",
+    action = "hover",
     arrow = true,
     classes = "",
     delay = 200,
@@ -550,6 +552,7 @@ export const tooltip = (options) => {
     data-controller="tooltip"
     data-tooltip-message-value="${message.replace(/"/g, '&quot;')}"
     data-tooltip-position-value="${position}"
+    data-tooltip-action-value="${action}"
     data-tooltip-arrow-value="${arrow}"
     data-tooltip-classes-value="${classes}"
     data-tooltip-delay-value="${delay}"
@@ -557,6 +560,32 @@ export const tooltip = (options) => {
   `.trim()
 }
 
+/**
+ * Wraps content with the Stimulus Popover Controller.
+ * Supports interactive content (links, buttons).
+ */
+export const popover = (options) => {
+  if (typeof options === "string") {
+    options = { message: options }
+  }
+
+  const {
+    message = "",
+    position = "bottom", // Popovers usually look better below the trigger
+    arrow = true,
+    classes = "bg-white dark:bg-slate-800 p-4 shadow-2xl border border-slate-200 dark:border-slate-700",
+    offset = 15
+  } = options
+
+  return `
+    data-controller="popover"
+    data-popover-message-value="${message.replace(/"/g, '&quot;')}"
+    data-popover-position-value="${position}"
+    data-popover-arrow-value="${arrow}"
+    data-popover-classes-value="${classes}"
+    data-popover-offset-value="${offset}"
+  `.trim()
+}
 
 export const checkbox = ({
   url = pathname(),
@@ -586,3 +615,46 @@ export const checkbox = ({
 
   return inputHtml
 }
+
+/**
+ * Renders a responsive HTML <picture> tag.
+ * @param {Object} options
+ * @param {string} options.src - Default/Mobile image path.
+ * @param {string} [options.tablet] - Image path for tablets (min-width: 640px).
+ * @param {string} [options.desktop] - Image path for desktops (min-width: 1024px).
+ * @param {string} [options.alt=''] - Alt text for accessibility.
+ * @param {string} [options.className=''] - Tailwind classes for the <img> tag.
+ * @param {string} [options.wrapperClass=''] - Tailwind classes for the <picture> tag.
+ * @param {string} [options.loading='lazy'] - 'lazy' or 'eager'.
+ */
+
+// ${picture({
+//   src: "/images/hero-mobile.jpg",
+//   tablet: "/images/hero-tablet.jpg",
+//   desktop: "/images/hero-desktop.jpg",
+//   alt: "Skycom Office",
+//   className: "w-full h-64 md:h-96 rounded-2xl object-cover shadow-inner",
+//   loading: "eager" // Load quickly since it's at the top
+// })}
+export const picture = ({
+  src,
+  tablet,
+  desktop,
+  alt = "",
+  className = "w-full h-auto object-cover",
+  wrapperClass = "block overflow-hidden",
+  loading = "lazy"
+}) => {
+  return `
+    <picture class="${wrapperClass}">
+      ${desktop ? `<source media="(min-width: 1024px)" srcset="${desktop}">` : ""}
+      ${tablet ? `<source media="(min-width: 640px)" srcset="${tablet}">` : ""}
+      <img 
+        src="${src}" 
+        alt="${alt.replace(/"/g, '&quot;')}" 
+        class="${className}" 
+        loading="${loading}"
+      />
+    </picture>
+  `.trim();
+};
