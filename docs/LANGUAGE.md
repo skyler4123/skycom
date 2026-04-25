@@ -139,6 +139,36 @@ ${"Click to edit"}
    },
    ```
 
+### Adding Words Without Translations (IMPORTANT)
+
+If you need to add a word/phrase that **doesn't exist in dictionary.js yet**, follow this rule:
+
+> **English (`en`) value = the key itself** (source of truth). Only translate to other languages.
+
+**Example - Adding "System Design":**
+```javascript
+"System Design": {
+  en: "System Design",     // ← Same as key
+  es: "Diseño del sistema",
+  fr: "Conception du système",
+  de: "Systemdesign",
+  vi: "Thiết Kế Hệ Thống",
+},
+```
+
+**Example - Adding "Employee Management":**
+```javascript
+"Employee Management": {
+  en: "Employee Management",
+  es: "Gestión de empleados",
+  fr: "Gestion des employés",
+  de: "Mitarbeiterverwaltung",
+  vi: "Quản Lý Nhân Viên",
+},
+```
+
+This ensures the fallback works correctly: when a translation is missing for a language, users will see the English text instead of a blank or broken display.
+
 ---
 
 ## 7. How to Switch Language
