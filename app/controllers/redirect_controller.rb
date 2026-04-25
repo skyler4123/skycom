@@ -3,6 +3,6 @@ class RedirectController < ApplicationController
     companies = current_user.accessible_companies
     redirect_to root_path if companies.empty?
     redirect_company = companies.first if companies.present?
-    redirect_to company_branches_path(redirect_company) if redirect_company
+    redirect_to company_dashboards_path(redirect_company) if redirect_company
   end
 end

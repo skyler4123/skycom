@@ -39,7 +39,3 @@ See `README.md` for detailed coverage of:
 - Type definitions (JSDoc patterns)
 - Reactive UI & inline editing patterns
 - Form engine lifecycle
-
-## CI Commands (Docker)
-- `docker compose -f docker-compose.seed-test.yml up` - Seed test suite
-- `docker compose -f docker-compose.rspec-test.yml up` - RSpec test suite
