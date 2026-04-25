@@ -326,7 +326,7 @@ export const translate = (key) => {
   const lang = localStorage.getItem("languageCode") || "en";
   
   // Return translation if found, otherwise return the key itself
-  return dictionary[key]?.[lang] || key;
+  return dictionary()[key]?.[lang] || key;
 };
 
 /**
