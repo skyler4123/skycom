@@ -85,7 +85,7 @@ export default class Companies_LayoutController extends Controller {
                 </a>
                 <a
                   class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:bg-blue-100 open:text-blue-600"
-                  ${tooltip({html: `<div class="bg-amber-100 text-amber-600">Branches link</div>`, action: "click"})}
+                  ${tooltip({html: `<div class="bg-amber-100 text-amber-600">${translate("Hello")}</div>`, action: "click"})}
                 >
                   <span class="material-symbols-outlined">apartment</span>
                   <p class="text-sm font-medium leading-normal">Branches</p>
@@ -316,9 +316,19 @@ export default class Companies_LayoutController extends Controller {
                 </button>
                 <button
                   class="flex cursor-pointer items-center justify-center overflow-hidden rounded-full h-10 w-10 hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-600 dark:text-gray-300"
-                  ${Helpers.triggerLanguageDropdown()}
+                  ${popover({
+                    html: `
+                      <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md shadow-lg z-50">
+                        <a data-language-code-param="en" data-action="click->language#changeLanguage" class="block px-4 py-2 text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer">English</a>
+                        <a data-language-code-param="es" data-action="click->language#changeLanguage" class="block px-4 py-2 text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer">Spanish</a>
+                        <a data-language-code-param="fr" data-action="click->language#changeLanguage" class="block px-4 py-2 text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer">French</a>
+                        <a data-language-code-param="de" data-action="click->language#changeLanguage" class="block px-4 py-2 text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer">German</a>
+                        <a data-language-code-param="vi" data-action="click->language#changeLanguage" class="block px-4 py-2 text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer">Vietnamese</a>
+                      </div>
+                    `
+                  })}
                 >
-                  <span ${Helpers.languageCodeTextTarget()}></span>
+                  <span>${(localStorage.getItem("languageCode") || "en").toUpperCase()}</span>
                 </button>
                 <button
                   class="flex cursor-pointer items-center justify-center overflow-hidden rounded-full h-10 w-10 hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-600 dark:text-gray-300">

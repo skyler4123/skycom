@@ -321,12 +321,13 @@ export const darkmodeTrigger = () => `data-darkmode-target="trigger"`
  */
 export const openByPathname = () => `data-open-target="openByPathname"`
 
-/**
- * Returns a data-language-key attribute string for translation.
- * @param {string} key - The translation key.
- * @returns {string} `data-language-key="..."`
- */
-export const translate = (key) => `data-language-key="${key}"`
+export const translate = (key) => {
+  // Get current lang from local storage, default to 'en'
+  const lang = localStorage.getItem("languageCode") || "en";
+  
+  // Return translation if found, otherwise return the key itself
+  return dictionary[key]?.[lang] || key;
+};
 
 /**
  * Returns the data-language-target attribute string for the language dropdown trigger.
@@ -573,7 +574,7 @@ export const popover = (options) => {
     html = "",
     position = "bottom", // Popovers usually look better below the trigger
     arrow = true,
-    classes = "bg-white dark:bg-slate-800 p-4 shadow-2xl border border-slate-200 dark:border-slate-700",
+    classes = "",
     offset = 15
   } = options
 
