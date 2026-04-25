@@ -2,6 +2,8 @@ BUSINESS_TYPES = {
   # Group 1: General & Retail (0-999)
   retail: 0,
   service: 1,
+  shop: 2,
+  fitness: 3,
 
   # Group 2: Food & Accommodation (1000-1999)
   restaurant: 1000,
