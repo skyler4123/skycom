@@ -17,10 +17,21 @@
 //    <div data-open-target="listener" data-open-group-param="`group1`" data-open-key-param="`key3`">Listener 3</div>
 //  </div>
 
+// <a
+//   class="flex"
+//   ${openByPathname()}
+// >
 import { Controller } from "@hotwired/stimulus"
 
 export default class OpenController extends Controller {
-  static targets = ["trigger", "listener"]
+  static targets = ["trigger", "listener", "openByPathname"]
+
+  connect() {
+    poll(() => {
+      this.updateOpenByPathnameTargets()
+      return this.openByPathnameTargets.every(target => target.hasAttribute("open"))
+    })
+  }
 
   click(event) {
     event.preventDefault()
@@ -53,6 +64,27 @@ export default class OpenController extends Controller {
         }
       })
     }
+  }
+
+  // Make sure openByPathname targets were added 
+  updateOpenByPathnameTargets() {
+    const currentPath = window.location.pathname
+
+    this.openByPathnameTargets.forEach((linkElement) => {
+      // If the link doesn't have an href, skip to the next iteration.
+      if (!linkElement.href) {
+        // console the text inside "Link element has no href:" and the linkElement
+        console.log("Link element has no href:", linkElement.innerText)
+        return; // Acts like 'continue' in a forEach loop
+      }
+
+      const linkPath = new URL(linkElement.href).pathname
+      if (linkPath === currentPath) {
+        linkElement.setAttribute("open", "")
+      } else {
+        linkElement.removeAttribute("open")
+      }
+    })
   }
 
 }

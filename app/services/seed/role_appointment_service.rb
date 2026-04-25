@@ -1,15 +1,17 @@
 class Seed::RoleAppointmentService
-  def self.run
-    Branch.all.each_with_index do |company, index|
-      roles = branch.roles
-      employee_groups = branch.employee_groups
-      employees = branch.employees
-      employees.each do |employee|
-        employee.roles << roles.sample
-      end
-      employee_groups.each do |employee_group|
-        employee_group.roles << roles.sample
-      end
-    end
+  def self.create(
+    company:,
+    role:,
+    appoint_to:,
+    workflow_status: :active,
+    business_type: nil
+  )
+    RoleAppointment.create!(
+      company: company,
+      role: role,
+      appoint_to: appoint_to,
+      workflow_status: workflow_status,
+      business_type: business_type
+    )
   end
 end

@@ -25,7 +25,7 @@ RSpec.describe Employee, type: :model do
   end
 
   describe "enums" do
-    it { should define_enum_for(:business_type).with_values(full_time: 0, part_time: 1, contractor: 2, intern: 3) }
+    it { should define_enum_for(:business_type).with_values(owner: 0, full_time: 1, part_time: 2, contractor: 3, intern: 4) }
     it { should define_enum_for(:lifecycle_status) }
     it { should define_enum_for(:workflow_status) }
   end

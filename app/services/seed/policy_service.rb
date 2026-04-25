@@ -1,30 +1,27 @@
 class Seed::PolicyService
   def self.new(
-    branch:,
+    company: nil,
+    branch: nil,
     name: nil,
     description: nil,
-    resource: COMMON_RESOURCES.sample,
-    action: COMMON_ACTIONS.sample,
-    kind: nil,
-    status: nil,
-    discarded_at: nil,
-    index: 1
+    resource: nil,
+    action: nil,
+    business_type: nil,
+    lifecycle_status: nil,
+    discarded_at: nil
   )
-    should_discard = rand(10) == 0
-    discarded_at ||= should_discard ? Time.zone.now - rand(1..90).days : nil
-    name ||= "#{action.capitalize} #{resource.titleize} Access Policy #{index + 1}"
-    description ||= "Policy governing the #{action} access to #{resource}."
-    kind ||= Policy.kinds.keys.sample
-    status ||= Policy.statuses.keys.sample
+    business_type ||= Policy.business_types.keys.sample
+    lifecycle_status ||= Policy.lifecycle_statuses.keys.sample
 
     Policy.new(
+      company: company || branch.company,
       branch: branch,
       name: name,
       description: description,
-      resource: resource.singularize,
+      resource: resource,
       action: action,
-      kind: kind,
-      status: status,
+      business_type: business_type,
+      lifecycle_status: lifecycle_status,
       discarded_at: discarded_at
     )
   end

@@ -5,14 +5,21 @@ class Seed::EmployeeService
     departments: [],
     roles: [],
     user: nil,
-    email: "employee_#{SecureRandom.hex}@gmail.com",
-    name: Faker::Name.name,
-    description: "#{Faker::Job.title} in #{Faker::Commerce.department}",
-    workflow_status: Employee.workflow_statuses.keys.sample,
-    lifecycle_status: Employee.lifecycle_statuses.keys.sample,
-    business_type: Employee.business_types.keys.sample,
+    email: nil,
+    name: nil,
+    description: nil,
+    workflow_status: nil,
+    lifecycle_status: nil,
+    business_type: nil,
     discarded_at: nil
   )
+    workflow_status ||= Employee.workflow_statuses.keys.sample
+    lifecycle_status ||= Employee.lifecycle_statuses.keys.sample
+    business_type ||= Employee.business_types.keys.sample
+    email ||= "employee_#{SecureRandom.hex}@gmail.com"
+    name ||= Faker::Name.name
+    description ||= "#{Faker::Job.title} in #{Faker::Commerce.department}"
+
     Employee.new(
       user: user,
       company: company,

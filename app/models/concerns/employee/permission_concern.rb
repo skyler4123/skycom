@@ -11,6 +11,9 @@ module Employee::PermissionConcern
     # 1. The Public Check
     # Now supports instance-level checks: current_employee.can?(:update, @product)
     def can?(action_name, target)
+      # Owner employee has all permissions - bypass normal checks
+      return true if owner_role?
+
       action   = action_name.to_s
       # Handle both Class (Product) and Instance (@product)
       resource = target.is_a?(Class) ? target.name : target.class.name
@@ -30,6 +33,11 @@ module Employee::PermissionConcern
 
       # 3. Instance-level check: Evaluate tag_conditions
       matching_policies.any? { |policy| evaluate_tag_conditions(target, policy[:tag_conditions]) }
+    end
+
+    # Check if employee has owner role (business_type = :owner)
+    def owner_role?
+      role_appointments.any? { |ra| ra.business_type == "owner" }
     end
 
     # 2. The ABAC Engine
@@ -59,7 +67,7 @@ module Employee::PermissionConcern
     # Used for Permissions UI page
     def permissions
       cache_key = "#{cache_key_with_version}/permissions"
-      Rails.cache.fetch(cache_key, expires_in: 24.hours) do
+      Rails.cache.fetch(cache_key, expires_in: 1.minutes) do
         load_permissions_from_db
       end
     end
@@ -100,7 +108,7 @@ module Employee::PermissionConcern
     # 5. Only active PolicyAppointments - used for can? checks
     def permissions_by_role
       cache_key = "#{cache_key_with_version}/permissions_by_role"
-      Rails.cache.fetch(cache_key, expires_in: 24.hours) do
+      Rails.cache.fetch(cache_key, expires_in: 1.minutes) do
         roles.includes(:policy_appointments).each_with_object({}) do |role, hash|
           active_appointments = role.policy_appointments.active.includes(:policy)
 

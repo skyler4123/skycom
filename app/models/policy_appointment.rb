@@ -5,11 +5,21 @@ class PolicyAppointment < ApplicationRecord
 
   belongs_to :company
   belongs_to :policy
-  # REASON: When a permission is toggled (created/destroyed), we must update the Role's timestamp so the Role knows its collection of policies has changed.
-  # appoint_to can be: role
   belongs_to :appoint_to, polymorphic: true, touch: true
   enum :workflow_status, {
     inactive: 0,
     active: 1
   }
+
+  enum :business_type, { owner: 0 }
+
+  before_update :prevent_modification_if_owner
+  before_destroy :prevent_modification_if_owner
+
+  private
+
+  def prevent_modification_if_owner
+    return unless business_type == "owner"
+    raise ActiveRecord::ReadOnlyRecord, "Owner records cannot be modified."
+  end
 end

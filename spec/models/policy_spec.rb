@@ -21,6 +21,6 @@ RSpec.describe Policy, type: :model do
   describe "enums" do
     it { should define_enum_for(:lifecycle_status) }
     it { should define_enum_for(:workflow_status) }
-    it { should define_enum_for(:business_type).with_values(security: 0, regulatory: 1, operational: 2, compliance: 3) }
+    it { should define_enum_for(:business_type).with_values(owner: 0, security: 1, regulatory: 2, operational: 3, compliance: 4) }
   end
 end

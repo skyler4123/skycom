@@ -1,13 +1,13 @@
 class Seed::RetailService
   EMPLOYEE_COUNTS = {
-    manager: 1,
-    cashier: 10,
-    sales_associate: 10,
-    stock_clerk: 1,
-    admin: 1
+    Manager: 1,
+    Cashier: 10,
+    Seller: 10,
+    Security: 1,
+    Admin: 1
   }.freeze
 
-  CUSTOMER_COUNTS = { customer: 20 }.freeze
+  CUSTOMER_COUNTS = { Customer: 20 }.freeze
   RETAIL_ROLES = (EMPLOYEE_COUNTS.keys + CUSTOMER_COUNTS.keys).freeze
   COMPANY_GROUP_BUSINESS_TYPE = :retail
 
@@ -334,33 +334,29 @@ class Seed::RetailService
 
   def assign_policies_to_roles
     role_definitions = {
-      admin: {
+      Admin: {
         "PolicyAppointment" => { create: true, read: true, update: true, delete: true }
       },
-      manager: {
+      Manager: {
         "Order" => { create: true, read: true, update: true, delete: true },
         "Product" => { create: true, read: true, update: true, delete: true },
         "Employee" => { create: true, read: true, update: true, delete: true },
         "Customer" => { create: true, read: true, update: true, delete: true },
         "PolicyAppointment" => { create: false, read: true, update: true, delete: false }
       },
-      cashier: {
+      Cashier: {
         "Order" => { create: true, read: true, update: true, delete: false },
         "Product" => { create: false, read: true, update: false, delete: false },
         "Customer" => { create: true, read: true, update: false, delete: false }
       },
-      sales_associate: {
+      Seller: {
         "Order" => { create: true, read: true, update: false, delete: false },
         "Product" => { create: false, read: true, update: false, delete: false },
         "Customer" => { create: false, read: true, update: false, delete: false }
       },
-      stock_clerk: {
-        "Product" => { create: true, read: true, update: true, delete: true },
-        "Order" => { create: false, read: false, update: false, delete: false }
-      },
-      customer: {
-        "Order" => { create: false, read: true, update: false, delete: false },
-        "Product" => { create: false, read: true, update: false, delete: false }
+      Security: {
+        "Product" => { create: false, read: true, update: false, delete: false },
+        "Order" => { create: false, read: true, update: false, delete: false }
       }
     }
 

@@ -9,20 +9,21 @@ module Company::PermissionConcern
     # Returns all roles with ALL company policies
     # Each policy includes policy_appointment (if exists) with workflow_status
     # Used for Permissions UI page - shows all policies with their assignment status
+    # Excludes owner role (business_type = :owner)
     def permissions
       cache_key = "#{cache_key_with_version}/permissions"
 
-      Rails.cache.fetch(cache_key, expires_in: 24.hours) do
-        all_policies = policies.to_a
+      Rails.cache.fetch(cache_key, expires_in: 1.minutes) do
+        all_policies = policies.where.not(business_type: :owner).to_a
 
-        roles.map do |role|
+        roles.where.not(business_type: :owner).map do |role|
           role_policies = role.policy_appointments.includes(:policy).to_a
 
           {
             id: role.id,
             name: role.name,
             description: role.description,
-            policies: all_policies.map do |policy|
+            policies: all_policies.select { |policy| role_policies.find { |a| a.policy_id == policy.id } }.map do |policy|
               appointment = role_policies.find { |a| a.policy_id == policy.id }
 
               {
@@ -48,7 +49,7 @@ module Company::PermissionConcern
     def permissions_by_role
       cache_key = "#{cache_key_with_version}/permissions_by_role"
 
-      Rails.cache.fetch(cache_key, expires_in: 24.hours) do
+      Rails.cache.fetch(cache_key, expires_in: 1.minutes) do
         roles.includes(:policy_appointments).each_with_object({}) do |role, hash|
           active_appointments = role.policy_appointments.active.includes(:policy)
 
@@ -73,7 +74,7 @@ module Company::PermissionConcern
     def permissions_by_resource
       cache_key = "#{cache_key_with_version}/permissions_by_resource"
 
-      Rails.cache.fetch(cache_key, expires_in: 24.hours) do
+      Rails.cache.fetch(cache_key, expires_in: 1.minutes) do
         roles.includes(:policy_appointments).each_with_object({}) do |role, hash|
           active_appointments = role.policy_appointments.active.includes(:policy)
           role_permissions = active_appointments.group_by { |a| a.policy.resource }.transform_values do |appointments|

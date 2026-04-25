@@ -316,17 +316,18 @@ export const closeModalAction = () => `data-action="click->modal#close"`
 export const darkmodeTrigger = () => `data-darkmode-target="trigger"`
 
 /**
- * Returns the data-link-target attribute string for opening links by pathname.
- * @returns {string} `data-link-target="openByPathname"`
+ * Returns the data-open-target attribute string for opening links by pathname.
+ * @returns {string} `data-open-target="openByPathname"`
  */
-export const openByPathname = () => `data-link-target="openByPathname"`
+export const openByPathname = () => `data-open-target="openByPathname"`
 
-/**
- * Returns a data-language-key attribute string for translation.
- * @param {string} key - The translation key.
- * @returns {string} `data-language-key="..."`
- */
-export const translate = (key) => `data-language-key="${key}"`
+export const translate = (key) => {
+  // Get current lang from local storage, default to 'en'
+  const lang = localStorage.getItem("languageCode") || "en";
+  
+  // Return translation if found, otherwise return the key itself
+  return dictionary()[key]?.[lang] || key;
+};
 
 /**
  * Returns the data-language-target attribute string for the language dropdown trigger.
@@ -519,10 +520,11 @@ export const editable = ({
 /**
  * Wraps content with the Stimulus Tooltip Controller.
  * @param {Object} options
- * @param {string} options.message - Text or HTML content for the tooltip.
+ * @param {string} options.html - Text or HTML content for the tooltip.
  * @param {string} options.html - The trigger element's inner HTML.
  * @param {string} [options.tag='div'] - The wrapper tag.
  * @param {string} [options.position='top'] - top, bottom, left, right.
+ * @param {string} [options.action='hover'] - 'hover' or 'click'.
  * @param {boolean} [options.arrow=true] - Show the little pointer arrow.
  * @param {string} [options.classes=''] - Custom Tailwind overrides for the tooltip box.
  * @param {number} [options.delay=200] - Delay before appearing (ms).
@@ -532,14 +534,14 @@ export const editable = ({
 export const tooltip = (options) => {
   // 1. Handle Simple Case: ${tooltip("Message")}
   if (typeof options === "string") {
-    options = { message: options }
+    options = { html: options }
   }
 
   // 2. Set Defaults for the Object Case
   const {
-    message = "",
+    html = "",
     position = "top",
-    arrow = true,
+    action = "hover",
     classes = "",
     delay = 200,
     duration = 10000
@@ -548,15 +550,39 @@ export const tooltip = (options) => {
   // 3. Return only the data attributes string
   return `
     data-controller="tooltip"
-    data-tooltip-message-value="${message.replace(/"/g, '&quot;')}"
+    data-tooltip-html-value="${html.replace(/"/g, '&quot;')}"
     data-tooltip-position-value="${position}"
-    data-tooltip-arrow-value="${arrow}"
+    data-tooltip-action-value="${action}"
     data-tooltip-classes-value="${classes}"
     data-tooltip-delay-value="${delay}"
     data-tooltip-duration-value="${duration}"
   `.trim()
 }
 
+/**
+ * Wraps content with the Stimulus Popover Controller.
+ * Supports interactive content (links, buttons).
+ */
+export const popover = (options) => {
+  if (typeof options === "string") {
+    options = { html: options }
+  }
+
+  const {
+    html = "",
+    position = "bottom", // Popovers usually look better below the trigger
+    classes = "",
+    offset = 15
+  } = options
+
+  return `
+    data-controller="popover"
+    data-popover-html-value="${html.replace(/"/g, '&quot;')}"
+    data-popover-position-value="${position}"
+    data-popover-classes-value="${classes}"
+    data-popover-offset-value="${offset}"
+  `.trim()
+}
 
 export const checkbox = ({
   url = pathname(),
@@ -586,3 +612,46 @@ export const checkbox = ({
 
   return inputHtml
 }
+
+/**
+ * Renders a responsive HTML <picture> tag.
+ * @param {Object} options
+ * @param {string} options.src - Default/Mobile image path.
+ * @param {string} [options.tablet] - Image path for tablets (min-width: 640px).
+ * @param {string} [options.desktop] - Image path for desktops (min-width: 1024px).
+ * @param {string} [options.alt=''] - Alt text for accessibility.
+ * @param {string} [options.className=''] - Tailwind classes for the <img> tag.
+ * @param {string} [options.wrapperClass=''] - Tailwind classes for the <picture> tag.
+ * @param {string} [options.loading='lazy'] - 'lazy' or 'eager'.
+ */
+
+// ${picture({
+//   src: "/images/hero-mobile.jpg",
+//   tablet: "/images/hero-tablet.jpg",
+//   desktop: "/images/hero-desktop.jpg",
+//   alt: "Skycom Office",
+//   className: "w-full h-64 md:h-96 rounded-2xl object-cover shadow-inner",
+//   loading: "eager" // Load quickly since it's at the top
+// })}
+export const picture = ({
+  src,
+  tablet,
+  desktop,
+  alt = "",
+  className = "w-full h-auto object-cover",
+  wrapperClass = "block overflow-hidden",
+  loading = "lazy"
+}) => {
+  return `
+    <picture class="${wrapperClass}">
+      ${desktop ? `<source media="(min-width: 1024px)" srcset="${desktop}">` : ""}
+      ${tablet ? `<source media="(min-width: 640px)" srcset="${tablet}">` : ""}
+      <img 
+        src="${src}" 
+        alt="${alt.replace(/"/g, '&quot;')}" 
+        class="${className}" 
+        loading="${loading}"
+      />
+    </picture>
+  `.trim();
+};

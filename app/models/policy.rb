@@ -24,10 +24,11 @@ class Policy < ApplicationRecord
 
   # Policy business_types based on common organizational categories
   enum :business_type, {
-    security: 0,
-    regulatory: 1,
-    operational: 2,
-    compliance: 3
+    owner: 0,
+    security: 1,
+    regulatory: 2,
+    operational: 3,
+    compliance: 4
   }
 
   # --- Validations ---
@@ -35,12 +36,12 @@ class Policy < ApplicationRecord
   validates :resource, presence: true
   validates :action, presence: true
 
-  # CRITICAL: Enforce uniqueness of the policy name scoped to the branch.
+  # CRITICAL: Enforce uniqueness of the policy name scoped to the company.
   # This prevents two policies within the same company from having the same name.
   validates :name,
             uniqueness: {
-              scope: :branch_id,
-              message: "A policy with this name already exists in this branch."
+              scope: :company_id,
+              message: "A policy with this name already exists in this company."
             }
 
   # If you edit the Policy name/action/resource, notify the Roles.
