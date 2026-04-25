@@ -322,5 +322,26 @@ export const dictionary = () => {
       de: "Land",
       vi: "Quốc gia",
     },
+    "New Company": {
+      en: "New Company",
+      es: "Nueva Empresa",
+      fr: "Nouvelle Entreprise",
+      de: "Neues Unternehmen",
+      vi: "Công Ty Mới",
+    },
+    "Create Company": {
+      en: "Create Company",
+      es: "Crear Empresa",
+      fr: "Créer une Entreprise",
+      de: "Unternehmen Erstellen",
+      vi: "Tạo Công Ty",
+    },
+    "Company Created Successfully!": {
+      en: "Company Created Successfully!",
+      es: "¡Empresa Creada con Éxito!",
+      fr: "Entreprise Créée avec Succès!",
+      de: "Unternehmen Erfolgreich Erstellt!",
+      vi: "Tạo Công Ty Thành Công!",
+    },
   }
 }
