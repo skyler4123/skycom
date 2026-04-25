@@ -542,7 +542,6 @@ export const tooltip = (options) => {
     html = "",
     position = "top",
     action = "hover",
-    arrow = true,
     classes = "",
     delay = 200,
     duration = 10000
@@ -554,7 +553,6 @@ export const tooltip = (options) => {
     data-tooltip-html-value="${html.replace(/"/g, '&quot;')}"
     data-tooltip-position-value="${position}"
     data-tooltip-action-value="${action}"
-    data-tooltip-arrow-value="${arrow}"
     data-tooltip-classes-value="${classes}"
     data-tooltip-delay-value="${delay}"
     data-tooltip-duration-value="${duration}"
@@ -573,7 +571,6 @@ export const popover = (options) => {
   const {
     html = "",
     position = "bottom", // Popovers usually look better below the trigger
-    arrow = true,
     classes = "",
     offset = 15
   } = options
@@ -582,7 +579,6 @@ export const popover = (options) => {
     data-controller="popover"
     data-popover-html-value="${html.replace(/"/g, '&quot;')}"
     data-popover-position-value="${position}"
-    data-popover-arrow-value="${arrow}"
     data-popover-classes-value="${classes}"
     data-popover-offset-value="${offset}"
   `.trim()

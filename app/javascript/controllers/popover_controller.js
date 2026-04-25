@@ -4,24 +4,17 @@ export default class extends Controller {
   static values = {
     html: String,
     position: { type: String, default: "bottom" },
-    arrow: { type: Boolean, default: true },
     classes: String,
     offset: { type: Number, default: 15 }
   }
 
   connect() {
     this.popover = null
-    // Popovers are almost always click-triggered in ERPs
     this.element.addEventListener("click", this.toggle.bind(this))
     
-    // The "Click Outside" logic
     this.clickOutsideHandler = (e) => {
       if (!this.popover) return
-      
-      const clickedInsideTrigger = this.element.contains(e.target)
-      const clickedInsidePopover = this.popover.contains(e.target)
-
-      if (!clickedInsideTrigger && !clickedInsidePopover) {
+      if (!this.element.contains(e.target) && !this.popover.contains(e.target)) {
         this.hide()
       }
     }
@@ -35,28 +28,19 @@ export default class extends Controller {
   show() {
     if (this.popover) return
 
-    // 1. Create Container
     this.popover = document.createElement("div")
-    
-    // 2. Styles: removed 'pointer-events-none' so we can click inside!
     const defaultClasses = "fixed z-[9999] rounded-xl transition-all duration-200 opacity-0 translate-y-1 pointer-events-auto"
     this.popover.className = `${defaultClasses} ${this.classesValue}`
     this.popover.innerHTML = this.htmlValue
 
-    // 3. Arrow logic
-    if (this.arrowValue) {
-      this.arrowElement = document.createElement("div")
-      this.arrowElement.className = "absolute size-3 rotate-45 bg-inherit border-inherit border-b border-r"
-      this.popover.appendChild(this.arrowElement)
-    }
-
     document.body.appendChild(this.popover)
+    
+    // We need a tiny delay or double-RAF to ensure the browser has 
+    // calculated the popover's width/height before we position it.
     this.updatePosition()
 
-    // 4. Listen for outside clicks
     document.addEventListener("click", this.clickOutsideHandler)
 
-    // 5. Animate In
     requestAnimationFrame(() => {
       this.popover?.classList.remove("opacity-0", "translate-y-1")
       this.popover?.classList.add("opacity-100", "translate-y-0")
@@ -65,7 +49,6 @@ export default class extends Controller {
 
   hide() {
     if (!this.popover) return
-
     document.removeEventListener("click", this.clickOutsideHandler)
     this.popover.classList.add("opacity-0")
     
@@ -76,13 +59,16 @@ export default class extends Controller {
   }
 
   updatePosition() {
+    if (!this.popover) return
+
     const target = this.element.getBoundingClientRect()
     const pop = this.popover.getBoundingClientRect()
     const offset = this.offsetValue
+    const screenPadding = 20 // Increase this to push it further from the edge
 
     let top, left
     
-    // Simple top/bottom/left/right logic
+    // 1. Calculate ideal coordinates
     switch (this.positionValue) {
       case "top":
         top = target.top - pop.height - offset
@@ -102,22 +88,19 @@ export default class extends Controller {
         break
     }
 
-    // Basic Screen Boundary Check
-    if (left < 10) left = 10
-    if (left + pop.width > window.innerWidth - 10) left = window.innerWidth - pop.width - 10
+    // 2. Strict Boundary Enforcement
+    // Calculate the boundaries
+    const minLeft = screenPadding
+    const maxLeft = window.innerWidth - pop.width - screenPadding
+    const minTop = screenPadding
+    const maxTop = window.innerHeight - pop.height - screenPadding
 
-    this.popover.style.top = `${top}px`
-    this.popover.style.left = `${left}px`
+    // Clamp the values
+    const finalLeft = Math.min(Math.max(left, minLeft), maxLeft)
+    const finalTop = Math.min(Math.max(top, minTop), maxTop)
 
-    // Arrow Positioning logic (similar to tooltip but sized for popover)
-    if (this.arrowValue && this.arrowElement) {
-        const isVertical = ["top", "bottom"].includes(this.positionValue)
-        this.arrowElement.style.top = this.positionValue === "bottom" ? "-6px" : (this.positionValue === "top" ? "auto" : "50%")
-        this.arrowElement.style.bottom = this.positionValue === "top" ? "-6px" : "auto"
-        this.arrowElement.style.left = isVertical ? "50%" : (this.positionValue === "right" ? "-6px" : "auto")
-        this.arrowElement.style.right = this.positionValue === "left" ? "-6px" : "auto"
-        this.arrowElement.style.transform = `translate(${isVertical ? '-50%' : '0'}, ${!isVertical ? '-50%' : '0'}) rotate(45deg)`
-    }
+    this.popover.style.left = `${finalLeft}px`
+    this.popover.style.top = `${finalTop}px`
   }
 
   disconnect() {

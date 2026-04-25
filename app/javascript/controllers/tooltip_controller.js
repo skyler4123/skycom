@@ -5,7 +5,6 @@ export default class extends Controller {
     html: String,
     position: { type: String, default: "top" },
     action: { type: String, default: "hover" }, // 'hover' or 'click'
-    arrow: { type: Boolean, default: false },
     classes: String,
     delay: { type: Number, default: 200 },
     duration: { type: Number, default: 10000 }
@@ -22,7 +21,6 @@ export default class extends Controller {
   bindEvents() {
     if (this.actionValue === "click") {
       this.element.addEventListener("click", this.toggle.bind(this))
-      // Handle closing when clicking outside
       this.clickOutsideHandler = (e) => {
         if (!this.element.contains(e.target) && this.tooltip && !this.tooltip.contains(e.target)) {
           this.hide()
@@ -51,18 +49,10 @@ export default class extends Controller {
     
     const defaultClasses = "fixed z-[9999] px-3 py-2 text-sm font-medium rounded-lg shadow-xl transition-all duration-300 opacity-0 translate-y-2 pointer-events-none"
     const themeClasses = "bg-slate-900 text-slate-100 border border-slate-700 dark:bg-white dark:text-slate-900 dark:border-slate-200"
-    
-    // If it's a click tooltip, we might want it to be interactive (pointer-events-auto)
     const interactionClass = this.actionValue === "click" ? "pointer-events-auto" : "pointer-events-none"
     
     this.tooltip.className = `${defaultClasses} ${interactionClass} ${this.classesValue || themeClasses}`
     this.tooltip.innerHTML = this.htmlValue
-
-    if (this.arrowValue) {
-      this.arrowElement = document.createElement("div")
-      this.arrowElement.className = "absolute size-2 rotate-45 bg-inherit border-inherit border-b border-r"
-      this.tooltip.appendChild(this.arrowElement)
-    }
 
     document.body.appendChild(this.tooltip)
     this.updatePosition()
@@ -98,14 +88,15 @@ export default class extends Controller {
   }
 
   updatePosition() {
+    if (!this.tooltip) return
+
     const target = this.element.getBoundingClientRect()
     const tip = this.tooltip.getBoundingClientRect()
-    let { position } = this
+    const offset = 12 
+    const padding = 15 // Gap from screen edges
 
     let top, left
-    const offset = 12 // Space between element and tooltip
 
-    // Basic calculation based on requested position
     const calculate = (pos) => {
       switch (pos) {
         case "top":
@@ -127,32 +118,24 @@ export default class extends Controller {
       }
     }
 
+    // Initial calculation
     calculate(this.positionValue)
 
-    // --- Collision Detection (Auto-Shift/Flip) ---
-    const padding = 10
-    if (top < padding) calculate("bottom") // If hits top, flip to bottom
-    if (top + tip.height > window.innerHeight - padding) calculate("top") // If hits bottom, flip to top
-    if (left < padding) left = padding // Don't go off left screen
-    if (left + tip.width > window.innerWidth - padding) left = window.innerWidth - tip.width - padding
+    // --- Boundary Logic ---
+    // 1. Flip vertically if clipping top/bottom
+    if (top < padding && this.positionValue === "top") calculate("bottom")
+    if (top + tip.height > window.innerHeight - padding && this.positionValue === "bottom") calculate("top")
 
-    this.tooltip.style.top = `${top}px`
-    this.tooltip.style.left = `${left}px`
+    // 2. Final Clamp (Ensure it stays on screen horizontally and vertically)
+    const maxLeft = window.innerWidth - tip.width - padding
+    const maxTop = window.innerHeight - tip.height - padding
 
-    // Position Arrow correctly
-    if (this.arrowValue && this.arrowElement) {
-      const isVertical = ["top", "bottom"].includes(this.positionValue)
-      this.arrowElement.style.top = this.positionValue === "bottom" ? "-4px" : (this.positionValue === "top" ? "auto" : "50%")
-      this.arrowElement.style.bottom = this.positionValue === "top" ? "-4px" : "auto"
-      this.arrowElement.style.left = isVertical ? "50%" : (this.positionValue === "right" ? "-4px" : "auto")
-      this.arrowElement.style.right = this.positionValue === "left" ? "-4px" : "auto"
-      this.arrowElement.style.transform = `translate(${isVertical ? '-50%' : '0'}, ${!isVertical ? '-50%' : '0'}) rotate(45deg)`
-    }
+    this.tooltip.style.left = `${Math.max(padding, Math.min(left, maxLeft))}px`
+    this.tooltip.style.top = `${Math.max(padding, Math.min(top, maxTop))}px`
   }
 
   disconnect() {
     this.hide()
-    // Ensure listeners are cleaned up
     this.element.removeEventListener("click", this.toggle)
     this.element.removeEventListener("mouseenter", this.prepareShow)
     this.element.removeEventListener("mouseleave", this.hide)
