@@ -58,9 +58,7 @@ Rails.application.routes.draw do
   get "/sign_in_for_test", to: "sessions#sign_in_for_test", as: :sign_in_for_test if Rails.env.test?
   # ----------------------------------------------------------------------------------------------------
   # DEFAULTS
-  get  "sign_in", to: "sessions#new"
   post "sign_in", to: "sessions#create"
-  get  "sign_up", to: "registrations#new"
   post "sign_up", to: "registrations#create"
   resources :sessions, only: [ :index, :show, :destroy ]
   resource  :password, only: [ :edit, :update ]

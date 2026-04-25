@@ -3,14 +3,11 @@
 class SessionsController < ApplicationController
   skip_before_action :set_current_request_details, only: [ :sign_out ]
   skip_before_action :set_current_session, only: [ :sign_out ]
-  skip_before_action :authenticate, only: %i[ new create sign_out sign_in_for_test ]
+  skip_before_action :authenticate, only: %i[ create sign_out sign_in_for_test ]
   before_action :set_session, only: :destroy
 
   def index
     @sessions = current_user.sessions.order(created_at: :desc)
-  end
-
-  def new
   end
 
   def create
