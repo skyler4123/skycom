@@ -4,11 +4,10 @@ class Seed::RetailService
     Cashier: 10,
     Seller: 10,
     Security: 1,
-    Admin: 1,
-    Customer: 10
+    Admin: 1
   }.freeze
 
-  CUSTOMER_COUNTS = { customer: 20 }.freeze
+  CUSTOMER_COUNTS = { Customer: 20 }.freeze
   RETAIL_ROLES = (EMPLOYEE_COUNTS.keys + CUSTOMER_COUNTS.keys).freeze
   COMPANY_GROUP_BUSINESS_TYPE = :retail
 
@@ -358,10 +357,6 @@ class Seed::RetailService
       Security: {
         "Product" => { create: false, read: true, update: false, delete: false },
         "Order" => { create: false, read: true, update: false, delete: false }
-      },
-      Customer: {
-        "Order" => { create: false, read: true, update: false, delete: false },
-        "Product" => { create: false, read: true, update: false, delete: false }
       }
     }
 
