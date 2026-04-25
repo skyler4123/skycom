@@ -96,8 +96,6 @@ export default class Companies_Employees_NewModalController extends Controller {
 
     return form({
       action: pathname(),
-      method: "POST",
-      dataAction: `submit->form#submit`,
       className: "p-8 bg-white dark:bg-slate-900 rounded-2xl w-[500px] shadow-2xl border border-slate-100 dark:border-slate-800",
       html: fields
     })

@@ -1,35 +1,10 @@
-// app/javascript/controllers/home/new_modal_controller.js
+// app/javascript/controllers/companies/new_modal_controller.js
 
 import { Controller } from "@hotwired/stimulus"
 
 export default class Companies_NewModalController extends Controller {
   connect() {
     this.element.innerHTML = this.modalHTML()
-  }
-
-  handleSuccess(event) {
-    event.stopImmediatePropagation()
-
-    const { response } = event.detail
-    const company = response?.company
-
-    if (company) {
-      closeModal()
-
-      const dashboardUrl = Helpers.company_dashboards_path(company.id)
-      const link = `<a href="${dashboardUrl}" class="font-bold underline hover:no-underline">${company.name}</a>`
-
-      setTimeout(() => {
-        toast({
-          type: "success",
-          message: `${translate("Company Created Successfully!")} ${link}`
-        })
-      }, 300)
-
-      setTimeout(() => {
-        window.location.href = dashboardUrl
-      }, 2000)
-    }
   }
 
   modalHTML() {
@@ -87,8 +62,6 @@ export default class Companies_NewModalController extends Controller {
 
     return form({
       action: Helpers.create_companies_path(),
-      method: "POST",
-      dataAction: `submit->form#submit`,
       className: "bg-white dark:bg-slate-900 rounded-2xl w-[480px] shadow-2xl border border-slate-100 dark:border-slate-800 overflow-hidden",
       html: fields
     })
