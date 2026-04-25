@@ -29,8 +29,10 @@ export default class extends Controller {
     if (this.popover) return
 
     this.popover = document.createElement("div")
+    // Notice we don't hardcode bg-white here anymore, we let this.classesValue handle it
     const defaultClasses = "fixed z-[9999] rounded-xl transition-all duration-200 opacity-0 translate-y-1 pointer-events-auto"
-    this.popover.className = `${defaultClasses} ${this.classesValue}`
+    
+    this.popover.className = `${defaultClasses} ${this.classesValue || 'bg-white dark:bg-gray-900 border dark:border-gray-800 shadow-lg'}`
     this.popover.innerHTML = this.htmlValue
 
     document.body.appendChild(this.popover)

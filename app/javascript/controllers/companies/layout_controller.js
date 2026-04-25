@@ -55,13 +55,13 @@ export default class Companies_LayoutController extends Controller {
                 <h1
                   class="text-gray-900 dark:text-white text-base font-medium leading-normal cursor-pointer"
                   ${popover({
+                    classes: "bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 shadow-2xl p-2",
                     html: `
-                      <div class="flex flex-col gap-y-6 w-64 bg-white dark:bg-gray-800">
+                      <div class="flex flex-col gap-y-1 w-64">
                         ${currentCompanies().map((company) => `
-                          <a href="${Helpers.company_branches_path(company.id)}" class="flex items-center gap-3 px-3 py-2 rounded-lg text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 ${currentCompany().id === company.id ? 'bg-gray-100 dark:bg-gray-700' : ''}">
-                            <div class="flex flex-col">
-                              <span class="text-sm font-medium">${company.name}</span>
-                            </div>
+                          <a href="${Helpers.company_branches_path(company.id)}" 
+                            class="flex items-center gap-3 px-3 py-2 rounded-lg text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 ${currentCompany().id === company.id ? 'bg-gray-100 dark:bg-gray-800 font-bold' : ''}">
+                            <span class="text-sm">${company.name}</span>
                           </a>`).join("")}
                       </div>
                     `
@@ -78,14 +78,21 @@ export default class Companies_LayoutController extends Controller {
                   class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:bg-blue-100 open:text-blue-600"
                   href="${Helpers.company_dashboards_path(currentCompany().id)}"
                   ${openByPathname()}
-                  ${tooltip("Dashboard link")}
+                  ${tooltip({
+                    html: "Dashboard",
+                    classes: "bg-gray-900 text-white dark:bg-gray-100 dark:text-gray-900 px-2 py-1 text-xs"
+                  })}
                 >
                   <span class="material-symbols-outlined">dashboard</span>
                   <p class="text-sm font-medium leading-normal" ${translate("Dashboard")}>Dashboard</p>
                 </a>
                 <a
                   class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:bg-blue-100 open:text-blue-600"
-                  ${tooltip({html: `<div class="bg-amber-100 text-amber-600">${translate("Hello")}</div>`, action: "click"})}
+                  ${tooltip({
+                    html: `<div>${translate("Hello")}</div>`, 
+                    action: "click",
+                    classes: "bg-amber-50 text-amber-700 border border-amber-200 dark:bg-amber-900/30 dark:text-amber-200 dark:border-amber-800"
+                  })}
                 >
                   <span class="material-symbols-outlined">apartment</span>
                   <p class="text-sm font-medium leading-normal">Branches</p>
@@ -317,14 +324,31 @@ export default class Companies_LayoutController extends Controller {
                 <button
                   class="flex cursor-pointer items-center justify-center overflow-hidden rounded-full h-10 w-10 hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-600 dark:text-gray-300"
                   ${popover({
+                    classes: "bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 shadow-xl overflow-hidden",
                     html: `
-                      <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md shadow-lg z-50">
-                        <a data-language-code-param="en" data-action="click->language#changeLanguage" class="block px-4 py-2 text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer">English</a>
-                        <a data-language-code-param="es" data-action="click->language#changeLanguage" class="block px-4 py-2 text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer">Spanish</a>
-                        <a data-language-code-param="fr" data-action="click->language#changeLanguage" class="block px-4 py-2 text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer">French</a>
-                        <a data-language-code-param="de" data-action="click->language#changeLanguage" class="block px-4 py-2 text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer">German</a>
-                        <a data-language-code-param="vi" data-action="click->language#changeLanguage" class="block px-4 py-2 text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer">Vietnamese</a>
-                      </div>
+                      ${(() => {
+                        // Define the display names for each code
+                        const languageNames = {
+                          en: "English",
+                          es: "Español",
+                          fr: "Français",
+                          de: "Deutsch",
+                          vi: "Tiếng Việt"
+                        };
+
+                        return `
+                          <div class="flex flex-col min-w-[140px] py-1">
+                            ${["en", "es", "fr", "de", "vi"].map(lang => `
+                              <a data-language-code-param="${lang}" 
+                                data-action="click->language#changeLanguage" 
+                                class="flex items-center px-4 py-2 text-sm text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer transition-colors"
+                              >
+                                ${languageNames[lang] || lang.toUpperCase()}
+                              </a>
+                            `).join("")}
+                          </div>
+                        `;
+                      })()}
                     `
                   })}
                 >
@@ -342,9 +366,13 @@ export default class Companies_LayoutController extends Controller {
                   data-alt="User profile picture"
                   style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuBYk6_5wqHwhOUyfqIOzuw7uF6nG1B2aHcNfqPXgheh0TJNM9wgrKtU__k7USaOwDZLXPpvIrYvaXBnMbO7rmZHK15vMirHZqrK0UBZ18vJdiQZlmTrGe8wch8p3G7GXSetuz5njKmy7Hb6XGw18g0stonxhwtIcuuEqzZVHxbviNLuy4i_B8JHC1x_JlbUrZoIV2QQqyAprbH-jems99h8nqDZ6D6FBmq8JDrKIfaBYkl3mR0cYldl3c0gaNynjiRNKDKfaUcIKBc");'
                   ${popover({
+                    classes: "bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 shadow-xl p-1",
                     html: `
-                      <div class="flex flex-col gap-y-6 w-64 bg-white dark:bg-gray-800">
-                        <a class="flex items-center gap-3 px-3 py-2 rounded-lg text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700" href="/sign_out" class="cursor-pointer">Sign Out</a>
+                      <div class="w-48">
+                        <a class="flex items-center gap-3 px-4 py-2 rounded-md text-sm text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20" href="/sign_out">
+                          <span class="material-symbols-outlined text-sm">logout</span>
+                          Sign Out
+                        </a>
                       </div>
                     `
                   })}
