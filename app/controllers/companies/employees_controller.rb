@@ -33,62 +33,39 @@ class Companies::EmployeesController < Companies::ApplicationController
   def create
     respond_to do |format|
       format.json do
-        begin
-          # Using your Seed::EmployeeService to handle the creation logic
-          @employee = Seed::EmployeeService.create(
-            company: current_company,
-            name: employee_params[:name],
-            description: employee_params[:description],
-            business_type: employee_params[:business_type],
-            # Optionally pass branch or user if provided in params
-            branch: current_company.branches.find_by(id: employee_params[:branch_id]),
-            departments: current_company.departments.where(id: employee_params[:department_id]),
-            roles: current_company.roles.where(id: employee_params[:role_id]),
-            user: User.find_by(id: params[:user_id])
-          )
-
-          render json: {
-            status: "success",
-            message: "Employee created successfully.",
-            employee: format_single_employee(@employee)
-          }, status: :created
-
-        rescue ActiveRecord::RecordInvalid => e
-          render json: {
-            status: "error",
-            message: "Validation failed",
-            errors: e.record.errors.full_messages
-          }, status: :unprocessable_entity
-        rescue => e
-          render json: {
-            status: "error",
-            message: e.message
-          }, status: :internal_server_error
+        # Using your Seed::EmployeeService to handle the creation logic
+        employee = Seed::EmployeeService.new(
+          company: current_company,
+          name: employee_params[:name],
+          description: employee_params[:description],
+          business_type: employee_params[:business_type],
+          # Optionally pass branch or user if provided in params
+          branch: current_company.branches.find_by(id: employee_params[:branch_id]),
+          departments: current_company.departments.where(id: employee_params[:department_id]),
+          roles: current_company.roles.where(id: employee_params[:role_id]),
+          user: User.find_by(id: params[:user_id])
+        )
+        if employee.save
+          render json: { employee: employee }, status: :created
+        else
+          render json: { errors: employee.errors.full_messages }, status: :unprocessable_entity
         end
       end
     end
   end
 
   def update
-    @employee = current_company.employees.find(params[:id])
+    employee = current_company.employees.find(params[:id])
 
     respond_to do |format|
       format.json do
-        update_params = update_employee_params
-        if update_params[:role_ids]
-          @employee.role_ids = update_params.delete(:role_ids)
+        if update_employee_params[:role_ids]
+          employee.role_ids = update_employee_params.delete(:role_ids)
         end
-        if @employee.update(update_params)
-          render json: {
-            status: "success",
-            message: "Updated successfully",
-            employee: format_single_employee(@employee)
-          }
+        if employee.update(update_employee_params)
+          render json: { employee: employee }, status: :created
         else
-          render json: {
-            status: "error",
-            errors: @employee.errors.full_messages
-          }, status: :unprocessable_entity
+          render json: { errors: employee.errors.full_messages }, status: :unprocessable_entity
         end
       end
     end

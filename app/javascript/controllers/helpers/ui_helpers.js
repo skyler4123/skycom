@@ -247,63 +247,6 @@ export const openModal = ({ html = "Model!", customClass = {}, ...rest }) => {
 }
 
 /**
- * Opens a SweetAlert2 popover positioned relative to a parent element.
- * @param {object} config - The configuration for the popover.
- * @param {HTMLElement} config.parentElement - The element to position the popover against.
- * @param {string} [config.html="Dialog content"] - The HTML content of the popover.
- * @param {('top-left'|'top-right'|'top-center'|'bottom-left'|'bottom-right'|'bottom-center'|'left-center'|'right-center'|'center-center')} [config.position='bottom-center'] - The position of the popover relative to the parent.
- * @param {string} [config.className=""] - Additional CSS classes for the popover.
- */
-export const openPopover = ({parentElement, html = "Dialog content", position = 'bottom-center', className = ""}) => {
-  const parentRect = parentElement.getBoundingClientRect();
-  const parentTop = parentRect.top;
-  const parentBottom = parentRect.bottom;
-  const parentLeft = parentRect.left;
-  const parentRight = parentRect.right;
-  const parentWidth = parentRect.width;
-  const parentHeight = parentRect.height;
-    
-  Swal.fire({
-    html: html,
-    position: 'top-start',
-    showConfirmButton: false,
-    showCloseButton: false,
-    customClass: {
-      container: '!bg-transparent',
-      popup: ' swal2-container-custom w-fit! h-fit! p-0! rounded-none! bg-transparent! ' + className,
-      htmlContainer: '!p-0',
-    },
-    showClass: { popup: `animate__animated animate__fadeInUp animate__faster` },
-    hideClass: { popup: `animate__animated animate__fadeOutDown animate__faster` },
-    didOpen: (popupElement) => {
-      const swalContainer = document.querySelector('.swal2-container-custom');
-      swalContainer.style.position = 'absolute';
-      
-      switch (position) {
-        case 'top-left':
-          swalContainer.style.top = `${parentTop}px`; swalContainer.style.left = `${parentLeft}px`; break;
-        case 'top-right':
-          swalContainer.style.top = `${parentTop}px`; swalContainer.style.left = `${parentRight}px`; break;
-        case 'top-center':
-          swalContainer.style.top = `${parentTop}px`; swalContainer.style.left = `${parentLeft + parentWidth/2}px`; break;
-        case 'bottom-left':
-          swalContainer.style.top = `${parentBottom}px`; swalContainer.style.left = `${parentLeft}px`; break;
-        case 'bottom-right':
-          swalContainer.style.top = `${parentBottom}px`; swalContainer.style.left = `${parentRight}px`; break;
-        case 'bottom-center':
-          swalContainer.style.top = `${parentBottom}px`; swalContainer.style.left = `${parentLeft + parentWidth/2}px`; break;
-        case 'left-center':
-          swalContainer.style.top = `${parentTop + parentHeight/2}px`; swalContainer.style.left = `${parentLeft}px`; break;
-        case 'right-center':
-          swalContainer.style.top = `${parentTop + parentHeight/2}px`; swalContainer.style.left = `${parentRight}px`; break;
-        case 'center-center':
-          swalContainer.style.top = `${parentTop + parentHeight/2}px`; swalContainer.style.left = `${parentLeft + parentWidth/2}px`; break;
-      }
-    },
-  });
-}
-
-/**
  * Closes any open SweetAlert2 modal or popover.
  */
 export const closeSwal = () => Swal.close()
@@ -401,66 +344,49 @@ export const toast = ({ type = "normal", message = "" }) => {
     // style: { background: "unset" } 
   }).showToast();
 }
-
 /**
- * Generates a Rails-compatible form wrapper.
+ * Generates a Rails-compatible form wrapper without a forced controller.
  * @param {object} options
  * @param {string} [options.action=pathname()] - Form action URL.
- * @param {string} [options.method="POST"] - HTTP method.
- * @param {string} [options.dataController="form"] - The Stimulus controller to attach. Pass null to skip.
- * @param {string} [options.dataAction="submit->form#submit"] - Stimulus actions.
- * @param {string} [options.className="flex flex-col gap-4"] - Tailwind CSS classes.
- * @param {string} [options.html=""] - Inner HTML content.
+ * @param {string} [options.method="POST"] - HTTP method (GET, POST, PATCH, DELETE).
+ * @param {string} [options.attributes=""] - Raw string for classes, data-attributes, etc.
+ * @param {string} options.html - Inner HTML content (Required).
  * @returns {string} The HTML form string.
  */
 export const form = ({ 
   action = pathname(), 
   method = "POST", 
-  dataController = "form",
-  dataAction = "submit->form#submit", 
-  className = "", 
-  html = "",
-  confirm = false,
-  confirmMessage = "Are you sure?"
+  attributes = "", 
+  html = "" 
 }) => {
+  if (!html) console.warn("Form helper: 'html' content is required.")
+
   const upperMethod = method.toUpperCase()
   const isGet = upperMethod === "GET"
   
   let methodTags = ""
   let formMethod = upperMethod
 
-  // Rails method spoofing & CSRF
+  // Rails method spoofing & CSRF logic
   if (!isGet) {
-    formMethod = "POST"
-    if (upperMethod === "PATCH") {
-      methodTags = formPatchSecurityTags()
+    formMethod = "POST" // Browsers only support GET/POST natively
+    
+    if (upperMethod === "PATCH" || upperMethod === "PUT") {
+      methodTags = `<input type="hidden" name="_method" value="${upperMethod.toLowerCase()}" autocomplete="off">` + formPostSecurityTags()
     } else if (upperMethod === "DELETE") {
       methodTags = `<input type="hidden" name="_method" value="delete" autocomplete="off">` + formPostSecurityTags()
     } else {
-      methodTags = formPostSecurityTags()
+      methodTags = formPostSecurityTags() // Standard POST
     }
   }
 
-  // Conditional Controller & Action strings
-  const controllerAttr = dataController ? `data-controller="${dataController}" data-action="submit->${dataController}#submit"` : ""
-  const actionAttr = (dataController && dataAction) ? `data-action="${dataAction}"` : ""
-
   return `
-    <form 
-      action="${action}" 
-      method="${formMethod}" 
-      ${controllerAttr}
-      ${actionAttr}
-      data-form-confirm-value="${confirm}"
-      data-form-confirm-message-value="${confirmMessage}"
-      class="${className}"
-    >
+    <form action="${action}" method="${formMethod}" ${attributes}>
       ${methodTags}
       ${html}
     </form>
   `
 }
-
 // Helper to render select options
 export const selectOptionsHTML = (options = [], selectedValue, defaultText) => {
   let html = `<option value="">${defaultText}</option>`;

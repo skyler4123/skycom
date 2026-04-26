@@ -7,6 +7,29 @@ export default class Companies_NewModalController extends Controller {
     this.element.innerHTML = this.modalHTML()
   }
 
+  async handleSubmit(event) {
+    event.preventDefault()
+
+    try {
+      const response = await fetchJson(Helpers.create_companies_path(), {
+        method: "POST",
+        body: new FormData(event.target)
+      })
+      /** @type {Company} */
+      const newCompany = response.company
+      toast({ 
+        type: "success", 
+        message: `${newCompany.name || 'Company'} created successfully`
+      })
+      closeModal()
+    } catch (error) {
+      toast({ 
+        type: "error", 
+        message: error.errors || "Failed to process request" 
+      })
+    }
+  }
+
   modalHTML() {
     const businessTypes = [
       { value: "retail", label: "Retail" },
@@ -61,10 +84,12 @@ export default class Companies_NewModalController extends Controller {
     `
 
     return form({
-      action: Helpers.create_companies_path(),
-      className: "bg-white dark:bg-slate-900 rounded-2xl w-[480px] shadow-2xl border border-slate-100 dark:border-slate-800 overflow-hidden",
-      html: fields,
-      confirm: false
+      attributes: `
+        class="bg-white dark:bg-slate-900 rounded-2xl w-[480px] shadow-2xl border border-slate-100 dark:border-slate-800 overflow-hidden"
+        data-${this.identifier}-target="form"
+        data-action="submit->${this.identifier}#handleSubmit"
+      `,
+      html: fields
     })
   }
 }

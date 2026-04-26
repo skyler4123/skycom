@@ -59,7 +59,7 @@ export default class Companies_LayoutController extends Controller {
                     html: `
                       <div class="flex flex-col gap-y-1 w-64">
                         ${currentCompanies().map((company) => `
-                          <a href="${Helpers.company_branches_path(company.id)}" 
+                          <a href="${Helpers.company_dashboards_path(company.id)}" 
                             class="flex items-center gap-3 px-3 py-2 rounded-lg text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 ${currentCompany().id === company.id ? 'bg-gray-100 dark:bg-gray-800 font-bold' : ''}">
                             <span class="text-sm">${company.name}</span>
                           </a>`).join("")}
