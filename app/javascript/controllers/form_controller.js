@@ -83,7 +83,7 @@ export default class extends Controller {
     } catch (error) {
       toast({ 
         type: "error", 
-        message: error.message || "Failed to process request" 
+        message: error.errors || "Failed to process request" 
       })
     }
   }

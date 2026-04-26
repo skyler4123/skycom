@@ -56,13 +56,19 @@ export const fetchJson = async (url, options = {}) => {
 
   try {
     const response = await fetch(requestUrl, config)
+    
     if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`)
+      const errorData = await response.json().catch(() => ({})); 
+      
+      const error = new Error(errorData.message || `HTTP error! status: ${response.status}`);
+      error.errors = errorData.errors;
+      error.status = response.status;
+      throw error;
     }
+
     if (response.status === 204) return null
     return await response.json()
   } catch (error) {
-    console.error("fetchJson error:", error)
     throw error
   }
 }

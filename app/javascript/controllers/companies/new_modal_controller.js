@@ -63,7 +63,8 @@ export default class Companies_NewModalController extends Controller {
     return form({
       action: Helpers.create_companies_path(),
       className: "bg-white dark:bg-slate-900 rounded-2xl w-[480px] shadow-2xl border border-slate-100 dark:border-slate-800 overflow-hidden",
-      html: fields
+      html: fields,
+      confirm: false
     })
   }
 }
