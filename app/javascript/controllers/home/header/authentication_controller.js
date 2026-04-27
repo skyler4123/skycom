@@ -47,7 +47,12 @@ export default class Home_Header_AuthenticationController extends Controller {
         <div
           role="avatar"
           class="bg-center bg-no-repeat aspect-square bg-cover rounded-full h-10 w-10 border border-slate-200 dark:border-slate-700"
-          style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuDmCMcaKuxM-L3kekIel30wVgf_J-ssrf86FqOelUJrmeAHwneIxkCor7hKn3SzOtbLg3DrSVpbI77hxo-i174Ll7V-lQ8CTCQB3H9YEA5_LSG8vyi_FynSf8l4w3lgYkc2uFLpD4U1w_DzdTIiCUzYkrAkVoZumb-iT_CjUsLofbZCfryp_hfJBATT8XUgqjbHSZdKEhdoREZiwf1ZCevLreCxK463hwZhGxwb6xu2NoSIYjbWxlfEmD5ABwPppLeyiUqyCCWWVw0");'>
+          style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuDmCMcaKuxM-L3kekIel30wVgf_J-ssrf86FqOelUJrmeAHwneIxkCor7hKn3SzOtbLg3DrSVpbI77hxo-i174Ll7V-lQ8CTCQB3H9YEA5_LSG8vyi_FynSf8l4w3lgYkc2uFLpD4U1w_DzdTIiCUzYkrAkVoZumb-iT_CjUsLofbZCfryp_hfJBATT8XUgqjbHSZdKEhdoREZiwf1ZCevLreCxK463hwZhGxwb6xu2NoSIYjbWxlfEmD5ABwPppLeyiUqyCCWWVw0");'
+          ${popover({
+            classes: "bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 shadow-xl p-1",
+            html: `<div data-controller="users--avatar-popover"></div>`
+          })}
+        >
         </div>
       </div>
       <a href="${Helpers.sign_out_path()}">
