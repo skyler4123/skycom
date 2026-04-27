@@ -32,6 +32,7 @@ class User < ApplicationRecord
   # ----------------------------------------------------------------------------------------------------
   # --- Concerns ---
   # Includes functionality for handling user avatars, likely from `app/models/user/avatar_concern.rb`.
+  include User::CacheConcern
   include User::AvatarConcern
   include User::ChatImagesConcern
   include AddressConcern

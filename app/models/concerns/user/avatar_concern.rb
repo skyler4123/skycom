@@ -3,16 +3,18 @@ module User::AvatarConcern
 
   included do
     has_one_attached :avatar_attachment, dependent: :purge_later do |attachable|
-      attachable.variant :full, resize_to_limit: [ 300, 300 ]
-      attachable.variant :thumb, resize_to_limit: [ 50, 50 ]
+      attachable.variant :thumb, resize_to_limit: [50, 50]
+      attachable.variant :medium, resize_to_limit: [150, 150]
+      attachable.variant :profile, resize_to_limit: [300, 300]
+      attachable.variant :full, resize_to_limit: [800, 800]
     end
 
     validate :acceptable_avatar_attachment
 
     def acceptable_avatar_attachment
       return unless avatar_attachment.attached?
-      unless avatar_attachment.blob.byte_size <= 200.kilobytes
-        errors.add(:avatar_attachment, "is too big (200KB)")
+      unless avatar_attachment.blob.byte_size <= 500.kilobytes
+        errors.add(:avatar_attachment, "is too big (500KB)")
       end
 
       acceptable_types = [ "image/jpeg", "image/png" ]
@@ -21,9 +23,17 @@ module User::AvatarConcern
       end
     end
 
-    def avatar_url
-      return "" unless self.avatar_attachment.attached?
-      Rails.application.routes.url_helpers.rails_blob_path(self.avatar_attachment, only_path: true)
+    def avatar_url(variant = :profile)
+      return "" unless avatar_attachment.attached?
+      
+      # Generates a URL for a specific variant
+      Rails.application.routes.url_helpers.rails_representation_url(
+        avatar_attachment.variant(variant).processed, 
+        only_path: true
+      )
+    rescue
+      # Fallback if processing fails
+      Rails.application.routes.url_helpers.rails_blob_path(avatar_attachment, only_path: true)
     end
 
     def update_avatar

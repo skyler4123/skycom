@@ -1,5 +1,6 @@
 # app/controllers/client_cache_controller.rb
 
+# Give the latest cache for client
 class ClientCacheController < ApplicationController
   def index
     respond_to do |format|

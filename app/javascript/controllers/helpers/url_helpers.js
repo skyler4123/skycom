@@ -20,6 +20,9 @@ export const sign_in_path = () => `/sign_in`
 export const sign_up_path = () => `/sign_up`
 export const sign_out_path = () => `/sign_out`
 
+export const users_path = () => `/users`
+export const users_update_avatar_path = () => `/users/update_avatar`
+
 export const create_companies_path = () => `/companies`
 export const company_dashboards_path = (companyId) => `/companies/${companyId}/dashboards`
 

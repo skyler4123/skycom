@@ -44,6 +44,11 @@ Rails.application.routes.draw do
     end
   end
 
+  resources :users do
+    collection do
+      patch :update_avatar
+    end
+  end
   resources :home, only: [ :index ] do
     collection do
       get :retail
