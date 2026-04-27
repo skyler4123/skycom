@@ -30,7 +30,7 @@ class User < ApplicationRecord
 
   # ----------------------------------------------------------------------------------------------------
   validates :name, uniqueness: true, allow_blank: true
-  
+
   # --- Concerns ---
   # Includes functionality for handling user avatars, likely from `app/models/user/avatar_concern.rb`.
   include User::CacheConcern

@@ -26,7 +26,7 @@ describe "name uniqueness" do
       it "allows multiple users with blank names" do
         create(:user, name: "")
         expect { create(:user, name: "") }.not_to raise_error
-        
+
         create(:user, name: nil)
         expect { create(:user, name: nil) }.not_to raise_error
       end
