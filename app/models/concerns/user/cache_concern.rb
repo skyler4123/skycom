@@ -5,7 +5,7 @@ module User::CacheConcern
 
   included do
     def refresh_cache
-      # .touch updates the updated_at timestamp to the current time 
+      # .touch updates the updated_at timestamp to the current time
       # without triggering all model validations.
       self.touch
     end

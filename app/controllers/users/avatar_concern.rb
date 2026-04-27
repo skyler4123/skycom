@@ -8,9 +8,9 @@ module Users::AvatarConcern
       if current_user.update(avatar_params)
         current_user.update_avatar
         current_user.refresh_cache
-        render json: { 
+        render json: {
           url: current_user.avatar_url(:profile),
-          message: "Avatar updated!" 
+          message: "Avatar updated!"
         }
       else
         render json: { errors: current_user.errors.full_messages }, status: :unprocessable_entity

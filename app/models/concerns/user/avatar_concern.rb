@@ -3,10 +3,10 @@ module User::AvatarConcern
 
   included do
     has_one_attached :avatar_attachment, dependent: :purge_later do |attachable|
-      attachable.variant :thumb, resize_to_limit: [50, 50]
-      attachable.variant :medium, resize_to_limit: [150, 150]
-      attachable.variant :profile, resize_to_limit: [300, 300]
-      attachable.variant :full, resize_to_limit: [800, 800]
+      attachable.variant :thumb, resize_to_limit: [ 50, 50 ]
+      attachable.variant :medium, resize_to_limit: [ 150, 150 ]
+      attachable.variant :profile, resize_to_limit: [ 300, 300 ]
+      attachable.variant :full, resize_to_limit: [ 800, 800 ]
     end
 
     validate :acceptable_avatar_attachment
@@ -25,10 +25,10 @@ module User::AvatarConcern
 
     def avatar_url(variant = :profile)
       return "" unless avatar_attachment.attached?
-      
+
       # Generates a URL for a specific variant
       Rails.application.routes.url_helpers.rails_representation_url(
-        avatar_attachment.variant(variant).processed, 
+        avatar_attachment.variant(variant).processed,
         only_path: true
       )
     rescue
