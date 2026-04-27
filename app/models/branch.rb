@@ -35,7 +35,28 @@ class Branch < ApplicationRecord
 
   # --- Enums ---
   enum :country_code, COUNTRIE_CODES, prefix: true
-  enum :business_type, BUSINESS_TYPES, prefix: true
+  enum :business_type, {
+    # Physical Points of Sale
+    storefront: 0,        # Main retail/customer-facing shop
+    kiosk: 1,             # Small booth, pop-up, or sub-counter
+    showroom: 2,          # Display only (common in high-end retail/fitness)
+
+    # Fulfillment & Logistics
+    warehouse: 10,        # Storage only, no walk-in customers
+    distribution_center: 11, # Hub for moving goods to other branches
+    dark_store: 12,       # Dedicated for online order picking
+
+    # Service & Support
+    service_point: 20,    # Repairs, customer support, or intake
+    clinic_wing: 21,      # Specific to Hospital companies
+    classroom_annex: 22,  # Specific to Education companies
+
+    # Administrative
+    headquarters: 90,     # Main office / Corporate
+    administrative: 91,   # Back-office branch (Accounting, HR)
+    
+    virtual: 99           # Online-only branch
+  }, prefix: true
   enum :timezone, TIMEZONES, prefix: true
   enum :currency_code, CURRENCIE_CODES, prefix: true
   enum :lifecycle_status, LIFECYCLE_STATUS, prefix: true

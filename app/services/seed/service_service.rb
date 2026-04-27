@@ -15,7 +15,7 @@ class Seed::ServiceService
     Service.new(
       company: company,
       branch: branch,
-      name: name || "#{branch.name} Service",
+      name: name || "Service #{SecureRandom.hex(4)}",
       description: description,
       lifecycle_status: lifecycle_status,
       workflow_status: workflow_status,

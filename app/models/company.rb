@@ -42,7 +42,14 @@ class Company < ApplicationRecord
 
   # --- Enums ---
   enum :country_code, COUNTRIE_CODES, prefix: true
-  enum :business_type, BUSINESS_TYPES, prefix: true
+  enum :business_type, {
+    retail: 0,
+    restaurant: 1000,
+    hospital: 2000,
+    education: 3000,
+    hotel: 4000,
+    fitness: 5000
+  }, prefix: true
   enum :lifecycle_status, LIFECYCLE_STATUS, prefix: true
   enum :workflow_status, WORKFLOW_STATUS, prefix: true
   enum :timezone, TIMEZONES, prefix: true
