@@ -367,14 +367,7 @@ export default class Companies_LayoutController extends Controller {
                   style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuBYk6_5wqHwhOUyfqIOzuw7uF6nG1B2aHcNfqPXgheh0TJNM9wgrKtU__k7USaOwDZLXPpvIrYvaXBnMbO7rmZHK15vMirHZqrK0UBZ18vJdiQZlmTrGe8wch8p3G7GXSetuz5njKmy7Hb6XGw18g0stonxhwtIcuuEqzZVHxbviNLuy4i_B8JHC1x_JlbUrZoIV2QQqyAprbH-jems99h8nqDZ6D6FBmq8JDrKIfaBYkl3mR0cYldl3c0gaNynjiRNKDKfaUcIKBc");'
                   ${popover({
                     classes: "bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 shadow-xl p-1",
-                    html: `
-                      <div class="w-48">
-                        <a class="flex items-center gap-3 px-4 py-2 rounded-md text-sm text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20" href="/sign_out">
-                          <span class="material-symbols-outlined text-sm">logout</span>
-                          Sign Out
-                        </a>
-                      </div>
-                    `
+                    html: `<div data-controller="users--avatar-popover"></div>`
                   })}
                 >
                 </div>
