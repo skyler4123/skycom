@@ -665,3 +665,31 @@ export const avatar = ({
     </div>
   `.trim();
 };
+
+/**
+ * Returns text based on the current screen resolution.
+ * Matches Tailwind default breakpoints.
+ * 
+ * @param {Object} options - { base: 'Text', sm: 'Small', md: 'Medium', lg: 'Large' }
+ * @returns {string}
+ */
+export const responsiveText = (options) => {
+  const width = window.innerWidth;
+
+  // Tailwind Default Breakpoints
+  const breakpoints = {
+    '2xl': 1536,
+    xl: 1280,
+    lg: 1024,
+    md: 768,
+    sm: 640,
+    base: 0
+  };
+
+  // Find the largest active breakpoint present in the options
+  const activeBreakpoint = Object.keys(breakpoints).find(key => {
+    return width >= breakpoints[key] && options[key] !== undefined;
+  });
+
+  return options[activeBreakpoint] || options['base'] || "";
+};
