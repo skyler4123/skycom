@@ -2782,7 +2782,6 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.datetime "updated_at", null: false
     t.index ["discarded_at"], name: "index_users_on_discarded_at"
     t.index ["email"], name: "index_users_on_email", unique: true
-    t.index ["name"], name: "index_users_on_name", unique: true
     t.index ["parent_user_id"], name: "index_users_on_parent_user_id"
     t.index ["single_access_token"], name: "index_users_on_single_access_token", unique: true
     t.index ["uid"], name: "index_users_on_uid", unique: true

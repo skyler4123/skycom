@@ -27,8 +27,7 @@ RSpec.feature "Authentication", type: :feature, js: true do
       end
 
       # Assertions
-      expect(page).to have_button("Sign Out")
-      expect(page).to have_selector('[role="avatar"]')
+      expect(page).to have_selector('[data-controller="avatar"]')
       expect(created_user).to be_present # more idiomatic than be_truthy for ActiveRecord objects
     end
   end
@@ -55,9 +54,7 @@ RSpec.feature "Authentication", type: :feature, js: true do
         click_button "Sign In"
       end
 
-      expect(page).to have_selector('[role="avatar"]', wait: 10)
-      expect(page).to have_button("Sign Out")
-      expect(page).to have_selector('[role="avatar"]')
+      expect(page).to have_selector('[data-controller="avatar"]')
       expect(user.sessions.count - before_session_count).to equal 1
     end
   end

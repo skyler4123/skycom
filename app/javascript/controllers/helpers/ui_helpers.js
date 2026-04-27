@@ -621,16 +621,27 @@ export const picture = ({
 //   paramName: "user[avatar_attachment]"
 // })}
 export const avatar = ({
-  url = "/placeholders/default.png",
+  url = null, 
   updateUrl = "/update_avatar",
   paramName = "",
   className = "size-10",
   shape = "rounded-full",
   method = "PATCH",
-  attributes = "",      // Root element (Outer)
-  innerAttributes = ""  // Interactive element (Middle)
+  attributes = "",      
+  innerAttributes = ""  
 }) => {
   const isEditable = !!updateUrl && !!paramName;
+  
+  // Safe check: if url is null/undefined, avatarContent will use the placeholder
+  const hasUrl = url && typeof url === 'string' && url.trim() !== "";
+
+  const avatarContent = hasUrl 
+    ? `<img data-avatar-target="image" src="${url}" class="h-full w-full object-cover pointer-events-none" alt="Avatar" />`
+    : `
+      <div data-avatar-target="image" class="h-full w-full flex items-center justify-center bg-slate-200 dark:bg-gray-700 text-slate-400 dark:text-gray-500 pointer-events-none">
+        <span class="material-symbols-outlined text-[1.5em]">person</span>
+      </div>
+    `;
 
   return `
     <div data-controller="avatar" 
@@ -640,15 +651,11 @@ export const avatar = ({
          ${attributes} 
          class="group relative inline-block ${className} shrink-0">
          
-      <!-- Middle Layer: The interactive hit-area -->
       <div ${innerAttributes} 
            class="${shape} h-full w-full overflow-hidden bg-slate-100 dark:bg-gray-800 border border-slate-200 dark:border-gray-800 ${isEditable ? 'cursor-pointer transition-transform hover:scale-[1.05]' : ''}"
            ${isEditable ? 'data-action="click->avatar#browse"' : ''}>
            
-        <img data-avatar-target="image" 
-             src="${url}" 
-             class="h-full w-full object-cover pointer-events-none" 
-             alt="Avatar" />
+        ${avatarContent}
              
         ${isEditable ? `
           <div class="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">

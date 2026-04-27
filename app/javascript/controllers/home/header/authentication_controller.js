@@ -42,25 +42,16 @@ export default class Home_Header_AuthenticationController extends Controller {
   }
 
   renderSignedIn() {
+    console.log(currentUser())
     this.element.innerHTML = `
       ${avatar({
-        url: currentUser().avatar,
+        url: currentUser()?.avatar,
         className: "size-12 cursor-pointer",
-        // 1. Root attributes (e.g., for layout or global tooltips)
-        attributes: `id="user_avatar_${currentUser().id}" title="${currentUser().name}"`,
-        
         // 2. Middle attributes (e.g., for your popover controller)
         innerAttributes: popover({
           position: "bottom",
           html: `<div data-controller="users--avatar-popover"></div>`
         })
-      })}
-      ${avatar({
-        url: currentUser().avatar,
-        className: "size-12 cursor-pointer",
-        // 3. Avatar logic (if you want it editable)
-        updateUrl: Helpers.users_update_avatar_path(),
-        paramName: "user[avatar_attachment]"
       })}
     `
   }

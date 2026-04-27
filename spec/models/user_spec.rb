@@ -14,7 +14,8 @@ RSpec.describe User, type: :model do
 
   describe "validations" do
     it { should validate_presence_of(:email) }
-    it { should validate_presence_of(:name) }
+    it { should validate_uniqueness_of(:name).allow_blank }
+    it { should_not validate_presence_of(:name) } # Optional: verify presence is gone
     it { should allow_value("test@example.com").for(:email) }
     it { should allow_value("user@domain.co.uk").for(:email) }
     it { should_not allow_value("invalid-email").for(:email) }
@@ -22,12 +23,20 @@ RSpec.describe User, type: :model do
     it { should_not allow_value("@example.com").for(:email) }
 
     describe "name uniqueness" do
-      let(:user) { create(:user) }
+      let!(:user) { create(:user, name: "Skycom User") }
 
-      it "prevents duplicate names" do
-        expect {
-          create(:user, name: user.name, system_role: user.system_role)
-        }.to raise_error(ActiveRecord::RecordInvalid)
+      it "prevents duplicate names when present" do
+        new_user = build(:user, name: "Skycom User")
+        expect(new_user).not_to be_valid
+        expect(new_user.errors[:name]).to include("has already been taken")
+      end
+
+      it "allows multiple users with blank names" do
+        create(:user, name: "")
+        expect { create(:user, name: "") }.not_to raise_error
+        
+        create(:user, name: nil)
+        expect { create(:user, name: nil) }.not_to raise_error
       end
     end
   end
