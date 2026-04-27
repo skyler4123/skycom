@@ -55,7 +55,7 @@ RSpec.feature "Companies::Employees Management", type: :feature, js: true do
 
     find('[data-action*="openNewModal"]').click
 
-    expect(page).to have_selector('form[data-controller="form"]', wait: 10)
+    expect(page).to have_selector('form[data-action*="handleSubmit"]', wait: 10)
 
     expect(page).to have_selector('input[name="employee[name]"]', wait: 5)
     fill_in 'employee[name]', with: 'New Test Employee'
@@ -71,7 +71,7 @@ RSpec.feature "Companies::Employees Management", type: :feature, js: true do
 
       find('[data-action*="openNewModal"]').click
 
-      expect(page).to have_selector('form[data-controller="form"]', wait: 10)
+      expect(page).to have_selector('form[data-action*="handleSubmit"]', wait: 10)
 
       expect(page).to have_selector('input[name="employee[name]"]', wait: 5)
       fill_in 'employee[name]', with: 'New Test Employee'

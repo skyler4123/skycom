@@ -14,6 +14,7 @@ Rails.application.routes.draw do
   end
   resources :companies do
     scope module: :companies do
+      resources :dashboards
       resources :branches
       resources :departments
       resources :products

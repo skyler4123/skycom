@@ -2,7 +2,7 @@ import Companies_LayoutController from "controllers/companies/layout_controller"
 import Companies_Employees_NewModalController from "controllers/companies/employees/new_modal_controller";
 import Companies_Employees_ShowModalController from "controllers/companies/employees/show_modal_controller";
 
-export default class Companies_Branches_EmployeesController extends Companies_LayoutController {
+export default class Companies_Employees_IndexController extends Companies_LayoutController {
   static targets = ["employeesList"]
 
   /** @type {(Employee & { departments: Department[], roles: Role[], branch: Branch })[]} */

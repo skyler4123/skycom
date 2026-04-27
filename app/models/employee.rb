@@ -43,6 +43,6 @@ class Employee < ApplicationRecord
   enum :workflow_status, WORKFLOW_STATUS, prefix: true
 
   # --- Validations ---
-  validates :name, presence: true
+  validates :name, presence: true, uniqueness: { scope: :company_id }
   validates :business_type, presence: true
 end

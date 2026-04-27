@@ -7,6 +7,28 @@ export default class Companies_Employees_NewModalController extends Controller {
     this.element.innerHTML = this.modalHTML()
   }
 
+  async handleSubmit(event) {
+    event.preventDefault()
+
+    try {
+      const response = await fetchJson(Helpers.create_company_employees_path(currentCompany().id), {
+        method: "POST",
+        body: new FormData(event.target)
+      })
+      /** @type {Company} */
+      const newEmployee = response.employee
+      toast({ 
+        type: "success", 
+        message: `${newEmployee.name || 'Employee'} created successfully`
+      })
+      closeModal()
+    } catch (error) {
+      toast({ 
+        type: "error", 
+        message: error.errors || "Failed to process request" 
+      })
+    }
+  }
   modalHTML() {
     const branches = currentBranches() || []
     const departments = Helpers.currentDepartments() || []
@@ -95,10 +117,10 @@ export default class Companies_Employees_NewModalController extends Controller {
     `
 
     return form({
-      action: pathname(),
-      method: "POST",
-      dataAction: `submit->form#submit`,
-      className: "p-8 bg-white dark:bg-slate-900 rounded-2xl w-[500px] shadow-2xl border border-slate-100 dark:border-slate-800",
+      attributes: `
+        class="p-8 bg-white dark:bg-slate-900 rounded-2xl w-[500px] shadow-2xl border border-slate-100 dark:border-slate-800"
+        data-action="submit->${this.identifier}#handleSubmit"
+      `,
       html: fields
     })
   }

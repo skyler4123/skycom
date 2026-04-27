@@ -184,7 +184,7 @@ class Seed::RetailService
           )
           employee = Seed::EmployeeService.create(
             user: user, company: @retail, branch: branch,
-            name: "Employee #{i + 1} - #{role_name.to_s.titleize}"
+            name: "Employee #{SecureRandom.hex(4)}"
           )
           employee.attach_role(role_name)
           branch_employees << employee
