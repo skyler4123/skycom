@@ -34,7 +34,7 @@ class Customer < ApplicationRecord
   }
 
   # --- Validations ---
-  validates :name, presence: true, length: { maximum: 255 }
+  validates :name, presence: true, uniqueness: { scope: :company_id }, length: { maximum: 255 }
 
   validates :business_type, presence: true
 end

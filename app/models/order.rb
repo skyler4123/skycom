@@ -25,7 +25,7 @@ class Order < ApplicationRecord
   }
 
   # --- Validations ---
-  validates :name, presence: true, length: { maximum: 255 }
+  validates :name, presence: true, uniqueness: { scope: :company_id }, length: { maximum: 255 }
   validates :currency_code, presence: true
 
   validates :business_type, presence: true

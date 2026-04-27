@@ -27,7 +27,7 @@ class Invoice < ApplicationRecord
   }
 
   # --- Validations ---
-  validates :name, presence: true, length: { maximum: 255 }
+  validates :name, presence: true, uniqueness: { scope: :company_id }, length: { maximum: 255 }
   validates :currency_code, presence: true
   validates :number, presence: true, uniqueness: true
   validates :total, presence: true, numericality: { greater_than_or_equal_to: 0 }
