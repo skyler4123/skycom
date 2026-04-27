@@ -20,7 +20,7 @@ window.translate = Helpers.translate
 window.poll = Helpers.poll
 window.openByPathname = Helpers.openByPathname
 window.identifier = Helpers.identifier
-
+window.avatar = Helpers.avatar
 // 3. Rails-style Collection Helpers
 window.keys = Helpers.keys
 window.values = Helpers.values

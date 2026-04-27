@@ -112,57 +112,7 @@ When a `PolicyAppointment` is created or destroyed, the Role's `updated_at` time
 
 ---
 
-## 7. Client Cache System
-
-Skycom caches company data in the browser's `localStorage` for fast frontend access across all Stimulus controllers.
-
-### Storage Keys
-| Key | Description |
-|-----|------------|
-| `client_cache_data` | JSON blob containing `companies`, `employees`, `enums`, etc. |
-| `client_cache_version` | Timestamp version for cache invalidation |
-
-### Backend Endpoint
-`ClientCacheController#index` returns the cached data:
-
-```json
-{
-  "user": { "id": "...", "email": "..." },
-  "companies": [{ "id": "...", "name": "...", "branches": [], "departments": [], "roles": [] }],
-  "enums": { "employee": { "lifecycle_statuses": [{ "name": "Active", "value": "active" }] } },
-  "employees": [...]
-}
-```
-
-### Frontend Helpers (`auth_helpers.js`)
-```javascript
-// Get cached company data
-const companies = Helpers.currentCompanies()      // → Company[]
-const company = Helpers.currentCompany()           // → Company | null
-const branches = Helpers.currentBranches()           // → Branch[]
-const roles = Helpers.currentRoles()                   // → Role[]
-const enums = Helpers.Enums()                    // → Enums object
-
-// Full cache access
-const cache = Helpers.getCache()                   // → { user, companies, enums, employees }
-const currentUser = Helpers.currentUser()         // → User | null
-```
-
-### Usage in Stimulus Controllers
-```javascript
-import { currentCompany, currentRoles } from "controllers/helpers/auth_helpers"
-
-export default class Companies_ProductsIndexController extends Companies_LayoutController {
-  async loadData() {
-    const roles = currentRoles()
-    // Use roles for permission checks or UI filtering
-  }
-}
-```
-
----
-
-## 8. Permissions UI Endpoint
+## 7. Permissions UI Endpoint
 
 **Route**: `GET /companies/:id/permissions`
 
@@ -196,7 +146,7 @@ Manage the policy-to-role assignments (PolicyAppointments) via a role-grouped UI
 
 ---
 
-## 9. Backend Implementation Requirements
+## 8. Backend Implementation Requirements
 
 ### Controller Actions
 
@@ -240,16 +190,9 @@ appointment.destroy!
 company.clear_permissions_cache
 ```
 
-### Cache Clearing
-After any create/destroy, call `company.clear_permissions_cache` to invalidate both:
-- `permissions` cache
-- `permissions_by_resource` cache
-
-This ensures the ABAC permission checks always use fresh data.
-
 ---
 
-## 10. Frontend Implementation Pattern
+## 8. Frontend Implementation Pattern
 
 ### Stimulus Controller
 `app/javascript/controllers/companies/permissions/index_controller.js`
@@ -288,7 +231,7 @@ Helpers.form({
 
 ---
 
-## 11. Permission Resource Name
+## 9. Permission Resource Name
 
 Each business entity has a `permission_resource_name` column to identify which resource type a policy applies to. This enables the permission system to know which records a role can access.
 
@@ -380,7 +323,7 @@ end
 
 ---
 
-## 13. Stimulus Controller Action Pattern
+## 11. Stimulus Controller Action Pattern
 
 Always use dynamic identifier for controller actions in HTML templates:
 
@@ -409,7 +352,7 @@ This connects the action to the current controller instance's method.
 
 ---
 
-## 14. Frontend Data Fetching: form vs fetchJson
+## 12. Frontend Data Fetching: form vs fetchJson
 
 This project has two patterns for handling API calls in Stimulus controllers:
 
@@ -488,7 +431,7 @@ Is there an HTML element triggering the action?
 
 ---
 
-## 15. Owner Role & Immutable Records
+## 13. Owner Role & Immutable Records
 
 When a company is created, Skycom automatically sets up an owner role with full permissions. This section documents how owner records are protected.
 

@@ -36,9 +36,9 @@ class Seed::ApplicationService
     user_3.address = Seed::AddressService.create
 
     # Create company groups
-    Seed::MultiCompanyService.new(user: user_1)
-    # Seed::MultiCompanyService.new(user: user_2)
-
+    Seed::RetailService.new(user: user_1, email: "retail1@company1.com")
+    Seed::RetailService.new(user: user_1, email: "retail1@company2.com")
+    Seed::RetailService.new(user: user_2, email: "retail1@company3.com")
 
     self.puts_count
 

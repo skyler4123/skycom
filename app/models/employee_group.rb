@@ -14,4 +14,7 @@ class EmployeeGroup < ApplicationRecord
 
   has_many :role_appointments, as: :appoint_to, dependent: :destroy
   has_many :roles, through: :role_appointments
+
+  # --- Validations ---
+  validates :name, presence: true, uniqueness: { scope: :company_id }, length: { maximum: 255 }
 end

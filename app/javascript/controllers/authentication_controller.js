@@ -1,3 +1,5 @@
+// Clear session_token will make BE know that user no longer signed in
+
 import { Controller } from "@hotwired/stimulus"
 
 export default class AuthenticationController extends Controller {

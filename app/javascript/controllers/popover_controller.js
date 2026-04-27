@@ -29,24 +29,26 @@ export default class extends Controller {
     if (this.popover) return
 
     this.popover = document.createElement("div")
-    // Notice we don't hardcode bg-white here anymore, we let this.classesValue handle it
     const defaultClasses = "fixed z-[9999] rounded-xl transition-all duration-200 opacity-0 translate-y-1 pointer-events-auto"
     
     this.popover.className = `${defaultClasses} ${this.classesValue || 'bg-white dark:bg-gray-900 border dark:border-gray-800 shadow-lg'}`
     this.popover.innerHTML = this.htmlValue
+    this.popover.style.maxWidth = `calc(100vw - 32px)` 
 
     document.body.appendChild(this.popover)
     
-    // We need a tiny delay or double-RAF to ensure the browser has 
-    // calculated the popover's width/height before we position it.
-    this.updatePosition()
+    // Give nested controllers (like avatar-popover) 1 tick to render their HTML
+    setTimeout(() => {
+      this.updatePosition()
+      
+      requestAnimationFrame(() => {
+        this.popover?.classList.remove("opacity-0", "translate-y-1")
+        this.popover?.classList.add("opacity-100", "translate-y-0")
+      })
+    }, 0)
 
     document.addEventListener("click", this.clickOutsideHandler)
-
-    requestAnimationFrame(() => {
-      this.popover?.classList.remove("opacity-0", "translate-y-1")
-      this.popover?.classList.add("opacity-100", "translate-y-0")
-    })
+    window.addEventListener("resize", this.resizeHandler)
   }
 
   hide() {
@@ -64,42 +66,31 @@ export default class extends Controller {
     if (!this.popover) return
 
     const target = this.element.getBoundingClientRect()
-    const pop = this.popover.getBoundingClientRect()
+    // By using offsetWidth here, we get the width AFTER the child controller has injected HTML
+    const popWidth = this.popover.offsetWidth 
+    const popHeight = this.popover.offsetHeight
     const offset = this.offsetValue
-    const screenPadding = 20 // Increase this to push it further from the edge
+    const screenPadding = 16 
 
     let top, left
     
-    // 1. Calculate ideal coordinates
     switch (this.positionValue) {
-      case "top":
-        top = target.top - pop.height - offset
-        left = target.left + (target.width / 2) - (pop.width / 2)
-        break
       case "bottom":
         top = target.bottom + offset
-        left = target.left + (target.width / 2) - (pop.width / 2)
+        // Attempt to center relative to avatar
+        left = target.left + (target.width / 2) - (popWidth / 2)
         break
-      case "left":
-        top = target.top + (target.height / 2) - (pop.height / 2)
-        left = target.left - pop.width - offset
-        break
-      case "right":
-        top = target.top + (target.height / 2) - (pop.height / 2)
-        left = target.left + target.width + offset
-        break
+      // ... other cases
     }
 
-    // 2. Strict Boundary Enforcement
-    // Calculate the boundaries
+    // BOUNDARY CHECK:
+    // If 'left' is too far right, maxLeft will be smaller than 'left', 
+    // and Math.min will pull it back.
+    const maxLeft = window.innerWidth - popWidth - screenPadding
     const minLeft = screenPadding
-    const maxLeft = window.innerWidth - pop.width - screenPadding
-    const minTop = screenPadding
-    const maxTop = window.innerHeight - pop.height - screenPadding
 
-    // Clamp the values
-    const finalLeft = Math.min(Math.max(left, minLeft), maxLeft)
-    const finalTop = Math.min(Math.max(top, minTop), maxTop)
+    const finalLeft = Math.max(minLeft, Math.min(left, maxLeft))
+    const finalTop = top // You can add vertical clamping too if needed
 
     this.popover.style.left = `${finalLeft}px`
     this.popover.style.top = `${finalTop}px`

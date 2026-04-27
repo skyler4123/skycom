@@ -214,7 +214,7 @@ class Seed::RetailService
             system_role: :company_customer
           )
           customer = Seed::CustomerService.create(
-            user: user, company: @retail, branch: branch, name: "Customer #{i + 1}"
+            user: user, company: @retail, branch: branch, name: "Customer #{SecureRandom.hex(4)}"
           )
           customer.attach_role(role_name)
           @customers << customer

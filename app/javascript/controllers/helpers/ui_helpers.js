@@ -587,3 +587,116 @@ export const picture = ({
     </picture>
   `.trim();
 };
+
+/**
+* Generates an Avatar. If updateUrl is provided, it becomes an interactive uploader.
+ * @param {object} options
+ * @param {string} options.url - The current image source URL.
+ * @param {string} options.updateUrl - The endpoint to upload the new file.
+ * @param {string} options.paramName - The param key (e.g., 'company[avatar_attachment]').
+ * @param {string} [options.className="size-24"] - Tailwind sizing for the container.
+ * @param {string} [options.shape="rounded-full"] - 'rounded-full' or 'rounded-lg'.
+ * @param {string} [options.method="PATCH"] - HTTP method.
+ * @param {string} options.attributes - Attributes for the ROOT (avatar controller).
+ * @param {string} options.innerAttributes - Attributes for the SUB-ELEMENT (popover controller, etc.).
+ * @returns {string} HTML string.
+ */
+// ${avatar({
+//   url: currentUser().avatar,
+//   className: "size-12 cursor-pointer",
+//   // 1. Root attributes (e.g., for layout or global tooltips)
+//   attributes: `id="user_avatar_${currentUser().id}" title="${currentUser().name}"`,
+  
+//   // 2. Middle attributes (e.g., for your popover controller)
+//   innerAttributes: popover({
+//     position: "bottom",
+//     html: `<div data-controller="users--avatar-popover"></div>`
+//   })
+// })}
+// ${avatar({
+//   url: currentUser().avatar,
+//   className: "size-12 cursor-pointer",
+//   // 3. Avatar logic (if you want it editable)
+//   updateUrl: `/users/${currentUser().id}/avatar`,
+//   paramName: "user[avatar_attachment]"
+// })}
+export const avatar = ({
+  url = null, 
+  updateUrl = "/update_avatar",
+  paramName = "",
+  className = "size-10",
+  shape = "rounded-full",
+  method = "PATCH",
+  attributes = "",      
+  innerAttributes = ""  
+}) => {
+  const isEditable = !!updateUrl && !!paramName;
+  
+  // Safe check: if url is null/undefined, avatarContent will use the placeholder
+  const hasUrl = url && typeof url === 'string' && url.trim() !== "";
+
+  const avatarContent = hasUrl 
+    ? `<img data-avatar-target="image" src="${url}" class="h-full w-full object-cover pointer-events-none" alt="Avatar" />`
+    : `
+      <div data-avatar-target="image" class="h-full w-full flex items-center justify-center bg-slate-200 dark:bg-gray-700 text-slate-400 dark:text-gray-500 pointer-events-none">
+        <span class="material-symbols-outlined text-[1.5em]">person</span>
+      </div>
+    `;
+
+  return `
+    <div data-controller="avatar" 
+         data-avatar-upload-url-value="${updateUrl}"
+         data-avatar-param-name-value="${paramName}"
+         data-avatar-method-value="${method}"
+         ${attributes} 
+         class="group relative inline-block ${className} shrink-0">
+         
+      <div ${innerAttributes} 
+           class="${shape} h-full w-full overflow-hidden bg-slate-100 dark:bg-gray-800 border border-slate-200 dark:border-gray-800 ${isEditable ? 'cursor-pointer transition-transform hover:scale-[1.05]' : ''}"
+           ${isEditable ? 'data-action="click->avatar#browse"' : ''}>
+           
+        ${avatarContent}
+             
+        ${isEditable ? `
+          <div class="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
+            <span class="material-symbols-outlined text-white text-[1.2em]">photo_camera</span>
+          </div>
+        ` : ""}
+      </div>
+
+      <input type="file" 
+             data-avatar-target="input" 
+             data-action="change->avatar#upload" 
+             class="hidden" 
+             accept="image/png, image/jpeg" />
+    </div>
+  `.trim();
+};
+
+/**
+ * Returns text based on the current screen resolution.
+ * Matches Tailwind default breakpoints.
+ * 
+ * @param {Object} options - { base: 'Text', sm: 'Small', md: 'Medium', lg: 'Large' }
+ * @returns {string}
+ */
+export const responsiveText = (options) => {
+  const width = window.innerWidth;
+
+  // Tailwind Default Breakpoints
+  const breakpoints = {
+    '2xl': 1536,
+    xl: 1280,
+    lg: 1024,
+    md: 768,
+    sm: 640,
+    base: 0
+  };
+
+  // Find the largest active breakpoint present in the options
+  const activeBreakpoint = Object.keys(breakpoints).find(key => {
+    return width >= breakpoints[key] && options[key] !== undefined;
+  });
+
+  return options[activeBreakpoint] || options['base'] || "";
+};

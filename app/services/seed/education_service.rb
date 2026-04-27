@@ -108,8 +108,8 @@ class Seed::EducationService
             user: user,
             company: @education,
             branch: school,
-            name: "Employee #{i + 1} - #{role_name.to_s.capitalize}",
-            description: "Description for Employee #{i + 1} - #{role_name.to_s.capitalize}"
+            name: "Employee #{SecureRandom.hex(4)} - #{role_name.to_s.capitalize}",
+            description: "Description for Employee #{SecureRandom.hex(4)} - #{role_name.to_s.capitalize}"
           )
           employee.attach_tag(name: "Employee #{employee.id} Tag")
           employee.attach_role(role_name)

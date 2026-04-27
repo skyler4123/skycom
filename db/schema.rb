@@ -2768,6 +2768,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.uuid "parent_user_id"
     t.integer "system_role"
     t.string "username"
+    t.string "name"
     t.string "first_name"
     t.string "last_name"
     t.string "avatar"

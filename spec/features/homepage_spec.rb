@@ -31,17 +31,23 @@ RSpec.feature "Homepage", type: :feature, js: true do
       sign_in(user)
     end
 
-    it "shows Sign Out, My Companies, and New Company buttons" do
+    it "My Companies, and New Company buttons" do
       visit root_path
 
-      expect(page).to have_link("Sign Out", href: /sign_out/)
       expect(page).to have_link("My Companies")
       expect(page).to have_button("New Company")
+    end
+
+    it "Avatar" do
+      visit root_path
+
+      expect(page).to have_selector('[data-controller="avatar"]')
     end
 
     it "clicking Sign Out signs user out" do
       visit root_path
 
+      find('[data-controller="avatar"]').click
       click_link "Sign Out"
 
       expect(page).to have_current_path(root_path)
