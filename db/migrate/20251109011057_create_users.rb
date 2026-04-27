@@ -13,6 +13,7 @@ class CreateUsers < ActiveRecord::Migration[8.0]
       t.references :parent_user, null: true, foreign_key: { to_table: :users }, type: :uuid
       t.integer :system_role
       t.string :username
+      t.string :name
       t.string :first_name
       t.string :last_name
       t.string :avatar
@@ -27,6 +28,7 @@ class CreateUsers < ActiveRecord::Migration[8.0]
     end
     add_index :users, :discarded_at
     add_index :users, :username, unique: true
+    add_index :users, :name, unique: true
     add_index :users, :uid, unique: true
     add_index :users, :single_access_token, unique: true
   end
