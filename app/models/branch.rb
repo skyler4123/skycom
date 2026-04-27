@@ -54,7 +54,7 @@ class Branch < ApplicationRecord
     # Administrative
     headquarters: 90,     # Main office / Corporate
     administrative: 91,   # Back-office branch (Accounting, HR)
-    
+
     virtual: 99           # Online-only branch
   }, prefix: true
   enum :timezone, TIMEZONES, prefix: true
