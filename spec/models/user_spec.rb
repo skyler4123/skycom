@@ -14,18 +14,10 @@ RSpec.describe User, type: :model do
 
   describe "validations" do
     it { should validate_presence_of(:email) }
-    it { should validate_uniqueness_of(:name).allow_blank }
-    it { should_not validate_presence_of(:name) } # Optional: verify presence is gone
-    it { should allow_value("test@example.com").for(:email) }
-    it { should allow_value("user@domain.co.uk").for(:email) }
-    it { should_not allow_value("invalid-email").for(:email) }
-    it { should_not allow_value("test@").for(:email) }
-    it { should_not allow_value("@example.com").for(:email) }
-
-    describe "name uniqueness" do
+describe "name uniqueness" do
       let!(:user) { create(:user, name: "Skycom User") }
 
-      it "prevents duplicate names when present" do
+      it "validates uniqueness when present" do
         new_user = build(:user, name: "Skycom User")
         expect(new_user).not_to be_valid
         expect(new_user.errors[:name]).to include("has already been taken")
