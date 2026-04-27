@@ -14,11 +14,22 @@ RSpec.describe User, type: :model do
 
   describe "validations" do
     it { should validate_presence_of(:email) }
+    it { should validate_presence_of(:name) }
     it { should allow_value("test@example.com").for(:email) }
     it { should allow_value("user@domain.co.uk").for(:email) }
     it { should_not allow_value("invalid-email").for(:email) }
     it { should_not allow_value("test@").for(:email) }
     it { should_not allow_value("@example.com").for(:email) }
+
+    describe "name uniqueness" do
+      let(:user) { create(:user) }
+
+      it "prevents duplicate names" do
+        expect {
+          create(:user, name: user.name, system_role: user.system_role)
+        }.to raise_error(ActiveRecord::RecordInvalid)
+      end
+    end
   end
 
   describe "enums" do
