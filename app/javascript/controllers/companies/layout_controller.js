@@ -362,15 +362,15 @@ export default class Companies_LayoutController extends Controller {
                   class="flex cursor-pointer items-center justify-center overflow-hidden rounded-full h-10 w-10 hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-600 dark:text-gray-300">
                   <span class="material-symbols-outlined">settings</span>
                 </button>
-                <div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10"
-                  data-alt="User profile picture"
-                  style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuBYk6_5wqHwhOUyfqIOzuw7uF6nG1B2aHcNfqPXgheh0TJNM9wgrKtU__k7USaOwDZLXPpvIrYvaXBnMbO7rmZHK15vMirHZqrK0UBZ18vJdiQZlmTrGe8wch8p3G7GXSetuz5njKmy7Hb6XGw18g0stonxhwtIcuuEqzZVHxbviNLuy4i_B8JHC1x_JlbUrZoIV2QQqyAprbH-jems99h8nqDZ6D6FBmq8JDrKIfaBYkl3mR0cYldl3c0gaNynjiRNKDKfaUcIKBc");'
-                  ${popover({
-                    classes: "bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 shadow-xl p-1",
+                ${avatar({
+                  url: currentUser()?.avatar,
+                  className: "size-12 cursor-pointer",
+                  // 2. Middle attributes (e.g., for your popover controller)
+                  innerAttributes: popover({
+                    position: "bottom",
                     html: `<div data-controller="users--avatar-popover"></div>`
-                  })}
-                >
-                </div>
+                  })
+                })}
               </div>
             </header>
             <!-- End Header -->
