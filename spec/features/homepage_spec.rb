@@ -49,11 +49,13 @@ RSpec.feature "Homepage", type: :feature, js: true do
     end
 
     it "clicking My Companies navigates to companies page" do
+      create(:company, user: user)
+
       visit root_path
 
       click_link "My Companies"
 
-      expect(page).to have_current_path(/redirect\/companies/)
+      expect(page).to have_current_path(%r{/companies/[^/]+/dashboards})
     end
 
     it "clicking New Company opens modal with form" do
