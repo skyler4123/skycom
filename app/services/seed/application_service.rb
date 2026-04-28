@@ -42,6 +42,7 @@ class Seed::ApplicationService
     Seed::HospitalService.new(user: user_1, email: "hospital1@company1.com")
     Seed::EducationService.new(user: user_1, email: "education1@company1.com")
     Seed::HotelService.new(user: user_1, email: "hotel1@company1.com")
+    Seed::FitnessService.new(user: user_1, email: "fitness1@company1.com")
     Seed::RetailService.new(user: user_2, email: "retail1@company3.com")
 
     self.puts_count
