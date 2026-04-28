@@ -1185,156 +1185,6 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.index ["discarded_at"], name: "index_facility_groups_on_discarded_at"
   end
 
-  create_table "inventories", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
-    t.uuid "company_id", null: false
-    t.uuid "branch_id"
-    t.uuid "category_id"
-    t.string "name"
-    t.string "description"
-    t.string "code"
-    t.integer "lifecycle_status"
-    t.integer "workflow_status"
-    t.integer "business_type"
-    t.datetime "discarded_at"
-    t.jsonb "metadata", default: {}
-    t.string "permission_resource_name"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.index ["branch_id"], name: "index_inventories_on_branch_id"
-    t.index ["category_id"], name: "index_inventories_on_category_id"
-    t.index ["company_id"], name: "index_inventories_on_company_id"
-    t.index ["discarded_at"], name: "index_inventories_on_discarded_at"
-  end
-
-  create_table "inventory_item_appointments", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
-    t.uuid "company_id", null: false
-    t.uuid "inventory_item_id", null: false
-    t.string "appoint_from_type"
-    t.uuid "appoint_from_id"
-    t.string "appoint_to_type", null: false
-    t.uuid "appoint_to_id", null: false
-    t.string "appoint_for_type"
-    t.uuid "appoint_for_id"
-    t.string "appoint_by_type"
-    t.uuid "appoint_by_id"
-    t.string "name"
-    t.string "description"
-    t.string "code"
-    t.integer "lifecycle_status"
-    t.integer "workflow_status"
-    t.integer "business_type"
-    t.datetime "discarded_at"
-    t.string "permission_resource_name"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.index ["appoint_by_type", "appoint_by_id"], name: "index_inventory_item_appointments_on_appoint_by"
-    t.index ["appoint_for_type", "appoint_for_id"], name: "index_inventory_item_appointments_on_appoint_for"
-    t.index ["appoint_from_type", "appoint_from_id"], name: "index_inventory_item_appointments_on_appoint_from"
-    t.index ["appoint_to_type", "appoint_to_id"], name: "index_inventory_item_appointments_on_appoint_to"
-    t.index ["company_id"], name: "index_inventory_item_appointments_on_company_id"
-    t.index ["discarded_at"], name: "index_inventory_item_appointments_on_discarded_at"
-    t.index ["inventory_item_id"], name: "index_inventory_item_appointments_on_inventory_item_id"
-  end
-
-  create_table "inventory_items", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
-    t.uuid "company_id", null: false
-    t.uuid "branch_id"
-    t.uuid "inventory_id", null: false
-    t.uuid "category_id"
-    t.string "name"
-    t.string "description"
-    t.string "code"
-    t.string "sku"
-    t.string "barcode"
-    t.string "upc"
-    t.string "ean"
-    t.string "manufacturer_code"
-    t.string "serial_number"
-    t.string "batch_number"
-    t.datetime "expiration_date"
-    t.integer "lifecycle_status"
-    t.integer "workflow_status"
-    t.integer "business_type"
-    t.datetime "discarded_at"
-    t.jsonb "metadata", default: {}
-    t.string "permission_resource_name"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.index ["barcode"], name: "index_inventory_items_on_barcode"
-    t.index ["branch_id"], name: "index_inventory_items_on_branch_id"
-    t.index ["category_id"], name: "index_inventory_items_on_category_id"
-    t.index ["company_id"], name: "index_inventory_items_on_company_id"
-    t.index ["discarded_at"], name: "index_inventory_items_on_discarded_at"
-    t.index ["ean"], name: "index_inventory_items_on_ean"
-    t.index ["inventory_id"], name: "index_inventory_items_on_inventory_id"
-    t.index ["serial_number"], name: "index_inventory_items_on_serial_number"
-    t.index ["sku"], name: "index_inventory_items_on_sku"
-    t.index ["upc"], name: "index_inventory_items_on_upc"
-  end
-
-  create_table "inventory_transaction_appointments", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
-    t.uuid "company_id", null: false
-    t.uuid "inventory_transaction_id", null: false
-    t.string "appoint_from_type"
-    t.uuid "appoint_from_id"
-    t.string "appoint_to_type", null: false
-    t.uuid "appoint_to_id", null: false
-    t.string "appoint_for_type"
-    t.uuid "appoint_for_id"
-    t.string "appoint_by_type"
-    t.uuid "appoint_by_id"
-    t.string "name"
-    t.string "description"
-    t.string "code"
-    t.integer "lifecycle_status"
-    t.integer "workflow_status"
-    t.integer "business_type"
-    t.datetime "discarded_at"
-    t.string "permission_resource_name"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.index ["appoint_by_type", "appoint_by_id"], name: "index_inventory_transaction_appointments_on_appoint_by"
-    t.index ["appoint_for_type", "appoint_for_id"], name: "index_inventory_transaction_appointments_on_appoint_for"
-    t.index ["appoint_from_type", "appoint_from_id"], name: "index_inventory_transaction_appointments_on_appoint_from"
-    t.index ["appoint_to_type", "appoint_to_id"], name: "index_inventory_transaction_appointments_on_appoint_to"
-    t.index ["company_id"], name: "index_inventory_transaction_appointments_on_company_id"
-    t.index ["discarded_at"], name: "index_inventory_transaction_appointments_on_discarded_at"
-    t.index ["inventory_transaction_id"], name: "idx_on_inventory_transaction_id_49862a2fce"
-  end
-
-  create_table "inventory_transactions", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
-    t.uuid "company_id", null: false
-    t.uuid "branch_id"
-    t.string "appoint_from_type"
-    t.uuid "appoint_from_id"
-    t.string "appoint_to_type", null: false
-    t.uuid "appoint_to_id", null: false
-    t.string "appoint_for_type"
-    t.uuid "appoint_for_id"
-    t.string "appoint_by_type"
-    t.uuid "appoint_by_id"
-    t.uuid "category_id"
-    t.string "name"
-    t.string "description"
-    t.string "code"
-    t.integer "lifecycle_status"
-    t.integer "workflow_status"
-    t.integer "business_type"
-    t.datetime "discarded_at"
-    t.jsonb "metadata", default: {}
-    t.string "permission_resource_name"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.index ["appoint_by_type", "appoint_by_id"], name: "index_inventory_transactions_on_appoint_by"
-    t.index ["appoint_for_type", "appoint_for_id"], name: "index_inventory_transactions_on_appoint_for"
-    t.index ["appoint_from_type", "appoint_from_id"], name: "index_inventory_transactions_on_appoint_from"
-    t.index ["appoint_to_type", "appoint_to_id"], name: "index_inventory_transactions_on_appoint_to"
-    t.index ["branch_id"], name: "index_inventory_transactions_on_branch_id"
-    t.index ["category_id"], name: "index_inventory_transactions_on_category_id"
-    t.index ["company_id"], name: "index_inventory_transactions_on_company_id"
-    t.index ["discarded_at"], name: "index_inventory_transactions_on_discarded_at"
-  end
-
   create_table "invoices", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.uuid "company_id", null: false
     t.uuid "branch_id"
@@ -2393,6 +2243,79 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.index ["recorded_at"], name: "index_statistics_on_recorded_at"
   end
 
+  create_table "stock_transfers", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "company_id", null: false
+    t.uuid "branch_id"
+    t.uuid "product_id", null: false
+    t.string "appoint_from_type"
+    t.uuid "appoint_from_id"
+    t.string "appoint_to_type"
+    t.uuid "appoint_to_id"
+    t.string "appoint_for_type"
+    t.uuid "appoint_for_id"
+    t.string "appoint_by_type"
+    t.uuid "appoint_by_id"
+    t.uuid "category_id"
+    t.string "name"
+    t.string "description"
+    t.string "code"
+    t.integer "quantity"
+    t.integer "lifecycle_status"
+    t.integer "workflow_status"
+    t.integer "business_type"
+    t.datetime "discarded_at"
+    t.jsonb "metadata", default: {}
+    t.string "permission_resource_name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["appoint_by_type", "appoint_by_id"], name: "index_stock_transfers_on_appoint_by"
+    t.index ["appoint_for_type", "appoint_for_id"], name: "index_stock_transfers_on_appoint_for"
+    t.index ["appoint_from_type", "appoint_from_id"], name: "index_stock_transfers_on_appoint_from"
+    t.index ["appoint_to_type", "appoint_to_id"], name: "index_stock_transfers_on_appoint_to"
+    t.index ["branch_id"], name: "index_stock_transfers_on_branch_id"
+    t.index ["category_id"], name: "index_stock_transfers_on_category_id"
+    t.index ["company_id"], name: "index_stock_transfers_on_company_id"
+    t.index ["discarded_at"], name: "index_stock_transfers_on_discarded_at"
+    t.index ["product_id"], name: "index_stock_transfers_on_product_id"
+  end
+
+  create_table "stocks", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "company_id", null: false
+    t.uuid "branch_id"
+    t.uuid "warehouse_id", null: false
+    t.uuid "category_id"
+    t.string "name"
+    t.string "description"
+    t.integer "quantity"
+    t.string "code"
+    t.string "sku"
+    t.string "barcode"
+    t.string "upc"
+    t.string "ean"
+    t.string "manufacturer_code"
+    t.string "serial_number"
+    t.string "batch_number"
+    t.datetime "expiration_date"
+    t.integer "lifecycle_status"
+    t.integer "workflow_status"
+    t.integer "business_type"
+    t.datetime "discarded_at"
+    t.jsonb "metadata", default: {}
+    t.string "permission_resource_name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["barcode"], name: "index_stocks_on_barcode"
+    t.index ["branch_id"], name: "index_stocks_on_branch_id"
+    t.index ["category_id"], name: "index_stocks_on_category_id"
+    t.index ["company_id"], name: "index_stocks_on_company_id"
+    t.index ["discarded_at"], name: "index_stocks_on_discarded_at"
+    t.index ["ean"], name: "index_stocks_on_ean"
+    t.index ["serial_number"], name: "index_stocks_on_serial_number"
+    t.index ["sku"], name: "index_stocks_on_sku"
+    t.index ["upc"], name: "index_stocks_on_upc"
+    t.index ["warehouse_id"], name: "index_stocks_on_warehouse_id"
+  end
+
   create_table "subscription_groups", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.uuid "company_id", null: false
     t.uuid "branch_id"
@@ -2788,6 +2711,29 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.index ["username"], name: "index_users_on_username", unique: true
   end
 
+  create_table "warehouses", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "company_id", null: false
+    t.uuid "branch_id"
+    t.uuid "category_id"
+    t.uuid "address_id"
+    t.string "name"
+    t.string "description"
+    t.string "code"
+    t.integer "lifecycle_status"
+    t.integer "workflow_status"
+    t.integer "business_type"
+    t.datetime "discarded_at"
+    t.jsonb "metadata", default: {}
+    t.string "permission_resource_name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["address_id"], name: "index_warehouses_on_address_id"
+    t.index ["branch_id"], name: "index_warehouses_on_branch_id"
+    t.index ["category_id"], name: "index_warehouses_on_category_id"
+    t.index ["company_id"], name: "index_warehouses_on_company_id"
+    t.index ["discarded_at"], name: "index_warehouses_on_discarded_at"
+  end
+
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
   add_foreign_key "address_appointments", "addresses"
@@ -2906,20 +2852,6 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
   add_foreign_key "facility_groups", "branches"
   add_foreign_key "facility_groups", "categories"
   add_foreign_key "facility_groups", "companies"
-  add_foreign_key "inventories", "branches"
-  add_foreign_key "inventories", "categories"
-  add_foreign_key "inventories", "companies"
-  add_foreign_key "inventory_item_appointments", "companies"
-  add_foreign_key "inventory_item_appointments", "inventory_items"
-  add_foreign_key "inventory_items", "branches"
-  add_foreign_key "inventory_items", "categories"
-  add_foreign_key "inventory_items", "companies"
-  add_foreign_key "inventory_items", "inventories"
-  add_foreign_key "inventory_transaction_appointments", "companies"
-  add_foreign_key "inventory_transaction_appointments", "inventory_transactions"
-  add_foreign_key "inventory_transactions", "branches"
-  add_foreign_key "inventory_transactions", "categories"
-  add_foreign_key "inventory_transactions", "companies"
   add_foreign_key "invoices", "branches"
   add_foreign_key "invoices", "categories"
   add_foreign_key "invoices", "companies"
@@ -3025,6 +2957,14 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
   add_foreign_key "shifts", "companies"
   add_foreign_key "shifts", "periods"
   add_foreign_key "sign_in_tokens", "users"
+  add_foreign_key "stock_transfers", "branches"
+  add_foreign_key "stock_transfers", "categories"
+  add_foreign_key "stock_transfers", "companies"
+  add_foreign_key "stock_transfers", "products"
+  add_foreign_key "stocks", "branches"
+  add_foreign_key "stocks", "categories"
+  add_foreign_key "stocks", "companies"
+  add_foreign_key "stocks", "warehouses"
   add_foreign_key "subscription_groups", "branches"
   add_foreign_key "subscription_groups", "companies"
   add_foreign_key "subscription_groups", "periods"
@@ -3067,4 +3007,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
   add_foreign_key "tasks", "companies"
   add_foreign_key "tasks", "task_groups"
   add_foreign_key "users", "users", column: "parent_user_id"
+  add_foreign_key "warehouses", "addresses"
+  add_foreign_key "warehouses", "branches"
+  add_foreign_key "warehouses", "categories"
+  add_foreign_key "warehouses", "companies"
 end

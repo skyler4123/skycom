@@ -1,13 +1,14 @@
-class CreateInventoryItems < ActiveRecord::Migration[8.0]
+class CreateStocks < ActiveRecord::Migration[8.0]
   def change
-    create_table :inventory_items, id: :uuid do |t|
+    create_table :stocks, id: :uuid do |t|
       t.references :company, null: false, foreign_key: true, type: :uuid
       t.references :branch, null: true, foreign_key: true, type: :uuid
-      t.references :inventory, null: false, foreign_key: true, type: :uuid
+      t.references :warehouse, null: false, foreign_key: true, type: :uuid
       t.references :category, null: true, foreign_key: true, type: :uuid
 
       t.string :name
       t.string :description
+      t.integer :quantity
       t.string :code
       t.string :sku
       t.string :barcode
@@ -26,11 +27,11 @@ class CreateInventoryItems < ActiveRecord::Migration[8.0]
 
       t.timestamps
     end
-    add_index :inventory_items, :sku
-    add_index :inventory_items, :barcode
-    add_index :inventory_items, :upc
-    add_index :inventory_items, :ean
-    add_index :inventory_items, :serial_number
-    add_index :inventory_items, :discarded_at
+    add_index :stocks, :sku
+    add_index :stocks, :barcode
+    add_index :stocks, :upc
+    add_index :stocks, :ean
+    add_index :stocks, :serial_number
+    add_index :stocks, :discarded_at
   end
 end
