@@ -1636,7 +1636,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
   end
 
   create_table "prices", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
-    t.decimal "amount", precision: 19, scale: 4, null: false
+    t.integer "amount"
     t.integer "currency_code", default: 0, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
@@ -2282,11 +2282,13 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
   create_table "stocks", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.uuid "company_id", null: false
     t.uuid "branch_id"
+    t.uuid "product_id", null: false
     t.uuid "warehouse_id", null: false
     t.uuid "category_id"
     t.string "name"
     t.string "description"
     t.integer "quantity"
+    t.integer "reorder"
     t.string "code"
     t.string "sku"
     t.string "barcode"
@@ -2310,6 +2312,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.index ["company_id"], name: "index_stocks_on_company_id"
     t.index ["discarded_at"], name: "index_stocks_on_discarded_at"
     t.index ["ean"], name: "index_stocks_on_ean"
+    t.index ["product_id", "warehouse_id"], name: "index_stocks_on_product_id_and_warehouse_id", unique: true
+    t.index ["product_id"], name: "index_stocks_on_product_id"
     t.index ["serial_number"], name: "index_stocks_on_serial_number"
     t.index ["sku"], name: "index_stocks_on_sku"
     t.index ["upc"], name: "index_stocks_on_upc"
@@ -2964,6 +2968,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
   add_foreign_key "stocks", "branches"
   add_foreign_key "stocks", "categories"
   add_foreign_key "stocks", "companies"
+  add_foreign_key "stocks", "products"
   add_foreign_key "stocks", "warehouses"
   add_foreign_key "subscription_groups", "branches"
   add_foreign_key "subscription_groups", "companies"

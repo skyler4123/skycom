@@ -11,7 +11,18 @@ class Seed::RetailService
   RETAIL_ROLES = (EMPLOYEE_COUNTS.keys).freeze
   COMPANY_GROUP_BUSINESS_TYPE = :retail
 
-  def initialize(user:, email: Faker::Internet.email)
+  GROCERY_ITEMS = [
+    { name: "Organic Bananas", sku: "FRU-BAN-01", price: 0.99, quantity: 500, reorder: 50 },
+    { name: "Whole Milk 1L", sku: "DAI-MILK-01", price: 1.50, quantity: 100, reorder: 20 },
+    { name: "Sourdough Bread", sku: "BAK-SOUR-01", price: 3.25, quantity: 30, reorder: 10 },
+    { name: "Instant Coffee 200g", sku: "DRY-COF-01", price: 7.99, quantity: 200, reorder: 40 },
+    { name: "Extra Virgin Olive Oil", sku: "PAN-OIL-01", price: 12.50, quantity: 80, reorder: 15 },
+    { name: "Paper Towels (2 Pack)", sku: "HOU-PAP-01", price: 4.50, quantity: 150, reorder: 30 },
+    { name: "Dish Soap 500ml", sku: "CLE-DISH-01", price: 2.75, quantity: 120, reorder: 25 },
+    { name: "Basmati Rice 5kg", sku: "PAN-RICE-01", price: 15.00, quantity: 60, reorder: 10 }
+  ]
+
+  def initialize(user:, email: Faker::Internet.email, name: nil)
     @multi_company_owner = user
     @retail = nil
     @branches = []
@@ -67,7 +78,7 @@ class Seed::RetailService
     puts "Creating retail group..."
     @retail = Seed::CompanyService.create(
       user: @multi_company_owner,
-      name: "Company #{Company.count + 1}",
+      name: name || "Company #{Company.count + 1}",
       email: @email,
       description: "A group for multiple retail branch branches",
       business_type: COMPANY_GROUP_BUSINESS_TYPE
