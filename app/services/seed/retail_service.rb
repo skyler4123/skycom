@@ -11,7 +11,7 @@ class Seed::RetailService
   RETAIL_ROLES = (EMPLOYEE_COUNTS.keys).freeze
   COMPANY_GROUP_BUSINESS_TYPE = :retail
 
-  GROCERY_ITEMS = [
+  RETAIL_ITEMS = [
     { name: "Organic Bananas", sku: "FRU-BAN-01", price: 0.99, quantity: 500, reorder: 50 },
     { name: "Whole Milk 1L", sku: "DAI-MILK-01", price: 1.50, quantity: 100, reorder: 20 },
     { name: "Sourdough Bread", sku: "BAK-SOUR-01", price: 3.25, quantity: 30, reorder: 10 },
