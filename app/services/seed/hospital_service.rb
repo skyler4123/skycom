@@ -8,7 +8,7 @@ class Seed::HospitalService
   }.freeze
 
   CUSTOMER_COUNTS = { Patient: 20 }.freeze
-  HOSPITAL_ROLES = (EMPLOYEE_COUNTS.keys + CUSTOMER_COUNTS.keys).freeze
+  HOSPITAL_ROLES = (EMPLOYEE_COUNTS.keys).freeze
   COMPANY_GROUP_BUSINESS_TYPE = :hospital
 
   def initialize(user:, email: Faker::Internet.email)
@@ -216,7 +216,7 @@ class Seed::HospitalService
           customer = Seed::CustomerService.create(
             user: user, company: @hospital, branch: branch, name: "Patient #{SecureRandom.hex(4)}"
           )
-          customer.attach_role(role_name)
+          # customer.attach_role(role_name)
           @customers << customer
         end
       end

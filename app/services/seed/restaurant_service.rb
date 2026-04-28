@@ -8,7 +8,7 @@ class Seed::RestaurantService
   }.freeze
 
   CUSTOMER_COUNTS = { Customer: 20 }.freeze
-  RESTAURANT_ROLES = (EMPLOYEE_COUNTS.keys + CUSTOMER_COUNTS.keys).freeze
+  RESTAURANT_ROLES = (EMPLOYEE_COUNTS.keys).freeze
   COMPANY_GROUP_BUSINESS_TYPE = :restaurant
 
   def initialize(user:, email: Faker::Internet.email)
@@ -216,7 +216,7 @@ class Seed::RestaurantService
           customer = Seed::CustomerService.create(
             user: user, company: @restaurant, branch: branch, name: "Customer #{SecureRandom.hex(4)}"
           )
-          customer.attach_role(role_name)
+          # customer.attach_role(role_name)
           @customers << customer
         end
       end
