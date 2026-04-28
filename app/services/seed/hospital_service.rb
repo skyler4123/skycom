@@ -1,19 +1,19 @@
-class Seed::RetailService
+class Seed::HospitalService
   EMPLOYEE_COUNTS = {
     Manager: 1,
-    Cashier: 10,
-    Seller: 10,
-    Security: 1,
-    Admin: 1
+    Doctor: 5,
+    Nurse: 10,
+    Receptionist: 3,
+    Admin: 2
   }.freeze
 
-  CUSTOMER_COUNTS = { Customer: 20 }.freeze
-  RETAIL_ROLES = (EMPLOYEE_COUNTS.keys + CUSTOMER_COUNTS.keys).freeze
-  COMPANY_GROUP_BUSINESS_TYPE = :retail
+  CUSTOMER_COUNTS = { Patient: 20 }.freeze
+  HOSPITAL_ROLES = (EMPLOYEE_COUNTS.keys + CUSTOMER_COUNTS.keys).freeze
+  COMPANY_GROUP_BUSINESS_TYPE = :hospital
 
   def initialize(user:, email: Faker::Internet.email)
     @multi_company_owner = user
-    @retail = nil
+    @hospital = nil
     @branches = []
     @facilities = []
     @departments = []
@@ -30,7 +30,7 @@ class Seed::RetailService
   def seeding
     print_header
 
-    create_retail_company
+    create_hospital_company
     create_branches
     subscribe_branches_to_system_subscription_plane
     create_subscription_plans_for_company
@@ -43,7 +43,7 @@ class Seed::RetailService
     create_customers_for_company
     subscribe_for_customers
     setup_loyalty_programs
-    create_inventory # Products and Services
+    create_inventory
     create_customer_orders
 
     print_footer
@@ -53,23 +53,23 @@ class Seed::RetailService
   private
 
   def print_header
-    puts "\n\n🛍️  Starting Retail Company Group Seeding..."
+    puts "\n\n🏥  Starting Hospital Company Group Seeding..."
     puts "========================================================="
   end
 
   def print_footer
     puts "\n========================================================="
-    puts "🛍️  Retail Company Group Seeding Complete!"
+    puts "🏥  Hospital Company Group Seeding Complete!"
     puts "========================================================="
   end
 
-  def create_retail_company
-    puts "Creating retail group..."
-    @retail = Seed::CompanyService.create(
+  def create_hospital_company
+    puts "Creating hospital group..."
+    @hospital = Seed::CompanyService.create(
       user: @multi_company_owner,
-      name: "Company #{Company.count + 1}",
+      name: "Hospital #{Company.count + 1}",
       email: @email,
-      description: "A group for multiple retail branch branches",
+      description: "A group for multiple hospital branch locations",
       business_type: COMPANY_GROUP_BUSINESS_TYPE
     )
   end
@@ -78,9 +78,9 @@ class Seed::RetailService
     puts "Creating #{count} branches..."
     count.times do |i|
       branch = Seed::BranchService.create(
-        name: "Branch #{i + 1}",
-        description: "Description for Branch #{i + 1}",
-        company: @retail
+        name: "Hospital Branch #{i + 1}",
+        description: "Description for Hospital Branch #{i + 1}",
+        company: @hospital
       )
       branch.attach_tag(key: "Branch #{branch.id} Tag")
       @branches << branch
@@ -98,10 +98,10 @@ class Seed::RetailService
     count.times do |i|
       price = Seed::PriceService.create(
         amount: rand(10..100),
-        currency_code: @retail.currency_code
+        currency_code: @hospital.currency_code
       )
       Seed::SubscriptionPlanService.create(
-        company: @retail,
+        company: @hospital,
         name: "Plan #{i + 1}",
         price: price,
         duration_days: rand(30..365)
@@ -112,9 +112,9 @@ class Seed::RetailService
   def create_subscriptions_for_company(count: 3)
     count.times do |i|
       Seed::SubscriptionService.create(
-        company: @retail,
-        name: "Retail Company Group Subscription #{i + 1}",
-        description: "Subscription plan #{i + 1} for #{@retail.name}"
+        company: @hospital,
+        name: "Hospital Company Group Subscription #{i + 1}",
+        description: "Subscription plan #{i + 1} for #{@hospital.name}"
       )
     end
   end
@@ -130,7 +130,7 @@ class Seed::RetailService
       facility_count = rand(1..3)
       facility_count.times do |i|
         facility = Seed::FacilityService.create(
-          company: @retail,
+          company: @hospital,
           branch: branch,
           name: "#{branch.name} Facility #{i + 1}",
           description: "A facility location for #{branch.name}"
@@ -143,29 +143,29 @@ class Seed::RetailService
 
   def appoint_payment_methods_to_company
     @branches.each do |branch|
-      3.times { Seed::PaymentMethodAppointmentService.create(company: @retail) }
+      3.times { Seed::PaymentMethodAppointmentService.create(company: @hospital) }
     end
   end
 
   def setup_roles_and_permissions
-    RETAIL_ROLES.each do |role_name|
+    HOSPITAL_ROLES.each do |role_name|
       Seed::RoleService.create(
-        company: @retail,
+        company: @hospital,
         name: role_name,
-        description: "#{role_name} role for #{@retail.name}"
+        description: "#{role_name} role for #{@hospital.name}"
       )
     end
-    configure_retail_permissions
+    configure_hospital_permissions
   end
 
   def create_departments_for_company
-    [ "Electronics", "Clothing", "Home Goods", "Customer Service" ].each do |dept_name|
+    [ "Emergency", "Surgery", "Pediatrics", "Cardiology" ].each do |dept_name|
       department = Seed::DepartmentService.create(
-        company: @retail,
+        company: @hospital,
         name: dept_name,
         description: "Department: #{dept_name}"
       )
-      department.update!(category: Seed::CategoryService.create(company: @retail, name: "Department"))
+      department.update!(category: Seed::CategoryService.create(company: @hospital, name: "Department"))
       department.attach_tag(key: "Department #{department.id} Tag")
       @departments << department
     end
@@ -179,11 +179,11 @@ class Seed::RetailService
         count.times do |i|
           user = Seed::UserService.create(
             parent_user: @multi_company_owner,
-            email: "#{role_name}_#{i + 1}_retail_branch_#{index + 1}@#{@email_domain}",
+            email: "#{role_name}_#{i + 1}_hospital_branch_#{index + 1}@#{@email_domain}",
             system_role: :company_employee
           )
           employee = Seed::EmployeeService.create(
-            user: user, company: @retail, branch: branch,
+            user: user, company: @hospital, branch: branch,
             name: "Employee #{SecureRandom.hex(4)}"
           )
           employee.attach_role(role_name)
@@ -210,11 +210,11 @@ class Seed::RetailService
         count.times do |i|
           user = Seed::UserService.create(
             parent_user: @multi_company_owner,
-            email: "customer_#{i + 1}_#{branch.id}@example.com",
+            email: "hospital_patient_#{i + 1}_#{branch.id}@example.com",
             system_role: :company_customer
           )
           customer = Seed::CustomerService.create(
-            user: user, company: @retail, branch: branch, name: "Customer #{SecureRandom.hex(4)}"
+            user: user, company: @hospital, branch: branch, name: "Patient #{SecureRandom.hex(4)}"
           )
           customer.attach_role(role_name)
           @customers << customer
@@ -226,10 +226,10 @@ class Seed::RetailService
   def subscribe_for_customers
     @customers.each do |customer|
       Seed::SubscriptionService.create(
-        company: @retail,
-        subscription_plan: @retail.subscription_plans.sample,
+        company: @hospital,
+        subscription_plan: @hospital.subscription_plans.sample,
         period: Seed::PeriodService.create,
-        seller: @retail,
+        seller: @hospital,
         buyer: customer
       )
     end
@@ -239,7 +239,7 @@ class Seed::RetailService
     @branches.each do |branch|
       2.times do |i|
         lp = Seed::CustomerGroupService.create(
-          company: @retail, branch: branch, name: "Loyalty Program #{i + 1} - #{branch.name}"
+          company: @hospital, branch: branch, name: "Health Program #{i + 1} - #{branch.name}"
         )
         @loyalty_programs << lp
 
@@ -253,16 +253,30 @@ class Seed::RetailService
 
   def create_inventory
     @branches.each do |branch|
-      # Products
-      15.times do |i|
+      medical_supplies = [
+        "Surgical Gloves", "Face Masks", "Bandages", "Syringes",
+        "Medical Cotton", "Antiseptic Solution", "IV Sets", "Catheters",
+        "Surgical Sutures", "Medical Tape", "Stethoscopes", "Thermometers",
+        "Blood Pressure Monitor", "Pulse Oximeter", "First Aid Kit"
+      ]
+
+      medical_supplies.each do |item_name|
         @products << Seed::ProductService.create(
-          company: @retail, branch: branch, name: "#{Faker::Commerce.product_name} #{i + 1}"
+          company: @hospital,
+          branch: branch,
+          name: "#{item_name} - #{branch.name}"
         )
       end
-      # Services
-      10.times do |i|
+
+      services = [
+        "General Consultation", "Emergency Care", "Surgery", "Lab Tests", "MRI Scan"
+      ]
+
+      services.each do |service_name|
         @services << Seed::ServiceService.create(
-          company: @retail, branch: branch, name: "#{Faker::Company.buzzword} Service #{i + 1}"
+          company: @hospital,
+          branch: branch,
+          name: "#{service_name} - #{branch.name}"
         )
       end
     end
@@ -276,7 +290,7 @@ class Seed::RetailService
       5.times do |i|
         customer = branch_customers.sample
         order = Seed::OrderService.create(
-          company: @retail, branch: branch, customer: customer, name: "Order #{i + 1} for #{customer.name}"
+          company: @hospital, branch: branch, customer: customer, name: "Order #{i + 1} for #{customer.name}"
         )
         attach_items_to_order(branch, order)
       end
@@ -284,20 +298,18 @@ class Seed::RetailService
   end
 
   def attach_items_to_order(branch, order)
-    # Attach Products
     branch_products = @products.select { |p| p.branch_id == branch.id }
-    branch_products.sample(rand(2..3)).each do |product|
-      OrderAppointment.create!(order: order, appoint_to: product, quantity: rand(1..5), unit_price: rand(10.0..100.0).round(2), total_price: 0)
+    branch_products.sample(rand(2..4)).each do |product|
+      OrderAppointment.create!(order: order, appoint_to: product, quantity: rand(1..5), unit_price: rand(5.0..50.0).round(2), total_price: 0)
     end
 
-    # Attach Services
     branch_services = @services.select { |s| s.branch_id == branch.id }
     branch_services.sample(rand(1..2)).each do |service|
-      OrderAppointment.create!(order: order, appoint_to: service, quantity: 1, unit_price: rand(50.0..200.0).round(2), total_price: 0)
+      OrderAppointment.create!(order: order, appoint_to: service, quantity: 1, unit_price: rand(50.0..500.0).round(2), total_price: 0)
     end
   end
 
-  def configure_retail_permissions
+  def configure_hospital_permissions
     create_all_crud_policies
     assign_policies_to_roles
   end
@@ -321,7 +333,7 @@ class Seed::RetailService
     policy_name = "Can #{action} #{resource}"
     Policy.find_or_create_by!(
       name: policy_name,
-      company: @retail,
+      company: @hospital,
       resource: resource,
       action: action
     ) do |p|
@@ -334,41 +346,52 @@ class Seed::RetailService
 
   def assign_policies_to_roles
     role_definitions = {
-      Admin: {
-        "PolicyAppointment" => { create: true, read: true, update: true, delete: true }
-      },
       Manager: {
         "Order" => { create: true, read: true, update: true, delete: true },
         "Product" => { create: true, read: true, update: true, delete: true },
         "Employee" => { create: true, read: true, update: true, delete: true },
         "Customer" => { create: true, read: true, update: true, delete: true },
-        "PolicyAppointment" => { create: false, read: true, update: true, delete: false }
+        "PolicyAppointment" => { create: true, read: true, update: true, delete: true }
       },
-      Cashier: {
+      Doctor: {
         "Order" => { create: true, read: true, update: true, delete: false },
-        "Product" => { create: false, read: true, update: false, delete: false },
-        "Customer" => { create: true, read: true, update: false, delete: false }
+        "Product" => { create: false, read: true, update: true, delete: false },
+        "Employee" => { create: false, read: true, update: false, delete: false },
+        "Customer" => { create: true, read: true, update: true, delete: false },
+        "PolicyAppointment" => { create: false, read: false, update: false, delete: false }
       },
-      Seller: {
+      Nurse: {
+        "Order" => { create: true, read: true, update: true, delete: false },
+        "Product" => { create: false, read: true, update: true, delete: false },
+        "Employee" => { create: false, read: false, update: false, delete: false },
+        "Customer" => { create: true, read: true, update: true, delete: false },
+        "PolicyAppointment" => { create: false, read: false, update: false, delete: false }
+      },
+      Receptionist: {
         "Order" => { create: true, read: true, update: false, delete: false },
         "Product" => { create: false, read: true, update: false, delete: false },
-        "Customer" => { create: false, read: true, update: false, delete: false }
+        "Employee" => { create: false, read: false, update: false, delete: false },
+        "Customer" => { create: true, read: true, update: true, delete: false },
+        "PolicyAppointment" => { create: false, read: false, update: false, delete: false }
       },
-      Security: {
-        "Product" => { create: false, read: true, update: false, delete: false },
-        "Order" => { create: false, read: true, update: false, delete: false }
+      Admin: {
+        "Order" => { create: true, read: true, update: true, delete: true },
+        "Product" => { create: true, read: true, update: true, delete: true },
+        "Employee" => { create: true, read: true, update: true, delete: true },
+        "Customer" => { create: true, read: true, update: true, delete: true },
+        "PolicyAppointment" => { create: true, read: true, update: true, delete: true }
       }
     }
 
     role_definitions.each do |role_name, resources|
-      role = Role.find_by(name: role_name, company: @retail)
+      role = Role.find_by(name: role_name, company: @hospital)
       next unless role
 
       resources.each do |resource_name, actions_hash|
         actions_hash.each do |action, is_active|
-          policy = Policy.find_by!(company: @retail, resource: resource_name, action: action)
+          policy = Policy.find_by!(company: @hospital, resource: resource_name, action: action)
           appointment = PolicyAppointment.find_or_create_by!(
-            company: @retail,
+            company: @hospital,
             policy: policy,
             appoint_to: role
           )
