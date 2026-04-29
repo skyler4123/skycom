@@ -11,19 +11,11 @@ class Seed::RetailService
   RETAIL_ROLES = (EMPLOYEE_COUNTS.keys).freeze
   COMPANY_GROUP_BUSINESS_TYPE = :retail
 
-  RETAIL_ITEMS = [
-    { name: "Organic Bananas", sku: "FRU-BAN-01", price: 0.99, quantity: 500, reorder: 50 },
-    { name: "Whole Milk 1L", sku: "DAI-MILK-01", price: 1.50, quantity: 100, reorder: 20 },
-    { name: "Sourdough Bread", sku: "BAK-SOUR-01", price: 3.25, quantity: 30, reorder: 10 },
-    { name: "Instant Coffee 200g", sku: "DRY-COF-01", price: 7.99, quantity: 200, reorder: 40 },
-    { name: "Extra Virgin Olive Oil", sku: "PAN-OIL-01", price: 12.50, quantity: 80, reorder: 15 },
-    { name: "Paper Towels (2 Pack)", sku: "HOU-PAP-01", price: 4.50, quantity: 150, reorder: 30 },
-    { name: "Dish Soap 500ml", sku: "CLE-DISH-01", price: 2.75, quantity: 120, reorder: 25 },
-    { name: "Basmati Rice 5kg", sku: "PAN-RICE-01", price: 15.00, quantity: 60, reorder: 10 }
-  ]
+  RETAIL_ITEMS = [ "Organic Bananas", "Whole Milk 1L", "Sourdough Bread", "Instant Coffee 200g", "Extra Virgin Olive Oil", "Paper Towels (2 Pack)", "Dish Soap 500ml", "Basmati Rice 5kg" ].freeze
 
   def initialize(user:, email: Faker::Internet.email, name: nil)
     @multi_company_owner = user
+    @name = name
     @retail = nil
     @branches = []
     @facilities = []
@@ -33,6 +25,7 @@ class Seed::RetailService
     @loyalty_programs = []
     @products = []
     @services = []
+    @warehouses = []
     @email = email
     @email_domain = EmailService.new(email).full_domain
     seeding
@@ -41,7 +34,7 @@ class Seed::RetailService
   def seeding
     print_header
 
-    create_retail_company
+create_retail_company
     create_branches
     subscribe_branches_to_system_subscription_plane
     create_subscription_plans_for_company
@@ -54,7 +47,10 @@ class Seed::RetailService
     create_customers_for_company
     subscribe_for_customers
     setup_loyalty_programs
-    create_inventory # Products and Services
+    create_inventory
+    create_warehouses_for_branches
+    create_stocks_for_products
+    create_stock_transfers
     create_customer_orders
 
     print_footer
@@ -78,7 +74,7 @@ class Seed::RetailService
     puts "Creating retail group..."
     @retail = Seed::CompanyService.create(
       user: @multi_company_owner,
-      name: name || "Company #{Company.count + 1}",
+      name: @name || "Company #{Company.count + 1}",
       email: @email,
       description: "A group for multiple retail branch branches",
       business_type: COMPANY_GROUP_BUSINESS_TYPE
@@ -94,6 +90,21 @@ class Seed::RetailService
         company: @retail
       )
       branch.attach_tag(key: "Branch #{branch.id} Tag")
+
+      if branch.address_line_1.present?
+        address = Address.find_or_create_by!(
+          line_1: branch.address_line_1,
+          city: branch.city,
+          postal_code: branch.postal_code,
+          country_code: branch.country_code
+        )
+        AddressAppointment.find_or_create_by!(
+          appoint_to: branch,
+          address: address,
+          business_type: :shipping
+        )
+      end
+
       @branches << branch
     end
   end
@@ -264,16 +275,87 @@ class Seed::RetailService
 
   def create_inventory
     @branches.each do |branch|
-      # Products
-      15.times do |i|
+      branch_index = @branches.index(branch) + 1
+
+      RETAIL_ITEMS.each do |item_name|
         @products << Seed::ProductService.create(
-          company: @retail, branch: branch, name: "#{Faker::Commerce.product_name} #{i + 1}"
+          company: @retail,
+          branch: branch,
+          name: "#{branch.name} - #{item_name}",
+          business_type: :physical
         )
       end
-      # Services
+
+      15.times do |i|
+        @products << Seed::ProductService.create(
+          company: @retail,
+          branch: branch,
+          name: "#{branch.name} - #{Faker::Commerce.product_name} #{i + 1}"
+        )
+      end
+
       10.times do |i|
         @services << Seed::ServiceService.create(
-          company: @retail, branch: branch, name: "#{Faker::Company.buzzword} Service #{i + 1}"
+          company: @retail,
+          branch: branch,
+          name: "#{branch.name} - #{Faker::Company.buzzword} Service #{i + 1}"
+        )
+      end
+    end
+  end
+
+  def create_warehouses_for_branches
+    @branches.each do |branch|
+      warehouse = Seed::WarehouseService.create(
+        company: @retail,
+        branch: branch,
+        name: "#{branch.name} Warehouse",
+        business_type: :distribution
+      )
+
+      if branch.address
+        AddressAppointment.find_or_create_by!(
+          appoint_to: warehouse,
+          address: branch.address,
+          business_type: :shipping
+        )
+      end
+
+      @warehouses ||= []
+      @warehouses << warehouse
+    end
+  end
+
+  def create_stocks_for_products
+    @warehouses.each do |warehouse|
+      warehouse_products = @products.select { |p| p.branch_id == warehouse.branch_id }
+      warehouse_products.each do |product|
+        Seed::StockService.create(
+          warehouse: warehouse,
+          product_id: product.id,
+          quantity: rand(50..200),
+          name: product.name
+        )
+      end
+    end
+  end
+
+  def create_stock_transfers
+    @warehouses.each do |warehouse|
+      warehouse_products = @products.select { |p| p.branch_id == warehouse.branch_id }
+      warehouse_products.each do |product|
+        stock = Stock.find_by(name: product.name, warehouse: warehouse)
+        next unless stock
+
+        Seed::StockTransferService.create(
+          company: @retail,
+          branch: warehouse.branch,
+          product: product,
+          appoint_from: warehouse,
+          appoint_to: warehouse.branch,
+          quantity: stock.quantity,
+          workflow_status: :completed,
+          lifecycle_status: :active
         )
       end
     end
