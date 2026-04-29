@@ -1,9 +1,10 @@
-class CreateInventories < ActiveRecord::Migration[8.0]
+class CreateWarehouses < ActiveRecord::Migration[8.0]
   def change
-    create_table :inventories, id: :uuid do |t|
+    create_table :warehouses, id: :uuid do |t|
       t.references :company, null: false, foreign_key: true, type: :uuid
       t.references :branch, null: true, foreign_key: true, type: :uuid
       t.references :category, null: true, foreign_key: true, type: :uuid
+      t.references :address, null: true, foreign_key: true, type: :uuid
 
       t.string :name
       t.string :description
@@ -17,6 +18,6 @@ class CreateInventories < ActiveRecord::Migration[8.0]
 
       t.timestamps
     end
-    add_index :inventories, :discarded_at
+    add_index :warehouses, :discarded_at
   end
 end
