@@ -35,6 +35,6 @@ class CreateStocks < ActiveRecord::Migration[8.0]
     add_index :stocks, :ean
     add_index :stocks, :serial_number
     add_index :stocks, :discarded_at
-    add_index :stocks, [:product_id, :warehouse_id], unique: true
+    add_index :stocks, [ :product_id, :warehouse_id ], unique: true
   end
 end

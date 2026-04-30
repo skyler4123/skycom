@@ -17,9 +17,9 @@ class Price < ApplicationRecord
 
   # 2. Money-Rails Configuration
   # We map the gem's 'cents' logic to your 'amount' column.
-  monetize :amount, 
+  monetize :amount,
            as: "value",                # Accessor will be .value (e.g., price.value.format)
-           with_model_currency: :currency_iso, 
+           with_model_currency: :currency_iso,
            disable_validation: true     # We'll handle validations manually for more control
 
   # 3. Validations
