@@ -296,15 +296,17 @@ export const languageCodeTextTarget = () => `data-language-target="codeText"`
  * @param {string|number} index - The index to identify a specific listener within the group.
  * @returns {string} The full data attribute string for an open trigger.
  */
-export const addOpenTrigger = (key, index) => `data-open-target="trigger" data-action="click->open#click" data-open-key-param="${key}" data-open-index-param="${index}"`
-
+export const addOpenTrigger = ({key, index = 1, toggle = false}) => {
+  const base = `data-open-target="trigger" data-action="click->open#click" data-open-key-param="${key}" data-open-index-param="${index}"`
+  return toggle ? `${base} data-open-toggle-param="true"` : base
+}
 /**
  * Returns the data attributes for a Stimulus 'open' controller listener.
  * @param {string} key - The key to identify this listener group.
  * @param {string|number} index - The index to uniquely identify this listener.
  * @returns {string} The full data attribute string for an open listener.
  */
-export const addOpenListener = (key, index) => `data-open-target="listener" data-open-key-param="${key}" data-open-index-param="${index}"`
+export const addOpenListener = ({key, index = 1}) => `data-open-target="listener" data-open-key-param="${key}" data-open-index-param="${index}"`
 
 export const pagination = (dataValue, classNames = "") => `
   <div
