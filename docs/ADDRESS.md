@@ -235,15 +235,4 @@ end
 
 ---
 
-## 9. Comparison with Time-Price
-
-| Feature | Address | Period | Price |
-|---------|---------|--------|-------|
-| Deduplication | Fingerprint (SHA256) | (start_at, end_at, timezone) | (amount, currency_code) |
-| Join table | AddressAppointment | PeriodPrice | PeriodPrice |
-| Immutable | Yes | Yes | Yes |
-| Use case | Physical locations | Time ranges | Monetary values |
-
----
-
 *End of documentation*

@@ -4,8 +4,6 @@
 class Price < ApplicationRecord
   include ImmutableRecordConcern
 
-  has_many :period_prices, dependent: :destroy
-
   # 1. Standard Rails Enum for Currencies
   # Use lowercase ISO codes as keys to keep integration simple.
   enum :currency_code, {
