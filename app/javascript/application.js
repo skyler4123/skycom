@@ -51,6 +51,8 @@ window.popover = Helpers.popover
 window.picture = Helpers.picture
 window.dictionary = Helpers.dictionary
 window.translate = Helpers.translate
+window.addOpenTrigger = Helpers.addOpenTrigger
+window.addOpenListener = Helpers.addOpenListener
 
 // 4. Data Getters (Safe from Race Conditions)
 // This allows you to use 'currentCompany()' as a variable that always fetches fresh data

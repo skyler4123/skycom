@@ -1,23 +1,30 @@
-class CreateInventoryItemAppointments < ActiveRecord::Migration[8.0]
+class CreateStockTransfers < ActiveRecord::Migration[8.0]
   def change
-    create_table :inventory_item_appointments, id: :uuid do |t|
+    create_table :stock_transfers, id: :uuid do |t|
       t.references :company, null: false, foreign_key: true, type: :uuid
-      t.references :inventory_item, null: false, foreign_key: true, type: :uuid
+      t.references :branch, null: true, foreign_key: true, type: :uuid
+      t.references :product, null: false, foreign_key: true, type: :uuid
+
       t.references :appoint_from, polymorphic: true, null: true, type: :uuid
-      t.references :appoint_to, polymorphic: true, null: false, type: :uuid
+      t.references :appoint_to, polymorphic: true, null: true, type: :uuid
       t.references :appoint_for, polymorphic: true, null: true, type: :uuid
       t.references :appoint_by, polymorphic: true, null: true, type: :uuid
+
+      t.references :category, null: true, foreign_key: true, type: :uuid
+
       t.string :name
       t.string :description
       t.string :code
+      t.integer :quantity
       t.integer :lifecycle_status
       t.integer :workflow_status
       t.integer :business_type
       t.datetime :discarded_at
+      t.jsonb :metadata, default: {}
       t.string :permission_resource_name
 
       t.timestamps
     end
-    add_index :inventory_item_appointments, :discarded_at
+    add_index :stock_transfers, :discarded_at
   end
 end

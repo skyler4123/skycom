@@ -27,55 +27,67 @@ export default class OpenController extends Controller {
   static targets = ["trigger", "listener", "openByPathname"]
 
   connect() {
-    poll(() => {
-      this.updateOpenByPathnameTargets()
-      return this.openByPathnameTargets.every(target => target.hasAttribute("open"))
-    })
+    // Assuming poll is defined globally or imported elsewhere
+    if (typeof poll === "function") {
+      poll(() => {
+        this.updateOpenByPathnameTargets()
+        return this.openByPathnameTargets.every(target => target.hasAttribute("open"))
+      })
+    }
   }
 
   click(event) {
     event.preventDefault()
 
-    const activeTriggerGroup = event.params.group
-    const activeTriggerKey = event.params.key
+    const { group, key, toggle } = event.params
+    
+    // 1. Identify if the current target is already open
+    const isAlreadyOpen = this.listenerTargets.find(
+      (l) => String(l.dataset.openGroupParam) === String(group) && 
+             String(l.dataset.openKeyParam) === String(key)
+    )?.hasAttribute("open")
 
+    // 2. Determine if we should be closing the item instead of opening it
+    const shouldClose = toggle && isAlreadyOpen
+
+    // Update Triggers
     if (this.hasTriggerTarget) {
       this.triggerTargets.forEach((trigger) => {
-        const triggerGroup = trigger.dataset.openGroupParam
-        const triggerKey = trigger.dataset.openKeyParam
-        if (String(triggerGroup) === String(activeTriggerGroup)) {
-          trigger.removeAttribute("open")
-        }
-        if (String(triggerKey) === String(activeTriggerKey)) {
-          trigger.setAttribute("open", true)
+        if (String(trigger.dataset.openGroupParam) === String(group)) {
+          const isMatch = String(trigger.dataset.openKeyParam) === String(key)
+          
+          if (isMatch && !shouldClose) {
+            trigger.setAttribute("open", "")
+          } else {
+            trigger.removeAttribute("open")
+          }
         }
       })
     }
 
+    // Update Listeners
     if (this.hasListenerTarget) {
       this.listenerTargets.forEach((listener) => {
-        const listenerGroup = listener.dataset.openGroupParam
-        const listenerKey = listener.dataset.openKeyParam
-        if (listenerGroup !== activeTriggerGroup) { return }
-        
-        listener.removeAttribute("open")
-        if (String(listenerKey) === String(activeTriggerKey)) {
-          listener.setAttribute("open", true)
+        if (String(listener.dataset.openGroupParam) === String(group)) {
+          const isMatch = String(listener.dataset.openKeyParam) === String(key)
+          
+          if (isMatch && !shouldClose) {
+            listener.setAttribute("open", "")
+          } else {
+            listener.removeAttribute("open")
+          }
         }
       })
     }
   }
 
-  // Make sure openByPathname targets were added 
   updateOpenByPathnameTargets() {
     const currentPath = window.location.pathname
 
     this.openByPathnameTargets.forEach((linkElement) => {
-      // If the link doesn't have an href, skip to the next iteration.
       if (!linkElement.href) {
-        // console the text inside "Link element has no href:" and the linkElement
         console.log("Link element has no href:", linkElement.innerText)
-        return; // Acts like 'continue' in a forEach loop
+        return
       }
 
       const linkPath = new URL(linkElement.href).pathname
@@ -86,5 +98,4 @@ export default class OpenController extends Controller {
       }
     })
   }
-
 }

@@ -42,36 +42,16 @@ export default class Companies_LayoutController extends Controller {
     if (!currentCompany()) return `<div class="p-4">Loading...</div>`;
     
     return `
+      <!-- Layout Wrapper: Font, Background, Colors -->
       <div class="font-display bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200">
-        <div class="flex h-screen">
+        <!-- Flex Container: Sidebar + Main -->
+        <div class="flex">
           <!-- Sidebar -->
           <aside
-            class="w-64 shrink-0 bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800 flex flex-col">
-            <div class="p-6 flex items-center gap-3 border-b border-gray-200 dark:border-gray-800">
-              <div class="bg-primary/20 text-primary p-2 rounded-lg">
-                <span class="material-symbols-outlined">storefront</span>
-              </div>
-              <div class="flex flex-col">
-                <h1
-                  class="text-gray-900 dark:text-white text-base font-medium leading-normal cursor-pointer"
-                  ${popover({
-                    classes: "bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 shadow-2xl p-2",
-                    html: `
-                      <div class="flex flex-col gap-y-1 w-64">
-                        ${currentCompanies().map((company) => `
-                          <a href="${Helpers.company_dashboards_path(company.id)}" 
-                            class="flex items-center gap-3 px-3 py-2 rounded-lg text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 ${currentCompany().id === company.id ? 'bg-gray-100 dark:bg-gray-800 font-bold' : ''}">
-                            <span class="text-sm">${company.name}</span>
-                          </a>`).join("")}
-                      </div>
-                    `
-                  })}
-                >
-                  ${currentCompany().name}
-                </h1>
-                <p class="text-gray-500 dark:text-gray-400 text-sm font-normal leading-normal">${Helpers.capitalize(currentCompany().business_type)}</p>
-              </div>
-            </div>
+            class="w-64 hidden open:flex flex-col shrink-0 bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800"
+            ${addOpenListener({key: "sidebar"})}
+          >
+            <!-- Sidebar Navigation Links -->
             <nav class="w-full p-4">
               <div role="navigation" class="flex flex-col gap-2">
                 <a
@@ -283,6 +263,7 @@ export default class Companies_LayoutController extends Controller {
                 </a>
               </div>
             </nav>
+            <!-- Sidebar Footer (Settings Link) -->
             <div class="p-4 border-t border-gray-200 dark:border-gray-800">
               <div class="flex flex-col gap-2">
                 <a
@@ -297,12 +278,45 @@ export default class Companies_LayoutController extends Controller {
             </div>
           </aside>
           <!-- End Sidebar -->
-          <!-- Main Content -->
+          <!-- Main Content Wrapper -->
           <main class="flex-1 flex flex-col overflow-auto">
             <!-- Header -->
             <header
               class="shrink-0 flex items-center justify-between whitespace-nowrap border-b border-gray-200 dark:border-gray-800 px-8 py-4 bg-white dark:bg-gray-900">
+              <!-- Header Left: Company Name, Toggle, Search -->
               <div class="flex items-center gap-8">
+                <div class="flex items-center gap-3 dark:border-gray-800">
+                  <div class="bg-primary/20 text-primary p-2 rounded-lg">
+                    <span class="material-symbols-outlined">storefront</span>
+                  </div>
+                  <div class="flex flex-col">
+                    <h1
+                      class="text-gray-900 dark:text-white text-base font-medium leading-normal cursor-pointer"
+                      ${popover({
+                        classes: "bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 shadow-2xl p-2",
+                        html: `
+                          <div class="flex flex-col gap-y-1 w-64">
+                            ${currentCompanies().map((company) => `
+                              <a href="${Helpers.company_dashboards_path(company.id)}" 
+                                class="flex items-center gap-3 px-3 py-2 rounded-lg text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 ${currentCompany().id === company.id ? 'bg-gray-100 dark:bg-gray-800 font-bold' : ''}">
+                                <span class="text-sm">${company.name}</span>
+                              </a>`).join("")}
+                          </div>
+                        `
+                      })}
+                    >
+                      ${currentCompany().name}
+                    </h1>
+                  </div>
+                </div>
+
+                <button
+                  class="flex cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 w-10 hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-600 dark:text-gray-300" id="sidebar-toggle"
+                  ${addOpenTrigger({key: "sidebar", toggle: true})}
+                >
+                  <span class="material-symbols-outlined">menu</span>
+                </button>
+                
                 <label class="flex flex-col min-w-40 h-10! w-80">
                   <div class="flex w-full flex-1 items-stretch rounded-lg h-full">
                     <div
@@ -315,6 +329,7 @@ export default class Companies_LayoutController extends Controller {
                   </div>
                 </label>
               </div>
+              <!-- Header Right: Actions (Dark Mode, Language, Notifications, Avatar) -->
               <div class="flex flex-1 justify-end gap-4 items-center">
                 <button
                   class="flex cursor-pointer items-center justify-center overflow-hidden rounded-full h-10 w-10 p-2 hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-600 dark:text-gray-300"
@@ -374,11 +389,11 @@ export default class Companies_LayoutController extends Controller {
               </div>
             </header>
             <!-- End Header -->
-            <!-- Main Content -->
+            <!-- Dynamic Content Area (injected by child controllers) -->
             <div data-${this.identifier}-target="content"></div>
-            <!-- End Main Content -->
+            <!-- End Dynamic Content Area -->
           </main>
-          <!-- End Main Content -->
+          <!-- End Main Content Wrapper -->
         </div>
       </div>
     `

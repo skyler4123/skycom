@@ -217,6 +217,16 @@ GEM
       railties (>= 7.1)
       stimulus-rails
       turbo-rails
+    monetize (2.0.0)
+      money (~> 7.0)
+    money (7.0.2)
+      bigdecimal
+      i18n (~> 1.9)
+    money-rails (3.0.0)
+      activesupport (>= 7.0)
+      monetize (~> 2.0)
+      money (~> 7.0)
+      railties (>= 7.0)
     msgpack (1.8.0)
     net-imap (0.6.3)
       date
@@ -501,6 +511,7 @@ DEPENDENCIES
   jbuilder
   kamal
   mission_control-jobs
+  money-rails
   omniauth
   omniauth-rails_csrf_protection
   pagy
