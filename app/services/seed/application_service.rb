@@ -3,10 +3,12 @@ class Seed::ApplicationService
     puts "\n\n🚀 Starting Full Database Seeding..."
     puts "========================================================="
 
-    RoleAppointment.delete_all
-    PolicyAppointment.delete_all
+    PriceAppointment.delete_all
     Price.delete_all
     Period.delete_all
+    RoleAppointment.delete_all
+    PolicyAppointment.delete_all
+
 
     # Clear global data before seeding
     User.destroy_all

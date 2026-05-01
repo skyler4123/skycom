@@ -4,23 +4,20 @@ module PriceConcern
 
   included do
     has_many :price_appointments, as: :appoint_to, dependent: :destroy
+    
+    # Direct access to all unique Price records assigned to this model
+    has_many :prices, through: :price_appointments, source: :price
 
-    has_one :current_price_appointment, -> {
-              where(lifecycle_status: :active)
-              .order(created_at: :desc)
-            },
-            as: :appoint_to,
-            class_name: "PriceAppointment"
-
+    has_one :current_price_appointment, -> { 
+              where(lifecycle_status: :active).order(created_at: :desc) 
+            }, as: :appoint_to, class_name: "PriceAppointment"
+            
     has_one :db_price, through: :current_price_appointment, source: :price
   end
 
   def price
     cache_key = "#{cache_key_with_version}/current_price"
-
-    Rails.cache.fetch(cache_key) do
-      db_price&.value || Money.new(0, "USD")
-    end
+    Rails.cache.fetch(cache_key) { db_price&.value || Money.new(0, "USD") }
   end
 
   # Setter: accepts { amount: 5.00, currency_code: :usd }
