@@ -41,7 +41,6 @@ class Seed::HotelService
     create_employees
     assign_employees_to_departments
     create_customers_for_company
-    subscribe_for_customers
     setup_loyalty_programs
     create_inventory
     create_customer_orders
@@ -94,12 +93,6 @@ class Seed::HotelService
         name: "Hotel Company Group Subscription #{i + 1}",
         description: "Subscription plan #{i + 1} for #{@hotel.name}"
       )
-    end
-  end
-
-  def subscribe_branches_to_plans
-    @branches.each do |branch|
-      branch.subscribe!(plan_name: Subscription.plan_names.keys.sample)
     end
   end
 
@@ -198,18 +191,6 @@ class Seed::HotelService
           @customers << customer
         end
       end
-    end
-  end
-
-  def subscribe_for_customers
-    @customers.each do |customer|
-      Seed::SubscriptionService.create(
-        company: @hotel,
-        subscription_plan: @hotel.subscription_plans.sample,
-        period: Seed::PeriodService.create,
-        seller: @hotel,
-        buyer: customer
-      )
     end
   end
 

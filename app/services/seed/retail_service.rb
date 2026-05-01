@@ -43,8 +43,6 @@ create_retail_company
     create_departments_for_company
     create_employees
     assign_employees_to_departments
-    create_customers_for_company
-    subscribe_for_customers
     setup_loyalty_programs
     create_inventory
     create_warehouses_for_branches
@@ -127,12 +125,6 @@ create_retail_company
         name: "Retail Company Group Subscription #{i + 1}",
         description: "Subscription plan #{i + 1} for #{@retail.name}"
       )
-    end
-  end
-
-  def subscribe_branches_to_plans
-    @branches.each do |branch|
-      branch.subscribe!(plan_name: Subscription.plan_names.keys.sample)
     end
   end
 
@@ -234,17 +226,6 @@ create_retail_company
     end
   end
 
-  def subscribe_for_customers
-    @customers.each do |customer|
-      Seed::SubscriptionService.create(
-        company: @retail,
-        subscription_plan: @retail.subscription_plans.sample,
-        seller: @retail,
-        buyer: customer
-      )
-    end
-  end
-
   def setup_loyalty_programs
     @branches.each do |branch|
       2.times do |i|
@@ -300,14 +281,6 @@ create_retail_company
         name: "#{branch.name} Warehouse",
         business_type: :distribution
       )
-
-      if branch.address
-        AddressAppointment.find_or_create_by!(
-          appoint_to: warehouse,
-          address: branch.address,
-          business_type: :shipping
-        )
-      end
 
       @warehouses ||= []
       @warehouses << warehouse

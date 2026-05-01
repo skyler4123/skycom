@@ -39,7 +39,6 @@ class Seed::HospitalService
     create_employees
     assign_employees_to_departments
     create_customers_for_company
-    subscribe_for_customers
     setup_loyalty_programs
     create_inventory
     create_customer_orders
@@ -92,12 +91,6 @@ class Seed::HospitalService
         name: "Hospital Company Group Subscription #{i + 1}",
         description: "Subscription plan #{i + 1} for #{@hospital.name}"
       )
-    end
-  end
-
-  def subscribe_branches_to_plans
-    @branches.each do |branch|
-      branch.subscribe!(plan_name: Subscription.plan_names.keys.sample)
     end
   end
 
@@ -196,18 +189,6 @@ class Seed::HospitalService
           @customers << customer
         end
       end
-    end
-  end
-
-  def subscribe_for_customers
-    @customers.each do |customer|
-      Seed::SubscriptionService.create(
-        company: @hospital,
-        subscription_plan: @hospital.subscription_plans.sample,
-        period: Seed::PeriodService.create,
-        seller: @hospital,
-        buyer: customer
-      )
     end
   end
 

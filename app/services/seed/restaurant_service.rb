@@ -40,7 +40,6 @@ class Seed::RestaurantService
     create_employees
     assign_employees_to_departments
     create_customers_for_company
-    subscribe_for_customers
     setup_loyalty_programs
     create_inventory
     create_customer_orders
@@ -110,12 +109,6 @@ class Seed::RestaurantService
         name: "Restaurant Company Group Subscription #{i + 1}",
         description: "Subscription plan #{i + 1} for #{@restaurant.name}"
       )
-    end
-  end
-
-  def subscribe_branches_to_plans
-    @branches.each do |branch|
-      branch.subscribe!(plan_name: Subscription.plan_names.keys.sample)
     end
   end
 
@@ -214,18 +207,6 @@ class Seed::RestaurantService
           @customers << customer
         end
       end
-    end
-  end
-
-  def subscribe_for_customers
-    @customers.each do |customer|
-      Seed::SubscriptionService.create(
-        company: @restaurant,
-        subscription_plan: @restaurant.subscription_plans.sample,
-        period: Seed::PeriodService.create,
-        seller: @restaurant,
-        buyer: customer
-      )
     end
   end
 
