@@ -2,7 +2,6 @@ class Customer < ApplicationRecord
   include RoleConcern
   include AddressConcern
   include TagConcern
-  include Subscription::BuyerConcern
 
   attribute :permission_resource_name, :string, default: -> { self.name }
 

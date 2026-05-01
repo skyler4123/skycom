@@ -6,8 +6,6 @@ class Company < ApplicationRecord
   include Company::EducationConcern
   include Company::HospitalConcern
   include Company::RestaurantConcern
-  include SystemSubscription::BuyerConcern
-  include Subscription::SellerConcern
   include Company::PermissionConcern
 
   belongs_to :user

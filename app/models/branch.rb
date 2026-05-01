@@ -3,8 +3,6 @@ class Branch < ApplicationRecord
 
   include AddressConcern
   include TagConcern
-  include SystemSubscription::ResourceConcern
-  include Subscription::SellerConcern
 
   belongs_to :company
 
@@ -28,6 +26,7 @@ class Branch < ApplicationRecord
   has_many :notification_groups, dependent: :destroy
   has_many :payment_methods, through: :payment_method_appointments
   has_many :statistics, as: :owner
+  has_many :warehouses, dependent: :destroy
 
   # Self-referencing association for company hierarchy
   # belongs_to :parent_company, class_name: "Company", optional: true
