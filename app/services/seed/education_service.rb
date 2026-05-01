@@ -28,7 +28,6 @@ class Seed::EducationService
 
     create_education_company
     create_branches
-    create_subscription_plans_for_company
     create_facilities_for_branches
     appoint_payment_methods_to_company
     setup_roles_and_permissions
@@ -75,21 +74,6 @@ class Seed::EducationService
       )
       branch.attach_tag(key: "Branch #{branch.id} Tag")
       @branches << branch
-    end
-  end
-
-  (count: 3)
-    count.times do |i|
-      price = Seed::PriceService.create(
-        amount: rand(10..100),
-        currency_code: @education.currency_code
-      )
-      Seed::SubscriptionPlanService.create(
-        company: @education,
-        name: "Plan #{i + 1}",
-        price: price,
-        duration_days: rand(30..365)
-      )
     end
   end
 
