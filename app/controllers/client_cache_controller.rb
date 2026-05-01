@@ -21,9 +21,9 @@ class ClientCacheController < ApplicationController
               business_types: Branch.business_types.keys.map { |t| { name: t.humanize, value: t } }
             },
             department: {
-              lifecycle_statuses: Department.lifecycle_statuses.keys.map { |s| { name: s.humanize, value: s } },
-              workflow_statuses: Department.workflow_statuses.keys.map { |s| { name: s.humanize, value: s } },
-              business_types: Department.business_types.keys.map { |t| { name: t.humanize, value: t } }
+              lifecycle_statuses: LIFECYCLE_STATUS.keys.map { |s| { name: s.to_s.humanize, value: s.to_s } },
+              workflow_statuses: WORKFLOW_STATUS.keys.map { |s| { name: s.to_s.humanize, value: s.to_s } },
+              business_types: Department.business_types.keys.map { |t| { name: t.to_s.humanize, value: t.to_s } }
             },
             product: {
               lifecycle_statuses: Product.lifecycle_statuses.keys.map { |s| { name: s.humanize, value: s } },
@@ -42,8 +42,8 @@ class ClientCacheController < ApplicationController
               currency_codes: Order.currency_codes.keys.map { |c| { name: c.humanize, value: c } }
             },
             booking: {
-              lifecycle_statuses: LIFECYCLE_STATUS.keys.map { |s| { name: s.humanize, value: s } },
-              workflow_statuses: WORKFLOW_STATUS.keys.map { |s| { name: s.humanize, value: s } }
+              lifecycle_statuses: LIFECYCLE_STATUS.keys.map { |s| { name: s.to_s.humanize, value: s.to_s } },
+              workflow_statuses: WORKFLOW_STATUS.keys.map { |s| { name: s.to_s.humanize, value: s.to_s } }
             },
             customer: {
               lifecycle_statuses: Customer.lifecycle_statuses.keys.map { |s| { name: s.humanize, value: s } },
