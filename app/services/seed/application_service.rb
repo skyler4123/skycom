@@ -3,6 +3,11 @@ class Seed::ApplicationService
     puts "\n\n🚀 Starting Full Database Seeding..."
     puts "========================================================="
 
+
+    SystemSubscription.delete_all
+    SystemSubscriptionPlan.delete_all
+    SubscriptionPlan.delete_all
+    Subscription.delete_all
     PriceAppointment.delete_all
     Price.delete_all
     Period.delete_all
@@ -14,7 +19,7 @@ class Seed::ApplicationService
     User.destroy_all
     PaymentMethod.destroy_all
     Brand.destroy_all
-    SystemSubscriptionPlan.destroy_all
+
 
     # Global Data
     # Identify the platform by a hardcoded CODE, not ID.
