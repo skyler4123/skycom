@@ -2311,14 +2311,6 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.uuid "branch_id"
     t.uuid "subscription_plan_id"
     t.uuid "subscription_group_id"
-    t.string "seller_type", null: false
-    t.uuid "seller_id", null: false
-    t.string "buyer_type", null: false
-    t.uuid "buyer_id", null: false
-    t.string "resource_type"
-    t.uuid "resource_id"
-    t.string "processer_type"
-    t.uuid "processer_id"
     t.string "name"
     t.string "description"
     t.integer "country_code", null: false
@@ -2332,16 +2324,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["branch_id"], name: "index_subscription_groups_on_branch_id"
-    t.index ["buyer_id", "buyer_type"], name: "index_subscription_groups_on_buyer_id_and_buyer_type"
-    t.index ["buyer_type", "buyer_id"], name: "index_subscription_groups_on_buyer"
     t.index ["company_id"], name: "index_subscription_groups_on_company_id"
     t.index ["discarded_at"], name: "index_subscription_groups_on_discarded_at"
-    t.index ["processer_id", "processer_type"], name: "index_subscription_groups_on_processer_id_and_processer_type"
-    t.index ["processer_type", "processer_id"], name: "index_subscription_groups_on_processer"
-    t.index ["resource_id", "resource_type"], name: "index_subscription_groups_on_resource_id_and_resource_type"
-    t.index ["resource_type", "resource_id"], name: "index_subscription_groups_on_resource"
-    t.index ["seller_id", "seller_type"], name: "index_subscription_groups_on_seller_id_and_seller_type"
-    t.index ["seller_type", "seller_id"], name: "index_subscription_groups_on_seller"
     t.index ["subscription_group_id"], name: "index_subscription_groups_on_subscription_group_id"
     t.index ["subscription_plan_id"], name: "index_subscription_groups_on_subscription_plan_id"
   end
@@ -2372,14 +2356,6 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.uuid "branch_id"
     t.uuid "subscription_plan_id"
     t.uuid "subscription_group_id"
-    t.string "seller_type", null: false
-    t.uuid "seller_id", null: false
-    t.string "buyer_type", null: false
-    t.uuid "buyer_id", null: false
-    t.string "resource_type"
-    t.uuid "resource_id"
-    t.string "processer_type"
-    t.uuid "processer_id"
     t.string "name"
     t.string "description"
     t.integer "country_code", null: false
@@ -2393,16 +2369,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["branch_id"], name: "index_subscriptions_on_branch_id"
-    t.index ["buyer_id", "buyer_type"], name: "index_subscriptions_on_buyer_id_and_buyer_type"
-    t.index ["buyer_type", "buyer_id"], name: "index_subscriptions_on_buyer"
     t.index ["company_id"], name: "index_subscriptions_on_company_id"
     t.index ["discarded_at"], name: "index_subscriptions_on_discarded_at"
-    t.index ["processer_id", "processer_type"], name: "index_subscriptions_on_processer_id_and_processer_type"
-    t.index ["processer_type", "processer_id"], name: "index_subscriptions_on_processer"
-    t.index ["resource_id", "resource_type"], name: "index_subscriptions_on_resource_id_and_resource_type"
-    t.index ["resource_type", "resource_id"], name: "index_subscriptions_on_resource"
-    t.index ["seller_id", "seller_type"], name: "index_subscriptions_on_seller_id_and_seller_type"
-    t.index ["seller_type", "seller_id"], name: "index_subscriptions_on_seller"
     t.index ["subscription_group_id"], name: "index_subscriptions_on_subscription_group_id"
     t.index ["subscription_plan_id"], name: "index_subscriptions_on_subscription_plan_id"
   end
@@ -2411,14 +2379,6 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.uuid "system_subscription_plan_id", null: false
     t.uuid "company_id", null: false
     t.uuid "branch_id"
-    t.string "seller_type", null: false
-    t.uuid "seller_id", null: false
-    t.string "buyer_type", null: false
-    t.uuid "buyer_id", null: false
-    t.string "resource_type"
-    t.uuid "resource_id"
-    t.string "processer_type"
-    t.uuid "processer_id"
     t.string "name"
     t.string "description"
     t.string "code"
@@ -2432,12 +2392,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["branch_id"], name: "index_system_subscription_groups_on_branch_id"
-    t.index ["buyer_type", "buyer_id"], name: "index_system_subscription_groups_on_buyer"
     t.index ["company_id"], name: "index_system_subscription_groups_on_company_id"
     t.index ["discarded_at"], name: "index_system_subscription_groups_on_discarded_at"
-    t.index ["processer_type", "processer_id"], name: "index_system_subscription_groups_on_processer"
-    t.index ["resource_type", "resource_id"], name: "index_system_subscription_groups_on_resource"
-    t.index ["seller_type", "seller_id"], name: "index_system_subscription_groups_on_seller"
     t.index ["system_subscription_plan_id"], name: "idx_on_system_subscription_plan_id_2f2a083a8b"
   end
 
@@ -2464,14 +2420,6 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.uuid "system_subscription_group_id"
     t.uuid "company_id", null: false
     t.uuid "branch_id"
-    t.string "seller_type", null: false
-    t.uuid "seller_id", null: false
-    t.string "buyer_type", null: false
-    t.uuid "buyer_id", null: false
-    t.string "resource_type"
-    t.uuid "resource_id"
-    t.string "processer_type"
-    t.uuid "processer_id"
     t.string "name"
     t.string "description"
     t.string "code"
@@ -2485,12 +2433,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["branch_id"], name: "index_system_subscriptions_on_branch_id"
-    t.index ["buyer_type", "buyer_id"], name: "index_system_subscriptions_on_buyer"
     t.index ["company_id"], name: "index_system_subscriptions_on_company_id"
     t.index ["discarded_at"], name: "index_system_subscriptions_on_discarded_at"
-    t.index ["processer_type", "processer_id"], name: "index_system_subscriptions_on_processer"
-    t.index ["resource_type", "resource_id"], name: "index_system_subscriptions_on_resource"
-    t.index ["seller_type", "seller_id"], name: "index_system_subscriptions_on_seller"
     t.index ["system_subscription_group_id"], name: "index_system_subscriptions_on_system_subscription_group_id"
     t.index ["system_subscription_plan_id"], name: "index_system_subscriptions_on_system_subscription_plan_id"
   end
@@ -2685,7 +2629,6 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.uuid "company_id", null: false
     t.uuid "branch_id"
     t.uuid "category_id"
-    t.uuid "address_id"
     t.string "name"
     t.string "description"
     t.string "code"
@@ -2697,7 +2640,6 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["address_id"], name: "index_warehouses_on_address_id"
     t.index ["branch_id"], name: "index_warehouses_on_branch_id"
     t.index ["category_id"], name: "index_warehouses_on_category_id"
     t.index ["company_id"], name: "index_warehouses_on_company_id"
@@ -2966,7 +2908,6 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
   add_foreign_key "tasks", "companies"
   add_foreign_key "tasks", "task_groups"
   add_foreign_key "users", "users", column: "parent_user_id"
-  add_foreign_key "warehouses", "addresses"
   add_foreign_key "warehouses", "branches"
   add_foreign_key "warehouses", "categories"
   add_foreign_key "warehouses", "companies"

@@ -6,18 +6,6 @@ class CreateSubscriptionGroups < ActiveRecord::Migration[8.0]
       t.references :subscription_plan, null: true, foreign_key: true, type: :uuid
       t.references :subscription_group, null: true, foreign_key: true, type: :uuid
 
-      # The entity selling the subscription (e.g., System, Company)
-      t.references :seller, polymorphic: true, null: false, type: :uuid
-
-      # The entity owning/using the subscription (e.g., User, Company Group, Company, Customer)
-      t.references :buyer, polymorphic: true, null: false, type: :uuid
-
-      # The specific resource the subscription applies to (if applicable)
-      t.references :resource, polymorphic: true, null: true, type: :uuid
-
-      # Who processed the subscription (e.g., Admin/System)
-      t.references :processer, polymorphic: true, null: true, type: :uuid
-
       t.string :name
       t.string :description
       t.integer :country_code, null: false
@@ -34,9 +22,5 @@ class CreateSubscriptionGroups < ActiveRecord::Migration[8.0]
       t.timestamps
     end
     add_index :subscription_groups, :discarded_at
-    add_index :subscription_groups, [ :seller_id, :seller_type ]
-    add_index :subscription_groups, [ :buyer_id, :buyer_type ]
-    add_index :subscription_groups, [ :resource_id, :resource_type ]
-    add_index :subscription_groups, [ :processer_id, :processer_type ]
   end
 end
