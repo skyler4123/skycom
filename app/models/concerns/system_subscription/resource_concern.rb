@@ -19,8 +19,10 @@ module SystemSubscription::ResourceConcern
       period = Seed::PeriodService.create(
         start_at: Time.current.beginning_of_day,
         end_at: Time.current.end_of_day + system_subscription_plan.duration_days.days,
-        timezone: -12
+        timezone: -12,
+        business_type: :subscription
       )
+      # Note: SystemSubscription no longer stores price/period - retrieve from plan instead
       SystemSubscription.create!(
         company: self.company,
         system_subscription_plan: system_subscription_plan,
@@ -29,8 +31,6 @@ module SystemSubscription::ResourceConcern
         resource: resource,
         processer: processer,
         country_code: country_code,
-        price: system_subscription_plan.price,
-        period: period,
         lifecycle_status: lifecycle_status,
         workflow_status: workflow_status
       )

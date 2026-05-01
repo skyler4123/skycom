@@ -118,14 +118,9 @@ create_retail_company
 
   def create_subscription_plans_for_company(count: 3)
     count.times do |i|
-      price = Seed::PriceService.create(
-        amount: rand(10..100),
-        currency_code: @retail.currency_code
-      )
       Seed::SubscriptionPlanService.create(
         company: @retail,
         name: "Plan #{i + 1}",
-        price: price,
         duration_days: rand(30..365)
       )
     end
@@ -250,7 +245,6 @@ create_retail_company
       Seed::SubscriptionService.create(
         company: @retail,
         subscription_plan: @retail.subscription_plans.sample,
-        period: Seed::PeriodService.create,
         seller: @retail,
         buyer: customer
       )

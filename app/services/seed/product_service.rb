@@ -13,26 +13,41 @@ class Seed::ProductService
   )
     should_discard = rand(10) == 0
     discarded_at ||= should_discard ? Time.zone.now - rand(1..180).days : nil
-    price ||= Faker::Commerce.price(range: 50..2000.0)
     business_type ||= Product.business_types.keys.sample
 
-    Product.new(
+    # Default price: convert Faker float to hash with company currency
+    raw_price = price || Faker::Commerce.price(range: 50..2000.0)
+    price_hash = {
+      amount: raw_price,
+      currency_code: company.currency_code
+    }
+
+    # Build product without setting price yet
+    product = Product.new(
       company: company,
       branch: branch,
       brand: brand,
       name: name,
       description: description,
-      price: price,
       lifecycle_status: lifecycle_status,
       workflow_status: workflow_status,
       business_type: business_type,
       discarded_at: discarded_at
     )
+    # Store price_hash temporarily on the object
+    product.singleton_class.attr_accessor :_pending_price_hash
+    product._pending_price_hash = price_hash
+    product
   end
 
   def self.create(...)
     product = new(...)
     product.save!
+    # Set price after save (uses PriceConcern's setter which creates PriceAppointment)
+    if product.respond_to?(:_pending_price_hash) && product._pending_price_hash
+      product.price = product._pending_price_hash
+      product.save!
+    end
     Seed::AttachmentService.attach(record: product, relation: :image_attachments, number: 2)
     product
   end
