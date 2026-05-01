@@ -4,7 +4,6 @@ class CreateBookings < ActiveRecord::Migration[8.0]
       t.references :company, null: false, foreign_key: true, type: :uuid
       t.references :branch, null: true, foreign_key: true, type: :uuid
       t.references :booking_resource, null: false, foreign_key: true, type: :uuid
-      t.references :price, null: false, foreign_key: true, type: :uuid
       t.references :appoint_from, polymorphic: true, null: false, type: :uuid
       t.references :appoint_to, polymorphic: true, null: false, type: :uuid
       t.references :appoint_for, polymorphic: true, null: false, type: :uuid
