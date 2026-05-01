@@ -6,4 +6,10 @@ class PeriodAppointment < ApplicationRecord
   belongs_to :appoint_to, polymorphic: true
   belongs_to :appoint_for, polymorphic: true, optional: true
   belongs_to :appoint_by, polymorphic: true, optional: true
+
+  enum :lifecycle_status, { active: 0, archived: 1 }, prefix: true
+  enum :workflow_status, { pending: 0, approved: 1, rejected: 2 }, prefix: true
+  
+  # business_type for periods often distinguishes between different timelines
+  enum :business_type, { base: 0, subscription: 1, trial: 2, promotion: 3 }
 end
