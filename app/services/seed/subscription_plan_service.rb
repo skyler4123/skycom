@@ -4,7 +4,6 @@ module Seed
     def self.create(
       company:,
       branch: nil,
-      price:,
       duration_days:,
       name:,
       code: "#{company.id}_#{name.parameterize}",
@@ -14,7 +13,6 @@ module Seed
       SubscriptionPlan.create!(
         company: company,
         branch: branch,
-        price: price,
         duration_days: duration_days,
         name: name,
         code: code,

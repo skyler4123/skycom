@@ -3,14 +3,23 @@ class Seed::ApplicationService
     puts "\n\n🚀 Starting Full Database Seeding..."
     puts "========================================================="
 
+
+    SystemSubscription.delete_all
+    SystemSubscriptionPlan.delete_all
+    Subscription.delete_all
+    SubscriptionPlan.delete_all
+    PriceAppointment.delete_all
+    Price.delete_all
+    Period.delete_all
     RoleAppointment.delete_all
     PolicyAppointment.delete_all
+
 
     # Clear global data before seeding
     User.destroy_all
     PaymentMethod.destroy_all
     Brand.destroy_all
-    SystemSubscriptionPlan.destroy_all
+
 
     # Global Data
     # Identify the platform by a hardcoded CODE, not ID.
@@ -37,13 +46,13 @@ class Seed::ApplicationService
 
     # Create company groups
     Seed::RetailService.new(user: user_1, email: "retail1@company1.com", name: "Grocery 1")
-    Seed::RetailService.new(user: user_1, email: "retail1@company2.com", name: "Grocery 2")
-    Seed::RestaurantService.new(user: user_1, email: "restaurant1@company1.com")
-    Seed::HospitalService.new(user: user_1, email: "hospital1@company1.com")
-    Seed::EducationService.new(user: user_1, email: "education1@company1.com")
-    Seed::HotelService.new(user: user_1, email: "hotel1@company1.com")
-    Seed::FitnessService.new(user: user_1, email: "fitness1@company1.com")
-    Seed::RetailService.new(user: user_2, email: "retail1@company3.com")
+    # Seed::RetailService.new(user: user_1, email: "retail1@company2.com", name: "Grocery 2")
+    # Seed::RestaurantService.new(user: user_1, email: "restaurant1@company1.com")
+    # Seed::HospitalService.new(user: user_1, email: "hospital1@company1.com")
+    # Seed::EducationService.new(user: user_1, email: "education1@company1.com")
+    # Seed::HotelService.new(user: user_1, email: "hotel1@company1.com")
+    # Seed::FitnessService.new(user: user_1, email: "fitness1@company1.com")
+    # Seed::RetailService.new(user: user_2, email: "retail1@company3.com")
 
     self.puts_count
 

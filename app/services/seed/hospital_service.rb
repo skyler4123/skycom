@@ -32,8 +32,6 @@ class Seed::HospitalService
 
     create_hospital_company
     create_branches
-    subscribe_branches_to_system_subscription_plane
-    create_subscription_plans_for_company
     create_facilities_for_branches
     appoint_payment_methods_to_company
     setup_roles_and_permissions
@@ -41,7 +39,6 @@ class Seed::HospitalService
     create_employees
     assign_employees_to_departments
     create_customers_for_company
-    subscribe_for_customers
     setup_loyalty_programs
     create_inventory
     create_customer_orders
@@ -87,28 +84,6 @@ class Seed::HospitalService
     end
   end
 
-  def subscribe_branches_to_system_subscription_plane
-    @branches.each do |branch|
-      plan_name = SystemSubscriptionPlan.pluck(:name).sample
-      branch.system_subscribe!(plan_name: plan_name)
-    end
-  end
-
-  def create_subscription_plans_for_company(count: 3)
-    count.times do |i|
-      price = Seed::PriceService.create(
-        amount: rand(10..100),
-        currency_code: @hospital.currency_code
-      )
-      Seed::SubscriptionPlanService.create(
-        company: @hospital,
-        name: "Plan #{i + 1}",
-        price: price,
-        duration_days: rand(30..365)
-      )
-    end
-  end
-
   def create_subscriptions_for_company(count: 3)
     count.times do |i|
       Seed::SubscriptionService.create(
@@ -116,12 +91,6 @@ class Seed::HospitalService
         name: "Hospital Company Group Subscription #{i + 1}",
         description: "Subscription plan #{i + 1} for #{@hospital.name}"
       )
-    end
-  end
-
-  def subscribe_branches_to_plans
-    @branches.each do |branch|
-      branch.subscribe!(plan_name: Subscription.plan_names.keys.sample)
     end
   end
 
@@ -220,18 +189,6 @@ class Seed::HospitalService
           @customers << customer
         end
       end
-    end
-  end
-
-  def subscribe_for_customers
-    @customers.each do |customer|
-      Seed::SubscriptionService.create(
-        company: @hospital,
-        subscription_plan: @hospital.subscription_plans.sample,
-        period: Seed::PeriodService.create,
-        seller: @hospital,
-        buyer: customer
-      )
     end
   end
 

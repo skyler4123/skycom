@@ -3,7 +3,8 @@ class Product < ApplicationRecord
 
   include TagConcern
   include OrderConcern
-  include Subscription::ResourceConcern
+  include PriceConcern
+
 
   # --- Associations ---
   belongs_to :company
@@ -15,6 +16,9 @@ class Product < ApplicationRecord
 
   has_many :product_group_appointments, dependent: :destroy, as: :appoint_to
   has_many :product_groups, through: :product_group_appointments
+
+  has_many :stocks, dependent: :destroy
+  has_many :stock_transfers, dependent: :destroy
 
   # --- Enums ---
   enum :lifecycle_status, LIFECYCLE_STATUS, prefix: true

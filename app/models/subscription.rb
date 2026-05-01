@@ -1,23 +1,15 @@
 class Subscription < ApplicationRecord
   include TagConcern
 
-  # Assuming you use Discard for the 'discarded_at' column in migration
-  # include Discard::Model
-
   # --- Associations ---
   belongs_to :company
   belongs_to :branch, optional: true
   belongs_to :subscription_plan
   belongs_to :subscription_group, optional: true
-  belongs_to :price
-  belongs_to :period
   belongs_to :seller, polymorphic: true
   belongs_to :buyer, polymorphic: true
   belongs_to :resource, polymorphic: true, optional: true
   belongs_to :processer, polymorphic: true, optional: true
-
-  # Ensure the definition components are always present
-  validates :price, :period, presence: true
 
   enum :country_code, COUNTRIE_CODES, prefix: true
   enum :lifecycle_status, LIFECYCLE_STATUS, prefix: true

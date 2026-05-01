@@ -2,8 +2,6 @@
 class System < ApplicationRecord
   attribute :permission_resource_name, :string, default: -> { self.name }
 
-  include SystemSubscription::SellerConcern
-
   # --- Associations ---
   has_many :subscription_appointments, as: :appoint_from
   has_many :subscriptions, through: :subscription_appointments

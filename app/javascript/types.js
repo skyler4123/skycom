@@ -102,7 +102,6 @@
 
 // --- 16. TIME & PERIODS ---
 /** @typedef {Object} Period @property {string} id @property {string} start_at @property {string} end_at @property {number} timezone */
-/** @typedef {Object} PeriodPrice @property {string} id @property {string} period_priceable_type @property {string} period_priceable_id @property {string} period_id @property {string} price_id */
 
 // --- 17. STORAGE (ACTIVE STORAGE) ---
 /** @typedef {Object} ActiveStorageAttachment @property {string} id @property {string} name @property {string} record_type @property {string} record_id @property {string} blob_id @property {string} created_at */
