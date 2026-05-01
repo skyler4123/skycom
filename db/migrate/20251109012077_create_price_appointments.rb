@@ -2,6 +2,7 @@ class CreatePriceAppointments < ActiveRecord::Migration[8.0]
   def change
     create_table :price_appointments, id: :uuid do |t|
       t.references :price, null: false, foreign_key: true, type: :uuid
+      t.references :period, null: true, foreign_key: true, type: :uuid
       t.references :appoint_from, polymorphic: true, null: true, type: :uuid
       t.references :appoint_to, polymorphic: true, null: false, type: :uuid
       t.references :appoint_for, polymorphic: true, null: true, type: :uuid

@@ -1,5 +1,5 @@
 class SystemSubscriptionPlan < ApplicationRecord
-  belongs_to :price
+  include PriceConcern
 
   enum :country_code, COUNTRIE_CODES, prefix: true
   enum :lifecycle_status, LIFECYCLE_STATUS, prefix: true

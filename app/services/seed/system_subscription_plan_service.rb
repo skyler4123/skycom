@@ -53,48 +53,47 @@ module Seed
     }.freeze
 
     def self.seeding
-      puts "🌱 Seeding System Subscription Plans (Simplified Durations)..."
+      puts "🌱 Seeding System Subscription Plans with Price Appointments..."
 
       PRICING.each do |country_code, plans|
         plans.each do |plan_code, pricing_details|
           plan_config = LIMITS[plan_code]
           next unless plan_config
 
-          # 1. Calculate Total Days
-          # (ActiveSupport::Duration / 1.day) returns the float/integer count of days
+          # 1. Calculate Days
           total_days = (plan_config[:duration] / 1.day).to_i
 
-          # 2. Find/Create Price
-          price = Seed::PriceService.create(
-            amount: pricing_details[:amount],
-            currency_code: pricing_details[:currency_code]
-          )
-
-          # 3. Find/Initialize Plan (Idempotent by code + country)
+          # 2. Find/Create the Plan record (The 'appoint_to')
           plan = SystemSubscriptionPlan.find_or_initialize_by(
             code: "#{country_code}_#{plan_code}",
             country_code: country_code
           )
 
-          # 4. Prepare resource limits (excluding duration)
-          limits = plan_config
+          # Prepare dev-random statuses
+          l_status = SystemSubscriptionPlan.lifecycle_statuses.keys.sample
+          w_status = SystemSubscriptionPlan.workflow_statuses.keys.sample
+          b_type = SystemSubscriptionPlan.business_types.keys.sample
 
-          lifecycle_status = SystemSubscriptionPlan.lifecycle_statuses.keys.sample
-          workflow_status = SystemSubscriptionPlan.workflow_statuses.keys.sample
-          business_type = SystemSubscriptionPlan.business_types.keys.sample
+          # 3. Update core attributes (Price is NOT included here)
           plan.update!(
-            price: price,
             name: plan_code,
             description: "#{plan_code.to_s.humanize} plan for #{country_code.upcase}",
             duration_days: total_days,
-            lifecycle_status: lifecycle_status,
-            workflow_status: workflow_status,
-            business_type: business_type,
-            limits: limits,
+            lifecycle_status: l_status,
+            workflow_status: w_status,
+            business_type: b_type,
+            limits: plan_config,
             features: generate_features(plan_code)
           )
 
-          puts "   ✅ Created: #{plan.code} (#{total_days} days)"
+          # 4. ATTACH PRICE (This is where PriceConcern kicks in)
+          # This creates a record in 'price_appointments' pointing to this plan
+          plan.price = {
+            amount: pricing_details[:amount],
+            currency_code: pricing_details[:currency_code]
+          }
+
+          puts "   ✅ [#{plan.code}] price attached: #{plan.price.format}"
         end
       end
 

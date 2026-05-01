@@ -1541,18 +1541,6 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.index ["period_id"], name: "index_period_appointments_on_period_id"
   end
 
-  create_table "period_prices", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
-    t.string "period_priceable_type", null: false
-    t.uuid "period_priceable_id", null: false
-    t.uuid "period_id", null: false
-    t.uuid "price_id", null: false
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.index ["period_id"], name: "index_period_prices_on_period_id"
-    t.index ["period_priceable_type", "period_priceable_id"], name: "index_period_prices_on_period_priceable"
-    t.index ["price_id"], name: "index_period_prices_on_price_id"
-  end
-
   create_table "periods", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.datetime "start_at", null: false
     t.datetime "end_at"
@@ -1607,6 +1595,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
 
   create_table "price_appointments", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.uuid "price_id", null: false
+    t.uuid "period_id"
     t.string "appoint_from_type"
     t.uuid "appoint_from_id"
     t.string "appoint_to_type", null: false
@@ -1632,6 +1621,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.index ["appoint_to_type", "appoint_to_id"], name: "index_price_appointments_on_appoint_to"
     t.index ["appoint_to_type", "appoint_to_id"], name: "index_price_appointments_on_appoint_to_type_and_appoint_to_id"
     t.index ["discarded_at"], name: "index_price_appointments_on_discarded_at"
+    t.index ["period_id"], name: "index_price_appointments_on_period_id"
     t.index ["price_id"], name: "index_price_appointments_on_price_id"
   end
 
@@ -1731,8 +1721,6 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.uuid "category_id"
     t.string "name"
     t.string "description"
-    t.decimal "price"
-    t.integer "currency_code"
     t.string "code"
     t.string "sku"
     t.string "barcode"
@@ -2470,7 +2458,6 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
   end
 
   create_table "system_subscription_plans", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
-    t.uuid "price_id", null: false
     t.string "name", null: false
     t.string "description"
     t.string "code"
@@ -2486,7 +2473,6 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["discarded_at"], name: "index_system_subscription_plans_on_discarded_at"
-    t.index ["price_id"], name: "index_system_subscription_plans_on_price_id"
   end
 
   create_table "system_subscriptions", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -2892,12 +2878,11 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
   add_foreign_key "payments", "companies"
   add_foreign_key "payments", "invoices"
   add_foreign_key "period_appointments", "periods"
-  add_foreign_key "period_prices", "periods"
-  add_foreign_key "period_prices", "prices"
   add_foreign_key "policies", "branches"
   add_foreign_key "policies", "companies"
   add_foreign_key "policy_appointments", "companies"
   add_foreign_key "policy_appointments", "policies"
+  add_foreign_key "price_appointments", "periods"
   add_foreign_key "price_appointments", "prices"
   add_foreign_key "product_appointments", "companies"
   add_foreign_key "product_appointments", "products"
@@ -2990,7 +2975,6 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
   add_foreign_key "system_subscription_groups", "periods"
   add_foreign_key "system_subscription_groups", "prices"
   add_foreign_key "system_subscription_groups", "system_subscription_plans"
-  add_foreign_key "system_subscription_plans", "prices"
   add_foreign_key "system_subscriptions", "branches"
   add_foreign_key "system_subscriptions", "companies"
   add_foreign_key "system_subscriptions", "periods"
