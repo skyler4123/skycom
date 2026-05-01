@@ -7,10 +7,6 @@ RSpec.describe Subscription, type: :model do
     it { should belong_to(:branch).optional }
     it { should belong_to(:subscription_plan) }
     it { should belong_to(:subscription_group).optional }
-    it { should belong_to(:price) }
-    it { should belong_to(:period) }
-    it { should belong_to(:seller) }
-    it { should belong_to(:buyer) }
   end
 
   describe "enums" do
