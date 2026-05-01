@@ -4,12 +4,12 @@ module AddressConcern
 
   included do
     has_many :address_appointments, as: :appoint_to, dependent: :destroy
-    
+
     # Direct access to all unique Address records assigned to this model
     has_many :addresses, through: :address_appointments, source: :address
 
-    has_one :current_address_appointment, -> { 
-              where(lifecycle_status: :active).order(created_at: :desc) 
+    has_one :current_address_appointment, -> {
+              where(lifecycle_status: :active).order(created_at: :desc)
             }, as: :appoint_to, class_name: "AddressAppointment"
 
     has_one :db_address, through: :current_address_appointment, source: :address

@@ -4,16 +4,16 @@ module PeriodConcern
 
   included do
     has_many :period_appointments, as: :appoint_to, dependent: :destroy
-    
+
     # Direct access to all unique Period records assigned to this model
     has_many :periods, through: :period_appointments, source: :period
 
     # Association for the primary active period (e.g., current subscription window)
-    has_one :current_period_appointment, -> { 
+    has_one :current_period_appointment, -> {
               where(lifecycle_status: :active)
-              .order(created_at: :desc) 
-            }, 
-            as: :appoint_to, 
+              .order(created_at: :desc)
+            },
+            as: :appoint_to,
             class_name: "PeriodAppointment"
 
     has_one :db_period, through: :current_period_appointment, source: :period
@@ -36,7 +36,7 @@ module PeriodConcern
     b_type = attributes[:business_type] || :base
     w_status = attributes[:workflow_status] || :approved
     l_status = :active
-    
+
     # 2. Find or create the immutable Period record
     # This reuses existing periods if the start/end/timezone match exactly
     target_period = Period.find_or_create_by!(
