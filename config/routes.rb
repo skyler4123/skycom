@@ -37,7 +37,7 @@ Rails.application.routes.draw do
       resources :tasks
       resources :facilities
       resources :settings
-      resources :subscriptions
+      resources :subscription_plan_appointments
       resources :permissions
       resources :policies
       resources :policy_appointments

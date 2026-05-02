@@ -3,9 +3,6 @@ class System < ApplicationRecord
   attribute :permission_resource_name, :string, default: -> { self.name }
 
   # --- Associations ---
-  has_many :subscription_appointments, as: :appoint_from
-  has_many :subscriptions, through: :subscription_appointments
-
   # --- Validations ---
   validates :code, presence: true, uniqueness: true
 

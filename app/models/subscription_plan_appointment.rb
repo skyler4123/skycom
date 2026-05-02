@@ -1,4 +1,4 @@
-class Subscription < ApplicationRecord
+class SubscriptionPlanAppointment < ApplicationRecord
   include TagConcern
 
   # --- Associations ---

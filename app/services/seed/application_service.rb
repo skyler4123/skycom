@@ -6,7 +6,7 @@ class Seed::ApplicationService
 
     SystemSubscription.delete_all
     SystemSubscriptionPlan.delete_all
-    Subscription.delete_all
+    SubscriptionPlanAppointment.delete_all
     SubscriptionPlan.delete_all
     PriceAppointment.delete_all
     Price.delete_all

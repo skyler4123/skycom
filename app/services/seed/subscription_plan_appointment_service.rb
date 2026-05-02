@@ -1,4 +1,4 @@
-class Seed::SubscriptionService
+class Seed::SubscriptionPlanAppointmentService
   def self.new(
     company:,
     branch: nil,
@@ -6,16 +6,16 @@ class Seed::SubscriptionService
     subscription_group: nil,
     name: Faker::Company.name,
     description: Faker::Lorem.sentence(word_count: 10),
-    country_code: Subscription.country_codes.keys.sample,
-    timezone: Subscription.timezones.keys.sample,
-    lifecycle_status: Subscription.lifecycle_statuses.keys.sample,
-    workflow_status: Subscription.workflow_statuses.keys.sample,
-    business_type: Subscription.business_types.keys.sample,
+    country_code: SubscriptionPlanAppointment.country_codes.keys.sample,
+    timezone: SubscriptionPlanAppointment.timezones.keys.sample,
+    lifecycle_status: SubscriptionPlanAppointment.lifecycle_statuses.keys.sample,
+    workflow_status: SubscriptionPlanAppointment.workflow_statuses.keys.sample,
+    business_type: SubscriptionPlanAppointment.business_types.keys.sample,
     auto_renew: false,
     discarded_at: nil,
     metadata: {}
   )
-    Subscription.new(
+    SubscriptionPlanAppointment.new(
       company: company,
       branch: branch,
       subscription_plan: subscription_plan,
