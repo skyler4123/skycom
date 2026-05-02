@@ -4,7 +4,7 @@ class Membership < ApplicationRecord
 
   enum :lifecycle_status, { active: 0, archived: 1 }, prefix: true
   enum :workflow_status, { pending: 0, approved: 1, rejected: 2 }, prefix: true
-  
+
   # Distinguish between Customer Tiers, Staff Roles, etc.
   enum :business_type, { loyalty: 1, subscription: 2, segment: 3 }
 

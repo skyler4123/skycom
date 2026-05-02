@@ -4,23 +4,23 @@ module MembershipConcern
 
   included do
     has_many :membership_appointments, as: :appoint_to, dependent: :destroy
-    
+
     # All memberships ever held
     has_many :memberships, through: :membership_appointments, source: :membership
 
     # Current appointments for all business types
-    has_many :current_membership_appointments, -> { 
-              where(lifecycle_status: :active) 
-            }, 
-            as: :appoint_to, 
+    has_many :current_membership_appointments, -> {
+              where(lifecycle_status: :active)
+            },
+            as: :appoint_to,
             class_name: "MembershipAppointment"
 
     # Quick access to the most recent active membership
-    has_one :latest_membership_appointment, -> { 
+    has_one :latest_membership_appointment, -> {
               where(lifecycle_status: :active)
-              .order(created_at: :desc) 
-            }, 
-            as: :appoint_to, 
+              .order(created_at: :desc)
+            },
+            as: :appoint_to,
             class_name: "MembershipAppointment"
 
     has_one :db_membership, through: :latest_membership_appointment, source: :membership
@@ -58,7 +58,7 @@ module MembershipConcern
         lifecycle_status: :active,
         workflow_status:  options[:workflow_status] || :approved
       )
-      
+
       # 3. Cache Invalidation
       self.touch if self.persisted?
     end
