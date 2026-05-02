@@ -27,13 +27,22 @@ export const create_companies_path = () => `/companies`
 export const company_dashboards_path = (companyId) => `/companies/${companyId}/dashboards`
 
 export const company_branches_path = (companyId) => `/companies/${companyId}/branches`
-export const new_company_branches_path = (companyId) => `/companies/${companyId}/branches/new`
+export const create_company_branches_path = (companyId) => `/companies/${companyId}/branches`
+export const edit_company_branch_path = (companyId, branchId) => `/companies/${companyId}/branches/${branchId}`
 
 export const company_branches_new_path = (companyId) => `/companies/${companyId}/branches/new`
 export const company_departments_path = (companyId) => `/companies/${companyId}/departments`
+export const create_company_departments_path = (companyId) => `/companies/${companyId}/departments`
+export const edit_company_department_path = (companyId, departmentId) => `/companies/${companyId}/departments/${departmentId}`
 export const company_products_path = (companyId) => `/companies/${companyId}/products`
+export const create_company_products_path = (companyId) => `/companies/${companyId}/products`
+export const edit_company_product_path = (companyId, productId) => `/companies/${companyId}/products/${productId}`
 export const company_services_path = (companyId) => `/companies/${companyId}/services`
+export const create_company_services_path = (companyId) => `/companies/${companyId}/services`
+export const edit_company_service_path = (companyId, serviceId) => `/companies/${companyId}/services/${serviceId}`
 export const company_customers_path = (companyId) => `/companies/${companyId}/customers`
+export const create_company_customers_path = (companyId) => `/companies/${companyId}/customers`
+export const edit_company_customer_path = (companyId, customerId) => `/companies/${companyId}/customers/${customerId}`
 export const company_facilities_path = (companyId) => `/companies/${companyId}/facilities`
 
 export const company_employees_path = (companyId) => `/companies/${companyId}/employees`
@@ -41,12 +50,17 @@ export const create_company_employees_path = (companyId) => `/companies/${compan
 export const edit_company_employee_path = (companyId, employeeId) => `/companies/${companyId}/employees/${employeeId}`
 
 export const company_orders_path = (companyId) => `/companies/${companyId}/orders`
+export const create_company_orders_path = (companyId) => `/companies/${companyId}/orders`
+export const edit_company_order_path = (companyId, orderId) => `/companies/${companyId}/orders/${orderId}`
+
+export const company_bookings_path = (companyId) => `/companies/${companyId}/bookings`
+export const create_company_bookings_path = (companyId) => `/companies/${companyId}/bookings`
+export const edit_company_booking_path = (companyId, bookingId) => `/companies/${companyId}/bookings/${bookingId}`
 
 export const company_permissions_path = (companyId) => `/companies/${companyId}/permissions`
 export const edit_company_permission_path = (companyId, permissionId) => `/companies/${companyId}/permissions/${permissionId}`
 
 export const company_roles_path = (companyId) => `/companies/${companyId}/roles`
-export const company_bookings_path = (companyId) => `/companies/${companyId}/bookings`
 export const company_settings_path = (companyId) => `/companies/${companyId}/settings`
 export const company_users_path = (companyId) => `/companies/${companyId}/users`
 export const company_payments_path = (companyId) => `/companies/${companyId}/payments`
@@ -63,4 +77,6 @@ export const company_tasks_path = (companyId) => `/companies/${companyId}/tasks`
 export const company_payslips_path = (companyId) => `/companies/${companyId}/payslips`
 
 export const company_invoices_path = (companyId) => `/companies/${companyId}/invoices`
+export const create_company_invoices_path = (companyId) => `/companies/${companyId}/invoices`
+export const edit_company_invoice_path = (companyId, invoiceId) => `/companies/${companyId}/invoices/${invoiceId}`
 export const company_inventories_path = (companyId) => `/companies/${companyId}/inventories`

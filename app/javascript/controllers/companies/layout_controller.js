@@ -68,11 +68,8 @@ export default class Companies_LayoutController extends Controller {
                 </a>
                 <a
                   class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:bg-blue-100 open:text-blue-600"
-                  ${tooltip({
-                    html: `<div>${translate("Hello")}</div>`, 
-                    action: "click",
-                    classes: "bg-amber-50 text-amber-700 border border-amber-200 dark:bg-amber-900/30 dark:text-amber-200 dark:border-amber-800"
-                  })}
+                  href="${Helpers.company_branches_path(currentCompany().id)}"
+                  ${openByPathname()}
                 >
                   <span class="material-symbols-outlined">apartment</span>
                   <p class="text-sm font-medium leading-normal">Branches</p>
