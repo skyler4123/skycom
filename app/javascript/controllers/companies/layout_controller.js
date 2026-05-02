@@ -49,7 +49,7 @@ export default class Companies_LayoutController extends Controller {
           <!-- Sidebar -->
           <aside
             class="w-64 hidden open:flex flex-col shrink-0 bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800"
-            ${addOpenListener({key: "sidebar"})}
+            ${addOpenListener({group: "sidebar", key: "sidebar", cache: true})}
           >
             <!-- Sidebar Navigation Links -->
             <nav class="w-full p-4">
@@ -309,7 +309,7 @@ export default class Companies_LayoutController extends Controller {
 
                 <button
                   class="flex cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 w-10 hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-600 dark:text-gray-300" id="sidebar-toggle"
-                  ${addOpenTrigger({key: "sidebar", toggle: true})}
+                  ${addOpenTrigger({group: "sidebar", key: "sidebar", toggle: true, cache: true})}
                 >
                   <span class="material-symbols-outlined">menu</span>
                 </button>

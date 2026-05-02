@@ -291,22 +291,28 @@ export const triggerLanguageDropdown = () => `data-language-target="triggerDropd
 export const languageCodeTextTarget = () => `data-language-target="codeText"`
 
 /**
- * Returns the data attributes for a Stimulus 'open' controller trigger.
- * @param {string} key - The key to identify a group of listeners.
- * @param {string|number} index - The index to identify a specific listener within the group.
- * @returns {string} The full data attribute string for an open trigger.
+ * @param {string} group - The group name (used as localStorage namespace)
+ * @param {string} key - The unique key within the group
+ * @param {boolean} toggle - Can click again to close?
+ * @param {boolean} cache - Should remember state on reload?
  */
-export const addOpenTrigger = ({key, index = 1, toggle = false}) => {
-  const base = `data-open-target="trigger" data-action="click->open#click" data-open-key-param="${key}" data-open-index-param="${index}"`
-  return toggle ? `${base} data-open-toggle-param="true"` : base
+export const addOpenTrigger = ({group, key, toggle = false, cache = false}) => {
+  let base = `data-open-target="trigger" data-action="click->open#click" data-open-group-param="${group}" data-open-key-param="${key}"`
+  if (toggle) base += ` data-open-toggle-param="true"`
+  if (cache)  base += ` data-open-cache-param="true"`
+  return base
 }
+
 /**
- * Returns the data attributes for a Stimulus 'open' controller listener.
- * @param {string} key - The key to identify this listener group.
- * @param {string|number} index - The index to uniquely identify this listener.
- * @returns {string} The full data attribute string for an open listener.
+ * @param {string} group - The group name
+ * @param {string} key - The unique key
+ * @param {boolean} cache - Does this listener support being opened by cache?
  */
-export const addOpenListener = ({key, index = 1}) => `data-open-target="listener" data-open-key-param="${key}" data-open-index-param="${index}"`
+export const addOpenListener = ({group, key, cache = false}) => {
+  let base = `data-open-target="listener" data-open-group-param="${group}" data-open-key-param="${key}"`
+  if (cache) base += ` data-open-cache-param="true"`
+  return base
+}
 
 export const pagination = (dataValue, classNames = "") => `
   <div
