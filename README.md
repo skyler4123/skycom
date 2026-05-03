@@ -99,10 +99,11 @@ description: Global JS Helpers and AI Prioritization Rules
     - Automatically injects `X-CSRF-Token`.
     - Sets `Content-Type: application/json`.
     - Default URL is `window.location.href`.
-2.  **`form({ action, method, dataAction, className, html })`**:
+2.  **`form({ action, method, attributes, html })`**:
     - Defaults `action` to current `pathname()`.
     - Handles Rails **Method Spoofing** (PATCH/DELETE).
     - Injects CSRF `authenticity_token`.
+    - Use `attributes` parameter to pass HTML attributes (class, data-action, etc.)
 3.  **Security Tags**:
     - `formPostSecurityTags()` / `formPatchSecurityTags()`: For manual HTML strings.
 
@@ -291,7 +292,7 @@ const fields = `
 return form({
   action: Helpers.employee_path(e.id),
   method: "PATCH",
-  className: "p-6 space-y-4",
+  attributes: `class="p-6 space-y-4"`,
   html: fields
 });
 ```

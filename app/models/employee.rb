@@ -29,7 +29,7 @@ class Employee < ApplicationRecord
   has_many :tag_appointments, dependent: :destroy, as: :appoint_to
   has_many :tags, through: :tag_appointments
 
-  has_many :bookings, as: :appoint_from, dependent: :destroy, class_name: "Booking"
+  has_many :bookings, as: :appoint_from, dependent: :destroy
 
   # --- Enums ---
   enum :business_type, {
@@ -45,4 +45,23 @@ class Employee < ApplicationRecord
   # --- Validations ---
   validates :name, presence: true, uniqueness: { scope: :company_id }
   validates :business_type, presence: true
+  validate :only_one_owner_per_company, on: :create
+
+  private
+
+  def only_one_owner_per_company
+    return unless business_type.to_s == "owner" && company_id.present?
+
+    # Only one owner employee per company
+    # Allow if this employee is updating their own record (same id)
+    return if persisted? && self.id == Employee.find_by(company_id: company_id, business_type: :owner)&.id
+
+    owner_exists = Employee.where(company_id: company_id, business_type: :owner)
+      .where.not(id: self.id)
+      .exists?
+
+    if owner_exists
+      errors.add(:base, "Only one owner employee is allowed per company.")
+    end
+  end
 end

@@ -1,5 +1,5 @@
 class Companies::PermissionsController < Companies::ApplicationController
-  before_action :authorize_permission_management, only: [ :update ]
+  before_action :authorize_permission_management, only: [ :update, :create ]
 
   # Shell First pattern - index action returns empty HTML, Stimulus renders content
   def index
@@ -20,6 +20,36 @@ class Companies::PermissionsController < Companies::ApplicationController
     else
       render json: { errors: appointment.errors.full_messages }, status: :unprocessable_entity
     end
+  end
+
+  def create
+    role_id = params.dig(:permission, :role_id)
+    resource_name = params.dig(:permission, :resource_name)
+
+    # Validate role exists and belongs to company
+    role = current_company.roles.find_by(id: role_id)
+    return render json: { error: "Role not found" }, status: :not_found unless role
+
+    # Validate resource_name is in company's resource_names
+    unless current_company.resource_names.include?(resource_name)
+      return render json: { error: "Invalid resource name" }, status: :unprocessable_entity
+    end
+
+    # Check if resource already has policies for this role
+    existing_policies = Policy.where(company: current_company, resource: resource_name)
+                             .joins(:policy_appointments)
+                             .where(policy_appointments: { appoint_to: role })
+                             .exists?
+
+    if existing_policies
+      return render json: { error: "Resource already assigned to this role" }, status: :unprocessable_entity
+    end
+
+    # Create policies for the role
+    role.setup_policies_for!(resource_name)
+    current_company.clear_permissions_cache
+
+    render json: { message: "Resource added successfully" }
   end
 
   private

@@ -18,6 +18,7 @@ RSpec.feature "Companies::Permissions Management", type: :feature, js: true do
   let!(:policy_read_order) { create_policy(resource: "Order", action: "read") }
   let!(:policy_create_order) { create_policy(resource: "Order", action: "create") }
   let!(:policy_read_customer) { create_policy(resource: "Customer", action: "read") }
+  let!(:policy_create_customer) { create_policy(resource: "Customer", action: "create") }
 
   # Admin role: Product(read) - ONE active for can? test; Order both active
   let!(:admin_read_product_active) do
@@ -277,5 +278,139 @@ RSpec.feature "Companies::Permissions Management", type: :feature, js: true do
 
     expect(owner_employee.can?(:create, Order)).to be_truthy
     expect(owner_employee.can?(:anything, :any_resource)).to be_truthy
+  end
+
+  scenario "click Add Resource button opens modal" do
+    sign_in(owner)
+    visit company_permissions_path(company)
+
+    expect(page).to have_selector('.role-section', text: "manager", wait: 20)
+
+    find('.role-section', text: "manager").click_button("Add Resource")
+
+    expect(page).to have_selector('.swal2-html-container')
+    expect(page).to have_content("Add Resource to manager")
+  end
+
+  scenario "modal shows only unassigned resources" do
+    sign_in(owner)
+    visit company_permissions_path(company)
+
+    manager_section = find('.role-section', text: "manager")
+    expect(manager_section).to have_content("Product")
+    expect(manager_section).to have_content("Order")
+
+    manager_section.click_button("Add Resource")
+
+    within(".swal2-html-container") do
+      expect(page).to have_content("Customer")
+      expect(page).to have_content("Select a resource")
+    end
+  end
+
+scenario "submit shows success toast and closes modal" do
+    sign_in(owner)
+    visit company_permissions_path(company)
+
+    find('.role-section', text: "cashier").click_button("Add Resource")
+    expect(page).to have_selector('.swal2-html-container')
+
+    within(".swal2-html-container") do
+      select "Product", from: "permission[resource_name]"
+      click_button "Add Resource"
+    end
+
+    expect(page).to have_content("Resource added successfully", wait: 10)
+    expect(page).not_to have_selector('.swal2-html-container')
+  end
+
+  scenario "page refreshes after successful add" do
+    sign_in(owner)
+    visit company_permissions_path(company)
+
+    cashier_section = find('.role-section', text: "cashier")
+    expect(cashier_section).not_to have_content("Product")
+
+    cashier_section.click_button("Add Resource")
+
+    within(".swal2-html-container") do
+      select "Product", from: "permission[resource_name]"
+      click_button "Add Resource"
+    end
+
+    expect(page).to have_content("Resource added successfully", wait: 10)
+
+    cashier_section = find('.role-section', text: "cashier")
+    expect(cashier_section).to have_content("Product")
+  end
+
+  scenario "click Cancel button closes modal" do
+    sign_in(owner)
+    visit company_permissions_path(company)
+
+    find('.role-section', text: "manager").click_button("Add Resource")
+    expect(page).to have_selector('.swal2-html-container')
+
+    within(".swal2-html-container") do
+      click_button "Cancel"
+    end
+
+    expect(page).not_to have_selector('.swal2-html-container')
+  end
+
+  scenario "duplicate resource shows error toast" do
+    sign_in(owner)
+    visit company_permissions_path(company)
+
+    cashier_section = find('.role-section', text: "cashier")
+    expect(cashier_section).to have_content("Order")
+    expect(cashier_section).not_to have_content("Customer")
+
+    cashier_section.click_button("Add Resource")
+    expect(page).to have_content("Select a resource")
+    expect(page).to have_content("Customer")
+
+    within(".swal2-html-container") do
+      select "Customer", from: "permission[resource_name]"
+      click_button "Add Resource"
+    end
+
+    expect(page).to have_content("Resource added successfully", wait: 10)
+
+    cashier_section = find('.role-section', text: "cashier")
+    expect(cashier_section).to have_content("Customer")
+
+    cashier_section.click_button("Add Resource")
+    expect(page).to have_selector('.swal2-html-container')
+    expect(page).to have_content("Select a resource")
+    expect(page).not_to have_content('option[value="Customer"]')
+  end
+
+  scenario "unassigned resources list updates after adding resource" do
+    sign_in(owner)
+    visit company_permissions_path(company)
+
+    manager_section = find('.role-section', text: "manager")
+    expect(manager_section).to have_content("Product")
+    expect(manager_section).to have_content("Order")
+    expect(manager_section).not_to have_content("Customer")
+
+    manager_section.click_button("Add Resource")
+
+    within(".swal2-html-container") do
+      expect(page).to have_content("Customer")
+      expect(page).not_to have_content('option[value="Product"]')
+      expect(page).not_to have_content('option[value="Order"]')
+    end
+
+    within(".swal2-html-container") do
+      select "Customer", from: "permission[resource_name]"
+      click_button "Add Resource"
+    end
+
+    expect(page).to have_content("Resource added successfully", wait: 10)
+
+    manager_section = find('.role-section', text: "manager")
+    expect(manager_section).to have_content("Customer")
   end
 end

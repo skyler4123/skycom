@@ -6,6 +6,9 @@
 - `bin/brakeman` - Security scan
 - `bin/rails` - Standard Rails commands
 
+## Pre-Commit Checklist
+- **ALWAYS** run `bin/rubocop --autocorrect-all` before committing any Ruby code
+
 ## Architecture
 - **Type**: Rails 7+ multi-tenant platform with Hybrid SPA (Stimulus + Tailwind)
 - **Data Flow**: JSON API, avoid server-side HTML partials
