@@ -679,12 +679,14 @@ Base: Owner role can only be assigned to owner employees.
 
 ### C. Seed Service Fix
 
-The `Seed::EmployeeService` is fixed to never randomly select `:owner` business_type, since owner employees are created via `Company#setup_owner_records`:
+The `Seed::EmployeeService` is fixed to never randomly select `"owner"` business_type, since owner employees are created via `Company#setup_owner_records`:
 
 ```ruby
 # app/services/seed/employee_service.rb
-business_type ||= (Employee.business_types.keys - [:owner]).sample
+business_type ||= (Employee.business_types.keys - ["owner"]).sample
 ```
+
+**Note:** Use strings (`"owner"`) not symbols (`:owner`) because Rails enums store keys as strings by default.
 
 ---
 
@@ -694,8 +696,10 @@ Test factories explicitly use non-owner business types to avoid validation failu
 
 ```ruby
 # spec/factories/employees.rb
-employee_business_type { [:full_time, :part_time, :contractor, :intern].sample }
+employee_business_type { ["full_time", "part_time", "contractor", "intern"].sample }
 ```
+
+**Note:** Use strings, not symbols.
 
 ---
 
