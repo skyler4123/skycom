@@ -43,9 +43,9 @@ export default class Companies_LayoutController extends Controller {
     
     return `
       <!-- Layout Wrapper: Font, Background, Colors -->
-      <div class="font-display bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200">
+      <div class="flex flex-1 font-display bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200">
         <!-- Flex Container: Sidebar + Main -->
-        <div class="flex">
+        <div class="flex flex-1">
           <!-- Sidebar -->
           <aside
             class="w-64 hidden open:flex flex-col shrink-0 bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800"
