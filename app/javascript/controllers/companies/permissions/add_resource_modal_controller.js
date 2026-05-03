@@ -30,7 +30,7 @@ export default class Companies_Permissions_AddResourceModalController extends Co
       closeModal()
       setTimeout(() => {
         window.location.reload()
-      }, 2000)
+      }, 500)
     } catch (error) {
       toast({ type: "error", message: error.error || "Failed to add resource" })
     }
