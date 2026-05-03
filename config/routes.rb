@@ -25,6 +25,8 @@ Rails.application.routes.draw do
       resources :employees
       resources :stocks
       resources :stock_transfers
+      resources :stock_imports
+      resources :stock_exports
       resources :customers
       resources :invoices
       resources :schedules

@@ -26,6 +26,8 @@ class Company < ApplicationRecord
   has_many :products, dependent: :destroy
   has_many :stocks, dependent: :destroy
   has_many :stock_transfers, dependent: :destroy
+  has_many :stock_imports, dependent: :destroy
+  has_many :stock_exports, dependent: :destroy
   has_many :customers, dependent: :destroy
   has_many :customer_groups, dependent: :destroy
   has_many :orders, dependent: :destroy

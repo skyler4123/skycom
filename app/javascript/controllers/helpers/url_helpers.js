@@ -81,3 +81,5 @@ export const create_company_invoices_path = (companyId) => `/companies/${company
 export const edit_company_invoice_path = (companyId, invoiceId) => `/companies/${companyId}/invoices/${invoiceId}`
 export const company_stocks_path = (companyId) => `/companies/${companyId}/stocks`
 export const company_stock_transfers_path = (companyId) => `/companies/${companyId}/stock_transfers`
+export const company_stock_imports_path = (companyId) => `/companies/${companyId}/stock_imports`
+export const company_stock_exports_path = (companyId) => `/companies/${companyId}/stock_exports`
