@@ -1,84 +1,82 @@
-// How to use:
-// add 'data-open-target="trigger" data-action="click->open#click" data-open-group-param="uniqueGroup" data-open-key-param="uniqueKey"'
-// add 'data-open-target="listener" data-open-group-param="uniqueGroup" data-open-key-param="uniqueKey"'
+// <%# If user clicks Trigger 2, it saves "sidebar" -> "settings" to localStorage %>
+// <a <%= addOpenTrigger(group: "sidebar", key: "settings", cache: true) %>>Settings</a>
+// <a <%= addOpenTrigger(group: "sidebar", key: "profile", cache: true) %>>Profile</a>
 
-// click action will make controller loop through listener targets
-// if their'group match to trigger'group, remove open attribute, then if they match with key param, set open attribute to true
-// if their'group dont match with trigger's group, do nothing
+// <%# On page reload, the controller checks "sidebar" cache and re-opens the last one %>
+// <div <%= addOpenListener(group: "sidebar", key: "settings", cache: true) %>>Settings Content</div>
+// <div <%= addOpenListener(group: "sidebar", key: "profile", cache: true) %>>Profile Content</div>
 
-// Example code:
-//  <div data-controller="open"> --> This already added at server html
-//    <a data-open-target="trigger" data-action="click->open#click" data-open-group-param="`group1`" data-open-key-param="`key1`">Trigger 1</a>
-//    <a data-open-target="trigger" data-action="click->open#click" data-open-group-param="`group1`" data-open-key-param="`key2`">Trigger 2</a>
-//    <a data-open-target="trigger" data-action="click->open#click" data-open-group-param="`group1`" data-open-key-param="`key3`">Trigger 3</a>
-//    
-//    <div data-open-target="listener" data-open-group-param="`group1`" data-open-key-param="`key1`">Listener 1</div>
-//    <div data-open-target="listener" data-open-group-param="`group1`" data-open-key-param="`key2`">Listener 2</div>
-//    <div data-open-target="listener" data-open-group-param="`group1`" data-open-key-param="`key3`">Listener 3</div>
-//  </div>
-
-// <a
-//   class="flex"
-//   ${openByPathname()}
-// >
 import { Controller } from "@hotwired/stimulus"
 
 export default class OpenController extends Controller {
   static targets = ["trigger", "listener", "openByPathname"]
 
   connect() {
-    // Assuming poll is defined globally or imported elsewhere
-    if (typeof poll === "function") {
-      poll(() => {
-        this.updateOpenByPathnameTargets()
-        return this.openByPathnameTargets.every(target => target.hasAttribute("open"))
-      })
-    }
+    poll(() => {
+      this.updateOpenByPathnameTargets()
+      return this.openByPathnameTargets.every(target => target.hasAttribute("open"))
+    })
+
+    poll(() => {
+      if (this.hasListenerTarget) {
+        this.checkCache()
+        return true
+      }
+    })
+  }
+
+  checkCache() {
+    // Collect all unique groups that have at least one listener requesting cache
+    const groupsToCache = [...new Set(
+      this.listenerTargets
+        .filter(l => l.dataset.openCacheParam === "true")
+        .map(l => l.dataset.openGroupParam)
+    )]
+    console.log(this)
+    groupsToCache.forEach(group => {
+      const cachedKey = localStorage.getItem(`open-cache-${group}`)
+      if (cachedKey) {
+        this.applyState(group, cachedKey, false)
+      }
+    })
   }
 
   click(event) {
     event.preventDefault()
-
-    const { group, key, toggle } = event.params
+    const { group, key, toggle, cache } = event.params
     
-    // 1. Identify if the current target is already open
     const isAlreadyOpen = this.listenerTargets.find(
       (l) => String(l.dataset.openGroupParam) === String(group) && 
              String(l.dataset.openKeyParam) === String(key)
     )?.hasAttribute("open")
 
-    // 2. Determine if we should be closing the item instead of opening it
     const shouldClose = toggle && isAlreadyOpen
 
-    // Update Triggers
-    if (this.hasTriggerTarget) {
-      this.triggerTargets.forEach((trigger) => {
-        if (String(trigger.dataset.openGroupParam) === String(group)) {
-          const isMatch = String(trigger.dataset.openKeyParam) === String(key)
-          
-          if (isMatch && !shouldClose) {
-            trigger.setAttribute("open", "")
-          } else {
-            trigger.removeAttribute("open")
-          }
+    // Update Cache if enabled
+    if (cache) {
+      if (shouldClose) {
+        localStorage.removeItem(`open-cache-${group}`)
+      } else {
+        localStorage.setItem(`open-cache-${group}`, key)
+      }
+    }
+
+    this.applyState(group, key, shouldClose)
+  }
+
+  // Refactored UI update logic into a single method
+  applyState(group, key, shouldClose) {
+    const update = (targets) => {
+      targets.forEach((el) => {
+        if (String(el.dataset.openGroupParam) === String(group)) {
+          const isMatch = String(el.dataset.openKeyParam) === String(key)
+          isMatch && !shouldClose ? el.setAttribute("open", "") : el.removeAttribute("open")
         }
       })
     }
 
-    // Update Listeners
-    if (this.hasListenerTarget) {
-      this.listenerTargets.forEach((listener) => {
-        if (String(listener.dataset.openGroupParam) === String(group)) {
-          const isMatch = String(listener.dataset.openKeyParam) === String(key)
-          
-          if (isMatch && !shouldClose) {
-            listener.setAttribute("open", "")
-          } else {
-            listener.removeAttribute("open")
-          }
-        }
-      })
-    }
+    if (this.hasTriggerTarget) update(this.triggerTargets)
+    if (this.hasListenerTarget) update(this.listenerTargets)
   }
 
   updateOpenByPathnameTargets() {

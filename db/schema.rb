@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
+ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pgcrypto"
@@ -1211,6 +1211,38 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.index ["order_id"], name: "index_invoices_on_order_id"
   end
 
+  create_table "membership_appointments", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "membership_id", null: false
+    t.string "appoint_from_type"
+    t.uuid "appoint_from_id"
+    t.string "appoint_to_type", null: false
+    t.uuid "appoint_to_id", null: false
+    t.string "appoint_for_type"
+    t.uuid "appoint_for_id"
+    t.string "appoint_by_type"
+    t.uuid "appoint_by_id"
+    t.integer "lifecycle_status"
+    t.integer "workflow_status"
+    t.integer "business_type"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["appoint_by_type", "appoint_by_id"], name: "index_membership_appointments_on_appoint_by"
+    t.index ["appoint_for_type", "appoint_for_id"], name: "index_membership_appointments_on_appoint_for"
+    t.index ["appoint_from_type", "appoint_from_id"], name: "index_membership_appointments_on_appoint_from"
+    t.index ["appoint_to_type", "appoint_to_id"], name: "index_membership_appointments_on_appoint_to"
+    t.index ["membership_id"], name: "index_membership_appointments_on_membership_id"
+  end
+
+  create_table "memberships", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.string "name"
+    t.string "code", null: false
+    t.integer "lifecycle_status"
+    t.integer "workflow_status"
+    t.integer "business_type"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
   create_table "notification_appointments", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.uuid "company_id", null: false
     t.uuid "notification_id", null: false
@@ -1929,6 +1961,38 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.index ["discarded_at"], name: "index_questions_on_discarded_at"
   end
 
+  create_table "reservation_appointments", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "reservations_id", null: false
+    t.string "appoint_from_type"
+    t.uuid "appoint_from_id"
+    t.string "appoint_to_type", null: false
+    t.uuid "appoint_to_id", null: false
+    t.string "appoint_for_type"
+    t.uuid "appoint_for_id"
+    t.string "appoint_by_type"
+    t.uuid "appoint_by_id"
+    t.integer "lifecycle_status"
+    t.integer "workflow_status"
+    t.integer "business_type"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["appoint_by_type", "appoint_by_id"], name: "index_reservation_appointments_on_appoint_by"
+    t.index ["appoint_for_type", "appoint_for_id"], name: "index_reservation_appointments_on_appoint_for"
+    t.index ["appoint_from_type", "appoint_from_id"], name: "index_reservation_appointments_on_appoint_from"
+    t.index ["appoint_to_type", "appoint_to_id"], name: "index_reservation_appointments_on_appoint_to"
+    t.index ["reservations_id"], name: "index_reservation_appointments_on_reservations_id"
+  end
+
+  create_table "reservations", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.string "name"
+    t.string "code", null: false
+    t.integer "lifecycle_status"
+    t.integer "workflow_status"
+    t.integer "business_type"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
   create_table "role_appointments", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.uuid "company_id", null: false
     t.uuid "role_id", null: false
@@ -2330,6 +2394,30 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.index ["subscription_plan_id"], name: "index_subscription_groups_on_subscription_plan_id"
   end
 
+  create_table "subscription_plan_appointments", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "company_id", null: false
+    t.uuid "branch_id"
+    t.uuid "subscription_plan_id"
+    t.uuid "subscription_group_id"
+    t.string "name"
+    t.string "description"
+    t.integer "country_code", null: false
+    t.integer "timezone"
+    t.integer "lifecycle_status"
+    t.integer "workflow_status"
+    t.integer "business_type"
+    t.boolean "auto_renew"
+    t.datetime "discarded_at"
+    t.jsonb "metadata", default: {}
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["branch_id"], name: "index_subscription_plan_appointments_on_branch_id"
+    t.index ["company_id"], name: "index_subscription_plan_appointments_on_company_id"
+    t.index ["discarded_at"], name: "index_subscription_plan_appointments_on_discarded_at"
+    t.index ["subscription_group_id"], name: "index_subscription_plan_appointments_on_subscription_group_id"
+    t.index ["subscription_plan_id"], name: "index_subscription_plan_appointments_on_subscription_plan_id"
+  end
+
   create_table "subscription_plans", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.uuid "company_id", null: false
     t.uuid "branch_id"
@@ -2349,30 +2437,6 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
     t.index ["branch_id"], name: "index_subscription_plans_on_branch_id"
     t.index ["company_id"], name: "index_subscription_plans_on_company_id"
     t.index ["discarded_at"], name: "index_subscription_plans_on_discarded_at"
-  end
-
-  create_table "subscriptions", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
-    t.uuid "company_id", null: false
-    t.uuid "branch_id"
-    t.uuid "subscription_plan_id"
-    t.uuid "subscription_group_id"
-    t.string "name"
-    t.string "description"
-    t.integer "country_code", null: false
-    t.integer "timezone"
-    t.integer "lifecycle_status"
-    t.integer "workflow_status"
-    t.integer "business_type"
-    t.boolean "auto_renew"
-    t.datetime "discarded_at"
-    t.jsonb "metadata", default: {}
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.index ["branch_id"], name: "index_subscriptions_on_branch_id"
-    t.index ["company_id"], name: "index_subscriptions_on_company_id"
-    t.index ["discarded_at"], name: "index_subscriptions_on_discarded_at"
-    t.index ["subscription_group_id"], name: "index_subscriptions_on_subscription_group_id"
-    t.index ["subscription_plan_id"], name: "index_subscriptions_on_subscription_plan_id"
   end
 
   create_table "system_subscription_groups", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -2767,6 +2831,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
   add_foreign_key "invoices", "categories"
   add_foreign_key "invoices", "companies"
   add_foreign_key "invoices", "orders"
+  add_foreign_key "membership_appointments", "memberships"
   add_foreign_key "notification_appointments", "companies"
   add_foreign_key "notification_appointments", "notifications"
   add_foreign_key "notification_group_appointments", "companies"
@@ -2837,6 +2902,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
   add_foreign_key "questions", "branches"
   add_foreign_key "questions", "categories"
   add_foreign_key "questions", "companies"
+  add_foreign_key "reservation_appointments", "reservations", column: "reservations_id"
   add_foreign_key "role_appointments", "companies"
   add_foreign_key "role_appointments", "roles"
   add_foreign_key "roles", "branches"
@@ -2880,12 +2946,12 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_172509) do
   add_foreign_key "subscription_groups", "companies"
   add_foreign_key "subscription_groups", "subscription_groups"
   add_foreign_key "subscription_groups", "subscription_plans"
+  add_foreign_key "subscription_plan_appointments", "branches"
+  add_foreign_key "subscription_plan_appointments", "companies"
+  add_foreign_key "subscription_plan_appointments", "subscription_groups"
+  add_foreign_key "subscription_plan_appointments", "subscription_plans"
   add_foreign_key "subscription_plans", "branches"
   add_foreign_key "subscription_plans", "companies"
-  add_foreign_key "subscriptions", "branches"
-  add_foreign_key "subscriptions", "companies"
-  add_foreign_key "subscriptions", "subscription_groups"
-  add_foreign_key "subscriptions", "subscription_plans"
   add_foreign_key "system_subscription_groups", "branches"
   add_foreign_key "system_subscription_groups", "companies"
   add_foreign_key "system_subscription_groups", "system_subscription_plans"
