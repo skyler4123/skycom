@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_05_02_010637) do
+ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pgcrypto"
@@ -1961,6 +1961,38 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_02_010637) do
     t.index ["discarded_at"], name: "index_questions_on_discarded_at"
   end
 
+  create_table "reservation_appointments", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "reservations_id", null: false
+    t.string "appoint_from_type"
+    t.uuid "appoint_from_id"
+    t.string "appoint_to_type", null: false
+    t.uuid "appoint_to_id", null: false
+    t.string "appoint_for_type"
+    t.uuid "appoint_for_id"
+    t.string "appoint_by_type"
+    t.uuid "appoint_by_id"
+    t.integer "lifecycle_status"
+    t.integer "workflow_status"
+    t.integer "business_type"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["appoint_by_type", "appoint_by_id"], name: "index_reservation_appointments_on_appoint_by"
+    t.index ["appoint_for_type", "appoint_for_id"], name: "index_reservation_appointments_on_appoint_for"
+    t.index ["appoint_from_type", "appoint_from_id"], name: "index_reservation_appointments_on_appoint_from"
+    t.index ["appoint_to_type", "appoint_to_id"], name: "index_reservation_appointments_on_appoint_to"
+    t.index ["reservations_id"], name: "index_reservation_appointments_on_reservations_id"
+  end
+
+  create_table "reservations", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.string "name"
+    t.string "code", null: false
+    t.integer "lifecycle_status"
+    t.integer "workflow_status"
+    t.integer "business_type"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
   create_table "role_appointments", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.uuid "company_id", null: false
     t.uuid "role_id", null: false
@@ -2870,6 +2902,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_02_010637) do
   add_foreign_key "questions", "branches"
   add_foreign_key "questions", "categories"
   add_foreign_key "questions", "companies"
+  add_foreign_key "reservation_appointments", "reservations", column: "reservations_id"
   add_foreign_key "role_appointments", "companies"
   add_foreign_key "role_appointments", "roles"
   add_foreign_key "roles", "branches"
