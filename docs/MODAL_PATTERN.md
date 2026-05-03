@@ -188,6 +188,47 @@ export const openModal = ({ html = "Model!", customClass = {}, ...rest }) => {
 3. **`data-controller` attribute** — This tells Stimulus which controller to initialize
 4. **SweetAlert2** — openModal is a wrapper around SweetAlert2, so it supports all SweetAlert options
 
+## Form Helper Usage (IMPORTANT)
+
+The `form()` helper in `ui_helpers.js` uses a specific pattern. Always use the `attributes` keyword parameter to pass HTML attributes.
+
+### Correct Usage
+
+```javascript
+form({
+  action: Helpers.company_employees_path(companyId),
+  method: "POST",
+  attributes: `
+    class="p-8 bg-white dark:bg-slate-900 rounded-2xl w-[500px] shadow-2xl"
+    data-action="submit->${this.identifier}#handleSubmit"
+  `,
+  html: fields
+})
+```
+
+### Parameters
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `action` | string | URL endpoint for form submission |
+| `method` | string | HTTP method (POST, PATCH, DELETE) |
+| `attributes` | string | **Required** - Raw string with HTML attributes (class, data-action, etc.) |
+| `html` | string | **Required** - Inner HTML content (form fields) |
+
+### Common Mistakes
+
+| Wrong | Correct |
+|-------|---------|
+| `className: "p-8 ..."` | `attributes: \`class="p-8 ..."\`` |
+| `dataAction: "submit->form#submit"` | `attributes: \`data-action="submit->form#submit"\`` |
+
+### Important Notes
+
+1. Use `attributes` keyword parameter (not `className`, not `dataAction`)
+2. Combine all attributes in one string with backticks
+3. Include `data-action` for form submission handling
+4. Use `submit->form#submit` to let FormController handle the submission
+
 ## Button Hookup in contentHTML
 
 In your index controller's `contentHTML()`, hook the button to the action:

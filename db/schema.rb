@@ -528,6 +528,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.string "website"
     t.integer "employee_count"
     t.integer "fiscal_year_end_month"
+    t.text "resource_names", default: [], array: true
     t.datetime "discarded_at"
     t.jsonb "metadata", default: {}
     t.string "permission_resource_name"

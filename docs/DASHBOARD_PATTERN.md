@@ -301,8 +301,10 @@ export default class Companies_Branches_NewModalController extends Controller {
     return form({
       action: pathname(),
       method: "POST",
-      dataAction: `submit->form#submit`,
-      className: "p-8 bg-white dark:bg-slate-900 rounded-2xl w-[500px] shadow-2xl",
+      attributes: `
+        class="p-8 bg-white dark:bg-slate-900 rounded-2xl w-[500px] shadow-2xl"
+        data-action="submit->form#submit"
+      `,
       html: fields
     })
   }

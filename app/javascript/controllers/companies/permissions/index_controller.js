@@ -1,4 +1,5 @@
 import Companies_LayoutController from "controllers/companies/layout_controller"
+import Companies_Permissions_AddResourceModalController from "controllers/companies/permissions/add_resource_modal_controller"
 
 export default class Companies_Permissions_IndexController extends Companies_LayoutController {
   async connect() {
@@ -62,6 +63,7 @@ export default class Companies_Permissions_IndexController extends Companies_Lay
   roleCardHTML(role) {
     const groupedByResource = this.groupPoliciesByResource(role.policies)
     const resources = Object.keys(groupedByResource).sort()
+    const assignedResources = resources
 
     return `
       <div class="role-section" data-role-id="${role.id}">
@@ -76,6 +78,19 @@ export default class Companies_Permissions_IndexController extends Companies_Lay
         </div>
         <div class="p-6 space-y-4">
           ${resources.map(resourceName => this.resourceSectionHTML(resourceName, groupedByResource[resourceName])).join('')}
+        </div>
+        <div class="px-6 pb-6 pt-2">
+          <button
+            type="button"
+            data-action="click->${this.identifier}#openAddResourceModal"
+            data-${this.identifier}-role-id-param="${role.id}"
+            data-${this.identifier}-role-name-param="${role.name}"
+            data-${this.identifier}-assigned-resources-param="${assignedResources.join(',')}"
+            class="flex items-center gap-2 px-4 py-2 text-sm font-medium text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition-colors"
+          >
+            <span class="material-symbols-outlined text-[18px]">add</span>
+            Add Resource
+          </button>
         </div>
       </div>
     `
@@ -149,5 +164,19 @@ export default class Companies_Permissions_IndexController extends Companies_Lay
 
   async refresh(event) {
     await this.loadData()
+  }
+
+  openAddResourceModal(event) {
+    const roleId = event.params.roleId
+    const roleName = event.params.roleName
+    const assignedResourcesStr = event.params.assignedResources || ''
+    const assignedResources = assignedResourcesStr ? assignedResourcesStr.split(',') : []
+
+    openModal({ html: `<div
+      data-controller="${identifier(Companies_Permissions_AddResourceModalController)}"
+      data-${identifier(Companies_Permissions_AddResourceModalController)}-role-id-value="${roleId}"
+      data-${identifier(Companies_Permissions_AddResourceModalController)}-role-name-value="${roleName}"
+      data-${identifier(Companies_Permissions_AddResourceModalController)}-assigned-resources-value='${JSON.stringify(assignedResources)}'
+    ></div>` })
   }
 }

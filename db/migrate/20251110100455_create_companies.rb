@@ -23,6 +23,7 @@ class CreateCompanies < ActiveRecord::Migration[8.0]
       t.string :website
       t.integer :employee_count
       t.integer :fiscal_year_end_month
+      t.text :resource_names, array: true, default: []
       t.datetime :discarded_at
       t.jsonb :metadata, default: {}
       t.string :permission_resource_name
