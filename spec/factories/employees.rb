@@ -9,7 +9,8 @@ FactoryBot.define do
     transient do
       departments { [] }
       roles { [] }
-      employee_business_type { nil }
+      # Test factory should never produce owner - causes validation failures
+      employee_business_type { [:full_time, :part_time, :contractor, :intern].sample }
     end
 
     initialize_with do
