@@ -23,7 +23,8 @@ Rails.application.routes.draw do
       resources :bookings
       resources :payments
       resources :employees
-      resources :inventories
+      resources :stocks
+      resources :stock_transfers
       resources :customers
       resources :invoices
       resources :schedules

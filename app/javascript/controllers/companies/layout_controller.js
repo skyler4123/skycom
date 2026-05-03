@@ -132,11 +132,19 @@ export default class Companies_LayoutController extends Controller {
                 </a>
                 <a
                   class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:bg-blue-100 open:text-blue-600"
-                  href="${Helpers.company_inventories_path(currentCompany().id)}"
+                  href="${Helpers.company_stocks_path(currentCompany().id)}"
                   ${openByPathname()}
                 >
                   <span class="material-symbols-outlined">inventory</span>
-                  <p class="text-sm font-medium leading-normal">Inventories</p>
+                  <p class="text-sm font-medium leading-normal">Stocks</p>
+                </a>
+                <a
+                  class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:bg-blue-100 open:text-blue-600"
+                  href="${Helpers.company_stock_transfers_path(currentCompany().id)}"
+                  ${openByPathname()}
+                >
+                  <span class="material-symbols-outlined">swap_horiz</span>
+                  <p class="text-sm font-medium leading-normal">Stock Transfers</p>
                 </a>
                 <a
                   class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:bg-blue-100 open:text-blue-600"

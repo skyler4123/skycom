@@ -79,4 +79,5 @@ export const company_payslips_path = (companyId) => `/companies/${companyId}/pay
 export const company_invoices_path = (companyId) => `/companies/${companyId}/invoices`
 export const create_company_invoices_path = (companyId) => `/companies/${companyId}/invoices`
 export const edit_company_invoice_path = (companyId, invoiceId) => `/companies/${companyId}/invoices/${invoiceId}`
-export const company_inventories_path = (companyId) => `/companies/${companyId}/inventories`
+export const company_stocks_path = (companyId) => `/companies/${companyId}/stocks`
+export const company_stock_transfers_path = (companyId) => `/companies/${companyId}/stock_transfers`
