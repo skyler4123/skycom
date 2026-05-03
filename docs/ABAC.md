@@ -575,4 +575,136 @@ end
 | Full permissions | `owner_role?` check in `can?` method |
 | Hidden from UI | Filtered in `Company#permissions` |
 
+---
+
+## 14. Owner Uniqueness Validation
+
+Skycom enforces that only ONE employee can be the "owner" in both the Employee table and RoleAppointment table. This ensures proper permission hierarchy and prevents conflicting ownership.
+
+### A. Employee Owner Uniqueness
+
+Only ONE employee with `business_type='owner'` is allowed per company. This validation prevents duplicate owner employees from being created.
+
+**Implementation:**
+```ruby
+# app/models/employee.rb
+validate :only_one_owner_per_company, on: :create
+
+private
+
+def only_one_owner_per_company
+  return unless business_type.to_s == "owner" && company_id.present?
+  
+  # Allow if this employee is updating their own record
+  return if persisted? && self.id == Employee.find_by(company_id: company_id, business_type: :owner)&.id
+
+  owner_exists = Employee.where(company_id: company_id, business_type: :owner)
+    .where.not(id: self.id)
+    .exists?
+
+  if owner_exists
+    errors.add(:base, "Only one owner employee is allowed per company.")
+  end
+end
+```
+
+**Behavior:**
+| Action | Result |
+|--------|--------|
+| Create first owner employee | ✅ Allowed |
+| Create second owner employee | ❌ Validation error blocked |
+| Update existing owner employee | ✅ Allowed |
+| Change existing owner to non-owner | ✅ Allowed |
+
+**Error message:**
+```
+Base: Only one owner employee is allowed per company.
+```
+
+---
+
+### B. RoleAppointment Owner Validation
+
+RoleAppointments with `business_type='owner'` have two constraints:
+
+1. **Only ONE owner role appointment per company** - Prevents multiple role appointments marked as owner
+2. **Owner role can only be assigned to employees with business_type='owner'** - Ensures the role assignment matches the employee's type
+
+**Implementation:**
+```ruby
+# app/models/role_appointment.rb
+validate :only_one_owner_appointment_per_company, on: :create
+
+private
+
+def only_one_owner_appointment_per_company
+  return unless business_type.to_s == "owner" && company_id.present?
+
+  # Constraint 1: Only one owner appointment per company
+  owner_exists = RoleAppointment.where(
+    company_id: company_id,
+    appoint_to_type: "Employee",
+    business_type: :owner
+  ).where.not(id: self.id).exists?
+
+  if owner_exists
+    errors.add(:base, "Only one owner role assignment is allowed per company.")
+  end
+
+  # Constraint 2: Owner role can only be assigned to owner employees
+  if appoint_to_type == "Employee" && appoint_to_id.present?
+    employee = Employee.find_by(id: appoint_to_id)
+    if employee && employee.business_type.to_s != "owner"
+      errors.add(:base, "Owner role can only be assigned to owner employees.")
+    end
+  end
+end
+```
+
+**Behavior:**
+| Action | Result |
+|--------|--------|
+| Create owner RoleAppointment to owner employee | ✅ Allowed |
+| Create second owner RoleAppointment | ❌ Validation error blocked |
+| Assign owner role to non-owner employee | ❌ Validation error blocked |
+| Update existing owner role appointment | ✅ Allowed |
+
+**Error messages:**
+```
+Base: Only one owner role assignment is allowed per company.
+Base: Owner role can only be assigned to owner employees.
+```
+
+---
+
+### C. Seed Service Fix
+
+The `Seed::EmployeeService` is fixed to never randomly select `:owner` business_type, since owner employees are created via `Company#setup_owner_records`:
+
+```ruby
+# app/services/seed/employee_service.rb
+business_type ||= (Employee.business_types.keys - [:owner]).sample
+```
+
+---
+
+### D. Test Factory Fix
+
+Test factories explicitly use non-owner business types to avoid validation failures:
+
+```ruby
+# spec/factories/employees.rb
+employee_business_type { [:full_time, :part_time, :contractor, :intern].sample }
+```
+
+---
+
+### E. Summary
+
+| Validation | Table | Constraint |
+|------------|-------|------------|
+| Employee uniqueness | `employees` | Only 1 with `business_type='owner'` per company |
+| RoleAppointment uniqueness | `role_appointments` | Only 1 with `business_type='owner'` per company |
+| RoleAppointment → Employee | `role_appointments` | Owner role can only point to employees with `business_type='owner'` |
+
 (End of file)
