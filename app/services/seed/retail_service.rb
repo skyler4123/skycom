@@ -48,6 +48,8 @@ create_retail_company
     create_warehouses_for_branches
     create_stocks_for_products
     create_stock_transfers
+    create_stock_imports
+    create_stock_exports
     create_customer_orders
 
     print_footer
@@ -316,6 +318,46 @@ create_retail_company
           appoint_to: warehouse.branch,
           quantity: stock.quantity,
           workflow_status: :completed,
+          lifecycle_status: :active
+        )
+      end
+    end
+  end
+
+  def create_stock_imports
+    @branches.each do |branch|
+      branch_products = @products.select { |p| p.branch_id == branch.id }
+      next if branch_products.empty?
+
+      branch_products.sample(rand(2..4)).each do |product|
+        Seed::StockImportService.create(
+          company: @retail,
+          branch: branch,
+          product: product,
+          code: "STKIM-#{SecureRandom.hex(4).upcase}",
+          quantity: rand(10..100),
+          business_type: StockImport.business_types.keys.sample,
+          workflow_status: StockImport.workflow_statuses.keys.sample,
+          lifecycle_status: :active
+        )
+      end
+    end
+  end
+
+  def create_stock_exports
+    @branches.each do |branch|
+      branch_products = @products.select { |p| p.branch_id == branch.id }
+      next if branch_products.empty?
+
+      branch_products.sample(rand(2..4)).each do |product|
+        Seed::StockExportService.create(
+          company: @retail,
+          branch: branch,
+          product: product,
+          code: "STKEX-#{SecureRandom.hex(4).upcase}",
+          quantity: rand(5..50),
+          business_type: StockExport.business_types.keys.sample,
+          workflow_status: StockExport.workflow_statuses.keys.sample,
           lifecycle_status: :active
         )
       end

@@ -1,4 +1,4 @@
-class Stock < ApplicationRecord
+class StockImport < ApplicationRecord
   attribute :permission_resource_name, :string, default: -> { self.name }
 
   include TagConcern
@@ -6,15 +6,18 @@ class Stock < ApplicationRecord
   belongs_to :company
   belongs_to :branch, optional: true
   belongs_to :product
-  belongs_to :warehouse
   belongs_to :category, optional: true
+  belongs_to :appoint_from, polymorphic: true, optional: true
+  belongs_to :appoint_to, polymorphic: true, optional: true
+  belongs_to :appoint_for, polymorphic: true, optional: true
+  belongs_to :appoint_by, polymorphic: true, optional: true
 
   enum :lifecycle_status, LIFECYCLE_STATUS, prefix: true
   enum :workflow_status, WORKFLOW_STATUS, prefix: true
   enum :business_type, {
-    inventory: 0,
-    raw_material: 1,
-    finished_good: 2,
-    return: 3
+    purchase: 0,
+    return: 1,
+    transfer_in: 2,
+    adjustment: 3
   }
 end

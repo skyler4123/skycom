@@ -62,6 +62,7 @@ RSpec.feature "Companies::Customers Management", type: :feature, js: true do
       click_button "Save Customer"
     end
     expect(page).to have_selector('tbody tr', wait: 10)
+    expect(page).to have_content("New Test Customer")
 
     expect(Customer.find_by(name: "New Test Customer")).to be_present
   end

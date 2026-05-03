@@ -43,9 +43,9 @@ export default class Companies_LayoutController extends Controller {
     
     return `
       <!-- Layout Wrapper: Font, Background, Colors -->
-      <div class="font-display bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200">
+      <div class="flex flex-1 font-display bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200">
         <!-- Flex Container: Sidebar + Main -->
-        <div class="flex">
+        <div class="flex flex-1">
           <!-- Sidebar -->
           <aside
             class="w-64 hidden open:flex flex-col shrink-0 bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800"
@@ -132,11 +132,35 @@ export default class Companies_LayoutController extends Controller {
                 </a>
                 <a
                   class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:bg-blue-100 open:text-blue-600"
-                  href="${Helpers.company_inventories_path(currentCompany().id)}"
+                  href="${Helpers.company_stocks_path(currentCompany().id)}"
                   ${openByPathname()}
                 >
                   <span class="material-symbols-outlined">inventory</span>
-                  <p class="text-sm font-medium leading-normal">Inventories</p>
+                  <p class="text-sm font-medium leading-normal">Stocks</p>
+                </a>
+                <a
+                  class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:bg-blue-100 open:text-blue-600"
+                  href="${Helpers.company_stock_transfers_path(currentCompany().id)}"
+                  ${openByPathname()}
+                >
+                  <span class="material-symbols-outlined">swap_horiz</span>
+                  <p class="text-sm font-medium leading-normal">Stock Transfers</p>
+                </a>
+                <a
+                  class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:bg-blue-100 open:text-blue-600"
+                  href="${Helpers.company_stock_imports_path(currentCompany().id)}"
+                  ${openByPathname()}
+                >
+                  <span class="material-symbols-outlined">download</span>
+                  <p class="text-sm font-medium leading-normal">Stock Imports</p>
+                </a>
+                <a
+                  class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:bg-blue-100 open:text-blue-600"
+                  href="${Helpers.company_stock_exports_path(currentCompany().id)}"
+                  ${openByPathname()}
+                >
+                  <span class="material-symbols-outlined">upload</span>
+                  <p class="text-sm font-medium leading-normal">Stock Exports</p>
                 </a>
                 <a
                   class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:bg-blue-100 open:text-blue-600"

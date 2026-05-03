@@ -58,6 +58,26 @@ class ClientCacheController < ApplicationController
             },
             company: {
               business_types: Company.business_types.keys.map { |t| { name: t.humanize, value: t } }
+            },
+            stock: {
+              lifecycle_statuses: Stock.lifecycle_statuses.keys.map { |s| { name: s.humanize, value: s } },
+              workflow_statuses: Stock.workflow_statuses.keys.map { |s| { name: s.humanize, value: s } },
+              business_types: Stock.business_types.keys.map { |t| { name: t.humanize, value: t } }
+            },
+            stock_transfer: {
+              lifecycle_statuses: StockTransfer.lifecycle_statuses.keys.map { |s| { name: s.humanize, value: s } },
+              workflow_statuses: StockTransfer.workflow_statuses.keys.map { |s| { name: s.humanize, value: s } },
+              business_types: StockTransfer.business_types.keys.map { |t| { name: t.humanize, value: t } }
+            },
+            stock_import: {
+              lifecycle_statuses: StockImport.lifecycle_statuses.keys.map { |s| { name: s.humanize, value: s } },
+              workflow_statuses: StockImport.workflow_statuses.keys.map { |s| { name: s.humanize, value: s } },
+              business_types: StockImport.business_types.keys.map { |t| { name: t.humanize, value: t } }
+            },
+            stock_export: {
+              lifecycle_statuses: StockExport.lifecycle_statuses.keys.map { |s| { name: s.humanize, value: s } },
+              workflow_statuses: StockExport.workflow_statuses.keys.map { |s| { name: s.humanize, value: s } },
+              business_types: StockExport.business_types.keys.map { |t| { name: t.humanize, value: t } }
             }
           },
           employees: current_user.employees

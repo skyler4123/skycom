@@ -2293,6 +2293,78 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.index ["recorded_at"], name: "index_statistics_on_recorded_at"
   end
 
+  create_table "stock_exports", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "company_id", null: false
+    t.uuid "branch_id"
+    t.uuid "product_id", null: false
+    t.string "appoint_from_type"
+    t.uuid "appoint_from_id"
+    t.string "appoint_to_type"
+    t.uuid "appoint_to_id"
+    t.string "appoint_for_type"
+    t.uuid "appoint_for_id"
+    t.string "appoint_by_type"
+    t.uuid "appoint_by_id"
+    t.uuid "category_id"
+    t.string "name"
+    t.string "description"
+    t.string "code"
+    t.integer "quantity"
+    t.integer "lifecycle_status"
+    t.integer "workflow_status"
+    t.integer "business_type"
+    t.datetime "discarded_at"
+    t.jsonb "metadata", default: {}
+    t.string "permission_resource_name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["appoint_by_type", "appoint_by_id"], name: "index_stock_exports_on_appoint_by"
+    t.index ["appoint_for_type", "appoint_for_id"], name: "index_stock_exports_on_appoint_for"
+    t.index ["appoint_from_type", "appoint_from_id"], name: "index_stock_exports_on_appoint_from"
+    t.index ["appoint_to_type", "appoint_to_id"], name: "index_stock_exports_on_appoint_to"
+    t.index ["branch_id"], name: "index_stock_exports_on_branch_id"
+    t.index ["category_id"], name: "index_stock_exports_on_category_id"
+    t.index ["company_id"], name: "index_stock_exports_on_company_id"
+    t.index ["discarded_at"], name: "index_stock_exports_on_discarded_at"
+    t.index ["product_id"], name: "index_stock_exports_on_product_id"
+  end
+
+  create_table "stock_imports", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "company_id", null: false
+    t.uuid "branch_id"
+    t.uuid "product_id", null: false
+    t.string "appoint_from_type"
+    t.uuid "appoint_from_id"
+    t.string "appoint_to_type"
+    t.uuid "appoint_to_id"
+    t.string "appoint_for_type"
+    t.uuid "appoint_for_id"
+    t.string "appoint_by_type"
+    t.uuid "appoint_by_id"
+    t.uuid "category_id"
+    t.string "name"
+    t.string "description"
+    t.string "code"
+    t.integer "quantity"
+    t.integer "lifecycle_status"
+    t.integer "workflow_status"
+    t.integer "business_type"
+    t.datetime "discarded_at"
+    t.jsonb "metadata", default: {}
+    t.string "permission_resource_name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["appoint_by_type", "appoint_by_id"], name: "index_stock_imports_on_appoint_by"
+    t.index ["appoint_for_type", "appoint_for_id"], name: "index_stock_imports_on_appoint_for"
+    t.index ["appoint_from_type", "appoint_from_id"], name: "index_stock_imports_on_appoint_from"
+    t.index ["appoint_to_type", "appoint_to_id"], name: "index_stock_imports_on_appoint_to"
+    t.index ["branch_id"], name: "index_stock_imports_on_branch_id"
+    t.index ["category_id"], name: "index_stock_imports_on_category_id"
+    t.index ["company_id"], name: "index_stock_imports_on_company_id"
+    t.index ["discarded_at"], name: "index_stock_imports_on_discarded_at"
+    t.index ["product_id"], name: "index_stock_imports_on_product_id"
+  end
+
   create_table "stock_transfers", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.uuid "company_id", null: false
     t.uuid "branch_id"
@@ -2933,6 +3005,14 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
   add_foreign_key "shifts", "companies"
   add_foreign_key "shifts", "periods"
   add_foreign_key "sign_in_tokens", "users"
+  add_foreign_key "stock_exports", "branches"
+  add_foreign_key "stock_exports", "categories"
+  add_foreign_key "stock_exports", "companies"
+  add_foreign_key "stock_exports", "products"
+  add_foreign_key "stock_imports", "branches"
+  add_foreign_key "stock_imports", "categories"
+  add_foreign_key "stock_imports", "companies"
+  add_foreign_key "stock_imports", "products"
   add_foreign_key "stock_transfers", "branches"
   add_foreign_key "stock_transfers", "categories"
   add_foreign_key "stock_transfers", "companies"
