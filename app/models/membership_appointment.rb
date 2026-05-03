@@ -1,5 +1,5 @@
 # app/models/membership_appointment.rb
-class Membership_appointment < ApplicationRecord
+class MembershipAppointment < ApplicationRecord
   belongs_to :membership
   belongs_to :appoint_from, polymorphic: true, optional: true
   belongs_to :appoint_to, polymorphic: true   # The Customer or User
