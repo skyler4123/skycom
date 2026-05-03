@@ -28,13 +28,14 @@ class RoleAppointment < ApplicationRecord
   def only_one_owner_appointment_per_company
     return unless business_type.to_s == "owner" && company_id.present?
 
-    # Existing: Only one owner appointment per company
-    existing = RoleAppointment.find_by(
+    # Only one owner appointment per company (exclude self for updates)
+    owner_exists = RoleAppointment.where(
       company_id: company_id,
       appoint_to_type: "Employee",
       business_type: :owner
-    )
-    if existing && existing.id != self.id
+    ).where.not(id: self.id).exists?
+
+    if owner_exists
       errors.add(:base, "Only one owner role assignment is allowed per company.")
     end
 

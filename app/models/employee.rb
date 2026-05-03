@@ -52,8 +52,15 @@ class Employee < ApplicationRecord
   def only_one_owner_per_company
     return unless business_type.to_s == "owner" && company_id.present?
 
-    existing_owner = Employee.find_by(company_id: company_id, business_type: :owner)
-    if existing_owner && existing_owner.id != self.id
+    # Only one owner employee per company
+    # Allow if this employee is updating their own record (same id)
+    return if persisted? && self.id == Employee.find_by(company_id: company_id, business_type: :owner)&.id
+
+    owner_exists = Employee.where(company_id: company_id, business_type: :owner)
+      .where.not(id: self.id)
+      .exists?
+
+    if owner_exists
       errors.add(:base, "Only one owner employee is allowed per company.")
     end
   end
