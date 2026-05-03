@@ -29,4 +29,25 @@ RSpec.describe Employee, type: :model do
     it { should define_enum_for(:lifecycle_status) }
     it { should define_enum_for(:workflow_status) }
   end
+
+  describe "owner uniqueness validation" do
+    let!(:company) { create(:company) }
+    let!(:existing_owner) { company.employees.find_by(business_type: :owner) }
+
+    context "when trying to create a second owner employee" do
+      it "adds a validation error" do
+        expect(existing_owner).to be_present
+        second_owner = Employee.new(company: company, name: "Another Owner", business_type: :owner)
+        expect(second_owner).not_to be_valid
+        expect(second_owner.errors[:base]).to include("Only one owner employee is allowed per company.")
+      end
+    end
+
+    context "when creating a non-owner employee" do
+      it "allows creation" do
+        non_owner = Employee.new(company: company, name: "Regular Employee", business_type: :full_time)
+        expect(non_owner).to be_valid
+      end
+    end
+  end
 end
