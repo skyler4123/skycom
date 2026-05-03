@@ -10,7 +10,7 @@ FactoryBot.define do
       departments { [] }
       roles { [] }
       # Test factory should never produce owner - causes validation failures
-      employee_business_type { [:full_time, :part_time, :contractor, :intern].sample }
+      employee_business_type { [ :full_time, :part_time, :contractor, :intern ].sample }
     end
 
     initialize_with do
