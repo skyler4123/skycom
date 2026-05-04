@@ -2,6 +2,8 @@
 
 class Companies::EmployeesController < Companies::ApplicationController
   def index
+    authorize current_employee, :index?, policy_class: Companies::EmployeePolicy
+
     respond_to do |format|
       format.html { render html: "", layout: true }
       format.json do
