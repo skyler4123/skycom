@@ -711,4 +711,156 @@ employee_business_type { ["full_time", "part_time", "contractor", "intern"].samp
 | RoleAppointment uniqueness | `role_appointments` | Only 1 with `business_type='owner'` per company |
 | RoleAppointment → Employee | `role_appointments` | Owner role can only point to employees with `business_type='owner'` |
 
+---
+
+## 15. Authorization with Pundit
+
+Skycom integrates **Pundit** with the ABAC system to provide controller-level authorization. This keeps the frontend simple - the BE handles all permission checks and redirects or returns errors appropriately.
+
+### Core Concept
+
+| Response Format | Behavior |
+|----------------|----------|
+| **HTML** | Redirects to referrer (or root) with flash alert message |
+| **JSON** | Returns `{ error, policy, action }` with 403 status |
+
+Frontend does NOT need to handle authorization - the user either sees the data (authorized) or gets redirected/errors (unauthorized).
+
+### A. Companies::Authorizable Concern
+
+Include this in any company-related controller to enable Pundit authorization:
+
+```ruby
+# app/controllers/companies/application_controller.rb
+class Companies::ApplicationController < ApplicationController
+  include Companies::Authorizable
+  # ... rest of controller
+end
+```
+
+This concern:
+1. Includes `Pundit::Authorization`
+2. Rescues `Pundit::NotAuthorizedError`
+3. Handles unauthorized requests based on response format
+
+### B. Implementation
+
+**File**: `app/controllers/concerns/companies/authorizable.rb`
+
+```ruby
+module Companies::Authorizable
+  extend ActiveSupport::Concern
+
+  included do
+    include Pundit::Authorization
+    rescue_from Pundit::NotAuthorizedError, with: :user_not_authorized
+  end
+
+  private
+
+  def authorize_employee!(action, record, policy_class:)
+    authorize current_employee, "#{action}?", policy_class: policy_class
+  end
+
+  def user_not_authorized(exception)
+    message = "You are not authorized to perform this action."
+
+    respond_to do |format|
+      format.html do
+        flash[:alert] = message
+        redirect_to(request.referrer || root_path)
+      end
+      format.json do
+        render json: {
+          error: message,
+          policy: exception.policy.class.to_s,
+          action: exception.query
+        }, status: :forbidden
+      end
+    end
+  end
+end
+```
+
+### C. Permission Policy
+
+Policies define which actions an employee can perform. They use the ABAC `can?` method:
+
+```ruby
+# app/policies/companies/permission_policy.rb
+class Companies::PermissionPolicy < ApplicationPolicy
+  def index?
+    record.can?(:read, PolicyAppointment)
+  end
+
+  def create?
+    record.can?(:create, PolicyAppointment)
+  end
+
+  def update?
+    record.can?(:update, PolicyAppointment)
+  end
+end
+```
+
+### D. Usage in Controller
+
+Add authorization check to any action that needs protection:
+
+```ruby
+# app/controllers/companies/permissions_controller.rb
+class Companies::PermissionsController < Companies::ApplicationController
+  def index
+    # Pundit checks index? - redirects or returns error if unauthorized
+    authorize current_employee, :index?, policy_class: Companies::PermissionPolicy
+
+    respond_to do |format|
+      format.html { render html: "", layout: true }
+      format.json { render json: { roles: current_company.permissions } }
+    end
+  end
+end
+```
+
+### E. Response Examples
+
+**HTML Request (unauthorized):**
+- Redirects to previous page (or root)
+- Flash: "You are not authorized to perform this action."
+
+**JSON Request (unauthorized):**
+```json
+{
+  "error": "You are not authorized to perform this action.",
+  "policy": "Companies::PermissionPolicy",
+  "action": "index?"
+}
+```
+Status: 403 Forbidden
+
+### F. Frontend Pattern
+
+Since authorization is handled BE-side, Stimulus controllers don't need authorization checks:
+
+```javascript
+// NO authorization check needed - user only sees this page if authorized
+async loadData() {
+  const response = await fetchJson(url)
+  this.roles = response.roles
+  this.renderContent()
+}
+```
+
+If the API returns 403, the user is redirected by the browser. No special handling required.
+
+### Summary
+
+| Layer | Responsibility |
+|-------|----------------|
+| **ABAC** | Defines what permissions employees have |
+| **Pundit Policy** | Maps actions to ABAC `can?` checks |
+| **Controller** | Calls `authorize` to enforce |
+| **Authorizable** | Handles errors (redirect/json) |
+| **Frontend** | Simple - just renders data |
+
 (End of file)
