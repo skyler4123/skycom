@@ -57,6 +57,8 @@ class Companies::EmployeesController < Companies::ApplicationController
   end
 
   def update
+    authorize current_employee, :update?, policy_class: Companies::EmployeePolicy
+
     employee = current_company.employees.find(params[:id])
 
     respond_to do |format|

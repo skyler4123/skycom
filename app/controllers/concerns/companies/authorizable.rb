@@ -18,16 +18,17 @@ module Companies::Authorizable
   end
 
   def user_not_authorized(exception)
-    message = "You are not authorized to perform this action."
+    # Wrap the single message in an array to match Rails validation style
+    error_messages = [ "You are not authorized to perform this action." ]
 
     respond_to do |format|
       format.html do
-        flash[:alert] = message
+        flash[:alert] = error_messages.first
         redirect_to(request.referrer || root_path)
       end
       format.json do
         render json: {
-          error: message,
+          errors: error_messages, # Consistency: always an array
           policy: exception.policy.class.to_s,
           action: exception.query
         }, status: :forbidden
