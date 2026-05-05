@@ -2,6 +2,8 @@
 
 class Companies::EmployeesController < Companies::ApplicationController
   def index
+    authorize current_employee, :index?, policy_class: Companies::EmployeePolicy
+
     respond_to do |format|
       format.html { render html: "", layout: true }
       format.json do
@@ -55,6 +57,8 @@ class Companies::EmployeesController < Companies::ApplicationController
   end
 
   def update
+    authorize current_employee, :update?, policy_class: Companies::EmployeePolicy
+
     employee = current_company.employees.find(params[:id])
 
     respond_to do |format|

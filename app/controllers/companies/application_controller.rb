@@ -1,4 +1,6 @@
 class Companies::ApplicationController < ApplicationController
+  include Companies::Authorizable
+
   before_action :set_company
   before_action :set_employee
 
@@ -6,7 +8,7 @@ class Companies::ApplicationController < ApplicationController
 
   def set_company
     company_id = params[:company_id]
-    @current_company = Company.find(company_id) if company_id.present?
+    @current_company ||= Company.find(company_id) if company_id.present?
   end
 
   def current_company
@@ -14,7 +16,7 @@ class Companies::ApplicationController < ApplicationController
   end
 
   def set_employee
-    @current_employee = current_user.employees.where(company: current_company).first
+    @current_employee ||= current_user.employees.where(company: current_company).first
   end
 
   def current_employee

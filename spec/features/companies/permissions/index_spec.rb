@@ -208,9 +208,8 @@ RSpec.feature "Companies::Permissions Management", type: :feature, js: true do
     sign_in(unauthorized_user)
     visit company_permissions_path(company)
 
-    expect(page).to have_selector('.bg-red-100', wait: 20)
-    expect(page).to have_content("No Access")
-    expect(page).to have_content("You don't have permission to manage permissions")
+    expect(page).not_to have_selector('.role-section')
+    expect(page).to have_content("You are not authorized to perform this action.")
   end
 
   scenario "unsigned in user can not access to this page" do

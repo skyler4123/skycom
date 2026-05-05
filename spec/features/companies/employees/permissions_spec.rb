@@ -460,8 +460,7 @@ RSpec.feature "Companies::Employees Permissions", type: :feature, js: true do
     expect(delete_emp.can?(:delete, Employee)).to be_falsey
   end
 
-  # Note: UI shows page to all employees - the permission check happens at backend
-  scenario "UI still accessible after permission removal (UI doesn't gate)" do
+  scenario "reader is redirected after permission removal" do
     sign_in(owner)
     visit company_permissions_path(company)
 
@@ -480,12 +479,11 @@ RSpec.feature "Companies::Employees Permissions", type: :feature, js: true do
     company.clear_permissions_cache
     reader_employee.clear_permissions_cache
 
-    # UI doesn't gate - employee can still see the page
     sign_in(reader_user)
     visit company_employees_path(company)
 
-    # The UI is accessible but backend would reject actions
-    expect(page).to have_selector('table', wait: 10)
+    expect(page).not_to have_selector('table')
+    expect(page).to have_content("You are not authorized to perform this action.")
   end
 
   # =========================================================================

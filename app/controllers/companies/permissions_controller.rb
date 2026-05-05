@@ -3,6 +3,9 @@ class Companies::PermissionsController < Companies::ApplicationController
 
   # Shell First pattern - index action returns empty HTML, Stimulus renders content
   def index
+    # We pass current_employee. Pundit matches this to PermissionPolicy
+    # because we explicitly define the policy_class.
+    authorize current_employee, :index?, policy_class: Companies::PermissionPolicy
     respond_to do |format|
       format.html { render html: "", layout: true }
       format.json { render json: { roles: current_company.permissions, authorized: can_manage_permissions? } }

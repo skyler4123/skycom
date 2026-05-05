@@ -111,7 +111,13 @@ export default class EditableController extends Controller {
 
       this.close()
     } catch (error) {
-      toast({ type: "error", message: this.errorMessageValue })
+      // Standardize: Join the array into a single string for the toast
+      const message = error.errors ? error.errors.join(". ") : this.errorMessageValue
+      
+      toast({ 
+        type: "error", 
+        message: message 
+      })
       this.cancel()
     } finally {
       this.inputElement.disabled = false
