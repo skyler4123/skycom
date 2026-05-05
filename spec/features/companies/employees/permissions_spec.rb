@@ -177,6 +177,30 @@ RSpec.feature "Companies::Employees Permissions", type: :feature, js: true do
   end
 
   # =========================================================================
+  # SCENARIO 2a: Employee WITHOUT create permission gets error when trying to create
+  # =========================================================================
+  scenario "employee without create permission cannot create new employee" do
+    creator_employee.clear_permissions_cache
+    sign_in(creator_user)
+    visit company_employees_path(company)
+
+    expect(page).to have_selector('table', wait: 10)
+    expect(page).to have_selector('[data-action*="openNewModal"]', wait: 5)
+
+    find('[data-action*="openNewModal"]').click
+
+    expect(page).to have_selector('form[data-action*="handleSubmit"]', wait: 10)
+    fill_in 'employee[name]', with: 'Should Not Be Created'
+    select 'Full Time', from: 'employee[business_type]'
+
+    click_button "Save Employee"
+
+    expect(page).to have_content("You are not authorized to perform this action.", wait: 10)
+
+    expect(Employee.find_by(name: "Should Not Be Created")).to be_nil
+  end
+
+  # =========================================================================
   # SCENARIO 3: Editor with READ+UPDATE can edit employee
   # =========================================================================
   # Note: Currently the UI shows edit buttons regardless of permissions

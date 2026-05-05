@@ -33,6 +33,8 @@ class Companies::EmployeesController < Companies::ApplicationController
   end
 
   def create
+    authorize current_employee, :create?, policy_class: Companies::EmployeePolicy
+
     respond_to do |format|
       format.json do
         # Using your Seed::EmployeeService to handle the creation logic
