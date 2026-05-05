@@ -180,8 +180,34 @@ RSpec.feature "Companies::Employees Permissions", type: :feature, js: true do
   # SCENARIO 2a: Employee WITHOUT create permission gets error when trying to create
   # =========================================================================
   scenario "employee without create permission cannot create new employee" do
-    creator_employee.clear_permissions_cache
-    sign_in(creator_user)
+    sign_in(owner)
+    visit company_permissions_path(company)
+
+    no_permission_section = find('.role-section', text: "NoPermission")
+
+    unless no_permission_section.has_content?("Can read Employee")
+      no_permission_section.click_button("Add Resource")
+      within(".swal2-html-container") do
+        select "Employee", from: "permission[resource_name]"
+        click_button "Add Resource"
+      end
+      expect(page).to have_content("Resource added successfully", wait: 10)
+    end
+
+    no_permission_section = find('.role-section', text: "NoPermission")
+    read_label = no_permission_section.all('label').find { |l| l.text.include?("Can read Employee") }
+    read_checkbox = read_label.find('input[type="checkbox"]')
+
+    unless read_checkbox.checked?
+      accept_confirm do
+        read_checkbox.click
+      end
+      expect(page).to have_selector('input[type="checkbox"]:checked', wait: 10)
+    end
+
+    company.clear_permissions_cache
+
+    sign_in(no_permission_user)
     visit company_employees_path(company)
 
     expect(page).to have_selector('table', wait: 10)
