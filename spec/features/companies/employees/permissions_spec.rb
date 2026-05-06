@@ -596,10 +596,10 @@ RSpec.feature "Companies::Employees Permissions", type: :feature, js: true do
 
     expect(page).to have_selector('.editable-input', wait: 5)
 
-    find('.editable-input').fill_in(with: 'Updated Name via Editable')
+    editable_name_field.find('.editable-input').fill_in(with: 'Updated Name via Editable')
 
     accept_confirm do
-      find('.editable-input').send_keys :enter
+      editable_name_field.find('.editable-input').send_keys :enter
     end
 
     expect(page).to have_content("Employee name updated successfully!", wait: 10)
@@ -668,10 +668,10 @@ RSpec.feature "Companies::Employees Permissions", type: :feature, js: true do
 
     expect(page).to have_selector('.editable-input', wait: 5)
 
-    find('.editable-input').fill_in(with: 'Attempted Update')
+    editable_name_field.find('.editable-input').fill_in(with: 'Attempted Update')
 
     accept_confirm do
-      find('.editable-input').send_keys :enter
+      editable_name_field.find('.editable-input').send_keys :enter
     end
 
     expect(page).to have_content("You are not authorized to perform this action.", wait: 10)
