@@ -2,7 +2,7 @@
 
 class Companies::EmployeesController < Companies::ApplicationController
   def index
-    authorize current_employee, :index?, policy_class: Companies::EmployeePolicy
+    authorize current_employee, :index?, policy_class: Companies::EmployeesPolicy
 
     respond_to do |format|
       format.html { render html: "", layout: true }
@@ -33,7 +33,7 @@ class Companies::EmployeesController < Companies::ApplicationController
   end
 
   def create
-    authorize current_employee, :create?, policy_class: Companies::EmployeePolicy
+    authorize current_employee, :create?, policy_class: Companies::EmployeesPolicy
 
     respond_to do |format|
       format.json do
@@ -59,7 +59,7 @@ class Companies::EmployeesController < Companies::ApplicationController
   end
 
   def update
-    authorize current_employee, :update?, policy_class: Companies::EmployeePolicy
+    authorize current_employee, :update?, policy_class: Companies::EmployeesPolicy
 
     employee = current_company.employees.find(params[:id])
 

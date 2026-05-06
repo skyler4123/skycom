@@ -4,35 +4,37 @@ module Companies::Authorizable
 
   included do
     include Pundit::Authorization
-
-    # Catch Pundit errors and route them to our custom handler
+    before_action :authorize_current_employee!
     rescue_from Pundit::NotAuthorizedError, with: :user_not_authorized
   end
 
   private
 
-  # A helper to authorize the employee for a specific action/resource
-  # Usage: authorize_employee!(:read, PolicyAppointment, policy_class: Companies::PermissionPolicy)
-  def authorize_employee!(action, record, policy_class:)
-    authorize current_employee, "#{action}?", policy_class: policy_class
+  def authorize_current_employee!
+    return unless current_employee
+
+    # 1. Derive Policy Class (e.g., Companies::EmployeesController -> Companies::EmployeesPolicy)
+    # We remove "Controller" but keep the plural "Employees"
+    policy_class_name = self.class.name.sub("Controller", "Policy")
+
+    # 2. Derive Action (e.g., 'index' -> 'index?')
+    query_method = "#{action_name}?"
+
+    begin
+      policy_class = policy_class_name.constantize
+      # We pass current_employee as the 'record' to the policy
+      authorize current_employee, query_method, policy_class: policy_class
+    rescue NameError
+      # If the policy doesn't exist, we can choose to deny access or allow it.
+      # For an ERP, denying by default is safer.
+      render json: { errors: [ "Security Policy for #{policy_class_name} not found." ] }, status: :internal_server_error
+    end
   end
 
   def user_not_authorized(exception)
-    # Wrap the single message in an array to match Rails validation style
-    error_messages = [ "You are not authorized to perform this action." ]
-
-    respond_to do |format|
-      format.html do
-        flash[:alert] = error_messages.first
-        redirect_to(request.referrer || root_path)
-      end
-      format.json do
-        render json: {
-          errors: error_messages, # Consistency: always an array
-          policy: exception.policy.class.to_s,
-          action: exception.query
-        }, status: :forbidden
-      end
-    end
+    # Your existing logic to return the 'errors' array to Stimulus
+    render json: {
+      errors: [ "You are not authorized to perform this action." ]
+    }, status: :forbidden
   end
 end
