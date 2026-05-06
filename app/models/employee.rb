@@ -5,6 +5,7 @@ class Employee < ApplicationRecord
   include RoleConcern
   include Employee::PermissionConcern
   include TagConcern
+  include Discard::Model
 
   attribute :permission_resource_name, :string, default: -> { self.name }
 

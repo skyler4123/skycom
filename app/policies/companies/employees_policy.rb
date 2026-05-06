@@ -1,5 +1,5 @@
-# app/policies/companies/employee_policy.rb
-class Companies::EmployeePolicy < ApplicationPolicy
+# app/policies/companies/employees_policy.rb
+class Companies::EmployeesPolicy < ApplicationPolicy
   def index?
     # 'record' is the current_employee passed from the controller
     record.can?(:read, Employee)

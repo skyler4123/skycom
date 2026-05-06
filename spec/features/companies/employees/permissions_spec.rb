@@ -50,17 +50,23 @@ RSpec.feature "Companies::Employees Permissions", type: :feature, js: true do
 
   let!(:creator_user) { create(:user, :company_employee) }
   let!(:creator_employee) do
-    create(:employee, company: company, branch: branch, user: creator_user, roles: [ creator_role ])
+    create(:employee, company: company, branch: branch, user: creator_user, roles: [ creator_role ]).tap do
+      company.clear_permissions_cache
+    end
   end
 
   let!(:editor_user) { create(:user, :company_employee) }
   let!(:editor_employee) do
-    create(:employee, company: company, branch: branch, user: editor_user, roles: [ editor_role ])
+    create(:employee, company: company, branch: branch, user: editor_user, roles: [ editor_role ]).tap do
+      company.clear_permissions_cache
+    end
   end
 
   let!(:no_permission_user) { create(:user, :company_employee) }
   let!(:no_permission_employee) do
-    create(:employee, company: company, branch: branch, user: no_permission_user, roles: [ no_permission_role ])
+    create(:employee, company: company, branch: branch, user: no_permission_user, roles: [ no_permission_role ]).tap do
+      company.clear_permissions_cache
+    end
   end
 
   # Target employee for edit/delete tests
@@ -150,6 +156,9 @@ RSpec.feature "Companies::Employees Permissions", type: :feature, js: true do
 
   scenario "creator can create new employee and see in table" do
     creator_employee.clear_permissions_cache
+    company.clear_permissions_cache
+    creator_employee.reload
+
     sign_in(creator_user)
     visit company_employees_path(company)
 
@@ -161,6 +170,7 @@ RSpec.feature "Companies::Employees Permissions", type: :feature, js: true do
     select 'Full Time', from: 'employee[business_type]'
 
     click_button "Save Employee"
+    sleep 1
     expect(page).to have_selector('tbody tr', wait: 10)
 
     expect(Employee.find_by(name: "Created by Creator")).to be_present
@@ -174,6 +184,56 @@ RSpec.feature "Companies::Employees Permissions", type: :feature, js: true do
     expect(creator_employee.can?(:create, Employee)).to be_truthy
     expect(creator_employee.can?(:update, Employee)).to be_falsey
     expect(creator_employee.can?(:delete, Employee)).to be_falsey
+  end
+
+  # =========================================================================
+  # SCENARIO 2a: Employee WITHOUT create permission gets error when trying to create
+  # =========================================================================
+  scenario "employee without create permission cannot create new employee" do
+    sign_in(owner)
+    visit company_permissions_path(company)
+
+    no_permission_section = find('.role-section', text: "NoPermission")
+
+    unless no_permission_section.has_content?("Can read Employee")
+      no_permission_section.click_button("Add Resource")
+      within(".swal2-html-container") do
+        select "Employee", from: "permission[resource_name]"
+        click_button "Add Resource"
+      end
+      expect(page).to have_content("Resource added successfully", wait: 10)
+    end
+
+    no_permission_section = find('.role-section', text: "NoPermission")
+    read_label = no_permission_section.all('label').find { |l| l.text.include?("Can read Employee") }
+    read_checkbox = read_label.find('input[type="checkbox"]')
+
+    unless read_checkbox.checked?
+      accept_confirm do
+        read_checkbox.click
+      end
+      expect(page).to have_selector('input[type="checkbox"]:checked', wait: 10)
+    end
+
+    company.clear_permissions_cache
+
+    sign_in(no_permission_user)
+    visit company_employees_path(company)
+
+    expect(page).to have_selector('table', wait: 10)
+    expect(page).to have_selector('[data-action*="openNewModal"]', wait: 5)
+
+    find('[data-action*="openNewModal"]').click
+
+    expect(page).to have_selector('form[data-action*="handleSubmit"]', wait: 10)
+    fill_in 'employee[name]', with: 'Should Not Be Created'
+    select 'Full Time', from: 'employee[business_type]'
+
+    click_button "Save Employee"
+
+    expect(page).to have_content("You are not authorized to perform this action.", wait: 10)
+
+    expect(Employee.find_by(name: "Should Not Be Created")).to be_nil
   end
 
   # =========================================================================
@@ -484,6 +544,140 @@ RSpec.feature "Companies::Employees Permissions", type: :feature, js: true do
 
     expect(page).not_to have_selector('table')
     expect(page).to have_content("You are not authorized to perform this action.")
+  end
+
+  # =========================================================================
+  # SCENARIO 9: Employee WITH update permission CAN edit another employee's name via editable
+  # =========================================================================
+  scenario "employee with update permission can edit another employee's name via editable" do
+    sign_in(owner)
+    visit company_permissions_path(company)
+
+    editor_section = find('.role-section', text: "Editor")
+
+    unless editor_section.has_content?("Can update Employee")
+      editor_section.click_button("Add Resource")
+      within(".swal2-html-container") do
+        select "Employee", from: "permission[resource_name]"
+        click_button "Add Resource"
+      end
+      expect(page).to have_content("Resource added successfully", wait: 10)
+    end
+
+    editor_section = find('.role-section', text: "Editor")
+    update_label = editor_section.all('label').find { |l| l.text.include?("Can update Employee") }
+    update_checkbox = update_label.find('input[type="checkbox"]')
+
+    unless update_checkbox.checked?
+      accept_confirm do
+        update_checkbox.click
+      end
+      expect(page).to have_selector('input[type="checkbox"]:checked', wait: 10)
+    end
+
+    company.clear_permissions_cache
+    editor_employee.clear_permissions_cache
+    editor_employee.reload
+
+    expect(editor_employee.can?(:update, Employee)).to be_truthy
+
+    sign_in(editor_user)
+    visit company_employees_path(company)
+
+    expect(page).to have_selector('table', wait: 10)
+
+    target_row = find('tbody tr', text: target_employee.name)
+    target_row.find('[data-action*="openShowModal"]').click
+
+    expect(page).to have_selector('.swal2-container', wait: 10)
+
+    editable_name_field = find('[data-controller="editable"]', match: :first)
+    editable_name_field.click
+
+    expect(page).to have_selector('.editable-input', wait: 5)
+
+    editable_name_field.find('.editable-input').fill_in(with: 'Updated Name via Editable')
+
+    accept_confirm do
+      editable_name_field.find('.editable-input').send_keys :enter
+    end
+
+    expect(page).to have_content("Employee name updated successfully!", wait: 10)
+
+    target_employee.reload
+    expect(target_employee.name).to eq('Updated Name via Editable')
+  end
+
+  # =========================================================================
+  # SCENARIO 10: Employee WITHOUT update permission gets error when editing
+  # =========================================================================
+  scenario "employee without update permission cannot edit another employee's name" do
+    sign_in(owner)
+    visit company_permissions_path(company)
+
+    editor_section = find('.role-section', text: "Editor")
+
+    unless editor_section.has_content?("Can update Employee")
+      editor_section.click_button("Add Resource")
+      within(".swal2-html-container") do
+        select "Employee", from: "permission[resource_name]"
+        click_button "Add Resource"
+      end
+      expect(page).to have_content("Resource added successfully", wait: 10)
+    end
+
+    editor_section = find('.role-section', text: "Editor")
+    update_label = editor_section.all('label').find { |l| l.text.include?("Can update Employee") }
+    update_checkbox = update_label.find('input[type="checkbox"]')
+
+    unless update_checkbox.checked?
+      accept_confirm do
+        update_checkbox.click
+      end
+      expect(page).to have_selector('input[type="checkbox"]:checked', wait: 10)
+    end
+
+    update_checkbox.reload
+    if update_checkbox.checked?
+      accept_confirm do
+        update_checkbox.click
+      end
+      expect(page).to have_selector('input[type="checkbox"]:not(:checked)', wait: 10)
+    end
+
+    company.clear_permissions_cache
+    editor_employee.clear_permissions_cache
+    editor_employee.reload
+
+    expect(editor_employee.can?(:update, Employee)).to be_falsey
+
+    original_name = target_employee.name
+
+    sign_in(editor_user)
+    visit company_employees_path(company)
+
+    expect(page).to have_selector('table', wait: 10)
+
+    target_row = find('tbody tr', text: target_employee.name)
+    target_row.find('[data-action*="openShowModal"]').click
+
+    expect(page).to have_selector('.swal2-container', wait: 10)
+
+    editable_name_field = find('[data-controller="editable"]', match: :first)
+    editable_name_field.click
+
+    expect(page).to have_selector('.editable-input', wait: 5)
+
+    editable_name_field.find('.editable-input').fill_in(with: 'Attempted Update')
+
+    accept_confirm do
+      editable_name_field.find('.editable-input').send_keys :enter
+    end
+
+    expect(page).to have_content("You are not authorized to perform this action.", wait: 10)
+
+    target_employee.reload
+    expect(target_employee.name).to eq(original_name)
   end
 
   # =========================================================================

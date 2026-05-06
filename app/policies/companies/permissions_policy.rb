@@ -1,5 +1,5 @@
-# app/policies/companies/permission_policy.rb
-class Companies::PermissionPolicy < ApplicationPolicy
+# app/policies/companies/permissions_policy.rb
+class Companies::PermissionsPolicy < ApplicationPolicy
   def index?
     # 'record' is the current_employee passed from the controller
     record.can?(:read, PolicyAppointment)
