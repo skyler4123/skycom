@@ -139,3 +139,48 @@ end
 ```
 
 Use retries sparingly - they mask real issues.
+
+---
+
+### 5. Permissions Cache Test Isolation
+
+**Problem**: When tests use permission-based authorization (ABAC `can?` checks), clearing the permissions cache is critical for test isolation. Tests can fail with "permission denied" when run individually vs. as part of a full suite due to stale cache pollution.
+
+**Example**: `permissions_spec.rb` test fails when run alone but passes in suite because earlier tests modified the company permissions cache.
+
+**Root Causes**:
+1. **Cache not cleared in setup**: Some employee `let!` blocks forgot to call `company.clear_permissions_cache`
+2. **Single vs. full suite**: Running alone uses fresh cache; running after other tests uses polluted cache
+3. **Timing**: Test checks database before async form submission completes
+
+**Solution** (1 > 2 > 3 fixes):
+
+1. **Setup**: Clear cache for ALL employees with role assignments:
+```ruby
+let!(:creator_employee) do
+  create(:employee, company: company, branch: branch, user: creator_user, roles: [ creator_role ]).tap do
+    company.clear_permissions_cache  # ADD THIS
+  end
+end
+```
+
+2. **Test**: Clear both employee AND company cache before use:
+```ruby
+scenario "creator can create new employee" do
+  creator_employee.clear_permissions_cache
+  company.clear_permissions_cache   # ADD THIS
+  creator_employee.reload         # ADD THIS
+
+  sign_in(creator_user)
+  # ...
+end
+```
+
+3. **Async Wait**: Add sleep after async actions to allow completion:
+```ruby
+click_button "Save Employee"
+sleep 1  # ADD THIS - wait for async form submission
+expect(page).to have_selector('tbody tr', wait: 10)
+```
+
+**Key Insight**: The `Employee#clear_permissions_cache` clears the employee's cache, but for the `can?` check to work reliably, the COMPANY cache must ALSO be cleared because permissions depend on policy appointments stored in the company's cache scope.

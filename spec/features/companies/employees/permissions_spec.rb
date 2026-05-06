@@ -50,17 +50,23 @@ RSpec.feature "Companies::Employees Permissions", type: :feature, js: true do
 
   let!(:creator_user) { create(:user, :company_employee) }
   let!(:creator_employee) do
-    create(:employee, company: company, branch: branch, user: creator_user, roles: [ creator_role ])
+    create(:employee, company: company, branch: branch, user: creator_user, roles: [ creator_role ]).tap do
+      company.clear_permissions_cache
+    end
   end
 
   let!(:editor_user) { create(:user, :company_employee) }
   let!(:editor_employee) do
-    create(:employee, company: company, branch: branch, user: editor_user, roles: [ editor_role ])
+    create(:employee, company: company, branch: branch, user: editor_user, roles: [ editor_role ]).tap do
+      company.clear_permissions_cache
+    end
   end
 
   let!(:no_permission_user) { create(:user, :company_employee) }
   let!(:no_permission_employee) do
-    create(:employee, company: company, branch: branch, user: no_permission_user, roles: [ no_permission_role ])
+    create(:employee, company: company, branch: branch, user: no_permission_user, roles: [ no_permission_role ]).tap do
+      company.clear_permissions_cache
+    end
   end
 
   # Target employee for edit/delete tests
