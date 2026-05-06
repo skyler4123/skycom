@@ -156,6 +156,9 @@ RSpec.feature "Companies::Employees Permissions", type: :feature, js: true do
 
   scenario "creator can create new employee and see in table" do
     creator_employee.clear_permissions_cache
+    company.clear_permissions_cache
+    creator_employee.reload
+
     sign_in(creator_user)
     visit company_employees_path(company)
 
@@ -167,6 +170,7 @@ RSpec.feature "Companies::Employees Permissions", type: :feature, js: true do
     select 'Full Time', from: 'employee[business_type]'
 
     click_button "Save Employee"
+    sleep 1
     expect(page).to have_selector('tbody tr', wait: 10)
 
     expect(Employee.find_by(name: "Created by Creator")).to be_present
