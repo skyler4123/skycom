@@ -89,4 +89,5 @@ gem "mission_control-jobs"
 gem "pundit"
 gem "pagy"
 gem "money-rails"
+gem "discard"
 # ----------------------------------------------------------------------------------------------------
