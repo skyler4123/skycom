@@ -108,6 +108,20 @@ click_button 'Save Employee'
 find('[data-action*="openNewModal"]').click
 ```
 
+### Scope Searches to Parent Element
+
+When interacting with one of multiple similar elements (like editable fields in a modal), scope subsequent searches to the specific element:
+
+```ruby
+# BAD: Global search finds ALL matching elements
+editable_field = find('[data-controller="editable"]', match: :first)
+find('.editable-input').fill_in(with: 'value')  # Ambiguous!
+
+# GOOD: Scope to the specific element
+editable_field = find('[data-controller="editable"]', match: :first)
+editable_field.find('.editable-input').fill_in(with: 'value')
+```
+
 ---
 
 ## Debugging Flaky Tests
@@ -184,3 +198,5 @@ expect(page).to have_selector('tbody tr', wait: 10)
 ```
 
 **Key Insight**: The `Employee#clear_permissions_cache` clears the employee's cache, but for the `can?` check to work reliably, the COMPANY cache must ALSO be cleared because permissions depend on policy appointments stored in the company's cache scope.
+
+---
