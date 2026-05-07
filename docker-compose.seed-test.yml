@@ -29,5 +29,3 @@ services:
     ports:
       - "9200:9200"
       - "9600:9600"
-    volumes:
-      - es_data:/usr/share/opensearch/data
