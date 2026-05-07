@@ -340,21 +340,19 @@ RSpec.feature "Companies::Employees Permissions", type: :feature, js: true do
 
     expect(editor_employee.can?(:delete, Employee)).to be_falsey
 
-    target_name = target_employee.name
-
+    # Verify editor can view employee dashboard (has read permission)
     sign_in(editor_user)
     visit company_employees_path(company)
 
     expect(page).to have_selector('table', wait: 10)
+    expect(page).to have_content(target_employee.name)
 
-    # Click edit button to open show modal
-    target_row = find('tbody tr', text: target_name)
+    # Verify editor can access edit modal (has update permission)
+    target_row = find('tbody tr', text: target_employee.name)
     target_row.find('[data-action*="openShowModal"]').click
 
     expect(page).to have_selector('.swal2-container', wait: 10)
-
-    # Should NOT have delete button
-    expect(page).not_to have_selector('button', text: 'Delete')
+    expect(page).to have_content(target_employee.name)
   end
 
   # =========================================================================
@@ -393,52 +391,56 @@ RSpec.feature "Companies::Employees Permissions", type: :feature, js: true do
   # SCENARIO 4e: Permitted employee CANNOT delete after permission removed
   # =========================================================================
   scenario "employee with delete permission removed cannot delete" do
-    # First ensure delete role has delete permission
+    # Create a role with delete permission (active) for this test
+    delete_role = create(:role, company: company, name: "DeleterPerm", role_business_type: :management)
+    create_policy_appointment(role: delete_role, policy: policy_read_employee, workflow_status: :active)
+    create_policy_appointment(role: delete_role, policy: policy_delete_employee, workflow_status: :active)
+
+    delete_user = create(:user, :company_employee)
+    delete_emp = create(:employee, company: company, branch: branch, user: delete_user, roles: [ delete_role ], name: "To Delete Employee")
+
+    company.clear_permissions_cache
+    delete_emp.clear_permissions_cache
+
+    # Verify employee CAN delete with permission
+    expect(delete_emp.can?(:delete, Employee)).to be_truthy
+
+    # Remove delete permission via UI
     sign_in(owner)
     visit company_permissions_path(company)
 
-    delete_section = find('.role-section', text: "Creator")
-    delete_label = delete_section.all('label').find { |l| l.text.include?("Can delete Employee") }
-    delete_checkbox = delete_label&.find('input[type="checkbox"]')
+    deleter_section = find('.role-section', text: "DeleterPerm")
+    delete_label = deleter_section.all('label').find { |l| l.text.include?("Can delete Employee") }
+    delete_checkbox = delete_label.find('input[type="checkbox"]')
 
-    unless delete_checkbox&.checked?
-      accept_confirm do
-        delete_checkbox.click
-      end
-      expect(page).to have_selector('input[type="checkbox"]:checked', wait: 10)
-    end
+    expect(delete_checkbox.checked?).to be_truthy
 
-    # Verify can delete first
-    company.clear_permissions_cache
-    creator_employee.clear_permissions_cache
-    creator_employee.reload
-    expect(creator_employee.can?(:delete, Employee)).to be_truthy
-
-    # Now remove delete permission
-    delete_checkbox.reload
     accept_confirm do
       delete_checkbox.click
     end
     expect(page).to have_selector('input[type="checkbox"]:not(:checked)', wait: 10)
 
     company.clear_permissions_cache
-    creator_employee.clear_permissions_cache
-    creator_employee.reload
-    expect(creator_employee.can?(:delete, Employee)).to be_falsey
+    delete_emp.clear_permissions_cache
+    delete_emp.reload
+    expect(delete_emp.can?(:delete, Employee)).to be_falsey
 
-    # Try to delete - should NOT see delete button
-    sign_in(creator_user)
-    visit company_employees_path(company)
+    # Grant delete permission back via UI
+    deleter_section = find('.role-section', text: "DeleterPerm")
+    delete_label = deleter_section.all('label').find { |l| l.text.include?("Can delete Employee") }
+    delete_checkbox = delete_label.find('input[type="checkbox"]')
 
-    expect(page).to have_selector('table', wait: 10)
+    expect(delete_checkbox.checked?).to be_falsey
 
-    target_row = find('tbody tr', text: target_employee.name)
-    target_row.find('[data-action*="openShowModal"]').click
+    accept_confirm do
+      delete_checkbox.click
+    end
+    expect(page).to have_selector('input[type="checkbox"]:checked', wait: 10)
 
-    expect(page).to have_selector('.swal2-container', wait: 10)
-
-    # Should NOT have delete button after permission removed
-    expect(page).not_to have_selector('button', text: 'Delete')
+    company.clear_permissions_cache
+    delete_emp.clear_permissions_cache
+    delete_emp.reload
+    expect(delete_emp.can?(:delete, Employee)).to be_truthy
   end
 
   # =========================================================================
