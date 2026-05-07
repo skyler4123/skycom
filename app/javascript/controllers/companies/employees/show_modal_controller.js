@@ -66,14 +66,9 @@ export default class Companies_Employees_ShowModalController extends Controller 
           
           <div class="flex items-center justify-between border-b border-slate-200 dark:border-gray-800 px-6 py-4">
             <h3 class="text-xl font-bold text-slate-900 dark:text-white">Employee Details</h3>
-            <div class="flex items-center gap-2">
-              <button type="button" data-action="click->${this.identifier}#deleteEmployee" class="px-3 py-1.5 text-sm font-medium text-red-600 hover:text-red-700 hover:bg-red-50 rounded-lg">
-                Delete
-              </button>
-              <button data-action="click->${this.identifier}#close" class="rounded-full p-2 text-slate-500 dark:text-gray-400 hover:bg-slate-100 dark:hover:bg-gray-800">
-                <span class="material-symbols-outlined">close</span>
-              </button>
-            </div>
+            <button data-action="click->${this.identifier}#close" class="rounded-full p-2 text-slate-500 dark:text-gray-400 hover:bg-slate-100 dark:hover:bg-gray-800">
+              <span class="material-symbols-outlined">close</span>
+            </button>
           </div>
 
           <div class="p-6">
@@ -113,109 +108,119 @@ export default class Companies_Employees_ShowModalController extends Controller 
               </div>
             </div>
 
-<div class="grid grid-cols-1 gap-6 border-t border-slate-200 dark:border-gray-800 pt-8 sm:grid-cols-2">
-               
-              <div class="flex items-center gap-3">
-                <div class="flex size-10 items-center justify-center rounded-lg bg-slate-100 dark:bg-gray-800 text-blue-600 dark:text-blue-400">
-                  <span class="material-symbols-outlined">location_on</span>
+            <div class="grid grid-cols-1 gap-6 border-t border-slate-200 dark:border-gray-800 pt-8 sm:grid-cols-2">
+                
+                <div class="flex items-center gap-3">
+                  <div class="flex size-10 items-center justify-center rounded-lg bg-slate-100 dark:bg-gray-800 text-blue-600 dark:text-blue-400">
+                    <span class="material-symbols-outlined">location_on</span>
+                  </div>
+                  <div>
+                    <p class="text-xs font-medium text-slate-500 dark:text-gray-400">Work Branch</p>
+                    ${(() => {
+                      const branches = currentBranches() || []
+                      const options = branches.map(b => ({ name: b.name, value: b.id }))
+                      return editable({
+                        dispatch: "updateEmployee",
+                        resource: "employee",
+                        name: "branch_id",
+                        id: e.id,
+                        value: e.branch?.id || e.branch_id,
+                        url: Helpers.edit_company_employee_path(currentCompany().id, e.id),
+                        type: "select",
+                        options: options,
+                        className: "dark:bg-gray-800 dark:text-white",
+                        html: `<p class="text-sm font-semibold text-slate-900 dark:text-white">${branchName}</p>`,
+                        confirmMessage: "Change branch to '{{value}}'?",
+                        successMessage: "Branch updated!",
+                        errorMessage: "Failed to update branch!"
+                      })
+                    })()}
+                  </div>
                 </div>
-                <div>
-                  <p class="text-xs font-medium text-slate-500 dark:text-gray-400">Work Branch</p>
-                  ${(() => {
-                    const branches = currentBranches() || []
-                    const options = branches.map(b => ({ name: b.name, value: b.id }))
-                    return editable({
-                      dispatch: "updateEmployee",
-                      resource: "employee",
-                      name: "branch_id",
-                      id: e.id,
-                      value: e.branch?.id || e.branch_id,
-                      url: Helpers.edit_company_employee_path(currentCompany().id, e.id),
-                      type: "select",
-                      options: options,
-                      className: "dark:bg-gray-800 dark:text-white",
-                      html: `<p class="text-sm font-semibold text-slate-900 dark:text-white">${branchName}</p>`,
-                      confirmMessage: "Change branch to '{{value}}'?",
-                      successMessage: "Branch updated!",
-                      errorMessage: "Failed to update branch!"
-                    })
-                  })()}
-                </div>
-              </div>
 
-              <div class="flex items-center gap-3">
-                <div class="flex size-10 items-center justify-center rounded-lg bg-slate-100 dark:bg-gray-800 text-blue-600 dark:text-blue-400">
-                  <span class="material-symbols-outlined">corporate_fare</span>
+                <div class="flex items-center gap-3">
+                  <div class="flex size-10 items-center justify-center rounded-lg bg-slate-100 dark:bg-gray-800 text-blue-600 dark:text-blue-400">
+                    <span class="material-symbols-outlined">corporate_fare</span>
+                  </div>
+                  <div>
+                    <p class="text-xs font-medium text-slate-500 dark:text-gray-400">Department</p>
+                    <p class="text-sm font-semibold text-slate-900 dark:text-white">${departmentName}</p>
+                  </div>
                 </div>
-                <div>
-                  <p class="text-xs font-medium text-slate-500 dark:text-gray-400">Department</p>
-                  <p class="text-sm font-semibold text-slate-900 dark:text-white">${departmentName}</p>
-                </div>
-              </div>
 
-              <div class="flex items-center gap-3">
-                <div class="flex size-10 items-center justify-center rounded-lg bg-slate-100 dark:bg-gray-800 text-blue-600 dark:text-blue-400">
-                  <span class="material-symbols-outlined">shield_person</span>
+                <div class="flex items-center gap-3">
+                  <div class="flex size-10 items-center justify-center rounded-lg bg-slate-100 dark:bg-gray-800 text-blue-600 dark:text-blue-400">
+                    <span class="material-symbols-outlined">shield_person</span>
+                  </div>
+                  <div>
+                    <p class="text-xs font-medium text-slate-500 dark:text-gray-400">Roles</p>
+                    ${(() => {
+                      const allRoles = Helpers.currentRoles() || []
+                      const options = allRoles.map(r => ({ name: r.name, value: r.id }))
+                      const selectedIds = e.roles?.map(r => r.id) || []
+                      return editable({
+                        dispatch: "updateEmployee",
+                        resource: "employee",
+                        name: "role_ids",
+                        id: e.id,
+                        value: selectedIds,
+                        url: Helpers.edit_company_employee_path(currentCompany().id, e.id),
+                        type: "select",
+                        multiple: true,
+                        options: options,
+                        className: "dark:bg-gray-800 dark:text-white",
+                        html: `<p class="text-sm font-semibold text-slate-900 dark:text-white">${rolesList}</p>`,
+                        confirmMessage: "Change roles to '{{value}}'?",
+                        successMessage: "Roles updated!",
+                        errorMessage: "Failed to update roles!"
+                      })
+                    })()}
+                  </div>
                 </div>
-                <div>
-                  <p class="text-xs font-medium text-slate-500 dark:text-gray-400">Roles</p>
-                  ${(() => {
-                    const allRoles = Helpers.currentRoles() || []
-                    const options = allRoles.map(r => ({ name: r.name, value: r.id }))
-                    const selectedIds = e.roles?.map(r => r.id) || []
-                    return editable({
-                      dispatch: "updateEmployee",
-                      resource: "employee",
-                      name: "role_ids",
-                      id: e.id,
-                      value: selectedIds,
-                      url: Helpers.edit_company_employee_path(currentCompany().id, e.id),
-                      type: "select",
-                      multiple: true,
-                      options: options,
-                      className: "dark:bg-gray-800 dark:text-white",
-                      html: `<p class="text-sm font-semibold text-slate-900 dark:text-white">${rolesList}</p>`,
-                      confirmMessage: "Change roles to '{{value}}'?",
-                      successMessage: "Roles updated!",
-                      errorMessage: "Failed to update roles!"
-                    })
-                  })()}
-                </div>
-              </div>
 
-              <div class="flex items-center gap-3">
-                <div class="flex size-10 items-center justify-center rounded-lg bg-slate-100 dark:bg-gray-800 text-blue-600 dark:text-blue-400">
-                  <span class="material-symbols-outlined">account_tree</span>
+                <div class="flex items-center gap-3">
+                  <div class="flex size-10 items-center justify-center rounded-lg bg-slate-100 dark:bg-gray-800 text-blue-600 dark:text-blue-400">
+                    <span class="material-symbols-outlined">account_tree</span>
+                  </div>
+                  <div>
+                    <p class="text-xs font-medium text-slate-500 dark:text-gray-400">Workflow</p>
+                    <p class="text-sm font-semibold text-slate-900 dark:text-white">${workflowLabel}</p>
+                  </div>
                 </div>
-                <div>
-                  <p class="text-xs font-medium text-slate-500 dark:text-gray-400">Workflow</p>
-                  <p class="text-sm font-semibold text-slate-900 dark:text-white">${workflowLabel}</p>
-                </div>
-              </div>
 
-              <div class="flex items-center gap-3">
-                <div class="flex size-10 items-center justify-center rounded-lg bg-slate-100 dark:bg-gray-800 text-blue-600 dark:text-blue-400">
-                  <span class="material-symbols-outlined">badge</span>
+                <div class="flex items-center gap-3">
+                  <div class="flex size-10 items-center justify-center rounded-lg bg-slate-100 dark:bg-gray-800 text-blue-600 dark:text-blue-400">
+                    <span class="material-symbols-outlined">badge</span>
+                  </div>
+                  <div>
+                    <p class="text-xs font-medium text-slate-500 dark:text-gray-400">Type</p>
+                    <p class="text-sm font-semibold text-slate-900 dark:text-white">${businessTypeLabel}</p>
+                  </div>
                 </div>
-                <div>
-                  <p class="text-xs font-medium text-slate-500 dark:text-gray-400">Type</p>
-                  <p class="text-sm font-semibold text-slate-900 dark:text-white">${businessTypeLabel}</p>
-                </div>
-              </div>
 
-              <div class="flex items-center gap-3">
-                <div class="flex size-10 items-center justify-center rounded-lg bg-slate-100 dark:bg-gray-800 text-blue-600 dark:text-blue-400">
-                  <span class="material-symbols-outlined">mail</span>
+                <div class="flex items-center gap-3">
+                  <div class="flex size-10 items-center justify-center rounded-lg bg-slate-100 dark:bg-gray-800 text-blue-600 dark:text-blue-400">
+                    <span class="material-symbols-outlined">mail</span>
+                  </div>
+                  <div>
+                    <p class="text-xs font-medium text-slate-500 dark:text-gray-400">Email</p>
+                    <p class="text-sm font-semibold text-slate-900 dark:text-white">${e.email}</p>
+                  </div>
                 </div>
-                <div>
-                  <p class="text-xs font-medium text-slate-500 dark:text-gray-400">Email</p>
-                  <p class="text-sm font-semibold text-slate-900 dark:text-white">${e.email}</p>
-                </div>
-              </div>
 
             </div>
           </div>
+
+          <div class="flex items-center justify-between border-t border-slate-200 dark:border-gray-800 px-6 py-4">
+            <button 
+              type="button" 
+              data-action="click->${this.identifier}#deleteEmployee" 
+              class="px-4 py-2 text-sm font-medium bg-red-50 text-red-600 hover:text-red-700 hover:bg-red-100 rounded-lg transition-colors"
+            >
+              Delete
+            </button>
           </div>
+        </div>
       </div>
     `
   }
