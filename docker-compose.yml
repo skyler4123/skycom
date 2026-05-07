@@ -51,18 +51,18 @@ services:
   #   volumes:
   #     - mongo_data:/data/db
 
-  # opensearch:
-  #   image: opensearchproject/opensearch:3
-  #   environment:
-  #     OPENSEARCH_INITIAL_ADMIN_PASSWORD: OpensearchPassword@1234
-  #     discovery.type: single-node
-  #     plugins.security.disabled: "true"
-  #     # DISABLE_SECURITY_PLUGIN: "true" # Disables Security plugin
-  #   ports:
-  #     - "9200:9200"
-  #     - "9600:9600"
-  #   volumes:
-  #     - es_data:/usr/share/opensearch/data
+  opensearch:
+    image: opensearchproject/opensearch:3
+    environment:
+      OPENSEARCH_INITIAL_ADMIN_PASSWORD: OpensearchPassword@1234
+      discovery.type: single-node
+      plugins.security.disabled: "true"
+      # DISABLE_SECURITY_PLUGIN: "true" # Disables Security plugin
+    ports:
+      - "9200:9200"
+      - "9600:9600"
+    volumes:
+      - es_data:/usr/share/opensearch/data
 
   # opensearch_dashboards:
   #   image: opensearchproject/opensearch-dashboards:3

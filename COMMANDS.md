@@ -2,7 +2,7 @@ rails new skycom --database=postgresql --css=tailwind
 
 rails generate authentication --omniauthable --passwordless --invitable
 
-docker compose up -d RAILS_MASTER_KEY=$(cat config/master.key) docker compose up -d
+docker compose up -d RAILS_MASTER_KEY=$(cat config/master1.key) docker compose up -d
 
 RAILS_MASTER_KEY=$(cat config/master.key) docker compose -f docker-compose.seed-test.yml up --abort-on-container-exit --exit-code-from web --attach web
 

@@ -18,3 +18,16 @@ services:
       POSTGRESQL_PASSWORD: password
     ports:
       - "5432:5432"
+
+  opensearch:
+    image: opensearchproject/opensearch:3
+    environment:
+      OPENSEARCH_INITIAL_ADMIN_PASSWORD: OpensearchPassword@1234
+      discovery.type: single-node
+      plugins.security.disabled: "true"
+      # DISABLE_SECURITY_PLUGIN: "true" # Disables Security plugin
+    ports:
+      - "9200:9200"
+      - "9600:9600"
+    volumes:
+      - es_data:/usr/share/opensearch/data

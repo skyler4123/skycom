@@ -91,4 +91,6 @@ gem "pagy"
 gem "money-rails"
 gem "discard"
 gem "paper_trail"
+gem "searchkick"
+gem "opensearch-ruby" # select one for searchkick
 # ----------------------------------------------------------------------------------------------------
