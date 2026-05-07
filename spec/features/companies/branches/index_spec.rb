@@ -48,7 +48,6 @@ RSpec.feature "Companies::Branches Management", type: :feature, js: true do
       click_button "Save Branch"
     rescue Selenium::WebDriver::Error::StaleElementReferenceError
       visit company_branches_path(company)
-      sleep 1
       expect(page).to have_selector('table', wait: 10)
 
       find('[data-action*="openNewModal"]').click

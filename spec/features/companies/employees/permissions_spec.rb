@@ -170,7 +170,6 @@ RSpec.feature "Companies::Employees Permissions", type: :feature, js: true do
     select 'Full Time', from: 'employee[business_type]'
 
     click_button "Save Employee"
-    sleep 1
     expect(page).to have_selector('tbody tr', wait: 10)
 
     expect(Employee.find_by(name: "Created by Creator")).to be_present
@@ -317,9 +316,7 @@ RSpec.feature "Companies::Employees Permissions", type: :feature, js: true do
     click_button "Delete"
 
     # Accept confirmation
-    accept_alert do
-      sleep 0.5
-    end
+    accept_alert
 
     expect(page).to have_content("Employee deleted successfully!", wait: 10)
 
@@ -377,9 +374,7 @@ RSpec.feature "Companies::Employees Permissions", type: :feature, js: true do
 
     click_button "Delete"
 
-    accept_alert do
-      sleep 0.5
-    end
+    accept_alert
 
     expect(page).to have_content("Employee deleted successfully!", wait: 10)
 
@@ -506,9 +501,7 @@ RSpec.feature "Companies::Employees Permissions", type: :feature, js: true do
 
     click_button "Delete"
 
-    accept_alert do
-      sleep 0.5
-    end
+    accept_alert
 
     expect(page).to have_content("Employee deleted successfully!", wait: 10)
 
@@ -630,7 +623,6 @@ RSpec.feature "Companies::Employees Permissions", type: :feature, js: true do
     select 'Full Time', from: 'employee[business_type]'
 
     click_button "Save Employee"
-    sleep 1
     expect(page).to have_selector('tbody tr', wait: 10)
 
     expect(Employee.find_by(name: "Created After Grant")).to be_present
@@ -1112,9 +1104,7 @@ RSpec.feature "Companies::Employees Permissions", type: :feature, js: true do
     expect(page).to have_selector('button', text: 'Delete')
 
     click_button "Delete"
-    accept_alert do
-      sleep 0.5
-    end
+    accept_alert
 
     expect(page).to have_content("Employee deleted successfully!", wait: 10)
     regular_employee.reload
@@ -1126,9 +1116,7 @@ RSpec.feature "Companies::Employees Permissions", type: :feature, js: true do
     expect(page).to have_selector('.swal2-container', wait: 10)
 
     click_button "Delete"
-    accept_alert do
-      sleep 0.5
-    end
+    accept_alert
 
     expect(page).to have_content("Employee deleted successfully!", wait: 10)
   end
@@ -1151,9 +1139,7 @@ RSpec.feature "Companies::Employees Permissions", type: :feature, js: true do
 
     click_button "Delete"
 
-    accept_alert do
-      sleep 0.5
-    end
+    accept_alert
 
     # Modal should close (delete button triggers close on error)
     # Employee should NOT be discarded

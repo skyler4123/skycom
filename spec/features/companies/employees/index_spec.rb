@@ -64,9 +64,7 @@ RSpec.feature "Companies::Employees Management", type: :feature, js: true do
     begin
       click_button "Save Employee"
     rescue Selenium::WebDriver::Error::StaleElementReferenceError
-      # Give it a millisecond to settle and try one last time
       visit company_employees_path(company)
-      sleep 1
       expect(page).to have_selector('table', wait: 10)
 
       find('[data-action*="openNewModal"]').click
@@ -101,9 +99,7 @@ RSpec.feature "Companies::Employees Management", type: :feature, js: true do
 
     click_button "Delete"
 
-    accept_alert do
-      sleep 0.5
-    end
+    accept_alert
 
     expect(page).to have_content("Employee deleted successfully!", wait: 10)
 
