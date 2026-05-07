@@ -16,7 +16,7 @@ export default class Companies_StockExports_IndexController extends Companies_La
       this.exports = response.stock_exports || []
       this.pagination = response.pagination || {}
 
-      window.poll(() => {
+      poll(() => {
         if (this.hasContentTarget) {
           this.renderContent()
           return true

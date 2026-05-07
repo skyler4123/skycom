@@ -2,6 +2,24 @@
 
 This document covers how to avoid and fix flaky tests in Skycom's feature test suite.
 
+## Critical Rule: Never Use `sleep` in Feature Tests
+
+**DO NOT use `sleep` in feature tests.** It is bad practice that:
+- Creates flaky, timing-dependent tests
+- Slows down test suite unnecessarily
+- Hides real race condition issues that should be fixed properly
+
+**Always use Capybara's built-in waiting mechanisms instead:**
+```ruby
+# Good - Capybara waits for element to appear
+expect(page).to have_selector('tbody tr', wait: 10)
+
+# Bad - hardcoded sleep (NEVER do this)
+sleep 2
+```
+
+---
+
 ## Common Causes of Flaky Tests
 
 ### 1. Race Conditions
@@ -108,6 +126,20 @@ click_button 'Save Employee'
 find('[data-action*="openNewModal"]').click
 ```
 
+### Scope Searches to Parent Element
+
+When interacting with one of multiple similar elements (like editable fields in a modal), scope subsequent searches to the specific element:
+
+```ruby
+# BAD: Global search finds ALL matching elements
+editable_field = find('[data-controller="editable"]', match: :first)
+find('.editable-input').fill_in(with: 'value')  # Ambiguous!
+
+# GOOD: Scope to the specific element
+editable_field = find('[data-controller="editable"]', match: :first)
+editable_field.find('.editable-input').fill_in(with: 'value')
+```
+
 ---
 
 ## Debugging Flaky Tests
@@ -176,11 +208,12 @@ scenario "creator can create new employee" do
 end
 ```
 
-3. **Async Wait**: Add sleep after async actions to allow completion:
+3. **Async Wait**: Use Capybara's built-in wait instead of sleep:
 ```ruby
 click_button "Save Employee"
-sleep 1  # ADD THIS - wait for async form submission
-expect(page).to have_selector('tbody tr', wait: 10)
+expect(page).to have_selector('tbody tr', wait: 10)  # Capybara waits for DOM update
 ```
 
 **Key Insight**: The `Employee#clear_permissions_cache` clears the employee's cache, but for the `can?` check to work reliably, the COMPANY cache must ALSO be cleared because permissions depend on policy appointments stored in the company's cache scope.
+
+---

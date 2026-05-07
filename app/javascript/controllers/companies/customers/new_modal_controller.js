@@ -15,12 +15,10 @@ export default class Companies_Customers_NewModalController extends Controller {
       })
       /** @type {Customer} */
       const newCustomer = response.customer
-      toast({
+      reloadThenToast({
         type: "success",
         message: `${newCustomer.name || 'Customer'} created successfully`
       })
-      closeModal()
-      window.dispatchEvent(new CustomEvent('refresh'))
     } catch (error) {
       toast({
         type: "error",

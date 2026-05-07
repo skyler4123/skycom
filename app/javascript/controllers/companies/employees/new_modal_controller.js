@@ -17,11 +17,10 @@ export default class Companies_Employees_NewModalController extends Controller {
       })
       /** @type {Company} */
       const newEmployee = response.employee
-      toast({ 
+      reloadThenToast({
         type: "success", 
         message: `${newEmployee.name || 'Employee'} created successfully`
       })
-      closeModal()
     } catch (error) {
       toast({ 
         type: "error", 

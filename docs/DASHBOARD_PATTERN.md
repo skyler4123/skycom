@@ -65,9 +65,6 @@ export default class Companies_Branches_IndexController extends Companies_Layout
   async connect() {
     super.connect()
     
-    // Listen for inline edit updates
-    addAction(this.element, `editable:updateBranch@window->${this.identifier}#handleUpdate`)
-    
     try {
       // Fetch data from API
       const response = await fetchJson()
@@ -75,7 +72,7 @@ export default class Companies_Branches_IndexController extends Companies_Layout
       this.pagination = response.pagination || {}
 
       // Render after DOM is ready
-      window.poll(() => {
+      poll(() => {
         if (this.hasContentTarget) {
           this.renderContent()
           return true
@@ -97,21 +94,6 @@ export default class Companies_Branches_IndexController extends Companies_Layout
     const { branchId } = event.params
     window.currentBranch = findById(this.branches, branchId)
     openModal({ html: `<div data-controller="${identifier(Companies_Branches_ShowModalController)}"></div>` })
-  }
-
-  handleUpdate(event) {
-    const { data } = event.detail
-    const newBranch = data.branch
-
-    if (!newBranch) return
-
-    this.branches = mergeObjectArrays(this.branches, [newBranch], "id")
-
-    if (window.currentBranch?.id === newBranch.id) {
-      window.currentBranch = newBranch
-    }
-
-    this.renderContent()
   }
 
   contentHTML() {
@@ -237,7 +219,6 @@ export default class Companies_Branches_IndexController extends Companies_Layout
 | `contentHTML()` | Render full page HTML |
 | `openNewModal()` | Trigger create modal |
 | `openShowModal(event)` | Trigger edit modal with ID param |
-| `handleUpdate(event)` | Handle inline edit updates |
 | `Helpers.statusBadge()` | Render status badge |
 | `selectOptionsHTML()` | Render select options |
 | `pagination()` | Render pagination |
@@ -394,7 +375,7 @@ export default class Companies_Branches_ShowModalController extends Controller {
 
   close(event) {
     event.preventDefault()
-    window.closeModal()
+    closeModal()
   }
 }
 ```
@@ -406,7 +387,7 @@ export default class Companies_Branches_ShowModalController extends Controller {
 | `window.currentBranch` | Store globally before opening modal |
 | `findById(array, id)` | Find record in local array |
 | `form({ action, method: "PATCH" })` | Edit form with method spoofing |
-| `window.closeModal()` | Close modal programmatically |
+| `closeModal()` | Close modal programmatically |
 
 ## How to Add New Resource Dashboard
 

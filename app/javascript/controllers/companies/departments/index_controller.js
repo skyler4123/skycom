@@ -10,7 +10,6 @@ export default class Companies_Departments_IndexController extends Companies_Lay
 
   async connect() {
     super.connect()
-    addAction(this.element, `editable:updateDepartment@window->${this.identifier}#handleUpdate`)
     try {
       /** @type {{ departments: Department[], pagination: any }} */
       const response = await fetchJson()
@@ -18,7 +17,7 @@ export default class Companies_Departments_IndexController extends Companies_Lay
       this.departments = response.departments || []
       this.pagination = response.pagination || {}
 
-      window.poll(() => {
+      poll(() => {
         if (this.hasContentTarget) {
           this.renderContent()
           return true
@@ -40,21 +39,6 @@ export default class Companies_Departments_IndexController extends Companies_Lay
     const { departmentId } = event.params
     window.currentDepartment = findById(this.departments, departmentId)
     openModal({ html: `<div data-controller="${identifier(Companies_Departments_ShowModalController)}"></div>` })
-  }
-
-  handleUpdate(event) {
-    const { data } = event.detail
-    const newDepartment = data.department
-
-    if (!newDepartment) return
-
-    this.departments = mergeObjectArrays(this.departments, [newDepartment], "id")
-
-    if (window.currentDepartment?.id === newDepartment.id) {
-      window.currentDepartment = newDepartment
-    }
-
-    this.renderContent()
   }
 
   contentHTML() {

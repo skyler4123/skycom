@@ -15,12 +15,10 @@ export default class Companies_Branches_NewModalController extends Controller {
       })
       /** @type {Branch} */
       const newBranch = response.branch
-      toast({
+      reloadThenToast({
         type: "success",
         message: `${newBranch.name || 'Branch'} created successfully`
       })
-      closeModal()
-      window.dispatchEvent(new CustomEvent('refresh'))
     } catch (error) {
       toast({
         type: "error",

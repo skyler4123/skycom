@@ -170,6 +170,6 @@ export default class Companies_Products_ShowModalController extends Controller {
 
   close(event) {
     event.preventDefault()
-    window.closeModal()
+    closeModal()
   }
 }

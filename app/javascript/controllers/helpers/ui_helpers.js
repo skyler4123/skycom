@@ -56,7 +56,6 @@ export const fetchJson = async (url, options = {}) => {
 
   try {
     const response = await fetch(requestUrl, config)
-    
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({})); 
       
@@ -352,6 +351,40 @@ export const toast = ({ type = "normal", message = "" }) => {
     // style: { background: "unset" } 
   }).showToast();
 }
+
+/**
+ * The key used to store pending toasts in localStorage.
+ * @type {string}
+ */
+export const PENDING_TOASTS_KEY = "pending_toasts";
+
+/**
+ * Queues an array of toasts in localStorage and reloads the current page.
+ * Useful for displaying feedback after a state-changing operation that requires a fresh UI sync.
+ * * @param {ToastOptions[]} [toastsArray=[]] - An array of toast configuration objects.
+ * @returns {void}
+ */
+export const reloadThenToasts = (toastsArray = []) => {
+  // Get existing or start fresh
+  const existing = JSON.parse(localStorage.getItem(PENDING_TOASTS_KEY) || "[]");
+  const updated = [...existing, ...toastsArray];
+  
+  localStorage.setItem(PENDING_TOASTS_KEY, JSON.stringify(updated));
+  window.location.reload();
+};
+
+/**
+ * Queues a single toast in localStorage and reloads the current page.
+ * * @param {ToastOptions} toastObj - The toast configuration object.
+ * @returns {void}
+ * @example
+ * reloadThenToast({ type: "success", message: "Employee discarded!" });
+ */
+export const reloadThenToast = (toastObj) => {
+  reloadThenToasts([toastObj]);
+};
+
+
 /**
  * Generates a Rails-compatible form wrapper without a forced controller.
  * @param {object} options

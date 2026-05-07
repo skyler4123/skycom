@@ -10,7 +10,6 @@ export default class Companies_Branches_IndexController extends Companies_Layout
 
   async connect() {
     super.connect()
-    addAction(this.element, `editable:updateBranch@window->${this.identifier}#handleUpdate`)
     try {
       /** @type {{ branches: Branch[], pagination: any }} */
       const response = await fetchJson()
@@ -18,7 +17,7 @@ export default class Companies_Branches_IndexController extends Companies_Layout
       this.branches = response.branches || []
       this.pagination = response.pagination || {}
 
-      window.poll(() => {
+      poll(() => {
         if (this.hasContentTarget) {
           this.renderContent()
           return true
@@ -40,21 +39,6 @@ export default class Companies_Branches_IndexController extends Companies_Layout
     const { branchId } = event.params
     window.currentBranch = findById(this.branches, branchId)
     openModal({ html: `<div data-controller="${identifier(Companies_Branches_ShowModalController)}"></div>` })
-  }
-
-  handleUpdate(event) {
-    const { data } = event.detail
-    const newBranch = data.branch
-
-    if (!newBranch) return
-
-    this.branches = mergeObjectArrays(this.branches, [newBranch], "id")
-
-    if (window.currentBranch?.id === newBranch.id) {
-      window.currentBranch = newBranch
-    }
-
-    this.renderContent()
   }
 
   contentHTML() {

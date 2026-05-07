@@ -4,7 +4,7 @@ import Companies_Permissions_AddResourceModalController from "controllers/compan
 export default class Companies_Permissions_IndexController extends Companies_LayoutController {
   async connect() {
     super.connect()
-    window.poll(() => {
+    poll(() => {
       if (this.hasContentTarget) {
         this.loadData()
         return true

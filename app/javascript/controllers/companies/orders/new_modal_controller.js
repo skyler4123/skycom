@@ -15,12 +15,10 @@ export default class Companies_Orders_NewModalController extends Controller {
       })
       /** @type {Order} */
       const newOrder = response.order
-      toast({
+      reloadThenToast({
         type: "success",
         message: `${newOrder.name || 'Order'} created successfully`
       })
-      closeModal()
-      window.dispatchEvent(new CustomEvent('refresh'))
     } catch (error) {
       toast({
         type: "error",

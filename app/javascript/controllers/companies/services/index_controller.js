@@ -10,7 +10,6 @@ export default class Companies_Services_IndexController extends Companies_Layout
 
   async connect() {
     super.connect()
-    addAction(this.element, `editable:updateService@window->${this.identifier}#handleUpdate`)
     try {
       /** @type {{ services: Service[], pagination: any }} */
       const response = await fetchJson()
@@ -18,7 +17,7 @@ export default class Companies_Services_IndexController extends Companies_Layout
       this.services = response.services || []
       this.pagination = response.pagination || {}
 
-      window.poll(() => {
+      poll(() => {
         if (this.hasContentTarget) {
           this.renderContent()
           return true
@@ -40,21 +39,6 @@ export default class Companies_Services_IndexController extends Companies_Layout
     const { serviceId } = event.params
     window.currentService = findById(this.services, serviceId)
     openModal({ html: `<div data-controller="${identifier(Companies_Services_ShowModalController)}"></div>` })
-  }
-
-  handleUpdate(event) {
-    const { data } = event.detail
-    const newService = data.service
-
-    if (!newService) return
-
-    this.services = mergeObjectArrays(this.services, [newService], "id")
-
-    if (window.currentService?.id === newService.id) {
-      window.currentService = newService
-    }
-
-    this.renderContent()
   }
 
   contentHTML() {

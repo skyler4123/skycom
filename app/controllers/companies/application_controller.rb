@@ -1,8 +1,9 @@
 class Companies::ApplicationController < ApplicationController
-  include Companies::Authorizable
-
   before_action :set_company
   before_action :set_employee
+
+  # Order reason: Companies::Authorizable need current_employee
+  include Companies::Authorizable
 
   private
 

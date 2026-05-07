@@ -26,11 +26,7 @@ export default class Companies_Permissions_AddResourceModalController extends Co
         body: new FormData(event.target)
       })
 
-      toast({ type: "success", message: response.message || "Resource added successfully" })
-      closeModal()
-      setTimeout(() => {
-        window.location.reload()
-      }, 500)
+      reloadThenToast({ type: "success", message: response.message || "Resource added successfully" })
     } catch (error) {
       toast({ type: "error", message: error.error || "Failed to add resource" })
     }

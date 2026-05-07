@@ -15,12 +15,10 @@ export default class Companies_Departments_NewModalController extends Controller
       })
       /** @type {Department} */
       const newDepartment = response.department
-      toast({
+      reloadThenToast({
         type: "success",
         message: `${newDepartment.name || 'Department'} created successfully`
       })
-      closeModal()
-      window.dispatchEvent(new CustomEvent('refresh'))
     } catch (error) {
       toast({
         type: "error",

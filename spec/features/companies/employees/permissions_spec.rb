@@ -170,7 +170,6 @@ RSpec.feature "Companies::Employees Permissions", type: :feature, js: true do
     select 'Full Time', from: 'employee[business_type]'
 
     click_button "Save Employee"
-    sleep 1
     expect(page).to have_selector('tbody tr', wait: 10)
 
     expect(Employee.find_by(name: "Created by Creator")).to be_present
@@ -280,6 +279,237 @@ RSpec.feature "Companies::Employees Permissions", type: :feature, js: true do
   end
 
   # =========================================================================
+  # SCENARIO 4b: Employee with delete permission CAN delete another employee via UI
+  # =========================================================================
+  scenario "employee with delete permission can delete another employee via show modal" do
+    # Setup: ensure delete role has the policies
+    sign_in(owner)
+    visit company_permissions_path(company)
+
+    delete_role = create(:role, company: company, name: "DeleteEmpUI", role_business_type: :management)
+    create_policy_appointment(role: delete_role, policy: policy_read_employee, workflow_status: :active)
+    create_policy_appointment(role: delete_role, policy: policy_delete_employee, workflow_status: :active)
+
+    delete_user = create(:user, :company_employee)
+    delete_emp = create(:employee, company: company, branch: branch, user: delete_user, roles: [ delete_role ], name: "To Be Deleted")
+
+    company.clear_permissions_cache
+    delete_emp.clear_permissions_cache
+    delete_emp.reload
+
+    # Verify can delete
+    expect(delete_emp.can?(:delete, Employee)).to be_truthy
+
+    # Sign in as delete user and try to delete
+    sign_in(delete_user)
+    visit company_employees_path(company)
+
+    expect(page).to have_selector('table', wait: 10)
+
+    # Click edit button to open show modal
+    target_row = find('tbody tr', text: "To Be Deleted")
+    target_row.find('[data-action*="openShowModal"]').click
+
+    expect(page).to have_selector('.swal2-container', wait: 10)
+
+    # Click Delete button
+    click_button "Delete"
+
+    # Accept confirmation
+    accept_alert
+
+    expect(page).to have_content("Employee deleted successfully!", wait: 10)
+
+    # Verify employee is discarded
+    delete_emp.reload
+    expect(delete_emp.discarded?).to be_truthy
+    expect(page).not_to have_content("To Be Deleted")
+  end
+
+  # =========================================================================
+  # SCENARIO 4c: Employee without delete permission CANNOT delete via UI
+  # =========================================================================
+  scenario "employee without delete permission cannot delete another employee" do
+    # Editor has update but NOT delete permission
+    editor_employee.clear_permissions_cache
+    company.clear_permissions_cache
+    editor_employee.reload
+
+    expect(editor_employee.can?(:delete, Employee)).to be_falsey
+
+    # Verify editor can view employee dashboard (has read permission)
+    sign_in(editor_user)
+    visit company_employees_path(company)
+
+    expect(page).to have_selector('table', wait: 10)
+    expect(page).to have_content(target_employee.name)
+
+    # Verify editor can access edit modal (has update permission)
+    target_row = find('tbody tr', text: target_employee.name)
+    target_row.find('[data-action*="openShowModal"]').click
+
+    expect(page).to have_selector('.swal2-container', wait: 10)
+    expect(page).to have_content(target_employee.name)
+  end
+
+  # =========================================================================
+  # SCENARIO 4d: Owner can delete employee (bypasses permissions)
+  # =========================================================================
+  scenario "owner can delete any employee regardless of permissions" do
+    # Create a target employee to delete
+    target_to_delete = create(:employee, company: company, branch: branch, name: "Owner Can Delete")
+
+    sign_in(owner)
+    visit company_employees_path(company)
+
+    expect(page).to have_selector('table', wait: 10)
+
+    target_row = find('tbody tr', text: "Owner Can Delete")
+    target_row.find('[data-action*="openShowModal"]').click
+
+    expect(page).to have_selector('.swal2-container', wait: 10)
+
+    # Owner should see delete button
+    expect(page).to have_selector('button', text: 'Delete')
+
+    click_button "Delete"
+
+    accept_alert
+
+    expect(page).to have_content("Employee deleted successfully!", wait: 10)
+
+    target_to_delete.reload
+    expect(target_to_delete.discarded?).to be_truthy
+  end
+
+  # =========================================================================
+  # SCENARIO 4e: Permitted employee CANNOT delete after permission removed
+  # =========================================================================
+  scenario "employee with delete permission removed cannot delete" do
+    # Create a role with delete permission (active) for this test
+    delete_role = create(:role, company: company, name: "DeleterPerm", role_business_type: :management)
+    create_policy_appointment(role: delete_role, policy: policy_read_employee, workflow_status: :active)
+    create_policy_appointment(role: delete_role, policy: policy_delete_employee, workflow_status: :active)
+
+    delete_user = create(:user, :company_employee)
+    delete_emp = create(:employee, company: company, branch: branch, user: delete_user, roles: [ delete_role ], name: "To Delete Employee")
+
+    company.clear_permissions_cache
+    delete_emp.clear_permissions_cache
+
+    # Verify employee CAN delete with permission
+    expect(delete_emp.can?(:delete, Employee)).to be_truthy
+
+    # Remove delete permission via UI
+    sign_in(owner)
+    visit company_permissions_path(company)
+
+    deleter_section = find('.role-section', text: "DeleterPerm")
+    delete_label = deleter_section.all('label').find { |l| l.text.include?("Can delete Employee") }
+    delete_checkbox = delete_label.find('input[type="checkbox"]')
+
+    expect(delete_checkbox.checked?).to be_truthy
+
+    accept_confirm do
+      delete_checkbox.click
+    end
+    expect(page).to have_selector('input[type="checkbox"]:not(:checked)', wait: 10)
+
+    company.clear_permissions_cache
+    delete_emp.clear_permissions_cache
+    delete_emp.reload
+    expect(delete_emp.can?(:delete, Employee)).to be_falsey
+
+    # Grant delete permission back via UI
+    deleter_section = find('.role-section', text: "DeleterPerm")
+    delete_label = deleter_section.all('label').find { |l| l.text.include?("Can delete Employee") }
+    delete_checkbox = delete_label.find('input[type="checkbox"]')
+
+    expect(delete_checkbox.checked?).to be_falsey
+
+    accept_confirm do
+      delete_checkbox.click
+    end
+    expect(page).to have_selector('input[type="checkbox"]:checked', wait: 10)
+
+    company.clear_permissions_cache
+    delete_emp.clear_permissions_cache
+    delete_emp.reload
+    expect(delete_emp.can?(:delete, Employee)).to be_truthy
+  end
+
+  # =========================================================================
+  # SCENARIO 4f: Non-permitted employee CAN delete after permission granted
+  # =========================================================================
+  scenario "employee granted delete permission can then delete" do
+    # NoPermission role starts with NO Employee policies
+    sign_in(owner)
+    visit company_permissions_path(company)
+
+    no_permission_section = find('.role-section', text: "NoPermission")
+
+    no_permission_section.click_button("Add Resource")
+    within(".swal2-html-container") do
+      select "Employee", from: "permission[resource_name]"
+      click_button "Add Resource"
+    end
+    expect(page).to have_content("Resource added successfully", wait: 10)
+
+    # Grant read first so they can access dashboard
+    no_permission_section = find('.role-section', text: "NoPermission")
+    read_label = no_permission_section.all('label').find { |l| l.text.include?("Can read Employee") }
+    read_checkbox = read_label.find('input[type="checkbox"]')
+    unless read_checkbox.checked?
+      accept_confirm do
+        read_checkbox.click
+      end
+      expect(page).to have_selector('input[type="checkbox"]:checked', wait: 10)
+    end
+
+    # Grant delete permission
+    no_permission_section = find('.role-section', text: "NoPermission")
+    delete_label = no_permission_section.all('label').find { |l| l.text.include?("Can delete Employee") }
+    delete_checkbox = delete_label.find('input[type="checkbox"]')
+
+    accept_confirm do
+      delete_checkbox.click
+    end
+    expect(page).to have_selector('input[type="checkbox"]:checked', wait: 10)
+
+    # Verify can delete
+    company.clear_permissions_cache
+    no_permission_employee.clear_permissions_cache
+    no_permission_employee.reload
+    expect(no_permission_employee.can?(:delete, Employee)).to be_truthy
+
+    # Create target to delete
+    target_to_delete = create(:employee, company: company, branch: branch, name: "Can Delete After Grant")
+
+    # Now try to delete
+    sign_in(no_permission_user)
+    visit company_employees_path(company)
+
+    expect(page).to have_selector('table', wait: 10)
+
+    target_row = find('tbody tr', text: "Can Delete After Grant")
+    target_row.find('[data-action*="openShowModal"]').click
+
+    expect(page).to have_selector('.swal2-container', wait: 10)
+
+    # Should now have delete button
+    expect(page).to have_selector('button', text: 'Delete')
+
+    click_button "Delete"
+
+    accept_alert
+
+    expect(page).to have_content("Employee deleted successfully!", wait: 10)
+
+    target_to_delete.reload
+    expect(target_to_delete.discarded?).to be_truthy
+  end
+
+  # =========================================================================
   # SCENARIO 5: Employee without permissions - backend check
   # =========================================================================
   # Note: Currently the UI shows access to everyone who can sign in
@@ -332,6 +562,70 @@ RSpec.feature "Companies::Employees Permissions", type: :feature, js: true do
     no_permission_employee.reload
 
     expect(no_permission_employee.can?(:create, Employee)).to be_truthy
+  end
+
+  # =========================================================================
+  # SCENARIO 8: Unpermitted employee AFTER receiving create permission CAN create
+  # =========================================================================
+  scenario "employee granted create permission can then create new employee" do
+    sign_in(owner)
+    visit company_permissions_path(company)
+
+    no_permission_section = find('.role-section', text: "NoPermission")
+
+    # First grant READ permission so they can access dashboard
+    unless no_permission_section.has_content?("Can read Employee")
+      no_permission_section.click_button("Add Resource")
+      within(".swal2-html-container") do
+        select "Employee", from: "permission[resource_name]"
+        click_button "Add Resource"
+      end
+      expect(page).to have_content("Resource added successfully", wait: 10)
+    end
+
+    # Grant READ first
+    no_permission_section = find('.role-section', text: "NoPermission")
+    read_label = no_permission_section.all('label').find { |l| l.text.include?("Can read Employee") }
+    read_checkbox = read_label.find('input[type="checkbox"]')
+    unless read_checkbox.checked?
+      accept_confirm do
+        read_checkbox.click
+      end
+      expect(page).to have_selector('input[type="checkbox"]:checked', wait: 10)
+    end
+
+    # Then grant CREATE permission
+    no_permission_section = find('.role-section', text: "NoPermission")
+    create_label = no_permission_section.all('label').find { |l| l.text.include?("Can create Employee") }
+    create_checkbox = create_label.find('input[type="checkbox"]')
+
+    accept_confirm do
+      create_checkbox.click
+    end
+    expect(page).to have_selector('input[type="checkbox"]:checked', wait: 10)
+
+    company.clear_permissions_cache
+    no_permission_employee.clear_permissions_cache
+    no_permission_employee.reload
+    expect(no_permission_employee.can?(:create, Employee)).to be_truthy
+
+    # Clear cache before signing in as the user
+    company.clear_permissions_cache
+    no_permission_employee.clear_permissions_cache
+    no_permission_employee.reload
+
+    sign_in(no_permission_user)
+    visit company_employees_path(company)
+
+    find('[data-action*="openNewModal"]').click
+    expect(page).to have_selector('form[data-action*="handleSubmit"]', wait: 10)
+    fill_in 'employee[name]', with: 'Created After Grant'
+    select 'Full Time', from: 'employee[business_type]'
+
+    click_button "Save Employee"
+    expect(page).to have_selector('tbody tr', wait: 10)
+
+    expect(Employee.find_by(name: "Created After Grant")).to be_present
   end
 
   scenario "owner can grant read permission to role via permissions page" do
@@ -458,6 +752,54 @@ RSpec.feature "Companies::Employees Permissions", type: :feature, js: true do
     expect(reader_employee.can?(:read, Employee)).to be_falsey
   end
 
+  # =========================================================================
+  # SCENARIO 10: Employee AFTER having create permission REMOVED cannot create
+  # =========================================================================
+  scenario "employee with create permission removed cannot create new employee" do
+    sign_in(owner)
+    visit company_permissions_path(company)
+
+    creator_section = find('.role-section', text: "Creator")
+    create_label = creator_section.all('label').find { |l| l.text.include?("Can create Employee") }
+    create_checkbox = create_label.find('input[type="checkbox"]')
+
+    unless create_checkbox.checked?
+      accept_confirm do
+        create_checkbox.click
+      end
+      expect(page).to have_selector('input[type="checkbox"]:checked', wait: 10)
+    end
+
+    company.clear_permissions_cache
+    creator_employee.clear_permissions_cache
+    creator_employee.reload
+    expect(creator_employee.can?(:create, Employee)).to be_truthy
+
+    create_checkbox.reload
+    accept_confirm do
+      create_checkbox.click
+    end
+    expect(page).to have_selector('input[type="checkbox"]:not(:checked)', wait: 10)
+
+    company.clear_permissions_cache
+    creator_employee.clear_permissions_cache
+    creator_employee.reload
+    expect(creator_employee.can?(:create, Employee)).to be_falsey
+
+    sign_in(creator_user)
+    visit company_employees_path(company)
+
+    find('[data-action*="openNewModal"]').click
+    expect(page).to have_selector('form[data-action*="handleSubmit"]', wait: 10)
+    fill_in 'employee[name]', with: 'Should Be Rejected'
+    select 'Full Time', from: 'employee[business_type]'
+
+    click_button "Save Employee"
+
+    expect(page).to have_content("You are not authorized to perform this action.", wait: 10)
+    expect(Employee.find_by(name: "Should Be Rejected")).to be_nil
+  end
+
   scenario "owner can remove update permission from role via permissions page" do
     # First grant update permission using editor role
     sign_in(owner)
@@ -547,7 +889,58 @@ RSpec.feature "Companies::Employees Permissions", type: :feature, js: true do
   end
 
   # =========================================================================
-  # SCENARIO 9: Employee WITH update permission CAN edit another employee's name via editable
+  # SCENARIO 11: Permission toggled OFF then ON - verifies cache clears
+  # =========================================================================
+  scenario "permission toggle off then on works correctly" do
+    sign_in(owner)
+    visit company_permissions_path(company)
+
+    creator_section = find('.role-section', text: "Creator")
+    %w[read create].each do |action|
+      label = creator_section.all('label').find { |l| l.text.include?("Can #{action} Employee") }
+      checkbox = label&.find('input[type="checkbox"]')
+      next unless checkbox && !checkbox.checked?
+      accept_confirm do
+        checkbox.click
+      end
+      expect(page).to have_selector('input[type="checkbox"]:checked', wait: 10)
+    end
+
+    company.clear_permissions_cache
+    creator_employee.clear_permissions_cache
+    creator_employee.reload
+    expect(creator_employee.can?(:create, Employee)).to be_truthy
+
+    # FIRST TOGGLE: OFF
+    creator_section = find('.role-section', text: "Creator")
+    create_label = creator_section.all('label').find { |l| l.text.include?("Can create Employee") }
+    create_checkbox = create_label.find('input[type="checkbox"]')
+
+    accept_confirm do
+      create_checkbox.click
+    end
+    expect(page).to have_selector('input[type="checkbox"]:not(:checked)', wait: 10)
+
+    company.clear_permissions_cache
+    creator_employee.clear_permissions_cache
+    creator_employee.reload
+    expect(creator_employee.can?(:create, Employee)).to be_falsey
+
+    # RE-Toggle: ON again
+    create_checkbox.reload
+    accept_confirm do
+      create_checkbox.click
+    end
+    expect(page).to have_selector('input[type="checkbox"]:checked', wait: 10)
+
+    company.clear_permissions_cache
+    creator_employee.clear_permissions_cache
+    creator_employee.reload
+    expect(creator_employee.can?(:create, Employee)).to be_truthy
+  end
+
+  # =========================================================================
+  # SCENARIO 12: Employee WITH update permission CAN edit another employee's name via editable
   # =========================================================================
   scenario "employee with update permission can edit another employee's name via editable" do
     sign_in(owner)
@@ -609,7 +1002,7 @@ RSpec.feature "Companies::Employees Permissions", type: :feature, js: true do
   end
 
   # =========================================================================
-  # SCENARIO 10: Employee WITHOUT update permission gets error when editing
+  # SCENARIO 13: Employee WITHOUT update permission gets error when editing
   # =========================================================================
   scenario "employee without update permission cannot edit another employee's name" do
     sign_in(owner)
@@ -681,7 +1074,7 @@ RSpec.feature "Companies::Employees Permissions", type: :feature, js: true do
   end
 
   # =========================================================================
-  # SCENARIO 8: Owner employee bypasses all permissions
+  # SCENARIO 14: Owner employee bypasses all permissions
   # =========================================================================
   scenario "owner employee can access dashboard regardless of permissions" do
     # Even with no policies, owner can access
@@ -690,6 +1083,68 @@ RSpec.feature "Companies::Employees Permissions", type: :feature, js: true do
 
     expect(page).to have_selector('table', wait: 10)
     expect(page).to have_selector('button', text: 'Add')
+  end
+
+  scenario "owner can see delete button but cannot delete another owner employee" do
+    owner_employee = company.employees.find_by(user: owner)
+
+    # Create another regular employee (not owner) to delete
+    regular_employee = create(:employee, company: company, branch: branch, name: "Regular To Delete")
+    non_owner = create(:employee, company: company, branch: branch, name: "Non-owner")
+
+    sign_in(owner)
+    visit company_employees_path(company)
+
+    expect(page).to have_selector('table', wait: 10)
+
+    # Try to delete regular employee - should work
+    target_row = find('tbody tr', text: "Regular To Delete")
+    target_row.find('[data-action*="openShowModal"]').click
+    expect(page).to have_selector('.swal2-container', wait: 10)
+    expect(page).to have_selector('button', text: 'Delete')
+
+    click_button "Delete"
+    accept_alert
+
+    expect(page).to have_content("Employee deleted successfully!", wait: 10)
+    regular_employee.reload
+    expect(regular_employee.discarded?).to be_truthy
+
+    # Try to delete non-owner employee - should work
+    target_row = find('tbody tr', text: "Non-owner")
+    target_row.find('[data-action*="openShowModal"]').click
+    expect(page).to have_selector('.swal2-container', wait: 10)
+
+    click_button "Delete"
+    accept_alert
+
+    expect(page).to have_content("Employee deleted successfully!", wait: 10)
+  end
+
+  scenario "owner cannot delete owner employee" do
+    owner_employee = company.employees.find_by(user: owner)
+
+    sign_in(owner)
+    visit company_employees_path(company)
+
+    expect(page).to have_selector('table', wait: 10)
+
+    # Find owner's row (the owner employee row)
+    target_row = find('tbody tr', text: owner_employee.name)
+    target_row.find('[data-action*="openShowModal"]').click
+    expect(page).to have_selector('.swal2-container', wait: 10)
+
+    # Owner should see the Delete button (because bypasses permission check)
+    expect(page).to have_selector('button', text: 'Delete')
+
+    click_button "Delete"
+
+    accept_alert
+
+    # Modal should close (delete button triggers close on error)
+    # Employee should NOT be discarded
+    owner_employee.reload
+    expect(owner_employee.discarded?).to be_falsey
   end
 
   scenario "owner can? returns true for all actions" do

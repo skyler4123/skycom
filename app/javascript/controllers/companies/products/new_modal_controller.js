@@ -15,12 +15,10 @@ export default class Companies_Products_NewModalController extends Controller {
       })
       /** @type {Product} */
       const newProduct = response.product
-      toast({
+      reloadThenToast({
         type: "success",
         message: `${newProduct.name || 'Product'} created successfully`
       })
-      closeModal()
-      window.dispatchEvent(new CustomEvent('refresh'))
     } catch (error) {
       toast({
         type: "error",

@@ -10,7 +10,6 @@ export default class Companies_Products_IndexController extends Companies_Layout
 
   async connect() {
     super.connect()
-    addAction(this.element, `editable:updateProduct@window->${this.identifier}#handleUpdate`)
     try {
       /** @type {{ products: Product[], pagination: any }} */
       const response = await fetchJson()
@@ -18,7 +17,7 @@ export default class Companies_Products_IndexController extends Companies_Layout
       this.products = response.products || []
       this.pagination = response.pagination || {}
 
-      window.poll(() => {
+      poll(() => {
         if (this.hasContentTarget) {
           this.renderContent()
           return true
@@ -40,21 +39,6 @@ export default class Companies_Products_IndexController extends Companies_Layout
     const { productId } = event.params
     window.currentProduct = findById(this.products, productId)
     openModal({ html: `<div data-controller="${identifier(Companies_Products_ShowModalController)}"></div>` })
-  }
-
-  handleUpdate(event) {
-    const { data } = event.detail
-    const newProduct = data.product
-
-    if (!newProduct) return
-
-    this.products = mergeObjectArrays(this.products, [newProduct], "id")
-
-    if (window.currentProduct?.id === newProduct.id) {
-      window.currentProduct = newProduct
-    }
-
-    this.renderContent()
   }
 
   contentHTML() {

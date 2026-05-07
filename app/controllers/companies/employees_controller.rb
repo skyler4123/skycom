@@ -2,13 +2,11 @@
 
 class Companies::EmployeesController < Companies::ApplicationController
   def index
-    authorize current_employee, :index?, policy_class: Companies::EmployeesPolicy
-
     respond_to do |format|
       format.html { render html: "", layout: true }
       format.json do
         # 1. Apply Filtering Logic
-        scope = current_company.employees.includes(:user, :roles, :departments, :branch)
+        scope = current_company.employees.kept.includes(:user, :roles, :departments, :branch)
         scope = scope.where(departments: { id: params[:department_id] }) if params[:department_id].present?
         scope = scope.where(roles: { id: params[:role_id] }) if params[:role_id].present?
         scope = scope.where(business_type: params[:business_type]) if params[:business_type].present?
@@ -33,8 +31,6 @@ class Companies::EmployeesController < Companies::ApplicationController
   end
 
   def create
-    authorize current_employee, :create?, policy_class: Companies::EmployeesPolicy
-
     respond_to do |format|
       format.json do
         # Using your Seed::EmployeeService to handle the creation logic
@@ -59,8 +55,6 @@ class Companies::EmployeesController < Companies::ApplicationController
   end
 
   def update
-    authorize current_employee, :update?, policy_class: Companies::EmployeesPolicy
-
     employee = current_company.employees.find(params[:id])
 
     respond_to do |format|
@@ -77,6 +71,24 @@ class Companies::EmployeesController < Companies::ApplicationController
     end
   rescue ActiveRecord::RecordNotFound
     render json: { status: "error", message: "Employee not found" }, status: :not_found
+  end
+
+  def destroy
+    employee = current_company.employees.find(params[:id])
+
+    respond_to do |format|
+      format.json do
+        if employee.discard!
+          render json: { message: "Employee deleted successfully!" }
+        else
+          render json: { errors: employee.errors.full_messages }, status: :unprocessable_entity
+        end
+      end
+    end
+  rescue ActiveRecord::RecordNotFound
+    render json: { status: "error", message: "Employee not found" }, status: :not_found
+  rescue Discard::RecordNotDiscarded => e
+    render json: { errors: [ e.message ] }, status: :unprocessable_entity
   end
 
   private

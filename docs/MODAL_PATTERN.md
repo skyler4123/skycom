@@ -153,7 +153,7 @@ export default class Companies_Employees_ShowModalController extends Controller 
 
   close(event) {
     event.preventDefault()
-    window.closeModal()
+    closeModal()
   }
 }
 ```

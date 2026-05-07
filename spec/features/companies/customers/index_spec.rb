@@ -49,7 +49,6 @@ RSpec.feature "Companies::Customers Management", type: :feature, js: true do
       click_button "Save Customer"
     rescue Selenium::WebDriver::Error::StaleElementReferenceError
       visit company_customers_path(company)
-      sleep 1
       expect(page).to have_selector('table', wait: 10)
 
       find('[data-action*="openNewModal"]').click

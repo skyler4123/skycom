@@ -64,9 +64,7 @@ RSpec.feature "Companies::Employees Management", type: :feature, js: true do
     begin
       click_button "Save Employee"
     rescue Selenium::WebDriver::Error::StaleElementReferenceError
-      # Give it a millisecond to settle and try one last time
       visit company_employees_path(company)
-      sleep 1
       expect(page).to have_selector('table', wait: 10)
 
       find('[data-action*="openNewModal"]').click
@@ -88,6 +86,25 @@ RSpec.feature "Companies::Employees Management", type: :feature, js: true do
     expect(page).to have_selector('table', wait: 10)
 
     expect(page).to have_selector('[data-action*="openShowModal"]', minimum: 1)
+  end
+
+  scenario "delete button removes employee from table" do
+    visit company_employees_path(company)
+    expect(page).to have_selector('table', wait: 10)
+
+    target_row = find('tbody tr', text: employee.name)
+    target_row.find('[data-action*="openShowModal"]').click
+
+    expect(page).to have_selector('.swal2-container', wait: 10)
+
+    click_button "Delete"
+
+    accept_alert
+
+    expect(page).to have_content("Employee deleted successfully!", wait: 10)
+
+    employee.reload
+    expect(employee.discarded?).to be_truthy
   end
 
   scenario "search triggers form submission and filters results" do

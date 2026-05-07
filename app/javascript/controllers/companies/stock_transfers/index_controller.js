@@ -16,7 +16,7 @@ export default class Companies_StockTransfers_IndexController extends Companies_
       this.transfers = response.stock_transfers || []
       this.pagination = response.pagination || {}
 
-      window.poll(() => {
+      poll(() => {
         if (this.hasContentTarget) {
           this.renderContent()
           return true

@@ -128,6 +128,6 @@ export default class Companies_Departments_ShowModalController extends Controlle
 
   close(event) {
     event.preventDefault()
-    window.closeModal()
+    closeModal()
   }
 }
