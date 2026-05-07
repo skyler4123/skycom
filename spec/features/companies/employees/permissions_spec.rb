@@ -334,6 +334,71 @@ RSpec.feature "Companies::Employees Permissions", type: :feature, js: true do
     expect(no_permission_employee.can?(:create, Employee)).to be_truthy
   end
 
+  # =========================================================================
+  # SCENARIO 8: Unpermitted employee AFTER receiving create permission CAN create
+  # =========================================================================
+  scenario "employee granted create permission can then create new employee" do
+    sign_in(owner)
+    visit company_permissions_path(company)
+
+    no_permission_section = find('.role-section', text: "NoPermission")
+
+    # First grant READ permission so they can access dashboard
+    unless no_permission_section.has_content?("Can read Employee")
+      no_permission_section.click_button("Add Resource")
+      within(".swal2-html-container") do
+        select "Employee", from: "permission[resource_name]"
+        click_button "Add Resource"
+      end
+      expect(page).to have_content("Resource added successfully", wait: 10)
+    end
+
+    # Grant READ first
+    no_permission_section = find('.role-section', text: "NoPermission")
+    read_label = no_permission_section.all('label').find { |l| l.text.include?("Can read Employee") }
+    read_checkbox = read_label.find('input[type="checkbox"]')
+    unless read_checkbox.checked?
+      accept_confirm do
+        read_checkbox.click
+      end
+      expect(page).to have_selector('input[type="checkbox"]:checked', wait: 10)
+    end
+
+    # Then grant CREATE permission
+    no_permission_section = find('.role-section', text: "NoPermission")
+    create_label = no_permission_section.all('label').find { |l| l.text.include?("Can create Employee") }
+    create_checkbox = create_label.find('input[type="checkbox"]')
+
+    accept_confirm do
+      create_checkbox.click
+    end
+    expect(page).to have_selector('input[type="checkbox"]:checked', wait: 10)
+
+    company.clear_permissions_cache
+    no_permission_employee.clear_permissions_cache
+    no_permission_employee.reload
+    expect(no_permission_employee.can?(:create, Employee)).to be_truthy
+
+    # Clear cache before signing in as the user
+    company.clear_permissions_cache
+    no_permission_employee.clear_permissions_cache
+    no_permission_employee.reload
+
+    sign_in(no_permission_user)
+    visit company_employees_path(company)
+
+    find('[data-action*="openNewModal"]').click
+    expect(page).to have_selector('form[data-action*="handleSubmit"]', wait: 10)
+    fill_in 'employee[name]', with: 'Created After Grant'
+    select 'Full Time', from: 'employee[business_type]'
+
+    click_button "Save Employee"
+    sleep 1
+    expect(page).to have_selector('tbody tr', wait: 10)
+
+    expect(Employee.find_by(name: "Created After Grant")).to be_present
+  end
+
   scenario "owner can grant read permission to role via permissions page" do
     sign_in(owner)
     visit company_permissions_path(company)
@@ -458,6 +523,54 @@ RSpec.feature "Companies::Employees Permissions", type: :feature, js: true do
     expect(reader_employee.can?(:read, Employee)).to be_falsey
   end
 
+  # =========================================================================
+  # SCENARIO 10: Employee AFTER having create permission REMOVED cannot create
+  # =========================================================================
+  scenario "employee with create permission removed cannot create new employee" do
+    sign_in(owner)
+    visit company_permissions_path(company)
+
+    creator_section = find('.role-section', text: "Creator")
+    create_label = creator_section.all('label').find { |l| l.text.include?("Can create Employee") }
+    create_checkbox = create_label.find('input[type="checkbox"]')
+
+    unless create_checkbox.checked?
+      accept_confirm do
+        create_checkbox.click
+      end
+      expect(page).to have_selector('input[type="checkbox"]:checked', wait: 10)
+    end
+
+    company.clear_permissions_cache
+    creator_employee.clear_permissions_cache
+    creator_employee.reload
+    expect(creator_employee.can?(:create, Employee)).to be_truthy
+
+    create_checkbox.reload
+    accept_confirm do
+      create_checkbox.click
+    end
+    expect(page).to have_selector('input[type="checkbox"]:not(:checked)', wait: 10)
+
+    company.clear_permissions_cache
+    creator_employee.clear_permissions_cache
+    creator_employee.reload
+    expect(creator_employee.can?(:create, Employee)).to be_falsey
+
+    sign_in(creator_user)
+    visit company_employees_path(company)
+
+    find('[data-action*="openNewModal"]').click
+    expect(page).to have_selector('form[data-action*="handleSubmit"]', wait: 10)
+    fill_in 'employee[name]', with: 'Should Be Rejected'
+    select 'Full Time', from: 'employee[business_type]'
+
+    click_button "Save Employee"
+
+    expect(page).to have_content("You are not authorized to perform this action.", wait: 10)
+    expect(Employee.find_by(name: "Should Be Rejected")).to be_nil
+  end
+
   scenario "owner can remove update permission from role via permissions page" do
     # First grant update permission using editor role
     sign_in(owner)
@@ -547,7 +660,58 @@ RSpec.feature "Companies::Employees Permissions", type: :feature, js: true do
   end
 
   # =========================================================================
-  # SCENARIO 9: Employee WITH update permission CAN edit another employee's name via editable
+  # SCENARIO 11: Permission toggled OFF then ON - verifies cache clears
+  # =========================================================================
+  scenario "permission toggle off then on works correctly" do
+    sign_in(owner)
+    visit company_permissions_path(company)
+
+    creator_section = find('.role-section', text: "Creator")
+    %w[read create].each do |action|
+      label = creator_section.all('label').find { |l| l.text.include?("Can #{action} Employee") }
+      checkbox = label&.find('input[type="checkbox"]')
+      next unless checkbox && !checkbox.checked?
+      accept_confirm do
+        checkbox.click
+      end
+      expect(page).to have_selector('input[type="checkbox"]:checked', wait: 10)
+    end
+
+    company.clear_permissions_cache
+    creator_employee.clear_permissions_cache
+    creator_employee.reload
+    expect(creator_employee.can?(:create, Employee)).to be_truthy
+
+    # FIRST TOGGLE: OFF
+    creator_section = find('.role-section', text: "Creator")
+    create_label = creator_section.all('label').find { |l| l.text.include?("Can create Employee") }
+    create_checkbox = create_label.find('input[type="checkbox"]')
+
+    accept_confirm do
+      create_checkbox.click
+    end
+    expect(page).to have_selector('input[type="checkbox"]:not(:checked)', wait: 10)
+
+    company.clear_permissions_cache
+    creator_employee.clear_permissions_cache
+    creator_employee.reload
+    expect(creator_employee.can?(:create, Employee)).to be_falsey
+
+    # RE-Toggle: ON again
+    create_checkbox.reload
+    accept_confirm do
+      create_checkbox.click
+    end
+    expect(page).to have_selector('input[type="checkbox"]:checked', wait: 10)
+
+    company.clear_permissions_cache
+    creator_employee.clear_permissions_cache
+    creator_employee.reload
+    expect(creator_employee.can?(:create, Employee)).to be_truthy
+  end
+
+  # =========================================================================
+  # SCENARIO 12: Employee WITH update permission CAN edit another employee's name via editable
   # =========================================================================
   scenario "employee with update permission can edit another employee's name via editable" do
     sign_in(owner)
@@ -609,7 +773,7 @@ RSpec.feature "Companies::Employees Permissions", type: :feature, js: true do
   end
 
   # =========================================================================
-  # SCENARIO 10: Employee WITHOUT update permission gets error when editing
+  # SCENARIO 13: Employee WITHOUT update permission gets error when editing
   # =========================================================================
   scenario "employee without update permission cannot edit another employee's name" do
     sign_in(owner)
@@ -681,7 +845,7 @@ RSpec.feature "Companies::Employees Permissions", type: :feature, js: true do
   end
 
   # =========================================================================
-  # SCENARIO 8: Owner employee bypasses all permissions
+  # SCENARIO 14: Owner employee bypasses all permissions
   # =========================================================================
   scenario "owner employee can access dashboard regardless of permissions" do
     # Even with no policies, owner can access
