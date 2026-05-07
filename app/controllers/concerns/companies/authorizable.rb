@@ -11,7 +11,7 @@ module Companies::Authorizable
   private
 
   def authorize_current_employee!
-    return unless current_employee
+    raise Pundit::NotAuthorizedError unless current_employee
 
     # 1. Derive Policy Class (e.g., Companies::EmployeesController -> Companies::EmployeesPolicy)
     # We remove "Controller" but keep the plural "Employees"
