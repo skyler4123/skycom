@@ -48,6 +48,7 @@ export const company_facilities_path = (companyId) => `/companies/${companyId}/f
 export const company_employees_path = (companyId) => `/companies/${companyId}/employees`
 export const create_company_employees_path = (companyId) => `/companies/${companyId}/employees`
 export const edit_company_employee_path = (companyId, employeeId) => `/companies/${companyId}/employees/${employeeId}`
+export const delete_company_employee_path = (companyId, employeeId) => `/companies/${companyId}/employees/${employeeId}`
 
 export const company_orders_path = (companyId) => `/companies/${companyId}/orders`
 export const create_company_orders_path = (companyId) => `/companies/${companyId}/orders`

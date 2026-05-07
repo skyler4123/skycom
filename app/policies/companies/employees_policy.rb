@@ -14,4 +14,8 @@ class Companies::EmployeesPolicy < ApplicationPolicy
     # but for general creation/index, checking the employee works perfectly.
     record.can?(:update, Employee)
   end
+
+  def destroy?
+    record.can?(:delete, Employee)
+  end
 end

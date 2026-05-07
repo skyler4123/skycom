@@ -36,9 +36,14 @@ export default class Companies_Employees_ShowModalController extends Controller 
           
           <div class="flex items-center justify-between border-b border-slate-200 dark:border-gray-800 px-6 py-4">
             <h3 class="text-xl font-bold text-slate-900 dark:text-white">Employee Details</h3>
-            <button data-action="click->${this.identifier}#close" class="rounded-full p-2 text-slate-500 dark:text-gray-400 hover:bg-slate-100 dark:hover:bg-gray-800">
-              <span class="material-symbols-outlined">close</span>
-            </button>
+            <div class="flex items-center gap-2">
+              <button type="button" data-action="click->${this.identifier}#deleteEmployee" class="px-3 py-1.5 text-sm font-medium text-red-600 hover:text-red-700 hover:bg-red-50 rounded-lg">
+                Delete
+              </button>
+              <button data-action="click->${this.identifier}#close" class="rounded-full p-2 text-slate-500 dark:text-gray-400 hover:bg-slate-100 dark:hover:bg-gray-800">
+                <span class="material-symbols-outlined">close</span>
+              </button>
+            </div>
           </div>
 
           <div class="p-6">
@@ -190,6 +195,31 @@ export default class Companies_Employees_ShowModalController extends Controller 
     const options = Enums().employee[collectionKey] || []
     const match = options.find(opt => opt.value === value)
     return match ? match.name : value
+  }
+
+  async deleteEmployee(event) {
+    event.preventDefault()
+
+    const confirmed = confirm(`Are you sure you want to delete "${this.employee.name}"? This action cannot be undone.`)
+    if (!confirmed) return
+
+    try {
+      // Use fetchJson with DELETE method
+      const response = await fetchJson(
+        Helpers.delete_company_employee_path(currentCompany().id, this.employee.id),
+        { method: "DELETE" }
+      )
+
+      toast({ type: "success", message: response.message || "Employee deleted successfully!" })
+      window.closeModal()
+
+      // Dispatch refresh event to reload the employee list
+      window.dispatchEvent(new CustomEvent("editable:updateEmployee", {
+        detail: { resource: "employee", data: { employee: { ...this.employee, workflow_status: "archived" } }, value: this.employee.name }
+      }))
+    } catch (error) {
+      toast({ type: "error", message: error.errors?.join(", ") || error.message || "Failed to delete employee" })
+    }
   }
 
   close(event) {

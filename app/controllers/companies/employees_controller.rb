@@ -8,7 +8,7 @@ class Companies::EmployeesController < Companies::ApplicationController
       format.html { render html: "", layout: true }
       format.json do
         # 1. Apply Filtering Logic
-        scope = current_company.employees.includes(:user, :roles, :departments, :branch)
+        scope = current_company.employees.kept.includes(:user, :roles, :departments, :branch)
         scope = scope.where(departments: { id: params[:department_id] }) if params[:department_id].present?
         scope = scope.where(roles: { id: params[:role_id] }) if params[:role_id].present?
         scope = scope.where(business_type: params[:business_type]) if params[:business_type].present?
@@ -77,6 +77,26 @@ class Companies::EmployeesController < Companies::ApplicationController
     end
   rescue ActiveRecord::RecordNotFound
     render json: { status: "error", message: "Employee not found" }, status: :not_found
+  end
+
+  def destroy
+    authorize current_employee, :destroy?, policy_class: Companies::EmployeesPolicy
+
+    employee = current_company.employees.find(params[:id])
+
+    respond_to do |format|
+      format.json do
+        if employee.discard!
+          render json: { message: "Employee deleted successfully!" }
+        else
+          render json: { errors: employee.errors.full_messages }, status: :unprocessable_entity
+        end
+      end
+    end
+  rescue ActiveRecord::RecordNotFound
+    render json: { status: "error", message: "Employee not found" }, status: :not_found
+  rescue Discard::RecordNotDiscarded => e
+    render json: { errors: [ e.message ] }, status: :unprocessable_entity
   end
 
   private

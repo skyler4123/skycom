@@ -48,6 +48,9 @@ class Employee < ApplicationRecord
   validates :business_type, presence: true
   validate :only_one_owner_per_company, on: :create
 
+  before_discard :prevent_discard_if_owner
+  before_destroy :prevent_destroy_if_owner
+
   private
 
   def only_one_owner_per_company
@@ -64,5 +67,17 @@ class Employee < ApplicationRecord
     if owner_exists
       errors.add(:base, "Only one owner employee is allowed per company.")
     end
+  end
+
+  def prevent_discard_if_owner
+    return unless business_type.to_s == "owner"
+    errors.add(:base, "Owner employee cannot be discarded.")
+    throw(:abort)
+  end
+
+  def prevent_destroy_if_owner
+    return unless business_type.to_s == "owner"
+    errors.add(:base, "Owner employee cannot be destroyed.")
+    throw(:abort)
   end
 end

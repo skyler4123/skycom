@@ -623,7 +623,44 @@ Base: Only one owner employee is allowed per company.
 
 ---
 
-### B. RoleAppointment Owner Validation
+### B. Owner Employee Cannot Be Deleted
+
+Owner employees are protected from deletion to prevent orphaned companies. Both `.discard!` (soft-delete) and `.destroy!` (hard-delete) are blocked.
+
+**Implementation:**
+```ruby
+# app/models/employee.rb
+before_discard :prevent_discard_if_owner
+before_destroy :prevent_destroy_if_owner
+
+private
+
+def prevent_discard_if_owner
+  return unless business_type.to_s == "owner"
+  errors.add(:base, "Owner employee cannot be discarded.")
+  throw(:abort)
+end
+
+def prevent_destroy_if_owner
+  return unless business_type.to_s == "owner"
+  errors.add(:base, "Owner employee cannot be destroyed.")
+  throw(:abort)
+end
+```
+
+**Behavior:**
+| Action | Result |
+|--------|--------|
+| Discard owner employee | ❌ Raises `Discard::RecordNotDiscarded` |
+| Destroy owner employee | ❌ Raises error (blocked by callbacks) |
+| Discard non-owner employee | ✅ Allowed |
+| Update owner employee | ✅ Allowed |
+
+**Why:** Deleting an owner employee would leave a company without an owner, breaking the permission system that relies on owner bypass.
+
+---
+
+### C. RoleAppointment Owner Validation
 
 RoleAppointments with `business_type='owner'` have two constraints:
 
@@ -708,6 +745,7 @@ employee_business_type { ["full_time", "part_time", "contractor", "intern"].samp
 | Validation | Table | Constraint |
 |------------|-------|------------|
 | Employee uniqueness | `employees` | Only 1 with `business_type='owner'` per company |
+| Employee protection | `employees` | Owner employee cannot be discarded or destroyed |
 | RoleAppointment uniqueness | `role_appointments` | Only 1 with `business_type='owner'` per company |
 | RoleAppointment → Employee | `role_appointments` | Owner role can only point to employees with `business_type='owner'` |
 

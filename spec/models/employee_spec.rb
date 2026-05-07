@@ -50,4 +50,27 @@ RSpec.describe Employee, type: :model do
       end
     end
   end
+
+  describe "owner employee protection" do
+    let!(:company) { create(:company) }
+    let!(:owner_employee) { company.employees.find_by(business_type: :owner) }
+
+    context "when trying to discard an owner employee" do
+      it "does not discard and raises an error" do
+        expect { owner_employee.discard! }.to raise_error(Discard::RecordNotDiscarded)
+        owner_employee.reload
+        expect(owner_employee.discarded?).to be_falsey
+      end
+    end
+
+    context "when trying to discard a non-owner employee" do
+      let!(:non_owner) { create(:employee, company: company, business_type: :full_time) }
+
+      it "allows discard" do
+        expect { non_owner.discard! }.not_to raise_error
+        non_owner.reload
+        expect(non_owner.discarded?).to be_truthy
+      end
+    end
+  end
 end
