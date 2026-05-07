@@ -10,7 +10,6 @@ export default class Companies_Orders_IndexController extends Companies_LayoutCo
 
   async connect() {
     super.connect()
-    addAction(this.element, `editable:updateOrder@window->${this.identifier}#handleUpdate`)
     try {
       /** @type {{ orders: Order[], pagination: any }} */
       const response = await fetchJson()
@@ -18,7 +17,7 @@ export default class Companies_Orders_IndexController extends Companies_LayoutCo
       this.orders = response.orders || []
       this.pagination = response.pagination || {}
 
-      window.poll(() => {
+      poll(() => {
         if (this.hasContentTarget) {
           this.renderContent()
           return true
@@ -40,21 +39,6 @@ export default class Companies_Orders_IndexController extends Companies_LayoutCo
     const { orderId } = event.params
     window.currentOrder = findById(this.orders, orderId)
     openModal({ html: `<div data-controller="${identifier(Companies_Orders_ShowModalController)}"></div>` })
-  }
-
-  handleUpdate(event) {
-    const { data } = event.detail
-    const newOrder = data.order
-
-    if (!newOrder) return
-
-    this.orders = mergeObjectArrays(this.orders, [newOrder], "id")
-
-    if (window.currentOrder?.id === newOrder.id) {
-      window.currentOrder = newOrder
-    }
-
-    this.renderContent()
   }
 
   contentHTML() {

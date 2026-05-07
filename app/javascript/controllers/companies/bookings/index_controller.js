@@ -10,7 +10,6 @@ export default class Companies_Bookings_IndexController extends Companies_Layout
 
   async connect() {
     super.connect()
-    addAction(this.element, `editable:updateBooking@window->${this.identifier}#handleUpdate`)
     try {
       /** @type {{ bookings: Booking[], pagination: any }} */
       const response = await fetchJson()
@@ -18,7 +17,7 @@ export default class Companies_Bookings_IndexController extends Companies_Layout
       this.bookings = response.bookings || []
       this.pagination = response.pagination || {}
 
-      window.poll(() => {
+      poll(() => {
         if (this.hasContentTarget) {
           this.renderContent()
           return true
@@ -40,21 +39,6 @@ export default class Companies_Bookings_IndexController extends Companies_Layout
     const { bookingId } = event.params
     window.currentBooking = findById(this.bookings, bookingId)
     openModal({ html: `<div data-controller="${identifier(Companies_Bookings_ShowModalController)}"></div>` })
-  }
-
-  handleUpdate(event) {
-    const { data } = event.detail
-    const newBooking = data.booking
-
-    if (!newBooking) return
-
-    this.bookings = mergeObjectArrays(this.bookings, [newBooking], "id")
-
-    if (window.currentBooking?.id === newBooking.id) {
-      window.currentBooking = newBooking
-    }
-
-    this.renderContent()
   }
 
   contentHTML() {

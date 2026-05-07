@@ -10,7 +10,6 @@ export default class Companies_Customers_IndexController extends Companies_Layou
 
   async connect() {
     super.connect()
-    addAction(this.element, `editable:updateCustomer@window->${this.identifier}#handleUpdate`)
     try {
       /** @type {{ customers: Customer[], pagination: any }} */
       const response = await fetchJson()
@@ -18,7 +17,7 @@ export default class Companies_Customers_IndexController extends Companies_Layou
       this.customers = response.customers || []
       this.pagination = response.pagination || {}
 
-      window.poll(() => {
+      poll(() => {
         if (this.hasContentTarget) {
           this.renderContent()
           return true
@@ -40,21 +39,6 @@ export default class Companies_Customers_IndexController extends Companies_Layou
     const { customerId } = event.params
     window.currentCustomer = findById(this.customers, customerId)
     openModal({ html: `<div data-controller="${identifier(Companies_Customers_ShowModalController)}"></div>` })
-  }
-
-  handleUpdate(event) {
-    const { data } = event.detail
-    const newCustomer = data.customer
-
-    if (!newCustomer) return
-
-    this.customers = mergeObjectArrays(this.customers, [newCustomer], "id")
-
-    if (window.currentCustomer?.id === newCustomer.id) {
-      window.currentCustomer = newCustomer
-    }
-
-    this.renderContent()
   }
 
   contentHTML() {

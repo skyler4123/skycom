@@ -10,7 +10,6 @@ export default class Companies_Invoices_IndexController extends Companies_Layout
 
   async connect() {
     super.connect()
-    addAction(this.element, `editable:updateInvoice@window->${this.identifier}#handleUpdate`)
     try {
       /** @type {{ invoices: Invoice[], pagination: any }} */
       const response = await fetchJson()
@@ -18,7 +17,7 @@ export default class Companies_Invoices_IndexController extends Companies_Layout
       this.invoices = response.invoices || []
       this.pagination = response.pagination || {}
 
-      window.poll(() => {
+      poll(() => {
         if (this.hasContentTarget) {
           this.renderContent()
           return true
@@ -40,21 +39,6 @@ export default class Companies_Invoices_IndexController extends Companies_Layout
     const { invoiceId } = event.params
     window.currentInvoice = findById(this.invoices, invoiceId)
     openModal({ html: `<div data-controller="${identifier(Companies_Invoices_ShowModalController)}"></div>` })
-  }
-
-  handleUpdate(event) {
-    const { data } = event.detail
-    const newInvoice = data.invoice
-
-    if (!newInvoice) return
-
-    this.invoices = mergeObjectArrays(this.invoices, [newInvoice], "id")
-
-    if (window.currentInvoice?.id === newInvoice.id) {
-      window.currentInvoice = newInvoice
-    }
-
-    this.renderContent()
   }
 
   contentHTML() {

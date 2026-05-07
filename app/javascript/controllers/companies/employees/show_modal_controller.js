@@ -16,6 +16,36 @@ export default class Companies_Employees_ShowModalController extends Controller 
     }
   }
 
+  // Enum helper from previous steps
+  getEnumName(collectionKey, value) {
+    const options = Enums().employee[collectionKey] || []
+    const match = options.find(opt => opt.value === value)
+    return match ? match.name : value
+  }
+
+  async deleteEmployee(event) {
+    event.preventDefault()
+
+    const confirmed = confirm(`Are you sure you want to delete "${this.employee.name}"? This action cannot be undone.`)
+    if (!confirmed) return
+
+    try {
+      // Use fetchJson with DELETE method
+      const response = await fetchJson(
+        Helpers.delete_company_employee_path(currentCompany().id, this.employee.id),
+        { method: "DELETE" }
+      )
+      reloadThenToast({type: "success", message: response.message || "Employee deleted successfully!"})
+    } catch (error) {
+      toast({ type: "error", message: error.errors?.join(", ") || error.message || "Failed to delete employee" })
+    }
+  }
+
+  close(event) {
+    event.preventDefault()
+    closeModal()
+  }
+
   html() {
     const e = this.employee
     const name = e.name || "N/A"
@@ -188,42 +218,5 @@ export default class Companies_Employees_ShowModalController extends Controller 
           </div>
       </div>
     `
-  }
-
-  // Enum helper from previous steps
-  getEnumName(collectionKey, value) {
-    const options = Enums().employee[collectionKey] || []
-    const match = options.find(opt => opt.value === value)
-    return match ? match.name : value
-  }
-
-  async deleteEmployee(event) {
-    event.preventDefault()
-
-    const confirmed = confirm(`Are you sure you want to delete "${this.employee.name}"? This action cannot be undone.`)
-    if (!confirmed) return
-
-    try {
-      // Use fetchJson with DELETE method
-      const response = await fetchJson(
-        Helpers.delete_company_employee_path(currentCompany().id, this.employee.id),
-        { method: "DELETE" }
-      )
-
-      toast({ type: "success", message: response.message || "Employee deleted successfully!" })
-      window.closeModal()
-
-      // Dispatch refresh event to reload the employee list
-      window.dispatchEvent(new CustomEvent("editable:updateEmployee", {
-        detail: { resource: "employee", data: { employee: { ...this.employee, workflow_status: "archived" } }, value: this.employee.name }
-      }))
-    } catch (error) {
-      toast({ type: "error", message: error.errors?.join(", ") || error.message || "Failed to delete employee" })
-    }
-  }
-
-  close(event) {
-    event.preventDefault()
-    window.closeModal()
   }
 }

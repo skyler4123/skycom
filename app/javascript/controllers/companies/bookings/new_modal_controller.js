@@ -15,12 +15,10 @@ export default class Companies_Bookings_NewModalController extends Controller {
       })
       /** @type {Booking} */
       const newBooking = response.booking
-      toast({
+      reloadThenToast({
         type: "success",
         message: `${newBooking.name || 'Booking'} created successfully`
       })
-      closeModal()
-      window.dispatchEvent(new CustomEvent('refresh'))
     } catch (error) {
       toast({
         type: "error",

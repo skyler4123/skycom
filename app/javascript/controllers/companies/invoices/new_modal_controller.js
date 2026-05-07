@@ -15,12 +15,10 @@ export default class Companies_Invoices_NewModalController extends Controller {
       })
       /** @type {Invoice} */
       const newInvoice = response.invoice
-      toast({
+      reloadThenToast({
         type: "success",
         message: `${newInvoice.name || 'Invoice'} created successfully`
       })
-      closeModal()
-      window.dispatchEvent(new CustomEvent('refresh'))
     } catch (error) {
       toast({
         type: "error",

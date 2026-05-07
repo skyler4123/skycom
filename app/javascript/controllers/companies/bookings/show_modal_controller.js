@@ -12,6 +12,11 @@ export default class Companies_Bookings_ShowModalController extends Controller {
     }
   }
 
+  close(event) {
+    event.preventDefault()
+    closeModal()
+  }
+
   html() {
     const b = this.booking
     const name = b.name || "N/A"
@@ -107,10 +112,5 @@ export default class Companies_Bookings_ShowModalController extends Controller {
         </div>
       </div>
     `
-  }
-
-  close(event) {
-    event.preventDefault()
-    window.closeModal()
   }
 }

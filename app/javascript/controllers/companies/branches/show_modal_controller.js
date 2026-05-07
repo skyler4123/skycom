@@ -209,6 +209,6 @@ export default class Companies_Branches_ShowModalController extends Controller {
 
   close(event) {
     event.preventDefault()
-    window.closeModal()
+    closeModal()
   }
 }
