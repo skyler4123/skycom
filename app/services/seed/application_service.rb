@@ -17,9 +17,11 @@ class Seed::ApplicationService
 
     # Clear global data before seeding
     User.destroy_all
+    Employee.delete_all
+    User.destroy_all
+
     PaymentMethod.destroy_all
     Brand.destroy_all
-
 
     # Global Data
     # Identify the platform by a hardcoded CODE, not ID.

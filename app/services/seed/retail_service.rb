@@ -4,14 +4,33 @@ class Seed::RetailService
     Cashier: 10,
     Seller: 10,
     Security: 1,
-    Admin: 1
+    Admin: 1,
+    Doctor: 3,      # Advises & Performs clinical services
+    Therapist: 8,   # Performs skin treatments/spa
+    Consultant: 5  # Sells products & advises services
+
   }.freeze
 
-  CUSTOMER_COUNTS = { Customer: 20 }.freeze
+  CUSTOMER_COUNTS = { Customer: 50 }.freeze
+  BEAUTY_PRODUCTS = [
+    "La Roche-Posay Effaclar 400ml", "Annessa Sunscreen 60ml",
+    "L'Oreal Micellar Water", "Klairs Supple Toner",
+    "Innisfree Green Tea Seed Serum", "CeraVe Hydrating Cleanser"
+  ].freeze
+
+  CLINIC_SERVICES = [
+    "Laser CO2 Fractional - Scar Removal",
+    "HIFU Lifting Treatment",
+    "Pico Laser - Toning",
+    "Acne Treatment - Standard",
+    "Basic Skin Care - Hydration"
+  ].freeze
   RETAIL_ROLES = (EMPLOYEE_COUNTS.keys).freeze
   COMPANY_GROUP_BUSINESS_TYPE = :retail
 
-  RETAIL_ITEMS = [ "Organic Bananas", "Whole Milk 1L", "Sourdough Bread", "Instant Coffee 200g", "Extra Virgin Olive Oil", "Paper Towels (2 Pack)", "Dish Soap 500ml", "Basmati Rice 5kg" ].freeze
+  CLINIC_RESOURCES = [ "Clinic Room A", "Clinic Room B", "Laser Machine 01", "HIFU Machine" ].freeze
+
+  RESOURCES = %w[Order Product Employee Customer PolicyAppointment Booking Service Order]
 
   def initialize(user:, email: Faker::Internet.email, name: nil)
     @multi_company_owner = user
@@ -47,6 +66,7 @@ create_retail_company
     create_inventory
     create_warehouses_for_branches
     create_stocks_for_products
+    setup_clinic_bookings
     create_stock_transfers
     create_stock_imports
     create_stock_exports
@@ -246,30 +266,22 @@ create_retail_company
 
   def create_inventory
     @branches.each do |branch|
-      branch_index = @branches.index(branch) + 1
-
-      RETAIL_ITEMS.each do |item_name|
+      # 1. Seed Beauty Products (Retail)
+      BEAUTY_PRODUCTS.each do |item_name|
         @products << Seed::ProductService.create(
           company: @retail,
           branch: branch,
-          name: "#{branch.name} - #{item_name}",
-          business_type: :physical
+          name: item_name + SecureRandom.hex(4)
         )
       end
 
-      15.times do |i|
-        @products << Seed::ProductService.create(
-          company: @retail,
-          branch: branch,
-          name: "#{branch.name} - #{Faker::Commerce.product_name} #{i + 1}"
-        )
-      end
-
-      10.times do |i|
+      # 2. Seed Clinic Services (Booking-based)
+      CLINIC_SERVICES.each do |service_name|
         @services << Seed::ServiceService.create(
           company: @retail,
           branch: branch,
-          name: "#{branch.name} - #{Faker::Company.buzzword} Service #{i + 1}"
+          name: service_name + SecureRandom.hex(4),
+          duration: [ 30, 45, 60, 90 ].sample
         )
       end
     end
@@ -298,6 +310,41 @@ create_retail_company
           product_id: product.id,
           quantity: rand(50..200),
           name: product.name
+        )
+      end
+    end
+  end
+
+  def setup_clinic_bookings
+    puts "Setting up clinic resources and sample bookings..."
+    @branches.each do |branch|
+      # Create physical resources (Rooms/Machines)
+      branch_resources = CLINIC_RESOURCES.map do |res_name|
+        Seed::FacilityService.create(
+          company: @retail,
+          branch: branch,
+          name: "#{branch.name} - #{res_name}")
+      end
+
+      # Create some sample bookings
+      doctors = @employees.select { |e| e.branch_id == branch.id && e.user.metadata["role"] == "Doctor" }
+      customers = @customers.select { |c| c.branch_id == branch.id }
+      services = @services.select { |s| s.branch_id == branch.id }
+
+      3.times do |i|
+        next if doctors.empty? || customers.empty?
+
+        Seed::BookingService.create(
+          company: @retail,
+          branch: branch,
+          booking_resource: branch_resources.sample,
+          appoint_from: doctors.sample,   # Performed by Doctor
+          appoint_to: customers.sample,   # For Customer
+          appoint_for: services.sample,    # The Service
+          appoint_by: @employees.sample,   # Booked by Staff
+          name: "Clinic Appointment ##{i+1}",
+          lifecycle_status: :active,
+          workflow_status: :confirmed
         )
       end
     end
@@ -399,10 +446,9 @@ create_retail_company
   end
 
   def create_all_crud_policies
-    resources = %w[Order Product Employee Customer PolicyAppointment]
     crud_actions = %w[create read update delete]
 
-    resources.each do |resource|
+    RESOURCES.each do |resource|
       crud_actions.each do |action|
         create_policy(resource: resource, action: action)
       end
@@ -453,6 +499,19 @@ create_retail_company
       Security: {
         "Product" => { create: false, read: true, update: false, delete: false },
         "Order" => { create: false, read: true, update: false, delete: false }
+      },
+      Doctor: {
+        "Order" => { read: true, update: true },
+        "Booking" => { create: true, read: true, update: true },
+        "Service" => { read: true }
+      },
+      Therapist: {
+        "Booking" => { read: true, update: true },
+        "Order" => { read: true }
+      },
+      Consultant: {
+        "Customer" => { create: true, read: true, update: true },
+        "Order" => { create: true, read: true }
       }
     }
 
