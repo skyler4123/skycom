@@ -6,19 +6,23 @@ class CreatePeriodAppointments < ActiveRecord::Migration[8.0]
       t.references :appoint_to, polymorphic: true, null: false, type: :uuid
       t.references :appoint_for, polymorphic: true, null: true, type: :uuid
       t.references :appoint_by, polymorphic: true, null: true, type: :uuid
+
       t.string :name
       t.string :description
       t.string :code
       t.string :value
-      t.integer :lifecycle_status
-      t.integer :workflow_status
-      t.integer :business_type
-      t.datetime :discarded_at
-      t.string :permission_resource_name
+
+      # --- System Fields ---
+      t.integer  :lifecycle_status
+      t.integer  :workflow_status
+      t.integer  :business_type
+      t.datetime :expiration_date
+      t.jsonb    :metadata,       default: {}
+      t.datetime :discarded_at,   index: true
+      t.string   :permission_resource_name
 
       t.timestamps
     end
-    add_index :period_appointments, :discarded_at
     add_index :period_appointments, [ :appoint_to_type, :appoint_to_id ]
   end
 end

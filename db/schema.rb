@@ -60,6 +60,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.integer "lifecycle_status"
     t.integer "workflow_status"
     t.integer "business_type"
+    t.datetime "expiration_date"
+    t.jsonb "metadata", default: {}
     t.datetime "discarded_at"
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
@@ -123,6 +125,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.integer "lifecycle_status"
     t.integer "workflow_status"
     t.integer "business_type"
+    t.datetime "expiration_date"
+    t.jsonb "metadata", default: {}
     t.datetime "discarded_at"
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
@@ -154,6 +158,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.integer "lifecycle_status"
     t.integer "workflow_status"
     t.integer "business_type"
+    t.datetime "expiration_date"
+    t.jsonb "metadata", default: {}
     t.datetime "discarded_at"
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
@@ -180,8 +186,10 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.integer "lifecycle_status"
     t.integer "workflow_status"
     t.integer "business_type"
-    t.datetime "discarded_at"
+    t.datetime "expiration_date"
     t.jsonb "metadata", default: {}
+    t.datetime "discarded_at"
+    t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["branch_id"], name: "index_article_groups_on_branch_id"
@@ -314,8 +322,10 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.integer "lifecycle_status"
     t.integer "workflow_status"
     t.integer "business_type"
-    t.datetime "discarded_at"
+    t.datetime "expiration_date"
     t.jsonb "metadata", default: {}
+    t.datetime "discarded_at"
+    t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["booking_resourceable_type", "booking_resourceable_id"], name: "index_booking_resources_on_booking_resourceable"
@@ -423,6 +433,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.integer "lifecycle_status"
     t.integer "workflow_status"
     t.integer "business_type"
+    t.datetime "expiration_date"
+    t.jsonb "metadata", default: {}
     t.datetime "discarded_at"
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
@@ -431,6 +443,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.index ["appoint_for_type", "appoint_for_id"], name: "index_cart_appointments_on_appoint_for"
     t.index ["appoint_from_type", "appoint_from_id"], name: "index_cart_appointments_on_appoint_from"
     t.index ["appoint_to_type", "appoint_to_id"], name: "index_cart_appointments_on_appoint_to"
+    t.index ["appoint_to_type", "appoint_to_id"], name: "index_cart_appointments_on_appoint_to_type_and_appoint_to_id"
     t.index ["cart_id"], name: "index_cart_appointments_on_cart_id"
     t.index ["company_id"], name: "index_cart_appointments_on_company_id"
     t.index ["discarded_at"], name: "index_cart_appointments_on_discarded_at"
@@ -499,10 +512,15 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.string "description"
     t.jsonb "metadata", default: {}
     t.string "permission_resource_name"
+    t.integer "lifecycle_status"
+    t.integer "workflow_status"
+    t.integer "business_type"
+    t.datetime "expiration_date"
+    t.datetime "discarded_at"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["company_id", "name"], name: "index_categories_on_company_id_and_name"
     t.index ["company_id"], name: "index_categories_on_company_id"
+    t.index ["discarded_at"], name: "index_categories_on_discarded_at"
   end
 
   create_table "companies", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -555,6 +573,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.integer "lifecycle_status"
     t.integer "workflow_status"
     t.integer "business_type"
+    t.datetime "expiration_date"
+    t.jsonb "metadata", default: {}
     t.datetime "discarded_at"
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
@@ -586,6 +606,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.integer "lifecycle_status"
     t.integer "workflow_status"
     t.integer "business_type"
+    t.datetime "expiration_date"
+    t.jsonb "metadata", default: {}
     t.datetime "discarded_at"
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
@@ -663,8 +685,9 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.integer "lifecycle_status"
     t.integer "workflow_status"
     t.integer "business_type"
-    t.datetime "discarded_at"
+    t.datetime "expiration_date"
     t.jsonb "metadata", default: {}
+    t.datetime "discarded_at"
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
@@ -675,6 +698,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.index ["appoint_to_type", "appoint_to_id"], name: "index_department_appointments_on_appoint_to"
     t.index ["company_id"], name: "index_department_appointments_on_company_id"
     t.index ["department_id"], name: "index_department_appointments_on_department_id"
+    t.index ["discarded_at"], name: "index_department_appointments_on_discarded_at"
   end
 
   create_table "departments", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -715,6 +739,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.integer "lifecycle_status"
     t.integer "workflow_status"
     t.integer "business_type"
+    t.datetime "expiration_date"
+    t.jsonb "metadata", default: {}
     t.datetime "discarded_at"
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
@@ -746,6 +772,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.integer "lifecycle_status"
     t.integer "workflow_status"
     t.integer "business_type"
+    t.datetime "expiration_date"
+    t.jsonb "metadata", default: {}
     t.datetime "discarded_at"
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
@@ -772,8 +800,10 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.integer "lifecycle_status"
     t.integer "workflow_status"
     t.integer "business_type"
-    t.datetime "discarded_at"
+    t.datetime "expiration_date"
     t.jsonb "metadata", default: {}
+    t.datetime "discarded_at"
+    t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["branch_id"], name: "index_document_groups_on_branch_id"
@@ -821,6 +851,12 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.string "description"
     t.string "code"
     t.string "permission_resource_name"
+    t.integer "lifecycle_status"
+    t.integer "workflow_status"
+    t.integer "business_type"
+    t.datetime "expiration_date"
+    t.jsonb "metadata", default: {}
+    t.datetime "discarded_at"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["appoint_by_type", "appoint_by_id"], name: "index_employee_appointments_on_appoint_by"
@@ -829,6 +865,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.index ["appoint_to_type", "appoint_to_id"], name: "idx_on_appoint_to_type_appoint_to_id_a39c78be55"
     t.index ["appoint_to_type", "appoint_to_id"], name: "index_employee_appointments_on_appoint_to"
     t.index ["company_id"], name: "index_employee_appointments_on_company_id"
+    t.index ["discarded_at"], name: "index_employee_appointments_on_discarded_at"
     t.index ["employee_id"], name: "index_employee_appointments_on_employee_id"
   end
 
@@ -847,6 +884,12 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.string "description"
     t.string "code"
     t.string "permission_resource_name"
+    t.integer "lifecycle_status"
+    t.integer "workflow_status"
+    t.integer "business_type"
+    t.datetime "expiration_date"
+    t.jsonb "metadata", default: {}
+    t.datetime "discarded_at"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["appoint_by_type", "appoint_by_id"], name: "index_employee_group_appointments_on_appoint_by"
@@ -855,6 +898,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.index ["appoint_to_type", "appoint_to_id"], name: "idx_on_appoint_to_type_appoint_to_id_57b6eaae20"
     t.index ["appoint_to_type", "appoint_to_id"], name: "index_employee_group_appointments_on_appoint_to"
     t.index ["company_id"], name: "index_employee_group_appointments_on_company_id"
+    t.index ["discarded_at"], name: "index_employee_group_appointments_on_discarded_at"
     t.index ["employee_group_id"], name: "index_employee_group_appointments_on_employee_group_id"
   end
 
@@ -922,6 +966,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.integer "lifecycle_status"
     t.integer "workflow_status"
     t.integer "business_type"
+    t.datetime "expiration_date"
+    t.jsonb "metadata", default: {}
     t.datetime "discarded_at"
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
@@ -953,6 +999,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.integer "lifecycle_status"
     t.integer "workflow_status"
     t.integer "business_type"
+    t.datetime "expiration_date"
+    t.jsonb "metadata", default: {}
     t.datetime "discarded_at"
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
@@ -977,8 +1025,10 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.integer "lifecycle_status"
     t.integer "workflow_status"
     t.integer "business_type"
-    t.datetime "discarded_at"
+    t.datetime "expiration_date"
     t.jsonb "metadata", default: {}
+    t.datetime "discarded_at"
+    t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["branch_id"], name: "index_event_groups_on_branch_id"
@@ -1026,6 +1076,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.integer "lifecycle_status"
     t.integer "workflow_status"
     t.integer "business_type"
+    t.datetime "expiration_date"
+    t.jsonb "metadata", default: {}
     t.datetime "discarded_at"
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
@@ -1120,6 +1172,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.integer "lifecycle_status"
     t.integer "workflow_status"
     t.integer "business_type"
+    t.datetime "expiration_date"
+    t.jsonb "metadata", default: {}
     t.datetime "discarded_at"
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
@@ -1127,6 +1181,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.index ["appoint_by_type", "appoint_by_id"], name: "index_facility_appointments_on_appoint_by"
     t.index ["appoint_for_type", "appoint_for_id"], name: "index_facility_appointments_on_appoint_for"
     t.index ["appoint_from_type", "appoint_from_id"], name: "index_facility_appointments_on_appoint_from"
+    t.index ["appoint_to_type", "appoint_to_id"], name: "idx_on_appoint_to_type_appoint_to_id_b7dff614b7"
     t.index ["appoint_to_type", "appoint_to_id"], name: "index_facility_appointments_on_appoint_to"
     t.index ["company_id"], name: "index_facility_appointments_on_company_id"
     t.index ["discarded_at"], name: "index_facility_appointments_on_discarded_at"
@@ -1150,6 +1205,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.integer "lifecycle_status"
     t.integer "workflow_status"
     t.integer "business_type"
+    t.datetime "expiration_date"
+    t.jsonb "metadata", default: {}
     t.datetime "discarded_at"
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
@@ -1157,6 +1214,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.index ["appoint_by_type", "appoint_by_id"], name: "index_facility_group_appointments_on_appoint_by"
     t.index ["appoint_for_type", "appoint_for_id"], name: "index_facility_group_appointments_on_appoint_for"
     t.index ["appoint_from_type", "appoint_from_id"], name: "index_facility_group_appointments_on_appoint_from"
+    t.index ["appoint_to_type", "appoint_to_id"], name: "idx_on_appoint_to_type_appoint_to_id_ebef229bea"
     t.index ["appoint_to_type", "appoint_to_id"], name: "index_facility_group_appointments_on_appoint_to"
     t.index ["company_id"], name: "index_facility_group_appointments_on_company_id"
     t.index ["discarded_at"], name: "index_facility_group_appointments_on_discarded_at"
@@ -1213,6 +1271,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
   end
 
   create_table "membership_appointments", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "company_id", null: false
     t.uuid "membership_id", null: false
     t.string "appoint_from_type"
     t.uuid "appoint_from_id"
@@ -1222,15 +1281,25 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.uuid "appoint_for_id"
     t.string "appoint_by_type"
     t.uuid "appoint_by_id"
+    t.string "name"
+    t.string "description"
+    t.string "code"
     t.integer "lifecycle_status"
     t.integer "workflow_status"
     t.integer "business_type"
+    t.datetime "expiration_date"
+    t.jsonb "metadata", default: {}
+    t.datetime "discarded_at"
+    t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["appoint_by_type", "appoint_by_id"], name: "index_membership_appointments_on_appoint_by"
     t.index ["appoint_for_type", "appoint_for_id"], name: "index_membership_appointments_on_appoint_for"
     t.index ["appoint_from_type", "appoint_from_id"], name: "index_membership_appointments_on_appoint_from"
+    t.index ["appoint_to_type", "appoint_to_id"], name: "idx_on_appoint_to_type_appoint_to_id_92c11e8cbf"
     t.index ["appoint_to_type", "appoint_to_id"], name: "index_membership_appointments_on_appoint_to"
+    t.index ["company_id"], name: "index_membership_appointments_on_company_id"
+    t.index ["discarded_at"], name: "index_membership_appointments_on_discarded_at"
     t.index ["membership_id"], name: "index_membership_appointments_on_membership_id"
   end
 
@@ -1261,6 +1330,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.integer "lifecycle_status"
     t.integer "workflow_status"
     t.integer "business_type"
+    t.datetime "expiration_date"
+    t.jsonb "metadata", default: {}
     t.datetime "discarded_at"
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
@@ -1268,6 +1339,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.index ["appoint_by_type", "appoint_by_id"], name: "index_notification_appointments_on_appoint_by"
     t.index ["appoint_for_type", "appoint_for_id"], name: "index_notification_appointments_on_appoint_for"
     t.index ["appoint_from_type", "appoint_from_id"], name: "index_notification_appointments_on_appoint_from"
+    t.index ["appoint_to_type", "appoint_to_id"], name: "idx_on_appoint_to_type_appoint_to_id_26a28b0bfc"
     t.index ["appoint_to_type", "appoint_to_id"], name: "index_notification_appointments_on_appoint_to"
     t.index ["company_id"], name: "index_notification_appointments_on_company_id"
     t.index ["discarded_at"], name: "index_notification_appointments_on_discarded_at"
@@ -1291,6 +1363,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.integer "lifecycle_status"
     t.integer "workflow_status"
     t.integer "business_type"
+    t.datetime "expiration_date"
+    t.jsonb "metadata", default: {}
     t.datetime "discarded_at"
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
@@ -1298,6 +1372,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.index ["appoint_by_type", "appoint_by_id"], name: "index_notification_group_appointments_on_appoint_by"
     t.index ["appoint_for_type", "appoint_for_id"], name: "index_notification_group_appointments_on_appoint_for"
     t.index ["appoint_from_type", "appoint_from_id"], name: "index_notification_group_appointments_on_appoint_from"
+    t.index ["appoint_to_type", "appoint_to_id"], name: "idx_on_appoint_to_type_appoint_to_id_8f6e8f37c0"
     t.index ["appoint_to_type", "appoint_to_id"], name: "index_notification_group_appointments_on_appoint_to"
     t.index ["company_id"], name: "index_notification_group_appointments_on_company_id"
     t.index ["discarded_at"], name: "index_notification_group_appointments_on_discarded_at"
@@ -1314,8 +1389,9 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.integer "lifecycle_status"
     t.integer "workflow_status"
     t.integer "business_type"
-    t.datetime "discarded_at"
+    t.datetime "expiration_date"
     t.jsonb "metadata", default: {}
+    t.datetime "discarded_at"
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
@@ -1367,6 +1443,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.integer "lifecycle_status"
     t.integer "workflow_status"
     t.integer "business_type"
+    t.datetime "expiration_date"
+    t.jsonb "metadata", default: {}
     t.datetime "discarded_at"
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
@@ -1375,6 +1453,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.index ["appoint_for_type", "appoint_for_id"], name: "index_order_appointments_on_appoint_for"
     t.index ["appoint_from_type", "appoint_from_id"], name: "index_order_appointments_on_appoint_from"
     t.index ["appoint_to_type", "appoint_to_id"], name: "index_order_appointments_on_appoint_to"
+    t.index ["appoint_to_type", "appoint_to_id"], name: "index_order_appointments_on_appoint_to_type_and_appoint_to_id"
     t.index ["company_id"], name: "index_order_appointments_on_company_id"
     t.index ["discarded_at"], name: "index_order_appointments_on_discarded_at"
     t.index ["order_id"], name: "index_order_appointments_on_order_id"
@@ -1400,6 +1479,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.integer "lifecycle_status"
     t.integer "workflow_status"
     t.integer "business_type"
+    t.datetime "expiration_date"
+    t.jsonb "metadata", default: {}
     t.datetime "discarded_at"
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
@@ -1407,6 +1488,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.index ["appoint_by_type", "appoint_by_id"], name: "index_order_group_appointments_on_appoint_by"
     t.index ["appoint_for_type", "appoint_for_id"], name: "index_order_group_appointments_on_appoint_for"
     t.index ["appoint_from_type", "appoint_from_id"], name: "index_order_group_appointments_on_appoint_from"
+    t.index ["appoint_to_type", "appoint_to_id"], name: "idx_on_appoint_to_type_appoint_to_id_1438b68413"
     t.index ["appoint_to_type", "appoint_to_id"], name: "index_order_group_appointments_on_appoint_to"
     t.index ["company_id"], name: "index_order_group_appointments_on_company_id"
     t.index ["discarded_at"], name: "index_order_group_appointments_on_discarded_at"
@@ -1477,21 +1559,25 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
   end
 
   create_table "payment_method_appointments", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
-    t.uuid "payment_method_id", null: false
     t.uuid "company_id", null: false
     t.uuid "branch_id"
+    t.uuid "payment_method_id", null: false
     t.string "name"
     t.string "description"
     t.string "code"
     t.integer "lifecycle_status"
     t.integer "workflow_status"
     t.integer "business_type"
+    t.datetime "expiration_date"
+    t.jsonb "metadata", default: {}
     t.datetime "discarded_at"
+    t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["branch_id"], name: "index_payment_method_appointments_on_branch_id"
     t.index ["company_id"], name: "index_payment_method_appointments_on_company_id"
     t.index ["discarded_at"], name: "index_payment_method_appointments_on_discarded_at"
+    t.index ["payment_method_id", "company_id"], name: "idx_on_payment_method_id_company_id_8ff3d49954"
     t.index ["payment_method_id"], name: "index_payment_method_appointments_on_payment_method_id"
   end
 
@@ -1559,6 +1645,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.integer "lifecycle_status"
     t.integer "workflow_status"
     t.integer "business_type"
+    t.datetime "expiration_date"
+    t.jsonb "metadata", default: {}
     t.datetime "discarded_at"
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
@@ -1613,6 +1701,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.integer "lifecycle_status"
     t.integer "workflow_status"
     t.integer "business_type"
+    t.datetime "expiration_date"
+    t.jsonb "metadata", default: {}
     t.datetime "discarded_at"
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
@@ -1642,6 +1732,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.integer "lifecycle_status"
     t.integer "workflow_status"
     t.integer "business_type"
+    t.datetime "expiration_date"
+    t.jsonb "metadata", default: {}
     t.datetime "discarded_at"
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
@@ -1681,6 +1773,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.integer "lifecycle_status"
     t.integer "workflow_status"
     t.integer "business_type"
+    t.datetime "expiration_date"
+    t.jsonb "metadata", default: {}
     t.datetime "discarded_at"
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
@@ -1688,6 +1782,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.index ["appoint_by_type", "appoint_by_id"], name: "index_product_appointments_on_appoint_by"
     t.index ["appoint_for_type", "appoint_for_id"], name: "index_product_appointments_on_appoint_for"
     t.index ["appoint_from_type", "appoint_from_id"], name: "index_product_appointments_on_appoint_from"
+    t.index ["appoint_to_type", "appoint_to_id"], name: "idx_on_appoint_to_type_appoint_to_id_6dd1b90540"
     t.index ["appoint_to_type", "appoint_to_id"], name: "index_product_appointments_on_appoint_to"
     t.index ["company_id"], name: "index_product_appointments_on_company_id"
     t.index ["discarded_at"], name: "index_product_appointments_on_discarded_at"
@@ -1711,6 +1806,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.integer "lifecycle_status"
     t.integer "workflow_status"
     t.integer "business_type"
+    t.datetime "expiration_date"
+    t.jsonb "metadata", default: {}
     t.datetime "discarded_at"
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
@@ -1718,6 +1815,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.index ["appoint_by_type", "appoint_by_id"], name: "index_product_group_appointments_on_appoint_by"
     t.index ["appoint_for_type", "appoint_for_id"], name: "index_product_group_appointments_on_appoint_for"
     t.index ["appoint_from_type", "appoint_from_id"], name: "index_product_group_appointments_on_appoint_from"
+    t.index ["appoint_to_type", "appoint_to_id"], name: "idx_on_appoint_to_type_appoint_to_id_53bf3d5444"
     t.index ["appoint_to_type", "appoint_to_id"], name: "index_product_group_appointments_on_appoint_to"
     t.index ["company_id"], name: "index_product_group_appointments_on_company_id"
     t.index ["discarded_at"], name: "index_product_group_appointments_on_discarded_at"
@@ -1812,6 +1910,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.integer "lifecycle_status"
     t.integer "workflow_status"
     t.integer "business_type"
+    t.datetime "expiration_date"
+    t.jsonb "metadata", default: {}
     t.datetime "discarded_at"
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
@@ -1819,6 +1919,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.index ["appoint_by_type", "appoint_by_id"], name: "index_project_appointments_on_appoint_by"
     t.index ["appoint_for_type", "appoint_for_id"], name: "index_project_appointments_on_appoint_for"
     t.index ["appoint_from_type", "appoint_from_id"], name: "index_project_appointments_on_appoint_from"
+    t.index ["appoint_to_type", "appoint_to_id"], name: "idx_on_appoint_to_type_appoint_to_id_eb5a8d66ff"
     t.index ["appoint_to_type", "appoint_to_id"], name: "index_project_appointments_on_appoint_to"
     t.index ["company_id"], name: "index_project_appointments_on_company_id"
     t.index ["discarded_at"], name: "index_project_appointments_on_discarded_at"
@@ -1842,6 +1943,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.integer "lifecycle_status"
     t.integer "workflow_status"
     t.integer "business_type"
+    t.datetime "expiration_date"
+    t.jsonb "metadata", default: {}
     t.datetime "discarded_at"
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
@@ -1849,6 +1952,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.index ["appoint_by_type", "appoint_by_id"], name: "index_project_group_appointments_on_appoint_by"
     t.index ["appoint_for_type", "appoint_for_id"], name: "index_project_group_appointments_on_appoint_for"
     t.index ["appoint_from_type", "appoint_from_id"], name: "index_project_group_appointments_on_appoint_from"
+    t.index ["appoint_to_type", "appoint_to_id"], name: "idx_on_appoint_to_type_appoint_to_id_4c26e2a726"
     t.index ["appoint_to_type", "appoint_to_id"], name: "index_project_group_appointments_on_appoint_to"
     t.index ["company_id"], name: "index_project_group_appointments_on_company_id"
     t.index ["discarded_at"], name: "index_project_group_appointments_on_discarded_at"
@@ -1977,7 +2081,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
   end
 
   create_table "reservation_appointments", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
-    t.uuid "reservations_id", null: false
+    t.uuid "company_id", null: false
+    t.uuid "reservation_id", null: false
     t.string "appoint_from_type"
     t.uuid "appoint_from_id"
     t.string "appoint_to_type", null: false
@@ -1986,16 +2091,26 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.uuid "appoint_for_id"
     t.string "appoint_by_type"
     t.uuid "appoint_by_id"
+    t.string "name"
+    t.string "description"
+    t.string "code"
     t.integer "lifecycle_status"
     t.integer "workflow_status"
     t.integer "business_type"
+    t.datetime "expiration_date"
+    t.jsonb "metadata", default: {}
+    t.datetime "discarded_at"
+    t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["appoint_by_type", "appoint_by_id"], name: "index_reservation_appointments_on_appoint_by"
     t.index ["appoint_for_type", "appoint_for_id"], name: "index_reservation_appointments_on_appoint_for"
     t.index ["appoint_from_type", "appoint_from_id"], name: "index_reservation_appointments_on_appoint_from"
+    t.index ["appoint_to_type", "appoint_to_id"], name: "idx_on_appoint_to_type_appoint_to_id_fab15553a8"
     t.index ["appoint_to_type", "appoint_to_id"], name: "index_reservation_appointments_on_appoint_to"
-    t.index ["reservations_id"], name: "index_reservation_appointments_on_reservations_id"
+    t.index ["company_id"], name: "index_reservation_appointments_on_company_id"
+    t.index ["discarded_at"], name: "index_reservation_appointments_on_discarded_at"
+    t.index ["reservation_id"], name: "index_reservation_appointments_on_reservation_id"
   end
 
   create_table "reservations", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -2019,6 +2134,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.integer "lifecycle_status"
     t.integer "workflow_status"
     t.integer "business_type"
+    t.datetime "expiration_date"
+    t.jsonb "metadata", default: {}
     t.datetime "discarded_at"
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
@@ -2063,11 +2180,13 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.string "name"
     t.string "description"
     t.string "code"
-    t.integer "lifecycle_status"
-    t.integer "workflow_status"
     t.integer "duration"
     t.datetime "start_at"
+    t.integer "lifecycle_status"
+    t.integer "workflow_status"
     t.integer "business_type"
+    t.datetime "expiration_date"
+    t.jsonb "metadata", default: {}
     t.datetime "discarded_at"
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
@@ -2075,6 +2194,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.index ["appoint_by_type", "appoint_by_id"], name: "index_service_appointments_on_appoint_by"
     t.index ["appoint_for_type", "appoint_for_id"], name: "index_service_appointments_on_appoint_for"
     t.index ["appoint_from_type", "appoint_from_id"], name: "index_service_appointments_on_appoint_from"
+    t.index ["appoint_to_type", "appoint_to_id"], name: "idx_on_appoint_to_type_appoint_to_id_25f7912f5f"
     t.index ["appoint_to_type", "appoint_to_id"], name: "index_service_appointments_on_appoint_to"
     t.index ["company_id"], name: "index_service_appointments_on_company_id"
     t.index ["discarded_at"], name: "index_service_appointments_on_discarded_at"
@@ -2095,11 +2215,13 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.string "name"
     t.string "description"
     t.string "code"
-    t.integer "lifecycle_status"
-    t.integer "workflow_status"
     t.integer "duration"
     t.datetime "start_at"
+    t.integer "lifecycle_status"
+    t.integer "workflow_status"
     t.integer "business_type"
+    t.datetime "expiration_date"
+    t.jsonb "metadata", default: {}
     t.datetime "discarded_at"
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
@@ -2107,6 +2229,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.index ["appoint_by_type", "appoint_by_id"], name: "index_service_group_appointments_on_appoint_by"
     t.index ["appoint_for_type", "appoint_for_id"], name: "index_service_group_appointments_on_appoint_for"
     t.index ["appoint_from_type", "appoint_from_id"], name: "index_service_group_appointments_on_appoint_from"
+    t.index ["appoint_to_type", "appoint_to_id"], name: "idx_on_appoint_to_type_appoint_to_id_9e69225799"
     t.index ["appoint_to_type", "appoint_to_id"], name: "index_service_group_appointments_on_appoint_to"
     t.index ["company_id"], name: "index_service_group_appointments_on_company_id"
     t.index ["discarded_at"], name: "index_service_group_appointments_on_discarded_at"
@@ -2188,6 +2311,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.integer "lifecycle_status"
     t.integer "workflow_status"
     t.integer "business_type"
+    t.datetime "expiration_date"
+    t.jsonb "metadata", default: {}
     t.datetime "discarded_at"
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
@@ -2219,6 +2344,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.integer "lifecycle_status"
     t.integer "workflow_status"
     t.integer "business_type"
+    t.datetime "expiration_date"
+    t.jsonb "metadata", default: {}
     t.datetime "discarded_at"
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
@@ -2244,8 +2371,10 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.integer "lifecycle_status"
     t.integer "workflow_status"
     t.integer "business_type"
-    t.datetime "discarded_at"
+    t.datetime "expiration_date"
     t.jsonb "metadata", default: {}
+    t.datetime "discarded_at"
+    t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["branch_id"], name: "index_setting_groups_on_branch_id"
@@ -2466,12 +2595,14 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.string "description"
     t.integer "country_code", null: false
     t.integer "timezone"
+    t.boolean "auto_renew"
     t.integer "lifecycle_status"
     t.integer "workflow_status"
     t.integer "business_type"
-    t.boolean "auto_renew"
-    t.datetime "discarded_at"
+    t.datetime "expiration_date"
     t.jsonb "metadata", default: {}
+    t.datetime "discarded_at"
+    t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["branch_id"], name: "index_subscription_groups_on_branch_id"
@@ -2490,12 +2621,14 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.string "description"
     t.integer "country_code", null: false
     t.integer "timezone"
+    t.boolean "auto_renew"
     t.integer "lifecycle_status"
     t.integer "workflow_status"
     t.integer "business_type"
-    t.boolean "auto_renew"
-    t.datetime "discarded_at"
+    t.datetime "expiration_date"
     t.jsonb "metadata", default: {}
+    t.datetime "discarded_at"
+    t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["branch_id"], name: "index_subscription_plan_appointments_on_branch_id"
@@ -2512,13 +2645,16 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.string "description"
     t.string "code"
     t.integer "duration_days"
-    t.integer "lifecycle_status"
-    t.integer "workflow_status"
-    t.integer "business_type"
     t.integer "country_code"
     t.jsonb "features", default: {}
     t.jsonb "limits", default: {}
+    t.integer "lifecycle_status"
+    t.integer "workflow_status"
+    t.integer "business_type"
+    t.datetime "expiration_date"
+    t.jsonb "metadata", default: {}
     t.datetime "discarded_at"
+    t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["branch_id"], name: "index_subscription_plans_on_branch_id"
@@ -2618,6 +2754,12 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.uuid "appoint_by_id"
     t.string "value"
     t.string "description"
+    t.integer "lifecycle_status"
+    t.integer "workflow_status"
+    t.integer "business_type"
+    t.datetime "expiration_date"
+    t.jsonb "metadata", default: {}
+    t.datetime "discarded_at"
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
@@ -2627,6 +2769,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.index ["appoint_to_type", "appoint_to_id"], name: "index_tag_appointments_on_appoint_to"
     t.index ["appoint_to_type", "appoint_to_id"], name: "index_tag_appointments_on_appoint_to_type_and_appoint_to_id"
     t.index ["company_id"], name: "index_tag_appointments_on_company_id"
+    t.index ["discarded_at"], name: "index_tag_appointments_on_discarded_at"
     t.index ["tag_id"], name: "index_tag_appointments_on_tag_id"
   end
 
@@ -2637,9 +2780,16 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.string "description"
     t.string "code"
     t.string "permission_resource_name"
+    t.integer "lifecycle_status"
+    t.integer "workflow_status"
+    t.integer "business_type"
+    t.datetime "expiration_date"
+    t.jsonb "metadata", default: {}
+    t.datetime "discarded_at"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["company_id"], name: "index_tags_on_company_id"
+    t.index ["discarded_at"], name: "index_tags_on_discarded_at"
   end
 
   create_table "task_appointments", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -2659,6 +2809,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.integer "lifecycle_status"
     t.integer "workflow_status"
     t.integer "business_type"
+    t.datetime "expiration_date"
+    t.jsonb "metadata", default: {}
     t.datetime "discarded_at"
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
@@ -2667,6 +2819,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.index ["appoint_for_type", "appoint_for_id"], name: "index_task_appointments_on_appoint_for"
     t.index ["appoint_from_type", "appoint_from_id"], name: "index_task_appointments_on_appoint_from"
     t.index ["appoint_to_type", "appoint_to_id"], name: "index_task_appointments_on_appoint_to"
+    t.index ["appoint_to_type", "appoint_to_id"], name: "index_task_appointments_on_appoint_to_type_and_appoint_to_id"
     t.index ["company_id"], name: "index_task_appointments_on_company_id"
     t.index ["discarded_at"], name: "index_task_appointments_on_discarded_at"
     t.index ["task_id"], name: "index_task_appointments_on_task_id"
@@ -2689,6 +2842,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.integer "lifecycle_status"
     t.integer "workflow_status"
     t.integer "business_type"
+    t.datetime "expiration_date"
+    t.jsonb "metadata", default: {}
     t.datetime "discarded_at"
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
@@ -2696,6 +2851,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.index ["appoint_by_type", "appoint_by_id"], name: "index_task_group_appointments_on_appoint_by"
     t.index ["appoint_for_type", "appoint_for_id"], name: "index_task_group_appointments_on_appoint_for"
     t.index ["appoint_from_type", "appoint_from_id"], name: "index_task_group_appointments_on_appoint_from"
+    t.index ["appoint_to_type", "appoint_to_id"], name: "idx_on_appoint_to_type_appoint_to_id_bd79761d5f"
     t.index ["appoint_to_type", "appoint_to_id"], name: "index_task_group_appointments_on_appoint_to"
     t.index ["company_id"], name: "index_task_group_appointments_on_company_id"
     t.index ["discarded_at"], name: "index_task_group_appointments_on_discarded_at"
@@ -2929,6 +3085,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
   add_foreign_key "invoices", "categories"
   add_foreign_key "invoices", "companies"
   add_foreign_key "invoices", "orders"
+  add_foreign_key "membership_appointments", "companies"
   add_foreign_key "membership_appointments", "memberships"
   add_foreign_key "notification_appointments", "companies"
   add_foreign_key "notification_appointments", "notifications"
@@ -3001,7 +3158,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
   add_foreign_key "questions", "branches"
   add_foreign_key "questions", "categories"
   add_foreign_key "questions", "companies"
-  add_foreign_key "reservation_appointments", "reservations", column: "reservations_id"
+  add_foreign_key "reservation_appointments", "companies"
+  add_foreign_key "reservation_appointments", "reservations"
   add_foreign_key "role_appointments", "companies"
   add_foreign_key "role_appointments", "roles"
   add_foreign_key "roles", "branches"
