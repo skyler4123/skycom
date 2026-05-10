@@ -142,4 +142,103 @@ RSpec.feature "Companies::Branches Management", type: :feature, js: true do
 
     expect(page).to have_current_path(/business_type=/)
   end
+
+  scenario "update branch name via show modal" do
+    visit company_branches_path(company)
+    expect(page).to have_selector('table', wait: 10)
+
+    target_row = find('tbody tr', text: branch.name)
+    target_row.find('[data-action*="openShowModal"]').click
+
+    expect(page).to have_selector('.swal2-container', wait: 10)
+
+    editable_name_field = find('[data-controller="editable"]', match: :first)
+    editable_name_field.click
+
+    expect(page).to have_selector('.editable-input', wait: 5)
+
+    editable_name_field.find('.editable-input').fill_in(with: 'Updated Branch Name')
+
+    accept_confirm do
+      editable_name_field.find('.editable-input').send_keys :enter
+    end
+
+    expect(page).to have_selector('tbody tr', wait: 10)
+    expect(Branch.find_by(id: branch.id).name).to eq("Updated Branch Name")
+  end
+
+  scenario "update branch description via show modal" do
+    visit company_branches_path(company)
+    expect(page).to have_selector('table', wait: 10)
+
+    target_row = find('tbody tr', text: branch.name)
+    target_row.find('[data-action*="openShowModal"]').click
+
+    expect(page).to have_selector('.swal2-container', wait: 10)
+
+    all_editable = all('[data-controller="editable"]')
+    desc_editable = all_editable[1]
+    desc_editable.click
+
+    expect(page).to have_selector('.editable-input', wait: 5)
+
+    desc_editable.find('.editable-input').fill_in(with: "Updated description for this branch")
+
+    accept_confirm do
+      desc_editable.find('.editable-input').send_keys :enter
+    end
+
+    expect(page).to have_selector('tbody tr', wait: 10)
+    expect(Branch.find_by(id: branch.id).description).to eq("Updated description for this branch")
+  end
+
+  scenario "update branch city via show modal" do
+    visit company_branches_path(company)
+    expect(page).to have_selector('table', wait: 10)
+
+    target_row = find('tbody tr', text: branch.name)
+    target_row.find('[data-action*="openShowModal"]').click
+
+    expect(page).to have_selector('.swal2-container', wait: 10)
+
+    all_editable = all('[data-controller="editable"]')
+    city_editable = all_editable[4]
+    city_editable.click
+
+    expect(page).to have_selector('.editable-input', wait: 5)
+
+    city_editable.find('.editable-input').fill_in(with: 'Hanoi')
+
+    accept_confirm do
+      city_editable.find('.editable-input').send_keys :enter
+    end
+
+    expect(page).to have_selector('tbody tr', wait: 10)
+    expect(Branch.find_by(id: branch.id).city).to eq("Hanoi")
+  end
+
+  scenario "update branch phone number via show modal" do
+    visit company_branches_path(company)
+    expect(page).to have_selector('table', wait: 10)
+
+    target_row = find('tbody tr', text: branch.name)
+    target_row.find('[data-action*="openShowModal"]').click
+
+    expect(page).to have_selector('.swal2-container', wait: 10)
+
+    all_editable = all('[data-controller="editable"]')
+    phone_editable = all_editable[5]
+    phone_editable.click
+
+    expect(page).to have_selector('.editable-input', wait: 5)
+
+    phone_editable.find('.editable-input').fill_in(with: "+84 123 456 789")
+
+    accept_confirm do
+      phone_editable.find('.editable-input').send_keys :enter
+    end
+
+    expect(page).to have_selector('tbody tr', wait: 10)
+    expect(Branch.find_by(id: branch.id).phone_number).to eq("+84 123 456 789")
+  end
 end
