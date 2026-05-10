@@ -42,7 +42,7 @@ class CreateProducts < ActiveRecord::Migration[8.0]
       t.boolean :is_recurring,  default: false
       t.references :required_role, null: true, foreign_key: { to_table: :roles }, type: :uuid
 
-      # --- 5. Lifecycle & Status ---
+      # --- System Fields ---
       t.integer  :lifecycle_status
       t.integer  :workflow_status
       t.integer  :business_type   # retail, education, gym, etc.
