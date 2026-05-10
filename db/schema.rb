@@ -98,8 +98,10 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.integer "lifecycle_status"
     t.integer "workflow_status"
     t.integer "business_type"
-    t.datetime "discarded_at"
+    t.datetime "expiration_date"
     t.jsonb "metadata", default: {}
+    t.datetime "discarded_at"
+    t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["category_id"], name: "index_answers_on_category_id"
@@ -211,8 +213,10 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.integer "lifecycle_status"
     t.integer "workflow_status"
     t.integer "business_type"
-    t.datetime "discarded_at"
+    t.datetime "expiration_date"
     t.jsonb "metadata", default: {}
+    t.datetime "discarded_at"
+    t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["article_group_id"], name: "index_articles_on_article_group_id"
@@ -371,10 +375,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.string "name"
     t.string "description"
     t.string "code"
-    t.integer "lifecycle_status"
-    t.integer "workflow_status"
     t.integer "ownership_type"
-    t.integer "business_type"
     t.integer "currency_code"
     t.string "registration_number"
     t.string "vat_id"
@@ -389,8 +390,12 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.string "website"
     t.integer "employee_count"
     t.integer "fiscal_year_end_month"
-    t.datetime "discarded_at"
+    t.integer "lifecycle_status"
+    t.integer "workflow_status"
+    t.integer "business_type"
+    t.datetime "expiration_date"
     t.jsonb "metadata", default: {}
+    t.datetime "discarded_at"
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
@@ -400,6 +405,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
   end
 
   create_table "brands", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "company_id", null: false
     t.uuid "category_id"
     t.string "name"
     t.string "description"
@@ -407,12 +413,14 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.integer "lifecycle_status"
     t.integer "workflow_status"
     t.integer "business_type"
-    t.datetime "discarded_at"
+    t.datetime "expiration_date"
     t.jsonb "metadata", default: {}
+    t.datetime "discarded_at"
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["category_id"], name: "index_brands_on_category_id"
+    t.index ["company_id"], name: "index_brands_on_company_id"
     t.index ["discarded_at"], name: "index_brands_on_discarded_at"
   end
 
@@ -459,8 +467,9 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.integer "lifecycle_status"
     t.integer "workflow_status"
     t.integer "business_type"
-    t.datetime "discarded_at"
+    t.datetime "expiration_date"
     t.jsonb "metadata", default: {}
+    t.datetime "discarded_at"
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
@@ -485,12 +494,12 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.string "manufacturer_code"
     t.string "serial_number"
     t.string "batch_number"
-    t.datetime "expiration_date"
     t.integer "lifecycle_status"
     t.integer "workflow_status"
     t.integer "business_type"
-    t.datetime "discarded_at"
+    t.datetime "expiration_date"
     t.jsonb "metadata", default: {}
+    t.datetime "discarded_at"
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
@@ -510,15 +519,16 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.uuid "company_id", null: false
     t.string "name"
     t.string "description"
-    t.jsonb "metadata", default: {}
-    t.string "permission_resource_name"
     t.integer "lifecycle_status"
     t.integer "workflow_status"
     t.integer "business_type"
     t.datetime "expiration_date"
+    t.jsonb "metadata", default: {}
     t.datetime "discarded_at"
+    t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["company_id", "name"], name: "index_categories_on_company_id_and_name"
     t.index ["company_id"], name: "index_categories_on_company_id"
     t.index ["discarded_at"], name: "index_categories_on_discarded_at"
   end
@@ -528,10 +538,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.string "name"
     t.string "description"
     t.string "code"
-    t.integer "lifecycle_status"
-    t.integer "workflow_status"
     t.integer "ownership_type"
-    t.integer "business_type"
     t.integer "currency_code"
     t.string "registration_number"
     t.string "vat_id"
@@ -547,8 +554,12 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.integer "employee_count"
     t.integer "fiscal_year_end_month"
     t.text "resource_names", default: [], array: true
-    t.datetime "discarded_at"
+    t.integer "lifecycle_status"
+    t.integer "workflow_status"
+    t.integer "business_type"
+    t.datetime "expiration_date"
     t.jsonb "metadata", default: {}
+    t.datetime "discarded_at"
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
@@ -633,8 +644,9 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.integer "lifecycle_status"
     t.integer "workflow_status"
     t.integer "business_type"
-    t.datetime "discarded_at"
+    t.datetime "expiration_date"
     t.jsonb "metadata", default: {}
+    t.datetime "discarded_at"
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
@@ -656,8 +668,9 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.integer "lifecycle_status"
     t.integer "workflow_status"
     t.integer "business_type"
-    t.datetime "discarded_at"
+    t.datetime "expiration_date"
     t.jsonb "metadata", default: {}
+    t.datetime "discarded_at"
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
@@ -711,8 +724,9 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.integer "lifecycle_status"
     t.integer "workflow_status"
     t.integer "business_type"
-    t.datetime "discarded_at"
+    t.datetime "expiration_date"
     t.jsonb "metadata", default: {}
+    t.datetime "discarded_at"
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
@@ -825,8 +839,10 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.integer "lifecycle_status"
     t.integer "workflow_status"
     t.integer "business_type"
-    t.datetime "discarded_at"
+    t.datetime "expiration_date"
     t.jsonb "metadata", default: {}
+    t.datetime "discarded_at"
+    t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["branch_id"], name: "index_documents_on_branch_id"
@@ -913,8 +929,9 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.integer "lifecycle_status"
     t.integer "workflow_status"
     t.integer "business_type"
-    t.datetime "discarded_at"
+    t.datetime "expiration_date"
     t.jsonb "metadata", default: {}
+    t.datetime "discarded_at"
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
@@ -937,8 +954,9 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.integer "lifecycle_status"
     t.integer "workflow_status"
     t.integer "business_type"
-    t.datetime "discarded_at"
+    t.datetime "expiration_date"
     t.jsonb "metadata", default: {}
+    t.datetime "discarded_at"
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
@@ -1048,8 +1066,10 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.integer "lifecycle_status"
     t.integer "workflow_status"
     t.integer "business_type"
-    t.datetime "discarded_at"
+    t.datetime "expiration_date"
     t.jsonb "metadata", default: {}
+    t.datetime "discarded_at"
+    t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["branch_id"], name: "index_events_on_branch_id"
@@ -1102,8 +1122,10 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.integer "lifecycle_status"
     t.integer "workflow_status"
     t.integer "business_type"
-    t.datetime "discarded_at"
+    t.datetime "expiration_date"
     t.jsonb "metadata", default: {}
+    t.datetime "discarded_at"
+    t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["branch_id"], name: "index_exam_groups_on_branch_id"
@@ -1123,8 +1145,10 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.integer "lifecycle_status"
     t.integer "workflow_status"
     t.integer "business_type"
-    t.datetime "discarded_at"
+    t.datetime "expiration_date"
     t.jsonb "metadata", default: {}
+    t.datetime "discarded_at"
+    t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["branch_id"], name: "index_exams_on_branch_id"
@@ -1144,8 +1168,9 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.integer "lifecycle_status"
     t.integer "workflow_status"
     t.integer "business_type"
-    t.datetime "discarded_at"
+    t.datetime "expiration_date"
     t.jsonb "metadata", default: {}
+    t.datetime "discarded_at"
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
@@ -1231,8 +1256,9 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.integer "lifecycle_status"
     t.integer "workflow_status"
     t.integer "business_type"
-    t.datetime "discarded_at"
+    t.datetime "expiration_date"
     t.jsonb "metadata", default: {}
+    t.datetime "discarded_at"
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
@@ -1258,8 +1284,9 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.integer "lifecycle_status"
     t.integer "workflow_status"
     t.integer "business_type"
-    t.datetime "discarded_at"
+    t.datetime "expiration_date"
     t.jsonb "metadata", default: {}
+    t.datetime "discarded_at"
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
@@ -1412,8 +1439,10 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.integer "lifecycle_status"
     t.integer "workflow_status"
     t.integer "business_type"
-    t.datetime "discarded_at"
+    t.datetime "expiration_date"
     t.jsonb "metadata", default: {}
+    t.datetime "discarded_at"
+    t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["branch_id"], name: "index_notifications_on_branch_id"
@@ -1508,8 +1537,9 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.integer "lifecycle_status"
     t.integer "workflow_status"
     t.integer "business_type"
-    t.datetime "discarded_at"
+    t.datetime "expiration_date"
     t.jsonb "metadata", default: {}
+    t.datetime "discarded_at"
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
@@ -1535,14 +1565,14 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.string "manufacturer_code"
     t.string "serial_number"
     t.string "batch_number"
-    t.datetime "expiration_date"
     t.integer "currency_code"
     t.integer "duration"
     t.integer "lifecycle_status"
     t.integer "workflow_status"
     t.integer "business_type"
-    t.datetime "discarded_at"
+    t.datetime "expiration_date"
     t.jsonb "metadata", default: {}
+    t.datetime "discarded_at"
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
@@ -1590,8 +1620,9 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.integer "lifecycle_status"
     t.integer "workflow_status"
     t.integer "business_type"
-    t.datetime "discarded_at"
+    t.datetime "expiration_date"
     t.jsonb "metadata", default: {}
+    t.datetime "discarded_at"
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
@@ -1616,8 +1647,9 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.integer "lifecycle_status"
     t.integer "workflow_status"
     t.integer "business_type"
-    t.datetime "discarded_at"
+    t.datetime "expiration_date"
     t.jsonb "metadata", default: {}
+    t.datetime "discarded_at"
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
@@ -1681,6 +1713,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.integer "lifecycle_status"
     t.integer "workflow_status"
     t.integer "business_type"
+    t.datetime "expiration_date"
+    t.jsonb "metadata", default: {}
     t.datetime "discarded_at"
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
@@ -1832,8 +1866,9 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.integer "lifecycle_status"
     t.integer "workflow_status"
     t.integer "business_type"
-    t.datetime "discarded_at"
+    t.datetime "expiration_date"
     t.jsonb "metadata", default: {}
+    t.datetime "discarded_at"
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
@@ -1969,8 +2004,9 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.integer "lifecycle_status"
     t.integer "workflow_status"
     t.integer "business_type"
-    t.datetime "discarded_at"
+    t.datetime "expiration_date"
     t.jsonb "metadata", default: {}
+    t.datetime "discarded_at"
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
@@ -1991,8 +2027,9 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.integer "lifecycle_status"
     t.integer "workflow_status"
     t.integer "business_type"
-    t.datetime "discarded_at"
+    t.datetime "expiration_date"
     t.jsonb "metadata", default: {}
+    t.datetime "discarded_at"
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
@@ -2018,12 +2055,12 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.string "manufacturer_code"
     t.string "serial_number"
     t.string "batch_number"
-    t.datetime "expiration_date"
     t.integer "lifecycle_status"
     t.integer "workflow_status"
     t.integer "business_type"
-    t.datetime "discarded_at"
+    t.datetime "expiration_date"
     t.jsonb "metadata", default: {}
+    t.datetime "discarded_at"
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
@@ -2049,8 +2086,9 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.integer "lifecycle_status"
     t.integer "workflow_status"
     t.integer "business_type"
-    t.datetime "discarded_at"
+    t.datetime "expiration_date"
     t.jsonb "metadata", default: {}
+    t.datetime "discarded_at"
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
@@ -2070,8 +2108,10 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.integer "lifecycle_status"
     t.integer "workflow_status"
     t.integer "business_type"
-    t.datetime "discarded_at"
+    t.datetime "expiration_date"
     t.jsonb "metadata", default: {}
+    t.datetime "discarded_at"
+    t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["branch_id"], name: "index_questions_on_branch_id"
@@ -2157,6 +2197,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.integer "lifecycle_status"
     t.integer "workflow_status"
     t.integer "business_type"
+    t.datetime "expiration_date"
+    t.jsonb "metadata", default: {}
     t.datetime "discarded_at"
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
@@ -2243,13 +2285,14 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.string "name"
     t.string "description"
     t.string "code"
-    t.integer "lifecycle_status"
-    t.integer "workflow_status"
     t.integer "duration"
     t.datetime "start_at"
+    t.integer "lifecycle_status"
+    t.integer "workflow_status"
     t.integer "business_type"
-    t.datetime "discarded_at"
+    t.datetime "expiration_date"
     t.jsonb "metadata", default: {}
+    t.datetime "discarded_at"
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
@@ -2266,13 +2309,14 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.string "name"
     t.string "description"
     t.string "code"
-    t.integer "lifecycle_status"
-    t.integer "workflow_status"
     t.integer "duration"
     t.datetime "start_at"
+    t.integer "lifecycle_status"
+    t.integer "workflow_status"
     t.integer "business_type"
-    t.datetime "discarded_at"
+    t.datetime "expiration_date"
     t.jsonb "metadata", default: {}
+    t.datetime "discarded_at"
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
@@ -2395,8 +2439,10 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.integer "lifecycle_status"
     t.integer "workflow_status"
     t.integer "business_type"
-    t.datetime "discarded_at"
+    t.datetime "expiration_date"
     t.jsonb "metadata", default: {}
+    t.datetime "discarded_at"
+    t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["branch_id"], name: "index_settings_on_branch_id"
@@ -2457,8 +2503,9 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.integer "lifecycle_status"
     t.integer "workflow_status"
     t.integer "business_type"
-    t.datetime "discarded_at"
+    t.datetime "expiration_date"
     t.jsonb "metadata", default: {}
+    t.datetime "discarded_at"
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
@@ -2493,8 +2540,9 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.integer "lifecycle_status"
     t.integer "workflow_status"
     t.integer "business_type"
-    t.datetime "discarded_at"
+    t.datetime "expiration_date"
     t.jsonb "metadata", default: {}
+    t.datetime "discarded_at"
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
@@ -2529,8 +2577,9 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.integer "lifecycle_status"
     t.integer "workflow_status"
     t.integer "business_type"
-    t.datetime "discarded_at"
+    t.datetime "expiration_date"
     t.jsonb "metadata", default: {}
+    t.datetime "discarded_at"
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
@@ -2563,12 +2612,12 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.string "manufacturer_code"
     t.string "serial_number"
     t.string "batch_number"
-    t.datetime "expiration_date"
     t.integer "lifecycle_status"
     t.integer "workflow_status"
     t.integer "business_type"
-    t.datetime "discarded_at"
+    t.datetime "expiration_date"
     t.jsonb "metadata", default: {}
+    t.datetime "discarded_at"
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
@@ -2669,13 +2718,16 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.string "name"
     t.string "description"
     t.string "code"
+    t.integer "country_code", null: false
+    t.integer "timezone"
+    t.boolean "auto_renew"
     t.integer "lifecycle_status"
     t.integer "workflow_status"
     t.integer "business_type"
-    t.integer "country_code"
-    t.boolean "auto_renew"
-    t.datetime "discarded_at"
+    t.datetime "expiration_date"
     t.jsonb "metadata", default: {}
+    t.datetime "discarded_at"
+    t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["branch_id"], name: "index_system_subscription_groups_on_branch_id"
@@ -2689,14 +2741,16 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.string "description"
     t.string "code"
     t.integer "duration_days"
-    t.integer "lifecycle_status"
-    t.integer "workflow_status"
-    t.integer "business_type"
     t.integer "country_code"
     t.jsonb "features", default: {}
     t.jsonb "limits", default: {}
-    t.datetime "discarded_at"
+    t.integer "lifecycle_status"
+    t.integer "workflow_status"
+    t.integer "business_type"
+    t.datetime "expiration_date"
     t.jsonb "metadata", default: {}
+    t.datetime "discarded_at"
+    t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["discarded_at"], name: "index_system_subscription_plans_on_discarded_at"
@@ -2710,13 +2764,15 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.string "name"
     t.string "description"
     t.string "code"
+    t.integer "country_code", null: false
+    t.boolean "auto_renew"
     t.integer "lifecycle_status"
     t.integer "workflow_status"
     t.integer "business_type"
-    t.integer "country_code"
-    t.boolean "auto_renew"
-    t.datetime "discarded_at"
+    t.datetime "expiration_date"
     t.jsonb "metadata", default: {}
+    t.datetime "discarded_at"
+    t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["branch_id"], name: "index_system_subscriptions_on_branch_id"
@@ -2734,10 +2790,16 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.integer "currency_code"
     t.integer "country_code"
     t.boolean "active", default: true, null: false
+    t.integer "lifecycle_status"
+    t.integer "workflow_status"
+    t.integer "business_type"
+    t.datetime "expiration_date"
     t.jsonb "metadata", default: {}
+    t.datetime "discarded_at"
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["discarded_at"], name: "index_systems_on_discarded_at"
     t.index ["name"], name: "index_systems_on_name", unique: true
   end
 
@@ -2868,8 +2930,9 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.integer "lifecycle_status"
     t.integer "workflow_status"
     t.integer "business_type"
-    t.datetime "discarded_at"
+    t.datetime "expiration_date"
     t.jsonb "metadata", default: {}
+    t.datetime "discarded_at"
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
@@ -2891,8 +2954,9 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.integer "lifecycle_status"
     t.integer "workflow_status"
     t.integer "business_type"
-    t.datetime "discarded_at"
+    t.datetime "expiration_date"
     t.jsonb "metadata", default: {}
+    t.datetime "discarded_at"
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
@@ -2919,8 +2983,12 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.string "phone_number"
     t.integer "country_code"
     t.string "single_access_token"
-    t.datetime "discarded_at"
+    t.integer "lifecycle_status"
+    t.integer "workflow_status"
+    t.integer "business_type"
+    t.datetime "expiration_date"
     t.jsonb "metadata", default: {}
+    t.datetime "discarded_at"
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
@@ -2953,8 +3021,9 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.integer "lifecycle_status"
     t.integer "workflow_status"
     t.integer "business_type"
-    t.datetime "discarded_at"
+    t.datetime "expiration_date"
     t.jsonb "metadata", default: {}
+    t.datetime "discarded_at"
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
@@ -3003,6 +3072,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
   add_foreign_key "branches", "categories"
   add_foreign_key "branches", "companies"
   add_foreign_key "brands", "categories"
+  add_foreign_key "brands", "companies"
   add_foreign_key "cart_appointments", "carts"
   add_foreign_key "cart_appointments", "companies"
   add_foreign_key "cart_groups", "branches"

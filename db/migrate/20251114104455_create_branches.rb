@@ -2,16 +2,12 @@ class CreateBranches < ActiveRecord::Migration[8.0]
   def change
     create_table :branches, id: :uuid do |t|
       t.references :company, null: false, foreign_key: true, type: :uuid
-      # t.references :parent_company, null: true, foreign_key: { to_table: :branches }, type: :uuid
       t.references :category, null: true, foreign_key: true, type: :uuid
 
       t.string :name
       t.string :description
       t.string :code
-      t.integer :lifecycle_status
-      t.integer :workflow_status
       t.integer :ownership_type
-      t.integer :business_type
       t.integer :currency_code
       t.string :registration_number
       t.string :vat_id
@@ -26,12 +22,17 @@ class CreateBranches < ActiveRecord::Migration[8.0]
       t.string :website
       t.integer :employee_count
       t.integer :fiscal_year_end_month
-      t.datetime :discarded_at
-      t.jsonb :metadata, default: {}
-      t.string :permission_resource_name
+
+      # --- System Fields ---
+      t.integer  :lifecycle_status
+      t.integer  :workflow_status
+      t.integer  :business_type
+      t.datetime :expiration_date
+      t.jsonb    :metadata,       default: {}
+      t.datetime :discarded_at,   index: true
+      t.string   :permission_resource_name
 
       t.timestamps
     end
-    add_index :branches, :discarded_at
   end
 end

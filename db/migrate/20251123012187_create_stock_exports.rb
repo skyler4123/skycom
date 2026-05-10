@@ -16,15 +16,17 @@ class CreateStockExports < ActiveRecord::Migration[8.0]
       t.string :description
       t.string :code
       t.integer :quantity
-      t.integer :lifecycle_status
-      t.integer :workflow_status
-      t.integer :business_type
-      t.datetime :discarded_at
-      t.jsonb :metadata, default: {}
-      t.string :permission_resource_name
+
+      # --- System Fields ---
+      t.integer  :lifecycle_status
+      t.integer  :workflow_status
+      t.integer  :business_type
+      t.datetime :expiration_date
+      t.jsonb    :metadata,       default: {}
+      t.datetime :discarded_at,   index: true
+      t.string   :permission_resource_name
 
       t.timestamps
     end
-    add_index :stock_exports, :discarded_at
   end
 end

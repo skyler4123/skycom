@@ -5,6 +5,7 @@ class CreateCarts < ActiveRecord::Migration[8.0]
       t.references :branch, null: true, foreign_key: true, type: :uuid
       t.references :cart_group, null: false, foreign_key: true, type: :uuid
       t.references :category, null: true, foreign_key: true, type: :uuid
+
       t.string :name
       t.string :description
       t.string :code
@@ -15,13 +16,15 @@ class CreateCarts < ActiveRecord::Migration[8.0]
       t.string :manufacturer_code
       t.string :serial_number
       t.string :batch_number
+
+      # --- System Fields ---
+      t.integer  :lifecycle_status
+      t.integer  :workflow_status
+      t.integer  :business_type
       t.datetime :expiration_date
-      t.integer :lifecycle_status
-      t.integer :workflow_status
-      t.integer :business_type
-      t.datetime :discarded_at
-      t.jsonb :metadata, default: {}
-      t.string :permission_resource_name
+      t.jsonb    :metadata,       default: {}
+      t.datetime :discarded_at,   index: true
+      t.string   :permission_resource_name
 
       t.timestamps
     end
@@ -30,6 +33,5 @@ class CreateCarts < ActiveRecord::Migration[8.0]
     add_index :carts, :upc
     add_index :carts, :ean
     add_index :carts, :serial_number
-    add_index :carts, :discarded_at
   end
 end

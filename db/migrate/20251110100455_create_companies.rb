@@ -5,10 +5,7 @@ class CreateCompanies < ActiveRecord::Migration[8.0]
       t.string :name
       t.string :description
       t.string :code
-      t.integer :lifecycle_status
-      t.integer :workflow_status
       t.integer :ownership_type
-      t.integer :business_type
       t.integer :currency_code
       t.string :registration_number
       t.string :vat_id
@@ -24,12 +21,17 @@ class CreateCompanies < ActiveRecord::Migration[8.0]
       t.integer :employee_count
       t.integer :fiscal_year_end_month
       t.text :resource_names, array: true, default: []
-      t.datetime :discarded_at
-      t.jsonb :metadata, default: {}
-      t.string :permission_resource_name
+
+      # --- System Fields ---
+      t.integer  :lifecycle_status
+      t.integer  :workflow_status
+      t.integer  :business_type
+      t.datetime :expiration_date
+      t.jsonb    :metadata,       default: {}
+      t.datetime :discarded_at,   index: true
+      t.string   :permission_resource_name
 
       t.timestamps
     end
-    add_index :companies, :discarded_at
   end
 end

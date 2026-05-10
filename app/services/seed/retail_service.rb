@@ -53,7 +53,8 @@ class Seed::RetailService
   def seeding
     print_header
 
-create_retail_company
+    create_retail_company
+    create_brands
     create_branches
     create_subscription_plans_for_company
     create_facilities_for_branches
@@ -98,6 +99,10 @@ create_retail_company
       description: "A group for multiple retail branch branches",
       business_type: COMPANY_GROUP_BUSINESS_TYPE
     )
+  end
+
+  def create_brands
+    Seed::BrandService.create(company: @retail)
   end
 
   def create_branches(count: 2)

@@ -4,6 +4,8 @@ class Brand < ApplicationRecord
   include TagConcern
 
   # --- Associations ---
+  belongs_to :company
+
   has_many :products, dependent: :nullify
 
   # --- Enums ---
@@ -19,8 +21,8 @@ class Brand < ApplicationRecord
   }
 
   # --- Validations ---
-  validates :name, presence: true, uniqueness: true, length: { maximum: 255 }
-  validates :code, presence: true, uniqueness: true
+  validates :name, presence: true, uniqueness: { scope: :company_id }, length: { maximum: 255 }
+  validates :code, presence: true, uniqueness: { scope: :company_id }
   validates :description, length: { maximum: 5000 }, allow_blank: true
 
   validates :business_type, presence: true
