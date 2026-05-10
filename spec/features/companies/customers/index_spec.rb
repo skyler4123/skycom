@@ -145,4 +145,53 @@ RSpec.feature "Companies::Customers Management", type: :feature, js: true do
 
     expect(page).to have_current_path(/business_type=/)
   end
+
+  scenario "update customer name via show modal" do
+    visit company_customers_path(company)
+    expect(page).to have_selector('table', wait: 10)
+
+    target_row = find('tbody tr', text: customer.name)
+    target_row.find('[data-action*="openShowModal"]').click
+
+    expect(page).to have_selector('.swal2-container', wait: 10)
+
+    editable_name_field = find('[data-controller="editable"]', match: :first)
+    editable_name_field.click
+
+    expect(page).to have_selector('.editable-input', wait: 5)
+
+    editable_name_field.find('.editable-input').fill_in(with: 'Updated Customer Name')
+
+    accept_confirm do
+      editable_name_field.find('.editable-input').send_keys :enter
+    end
+
+    expect(page).to have_selector('tbody tr', wait: 10)
+    expect(Customer.find_by(id: customer.id).name).to eq("Updated Customer Name")
+  end
+
+  scenario "update customer description via show modal" do
+    visit company_customers_path(company)
+    expect(page).to have_selector('table', wait: 10)
+
+    target_row = find('tbody tr', text: customer.name)
+    target_row.find('[data-action*="openShowModal"]').click
+
+    expect(page).to have_selector('.swal2-container', wait: 10)
+
+    all_editable = all('[data-controller="editable"]')
+    desc_editable = all_editable[1]
+    desc_editable.click
+
+    expect(page).to have_selector('.editable-input', wait: 5)
+
+    desc_editable.find('.editable-input').fill_in(with: 'Updated description for this customer')
+
+    accept_confirm do
+      desc_editable.find('.editable-input').send_keys :enter
+    end
+
+    expect(page).to have_selector('tbody tr', wait: 10)
+    expect(Customer.find_by(id: customer.id).description).to eq("Updated description for this customer")
+  end
 end

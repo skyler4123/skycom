@@ -55,7 +55,8 @@ class Companies::DepartmentsController < Companies::ApplicationController
       :name,
       :description,
       :business_type,
-      :workflow_status
+      :workflow_status,
+      :email
     )
   end
 
