@@ -14,7 +14,7 @@ class Seed::BrandService
     "J.P. Morgan", "Goldman Sachs", "Morgan Stanley", "Netflix", "Spotify"
   ].freeze
 
-  def self.create
+  def self.create(company:)
     # Get enum keys once before the loop for efficiency.
     lifecycle_statuses = Brand.lifecycle_statuses.keys
     workflow_statuses = Brand.workflow_statuses.keys
@@ -27,6 +27,7 @@ class Seed::BrandService
       should_discard = rand(10) == 0 # 10% chance of being discarded
 
       Brand.create!(
+        company: company,
         name: brand_name,
         description: "Official brand page for #{brand_name}.",
         code: "BR-#{SecureRandom.hex(4).upcase}",

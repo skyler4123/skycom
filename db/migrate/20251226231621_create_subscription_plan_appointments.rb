@@ -10,17 +10,18 @@ class CreateSubscriptionPlanAppointments < ActiveRecord::Migration[8.0]
       t.string :description
       t.integer :country_code, null: false
       t.integer :timezone
+      t.boolean :auto_renew
 
-      # --- State Columns (Moved Here) ---
-      t.integer :lifecycle_status  # e.g., active, expired, canceled
-      t.integer :workflow_status   # e.g., pending_payment, active
-      t.integer :business_type     # e.g., b2b, b2c (context specific)
-      t.boolean :auto_renew        # Instance specific setting
-      t.datetime :discarded_at
-      t.jsonb :metadata, default: {}
+      # --- System Fields ---
+      t.integer  :lifecycle_status
+      t.integer  :workflow_status
+      t.integer  :business_type
+      t.datetime :expiration_date
+      t.jsonb    :metadata,       default: {}
+      t.datetime :discarded_at,   index: true
+      t.string   :permission_resource_name
 
       t.timestamps
     end
-    add_index :subscription_plan_appointments, :discarded_at
   end
 end

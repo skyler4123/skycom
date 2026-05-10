@@ -1,6 +1,7 @@
 # spec/factories/brands.rb
 FactoryBot.define do
   factory :brand do
+    association :company
     name { Faker::Company.name }
     description { Faker::Lorem.sentence(word_count: 15) }
     code { "BR-#{SecureRandom.hex(4).upcase}" }
@@ -9,8 +10,8 @@ FactoryBot.define do
     business_type { Brand.business_types.keys.sample }
     discarded_at { nil }
 
-    initialize_with do
-      Seed::BrandService.new
+    trait :with_company do
+      association :company
     end
   end
 end

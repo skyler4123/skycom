@@ -17,9 +17,10 @@ class Seed::ApplicationService
 
     # Clear global data before seeding
     User.destroy_all
-    PaymentMethod.destroy_all
-    Brand.destroy_all
+    Employee.delete_all
+    User.destroy_all
 
+    PaymentMethod.destroy_all
 
     # Global Data
     # Identify the platform by a hardcoded CODE, not ID.
@@ -29,7 +30,6 @@ class Seed::ApplicationService
       sa.currency_code = :usd
     end
     Seed::PaymentMethodService.create # Ensure global payment methods are seeded first
-    Seed::BrandService.create # Seed global brands
     Seed::SystemSubscriptionPlanService.seeding # Seed subscription plans
     # User
     super_admin_1 = Seed::UserService.create(email: "super_admin_1@example.com", system_role: :super_admin)

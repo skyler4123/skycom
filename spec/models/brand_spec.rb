@@ -7,11 +7,14 @@ RSpec.describe Brand, type: :model do
   end
 
   describe "validations" do
+    let!(:company) { create(:company) }
+    let!(:brand) { create(:brand, company: company) }
+
     it { should validate_presence_of(:name) }
     it { should validate_presence_of(:code) }
     it { should validate_presence_of(:business_type) }
-    it { should validate_uniqueness_of(:name) }
-    it { should validate_uniqueness_of(:code) }
+    it { should validate_uniqueness_of(:name).scoped_to(:company_id) }
+    it { should validate_uniqueness_of(:code).scoped_to(:company_id) }
     it { should validate_length_of(:name).is_at_most(255) }
     it { should validate_length_of(:description).is_at_most(5000) }
   end

@@ -3,9 +3,9 @@ class CreatePurchaseItems < ActiveRecord::Migration[8.0]
     create_table :purchase_items, id: :uuid do |t|
       t.references :company, null: false, foreign_key: true, type: :uuid
       t.references :branch, null: true, foreign_key: true, type: :uuid
-
       t.references :purchase, null: false, foreign_key: true, type: :uuid
       t.references :category, null: true, foreign_key: true, type: :uuid
+
       t.string :name
       t.string :description
       t.string :code
@@ -16,13 +16,15 @@ class CreatePurchaseItems < ActiveRecord::Migration[8.0]
       t.string :manufacturer_code
       t.string :serial_number
       t.string :batch_number
+
+      # --- System Fields ---
+      t.integer  :lifecycle_status
+      t.integer  :workflow_status
+      t.integer  :business_type
       t.datetime :expiration_date
-      t.integer :lifecycle_status
-      t.integer :workflow_status
-      t.integer :business_type
-      t.datetime :discarded_at
-      t.jsonb :metadata, default: {}
-      t.string :permission_resource_name
+      t.jsonb    :metadata,       default: {}
+      t.datetime :discarded_at,   index: true
+      t.string   :permission_resource_name
 
       t.timestamps
     end
@@ -31,6 +33,5 @@ class CreatePurchaseItems < ActiveRecord::Migration[8.0]
     add_index :purchase_items, :upc
     add_index :purchase_items, :ean
     add_index :purchase_items, :serial_number
-    add_index :purchase_items, :discarded_at
   end
 end

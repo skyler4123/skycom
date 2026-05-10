@@ -170,6 +170,8 @@ RSpec.feature "Companies::Employees Permissions", type: :feature, js: true do
     select 'Full Time', from: 'employee[business_type]'
 
     click_button "Save Employee"
+
+    expect(page).to have_content("created successfully", wait: 10)
     expect(page).to have_selector('tbody tr', wait: 10)
 
     expect(Employee.find_by(name: "Created by Creator")).to be_present
@@ -623,6 +625,8 @@ RSpec.feature "Companies::Employees Permissions", type: :feature, js: true do
     select 'Full Time', from: 'employee[business_type]'
 
     click_button "Save Employee"
+
+    expect(page).to have_content("created successfully", wait: 10)
     expect(page).to have_selector('tbody tr', wait: 10)
 
     expect(Employee.find_by(name: "Created After Grant")).to be_present

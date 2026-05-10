@@ -19,13 +19,15 @@ class CreateStocks < ActiveRecord::Migration[8.0]
       t.string :manufacturer_code
       t.string :serial_number
       t.string :batch_number
+
+      # --- System Fields ---
+      t.integer  :lifecycle_status
+      t.integer  :workflow_status
+      t.integer  :business_type
       t.datetime :expiration_date
-      t.integer :lifecycle_status
-      t.integer :workflow_status
-      t.integer :business_type
-      t.datetime :discarded_at
-      t.jsonb :metadata, default: {}
-      t.string :permission_resource_name
+      t.jsonb    :metadata,       default: {}
+      t.datetime :discarded_at,   index: true
+      t.string   :permission_resource_name
 
       t.timestamps
     end
@@ -34,7 +36,6 @@ class CreateStocks < ActiveRecord::Migration[8.0]
     add_index :stocks, :upc
     add_index :stocks, :ean
     add_index :stocks, :serial_number
-    add_index :stocks, :discarded_at
     add_index :stocks, [ :product_id, :warehouse_id ], unique: true
   end
 end

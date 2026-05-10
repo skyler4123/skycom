@@ -27,6 +27,10 @@ class Branch < ApplicationRecord
   has_many :payment_methods, through: :payment_method_appointments
   has_many :statistics, as: :owner
   has_many :warehouses, dependent: :destroy
+  has_many :stocks, dependent: :destroy
+  has_many :stock_exports, dependent: :destroy
+  has_many :stock_imports, dependent: :destroy
+  has_many :stock_transfers, dependent: :destroy
 
   # Self-referencing association for company hierarchy
   # belongs_to :parent_company, class_name: "Company", optional: true
