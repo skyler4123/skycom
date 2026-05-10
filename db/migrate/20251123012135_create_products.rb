@@ -1,36 +1,57 @@
 class CreateProducts < ActiveRecord::Migration[8.0]
   def change
     create_table :products, id: :uuid do |t|
+      # --- Base Identity ---
       t.references :company, null: false, foreign_key: true, type: :uuid
-      t.references :branch, null: true, foreign_key: true, type: :uuid
-      t.references :brand, null: true, foreign_key: true, type: :uuid
+      t.references :branch,  null: true,  foreign_key: true, type: :uuid
+      t.references :brand,   null: true,  foreign_key: true, type: :uuid
       t.references :category, null: true, foreign_key: true, type: :uuid
 
       t.string :name
-      t.string :description
-      t.string :code
-      t.string :sku
+      t.text   :description
+      t.string :code, index: true
+      t.string :sku,  index: true
       t.string :barcode
-      t.string :upc
-      t.string :ean
-      t.string :manufacturer_code
-      t.string :serial_number
-      t.string :batch_number
+
+      # --- 1. Physical Properties (The "Thing" Attributes) ---
+      t.string :material     # e.g., "Organic Cotton", "Stainless Steel", "Plastic"
+      t.string :color        # e.g., "Midnight Black", "Hasaki Green"
+      t.string :size         # e.g., "XL", "42", "500ml"
+      t.string :shape        # e.g., "Cylindrical", "Rectangular"
+      t.string :pattern      # e.g., "Striped", "Matte", "Glossy"
+      t.string :flavor_scent # e.g., "Lavender" (Hasaki), "Chocolate" (Gym Supplements)
+
+      # --- 2. Dimensions & Logistics (For Warehousing) ---
+      t.decimal :weight,    precision: 10, scale: 3 # kg
+      t.decimal :length,    precision: 10, scale: 2 # cm
+      t.decimal :width,     precision: 10, scale: 2 # cm
+      t.decimal :height,    precision: 10, scale: 2 # cm
+      t.decimal :volume,    precision: 10, scale: 3 # Liters/m3
+      t.string  :unit_type, default: 'piece'        # e.g., 'pair', 'set', 'pack'
+
+      # --- 3. Manufacturing & Origin ---
+      t.string :origin_country # e.g., "VN", "JP", "US"
+      t.string :manufacturer_name
+      t.string :model_year
+      t.string :warranty_info
+
+      # --- 4. Industry Specifics (Gym/Education/Clinic) ---
+      t.integer :duration_value
+      t.string  :duration_unit
+      t.integer :capacity
+      t.boolean :is_recurring,  default: false
+      t.references :required_role, null: true, foreign_key: { to_table: :roles }, type: :uuid
+
+      # --- 5. Lifecycle & Status ---
+      t.integer  :lifecycle_status
+      t.integer  :workflow_status
+      t.integer  :business_type   # retail, education, gym, etc.
       t.datetime :expiration_date
-      t.integer :lifecycle_status
-      t.integer :workflow_status
-      t.integer :business_type
-      t.datetime :discarded_at
-      t.jsonb :metadata, default: {}
+      t.jsonb    :metadata,       default: {}
+      t.datetime :discarded_at,   index: true
       t.string :permission_resource_name
 
       t.timestamps
     end
-    add_index :products, :sku
-    add_index :products, :barcode
-    add_index :products, :upc
-    add_index :products, :ean
-    add_index :products, :serial_number
-    add_index :products, :discarded_at
   end
 end

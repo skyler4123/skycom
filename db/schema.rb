@@ -1751,34 +1751,48 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.uuid "brand_id"
     t.uuid "category_id"
     t.string "name"
-    t.string "description"
+    t.text "description"
     t.string "code"
     t.string "sku"
     t.string "barcode"
-    t.string "upc"
-    t.string "ean"
-    t.string "manufacturer_code"
-    t.string "serial_number"
-    t.string "batch_number"
-    t.datetime "expiration_date"
+    t.string "material"
+    t.string "color"
+    t.string "size"
+    t.string "shape"
+    t.string "pattern"
+    t.string "flavor_scent"
+    t.decimal "weight", precision: 10, scale: 3
+    t.decimal "length", precision: 10, scale: 2
+    t.decimal "width", precision: 10, scale: 2
+    t.decimal "height", precision: 10, scale: 2
+    t.decimal "volume", precision: 10, scale: 3
+    t.string "unit_type", default: "piece"
+    t.string "origin_country"
+    t.string "manufacturer_name"
+    t.string "model_year"
+    t.string "warranty_info"
+    t.integer "duration_value"
+    t.string "duration_unit"
+    t.integer "capacity"
+    t.boolean "is_recurring", default: false
+    t.uuid "required_role_id"
     t.integer "lifecycle_status"
     t.integer "workflow_status"
     t.integer "business_type"
-    t.datetime "discarded_at"
+    t.datetime "expiration_date"
     t.jsonb "metadata", default: {}
+    t.datetime "discarded_at"
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["barcode"], name: "index_products_on_barcode"
     t.index ["branch_id"], name: "index_products_on_branch_id"
     t.index ["brand_id"], name: "index_products_on_brand_id"
     t.index ["category_id"], name: "index_products_on_category_id"
+    t.index ["code"], name: "index_products_on_code"
     t.index ["company_id"], name: "index_products_on_company_id"
     t.index ["discarded_at"], name: "index_products_on_discarded_at"
-    t.index ["ean"], name: "index_products_on_ean"
-    t.index ["serial_number"], name: "index_products_on_serial_number"
+    t.index ["required_role_id"], name: "index_products_on_required_role_id"
     t.index ["sku"], name: "index_products_on_sku"
-    t.index ["upc"], name: "index_products_on_upc"
   end
 
   create_table "project_appointments", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -2965,6 +2979,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
   add_foreign_key "products", "brands"
   add_foreign_key "products", "categories"
   add_foreign_key "products", "companies"
+  add_foreign_key "products", "roles", column: "required_role_id"
   add_foreign_key "project_appointments", "companies"
   add_foreign_key "project_appointments", "projects"
   add_foreign_key "project_group_appointments", "companies"

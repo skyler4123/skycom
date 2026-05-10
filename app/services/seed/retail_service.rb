@@ -266,16 +266,87 @@ create_retail_company
 
   def create_inventory
     @branches.each do |branch|
-      # 1. Seed Beauty Products (Retail)
+      # 1. Seed Beauty Products (Retail) with enhanced fields
       BEAUTY_PRODUCTS.each do |item_name|
         @products << Seed::ProductService.create(
           company: @retail,
           branch: branch,
-          name: item_name + SecureRandom.hex(4)
+          name: item_name + SecureRandom.hex(4),
+          description: "High-quality #{item_name} for daily skincare routine",
+          # Physical Properties
+          material: "Liquid/Cream",
+          color: [ "White", "Translucent", "Light Pink", "Blue" ].sample,
+          size: [ "30ml", "50ml", "60ml", "100ml", "150ml" ].sample,
+          shape: "Cylindrical Bottle",
+          pattern: "Matte",
+          flavor_scent: [ "Fragrance-free", "Hypoallergenic", "Aloe", "Green Tea" ].sample,
+          # Dimensions & Logistics
+          weight: rand(0.05..0.3).round(3),
+          length: rand(3..8).round(2),
+          width: rand(3..6).round(2),
+          height: rand(10..20).round(2),
+          volume: rand(0.05..0.2).round(3),
+          unit_type: "bottle",
+          # Manufacturing & Origin
+          origin_country: [ "FR", "JP", "KR", "US", "VN" ].sample,
+          manufacturer_name: [ "La Roche-Posay", "L'Oreal", "Innisfree", "CeraVe", "Klairs" ].sample,
+          model_year: "2024",
+          warranty_info: "1 year shelf life",
+          # Industry Specifics (for potential services)
+          duration_value: nil,
+          duration_unit: nil,
+          capacity: nil,
+          is_recurring: false,
+          # Other Identifiers
+          code: "PRD-#{SecureRandom.hex(4).upcase}",
+          sku: "SKU-#{Faker::Number.number(digits: 8)}",
+          barcode: Faker::Barcode.ean,
+          expiration_date: 2.years.from_now
         )
       end
 
-      # 2. Seed Clinic Services (Booking-based)
+      # 2. Seed Additional Retail Products with variety
+      additional_products = [
+        { name: "Vitamin C Serum 20%", material: "Liquid", size: "30ml", flavor_scent: "Citrus" },
+        { name: "Hyaluronic Acid Moisturizer", material: "Cream", size: "50ml", flavor_scent: "Neutral" },
+        { name: "Niacinamide Toner", material: "Liquid", size: "150ml", flavor_scent: "Aloe" },
+        { name: "Sunscreen SPF50+", material: "Gel", size: "60ml", flavor_scent: "Light" },
+        { name: "Cleansing Foam", material: "Foam", size: "150ml", flavor_scent: "Fresh" },
+        { name: "Sheet Mask - Hydration", material: "Sheet", size: "25ml", flavor_scent: "Rose" },
+        { name: "Eye Cream", material: "Cream", size: "15ml", flavor_scent: "Fragrance-free" },
+        { name: "Lip Balm", material: "Wax", size: "10g", flavor_scent: "Mint" }
+      ]
+
+      additional_products.each do |prod|
+        @products << Seed::ProductService.create(
+          company: @retail,
+          branch: branch,
+          name: prod[:name] + SecureRandom.hex(4),
+          description: "Premium skincare product for professional use",
+          material: prod[:material],
+          size: prod[:size],
+          flavor_scent: prod[:flavor_scent],
+          color: [ "Translucent", "White", "Light Yellow" ].sample,
+          shape: [ "Cylindrical", "Tube", "Jar" ].sample,
+          pattern: [ "Matte", "Glossy", "Satin" ].sample,
+          weight: rand(0.02..0.2).round(3),
+          length: rand(2..10).round(2),
+          width: rand(2..8).round(2),
+          height: rand(5..15).round(2),
+          volume: rand(0.01..0.15).round(3),
+          unit_type: [ "bottle", "tube", "jar", "pack" ].sample,
+          origin_country: [ "FR", "JP", "KR", "US", "VN", "DE" ].sample,
+          manufacturer_name: [ "La Roche-Posay", "L'Oreal", "Innisfree", "CeraVe", "The Ordinary", "Paula's Choice" ].sample,
+          model_year: [ "2023", "2024", "2025" ].sample,
+          warranty_info: "2 years shelf life",
+          code: "PRD-#{SecureRandom.hex(4).upcase}",
+          sku: "SKU-#{Faker::Number.number(digits: 8)}",
+          barcode: Faker::Barcode.ean,
+          expiration_date: rand(1..3).years.from_now
+        )
+      end
+
+      # 3. Seed Clinic Services (Booking-based)
       CLINIC_SERVICES.each do |service_name|
         @services << Seed::ServiceService.create(
           company: @retail,

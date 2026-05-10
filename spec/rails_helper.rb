@@ -73,6 +73,7 @@ end
 
 
 # ----------------------------------------------------------------------------------------------------
+require "cache_helper"
 require "factory_bot_rails_helper"
 require "shoulda_matchers_helper"
 require "retry_helper"
