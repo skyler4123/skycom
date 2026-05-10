@@ -2762,6 +2762,17 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.index ["username"], name: "index_users_on_username", unique: true
   end
 
+  create_table "versions", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.string "whodunnit"
+    t.datetime "created_at"
+    t.string "item_id", null: false
+    t.string "item_type", null: false
+    t.string "event", null: false
+    t.text "object"
+    t.text "object_changes"
+    t.index ["item_type", "item_id"], name: "index_versions_on_item_type_and_item_id"
+  end
+
   create_table "warehouses", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.uuid "company_id", null: false
     t.uuid "branch_id"

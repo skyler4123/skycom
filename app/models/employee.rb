@@ -6,8 +6,11 @@ class Employee < ApplicationRecord
   include Employee::PermissionConcern
   include TagConcern
   include Discard::Model
+  include Employee::SearchkickConcern
 
   attribute :permission_resource_name, :string, default: -> { self.name }
+
+  has_paper_trail
 
   # --- Associations ---
   belongs_to :company

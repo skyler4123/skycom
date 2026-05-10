@@ -18,6 +18,7 @@ class ApplicationController < ActionController::Base
   before_action :set_current_session
   before_action :authenticate
   before_action :sync_client_cache_version, if: :current_user
+  before_action :set_paper_trail_whodunnit
 
   # --------------------------------------------------------------------------
   # SINGLE-SESSION MODE
