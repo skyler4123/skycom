@@ -998,39 +998,39 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
 
   create_table "company_dynamics", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
     t.uuid "company_id", null: false
-    t.integer "branch_cache_version", default: 0
-    t.integer "department_cache_version", default: 0
-    t.integer "employee_group_cache_version", default: 0
-    t.integer "employee_cache_version", default: 0
-    t.integer "customer_group_cache_version", default: 0
-    t.integer "customer_cache_version", default: 0
-    t.integer "brand_cache_version", default: 0
-    t.integer "product_group_cache_version", default: 0
-    t.integer "product_cache_version", default: 0
-    t.integer "warehouse_cache_version", default: 0
-    t.integer "stock_cache_version", default: 0
-    t.integer "stock_transfer_cache_version", default: 0
-    t.integer "stock_import_cache_version", default: 0
-    t.integer "stock_export_cache_version", default: 0
-    t.integer "service_group_cache_version", default: 0
-    t.integer "service_cache_version", default: 0
-    t.integer "order_group_cache_version", default: 0
-    t.integer "order_cache_version", default: 0
-    t.integer "cart_group_cache_version", default: 0
-    t.integer "cart_cache_version", default: 0
-    t.integer "purchase_cache_version", default: 0
-    t.integer "purchase_item_cache_version", default: 0
-    t.integer "invoice_cache_version", default: 0
-    t.integer "payment_cache_version", default: 0
-    t.integer "facility_group_cache_version", default: 0
-    t.integer "facility_cache_version", default: 0
-    t.integer "project_group_cache_version", default: 0
-    t.integer "project_cache_version", default: 0
-    t.integer "task_group_cache_version", default: 0
-    t.integer "task_cache_version", default: 0
-    t.integer "booking_cache_version", default: 0
-    t.integer "membership_cache_version", default: 0
-    t.integer "reservation_cache_version", default: 0
+    t.integer "branches_cache_version", default: 0
+    t.integer "departments_cache_version", default: 0
+    t.integer "employee_groups_cache_version", default: 0
+    t.integer "employees_cache_version", default: 0
+    t.integer "customer_groups_cache_version", default: 0
+    t.integer "customers_cache_version", default: 0
+    t.integer "brands_cache_version", default: 0
+    t.integer "product_groups_cache_version", default: 0
+    t.integer "products_cache_version", default: 0
+    t.integer "warehouses_cache_version", default: 0
+    t.integer "stocks_cache_version", default: 0
+    t.integer "stock_transfers_cache_version", default: 0
+    t.integer "stock_imports_cache_version", default: 0
+    t.integer "stock_exports_cache_version", default: 0
+    t.integer "service_groups_cache_version", default: 0
+    t.integer "services_cache_version", default: 0
+    t.integer "order_groups_cache_version", default: 0
+    t.integer "orders_cache_version", default: 0
+    t.integer "cart_groups_cache_version", default: 0
+    t.integer "carts_cache_version", default: 0
+    t.integer "purchases_cache_version", default: 0
+    t.integer "purchase_items_cache_version", default: 0
+    t.integer "invoices_cache_version", default: 0
+    t.integer "payments_cache_version", default: 0
+    t.integer "facility_groups_cache_version", default: 0
+    t.integer "facilities_cache_version", default: 0
+    t.integer "project_groups_cache_version", default: 0
+    t.integer "projects_cache_version", default: 0
+    t.integer "task_groups_cache_version", default: 0
+    t.integer "tasks_cache_version", default: 0
+    t.integer "bookings_cache_version", default: 0
+    t.integer "memberships_cache_version", default: 0
+    t.integer "reservations_cache_version", default: 0
     t.integer "lifecycle_status"
     t.integer "workflow_status"
     t.integer "business_type"
@@ -1050,6 +1050,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
   create_table "company_statics", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
     t.uuid "company_id", null: false
     t.string "name"
+    t.text "resource_names", default: [], array: true
     t.jsonb "branch_property_string_mappings", default: {}
     t.jsonb "branch_property_text_mappings", default: {}
     t.jsonb "branch_property_integer_mappings", default: {}

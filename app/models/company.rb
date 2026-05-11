@@ -11,7 +11,7 @@ class Company < ApplicationRecord
 
   belongs_to :user
 
-  has_many :company_staics, dependent: :destroy
+  has_many :company_statics, dependent: :destroy
   has_many :company_dynamics, dependent: :destroy
   has_many :brands, dependent: :destroy
   has_many :branches, dependent: :destroy
@@ -165,5 +165,9 @@ class Company < ApplicationRecord
       workflow_status: :active,
       business_type: :owner
     )
+  end
+
+  def company_static
+    company_statics.first
   end
 end

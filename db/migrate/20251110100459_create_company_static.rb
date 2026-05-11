@@ -3,6 +3,7 @@ class CreateCompanyStatic < ActiveRecord::Migration[8.0]
     create_table :company_statics, id: :uuid, default: -> { "uuidv7()" } do |t|
       t.references :company, null: false, foreign_key: true, type: :uuid
       t.string :name
+      t.text :resource_names, array: true, default: []
 
       # --- BRANCH MAPPINGS ---
       t.jsonb :branch_property_string_mappings, default: {}

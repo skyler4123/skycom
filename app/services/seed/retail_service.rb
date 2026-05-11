@@ -28,7 +28,7 @@ class Seed::RetailService
   RETAIL_ROLES = (EMPLOYEE_COUNTS.keys).freeze
   COMPANY_GROUP_BUSINESS_TYPE = :retail
 
-  CLINIC_RESOURCES = [ "Clinic Room A", "Clinic Room B", "Laser Machine 01", "HIFU Machine" ].freeze
+  CLINIC_FACILITIES = [ "Clinic Room A", "Clinic Room B", "Laser Machine 01", "HIFU Machine" ].freeze
 
   RESOURCES = %w[Order Product Employee Customer PolicyAppointment Booking Service Order]
 
@@ -382,7 +382,7 @@ class Seed::RetailService
     puts "Setting up clinic resources and sample bookings..."
     @branches.each do |branch|
       # Create physical resources (Rooms/Machines)
-      branch_resources = CLINIC_RESOURCES.map do |res_name|
+      branch_resources = CLINIC_FACILITIES.map do |res_name|
         Seed::FacilityService.create(
           company: @retail,
           branch: branch,
