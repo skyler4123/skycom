@@ -72,7 +72,10 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.index ["appoint_from_type", "appoint_from_id"], name: "index_address_appointments_on_appoint_from"
     t.index ["appoint_to_type", "appoint_to_id"], name: "idx_on_appoint_to_type_appoint_to_id_9dbaa804bc"
     t.index ["appoint_to_type", "appoint_to_id"], name: "index_address_appointments_on_appoint_to"
+    t.index ["business_type"], name: "index_address_appointments_on_business_type"
     t.index ["discarded_at"], name: "index_address_appointments_on_discarded_at"
+    t.index ["lifecycle_status"], name: "index_address_appointments_on_lifecycle_status"
+    t.index ["workflow_status"], name: "index_address_appointments_on_workflow_status"
   end
 
   create_table "addresses", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -104,10 +107,13 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["business_type"], name: "index_answers_on_business_type"
     t.index ["category_id"], name: "index_answers_on_category_id"
     t.index ["company_id"], name: "index_answers_on_company_id"
     t.index ["discarded_at"], name: "index_answers_on_discarded_at"
+    t.index ["lifecycle_status"], name: "index_answers_on_lifecycle_status"
     t.index ["question_id"], name: "index_answers_on_question_id"
+    t.index ["workflow_status"], name: "index_answers_on_workflow_status"
   end
 
   create_table "article_appointments", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -139,8 +145,11 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.index ["appoint_to_type", "appoint_to_id"], name: "idx_on_appoint_to_type_appoint_to_id_aae71362ee"
     t.index ["appoint_to_type", "appoint_to_id"], name: "index_article_appointments_on_appoint_to"
     t.index ["article_id"], name: "index_article_appointments_on_article_id"
+    t.index ["business_type"], name: "index_article_appointments_on_business_type"
     t.index ["company_id"], name: "index_article_appointments_on_company_id"
     t.index ["discarded_at"], name: "index_article_appointments_on_discarded_at"
+    t.index ["lifecycle_status"], name: "index_article_appointments_on_lifecycle_status"
+    t.index ["workflow_status"], name: "index_article_appointments_on_workflow_status"
   end
 
   create_table "article_group_appointments", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -172,8 +181,11 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.index ["appoint_to_type", "appoint_to_id"], name: "idx_on_appoint_to_type_appoint_to_id_3810e29801"
     t.index ["appoint_to_type", "appoint_to_id"], name: "index_article_group_appointments_on_appoint_to"
     t.index ["article_group_id"], name: "index_article_group_appointments_on_article_group_id"
+    t.index ["business_type"], name: "index_article_group_appointments_on_business_type"
     t.index ["company_id"], name: "index_article_group_appointments_on_company_id"
     t.index ["discarded_at"], name: "index_article_group_appointments_on_discarded_at"
+    t.index ["lifecycle_status"], name: "index_article_group_appointments_on_lifecycle_status"
+    t.index ["workflow_status"], name: "index_article_group_appointments_on_workflow_status"
   end
 
   create_table "article_groups", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -195,9 +207,12 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["branch_id"], name: "index_article_groups_on_branch_id"
+    t.index ["business_type"], name: "index_article_groups_on_business_type"
     t.index ["category_id"], name: "index_article_groups_on_category_id"
     t.index ["company_id"], name: "index_article_groups_on_company_id"
     t.index ["discarded_at"], name: "index_article_groups_on_discarded_at"
+    t.index ["lifecycle_status"], name: "index_article_groups_on_lifecycle_status"
+    t.index ["workflow_status"], name: "index_article_groups_on_workflow_status"
   end
 
   create_table "articles", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -221,9 +236,12 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.datetime "updated_at", null: false
     t.index ["article_group_id"], name: "index_articles_on_article_group_id"
     t.index ["branch_id"], name: "index_articles_on_branch_id"
+    t.index ["business_type"], name: "index_articles_on_business_type"
     t.index ["category_id"], name: "index_articles_on_category_id"
     t.index ["company_id"], name: "index_articles_on_company_id"
     t.index ["discarded_at"], name: "index_articles_on_discarded_at"
+    t.index ["lifecycle_status"], name: "index_articles_on_lifecycle_status"
+    t.index ["workflow_status"], name: "index_articles_on_workflow_status"
   end
 
   create_table "attendance_days", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -334,8 +352,11 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.datetime "updated_at", null: false
     t.index ["booking_resourceable_type", "booking_resourceable_id"], name: "index_booking_resources_on_booking_resourceable"
     t.index ["branch_id"], name: "index_booking_resources_on_branch_id"
+    t.index ["business_type"], name: "index_booking_resources_on_business_type"
     t.index ["company_id"], name: "index_booking_resources_on_company_id"
     t.index ["discarded_at"], name: "index_booking_resources_on_discarded_at"
+    t.index ["lifecycle_status"], name: "index_booking_resources_on_lifecycle_status"
+    t.index ["workflow_status"], name: "index_booking_resources_on_workflow_status"
   end
 
   create_table "bookings", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -355,8 +376,80 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.integer "lifecycle_status"
     t.integer "workflow_status"
     t.integer "business_type"
-    t.datetime "discarded_at"
+    t.datetime "expiration_date"
     t.jsonb "metadata", default: {}
+    t.datetime "discarded_at"
+    t.string "permission_resource_name"
+    t.string "dynamic_property_string_1"
+    t.string "dynamic_property_string_2"
+    t.string "dynamic_property_string_3"
+    t.string "dynamic_property_string_4"
+    t.string "dynamic_property_string_5"
+    t.string "dynamic_property_string_6"
+    t.string "dynamic_property_string_7"
+    t.string "dynamic_property_string_8"
+    t.string "dynamic_property_string_9"
+    t.string "dynamic_property_string_10"
+    t.string "dynamic_property_string_11"
+    t.string "dynamic_property_string_12"
+    t.string "dynamic_property_string_13"
+    t.string "dynamic_property_string_14"
+    t.string "dynamic_property_string_15"
+    t.string "dynamic_property_string_16"
+    t.string "dynamic_property_string_17"
+    t.string "dynamic_property_string_18"
+    t.string "dynamic_property_string_19"
+    t.string "dynamic_property_string_20"
+    t.integer "dynamic_property_integer_1"
+    t.integer "dynamic_property_integer_2"
+    t.integer "dynamic_property_integer_3"
+    t.integer "dynamic_property_integer_4"
+    t.integer "dynamic_property_integer_5"
+    t.integer "dynamic_property_integer_6"
+    t.integer "dynamic_property_integer_7"
+    t.integer "dynamic_property_integer_8"
+    t.integer "dynamic_property_integer_9"
+    t.integer "dynamic_property_integer_10"
+    t.integer "dynamic_property_integer_11"
+    t.integer "dynamic_property_integer_12"
+    t.integer "dynamic_property_integer_13"
+    t.integer "dynamic_property_integer_14"
+    t.integer "dynamic_property_integer_15"
+    t.integer "dynamic_property_integer_16"
+    t.integer "dynamic_property_integer_17"
+    t.integer "dynamic_property_integer_18"
+    t.integer "dynamic_property_integer_19"
+    t.integer "dynamic_property_integer_20"
+    t.decimal "dynamic_property_decimal_1", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_2", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_3", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_4", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_5", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_6", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_7", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_8", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_9", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_10", precision: 15, scale: 4
+    t.boolean "dynamic_property_boolean_1"
+    t.boolean "dynamic_property_boolean_2"
+    t.boolean "dynamic_property_boolean_3"
+    t.boolean "dynamic_property_boolean_4"
+    t.boolean "dynamic_property_boolean_5"
+    t.boolean "dynamic_property_boolean_6"
+    t.boolean "dynamic_property_boolean_7"
+    t.boolean "dynamic_property_boolean_8"
+    t.boolean "dynamic_property_boolean_9"
+    t.boolean "dynamic_property_boolean_10"
+    t.boolean "dynamic_property_datetime_1"
+    t.boolean "dynamic_property_datetime_2"
+    t.boolean "dynamic_property_datetime_3"
+    t.boolean "dynamic_property_datetime_4"
+    t.boolean "dynamic_property_datetime_5"
+    t.boolean "dynamic_property_datetime_6"
+    t.boolean "dynamic_property_datetime_7"
+    t.boolean "dynamic_property_datetime_8"
+    t.boolean "dynamic_property_datetime_9"
+    t.boolean "dynamic_property_datetime_10"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["appoint_by_type", "appoint_by_id"], name: "index_bookings_on_appoint_by"
@@ -365,8 +458,11 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.index ["appoint_to_type", "appoint_to_id"], name: "index_bookings_on_appoint_to"
     t.index ["booking_resource_id"], name: "index_bookings_on_booking_resource_id"
     t.index ["branch_id"], name: "index_bookings_on_branch_id"
+    t.index ["business_type"], name: "index_bookings_on_business_type"
     t.index ["company_id"], name: "index_bookings_on_company_id"
     t.index ["discarded_at"], name: "index_bookings_on_discarded_at"
+    t.index ["lifecycle_status"], name: "index_bookings_on_lifecycle_status"
+    t.index ["workflow_status"], name: "index_bookings_on_workflow_status"
   end
 
   create_table "branches", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -478,8 +574,10 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.index ["code"], name: "index_branches_on_code", unique: true
     t.index ["company_id"], name: "index_branches_on_company_id"
     t.index ["discarded_at"], name: "index_branches_on_discarded_at"
+    t.index ["lifecycle_status"], name: "index_branches_on_lifecycle_status"
     t.index ["parent_branch_id"], name: "index_branches_on_parent_branch_id"
     t.index ["slug"], name: "index_branches_on_slug", unique: true
+    t.index ["workflow_status"], name: "index_branches_on_workflow_status"
   end
 
   create_table "brands", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -495,11 +593,84 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.jsonb "metadata", default: {}
     t.datetime "discarded_at"
     t.string "permission_resource_name"
+    t.string "dynamic_property_string_1"
+    t.string "dynamic_property_string_2"
+    t.string "dynamic_property_string_3"
+    t.string "dynamic_property_string_4"
+    t.string "dynamic_property_string_5"
+    t.string "dynamic_property_string_6"
+    t.string "dynamic_property_string_7"
+    t.string "dynamic_property_string_8"
+    t.string "dynamic_property_string_9"
+    t.string "dynamic_property_string_10"
+    t.string "dynamic_property_string_11"
+    t.string "dynamic_property_string_12"
+    t.string "dynamic_property_string_13"
+    t.string "dynamic_property_string_14"
+    t.string "dynamic_property_string_15"
+    t.string "dynamic_property_string_16"
+    t.string "dynamic_property_string_17"
+    t.string "dynamic_property_string_18"
+    t.string "dynamic_property_string_19"
+    t.string "dynamic_property_string_20"
+    t.integer "dynamic_property_integer_1"
+    t.integer "dynamic_property_integer_2"
+    t.integer "dynamic_property_integer_3"
+    t.integer "dynamic_property_integer_4"
+    t.integer "dynamic_property_integer_5"
+    t.integer "dynamic_property_integer_6"
+    t.integer "dynamic_property_integer_7"
+    t.integer "dynamic_property_integer_8"
+    t.integer "dynamic_property_integer_9"
+    t.integer "dynamic_property_integer_10"
+    t.integer "dynamic_property_integer_11"
+    t.integer "dynamic_property_integer_12"
+    t.integer "dynamic_property_integer_13"
+    t.integer "dynamic_property_integer_14"
+    t.integer "dynamic_property_integer_15"
+    t.integer "dynamic_property_integer_16"
+    t.integer "dynamic_property_integer_17"
+    t.integer "dynamic_property_integer_18"
+    t.integer "dynamic_property_integer_19"
+    t.integer "dynamic_property_integer_20"
+    t.decimal "dynamic_property_decimal_1", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_2", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_3", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_4", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_5", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_6", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_7", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_8", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_9", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_10", precision: 15, scale: 4
+    t.boolean "dynamic_property_boolean_1"
+    t.boolean "dynamic_property_boolean_2"
+    t.boolean "dynamic_property_boolean_3"
+    t.boolean "dynamic_property_boolean_4"
+    t.boolean "dynamic_property_boolean_5"
+    t.boolean "dynamic_property_boolean_6"
+    t.boolean "dynamic_property_boolean_7"
+    t.boolean "dynamic_property_boolean_8"
+    t.boolean "dynamic_property_boolean_9"
+    t.boolean "dynamic_property_boolean_10"
+    t.boolean "dynamic_property_datetime_1"
+    t.boolean "dynamic_property_datetime_2"
+    t.boolean "dynamic_property_datetime_3"
+    t.boolean "dynamic_property_datetime_4"
+    t.boolean "dynamic_property_datetime_5"
+    t.boolean "dynamic_property_datetime_6"
+    t.boolean "dynamic_property_datetime_7"
+    t.boolean "dynamic_property_datetime_8"
+    t.boolean "dynamic_property_datetime_9"
+    t.boolean "dynamic_property_datetime_10"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["business_type"], name: "index_brands_on_business_type"
     t.index ["category_id"], name: "index_brands_on_category_id"
     t.index ["company_id"], name: "index_brands_on_company_id"
     t.index ["discarded_at"], name: "index_brands_on_discarded_at"
+    t.index ["lifecycle_status"], name: "index_brands_on_lifecycle_status"
+    t.index ["workflow_status"], name: "index_brands_on_workflow_status"
   end
 
   create_table "cart_appointments", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -530,9 +701,12 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.index ["appoint_from_type", "appoint_from_id"], name: "index_cart_appointments_on_appoint_from"
     t.index ["appoint_to_type", "appoint_to_id"], name: "index_cart_appointments_on_appoint_to"
     t.index ["appoint_to_type", "appoint_to_id"], name: "index_cart_appointments_on_appoint_to_type_and_appoint_to_id"
+    t.index ["business_type"], name: "index_cart_appointments_on_business_type"
     t.index ["cart_id"], name: "index_cart_appointments_on_cart_id"
     t.index ["company_id"], name: "index_cart_appointments_on_company_id"
     t.index ["discarded_at"], name: "index_cart_appointments_on_discarded_at"
+    t.index ["lifecycle_status"], name: "index_cart_appointments_on_lifecycle_status"
+    t.index ["workflow_status"], name: "index_cart_appointments_on_workflow_status"
   end
 
   create_table "cart_groups", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -549,12 +723,85 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.jsonb "metadata", default: {}
     t.datetime "discarded_at"
     t.string "permission_resource_name"
+    t.string "dynamic_property_string_1"
+    t.string "dynamic_property_string_2"
+    t.string "dynamic_property_string_3"
+    t.string "dynamic_property_string_4"
+    t.string "dynamic_property_string_5"
+    t.string "dynamic_property_string_6"
+    t.string "dynamic_property_string_7"
+    t.string "dynamic_property_string_8"
+    t.string "dynamic_property_string_9"
+    t.string "dynamic_property_string_10"
+    t.string "dynamic_property_string_11"
+    t.string "dynamic_property_string_12"
+    t.string "dynamic_property_string_13"
+    t.string "dynamic_property_string_14"
+    t.string "dynamic_property_string_15"
+    t.string "dynamic_property_string_16"
+    t.string "dynamic_property_string_17"
+    t.string "dynamic_property_string_18"
+    t.string "dynamic_property_string_19"
+    t.string "dynamic_property_string_20"
+    t.integer "dynamic_property_integer_1"
+    t.integer "dynamic_property_integer_2"
+    t.integer "dynamic_property_integer_3"
+    t.integer "dynamic_property_integer_4"
+    t.integer "dynamic_property_integer_5"
+    t.integer "dynamic_property_integer_6"
+    t.integer "dynamic_property_integer_7"
+    t.integer "dynamic_property_integer_8"
+    t.integer "dynamic_property_integer_9"
+    t.integer "dynamic_property_integer_10"
+    t.integer "dynamic_property_integer_11"
+    t.integer "dynamic_property_integer_12"
+    t.integer "dynamic_property_integer_13"
+    t.integer "dynamic_property_integer_14"
+    t.integer "dynamic_property_integer_15"
+    t.integer "dynamic_property_integer_16"
+    t.integer "dynamic_property_integer_17"
+    t.integer "dynamic_property_integer_18"
+    t.integer "dynamic_property_integer_19"
+    t.integer "dynamic_property_integer_20"
+    t.decimal "dynamic_property_decimal_1", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_2", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_3", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_4", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_5", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_6", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_7", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_8", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_9", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_10", precision: 15, scale: 4
+    t.boolean "dynamic_property_boolean_1"
+    t.boolean "dynamic_property_boolean_2"
+    t.boolean "dynamic_property_boolean_3"
+    t.boolean "dynamic_property_boolean_4"
+    t.boolean "dynamic_property_boolean_5"
+    t.boolean "dynamic_property_boolean_6"
+    t.boolean "dynamic_property_boolean_7"
+    t.boolean "dynamic_property_boolean_8"
+    t.boolean "dynamic_property_boolean_9"
+    t.boolean "dynamic_property_boolean_10"
+    t.boolean "dynamic_property_datetime_1"
+    t.boolean "dynamic_property_datetime_2"
+    t.boolean "dynamic_property_datetime_3"
+    t.boolean "dynamic_property_datetime_4"
+    t.boolean "dynamic_property_datetime_5"
+    t.boolean "dynamic_property_datetime_6"
+    t.boolean "dynamic_property_datetime_7"
+    t.boolean "dynamic_property_datetime_8"
+    t.boolean "dynamic_property_datetime_9"
+    t.boolean "dynamic_property_datetime_10"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["branch_id"], name: "index_cart_groups_on_branch_id"
+    t.index ["business_type"], name: "index_cart_groups_on_business_type"
     t.index ["category_id"], name: "index_cart_groups_on_category_id"
     t.index ["company_id"], name: "index_cart_groups_on_company_id"
     t.index ["discarded_at"], name: "index_cart_groups_on_discarded_at"
+    t.index ["lifecycle_status"], name: "index_cart_groups_on_lifecycle_status"
+    t.index ["workflow_status"], name: "index_cart_groups_on_workflow_status"
   end
 
   create_table "carts", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -579,18 +826,91 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.jsonb "metadata", default: {}
     t.datetime "discarded_at"
     t.string "permission_resource_name"
+    t.string "dynamic_property_string_1"
+    t.string "dynamic_property_string_2"
+    t.string "dynamic_property_string_3"
+    t.string "dynamic_property_string_4"
+    t.string "dynamic_property_string_5"
+    t.string "dynamic_property_string_6"
+    t.string "dynamic_property_string_7"
+    t.string "dynamic_property_string_8"
+    t.string "dynamic_property_string_9"
+    t.string "dynamic_property_string_10"
+    t.string "dynamic_property_string_11"
+    t.string "dynamic_property_string_12"
+    t.string "dynamic_property_string_13"
+    t.string "dynamic_property_string_14"
+    t.string "dynamic_property_string_15"
+    t.string "dynamic_property_string_16"
+    t.string "dynamic_property_string_17"
+    t.string "dynamic_property_string_18"
+    t.string "dynamic_property_string_19"
+    t.string "dynamic_property_string_20"
+    t.integer "dynamic_property_integer_1"
+    t.integer "dynamic_property_integer_2"
+    t.integer "dynamic_property_integer_3"
+    t.integer "dynamic_property_integer_4"
+    t.integer "dynamic_property_integer_5"
+    t.integer "dynamic_property_integer_6"
+    t.integer "dynamic_property_integer_7"
+    t.integer "dynamic_property_integer_8"
+    t.integer "dynamic_property_integer_9"
+    t.integer "dynamic_property_integer_10"
+    t.integer "dynamic_property_integer_11"
+    t.integer "dynamic_property_integer_12"
+    t.integer "dynamic_property_integer_13"
+    t.integer "dynamic_property_integer_14"
+    t.integer "dynamic_property_integer_15"
+    t.integer "dynamic_property_integer_16"
+    t.integer "dynamic_property_integer_17"
+    t.integer "dynamic_property_integer_18"
+    t.integer "dynamic_property_integer_19"
+    t.integer "dynamic_property_integer_20"
+    t.decimal "dynamic_property_decimal_1", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_2", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_3", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_4", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_5", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_6", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_7", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_8", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_9", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_10", precision: 15, scale: 4
+    t.boolean "dynamic_property_boolean_1"
+    t.boolean "dynamic_property_boolean_2"
+    t.boolean "dynamic_property_boolean_3"
+    t.boolean "dynamic_property_boolean_4"
+    t.boolean "dynamic_property_boolean_5"
+    t.boolean "dynamic_property_boolean_6"
+    t.boolean "dynamic_property_boolean_7"
+    t.boolean "dynamic_property_boolean_8"
+    t.boolean "dynamic_property_boolean_9"
+    t.boolean "dynamic_property_boolean_10"
+    t.boolean "dynamic_property_datetime_1"
+    t.boolean "dynamic_property_datetime_2"
+    t.boolean "dynamic_property_datetime_3"
+    t.boolean "dynamic_property_datetime_4"
+    t.boolean "dynamic_property_datetime_5"
+    t.boolean "dynamic_property_datetime_6"
+    t.boolean "dynamic_property_datetime_7"
+    t.boolean "dynamic_property_datetime_8"
+    t.boolean "dynamic_property_datetime_9"
+    t.boolean "dynamic_property_datetime_10"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["barcode"], name: "index_carts_on_barcode"
     t.index ["branch_id"], name: "index_carts_on_branch_id"
+    t.index ["business_type"], name: "index_carts_on_business_type"
     t.index ["cart_group_id"], name: "index_carts_on_cart_group_id"
     t.index ["category_id"], name: "index_carts_on_category_id"
     t.index ["company_id"], name: "index_carts_on_company_id"
     t.index ["discarded_at"], name: "index_carts_on_discarded_at"
     t.index ["ean"], name: "index_carts_on_ean"
+    t.index ["lifecycle_status"], name: "index_carts_on_lifecycle_status"
     t.index ["serial_number"], name: "index_carts_on_serial_number"
     t.index ["sku"], name: "index_carts_on_sku"
     t.index ["upc"], name: "index_carts_on_upc"
+    t.index ["workflow_status"], name: "index_carts_on_workflow_status"
   end
 
   create_table "categories", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -606,9 +926,12 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["business_type"], name: "index_categories_on_business_type"
     t.index ["company_id", "name"], name: "index_categories_on_company_id_and_name"
     t.index ["company_id"], name: "index_categories_on_company_id"
     t.index ["discarded_at"], name: "index_categories_on_discarded_at"
+    t.index ["lifecycle_status"], name: "index_categories_on_lifecycle_status"
+    t.index ["workflow_status"], name: "index_categories_on_workflow_status"
   end
 
   create_table "companies", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -641,8 +964,11 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["business_type"], name: "index_companies_on_business_type"
     t.index ["discarded_at"], name: "index_companies_on_discarded_at"
+    t.index ["lifecycle_status"], name: "index_companies_on_lifecycle_status"
     t.index ["user_id"], name: "index_companies_on_user_id"
+    t.index ["workflow_status"], name: "index_companies_on_workflow_status"
   end
 
   create_table "customer_appointments", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -673,9 +999,12 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.index ["appoint_from_type", "appoint_from_id"], name: "index_customer_appointments_on_appoint_from"
     t.index ["appoint_to_type", "appoint_to_id"], name: "idx_on_appoint_to_type_appoint_to_id_1b496b2c03"
     t.index ["appoint_to_type", "appoint_to_id"], name: "index_customer_appointments_on_appoint_to"
+    t.index ["business_type"], name: "index_customer_appointments_on_business_type"
     t.index ["company_id"], name: "index_customer_appointments_on_company_id"
     t.index ["customer_id"], name: "index_customer_appointments_on_customer_id"
     t.index ["discarded_at"], name: "index_customer_appointments_on_discarded_at"
+    t.index ["lifecycle_status"], name: "index_customer_appointments_on_lifecycle_status"
+    t.index ["workflow_status"], name: "index_customer_appointments_on_workflow_status"
   end
 
   create_table "customer_group_appointments", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -706,9 +1035,12 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.index ["appoint_from_type", "appoint_from_id"], name: "index_customer_group_appointments_on_appoint_from"
     t.index ["appoint_to_type", "appoint_to_id"], name: "idx_on_appoint_to_type_appoint_to_id_a6c19edb35"
     t.index ["appoint_to_type", "appoint_to_id"], name: "index_customer_group_appointments_on_appoint_to"
+    t.index ["business_type"], name: "index_customer_group_appointments_on_business_type"
     t.index ["company_id"], name: "index_customer_group_appointments_on_company_id"
     t.index ["customer_group_id"], name: "index_customer_group_appointments_on_customer_group_id"
     t.index ["discarded_at"], name: "index_customer_group_appointments_on_discarded_at"
+    t.index ["lifecycle_status"], name: "index_customer_group_appointments_on_lifecycle_status"
+    t.index ["workflow_status"], name: "index_customer_group_appointments_on_workflow_status"
   end
 
   create_table "customer_groups", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -726,12 +1058,85 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.jsonb "metadata", default: {}
     t.datetime "discarded_at"
     t.string "permission_resource_name"
+    t.string "dynamic_property_string_1"
+    t.string "dynamic_property_string_2"
+    t.string "dynamic_property_string_3"
+    t.string "dynamic_property_string_4"
+    t.string "dynamic_property_string_5"
+    t.string "dynamic_property_string_6"
+    t.string "dynamic_property_string_7"
+    t.string "dynamic_property_string_8"
+    t.string "dynamic_property_string_9"
+    t.string "dynamic_property_string_10"
+    t.string "dynamic_property_string_11"
+    t.string "dynamic_property_string_12"
+    t.string "dynamic_property_string_13"
+    t.string "dynamic_property_string_14"
+    t.string "dynamic_property_string_15"
+    t.string "dynamic_property_string_16"
+    t.string "dynamic_property_string_17"
+    t.string "dynamic_property_string_18"
+    t.string "dynamic_property_string_19"
+    t.string "dynamic_property_string_20"
+    t.integer "dynamic_property_integer_1"
+    t.integer "dynamic_property_integer_2"
+    t.integer "dynamic_property_integer_3"
+    t.integer "dynamic_property_integer_4"
+    t.integer "dynamic_property_integer_5"
+    t.integer "dynamic_property_integer_6"
+    t.integer "dynamic_property_integer_7"
+    t.integer "dynamic_property_integer_8"
+    t.integer "dynamic_property_integer_9"
+    t.integer "dynamic_property_integer_10"
+    t.integer "dynamic_property_integer_11"
+    t.integer "dynamic_property_integer_12"
+    t.integer "dynamic_property_integer_13"
+    t.integer "dynamic_property_integer_14"
+    t.integer "dynamic_property_integer_15"
+    t.integer "dynamic_property_integer_16"
+    t.integer "dynamic_property_integer_17"
+    t.integer "dynamic_property_integer_18"
+    t.integer "dynamic_property_integer_19"
+    t.integer "dynamic_property_integer_20"
+    t.decimal "dynamic_property_decimal_1", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_2", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_3", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_4", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_5", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_6", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_7", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_8", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_9", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_10", precision: 15, scale: 4
+    t.boolean "dynamic_property_boolean_1"
+    t.boolean "dynamic_property_boolean_2"
+    t.boolean "dynamic_property_boolean_3"
+    t.boolean "dynamic_property_boolean_4"
+    t.boolean "dynamic_property_boolean_5"
+    t.boolean "dynamic_property_boolean_6"
+    t.boolean "dynamic_property_boolean_7"
+    t.boolean "dynamic_property_boolean_8"
+    t.boolean "dynamic_property_boolean_9"
+    t.boolean "dynamic_property_boolean_10"
+    t.boolean "dynamic_property_datetime_1"
+    t.boolean "dynamic_property_datetime_2"
+    t.boolean "dynamic_property_datetime_3"
+    t.boolean "dynamic_property_datetime_4"
+    t.boolean "dynamic_property_datetime_5"
+    t.boolean "dynamic_property_datetime_6"
+    t.boolean "dynamic_property_datetime_7"
+    t.boolean "dynamic_property_datetime_8"
+    t.boolean "dynamic_property_datetime_9"
+    t.boolean "dynamic_property_datetime_10"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["branch_id"], name: "index_customer_groups_on_branch_id"
+    t.index ["business_type"], name: "index_customer_groups_on_business_type"
     t.index ["category_id"], name: "index_customer_groups_on_category_id"
     t.index ["company_id"], name: "index_customer_groups_on_company_id"
     t.index ["discarded_at"], name: "index_customer_groups_on_discarded_at"
+    t.index ["lifecycle_status"], name: "index_customer_groups_on_lifecycle_status"
+    t.index ["workflow_status"], name: "index_customer_groups_on_workflow_status"
   end
 
   create_table "customers", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -750,13 +1155,86 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.jsonb "metadata", default: {}
     t.datetime "discarded_at"
     t.string "permission_resource_name"
+    t.string "dynamic_property_string_1"
+    t.string "dynamic_property_string_2"
+    t.string "dynamic_property_string_3"
+    t.string "dynamic_property_string_4"
+    t.string "dynamic_property_string_5"
+    t.string "dynamic_property_string_6"
+    t.string "dynamic_property_string_7"
+    t.string "dynamic_property_string_8"
+    t.string "dynamic_property_string_9"
+    t.string "dynamic_property_string_10"
+    t.string "dynamic_property_string_11"
+    t.string "dynamic_property_string_12"
+    t.string "dynamic_property_string_13"
+    t.string "dynamic_property_string_14"
+    t.string "dynamic_property_string_15"
+    t.string "dynamic_property_string_16"
+    t.string "dynamic_property_string_17"
+    t.string "dynamic_property_string_18"
+    t.string "dynamic_property_string_19"
+    t.string "dynamic_property_string_20"
+    t.integer "dynamic_property_integer_1"
+    t.integer "dynamic_property_integer_2"
+    t.integer "dynamic_property_integer_3"
+    t.integer "dynamic_property_integer_4"
+    t.integer "dynamic_property_integer_5"
+    t.integer "dynamic_property_integer_6"
+    t.integer "dynamic_property_integer_7"
+    t.integer "dynamic_property_integer_8"
+    t.integer "dynamic_property_integer_9"
+    t.integer "dynamic_property_integer_10"
+    t.integer "dynamic_property_integer_11"
+    t.integer "dynamic_property_integer_12"
+    t.integer "dynamic_property_integer_13"
+    t.integer "dynamic_property_integer_14"
+    t.integer "dynamic_property_integer_15"
+    t.integer "dynamic_property_integer_16"
+    t.integer "dynamic_property_integer_17"
+    t.integer "dynamic_property_integer_18"
+    t.integer "dynamic_property_integer_19"
+    t.integer "dynamic_property_integer_20"
+    t.decimal "dynamic_property_decimal_1", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_2", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_3", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_4", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_5", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_6", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_7", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_8", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_9", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_10", precision: 15, scale: 4
+    t.boolean "dynamic_property_boolean_1"
+    t.boolean "dynamic_property_boolean_2"
+    t.boolean "dynamic_property_boolean_3"
+    t.boolean "dynamic_property_boolean_4"
+    t.boolean "dynamic_property_boolean_5"
+    t.boolean "dynamic_property_boolean_6"
+    t.boolean "dynamic_property_boolean_7"
+    t.boolean "dynamic_property_boolean_8"
+    t.boolean "dynamic_property_boolean_9"
+    t.boolean "dynamic_property_boolean_10"
+    t.boolean "dynamic_property_datetime_1"
+    t.boolean "dynamic_property_datetime_2"
+    t.boolean "dynamic_property_datetime_3"
+    t.boolean "dynamic_property_datetime_4"
+    t.boolean "dynamic_property_datetime_5"
+    t.boolean "dynamic_property_datetime_6"
+    t.boolean "dynamic_property_datetime_7"
+    t.boolean "dynamic_property_datetime_8"
+    t.boolean "dynamic_property_datetime_9"
+    t.boolean "dynamic_property_datetime_10"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["branch_id"], name: "index_customers_on_branch_id"
+    t.index ["business_type"], name: "index_customers_on_business_type"
     t.index ["category_id"], name: "index_customers_on_category_id"
     t.index ["company_id"], name: "index_customers_on_company_id"
     t.index ["discarded_at"], name: "index_customers_on_discarded_at"
+    t.index ["lifecycle_status"], name: "index_customers_on_lifecycle_status"
     t.index ["user_id"], name: "index_customers_on_user_id"
+    t.index ["workflow_status"], name: "index_customers_on_workflow_status"
   end
 
   create_table "department_appointments", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -787,9 +1265,12 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.index ["appoint_from_type", "appoint_from_id"], name: "index_department_appointments_on_appoint_from"
     t.index ["appoint_to_type", "appoint_to_id"], name: "idx_on_appoint_to_type_appoint_to_id_8ea813e354"
     t.index ["appoint_to_type", "appoint_to_id"], name: "index_department_appointments_on_appoint_to"
+    t.index ["business_type"], name: "index_department_appointments_on_business_type"
     t.index ["company_id"], name: "index_department_appointments_on_company_id"
     t.index ["department_id"], name: "index_department_appointments_on_department_id"
     t.index ["discarded_at"], name: "index_department_appointments_on_discarded_at"
+    t.index ["lifecycle_status"], name: "index_department_appointments_on_lifecycle_status"
+    t.index ["workflow_status"], name: "index_department_appointments_on_workflow_status"
   end
 
   create_table "departments", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -806,12 +1287,85 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.jsonb "metadata", default: {}
     t.datetime "discarded_at"
     t.string "permission_resource_name"
+    t.string "dynamic_property_string_1"
+    t.string "dynamic_property_string_2"
+    t.string "dynamic_property_string_3"
+    t.string "dynamic_property_string_4"
+    t.string "dynamic_property_string_5"
+    t.string "dynamic_property_string_6"
+    t.string "dynamic_property_string_7"
+    t.string "dynamic_property_string_8"
+    t.string "dynamic_property_string_9"
+    t.string "dynamic_property_string_10"
+    t.string "dynamic_property_string_11"
+    t.string "dynamic_property_string_12"
+    t.string "dynamic_property_string_13"
+    t.string "dynamic_property_string_14"
+    t.string "dynamic_property_string_15"
+    t.string "dynamic_property_string_16"
+    t.string "dynamic_property_string_17"
+    t.string "dynamic_property_string_18"
+    t.string "dynamic_property_string_19"
+    t.string "dynamic_property_string_20"
+    t.integer "dynamic_property_integer_1"
+    t.integer "dynamic_property_integer_2"
+    t.integer "dynamic_property_integer_3"
+    t.integer "dynamic_property_integer_4"
+    t.integer "dynamic_property_integer_5"
+    t.integer "dynamic_property_integer_6"
+    t.integer "dynamic_property_integer_7"
+    t.integer "dynamic_property_integer_8"
+    t.integer "dynamic_property_integer_9"
+    t.integer "dynamic_property_integer_10"
+    t.integer "dynamic_property_integer_11"
+    t.integer "dynamic_property_integer_12"
+    t.integer "dynamic_property_integer_13"
+    t.integer "dynamic_property_integer_14"
+    t.integer "dynamic_property_integer_15"
+    t.integer "dynamic_property_integer_16"
+    t.integer "dynamic_property_integer_17"
+    t.integer "dynamic_property_integer_18"
+    t.integer "dynamic_property_integer_19"
+    t.integer "dynamic_property_integer_20"
+    t.decimal "dynamic_property_decimal_1", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_2", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_3", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_4", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_5", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_6", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_7", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_8", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_9", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_10", precision: 15, scale: 4
+    t.boolean "dynamic_property_boolean_1"
+    t.boolean "dynamic_property_boolean_2"
+    t.boolean "dynamic_property_boolean_3"
+    t.boolean "dynamic_property_boolean_4"
+    t.boolean "dynamic_property_boolean_5"
+    t.boolean "dynamic_property_boolean_6"
+    t.boolean "dynamic_property_boolean_7"
+    t.boolean "dynamic_property_boolean_8"
+    t.boolean "dynamic_property_boolean_9"
+    t.boolean "dynamic_property_boolean_10"
+    t.boolean "dynamic_property_datetime_1"
+    t.boolean "dynamic_property_datetime_2"
+    t.boolean "dynamic_property_datetime_3"
+    t.boolean "dynamic_property_datetime_4"
+    t.boolean "dynamic_property_datetime_5"
+    t.boolean "dynamic_property_datetime_6"
+    t.boolean "dynamic_property_datetime_7"
+    t.boolean "dynamic_property_datetime_8"
+    t.boolean "dynamic_property_datetime_9"
+    t.boolean "dynamic_property_datetime_10"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["business_type"], name: "index_departments_on_business_type"
     t.index ["category_id"], name: "index_departments_on_category_id"
     t.index ["company_id"], name: "index_departments_on_company_id"
     t.index ["discarded_at"], name: "index_departments_on_discarded_at"
     t.index ["email"], name: "index_departments_on_email", unique: true
+    t.index ["lifecycle_status"], name: "index_departments_on_lifecycle_status"
+    t.index ["workflow_status"], name: "index_departments_on_workflow_status"
   end
 
   create_table "document_appointments", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -842,9 +1396,12 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.index ["appoint_from_type", "appoint_from_id"], name: "index_document_appointments_on_appoint_from"
     t.index ["appoint_to_type", "appoint_to_id"], name: "idx_on_appoint_to_type_appoint_to_id_fcaa395aab"
     t.index ["appoint_to_type", "appoint_to_id"], name: "index_document_appointments_on_appoint_to"
+    t.index ["business_type"], name: "index_document_appointments_on_business_type"
     t.index ["company_id"], name: "index_document_appointments_on_company_id"
     t.index ["discarded_at"], name: "index_document_appointments_on_discarded_at"
     t.index ["document_id"], name: "index_document_appointments_on_document_id"
+    t.index ["lifecycle_status"], name: "index_document_appointments_on_lifecycle_status"
+    t.index ["workflow_status"], name: "index_document_appointments_on_workflow_status"
   end
 
   create_table "document_group_appointments", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -875,9 +1432,12 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.index ["appoint_from_type", "appoint_from_id"], name: "index_document_group_appointments_on_appoint_from"
     t.index ["appoint_to_type", "appoint_to_id"], name: "idx_on_appoint_to_type_appoint_to_id_a5029e226f"
     t.index ["appoint_to_type", "appoint_to_id"], name: "index_document_group_appointments_on_appoint_to"
+    t.index ["business_type"], name: "index_document_group_appointments_on_business_type"
     t.index ["company_id"], name: "index_document_group_appointments_on_company_id"
     t.index ["discarded_at"], name: "index_document_group_appointments_on_discarded_at"
     t.index ["document_group_id"], name: "index_document_group_appointments_on_document_group_id"
+    t.index ["lifecycle_status"], name: "index_document_group_appointments_on_lifecycle_status"
+    t.index ["workflow_status"], name: "index_document_group_appointments_on_workflow_status"
   end
 
   create_table "document_groups", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -899,9 +1459,12 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["branch_id"], name: "index_document_groups_on_branch_id"
+    t.index ["business_type"], name: "index_document_groups_on_business_type"
     t.index ["category_id"], name: "index_document_groups_on_category_id"
     t.index ["company_id"], name: "index_document_groups_on_company_id"
     t.index ["discarded_at"], name: "index_document_groups_on_discarded_at"
+    t.index ["lifecycle_status"], name: "index_document_groups_on_lifecycle_status"
+    t.index ["workflow_status"], name: "index_document_groups_on_workflow_status"
   end
 
   create_table "documents", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -924,10 +1487,13 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["branch_id"], name: "index_documents_on_branch_id"
+    t.index ["business_type"], name: "index_documents_on_business_type"
     t.index ["category_id"], name: "index_documents_on_category_id"
     t.index ["company_id"], name: "index_documents_on_company_id"
     t.index ["discarded_at"], name: "index_documents_on_discarded_at"
     t.index ["document_group_id"], name: "index_documents_on_document_group_id"
+    t.index ["lifecycle_status"], name: "index_documents_on_lifecycle_status"
+    t.index ["workflow_status"], name: "index_documents_on_workflow_status"
   end
 
   create_table "employee_appointments", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -958,9 +1524,12 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.index ["appoint_from_type", "appoint_from_id"], name: "index_employee_appointments_on_appoint_from"
     t.index ["appoint_to_type", "appoint_to_id"], name: "idx_on_appoint_to_type_appoint_to_id_a39c78be55"
     t.index ["appoint_to_type", "appoint_to_id"], name: "index_employee_appointments_on_appoint_to"
+    t.index ["business_type"], name: "index_employee_appointments_on_business_type"
     t.index ["company_id"], name: "index_employee_appointments_on_company_id"
     t.index ["discarded_at"], name: "index_employee_appointments_on_discarded_at"
     t.index ["employee_id"], name: "index_employee_appointments_on_employee_id"
+    t.index ["lifecycle_status"], name: "index_employee_appointments_on_lifecycle_status"
+    t.index ["workflow_status"], name: "index_employee_appointments_on_workflow_status"
   end
 
   create_table "employee_group_appointments", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -991,9 +1560,12 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.index ["appoint_from_type", "appoint_from_id"], name: "index_employee_group_appointments_on_appoint_from"
     t.index ["appoint_to_type", "appoint_to_id"], name: "idx_on_appoint_to_type_appoint_to_id_57b6eaae20"
     t.index ["appoint_to_type", "appoint_to_id"], name: "index_employee_group_appointments_on_appoint_to"
+    t.index ["business_type"], name: "index_employee_group_appointments_on_business_type"
     t.index ["company_id"], name: "index_employee_group_appointments_on_company_id"
     t.index ["discarded_at"], name: "index_employee_group_appointments_on_discarded_at"
     t.index ["employee_group_id"], name: "index_employee_group_appointments_on_employee_group_id"
+    t.index ["lifecycle_status"], name: "index_employee_group_appointments_on_lifecycle_status"
+    t.index ["workflow_status"], name: "index_employee_group_appointments_on_workflow_status"
   end
 
   create_table "employee_groups", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -1011,13 +1583,86 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.jsonb "metadata", default: {}
     t.datetime "discarded_at"
     t.string "permission_resource_name"
+    t.string "dynamic_property_string_1"
+    t.string "dynamic_property_string_2"
+    t.string "dynamic_property_string_3"
+    t.string "dynamic_property_string_4"
+    t.string "dynamic_property_string_5"
+    t.string "dynamic_property_string_6"
+    t.string "dynamic_property_string_7"
+    t.string "dynamic_property_string_8"
+    t.string "dynamic_property_string_9"
+    t.string "dynamic_property_string_10"
+    t.string "dynamic_property_string_11"
+    t.string "dynamic_property_string_12"
+    t.string "dynamic_property_string_13"
+    t.string "dynamic_property_string_14"
+    t.string "dynamic_property_string_15"
+    t.string "dynamic_property_string_16"
+    t.string "dynamic_property_string_17"
+    t.string "dynamic_property_string_18"
+    t.string "dynamic_property_string_19"
+    t.string "dynamic_property_string_20"
+    t.integer "dynamic_property_integer_1"
+    t.integer "dynamic_property_integer_2"
+    t.integer "dynamic_property_integer_3"
+    t.integer "dynamic_property_integer_4"
+    t.integer "dynamic_property_integer_5"
+    t.integer "dynamic_property_integer_6"
+    t.integer "dynamic_property_integer_7"
+    t.integer "dynamic_property_integer_8"
+    t.integer "dynamic_property_integer_9"
+    t.integer "dynamic_property_integer_10"
+    t.integer "dynamic_property_integer_11"
+    t.integer "dynamic_property_integer_12"
+    t.integer "dynamic_property_integer_13"
+    t.integer "dynamic_property_integer_14"
+    t.integer "dynamic_property_integer_15"
+    t.integer "dynamic_property_integer_16"
+    t.integer "dynamic_property_integer_17"
+    t.integer "dynamic_property_integer_18"
+    t.integer "dynamic_property_integer_19"
+    t.integer "dynamic_property_integer_20"
+    t.decimal "dynamic_property_decimal_1", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_2", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_3", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_4", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_5", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_6", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_7", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_8", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_9", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_10", precision: 15, scale: 4
+    t.boolean "dynamic_property_boolean_1"
+    t.boolean "dynamic_property_boolean_2"
+    t.boolean "dynamic_property_boolean_3"
+    t.boolean "dynamic_property_boolean_4"
+    t.boolean "dynamic_property_boolean_5"
+    t.boolean "dynamic_property_boolean_6"
+    t.boolean "dynamic_property_boolean_7"
+    t.boolean "dynamic_property_boolean_8"
+    t.boolean "dynamic_property_boolean_9"
+    t.boolean "dynamic_property_boolean_10"
+    t.boolean "dynamic_property_datetime_1"
+    t.boolean "dynamic_property_datetime_2"
+    t.boolean "dynamic_property_datetime_3"
+    t.boolean "dynamic_property_datetime_4"
+    t.boolean "dynamic_property_datetime_5"
+    t.boolean "dynamic_property_datetime_6"
+    t.boolean "dynamic_property_datetime_7"
+    t.boolean "dynamic_property_datetime_8"
+    t.boolean "dynamic_property_datetime_9"
+    t.boolean "dynamic_property_datetime_10"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["branch_id"], name: "index_employee_groups_on_branch_id"
+    t.index ["business_type"], name: "index_employee_groups_on_business_type"
     t.index ["category_id"], name: "index_employee_groups_on_category_id"
     t.index ["company_id", "updated_at"], name: "index_employee_groups_on_company_id_and_updated_at"
     t.index ["company_id"], name: "index_employee_groups_on_company_id"
     t.index ["discarded_at"], name: "index_employee_groups_on_discarded_at"
+    t.index ["lifecycle_status"], name: "index_employee_groups_on_lifecycle_status"
+    t.index ["workflow_status"], name: "index_employee_groups_on_workflow_status"
   end
 
   create_table "employees", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -1036,13 +1681,86 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.jsonb "metadata", default: {}
     t.datetime "discarded_at"
     t.string "permission_resource_name"
+    t.string "dynamic_property_string_1"
+    t.string "dynamic_property_string_2"
+    t.string "dynamic_property_string_3"
+    t.string "dynamic_property_string_4"
+    t.string "dynamic_property_string_5"
+    t.string "dynamic_property_string_6"
+    t.string "dynamic_property_string_7"
+    t.string "dynamic_property_string_8"
+    t.string "dynamic_property_string_9"
+    t.string "dynamic_property_string_10"
+    t.string "dynamic_property_string_11"
+    t.string "dynamic_property_string_12"
+    t.string "dynamic_property_string_13"
+    t.string "dynamic_property_string_14"
+    t.string "dynamic_property_string_15"
+    t.string "dynamic_property_string_16"
+    t.string "dynamic_property_string_17"
+    t.string "dynamic_property_string_18"
+    t.string "dynamic_property_string_19"
+    t.string "dynamic_property_string_20"
+    t.integer "dynamic_property_integer_1"
+    t.integer "dynamic_property_integer_2"
+    t.integer "dynamic_property_integer_3"
+    t.integer "dynamic_property_integer_4"
+    t.integer "dynamic_property_integer_5"
+    t.integer "dynamic_property_integer_6"
+    t.integer "dynamic_property_integer_7"
+    t.integer "dynamic_property_integer_8"
+    t.integer "dynamic_property_integer_9"
+    t.integer "dynamic_property_integer_10"
+    t.integer "dynamic_property_integer_11"
+    t.integer "dynamic_property_integer_12"
+    t.integer "dynamic_property_integer_13"
+    t.integer "dynamic_property_integer_14"
+    t.integer "dynamic_property_integer_15"
+    t.integer "dynamic_property_integer_16"
+    t.integer "dynamic_property_integer_17"
+    t.integer "dynamic_property_integer_18"
+    t.integer "dynamic_property_integer_19"
+    t.integer "dynamic_property_integer_20"
+    t.decimal "dynamic_property_decimal_1", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_2", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_3", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_4", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_5", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_6", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_7", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_8", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_9", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_10", precision: 15, scale: 4
+    t.boolean "dynamic_property_boolean_1"
+    t.boolean "dynamic_property_boolean_2"
+    t.boolean "dynamic_property_boolean_3"
+    t.boolean "dynamic_property_boolean_4"
+    t.boolean "dynamic_property_boolean_5"
+    t.boolean "dynamic_property_boolean_6"
+    t.boolean "dynamic_property_boolean_7"
+    t.boolean "dynamic_property_boolean_8"
+    t.boolean "dynamic_property_boolean_9"
+    t.boolean "dynamic_property_boolean_10"
+    t.boolean "dynamic_property_datetime_1"
+    t.boolean "dynamic_property_datetime_2"
+    t.boolean "dynamic_property_datetime_3"
+    t.boolean "dynamic_property_datetime_4"
+    t.boolean "dynamic_property_datetime_5"
+    t.boolean "dynamic_property_datetime_6"
+    t.boolean "dynamic_property_datetime_7"
+    t.boolean "dynamic_property_datetime_8"
+    t.boolean "dynamic_property_datetime_9"
+    t.boolean "dynamic_property_datetime_10"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["branch_id"], name: "index_employees_on_branch_id"
+    t.index ["business_type"], name: "index_employees_on_business_type"
     t.index ["category_id"], name: "index_employees_on_category_id"
     t.index ["company_id"], name: "index_employees_on_company_id"
     t.index ["discarded_at"], name: "index_employees_on_discarded_at"
+    t.index ["lifecycle_status"], name: "index_employees_on_lifecycle_status"
     t.index ["user_id"], name: "index_employees_on_user_id"
+    t.index ["workflow_status"], name: "index_employees_on_workflow_status"
   end
 
   create_table "event_appointments", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -1073,9 +1791,12 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.index ["appoint_from_type", "appoint_from_id"], name: "index_event_appointments_on_appoint_from"
     t.index ["appoint_to_type", "appoint_to_id"], name: "index_event_appointments_on_appoint_to"
     t.index ["appoint_to_type", "appoint_to_id"], name: "index_event_appointments_on_appoint_to_type_and_appoint_to_id"
+    t.index ["business_type"], name: "index_event_appointments_on_business_type"
     t.index ["company_id"], name: "index_event_appointments_on_company_id"
     t.index ["discarded_at"], name: "index_event_appointments_on_discarded_at"
     t.index ["event_id"], name: "index_event_appointments_on_event_id"
+    t.index ["lifecycle_status"], name: "index_event_appointments_on_lifecycle_status"
+    t.index ["workflow_status"], name: "index_event_appointments_on_workflow_status"
   end
 
   create_table "event_group_appointments", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -1106,9 +1827,12 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.index ["appoint_from_type", "appoint_from_id"], name: "index_event_group_appointments_on_appoint_from"
     t.index ["appoint_to_type", "appoint_to_id"], name: "idx_on_appoint_to_type_appoint_to_id_941fb608a2"
     t.index ["appoint_to_type", "appoint_to_id"], name: "index_event_group_appointments_on_appoint_to"
+    t.index ["business_type"], name: "index_event_group_appointments_on_business_type"
     t.index ["company_id"], name: "index_event_group_appointments_on_company_id"
     t.index ["discarded_at"], name: "index_event_group_appointments_on_discarded_at"
     t.index ["event_group_id"], name: "index_event_group_appointments_on_event_group_id"
+    t.index ["lifecycle_status"], name: "index_event_group_appointments_on_lifecycle_status"
+    t.index ["workflow_status"], name: "index_event_group_appointments_on_workflow_status"
   end
 
   create_table "event_groups", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -1128,9 +1852,12 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["branch_id"], name: "index_event_groups_on_branch_id"
+    t.index ["business_type"], name: "index_event_groups_on_business_type"
     t.index ["category_id"], name: "index_event_groups_on_category_id"
     t.index ["company_id"], name: "index_event_groups_on_company_id"
     t.index ["discarded_at"], name: "index_event_groups_on_discarded_at"
+    t.index ["lifecycle_status"], name: "index_event_groups_on_lifecycle_status"
+    t.index ["workflow_status"], name: "index_event_groups_on_workflow_status"
   end
 
   create_table "events", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -1151,10 +1878,13 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["branch_id"], name: "index_events_on_branch_id"
+    t.index ["business_type"], name: "index_events_on_business_type"
     t.index ["category_id"], name: "index_events_on_category_id"
     t.index ["company_id"], name: "index_events_on_company_id"
     t.index ["discarded_at"], name: "index_events_on_discarded_at"
     t.index ["event_group_id"], name: "index_events_on_event_group_id"
+    t.index ["lifecycle_status"], name: "index_events_on_lifecycle_status"
+    t.index ["workflow_status"], name: "index_events_on_workflow_status"
   end
 
   create_table "exam_appointments", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -1185,9 +1915,12 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.index ["appoint_from_type", "appoint_from_id"], name: "index_exam_appointments_on_appoint_from"
     t.index ["appoint_to_type", "appoint_to_id"], name: "index_exam_appointments_on_appoint_to"
     t.index ["appoint_to_type", "appoint_to_id"], name: "index_exam_appointments_on_appoint_to_type_and_appoint_to_id"
+    t.index ["business_type"], name: "index_exam_appointments_on_business_type"
     t.index ["company_id"], name: "index_exam_appointments_on_company_id"
     t.index ["discarded_at"], name: "index_exam_appointments_on_discarded_at"
     t.index ["exam_id"], name: "index_exam_appointments_on_exam_id"
+    t.index ["lifecycle_status"], name: "index_exam_appointments_on_lifecycle_status"
+    t.index ["workflow_status"], name: "index_exam_appointments_on_workflow_status"
   end
 
   create_table "exam_groups", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -1207,9 +1940,12 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["branch_id"], name: "index_exam_groups_on_branch_id"
+    t.index ["business_type"], name: "index_exam_groups_on_business_type"
     t.index ["category_id"], name: "index_exam_groups_on_category_id"
     t.index ["company_id"], name: "index_exam_groups_on_company_id"
     t.index ["discarded_at"], name: "index_exam_groups_on_discarded_at"
+    t.index ["lifecycle_status"], name: "index_exam_groups_on_lifecycle_status"
+    t.index ["workflow_status"], name: "index_exam_groups_on_workflow_status"
   end
 
   create_table "exams", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -1230,10 +1966,13 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["branch_id"], name: "index_exams_on_branch_id"
+    t.index ["business_type"], name: "index_exams_on_business_type"
     t.index ["category_id"], name: "index_exams_on_category_id"
     t.index ["company_id"], name: "index_exams_on_company_id"
     t.index ["discarded_at"], name: "index_exams_on_discarded_at"
     t.index ["exam_group_id"], name: "index_exams_on_exam_group_id"
+    t.index ["lifecycle_status"], name: "index_exams_on_lifecycle_status"
+    t.index ["workflow_status"], name: "index_exams_on_workflow_status"
   end
 
   create_table "facilities", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -1250,12 +1989,85 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.jsonb "metadata", default: {}
     t.datetime "discarded_at"
     t.string "permission_resource_name"
+    t.string "dynamic_property_string_1"
+    t.string "dynamic_property_string_2"
+    t.string "dynamic_property_string_3"
+    t.string "dynamic_property_string_4"
+    t.string "dynamic_property_string_5"
+    t.string "dynamic_property_string_6"
+    t.string "dynamic_property_string_7"
+    t.string "dynamic_property_string_8"
+    t.string "dynamic_property_string_9"
+    t.string "dynamic_property_string_10"
+    t.string "dynamic_property_string_11"
+    t.string "dynamic_property_string_12"
+    t.string "dynamic_property_string_13"
+    t.string "dynamic_property_string_14"
+    t.string "dynamic_property_string_15"
+    t.string "dynamic_property_string_16"
+    t.string "dynamic_property_string_17"
+    t.string "dynamic_property_string_18"
+    t.string "dynamic_property_string_19"
+    t.string "dynamic_property_string_20"
+    t.integer "dynamic_property_integer_1"
+    t.integer "dynamic_property_integer_2"
+    t.integer "dynamic_property_integer_3"
+    t.integer "dynamic_property_integer_4"
+    t.integer "dynamic_property_integer_5"
+    t.integer "dynamic_property_integer_6"
+    t.integer "dynamic_property_integer_7"
+    t.integer "dynamic_property_integer_8"
+    t.integer "dynamic_property_integer_9"
+    t.integer "dynamic_property_integer_10"
+    t.integer "dynamic_property_integer_11"
+    t.integer "dynamic_property_integer_12"
+    t.integer "dynamic_property_integer_13"
+    t.integer "dynamic_property_integer_14"
+    t.integer "dynamic_property_integer_15"
+    t.integer "dynamic_property_integer_16"
+    t.integer "dynamic_property_integer_17"
+    t.integer "dynamic_property_integer_18"
+    t.integer "dynamic_property_integer_19"
+    t.integer "dynamic_property_integer_20"
+    t.decimal "dynamic_property_decimal_1", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_2", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_3", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_4", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_5", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_6", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_7", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_8", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_9", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_10", precision: 15, scale: 4
+    t.boolean "dynamic_property_boolean_1"
+    t.boolean "dynamic_property_boolean_2"
+    t.boolean "dynamic_property_boolean_3"
+    t.boolean "dynamic_property_boolean_4"
+    t.boolean "dynamic_property_boolean_5"
+    t.boolean "dynamic_property_boolean_6"
+    t.boolean "dynamic_property_boolean_7"
+    t.boolean "dynamic_property_boolean_8"
+    t.boolean "dynamic_property_boolean_9"
+    t.boolean "dynamic_property_boolean_10"
+    t.boolean "dynamic_property_datetime_1"
+    t.boolean "dynamic_property_datetime_2"
+    t.boolean "dynamic_property_datetime_3"
+    t.boolean "dynamic_property_datetime_4"
+    t.boolean "dynamic_property_datetime_5"
+    t.boolean "dynamic_property_datetime_6"
+    t.boolean "dynamic_property_datetime_7"
+    t.boolean "dynamic_property_datetime_8"
+    t.boolean "dynamic_property_datetime_9"
+    t.boolean "dynamic_property_datetime_10"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["branch_id"], name: "index_facilities_on_branch_id"
+    t.index ["business_type"], name: "index_facilities_on_business_type"
     t.index ["category_id"], name: "index_facilities_on_category_id"
     t.index ["company_id"], name: "index_facilities_on_company_id"
     t.index ["discarded_at"], name: "index_facilities_on_discarded_at"
+    t.index ["lifecycle_status"], name: "index_facilities_on_lifecycle_status"
+    t.index ["workflow_status"], name: "index_facilities_on_workflow_status"
   end
 
   create_table "facility_appointments", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -1286,9 +2098,12 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.index ["appoint_from_type", "appoint_from_id"], name: "index_facility_appointments_on_appoint_from"
     t.index ["appoint_to_type", "appoint_to_id"], name: "idx_on_appoint_to_type_appoint_to_id_b7dff614b7"
     t.index ["appoint_to_type", "appoint_to_id"], name: "index_facility_appointments_on_appoint_to"
+    t.index ["business_type"], name: "index_facility_appointments_on_business_type"
     t.index ["company_id"], name: "index_facility_appointments_on_company_id"
     t.index ["discarded_at"], name: "index_facility_appointments_on_discarded_at"
     t.index ["facility_id"], name: "index_facility_appointments_on_facility_id"
+    t.index ["lifecycle_status"], name: "index_facility_appointments_on_lifecycle_status"
+    t.index ["workflow_status"], name: "index_facility_appointments_on_workflow_status"
   end
 
   create_table "facility_group_appointments", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -1319,9 +2134,12 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.index ["appoint_from_type", "appoint_from_id"], name: "index_facility_group_appointments_on_appoint_from"
     t.index ["appoint_to_type", "appoint_to_id"], name: "idx_on_appoint_to_type_appoint_to_id_ebef229bea"
     t.index ["appoint_to_type", "appoint_to_id"], name: "index_facility_group_appointments_on_appoint_to"
+    t.index ["business_type"], name: "index_facility_group_appointments_on_business_type"
     t.index ["company_id"], name: "index_facility_group_appointments_on_company_id"
     t.index ["discarded_at"], name: "index_facility_group_appointments_on_discarded_at"
     t.index ["facility_group_id"], name: "index_facility_group_appointments_on_facility_group_id"
+    t.index ["lifecycle_status"], name: "index_facility_group_appointments_on_lifecycle_status"
+    t.index ["workflow_status"], name: "index_facility_group_appointments_on_workflow_status"
   end
 
   create_table "facility_groups", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -1338,12 +2156,85 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.jsonb "metadata", default: {}
     t.datetime "discarded_at"
     t.string "permission_resource_name"
+    t.string "dynamic_property_string_1"
+    t.string "dynamic_property_string_2"
+    t.string "dynamic_property_string_3"
+    t.string "dynamic_property_string_4"
+    t.string "dynamic_property_string_5"
+    t.string "dynamic_property_string_6"
+    t.string "dynamic_property_string_7"
+    t.string "dynamic_property_string_8"
+    t.string "dynamic_property_string_9"
+    t.string "dynamic_property_string_10"
+    t.string "dynamic_property_string_11"
+    t.string "dynamic_property_string_12"
+    t.string "dynamic_property_string_13"
+    t.string "dynamic_property_string_14"
+    t.string "dynamic_property_string_15"
+    t.string "dynamic_property_string_16"
+    t.string "dynamic_property_string_17"
+    t.string "dynamic_property_string_18"
+    t.string "dynamic_property_string_19"
+    t.string "dynamic_property_string_20"
+    t.integer "dynamic_property_integer_1"
+    t.integer "dynamic_property_integer_2"
+    t.integer "dynamic_property_integer_3"
+    t.integer "dynamic_property_integer_4"
+    t.integer "dynamic_property_integer_5"
+    t.integer "dynamic_property_integer_6"
+    t.integer "dynamic_property_integer_7"
+    t.integer "dynamic_property_integer_8"
+    t.integer "dynamic_property_integer_9"
+    t.integer "dynamic_property_integer_10"
+    t.integer "dynamic_property_integer_11"
+    t.integer "dynamic_property_integer_12"
+    t.integer "dynamic_property_integer_13"
+    t.integer "dynamic_property_integer_14"
+    t.integer "dynamic_property_integer_15"
+    t.integer "dynamic_property_integer_16"
+    t.integer "dynamic_property_integer_17"
+    t.integer "dynamic_property_integer_18"
+    t.integer "dynamic_property_integer_19"
+    t.integer "dynamic_property_integer_20"
+    t.decimal "dynamic_property_decimal_1", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_2", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_3", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_4", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_5", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_6", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_7", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_8", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_9", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_10", precision: 15, scale: 4
+    t.boolean "dynamic_property_boolean_1"
+    t.boolean "dynamic_property_boolean_2"
+    t.boolean "dynamic_property_boolean_3"
+    t.boolean "dynamic_property_boolean_4"
+    t.boolean "dynamic_property_boolean_5"
+    t.boolean "dynamic_property_boolean_6"
+    t.boolean "dynamic_property_boolean_7"
+    t.boolean "dynamic_property_boolean_8"
+    t.boolean "dynamic_property_boolean_9"
+    t.boolean "dynamic_property_boolean_10"
+    t.boolean "dynamic_property_datetime_1"
+    t.boolean "dynamic_property_datetime_2"
+    t.boolean "dynamic_property_datetime_3"
+    t.boolean "dynamic_property_datetime_4"
+    t.boolean "dynamic_property_datetime_5"
+    t.boolean "dynamic_property_datetime_6"
+    t.boolean "dynamic_property_datetime_7"
+    t.boolean "dynamic_property_datetime_8"
+    t.boolean "dynamic_property_datetime_9"
+    t.boolean "dynamic_property_datetime_10"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["branch_id"], name: "index_facility_groups_on_branch_id"
+    t.index ["business_type"], name: "index_facility_groups_on_business_type"
     t.index ["category_id"], name: "index_facility_groups_on_category_id"
     t.index ["company_id"], name: "index_facility_groups_on_company_id"
     t.index ["discarded_at"], name: "index_facility_groups_on_discarded_at"
+    t.index ["lifecycle_status"], name: "index_facility_groups_on_lifecycle_status"
+    t.index ["workflow_status"], name: "index_facility_groups_on_workflow_status"
   end
 
   create_table "invoices", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -1366,13 +2257,86 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.jsonb "metadata", default: {}
     t.datetime "discarded_at"
     t.string "permission_resource_name"
+    t.string "dynamic_property_string_1"
+    t.string "dynamic_property_string_2"
+    t.string "dynamic_property_string_3"
+    t.string "dynamic_property_string_4"
+    t.string "dynamic_property_string_5"
+    t.string "dynamic_property_string_6"
+    t.string "dynamic_property_string_7"
+    t.string "dynamic_property_string_8"
+    t.string "dynamic_property_string_9"
+    t.string "dynamic_property_string_10"
+    t.string "dynamic_property_string_11"
+    t.string "dynamic_property_string_12"
+    t.string "dynamic_property_string_13"
+    t.string "dynamic_property_string_14"
+    t.string "dynamic_property_string_15"
+    t.string "dynamic_property_string_16"
+    t.string "dynamic_property_string_17"
+    t.string "dynamic_property_string_18"
+    t.string "dynamic_property_string_19"
+    t.string "dynamic_property_string_20"
+    t.integer "dynamic_property_integer_1"
+    t.integer "dynamic_property_integer_2"
+    t.integer "dynamic_property_integer_3"
+    t.integer "dynamic_property_integer_4"
+    t.integer "dynamic_property_integer_5"
+    t.integer "dynamic_property_integer_6"
+    t.integer "dynamic_property_integer_7"
+    t.integer "dynamic_property_integer_8"
+    t.integer "dynamic_property_integer_9"
+    t.integer "dynamic_property_integer_10"
+    t.integer "dynamic_property_integer_11"
+    t.integer "dynamic_property_integer_12"
+    t.integer "dynamic_property_integer_13"
+    t.integer "dynamic_property_integer_14"
+    t.integer "dynamic_property_integer_15"
+    t.integer "dynamic_property_integer_16"
+    t.integer "dynamic_property_integer_17"
+    t.integer "dynamic_property_integer_18"
+    t.integer "dynamic_property_integer_19"
+    t.integer "dynamic_property_integer_20"
+    t.decimal "dynamic_property_decimal_1", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_2", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_3", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_4", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_5", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_6", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_7", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_8", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_9", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_10", precision: 15, scale: 4
+    t.boolean "dynamic_property_boolean_1"
+    t.boolean "dynamic_property_boolean_2"
+    t.boolean "dynamic_property_boolean_3"
+    t.boolean "dynamic_property_boolean_4"
+    t.boolean "dynamic_property_boolean_5"
+    t.boolean "dynamic_property_boolean_6"
+    t.boolean "dynamic_property_boolean_7"
+    t.boolean "dynamic_property_boolean_8"
+    t.boolean "dynamic_property_boolean_9"
+    t.boolean "dynamic_property_boolean_10"
+    t.boolean "dynamic_property_datetime_1"
+    t.boolean "dynamic_property_datetime_2"
+    t.boolean "dynamic_property_datetime_3"
+    t.boolean "dynamic_property_datetime_4"
+    t.boolean "dynamic_property_datetime_5"
+    t.boolean "dynamic_property_datetime_6"
+    t.boolean "dynamic_property_datetime_7"
+    t.boolean "dynamic_property_datetime_8"
+    t.boolean "dynamic_property_datetime_9"
+    t.boolean "dynamic_property_datetime_10"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["branch_id"], name: "index_invoices_on_branch_id"
+    t.index ["business_type"], name: "index_invoices_on_business_type"
     t.index ["category_id"], name: "index_invoices_on_category_id"
     t.index ["company_id"], name: "index_invoices_on_company_id"
     t.index ["discarded_at"], name: "index_invoices_on_discarded_at"
+    t.index ["lifecycle_status"], name: "index_invoices_on_lifecycle_status"
     t.index ["order_id"], name: "index_invoices_on_order_id"
+    t.index ["workflow_status"], name: "index_invoices_on_workflow_status"
   end
 
   create_table "membership_appointments", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -1403,9 +2367,12 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.index ["appoint_from_type", "appoint_from_id"], name: "index_membership_appointments_on_appoint_from"
     t.index ["appoint_to_type", "appoint_to_id"], name: "idx_on_appoint_to_type_appoint_to_id_92c11e8cbf"
     t.index ["appoint_to_type", "appoint_to_id"], name: "index_membership_appointments_on_appoint_to"
+    t.index ["business_type"], name: "index_membership_appointments_on_business_type"
     t.index ["company_id"], name: "index_membership_appointments_on_company_id"
     t.index ["discarded_at"], name: "index_membership_appointments_on_discarded_at"
+    t.index ["lifecycle_status"], name: "index_membership_appointments_on_lifecycle_status"
     t.index ["membership_id"], name: "index_membership_appointments_on_membership_id"
+    t.index ["workflow_status"], name: "index_membership_appointments_on_workflow_status"
   end
 
   create_table "memberships", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -1414,8 +2381,86 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.integer "lifecycle_status"
     t.integer "workflow_status"
     t.integer "business_type"
+    t.datetime "expiration_date"
+    t.jsonb "metadata", default: {}
+    t.datetime "discarded_at"
+    t.string "permission_resource_name"
+    t.string "dynamic_property_string_1"
+    t.string "dynamic_property_string_2"
+    t.string "dynamic_property_string_3"
+    t.string "dynamic_property_string_4"
+    t.string "dynamic_property_string_5"
+    t.string "dynamic_property_string_6"
+    t.string "dynamic_property_string_7"
+    t.string "dynamic_property_string_8"
+    t.string "dynamic_property_string_9"
+    t.string "dynamic_property_string_10"
+    t.string "dynamic_property_string_11"
+    t.string "dynamic_property_string_12"
+    t.string "dynamic_property_string_13"
+    t.string "dynamic_property_string_14"
+    t.string "dynamic_property_string_15"
+    t.string "dynamic_property_string_16"
+    t.string "dynamic_property_string_17"
+    t.string "dynamic_property_string_18"
+    t.string "dynamic_property_string_19"
+    t.string "dynamic_property_string_20"
+    t.integer "dynamic_property_integer_1"
+    t.integer "dynamic_property_integer_2"
+    t.integer "dynamic_property_integer_3"
+    t.integer "dynamic_property_integer_4"
+    t.integer "dynamic_property_integer_5"
+    t.integer "dynamic_property_integer_6"
+    t.integer "dynamic_property_integer_7"
+    t.integer "dynamic_property_integer_8"
+    t.integer "dynamic_property_integer_9"
+    t.integer "dynamic_property_integer_10"
+    t.integer "dynamic_property_integer_11"
+    t.integer "dynamic_property_integer_12"
+    t.integer "dynamic_property_integer_13"
+    t.integer "dynamic_property_integer_14"
+    t.integer "dynamic_property_integer_15"
+    t.integer "dynamic_property_integer_16"
+    t.integer "dynamic_property_integer_17"
+    t.integer "dynamic_property_integer_18"
+    t.integer "dynamic_property_integer_19"
+    t.integer "dynamic_property_integer_20"
+    t.decimal "dynamic_property_decimal_1", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_2", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_3", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_4", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_5", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_6", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_7", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_8", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_9", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_10", precision: 15, scale: 4
+    t.boolean "dynamic_property_boolean_1"
+    t.boolean "dynamic_property_boolean_2"
+    t.boolean "dynamic_property_boolean_3"
+    t.boolean "dynamic_property_boolean_4"
+    t.boolean "dynamic_property_boolean_5"
+    t.boolean "dynamic_property_boolean_6"
+    t.boolean "dynamic_property_boolean_7"
+    t.boolean "dynamic_property_boolean_8"
+    t.boolean "dynamic_property_boolean_9"
+    t.boolean "dynamic_property_boolean_10"
+    t.boolean "dynamic_property_datetime_1"
+    t.boolean "dynamic_property_datetime_2"
+    t.boolean "dynamic_property_datetime_3"
+    t.boolean "dynamic_property_datetime_4"
+    t.boolean "dynamic_property_datetime_5"
+    t.boolean "dynamic_property_datetime_6"
+    t.boolean "dynamic_property_datetime_7"
+    t.boolean "dynamic_property_datetime_8"
+    t.boolean "dynamic_property_datetime_9"
+    t.boolean "dynamic_property_datetime_10"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["business_type"], name: "index_memberships_on_business_type"
+    t.index ["discarded_at"], name: "index_memberships_on_discarded_at"
+    t.index ["lifecycle_status"], name: "index_memberships_on_lifecycle_status"
+    t.index ["workflow_status"], name: "index_memberships_on_workflow_status"
   end
 
   create_table "notification_appointments", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -1446,9 +2491,12 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.index ["appoint_from_type", "appoint_from_id"], name: "index_notification_appointments_on_appoint_from"
     t.index ["appoint_to_type", "appoint_to_id"], name: "idx_on_appoint_to_type_appoint_to_id_26a28b0bfc"
     t.index ["appoint_to_type", "appoint_to_id"], name: "index_notification_appointments_on_appoint_to"
+    t.index ["business_type"], name: "index_notification_appointments_on_business_type"
     t.index ["company_id"], name: "index_notification_appointments_on_company_id"
     t.index ["discarded_at"], name: "index_notification_appointments_on_discarded_at"
+    t.index ["lifecycle_status"], name: "index_notification_appointments_on_lifecycle_status"
     t.index ["notification_id"], name: "index_notification_appointments_on_notification_id"
+    t.index ["workflow_status"], name: "index_notification_appointments_on_workflow_status"
   end
 
   create_table "notification_group_appointments", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -1479,9 +2527,12 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.index ["appoint_from_type", "appoint_from_id"], name: "index_notification_group_appointments_on_appoint_from"
     t.index ["appoint_to_type", "appoint_to_id"], name: "idx_on_appoint_to_type_appoint_to_id_8f6e8f37c0"
     t.index ["appoint_to_type", "appoint_to_id"], name: "index_notification_group_appointments_on_appoint_to"
+    t.index ["business_type"], name: "index_notification_group_appointments_on_business_type"
     t.index ["company_id"], name: "index_notification_group_appointments_on_company_id"
     t.index ["discarded_at"], name: "index_notification_group_appointments_on_discarded_at"
+    t.index ["lifecycle_status"], name: "index_notification_group_appointments_on_lifecycle_status"
     t.index ["notification_group_id"], name: "index_notification_group_appointments_on_notification_group_id"
+    t.index ["workflow_status"], name: "index_notification_group_appointments_on_workflow_status"
   end
 
   create_table "notification_groups", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -1501,9 +2552,12 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["branch_id"], name: "index_notification_groups_on_branch_id"
+    t.index ["business_type"], name: "index_notification_groups_on_business_type"
     t.index ["category_id"], name: "index_notification_groups_on_category_id"
     t.index ["company_id"], name: "index_notification_groups_on_company_id"
     t.index ["discarded_at"], name: "index_notification_groups_on_discarded_at"
+    t.index ["lifecycle_status"], name: "index_notification_groups_on_lifecycle_status"
+    t.index ["workflow_status"], name: "index_notification_groups_on_workflow_status"
   end
 
   create_table "notifications", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -1524,10 +2578,13 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["branch_id"], name: "index_notifications_on_branch_id"
+    t.index ["business_type"], name: "index_notifications_on_business_type"
     t.index ["category_id"], name: "index_notifications_on_category_id"
     t.index ["company_id"], name: "index_notifications_on_company_id"
     t.index ["discarded_at"], name: "index_notifications_on_discarded_at"
+    t.index ["lifecycle_status"], name: "index_notifications_on_lifecycle_status"
     t.index ["notification_group_id"], name: "index_notifications_on_notification_group_id"
+    t.index ["workflow_status"], name: "index_notifications_on_workflow_status"
   end
 
   create_table "order_appointments", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -1561,9 +2618,12 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.index ["appoint_from_type", "appoint_from_id"], name: "index_order_appointments_on_appoint_from"
     t.index ["appoint_to_type", "appoint_to_id"], name: "index_order_appointments_on_appoint_to"
     t.index ["appoint_to_type", "appoint_to_id"], name: "index_order_appointments_on_appoint_to_type_and_appoint_to_id"
+    t.index ["business_type"], name: "index_order_appointments_on_business_type"
     t.index ["company_id"], name: "index_order_appointments_on_company_id"
     t.index ["discarded_at"], name: "index_order_appointments_on_discarded_at"
+    t.index ["lifecycle_status"], name: "index_order_appointments_on_lifecycle_status"
     t.index ["order_id"], name: "index_order_appointments_on_order_id"
+    t.index ["workflow_status"], name: "index_order_appointments_on_workflow_status"
   end
 
   create_table "order_group_appointments", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -1597,9 +2657,12 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.index ["appoint_from_type", "appoint_from_id"], name: "index_order_group_appointments_on_appoint_from"
     t.index ["appoint_to_type", "appoint_to_id"], name: "idx_on_appoint_to_type_appoint_to_id_1438b68413"
     t.index ["appoint_to_type", "appoint_to_id"], name: "index_order_group_appointments_on_appoint_to"
+    t.index ["business_type"], name: "index_order_group_appointments_on_business_type"
     t.index ["company_id"], name: "index_order_group_appointments_on_company_id"
     t.index ["discarded_at"], name: "index_order_group_appointments_on_discarded_at"
+    t.index ["lifecycle_status"], name: "index_order_group_appointments_on_lifecycle_status"
     t.index ["order_group_id"], name: "index_order_group_appointments_on_order_group_id"
+    t.index ["workflow_status"], name: "index_order_group_appointments_on_workflow_status"
   end
 
   create_table "order_groups", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -1619,13 +2682,86 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.jsonb "metadata", default: {}
     t.datetime "discarded_at"
     t.string "permission_resource_name"
+    t.string "dynamic_property_string_1"
+    t.string "dynamic_property_string_2"
+    t.string "dynamic_property_string_3"
+    t.string "dynamic_property_string_4"
+    t.string "dynamic_property_string_5"
+    t.string "dynamic_property_string_6"
+    t.string "dynamic_property_string_7"
+    t.string "dynamic_property_string_8"
+    t.string "dynamic_property_string_9"
+    t.string "dynamic_property_string_10"
+    t.string "dynamic_property_string_11"
+    t.string "dynamic_property_string_12"
+    t.string "dynamic_property_string_13"
+    t.string "dynamic_property_string_14"
+    t.string "dynamic_property_string_15"
+    t.string "dynamic_property_string_16"
+    t.string "dynamic_property_string_17"
+    t.string "dynamic_property_string_18"
+    t.string "dynamic_property_string_19"
+    t.string "dynamic_property_string_20"
+    t.integer "dynamic_property_integer_1"
+    t.integer "dynamic_property_integer_2"
+    t.integer "dynamic_property_integer_3"
+    t.integer "dynamic_property_integer_4"
+    t.integer "dynamic_property_integer_5"
+    t.integer "dynamic_property_integer_6"
+    t.integer "dynamic_property_integer_7"
+    t.integer "dynamic_property_integer_8"
+    t.integer "dynamic_property_integer_9"
+    t.integer "dynamic_property_integer_10"
+    t.integer "dynamic_property_integer_11"
+    t.integer "dynamic_property_integer_12"
+    t.integer "dynamic_property_integer_13"
+    t.integer "dynamic_property_integer_14"
+    t.integer "dynamic_property_integer_15"
+    t.integer "dynamic_property_integer_16"
+    t.integer "dynamic_property_integer_17"
+    t.integer "dynamic_property_integer_18"
+    t.integer "dynamic_property_integer_19"
+    t.integer "dynamic_property_integer_20"
+    t.decimal "dynamic_property_decimal_1", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_2", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_3", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_4", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_5", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_6", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_7", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_8", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_9", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_10", precision: 15, scale: 4
+    t.boolean "dynamic_property_boolean_1"
+    t.boolean "dynamic_property_boolean_2"
+    t.boolean "dynamic_property_boolean_3"
+    t.boolean "dynamic_property_boolean_4"
+    t.boolean "dynamic_property_boolean_5"
+    t.boolean "dynamic_property_boolean_6"
+    t.boolean "dynamic_property_boolean_7"
+    t.boolean "dynamic_property_boolean_8"
+    t.boolean "dynamic_property_boolean_9"
+    t.boolean "dynamic_property_boolean_10"
+    t.boolean "dynamic_property_datetime_1"
+    t.boolean "dynamic_property_datetime_2"
+    t.boolean "dynamic_property_datetime_3"
+    t.boolean "dynamic_property_datetime_4"
+    t.boolean "dynamic_property_datetime_5"
+    t.boolean "dynamic_property_datetime_6"
+    t.boolean "dynamic_property_datetime_7"
+    t.boolean "dynamic_property_datetime_8"
+    t.boolean "dynamic_property_datetime_9"
+    t.boolean "dynamic_property_datetime_10"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["branch_id"], name: "index_order_groups_on_branch_id"
+    t.index ["business_type"], name: "index_order_groups_on_business_type"
     t.index ["category_id"], name: "index_order_groups_on_category_id"
     t.index ["company_id"], name: "index_order_groups_on_company_id"
     t.index ["customer_id"], name: "index_order_groups_on_customer_id"
     t.index ["discarded_at"], name: "index_order_groups_on_discarded_at"
+    t.index ["lifecycle_status"], name: "index_order_groups_on_lifecycle_status"
+    t.index ["workflow_status"], name: "index_order_groups_on_workflow_status"
   end
 
   create_table "orders", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -1652,18 +2788,91 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.jsonb "metadata", default: {}
     t.datetime "discarded_at"
     t.string "permission_resource_name"
+    t.string "dynamic_property_string_1"
+    t.string "dynamic_property_string_2"
+    t.string "dynamic_property_string_3"
+    t.string "dynamic_property_string_4"
+    t.string "dynamic_property_string_5"
+    t.string "dynamic_property_string_6"
+    t.string "dynamic_property_string_7"
+    t.string "dynamic_property_string_8"
+    t.string "dynamic_property_string_9"
+    t.string "dynamic_property_string_10"
+    t.string "dynamic_property_string_11"
+    t.string "dynamic_property_string_12"
+    t.string "dynamic_property_string_13"
+    t.string "dynamic_property_string_14"
+    t.string "dynamic_property_string_15"
+    t.string "dynamic_property_string_16"
+    t.string "dynamic_property_string_17"
+    t.string "dynamic_property_string_18"
+    t.string "dynamic_property_string_19"
+    t.string "dynamic_property_string_20"
+    t.integer "dynamic_property_integer_1"
+    t.integer "dynamic_property_integer_2"
+    t.integer "dynamic_property_integer_3"
+    t.integer "dynamic_property_integer_4"
+    t.integer "dynamic_property_integer_5"
+    t.integer "dynamic_property_integer_6"
+    t.integer "dynamic_property_integer_7"
+    t.integer "dynamic_property_integer_8"
+    t.integer "dynamic_property_integer_9"
+    t.integer "dynamic_property_integer_10"
+    t.integer "dynamic_property_integer_11"
+    t.integer "dynamic_property_integer_12"
+    t.integer "dynamic_property_integer_13"
+    t.integer "dynamic_property_integer_14"
+    t.integer "dynamic_property_integer_15"
+    t.integer "dynamic_property_integer_16"
+    t.integer "dynamic_property_integer_17"
+    t.integer "dynamic_property_integer_18"
+    t.integer "dynamic_property_integer_19"
+    t.integer "dynamic_property_integer_20"
+    t.decimal "dynamic_property_decimal_1", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_2", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_3", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_4", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_5", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_6", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_7", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_8", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_9", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_10", precision: 15, scale: 4
+    t.boolean "dynamic_property_boolean_1"
+    t.boolean "dynamic_property_boolean_2"
+    t.boolean "dynamic_property_boolean_3"
+    t.boolean "dynamic_property_boolean_4"
+    t.boolean "dynamic_property_boolean_5"
+    t.boolean "dynamic_property_boolean_6"
+    t.boolean "dynamic_property_boolean_7"
+    t.boolean "dynamic_property_boolean_8"
+    t.boolean "dynamic_property_boolean_9"
+    t.boolean "dynamic_property_boolean_10"
+    t.boolean "dynamic_property_datetime_1"
+    t.boolean "dynamic_property_datetime_2"
+    t.boolean "dynamic_property_datetime_3"
+    t.boolean "dynamic_property_datetime_4"
+    t.boolean "dynamic_property_datetime_5"
+    t.boolean "dynamic_property_datetime_6"
+    t.boolean "dynamic_property_datetime_7"
+    t.boolean "dynamic_property_datetime_8"
+    t.boolean "dynamic_property_datetime_9"
+    t.boolean "dynamic_property_datetime_10"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["barcode"], name: "index_orders_on_barcode"
     t.index ["branch_id"], name: "index_orders_on_branch_id"
+    t.index ["business_type"], name: "index_orders_on_business_type"
     t.index ["category_id"], name: "index_orders_on_category_id"
     t.index ["company_id"], name: "index_orders_on_company_id"
     t.index ["customer_id"], name: "index_orders_on_customer_id"
     t.index ["discarded_at"], name: "index_orders_on_discarded_at"
     t.index ["ean"], name: "index_orders_on_ean"
+    t.index ["lifecycle_status"], name: "index_orders_on_lifecycle_status"
     t.index ["serial_number"], name: "index_orders_on_serial_number"
     t.index ["sku"], name: "index_orders_on_sku"
     t.index ["upc"], name: "index_orders_on_upc"
+    t.index ["workflow_status"], name: "index_orders_on_workflow_status"
   end
 
   create_table "payment_method_appointments", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -1683,10 +2892,13 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["branch_id"], name: "index_payment_method_appointments_on_branch_id"
+    t.index ["business_type"], name: "index_payment_method_appointments_on_business_type"
     t.index ["company_id"], name: "index_payment_method_appointments_on_company_id"
     t.index ["discarded_at"], name: "index_payment_method_appointments_on_discarded_at"
+    t.index ["lifecycle_status"], name: "index_payment_method_appointments_on_lifecycle_status"
     t.index ["payment_method_id", "company_id"], name: "idx_on_payment_method_id_company_id_8ff3d49954"
     t.index ["payment_method_id"], name: "index_payment_method_appointments_on_payment_method_id"
+    t.index ["workflow_status"], name: "index_payment_method_appointments_on_workflow_status"
   end
 
   create_table "payment_methods", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -1704,8 +2916,11 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["business_type"], name: "index_payment_methods_on_business_type"
     t.index ["category_id"], name: "index_payment_methods_on_category_id"
     t.index ["discarded_at"], name: "index_payment_methods_on_discarded_at"
+    t.index ["lifecycle_status"], name: "index_payment_methods_on_lifecycle_status"
+    t.index ["workflow_status"], name: "index_payment_methods_on_workflow_status"
   end
 
   create_table "payments", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -1729,13 +2944,86 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.jsonb "metadata", default: {}
     t.datetime "discarded_at"
     t.string "permission_resource_name"
+    t.string "dynamic_property_string_1"
+    t.string "dynamic_property_string_2"
+    t.string "dynamic_property_string_3"
+    t.string "dynamic_property_string_4"
+    t.string "dynamic_property_string_5"
+    t.string "dynamic_property_string_6"
+    t.string "dynamic_property_string_7"
+    t.string "dynamic_property_string_8"
+    t.string "dynamic_property_string_9"
+    t.string "dynamic_property_string_10"
+    t.string "dynamic_property_string_11"
+    t.string "dynamic_property_string_12"
+    t.string "dynamic_property_string_13"
+    t.string "dynamic_property_string_14"
+    t.string "dynamic_property_string_15"
+    t.string "dynamic_property_string_16"
+    t.string "dynamic_property_string_17"
+    t.string "dynamic_property_string_18"
+    t.string "dynamic_property_string_19"
+    t.string "dynamic_property_string_20"
+    t.integer "dynamic_property_integer_1"
+    t.integer "dynamic_property_integer_2"
+    t.integer "dynamic_property_integer_3"
+    t.integer "dynamic_property_integer_4"
+    t.integer "dynamic_property_integer_5"
+    t.integer "dynamic_property_integer_6"
+    t.integer "dynamic_property_integer_7"
+    t.integer "dynamic_property_integer_8"
+    t.integer "dynamic_property_integer_9"
+    t.integer "dynamic_property_integer_10"
+    t.integer "dynamic_property_integer_11"
+    t.integer "dynamic_property_integer_12"
+    t.integer "dynamic_property_integer_13"
+    t.integer "dynamic_property_integer_14"
+    t.integer "dynamic_property_integer_15"
+    t.integer "dynamic_property_integer_16"
+    t.integer "dynamic_property_integer_17"
+    t.integer "dynamic_property_integer_18"
+    t.integer "dynamic_property_integer_19"
+    t.integer "dynamic_property_integer_20"
+    t.decimal "dynamic_property_decimal_1", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_2", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_3", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_4", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_5", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_6", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_7", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_8", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_9", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_10", precision: 15, scale: 4
+    t.boolean "dynamic_property_boolean_1"
+    t.boolean "dynamic_property_boolean_2"
+    t.boolean "dynamic_property_boolean_3"
+    t.boolean "dynamic_property_boolean_4"
+    t.boolean "dynamic_property_boolean_5"
+    t.boolean "dynamic_property_boolean_6"
+    t.boolean "dynamic_property_boolean_7"
+    t.boolean "dynamic_property_boolean_8"
+    t.boolean "dynamic_property_boolean_9"
+    t.boolean "dynamic_property_boolean_10"
+    t.boolean "dynamic_property_datetime_1"
+    t.boolean "dynamic_property_datetime_2"
+    t.boolean "dynamic_property_datetime_3"
+    t.boolean "dynamic_property_datetime_4"
+    t.boolean "dynamic_property_datetime_5"
+    t.boolean "dynamic_property_datetime_6"
+    t.boolean "dynamic_property_datetime_7"
+    t.boolean "dynamic_property_datetime_8"
+    t.boolean "dynamic_property_datetime_9"
+    t.boolean "dynamic_property_datetime_10"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["branch_id"], name: "index_payments_on_branch_id"
+    t.index ["business_type"], name: "index_payments_on_business_type"
     t.index ["category_id"], name: "index_payments_on_category_id"
     t.index ["company_id"], name: "index_payments_on_company_id"
     t.index ["discarded_at"], name: "index_payments_on_discarded_at"
     t.index ["invoice_id"], name: "index_payments_on_invoice_id"
+    t.index ["lifecycle_status"], name: "index_payments_on_lifecycle_status"
+    t.index ["workflow_status"], name: "index_payments_on_workflow_status"
   end
 
   create_table "period_appointments", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -1766,8 +3054,11 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.index ["appoint_from_type", "appoint_from_id"], name: "index_period_appointments_on_appoint_from"
     t.index ["appoint_to_type", "appoint_to_id"], name: "index_period_appointments_on_appoint_to"
     t.index ["appoint_to_type", "appoint_to_id"], name: "index_period_appointments_on_appoint_to_type_and_appoint_to_id"
+    t.index ["business_type"], name: "index_period_appointments_on_business_type"
     t.index ["discarded_at"], name: "index_period_appointments_on_discarded_at"
+    t.index ["lifecycle_status"], name: "index_period_appointments_on_lifecycle_status"
     t.index ["period_id"], name: "index_period_appointments_on_period_id"
+    t.index ["workflow_status"], name: "index_period_appointments_on_workflow_status"
   end
 
   create_table "periods", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -1798,8 +3089,11 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["branch_id"], name: "index_policies_on_branch_id"
+    t.index ["business_type"], name: "index_policies_on_business_type"
     t.index ["company_id"], name: "index_policies_on_company_id"
     t.index ["discarded_at"], name: "index_policies_on_discarded_at"
+    t.index ["lifecycle_status"], name: "index_policies_on_lifecycle_status"
+    t.index ["workflow_status"], name: "index_policies_on_workflow_status"
   end
 
   create_table "policy_appointments", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -1821,9 +3115,12 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.datetime "updated_at", null: false
     t.index ["appoint_to_type", "appoint_to_id"], name: "index_policy_appointments_on_appoint_to"
     t.index ["appoint_to_type", "appoint_to_id"], name: "index_policy_appointments_on_appoint_to_type_and_appoint_to_id"
+    t.index ["business_type"], name: "index_policy_appointments_on_business_type"
     t.index ["company_id"], name: "index_policy_appointments_on_company_id"
     t.index ["discarded_at"], name: "index_policy_appointments_on_discarded_at"
+    t.index ["lifecycle_status"], name: "index_policy_appointments_on_lifecycle_status"
     t.index ["policy_id"], name: "index_policy_appointments_on_policy_id"
+    t.index ["workflow_status"], name: "index_policy_appointments_on_workflow_status"
   end
 
   create_table "price_appointments", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -1855,9 +3152,12 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.index ["appoint_from_type", "appoint_from_id"], name: "index_price_appointments_on_appoint_from"
     t.index ["appoint_to_type", "appoint_to_id"], name: "index_price_appointments_on_appoint_to"
     t.index ["appoint_to_type", "appoint_to_id"], name: "index_price_appointments_on_appoint_to_type_and_appoint_to_id"
+    t.index ["business_type"], name: "index_price_appointments_on_business_type"
     t.index ["discarded_at"], name: "index_price_appointments_on_discarded_at"
+    t.index ["lifecycle_status"], name: "index_price_appointments_on_lifecycle_status"
     t.index ["period_id"], name: "index_price_appointments_on_period_id"
     t.index ["price_id"], name: "index_price_appointments_on_price_id"
+    t.index ["workflow_status"], name: "index_price_appointments_on_workflow_status"
   end
 
   create_table "prices", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -1896,9 +3196,12 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.index ["appoint_from_type", "appoint_from_id"], name: "index_product_appointments_on_appoint_from"
     t.index ["appoint_to_type", "appoint_to_id"], name: "idx_on_appoint_to_type_appoint_to_id_6dd1b90540"
     t.index ["appoint_to_type", "appoint_to_id"], name: "index_product_appointments_on_appoint_to"
+    t.index ["business_type"], name: "index_product_appointments_on_business_type"
     t.index ["company_id"], name: "index_product_appointments_on_company_id"
     t.index ["discarded_at"], name: "index_product_appointments_on_discarded_at"
+    t.index ["lifecycle_status"], name: "index_product_appointments_on_lifecycle_status"
     t.index ["product_id"], name: "index_product_appointments_on_product_id"
+    t.index ["workflow_status"], name: "index_product_appointments_on_workflow_status"
   end
 
   create_table "product_group_appointments", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -1929,9 +3232,12 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.index ["appoint_from_type", "appoint_from_id"], name: "index_product_group_appointments_on_appoint_from"
     t.index ["appoint_to_type", "appoint_to_id"], name: "idx_on_appoint_to_type_appoint_to_id_53bf3d5444"
     t.index ["appoint_to_type", "appoint_to_id"], name: "index_product_group_appointments_on_appoint_to"
+    t.index ["business_type"], name: "index_product_group_appointments_on_business_type"
     t.index ["company_id"], name: "index_product_group_appointments_on_company_id"
     t.index ["discarded_at"], name: "index_product_group_appointments_on_discarded_at"
+    t.index ["lifecycle_status"], name: "index_product_group_appointments_on_lifecycle_status"
     t.index ["product_group_id"], name: "index_product_group_appointments_on_product_group_id"
+    t.index ["workflow_status"], name: "index_product_group_appointments_on_workflow_status"
   end
 
   create_table "product_groups", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -1948,12 +3254,85 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.jsonb "metadata", default: {}
     t.datetime "discarded_at"
     t.string "permission_resource_name"
+    t.string "dynamic_property_string_1"
+    t.string "dynamic_property_string_2"
+    t.string "dynamic_property_string_3"
+    t.string "dynamic_property_string_4"
+    t.string "dynamic_property_string_5"
+    t.string "dynamic_property_string_6"
+    t.string "dynamic_property_string_7"
+    t.string "dynamic_property_string_8"
+    t.string "dynamic_property_string_9"
+    t.string "dynamic_property_string_10"
+    t.string "dynamic_property_string_11"
+    t.string "dynamic_property_string_12"
+    t.string "dynamic_property_string_13"
+    t.string "dynamic_property_string_14"
+    t.string "dynamic_property_string_15"
+    t.string "dynamic_property_string_16"
+    t.string "dynamic_property_string_17"
+    t.string "dynamic_property_string_18"
+    t.string "dynamic_property_string_19"
+    t.string "dynamic_property_string_20"
+    t.integer "dynamic_property_integer_1"
+    t.integer "dynamic_property_integer_2"
+    t.integer "dynamic_property_integer_3"
+    t.integer "dynamic_property_integer_4"
+    t.integer "dynamic_property_integer_5"
+    t.integer "dynamic_property_integer_6"
+    t.integer "dynamic_property_integer_7"
+    t.integer "dynamic_property_integer_8"
+    t.integer "dynamic_property_integer_9"
+    t.integer "dynamic_property_integer_10"
+    t.integer "dynamic_property_integer_11"
+    t.integer "dynamic_property_integer_12"
+    t.integer "dynamic_property_integer_13"
+    t.integer "dynamic_property_integer_14"
+    t.integer "dynamic_property_integer_15"
+    t.integer "dynamic_property_integer_16"
+    t.integer "dynamic_property_integer_17"
+    t.integer "dynamic_property_integer_18"
+    t.integer "dynamic_property_integer_19"
+    t.integer "dynamic_property_integer_20"
+    t.decimal "dynamic_property_decimal_1", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_2", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_3", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_4", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_5", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_6", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_7", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_8", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_9", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_10", precision: 15, scale: 4
+    t.boolean "dynamic_property_boolean_1"
+    t.boolean "dynamic_property_boolean_2"
+    t.boolean "dynamic_property_boolean_3"
+    t.boolean "dynamic_property_boolean_4"
+    t.boolean "dynamic_property_boolean_5"
+    t.boolean "dynamic_property_boolean_6"
+    t.boolean "dynamic_property_boolean_7"
+    t.boolean "dynamic_property_boolean_8"
+    t.boolean "dynamic_property_boolean_9"
+    t.boolean "dynamic_property_boolean_10"
+    t.boolean "dynamic_property_datetime_1"
+    t.boolean "dynamic_property_datetime_2"
+    t.boolean "dynamic_property_datetime_3"
+    t.boolean "dynamic_property_datetime_4"
+    t.boolean "dynamic_property_datetime_5"
+    t.boolean "dynamic_property_datetime_6"
+    t.boolean "dynamic_property_datetime_7"
+    t.boolean "dynamic_property_datetime_8"
+    t.boolean "dynamic_property_datetime_9"
+    t.boolean "dynamic_property_datetime_10"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["branch_id"], name: "index_product_groups_on_branch_id"
+    t.index ["business_type"], name: "index_product_groups_on_business_type"
     t.index ["category_id"], name: "index_product_groups_on_category_id"
     t.index ["company_id"], name: "index_product_groups_on_company_id"
     t.index ["discarded_at"], name: "index_product_groups_on_discarded_at"
+    t.index ["lifecycle_status"], name: "index_product_groups_on_lifecycle_status"
+    t.index ["workflow_status"], name: "index_product_groups_on_workflow_status"
   end
 
   create_table "products", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -1994,16 +3373,89 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.jsonb "metadata", default: {}
     t.datetime "discarded_at"
     t.string "permission_resource_name"
+    t.string "dynamic_property_string_1"
+    t.string "dynamic_property_string_2"
+    t.string "dynamic_property_string_3"
+    t.string "dynamic_property_string_4"
+    t.string "dynamic_property_string_5"
+    t.string "dynamic_property_string_6"
+    t.string "dynamic_property_string_7"
+    t.string "dynamic_property_string_8"
+    t.string "dynamic_property_string_9"
+    t.string "dynamic_property_string_10"
+    t.string "dynamic_property_string_11"
+    t.string "dynamic_property_string_12"
+    t.string "dynamic_property_string_13"
+    t.string "dynamic_property_string_14"
+    t.string "dynamic_property_string_15"
+    t.string "dynamic_property_string_16"
+    t.string "dynamic_property_string_17"
+    t.string "dynamic_property_string_18"
+    t.string "dynamic_property_string_19"
+    t.string "dynamic_property_string_20"
+    t.integer "dynamic_property_integer_1"
+    t.integer "dynamic_property_integer_2"
+    t.integer "dynamic_property_integer_3"
+    t.integer "dynamic_property_integer_4"
+    t.integer "dynamic_property_integer_5"
+    t.integer "dynamic_property_integer_6"
+    t.integer "dynamic_property_integer_7"
+    t.integer "dynamic_property_integer_8"
+    t.integer "dynamic_property_integer_9"
+    t.integer "dynamic_property_integer_10"
+    t.integer "dynamic_property_integer_11"
+    t.integer "dynamic_property_integer_12"
+    t.integer "dynamic_property_integer_13"
+    t.integer "dynamic_property_integer_14"
+    t.integer "dynamic_property_integer_15"
+    t.integer "dynamic_property_integer_16"
+    t.integer "dynamic_property_integer_17"
+    t.integer "dynamic_property_integer_18"
+    t.integer "dynamic_property_integer_19"
+    t.integer "dynamic_property_integer_20"
+    t.decimal "dynamic_property_decimal_1", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_2", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_3", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_4", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_5", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_6", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_7", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_8", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_9", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_10", precision: 15, scale: 4
+    t.boolean "dynamic_property_boolean_1"
+    t.boolean "dynamic_property_boolean_2"
+    t.boolean "dynamic_property_boolean_3"
+    t.boolean "dynamic_property_boolean_4"
+    t.boolean "dynamic_property_boolean_5"
+    t.boolean "dynamic_property_boolean_6"
+    t.boolean "dynamic_property_boolean_7"
+    t.boolean "dynamic_property_boolean_8"
+    t.boolean "dynamic_property_boolean_9"
+    t.boolean "dynamic_property_boolean_10"
+    t.boolean "dynamic_property_datetime_1"
+    t.boolean "dynamic_property_datetime_2"
+    t.boolean "dynamic_property_datetime_3"
+    t.boolean "dynamic_property_datetime_4"
+    t.boolean "dynamic_property_datetime_5"
+    t.boolean "dynamic_property_datetime_6"
+    t.boolean "dynamic_property_datetime_7"
+    t.boolean "dynamic_property_datetime_8"
+    t.boolean "dynamic_property_datetime_9"
+    t.boolean "dynamic_property_datetime_10"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["branch_id"], name: "index_products_on_branch_id"
     t.index ["brand_id"], name: "index_products_on_brand_id"
+    t.index ["business_type"], name: "index_products_on_business_type"
     t.index ["category_id"], name: "index_products_on_category_id"
     t.index ["code"], name: "index_products_on_code"
     t.index ["company_id"], name: "index_products_on_company_id"
     t.index ["discarded_at"], name: "index_products_on_discarded_at"
+    t.index ["lifecycle_status"], name: "index_products_on_lifecycle_status"
     t.index ["required_role_id"], name: "index_products_on_required_role_id"
     t.index ["sku"], name: "index_products_on_sku"
+    t.index ["workflow_status"], name: "index_products_on_workflow_status"
   end
 
   create_table "project_appointments", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -2034,9 +3486,12 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.index ["appoint_from_type", "appoint_from_id"], name: "index_project_appointments_on_appoint_from"
     t.index ["appoint_to_type", "appoint_to_id"], name: "idx_on_appoint_to_type_appoint_to_id_eb5a8d66ff"
     t.index ["appoint_to_type", "appoint_to_id"], name: "index_project_appointments_on_appoint_to"
+    t.index ["business_type"], name: "index_project_appointments_on_business_type"
     t.index ["company_id"], name: "index_project_appointments_on_company_id"
     t.index ["discarded_at"], name: "index_project_appointments_on_discarded_at"
+    t.index ["lifecycle_status"], name: "index_project_appointments_on_lifecycle_status"
     t.index ["project_id"], name: "index_project_appointments_on_project_id"
+    t.index ["workflow_status"], name: "index_project_appointments_on_workflow_status"
   end
 
   create_table "project_group_appointments", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -2067,9 +3522,12 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.index ["appoint_from_type", "appoint_from_id"], name: "index_project_group_appointments_on_appoint_from"
     t.index ["appoint_to_type", "appoint_to_id"], name: "idx_on_appoint_to_type_appoint_to_id_4c26e2a726"
     t.index ["appoint_to_type", "appoint_to_id"], name: "index_project_group_appointments_on_appoint_to"
+    t.index ["business_type"], name: "index_project_group_appointments_on_business_type"
     t.index ["company_id"], name: "index_project_group_appointments_on_company_id"
     t.index ["discarded_at"], name: "index_project_group_appointments_on_discarded_at"
+    t.index ["lifecycle_status"], name: "index_project_group_appointments_on_lifecycle_status"
     t.index ["project_group_id"], name: "index_project_group_appointments_on_project_group_id"
+    t.index ["workflow_status"], name: "index_project_group_appointments_on_workflow_status"
   end
 
   create_table "project_groups", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -2086,12 +3544,85 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.jsonb "metadata", default: {}
     t.datetime "discarded_at"
     t.string "permission_resource_name"
+    t.string "dynamic_property_string_1"
+    t.string "dynamic_property_string_2"
+    t.string "dynamic_property_string_3"
+    t.string "dynamic_property_string_4"
+    t.string "dynamic_property_string_5"
+    t.string "dynamic_property_string_6"
+    t.string "dynamic_property_string_7"
+    t.string "dynamic_property_string_8"
+    t.string "dynamic_property_string_9"
+    t.string "dynamic_property_string_10"
+    t.string "dynamic_property_string_11"
+    t.string "dynamic_property_string_12"
+    t.string "dynamic_property_string_13"
+    t.string "dynamic_property_string_14"
+    t.string "dynamic_property_string_15"
+    t.string "dynamic_property_string_16"
+    t.string "dynamic_property_string_17"
+    t.string "dynamic_property_string_18"
+    t.string "dynamic_property_string_19"
+    t.string "dynamic_property_string_20"
+    t.integer "dynamic_property_integer_1"
+    t.integer "dynamic_property_integer_2"
+    t.integer "dynamic_property_integer_3"
+    t.integer "dynamic_property_integer_4"
+    t.integer "dynamic_property_integer_5"
+    t.integer "dynamic_property_integer_6"
+    t.integer "dynamic_property_integer_7"
+    t.integer "dynamic_property_integer_8"
+    t.integer "dynamic_property_integer_9"
+    t.integer "dynamic_property_integer_10"
+    t.integer "dynamic_property_integer_11"
+    t.integer "dynamic_property_integer_12"
+    t.integer "dynamic_property_integer_13"
+    t.integer "dynamic_property_integer_14"
+    t.integer "dynamic_property_integer_15"
+    t.integer "dynamic_property_integer_16"
+    t.integer "dynamic_property_integer_17"
+    t.integer "dynamic_property_integer_18"
+    t.integer "dynamic_property_integer_19"
+    t.integer "dynamic_property_integer_20"
+    t.decimal "dynamic_property_decimal_1", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_2", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_3", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_4", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_5", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_6", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_7", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_8", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_9", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_10", precision: 15, scale: 4
+    t.boolean "dynamic_property_boolean_1"
+    t.boolean "dynamic_property_boolean_2"
+    t.boolean "dynamic_property_boolean_3"
+    t.boolean "dynamic_property_boolean_4"
+    t.boolean "dynamic_property_boolean_5"
+    t.boolean "dynamic_property_boolean_6"
+    t.boolean "dynamic_property_boolean_7"
+    t.boolean "dynamic_property_boolean_8"
+    t.boolean "dynamic_property_boolean_9"
+    t.boolean "dynamic_property_boolean_10"
+    t.boolean "dynamic_property_datetime_1"
+    t.boolean "dynamic_property_datetime_2"
+    t.boolean "dynamic_property_datetime_3"
+    t.boolean "dynamic_property_datetime_4"
+    t.boolean "dynamic_property_datetime_5"
+    t.boolean "dynamic_property_datetime_6"
+    t.boolean "dynamic_property_datetime_7"
+    t.boolean "dynamic_property_datetime_8"
+    t.boolean "dynamic_property_datetime_9"
+    t.boolean "dynamic_property_datetime_10"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["branch_id"], name: "index_project_groups_on_branch_id"
+    t.index ["business_type"], name: "index_project_groups_on_business_type"
     t.index ["category_id"], name: "index_project_groups_on_category_id"
     t.index ["company_id"], name: "index_project_groups_on_company_id"
     t.index ["discarded_at"], name: "index_project_groups_on_discarded_at"
+    t.index ["lifecycle_status"], name: "index_project_groups_on_lifecycle_status"
+    t.index ["workflow_status"], name: "index_project_groups_on_workflow_status"
   end
 
   create_table "projects", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -2109,13 +3640,86 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.jsonb "metadata", default: {}
     t.datetime "discarded_at"
     t.string "permission_resource_name"
+    t.string "dynamic_property_string_1"
+    t.string "dynamic_property_string_2"
+    t.string "dynamic_property_string_3"
+    t.string "dynamic_property_string_4"
+    t.string "dynamic_property_string_5"
+    t.string "dynamic_property_string_6"
+    t.string "dynamic_property_string_7"
+    t.string "dynamic_property_string_8"
+    t.string "dynamic_property_string_9"
+    t.string "dynamic_property_string_10"
+    t.string "dynamic_property_string_11"
+    t.string "dynamic_property_string_12"
+    t.string "dynamic_property_string_13"
+    t.string "dynamic_property_string_14"
+    t.string "dynamic_property_string_15"
+    t.string "dynamic_property_string_16"
+    t.string "dynamic_property_string_17"
+    t.string "dynamic_property_string_18"
+    t.string "dynamic_property_string_19"
+    t.string "dynamic_property_string_20"
+    t.integer "dynamic_property_integer_1"
+    t.integer "dynamic_property_integer_2"
+    t.integer "dynamic_property_integer_3"
+    t.integer "dynamic_property_integer_4"
+    t.integer "dynamic_property_integer_5"
+    t.integer "dynamic_property_integer_6"
+    t.integer "dynamic_property_integer_7"
+    t.integer "dynamic_property_integer_8"
+    t.integer "dynamic_property_integer_9"
+    t.integer "dynamic_property_integer_10"
+    t.integer "dynamic_property_integer_11"
+    t.integer "dynamic_property_integer_12"
+    t.integer "dynamic_property_integer_13"
+    t.integer "dynamic_property_integer_14"
+    t.integer "dynamic_property_integer_15"
+    t.integer "dynamic_property_integer_16"
+    t.integer "dynamic_property_integer_17"
+    t.integer "dynamic_property_integer_18"
+    t.integer "dynamic_property_integer_19"
+    t.integer "dynamic_property_integer_20"
+    t.decimal "dynamic_property_decimal_1", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_2", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_3", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_4", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_5", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_6", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_7", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_8", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_9", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_10", precision: 15, scale: 4
+    t.boolean "dynamic_property_boolean_1"
+    t.boolean "dynamic_property_boolean_2"
+    t.boolean "dynamic_property_boolean_3"
+    t.boolean "dynamic_property_boolean_4"
+    t.boolean "dynamic_property_boolean_5"
+    t.boolean "dynamic_property_boolean_6"
+    t.boolean "dynamic_property_boolean_7"
+    t.boolean "dynamic_property_boolean_8"
+    t.boolean "dynamic_property_boolean_9"
+    t.boolean "dynamic_property_boolean_10"
+    t.boolean "dynamic_property_datetime_1"
+    t.boolean "dynamic_property_datetime_2"
+    t.boolean "dynamic_property_datetime_3"
+    t.boolean "dynamic_property_datetime_4"
+    t.boolean "dynamic_property_datetime_5"
+    t.boolean "dynamic_property_datetime_6"
+    t.boolean "dynamic_property_datetime_7"
+    t.boolean "dynamic_property_datetime_8"
+    t.boolean "dynamic_property_datetime_9"
+    t.boolean "dynamic_property_datetime_10"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["branch_id"], name: "index_projects_on_branch_id"
+    t.index ["business_type"], name: "index_projects_on_business_type"
     t.index ["category_id"], name: "index_projects_on_category_id"
     t.index ["company_id"], name: "index_projects_on_company_id"
     t.index ["discarded_at"], name: "index_projects_on_discarded_at"
+    t.index ["lifecycle_status"], name: "index_projects_on_lifecycle_status"
     t.index ["project_group_id"], name: "index_projects_on_project_group_id"
+    t.index ["workflow_status"], name: "index_projects_on_workflow_status"
   end
 
   create_table "purchase_items", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -2140,18 +3744,91 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.jsonb "metadata", default: {}
     t.datetime "discarded_at"
     t.string "permission_resource_name"
+    t.string "dynamic_property_string_1"
+    t.string "dynamic_property_string_2"
+    t.string "dynamic_property_string_3"
+    t.string "dynamic_property_string_4"
+    t.string "dynamic_property_string_5"
+    t.string "dynamic_property_string_6"
+    t.string "dynamic_property_string_7"
+    t.string "dynamic_property_string_8"
+    t.string "dynamic_property_string_9"
+    t.string "dynamic_property_string_10"
+    t.string "dynamic_property_string_11"
+    t.string "dynamic_property_string_12"
+    t.string "dynamic_property_string_13"
+    t.string "dynamic_property_string_14"
+    t.string "dynamic_property_string_15"
+    t.string "dynamic_property_string_16"
+    t.string "dynamic_property_string_17"
+    t.string "dynamic_property_string_18"
+    t.string "dynamic_property_string_19"
+    t.string "dynamic_property_string_20"
+    t.integer "dynamic_property_integer_1"
+    t.integer "dynamic_property_integer_2"
+    t.integer "dynamic_property_integer_3"
+    t.integer "dynamic_property_integer_4"
+    t.integer "dynamic_property_integer_5"
+    t.integer "dynamic_property_integer_6"
+    t.integer "dynamic_property_integer_7"
+    t.integer "dynamic_property_integer_8"
+    t.integer "dynamic_property_integer_9"
+    t.integer "dynamic_property_integer_10"
+    t.integer "dynamic_property_integer_11"
+    t.integer "dynamic_property_integer_12"
+    t.integer "dynamic_property_integer_13"
+    t.integer "dynamic_property_integer_14"
+    t.integer "dynamic_property_integer_15"
+    t.integer "dynamic_property_integer_16"
+    t.integer "dynamic_property_integer_17"
+    t.integer "dynamic_property_integer_18"
+    t.integer "dynamic_property_integer_19"
+    t.integer "dynamic_property_integer_20"
+    t.decimal "dynamic_property_decimal_1", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_2", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_3", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_4", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_5", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_6", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_7", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_8", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_9", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_10", precision: 15, scale: 4
+    t.boolean "dynamic_property_boolean_1"
+    t.boolean "dynamic_property_boolean_2"
+    t.boolean "dynamic_property_boolean_3"
+    t.boolean "dynamic_property_boolean_4"
+    t.boolean "dynamic_property_boolean_5"
+    t.boolean "dynamic_property_boolean_6"
+    t.boolean "dynamic_property_boolean_7"
+    t.boolean "dynamic_property_boolean_8"
+    t.boolean "dynamic_property_boolean_9"
+    t.boolean "dynamic_property_boolean_10"
+    t.boolean "dynamic_property_datetime_1"
+    t.boolean "dynamic_property_datetime_2"
+    t.boolean "dynamic_property_datetime_3"
+    t.boolean "dynamic_property_datetime_4"
+    t.boolean "dynamic_property_datetime_5"
+    t.boolean "dynamic_property_datetime_6"
+    t.boolean "dynamic_property_datetime_7"
+    t.boolean "dynamic_property_datetime_8"
+    t.boolean "dynamic_property_datetime_9"
+    t.boolean "dynamic_property_datetime_10"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["barcode"], name: "index_purchase_items_on_barcode"
     t.index ["branch_id"], name: "index_purchase_items_on_branch_id"
+    t.index ["business_type"], name: "index_purchase_items_on_business_type"
     t.index ["category_id"], name: "index_purchase_items_on_category_id"
     t.index ["company_id"], name: "index_purchase_items_on_company_id"
     t.index ["discarded_at"], name: "index_purchase_items_on_discarded_at"
     t.index ["ean"], name: "index_purchase_items_on_ean"
+    t.index ["lifecycle_status"], name: "index_purchase_items_on_lifecycle_status"
     t.index ["purchase_id"], name: "index_purchase_items_on_purchase_id"
     t.index ["serial_number"], name: "index_purchase_items_on_serial_number"
     t.index ["sku"], name: "index_purchase_items_on_sku"
     t.index ["upc"], name: "index_purchase_items_on_upc"
+    t.index ["workflow_status"], name: "index_purchase_items_on_workflow_status"
   end
 
   create_table "purchases", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -2168,12 +3845,85 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.jsonb "metadata", default: {}
     t.datetime "discarded_at"
     t.string "permission_resource_name"
+    t.string "dynamic_property_string_1"
+    t.string "dynamic_property_string_2"
+    t.string "dynamic_property_string_3"
+    t.string "dynamic_property_string_4"
+    t.string "dynamic_property_string_5"
+    t.string "dynamic_property_string_6"
+    t.string "dynamic_property_string_7"
+    t.string "dynamic_property_string_8"
+    t.string "dynamic_property_string_9"
+    t.string "dynamic_property_string_10"
+    t.string "dynamic_property_string_11"
+    t.string "dynamic_property_string_12"
+    t.string "dynamic_property_string_13"
+    t.string "dynamic_property_string_14"
+    t.string "dynamic_property_string_15"
+    t.string "dynamic_property_string_16"
+    t.string "dynamic_property_string_17"
+    t.string "dynamic_property_string_18"
+    t.string "dynamic_property_string_19"
+    t.string "dynamic_property_string_20"
+    t.integer "dynamic_property_integer_1"
+    t.integer "dynamic_property_integer_2"
+    t.integer "dynamic_property_integer_3"
+    t.integer "dynamic_property_integer_4"
+    t.integer "dynamic_property_integer_5"
+    t.integer "dynamic_property_integer_6"
+    t.integer "dynamic_property_integer_7"
+    t.integer "dynamic_property_integer_8"
+    t.integer "dynamic_property_integer_9"
+    t.integer "dynamic_property_integer_10"
+    t.integer "dynamic_property_integer_11"
+    t.integer "dynamic_property_integer_12"
+    t.integer "dynamic_property_integer_13"
+    t.integer "dynamic_property_integer_14"
+    t.integer "dynamic_property_integer_15"
+    t.integer "dynamic_property_integer_16"
+    t.integer "dynamic_property_integer_17"
+    t.integer "dynamic_property_integer_18"
+    t.integer "dynamic_property_integer_19"
+    t.integer "dynamic_property_integer_20"
+    t.decimal "dynamic_property_decimal_1", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_2", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_3", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_4", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_5", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_6", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_7", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_8", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_9", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_10", precision: 15, scale: 4
+    t.boolean "dynamic_property_boolean_1"
+    t.boolean "dynamic_property_boolean_2"
+    t.boolean "dynamic_property_boolean_3"
+    t.boolean "dynamic_property_boolean_4"
+    t.boolean "dynamic_property_boolean_5"
+    t.boolean "dynamic_property_boolean_6"
+    t.boolean "dynamic_property_boolean_7"
+    t.boolean "dynamic_property_boolean_8"
+    t.boolean "dynamic_property_boolean_9"
+    t.boolean "dynamic_property_boolean_10"
+    t.boolean "dynamic_property_datetime_1"
+    t.boolean "dynamic_property_datetime_2"
+    t.boolean "dynamic_property_datetime_3"
+    t.boolean "dynamic_property_datetime_4"
+    t.boolean "dynamic_property_datetime_5"
+    t.boolean "dynamic_property_datetime_6"
+    t.boolean "dynamic_property_datetime_7"
+    t.boolean "dynamic_property_datetime_8"
+    t.boolean "dynamic_property_datetime_9"
+    t.boolean "dynamic_property_datetime_10"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["branch_id"], name: "index_purchases_on_branch_id"
+    t.index ["business_type"], name: "index_purchases_on_business_type"
     t.index ["category_id"], name: "index_purchases_on_category_id"
     t.index ["company_id"], name: "index_purchases_on_company_id"
     t.index ["discarded_at"], name: "index_purchases_on_discarded_at"
+    t.index ["lifecycle_status"], name: "index_purchases_on_lifecycle_status"
+    t.index ["workflow_status"], name: "index_purchases_on_workflow_status"
   end
 
   create_table "questions", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -2193,9 +3943,12 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["branch_id"], name: "index_questions_on_branch_id"
+    t.index ["business_type"], name: "index_questions_on_business_type"
     t.index ["category_id"], name: "index_questions_on_category_id"
     t.index ["company_id"], name: "index_questions_on_company_id"
     t.index ["discarded_at"], name: "index_questions_on_discarded_at"
+    t.index ["lifecycle_status"], name: "index_questions_on_lifecycle_status"
+    t.index ["workflow_status"], name: "index_questions_on_workflow_status"
   end
 
   create_table "reservation_appointments", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -2226,9 +3979,12 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.index ["appoint_from_type", "appoint_from_id"], name: "index_reservation_appointments_on_appoint_from"
     t.index ["appoint_to_type", "appoint_to_id"], name: "idx_on_appoint_to_type_appoint_to_id_fab15553a8"
     t.index ["appoint_to_type", "appoint_to_id"], name: "index_reservation_appointments_on_appoint_to"
+    t.index ["business_type"], name: "index_reservation_appointments_on_business_type"
     t.index ["company_id"], name: "index_reservation_appointments_on_company_id"
     t.index ["discarded_at"], name: "index_reservation_appointments_on_discarded_at"
+    t.index ["lifecycle_status"], name: "index_reservation_appointments_on_lifecycle_status"
     t.index ["reservation_id"], name: "index_reservation_appointments_on_reservation_id"
+    t.index ["workflow_status"], name: "index_reservation_appointments_on_workflow_status"
   end
 
   create_table "reservations", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -2237,8 +3993,86 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.integer "lifecycle_status"
     t.integer "workflow_status"
     t.integer "business_type"
+    t.datetime "expiration_date"
+    t.jsonb "metadata", default: {}
+    t.datetime "discarded_at"
+    t.string "permission_resource_name"
+    t.string "dynamic_property_string_1"
+    t.string "dynamic_property_string_2"
+    t.string "dynamic_property_string_3"
+    t.string "dynamic_property_string_4"
+    t.string "dynamic_property_string_5"
+    t.string "dynamic_property_string_6"
+    t.string "dynamic_property_string_7"
+    t.string "dynamic_property_string_8"
+    t.string "dynamic_property_string_9"
+    t.string "dynamic_property_string_10"
+    t.string "dynamic_property_string_11"
+    t.string "dynamic_property_string_12"
+    t.string "dynamic_property_string_13"
+    t.string "dynamic_property_string_14"
+    t.string "dynamic_property_string_15"
+    t.string "dynamic_property_string_16"
+    t.string "dynamic_property_string_17"
+    t.string "dynamic_property_string_18"
+    t.string "dynamic_property_string_19"
+    t.string "dynamic_property_string_20"
+    t.integer "dynamic_property_integer_1"
+    t.integer "dynamic_property_integer_2"
+    t.integer "dynamic_property_integer_3"
+    t.integer "dynamic_property_integer_4"
+    t.integer "dynamic_property_integer_5"
+    t.integer "dynamic_property_integer_6"
+    t.integer "dynamic_property_integer_7"
+    t.integer "dynamic_property_integer_8"
+    t.integer "dynamic_property_integer_9"
+    t.integer "dynamic_property_integer_10"
+    t.integer "dynamic_property_integer_11"
+    t.integer "dynamic_property_integer_12"
+    t.integer "dynamic_property_integer_13"
+    t.integer "dynamic_property_integer_14"
+    t.integer "dynamic_property_integer_15"
+    t.integer "dynamic_property_integer_16"
+    t.integer "dynamic_property_integer_17"
+    t.integer "dynamic_property_integer_18"
+    t.integer "dynamic_property_integer_19"
+    t.integer "dynamic_property_integer_20"
+    t.decimal "dynamic_property_decimal_1", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_2", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_3", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_4", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_5", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_6", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_7", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_8", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_9", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_10", precision: 15, scale: 4
+    t.boolean "dynamic_property_boolean_1"
+    t.boolean "dynamic_property_boolean_2"
+    t.boolean "dynamic_property_boolean_3"
+    t.boolean "dynamic_property_boolean_4"
+    t.boolean "dynamic_property_boolean_5"
+    t.boolean "dynamic_property_boolean_6"
+    t.boolean "dynamic_property_boolean_7"
+    t.boolean "dynamic_property_boolean_8"
+    t.boolean "dynamic_property_boolean_9"
+    t.boolean "dynamic_property_boolean_10"
+    t.boolean "dynamic_property_datetime_1"
+    t.boolean "dynamic_property_datetime_2"
+    t.boolean "dynamic_property_datetime_3"
+    t.boolean "dynamic_property_datetime_4"
+    t.boolean "dynamic_property_datetime_5"
+    t.boolean "dynamic_property_datetime_6"
+    t.boolean "dynamic_property_datetime_7"
+    t.boolean "dynamic_property_datetime_8"
+    t.boolean "dynamic_property_datetime_9"
+    t.boolean "dynamic_property_datetime_10"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["business_type"], name: "index_reservations_on_business_type"
+    t.index ["discarded_at"], name: "index_reservations_on_discarded_at"
+    t.index ["lifecycle_status"], name: "index_reservations_on_lifecycle_status"
+    t.index ["workflow_status"], name: "index_reservations_on_workflow_status"
   end
 
   create_table "role_appointments", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -2260,9 +4094,12 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.datetime "updated_at", null: false
     t.index ["appoint_to_type", "appoint_to_id"], name: "index_role_appointments_on_appoint_to"
     t.index ["appoint_to_type", "appoint_to_id"], name: "index_role_appointments_on_appoint_to_type_and_appoint_to_id"
+    t.index ["business_type"], name: "index_role_appointments_on_business_type"
     t.index ["company_id"], name: "index_role_appointments_on_company_id"
     t.index ["discarded_at"], name: "index_role_appointments_on_discarded_at"
+    t.index ["lifecycle_status"], name: "index_role_appointments_on_lifecycle_status"
     t.index ["role_id"], name: "index_role_appointments_on_role_id"
+    t.index ["workflow_status"], name: "index_role_appointments_on_workflow_status"
   end
 
   create_table "roles", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -2282,8 +4119,11 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["branch_id"], name: "index_roles_on_branch_id"
+    t.index ["business_type"], name: "index_roles_on_business_type"
     t.index ["company_id"], name: "index_roles_on_company_id"
     t.index ["discarded_at"], name: "index_roles_on_discarded_at"
+    t.index ["lifecycle_status"], name: "index_roles_on_lifecycle_status"
+    t.index ["workflow_status"], name: "index_roles_on_workflow_status"
   end
 
   create_table "service_appointments", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -2316,9 +4156,12 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.index ["appoint_from_type", "appoint_from_id"], name: "index_service_appointments_on_appoint_from"
     t.index ["appoint_to_type", "appoint_to_id"], name: "idx_on_appoint_to_type_appoint_to_id_25f7912f5f"
     t.index ["appoint_to_type", "appoint_to_id"], name: "index_service_appointments_on_appoint_to"
+    t.index ["business_type"], name: "index_service_appointments_on_business_type"
     t.index ["company_id"], name: "index_service_appointments_on_company_id"
     t.index ["discarded_at"], name: "index_service_appointments_on_discarded_at"
+    t.index ["lifecycle_status"], name: "index_service_appointments_on_lifecycle_status"
     t.index ["service_id"], name: "index_service_appointments_on_service_id"
+    t.index ["workflow_status"], name: "index_service_appointments_on_workflow_status"
   end
 
   create_table "service_group_appointments", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -2351,9 +4194,12 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.index ["appoint_from_type", "appoint_from_id"], name: "index_service_group_appointments_on_appoint_from"
     t.index ["appoint_to_type", "appoint_to_id"], name: "idx_on_appoint_to_type_appoint_to_id_9e69225799"
     t.index ["appoint_to_type", "appoint_to_id"], name: "index_service_group_appointments_on_appoint_to"
+    t.index ["business_type"], name: "index_service_group_appointments_on_business_type"
     t.index ["company_id"], name: "index_service_group_appointments_on_company_id"
     t.index ["discarded_at"], name: "index_service_group_appointments_on_discarded_at"
+    t.index ["lifecycle_status"], name: "index_service_group_appointments_on_lifecycle_status"
     t.index ["service_group_id"], name: "index_service_group_appointments_on_service_group_id"
+    t.index ["workflow_status"], name: "index_service_group_appointments_on_workflow_status"
   end
 
   create_table "service_groups", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -2372,12 +4218,85 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.jsonb "metadata", default: {}
     t.datetime "discarded_at"
     t.string "permission_resource_name"
+    t.string "dynamic_property_string_1"
+    t.string "dynamic_property_string_2"
+    t.string "dynamic_property_string_3"
+    t.string "dynamic_property_string_4"
+    t.string "dynamic_property_string_5"
+    t.string "dynamic_property_string_6"
+    t.string "dynamic_property_string_7"
+    t.string "dynamic_property_string_8"
+    t.string "dynamic_property_string_9"
+    t.string "dynamic_property_string_10"
+    t.string "dynamic_property_string_11"
+    t.string "dynamic_property_string_12"
+    t.string "dynamic_property_string_13"
+    t.string "dynamic_property_string_14"
+    t.string "dynamic_property_string_15"
+    t.string "dynamic_property_string_16"
+    t.string "dynamic_property_string_17"
+    t.string "dynamic_property_string_18"
+    t.string "dynamic_property_string_19"
+    t.string "dynamic_property_string_20"
+    t.integer "dynamic_property_integer_1"
+    t.integer "dynamic_property_integer_2"
+    t.integer "dynamic_property_integer_3"
+    t.integer "dynamic_property_integer_4"
+    t.integer "dynamic_property_integer_5"
+    t.integer "dynamic_property_integer_6"
+    t.integer "dynamic_property_integer_7"
+    t.integer "dynamic_property_integer_8"
+    t.integer "dynamic_property_integer_9"
+    t.integer "dynamic_property_integer_10"
+    t.integer "dynamic_property_integer_11"
+    t.integer "dynamic_property_integer_12"
+    t.integer "dynamic_property_integer_13"
+    t.integer "dynamic_property_integer_14"
+    t.integer "dynamic_property_integer_15"
+    t.integer "dynamic_property_integer_16"
+    t.integer "dynamic_property_integer_17"
+    t.integer "dynamic_property_integer_18"
+    t.integer "dynamic_property_integer_19"
+    t.integer "dynamic_property_integer_20"
+    t.decimal "dynamic_property_decimal_1", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_2", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_3", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_4", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_5", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_6", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_7", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_8", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_9", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_10", precision: 15, scale: 4
+    t.boolean "dynamic_property_boolean_1"
+    t.boolean "dynamic_property_boolean_2"
+    t.boolean "dynamic_property_boolean_3"
+    t.boolean "dynamic_property_boolean_4"
+    t.boolean "dynamic_property_boolean_5"
+    t.boolean "dynamic_property_boolean_6"
+    t.boolean "dynamic_property_boolean_7"
+    t.boolean "dynamic_property_boolean_8"
+    t.boolean "dynamic_property_boolean_9"
+    t.boolean "dynamic_property_boolean_10"
+    t.boolean "dynamic_property_datetime_1"
+    t.boolean "dynamic_property_datetime_2"
+    t.boolean "dynamic_property_datetime_3"
+    t.boolean "dynamic_property_datetime_4"
+    t.boolean "dynamic_property_datetime_5"
+    t.boolean "dynamic_property_datetime_6"
+    t.boolean "dynamic_property_datetime_7"
+    t.boolean "dynamic_property_datetime_8"
+    t.boolean "dynamic_property_datetime_9"
+    t.boolean "dynamic_property_datetime_10"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["branch_id"], name: "index_service_groups_on_branch_id"
+    t.index ["business_type"], name: "index_service_groups_on_business_type"
     t.index ["category_id"], name: "index_service_groups_on_category_id"
     t.index ["company_id"], name: "index_service_groups_on_company_id"
     t.index ["discarded_at"], name: "index_service_groups_on_discarded_at"
+    t.index ["lifecycle_status"], name: "index_service_groups_on_lifecycle_status"
+    t.index ["workflow_status"], name: "index_service_groups_on_workflow_status"
   end
 
   create_table "services", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -2396,12 +4315,85 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.jsonb "metadata", default: {}
     t.datetime "discarded_at"
     t.string "permission_resource_name"
+    t.string "dynamic_property_string_1"
+    t.string "dynamic_property_string_2"
+    t.string "dynamic_property_string_3"
+    t.string "dynamic_property_string_4"
+    t.string "dynamic_property_string_5"
+    t.string "dynamic_property_string_6"
+    t.string "dynamic_property_string_7"
+    t.string "dynamic_property_string_8"
+    t.string "dynamic_property_string_9"
+    t.string "dynamic_property_string_10"
+    t.string "dynamic_property_string_11"
+    t.string "dynamic_property_string_12"
+    t.string "dynamic_property_string_13"
+    t.string "dynamic_property_string_14"
+    t.string "dynamic_property_string_15"
+    t.string "dynamic_property_string_16"
+    t.string "dynamic_property_string_17"
+    t.string "dynamic_property_string_18"
+    t.string "dynamic_property_string_19"
+    t.string "dynamic_property_string_20"
+    t.integer "dynamic_property_integer_1"
+    t.integer "dynamic_property_integer_2"
+    t.integer "dynamic_property_integer_3"
+    t.integer "dynamic_property_integer_4"
+    t.integer "dynamic_property_integer_5"
+    t.integer "dynamic_property_integer_6"
+    t.integer "dynamic_property_integer_7"
+    t.integer "dynamic_property_integer_8"
+    t.integer "dynamic_property_integer_9"
+    t.integer "dynamic_property_integer_10"
+    t.integer "dynamic_property_integer_11"
+    t.integer "dynamic_property_integer_12"
+    t.integer "dynamic_property_integer_13"
+    t.integer "dynamic_property_integer_14"
+    t.integer "dynamic_property_integer_15"
+    t.integer "dynamic_property_integer_16"
+    t.integer "dynamic_property_integer_17"
+    t.integer "dynamic_property_integer_18"
+    t.integer "dynamic_property_integer_19"
+    t.integer "dynamic_property_integer_20"
+    t.decimal "dynamic_property_decimal_1", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_2", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_3", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_4", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_5", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_6", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_7", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_8", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_9", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_10", precision: 15, scale: 4
+    t.boolean "dynamic_property_boolean_1"
+    t.boolean "dynamic_property_boolean_2"
+    t.boolean "dynamic_property_boolean_3"
+    t.boolean "dynamic_property_boolean_4"
+    t.boolean "dynamic_property_boolean_5"
+    t.boolean "dynamic_property_boolean_6"
+    t.boolean "dynamic_property_boolean_7"
+    t.boolean "dynamic_property_boolean_8"
+    t.boolean "dynamic_property_boolean_9"
+    t.boolean "dynamic_property_boolean_10"
+    t.boolean "dynamic_property_datetime_1"
+    t.boolean "dynamic_property_datetime_2"
+    t.boolean "dynamic_property_datetime_3"
+    t.boolean "dynamic_property_datetime_4"
+    t.boolean "dynamic_property_datetime_5"
+    t.boolean "dynamic_property_datetime_6"
+    t.boolean "dynamic_property_datetime_7"
+    t.boolean "dynamic_property_datetime_8"
+    t.boolean "dynamic_property_datetime_9"
+    t.boolean "dynamic_property_datetime_10"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["branch_id"], name: "index_services_on_branch_id"
+    t.index ["business_type"], name: "index_services_on_business_type"
     t.index ["category_id"], name: "index_services_on_category_id"
     t.index ["company_id"], name: "index_services_on_company_id"
     t.index ["discarded_at"], name: "index_services_on_discarded_at"
+    t.index ["lifecycle_status"], name: "index_services_on_lifecycle_status"
+    t.index ["workflow_status"], name: "index_services_on_workflow_status"
   end
 
   create_table "sessions", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -2444,9 +4436,12 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.index ["appoint_from_type", "appoint_from_id"], name: "index_setting_appointments_on_appoint_from"
     t.index ["appoint_to_type", "appoint_to_id"], name: "idx_on_appoint_to_type_appoint_to_id_2604430405"
     t.index ["appoint_to_type", "appoint_to_id"], name: "index_setting_appointments_on_appoint_to"
+    t.index ["business_type"], name: "index_setting_appointments_on_business_type"
     t.index ["company_id"], name: "index_setting_appointments_on_company_id"
     t.index ["discarded_at"], name: "index_setting_appointments_on_discarded_at"
+    t.index ["lifecycle_status"], name: "index_setting_appointments_on_lifecycle_status"
     t.index ["setting_id"], name: "index_setting_appointments_on_setting_id"
+    t.index ["workflow_status"], name: "index_setting_appointments_on_workflow_status"
   end
 
   create_table "setting_group_appointments", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -2477,9 +4472,12 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.index ["appoint_from_type", "appoint_from_id"], name: "index_setting_group_appointments_on_appoint_from"
     t.index ["appoint_to_type", "appoint_to_id"], name: "idx_on_appoint_to_type_appoint_to_id_2769e0ab46"
     t.index ["appoint_to_type", "appoint_to_id"], name: "index_setting_group_appointments_on_appoint_to"
+    t.index ["business_type"], name: "index_setting_group_appointments_on_business_type"
     t.index ["company_id"], name: "index_setting_group_appointments_on_company_id"
     t.index ["discarded_at"], name: "index_setting_group_appointments_on_discarded_at"
+    t.index ["lifecycle_status"], name: "index_setting_group_appointments_on_lifecycle_status"
     t.index ["setting_group_id"], name: "index_setting_group_appointments_on_setting_group_id"
+    t.index ["workflow_status"], name: "index_setting_group_appointments_on_workflow_status"
   end
 
   create_table "setting_groups", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -2500,9 +4498,12 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["branch_id"], name: "index_setting_groups_on_branch_id"
+    t.index ["business_type"], name: "index_setting_groups_on_business_type"
     t.index ["category_id"], name: "index_setting_groups_on_category_id"
     t.index ["company_id"], name: "index_setting_groups_on_company_id"
     t.index ["discarded_at"], name: "index_setting_groups_on_discarded_at"
+    t.index ["lifecycle_status"], name: "index_setting_groups_on_lifecycle_status"
+    t.index ["workflow_status"], name: "index_setting_groups_on_workflow_status"
   end
 
   create_table "settings", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -2524,10 +4525,13 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["branch_id"], name: "index_settings_on_branch_id"
+    t.index ["business_type"], name: "index_settings_on_business_type"
     t.index ["category_id"], name: "index_settings_on_category_id"
     t.index ["company_id"], name: "index_settings_on_company_id"
     t.index ["discarded_at"], name: "index_settings_on_discarded_at"
+    t.index ["lifecycle_status"], name: "index_settings_on_lifecycle_status"
     t.index ["setting_group_id"], name: "index_settings_on_setting_group_id"
+    t.index ["workflow_status"], name: "index_settings_on_workflow_status"
   end
 
   create_table "shifts", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -2585,6 +4589,76 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.jsonb "metadata", default: {}
     t.datetime "discarded_at"
     t.string "permission_resource_name"
+    t.string "dynamic_property_string_1"
+    t.string "dynamic_property_string_2"
+    t.string "dynamic_property_string_3"
+    t.string "dynamic_property_string_4"
+    t.string "dynamic_property_string_5"
+    t.string "dynamic_property_string_6"
+    t.string "dynamic_property_string_7"
+    t.string "dynamic_property_string_8"
+    t.string "dynamic_property_string_9"
+    t.string "dynamic_property_string_10"
+    t.string "dynamic_property_string_11"
+    t.string "dynamic_property_string_12"
+    t.string "dynamic_property_string_13"
+    t.string "dynamic_property_string_14"
+    t.string "dynamic_property_string_15"
+    t.string "dynamic_property_string_16"
+    t.string "dynamic_property_string_17"
+    t.string "dynamic_property_string_18"
+    t.string "dynamic_property_string_19"
+    t.string "dynamic_property_string_20"
+    t.integer "dynamic_property_integer_1"
+    t.integer "dynamic_property_integer_2"
+    t.integer "dynamic_property_integer_3"
+    t.integer "dynamic_property_integer_4"
+    t.integer "dynamic_property_integer_5"
+    t.integer "dynamic_property_integer_6"
+    t.integer "dynamic_property_integer_7"
+    t.integer "dynamic_property_integer_8"
+    t.integer "dynamic_property_integer_9"
+    t.integer "dynamic_property_integer_10"
+    t.integer "dynamic_property_integer_11"
+    t.integer "dynamic_property_integer_12"
+    t.integer "dynamic_property_integer_13"
+    t.integer "dynamic_property_integer_14"
+    t.integer "dynamic_property_integer_15"
+    t.integer "dynamic_property_integer_16"
+    t.integer "dynamic_property_integer_17"
+    t.integer "dynamic_property_integer_18"
+    t.integer "dynamic_property_integer_19"
+    t.integer "dynamic_property_integer_20"
+    t.decimal "dynamic_property_decimal_1", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_2", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_3", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_4", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_5", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_6", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_7", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_8", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_9", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_10", precision: 15, scale: 4
+    t.boolean "dynamic_property_boolean_1"
+    t.boolean "dynamic_property_boolean_2"
+    t.boolean "dynamic_property_boolean_3"
+    t.boolean "dynamic_property_boolean_4"
+    t.boolean "dynamic_property_boolean_5"
+    t.boolean "dynamic_property_boolean_6"
+    t.boolean "dynamic_property_boolean_7"
+    t.boolean "dynamic_property_boolean_8"
+    t.boolean "dynamic_property_boolean_9"
+    t.boolean "dynamic_property_boolean_10"
+    t.boolean "dynamic_property_datetime_1"
+    t.boolean "dynamic_property_datetime_2"
+    t.boolean "dynamic_property_datetime_3"
+    t.boolean "dynamic_property_datetime_4"
+    t.boolean "dynamic_property_datetime_5"
+    t.boolean "dynamic_property_datetime_6"
+    t.boolean "dynamic_property_datetime_7"
+    t.boolean "dynamic_property_datetime_8"
+    t.boolean "dynamic_property_datetime_9"
+    t.boolean "dynamic_property_datetime_10"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["appoint_by_type", "appoint_by_id"], name: "index_stock_exports_on_appoint_by"
@@ -2592,10 +4666,13 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.index ["appoint_from_type", "appoint_from_id"], name: "index_stock_exports_on_appoint_from"
     t.index ["appoint_to_type", "appoint_to_id"], name: "index_stock_exports_on_appoint_to"
     t.index ["branch_id"], name: "index_stock_exports_on_branch_id"
+    t.index ["business_type"], name: "index_stock_exports_on_business_type"
     t.index ["category_id"], name: "index_stock_exports_on_category_id"
     t.index ["company_id"], name: "index_stock_exports_on_company_id"
     t.index ["discarded_at"], name: "index_stock_exports_on_discarded_at"
+    t.index ["lifecycle_status"], name: "index_stock_exports_on_lifecycle_status"
     t.index ["product_id"], name: "index_stock_exports_on_product_id"
+    t.index ["workflow_status"], name: "index_stock_exports_on_workflow_status"
   end
 
   create_table "stock_imports", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -2622,6 +4699,76 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.jsonb "metadata", default: {}
     t.datetime "discarded_at"
     t.string "permission_resource_name"
+    t.string "dynamic_property_string_1"
+    t.string "dynamic_property_string_2"
+    t.string "dynamic_property_string_3"
+    t.string "dynamic_property_string_4"
+    t.string "dynamic_property_string_5"
+    t.string "dynamic_property_string_6"
+    t.string "dynamic_property_string_7"
+    t.string "dynamic_property_string_8"
+    t.string "dynamic_property_string_9"
+    t.string "dynamic_property_string_10"
+    t.string "dynamic_property_string_11"
+    t.string "dynamic_property_string_12"
+    t.string "dynamic_property_string_13"
+    t.string "dynamic_property_string_14"
+    t.string "dynamic_property_string_15"
+    t.string "dynamic_property_string_16"
+    t.string "dynamic_property_string_17"
+    t.string "dynamic_property_string_18"
+    t.string "dynamic_property_string_19"
+    t.string "dynamic_property_string_20"
+    t.integer "dynamic_property_integer_1"
+    t.integer "dynamic_property_integer_2"
+    t.integer "dynamic_property_integer_3"
+    t.integer "dynamic_property_integer_4"
+    t.integer "dynamic_property_integer_5"
+    t.integer "dynamic_property_integer_6"
+    t.integer "dynamic_property_integer_7"
+    t.integer "dynamic_property_integer_8"
+    t.integer "dynamic_property_integer_9"
+    t.integer "dynamic_property_integer_10"
+    t.integer "dynamic_property_integer_11"
+    t.integer "dynamic_property_integer_12"
+    t.integer "dynamic_property_integer_13"
+    t.integer "dynamic_property_integer_14"
+    t.integer "dynamic_property_integer_15"
+    t.integer "dynamic_property_integer_16"
+    t.integer "dynamic_property_integer_17"
+    t.integer "dynamic_property_integer_18"
+    t.integer "dynamic_property_integer_19"
+    t.integer "dynamic_property_integer_20"
+    t.decimal "dynamic_property_decimal_1", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_2", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_3", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_4", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_5", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_6", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_7", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_8", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_9", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_10", precision: 15, scale: 4
+    t.boolean "dynamic_property_boolean_1"
+    t.boolean "dynamic_property_boolean_2"
+    t.boolean "dynamic_property_boolean_3"
+    t.boolean "dynamic_property_boolean_4"
+    t.boolean "dynamic_property_boolean_5"
+    t.boolean "dynamic_property_boolean_6"
+    t.boolean "dynamic_property_boolean_7"
+    t.boolean "dynamic_property_boolean_8"
+    t.boolean "dynamic_property_boolean_9"
+    t.boolean "dynamic_property_boolean_10"
+    t.boolean "dynamic_property_datetime_1"
+    t.boolean "dynamic_property_datetime_2"
+    t.boolean "dynamic_property_datetime_3"
+    t.boolean "dynamic_property_datetime_4"
+    t.boolean "dynamic_property_datetime_5"
+    t.boolean "dynamic_property_datetime_6"
+    t.boolean "dynamic_property_datetime_7"
+    t.boolean "dynamic_property_datetime_8"
+    t.boolean "dynamic_property_datetime_9"
+    t.boolean "dynamic_property_datetime_10"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["appoint_by_type", "appoint_by_id"], name: "index_stock_imports_on_appoint_by"
@@ -2629,10 +4776,13 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.index ["appoint_from_type", "appoint_from_id"], name: "index_stock_imports_on_appoint_from"
     t.index ["appoint_to_type", "appoint_to_id"], name: "index_stock_imports_on_appoint_to"
     t.index ["branch_id"], name: "index_stock_imports_on_branch_id"
+    t.index ["business_type"], name: "index_stock_imports_on_business_type"
     t.index ["category_id"], name: "index_stock_imports_on_category_id"
     t.index ["company_id"], name: "index_stock_imports_on_company_id"
     t.index ["discarded_at"], name: "index_stock_imports_on_discarded_at"
+    t.index ["lifecycle_status"], name: "index_stock_imports_on_lifecycle_status"
     t.index ["product_id"], name: "index_stock_imports_on_product_id"
+    t.index ["workflow_status"], name: "index_stock_imports_on_workflow_status"
   end
 
   create_table "stock_transfers", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -2659,6 +4809,76 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.jsonb "metadata", default: {}
     t.datetime "discarded_at"
     t.string "permission_resource_name"
+    t.string "dynamic_property_string_1"
+    t.string "dynamic_property_string_2"
+    t.string "dynamic_property_string_3"
+    t.string "dynamic_property_string_4"
+    t.string "dynamic_property_string_5"
+    t.string "dynamic_property_string_6"
+    t.string "dynamic_property_string_7"
+    t.string "dynamic_property_string_8"
+    t.string "dynamic_property_string_9"
+    t.string "dynamic_property_string_10"
+    t.string "dynamic_property_string_11"
+    t.string "dynamic_property_string_12"
+    t.string "dynamic_property_string_13"
+    t.string "dynamic_property_string_14"
+    t.string "dynamic_property_string_15"
+    t.string "dynamic_property_string_16"
+    t.string "dynamic_property_string_17"
+    t.string "dynamic_property_string_18"
+    t.string "dynamic_property_string_19"
+    t.string "dynamic_property_string_20"
+    t.integer "dynamic_property_integer_1"
+    t.integer "dynamic_property_integer_2"
+    t.integer "dynamic_property_integer_3"
+    t.integer "dynamic_property_integer_4"
+    t.integer "dynamic_property_integer_5"
+    t.integer "dynamic_property_integer_6"
+    t.integer "dynamic_property_integer_7"
+    t.integer "dynamic_property_integer_8"
+    t.integer "dynamic_property_integer_9"
+    t.integer "dynamic_property_integer_10"
+    t.integer "dynamic_property_integer_11"
+    t.integer "dynamic_property_integer_12"
+    t.integer "dynamic_property_integer_13"
+    t.integer "dynamic_property_integer_14"
+    t.integer "dynamic_property_integer_15"
+    t.integer "dynamic_property_integer_16"
+    t.integer "dynamic_property_integer_17"
+    t.integer "dynamic_property_integer_18"
+    t.integer "dynamic_property_integer_19"
+    t.integer "dynamic_property_integer_20"
+    t.decimal "dynamic_property_decimal_1", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_2", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_3", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_4", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_5", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_6", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_7", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_8", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_9", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_10", precision: 15, scale: 4
+    t.boolean "dynamic_property_boolean_1"
+    t.boolean "dynamic_property_boolean_2"
+    t.boolean "dynamic_property_boolean_3"
+    t.boolean "dynamic_property_boolean_4"
+    t.boolean "dynamic_property_boolean_5"
+    t.boolean "dynamic_property_boolean_6"
+    t.boolean "dynamic_property_boolean_7"
+    t.boolean "dynamic_property_boolean_8"
+    t.boolean "dynamic_property_boolean_9"
+    t.boolean "dynamic_property_boolean_10"
+    t.boolean "dynamic_property_datetime_1"
+    t.boolean "dynamic_property_datetime_2"
+    t.boolean "dynamic_property_datetime_3"
+    t.boolean "dynamic_property_datetime_4"
+    t.boolean "dynamic_property_datetime_5"
+    t.boolean "dynamic_property_datetime_6"
+    t.boolean "dynamic_property_datetime_7"
+    t.boolean "dynamic_property_datetime_8"
+    t.boolean "dynamic_property_datetime_9"
+    t.boolean "dynamic_property_datetime_10"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["appoint_by_type", "appoint_by_id"], name: "index_stock_transfers_on_appoint_by"
@@ -2666,10 +4886,13 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.index ["appoint_from_type", "appoint_from_id"], name: "index_stock_transfers_on_appoint_from"
     t.index ["appoint_to_type", "appoint_to_id"], name: "index_stock_transfers_on_appoint_to"
     t.index ["branch_id"], name: "index_stock_transfers_on_branch_id"
+    t.index ["business_type"], name: "index_stock_transfers_on_business_type"
     t.index ["category_id"], name: "index_stock_transfers_on_category_id"
     t.index ["company_id"], name: "index_stock_transfers_on_company_id"
     t.index ["discarded_at"], name: "index_stock_transfers_on_discarded_at"
+    t.index ["lifecycle_status"], name: "index_stock_transfers_on_lifecycle_status"
     t.index ["product_id"], name: "index_stock_transfers_on_product_id"
+    t.index ["workflow_status"], name: "index_stock_transfers_on_workflow_status"
   end
 
   create_table "stocks", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -2697,20 +4920,93 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.jsonb "metadata", default: {}
     t.datetime "discarded_at"
     t.string "permission_resource_name"
+    t.string "dynamic_property_string_1"
+    t.string "dynamic_property_string_2"
+    t.string "dynamic_property_string_3"
+    t.string "dynamic_property_string_4"
+    t.string "dynamic_property_string_5"
+    t.string "dynamic_property_string_6"
+    t.string "dynamic_property_string_7"
+    t.string "dynamic_property_string_8"
+    t.string "dynamic_property_string_9"
+    t.string "dynamic_property_string_10"
+    t.string "dynamic_property_string_11"
+    t.string "dynamic_property_string_12"
+    t.string "dynamic_property_string_13"
+    t.string "dynamic_property_string_14"
+    t.string "dynamic_property_string_15"
+    t.string "dynamic_property_string_16"
+    t.string "dynamic_property_string_17"
+    t.string "dynamic_property_string_18"
+    t.string "dynamic_property_string_19"
+    t.string "dynamic_property_string_20"
+    t.integer "dynamic_property_integer_1"
+    t.integer "dynamic_property_integer_2"
+    t.integer "dynamic_property_integer_3"
+    t.integer "dynamic_property_integer_4"
+    t.integer "dynamic_property_integer_5"
+    t.integer "dynamic_property_integer_6"
+    t.integer "dynamic_property_integer_7"
+    t.integer "dynamic_property_integer_8"
+    t.integer "dynamic_property_integer_9"
+    t.integer "dynamic_property_integer_10"
+    t.integer "dynamic_property_integer_11"
+    t.integer "dynamic_property_integer_12"
+    t.integer "dynamic_property_integer_13"
+    t.integer "dynamic_property_integer_14"
+    t.integer "dynamic_property_integer_15"
+    t.integer "dynamic_property_integer_16"
+    t.integer "dynamic_property_integer_17"
+    t.integer "dynamic_property_integer_18"
+    t.integer "dynamic_property_integer_19"
+    t.integer "dynamic_property_integer_20"
+    t.decimal "dynamic_property_decimal_1", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_2", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_3", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_4", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_5", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_6", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_7", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_8", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_9", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_10", precision: 15, scale: 4
+    t.boolean "dynamic_property_boolean_1"
+    t.boolean "dynamic_property_boolean_2"
+    t.boolean "dynamic_property_boolean_3"
+    t.boolean "dynamic_property_boolean_4"
+    t.boolean "dynamic_property_boolean_5"
+    t.boolean "dynamic_property_boolean_6"
+    t.boolean "dynamic_property_boolean_7"
+    t.boolean "dynamic_property_boolean_8"
+    t.boolean "dynamic_property_boolean_9"
+    t.boolean "dynamic_property_boolean_10"
+    t.boolean "dynamic_property_datetime_1"
+    t.boolean "dynamic_property_datetime_2"
+    t.boolean "dynamic_property_datetime_3"
+    t.boolean "dynamic_property_datetime_4"
+    t.boolean "dynamic_property_datetime_5"
+    t.boolean "dynamic_property_datetime_6"
+    t.boolean "dynamic_property_datetime_7"
+    t.boolean "dynamic_property_datetime_8"
+    t.boolean "dynamic_property_datetime_9"
+    t.boolean "dynamic_property_datetime_10"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["barcode"], name: "index_stocks_on_barcode"
     t.index ["branch_id"], name: "index_stocks_on_branch_id"
+    t.index ["business_type"], name: "index_stocks_on_business_type"
     t.index ["category_id"], name: "index_stocks_on_category_id"
     t.index ["company_id"], name: "index_stocks_on_company_id"
     t.index ["discarded_at"], name: "index_stocks_on_discarded_at"
     t.index ["ean"], name: "index_stocks_on_ean"
+    t.index ["lifecycle_status"], name: "index_stocks_on_lifecycle_status"
     t.index ["product_id", "warehouse_id"], name: "index_stocks_on_product_id_and_warehouse_id", unique: true
     t.index ["product_id"], name: "index_stocks_on_product_id"
     t.index ["serial_number"], name: "index_stocks_on_serial_number"
     t.index ["sku"], name: "index_stocks_on_sku"
     t.index ["upc"], name: "index_stocks_on_upc"
     t.index ["warehouse_id"], name: "index_stocks_on_warehouse_id"
+    t.index ["workflow_status"], name: "index_stocks_on_workflow_status"
   end
 
   create_table "subscription_groups", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -2733,10 +5029,13 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["branch_id"], name: "index_subscription_groups_on_branch_id"
+    t.index ["business_type"], name: "index_subscription_groups_on_business_type"
     t.index ["company_id"], name: "index_subscription_groups_on_company_id"
     t.index ["discarded_at"], name: "index_subscription_groups_on_discarded_at"
+    t.index ["lifecycle_status"], name: "index_subscription_groups_on_lifecycle_status"
     t.index ["subscription_group_id"], name: "index_subscription_groups_on_subscription_group_id"
     t.index ["subscription_plan_id"], name: "index_subscription_groups_on_subscription_plan_id"
+    t.index ["workflow_status"], name: "index_subscription_groups_on_workflow_status"
   end
 
   create_table "subscription_plan_appointments", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -2759,10 +5058,13 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["branch_id"], name: "index_subscription_plan_appointments_on_branch_id"
+    t.index ["business_type"], name: "index_subscription_plan_appointments_on_business_type"
     t.index ["company_id"], name: "index_subscription_plan_appointments_on_company_id"
     t.index ["discarded_at"], name: "index_subscription_plan_appointments_on_discarded_at"
+    t.index ["lifecycle_status"], name: "index_subscription_plan_appointments_on_lifecycle_status"
     t.index ["subscription_group_id"], name: "index_subscription_plan_appointments_on_subscription_group_id"
     t.index ["subscription_plan_id"], name: "index_subscription_plan_appointments_on_subscription_plan_id"
+    t.index ["workflow_status"], name: "index_subscription_plan_appointments_on_workflow_status"
   end
 
   create_table "subscription_plans", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -2785,8 +5087,11 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["branch_id"], name: "index_subscription_plans_on_branch_id"
+    t.index ["business_type"], name: "index_subscription_plans_on_business_type"
     t.index ["company_id"], name: "index_subscription_plans_on_company_id"
     t.index ["discarded_at"], name: "index_subscription_plans_on_discarded_at"
+    t.index ["lifecycle_status"], name: "index_subscription_plans_on_lifecycle_status"
+    t.index ["workflow_status"], name: "index_subscription_plans_on_workflow_status"
   end
 
   create_table "system_subscription_groups", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -2809,9 +5114,12 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["branch_id"], name: "index_system_subscription_groups_on_branch_id"
+    t.index ["business_type"], name: "index_system_subscription_groups_on_business_type"
     t.index ["company_id"], name: "index_system_subscription_groups_on_company_id"
     t.index ["discarded_at"], name: "index_system_subscription_groups_on_discarded_at"
+    t.index ["lifecycle_status"], name: "index_system_subscription_groups_on_lifecycle_status"
     t.index ["system_subscription_plan_id"], name: "idx_on_system_subscription_plan_id_2f2a083a8b"
+    t.index ["workflow_status"], name: "index_system_subscription_groups_on_workflow_status"
   end
 
   create_table "system_subscription_plans", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -2831,7 +5139,10 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["business_type"], name: "index_system_subscription_plans_on_business_type"
     t.index ["discarded_at"], name: "index_system_subscription_plans_on_discarded_at"
+    t.index ["lifecycle_status"], name: "index_system_subscription_plans_on_lifecycle_status"
+    t.index ["workflow_status"], name: "index_system_subscription_plans_on_workflow_status"
   end
 
   create_table "system_subscriptions", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -2854,10 +5165,13 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["branch_id"], name: "index_system_subscriptions_on_branch_id"
+    t.index ["business_type"], name: "index_system_subscriptions_on_business_type"
     t.index ["company_id"], name: "index_system_subscriptions_on_company_id"
     t.index ["discarded_at"], name: "index_system_subscriptions_on_discarded_at"
+    t.index ["lifecycle_status"], name: "index_system_subscriptions_on_lifecycle_status"
     t.index ["system_subscription_group_id"], name: "index_system_subscriptions_on_system_subscription_group_id"
     t.index ["system_subscription_plan_id"], name: "index_system_subscriptions_on_system_subscription_plan_id"
+    t.index ["workflow_status"], name: "index_system_subscriptions_on_workflow_status"
   end
 
   create_table "systems", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -2877,8 +5191,11 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["business_type"], name: "index_systems_on_business_type"
     t.index ["discarded_at"], name: "index_systems_on_discarded_at"
+    t.index ["lifecycle_status"], name: "index_systems_on_lifecycle_status"
     t.index ["name"], name: "index_systems_on_name", unique: true
+    t.index ["workflow_status"], name: "index_systems_on_workflow_status"
   end
 
   create_table "tag_appointments", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -2908,9 +5225,12 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.index ["appoint_from_type", "appoint_from_id"], name: "index_tag_appointments_on_appoint_from"
     t.index ["appoint_to_type", "appoint_to_id"], name: "index_tag_appointments_on_appoint_to"
     t.index ["appoint_to_type", "appoint_to_id"], name: "index_tag_appointments_on_appoint_to_type_and_appoint_to_id"
+    t.index ["business_type"], name: "index_tag_appointments_on_business_type"
     t.index ["company_id"], name: "index_tag_appointments_on_company_id"
     t.index ["discarded_at"], name: "index_tag_appointments_on_discarded_at"
+    t.index ["lifecycle_status"], name: "index_tag_appointments_on_lifecycle_status"
     t.index ["tag_id"], name: "index_tag_appointments_on_tag_id"
+    t.index ["workflow_status"], name: "index_tag_appointments_on_workflow_status"
   end
 
   create_table "tags", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -2928,8 +5248,11 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.datetime "discarded_at"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["business_type"], name: "index_tags_on_business_type"
     t.index ["company_id"], name: "index_tags_on_company_id"
     t.index ["discarded_at"], name: "index_tags_on_discarded_at"
+    t.index ["lifecycle_status"], name: "index_tags_on_lifecycle_status"
+    t.index ["workflow_status"], name: "index_tags_on_workflow_status"
   end
 
   create_table "task_appointments", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -2960,9 +5283,12 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.index ["appoint_from_type", "appoint_from_id"], name: "index_task_appointments_on_appoint_from"
     t.index ["appoint_to_type", "appoint_to_id"], name: "index_task_appointments_on_appoint_to"
     t.index ["appoint_to_type", "appoint_to_id"], name: "index_task_appointments_on_appoint_to_type_and_appoint_to_id"
+    t.index ["business_type"], name: "index_task_appointments_on_business_type"
     t.index ["company_id"], name: "index_task_appointments_on_company_id"
     t.index ["discarded_at"], name: "index_task_appointments_on_discarded_at"
+    t.index ["lifecycle_status"], name: "index_task_appointments_on_lifecycle_status"
     t.index ["task_id"], name: "index_task_appointments_on_task_id"
+    t.index ["workflow_status"], name: "index_task_appointments_on_workflow_status"
   end
 
   create_table "task_group_appointments", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -2993,9 +5319,12 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.index ["appoint_from_type", "appoint_from_id"], name: "index_task_group_appointments_on_appoint_from"
     t.index ["appoint_to_type", "appoint_to_id"], name: "idx_on_appoint_to_type_appoint_to_id_bd79761d5f"
     t.index ["appoint_to_type", "appoint_to_id"], name: "index_task_group_appointments_on_appoint_to"
+    t.index ["business_type"], name: "index_task_group_appointments_on_business_type"
     t.index ["company_id"], name: "index_task_group_appointments_on_company_id"
     t.index ["discarded_at"], name: "index_task_group_appointments_on_discarded_at"
+    t.index ["lifecycle_status"], name: "index_task_group_appointments_on_lifecycle_status"
     t.index ["task_group_id"], name: "index_task_group_appointments_on_task_group_id"
+    t.index ["workflow_status"], name: "index_task_group_appointments_on_workflow_status"
   end
 
   create_table "task_groups", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -3012,12 +5341,85 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.jsonb "metadata", default: {}
     t.datetime "discarded_at"
     t.string "permission_resource_name"
+    t.string "dynamic_property_string_1"
+    t.string "dynamic_property_string_2"
+    t.string "dynamic_property_string_3"
+    t.string "dynamic_property_string_4"
+    t.string "dynamic_property_string_5"
+    t.string "dynamic_property_string_6"
+    t.string "dynamic_property_string_7"
+    t.string "dynamic_property_string_8"
+    t.string "dynamic_property_string_9"
+    t.string "dynamic_property_string_10"
+    t.string "dynamic_property_string_11"
+    t.string "dynamic_property_string_12"
+    t.string "dynamic_property_string_13"
+    t.string "dynamic_property_string_14"
+    t.string "dynamic_property_string_15"
+    t.string "dynamic_property_string_16"
+    t.string "dynamic_property_string_17"
+    t.string "dynamic_property_string_18"
+    t.string "dynamic_property_string_19"
+    t.string "dynamic_property_string_20"
+    t.integer "dynamic_property_integer_1"
+    t.integer "dynamic_property_integer_2"
+    t.integer "dynamic_property_integer_3"
+    t.integer "dynamic_property_integer_4"
+    t.integer "dynamic_property_integer_5"
+    t.integer "dynamic_property_integer_6"
+    t.integer "dynamic_property_integer_7"
+    t.integer "dynamic_property_integer_8"
+    t.integer "dynamic_property_integer_9"
+    t.integer "dynamic_property_integer_10"
+    t.integer "dynamic_property_integer_11"
+    t.integer "dynamic_property_integer_12"
+    t.integer "dynamic_property_integer_13"
+    t.integer "dynamic_property_integer_14"
+    t.integer "dynamic_property_integer_15"
+    t.integer "dynamic_property_integer_16"
+    t.integer "dynamic_property_integer_17"
+    t.integer "dynamic_property_integer_18"
+    t.integer "dynamic_property_integer_19"
+    t.integer "dynamic_property_integer_20"
+    t.decimal "dynamic_property_decimal_1", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_2", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_3", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_4", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_5", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_6", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_7", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_8", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_9", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_10", precision: 15, scale: 4
+    t.boolean "dynamic_property_boolean_1"
+    t.boolean "dynamic_property_boolean_2"
+    t.boolean "dynamic_property_boolean_3"
+    t.boolean "dynamic_property_boolean_4"
+    t.boolean "dynamic_property_boolean_5"
+    t.boolean "dynamic_property_boolean_6"
+    t.boolean "dynamic_property_boolean_7"
+    t.boolean "dynamic_property_boolean_8"
+    t.boolean "dynamic_property_boolean_9"
+    t.boolean "dynamic_property_boolean_10"
+    t.boolean "dynamic_property_datetime_1"
+    t.boolean "dynamic_property_datetime_2"
+    t.boolean "dynamic_property_datetime_3"
+    t.boolean "dynamic_property_datetime_4"
+    t.boolean "dynamic_property_datetime_5"
+    t.boolean "dynamic_property_datetime_6"
+    t.boolean "dynamic_property_datetime_7"
+    t.boolean "dynamic_property_datetime_8"
+    t.boolean "dynamic_property_datetime_9"
+    t.boolean "dynamic_property_datetime_10"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["branch_id"], name: "index_task_groups_on_branch_id"
+    t.index ["business_type"], name: "index_task_groups_on_business_type"
     t.index ["category_id"], name: "index_task_groups_on_category_id"
     t.index ["company_id"], name: "index_task_groups_on_company_id"
     t.index ["discarded_at"], name: "index_task_groups_on_discarded_at"
+    t.index ["lifecycle_status"], name: "index_task_groups_on_lifecycle_status"
+    t.index ["workflow_status"], name: "index_task_groups_on_workflow_status"
   end
 
   create_table "tasks", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -3036,13 +5438,86 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.jsonb "metadata", default: {}
     t.datetime "discarded_at"
     t.string "permission_resource_name"
+    t.string "dynamic_property_string_1"
+    t.string "dynamic_property_string_2"
+    t.string "dynamic_property_string_3"
+    t.string "dynamic_property_string_4"
+    t.string "dynamic_property_string_5"
+    t.string "dynamic_property_string_6"
+    t.string "dynamic_property_string_7"
+    t.string "dynamic_property_string_8"
+    t.string "dynamic_property_string_9"
+    t.string "dynamic_property_string_10"
+    t.string "dynamic_property_string_11"
+    t.string "dynamic_property_string_12"
+    t.string "dynamic_property_string_13"
+    t.string "dynamic_property_string_14"
+    t.string "dynamic_property_string_15"
+    t.string "dynamic_property_string_16"
+    t.string "dynamic_property_string_17"
+    t.string "dynamic_property_string_18"
+    t.string "dynamic_property_string_19"
+    t.string "dynamic_property_string_20"
+    t.integer "dynamic_property_integer_1"
+    t.integer "dynamic_property_integer_2"
+    t.integer "dynamic_property_integer_3"
+    t.integer "dynamic_property_integer_4"
+    t.integer "dynamic_property_integer_5"
+    t.integer "dynamic_property_integer_6"
+    t.integer "dynamic_property_integer_7"
+    t.integer "dynamic_property_integer_8"
+    t.integer "dynamic_property_integer_9"
+    t.integer "dynamic_property_integer_10"
+    t.integer "dynamic_property_integer_11"
+    t.integer "dynamic_property_integer_12"
+    t.integer "dynamic_property_integer_13"
+    t.integer "dynamic_property_integer_14"
+    t.integer "dynamic_property_integer_15"
+    t.integer "dynamic_property_integer_16"
+    t.integer "dynamic_property_integer_17"
+    t.integer "dynamic_property_integer_18"
+    t.integer "dynamic_property_integer_19"
+    t.integer "dynamic_property_integer_20"
+    t.decimal "dynamic_property_decimal_1", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_2", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_3", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_4", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_5", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_6", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_7", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_8", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_9", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_10", precision: 15, scale: 4
+    t.boolean "dynamic_property_boolean_1"
+    t.boolean "dynamic_property_boolean_2"
+    t.boolean "dynamic_property_boolean_3"
+    t.boolean "dynamic_property_boolean_4"
+    t.boolean "dynamic_property_boolean_5"
+    t.boolean "dynamic_property_boolean_6"
+    t.boolean "dynamic_property_boolean_7"
+    t.boolean "dynamic_property_boolean_8"
+    t.boolean "dynamic_property_boolean_9"
+    t.boolean "dynamic_property_boolean_10"
+    t.boolean "dynamic_property_datetime_1"
+    t.boolean "dynamic_property_datetime_2"
+    t.boolean "dynamic_property_datetime_3"
+    t.boolean "dynamic_property_datetime_4"
+    t.boolean "dynamic_property_datetime_5"
+    t.boolean "dynamic_property_datetime_6"
+    t.boolean "dynamic_property_datetime_7"
+    t.boolean "dynamic_property_datetime_8"
+    t.boolean "dynamic_property_datetime_9"
+    t.boolean "dynamic_property_datetime_10"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["branch_id"], name: "index_tasks_on_branch_id"
+    t.index ["business_type"], name: "index_tasks_on_business_type"
     t.index ["category_id"], name: "index_tasks_on_category_id"
     t.index ["company_id"], name: "index_tasks_on_company_id"
     t.index ["discarded_at"], name: "index_tasks_on_discarded_at"
+    t.index ["lifecycle_status"], name: "index_tasks_on_lifecycle_status"
     t.index ["task_group_id"], name: "index_tasks_on_task_group_id"
+    t.index ["workflow_status"], name: "index_tasks_on_workflow_status"
   end
 
   create_table "users", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -3070,12 +5545,15 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["business_type"], name: "index_users_on_business_type"
     t.index ["discarded_at"], name: "index_users_on_discarded_at"
     t.index ["email"], name: "index_users_on_email", unique: true
+    t.index ["lifecycle_status"], name: "index_users_on_lifecycle_status"
     t.index ["parent_user_id"], name: "index_users_on_parent_user_id"
     t.index ["single_access_token"], name: "index_users_on_single_access_token", unique: true
     t.index ["uid"], name: "index_users_on_uid", unique: true
     t.index ["username"], name: "index_users_on_username", unique: true
+    t.index ["workflow_status"], name: "index_users_on_workflow_status"
   end
 
   create_table "versions", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -3103,12 +5581,85 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.jsonb "metadata", default: {}
     t.datetime "discarded_at"
     t.string "permission_resource_name"
+    t.string "dynamic_property_string_1"
+    t.string "dynamic_property_string_2"
+    t.string "dynamic_property_string_3"
+    t.string "dynamic_property_string_4"
+    t.string "dynamic_property_string_5"
+    t.string "dynamic_property_string_6"
+    t.string "dynamic_property_string_7"
+    t.string "dynamic_property_string_8"
+    t.string "dynamic_property_string_9"
+    t.string "dynamic_property_string_10"
+    t.string "dynamic_property_string_11"
+    t.string "dynamic_property_string_12"
+    t.string "dynamic_property_string_13"
+    t.string "dynamic_property_string_14"
+    t.string "dynamic_property_string_15"
+    t.string "dynamic_property_string_16"
+    t.string "dynamic_property_string_17"
+    t.string "dynamic_property_string_18"
+    t.string "dynamic_property_string_19"
+    t.string "dynamic_property_string_20"
+    t.integer "dynamic_property_integer_1"
+    t.integer "dynamic_property_integer_2"
+    t.integer "dynamic_property_integer_3"
+    t.integer "dynamic_property_integer_4"
+    t.integer "dynamic_property_integer_5"
+    t.integer "dynamic_property_integer_6"
+    t.integer "dynamic_property_integer_7"
+    t.integer "dynamic_property_integer_8"
+    t.integer "dynamic_property_integer_9"
+    t.integer "dynamic_property_integer_10"
+    t.integer "dynamic_property_integer_11"
+    t.integer "dynamic_property_integer_12"
+    t.integer "dynamic_property_integer_13"
+    t.integer "dynamic_property_integer_14"
+    t.integer "dynamic_property_integer_15"
+    t.integer "dynamic_property_integer_16"
+    t.integer "dynamic_property_integer_17"
+    t.integer "dynamic_property_integer_18"
+    t.integer "dynamic_property_integer_19"
+    t.integer "dynamic_property_integer_20"
+    t.decimal "dynamic_property_decimal_1", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_2", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_3", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_4", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_5", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_6", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_7", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_8", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_9", precision: 15, scale: 4
+    t.decimal "dynamic_property_decimal_10", precision: 15, scale: 4
+    t.boolean "dynamic_property_boolean_1"
+    t.boolean "dynamic_property_boolean_2"
+    t.boolean "dynamic_property_boolean_3"
+    t.boolean "dynamic_property_boolean_4"
+    t.boolean "dynamic_property_boolean_5"
+    t.boolean "dynamic_property_boolean_6"
+    t.boolean "dynamic_property_boolean_7"
+    t.boolean "dynamic_property_boolean_8"
+    t.boolean "dynamic_property_boolean_9"
+    t.boolean "dynamic_property_boolean_10"
+    t.boolean "dynamic_property_datetime_1"
+    t.boolean "dynamic_property_datetime_2"
+    t.boolean "dynamic_property_datetime_3"
+    t.boolean "dynamic_property_datetime_4"
+    t.boolean "dynamic_property_datetime_5"
+    t.boolean "dynamic_property_datetime_6"
+    t.boolean "dynamic_property_datetime_7"
+    t.boolean "dynamic_property_datetime_8"
+    t.boolean "dynamic_property_datetime_9"
+    t.boolean "dynamic_property_datetime_10"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["branch_id"], name: "index_warehouses_on_branch_id"
+    t.index ["business_type"], name: "index_warehouses_on_business_type"
     t.index ["category_id"], name: "index_warehouses_on_category_id"
     t.index ["company_id"], name: "index_warehouses_on_company_id"
     t.index ["discarded_at"], name: "index_warehouses_on_discarded_at"
+    t.index ["lifecycle_status"], name: "index_warehouses_on_lifecycle_status"
+    t.index ["workflow_status"], name: "index_warehouses_on_workflow_status"
   end
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"

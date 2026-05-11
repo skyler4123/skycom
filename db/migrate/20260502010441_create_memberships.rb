@@ -4,9 +4,21 @@ class CreateMemberships < ActiveRecord::Migration[8.0]
       t.string :name
       t.string :code, null: false
 
-      t.integer :lifecycle_status
-      t.integer :workflow_status
-      t.integer :business_type
+      # --- System Fields ---
+      t.integer  :lifecycle_status, index: true
+      t.integer  :workflow_status, index: true
+      t.integer  :business_type, index: true
+      t.datetime :expiration_date
+      t.jsonb    :metadata,       default: {}
+      t.datetime :discarded_at,   index: true
+      t.string   :permission_resource_name
+
+      # --- Dynamic Fields ---
+      1.upto(20) { |i| t.string "dynamic_property_string_#{i}" }
+      1.upto(20) { |i| t.integer "dynamic_property_integer_#{i}" }
+      1.upto(10)  { |i| t.decimal "dynamic_property_decimal_#{i}", precision: 15, scale: 4 }
+      1.upto(10)  { |i| t.boolean "dynamic_property_boolean_#{i}" }
+      1.upto(10)  { |i| t.boolean "dynamic_property_datetime_#{i}" }
 
       t.timestamps
     end

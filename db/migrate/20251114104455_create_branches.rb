@@ -42,7 +42,7 @@ class CreateBranches < ActiveRecord::Migration[8.0]
       t.datetime :discarded_at,   index: true
       t.string   :permission_resource_name, default: "Branch"
 
-      # --- Permanent Generic Slots (The "No Migration" Guarantee) ---
+      # --- Dynamic Fields ---
       1.upto(20) { |i| t.string "dynamic_property_string_#{i}" }
       1.upto(20) { |i| t.integer "dynamic_property_integer_#{i}" }
       1.upto(10)  { |i| t.decimal "dynamic_property_decimal_#{i}", precision: 15, scale: 4 }
