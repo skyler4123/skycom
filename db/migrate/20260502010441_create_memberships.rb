@@ -1,6 +1,6 @@
 class CreateMemberships < ActiveRecord::Migration[8.0]
   def change
-    create_table :memberships, id: :uuid do |t|
+    create_table :memberships, id: :uuid, default: -> { "uuidv7()" } do |t|
       t.string :name
       t.string :code, null: false
 

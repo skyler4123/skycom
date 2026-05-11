@@ -1,6 +1,6 @@
 class CreateCarts < ActiveRecord::Migration[8.0]
   def change
-    create_table :carts, id: :uuid do |t|
+    create_table :carts, id: :uuid, default: -> { "uuidv7()" } do |t|
       t.references :company, null: false, foreign_key: true, type: :uuid
       t.references :branch, null: true, foreign_key: true, type: :uuid
       t.references :cart_group, null: false, foreign_key: true, type: :uuid

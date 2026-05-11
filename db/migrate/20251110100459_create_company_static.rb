@@ -1,6 +1,6 @@
 class CreateCompanyStatic < ActiveRecord::Migration[8.0]
   def change
-    create_table :company_statics, id: :uuid do |t|
+    create_table :company_statics, id: :uuid, default: -> { "uuidv7()" } do |t|
       t.references :company, null: false, foreign_key: true, type: :uuid
       t.string :name
 

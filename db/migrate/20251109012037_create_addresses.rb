@@ -1,6 +1,6 @@
 class CreateAddresses < ActiveRecord::Migration[8.0]
   def change
-    create_table :addresses, id: :uuid do |t|
+    create_table :addresses, id: :uuid, default: -> { "uuidv7()" } do |t|
       # Standard Address Fields
       t.string :line_1, null: false
       t.string :line_2                    # Optional (Apt, Suite, Unit)

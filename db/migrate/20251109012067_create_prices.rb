@@ -1,6 +1,6 @@
 class CreatePrices < ActiveRecord::Migration[8.0]
   def change
-    create_table :prices, id: :uuid do |t|
+    create_table :prices, id: :uuid, default: -> { "uuidv7()" } do |t|
       # High precision for amount (same as before)
       t.integer :amount
 

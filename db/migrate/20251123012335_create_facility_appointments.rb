@@ -1,6 +1,6 @@
 class CreateFacilityAppointments < ActiveRecord::Migration[8.0]
   def change
-    create_table :facility_appointments, id: :uuid do |t|
+    create_table :facility_appointments, id: :uuid, default: -> { "uuidv7()" } do |t|
       t.references :company, null: false, foreign_key: true, type: :uuid
       t.references :facility, null: false, foreign_key: true, type: :uuid
       t.references :appoint_from, polymorphic: true, null: true, type: :uuid

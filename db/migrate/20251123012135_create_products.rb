@@ -1,6 +1,6 @@
 class CreateProducts < ActiveRecord::Migration[8.0]
   def change
-    create_table :products, id: :uuid do |t|
+    create_table :products, id: :uuid, default: -> { "uuidv7()" } do |t|
       # --- Base Identity ---
       t.references :company, null: false, foreign_key: true, type: :uuid
       t.references :branch,  null: true,  foreign_key: true, type: :uuid
