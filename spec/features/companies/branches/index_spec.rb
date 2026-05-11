@@ -5,13 +5,7 @@ RSpec.feature "Companies::Branches Management", type: :feature, js: true do
   let(:company) { branch.company }
   let(:owner) { company.user }
 
-  let!(:branch2) do
-    create(:branch,
-      company: company,
-      business_type: "warehouse",
-      city: "Ho Chi Minh City"
-    )
-  end
+  let!(:branch2) { create(:branch, company: company, business_type: "warehouse") }
 
   before do
     sign_in(owner)
@@ -24,7 +18,6 @@ RSpec.feature "Companies::Branches Management", type: :feature, js: true do
 
     expect(page).to have_selector('th', text: 'Branch Name')
     expect(page).to have_selector('th', text: 'Type')
-    expect(page).to have_selector('th', text: 'City')
     expect(page).to have_selector('th', text: 'Status')
 
     expect(page).to have_selector('tbody tr')
@@ -42,7 +35,6 @@ RSpec.feature "Companies::Branches Management", type: :feature, js: true do
     expect(page).to have_selector('input[name="branch[name]"]', wait: 5)
     fill_in 'branch[name]', with: 'New Test Branch'
     select 'Headquarters', from: 'branch[business_type]'
-    fill_in 'branch[city]', with: 'Da Nang'
 
     begin
       click_button "Save Branch"
@@ -122,12 +114,7 @@ RSpec.feature "Companies::Branches Management", type: :feature, js: true do
     expect(page).to have_selector('span.rounded-full', wait: 10)
   end
 
-  scenario "display branch city" do
-    visit company_branches_path(company)
-    expect(page).to have_selector('table', wait: 10)
 
-    expect(page).to have_content("Ho Chi Minh City")
-  end
 
   scenario "clear filters resets URL and shows all branches" do
     visit company_branches_path(company, business_type: "warehouse")
@@ -192,31 +179,6 @@ RSpec.feature "Companies::Branches Management", type: :feature, js: true do
     expect(Branch.find_by(id: branch.id).description).to eq("Updated description for this branch")
   end
 
-  scenario "update branch city via show modal" do
-    visit company_branches_path(company)
-    expect(page).to have_selector('table', wait: 10)
-
-    target_row = find('tbody tr', text: branch.name)
-    target_row.find('[data-action*="openShowModal"]').click
-
-    expect(page).to have_selector('.swal2-container', wait: 10)
-
-    all_editable = all('[data-controller="editable"]')
-    city_editable = all_editable[4]
-    city_editable.click
-
-    expect(page).to have_selector('.editable-input', wait: 5)
-
-    city_editable.find('.editable-input').fill_in(with: 'Hanoi')
-
-    accept_confirm do
-      city_editable.find('.editable-input').send_keys :enter
-    end
-
-    expect(page).to have_selector('tbody tr', wait: 10)
-    expect(Branch.find_by(id: branch.id).city).to eq("Hanoi")
-  end
-
   scenario "update branch phone number via show modal" do
     visit company_branches_path(company)
     expect(page).to have_selector('table', wait: 10)
@@ -227,7 +189,7 @@ RSpec.feature "Companies::Branches Management", type: :feature, js: true do
     expect(page).to have_selector('.swal2-container', wait: 10)
 
     all_editable = all('[data-controller="editable"]')
-    phone_editable = all_editable[5]
+    phone_editable = all_editable[4]
     phone_editable.click
 
     expect(page).to have_selector('.editable-input', wait: 5)

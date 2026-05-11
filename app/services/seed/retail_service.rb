@@ -114,20 +114,7 @@ class Seed::RetailService
         company: @retail
       )
       branch.attach_tag(key: "Branch #{branch.id} Tag")
-
-      if branch.address_line_1.present?
-        address = Address.find_or_create_by!(
-          line_1: branch.address_line_1,
-          city: branch.city,
-          postal_code: branch.postal_code,
-          country_code: branch.country_code
-        )
-        AddressAppointment.find_or_create_by!(
-          appoint_to: branch,
-          address: address,
-          business_type: :shipping
-        )
-      end
+      branch.address = Seed::AddressService.create
 
       @branches << branch
     end

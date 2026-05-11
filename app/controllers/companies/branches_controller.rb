@@ -56,8 +56,6 @@ class Companies::BranchesController < Companies::ApplicationController
       :description,
       :business_type,
       :workflow_status,
-      :address_line_1,
-      :city,
       :country_code,
       :phone_number,
       :email
@@ -65,12 +63,23 @@ class Companies::BranchesController < Companies::ApplicationController
   end
 
   def format_branch(branch)
-    branch.as_json(only: [
-      :id, :name, :description, :code, :business_type,
-      :lifecycle_status, :workflow_status, :address_line_1,
-      :city, :country_code, :phone_number, :email,
-      :employee_count, :created_at, :updated_at
-    ])
+    result = {
+      id: branch.id,
+      name: branch.name,
+      description: branch.description,
+      code: branch.code,
+      business_type: branch.business_type,
+      lifecycle_status: branch.lifecycle_status,
+      workflow_status: branch.workflow_status,
+      country_code: branch.country_code,
+      phone_number: branch.phone_number,
+      email: branch.email,
+      employee_count: branch.employee_count,
+      created_at: branch.created_at,
+      updated_at: branch.updated_at
+    }
+    result[:address] = branch.address.as_json(only: [ :line_1, :line_2, :city, :state_or_province, :postal_code, :country_code ]) if branch.address
+    result
   end
 
   def format_branches(branches)

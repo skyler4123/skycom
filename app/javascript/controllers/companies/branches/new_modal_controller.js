@@ -51,13 +51,7 @@ export default class Companies_Branches_NewModalController extends Controller {
             </select>
           </div>
 
-          <div class="space-y-1">
-            <label class="text-[10px] font-bold text-slate-400 dark:text-slate-300 uppercase tracking-wider">City</label>
-            <input type="text" name="branch[city]" placeholder="e.g. Ho Chi Minh City"
-              class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-sm text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none placeholder:text-slate-400 dark:placeholder:text-slate-500">
-          </div>
-
-          <div class="space-y-1">
+          
             <label class="text-[10px] font-bold text-slate-400 dark:text-slate-300 uppercase tracking-wider">Phone Number</label>
             <input type="text" name="branch[phone_number]" placeholder="e.g. +84 123 456 789"
               class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-sm text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none placeholder:text-slate-400 dark:placeholder:text-slate-500">
@@ -70,13 +64,7 @@ export default class Companies_Branches_NewModalController extends Controller {
           </div>
         </div>
 
-        <div class="space-y-1">
-          <label class="text-[10px] font-bold text-slate-400 dark:text-slate-300 uppercase tracking-wider">Address</label>
-          <input type="text" name="branch[address_line_1]" placeholder="e.g. 123 Main Street, District 1"
-            class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-sm text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none placeholder:text-slate-400 dark:placeholder:text-slate-500">
-        </div>
-
-        <div class="space-y-1">
+        
           <label class="text-[10px] font-bold text-slate-400 dark:text-slate-300 uppercase tracking-wider">Description</label>
           <textarea name="branch[description]" rows="3"
             class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-sm text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none placeholder:text-slate-400 dark:placeholder:text-slate-500"></textarea>

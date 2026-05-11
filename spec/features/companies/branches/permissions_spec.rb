@@ -69,7 +69,7 @@ RSpec.feature "Companies::Branches Permissions", type: :feature, js: true do
   end
 
   # Target branch for edit tests
-  let!(:target_branch) { create(:branch, company: company, name: "Target Branch", city: "Hanoi") }
+  let!(:target_branch) { create(:branch, company: company, name: "Target Branch") }
 
   def create_policy(resource:, action:, business_type: :operational)
     Seed::PolicyService.create(
@@ -162,7 +162,6 @@ RSpec.feature "Companies::Branches Permissions", type: :feature, js: true do
     expect(page).to have_selector('input[name="branch[name]"]', wait: 5)
     fill_in 'branch[name]', with: 'Created by Creator'
     select 'Warehouse', from: 'branch[business_type]'
-    fill_in 'branch[city]', with: 'Da Nang'
 
     click_button "Save Branch"
 
@@ -252,9 +251,7 @@ RSpec.feature "Companies::Branches Permissions", type: :feature, js: true do
     expect(editor_employee.can?(:update, Branch)).to be_truthy
   end
 
-  # =========================================================================
-  # SCENARIO 3b: Editor can update branch name via show modal
-  # =========================================================================
+
   scenario "editor with update permission can update branch name via editable" do
     # Use owner for this UI test as it requires more complex permission setup
     sign_in(owner)
@@ -283,35 +280,7 @@ RSpec.feature "Companies::Branches Permissions", type: :feature, js: true do
   end
 
   # =========================================================================
-  # SCENARIO 3c: Editor can update branch city via show modal
-  # =========================================================================
-  scenario "editor with update permission can update branch city via editable" do
-    sign_in(owner)
-    visit company_branches_path(company)
-
-    expect(page).to have_selector('table', wait: 10)
-
-    target_row = find('tbody tr', text: target_branch.name)
-    target_row.find('[data-action*="openShowModal"]').click
-
-    expect(page).to have_selector('.swal2-container', wait: 10)
-
-    all_editable = all('[data-controller="editable"]')
-    city_editable = all_editable[4]
-    city_editable.click
-
-    expect(page).to have_selector('.editable-input', wait: 5)
-
-    city_editable.find('.editable-input').fill_in(with: 'Ho Chi Minh City')
-
-    accept_confirm do
-      city_editable.find('.editable-input').send_keys :enter
-    end
-
-    expect(page).to have_selector('tbody tr', wait: 10)
-    expect(Branch.find_by(id: target_branch.id).city).to eq("Ho Chi Minh City")
-  end
-
+  # SCENARIO 3b: Editor can update branch name via show modal
   # =========================================================================
   # SCENARIO 3d: Employee WITHOUT update permission gets error when editing
   # =========================================================================

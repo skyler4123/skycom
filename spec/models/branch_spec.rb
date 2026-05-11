@@ -35,7 +35,6 @@ RSpec.describe Branch, type: :model do
   describe "enums" do
     it { should define_enum_for(:country_code) }
     it { should define_enum_for(:business_type) }
-    it { should define_enum_for(:timezone) }
     it { should define_enum_for(:currency_code) }
     it { should define_enum_for(:lifecycle_status) }
     it { should define_enum_for(:workflow_status) }

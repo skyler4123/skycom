@@ -18,9 +18,9 @@ class CreatePurchaseItems < ActiveRecord::Migration[8.0]
       t.string :batch_number
 
       # --- System Fields ---
-      t.integer  :lifecycle_status
-      t.integer  :workflow_status
-      t.integer  :business_type
+      t.integer  :lifecycle_status, index: true
+      t.integer  :workflow_status, index: true
+      t.integer  :business_type, index: true
       t.datetime :expiration_date
       t.jsonb    :metadata,       default: {}
       t.datetime :discarded_at,   index: true
