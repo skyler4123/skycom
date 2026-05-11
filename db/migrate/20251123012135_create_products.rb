@@ -43,9 +43,9 @@ class CreateProducts < ActiveRecord::Migration[8.0]
       t.references :required_role, null: true, foreign_key: { to_table: :roles }, type: :uuid
 
       # --- System Fields ---
-      t.integer  :lifecycle_status
-      t.integer  :workflow_status
-      t.integer  :business_type   # retail, education, gym, etc.
+      t.integer  :lifecycle_status, index: true
+      t.integer  :workflow_status, index: true
+      t.integer  :business_type, index: true   # retail, education, gym, etc.
       t.datetime :expiration_date
       t.jsonb    :metadata,       default: {}
       t.datetime :discarded_at,   index: true

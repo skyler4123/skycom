@@ -34,8 +34,8 @@ class CreateBranches < ActiveRecord::Migration[8.0]
       t.jsonb   :opening_hours,   default: {}
 
       # --- System Fields ---
-      t.integer  :lifecycle_status
-      t.integer  :workflow_status
+      t.integer  :lifecycle_status, index: true
+      t.integer  :workflow_status, index: true
       t.integer  :business_type, index: true
       t.datetime :expiration_date
       t.jsonb    :metadata,       default: {}
