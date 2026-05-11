@@ -5,7 +5,7 @@ import Companies_Branches_ShowModalController from "controllers/companies/branch
 export default class Companies_Branches_IndexController extends Companies_LayoutController {
   static targets = ["branchesList"]
 
-  /** @type {(Branch & { city: string, country_code: string })[]} */
+  /** @type {(Branch & { country_code: string })[]} */
   branches = []
 
   async connect() {
@@ -93,7 +93,6 @@ export default class Companies_Branches_IndexController extends Companies_Layout
                 <tr class="text-sm text-slate-500 dark:text-slate-400 bg-slate-50 dark:bg-slate-800/50 border-b border-slate-200 dark:border-slate-700">
                   <th class="py-4 px-6 font-medium whitespace-nowrap">Branch Name</th>
                   <th class="py-4 px-6 font-medium whitespace-nowrap">Type</th>
-                  <th class="py-4 px-6 font-medium whitespace-nowrap">City</th>
                   <th class="py-4 px-6 font-medium whitespace-nowrap">Status</th>
                   <th class="py-4 px-6 font-medium text-right whitespace-nowrap">Actions</th>
                 </tr>
@@ -123,7 +122,6 @@ export default class Companies_Branches_IndexController extends Companies_Layout
                         ${Helpers.capitalize(branch.business_type?.replace('_', ' ') || 'storefront')}
                       </span>
                     </td>
-                    <td class="py-4 px-6 text-sm text-slate-600 dark:text-slate-300">${branch.city || 'N/A'}</td>
                     <td class="py-4 px-6 text-sm">
                       ${Helpers.statusBadge(branch.workflow_status)}
                     </td>

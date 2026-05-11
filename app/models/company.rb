@@ -10,10 +10,10 @@ class Company < ApplicationRecord
   include Company::PermissionConcern
 
   belongs_to :user
+
+  has_many :brands, dependent: :destroy
   has_many :branches, dependent: :destroy
-
   has_many :tags, dependent: :destroy
-
   has_many :employee_groups, dependent: :destroy
   has_many :employees, dependent: :destroy
   has_many :roles, dependent: :destroy

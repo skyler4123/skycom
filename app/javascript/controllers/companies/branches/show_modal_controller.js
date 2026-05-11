@@ -127,28 +127,7 @@ export default class Companies_Branches_ShowModalController extends Controller {
                 </div>
               </div>
 
-              <div class="flex items-center gap-3">
-                <div class="flex size-10 items-center justify-center rounded-lg bg-slate-100 dark:bg-gray-800 text-blue-600 dark:text-blue-400">
-                  <span class="material-symbols-outlined">location_on</span>
-                </div>
-                <div>
-                  <p class="text-xs font-medium text-slate-500 dark:text-gray-400">City</p>
-                  ${editable({
-                    dispatch: "updateBranch",
-                    resource: "branch",
-                    name: "city",
-                    id: b.id,
-                    value: b.city || '',
-                    url: Helpers.edit_company_branch_path(currentCompany().id, b.id),
-                    html: `<p class="text-sm font-semibold text-slate-900 dark:text-white">${b.city || 'N/A'}</p>`,
-                    confirmMessage: "Change city to '{{value}}'?",
-                    successMessage: "City updated!",
-                    errorMessage: "Failed to update city!"
-                  })}
-                </div>
-              </div>
-
-              <div class="flex items-center gap-3">
+              
                 <div class="flex size-10 items-center justify-center rounded-lg bg-slate-100 dark:bg-gray-800 text-blue-600 dark:text-blue-400">
                   <span class="material-symbols-outlined">phone</span>
                 </div>
