@@ -22,11 +22,12 @@ class CreateOrderGroups < ActiveRecord::Migration[8.0]
       t.string   :permission_resource_name
 
       # --- Dynamic Fields ---
-      1.upto(20) { |i| t.string "dynamic_property_string_#{i}" }
-      1.upto(20) { |i| t.integer "dynamic_property_integer_#{i}" }
-      1.upto(10)  { |i| t.decimal "dynamic_property_decimal_#{i}", precision: 15, scale: 4 }
-      1.upto(10)  { |i| t.boolean "dynamic_property_boolean_#{i}" }
-      1.upto(10)  { |i| t.boolean "dynamic_property_datetime_#{i}" }
+      1.upto(20) { |i| t.string "property_string_#{i}" }
+      1.upto(5) { |i| t.text "property_text_#{i}" }
+      1.upto(20) { |i| t.integer "property_integer_#{i}" }
+      1.upto(10)  { |i| t.decimal "property_decimal_#{i}", precision: 15, scale: 4 }
+      1.upto(10)  { |i| t.boolean "property_boolean_#{i}" }
+      1.upto(10)  { |i| t.datetime "property_datetime_#{i}" }
 
       t.timestamps
     end

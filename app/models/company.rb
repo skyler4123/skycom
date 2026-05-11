@@ -11,6 +11,8 @@ class Company < ApplicationRecord
 
   belongs_to :user
 
+  has_many :company_staics, dependent: :destroy
+  has_many :company_dynamics, dependent: :destroy
   has_many :brands, dependent: :destroy
   has_many :branches, dependent: :destroy
   has_many :tags, dependent: :destroy
