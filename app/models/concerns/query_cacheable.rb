@@ -22,8 +22,6 @@ module QueryCacheable
       puts cache_key
       # 4. Fetch IDs from Solid Cache (SQLite)
       id_list = Rails.cache.fetch(cache_key, expires_in: expires_in) do
-        # Rails.cache.delete(cache_key)
-        # CachedVersion.find(Current.cached_version["id"]).increment!("#{resource_name}_cached_version")
         with_reading_connection { self.pluck(:id) }
       end
 
