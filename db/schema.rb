@@ -688,6 +688,46 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.index ["workflow_status"], name: "index_brands_on_workflow_status"
   end
 
+  create_table "cached_versions", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
+    t.uuid "company_id", null: false
+    t.integer "branches_cached_version", default: 0
+    t.integer "departments_cached_version", default: 0
+    t.integer "employee_groups_cached_version", default: 0
+    t.integer "employees_cached_version", default: 0
+    t.integer "customer_groups_cached_version", default: 0
+    t.integer "customers_cached_version", default: 0
+    t.integer "brands_cached_version", default: 0
+    t.integer "product_groups_cached_version", default: 0
+    t.integer "products_cached_version", default: 0
+    t.integer "warehouses_cached_version", default: 0
+    t.integer "stocks_cached_version", default: 0
+    t.integer "stock_transfers_cached_version", default: 0
+    t.integer "stock_imports_cached_version", default: 0
+    t.integer "stock_exports_cached_version", default: 0
+    t.integer "service_groups_cached_version", default: 0
+    t.integer "services_cached_version", default: 0
+    t.integer "order_groups_cached_version", default: 0
+    t.integer "orders_cached_version", default: 0
+    t.integer "cart_groups_cached_version", default: 0
+    t.integer "carts_cached_version", default: 0
+    t.integer "purchases_cached_version", default: 0
+    t.integer "purchase_items_cached_version", default: 0
+    t.integer "invoices_cached_version", default: 0
+    t.integer "payments_cached_version", default: 0
+    t.integer "facility_groups_cached_version", default: 0
+    t.integer "facilities_cached_version", default: 0
+    t.integer "project_groups_cached_version", default: 0
+    t.integer "projects_cached_version", default: 0
+    t.integer "task_groups_cached_version", default: 0
+    t.integer "tasks_cached_version", default: 0
+    t.integer "bookings_cached_version", default: 0
+    t.integer "memberships_cached_version", default: 0
+    t.integer "reservations_cached_version", default: 0
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["company_id"], name: "index_cached_versions_on_company_id"
+  end
+
   create_table "cart_appointments", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
     t.uuid "company_id", null: false
     t.uuid "cart_id", null: false
@@ -996,58 +1036,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.index ["workflow_status"], name: "index_companies_on_workflow_status"
   end
 
-  create_table "company_dynamics", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
-    t.uuid "company_id", null: false
-    t.integer "branches_cache_version", default: 0
-    t.integer "departments_cache_version", default: 0
-    t.integer "employee_groups_cache_version", default: 0
-    t.integer "employees_cache_version", default: 0
-    t.integer "customer_groups_cache_version", default: 0
-    t.integer "customers_cache_version", default: 0
-    t.integer "brands_cache_version", default: 0
-    t.integer "product_groups_cache_version", default: 0
-    t.integer "products_cache_version", default: 0
-    t.integer "warehouses_cache_version", default: 0
-    t.integer "stocks_cache_version", default: 0
-    t.integer "stock_transfers_cache_version", default: 0
-    t.integer "stock_imports_cache_version", default: 0
-    t.integer "stock_exports_cache_version", default: 0
-    t.integer "service_groups_cache_version", default: 0
-    t.integer "services_cache_version", default: 0
-    t.integer "order_groups_cache_version", default: 0
-    t.integer "orders_cache_version", default: 0
-    t.integer "cart_groups_cache_version", default: 0
-    t.integer "carts_cache_version", default: 0
-    t.integer "purchases_cache_version", default: 0
-    t.integer "purchase_items_cache_version", default: 0
-    t.integer "invoices_cache_version", default: 0
-    t.integer "payments_cache_version", default: 0
-    t.integer "facility_groups_cache_version", default: 0
-    t.integer "facilities_cache_version", default: 0
-    t.integer "project_groups_cache_version", default: 0
-    t.integer "projects_cache_version", default: 0
-    t.integer "task_groups_cache_version", default: 0
-    t.integer "tasks_cache_version", default: 0
-    t.integer "bookings_cache_version", default: 0
-    t.integer "memberships_cache_version", default: 0
-    t.integer "reservations_cache_version", default: 0
-    t.integer "lifecycle_status"
-    t.integer "workflow_status"
-    t.integer "business_type"
-    t.datetime "expiration_date"
-    t.jsonb "metadata", default: {}
-    t.datetime "discarded_at"
-    t.string "permission_resource_name"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.index ["business_type"], name: "index_company_dynamics_on_business_type"
-    t.index ["company_id"], name: "index_company_dynamics_on_company_id"
-    t.index ["discarded_at"], name: "index_company_dynamics_on_discarded_at"
-    t.index ["lifecycle_status"], name: "index_company_dynamics_on_lifecycle_status"
-    t.index ["workflow_status"], name: "index_company_dynamics_on_workflow_status"
-  end
-
-  create_table "company_statics", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
+  create_table "company_configs", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
     t.uuid "company_id", null: false
     t.string "name"
     t.text "resource_names", default: [], array: true
@@ -1258,11 +1247,11 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["business_type"], name: "index_company_statics_on_business_type"
-    t.index ["company_id"], name: "index_company_statics_on_company_id"
-    t.index ["discarded_at"], name: "index_company_statics_on_discarded_at"
-    t.index ["lifecycle_status"], name: "index_company_statics_on_lifecycle_status"
-    t.index ["workflow_status"], name: "index_company_statics_on_workflow_status"
+    t.index ["business_type"], name: "index_company_configs_on_business_type"
+    t.index ["company_id"], name: "index_company_configs_on_company_id"
+    t.index ["discarded_at"], name: "index_company_configs_on_discarded_at"
+    t.index ["lifecycle_status"], name: "index_company_configs_on_lifecycle_status"
+    t.index ["workflow_status"], name: "index_company_configs_on_workflow_status"
   end
 
   create_table "customer_appointments", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
@@ -6137,6 +6126,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
   add_foreign_key "branches", "companies"
   add_foreign_key "brands", "categories"
   add_foreign_key "brands", "companies"
+  add_foreign_key "cached_versions", "companies"
   add_foreign_key "cart_appointments", "carts"
   add_foreign_key "cart_appointments", "companies"
   add_foreign_key "cart_groups", "branches"
@@ -6148,8 +6138,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
   add_foreign_key "carts", "companies"
   add_foreign_key "categories", "companies"
   add_foreign_key "companies", "users"
-  add_foreign_key "company_dynamics", "companies"
-  add_foreign_key "company_statics", "companies"
+  add_foreign_key "company_configs", "companies"
   add_foreign_key "customer_appointments", "companies"
   add_foreign_key "customer_appointments", "customers"
   add_foreign_key "customer_group_appointments", "companies"

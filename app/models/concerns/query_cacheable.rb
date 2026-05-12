@@ -7,36 +7,30 @@ module QueryCacheable
   end
 
   module RelationMethods
-    def cached_query(expires_in: 1.minutes)
+    # Set Current.company: Current.company_id = Company.first.id
+    def cached_query(expires_in: 24.hours)
       # 1. Automatically detect the company from the global state
-      company = Company.first
+      company ||= Current.company
       raise "Current.company is missing!" unless company
+
+      resource_name = self.model.name.underscore.pluralize
+      model_cached_version_number = Current.cached_version["#{resource_name}_cached_version"]
 
       # 3. Generate the key unique to this Company + Version + SQL
       sql_hash = Digest::MD5.hexdigest(self.to_sql)
-      cache_key = "c_#{company.id.to_s[0..7]}/q_#{sql_hash}"
+      cache_key = "c#{company.id.to_s[0..7]}/#{resource_name}/v#{model_cached_version_number}/q#{sql_hash}"
       puts cache_key
       # 4. Fetch IDs from Solid Cache (SQLite)
       id_list = Rails.cache.fetch(cache_key, expires_in: expires_in) do
-        # ActiveRecord::Base.connected_to(role: :reading) { self.pluck(:id) }
-        # self.pluck(:id)
+        # Rails.cache.delete(cache_key)
+        # CachedVersion.find(Current.cached_version["id"]).increment!("#{resource_name}_cached_version")
         with_reading_connection { self.pluck(:id) }
       end
 
       return self.model.none if id_list.empty?
 
       # 5. Hydrate from Postgres Replica
-      # ActiveRecord::Base.connected_to(role: :reading) { self.model.where(id: id_list) }
-      # self.model.where(id: id_list)
       with_reading_connection { self.model.where(id: id_list) }
-    end
-
-    def clear_cached_query
-      company = Company.first
-      raise "Current.company is missing!" unless company
-      sql_hash = Digest::SHA256.hexdigest(self.to_sql)
-      cache_key = "c_#{company.id}/q_#{sql_hash}"
-      Rails.cache.delete(cache_key)
     end
 
     # Define a helper to handle the connection switch safely
