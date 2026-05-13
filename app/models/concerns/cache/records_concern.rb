@@ -23,7 +23,7 @@ module Cache::RecordsConcern
       cache_key = "#{model_name.plural.underscore}/queries/q#{sql_hash}"
 
       # 3. Fetch the array of attribute hashes from Solid Cache
-      attributes_array = Rails.cache.fetch(cache_key, expires_in: 24.hours) do
+      attributes_array = Rails.cache.fetch(cache_key, expires_in: 5.minutes) do
         # We execute the query and convert the result to an array of hashes
         relation.map(&:attributes)
       end
@@ -42,7 +42,7 @@ module Cache::RecordsConcern
       cache_key = "#{model_name.plural}_#{id}"
 
       # Fetch the hash and re-hydrate into a new object
-      attributes = Rails.cache.fetch(cache_key) do
+      attributes = Rails.cache.fetch(cache_key, expires_in: 5.minutes) do
         # If it's a miss, hit the DB and return the attributes hash
         find_by(id: id)&.attributes
       end
