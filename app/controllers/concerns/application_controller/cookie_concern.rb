@@ -14,12 +14,14 @@ module ApplicationController::CookieConcern
     cookies.permanent[:client_cache_version] = cache_version(user: current_user)
   end
 
+  # cache_version cover the cache of entire browser cache that must bas eon user + companies
   # To update the cache_version, just update new updated_at for user or any companies
   def cache_version(user:)
     # If a company name changes or a branch is added, this hash changes.
     latest_update = [
       user.updated_at,
-      user.companies.maximum(:updated_at)
+      # user.companies.maximum(:updated_at)
+      Company.cached_where(user_id: user.id).maximum(:updated_at)
     ].compact.max.to_i
 
     # Convert to a string for comparison

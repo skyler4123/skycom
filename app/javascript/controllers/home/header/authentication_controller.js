@@ -42,7 +42,6 @@ export default class Home_Header_AuthenticationController extends Controller {
   }
 
   renderSignedIn() {
-    console.log(currentUser())
     this.element.innerHTML = `
       ${avatar({
         url: currentUser()?.avatar,

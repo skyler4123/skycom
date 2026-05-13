@@ -7,7 +7,7 @@ class Employee < ApplicationRecord
   include TagConcern
   include Discard::Model
   include Employee::SearchkickConcern
-  include QueryCacheable
+  include Cache::RecordsConcern
 
   attribute :permission_resource_name, :string, default: -> { self.name }
 

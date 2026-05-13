@@ -3,6 +3,7 @@ class Company < ApplicationRecord
   attribute :resource_names, :string, array: true, default: []
 
   include AddressConcern
+  include Cache::RecordsConcern
   include Company::CacheConcern
   include Company::EducationConcern
   include Company::HospitalConcern

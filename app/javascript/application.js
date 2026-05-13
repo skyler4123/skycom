@@ -12,6 +12,7 @@ window.Helpers = Helpers;
 window.Cookie = Helpers.Cookie
 window.setCookie = Helpers.setCookie
 window.removeCookie = Helpers.removeCookie
+window.removeLocalStorage = Helpers.removeLocalStorage
 window.fetchJson = Helpers.fetchJson
 window.pathname = Helpers.pathname
 window.addAttribute = Helpers.addAttribute
