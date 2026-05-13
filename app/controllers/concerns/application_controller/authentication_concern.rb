@@ -33,7 +33,8 @@ module ApplicationController::AuthenticationConcern
     return unless token
 
     # 1. Generate Key: "session/{token}"
-    cache_key = Session.cache_key_for(token)
+    # cache_key = Session.cache_key_for(token)
+    cache_key = "session/#{token}"
 
     # 2. Fetch or Miss
     session_record = Rails.cache.fetch(cache_key, expires_in: 4.hours) do

@@ -20,6 +20,6 @@ class Session < ApplicationRecord
   def invalidate_auth_cache
     # self.class.cache_key_for(id) calls the method in ApplicationRecord
     # Generates key like: "session/a1b2c3d4"
-    Rails.cache.delete(self.class.cache_key_for(id))
+    Rails.cache.delete("session/#{id}")
   end
 end
