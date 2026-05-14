@@ -38,6 +38,7 @@ module Employee::PermissionConcern
     # Check if employee has owner role (business_type = :owner)
     def owner_role?
       role_appointments.any? { |ra| ra.business_type == "owner" }
+      # RoleAppointment.cached_where(appoint_to: self).any? { |ra| ra.business_type == "owner" }
     end
 
     # 2. The ABAC Engine

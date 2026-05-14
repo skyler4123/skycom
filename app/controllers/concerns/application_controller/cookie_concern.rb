@@ -21,7 +21,7 @@ module ApplicationController::CookieConcern
     latest_update = [
       user.updated_at,
       # user.companies.maximum(:updated_at)
-      Company.cached_where(user_id: user.id).maximum(:updated_at)
+      Company.cached_where(user: user).maximum(:updated_at)
     ].compact.max.to_i
 
     # Convert to a string for comparison
