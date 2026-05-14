@@ -48,7 +48,6 @@ export const setCookie = (name, value, days) => {
  */
 export const removeCookie = (name) => {
   // We set the date to Epoch (Jan 1, 1970) to ensure it is expired
-  console.log(name)
   document.cookie = name + "=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;"
 }
 

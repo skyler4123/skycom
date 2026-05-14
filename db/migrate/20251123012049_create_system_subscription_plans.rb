@@ -1,6 +1,6 @@
 class CreateSystemSubscriptionPlans < ActiveRecord::Migration[8.0]
   def change
-    create_table :system_subscription_plans, id: :uuid do |t|
+    create_table :system_subscription_plans, id: :uuid, default: -> { "uuidv7()" } do |t|
       t.string :name, null: false
       t.string :description
       t.string :code

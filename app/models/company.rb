@@ -3,7 +3,7 @@ class Company < ApplicationRecord
   attribute :resource_names, :string, array: true, default: []
 
   include AddressConcern
-  include Company::CacheConcern
+  include Cache::RecordsConcern
   include Company::EducationConcern
   include Company::HospitalConcern
   include Company::RestaurantConcern
@@ -11,6 +11,9 @@ class Company < ApplicationRecord
 
   belongs_to :user
 
+  has_one :cached_version, dependent: :destroy
+
+  has_many :company_configs, dependent: :destroy
   has_many :brands, dependent: :destroy
   has_many :branches, dependent: :destroy
   has_many :tags, dependent: :destroy
@@ -108,6 +111,7 @@ class Company < ApplicationRecord
   # validates :fiscal_year_end_month, presence: true, numericality: { in: 1..12 }
 
   after_create :setup_owner_records
+  after_create :initialize_cached_version
 
   def create_first_cloned_company
     return if branches.size > 1
@@ -163,5 +167,17 @@ class Company < ApplicationRecord
       workflow_status: :active,
       business_type: :owner
     )
+  end
+
+  def company_static
+    company_statics.first
+  end
+
+  private
+
+  def initialize_cached_version
+    # create_cached_version! is a helper method provided by has_one
+    # It automatically sets the company_id for you.
+    create_cached_version!
   end
 end

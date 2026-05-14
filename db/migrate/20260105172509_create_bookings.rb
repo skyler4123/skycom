@@ -1,6 +1,6 @@
 class CreateBookings < ActiveRecord::Migration[8.0]
   def change
-    create_table :bookings, id: :uuid do |t|
+    create_table :bookings, id: :uuid, default: -> { "uuidv7()" } do |t|
       t.references :company, null: false, foreign_key: true, type: :uuid
       t.references :branch, null: true, foreign_key: true, type: :uuid
       t.references :booking_resource, null: false, foreign_key: true, type: :uuid
@@ -10,14 +10,25 @@ class CreateBookings < ActiveRecord::Migration[8.0]
       t.references :appoint_by, polymorphic: true, null: false, type: :uuid
       t.string :name
       t.text :description
-      t.integer :lifecycle_status
-      t.integer :workflow_status
-      t.integer :business_type
-      t.datetime :discarded_at
-      t.jsonb :metadata, default: {}
+
+      # --- System Fields ---
+      t.integer  :lifecycle_status, index: true
+      t.integer  :workflow_status, index: true
+      t.integer  :business_type, index: true
+      t.datetime :expiration_date
+      t.jsonb    :metadata,       default: {}
+      t.datetime :discarded_at,   index: true
+      t.string   :permission_resource_name
+
+      # --- Dynamic Fields ---
+      1.upto(20) { |i| t.string "property_string_#{i}" }
+      1.upto(5) { |i| t.text "property_text_#{i}" }
+      1.upto(20) { |i| t.integer "property_integer_#{i}" }
+      1.upto(10)  { |i| t.decimal "property_decimal_#{i}", precision: 15, scale: 4 }
+      1.upto(10)  { |i| t.boolean "property_boolean_#{i}" }
+      1.upto(10)  { |i| t.datetime "property_datetime_#{i}" }
 
       t.timestamps
     end
-    add_index :bookings, :discarded_at
   end
 end

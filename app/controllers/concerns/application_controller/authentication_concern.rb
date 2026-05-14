@@ -8,7 +8,8 @@ module ApplicationController::AuthenticationConcern
   end
 
   def current_user
-    @current_user ||= current_session&.user
+    # @current_user ||= current_session&.user
+    @current_user ||= User.cached_find(current_session&.user_id)
   end
 
   def current_session
@@ -32,20 +33,8 @@ module ApplicationController::AuthenticationConcern
     token = cookies.signed[:session_token]
     return unless token
 
-    # 1. Generate Key: "session/{token}"
-    cache_key = Session.cache_key_for(token)
-
-    # 2. Fetch or Miss
-    session_record = Rails.cache.fetch(cache_key, expires_in: 4.hours) do
-      Session.find_by(id: token)
-    end
-
-    if session_record
-      Current.session = session_record
-    else
-      # If we found nil (record deleted in DB but token exists in cookie), clear cache to be safe
-      Rails.cache.delete(cache_key)
-    end
+    session_record = Session.cached_find(token)
+    Current.session = session_record
   end
 
   def authenticate

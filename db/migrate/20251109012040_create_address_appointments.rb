@@ -1,6 +1,6 @@
 class CreateAddressAppointments < ActiveRecord::Migration[8.0]
   def change
-    create_table :address_appointments, id: :uuid do |t|
+    create_table :address_appointments, id: :uuid, default: -> { "uuidv7()" } do |t|
       t.references :address, null: false, foreign_key: true, type: :uuid
       t.references :appoint_from, polymorphic: true, null: true, type: :uuid
       t.references :appoint_to, polymorphic: true, null: false, type: :uuid

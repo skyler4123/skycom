@@ -1,6 +1,6 @@
 class CreatePeriods < ActiveRecord::Migration[8.0]
   def change
-    create_table :periods, id: :uuid do |t|
+    create_table :periods, id: :uuid, default: -> { "uuidv7()" } do |t|
       t.datetime :start_at, null: false
       t.datetime :end_at # Allow nil (forever)
 

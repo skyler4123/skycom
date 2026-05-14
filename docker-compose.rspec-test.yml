@@ -29,10 +29,10 @@ services:
       - web
 
   postgres:
-    image: bitnamilegacy/postgresql:17.6.0-debian-12-r4
+    image: postgres:18.3
     environment:
-      POSTGRESQL_USERNAME: postgres
-      POSTGRESQL_PASSWORD: password
+      POSTGRES_USERNAME: postgres
+      POSTGRES_PASSWORD: password
     # No volume mapping here to ensure a fresh DB state for every test run
     ports:
       - "5432:5432"

@@ -1,6 +1,6 @@
 class CreateSystemSubscriptions < ActiveRecord::Migration[8.0]
   def change
-    create_table :system_subscriptions, id: :uuid do |t|
+    create_table :system_subscriptions, id: :uuid, default: -> { "uuidv7()" } do |t|
       t.references :system_subscription_plan, null: false, foreign_key: true, type: :uuid
       t.references :system_subscription_group, null: true, foreign_key: true, type: :uuid
       t.references :company, null: false, foreign_key: true, type: :uuid

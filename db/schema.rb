@@ -43,7 +43,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.index ["blob_id", "variation_digest"], name: "index_active_storage_variant_records_uniqueness", unique: true
   end
 
-  create_table "address_appointments", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+  create_table "address_appointments", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
     t.uuid "address_id", null: false
     t.string "appoint_from_type"
     t.uuid "appoint_from_id"
@@ -72,10 +72,13 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.index ["appoint_from_type", "appoint_from_id"], name: "index_address_appointments_on_appoint_from"
     t.index ["appoint_to_type", "appoint_to_id"], name: "idx_on_appoint_to_type_appoint_to_id_9dbaa804bc"
     t.index ["appoint_to_type", "appoint_to_id"], name: "index_address_appointments_on_appoint_to"
+    t.index ["business_type"], name: "index_address_appointments_on_business_type"
     t.index ["discarded_at"], name: "index_address_appointments_on_discarded_at"
+    t.index ["lifecycle_status"], name: "index_address_appointments_on_lifecycle_status"
+    t.index ["workflow_status"], name: "index_address_appointments_on_workflow_status"
   end
 
-  create_table "addresses", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+  create_table "addresses", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
     t.string "line_1", null: false
     t.string "line_2"
     t.string "city", null: false
@@ -88,7 +91,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.index ["fingerprint"], name: "index_addresses_on_fingerprint", unique: true
   end
 
-  create_table "answers", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+  create_table "answers", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
     t.uuid "company_id", null: false
     t.uuid "question_id", null: false
     t.uuid "category_id"
@@ -104,13 +107,16 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["business_type"], name: "index_answers_on_business_type"
     t.index ["category_id"], name: "index_answers_on_category_id"
     t.index ["company_id"], name: "index_answers_on_company_id"
     t.index ["discarded_at"], name: "index_answers_on_discarded_at"
+    t.index ["lifecycle_status"], name: "index_answers_on_lifecycle_status"
     t.index ["question_id"], name: "index_answers_on_question_id"
+    t.index ["workflow_status"], name: "index_answers_on_workflow_status"
   end
 
-  create_table "article_appointments", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+  create_table "article_appointments", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
     t.uuid "company_id", null: false
     t.uuid "article_id", null: false
     t.string "appoint_from_type"
@@ -139,11 +145,14 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.index ["appoint_to_type", "appoint_to_id"], name: "idx_on_appoint_to_type_appoint_to_id_aae71362ee"
     t.index ["appoint_to_type", "appoint_to_id"], name: "index_article_appointments_on_appoint_to"
     t.index ["article_id"], name: "index_article_appointments_on_article_id"
+    t.index ["business_type"], name: "index_article_appointments_on_business_type"
     t.index ["company_id"], name: "index_article_appointments_on_company_id"
     t.index ["discarded_at"], name: "index_article_appointments_on_discarded_at"
+    t.index ["lifecycle_status"], name: "index_article_appointments_on_lifecycle_status"
+    t.index ["workflow_status"], name: "index_article_appointments_on_workflow_status"
   end
 
-  create_table "article_group_appointments", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+  create_table "article_group_appointments", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
     t.uuid "company_id", null: false
     t.uuid "article_group_id", null: false
     t.string "appoint_from_type"
@@ -172,11 +181,14 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.index ["appoint_to_type", "appoint_to_id"], name: "idx_on_appoint_to_type_appoint_to_id_3810e29801"
     t.index ["appoint_to_type", "appoint_to_id"], name: "index_article_group_appointments_on_appoint_to"
     t.index ["article_group_id"], name: "index_article_group_appointments_on_article_group_id"
+    t.index ["business_type"], name: "index_article_group_appointments_on_business_type"
     t.index ["company_id"], name: "index_article_group_appointments_on_company_id"
     t.index ["discarded_at"], name: "index_article_group_appointments_on_discarded_at"
+    t.index ["lifecycle_status"], name: "index_article_group_appointments_on_lifecycle_status"
+    t.index ["workflow_status"], name: "index_article_group_appointments_on_workflow_status"
   end
 
-  create_table "article_groups", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+  create_table "article_groups", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
     t.uuid "company_id", null: false
     t.uuid "branch_id"
     t.uuid "category_id"
@@ -195,12 +207,15 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["branch_id"], name: "index_article_groups_on_branch_id"
+    t.index ["business_type"], name: "index_article_groups_on_business_type"
     t.index ["category_id"], name: "index_article_groups_on_category_id"
     t.index ["company_id"], name: "index_article_groups_on_company_id"
     t.index ["discarded_at"], name: "index_article_groups_on_discarded_at"
+    t.index ["lifecycle_status"], name: "index_article_groups_on_lifecycle_status"
+    t.index ["workflow_status"], name: "index_article_groups_on_workflow_status"
   end
 
-  create_table "articles", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+  create_table "articles", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
     t.uuid "article_group_id", null: false
     t.uuid "company_id", null: false
     t.uuid "branch_id"
@@ -221,12 +236,15 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.datetime "updated_at", null: false
     t.index ["article_group_id"], name: "index_articles_on_article_group_id"
     t.index ["branch_id"], name: "index_articles_on_branch_id"
+    t.index ["business_type"], name: "index_articles_on_business_type"
     t.index ["category_id"], name: "index_articles_on_category_id"
     t.index ["company_id"], name: "index_articles_on_company_id"
     t.index ["discarded_at"], name: "index_articles_on_discarded_at"
+    t.index ["lifecycle_status"], name: "index_articles_on_lifecycle_status"
+    t.index ["workflow_status"], name: "index_articles_on_workflow_status"
   end
 
-  create_table "attendance_days", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+  create_table "attendance_days", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
     t.uuid "company_id", null: false
     t.uuid "branch_id"
     t.uuid "employee_id", null: false
@@ -267,7 +285,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.index ["period_id"], name: "index_attendance_days_on_period_id"
   end
 
-  create_table "attendance_logs", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+  create_table "attendance_logs", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
     t.uuid "company_id", null: false
     t.uuid "branch_id"
     t.uuid "customer_id", null: false
@@ -287,7 +305,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.index ["period_id"], name: "index_attendance_logs_on_period_id"
   end
 
-  create_table "attendance_months", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+  create_table "attendance_months", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
     t.uuid "company_id", null: false
     t.uuid "branch_id"
     t.uuid "customer_id", null: false
@@ -303,7 +321,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.index ["period_id"], name: "index_attendance_months_on_period_id"
   end
 
-  create_table "booking_periods", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+  create_table "booking_periods", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
     t.uuid "booking_resource_id", null: false
     t.uuid "period_id", null: false
     t.integer "lifecycle_status"
@@ -316,7 +334,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.index ["period_id"], name: "index_booking_periods_on_period_id"
   end
 
-  create_table "booking_resources", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+  create_table "booking_resources", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
     t.uuid "company_id", null: false
     t.uuid "branch_id"
     t.string "booking_resourceable_type", null: false
@@ -334,11 +352,14 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.datetime "updated_at", null: false
     t.index ["booking_resourceable_type", "booking_resourceable_id"], name: "index_booking_resources_on_booking_resourceable"
     t.index ["branch_id"], name: "index_booking_resources_on_branch_id"
+    t.index ["business_type"], name: "index_booking_resources_on_business_type"
     t.index ["company_id"], name: "index_booking_resources_on_company_id"
     t.index ["discarded_at"], name: "index_booking_resources_on_discarded_at"
+    t.index ["lifecycle_status"], name: "index_booking_resources_on_lifecycle_status"
+    t.index ["workflow_status"], name: "index_booking_resources_on_workflow_status"
   end
 
-  create_table "bookings", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+  create_table "bookings", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
     t.uuid "company_id", null: false
     t.uuid "branch_id"
     t.uuid "booking_resource_id", null: false
@@ -355,8 +376,85 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.integer "lifecycle_status"
     t.integer "workflow_status"
     t.integer "business_type"
-    t.datetime "discarded_at"
+    t.datetime "expiration_date"
     t.jsonb "metadata", default: {}
+    t.datetime "discarded_at"
+    t.string "permission_resource_name"
+    t.string "property_string_1"
+    t.string "property_string_2"
+    t.string "property_string_3"
+    t.string "property_string_4"
+    t.string "property_string_5"
+    t.string "property_string_6"
+    t.string "property_string_7"
+    t.string "property_string_8"
+    t.string "property_string_9"
+    t.string "property_string_10"
+    t.string "property_string_11"
+    t.string "property_string_12"
+    t.string "property_string_13"
+    t.string "property_string_14"
+    t.string "property_string_15"
+    t.string "property_string_16"
+    t.string "property_string_17"
+    t.string "property_string_18"
+    t.string "property_string_19"
+    t.string "property_string_20"
+    t.text "property_text_1"
+    t.text "property_text_2"
+    t.text "property_text_3"
+    t.text "property_text_4"
+    t.text "property_text_5"
+    t.integer "property_integer_1"
+    t.integer "property_integer_2"
+    t.integer "property_integer_3"
+    t.integer "property_integer_4"
+    t.integer "property_integer_5"
+    t.integer "property_integer_6"
+    t.integer "property_integer_7"
+    t.integer "property_integer_8"
+    t.integer "property_integer_9"
+    t.integer "property_integer_10"
+    t.integer "property_integer_11"
+    t.integer "property_integer_12"
+    t.integer "property_integer_13"
+    t.integer "property_integer_14"
+    t.integer "property_integer_15"
+    t.integer "property_integer_16"
+    t.integer "property_integer_17"
+    t.integer "property_integer_18"
+    t.integer "property_integer_19"
+    t.integer "property_integer_20"
+    t.decimal "property_decimal_1", precision: 15, scale: 4
+    t.decimal "property_decimal_2", precision: 15, scale: 4
+    t.decimal "property_decimal_3", precision: 15, scale: 4
+    t.decimal "property_decimal_4", precision: 15, scale: 4
+    t.decimal "property_decimal_5", precision: 15, scale: 4
+    t.decimal "property_decimal_6", precision: 15, scale: 4
+    t.decimal "property_decimal_7", precision: 15, scale: 4
+    t.decimal "property_decimal_8", precision: 15, scale: 4
+    t.decimal "property_decimal_9", precision: 15, scale: 4
+    t.decimal "property_decimal_10", precision: 15, scale: 4
+    t.boolean "property_boolean_1"
+    t.boolean "property_boolean_2"
+    t.boolean "property_boolean_3"
+    t.boolean "property_boolean_4"
+    t.boolean "property_boolean_5"
+    t.boolean "property_boolean_6"
+    t.boolean "property_boolean_7"
+    t.boolean "property_boolean_8"
+    t.boolean "property_boolean_9"
+    t.boolean "property_boolean_10"
+    t.datetime "property_datetime_1"
+    t.datetime "property_datetime_2"
+    t.datetime "property_datetime_3"
+    t.datetime "property_datetime_4"
+    t.datetime "property_datetime_5"
+    t.datetime "property_datetime_6"
+    t.datetime "property_datetime_7"
+    t.datetime "property_datetime_8"
+    t.datetime "property_datetime_9"
+    t.datetime "property_datetime_10"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["appoint_by_type", "appoint_by_id"], name: "index_bookings_on_appoint_by"
@@ -365,11 +463,14 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.index ["appoint_to_type", "appoint_to_id"], name: "index_bookings_on_appoint_to"
     t.index ["booking_resource_id"], name: "index_bookings_on_booking_resource_id"
     t.index ["branch_id"], name: "index_bookings_on_branch_id"
+    t.index ["business_type"], name: "index_bookings_on_business_type"
     t.index ["company_id"], name: "index_bookings_on_company_id"
     t.index ["discarded_at"], name: "index_bookings_on_discarded_at"
+    t.index ["lifecycle_status"], name: "index_bookings_on_lifecycle_status"
+    t.index ["workflow_status"], name: "index_bookings_on_workflow_status"
   end
 
-  create_table "branches", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+  create_table "branches", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
     t.uuid "company_id", null: false
     t.uuid "category_id"
     t.uuid "parent_branch_id"
@@ -401,76 +502,81 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.jsonb "metadata", default: {}
     t.datetime "discarded_at"
     t.string "permission_resource_name", default: "Branch"
-    t.string "dynamic_property_string_1"
-    t.string "dynamic_property_string_2"
-    t.string "dynamic_property_string_3"
-    t.string "dynamic_property_string_4"
-    t.string "dynamic_property_string_5"
-    t.string "dynamic_property_string_6"
-    t.string "dynamic_property_string_7"
-    t.string "dynamic_property_string_8"
-    t.string "dynamic_property_string_9"
-    t.string "dynamic_property_string_10"
-    t.string "dynamic_property_string_11"
-    t.string "dynamic_property_string_12"
-    t.string "dynamic_property_string_13"
-    t.string "dynamic_property_string_14"
-    t.string "dynamic_property_string_15"
-    t.string "dynamic_property_string_16"
-    t.string "dynamic_property_string_17"
-    t.string "dynamic_property_string_18"
-    t.string "dynamic_property_string_19"
-    t.string "dynamic_property_string_20"
-    t.integer "dynamic_property_integer_1"
-    t.integer "dynamic_property_integer_2"
-    t.integer "dynamic_property_integer_3"
-    t.integer "dynamic_property_integer_4"
-    t.integer "dynamic_property_integer_5"
-    t.integer "dynamic_property_integer_6"
-    t.integer "dynamic_property_integer_7"
-    t.integer "dynamic_property_integer_8"
-    t.integer "dynamic_property_integer_9"
-    t.integer "dynamic_property_integer_10"
-    t.integer "dynamic_property_integer_11"
-    t.integer "dynamic_property_integer_12"
-    t.integer "dynamic_property_integer_13"
-    t.integer "dynamic_property_integer_14"
-    t.integer "dynamic_property_integer_15"
-    t.integer "dynamic_property_integer_16"
-    t.integer "dynamic_property_integer_17"
-    t.integer "dynamic_property_integer_18"
-    t.integer "dynamic_property_integer_19"
-    t.integer "dynamic_property_integer_20"
-    t.decimal "dynamic_property_decimal_1", precision: 15, scale: 4
-    t.decimal "dynamic_property_decimal_2", precision: 15, scale: 4
-    t.decimal "dynamic_property_decimal_3", precision: 15, scale: 4
-    t.decimal "dynamic_property_decimal_4", precision: 15, scale: 4
-    t.decimal "dynamic_property_decimal_5", precision: 15, scale: 4
-    t.decimal "dynamic_property_decimal_6", precision: 15, scale: 4
-    t.decimal "dynamic_property_decimal_7", precision: 15, scale: 4
-    t.decimal "dynamic_property_decimal_8", precision: 15, scale: 4
-    t.decimal "dynamic_property_decimal_9", precision: 15, scale: 4
-    t.decimal "dynamic_property_decimal_10", precision: 15, scale: 4
-    t.boolean "dynamic_property_boolean_1"
-    t.boolean "dynamic_property_boolean_2"
-    t.boolean "dynamic_property_boolean_3"
-    t.boolean "dynamic_property_boolean_4"
-    t.boolean "dynamic_property_boolean_5"
-    t.boolean "dynamic_property_boolean_6"
-    t.boolean "dynamic_property_boolean_7"
-    t.boolean "dynamic_property_boolean_8"
-    t.boolean "dynamic_property_boolean_9"
-    t.boolean "dynamic_property_boolean_10"
-    t.boolean "dynamic_property_datetime_1"
-    t.boolean "dynamic_property_datetime_2"
-    t.boolean "dynamic_property_datetime_3"
-    t.boolean "dynamic_property_datetime_4"
-    t.boolean "dynamic_property_datetime_5"
-    t.boolean "dynamic_property_datetime_6"
-    t.boolean "dynamic_property_datetime_7"
-    t.boolean "dynamic_property_datetime_8"
-    t.boolean "dynamic_property_datetime_9"
-    t.boolean "dynamic_property_datetime_10"
+    t.string "property_string_1"
+    t.string "property_string_2"
+    t.string "property_string_3"
+    t.string "property_string_4"
+    t.string "property_string_5"
+    t.string "property_string_6"
+    t.string "property_string_7"
+    t.string "property_string_8"
+    t.string "property_string_9"
+    t.string "property_string_10"
+    t.string "property_string_11"
+    t.string "property_string_12"
+    t.string "property_string_13"
+    t.string "property_string_14"
+    t.string "property_string_15"
+    t.string "property_string_16"
+    t.string "property_string_17"
+    t.string "property_string_18"
+    t.string "property_string_19"
+    t.string "property_string_20"
+    t.text "property_text_1"
+    t.text "property_text_2"
+    t.text "property_text_3"
+    t.text "property_text_4"
+    t.text "property_text_5"
+    t.integer "property_integer_1"
+    t.integer "property_integer_2"
+    t.integer "property_integer_3"
+    t.integer "property_integer_4"
+    t.integer "property_integer_5"
+    t.integer "property_integer_6"
+    t.integer "property_integer_7"
+    t.integer "property_integer_8"
+    t.integer "property_integer_9"
+    t.integer "property_integer_10"
+    t.integer "property_integer_11"
+    t.integer "property_integer_12"
+    t.integer "property_integer_13"
+    t.integer "property_integer_14"
+    t.integer "property_integer_15"
+    t.integer "property_integer_16"
+    t.integer "property_integer_17"
+    t.integer "property_integer_18"
+    t.integer "property_integer_19"
+    t.integer "property_integer_20"
+    t.decimal "property_decimal_1", precision: 15, scale: 4
+    t.decimal "property_decimal_2", precision: 15, scale: 4
+    t.decimal "property_decimal_3", precision: 15, scale: 4
+    t.decimal "property_decimal_4", precision: 15, scale: 4
+    t.decimal "property_decimal_5", precision: 15, scale: 4
+    t.decimal "property_decimal_6", precision: 15, scale: 4
+    t.decimal "property_decimal_7", precision: 15, scale: 4
+    t.decimal "property_decimal_8", precision: 15, scale: 4
+    t.decimal "property_decimal_9", precision: 15, scale: 4
+    t.decimal "property_decimal_10", precision: 15, scale: 4
+    t.boolean "property_boolean_1"
+    t.boolean "property_boolean_2"
+    t.boolean "property_boolean_3"
+    t.boolean "property_boolean_4"
+    t.boolean "property_boolean_5"
+    t.boolean "property_boolean_6"
+    t.boolean "property_boolean_7"
+    t.boolean "property_boolean_8"
+    t.boolean "property_boolean_9"
+    t.boolean "property_boolean_10"
+    t.datetime "property_datetime_1"
+    t.datetime "property_datetime_2"
+    t.datetime "property_datetime_3"
+    t.datetime "property_datetime_4"
+    t.datetime "property_datetime_5"
+    t.datetime "property_datetime_6"
+    t.datetime "property_datetime_7"
+    t.datetime "property_datetime_8"
+    t.datetime "property_datetime_9"
+    t.datetime "property_datetime_10"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["business_type"], name: "index_branches_on_business_type"
@@ -478,11 +584,13 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.index ["code"], name: "index_branches_on_code", unique: true
     t.index ["company_id"], name: "index_branches_on_company_id"
     t.index ["discarded_at"], name: "index_branches_on_discarded_at"
+    t.index ["lifecycle_status"], name: "index_branches_on_lifecycle_status"
     t.index ["parent_branch_id"], name: "index_branches_on_parent_branch_id"
     t.index ["slug"], name: "index_branches_on_slug", unique: true
+    t.index ["workflow_status"], name: "index_branches_on_workflow_status"
   end
 
-  create_table "brands", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+  create_table "brands", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
     t.uuid "company_id", null: false
     t.uuid "category_id"
     t.string "name"
@@ -495,14 +603,132 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.jsonb "metadata", default: {}
     t.datetime "discarded_at"
     t.string "permission_resource_name"
+    t.string "property_string_1"
+    t.string "property_string_2"
+    t.string "property_string_3"
+    t.string "property_string_4"
+    t.string "property_string_5"
+    t.string "property_string_6"
+    t.string "property_string_7"
+    t.string "property_string_8"
+    t.string "property_string_9"
+    t.string "property_string_10"
+    t.string "property_string_11"
+    t.string "property_string_12"
+    t.string "property_string_13"
+    t.string "property_string_14"
+    t.string "property_string_15"
+    t.string "property_string_16"
+    t.string "property_string_17"
+    t.string "property_string_18"
+    t.string "property_string_19"
+    t.string "property_string_20"
+    t.text "property_text_1"
+    t.text "property_text_2"
+    t.text "property_text_3"
+    t.text "property_text_4"
+    t.text "property_text_5"
+    t.integer "property_integer_1"
+    t.integer "property_integer_2"
+    t.integer "property_integer_3"
+    t.integer "property_integer_4"
+    t.integer "property_integer_5"
+    t.integer "property_integer_6"
+    t.integer "property_integer_7"
+    t.integer "property_integer_8"
+    t.integer "property_integer_9"
+    t.integer "property_integer_10"
+    t.integer "property_integer_11"
+    t.integer "property_integer_12"
+    t.integer "property_integer_13"
+    t.integer "property_integer_14"
+    t.integer "property_integer_15"
+    t.integer "property_integer_16"
+    t.integer "property_integer_17"
+    t.integer "property_integer_18"
+    t.integer "property_integer_19"
+    t.integer "property_integer_20"
+    t.decimal "property_decimal_1", precision: 15, scale: 4
+    t.decimal "property_decimal_2", precision: 15, scale: 4
+    t.decimal "property_decimal_3", precision: 15, scale: 4
+    t.decimal "property_decimal_4", precision: 15, scale: 4
+    t.decimal "property_decimal_5", precision: 15, scale: 4
+    t.decimal "property_decimal_6", precision: 15, scale: 4
+    t.decimal "property_decimal_7", precision: 15, scale: 4
+    t.decimal "property_decimal_8", precision: 15, scale: 4
+    t.decimal "property_decimal_9", precision: 15, scale: 4
+    t.decimal "property_decimal_10", precision: 15, scale: 4
+    t.boolean "property_boolean_1"
+    t.boolean "property_boolean_2"
+    t.boolean "property_boolean_3"
+    t.boolean "property_boolean_4"
+    t.boolean "property_boolean_5"
+    t.boolean "property_boolean_6"
+    t.boolean "property_boolean_7"
+    t.boolean "property_boolean_8"
+    t.boolean "property_boolean_9"
+    t.boolean "property_boolean_10"
+    t.datetime "property_datetime_1"
+    t.datetime "property_datetime_2"
+    t.datetime "property_datetime_3"
+    t.datetime "property_datetime_4"
+    t.datetime "property_datetime_5"
+    t.datetime "property_datetime_6"
+    t.datetime "property_datetime_7"
+    t.datetime "property_datetime_8"
+    t.datetime "property_datetime_9"
+    t.datetime "property_datetime_10"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["business_type"], name: "index_brands_on_business_type"
     t.index ["category_id"], name: "index_brands_on_category_id"
     t.index ["company_id"], name: "index_brands_on_company_id"
     t.index ["discarded_at"], name: "index_brands_on_discarded_at"
+    t.index ["lifecycle_status"], name: "index_brands_on_lifecycle_status"
+    t.index ["workflow_status"], name: "index_brands_on_workflow_status"
   end
 
-  create_table "cart_appointments", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+  create_table "cached_versions", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
+    t.uuid "company_id", null: false
+    t.integer "branches_cached_version", default: 0
+    t.integer "departments_cached_version", default: 0
+    t.integer "employee_groups_cached_version", default: 0
+    t.integer "employees_cached_version", default: 0
+    t.integer "customer_groups_cached_version", default: 0
+    t.integer "customers_cached_version", default: 0
+    t.integer "brands_cached_version", default: 0
+    t.integer "product_groups_cached_version", default: 0
+    t.integer "products_cached_version", default: 0
+    t.integer "warehouses_cached_version", default: 0
+    t.integer "stocks_cached_version", default: 0
+    t.integer "stock_transfers_cached_version", default: 0
+    t.integer "stock_imports_cached_version", default: 0
+    t.integer "stock_exports_cached_version", default: 0
+    t.integer "service_groups_cached_version", default: 0
+    t.integer "services_cached_version", default: 0
+    t.integer "order_groups_cached_version", default: 0
+    t.integer "orders_cached_version", default: 0
+    t.integer "cart_groups_cached_version", default: 0
+    t.integer "carts_cached_version", default: 0
+    t.integer "purchases_cached_version", default: 0
+    t.integer "purchase_items_cached_version", default: 0
+    t.integer "invoices_cached_version", default: 0
+    t.integer "payments_cached_version", default: 0
+    t.integer "facility_groups_cached_version", default: 0
+    t.integer "facilities_cached_version", default: 0
+    t.integer "project_groups_cached_version", default: 0
+    t.integer "projects_cached_version", default: 0
+    t.integer "task_groups_cached_version", default: 0
+    t.integer "tasks_cached_version", default: 0
+    t.integer "bookings_cached_version", default: 0
+    t.integer "memberships_cached_version", default: 0
+    t.integer "reservations_cached_version", default: 0
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["company_id"], name: "index_cached_versions_on_company_id"
+  end
+
+  create_table "cart_appointments", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
     t.uuid "company_id", null: false
     t.uuid "cart_id", null: false
     t.string "appoint_from_type"
@@ -530,12 +756,15 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.index ["appoint_from_type", "appoint_from_id"], name: "index_cart_appointments_on_appoint_from"
     t.index ["appoint_to_type", "appoint_to_id"], name: "index_cart_appointments_on_appoint_to"
     t.index ["appoint_to_type", "appoint_to_id"], name: "index_cart_appointments_on_appoint_to_type_and_appoint_to_id"
+    t.index ["business_type"], name: "index_cart_appointments_on_business_type"
     t.index ["cart_id"], name: "index_cart_appointments_on_cart_id"
     t.index ["company_id"], name: "index_cart_appointments_on_company_id"
     t.index ["discarded_at"], name: "index_cart_appointments_on_discarded_at"
+    t.index ["lifecycle_status"], name: "index_cart_appointments_on_lifecycle_status"
+    t.index ["workflow_status"], name: "index_cart_appointments_on_workflow_status"
   end
 
-  create_table "cart_groups", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+  create_table "cart_groups", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
     t.uuid "company_id", null: false
     t.uuid "branch_id"
     t.uuid "category_id"
@@ -549,15 +778,93 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.jsonb "metadata", default: {}
     t.datetime "discarded_at"
     t.string "permission_resource_name"
+    t.string "property_string_1"
+    t.string "property_string_2"
+    t.string "property_string_3"
+    t.string "property_string_4"
+    t.string "property_string_5"
+    t.string "property_string_6"
+    t.string "property_string_7"
+    t.string "property_string_8"
+    t.string "property_string_9"
+    t.string "property_string_10"
+    t.string "property_string_11"
+    t.string "property_string_12"
+    t.string "property_string_13"
+    t.string "property_string_14"
+    t.string "property_string_15"
+    t.string "property_string_16"
+    t.string "property_string_17"
+    t.string "property_string_18"
+    t.string "property_string_19"
+    t.string "property_string_20"
+    t.text "property_text_1"
+    t.text "property_text_2"
+    t.text "property_text_3"
+    t.text "property_text_4"
+    t.text "property_text_5"
+    t.integer "property_integer_1"
+    t.integer "property_integer_2"
+    t.integer "property_integer_3"
+    t.integer "property_integer_4"
+    t.integer "property_integer_5"
+    t.integer "property_integer_6"
+    t.integer "property_integer_7"
+    t.integer "property_integer_8"
+    t.integer "property_integer_9"
+    t.integer "property_integer_10"
+    t.integer "property_integer_11"
+    t.integer "property_integer_12"
+    t.integer "property_integer_13"
+    t.integer "property_integer_14"
+    t.integer "property_integer_15"
+    t.integer "property_integer_16"
+    t.integer "property_integer_17"
+    t.integer "property_integer_18"
+    t.integer "property_integer_19"
+    t.integer "property_integer_20"
+    t.decimal "property_decimal_1", precision: 15, scale: 4
+    t.decimal "property_decimal_2", precision: 15, scale: 4
+    t.decimal "property_decimal_3", precision: 15, scale: 4
+    t.decimal "property_decimal_4", precision: 15, scale: 4
+    t.decimal "property_decimal_5", precision: 15, scale: 4
+    t.decimal "property_decimal_6", precision: 15, scale: 4
+    t.decimal "property_decimal_7", precision: 15, scale: 4
+    t.decimal "property_decimal_8", precision: 15, scale: 4
+    t.decimal "property_decimal_9", precision: 15, scale: 4
+    t.decimal "property_decimal_10", precision: 15, scale: 4
+    t.boolean "property_boolean_1"
+    t.boolean "property_boolean_2"
+    t.boolean "property_boolean_3"
+    t.boolean "property_boolean_4"
+    t.boolean "property_boolean_5"
+    t.boolean "property_boolean_6"
+    t.boolean "property_boolean_7"
+    t.boolean "property_boolean_8"
+    t.boolean "property_boolean_9"
+    t.boolean "property_boolean_10"
+    t.datetime "property_datetime_1"
+    t.datetime "property_datetime_2"
+    t.datetime "property_datetime_3"
+    t.datetime "property_datetime_4"
+    t.datetime "property_datetime_5"
+    t.datetime "property_datetime_6"
+    t.datetime "property_datetime_7"
+    t.datetime "property_datetime_8"
+    t.datetime "property_datetime_9"
+    t.datetime "property_datetime_10"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["branch_id"], name: "index_cart_groups_on_branch_id"
+    t.index ["business_type"], name: "index_cart_groups_on_business_type"
     t.index ["category_id"], name: "index_cart_groups_on_category_id"
     t.index ["company_id"], name: "index_cart_groups_on_company_id"
     t.index ["discarded_at"], name: "index_cart_groups_on_discarded_at"
+    t.index ["lifecycle_status"], name: "index_cart_groups_on_lifecycle_status"
+    t.index ["workflow_status"], name: "index_cart_groups_on_workflow_status"
   end
 
-  create_table "carts", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+  create_table "carts", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
     t.uuid "company_id", null: false
     t.uuid "branch_id"
     t.uuid "cart_group_id", null: false
@@ -579,21 +886,99 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.jsonb "metadata", default: {}
     t.datetime "discarded_at"
     t.string "permission_resource_name"
+    t.string "property_string_1"
+    t.string "property_string_2"
+    t.string "property_string_3"
+    t.string "property_string_4"
+    t.string "property_string_5"
+    t.string "property_string_6"
+    t.string "property_string_7"
+    t.string "property_string_8"
+    t.string "property_string_9"
+    t.string "property_string_10"
+    t.string "property_string_11"
+    t.string "property_string_12"
+    t.string "property_string_13"
+    t.string "property_string_14"
+    t.string "property_string_15"
+    t.string "property_string_16"
+    t.string "property_string_17"
+    t.string "property_string_18"
+    t.string "property_string_19"
+    t.string "property_string_20"
+    t.text "property_text_1"
+    t.text "property_text_2"
+    t.text "property_text_3"
+    t.text "property_text_4"
+    t.text "property_text_5"
+    t.integer "property_integer_1"
+    t.integer "property_integer_2"
+    t.integer "property_integer_3"
+    t.integer "property_integer_4"
+    t.integer "property_integer_5"
+    t.integer "property_integer_6"
+    t.integer "property_integer_7"
+    t.integer "property_integer_8"
+    t.integer "property_integer_9"
+    t.integer "property_integer_10"
+    t.integer "property_integer_11"
+    t.integer "property_integer_12"
+    t.integer "property_integer_13"
+    t.integer "property_integer_14"
+    t.integer "property_integer_15"
+    t.integer "property_integer_16"
+    t.integer "property_integer_17"
+    t.integer "property_integer_18"
+    t.integer "property_integer_19"
+    t.integer "property_integer_20"
+    t.decimal "property_decimal_1", precision: 15, scale: 4
+    t.decimal "property_decimal_2", precision: 15, scale: 4
+    t.decimal "property_decimal_3", precision: 15, scale: 4
+    t.decimal "property_decimal_4", precision: 15, scale: 4
+    t.decimal "property_decimal_5", precision: 15, scale: 4
+    t.decimal "property_decimal_6", precision: 15, scale: 4
+    t.decimal "property_decimal_7", precision: 15, scale: 4
+    t.decimal "property_decimal_8", precision: 15, scale: 4
+    t.decimal "property_decimal_9", precision: 15, scale: 4
+    t.decimal "property_decimal_10", precision: 15, scale: 4
+    t.boolean "property_boolean_1"
+    t.boolean "property_boolean_2"
+    t.boolean "property_boolean_3"
+    t.boolean "property_boolean_4"
+    t.boolean "property_boolean_5"
+    t.boolean "property_boolean_6"
+    t.boolean "property_boolean_7"
+    t.boolean "property_boolean_8"
+    t.boolean "property_boolean_9"
+    t.boolean "property_boolean_10"
+    t.datetime "property_datetime_1"
+    t.datetime "property_datetime_2"
+    t.datetime "property_datetime_3"
+    t.datetime "property_datetime_4"
+    t.datetime "property_datetime_5"
+    t.datetime "property_datetime_6"
+    t.datetime "property_datetime_7"
+    t.datetime "property_datetime_8"
+    t.datetime "property_datetime_9"
+    t.datetime "property_datetime_10"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["barcode"], name: "index_carts_on_barcode"
     t.index ["branch_id"], name: "index_carts_on_branch_id"
+    t.index ["business_type"], name: "index_carts_on_business_type"
     t.index ["cart_group_id"], name: "index_carts_on_cart_group_id"
     t.index ["category_id"], name: "index_carts_on_category_id"
     t.index ["company_id"], name: "index_carts_on_company_id"
     t.index ["discarded_at"], name: "index_carts_on_discarded_at"
     t.index ["ean"], name: "index_carts_on_ean"
+    t.index ["lifecycle_status"], name: "index_carts_on_lifecycle_status"
     t.index ["serial_number"], name: "index_carts_on_serial_number"
     t.index ["sku"], name: "index_carts_on_sku"
     t.index ["upc"], name: "index_carts_on_upc"
+    t.index ["workflow_status"], name: "index_carts_on_workflow_status"
   end
 
-  create_table "categories", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+  create_table "categories", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
     t.uuid "company_id", null: false
     t.string "name"
     t.string "description"
@@ -606,12 +991,15 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["business_type"], name: "index_categories_on_business_type"
     t.index ["company_id", "name"], name: "index_categories_on_company_id_and_name"
     t.index ["company_id"], name: "index_categories_on_company_id"
     t.index ["discarded_at"], name: "index_categories_on_discarded_at"
+    t.index ["lifecycle_status"], name: "index_categories_on_lifecycle_status"
+    t.index ["workflow_status"], name: "index_categories_on_workflow_status"
   end
 
-  create_table "companies", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+  create_table "companies", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
     t.uuid "user_id", null: false
     t.string "name"
     t.string "description"
@@ -641,11 +1029,232 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["business_type"], name: "index_companies_on_business_type"
     t.index ["discarded_at"], name: "index_companies_on_discarded_at"
+    t.index ["lifecycle_status"], name: "index_companies_on_lifecycle_status"
     t.index ["user_id"], name: "index_companies_on_user_id"
+    t.index ["workflow_status"], name: "index_companies_on_workflow_status"
   end
 
-  create_table "customer_appointments", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+  create_table "company_configs", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
+    t.uuid "company_id", null: false
+    t.string "name"
+    t.text "resource_names", default: [], array: true
+    t.jsonb "branch_property_string_mappings", default: {}
+    t.jsonb "branch_property_text_mappings", default: {}
+    t.jsonb "branch_property_integer_mappings", default: {}
+    t.jsonb "branch_property_decimal_mappings", default: {}
+    t.jsonb "branch_property_boolean_mappings", default: {}
+    t.jsonb "branch_property_datetime_mappings", default: {}
+    t.jsonb "department_property_string_mappings", default: {}
+    t.jsonb "department_property_text_mappings", default: {}
+    t.jsonb "department_property_integer_mappings", default: {}
+    t.jsonb "department_property_decimal_mappings", default: {}
+    t.jsonb "department_property_boolean_mappings", default: {}
+    t.jsonb "department_property_datetime_mappings", default: {}
+    t.jsonb "employee_group_property_string_mappings", default: {}
+    t.jsonb "employee_group_property_text_mappings", default: {}
+    t.jsonb "employee_group_property_integer_mappings", default: {}
+    t.jsonb "employee_group_property_decimal_mappings", default: {}
+    t.jsonb "employee_group_property_boolean_mappings", default: {}
+    t.jsonb "employee_group_property_datetime_mappings", default: {}
+    t.jsonb "employee_property_string_mappings", default: {}
+    t.jsonb "employee_property_text_mappings", default: {}
+    t.jsonb "employee_property_integer_mappings", default: {}
+    t.jsonb "employee_property_decimal_mappings", default: {}
+    t.jsonb "employee_property_boolean_mappings", default: {}
+    t.jsonb "employee_property_datetime_mappings", default: {}
+    t.jsonb "customer_group_property_string_mappings", default: {}
+    t.jsonb "customer_group_property_text_mappings", default: {}
+    t.jsonb "customer_group_property_integer_mappings", default: {}
+    t.jsonb "customer_group_property_decimal_mappings", default: {}
+    t.jsonb "customer_group_property_boolean_mappings", default: {}
+    t.jsonb "customer_group_property_datetime_mappings", default: {}
+    t.jsonb "customer_property_string_mappings", default: {}
+    t.jsonb "customer_property_text_mappings", default: {}
+    t.jsonb "customer_property_integer_mappings", default: {}
+    t.jsonb "customer_property_decimal_mappings", default: {}
+    t.jsonb "customer_property_boolean_mappings", default: {}
+    t.jsonb "customer_property_datetime_mappings", default: {}
+    t.jsonb "brand_property_string_mappings", default: {}
+    t.jsonb "brand_property_text_mappings", default: {}
+    t.jsonb "brand_property_integer_mappings", default: {}
+    t.jsonb "brand_property_decimal_mappings", default: {}
+    t.jsonb "brand_property_boolean_mappings", default: {}
+    t.jsonb "brand_property_datetime_mappings", default: {}
+    t.jsonb "product_group_property_string_mappings", default: {}
+    t.jsonb "product_group_property_text_mappings", default: {}
+    t.jsonb "product_group_property_integer_mappings", default: {}
+    t.jsonb "product_group_property_decimal_mappings", default: {}
+    t.jsonb "product_group_property_boolean_mappings", default: {}
+    t.jsonb "product_group_property_datetime_mappings", default: {}
+    t.jsonb "product_property_string_mappings", default: {}
+    t.jsonb "product_property_text_mappings", default: {}
+    t.jsonb "product_property_integer_mappings", default: {}
+    t.jsonb "product_property_decimal_mappings", default: {}
+    t.jsonb "product_property_boolean_mappings", default: {}
+    t.jsonb "product_property_datetime_mappings", default: {}
+    t.jsonb "warehouse_property_string_mappings", default: {}
+    t.jsonb "warehouse_property_text_mappings", default: {}
+    t.jsonb "warehouse_property_integer_mappings", default: {}
+    t.jsonb "warehouse_property_decimal_mappings", default: {}
+    t.jsonb "warehouse_property_boolean_mappings", default: {}
+    t.jsonb "warehouse_property_datetime_mappings", default: {}
+    t.jsonb "stock_property_string_mappings", default: {}
+    t.jsonb "stock_property_text_mappings", default: {}
+    t.jsonb "stock_property_integer_mappings", default: {}
+    t.jsonb "stock_property_decimal_mappings", default: {}
+    t.jsonb "stock_property_boolean_mappings", default: {}
+    t.jsonb "stock_property_datetime_mappings", default: {}
+    t.jsonb "stock_transfer_property_string_mappings", default: {}
+    t.jsonb "stock_transfer_property_text_mappings", default: {}
+    t.jsonb "stock_transfer_property_integer_mappings", default: {}
+    t.jsonb "stock_transfer_property_decimal_mappings", default: {}
+    t.jsonb "stock_transfer_property_boolean_mappings", default: {}
+    t.jsonb "stock_transfer_property_datetime_mappings", default: {}
+    t.jsonb "stock_import_property_string_mappings", default: {}
+    t.jsonb "stock_import_property_text_mappings", default: {}
+    t.jsonb "stock_import_property_integer_mappings", default: {}
+    t.jsonb "stock_import_property_decimal_mappings", default: {}
+    t.jsonb "stock_import_property_boolean_mappings", default: {}
+    t.jsonb "stock_import_property_datetime_mappings", default: {}
+    t.jsonb "stock_export_property_string_mappings", default: {}
+    t.jsonb "stock_export_property_text_mappings", default: {}
+    t.jsonb "stock_export_property_integer_mappings", default: {}
+    t.jsonb "stock_export_property_decimal_mappings", default: {}
+    t.jsonb "stock_export_property_boolean_mappings", default: {}
+    t.jsonb "stock_export_property_datetime_mappings", default: {}
+    t.jsonb "service_group_property_string_mappings", default: {}
+    t.jsonb "service_group_property_text_mappings", default: {}
+    t.jsonb "service_group_property_integer_mappings", default: {}
+    t.jsonb "service_group_property_decimal_mappings", default: {}
+    t.jsonb "service_group_property_boolean_mappings", default: {}
+    t.jsonb "service_group_property_datetime_mappings", default: {}
+    t.jsonb "service_property_string_mappings", default: {}
+    t.jsonb "service_property_text_mappings", default: {}
+    t.jsonb "service_property_integer_mappings", default: {}
+    t.jsonb "service_property_decimal_mappings", default: {}
+    t.jsonb "service_property_boolean_mappings", default: {}
+    t.jsonb "service_property_datetime_mappings", default: {}
+    t.jsonb "order_group_property_string_mappings", default: {}
+    t.jsonb "order_group_property_text_mappings", default: {}
+    t.jsonb "order_group_property_integer_mappings", default: {}
+    t.jsonb "order_group_property_decimal_mappings", default: {}
+    t.jsonb "order_group_property_boolean_mappings", default: {}
+    t.jsonb "order_group_property_datetime_mappings", default: {}
+    t.jsonb "order_property_string_mappings", default: {}
+    t.jsonb "order_property_text_mappings", default: {}
+    t.jsonb "order_property_integer_mappings", default: {}
+    t.jsonb "order_property_decimal_mappings", default: {}
+    t.jsonb "order_property_boolean_mappings", default: {}
+    t.jsonb "order_property_datetime_mappings", default: {}
+    t.jsonb "cart_group_property_string_mappings", default: {}
+    t.jsonb "cart_group_property_text_mappings", default: {}
+    t.jsonb "cart_group_property_integer_mappings", default: {}
+    t.jsonb "cart_group_property_decimal_mappings", default: {}
+    t.jsonb "cart_group_property_boolean_mappings", default: {}
+    t.jsonb "cart_group_property_datetime_mappings", default: {}
+    t.jsonb "cart_property_string_mappings", default: {}
+    t.jsonb "cart_property_text_mappings", default: {}
+    t.jsonb "cart_property_integer_mappings", default: {}
+    t.jsonb "cart_property_decimal_mappings", default: {}
+    t.jsonb "cart_property_boolean_mappings", default: {}
+    t.jsonb "cart_property_datetime_mappings", default: {}
+    t.jsonb "purchase_property_string_mappings", default: {}
+    t.jsonb "purchase_property_text_mappings", default: {}
+    t.jsonb "purchase_property_integer_mappings", default: {}
+    t.jsonb "purchase_property_decimal_mappings", default: {}
+    t.jsonb "purchase_property_boolean_mappings", default: {}
+    t.jsonb "purchase_property_datetime_mappings", default: {}
+    t.jsonb "purchase_item_property_string_mappings", default: {}
+    t.jsonb "purchase_item_property_text_mappings", default: {}
+    t.jsonb "purchase_item_property_integer_mappings", default: {}
+    t.jsonb "purchase_item_property_decimal_mappings", default: {}
+    t.jsonb "purchase_item_property_boolean_mappings", default: {}
+    t.jsonb "purchase_item_property_datetime_mappings", default: {}
+    t.jsonb "invoice_property_string_mappings", default: {}
+    t.jsonb "invoice_property_text_mappings", default: {}
+    t.jsonb "invoice_property_integer_mappings", default: {}
+    t.jsonb "invoice_property_decimal_mappings", default: {}
+    t.jsonb "invoice_property_boolean_mappings", default: {}
+    t.jsonb "invoice_property_datetime_mappings", default: {}
+    t.jsonb "payment_property_string_mappings", default: {}
+    t.jsonb "payment_property_text_mappings", default: {}
+    t.jsonb "payment_property_integer_mappings", default: {}
+    t.jsonb "payment_property_decimal_mappings", default: {}
+    t.jsonb "payment_property_boolean_mappings", default: {}
+    t.jsonb "payment_property_datetime_mappings", default: {}
+    t.jsonb "facility_group_property_string_mappings", default: {}
+    t.jsonb "facility_group_property_text_mappings", default: {}
+    t.jsonb "facility_group_property_integer_mappings", default: {}
+    t.jsonb "facility_group_property_decimal_mappings", default: {}
+    t.jsonb "facility_group_property_boolean_mappings", default: {}
+    t.jsonb "facility_group_property_datetime_mappings", default: {}
+    t.jsonb "facility_property_string_mappings", default: {}
+    t.jsonb "facility_property_text_mappings", default: {}
+    t.jsonb "facility_property_integer_mappings", default: {}
+    t.jsonb "facility_property_decimal_mappings", default: {}
+    t.jsonb "facility_property_boolean_mappings", default: {}
+    t.jsonb "facility_property_datetime_mappings", default: {}
+    t.jsonb "project_group_property_string_mappings", default: {}
+    t.jsonb "project_group_property_text_mappings", default: {}
+    t.jsonb "project_group_property_integer_mappings", default: {}
+    t.jsonb "project_group_property_decimal_mappings", default: {}
+    t.jsonb "project_group_property_boolean_mappings", default: {}
+    t.jsonb "project_group_property_datetime_mappings", default: {}
+    t.jsonb "project_property_string_mappings", default: {}
+    t.jsonb "project_property_text_mappings", default: {}
+    t.jsonb "project_property_integer_mappings", default: {}
+    t.jsonb "project_property_decimal_mappings", default: {}
+    t.jsonb "project_property_boolean_mappings", default: {}
+    t.jsonb "project_property_datetime_mappings", default: {}
+    t.jsonb "task_group_property_string_mappings", default: {}
+    t.jsonb "task_group_property_text_mappings", default: {}
+    t.jsonb "task_group_property_integer_mappings", default: {}
+    t.jsonb "task_group_property_decimal_mappings", default: {}
+    t.jsonb "task_group_property_boolean_mappings", default: {}
+    t.jsonb "task_group_property_datetime_mappings", default: {}
+    t.jsonb "task_property_string_mappings", default: {}
+    t.jsonb "task_property_text_mappings", default: {}
+    t.jsonb "task_property_integer_mappings", default: {}
+    t.jsonb "task_property_decimal_mappings", default: {}
+    t.jsonb "task_property_boolean_mappings", default: {}
+    t.jsonb "task_property_datetime_mappings", default: {}
+    t.jsonb "booking_property_string_mappings", default: {}
+    t.jsonb "booking_property_text_mappings", default: {}
+    t.jsonb "booking_property_integer_mappings", default: {}
+    t.jsonb "booking_property_decimal_mappings", default: {}
+    t.jsonb "booking_property_boolean_mappings", default: {}
+    t.jsonb "booking_property_datetime_mappings", default: {}
+    t.jsonb "membership_property_string_mappings", default: {}
+    t.jsonb "membership_property_text_mappings", default: {}
+    t.jsonb "membership_property_integer_mappings", default: {}
+    t.jsonb "membership_property_decimal_mappings", default: {}
+    t.jsonb "membership_property_boolean_mappings", default: {}
+    t.jsonb "membership_property_datetime_mappings", default: {}
+    t.jsonb "reservation_property_string_mappings", default: {}
+    t.jsonb "reservation_property_text_mappings", default: {}
+    t.jsonb "reservation_property_integer_mappings", default: {}
+    t.jsonb "reservation_property_decimal_mappings", default: {}
+    t.jsonb "reservation_property_boolean_mappings", default: {}
+    t.jsonb "reservation_property_datetime_mappings", default: {}
+    t.integer "lifecycle_status"
+    t.integer "workflow_status"
+    t.integer "business_type"
+    t.datetime "expiration_date"
+    t.jsonb "metadata", default: {}
+    t.datetime "discarded_at"
+    t.string "permission_resource_name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["business_type"], name: "index_company_configs_on_business_type"
+    t.index ["company_id"], name: "index_company_configs_on_company_id"
+    t.index ["discarded_at"], name: "index_company_configs_on_discarded_at"
+    t.index ["lifecycle_status"], name: "index_company_configs_on_lifecycle_status"
+    t.index ["workflow_status"], name: "index_company_configs_on_workflow_status"
+  end
+
+  create_table "customer_appointments", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
     t.uuid "company_id", null: false
     t.uuid "customer_id", null: false
     t.string "appoint_from_type"
@@ -673,12 +1282,15 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.index ["appoint_from_type", "appoint_from_id"], name: "index_customer_appointments_on_appoint_from"
     t.index ["appoint_to_type", "appoint_to_id"], name: "idx_on_appoint_to_type_appoint_to_id_1b496b2c03"
     t.index ["appoint_to_type", "appoint_to_id"], name: "index_customer_appointments_on_appoint_to"
+    t.index ["business_type"], name: "index_customer_appointments_on_business_type"
     t.index ["company_id"], name: "index_customer_appointments_on_company_id"
     t.index ["customer_id"], name: "index_customer_appointments_on_customer_id"
     t.index ["discarded_at"], name: "index_customer_appointments_on_discarded_at"
+    t.index ["lifecycle_status"], name: "index_customer_appointments_on_lifecycle_status"
+    t.index ["workflow_status"], name: "index_customer_appointments_on_workflow_status"
   end
 
-  create_table "customer_group_appointments", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+  create_table "customer_group_appointments", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
     t.uuid "company_id", null: false
     t.uuid "customer_group_id", null: false
     t.string "appoint_from_type"
@@ -706,12 +1318,15 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.index ["appoint_from_type", "appoint_from_id"], name: "index_customer_group_appointments_on_appoint_from"
     t.index ["appoint_to_type", "appoint_to_id"], name: "idx_on_appoint_to_type_appoint_to_id_a6c19edb35"
     t.index ["appoint_to_type", "appoint_to_id"], name: "index_customer_group_appointments_on_appoint_to"
+    t.index ["business_type"], name: "index_customer_group_appointments_on_business_type"
     t.index ["company_id"], name: "index_customer_group_appointments_on_company_id"
     t.index ["customer_group_id"], name: "index_customer_group_appointments_on_customer_group_id"
     t.index ["discarded_at"], name: "index_customer_group_appointments_on_discarded_at"
+    t.index ["lifecycle_status"], name: "index_customer_group_appointments_on_lifecycle_status"
+    t.index ["workflow_status"], name: "index_customer_group_appointments_on_workflow_status"
   end
 
-  create_table "customer_groups", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+  create_table "customer_groups", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
     t.uuid "company_id", null: false
     t.uuid "branch_id"
     t.uuid "category_id"
@@ -726,15 +1341,93 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.jsonb "metadata", default: {}
     t.datetime "discarded_at"
     t.string "permission_resource_name"
+    t.string "property_string_1"
+    t.string "property_string_2"
+    t.string "property_string_3"
+    t.string "property_string_4"
+    t.string "property_string_5"
+    t.string "property_string_6"
+    t.string "property_string_7"
+    t.string "property_string_8"
+    t.string "property_string_9"
+    t.string "property_string_10"
+    t.string "property_string_11"
+    t.string "property_string_12"
+    t.string "property_string_13"
+    t.string "property_string_14"
+    t.string "property_string_15"
+    t.string "property_string_16"
+    t.string "property_string_17"
+    t.string "property_string_18"
+    t.string "property_string_19"
+    t.string "property_string_20"
+    t.text "property_text_1"
+    t.text "property_text_2"
+    t.text "property_text_3"
+    t.text "property_text_4"
+    t.text "property_text_5"
+    t.integer "property_integer_1"
+    t.integer "property_integer_2"
+    t.integer "property_integer_3"
+    t.integer "property_integer_4"
+    t.integer "property_integer_5"
+    t.integer "property_integer_6"
+    t.integer "property_integer_7"
+    t.integer "property_integer_8"
+    t.integer "property_integer_9"
+    t.integer "property_integer_10"
+    t.integer "property_integer_11"
+    t.integer "property_integer_12"
+    t.integer "property_integer_13"
+    t.integer "property_integer_14"
+    t.integer "property_integer_15"
+    t.integer "property_integer_16"
+    t.integer "property_integer_17"
+    t.integer "property_integer_18"
+    t.integer "property_integer_19"
+    t.integer "property_integer_20"
+    t.decimal "property_decimal_1", precision: 15, scale: 4
+    t.decimal "property_decimal_2", precision: 15, scale: 4
+    t.decimal "property_decimal_3", precision: 15, scale: 4
+    t.decimal "property_decimal_4", precision: 15, scale: 4
+    t.decimal "property_decimal_5", precision: 15, scale: 4
+    t.decimal "property_decimal_6", precision: 15, scale: 4
+    t.decimal "property_decimal_7", precision: 15, scale: 4
+    t.decimal "property_decimal_8", precision: 15, scale: 4
+    t.decimal "property_decimal_9", precision: 15, scale: 4
+    t.decimal "property_decimal_10", precision: 15, scale: 4
+    t.boolean "property_boolean_1"
+    t.boolean "property_boolean_2"
+    t.boolean "property_boolean_3"
+    t.boolean "property_boolean_4"
+    t.boolean "property_boolean_5"
+    t.boolean "property_boolean_6"
+    t.boolean "property_boolean_7"
+    t.boolean "property_boolean_8"
+    t.boolean "property_boolean_9"
+    t.boolean "property_boolean_10"
+    t.datetime "property_datetime_1"
+    t.datetime "property_datetime_2"
+    t.datetime "property_datetime_3"
+    t.datetime "property_datetime_4"
+    t.datetime "property_datetime_5"
+    t.datetime "property_datetime_6"
+    t.datetime "property_datetime_7"
+    t.datetime "property_datetime_8"
+    t.datetime "property_datetime_9"
+    t.datetime "property_datetime_10"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["branch_id"], name: "index_customer_groups_on_branch_id"
+    t.index ["business_type"], name: "index_customer_groups_on_business_type"
     t.index ["category_id"], name: "index_customer_groups_on_category_id"
     t.index ["company_id"], name: "index_customer_groups_on_company_id"
     t.index ["discarded_at"], name: "index_customer_groups_on_discarded_at"
+    t.index ["lifecycle_status"], name: "index_customer_groups_on_lifecycle_status"
+    t.index ["workflow_status"], name: "index_customer_groups_on_workflow_status"
   end
 
-  create_table "customers", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+  create_table "customers", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
     t.uuid "company_id", null: false
     t.uuid "branch_id"
     t.uuid "user_id"
@@ -750,16 +1443,94 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.jsonb "metadata", default: {}
     t.datetime "discarded_at"
     t.string "permission_resource_name"
+    t.string "property_string_1"
+    t.string "property_string_2"
+    t.string "property_string_3"
+    t.string "property_string_4"
+    t.string "property_string_5"
+    t.string "property_string_6"
+    t.string "property_string_7"
+    t.string "property_string_8"
+    t.string "property_string_9"
+    t.string "property_string_10"
+    t.string "property_string_11"
+    t.string "property_string_12"
+    t.string "property_string_13"
+    t.string "property_string_14"
+    t.string "property_string_15"
+    t.string "property_string_16"
+    t.string "property_string_17"
+    t.string "property_string_18"
+    t.string "property_string_19"
+    t.string "property_string_20"
+    t.text "property_text_1"
+    t.text "property_text_2"
+    t.text "property_text_3"
+    t.text "property_text_4"
+    t.text "property_text_5"
+    t.integer "property_integer_1"
+    t.integer "property_integer_2"
+    t.integer "property_integer_3"
+    t.integer "property_integer_4"
+    t.integer "property_integer_5"
+    t.integer "property_integer_6"
+    t.integer "property_integer_7"
+    t.integer "property_integer_8"
+    t.integer "property_integer_9"
+    t.integer "property_integer_10"
+    t.integer "property_integer_11"
+    t.integer "property_integer_12"
+    t.integer "property_integer_13"
+    t.integer "property_integer_14"
+    t.integer "property_integer_15"
+    t.integer "property_integer_16"
+    t.integer "property_integer_17"
+    t.integer "property_integer_18"
+    t.integer "property_integer_19"
+    t.integer "property_integer_20"
+    t.decimal "property_decimal_1", precision: 15, scale: 4
+    t.decimal "property_decimal_2", precision: 15, scale: 4
+    t.decimal "property_decimal_3", precision: 15, scale: 4
+    t.decimal "property_decimal_4", precision: 15, scale: 4
+    t.decimal "property_decimal_5", precision: 15, scale: 4
+    t.decimal "property_decimal_6", precision: 15, scale: 4
+    t.decimal "property_decimal_7", precision: 15, scale: 4
+    t.decimal "property_decimal_8", precision: 15, scale: 4
+    t.decimal "property_decimal_9", precision: 15, scale: 4
+    t.decimal "property_decimal_10", precision: 15, scale: 4
+    t.boolean "property_boolean_1"
+    t.boolean "property_boolean_2"
+    t.boolean "property_boolean_3"
+    t.boolean "property_boolean_4"
+    t.boolean "property_boolean_5"
+    t.boolean "property_boolean_6"
+    t.boolean "property_boolean_7"
+    t.boolean "property_boolean_8"
+    t.boolean "property_boolean_9"
+    t.boolean "property_boolean_10"
+    t.datetime "property_datetime_1"
+    t.datetime "property_datetime_2"
+    t.datetime "property_datetime_3"
+    t.datetime "property_datetime_4"
+    t.datetime "property_datetime_5"
+    t.datetime "property_datetime_6"
+    t.datetime "property_datetime_7"
+    t.datetime "property_datetime_8"
+    t.datetime "property_datetime_9"
+    t.datetime "property_datetime_10"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["branch_id"], name: "index_customers_on_branch_id"
+    t.index ["business_type"], name: "index_customers_on_business_type"
     t.index ["category_id"], name: "index_customers_on_category_id"
     t.index ["company_id"], name: "index_customers_on_company_id"
     t.index ["discarded_at"], name: "index_customers_on_discarded_at"
+    t.index ["lifecycle_status"], name: "index_customers_on_lifecycle_status"
     t.index ["user_id"], name: "index_customers_on_user_id"
+    t.index ["workflow_status"], name: "index_customers_on_workflow_status"
   end
 
-  create_table "department_appointments", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+  create_table "department_appointments", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
     t.uuid "company_id", null: false
     t.uuid "department_id", null: false
     t.string "appoint_from_type"
@@ -787,12 +1558,15 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.index ["appoint_from_type", "appoint_from_id"], name: "index_department_appointments_on_appoint_from"
     t.index ["appoint_to_type", "appoint_to_id"], name: "idx_on_appoint_to_type_appoint_to_id_8ea813e354"
     t.index ["appoint_to_type", "appoint_to_id"], name: "index_department_appointments_on_appoint_to"
+    t.index ["business_type"], name: "index_department_appointments_on_business_type"
     t.index ["company_id"], name: "index_department_appointments_on_company_id"
     t.index ["department_id"], name: "index_department_appointments_on_department_id"
     t.index ["discarded_at"], name: "index_department_appointments_on_discarded_at"
+    t.index ["lifecycle_status"], name: "index_department_appointments_on_lifecycle_status"
+    t.index ["workflow_status"], name: "index_department_appointments_on_workflow_status"
   end
 
-  create_table "departments", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+  create_table "departments", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
     t.uuid "company_id", null: false
     t.uuid "category_id"
     t.string "email", null: false
@@ -806,15 +1580,93 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.jsonb "metadata", default: {}
     t.datetime "discarded_at"
     t.string "permission_resource_name"
+    t.string "property_string_1"
+    t.string "property_string_2"
+    t.string "property_string_3"
+    t.string "property_string_4"
+    t.string "property_string_5"
+    t.string "property_string_6"
+    t.string "property_string_7"
+    t.string "property_string_8"
+    t.string "property_string_9"
+    t.string "property_string_10"
+    t.string "property_string_11"
+    t.string "property_string_12"
+    t.string "property_string_13"
+    t.string "property_string_14"
+    t.string "property_string_15"
+    t.string "property_string_16"
+    t.string "property_string_17"
+    t.string "property_string_18"
+    t.string "property_string_19"
+    t.string "property_string_20"
+    t.text "property_text_1"
+    t.text "property_text_2"
+    t.text "property_text_3"
+    t.text "property_text_4"
+    t.text "property_text_5"
+    t.integer "property_integer_1"
+    t.integer "property_integer_2"
+    t.integer "property_integer_3"
+    t.integer "property_integer_4"
+    t.integer "property_integer_5"
+    t.integer "property_integer_6"
+    t.integer "property_integer_7"
+    t.integer "property_integer_8"
+    t.integer "property_integer_9"
+    t.integer "property_integer_10"
+    t.integer "property_integer_11"
+    t.integer "property_integer_12"
+    t.integer "property_integer_13"
+    t.integer "property_integer_14"
+    t.integer "property_integer_15"
+    t.integer "property_integer_16"
+    t.integer "property_integer_17"
+    t.integer "property_integer_18"
+    t.integer "property_integer_19"
+    t.integer "property_integer_20"
+    t.decimal "property_decimal_1", precision: 15, scale: 4
+    t.decimal "property_decimal_2", precision: 15, scale: 4
+    t.decimal "property_decimal_3", precision: 15, scale: 4
+    t.decimal "property_decimal_4", precision: 15, scale: 4
+    t.decimal "property_decimal_5", precision: 15, scale: 4
+    t.decimal "property_decimal_6", precision: 15, scale: 4
+    t.decimal "property_decimal_7", precision: 15, scale: 4
+    t.decimal "property_decimal_8", precision: 15, scale: 4
+    t.decimal "property_decimal_9", precision: 15, scale: 4
+    t.decimal "property_decimal_10", precision: 15, scale: 4
+    t.boolean "property_boolean_1"
+    t.boolean "property_boolean_2"
+    t.boolean "property_boolean_3"
+    t.boolean "property_boolean_4"
+    t.boolean "property_boolean_5"
+    t.boolean "property_boolean_6"
+    t.boolean "property_boolean_7"
+    t.boolean "property_boolean_8"
+    t.boolean "property_boolean_9"
+    t.boolean "property_boolean_10"
+    t.datetime "property_datetime_1"
+    t.datetime "property_datetime_2"
+    t.datetime "property_datetime_3"
+    t.datetime "property_datetime_4"
+    t.datetime "property_datetime_5"
+    t.datetime "property_datetime_6"
+    t.datetime "property_datetime_7"
+    t.datetime "property_datetime_8"
+    t.datetime "property_datetime_9"
+    t.datetime "property_datetime_10"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["business_type"], name: "index_departments_on_business_type"
     t.index ["category_id"], name: "index_departments_on_category_id"
     t.index ["company_id"], name: "index_departments_on_company_id"
     t.index ["discarded_at"], name: "index_departments_on_discarded_at"
     t.index ["email"], name: "index_departments_on_email", unique: true
+    t.index ["lifecycle_status"], name: "index_departments_on_lifecycle_status"
+    t.index ["workflow_status"], name: "index_departments_on_workflow_status"
   end
 
-  create_table "document_appointments", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+  create_table "document_appointments", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
     t.uuid "company_id", null: false
     t.uuid "document_id", null: false
     t.string "appoint_from_type"
@@ -842,12 +1694,15 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.index ["appoint_from_type", "appoint_from_id"], name: "index_document_appointments_on_appoint_from"
     t.index ["appoint_to_type", "appoint_to_id"], name: "idx_on_appoint_to_type_appoint_to_id_fcaa395aab"
     t.index ["appoint_to_type", "appoint_to_id"], name: "index_document_appointments_on_appoint_to"
+    t.index ["business_type"], name: "index_document_appointments_on_business_type"
     t.index ["company_id"], name: "index_document_appointments_on_company_id"
     t.index ["discarded_at"], name: "index_document_appointments_on_discarded_at"
     t.index ["document_id"], name: "index_document_appointments_on_document_id"
+    t.index ["lifecycle_status"], name: "index_document_appointments_on_lifecycle_status"
+    t.index ["workflow_status"], name: "index_document_appointments_on_workflow_status"
   end
 
-  create_table "document_group_appointments", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+  create_table "document_group_appointments", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
     t.uuid "company_id", null: false
     t.uuid "document_group_id", null: false
     t.string "appoint_from_type"
@@ -875,12 +1730,15 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.index ["appoint_from_type", "appoint_from_id"], name: "index_document_group_appointments_on_appoint_from"
     t.index ["appoint_to_type", "appoint_to_id"], name: "idx_on_appoint_to_type_appoint_to_id_a5029e226f"
     t.index ["appoint_to_type", "appoint_to_id"], name: "index_document_group_appointments_on_appoint_to"
+    t.index ["business_type"], name: "index_document_group_appointments_on_business_type"
     t.index ["company_id"], name: "index_document_group_appointments_on_company_id"
     t.index ["discarded_at"], name: "index_document_group_appointments_on_discarded_at"
     t.index ["document_group_id"], name: "index_document_group_appointments_on_document_group_id"
+    t.index ["lifecycle_status"], name: "index_document_group_appointments_on_lifecycle_status"
+    t.index ["workflow_status"], name: "index_document_group_appointments_on_workflow_status"
   end
 
-  create_table "document_groups", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+  create_table "document_groups", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
     t.uuid "company_id", null: false
     t.uuid "branch_id"
     t.uuid "category_id"
@@ -899,12 +1757,15 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["branch_id"], name: "index_document_groups_on_branch_id"
+    t.index ["business_type"], name: "index_document_groups_on_business_type"
     t.index ["category_id"], name: "index_document_groups_on_category_id"
     t.index ["company_id"], name: "index_document_groups_on_company_id"
     t.index ["discarded_at"], name: "index_document_groups_on_discarded_at"
+    t.index ["lifecycle_status"], name: "index_document_groups_on_lifecycle_status"
+    t.index ["workflow_status"], name: "index_document_groups_on_workflow_status"
   end
 
-  create_table "documents", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+  create_table "documents", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
     t.uuid "document_group_id", null: false
     t.uuid "company_id", null: false
     t.uuid "branch_id"
@@ -924,13 +1785,16 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["branch_id"], name: "index_documents_on_branch_id"
+    t.index ["business_type"], name: "index_documents_on_business_type"
     t.index ["category_id"], name: "index_documents_on_category_id"
     t.index ["company_id"], name: "index_documents_on_company_id"
     t.index ["discarded_at"], name: "index_documents_on_discarded_at"
     t.index ["document_group_id"], name: "index_documents_on_document_group_id"
+    t.index ["lifecycle_status"], name: "index_documents_on_lifecycle_status"
+    t.index ["workflow_status"], name: "index_documents_on_workflow_status"
   end
 
-  create_table "employee_appointments", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+  create_table "employee_appointments", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
     t.uuid "company_id", null: false
     t.uuid "employee_id", null: false
     t.string "appoint_from_type"
@@ -958,12 +1822,15 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.index ["appoint_from_type", "appoint_from_id"], name: "index_employee_appointments_on_appoint_from"
     t.index ["appoint_to_type", "appoint_to_id"], name: "idx_on_appoint_to_type_appoint_to_id_a39c78be55"
     t.index ["appoint_to_type", "appoint_to_id"], name: "index_employee_appointments_on_appoint_to"
+    t.index ["business_type"], name: "index_employee_appointments_on_business_type"
     t.index ["company_id"], name: "index_employee_appointments_on_company_id"
     t.index ["discarded_at"], name: "index_employee_appointments_on_discarded_at"
     t.index ["employee_id"], name: "index_employee_appointments_on_employee_id"
+    t.index ["lifecycle_status"], name: "index_employee_appointments_on_lifecycle_status"
+    t.index ["workflow_status"], name: "index_employee_appointments_on_workflow_status"
   end
 
-  create_table "employee_group_appointments", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+  create_table "employee_group_appointments", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
     t.uuid "company_id", null: false
     t.uuid "employee_group_id", null: false
     t.string "appoint_from_type"
@@ -991,12 +1858,15 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.index ["appoint_from_type", "appoint_from_id"], name: "index_employee_group_appointments_on_appoint_from"
     t.index ["appoint_to_type", "appoint_to_id"], name: "idx_on_appoint_to_type_appoint_to_id_57b6eaae20"
     t.index ["appoint_to_type", "appoint_to_id"], name: "index_employee_group_appointments_on_appoint_to"
+    t.index ["business_type"], name: "index_employee_group_appointments_on_business_type"
     t.index ["company_id"], name: "index_employee_group_appointments_on_company_id"
     t.index ["discarded_at"], name: "index_employee_group_appointments_on_discarded_at"
     t.index ["employee_group_id"], name: "index_employee_group_appointments_on_employee_group_id"
+    t.index ["lifecycle_status"], name: "index_employee_group_appointments_on_lifecycle_status"
+    t.index ["workflow_status"], name: "index_employee_group_appointments_on_workflow_status"
   end
 
-  create_table "employee_groups", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+  create_table "employee_groups", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
     t.uuid "company_id", null: false
     t.uuid "branch_id"
     t.uuid "category_id"
@@ -1011,16 +1881,94 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.jsonb "metadata", default: {}
     t.datetime "discarded_at"
     t.string "permission_resource_name"
+    t.string "property_string_1"
+    t.string "property_string_2"
+    t.string "property_string_3"
+    t.string "property_string_4"
+    t.string "property_string_5"
+    t.string "property_string_6"
+    t.string "property_string_7"
+    t.string "property_string_8"
+    t.string "property_string_9"
+    t.string "property_string_10"
+    t.string "property_string_11"
+    t.string "property_string_12"
+    t.string "property_string_13"
+    t.string "property_string_14"
+    t.string "property_string_15"
+    t.string "property_string_16"
+    t.string "property_string_17"
+    t.string "property_string_18"
+    t.string "property_string_19"
+    t.string "property_string_20"
+    t.text "property_text_1"
+    t.text "property_text_2"
+    t.text "property_text_3"
+    t.text "property_text_4"
+    t.text "property_text_5"
+    t.integer "property_integer_1"
+    t.integer "property_integer_2"
+    t.integer "property_integer_3"
+    t.integer "property_integer_4"
+    t.integer "property_integer_5"
+    t.integer "property_integer_6"
+    t.integer "property_integer_7"
+    t.integer "property_integer_8"
+    t.integer "property_integer_9"
+    t.integer "property_integer_10"
+    t.integer "property_integer_11"
+    t.integer "property_integer_12"
+    t.integer "property_integer_13"
+    t.integer "property_integer_14"
+    t.integer "property_integer_15"
+    t.integer "property_integer_16"
+    t.integer "property_integer_17"
+    t.integer "property_integer_18"
+    t.integer "property_integer_19"
+    t.integer "property_integer_20"
+    t.decimal "property_decimal_1", precision: 15, scale: 4
+    t.decimal "property_decimal_2", precision: 15, scale: 4
+    t.decimal "property_decimal_3", precision: 15, scale: 4
+    t.decimal "property_decimal_4", precision: 15, scale: 4
+    t.decimal "property_decimal_5", precision: 15, scale: 4
+    t.decimal "property_decimal_6", precision: 15, scale: 4
+    t.decimal "property_decimal_7", precision: 15, scale: 4
+    t.decimal "property_decimal_8", precision: 15, scale: 4
+    t.decimal "property_decimal_9", precision: 15, scale: 4
+    t.decimal "property_decimal_10", precision: 15, scale: 4
+    t.boolean "property_boolean_1"
+    t.boolean "property_boolean_2"
+    t.boolean "property_boolean_3"
+    t.boolean "property_boolean_4"
+    t.boolean "property_boolean_5"
+    t.boolean "property_boolean_6"
+    t.boolean "property_boolean_7"
+    t.boolean "property_boolean_8"
+    t.boolean "property_boolean_9"
+    t.boolean "property_boolean_10"
+    t.datetime "property_datetime_1"
+    t.datetime "property_datetime_2"
+    t.datetime "property_datetime_3"
+    t.datetime "property_datetime_4"
+    t.datetime "property_datetime_5"
+    t.datetime "property_datetime_6"
+    t.datetime "property_datetime_7"
+    t.datetime "property_datetime_8"
+    t.datetime "property_datetime_9"
+    t.datetime "property_datetime_10"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["branch_id"], name: "index_employee_groups_on_branch_id"
+    t.index ["business_type"], name: "index_employee_groups_on_business_type"
     t.index ["category_id"], name: "index_employee_groups_on_category_id"
     t.index ["company_id", "updated_at"], name: "index_employee_groups_on_company_id_and_updated_at"
     t.index ["company_id"], name: "index_employee_groups_on_company_id"
     t.index ["discarded_at"], name: "index_employee_groups_on_discarded_at"
+    t.index ["lifecycle_status"], name: "index_employee_groups_on_lifecycle_status"
+    t.index ["workflow_status"], name: "index_employee_groups_on_workflow_status"
   end
 
-  create_table "employees", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+  create_table "employees", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
     t.uuid "company_id", null: false
     t.uuid "branch_id"
     t.uuid "user_id"
@@ -1036,16 +1984,94 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.jsonb "metadata", default: {}
     t.datetime "discarded_at"
     t.string "permission_resource_name"
+    t.string "property_string_1"
+    t.string "property_string_2"
+    t.string "property_string_3"
+    t.string "property_string_4"
+    t.string "property_string_5"
+    t.string "property_string_6"
+    t.string "property_string_7"
+    t.string "property_string_8"
+    t.string "property_string_9"
+    t.string "property_string_10"
+    t.string "property_string_11"
+    t.string "property_string_12"
+    t.string "property_string_13"
+    t.string "property_string_14"
+    t.string "property_string_15"
+    t.string "property_string_16"
+    t.string "property_string_17"
+    t.string "property_string_18"
+    t.string "property_string_19"
+    t.string "property_string_20"
+    t.text "property_text_1"
+    t.text "property_text_2"
+    t.text "property_text_3"
+    t.text "property_text_4"
+    t.text "property_text_5"
+    t.integer "property_integer_1"
+    t.integer "property_integer_2"
+    t.integer "property_integer_3"
+    t.integer "property_integer_4"
+    t.integer "property_integer_5"
+    t.integer "property_integer_6"
+    t.integer "property_integer_7"
+    t.integer "property_integer_8"
+    t.integer "property_integer_9"
+    t.integer "property_integer_10"
+    t.integer "property_integer_11"
+    t.integer "property_integer_12"
+    t.integer "property_integer_13"
+    t.integer "property_integer_14"
+    t.integer "property_integer_15"
+    t.integer "property_integer_16"
+    t.integer "property_integer_17"
+    t.integer "property_integer_18"
+    t.integer "property_integer_19"
+    t.integer "property_integer_20"
+    t.decimal "property_decimal_1", precision: 15, scale: 4
+    t.decimal "property_decimal_2", precision: 15, scale: 4
+    t.decimal "property_decimal_3", precision: 15, scale: 4
+    t.decimal "property_decimal_4", precision: 15, scale: 4
+    t.decimal "property_decimal_5", precision: 15, scale: 4
+    t.decimal "property_decimal_6", precision: 15, scale: 4
+    t.decimal "property_decimal_7", precision: 15, scale: 4
+    t.decimal "property_decimal_8", precision: 15, scale: 4
+    t.decimal "property_decimal_9", precision: 15, scale: 4
+    t.decimal "property_decimal_10", precision: 15, scale: 4
+    t.boolean "property_boolean_1"
+    t.boolean "property_boolean_2"
+    t.boolean "property_boolean_3"
+    t.boolean "property_boolean_4"
+    t.boolean "property_boolean_5"
+    t.boolean "property_boolean_6"
+    t.boolean "property_boolean_7"
+    t.boolean "property_boolean_8"
+    t.boolean "property_boolean_9"
+    t.boolean "property_boolean_10"
+    t.datetime "property_datetime_1"
+    t.datetime "property_datetime_2"
+    t.datetime "property_datetime_3"
+    t.datetime "property_datetime_4"
+    t.datetime "property_datetime_5"
+    t.datetime "property_datetime_6"
+    t.datetime "property_datetime_7"
+    t.datetime "property_datetime_8"
+    t.datetime "property_datetime_9"
+    t.datetime "property_datetime_10"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["branch_id"], name: "index_employees_on_branch_id"
+    t.index ["business_type"], name: "index_employees_on_business_type"
     t.index ["category_id"], name: "index_employees_on_category_id"
     t.index ["company_id"], name: "index_employees_on_company_id"
     t.index ["discarded_at"], name: "index_employees_on_discarded_at"
+    t.index ["lifecycle_status"], name: "index_employees_on_lifecycle_status"
     t.index ["user_id"], name: "index_employees_on_user_id"
+    t.index ["workflow_status"], name: "index_employees_on_workflow_status"
   end
 
-  create_table "event_appointments", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+  create_table "event_appointments", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
     t.uuid "company_id", null: false
     t.uuid "event_id", null: false
     t.string "appoint_from_type"
@@ -1073,12 +2099,15 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.index ["appoint_from_type", "appoint_from_id"], name: "index_event_appointments_on_appoint_from"
     t.index ["appoint_to_type", "appoint_to_id"], name: "index_event_appointments_on_appoint_to"
     t.index ["appoint_to_type", "appoint_to_id"], name: "index_event_appointments_on_appoint_to_type_and_appoint_to_id"
+    t.index ["business_type"], name: "index_event_appointments_on_business_type"
     t.index ["company_id"], name: "index_event_appointments_on_company_id"
     t.index ["discarded_at"], name: "index_event_appointments_on_discarded_at"
     t.index ["event_id"], name: "index_event_appointments_on_event_id"
+    t.index ["lifecycle_status"], name: "index_event_appointments_on_lifecycle_status"
+    t.index ["workflow_status"], name: "index_event_appointments_on_workflow_status"
   end
 
-  create_table "event_group_appointments", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+  create_table "event_group_appointments", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
     t.uuid "company_id", null: false
     t.uuid "event_group_id", null: false
     t.string "appoint_from_type"
@@ -1106,12 +2135,15 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.index ["appoint_from_type", "appoint_from_id"], name: "index_event_group_appointments_on_appoint_from"
     t.index ["appoint_to_type", "appoint_to_id"], name: "idx_on_appoint_to_type_appoint_to_id_941fb608a2"
     t.index ["appoint_to_type", "appoint_to_id"], name: "index_event_group_appointments_on_appoint_to"
+    t.index ["business_type"], name: "index_event_group_appointments_on_business_type"
     t.index ["company_id"], name: "index_event_group_appointments_on_company_id"
     t.index ["discarded_at"], name: "index_event_group_appointments_on_discarded_at"
     t.index ["event_group_id"], name: "index_event_group_appointments_on_event_group_id"
+    t.index ["lifecycle_status"], name: "index_event_group_appointments_on_lifecycle_status"
+    t.index ["workflow_status"], name: "index_event_group_appointments_on_workflow_status"
   end
 
-  create_table "event_groups", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+  create_table "event_groups", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
     t.uuid "company_id", null: false
     t.uuid "branch_id"
     t.uuid "category_id"
@@ -1128,12 +2160,15 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["branch_id"], name: "index_event_groups_on_branch_id"
+    t.index ["business_type"], name: "index_event_groups_on_business_type"
     t.index ["category_id"], name: "index_event_groups_on_category_id"
     t.index ["company_id"], name: "index_event_groups_on_company_id"
     t.index ["discarded_at"], name: "index_event_groups_on_discarded_at"
+    t.index ["lifecycle_status"], name: "index_event_groups_on_lifecycle_status"
+    t.index ["workflow_status"], name: "index_event_groups_on_workflow_status"
   end
 
-  create_table "events", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+  create_table "events", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
     t.uuid "event_group_id", null: false
     t.uuid "company_id", null: false
     t.uuid "branch_id"
@@ -1151,13 +2186,16 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["branch_id"], name: "index_events_on_branch_id"
+    t.index ["business_type"], name: "index_events_on_business_type"
     t.index ["category_id"], name: "index_events_on_category_id"
     t.index ["company_id"], name: "index_events_on_company_id"
     t.index ["discarded_at"], name: "index_events_on_discarded_at"
     t.index ["event_group_id"], name: "index_events_on_event_group_id"
+    t.index ["lifecycle_status"], name: "index_events_on_lifecycle_status"
+    t.index ["workflow_status"], name: "index_events_on_workflow_status"
   end
 
-  create_table "exam_appointments", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+  create_table "exam_appointments", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
     t.uuid "company_id", null: false
     t.uuid "exam_id", null: false
     t.string "appoint_from_type"
@@ -1185,12 +2223,15 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.index ["appoint_from_type", "appoint_from_id"], name: "index_exam_appointments_on_appoint_from"
     t.index ["appoint_to_type", "appoint_to_id"], name: "index_exam_appointments_on_appoint_to"
     t.index ["appoint_to_type", "appoint_to_id"], name: "index_exam_appointments_on_appoint_to_type_and_appoint_to_id"
+    t.index ["business_type"], name: "index_exam_appointments_on_business_type"
     t.index ["company_id"], name: "index_exam_appointments_on_company_id"
     t.index ["discarded_at"], name: "index_exam_appointments_on_discarded_at"
     t.index ["exam_id"], name: "index_exam_appointments_on_exam_id"
+    t.index ["lifecycle_status"], name: "index_exam_appointments_on_lifecycle_status"
+    t.index ["workflow_status"], name: "index_exam_appointments_on_workflow_status"
   end
 
-  create_table "exam_groups", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+  create_table "exam_groups", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
     t.uuid "company_id", null: false
     t.uuid "branch_id"
     t.uuid "category_id"
@@ -1207,12 +2248,15 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["branch_id"], name: "index_exam_groups_on_branch_id"
+    t.index ["business_type"], name: "index_exam_groups_on_business_type"
     t.index ["category_id"], name: "index_exam_groups_on_category_id"
     t.index ["company_id"], name: "index_exam_groups_on_company_id"
     t.index ["discarded_at"], name: "index_exam_groups_on_discarded_at"
+    t.index ["lifecycle_status"], name: "index_exam_groups_on_lifecycle_status"
+    t.index ["workflow_status"], name: "index_exam_groups_on_workflow_status"
   end
 
-  create_table "exams", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+  create_table "exams", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
     t.uuid "exam_group_id", null: false
     t.uuid "company_id", null: false
     t.uuid "branch_id"
@@ -1230,13 +2274,16 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["branch_id"], name: "index_exams_on_branch_id"
+    t.index ["business_type"], name: "index_exams_on_business_type"
     t.index ["category_id"], name: "index_exams_on_category_id"
     t.index ["company_id"], name: "index_exams_on_company_id"
     t.index ["discarded_at"], name: "index_exams_on_discarded_at"
     t.index ["exam_group_id"], name: "index_exams_on_exam_group_id"
+    t.index ["lifecycle_status"], name: "index_exams_on_lifecycle_status"
+    t.index ["workflow_status"], name: "index_exams_on_workflow_status"
   end
 
-  create_table "facilities", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+  create_table "facilities", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
     t.uuid "company_id", null: false
     t.uuid "branch_id"
     t.uuid "category_id"
@@ -1250,15 +2297,93 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.jsonb "metadata", default: {}
     t.datetime "discarded_at"
     t.string "permission_resource_name"
+    t.string "property_string_1"
+    t.string "property_string_2"
+    t.string "property_string_3"
+    t.string "property_string_4"
+    t.string "property_string_5"
+    t.string "property_string_6"
+    t.string "property_string_7"
+    t.string "property_string_8"
+    t.string "property_string_9"
+    t.string "property_string_10"
+    t.string "property_string_11"
+    t.string "property_string_12"
+    t.string "property_string_13"
+    t.string "property_string_14"
+    t.string "property_string_15"
+    t.string "property_string_16"
+    t.string "property_string_17"
+    t.string "property_string_18"
+    t.string "property_string_19"
+    t.string "property_string_20"
+    t.text "property_text_1"
+    t.text "property_text_2"
+    t.text "property_text_3"
+    t.text "property_text_4"
+    t.text "property_text_5"
+    t.integer "property_integer_1"
+    t.integer "property_integer_2"
+    t.integer "property_integer_3"
+    t.integer "property_integer_4"
+    t.integer "property_integer_5"
+    t.integer "property_integer_6"
+    t.integer "property_integer_7"
+    t.integer "property_integer_8"
+    t.integer "property_integer_9"
+    t.integer "property_integer_10"
+    t.integer "property_integer_11"
+    t.integer "property_integer_12"
+    t.integer "property_integer_13"
+    t.integer "property_integer_14"
+    t.integer "property_integer_15"
+    t.integer "property_integer_16"
+    t.integer "property_integer_17"
+    t.integer "property_integer_18"
+    t.integer "property_integer_19"
+    t.integer "property_integer_20"
+    t.decimal "property_decimal_1", precision: 15, scale: 4
+    t.decimal "property_decimal_2", precision: 15, scale: 4
+    t.decimal "property_decimal_3", precision: 15, scale: 4
+    t.decimal "property_decimal_4", precision: 15, scale: 4
+    t.decimal "property_decimal_5", precision: 15, scale: 4
+    t.decimal "property_decimal_6", precision: 15, scale: 4
+    t.decimal "property_decimal_7", precision: 15, scale: 4
+    t.decimal "property_decimal_8", precision: 15, scale: 4
+    t.decimal "property_decimal_9", precision: 15, scale: 4
+    t.decimal "property_decimal_10", precision: 15, scale: 4
+    t.boolean "property_boolean_1"
+    t.boolean "property_boolean_2"
+    t.boolean "property_boolean_3"
+    t.boolean "property_boolean_4"
+    t.boolean "property_boolean_5"
+    t.boolean "property_boolean_6"
+    t.boolean "property_boolean_7"
+    t.boolean "property_boolean_8"
+    t.boolean "property_boolean_9"
+    t.boolean "property_boolean_10"
+    t.datetime "property_datetime_1"
+    t.datetime "property_datetime_2"
+    t.datetime "property_datetime_3"
+    t.datetime "property_datetime_4"
+    t.datetime "property_datetime_5"
+    t.datetime "property_datetime_6"
+    t.datetime "property_datetime_7"
+    t.datetime "property_datetime_8"
+    t.datetime "property_datetime_9"
+    t.datetime "property_datetime_10"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["branch_id"], name: "index_facilities_on_branch_id"
+    t.index ["business_type"], name: "index_facilities_on_business_type"
     t.index ["category_id"], name: "index_facilities_on_category_id"
     t.index ["company_id"], name: "index_facilities_on_company_id"
     t.index ["discarded_at"], name: "index_facilities_on_discarded_at"
+    t.index ["lifecycle_status"], name: "index_facilities_on_lifecycle_status"
+    t.index ["workflow_status"], name: "index_facilities_on_workflow_status"
   end
 
-  create_table "facility_appointments", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+  create_table "facility_appointments", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
     t.uuid "company_id", null: false
     t.uuid "facility_id", null: false
     t.string "appoint_from_type"
@@ -1286,12 +2411,15 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.index ["appoint_from_type", "appoint_from_id"], name: "index_facility_appointments_on_appoint_from"
     t.index ["appoint_to_type", "appoint_to_id"], name: "idx_on_appoint_to_type_appoint_to_id_b7dff614b7"
     t.index ["appoint_to_type", "appoint_to_id"], name: "index_facility_appointments_on_appoint_to"
+    t.index ["business_type"], name: "index_facility_appointments_on_business_type"
     t.index ["company_id"], name: "index_facility_appointments_on_company_id"
     t.index ["discarded_at"], name: "index_facility_appointments_on_discarded_at"
     t.index ["facility_id"], name: "index_facility_appointments_on_facility_id"
+    t.index ["lifecycle_status"], name: "index_facility_appointments_on_lifecycle_status"
+    t.index ["workflow_status"], name: "index_facility_appointments_on_workflow_status"
   end
 
-  create_table "facility_group_appointments", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+  create_table "facility_group_appointments", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
     t.uuid "company_id", null: false
     t.uuid "facility_group_id", null: false
     t.string "appoint_from_type"
@@ -1319,12 +2447,15 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.index ["appoint_from_type", "appoint_from_id"], name: "index_facility_group_appointments_on_appoint_from"
     t.index ["appoint_to_type", "appoint_to_id"], name: "idx_on_appoint_to_type_appoint_to_id_ebef229bea"
     t.index ["appoint_to_type", "appoint_to_id"], name: "index_facility_group_appointments_on_appoint_to"
+    t.index ["business_type"], name: "index_facility_group_appointments_on_business_type"
     t.index ["company_id"], name: "index_facility_group_appointments_on_company_id"
     t.index ["discarded_at"], name: "index_facility_group_appointments_on_discarded_at"
     t.index ["facility_group_id"], name: "index_facility_group_appointments_on_facility_group_id"
+    t.index ["lifecycle_status"], name: "index_facility_group_appointments_on_lifecycle_status"
+    t.index ["workflow_status"], name: "index_facility_group_appointments_on_workflow_status"
   end
 
-  create_table "facility_groups", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+  create_table "facility_groups", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
     t.uuid "company_id", null: false
     t.uuid "branch_id"
     t.uuid "category_id"
@@ -1338,15 +2469,93 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.jsonb "metadata", default: {}
     t.datetime "discarded_at"
     t.string "permission_resource_name"
+    t.string "property_string_1"
+    t.string "property_string_2"
+    t.string "property_string_3"
+    t.string "property_string_4"
+    t.string "property_string_5"
+    t.string "property_string_6"
+    t.string "property_string_7"
+    t.string "property_string_8"
+    t.string "property_string_9"
+    t.string "property_string_10"
+    t.string "property_string_11"
+    t.string "property_string_12"
+    t.string "property_string_13"
+    t.string "property_string_14"
+    t.string "property_string_15"
+    t.string "property_string_16"
+    t.string "property_string_17"
+    t.string "property_string_18"
+    t.string "property_string_19"
+    t.string "property_string_20"
+    t.text "property_text_1"
+    t.text "property_text_2"
+    t.text "property_text_3"
+    t.text "property_text_4"
+    t.text "property_text_5"
+    t.integer "property_integer_1"
+    t.integer "property_integer_2"
+    t.integer "property_integer_3"
+    t.integer "property_integer_4"
+    t.integer "property_integer_5"
+    t.integer "property_integer_6"
+    t.integer "property_integer_7"
+    t.integer "property_integer_8"
+    t.integer "property_integer_9"
+    t.integer "property_integer_10"
+    t.integer "property_integer_11"
+    t.integer "property_integer_12"
+    t.integer "property_integer_13"
+    t.integer "property_integer_14"
+    t.integer "property_integer_15"
+    t.integer "property_integer_16"
+    t.integer "property_integer_17"
+    t.integer "property_integer_18"
+    t.integer "property_integer_19"
+    t.integer "property_integer_20"
+    t.decimal "property_decimal_1", precision: 15, scale: 4
+    t.decimal "property_decimal_2", precision: 15, scale: 4
+    t.decimal "property_decimal_3", precision: 15, scale: 4
+    t.decimal "property_decimal_4", precision: 15, scale: 4
+    t.decimal "property_decimal_5", precision: 15, scale: 4
+    t.decimal "property_decimal_6", precision: 15, scale: 4
+    t.decimal "property_decimal_7", precision: 15, scale: 4
+    t.decimal "property_decimal_8", precision: 15, scale: 4
+    t.decimal "property_decimal_9", precision: 15, scale: 4
+    t.decimal "property_decimal_10", precision: 15, scale: 4
+    t.boolean "property_boolean_1"
+    t.boolean "property_boolean_2"
+    t.boolean "property_boolean_3"
+    t.boolean "property_boolean_4"
+    t.boolean "property_boolean_5"
+    t.boolean "property_boolean_6"
+    t.boolean "property_boolean_7"
+    t.boolean "property_boolean_8"
+    t.boolean "property_boolean_9"
+    t.boolean "property_boolean_10"
+    t.datetime "property_datetime_1"
+    t.datetime "property_datetime_2"
+    t.datetime "property_datetime_3"
+    t.datetime "property_datetime_4"
+    t.datetime "property_datetime_5"
+    t.datetime "property_datetime_6"
+    t.datetime "property_datetime_7"
+    t.datetime "property_datetime_8"
+    t.datetime "property_datetime_9"
+    t.datetime "property_datetime_10"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["branch_id"], name: "index_facility_groups_on_branch_id"
+    t.index ["business_type"], name: "index_facility_groups_on_business_type"
     t.index ["category_id"], name: "index_facility_groups_on_category_id"
     t.index ["company_id"], name: "index_facility_groups_on_company_id"
     t.index ["discarded_at"], name: "index_facility_groups_on_discarded_at"
+    t.index ["lifecycle_status"], name: "index_facility_groups_on_lifecycle_status"
+    t.index ["workflow_status"], name: "index_facility_groups_on_workflow_status"
   end
 
-  create_table "invoices", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+  create_table "invoices", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
     t.uuid "company_id", null: false
     t.uuid "branch_id"
     t.uuid "order_id", null: false
@@ -1366,16 +2575,94 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.jsonb "metadata", default: {}
     t.datetime "discarded_at"
     t.string "permission_resource_name"
+    t.string "property_string_1"
+    t.string "property_string_2"
+    t.string "property_string_3"
+    t.string "property_string_4"
+    t.string "property_string_5"
+    t.string "property_string_6"
+    t.string "property_string_7"
+    t.string "property_string_8"
+    t.string "property_string_9"
+    t.string "property_string_10"
+    t.string "property_string_11"
+    t.string "property_string_12"
+    t.string "property_string_13"
+    t.string "property_string_14"
+    t.string "property_string_15"
+    t.string "property_string_16"
+    t.string "property_string_17"
+    t.string "property_string_18"
+    t.string "property_string_19"
+    t.string "property_string_20"
+    t.text "property_text_1"
+    t.text "property_text_2"
+    t.text "property_text_3"
+    t.text "property_text_4"
+    t.text "property_text_5"
+    t.integer "property_integer_1"
+    t.integer "property_integer_2"
+    t.integer "property_integer_3"
+    t.integer "property_integer_4"
+    t.integer "property_integer_5"
+    t.integer "property_integer_6"
+    t.integer "property_integer_7"
+    t.integer "property_integer_8"
+    t.integer "property_integer_9"
+    t.integer "property_integer_10"
+    t.integer "property_integer_11"
+    t.integer "property_integer_12"
+    t.integer "property_integer_13"
+    t.integer "property_integer_14"
+    t.integer "property_integer_15"
+    t.integer "property_integer_16"
+    t.integer "property_integer_17"
+    t.integer "property_integer_18"
+    t.integer "property_integer_19"
+    t.integer "property_integer_20"
+    t.decimal "property_decimal_1", precision: 15, scale: 4
+    t.decimal "property_decimal_2", precision: 15, scale: 4
+    t.decimal "property_decimal_3", precision: 15, scale: 4
+    t.decimal "property_decimal_4", precision: 15, scale: 4
+    t.decimal "property_decimal_5", precision: 15, scale: 4
+    t.decimal "property_decimal_6", precision: 15, scale: 4
+    t.decimal "property_decimal_7", precision: 15, scale: 4
+    t.decimal "property_decimal_8", precision: 15, scale: 4
+    t.decimal "property_decimal_9", precision: 15, scale: 4
+    t.decimal "property_decimal_10", precision: 15, scale: 4
+    t.boolean "property_boolean_1"
+    t.boolean "property_boolean_2"
+    t.boolean "property_boolean_3"
+    t.boolean "property_boolean_4"
+    t.boolean "property_boolean_5"
+    t.boolean "property_boolean_6"
+    t.boolean "property_boolean_7"
+    t.boolean "property_boolean_8"
+    t.boolean "property_boolean_9"
+    t.boolean "property_boolean_10"
+    t.datetime "property_datetime_1"
+    t.datetime "property_datetime_2"
+    t.datetime "property_datetime_3"
+    t.datetime "property_datetime_4"
+    t.datetime "property_datetime_5"
+    t.datetime "property_datetime_6"
+    t.datetime "property_datetime_7"
+    t.datetime "property_datetime_8"
+    t.datetime "property_datetime_9"
+    t.datetime "property_datetime_10"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["branch_id"], name: "index_invoices_on_branch_id"
+    t.index ["business_type"], name: "index_invoices_on_business_type"
     t.index ["category_id"], name: "index_invoices_on_category_id"
     t.index ["company_id"], name: "index_invoices_on_company_id"
     t.index ["discarded_at"], name: "index_invoices_on_discarded_at"
+    t.index ["lifecycle_status"], name: "index_invoices_on_lifecycle_status"
     t.index ["order_id"], name: "index_invoices_on_order_id"
+    t.index ["workflow_status"], name: "index_invoices_on_workflow_status"
   end
 
-  create_table "membership_appointments", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+  create_table "membership_appointments", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
     t.uuid "company_id", null: false
     t.uuid "membership_id", null: false
     t.string "appoint_from_type"
@@ -1403,22 +2690,108 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.index ["appoint_from_type", "appoint_from_id"], name: "index_membership_appointments_on_appoint_from"
     t.index ["appoint_to_type", "appoint_to_id"], name: "idx_on_appoint_to_type_appoint_to_id_92c11e8cbf"
     t.index ["appoint_to_type", "appoint_to_id"], name: "index_membership_appointments_on_appoint_to"
+    t.index ["business_type"], name: "index_membership_appointments_on_business_type"
     t.index ["company_id"], name: "index_membership_appointments_on_company_id"
     t.index ["discarded_at"], name: "index_membership_appointments_on_discarded_at"
+    t.index ["lifecycle_status"], name: "index_membership_appointments_on_lifecycle_status"
     t.index ["membership_id"], name: "index_membership_appointments_on_membership_id"
+    t.index ["workflow_status"], name: "index_membership_appointments_on_workflow_status"
   end
 
-  create_table "memberships", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+  create_table "memberships", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
     t.string "name"
     t.string "code", null: false
     t.integer "lifecycle_status"
     t.integer "workflow_status"
     t.integer "business_type"
+    t.datetime "expiration_date"
+    t.jsonb "metadata", default: {}
+    t.datetime "discarded_at"
+    t.string "permission_resource_name"
+    t.string "property_string_1"
+    t.string "property_string_2"
+    t.string "property_string_3"
+    t.string "property_string_4"
+    t.string "property_string_5"
+    t.string "property_string_6"
+    t.string "property_string_7"
+    t.string "property_string_8"
+    t.string "property_string_9"
+    t.string "property_string_10"
+    t.string "property_string_11"
+    t.string "property_string_12"
+    t.string "property_string_13"
+    t.string "property_string_14"
+    t.string "property_string_15"
+    t.string "property_string_16"
+    t.string "property_string_17"
+    t.string "property_string_18"
+    t.string "property_string_19"
+    t.string "property_string_20"
+    t.text "property_text_1"
+    t.text "property_text_2"
+    t.text "property_text_3"
+    t.text "property_text_4"
+    t.text "property_text_5"
+    t.integer "property_integer_1"
+    t.integer "property_integer_2"
+    t.integer "property_integer_3"
+    t.integer "property_integer_4"
+    t.integer "property_integer_5"
+    t.integer "property_integer_6"
+    t.integer "property_integer_7"
+    t.integer "property_integer_8"
+    t.integer "property_integer_9"
+    t.integer "property_integer_10"
+    t.integer "property_integer_11"
+    t.integer "property_integer_12"
+    t.integer "property_integer_13"
+    t.integer "property_integer_14"
+    t.integer "property_integer_15"
+    t.integer "property_integer_16"
+    t.integer "property_integer_17"
+    t.integer "property_integer_18"
+    t.integer "property_integer_19"
+    t.integer "property_integer_20"
+    t.decimal "property_decimal_1", precision: 15, scale: 4
+    t.decimal "property_decimal_2", precision: 15, scale: 4
+    t.decimal "property_decimal_3", precision: 15, scale: 4
+    t.decimal "property_decimal_4", precision: 15, scale: 4
+    t.decimal "property_decimal_5", precision: 15, scale: 4
+    t.decimal "property_decimal_6", precision: 15, scale: 4
+    t.decimal "property_decimal_7", precision: 15, scale: 4
+    t.decimal "property_decimal_8", precision: 15, scale: 4
+    t.decimal "property_decimal_9", precision: 15, scale: 4
+    t.decimal "property_decimal_10", precision: 15, scale: 4
+    t.boolean "property_boolean_1"
+    t.boolean "property_boolean_2"
+    t.boolean "property_boolean_3"
+    t.boolean "property_boolean_4"
+    t.boolean "property_boolean_5"
+    t.boolean "property_boolean_6"
+    t.boolean "property_boolean_7"
+    t.boolean "property_boolean_8"
+    t.boolean "property_boolean_9"
+    t.boolean "property_boolean_10"
+    t.datetime "property_datetime_1"
+    t.datetime "property_datetime_2"
+    t.datetime "property_datetime_3"
+    t.datetime "property_datetime_4"
+    t.datetime "property_datetime_5"
+    t.datetime "property_datetime_6"
+    t.datetime "property_datetime_7"
+    t.datetime "property_datetime_8"
+    t.datetime "property_datetime_9"
+    t.datetime "property_datetime_10"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["business_type"], name: "index_memberships_on_business_type"
+    t.index ["discarded_at"], name: "index_memberships_on_discarded_at"
+    t.index ["lifecycle_status"], name: "index_memberships_on_lifecycle_status"
+    t.index ["workflow_status"], name: "index_memberships_on_workflow_status"
   end
 
-  create_table "notification_appointments", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+  create_table "notification_appointments", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
     t.uuid "company_id", null: false
     t.uuid "notification_id", null: false
     t.string "appoint_from_type"
@@ -1446,12 +2819,15 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.index ["appoint_from_type", "appoint_from_id"], name: "index_notification_appointments_on_appoint_from"
     t.index ["appoint_to_type", "appoint_to_id"], name: "idx_on_appoint_to_type_appoint_to_id_26a28b0bfc"
     t.index ["appoint_to_type", "appoint_to_id"], name: "index_notification_appointments_on_appoint_to"
+    t.index ["business_type"], name: "index_notification_appointments_on_business_type"
     t.index ["company_id"], name: "index_notification_appointments_on_company_id"
     t.index ["discarded_at"], name: "index_notification_appointments_on_discarded_at"
+    t.index ["lifecycle_status"], name: "index_notification_appointments_on_lifecycle_status"
     t.index ["notification_id"], name: "index_notification_appointments_on_notification_id"
+    t.index ["workflow_status"], name: "index_notification_appointments_on_workflow_status"
   end
 
-  create_table "notification_group_appointments", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+  create_table "notification_group_appointments", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
     t.uuid "company_id", null: false
     t.uuid "notification_group_id", null: false
     t.string "appoint_from_type"
@@ -1479,12 +2855,15 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.index ["appoint_from_type", "appoint_from_id"], name: "index_notification_group_appointments_on_appoint_from"
     t.index ["appoint_to_type", "appoint_to_id"], name: "idx_on_appoint_to_type_appoint_to_id_8f6e8f37c0"
     t.index ["appoint_to_type", "appoint_to_id"], name: "index_notification_group_appointments_on_appoint_to"
+    t.index ["business_type"], name: "index_notification_group_appointments_on_business_type"
     t.index ["company_id"], name: "index_notification_group_appointments_on_company_id"
     t.index ["discarded_at"], name: "index_notification_group_appointments_on_discarded_at"
+    t.index ["lifecycle_status"], name: "index_notification_group_appointments_on_lifecycle_status"
     t.index ["notification_group_id"], name: "index_notification_group_appointments_on_notification_group_id"
+    t.index ["workflow_status"], name: "index_notification_group_appointments_on_workflow_status"
   end
 
-  create_table "notification_groups", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+  create_table "notification_groups", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
     t.uuid "company_id", null: false
     t.uuid "branch_id"
     t.uuid "category_id"
@@ -1501,12 +2880,15 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["branch_id"], name: "index_notification_groups_on_branch_id"
+    t.index ["business_type"], name: "index_notification_groups_on_business_type"
     t.index ["category_id"], name: "index_notification_groups_on_category_id"
     t.index ["company_id"], name: "index_notification_groups_on_company_id"
     t.index ["discarded_at"], name: "index_notification_groups_on_discarded_at"
+    t.index ["lifecycle_status"], name: "index_notification_groups_on_lifecycle_status"
+    t.index ["workflow_status"], name: "index_notification_groups_on_workflow_status"
   end
 
-  create_table "notifications", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+  create_table "notifications", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
     t.uuid "notification_group_id", null: false
     t.uuid "company_id", null: false
     t.uuid "branch_id"
@@ -1524,13 +2906,16 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["branch_id"], name: "index_notifications_on_branch_id"
+    t.index ["business_type"], name: "index_notifications_on_business_type"
     t.index ["category_id"], name: "index_notifications_on_category_id"
     t.index ["company_id"], name: "index_notifications_on_company_id"
     t.index ["discarded_at"], name: "index_notifications_on_discarded_at"
+    t.index ["lifecycle_status"], name: "index_notifications_on_lifecycle_status"
     t.index ["notification_group_id"], name: "index_notifications_on_notification_group_id"
+    t.index ["workflow_status"], name: "index_notifications_on_workflow_status"
   end
 
-  create_table "order_appointments", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+  create_table "order_appointments", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
     t.uuid "company_id", null: false
     t.uuid "order_id", null: false
     t.string "appoint_from_type"
@@ -1561,12 +2946,15 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.index ["appoint_from_type", "appoint_from_id"], name: "index_order_appointments_on_appoint_from"
     t.index ["appoint_to_type", "appoint_to_id"], name: "index_order_appointments_on_appoint_to"
     t.index ["appoint_to_type", "appoint_to_id"], name: "index_order_appointments_on_appoint_to_type_and_appoint_to_id"
+    t.index ["business_type"], name: "index_order_appointments_on_business_type"
     t.index ["company_id"], name: "index_order_appointments_on_company_id"
     t.index ["discarded_at"], name: "index_order_appointments_on_discarded_at"
+    t.index ["lifecycle_status"], name: "index_order_appointments_on_lifecycle_status"
     t.index ["order_id"], name: "index_order_appointments_on_order_id"
+    t.index ["workflow_status"], name: "index_order_appointments_on_workflow_status"
   end
 
-  create_table "order_group_appointments", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+  create_table "order_group_appointments", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
     t.uuid "company_id", null: false
     t.uuid "order_group_id", null: false
     t.string "appoint_from_type"
@@ -1597,12 +2985,15 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.index ["appoint_from_type", "appoint_from_id"], name: "index_order_group_appointments_on_appoint_from"
     t.index ["appoint_to_type", "appoint_to_id"], name: "idx_on_appoint_to_type_appoint_to_id_1438b68413"
     t.index ["appoint_to_type", "appoint_to_id"], name: "index_order_group_appointments_on_appoint_to"
+    t.index ["business_type"], name: "index_order_group_appointments_on_business_type"
     t.index ["company_id"], name: "index_order_group_appointments_on_company_id"
     t.index ["discarded_at"], name: "index_order_group_appointments_on_discarded_at"
+    t.index ["lifecycle_status"], name: "index_order_group_appointments_on_lifecycle_status"
     t.index ["order_group_id"], name: "index_order_group_appointments_on_order_group_id"
+    t.index ["workflow_status"], name: "index_order_group_appointments_on_workflow_status"
   end
 
-  create_table "order_groups", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+  create_table "order_groups", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
     t.uuid "company_id", null: false
     t.uuid "branch_id"
     t.uuid "customer_id", null: false
@@ -1619,16 +3010,94 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.jsonb "metadata", default: {}
     t.datetime "discarded_at"
     t.string "permission_resource_name"
+    t.string "property_string_1"
+    t.string "property_string_2"
+    t.string "property_string_3"
+    t.string "property_string_4"
+    t.string "property_string_5"
+    t.string "property_string_6"
+    t.string "property_string_7"
+    t.string "property_string_8"
+    t.string "property_string_9"
+    t.string "property_string_10"
+    t.string "property_string_11"
+    t.string "property_string_12"
+    t.string "property_string_13"
+    t.string "property_string_14"
+    t.string "property_string_15"
+    t.string "property_string_16"
+    t.string "property_string_17"
+    t.string "property_string_18"
+    t.string "property_string_19"
+    t.string "property_string_20"
+    t.text "property_text_1"
+    t.text "property_text_2"
+    t.text "property_text_3"
+    t.text "property_text_4"
+    t.text "property_text_5"
+    t.integer "property_integer_1"
+    t.integer "property_integer_2"
+    t.integer "property_integer_3"
+    t.integer "property_integer_4"
+    t.integer "property_integer_5"
+    t.integer "property_integer_6"
+    t.integer "property_integer_7"
+    t.integer "property_integer_8"
+    t.integer "property_integer_9"
+    t.integer "property_integer_10"
+    t.integer "property_integer_11"
+    t.integer "property_integer_12"
+    t.integer "property_integer_13"
+    t.integer "property_integer_14"
+    t.integer "property_integer_15"
+    t.integer "property_integer_16"
+    t.integer "property_integer_17"
+    t.integer "property_integer_18"
+    t.integer "property_integer_19"
+    t.integer "property_integer_20"
+    t.decimal "property_decimal_1", precision: 15, scale: 4
+    t.decimal "property_decimal_2", precision: 15, scale: 4
+    t.decimal "property_decimal_3", precision: 15, scale: 4
+    t.decimal "property_decimal_4", precision: 15, scale: 4
+    t.decimal "property_decimal_5", precision: 15, scale: 4
+    t.decimal "property_decimal_6", precision: 15, scale: 4
+    t.decimal "property_decimal_7", precision: 15, scale: 4
+    t.decimal "property_decimal_8", precision: 15, scale: 4
+    t.decimal "property_decimal_9", precision: 15, scale: 4
+    t.decimal "property_decimal_10", precision: 15, scale: 4
+    t.boolean "property_boolean_1"
+    t.boolean "property_boolean_2"
+    t.boolean "property_boolean_3"
+    t.boolean "property_boolean_4"
+    t.boolean "property_boolean_5"
+    t.boolean "property_boolean_6"
+    t.boolean "property_boolean_7"
+    t.boolean "property_boolean_8"
+    t.boolean "property_boolean_9"
+    t.boolean "property_boolean_10"
+    t.datetime "property_datetime_1"
+    t.datetime "property_datetime_2"
+    t.datetime "property_datetime_3"
+    t.datetime "property_datetime_4"
+    t.datetime "property_datetime_5"
+    t.datetime "property_datetime_6"
+    t.datetime "property_datetime_7"
+    t.datetime "property_datetime_8"
+    t.datetime "property_datetime_9"
+    t.datetime "property_datetime_10"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["branch_id"], name: "index_order_groups_on_branch_id"
+    t.index ["business_type"], name: "index_order_groups_on_business_type"
     t.index ["category_id"], name: "index_order_groups_on_category_id"
     t.index ["company_id"], name: "index_order_groups_on_company_id"
     t.index ["customer_id"], name: "index_order_groups_on_customer_id"
     t.index ["discarded_at"], name: "index_order_groups_on_discarded_at"
+    t.index ["lifecycle_status"], name: "index_order_groups_on_lifecycle_status"
+    t.index ["workflow_status"], name: "index_order_groups_on_workflow_status"
   end
 
-  create_table "orders", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+  create_table "orders", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
     t.uuid "company_id", null: false
     t.uuid "branch_id"
     t.uuid "customer_id", null: false
@@ -1652,21 +3121,99 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.jsonb "metadata", default: {}
     t.datetime "discarded_at"
     t.string "permission_resource_name"
+    t.string "property_string_1"
+    t.string "property_string_2"
+    t.string "property_string_3"
+    t.string "property_string_4"
+    t.string "property_string_5"
+    t.string "property_string_6"
+    t.string "property_string_7"
+    t.string "property_string_8"
+    t.string "property_string_9"
+    t.string "property_string_10"
+    t.string "property_string_11"
+    t.string "property_string_12"
+    t.string "property_string_13"
+    t.string "property_string_14"
+    t.string "property_string_15"
+    t.string "property_string_16"
+    t.string "property_string_17"
+    t.string "property_string_18"
+    t.string "property_string_19"
+    t.string "property_string_20"
+    t.text "property_text_1"
+    t.text "property_text_2"
+    t.text "property_text_3"
+    t.text "property_text_4"
+    t.text "property_text_5"
+    t.integer "property_integer_1"
+    t.integer "property_integer_2"
+    t.integer "property_integer_3"
+    t.integer "property_integer_4"
+    t.integer "property_integer_5"
+    t.integer "property_integer_6"
+    t.integer "property_integer_7"
+    t.integer "property_integer_8"
+    t.integer "property_integer_9"
+    t.integer "property_integer_10"
+    t.integer "property_integer_11"
+    t.integer "property_integer_12"
+    t.integer "property_integer_13"
+    t.integer "property_integer_14"
+    t.integer "property_integer_15"
+    t.integer "property_integer_16"
+    t.integer "property_integer_17"
+    t.integer "property_integer_18"
+    t.integer "property_integer_19"
+    t.integer "property_integer_20"
+    t.decimal "property_decimal_1", precision: 15, scale: 4
+    t.decimal "property_decimal_2", precision: 15, scale: 4
+    t.decimal "property_decimal_3", precision: 15, scale: 4
+    t.decimal "property_decimal_4", precision: 15, scale: 4
+    t.decimal "property_decimal_5", precision: 15, scale: 4
+    t.decimal "property_decimal_6", precision: 15, scale: 4
+    t.decimal "property_decimal_7", precision: 15, scale: 4
+    t.decimal "property_decimal_8", precision: 15, scale: 4
+    t.decimal "property_decimal_9", precision: 15, scale: 4
+    t.decimal "property_decimal_10", precision: 15, scale: 4
+    t.boolean "property_boolean_1"
+    t.boolean "property_boolean_2"
+    t.boolean "property_boolean_3"
+    t.boolean "property_boolean_4"
+    t.boolean "property_boolean_5"
+    t.boolean "property_boolean_6"
+    t.boolean "property_boolean_7"
+    t.boolean "property_boolean_8"
+    t.boolean "property_boolean_9"
+    t.boolean "property_boolean_10"
+    t.datetime "property_datetime_1"
+    t.datetime "property_datetime_2"
+    t.datetime "property_datetime_3"
+    t.datetime "property_datetime_4"
+    t.datetime "property_datetime_5"
+    t.datetime "property_datetime_6"
+    t.datetime "property_datetime_7"
+    t.datetime "property_datetime_8"
+    t.datetime "property_datetime_9"
+    t.datetime "property_datetime_10"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["barcode"], name: "index_orders_on_barcode"
     t.index ["branch_id"], name: "index_orders_on_branch_id"
+    t.index ["business_type"], name: "index_orders_on_business_type"
     t.index ["category_id"], name: "index_orders_on_category_id"
     t.index ["company_id"], name: "index_orders_on_company_id"
     t.index ["customer_id"], name: "index_orders_on_customer_id"
     t.index ["discarded_at"], name: "index_orders_on_discarded_at"
     t.index ["ean"], name: "index_orders_on_ean"
+    t.index ["lifecycle_status"], name: "index_orders_on_lifecycle_status"
     t.index ["serial_number"], name: "index_orders_on_serial_number"
     t.index ["sku"], name: "index_orders_on_sku"
     t.index ["upc"], name: "index_orders_on_upc"
+    t.index ["workflow_status"], name: "index_orders_on_workflow_status"
   end
 
-  create_table "payment_method_appointments", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+  create_table "payment_method_appointments", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
     t.uuid "company_id", null: false
     t.uuid "branch_id"
     t.uuid "payment_method_id", null: false
@@ -1683,13 +3230,16 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["branch_id"], name: "index_payment_method_appointments_on_branch_id"
+    t.index ["business_type"], name: "index_payment_method_appointments_on_business_type"
     t.index ["company_id"], name: "index_payment_method_appointments_on_company_id"
     t.index ["discarded_at"], name: "index_payment_method_appointments_on_discarded_at"
+    t.index ["lifecycle_status"], name: "index_payment_method_appointments_on_lifecycle_status"
     t.index ["payment_method_id", "company_id"], name: "idx_on_payment_method_id_company_id_8ff3d49954"
     t.index ["payment_method_id"], name: "index_payment_method_appointments_on_payment_method_id"
+    t.index ["workflow_status"], name: "index_payment_method_appointments_on_workflow_status"
   end
 
-  create_table "payment_methods", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+  create_table "payment_methods", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
     t.uuid "category_id"
     t.string "name"
     t.string "description"
@@ -1704,11 +3254,14 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["business_type"], name: "index_payment_methods_on_business_type"
     t.index ["category_id"], name: "index_payment_methods_on_category_id"
     t.index ["discarded_at"], name: "index_payment_methods_on_discarded_at"
+    t.index ["lifecycle_status"], name: "index_payment_methods_on_lifecycle_status"
+    t.index ["workflow_status"], name: "index_payment_methods_on_workflow_status"
   end
 
-  create_table "payments", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+  create_table "payments", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
     t.uuid "company_id", null: false
     t.uuid "branch_id"
     t.uuid "invoice_id", null: false
@@ -1729,16 +3282,94 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.jsonb "metadata", default: {}
     t.datetime "discarded_at"
     t.string "permission_resource_name"
+    t.string "property_string_1"
+    t.string "property_string_2"
+    t.string "property_string_3"
+    t.string "property_string_4"
+    t.string "property_string_5"
+    t.string "property_string_6"
+    t.string "property_string_7"
+    t.string "property_string_8"
+    t.string "property_string_9"
+    t.string "property_string_10"
+    t.string "property_string_11"
+    t.string "property_string_12"
+    t.string "property_string_13"
+    t.string "property_string_14"
+    t.string "property_string_15"
+    t.string "property_string_16"
+    t.string "property_string_17"
+    t.string "property_string_18"
+    t.string "property_string_19"
+    t.string "property_string_20"
+    t.text "property_text_1"
+    t.text "property_text_2"
+    t.text "property_text_3"
+    t.text "property_text_4"
+    t.text "property_text_5"
+    t.integer "property_integer_1"
+    t.integer "property_integer_2"
+    t.integer "property_integer_3"
+    t.integer "property_integer_4"
+    t.integer "property_integer_5"
+    t.integer "property_integer_6"
+    t.integer "property_integer_7"
+    t.integer "property_integer_8"
+    t.integer "property_integer_9"
+    t.integer "property_integer_10"
+    t.integer "property_integer_11"
+    t.integer "property_integer_12"
+    t.integer "property_integer_13"
+    t.integer "property_integer_14"
+    t.integer "property_integer_15"
+    t.integer "property_integer_16"
+    t.integer "property_integer_17"
+    t.integer "property_integer_18"
+    t.integer "property_integer_19"
+    t.integer "property_integer_20"
+    t.decimal "property_decimal_1", precision: 15, scale: 4
+    t.decimal "property_decimal_2", precision: 15, scale: 4
+    t.decimal "property_decimal_3", precision: 15, scale: 4
+    t.decimal "property_decimal_4", precision: 15, scale: 4
+    t.decimal "property_decimal_5", precision: 15, scale: 4
+    t.decimal "property_decimal_6", precision: 15, scale: 4
+    t.decimal "property_decimal_7", precision: 15, scale: 4
+    t.decimal "property_decimal_8", precision: 15, scale: 4
+    t.decimal "property_decimal_9", precision: 15, scale: 4
+    t.decimal "property_decimal_10", precision: 15, scale: 4
+    t.boolean "property_boolean_1"
+    t.boolean "property_boolean_2"
+    t.boolean "property_boolean_3"
+    t.boolean "property_boolean_4"
+    t.boolean "property_boolean_5"
+    t.boolean "property_boolean_6"
+    t.boolean "property_boolean_7"
+    t.boolean "property_boolean_8"
+    t.boolean "property_boolean_9"
+    t.boolean "property_boolean_10"
+    t.datetime "property_datetime_1"
+    t.datetime "property_datetime_2"
+    t.datetime "property_datetime_3"
+    t.datetime "property_datetime_4"
+    t.datetime "property_datetime_5"
+    t.datetime "property_datetime_6"
+    t.datetime "property_datetime_7"
+    t.datetime "property_datetime_8"
+    t.datetime "property_datetime_9"
+    t.datetime "property_datetime_10"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["branch_id"], name: "index_payments_on_branch_id"
+    t.index ["business_type"], name: "index_payments_on_business_type"
     t.index ["category_id"], name: "index_payments_on_category_id"
     t.index ["company_id"], name: "index_payments_on_company_id"
     t.index ["discarded_at"], name: "index_payments_on_discarded_at"
     t.index ["invoice_id"], name: "index_payments_on_invoice_id"
+    t.index ["lifecycle_status"], name: "index_payments_on_lifecycle_status"
+    t.index ["workflow_status"], name: "index_payments_on_workflow_status"
   end
 
-  create_table "period_appointments", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+  create_table "period_appointments", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
     t.uuid "period_id", null: false
     t.string "appoint_from_type"
     t.uuid "appoint_from_id"
@@ -1766,11 +3397,14 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.index ["appoint_from_type", "appoint_from_id"], name: "index_period_appointments_on_appoint_from"
     t.index ["appoint_to_type", "appoint_to_id"], name: "index_period_appointments_on_appoint_to"
     t.index ["appoint_to_type", "appoint_to_id"], name: "index_period_appointments_on_appoint_to_type_and_appoint_to_id"
+    t.index ["business_type"], name: "index_period_appointments_on_business_type"
     t.index ["discarded_at"], name: "index_period_appointments_on_discarded_at"
+    t.index ["lifecycle_status"], name: "index_period_appointments_on_lifecycle_status"
     t.index ["period_id"], name: "index_period_appointments_on_period_id"
+    t.index ["workflow_status"], name: "index_period_appointments_on_workflow_status"
   end
 
-  create_table "periods", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+  create_table "periods", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
     t.datetime "start_at", null: false
     t.datetime "end_at"
     t.integer "timezone", default: 0, null: false
@@ -1779,7 +3413,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.index ["start_at", "end_at", "timezone"], name: "index_periods_on_start_at_and_end_at_and_timezone", unique: true, nulls_not_distinct: true
   end
 
-  create_table "policies", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+  create_table "policies", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
     t.uuid "company_id", null: false
     t.uuid "branch_id"
     t.string "name"
@@ -1798,11 +3432,14 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["branch_id"], name: "index_policies_on_branch_id"
+    t.index ["business_type"], name: "index_policies_on_business_type"
     t.index ["company_id"], name: "index_policies_on_company_id"
     t.index ["discarded_at"], name: "index_policies_on_discarded_at"
+    t.index ["lifecycle_status"], name: "index_policies_on_lifecycle_status"
+    t.index ["workflow_status"], name: "index_policies_on_workflow_status"
   end
 
-  create_table "policy_appointments", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+  create_table "policy_appointments", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
     t.uuid "company_id", null: false
     t.uuid "policy_id", null: false
     t.string "appoint_to_type", null: false
@@ -1821,12 +3458,15 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.datetime "updated_at", null: false
     t.index ["appoint_to_type", "appoint_to_id"], name: "index_policy_appointments_on_appoint_to"
     t.index ["appoint_to_type", "appoint_to_id"], name: "index_policy_appointments_on_appoint_to_type_and_appoint_to_id"
+    t.index ["business_type"], name: "index_policy_appointments_on_business_type"
     t.index ["company_id"], name: "index_policy_appointments_on_company_id"
     t.index ["discarded_at"], name: "index_policy_appointments_on_discarded_at"
+    t.index ["lifecycle_status"], name: "index_policy_appointments_on_lifecycle_status"
     t.index ["policy_id"], name: "index_policy_appointments_on_policy_id"
+    t.index ["workflow_status"], name: "index_policy_appointments_on_workflow_status"
   end
 
-  create_table "price_appointments", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+  create_table "price_appointments", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
     t.uuid "price_id", null: false
     t.uuid "period_id"
     t.string "appoint_from_type"
@@ -1855,12 +3495,15 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.index ["appoint_from_type", "appoint_from_id"], name: "index_price_appointments_on_appoint_from"
     t.index ["appoint_to_type", "appoint_to_id"], name: "index_price_appointments_on_appoint_to"
     t.index ["appoint_to_type", "appoint_to_id"], name: "index_price_appointments_on_appoint_to_type_and_appoint_to_id"
+    t.index ["business_type"], name: "index_price_appointments_on_business_type"
     t.index ["discarded_at"], name: "index_price_appointments_on_discarded_at"
+    t.index ["lifecycle_status"], name: "index_price_appointments_on_lifecycle_status"
     t.index ["period_id"], name: "index_price_appointments_on_period_id"
     t.index ["price_id"], name: "index_price_appointments_on_price_id"
+    t.index ["workflow_status"], name: "index_price_appointments_on_workflow_status"
   end
 
-  create_table "prices", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+  create_table "prices", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
     t.integer "amount"
     t.integer "currency_code", default: 0, null: false
     t.datetime "created_at", null: false
@@ -1868,7 +3511,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.index ["amount", "currency_code"], name: "index_prices_on_amount_and_currency_code", unique: true
   end
 
-  create_table "product_appointments", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+  create_table "product_appointments", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
     t.uuid "company_id", null: false
     t.uuid "product_id", null: false
     t.string "appoint_from_type"
@@ -1896,12 +3539,15 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.index ["appoint_from_type", "appoint_from_id"], name: "index_product_appointments_on_appoint_from"
     t.index ["appoint_to_type", "appoint_to_id"], name: "idx_on_appoint_to_type_appoint_to_id_6dd1b90540"
     t.index ["appoint_to_type", "appoint_to_id"], name: "index_product_appointments_on_appoint_to"
+    t.index ["business_type"], name: "index_product_appointments_on_business_type"
     t.index ["company_id"], name: "index_product_appointments_on_company_id"
     t.index ["discarded_at"], name: "index_product_appointments_on_discarded_at"
+    t.index ["lifecycle_status"], name: "index_product_appointments_on_lifecycle_status"
     t.index ["product_id"], name: "index_product_appointments_on_product_id"
+    t.index ["workflow_status"], name: "index_product_appointments_on_workflow_status"
   end
 
-  create_table "product_group_appointments", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+  create_table "product_group_appointments", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
     t.uuid "company_id", null: false
     t.uuid "product_group_id", null: false
     t.string "appoint_from_type"
@@ -1929,12 +3575,15 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.index ["appoint_from_type", "appoint_from_id"], name: "index_product_group_appointments_on_appoint_from"
     t.index ["appoint_to_type", "appoint_to_id"], name: "idx_on_appoint_to_type_appoint_to_id_53bf3d5444"
     t.index ["appoint_to_type", "appoint_to_id"], name: "index_product_group_appointments_on_appoint_to"
+    t.index ["business_type"], name: "index_product_group_appointments_on_business_type"
     t.index ["company_id"], name: "index_product_group_appointments_on_company_id"
     t.index ["discarded_at"], name: "index_product_group_appointments_on_discarded_at"
+    t.index ["lifecycle_status"], name: "index_product_group_appointments_on_lifecycle_status"
     t.index ["product_group_id"], name: "index_product_group_appointments_on_product_group_id"
+    t.index ["workflow_status"], name: "index_product_group_appointments_on_workflow_status"
   end
 
-  create_table "product_groups", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+  create_table "product_groups", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
     t.uuid "company_id", null: false
     t.uuid "branch_id"
     t.uuid "category_id"
@@ -1948,15 +3597,93 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.jsonb "metadata", default: {}
     t.datetime "discarded_at"
     t.string "permission_resource_name"
+    t.string "property_string_1"
+    t.string "property_string_2"
+    t.string "property_string_3"
+    t.string "property_string_4"
+    t.string "property_string_5"
+    t.string "property_string_6"
+    t.string "property_string_7"
+    t.string "property_string_8"
+    t.string "property_string_9"
+    t.string "property_string_10"
+    t.string "property_string_11"
+    t.string "property_string_12"
+    t.string "property_string_13"
+    t.string "property_string_14"
+    t.string "property_string_15"
+    t.string "property_string_16"
+    t.string "property_string_17"
+    t.string "property_string_18"
+    t.string "property_string_19"
+    t.string "property_string_20"
+    t.text "property_text_1"
+    t.text "property_text_2"
+    t.text "property_text_3"
+    t.text "property_text_4"
+    t.text "property_text_5"
+    t.integer "property_integer_1"
+    t.integer "property_integer_2"
+    t.integer "property_integer_3"
+    t.integer "property_integer_4"
+    t.integer "property_integer_5"
+    t.integer "property_integer_6"
+    t.integer "property_integer_7"
+    t.integer "property_integer_8"
+    t.integer "property_integer_9"
+    t.integer "property_integer_10"
+    t.integer "property_integer_11"
+    t.integer "property_integer_12"
+    t.integer "property_integer_13"
+    t.integer "property_integer_14"
+    t.integer "property_integer_15"
+    t.integer "property_integer_16"
+    t.integer "property_integer_17"
+    t.integer "property_integer_18"
+    t.integer "property_integer_19"
+    t.integer "property_integer_20"
+    t.decimal "property_decimal_1", precision: 15, scale: 4
+    t.decimal "property_decimal_2", precision: 15, scale: 4
+    t.decimal "property_decimal_3", precision: 15, scale: 4
+    t.decimal "property_decimal_4", precision: 15, scale: 4
+    t.decimal "property_decimal_5", precision: 15, scale: 4
+    t.decimal "property_decimal_6", precision: 15, scale: 4
+    t.decimal "property_decimal_7", precision: 15, scale: 4
+    t.decimal "property_decimal_8", precision: 15, scale: 4
+    t.decimal "property_decimal_9", precision: 15, scale: 4
+    t.decimal "property_decimal_10", precision: 15, scale: 4
+    t.boolean "property_boolean_1"
+    t.boolean "property_boolean_2"
+    t.boolean "property_boolean_3"
+    t.boolean "property_boolean_4"
+    t.boolean "property_boolean_5"
+    t.boolean "property_boolean_6"
+    t.boolean "property_boolean_7"
+    t.boolean "property_boolean_8"
+    t.boolean "property_boolean_9"
+    t.boolean "property_boolean_10"
+    t.datetime "property_datetime_1"
+    t.datetime "property_datetime_2"
+    t.datetime "property_datetime_3"
+    t.datetime "property_datetime_4"
+    t.datetime "property_datetime_5"
+    t.datetime "property_datetime_6"
+    t.datetime "property_datetime_7"
+    t.datetime "property_datetime_8"
+    t.datetime "property_datetime_9"
+    t.datetime "property_datetime_10"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["branch_id"], name: "index_product_groups_on_branch_id"
+    t.index ["business_type"], name: "index_product_groups_on_business_type"
     t.index ["category_id"], name: "index_product_groups_on_category_id"
     t.index ["company_id"], name: "index_product_groups_on_company_id"
     t.index ["discarded_at"], name: "index_product_groups_on_discarded_at"
+    t.index ["lifecycle_status"], name: "index_product_groups_on_lifecycle_status"
+    t.index ["workflow_status"], name: "index_product_groups_on_workflow_status"
   end
 
-  create_table "products", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+  create_table "products", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
     t.uuid "company_id", null: false
     t.uuid "branch_id"
     t.uuid "brand_id"
@@ -1994,19 +3721,97 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.jsonb "metadata", default: {}
     t.datetime "discarded_at"
     t.string "permission_resource_name"
+    t.string "property_string_1"
+    t.string "property_string_2"
+    t.string "property_string_3"
+    t.string "property_string_4"
+    t.string "property_string_5"
+    t.string "property_string_6"
+    t.string "property_string_7"
+    t.string "property_string_8"
+    t.string "property_string_9"
+    t.string "property_string_10"
+    t.string "property_string_11"
+    t.string "property_string_12"
+    t.string "property_string_13"
+    t.string "property_string_14"
+    t.string "property_string_15"
+    t.string "property_string_16"
+    t.string "property_string_17"
+    t.string "property_string_18"
+    t.string "property_string_19"
+    t.string "property_string_20"
+    t.text "property_text_1"
+    t.text "property_text_2"
+    t.text "property_text_3"
+    t.text "property_text_4"
+    t.text "property_text_5"
+    t.integer "property_integer_1"
+    t.integer "property_integer_2"
+    t.integer "property_integer_3"
+    t.integer "property_integer_4"
+    t.integer "property_integer_5"
+    t.integer "property_integer_6"
+    t.integer "property_integer_7"
+    t.integer "property_integer_8"
+    t.integer "property_integer_9"
+    t.integer "property_integer_10"
+    t.integer "property_integer_11"
+    t.integer "property_integer_12"
+    t.integer "property_integer_13"
+    t.integer "property_integer_14"
+    t.integer "property_integer_15"
+    t.integer "property_integer_16"
+    t.integer "property_integer_17"
+    t.integer "property_integer_18"
+    t.integer "property_integer_19"
+    t.integer "property_integer_20"
+    t.decimal "property_decimal_1", precision: 15, scale: 4
+    t.decimal "property_decimal_2", precision: 15, scale: 4
+    t.decimal "property_decimal_3", precision: 15, scale: 4
+    t.decimal "property_decimal_4", precision: 15, scale: 4
+    t.decimal "property_decimal_5", precision: 15, scale: 4
+    t.decimal "property_decimal_6", precision: 15, scale: 4
+    t.decimal "property_decimal_7", precision: 15, scale: 4
+    t.decimal "property_decimal_8", precision: 15, scale: 4
+    t.decimal "property_decimal_9", precision: 15, scale: 4
+    t.decimal "property_decimal_10", precision: 15, scale: 4
+    t.boolean "property_boolean_1"
+    t.boolean "property_boolean_2"
+    t.boolean "property_boolean_3"
+    t.boolean "property_boolean_4"
+    t.boolean "property_boolean_5"
+    t.boolean "property_boolean_6"
+    t.boolean "property_boolean_7"
+    t.boolean "property_boolean_8"
+    t.boolean "property_boolean_9"
+    t.boolean "property_boolean_10"
+    t.datetime "property_datetime_1"
+    t.datetime "property_datetime_2"
+    t.datetime "property_datetime_3"
+    t.datetime "property_datetime_4"
+    t.datetime "property_datetime_5"
+    t.datetime "property_datetime_6"
+    t.datetime "property_datetime_7"
+    t.datetime "property_datetime_8"
+    t.datetime "property_datetime_9"
+    t.datetime "property_datetime_10"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["branch_id"], name: "index_products_on_branch_id"
     t.index ["brand_id"], name: "index_products_on_brand_id"
+    t.index ["business_type"], name: "index_products_on_business_type"
     t.index ["category_id"], name: "index_products_on_category_id"
     t.index ["code"], name: "index_products_on_code"
     t.index ["company_id"], name: "index_products_on_company_id"
     t.index ["discarded_at"], name: "index_products_on_discarded_at"
+    t.index ["lifecycle_status"], name: "index_products_on_lifecycle_status"
     t.index ["required_role_id"], name: "index_products_on_required_role_id"
     t.index ["sku"], name: "index_products_on_sku"
+    t.index ["workflow_status"], name: "index_products_on_workflow_status"
   end
 
-  create_table "project_appointments", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+  create_table "project_appointments", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
     t.uuid "company_id", null: false
     t.uuid "project_id", null: false
     t.string "appoint_from_type"
@@ -2034,12 +3839,15 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.index ["appoint_from_type", "appoint_from_id"], name: "index_project_appointments_on_appoint_from"
     t.index ["appoint_to_type", "appoint_to_id"], name: "idx_on_appoint_to_type_appoint_to_id_eb5a8d66ff"
     t.index ["appoint_to_type", "appoint_to_id"], name: "index_project_appointments_on_appoint_to"
+    t.index ["business_type"], name: "index_project_appointments_on_business_type"
     t.index ["company_id"], name: "index_project_appointments_on_company_id"
     t.index ["discarded_at"], name: "index_project_appointments_on_discarded_at"
+    t.index ["lifecycle_status"], name: "index_project_appointments_on_lifecycle_status"
     t.index ["project_id"], name: "index_project_appointments_on_project_id"
+    t.index ["workflow_status"], name: "index_project_appointments_on_workflow_status"
   end
 
-  create_table "project_group_appointments", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+  create_table "project_group_appointments", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
     t.uuid "company_id", null: false
     t.uuid "project_group_id", null: false
     t.string "appoint_from_type"
@@ -2067,12 +3875,15 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.index ["appoint_from_type", "appoint_from_id"], name: "index_project_group_appointments_on_appoint_from"
     t.index ["appoint_to_type", "appoint_to_id"], name: "idx_on_appoint_to_type_appoint_to_id_4c26e2a726"
     t.index ["appoint_to_type", "appoint_to_id"], name: "index_project_group_appointments_on_appoint_to"
+    t.index ["business_type"], name: "index_project_group_appointments_on_business_type"
     t.index ["company_id"], name: "index_project_group_appointments_on_company_id"
     t.index ["discarded_at"], name: "index_project_group_appointments_on_discarded_at"
+    t.index ["lifecycle_status"], name: "index_project_group_appointments_on_lifecycle_status"
     t.index ["project_group_id"], name: "index_project_group_appointments_on_project_group_id"
+    t.index ["workflow_status"], name: "index_project_group_appointments_on_workflow_status"
   end
 
-  create_table "project_groups", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+  create_table "project_groups", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
     t.uuid "company_id", null: false
     t.uuid "branch_id"
     t.uuid "category_id"
@@ -2086,15 +3897,93 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.jsonb "metadata", default: {}
     t.datetime "discarded_at"
     t.string "permission_resource_name"
+    t.string "property_string_1"
+    t.string "property_string_2"
+    t.string "property_string_3"
+    t.string "property_string_4"
+    t.string "property_string_5"
+    t.string "property_string_6"
+    t.string "property_string_7"
+    t.string "property_string_8"
+    t.string "property_string_9"
+    t.string "property_string_10"
+    t.string "property_string_11"
+    t.string "property_string_12"
+    t.string "property_string_13"
+    t.string "property_string_14"
+    t.string "property_string_15"
+    t.string "property_string_16"
+    t.string "property_string_17"
+    t.string "property_string_18"
+    t.string "property_string_19"
+    t.string "property_string_20"
+    t.text "property_text_1"
+    t.text "property_text_2"
+    t.text "property_text_3"
+    t.text "property_text_4"
+    t.text "property_text_5"
+    t.integer "property_integer_1"
+    t.integer "property_integer_2"
+    t.integer "property_integer_3"
+    t.integer "property_integer_4"
+    t.integer "property_integer_5"
+    t.integer "property_integer_6"
+    t.integer "property_integer_7"
+    t.integer "property_integer_8"
+    t.integer "property_integer_9"
+    t.integer "property_integer_10"
+    t.integer "property_integer_11"
+    t.integer "property_integer_12"
+    t.integer "property_integer_13"
+    t.integer "property_integer_14"
+    t.integer "property_integer_15"
+    t.integer "property_integer_16"
+    t.integer "property_integer_17"
+    t.integer "property_integer_18"
+    t.integer "property_integer_19"
+    t.integer "property_integer_20"
+    t.decimal "property_decimal_1", precision: 15, scale: 4
+    t.decimal "property_decimal_2", precision: 15, scale: 4
+    t.decimal "property_decimal_3", precision: 15, scale: 4
+    t.decimal "property_decimal_4", precision: 15, scale: 4
+    t.decimal "property_decimal_5", precision: 15, scale: 4
+    t.decimal "property_decimal_6", precision: 15, scale: 4
+    t.decimal "property_decimal_7", precision: 15, scale: 4
+    t.decimal "property_decimal_8", precision: 15, scale: 4
+    t.decimal "property_decimal_9", precision: 15, scale: 4
+    t.decimal "property_decimal_10", precision: 15, scale: 4
+    t.boolean "property_boolean_1"
+    t.boolean "property_boolean_2"
+    t.boolean "property_boolean_3"
+    t.boolean "property_boolean_4"
+    t.boolean "property_boolean_5"
+    t.boolean "property_boolean_6"
+    t.boolean "property_boolean_7"
+    t.boolean "property_boolean_8"
+    t.boolean "property_boolean_9"
+    t.boolean "property_boolean_10"
+    t.datetime "property_datetime_1"
+    t.datetime "property_datetime_2"
+    t.datetime "property_datetime_3"
+    t.datetime "property_datetime_4"
+    t.datetime "property_datetime_5"
+    t.datetime "property_datetime_6"
+    t.datetime "property_datetime_7"
+    t.datetime "property_datetime_8"
+    t.datetime "property_datetime_9"
+    t.datetime "property_datetime_10"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["branch_id"], name: "index_project_groups_on_branch_id"
+    t.index ["business_type"], name: "index_project_groups_on_business_type"
     t.index ["category_id"], name: "index_project_groups_on_category_id"
     t.index ["company_id"], name: "index_project_groups_on_company_id"
     t.index ["discarded_at"], name: "index_project_groups_on_discarded_at"
+    t.index ["lifecycle_status"], name: "index_project_groups_on_lifecycle_status"
+    t.index ["workflow_status"], name: "index_project_groups_on_workflow_status"
   end
 
-  create_table "projects", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+  create_table "projects", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
     t.uuid "company_id", null: false
     t.uuid "branch_id"
     t.uuid "project_group_id", null: false
@@ -2109,16 +3998,94 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.jsonb "metadata", default: {}
     t.datetime "discarded_at"
     t.string "permission_resource_name"
+    t.string "property_string_1"
+    t.string "property_string_2"
+    t.string "property_string_3"
+    t.string "property_string_4"
+    t.string "property_string_5"
+    t.string "property_string_6"
+    t.string "property_string_7"
+    t.string "property_string_8"
+    t.string "property_string_9"
+    t.string "property_string_10"
+    t.string "property_string_11"
+    t.string "property_string_12"
+    t.string "property_string_13"
+    t.string "property_string_14"
+    t.string "property_string_15"
+    t.string "property_string_16"
+    t.string "property_string_17"
+    t.string "property_string_18"
+    t.string "property_string_19"
+    t.string "property_string_20"
+    t.text "property_text_1"
+    t.text "property_text_2"
+    t.text "property_text_3"
+    t.text "property_text_4"
+    t.text "property_text_5"
+    t.integer "property_integer_1"
+    t.integer "property_integer_2"
+    t.integer "property_integer_3"
+    t.integer "property_integer_4"
+    t.integer "property_integer_5"
+    t.integer "property_integer_6"
+    t.integer "property_integer_7"
+    t.integer "property_integer_8"
+    t.integer "property_integer_9"
+    t.integer "property_integer_10"
+    t.integer "property_integer_11"
+    t.integer "property_integer_12"
+    t.integer "property_integer_13"
+    t.integer "property_integer_14"
+    t.integer "property_integer_15"
+    t.integer "property_integer_16"
+    t.integer "property_integer_17"
+    t.integer "property_integer_18"
+    t.integer "property_integer_19"
+    t.integer "property_integer_20"
+    t.decimal "property_decimal_1", precision: 15, scale: 4
+    t.decimal "property_decimal_2", precision: 15, scale: 4
+    t.decimal "property_decimal_3", precision: 15, scale: 4
+    t.decimal "property_decimal_4", precision: 15, scale: 4
+    t.decimal "property_decimal_5", precision: 15, scale: 4
+    t.decimal "property_decimal_6", precision: 15, scale: 4
+    t.decimal "property_decimal_7", precision: 15, scale: 4
+    t.decimal "property_decimal_8", precision: 15, scale: 4
+    t.decimal "property_decimal_9", precision: 15, scale: 4
+    t.decimal "property_decimal_10", precision: 15, scale: 4
+    t.boolean "property_boolean_1"
+    t.boolean "property_boolean_2"
+    t.boolean "property_boolean_3"
+    t.boolean "property_boolean_4"
+    t.boolean "property_boolean_5"
+    t.boolean "property_boolean_6"
+    t.boolean "property_boolean_7"
+    t.boolean "property_boolean_8"
+    t.boolean "property_boolean_9"
+    t.boolean "property_boolean_10"
+    t.datetime "property_datetime_1"
+    t.datetime "property_datetime_2"
+    t.datetime "property_datetime_3"
+    t.datetime "property_datetime_4"
+    t.datetime "property_datetime_5"
+    t.datetime "property_datetime_6"
+    t.datetime "property_datetime_7"
+    t.datetime "property_datetime_8"
+    t.datetime "property_datetime_9"
+    t.datetime "property_datetime_10"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["branch_id"], name: "index_projects_on_branch_id"
+    t.index ["business_type"], name: "index_projects_on_business_type"
     t.index ["category_id"], name: "index_projects_on_category_id"
     t.index ["company_id"], name: "index_projects_on_company_id"
     t.index ["discarded_at"], name: "index_projects_on_discarded_at"
+    t.index ["lifecycle_status"], name: "index_projects_on_lifecycle_status"
     t.index ["project_group_id"], name: "index_projects_on_project_group_id"
+    t.index ["workflow_status"], name: "index_projects_on_workflow_status"
   end
 
-  create_table "purchase_items", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+  create_table "purchase_items", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
     t.uuid "company_id", null: false
     t.uuid "branch_id"
     t.uuid "purchase_id", null: false
@@ -2140,21 +4107,99 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.jsonb "metadata", default: {}
     t.datetime "discarded_at"
     t.string "permission_resource_name"
+    t.string "property_string_1"
+    t.string "property_string_2"
+    t.string "property_string_3"
+    t.string "property_string_4"
+    t.string "property_string_5"
+    t.string "property_string_6"
+    t.string "property_string_7"
+    t.string "property_string_8"
+    t.string "property_string_9"
+    t.string "property_string_10"
+    t.string "property_string_11"
+    t.string "property_string_12"
+    t.string "property_string_13"
+    t.string "property_string_14"
+    t.string "property_string_15"
+    t.string "property_string_16"
+    t.string "property_string_17"
+    t.string "property_string_18"
+    t.string "property_string_19"
+    t.string "property_string_20"
+    t.text "property_text_1"
+    t.text "property_text_2"
+    t.text "property_text_3"
+    t.text "property_text_4"
+    t.text "property_text_5"
+    t.integer "property_integer_1"
+    t.integer "property_integer_2"
+    t.integer "property_integer_3"
+    t.integer "property_integer_4"
+    t.integer "property_integer_5"
+    t.integer "property_integer_6"
+    t.integer "property_integer_7"
+    t.integer "property_integer_8"
+    t.integer "property_integer_9"
+    t.integer "property_integer_10"
+    t.integer "property_integer_11"
+    t.integer "property_integer_12"
+    t.integer "property_integer_13"
+    t.integer "property_integer_14"
+    t.integer "property_integer_15"
+    t.integer "property_integer_16"
+    t.integer "property_integer_17"
+    t.integer "property_integer_18"
+    t.integer "property_integer_19"
+    t.integer "property_integer_20"
+    t.decimal "property_decimal_1", precision: 15, scale: 4
+    t.decimal "property_decimal_2", precision: 15, scale: 4
+    t.decimal "property_decimal_3", precision: 15, scale: 4
+    t.decimal "property_decimal_4", precision: 15, scale: 4
+    t.decimal "property_decimal_5", precision: 15, scale: 4
+    t.decimal "property_decimal_6", precision: 15, scale: 4
+    t.decimal "property_decimal_7", precision: 15, scale: 4
+    t.decimal "property_decimal_8", precision: 15, scale: 4
+    t.decimal "property_decimal_9", precision: 15, scale: 4
+    t.decimal "property_decimal_10", precision: 15, scale: 4
+    t.boolean "property_boolean_1"
+    t.boolean "property_boolean_2"
+    t.boolean "property_boolean_3"
+    t.boolean "property_boolean_4"
+    t.boolean "property_boolean_5"
+    t.boolean "property_boolean_6"
+    t.boolean "property_boolean_7"
+    t.boolean "property_boolean_8"
+    t.boolean "property_boolean_9"
+    t.boolean "property_boolean_10"
+    t.datetime "property_datetime_1"
+    t.datetime "property_datetime_2"
+    t.datetime "property_datetime_3"
+    t.datetime "property_datetime_4"
+    t.datetime "property_datetime_5"
+    t.datetime "property_datetime_6"
+    t.datetime "property_datetime_7"
+    t.datetime "property_datetime_8"
+    t.datetime "property_datetime_9"
+    t.datetime "property_datetime_10"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["barcode"], name: "index_purchase_items_on_barcode"
     t.index ["branch_id"], name: "index_purchase_items_on_branch_id"
+    t.index ["business_type"], name: "index_purchase_items_on_business_type"
     t.index ["category_id"], name: "index_purchase_items_on_category_id"
     t.index ["company_id"], name: "index_purchase_items_on_company_id"
     t.index ["discarded_at"], name: "index_purchase_items_on_discarded_at"
     t.index ["ean"], name: "index_purchase_items_on_ean"
+    t.index ["lifecycle_status"], name: "index_purchase_items_on_lifecycle_status"
     t.index ["purchase_id"], name: "index_purchase_items_on_purchase_id"
     t.index ["serial_number"], name: "index_purchase_items_on_serial_number"
     t.index ["sku"], name: "index_purchase_items_on_sku"
     t.index ["upc"], name: "index_purchase_items_on_upc"
+    t.index ["workflow_status"], name: "index_purchase_items_on_workflow_status"
   end
 
-  create_table "purchases", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+  create_table "purchases", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
     t.uuid "company_id", null: false
     t.uuid "branch_id"
     t.uuid "category_id"
@@ -2168,15 +4213,93 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.jsonb "metadata", default: {}
     t.datetime "discarded_at"
     t.string "permission_resource_name"
+    t.string "property_string_1"
+    t.string "property_string_2"
+    t.string "property_string_3"
+    t.string "property_string_4"
+    t.string "property_string_5"
+    t.string "property_string_6"
+    t.string "property_string_7"
+    t.string "property_string_8"
+    t.string "property_string_9"
+    t.string "property_string_10"
+    t.string "property_string_11"
+    t.string "property_string_12"
+    t.string "property_string_13"
+    t.string "property_string_14"
+    t.string "property_string_15"
+    t.string "property_string_16"
+    t.string "property_string_17"
+    t.string "property_string_18"
+    t.string "property_string_19"
+    t.string "property_string_20"
+    t.text "property_text_1"
+    t.text "property_text_2"
+    t.text "property_text_3"
+    t.text "property_text_4"
+    t.text "property_text_5"
+    t.integer "property_integer_1"
+    t.integer "property_integer_2"
+    t.integer "property_integer_3"
+    t.integer "property_integer_4"
+    t.integer "property_integer_5"
+    t.integer "property_integer_6"
+    t.integer "property_integer_7"
+    t.integer "property_integer_8"
+    t.integer "property_integer_9"
+    t.integer "property_integer_10"
+    t.integer "property_integer_11"
+    t.integer "property_integer_12"
+    t.integer "property_integer_13"
+    t.integer "property_integer_14"
+    t.integer "property_integer_15"
+    t.integer "property_integer_16"
+    t.integer "property_integer_17"
+    t.integer "property_integer_18"
+    t.integer "property_integer_19"
+    t.integer "property_integer_20"
+    t.decimal "property_decimal_1", precision: 15, scale: 4
+    t.decimal "property_decimal_2", precision: 15, scale: 4
+    t.decimal "property_decimal_3", precision: 15, scale: 4
+    t.decimal "property_decimal_4", precision: 15, scale: 4
+    t.decimal "property_decimal_5", precision: 15, scale: 4
+    t.decimal "property_decimal_6", precision: 15, scale: 4
+    t.decimal "property_decimal_7", precision: 15, scale: 4
+    t.decimal "property_decimal_8", precision: 15, scale: 4
+    t.decimal "property_decimal_9", precision: 15, scale: 4
+    t.decimal "property_decimal_10", precision: 15, scale: 4
+    t.boolean "property_boolean_1"
+    t.boolean "property_boolean_2"
+    t.boolean "property_boolean_3"
+    t.boolean "property_boolean_4"
+    t.boolean "property_boolean_5"
+    t.boolean "property_boolean_6"
+    t.boolean "property_boolean_7"
+    t.boolean "property_boolean_8"
+    t.boolean "property_boolean_9"
+    t.boolean "property_boolean_10"
+    t.datetime "property_datetime_1"
+    t.datetime "property_datetime_2"
+    t.datetime "property_datetime_3"
+    t.datetime "property_datetime_4"
+    t.datetime "property_datetime_5"
+    t.datetime "property_datetime_6"
+    t.datetime "property_datetime_7"
+    t.datetime "property_datetime_8"
+    t.datetime "property_datetime_9"
+    t.datetime "property_datetime_10"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["branch_id"], name: "index_purchases_on_branch_id"
+    t.index ["business_type"], name: "index_purchases_on_business_type"
     t.index ["category_id"], name: "index_purchases_on_category_id"
     t.index ["company_id"], name: "index_purchases_on_company_id"
     t.index ["discarded_at"], name: "index_purchases_on_discarded_at"
+    t.index ["lifecycle_status"], name: "index_purchases_on_lifecycle_status"
+    t.index ["workflow_status"], name: "index_purchases_on_workflow_status"
   end
 
-  create_table "questions", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+  create_table "questions", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
     t.uuid "company_id", null: false
     t.uuid "branch_id"
     t.uuid "category_id"
@@ -2193,12 +4316,15 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["branch_id"], name: "index_questions_on_branch_id"
+    t.index ["business_type"], name: "index_questions_on_business_type"
     t.index ["category_id"], name: "index_questions_on_category_id"
     t.index ["company_id"], name: "index_questions_on_company_id"
     t.index ["discarded_at"], name: "index_questions_on_discarded_at"
+    t.index ["lifecycle_status"], name: "index_questions_on_lifecycle_status"
+    t.index ["workflow_status"], name: "index_questions_on_workflow_status"
   end
 
-  create_table "reservation_appointments", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+  create_table "reservation_appointments", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
     t.uuid "company_id", null: false
     t.uuid "reservation_id", null: false
     t.string "appoint_from_type"
@@ -2226,22 +4352,108 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.index ["appoint_from_type", "appoint_from_id"], name: "index_reservation_appointments_on_appoint_from"
     t.index ["appoint_to_type", "appoint_to_id"], name: "idx_on_appoint_to_type_appoint_to_id_fab15553a8"
     t.index ["appoint_to_type", "appoint_to_id"], name: "index_reservation_appointments_on_appoint_to"
+    t.index ["business_type"], name: "index_reservation_appointments_on_business_type"
     t.index ["company_id"], name: "index_reservation_appointments_on_company_id"
     t.index ["discarded_at"], name: "index_reservation_appointments_on_discarded_at"
+    t.index ["lifecycle_status"], name: "index_reservation_appointments_on_lifecycle_status"
     t.index ["reservation_id"], name: "index_reservation_appointments_on_reservation_id"
+    t.index ["workflow_status"], name: "index_reservation_appointments_on_workflow_status"
   end
 
-  create_table "reservations", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+  create_table "reservations", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
     t.string "name"
     t.string "code", null: false
     t.integer "lifecycle_status"
     t.integer "workflow_status"
     t.integer "business_type"
+    t.datetime "expiration_date"
+    t.jsonb "metadata", default: {}
+    t.datetime "discarded_at"
+    t.string "permission_resource_name"
+    t.string "property_string_1"
+    t.string "property_string_2"
+    t.string "property_string_3"
+    t.string "property_string_4"
+    t.string "property_string_5"
+    t.string "property_string_6"
+    t.string "property_string_7"
+    t.string "property_string_8"
+    t.string "property_string_9"
+    t.string "property_string_10"
+    t.string "property_string_11"
+    t.string "property_string_12"
+    t.string "property_string_13"
+    t.string "property_string_14"
+    t.string "property_string_15"
+    t.string "property_string_16"
+    t.string "property_string_17"
+    t.string "property_string_18"
+    t.string "property_string_19"
+    t.string "property_string_20"
+    t.text "property_text_1"
+    t.text "property_text_2"
+    t.text "property_text_3"
+    t.text "property_text_4"
+    t.text "property_text_5"
+    t.integer "property_integer_1"
+    t.integer "property_integer_2"
+    t.integer "property_integer_3"
+    t.integer "property_integer_4"
+    t.integer "property_integer_5"
+    t.integer "property_integer_6"
+    t.integer "property_integer_7"
+    t.integer "property_integer_8"
+    t.integer "property_integer_9"
+    t.integer "property_integer_10"
+    t.integer "property_integer_11"
+    t.integer "property_integer_12"
+    t.integer "property_integer_13"
+    t.integer "property_integer_14"
+    t.integer "property_integer_15"
+    t.integer "property_integer_16"
+    t.integer "property_integer_17"
+    t.integer "property_integer_18"
+    t.integer "property_integer_19"
+    t.integer "property_integer_20"
+    t.decimal "property_decimal_1", precision: 15, scale: 4
+    t.decimal "property_decimal_2", precision: 15, scale: 4
+    t.decimal "property_decimal_3", precision: 15, scale: 4
+    t.decimal "property_decimal_4", precision: 15, scale: 4
+    t.decimal "property_decimal_5", precision: 15, scale: 4
+    t.decimal "property_decimal_6", precision: 15, scale: 4
+    t.decimal "property_decimal_7", precision: 15, scale: 4
+    t.decimal "property_decimal_8", precision: 15, scale: 4
+    t.decimal "property_decimal_9", precision: 15, scale: 4
+    t.decimal "property_decimal_10", precision: 15, scale: 4
+    t.boolean "property_boolean_1"
+    t.boolean "property_boolean_2"
+    t.boolean "property_boolean_3"
+    t.boolean "property_boolean_4"
+    t.boolean "property_boolean_5"
+    t.boolean "property_boolean_6"
+    t.boolean "property_boolean_7"
+    t.boolean "property_boolean_8"
+    t.boolean "property_boolean_9"
+    t.boolean "property_boolean_10"
+    t.datetime "property_datetime_1"
+    t.datetime "property_datetime_2"
+    t.datetime "property_datetime_3"
+    t.datetime "property_datetime_4"
+    t.datetime "property_datetime_5"
+    t.datetime "property_datetime_6"
+    t.datetime "property_datetime_7"
+    t.datetime "property_datetime_8"
+    t.datetime "property_datetime_9"
+    t.datetime "property_datetime_10"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["business_type"], name: "index_reservations_on_business_type"
+    t.index ["discarded_at"], name: "index_reservations_on_discarded_at"
+    t.index ["lifecycle_status"], name: "index_reservations_on_lifecycle_status"
+    t.index ["workflow_status"], name: "index_reservations_on_workflow_status"
   end
 
-  create_table "role_appointments", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+  create_table "role_appointments", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
     t.uuid "company_id", null: false
     t.uuid "role_id", null: false
     t.string "appoint_to_type", null: false
@@ -2260,12 +4472,15 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.datetime "updated_at", null: false
     t.index ["appoint_to_type", "appoint_to_id"], name: "index_role_appointments_on_appoint_to"
     t.index ["appoint_to_type", "appoint_to_id"], name: "index_role_appointments_on_appoint_to_type_and_appoint_to_id"
+    t.index ["business_type"], name: "index_role_appointments_on_business_type"
     t.index ["company_id"], name: "index_role_appointments_on_company_id"
     t.index ["discarded_at"], name: "index_role_appointments_on_discarded_at"
+    t.index ["lifecycle_status"], name: "index_role_appointments_on_lifecycle_status"
     t.index ["role_id"], name: "index_role_appointments_on_role_id"
+    t.index ["workflow_status"], name: "index_role_appointments_on_workflow_status"
   end
 
-  create_table "roles", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+  create_table "roles", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
     t.uuid "company_id", null: false
     t.uuid "branch_id"
     t.integer "model_type"
@@ -2282,11 +4497,14 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["branch_id"], name: "index_roles_on_branch_id"
+    t.index ["business_type"], name: "index_roles_on_business_type"
     t.index ["company_id"], name: "index_roles_on_company_id"
     t.index ["discarded_at"], name: "index_roles_on_discarded_at"
+    t.index ["lifecycle_status"], name: "index_roles_on_lifecycle_status"
+    t.index ["workflow_status"], name: "index_roles_on_workflow_status"
   end
 
-  create_table "service_appointments", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+  create_table "service_appointments", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
     t.uuid "company_id", null: false
     t.uuid "service_id", null: false
     t.string "appoint_from_type"
@@ -2316,12 +4534,15 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.index ["appoint_from_type", "appoint_from_id"], name: "index_service_appointments_on_appoint_from"
     t.index ["appoint_to_type", "appoint_to_id"], name: "idx_on_appoint_to_type_appoint_to_id_25f7912f5f"
     t.index ["appoint_to_type", "appoint_to_id"], name: "index_service_appointments_on_appoint_to"
+    t.index ["business_type"], name: "index_service_appointments_on_business_type"
     t.index ["company_id"], name: "index_service_appointments_on_company_id"
     t.index ["discarded_at"], name: "index_service_appointments_on_discarded_at"
+    t.index ["lifecycle_status"], name: "index_service_appointments_on_lifecycle_status"
     t.index ["service_id"], name: "index_service_appointments_on_service_id"
+    t.index ["workflow_status"], name: "index_service_appointments_on_workflow_status"
   end
 
-  create_table "service_group_appointments", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+  create_table "service_group_appointments", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
     t.uuid "company_id", null: false
     t.uuid "service_group_id", null: false
     t.string "appoint_from_type"
@@ -2351,12 +4572,15 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.index ["appoint_from_type", "appoint_from_id"], name: "index_service_group_appointments_on_appoint_from"
     t.index ["appoint_to_type", "appoint_to_id"], name: "idx_on_appoint_to_type_appoint_to_id_9e69225799"
     t.index ["appoint_to_type", "appoint_to_id"], name: "index_service_group_appointments_on_appoint_to"
+    t.index ["business_type"], name: "index_service_group_appointments_on_business_type"
     t.index ["company_id"], name: "index_service_group_appointments_on_company_id"
     t.index ["discarded_at"], name: "index_service_group_appointments_on_discarded_at"
+    t.index ["lifecycle_status"], name: "index_service_group_appointments_on_lifecycle_status"
     t.index ["service_group_id"], name: "index_service_group_appointments_on_service_group_id"
+    t.index ["workflow_status"], name: "index_service_group_appointments_on_workflow_status"
   end
 
-  create_table "service_groups", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+  create_table "service_groups", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
     t.uuid "company_id", null: false
     t.uuid "branch_id"
     t.uuid "category_id"
@@ -2372,15 +4596,93 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.jsonb "metadata", default: {}
     t.datetime "discarded_at"
     t.string "permission_resource_name"
+    t.string "property_string_1"
+    t.string "property_string_2"
+    t.string "property_string_3"
+    t.string "property_string_4"
+    t.string "property_string_5"
+    t.string "property_string_6"
+    t.string "property_string_7"
+    t.string "property_string_8"
+    t.string "property_string_9"
+    t.string "property_string_10"
+    t.string "property_string_11"
+    t.string "property_string_12"
+    t.string "property_string_13"
+    t.string "property_string_14"
+    t.string "property_string_15"
+    t.string "property_string_16"
+    t.string "property_string_17"
+    t.string "property_string_18"
+    t.string "property_string_19"
+    t.string "property_string_20"
+    t.text "property_text_1"
+    t.text "property_text_2"
+    t.text "property_text_3"
+    t.text "property_text_4"
+    t.text "property_text_5"
+    t.integer "property_integer_1"
+    t.integer "property_integer_2"
+    t.integer "property_integer_3"
+    t.integer "property_integer_4"
+    t.integer "property_integer_5"
+    t.integer "property_integer_6"
+    t.integer "property_integer_7"
+    t.integer "property_integer_8"
+    t.integer "property_integer_9"
+    t.integer "property_integer_10"
+    t.integer "property_integer_11"
+    t.integer "property_integer_12"
+    t.integer "property_integer_13"
+    t.integer "property_integer_14"
+    t.integer "property_integer_15"
+    t.integer "property_integer_16"
+    t.integer "property_integer_17"
+    t.integer "property_integer_18"
+    t.integer "property_integer_19"
+    t.integer "property_integer_20"
+    t.decimal "property_decimal_1", precision: 15, scale: 4
+    t.decimal "property_decimal_2", precision: 15, scale: 4
+    t.decimal "property_decimal_3", precision: 15, scale: 4
+    t.decimal "property_decimal_4", precision: 15, scale: 4
+    t.decimal "property_decimal_5", precision: 15, scale: 4
+    t.decimal "property_decimal_6", precision: 15, scale: 4
+    t.decimal "property_decimal_7", precision: 15, scale: 4
+    t.decimal "property_decimal_8", precision: 15, scale: 4
+    t.decimal "property_decimal_9", precision: 15, scale: 4
+    t.decimal "property_decimal_10", precision: 15, scale: 4
+    t.boolean "property_boolean_1"
+    t.boolean "property_boolean_2"
+    t.boolean "property_boolean_3"
+    t.boolean "property_boolean_4"
+    t.boolean "property_boolean_5"
+    t.boolean "property_boolean_6"
+    t.boolean "property_boolean_7"
+    t.boolean "property_boolean_8"
+    t.boolean "property_boolean_9"
+    t.boolean "property_boolean_10"
+    t.datetime "property_datetime_1"
+    t.datetime "property_datetime_2"
+    t.datetime "property_datetime_3"
+    t.datetime "property_datetime_4"
+    t.datetime "property_datetime_5"
+    t.datetime "property_datetime_6"
+    t.datetime "property_datetime_7"
+    t.datetime "property_datetime_8"
+    t.datetime "property_datetime_9"
+    t.datetime "property_datetime_10"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["branch_id"], name: "index_service_groups_on_branch_id"
+    t.index ["business_type"], name: "index_service_groups_on_business_type"
     t.index ["category_id"], name: "index_service_groups_on_category_id"
     t.index ["company_id"], name: "index_service_groups_on_company_id"
     t.index ["discarded_at"], name: "index_service_groups_on_discarded_at"
+    t.index ["lifecycle_status"], name: "index_service_groups_on_lifecycle_status"
+    t.index ["workflow_status"], name: "index_service_groups_on_workflow_status"
   end
 
-  create_table "services", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+  create_table "services", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
     t.uuid "company_id", null: false
     t.uuid "branch_id"
     t.uuid "category_id"
@@ -2396,15 +4698,93 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.jsonb "metadata", default: {}
     t.datetime "discarded_at"
     t.string "permission_resource_name"
+    t.string "property_string_1"
+    t.string "property_string_2"
+    t.string "property_string_3"
+    t.string "property_string_4"
+    t.string "property_string_5"
+    t.string "property_string_6"
+    t.string "property_string_7"
+    t.string "property_string_8"
+    t.string "property_string_9"
+    t.string "property_string_10"
+    t.string "property_string_11"
+    t.string "property_string_12"
+    t.string "property_string_13"
+    t.string "property_string_14"
+    t.string "property_string_15"
+    t.string "property_string_16"
+    t.string "property_string_17"
+    t.string "property_string_18"
+    t.string "property_string_19"
+    t.string "property_string_20"
+    t.text "property_text_1"
+    t.text "property_text_2"
+    t.text "property_text_3"
+    t.text "property_text_4"
+    t.text "property_text_5"
+    t.integer "property_integer_1"
+    t.integer "property_integer_2"
+    t.integer "property_integer_3"
+    t.integer "property_integer_4"
+    t.integer "property_integer_5"
+    t.integer "property_integer_6"
+    t.integer "property_integer_7"
+    t.integer "property_integer_8"
+    t.integer "property_integer_9"
+    t.integer "property_integer_10"
+    t.integer "property_integer_11"
+    t.integer "property_integer_12"
+    t.integer "property_integer_13"
+    t.integer "property_integer_14"
+    t.integer "property_integer_15"
+    t.integer "property_integer_16"
+    t.integer "property_integer_17"
+    t.integer "property_integer_18"
+    t.integer "property_integer_19"
+    t.integer "property_integer_20"
+    t.decimal "property_decimal_1", precision: 15, scale: 4
+    t.decimal "property_decimal_2", precision: 15, scale: 4
+    t.decimal "property_decimal_3", precision: 15, scale: 4
+    t.decimal "property_decimal_4", precision: 15, scale: 4
+    t.decimal "property_decimal_5", precision: 15, scale: 4
+    t.decimal "property_decimal_6", precision: 15, scale: 4
+    t.decimal "property_decimal_7", precision: 15, scale: 4
+    t.decimal "property_decimal_8", precision: 15, scale: 4
+    t.decimal "property_decimal_9", precision: 15, scale: 4
+    t.decimal "property_decimal_10", precision: 15, scale: 4
+    t.boolean "property_boolean_1"
+    t.boolean "property_boolean_2"
+    t.boolean "property_boolean_3"
+    t.boolean "property_boolean_4"
+    t.boolean "property_boolean_5"
+    t.boolean "property_boolean_6"
+    t.boolean "property_boolean_7"
+    t.boolean "property_boolean_8"
+    t.boolean "property_boolean_9"
+    t.boolean "property_boolean_10"
+    t.datetime "property_datetime_1"
+    t.datetime "property_datetime_2"
+    t.datetime "property_datetime_3"
+    t.datetime "property_datetime_4"
+    t.datetime "property_datetime_5"
+    t.datetime "property_datetime_6"
+    t.datetime "property_datetime_7"
+    t.datetime "property_datetime_8"
+    t.datetime "property_datetime_9"
+    t.datetime "property_datetime_10"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["branch_id"], name: "index_services_on_branch_id"
+    t.index ["business_type"], name: "index_services_on_business_type"
     t.index ["category_id"], name: "index_services_on_category_id"
     t.index ["company_id"], name: "index_services_on_company_id"
     t.index ["discarded_at"], name: "index_services_on_discarded_at"
+    t.index ["lifecycle_status"], name: "index_services_on_lifecycle_status"
+    t.index ["workflow_status"], name: "index_services_on_workflow_status"
   end
 
-  create_table "sessions", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+  create_table "sessions", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
     t.uuid "user_id", null: false
     t.string "user_agent"
     t.string "ip_address"
@@ -2416,7 +4796,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.index ["user_id"], name: "index_sessions_on_user_id"
   end
 
-  create_table "setting_appointments", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+  create_table "setting_appointments", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
     t.uuid "company_id", null: false
     t.uuid "setting_id", null: false
     t.string "appoint_from_type"
@@ -2444,12 +4824,15 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.index ["appoint_from_type", "appoint_from_id"], name: "index_setting_appointments_on_appoint_from"
     t.index ["appoint_to_type", "appoint_to_id"], name: "idx_on_appoint_to_type_appoint_to_id_2604430405"
     t.index ["appoint_to_type", "appoint_to_id"], name: "index_setting_appointments_on_appoint_to"
+    t.index ["business_type"], name: "index_setting_appointments_on_business_type"
     t.index ["company_id"], name: "index_setting_appointments_on_company_id"
     t.index ["discarded_at"], name: "index_setting_appointments_on_discarded_at"
+    t.index ["lifecycle_status"], name: "index_setting_appointments_on_lifecycle_status"
     t.index ["setting_id"], name: "index_setting_appointments_on_setting_id"
+    t.index ["workflow_status"], name: "index_setting_appointments_on_workflow_status"
   end
 
-  create_table "setting_group_appointments", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+  create_table "setting_group_appointments", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
     t.uuid "company_id", null: false
     t.uuid "setting_group_id", null: false
     t.string "appoint_from_type"
@@ -2477,12 +4860,15 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.index ["appoint_from_type", "appoint_from_id"], name: "index_setting_group_appointments_on_appoint_from"
     t.index ["appoint_to_type", "appoint_to_id"], name: "idx_on_appoint_to_type_appoint_to_id_2769e0ab46"
     t.index ["appoint_to_type", "appoint_to_id"], name: "index_setting_group_appointments_on_appoint_to"
+    t.index ["business_type"], name: "index_setting_group_appointments_on_business_type"
     t.index ["company_id"], name: "index_setting_group_appointments_on_company_id"
     t.index ["discarded_at"], name: "index_setting_group_appointments_on_discarded_at"
+    t.index ["lifecycle_status"], name: "index_setting_group_appointments_on_lifecycle_status"
     t.index ["setting_group_id"], name: "index_setting_group_appointments_on_setting_group_id"
+    t.index ["workflow_status"], name: "index_setting_group_appointments_on_workflow_status"
   end
 
-  create_table "setting_groups", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+  create_table "setting_groups", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
     t.uuid "company_id", null: false
     t.uuid "branch_id"
     t.uuid "category_id"
@@ -2500,12 +4886,15 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["branch_id"], name: "index_setting_groups_on_branch_id"
+    t.index ["business_type"], name: "index_setting_groups_on_business_type"
     t.index ["category_id"], name: "index_setting_groups_on_category_id"
     t.index ["company_id"], name: "index_setting_groups_on_company_id"
     t.index ["discarded_at"], name: "index_setting_groups_on_discarded_at"
+    t.index ["lifecycle_status"], name: "index_setting_groups_on_lifecycle_status"
+    t.index ["workflow_status"], name: "index_setting_groups_on_workflow_status"
   end
 
-  create_table "settings", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+  create_table "settings", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
     t.uuid "setting_group_id", null: false
     t.uuid "company_id", null: false
     t.uuid "branch_id"
@@ -2524,13 +4913,16 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["branch_id"], name: "index_settings_on_branch_id"
+    t.index ["business_type"], name: "index_settings_on_business_type"
     t.index ["category_id"], name: "index_settings_on_category_id"
     t.index ["company_id"], name: "index_settings_on_company_id"
     t.index ["discarded_at"], name: "index_settings_on_discarded_at"
+    t.index ["lifecycle_status"], name: "index_settings_on_lifecycle_status"
     t.index ["setting_group_id"], name: "index_settings_on_setting_group_id"
+    t.index ["workflow_status"], name: "index_settings_on_workflow_status"
   end
 
-  create_table "shifts", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+  create_table "shifts", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
     t.uuid "company_id", null: false
     t.uuid "branch_id"
     t.uuid "period_id", null: false
@@ -2544,12 +4936,12 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.index ["period_id"], name: "index_shifts_on_period_id"
   end
 
-  create_table "sign_in_tokens", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+  create_table "sign_in_tokens", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
     t.uuid "user_id", null: false
     t.index ["user_id"], name: "index_sign_in_tokens_on_user_id"
   end
 
-  create_table "statistics", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+  create_table "statistics", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
     t.string "owner_type", null: false
     t.uuid "owner_id", null: false
     t.json "data"
@@ -2561,7 +4953,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.index ["recorded_at"], name: "index_statistics_on_recorded_at"
   end
 
-  create_table "stock_exports", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+  create_table "stock_exports", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
     t.uuid "company_id", null: false
     t.uuid "branch_id"
     t.uuid "product_id", null: false
@@ -2585,6 +4977,81 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.jsonb "metadata", default: {}
     t.datetime "discarded_at"
     t.string "permission_resource_name"
+    t.string "property_string_1"
+    t.string "property_string_2"
+    t.string "property_string_3"
+    t.string "property_string_4"
+    t.string "property_string_5"
+    t.string "property_string_6"
+    t.string "property_string_7"
+    t.string "property_string_8"
+    t.string "property_string_9"
+    t.string "property_string_10"
+    t.string "property_string_11"
+    t.string "property_string_12"
+    t.string "property_string_13"
+    t.string "property_string_14"
+    t.string "property_string_15"
+    t.string "property_string_16"
+    t.string "property_string_17"
+    t.string "property_string_18"
+    t.string "property_string_19"
+    t.string "property_string_20"
+    t.text "property_text_1"
+    t.text "property_text_2"
+    t.text "property_text_3"
+    t.text "property_text_4"
+    t.text "property_text_5"
+    t.integer "property_integer_1"
+    t.integer "property_integer_2"
+    t.integer "property_integer_3"
+    t.integer "property_integer_4"
+    t.integer "property_integer_5"
+    t.integer "property_integer_6"
+    t.integer "property_integer_7"
+    t.integer "property_integer_8"
+    t.integer "property_integer_9"
+    t.integer "property_integer_10"
+    t.integer "property_integer_11"
+    t.integer "property_integer_12"
+    t.integer "property_integer_13"
+    t.integer "property_integer_14"
+    t.integer "property_integer_15"
+    t.integer "property_integer_16"
+    t.integer "property_integer_17"
+    t.integer "property_integer_18"
+    t.integer "property_integer_19"
+    t.integer "property_integer_20"
+    t.decimal "property_decimal_1", precision: 15, scale: 4
+    t.decimal "property_decimal_2", precision: 15, scale: 4
+    t.decimal "property_decimal_3", precision: 15, scale: 4
+    t.decimal "property_decimal_4", precision: 15, scale: 4
+    t.decimal "property_decimal_5", precision: 15, scale: 4
+    t.decimal "property_decimal_6", precision: 15, scale: 4
+    t.decimal "property_decimal_7", precision: 15, scale: 4
+    t.decimal "property_decimal_8", precision: 15, scale: 4
+    t.decimal "property_decimal_9", precision: 15, scale: 4
+    t.decimal "property_decimal_10", precision: 15, scale: 4
+    t.boolean "property_boolean_1"
+    t.boolean "property_boolean_2"
+    t.boolean "property_boolean_3"
+    t.boolean "property_boolean_4"
+    t.boolean "property_boolean_5"
+    t.boolean "property_boolean_6"
+    t.boolean "property_boolean_7"
+    t.boolean "property_boolean_8"
+    t.boolean "property_boolean_9"
+    t.boolean "property_boolean_10"
+    t.datetime "property_datetime_1"
+    t.datetime "property_datetime_2"
+    t.datetime "property_datetime_3"
+    t.datetime "property_datetime_4"
+    t.datetime "property_datetime_5"
+    t.datetime "property_datetime_6"
+    t.datetime "property_datetime_7"
+    t.datetime "property_datetime_8"
+    t.datetime "property_datetime_9"
+    t.datetime "property_datetime_10"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["appoint_by_type", "appoint_by_id"], name: "index_stock_exports_on_appoint_by"
@@ -2592,13 +5059,16 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.index ["appoint_from_type", "appoint_from_id"], name: "index_stock_exports_on_appoint_from"
     t.index ["appoint_to_type", "appoint_to_id"], name: "index_stock_exports_on_appoint_to"
     t.index ["branch_id"], name: "index_stock_exports_on_branch_id"
+    t.index ["business_type"], name: "index_stock_exports_on_business_type"
     t.index ["category_id"], name: "index_stock_exports_on_category_id"
     t.index ["company_id"], name: "index_stock_exports_on_company_id"
     t.index ["discarded_at"], name: "index_stock_exports_on_discarded_at"
+    t.index ["lifecycle_status"], name: "index_stock_exports_on_lifecycle_status"
     t.index ["product_id"], name: "index_stock_exports_on_product_id"
+    t.index ["workflow_status"], name: "index_stock_exports_on_workflow_status"
   end
 
-  create_table "stock_imports", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+  create_table "stock_imports", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
     t.uuid "company_id", null: false
     t.uuid "branch_id"
     t.uuid "product_id", null: false
@@ -2622,6 +5092,81 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.jsonb "metadata", default: {}
     t.datetime "discarded_at"
     t.string "permission_resource_name"
+    t.string "property_string_1"
+    t.string "property_string_2"
+    t.string "property_string_3"
+    t.string "property_string_4"
+    t.string "property_string_5"
+    t.string "property_string_6"
+    t.string "property_string_7"
+    t.string "property_string_8"
+    t.string "property_string_9"
+    t.string "property_string_10"
+    t.string "property_string_11"
+    t.string "property_string_12"
+    t.string "property_string_13"
+    t.string "property_string_14"
+    t.string "property_string_15"
+    t.string "property_string_16"
+    t.string "property_string_17"
+    t.string "property_string_18"
+    t.string "property_string_19"
+    t.string "property_string_20"
+    t.text "property_text_1"
+    t.text "property_text_2"
+    t.text "property_text_3"
+    t.text "property_text_4"
+    t.text "property_text_5"
+    t.integer "property_integer_1"
+    t.integer "property_integer_2"
+    t.integer "property_integer_3"
+    t.integer "property_integer_4"
+    t.integer "property_integer_5"
+    t.integer "property_integer_6"
+    t.integer "property_integer_7"
+    t.integer "property_integer_8"
+    t.integer "property_integer_9"
+    t.integer "property_integer_10"
+    t.integer "property_integer_11"
+    t.integer "property_integer_12"
+    t.integer "property_integer_13"
+    t.integer "property_integer_14"
+    t.integer "property_integer_15"
+    t.integer "property_integer_16"
+    t.integer "property_integer_17"
+    t.integer "property_integer_18"
+    t.integer "property_integer_19"
+    t.integer "property_integer_20"
+    t.decimal "property_decimal_1", precision: 15, scale: 4
+    t.decimal "property_decimal_2", precision: 15, scale: 4
+    t.decimal "property_decimal_3", precision: 15, scale: 4
+    t.decimal "property_decimal_4", precision: 15, scale: 4
+    t.decimal "property_decimal_5", precision: 15, scale: 4
+    t.decimal "property_decimal_6", precision: 15, scale: 4
+    t.decimal "property_decimal_7", precision: 15, scale: 4
+    t.decimal "property_decimal_8", precision: 15, scale: 4
+    t.decimal "property_decimal_9", precision: 15, scale: 4
+    t.decimal "property_decimal_10", precision: 15, scale: 4
+    t.boolean "property_boolean_1"
+    t.boolean "property_boolean_2"
+    t.boolean "property_boolean_3"
+    t.boolean "property_boolean_4"
+    t.boolean "property_boolean_5"
+    t.boolean "property_boolean_6"
+    t.boolean "property_boolean_7"
+    t.boolean "property_boolean_8"
+    t.boolean "property_boolean_9"
+    t.boolean "property_boolean_10"
+    t.datetime "property_datetime_1"
+    t.datetime "property_datetime_2"
+    t.datetime "property_datetime_3"
+    t.datetime "property_datetime_4"
+    t.datetime "property_datetime_5"
+    t.datetime "property_datetime_6"
+    t.datetime "property_datetime_7"
+    t.datetime "property_datetime_8"
+    t.datetime "property_datetime_9"
+    t.datetime "property_datetime_10"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["appoint_by_type", "appoint_by_id"], name: "index_stock_imports_on_appoint_by"
@@ -2629,13 +5174,16 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.index ["appoint_from_type", "appoint_from_id"], name: "index_stock_imports_on_appoint_from"
     t.index ["appoint_to_type", "appoint_to_id"], name: "index_stock_imports_on_appoint_to"
     t.index ["branch_id"], name: "index_stock_imports_on_branch_id"
+    t.index ["business_type"], name: "index_stock_imports_on_business_type"
     t.index ["category_id"], name: "index_stock_imports_on_category_id"
     t.index ["company_id"], name: "index_stock_imports_on_company_id"
     t.index ["discarded_at"], name: "index_stock_imports_on_discarded_at"
+    t.index ["lifecycle_status"], name: "index_stock_imports_on_lifecycle_status"
     t.index ["product_id"], name: "index_stock_imports_on_product_id"
+    t.index ["workflow_status"], name: "index_stock_imports_on_workflow_status"
   end
 
-  create_table "stock_transfers", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+  create_table "stock_transfers", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
     t.uuid "company_id", null: false
     t.uuid "branch_id"
     t.uuid "product_id", null: false
@@ -2659,6 +5207,81 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.jsonb "metadata", default: {}
     t.datetime "discarded_at"
     t.string "permission_resource_name"
+    t.string "property_string_1"
+    t.string "property_string_2"
+    t.string "property_string_3"
+    t.string "property_string_4"
+    t.string "property_string_5"
+    t.string "property_string_6"
+    t.string "property_string_7"
+    t.string "property_string_8"
+    t.string "property_string_9"
+    t.string "property_string_10"
+    t.string "property_string_11"
+    t.string "property_string_12"
+    t.string "property_string_13"
+    t.string "property_string_14"
+    t.string "property_string_15"
+    t.string "property_string_16"
+    t.string "property_string_17"
+    t.string "property_string_18"
+    t.string "property_string_19"
+    t.string "property_string_20"
+    t.text "property_text_1"
+    t.text "property_text_2"
+    t.text "property_text_3"
+    t.text "property_text_4"
+    t.text "property_text_5"
+    t.integer "property_integer_1"
+    t.integer "property_integer_2"
+    t.integer "property_integer_3"
+    t.integer "property_integer_4"
+    t.integer "property_integer_5"
+    t.integer "property_integer_6"
+    t.integer "property_integer_7"
+    t.integer "property_integer_8"
+    t.integer "property_integer_9"
+    t.integer "property_integer_10"
+    t.integer "property_integer_11"
+    t.integer "property_integer_12"
+    t.integer "property_integer_13"
+    t.integer "property_integer_14"
+    t.integer "property_integer_15"
+    t.integer "property_integer_16"
+    t.integer "property_integer_17"
+    t.integer "property_integer_18"
+    t.integer "property_integer_19"
+    t.integer "property_integer_20"
+    t.decimal "property_decimal_1", precision: 15, scale: 4
+    t.decimal "property_decimal_2", precision: 15, scale: 4
+    t.decimal "property_decimal_3", precision: 15, scale: 4
+    t.decimal "property_decimal_4", precision: 15, scale: 4
+    t.decimal "property_decimal_5", precision: 15, scale: 4
+    t.decimal "property_decimal_6", precision: 15, scale: 4
+    t.decimal "property_decimal_7", precision: 15, scale: 4
+    t.decimal "property_decimal_8", precision: 15, scale: 4
+    t.decimal "property_decimal_9", precision: 15, scale: 4
+    t.decimal "property_decimal_10", precision: 15, scale: 4
+    t.boolean "property_boolean_1"
+    t.boolean "property_boolean_2"
+    t.boolean "property_boolean_3"
+    t.boolean "property_boolean_4"
+    t.boolean "property_boolean_5"
+    t.boolean "property_boolean_6"
+    t.boolean "property_boolean_7"
+    t.boolean "property_boolean_8"
+    t.boolean "property_boolean_9"
+    t.boolean "property_boolean_10"
+    t.datetime "property_datetime_1"
+    t.datetime "property_datetime_2"
+    t.datetime "property_datetime_3"
+    t.datetime "property_datetime_4"
+    t.datetime "property_datetime_5"
+    t.datetime "property_datetime_6"
+    t.datetime "property_datetime_7"
+    t.datetime "property_datetime_8"
+    t.datetime "property_datetime_9"
+    t.datetime "property_datetime_10"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["appoint_by_type", "appoint_by_id"], name: "index_stock_transfers_on_appoint_by"
@@ -2666,13 +5289,16 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.index ["appoint_from_type", "appoint_from_id"], name: "index_stock_transfers_on_appoint_from"
     t.index ["appoint_to_type", "appoint_to_id"], name: "index_stock_transfers_on_appoint_to"
     t.index ["branch_id"], name: "index_stock_transfers_on_branch_id"
+    t.index ["business_type"], name: "index_stock_transfers_on_business_type"
     t.index ["category_id"], name: "index_stock_transfers_on_category_id"
     t.index ["company_id"], name: "index_stock_transfers_on_company_id"
     t.index ["discarded_at"], name: "index_stock_transfers_on_discarded_at"
+    t.index ["lifecycle_status"], name: "index_stock_transfers_on_lifecycle_status"
     t.index ["product_id"], name: "index_stock_transfers_on_product_id"
+    t.index ["workflow_status"], name: "index_stock_transfers_on_workflow_status"
   end
 
-  create_table "stocks", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+  create_table "stocks", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
     t.uuid "company_id", null: false
     t.uuid "branch_id"
     t.uuid "product_id", null: false
@@ -2697,23 +5323,101 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.jsonb "metadata", default: {}
     t.datetime "discarded_at"
     t.string "permission_resource_name"
+    t.string "property_string_1"
+    t.string "property_string_2"
+    t.string "property_string_3"
+    t.string "property_string_4"
+    t.string "property_string_5"
+    t.string "property_string_6"
+    t.string "property_string_7"
+    t.string "property_string_8"
+    t.string "property_string_9"
+    t.string "property_string_10"
+    t.string "property_string_11"
+    t.string "property_string_12"
+    t.string "property_string_13"
+    t.string "property_string_14"
+    t.string "property_string_15"
+    t.string "property_string_16"
+    t.string "property_string_17"
+    t.string "property_string_18"
+    t.string "property_string_19"
+    t.string "property_string_20"
+    t.text "property_text_1"
+    t.text "property_text_2"
+    t.text "property_text_3"
+    t.text "property_text_4"
+    t.text "property_text_5"
+    t.integer "property_integer_1"
+    t.integer "property_integer_2"
+    t.integer "property_integer_3"
+    t.integer "property_integer_4"
+    t.integer "property_integer_5"
+    t.integer "property_integer_6"
+    t.integer "property_integer_7"
+    t.integer "property_integer_8"
+    t.integer "property_integer_9"
+    t.integer "property_integer_10"
+    t.integer "property_integer_11"
+    t.integer "property_integer_12"
+    t.integer "property_integer_13"
+    t.integer "property_integer_14"
+    t.integer "property_integer_15"
+    t.integer "property_integer_16"
+    t.integer "property_integer_17"
+    t.integer "property_integer_18"
+    t.integer "property_integer_19"
+    t.integer "property_integer_20"
+    t.decimal "property_decimal_1", precision: 15, scale: 4
+    t.decimal "property_decimal_2", precision: 15, scale: 4
+    t.decimal "property_decimal_3", precision: 15, scale: 4
+    t.decimal "property_decimal_4", precision: 15, scale: 4
+    t.decimal "property_decimal_5", precision: 15, scale: 4
+    t.decimal "property_decimal_6", precision: 15, scale: 4
+    t.decimal "property_decimal_7", precision: 15, scale: 4
+    t.decimal "property_decimal_8", precision: 15, scale: 4
+    t.decimal "property_decimal_9", precision: 15, scale: 4
+    t.decimal "property_decimal_10", precision: 15, scale: 4
+    t.boolean "property_boolean_1"
+    t.boolean "property_boolean_2"
+    t.boolean "property_boolean_3"
+    t.boolean "property_boolean_4"
+    t.boolean "property_boolean_5"
+    t.boolean "property_boolean_6"
+    t.boolean "property_boolean_7"
+    t.boolean "property_boolean_8"
+    t.boolean "property_boolean_9"
+    t.boolean "property_boolean_10"
+    t.datetime "property_datetime_1"
+    t.datetime "property_datetime_2"
+    t.datetime "property_datetime_3"
+    t.datetime "property_datetime_4"
+    t.datetime "property_datetime_5"
+    t.datetime "property_datetime_6"
+    t.datetime "property_datetime_7"
+    t.datetime "property_datetime_8"
+    t.datetime "property_datetime_9"
+    t.datetime "property_datetime_10"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["barcode"], name: "index_stocks_on_barcode"
     t.index ["branch_id"], name: "index_stocks_on_branch_id"
+    t.index ["business_type"], name: "index_stocks_on_business_type"
     t.index ["category_id"], name: "index_stocks_on_category_id"
     t.index ["company_id"], name: "index_stocks_on_company_id"
     t.index ["discarded_at"], name: "index_stocks_on_discarded_at"
     t.index ["ean"], name: "index_stocks_on_ean"
+    t.index ["lifecycle_status"], name: "index_stocks_on_lifecycle_status"
     t.index ["product_id", "warehouse_id"], name: "index_stocks_on_product_id_and_warehouse_id", unique: true
     t.index ["product_id"], name: "index_stocks_on_product_id"
     t.index ["serial_number"], name: "index_stocks_on_serial_number"
     t.index ["sku"], name: "index_stocks_on_sku"
     t.index ["upc"], name: "index_stocks_on_upc"
     t.index ["warehouse_id"], name: "index_stocks_on_warehouse_id"
+    t.index ["workflow_status"], name: "index_stocks_on_workflow_status"
   end
 
-  create_table "subscription_groups", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+  create_table "subscription_groups", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
     t.uuid "company_id", null: false
     t.uuid "branch_id"
     t.uuid "subscription_plan_id"
@@ -2733,13 +5437,16 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["branch_id"], name: "index_subscription_groups_on_branch_id"
+    t.index ["business_type"], name: "index_subscription_groups_on_business_type"
     t.index ["company_id"], name: "index_subscription_groups_on_company_id"
     t.index ["discarded_at"], name: "index_subscription_groups_on_discarded_at"
+    t.index ["lifecycle_status"], name: "index_subscription_groups_on_lifecycle_status"
     t.index ["subscription_group_id"], name: "index_subscription_groups_on_subscription_group_id"
     t.index ["subscription_plan_id"], name: "index_subscription_groups_on_subscription_plan_id"
+    t.index ["workflow_status"], name: "index_subscription_groups_on_workflow_status"
   end
 
-  create_table "subscription_plan_appointments", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+  create_table "subscription_plan_appointments", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
     t.uuid "company_id", null: false
     t.uuid "branch_id"
     t.uuid "subscription_plan_id"
@@ -2759,13 +5466,16 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["branch_id"], name: "index_subscription_plan_appointments_on_branch_id"
+    t.index ["business_type"], name: "index_subscription_plan_appointments_on_business_type"
     t.index ["company_id"], name: "index_subscription_plan_appointments_on_company_id"
     t.index ["discarded_at"], name: "index_subscription_plan_appointments_on_discarded_at"
+    t.index ["lifecycle_status"], name: "index_subscription_plan_appointments_on_lifecycle_status"
     t.index ["subscription_group_id"], name: "index_subscription_plan_appointments_on_subscription_group_id"
     t.index ["subscription_plan_id"], name: "index_subscription_plan_appointments_on_subscription_plan_id"
+    t.index ["workflow_status"], name: "index_subscription_plan_appointments_on_workflow_status"
   end
 
-  create_table "subscription_plans", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+  create_table "subscription_plans", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
     t.uuid "company_id", null: false
     t.uuid "branch_id"
     t.string "name", null: false
@@ -2785,11 +5495,14 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["branch_id"], name: "index_subscription_plans_on_branch_id"
+    t.index ["business_type"], name: "index_subscription_plans_on_business_type"
     t.index ["company_id"], name: "index_subscription_plans_on_company_id"
     t.index ["discarded_at"], name: "index_subscription_plans_on_discarded_at"
+    t.index ["lifecycle_status"], name: "index_subscription_plans_on_lifecycle_status"
+    t.index ["workflow_status"], name: "index_subscription_plans_on_workflow_status"
   end
 
-  create_table "system_subscription_groups", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+  create_table "system_subscription_groups", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
     t.uuid "system_subscription_plan_id", null: false
     t.uuid "company_id", null: false
     t.uuid "branch_id"
@@ -2809,12 +5522,15 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["branch_id"], name: "index_system_subscription_groups_on_branch_id"
+    t.index ["business_type"], name: "index_system_subscription_groups_on_business_type"
     t.index ["company_id"], name: "index_system_subscription_groups_on_company_id"
     t.index ["discarded_at"], name: "index_system_subscription_groups_on_discarded_at"
+    t.index ["lifecycle_status"], name: "index_system_subscription_groups_on_lifecycle_status"
     t.index ["system_subscription_plan_id"], name: "idx_on_system_subscription_plan_id_2f2a083a8b"
+    t.index ["workflow_status"], name: "index_system_subscription_groups_on_workflow_status"
   end
 
-  create_table "system_subscription_plans", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+  create_table "system_subscription_plans", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
     t.string "name", null: false
     t.string "description"
     t.string "code"
@@ -2831,10 +5547,13 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["business_type"], name: "index_system_subscription_plans_on_business_type"
     t.index ["discarded_at"], name: "index_system_subscription_plans_on_discarded_at"
+    t.index ["lifecycle_status"], name: "index_system_subscription_plans_on_lifecycle_status"
+    t.index ["workflow_status"], name: "index_system_subscription_plans_on_workflow_status"
   end
 
-  create_table "system_subscriptions", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+  create_table "system_subscriptions", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
     t.uuid "system_subscription_plan_id", null: false
     t.uuid "system_subscription_group_id"
     t.uuid "company_id", null: false
@@ -2854,13 +5573,16 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["branch_id"], name: "index_system_subscriptions_on_branch_id"
+    t.index ["business_type"], name: "index_system_subscriptions_on_business_type"
     t.index ["company_id"], name: "index_system_subscriptions_on_company_id"
     t.index ["discarded_at"], name: "index_system_subscriptions_on_discarded_at"
+    t.index ["lifecycle_status"], name: "index_system_subscriptions_on_lifecycle_status"
     t.index ["system_subscription_group_id"], name: "index_system_subscriptions_on_system_subscription_group_id"
     t.index ["system_subscription_plan_id"], name: "index_system_subscriptions_on_system_subscription_plan_id"
+    t.index ["workflow_status"], name: "index_system_subscriptions_on_workflow_status"
   end
 
-  create_table "systems", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+  create_table "systems", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
     t.string "email"
     t.string "name", default: "System", null: false
     t.string "code", null: false, comment: "System"
@@ -2877,11 +5599,14 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["business_type"], name: "index_systems_on_business_type"
     t.index ["discarded_at"], name: "index_systems_on_discarded_at"
+    t.index ["lifecycle_status"], name: "index_systems_on_lifecycle_status"
     t.index ["name"], name: "index_systems_on_name", unique: true
+    t.index ["workflow_status"], name: "index_systems_on_workflow_status"
   end
 
-  create_table "tag_appointments", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+  create_table "tag_appointments", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
     t.uuid "company_id", null: false
     t.uuid "tag_id", null: false
     t.string "appoint_from_type"
@@ -2908,12 +5633,15 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.index ["appoint_from_type", "appoint_from_id"], name: "index_tag_appointments_on_appoint_from"
     t.index ["appoint_to_type", "appoint_to_id"], name: "index_tag_appointments_on_appoint_to"
     t.index ["appoint_to_type", "appoint_to_id"], name: "index_tag_appointments_on_appoint_to_type_and_appoint_to_id"
+    t.index ["business_type"], name: "index_tag_appointments_on_business_type"
     t.index ["company_id"], name: "index_tag_appointments_on_company_id"
     t.index ["discarded_at"], name: "index_tag_appointments_on_discarded_at"
+    t.index ["lifecycle_status"], name: "index_tag_appointments_on_lifecycle_status"
     t.index ["tag_id"], name: "index_tag_appointments_on_tag_id"
+    t.index ["workflow_status"], name: "index_tag_appointments_on_workflow_status"
   end
 
-  create_table "tags", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+  create_table "tags", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
     t.uuid "company_id", null: false
     t.string "key"
     t.string "value"
@@ -2928,11 +5656,14 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.datetime "discarded_at"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["business_type"], name: "index_tags_on_business_type"
     t.index ["company_id"], name: "index_tags_on_company_id"
     t.index ["discarded_at"], name: "index_tags_on_discarded_at"
+    t.index ["lifecycle_status"], name: "index_tags_on_lifecycle_status"
+    t.index ["workflow_status"], name: "index_tags_on_workflow_status"
   end
 
-  create_table "task_appointments", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+  create_table "task_appointments", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
     t.uuid "company_id", null: false
     t.uuid "task_id", null: false
     t.string "appoint_from_type"
@@ -2960,12 +5691,15 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.index ["appoint_from_type", "appoint_from_id"], name: "index_task_appointments_on_appoint_from"
     t.index ["appoint_to_type", "appoint_to_id"], name: "index_task_appointments_on_appoint_to"
     t.index ["appoint_to_type", "appoint_to_id"], name: "index_task_appointments_on_appoint_to_type_and_appoint_to_id"
+    t.index ["business_type"], name: "index_task_appointments_on_business_type"
     t.index ["company_id"], name: "index_task_appointments_on_company_id"
     t.index ["discarded_at"], name: "index_task_appointments_on_discarded_at"
+    t.index ["lifecycle_status"], name: "index_task_appointments_on_lifecycle_status"
     t.index ["task_id"], name: "index_task_appointments_on_task_id"
+    t.index ["workflow_status"], name: "index_task_appointments_on_workflow_status"
   end
 
-  create_table "task_group_appointments", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+  create_table "task_group_appointments", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
     t.uuid "company_id", null: false
     t.uuid "task_group_id", null: false
     t.string "appoint_from_type"
@@ -2993,12 +5727,15 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.index ["appoint_from_type", "appoint_from_id"], name: "index_task_group_appointments_on_appoint_from"
     t.index ["appoint_to_type", "appoint_to_id"], name: "idx_on_appoint_to_type_appoint_to_id_bd79761d5f"
     t.index ["appoint_to_type", "appoint_to_id"], name: "index_task_group_appointments_on_appoint_to"
+    t.index ["business_type"], name: "index_task_group_appointments_on_business_type"
     t.index ["company_id"], name: "index_task_group_appointments_on_company_id"
     t.index ["discarded_at"], name: "index_task_group_appointments_on_discarded_at"
+    t.index ["lifecycle_status"], name: "index_task_group_appointments_on_lifecycle_status"
     t.index ["task_group_id"], name: "index_task_group_appointments_on_task_group_id"
+    t.index ["workflow_status"], name: "index_task_group_appointments_on_workflow_status"
   end
 
-  create_table "task_groups", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+  create_table "task_groups", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
     t.uuid "company_id", null: false
     t.uuid "branch_id"
     t.uuid "category_id"
@@ -3012,15 +5749,93 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.jsonb "metadata", default: {}
     t.datetime "discarded_at"
     t.string "permission_resource_name"
+    t.string "property_string_1"
+    t.string "property_string_2"
+    t.string "property_string_3"
+    t.string "property_string_4"
+    t.string "property_string_5"
+    t.string "property_string_6"
+    t.string "property_string_7"
+    t.string "property_string_8"
+    t.string "property_string_9"
+    t.string "property_string_10"
+    t.string "property_string_11"
+    t.string "property_string_12"
+    t.string "property_string_13"
+    t.string "property_string_14"
+    t.string "property_string_15"
+    t.string "property_string_16"
+    t.string "property_string_17"
+    t.string "property_string_18"
+    t.string "property_string_19"
+    t.string "property_string_20"
+    t.text "property_text_1"
+    t.text "property_text_2"
+    t.text "property_text_3"
+    t.text "property_text_4"
+    t.text "property_text_5"
+    t.integer "property_integer_1"
+    t.integer "property_integer_2"
+    t.integer "property_integer_3"
+    t.integer "property_integer_4"
+    t.integer "property_integer_5"
+    t.integer "property_integer_6"
+    t.integer "property_integer_7"
+    t.integer "property_integer_8"
+    t.integer "property_integer_9"
+    t.integer "property_integer_10"
+    t.integer "property_integer_11"
+    t.integer "property_integer_12"
+    t.integer "property_integer_13"
+    t.integer "property_integer_14"
+    t.integer "property_integer_15"
+    t.integer "property_integer_16"
+    t.integer "property_integer_17"
+    t.integer "property_integer_18"
+    t.integer "property_integer_19"
+    t.integer "property_integer_20"
+    t.decimal "property_decimal_1", precision: 15, scale: 4
+    t.decimal "property_decimal_2", precision: 15, scale: 4
+    t.decimal "property_decimal_3", precision: 15, scale: 4
+    t.decimal "property_decimal_4", precision: 15, scale: 4
+    t.decimal "property_decimal_5", precision: 15, scale: 4
+    t.decimal "property_decimal_6", precision: 15, scale: 4
+    t.decimal "property_decimal_7", precision: 15, scale: 4
+    t.decimal "property_decimal_8", precision: 15, scale: 4
+    t.decimal "property_decimal_9", precision: 15, scale: 4
+    t.decimal "property_decimal_10", precision: 15, scale: 4
+    t.boolean "property_boolean_1"
+    t.boolean "property_boolean_2"
+    t.boolean "property_boolean_3"
+    t.boolean "property_boolean_4"
+    t.boolean "property_boolean_5"
+    t.boolean "property_boolean_6"
+    t.boolean "property_boolean_7"
+    t.boolean "property_boolean_8"
+    t.boolean "property_boolean_9"
+    t.boolean "property_boolean_10"
+    t.datetime "property_datetime_1"
+    t.datetime "property_datetime_2"
+    t.datetime "property_datetime_3"
+    t.datetime "property_datetime_4"
+    t.datetime "property_datetime_5"
+    t.datetime "property_datetime_6"
+    t.datetime "property_datetime_7"
+    t.datetime "property_datetime_8"
+    t.datetime "property_datetime_9"
+    t.datetime "property_datetime_10"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["branch_id"], name: "index_task_groups_on_branch_id"
+    t.index ["business_type"], name: "index_task_groups_on_business_type"
     t.index ["category_id"], name: "index_task_groups_on_category_id"
     t.index ["company_id"], name: "index_task_groups_on_company_id"
     t.index ["discarded_at"], name: "index_task_groups_on_discarded_at"
+    t.index ["lifecycle_status"], name: "index_task_groups_on_lifecycle_status"
+    t.index ["workflow_status"], name: "index_task_groups_on_workflow_status"
   end
 
-  create_table "tasks", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+  create_table "tasks", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
     t.uuid "company_id", null: false
     t.uuid "branch_id"
     t.uuid "task_group_id", null: false
@@ -3036,16 +5851,94 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.jsonb "metadata", default: {}
     t.datetime "discarded_at"
     t.string "permission_resource_name"
+    t.string "property_string_1"
+    t.string "property_string_2"
+    t.string "property_string_3"
+    t.string "property_string_4"
+    t.string "property_string_5"
+    t.string "property_string_6"
+    t.string "property_string_7"
+    t.string "property_string_8"
+    t.string "property_string_9"
+    t.string "property_string_10"
+    t.string "property_string_11"
+    t.string "property_string_12"
+    t.string "property_string_13"
+    t.string "property_string_14"
+    t.string "property_string_15"
+    t.string "property_string_16"
+    t.string "property_string_17"
+    t.string "property_string_18"
+    t.string "property_string_19"
+    t.string "property_string_20"
+    t.text "property_text_1"
+    t.text "property_text_2"
+    t.text "property_text_3"
+    t.text "property_text_4"
+    t.text "property_text_5"
+    t.integer "property_integer_1"
+    t.integer "property_integer_2"
+    t.integer "property_integer_3"
+    t.integer "property_integer_4"
+    t.integer "property_integer_5"
+    t.integer "property_integer_6"
+    t.integer "property_integer_7"
+    t.integer "property_integer_8"
+    t.integer "property_integer_9"
+    t.integer "property_integer_10"
+    t.integer "property_integer_11"
+    t.integer "property_integer_12"
+    t.integer "property_integer_13"
+    t.integer "property_integer_14"
+    t.integer "property_integer_15"
+    t.integer "property_integer_16"
+    t.integer "property_integer_17"
+    t.integer "property_integer_18"
+    t.integer "property_integer_19"
+    t.integer "property_integer_20"
+    t.decimal "property_decimal_1", precision: 15, scale: 4
+    t.decimal "property_decimal_2", precision: 15, scale: 4
+    t.decimal "property_decimal_3", precision: 15, scale: 4
+    t.decimal "property_decimal_4", precision: 15, scale: 4
+    t.decimal "property_decimal_5", precision: 15, scale: 4
+    t.decimal "property_decimal_6", precision: 15, scale: 4
+    t.decimal "property_decimal_7", precision: 15, scale: 4
+    t.decimal "property_decimal_8", precision: 15, scale: 4
+    t.decimal "property_decimal_9", precision: 15, scale: 4
+    t.decimal "property_decimal_10", precision: 15, scale: 4
+    t.boolean "property_boolean_1"
+    t.boolean "property_boolean_2"
+    t.boolean "property_boolean_3"
+    t.boolean "property_boolean_4"
+    t.boolean "property_boolean_5"
+    t.boolean "property_boolean_6"
+    t.boolean "property_boolean_7"
+    t.boolean "property_boolean_8"
+    t.boolean "property_boolean_9"
+    t.boolean "property_boolean_10"
+    t.datetime "property_datetime_1"
+    t.datetime "property_datetime_2"
+    t.datetime "property_datetime_3"
+    t.datetime "property_datetime_4"
+    t.datetime "property_datetime_5"
+    t.datetime "property_datetime_6"
+    t.datetime "property_datetime_7"
+    t.datetime "property_datetime_8"
+    t.datetime "property_datetime_9"
+    t.datetime "property_datetime_10"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["branch_id"], name: "index_tasks_on_branch_id"
+    t.index ["business_type"], name: "index_tasks_on_business_type"
     t.index ["category_id"], name: "index_tasks_on_category_id"
     t.index ["company_id"], name: "index_tasks_on_company_id"
     t.index ["discarded_at"], name: "index_tasks_on_discarded_at"
+    t.index ["lifecycle_status"], name: "index_tasks_on_lifecycle_status"
     t.index ["task_group_id"], name: "index_tasks_on_task_group_id"
+    t.index ["workflow_status"], name: "index_tasks_on_workflow_status"
   end
 
-  create_table "users", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+  create_table "users", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
     t.string "email", null: false
     t.string "password_digest", null: false
     t.boolean "verified", default: false, null: false
@@ -3070,15 +5963,18 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["business_type"], name: "index_users_on_business_type"
     t.index ["discarded_at"], name: "index_users_on_discarded_at"
     t.index ["email"], name: "index_users_on_email", unique: true
+    t.index ["lifecycle_status"], name: "index_users_on_lifecycle_status"
     t.index ["parent_user_id"], name: "index_users_on_parent_user_id"
     t.index ["single_access_token"], name: "index_users_on_single_access_token", unique: true
     t.index ["uid"], name: "index_users_on_uid", unique: true
     t.index ["username"], name: "index_users_on_username", unique: true
+    t.index ["workflow_status"], name: "index_users_on_workflow_status"
   end
 
-  create_table "versions", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+  create_table "versions", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
     t.string "whodunnit"
     t.datetime "created_at"
     t.string "item_id", null: false
@@ -3089,7 +5985,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.index ["item_type", "item_id"], name: "index_versions_on_item_type_and_item_id"
   end
 
-  create_table "warehouses", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+  create_table "warehouses", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
     t.uuid "company_id", null: false
     t.uuid "branch_id"
     t.uuid "category_id"
@@ -3103,12 +5999,90 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.jsonb "metadata", default: {}
     t.datetime "discarded_at"
     t.string "permission_resource_name"
+    t.string "property_string_1"
+    t.string "property_string_2"
+    t.string "property_string_3"
+    t.string "property_string_4"
+    t.string "property_string_5"
+    t.string "property_string_6"
+    t.string "property_string_7"
+    t.string "property_string_8"
+    t.string "property_string_9"
+    t.string "property_string_10"
+    t.string "property_string_11"
+    t.string "property_string_12"
+    t.string "property_string_13"
+    t.string "property_string_14"
+    t.string "property_string_15"
+    t.string "property_string_16"
+    t.string "property_string_17"
+    t.string "property_string_18"
+    t.string "property_string_19"
+    t.string "property_string_20"
+    t.text "property_text_1"
+    t.text "property_text_2"
+    t.text "property_text_3"
+    t.text "property_text_4"
+    t.text "property_text_5"
+    t.integer "property_integer_1"
+    t.integer "property_integer_2"
+    t.integer "property_integer_3"
+    t.integer "property_integer_4"
+    t.integer "property_integer_5"
+    t.integer "property_integer_6"
+    t.integer "property_integer_7"
+    t.integer "property_integer_8"
+    t.integer "property_integer_9"
+    t.integer "property_integer_10"
+    t.integer "property_integer_11"
+    t.integer "property_integer_12"
+    t.integer "property_integer_13"
+    t.integer "property_integer_14"
+    t.integer "property_integer_15"
+    t.integer "property_integer_16"
+    t.integer "property_integer_17"
+    t.integer "property_integer_18"
+    t.integer "property_integer_19"
+    t.integer "property_integer_20"
+    t.decimal "property_decimal_1", precision: 15, scale: 4
+    t.decimal "property_decimal_2", precision: 15, scale: 4
+    t.decimal "property_decimal_3", precision: 15, scale: 4
+    t.decimal "property_decimal_4", precision: 15, scale: 4
+    t.decimal "property_decimal_5", precision: 15, scale: 4
+    t.decimal "property_decimal_6", precision: 15, scale: 4
+    t.decimal "property_decimal_7", precision: 15, scale: 4
+    t.decimal "property_decimal_8", precision: 15, scale: 4
+    t.decimal "property_decimal_9", precision: 15, scale: 4
+    t.decimal "property_decimal_10", precision: 15, scale: 4
+    t.boolean "property_boolean_1"
+    t.boolean "property_boolean_2"
+    t.boolean "property_boolean_3"
+    t.boolean "property_boolean_4"
+    t.boolean "property_boolean_5"
+    t.boolean "property_boolean_6"
+    t.boolean "property_boolean_7"
+    t.boolean "property_boolean_8"
+    t.boolean "property_boolean_9"
+    t.boolean "property_boolean_10"
+    t.datetime "property_datetime_1"
+    t.datetime "property_datetime_2"
+    t.datetime "property_datetime_3"
+    t.datetime "property_datetime_4"
+    t.datetime "property_datetime_5"
+    t.datetime "property_datetime_6"
+    t.datetime "property_datetime_7"
+    t.datetime "property_datetime_8"
+    t.datetime "property_datetime_9"
+    t.datetime "property_datetime_10"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["branch_id"], name: "index_warehouses_on_branch_id"
+    t.index ["business_type"], name: "index_warehouses_on_business_type"
     t.index ["category_id"], name: "index_warehouses_on_category_id"
     t.index ["company_id"], name: "index_warehouses_on_company_id"
     t.index ["discarded_at"], name: "index_warehouses_on_discarded_at"
+    t.index ["lifecycle_status"], name: "index_warehouses_on_lifecycle_status"
+    t.index ["workflow_status"], name: "index_warehouses_on_workflow_status"
   end
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
@@ -3152,6 +6126,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
   add_foreign_key "branches", "companies"
   add_foreign_key "brands", "categories"
   add_foreign_key "brands", "companies"
+  add_foreign_key "cached_versions", "companies"
   add_foreign_key "cart_appointments", "carts"
   add_foreign_key "cart_appointments", "companies"
   add_foreign_key "cart_groups", "branches"
@@ -3163,6 +6138,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
   add_foreign_key "carts", "companies"
   add_foreign_key "categories", "companies"
   add_foreign_key "companies", "users"
+  add_foreign_key "company_configs", "companies"
   add_foreign_key "customer_appointments", "companies"
   add_foreign_key "customer_appointments", "customers"
   add_foreign_key "customer_group_appointments", "companies"

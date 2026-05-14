@@ -1,6 +1,6 @@
 class CreatePaymentMethods < ActiveRecord::Migration[8.0]
   def change
-    create_table :payment_methods, id: :uuid do |t|
+    create_table :payment_methods, id: :uuid, default: -> { "uuidv7()" } do |t|
       t.references :category, null: true, foreign_key: true, type: :uuid
 
       t.string :name

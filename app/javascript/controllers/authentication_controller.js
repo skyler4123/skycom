@@ -12,9 +12,16 @@ export default class AuthenticationController extends Controller {
       setInterval(() => {
         if (isSignedIn()) return;
         removeCookie("session_token")
+        this.clearLocalStorage()
         console.warn("No session detected. Redirecting...")    
         // window.location.href = Helpers.root_path()
-      }, 1000)
+      }, 5000)
     }, 5000)
+  }
+
+  
+  clearLocalStorage() {
+    localStorage.clear();
+    console.log("LocalStorage has been fully cleared.");
   }
 }

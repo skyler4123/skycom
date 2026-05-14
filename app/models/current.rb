@@ -6,6 +6,7 @@ class Current < ActiveSupport::CurrentAttributes
 
   # ------------------------------------------------------------------------
   attribute :company_id
+  attribute :cached_versions_store
 
   # company_owner is User
   def self.company_owner
@@ -17,11 +18,18 @@ class Current < ActiveSupport::CurrentAttributes
   end
 
   def self.company
-    Company.find(company_id) if company_id.present?
+    # IMPORTANT: Memoize the company object too!
+    # Otherwise, Current.company.branches calls Company.find(id) every time.
+    @company ||= Company.find(company_id) if company_id.present?
   end
 
   def self.branches
     company&.branches
+  end
+
+  def self.cached_version
+    # Use the attribute to memoize within the request
+    self.cached_versions_store ||= company.cached_version.attributes
   end
   # ------------------------------------------------------------------------
 end

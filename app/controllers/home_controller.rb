@@ -2,7 +2,13 @@ class HomeController < ApplicationController
   skip_before_action :authenticate, only: [ :index ]
 
   def index
-     cookies.clear if !current_session
+    respond_to do |format|
+      format.html do
+        cookies.clear if !current_session
+      end
+      # format.json do
+      # end
+    end
   end
 
   # def retail
