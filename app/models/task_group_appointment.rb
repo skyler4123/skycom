@@ -1,6 +1,4 @@
 class TaskGroupAppointment < ApplicationRecord
-  include CompanyFromAssociation
-
   attribute :permission_resource_name, :string, default: -> { self.name }
 
   belongs_to :company

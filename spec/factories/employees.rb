@@ -4,12 +4,10 @@ FactoryBot.define do
     association :company
 
     user { association :user }
+
     branch { association :branch, company: company }
 
     transient do
-      departments { [] }
-      roles { [] }
-      # Test factory should never produce owner - causes validation failures
       employee_business_type { [ :full_time, :part_time, :contractor, :intern ].sample }
     end
 
@@ -18,8 +16,6 @@ FactoryBot.define do
         company: company,
         branch: branch,
         user: user,
-        departments: departments,
-        roles: roles,
         business_type: employee_business_type
       )
     end

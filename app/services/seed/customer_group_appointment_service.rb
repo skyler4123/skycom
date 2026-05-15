@@ -3,16 +3,18 @@
 
 class Seed::CustomerGroupAppointmentService
   def self.create(
+    company:,
     customer_group:,
     appoint_to:,
     name: Faker::Commerce.department,
     description: Faker::Lorem.sentence(word_count: 15)
   )
     CustomerGroupAppointment.create!(
+      company: company,
       customer_group: customer_group,
       appoint_to: appoint_to,
       name: name,
       description: description
-  )
+    )
   end
 end

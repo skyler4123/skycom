@@ -1,5 +1,4 @@
 class RoleAppointment < ApplicationRecord
-  include CompanyFromAssociation
   include Cache::RecordsConcern
 
   attribute :permission_resource_name, :string, default: -> { self.name }
