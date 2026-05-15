@@ -18,9 +18,8 @@ class Companies::ApplicationController < ApplicationController
   end
 
   def set_employee
-    # debugger
     # @current_employee ||= current_user.employees.where(company: current_company).first
-    @current_employee ||= Employee.cached_where(user_id: current_user.id, company_id: current_company.id).first
+    @current_employee ||= Employee.cached_where(user: current_user, company: current_company).first
   end
 
   def current_employee

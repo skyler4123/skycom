@@ -416,6 +416,7 @@ RSpec.feature "Companies::Products Permissions", type: :feature, js: true do
     end
 
     company.clear_permissions_cache
+    no_permission_employee.clear_permissions_cache
     no_permission_employee.reload
     expect(no_permission_employee.can?(:create, Product)).to be_truthy
   end
