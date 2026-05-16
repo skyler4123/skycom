@@ -12,6 +12,7 @@ FactoryBot.define do
 
     initialize_with do
       Seed::EmployeeGroupAppointmentService.new(
+        company: company,
         employee_group: employee_group,
         appoint_to: appoint_to,
         name: name,

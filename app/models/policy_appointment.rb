@@ -1,6 +1,4 @@
 class PolicyAppointment < ApplicationRecord
-  include CompanyFromAssociation
-
   attribute :permission_resource_name, :string, default: -> { self.name }
 
   belongs_to :company
@@ -13,10 +11,16 @@ class PolicyAppointment < ApplicationRecord
 
   enum :business_type, { owner: 0 }
 
+  after_create :clear_company_permissions_cache
+  after_update :clear_company_permissions_cache, if: :workflow_status_changed?
   before_update :prevent_modification_if_owner
   before_destroy :prevent_modification_if_owner
 
   private
+
+  def clear_company_permissions_cache
+    company&.clear_permissions_cache
+  end
 
   def prevent_modification_if_owner
     return unless business_type == "owner"

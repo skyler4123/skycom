@@ -215,6 +215,7 @@ class Seed::RetailService
   def assign_employees_to_departments
     @employees.each do |employee|
       Seed::DepartmentAppointmentService.create(
+        company: @retail,
         department: @departments.sample,
         appoint_to: employee
       )
@@ -493,13 +494,13 @@ class Seed::RetailService
     # Attach Products
     branch_products = @products.select { |p| p.branch_id == branch.id }
     branch_products.sample(rand(2..3)).each do |product|
-      OrderAppointment.create!(order: order, appoint_to: product, quantity: rand(1..5), unit_price: rand(10.0..100.0).round(2), total_price: 0)
+      OrderAppointment.create!(company: @retail, order: order, appoint_to: product, quantity: rand(1..5), unit_price: rand(10.0..100.0).round(2), total_price: 0)
     end
 
     # Attach Services
     branch_services = @services.select { |s| s.branch_id == branch.id }
     branch_services.sample(rand(1..2)).each do |service|
-      OrderAppointment.create!(order: order, appoint_to: service, quantity: 1, unit_price: rand(50.0..200.0).round(2), total_price: 0)
+      OrderAppointment.create!(company: @retail, order: order, appoint_to: service, quantity: 1, unit_price: rand(50.0..200.0).round(2), total_price: 0)
     end
   end
 

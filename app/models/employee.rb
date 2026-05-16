@@ -19,7 +19,7 @@ class Employee < ApplicationRecord
   belongs_to :user, optional: true
 
 
-  has_many :role_appointments, as: :appoint_to, dependent: :destroy
+  has_many :role_appointments, as: :appoint_to, dependent: :destroy, inverse_of: :appoint_to
   has_many :roles, through: :role_appointments
 
   has_many :service_appointments, dependent: :destroy, as: :appoint_to
