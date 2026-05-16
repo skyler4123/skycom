@@ -982,6 +982,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.uuid "company_id", null: false
     t.string "name"
     t.string "description"
+    t.string "resource_name"
     t.integer "lifecycle_status"
     t.integer "workflow_status"
     t.integer "business_type"

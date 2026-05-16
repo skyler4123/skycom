@@ -30,6 +30,15 @@ class Seed::RetailService
 
   CLINIC_FACILITIES = [ "Clinic Room A", "Clinic Room B", "Laser Machine 01", "HIFU Machine" ].freeze
 
+  DEFAULT_CATEGORIES = {
+    products:    [ "cosmetics", "perfumes", "beauty tools", "makeup", "jewelry", "accessories" ],
+    employees:   [ "management", "sales specialist", "cashier", "technical support", "marketing" ],
+    branches:    [ "flagship store", "mall kiosk", "warehouse distribution", "pop-up shop" ],
+    departments: [ "operations", "human resources", "finance", "customer service", "inventory control" ],
+    brands:      [ "luxury", "mass market", "indie", "organic", "eco-friendly" ],
+    customers:   [ "retail VIP", "regular", "wholesale", "occasional", "walk-in" ]
+  }.freeze
+
   RESOURCES = %w[Order Product Employee Customer PolicyAppointment Booking Service Order]
 
   def initialize(user:, email: Faker::Internet.email, name: nil)
@@ -54,6 +63,7 @@ class Seed::RetailService
     print_header
 
     create_retail_company
+    create_categories
     create_brands
     create_branches
     create_subscription_plans_for_company
@@ -99,6 +109,20 @@ class Seed::RetailService
       description: "A group for multiple retail branch branches",
       business_type: COMPANY_GROUP_BUSINESS_TYPE
     )
+  end
+
+
+  def create_categories(categories_hash = nil)
+    categories_hash ||= DEFAULT_CATEGORIES
+    categories_hash.each do |resource_name, names|
+      names.each do |name|
+        Seed::CategoryService.create(
+          company: @retail,
+          name: name,
+          resource_name: resource_name.to_s
+        )
+      end
+    end
   end
 
   def create_brands
@@ -182,7 +206,6 @@ class Seed::RetailService
         name: dept_name,
         description: "Department: #{dept_name}"
       )
-      department.update!(category: Seed::CategoryService.create(company: @retail, name: "Department"))
       department.attach_tag(key: "Department #{department.id} Tag")
       @departments << department
     end
@@ -541,14 +564,18 @@ class Seed::RetailService
   def assign_policies_to_roles
     role_definitions = {
       Admin: {
-        "PolicyAppointment" => { create: true, read: true, update: true, delete: true }
+        "Order" => { create: true, read: true, update: true, delete: true },
+        "Product" => { create: true, read: true, update: true, delete: true },
+        "Employee" => { create: false, read: true, update: false, delete: true },
+        "Customer" => { create: true, read: true, update: true, delete: true },
+        "PolicyAppointment" => { create: true, read: true, update: true, delete: false }
       },
       Manager: {
         "Order" => { create: true, read: true, update: true, delete: true },
         "Product" => { create: true, read: true, update: true, delete: true },
         "Employee" => { create: false, read: true, update: false, delete: true },
         "Customer" => { create: true, read: true, update: true, delete: true },
-        "PolicyAppointment" => { create: false, read: true, update: true, delete: false }
+        "PolicyAppointment" => { create: false, read: true, update: false, delete: false }
       },
       Cashier: {
         "Order" => { create: true, read: true, update: true, delete: false },

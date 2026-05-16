@@ -32,7 +32,6 @@ module Companies::Authorizable
   end
 
   def user_not_authorized(exception)
-    # debugger
     message = "You are not authorized to perform this action."
 
     respond_to do |format|
