@@ -546,7 +546,7 @@ class Seed::RetailService
       Manager: {
         "Order" => { create: true, read: true, update: true, delete: true },
         "Product" => { create: true, read: true, update: true, delete: true },
-        "Employee" => { create: true, read: true, update: true, delete: true },
+        "Employee" => { create: false, read: true, update: false, delete: true },
         "Customer" => { create: true, read: true, update: true, delete: true },
         "PolicyAppointment" => { create: false, read: true, update: true, delete: false }
       },

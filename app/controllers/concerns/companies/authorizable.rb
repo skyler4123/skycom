@@ -32,9 +32,21 @@ module Companies::Authorizable
   end
 
   def user_not_authorized(exception)
-    # Your existing logic to return the 'errors' array to Stimulus
-    render json: {
-      errors: [ "You are not authorized to perform this action." ]
-    }, status: :forbidden
+    # debugger
+    message = "You are not authorized to perform this action."
+
+    respond_to do |format|
+      format.html do
+        flash[:alert] = message
+        redirect_to(request.referrer || root_path)
+      end
+      format.json do
+        render json: {
+          errors: [ message ],
+          policy: exception.policy.class.to_s,
+          action: exception.query
+        }, status: :forbidden
+      end
+    end
   end
 end
