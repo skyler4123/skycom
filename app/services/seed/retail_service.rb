@@ -215,6 +215,7 @@ class Seed::RetailService
   def assign_employees_to_departments
     @employees.each do |employee|
       Seed::DepartmentAppointmentService.create(
+        company: @retail,
         department: @departments.sample,
         appoint_to: employee
       )
