@@ -303,9 +303,9 @@ export default class Companies_LayoutController extends Controller {
           <main class="flex-1 flex flex-col overflow-auto">
             <!-- Header -->
             <header
-              class="shrink-0 flex items-center justify-between whitespace-nowrap border-b border-gray-200 dark:border-gray-800 px-8 py-4 bg-white dark:bg-gray-900">
+              class="shrink-0 flex flex-wrap items-center justify-between gap-4 border-b border-gray-200 dark:border-gray-800 px-4 md:px-8 py-4 bg-white dark:bg-gray-900">
               <!-- Header Left: Company Name, Toggle, Search -->
-              <div class="flex items-center gap-8">
+              <div class="flex flex-wrap items-center gap-3 md:gap-6">
                 <div class="flex items-center gap-3 dark:border-gray-800">
                   <div class="bg-primary/20 text-primary p-2 rounded-lg">
                     <span class="material-symbols-outlined">storefront</span>
@@ -338,7 +338,7 @@ export default class Companies_LayoutController extends Controller {
                   <span class="material-symbols-outlined">menu</span>
                 </button>
                 
-                <label class="flex flex-col min-w-40 h-10! w-80">
+                <label class="flex flex-col min-w-40 h-10! w-full md:w-80">
                   <div class="flex w-full flex-1 items-stretch rounded-lg h-full">
                     <div
                       class="text-gray-500 flex bg-gray-100 dark:bg-gray-800 items-center justify-center pl-4 rounded-l-lg border-r-0">
@@ -351,7 +351,7 @@ export default class Companies_LayoutController extends Controller {
                 </label>
               </div>
               <!-- Header Right: Actions (Dark Mode, Language, Notifications, Avatar) -->
-              <div class="flex flex-1 justify-end gap-4 items-center">
+              <div class="flex flex-wrap justify-end gap-2 md:gap-4 items-center">
                 <button
                   class="flex cursor-pointer items-center justify-center overflow-hidden rounded-full h-10 w-10 p-2 hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-600 dark:text-gray-300"
                   ${Helpers.darkmodeTrigger()}
@@ -391,11 +391,11 @@ export default class Companies_LayoutController extends Controller {
                   <span>${(localStorage.getItem("languageCode") || "en").toUpperCase()}</span>
                 </button>
                 <button
-                  class="flex cursor-pointer items-center justify-center overflow-hidden rounded-full h-10 w-10 hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-600 dark:text-gray-300">
+                  class="hidden md:flex cursor-pointer items-center justify-center overflow-hidden rounded-full h-10 w-10 hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-600 dark:text-gray-300">
                   <span class="material-symbols-outlined">notifications</span>
                 </button>
                 <button
-                  class="flex cursor-pointer items-center justify-center overflow-hidden rounded-full h-10 w-10 hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-600 dark:text-gray-300">
+                  class="hidden md:flex cursor-pointer items-center justify-center overflow-hidden rounded-full h-10 w-10 hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-600 dark:text-gray-300">
                   <span class="material-symbols-outlined">settings</span>
                 </button>
                 ${avatar({
