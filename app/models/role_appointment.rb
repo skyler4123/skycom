@@ -1,5 +1,6 @@
 class RoleAppointment < ApplicationRecord
   include Cache::RecordsConcern
+  include SetDefaultCompanyConcern
 
   attribute :permission_resource_name, :string, default: -> { self.name }
 
