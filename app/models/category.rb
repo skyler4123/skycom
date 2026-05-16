@@ -7,5 +7,5 @@ class Category < ApplicationRecord
   has_many :employees, dependent: :nullify
   has_many :departments, dependent: :nullify
 
-  validates :name, uniqueness: { scope: :company_id }
+  validates :name, uniqueness: { scope: [ :company_id, :resource_name ] }
 end

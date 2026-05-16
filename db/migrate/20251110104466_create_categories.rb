@@ -4,6 +4,7 @@ class CreateCategories < ActiveRecord::Migration[8.0]
       t.references :company, null: false, foreign_key: true, type: :uuid
       t.string :name
       t.string :description
+      t.string :resource_name
 
       # --- System Fields ---
       t.integer  :lifecycle_status, index: true
