@@ -15,10 +15,15 @@ class RoleAppointment < ApplicationRecord
   validates :appoint_to_type, presence: true
   validate :only_one_owner_appointment_per_company, on: :create
 
+  after_create :clear_company_permissions_cache
   before_update :prevent_modification_if_owner
   before_destroy :prevent_modification_if_owner
 
   private
+
+  def clear_company_permissions_cache
+    company&.clear_permissions_cache
+  end
 
   def prevent_modification_if_owner
     return unless business_type == "owner"
