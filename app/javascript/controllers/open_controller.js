@@ -32,7 +32,6 @@ export default class OpenController extends Controller {
         .filter(l => l.dataset.openCacheParam === "true")
         .map(l => l.dataset.openGroupParam)
     )]
-    console.log(this)
     groupsToCache.forEach(group => {
       const cachedKey = localStorage.getItem(`open-cache-${group}`)
       if (cachedKey) {
