@@ -1,5 +1,6 @@
 class SubscriptionPlanAppointment < ApplicationRecord
   include TagConcern
+  include SetDefaultCompanyConcern
 
   # --- Associations ---
   belongs_to :company

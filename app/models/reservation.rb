@@ -1,5 +1,6 @@
 # app/models/reservation.rb
 class Reservation < ApplicationRecord
+  belongs_to :company
   has_many :reservation_appointments, dependent: :destroy
 
   # Standard ERP enums based on your schema pattern

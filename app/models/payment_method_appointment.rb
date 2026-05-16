@@ -1,4 +1,6 @@
 class PaymentMethodAppointment < ApplicationRecord
+  include SetDefaultCompanyConcern
+
   attribute :permission_resource_name, :string, default: -> { self.name }
 
   # --- Associations ---

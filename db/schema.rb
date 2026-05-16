@@ -4361,6 +4361,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
   end
 
   create_table "reservations", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
+    t.uuid "company_id", null: false
     t.string "name"
     t.string "code", null: false
     t.integer "lifecycle_status"
@@ -4448,6 +4449,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["business_type"], name: "index_reservations_on_business_type"
+    t.index ["company_id"], name: "index_reservations_on_company_id"
     t.index ["discarded_at"], name: "index_reservations_on_discarded_at"
     t.index ["lifecycle_status"], name: "index_reservations_on_lifecycle_status"
     t.index ["workflow_status"], name: "index_reservations_on_workflow_status"
@@ -6285,6 +6287,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
   add_foreign_key "questions", "companies"
   add_foreign_key "reservation_appointments", "companies"
   add_foreign_key "reservation_appointments", "reservations"
+  add_foreign_key "reservations", "companies"
   add_foreign_key "role_appointments", "companies"
   add_foreign_key "role_appointments", "roles"
   add_foreign_key "roles", "branches"
