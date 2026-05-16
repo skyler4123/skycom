@@ -42,30 +42,30 @@ RSpec.feature "Companies::Products Permissions", type: :feature, js: true do
   # Test employees with different roles
   let!(:reader_user) { create(:user, :company_employee) }
   let!(:reader_employee) do
-    create(:employee, company: company, branch: branch, user: reader_user, roles: [ reader_role ]).tap do
-      company.clear_permissions_cache
-    end
+    emp = create(:employee, company: company, branch: branch, user: reader_user)
+    create(:role_appointment, company: company, appoint_to: emp, role: reader_role)
+    emp
   end
 
   let!(:creator_user) { create(:user, :company_employee) }
   let!(:creator_employee) do
-    create(:employee, company: company, branch: branch, user: creator_user, roles: [ creator_role ]).tap do
-      company.clear_permissions_cache
-    end
+    emp = create(:employee, company: company, branch: branch, user: creator_user)
+    create(:role_appointment, company: company, appoint_to: emp, role: creator_role)
+    emp
   end
 
   let!(:editor_user) { create(:user, :company_employee) }
   let!(:editor_employee) do
-    create(:employee, company: company, branch: branch, user: editor_user, roles: [ editor_role ]).tap do
-      company.clear_permissions_cache
-    end
+    emp = create(:employee, company: company, branch: branch, user: editor_user)
+    create(:role_appointment, company: company, appoint_to: emp, role: editor_role)
+    emp
   end
 
   let!(:no_permission_user) { create(:user, :company_employee) }
   let!(:no_permission_employee) do
-    create(:employee, company: company, branch: branch, user: no_permission_user, roles: [ no_permission_role ]).tap do
-      company.clear_permissions_cache
-    end
+    emp = create(:employee, company: company, branch: branch, user: no_permission_user)
+    create(:role_appointment, company: company, appoint_to: emp, role: no_permission_role)
+    emp
   end
 
   # Target product for edit tests

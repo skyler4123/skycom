@@ -59,14 +59,16 @@ RSpec.feature "Companies::Permissions Management", type: :feature, js: true do
   # Use let! for employees
   let!(:admin_user) { create(:user, :company_employee) }
   let!(:admin_employee) do
-    create(:employee, company: company, branch: branch, user: admin_user, roles: [ admin_role ]).tap do |emp|
-      company.clear_permissions_cache
-    end
+    emp = create(:employee, company: company, branch: branch, user: admin_user)
+    create(:role_appointment, company: company, appoint_to: emp, role: admin_role)
+    emp
   end
 
   let!(:unauthorized_user) { create(:user, :company_employee) }
   let!(:unauthorized_employee) do
-    create(:employee, company: company, branch: branch, user: unauthorized_user, roles: [ manager_role ])
+    emp = create(:employee, company: company, branch: branch, user: unauthorized_user)
+    create(:role_appointment, company: company, appoint_to: emp, role: manager_role)
+    emp
   end
 
   def create_policy(resource:, action:, business_type: :operational)
