@@ -474,27 +474,14 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.uuid "company_id", null: false
     t.uuid "category_id"
     t.uuid "parent_branch_id"
+    t.string "email"
     t.string "name"
     t.text "description"
     t.string "code"
-    t.string "slug"
-    t.string "legal_name"
-    t.string "registration_number"
-    t.string "vat_id"
-    t.string "tax_id"
-    t.string "email"
     t.string "phone_number"
-    t.string "emergency_phone"
-    t.string "website"
-    t.string "social_media_links", default: [], array: true
-    t.integer "ownership_type"
     t.integer "currency_code", default: 840
     t.integer "country_code", default: 1
     t.string "timezone", default: "UTC"
-    t.integer "employee_count"
-    t.integer "fiscal_year_end_month", default: 12
-    t.integer "capacity_limit"
-    t.jsonb "opening_hours", default: {}
     t.integer "lifecycle_status"
     t.integer "workflow_status"
     t.integer "business_type"
@@ -584,18 +571,23 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.index ["code"], name: "index_branches_on_code", unique: true
     t.index ["company_id"], name: "index_branches_on_company_id"
     t.index ["discarded_at"], name: "index_branches_on_discarded_at"
+    t.index ["email"], name: "index_branches_on_email", unique: true
     t.index ["lifecycle_status"], name: "index_branches_on_lifecycle_status"
     t.index ["parent_branch_id"], name: "index_branches_on_parent_branch_id"
-    t.index ["slug"], name: "index_branches_on_slug", unique: true
     t.index ["workflow_status"], name: "index_branches_on_workflow_status"
   end
 
   create_table "brands", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
     t.uuid "company_id", null: false
     t.uuid "category_id"
+    t.string "email"
     t.string "name"
-    t.string "description"
+    t.text "description"
     t.string "code"
+    t.string "phone_number"
+    t.integer "currency_code", default: 840
+    t.integer "country_code", default: 1
+    t.string "timezone", default: "UTC"
     t.integer "lifecycle_status"
     t.integer "workflow_status"
     t.integer "business_type"
@@ -682,8 +674,10 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.datetime "updated_at", null: false
     t.index ["business_type"], name: "index_brands_on_business_type"
     t.index ["category_id"], name: "index_brands_on_category_id"
+    t.index ["code"], name: "index_brands_on_code", unique: true
     t.index ["company_id"], name: "index_brands_on_company_id"
     t.index ["discarded_at"], name: "index_brands_on_discarded_at"
+    t.index ["email"], name: "index_brands_on_email", unique: true
     t.index ["lifecycle_status"], name: "index_brands_on_lifecycle_status"
     t.index ["workflow_status"], name: "index_brands_on_workflow_status"
   end
@@ -768,9 +762,14 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.uuid "company_id", null: false
     t.uuid "branch_id"
     t.uuid "category_id"
+    t.string "email"
     t.string "name"
-    t.string "description"
+    t.text "description"
     t.string "code"
+    t.string "phone_number"
+    t.integer "currency_code", default: 840
+    t.integer "country_code", default: 1
+    t.string "timezone", default: "UTC"
     t.integer "lifecycle_status"
     t.integer "workflow_status"
     t.integer "business_type"
@@ -858,8 +857,10 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.index ["branch_id"], name: "index_cart_groups_on_branch_id"
     t.index ["business_type"], name: "index_cart_groups_on_business_type"
     t.index ["category_id"], name: "index_cart_groups_on_category_id"
+    t.index ["code"], name: "index_cart_groups_on_code", unique: true
     t.index ["company_id"], name: "index_cart_groups_on_company_id"
     t.index ["discarded_at"], name: "index_cart_groups_on_discarded_at"
+    t.index ["email"], name: "index_cart_groups_on_email", unique: true
     t.index ["lifecycle_status"], name: "index_cart_groups_on_lifecycle_status"
     t.index ["workflow_status"], name: "index_cart_groups_on_workflow_status"
   end
@@ -869,16 +870,14 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.uuid "branch_id"
     t.uuid "cart_group_id", null: false
     t.uuid "category_id"
+    t.string "email"
     t.string "name"
-    t.string "description"
+    t.text "description"
     t.string "code"
-    t.string "sku"
-    t.string "barcode"
-    t.string "upc"
-    t.string "ean"
-    t.string "manufacturer_code"
-    t.string "serial_number"
-    t.string "batch_number"
+    t.string "phone_number"
+    t.integer "currency_code", default: 840
+    t.integer "country_code", default: 1
+    t.string "timezone", default: "UTC"
     t.integer "lifecycle_status"
     t.integer "workflow_status"
     t.integer "business_type"
@@ -963,18 +962,15 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.datetime "property_datetime_10"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["barcode"], name: "index_carts_on_barcode"
     t.index ["branch_id"], name: "index_carts_on_branch_id"
     t.index ["business_type"], name: "index_carts_on_business_type"
     t.index ["cart_group_id"], name: "index_carts_on_cart_group_id"
     t.index ["category_id"], name: "index_carts_on_category_id"
+    t.index ["code"], name: "index_carts_on_code", unique: true
     t.index ["company_id"], name: "index_carts_on_company_id"
     t.index ["discarded_at"], name: "index_carts_on_discarded_at"
-    t.index ["ean"], name: "index_carts_on_ean"
+    t.index ["email"], name: "index_carts_on_email", unique: true
     t.index ["lifecycle_status"], name: "index_carts_on_lifecycle_status"
-    t.index ["serial_number"], name: "index_carts_on_serial_number"
-    t.index ["sku"], name: "index_carts_on_sku"
-    t.index ["upc"], name: "index_carts_on_upc"
     t.index ["workflow_status"], name: "index_carts_on_workflow_status"
   end
 
@@ -1333,8 +1329,12 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.uuid "category_id"
     t.string "email"
     t.string "name"
-    t.string "description"
+    t.text "description"
     t.string "code"
+    t.string "phone_number"
+    t.integer "currency_code", default: 840
+    t.integer "country_code", default: 1
+    t.string "timezone", default: "UTC"
     t.integer "lifecycle_status"
     t.integer "workflow_status"
     t.integer "business_type"
@@ -1422,8 +1422,10 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.index ["branch_id"], name: "index_customer_groups_on_branch_id"
     t.index ["business_type"], name: "index_customer_groups_on_business_type"
     t.index ["category_id"], name: "index_customer_groups_on_category_id"
+    t.index ["code"], name: "index_customer_groups_on_code", unique: true
     t.index ["company_id"], name: "index_customer_groups_on_company_id"
     t.index ["discarded_at"], name: "index_customer_groups_on_discarded_at"
+    t.index ["email"], name: "index_customer_groups_on_email", unique: true
     t.index ["lifecycle_status"], name: "index_customer_groups_on_lifecycle_status"
     t.index ["workflow_status"], name: "index_customer_groups_on_workflow_status"
   end
@@ -1435,8 +1437,12 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.uuid "category_id"
     t.string "email"
     t.string "name"
-    t.string "description"
+    t.text "description"
     t.string "code"
+    t.string "phone_number"
+    t.integer "currency_code", default: 840
+    t.integer "country_code", default: 1
+    t.string "timezone", default: "UTC"
     t.integer "lifecycle_status"
     t.integer "workflow_status"
     t.integer "business_type"
@@ -1524,8 +1530,10 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.index ["branch_id"], name: "index_customers_on_branch_id"
     t.index ["business_type"], name: "index_customers_on_business_type"
     t.index ["category_id"], name: "index_customers_on_category_id"
+    t.index ["code"], name: "index_customers_on_code", unique: true
     t.index ["company_id"], name: "index_customers_on_company_id"
     t.index ["discarded_at"], name: "index_customers_on_discarded_at"
+    t.index ["email"], name: "index_customers_on_email", unique: true
     t.index ["lifecycle_status"], name: "index_customers_on_lifecycle_status"
     t.index ["user_id"], name: "index_customers_on_user_id"
     t.index ["workflow_status"], name: "index_customers_on_workflow_status"
@@ -1570,10 +1578,14 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
   create_table "departments", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
     t.uuid "company_id", null: false
     t.uuid "category_id"
-    t.string "email", null: false
+    t.string "email"
     t.string "name"
-    t.string "description"
+    t.text "description"
     t.string "code"
+    t.string "phone_number"
+    t.integer "currency_code", default: 840
+    t.integer "country_code", default: 1
+    t.string "timezone", default: "UTC"
     t.integer "lifecycle_status"
     t.integer "workflow_status"
     t.integer "business_type"
@@ -1660,6 +1672,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.datetime "updated_at", null: false
     t.index ["business_type"], name: "index_departments_on_business_type"
     t.index ["category_id"], name: "index_departments_on_category_id"
+    t.index ["code"], name: "index_departments_on_code", unique: true
     t.index ["company_id"], name: "index_departments_on_company_id"
     t.index ["discarded_at"], name: "index_departments_on_discarded_at"
     t.index ["email"], name: "index_departments_on_email", unique: true
@@ -1873,8 +1886,12 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.uuid "category_id"
     t.string "email"
     t.string "name"
-    t.string "description"
+    t.text "description"
     t.string "code"
+    t.string "phone_number"
+    t.integer "currency_code", default: 840
+    t.integer "country_code", default: 1
+    t.string "timezone", default: "UTC"
     t.integer "lifecycle_status"
     t.integer "workflow_status"
     t.integer "business_type"
@@ -1962,9 +1979,10 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.index ["branch_id"], name: "index_employee_groups_on_branch_id"
     t.index ["business_type"], name: "index_employee_groups_on_business_type"
     t.index ["category_id"], name: "index_employee_groups_on_category_id"
-    t.index ["company_id", "updated_at"], name: "index_employee_groups_on_company_id_and_updated_at"
+    t.index ["code"], name: "index_employee_groups_on_code", unique: true
     t.index ["company_id"], name: "index_employee_groups_on_company_id"
     t.index ["discarded_at"], name: "index_employee_groups_on_discarded_at"
+    t.index ["email"], name: "index_employee_groups_on_email", unique: true
     t.index ["lifecycle_status"], name: "index_employee_groups_on_lifecycle_status"
     t.index ["workflow_status"], name: "index_employee_groups_on_workflow_status"
   end
@@ -1976,8 +1994,12 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.uuid "category_id"
     t.string "email"
     t.string "name"
-    t.string "description"
+    t.text "description"
     t.string "code"
+    t.string "phone_number"
+    t.integer "currency_code", default: 840
+    t.integer "country_code", default: 1
+    t.string "timezone", default: "UTC"
     t.integer "lifecycle_status"
     t.integer "workflow_status"
     t.integer "business_type"
@@ -2065,8 +2087,10 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.index ["branch_id"], name: "index_employees_on_branch_id"
     t.index ["business_type"], name: "index_employees_on_business_type"
     t.index ["category_id"], name: "index_employees_on_category_id"
+    t.index ["code"], name: "index_employees_on_code", unique: true
     t.index ["company_id"], name: "index_employees_on_company_id"
     t.index ["discarded_at"], name: "index_employees_on_discarded_at"
+    t.index ["email"], name: "index_employees_on_email", unique: true
     t.index ["lifecycle_status"], name: "index_employees_on_lifecycle_status"
     t.index ["user_id"], name: "index_employees_on_user_id"
     t.index ["workflow_status"], name: "index_employees_on_workflow_status"
@@ -2288,9 +2312,14 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.uuid "company_id", null: false
     t.uuid "branch_id"
     t.uuid "category_id"
+    t.string "email"
     t.string "name"
-    t.string "description"
+    t.text "description"
     t.string "code"
+    t.string "phone_number"
+    t.integer "currency_code", default: 840
+    t.integer "country_code", default: 1
+    t.string "timezone", default: "UTC"
     t.integer "lifecycle_status"
     t.integer "workflow_status"
     t.integer "business_type"
@@ -2378,8 +2407,10 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.index ["branch_id"], name: "index_facilities_on_branch_id"
     t.index ["business_type"], name: "index_facilities_on_business_type"
     t.index ["category_id"], name: "index_facilities_on_category_id"
+    t.index ["code"], name: "index_facilities_on_code", unique: true
     t.index ["company_id"], name: "index_facilities_on_company_id"
     t.index ["discarded_at"], name: "index_facilities_on_discarded_at"
+    t.index ["email"], name: "index_facilities_on_email", unique: true
     t.index ["lifecycle_status"], name: "index_facilities_on_lifecycle_status"
     t.index ["workflow_status"], name: "index_facilities_on_workflow_status"
   end
@@ -2460,9 +2491,14 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.uuid "company_id", null: false
     t.uuid "branch_id"
     t.uuid "category_id"
+    t.string "email"
     t.string "name"
-    t.string "description"
+    t.text "description"
     t.string "code"
+    t.string "phone_number"
+    t.integer "currency_code", default: 840
+    t.integer "country_code", default: 1
+    t.string "timezone", default: "UTC"
     t.integer "lifecycle_status"
     t.integer "workflow_status"
     t.integer "business_type"
@@ -2550,8 +2586,10 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.index ["branch_id"], name: "index_facility_groups_on_branch_id"
     t.index ["business_type"], name: "index_facility_groups_on_business_type"
     t.index ["category_id"], name: "index_facility_groups_on_category_id"
+    t.index ["code"], name: "index_facility_groups_on_code", unique: true
     t.index ["company_id"], name: "index_facility_groups_on_company_id"
     t.index ["discarded_at"], name: "index_facility_groups_on_discarded_at"
+    t.index ["email"], name: "index_facility_groups_on_email", unique: true
     t.index ["lifecycle_status"], name: "index_facility_groups_on_lifecycle_status"
     t.index ["workflow_status"], name: "index_facility_groups_on_workflow_status"
   end
@@ -2561,14 +2599,14 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.uuid "branch_id"
     t.uuid "order_id", null: false
     t.uuid "category_id"
+    t.string "email"
     t.string "name"
-    t.string "description"
+    t.text "description"
     t.string "code"
-    t.integer "currency_code"
-    t.integer "duration"
-    t.string "number"
-    t.decimal "total_price"
-    t.datetime "due_date"
+    t.string "phone_number"
+    t.integer "currency_code", default: 840
+    t.integer "country_code", default: 1
+    t.string "timezone", default: "UTC"
     t.integer "lifecycle_status"
     t.integer "workflow_status"
     t.integer "business_type"
@@ -2656,8 +2694,10 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.index ["branch_id"], name: "index_invoices_on_branch_id"
     t.index ["business_type"], name: "index_invoices_on_business_type"
     t.index ["category_id"], name: "index_invoices_on_category_id"
+    t.index ["code"], name: "index_invoices_on_code", unique: true
     t.index ["company_id"], name: "index_invoices_on_company_id"
     t.index ["discarded_at"], name: "index_invoices_on_discarded_at"
+    t.index ["email"], name: "index_invoices_on_email", unique: true
     t.index ["lifecycle_status"], name: "index_invoices_on_lifecycle_status"
     t.index ["order_id"], name: "index_invoices_on_order_id"
     t.index ["workflow_status"], name: "index_invoices_on_workflow_status"
@@ -2700,8 +2740,17 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
   end
 
   create_table "memberships", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
+    t.uuid "company_id", null: false
+    t.uuid "branch_id"
+    t.uuid "category_id"
+    t.string "email"
     t.string "name"
-    t.string "code", null: false
+    t.text "description"
+    t.string "code"
+    t.string "phone_number"
+    t.integer "currency_code", default: 840
+    t.integer "country_code", default: 1
+    t.string "timezone", default: "UTC"
     t.integer "lifecycle_status"
     t.integer "workflow_status"
     t.integer "business_type"
@@ -2786,8 +2835,13 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.datetime "property_datetime_10"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["branch_id"], name: "index_memberships_on_branch_id"
     t.index ["business_type"], name: "index_memberships_on_business_type"
+    t.index ["category_id"], name: "index_memberships_on_category_id"
+    t.index ["code"], name: "index_memberships_on_code", unique: true
+    t.index ["company_id"], name: "index_memberships_on_company_id"
     t.index ["discarded_at"], name: "index_memberships_on_discarded_at"
+    t.index ["email"], name: "index_memberships_on_email", unique: true
     t.index ["lifecycle_status"], name: "index_memberships_on_lifecycle_status"
     t.index ["workflow_status"], name: "index_memberships_on_workflow_status"
   end
@@ -2868,9 +2922,14 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.uuid "company_id", null: false
     t.uuid "branch_id"
     t.uuid "category_id"
+    t.string "email"
     t.string "name"
-    t.string "description"
+    t.text "description"
     t.string "code"
+    t.string "phone_number"
+    t.integer "currency_code", default: 840
+    t.integer "country_code", default: 1
+    t.string "timezone", default: "UTC"
     t.integer "lifecycle_status"
     t.integer "workflow_status"
     t.integer "business_type"
@@ -2883,8 +2942,10 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.index ["branch_id"], name: "index_notification_groups_on_branch_id"
     t.index ["business_type"], name: "index_notification_groups_on_business_type"
     t.index ["category_id"], name: "index_notification_groups_on_category_id"
+    t.index ["code"], name: "index_notification_groups_on_code", unique: true
     t.index ["company_id"], name: "index_notification_groups_on_company_id"
     t.index ["discarded_at"], name: "index_notification_groups_on_discarded_at"
+    t.index ["email"], name: "index_notification_groups_on_email", unique: true
     t.index ["lifecycle_status"], name: "index_notification_groups_on_lifecycle_status"
     t.index ["workflow_status"], name: "index_notification_groups_on_workflow_status"
   end
@@ -2894,9 +2955,14 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.uuid "company_id", null: false
     t.uuid "branch_id"
     t.uuid "category_id"
+    t.string "email"
     t.string "name"
-    t.string "description"
+    t.text "description"
     t.string "code"
+    t.string "phone_number"
+    t.integer "currency_code", default: 840
+    t.integer "country_code", default: 1
+    t.string "timezone", default: "UTC"
     t.integer "lifecycle_status"
     t.integer "workflow_status"
     t.integer "business_type"
@@ -2909,8 +2975,10 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.index ["branch_id"], name: "index_notifications_on_branch_id"
     t.index ["business_type"], name: "index_notifications_on_business_type"
     t.index ["category_id"], name: "index_notifications_on_category_id"
+    t.index ["code"], name: "index_notifications_on_code", unique: true
     t.index ["company_id"], name: "index_notifications_on_company_id"
     t.index ["discarded_at"], name: "index_notifications_on_discarded_at"
+    t.index ["email"], name: "index_notifications_on_email", unique: true
     t.index ["lifecycle_status"], name: "index_notifications_on_lifecycle_status"
     t.index ["notification_group_id"], name: "index_notifications_on_notification_group_id"
     t.index ["workflow_status"], name: "index_notifications_on_workflow_status"
@@ -2999,11 +3067,14 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.uuid "branch_id"
     t.uuid "customer_id", null: false
     t.uuid "category_id"
+    t.string "email"
     t.string "name"
-    t.string "description"
+    t.text "description"
     t.string "code"
-    t.integer "currency_code"
-    t.integer "duration"
+    t.string "phone_number"
+    t.integer "currency_code", default: 840
+    t.integer "country_code", default: 1
+    t.string "timezone", default: "UTC"
     t.integer "lifecycle_status"
     t.integer "workflow_status"
     t.integer "business_type"
@@ -3091,9 +3162,11 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.index ["branch_id"], name: "index_order_groups_on_branch_id"
     t.index ["business_type"], name: "index_order_groups_on_business_type"
     t.index ["category_id"], name: "index_order_groups_on_category_id"
+    t.index ["code"], name: "index_order_groups_on_code", unique: true
     t.index ["company_id"], name: "index_order_groups_on_company_id"
     t.index ["customer_id"], name: "index_order_groups_on_customer_id"
     t.index ["discarded_at"], name: "index_order_groups_on_discarded_at"
+    t.index ["email"], name: "index_order_groups_on_email", unique: true
     t.index ["lifecycle_status"], name: "index_order_groups_on_lifecycle_status"
     t.index ["workflow_status"], name: "index_order_groups_on_workflow_status"
   end
@@ -3103,18 +3176,14 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.uuid "branch_id"
     t.uuid "customer_id", null: false
     t.uuid "category_id"
+    t.string "email"
     t.string "name"
-    t.string "description"
+    t.text "description"
     t.string "code"
-    t.string "sku"
-    t.string "barcode"
-    t.string "upc"
-    t.string "ean"
-    t.string "manufacturer_code"
-    t.string "serial_number"
-    t.string "batch_number"
-    t.integer "currency_code"
-    t.integer "duration"
+    t.string "phone_number"
+    t.integer "currency_code", default: 840
+    t.integer "country_code", default: 1
+    t.string "timezone", default: "UTC"
     t.integer "lifecycle_status"
     t.integer "workflow_status"
     t.integer "business_type"
@@ -3199,18 +3268,15 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.datetime "property_datetime_10"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["barcode"], name: "index_orders_on_barcode"
     t.index ["branch_id"], name: "index_orders_on_branch_id"
     t.index ["business_type"], name: "index_orders_on_business_type"
     t.index ["category_id"], name: "index_orders_on_category_id"
+    t.index ["code"], name: "index_orders_on_code", unique: true
     t.index ["company_id"], name: "index_orders_on_company_id"
     t.index ["customer_id"], name: "index_orders_on_customer_id"
     t.index ["discarded_at"], name: "index_orders_on_discarded_at"
-    t.index ["ean"], name: "index_orders_on_ean"
+    t.index ["email"], name: "index_orders_on_email", unique: true
     t.index ["lifecycle_status"], name: "index_orders_on_lifecycle_status"
-    t.index ["serial_number"], name: "index_orders_on_serial_number"
-    t.index ["sku"], name: "index_orders_on_sku"
-    t.index ["upc"], name: "index_orders_on_upc"
     t.index ["workflow_status"], name: "index_orders_on_workflow_status"
   end
 
@@ -3242,10 +3308,14 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
 
   create_table "payment_methods", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
     t.uuid "category_id"
+    t.string "email"
     t.string "name"
-    t.string "description"
+    t.text "description"
     t.string "code"
-    t.integer "currency_code"
+    t.string "phone_number"
+    t.integer "currency_code", default: 840
+    t.integer "country_code", default: 1
+    t.string "timezone", default: "UTC"
     t.integer "lifecycle_status"
     t.integer "workflow_status"
     t.integer "business_type"
@@ -3257,7 +3327,9 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.datetime "updated_at", null: false
     t.index ["business_type"], name: "index_payment_methods_on_business_type"
     t.index ["category_id"], name: "index_payment_methods_on_category_id"
+    t.index ["code"], name: "index_payment_methods_on_code", unique: true
     t.index ["discarded_at"], name: "index_payment_methods_on_discarded_at"
+    t.index ["email"], name: "index_payment_methods_on_email", unique: true
     t.index ["lifecycle_status"], name: "index_payment_methods_on_lifecycle_status"
     t.index ["workflow_status"], name: "index_payment_methods_on_workflow_status"
   end
@@ -3267,15 +3339,14 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.uuid "branch_id"
     t.uuid "invoice_id", null: false
     t.uuid "category_id"
+    t.string "email"
     t.string "name"
-    t.string "description"
+    t.text "description"
     t.string "code"
-    t.integer "currency_code"
-    t.integer "duration"
-    t.decimal "exchange_rate"
-    t.decimal "amount"
-    t.string "payment_method"
-    t.string "gateway_details"
+    t.string "phone_number"
+    t.integer "currency_code", default: 840
+    t.integer "country_code", default: 1
+    t.string "timezone", default: "UTC"
     t.integer "lifecycle_status"
     t.integer "workflow_status"
     t.integer "business_type"
@@ -3363,8 +3434,10 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.index ["branch_id"], name: "index_payments_on_branch_id"
     t.index ["business_type"], name: "index_payments_on_business_type"
     t.index ["category_id"], name: "index_payments_on_category_id"
+    t.index ["code"], name: "index_payments_on_code", unique: true
     t.index ["company_id"], name: "index_payments_on_company_id"
     t.index ["discarded_at"], name: "index_payments_on_discarded_at"
+    t.index ["email"], name: "index_payments_on_email", unique: true
     t.index ["invoice_id"], name: "index_payments_on_invoice_id"
     t.index ["lifecycle_status"], name: "index_payments_on_lifecycle_status"
     t.index ["workflow_status"], name: "index_payments_on_workflow_status"
@@ -3588,9 +3661,14 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.uuid "company_id", null: false
     t.uuid "branch_id"
     t.uuid "category_id"
+    t.string "email"
     t.string "name"
-    t.string "description"
+    t.text "description"
     t.string "code"
+    t.string "phone_number"
+    t.integer "currency_code", default: 840
+    t.integer "country_code", default: 1
+    t.string "timezone", default: "UTC"
     t.integer "lifecycle_status"
     t.integer "workflow_status"
     t.integer "business_type"
@@ -3678,8 +3756,10 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.index ["branch_id"], name: "index_product_groups_on_branch_id"
     t.index ["business_type"], name: "index_product_groups_on_business_type"
     t.index ["category_id"], name: "index_product_groups_on_category_id"
+    t.index ["code"], name: "index_product_groups_on_code", unique: true
     t.index ["company_id"], name: "index_product_groups_on_company_id"
     t.index ["discarded_at"], name: "index_product_groups_on_discarded_at"
+    t.index ["email"], name: "index_product_groups_on_email", unique: true
     t.index ["lifecycle_status"], name: "index_product_groups_on_lifecycle_status"
     t.index ["workflow_status"], name: "index_product_groups_on_workflow_status"
   end
@@ -3689,32 +3769,14 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.uuid "branch_id"
     t.uuid "brand_id"
     t.uuid "category_id"
+    t.string "email"
     t.string "name"
     t.text "description"
     t.string "code"
-    t.string "sku"
-    t.string "barcode"
-    t.string "material"
-    t.string "color"
-    t.string "size"
-    t.string "shape"
-    t.string "pattern"
-    t.string "flavor_scent"
-    t.decimal "weight", precision: 10, scale: 3
-    t.decimal "length", precision: 10, scale: 2
-    t.decimal "width", precision: 10, scale: 2
-    t.decimal "height", precision: 10, scale: 2
-    t.decimal "volume", precision: 10, scale: 3
-    t.string "unit_type", default: "piece"
-    t.string "origin_country"
-    t.string "manufacturer_name"
-    t.string "model_year"
-    t.string "warranty_info"
-    t.integer "duration_value"
-    t.string "duration_unit"
-    t.integer "capacity"
-    t.boolean "is_recurring", default: false
-    t.uuid "required_role_id"
+    t.string "phone_number"
+    t.integer "currency_code", default: 840
+    t.integer "country_code", default: 1
+    t.string "timezone", default: "UTC"
     t.integer "lifecycle_status"
     t.integer "workflow_status"
     t.integer "business_type"
@@ -3803,12 +3865,11 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.index ["brand_id"], name: "index_products_on_brand_id"
     t.index ["business_type"], name: "index_products_on_business_type"
     t.index ["category_id"], name: "index_products_on_category_id"
-    t.index ["code"], name: "index_products_on_code"
+    t.index ["code"], name: "index_products_on_code", unique: true
     t.index ["company_id"], name: "index_products_on_company_id"
     t.index ["discarded_at"], name: "index_products_on_discarded_at"
+    t.index ["email"], name: "index_products_on_email", unique: true
     t.index ["lifecycle_status"], name: "index_products_on_lifecycle_status"
-    t.index ["required_role_id"], name: "index_products_on_required_role_id"
-    t.index ["sku"], name: "index_products_on_sku"
     t.index ["workflow_status"], name: "index_products_on_workflow_status"
   end
 
@@ -3888,9 +3949,14 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.uuid "company_id", null: false
     t.uuid "branch_id"
     t.uuid "category_id"
+    t.string "email"
     t.string "name"
-    t.string "description"
+    t.text "description"
     t.string "code"
+    t.string "phone_number"
+    t.integer "currency_code", default: 840
+    t.integer "country_code", default: 1
+    t.string "timezone", default: "UTC"
     t.integer "lifecycle_status"
     t.integer "workflow_status"
     t.integer "business_type"
@@ -3978,8 +4044,10 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.index ["branch_id"], name: "index_project_groups_on_branch_id"
     t.index ["business_type"], name: "index_project_groups_on_business_type"
     t.index ["category_id"], name: "index_project_groups_on_category_id"
+    t.index ["code"], name: "index_project_groups_on_code", unique: true
     t.index ["company_id"], name: "index_project_groups_on_company_id"
     t.index ["discarded_at"], name: "index_project_groups_on_discarded_at"
+    t.index ["email"], name: "index_project_groups_on_email", unique: true
     t.index ["lifecycle_status"], name: "index_project_groups_on_lifecycle_status"
     t.index ["workflow_status"], name: "index_project_groups_on_workflow_status"
   end
@@ -3989,9 +4057,14 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.uuid "branch_id"
     t.uuid "project_group_id", null: false
     t.uuid "category_id"
+    t.string "email"
     t.string "name"
-    t.string "description"
+    t.text "description"
     t.string "code"
+    t.string "phone_number"
+    t.integer "currency_code", default: 840
+    t.integer "country_code", default: 1
+    t.string "timezone", default: "UTC"
     t.integer "lifecycle_status"
     t.integer "workflow_status"
     t.integer "business_type"
@@ -4079,8 +4152,10 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.index ["branch_id"], name: "index_projects_on_branch_id"
     t.index ["business_type"], name: "index_projects_on_business_type"
     t.index ["category_id"], name: "index_projects_on_category_id"
+    t.index ["code"], name: "index_projects_on_code", unique: true
     t.index ["company_id"], name: "index_projects_on_company_id"
     t.index ["discarded_at"], name: "index_projects_on_discarded_at"
+    t.index ["email"], name: "index_projects_on_email", unique: true
     t.index ["lifecycle_status"], name: "index_projects_on_lifecycle_status"
     t.index ["project_group_id"], name: "index_projects_on_project_group_id"
     t.index ["workflow_status"], name: "index_projects_on_workflow_status"
@@ -4091,16 +4166,14 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.uuid "branch_id"
     t.uuid "purchase_id", null: false
     t.uuid "category_id"
+    t.string "email"
     t.string "name"
-    t.string "description"
+    t.text "description"
     t.string "code"
-    t.string "sku"
-    t.string "barcode"
-    t.string "upc"
-    t.string "ean"
-    t.string "manufacturer_code"
-    t.string "serial_number"
-    t.string "batch_number"
+    t.string "phone_number"
+    t.integer "currency_code", default: 840
+    t.integer "country_code", default: 1
+    t.string "timezone", default: "UTC"
     t.integer "lifecycle_status"
     t.integer "workflow_status"
     t.integer "business_type"
@@ -4185,18 +4258,15 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.datetime "property_datetime_10"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["barcode"], name: "index_purchase_items_on_barcode"
     t.index ["branch_id"], name: "index_purchase_items_on_branch_id"
     t.index ["business_type"], name: "index_purchase_items_on_business_type"
     t.index ["category_id"], name: "index_purchase_items_on_category_id"
+    t.index ["code"], name: "index_purchase_items_on_code", unique: true
     t.index ["company_id"], name: "index_purchase_items_on_company_id"
     t.index ["discarded_at"], name: "index_purchase_items_on_discarded_at"
-    t.index ["ean"], name: "index_purchase_items_on_ean"
+    t.index ["email"], name: "index_purchase_items_on_email", unique: true
     t.index ["lifecycle_status"], name: "index_purchase_items_on_lifecycle_status"
     t.index ["purchase_id"], name: "index_purchase_items_on_purchase_id"
-    t.index ["serial_number"], name: "index_purchase_items_on_serial_number"
-    t.index ["sku"], name: "index_purchase_items_on_sku"
-    t.index ["upc"], name: "index_purchase_items_on_upc"
     t.index ["workflow_status"], name: "index_purchase_items_on_workflow_status"
   end
 
@@ -4204,9 +4274,14 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.uuid "company_id", null: false
     t.uuid "branch_id"
     t.uuid "category_id"
+    t.string "email"
     t.string "name"
-    t.string "description"
+    t.text "description"
     t.string "code"
+    t.string "phone_number"
+    t.integer "currency_code", default: 840
+    t.integer "country_code", default: 1
+    t.string "timezone", default: "UTC"
     t.integer "lifecycle_status"
     t.integer "workflow_status"
     t.integer "business_type"
@@ -4294,8 +4369,10 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.index ["branch_id"], name: "index_purchases_on_branch_id"
     t.index ["business_type"], name: "index_purchases_on_business_type"
     t.index ["category_id"], name: "index_purchases_on_category_id"
+    t.index ["code"], name: "index_purchases_on_code", unique: true
     t.index ["company_id"], name: "index_purchases_on_company_id"
     t.index ["discarded_at"], name: "index_purchases_on_discarded_at"
+    t.index ["email"], name: "index_purchases_on_email", unique: true
     t.index ["lifecycle_status"], name: "index_purchases_on_lifecycle_status"
     t.index ["workflow_status"], name: "index_purchases_on_workflow_status"
   end
@@ -4363,8 +4440,16 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
 
   create_table "reservations", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
     t.uuid "company_id", null: false
+    t.uuid "branch_id"
+    t.uuid "category_id"
+    t.string "email"
     t.string "name"
-    t.string "code", null: false
+    t.text "description"
+    t.string "code"
+    t.string "phone_number"
+    t.integer "currency_code", default: 840
+    t.integer "country_code", default: 1
+    t.string "timezone", default: "UTC"
     t.integer "lifecycle_status"
     t.integer "workflow_status"
     t.integer "business_type"
@@ -4449,9 +4534,13 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.datetime "property_datetime_10"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["branch_id"], name: "index_reservations_on_branch_id"
     t.index ["business_type"], name: "index_reservations_on_business_type"
+    t.index ["category_id"], name: "index_reservations_on_category_id"
+    t.index ["code"], name: "index_reservations_on_code", unique: true
     t.index ["company_id"], name: "index_reservations_on_company_id"
     t.index ["discarded_at"], name: "index_reservations_on_discarded_at"
+    t.index ["email"], name: "index_reservations_on_email", unique: true
     t.index ["lifecycle_status"], name: "index_reservations_on_lifecycle_status"
     t.index ["workflow_status"], name: "index_reservations_on_workflow_status"
   end
@@ -4587,11 +4676,14 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.uuid "company_id", null: false
     t.uuid "branch_id"
     t.uuid "category_id"
+    t.string "email"
     t.string "name"
-    t.string "description"
+    t.text "description"
     t.string "code"
-    t.integer "duration"
-    t.datetime "start_at"
+    t.string "phone_number"
+    t.integer "currency_code", default: 840
+    t.integer "country_code", default: 1
+    t.string "timezone", default: "UTC"
     t.integer "lifecycle_status"
     t.integer "workflow_status"
     t.integer "business_type"
@@ -4679,8 +4771,10 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.index ["branch_id"], name: "index_service_groups_on_branch_id"
     t.index ["business_type"], name: "index_service_groups_on_business_type"
     t.index ["category_id"], name: "index_service_groups_on_category_id"
+    t.index ["code"], name: "index_service_groups_on_code", unique: true
     t.index ["company_id"], name: "index_service_groups_on_company_id"
     t.index ["discarded_at"], name: "index_service_groups_on_discarded_at"
+    t.index ["email"], name: "index_service_groups_on_email", unique: true
     t.index ["lifecycle_status"], name: "index_service_groups_on_lifecycle_status"
     t.index ["workflow_status"], name: "index_service_groups_on_workflow_status"
   end
@@ -4689,11 +4783,14 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.uuid "company_id", null: false
     t.uuid "branch_id"
     t.uuid "category_id"
+    t.string "email"
     t.string "name"
-    t.string "description"
+    t.text "description"
     t.string "code"
-    t.integer "duration"
-    t.datetime "start_at"
+    t.string "phone_number"
+    t.integer "currency_code", default: 840
+    t.integer "country_code", default: 1
+    t.string "timezone", default: "UTC"
     t.integer "lifecycle_status"
     t.integer "workflow_status"
     t.integer "business_type"
@@ -4781,8 +4878,10 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.index ["branch_id"], name: "index_services_on_branch_id"
     t.index ["business_type"], name: "index_services_on_business_type"
     t.index ["category_id"], name: "index_services_on_category_id"
+    t.index ["code"], name: "index_services_on_code", unique: true
     t.index ["company_id"], name: "index_services_on_company_id"
     t.index ["discarded_at"], name: "index_services_on_discarded_at"
+    t.index ["email"], name: "index_services_on_email", unique: true
     t.index ["lifecycle_status"], name: "index_services_on_lifecycle_status"
     t.index ["workflow_status"], name: "index_services_on_workflow_status"
   end
@@ -4969,9 +5068,14 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.string "appoint_by_type"
     t.uuid "appoint_by_id"
     t.uuid "category_id"
+    t.string "email"
     t.string "name"
-    t.string "description"
+    t.text "description"
     t.string "code"
+    t.string "phone_number"
+    t.integer "currency_code", default: 840
+    t.integer "country_code", default: 1
+    t.string "timezone", default: "UTC"
     t.integer "quantity"
     t.integer "lifecycle_status"
     t.integer "workflow_status"
@@ -5064,8 +5168,10 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.index ["branch_id"], name: "index_stock_exports_on_branch_id"
     t.index ["business_type"], name: "index_stock_exports_on_business_type"
     t.index ["category_id"], name: "index_stock_exports_on_category_id"
+    t.index ["code"], name: "index_stock_exports_on_code", unique: true
     t.index ["company_id"], name: "index_stock_exports_on_company_id"
     t.index ["discarded_at"], name: "index_stock_exports_on_discarded_at"
+    t.index ["email"], name: "index_stock_exports_on_email", unique: true
     t.index ["lifecycle_status"], name: "index_stock_exports_on_lifecycle_status"
     t.index ["product_id"], name: "index_stock_exports_on_product_id"
     t.index ["workflow_status"], name: "index_stock_exports_on_workflow_status"
@@ -5084,9 +5190,14 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.string "appoint_by_type"
     t.uuid "appoint_by_id"
     t.uuid "category_id"
+    t.string "email"
     t.string "name"
-    t.string "description"
+    t.text "description"
     t.string "code"
+    t.string "phone_number"
+    t.integer "currency_code", default: 840
+    t.integer "country_code", default: 1
+    t.string "timezone", default: "UTC"
     t.integer "quantity"
     t.integer "lifecycle_status"
     t.integer "workflow_status"
@@ -5179,8 +5290,10 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.index ["branch_id"], name: "index_stock_imports_on_branch_id"
     t.index ["business_type"], name: "index_stock_imports_on_business_type"
     t.index ["category_id"], name: "index_stock_imports_on_category_id"
+    t.index ["code"], name: "index_stock_imports_on_code", unique: true
     t.index ["company_id"], name: "index_stock_imports_on_company_id"
     t.index ["discarded_at"], name: "index_stock_imports_on_discarded_at"
+    t.index ["email"], name: "index_stock_imports_on_email", unique: true
     t.index ["lifecycle_status"], name: "index_stock_imports_on_lifecycle_status"
     t.index ["product_id"], name: "index_stock_imports_on_product_id"
     t.index ["workflow_status"], name: "index_stock_imports_on_workflow_status"
@@ -5199,9 +5312,14 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.string "appoint_by_type"
     t.uuid "appoint_by_id"
     t.uuid "category_id"
+    t.string "email"
     t.string "name"
-    t.string "description"
+    t.text "description"
     t.string "code"
+    t.string "phone_number"
+    t.integer "currency_code", default: 840
+    t.integer "country_code", default: 1
+    t.string "timezone", default: "UTC"
     t.integer "quantity"
     t.integer "lifecycle_status"
     t.integer "workflow_status"
@@ -5294,8 +5412,10 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.index ["branch_id"], name: "index_stock_transfers_on_branch_id"
     t.index ["business_type"], name: "index_stock_transfers_on_business_type"
     t.index ["category_id"], name: "index_stock_transfers_on_category_id"
+    t.index ["code"], name: "index_stock_transfers_on_code", unique: true
     t.index ["company_id"], name: "index_stock_transfers_on_company_id"
     t.index ["discarded_at"], name: "index_stock_transfers_on_discarded_at"
+    t.index ["email"], name: "index_stock_transfers_on_email", unique: true
     t.index ["lifecycle_status"], name: "index_stock_transfers_on_lifecycle_status"
     t.index ["product_id"], name: "index_stock_transfers_on_product_id"
     t.index ["workflow_status"], name: "index_stock_transfers_on_workflow_status"
@@ -5307,18 +5427,14 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.uuid "product_id", null: false
     t.uuid "warehouse_id", null: false
     t.uuid "category_id"
+    t.string "email"
     t.string "name"
-    t.string "description"
-    t.integer "quantity"
-    t.integer "reorder"
+    t.text "description"
     t.string "code"
-    t.string "sku"
-    t.string "barcode"
-    t.string "upc"
-    t.string "ean"
-    t.string "manufacturer_code"
-    t.string "serial_number"
-    t.string "batch_number"
+    t.string "phone_number"
+    t.integer "currency_code", default: 840
+    t.integer "country_code", default: 1
+    t.string "timezone", default: "UTC"
     t.integer "lifecycle_status"
     t.integer "workflow_status"
     t.integer "business_type"
@@ -5403,19 +5519,15 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.datetime "property_datetime_10"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["barcode"], name: "index_stocks_on_barcode"
     t.index ["branch_id"], name: "index_stocks_on_branch_id"
     t.index ["business_type"], name: "index_stocks_on_business_type"
     t.index ["category_id"], name: "index_stocks_on_category_id"
+    t.index ["code"], name: "index_stocks_on_code", unique: true
     t.index ["company_id"], name: "index_stocks_on_company_id"
     t.index ["discarded_at"], name: "index_stocks_on_discarded_at"
-    t.index ["ean"], name: "index_stocks_on_ean"
+    t.index ["email"], name: "index_stocks_on_email", unique: true
     t.index ["lifecycle_status"], name: "index_stocks_on_lifecycle_status"
-    t.index ["product_id", "warehouse_id"], name: "index_stocks_on_product_id_and_warehouse_id", unique: true
     t.index ["product_id"], name: "index_stocks_on_product_id"
-    t.index ["serial_number"], name: "index_stocks_on_serial_number"
-    t.index ["sku"], name: "index_stocks_on_sku"
-    t.index ["upc"], name: "index_stocks_on_upc"
     t.index ["warehouse_id"], name: "index_stocks_on_warehouse_id"
     t.index ["workflow_status"], name: "index_stocks_on_workflow_status"
   end
@@ -5742,9 +5854,14 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.uuid "company_id", null: false
     t.uuid "branch_id"
     t.uuid "category_id"
+    t.string "email"
     t.string "name"
-    t.string "description"
+    t.text "description"
     t.string "code"
+    t.string "phone_number"
+    t.integer "currency_code", default: 840
+    t.integer "country_code", default: 1
+    t.string "timezone", default: "UTC"
     t.integer "lifecycle_status"
     t.integer "workflow_status"
     t.integer "business_type"
@@ -5832,8 +5949,10 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.index ["branch_id"], name: "index_task_groups_on_branch_id"
     t.index ["business_type"], name: "index_task_groups_on_business_type"
     t.index ["category_id"], name: "index_task_groups_on_category_id"
+    t.index ["code"], name: "index_task_groups_on_code", unique: true
     t.index ["company_id"], name: "index_task_groups_on_company_id"
     t.index ["discarded_at"], name: "index_task_groups_on_discarded_at"
+    t.index ["email"], name: "index_task_groups_on_email", unique: true
     t.index ["lifecycle_status"], name: "index_task_groups_on_lifecycle_status"
     t.index ["workflow_status"], name: "index_task_groups_on_workflow_status"
   end
@@ -5843,10 +5962,14 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.uuid "branch_id"
     t.uuid "task_group_id", null: false
     t.uuid "category_id"
+    t.string "email"
     t.string "name"
-    t.string "description"
+    t.text "description"
     t.string "code"
-    t.integer "currency_code"
+    t.string "phone_number"
+    t.integer "currency_code", default: 840
+    t.integer "country_code", default: 1
+    t.string "timezone", default: "UTC"
     t.integer "lifecycle_status"
     t.integer "workflow_status"
     t.integer "business_type"
@@ -5934,8 +6057,10 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.index ["branch_id"], name: "index_tasks_on_branch_id"
     t.index ["business_type"], name: "index_tasks_on_business_type"
     t.index ["category_id"], name: "index_tasks_on_category_id"
+    t.index ["code"], name: "index_tasks_on_code", unique: true
     t.index ["company_id"], name: "index_tasks_on_company_id"
     t.index ["discarded_at"], name: "index_tasks_on_discarded_at"
+    t.index ["email"], name: "index_tasks_on_email", unique: true
     t.index ["lifecycle_status"], name: "index_tasks_on_lifecycle_status"
     t.index ["task_group_id"], name: "index_tasks_on_task_group_id"
     t.index ["workflow_status"], name: "index_tasks_on_workflow_status"
@@ -5992,9 +6117,14 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.uuid "company_id", null: false
     t.uuid "branch_id"
     t.uuid "category_id"
+    t.string "email"
     t.string "name"
-    t.string "description"
+    t.text "description"
     t.string "code"
+    t.string "phone_number"
+    t.integer "currency_code", default: 840
+    t.integer "country_code", default: 1
+    t.string "timezone", default: "UTC"
     t.integer "lifecycle_status"
     t.integer "workflow_status"
     t.integer "business_type"
@@ -6082,8 +6212,10 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.index ["branch_id"], name: "index_warehouses_on_branch_id"
     t.index ["business_type"], name: "index_warehouses_on_business_type"
     t.index ["category_id"], name: "index_warehouses_on_category_id"
+    t.index ["code"], name: "index_warehouses_on_code", unique: true
     t.index ["company_id"], name: "index_warehouses_on_company_id"
     t.index ["discarded_at"], name: "index_warehouses_on_discarded_at"
+    t.index ["email"], name: "index_warehouses_on_email", unique: true
     t.index ["lifecycle_status"], name: "index_warehouses_on_lifecycle_status"
     t.index ["workflow_status"], name: "index_warehouses_on_workflow_status"
   end
@@ -6215,6 +6347,9 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
   add_foreign_key "invoices", "orders"
   add_foreign_key "membership_appointments", "companies"
   add_foreign_key "membership_appointments", "memberships"
+  add_foreign_key "memberships", "branches"
+  add_foreign_key "memberships", "categories"
+  add_foreign_key "memberships", "companies"
   add_foreign_key "notification_appointments", "companies"
   add_foreign_key "notification_appointments", "notifications"
   add_foreign_key "notification_group_appointments", "companies"
@@ -6264,7 +6399,6 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
   add_foreign_key "products", "brands"
   add_foreign_key "products", "categories"
   add_foreign_key "products", "companies"
-  add_foreign_key "products", "roles", column: "required_role_id"
   add_foreign_key "project_appointments", "companies"
   add_foreign_key "project_appointments", "projects"
   add_foreign_key "project_group_appointments", "companies"
@@ -6288,6 +6422,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
   add_foreign_key "questions", "companies"
   add_foreign_key "reservation_appointments", "companies"
   add_foreign_key "reservation_appointments", "reservations"
+  add_foreign_key "reservations", "branches"
+  add_foreign_key "reservations", "categories"
   add_foreign_key "reservations", "companies"
   add_foreign_key "role_appointments", "companies"
   add_foreign_key "role_appointments", "roles"

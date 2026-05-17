@@ -5,11 +5,15 @@ class CreateServiceGroups < ActiveRecord::Migration[8.0]
       t.references :branch, null: true, foreign_key: true, type: :uuid
       t.references :category, null: true, foreign_key: true, type: :uuid
 
+      # --- Identity ---
+      t.string :email, null: true, index: { unique: true }
       t.string :name
-      t.string :description
-      t.string :code
-      t.integer :duration
-      t.datetime :start_at
+      t.text   :description
+      t.string :code, index: { unique: true }
+      t.string :phone_number
+      t.integer :currency_code, default: 840 # USD
+      t.integer :country_code,  default: 1   # US
+      t.string  :timezone,      default: "UTC" # Global Standard
 
       # --- System Fields ---
       t.integer  :lifecycle_status, index: true

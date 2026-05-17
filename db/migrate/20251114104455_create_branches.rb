@@ -6,32 +6,15 @@ class CreateBranches < ActiveRecord::Migration[8.0]
       t.references :category, null: true, foreign_key: true, type: :uuid
       t.references :parent_branch, null: true, foreign_key: { to_table: :branches }, type: :uuid
 
-      # --- Identity & Branding ---
+      # --- Identity ---
+      t.string :email, null: true, index: { unique: true }
       t.string :name
       t.text   :description
       t.string :code, index: { unique: true }
-      t.string :slug, index: { unique: true }
-      t.string :legal_name
-      t.string :registration_number
-      t.string :vat_id
-      t.string :tax_id
-
-      # --- Communication Infrastructure ---
-      t.string :email
       t.string :phone_number
-      t.string :emergency_phone
-      t.string :website
-      t.string :social_media_links, array: true, default: []
-
-      # --- Operational Constraints & Capacity ---
-      t.integer :ownership_type
       t.integer :currency_code, default: 840 # USD
       t.integer :country_code,  default: 1   # US
       t.string  :timezone,      default: "UTC" # Global Standard
-      t.integer :employee_count
-      t.integer :fiscal_year_end_month, default: 12
-      t.integer :capacity_limit   # Crucial for Hotel/Gym/Hospital scheduling
-      t.jsonb   :opening_hours,   default: {}
 
       # --- System Fields ---
       t.integer  :lifecycle_status, index: true

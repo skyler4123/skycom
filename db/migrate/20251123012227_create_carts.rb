@@ -6,16 +6,15 @@ class CreateCarts < ActiveRecord::Migration[8.0]
       t.references :cart_group, null: false, foreign_key: true, type: :uuid
       t.references :category, null: true, foreign_key: true, type: :uuid
 
+      # --- Identity ---
+      t.string :email, null: true, index: { unique: true }
       t.string :name
-      t.string :description
-      t.string :code
-      t.string :sku
-      t.string :barcode
-      t.string :upc
-      t.string :ean
-      t.string :manufacturer_code
-      t.string :serial_number
-      t.string :batch_number
+      t.text   :description
+      t.string :code, index: { unique: true }
+      t.string :phone_number
+      t.integer :currency_code, default: 840 # USD
+      t.integer :country_code,  default: 1   # US
+      t.string  :timezone,      default: "UTC" # Global Standard
 
       # --- System Fields ---
       t.integer  :lifecycle_status, index: true
@@ -36,10 +35,5 @@ class CreateCarts < ActiveRecord::Migration[8.0]
 
       t.timestamps
     end
-    add_index :carts, :sku
-    add_index :carts, :barcode
-    add_index :carts, :upc
-    add_index :carts, :ean
-    add_index :carts, :serial_number
   end
 end
