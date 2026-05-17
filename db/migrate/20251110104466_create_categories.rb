@@ -6,6 +6,14 @@ class CreateCategories < ActiveRecord::Migration[8.0]
       t.string :description
       t.string :resource_name
 
+      # --- Dynamic Fields ---
+      1.upto(20) { |i| t.string "property_string_#{i}" }
+      1.upto(5) { |i| t.string "property_text_#{i}" }
+      1.upto(20) { |i| t.string "property_integer_#{i}" }
+      1.upto(10)  { |i| t.string "property_decimal_#{i}" }
+      1.upto(10)  { |i| t.string "property_boolean_#{i}" }
+      1.upto(10)  { |i| t.string "property_datetime_#{i}" }
+
       # --- System Fields ---
       t.integer  :lifecycle_status, index: true
       t.integer  :workflow_status, index: true

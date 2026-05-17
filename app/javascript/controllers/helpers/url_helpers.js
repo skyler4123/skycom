@@ -34,6 +34,11 @@ export const company_branches_new_path = (companyId) => `/companies/${companyId}
 export const company_departments_path = (companyId) => `/companies/${companyId}/departments`
 export const create_company_departments_path = (companyId) => `/companies/${companyId}/departments`
 export const edit_company_department_path = (companyId, departmentId) => `/companies/${companyId}/departments/${departmentId}`
+
+export const company_categories_path = (companyId) => `/companies/${companyId}/categories`
+export const create_company_categories_path = (companyId) => `/companies/${companyId}/categories`
+export const edit_company_category_path = (companyId, categoryId) => `/companies/${companyId}/categories/${categoryId}`
+
 export const company_products_path = (companyId) => `/companies/${companyId}/products`
 export const create_company_products_path = (companyId) => `/companies/${companyId}/products`
 export const edit_company_product_path = (companyId, productId) => `/companies/${companyId}/products/${productId}`

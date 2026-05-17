@@ -27,7 +27,17 @@ module Companies::Authorizable
     rescue NameError
       # If the policy doesn't exist, we can choose to deny access or allow it.
       # For an ERP, denying by default is safer.
-      render json: { errors: [ "Security Policy for #{policy_class_name} not found." ] }, status: :internal_server_error
+      message = "Security Policy for #{policy_class_name} not found."
+
+      respond_to do |format|
+        format.html do
+          flash[:alert] = message
+          redirect_to(request.referrer || root_path)
+        end
+        format.json do
+          render json: { errors: [ message ] }, status: :internal_server_error
+        end
+      end
     end
   end
 

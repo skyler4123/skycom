@@ -25,6 +25,11 @@ class ClientCacheController < ApplicationController
               workflow_statuses: WORKFLOW_STATUS.keys.map { |s| { name: s.to_s.humanize, value: s.to_s } },
               business_types: Department.business_types.keys.map { |t| { name: t.to_s.humanize, value: t.to_s } }
             },
+            category: {
+              lifecycle_statuses: LIFECYCLE_STATUS.keys.map { |s| { name: s.to_s.humanize, value: s.to_s } },
+              workflow_statuses: WORKFLOW_STATUS.keys.map { |s| { name: s.to_s.humanize, value: s.to_s } },
+              resource_names: [ "products", "employees", "branches", "departments", "brands", "customers", "services", "facilities" ]
+            },
             product: {
               lifecycle_statuses: Product.lifecycle_statuses.keys.map { |s| { name: s.humanize, value: s } },
               workflow_statuses: Product.workflow_statuses.keys.map { |s| { name: s.humanize, value: s } },
