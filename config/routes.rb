@@ -17,6 +17,7 @@ Rails.application.routes.draw do
       resources :dashboards
       resources :branches
       resources :departments
+      resources :categories
       resources :products
       resources :services
       resources :orders

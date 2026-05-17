@@ -180,7 +180,7 @@ class Seed::RetailService
     }
   }.freeze
 
-  RESOURCES = %w[Order Product Employee Customer PolicyAppointment Booking Service Order]
+  RESOURCES = %w[Order Product Employee Customer PolicyAppointment Booking Service Order Category]
 
   # An array of popular company/brand names for seeding.
   POPULAR_BRANDS = [
@@ -684,6 +684,7 @@ class Seed::RetailService
         "Product" => { create: true, read: true, update: true, delete: true },
         "Employee" => { create: false, read: true, update: false, delete: true },
         "Customer" => { create: true, read: true, update: true, delete: true },
+        "Category" => { create: true, read: true, update: true, delete: true },
         "PolicyAppointment" => { create: true, read: true, update: true, delete: false }
       },
       Manager: {
@@ -691,6 +692,7 @@ class Seed::RetailService
         "Product" => { create: true, read: true, update: true, delete: true },
         "Employee" => { create: false, read: true, update: false, delete: true },
         "Customer" => { create: true, read: true, update: true, delete: true },
+        "Category" => { create: true, read: true, update: true, delete: true },
         "PolicyAppointment" => { create: false, read: true, update: false, delete: false }
       },
       Cashier: {
