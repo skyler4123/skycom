@@ -12,16 +12,19 @@ RSpec.describe ServiceGroup, type: :model do
   describe "validations" do
     it { should validate_presence_of(:name) }
     it { should validate_presence_of(:business_type) }
-    it { should validate_presence_of(:start_at) }
     it { should validate_presence_of(:code) }
     it { should validate_length_of(:name).is_at_most(255) }
+
+    # NOTE: start_at and duration columns were removed from schema
+    # it { should validate_presence_of(:start_at) }
   end
 
   describe "validations :duration" do
-    it { should allow_value(nil).for(:duration) }
-    it { should allow_value(0).for(:duration) }
-    it { should allow_value(120).for(:duration) }
-    it { should_not allow_value(-1).for(:duration) }
+    # NOTE: duration column was removed from schema
+    # it { should allow_value(nil).for(:duration) }
+    # it { should allow_value(0).for(:duration) }
+    # it { should allow_value(120).for(:duration) }
+    # it { should_not allow_value(-1).for(:duration) }
   end
 
   describe "enums" do

@@ -38,8 +38,10 @@ RSpec.describe Branch, type: :model do
     it { should define_enum_for(:currency_code) }
     it { should define_enum_for(:lifecycle_status) }
     it { should define_enum_for(:workflow_status) }
-    it { should define_enum_for(:ownership_type) }
-    it { should define_enum_for(:fiscal_year_end_month) }
+
+    # NOTE: ownership_type and fiscal_year_end_month columns were removed from schema
+    # it { should define_enum_for(:ownership_type) }
+    # it { should define_enum_for(:fiscal_year_end_month) }
   end
 
   describe "#subscription_buyer" do

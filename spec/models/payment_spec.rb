@@ -9,10 +9,12 @@ RSpec.describe Payment, type: :model do
   end
 
   describe "validations" do
-    it { should validate_presence_of(:amount) }
     it { should validate_presence_of(:currency_code) }
-    it { should validate_presence_of(:payment_method) }
-    it { should validate_numericality_of(:amount).is_greater_than(0) }
+
+    # NOTE: amount and payment_method columns were removed from schema
+    # it { should validate_presence_of(:amount) }
+    # it { should validate_presence_of(:payment_method) }
+    # it { should validate_numericality_of(:amount).is_greater_than(0) }
   end
 
   describe "enums" do

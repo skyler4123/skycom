@@ -56,7 +56,6 @@ class Companies::ServicesController < Companies::ApplicationController
       :description,
       :business_type,
       :workflow_status,
-      :duration,
       :code
     )
   end
@@ -65,7 +64,6 @@ class Companies::ServicesController < Companies::ApplicationController
     service.as_json(only: [
       :id, :name, :description, :code,
       :lifecycle_status, :workflow_status, :business_type,
-      :duration, :start_at,
       :created_at, :updated_at
     ])
   end

@@ -55,15 +55,13 @@ class Companies::ProductsController < Companies::ApplicationController
       :name,
       :description,
       :business_type,
-      :workflow_status,
-      :sku,
-      :barcode
+      :workflow_status
     )
   end
 
   def format_product(product)
     product.as_json(only: [
-      :id, :name, :description, :code, :sku, :barcode,
+      :id, :name, :description, :code,
       :lifecycle_status, :workflow_status, :business_type,
       :created_at, :updated_at
     ])

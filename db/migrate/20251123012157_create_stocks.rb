@@ -7,18 +7,17 @@ class CreateStocks < ActiveRecord::Migration[8.0]
       t.references :warehouse, null: false, foreign_key: true, type: :uuid
       t.references :category, null: true, foreign_key: true, type: :uuid
 
+      # --- Identity ---
+      t.string :email, null: true, index: { unique: true }
       t.string :name
-      t.string :description
+      t.text   :description
+      t.string :code, index: { unique: true }
+      t.string :phone_number
+      t.integer :currency_code, default: 840 # USD
+      t.integer :country_code,  default: 1   # US
+      t.string  :timezone,      default: "UTC" # Global Standard
+
       t.integer :quantity
-      t.integer :reorder
-      t.string :code
-      t.string :sku
-      t.string :barcode
-      t.string :upc
-      t.string :ean
-      t.string :manufacturer_code
-      t.string :serial_number
-      t.string :batch_number
 
       # --- System Fields ---
       t.integer  :lifecycle_status, index: true
@@ -39,11 +38,5 @@ class CreateStocks < ActiveRecord::Migration[8.0]
 
       t.timestamps
     end
-    add_index :stocks, :sku
-    add_index :stocks, :barcode
-    add_index :stocks, :upc
-    add_index :stocks, :ean
-    add_index :stocks, :serial_number
-    add_index :stocks, [ :product_id, :warehouse_id ], unique: true
   end
 end

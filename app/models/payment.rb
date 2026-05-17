@@ -11,22 +11,24 @@ class Payment < ApplicationRecord
   # --- Enums ---
   enum :lifecycle_status, LIFECYCLE_STATUS, prefix: true
   enum :workflow_status, WORKFLOW_STATUS, prefix: true
-
-  enum :payment_method, {
-    credit_card: 0,
-    bank_transfer: 1,
-    paypal: 2,
-    cash: 3
-  }
-
   enum :business_type, {
     standard_payment: 0,
     prepayment: 1,
     final_payment: 2
   }
 
+  # NOTE: payment_method and amount columns were removed from schema
+  # enum :payment_method, {
+  #   credit_card: 0,
+  #   bank_transfer: 1,
+  #   paypal: 2,
+  #   cash: 3
+  # }
+
   # --- Validations ---
-  validates :amount, presence: true, numericality: { greater_than: 0 }
   validates :currency_code, presence: true
-  validates :payment_method, presence: true
+
+  # NOTE: amount and payment_method columns were removed from schema
+  # validates :amount, presence: true, numericality: { greater_than: 0 }
+  # validates :payment_method, presence: true
 end
