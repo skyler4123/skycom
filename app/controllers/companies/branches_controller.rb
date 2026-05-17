@@ -74,7 +74,6 @@ class Companies::BranchesController < Companies::ApplicationController
       country_code: branch.country_code,
       phone_number: branch.phone_number,
       email: branch.email,
-      employee_count: branch.employee_count,
       created_at: branch.created_at,
       updated_at: branch.updated_at
     }

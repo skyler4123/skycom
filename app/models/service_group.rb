@@ -26,6 +26,9 @@ class ServiceGroup < ApplicationRecord
   validates :code, presence: true, uniqueness: { scope: :branch_id }
 
   validates :business_type, presence: true
-  validates :duration, numericality: { greater_than_or_equal_to: 0 }, allow_nil: true
-  validates :start_at, presence: true
+
+  # NOTE: duration and start_at columns were removed from schema
+  # Validations kept for future reference:
+  # validates :duration, numericality: { greater_than_or_equal_to: 0 }, allow_nil: true
+  # validates :start_at, presence: true
 end

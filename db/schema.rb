@@ -5435,6 +5435,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.integer "currency_code", default: 840
     t.integer "country_code", default: 1
     t.string "timezone", default: "UTC"
+    t.integer "quantity"
     t.integer "lifecycle_status"
     t.integer "workflow_status"
     t.integer "business_type"

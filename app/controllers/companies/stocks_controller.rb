@@ -10,7 +10,7 @@ class Companies::StocksController < Companies::ApplicationController
         scope = scope.where(workflow_status: params[:workflow_status]) if params[:workflow_status].present?
 
         if params[:search].present?
-          scope = scope.where("sku ILIKE ? OR barcode ILIKE ?", "%#{params[:search]}%", "%#{params[:search]}%")
+          scope = scope.where("name ILIKE ?", "%#{params[:search]}%")
         end
 
         @pagy, @stocks_results = pagy(:offset, scope, jsonapi: true)
@@ -27,7 +27,7 @@ class Companies::StocksController < Companies::ApplicationController
 
   def format_stock(stock)
     stock.as_json(only: [
-      :id, :name, :quantity, :reorder, :sku, :barcode,
+      :id, :name, :quantity,
       :business_type, :lifecycle_status, :workflow_status,
       :created_at, :updated_at
     ]).merge(

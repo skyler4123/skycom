@@ -17,6 +17,8 @@ class CreateStocks < ActiveRecord::Migration[8.0]
       t.integer :country_code,  default: 1   # US
       t.string  :timezone,      default: "UTC" # Global Standard
 
+      t.integer :quantity
+
       # --- System Fields ---
       t.integer  :lifecycle_status, index: true
       t.integer  :workflow_status, index: true

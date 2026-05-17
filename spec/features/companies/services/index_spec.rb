@@ -11,7 +11,6 @@ RSpec.feature "Companies::Services Management", type: :feature, js: true do
       branch: branch,
       name: "Test Service 1",
       business_type: "b2b",
-      duration: 60,
       workflow_status: "draft"
     )
   end
@@ -22,8 +21,7 @@ RSpec.feature "Companies::Services Management", type: :feature, js: true do
       branch: branch,
       name: "Test Service 2",
       business_type: "b2c",
-      workflow_status: "pending",
-      duration: 30
+      workflow_status: "pending"
     )
   end
 
@@ -37,7 +35,6 @@ RSpec.feature "Companies::Services Management", type: :feature, js: true do
     expect(page).to have_selector('table', wait: 10)
 
     expect(page).to have_selector('th', text: 'Service Name')
-    expect(page).to have_selector('th', text: 'Duration')
     expect(page).to have_selector('th', text: 'Type')
     expect(page).to have_selector('th', text: 'Status')
 
