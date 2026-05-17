@@ -5,6 +5,7 @@ class Brand < ApplicationRecord
 
   # --- Associations ---
   belongs_to :company
+  belongs_to :category, optional: true
 
   has_many :products, dependent: :nullify
 

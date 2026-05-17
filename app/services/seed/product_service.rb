@@ -10,8 +10,7 @@ class Seed::ProductService
     lifecycle_status: nil,
     workflow_status: nil,
     business_type: nil,
-    discarded_at: nil,
-    **kwargs # Ignore extra kwargs for removed columns
+    discarded_at: nil
   )
     should_discard = rand(10) == 0
     discarded_at ||= should_discard ? Time.zone.now - rand(1..180).days : nil

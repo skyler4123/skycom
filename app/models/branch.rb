@@ -5,6 +5,7 @@ class Branch < ApplicationRecord
   include TagConcern
 
   belongs_to :company
+  belongs_to :category, optional: true
 
   has_many :employee_groups, dependent: :destroy
   has_many :employees, dependent: :destroy
