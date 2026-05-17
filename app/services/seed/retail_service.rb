@@ -17,15 +17,167 @@ class Seed::RetailService
 
   CLINIC_FACILITIES = [ "Clinic Room A", "Clinic Room B", "Laser Machine 01", "HIFU Machine" ].freeze
 
-  DEFAULT_CATEGORIES = {
-    products:    [ "cosmetics", "perfumes", "beauty tools", "makeup", "jewelry", "accessories" ],
-    employees:   [ "management", "sales specialist", "cashier", "technical support", "marketing" ],
-    branches:    [ "flagship store", "mall kiosk", "warehouse distribution", "pop-up shop" ],
-    departments: [ "operations", "human resources", "finance", "customer service", "inventory control" ],
-    brands:      [ "luxury", "mass market", "indie", "organic", "eco-friendly" ],
-    customers:   [ "retail VIP", "regular", "wholesale", "occasional", "walk-in" ],
-    services:    [ "skincare consultation", "makeup artistry", "spa treatment", "delivery & installation", "membership registration" ],
-    facilities:  [ "retail floor", "storage room", "office space", "break room", "parking area", "security station" ]
+
+
+  METADATA_CATEGORIES = {
+    products: {
+      "Cosmetics" => {
+        property_string_1: "Skin Type Suitability",
+        property_string_2: "Key Ingredients",
+        property_string_3: "Formulation (e.g., Liquid, Powder)",
+        property_integer_1: "Volume (ml)",
+        property_integer_2: "Shelf Life (Months)",
+        property_boolean_1: "Organic Certified",
+        property_boolean_2: "Requires Refrigeration"
+      },
+      "Perfumes" => {
+        property_string_1: "Scent Profile / Notes",
+        property_string_2: "Concentration (EDP / EDT)",
+        property_integer_1: "Volume (ml)",
+        property_boolean_1: "Includes Tester Unit"
+      },
+      "Beauty Tools" => {
+        property_string_1: "Material Composition",
+        property_string_2: "Power Source Type",
+        property_integer_1: "Warranty Period (Months)",
+        property_boolean_1: "Waterproof Rating"
+      },
+      "Makeup" => {
+        property_string_1: "Shade / Color Code",
+        property_string_2: "Finish (Matte / Dewy)",
+        property_integer_1: "Net Weight (g)",
+        property_boolean_1: "Vegan Formulation"
+      },
+      "Jewelry" => {
+        property_string_1: "Material (Gold / Silver)",
+        property_string_2: "Gemstone Type",
+        property_decimal_1: "Weight (Grams)",
+        property_decimal_2: "Purity Carat"
+      },
+      "Accessories" => {
+        property_string_1: "Size / Dimensions",
+        property_string_2: "Color Palette",
+        property_string_3: "Material Type"
+      }
+    },
+
+    employees: {
+      "Management" => {
+        property_string_1: "Corporate Level",
+        property_decimal_1: "KPI Target Bonus %",
+        property_boolean_1: "Signing Authority"
+      },
+      "Sales Specialist" => {
+        property_string_1: "Assigned Product Line",
+        property_decimal_1: "Commission Tier %",
+        property_integer_1: "Monthly Sales Target"
+      },
+      "Cashier" => {
+        property_string_1: "POS Station Number",
+        property_integer_1: "Assigned Cash Drawer ID"
+      },
+      "Technical Support" => {
+        property_string_1: "Certifications",
+        property_string_2: "Primary Tech Stack"
+      },
+      "Marketing" => {
+        property_string_1: "Channel Focus (Digital/Social)",
+        property_decimal_1: "Monthly Ad Budget Limit"
+      }
+    },
+
+    branches: {
+      "Flagship Store" => {
+        property_integer_1: "Maximum Occupancy Capacity",
+        property_integer_2: "Number of POS Tills",
+        property_boolean_1: "Has Tax-Free Counter"
+      },
+      "Mall Kiosk" => {
+        property_string_5: "Mall Unit Number",
+        property_decimal_1: "Lease Square Footage"
+      },
+      "Warehouse Distribution" => {
+        property_integer_1: "Loading Bay Count",
+        property_decimal_1: "Storage Capacity (Cubic Meters)",
+        property_boolean_1: "Cold Chain Storage Enabled"
+      },
+      "Pop-up Shop" => {
+        property_datetime_1: "Operation Start Date",
+        property_datetime_2: "Operation End Date"
+      }
+    },
+
+    departments: {
+      "Operations" => { property_string_1: "Regional Scope", property_string_2: "SOP Revision Code" },
+      "Human Resources" => { property_string_1: "ATS Platform Integration", property_boolean_1: "Handles Payroll Directly" },
+      "Finance" => { property_string_1: "Accounting Standard (IFRS/VAS)", property_string_2: "Primary Corporate Bank Account" },
+      "Customer Service" => { property_string_1: "Helpdesk SLA Tier", property_string_2: "Support Communication Channels" },
+      "Inventory Control" => { property_string_1: "Audit Cycle Frequency", property_boolean_1: "Auto-Reorder Triggers Active" }
+    },
+
+    brands: {
+      "Luxury" => { property_string_1: "Tier Level", property_decimal_1: "Minimum MSRP Markup Margin" },
+      "Mass Market" => { property_string_1: "Distribution Channel Model", property_integer_1: "Minimum Order Quantity (MOQ)" },
+      "Indie" => { property_string_1: "Founder Region", property_boolean_1: "Consignment Agreement Terms" },
+      "Organic" => { property_string_1: "Certification Body Name", property_datetime_1: "Certificate Expiration Date" },
+      "Eco-friendly" => { property_string_1: "Sustainability Rating", property_string_2: "Packaging Material Base" }
+    },
+
+    customers: {
+      "Retail VIP" => {
+        property_integer_1: "Current Loyalty Reward Points",
+        property_decimal_1: "Fixed Lifetime Discount Percentage",
+        property_datetime_1: "VIP Tier Expiration Date"
+      },
+      "Regular" => { property_integer_1: "Visit Frequency Count", property_string_1: "Preferred Store Branch" },
+      "Wholesale" => {
+        property_string_1: "Tax Identification Number (TIN)",
+        property_string_2: "Credit Terms Granted (e.g., Net 30)",
+        property_decimal_1: "Credit Line Limit Amount"
+      },
+      "Occasional" => { property_string_1: "Acquisition Campaign Source" },
+      "Walk-in" => { property_string_1: "General Notes / Behavioral Tags" }
+    },
+
+    services: {
+      "Skincare Consultation" => {
+        property_integer_1: "Duration (Minutes)",
+        property_string_1: "Required Analysis Equipment"
+      },
+      "Makeup Artistry" => {
+        property_integer_1: "Duration (Minutes)",
+        property_decimal_1: "Consumables Material Surcharge Cost"
+      },
+      "Spa Treatment" => {
+        property_integer_1: "Duration (Minutes)",
+        property_string_1: "Assigned Treatment Room",
+        property_boolean_1: "Shower Facilities Required"
+      },
+      "Delivery & Installation" => {
+        property_string_1: "Logistics Vehicle Tier Required",
+        property_decimal_1: "Base Distance Rate Buffer Zone"
+      },
+      "Membership Registration" => {
+        property_string_1: "Sign-up Welcome Gift Kit Code",
+        property_boolean_1: "Requires Physical Card Printing"
+      }
+    },
+
+    facilities: {
+      "Retail Floor" => {
+        property_decimal_1: "Floor Space (Sqm)",
+        property_integer_1: "Maximum Customer Capacity Count"
+      },
+      "Storage Room" => {
+        property_decimal_1: "Temperature Range Ceiling (C)",
+        property_decimal_2: "Humidity Target Threshold %",
+        property_boolean_1: "Biometric Lock Security Restricting Access"
+      },
+      "Office Space" => { property_integer_1: "Configured Network Nodes Count", property_integer_2: "Desk Capacity Limit" },
+      "Break Room" => { property_boolean_1: "Equipped with Refrigerator", property_boolean_2: "Water Purifier Installed" },
+      "Parking Area" => { property_integer_1: "Motorbike Parking Stalls Count", property_integer_2: "Car Parking Stalls Count" },
+      "Security Station" => { property_integer_1: "CCTV Monitor Matrices Hooked", property_string_1: "Emergency Contact Keypad Trunk Line" }
+    }
   }.freeze
 
   RESOURCES = %w[Order Product Employee Customer PolicyAppointment Booking Service Order]
@@ -122,14 +274,14 @@ class Seed::RetailService
   end
 
 
-  def create_categories(categories_hash = nil)
-    categories_hash ||= DEFAULT_CATEGORIES
-    categories_hash.each do |resource_name, names|
-      names.each do |name|
+  def create_categories
+    METADATA_CATEGORIES.each do |resource_name, categories|
+      categories.each do |name, properties|
         Seed::CategoryService.create(
           company: @retail,
           name: name,
-          resource_name: resource_name.to_s
+          resource_name: resource_name.to_s,
+          properties: properties
         )
       end
     end

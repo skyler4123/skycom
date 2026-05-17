@@ -2,13 +2,16 @@ class Seed::CategoryService
   def self.new(
     company:,
     name: Faker::Commerce.department,
-    resource_name: nil
+    resource_name: nil,
+    properties: {}
   )
-    Category.new(
+    category = Category.new(
       company: company,
       name: name,
       resource_name: resource_name
     )
+    properties.each { |key, value| category[key] = value }
+    category
   end
 
   def self.create(...)
