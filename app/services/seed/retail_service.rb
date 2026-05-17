@@ -12,19 +12,6 @@ class Seed::RetailService
   }.freeze
 
   CUSTOMER_COUNTS = { Customer: 50 }.freeze
-  BEAUTY_PRODUCTS = [
-    "La Roche-Posay Effaclar 400ml", "Annessa Sunscreen 60ml",
-    "L'Oreal Micellar Water", "Klairs Supple Toner",
-    "Innisfree Green Tea Seed Serum", "CeraVe Hydrating Cleanser"
-  ].freeze
-
-  CLINIC_SERVICES = [
-    "Laser CO2 Fractional - Scar Removal",
-    "HIFU Lifting Treatment",
-    "Pico Laser - Toning",
-    "Acne Treatment - Standard",
-    "Basic Skin Care - Hydration"
-  ].freeze
   RETAIL_ROLES = (EMPLOYEE_COUNTS.keys).freeze
   COMPANY_GROUP_BUSINESS_TYPE = :retail
 
@@ -36,10 +23,23 @@ class Seed::RetailService
     branches:    [ "flagship store", "mall kiosk", "warehouse distribution", "pop-up shop" ],
     departments: [ "operations", "human resources", "finance", "customer service", "inventory control" ],
     brands:      [ "luxury", "mass market", "indie", "organic", "eco-friendly" ],
-    customers:   [ "retail VIP", "regular", "wholesale", "occasional", "walk-in" ]
+    customers:   [ "retail VIP", "regular", "wholesale", "occasional", "walk-in" ],
+    services:    [ "skincare consultation", "makeup artistry", "spa treatment", "delivery & installation", "membership registration" ],
+    facilities:  [ "retail floor", "storage room", "office space", "break room", "parking area", "security station" ]
   }.freeze
 
   RESOURCES = %w[Order Product Employee Customer PolicyAppointment Booking Service Order]
+
+  # An array of popular company/brand names for seeding.
+  POPULAR_BRANDS = [
+    "Apple", "Samsung", "Google", "Microsoft", "Amazon", "Facebook", "Tesla",
+    "Toyota", "Coca-Cola", "McDonald's", "Disney", "Nike", "Adidas", "Louis Vuitton",
+    "Gucci", "Mercedes-Benz", "BMW", "Intel", "IBM", "Cisco", "Oracle", "SAP",
+    "Accenture", "Deloitte", "PwC", "KPMG", "EY", "GE", "Honda", "Ford", "Pepsi",
+    "Starbucks", "IKEA", "H&M", "Zara", "Uniqlo", "L'Oréal", "Gillette", "Pampers",
+    "Colgate", "Nescafé", "Red Bull", "Mastercard", "Visa", "American Express",
+    "J.P. Morgan", "Goldman Sachs", "Morgan Stanley", "Netflix", "Spotify"
+  ].freeze
 
   def initialize(user:, email: Faker::Internet.email, name: nil)
     @multi_company_owner = user
@@ -54,6 +54,11 @@ class Seed::RetailService
     @products = []
     @services = []
     @warehouses = []
+    @product_counter = 0
+    @service_counter = 0
+    @employee_counter = 0
+    @customer_counter = 0
+    @facility_counter = 0
     @email = email
     @email_domain = EmailService.new(email).full_domain
     seeding
@@ -73,6 +78,7 @@ class Seed::RetailService
     create_departments_for_company
     create_employees
     assign_employees_to_departments
+    create_customers_for_company
     setup_loyalty_programs
     create_inventory
     create_warehouses_for_branches
@@ -98,6 +104,10 @@ class Seed::RetailService
     puts "\n========================================================="
     puts "🛍️  Retail Company Group Seeding Complete!"
     puts "========================================================="
+  end
+
+  def random_category(resource_name)
+    Category.where(company: @retail, resource_name: resource_name.to_s).sample
   end
 
   def create_retail_company
@@ -126,7 +136,11 @@ class Seed::RetailService
   end
 
   def create_brands
-    Seed::BrandService.create(company: @retail)
+    POPULAR_BRANDS.each do |brand_name|
+      brand = Seed::BrandService.create(company: @retail, name: brand_name)
+      brand.category = random_category(:brands)
+      brand.save!
+    end
   end
 
   def create_branches(count: 2)
@@ -139,6 +153,8 @@ class Seed::RetailService
       )
       branch.attach_tag(key: "Branch #{branch.id} Tag")
       branch.address = Seed::AddressService.create
+      branch.category = random_category(:branches)
+      branch.save!
 
       @branches << branch
     end
@@ -170,13 +186,16 @@ class Seed::RetailService
     @branches.each do |branch|
       facility_count = rand(1..3)
       facility_count.times do |i|
+        @facility_counter += 1
         facility = Seed::FacilityService.create(
           company: @retail,
           branch: branch,
-          name: "#{branch.name} Facility #{i + 1}",
+          name: "Facility #{@facility_counter}",
           description: "A facility location for #{branch.name}"
         )
         facility.attach_tag(key: "Facility #{facility.id} Tag")
+        facility.category = random_category(:facilities)
+        facility.save!
         @facilities << facility
       end
     end
@@ -207,6 +226,8 @@ class Seed::RetailService
         description: "Department: #{dept_name}"
       )
       department.attach_tag(key: "Department #{department.id} Tag")
+      department.category = random_category(:departments)
+      department.save!
       @departments << department
     end
   end
@@ -222,11 +243,14 @@ class Seed::RetailService
             email: "#{role_name}_#{i + 1}_retail_branch_#{index + 1}@#{@email_domain}",
             system_role: :company_employee
           )
+          @employee_counter += 1
           employee = Seed::EmployeeService.create(
             user: user, company: @retail, branch: branch,
-            name: "Employee #{SecureRandom.hex(4)}"
+            name: "Employee #{@employee_counter}"
           )
           employee.attach_role(role_name)
+          employee.category = random_category(:employees)
+          employee.save!
           branch_employees << employee
         end
       end
@@ -254,10 +278,12 @@ class Seed::RetailService
             email: "customer_#{i + 1}_#{branch.id}@example.com",
             system_role: :company_customer
           )
+          @customer_counter += 1
           customer = Seed::CustomerService.create(
-            user: user, company: @retail, branch: branch, name: "Customer #{SecureRandom.hex(4)}"
+            user: user, company: @retail, branch: branch, name: "Customer #{@customer_counter}"
           )
-          # customer.attach_role(role_name)
+          customer.category = random_category(:customers)
+          customer.save!
           @customers << customer
         end
       end
@@ -274,7 +300,7 @@ class Seed::RetailService
 
         branch_customers = @customers.select { |c| c.branch_id == branch.id }
         branch_customers.sample(10).each do |customer|
-          Seed::CustomerGroupAppointmentService.create(customer_group: lp, appoint_to: customer)
+          Seed::CustomerGroupAppointmentService.create(company: @retail, customer_group: lp, appoint_to: customer)
         end
       end
     end
@@ -282,94 +308,32 @@ class Seed::RetailService
 
   def create_inventory
     @branches.each do |branch|
-      # 1. Seed Beauty Products (Retail) with enhanced fields
-      BEAUTY_PRODUCTS.each do |item_name|
-        @products << Seed::ProductService.create(
+      # 1. Seed 14 Products per branch with index-based naming
+      14.times do
+        @product_counter += 1
+        product = Seed::ProductService.create(
           company: @retail,
           branch: branch,
-          name: item_name + SecureRandom.hex(4),
-          description: "High-quality #{item_name} for daily skincare routine",
-          # Physical Properties
-          material: "Liquid/Cream",
-          color: [ "White", "Translucent", "Light Pink", "Blue" ].sample,
-          size: [ "30ml", "50ml", "60ml", "100ml", "150ml" ].sample,
-          shape: "Cylindrical Bottle",
-          pattern: "Matte",
-          flavor_scent: [ "Fragrance-free", "Hypoallergenic", "Aloe", "Green Tea" ].sample,
-          # Dimensions & Logistics
-          weight: rand(0.05..0.3).round(3),
-          length: rand(3..8).round(2),
-          width: rand(3..6).round(2),
-          height: rand(10..20).round(2),
-          volume: rand(0.05..0.2).round(3),
-          unit_type: "bottle",
-          # Manufacturing & Origin
-          origin_country: [ "FR", "JP", "KR", "US", "VN" ].sample,
-          manufacturer_name: [ "La Roche-Posay", "L'Oreal", "Innisfree", "CeraVe", "Klairs" ].sample,
-          model_year: "2024",
-          warranty_info: "1 year shelf life",
-          # Industry Specifics (for potential services)
-          duration_value: nil,
-          duration_unit: nil,
-          capacity: nil,
-          is_recurring: false,
-          # Other Identifiers
-          code: "PRD-#{SecureRandom.hex(4).upcase}",
-          sku: "SKU-#{Faker::Number.number(digits: 8)}",
-          barcode: Faker::Barcode.ean,
-          expiration_date: 2.years.from_now
+          name: "Product #{@product_counter}",
+          description: "High-quality skincare product"
         )
+        product.category = random_category(:products)
+        product.save!
+        @products << product
       end
 
-      # 2. Seed Additional Retail Products with variety
-      additional_products = [
-        { name: "Vitamin C Serum 20%", material: "Liquid", size: "30ml", flavor_scent: "Citrus" },
-        { name: "Hyaluronic Acid Moisturizer", material: "Cream", size: "50ml", flavor_scent: "Neutral" },
-        { name: "Niacinamide Toner", material: "Liquid", size: "150ml", flavor_scent: "Aloe" },
-        { name: "Sunscreen SPF50+", material: "Gel", size: "60ml", flavor_scent: "Light" },
-        { name: "Cleansing Foam", material: "Foam", size: "150ml", flavor_scent: "Fresh" },
-        { name: "Sheet Mask - Hydration", material: "Sheet", size: "25ml", flavor_scent: "Rose" },
-        { name: "Eye Cream", material: "Cream", size: "15ml", flavor_scent: "Fragrance-free" },
-        { name: "Lip Balm", material: "Wax", size: "10g", flavor_scent: "Mint" }
-      ]
-
-      additional_products.each do |prod|
-        @products << Seed::ProductService.create(
+      # 2. Seed 5 Services per branch with index-based naming
+      5.times do
+        @service_counter += 1
+        service = Seed::ServiceService.create(
           company: @retail,
           branch: branch,
-          name: prod[:name] + SecureRandom.hex(4),
-          description: "Premium skincare product for professional use",
-          material: prod[:material],
-          size: prod[:size],
-          flavor_scent: prod[:flavor_scent],
-          color: [ "Translucent", "White", "Light Yellow" ].sample,
-          shape: [ "Cylindrical", "Tube", "Jar" ].sample,
-          pattern: [ "Matte", "Glossy", "Satin" ].sample,
-          weight: rand(0.02..0.2).round(3),
-          length: rand(2..10).round(2),
-          width: rand(2..8).round(2),
-          height: rand(5..15).round(2),
-          volume: rand(0.01..0.15).round(3),
-          unit_type: [ "bottle", "tube", "jar", "pack" ].sample,
-          origin_country: [ "FR", "JP", "KR", "US", "VN", "DE" ].sample,
-          manufacturer_name: [ "La Roche-Posay", "L'Oreal", "Innisfree", "CeraVe", "The Ordinary", "Paula's Choice" ].sample,
-          model_year: [ "2023", "2024", "2025" ].sample,
-          warranty_info: "2 years shelf life",
-          code: "PRD-#{SecureRandom.hex(4).upcase}",
-          sku: "SKU-#{Faker::Number.number(digits: 8)}",
-          barcode: Faker::Barcode.ean,
-          expiration_date: rand(1..3).years.from_now
-        )
-      end
-
-      # 3. Seed Clinic Services (Booking-based)
-      CLINIC_SERVICES.each do |service_name|
-        @services << Seed::ServiceService.create(
-          company: @retail,
-          branch: branch,
-          name: service_name + SecureRandom.hex(4),
+          name: "Service #{@service_counter}",
           duration: [ 30, 45, 60, 90 ].sample
         )
+        service.category = random_category(:services)
+        service.save!
+        @services << service
       end
     end
   end

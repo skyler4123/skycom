@@ -10,6 +10,7 @@ class Product < ApplicationRecord
   belongs_to :company
   belongs_to :branch, optional: true
   belongs_to :brand, optional: true
+  belongs_to :category, optional: true
 
   has_many :order_appointments, as: :appoint_to, dependent: :destroy
   has_many :orders, through: :order_appointments
