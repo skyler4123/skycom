@@ -11,3 +11,4 @@ pin "stimulus-use" # @0.52.3
 pin "apexcharts" # @5.3.6
 pin "swiper" # @12.1.3
 pin "toastify-js" # @1.12.0
+pin "tabulator-tables" # @6.4.0
