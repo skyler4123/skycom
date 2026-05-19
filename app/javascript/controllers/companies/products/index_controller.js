@@ -3,7 +3,8 @@ import Companies_Products_NewModalController from "controllers/companies/product
 import Companies_Products_ShowModalController from "controllers/companies/products/show_modal_controller";
 
 export default class Companies_Products_IndexController extends Companies_LayoutController {
-  static targets = ["productsList"]
+  // 1. Change target name to point to the mount container instead of tbody
+  static targets = ["tableContainer"]
 
   /** @type {(Product & { name: string })[]} */
   products = []
@@ -20,6 +21,8 @@ export default class Companies_Products_IndexController extends Companies_Layout
       poll(() => {
         if (this.hasContentTarget) {
           this.renderContent()
+          // 2. Initialize the dynamic pure-HTML table after layout injection
+          this.initTable()
           return true
         }
         return false
@@ -41,10 +44,75 @@ export default class Companies_Products_IndexController extends Companies_Layout
     openModal({ html: `<div data-controller="${identifier(Companies_Products_ShowModalController)}"></div>` })
   }
 
+  initTable() {
+    if (!this.hasTableContainerTarget) return
+
+    table(this.tableContainerTarget, {
+      data: this.products,
+      columns: [
+        {
+          title: "Product Name",
+          field: "name",
+          formatter: (value) => `
+            <div class="flex items-center gap-4">
+              <div class="w-10 h-10 rounded-lg bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center">
+                <span class="material-symbols-outlined text-emerald-600 dark:text-emerald-400">inventory_2</span>
+              </div>
+              <div>
+                <p class="font-medium text-slate-900 dark:text-white cursor-pointer hover:underline">
+                  ${value}
+                </p>
+              </div>
+            </div>
+          `
+        },
+        {
+          title: "SKU",
+          field: "sku",
+          formatter: (value) => `<span class="font-mono text-slate-600 dark:text-slate-300">${value || 'N/A'}</span>`
+        },
+        {
+          title: "Type",
+          field: "business_type",
+          formatter: (value) => {
+            const type = value || 'physical'
+            const badgeClass = 
+              type === 'physical' ? 'bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-300' :
+              type === 'digital' ? 'bg-purple-100 text-purple-800 dark:bg-purple-900/50 dark:text-purple-300' :
+              'bg-blue-100 text-blue-800 dark:bg-blue-900/50 dark:text-blue-300';
+            
+            return `
+              <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${badgeClass}">
+                ${Helpers.capitalize(type)}
+              </span>
+            `
+          }
+        },
+        {
+          title: "Status",
+          field: "workflow_status",
+          formatter: (value) => Helpers.statusBadge(value)
+        },
+        {
+          title: "Actions",
+          align: "right",
+          formatter: (_value, row) => `
+            <button
+              class="p-2 text-slate-500 hover:text-blue-600 hover:bg-blue-50 rounded-lg cursor-pointer"
+              data-action="click->${this.identifier}#openShowModal"
+              data-${this.identifier}-product-id-param="${row.id}"
+            >
+              <span class="material-symbols-outlined text-[20px]">edit</span>
+            </button>
+          `
+        }
+      ]
+    })
+  }
+  
   contentHTML() {
     const typeFilter = Enums()?.product?.business_types || []
     const workflowStatusFilter = Enums()?.product?.workflow_statuses || []
-
     const urlParams = new URLSearchParams(window.location.search)
 
     return `
@@ -87,59 +155,7 @@ export default class Companies_Products_IndexController extends Companies_Layout
             </form>
           </div>
 
-          <div class="overflow-x-auto">
-            <table class="w-full text-left border-collapse">
-              <thead>
-                <tr class="text-sm text-slate-500 dark:text-slate-400 bg-slate-50 dark:bg-slate-800/50 border-b border-slate-200 dark:border-slate-700">
-                  <th class="py-4 px-6 font-medium whitespace-nowrap">Product Name</th>
-                  <th class="py-4 px-6 font-medium whitespace-nowrap">SKU</th>
-                  <th class="py-4 px-6 font-medium whitespace-nowrap">Type</th>
-                  <th class="py-4 px-6 font-medium whitespace-nowrap">Status</th>
-                  <th class="py-4 px-6 font-medium text-right whitespace-nowrap">Actions</th>
-                </tr>
-              </thead>
-              <tbody data-${this.identifier}-target="productsList" class="divide-y divide-slate-200 dark:divide-slate-800">
-                ${this.products.map(product => `
-                  <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
-                    <td class="py-4 px-6 text-sm">
-                      <div class="flex items-center gap-4">
-                        <div class="w-10 h-10 rounded-lg bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center">
-                          <span class="material-symbols-outlined text-emerald-600 dark:text-emerald-400">inventory_2</span>
-                        </div>
-                        <div>
-                          <p class="font-medium text-slate-900 dark:text-white cursor-pointer hover:underline">
-                            ${product.name}
-                          </p>
-                        </div>
-                      </div>
-                    </td>
-                    <td class="py-4 px-6 text-sm text-slate-600 dark:text-slate-300 font-mono">${product.sku || 'N/A'}</td>
-                    <td class="py-4 px-6 text-sm">
-                      <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                        product.business_type === 'physical' ? 'bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-300' :
-                        product.business_type === 'digital' ? 'bg-purple-100 text-purple-800 dark:bg-purple-900/50 dark:text-purple-300' :
-                        'bg-blue-100 text-blue-800 dark:bg-blue-900/50 dark:text-blue-300'
-                      }">
-                        ${Helpers.capitalize(product.business_type || 'physical')}
-                      </span>
-                    </td>
-                    <td class="py-4 px-6 text-sm">
-                      ${Helpers.statusBadge(product.workflow_status)}
-                    </td>
-                    <td class="py-4 px-6 text-sm text-right">
-                      <button
-                        class="p-2 text-slate-500 hover:text-blue-600 hover:bg-blue-50 rounded-lg cursor-pointer"
-                        data-action="click->${this.identifier}#openShowModal"
-                        data-${this.identifier}-product-id-param="${product.id}"
-                      >
-                        <span class="material-symbols-outlined text-[20px]">edit</span>
-                      </button>
-                    </td>
-                  </tr>
-                `).join('')}
-              </tbody>
-            </table>
-          </div>
+          <div data-${this.identifier}-target="tableContainer"></div>
 
           <div class="flex justify-center pt-6">
             ${pagination(this.pagination)}
