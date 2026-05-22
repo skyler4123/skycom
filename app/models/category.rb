@@ -3,6 +3,7 @@ class Category < ApplicationRecord
 
   belongs_to :company
 
+  has_one :property_mapping, dependent: :destroy
   has_many :employee_groups, dependent: :nullify
   has_many :employees, dependent: :nullify
   has_many :departments, dependent: :nullify

@@ -5,18 +5,37 @@ class Seed::CategoryService
     resource_name: nil,
     properties: {}
   )
-    category = Category.new(
+    Category.new(
       company: company,
       name: name,
       resource_name: resource_name
     )
-    properties.each { |key, value| category[key] = value }
-    category
   end
 
-  def self.create(...)
-    category = new(...)
+  def self.create(
+    company:,
+    name: Faker::Commerce.department,
+    resource_name: nil,
+    properties: {}
+  )
+    category = new(
+      company: company,
+      name: name,
+      resource_name: resource_name,
+      properties: properties
+    )
     category.save!
+
+    if properties.present?
+      PropertyMapping.create!(
+        company: company,
+        category: category,
+        resource_name: resource_name,
+        name: "#{name} mappings",
+        **properties
+      )
+    end
+
     category
   end
 end
