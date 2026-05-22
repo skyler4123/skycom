@@ -56,7 +56,6 @@ window.addOpenTrigger = Helpers.addOpenTrigger
 window.addOpenListener = Helpers.addOpenListener
 window.reloadThenToast = Helpers.reloadThenToast
 window.reloadThenToasts = Helpers.reloadThenToasts
-window.table = Helpers.table
 
 // 4. Data Getters (Safe from Race Conditions)
 // This allows you to use 'currentCompany()' as a variable that always fetches fresh data
