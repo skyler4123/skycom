@@ -5821,6 +5821,31 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.index ["workflow_status"], name: "index_systems_on_workflow_status"
   end
 
+  create_table "table_configs", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
+    t.uuid "company_id", null: false
+    t.uuid "category_id"
+    t.string "name"
+    t.string "description"
+    t.string "resource_name"
+    t.jsonb "visible_fields", default: [], null: false
+    t.integer "lifecycle_status"
+    t.integer "workflow_status"
+    t.integer "business_type"
+    t.datetime "expiration_date"
+    t.jsonb "metadata", default: {}
+    t.datetime "discarded_at"
+    t.string "permission_resource_name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["business_type"], name: "index_table_configs_on_business_type"
+    t.index ["category_id"], name: "index_table_configs_on_category_id"
+    t.index ["company_id", "resource_name", "category_id"], name: "idx_on_company_id_resource_name_category_id_66b8ad4700"
+    t.index ["company_id"], name: "index_table_configs_on_company_id"
+    t.index ["discarded_at"], name: "index_table_configs_on_discarded_at"
+    t.index ["lifecycle_status"], name: "index_table_configs_on_lifecycle_status"
+    t.index ["workflow_status"], name: "index_table_configs_on_workflow_status"
+  end
+
   create_table "tag_appointments", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
     t.uuid "company_id", null: false
     t.uuid "tag_id", null: false
@@ -6591,6 +6616,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
   add_foreign_key "system_subscriptions", "companies"
   add_foreign_key "system_subscriptions", "system_subscription_groups"
   add_foreign_key "system_subscriptions", "system_subscription_plans"
+  add_foreign_key "table_configs", "categories"
+  add_foreign_key "table_configs", "companies"
   add_foreign_key "tag_appointments", "companies"
   add_foreign_key "tag_appointments", "tags"
   add_foreign_key "tags", "companies"

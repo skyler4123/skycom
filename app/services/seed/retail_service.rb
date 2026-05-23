@@ -22,165 +22,337 @@ class Seed::RetailService
   METADATA_CATEGORIES = {
     products: {
       "Cosmetics" => {
-        property_string_1: "Skin Type Suitability",
-        property_string_2: "Key Ingredients",
-        property_string_3: "Formulation (e.g., Liquid, Powder)",
-        property_integer_1: "Volume (ml)",
-        property_integer_2: "Shelf Life (Months)",
-        property_boolean_1: "Organic Certified",
-        property_boolean_2: "Requires Refrigeration"
+        properties: {
+          property_string_1: "Skin Type Suitability",
+          property_string_2: "Key Ingredients",
+          property_string_3: "Formulation (e.g., Liquid, Powder)",
+          property_integer_1: "Volume (ml)",
+          property_integer_2: "Shelf Life (Months)",
+          property_boolean_1: "Organic Certified",
+          property_boolean_2: "Requires Refrigeration"
+        },
+        visible_columns: %w[name code property_string_1 property_string_2 property_integer_1 property_boolean_1]
       },
       "Perfumes" => {
-        property_string_1: "Scent Profile / Notes",
-        property_string_2: "Concentration (EDP / EDT)",
-        property_integer_1: "Volume (ml)",
-        property_boolean_1: "Includes Tester Unit"
+        properties: {
+          property_string_1: "Scent Profile / Notes",
+          property_string_2: "Concentration (EDP / EDT)",
+          property_integer_1: "Volume (ml)",
+          property_boolean_1: "Includes Tester Unit"
+        },
+        visible_columns: %w[name code property_string_1 property_integer_1 property_boolean_1]
       },
       "Beauty Tools" => {
-        property_string_1: "Material Composition",
-        property_string_2: "Power Source Type",
-        property_integer_1: "Warranty Period (Months)",
-        property_boolean_1: "Waterproof Rating"
+        properties: {
+          property_string_1: "Material Composition",
+          property_string_2: "Power Source Type",
+          property_integer_1: "Warranty Period (Months)",
+          property_boolean_1: "Waterproof Rating"
+        },
+        visible_columns: %w[name code property_string_1 property_integer_1 property_boolean_1]
       },
       "Makeup" => {
-        property_string_1: "Shade / Color Code",
-        property_string_2: "Finish (Matte / Dewy)",
-        property_integer_1: "Net Weight (g)",
-        property_boolean_1: "Vegan Formulation"
+        properties: {
+          property_string_1: "Shade / Color Code",
+          property_string_2: "Finish (Matte / Dewy)",
+          property_integer_1: "Net Weight (g)",
+          property_boolean_1: "Vegan Formulation"
+        },
+        visible_columns: %w[name code property_string_1 property_integer_1 property_boolean_1]
       },
       "Jewelry" => {
-        property_string_1: "Material (Gold / Silver)",
-        property_string_2: "Gemstone Type",
-        property_decimal_1: "Weight (Grams)",
-        property_decimal_2: "Purity Carat"
+        properties: {
+          property_string_1: "Material (Gold / Silver)",
+          property_string_2: "Gemstone Type",
+          property_decimal_1: "Weight (Grams)",
+          property_decimal_2: "Purity Carat"
+        },
+        visible_columns: %w[name code property_string_1 property_decimal_1 property_decimal_2]
       },
       "Accessories" => {
-        property_string_1: "Size / Dimensions",
-        property_string_2: "Color Palette",
-        property_string_3: "Material Type"
+        properties: {
+          property_string_1: "Size / Dimensions",
+          property_string_2: "Color Palette",
+          property_string_3: "Material Type"
+        },
+        visible_columns: %w[name code property_string_1 property_string_2]
       }
     },
 
     employees: {
       "Management" => {
-        property_string_1: "Corporate Level",
-        property_decimal_1: "KPI Target Bonus %",
-        property_boolean_1: "Signing Authority"
+        properties: {
+          property_string_1: "Corporate Level",
+          property_decimal_1: "KPI Target Bonus %",
+          property_boolean_1: "Signing Authority"
+        },
+        visible_columns: %w[name email property_string_1 property_decimal_1 property_boolean_1]
       },
       "Sales Specialist" => {
-        property_string_1: "Assigned Product Line",
-        property_decimal_1: "Commission Tier %",
-        property_integer_1: "Monthly Sales Target"
+        properties: {
+          property_string_1: "Assigned Product Line",
+          property_decimal_1: "Commission Tier %",
+          property_integer_1: "Monthly Sales Target"
+        },
+        visible_columns: %w[name email property_string_1 property_decimal_1 property_integer_1]
       },
       "Cashier" => {
-        property_string_1: "POS Station Number",
-        property_integer_1: "Assigned Cash Drawer ID"
+        properties: {
+          property_string_1: "POS Station Number",
+          property_integer_1: "Assigned Cash Drawer ID"
+        },
+        visible_columns: %w[name email property_string_1 property_integer_1]
       },
       "Technical Support" => {
-        property_string_1: "Certifications",
-        property_string_2: "Primary Tech Stack"
+        properties: {
+          property_string_1: "Certifications",
+          property_string_2: "Primary Tech Stack"
+        },
+        visible_columns: %w[name email property_string_1 property_string_2]
       },
       "Marketing" => {
-        property_string_1: "Channel Focus (Digital/Social)",
-        property_decimal_1: "Monthly Ad Budget Limit"
+        properties: {
+          property_string_1: "Channel Focus (Digital/Social)",
+          property_decimal_1: "Monthly Ad Budget Limit"
+        },
+        visible_columns: %w[name email property_string_1 property_decimal_1]
       }
     },
 
     branches: {
       "Flagship Store" => {
-        property_integer_1: "Maximum Occupancy Capacity",
-        property_integer_2: "Number of POS Tills",
-        property_boolean_1: "Has Tax-Free Counter"
+        properties: {
+          property_integer_1: "Maximum Occupancy Capacity",
+          property_integer_2: "Number of POS Tills",
+          property_boolean_1: "Has Tax-Free Counter"
+        },
+        visible_columns: %w[name property_integer_1 property_integer_2 property_boolean_1]
       },
       "Mall Kiosk" => {
-        property_string_5: "Mall Unit Number",
-        property_decimal_1: "Lease Square Footage"
+        properties: {
+          property_string_5: "Mall Unit Number",
+          property_decimal_1: "Lease Square Footage"
+        },
+        visible_columns: %w[name property_string_5 property_decimal_1]
       },
       "Warehouse Distribution" => {
-        property_integer_1: "Loading Bay Count",
-        property_decimal_1: "Storage Capacity (Cubic Meters)",
-        property_boolean_1: "Cold Chain Storage Enabled"
+        properties: {
+          property_integer_1: "Loading Bay Count",
+          property_decimal_1: "Storage Capacity (Cubic Meters)",
+          property_boolean_1: "Cold Chain Storage Enabled"
+        },
+        visible_columns: %w[name property_integer_1 property_decimal_1 property_boolean_1]
       },
       "Pop-up Shop" => {
-        property_datetime_1: "Operation Start Date",
-        property_datetime_2: "Operation End Date"
+        properties: {
+          property_datetime_1: "Operation Start Date",
+          property_datetime_2: "Operation End Date"
+        },
+        visible_columns: %w[name property_datetime_1 property_datetime_2]
       }
     },
 
     departments: {
-      "Operations" => { property_string_1: "Regional Scope", property_string_2: "SOP Revision Code" },
-      "Human Resources" => { property_string_1: "ATS Platform Integration", property_boolean_1: "Handles Payroll Directly" },
-      "Finance" => { property_string_1: "Accounting Standard (IFRS/VAS)", property_string_2: "Primary Corporate Bank Account" },
-      "Customer Service" => { property_string_1: "Helpdesk SLA Tier", property_string_2: "Support Communication Channels" },
-      "Inventory Control" => { property_string_1: "Audit Cycle Frequency", property_boolean_1: "Auto-Reorder Triggers Active" }
+      "Operations" => {
+        properties: {
+          property_string_1: "Regional Scope",
+          property_string_2: "SOP Revision Code"
+        },
+        visible_columns: %w[name property_string_1]
+      },
+      "Human Resources" => {
+        properties: {
+          property_string_1: "ATS Platform Integration",
+          property_boolean_1: "Handles Payroll Directly"
+        },
+        visible_columns: %w[name property_string_1 property_boolean_1]
+      },
+      "Finance" => {
+        properties: {
+          property_string_1: "Accounting Standard (IFRS/VAS)",
+          property_string_2: "Primary Corporate Bank Account"
+        },
+        visible_columns: %w[name property_string_1]
+      },
+      "Customer Service" => {
+        properties: {
+          property_string_1: "Helpdesk SLA Tier",
+          property_string_2: "Support Communication Channels"
+        },
+        visible_columns: %w[name property_string_1]
+      },
+      "Inventory Control" => {
+        properties: {
+          property_string_1: "Audit Cycle Frequency",
+          property_boolean_1: "Auto-Reorder Triggers Active"
+        },
+        visible_columns: %w[name property_string_1 property_boolean_1]
+      }
     },
 
     brands: {
-      "Luxury" => { property_string_1: "Tier Level", property_decimal_1: "Minimum MSRP Markup Margin" },
-      "Mass Market" => { property_string_1: "Distribution Channel Model", property_integer_1: "Minimum Order Quantity (MOQ)" },
-      "Indie" => { property_string_1: "Founder Region", property_boolean_1: "Consignment Agreement Terms" },
-      "Organic" => { property_string_1: "Certification Body Name", property_datetime_1: "Certificate Expiration Date" },
-      "Eco-friendly" => { property_string_1: "Sustainability Rating", property_string_2: "Packaging Material Base" }
+      "Luxury" => {
+        properties: {
+          property_string_1: "Tier Level",
+          property_decimal_1: "Minimum MSRP Markup Margin"
+        },
+        visible_columns: %w[name property_string_1 property_decimal_1]
+      },
+      "Mass Market" => {
+        properties: {
+          property_string_1: "Distribution Channel Model",
+          property_integer_1: "Minimum Order Quantity (MOQ)"
+        },
+        visible_columns: %w[name property_string_1 property_integer_1]
+      },
+      "Indie" => {
+        properties: {
+          property_string_1: "Founder Region",
+          property_boolean_1: "Consignment Agreement Terms"
+        },
+        visible_columns: %w[name property_string_1 property_boolean_1]
+      },
+      "Organic" => {
+        properties: {
+          property_string_1: "Certification Body Name",
+          property_datetime_1: "Certificate Expiration Date"
+        },
+        visible_columns: %w[name property_string_1 property_datetime_1]
+      },
+      "Eco-friendly" => {
+        properties: {
+          property_string_1: "Sustainability Rating",
+          property_string_2: "Packaging Material Base"
+        },
+        visible_columns: %w[name property_string_1 property_string_2]
+      }
     },
 
     customers: {
       "Retail VIP" => {
-        property_integer_1: "Current Loyalty Reward Points",
-        property_decimal_1: "Fixed Lifetime Discount Percentage",
-        property_datetime_1: "VIP Tier Expiration Date"
+        properties: {
+          property_integer_1: "Current Loyalty Reward Points",
+          property_decimal_1: "Fixed Lifetime Discount Percentage",
+          property_datetime_1: "VIP Tier Expiration Date"
+        },
+        visible_columns: %w[name email property_integer_1 property_decimal_1 property_datetime_1]
       },
-      "Regular" => { property_integer_1: "Visit Frequency Count", property_string_1: "Preferred Store Branch" },
+      "Regular" => {
+        properties: {
+          property_integer_1: "Visit Frequency Count",
+          property_string_1: "Preferred Store Branch"
+        },
+        visible_columns: %w[name email property_integer_1 property_string_1]
+      },
       "Wholesale" => {
-        property_string_1: "Tax Identification Number (TIN)",
-        property_string_2: "Credit Terms Granted (e.g., Net 30)",
-        property_decimal_1: "Credit Line Limit Amount"
+        properties: {
+          property_string_1: "Tax Identification Number (TIN)",
+          property_string_2: "Credit Terms Granted (e.g., Net 30)",
+          property_decimal_1: "Credit Line Limit Amount"
+        },
+        visible_columns: %w[name email property_string_1 property_string_2 property_decimal_1]
       },
-      "Occasional" => { property_string_1: "Acquisition Campaign Source" },
-      "Walk-in" => { property_string_1: "General Notes / Behavioral Tags" }
+      "Occasional" => {
+        properties: {
+          property_string_1: "Acquisition Campaign Source"
+        },
+        visible_columns: %w[name email property_string_1]
+      },
+      "Walk-in" => {
+        properties: {
+          property_string_1: "General Notes / Behavioral Tags"
+        },
+        visible_columns: %w[name email property_string_1]
+      }
     },
 
     services: {
       "Skincare Consultation" => {
-        property_integer_1: "Duration (Minutes)",
-        property_string_1: "Required Analysis Equipment"
+        properties: {
+          property_integer_1: "Duration (Minutes)",
+          property_string_1: "Required Analysis Equipment"
+        },
+        visible_columns: %w[name property_integer_1 property_string_1]
       },
       "Makeup Artistry" => {
-        property_integer_1: "Duration (Minutes)",
-        property_decimal_1: "Consumables Material Surcharge Cost"
+        properties: {
+          property_integer_1: "Duration (Minutes)",
+          property_decimal_1: "Consumables Material Surcharge Cost"
+        },
+        visible_columns: %w[name property_integer_1 property_decimal_1]
       },
       "Spa Treatment" => {
-        property_integer_1: "Duration (Minutes)",
-        property_string_1: "Assigned Treatment Room",
-        property_boolean_1: "Shower Facilities Required"
+        properties: {
+          property_integer_1: "Duration (Minutes)",
+          property_string_1: "Assigned Treatment Room",
+          property_boolean_1: "Shower Facilities Required"
+        },
+        visible_columns: %w[name property_integer_1 property_string_1 property_boolean_1]
       },
       "Delivery & Installation" => {
-        property_string_1: "Logistics Vehicle Tier Required",
-        property_decimal_1: "Base Distance Rate Buffer Zone"
+        properties: {
+          property_string_1: "Logistics Vehicle Tier Required",
+          property_decimal_1: "Base Distance Rate Buffer Zone"
+        },
+        visible_columns: %w[name property_string_1 property_decimal_1]
       },
       "Membership Registration" => {
-        property_string_1: "Sign-up Welcome Gift Kit Code",
-        property_boolean_1: "Requires Physical Card Printing"
+        properties: {
+          property_string_1: "Sign-up Welcome Gift Kit Code",
+          property_boolean_1: "Requires Physical Card Printing"
+        },
+        visible_columns: %w[name property_string_1 property_boolean_1]
       }
     },
 
     facilities: {
       "Retail Floor" => {
-        property_decimal_1: "Floor Space (Sqm)",
-        property_integer_1: "Maximum Customer Capacity Count"
+        properties: {
+          property_decimal_1: "Floor Space (Sqm)",
+          property_integer_1: "Maximum Customer Capacity Count"
+        },
+        visible_columns: %w[name property_decimal_1 property_integer_1]
       },
       "Storage Room" => {
-        property_decimal_1: "Temperature Range Ceiling (C)",
-        property_decimal_2: "Humidity Target Threshold %",
-        property_boolean_1: "Biometric Lock Security Restricting Access"
+        properties: {
+          property_decimal_1: "Temperature Range Ceiling (C)",
+          property_decimal_2: "Humidity Target Threshold %",
+          property_boolean_1: "Biometric Lock Security Restricting Access"
+        },
+        visible_columns: %w[name property_decimal_1 property_boolean_1]
       },
-      "Office Space" => { property_integer_1: "Configured Network Nodes Count", property_integer_2: "Desk Capacity Limit" },
-      "Break Room" => { property_boolean_1: "Equipped with Refrigerator", property_boolean_2: "Water Purifier Installed" },
-      "Parking Area" => { property_integer_1: "Motorbike Parking Stalls Count", property_integer_2: "Car Parking Stalls Count" },
-      "Security Station" => { property_integer_1: "CCTV Monitor Matrices Hooked", property_string_1: "Emergency Contact Keypad Trunk Line" }
+      "Office Space" => {
+        properties: {
+          property_integer_1: "Configured Network Nodes Count",
+          property_integer_2: "Desk Capacity Limit"
+        },
+        visible_columns: %w[name property_integer_1 property_integer_2]
+      },
+      "Break Room" => {
+        properties: {
+          property_boolean_1: "Equipped with Refrigerator",
+          property_boolean_2: "Water Purifier Installed"
+        },
+        visible_columns: %w[name property_boolean_1 property_boolean_2]
+      },
+      "Parking Area" => {
+        properties: {
+          property_integer_1: "Motorbike Parking Stalls Count",
+          property_integer_2: "Car Parking Stalls Count"
+        },
+        visible_columns: %w[name property_integer_1 property_integer_2]
+      },
+      "Security Station" => {
+        properties: {
+          property_integer_1: "CCTV Monitor Matrices Hooked",
+          property_string_1: "Emergency Contact Keypad Trunk Line"
+        },
+        visible_columns: %w[name property_integer_1 property_string_1]
+      }
     }
   }.freeze
 
-  RESOURCES = %w[Order Product Employee Customer PolicyAppointment Booking Service Order Category PropertyMapping]
+  RESOURCES = %w[Order Product Employee Customer PolicyAppointment Booking Service Order Category PropertyMapping TableConfig]
 
   # An array of popular company/brand names for seeding.
   POPULAR_BRANDS = [
@@ -221,6 +393,7 @@ class Seed::RetailService
 
     create_retail_company
     create_categories
+    create_table_configs
     create_brands
     create_branches
     create_subscription_plans_for_company
@@ -276,12 +449,32 @@ class Seed::RetailService
 
   def create_categories
     METADATA_CATEGORIES.each do |resource_name, categories|
-      categories.each do |name, properties|
+      categories.each do |name, entry|
         Seed::CategoryService.create(
           company: @retail,
           name: name,
           resource_name: resource_name.to_s,
-          properties: properties
+          properties: entry[:properties]
+        )
+      end
+    end
+  end
+
+  def create_table_configs
+    METADATA_CATEGORIES.each do |resource_name, categories|
+      categories.each do |name, entry|
+        visible_columns = entry[:visible_columns]
+        next unless visible_columns.present?
+
+        category = Category.find_by(company: @retail, resource_name: resource_name.to_s, name: name)
+        next unless category
+
+        Seed::TableConfigService.create(
+          company: @retail,
+          resource_name: resource_name.to_s,
+          category: category,
+          visible_fields: visible_columns,
+          name: "#{name} table config"
         )
       end
     end
