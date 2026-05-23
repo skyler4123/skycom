@@ -174,4 +174,64 @@ Clear the cache when:
 
 ---
 
+## 11. Cookie Expiration & Daily Re-authentication
+
+All session and cache cookies use a **1-day expiration** to force daily re-authentication.
+
+### Cookie Lifetimes
+
+| Cookie | Expiry | Purpose |
+|--------|--------|---------|
+| `session_token` | 1 day (HTTP-only, signed) | Rails session — daily expiry forces re-login |
+| `is_signed_in` | 1 day | Public flag the frontend reads for auth state |
+| `client_cache_version` | 1 day | Version stamp the frontend compares against localStorage |
+
+### Why 1 Day?
+
+- **Security**: Old cookies can't linger indefinitely. User must sign in at least once every 24 hours.
+- **Cache freshness**: When `client_cache_version` cookie expires, the frontend sees no server version, detects a mismatch with the localStorage version, and triggers a full `/client_cache` refresh on next page load.
+- **No stale data**: Company/employee/role data is re-fetched daily, so mutations (new branches, role changes, etc.) are picked up within 24 hours even if the user doesn't manually clear cache.
+
+### Implementation
+
+**File**: `app/controllers/concerns/application_controller/cookie_concern.rb`
+
+```ruby
+def update_cookie(session:, user:)
+  cookies.signed[:session_token] = { 
+    value: session.id, 
+    httponly: true, 
+    expires: 1.day 
+  }
+  cookies[:is_signed_in] = { 
+    value: true, 
+    expires: 1.day 
+  }
+  cookies[:client_cache_version] = { 
+    value: cache_version(user: user), 
+    expires: 1.day 
+  }
+end
+```
+
+`sync_client_cache_version` also extends the cookie lifetime by re-setting `expires: 1.day` whenever the version changes.
+
+### Frontend Effect
+
+In `client_cache_controller.js:12`:
+```javascript
+const serverVersion = Cookie('client_cache_version')
+```
+
+When the cookie has expired, `serverVersion` is `undefined`. The `sync()` method compares this against `localStorage.getItem('client_cache_version')`. A mismatch triggers `refreshCache()` → full `/client_cache` fetch → `localStorage` is repopulated.
+
+### User Experience
+
+- User logs in → cookies set with 1-day expiry
+- Throughout the day → cache serves data from localStorage, no extra API calls
+- Next day (or after 24h of inactivity) → cookies expired → user sees login page
+- User signs in again → fresh cookies, fresh cache
+
+---
+
 *End of file*

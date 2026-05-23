@@ -3,28 +3,46 @@ module ApplicationController::CookieConcern
   extend ActiveSupport::Concern
 
   def update_cookie(session:, user:)
-    cookies.signed.permanent[:session_token] = { value: session.id, httponly: true }
-    cookies.permanent[:is_signed_in] = true
-    cookies.permanent[:client_cache_version] = cache_version(user: user)
+    # signed + explicit 1-day expiration
+    cookies.signed[:session_token] = {
+      value: session.id,
+      httponly: true,
+      expires: 1.day
+    }
+
+    # Standard public cookies with explicit 1-day expiration
+    cookies[:is_signed_in] = {
+      value: true,
+      expires: 1.day
+    }
+
+    cookies[:client_cache_version] = {
+      value: cache_version(user: user),
+      expires: 1.day
+    }
   end
 
   def sync_client_cache_version
-    # Only write to the cookie if the version has changed
-    return if cookies[:client_cache_version] == cache_version(user: current_user)
-    cookies.permanent[:client_cache_version] = cache_version(user: current_user)
+    current_version = cache_version(user: current_user)
+
+    # Only update if the version has changed
+    return if cookies[:client_cache_version] == current_version
+
+    # Refresh the version value and extend its lifetime for another day
+    cookies[:client_cache_version] = {
+      value: current_version,
+      expires: 1.day
+    }
   end
 
-  # cache_version cover the cache of entire browser cache that must bas eon user + companies
-  # To update the cache_version, just update new updated_at for user or any companies
   def cache_version(user:)
-    # If a company name changes or a branch is added, this hash changes.
+    return "0" unless user
+
     latest_update = [
       user.updated_at,
-      # user.companies.maximum(:updated_at)
       Company.cached_where(user: user).maximum(:updated_at)
     ].compact.max.to_i
 
-    # Convert to a string for comparison
     latest_update.to_s
   end
 end
