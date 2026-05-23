@@ -66,3 +66,6 @@ window.currentUser = Helpers.currentUser
 window.isSignedIn = Helpers.isSignedIn
 window.currentDepartments = Helpers.currentDepartments
 window.currentRoles = Helpers.currentRoles
+window.currentCategories = Helpers.currentCategories
+window.currentPropertyMappings = Helpers.currentPropertyMappings
+window.currentTableConfigs = Helpers.currentTableConfigs
