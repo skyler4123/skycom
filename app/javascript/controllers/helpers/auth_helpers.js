@@ -105,3 +105,15 @@ export const currentUser = () => {
 export const isSignedIn = () => {
   return Cookie('is_signed_in') && Cookie('is_signed_in') === 'true'
 }
+
+export const currentCategories = () => {
+  return currentCompany().categories
+}
+
+export const currentPropertyMappings = () => {
+  return currentCompany().property_mappings
+}
+
+export const currentTableConfigs = () => {
+  return currentCompany().table_configs
+}

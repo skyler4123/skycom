@@ -4,6 +4,7 @@ class Category < ApplicationRecord
   belongs_to :company
 
   has_one :property_mapping, dependent: :destroy
+  has_one :table_config, dependent: :destroy
 
   after_create :create_default_property_mapping
   has_many :employee_groups, dependent: :nullify

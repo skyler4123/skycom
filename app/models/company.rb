@@ -14,6 +14,8 @@ class Company < ApplicationRecord
   has_one :cached_version, dependent: :destroy
 
   has_many :company_configs, dependent: :destroy
+  has_many :property_mappings, dependent: :destroy
+  has_many :table_configs, dependent: :destroy
   has_many :brands, dependent: :destroy
   has_many :branches, dependent: :destroy
   has_many :tags, dependent: :destroy
@@ -43,7 +45,6 @@ class Company < ApplicationRecord
   has_many :payment_methods, through: :payment_method_appointments
   has_many :statistics, as: :owner
   has_many :categories, dependent: :destroy
-  has_many :property_mappings, dependent: :destroy
   has_many :subscription_plans, dependent: :destroy
   has_many :departments, dependent: :destroy
 
