@@ -778,26 +778,52 @@ end
 
 This concern:
 1. Includes `Pundit::Authorization`
-2. Rescues `Pundit::NotAuthorizedError`
-3. Handles unauthorized requests based on response format
+2. Adds a `before_action :authorize_current_employee!` that **auto-derives the policy class** from the controller class name (e.g., `Companies::PropertyMappingsController` → `Companies::PropertyMappingsPolicy`) and calls `authorize` for every action automatically
+3. Rescues `Pundit::NotAuthorizedError` and handles unauthorized responses based on format
+4. If no matching policy class exists, returns a 500 error with "Security Policy for ... not found."
 
 ### B. Implementation
 
 **File**: `app/controllers/concerns/companies/authorizable.rb`
 
 ```ruby
+# app/controllers/concerns/companies/authorizable.rb
 module Companies::Authorizable
   extend ActiveSupport::Concern
 
   included do
     include Pundit::Authorization
+    before_action :authorize_current_employee!
     rescue_from Pundit::NotAuthorizedError, with: :user_not_authorized
   end
 
   private
 
-  def authorize_employee!(action, record, policy_class:)
-    authorize current_employee, "#{action}?", policy_class: policy_class
+  def authorize_current_employee!
+    raise Pundit::NotAuthorizedError unless current_employee
+
+    # Derive policy class from controller name
+    # e.g., Companies::PropertyMappingsController → Companies::PropertyMappingsPolicy
+    policy_class_name = self.class.name.sub("Controller", "Policy")
+    query_method = "#{action_name}?"
+
+    begin
+      policy_class = policy_class_name.constantize
+      authorize current_employee, query_method, policy_class: policy_class
+    rescue NameError
+      # If the policy doesn't exist, return a 500 error
+      message = "Security Policy for #{policy_class_name} not found."
+
+      respond_to do |format|
+        format.html do
+          flash[:alert] = message
+          redirect_to(request.referrer || root_path)
+        end
+        format.json do
+          render json: { errors: [ message ] }, status: :internal_server_error
+        end
+      end
+    end
   end
 
   def user_not_authorized(exception)
@@ -810,7 +836,7 @@ module Companies::Authorizable
       end
       format.json do
         render json: {
-          error: message,
+          errors: [ message ],
           policy: exception.policy.class.to_s,
           action: exception.query
         }, status: :forbidden
@@ -843,14 +869,14 @@ end
 
 ### D. Usage in Controller
 
-Add authorization check to any action that needs protection:
+No explicit `authorize` call is needed in controller actions. The `before_action :authorize_current_employee!` in `Companies::Authorizable` automatically authorizes every action — it derives the policy class from the controller name and the query method from the action name:
 
 ```ruby
-# app/controllers/companies/permissions_controller.rb
-class Companies::PermissionsController < Companies::ApplicationController
+# app/controllers/companies/property_mappings_controller.rb
+class Companies::PropertyMappingsController < Companies::ApplicationController
   def index
-    # Pundit checks index? - redirects or returns error if unauthorized
-    authorize current_employee, :index?, policy_class: Companies::PermissionPolicy
+    # No explicit authorize call — the before_action handles it.
+    # Auto-derived: policy_class: Companies::PropertyMappingsPolicy, query: "index?"
 
     respond_to do |format|
       format.html { render html: "", layout: true }
@@ -891,13 +917,60 @@ async loadData() {
 
 If the API returns 403, the user is redirected by the browser. No special handling required.
 
+### G. Controller-to-Policy Naming Convention
+
+Pundit maps controllers to policies by convention. When you create a new controller, you must also create a matching policy:
+
+| Controller | Policy | Resource in ABAC |
+|------------|--------|-----------------|
+| `Companies::PermissionsController` | `Companies::PermissionPolicy` | `PolicyAppointment` |
+| `Companies::CategoriesController` | `Companies::CategoriesPolicy` | `Category` |
+| `Companies::PropertyMappingsController` | `Companies::PropertyMappingsPolicy` | `PropertyMapping` |
+| `Companies::BranchesController` | `Companies::BranchesPolicy` | `Branch` |
+
+#### The Rule
+
+Given a controller under `Companies::` namespace, the policy is:
+```
+Companies::<ControllerName>Policy
+```
+where `<ControllerName>` matches the controller class name (plural, PascalCase).
+
+#### How Auto-Discovery Works
+
+Since `Companies::Authorizable` includes a `before_action :authorize_current_employee!`, you never need to call `authorize` manually in your controller actions. The method automatically:
+
+1. **Derives the policy class**: `self.class.name.sub("Controller", "Policy")` — e.g., `Companies::PropertyMappingsController` becomes `Companies::PropertyMappingsPolicy`
+2. **Derives the query method**: `"#{action_name}?"` — e.g., `"update"` becomes `"update?"`
+3. **Calls `authorize`**: `authorize current_employee, query_method, policy_class: policy_class`
+
+This is why every controller under `Companies::` namespace needs a corresponding policy file at `app/policies/companies/`. If the policy file doesn't exist, the `before_action` rescues the `NameError` and returns a 500 error with `"Security Policy for #{policy_class_name} not found."`
+
+#### What Happens If the Policy Is Missing
+
+When `authorize_current_employee!` tries to constantize the policy class, it raises `NameError`:
+```
+uninitialized constant Companies::PropertyMappingsPolicy
+```
+
+This is caught by the `rescue NameError` in `authorize_current_employee!` and returns a 500 error with `"Security Policy for Companies::PropertyMappingsPolicy not found."`
+
+#### Steps to Add a New Policy
+
+1. Create the policy file at `app/policies/companies/<resource>_policy.rb`
+2. Define action methods (index?, create?, update?, destroy?)
+3. Each method calls `record.can?(:action, ResourceClass)` using ABAC
+4. Add the resource name to the seed service's `RESOURCES` constant
+5. Add CRUD permissions to the relevant roles in `assign_policies_to_roles`
+6. Re-seed the database to create the policy records
+
 ### Summary
 
 | Layer | Responsibility |
 |-------|----------------|
 | **ABAC** | Defines what permissions employees have |
 | **Pundit Policy** | Maps actions to ABAC `can?` checks |
-| **Controller** | Calls `authorize` to enforce |
+| **Controller** | Authorization is automatic via `before_action` in `Authorizable` |
 | **Authorizable** | Handles errors (redirect/json) |
 | **Frontend** | Simple - just renders data |
 

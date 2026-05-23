@@ -46,29 +46,51 @@ export default class Companies_Employees_IndexController extends Companies_Layou
 **Identifier format:**
 - `Companies_Employees_NewModalController` → `companies--employees--new-modal`
 
-## Step 2: Create Modal Controller
+## Step 2: Create New Modal Controller with `handleSubmit`
 
-Create a new modal controller that extends `Controller`:
+Create a new modal controller that extends `Controller` with a `handleSubmit` method:
 
 ```javascript
-// app/javascript/controllers/companies/employees/new_modal_controller.js
+// app/javascript/controllers/companies/branches/new_modal_controller.js
 
 import { Controller } from "@hotwired/stimulus"
 
-export default class Companies_Employees_NewModalController extends Controller {
+export default class Companies_Branches_NewModalController extends Controller {
   connect() {
     this.element.innerHTML = this.modalHTML()
+  }
+
+  async handleSubmit(event) {
+    event.preventDefault()
+
+    try {
+      const response = await fetchJson(Helpers.create_company_branches_path(currentCompany().id), {
+        method: "POST",
+        body: new FormData(event.target)
+      })
+      /** @type {Branch} */
+      const newBranch = response.branch
+      reloadThenToast({
+        type: "success",
+        message: `${newBranch.name || 'Branch'} created successfully`
+      })
+    } catch (error) {
+      toast({
+        type: "error",
+        message: error.errors || "Failed to create branch"
+      })
+    }
   }
 
   modalHTML() {
     const fields = `
       <div class="space-y-6">
-        <h2 class="text-xl font-bold text-slate-900 dark:text-white">New Employee</h2>
+        <h2 class="text-xl font-bold text-slate-900 dark:text-white">New Branch</h2>
         
         <div class="grid grid-cols-2 gap-4">
           <div class="col-span-2 space-y-1">
-            <label class="text-[10px] font-bold text-slate-400 dark:text-slate-300 uppercase">Full Name</label>
-            <input type="text" name="employee[name]" required placeholder="e.g. John Doe"
+            <label class="text-[10px] font-bold text-slate-400 dark:text-slate-300 uppercase">Branch Name</label>
+            <input type="text" name="branch[name]" required placeholder="e.g. Main Street Store"
               class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-sm">
           </div>
         </div>
@@ -80,17 +102,17 @@ export default class Companies_Employees_NewModalController extends Controller {
           </button>
           <button type="submit" 
             class="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-bold text-sm">
-            Save Employee
+            Save Branch
           </button>
         </div>
       </div>
     `
 
     return form({
-      action: pathname(),
-      method: "POST",
-      dataAction: `submit->form#submit`,
-      className: "p-8 bg-white dark:bg-slate-900 rounded-2xl w-[500px] shadow-2xl",
+      attributes: `
+        class="p-8 bg-white dark:bg-slate-900 rounded-2xl w-[500px] shadow-2xl"
+        data-action="submit->${this.identifier}#handleSubmit"
+      `,
       html: fields
     })
   }
@@ -104,8 +126,10 @@ export default class Companies_Employees_NewModalController extends Controller {
 | `extends Controller` | Not a layout controller — standalone |
 | `connect()` lifecycle | Renders content when modal opens |
 | `this.element.innerHTML = ...` | Injects HTML into the empty div |
-| `this.modalHTML()` method | Returns the full modal UI |
-| `form({ ... })` helper | Wraps fields in form with CSRF |
+| `handleSubmit(event)` | Intercepts form submission, uses `fetchJson` + `new FormData(event.target)` |
+| `reloadThenToast()` | **Success** — reloads the page so the new record appears (never `closeModal()`) |
+| `toast()` | **Error only** — keeps modal open so user can retry |
+| `form({ attributes, html })` | Uses `attributes` (not `dataAction`/`className`) with `submit->${this.identifier}#handleSubmit` |
 
 ## Step 3: Show Modal (View-Only)
 
@@ -220,14 +244,14 @@ form({
 | Wrong | Correct |
 |-------|---------|
 | `className: "p-8 ..."` | `attributes: \`class="p-8 ..."\`` |
-| `dataAction: "submit->form#submit"` | `attributes: \`data-action="submit->form#submit"\`` |
+| `dataAction: "submit->form#submit"` | `attributes: \`data-action="submit->${this.identifier}#handleSubmit"\`` |
 
 ### Important Notes
 
 1. Use `attributes` keyword parameter (not `className`, not `dataAction`)
 2. Combine all attributes in one string with backticks
-3. Include `data-action` for form submission handling
-4. Use `submit->form#submit` to let FormController handle the submission
+3. Include `data-action` for form submission pointing to your controller's method
+4. Use `${this.identifier}` to dynamically match the controller identifier
 
 ## Button Hookup in contentHTML
 

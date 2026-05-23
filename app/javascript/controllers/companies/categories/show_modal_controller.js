@@ -95,46 +95,47 @@ export default class Companies_Categories_ShowModalController extends Controller
 
   renderPropertyFields(category) {
     const sections = []
+    const mapping = category.property_mapping || {}
 
     const stringFields = []
     for (let i = 1; i <= 20; i++) {
       const key = `property_string_${i}`
-      const label = category[key] || `String ${i} (Label)`
+      const label = mapping[key] || `String ${i} (Label)`
       stringFields.push(this.renderField(category, key, label, 'text'))
     }
 
     const textFields = []
     for (let i = 1; i <= 5; i++) {
       const key = `property_text_${i}`
-      const label = category[key] || `Text ${i} (Label)`
+      const label = mapping[key] || `Text ${i} (Label)`
       textFields.push(this.renderField(category, key, label, 'textarea'))
     }
 
     const integerFields = []
     for (let i = 1; i <= 20; i++) {
       const key = `property_integer_${i}`
-      const label = category[key] || `Integer ${i} (Label)`
+      const label = mapping[key] || `Integer ${i} (Label)`
       integerFields.push(this.renderField(category, key, label, 'number'))
     }
 
     const decimalFields = []
     for (let i = 1; i <= 10; i++) {
       const key = `property_decimal_${i}`
-      const label = category[key] || `Decimal ${i} (Label)`
+      const label = mapping[key] || `Decimal ${i} (Label)`
       decimalFields.push(this.renderField(category, key, label, 'decimal'))
     }
 
     const booleanFields = []
     for (let i = 1; i <= 20; i++) {
       const key = `property_boolean_${i}`
-      const label = category[key] || `Boolean ${i} (Label)`
+      const label = mapping[key] || `Boolean ${i} (Label)`
       booleanFields.push(this.renderField(category, key, label, 'boolean'))
     }
 
     const datetimeFields = []
     for (let i = 1; i <= 10; i++) {
       const key = `property_datetime_${i}`
-      const label = category[key] || `DateTime ${i} (Label)`
+      const label = mapping[key] || `DateTime ${i} (Label)`
       datetimeFields.push(this.renderField(category, key, label, 'datetime'))
     }
 
@@ -196,7 +197,8 @@ export default class Companies_Categories_ShowModalController extends Controller
   }
 
   renderField(category, key, label, type) {
-    const value = category[key]
+    const mapping = category.property_mapping || {}
+    const value = mapping[key]
 
     if (type === 'boolean') {
       const boolValue = value === true || value === 'true'
@@ -209,12 +211,12 @@ export default class Companies_Categories_ShowModalController extends Controller
             ${!hasValue ? '<span class="text-[10px] text-slate-400 italic">Click to set value</span>' : ''}
           </div>
           ${editable({
-            dispatch: "updateCategory",
-            resource: "category",
+            dispatch: "updatePropertyMapping",
+            resource: "property_mapping",
             name: key,
-            id: category.id,
+            id: (mapping.id || ''),
             value: boolValue ? 'true' : 'false',
-            url: Helpers.edit_company_category_path(currentCompany().id, category.id),
+            url: Helpers.edit_company_property_mapping_path(currentCompany().id, (mapping.id || '')),
             type: "select",
             options: [
               { name: "True", value: "true" },
@@ -236,12 +238,12 @@ export default class Companies_Categories_ShowModalController extends Controller
       <div class="p-3 bg-slate-50 dark:bg-slate-800 rounded-lg ${!hasValue ? 'opacity-60' : ''}">
         <label class="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase mb-1 block">${label}</label>
         ${editable({
-          dispatch: "updateCategory",
-          resource: "category",
+          dispatch: "updatePropertyMapping",
+          resource: "property_mapping",
           name: key,
-          id: category.id,
+          id: (mapping.id || ''),
           value: value || '',
-          url: Helpers.edit_company_category_path(currentCompany().id, category.id),
+          url: Helpers.edit_company_property_mapping_path(currentCompany().id, (mapping.id || '')),
           type: type === 'textarea' ? 'text' : inputType,
           html: type === 'textarea'
             ? `<p class="text-sm text-slate-600 dark:text-slate-300 whitespace-pre-wrap">${displayValue}</p>`
