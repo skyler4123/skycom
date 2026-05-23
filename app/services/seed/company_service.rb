@@ -1,6 +1,6 @@
 class Seed::CompanyService
   RESOURCE_NAMES = {
-    retail: %w[Product Order Customer Employee Branch Department PolicyAppointment Invoice Payment Service],
+    retail: %w[Product Order Customer Employee Branch Department PolicyAppointment Invoice Payment Service Category PropertyMapping],
     restaurant: %w[Product Order Customer Employee Branch Department PolicyAppointment Invoice Payment Service Table Reservation],
     hotel: %w[Product Order Customer Employee Branch Department PolicyAppointment Invoice Payment Service Room Booking Guest],
     hospital: %w[Product Order Customer Employee Branch Department PolicyAppointment Invoice Payment Service Patient Appointment],

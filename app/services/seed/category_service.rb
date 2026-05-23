@@ -26,15 +26,7 @@ class Seed::CategoryService
     )
     category.save!
 
-    if properties.present?
-      PropertyMapping.create!(
-        company: company,
-        category: category,
-        resource_name: resource_name,
-        name: "#{name} mappings",
-        **properties
-      )
-    end
+    category.property_mapping.update!(**properties) if properties.present?
 
     category
   end

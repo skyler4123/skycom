@@ -43,6 +43,7 @@ class Company < ApplicationRecord
   has_many :payment_methods, through: :payment_method_appointments
   has_many :statistics, as: :owner
   has_many :categories, dependent: :destroy
+  has_many :property_mappings, dependent: :destroy
   has_many :subscription_plans, dependent: :destroy
   has_many :departments, dependent: :destroy
 
@@ -73,7 +74,7 @@ class Company < ApplicationRecord
   }
 
   DEFAULT_RESOURCE_NAMES = {
-    retail: %w[Product Order Customer Employee Branch Department PolicyAppointment Invoice Payment Service],
+    retail: %w[Product Order Customer Employee Branch Department PolicyAppointment Invoice Payment Service Category PropertyMapping],
     restaurant: %w[Product Order Customer Employee Branch Department PolicyAppointment Invoice Payment Service Table Reservation],
     hotel: %w[Product Order Customer Employee Branch Department PolicyAppointment Invoice Payment Service Room Booking Guest],
     hospital: %w[Product Order Customer Employee Branch Department PolicyAppointment Invoice Payment Service Patient Appointment],

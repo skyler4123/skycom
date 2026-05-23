@@ -45,6 +45,7 @@ Rails.application.routes.draw do
       resources :permissions
       resources :policies
       resources :policy_appointments
+      resources :property_mappings, only: [ :create, :update, :show, :destroy ]
     end
   end
 

@@ -39,6 +39,9 @@ export const company_categories_path = (companyId) => `/companies/${companyId}/c
 export const create_company_categories_path = (companyId) => `/companies/${companyId}/categories`
 export const edit_company_category_path = (companyId, categoryId) => `/companies/${companyId}/categories/${categoryId}`
 
+export const company_property_mappings_path = (companyId) => `/companies/${companyId}/property_mappings`
+export const edit_company_property_mapping_path = (companyId, mappingId) => `/companies/${companyId}/property_mappings/${mappingId}`
+
 export const company_products_path = (companyId) => `/companies/${companyId}/products`
 export const create_company_products_path = (companyId) => `/companies/${companyId}/products`
 export const edit_company_product_path = (companyId, productId) => `/companies/${companyId}/products/${productId}`
