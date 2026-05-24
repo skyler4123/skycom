@@ -352,8 +352,6 @@ class Seed::RetailService
     }
   }.freeze
 
-  RESOURCES = %w[Order Product Employee Customer PolicyAppointment Booking Service Category PropertyMapping TableConfig Brand Facility]
-
   # An array of popular company/brand names for seeding.
   POPULAR_BRANDS = [
     "Apple", "Samsung", "Google", "Microsoft", "Amazon", "Facebook", "Tesla",
@@ -844,7 +842,7 @@ class Seed::RetailService
   def create_all_crud_policies
     crud_actions = %w[create read update delete]
 
-    RESOURCES.each do |resource|
+    @retail.resource_names.each do |resource|
       crud_actions.each do |action|
         create_policy(resource: resource, action: action)
       end

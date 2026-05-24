@@ -74,19 +74,19 @@ class Company < ApplicationRecord
     september: 9, october: 10, november: 11, december: 12
   }
 
-  DEFAULT_RESOURCE_NAMES = {
-    retail: %w[Product Order Customer Employee Branch Department PolicyAppointment Invoice Payment Service Category PropertyMapping Brand Facility],
-    restaurant: %w[Product Order Customer Employee Branch Department PolicyAppointment Invoice Payment Service Table Reservation],
-    hotel: %w[Product Order Customer Employee Branch Department PolicyAppointment Invoice Payment Service Room Booking Guest],
-    hospital: %w[Product Order Customer Employee Branch Department PolicyAppointment Invoice Payment Service Patient Appointment],
-    education: %w[Product Order Customer Employee Branch Department PolicyAppointment Invoice Payment Service Course Student Exam],
-    fitness: %w[Product Order Customer Employee Branch Department PolicyAppointment Invoice Payment Service Membership Booking]
-  }.freeze
+  DEFAULT_RESOURCE_NAMES = %w[
+    Product Order Customer Employee Branch Department
+    PolicyAppointment Invoice Payment Service
+    Category PropertyMapping Brand Facility
+    Table Reservation Room Booking Guest
+    Patient Appointment Course Student Exam
+    Membership
+  ].freeze
 
   before_validation :set_default_resource_names, if: -> { resource_names.blank? && business_type.present? }
 
   def set_default_resource_names
-    self.resource_names = DEFAULT_RESOURCE_NAMES[business_type.to_sym] || DEFAULT_RESOURCE_NAMES[:retail]
+    self.resource_names = DEFAULT_RESOURCE_NAMES
   end
 
   # --- Validations ---
