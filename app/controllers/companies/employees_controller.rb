@@ -11,6 +11,7 @@ class Companies::EmployeesController < Companies::ApplicationController
         scope = scope.where(roles: { id: params[:role_id] }) if params[:role_id].present?
         scope = scope.where(business_type: params[:business_type]) if params[:business_type].present?
         scope = scope.where(workflow_status: params[:workflow_status]) if params[:workflow_status].present?
+        scope = scope.where(category_id: params[:category_id]) if params[:category_id].present?
 
         @pagy, @employees_results = pagy(:offset, scope, jsonapi: true)
         # 2. Always provide filter options so the form stays populated
@@ -124,7 +125,8 @@ class Companies::EmployeesController < Companies::ApplicationController
     employees.map do |employee|
       employee.as_json(include: { user: { only: :email }, branch: { only: [ :id, :name ] } }).merge(
         roles: employee.roles.map { |r| { id: r.id, name: r.name } },
-        departments: employee.departments.map { |d| { id: d.id, name: d.name } }
+        departments: employee.departments.map { |d| { id: d.id, name: d.name } },
+        category: employee.category&.as_json(only: [ :id, :name ])
       )
     end
   end

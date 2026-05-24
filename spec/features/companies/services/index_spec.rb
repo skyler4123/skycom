@@ -82,6 +82,19 @@ RSpec.feature "Companies::Services Management", type: :feature, js: true do
 
 
 
+  scenario "filter by category updates URL and filters table" do
+    category = Seed::CategoryService.create(company: company, name: "Test Category", resource_name: "services")
+    service.update!(category: category)
+    visit company_services_path(company)
+    expect(page).to have_selector('table', wait: 10)
+
+    select(category.name, from: 'category_id')
+    click_button "Search"
+
+    expect(page).to have_current_path(/category_id=#{category.id}/)
+    expect(page).to have_selector('tbody tr', wait: 10)
+  end
+
   scenario "filter by workflow status updates URL and filters table" do
     service2.update!(workflow_status: :pending)
     visit company_services_path(company)

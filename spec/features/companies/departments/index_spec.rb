@@ -78,6 +78,19 @@ RSpec.feature "Companies::Departments Management", type: :feature, js: true do
     expect(page).to have_selector('tbody tr', wait: 10)
   end
 
+  scenario "filter by category updates URL and filters table" do
+    category = Seed::CategoryService.create(company: company, name: "Test Category", resource_name: "departments")
+    department.update!(category: category)
+    visit company_departments_path(company)
+    expect(page).to have_selector('table', wait: 10)
+
+    select(category.name, from: 'category_id')
+    click_button "Search"
+
+    expect(page).to have_current_path(/category_id=#{category.id}/)
+    expect(page).to have_selector('tbody tr', wait: 10)
+  end
+
   scenario "filter by business type updates URL and filters table" do
     visit company_departments_path(company)
     expect(page).to have_selector('table', wait: 10)

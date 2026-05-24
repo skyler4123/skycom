@@ -8,6 +8,7 @@ class Companies::BranchesController < Companies::ApplicationController
         scope = current_company.branches
         scope = scope.where(business_type: params[:business_type]) if params[:business_type].present?
         scope = scope.where(workflow_status: params[:workflow_status]) if params[:workflow_status].present?
+        scope = scope.where(category_id: params[:category_id]) if params[:category_id].present?
 
         @pagy, @branches_results = pagy(:offset, scope, jsonapi: true)
 
@@ -78,6 +79,7 @@ class Companies::BranchesController < Companies::ApplicationController
       updated_at: branch.updated_at
     }
     result[:address] = branch.address.as_json(only: [ :line_1, :line_2, :city, :state_or_province, :postal_code, :country_code ]) if branch.address
+    result[:category] = branch.category&.as_json(only: [ :id, :name ])
     result
   end
 
