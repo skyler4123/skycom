@@ -19,6 +19,7 @@ Rails.application.routes.draw do
       resources :departments
       resources :categories
       resources :products
+      resources :brands
       resources :services
       resources :orders
       resources :bookings

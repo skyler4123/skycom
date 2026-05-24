@@ -352,7 +352,7 @@ class Seed::RetailService
     }
   }.freeze
 
-  RESOURCES = %w[Order Product Employee Customer PolicyAppointment Booking Service Order Category PropertyMapping TableConfig]
+  RESOURCES = %w[Order Product Employee Customer PolicyAppointment Booking Service Category PropertyMapping TableConfig Brand Facility]
 
   # An array of popular company/brand names for seeding.
   POPULAR_BRANDS = [
@@ -879,7 +879,9 @@ class Seed::RetailService
         "Customer" => { create: true, read: true, update: true, delete: true },
         "Category" => { create: true, read: true, update: true, delete: true },
         "PropertyMapping" => { create: true, read: true, update: true, delete: true },
-        "PolicyAppointment" => { create: true, read: true, update: true, delete: false }
+        "PolicyAppointment" => { create: true, read: true, update: true, delete: false },
+        "Brand" => { create: true, read: true, update: true, delete: true },
+        "Facility" => { create: true, read: true, update: true, delete: true }
       },
       Manager: {
         "Order" => { create: true, read: true, update: true, delete: true },
@@ -888,17 +890,21 @@ class Seed::RetailService
         "Customer" => { create: true, read: true, update: true, delete: true },
         "Category" => { create: true, read: true, update: true, delete: true },
         "PropertyMapping" => { create: true, read: true, update: true, delete: true },
-        "PolicyAppointment" => { create: false, read: true, update: false, delete: false }
+        "PolicyAppointment" => { create: false, read: true, update: false, delete: false },
+        "Brand" => { create: true, read: true, update: true, delete: true },
+        "Facility" => { create: true, read: true, update: true, delete: true }
       },
       Cashier: {
         "Order" => { create: true, read: true, update: true, delete: false },
         "Product" => { create: false, read: true, update: false, delete: false },
-        "Customer" => { create: true, read: true, update: false, delete: false }
+        "Customer" => { create: true, read: true, update: false, delete: false },
+        "Brand" => { create: false, read: true, update: false, delete: false }
       },
       Seller: {
         "Order" => { create: true, read: true, update: false, delete: false },
         "Product" => { create: false, read: true, update: false, delete: false },
-        "Customer" => { create: false, read: true, update: false, delete: false }
+        "Customer" => { create: false, read: true, update: false, delete: false },
+        "Brand" => { create: false, read: true, update: false, delete: false }
       },
       Security: {
         "Product" => { create: false, read: true, update: false, delete: false },
@@ -907,15 +913,19 @@ class Seed::RetailService
       Doctor: {
         "Order" => { read: true, update: true },
         "Booking" => { create: true, read: true, update: true },
-        "Service" => { read: true }
+        "Service" => { read: true },
+        "Brand" => { create: false, read: true, update: false, delete: false },
+        "Facility" => { create: true, read: true, update: true, delete: false }
       },
       Therapist: {
         "Booking" => { read: true, update: true },
-        "Order" => { read: true }
+        "Order" => { read: true },
+        "Facility" => { create: false, read: true, update: false, delete: false }
       },
       Consultant: {
         "Customer" => { create: true, read: true, update: true },
-        "Order" => { create: true, read: true }
+        "Order" => { create: true, read: true },
+        "Brand" => { create: false, read: true, update: false, delete: false }
       }
     }
 

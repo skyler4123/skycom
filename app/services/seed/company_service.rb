@@ -1,11 +1,11 @@
 class Seed::CompanyService
   RESOURCE_NAMES = {
-    retail: %w[Product Order Customer Employee Branch Department PolicyAppointment Invoice Payment Service Category PropertyMapping],
-    restaurant: %w[Product Order Customer Employee Branch Department PolicyAppointment Invoice Payment Service Table Reservation],
-    hotel: %w[Product Order Customer Employee Branch Department PolicyAppointment Invoice Payment Service Room Booking Guest],
-    hospital: %w[Product Order Customer Employee Branch Department PolicyAppointment Invoice Payment Service Patient Appointment],
-    education: %w[Product Order Customer Employee Branch Department PolicyAppointment Invoice Payment Service Course Student Exam],
-    fitness: %w[Product Order Customer Employee Branch Department PolicyAppointment Invoice Payment Service Membership Booking]
+    retail: %w[Product Order Customer Employee Branch Department PolicyAppointment Invoice Payment Service Category PropertyMapping Brand Facility],
+    restaurant: %w[Product Order Customer Employee Branch Department PolicyAppointment Invoice Payment Service Table Reservation Brand Facility],
+    hotel: %w[Product Order Customer Employee Branch Department PolicyAppointment Invoice Payment Service Room Booking Guest Brand Facility],
+    hospital: %w[Product Order Customer Employee Branch Department PolicyAppointment Invoice Payment Service Patient Appointment Brand Facility],
+    education: %w[Product Order Customer Employee Branch Department PolicyAppointment Invoice Payment Service Course Student Exam Brand Facility],
+    fitness: %w[Product Order Customer Employee Branch Department PolicyAppointment Invoice Payment Service Membership Booking Brand Facility]
   }.freeze
 
   def self.new(
