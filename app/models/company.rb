@@ -1,6 +1,13 @@
 class Company < ApplicationRecord
   attribute :permission_resource_name, :string, default: -> { self.name }
-  attribute :resource_names, :string, array: true, default: []
+  attribute :resource_names, :string, array: true, default: %w[
+    Product Order Customer Employee Branch Department
+    PolicyAppointment Invoice Payment Service
+    Category PropertyMapping Brand Facility
+    Table Reservation Room Booking Guest
+    Patient Appointment Course Student Exam
+    Membership
+  ]
 
   include AddressConcern
   include Cache::RecordsConcern
@@ -73,21 +80,6 @@ class Company < ApplicationRecord
     may: 5, june: 6, july: 7, august: 8,
     september: 9, october: 10, november: 11, december: 12
   }
-
-  DEFAULT_RESOURCE_NAMES = %w[
-    Product Order Customer Employee Branch Department
-    PolicyAppointment Invoice Payment Service
-    Category PropertyMapping Brand Facility
-    Table Reservation Room Booking Guest
-    Patient Appointment Course Student Exam
-    Membership
-  ].freeze
-
-  before_validation :set_default_resource_names, if: -> { resource_names.blank? && business_type.present? }
-
-  def set_default_resource_names
-    self.resource_names = DEFAULT_RESOURCE_NAMES
-  end
 
   # --- Validations ---
   validates :name, presence: true, uniqueness: { scope: :user_id }, length: { maximum: 255 }
