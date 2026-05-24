@@ -6,6 +6,13 @@ on:
   push:
     branches: [ main ]
 
+# --- The Usage Saver Configuration ---
+# 1. Group jobs by workflow name + Git reference (branch/PR target).
+# 2. cancel-in-progress: true will instantly kill any older active workflow in this group.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+  
 jobs:
   scan_ruby:
     runs-on: ubuntu-latest

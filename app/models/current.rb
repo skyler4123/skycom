@@ -6,7 +6,6 @@ class Current < ActiveSupport::CurrentAttributes
 
   # ------------------------------------------------------------------------
   attribute :company_id
-  attribute :cached_versions_store
 
   # company_owner is User
   def self.company_owner
@@ -25,11 +24,6 @@ class Current < ActiveSupport::CurrentAttributes
 
   def self.branches
     company&.branches
-  end
-
-  def self.cached_version
-    # Use the attribute to memoize within the request
-    self.cached_versions_store ||= company.cached_version.attributes
   end
   # ------------------------------------------------------------------------
 end

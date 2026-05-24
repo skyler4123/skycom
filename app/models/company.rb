@@ -1,6 +1,13 @@
 class Company < ApplicationRecord
   attribute :permission_resource_name, :string, default: -> { self.name }
-  attribute :resource_names, :string, array: true, default: []
+  attribute :resource_names, :string, array: true, default: %w[
+    Product Order Customer Employee Branch Department
+    PolicyAppointment Invoice Payment Service
+     Category PropertyMapping Brand Facility
+     Table Reservation Room Guest
+    Patient Appointment Course Student Exam
+    Membership
+  ]
 
   include AddressConcern
   include Cache::RecordsConcern
@@ -11,9 +18,6 @@ class Company < ApplicationRecord
 
   belongs_to :user
 
-  has_one :cached_version, dependent: :destroy
-
-  has_many :company_configs, dependent: :destroy
   has_many :property_mappings, dependent: :destroy
   has_many :table_configs, dependent: :destroy
   has_many :brands, dependent: :destroy
@@ -74,21 +78,6 @@ class Company < ApplicationRecord
     september: 9, october: 10, november: 11, december: 12
   }
 
-  DEFAULT_RESOURCE_NAMES = {
-    retail: %w[Product Order Customer Employee Branch Department PolicyAppointment Invoice Payment Service Category PropertyMapping Brand Facility],
-    restaurant: %w[Product Order Customer Employee Branch Department PolicyAppointment Invoice Payment Service Table Reservation],
-    hotel: %w[Product Order Customer Employee Branch Department PolicyAppointment Invoice Payment Service Room Booking Guest],
-    hospital: %w[Product Order Customer Employee Branch Department PolicyAppointment Invoice Payment Service Patient Appointment],
-    education: %w[Product Order Customer Employee Branch Department PolicyAppointment Invoice Payment Service Course Student Exam],
-    fitness: %w[Product Order Customer Employee Branch Department PolicyAppointment Invoice Payment Service Membership Booking]
-  }.freeze
-
-  before_validation :set_default_resource_names, if: -> { resource_names.blank? && business_type.present? }
-
-  def set_default_resource_names
-    self.resource_names = DEFAULT_RESOURCE_NAMES[business_type.to_sym] || DEFAULT_RESOURCE_NAMES[:retail]
-  end
-
   # --- Validations ---
   validates :name, presence: true, uniqueness: { scope: :user_id }, length: { maximum: 255 }
   validates :description, length: { maximum: 5000 }, allow_blank: true
@@ -113,7 +102,6 @@ class Company < ApplicationRecord
   # validates :fiscal_year_end_month, presence: true, numericality: { in: 1..12 }
 
   after_create :setup_owner_records
-  after_create :initialize_cached_version
 
   def create_first_cloned_company
     return if branches.size > 1
@@ -171,15 +159,5 @@ class Company < ApplicationRecord
     )
   end
 
-  def company_static
-    company_statics.first
-  end
-
   private
-
-  def initialize_cached_version
-    # create_cached_version! is a helper method provided by has_one
-    # It automatically sets the company_id for you.
-    create_cached_version!
-  end
 end

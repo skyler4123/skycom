@@ -1,13 +1,4 @@
 class Seed::CompanyService
-  RESOURCE_NAMES = {
-    retail: %w[Product Order Customer Employee Branch Department PolicyAppointment Invoice Payment Service Category PropertyMapping Brand Facility],
-    restaurant: %w[Product Order Customer Employee Branch Department PolicyAppointment Invoice Payment Service Table Reservation Brand Facility],
-    hotel: %w[Product Order Customer Employee Branch Department PolicyAppointment Invoice Payment Service Room Booking Guest Brand Facility],
-    hospital: %w[Product Order Customer Employee Branch Department PolicyAppointment Invoice Payment Service Patient Appointment Brand Facility],
-    education: %w[Product Order Customer Employee Branch Department PolicyAppointment Invoice Payment Service Course Student Exam Brand Facility],
-    fitness: %w[Product Order Customer Employee Branch Department PolicyAppointment Invoice Payment Service Membership Booking Brand Facility]
-  }.freeze
-
   def self.new(
     user:,
     email: "company_#{SecureRandom.hex}@gmail.com",
@@ -29,7 +20,6 @@ class Seed::CompanyService
     phone_number: Faker::PhoneNumber.phone_number,
     website: Faker::Internet.url,
     fiscal_year_end_month: Company.fiscal_year_end_months.keys.sample,
-    resource_names: RESOURCE_NAMES[business_type] || RESOURCE_NAMES[:retail],
     discarded_at: nil
   )
     Company.new(
@@ -53,7 +43,6 @@ class Seed::CompanyService
       phone_number: phone_number,
       website: website,
       fiscal_year_end_month: fiscal_year_end_month,
-      resource_names: resource_names,
       discarded_at: discarded_at
     )
   end
