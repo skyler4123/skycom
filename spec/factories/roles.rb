@@ -4,15 +4,10 @@ FactoryBot.define do
     association :company
     name { Faker::Job.title }
 
-    transient do
-      role_business_type { nil }
-    end
-
     initialize_with do
       Seed::RoleService.new(
         company: company,
-        name: name,
-        business_type: role_business_type
+        name: name
       )
     end
   end
