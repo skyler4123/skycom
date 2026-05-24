@@ -56,13 +56,6 @@ export const dictionary = () => {
       de: "Mitarbeiter",
       vi: "Nhân viên",
     },
-    "Bookings": {
-      en: "Bookings",
-      es: "Reservas",
-      fr: "Réservations",
-      de: "Buchungen",
-      vi: "Đặt chỗ",
-    },
     "Payments": {
       en: "Payments",
       es: "Pagos",

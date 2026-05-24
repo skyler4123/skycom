@@ -3,8 +3,8 @@ class Company < ApplicationRecord
   attribute :resource_names, :string, array: true, default: %w[
     Product Order Customer Employee Branch Department
     PolicyAppointment Invoice Payment Service
-    Category PropertyMapping Brand Facility
-    Table Reservation Room Booking Guest
+     Category PropertyMapping Brand Facility
+     Table Reservation Room Guest
     Patient Appointment Course Student Exam
     Membership
   ]
@@ -20,7 +20,6 @@ class Company < ApplicationRecord
 
   has_one :cached_version, dependent: :destroy
 
-  has_many :company_configs, dependent: :destroy
   has_many :property_mappings, dependent: :destroy
   has_many :table_configs, dependent: :destroy
   has_many :brands, dependent: :destroy
@@ -161,10 +160,6 @@ class Company < ApplicationRecord
       workflow_status: :active,
       business_type: :owner
     )
-  end
-
-  def company_static
-    company_statics.first
   end
 
   private

@@ -8,7 +8,7 @@ class ClientCacheController < ApplicationController
       format.json do
         render json: {
           user: current_user.as_json,
-          companies: current_user.accessible_companies.as_json(include: [ :branches, :departments, :roles, :company_configs, :categories, :property_mappings, :table_configs ]),
+          companies: current_user.accessible_companies.as_json(include: [ :branches, :departments, :roles, :categories, :property_mappings, :table_configs ]),
           enums: {
             employee: {
               lifecycle_statuses: Employee.lifecycle_statuses.keys.map { |s| { name: s.humanize, value: s } },
@@ -55,10 +55,6 @@ class ClientCacheController < ApplicationController
               workflow_statuses: Order.workflow_statuses.keys.map { |s| { name: s.humanize, value: s } },
               business_types: Order.business_types.keys.map { |t| { name: t.humanize, value: t } },
               currency_codes: Order.currency_codes.keys.map { |c| { name: c.humanize, value: c } }
-            },
-            booking: {
-              lifecycle_statuses: LIFECYCLE_STATUS.keys.map { |s| { name: s.to_s.humanize, value: s.to_s } },
-              workflow_statuses: WORKFLOW_STATUS.keys.map { |s| { name: s.to_s.humanize, value: s.to_s } }
             },
             customer: {
               lifecycle_statuses: Customer.lifecycle_statuses.keys.map { |s| { name: s.humanize, value: s } },

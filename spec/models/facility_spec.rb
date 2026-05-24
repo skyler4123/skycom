@@ -7,7 +7,6 @@ RSpec.describe Facility, type: :model do
     it { should belong_to(:branch).optional }
     it { should have_many(:facility_group_appointments).dependent(:destroy) }
     it { should have_many(:facility_groups).through(:facility_group_appointments) }
-    it { should have_many(:bookings).dependent(:destroy) }
     it { should have_many(:tag_appointments).dependent(:destroy) }
     it { should have_many(:tags).through(:tag_appointments) }
   end

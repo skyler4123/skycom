@@ -406,7 +406,6 @@ class Seed::RetailService
     create_inventory
     create_warehouses_for_branches
     create_stocks_for_products
-    setup_clinic_bookings
     create_stock_transfers
     create_stock_imports
     create_stock_exports
@@ -709,41 +708,6 @@ class Seed::RetailService
     end
   end
 
-  def setup_clinic_bookings
-    puts "Setting up clinic resources and sample bookings..."
-    @branches.each do |branch|
-      # Create physical resources (Rooms/Machines)
-      branch_resources = CLINIC_FACILITIES.map do |res_name|
-        Seed::FacilityService.create(
-          company: @retail,
-          branch: branch,
-          name: "#{branch.name} - #{res_name}")
-      end
-
-      # Create some sample bookings
-      doctors = @employees.select { |e| e.branch_id == branch.id && e.user.metadata["role"] == "Doctor" }
-      customers = @customers.select { |c| c.branch_id == branch.id }
-      services = @services.select { |s| s.branch_id == branch.id }
-
-      3.times do |i|
-        next if doctors.empty? || customers.empty?
-
-        Seed::BookingService.create(
-          company: @retail,
-          branch: branch,
-          booking_resource: branch_resources.sample,
-          appoint_from: doctors.sample,   # Performed by Doctor
-          appoint_to: customers.sample,   # For Customer
-          appoint_for: services.sample,    # The Service
-          appoint_by: @employees.sample,   # Booked by Staff
-          name: "Clinic Appointment ##{i+1}",
-          lifecycle_status: :active,
-          workflow_status: :confirmed
-        )
-      end
-    end
-  end
-
   def create_stock_transfers
     @warehouses.each do |warehouse|
       warehouse_products = @products.select { |p| p.branch_id == warehouse.branch_id }
@@ -910,13 +874,11 @@ class Seed::RetailService
       },
       Doctor: {
         "Order" => { read: true, update: true },
-        "Booking" => { create: true, read: true, update: true },
         "Service" => { read: true },
         "Brand" => { create: false, read: true, update: false, delete: false },
         "Facility" => { create: true, read: true, update: true, delete: false }
       },
       Therapist: {
-        "Booking" => { read: true, update: true },
         "Order" => { read: true },
         "Facility" => { create: false, read: true, update: false, delete: false }
       },

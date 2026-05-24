@@ -35,8 +35,6 @@ class Employee < ApplicationRecord
   has_many :tag_appointments, dependent: :destroy, as: :appoint_to
   has_many :tags, through: :tag_appointments
 
-  has_many :bookings, as: :appoint_from, dependent: :destroy
-
   # --- Enums ---
   enum :business_type, {
     owner: 0,

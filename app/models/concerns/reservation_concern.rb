@@ -33,7 +33,7 @@ module ReservationConcern
     Rails.cache.fetch(cache_key) { db_reservation }
   end
 
-  # Setter: Primary entry point for attaching a reservation via code
+  # Setter: Primary entry point for attaching a reservation
   def reservation=(code)
     return if code.blank?
     attach_reservation(code)

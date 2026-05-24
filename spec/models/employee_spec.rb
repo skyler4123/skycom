@@ -16,7 +16,6 @@ RSpec.describe Employee, type: :model do
     it { should have_many(:departments).through(:department_appointments) }
     it { should have_many(:tag_appointments).dependent(:destroy) }
     it { should have_many(:tags).through(:tag_appointments) }
-    it { should have_many(:bookings).dependent(:destroy) }
   end
 
   describe "validations" do

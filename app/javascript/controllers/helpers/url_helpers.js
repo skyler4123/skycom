@@ -67,10 +67,6 @@ export const company_orders_path = (companyId) => `/companies/${companyId}/order
 export const create_company_orders_path = (companyId) => `/companies/${companyId}/orders`
 export const edit_company_order_path = (companyId, orderId) => `/companies/${companyId}/orders/${orderId}`
 
-export const company_bookings_path = (companyId) => `/companies/${companyId}/bookings`
-export const create_company_bookings_path = (companyId) => `/companies/${companyId}/bookings`
-export const edit_company_booking_path = (companyId, bookingId) => `/companies/${companyId}/bookings/${bookingId}`
-
 export const company_permissions_path = (companyId) => `/companies/${companyId}/permissions`
 export const edit_company_permission_path = (companyId, permissionId) => `/companies/${companyId}/permissions/${permissionId}`
 
