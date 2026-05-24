@@ -51,7 +51,12 @@ export const edit_company_service_path = (companyId, serviceId) => `/companies/$
 export const company_customers_path = (companyId) => `/companies/${companyId}/customers`
 export const create_company_customers_path = (companyId) => `/companies/${companyId}/customers`
 export const edit_company_customer_path = (companyId, customerId) => `/companies/${companyId}/customers/${customerId}`
+export const company_brands_path = (companyId) => `/companies/${companyId}/brands`
+export const create_company_brands_path = (companyId) => `/companies/${companyId}/brands`
+export const edit_company_brand_path = (companyId, brandId) => `/companies/${companyId}/brands/${brandId}`
 export const company_facilities_path = (companyId) => `/companies/${companyId}/facilities`
+export const create_company_facilities_path = (companyId) => `/companies/${companyId}/facilities`
+export const edit_company_facility_path = (companyId, facilityId) => `/companies/${companyId}/facilities/${facilityId}`
 
 export const company_employees_path = (companyId) => `/companies/${companyId}/employees`
 export const create_company_employees_path = (companyId) => `/companies/${companyId}/employees`
