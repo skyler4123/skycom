@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_05_24_134844) do
+ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pgcrypto"
@@ -531,45 +531,6 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_24_134844) do
     t.index ["email"], name: "index_brands_on_email", unique: true
     t.index ["lifecycle_status"], name: "index_brands_on_lifecycle_status"
     t.index ["workflow_status"], name: "index_brands_on_workflow_status"
-  end
-
-  create_table "cached_versions", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
-    t.uuid "company_id", null: false
-    t.integer "branches_cached_version", default: 0
-    t.integer "departments_cached_version", default: 0
-    t.integer "employee_groups_cached_version", default: 0
-    t.integer "employees_cached_version", default: 0
-    t.integer "customer_groups_cached_version", default: 0
-    t.integer "customers_cached_version", default: 0
-    t.integer "brands_cached_version", default: 0
-    t.integer "product_groups_cached_version", default: 0
-    t.integer "products_cached_version", default: 0
-    t.integer "warehouses_cached_version", default: 0
-    t.integer "stocks_cached_version", default: 0
-    t.integer "stock_transfers_cached_version", default: 0
-    t.integer "stock_imports_cached_version", default: 0
-    t.integer "stock_exports_cached_version", default: 0
-    t.integer "service_groups_cached_version", default: 0
-    t.integer "services_cached_version", default: 0
-    t.integer "order_groups_cached_version", default: 0
-    t.integer "orders_cached_version", default: 0
-    t.integer "cart_groups_cached_version", default: 0
-    t.integer "carts_cached_version", default: 0
-    t.integer "purchases_cached_version", default: 0
-    t.integer "purchase_items_cached_version", default: 0
-    t.integer "invoices_cached_version", default: 0
-    t.integer "payments_cached_version", default: 0
-    t.integer "facility_groups_cached_version", default: 0
-    t.integer "facilities_cached_version", default: 0
-    t.integer "project_groups_cached_version", default: 0
-    t.integer "projects_cached_version", default: 0
-    t.integer "task_groups_cached_version", default: 0
-    t.integer "tasks_cached_version", default: 0
-    t.integer "memberships_cached_version", default: 0
-    t.integer "reservations_cached_version", default: 0
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.index ["company_id"], name: "index_cached_versions_on_company_id"
   end
 
   create_table "cart_appointments", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
@@ -6011,7 +5972,6 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_24_134844) do
   add_foreign_key "branches", "companies"
   add_foreign_key "brands", "categories"
   add_foreign_key "brands", "companies"
-  add_foreign_key "cached_versions", "companies"
   add_foreign_key "cart_appointments", "carts"
   add_foreign_key "cart_appointments", "companies"
   add_foreign_key "cart_groups", "branches"

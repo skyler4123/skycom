@@ -18,8 +18,6 @@ class Company < ApplicationRecord
 
   belongs_to :user
 
-  has_one :cached_version, dependent: :destroy
-
   has_many :property_mappings, dependent: :destroy
   has_many :table_configs, dependent: :destroy
   has_many :brands, dependent: :destroy
@@ -104,7 +102,6 @@ class Company < ApplicationRecord
   # validates :fiscal_year_end_month, presence: true, numericality: { in: 1..12 }
 
   after_create :setup_owner_records
-  after_create :initialize_cached_version
 
   def create_first_cloned_company
     return if branches.size > 1
@@ -163,10 +160,4 @@ class Company < ApplicationRecord
   end
 
   private
-
-  def initialize_cached_version
-    # create_cached_version! is a helper method provided by has_one
-    # It automatically sets the company_id for you.
-    create_cached_version!
-  end
 end
