@@ -8,6 +8,7 @@ class Companies::DepartmentsController < Companies::ApplicationController
         scope = current_company.departments
         scope = scope.where(business_type: params[:business_type]) if params[:business_type].present?
         scope = scope.where(workflow_status: params[:workflow_status]) if params[:workflow_status].present?
+        scope = scope.where(category_id: params[:category_id]) if params[:category_id].present?
 
         @pagy, @departments_results = pagy(:offset, scope, jsonapi: true)
 
@@ -65,7 +66,9 @@ class Companies::DepartmentsController < Companies::ApplicationController
       :id, :name, :description, :code,
       :lifecycle_status, :workflow_status, :business_type,
       :created_at, :updated_at
-    ])
+    ]).merge(
+      category: department.category&.as_json(only: [ :id, :name ])
+    )
   end
 
   def format_departments(departments)

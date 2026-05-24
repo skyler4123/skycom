@@ -49,6 +49,7 @@ export default class Companies_Employees_IndexController extends Companies_Layou
     const roleFilter = Helpers.currentRoles();
     const workflowStatusFilter = Enums().employee.workflow_statuses;
     const typeFilter = Enums().employee.business_types;
+    const categoryFilter = currentCategories().filter(c => c.resource_name === "employees");
     
     const urlParams = new URLSearchParams(window.location.search);
 
@@ -59,7 +60,14 @@ export default class Companies_Employees_IndexController extends Companies_Layou
           <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
             <form method="get" action="${pathname()}" class="flex flex-col lg:flex-row items-end justify-between gap-4 mb-6 w-full">
               <div class="flex flex-wrap items-center gap-3 w-full lg:w-auto">
-                
+
+                <div class="flex flex-col gap-1">
+                  <label class="text-[10px] font-bold text-slate-400 uppercase ml-1">Category</label>
+                  <select name="category_id" class="pl-3 pr-10 py-2 text-sm border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300">
+                    ${selectOptionsHTML(cloneNewKey(categoryFilter, "id", "value"), urlParams.get('category_id'), "All Categories")}
+                  </select>
+                </div>
+
                 <div class="flex flex-col gap-1">
                   <label class="text-[10px] font-bold text-slate-400 uppercase ml-1">Department</label>
                   <select name="department_id" class="pl-3 pr-10 py-2 text-sm border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300">
@@ -111,6 +119,7 @@ export default class Companies_Employees_IndexController extends Companies_Layou
               <thead>
                 <tr class="text-sm text-slate-500 dark:text-slate-400 bg-slate-50 dark:bg-slate-800/50 border-b border-slate-200 dark:border-slate-700">
                   <th class="py-4 px-6 font-medium whitespace-nowrap">Employee Name</th>
+                  <th class="py-4 px-6 font-medium whitespace-nowrap">Category</th>
                   <th class="py-4 px-6 font-medium whitespace-nowrap">Departments</th>
                   <th class="py-4 px-6 font-medium whitespace-nowrap">Roles</th>
                   <th class="py-4 px-6 font-medium whitespace-nowrap">Code</th>
@@ -134,6 +143,7 @@ export default class Companies_Employees_IndexController extends Companies_Layou
                         </div>
                       </div>
                     </td>
+                    <td class="py-4 px-6 text-sm text-slate-600 dark:text-slate-300">${employee.category?.name || 'N/A'}</td>
                     <td class="py-4 px-6">
                       <div class="flex flex-wrap gap-1">
                         ${employee.departments?.length > 0 
