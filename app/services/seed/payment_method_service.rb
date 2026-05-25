@@ -14,6 +14,29 @@ class Seed::PaymentMethodService
     { name: "Stripe", code: "STRIPE", business_type: :online, status: :restricted }
   ].freeze
 
+  def self.new(
+    name:,
+    description: nil,
+    code: nil,
+    lifecycle_status: PaymentMethod.lifecycle_statuses.keys.sample,
+    workflow_status: PaymentMethod.workflow_statuses.keys.sample,
+    business_type: PaymentMethod.business_types.keys.sample,
+    discarded_at: nil
+  )
+    should_discard = rand(10) == 0
+    discarded_at ||= should_discard ? Time.zone.now - rand(1..180).days : nil
+
+    PaymentMethod.new(
+      name: name,
+      description: description || "Payment method for #{name}.",
+      code: code || "PM-#{SecureRandom.hex(4).upcase}",
+      lifecycle_status: lifecycle_status,
+      workflow_status: workflow_status,
+      business_type: business_type,
+      discarded_at: discarded_at
+    )
+  end
+
   def self.create
     puts "Seeding PaymentMethod records..."
 

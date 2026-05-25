@@ -6,9 +6,9 @@ RSpec.feature "Companies::Permissions Management", type: :feature, js: true do
   let(:owner) { company.user }
 
   # Use let! to ensure roles are created before visiting the page
-  let!(:admin_role) { create(:role, company: company, name: "admin", role_business_type: :administrative) }
-  let!(:manager_role) { create(:role, company: company, name: "manager", role_business_type: :management) }
-  let!(:cashier_role) { create(:role, company: company, name: "cashier", role_business_type: :support) }
+  let!(:admin_role) { create(:role, company: company, name: "admin", business_type: :administrative) }
+  let!(:manager_role) { create(:role, company: company, name: "manager", business_type: :management) }
+  let!(:cashier_role) { create(:role, company: company, name: "cashier", business_type: :support) }
 
   # Use let! for policies
   let!(:policy_read_product) { create_policy(resource: "Product", action: "read") }

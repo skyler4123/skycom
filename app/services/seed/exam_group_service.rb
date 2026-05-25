@@ -1,5 +1,5 @@
 class Seed::ExamGroupService
-  def self.create(
+  def self.new(
     company:,
     branch: nil,
     name: nil,
@@ -9,7 +9,7 @@ class Seed::ExamGroupService
     business_type: nil,
     discarded_at: nil
   )
-    ExamGroup.create!(
+    ExamGroup.new(
       company: company,
       branch: branch,
       name: name || "ExamGroup #{Faker::Lorem.sentence(word_count: 3)}",
@@ -19,5 +19,11 @@ class Seed::ExamGroupService
       business_type: business_type || ExamGroup.business_types.keys.sample,
       discarded_at: discarded_at
     )
+  end
+
+  def self.create(...)
+    exam_group = new(...)
+    exam_group.save!
+    exam_group
   end
 end

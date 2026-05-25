@@ -3,7 +3,7 @@
 # and simulates soft deletion for a portion of the records.
 
 class Seed::PaymentService
-  def self.create(
+  def self.new(
     invoice: Invoice.where.not(status: %w[draft cancelled]).sample,
     name: nil,
     description: nil,
@@ -25,7 +25,7 @@ class Seed::PaymentService
     currency ||= invoice.currency
     amount ||= invoice.total
 
-    Payment.create!(
+    Payment.new(
       invoice: invoice,
       name: name,
       description: description,
@@ -38,5 +38,11 @@ class Seed::PaymentService
       business_type: business_type,
       discarded_at: discarded_at
     )
+  end
+
+  def self.create(...)
+    payment = new(...)
+    payment.save!
+    payment
   end
 end

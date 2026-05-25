@@ -6,10 +6,10 @@ RSpec.feature "Companies::Services Permissions", type: :feature, js: true do
   let(:owner) { company.user }
 
   # Roles
-  let!(:reader_role) { create(:role, company: company, name: "Reader", role_business_type: :support) }
-  let!(:creator_role) { create(:role, company: company, name: "Creator", role_business_type: :support) }
-  let!(:editor_role) { create(:role, company: company, name: "Editor", role_business_type: :management) }
-  let!(:no_permission_role) { create(:role, company: company, name: "NoPermission", role_business_type: :support) }
+  let!(:reader_role) { create(:role, company: company, name: "Reader", business_type: :support) }
+  let!(:creator_role) { create(:role, company: company, name: "Creator", business_type: :support) }
+  let!(:editor_role) { create(:role, company: company, name: "Editor", business_type: :management) }
+  let!(:no_permission_role) { create(:role, company: company, name: "NoPermission", business_type: :support) }
 
   # Policies for Service resource
   let!(:policy_read_service) { create_policy(resource: "Service", action: "read") }

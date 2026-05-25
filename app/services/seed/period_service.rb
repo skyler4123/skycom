@@ -3,6 +3,19 @@
 # soft deletion for a portion of the records.
 
 class Seed::PeriodService
+  def self.new(
+    start_at:,
+    end_at:,
+    timezone:,
+    business_type: :subscription
+  )
+    Period.new(
+      start_at: start_at,
+      end_at: end_at,
+      timezone: timezone
+    )
+  end
+
   def self.create(start_at:, end_at:, timezone:, business_type: :subscription)
     {
       start_at: start_at,
