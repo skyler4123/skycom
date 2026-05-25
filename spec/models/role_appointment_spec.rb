@@ -35,7 +35,7 @@ RSpec.describe RoleAppointment, type: :model do
 
     context "when assigning owner role to non-owner employee" do
       let(:non_owner_employee) do
-        create(:employee, company: company, employee_business_type: :full_time)
+        create(:employee, company: company, business_type: :full_time)
       end
 
       it "adds validation error" do

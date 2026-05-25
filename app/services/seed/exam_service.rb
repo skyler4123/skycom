@@ -1,5 +1,5 @@
 class Seed::ExamService
-  def self.create(
+  def self.new(
     company:,
     branch: nil,
     exam_group: nil,
@@ -14,7 +14,7 @@ class Seed::ExamService
     branch ||= exam_group.branch if exam_group
     company ||= exam_group.company if exam_group
 
-    Exam.create!(
+    Exam.new(
       company: company,
       branch: branch,
       exam_group: exam_group,
@@ -25,5 +25,11 @@ class Seed::ExamService
       business_type: business_type || Exam.business_types.keys.sample,
       discarded_at: discarded_at
     )
+  end
+
+  def self.create(...)
+    exam = new(...)
+    exam.save!
+    exam
   end
 end

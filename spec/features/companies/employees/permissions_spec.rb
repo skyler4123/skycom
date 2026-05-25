@@ -6,10 +6,10 @@ RSpec.feature "Companies::Employees Permissions", type: :feature, js: true do
   let(:owner) { company.user }
 
   # Roles
-  let!(:reader_role) { create(:role, company: company, name: "Reader", role_business_type: :support) }
-  let!(:creator_role) { create(:role, company: company, name: "Creator", role_business_type: :support) }
-  let!(:editor_role) { create(:role, company: company, name: "Editor", role_business_type: :management) }
-  let!(:no_permission_role) { create(:role, company: company, name: "NoPermission", role_business_type: :support) }
+  let!(:reader_role) { create(:role, company: company, name: "Reader", business_type: :support) }
+  let!(:creator_role) { create(:role, company: company, name: "Creator", business_type: :support) }
+  let!(:editor_role) { create(:role, company: company, name: "Editor", business_type: :management) }
+  let!(:no_permission_role) { create(:role, company: company, name: "NoPermission", business_type: :support) }
 
   # Policies for Employee resource
   let!(:policy_read_employee) { create_policy(resource: "Employee", action: "read") }
@@ -266,7 +266,7 @@ RSpec.feature "Companies::Employees Permissions", type: :feature, js: true do
   # =========================================================================
   scenario "employee with delete permission can? returns true for delete" do
     # Create a new role with delete permission - reuse existing policy
-    delete_role = create(:role, company: company, name: "DeleterTest", role_business_type: :management)
+    delete_role = create(:role, company: company, name: "DeleterTest", business_type: :management)
 
     create_policy_appointment(role: delete_role, policy: policy_read_employee, workflow_status: :active)
     create_policy_appointment(role: delete_role, policy: policy_delete_employee, workflow_status: :active)
@@ -289,7 +289,7 @@ RSpec.feature "Companies::Employees Permissions", type: :feature, js: true do
     sign_in(owner)
     visit company_permissions_path(company)
 
-    delete_role = create(:role, company: company, name: "DeleteEmpUI", role_business_type: :management)
+    delete_role = create(:role, company: company, name: "DeleteEmpUI", business_type: :management)
     create_policy_appointment(role: delete_role, policy: policy_read_employee, workflow_status: :active)
     create_policy_appointment(role: delete_role, policy: policy_delete_employee, workflow_status: :active)
 
@@ -391,7 +391,7 @@ RSpec.feature "Companies::Employees Permissions", type: :feature, js: true do
   # =========================================================================
   scenario "employee with delete permission removed cannot delete" do
     # Create a role with delete permission (active) for this test
-    delete_role = create(:role, company: company, name: "DeleterPerm", role_business_type: :management)
+    delete_role = create(:role, company: company, name: "DeleterPerm", business_type: :management)
     create_policy_appointment(role: delete_role, policy: policy_read_employee, workflow_status: :active)
     create_policy_appointment(role: delete_role, policy: policy_delete_employee, workflow_status: :active)
 
@@ -835,7 +835,7 @@ RSpec.feature "Companies::Employees Permissions", type: :feature, js: true do
 
   scenario "owner can remove delete permission from role via permissions page" do
     # First grant delete permission (create a role with delete)
-    delete_role = create(:role, company: company, name: "DeleterPerm", role_business_type: :management)
+    delete_role = create(:role, company: company, name: "DeleterPerm", business_type: :management)
     create_policy_appointment(role: delete_role, policy: policy_read_employee, workflow_status: :active)
     create_policy_appointment(role: delete_role, policy: policy_delete_employee, workflow_status: :active)
 

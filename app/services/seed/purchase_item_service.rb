@@ -1,5 +1,5 @@
 class Seed::PurchaseItemService
-  def self.create(
+  def self.new(
     purchase:,
     name: nil,
     description: nil,
@@ -21,7 +21,7 @@ class Seed::PurchaseItemService
     should_discard = rand(10) == 0
     discarded_at ||= should_discard ? Time.zone.now - rand(1..180).days : nil
 
-    PurchaseItem.create!(
+    PurchaseItem.new(
       purchase: purchase,
       company: purchase.company,
       branch: purchase.branch,
@@ -40,5 +40,11 @@ class Seed::PurchaseItemService
       business_type: business_type || PurchaseItem.business_types.keys.sample,
       discarded_at: discarded_at
     )
+  end
+
+  def self.create(...)
+    item = new(...)
+    item.save!
+    item
   end
 end

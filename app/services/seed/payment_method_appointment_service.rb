@@ -3,7 +3,7 @@
 # to have their own configurations or subsets of available payment methods.
 
 class Seed::PaymentMethodAppointmentService
-  def self.create(
+  def self.new(
     company:,
     payment_method: PaymentMethod.all.sample,
     name: nil,
@@ -20,9 +20,9 @@ class Seed::PaymentMethodAppointmentService
     discarded_at ||= should_discard ? Time.zone.now - rand(1..180).days : nil
     name ||= "#{payment_method.name} for #{company.name}"
     description ||= "Company-specific configuration for #{payment_method.name}."
-    code ||= "#{payment_method.code}_#{company.id}_#{SecureRandom.hex(4)}" # Ensure unique code
+    code ||= "#{payment_method.code}_#{company.id}_#{SecureRandom.hex(4)}"
 
-    PaymentMethodAppointment.create!(
+    PaymentMethodAppointment.new(
       company: company,
       payment_method: payment_method,
       name: name,
@@ -33,5 +33,11 @@ class Seed::PaymentMethodAppointmentService
       business_type: business_type,
       discarded_at: discarded_at
     )
+  end
+
+  def self.create(...)
+    appointment = new(...)
+    appointment.save!
+    appointment
   end
 end
