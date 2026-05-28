@@ -72,12 +72,7 @@ RSpec.feature "Companies::Categories Permissions", type: :feature, js: true do
 
   # Target category for edit tests
   let!(:target_category) do
-    Seed::CategoryService.create(
-      company: company,
-      name: "Test Category",
-      resource_name: "products",
-      properties: { property_string_1: "Brand" }
-    )
+    create(:category, company: company, name: "Test Category", resource_name: "products")
   end
 
   def create_policy(resource:, action:, business_type: :operational)

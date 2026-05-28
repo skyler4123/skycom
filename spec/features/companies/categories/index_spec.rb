@@ -6,20 +6,11 @@ RSpec.feature "Companies::Categories Management", type: :feature, js: true do
   let(:owner)    { company.user }
 
   let!(:category) do
-    Seed::CategoryService.create(
-      company: company,
-      name: "Cosmetics",
-      resource_name: "products",
-      properties: { property_string_1: "Brand" }
-    )
+    create(:category, company: company, name: "Cosmetics", resource_name: "products")
   end
 
   let!(:category2) do
-    Seed::CategoryService.create(
-      company: company,
-      name: "Management",
-      resource_name: "employees"
-    )
+    create(:category, company: company, name: "Management", resource_name: "employees")
   end
 
   before do
