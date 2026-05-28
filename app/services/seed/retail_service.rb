@@ -26,13 +26,12 @@ class Seed::RetailService
           property_string_1: "Skin Type Suitability",
           property_string_2: "Key Ingredients",
           property_string_3: "Formulation (e.g., Liquid, Powder)",
-          property_select_1: "Seasonal Collection",
           property_integer_1: "Volume (ml)",
           property_integer_2: "Shelf Life (Months)",
           property_boolean_1: "Organic Certified",
           property_boolean_2: "Requires Refrigeration"
         },
-        visible_columns: %w[name code property_string_1 property_string_2 property_select_1 property_integer_1 property_boolean_1]
+        visible_columns: %w[name code property_string_1 property_string_2 property_integer_1 property_boolean_1]
       },
       "Perfumes" => {
         properties: {
@@ -56,21 +55,19 @@ class Seed::RetailService
         properties: {
           property_string_1: "Shade / Color Code",
           property_string_2: "Finish (Matte / Dewy)",
-          property_select_1: "Finish Category",
           property_integer_1: "Net Weight (g)",
           property_boolean_1: "Vegan Formulation"
         },
-        visible_columns: %w[name code property_string_1 property_select_1 property_integer_1 property_boolean_1]
+        visible_columns: %w[name code property_string_1 property_integer_1 property_boolean_1]
       },
       "Jewelry" => {
         properties: {
           property_string_1: "Material (Gold / Silver)",
           property_string_2: "Gemstone Type",
-          property_select_1: "Gemstone Clarity Grade",
           property_decimal_1: "Weight (Grams)",
           property_decimal_2: "Purity Carat"
         },
-        visible_columns: %w[name code property_string_1 property_select_1 property_decimal_1 property_decimal_2]
+        visible_columns: %w[name code property_string_1 property_decimal_1 property_decimal_2]
       },
       "Accessories" => {
         properties: {
@@ -86,20 +83,18 @@ class Seed::RetailService
       "Management" => {
         properties: {
           property_string_1: "Corporate Level",
-          property_select_1: "Management Tier",
           property_decimal_1: "KPI Target Bonus %",
           property_boolean_1: "Signing Authority"
         },
-        visible_columns: %w[name email property_string_1 property_select_1 property_decimal_1 property_boolean_1]
+        visible_columns: %w[name email property_string_1 property_decimal_1 property_boolean_1]
       },
       "Sales Specialist" => {
         properties: {
           property_string_1: "Assigned Product Line",
-          property_select_1: "Performance Rating",
           property_decimal_1: "Commission Tier %",
           property_integer_1: "Monthly Sales Target"
         },
-        visible_columns: %w[name email property_string_1 property_select_1 property_decimal_1 property_integer_1]
+        visible_columns: %w[name email property_string_1 property_decimal_1 property_integer_1]
       },
       "Cashier" => {
         properties: {
@@ -127,12 +122,11 @@ class Seed::RetailService
     branches: {
       "Flagship Store" => {
         properties: {
-          property_select_1: "Store Tier Classification",
           property_integer_1: "Maximum Occupancy Capacity",
           property_integer_2: "Number of POS Tills",
           property_boolean_1: "Has Tax-Free Counter"
         },
-        visible_columns: %w[name property_select_1 property_integer_1 property_integer_2 property_boolean_1]
+        visible_columns: %w[name property_integer_1 property_integer_2 property_boolean_1]
       },
       "Mall Kiosk" => {
         properties: {
@@ -162,10 +156,9 @@ class Seed::RetailService
       "Operations" => {
         properties: {
           property_string_1: "Regional Scope",
-          property_string_2: "SOP Revision Code",
-          property_select_1: "Operational Priority Rating"
+          property_string_2: "SOP Revision Code"
         },
-        visible_columns: %w[name property_string_1 property_select_1]
+        visible_columns: %w[name property_string_1]
       },
       "Human Resources" => {
         properties: {
@@ -238,12 +231,11 @@ class Seed::RetailService
     customers: {
       "Retail VIP" => {
         properties: {
-          property_select_1: "VIP Tier Level",
           property_integer_1: "Current Loyalty Reward Points",
           property_decimal_1: "Fixed Lifetime Discount Percentage",
           property_datetime_1: "VIP Tier Expiration Date"
         },
-        visible_columns: %w[name email property_select_1 property_integer_1 property_decimal_1 property_datetime_1]
+        visible_columns: %w[name email property_integer_1 property_decimal_1 property_datetime_1]
       },
       "Regular" => {
         properties: {
@@ -256,10 +248,9 @@ class Seed::RetailService
         properties: {
           property_string_1: "Tax Identification Number (TIN)",
           property_string_2: "Credit Terms Granted (e.g., Net 30)",
-          property_select_1: "Contract Type",
           property_decimal_1: "Credit Line Limit Amount"
         },
-        visible_columns: %w[name email property_string_1 property_string_2 property_select_1 property_decimal_1]
+        visible_columns: %w[name email property_string_1 property_string_2 property_decimal_1]
       },
       "Occasional" => {
         properties: {
@@ -279,10 +270,9 @@ class Seed::RetailService
       "Skincare Consultation" => {
         properties: {
           property_integer_1: "Duration (Minutes)",
-          property_string_1: "Required Analysis Equipment",
-          property_select_1: "Expertise Level Required"
+          property_string_1: "Required Analysis Equipment"
         },
-        visible_columns: %w[name property_integer_1 property_string_1 property_select_1]
+        visible_columns: %w[name property_integer_1 property_string_1]
       },
       "Makeup Artistry" => {
         properties: {
@@ -325,12 +315,11 @@ class Seed::RetailService
       },
       "Storage Room" => {
         properties: {
-          property_select_1: "Climate Zone Classification",
           property_decimal_1: "Temperature Range Ceiling (C)",
           property_decimal_2: "Humidity Target Threshold %",
           property_boolean_1: "Biometric Lock Security Restricting Access"
         },
-        visible_columns: %w[name property_select_1 property_decimal_1 property_boolean_1]
+        visible_columns: %w[name property_decimal_1 property_boolean_1]
       },
       "Office Space" => {
         properties: {

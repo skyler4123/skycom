@@ -115,21 +115,14 @@ export default class Companies_Categories_ShowModalController extends Controller
     for (let i = 1; i <= 20; i++) {
       const key = `property_integer_${i}`
       const label = mapping[key] || `Integer ${i} (Label)`
-      integerFields.push(this.renderField(category, key, label, 'text'))
-    }
-
-    const selectFields = []
-    for (let i = 1; i <= 20; i++) {
-      const key = `property_select_${i}`
-      const label = mapping[key] || `Select ${i} (Label)`
-      selectFields.push(this.renderField(category, key, label, 'text'))
+      integerFields.push(this.renderField(category, key, label, 'number'))
     }
 
     const decimalFields = []
     for (let i = 1; i <= 10; i++) {
       const key = `property_decimal_${i}`
       const label = mapping[key] || `Decimal ${i} (Label)`
-      decimalFields.push(this.renderField(category, key, label, 'text'))
+      decimalFields.push(this.renderField(category, key, label, 'decimal'))
     }
 
     const booleanFields = []
@@ -169,15 +162,6 @@ export default class Companies_Categories_ShowModalController extends Controller
         <h4 class="text-lg font-bold text-slate-900 dark:text-white mb-4">Property Integer Fields (1-20)</h4>
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           ${integerFields.join('')}
-        </div>
-      </div>
-    `)
-
-    sections.push(`
-      <div class="border-t border-slate-200 dark:border-gray-800 pt-6">
-        <h4 class="text-lg font-bold text-slate-900 dark:text-white mb-4">Property Select Fields (1-20)</h4>
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          ${selectFields.join('')}
         </div>
       </div>
     `)

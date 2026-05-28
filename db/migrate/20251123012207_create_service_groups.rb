@@ -28,7 +28,6 @@ class CreateServiceGroups < ActiveRecord::Migration[8.0]
       1.upto(20) { |i| t.string "property_string_#{i}" }
       1.upto(5) { |i| t.text "property_text_#{i}" }
       1.upto(20) { |i| t.integer "property_integer_#{i}" }
-      1.upto(20) { |i| t.integer "property_select_#{i}" }
       1.upto(10)  { |i| t.decimal "property_decimal_#{i}", precision: 15, scale: 4 }
       1.upto(10)  { |i| t.boolean "property_boolean_#{i}" }
       1.upto(10)  { |i| t.datetime "property_datetime_#{i}" }
