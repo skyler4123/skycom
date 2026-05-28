@@ -4,6 +4,7 @@ class Companies::PropertyMappingsController < Companies::ApplicationController
   PROPERTY_KEYS = (1..20).flat_map { |i| [ :"property_string_#{i}" ] } +
                   (1..5).flat_map { |i| [ :"property_text_#{i}" ] } +
                   (1..20).flat_map { |i| [ :"property_integer_#{i}" ] } +
+                  (1..20).flat_map { |i| [ :"property_select_#{i}" ] } +
                   (1..10).flat_map { |i| [ :"property_decimal_#{i}" ] } +
                   (1..20).flat_map { |i| [ :"property_boolean_#{i}" ] } +
                   (1..10).flat_map { |i| [ :"property_datetime_#{i}" ] }.freeze

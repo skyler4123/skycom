@@ -12,6 +12,7 @@ class CreatePropertyMappings < ActiveRecord::Migration[8.0]
       1.upto(20) { |i| t.string "property_string_#{i}" }
       1.upto(5) { |i| t.string "property_text_#{i}" }
       1.upto(20) { |i| t.string "property_integer_#{i}" }
+      1.upto(20) { |i| t.string "property_select_#{i}" }
       1.upto(10)  { |i| t.string "property_decimal_#{i}" }
       1.upto(10)  { |i| t.string "property_boolean_#{i}" }
       1.upto(10)  { |i| t.string "property_datetime_#{i}" }

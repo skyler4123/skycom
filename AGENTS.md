@@ -8,6 +8,7 @@
 
 ## Pre-Commit Checklist
 - **ALWAYS** run `bin/rubocop --autocorrect-all` before committing any Ruby code
+- **Update** `docs/MODEL_CALLBACKS.md` if model/concern callbacks were added or modified
 
 ## Architecture
 - **Type**: Rails 7+ multi-tenant platform with Hybrid SPA (Stimulus + Tailwind)
