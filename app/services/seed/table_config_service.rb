@@ -3,7 +3,7 @@ class Seed::TableConfigService
     company:,
     resource_name:,
     category:,
-    visible_fields: [],
+    fields: [],
     name: nil
   )
     TableConfig.new(
@@ -11,7 +11,7 @@ class Seed::TableConfigService
       resource_name: resource_name,
       category: category,
       name: name || "#{category&.name || resource_name} table config",
-      visible_fields: visible_fields
+      fields: fields
     )
   end
 
@@ -19,14 +19,14 @@ class Seed::TableConfigService
     company:,
     resource_name:,
     category:,
-    visible_fields: [],
+    fields: [],
     name: nil
   )
     record = new(
       company: company,
       resource_name: resource_name,
       category: category,
-      visible_fields: visible_fields,
+      fields: fields,
       name: name
     )
     record.save!

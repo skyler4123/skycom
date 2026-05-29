@@ -460,8 +460,8 @@ class Seed::RetailService
   def create_table_configs
     METADATA_CATEGORIES.each do |resource_name, categories|
       categories.each do |name, entry|
-        visible_columns = entry[:visible_columns]
-        next unless visible_columns.present?
+        keys = entry[:visible_columns]
+        next unless keys.present?
 
         category = Category.find_by(company: @retail, resource_name: resource_name.to_s, name: name)
         next unless category
@@ -470,11 +470,18 @@ class Seed::RetailService
           company: @retail,
           resource_name: resource_name.to_s,
           category: category,
-          visible_fields: visible_columns,
+          fields: keys.map { |k| field_hash(k) },
           name: "#{name} table config"
         )
       end
     end
+  end
+
+  def field_hash(key)
+    { "key" => key, "label" => key.humanize, "visible" => true,
+      "sortable" => true, "align" => "left", "pinned" => nil,
+      "width" => nil, "roles" => [], "is_virtual" => false,
+      "render_config" => {} }
   end
 
   def create_brands

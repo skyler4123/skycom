@@ -5120,7 +5120,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.string "name"
     t.string "description"
     t.string "resource_name"
-    t.jsonb "visible_fields", default: [], null: false
+    t.jsonb "fields", default: [], null: false
     t.integer "lifecycle_status"
     t.integer "workflow_status"
     t.integer "business_type"

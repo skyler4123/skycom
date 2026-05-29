@@ -4,7 +4,7 @@
 
 The **Category + PropertyMapping + TableConfig** system provides a complete **Dynamic Schema + Display Configuration** for the UI. It defines:
 - **What** data the `property_*` columns represent (via PropertyMapping labels)
-- **Which** columns to show and in what order (via TableConfig visible_fields)
+- **Which** columns to show, their display properties, and ordering (via TableConfig `fields`)
 
 ### Core Concept
 
@@ -12,7 +12,7 @@ The **Category + PropertyMapping + TableConfig** system provides a complete **Dy
 |-------|---------|--------|
 | **Category** | Taxonomy grouping (name, description, resource_name) | — |
 | **PropertyMapping** | Translates `property_*` column names to human labels | **String** labels (e.g., "Skin Type Suitability", "Volume (ml)") |
-| **TableConfig** | Defines visible columns and their display order | **JSONB array** of field names (e.g., `["name", "code", "property_string_1", "workflow_status"]`) |
+| **TableConfig** | Defines visible columns, layout, and permissions | **JSONB array** of field hashes (e.g., `[{ "key": "name", "label": "Name", "visible": true, "sortable": true, "align": "left", "width": 200, ... }]`) |
 | **Resource (Product, Employee, etc.)** | Stores actual data | **Typed values** (string, integer, boolean, etc.) |
 
 Each Category `has_one` PropertyMapping — they are created together. The `after_create` callback on Category guarantees every category has a dedicated PropertyMapping. Each Category also `has_one` TableConfig.
@@ -73,8 +73,8 @@ create_table "table_configs", id: :uuid do |t|
   t.string   "name"                              # Human name (e.g., "Cosmetics table config")
   t.string   "resource_name"                     # Resource type: "products", "employees", etc.
 
-  # Display Configuration (JSONB array — ordered list of visible columns)
-  t.jsonb    "visible_fields", default: ["name"] # e.g., ["name", "code", "property_string_1", "workflow_status"]
+  # Display Configuration (JSONB array of hashes — each hash defines a column's layout, behavior, and permissions)
+  t.jsonb    "fields", default: []
 
   # --- System Fields ---
   t.integer  :lifecycle_status
@@ -145,18 +145,20 @@ product = Product.create!(
 
 ### Step 3: Configure Table Display
 
-Each Category has a TableConfig that defines which columns are visible and in what order:
+Each Category has a TableConfig that defines which columns are visible, their display properties, and ordering:
 
 ```ruby
 # TableConfig for the Cosmetics category
-cosmetics_category.table_config.visible_fields
-# => ["name", "code", "property_string_1", "property_string_2", "property_integer_1", "property_boolean_1", "workflow_status"]
+cosmetics_category.table_config.fields
+# => [{ "key" => "name", "label" => "Name", "visible" => true, "sortable" => true, "align" => "left", "pinned" => "left", "width" => 250, "roles" => [], "is_virtual" => false, "render_config" => {} },
+#     { "key" => "property_string_1", "label" => "Skin Type Suitability", "visible" => true, "sortable" => true, "align" => "left", ... },
+#     ...]
 
 # The first item is always "name" (set as default attribute on the model)
 # Columns are rendered in this exact order in the table
 ```
 
-The `visible_fields` array stores only the column *names*. The frontend merges this with the PropertyMapping's labels to produce the full column config.
+The `fields` array stores structured column definitions. The frontend reads these directly — no manual merge needed.
 
 ### Step 4: UI Renders Dynamically
 
@@ -194,7 +196,7 @@ Renders:
 When the frontend boots up to render a table, it combines all three tables into a single column config:
 
 ```
-TableConfig.visible_fields      PropertyMapping labels
+TableConfig.fields              PropertyMapping labels (legacy)
         │                               │
         ▼                               ▼
   ["name",                    ┌ property_string_1: "Skin Type"
@@ -209,6 +211,11 @@ TableConfig.visible_fields      PropertyMapping labels
          { field: "property_string_1",  title: "Skin Type" },
          { field: "property_integer_1", title: "Volume (ml)" },
          { field: "workflow_status",    title: "Workflow Status" }]
+
+# With the new structured `fields` column, each element already contains
+# its own label, width, alignment, pinned state, sortability, and roles.
+# The frontend reads `table_config.fields` directly — no merge with
+# PropertyMapping labels is necessary for the table view.
 ```
 
 ### Example JSON Payload
@@ -233,7 +240,7 @@ TableConfig.visible_fields      PropertyMapping labels
 | **PropertyMapping** | Defines what `property_*` columns mean | `property_string_1` = "Skin Type" |
 | **TableConfig** | Defines column visibility + order | Show name, skin type, volume; hide shelf life |
 
-This separation means you can define a property label in PropertyMapping but choose not to show it in the table by omitting it from `visible_columns`. The data exists, the label exists, but it's hidden from the table view.
+This separation means you can define a property label in PropertyMapping but choose not to show it in the table by setting `visible: false` in the table config's field hash. The data exists, the label exists, but it's hidden from the table view.
 
 ---
 
@@ -345,11 +352,16 @@ Seed::CategoryService.create(
 
 # Seed::TableConfigService is called after categories are created
 # It reads visible_columns from the same METADATA_CATEGORIES entry
+# String keys are auto-converted to structured field hashes via #field_hash
 Seed::TableConfigService.create(
   company: company,
   resource_name: "products",
   category: cosmetics_category,
-  visible_fields: %w[name code property_string_1 property_integer_1 property_boolean_1]
+  fields: %w[name code property_string_1 property_integer_1 property_boolean_1].map { |k|
+    { "key" => k, "label" => k.humanize, "visible" => true, "sortable" => true,
+      "align" => "left", "pinned" => nil, "width" => nil, "roles" => [],
+      "is_virtual" => false, "render_config" => {} }
+  }
 )
 ```
 
@@ -380,17 +392,22 @@ const labelMap = {
 
 ### Three-Table Column Merge
 
-The frontend combines `TableConfig.visible_fields` with `PropertyMapping` labels to render table headers:
+The frontend combines `TableConfig.fields` with `PropertyMapping` labels to render table headers:
 
 ```javascript
 // Load table config + property mapping to build column array
 const config = category.table_config
 const mapping = category.property_mapping || {}
-const columns = (config?.visible_fields || ["name"]).map(field => ({
-  field,
-  title: field.startsWith("property_") ? (mapping[field] || Helpers.humanize(field)) : Helpers.humanize(field)
+const columns = (config?.fields || []).map(f => ({
+  field: f.key,
+  title: f.key.startsWith("property_") ? (mapping[f.key] || f.label) : f.label,
+  width: f.width,
+  align: f.align,
+  pinned: f.pinned,
+  sortable: f.sortable,
+  visible: f.visible
 }))
-// Result: [{ field: "name", title: "Name" }, { field: "property_string_1", title: "Skin Type" }, ...]
+// Result: [{ field: "name", title: "Name", width: 250, align: "left", pinned: "left", ... }, ...]
 ```
 
 ### Rendering Dynamic Form
@@ -442,7 +459,7 @@ function renderDynamicFields(product, category) {
 3. **Keep labels short** - UI labels should be concise (e.g., "Volume (ml)" not "Product Volume in Milliliters")
 4. **Type matching** - Ensure PropertyMapping label slot matches the data type (e.g., use property_integer_* for numeric values)
 5. **Empty = Skip** - If a property label is `nil` or empty, don't render that field in UI
-6. **Separate concerns** - PropertyMapping defines what data means; TableConfig defines what's visible. A labeled property can be hidden from the table by omitting it from `visible_columns`
+6. **Separate concerns** - PropertyMapping defines what data means; TableConfig defines what's visible. A labeled property can be hidden from the table by setting `visible: false` in the field hash
 7. **Keep in sync** - Properties and their table visibility live in the same `METADATA_CATEGORIES` entry — never define them separately
 8. **`name` is universal** - The `name` column is prepended automatically by `TableConfig`'s default. Always include it first in the seed `visible_columns` array
 
@@ -501,7 +518,11 @@ end
 # app/models/table_config.rb
 class TableConfig < ApplicationRecord
   attribute :permission_resource_name, :string, default: -> { self.name }
-  attribute :visible_fields, :jsonb, default: [ "name" ]
+  attribute :fields, :jsonb, default: -> {
+    [{ "key" => "name", "label" => "Name", "visible" => true, "sortable" => true,
+       "align" => "left", "pinned" => nil, "width" => nil, "roles" => [],
+       "is_virtual" => false, "render_config" => {} }]
+  }
 
   belongs_to :company
   belongs_to :category, optional: true
@@ -535,11 +556,11 @@ end
 | **Purpose** | Dynamic schema mapping — defines what property columns mean per resource type |
 | **Category stores** | Taxonomy grouping (name, description, resource_name) |
 | **PropertyMapping stores** | UI labels (as strings) |
-| **TableConfig stores** | Visible column order (as JSONB array) |
+| **TableConfig stores** | Visible column order + layout/permissions (as JSONB array of hashes) |
 | **Resource stores** | Actual typed data |
 | **Link** | `category_id` on resource tables; `property_mapping.category_id` on PropertyMapping; `table_config.category_id` on TableConfig |
 | **Category ↔ PropertyMapping** | `has_one` — auto-created via `after_create` callback |
-| **Category ↔ TableConfig** | `has_one` — explicitly seeded from `visible_columns` |
+| **Category ↔ TableConfig** | `has_one` — explicitly seeded from `visible_columns`, auto-converted to field hashes |
 | **Uniqueness** | `name` + `resource_name` scoped to `company_id` |
 
 This system allows different industries (retail, clinic, etc.) to have completely different metadata schemas for the same generic `property_*` columns without code changes.
