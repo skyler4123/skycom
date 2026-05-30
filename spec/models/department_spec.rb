@@ -4,7 +4,7 @@ require 'rails_helper'
 RSpec.describe Department, type: :model do
   describe "associations" do
     it { should belong_to(:company) }
-    it { should belong_to(:category).optional }
+    it { should belong_to(:category) }
     it { should have_many(:role_appointments).dependent(:destroy) }
     it { should have_many(:roles).through(:role_appointments) }
     it { should have_many(:department_appointments).dependent(:destroy) }

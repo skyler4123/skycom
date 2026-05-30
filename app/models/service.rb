@@ -1,4 +1,5 @@
 class Service < ApplicationRecord
+  include CategoryConcern
   attribute :permission_resource_name, :string, default: -> { self.name }
 
   include TagConcern
@@ -6,7 +7,7 @@ class Service < ApplicationRecord
 
   belongs_to :company
   belongs_to :branch, optional: true
-  belongs_to :category, optional: true
+  belongs_to :category
 
   has_many :order_appointments, as: :appoint_to, dependent: :destroy
   has_many :orders, through: :order_appointments

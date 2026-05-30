@@ -4,7 +4,7 @@ require 'rails_helper'
 RSpec.describe PropertyMapping, type: :model do
   describe "associations" do
     it { should belong_to(:company) }
-    it { should belong_to(:category).optional }
+    it { should belong_to(:category) }
   end
 
   describe "property config validation" do

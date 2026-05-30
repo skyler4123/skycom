@@ -1,6 +1,7 @@
 # app/models/employee.rb
 
 class Employee < ApplicationRecord
+  include CategoryConcern
   include AddressConcern
   include RoleConcern
   include Employee::PermissionConcern
@@ -17,7 +18,7 @@ class Employee < ApplicationRecord
   belongs_to :company
   belongs_to :branch, optional: true
   belongs_to :user, optional: true
-  belongs_to :category, optional: true
+  belongs_to :category
 
 
   has_many :role_appointments, as: :appoint_to, dependent: :destroy, inverse_of: :appoint_to

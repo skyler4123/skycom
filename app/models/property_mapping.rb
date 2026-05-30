@@ -54,10 +54,11 @@
 #   Example:   { "label":"Hire Date", "input_type":"date_only", "format":"YYYY-MM-DD" }
 
 class PropertyMapping < ApplicationRecord
+  include CategoryConcern
   attribute :permission_resource_name, :string, default: -> { self.name }
 
   belongs_to :company
-  belongs_to :category, optional: true
+  belongs_to :category
 
   before_validation :normalize_string_values
 

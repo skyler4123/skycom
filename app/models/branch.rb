@@ -1,11 +1,12 @@
 class Branch < ApplicationRecord
+  include CategoryConcern
   attribute :permission_resource_name, :string, default: -> { self.name }
 
   include AddressConcern
   include TagConcern
 
   belongs_to :company
-  belongs_to :category, optional: true
+  belongs_to :category
 
   has_many :employee_groups, dependent: :destroy
   has_many :employees, dependent: :destroy

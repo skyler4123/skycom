@@ -6,7 +6,7 @@ RSpec.describe StockTransfer, type: :model do
     it { should belong_to(:company) }
     it { should belong_to(:branch).optional }
     it { should belong_to(:product) }
-    it { should belong_to(:category).optional }
+    it { should belong_to(:category) }
     it { should belong_to(:appoint_from).optional }
     it { should belong_to(:appoint_to).optional }
     it { should belong_to(:appoint_for).optional }

@@ -177,11 +177,23 @@ Auto-derives `company_id` on Appointment records from the associated polymorphic
 
 ---
 
+### CategoryConcern (`app/models/concerns/category_concern.rb`)
+
+Auto-assigns a default category on create if none is provided. Ensures every resource record has a category for dynamic property resolution and ABAC permission evaluation.
+
+| Callback | Line | Method | Description |
+|----------|------|--------|-------------|
+| `before_validation :ensure_category, on: :create` | 10 | `ensure_category` | If `category` is nil and `company` is present, finds or creates a default `Category` record using `find_or_create_by!(company:, resource_name:)` with the model's plural name. Uses the same `find_or_create_for` pattern as seed services. |
+
+**Included in (17 models):** `Branch`, `Brand`, `Customer`, `Department`, `Employee`, `EmployeeGroup`, `Facility`, `Order`, `Product`, `PropertyMapping`, `Service`, `Stock`, `StockExport`, `StockImport`, `StockTransfer`, `TableConfig`, `Warehouse`
+
+---
+
 ## 3. Summary Table
 
 | Callback Type | Count | Models with Direct Declarations |
 |--------------|-------|---------------------------------|
-| `before_validation` | 3 | Address, User, (SetDefaultCompanyConcern → 34+ appointment models) |
+| `before_validation` | 4 | Address, User, (SetDefaultCompanyConcern → 34+ appointment models), (CategoryConcern → 17 models) |
 | `after_initialize` | 1 | Branch |
 | `before_create` | 1 | Session |
 | `after_create` | 4 | Category, Company, PolicyAppointment, RoleAppointment |
@@ -193,7 +205,7 @@ Auto-derives `company_id` on Appointment records from the associated polymorphic
 | `after_touch` | 2* | Role (duplicate declaration on lines 30 and 87) |
 | `after_commit` | 2 | (Cache::RecordsConcern → 5 models) |
 
-**Total unique callback declarations: ~25 directly across 12 model files + 3 concern files propagating to ~40+ models.**
+**Total unique callback declarations: ~25 directly across 12 model files + 4 concern files propagating to ~57+ models.**
 
 ---
 

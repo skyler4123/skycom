@@ -1,11 +1,12 @@
 class Brand < ApplicationRecord
+  include CategoryConcern
   attribute :permission_resource_name, :string, default: -> { self.name }
 
   include TagConcern
 
   # --- Associations ---
   belongs_to :company
-  belongs_to :category, optional: true
+  belongs_to :category
 
   has_many :products, dependent: :nullify
 

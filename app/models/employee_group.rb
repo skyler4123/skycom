@@ -1,4 +1,5 @@
 class EmployeeGroup < ApplicationRecord
+  include CategoryConcern
   include AddressConcern
   include TagConcern
 
@@ -7,7 +8,7 @@ class EmployeeGroup < ApplicationRecord
   # --- Associations ---
   belongs_to :company
   belongs_to :branch, optional: true
-  belongs_to :category, optional: true
+  belongs_to :category
 
   has_many :employee_group_appointments, dependent: :destroy
   has_many :employees, through: :employee_group_appointments, source: :appoint_to, source_type: "Employee"

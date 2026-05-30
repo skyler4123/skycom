@@ -8,7 +8,16 @@ class ClientCacheController < ApplicationController
       format.json do
         render json: {
           user: current_user.as_json,
-          companies: current_user.accessible_companies.as_json(include: [ :branches, :departments, :roles, :categories, :property_mappings, :table_configs ]),
+          companies: current_user.accessible_companies.as_json(
+            include: {
+              branches:          {},
+              departments:       {},
+              roles:             {},
+              categories:        {},
+              property_mappings: {},
+              table_configs:     {} # Your updated layout schema engine holding the fields JSONB array
+            }
+          ),
           enums: {
             employee: {
               lifecycle_statuses: Employee.lifecycle_statuses.keys.map { |s| { name: s.humanize, value: s } },
