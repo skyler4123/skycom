@@ -1,4 +1,5 @@
 class Stock < ApplicationRecord
+  include CategoryConcern
   attribute :permission_resource_name, :string, default: -> { self.name }
 
   include TagConcern
@@ -7,7 +8,7 @@ class Stock < ApplicationRecord
   belongs_to :branch, optional: true
   belongs_to :product
   belongs_to :warehouse
-  belongs_to :category, optional: true
+  belongs_to :category
 
   enum :lifecycle_status, LIFECYCLE_STATUS, prefix: true
   enum :workflow_status, WORKFLOW_STATUS, prefix: true

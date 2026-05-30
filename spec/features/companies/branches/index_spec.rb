@@ -50,6 +50,7 @@ RSpec.feature "Companies::Branches Management", type: :feature, js: true do
       select 'Headquarters', from: 'branch[business_type]'
       click_button "Save Branch"
     end
+    expect(page).to have_content("created successfully", wait: 10)
     expect(page).to have_selector('tbody tr', wait: 10)
 
     expect(Branch.find_by(name: "New Test Branch")).to be_present

@@ -1,4 +1,5 @@
 class TableConfig < ApplicationRecord
+  include CategoryConcern
   attribute :permission_resource_name, :string, default: -> { self.name }
   attribute :fields, :jsonb, default: -> {
     [ { "key" => "name", "label" => "Name", "visible" => true, "sortable" => true,
@@ -7,7 +8,7 @@ class TableConfig < ApplicationRecord
   }
 
   belongs_to :company
-  belongs_to :category, optional: true
+  belongs_to :category
 
   # ---------------------------------------------------------------------------
   # `fields` JSONB Array — Enterprise Table Configuration

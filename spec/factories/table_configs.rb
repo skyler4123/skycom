@@ -2,6 +2,7 @@
 FactoryBot.define do
   factory :table_config do
     association :company
+    association :category
 
     name { "Test table config" }
     resource_name { "products" }

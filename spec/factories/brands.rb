@@ -2,6 +2,7 @@
 FactoryBot.define do
   factory :brand do
     association :company
+    association :category
     name { Faker::Company.name }
     description { Faker::Lorem.sentence(word_count: 15) }
     code { "BR-#{SecureRandom.hex(4).upcase}" }

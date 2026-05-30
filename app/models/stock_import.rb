@@ -1,4 +1,5 @@
 class StockImport < ApplicationRecord
+  include CategoryConcern
   attribute :permission_resource_name, :string, default: -> { self.name }
 
   include TagConcern
@@ -6,7 +7,7 @@ class StockImport < ApplicationRecord
   belongs_to :company
   belongs_to :branch, optional: true
   belongs_to :product
-  belongs_to :category, optional: true
+  belongs_to :category
   belongs_to :appoint_from, polymorphic: true, optional: true
   belongs_to :appoint_to, polymorphic: true, optional: true
   belongs_to :appoint_for, polymorphic: true, optional: true
