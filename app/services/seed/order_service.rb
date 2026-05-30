@@ -2,6 +2,7 @@ class Seed::OrderService
   def self.new(
     company:,
     branch: nil,
+    category: nil,
     customer: nil,
     name: Faker::Company.buzzword,
     description: Faker::Lorem.sentence(word_count: 15),
@@ -14,6 +15,7 @@ class Seed::OrderService
     Order.new(
       company: company,
       branch: branch,
+      category: category,
       customer: customer,
       name: name,
       description: description,
@@ -27,6 +29,12 @@ class Seed::OrderService
 
   def self.create(...)
     order = new(...)
+    if order.category.nil? && order.company.present?
+      order.category = Seed::CategoryService.find_or_create_for(
+        company: order.company,
+        resource_name: Order.model_name.plural
+      )
+    end
     order.save!
     order
   end

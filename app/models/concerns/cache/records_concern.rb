@@ -23,7 +23,10 @@ module Cache::RecordsConcern
       end
 
       return [] if attributes_array.blank?
-      attributes_array.map { |attrs| instantiate(attrs) }
+      attributes_array.map do |attrs|
+        normalize_enum_attributes!(attrs)
+        instantiate(attrs)
+      end
     end
 
     # Usage: User.cached_find(id, expires_in: 10.minutes)
@@ -38,7 +41,26 @@ module Cache::RecordsConcern
         find_by(id: id)&.attributes
       end
 
-      instantiate(attributes) if attributes.present?
+      return nil if attributes.blank?
+
+      # Rails 8: #attributes returns enum values as strings ("company_owner")
+      # but instantiate expects raw database integers (2).
+      # Mismatch causes wrong enum values (e.g. "company_owner" → "super_admin").
+      normalize_enum_attributes!(attributes)
+      instantiate(attributes)
+    end
+
+    private
+
+    # Rails 8: #attributes returns enum values as strings, but instantiate
+    # expects raw integers. Convert strings back to avoid wrong enum mapping.
+    def normalize_enum_attributes!(attrs)
+      defined_enums.each do |enum_name, mapping|
+        value = attrs[enum_name]
+        if value.is_a?(String) && mapping.key?(value)
+          attrs[enum_name] = mapping[value]
+        end
+      end
     end
   end
 

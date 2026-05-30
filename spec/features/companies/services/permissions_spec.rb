@@ -276,7 +276,7 @@ RSpec.feature "Companies::Services Permissions", type: :feature, js: true do
       editable_name_field.find('.editable-input').send_keys :enter
     end
 
-    expect(page).to have_selector('tbody tr', wait: 10)
+    expect(page).to have_content('Updated Service Name', wait: 10)
     expect(Service.find_by(id: target_service.id).name).to eq("Updated Service Name")
   end
 
@@ -306,7 +306,7 @@ RSpec.feature "Companies::Services Permissions", type: :feature, js: true do
       desc_editable.find('.editable-input').send_keys :enter
     end
 
-    expect(page).to have_selector('tbody tr', wait: 10)
+    expect(page).to have_content('Updated description', wait: 10)
     expect(Service.find_by(id: target_service.id).description).to eq("Updated description")
   end
 

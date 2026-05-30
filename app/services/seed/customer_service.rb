@@ -2,6 +2,7 @@ class Seed::CustomerService
   def self.new(
     company:,
     branch: nil,
+    category: nil,
     user: nil,
     email: "customer_#{SecureRandom.hex}@gmail.com",
     name: Faker::Name.name,
@@ -14,6 +15,7 @@ class Seed::CustomerService
     Customer.new(
       company: company,
       branch: branch,
+      category: category,
       user: user,
       name: name,
       email: email,
@@ -27,6 +29,12 @@ class Seed::CustomerService
 
   def self.create(...)
     customer = new(...)
+    if customer.category.nil? && customer.company.present?
+      customer.category = Seed::CategoryService.find_or_create_for(
+        company: customer.company,
+        resource_name: Customer.model_name.plural
+      )
+    end
     customer.save!
     customer
   end

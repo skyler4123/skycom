@@ -57,6 +57,13 @@ class Seed::CategoryService
     category
   end
 
+  def self.find_or_create_for(company:, resource_name:)
+    Category.find_or_create_by!(
+      company: company,
+      resource_name: resource_name.to_s
+    ) { |cat| cat.name = resource_name.to_s.humanize }
+  end
+
   def self.random_property_labels
     count = rand(10..25)
     PROPERTY_COLUMNS.sample(count).each_with_object({}) do |column, hash|

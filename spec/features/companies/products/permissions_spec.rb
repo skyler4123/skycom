@@ -276,7 +276,7 @@ RSpec.feature "Companies::Products Permissions", type: :feature, js: true do
       editable_name_field.find('.editable-input').send_keys :enter
     end
 
-    expect(page).to have_selector('tbody tr', wait: 10)
+    expect(page).to have_content('Updated Product Name', wait: 10)
     expect(Product.find_by(id: target_product.id).name).to eq("Updated Product Name")
   end
 
@@ -306,7 +306,7 @@ RSpec.feature "Companies::Products Permissions", type: :feature, js: true do
       desc_editable.find('.editable-input').send_keys :enter
     end
 
-    expect(page).to have_selector('tbody tr', wait: 10)
+    expect(page).to have_content('Updated description', wait: 10)
     expect(Product.find_by(id: target_product.id).description).to eq("Updated description")
   end
 

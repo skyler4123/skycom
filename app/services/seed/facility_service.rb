@@ -2,6 +2,7 @@ class Seed::FacilityService
   def self.new(
     company:,
     branch: nil,
+    category: nil,
     name: Faker::Commerce.department,
     description: Faker::Lorem.sentence(word_count: 10),
     lifecycle_status: Facility.lifecycle_statuses.keys.sample,
@@ -12,6 +13,7 @@ class Seed::FacilityService
     Facility.new(
       company: company,
       branch: branch,
+      category: category,
       name: name,
       description: description,
       lifecycle_status: lifecycle_status,
@@ -23,6 +25,12 @@ class Seed::FacilityService
 
   def self.create(...)
     facility = new(...)
+    if facility.category.nil? && facility.company.present?
+      facility.category = Seed::CategoryService.find_or_create_for(
+        company: facility.company,
+        resource_name: Facility.model_name.plural
+      )
+    end
     facility.save!
     facility
   end

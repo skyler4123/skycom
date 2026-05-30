@@ -157,7 +157,7 @@ RSpec.feature "Companies::Departments Management", type: :feature, js: true do
       editable_name_field.find('.editable-input').send_keys :enter
     end
 
-    expect(page).to have_selector('tbody tr', wait: 10)
+    expect(page).to have_content('Updated Department Name', wait: 10)
     expect(Department.find_by(id: department.id).name).to eq("Updated Department Name")
   end
 
@@ -182,7 +182,7 @@ RSpec.feature "Companies::Departments Management", type: :feature, js: true do
       desc_editable.find('.editable-input').send_keys :enter
     end
 
-    expect(page).to have_selector('tbody tr', wait: 10)
+    expect(page).to have_content('Updated description for this department', wait: 10)
     expect(Department.find_by(id: department.id).description).to eq("Updated description for this department")
   end
 end
