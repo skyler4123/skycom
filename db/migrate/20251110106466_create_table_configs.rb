@@ -9,9 +9,7 @@ class CreateTableConfigs < ActiveRecord::Migration[8.0]
       t.string :description
       t.string :resource_name
 
-      # A simple ordered list of the visible columns.
-      # Example payload: ["name", "sku", "property_string_1", "property_boolean_4", "workflow_status"]
-      t.jsonb :visible_fields, null: false, default: []
+      t.jsonb :fields, null: false, default: []
 
       # --- System Fields ---
       t.integer  :lifecycle_status, index: true

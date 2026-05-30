@@ -20,6 +20,7 @@ RSpec.configure do |config|
     # run some additional clean up task - can be filtered by example metadata
     if ex.metadata[:js]
       Capybara.reset!
+      Faker::UniqueGenerator.clear
     end
   end
 end
