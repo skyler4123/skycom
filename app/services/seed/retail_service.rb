@@ -349,6 +349,153 @@ class Seed::RetailService
         },
         visible_columns: %w[name property_integer_1 property_string_1]
       }
+    },
+
+    warehouses: {
+      "Distribution Center" => {
+        properties: {
+          property_integer_1: "Loading Bay Count",
+          property_decimal_1: "Storage Capacity (sqm)",
+          property_boolean_1: "Automated Sorting System"
+        },
+        visible_columns: %w[name property_integer_1 property_decimal_1 property_boolean_1]
+      },
+      "Cold Storage" => {
+        properties: {
+          property_decimal_1: "Min Temperature (C)",
+          property_decimal_2: "Max Temperature (C)",
+          property_boolean_1: "Backup Generator Installed"
+        },
+        visible_columns: %w[name property_decimal_1 property_decimal_2 property_boolean_1]
+      },
+      "Fulfillment Hub" => {
+        properties: {
+          property_integer_1: "Max Daily Orders Capacity",
+          property_integer_2: "Staff Count Per Shift",
+          property_string_1: "Carrier Partnerships"
+        },
+        visible_columns: %w[name property_integer_1 property_integer_2 property_string_1]
+      }
+    },
+
+    stocks: {
+      "High Value" => {
+        properties: {
+          property_decimal_1: "Unit Cost (VND)",
+          property_integer_1: "Reorder Threshold Level",
+          property_boolean_1: "Requires Manager Approval"
+        },
+        visible_columns: %w[name property_decimal_1 property_integer_1 property_boolean_1]
+      },
+      "Fast Moving" => {
+        properties: {
+          property_integer_1: "Daily Turnover Rate",
+          property_string_1: "Preferred Bin Location Zone",
+          property_integer_2: "Safety Stock Level"
+        },
+        visible_columns: %w[name property_integer_1 property_string_1 property_integer_2]
+      },
+      "Slow Moving" => {
+        properties: {
+          property_integer_1: "Days Since Last Movement",
+          property_datetime_1: "Inventory Aging Date",
+          property_boolean_1: "Marked for Clearance"
+        },
+        visible_columns: %w[name property_integer_1 property_datetime_1 property_boolean_1]
+      }
+    },
+
+    stock_transfers: {
+      "Inter-Branch Transfer" => {
+        properties: {
+          property_string_1: "Origin Warehouse Name",
+          property_string_2: "Destination Branch Name",
+          property_integer_1: "Transit Time (Hours)"
+        },
+        visible_columns: %w[name property_string_1 property_string_2 property_integer_1]
+      },
+      "Emergency Replenishment" => {
+        properties: {
+          property_string_1: "Urgency Reason Notes",
+          property_boolean_1: "Approved by Manager"
+        },
+        visible_columns: %w[name property_string_1 property_boolean_1]
+      }
+    },
+
+    stock_exports: {
+      "Customer Sale" => {
+        properties: {
+          property_string_1: "Customer Order Reference Code",
+          property_integer_1: "Items Count In Shipment"
+        },
+        visible_columns: %w[name property_string_1 property_integer_1]
+      },
+      "Damaged Write-off" => {
+        properties: {
+          property_string_1: "Damage Description",
+          property_boolean_1: "Insurance Claim Filed"
+        },
+        visible_columns: %w[name property_string_1 property_boolean_1]
+      },
+      "Expired Disposal" => {
+        properties: {
+          property_datetime_1: "Expiration Date",
+          property_string_1: "Disposal Method Used"
+        },
+        visible_columns: %w[name property_datetime_1 property_string_1]
+      }
+    },
+
+    orders: {
+      "In-Store Purchase" => {
+        properties: {
+          property_string_1: "Sales Associate Name",
+          property_string_2: "Payment Method Used",
+          property_integer_1: "Items Count"
+        },
+        visible_columns: %w[name code property_string_1 property_string_2 property_integer_1]
+      },
+      "Online Order" => {
+        properties: {
+          property_string_1: "Shipping Carrier Name",
+          property_datetime_1: "Estimated Delivery Date",
+          property_boolean_1: "Gift Wrapping Requested"
+        },
+        visible_columns: %w[name code property_string_1 property_datetime_1 property_boolean_1]
+      },
+      "Phone Order" => {
+        properties: {
+          property_string_1: "Call Agent Name",
+          property_string_2: "Customer Callback Number"
+        },
+        visible_columns: %w[name code property_string_1 property_string_2]
+      }
+    },
+
+    stock_imports: {
+      "Supplier Purchase" => {
+        properties: {
+          property_string_1: "Supplier Name",
+          property_datetime_1: "Expected Delivery Date",
+          property_integer_1: "Purchase Order Line Items"
+        },
+        visible_columns: %w[name property_string_1 property_datetime_1 property_integer_1]
+      },
+      "Customer Return" => {
+        properties: {
+          property_string_1: "Return Reason Category",
+          property_boolean_1: "Inspection Passed"
+        },
+        visible_columns: %w[name property_string_1 property_boolean_1]
+      },
+      "Transfer In" => {
+        properties: {
+          property_string_1: "Source Warehouse Name",
+          property_integer_1: "Packing Slip Units Count"
+        },
+        visible_columns: %w[name property_string_1 property_integer_1]
+      }
     }
   }.freeze
 
@@ -695,6 +842,8 @@ class Seed::RetailService
         name: "#{branch.name} Warehouse",
         business_type: :distribution
       )
+      warehouse.category = random_category(:warehouses)
+      warehouse.save!
 
       @warehouses ||= []
       @warehouses << warehouse
@@ -705,12 +854,14 @@ class Seed::RetailService
     @warehouses.each do |warehouse|
       warehouse_products = @products.select { |p| p.branch_id == warehouse.branch_id }
       warehouse_products.each do |product|
-        Seed::StockService.create(
+        stock = Seed::StockService.create(
           warehouse: warehouse,
           product_id: product.id,
           quantity: rand(50..200),
           name: product.name
         )
+        stock.category = random_category(:stocks)
+        stock.save!
       end
     end
   end
@@ -722,7 +873,7 @@ class Seed::RetailService
         stock = Stock.find_by(name: product.name, warehouse: warehouse)
         next unless stock
 
-        Seed::StockTransferService.create(
+        transfer = Seed::StockTransferService.create(
           company: @retail,
           branch: warehouse.branch,
           product: product,
@@ -732,6 +883,8 @@ class Seed::RetailService
           workflow_status: :completed,
           lifecycle_status: :active
         )
+        transfer.category = random_category(:stock_transfers)
+        transfer.save!
       end
     end
   end
@@ -742,7 +895,7 @@ class Seed::RetailService
       next if branch_products.empty?
 
       branch_products.sample(rand(2..4)).each do |product|
-        Seed::StockImportService.create(
+        stock_import = Seed::StockImportService.create(
           company: @retail,
           branch: branch,
           product: product,
@@ -752,6 +905,8 @@ class Seed::RetailService
           workflow_status: StockImport.workflow_statuses.keys.sample,
           lifecycle_status: :active
         )
+        stock_import.category = random_category(:stock_imports)
+        stock_import.save!
       end
     end
   end
@@ -762,7 +917,7 @@ class Seed::RetailService
       next if branch_products.empty?
 
       branch_products.sample(rand(2..4)).each do |product|
-        Seed::StockExportService.create(
+        stock_export = Seed::StockExportService.create(
           company: @retail,
           branch: branch,
           product: product,
@@ -772,6 +927,8 @@ class Seed::RetailService
           workflow_status: StockExport.workflow_statuses.keys.sample,
           lifecycle_status: :active
         )
+        stock_export.category = random_category(:stock_exports)
+        stock_export.save!
       end
     end
   end
@@ -786,6 +943,8 @@ class Seed::RetailService
         order = Seed::OrderService.create(
           company: @retail, branch: branch, customer: customer, name: "Order #{i + 1} for #{customer.name}"
         )
+        order.category = random_category(:orders)
+        order.save!
         attach_items_to_order(branch, order)
       end
     end
