@@ -27,6 +27,12 @@ class Seed::WarehouseService
 
   def self.create(...)
     warehouse = new(...)
+    if warehouse.category.nil? && warehouse.company.present?
+      warehouse.category = Seed::CategoryService.find_or_create_for(
+        company: warehouse.company,
+        resource_name: Warehouse.model_name.plural
+      )
+    end
     warehouse.save!
     warehouse
   end

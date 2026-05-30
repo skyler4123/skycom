@@ -3,6 +3,7 @@ class Seed::ProductService
     company:,
     branch: nil,
     brand: nil,
+    category: nil,
     name: nil,
     description: nil,
     code: nil,
@@ -33,6 +34,7 @@ class Seed::ProductService
       company: company,
       branch: branch,
       brand: brand,
+      category: category,
       name: name,
       description: description,
       code: code,
@@ -49,6 +51,12 @@ class Seed::ProductService
 
   def self.create(...)
     product = new(...)
+    if product.category.nil? && product.company.present?
+      product.category = Seed::CategoryService.find_or_create_for(
+        company: product.company,
+        resource_name: Product.model_name.plural
+      )
+    end
     product.save!
     # Set price after save (uses PriceConcern's setter which creates PriceAppointment)
     if product.respond_to?(:_pending_price_hash) && product._pending_price_hash

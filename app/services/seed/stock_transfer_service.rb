@@ -45,6 +45,12 @@ class Seed::StockTransferService
 
   def self.create(...)
     transfer = new(...)
+    if transfer.category.nil? && transfer.company.present?
+      transfer.category = Seed::CategoryService.find_or_create_for(
+        company: transfer.company,
+        resource_name: StockTransfer.model_name.plural
+      )
+    end
     transfer.save!
     transfer
   end

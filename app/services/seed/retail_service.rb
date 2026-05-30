@@ -575,10 +575,6 @@ class Seed::RetailService
     puts "========================================================="
   end
 
-  def random_category(resource_name)
-    Category.where(company: @retail, resource_name: resource_name.to_s).sample
-  end
-
   def create_retail_company
     puts "Creating retail group..."
     @retail = Seed::CompanyService.create(
@@ -633,9 +629,7 @@ class Seed::RetailService
 
   def create_brands
     POPULAR_BRANDS.each do |brand_name|
-      brand = Seed::BrandService.create(company: @retail, name: brand_name)
-      brand.category = random_category(:brands)
-      brand.save!
+      Seed::BrandService.create(company: @retail, name: brand_name)
     end
   end
 
@@ -649,7 +643,6 @@ class Seed::RetailService
       )
       branch.attach_tag(key: "Branch #{branch.id} Tag")
       branch.address = Seed::AddressService.create
-      branch.category = random_category(:branches)
       branch.save!
 
       @branches << branch
@@ -690,7 +683,6 @@ class Seed::RetailService
           description: "A facility location for #{branch.name}"
         )
         facility.attach_tag(key: "Facility #{facility.id} Tag")
-        facility.category = random_category(:facilities)
         facility.save!
         @facilities << facility
       end
@@ -722,7 +714,6 @@ class Seed::RetailService
         description: "Department: #{dept_name}"
       )
       department.attach_tag(key: "Department #{department.id} Tag")
-      department.category = random_category(:departments)
       department.save!
       @departments << department
     end
@@ -745,7 +736,6 @@ class Seed::RetailService
             name: "Employee #{@employee_counter}"
           )
           employee.attach_role(role_name)
-          employee.category = random_category(:employees)
           employee.save!
           branch_employees << employee
         end
@@ -778,8 +768,6 @@ class Seed::RetailService
           customer = Seed::CustomerService.create(
             user: user, company: @retail, branch: branch, name: "Customer #{@customer_counter}"
           )
-          customer.category = random_category(:customers)
-          customer.save!
           @customers << customer
         end
       end
@@ -813,8 +801,6 @@ class Seed::RetailService
           name: "Product #{@product_counter}",
           description: "High-quality skincare product"
         )
-        product.category = random_category(:products)
-        product.save!
         @products << product
       end
 
@@ -827,8 +813,6 @@ class Seed::RetailService
           name: "Service #{@service_counter}",
           duration: [ 30, 45, 60, 90 ].sample
         )
-        service.category = random_category(:services)
-        service.save!
         @services << service
       end
     end
@@ -842,8 +826,6 @@ class Seed::RetailService
         name: "#{branch.name} Warehouse",
         business_type: :distribution
       )
-      warehouse.category = random_category(:warehouses)
-      warehouse.save!
 
       @warehouses ||= []
       @warehouses << warehouse
@@ -854,14 +836,12 @@ class Seed::RetailService
     @warehouses.each do |warehouse|
       warehouse_products = @products.select { |p| p.branch_id == warehouse.branch_id }
       warehouse_products.each do |product|
-        stock = Seed::StockService.create(
+        Seed::StockService.create(
           warehouse: warehouse,
           product_id: product.id,
           quantity: rand(50..200),
           name: product.name
         )
-        stock.category = random_category(:stocks)
-        stock.save!
       end
     end
   end
@@ -873,7 +853,7 @@ class Seed::RetailService
         stock = Stock.find_by(name: product.name, warehouse: warehouse)
         next unless stock
 
-        transfer = Seed::StockTransferService.create(
+        Seed::StockTransferService.create(
           company: @retail,
           branch: warehouse.branch,
           product: product,
@@ -883,8 +863,6 @@ class Seed::RetailService
           workflow_status: :completed,
           lifecycle_status: :active
         )
-        transfer.category = random_category(:stock_transfers)
-        transfer.save!
       end
     end
   end
@@ -895,7 +873,7 @@ class Seed::RetailService
       next if branch_products.empty?
 
       branch_products.sample(rand(2..4)).each do |product|
-        stock_import = Seed::StockImportService.create(
+        Seed::StockImportService.create(
           company: @retail,
           branch: branch,
           product: product,
@@ -905,8 +883,6 @@ class Seed::RetailService
           workflow_status: StockImport.workflow_statuses.keys.sample,
           lifecycle_status: :active
         )
-        stock_import.category = random_category(:stock_imports)
-        stock_import.save!
       end
     end
   end
@@ -917,7 +893,7 @@ class Seed::RetailService
       next if branch_products.empty?
 
       branch_products.sample(rand(2..4)).each do |product|
-        stock_export = Seed::StockExportService.create(
+        Seed::StockExportService.create(
           company: @retail,
           branch: branch,
           product: product,
@@ -927,8 +903,6 @@ class Seed::RetailService
           workflow_status: StockExport.workflow_statuses.keys.sample,
           lifecycle_status: :active
         )
-        stock_export.category = random_category(:stock_exports)
-        stock_export.save!
       end
     end
   end
@@ -943,8 +917,6 @@ class Seed::RetailService
         order = Seed::OrderService.create(
           company: @retail, branch: branch, customer: customer, name: "Order #{i + 1} for #{customer.name}"
         )
-        order.category = random_category(:orders)
-        order.save!
         attach_items_to_order(branch, order)
       end
     end

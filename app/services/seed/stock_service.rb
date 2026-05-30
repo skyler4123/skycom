@@ -40,6 +40,12 @@ class Seed::StockService
 
   def self.create(...)
     stock = new(...)
+    if stock.category.nil? && stock.company.present?
+      stock.category = Seed::CategoryService.find_or_create_for(
+        company: stock.company,
+        resource_name: Stock.model_name.plural
+      )
+    end
     stock.save!
     stock
   end

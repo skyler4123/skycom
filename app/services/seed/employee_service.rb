@@ -4,6 +4,7 @@ class Seed::EmployeeService
     branch: nil,
     departments: [],
     roles: [],
+    category: nil,
     user: nil,
     email: nil,
     name: nil,
@@ -25,6 +26,7 @@ class Seed::EmployeeService
       user: user,
       company: company,
       branch: branch,
+      category: category,
       departments: departments,
       roles: roles,
       email: email,
@@ -39,6 +41,12 @@ class Seed::EmployeeService
 
   def self.create(...)
     employee = new(...)
+    if employee.category.nil? && employee.company.present?
+      employee.category = Seed::CategoryService.find_or_create_for(
+        company: employee.company,
+        resource_name: Employee.model_name.plural
+      )
+    end
     employee.save!
     employee
   end

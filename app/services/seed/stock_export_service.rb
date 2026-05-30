@@ -44,8 +44,14 @@ class Seed::StockExportService
   end
 
   def self.create(...)
-    transfer = new(...)
-    transfer.save!
-    transfer
+    stock_export = new(...)
+    if stock_export.category.nil? && stock_export.company.present?
+      stock_export.category = Seed::CategoryService.find_or_create_for(
+        company: stock_export.company,
+        resource_name: StockExport.model_name.plural
+      )
+    end
+    stock_export.save!
+    stock_export
   end
 end

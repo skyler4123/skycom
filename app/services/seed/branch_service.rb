@@ -1,6 +1,7 @@
 class Seed::BranchService
   def self.new(
     company:,
+    category: nil,
     name: nil,
     description: nil,
     code: nil,
@@ -33,6 +34,7 @@ class Seed::BranchService
 
     Branch.new(
       company: company,
+      category: category,
       name: name,
       description: description,
       code: code,
@@ -50,6 +52,12 @@ class Seed::BranchService
 
   def self.create(...)
     branch = new(...)
+    if branch.category.nil? && branch.company.present?
+      branch.category = Seed::CategoryService.find_or_create_for(
+        company: branch.company,
+        resource_name: Branch.model_name.plural
+      )
+    end
     branch.save!
     branch
   end

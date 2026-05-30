@@ -2,6 +2,7 @@ class Seed::ServiceService
   def self.new(
     company:,
     branch: nil,
+    category: nil,
     name: nil,
     description: nil,
     lifecycle_status: nil,
@@ -21,6 +22,7 @@ class Seed::ServiceService
     Service.new(
       company: company,
       branch: branch,
+      category: category,
       name: name,
       description: description,
       lifecycle_status: lifecycle_status,
@@ -32,6 +34,12 @@ class Seed::ServiceService
 
   def self.create(...)
     service = new(...)
+    if service.category.nil? && service.company.present?
+      service.category = Seed::CategoryService.find_or_create_for(
+        company: service.company,
+        resource_name: Service.model_name.plural
+      )
+    end
     service.save!
     service
   end
