@@ -276,6 +276,7 @@ RSpec.feature "Companies::Branches Permissions", type: :feature, js: true do
     end
 
     expect(page).to have_selector('tbody tr', wait: 10)
+    expect(page).to have_content('Updated Branch Name', wait: 10)
     expect(Branch.find_by(id: target_branch.id).name).to eq("Updated Branch Name")
   end
 

@@ -163,7 +163,7 @@ RSpec.feature "Companies::Branches Management", type: :feature, js: true do
       editable_name_field.find('.editable-input').send_keys :enter
     end
 
-    expect(page).to have_selector('tbody tr', wait: 10)
+    expect(page).to have_content('Updated Branch Name', wait: 10)
     expect(Branch.find_by(id: branch.id).name).to eq("Updated Branch Name")
   end
 
@@ -188,7 +188,7 @@ RSpec.feature "Companies::Branches Management", type: :feature, js: true do
       desc_editable.find('.editable-input').send_keys :enter
     end
 
-    expect(page).to have_selector('tbody tr', wait: 10)
+    expect(page).to have_content('Updated description for this branch', wait: 10)
     expect(Branch.find_by(id: branch.id).description).to eq("Updated description for this branch")
   end
 
@@ -213,7 +213,7 @@ RSpec.feature "Companies::Branches Management", type: :feature, js: true do
       phone_editable.find('.editable-input').send_keys :enter
     end
 
-    expect(page).to have_selector('tbody tr', wait: 10)
+    expect(page).to have_content('+84 123 456 789', wait: 10)
     expect(Branch.find_by(id: branch.id).phone_number).to eq("+84 123 456 789")
   end
 end

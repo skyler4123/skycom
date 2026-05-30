@@ -163,7 +163,7 @@ RSpec.feature "Companies::Products Management", type: :feature, js: true do
       editable_name_field.find('.editable-input').send_keys :enter
     end
 
-    expect(page).to have_selector('tbody tr', wait: 10)
+    expect(page).to have_content('Updated Product Name', wait: 10)
     expect(Product.find_by(id: product.id).name).to eq("Updated Product Name")
   end
 
@@ -188,7 +188,7 @@ RSpec.feature "Companies::Products Management", type: :feature, js: true do
       desc_editable.find('.editable-input').send_keys :enter
     end
 
-    expect(page).to have_selector('tbody tr', wait: 10)
+    expect(page).to have_content('Updated description for this product', wait: 10)
     expect(Product.find_by(id: product.id).description).to eq("Updated description for this product")
   end
 end

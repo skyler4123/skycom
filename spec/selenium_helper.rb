@@ -33,4 +33,6 @@ if TEST_RUN_INSIDE_DOCKER
 else
   Capybara.default_driver = :selenium_chrome
   Capybara.javascript_driver = :selenium_chrome
+  # Capybara.default_driver = :selenium_chrome_headless
+  # Capybara.javascript_driver = :selenium_chrome_headless
 end
