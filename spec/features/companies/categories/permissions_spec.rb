@@ -287,7 +287,7 @@ RSpec.feature "Companies::Categories Permissions", type: :feature, js: true do
     expect(page).to have_selector('.swal2-container', wait: 10)
 
     # Find the property string section and the first editable property field
-    section = find('h4', text: 'Property String Fields (1-20)').find(:xpath, '..')
+    section = find('h4', text: 'Property String Fields (1-10)').find(:xpath, '..')
     property_editable = section.find('[data-controller="editable"]', match: :first)
     property_editable.click
 
@@ -302,7 +302,7 @@ RSpec.feature "Companies::Categories Permissions", type: :feature, js: true do
     expect(page).to have_content("property_string_1 updated!", wait: 10)
 
     target_category.property_mapping.reload
-    expect(target_category.property_mapping.property_string_1).to eq('Skin Type')
+    expect(target_category.property_mapping.property_string_1).to eq({ "label" => "Skin Type" })
   end
 
   scenario "editor can? returns correct values" do

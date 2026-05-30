@@ -67,6 +67,14 @@ Callbacks defined directly in the model file (not inherited from a concern).
 
 ---
 
+### PropertyMapping (`app/models/property_mapping.rb`)
+
+| Callback | Line | Method | Description |
+|----------|------|--------|-------------|
+| `before_validation :normalize_string_values` | 62 | `normalize_string_values` | Auto-wraps plain string values on all `property_*` columns into `{"label" => value}` hashes to support the JSONB object format used by the frontend. Only wraps values that are strings (not hashes). |
+
+---
+
 ### PolicyAppointment (`app/models/policy_appointment.rb`)
 
 | Callback | Line | Method | Description |

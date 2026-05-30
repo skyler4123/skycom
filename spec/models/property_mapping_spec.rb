@@ -47,8 +47,14 @@ RSpec.describe PropertyMapping, type: :model do
       expect(mapping).to be_valid
     end
 
-    it "is invalid with a non-hash value" do
-      mapping.property_string_1 = "just a string"
+    it "auto-converts a plain string to a label hash" do
+      mapping.property_string_1 = "Skin Type"
+      expect(mapping).to be_valid
+      expect(mapping.property_string_1).to eq({ "label" => "Skin Type" })
+    end
+
+    it "is invalid with a non-hash non-string value" do
+      mapping.property_string_1 = [ "array" ]
       expect(mapping).not_to be_valid
       expect(mapping.errors[:property_string_1]).to include("must be a JSON object (Hash)")
     end

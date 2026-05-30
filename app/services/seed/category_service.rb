@@ -2,8 +2,6 @@ class Seed::CategoryService
   PROPERTY_COLUMNS = %w[
     property_string_1 property_string_2 property_string_3 property_string_4 property_string_5
     property_string_6 property_string_7 property_string_8 property_string_9 property_string_10
-    property_string_11 property_string_12 property_string_13 property_string_14 property_string_15
-    property_string_16 property_string_17 property_string_18 property_string_19 property_string_20
     property_text_1 property_text_2 property_text_3 property_text_4 property_text_5
     property_integer_1 property_integer_2 property_integer_3 property_integer_4 property_integer_5
     property_integer_6 property_integer_7 property_integer_8 property_integer_9 property_integer_10
@@ -53,7 +51,7 @@ class Seed::CategoryService
       resource_name: resource_name
     )
     category.save!
-    all_properties = properties || random_property_labels
+    all_properties = properties.presence || random_property_labels
     category.property_mapping.update!(**all_properties) if all_properties.present?
 
     category
@@ -62,7 +60,7 @@ class Seed::CategoryService
   def self.random_property_labels
     count = rand(10..25)
     PROPERTY_COLUMNS.sample(count).each_with_object({}) do |column, hash|
-      hash[column] = label_for(column)
+      hash[column] = { "label" => label_for(column) }
     end
   end
 

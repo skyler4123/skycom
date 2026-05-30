@@ -59,6 +59,8 @@ class PropertyMapping < ApplicationRecord
   belongs_to :company
   belongs_to :category, optional: true
 
+  before_validation :normalize_string_values
+
   SUPPORTED_KEYS = {
     property_string:  %w[label input_type placeholder suffix prefix default].freeze,
     property_text:    %w[label input_type placeholder default].freeze,
@@ -122,6 +124,16 @@ class PropertyMapping < ApplicationRecord
           errors.add(column, "\"options\" must be an array of objects with \"value\" and \"label\" keys")
         end
       end
+    end
+  end
+
+  def normalize_string_values
+    property_columns = self.class.attribute_names.select { |a| a.start_with?("property_") }
+
+    property_columns.each do |column|
+      value = send(column)
+      next unless value.is_a?(String)
+      send(:"#{column}=", { "label" => value })
     end
   end
 end
