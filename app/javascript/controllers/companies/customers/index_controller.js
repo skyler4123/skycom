@@ -12,7 +12,9 @@ export default class Companies_Customers_IndexController extends Companies_Layou
     super.connect()
     try {
       /** @type {{ customers: Customer[], pagination: any }} */
-      const response = await fetchJson()
+      const response = await fetchJson({
+        params: { category_id: this.defaultFilterCategory().id }
+      })
 
       this.customers = response.customers || []
       this.pagination = response.pagination || {}
@@ -41,10 +43,18 @@ export default class Companies_Customers_IndexController extends Companies_Layou
     openModal({ html: `<div data-controller="${identifier(Companies_Customers_ShowModalController)}"></div>` })
   }
 
+  customersCategories() {
+    return currentCategories().filter(c => c.resource_name === "customers")
+  }
+
+  defaultFilterCategory() {
+    return this.customersCategories()[0]
+  }
+
   contentHTML() {
     const typeFilter = Enums()?.customer?.business_types || []
     const statusFilter = Enums()?.customer?.workflow_statuses || []
-    const categoryFilter = currentCategories().filter(c => c.resource_name === "customers")
+    const categoryFilter = this.customersCategories()
 
     const urlParams = new URLSearchParams(window.location.search)
 

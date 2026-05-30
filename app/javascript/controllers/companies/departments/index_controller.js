@@ -12,7 +12,9 @@ export default class Companies_Departments_IndexController extends Companies_Lay
     super.connect()
     try {
       /** @type {{ departments: Department[], pagination: any }} */
-      const response = await fetchJson()
+      const response = await fetchJson({
+        params: { category_id: this.defaultFilterCategory().id }
+      })
 
       this.departments = response.departments || []
       this.pagination = response.pagination || {}
@@ -41,10 +43,18 @@ export default class Companies_Departments_IndexController extends Companies_Lay
     openModal({ html: `<div data-controller="${identifier(Companies_Departments_ShowModalController)}"></div>` })
   }
 
+  departmentsCategories() {
+    return currentCategories().filter(c => c.resource_name === "departments")
+  }
+
+  defaultFilterCategory() {
+    return this.departmentsCategories()[0]
+  }
+
   contentHTML() {
     const typeFilter = Enums()?.department?.business_types || []
     const workflowStatusFilter = Enums()?.department?.workflow_statuses || []
-    const categoryFilter = currentCategories().filter(c => c.resource_name === "departments")
+    const categoryFilter = this.departmentsCategories()
 
     const urlParams = new URLSearchParams(window.location.search)
 

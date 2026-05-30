@@ -12,7 +12,9 @@ export default class Companies_Branches_IndexController extends Companies_Layout
     super.connect()
     try {
       /** @type {{ branches: Branch[], pagination: any }} */
-      const response = await fetchJson()
+      const response = await fetchJson({
+        params: { category_id: this.defaultFilterCategory().id }
+      })
 
       this.branches = response.branches || []
       this.pagination = response.pagination || {}
@@ -41,10 +43,18 @@ export default class Companies_Branches_IndexController extends Companies_Layout
     openModal({ html: `<div data-controller="${identifier(Companies_Branches_ShowModalController)}"></div>` })
   }
 
+  branchesCategories() {
+    return currentCategories().filter(c => c.resource_name === "branches")
+  }
+
+  defaultFilterCategory() {
+    return this.branchesCategories()[0]
+  }
+
   contentHTML() {
     const typeFilter = Enums()?.branch?.business_types || []
     const workflowStatusFilter = Enums()?.branch?.workflow_statuses || []
-    const categoryFilter = currentCategories().filter(c => c.resource_name === "branches")
+    const categoryFilter = this.branchesCategories()
 
     const urlParams = new URLSearchParams(window.location.search)
 

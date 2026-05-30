@@ -12,7 +12,9 @@ export default class Companies_Employees_IndexController extends Companies_Layou
     super.connect() // Start parent layout logic
     try {
       /** @type {{ employees: Employee[], pagination: any }} */
-      const response = await fetchJson()
+      const response = await fetchJson({
+        params: { category_id: this.defaultFilterCategory().id }
+      })
       
       // 1. Save the data to the instance immediately
       this.employees = response.employees || []
@@ -43,13 +45,21 @@ export default class Companies_Employees_IndexController extends Companies_Layou
     openModal({ html: `<div data-controller="${identifier(Companies_Employees_ShowModalController)}"></div>` })
   }
 
+  employeesCategories() {
+    return currentCategories().filter(c => c.resource_name === "employees")
+  }
+
+  defaultFilterCategory() {
+    return this.employeesCategories()[0]
+  }
+
   contentHTML() {
     // Local aliases for cleaner template interpolation
     const departmentFilter = Helpers.currentDepartments();
     const roleFilter = Helpers.currentRoles();
     const workflowStatusFilter = Enums().employee.workflow_statuses;
     const typeFilter = Enums().employee.business_types;
-    const categoryFilter = currentCategories().filter(c => c.resource_name === "employees");
+    const categoryFilter = this.employeesCategories();
     
     const urlParams = new URLSearchParams(window.location.search);
 

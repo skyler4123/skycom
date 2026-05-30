@@ -12,7 +12,9 @@ export default class Companies_Brands_IndexController extends Companies_LayoutCo
     super.connect()
     try {
       /** @type {{ brands: Brand[], pagination: any }} */
-      const response = await fetchJson()
+      const response = await fetchJson({
+        params: { category_id: this.defaultFilterCategory().id }
+      })
 
       this.brands = response.brands || []
       this.pagination = response.pagination || {}
@@ -41,10 +43,18 @@ export default class Companies_Brands_IndexController extends Companies_LayoutCo
     openModal({ html: `<div data-controller="${identifier(Companies_Brands_ShowModalController)}"></div>` })
   }
 
+  brandsCategories() {
+    return currentCategories().filter(c => c.resource_name === "brands")
+  }
+
+  defaultFilterCategory() {
+    return this.brandsCategories()[0]
+  }
+
   contentHTML() {
     const businessTypeFilter = Enums()?.brand?.business_types || []
     const workflowStatusFilter = Enums()?.brand?.workflow_statuses || []
-    const categoryFilter = currentCategories().filter(c => c.resource_name === "brands")
+    const categoryFilter = this.brandsCategories()
 
     const urlParams = new URLSearchParams(window.location.search)
 

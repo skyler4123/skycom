@@ -12,7 +12,9 @@ export default class Companies_Products_IndexController extends Companies_Layout
     super.connect()
     try {
       /** @type {{ products: Product[], pagination: any }} */
-      const response = await fetchJson()
+      const response = await fetchJson({
+        params: { category_id: this.defaultFilterCategory().id }
+      })
 
       this.products = response.products || []
       this.pagination = response.pagination || {}
@@ -30,6 +32,14 @@ export default class Companies_Products_IndexController extends Companies_Layout
     }
   }
 
+  productsCategories() {
+    return currentCategories().filter(c => c.resource_name === "products")
+  }
+
+  defaultFilterCategory() {
+    return this.productsCategories()[0]
+  }
+
   openNewModal() {
     openModal({ html: `<div data-controller="${identifier(Companies_Products_NewModalController)}"></div>` })
   }
@@ -44,7 +54,7 @@ export default class Companies_Products_IndexController extends Companies_Layout
   contentHTML() {
     const typeFilter = Enums()?.product?.business_types || []
     const workflowStatusFilter = Enums()?.product?.workflow_statuses || []
-    const categoryFilter = currentCategories().filter(c => c.resource_name === "products")
+    const categoryFilter = this.productsCategories()
 
     const urlParams = new URLSearchParams(window.location.search)
 

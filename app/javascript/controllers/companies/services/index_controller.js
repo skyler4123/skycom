@@ -12,7 +12,9 @@ export default class Companies_Services_IndexController extends Companies_Layout
     super.connect()
     try {
       /** @type {{ services: Service[], pagination: any }} */
-      const response = await fetchJson()
+      const response = await fetchJson({
+        params: { category_id: this.defaultFilterCategory().id }
+      })
 
       this.services = response.services || []
       this.pagination = response.pagination || {}
@@ -41,10 +43,18 @@ export default class Companies_Services_IndexController extends Companies_Layout
     openModal({ html: `<div data-controller="${identifier(Companies_Services_ShowModalController)}"></div>` })
   }
 
+  servicesCategories() {
+    return currentCategories().filter(c => c.resource_name === "services")
+  }
+
+  defaultFilterCategory() {
+    return this.servicesCategories()[0]
+  }
+
   contentHTML() {
     const typeFilter = Enums()?.service?.business_types || []
     const workflowStatusFilter = Enums()?.service?.workflow_statuses || []
-    const categoryFilter = currentCategories().filter(c => c.resource_name === "services")
+    const categoryFilter = this.servicesCategories()
 
     const urlParams = new URLSearchParams(window.location.search)
 
