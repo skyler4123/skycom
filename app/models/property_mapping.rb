@@ -60,6 +60,8 @@ class PropertyMapping < ApplicationRecord
   belongs_to :company
   belongs_to :category
 
+  has_many :table_configs, dependent: :destroy
+
   before_validation :normalize_string_values
 
   SUPPORTED_KEYS = {

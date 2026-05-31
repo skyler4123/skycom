@@ -5119,6 +5119,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
   create_table "table_configs", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
     t.uuid "company_id", null: false
     t.uuid "category_id"
+    t.uuid "property_mapping_id"
     t.string "name"
     t.string "description"
     t.string "resource_name"
@@ -5138,6 +5139,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.index ["company_id"], name: "index_table_configs_on_company_id"
     t.index ["discarded_at"], name: "index_table_configs_on_discarded_at"
     t.index ["lifecycle_status"], name: "index_table_configs_on_lifecycle_status"
+    t.index ["property_mapping_id"], name: "index_table_configs_on_property_mapping_id"
     t.index ["workflow_status"], name: "index_table_configs_on_workflow_status"
   end
 
@@ -5874,6 +5876,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
   add_foreign_key "system_subscriptions", "system_subscription_plans"
   add_foreign_key "table_configs", "categories"
   add_foreign_key "table_configs", "companies"
+  add_foreign_key "table_configs", "property_mappings"
   add_foreign_key "tag_appointments", "companies"
   add_foreign_key "tag_appointments", "tags"
   add_foreign_key "tags", "companies"
