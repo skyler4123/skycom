@@ -7,6 +7,7 @@ class Company < ApplicationRecord
      Table Reservation Room Guest
     Patient Appointment Course Student Exam
     Membership
+    Stock StockTransfer StockImport StockExport
   ]
 
   include AddressConcern

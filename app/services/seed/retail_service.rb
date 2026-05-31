@@ -1438,6 +1438,10 @@ class Seed::RetailService
         "Reservation" => { create: true, read: true, update: true, delete: true },
         "Room" => { create: true, read: true, update: true, delete: true },
         "Service" => { create: true, read: true, update: true, delete: true },
+        "Stock" => { create: true, read: true, update: true, delete: true },
+        "StockExport" => { create: true, read: true, update: true, delete: true },
+        "StockImport" => { create: true, read: true, update: true, delete: true },
+        "StockTransfer" => { create: true, read: true, update: true, delete: true },
         "Student" => { create: true, read: true, update: true, delete: true },
         "Table" => { create: true, read: true, update: true, delete: true }
       },

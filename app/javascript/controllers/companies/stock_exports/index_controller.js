@@ -11,7 +11,10 @@ export default class Companies_StockExports_IndexController extends Companies_La
 
     try {
       /** @type {{ stock_exports: StockExport[], pagination: any }} */
-      const response = await fetchJson()
+      const urlParams = new URLSearchParams(window.location.search)
+      const response = await fetchJson({
+        params: { category_id: urlParams.get('category_id') || this.defaultFilterCategory()?.id }
+      })
 
       this.exports = response.stock_exports || []
       this.pagination = response.pagination || {}
@@ -29,11 +32,21 @@ export default class Companies_StockExports_IndexController extends Companies_La
     }
   }
 
+  stockExportsCategories() {
+    return currentCategories().filter(c => c.resource_name === "stock_exports")
+  }
+
+  defaultFilterCategory() {
+    return this.stockExportsCategories()[0]
+  }
+
   contentHTML() {
     const typeFilter = Enums()?.stock_export?.business_types || []
     const workflowStatusFilter = Enums()?.stock_export?.workflow_statuses || []
+    const categoryFilter = this.stockExportsCategories()
 
     const urlParams = new URLSearchParams(window.location.search)
+    const categoryValue = urlParams.get('category_id') || this.defaultFilterCategory()?.id
 
     return `
       <div class="p-4 overflow-y-auto">
@@ -41,6 +54,13 @@ export default class Companies_StockExports_IndexController extends Companies_La
 
           <form method="get" action="${pathname()}" class="flex flex-wrap items-end gap-3 mb-6 w-full">
             <div class="flex flex-wrap items-center gap-3">
+              <div class="flex flex-col gap-1">
+                <label class="text-[10px] font-bold text-slate-400 uppercase ml-1">Category</label>
+                <select name="category_id" class="pl-3 pr-10 py-2 text-sm border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300">
+                  ${selectOptionsHTML(cloneNewKey(categoryFilter, "id", "value"), categoryValue)}
+                </select>
+              </div>
+
               <div class="flex flex-col gap-1">
                 <label class="text-[10px] font-bold text-slate-400 uppercase ml-1">Search</label>
                 <input 
