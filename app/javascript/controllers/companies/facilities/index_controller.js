@@ -12,7 +12,10 @@ export default class Companies_Facilities_IndexController extends Companies_Layo
     super.connect()
     try {
       /** @type {{ facilities: Facility[], pagination: any }} */
-      const response = await fetchJson()
+      const urlParams = new URLSearchParams(window.location.search)
+      const response = await fetchJson({
+        params: { category_id: urlParams.get('category_id') || this.defaultFilterCategory()?.id }
+      })
 
       this.facilities = response.facilities || []
       this.pagination = response.pagination || {}
@@ -41,13 +44,22 @@ export default class Companies_Facilities_IndexController extends Companies_Layo
     openModal({ html: `<div data-controller="${identifier(Companies_Facilities_ShowModalController)}"></div>` })
   }
 
+  facilitiesCategories() {
+    return currentCategories().filter(c => c.resource_name === "facilities")
+  }
+
+  defaultFilterCategory() {
+    return this.facilitiesCategories()[0]
+  }
+
   contentHTML() {
     const branchFilter = currentBranches()
     const businessTypeFilter = Enums()?.facility?.business_types || []
     const workflowStatusFilter = Enums()?.facility?.workflow_statuses || []
-    const categoryFilter = currentCategories().filter(c => c.resource_name === "facilities")
+    const categoryFilter = this.facilitiesCategories()
 
     const urlParams = new URLSearchParams(window.location.search)
+    const categoryValue = urlParams.get('category_id') || this.defaultFilterCategory()?.id
 
     return `
       <div class="p-4 overflow-y-auto" data-action="filter:changed@window->${this.identifier}#handleFilter">
@@ -58,16 +70,16 @@ export default class Companies_Facilities_IndexController extends Companies_Layo
               <div class="flex flex-wrap items-center gap-3 w-full lg:w-auto">
 
                 <div class="flex flex-col gap-1">
-                  <label class="text-[10px] font-bold text-slate-400 uppercase ml-1">Branch</label>
-                  <select name="branch_id" class="pl-3 pr-10 py-2 text-sm border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300">
-                    ${selectOptionsHTML(cloneNewKey(branchFilter, "id", "value"), urlParams.get('branch_id'), "All Branches")}
+                  <label class="text-[10px] font-bold text-slate-400 uppercase ml-1">Category</label>
+                  <select name="category_id" class="pl-3 pr-10 py-2 text-sm border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300">
+                    ${selectOptionsHTML(cloneNewKey(categoryFilter, "id", "value"), categoryValue)}
                   </select>
                 </div>
 
                 <div class="flex flex-col gap-1">
-                  <label class="text-[10px] font-bold text-slate-400 uppercase ml-1">Category</label>
-                  <select name="category_id" class="pl-3 pr-10 py-2 text-sm border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300">
-                    ${selectOptionsHTML(cloneNewKey(categoryFilter, "id", "value"), urlParams.get('category_id'), "All Categories")}
+                  <label class="text-[10px] font-bold text-slate-400 uppercase ml-1">Branch</label>
+                  <select name="branch_id" class="pl-3 pr-10 py-2 text-sm border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300">
+                    ${selectOptionsHTML(cloneNewKey(branchFilter, "id", "value"), urlParams.get('branch_id'), "All Branches")}
                   </select>
                 </div>
 
