@@ -122,14 +122,7 @@ export default class Companies_LayoutController extends Controller {
                   <span class="material-symbols-outlined">order_approve</span>
                   <p class="text-sm font-medium leading-normal">Orders</p>
                 </a>
-                <a
-                  class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:bg-blue-100 open:text-blue-600"
-                  href="${Helpers.company_payments_path(currentCompany().id)}"
-                  ${openByPathname()}
-                >
-                  <span class="material-symbols-outlined">payments</span>
-                  <p class="text-sm font-medium leading-normal">Payments</p>
-                </a>
+
                 <a
                   class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:bg-blue-100 open:text-blue-600"
                   href="${Helpers.company_employees_path(currentCompany().id)}"
@@ -186,102 +179,24 @@ export default class Companies_LayoutController extends Controller {
                   <span class="material-symbols-outlined">receipt_long</span>
                   <p class="text-sm font-medium leading-normal">Invoices</p>
                 </a>
+
                 <a
                   class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:bg-blue-100 open:text-blue-600"
-                  href="${Helpers.company_schedules_path(currentCompany().id)}"
+                  href="${Helpers.company_policies_path(currentCompany().id)}"
                   ${openByPathname()}
                 >
-                  <span class="material-symbols-outlined">calendar_month</span>
-                  <p class="text-sm font-medium leading-normal">Schedules</p>
-                </a>
-                <a
-                  class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:bg-blue-100 open:text-blue-600"
-                  href="${Helpers.company_attendances_path(currentCompany().id)}"
-                  ${openByPathname()}
-                >
-                  <span class="material-symbols-outlined">fact_check</span>
-                  <p class="text-sm font-medium leading-normal">Attendances</p>
+                  <span class="material-symbols-outlined">security</span>
+                  <p class="text-sm font-medium leading-normal">Policies</p>
                 </a>
                 <a
                   class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:bg-blue-100 open:text-blue-600"
-                  href="${Helpers.company_reports_path(currentCompany().id)}"
+                  href="${Helpers.company_permissions_path(currentCompany().id)}"
                   ${openByPathname()}
                 >
-                  <span class="material-symbols-outlined">report_problem</span>
-                  <p class="text-sm font-medium leading-normal">Reports</p>
+                  <span class="material-symbols-outlined">shield</span>
+                  <p class="text-sm font-medium leading-normal">Permissions</p>
                 </a>
-                <a
-                  class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:bg-blue-100 open:text-blue-600"
-                  href="${Helpers.company_documents_path(currentCompany().id)}
-                  ${openByPathname()}
-                >
-                  <span class="material-symbols-outlined">description</span>
-                  <p class="text-sm font-medium leading-normal">Documents</p>
-                </a>
-                <a
-                  class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:bg-blue-100 open:text-blue-600"
-                  href="${Helpers.company_announcements_path(currentCompany().id)}"
-                  ${openByPathname()}
-                >
-                  <span class="material-symbols-outlined">campaign</span>
-                  <p class="text-sm font-medium leading-normal">Announcements</p>
-                </a>
-                <a
-                  class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:bg-blue-100 open:text-blue-600"
-                  href="${Helpers.company_events_path(currentCompany().id)}"
-                  ${openByPathname()}
-                >
-                  <span class="material-symbols-outlined">event</span>
-                  <p class="text-sm font-medium leading-normal">Events</p>
-                </a>
-                <a
-                  class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:bg-blue-100 open:text-blue-600"
-                  href="${Helpers.company_discounts_path(currentCompany().id)}"
-                  ${openByPathname()}
-                >
-                  <span class="material-symbols-outlined">percent</span>
-                  <p class="text-sm font-medium leading-normal">Discounts</p>
-                </a>
-                <a
-                  class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:bg-blue-100 open:text-blue-600"
-                  href="${Helpers.company_subscriptions_path(currentCompany().id)}"
-                  ${openByPathname()}
-                >
-                   <span class="material-symbols-outlined">loyalty</span>
-                   <p class="text-sm font-medium leading-normal">Subscriptions</p>
-                </a>
-                  <a
-                    class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:bg-blue-100 open:text-blue-600"
-                    href="${Helpers.company_policies_path(currentCompany().id)}"
-                    ${openByPathname()}
-                  >
-                    <span class="material-symbols-outlined">security</span>
-                    <p class="text-sm font-medium leading-normal">Policies</p>
-                  </a>
-                  <a
-                    class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:bg-blue-100 open:text-blue-600"
-                    href="${Helpers.company_permissions_path(currentCompany().id)}"
-                    ${openByPathname()}
-                  >
-                    <span class="material-symbols-outlined">shield</span>
-                    <p class="text-sm font-medium leading-normal">Permissions</p>
-                  </a>
-                <a
-                   class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:bg-blue-100 open:text-blue-600"
-                   href="${Helpers.company_tasks_path(currentCompany().id)}"
-                   ${openByPathname()}
-                 >
-                  <span class="material-symbols-outlined">check_box</span>
-                  <p class="text-sm font-medium leading-normal">Tasks</p>
-                </a>
-                <a
-                  class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:bg-blue-100 open:text-blue-600"
-                  href="${Helpers.company_payslips_path(currentCompany().id)}"
-                  ${openByPathname()}
-                >
-                  <span class="material-symbols-outlined">receipt</span>
-                  <p class="text-sm font-medium leading-normal">Payslips</p>
-                </a>
+
                 <a
                   class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:bg-blue-100 open:text-blue-600"
                   href="${Helpers.company_facilities_path(currentCompany().id)}"
@@ -292,19 +207,7 @@ export default class Companies_LayoutController extends Controller {
                 </a>
               </div>
             </nav>
-            <!-- Sidebar Footer (Settings Link) -->
-            <div class="p-4 border-t border-gray-200 dark:border-gray-800">
-              <div class="flex flex-col gap-2">
-                <a
-                  class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:bg-blue-100 open:text-blue-600"
-                  ${openByPathname()}
-                  href="${Helpers.company_settings_path(currentCompany().id)}"
-                >
-                  <span class="material-symbols-outlined">settings</span>
-                  <p class="text-sm font-medium leading-normal">Settings</p>
-                </a>
-              </div>
-            </div>
+
           </aside>
           <!-- End Sidebar -->
           <!-- Main Content Wrapper -->

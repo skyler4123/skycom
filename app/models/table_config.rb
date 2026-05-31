@@ -9,6 +9,7 @@ class TableConfig < ApplicationRecord
 
   belongs_to :company
   belongs_to :category
+  belongs_to :property_mapping
 
   # ---------------------------------------------------------------------------
   # `fields` JSONB Array — Enterprise Table Configuration

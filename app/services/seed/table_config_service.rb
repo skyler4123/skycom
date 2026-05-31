@@ -3,6 +3,7 @@ class Seed::TableConfigService
     company:,
     resource_name:,
     category:,
+    property_mapping: nil,
     fields: [],
     name: nil
   )
@@ -10,6 +11,7 @@ class Seed::TableConfigService
       company: company,
       resource_name: resource_name,
       category: category,
+      property_mapping: property_mapping,
       name: name || "#{category&.name || resource_name} table config",
       fields: fields
     )
@@ -19,6 +21,7 @@ class Seed::TableConfigService
     company:,
     resource_name:,
     category:,
+    property_mapping: nil,
     fields: [],
     name: nil
   )
@@ -26,6 +29,7 @@ class Seed::TableConfigService
       company: company,
       resource_name: resource_name,
       category: category,
+      property_mapping: property_mapping,
       fields: fields,
       name: name
     )
