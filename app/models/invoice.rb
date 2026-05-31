@@ -20,17 +20,13 @@ class Invoice < ApplicationRecord
     subscription: 2
   }
 
-  enum :currency_code, {
-    usd: 0,
-    eur: 1,
-    gbp: 2
-  }
+  enum :currency_code, CURRENCIE_CODES, prefix: true
 
   # --- Validations ---
   validates :name, presence: true, uniqueness: { scope: :company_id }, length: { maximum: 255 }
   validates :currency_code, presence: true
-  validates :number, presence: true, uniqueness: true
-  validates :total, presence: true, numericality: { greater_than_or_equal_to: 0 }
+  validates :code, presence: true, uniqueness: true
+  validates :total_price, presence: true, numericality: { greater_than_or_equal_to: 0 }
 
   validates :business_type, presence: true
 end

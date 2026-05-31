@@ -58,7 +58,7 @@ class Companies::InvoicesController < Companies::ApplicationController
       :business_type,
       :workflow_status,
       :currency_code,
-      :number,
+      :code,
       :total_price,
       :due_date
     )
@@ -66,7 +66,7 @@ class Companies::InvoicesController < Companies::ApplicationController
 
   def format_invoice(invoice)
     invoice.as_json(only: [
-      :id, :name, :description, :code, :number,
+      :id, :name, :description, :code,
       :lifecycle_status, :workflow_status, :business_type,
       :currency_code, :total_price, :due_date,
       :order_id, :created_at, :updated_at

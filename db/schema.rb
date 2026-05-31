@@ -2087,6 +2087,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.text "description"
     t.string "code"
     t.string "phone_number"
+    t.decimal "total_price", precision: 15, scale: 2
+    t.datetime "due_date"
     t.integer "currency_code", default: 840
     t.integer "country_code", default: 1
     t.string "timezone", default: "UTC"

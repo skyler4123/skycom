@@ -989,6 +989,7 @@ class Seed::RetailService
     create_stock_imports
     create_stock_exports
     create_customer_orders
+    create_invoices
 
     print_footer
     true
@@ -1366,6 +1367,19 @@ class Seed::RetailService
     branch_services.sample(rand(1..2)).each do |service|
       OrderAppointment.create!(company: @retail, order: order, appoint_to: service, quantity: 1, unit_price: rand(50.0..200.0).round(2), total_price: 0)
     end
+  end
+
+  def create_invoices
+    puts "Creating invoices for orders..."
+    @branches.each do |branch|
+      branch_orders = Order.where(company: @retail, branch: branch)
+      next if branch_orders.empty?
+
+      branch_orders.sample(rand(3..5)).each do |order|
+        Seed::InvoiceService.create(order: order)
+      end
+    end
+    puts "  -> #{Invoice.where(company: @retail).count} invoices created"
   end
 
   def configure_retail_permissions
