@@ -90,8 +90,8 @@ RSpec.feature "Companies::Customers Management", type: :feature, js: true do
     visit company_customers_path(company)
     expect(page).to have_selector('table', wait: 10)
 
-    expect(page).to have_content("Individual", minimum: 1)
-    expect(page).to have_content("Enterprise", minimum: 1)
+    expect(page).to have_content(customer.business_type.to_s.titleize, minimum: 1)
+    expect(page).to have_content(customer2.business_type.to_s.titleize, minimum: 1)
   end
 
   scenario "display customer workflow status as badge" do
