@@ -73,17 +73,6 @@ RSpec.feature "Companies::Customers Management", type: :feature, js: true do
     expect(page).to have_selector('[data-action*="openShowModal"]', minimum: 1)
   end
 
-  scenario "search triggers form submission and filters results" do
-    visit company_customers_path(company)
-    expect(page).to have_selector('table', wait: 10)
-
-    expect(page).to have_button("Search")
-
-    click_button "Search"
-
-    expect(page).to have_selector('tbody tr', wait: 10)
-  end
-
   scenario "filter by category updates URL and filters table" do
     category = Seed::CategoryService.create(company: company, name: "Test Category", resource_name: "customers")
     customer.update!(category: category)
@@ -94,32 +83,6 @@ RSpec.feature "Companies::Customers Management", type: :feature, js: true do
     click_button "Search"
 
     expect(page).to have_current_path(/category_id=#{category.id}/)
-    expect(page).to have_selector('tbody tr', wait: 10)
-  end
-
-  scenario "filter by business type updates URL and filters table" do
-    visit company_customers_path(company)
-    expect(page).to have_selector('table', wait: 10)
-
-    select("Enterprise", from: 'business_type')
-    click_button "Search"
-
-    expect(page).to have_current_path(/business_type=enterprise/)
-
-    expect(page).to have_selector('tbody tr', wait: 10)
-    expect(page).to have_content("Enterprise")
-  end
-
-  scenario "filter by workflow status updates URL and filters table" do
-    customer2.update!(workflow_status: "pending")
-    visit company_customers_path(company)
-    expect(page).to have_selector('table', wait: 10)
-
-    select("Pending", from: 'workflow_status')
-    click_button "Search"
-
-    expect(page).to have_current_path(/workflow_status=pending/)
-
     expect(page).to have_selector('tbody tr', wait: 10)
   end
 
@@ -143,20 +106,6 @@ RSpec.feature "Companies::Customers Management", type: :feature, js: true do
     expect(page).to have_selector('table', wait: 10)
 
     expect(page).to have_content("enterprise@example.com")
-  end
-
-  scenario "clear filters resets URL and shows all customers" do
-    visit company_customers_path(company, business_type: "enterprise")
-    expect(page).to have_selector('table', wait: 10)
-
-    click_button "Search"
-
-    expect(page).to have_current_path(/business_type=enterprise/)
-
-    select("All Types", from: 'business_type')
-    click_button "Search"
-
-    expect(page).to have_current_path(/business_type=/)
   end
 
   scenario "update customer name via show modal" do

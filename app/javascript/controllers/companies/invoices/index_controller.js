@@ -53,9 +53,6 @@ export default class Companies_Invoices_IndexController extends Companies_Layout
   }
 
   contentHTML() {
-    const typeFilter = Enums()?.invoice?.business_types || []
-    const statusFilter = Enums()?.invoice?.workflow_statuses || []
-    const currencyFilter = Enums()?.invoice?.currency_codes || []
     const categoryFilter = this.invoicesCategories()
 
     const urlParams = new URLSearchParams(window.location.search)
@@ -73,27 +70,6 @@ export default class Companies_Invoices_IndexController extends Companies_Layout
                   <label class="text-[10px] font-bold text-slate-400 uppercase ml-1">Category</label>
                   <select name="category_id" class="pl-3 pr-10 py-2 text-sm border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300">
                     ${selectOptionsHTML(cloneNewKey(categoryFilter, "id", "value"), categoryValue)}
-                  </select>
-                </div>
-
-                <div class="flex flex-col gap-1">
-                  <label class="text-[10px] font-bold text-slate-400 uppercase ml-1">Type</label>
-                  <select name="business_type" class="pl-3 pr-10 py-2 text-sm border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300">
-                    ${selectOptionsHTML(typeFilter, urlParams.get('business_type'), "All Types")}
-                  </select>
-                </div>
-
-                <div class="flex flex-col gap-1">
-                  <label class="text-[10px] font-bold text-slate-400 uppercase ml-1">Status</label>
-                  <select name="workflow_status" class="pl-3 pr-10 py-2 text-sm border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300">
-                    ${selectOptionsHTML(statusFilter, urlParams.get('workflow_status'), "All Statuses")}
-                  </select>
-                </div>
-
-                <div class="flex flex-col gap-1">
-                  <label class="text-[10px] font-bold text-slate-400 uppercase ml-1">Currency</label>
-                  <select name="currency_code" class="pl-3 pr-10 py-2 text-sm border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300">
-                    ${selectOptionsHTML(currencyFilter, urlParams.get('currency_code'), "All Currencies")}
                   </select>
                 </div>
 

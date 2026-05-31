@@ -56,10 +56,6 @@ export default class Companies_Employees_IndexController extends Companies_Layou
 
   contentHTML() {
     // Local aliases for cleaner template interpolation
-    const departmentFilter = Helpers.currentDepartments();
-    const roleFilter = Helpers.currentRoles();
-    const workflowStatusFilter = Enums().employee.workflow_statuses;
-    const typeFilter = Enums().employee.business_types;
     const categoryFilter = this.employeesCategories();
     
     const urlParams = new URLSearchParams(window.location.search);
@@ -77,34 +73,6 @@ export default class Companies_Employees_IndexController extends Companies_Layou
                   <label class="text-[10px] font-bold text-slate-400 uppercase ml-1">Category</label>
                   <select name="category_id" class="pl-3 pr-10 py-2 text-sm border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300">
                     ${selectOptionsHTML(cloneNewKey(categoryFilter, "id", "value"), categoryValue)}
-                  </select>
-                </div>
-
-                <div class="flex flex-col gap-1">
-                  <label class="text-[10px] font-bold text-slate-400 uppercase ml-1">Department</label>
-                  <select name="department_id" class="pl-3 pr-10 py-2 text-sm border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300">
-                    ${selectOptionsHTML(cloneNewKey(departmentFilter, "id", "value"), urlParams.get('department_id'), "All Departments")}
-                  </select>
-                </div>
-
-                <div class="flex flex-col gap-1">
-                  <label class="text-[10px] font-bold text-slate-400 uppercase ml-1">Role</label>
-                  <select name="role_id" class="pl-3 pr-10 py-2 text-sm border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300">
-                    ${selectOptionsHTML(cloneNewKey(roleFilter, "id", "value"), urlParams.get('role_id'), "All Roles")}
-                  </select>
-                </div>
-
-                <div class="flex flex-col gap-1">
-                  <label class="text-[10px] font-bold text-slate-400 uppercase ml-1">Status</label>
-                  <select name="workflow_status" class="pl-3 pr-10 py-2 text-sm border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300">
-                    ${selectOptionsHTML(workflowStatusFilter, urlParams.get('workflow_status'), "All Statuses")}
-                  </select>
-                </div>
-
-                <div class="flex flex-col gap-1">
-                  <label class="text-[10px] font-bold text-slate-400 uppercase ml-1">Type</label>
-                  <select name="business_type" class="pl-3 pr-10 py-2 text-sm border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300">
-                    ${selectOptionsHTML(typeFilter, urlParams.get('business_type'), "All Types")}
                   </select>
                 </div>
 

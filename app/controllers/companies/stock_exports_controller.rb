@@ -7,12 +7,6 @@ class Companies::StockExportsController < Companies::ApplicationController
       format.json do
         scope = current_company.stock_exports.includes(:product, :branch, :category)
         scope = scope.where(category_id: params[:category_id]) if params[:category_id].present?
-        scope = scope.where(business_type: params[:business_type]) if params[:business_type].present?
-        scope = scope.where(workflow_status: params[:workflow_status]) if params[:workflow_status].present?
-
-        if params[:search].present?
-          scope = scope.where("code ILIKE ?", "%#{params[:search]}%")
-        end
 
         @pagy, @exports_results = pagy(:offset, scope, jsonapi: true)
 

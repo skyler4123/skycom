@@ -928,6 +928,54 @@ class Seed::RetailService
         },
         visible_columns: %w[name property_string_1 property_integer_1 property_boolean_1 property_integer_2]
       }
+    },
+
+    invoices: {
+      "B2C Retail Invoice" => {
+        properties: {
+          property_string_1: "Payment Method Type (Cash/Card/Wallet)",
+          property_string_2: "POS Terminal Machine Identifier",
+          property_string_3: "Connected Order Reference Code",
+          property_string_4: "Cashier Employee Database ID",
+          property_integer_1: "Total Line-Item Quantities Invoiced",
+          property_integer_2: "Loyalty Program Reward Points Earned",
+          property_decimal_1: "Value-Added Tax (VAT Amount VND)",
+          property_decimal_2: "Applied Direct Promotional Discount (VND)",
+          property_boolean_1: "Digital Receipt Emailed to Customer",
+          property_datetime_1: "Fiscal Ledger Synchronization Timestamp"
+        },
+        visible_columns: %w[name code property_string_1 property_string_3 property_decimal_1 property_boolean_1]
+      },
+      "B2B Corporate Invoice" => {
+        properties: {
+          property_string_1: "Buyer Tax Identification Number (TIN)",
+          property_string_2: "Registered Corporate Company Name",
+          property_string_3: "Credit Payment Terms Granted (e.g., Net 30)",
+          property_string_4: "Authorized Corporate Procurement Agent Name",
+          property_integer_1: "Purchase Order (PO) Reference Document Number",
+          property_integer_2: "Days Outstanding Until Late Penalty Trigger",
+          property_decimal_1: "Total Gross Transaction Subtotal (VND)",
+          property_decimal_2: "Approved Commercial Volume Discount Rate %",
+          property_boolean_1: "Requires Split-Payment Milestone Clearing",
+          property_boolean_2: "E-Invoice Electronic Signature Verified (Sign Digital)"
+        },
+        visible_columns: %w[name code property_string_1 property_string_2 property_string_3 property_decimal_1 property_boolean_2]
+      },
+      "Tax Refund Invoice" => {
+        properties: {
+          property_string_1: "Tourist International Passport Number",
+          property_string_2: "Nationality / Country of Citizenship Registry",
+          property_string_3: "Customs Inspection Gate Processing Location",
+          property_string_4: "Tax Refund Agent Counter Clearance Reference",
+          property_integer_1: "Flight / Voyage Outbound Departure Number",
+          property_integer_2: "Days Left to Claim Refund Before Expiration",
+          property_decimal_1: "Refundable Tax Value Amount (VND)",
+          property_decimal_2: "Admin Processing Handling Fee Surcharge (VND)",
+          property_boolean_1: "Customs Declaration Physical Stamp Cleared",
+          property_datetime_1: "Port of Exit Border Ingestion Inspection Date"
+        },
+        visible_columns: %w[name code property_string_1 property_string_2 property_decimal_1 property_boolean_1 property_datetime_1]
+      }
     }
   }.freeze
 

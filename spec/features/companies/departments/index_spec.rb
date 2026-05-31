@@ -67,17 +67,6 @@ RSpec.feature "Companies::Departments Management", type: :feature, js: true do
     expect(page).to have_selector('[data-action*="openShowModal"]', minimum: 1)
   end
 
-  scenario "search triggers form submission and filters results" do
-    visit company_departments_path(company)
-    expect(page).to have_selector('table', wait: 10)
-
-    expect(page).to have_button("Search")
-
-    click_button "Search"
-
-    expect(page).to have_selector('tbody tr', wait: 10)
-  end
-
   scenario "filter by category updates URL and filters table" do
     category = Seed::CategoryService.create(company: company, name: "Test Category", resource_name: "departments")
     department.update!(category: category)
@@ -90,21 +79,6 @@ RSpec.feature "Companies::Departments Management", type: :feature, js: true do
     expect(page).to have_current_path(/category_id=#{category.id}/)
     expect(page).to have_selector('tbody tr', wait: 10)
   end
-
-  scenario "filter by business type updates URL and filters table" do
-    visit company_departments_path(company)
-    expect(page).to have_selector('table', wait: 10)
-
-    select("Marketing", from: 'business_type')
-    click_button "Search"
-
-    expect(page).to have_current_path(/business_type=marketing/)
-
-    expect(page).to have_selector('tbody tr', wait: 10)
-    expect(page).to have_content("Marketing")
-  end
-
-
 
   scenario "display department business type as badge" do
     visit company_departments_path(company)
@@ -119,22 +93,6 @@ RSpec.feature "Companies::Departments Management", type: :feature, js: true do
     expect(page).to have_selector('table', wait: 10)
 
     expect(page).to have_selector('span.rounded-full', wait: 10)
-  end
-
-
-
-  scenario "clear filters resets URL and shows all departments" do
-    visit company_departments_path(company, business_type: "marketing")
-    expect(page).to have_selector('table', wait: 10)
-
-    click_button "Search"
-
-    expect(page).to have_current_path(/business_type=marketing/)
-
-    select("All Types", from: 'business_type')
-    click_button "Search"
-
-    expect(page).to have_current_path(/business_type=/)
   end
 
   scenario "update department name via show modal" do

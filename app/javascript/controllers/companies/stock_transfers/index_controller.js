@@ -41,8 +41,6 @@ export default class Companies_StockTransfers_IndexController extends Companies_
   }
 
   contentHTML() {
-    const typeFilter = Enums()?.stock_transfer?.business_types || []
-    const workflowStatusFilter = Enums()?.stock_transfer?.workflow_statuses || []
     const categoryFilter = this.stockTransfersCategories()
 
     const urlParams = new URLSearchParams(window.location.search)
@@ -61,30 +59,6 @@ export default class Companies_StockTransfers_IndexController extends Companies_
                 </select>
               </div>
 
-              <div class="flex flex-col gap-1">
-                <label class="text-[10px] font-bold text-slate-400 uppercase ml-1">Search</label>
-                <input 
-                  type="text" 
-                  name="search" 
-                  value="${urlParams.get('search') || ''}" 
-                  placeholder="Transfer Code"
-                  class="pl-3 pr-10 py-2 text-sm border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 w-40"
-                >
-              </div>
-
-              <div class="flex flex-col gap-1">
-                <label class="text-[10px] font-bold text-slate-400 uppercase ml-1">Type</label>
-                <select name="business_type" class="pl-3 pr-10 py-2 text-sm border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300">
-                  ${selectOptionsHTML(typeFilter, urlParams.get('business_type'), "All Types")}
-                </select>
-              </div>
-
-              <div class="flex flex-col gap-1">
-                <label class="text-[10px] font-bold text-slate-400 uppercase ml-1">Status</label>
-                <select name="workflow_status" class="pl-3 pr-10 py-2 text-sm border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300">
-                  ${selectOptionsHTML(workflowStatusFilter, urlParams.get('workflow_status'), "All Statuses")}
-                </select>
-              </div>
 
               <button type="submit" class="h-[38px] px-6 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors font-medium text-sm flex items-center gap-2">
                 <span class="material-symbols-outlined text-[18px]">search</span>

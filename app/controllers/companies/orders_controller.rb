@@ -7,9 +7,6 @@ class Companies::OrdersController < Companies::ApplicationController
       format.json do
         scope = current_company.orders.includes(:category)
         scope = scope.where(category_id: params[:category_id]) if params[:category_id].present?
-        scope = scope.where(business_type: params[:business_type]) if params[:business_type].present?
-        scope = scope.where(workflow_status: params[:workflow_status]) if params[:workflow_status].present?
-        scope = scope.where(currency_code: params[:currency_code]) if params[:currency_code].present?
 
         @pagy, @orders_results = pagy(:offset, scope, jsonapi: true)
 
