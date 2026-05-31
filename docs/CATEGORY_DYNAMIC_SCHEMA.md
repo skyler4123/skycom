@@ -549,7 +549,73 @@ end
 
 ---
 
-## 11. Summary
+## 11. Default Category Filter (Dashboard Index)
+
+All resource index dashboards (products, branches, employees, etc.) apply a **default category filter** on initial load. This is not optional — dynamic property display depends on knowing which category the resource belongs to.
+
+### Why Always Filter by Category?
+
+Every resource record must have a `category_id`. The dynamic `property_*` columns derive their meaning from the Category's PropertyMapping. Without a category, you cannot know what `property_string_1` represents. Therefore:
+
+- **"All Categories" is meaningless** — you cannot render a unified view across categories because the column labels differ per category
+- **The first category is always pre-selected** — the dashboard loads filtered to the first category from `currentCategories()`
+
+### Frontend Implementation
+
+Each index controller has this pattern in `connect()`:
+
+```javascript
+const urlParams = new URLSearchParams(window.location.search)
+const response = await fetchJson({
+  params: { category_id: urlParams.get('category_id') || this.defaultFilterCategory()?.id }
+})
+```
+
+If the URL already has a `category_id` (user applied a filter), that value is preserved. Otherwise, the first available category for that resource is used as the default.
+
+### Helper Methods
+
+Each controller defines two methods:
+
+```javascript
+branchesCategories() {
+  return currentCategories().filter(c => c.resource_name === "branches")
+}
+
+defaultFilterCategory() {
+  return this.branchesCategories()[0]
+}
+```
+
+- `{resource}Categories()` — filters available categories by the resource's plural name
+- `defaultFilterCategory()` — returns the first category (used as the default filter and for the dropdown's selected value)
+
+### Category Dropdown (No "All Categories")
+
+Because every resource belongs to a category, the filter dropdown has no "All Categories" option. The selected value is always a specific category:
+
+```javascript
+const categoryValue = urlParams.get('category_id') || this.defaultFilterCategory()?.id
+${selectOptionsHTML(cloneNewKey(categoryFilter, "id", "value"), categoryValue)}
+```
+
+If `defaultText` is omitted (3rd arg), `selectOptionsHTML` skips rendering the default `<option value="">` row entirely.
+
+### Race Condition Safety
+
+The `currentCategories()` helper is null-safe because `currentCompany()` may not be available yet when `connect()` fires (client cache loads asynchronously):
+
+```javascript
+export const currentCategories = () => {
+  return currentCompany()?.categories || []
+}
+```
+
+This returns `[]` when the cache hasn't loaded, so `defaultFilterCategory()` returns `undefined`, `undefined?.id` resolves to `undefined`, and `fetchJson` skips the param (via `isDefined` check). Once the cache loads, subsequent renders use real category data.
+
+---
+
+## 12. Summary
 
 | Concept | Description |
 |---------|-------------|

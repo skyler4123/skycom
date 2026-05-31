@@ -430,7 +430,7 @@ export const form = ({
 }
 // Helper to render select options
 export const selectOptionsHTML = (options = [], selectedValue, defaultText) => {
-  let html = `<option value="">${defaultText}</option>`;
+  let html = defaultText != null ? `<option value="">${defaultText}</option>` : '';
   options.forEach(opt => {
     const isSelected = String(opt.value) === String(selectedValue) ? 'selected' : '';
     html += `<option value="${opt.value}" ${isSelected}>${opt.name}</option>`;

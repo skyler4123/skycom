@@ -12,8 +12,9 @@ export default class Companies_Branches_IndexController extends Companies_Layout
     super.connect()
     try {
       /** @type {{ branches: Branch[], pagination: any }} */
+      const urlParams = new URLSearchParams(window.location.search)
       const response = await fetchJson({
-        params: { category_id: this.defaultFilterCategory().id }
+        params: { category_id: urlParams.get('category_id') || this.defaultFilterCategory()?.id }
       })
 
       this.branches = response.branches || []
@@ -57,6 +58,7 @@ export default class Companies_Branches_IndexController extends Companies_Layout
     const categoryFilter = this.branchesCategories()
 
     const urlParams = new URLSearchParams(window.location.search)
+    const categoryValue = urlParams.get('category_id') || this.defaultFilterCategory()?.id
 
     return `
       <div class="p-4 overflow-y-auto" data-action="filter:changed@window->${this.identifier}#handleFilter">
@@ -69,7 +71,7 @@ export default class Companies_Branches_IndexController extends Companies_Layout
                 <div class="flex flex-col gap-1">
                   <label class="text-[10px] font-bold text-slate-400 uppercase ml-1">Category</label>
                   <select name="category_id" class="pl-3 pr-10 py-2 text-sm border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300">
-                    ${selectOptionsHTML(cloneNewKey(categoryFilter, "id", "value"), urlParams.get('category_id'), "All Categories")}
+                    ${selectOptionsHTML(cloneNewKey(categoryFilter, "id", "value"), categoryValue)}
                   </select>
                 </div>
 

@@ -107,13 +107,13 @@ export const isSignedIn = () => {
 }
 
 export const currentCategories = () => {
-  return currentCompany().categories
+  return currentCompany()?.categories || []
 }
 
 export const currentPropertyMappings = () => {
-  return currentCompany().property_mappings
+  return currentCompany()?.property_mappings || []
 }
 
 export const currentTableConfigs = () => {
-  return currentCompany().table_configs
+  return currentCompany()?.table_configs || []
 }
