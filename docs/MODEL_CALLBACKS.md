@@ -185,7 +185,7 @@ Auto-assigns a default category on create if none is provided. Ensures every res
 |----------|------|--------|-------------|
 | `before_validation :ensure_category, on: :create` | 10 | `ensure_category` | If `category` is nil and `company` is present, finds or creates a default `Category` record using `find_or_create_by!(company:, resource_name:)` with the model's plural name. Uses the same `find_or_create_for` pattern as seed services. |
 
-**Included in (17 models):** `Branch`, `Brand`, `Customer`, `Department`, `Employee`, `EmployeeGroup`, `Facility`, `Order`, `Product`, `PropertyMapping`, `Service`, `Stock`, `StockExport`, `StockImport`, `StockTransfer`, `TableConfig`, `Warehouse`
+**Included in (18 models):** `Branch`, `Brand`, `Customer`, `Department`, `Employee`, `EmployeeGroup`, `Facility`, `Invoice`, `Order`, `Product`, `PropertyMapping`, `Service`, `Stock`, `StockExport`, `StockImport`, `StockTransfer`, `TableConfig`, `Warehouse`
 
 ---
 
@@ -193,7 +193,7 @@ Auto-assigns a default category on create if none is provided. Ensures every res
 
 | Callback Type | Count | Models with Direct Declarations |
 |--------------|-------|---------------------------------|
-| `before_validation` | 4 | Address, User, (SetDefaultCompanyConcern → 34+ appointment models), (CategoryConcern → 17 models) |
+| `before_validation` | 4 | Address, User, (SetDefaultCompanyConcern → 34+ appointment models), (CategoryConcern → 18 models) |
 | `after_initialize` | 1 | Branch |
 | `before_create` | 1 | Session |
 | `after_create` | 4 | Category, Company, PolicyAppointment, RoleAppointment |

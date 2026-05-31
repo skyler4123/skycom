@@ -15,23 +15,6 @@ export default class Companies_Policies_IndexController extends Companies_Layout
       <div class="p-8 overflow-y-auto">
         <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 flex flex-col">
 
-          <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
-            <div class="flex flex-wrap items-center gap-3 w-full sm:w-auto">
-              <select class="pl-3 pr-10 py-2 text-sm border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 focus:border-blue-600 focus:ring-blue-600 w-full sm:w-auto">
-                <option selected="">Status: All</option>
-                <option value="active">Active</option>
-                <option value="inactive">Inactive</option>
-              </select>
-              <select class="pl-3 pr-10 py-2 text-sm border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 focus:border-blue-600 focus:ring-blue-600 w-full sm:w-auto">
-                <option selected="">Business Type: All</option>
-                <option value="security">Security</option>
-                <option value="regulatory">Regulatory</option>
-                <option value="operational">Operational</option>
-                <option value="compliance">Compliance</option>
-              </select>
-            </div>
-          </div>
-
           <div class="overflow-x-auto">
             <table class="w-full text-left border-collapse">
               <thead>

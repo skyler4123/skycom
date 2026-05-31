@@ -14,7 +14,6 @@ export default class OpenController extends Controller {
   connect() {
     poll(() => {
       this.updateOpenByPathnameTargets()
-      return this.openByPathnameTargets.every(target => target.hasAttribute("open"))
     })
 
     poll(() => {
@@ -82,6 +81,7 @@ export default class OpenController extends Controller {
     const currentPath = window.location.pathname
 
     this.openByPathnameTargets.forEach((linkElement) => {
+      if (linkElement.hasAttribute("open")) return; 
       if (!linkElement.href) {
         console.log("Link element has no href:", linkElement.innerText)
         return

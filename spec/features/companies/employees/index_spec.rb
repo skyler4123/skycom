@@ -101,56 +101,6 @@ RSpec.feature "Companies::Employees Management", type: :feature, js: true do
     expect(employee.discarded?).to be_truthy
   end
 
-  scenario "search triggers form submission and filters results" do
-    visit company_employees_path(company)
-    expect(page).to have_selector('table', wait: 10)
-
-    expect(page).to have_button("Search")
-
-    click_button "Search"
-
-    expect(page).to have_selector('tbody tr', wait: 10)
-  end
-
-  scenario "filter by department updates URL and filters table" do
-    visit company_employees_path(company)
-    expect(page).to have_selector('table', wait: 10)
-
-    select(department.name, from: 'department_id')
-    click_button "Search"
-
-    expect(page).to have_current_path(/department_id=#{department.id}/)
-
-    expect(page).to have_selector('tbody tr', wait: 10)
-    expect(page).to have_content(department.name)
-  end
-
-  scenario "filter by role updates URL and filters table" do
-    visit company_employees_path(company)
-    expect(page).to have_selector('table', wait: 10)
-
-    select(role.name, from: 'role_id')
-    click_button "Search"
-
-    expect(page).to have_current_path(/role_id=#{role.id}/)
-
-    expect(page).to have_selector('tbody tr', wait: 10)
-    expect(page).to have_content(role.name)
-  end
-
-  scenario "filter by workflow status updates URL and filters table" do
-    employee.update!(workflow_status: "draft")
-    visit company_employees_path(company)
-    expect(page).to have_selector('table', wait: 10)
-
-    select("Draft", from: 'workflow_status')
-    click_button "Search"
-
-    expect(page).to have_current_path(/workflow_status=draft/)
-
-    expect(page).to have_selector('tbody tr', wait: 10)
-  end
-
   scenario "filter by category updates URL and filters table" do
     category = Seed::CategoryService.create(company: company, name: "Test Category", resource_name: "employees")
     employee.update!(category: category)
@@ -162,33 +112,6 @@ RSpec.feature "Companies::Employees Management", type: :feature, js: true do
 
     expect(page).to have_current_path(/category_id=#{category.id}/)
     expect(page).to have_selector('tbody tr', wait: 10)
-  end
-
-  scenario "filter by business type updates URL and filters table" do
-    visit company_employees_path(company)
-    expect(page).to have_selector('table', wait: 10)
-
-    select("Full time", from: 'business_type')
-    click_button "Search"
-
-    expect(page).to have_current_path(/business_type=full_time/)
-
-    expect(page).to have_selector('tbody tr', wait: 10)
-    expect(page).to have_content("Full time")
-  end
-
-  scenario "clear filters resets URL and shows all employees" do
-    visit company_employees_path(company, department_id: department.id)
-    expect(page).to have_selector('table', wait: 10)
-
-    click_button "Search"
-
-    expect(page).to have_current_path(/department_id=#{department.id}/)
-
-    select("All Departments", from: 'department_id')
-    click_button "Search"
-
-    expect(page).to have_current_path(/department_id=/)
   end
 
   scenario "display employee departments as badges" do

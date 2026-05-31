@@ -63,17 +63,6 @@ RSpec.feature "Companies::Branches Management", type: :feature, js: true do
     expect(page).to have_selector('[data-action*="openShowModal"]', minimum: 1)
   end
 
-  scenario "search triggers form submission and filters results" do
-    visit company_branches_path(company)
-    expect(page).to have_selector('table', wait: 10)
-
-    expect(page).to have_button("Search")
-
-    click_button "Search"
-
-    expect(page).to have_selector('tbody tr', wait: 10)
-  end
-
   scenario "filter by category updates URL and filters table" do
     category = Seed::CategoryService.create(company: company, name: "Test Category", resource_name: "branches")
     branch.update!(category: category)
@@ -87,38 +76,12 @@ RSpec.feature "Companies::Branches Management", type: :feature, js: true do
     expect(page).to have_selector('tbody tr', wait: 10)
   end
 
-  scenario "filter by business type updates URL and filters table" do
-    visit company_branches_path(company)
-    expect(page).to have_selector('table', wait: 10)
-
-    select("Warehouse", from: 'business_type')
-    click_button "Search"
-
-    expect(page).to have_current_path(/business_type=warehouse/)
-
-    expect(page).to have_selector('tbody tr', wait: 10)
-    expect(page).to have_content("Warehouse")
-  end
-
-  scenario "filter by workflow status updates URL and filters table" do
-    branch2.update!(workflow_status: "pending")
-    visit company_branches_path(company)
-    expect(page).to have_selector('table', wait: 10)
-
-    select("Pending", from: 'workflow_status')
-    click_button "Search"
-
-    expect(page).to have_current_path(/workflow_status=pending/)
-
-    expect(page).to have_selector('tbody tr', wait: 10)
-  end
-
   scenario "display branch business type as badge" do
     visit company_branches_path(company)
     expect(page).to have_selector('table', wait: 10)
 
-    expect(page).to have_content("Storefront", minimum: 1)
-    expect(page).to have_content("Warehouse", minimum: 1)
+    expect(page).to have_content(branch.business_type.to_s.humanize, minimum: 1)
+    expect(page).to have_content(branch2.business_type.to_s.humanize, minimum: 1)
   end
 
   scenario "display branch workflow status as badge" do
@@ -126,22 +89,6 @@ RSpec.feature "Companies::Branches Management", type: :feature, js: true do
     expect(page).to have_selector('table', wait: 10)
 
     expect(page).to have_selector('span.rounded-full', wait: 10)
-  end
-
-
-
-  scenario "clear filters resets URL and shows all branches" do
-    visit company_branches_path(company, business_type: "warehouse")
-    expect(page).to have_selector('table', wait: 10)
-
-    click_button "Search"
-
-    expect(page).to have_current_path(/business_type=warehouse/)
-
-    select("All Types", from: 'business_type')
-    click_button "Search"
-
-    expect(page).to have_current_path(/business_type=/)
   end
 
   scenario "update branch name via show modal" do

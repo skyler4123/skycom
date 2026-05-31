@@ -53,8 +53,6 @@ export default class Companies_Brands_IndexController extends Companies_LayoutCo
   }
 
   contentHTML() {
-    const businessTypeFilter = Enums()?.brand?.business_types || []
-    const workflowStatusFilter = Enums()?.brand?.workflow_statuses || []
     const categoryFilter = this.brandsCategories()
 
     const urlParams = new URLSearchParams(window.location.search)
@@ -72,20 +70,6 @@ export default class Companies_Brands_IndexController extends Companies_LayoutCo
                   <label class="text-[10px] font-bold text-slate-400 uppercase ml-1">Category</label>
                   <select name="category_id" class="pl-3 pr-10 py-2 text-sm border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300">
                     ${selectOptionsHTML(cloneNewKey(categoryFilter, "id", "value"), categoryValue)}
-                  </select>
-                </div>
-
-                <div class="flex flex-col gap-1">
-                  <label class="text-[10px] font-bold text-slate-400 uppercase ml-1">Type</label>
-                  <select name="business_type" class="pl-3 pr-10 py-2 text-sm border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300">
-                    ${selectOptionsHTML(businessTypeFilter, urlParams.get('business_type'), "All Types")}
-                  </select>
-                </div>
-
-                <div class="flex flex-col gap-1">
-                  <label class="text-[10px] font-bold text-slate-400 uppercase ml-1">Status</label>
-                  <select name="workflow_status" class="pl-3 pr-10 py-2 text-sm border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300">
-                    ${selectOptionsHTML(workflowStatusFilter, urlParams.get('workflow_status'), "All Statuses")}
                   </select>
                 </div>
 

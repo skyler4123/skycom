@@ -6,8 +6,6 @@ class Companies::CustomersController < Companies::ApplicationController
       format.html { render html: "", layout: true }
       format.json do
         scope = current_company.customers
-        scope = scope.where(business_type: params[:business_type]) if params[:business_type].present?
-        scope = scope.where(workflow_status: params[:workflow_status]) if params[:workflow_status].present?
         scope = scope.where(category_id: params[:category_id]) if params[:category_id].present?
 
         @pagy, @customers_results = pagy(:offset, scope, jsonapi: true)

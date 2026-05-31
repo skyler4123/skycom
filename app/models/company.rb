@@ -7,6 +7,7 @@ class Company < ApplicationRecord
      Table Reservation Room Guest
     Patient Appointment Course Student Exam
     Membership
+    Stock StockTransfer StockImport StockExport
   ]
 
   include AddressConcern
@@ -41,6 +42,7 @@ class Company < ApplicationRecord
   has_many :customers, dependent: :destroy
   has_many :customer_groups, dependent: :destroy
   has_many :orders, dependent: :destroy
+  has_many :invoices, dependent: :destroy
   has_many :payment_method_appointments, dependent: :destroy
   has_many :task_groups, dependent: :destroy
   has_many :project_groups, dependent: :destroy

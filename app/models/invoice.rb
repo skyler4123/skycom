@@ -1,4 +1,6 @@
 class Invoice < ApplicationRecord
+  include CategoryConcern
+
   attribute :permission_resource_name, :string, default: -> { self.name }
 
   include TagConcern
@@ -7,6 +9,7 @@ class Invoice < ApplicationRecord
   belongs_to :company
   belongs_to :branch, optional: true
   belongs_to :order
+  belongs_to :category, optional: true
 
   has_many :payments, dependent: :destroy
 
@@ -20,17 +23,13 @@ class Invoice < ApplicationRecord
     subscription: 2
   }
 
-  enum :currency_code, {
-    usd: 0,
-    eur: 1,
-    gbp: 2
-  }
+  enum :currency_code, CURRENCIE_CODES, prefix: true
 
   # --- Validations ---
   validates :name, presence: true, uniqueness: { scope: :company_id }, length: { maximum: 255 }
   validates :currency_code, presence: true
-  validates :number, presence: true, uniqueness: true
-  validates :total, presence: true, numericality: { greater_than_or_equal_to: 0 }
+  validates :code, presence: true, uniqueness: true
+  validates :total_price, presence: true, numericality: { greater_than_or_equal_to: 0 }
 
   validates :business_type, presence: true
 end

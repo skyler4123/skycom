@@ -6,7 +6,7 @@ class Seed::InvoiceService
     name: nil,
     description: Faker::Lorem.sentence(word_count: 10),
     currency_code: Invoice.currency_codes.keys.sample,
-    number: nil,
+    code: nil,
     total_price: nil,
     due_date: Faker::Date.forward(days: 30),
     lifecycle_status: Invoice.lifecycle_statuses.keys.sample,
@@ -25,7 +25,7 @@ class Seed::InvoiceService
     should_discard = rand(10) == 0
     discarded_at ||= should_discard ? Time.zone.now - rand(1..180).days : nil
     name ||= "Invoice for Order ##{order.id}"
-    number ||= "INV-#{order.id}-#{SecureRandom.hex(4).upcase}"
+    code ||= "INV-#{order.id}-#{SecureRandom.hex(4).upcase}"
 
     Invoice.new(
       order: order,
@@ -34,7 +34,7 @@ class Seed::InvoiceService
       name: name,
       description: description,
       currency_code: currency_code,
-      number: number,
+      code: code,
       total_price: total_price,
       due_date: due_date,
       lifecycle_status: lifecycle_status,

@@ -67,18 +67,6 @@ RSpec.feature "Companies::Brands Management", type: :feature, js: true do
     expect(page).to have_selector('tbody tr', wait: 10)
   end
 
-  scenario "filter by business type updates URL" do
-    brand.update!(business_type: "manufacturer")
-    visit company_brands_path(company)
-    expect(page).to have_selector('table', wait: 10)
-
-    select("Manufacturer", from: 'business_type')
-    click_button "Search"
-
-    expect(page).to have_current_path(/business_type=manufacturer/)
-    expect(page).to have_selector('tbody tr', wait: 10)
-  end
-
   scenario "display brand business type as badge" do
     visit company_brands_path(company)
     expect(page).to have_selector('table', wait: 10)

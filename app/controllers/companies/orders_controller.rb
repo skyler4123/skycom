@@ -5,10 +5,8 @@ class Companies::OrdersController < Companies::ApplicationController
     respond_to do |format|
       format.html { render html: "", layout: true }
       format.json do
-        scope = current_company.orders
-        scope = scope.where(business_type: params[:business_type]) if params[:business_type].present?
-        scope = scope.where(workflow_status: params[:workflow_status]) if params[:workflow_status].present?
-        scope = scope.where(currency_code: params[:currency_code]) if params[:currency_code].present?
+        scope = current_company.orders.includes(:category)
+        scope = scope.where(category_id: params[:category_id]) if params[:category_id].present?
 
         @pagy, @orders_results = pagy(:offset, scope, jsonapi: true)
 
@@ -58,6 +56,7 @@ class Companies::OrdersController < Companies::ApplicationController
       :business_type,
       :workflow_status,
       :currency_code,
+      :category_id,
       :customer_id
     )
   end
@@ -66,7 +65,7 @@ class Companies::OrdersController < Companies::ApplicationController
     order.as_json(only: [
       :id, :name, :description, :code,
       :lifecycle_status, :workflow_status, :business_type,
-      :currency_code, :customer_id,
+      :currency_code, :category_id, :customer_id,
       :created_at, :updated_at
     ])
   end
