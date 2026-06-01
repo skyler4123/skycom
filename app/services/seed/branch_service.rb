@@ -58,6 +58,7 @@ class Seed::BranchService
         resource_name: Branch.model_name.plural
       )
     end
+    Seed::PropertyPopulator.populate(branch)
     branch.save!
     branch
   end

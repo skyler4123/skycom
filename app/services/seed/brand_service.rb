@@ -25,6 +25,7 @@ class Seed::BrandService
         resource_name: Brand.model_name.plural
       )
     end
+    Seed::PropertyPopulator.populate(brand)
     brand.save!
     brand
   end

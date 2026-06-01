@@ -51,6 +51,7 @@ class Seed::StockImportService
         resource_name: StockImport.model_name.plural
       )
     end
+    Seed::PropertyPopulator.populate(stock_import)
     stock_import.save!
     stock_import
   end

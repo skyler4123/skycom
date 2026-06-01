@@ -51,6 +51,7 @@ class Seed::StockTransferService
         resource_name: StockTransfer.model_name.plural
       )
     end
+    Seed::PropertyPopulator.populate(transfer)
     transfer.save!
     transfer
   end

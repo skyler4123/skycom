@@ -35,6 +35,7 @@ class Seed::CustomerService
         resource_name: Customer.model_name.plural
       )
     end
+    Seed::PropertyPopulator.populate(customer)
     customer.save!
     customer
   end

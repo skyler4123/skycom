@@ -46,6 +46,7 @@ class Seed::StockService
         resource_name: Stock.model_name.plural
       )
     end
+    Seed::PropertyPopulator.populate(stock)
     stock.save!
     stock
   end

@@ -35,6 +35,7 @@ class Seed::OrderService
         resource_name: Order.model_name.plural
       )
     end
+    Seed::PropertyPopulator.populate(order)
     order.save!
     order
   end

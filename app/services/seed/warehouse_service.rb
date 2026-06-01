@@ -33,6 +33,7 @@ class Seed::WarehouseService
         resource_name: Warehouse.model_name.plural
       )
     end
+    Seed::PropertyPopulator.populate(warehouse)
     warehouse.save!
     warehouse
   end

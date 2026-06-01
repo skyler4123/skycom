@@ -31,6 +31,7 @@ class Seed::FacilityService
         resource_name: Facility.model_name.plural
       )
     end
+    Seed::PropertyPopulator.populate(facility)
     facility.save!
     facility
   end

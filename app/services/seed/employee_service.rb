@@ -47,6 +47,7 @@ class Seed::EmployeeService
         resource_name: Employee.model_name.plural
       )
     end
+    Seed::PropertyPopulator.populate(employee)
     employee.save!
     employee
   end
