@@ -3562,71 +3562,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.string "name"
     t.string "description"
     t.string "resource_name"
-    t.jsonb "property_string_1", default: {}
-    t.jsonb "property_string_2", default: {}
-    t.jsonb "property_string_3", default: {}
-    t.jsonb "property_string_4", default: {}
-    t.jsonb "property_string_5", default: {}
-    t.jsonb "property_string_6", default: {}
-    t.jsonb "property_string_7", default: {}
-    t.jsonb "property_string_8", default: {}
-    t.jsonb "property_string_9", default: {}
-    t.jsonb "property_string_10", default: {}
-    t.jsonb "property_text_1", default: {}
-    t.jsonb "property_text_2", default: {}
-    t.jsonb "property_text_3", default: {}
-    t.jsonb "property_text_4", default: {}
-    t.jsonb "property_text_5", default: {}
-    t.jsonb "property_integer_1", default: {}
-    t.jsonb "property_integer_2", default: {}
-    t.jsonb "property_integer_3", default: {}
-    t.jsonb "property_integer_4", default: {}
-    t.jsonb "property_integer_5", default: {}
-    t.jsonb "property_integer_6", default: {}
-    t.jsonb "property_integer_7", default: {}
-    t.jsonb "property_integer_8", default: {}
-    t.jsonb "property_integer_9", default: {}
-    t.jsonb "property_integer_10", default: {}
-    t.jsonb "property_integer_11", default: {}
-    t.jsonb "property_integer_12", default: {}
-    t.jsonb "property_integer_13", default: {}
-    t.jsonb "property_integer_14", default: {}
-    t.jsonb "property_integer_15", default: {}
-    t.jsonb "property_integer_16", default: {}
-    t.jsonb "property_integer_17", default: {}
-    t.jsonb "property_integer_18", default: {}
-    t.jsonb "property_integer_19", default: {}
-    t.jsonb "property_integer_20", default: {}
-    t.jsonb "property_decimal_1", default: {}
-    t.jsonb "property_decimal_2", default: {}
-    t.jsonb "property_decimal_3", default: {}
-    t.jsonb "property_decimal_4", default: {}
-    t.jsonb "property_decimal_5", default: {}
-    t.jsonb "property_decimal_6", default: {}
-    t.jsonb "property_decimal_7", default: {}
-    t.jsonb "property_decimal_8", default: {}
-    t.jsonb "property_decimal_9", default: {}
-    t.jsonb "property_decimal_10", default: {}
-    t.jsonb "property_boolean_1", default: {}
-    t.jsonb "property_boolean_2", default: {}
-    t.jsonb "property_boolean_3", default: {}
-    t.jsonb "property_boolean_4", default: {}
-    t.jsonb "property_boolean_5", default: {}
-    t.jsonb "property_boolean_6", default: {}
-    t.jsonb "property_boolean_7", default: {}
-    t.jsonb "property_boolean_8", default: {}
-    t.jsonb "property_boolean_9", default: {}
-    t.jsonb "property_boolean_10", default: {}
-    t.jsonb "property_datetime_1", default: {}
-    t.jsonb "property_datetime_2", default: {}
-    t.jsonb "property_datetime_3", default: {}
-    t.jsonb "property_datetime_4", default: {}
-    t.jsonb "property_datetime_5", default: {}
-    t.jsonb "property_datetime_6", default: {}
-    t.jsonb "property_datetime_7", default: {}
-    t.jsonb "property_datetime_8", default: {}
-    t.jsonb "property_datetime_9", default: {}
-    t.jsonb "property_datetime_10", default: {}
+    t.jsonb "property_metadatas", default: [], null: false
     t.integer "lifecycle_status"
     t.integer "workflow_status"
     t.integer "business_type"
@@ -5123,7 +5059,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.string "name"
     t.string "description"
     t.string "resource_name"
-    t.jsonb "fields", default: [], null: false
+    t.jsonb "columns_metadata", default: [], null: false
     t.integer "lifecycle_status"
     t.integer "workflow_status"
     t.integer "business_type"

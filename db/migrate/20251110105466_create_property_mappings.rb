@@ -8,13 +8,7 @@ class CreatePropertyMappings < ActiveRecord::Migration[8.0]
       t.string :description
       t.string :resource_name
 
-      # --- Dynamic Fields ---
-      1.upto(10) { |i| t.jsonb "property_string_#{i}", default: {} }
-      1.upto(5) { |i| t.jsonb "property_text_#{i}", default: {} }
-      1.upto(20) { |i| t.jsonb "property_integer_#{i}", default: {} }
-      1.upto(10)  { |i| t.jsonb "property_decimal_#{i}", default: {} }
-      1.upto(10)  { |i| t.jsonb "property_boolean_#{i}", default: {} }
-      1.upto(10)  { |i| t.jsonb "property_datetime_#{i}", default: {} }
+      t.jsonb :property_metadatas, null: false, default: []
 
       # --- System Fields ---
       t.integer  :lifecycle_status, index: true
