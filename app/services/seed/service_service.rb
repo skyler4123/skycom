@@ -40,6 +40,7 @@ class Seed::ServiceService
         resource_name: Service.model_name.plural
       )
     end
+    Seed::PropertyPopulator.populate(service)
     service.save!
     service
   end

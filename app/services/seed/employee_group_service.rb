@@ -25,6 +25,7 @@ class Seed::EmployeeGroupService
         resource_name: EmployeeGroup.model_name.plural
       )
     end
+    Seed::PropertyPopulator.populate(employee_group)
     employee_group.save!
     employee_group
   end

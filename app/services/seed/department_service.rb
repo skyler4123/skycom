@@ -23,6 +23,7 @@ class Seed::DepartmentService
         resource_name: Department.model_name.plural
       )
     end
+    Seed::PropertyPopulator.populate(department)
     department.save!
     department
   end

@@ -57,6 +57,7 @@ class Seed::ProductService
         resource_name: Product.model_name.plural
       )
     end
+    Seed::PropertyPopulator.populate(product)
     product.save!
     # Set price after save (uses PriceConcern's setter which creates PriceAppointment)
     if product.respond_to?(:_pending_price_hash) && product._pending_price_hash
