@@ -4,7 +4,7 @@ class Seed::TableConfigService
     resource_name:,
     category:,
     property_mapping: nil,
-    fields: [],
+    columns_metadata: [],
     name: nil
   )
     TableConfig.new(
@@ -13,7 +13,7 @@ class Seed::TableConfigService
       category: category,
       property_mapping: property_mapping,
       name: name || "#{category&.name || resource_name} table config",
-      fields: fields
+      columns_metadata: columns_metadata
     )
   end
 
@@ -22,7 +22,7 @@ class Seed::TableConfigService
     resource_name:,
     category:,
     property_mapping: nil,
-    fields: [],
+    columns_metadata: [],
     name: nil
   )
     record = new(
@@ -30,7 +30,7 @@ class Seed::TableConfigService
       resource_name: resource_name,
       category: category,
       property_mapping: property_mapping,
-      fields: fields,
+      columns_metadata: columns_metadata,
       name: name
     )
     record.save!

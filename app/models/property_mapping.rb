@@ -1,57 +1,51 @@
-# == Property Slot Count Rationale (10-5-20-10-10-10)
+# PropertyMapping configuration for the "invoices" resource (e.g., Category: "B2C Retail Invoice")
+# [
+#   {
+#     "key" => "property_string_1",
+#     "name" => "payment_method",
+#     "type" => "string",
+#     "validates" => {
+#       "presence" => true,
+#       "inclusion" => { "in" => ["Cash", "Credit Card", "E-Wallet"] }
+#     }
+#   },
+#   {
+#     "key" => "property_integer_1",
+#     "name" => "total_items_quantity",
+#     "type" => "integer",
+#     "validates" => {
+#       "numericality" => { "only_integer" => true, "greater_than" => 0 }
+#     }
+#   },
+#   {
+#     "key" => "property_decimal_1",
+#     "name" => "vat_amount_vnd",
+#     "type" => "decimal",
+#     "validates" => {
+#       "numericality" => { "greater_than_or_equal_to" => 0 }
+#     }
+#   },
+#   {
+#     "key" => "property_boolean_1",
+#     "name" => "is_e_invoice_sent",
+#     "type" => "boolean",
+#     "validates" => {
+#       "inclusion" => { "in" => [true, false] }
+#     }
+#   }
+# ]
 #
-# The property_* columns on this table store jsonb *display configuration*
-# (label, input_type, options, format hints) — NOT the actual data.
-# Actual typed data lives in the corresponding resource table columns.
+# === Per-Config Object Schema
 #
-#   property_mappings.property_integer_1 = { "label": "Volume", "input_type": "number", "suffix": "ml" }
-#   products.property_integer_1          = 150  (the actual value)
+# Each element in the array must be a Hash with these keys:
 #
-# WHY THESE COUNTS:
-#   string (10)  — Reduced from 20: free-text inputs can often be replaced by
-#                  integer-backed select dropdowns. Covers color codes, short IDs,
-#                  phone masks, badge labels.
-#   text    (5)  — Long-form only: descriptions, notes, terms. Rarely need >5.
-#   integer (20) — Most versatile. Can serve as select dropdowns (store enum IDs,
-#                  display labels in UI), counts, thresholds, ranks, progress bars,
-#                  sliders. 20 slots handle rich categorical + numeric needs.
-#   decimal (10) — Monetary values, weights, percentages, dimensions. Sufficient
-#                  for financial/measurement fields per category.
-#   boolean (10) — Toggle flags, binary decisions, radio cards. Covers typical
-#                  yes/no attributes per category.
-#   datetime(10) — Dates, timestamps for scheduling, expiry, milestones, audits.
-
-# === Supported Keys Per Type ===
-#
-# These are the only keys recognized per column type. Any key outside this
-# list will fail validation.
-#
-# STRING (property_string_1..10)
-#   Keys:      label, input_type, placeholder, suffix, prefix, default
-#   Example:   { "label":"Variant Color", "input_type":"text", "placeholder":"#FF5733" }
-#
-# TEXT (property_text_1..5)
-#   Keys:      label, input_type, placeholder, default
-#   Example:   { "label":"Full Description", "input_type":"textarea" }
-#
-# INTEGER (property_integer_1..20)
-#   Keys:      label, input_type, min, max, placeholder, suffix, prefix, default, options
-#   input_type: select, progress_bar, slider, star
-#   Example:   { "label":"Skin Type", "input_type":"select",
-#                "options":[{"value":1,"label":"Oily"},{"value":2,"label":"Dry"}] }
-#
-# DECIMAL (property_decimal_1..10)
-#   Keys:      label, input_type, precision, suffix, prefix, placeholder, default, currency
-#   input_type: currency, number, percentage
-#   Example:   { "label":"Price", "input_type":"currency", "currency":"VND", "precision":0 }
-#
-# BOOLEAN (property_boolean_1..10)
-#   Keys:      label, input_type, suffix, prefix, placeholder, default, true_label, false_label
-#   Example:   { "label":"Active", "input_type":"toggle" }
-#
-# DATETIME (property_datetime_1..10)
-#   Keys:      label, input_type, suffix, prefix, placeholder, default, format, timezone
-#   Example:   { "label":"Hire Date", "input_type":"date_only", "format":"YYYY-MM-DD" }
+#   key:        String  — The resource column this config describes
+#                        (e.g. "property_string_1"). Required.
+#   name:       String  — System identifier (underscored, e.g. "skin_type").
+#   type:       String  — One of: string, text, integer, decimal, boolean,
+#                        datetime. Derivable from the key prefix.
+#   label:      String  — Human-readable display name. Required.
+#   validates:  Hash    — Validation rules (future use, currently {}).
 
 class PropertyMapping < ApplicationRecord
   include CategoryConcern
@@ -61,8 +55,6 @@ class PropertyMapping < ApplicationRecord
   belongs_to :category
 
   has_many :table_configs, dependent: :destroy
-
-  before_validation :normalize_string_values
 
   SUPPORTED_KEYS = {
     property_string:  %w[label input_type placeholder suffix prefix default].freeze,
@@ -82,61 +74,58 @@ class PropertyMapping < ApplicationRecord
     property_datetime: nil
   }.freeze
 
-  validate :validate_property_configs
+  validate :validate_property_metadatas
 
   private
 
-  def validate_property_configs
-    property_columns = self.class.attribute_names.select { |a| a.start_with?("property_") }
+  def validate_property_metadatas
+    unless property_metadatas.is_a?(Array)
+      errors.add(:property_metadatas, "must be an array")
+      return
+    end
 
-    property_columns.each do |column|
-      value = send(column)
-      next if value.nil? || value == {} || value == []
-
-      unless value.is_a?(Hash)
-        errors.add(column, "must be a JSON object (Hash)")
+    property_metadatas.each_with_index do |entry, idx|
+      unless entry.is_a?(Hash)
+        errors.add(:property_metadatas, "element #{idx} must be a hash")
         next
       end
 
-      prefix = column.to_s.sub(/_\d+\z/, "").to_sym
+      key = entry["key"]
+      if key.blank?
+        errors.add(:property_metadatas, "element #{idx}: key is required")
+        next
+      end
+
+      label = entry["label"]
+      if label.blank?
+        errors.add(:property_metadatas, "element #{idx}: label is required")
+      end
+
+      prefix = key.to_s.sub(/_\d+\z/, "").to_sym
       supported = SUPPORTED_KEYS[prefix]
 
       if supported
-        unexpected = value.keys.map(&:to_s) - supported
+        unexpected = entry.keys - supported - %w[key name type label validates]
         if unexpected.any?
-          errors.add(column, "unsupported keys: #{unexpected.join(", ")}. Supported keys: #{supported.join(", ")}")
+          errors.add(:property_metadatas, "element #{idx}: unsupported keys #{unexpected.join(", ")} for #{key}. Supported: #{supported.join(", ")}")
         end
       end
 
-      if value["label"].blank?
-        errors.add(column, "must include a non-blank \"label\" key")
-      end
-
-      input_type = value["input_type"]
+      input_type = entry["input_type"]
       next if input_type.blank?
 
       valid_types = VALID_INPUT_TYPES[prefix]
       if valid_types && !valid_types.include?(input_type)
-        errors.add(column, "\"input_type\" must be one of: #{valid_types.join(", ")}")
+        errors.add(:property_metadatas, "element #{idx}: input_type must be one of: #{valid_types.join(", ")}")
         next
       end
 
       if input_type == "select"
-        options = value["options"]
+        options = entry["options"]
         unless options.is_a?(Array) && options.all? { |o| o.is_a?(Hash) && o.key?("value") && o.key?("label") }
-          errors.add(column, "\"options\" must be an array of objects with \"value\" and \"label\" keys")
+          errors.add(:property_metadatas, "element #{idx}: options must be an array of objects with value and label keys")
         end
       end
-    end
-  end
-
-  def normalize_string_values
-    property_columns = self.class.attribute_names.select { |a| a.start_with?("property_") }
-
-    property_columns.each do |column|
-      value = send(column)
-      next unless value.is_a?(String)
-      send(:"#{column}=", { "label" => value })
     end
   end
 end

@@ -1095,7 +1095,7 @@ class Seed::RetailService
           resource_name: resource_name.to_s,
           category: category,
           property_mapping: category.property_mapping,
-          fields: keys.map { |k| field_hash(k) },
+          columns_metadata: keys.map { |k| field_hash(k) },
           name: "#{name} table config"
         )
       end
