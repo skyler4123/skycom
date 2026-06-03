@@ -2804,8 +2804,6 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
   end
 
   create_table "payment_methods", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
-    t.uuid "category_id", null: false
-    t.uuid "property_mapping_id", null: false
     t.string "email"
     t.string "name"
     t.text "description"
@@ -2824,12 +2822,10 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["business_type"], name: "index_payment_methods_on_business_type"
-    t.index ["category_id"], name: "index_payment_methods_on_category_id"
     t.index ["code"], name: "index_payment_methods_on_code", unique: true
     t.index ["discarded_at"], name: "index_payment_methods_on_discarded_at"
     t.index ["email"], name: "index_payment_methods_on_email", unique: true
     t.index ["lifecycle_status"], name: "index_payment_methods_on_lifecycle_status"
-    t.index ["property_mapping_id"], name: "index_payment_methods_on_property_mapping_id"
     t.index ["workflow_status"], name: "index_payment_methods_on_workflow_status"
   end
 
@@ -5815,8 +5811,6 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
   add_foreign_key "payment_method_appointments", "branches"
   add_foreign_key "payment_method_appointments", "companies"
   add_foreign_key "payment_method_appointments", "payment_methods"
-  add_foreign_key "payment_methods", "categories"
-  add_foreign_key "payment_methods", "property_mappings"
   add_foreign_key "payments", "branches"
   add_foreign_key "payments", "categories"
   add_foreign_key "payments", "companies"

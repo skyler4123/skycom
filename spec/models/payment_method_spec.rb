@@ -8,14 +8,6 @@ RSpec.describe PaymentMethod, type: :model do
   end
 
   describe "validations" do
-    let(:category) { create(:category) }
-    let(:valid_attributes) {
-      { name: "Test PM", code: "PM-TEST", business_type: :online,
-        category: category, property_mapping: category.property_mapping }
-    }
-
-    subject(:payment_method) { PaymentMethod.new(valid_attributes) }
-
     it { should validate_presence_of(:name) }
     it { should validate_presence_of(:code) }
     it { should validate_presence_of(:business_type) }

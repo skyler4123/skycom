@@ -56,6 +56,53 @@ class PropertyMapping < ApplicationRecord
 
   has_many :table_configs, dependent: :destroy
 
+  has_many :answers, dependent: :restrict_with_error
+  has_many :articles, dependent: :restrict_with_error
+  has_many :article_groups, dependent: :restrict_with_error
+  has_many :brands, dependent: :restrict_with_error
+  has_many :branches, dependent: :restrict_with_error
+  has_many :carts, dependent: :restrict_with_error
+  has_many :cart_groups, dependent: :restrict_with_error
+  has_many :customers, dependent: :restrict_with_error
+  has_many :customer_groups, dependent: :restrict_with_error
+  has_many :departments, dependent: :restrict_with_error
+  has_many :documents, dependent: :restrict_with_error
+  has_many :document_groups, dependent: :restrict_with_error
+  has_many :employees, dependent: :restrict_with_error
+  has_many :employee_groups, dependent: :restrict_with_error
+  has_many :events, dependent: :restrict_with_error
+  has_many :event_groups, dependent: :restrict_with_error
+  has_many :exams, dependent: :restrict_with_error
+  has_many :exam_groups, dependent: :restrict_with_error
+  has_many :facilities, dependent: :restrict_with_error
+  has_many :facility_groups, dependent: :restrict_with_error
+  has_many :invoices, dependent: :restrict_with_error
+  has_many :memberships, dependent: :restrict_with_error
+  has_many :notifications, dependent: :restrict_with_error
+  has_many :notification_groups, dependent: :restrict_with_error
+  has_many :orders, dependent: :restrict_with_error
+  has_many :order_groups, dependent: :restrict_with_error
+  has_many :payments, dependent: :restrict_with_error
+  has_many :products, dependent: :restrict_with_error
+  has_many :product_groups, dependent: :restrict_with_error
+  has_many :projects, dependent: :restrict_with_error
+  has_many :project_groups, dependent: :restrict_with_error
+  has_many :purchases, dependent: :restrict_with_error
+  has_many :purchase_items, dependent: :restrict_with_error
+  has_many :questions, dependent: :restrict_with_error
+  has_many :reservations, dependent: :restrict_with_error
+  has_many :services, dependent: :restrict_with_error
+  has_many :service_groups, dependent: :restrict_with_error
+  has_many :settings, dependent: :restrict_with_error
+  has_many :setting_groups, dependent: :restrict_with_error
+  has_many :stocks, dependent: :restrict_with_error
+  has_many :stock_exports, dependent: :restrict_with_error
+  has_many :stock_imports, dependent: :restrict_with_error
+  has_many :stock_transfers, dependent: :restrict_with_error
+  has_many :tasks, dependent: :restrict_with_error
+  has_many :task_groups, dependent: :restrict_with_error
+  has_many :warehouses, dependent: :restrict_with_error
+
   SUPPORTED_KEYS = {
     property_string:  %w[label input_type placeholder suffix prefix default].freeze,
     property_text:    %w[label input_type placeholder default].freeze,
