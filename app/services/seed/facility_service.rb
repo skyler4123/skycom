@@ -3,6 +3,7 @@ class Seed::FacilityService
     company:,
     branch: nil,
     category: nil,
+    property_mapping: nil,
     name: Faker::Commerce.department,
     description: Faker::Lorem.sentence(word_count: 10),
     lifecycle_status: Facility.lifecycle_statuses.keys.sample,
@@ -14,6 +15,7 @@ class Seed::FacilityService
       company: company,
       branch: branch,
       category: category,
+      property_mapping: property_mapping,
       name: name,
       description: description,
       lifecycle_status: lifecycle_status,
@@ -30,6 +32,9 @@ class Seed::FacilityService
         company: facility.company,
         resource_name: Facility.model_name.plural
       )
+    end
+    if facility.property_mapping.nil? && facility.category.present?
+      facility.property_mapping = facility.category.property_mapping
     end
     Seed::PropertyPopulator.populate(facility)
     facility.save!

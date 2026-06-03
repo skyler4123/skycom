@@ -3,6 +3,7 @@ class Seed::CustomerService
     company:,
     branch: nil,
     category: nil,
+    property_mapping: nil,
     user: nil,
     email: "customer_#{SecureRandom.hex}@gmail.com",
     name: Faker::Name.name,
@@ -16,6 +17,7 @@ class Seed::CustomerService
       company: company,
       branch: branch,
       category: category,
+      property_mapping: property_mapping,
       user: user,
       name: name,
       email: email,
@@ -34,6 +36,9 @@ class Seed::CustomerService
         company: customer.company,
         resource_name: Customer.model_name.plural
       )
+    end
+    if customer.property_mapping.nil? && customer.category.present?
+      customer.property_mapping = customer.category.property_mapping
     end
     Seed::PropertyPopulator.populate(customer)
     customer.save!

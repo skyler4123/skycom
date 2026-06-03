@@ -5,6 +5,7 @@ class Seed::EmployeeService
     departments: [],
     roles: [],
     category: nil,
+    property_mapping: nil,
     user: nil,
     email: nil,
     name: nil,
@@ -27,6 +28,7 @@ class Seed::EmployeeService
       company: company,
       branch: branch,
       category: category,
+      property_mapping: property_mapping,
       departments: departments,
       roles: roles,
       email: email,
@@ -46,6 +48,9 @@ class Seed::EmployeeService
         company: employee.company,
         resource_name: Employee.model_name.plural
       )
+    end
+    if employee.property_mapping.nil? && employee.category.present?
+      employee.property_mapping = employee.category.property_mapping
     end
     Seed::PropertyPopulator.populate(employee)
     employee.save!

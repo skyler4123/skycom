@@ -329,8 +329,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
 
   create_table "branches", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
     t.uuid "company_id", null: false
-    t.uuid "category_id"
-    t.uuid "property_mapping_id"
+    t.uuid "category_id", null: false
+    t.uuid "property_mapping_id", null: false
     t.uuid "parent_branch_id"
     t.string "email"
     t.string "name"

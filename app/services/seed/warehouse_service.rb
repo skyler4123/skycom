@@ -3,6 +3,7 @@ class Seed::WarehouseService
     company:,
     branch: nil,
     category: nil,
+    property_mapping: nil,
     name: nil,
     description: nil,
     code: nil,
@@ -15,6 +16,7 @@ class Seed::WarehouseService
       company: company,
       branch: branch,
       category: category,
+      property_mapping: property_mapping,
       name: name || "Warehouse #{Faker::Lorem.sentence(word_count: 2)}",
       description: description || Faker::Lorem.sentence(word_count: 10),
       code: code || "WH-#{SecureRandom.hex(4).upcase}",
@@ -32,6 +34,9 @@ class Seed::WarehouseService
         company: warehouse.company,
         resource_name: Warehouse.model_name.plural
       )
+    end
+    if warehouse.property_mapping.nil? && warehouse.category.present?
+      warehouse.property_mapping = warehouse.category.property_mapping
     end
     Seed::PropertyPopulator.populate(warehouse)
     warehouse.save!

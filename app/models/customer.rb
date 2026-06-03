@@ -1,5 +1,6 @@
 class Customer < ApplicationRecord
   include CategoryConcern
+  include PropertyMappingConcern
   include RoleConcern
   include AddressConcern
   include TagConcern
@@ -11,6 +12,7 @@ class Customer < ApplicationRecord
   belongs_to :company, optional: true
   belongs_to :branch, optional: true
   belongs_to :category
+  belongs_to :property_mapping
 
   has_many :orders, dependent: :destroy
   has_many :customer_group_appointments, as: :appoint_to, dependent: :destroy

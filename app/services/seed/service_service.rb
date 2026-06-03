@@ -3,6 +3,7 @@ class Seed::ServiceService
     company:,
     branch: nil,
     category: nil,
+    property_mapping: nil,
     name: nil,
     description: nil,
     lifecycle_status: nil,
@@ -23,6 +24,7 @@ class Seed::ServiceService
       company: company,
       branch: branch,
       category: category,
+      property_mapping: property_mapping,
       name: name,
       description: description,
       lifecycle_status: lifecycle_status,
@@ -39,6 +41,9 @@ class Seed::ServiceService
         company: service.company,
         resource_name: Service.model_name.plural
       )
+    end
+    if service.property_mapping.nil? && service.category.present?
+      service.property_mapping = service.category.property_mapping
     end
     Seed::PropertyPopulator.populate(service)
     service.save!

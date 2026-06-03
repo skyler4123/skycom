@@ -1,5 +1,5 @@
 class Seed::BrandService
-  def self.new(company:, category: nil, name:)
+  def self.new(company:, category: nil, property_mapping: nil, name:)
     # Get enum keys once before the loop for efficiency.
     lifecycle_statuses = Brand.lifecycle_statuses.keys
     workflow_statuses = Brand.workflow_statuses.keys
@@ -8,6 +8,7 @@ class Seed::BrandService
     Brand.new(
       company: company,
       category: category,
+      property_mapping: property_mapping,
       name: name,
       description: "Official brand page for #{name}.",
       code: "BR-#{SecureRandom.hex(4).upcase}",
@@ -24,6 +25,9 @@ class Seed::BrandService
         company: brand.company,
         resource_name: Brand.model_name.plural
       )
+    end
+    if brand.property_mapping.nil? && brand.category.present?
+      brand.property_mapping = brand.category.property_mapping
     end
     Seed::PropertyPopulator.populate(brand)
     brand.save!

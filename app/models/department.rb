@@ -1,5 +1,6 @@
 class Department < ApplicationRecord
   include CategoryConcern
+  include PropertyMappingConcern
   attribute :permission_resource_name, :string, default: -> { self.name }
 
   include AddressConcern
@@ -21,6 +22,7 @@ class Department < ApplicationRecord
   # --- Associations ---
   belongs_to :company
   belongs_to :category
+  belongs_to :property_mapping
 
   has_many :role_appointments, as: :appoint_to, dependent: :destroy
   has_many :roles, through: :role_appointments

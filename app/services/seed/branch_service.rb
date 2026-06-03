@@ -2,6 +2,7 @@ class Seed::BranchService
   def self.new(
     company:,
     category: nil,
+    property_mapping: nil,
     name: nil,
     description: nil,
     code: nil,
@@ -35,6 +36,7 @@ class Seed::BranchService
     Branch.new(
       company: company,
       category: category,
+      property_mapping: property_mapping,
       name: name,
       description: description,
       code: code,
@@ -57,6 +59,9 @@ class Seed::BranchService
         company: branch.company,
         resource_name: Branch.model_name.plural
       )
+    end
+    if branch.property_mapping.nil? && branch.category.present?
+      branch.property_mapping = branch.category.property_mapping
     end
     Seed::PropertyPopulator.populate(branch)
     branch.save!

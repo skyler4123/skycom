@@ -4,6 +4,7 @@ class Seed::ProductService
     branch: nil,
     brand: nil,
     category: nil,
+    property_mapping: nil,
     name: nil,
     description: nil,
     code: nil,
@@ -35,6 +36,7 @@ class Seed::ProductService
       branch: branch,
       brand: brand,
       category: category,
+      property_mapping: property_mapping,
       name: name,
       description: description,
       code: code,
@@ -56,6 +58,9 @@ class Seed::ProductService
         company: product.company,
         resource_name: Product.model_name.plural
       )
+    end
+    if product.property_mapping.nil? && product.category.present?
+      product.property_mapping = product.category.property_mapping
     end
     Seed::PropertyPopulator.populate(product)
     product.save!

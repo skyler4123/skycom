@@ -189,11 +189,23 @@ Auto-assigns a default category on create if none is provided. Ensures every res
 
 ---
 
+### PropertyMappingConcern (`app/models/concerns/property_mapping_concern.rb`)
+
+Auto-assigns a default property_mapping on create if none is provided. Derives `property_mapping` from `category.property_mapping`.
+
+| Callback | Line | Method | Description |
+|----------|------|--------|-------------|
+| `before_validation :ensure_property_mapping, on: :create` | 9 | `ensure_property_mapping` | If `property_mapping` is nil and `category` is present, sets `self.property_mapping = category.property_mapping`. Ensures every resource record has a property_mapping for dynamic property resolution. |
+
+**Included in (48 models):** All models that include `CategoryConcern` (18 models) plus additional managed resources: `Answer`, `Article`, `ArticleGroup`, `Cart`, `CartGroup`, `CustomerGroup`, `Document`, `DocumentGroup`, `Event`, `EventGroup`, `Exam`, `ExamGroup`, `FacilityGroup`, `Membership`, `Notification`, `NotificationGroup`, `OrderGroup`, `Payment`, `ProductGroup`, `Project`, `ProjectGroup`, `Purchase`, `PurchaseItem`, `Question`, `Reservation`, `ServiceGroup`, `Setting`, `SettingGroup`, `Task`, `TaskGroup`
+
+---
+
 ## 3. Summary Table
 
 | Callback Type | Count | Models with Direct Declarations |
 |--------------|-------|---------------------------------|
-| `before_validation` | 4 | Address, User, (SetDefaultCompanyConcern → 34+ appointment models), (CategoryConcern → 18 models) |
+| `before_validation` | 5 | Address, User, (SetDefaultCompanyConcern → 34+ appointment models), (CategoryConcern → 18 models), (PropertyMappingConcern → 48 models) |
 | `after_initialize` | 1 | Branch |
 | `before_create` | 1 | Session |
 | `after_create` | 4 | Category, Company, PolicyAppointment, RoleAppointment |

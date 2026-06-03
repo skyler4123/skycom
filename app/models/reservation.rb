@@ -1,6 +1,11 @@
 # app/models/reservation.rb
 class Reservation < ApplicationRecord
+  include CategoryConcern
+  include PropertyMappingConcern
+
   belongs_to :company
+  belongs_to :category
+  belongs_to :property_mapping
   has_many :reservation_appointments, dependent: :destroy
 
   # Standard ERP enums based on your schema pattern

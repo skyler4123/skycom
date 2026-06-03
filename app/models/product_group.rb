@@ -1,4 +1,7 @@
 class ProductGroup < ApplicationRecord
+  include CategoryConcern
+  include PropertyMappingConcern
+
   attribute :permission_resource_name, :string, default: -> { self.name }
 
   include TagConcern
@@ -7,6 +10,8 @@ class ProductGroup < ApplicationRecord
   # --- Associations ---
   belongs_to :company
   belongs_to :branch, optional: true
+  belongs_to :category
+  belongs_to :property_mapping
   has_many :product_group_appointments, dependent: :destroy
   has_many :products, through: :product_group_appointments, source: :appoint_to, source_type: "Product"
 

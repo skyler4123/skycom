@@ -3,6 +3,8 @@ class PaymentMethod < ApplicationRecord
 
   # --- Associations ---
   # This model is intended to be global, so it does not belong to a branch.
+  belongs_to :category
+  belongs_to :property_mapping
   has_many :payment_method_appointments, dependent: :destroy
   has_many :branches, through: :payment_method_appointments
 

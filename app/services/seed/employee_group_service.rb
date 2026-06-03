@@ -3,6 +3,7 @@ class Seed::EmployeeGroupService
     company:,
     branch: nil,
     category: nil,
+    property_mapping: nil,
     email: "employee_group_#{SecureRandom.hex}@gmail.com",
     name: "#{Faker::Job.field} Group",
     description: Faker::Movie.quote
@@ -11,6 +12,7 @@ class Seed::EmployeeGroupService
       company: company,
       branch: branch,
       category: category,
+      property_mapping: property_mapping,
       email: email,
       name: name,
       description: description
@@ -24,6 +26,9 @@ class Seed::EmployeeGroupService
         company: employee_group.company,
         resource_name: EmployeeGroup.model_name.plural
       )
+    end
+    if employee_group.property_mapping.nil? && employee_group.category.present?
+      employee_group.property_mapping = employee_group.category.property_mapping
     end
     Seed::PropertyPopulator.populate(employee_group)
     employee_group.save!
