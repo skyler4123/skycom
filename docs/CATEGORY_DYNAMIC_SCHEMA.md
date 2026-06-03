@@ -3,7 +3,7 @@
 ## 1. Overview
 
 The **Category + PropertyMapping + TableConfig** system provides a complete **Dynamic Schema + Display Configuration** for the UI. It defines:
-- **What** data the `property_*` columns represent (via PropertyMapping `property_metadatas` array)
+- **What** data the `property_*` columns represent (via PropertyMapping `property_metadata` array)
 - **Which** columns to show, their display properties, and ordering (via TableConfig `columns_metadata`)
 
 ### Core Concept
@@ -46,7 +46,7 @@ create_table "property_mappings", id: :uuid do |t|
 
   # Single JSONB array holding all dynamic property configs
   # Each element: { "key", "name", "type", "label", "validates" }
-  t.jsonb    "property_metadatas", null: false, default: []
+  t.jsonb    "property_metadata", null: false, default: []
 
   # --- System Fields ---
   t.integer  :lifecycle_status
@@ -120,7 +120,7 @@ category = Category.create!(
 
 # Update property labels on the mapping (array of config objects)
 category.property_mapping.update!(
-  property_metadatas: [
+  property_metadata: [
     { "key" => "property_string_1", "name" => "skin_type_suitability",
       "type" => "string", "label" => "Skin Type Suitability", "validates" => {} },
     { "key" => "property_string_2", "name" => "key_ingredients",
@@ -142,9 +142,9 @@ product = Product.create!(
   name: "Face Cream",
   category: cosmetics_category,  # Links to "Cosmetics" category
   # Actual data values:
-  property_string_1: "Oily Skin", # Matches property_metadatas entry with key "property_string_1"
-  property_integer_1: 150,         # Matches property_metadatas entry with key "property_integer_1"
-  property_boolean_1: true         # Matches property_metadatas entry with key "property_boolean_1"
+  property_string_1: "Oily Skin", # Matches property_metadata entry with key "property_string_1"
+  property_integer_1: 150,         # Matches property_metadata entry with key "property_integer_1"
+  property_boolean_1: true         # Matches property_metadata entry with key "property_boolean_1"
 )
 ```
 
@@ -167,29 +167,29 @@ The `columns_metadata` array stores structured column definitions. The frontend 
 
 ### Step 4: UI Renders Dynamically
 
-The UI looks up the Category's PropertyMapping `property_metadatas` to get labels, then renders form fields:
+The UI looks up the Category's PropertyMapping `property_metadata` to get labels, then renders form fields:
 
 ```
 Product: Face Cream (Category: Cosmetics)
 
-UI reads PropertyMapping property_metadatas:
+UI reads PropertyMapping property_metadata:
   - { key: "property_string_1",  label: "Skin Type Suitability" }
   - { key: "property_integer_1", label: "Volume (ml)" }
   - { key: "property_boolean_1", label: "Organic Certified" }
 
 Renders:
   ┌─────────────────────────┐
-  │ Skin Type Suitability  │  ← Label from property_metadatas
+  │ Skin Type Suitability  │  ← Label from property_metadata
   │ [ Oily Skin          ]  │  ← Value from Product.property_string_1
   └─────────────────────────┘
 
   ┌─────────────────────────┐
-  │ Volume (ml)             │  ← Label from property_metadatas
+  │ Volume (ml)             │  ← Label from property_metadata
   │ [ 150                 ]  │  ← Value from Product.property_integer_1
   └─────────────────────────┘
 
   ┌─────────────────────────┐
-  │ Organic Certified      │  ← Label from property_metadatas
+  │ Organic Certified      │  ← Label from property_metadata
   │ [✓]                    │  ← Value from Product.property_boolean_1
   └─────────────────────────┘
 ```
@@ -201,7 +201,7 @@ Renders:
 When the frontend boots up to render a table, it combines all three tables into a single column config:
 
 ```
-TableConfig.columns_metadata        PropertyMapping.property_metadatas (array)
+TableConfig.columns_metadata        PropertyMapping.property_metadata (array)
         │                               │
         ▼                               ▼
   [{ key: "name",             [{ key: "property_string_1", label: "Skin Type" },
@@ -243,7 +243,7 @@ TableConfig.columns_metadata        PropertyMapping.property_metadatas (array)
 | Table | Job | Example |
 |-------|-----|---------|
 | **Category** | Groups resources + links PropertyMapping and TableConfig | "Cosmetics" → products |
-| **PropertyMapping** | Defines what `property_*` columns mean via `property_metadatas` | `[{ key: "property_string_1", label: "Skin Type", ... }]` |
+| **PropertyMapping** | Defines what `property_*` columns mean via `property_metadata` | `[{ key: "property_string_1", label: "Skin Type", ... }]` |
 | **TableConfig** | Defines column visibility + order | Show name, skin type, volume; hide shelf life |
 
 This separation means you can define a property label in PropertyMapping but choose not to show it in the table by setting `visible: false` in the table config's column hash. The data exists, the label exists, but it's hidden from the table view.
@@ -282,7 +282,7 @@ Category can define schemas for these resources (via `resource_name`):
 
 ### Per-Config Object Schema
 
-Each element in `property_metadatas` is a Hash with these keys:
+Each element in `property_metadata` is a Hash with these keys:
 
 | Key | Type | Description |
 |-----|------|-------------|
@@ -309,7 +309,7 @@ Each element in `property_metadatas` is a Hash with these keys:
 
 ### METADATA_CATEGORIES Structure
 
-Properties are defined as a hash of `slot_key => label_string` in the seed data. `Seed::CategoryService` converts this into the `property_metadatas` array format:
+Properties are defined as a hash of `slot_key => label_string` in the seed data. `Seed::CategoryService` converts this into the `property_metadata` array format:
 
 ```ruby
 METADATA_CATEGORIES = {
@@ -340,7 +340,7 @@ METADATA_CATEGORIES = {
 
 ```ruby
 # Seed::CategoryService creates the Category (auto-generates PropertyMapping via callback)
-# then converts the properties hash to the property_metadatas array format:
+# then converts the properties hash to the property_metadata array format:
 #
 #   { property_string_1: "Skin Type Suitability" }
 #     → [{ "key" => "property_string_1", "name" => "skin_type_suitability",
@@ -379,16 +379,16 @@ Since `properties` and `visible_columns` live in the same `METADATA_CATEGORIES` 
 
 ### Fetching Property Labels
 
-Labels live in the `property_metadatas` array on the PropertyMapping record:
+Labels live in the `property_metadata` array on the PropertyMapping record:
 
 ```javascript
 // Get category for current product
 const category = product.category
 const mapping = category.property_mapping || {}
 
-// Build label map from property_metadatas array
+// Build label map from property_metadata array
 const labelMap = {}
-for (const config of (mapping.property_metadatas || [])) {
+for (const config of (mapping.property_metadata || [])) {
   labelMap[config.key] = config.label
 }
 // Result: { property_string_1: "Skin Type Suitability", property_integer_1: "Volume (ml)" }
@@ -418,7 +418,7 @@ const columns = (config?.columns_metadata || []).map(f => ({
 ```javascript
 function renderDynamicFields(product, category) {
   const mapping = category.property_mapping || {}
-  const metadatas = mapping.property_metadatas || []
+  const metadatas = mapping.property_metadata || []
 
   return metadatas.map(config => {
     const { key, label, type } = config
@@ -434,9 +434,9 @@ function renderDynamicFields(product, category) {
 
 1. **Use consistent naming** - Property keys should be numbered sequentially (1, 2, 3...) per category type
 2. **Keep labels short** - UI labels should be concise (e.g., "Volume (ml)" not "Product Volume in Milliliters")
-3. **Type matching** - Ensure the `type` in `property_metadatas` matches the database column type (string, integer, boolean, etc.)
+3. **Type matching** - Ensure the `type` in `property_metadata` matches the database column type (string, integer, boolean, etc.)
 4. **Empty = Skip** - If a property has no label, don't render that field in UI
-5. **Separate concerns** - PropertyMapping defines what data means via `property_metadatas`; TableConfig defines what's visible via `columns_metadata`. A labeled property can be hidden from the table by setting `visible: false` in the column hash
+5. **Separate concerns** - PropertyMapping defines what data means via `property_metadata`; TableConfig defines what's visible via `columns_metadata`. A labeled property can be hidden from the table by setting `visible: false` in the column hash
 6. **Keep in sync** - Properties and their table visibility live in the same `METADATA_CATEGORIES` entry — never define them separately
 7. **`name` is universal** - The `name` column is prepended automatically by `TableConfig`'s default. Always include it first in the seed `visible_columns` array
 
@@ -489,7 +489,7 @@ class PropertyMapping < ApplicationRecord
 
   has_many :table_configs, dependent: :destroy
 
-  # property_metadatas stores an array of config hashes:
+  # property_metadata stores an array of config hashes:
   # [{ "key" => "property_string_1", "name" => "skin_type",
   #    "type" => "string", "label" => "Skin Type", "validates" => {} }]
 end
@@ -605,7 +605,7 @@ This returns `[]` when the cache hasn't loaded, so `defaultFilterCategory()` ret
 |---------|-------------|
 | **Purpose** | Dynamic schema mapping — defines what property columns mean per resource type |
 | **Category stores** | Taxonomy grouping (name, description, resource_name) |
-| **PropertyMapping stores** | `property_metadatas` JSONB array of config objects (label, name, type per slot) |
+| **PropertyMapping stores** | `property_metadata` JSONB array of config objects (label, name, type per slot) |
 | **TableConfig stores** | `columns_metadata` JSONB array of column display configs |
 | **Resource stores** | Actual typed data in individual `property_*` columns |
 | **Link** | `category_id` on resource tables; `property_mapping.category_id` on PropertyMapping; `table_config.category_id` on TableConfig |

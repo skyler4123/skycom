@@ -56,15 +56,15 @@ class Seed::CategoryService
       resource_name: resource_name
     )
     category.save!
-    metadatas = build_property_metadatas(properties.presence || random_property_labels)
-    category.property_mapping.update!(property_metadatas: metadatas) if metadatas.present?
+    metadatas = build_property_metadata(properties.presence || random_property_labels)
+    category.property_mapping.update!(property_metadata: metadatas) if metadatas.present?
 
     category
   end
 
   # Convert a hash of slot_key → label_string into the JSONB array format
-  # stored in property_mappings.property_metadatas.
-  def self.build_property_metadatas(entries)
+  # stored in property_mappings.property_metadata.
+  def self.build_property_metadata(entries)
     entries.map do |key, label|
       type = TYPE_FROM_KEY[key.to_s] || "string"
       name = label.to_s.parameterize.underscore.tr("-", "_")
@@ -86,7 +86,7 @@ class Seed::CategoryService
   end
 
   # Returns an array of slot-key → random-label pairs (same shape as
-  # the `properties:` hash) so build_property_metadatas can consume it.
+  # the `properties:` hash) so build_property_metadata can consume it.
   def self.random_property_labels
     count = rand(10..25)
     PROPERTY_SLOT_KEYS.sample(count).each_with_object({}) do |column, hash|

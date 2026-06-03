@@ -35,10 +35,10 @@ class Companies::PropertyMappingsController < Companies::ApplicationController
   private
 
   def property_mapping_params
-    params.require(:property_mapping).permit(:category_id, :name, property_metadatas: {})
+    params.require(:property_mapping).permit(:category_id, :name, property_metadata: {})
   end
 
   def format_mapping(mapping)
-    mapping.as_json(only: [ :id, :category_id, :name, :property_metadatas ])
+    mapping.as_json(only: [ :id, :category_id, :name, :property_metadata ])
   end
 end

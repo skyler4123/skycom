@@ -8,7 +8,7 @@ class CreatePropertyMappings < ActiveRecord::Migration[8.0]
       t.string :description
       t.string :resource_name
 
-      t.jsonb :property_metadatas, null: false, default: []
+      t.jsonb :property_metadata, null: false, default: []
 
       # --- System Fields ---
       t.integer  :lifecycle_status, index: true

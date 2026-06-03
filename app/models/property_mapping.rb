@@ -74,31 +74,31 @@ class PropertyMapping < ApplicationRecord
     property_datetime: nil
   }.freeze
 
-  validate :validate_property_metadatas
+  validate :validate_property_metadata
 
   private
 
-  def validate_property_metadatas
-    unless property_metadatas.is_a?(Array)
-      errors.add(:property_metadatas, "must be an array")
+  def validate_property_metadata
+    unless property_metadata.is_a?(Array)
+      errors.add(:property_metadata, "must be an array")
       return
     end
 
-    property_metadatas.each_with_index do |entry, idx|
+    property_metadata.each_with_index do |entry, idx|
       unless entry.is_a?(Hash)
-        errors.add(:property_metadatas, "element #{idx} must be a hash")
+        errors.add(:property_metadata, "element #{idx} must be a hash")
         next
       end
 
       key = entry["key"]
       if key.blank?
-        errors.add(:property_metadatas, "element #{idx}: key is required")
+        errors.add(:property_metadata, "element #{idx}: key is required")
         next
       end
 
       label = entry["label"]
       if label.blank?
-        errors.add(:property_metadatas, "element #{idx}: label is required")
+        errors.add(:property_metadata, "element #{idx}: label is required")
       end
 
       prefix = key.to_s.sub(/_\d+\z/, "").to_sym
@@ -107,7 +107,7 @@ class PropertyMapping < ApplicationRecord
       if supported
         unexpected = entry.keys - supported - %w[key name type label validates]
         if unexpected.any?
-          errors.add(:property_metadatas, "element #{idx}: unsupported keys #{unexpected.join(", ")} for #{key}. Supported: #{supported.join(", ")}")
+          errors.add(:property_metadata, "element #{idx}: unsupported keys #{unexpected.join(", ")} for #{key}. Supported: #{supported.join(", ")}")
         end
       end
 
@@ -116,14 +116,14 @@ class PropertyMapping < ApplicationRecord
 
       valid_types = VALID_INPUT_TYPES[prefix]
       if valid_types && !valid_types.include?(input_type)
-        errors.add(:property_metadatas, "element #{idx}: input_type must be one of: #{valid_types.join(", ")}")
+        errors.add(:property_metadata, "element #{idx}: input_type must be one of: #{valid_types.join(", ")}")
         next
       end
 
       if input_type == "select"
         options = entry["options"]
         unless options.is_a?(Array) && options.all? { |o| o.is_a?(Hash) && o.key?("value") && o.key?("label") }
-          errors.add(:property_metadatas, "element #{idx}: options must be an array of objects with value and label keys")
+          errors.add(:property_metadata, "element #{idx}: options must be an array of objects with value and label keys")
         end
       end
     end
