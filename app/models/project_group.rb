@@ -1,4 +1,7 @@
 class ProjectGroup < ApplicationRecord
+  include CategoryConcern
+  include PropertyMappingConcern
+
   attribute :permission_resource_name, :string, default: -> { self.name }
 
   include TagConcern
@@ -6,6 +9,8 @@ class ProjectGroup < ApplicationRecord
   # --- Associations ---
   belongs_to :company
   belongs_to :branch, optional: true
+  belongs_to :category
+  belongs_to :property_mapping
   has_many :project_group_appointments, dependent: :destroy
 
   # --- Enums ---

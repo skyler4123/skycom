@@ -3,6 +3,7 @@ class Seed::OrderService
     company:,
     branch: nil,
     category: nil,
+    property_mapping: nil,
     customer: nil,
     name: Faker::Company.buzzword,
     description: Faker::Lorem.sentence(word_count: 15),
@@ -16,6 +17,7 @@ class Seed::OrderService
       company: company,
       branch: branch,
       category: category,
+      property_mapping: property_mapping,
       customer: customer,
       name: name,
       description: description,
@@ -34,6 +36,9 @@ class Seed::OrderService
         company: order.company,
         resource_name: Order.model_name.plural
       )
+    end
+    if order.property_mapping.nil? && order.category.present?
+      order.property_mapping = order.category.property_mapping
     end
     Seed::PropertyPopulator.populate(order)
     order.save!

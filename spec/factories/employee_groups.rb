@@ -11,6 +11,9 @@ FactoryBot.define do
             resource_name: record.class.model_name.plural
           )
         end
+        if record.property_mapping.nil? && record.category.present?
+          record.property_mapping = record.category.property_mapping
+        end
       end
     end
   end

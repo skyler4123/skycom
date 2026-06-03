@@ -1,5 +1,6 @@
 class Facility < ApplicationRecord
   include CategoryConcern
+  include PropertyMappingConcern
   attribute :permission_resource_name, :string, default: -> { self.name }
 
   include TagConcern
@@ -7,6 +8,7 @@ class Facility < ApplicationRecord
   belongs_to :company
   belongs_to :branch, optional: true
   belongs_to :category
+  belongs_to :property_mapping
   has_many :facility_group_appointments, as: :appoint_to, dependent: :destroy
   has_many :facility_groups, through: :facility_group_appointments
   has_many :tag_appointments, dependent: :destroy, as: :appoint_to

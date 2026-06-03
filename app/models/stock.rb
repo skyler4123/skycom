@@ -1,5 +1,6 @@
 class Stock < ApplicationRecord
   include CategoryConcern
+  include PropertyMappingConcern
   attribute :permission_resource_name, :string, default: -> { self.name }
 
   include TagConcern
@@ -9,6 +10,7 @@ class Stock < ApplicationRecord
   belongs_to :product
   belongs_to :warehouse
   belongs_to :category
+  belongs_to :property_mapping
 
   enum :lifecycle_status, LIFECYCLE_STATUS, prefix: true
   enum :workflow_status, WORKFLOW_STATUS, prefix: true

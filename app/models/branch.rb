@@ -1,5 +1,6 @@
 class Branch < ApplicationRecord
   include CategoryConcern
+  include PropertyMappingConcern
   attribute :permission_resource_name, :string, default: -> { self.name }
 
   include AddressConcern
@@ -7,6 +8,7 @@ class Branch < ApplicationRecord
 
   belongs_to :company
   belongs_to :category
+  belongs_to :property_mapping
 
   has_many :employee_groups, dependent: :destroy
   has_many :employees, dependent: :destroy

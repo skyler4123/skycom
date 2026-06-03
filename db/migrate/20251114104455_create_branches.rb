@@ -3,7 +3,8 @@ class CreateBranches < ActiveRecord::Migration[8.0]
     create_table :branches, id: :uuid, default: -> { "uuidv7()" } do |t|
       # --- Hierarchy & Global Scoping ---
       t.references :company, null: false, foreign_key: true, type: :uuid
-      t.references :category, null: true, foreign_key: true, type: :uuid
+      t.references :category, null: false, foreign_key: true, type: :uuid
+      t.references :property_mapping, null: false, foreign_key: true, type: :uuid
       t.references :parent_branch, null: true, foreign_key: { to_table: :branches }, type: :uuid
 
       # --- Identity ---

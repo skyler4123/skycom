@@ -4,6 +4,7 @@ class Seed::StockExportService
     branch: nil,
     product:,
     category: nil,
+    property_mapping: nil,
     appoint_from: nil,
     appoint_to: nil,
     appoint_for: nil,
@@ -28,6 +29,7 @@ class Seed::StockExportService
       branch: branch,
       product: product,
       category: category,
+      property_mapping: property_mapping,
       appoint_from: appoint_from,
       appoint_to: appoint_to,
       appoint_for: appoint_for,
@@ -50,6 +52,9 @@ class Seed::StockExportService
         company: stock_export.company,
         resource_name: StockExport.model_name.plural
       )
+    end
+    if stock_export.property_mapping.nil? && stock_export.category.present?
+      stock_export.property_mapping = stock_export.category.property_mapping
     end
     Seed::PropertyPopulator.populate(stock_export)
     stock_export.save!

@@ -1,5 +1,6 @@
 class Warehouse < ApplicationRecord
   include CategoryConcern
+  include PropertyMappingConcern
   attribute :permission_resource_name, :string, default: -> { self.name }
 
   include TagConcern
@@ -7,6 +8,7 @@ class Warehouse < ApplicationRecord
   belongs_to :company
   belongs_to :branch, optional: true
   belongs_to :category
+  belongs_to :property_mapping
   belongs_to :address, optional: true
   has_many :stocks, dependent: :destroy
 

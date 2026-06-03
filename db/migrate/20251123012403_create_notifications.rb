@@ -4,7 +4,8 @@ class CreateNotifications < ActiveRecord::Migration[8.0]
       t.references :notification_group, null: false, foreign_key: true, type: :uuid
       t.references :company, null: false, foreign_key: true, type: :uuid
       t.references :branch, null: true, foreign_key: true, type: :uuid
-      t.references :category, null: true, foreign_key: true, type: :uuid
+      t.references :category, null: false, foreign_key: true, type: :uuid
+      t.references :property_mapping, null: false, foreign_key: true, type: :uuid
 
       # --- Identity ---
       t.string :email, null: true, index: { unique: true }

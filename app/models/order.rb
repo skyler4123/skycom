@@ -1,5 +1,6 @@
 class Order < ApplicationRecord
   include CategoryConcern
+  include PropertyMappingConcern
   attribute :permission_resource_name, :string, default: -> { self.name }
 
   include TagConcern
@@ -9,6 +10,7 @@ class Order < ApplicationRecord
   belongs_to :branch, optional: true
   belongs_to :customer, optional: true
   belongs_to :category
+  belongs_to :property_mapping
 
   has_many :invoices, dependent: :destroy
   has_many :order_appointments, dependent: :destroy

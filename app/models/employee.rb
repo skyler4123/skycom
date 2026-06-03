@@ -2,6 +2,7 @@
 
 class Employee < ApplicationRecord
   include CategoryConcern
+  include PropertyMappingConcern
   include AddressConcern
   include RoleConcern
   include Employee::PermissionConcern
@@ -19,7 +20,7 @@ class Employee < ApplicationRecord
   belongs_to :branch, optional: true
   belongs_to :user, optional: true
   belongs_to :category
-
+  belongs_to :property_mapping
 
   has_many :role_appointments, as: :appoint_to, dependent: :destroy, inverse_of: :appoint_to
   has_many :roles, through: :role_appointments

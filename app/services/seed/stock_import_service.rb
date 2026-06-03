@@ -4,6 +4,7 @@ class Seed::StockImportService
     branch: nil,
     product:,
     category: nil,
+    property_mapping: nil,
     appoint_from: nil,
     appoint_to: nil,
     appoint_for: nil,
@@ -28,6 +29,7 @@ class Seed::StockImportService
       branch: branch,
       product: product,
       category: category,
+      property_mapping: property_mapping,
       appoint_from: appoint_from,
       appoint_to: appoint_to,
       appoint_for: appoint_for,
@@ -50,6 +52,9 @@ class Seed::StockImportService
         company: stock_import.company,
         resource_name: StockImport.model_name.plural
       )
+    end
+    if stock_import.property_mapping.nil? && stock_import.category.present?
+      stock_import.property_mapping = stock_import.category.property_mapping
     end
     Seed::PropertyPopulator.populate(stock_import)
     stock_import.save!

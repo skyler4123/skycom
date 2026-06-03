@@ -1,4 +1,7 @@
 class NotificationGroup < ApplicationRecord
+  include CategoryConcern
+  include PropertyMappingConcern
+
   attribute :permission_resource_name, :string, default: -> { self.name }
 
   include TagConcern
@@ -6,6 +9,8 @@ class NotificationGroup < ApplicationRecord
   # --- Associations ---
   belongs_to :company
   belongs_to :branch, optional: true
+  belongs_to :category
+  belongs_to :property_mapping
   has_many :notifications, dependent: :destroy
 
   # --- Enums ---

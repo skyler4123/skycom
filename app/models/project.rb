@@ -1,4 +1,7 @@
 class Project < ApplicationRecord
+  include CategoryConcern
+  include PropertyMappingConcern
+
   attribute :permission_resource_name, :string, default: -> { self.name }
 
   include TagConcern
@@ -7,6 +10,8 @@ class Project < ApplicationRecord
   belongs_to :company
   belongs_to :branch, optional: true
   belongs_to :project_group
+  belongs_to :category
+  belongs_to :property_mapping
 
   # --- Enums ---
   enum :lifecycle_status, LIFECYCLE_STATUS, prefix: true

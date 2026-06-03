@@ -4,6 +4,7 @@ class Seed::StockTransferService
     branch: nil,
     product:,
     category: nil,
+    property_mapping: nil,
     appoint_from: nil,
     appoint_to: nil,
     appoint_for: nil,
@@ -28,6 +29,7 @@ class Seed::StockTransferService
       branch: branch,
       product: product,
       category: category,
+      property_mapping: property_mapping,
       appoint_from: appoint_from,
       appoint_to: appoint_to,
       appoint_for: appoint_for,
@@ -50,6 +52,9 @@ class Seed::StockTransferService
         company: transfer.company,
         resource_name: StockTransfer.model_name.plural
       )
+    end
+    if transfer.property_mapping.nil? && transfer.category.present?
+      transfer.property_mapping = transfer.category.property_mapping
     end
     Seed::PropertyPopulator.populate(transfer)
     transfer.save!

@@ -3,6 +3,7 @@ class Seed::StockService
     warehouse:,
     branch: nil,
     category: nil,
+    property_mapping: nil,
     company: nil,
     product_id: nil,
     name: nil,
@@ -27,6 +28,7 @@ class Seed::StockService
       company: company,
       branch: branch,
       category: category,
+      property_mapping: property_mapping,
       product_id: product_id,
       name: name || Faker::Commerce.product_name,
       description: description || Faker::Lorem.sentence(word_count: 10),
@@ -45,6 +47,9 @@ class Seed::StockService
         company: stock.company,
         resource_name: Stock.model_name.plural
       )
+    end
+    if stock.property_mapping.nil? && stock.category.present?
+      stock.property_mapping = stock.category.property_mapping
     end
     Seed::PropertyPopulator.populate(stock)
     stock.save!

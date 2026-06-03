@@ -18,6 +18,8 @@ class Seed::PaymentMethodService
     name:,
     description: nil,
     code: nil,
+    category: nil,
+    property_mapping: nil,
     lifecycle_status: PaymentMethod.lifecycle_statuses.keys.sample,
     workflow_status: PaymentMethod.workflow_statuses.keys.sample,
     business_type: PaymentMethod.business_types.keys.sample,
@@ -30,6 +32,8 @@ class Seed::PaymentMethodService
       name: name,
       description: description || "Payment method for #{name}.",
       code: code || "PM-#{SecureRandom.hex(4).upcase}",
+      category: category,
+      property_mapping: property_mapping,
       lifecycle_status: lifecycle_status,
       workflow_status: workflow_status,
       business_type: business_type,
@@ -37,8 +41,15 @@ class Seed::PaymentMethodService
     )
   end
 
-  def self.create
+  def self.create(company: nil)
     puts "Seeding PaymentMethod records..."
+
+    category = if company
+      Seed::CategoryService.find_or_create_for(
+        company: company,
+        resource_name: PaymentMethod.model_name.plural
+      )
+    end
 
     # Use find_or_create_by to avoid duplicates on subsequent runs.
     PAYMENT_METHODS.each do |method_attrs|
@@ -46,9 +57,8 @@ class Seed::PaymentMethodService
         pm.name = method_attrs[:name]
         pm.description = "Payment method for #{method_attrs[:name]} transactions."
         pm.business_type = method_attrs[:business_type]
-        # pm.status = method_attrs[:status]
-        # Currency can be left nil for global methods or set to a default
-        # pm.currency = :usd
+        pm.category = category if category
+        pm.property_mapping = category.property_mapping if category
       end
     end
 

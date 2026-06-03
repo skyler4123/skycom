@@ -1,5 +1,6 @@
 class TableConfig < ApplicationRecord
   include CategoryConcern
+  include PropertyMappingConcern
   attribute :permission_resource_name, :string, default: -> { self.name }
   attribute :columns_metadata, :jsonb, default: -> {
     [ { "key" => "name", "label" => "Name", "visible" => true, "sortable" => true,
