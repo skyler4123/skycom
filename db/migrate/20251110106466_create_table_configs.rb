@@ -2,7 +2,7 @@ class CreateTableConfigs < ActiveRecord::Migration[8.0]
   def change
     create_table :table_configs, id: :uuid, default: -> { "uuidv7()" } do |t|
       t.references :company, null: false, foreign_key: true, type: :uuid
-      t.references :category, null: true, foreign_key: true, type: :uuid
+      t.references :category, null: false, foreign_key: true, type: :uuid
       t.references :property_mapping, null: true, foreign_key: true, type: :uuid
 
       t.string :name

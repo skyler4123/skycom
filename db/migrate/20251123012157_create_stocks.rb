@@ -5,7 +5,8 @@ class CreateStocks < ActiveRecord::Migration[8.0]
       t.references :branch, null: true, foreign_key: true, type: :uuid
       t.references :product, null: false, foreign_key: true, type: :uuid
       t.references :warehouse, null: false, foreign_key: true, type: :uuid
-      t.references :category, null: true, foreign_key: true, type: :uuid
+      t.references :category, null: false, foreign_key: true, type: :uuid
+      t.references :property_mapping, null: false, foreign_key: true, type: :uuid
 
       # --- Identity ---
       t.string :email, null: true, index: { unique: true }

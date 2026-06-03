@@ -94,7 +94,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
   create_table "answers", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
     t.uuid "company_id", null: false
     t.uuid "question_id", null: false
-    t.uuid "category_id"
+    t.uuid "category_id", null: false
+    t.uuid "property_mapping_id", null: false
     t.string "name"
     t.string "description"
     t.string "code"
@@ -112,6 +113,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.index ["company_id"], name: "index_answers_on_company_id"
     t.index ["discarded_at"], name: "index_answers_on_discarded_at"
     t.index ["lifecycle_status"], name: "index_answers_on_lifecycle_status"
+    t.index ["property_mapping_id"], name: "index_answers_on_property_mapping_id"
     t.index ["question_id"], name: "index_answers_on_question_id"
     t.index ["workflow_status"], name: "index_answers_on_workflow_status"
   end
@@ -191,7 +193,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
   create_table "article_groups", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
     t.uuid "company_id", null: false
     t.uuid "branch_id"
-    t.uuid "category_id"
+    t.uuid "category_id", null: false
+    t.uuid "property_mapping_id", null: false
     t.string "title"
     t.json "content"
     t.string "name"
@@ -212,6 +215,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.index ["company_id"], name: "index_article_groups_on_company_id"
     t.index ["discarded_at"], name: "index_article_groups_on_discarded_at"
     t.index ["lifecycle_status"], name: "index_article_groups_on_lifecycle_status"
+    t.index ["property_mapping_id"], name: "index_article_groups_on_property_mapping_id"
     t.index ["workflow_status"], name: "index_article_groups_on_workflow_status"
   end
 
@@ -219,7 +223,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.uuid "article_group_id", null: false
     t.uuid "company_id", null: false
     t.uuid "branch_id"
-    t.uuid "category_id"
+    t.uuid "category_id", null: false
+    t.uuid "property_mapping_id", null: false
     t.string "title"
     t.json "content"
     t.string "name"
@@ -241,6 +246,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.index ["company_id"], name: "index_articles_on_company_id"
     t.index ["discarded_at"], name: "index_articles_on_discarded_at"
     t.index ["lifecycle_status"], name: "index_articles_on_lifecycle_status"
+    t.index ["property_mapping_id"], name: "index_articles_on_property_mapping_id"
     t.index ["workflow_status"], name: "index_articles_on_workflow_status"
   end
 
@@ -324,6 +330,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
   create_table "branches", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
     t.uuid "company_id", null: false
     t.uuid "category_id"
+    t.uuid "property_mapping_id"
     t.uuid "parent_branch_id"
     t.string "email"
     t.string "name"
@@ -415,12 +422,14 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.index ["email"], name: "index_branches_on_email", unique: true
     t.index ["lifecycle_status"], name: "index_branches_on_lifecycle_status"
     t.index ["parent_branch_id"], name: "index_branches_on_parent_branch_id"
+    t.index ["property_mapping_id"], name: "index_branches_on_property_mapping_id"
     t.index ["workflow_status"], name: "index_branches_on_workflow_status"
   end
 
   create_table "brands", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
     t.uuid "company_id", null: false
-    t.uuid "category_id"
+    t.uuid "category_id", null: false
+    t.uuid "property_mapping_id", null: false
     t.string "email"
     t.string "name"
     t.text "description"
@@ -510,6 +519,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.index ["discarded_at"], name: "index_brands_on_discarded_at"
     t.index ["email"], name: "index_brands_on_email", unique: true
     t.index ["lifecycle_status"], name: "index_brands_on_lifecycle_status"
+    t.index ["property_mapping_id"], name: "index_brands_on_property_mapping_id"
     t.index ["workflow_status"], name: "index_brands_on_workflow_status"
   end
 
@@ -552,7 +562,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
   create_table "cart_groups", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
     t.uuid "company_id", null: false
     t.uuid "branch_id"
-    t.uuid "category_id"
+    t.uuid "category_id", null: false
+    t.uuid "property_mapping_id", null: false
     t.string "email"
     t.string "name"
     t.text "description"
@@ -643,6 +654,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.index ["discarded_at"], name: "index_cart_groups_on_discarded_at"
     t.index ["email"], name: "index_cart_groups_on_email", unique: true
     t.index ["lifecycle_status"], name: "index_cart_groups_on_lifecycle_status"
+    t.index ["property_mapping_id"], name: "index_cart_groups_on_property_mapping_id"
     t.index ["workflow_status"], name: "index_cart_groups_on_workflow_status"
   end
 
@@ -650,7 +662,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.uuid "company_id", null: false
     t.uuid "branch_id"
     t.uuid "cart_group_id", null: false
-    t.uuid "category_id"
+    t.uuid "category_id", null: false
+    t.uuid "property_mapping_id", null: false
     t.string "email"
     t.string "name"
     t.text "description"
@@ -742,6 +755,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.index ["discarded_at"], name: "index_carts_on_discarded_at"
     t.index ["email"], name: "index_carts_on_email", unique: true
     t.index ["lifecycle_status"], name: "index_carts_on_lifecycle_status"
+    t.index ["property_mapping_id"], name: "index_carts_on_property_mapping_id"
     t.index ["workflow_status"], name: "index_carts_on_workflow_status"
   end
 
@@ -879,7 +893,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
   create_table "customer_groups", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
     t.uuid "company_id", null: false
     t.uuid "branch_id"
-    t.uuid "category_id"
+    t.uuid "category_id", null: false
+    t.uuid "property_mapping_id", null: false
     t.string "email"
     t.string "name"
     t.text "description"
@@ -970,6 +985,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.index ["discarded_at"], name: "index_customer_groups_on_discarded_at"
     t.index ["email"], name: "index_customer_groups_on_email", unique: true
     t.index ["lifecycle_status"], name: "index_customer_groups_on_lifecycle_status"
+    t.index ["property_mapping_id"], name: "index_customer_groups_on_property_mapping_id"
     t.index ["workflow_status"], name: "index_customer_groups_on_workflow_status"
   end
 
@@ -977,7 +993,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.uuid "company_id", null: false
     t.uuid "branch_id"
     t.uuid "user_id"
-    t.uuid "category_id"
+    t.uuid "category_id", null: false
+    t.uuid "property_mapping_id", null: false
     t.string "email"
     t.string "name"
     t.text "description"
@@ -1068,6 +1085,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.index ["discarded_at"], name: "index_customers_on_discarded_at"
     t.index ["email"], name: "index_customers_on_email", unique: true
     t.index ["lifecycle_status"], name: "index_customers_on_lifecycle_status"
+    t.index ["property_mapping_id"], name: "index_customers_on_property_mapping_id"
     t.index ["user_id"], name: "index_customers_on_user_id"
     t.index ["workflow_status"], name: "index_customers_on_workflow_status"
   end
@@ -1110,7 +1128,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
 
   create_table "departments", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
     t.uuid "company_id", null: false
-    t.uuid "category_id"
+    t.uuid "category_id", null: false
+    t.uuid "property_mapping_id", null: false
     t.string "email"
     t.string "name"
     t.text "description"
@@ -1200,6 +1219,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.index ["discarded_at"], name: "index_departments_on_discarded_at"
     t.index ["email"], name: "index_departments_on_email", unique: true
     t.index ["lifecycle_status"], name: "index_departments_on_lifecycle_status"
+    t.index ["property_mapping_id"], name: "index_departments_on_property_mapping_id"
     t.index ["workflow_status"], name: "index_departments_on_workflow_status"
   end
 
@@ -1278,7 +1298,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
   create_table "document_groups", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
     t.uuid "company_id", null: false
     t.uuid "branch_id"
-    t.uuid "category_id"
+    t.uuid "category_id", null: false
+    t.uuid "property_mapping_id", null: false
     t.string "title"
     t.json "content"
     t.string "name"
@@ -1299,6 +1320,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.index ["company_id"], name: "index_document_groups_on_company_id"
     t.index ["discarded_at"], name: "index_document_groups_on_discarded_at"
     t.index ["lifecycle_status"], name: "index_document_groups_on_lifecycle_status"
+    t.index ["property_mapping_id"], name: "index_document_groups_on_property_mapping_id"
     t.index ["workflow_status"], name: "index_document_groups_on_workflow_status"
   end
 
@@ -1306,7 +1328,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.uuid "document_group_id", null: false
     t.uuid "company_id", null: false
     t.uuid "branch_id"
-    t.uuid "category_id"
+    t.uuid "category_id", null: false
+    t.uuid "property_mapping_id", null: false
     t.string "title"
     t.json "content"
     t.string "name"
@@ -1328,6 +1351,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.index ["discarded_at"], name: "index_documents_on_discarded_at"
     t.index ["document_group_id"], name: "index_documents_on_document_group_id"
     t.index ["lifecycle_status"], name: "index_documents_on_lifecycle_status"
+    t.index ["property_mapping_id"], name: "index_documents_on_property_mapping_id"
     t.index ["workflow_status"], name: "index_documents_on_workflow_status"
   end
 
@@ -1406,7 +1430,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
   create_table "employee_groups", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
     t.uuid "company_id", null: false
     t.uuid "branch_id"
-    t.uuid "category_id"
+    t.uuid "category_id", null: false
+    t.uuid "property_mapping_id", null: false
     t.string "email"
     t.string "name"
     t.text "description"
@@ -1497,6 +1522,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.index ["discarded_at"], name: "index_employee_groups_on_discarded_at"
     t.index ["email"], name: "index_employee_groups_on_email", unique: true
     t.index ["lifecycle_status"], name: "index_employee_groups_on_lifecycle_status"
+    t.index ["property_mapping_id"], name: "index_employee_groups_on_property_mapping_id"
     t.index ["workflow_status"], name: "index_employee_groups_on_workflow_status"
   end
 
@@ -1504,7 +1530,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.uuid "company_id", null: false
     t.uuid "branch_id"
     t.uuid "user_id"
-    t.uuid "category_id"
+    t.uuid "category_id", null: false
+    t.uuid "property_mapping_id", null: false
     t.string "email"
     t.string "name"
     t.text "description"
@@ -1595,6 +1622,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.index ["discarded_at"], name: "index_employees_on_discarded_at"
     t.index ["email"], name: "index_employees_on_email", unique: true
     t.index ["lifecycle_status"], name: "index_employees_on_lifecycle_status"
+    t.index ["property_mapping_id"], name: "index_employees_on_property_mapping_id"
     t.index ["user_id"], name: "index_employees_on_user_id"
     t.index ["workflow_status"], name: "index_employees_on_workflow_status"
   end
@@ -1674,7 +1702,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
   create_table "event_groups", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
     t.uuid "company_id", null: false
     t.uuid "branch_id"
-    t.uuid "category_id"
+    t.uuid "category_id", null: false
+    t.uuid "property_mapping_id", null: false
     t.string "name"
     t.string "description"
     t.string "code"
@@ -1693,6 +1722,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.index ["company_id"], name: "index_event_groups_on_company_id"
     t.index ["discarded_at"], name: "index_event_groups_on_discarded_at"
     t.index ["lifecycle_status"], name: "index_event_groups_on_lifecycle_status"
+    t.index ["property_mapping_id"], name: "index_event_groups_on_property_mapping_id"
     t.index ["workflow_status"], name: "index_event_groups_on_workflow_status"
   end
 
@@ -1700,7 +1730,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.uuid "event_group_id", null: false
     t.uuid "company_id", null: false
     t.uuid "branch_id"
-    t.uuid "category_id"
+    t.uuid "category_id", null: false
+    t.uuid "property_mapping_id", null: false
     t.string "name"
     t.string "description"
     t.string "code"
@@ -1720,6 +1751,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.index ["discarded_at"], name: "index_events_on_discarded_at"
     t.index ["event_group_id"], name: "index_events_on_event_group_id"
     t.index ["lifecycle_status"], name: "index_events_on_lifecycle_status"
+    t.index ["property_mapping_id"], name: "index_events_on_property_mapping_id"
     t.index ["workflow_status"], name: "index_events_on_workflow_status"
   end
 
@@ -1762,7 +1794,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
   create_table "exam_groups", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
     t.uuid "company_id", null: false
     t.uuid "branch_id"
-    t.uuid "category_id"
+    t.uuid "category_id", null: false
+    t.uuid "property_mapping_id", null: false
     t.string "name"
     t.string "description"
     t.string "code"
@@ -1781,6 +1814,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.index ["company_id"], name: "index_exam_groups_on_company_id"
     t.index ["discarded_at"], name: "index_exam_groups_on_discarded_at"
     t.index ["lifecycle_status"], name: "index_exam_groups_on_lifecycle_status"
+    t.index ["property_mapping_id"], name: "index_exam_groups_on_property_mapping_id"
     t.index ["workflow_status"], name: "index_exam_groups_on_workflow_status"
   end
 
@@ -1788,7 +1822,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.uuid "exam_group_id", null: false
     t.uuid "company_id", null: false
     t.uuid "branch_id"
-    t.uuid "category_id"
+    t.uuid "category_id", null: false
+    t.uuid "property_mapping_id", null: false
     t.string "name"
     t.string "description"
     t.string "code"
@@ -1808,13 +1843,15 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.index ["discarded_at"], name: "index_exams_on_discarded_at"
     t.index ["exam_group_id"], name: "index_exams_on_exam_group_id"
     t.index ["lifecycle_status"], name: "index_exams_on_lifecycle_status"
+    t.index ["property_mapping_id"], name: "index_exams_on_property_mapping_id"
     t.index ["workflow_status"], name: "index_exams_on_workflow_status"
   end
 
   create_table "facilities", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
     t.uuid "company_id", null: false
     t.uuid "branch_id"
-    t.uuid "category_id"
+    t.uuid "category_id", null: false
+    t.uuid "property_mapping_id", null: false
     t.string "email"
     t.string "name"
     t.text "description"
@@ -1905,6 +1942,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.index ["discarded_at"], name: "index_facilities_on_discarded_at"
     t.index ["email"], name: "index_facilities_on_email", unique: true
     t.index ["lifecycle_status"], name: "index_facilities_on_lifecycle_status"
+    t.index ["property_mapping_id"], name: "index_facilities_on_property_mapping_id"
     t.index ["workflow_status"], name: "index_facilities_on_workflow_status"
   end
 
@@ -1983,7 +2021,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
   create_table "facility_groups", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
     t.uuid "company_id", null: false
     t.uuid "branch_id"
-    t.uuid "category_id"
+    t.uuid "category_id", null: false
+    t.uuid "property_mapping_id", null: false
     t.string "email"
     t.string "name"
     t.text "description"
@@ -2074,6 +2113,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.index ["discarded_at"], name: "index_facility_groups_on_discarded_at"
     t.index ["email"], name: "index_facility_groups_on_email", unique: true
     t.index ["lifecycle_status"], name: "index_facility_groups_on_lifecycle_status"
+    t.index ["property_mapping_id"], name: "index_facility_groups_on_property_mapping_id"
     t.index ["workflow_status"], name: "index_facility_groups_on_workflow_status"
   end
 
@@ -2081,7 +2121,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.uuid "company_id", null: false
     t.uuid "branch_id"
     t.uuid "order_id", null: false
-    t.uuid "category_id"
+    t.uuid "category_id", null: false
+    t.uuid "property_mapping_id", null: false
     t.string "email"
     t.string "name"
     t.text "description"
@@ -2175,6 +2216,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.index ["email"], name: "index_invoices_on_email", unique: true
     t.index ["lifecycle_status"], name: "index_invoices_on_lifecycle_status"
     t.index ["order_id"], name: "index_invoices_on_order_id"
+    t.index ["property_mapping_id"], name: "index_invoices_on_property_mapping_id"
     t.index ["workflow_status"], name: "index_invoices_on_workflow_status"
   end
 
@@ -2217,7 +2259,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
   create_table "memberships", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
     t.uuid "company_id", null: false
     t.uuid "branch_id"
-    t.uuid "category_id"
+    t.uuid "category_id", null: false
+    t.uuid "property_mapping_id", null: false
     t.string "email"
     t.string "name"
     t.text "description"
@@ -2308,6 +2351,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.index ["discarded_at"], name: "index_memberships_on_discarded_at"
     t.index ["email"], name: "index_memberships_on_email", unique: true
     t.index ["lifecycle_status"], name: "index_memberships_on_lifecycle_status"
+    t.index ["property_mapping_id"], name: "index_memberships_on_property_mapping_id"
     t.index ["workflow_status"], name: "index_memberships_on_workflow_status"
   end
 
@@ -2386,7 +2430,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
   create_table "notification_groups", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
     t.uuid "company_id", null: false
     t.uuid "branch_id"
-    t.uuid "category_id"
+    t.uuid "category_id", null: false
+    t.uuid "property_mapping_id", null: false
     t.string "email"
     t.string "name"
     t.text "description"
@@ -2412,6 +2457,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.index ["discarded_at"], name: "index_notification_groups_on_discarded_at"
     t.index ["email"], name: "index_notification_groups_on_email", unique: true
     t.index ["lifecycle_status"], name: "index_notification_groups_on_lifecycle_status"
+    t.index ["property_mapping_id"], name: "index_notification_groups_on_property_mapping_id"
     t.index ["workflow_status"], name: "index_notification_groups_on_workflow_status"
   end
 
@@ -2419,7 +2465,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.uuid "notification_group_id", null: false
     t.uuid "company_id", null: false
     t.uuid "branch_id"
-    t.uuid "category_id"
+    t.uuid "category_id", null: false
+    t.uuid "property_mapping_id", null: false
     t.string "email"
     t.string "name"
     t.text "description"
@@ -2446,6 +2493,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.index ["email"], name: "index_notifications_on_email", unique: true
     t.index ["lifecycle_status"], name: "index_notifications_on_lifecycle_status"
     t.index ["notification_group_id"], name: "index_notifications_on_notification_group_id"
+    t.index ["property_mapping_id"], name: "index_notifications_on_property_mapping_id"
     t.index ["workflow_status"], name: "index_notifications_on_workflow_status"
   end
 
@@ -2531,7 +2579,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.uuid "company_id", null: false
     t.uuid "branch_id"
     t.uuid "customer_id", null: false
-    t.uuid "category_id"
+    t.uuid "category_id", null: false
+    t.uuid "property_mapping_id", null: false
     t.string "email"
     t.string "name"
     t.text "description"
@@ -2623,6 +2672,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.index ["discarded_at"], name: "index_order_groups_on_discarded_at"
     t.index ["email"], name: "index_order_groups_on_email", unique: true
     t.index ["lifecycle_status"], name: "index_order_groups_on_lifecycle_status"
+    t.index ["property_mapping_id"], name: "index_order_groups_on_property_mapping_id"
     t.index ["workflow_status"], name: "index_order_groups_on_workflow_status"
   end
 
@@ -2630,7 +2680,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.uuid "company_id", null: false
     t.uuid "branch_id"
     t.uuid "customer_id", null: false
-    t.uuid "category_id"
+    t.uuid "category_id", null: false
+    t.uuid "property_mapping_id", null: false
     t.string "email"
     t.string "name"
     t.text "description"
@@ -2722,6 +2773,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.index ["discarded_at"], name: "index_orders_on_discarded_at"
     t.index ["email"], name: "index_orders_on_email", unique: true
     t.index ["lifecycle_status"], name: "index_orders_on_lifecycle_status"
+    t.index ["property_mapping_id"], name: "index_orders_on_property_mapping_id"
     t.index ["workflow_status"], name: "index_orders_on_workflow_status"
   end
 
@@ -2752,7 +2804,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
   end
 
   create_table "payment_methods", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
-    t.uuid "category_id"
+    t.uuid "category_id", null: false
+    t.uuid "property_mapping_id", null: false
     t.string "email"
     t.string "name"
     t.text "description"
@@ -2776,6 +2829,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.index ["discarded_at"], name: "index_payment_methods_on_discarded_at"
     t.index ["email"], name: "index_payment_methods_on_email", unique: true
     t.index ["lifecycle_status"], name: "index_payment_methods_on_lifecycle_status"
+    t.index ["property_mapping_id"], name: "index_payment_methods_on_property_mapping_id"
     t.index ["workflow_status"], name: "index_payment_methods_on_workflow_status"
   end
 
@@ -2783,7 +2837,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.uuid "company_id", null: false
     t.uuid "branch_id"
     t.uuid "invoice_id", null: false
-    t.uuid "category_id"
+    t.uuid "category_id", null: false
+    t.uuid "property_mapping_id", null: false
     t.string "email"
     t.string "name"
     t.text "description"
@@ -2875,6 +2930,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.index ["email"], name: "index_payments_on_email", unique: true
     t.index ["invoice_id"], name: "index_payments_on_invoice_id"
     t.index ["lifecycle_status"], name: "index_payments_on_lifecycle_status"
+    t.index ["property_mapping_id"], name: "index_payments_on_property_mapping_id"
     t.index ["workflow_status"], name: "index_payments_on_workflow_status"
   end
 
@@ -3095,7 +3151,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
   create_table "product_groups", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
     t.uuid "company_id", null: false
     t.uuid "branch_id"
-    t.uuid "category_id"
+    t.uuid "category_id", null: false
+    t.uuid "property_mapping_id", null: false
     t.string "email"
     t.string "name"
     t.text "description"
@@ -3186,6 +3243,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.index ["discarded_at"], name: "index_product_groups_on_discarded_at"
     t.index ["email"], name: "index_product_groups_on_email", unique: true
     t.index ["lifecycle_status"], name: "index_product_groups_on_lifecycle_status"
+    t.index ["property_mapping_id"], name: "index_product_groups_on_property_mapping_id"
     t.index ["workflow_status"], name: "index_product_groups_on_workflow_status"
   end
 
@@ -3193,7 +3251,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.uuid "company_id", null: false
     t.uuid "branch_id"
     t.uuid "brand_id"
-    t.uuid "category_id"
+    t.uuid "category_id", null: false
+    t.uuid "property_mapping_id", null: false
     t.string "email"
     t.string "name"
     t.text "description"
@@ -3285,6 +3344,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.index ["discarded_at"], name: "index_products_on_discarded_at"
     t.index ["email"], name: "index_products_on_email", unique: true
     t.index ["lifecycle_status"], name: "index_products_on_lifecycle_status"
+    t.index ["property_mapping_id"], name: "index_products_on_property_mapping_id"
     t.index ["workflow_status"], name: "index_products_on_workflow_status"
   end
 
@@ -3363,7 +3423,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
   create_table "project_groups", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
     t.uuid "company_id", null: false
     t.uuid "branch_id"
-    t.uuid "category_id"
+    t.uuid "category_id", null: false
+    t.uuid "property_mapping_id", null: false
     t.string "email"
     t.string "name"
     t.text "description"
@@ -3454,6 +3515,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.index ["discarded_at"], name: "index_project_groups_on_discarded_at"
     t.index ["email"], name: "index_project_groups_on_email", unique: true
     t.index ["lifecycle_status"], name: "index_project_groups_on_lifecycle_status"
+    t.index ["property_mapping_id"], name: "index_project_groups_on_property_mapping_id"
     t.index ["workflow_status"], name: "index_project_groups_on_workflow_status"
   end
 
@@ -3461,7 +3523,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.uuid "company_id", null: false
     t.uuid "branch_id"
     t.uuid "project_group_id", null: false
-    t.uuid "category_id"
+    t.uuid "category_id", null: false
+    t.uuid "property_mapping_id", null: false
     t.string "email"
     t.string "name"
     t.text "description"
@@ -3553,12 +3616,13 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.index ["email"], name: "index_projects_on_email", unique: true
     t.index ["lifecycle_status"], name: "index_projects_on_lifecycle_status"
     t.index ["project_group_id"], name: "index_projects_on_project_group_id"
+    t.index ["property_mapping_id"], name: "index_projects_on_property_mapping_id"
     t.index ["workflow_status"], name: "index_projects_on_workflow_status"
   end
 
   create_table "property_mappings", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
     t.uuid "company_id", null: false
-    t.uuid "category_id"
+    t.uuid "category_id", null: false
     t.string "name"
     t.string "description"
     t.string "resource_name"
@@ -3585,7 +3649,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.uuid "company_id", null: false
     t.uuid "branch_id"
     t.uuid "purchase_id", null: false
-    t.uuid "category_id"
+    t.uuid "category_id", null: false
+    t.uuid "property_mapping_id", null: false
     t.string "email"
     t.string "name"
     t.text "description"
@@ -3676,6 +3741,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.index ["discarded_at"], name: "index_purchase_items_on_discarded_at"
     t.index ["email"], name: "index_purchase_items_on_email", unique: true
     t.index ["lifecycle_status"], name: "index_purchase_items_on_lifecycle_status"
+    t.index ["property_mapping_id"], name: "index_purchase_items_on_property_mapping_id"
     t.index ["purchase_id"], name: "index_purchase_items_on_purchase_id"
     t.index ["workflow_status"], name: "index_purchase_items_on_workflow_status"
   end
@@ -3683,7 +3749,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
   create_table "purchases", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
     t.uuid "company_id", null: false
     t.uuid "branch_id"
-    t.uuid "category_id"
+    t.uuid "category_id", null: false
+    t.uuid "property_mapping_id", null: false
     t.string "email"
     t.string "name"
     t.text "description"
@@ -3774,13 +3841,15 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.index ["discarded_at"], name: "index_purchases_on_discarded_at"
     t.index ["email"], name: "index_purchases_on_email", unique: true
     t.index ["lifecycle_status"], name: "index_purchases_on_lifecycle_status"
+    t.index ["property_mapping_id"], name: "index_purchases_on_property_mapping_id"
     t.index ["workflow_status"], name: "index_purchases_on_workflow_status"
   end
 
   create_table "questions", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
     t.uuid "company_id", null: false
     t.uuid "branch_id"
-    t.uuid "category_id"
+    t.uuid "category_id", null: false
+    t.uuid "property_mapping_id", null: false
     t.string "name"
     t.string "description"
     t.string "code"
@@ -3799,6 +3868,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.index ["company_id"], name: "index_questions_on_company_id"
     t.index ["discarded_at"], name: "index_questions_on_discarded_at"
     t.index ["lifecycle_status"], name: "index_questions_on_lifecycle_status"
+    t.index ["property_mapping_id"], name: "index_questions_on_property_mapping_id"
     t.index ["workflow_status"], name: "index_questions_on_workflow_status"
   end
 
@@ -3841,7 +3911,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
   create_table "reservations", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
     t.uuid "company_id", null: false
     t.uuid "branch_id"
-    t.uuid "category_id"
+    t.uuid "category_id", null: false
+    t.uuid "property_mapping_id", null: false
     t.string "email"
     t.string "name"
     t.text "description"
@@ -3932,6 +4003,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.index ["discarded_at"], name: "index_reservations_on_discarded_at"
     t.index ["email"], name: "index_reservations_on_email", unique: true
     t.index ["lifecycle_status"], name: "index_reservations_on_lifecycle_status"
+    t.index ["property_mapping_id"], name: "index_reservations_on_property_mapping_id"
     t.index ["workflow_status"], name: "index_reservations_on_workflow_status"
   end
 
@@ -4065,7 +4137,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
   create_table "service_groups", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
     t.uuid "company_id", null: false
     t.uuid "branch_id"
-    t.uuid "category_id"
+    t.uuid "category_id", null: false
+    t.uuid "property_mapping_id", null: false
     t.string "email"
     t.string "name"
     t.text "description"
@@ -4156,13 +4229,15 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.index ["discarded_at"], name: "index_service_groups_on_discarded_at"
     t.index ["email"], name: "index_service_groups_on_email", unique: true
     t.index ["lifecycle_status"], name: "index_service_groups_on_lifecycle_status"
+    t.index ["property_mapping_id"], name: "index_service_groups_on_property_mapping_id"
     t.index ["workflow_status"], name: "index_service_groups_on_workflow_status"
   end
 
   create_table "services", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
     t.uuid "company_id", null: false
     t.uuid "branch_id"
-    t.uuid "category_id"
+    t.uuid "category_id", null: false
+    t.uuid "property_mapping_id", null: false
     t.string "email"
     t.string "name"
     t.text "description"
@@ -4253,6 +4328,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.index ["discarded_at"], name: "index_services_on_discarded_at"
     t.index ["email"], name: "index_services_on_email", unique: true
     t.index ["lifecycle_status"], name: "index_services_on_lifecycle_status"
+    t.index ["property_mapping_id"], name: "index_services_on_property_mapping_id"
     t.index ["workflow_status"], name: "index_services_on_workflow_status"
   end
 
@@ -4343,7 +4419,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
   create_table "setting_groups", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
     t.uuid "company_id", null: false
     t.uuid "branch_id"
-    t.uuid "category_id"
+    t.uuid "category_id", null: false
+    t.uuid "property_mapping_id", null: false
     t.json "content"
     t.string "name"
     t.string "description"
@@ -4363,6 +4440,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.index ["company_id"], name: "index_setting_groups_on_company_id"
     t.index ["discarded_at"], name: "index_setting_groups_on_discarded_at"
     t.index ["lifecycle_status"], name: "index_setting_groups_on_lifecycle_status"
+    t.index ["property_mapping_id"], name: "index_setting_groups_on_property_mapping_id"
     t.index ["workflow_status"], name: "index_setting_groups_on_workflow_status"
   end
 
@@ -4370,7 +4448,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.uuid "setting_group_id", null: false
     t.uuid "company_id", null: false
     t.uuid "branch_id"
-    t.uuid "category_id"
+    t.uuid "category_id", null: false
+    t.uuid "property_mapping_id", null: false
     t.json "content"
     t.string "name"
     t.string "description"
@@ -4390,6 +4469,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.index ["company_id"], name: "index_settings_on_company_id"
     t.index ["discarded_at"], name: "index_settings_on_discarded_at"
     t.index ["lifecycle_status"], name: "index_settings_on_lifecycle_status"
+    t.index ["property_mapping_id"], name: "index_settings_on_property_mapping_id"
     t.index ["setting_group_id"], name: "index_settings_on_setting_group_id"
     t.index ["workflow_status"], name: "index_settings_on_workflow_status"
   end
@@ -4437,7 +4517,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.uuid "appoint_for_id"
     t.string "appoint_by_type"
     t.uuid "appoint_by_id"
-    t.uuid "category_id"
+    t.uuid "category_id", null: false
+    t.uuid "property_mapping_id", null: false
     t.string "email"
     t.string "name"
     t.text "description"
@@ -4534,6 +4615,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.index ["email"], name: "index_stock_exports_on_email", unique: true
     t.index ["lifecycle_status"], name: "index_stock_exports_on_lifecycle_status"
     t.index ["product_id"], name: "index_stock_exports_on_product_id"
+    t.index ["property_mapping_id"], name: "index_stock_exports_on_property_mapping_id"
     t.index ["workflow_status"], name: "index_stock_exports_on_workflow_status"
   end
 
@@ -4549,7 +4631,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.uuid "appoint_for_id"
     t.string "appoint_by_type"
     t.uuid "appoint_by_id"
-    t.uuid "category_id"
+    t.uuid "category_id", null: false
+    t.uuid "property_mapping_id", null: false
     t.string "email"
     t.string "name"
     t.text "description"
@@ -4646,6 +4729,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.index ["email"], name: "index_stock_imports_on_email", unique: true
     t.index ["lifecycle_status"], name: "index_stock_imports_on_lifecycle_status"
     t.index ["product_id"], name: "index_stock_imports_on_product_id"
+    t.index ["property_mapping_id"], name: "index_stock_imports_on_property_mapping_id"
     t.index ["workflow_status"], name: "index_stock_imports_on_workflow_status"
   end
 
@@ -4661,7 +4745,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.uuid "appoint_for_id"
     t.string "appoint_by_type"
     t.uuid "appoint_by_id"
-    t.uuid "category_id"
+    t.uuid "category_id", null: false
+    t.uuid "property_mapping_id", null: false
     t.string "email"
     t.string "name"
     t.text "description"
@@ -4758,6 +4843,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.index ["email"], name: "index_stock_transfers_on_email", unique: true
     t.index ["lifecycle_status"], name: "index_stock_transfers_on_lifecycle_status"
     t.index ["product_id"], name: "index_stock_transfers_on_product_id"
+    t.index ["property_mapping_id"], name: "index_stock_transfers_on_property_mapping_id"
     t.index ["workflow_status"], name: "index_stock_transfers_on_workflow_status"
   end
 
@@ -4766,7 +4852,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.uuid "branch_id"
     t.uuid "product_id", null: false
     t.uuid "warehouse_id", null: false
-    t.uuid "category_id"
+    t.uuid "category_id", null: false
+    t.uuid "property_mapping_id", null: false
     t.string "email"
     t.string "name"
     t.text "description"
@@ -4859,6 +4946,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.index ["email"], name: "index_stocks_on_email", unique: true
     t.index ["lifecycle_status"], name: "index_stocks_on_lifecycle_status"
     t.index ["product_id"], name: "index_stocks_on_product_id"
+    t.index ["property_mapping_id"], name: "index_stocks_on_property_mapping_id"
     t.index ["warehouse_id"], name: "index_stocks_on_warehouse_id"
     t.index ["workflow_status"], name: "index_stocks_on_workflow_status"
   end
@@ -5054,7 +5142,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
 
   create_table "table_configs", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
     t.uuid "company_id", null: false
-    t.uuid "category_id"
+    t.uuid "category_id", null: false
     t.uuid "property_mapping_id"
     t.string "name"
     t.string "description"
@@ -5211,7 +5299,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
   create_table "task_groups", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
     t.uuid "company_id", null: false
     t.uuid "branch_id"
-    t.uuid "category_id"
+    t.uuid "category_id", null: false
+    t.uuid "property_mapping_id", null: false
     t.string "email"
     t.string "name"
     t.text "description"
@@ -5302,6 +5391,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.index ["discarded_at"], name: "index_task_groups_on_discarded_at"
     t.index ["email"], name: "index_task_groups_on_email", unique: true
     t.index ["lifecycle_status"], name: "index_task_groups_on_lifecycle_status"
+    t.index ["property_mapping_id"], name: "index_task_groups_on_property_mapping_id"
     t.index ["workflow_status"], name: "index_task_groups_on_workflow_status"
   end
 
@@ -5309,7 +5399,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.uuid "company_id", null: false
     t.uuid "branch_id"
     t.uuid "task_group_id", null: false
-    t.uuid "category_id"
+    t.uuid "category_id", null: false
+    t.uuid "property_mapping_id", null: false
     t.string "email"
     t.string "name"
     t.text "description"
@@ -5400,6 +5491,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.index ["discarded_at"], name: "index_tasks_on_discarded_at"
     t.index ["email"], name: "index_tasks_on_email", unique: true
     t.index ["lifecycle_status"], name: "index_tasks_on_lifecycle_status"
+    t.index ["property_mapping_id"], name: "index_tasks_on_property_mapping_id"
     t.index ["task_group_id"], name: "index_tasks_on_task_group_id"
     t.index ["workflow_status"], name: "index_tasks_on_workflow_status"
   end
@@ -5454,7 +5546,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
   create_table "warehouses", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
     t.uuid "company_id", null: false
     t.uuid "branch_id"
-    t.uuid "category_id"
+    t.uuid "category_id", null: false
+    t.uuid "property_mapping_id", null: false
     t.string "email"
     t.string "name"
     t.text "description"
@@ -5545,6 +5638,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.index ["discarded_at"], name: "index_warehouses_on_discarded_at"
     t.index ["email"], name: "index_warehouses_on_email", unique: true
     t.index ["lifecycle_status"], name: "index_warehouses_on_lifecycle_status"
+    t.index ["property_mapping_id"], name: "index_warehouses_on_property_mapping_id"
     t.index ["workflow_status"], name: "index_warehouses_on_workflow_status"
   end
 
@@ -5553,6 +5647,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
   add_foreign_key "address_appointments", "addresses"
   add_foreign_key "answers", "categories"
   add_foreign_key "answers", "companies"
+  add_foreign_key "answers", "property_mappings"
   add_foreign_key "answers", "questions"
   add_foreign_key "article_appointments", "articles"
   add_foreign_key "article_appointments", "companies"
@@ -5561,10 +5656,12 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
   add_foreign_key "article_groups", "branches"
   add_foreign_key "article_groups", "categories"
   add_foreign_key "article_groups", "companies"
+  add_foreign_key "article_groups", "property_mappings"
   add_foreign_key "articles", "article_groups"
   add_foreign_key "articles", "branches"
   add_foreign_key "articles", "categories"
   add_foreign_key "articles", "companies"
+  add_foreign_key "articles", "property_mappings"
   add_foreign_key "attendance_days", "branches"
   add_foreign_key "attendance_days", "companies"
   add_foreign_key "attendance_days", "employees"
@@ -5580,17 +5677,21 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
   add_foreign_key "branches", "branches", column: "parent_branch_id"
   add_foreign_key "branches", "categories"
   add_foreign_key "branches", "companies"
+  add_foreign_key "branches", "property_mappings"
   add_foreign_key "brands", "categories"
   add_foreign_key "brands", "companies"
+  add_foreign_key "brands", "property_mappings"
   add_foreign_key "cart_appointments", "carts"
   add_foreign_key "cart_appointments", "companies"
   add_foreign_key "cart_groups", "branches"
   add_foreign_key "cart_groups", "categories"
   add_foreign_key "cart_groups", "companies"
+  add_foreign_key "cart_groups", "property_mappings"
   add_foreign_key "carts", "branches"
   add_foreign_key "carts", "cart_groups"
   add_foreign_key "carts", "categories"
   add_foreign_key "carts", "companies"
+  add_foreign_key "carts", "property_mappings"
   add_foreign_key "categories", "companies"
   add_foreign_key "companies", "users"
   add_foreign_key "customer_appointments", "companies"
@@ -5600,14 +5701,17 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
   add_foreign_key "customer_groups", "branches"
   add_foreign_key "customer_groups", "categories"
   add_foreign_key "customer_groups", "companies"
+  add_foreign_key "customer_groups", "property_mappings"
   add_foreign_key "customers", "branches"
   add_foreign_key "customers", "categories"
   add_foreign_key "customers", "companies"
+  add_foreign_key "customers", "property_mappings"
   add_foreign_key "customers", "users"
   add_foreign_key "department_appointments", "companies"
   add_foreign_key "department_appointments", "departments"
   add_foreign_key "departments", "categories"
   add_foreign_key "departments", "companies"
+  add_foreign_key "departments", "property_mappings"
   add_foreign_key "document_appointments", "companies"
   add_foreign_key "document_appointments", "documents"
   add_foreign_key "document_group_appointments", "companies"
@@ -5615,10 +5719,12 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
   add_foreign_key "document_groups", "branches"
   add_foreign_key "document_groups", "categories"
   add_foreign_key "document_groups", "companies"
+  add_foreign_key "document_groups", "property_mappings"
   add_foreign_key "documents", "branches"
   add_foreign_key "documents", "categories"
   add_foreign_key "documents", "companies"
   add_foreign_key "documents", "document_groups"
+  add_foreign_key "documents", "property_mappings"
   add_foreign_key "employee_appointments", "companies"
   add_foreign_key "employee_appointments", "employees"
   add_foreign_key "employee_group_appointments", "companies"
@@ -5626,9 +5732,11 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
   add_foreign_key "employee_groups", "branches"
   add_foreign_key "employee_groups", "categories"
   add_foreign_key "employee_groups", "companies"
+  add_foreign_key "employee_groups", "property_mappings"
   add_foreign_key "employees", "branches"
   add_foreign_key "employees", "categories"
   add_foreign_key "employees", "companies"
+  add_foreign_key "employees", "property_mappings"
   add_foreign_key "employees", "users"
   add_foreign_key "event_appointments", "companies"
   add_foreign_key "event_appointments", "events"
@@ -5637,22 +5745,27 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
   add_foreign_key "event_groups", "branches"
   add_foreign_key "event_groups", "categories"
   add_foreign_key "event_groups", "companies"
+  add_foreign_key "event_groups", "property_mappings"
   add_foreign_key "events", "branches"
   add_foreign_key "events", "categories"
   add_foreign_key "events", "companies"
   add_foreign_key "events", "event_groups"
+  add_foreign_key "events", "property_mappings"
   add_foreign_key "exam_appointments", "companies"
   add_foreign_key "exam_appointments", "exams"
   add_foreign_key "exam_groups", "branches"
   add_foreign_key "exam_groups", "categories"
   add_foreign_key "exam_groups", "companies"
+  add_foreign_key "exam_groups", "property_mappings"
   add_foreign_key "exams", "branches"
   add_foreign_key "exams", "categories"
   add_foreign_key "exams", "companies"
   add_foreign_key "exams", "exam_groups"
+  add_foreign_key "exams", "property_mappings"
   add_foreign_key "facilities", "branches"
   add_foreign_key "facilities", "categories"
   add_foreign_key "facilities", "companies"
+  add_foreign_key "facilities", "property_mappings"
   add_foreign_key "facility_appointments", "companies"
   add_foreign_key "facility_appointments", "facilities"
   add_foreign_key "facility_group_appointments", "companies"
@@ -5660,15 +5773,18 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
   add_foreign_key "facility_groups", "branches"
   add_foreign_key "facility_groups", "categories"
   add_foreign_key "facility_groups", "companies"
+  add_foreign_key "facility_groups", "property_mappings"
   add_foreign_key "invoices", "branches"
   add_foreign_key "invoices", "categories"
   add_foreign_key "invoices", "companies"
   add_foreign_key "invoices", "orders"
+  add_foreign_key "invoices", "property_mappings"
   add_foreign_key "membership_appointments", "companies"
   add_foreign_key "membership_appointments", "memberships"
   add_foreign_key "memberships", "branches"
   add_foreign_key "memberships", "categories"
   add_foreign_key "memberships", "companies"
+  add_foreign_key "memberships", "property_mappings"
   add_foreign_key "notification_appointments", "companies"
   add_foreign_key "notification_appointments", "notifications"
   add_foreign_key "notification_group_appointments", "companies"
@@ -5676,10 +5792,12 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
   add_foreign_key "notification_groups", "branches"
   add_foreign_key "notification_groups", "categories"
   add_foreign_key "notification_groups", "companies"
+  add_foreign_key "notification_groups", "property_mappings"
   add_foreign_key "notifications", "branches"
   add_foreign_key "notifications", "categories"
   add_foreign_key "notifications", "companies"
   add_foreign_key "notifications", "notification_groups"
+  add_foreign_key "notifications", "property_mappings"
   add_foreign_key "order_appointments", "companies"
   add_foreign_key "order_appointments", "orders"
   add_foreign_key "order_group_appointments", "companies"
@@ -5688,18 +5806,22 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
   add_foreign_key "order_groups", "categories"
   add_foreign_key "order_groups", "companies"
   add_foreign_key "order_groups", "customers"
+  add_foreign_key "order_groups", "property_mappings"
   add_foreign_key "orders", "branches"
   add_foreign_key "orders", "categories"
   add_foreign_key "orders", "companies"
   add_foreign_key "orders", "customers"
+  add_foreign_key "orders", "property_mappings"
   add_foreign_key "payment_method_appointments", "branches"
   add_foreign_key "payment_method_appointments", "companies"
   add_foreign_key "payment_method_appointments", "payment_methods"
   add_foreign_key "payment_methods", "categories"
+  add_foreign_key "payment_methods", "property_mappings"
   add_foreign_key "payments", "branches"
   add_foreign_key "payments", "categories"
   add_foreign_key "payments", "companies"
   add_foreign_key "payments", "invoices"
+  add_foreign_key "payments", "property_mappings"
   add_foreign_key "period_appointments", "periods"
   add_foreign_key "policies", "branches"
   add_foreign_key "policies", "companies"
@@ -5714,10 +5836,12 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
   add_foreign_key "product_groups", "branches"
   add_foreign_key "product_groups", "categories"
   add_foreign_key "product_groups", "companies"
+  add_foreign_key "product_groups", "property_mappings"
   add_foreign_key "products", "branches"
   add_foreign_key "products", "brands"
   add_foreign_key "products", "categories"
   add_foreign_key "products", "companies"
+  add_foreign_key "products", "property_mappings"
   add_foreign_key "project_appointments", "companies"
   add_foreign_key "project_appointments", "projects"
   add_foreign_key "project_group_appointments", "companies"
@@ -5725,27 +5849,33 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
   add_foreign_key "project_groups", "branches"
   add_foreign_key "project_groups", "categories"
   add_foreign_key "project_groups", "companies"
+  add_foreign_key "project_groups", "property_mappings"
   add_foreign_key "projects", "branches"
   add_foreign_key "projects", "categories"
   add_foreign_key "projects", "companies"
   add_foreign_key "projects", "project_groups"
+  add_foreign_key "projects", "property_mappings"
   add_foreign_key "property_mappings", "categories"
   add_foreign_key "property_mappings", "companies"
   add_foreign_key "purchase_items", "branches"
   add_foreign_key "purchase_items", "categories"
   add_foreign_key "purchase_items", "companies"
+  add_foreign_key "purchase_items", "property_mappings"
   add_foreign_key "purchase_items", "purchases"
   add_foreign_key "purchases", "branches"
   add_foreign_key "purchases", "categories"
   add_foreign_key "purchases", "companies"
+  add_foreign_key "purchases", "property_mappings"
   add_foreign_key "questions", "branches"
   add_foreign_key "questions", "categories"
   add_foreign_key "questions", "companies"
+  add_foreign_key "questions", "property_mappings"
   add_foreign_key "reservation_appointments", "companies"
   add_foreign_key "reservation_appointments", "reservations"
   add_foreign_key "reservations", "branches"
   add_foreign_key "reservations", "categories"
   add_foreign_key "reservations", "companies"
+  add_foreign_key "reservations", "property_mappings"
   add_foreign_key "role_appointments", "companies"
   add_foreign_key "role_appointments", "roles"
   add_foreign_key "roles", "branches"
@@ -5757,9 +5887,11 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
   add_foreign_key "service_groups", "branches"
   add_foreign_key "service_groups", "categories"
   add_foreign_key "service_groups", "companies"
+  add_foreign_key "service_groups", "property_mappings"
   add_foreign_key "services", "branches"
   add_foreign_key "services", "categories"
   add_foreign_key "services", "companies"
+  add_foreign_key "services", "property_mappings"
   add_foreign_key "sessions", "users"
   add_foreign_key "setting_appointments", "companies"
   add_foreign_key "setting_appointments", "settings"
@@ -5768,9 +5900,11 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
   add_foreign_key "setting_groups", "branches"
   add_foreign_key "setting_groups", "categories"
   add_foreign_key "setting_groups", "companies"
+  add_foreign_key "setting_groups", "property_mappings"
   add_foreign_key "settings", "branches"
   add_foreign_key "settings", "categories"
   add_foreign_key "settings", "companies"
+  add_foreign_key "settings", "property_mappings"
   add_foreign_key "settings", "setting_groups"
   add_foreign_key "shifts", "branches"
   add_foreign_key "shifts", "companies"
@@ -5780,18 +5914,22 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
   add_foreign_key "stock_exports", "categories"
   add_foreign_key "stock_exports", "companies"
   add_foreign_key "stock_exports", "products"
+  add_foreign_key "stock_exports", "property_mappings"
   add_foreign_key "stock_imports", "branches"
   add_foreign_key "stock_imports", "categories"
   add_foreign_key "stock_imports", "companies"
   add_foreign_key "stock_imports", "products"
+  add_foreign_key "stock_imports", "property_mappings"
   add_foreign_key "stock_transfers", "branches"
   add_foreign_key "stock_transfers", "categories"
   add_foreign_key "stock_transfers", "companies"
   add_foreign_key "stock_transfers", "products"
+  add_foreign_key "stock_transfers", "property_mappings"
   add_foreign_key "stocks", "branches"
   add_foreign_key "stocks", "categories"
   add_foreign_key "stocks", "companies"
   add_foreign_key "stocks", "products"
+  add_foreign_key "stocks", "property_mappings"
   add_foreign_key "stocks", "warehouses"
   add_foreign_key "subscription_groups", "branches"
   add_foreign_key "subscription_groups", "companies"
@@ -5823,12 +5961,15 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
   add_foreign_key "task_groups", "branches"
   add_foreign_key "task_groups", "categories"
   add_foreign_key "task_groups", "companies"
+  add_foreign_key "task_groups", "property_mappings"
   add_foreign_key "tasks", "branches"
   add_foreign_key "tasks", "categories"
   add_foreign_key "tasks", "companies"
+  add_foreign_key "tasks", "property_mappings"
   add_foreign_key "tasks", "task_groups"
   add_foreign_key "users", "users", column: "parent_user_id"
   add_foreign_key "warehouses", "branches"
   add_foreign_key "warehouses", "categories"
   add_foreign_key "warehouses", "companies"
+  add_foreign_key "warehouses", "property_mappings"
 end

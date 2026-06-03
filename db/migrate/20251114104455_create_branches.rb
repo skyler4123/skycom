@@ -4,6 +4,7 @@ class CreateBranches < ActiveRecord::Migration[8.0]
       # --- Hierarchy & Global Scoping ---
       t.references :company, null: false, foreign_key: true, type: :uuid
       t.references :category, null: true, foreign_key: true, type: :uuid
+      t.references :property_mapping, null: true, foreign_key: true, type: :uuid
       t.references :parent_branch, null: true, foreign_key: { to_table: :branches }, type: :uuid
 
       # --- Identity ---
