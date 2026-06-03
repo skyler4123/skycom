@@ -1,13 +1,6 @@
 # app/controllers/companies/property_mappings_controller.rb
 
 class Companies::PropertyMappingsController < Companies::ApplicationController
-  PROPERTY_KEYS = (1..10).flat_map { |i| [ :"property_string_#{i}" ] } +
-                  (1..5).flat_map { |i| [ :"property_text_#{i}" ] } +
-                  (1..20).flat_map { |i| [ :"property_integer_#{i}" ] } +
-                  (1..10).flat_map { |i| [ :"property_decimal_#{i}" ] } +
-                  (1..10).flat_map { |i| [ :"property_boolean_#{i}" ] } +
-                  (1..10).flat_map { |i| [ :"property_datetime_#{i}" ] }.freeze
-
   def show
     mapping = current_company.property_mappings.find(params[:id])
     render json: { property_mapping: format_mapping(mapping) }
@@ -42,10 +35,10 @@ class Companies::PropertyMappingsController < Companies::ApplicationController
   private
 
   def property_mapping_params
-    params.require(:property_mapping).permit(:category_id, :name, *PROPERTY_KEYS)
+    params.require(:property_mapping).permit(:category_id, :name, property_metadata: {})
   end
 
   def format_mapping(mapping)
-    mapping.as_json(only: [ :id, :category_id, :name, *PROPERTY_KEYS ])
+    mapping.as_json(only: [ :id, :category_id, :name, :property_metadata ])
   end
 end

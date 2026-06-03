@@ -9,7 +9,7 @@ class CreateTableConfigs < ActiveRecord::Migration[8.0]
       t.string :description
       t.string :resource_name
 
-      t.jsonb :fields, null: false, default: []
+      t.jsonb :columns_metadata, null: false, default: []
 
       # --- System Fields ---
       t.integer  :lifecycle_status, index: true

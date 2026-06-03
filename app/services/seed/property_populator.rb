@@ -75,26 +75,22 @@ class Seed::PropertyPopulator
     mapping = record.category&.property_mapping
     return unless mapping
 
-    PropertyMapping.column_names.grep(/^property_/).each do |col|
-      value = mapping[col]
-      next if value.blank?
+    mapping.property_metadata.each do |config|
+      key = config["key"]
+      next if key.blank?
 
-      label = value.is_a?(Hash) ? value["label"] : value
+      label = config["label"]
       next if label.blank?
 
-      record[col] = case col
-      when /^property_string/
-                      random_string_value(label)
-      when /^property_integer/
-                      rand(1..250)
-      when /^property_boolean/
-                      [ true, false ].sample
-      when /^property_decimal/
-                      rand(1.0..500.0).round(2)
-      when /^property_datetime/
-                      Faker::Time.between(from: 2.years.ago, to: 2.years.from_now)
-      when /^property_text/
-                      Faker::Lorem.paragraph(sentence_count: 3)
+      type = config["type"] || key.split("_")[1]
+
+      record[key] = case type
+      when "string"  then random_string_value(label)
+      when "integer" then rand(1..250)
+      when "boolean" then [ true, false ].sample
+      when "decimal" then rand(1.0..500.0).round(2)
+      when "datetime" then Faker::Time.between(from: 2.years.ago, to: 2.years.from_now)
+      when "text"    then Faker::Lorem.paragraph(sentence_count: 3)
       end
     end
   end

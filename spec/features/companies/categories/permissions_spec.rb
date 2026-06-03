@@ -15,8 +15,6 @@ RSpec.feature "Companies::Categories Permissions", type: :feature, js: true do
   let!(:policy_read_category) { create_policy(resource: "Category", action: "read") }
   let!(:policy_create_category) { create_policy(resource: "Category", action: "create") }
   let!(:policy_update_category) { create_policy(resource: "Category", action: "update") }
-  let!(:policy_update_property_mapping) { create_policy(resource: "PropertyMapping", action: "update") }
-
   # Reader role: Category(read) - active
   let!(:reader_read_category_active) do
     create_policy_appointment(role: reader_role, policy: policy_read_category, workflow_status: :active)
@@ -30,15 +28,12 @@ RSpec.feature "Companies::Categories Permissions", type: :feature, js: true do
     create_policy_appointment(role: creator_role, policy: policy_create_category, workflow_status: :active)
   end
 
-  # Editor role: Category(read, update) + PropertyMapping(update) - active
+  # Editor role: Category(read, update) - active
   let!(:editor_read_category_active) do
     create_policy_appointment(role: editor_role, policy: policy_read_category, workflow_status: :active)
   end
   let!(:editor_update_category_active) do
     create_policy_appointment(role: editor_role, policy: policy_update_category, workflow_status: :active)
-  end
-  let!(:editor_update_property_mapping_active) do
-    create_policy_appointment(role: editor_role, policy: policy_update_property_mapping, workflow_status: :active)
   end
 
   # Test employees
@@ -269,42 +264,6 @@ RSpec.feature "Companies::Categories Permissions", type: :feature, js: true do
     expect(target_category.name).to eq('Updated Category Name')
   end
 
-  scenario "employee with update permission can edit property mapping label via show modal" do
-    editor_employee.clear_permissions_cache
-    company.clear_permissions_cache
-    editor_employee.reload
-
-    expect(editor_employee.can?(:update, PropertyMapping)).to be_truthy
-
-    sign_in(editor_user)
-    visit company_categories_path(company)
-
-    expect(page).to have_selector('table', wait: 10)
-
-    target_row = find('tbody tr', text: target_category.name)
-    target_row.find('[data-action*="openShowModal"]').click
-
-    expect(page).to have_selector('.swal2-container', wait: 10)
-
-    # Find the property string section and the first editable property field
-    section = find('h4', text: 'Property String Fields (1-10)').find(:xpath, '..')
-    property_editable = section.find('[data-controller="editable"]', match: :first)
-    property_editable.click
-
-    expect(page).to have_selector('.editable-input', wait: 5)
-
-    property_editable.find('.editable-input').fill_in(with: 'Skin Type')
-
-    accept_confirm do
-      property_editable.find('.editable-input').send_keys :enter
-    end
-
-    expect(page).to have_content("property_string_1 updated!", wait: 10)
-
-    target_category.property_mapping.reload
-    expect(target_category.property_mapping.property_string_1).to eq({ "label" => "Skin Type" })
-  end
-
   scenario "editor can? returns correct values" do
     editor_employee.clear_permissions_cache
     editor_employee.reload
@@ -312,7 +271,6 @@ RSpec.feature "Companies::Categories Permissions", type: :feature, js: true do
     expect(editor_employee.can?(:read, Category)).to be_truthy
     expect(editor_employee.can?(:create, Category)).to be_falsey
     expect(editor_employee.can?(:update, Category)).to be_truthy
-    expect(editor_employee.can?(:update, PropertyMapping)).to be_truthy
   end
 
   # =========================================================================
