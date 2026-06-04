@@ -21,4 +21,5 @@ RSpec.describe Project, type: :model do
     it { should define_enum_for(:workflow_status) }
     it { should define_enum_for(:business_type).with_values(internal: 0, client_project: 1, maintenance: 2) }
   end
+  it_behaves_like "property_mapping concern", Project
 end

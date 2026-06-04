@@ -30,4 +30,5 @@ RSpec.describe Service, type: :model do
     it { should define_enum_for(:workflow_status) }
     it { should define_enum_for(:business_type).with_values(b2b: 0, b2c: 1) }
   end
+  it_behaves_like "property_mapping concern", Service
 end

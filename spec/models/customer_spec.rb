@@ -26,4 +26,5 @@ RSpec.describe Customer, type: :model do
     it { should define_enum_for(:workflow_status) }
     it { should define_enum_for(:business_type).with_values(individual: 0, small_business: 1, enterprise: 2) }
   end
+  it_behaves_like "property_mapping concern", Customer
 end

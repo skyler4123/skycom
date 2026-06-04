@@ -21,4 +21,5 @@ RSpec.describe ProductGroup, type: :model do
     it { should define_enum_for(:workflow_status) }
     it { should define_enum_for(:business_type).with_values(category: 0, collection: 1, line: 2) }
   end
+  it_behaves_like "property_mapping concern", ProductGroup
 end

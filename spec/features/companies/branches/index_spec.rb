@@ -65,7 +65,7 @@ RSpec.feature "Companies::Branches Management", type: :feature, js: true do
 
   scenario "filter by category updates URL and filters table" do
     category = Seed::CategoryService.create(company: company, name: "Test Category", resource_name: "branches")
-    branch.update!(category: category)
+    branch.update!(category: category, property_mapping: category.property_mapping)
     visit company_branches_path(company)
     expect(page).to have_selector('table', wait: 10)
 

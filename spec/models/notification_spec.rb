@@ -21,4 +21,5 @@ RSpec.describe Notification, type: :model do
     it { should define_enum_for(:workflow_status) }
     it { should define_enum_for(:business_type).with_values(email: 0, sms: 1, push_notification: 2) }
   end
+  it_behaves_like "property_mapping concern", Notification
 end

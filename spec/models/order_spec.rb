@@ -25,4 +25,5 @@ RSpec.describe Order, type: :model do
     it { should define_enum_for(:currency_code) }
     it { should define_enum_for(:business_type).with_values(online: 0, in_store: 1, phone: 2) }
   end
+  it_behaves_like "property_mapping concern", Order
 end

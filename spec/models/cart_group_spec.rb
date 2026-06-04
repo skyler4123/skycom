@@ -19,4 +19,5 @@ RSpec.describe CartGroup, type: :model do
     it { should define_enum_for(:workflow_status) }
     it { should define_enum_for(:business_type).with_values(abandoned: 0, active_carts: 1, wishlists: 2) }
   end
+  it_behaves_like "property_mapping concern", CartGroup
 end

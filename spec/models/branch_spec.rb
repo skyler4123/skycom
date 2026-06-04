@@ -51,4 +51,5 @@ RSpec.describe Branch, type: :model do
       expect(branch.subscription_buyer).to eq(company.user)
     end
   end
+  it_behaves_like "property_mapping concern", Branch
 end

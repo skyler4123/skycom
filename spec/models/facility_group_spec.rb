@@ -21,4 +21,5 @@ RSpec.describe FacilityGroup, type: :model do
     it { should define_enum_for(:workflow_status) }
     it { should define_enum_for(:business_type).with_values(building: 0, floor: 1, wing: 2) }
   end
+  it_behaves_like "property_mapping concern", FacilityGroup
 end

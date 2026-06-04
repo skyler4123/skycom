@@ -66,7 +66,7 @@ RSpec.feature "Companies::Products Management", type: :feature, js: true do
 
   scenario "filter by category updates URL and filters table" do
     category = Seed::CategoryService.create(company: company, name: "Test Category", resource_name: "products")
-    product.update!(category: category)
+    product.update!(category: category, property_mapping: category.property_mapping)
     visit company_products_path(company)
     expect(page).to have_selector('table', wait: 10)
 

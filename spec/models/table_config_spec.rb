@@ -174,4 +174,5 @@ RSpec.describe TableConfig, type: :model do
       end
     end
   end
+  it_behaves_like "property_mapping concern", TableConfig
 end

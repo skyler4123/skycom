@@ -14,4 +14,5 @@ RSpec.describe StockTransfer, type: :model do
     it { should have_many(:tag_appointments).dependent(:destroy) }
     it { should have_many(:tags).through(:tag_appointments) }
   end
+  it_behaves_like "property_mapping concern", StockTransfer
 end
