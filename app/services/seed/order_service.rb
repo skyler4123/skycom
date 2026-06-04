@@ -32,7 +32,7 @@ class Seed::OrderService
   def self.create(...)
     order = new(...)
     if order.category.nil? && order.company.present?
-      order.category = Seed::CategoryService.find_or_create_for(
+      order.category = Seed::CategoryService.random_for(
         company: order.company,
         resource_name: Order.model_name.plural
       )

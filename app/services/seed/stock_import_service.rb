@@ -48,7 +48,7 @@ class Seed::StockImportService
   def self.create(...)
     stock_import = new(...)
     if stock_import.category.nil? && stock_import.company.present?
-      stock_import.category = Seed::CategoryService.find_or_create_for(
+      stock_import.category = Seed::CategoryService.random_for(
         company: stock_import.company,
         resource_name: StockImport.model_name.plural
       )

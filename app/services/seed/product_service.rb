@@ -54,7 +54,7 @@ class Seed::ProductService
   def self.create(...)
     product = new(...)
     if product.category.nil? && product.company.present?
-      product.category = Seed::CategoryService.find_or_create_for(
+      product.category = Seed::CategoryService.random_for(
         company: product.company,
         resource_name: Product.model_name.plural
       )

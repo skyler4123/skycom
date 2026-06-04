@@ -28,7 +28,7 @@ class Seed::FacilityService
   def self.create(...)
     facility = new(...)
     if facility.category.nil? && facility.company.present?
-      facility.category = Seed::CategoryService.find_or_create_for(
+      facility.category = Seed::CategoryService.random_for(
         company: facility.company,
         resource_name: Facility.model_name.plural
       )

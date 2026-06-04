@@ -55,7 +55,7 @@ class Seed::BranchService
   def self.create(...)
     branch = new(...)
     if branch.category.nil? && branch.company.present?
-      branch.category = Seed::CategoryService.find_or_create_for(
+      branch.category = Seed::CategoryService.random_for(
         company: branch.company,
         resource_name: Branch.model_name.plural
       )

@@ -32,7 +32,7 @@ class Seed::CustomerService
   def self.create(...)
     customer = new(...)
     if customer.category.nil? && customer.company.present?
-      customer.category = Seed::CategoryService.find_or_create_for(
+      customer.category = Seed::CategoryService.random_for(
         company: customer.company,
         resource_name: Customer.model_name.plural
       )
