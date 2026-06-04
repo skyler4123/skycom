@@ -72,4 +72,5 @@ RSpec.describe Employee, type: :model do
       end
     end
   end
+  it_behaves_like "property_mapping concern", Employee
 end

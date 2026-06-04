@@ -22,4 +22,5 @@ RSpec.describe ProjectGroup, type: :model do
     it { should define_enum_for(:workflow_status) }
     it { should define_enum_for(:business_type).with_values(internal: 0, client_facing: 1, research_and_development: 2) }
   end
+  it_behaves_like "property_mapping concern", ProjectGroup
 end

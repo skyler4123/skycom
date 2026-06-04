@@ -32,4 +32,5 @@ RSpec.describe ServiceGroup, type: :model do
     it { should define_enum_for(:workflow_status) }
     it { should define_enum_for(:business_type).with_values(consulting: 0, maintenance: 1, support: 2, training: 3) }
   end
+  it_behaves_like "property_mapping concern", ServiceGroup
 end

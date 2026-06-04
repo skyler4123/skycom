@@ -4,23 +4,25 @@ class Seed::ApplicationService
     puts "========================================================="
 
 
-    SystemSubscription.delete_all
-    SystemSubscriptionPlan.delete_all
-    SubscriptionPlanAppointment.delete_all
-    SubscriptionPlan.delete_all
-    PriceAppointment.delete_all
-    Price.delete_all
-    Period.delete_all
-    RoleAppointment.delete_all
-    PolicyAppointment.delete_all
-
-
-    # Clear global data before seeding
-    User.destroy_all
-    Employee.delete_all
-    User.destroy_all
-
-    PaymentMethod.destroy_all
+    # Clear all seed-created data before reseeding.
+    # Disable referential integrity to bypass PostgreSQL FK constraints (328 FKs).
+    # Use unscoped.delete_all to:
+    #   1) Bypass Rails-level callbacks (restrict_with_error, before_destroy guards)
+    #   2) Handle Discard default_scope (unscoped removes discarded_at filter)
+    #   3) Cover all models automatically (no manual table list to maintain)
+    Rails.application.eager_load!
+    system_tables = %w[
+      schema_migrations ar_internal_metadata
+      active_storage_blobs active_storage_attachments active_storage_variant_records
+      systems
+    ]
+    ActiveRecord::Base.connection.disable_referential_integrity do
+      ApplicationRecord.descendants.each do |model|
+        next if system_tables.include?(model.table_name)
+        next if model == ApplicationRecord || model.abstract_class?
+        model.unscoped.delete_all
+      end
+    end
 
     # Global Data
     # Identify the platform by a hardcoded CODE, not ID.

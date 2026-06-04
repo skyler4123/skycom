@@ -10,4 +10,5 @@ RSpec.describe Department, type: :model do
     it { should have_many(:department_appointments).dependent(:destroy) }
     it { should have_many(:employees).through(:department_appointments) }
   end
+  it_behaves_like "property_mapping concern", Department
 end

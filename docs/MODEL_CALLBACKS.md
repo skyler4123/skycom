@@ -195,7 +195,8 @@ Auto-assigns a default property_mapping on create if none is provided. Derives `
 
 | Callback | Line | Method | Description |
 |----------|------|--------|-------------|
-| `before_validation :ensure_property_mapping, on: :create` | 9 | `ensure_property_mapping` | If `property_mapping` is nil and `category` is present, sets `self.property_mapping = category.property_mapping`. Ensures every resource record has a property_mapping for dynamic property resolution. |
+| `before_validation :ensure_property_mapping, on: :create` | 10 | `ensure_property_mapping` | If `property_mapping` is nil and `category` is present, sets `self.property_mapping = category.property_mapping`. Ensures every resource record has a property_mapping for dynamic property resolution. |
+| `validate :category_matches_property_mapping_category` | 11 | `category_matches_property_mapping_category` | Ensures the resource's `category_id` matches the `property_mapping.category_id`. Prevents inconsistency on update or manual assignment. Returns early if either association is blank. |
 
 **Included in (48 models):** All models that include `CategoryConcern` (18 models) plus additional managed resources: `Answer`, `Article`, `ArticleGroup`, `Cart`, `CartGroup`, `CustomerGroup`, `Document`, `DocumentGroup`, `Event`, `EventGroup`, `Exam`, `ExamGroup`, `FacilityGroup`, `Membership`, `Notification`, `NotificationGroup`, `OrderGroup`, `Payment`, `ProductGroup`, `Project`, `ProjectGroup`, `Purchase`, `PurchaseItem`, `Question`, `Reservation`, `ServiceGroup`, `Setting`, `SettingGroup`, `Task`, `TaskGroup`
 
@@ -216,8 +217,9 @@ Auto-assigns a default property_mapping on create if none is provided. Derives `
 | `before_discard` | 1 | Employee |
 | `after_touch` | 2* | Role (duplicate declaration on lines 30 and 87) |
 | `after_commit` | 2 | (Cache::RecordsConcern → 5 models) |
+| `validate` | 1 | (PropertyMappingConcern → 48 models) |
 
-**Total unique callback declarations: ~25 directly across 12 model files + 4 concern files propagating to ~57+ models.**
+**Total unique callback declarations: ~26 directly across 12 model files + 4 concern files propagating to ~57+ models.**
 
 ---
 

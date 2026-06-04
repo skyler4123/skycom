@@ -6,4 +6,5 @@ RSpec.describe Invoice, type: :model do
     it { should define_enum_for(:lifecycle_status) }
     it { should define_enum_for(:workflow_status) }
   end
+  it_behaves_like "property_mapping concern", Invoice
 end

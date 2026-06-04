@@ -22,4 +22,5 @@ RSpec.describe Task, type: :model do
     it { should define_enum_for(:business_type).with_values(general: 0, technical: 1, administrative: 2) }
     it { should define_enum_for(:currency_code).with_values(usd: 0, eur: 1, gbp: 2) }
   end
+  it_behaves_like "property_mapping concern", Task
 end
