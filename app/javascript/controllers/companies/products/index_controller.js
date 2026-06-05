@@ -3,12 +3,17 @@ import Companies_Products_NewModalController from "controllers/companies/product
 import Companies_Products_ShowModalController from "controllers/companies/products/show_modal_controller";
 
 export default class Companies_Products_IndexController extends Companies_LayoutController {
-  static targets = ["productsList"]
+  static targets = ["categorySelect", "productsList"]
+  static values = {
+    categoryId: { type: String, default: "" },
+    propertyMappingId: { type: String, default: "" }
+  }
 
   /** @type {(Product & { name: string })[]} */
   products = []
 
   async connect() {
+    console.log(this)
     super.connect()
     try {
       /** @type {{ products: Product[], pagination: any }} */
@@ -23,6 +28,9 @@ export default class Companies_Products_IndexController extends Companies_Layout
       poll(() => {
         if (this.hasContentTarget) {
           this.renderContent()
+          this.categoryIdValue = this.categorySelectTarget.value
+          const propertyMapping = currentPropertyMappings().find(mapping => mapping.category_id === this.categoryIdValue)
+          this.propertyMappingIdValue = propertyMapping.id
           return true
         }
         return false
@@ -68,7 +76,11 @@ export default class Companies_Products_IndexController extends Companies_Layout
 
                 <div class="flex flex-col gap-1">
                   <label class="text-[10px] font-bold text-slate-400 uppercase ml-1">Category</label>
-                  <select name="category_id" class="pl-3 pr-10 py-2 text-sm border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300">
+                  <select
+                    name="category_id"
+                    class="pl-3 pr-10 py-2 text-sm border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300"
+                    data-${this.identifier}-target="categorySelect"
+                  >
                     ${selectOptionsHTML(cloneNewKey(categoryFilter, "id", "value"), categoryValue)}
                   </select>
                 </div>
