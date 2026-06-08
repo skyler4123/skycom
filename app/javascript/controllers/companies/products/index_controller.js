@@ -4,10 +4,6 @@ import Companies_Products_ShowModalController from "controllers/companies/produc
 
 export default class Companies_Products_IndexController extends Companies_LayoutController {
   static targets = ["categorySelect", "productsList"]
-  static values = {
-    categoryId: { type: String, default: "" },
-    propertyMappingId: { type: String, default: "" }
-  }
 
   /** @type {(Product & { name: string })[]} */
   products = []
@@ -31,6 +27,8 @@ export default class Companies_Products_IndexController extends Companies_Layout
           this.categoryIdValue = this.categorySelectTarget.value
           const propertyMapping = currentPropertyMappings().find(mapping => mapping.category_id === this.categoryIdValue)
           this.propertyMappingIdValue = propertyMapping.id
+          // Need to customize this select later to dynamic choose table config record
+          this.tableConfigIdValue = currentTableConfigs().find(config => config.property_mapping_id === this.propertyMappingIdValue)
           return true
         }
         return false
