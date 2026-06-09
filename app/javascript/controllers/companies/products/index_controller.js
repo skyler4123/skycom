@@ -132,7 +132,9 @@ export default class Companies_Products_IndexController extends Companies_Layout
                   ${visibleColumns.map(col => {
                     // Resolve human label: Prefer TableConfig label as authoritative source
                     const mappedField = mappingLookup[col.key]
-                    const resolvedLabel = col.label || mappedField?.label || col.key
+                    const resolvedLabel = col.key.startsWith("property_")
+                      ? (mappedField?.label || col.label || col.key)
+                      : (col.label || col.key)
 
                     const widthStyle = col.width ? `style="width: ${col.width}px;"` : ''
                     const alignmentClass = col.align === 'right' ? 'text-right' : col.align === 'center' ? 'text-center' : 'text-left'
