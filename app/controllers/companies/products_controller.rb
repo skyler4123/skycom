@@ -50,17 +50,22 @@ class Companies::ProductsController < Companies::ApplicationController
   private
 
   def product_params
+    property_keys = (1..10).map { |i| "property_string_#{i}" } +
+                    (1..5).map { |i| "property_text_#{i}" } +
+                    (1..20).map { |i| "property_integer_#{i}" } +
+                    (1..10).map { |i| "property_decimal_#{i}" } +
+                    (1..10).map { |i| "property_boolean_#{i}" } +
+                    (1..10).map { |i| "property_datetime_#{i}" }
+
     params.require(:product).permit(
-      :name,
-      :description,
-      :business_type,
-      :workflow_status
+      :name, :description, :business_type, :workflow_status, :category_id,
+      *property_keys
     )
   end
 
   def format_product(product)
     product.as_json(only: [
-      :id, :name, :description, :code,
+      :id, :name, :description, :code, :category_id,
       :lifecycle_status, :workflow_status, :business_type,
       :created_at, :updated_at,
       :property_string_1, :property_string_2, :property_string_3, :property_string_4, :property_string_5,

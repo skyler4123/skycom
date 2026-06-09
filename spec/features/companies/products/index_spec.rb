@@ -480,7 +480,13 @@ RSpec.feature "Companies::Products Management", type: :feature, js: true do
       row.find('[data-action*="openShowModal"]').click
 
       expect(page).to have_selector('.swal2-container', wait: 10)
-      expect(page).to have_selector('[data-controller="editable"]', wait: 10)
+
+      within('.swal2-container') do
+        expect(page).to have_content('Skin Type', wait: 5)
+        expect(page).to have_content('Key Ingredients')
+        expect(page).to have_content('Volume (ml)')
+        expect(page).to have_content('Organic Certified')
+      end
     end
 
     # =========================================================================
@@ -495,6 +501,11 @@ RSpec.feature "Companies::Products Management", type: :feature, js: true do
       expect(page).to have_selector('form[data-action*="handleSubmit"]', wait: 10)
 
       expect(page).to have_selector('input[name="product[name]"]', wait: 5)
+      expect(page).to have_selector('input[name="product[property_string_1]"]', wait: 5)
+      expect(page).to have_selector('input[name="product[property_string_2]"]')
+      expect(page).to have_selector('input[name="product[property_integer_1]"]')
+      expect(page).to have_selector('input[type="checkbox"][name="product[property_boolean_1]"]')
+
       fill_in 'product[name]', with: 'Dynamic Property Product'
       select 'Digital', from: 'product[business_type]'
 
@@ -503,7 +514,9 @@ RSpec.feature "Companies::Products Management", type: :feature, js: true do
       expect(page).to have_content("created successfully", wait: 10)
       expect(page).to have_selector('tbody tr', wait: 10)
 
-      expect(Product.find_by(name: "Dynamic Property Product")).to be_present
+      product = Product.find_by(name: "Dynamic Property Product")
+      expect(product).to be_present
+      expect(product.category).to eq(category_cosmetics)
     end
   end
 end

@@ -9,6 +9,7 @@ export default class Companies_Products_IndexController extends Companies_Layout
   products = []
 
   async connect() {
+    console.log(this)
     super.connect()
     try {
       const urlParams = new URLSearchParams(window.location.search)
