@@ -130,9 +130,9 @@ export default class Companies_Products_IndexController extends Companies_Layout
               <thead>
                 <tr class="text-sm text-slate-500 dark:text-slate-400 bg-slate-50 dark:bg-slate-800/50 border-b border-slate-200 dark:border-slate-700">
                   ${visibleColumns.map(col => {
-                    // Resolve human label: Prefer PropertyMapping.label over raw TableConfig fallback
+                    // Resolve human label: Prefer TableConfig label as authoritative source
                     const mappedField = mappingLookup[col.key]
-                    const resolvedLabel = mappedField?.label || col.label || col.key
+                    const resolvedLabel = col.label || mappedField?.label || col.key
 
                     const widthStyle = col.width ? `style="width: ${col.width}px;"` : ''
                     const alignmentClass = col.align === 'right' ? 'text-right' : col.align === 'center' ? 'text-center' : 'text-left'
@@ -192,9 +192,9 @@ export default class Companies_Products_IndexController extends Companies_Layout
           <div class="w-8 h-8 rounded-lg bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center shrink-0">
             <span class="material-symbols-outlined text-emerald-600 dark:text-emerald-400 text-[18px]">inventory_2</span>
           </div>
-          <p class="font-medium text-slate-900 dark:text-white cursor-pointer hover:underline truncate">
-            ${value || 'Unnamed Product'}
-          </p>
+      <p class="font-medium text-slate-900 dark:text-white overflow-visible whitespace-normal">
+        ${value || 'Unnamed Product'}
+      </p>
         </div>
       `
     }
