@@ -42,10 +42,12 @@ RSpec.feature "Companies::Products Management", type: :feature, js: true do
   before do
     sign_in(owner)
 
+    page.execute_script("localStorage.clear()")
+
     company_data = JSON.parse(company.to_json).merge(
-      "property_mappings" => company.property_mappings.map { |pm| JSON.parse(pm.to_json) },
-      "table_configs" => company.table_configs.map { |tc| JSON.parse(tc.to_json) },
-      "categories" => company.categories.map { |c| JSON.parse(c.to_json) },
+      "property_mappings" => company.property_mappings.reset.map { |pm| JSON.parse(pm.to_json) },
+      "table_configs" => company.table_configs.reset.map { |tc| JSON.parse(tc.to_json) },
+      "categories" => company.categories.reset.map { |c| JSON.parse(c.to_json) },
       "branches" => [],
       "departments" => [],
       "roles" => []
@@ -60,6 +62,7 @@ RSpec.feature "Companies::Products Management", type: :feature, js: true do
 
     page.execute_script("localStorage.setItem('client_cache_data', arguments[0])", payload.to_json)
     page.execute_script("localStorage.setItem('client_cache_version', 'forced')")
+    page.execute_script("document.cookie = 'client_cache_version=forced; path=/'")
   end
 
   scenario "index page loads and displays products table" do
@@ -247,10 +250,11 @@ RSpec.feature "Companies::Products Management", type: :feature, js: true do
     end
 
     let!(:products_cosmetics) do
-      2.times.map do
+      names = [ "Gorgeous Steel Plate", "Practical Wool Shoes" ]
+      names.map.with_index do |nm, i|
         product = Product.new(
           company: company,
-          name: Faker::Commerce.product_name,
+          name: nm,
           description: Faker::Lorem.sentence(word_count: 12),
           code: "PRD-#{SecureRandom.hex(4).upcase}",
           category: category_cosmetics,
@@ -266,10 +270,11 @@ RSpec.feature "Companies::Products Management", type: :feature, js: true do
     end
 
     let!(:products_supplements) do
-      2.times.map do
+      names = [ "Aerodynamic Iron Car", "Intelligent Copper Wallet" ]
+      names.map.with_index do |nm, i|
         product = Product.new(
           company: company,
-          name: Faker::Commerce.product_name,
+          name: nm,
           description: Faker::Lorem.sentence(word_count: 12),
           code: "PRD-#{SecureRandom.hex(4).upcase}",
           category: category_supplements,
@@ -285,10 +290,12 @@ RSpec.feature "Companies::Products Management", type: :feature, js: true do
     end
 
     before do
+      page.execute_script("localStorage.clear()")
+
       company_data = JSON.parse(company.to_json).merge(
-        "property_mappings" => company.property_mappings.map { |pm| JSON.parse(pm.to_json) },
-        "table_configs" => company.table_configs.map { |tc| JSON.parse(tc.to_json) },
-        "categories" => company.categories.map { |c| JSON.parse(c.to_json) },
+        "property_mappings" => company.property_mappings.reset.map { |pm| JSON.parse(pm.to_json) },
+        "table_configs" => company.table_configs.reset.map { |tc| JSON.parse(tc.to_json) },
+        "categories" => company.categories.reset.map { |c| JSON.parse(c.to_json) },
         "branches" => [],
         "departments" => [],
         "roles" => []
@@ -301,10 +308,10 @@ RSpec.feature "Companies::Products Management", type: :feature, js: true do
         employees: []
       }
 
-      json_str = payload.to_json
-
-      page.execute_script("localStorage.setItem('client_cache_data', arguments[0])", json_str)
+      page.execute_script("localStorage.setItem('client_cache_data', arguments[0])", payload.to_json)
+      # Sync cookie version to prevent ClientCacheController from overwriting localStorage
       page.execute_script("localStorage.setItem('client_cache_version', 'forced')")
+      page.execute_script("document.cookie = 'client_cache_version=forced; path=/'")
     end
 
     # =========================================================================

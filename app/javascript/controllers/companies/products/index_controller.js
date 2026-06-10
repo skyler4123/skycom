@@ -9,37 +9,31 @@ export default class Companies_Products_IndexController extends Companies_Layout
   products = []
 
   async connect() {
-    console.log(this)
     super.connect()
-    try {
-      const urlParams = new URLSearchParams(window.location.search)
-      const response = await fetchJson({
-        params: { category_id: urlParams.get('category_id') || this.defaultFilterCategory()?.id }
-      })
 
+    this.categoryIdValue = new URLSearchParams(window.location.search).get('category_id') || this.defaultFilterCategory()?.id
+
+    const propertyMapping = currentPropertyMappings().find(m => m.category_id === this.categoryIdValue)
+    if (propertyMapping) this.propertyMappingIdValue = propertyMapping.id
+
+    const tableConfig = currentTableConfigs().find(c => c.property_mapping_id === this.propertyMappingIdValue)
+    if (tableConfig) this.tableConfigIdValue = tableConfig.id
+
+    try {
+      const response = await fetchJson({ params: { category_id: this.categoryIdValue } })
       this.products = response.products || []
       this.pagination = response.pagination || {}
-
-      poll(() => {
-        if (this.hasContentTarget) {
-          this.categoryIdValue = getQueryParam("category_id")
-          
-          const propertyMapping = currentPropertyMappings().find(mapping => mapping.category_id === this.categoryIdValue)
-          if (propertyMapping) this.propertyMappingIdValue = propertyMapping.id
-          
-          const tableConfig = currentTableConfigs().find(config => config.property_mapping_id === this.propertyMappingIdValue)
-          if (tableConfig) this.tableConfigIdValue = tableConfig.id
-          
-          this.renderContent()
-
-          return true
-        }
-        return false
-      })
-
     } catch (error) {
       toast({ type: "error", message: "Failed to load products" })
     }
+
+    poll(() => {
+      if (this.hasContentTarget) {
+        this.renderContent()
+        return true
+      }
+      return false
+    })
   }
 
   productsCategories() {
@@ -61,20 +55,13 @@ export default class Companies_Products_IndexController extends Companies_Layout
     openModal({ html: `<div data-controller="${identifier(Companies_Products_ShowModalController)}"></div>` })
   }
 
-  /**
-   * Generates the dynamic headers and rows by combining TableConfig order 
-   * with PropertyMapping data labels.
-   */
   contentHTML() {
     const categoryFilter = this.productsCategories()
-    const urlParams = new URLSearchParams(window.location.search)
-    const categoryValue = urlParams.get('category_id') || this.defaultFilterCategory()?.id
+    const categoryValue = this.categoryIdValue || this.defaultFilterCategory()?.id
 
-    // 1. Grab both configuration structures safely
     const tableConfig = this.currentTableConfig()
     const propertyMapping = this.currentPropertyMapping()
 
-    // Fallback blueprint if configs haven't fully initialized on page load
     const fallbackColumns = [
       { key: "name", label: "Product Name" },
       { key: "code", label: "Product Code" },
@@ -84,7 +71,6 @@ export default class Companies_Products_IndexController extends Companies_Layout
     const rawColumns = tableConfig?.columns_metadata || fallbackColumns
     const visibleColumns = rawColumns.filter(col => col.visible !== false)
 
-    // Build an in-memory dictionary lookup from PropertyMapping for O(1) attribute matching
     const mappingLookup = (propertyMapping?.property_metadata || []).reduce((acc, field) => {
       acc[field.key] = field
       return acc
@@ -103,6 +89,7 @@ export default class Companies_Products_IndexController extends Companies_Layout
                     name="category_id"
                     class="pl-3 pr-10 py-2 text-sm border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300"
                     data-${this.identifier}-target="categorySelect"
+                    data-action="change->${this.identifier}#onCategoryChange"
                   >
                     ${selectOptionsHTML(cloneNewKey(categoryFilter, "id", "value"), categoryValue)}
                   </select>
@@ -130,7 +117,6 @@ export default class Companies_Products_IndexController extends Companies_Layout
               <thead>
                 <tr class="text-sm text-slate-500 dark:text-slate-400 bg-slate-50 dark:bg-slate-800/50 border-b border-slate-200 dark:border-slate-700">
                   ${visibleColumns.map(col => {
-                    // Resolve human label: Prefer TableConfig label as authoritative source
                     const mappedField = mappingLookup[col.key]
                     const resolvedLabel = col.key.startsWith("property_")
                       ? (mappedField?.label || col.label || col.key)
@@ -181,13 +167,32 @@ export default class Companies_Products_IndexController extends Companies_Layout
     `
   }
 
-  /**
-   * Evaluates formatting styles based on types (string, integer, boolean, decimal)
-   */
+  onCategoryChange(event) {
+    const categoryId = event.target.value
+    this.categoryIdValue = categoryId
+
+    const propertyMapping = currentPropertyMappings().find(m => m.category_id === categoryId)
+    if (propertyMapping) this.propertyMappingIdValue = propertyMapping.id
+
+    const tableConfig = currentTableConfigs().find(c => c.property_mapping_id === this.propertyMappingIdValue)
+    if (tableConfig) this.tableConfigIdValue = tableConfig.id
+
+    this.products = []
+
+    fetchJson({ params: { category_id: categoryId } })
+      .then(response => {
+        this.products = response.products || []
+        this.pagination = response.pagination || {}
+        this.renderContent()
+      })
+      .catch(error => {
+        toast({ type: "error", message: "Failed to load products" })
+      })
+  }
+
   renderCellContent(product, col, mappedField) {
     const value = product[col.key]
 
-    // Core layout field mappings
     if (col.key === "name") {
       return `
         <div class="flex items-center gap-4">
@@ -209,12 +214,10 @@ export default class Companies_Products_IndexController extends Companies_Layout
       return Helpers.statusBadge(value)
     }
 
-    // Dynamic Matrix Fallback Check
     if (value === null || value === undefined) {
       return `<span class="text-slate-300 dark:text-slate-700">—</span>`
     }
 
-    // Custom formatting strategies inferred from PropertyMapping types
     const fieldType = mappedField?.type
 
     if (fieldType === "boolean") {
@@ -228,7 +231,6 @@ export default class Companies_Products_IndexController extends Companies_Layout
     }
 
     if (fieldType === "decimal") {
-      // Formats decimals like Certification Scores or specific pricing dimensions cleanly
       return `<span class="font-mono font-medium text-blue-600 dark:text-blue-400">${Number(value).toFixed(2)}</span>`
     }
 
