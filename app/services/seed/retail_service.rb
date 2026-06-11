@@ -1095,15 +1095,16 @@ class Seed::RetailService
           resource_name: resource_name.to_s,
           category: category,
           property_mapping: category.property_mapping,
-          columns_metadata: keys.map { |k| field_hash(k) },
+          columns_metadata: keys.map { |k| field_hash(k, entry[:properties]) },
           name: "#{name} table config"
         )
       end
     end
   end
 
-  def field_hash(key)
-    { "key" => key, "label" => key.humanize, "visible" => true,
+  def field_hash(key, properties = {})
+    label = properties[key.to_sym] || key.humanize
+    { "key" => key, "label" => label, "visible" => true,
       "sortable" => true, "align" => "left", "pinned" => nil,
       "width" => nil, "roles" => [], "is_virtual" => false,
       "render_config" => {} }

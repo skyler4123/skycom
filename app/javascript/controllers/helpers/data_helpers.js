@@ -458,3 +458,19 @@ export const cloneNewKey = (array = [], sourceKey = "id", newKey = "value") => {
     [newKey]: item[sourceKey]
   }));
 }
+
+/**
+ * Extracts a query parameter value from a given URL string or the current browser window URL.
+ * * @param {string} paramName - The name of the query parameter to fetch (e.g., "category_id")
+ * @param {string} [urlString] - Optional absolute URL string. Defaults to window.location.href if omitted.
+ * @returns {string|null} The value of the parameter, or null if it doesn't exist.
+ */
+export const getQueryParam = (paramName, urlString = window.location.href) => {
+  try {
+    const url = new URL(urlString);
+    return url.searchParams.get(paramName);
+  } catch (error) {
+    console.error("Invalid URL provided to getQueryParam:", error);
+    return null;
+  }
+}

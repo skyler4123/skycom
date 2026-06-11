@@ -50,19 +50,37 @@ class Companies::ProductsController < Companies::ApplicationController
   private
 
   def product_params
+    property_keys = (1..10).map { |i| "property_string_#{i}" } +
+                    (1..5).map { |i| "property_text_#{i}" } +
+                    (1..20).map { |i| "property_integer_#{i}" } +
+                    (1..10).map { |i| "property_decimal_#{i}" } +
+                    (1..10).map { |i| "property_boolean_#{i}" } +
+                    (1..10).map { |i| "property_datetime_#{i}" }
+
     params.require(:product).permit(
-      :name,
-      :description,
-      :business_type,
-      :workflow_status
+      :name, :description, :business_type, :workflow_status, :category_id,
+      *property_keys
     )
   end
 
   def format_product(product)
     product.as_json(only: [
-      :id, :name, :description, :code,
+      :id, :name, :description, :code, :category_id,
       :lifecycle_status, :workflow_status, :business_type,
-      :created_at, :updated_at
+      :created_at, :updated_at,
+      :property_string_1, :property_string_2, :property_string_3, :property_string_4, :property_string_5,
+      :property_string_6, :property_string_7, :property_string_8, :property_string_9, :property_string_10,
+      :property_text_1, :property_text_2, :property_text_3, :property_text_4, :property_text_5,
+      :property_integer_1, :property_integer_2, :property_integer_3, :property_integer_4, :property_integer_5,
+      :property_integer_6, :property_integer_7, :property_integer_8, :property_integer_9, :property_integer_10,
+      :property_integer_11, :property_integer_12, :property_integer_13, :property_integer_14, :property_integer_15,
+      :property_integer_16, :property_integer_17, :property_integer_18, :property_integer_19, :property_integer_20,
+      :property_decimal_1, :property_decimal_2, :property_decimal_3, :property_decimal_4, :property_decimal_5,
+      :property_decimal_6, :property_decimal_7, :property_decimal_8, :property_decimal_9, :property_decimal_10,
+      :property_boolean_1, :property_boolean_2, :property_boolean_3, :property_boolean_4, :property_boolean_5,
+      :property_boolean_6, :property_boolean_7, :property_boolean_8, :property_boolean_9, :property_boolean_10,
+      :property_datetime_1, :property_datetime_2, :property_datetime_3, :property_datetime_4, :property_datetime_5,
+      :property_datetime_6, :property_datetime_7, :property_datetime_8, :property_datetime_9, :property_datetime_10
     ]).merge(
       category: product.category&.as_json(only: [ :id, :name ])
     )

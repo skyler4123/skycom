@@ -85,6 +85,10 @@ class Seed::CategoryService
     ) { |cat| cat.name = resource_name.to_s.humanize }
   end
 
+  def self.random_for(company:, resource_name:)
+    Category.where(company: company, resource_name: resource_name.to_s).sample
+  end
+
   # Returns an array of slot-key → random-label pairs (same shape as
   # the `properties:` hash) so build_property_metadata can consume it.
   def self.random_property_labels

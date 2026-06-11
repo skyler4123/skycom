@@ -10,7 +10,10 @@ export default class Companies_LayoutController extends Controller {
     data: { type: Object, default: {} },
     isOpenProfileDropdown: { type: Boolean, default: false },
     openHeaderSubmenuName: { type: String, default: "" },
-    
+   
+    categoryId: { type: String, default: "" },
+    propertyMappingId: { type: String, default: "" },
+    tableConfigId: { type: String, default: "" }
   }
 
   connect() {
@@ -24,6 +27,18 @@ export default class Companies_LayoutController extends Controller {
       }
       return false; // Keep polling
     });
+  }
+
+  currentCategory() {
+    return currentCategories().find(category => category.id === this.categoryIdValue)
+  }
+
+  currentPropertyMapping() {
+    return currentPropertyMappings().find(mapping => mapping.id === this.propertyMappingIdValue)
+  }
+
+  currentTableConfig() {
+    return currentTableConfigs().find(config => config.id === this.tableConfigIdValue)
   }
 
   renderLayout() {

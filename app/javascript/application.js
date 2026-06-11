@@ -34,6 +34,7 @@ window.transformValues = Helpers.transformValues
 window.isPresent = Helpers.isPresent
 window.isEmpty = Helpers.isEmpty
 window.sort = Helpers.sort
+window.getQueryParam = Helpers.getQueryParam
 window.pagination = Helpers.pagination
 window.randomId = Helpers.randomId
 window.cloneNewKey = Helpers.cloneNewKey
