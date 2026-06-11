@@ -29,3 +29,8 @@ services:
     ports:
       - "9200:9200"
       - "9600:9600"
+  
+  redis:
+    image: redis:7.2-alpine
+    ports:
+      - "6379:6379"

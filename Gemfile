@@ -93,4 +93,5 @@ gem "discard"
 gem "paper_trail"
 gem "searchkick"
 gem "opensearch-ruby" # select one for searchkick
+gem "kredis"
 # ----------------------------------------------------------------------------------------------------

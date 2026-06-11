@@ -136,7 +136,16 @@ services:
     # This service runs once and exits successfully
     # profiles: ["no-start"] # Optional: Prevents this service from running on 'docker compose up' by default, if you only want it on explicit 'docker compose run'
 
-    
+  redis:
+    image: redis:7.2-alpine
+    # container_name: redis_central_cache
+    # --appendonly yes ensures your flash sale data is saved to disk continuously
+    # command: redis-server --appendonly yes --requirepass "${REDIS_PASSWORD:-secretpassword}"
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+
 volumes:
   postgres_data:
   mongo_data:
@@ -144,4 +153,4 @@ volumes:
   grafana_data:
   minio_data:
   sqlite_storage:
-  
+  redis_data:

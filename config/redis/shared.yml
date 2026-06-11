@@ -1,0 +1,17 @@
+production: &production
+  url: <%= Rails.application.credentials.dig(:redis_url_production) || "redis://127.0.0.1:6379/0" %>
+  timeout: 1
+
+development: &development
+  url: <%= Rails.application.credentials.dig(:redis_url_development) || "redis://127.0.0.1:6379/0" %>
+  timeout: 1
+
+  # You can also specify host, port, and db instead of url
+  # host: <%= ENV.fetch("REDIS_SHARED_HOST", "127.0.0.1") %>
+  # port: <%= ENV.fetch("REDIS_SHARED_PORT", "6379") %>
+  # db: <%= ENV.fetch("REDIS_SHARED_DB", "11") %>
+
+test:
+  url: <%= Rails.application.credentials.dig(:redis_url_test) || "redis://127.0.0.1:6379/0" %>
+  timeout: 1
+
