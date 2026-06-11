@@ -14,7 +14,7 @@ This roadmap outlines the journey from initial sign-up to managing a nationwide 
 7.  **Legal Registration:** Input `tax_id` and `registration_number` for Vietnamese compliance.
 8.  **Currency Initialization:** Set the primary currency to VND (using precision 15, scale 2).
 9.  **Timezone Configuration:** Calibrate system events to GMT+7.
-10. **Global Search Index:** Trigger the initial OpenSearch mapping for the new company.
+10. **Global Search Index:** Trigger the initial search index mapping for the new company.
 
 ## Phase 2: Structural Hierarchy (11-20)
 11. **Core Categories:** Create high-level categories for "Retail" and "Clinic Services."

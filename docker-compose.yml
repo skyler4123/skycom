@@ -19,9 +19,6 @@ services:
     depends_on:
       - postgres
       # - mongo
-      # - opensearch
-      # - opensearch_dashboards
-
   job:
     build: .
     command: bash -c "sleep 30 && bundle exec rails db:prepare && bin/jobs"
@@ -50,29 +47,6 @@ services:
   #     - "27017:27017"
   #   volumes:
   #     - mongo_data:/data/db
-
-  opensearch:
-    image: opensearchproject/opensearch:3
-    environment:
-      OPENSEARCH_INITIAL_ADMIN_PASSWORD: OpensearchPassword@1234
-      discovery.type: single-node
-      plugins.security.disabled: "true"
-      # DISABLE_SECURITY_PLUGIN: "true" # Disables Security plugin
-    ports:
-      - "9200:9200"
-      - "9600:9600"
-    volumes:
-      - search_data:/usr/share/opensearch/data
-
-  # opensearch_dashboards:
-  #   image: opensearchproject/opensearch-dashboards:3
-  #   environment:
-  #     - 'OPENSEARCH_HOSTS=["http://opensearch:9200"]'
-  #     - "DISABLE_SECURITY_DASHBOARDS_PLUGIN=true"
-  #   ports:
-  #     - "5601:5601"
-  #   depends_on:
-  #     - opensearch
 
   # grafana:
   #   # username: admin
@@ -149,8 +123,7 @@ services:
 volumes:
   postgres_data:
   mongo_data:
-  search_data:
-  grafana_data:
+grafana_data:
   minio_data:
   sqlite_storage:
   redis_data:
