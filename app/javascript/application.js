@@ -44,6 +44,7 @@ window.openPopover = Helpers.openPopover
 window.form = Helpers.form
 window.toast = Helpers.toast
 window.selectOptionsHTML = Helpers.selectOptionsHTML
+window.table = Helpers.table
 window.findById = Helpers.findById
 window.Enums = Helpers.Enums
 window.mergeObjectArrays = Helpers.mergeObjectArrays
