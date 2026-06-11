@@ -741,3 +741,101 @@ export const responsiveText = (options) => {
 
   return options[activeBreakpoint] || options['base'] || "";
 };
+
+/**
+ * Renders a dynamic <table> with type-aware cell rendering.
+ * Pure function — no global state, all data passed explicitly.
+ *
+ * @param {Object} options
+ * @param {Array<Object>} options.rows - Array of record objects
+ * @param {Array<{ key: string, label?: string, width?: number, align?: string, visible?: boolean }>} options.columns - Column definitions
+ * @param {string} options.identifier - Stimulus controller identifier for data-* attrs
+ * @param {string} options.target - Stimulus target name for tbody
+ * @param {Object<string, { type?: string, label?: string }>} [options.mappingLookup] - Property metadata lookup for type-aware rendering
+ * @param {Object<string, function>} [options.renderers] - Custom cell renderers per column key: (value, record, column) => html
+ * @param {function} [options.renderActions] - Custom actions column renderer: (record, identifier) => html (returns full <td>)
+ * @returns {string} The <table> HTML string
+ */
+export const table = ({
+  rows = [],
+  columns = [],
+  identifier,
+  target,
+  mappingLookup = {},
+  renderers = {},
+  renderActions
+}) => {
+  const resolveLabel = (col) => {
+    if (col.key.startsWith("property_")) {
+      return mappingLookup[col.key]?.label || col.label || col.key
+    }
+    return col.label || col.key
+  }
+
+  const renderCell = (record, col) => {
+    const value = record[col.key]
+
+    if (renderers[col.key]) {
+      return renderers[col.key](value, record, col)
+    }
+
+    if (col.key === "workflow_status") {
+      return statusBadge(value)
+    }
+
+    if (value === null || value === undefined) {
+      return `<span class="text-slate-300 dark:text-slate-700">—</span>`
+    }
+
+    const fieldType = mappingLookup[col.key]?.type
+
+    if (fieldType === "boolean") {
+      const isTrue = value === true || value === "true"
+      const badgeColor = isTrue ? "emerald" : "slate"
+      return `<span class="inline-flex items-center px-2 py-0.5 text-xs font-medium rounded-md bg-${badgeColor}-50 text-${badgeColor}-700 dark:bg-${badgeColor}-900/30 dark:text-${badgeColor}-400">${isTrue ? 'Yes' : 'No'}</span>`
+    }
+
+    if (fieldType === "integer") {
+      return `<span class="font-mono text-slate-900 dark:text-slate-100">${Number(value).toLocaleString()}</span>`
+    }
+
+    if (fieldType === "decimal") {
+      return `<span class="font-mono font-medium text-blue-600 dark:text-blue-400">${Number(value).toFixed(2)}</span>`
+    }
+
+    return value
+  }
+
+  const alignmentClass = (col) => {
+    if (col.align === 'right') return 'text-right'
+    if (col.align === 'center') return 'text-center'
+    return 'text-left'
+  }
+
+  const widthStyle = (col) => col.width ? `style="width: ${col.width}px;"` : ''
+
+  return `
+    <table class="w-full text-left border-collapse table-fixed">
+      <thead>
+        <tr class="text-sm text-slate-500 dark:text-slate-400 bg-slate-50 dark:bg-slate-800/50 border-b border-slate-200 dark:border-slate-700">
+          ${columns.map(col => `
+            <th ${widthStyle(col)} class="py-4 px-6 font-medium whitespace-nowrap ${alignmentClass(col)}">${resolveLabel(col)}</th>
+          `).join('')}
+          ${renderActions ? `<th class="py-4 px-6 font-medium text-right whitespace-nowrap w-[100px]">Actions</th>` : ''}
+        </tr>
+      </thead>
+      <tbody data-${identifier}-target="${target}" class="divide-y divide-slate-200 dark:divide-slate-800">
+        ${rows.map(record => `
+          <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
+            ${columns.map(col => `
+              <td class="py-4 px-6 text-sm ${alignmentClass(col)}">
+                ${renderCell(record, col)}
+              </td>
+            `).join('')}
+            ${renderActions ? renderActions(record, identifier) : ''}
+          </tr>
+        `).join('')}
+      </tbody>
+    </table>
+  `
+}

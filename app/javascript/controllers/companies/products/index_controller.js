@@ -113,50 +113,36 @@ export default class Companies_Products_IndexController extends Companies_Layout
           </div>
 
           <div class="overflow-x-auto">
-            <table class="w-full text-left border-collapse table-fixed">
-              <thead>
-                <tr class="text-sm text-slate-500 dark:text-slate-400 bg-slate-50 dark:bg-slate-800/50 border-b border-slate-200 dark:border-slate-700">
-                  ${visibleColumns.map(col => {
-                    const mappedField = mappingLookup[col.key]
-                    const resolvedLabel = col.key.startsWith("property_")
-                      ? (mappedField?.label || col.label || col.key)
-                      : (col.label || col.key)
-
-                    const widthStyle = col.width ? `style="width: ${col.width}px;"` : ''
-                    const alignmentClass = col.align === 'right' ? 'text-right' : col.align === 'center' ? 'text-center' : 'text-left'
-                    
-                    return `<th ${widthStyle} class="py-4 px-6 font-medium whitespace-nowrap ${alignmentClass}">${resolvedLabel}</th>`
-                  }).join('')}
-                  <th class="py-4 px-6 font-medium text-right whitespace-nowrap w-[100px]">Actions</th>
-                </tr>
-              </thead>
-              <tbody data-${this.identifier}-target="productsList" class="divide-y divide-slate-200 dark:divide-slate-800">
-                ${this.products.map(product => `
-                  <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
-                    ${visibleColumns.map(col => {
-                      const alignmentClass = col.align === 'right' ? 'text-right' : col.align === 'center' ? 'text-center' : 'text-left'
-                      const mappedField = mappingLookup[col.key]
-                      
-                      return `
-                        <td class="py-4 px-6 text-sm ${alignmentClass}">
-                          ${this.renderCellContent(product, col, mappedField)}
-                        </td>
-                      `
-                    }).join('')}
-                    
-                    <td class="py-4 px-6 text-sm text-right whitespace-nowrap">
-                      <button
-                        class="p-2 text-slate-500 hover:text-blue-600 hover:bg-blue-50 rounded-lg cursor-pointer"
-                        data-action="click->${this.identifier}#openShowModal"
-                        data-${this.identifier}-product-id-param="${product.id}"
-                      >
-                        <span class="material-symbols-outlined text-[20px]">edit</span>
-                      </button>
-                    </td>
-                  </tr>
-                `).join('')}
-              </tbody>
-            </table>
+            ${table({
+              rows: this.products,
+              columns: visibleColumns,
+              identifier: this.identifier,
+              target: "productsList",
+              mappingLookup,
+              renderers: {
+                name: (value) => `
+                  <div class="flex items-center gap-4">
+                    <div class="w-8 h-8 rounded-lg bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center shrink-0">
+                      <span class="material-symbols-outlined text-emerald-600 dark:text-emerald-400 text-[18px]">inventory_2</span>
+                    </div>
+                    <p class="font-medium text-slate-900 dark:text-white overflow-visible whitespace-normal">
+                      ${value || 'Unnamed Product'}
+                    </p>
+                  </div>
+                `,
+                code: (value) => `<span class="font-mono text-xs bg-slate-100 dark:bg-slate-800/60 px-2 py-0.5 rounded text-slate-600 dark:text-slate-300 font-medium">${value || '—'}</span>`
+              },
+              renderActions: (record) => `
+                <td class="py-4 px-6 text-sm text-right whitespace-nowrap">
+                  <button
+                    class="p-2 text-slate-500 hover:text-blue-600 hover:bg-blue-50 rounded-lg cursor-pointer"
+                    data-action="click->${this.identifier}#openShowModal"
+                    data-${this.identifier}-product-id-param="${record.id}"
+                  >
+                    <span class="material-symbols-outlined text-[20px]">edit</span>
+                  </button>
+                </td>`
+            })}
           </div>
 
           <div class="flex justify-center pt-6">
@@ -190,50 +176,5 @@ export default class Companies_Products_IndexController extends Companies_Layout
       })
   }
 
-  renderCellContent(product, col, mappedField) {
-    const value = product[col.key]
 
-    if (col.key === "name") {
-      return `
-        <div class="flex items-center gap-4">
-          <div class="w-8 h-8 rounded-lg bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center shrink-0">
-            <span class="material-symbols-outlined text-emerald-600 dark:text-emerald-400 text-[18px]">inventory_2</span>
-          </div>
-      <p class="font-medium text-slate-900 dark:text-white overflow-visible whitespace-normal">
-        ${value || 'Unnamed Product'}
-      </p>
-        </div>
-      `
-    }
-
-    if (col.key === "code") {
-      return `<span class="font-mono text-xs bg-slate-100 dark:bg-slate-800/60 px-2 py-0.5 rounded text-slate-600 dark:text-slate-300 font-medium">${value || '—'}</span>`
-    }
-
-    if (col.key === "workflow_status") {
-      return Helpers.statusBadge(value)
-    }
-
-    if (value === null || value === undefined) {
-      return `<span class="text-slate-300 dark:text-slate-700">—</span>`
-    }
-
-    const fieldType = mappedField?.type
-
-    if (fieldType === "boolean") {
-      const isTrue = value === true || value === "true"
-      const badgeColor = isTrue ? "emerald" : "slate"
-      return `<span class="inline-flex items-center px-2 py-0.5 text-xs font-medium rounded-md bg-${badgeColor}-50 text-${badgeColor}-700 dark:bg-${badgeColor}-900/30 dark:text-${badgeColor}-400">${isTrue ? 'Yes' : 'No'}</span>`
-    }
-
-    if (fieldType === "integer") {
-      return `<span class="font-mono text-slate-900 dark:text-slate-100">${Number(value).toLocaleString()}</span>`
-    }
-
-    if (fieldType === "decimal") {
-      return `<span class="font-mono font-medium text-blue-600 dark:text-blue-400">${Number(value).toFixed(2)}</span>`
-    }
-
-    return value
-  }
 }
