@@ -1,0 +1,18 @@
+# config/kredis.yml
+shared:
+  connect_timeout: 5.0
+  read_timeout: 0.5
+  write_timeout: 0.5
+
+development:
+  url: <%= Rails.application.credentials.dig(:redis_url_development) || "redis://127.0.0.1:6379/0" %>
+  namespace: ecom_dev
+
+test:
+  url: <%= Rails.application.credentials.dig(:redis_url_test) || "redis://127.0.0.1:6379/1" %>
+  namespace: ecom_test
+
+production:
+  # Forces a crash on boot if the production credential key is missing
+  url: <%= Rails.application.credentials.dig(:redis_url_production) %>
+  namespace: ecom_prod
