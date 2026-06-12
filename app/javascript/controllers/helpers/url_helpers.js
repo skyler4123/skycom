@@ -43,8 +43,10 @@ export const company_property_mappings_path = (companyId) => `/companies/${compa
 export const edit_company_property_mapping_path = (companyId, mappingId) => `/companies/${companyId}/property_mappings/${mappingId}`
 
 export const company_products_path = (companyId) => `/companies/${companyId}/products`
+export const new_company_product_path = (companyId) => `/companies/${companyId}/products/new`
 export const create_company_products_path = (companyId) => `/companies/${companyId}/products`
-export const edit_company_product_path = (companyId, productId) => `/companies/${companyId}/products/${productId}`
+export const company_product_path = (companyId, productId) => `/companies/${companyId}/products/${productId}`
+export const edit_company_product_path = (companyId, productId) => `/companies/${companyId}/products/${productId}/edit`
 export const company_services_path = (companyId) => `/companies/${companyId}/services`
 export const create_company_services_path = (companyId) => `/companies/${companyId}/services`
 export const edit_company_service_path = (companyId, serviceId) => `/companies/${companyId}/services/${serviceId}`
