@@ -18,48 +18,77 @@ class Companies::InvoicesController < Companies::ApplicationController
     end
   end
 
-  def create
+  def show
+    invoice = current_company.invoices.find(params[:id])
+
     respond_to do |format|
-      format.json do
-        invoice = current_company.invoices.new(invoice_params)
-        if invoice.save
-          render json: { invoice: format_invoice(invoice) }, status: :created
-        else
-          render json: { errors: invoice.errors.full_messages }, status: :unprocessable_entity
-        end
-      end
+      format.html { render html: "", layout: true }
+      format.json { render json: { invoice: format_invoice(invoice) } }
+    end
+  end
+
+  def new
+    respond_to do |format|
+      format.html { render html: "", layout: true }
+      format.json { render json: {} }
+    end
+  end
+
+  def edit
+    invoice = current_company.invoices.find(params[:id])
+
+    respond_to do |format|
+      format.html { render html: "", layout: true }
+      format.json { render json: { invoice: format_invoice(invoice) } }
+    end
+  end
+
+  def create
+    invoice = current_company.invoices.new(invoice_params)
+
+    if invoice.save
+      redirect_to company_invoice_path(current_company, invoice), notice: "Invoice created successfully"
+    else
+      redirect_to new_company_invoice_path(current_company),
+        alert: invoice.errors.full_messages.to_sentence
     end
   end
 
   def update
     invoice = current_company.invoices.find(params[:id])
 
-    respond_to do |format|
-      format.json do
-        if invoice.update(invoice_params)
-          render json: { invoice: format_invoice(invoice) }, status: :created
-        else
-          render json: { errors: invoice.errors.full_messages }, status: :unprocessable_entity
-        end
-      end
+    if invoice.update(invoice_params)
+      redirect_to company_invoice_path(current_company, invoice), notice: "Invoice updated successfully"
+    else
+      redirect_to edit_company_invoice_path(current_company, invoice),
+        alert: invoice.errors.full_messages.to_sentence
     end
-  rescue ActiveRecord::RecordNotFound
-    render json: { status: "error", message: "Invoice not found" }, status: :not_found
   end
 
   private
+
+  def property_keys
+    (1..10).map { |i| "property_string_#{i}" } +
+      (1..5).map { |i| "property_text_#{i}" } +
+      (1..20).map { |i| "property_integer_#{i}" } +
+      (1..10).map { |i| "property_decimal_#{i}" } +
+      (1..10).map { |i| "property_boolean_#{i}" } +
+      (1..10).map { |i| "property_datetime_#{i}" }
+  end
 
   def invoice_params
     params.require(:invoice).permit(
       :name,
       :description,
+      :code,
       :business_type,
       :workflow_status,
       :currency_code,
-      :category_id,
-      :code,
       :total_price,
-      :due_date
+      :due_date,
+      :category_id,
+      :order_id,
+      *property_keys
     )
   end
 
@@ -67,9 +96,13 @@ class Companies::InvoicesController < Companies::ApplicationController
     invoice.as_json(only: [
       :id, :name, :description, :code,
       :lifecycle_status, :workflow_status, :business_type,
-      :currency_code, :category_id, :total_price, :due_date,
-      :order_id, :created_at, :updated_at
-    ])
+      :currency_code, :total_price, :due_date,
+      :category_id, :order_id,
+      :created_at, :updated_at,
+      *property_keys
+    ]).merge(
+      category: invoice.category&.as_json(only: [ :id, :name ])
+    )
   end
 
   def format_invoices(invoices)

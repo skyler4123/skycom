@@ -117,35 +117,33 @@ RSpec.feature "Companies::Branches Permissions", type: :feature, js: true do
     expect(reader_employee.can?(:update, Branch)).to be_falsey
   end
 
-  scenario "read-only employee can see Add button in UI (UI doesn't gate on permissions)" do
+  scenario "read-only employee can see Add link in UI (UI doesn't gate on permissions)" do
     reader_employee.clear_permissions_cache
     sign_in(reader_user)
     visit company_branches_path(company)
 
     expect(page).to have_selector('table', wait: 10)
-    expect(page).to have_selector('button', text: 'Add')
+    expect(page).to have_selector('a', text: 'Add')
   end
 
   # =========================================================================
   # SCENARIO 2: Creator with READ+CREATE can create branch
   # =========================================================================
-  scenario "employee with create permission can see Add button" do
+  scenario "employee with create permission can see Add link" do
     creator_employee.clear_permissions_cache
     sign_in(creator_user)
     visit company_branches_path(company)
 
     expect(page).to have_selector('table', wait: 10)
-    expect(page).to have_selector('button', text: 'Add', wait: 5)
+    expect(page).to have_selector('a', text: 'Add', wait: 5)
   end
 
-  scenario "employee with create permission can open create modal" do
+  scenario "employee with create permission can access new page" do
     creator_employee.clear_permissions_cache
     sign_in(creator_user)
-    visit company_branches_path(company)
+    visit new_company_branch_path(company)
 
-    expect(page).to have_selector('[data-action*="openNewModal"]', wait: 5)
-    find('[data-action*="openNewModal"]').click
-    expect(page).to have_selector('form[data-action*="handleSubmit"]', wait: 10)
+    expect(page).to have_selector('input[name="branch[name]"]', wait: 10)
   end
 
   scenario "creator can create new branch and see in table" do
@@ -154,19 +152,15 @@ RSpec.feature "Companies::Branches Permissions", type: :feature, js: true do
     creator_employee.reload
 
     sign_in(creator_user)
-    visit company_branches_path(company)
+    visit new_company_branch_path(company)
 
-    find('[data-action*="openNewModal"]').click
-
-    expect(page).to have_selector('form[data-action*="handleSubmit"]', wait: 10)
-    expect(page).to have_selector('input[name="branch[name]"]', wait: 5)
+    expect(page).to have_selector('input[name="branch[name]"]', wait: 10)
     fill_in 'branch[name]', with: 'Created by Creator'
     select 'Warehouse', from: 'branch[business_type]'
 
     click_button "Save Branch"
 
-    expect(page).to have_content("created successfully", wait: 10)
-    expect(page).to have_selector('tbody tr', wait: 10)
+    expect(page).to have_content('Created by Creator', wait: 10)
 
     expect(Branch.find_by(name: "Created by Creator")).to be_present
   end
@@ -183,7 +177,7 @@ RSpec.feature "Companies::Branches Permissions", type: :feature, js: true do
   # =========================================================================
   # SCENARIO 2a: Employee WITHOUT create permission gets error when trying to create
   # =========================================================================
-  scenario "employee without create permission cannot create new branch" do
+  scenario "employee without create permission cannot access new page" do
     sign_in(owner)
     visit company_permissions_path(company)
 
@@ -212,34 +206,21 @@ RSpec.feature "Companies::Branches Permissions", type: :feature, js: true do
     company.clear_permissions_cache
 
     sign_in(no_permission_user)
-    visit company_branches_path(company)
-
-    expect(page).to have_selector('table', wait: 10)
-    expect(page).to have_selector('[data-action*="openNewModal"]', wait: 5)
-
-    find('[data-action*="openNewModal"]').click
-
-    expect(page).to have_selector('form[data-action*="handleSubmit"]', wait: 10)
-    fill_in 'branch[name]', with: 'Should Not Be Created'
-    select 'Warehouse', from: 'branch[business_type]'
-
-    click_button "Save Branch"
+    visit new_company_branch_path(company)
 
     expect(page).to have_content("You are not authorized to perform this action.", wait: 10)
-
-    expect(Branch.find_by(name: "Should Not Be Created")).to be_nil
   end
 
   # =========================================================================
   # SCENARIO 3: Editor with READ+UPDATE can edit branch
   # =========================================================================
-  scenario "employee with update permission can see table with edit buttons" do
+  scenario "employee with update permission can see table with edit links" do
     editor_employee.clear_permissions_cache
     sign_in(editor_user)
     visit company_branches_path(company)
 
     expect(page).to have_selector('table', wait: 10)
-    expect(page).to have_selector('[data-action*="openShowModal"]', minimum: 1)
+    expect(page).to have_selector('a[href*="/edit"]', minimum: 1)
   end
 
   scenario "editor can? returns true for read and update" do
@@ -252,40 +233,27 @@ RSpec.feature "Companies::Branches Permissions", type: :feature, js: true do
   end
 
 
-  scenario "editor with update permission can update branch name via editable" do
-    # Use owner for this UI test as it requires more complex permission setup
-    sign_in(owner)
-    visit company_branches_path(company)
+  scenario "editor with update permission can update branch name via edit page" do
+    editor_employee.clear_permissions_cache
+    company.clear_permissions_cache
+    editor_employee.reload
 
-    expect(page).to have_selector('table', wait: 10)
+    sign_in(editor_user)
+    visit edit_company_branch_path(company, target_branch)
 
-    target_row = find('tbody tr', text: target_branch.name)
-    target_row.find('[data-action*="openShowModal"]').click
+    expect(page).to have_selector('input[name="branch[name]"]', wait: 10)
+    fill_in 'branch[name]', with: 'Updated Branch Name'
 
-    expect(page).to have_selector('.swal2-container', wait: 10)
+    click_button "Save Changes"
 
-    editable_name_field = find('[data-controller="editable"]', match: :first)
-    editable_name_field.click
-
-    expect(page).to have_selector('.editable-input', wait: 5)
-
-    editable_name_field.find('.editable-input').fill_in(with: 'Updated Branch Name')
-
-    accept_confirm do
-      editable_name_field.find('.editable-input').send_keys :enter
-    end
-
-    expect(page).to have_selector('tbody tr', wait: 10)
     expect(page).to have_content('Updated Branch Name', wait: 10)
     expect(Branch.find_by(id: target_branch.id).name).to eq("Updated Branch Name")
   end
 
   # =========================================================================
-  # SCENARIO 3b: Editor can update branch name via show modal
-  # =========================================================================
   # SCENARIO 3d: Employee WITHOUT update permission gets error when editing
   # =========================================================================
-  scenario "employee without update permission cannot edit another branch's name" do
+  scenario "employee without update permission cannot access edit page" do
     sign_in(owner)
     visit company_permissions_path(company)
 
@@ -310,27 +278,9 @@ RSpec.feature "Companies::Branches Permissions", type: :feature, js: true do
 
     expect(editor_employee.can?(:update, Branch)).to be_falsey
 
-    # Try to update - should fail with authorization error
+    # Try to access edit page - should fail with authorization error
     sign_in(editor_user)
-    visit company_branches_path(company)
-
-    expect(page).to have_selector('table', wait: 10)
-
-    target_row = find('tbody tr', text: target_branch.name)
-    target_row.find('[data-action*="openShowModal"]').click
-
-    expect(page).to have_selector('.swal2-container', wait: 10)
-
-    editable_name_field = find('[data-controller="editable"]', match: :first)
-    editable_name_field.click
-
-    expect(page).to have_selector('.editable-input', wait: 5)
-
-    editable_name_field.find('.editable-input').fill_in(with: 'Attempted Update')
-
-    accept_confirm do
-      editable_name_field.find('.editable-input').send_keys :enter
-    end
+    visit edit_company_branch_path(company, target_branch)
 
     expect(page).to have_content("You are not authorized to perform this action.", wait: 10)
 

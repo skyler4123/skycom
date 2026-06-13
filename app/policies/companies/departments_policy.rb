@@ -4,8 +4,20 @@ class Companies::DepartmentsPolicy < ApplicationPolicy
     record.can?(:read, Department)
   end
 
+  def show?
+    record.can?(:read, Department)
+  end
+
+  def new?
+    record.can?(:create, Department)
+  end
+
   def create?
     record.can?(:create, Department)
+  end
+
+  def edit?
+    record.can?(:update, Department)
   end
 
   def update?

@@ -217,3 +217,52 @@ expect(page).to have_selector('tbody tr', wait: 10)  # Capybara waits for DOM up
 **Key Insight**: The `Employee#clear_permissions_cache` clears the employee's cache, but for the `can?` check to work reliably, the COMPANY cache must ALSO be cleared because permissions depend on policy appointments stored in the company's cache scope.
 
 ---
+
+### 6. Client Cache Enum Pollution (localStorage)
+
+**Problem**: Tests fail with `Capybara::ElementNotFound: Unable to find option "Full Time"` when run as part of the full suite, but pass in isolation. The `<select>` renders with zero `<option>` elements.
+
+**Root Cause**: The form renders `<option>` elements from `Enums()?.resource?.business_types`, which reads the client cache (`localStorage`). `seed_client_cache` seeds this data, but `ClientCacheController.sync()` overwrites localStorage on the next page load when the cookie version doesn't match the seeded version. Since `sync()` is async and `contentHTML()` renders synchronously during `connect()`, the controller reads from localStorage before the server response arrives — but in full-suite runs, cross-test state (stale cookies, other test data) can cause the sync to complete before the controller's `connect()`, overwriting the seeded enums.
+
+**Symptoms**:
+- `select 'Full Time', from: 'employee[business_type]'` → `"Unable to find option "Full Time"`
+- `find('option', text: 'Full Time', wait: 5).select_option` → times out
+- Passes in isolation (`bundle exec rspec spec/...:LINE`), fails in `spec/features/` full suite
+- The `select` element exists in the DOM but is empty
+
+**Fix 1 — Controller Fallback (always do this)**:
+
+Every new/edit page controller that renders `<select>` from `Enums()` must include static fallback arrays:
+
+```javascript
+// app/javascript/controllers/companies/{resource}/new_controller.js
+const typeOptions = (Enums()?.resource?.business_types || [
+  { name: "Full Time", value: "full_time" },
+  { name: "Part Time", value: "part_time" },
+  // ...all possible types EXCEPT "owner"...
+]).map(t => `<option value="${t.value}">${t.name}</option>`).join('')
+```
+
+This ensures dropdowns always have options, regardless of client cache state.
+
+**Fix 2 — Test-Level (for form-submission tests)**:
+
+When testing form submissions that depend on enum-based `<select>` elements, bypass the `select` helper entirely. Set the value via JavaScript after confirming the `<input[name]>` is present:
+
+```ruby
+# Instead of:
+select 'Full Time', from: 'employee[business_type]'
+
+# Use:
+page.execute_script("document.querySelector('select[name=\"employee[business_type]\"]').value = 'full_time'")
+```
+
+This works only when the controller fallback (Fix 1) is in place — the browser rejects setting `.value` to a string that doesn't match any existing `<option>` element.
+
+**Prevention Checklist**:
+- When adding a new page controller with enum-backed `<select>`, ALWAYS include fallback arrays with every possible enum value.
+- When writing feature tests that submit forms, use `page.execute_script` for enum selects rather than Capybara's `select`.
+- The `seed_client_cache` helper is useful but insufficient alone — always pair it with controller-side fallbacks.
+- Search the codebase for `Enums()?.` calls in page controllers to audit whether fallbacks are missing.
+
+---

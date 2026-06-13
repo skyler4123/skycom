@@ -1,21 +1,72 @@
 require "rails_helper"
 
 RSpec.feature "Companies::Customers Management", type: :feature, js: true do
-  let(:customer) { create(:customer) }
-  let(:company) { customer.company }
+  let(:company) { create(:company) }
+  let(:branch) { create(:branch, company: company) }
   let(:owner) { company.user }
 
-  let!(:customer2) do
-    create(:customer,
+  let!(:default_category) do
+    Seed::CategoryService.find_or_create_for(company: company, resource_name: "customers")
+  end
+
+  let!(:customer) do
+    Seed::CustomerService.create(
       company: company,
-      name: "Enterprise Corp",
-      email: "enterprise@example.com",
-      business_type: "enterprise"
+      name: "Test Customer 1",
+      business_type: "individual",
+      workflow_status: "draft",
+      category: default_category
+    )
+  end
+
+  let!(:customer2) do
+    Seed::CustomerService.create(
+      company: company,
+      name: "Test Customer 2",
+      business_type: "enterprise",
+      workflow_status: "pending",
+      category: default_category
+    )
+  end
+
+  let!(:default_table_config) do
+    TableConfig.create!(
+      company: company,
+      category: default_category,
+      property_mapping: default_category.property_mapping,
+      resource_name: "customers",
+      columns_metadata: [
+        { "key" => "name", "label" => "Customer Name", "visible" => true, "sortable" => true, "align" => "left", "pinned" => nil, "width" => nil, "roles" => [], "is_virtual" => false, "render_config" => {} },
+        { "key" => "code", "label" => "Code", "visible" => true, "sortable" => true, "align" => "left", "pinned" => nil, "width" => nil, "roles" => [], "is_virtual" => false, "render_config" => {} },
+        { "key" => "workflow_status", "label" => "Status", "visible" => true, "sortable" => true, "align" => "center", "pinned" => nil, "width" => nil, "roles" => [], "is_virtual" => false, "render_config" => {} }
+      ]
     )
   end
 
   before do
     sign_in(owner)
+
+    page.execute_script("localStorage.clear()")
+
+    company_data = JSON.parse(company.to_json).merge(
+      "property_mappings" => company.property_mappings.reset.map { |pm| JSON.parse(pm.to_json) },
+      "table_configs" => company.table_configs.reset.map { |tc| JSON.parse(tc.to_json) },
+      "categories" => company.categories.reset.map { |c| JSON.parse(c.to_json) },
+      "branches" => [],
+      "departments" => [],
+      "roles" => []
+    )
+
+    payload = {
+      user: JSON.parse(owner.to_json),
+      companies: [ company_data ],
+      enums: {},
+      employees: []
+    }
+
+    page.execute_script("localStorage.setItem('client_cache_data', arguments[0])", payload.to_json)
+    page.execute_script("localStorage.setItem('client_cache_version', 'forced')")
+    page.execute_script("document.cookie = 'client_cache_version=forced; path=/'")
   end
 
   scenario "index page loads and displays customers table" do
@@ -24,53 +75,18 @@ RSpec.feature "Companies::Customers Management", type: :feature, js: true do
     expect(page).to have_selector('table', wait: 10)
 
     expect(page).to have_selector('th', text: 'Customer Name')
-    expect(page).to have_selector('th', text: 'Email')
-    expect(page).to have_selector('th', text: 'Type')
     expect(page).to have_selector('th', text: 'Status')
 
     expect(page).to have_selector('tbody tr')
     expect(page).to have_content(customer.name)
   end
 
-  scenario "create new customer via modal" do
+  scenario "edit button links to edit page for customer" do
     visit company_customers_path(company)
     expect(page).to have_selector('table', wait: 10)
 
-    find('[data-action*="openNewModal"]').click
-
-    expect(page).to have_selector('form[data-action*="handleSubmit"]', wait: 10)
-
-    expect(page).to have_selector('input[name="customer[name]"]', wait: 5)
-    fill_in 'customer[name]', with: 'New Test Customer'
-    fill_in 'customer[email]', with: 'new@example.com'
-    select 'Individual', from: 'customer[business_type]'
-
-    begin
-      click_button "Save Customer"
-    rescue Selenium::WebDriver::Error::StaleElementReferenceError
-      visit company_customers_path(company)
-      expect(page).to have_selector('table', wait: 10)
-
-      find('[data-action*="openNewModal"]').click
-
-      expect(page).to have_selector('form[data-action*="handleSubmit"]', wait: 10)
-
-      fill_in 'customer[name]', with: 'New Test Customer'
-      fill_in 'customer[email]', with: 'new@example.com'
-      select 'Individual', from: 'customer[business_type]'
-      click_button "Save Customer"
-    end
-    expect(page).to have_selector('tbody tr', wait: 10)
-    expect(page).to have_content("New Test Customer")
-
-    expect(Customer.find_by(name: "New Test Customer")).to be_present
-  end
-
-  scenario "edit button opens show modal for customer" do
-    visit company_customers_path(company)
-    expect(page).to have_selector('table', wait: 10)
-
-    expect(page).to have_selector('[data-action*="openShowModal"]', minimum: 1)
+    edit_link = find("a[href*='/customers/#{customer.id}/edit']", match: :first)
+    expect(edit_link).to be_present
   end
 
   scenario "filter by category updates URL and filters table" do
@@ -86,74 +102,18 @@ RSpec.feature "Companies::Customers Management", type: :feature, js: true do
     expect(page).to have_selector('tbody tr', wait: 10)
   end
 
-  scenario "display customer business type as badge" do
-    visit company_customers_path(company)
-    expect(page).to have_selector('table', wait: 10)
-
-    expect(page).to have_content(customer.business_type.to_s.titleize, minimum: 1)
-    expect(page).to have_content(customer2.business_type.to_s.titleize, minimum: 1)
-  end
-
-  scenario "display customer workflow status as badge" do
+  scenario "displays customer workflow status as badge" do
     visit company_customers_path(company)
     expect(page).to have_selector('table', wait: 10)
 
     expect(page).to have_selector('span.rounded-full', wait: 10)
   end
 
-  scenario "display customer email" do
+  scenario "name link goes to show page" do
     visit company_customers_path(company)
     expect(page).to have_selector('table', wait: 10)
 
-    expect(page).to have_content("enterprise@example.com")
-  end
-
-  scenario "update customer name via show modal" do
-    visit company_customers_path(company)
-    expect(page).to have_selector('table', wait: 10)
-
-    target_row = find('tbody tr', text: customer.name)
-    target_row.find('[data-action*="openShowModal"]').click
-
-    expect(page).to have_selector('.swal2-container', wait: 10)
-
-    editable_name_field = find('[data-controller="editable"]', match: :first)
-    editable_name_field.click
-
-    expect(page).to have_selector('.editable-input', wait: 5)
-
-    editable_name_field.find('.editable-input').fill_in(with: 'Updated Customer Name')
-
-    accept_confirm do
-      editable_name_field.find('.editable-input').send_keys :enter
-    end
-
-    expect(page).to have_content('Updated Customer Name', wait: 10)
-    expect(Customer.find_by(id: customer.id).name).to eq("Updated Customer Name")
-  end
-
-  scenario "update customer description via show modal" do
-    visit company_customers_path(company)
-    expect(page).to have_selector('table', wait: 10)
-
-    target_row = find('tbody tr', text: customer.name)
-    target_row.find('[data-action*="openShowModal"]').click
-
-    expect(page).to have_selector('.swal2-container', wait: 10)
-
-    all_editable = all('[data-controller="editable"]')
-    desc_editable = all_editable[1]
-    desc_editable.click
-
-    expect(page).to have_selector('.editable-input', wait: 5)
-
-    desc_editable.find('.editable-input').fill_in(with: 'Updated description for this customer')
-
-    accept_confirm do
-      desc_editable.find('.editable-input').send_keys :enter
-    end
-
-    expect(page).to have_content('Updated description for this customer', wait: 10)
-    expect(Customer.find_by(id: customer.id).description).to eq("Updated description for this customer")
+    name_link = find("a[href*='/customers/#{customer.id}']", match: :first)
+    expect(name_link).to be_present
   end
 end

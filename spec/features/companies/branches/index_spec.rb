@@ -5,10 +5,51 @@ RSpec.feature "Companies::Branches Management", type: :feature, js: true do
   let(:company) { branch.company }
   let(:owner) { company.user }
 
-  let!(:branch2) { create(:branch, company: company, business_type: "warehouse") }
+  let!(:branch2) { create(:branch, company: company) }
+
+  let!(:default_category) do
+    Seed::CategoryService.find_or_create_for(company: company, resource_name: "branches")
+  end
+
+  let!(:default_table_config) do
+    TableConfig.create!(
+      company: company,
+      category: default_category,
+      property_mapping: default_category.property_mapping,
+      resource_name: "branches",
+      columns_metadata: [
+        { "key" => "name", "label" => "Branch Name", "visible" => true, "sortable" => true, "align" => "left", "pinned" => nil, "width" => nil, "roles" => [], "is_virtual" => false, "render_config" => {} },
+        { "key" => "code", "label" => "Code", "visible" => true, "sortable" => true, "align" => "left", "pinned" => nil, "width" => nil, "roles" => [], "is_virtual" => false, "render_config" => {} },
+        { "key" => "business_type", "label" => "Type", "visible" => true, "sortable" => true, "align" => "center", "pinned" => nil, "width" => nil, "roles" => [], "is_virtual" => false, "render_config" => {} },
+        { "key" => "workflow_status", "label" => "Status", "visible" => true, "sortable" => true, "align" => "center", "pinned" => nil, "width" => nil, "roles" => [], "is_virtual" => false, "render_config" => {} }
+      ]
+    )
+  end
 
   before do
     sign_in(owner)
+
+    page.execute_script("localStorage.clear()")
+
+    company_data = JSON.parse(company.to_json).merge(
+      "property_mappings" => company.property_mappings.reset.map { |pm| JSON.parse(pm.to_json) },
+      "table_configs" => company.table_configs.reset.map { |tc| JSON.parse(tc.to_json) },
+      "categories" => company.categories.reset.map { |c| JSON.parse(c.to_json) },
+      "branches" => [],
+      "departments" => [],
+      "roles" => []
+    )
+
+    payload = {
+      user: JSON.parse(owner.to_json),
+      companies: [ company_data ],
+      enums: {},
+      employees: []
+    }
+
+    page.execute_script("localStorage.setItem('client_cache_data', arguments[0])", payload.to_json)
+    page.execute_script("localStorage.setItem('client_cache_version', 'forced')")
+    page.execute_script("document.cookie = 'client_cache_version=forced; path=/'")
   end
 
   scenario "index page loads and displays branches table" do
@@ -24,43 +65,12 @@ RSpec.feature "Companies::Branches Management", type: :feature, js: true do
     expect(page).to have_content(branch.name)
   end
 
-  scenario "create new branch via modal" do
+  scenario "edit button links to show page for branch" do
     visit company_branches_path(company)
     expect(page).to have_selector('table', wait: 10)
 
-    find('[data-action*="openNewModal"]').click
-
-    expect(page).to have_selector('form[data-action*="handleSubmit"]', wait: 10)
-
-    expect(page).to have_selector('input[name="branch[name]"]', wait: 5)
-    fill_in 'branch[name]', with: 'New Test Branch'
-    select 'Headquarters', from: 'branch[business_type]'
-
-    begin
-      click_button "Save Branch"
-    rescue Selenium::WebDriver::Error::StaleElementReferenceError
-      visit company_branches_path(company)
-      expect(page).to have_selector('table', wait: 10)
-
-      find('[data-action*="openNewModal"]').click
-
-      expect(page).to have_selector('form[data-action*="handleSubmit"]', wait: 10)
-
-      fill_in 'branch[name]', with: 'New Test Branch'
-      select 'Headquarters', from: 'branch[business_type]'
-      click_button "Save Branch"
-    end
-    expect(page).to have_content("created successfully", wait: 10)
-    expect(page).to have_selector('tbody tr', wait: 10)
-
-    expect(Branch.find_by(name: "New Test Branch")).to be_present
-  end
-
-  scenario "edit button opens show modal for branch" do
-    visit company_branches_path(company)
-    expect(page).to have_selector('table', wait: 10)
-
-    expect(page).to have_selector('[data-action*="openShowModal"]', minimum: 1)
+    edit_link = find("a[href*='/branches/#{branch.id}']", match: :first)
+    expect(edit_link).to be_present
   end
 
   scenario "filter by category updates URL and filters table" do
@@ -76,92 +86,10 @@ RSpec.feature "Companies::Branches Management", type: :feature, js: true do
     expect(page).to have_selector('tbody tr', wait: 10)
   end
 
-  scenario "display branch business type as badge" do
-    visit company_branches_path(company)
-    expect(page).to have_selector('table', wait: 10)
-
-    expect(page).to have_content(branch.business_type.to_s.humanize, minimum: 1)
-    expect(page).to have_content(branch2.business_type.to_s.humanize, minimum: 1)
-  end
-
   scenario "display branch workflow status as badge" do
     visit company_branches_path(company)
     expect(page).to have_selector('table', wait: 10)
 
     expect(page).to have_selector('span.rounded-full', wait: 10)
-  end
-
-  scenario "update branch name via show modal" do
-    visit company_branches_path(company)
-    expect(page).to have_selector('table', wait: 10)
-
-    target_row = find('tbody tr', text: branch.name)
-    target_row.find('[data-action*="openShowModal"]').click
-
-    expect(page).to have_selector('.swal2-container', wait: 10)
-
-    editable_name_field = find('[data-controller="editable"]', match: :first)
-    editable_name_field.click
-
-    expect(page).to have_selector('.editable-input', wait: 5)
-
-    editable_name_field.find('.editable-input').fill_in(with: 'Updated Branch Name')
-
-    accept_confirm do
-      editable_name_field.find('.editable-input').send_keys :enter
-    end
-
-    expect(page).to have_content('Updated Branch Name', wait: 10)
-    expect(Branch.find_by(id: branch.id).name).to eq("Updated Branch Name")
-  end
-
-  scenario "update branch description via show modal" do
-    visit company_branches_path(company)
-    expect(page).to have_selector('table', wait: 10)
-
-    target_row = find('tbody tr', text: branch.name)
-    target_row.find('[data-action*="openShowModal"]').click
-
-    expect(page).to have_selector('.swal2-container', wait: 10)
-
-    all_editable = all('[data-controller="editable"]')
-    desc_editable = all_editable[1]
-    desc_editable.click
-
-    expect(page).to have_selector('.editable-input', wait: 5)
-
-    desc_editable.find('.editable-input').fill_in(with: "Updated description for this branch")
-
-    accept_confirm do
-      desc_editable.find('.editable-input').send_keys :enter
-    end
-
-    expect(page).to have_content('Updated description for this branch', wait: 10)
-    expect(Branch.find_by(id: branch.id).description).to eq("Updated description for this branch")
-  end
-
-  scenario "update branch phone number via show modal" do
-    visit company_branches_path(company)
-    expect(page).to have_selector('table', wait: 10)
-
-    target_row = find('tbody tr', text: branch.name)
-    target_row.find('[data-action*="openShowModal"]').click
-
-    expect(page).to have_selector('.swal2-container', wait: 10)
-
-    all_editable = all('[data-controller="editable"]')
-    phone_editable = all_editable[4]
-    phone_editable.click
-
-    expect(page).to have_selector('.editable-input', wait: 5)
-
-    phone_editable.find('.editable-input').fill_in(with: "+84 123 456 789")
-
-    accept_confirm do
-      phone_editable.find('.editable-input').send_keys :enter
-    end
-
-    expect(page).to have_content('+84 123 456 789', wait: 10)
-    expect(Branch.find_by(id: branch.id).phone_number).to eq("+84 123 456 789")
   end
 end

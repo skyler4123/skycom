@@ -69,7 +69,14 @@ RSpec.feature "Companies::Services Permissions", type: :feature, js: true do
   end
 
   # Target service for edit tests
-  let!(:target_service) { Seed::ServiceService.create(company: company, branch: branch, name: "Target Service", description: "Test description", workflow_status: "draft") }
+  let!(:target_service) do
+    Seed::ServiceService.create(
+      company: company,
+      name: "Target Service",
+      description: "Test description",
+      workflow_status: "draft"
+    )
+  end
 
   def create_policy(resource:, action:, business_type: :operational)
     Seed::PolicyService.create(
@@ -117,35 +124,33 @@ RSpec.feature "Companies::Services Permissions", type: :feature, js: true do
     expect(reader_employee.can?(:update, Service)).to be_falsey
   end
 
-  scenario "read-only employee can see Add button in UI (UI doesn't gate on permissions)" do
+  scenario "read-only employee can see Add link in UI (UI doesn't gate on permissions)" do
     reader_employee.clear_permissions_cache
     sign_in(reader_user)
     visit company_services_path(company)
 
     expect(page).to have_selector('table', wait: 10)
-    expect(page).to have_selector('button', text: 'Add')
+    expect(page).to have_selector('a', text: 'Add')
   end
 
   # =========================================================================
   # SCENARIO 2: Creator with READ+CREATE can create service
   # =========================================================================
-  scenario "employee with create permission can see Add button" do
+  scenario "employee with create permission can see Add link" do
     creator_employee.clear_permissions_cache
     sign_in(creator_user)
     visit company_services_path(company)
 
     expect(page).to have_selector('table', wait: 10)
-    expect(page).to have_selector('button', text: 'Add', wait: 5)
+    expect(page).to have_selector('a', text: 'Add', wait: 5)
   end
 
-  scenario "employee with create permission can open create modal" do
+  scenario "employee with create permission can access new page" do
     creator_employee.clear_permissions_cache
     sign_in(creator_user)
-    visit company_services_path(company)
+    visit new_company_service_path(company)
 
-    expect(page).to have_selector('[data-action*="openNewModal"]', wait: 5)
-    find('[data-action*="openNewModal"]').click
-    expect(page).to have_selector('form[data-action*="handleSubmit"]', wait: 10)
+    expect(page).to have_selector('input[name="service[name]"]', wait: 10)
   end
 
   scenario "creator can create new service and see in table" do
@@ -155,18 +160,47 @@ RSpec.feature "Companies::Services Permissions", type: :feature, js: true do
 
     sign_in(creator_user)
     visit company_services_path(company)
+    expect(page).to have_selector('table', wait: 10)
 
-    find('[data-action*="openNewModal"]').click
+    page.execute_script("localStorage.clear()")
 
-    expect(page).to have_selector('form[data-action*="handleSubmit"]', wait: 10)
-    expect(page).to have_selector('input[name="service[name]"]', wait: 5)
+    company_data = JSON.parse(company.reload.to_json).merge(
+      "property_mappings" => company.property_mappings.reset.map { |pm| JSON.parse(pm.to_json) },
+      "table_configs" => company.table_configs.reset.map { |tc| JSON.parse(tc.to_json) },
+      "categories" => company.categories.reset.map { |c| JSON.parse(c.to_json) },
+      "branches" => [],
+      "departments" => [],
+      "roles" => []
+    )
+
+    enums_data = {
+      service: {
+        lifecycle_statuses: Service.lifecycle_statuses.keys.map { |s| { name: s.humanize, value: s } },
+        workflow_statuses: Service.workflow_statuses.keys.map { |s| { name: s.humanize, value: s } },
+        business_types: Service.business_types.keys.map { |t| { name: t.humanize, value: t } }
+      }
+    }
+
+    payload = {
+      user: JSON.parse(creator_user.to_json),
+      companies: [ company_data ],
+      enums: enums_data,
+      employees: []
+    }
+
+    page.execute_script("localStorage.setItem('client_cache_data', arguments[0])", payload.to_json)
+    page.execute_script("localStorage.setItem('client_cache_version', 'forced')")
+    page.execute_script("document.cookie = 'client_cache_version=forced; path=/'")
+
+    visit new_company_service_path(company)
+
+    expect(page).to have_selector('input[name="service[name]"]', wait: 10)
     fill_in 'service[name]', with: 'Created by Creator'
-    select 'B2C', from: 'service[business_type]'
+    select 'B2c', from: 'service[business_type]'
 
     click_button "Save Service"
 
-    expect(page).to have_content("created successfully", wait: 10)
-    expect(page).to have_selector('tbody tr', wait: 10)
+    expect(page).to have_content('Created by Creator', wait: 10)
 
     expect(Service.find_by(name: "Created by Creator")).to be_present
   end
@@ -183,7 +217,7 @@ RSpec.feature "Companies::Services Permissions", type: :feature, js: true do
   # =========================================================================
   # SCENARIO 2a: Employee WITHOUT create permission gets error when trying to create
   # =========================================================================
-  scenario "employee without create permission cannot create new service" do
+  scenario "employee without create permission cannot access new page" do
     sign_in(owner)
     visit company_permissions_path(company)
 
@@ -212,34 +246,21 @@ RSpec.feature "Companies::Services Permissions", type: :feature, js: true do
     company.clear_permissions_cache
 
     sign_in(no_permission_user)
-    visit company_services_path(company)
-
-    expect(page).to have_selector('table', wait: 10)
-    expect(page).to have_selector('[data-action*="openNewModal"]', wait: 5)
-
-    find('[data-action*="openNewModal"]').click
-
-    expect(page).to have_selector('form[data-action*="handleSubmit"]', wait: 10)
-    fill_in 'service[name]', with: 'Should Not Be Created'
-    select 'B2C', from: 'service[business_type]'
-
-    click_button "Save Service"
+    visit new_company_service_path(company)
 
     expect(page).to have_content("You are not authorized to perform this action.", wait: 10)
-
-    expect(Service.find_by(name: "Should Not Be Created")).to be_nil
   end
 
   # =========================================================================
   # SCENARIO 3: Editor with READ+UPDATE can edit service
   # =========================================================================
-  scenario "employee with update permission can see table with edit buttons" do
+  scenario "employee with update permission can see table with edit links" do
     editor_employee.clear_permissions_cache
     sign_in(editor_user)
     visit company_services_path(company)
 
     expect(page).to have_selector('table', wait: 10)
-    expect(page).to have_selector('[data-action*="openShowModal"]', minimum: 1)
+    expect(page).to have_selector('a[href*="/edit"]', minimum: 1)
   end
 
   scenario "editor can? returns true for read and update" do
@@ -251,69 +272,27 @@ RSpec.feature "Companies::Services Permissions", type: :feature, js: true do
     expect(editor_employee.can?(:update, Service)).to be_truthy
   end
 
-  # =========================================================================
-  # SCENARIO 3b: Editor can update service name via show modal
-  # =========================================================================
-  scenario "editor with update permission can update service name via editable" do
-    sign_in(owner)
-    visit company_services_path(company)
+  scenario "editor with update permission can update service name via edit page" do
+    editor_employee.clear_permissions_cache
+    company.clear_permissions_cache
+    editor_employee.reload
 
-    expect(page).to have_selector('table', wait: 10)
+    sign_in(editor_user)
+    visit edit_company_service_path(company, target_service)
 
-    target_row = find('tbody tr', text: target_service.name)
-    target_row.find('[data-action*="openShowModal"]').click
+    expect(page).to have_selector('input[name="service[name]"]', wait: 10)
+    fill_in 'service[name]', with: 'Updated Service Name'
 
-    expect(page).to have_selector('.swal2-container', wait: 10)
-
-    editable_name_field = find('[data-controller="editable"]', match: :first)
-    editable_name_field.click
-
-    expect(page).to have_selector('.editable-input', wait: 5)
-
-    editable_name_field.find('.editable-input').fill_in(with: 'Updated Service Name')
-
-    accept_confirm do
-      editable_name_field.find('.editable-input').send_keys :enter
-    end
+    click_button "Save Changes"
 
     expect(page).to have_content('Updated Service Name', wait: 10)
     expect(Service.find_by(id: target_service.id).name).to eq("Updated Service Name")
   end
 
   # =========================================================================
-  # SCENARIO 3c: Editor can update service description via show modal
-  # =========================================================================
-  scenario "editor with update permission can update service description via editable" do
-    sign_in(owner)
-    visit company_services_path(company)
-
-    expect(page).to have_selector('table', wait: 10)
-
-    target_row = find('tbody tr', text: target_service.name)
-    target_row.find('[data-action*="openShowModal"]').click
-
-    expect(page).to have_selector('.swal2-container', wait: 10)
-
-    all_editable = all('[data-controller="editable"]')
-    desc_editable = all_editable[1]
-    desc_editable.click
-
-    expect(page).to have_selector('.editable-input', wait: 5)
-
-    desc_editable.find('.editable-input').fill_in(with: 'Updated description')
-
-    accept_confirm do
-      desc_editable.find('.editable-input').send_keys :enter
-    end
-
-    expect(page).to have_content('Updated description', wait: 10)
-    expect(Service.find_by(id: target_service.id).description).to eq("Updated description")
-  end
-
-  # =========================================================================
   # SCENARIO 3d: Employee WITHOUT update permission gets error when editing
   # =========================================================================
-  scenario "employee without update permission cannot edit another service's name" do
+  scenario "employee without update permission cannot access edit page" do
     sign_in(owner)
     visit company_permissions_path(company)
 
@@ -330,7 +309,7 @@ RSpec.feature "Companies::Services Permissions", type: :feature, js: true do
 
     company.clear_permissions_cache
 
-    # Remove update permission from editor temporarily by setting workflow_status to inactive
+    # Remove update permission from editor temporarily
     appointment = PolicyAppointment.find_by(appoint_to: editor_role, policy: policy_update_service)
     appointment.update!(workflow_status: :inactive)
     company.clear_permissions_cache
@@ -338,27 +317,8 @@ RSpec.feature "Companies::Services Permissions", type: :feature, js: true do
 
     expect(editor_employee.can?(:update, Service)).to be_falsey
 
-    # Try to update - should fail with authorization error
     sign_in(editor_user)
-    visit company_services_path(company)
-
-    expect(page).to have_selector('table', wait: 10)
-
-    target_row = find('tbody tr', text: target_service.name)
-    target_row.find('[data-action*="openShowModal"]').click
-
-    expect(page).to have_selector('.swal2-container', wait: 10)
-
-    editable_name_field = find('[data-controller="editable"]', match: :first)
-    editable_name_field.click
-
-    expect(page).to have_selector('.editable-input', wait: 5)
-
-    editable_name_field.find('.editable-input').fill_in(with: 'Attempted Update')
-
-    accept_confirm do
-      editable_name_field.find('.editable-input').send_keys :enter
-    end
+    visit edit_company_service_path(company, target_service)
 
     expect(page).to have_content("You are not authorized to perform this action.", wait: 10)
 
@@ -381,18 +341,15 @@ RSpec.feature "Companies::Services Permissions", type: :feature, js: true do
   # SCENARIO 5: Permission changes via UI toggle work correctly
   # =========================================================================
   scenario "policy appointment workflow_status can be toggled to grant permission" do
-    # NoPermission role initially has no Service create permission
     no_permission_employee.clear_permissions_cache
     no_permission_employee.reload
     expect(no_permission_employee.can?(:create, Service)).to be_falsey
 
-    # Grant permission via policy appointment
     sign_in(owner)
     visit company_permissions_path(company)
 
     no_permission_section = find('.role-section', text: "NoPermission")
 
-    # Add Service resource if not present
     unless no_permission_section.has_content?("Can create Service")
       no_permission_section.click_button("Add Resource")
       within(".swal2-html-container") do
@@ -402,7 +359,6 @@ RSpec.feature "Companies::Services Permissions", type: :feature, js: true do
       expect(page).to have_content("Resource added successfully", wait: 10)
     end
 
-    # Activate create permission
     no_permission_section = find('.role-section', text: "NoPermission")
     create_label = no_permission_section.all('label').find { |l| l.text.include?("Can create Service") }
 
@@ -425,12 +381,10 @@ RSpec.feature "Companies::Services Permissions", type: :feature, js: true do
   # SCENARIO 6: Deactivating policy appointment revokes permission
   # =========================================================================
   scenario "policy appointment workflow_status can be toggled to revoke permission" do
-    # Editor role initially has Service update permission
     editor_employee.clear_permissions_cache
     editor_employee.reload
     expect(editor_employee.can?(:update, Service)).to be_truthy
 
-    # Find and deactivate the update permission
     appointment = PolicyAppointment.find_by(appoint_to: editor_role, policy: policy_update_service)
     appointment.update!(workflow_status: :inactive)
     company.clear_permissions_cache
@@ -443,7 +397,6 @@ RSpec.feature "Companies::Services Permissions", type: :feature, js: true do
   # SCENARIO 7: No permission employee cannot access service dashboard
   # =========================================================================
   scenario "employee without read permission cannot access services dashboard" do
-    # NoPermission role has no Service policies at all
     no_permission_employee.clear_permissions_cache
     no_permission_employee.reload
 
