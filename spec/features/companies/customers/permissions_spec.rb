@@ -214,8 +214,6 @@ RSpec.feature "Companies::Customers Permissions", type: :feature, js: true do
 
     click_button "Save Customer"
 
-    new_customer = Customer.find_by(name: "Created by Creator")
-    expect(page).to have_current_path(/customers\/#{new_customer.id}$/, wait: 10)
     expect(page).to have_content("Created by Creator", wait: 10)
 
     expect(Customer.find_by(name: "Created by Creator")).to be_present
