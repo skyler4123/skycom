@@ -763,6 +763,7 @@ export const table = ({
   target,
   mappingLookup = {},
   renderers = {},
+  className = "w-full text-left border-collapse table-auto",
   renderActions
 }) => {
   const resolveLabel = (col) => {
@@ -815,7 +816,7 @@ export const table = ({
   const widthStyle = (col) => col.width ? `style="width: ${col.width}px;"` : ''
 
   return `
-    <table class="w-full text-left border-collapse table-fixed">
+    <table class="${className}">
       <thead>
         <tr class="text-sm text-slate-500 dark:text-slate-400 bg-slate-50 dark:bg-slate-800/50 border-b border-slate-200 dark:border-slate-700">
           ${columns.map(col => `

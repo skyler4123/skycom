@@ -58,9 +58,9 @@ export default class Companies_LayoutController extends Controller {
     
     return `
       <!-- Layout Wrapper: Font, Background, Colors -->
-      <div class="flex flex-1 font-display bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200">
+      <div class="min-w-0 flex flex-1 font-display bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200">
         <!-- Flex Container: Sidebar + Main -->
-        <div class="flex flex-1">
+        <div class="min-w-0 flex flex-1">
           <!-- Sidebar -->
           <aside
             class="w-64 hidden open:flex flex-col shrink-0 bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800"
@@ -226,7 +226,7 @@ export default class Companies_LayoutController extends Controller {
           </aside>
           <!-- End Sidebar -->
           <!-- Main Content Wrapper -->
-          <main class="flex-1 flex flex-col overflow-auto">
+          <main class="min-w-0 flex-1 flex flex-col overflow-y-auto overflow-x-hidden">
             <!-- Header -->
             <header
               class="shrink-0 flex flex-wrap items-center justify-between gap-4 border-b border-gray-200 dark:border-gray-800 px-4 md:px-8 py-4 bg-white dark:bg-gray-900">
