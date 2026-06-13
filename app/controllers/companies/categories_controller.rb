@@ -1,5 +1,3 @@
-# app/controllers/companies/categories_controller.rb
-
 class Companies::CategoriesController < Companies::ApplicationController
   def index
     respond_to do |format|
@@ -18,43 +16,58 @@ class Companies::CategoriesController < Companies::ApplicationController
     end
   end
 
+  def show
+    category = current_company.categories.includes(:property_mapping).find(params[:id])
+
+    respond_to do |format|
+      format.html { render html: "", layout: true }
+      format.json { render json: { category: format_category(category) } }
+    end
+  rescue ActiveRecord::RecordNotFound
+    respond_to do |format|
+      format.json { render json: { status: "error", message: "Category not found" }, status: :not_found }
+    end
+  end
+
+  def new
+    respond_to do |format|
+      format.html { render html: "", layout: true }
+      format.json { render json: {} }
+    end
+  end
+
+  def edit
+    category = current_company.categories.includes(:property_mapping).find(params[:id])
+
+    respond_to do |format|
+      format.html { render html: "", layout: true }
+      format.json { render json: { category: format_category(category) } }
+    end
+  rescue ActiveRecord::RecordNotFound
+    respond_to do |format|
+      format.json { render json: { status: "error", message: "Category not found" }, status: :not_found }
+    end
+  end
+
   def create
     category = current_company.categories.new(category_params)
 
-    respond_to do |format|
-      format.json do
-        if category.save
-          render json: { category: format_category(category) }, status: :created
-        else
-          render json: { errors: category.errors.full_messages }, status: :unprocessable_entity
-        end
-      end
+    if category.save
+      redirect_to company_category_path(current_company, category), notice: "Category created successfully."
+    else
+      redirect_to new_company_category_path(current_company),
+        alert: category.errors.full_messages.to_sentence
     end
   end
 
   def update
     category = current_company.categories.includes(:property_mapping).find(params[:id])
 
-    respond_to do |format|
-      format.json do
-        if category.update(category_params)
-          render json: { category: format_category(category) }
-        else
-          render json: { errors: category.errors.full_messages }, status: :unprocessable_entity
-        end
-      end
-    end
-  rescue ActiveRecord::RecordNotFound
-    render json: { status: "error", message: "Category not found" }, status: :not_found
-  end
-
-  def show
-    category = current_company.categories.includes(:property_mapping).find(params[:id])
-
-    respond_to do |format|
-      format.json do
-        render json: { category: format_category(category) }
-      end
+    if category.update(category_params)
+      redirect_to company_category_path(current_company, category), notice: "Category updated successfully."
+    else
+      redirect_to edit_company_category_path(current_company, category),
+        alert: category.errors.full_messages.to_sentence
     end
   rescue ActiveRecord::RecordNotFound
     render json: { status: "error", message: "Category not found" }, status: :not_found

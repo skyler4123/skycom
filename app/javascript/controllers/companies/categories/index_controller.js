@@ -1,6 +1,4 @@
 import Companies_LayoutController from "controllers/companies/layout_controller"
-import Companies_Categories_NewModalController from "controllers/companies/categories/new_modal_controller";
-import Companies_Categories_ShowModalController from "controllers/companies/categories/show_modal_controller";
 
 export default class Companies_Categories_IndexController extends Companies_LayoutController {
   static targets = ["categoriesList"]
@@ -10,10 +8,9 @@ export default class Companies_Categories_IndexController extends Companies_Layo
 
   async connect() {
     super.connect()
-    try {
-      /** @type {{ categories: Category[], pagination: any }} */
-      const response = await fetchJson()
 
+    try {
+      const response = await fetchJson()
       this.categories = response.categories || []
       this.pagination = response.pagination || {}
 
@@ -24,32 +21,9 @@ export default class Companies_Categories_IndexController extends Companies_Layo
         }
         return false
       })
-
     } catch (error) {
       toast({ type: "error", message: "Failed to load categories" })
     }
-  }
-
-  openNewModal() {
-    openModal({ html: `<div data-controller="${identifier(Companies_Categories_NewModalController)}"></div>` })
-  }
-
-  openShowModal(event) {
-    event.preventDefault()
-    const { categoryId } = event.params
-    window.currentCategory = findById(this.categories, categoryId)
-    openModal({ html: `<div data-controller="${identifier(Companies_Categories_ShowModalController)}"></div>` })
-  }
-
-  handleUpdate(event) {
-    const { resource, data } = event.detail
-    const newObject = data[resource] || data
-
-    if (!newObject) return
-
-    this.categories = mergeObjectArrays(this.categories, [newObject], "id")
-    this.renderContent()
-    toast({ type: "success", message: "Category updated successfully!" })
   }
 
   contentHTML() {
@@ -82,13 +56,11 @@ export default class Companies_Categories_IndexController extends Companies_Layo
                 </div>
               </div>
 
-              <button
-                type="button"
-                data-action="click->${this.identifier}#openNewModal"
+              <a href="${Helpers.new_company_category_path(currentCompany().id)}"
                 class="flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors font-medium text-sm whitespace-nowrap cursor-pointer">
                 <span class="material-symbols-outlined text-[20px]">add</span>
                 Add
-              </button>
+              </a>
             </form>
           </div>
 
@@ -111,7 +83,10 @@ export default class Companies_Categories_IndexController extends Companies_Layo
                           <span class="material-symbols-outlined text-purple-600 dark:text-purple-400">category</span>
                         </div>
                         <div>
-                          <p class="font-medium text-slate-900 dark:text-white">${category.name || 'N/A'}</p>
+                          <a href="${Helpers.company_category_path(currentCompany().id, category.id)}"
+                            class="font-medium text-slate-900 dark:text-white hover:text-blue-600 dark:hover:text-blue-400 transition-colors cursor-pointer">
+                            ${category.name || 'N/A'}
+                          </a>
                         </div>
                       </div>
                     </td>
@@ -124,13 +99,10 @@ export default class Companies_Categories_IndexController extends Companies_Layo
                       ${category.description || '-'}
                     </td>
                     <td class="py-4 px-6 text-sm text-right">
-                      <button
-                        class="p-2 text-slate-500 hover:text-blue-600 hover:bg-blue-50 rounded-lg cursor-pointer dark:hover:bg-blue-900/30"
-                        data-action="click->${this.identifier}#openShowModal"
-                        data-${this.identifier}-category-id-param="${category.id}"
-                      >
+                      <a href="${Helpers.edit_company_category_path(currentCompany().id, category.id)}"
+                        class="inline-flex items-center justify-center p-2 text-slate-500 hover:text-blue-600 hover:bg-blue-50 rounded-lg cursor-pointer">
                         <span class="material-symbols-outlined text-[20px]">edit</span>
-                      </button>
+                      </a>
                     </td>
                   </tr>
                 `).join('')}

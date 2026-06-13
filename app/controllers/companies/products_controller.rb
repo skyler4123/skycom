@@ -18,16 +18,38 @@ class Companies::ProductsController < Companies::ApplicationController
     end
   end
 
-  def create
+  def show
+    product = current_company.products.find(params[:id])
+
     respond_to do |format|
-      format.json do
-        product = current_company.products.new(product_params)
-        if product.save
-          render json: { product: format_product(product) }, status: :created
-        else
-          render json: { errors: product.errors.full_messages }, status: :unprocessable_entity
-        end
-      end
+      format.html { render html: "", layout: true }
+      format.json { render json: { product: format_product(product) } }
+    end
+  end
+
+  def new
+    respond_to do |format|
+      format.html { render html: "", layout: true }
+      format.json { render json: {} }
+    end
+  end
+
+  def edit
+    product = current_company.products.find(params[:id])
+
+    respond_to do |format|
+      format.html { render html: "", layout: true }
+      format.json { render json: { product: format_product(product) } }
+    end
+  end
+
+  def create
+    product = current_company.products.new(product_params)
+    if product.save
+      redirect_to company_product_path(current_company, product), notice: "Product created successfully"
+    else
+      redirect_to new_company_product_path(current_company),
+        alert: product.errors.full_messages.to_sentence
     end
   end
 
@@ -35,9 +57,17 @@ class Companies::ProductsController < Companies::ApplicationController
     product = current_company.products.find(params[:id])
 
     respond_to do |format|
+      format.html do
+        if product.update(product_params)
+          redirect_to company_product_path(current_company, product), notice: "Product updated successfully."
+        else
+          redirect_to edit_company_product_path(current_company, product),
+            alert: product.errors.full_messages.to_sentence
+        end
+      end
       format.json do
         if product.update(product_params)
-          render json: { product: format_product(product) }, status: :created
+          render json: { product: format_product(product) }, status: :ok
         else
           render json: { errors: product.errors.full_messages }, status: :unprocessable_entity
         end

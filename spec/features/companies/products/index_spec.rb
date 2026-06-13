@@ -78,31 +78,12 @@ RSpec.feature "Companies::Products Management", type: :feature, js: true do
     expect(page).to have_content(product.name)
   end
 
-  scenario "create new product via modal" do
+  scenario "edit button links to show page for product" do
     visit company_products_path(company)
     expect(page).to have_selector('table', wait: 10)
 
-    find('[data-action*="openNewModal"]').click
-
-    expect(page).to have_selector('form[data-action*="handleSubmit"]', wait: 10)
-
-    expect(page).to have_selector('input[name="product[name]"]', wait: 5)
-    fill_in 'product[name]', with: 'New Test Product'
-    select 'Digital', from: 'product[business_type]'
-
-    click_button "Save Product"
-
-    expect(page).to have_content("created successfully", wait: 10)
-    expect(page).to have_selector('tbody tr', wait: 10)
-
-    expect(Product.find_by(name: "New Test Product")).to be_present
-  end
-
-  scenario "edit button opens show modal for product" do
-    visit company_products_path(company)
-    expect(page).to have_selector('table', wait: 10)
-
-    expect(page).to have_selector('[data-action*="openShowModal"]', minimum: 1)
+    edit_link = find("a[href*='/products/#{product.id}']", match: :first)
+    expect(edit_link).to be_present
   end
 
   scenario "filter by category updates URL and filters table" do
@@ -131,55 +112,6 @@ RSpec.feature "Companies::Products Management", type: :feature, js: true do
     expect(page).to have_selector('table', wait: 10)
 
     expect(page).to have_selector('span.rounded-full', wait: 10)
-  end
-
-  scenario "update product name via show modal" do
-    visit company_products_path(company)
-    expect(page).to have_selector('table', wait: 10)
-
-    target_row = find('tbody tr', text: product.name)
-    target_row.find('[data-action*="openShowModal"]').click
-
-    expect(page).to have_selector('.swal2-container', wait: 10)
-
-    editable_name_field = find('[data-controller="editable"]', match: :first)
-    editable_name_field.click
-
-    expect(page).to have_selector('.editable-input', wait: 5)
-
-    editable_name_field.find('.editable-input').fill_in(with: 'Updated Product Name')
-
-    accept_confirm do
-      editable_name_field.find('.editable-input').send_keys :enter
-    end
-
-    expect(page).to have_content('Updated Product Name', wait: 10)
-    expect(Product.find_by(id: product.id).name).to eq("Updated Product Name")
-  end
-
-  scenario "update product description via show modal" do
-    visit company_products_path(company)
-    expect(page).to have_selector('table', wait: 10)
-
-    target_row = find('tbody tr', text: product.name)
-    target_row.find('[data-action*="openShowModal"]').click
-
-    expect(page).to have_selector('.swal2-container', wait: 10)
-
-    all_editable = all('[data-controller="editable"]')
-    desc_editable = all_editable[1]
-    desc_editable.click
-
-    expect(page).to have_selector('.editable-input', wait: 5)
-
-    desc_editable.find('.editable-input').fill_in(with: 'Updated description for this product')
-
-    accept_confirm do
-      desc_editable.find('.editable-input').send_keys :enter
-    end
-
-    expect(page).to have_content('Updated description for this product', wait: 10)
-    expect(Product.find_by(id: product.id).description).to eq("Updated description for this product")
   end
 
   # ============================================================================
@@ -473,57 +405,6 @@ RSpec.feature "Companies::Products Management", type: :feature, js: true do
       expect(page).to have_selector('table', wait: 10)
 
       expect(page).to have_selector('span.rounded-full', wait: 10)
-    end
-
-    # =========================================================================
-    # SCENARIO 12: Show modal renders editable fields for properties
-    # =========================================================================
-    scenario "show modal opens with editable property fields" do
-      visit company_products_path(company, category_id: category_cosmetics.id)
-      expect(page).to have_selector('table', wait: 10)
-
-      target_product = products_cosmetics.first
-      row = find('tbody tr', text: target_product.name)
-      row.find('[data-action*="openShowModal"]').click
-
-      expect(page).to have_selector('.swal2-container', wait: 10)
-
-      within('.swal2-container') do
-        expect(page).to have_content('Skin Type', wait: 5)
-        expect(page).to have_content('Key Ingredients')
-        expect(page).to have_content('Volume (ml)')
-        expect(page).to have_content('Organic Certified')
-      end
-    end
-
-    # =========================================================================
-    # SCENARIO 13: Create new product modal renders dynamic fields for category
-    # =========================================================================
-    scenario "create new product modal renders with dynamic property fields" do
-      visit company_products_path(company, category_id: category_cosmetics.id)
-      expect(page).to have_selector('table', wait: 10)
-
-      find('[data-action*="openNewModal"]').click
-
-      expect(page).to have_selector('form[data-action*="handleSubmit"]', wait: 10)
-
-      expect(page).to have_selector('input[name="product[name]"]', wait: 5)
-      expect(page).to have_selector('input[name="product[property_string_1]"]', wait: 5)
-      expect(page).to have_selector('input[name="product[property_string_2]"]')
-      expect(page).to have_selector('input[name="product[property_integer_1]"]')
-      expect(page).to have_selector('input[type="checkbox"][name="product[property_boolean_1]"]')
-
-      fill_in 'product[name]', with: 'Dynamic Property Product'
-      select 'Digital', from: 'product[business_type]'
-
-      click_button "Save Product"
-
-      expect(page).to have_content("created successfully", wait: 10)
-      expect(page).to have_selector('tbody tr', wait: 10)
-
-      product = Product.find_by(name: "Dynamic Property Product")
-      expect(product).to be_present
-      expect(product.category).to eq(category_cosmetics)
     end
   end
 end

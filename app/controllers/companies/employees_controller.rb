@@ -1,73 +1,66 @@
-# app/controllers/companies/employees_controller.rb
-
 class Companies::EmployeesController < Companies::ApplicationController
   def index
     respond_to do |format|
       format.html { render html: "", layout: true }
       format.json do
-        # 1. Apply Filtering Logic
         scope = current_company.employees.kept.includes(:user, :branch)
         scope = scope.where(category_id: params[:category_id]) if params[:category_id].present?
 
         @pagy, @employees_results = pagy(:offset, scope, jsonapi: true)
-        # 2. Always provide filter options so the form stays populated
-        # filter_options = {
-        #   departments: current_company.departments.map { |d| { name: d.name, value: d.id} },
-        #   roles: current_company.roles.map { |r| { name: r.name, value: r.id } },
-        #   statuses: Employee.lifecycle_statuses.keys.map { |s| { name: s.humanize, value: s } },
-        #   types: Employee.business_types.keys.map { |t| { name: t.humanize, value: t } }
-        # }
 
         render json: {
           employees: format_employees(@employees_results),
           pagination: @pagy.data_hash
-          # filter_options: filter_options
         }
       end
     end
   end
 
-  def create
+  def show
+    employee = current_company.employees.find(params[:id])
+
     respond_to do |format|
-      format.json do
-        # Using your Seed::EmployeeService to handle the creation logic
-        employee = Seed::EmployeeService.new(
-          company: current_company,
-          name: employee_params[:name],
-          description: employee_params[:description],
-          business_type: employee_params[:business_type],
-          # Optionally pass branch or user if provided in params
-          branch: current_company.branches.find_by(id: employee_params[:branch_id]),
-          departments: current_company.departments.where(id: employee_params[:department_id]),
-          roles: current_company.roles.where(id: employee_params[:role_id]),
-          user: User.find_by(id: params[:user_id])
-        )
-        if employee.save
-          render json: { employee: employee }, status: :created
-        else
-          render json: { errors: employee.errors.full_messages }, status: :unprocessable_entity
-        end
-      end
+      format.html { render html: "", layout: true }
+      format.json { render json: { employee: format_employee(employee) } }
+    end
+  end
+
+  def new
+    respond_to do |format|
+      format.html { render html: "", layout: true }
+      format.json { render json: {} }
+    end
+  end
+
+  def edit
+    employee = current_company.employees.find(params[:id])
+
+    respond_to do |format|
+      format.html { render html: "", layout: true }
+      format.json { render json: { employee: format_employee(employee) } }
+    end
+  end
+
+  def create
+    employee = current_company.employees.new(create_employee_params)
+
+    if employee.save
+      redirect_to company_employee_path(current_company, employee), notice: "Employee created successfully."
+    else
+      redirect_to new_company_employee_path(current_company),
+        alert: employee.errors.full_messages.to_sentence
     end
   end
 
   def update
     employee = current_company.employees.find(params[:id])
 
-    respond_to do |format|
-      format.json do
-        if update_employee_params[:role_ids]
-          employee.role_ids = update_employee_params.delete(:role_ids)
-        end
-        if employee.update(update_employee_params)
-          render json: { employee: employee }, status: :created
-        else
-          render json: { errors: employee.errors.full_messages }, status: :unprocessable_entity
-        end
-      end
+    if employee.update(update_employee_params)
+      redirect_to company_employee_path(current_company, employee), notice: "Employee updated successfully."
+    else
+      redirect_to edit_company_employee_path(current_company, employee),
+        alert: employee.errors.full_messages.to_sentence
     end
-  rescue ActiveRecord::RecordNotFound
-    render json: { status: "error", message: "Employee not found" }, status: :not_found
   end
 
   def destroy
@@ -90,40 +83,72 @@ class Companies::EmployeesController < Companies::ApplicationController
 
   private
 
-  def employee_params
-    params.require(:employee).permit(:name, :description, :business_type, :branch_id, :department_id, :role_id)
-  end
+  def create_employee_params
+    property_keys = (1..10).map { |i| "property_string_#{i}" } +
+                    (1..5).map { |i| "property_text_#{i}" } +
+                    (1..20).map { |i| "property_integer_#{i}" } +
+                    (1..10).map { |i| "property_decimal_#{i}" } +
+                    (1..10).map { |i| "property_boolean_#{i}" } +
+                    (1..10).map { |i| "property_datetime_#{i}" }
 
-  def update_employee_params
-    params.permit(
+    params.require(:employee).permit(
       :name,
       :description,
       :business_type,
       :branch_id,
-      :department_id,
       :workflow_status,
-      role_ids: []
+      :category_id,
+      *property_keys
     )
   end
 
-  # Helper to format a single employee response, following your index pattern
-  def format_single_employee(employee)
-    employee.as_json(include: {
-      user: { only: :email },
-      branch: { only: [ :id, :name ] }
-    }).merge(
+  def update_employee_params
+    property_keys = (1..10).map { |i| "property_string_#{i}" } +
+                    (1..5).map { |i| "property_text_#{i}" } +
+                    (1..20).map { |i| "property_integer_#{i}" } +
+                    (1..10).map { |i| "property_decimal_#{i}" } +
+                    (1..10).map { |i| "property_boolean_#{i}" } +
+                    (1..10).map { |i| "property_datetime_#{i}" }
+
+    params.require(:employee).permit(
+      :name,
+      :description,
+      :business_type,
+      :branch_id,
+      :workflow_status,
+      :category_id,
+      *property_keys
+    )
+  end
+
+  def format_employee(employee)
+    employee.as_json(only: [
+      :id, :name, :description, :code, :branch_id, :category_id,
+      :business_type, :lifecycle_status, :workflow_status, :phone_number,
+      :email, :created_at, :updated_at,
+      :property_string_1, :property_string_2, :property_string_3, :property_string_4, :property_string_5,
+      :property_string_6, :property_string_7, :property_string_8, :property_string_9, :property_string_10,
+      :property_text_1, :property_text_2, :property_text_3, :property_text_4, :property_text_5,
+      :property_integer_1, :property_integer_2, :property_integer_3, :property_integer_4, :property_integer_5,
+      :property_integer_6, :property_integer_7, :property_integer_8, :property_integer_9, :property_integer_10,
+      :property_integer_11, :property_integer_12, :property_integer_13, :property_integer_14, :property_integer_15,
+      :property_integer_16, :property_integer_17, :property_integer_18, :property_integer_19, :property_integer_20,
+      :property_decimal_1, :property_decimal_2, :property_decimal_3, :property_decimal_4, :property_decimal_5,
+      :property_decimal_6, :property_decimal_7, :property_decimal_8, :property_decimal_9, :property_decimal_10,
+      :property_boolean_1, :property_boolean_2, :property_boolean_3, :property_boolean_4, :property_boolean_5,
+      :property_boolean_6, :property_boolean_7, :property_boolean_8, :property_boolean_9, :property_boolean_10,
+      :property_datetime_1, :property_datetime_2, :property_datetime_3, :property_datetime_4, :property_datetime_5,
+      :property_datetime_6, :property_datetime_7, :property_datetime_8, :property_datetime_9, :property_datetime_10
+    ]).merge(
+      user: employee.user&.as_json(only: [ :id, :email ]),
+      branch: employee.branch&.as_json(only: [ :id, :name ]),
+      category: employee.category&.as_json(only: [ :id, :name ]),
       roles: employee.roles.map { |r| { id: r.id, name: r.name } },
       departments: employee.departments.map { |d| { id: d.id, name: d.name } }
     )
   end
 
   def format_employees(employees)
-    employees.map do |employee|
-      employee.as_json(include: { user: { only: :email }, branch: { only: [ :id, :name ] } }).merge(
-        roles: employee.roles.map { |r| { id: r.id, name: r.name } },
-        departments: employee.departments.map { |d| { id: d.id, name: d.name } },
-        category: employee.category&.as_json(only: [ :id, :name ])
-      )
-    end
+    employees.map { |employee| format_employee(employee) }
   end
 end

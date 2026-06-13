@@ -4,8 +4,20 @@ class Companies::ProductsPolicy < ApplicationPolicy
     record.can?(:read, Product)
   end
 
+  def show?
+    record.can?(:read, Product)
+  end
+
+  def new?
+    record.can?(:create, Product)
+  end
+
   def create?
     record.can?(:create, Product)
+  end
+
+  def edit?
+    record.can?(:update, Product)
   end
 
   def update?

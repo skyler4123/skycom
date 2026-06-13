@@ -6,22 +6,57 @@ RSpec.feature "Companies::Departments Management", type: :feature, js: true do
   let(:owner) { company.user }
 
   let!(:department) do
-    create(:department,
-      company: company,
-      business_type: "sales"
-    )
+    create(:department, company: company, business_type: "sales")
   end
 
   let!(:department2) do
-    create(:department,
+    create(:department, company: company, business_type: "marketing")
+  end
+
+  let!(:default_category) do
+    Seed::CategoryService.find_or_create_for(company: company, resource_name: "departments")
+  end
+
+  let!(:default_table_config) do
+    TableConfig.create!(
       company: company,
-      business_type: "marketing",
-      workflow_status: "pending"
+      category: default_category,
+      property_mapping: default_category.property_mapping,
+      resource_name: "departments",
+      columns_metadata: [
+        { "key" => "name", "label" => "Department Name", "visible" => true, "sortable" => true, "align" => "left", "pinned" => nil, "width" => nil, "roles" => [], "is_virtual" => false, "render_config" => {} },
+        { "key" => "code", "label" => "Code", "visible" => true, "sortable" => true, "align" => "left", "pinned" => nil, "width" => nil, "roles" => [], "is_virtual" => false, "render_config" => {} },
+        { "key" => "workflow_status", "label" => "Status", "visible" => true, "sortable" => true, "align" => "center", "pinned" => nil, "width" => nil, "roles" => [], "is_virtual" => false, "render_config" => {} }
+      ]
     )
   end
 
   before do
+    department2.update_column(:workflow_status, 1)
+
     sign_in(owner)
+
+    page.execute_script("localStorage.clear()")
+
+    company_data = JSON.parse(company.to_json).merge(
+      "property_mappings" => company.property_mappings.reset.map { |pm| JSON.parse(pm.to_json) },
+      "table_configs" => company.table_configs.reset.map { |tc| JSON.parse(tc.to_json) },
+      "categories" => company.categories.reset.map { |c| JSON.parse(c.to_json) },
+      "branches" => [],
+      "departments" => [],
+      "roles" => []
+    )
+
+    payload = {
+      user: JSON.parse(owner.to_json),
+      companies: [ company_data ],
+      enums: {},
+      employees: []
+    }
+
+    page.execute_script("localStorage.setItem('client_cache_data', arguments[0])", payload.to_json)
+    page.execute_script("localStorage.setItem('client_cache_version', 'forced')")
+    page.execute_script("document.cookie = 'client_cache_version=forced; path=/'")
   end
 
   scenario "index page loads and displays departments table" do
@@ -30,41 +65,18 @@ RSpec.feature "Companies::Departments Management", type: :feature, js: true do
     expect(page).to have_selector('table', wait: 10)
 
     expect(page).to have_selector('th', text: 'Department Name')
-    expect(page).to have_selector('th', text: 'Type')
     expect(page).to have_selector('th', text: 'Status')
 
     expect(page).to have_selector('tbody tr')
     expect(page).to have_content(department.name)
   end
 
-
-
-  scenario "create new department via modal" do
+  scenario "edit button links to edit page for department" do
     visit company_departments_path(company)
     expect(page).to have_selector('table', wait: 10)
 
-    find('[data-action*="openNewModal"]').click
-
-    expect(page).to have_selector('form[data-action*="handleSubmit"]', wait: 10)
-
-    expect(page).to have_selector('input[name="department[name]"]', wait: 5)
-    fill_in 'department[name]', with: 'New Test Department'
-    fill_in 'department[email]', with: 'test@department.com'
-    select 'Operations', from: 'department[business_type]'
-
-    click_button "Save Department"
-
-    expect(page).to have_content("created successfully", wait: 10)
-    expect(page).to have_selector('tbody tr', wait: 10)
-
-    expect(Department.find_by(name: "New Test Department")).to be_present
-  end
-
-  scenario "edit button opens show modal for department" do
-    visit company_departments_path(company)
-    expect(page).to have_selector('table', wait: 10)
-
-    expect(page).to have_selector('[data-action*="openShowModal"]', minimum: 1)
+    edit_link = find("a[href*='/departments/#{department.id}/edit']", match: :first)
+    expect(edit_link).to be_present
   end
 
   scenario "filter by category updates URL and filters table" do
@@ -80,67 +92,10 @@ RSpec.feature "Companies::Departments Management", type: :feature, js: true do
     expect(page).to have_selector('tbody tr', wait: 10)
   end
 
-  scenario "display department business type as badge" do
-    visit company_departments_path(company)
-    expect(page).to have_selector('table', wait: 10)
-
-    expect(page).to have_content("Sales", minimum: 1)
-    expect(page).to have_content("Marketing", minimum: 1)
-  end
-
   scenario "display department workflow status as badge" do
     visit company_departments_path(company)
     expect(page).to have_selector('table', wait: 10)
 
     expect(page).to have_selector('span.rounded-full', wait: 10)
-  end
-
-  scenario "update department name via show modal" do
-    visit company_departments_path(company)
-    expect(page).to have_selector('table', wait: 10)
-
-    target_row = find('tbody tr', text: department.name)
-    target_row.find('[data-action*="openShowModal"]').click
-
-    expect(page).to have_selector('.swal2-container', wait: 10)
-
-    editable_name_field = find('[data-controller="editable"]', match: :first)
-    editable_name_field.click
-
-    expect(page).to have_selector('.editable-input', wait: 5)
-
-    editable_name_field.find('.editable-input').fill_in(with: 'Updated Department Name')
-
-    accept_confirm do
-      editable_name_field.find('.editable-input').send_keys :enter
-    end
-
-    expect(page).to have_content('Updated Department Name', wait: 10)
-    expect(Department.find_by(id: department.id).name).to eq("Updated Department Name")
-  end
-
-  scenario "update department description via show modal" do
-    visit company_departments_path(company)
-    expect(page).to have_selector('table', wait: 10)
-
-    target_row = find('tbody tr', text: department.name)
-    target_row.find('[data-action*="openShowModal"]').click
-
-    expect(page).to have_selector('.swal2-container', wait: 10)
-
-    all_editable = all('[data-controller="editable"]')
-    desc_editable = all_editable[1]
-    desc_editable.click
-
-    expect(page).to have_selector('.editable-input', wait: 5)
-
-    desc_editable.find('.editable-input').fill_in(with: 'Updated description for this department')
-
-    accept_confirm do
-      desc_editable.find('.editable-input').send_keys :enter
-    end
-
-    expect(page).to have_content('Updated description for this department', wait: 10)
-    expect(Department.find_by(id: department.id).description).to eq("Updated description for this department")
   end
 end

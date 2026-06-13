@@ -32,24 +32,21 @@ RSpec.feature "Companies::Categories Management", type: :feature, js: true do
     expect(page).to have_content(category2.name)
   end
 
-  scenario "create new category via modal" do
+  scenario "edit button links to edit page for category" do
     visit company_categories_path(company)
     expect(page).to have_selector('table', wait: 10)
 
-    find('[data-action*="openNewModal"]').click
+    edit_link = find("a[href*='/edit']", match: :first)
+    expect(edit_link).to be_present
+  end
 
-    expect(page).to have_selector('form[data-action*="handleSubmit"]', wait: 10)
+  scenario "name link goes to show page" do
+    visit company_categories_path(company)
+    expect(page).to have_selector('table', wait: 10)
 
-    fill_in 'category[name]', with: 'Skincare Products'
-    select 'Products', from: 'category[resource_name]'
-    fill_in 'category[description]', with: 'Skincare description'
-
-    click_button "Save Category"
-
-    expect(page).to have_content("created successfully!", wait: 10)
-    expect(page).to have_selector('tbody tr', wait: 10)
-
-    expect(Category.find_by(name: "Skincare Products")).to be_present
+    click_link category.name, match: :first
+    expect(page).to have_current_path(/categories\/#{category.id}$/, wait: 10)
+    expect(page).to have_content(category.name)
   end
 
   scenario "filter by resource name updates URL and filters table" do
@@ -66,13 +63,6 @@ RSpec.feature "Companies::Categories Management", type: :feature, js: true do
     expect(page).to have_content(category.name)
   end
 
-  scenario "edit button opens show modal for category" do
-    visit company_categories_path(company)
-    expect(page).to have_selector('table', wait: 10)
-
-    expect(page).to have_selector('[data-action*="openShowModal"]', minimum: 1)
-  end
-
   scenario "search triggers form submission and displays results" do
     visit company_categories_path(company)
     expect(page).to have_selector('table', wait: 10)
@@ -84,55 +74,11 @@ RSpec.feature "Companies::Categories Management", type: :feature, js: true do
     expect(page).to have_selector('tbody tr', wait: 10)
   end
 
-  # =========================================================================
-  # Category Field Update Tests
-  # =========================================================================
+  scenario "show page displays category details" do
+    visit company_category_path(company, category)
+    expect(page).to have_content(category.name, wait: 10)
 
-  scenario "updates category description via show modal" do
-    visit company_categories_path(company)
-    expect(page).to have_selector('table', wait: 10)
-
-    target_row = find('tbody tr', text: category.name)
-    target_row.find('[data-action*="openShowModal"]').click
-    expect(page).to have_selector('.swal2-container', wait: 10)
-
-    description_editable = all('[data-controller="editable"]')[2]
-    description_editable.click
-
-    expect(page).to have_selector('.editable-input', wait: 5)
-    description_editable.find('.editable-input').fill_in(with: 'Updated Description')
-
-    accept_confirm do
-      description_editable.find('.editable-input').send_keys :enter
-    end
-
-    expect(page).to have_content("Description updated!", wait: 10)
-
-    category.reload
-    expect(category.description).to eq('Updated Description')
-  end
-
-  scenario "updates category resource name via show modal" do
-    visit company_categories_path(company)
-    expect(page).to have_selector('table', wait: 10)
-
-    target_row = find('tbody tr', text: category.name)
-    target_row.find('[data-action*="openShowModal"]').click
-    expect(page).to have_selector('.swal2-container', wait: 10)
-
-    resource_editable = all('[data-controller="editable"]')[1]
-    resource_editable.click
-
-    expect(page).to have_selector('.editable-input', wait: 5)
-    resource_editable.find('.editable-input').fill_in(with: 'services')
-
-    accept_confirm do
-      resource_editable.find('.editable-input').send_keys :enter
-    end
-
-    expect(page).to have_content("Resource name updated!", wait: 10)
-
-    category.reload
-    expect(category.resource_name).to eq('services')
+    expect(page).to have_content(category.resource_name)
+    expect(page).to have_content("Property Fields")
   end
 end

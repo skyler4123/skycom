@@ -4,8 +4,20 @@ class Companies::OrdersPolicy < ApplicationPolicy
     record.can?(:read, Order)
   end
 
+  def show?
+    record.can?(:read, Order)
+  end
+
+  def new?
+    record.can?(:create, Order)
+  end
+
   def create?
     record.can?(:create, Order)
+  end
+
+  def edit?
+    record.can?(:update, Order)
   end
 
   def update?

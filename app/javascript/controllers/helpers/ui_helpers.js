@@ -821,7 +821,7 @@ export const table = ({
           ${columns.map(col => `
             <th ${widthStyle(col)} class="py-4 px-6 font-medium whitespace-nowrap ${alignmentClass(col)}">${resolveLabel(col)}</th>
           `).join('')}
-          ${renderActions ? `<th class="py-4 px-6 font-medium text-right whitespace-nowrap w-[100px]">Actions</th>` : ''}
+          ${renderActions ? `<th class="py-4 px-6 font-medium text-right whitespace-nowrap w-[100px]">Edit</th>` : ''}
         </tr>
       </thead>
       <tbody data-${identifier}-target="${target}" class="divide-y divide-slate-200 dark:divide-slate-800">

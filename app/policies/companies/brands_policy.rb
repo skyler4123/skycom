@@ -3,8 +3,20 @@ class Companies::BrandsPolicy < ApplicationPolicy
     record.can?(:read, Brand)
   end
 
+  def show?
+    record.can?(:read, Brand)
+  end
+
+  def new?
+    record.can?(:create, Brand)
+  end
+
   def create?
     record.can?(:create, Brand)
+  end
+
+  def edit?
+    record.can?(:update, Brand)
   end
 
   def update?

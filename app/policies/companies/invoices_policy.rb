@@ -4,8 +4,20 @@ class Companies::InvoicesPolicy < ApplicationPolicy
     record.can?(:read, Invoice)
   end
 
+  def show?
+    record.can?(:read, Invoice)
+  end
+
+  def new?
+    record.can?(:create, Invoice)
+  end
+
   def create?
     record.can?(:create, Invoice)
+  end
+
+  def edit?
+    record.can?(:update, Invoice)
   end
 
   def update?

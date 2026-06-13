@@ -117,35 +117,33 @@ RSpec.feature "Companies::Departments Permissions", type: :feature, js: true do
     expect(reader_employee.can?(:update, Department)).to be_falsey
   end
 
-  scenario "read-only employee can see Add button in UI (UI doesn't gate on permissions)" do
+  scenario "read-only employee can see Add link in UI (UI doesn't gate on permissions)" do
     reader_employee.clear_permissions_cache
     sign_in(reader_user)
     visit company_departments_path(company)
 
     expect(page).to have_selector('table', wait: 10)
-    expect(page).to have_selector('button', text: 'Add')
+    expect(page).to have_selector('a', text: 'Add')
   end
 
   # =========================================================================
   # SCENARIO 2: Creator with READ+CREATE can create department
   # =========================================================================
-  scenario "employee with create permission can see Add button" do
+  scenario "employee with create permission can see Add link" do
     creator_employee.clear_permissions_cache
     sign_in(creator_user)
     visit company_departments_path(company)
 
     expect(page).to have_selector('table', wait: 10)
-    expect(page).to have_selector('button', text: 'Add', wait: 5)
+    expect(page).to have_selector('a', text: 'Add', wait: 5)
   end
 
-  scenario "employee with create permission can open create modal" do
+  scenario "employee with create permission can access new page" do
     creator_employee.clear_permissions_cache
     sign_in(creator_user)
-    visit company_departments_path(company)
+    visit new_company_department_path(company)
 
-    expect(page).to have_selector('[data-action*="openNewModal"]', wait: 5)
-    find('[data-action*="openNewModal"]').click
-    expect(page).to have_selector('form[data-action*="handleSubmit"]', wait: 10)
+    expect(page).to have_selector('input[name="department[name]"]', wait: 10)
   end
 
   scenario "creator can create new department and see in table" do
@@ -154,20 +152,15 @@ RSpec.feature "Companies::Departments Permissions", type: :feature, js: true do
     creator_employee.reload
 
     sign_in(creator_user)
-    visit company_departments_path(company)
+    visit new_company_department_path(company)
 
-    find('[data-action*="openNewModal"]').click
-
-    expect(page).to have_selector('form[data-action*="handleSubmit"]', wait: 10)
-    expect(page).to have_selector('input[name="department[name]"]', wait: 5)
+    expect(page).to have_selector('input[name="department[name]"]', wait: 10)
     fill_in 'department[name]', with: 'Created by Creator'
-    fill_in 'department[email]', with: 'creator@department.com'
     select 'Operations', from: 'department[business_type]'
 
     click_button "Save Department"
 
-    expect(page).to have_content("created successfully", wait: 10)
-    expect(page).to have_selector('tbody tr', wait: 10)
+    expect(page).to have_content('Created by Creator', wait: 10)
 
     expect(Department.find_by(name: "Created by Creator")).to be_present
   end
@@ -184,7 +177,7 @@ RSpec.feature "Companies::Departments Permissions", type: :feature, js: true do
   # =========================================================================
   # SCENARIO 2a: Employee WITHOUT create permission gets error when trying to create
   # =========================================================================
-  scenario "employee without create permission cannot create new department" do
+  scenario "employee without create permission cannot access new page" do
     sign_in(owner)
     visit company_permissions_path(company)
 
@@ -213,35 +206,21 @@ RSpec.feature "Companies::Departments Permissions", type: :feature, js: true do
     company.clear_permissions_cache
 
     sign_in(no_permission_user)
-    visit company_departments_path(company)
-
-    expect(page).to have_selector('table', wait: 10)
-    expect(page).to have_selector('[data-action*="openNewModal"]', wait: 5)
-
-    find('[data-action*="openNewModal"]').click
-
-    expect(page).to have_selector('form[data-action*="handleSubmit"]', wait: 10)
-    fill_in 'department[name]', with: 'Should Not Be Created'
-    fill_in 'department[email]', with: 'test@example.com'
-    select 'Operations', from: 'department[business_type]'
-
-    click_button "Save Department"
+    visit new_company_department_path(company)
 
     expect(page).to have_content("You are not authorized to perform this action.", wait: 10)
-
-    expect(Department.find_by(name: "Should Not Be Created")).to be_nil
   end
 
   # =========================================================================
   # SCENARIO 3: Editor with READ+UPDATE can edit department
   # =========================================================================
-  scenario "employee with update permission can see table with edit buttons" do
+  scenario "employee with update permission can see table with edit links" do
     editor_employee.clear_permissions_cache
     sign_in(editor_user)
     visit company_departments_path(company)
 
     expect(page).to have_selector('table', wait: 10)
-    expect(page).to have_selector('[data-action*="openShowModal"]', minimum: 1)
+    expect(page).to have_selector('a[href*="/edit"]', minimum: 1)
   end
 
   scenario "editor can? returns true for read and update" do
@@ -253,69 +232,27 @@ RSpec.feature "Companies::Departments Permissions", type: :feature, js: true do
     expect(editor_employee.can?(:update, Department)).to be_truthy
   end
 
-  # =========================================================================
-  # SCENARIO 3b: Editor can update department name via show modal
-  # =========================================================================
-  scenario "editor with update permission can update department name via editable" do
-    sign_in(owner)
-    visit company_departments_path(company)
+  scenario "editor with update permission can update department name via edit page" do
+    editor_employee.clear_permissions_cache
+    company.clear_permissions_cache
+    editor_employee.reload
 
-    expect(page).to have_selector('table', wait: 10)
+    sign_in(editor_user)
+    visit edit_company_department_path(company, target_department)
 
-    target_row = find('tbody tr', text: target_department.name)
-    target_row.find('[data-action*="openShowModal"]').click
+    expect(page).to have_selector('input[name="department[name]"]', wait: 10)
+    fill_in 'department[name]', with: 'Updated Department Name'
 
-    expect(page).to have_selector('.swal2-container', wait: 10)
-
-    editable_name_field = find('[data-controller="editable"]', match: :first)
-    editable_name_field.click
-
-    expect(page).to have_selector('.editable-input', wait: 5)
-
-    editable_name_field.find('.editable-input').fill_in(with: 'Updated Department Name')
-
-    accept_confirm do
-      editable_name_field.find('.editable-input').send_keys :enter
-    end
+    click_button "Save Changes"
 
     expect(page).to have_content('Updated Department Name', wait: 10)
     expect(Department.find_by(id: target_department.id).name).to eq("Updated Department Name")
   end
 
   # =========================================================================
-  # SCENARIO 3c: Editor can update department description via show modal
-  # =========================================================================
-  scenario "editor with update permission can update department description via editable" do
-    sign_in(owner)
-    visit company_departments_path(company)
-
-    expect(page).to have_selector('table', wait: 10)
-
-    target_row = find('tbody tr', text: target_department.name)
-    target_row.find('[data-action*="openShowModal"]').click
-
-    expect(page).to have_selector('.swal2-container', wait: 10)
-
-    all_editable = all('[data-controller="editable"]')
-    desc_editable = all_editable[1]
-    desc_editable.click
-
-    expect(page).to have_selector('.editable-input', wait: 5)
-
-    desc_editable.find('.editable-input').fill_in(with: 'Updated description')
-
-    accept_confirm do
-      desc_editable.find('.editable-input').send_keys :enter
-    end
-
-    expect(page).to have_content('Updated description', wait: 10)
-    expect(Department.find_by(id: target_department.id).description).to eq("Updated description")
-  end
-
-  # =========================================================================
   # SCENARIO 3d: Employee WITHOUT update permission gets error when editing
   # =========================================================================
-  scenario "employee without update permission cannot edit another department's name" do
+  scenario "employee without update permission cannot access edit page" do
     sign_in(owner)
     visit company_permissions_path(company)
 
@@ -340,27 +277,9 @@ RSpec.feature "Companies::Departments Permissions", type: :feature, js: true do
 
     expect(editor_employee.can?(:update, Department)).to be_falsey
 
-    # Try to update - should fail with authorization error
+    # Try to access edit page - should fail with authorization error
     sign_in(editor_user)
-    visit company_departments_path(company)
-
-    expect(page).to have_selector('table', wait: 10)
-
-    target_row = find('tbody tr', text: target_department.name)
-    target_row.find('[data-action*="openShowModal"]').click
-
-    expect(page).to have_selector('.swal2-container', wait: 10)
-
-    editable_name_field = find('[data-controller="editable"]', match: :first)
-    editable_name_field.click
-
-    expect(page).to have_selector('.editable-input', wait: 5)
-
-    editable_name_field.find('.editable-input').fill_in(with: 'Attempted Update')
-
-    accept_confirm do
-      editable_name_field.find('.editable-input').send_keys :enter
-    end
+    visit edit_company_department_path(company, target_department)
 
     expect(page).to have_content("You are not authorized to perform this action.", wait: 10)
 

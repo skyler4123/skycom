@@ -15,6 +15,7 @@ RSpec.feature "Companies::Categories Permissions", type: :feature, js: true do
   let!(:policy_read_category) { create_policy(resource: "Category", action: "read") }
   let!(:policy_create_category) { create_policy(resource: "Category", action: "create") }
   let!(:policy_update_category) { create_policy(resource: "Category", action: "update") }
+
   # Reader role: Category(read) - active
   let!(:reader_read_category_active) do
     create_policy_appointment(role: reader_role, policy: policy_read_category, workflow_status: :active)
@@ -35,6 +36,8 @@ RSpec.feature "Companies::Categories Permissions", type: :feature, js: true do
   let!(:editor_update_category_active) do
     create_policy_appointment(role: editor_role, policy: policy_update_category, workflow_status: :active)
   end
+
+  # NoPermission role: NO policies for Category
 
   # Test employees
   let!(:reader_user) { create(:user, :company_employee) }
@@ -119,26 +122,29 @@ RSpec.feature "Companies::Categories Permissions", type: :feature, js: true do
   # =========================================================================
   # SCENARIO 2: Creator with READ+CREATE
   # =========================================================================
-  scenario "employee with create permission can create category" do
+  scenario "employee with create permission can access new category page" do
+    creator_employee.clear_permissions_cache
+    sign_in(creator_user)
+    visit new_company_category_path(company)
+
+    expect(page).to have_selector('input[name="category[name]"]', wait: 10)
+  end
+
+  scenario "creator can create new category and see in table" do
     creator_employee.clear_permissions_cache
     company.clear_permissions_cache
     creator_employee.reload
 
     sign_in(creator_user)
-    visit company_categories_path(company)
+    visit new_company_category_path(company)
 
-    expect(page).to have_selector('table', wait: 10)
-
-    find('[data-action*="openNewModal"]').click
-
-    expect(page).to have_selector('form[data-action*="handleSubmit"]', wait: 10)
+    expect(page).to have_selector('input[name="category[name]"]', wait: 10)
     fill_in 'category[name]', with: 'Created by Creator'
     select 'Products', from: 'category[resource_name]'
 
     click_button "Save Category"
 
-    expect(page).to have_content("created successfully!", wait: 10)
-    expect(page).to have_selector('tbody tr', wait: 10)
+    expect(page).to have_content('Created by Creator', wait: 10)
 
     expect(Category.find_by(name: "Created by Creator")).to be_present
   end
@@ -155,7 +161,7 @@ RSpec.feature "Companies::Categories Permissions", type: :feature, js: true do
   # =========================================================================
   # SCENARIO 2a: Employee WITHOUT create permission gets error
   # =========================================================================
-  scenario "employee without create permission cannot create new category" do
+  scenario "employee without create permission cannot access new category page" do
     sign_in(owner)
     visit company_permissions_path(company)
 
@@ -184,84 +190,21 @@ RSpec.feature "Companies::Categories Permissions", type: :feature, js: true do
     company.clear_permissions_cache
 
     sign_in(no_permission_user)
-    visit company_categories_path(company)
-
-    expect(page).to have_selector('table', wait: 10)
-    expect(page).to have_selector('[data-action*="openNewModal"]', wait: 5)
-
-    find('[data-action*="openNewModal"]').click
-
-    expect(page).to have_selector('form[data-action*="handleSubmit"]', wait: 10)
-    fill_in 'category[name]', with: 'Should Not Be Created'
-    select 'Products', from: 'category[resource_name]'
-
-    click_button "Save Category"
+    visit new_company_category_path(company)
 
     expect(page).to have_content("You are not authorized to perform this action.", wait: 10)
-
-    expect(Category.find_by(name: "Should Not Be Created")).to be_nil
   end
 
   # =========================================================================
   # SCENARIO 3: Editor with READ+UPDATE can edit category
   # =========================================================================
-  scenario "employee with update permission can edit category name via show modal" do
-    sign_in(owner)
-    visit company_permissions_path(company)
-
-    editor_section = find('.role-section', text: "Editor")
-
-    unless editor_section.has_content?("Can update Category")
-      editor_section.click_button("Add Resource")
-      within(".swal2-html-container") do
-        select "Category", from: "permission[resource_name]"
-        click_button "Add Resource"
-      end
-      expect(page).to have_content("Resource added successfully", wait: 10)
-    end
-
-    editor_section = find('.role-section', text: "Editor")
-    update_label = editor_section.all('label').find { |l| l.text.include?("Can update Category") }
-    update_checkbox = update_label.find('input[type="checkbox"]')
-
-    unless update_checkbox.checked?
-      accept_confirm do
-        update_checkbox.click
-      end
-      expect(page).to have_selector('input[type="checkbox"]:checked', wait: 10)
-    end
-
-    company.clear_permissions_cache
+  scenario "employee with update permission can see table with edit links" do
     editor_employee.clear_permissions_cache
-    editor_employee.reload
-
-    expect(editor_employee.can?(:update, Category)).to be_truthy
-
     sign_in(editor_user)
     visit company_categories_path(company)
 
     expect(page).to have_selector('table', wait: 10)
-
-    target_row = find('tbody tr', text: target_category.name)
-    target_row.find('[data-action*="openShowModal"]').click
-
-    expect(page).to have_selector('.swal2-container', wait: 10)
-
-    editable_name_field = find('[data-controller="editable"]', match: :first)
-    editable_name_field.click
-
-    expect(page).to have_selector('.editable-input', wait: 5)
-
-    editable_name_field.find('.editable-input').fill_in(with: 'Updated Category Name')
-
-    accept_confirm do
-      editable_name_field.find('.editable-input').send_keys :enter
-    end
-
-    expect(page).to have_content("Category name updated!", wait: 10)
-
-    target_category.reload
-    expect(target_category.name).to eq('Updated Category Name')
+    expect(page).to have_selector('a[href*="/edit"]', minimum: 1)
   end
 
   scenario "editor can? returns correct values" do
@@ -273,10 +216,27 @@ RSpec.feature "Companies::Categories Permissions", type: :feature, js: true do
     expect(editor_employee.can?(:update, Category)).to be_truthy
   end
 
+  scenario "editor with update permission can update category name via edit page" do
+    editor_employee.clear_permissions_cache
+    company.clear_permissions_cache
+    editor_employee.reload
+
+    sign_in(editor_user)
+    visit edit_company_category_path(company, target_category)
+
+    expect(page).to have_selector('input[name="category[name]"]', wait: 10)
+    fill_in 'category[name]', with: 'Updated Category Name'
+
+    click_button "Save Changes"
+
+    expect(page).to have_content('Updated Category Name', wait: 10)
+    expect(Category.find_by(id: target_category.id).name).to eq('Updated Category Name')
+  end
+
   # =========================================================================
   # SCENARIO 3a: Employee without update permission gets error
   # =========================================================================
-  scenario "employee without update permission cannot edit category name" do
+  scenario "employee without update permission cannot access edit page" do
     sign_in(owner)
     visit company_permissions_path(company)
 
@@ -291,27 +251,11 @@ RSpec.feature "Companies::Categories Permissions", type: :feature, js: true do
       expect(page).to have_content("Resource added successfully", wait: 10)
     end
 
-    editor_section = find('.role-section', text: "Editor")
-    update_label = editor_section.all('label').find { |l| l.text.include?("Can update Category") }
-    update_checkbox = update_label.find('input[type="checkbox"]')
-
-    unless update_checkbox.checked?
-      accept_confirm do
-        update_checkbox.click
-      end
-      expect(page).to have_selector('input[type="checkbox"]:checked', wait: 10)
-    end
-
-    update_checkbox.reload
-    if update_checkbox.checked?
-      accept_confirm do
-        update_checkbox.click
-      end
-      expect(page).to have_selector('input[type="checkbox"]:not(:checked)', wait: 10)
-    end
-
     company.clear_permissions_cache
-    editor_employee.clear_permissions_cache
+
+    appointment = PolicyAppointment.find_by(appoint_to: editor_role, policy: policy_update_category)
+    appointment.update!(workflow_status: :inactive)
+    company.clear_permissions_cache
     editor_employee.reload
 
     expect(editor_employee.can?(:update, Category)).to be_falsey
@@ -319,25 +263,7 @@ RSpec.feature "Companies::Categories Permissions", type: :feature, js: true do
     original_name = target_category.name
 
     sign_in(editor_user)
-    visit company_categories_path(company)
-
-    expect(page).to have_selector('table', wait: 10)
-
-    target_row = find('tbody tr', text: target_category.name)
-    target_row.find('[data-action*="openShowModal"]').click
-
-    expect(page).to have_selector('.swal2-container', wait: 10)
-
-    editable_name_field = find('[data-controller="editable"]', match: :first)
-    editable_name_field.click
-
-    expect(page).to have_selector('.editable-input', wait: 5)
-
-    editable_name_field.find('.editable-input').fill_in(with: 'Attempted Update')
-
-    accept_confirm do
-      editable_name_field.find('.editable-input').send_keys :enter
-    end
+    visit edit_company_category_path(company, target_category)
 
     expect(page).to have_content("You are not authorized to perform this action.", wait: 10)
 
@@ -365,7 +291,7 @@ RSpec.feature "Companies::Categories Permissions", type: :feature, js: true do
     visit company_categories_path(company)
 
     expect(page).to have_selector('table', wait: 10)
-    expect(page).to have_selector('button', text: 'Add')
+    expect(page).to have_selector('a', text: 'Add')
   end
 
   scenario "owner can? returns true for all actions" do
@@ -460,17 +386,15 @@ RSpec.feature "Companies::Categories Permissions", type: :feature, js: true do
     no_permission_employee.reload
 
     sign_in(no_permission_user)
-    visit company_categories_path(company)
+    visit new_company_category_path(company)
 
-    find('[data-action*="openNewModal"]').click
-    expect(page).to have_selector('form[data-action*="handleSubmit"]', wait: 10)
+    expect(page).to have_selector('input[name="category[name]"]', wait: 10)
     fill_in 'category[name]', with: 'Created After Grant'
     select 'Products', from: 'category[resource_name]'
 
     click_button "Save Category"
 
-    expect(page).to have_content("created successfully!", wait: 10)
-    expect(page).to have_selector('tbody tr', wait: 10)
+    expect(page).to have_content('Created After Grant', wait: 10)
 
     expect(Category.find_by(name: "Created After Grant")).to be_present
   end
@@ -510,14 +434,7 @@ RSpec.feature "Companies::Categories Permissions", type: :feature, js: true do
     expect(creator_employee.can?(:create, Category)).to be_falsey
 
     sign_in(creator_user)
-    visit company_categories_path(company)
-
-    find('[data-action*="openNewModal"]').click
-    expect(page).to have_selector('form[data-action*="handleSubmit"]', wait: 10)
-    fill_in 'category[name]', with: 'Should Be Rejected'
-    select 'Products', from: 'category[resource_name]'
-
-    click_button "Save Category"
+    visit new_company_category_path(company)
 
     expect(page).to have_content("You are not authorized to perform this action.", wait: 10)
     expect(Category.find_by(name: "Should Be Rejected")).to be_nil
@@ -604,7 +521,7 @@ RSpec.feature "Companies::Categories Permissions", type: :feature, js: true do
   end
 
   # =========================================================================
-  # SCENARIO 11: Grant read permission and access dashboard
+  # SCENARIO 11: Grant read permission via UI
   # =========================================================================
   scenario "owner can grant read permission to role via permissions page" do
     sign_in(owner)
@@ -636,41 +553,10 @@ RSpec.feature "Companies::Categories Permissions", type: :feature, js: true do
     expect(no_permission_employee.can?(:read, Category)).to be_truthy
   end
 
-  scenario "owner can grant update permission to role via permissions page" do
-    sign_in(owner)
-    visit company_permissions_path(company)
-
-    no_permission_section = find('.role-section', text: "NoPermission")
-
-    no_permission_section.click_button("Add Resource")
-    within(".swal2-html-container") do
-      select "Category", from: "permission[resource_name]"
-      click_button "Add Resource"
-    end
-    expect(page).to have_content("Resource added successfully", wait: 10)
-
-    no_permission_section = find('.role-section', text: "NoPermission")
-    update_label = no_permission_section.all('label').find { |l| l.text.include?("Can update Category") }
-    update_checkbox = update_label.find('input[type="checkbox"]')
-
-    accept_confirm do
-      update_checkbox.click
-    end
-
-    expect(page).to have_selector('input[type="checkbox"]:checked', wait: 10)
-
-    company.clear_permissions_cache
-    no_permission_employee.clear_permissions_cache
-    no_permission_employee.reload
-
-    expect(no_permission_employee.can?(:update, Category)).to be_truthy
-  end
-
   # =========================================================================
   # SCENARIO 12: Remove update permission
   # =========================================================================
   scenario "owner can remove update permission from role via permissions page" do
-    # First grant update permission using editor role
     sign_in(owner)
     visit company_permissions_path(company)
 
@@ -693,5 +579,20 @@ RSpec.feature "Companies::Categories Permissions", type: :feature, js: true do
     editor_employee.reload
 
     expect(editor_employee.can?(:update, Category)).to be_falsey
+  end
+
+  # =========================================================================
+  # SCENARIO 13: Employee without read permission cannot access dashboard
+  # =========================================================================
+  scenario "employee without read permission cannot access categories dashboard" do
+    no_permission_employee.clear_permissions_cache
+    no_permission_employee.reload
+
+    expect(no_permission_employee.can?(:read, Category)).to be_falsey
+
+    sign_in(no_permission_user)
+    visit company_categories_path(company)
+
+    expect(page).to have_content("You are not authorized to perform this action.", wait: 10)
   end
 end

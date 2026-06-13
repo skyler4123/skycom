@@ -18,46 +18,75 @@ class Companies::OrdersController < Companies::ApplicationController
     end
   end
 
-  def create
+  def show
+    order = current_company.orders.find(params[:id])
+
     respond_to do |format|
-      format.json do
-        order = current_company.orders.new(order_params)
-        if order.save
-          render json: { order: format_order(order) }, status: :created
-        else
-          render json: { errors: order.errors.full_messages }, status: :unprocessable_entity
-        end
-      end
+      format.html { render html: "", layout: true }
+      format.json { render json: { order: format_order(order) } }
+    end
+  end
+
+  def new
+    respond_to do |format|
+      format.html { render html: "", layout: true }
+      format.json { render json: {} }
+    end
+  end
+
+  def edit
+    order = current_company.orders.find(params[:id])
+
+    respond_to do |format|
+      format.html { render html: "", layout: true }
+      format.json { render json: { order: format_order(order) } }
+    end
+  end
+
+  def create
+    order = current_company.orders.new(order_params)
+
+    if order.save
+      redirect_to company_order_path(current_company, order), notice: "Order created successfully"
+    else
+      redirect_to new_company_order_path(current_company),
+        alert: order.errors.full_messages.to_sentence
     end
   end
 
   def update
     order = current_company.orders.find(params[:id])
 
-    respond_to do |format|
-      format.json do
-        if order.update(order_params)
-          render json: { order: format_order(order) }, status: :created
-        else
-          render json: { errors: order.errors.full_messages }, status: :unprocessable_entity
-        end
-      end
+    if order.update(order_params)
+      redirect_to company_order_path(current_company, order), notice: "Order updated successfully"
+    else
+      redirect_to edit_company_order_path(current_company, order),
+        alert: order.errors.full_messages.to_sentence
     end
-  rescue ActiveRecord::RecordNotFound
-    render json: { status: "error", message: "Order not found" }, status: :not_found
   end
 
   private
+
+  def property_keys
+    (1..10).map { |i| "property_string_#{i}" } +
+      (1..5).map { |i| "property_text_#{i}" } +
+      (1..20).map { |i| "property_integer_#{i}" } +
+      (1..10).map { |i| "property_decimal_#{i}" } +
+      (1..10).map { |i| "property_boolean_#{i}" } +
+      (1..10).map { |i| "property_datetime_#{i}" }
+  end
 
   def order_params
     params.require(:order).permit(
       :name,
       :description,
+      :code,
       :business_type,
       :workflow_status,
       :currency_code,
       :category_id,
-      :customer_id
+      :customer_id,
+      *property_keys
     )
   end
 
@@ -66,8 +95,11 @@ class Companies::OrdersController < Companies::ApplicationController
       :id, :name, :description, :code,
       :lifecycle_status, :workflow_status, :business_type,
       :currency_code, :category_id, :customer_id,
-      :created_at, :updated_at
-    ])
+      :created_at, :updated_at,
+      *property_keys
+    ]).merge(
+      category: order.category&.as_json(only: [ :id, :name ])
+    )
   end
 
   def format_orders(orders)
