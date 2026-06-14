@@ -4,6 +4,7 @@ class Brand < ApplicationRecord
   attribute :permission_resource_name, :string, default: -> { self.name }
 
   include TagConcern
+  include Brand::ImageConcern
 
   # --- Associations ---
   belongs_to :company

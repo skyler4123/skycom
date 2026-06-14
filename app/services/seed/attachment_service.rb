@@ -4,7 +4,7 @@ class Seed::AttachmentService
       file_name, file_type = file.path.split("/").last.split(".")
       record.send(relation).attach(io: file, filename: file_name, content_type: "image/#{file_type}")
     end
-    record.update_avatar if record.class == User
+    record.update_avatar if record.respond_to?(:update_avatar)
     [ record.send(relation) ].flatten.map { |attachment| Rails.application.routes.url_helpers.rails_blob_url(attachment, only_path: true) }
   end
 end

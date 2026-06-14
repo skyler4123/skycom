@@ -4,6 +4,7 @@ class Customer < ApplicationRecord
   include RoleConcern
   include AddressConcern
   include TagConcern
+  include Customer::ImageConcern
 
   attribute :permission_resource_name, :string, default: -> { self.name }
 

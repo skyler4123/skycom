@@ -92,6 +92,7 @@ export const create_company_pages_path = (companyId) => `/companies/${companyId}
 export const company_page_path = (companyId, pageId) => `/companies/${companyId}/pages/${pageId}`
 export const new_company_page_path = (companyId) => `/companies/${companyId}/pages/new`
 export const edit_company_page_path = (companyId, pageId) => `/companies/${companyId}/pages/${pageId}/edit`
+export const retail_cashier_company_page_path = (companyId, pageId) => `/companies/${companyId}/pages/${pageId}/retail_cashier`
 
 export const company_permissions_path = (companyId) => `/companies/${companyId}/permissions`
 export const edit_company_permission_path = (companyId, permissionId) => `/companies/${companyId}/permissions/${permissionId}`
