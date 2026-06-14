@@ -7,6 +7,7 @@ class Company < ApplicationRecord
      Table Reservation Room Guest
     Patient Appointment Course Student Exam
     Membership
+    Page
     Stock StockTransfer StockImport StockExport
   ]
 
@@ -53,6 +54,7 @@ class Company < ApplicationRecord
   has_many :categories, dependent: :destroy
   has_many :subscription_plans, dependent: :destroy
   has_many :departments, dependent: :destroy
+  has_many :pages, dependent: :destroy
 
   # --- Enums ---
   enum :country_code, COUNTRIE_CODES, prefix: true

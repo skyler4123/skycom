@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
+ActiveRecord::Schema[8.0].define(version: 2026_06_13_235333) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pgcrypto"
@@ -2775,6 +2775,42 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
     t.index ["lifecycle_status"], name: "index_orders_on_lifecycle_status"
     t.index ["property_mapping_id"], name: "index_orders_on_property_mapping_id"
     t.index ["workflow_status"], name: "index_orders_on_workflow_status"
+  end
+
+  create_table "pages", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "company_id", null: false
+    t.uuid "branch_id", null: false
+    t.string "email"
+    t.string "name"
+    t.text "description"
+    t.string "code"
+    t.string "phone_number"
+    t.integer "currency_code", default: 840
+    t.integer "country_code", default: 1
+    t.string "timezone", default: "UTC"
+    t.integer "business_type", default: 10, null: false
+    t.integer "target_role", default: 20, null: false
+    t.integer "target_resolution", default: 30, null: false
+    t.integer "lifecycle_status", default: 20, null: false
+    t.integer "workflow_status", default: 10, null: false
+    t.jsonb "layout_manifest", default: {}, null: false
+    t.jsonb "metadata", default: {}, null: false
+    t.string "permission_resource_name", null: false
+    t.datetime "expiration_date"
+    t.datetime "discarded_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["branch_id", "target_role", "target_resolution", "code"], name: "idx_on_branch_id_target_role_target_resolution_code_6c16dc00fe", unique: true
+    t.index ["branch_id"], name: "index_pages_on_branch_id"
+    t.index ["business_type"], name: "index_pages_on_business_type"
+    t.index ["code"], name: "index_pages_on_code", unique: true
+    t.index ["company_id"], name: "index_pages_on_company_id"
+    t.index ["discarded_at"], name: "index_pages_on_discarded_at"
+    t.index ["email"], name: "index_pages_on_email", unique: true
+    t.index ["lifecycle_status"], name: "index_pages_on_lifecycle_status"
+    t.index ["target_resolution"], name: "index_pages_on_target_resolution"
+    t.index ["target_role"], name: "index_pages_on_target_role"
+    t.index ["workflow_status"], name: "index_pages_on_workflow_status"
   end
 
   create_table "payment_method_appointments", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
@@ -5808,6 +5844,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_03_054715) do
   add_foreign_key "orders", "companies"
   add_foreign_key "orders", "customers"
   add_foreign_key "orders", "property_mappings"
+  add_foreign_key "pages", "branches"
+  add_foreign_key "pages", "companies"
   add_foreign_key "payment_method_appointments", "branches"
   add_foreign_key "payment_method_appointments", "companies"
   add_foreign_key "payment_method_appointments", "payment_methods"

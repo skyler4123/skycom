@@ -1003,6 +1003,7 @@ class Seed::RetailService
     @products = []
     @services = []
     @warehouses = []
+    @pages = []
     @product_counter = 0
     @service_counter = 0
     @employee_counter = 0
@@ -1021,6 +1022,7 @@ class Seed::RetailService
     create_table_configs
     create_brands
     create_branches
+    create_pages
     create_subscription_plans_for_company
     create_facilities_for_branches
     appoint_payment_methods_to_company
@@ -1132,7 +1134,54 @@ class Seed::RetailService
     end
   end
 
+  def create_pages
+    puts "Creating pages for each branch..."
+    @branches.each do |branch|
+      Seed::PageService.create(
+        company: @retail,
+        branch: branch,
+        name: "Retail Cashier",
+        target_role: :retail_cashier,
+        target_resolution: :desktop_widescreen,
+        layout_manifest: {
+          grid_columns: 12,
+          default_sidebar: "customer_loyalty_panel",
+          enabled_components: [
+            { id: "barcode_listener_daemon", position: "background" },
+            { id: "product_search_matrix", position: "span-8", items_per_row: 6 },
+            { id: "checkout_summary_card", position: "span-4" }
+          ],
+          features: {
+            quick_cash_buttons: [ 10000, 20000, 50000, 100000, 200000, 500000 ],
+            gift_card_redemption: true
+          }
+        }
+      )
 
+      Seed::PageService.create(
+        company: @retail,
+        branch: branch,
+        name: "Retail Store Manager",
+        target_role: :retail_store_manager,
+        target_resolution: :desktop_widescreen,
+        layout_manifest: {
+          grid_columns: 12,
+          default_sidebar: "analytics_panel",
+          enabled_components: [
+            { id: "sales_kpi_dashboard", position: "span-6" },
+            { id: "inventory_alerts", position: "span-6" },
+            { id: "staff_on_duty", position: "span-4" },
+            { id: "daily_revenue_chart", position: "span-8" }
+          ],
+          features: {
+            approve_discounts: true,
+            view_profit_margins: true,
+            export_reports: true
+          }
+        }
+      )
+    end
+  end
 
   def create_subscription_plans_for_company(count: 3)
     count.times do |i|
@@ -1482,6 +1531,7 @@ class Seed::RetailService
       Manager: {
         "Appointment" => { create: true, read: true, update: true, delete: true },
         "Brand" => { create: true, read: true, update: true, delete: true },
+        "Page" => { create: true, read: true, update: true, delete: true },
         "Branch" => { create: true, read: true, update: true, delete: true },
         "Category" => { create: true, read: true, update: true, delete: true },
         "Course" => { create: true, read: true, update: true, delete: true },
