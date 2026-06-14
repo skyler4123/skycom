@@ -46,7 +46,11 @@ Rails.application.routes.draw do
       resources :policies
       resources :policy_appointments
       resources :property_mappings, only: [ :create, :update, :show, :destroy ]
-      resources :pages
+      resources :pages do
+        member do
+          get :retail_cashier
+        end
+      end
     end
   end
 

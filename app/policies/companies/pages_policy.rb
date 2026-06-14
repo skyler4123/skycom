@@ -12,6 +12,10 @@ class Companies::PagesPolicy < ApplicationPolicy
     record.can?(:create, Page)
   end
 
+  def retail_cashier?
+    record.can?(:read, Page)
+  end
+
   def create?
     record.can?(:create, Page)
   end
