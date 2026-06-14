@@ -42,6 +42,7 @@ class Seed::CustomerService
     end
     Seed::PropertyPopulator.populate(customer)
     customer.save!
+    Seed::AttachmentService.attach(record: customer, relation: :image_attachments, number: 2)
     customer
   end
 end

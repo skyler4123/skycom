@@ -30,6 +30,7 @@ class Seed::DepartmentService
     end
     Seed::PropertyPopulator.populate(department)
     department.save!
+    Seed::AttachmentService.attach(record: department, relation: :image_attachments, number: 2)
     department
   end
 end

@@ -5,6 +5,7 @@ class Service < ApplicationRecord
 
   include TagConcern
   include OrderConcern
+  include Service::ImageConcern
 
   belongs_to :company
   belongs_to :branch, optional: true

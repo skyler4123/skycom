@@ -65,6 +65,7 @@ class Seed::BranchService
     end
     Seed::PropertyPopulator.populate(branch)
     branch.save!
+    Seed::AttachmentService.attach(record: branch, relation: :image_attachments, number: 2)
     branch
   end
 end

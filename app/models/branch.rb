@@ -5,6 +5,7 @@ class Branch < ApplicationRecord
 
   include AddressConcern
   include TagConcern
+  include Branch::ImageConcern
 
   belongs_to :company
   belongs_to :category

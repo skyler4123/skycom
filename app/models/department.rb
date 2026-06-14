@@ -5,6 +5,7 @@ class Department < ApplicationRecord
 
   include AddressConcern
   include TagConcern
+  include Department::ImageConcern
 
   enum :business_type, {
     sales: 0,

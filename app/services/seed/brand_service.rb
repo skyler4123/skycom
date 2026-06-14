@@ -31,6 +31,7 @@ class Seed::BrandService
     end
     Seed::PropertyPopulator.populate(brand)
     brand.save!
+    Seed::AttachmentService.attach(record: brand, relation: :image_attachments, number: 2)
     brand
   end
 end

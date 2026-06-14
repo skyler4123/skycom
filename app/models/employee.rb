@@ -4,6 +4,8 @@ class Employee < ApplicationRecord
   include CategoryConcern
   include PropertyMappingConcern
   include AddressConcern
+  include AvatarConcern
+  include Employee::ImageConcern
   include RoleConcern
   include Employee::PermissionConcern
   include TagConcern

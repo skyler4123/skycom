@@ -54,6 +54,8 @@ class Seed::EmployeeService
     end
     Seed::PropertyPopulator.populate(employee)
     employee.save!
+    Seed::AttachmentService.attach(record: employee, relation: :avatar_attachment, number: 1)
+    Seed::AttachmentService.attach(record: employee, relation: :image_attachments, number: 2)
     employee
   end
 end
