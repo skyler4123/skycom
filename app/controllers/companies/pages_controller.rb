@@ -40,10 +40,10 @@ class Companies::PagesController < Companies::ApplicationController
       format.json do
         products = current_company.products.where(branch_id: page.branch_id).limit(50).map { |p|
           price = p.price
-          { id: p.id, name: p.name, code: p.code, price: price&.to_f || 0, currency: price&.currency.iso_code || "USD" }
+          { id: p.id, name: p.name, code: p.code, price: price&.to_f || 0, currency: price&.currency.iso_code || "USD", image_url: p.image_attachments.first&.variant(:thumb)&.processed&.url }
         }
         services = current_company.services.where(branch_id: page.branch_id).limit(50).map { |s|
-          { id: s.id, name: s.name, code: s.code, price: 0, currency: "usd" }
+          { id: s.id, name: s.name, code: s.code, price: 0, currency: "usd", image_url: s.image_attachments.first&.variant(:thumb)&.processed&.url }
         }
 
         render json: {

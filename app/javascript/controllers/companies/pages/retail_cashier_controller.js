@@ -181,9 +181,14 @@ export default class Companies_Pages_RetailCashierController extends Controller 
         data-${this.identifier}-name-param="${p.name.replace(/"/g, '&quot;')}"
         data-${this.identifier}-price-param="${p.price || 0}"
         class="bg-white rounded-xl border border-slate-200 p-3 hover:shadow-md hover:border-blue-200 transition-all cursor-pointer active:scale-[0.98]">
-        <div class="w-full h-24 bg-gradient-to-br from-blue-50 to-indigo-100 rounded-lg flex items-center justify-center mb-3">
-          <span class="material-symbols-outlined text-3xl text-blue-400">inventory_2</span>
-        </div>
+        ${p.image_url
+          ? `<div class="w-full h-24 rounded-lg overflow-hidden mb-3 bg-slate-50">
+               <img src="${p.image_url}" class="w-full h-full object-cover" />
+             </div>`
+          : `<div class="w-full h-24 bg-gradient-to-br from-blue-50 to-indigo-100 rounded-lg flex items-center justify-center mb-3">
+               <span class="material-symbols-outlined text-3xl text-blue-400">inventory_2</span>
+             </div>`
+        }
         <p class="text-sm font-semibold text-slate-900 truncate">${p.name}</p>
         <p class="text-sm font-bold text-blue-600 mt-1">$${(p.price || 0).toFixed(2)}</p>
       </div>
@@ -195,9 +200,14 @@ export default class Companies_Pages_RetailCashierController extends Controller 
         data-${this.identifier}-name-param="${s.name.replace(/"/g, '&quot;')}"
         data-${this.identifier}-price-param="${s.price || 0}"
         class="bg-white rounded-xl border border-slate-200 p-3 hover:shadow-md hover:border-emerald-200 transition-all cursor-pointer active:scale-[0.98]">
-        <div class="w-full h-24 bg-gradient-to-br from-emerald-50 to-green-100 rounded-lg flex items-center justify-center mb-3">
-          <span class="material-symbols-outlined text-3xl text-emerald-400">spa</span>
-        </div>
+        ${s.image_url
+          ? `<div class="w-full h-24 rounded-lg overflow-hidden mb-3 bg-slate-50">
+               <img src="${s.image_url}" class="w-full h-full object-cover" />
+             </div>`
+          : `<div class="w-full h-24 bg-gradient-to-br from-emerald-50 to-green-100 rounded-lg flex items-center justify-center mb-3">
+               <span class="material-symbols-outlined text-3xl text-emerald-400">spa</span>
+             </div>`
+        }
         <p class="text-sm font-semibold text-slate-900 truncate">${s.name}</p>
         <p class="text-sm font-bold text-emerald-600 mt-1">$${(s.price || 0).toFixed(2)}</p>
       </div>
