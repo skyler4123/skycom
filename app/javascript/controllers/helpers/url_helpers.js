@@ -87,6 +87,12 @@ export const company_order_path = (companyId, orderId) => `/companies/${companyI
 export const new_company_order_path = (companyId) => `/companies/${companyId}/orders/new`
 export const edit_company_order_path = (companyId, orderId) => `/companies/${companyId}/orders/${orderId}/edit`
 
+export const company_pages_path = (companyId) => `/companies/${companyId}/pages`
+export const create_company_pages_path = (companyId) => `/companies/${companyId}/pages`
+export const company_page_path = (companyId, pageId) => `/companies/${companyId}/pages/${pageId}`
+export const new_company_page_path = (companyId) => `/companies/${companyId}/pages/new`
+export const edit_company_page_path = (companyId, pageId) => `/companies/${companyId}/pages/${pageId}/edit`
+
 export const company_permissions_path = (companyId) => `/companies/${companyId}/permissions`
 export const edit_company_permission_path = (companyId, permissionId) => `/companies/${companyId}/permissions/${permissionId}`
 
