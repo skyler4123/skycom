@@ -72,6 +72,10 @@ Rails.application.routes.draw do
   mount MissionControl::Jobs::Engine, at: "/jobs"
   get "sign_out", to: "sessions#sign_out"
   get "/sign_in_for_test", to: "sessions#sign_in_for_test", as: :sign_in_for_test if Rails.env.test?
+
+  # OmniAuth routes
+  get "/auth/:provider/callback", to: "sessions#create_from_omniauth"
+  get "/auth/failure", to: "sessions#auth_failure"
   # ----------------------------------------------------------------------------------------------------
   # DEFAULTS
   post "sign_in", to: "sessions#create"

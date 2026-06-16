@@ -81,6 +81,7 @@ end
 gem "authentication-zero"
 # Use OmniAuth to support multi-provider authentication [https://github.com/omniauth/omniauth]
 gem "omniauth"
+gem "omniauth-google-oauth2"
 # Provides a mitigation against CVE-2015-9284 [https://github.com/cookpad/omniauth-rails_csrf_protection]
 gem "omniauth-rails_csrf_protection"
 gem "faker"
