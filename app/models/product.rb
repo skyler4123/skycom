@@ -26,14 +26,14 @@ class Product < ApplicationRecord
 
   # --- New Inventory Ledger Associations ---
   has_many :stocks, dependent: :destroy
-  
+
   # The true atomic ledger tracking every specific movement of this item
   has_many :stock_transactions, dependent: :destroy
 
   # Indirectly access source documents that impacted this product's inventory levels
-  has_many :stock_imports,   through: :stock_transactions, source: :appoint_for, source_type: 'StockImport'
-  has_many :stock_exports,   through: :stock_transactions, source: :appoint_for, source_type: 'StockExport'
-  has_many :stock_transfers, through: :stock_transactions, source: :appoint_for, source_type: 'StockTransfer'
+  has_many :stock_imports,   through: :stock_transactions, source: :appoint_for, source_type: "StockImport"
+  has_many :stock_exports,   through: :stock_transactions, source: :appoint_for, source_type: "StockExport"
+  has_many :stock_transfers, through: :stock_transactions, source: :appoint_for, source_type: "StockTransfer"
 
   # --- Enums ---
   enum :lifecycle_status, LIFECYCLE_STATUS, prefix: true
