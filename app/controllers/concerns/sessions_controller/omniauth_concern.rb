@@ -2,6 +2,10 @@ module SessionsController::OmniauthConcern
   extend ActiveSupport::Concern
 
   included do
+    # 1. Register the method as an official callback filter first!
+    before_action :concern_skip_before_action
+
+    # 2. Now that Rails knows it exists, you can safely skip it for OmniAuth routes
     # Skip CSRF check only if you trust OmniAuth middleware's internal protection
     # skip_before_action :verify_authenticity_token, only: :create_from_omniauth
     skip_before_action :concern_skip_before_action, only: %i[ create_from_omniauth auth_failure ]
@@ -34,8 +38,6 @@ module SessionsController::OmniauthConcern
   def auth_failure
     redirect_to sign_in_path, alert: "Google authentication failed or was cancelled."
   end
-
-  private
 
   def concern_skip_before_action
     authenticate
