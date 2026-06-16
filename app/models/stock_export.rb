@@ -25,4 +25,7 @@ class StockExport < ApplicationRecord
     damaged: 4,
     expired: 5
   }
+  has_many :stock_transactions, as: :appoint_for, dependent: :restrict_with_error
+
+  validates :code, presence: true, uniqueness: true
 end

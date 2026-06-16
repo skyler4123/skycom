@@ -1,6 +1,6 @@
-class CreateStockTransfers < ActiveRecord::Migration[8.0]
+class CreateStockTransactions < ActiveRecord::Migration[8.0]
   def change
-    create_table :stock_transfers, id: :uuid, default: -> { "uuidv7()" } do |t|
+    create_table :stock_transactions, id: :uuid, default: -> { "uuidv7()" } do |t|
       t.references :company, null: false, foreign_key: true, type: :uuid
       t.references :branch, null: true, foreign_key: true, type: :uuid
       t.references :warehouse, null: false, foreign_key: true, type: :uuid
@@ -24,7 +24,10 @@ class CreateStockTransfers < ActiveRecord::Migration[8.0]
       t.integer :country_code,  default: 1   # US
       t.string  :timezone,      default: "UTC" # Global Standard
 
-      t.integer :quantity
+      # --- Operational Metrics ---
+      t.integer :quantity, null: false
+      t.integer :direction, null: false, index: true        # 0: increment, 1: decrement
+      t.integer :transaction_type, null: false, index: true  # e.g., import, export, transfer, adjustment
 
       # --- System Fields ---
       t.integer  :lifecycle_status, index: true

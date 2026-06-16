@@ -4540,6 +4540,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_06_13_235333) do
   create_table "stock_exports", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
     t.uuid "company_id", null: false
     t.uuid "branch_id"
+    t.uuid "warehouse_id", null: false
     t.uuid "product_id", null: false
     t.string "appoint_from_type"
     t.uuid "appoint_from_id"
@@ -4572,16 +4573,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_06_13_235333) do
     t.string "property_string_3"
     t.string "property_string_4"
     t.string "property_string_5"
-    t.string "property_string_6"
-    t.string "property_string_7"
-    t.string "property_string_8"
-    t.string "property_string_9"
-    t.string "property_string_10"
     t.text "property_text_1"
     t.text "property_text_2"
-    t.text "property_text_3"
-    t.text "property_text_4"
-    t.text "property_text_5"
     t.integer "property_integer_1"
     t.integer "property_integer_2"
     t.integer "property_integer_3"
@@ -4592,46 +4585,21 @@ ActiveRecord::Schema[8.0].define(version: 2026_06_13_235333) do
     t.integer "property_integer_8"
     t.integer "property_integer_9"
     t.integer "property_integer_10"
-    t.integer "property_integer_11"
-    t.integer "property_integer_12"
-    t.integer "property_integer_13"
-    t.integer "property_integer_14"
-    t.integer "property_integer_15"
-    t.integer "property_integer_16"
-    t.integer "property_integer_17"
-    t.integer "property_integer_18"
-    t.integer "property_integer_19"
-    t.integer "property_integer_20"
     t.decimal "property_decimal_1", precision: 15, scale: 4
     t.decimal "property_decimal_2", precision: 15, scale: 4
     t.decimal "property_decimal_3", precision: 15, scale: 4
     t.decimal "property_decimal_4", precision: 15, scale: 4
     t.decimal "property_decimal_5", precision: 15, scale: 4
-    t.decimal "property_decimal_6", precision: 15, scale: 4
-    t.decimal "property_decimal_7", precision: 15, scale: 4
-    t.decimal "property_decimal_8", precision: 15, scale: 4
-    t.decimal "property_decimal_9", precision: 15, scale: 4
-    t.decimal "property_decimal_10", precision: 15, scale: 4
     t.boolean "property_boolean_1"
     t.boolean "property_boolean_2"
     t.boolean "property_boolean_3"
     t.boolean "property_boolean_4"
     t.boolean "property_boolean_5"
-    t.boolean "property_boolean_6"
-    t.boolean "property_boolean_7"
-    t.boolean "property_boolean_8"
-    t.boolean "property_boolean_9"
-    t.boolean "property_boolean_10"
     t.datetime "property_datetime_1"
     t.datetime "property_datetime_2"
     t.datetime "property_datetime_3"
     t.datetime "property_datetime_4"
     t.datetime "property_datetime_5"
-    t.datetime "property_datetime_6"
-    t.datetime "property_datetime_7"
-    t.datetime "property_datetime_8"
-    t.datetime "property_datetime_9"
-    t.datetime "property_datetime_10"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["appoint_by_type", "appoint_by_id"], name: "index_stock_exports_on_appoint_by"
@@ -4648,12 +4616,14 @@ ActiveRecord::Schema[8.0].define(version: 2026_06_13_235333) do
     t.index ["lifecycle_status"], name: "index_stock_exports_on_lifecycle_status"
     t.index ["product_id"], name: "index_stock_exports_on_product_id"
     t.index ["property_mapping_id"], name: "index_stock_exports_on_property_mapping_id"
+    t.index ["warehouse_id"], name: "index_stock_exports_on_warehouse_id"
     t.index ["workflow_status"], name: "index_stock_exports_on_workflow_status"
   end
 
   create_table "stock_imports", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
     t.uuid "company_id", null: false
     t.uuid "branch_id"
+    t.uuid "warehouse_id", null: false
     t.uuid "product_id", null: false
     t.string "appoint_from_type"
     t.uuid "appoint_from_id"
@@ -4686,16 +4656,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_06_13_235333) do
     t.string "property_string_3"
     t.string "property_string_4"
     t.string "property_string_5"
-    t.string "property_string_6"
-    t.string "property_string_7"
-    t.string "property_string_8"
-    t.string "property_string_9"
-    t.string "property_string_10"
     t.text "property_text_1"
     t.text "property_text_2"
-    t.text "property_text_3"
-    t.text "property_text_4"
-    t.text "property_text_5"
     t.integer "property_integer_1"
     t.integer "property_integer_2"
     t.integer "property_integer_3"
@@ -4706,46 +4668,21 @@ ActiveRecord::Schema[8.0].define(version: 2026_06_13_235333) do
     t.integer "property_integer_8"
     t.integer "property_integer_9"
     t.integer "property_integer_10"
-    t.integer "property_integer_11"
-    t.integer "property_integer_12"
-    t.integer "property_integer_13"
-    t.integer "property_integer_14"
-    t.integer "property_integer_15"
-    t.integer "property_integer_16"
-    t.integer "property_integer_17"
-    t.integer "property_integer_18"
-    t.integer "property_integer_19"
-    t.integer "property_integer_20"
     t.decimal "property_decimal_1", precision: 15, scale: 4
     t.decimal "property_decimal_2", precision: 15, scale: 4
     t.decimal "property_decimal_3", precision: 15, scale: 4
     t.decimal "property_decimal_4", precision: 15, scale: 4
     t.decimal "property_decimal_5", precision: 15, scale: 4
-    t.decimal "property_decimal_6", precision: 15, scale: 4
-    t.decimal "property_decimal_7", precision: 15, scale: 4
-    t.decimal "property_decimal_8", precision: 15, scale: 4
-    t.decimal "property_decimal_9", precision: 15, scale: 4
-    t.decimal "property_decimal_10", precision: 15, scale: 4
     t.boolean "property_boolean_1"
     t.boolean "property_boolean_2"
     t.boolean "property_boolean_3"
     t.boolean "property_boolean_4"
     t.boolean "property_boolean_5"
-    t.boolean "property_boolean_6"
-    t.boolean "property_boolean_7"
-    t.boolean "property_boolean_8"
-    t.boolean "property_boolean_9"
-    t.boolean "property_boolean_10"
     t.datetime "property_datetime_1"
     t.datetime "property_datetime_2"
     t.datetime "property_datetime_3"
     t.datetime "property_datetime_4"
     t.datetime "property_datetime_5"
-    t.datetime "property_datetime_6"
-    t.datetime "property_datetime_7"
-    t.datetime "property_datetime_8"
-    t.datetime "property_datetime_9"
-    t.datetime "property_datetime_10"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["appoint_by_type", "appoint_by_id"], name: "index_stock_imports_on_appoint_by"
@@ -4762,12 +4699,101 @@ ActiveRecord::Schema[8.0].define(version: 2026_06_13_235333) do
     t.index ["lifecycle_status"], name: "index_stock_imports_on_lifecycle_status"
     t.index ["product_id"], name: "index_stock_imports_on_product_id"
     t.index ["property_mapping_id"], name: "index_stock_imports_on_property_mapping_id"
+    t.index ["warehouse_id"], name: "index_stock_imports_on_warehouse_id"
     t.index ["workflow_status"], name: "index_stock_imports_on_workflow_status"
+  end
+
+  create_table "stock_transactions", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
+    t.uuid "company_id", null: false
+    t.uuid "branch_id"
+    t.uuid "warehouse_id", null: false
+    t.uuid "product_id", null: false
+    t.string "appoint_from_type"
+    t.uuid "appoint_from_id"
+    t.string "appoint_to_type"
+    t.uuid "appoint_to_id"
+    t.string "appoint_for_type"
+    t.uuid "appoint_for_id"
+    t.string "appoint_by_type"
+    t.uuid "appoint_by_id"
+    t.uuid "category_id", null: false
+    t.uuid "property_mapping_id", null: false
+    t.string "email"
+    t.string "name"
+    t.text "description"
+    t.string "code"
+    t.string "phone_number"
+    t.integer "currency_code", default: 840
+    t.integer "country_code", default: 1
+    t.string "timezone", default: "UTC"
+    t.integer "quantity", null: false
+    t.integer "direction", null: false
+    t.integer "transaction_type", null: false
+    t.integer "lifecycle_status"
+    t.integer "workflow_status"
+    t.integer "business_type"
+    t.datetime "expiration_date"
+    t.jsonb "metadata", default: {}
+    t.datetime "discarded_at"
+    t.string "permission_resource_name"
+    t.string "property_string_1"
+    t.string "property_string_2"
+    t.string "property_string_3"
+    t.string "property_string_4"
+    t.string "property_string_5"
+    t.text "property_text_1"
+    t.text "property_text_2"
+    t.integer "property_integer_1"
+    t.integer "property_integer_2"
+    t.integer "property_integer_3"
+    t.integer "property_integer_4"
+    t.integer "property_integer_5"
+    t.integer "property_integer_6"
+    t.integer "property_integer_7"
+    t.integer "property_integer_8"
+    t.integer "property_integer_9"
+    t.integer "property_integer_10"
+    t.decimal "property_decimal_1", precision: 15, scale: 4
+    t.decimal "property_decimal_2", precision: 15, scale: 4
+    t.decimal "property_decimal_3", precision: 15, scale: 4
+    t.decimal "property_decimal_4", precision: 15, scale: 4
+    t.decimal "property_decimal_5", precision: 15, scale: 4
+    t.boolean "property_boolean_1"
+    t.boolean "property_boolean_2"
+    t.boolean "property_boolean_3"
+    t.boolean "property_boolean_4"
+    t.boolean "property_boolean_5"
+    t.datetime "property_datetime_1"
+    t.datetime "property_datetime_2"
+    t.datetime "property_datetime_3"
+    t.datetime "property_datetime_4"
+    t.datetime "property_datetime_5"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["appoint_by_type", "appoint_by_id"], name: "index_stock_transactions_on_appoint_by"
+    t.index ["appoint_for_type", "appoint_for_id"], name: "index_stock_transactions_on_appoint_for"
+    t.index ["appoint_from_type", "appoint_from_id"], name: "index_stock_transactions_on_appoint_from"
+    t.index ["appoint_to_type", "appoint_to_id"], name: "index_stock_transactions_on_appoint_to"
+    t.index ["branch_id"], name: "index_stock_transactions_on_branch_id"
+    t.index ["business_type"], name: "index_stock_transactions_on_business_type"
+    t.index ["category_id"], name: "index_stock_transactions_on_category_id"
+    t.index ["code"], name: "index_stock_transactions_on_code", unique: true
+    t.index ["company_id"], name: "index_stock_transactions_on_company_id"
+    t.index ["direction"], name: "index_stock_transactions_on_direction"
+    t.index ["discarded_at"], name: "index_stock_transactions_on_discarded_at"
+    t.index ["email"], name: "index_stock_transactions_on_email", unique: true
+    t.index ["lifecycle_status"], name: "index_stock_transactions_on_lifecycle_status"
+    t.index ["product_id"], name: "index_stock_transactions_on_product_id"
+    t.index ["property_mapping_id"], name: "index_stock_transactions_on_property_mapping_id"
+    t.index ["transaction_type"], name: "index_stock_transactions_on_transaction_type"
+    t.index ["warehouse_id"], name: "index_stock_transactions_on_warehouse_id"
+    t.index ["workflow_status"], name: "index_stock_transactions_on_workflow_status"
   end
 
   create_table "stock_transfers", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
     t.uuid "company_id", null: false
     t.uuid "branch_id"
+    t.uuid "warehouse_id", null: false
     t.uuid "product_id", null: false
     t.string "appoint_from_type"
     t.uuid "appoint_from_id"
@@ -4800,16 +4826,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_06_13_235333) do
     t.string "property_string_3"
     t.string "property_string_4"
     t.string "property_string_5"
-    t.string "property_string_6"
-    t.string "property_string_7"
-    t.string "property_string_8"
-    t.string "property_string_9"
-    t.string "property_string_10"
     t.text "property_text_1"
     t.text "property_text_2"
-    t.text "property_text_3"
-    t.text "property_text_4"
-    t.text "property_text_5"
     t.integer "property_integer_1"
     t.integer "property_integer_2"
     t.integer "property_integer_3"
@@ -4820,46 +4838,21 @@ ActiveRecord::Schema[8.0].define(version: 2026_06_13_235333) do
     t.integer "property_integer_8"
     t.integer "property_integer_9"
     t.integer "property_integer_10"
-    t.integer "property_integer_11"
-    t.integer "property_integer_12"
-    t.integer "property_integer_13"
-    t.integer "property_integer_14"
-    t.integer "property_integer_15"
-    t.integer "property_integer_16"
-    t.integer "property_integer_17"
-    t.integer "property_integer_18"
-    t.integer "property_integer_19"
-    t.integer "property_integer_20"
     t.decimal "property_decimal_1", precision: 15, scale: 4
     t.decimal "property_decimal_2", precision: 15, scale: 4
     t.decimal "property_decimal_3", precision: 15, scale: 4
     t.decimal "property_decimal_4", precision: 15, scale: 4
     t.decimal "property_decimal_5", precision: 15, scale: 4
-    t.decimal "property_decimal_6", precision: 15, scale: 4
-    t.decimal "property_decimal_7", precision: 15, scale: 4
-    t.decimal "property_decimal_8", precision: 15, scale: 4
-    t.decimal "property_decimal_9", precision: 15, scale: 4
-    t.decimal "property_decimal_10", precision: 15, scale: 4
     t.boolean "property_boolean_1"
     t.boolean "property_boolean_2"
     t.boolean "property_boolean_3"
     t.boolean "property_boolean_4"
     t.boolean "property_boolean_5"
-    t.boolean "property_boolean_6"
-    t.boolean "property_boolean_7"
-    t.boolean "property_boolean_8"
-    t.boolean "property_boolean_9"
-    t.boolean "property_boolean_10"
     t.datetime "property_datetime_1"
     t.datetime "property_datetime_2"
     t.datetime "property_datetime_3"
     t.datetime "property_datetime_4"
     t.datetime "property_datetime_5"
-    t.datetime "property_datetime_6"
-    t.datetime "property_datetime_7"
-    t.datetime "property_datetime_8"
-    t.datetime "property_datetime_9"
-    t.datetime "property_datetime_10"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["appoint_by_type", "appoint_by_id"], name: "index_stock_transfers_on_appoint_by"
@@ -4876,6 +4869,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_06_13_235333) do
     t.index ["lifecycle_status"], name: "index_stock_transfers_on_lifecycle_status"
     t.index ["product_id"], name: "index_stock_transfers_on_product_id"
     t.index ["property_mapping_id"], name: "index_stock_transfers_on_property_mapping_id"
+    t.index ["warehouse_id"], name: "index_stock_transfers_on_warehouse_id"
     t.index ["workflow_status"], name: "index_stock_transfers_on_workflow_status"
   end
 
@@ -4894,7 +4888,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_06_13_235333) do
     t.integer "currency_code", default: 840
     t.integer "country_code", default: 1
     t.string "timezone", default: "UTC"
-    t.integer "quantity"
+    t.integer "quantity", default: 0, null: false
+    t.integer "reserved_quantity", default: 0, null: false
     t.integer "lifecycle_status"
     t.integer "workflow_status"
     t.integer "business_type"
@@ -4907,16 +4902,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_06_13_235333) do
     t.string "property_string_3"
     t.string "property_string_4"
     t.string "property_string_5"
-    t.string "property_string_6"
-    t.string "property_string_7"
-    t.string "property_string_8"
-    t.string "property_string_9"
-    t.string "property_string_10"
     t.text "property_text_1"
     t.text "property_text_2"
-    t.text "property_text_3"
-    t.text "property_text_4"
-    t.text "property_text_5"
     t.integer "property_integer_1"
     t.integer "property_integer_2"
     t.integer "property_integer_3"
@@ -4927,46 +4914,21 @@ ActiveRecord::Schema[8.0].define(version: 2026_06_13_235333) do
     t.integer "property_integer_8"
     t.integer "property_integer_9"
     t.integer "property_integer_10"
-    t.integer "property_integer_11"
-    t.integer "property_integer_12"
-    t.integer "property_integer_13"
-    t.integer "property_integer_14"
-    t.integer "property_integer_15"
-    t.integer "property_integer_16"
-    t.integer "property_integer_17"
-    t.integer "property_integer_18"
-    t.integer "property_integer_19"
-    t.integer "property_integer_20"
     t.decimal "property_decimal_1", precision: 15, scale: 4
     t.decimal "property_decimal_2", precision: 15, scale: 4
     t.decimal "property_decimal_3", precision: 15, scale: 4
     t.decimal "property_decimal_4", precision: 15, scale: 4
     t.decimal "property_decimal_5", precision: 15, scale: 4
-    t.decimal "property_decimal_6", precision: 15, scale: 4
-    t.decimal "property_decimal_7", precision: 15, scale: 4
-    t.decimal "property_decimal_8", precision: 15, scale: 4
-    t.decimal "property_decimal_9", precision: 15, scale: 4
-    t.decimal "property_decimal_10", precision: 15, scale: 4
     t.boolean "property_boolean_1"
     t.boolean "property_boolean_2"
     t.boolean "property_boolean_3"
     t.boolean "property_boolean_4"
     t.boolean "property_boolean_5"
-    t.boolean "property_boolean_6"
-    t.boolean "property_boolean_7"
-    t.boolean "property_boolean_8"
-    t.boolean "property_boolean_9"
-    t.boolean "property_boolean_10"
     t.datetime "property_datetime_1"
     t.datetime "property_datetime_2"
     t.datetime "property_datetime_3"
     t.datetime "property_datetime_4"
     t.datetime "property_datetime_5"
-    t.datetime "property_datetime_6"
-    t.datetime "property_datetime_7"
-    t.datetime "property_datetime_8"
-    t.datetime "property_datetime_9"
-    t.datetime "property_datetime_10"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["branch_id"], name: "index_stocks_on_branch_id"
@@ -5947,16 +5909,25 @@ ActiveRecord::Schema[8.0].define(version: 2026_06_13_235333) do
   add_foreign_key "stock_exports", "companies"
   add_foreign_key "stock_exports", "products"
   add_foreign_key "stock_exports", "property_mappings"
+  add_foreign_key "stock_exports", "warehouses"
   add_foreign_key "stock_imports", "branches"
   add_foreign_key "stock_imports", "categories"
   add_foreign_key "stock_imports", "companies"
   add_foreign_key "stock_imports", "products"
   add_foreign_key "stock_imports", "property_mappings"
+  add_foreign_key "stock_imports", "warehouses"
+  add_foreign_key "stock_transactions", "branches"
+  add_foreign_key "stock_transactions", "categories"
+  add_foreign_key "stock_transactions", "companies"
+  add_foreign_key "stock_transactions", "products"
+  add_foreign_key "stock_transactions", "property_mappings"
+  add_foreign_key "stock_transactions", "warehouses"
   add_foreign_key "stock_transfers", "branches"
   add_foreign_key "stock_transfers", "categories"
   add_foreign_key "stock_transfers", "companies"
   add_foreign_key "stock_transfers", "products"
   add_foreign_key "stock_transfers", "property_mappings"
+  add_foreign_key "stock_transfers", "warehouses"
   add_foreign_key "stocks", "branches"
   add_foreign_key "stocks", "categories"
   add_foreign_key "stocks", "companies"

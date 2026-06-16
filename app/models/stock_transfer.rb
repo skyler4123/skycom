@@ -23,4 +23,7 @@ class StockTransfer < ApplicationRecord
     return: 2,
     exchange: 3
   }
+  has_many :stock_transactions, as: :appoint_for, dependent: :restrict_with_error
+
+  validates :code, presence: true, uniqueness: true
 end
