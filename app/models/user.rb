@@ -38,6 +38,7 @@ class User < ApplicationRecord
   include User::AvatarConcern
   include User::ChatImagesConcern
   include AddressConcern
+  include User::OmniauthConcern
 
   # --- Business Logic Associations ---
 

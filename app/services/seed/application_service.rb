@@ -61,6 +61,8 @@ class Seed::ApplicationService
     puts "\n========================================================="
     puts "🎉 Seeding is complete! Database is ready to use. 🎉"
     puts "========================================================="
+    # Clear cache to force sign in for current sign in account
+    Rails.cache.clear
     true
   end
 
