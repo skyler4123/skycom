@@ -7,6 +7,8 @@ export default class Companies_Pages_RetailCashierController extends Controller 
   /** @type {{ id: number, name: string, items: { id: number, name: string, price: number, qty: number }[] }[]} */ tabs = []
   /** @type {number} */ activeTabIndex = 0
   /** @type {number} */ tabCounter = 0
+  /** @type {string} */ activePaymentMethod = 'cash'
+  /** @type {number} */ cashReceived = 0
 
   async connect() {
     const pathParts = window.location.pathname.split("/")
@@ -84,22 +86,48 @@ export default class Companies_Pages_RetailCashierController extends Controller 
     this.renderContent()
   }
 
+  setPaymentMethod(event) {
+    this.activePaymentMethod = event.params.method
+    this.renderContent()
+  }
+
+  updateCashReceived(event) {
+    this.cashReceived = parseFloat(event.target.value) || 0
+    this.renderContent()
+  }
+
   pay() {
     const tab = this.activeTab
     if (!tab || tab.items.length === 0) {
-      console.log("Pay clicked — cart is empty")
+      toast({ type: 'warning', message: 'Cart is empty' })
       return
     }
-    console.log("=== PAYMENT ===")
-    console.log("Customer:", tab.name)
-    console.log("Items:", JSON.parse(JSON.stringify(tab.items)))
-    console.log("Total:", this.getTotal().toFixed(2))
-    console.log("==============")
+
+    const total = this.getTotal()
+    const method = this.activePaymentMethod
+
+    toast({ type: 'success', message: `Transaction completed! ${tab.name} paid $${total.toFixed(2)} via ${method}` })
+
+    tab.items = []
+    this.cashReceived = 0
+    this.renderContent()
+  }
+
+  getSubtotal() {
+    if (!this.activeTab) return 0
+    return this.activeTab.items.reduce((sum, i) => sum + (i.price * i.qty), 0)
+  }
+
+  getTax() {
+    return this.getSubtotal() * 0.10
   }
 
   getTotal() {
-    if (!this.activeTab) return 0
-    return this.activeTab.items.reduce((sum, i) => sum + (i.price * i.qty), 0)
+    return this.getSubtotal() + this.getTax()
+  }
+
+  getChangeDue() {
+    return this.cashReceived - this.getTotal()
   }
 
   renderContent() {
@@ -108,157 +136,319 @@ export default class Companies_Pages_RetailCashierController extends Controller 
 
   contentHTML() {
     const p = this.page || {}
-    const branchName = p.branch?.name || ""
-    const pageName = p.name || "Cashier"
+    const branchName = p.branch?.name || ''
+    const pageName = p.name || 'Cashier'
+    const userName = window.currentUser?.name || 'Admin User'
+    const userRole = window.currentUser?.role || 'Administrator'
+    const avatarUrl = window.currentUser?.avatar || ''
 
     return `
-      <div class="h-screen flex flex-col bg-slate-50 overflow-hidden">
-        <div class="bg-white border-b border-slate-200 px-6 py-3 flex items-center justify-between shrink-0">
-          <div class="flex items-center gap-4">
-            <a href="${Helpers.company_pages_path(this.getCompanyId())}"
-              class="text-sm text-slate-400 hover:text-slate-600 cursor-pointer">
-              <span class="material-symbols-outlined text-[18px] align-middle">arrow_back</span>
-            </a>
-            <h1 class="text-lg font-bold text-slate-900">${pageName}</h1>
-            <span class="text-sm text-slate-400">${branchName}</span>
+      <div class="bg-gray-50 text-gray-900 min-h-screen flex flex-col overflow-hidden">
+        ${this.renderHeader(branchName, pageName, userName, userRole, avatarUrl)}
+        <main class="flex flex-1 pt-16 overflow-hidden">
+          <div class="flex-1 flex flex-col p-6 overflow-y-auto">
+            ${this.renderCategoryPills()}
+            ${this.renderProductsSection()}
+            ${this.renderServicesSection()}
+          </div>
+          <aside class="w-[420px] bg-white border-l border-gray-200 flex flex-col shrink-0 relative z-10">
+            ${this.renderOrderHeader()}
+            <div class="flex-1 overflow-y-auto p-4 space-y-3">${this.renderCartItems()}</div>
+            ${this.renderPaymentSection()}
+          </aside>
+        </main>
+        ${this.renderFloatingActions()}
+      </div>
+    `
+  }
+
+  renderHeader(branchName, pageName, userName, userRole, avatarUrl) {
+    return `
+      <header class="fixed top-0 w-full z-50 bg-white shadow-sm flex justify-between items-center h-16 px-8 border-b border-gray-200">
+        <div class="flex items-center gap-6">
+          <div class="text-xl font-bold tracking-tighter text-blue-600">${pageName}</div>
+          <div class="h-6 w-px bg-gray-200 mx-2"></div>
+          <div class="flex items-center gap-2">
+            <span class="material-symbols-outlined text-gray-500">storefront</span>
+            <span class="text-sm font-medium">${branchName || 'Branch'}</span>
           </div>
         </div>
-
-        <div class="flex flex-1 overflow-hidden">
-          <div class="flex flex-col flex-1 min-w-0">
-            <div class="bg-white border-b border-slate-200 px-4 py-2 flex items-center gap-1 overflow-x-auto shrink-0">
-              ${this.tabs.map((tab, i) => `
-                <div class="flex items-center gap-1 px-3 py-1.5 rounded-lg text-sm whitespace-nowrap cursor-pointer transition-colors ${i === this.activeTabIndex ? 'bg-blue-100 text-blue-700 font-semibold' : 'text-slate-600 hover:bg-slate-100'}">
-                  <span data-action="click->${this.identifier}#switchTab" data-${this.identifier}-index-param="${i}">${tab.name}</span>
-                  ${this.tabs.length > 1 ? `
-                    <button data-action="click->${this.identifier}#closeTab" data-${this.identifier}-index-param="${i}"
-                      class="ml-1 text-slate-400 hover:text-red-500 cursor-pointer">
-                      <span class="material-symbols-outlined text-[14px]">close</span>
-                    </button>
-                  ` : ''}
-                </div>
-              `).join('')}
-              <button data-action="click->${this.identifier}#addTab"
-                class="flex items-center gap-1 px-3 py-1.5 text-sm text-blue-600 hover:bg-blue-50 rounded-lg cursor-pointer whitespace-nowrap">
-                <span class="material-symbols-outlined text-[16px]">add</span>
-                Add
-              </button>
+        <div class="flex-1 max-w-xl mx-12">
+          <div class="relative">
+            <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 text-lg">search</span>
+            <input type="text" placeholder="Search products (F1)..."
+              class="w-full bg-gray-100 border-none rounded-lg pl-10 pr-4 py-2 text-sm focus:ring-2 focus:ring-blue-600 transition-all outline-none" />
+          </div>
+        </div>
+        <div class="flex items-center gap-4">
+          <button class="p-2 rounded-full hover:bg-gray-50 transition-colors cursor-pointer">
+            <span class="material-symbols-outlined text-gray-500">notifications</span>
+          </button>
+          <button class="p-2 rounded-full hover:bg-gray-50 transition-colors cursor-pointer">
+            <span class="material-symbols-outlined text-gray-500">help_outline</span>
+          </button>
+          <button class="p-2 rounded-full hover:bg-gray-50 transition-colors cursor-pointer">
+            <span class="material-symbols-outlined text-gray-500">settings</span>
+          </button>
+          <div class="flex items-center gap-3 ml-2 pl-4 border-l border-gray-200">
+            <div class="text-right">
+              <p class="text-xs font-bold">${userName}</p>
+              <p class="text-[10px] text-gray-500">${userRole}</p>
             </div>
-
-            <div class="flex-1 overflow-y-auto p-4">
-              ${this.renderProductGrid()}
+            <div class="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden">
+              ${avatarUrl ? `<img src="${avatarUrl}" class="w-full h-full object-cover" />` : `
+                <span class="material-symbols-outlined text-gray-500 text-sm">person</span>
+              `}
             </div>
           </div>
+        </div>
+      </header>
+    `
+  }
 
-          <div class="w-[380px] bg-white border-l border-slate-200 flex flex-col shrink-0">
-            <div class="px-5 py-3 border-b border-slate-200">
-              <div class="flex items-center justify-between">
-                <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">Cart</span>
-                <span class="text-xs font-medium text-slate-500">${this.activeTab?.name || ''}</span>
-              </div>
-            </div>
-            <div class="flex-1 overflow-y-auto px-5 py-3 space-y-2">${this.renderCartItems()}</div>
-            <div class="px-5 py-4 border-t border-slate-200 bg-slate-50">
-              <div class="flex justify-between items-baseline mb-4">
-                <span class="text-sm font-semibold text-slate-600">Total</span>
-                <span class="text-2xl font-bold text-slate-900">$${this.getTotal().toFixed(2)}</span>
-              </div>
-              <button data-action="click->${this.identifier}#pay"
-                class="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold text-sm transition-colors cursor-pointer">
-                Pay
-              </button>
-            </div>
+  renderCategoryPills() {
+    const categories = [
+      'All Products', 'Tech Accessories', 'Apparel', 'Office Supplies', 'Electronics', 'Services'
+    ]
+    return `
+      <div class="flex items-center gap-3 mb-6 overflow-x-auto pb-2">
+        ${categories.map((cat, i) => `
+          <button class="px-6 py-2 ${i === 0 ? 'bg-blue-600 text-white' : 'bg-white hover:bg-gray-100 border border-gray-200 text-gray-500'} rounded-full font-medium whitespace-nowrap transition-colors cursor-pointer text-sm">
+            ${cat}
+          </button>
+        `).join('')}
+      </div>
+    `
+  }
+
+  renderProductsSection() {
+    if (this.products.length === 0) return ''
+
+    return `
+      <div class="flex justify-between items-end mb-4">
+        <h3 class="text-xs font-bold text-gray-500 uppercase tracking-widest">Products Gallery</h3>
+        <div class="flex gap-2">
+          <button class="p-1.5 rounded bg-white border border-gray-200 hover:bg-gray-50 cursor-pointer">
+            <span class="material-symbols-outlined text-sm text-gray-500">grid_view</span>
+          </button>
+          <button class="p-1.5 rounded bg-white border border-gray-200 hover:bg-gray-50 cursor-pointer">
+            <span class="material-symbols-outlined text-sm text-gray-500">view_list</span>
+          </button>
+        </div>
+      </div>
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4">
+        ${this.products.map(p => this.renderProductCard(p)).join('')}
+      </div>
+    `
+  }
+
+  renderProductCard(p) {
+    return `
+      <div data-action="click->${this.identifier}#addToCart"
+        data-${this.identifier}-id-param="${p.id}"
+        data-${this.identifier}-name-param="${(p.name || '').replace(/"/g, '&quot;')}"
+        data-${this.identifier}-price-param="${p.price || 0}"
+        class="bg-white rounded-xl overflow-hidden shadow-sm border border-gray-200 hover:shadow-lg transition-all cursor-pointer flex flex-col group active:scale-[0.98]">
+        <div class="h-32 overflow-hidden relative">
+          ${p.image_url
+            ? `<img src="${p.image_url}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />`
+            : `<div class="w-full h-full bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center">
+                 <span class="material-symbols-outlined text-3xl text-blue-400">inventory_2</span>
+               </div>`
+          }
+          <div class="absolute inset-0 bg-blue-600/0 group-hover:bg-blue-600/10 transition-colors"></div>
+        </div>
+        <div class="p-4 flex flex-col flex-1">
+          <span class="text-[10px] uppercase tracking-tighter text-gray-500 mb-1">${p.code || 'SKU-' + p.id}</span>
+          <h4 class="font-bold text-gray-900 leading-tight mb-2 text-sm">${p.name || 'Unnamed Product'}</h4>
+          <div class="mt-auto flex justify-between items-center">
+            <span class="text-blue-600 font-black">$${(p.price || 0).toFixed(2)}</span>
+            <span class="material-symbols-outlined text-blue-600 opacity-0 group-hover:opacity-100 transition-opacity">add_circle</span>
           </div>
         </div>
       </div>
     `
   }
 
-  renderProductGrid() {
-    const productCards = this.products.map(p => `
-      <div data-action="click->${this.identifier}#addToCart"
-        data-${this.identifier}-id-param="${p.id}"
-        data-${this.identifier}-name-param="${p.name.replace(/"/g, '&quot;')}"
-        data-${this.identifier}-price-param="${p.price || 0}"
-        class="bg-white rounded-xl border border-slate-200 p-3 hover:shadow-md hover:border-blue-200 transition-all cursor-pointer active:scale-[0.98]">
-        ${p.image_url
-          ? `<div class="w-full h-24 rounded-lg overflow-hidden mb-3 bg-slate-50">
-               <img src="${p.image_url}" class="w-full h-full object-cover" />
-             </div>`
-          : `<div class="w-full h-24 bg-gradient-to-br from-blue-50 to-indigo-100 rounded-lg flex items-center justify-center mb-3">
-               <span class="material-symbols-outlined text-3xl text-blue-400">inventory_2</span>
-             </div>`
-        }
-        <p class="text-sm font-semibold text-slate-900 truncate">${p.name}</p>
-        <p class="text-sm font-bold text-blue-600 mt-1">$${(p.price || 0).toFixed(2)}</p>
-      </div>
-    `).join('')
+  renderServicesSection() {
+    if (this.services.length === 0) return ''
 
-    const serviceCards = this.services.map(s => `
-      <div data-action="click->${this.identifier}#addToCart"
-        data-${this.identifier}-id-param="${s.id}"
-        data-${this.identifier}-name-param="${s.name.replace(/"/g, '&quot;')}"
-        data-${this.identifier}-price-param="${s.price || 0}"
-        class="bg-white rounded-xl border border-slate-200 p-3 hover:shadow-md hover:border-emerald-200 transition-all cursor-pointer active:scale-[0.98]">
-        ${s.image_url
-          ? `<div class="w-full h-24 rounded-lg overflow-hidden mb-3 bg-slate-50">
-               <img src="${s.image_url}" class="w-full h-full object-cover" />
-             </div>`
-          : `<div class="w-full h-24 bg-gradient-to-br from-emerald-50 to-green-100 rounded-lg flex items-center justify-center mb-3">
-               <span class="material-symbols-outlined text-3xl text-emerald-400">spa</span>
-             </div>`
-        }
-        <p class="text-sm font-semibold text-slate-900 truncate">${s.name}</p>
-        <p class="text-sm font-bold text-emerald-600 mt-1">$${(s.price || 0).toFixed(2)}</p>
-      </div>
-    `).join('')
-
-    const sections = []
-    if (productCards) {
-      sections.push(`
-        <div>
-          <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">Products</h3>
-          <div class="grid grid-cols-3 xl:grid-cols-4 gap-3">${productCards}</div>
-        </div>
-      `)
-    }
-    if (serviceCards) {
-      sections.push(`
-        <div class="mt-6">
-          <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">Services</h3>
-          <div class="grid grid-cols-3 xl:grid-cols-4 gap-3">${serviceCards}</div>
-        </div>
-      `)
+    const serviceIconMap = {
+      delivery: 'local_shipping',
+      shipping: 'local_shipping',
+      assembly: 'build',
+      install: 'build',
+      warranty: 'verified',
+      protect: 'verified',
+      gift: 'id_card',
+      wrap: 'id_card',
+      package: 'id_card'
     }
 
-    return sections.length > 0
-      ? sections.join('')
-      : '<div class="flex items-center justify-center h-full text-slate-400 text-sm">No products or services available.</div>'
+    return `
+      <div class="mt-12 mb-6">
+        <h3 class="text-xs font-bold text-gray-500 uppercase tracking-widest mb-4">Retail Services</h3>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          ${this.services.map(s => {
+            const sName = (s.name || '').toLowerCase()
+            const icon = Object.entries(serviceIconMap).find(([key]) => sName.includes(key))?.[1] || 'spa'
+            return `
+              <div data-action="click->${this.identifier}#addToCart"
+                data-${this.identifier}-id-param="${s.id}"
+                data-${this.identifier}-name-param="${(s.name || '').replace(/"/g, '&quot;')}"
+                data-${this.identifier}-price-param="${s.price || 0}"
+                class="bg-gray-100 border border-gray-200 p-4 rounded-xl flex items-center gap-4 hover:border-blue-600 transition-colors cursor-pointer group">
+                <div class="w-12 h-12 rounded-lg bg-blue-600/10 flex items-center justify-center text-blue-600 shrink-0">
+                  <span class="material-symbols-outlined">${icon}</span>
+                </div>
+                <div>
+                  <h4 class="text-sm font-bold text-gray-900">${s.name || 'Service'}</h4>
+                  <p class="text-xs text-gray-500">$${(s.price || 0).toFixed(2)}</p>
+                </div>
+              </div>
+            `
+          }).join('')}
+        </div>
+      </div>
+    `
+  }
+
+  renderOrderHeader() {
+    return `
+      <div class="p-4 border-b border-gray-200">
+        <div class="flex items-center gap-1 overflow-x-auto">
+          ${this.tabs.map((tab, i) => `
+            <div class="flex items-center gap-1 px-3 py-1.5 rounded-lg text-sm whitespace-nowrap transition-colors ${i === this.activeTabIndex ? 'bg-blue-100 text-blue-700 font-semibold' : 'text-gray-500 hover:bg-gray-100'} cursor-pointer">
+              <span data-action="click->${this.identifier}#switchTab" data-${this.identifier}-index-param="${i}">${tab.name}</span>
+              ${this.tabs.length > 1 ? `
+                <button data-action="click->${this.identifier}#closeTab" data-${this.identifier}-index-param="${i}"
+                  class="ml-1 text-gray-400 hover:text-red-500 cursor-pointer">
+                  <span class="material-symbols-outlined text-[14px]">close</span>
+                </button>
+              ` : ''}
+            </div>
+          `).join('')}
+          <button data-action="click->${this.identifier}#addTab"
+            class="flex items-center gap-1 px-3 py-1.5 text-sm text-blue-600 hover:bg-blue-50 rounded-lg cursor-pointer whitespace-nowrap">
+            <span class="material-symbols-outlined text-[16px]">add</span>
+            Add
+          </button>
+        </div>
+      </div>
+    `
   }
 
   renderCartItems() {
     if (!this.activeTab || this.activeTab.items.length === 0) {
-      return '<div class="text-center text-slate-400 py-8 text-sm">Cart is empty</div>'
+      return '<div class="text-center text-gray-400 py-8 text-sm">Cart is empty</div>'
     }
     return this.activeTab.items.map(item => `
-      <div class="flex items-center justify-between p-3 bg-slate-50 rounded-lg gap-3">
-        <div class="flex-1 min-w-0">
-          <p class="text-sm font-medium text-slate-900 truncate">${item.name}</p>
-          <div class="flex items-center gap-1 mt-1.5">
-            <button data-action="click->${this.identifier}#updateQty" data-${this.identifier}-id-param="${item.id}" data-${this.identifier}-delta-param="-1"
-              class="w-7 h-7 rounded-md bg-white border border-slate-200 text-slate-600 hover:text-red-600 hover:border-red-200 flex items-center justify-center text-sm font-medium cursor-pointer">−</button>
-            <span class="text-sm font-semibold w-7 text-center text-slate-900">${item.qty}</span>
-            <button data-action="click->${this.identifier}#updateQty" data-${this.identifier}-id-param="${item.id}" data-${this.identifier}-delta-param="1"
-              class="w-7 h-7 rounded-md bg-white border border-slate-200 text-slate-600 hover:text-emerald-600 hover:border-emerald-200 flex items-center justify-center text-sm font-medium cursor-pointer">+</button>
-          </div>
+      <div class="flex gap-3 bg-gray-50 p-3 rounded-xl border border-gray-200/50 group">
+        <div class="w-16 h-16 rounded-lg bg-white overflow-hidden flex-shrink-0 border border-gray-200 flex items-center justify-center">
+          <span class="material-symbols-outlined text-gray-400">inventory_2</span>
         </div>
-        <div class="text-right shrink-0">
-          <p class="text-sm font-bold text-slate-900">$${(item.price * item.qty).toFixed(2)}</p>
-          <button data-action="click->${this.identifier}#removeFromCart" data-${this.identifier}-id-param="${item.id}"
-            class="text-[11px] text-red-400 hover:text-red-600 cursor-pointer">Remove</button>
+        <div class="flex-1 flex flex-col justify-between min-w-0">
+          <div class="flex justify-between items-start gap-2">
+            <h5 class="text-sm font-bold text-gray-900 truncate">${item.name}</h5>
+            <button data-action="click->${this.identifier}#removeFromCart" data-${this.identifier}-id-param="${item.id}"
+              class="text-gray-400 hover:text-red-600 transition-colors shrink-0 cursor-pointer">
+              <span class="material-symbols-outlined text-sm">close</span>
+            </button>
+          </div>
+          <div class="flex justify-between items-center mt-1">
+            <div class="flex items-center gap-3 bg-white border border-gray-200 rounded-md px-1 py-0.5">
+              <button data-action="click->${this.identifier}#updateQty" data-${this.identifier}-id-param="${item.id}" data-${this.identifier}-delta-param="-1"
+                class="w-5 h-5 flex items-center justify-center text-gray-500 hover:text-blue-600 cursor-pointer">
+                <span class="material-symbols-outlined text-xs">remove</span>
+              </button>
+              <span class="text-xs font-bold w-4 text-center text-gray-900">${item.qty}</span>
+              <button data-action="click->${this.identifier}#updateQty" data-${this.identifier}-id-param="${item.id}" data-${this.identifier}-delta-param="1"
+                class="w-5 h-5 flex items-center justify-center text-gray-500 hover:text-blue-600 cursor-pointer">
+                <span class="material-symbols-outlined text-xs">add</span>
+              </button>
+            </div>
+            <span class="text-sm font-bold text-gray-900">$${(item.price * item.qty).toFixed(2)}</span>
+          </div>
         </div>
       </div>
     `).join('')
+  }
+
+  renderPaymentSection() {
+    const subtotal = this.getSubtotal()
+    const tax = this.getTax()
+    const total = this.getTotal()
+    const changeDue = this.getChangeDue()
+
+    return `
+      <div class="p-6 bg-white border-t border-gray-200">
+        <div class="grid grid-cols-2 gap-2 mb-6 p-1 bg-gray-100 rounded-xl border border-gray-200">
+          <button data-action="click->${this.identifier}#setPaymentMethod" data-${this.identifier}-method-param="cash"
+            class="flex items-center justify-center gap-2 py-2.5 rounded-lg ${this.activePaymentMethod === 'cash' ? 'bg-white shadow-sm border border-gray-200 text-blue-600 font-bold' : 'text-gray-500 font-medium hover:bg-white/50'} transition-all cursor-pointer">
+            <span class="material-symbols-outlined text-sm">payments</span>
+            <span class="text-sm">Cash</span>
+          </button>
+          <button data-action="click->${this.identifier}#setPaymentMethod" data-${this.identifier}-method-param="card"
+            class="flex items-center justify-center gap-2 py-2.5 rounded-lg ${this.activePaymentMethod === 'card' ? 'bg-white shadow-sm border border-gray-200 text-blue-600 font-bold' : 'text-gray-500 font-medium hover:bg-white/50'} transition-all cursor-pointer">
+            <span class="material-symbols-outlined text-sm">credit_card</span>
+            <span class="text-sm">Card</span>
+          </button>
+        </div>
+
+        <div class="space-y-3 mb-6">
+          <div class="flex justify-between text-sm text-gray-500">
+            <span>Subtotal</span>
+            <span>$${subtotal.toFixed(2)}</span>
+          </div>
+          <div class="flex justify-between text-sm text-gray-500">
+            <span>Tax (10%)</span>
+            <span>$${tax.toFixed(2)}</span>
+          </div>
+          <div class="flex justify-between items-center pt-2 border-t border-dashed border-gray-200">
+            <span class="font-bold text-gray-900">Total Amount</span>
+            <span class="text-3xl font-black text-blue-600">$${total.toFixed(2)}</span>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-4 mb-6">
+          <div>
+            <label class="block text-[10px] uppercase tracking-widest text-gray-500 font-bold mb-1.5">Received</label>
+            <div class="relative">
+              <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 font-bold text-sm">$</span>
+              <input type="number" value="${this.cashReceived || ''}" data-action="input->${this.identifier}#updateCashReceived"
+                class="w-full bg-gray-200 border-none rounded-lg pl-7 pr-3 py-3 text-lg font-bold focus:ring-2 focus:ring-blue-600 outline-none" />
+            </div>
+          </div>
+          <div>
+            <label class="block text-[10px] uppercase tracking-widest text-gray-500 font-bold mb-1.5">Change Due</label>
+            <div class="w-full bg-green-50 border border-green-200 rounded-lg px-3 py-3 flex items-center justify-center">
+              <span class="text-lg font-black ${changeDue >= 0 ? 'text-green-600' : 'text-red-600'}">
+                ${changeDue >= 0 ? '$' + changeDue.toFixed(2) : '-$' + Math.abs(changeDue).toFixed(2)}
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <button data-action="click->${this.identifier}#pay"
+          class="w-full bg-blue-600 text-white py-4 rounded-xl text-lg font-black shadow-lg shadow-blue-600/20 hover:brightness-110 active:scale-[0.98] transition-all flex items-center justify-center gap-3 cursor-pointer">
+          <span class="material-symbols-outlined">point_of_sale</span>
+          COMPLETE TRANSACTION
+        </button>
+      </div>
+    `
+  }
+
+  renderFloatingActions() {
+    return `
+      <div class="fixed bottom-8 left-8 flex gap-3 z-50">
+        <button class="w-12 h-12 bg-gray-900 text-white rounded-full shadow-xl flex items-center justify-center hover:scale-110 transition-transform cursor-pointer">
+          <span class="material-symbols-outlined">barcode_scanner</span>
+        </button>
+        <button class="w-12 h-12 bg-white border border-gray-200 text-gray-900 rounded-full shadow-xl flex items-center justify-center hover:scale-110 transition-transform cursor-pointer">
+          <span class="material-symbols-outlined">print</span>
+        </button>
+      </div>
+    `
   }
 
   getCompanyId() {
