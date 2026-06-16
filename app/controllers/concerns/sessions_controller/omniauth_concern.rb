@@ -4,6 +4,7 @@ module SessionsController::OmniauthConcern
   included do
     # Skip CSRF check only if you trust OmniAuth middleware's internal protection
     # skip_before_action :verify_authenticity_token, only: :create_from_omniauth
+    skip_before_action :concern_skip_before_action, only: %i[ create_from_omniauth auth_failure ]
   end
 
   # POST/GET /auth/:provider/callback
@@ -32,5 +33,11 @@ module SessionsController::OmniauthConcern
   # GET /auth/failure
   def auth_failure
     redirect_to sign_in_path, alert: "Google authentication failed or was cancelled."
+  end
+
+  private
+
+  def concern_skip_before_action
+    authenticate
   end
 end

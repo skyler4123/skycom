@@ -5,7 +5,7 @@ class SessionsController < ApplicationController
 
   skip_before_action :set_current_request_details, only: [ :sign_out ]
   skip_before_action :set_current_session, only: [ :sign_out ]
-  skip_before_action :authenticate, only: %i[ create sign_out sign_in_for_test create_from_omniauth auth_failure]
+  skip_before_action :authenticate, only: %i[ create sign_out sign_in_for_test ]
   skip_before_action :sync_client_cache_version, only: [ :sign_out ]
   before_action :set_session, only: :destroy
 
