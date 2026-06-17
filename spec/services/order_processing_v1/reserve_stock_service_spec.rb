@@ -2,6 +2,9 @@
 
 require "rails_helper"
 
+# Ensure the root module file is loaded (defines InsufficientStockError)
+OrderProcessingV1
+
 RSpec.describe OrderProcessingV1::ReserveStockService do
   describe ".call" do
     let(:company) { create(:company) }
@@ -21,8 +24,6 @@ RSpec.describe OrderProcessingV1::ReserveStockService do
       )
     end
     let(:items) { [{ stock_id: stock.id, quantity: 2 }] }
-
-    before { stock.sync_available_counter }
 
     context "when stock is sufficient" do
       it "decrements the Redis counter and returns success" do

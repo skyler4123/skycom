@@ -21,7 +21,7 @@ RSpec.describe OrderProcessingV1::CheckAvailabilityService do
         code: "STK-TEST"
       )
     end
-    let(:items) { [{ stock_id: stock.id, quantity: 3 }] }
+    let(:items) { [ { stock_id: stock.id, quantity: 3 } ] }
 
     before { stock.send(:sync_available_counter) }
 
@@ -32,7 +32,7 @@ RSpec.describe OrderProcessingV1::CheckAvailabilityService do
     end
 
     context "when an item has insufficient stock" do
-      let(:items) { [{ stock_id: stock.id, quantity: 20 }] }
+      let(:items) { [ { stock_id: stock.id, quantity: 20 } ] }
 
       it "returns available: false with the failed item" do
         expect(result[:available]).to be false

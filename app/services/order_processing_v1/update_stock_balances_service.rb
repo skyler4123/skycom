@@ -7,7 +7,7 @@ module OrderProcessingV1
         stock = Stock.find_by!(company_id: order.company_id, product_id: product.id)
 
         Stock.where(id: stock.id).update_all(
-          ["quantity = quantity - ?, reserved_quantity = reserved_quantity - ?", oa.quantity, oa.quantity]
+          [ "quantity = quantity - ?, reserved_quantity = reserved_quantity - ?", oa.quantity, oa.quantity ]
         )
 
         updated << stock.id
