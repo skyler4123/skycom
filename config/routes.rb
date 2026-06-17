@@ -51,6 +51,9 @@ Rails.application.routes.draw do
           get :retail_cashier
         end
       end
+
+      post "order_processing/v1/checkout", to: "order_processing/v1#checkout"
+      post "order_processing/v1/pay", to: "order_processing/v1#pay"
     end
   end
 

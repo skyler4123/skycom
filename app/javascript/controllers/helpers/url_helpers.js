@@ -95,6 +95,9 @@ export const new_company_page_path = (companyId) => `/companies/${companyId}/pag
 export const edit_company_page_path = (companyId, pageId) => `/companies/${companyId}/pages/${pageId}/edit`
 export const retail_cashier_company_page_path = (companyId, pageId) => `/companies/${companyId}/pages/${pageId}/retail_cashier`
 
+export const order_processing_v1_checkout_path = (companyId) => `/companies/${companyId}/order_processing/v1/checkout`
+export const order_processing_v1_pay_path = (companyId) => `/companies/${companyId}/order_processing/v1/pay`
+
 export const company_permissions_path = (companyId) => `/companies/${companyId}/permissions`
 export const edit_company_permission_path = (companyId, permissionId) => `/companies/${companyId}/permissions/${permissionId}`
 

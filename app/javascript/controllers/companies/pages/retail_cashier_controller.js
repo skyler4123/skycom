@@ -4,11 +4,13 @@ export default class Companies_Pages_RetailCashierController extends Controller 
   /** @type {any | null} */ page = null
   /** @type {any[]} */ products = []
   /** @type {any[]} */ services = []
-  /** @type {{ id: number, name: string, items: { id: number, name: string, price: number, qty: number }[] }[]} */ tabs = []
+  /** @type {{ id: number, name: string, items: { id: number, name: string, price: number, qty: number, stockId?: string }[] }[]} */ tabs = []
   /** @type {number} */ activeTabIndex = 0
   /** @type {number} */ tabCounter = 0
   /** @type {string} */ activePaymentMethod = 'cash'
   /** @type {number} */ cashReceived = 0
+  /** @type {string | null} */ orderId = null
+  /** @type {number} */ orderTotal = 0
 
   async connect() {
     const pathParts = window.location.pathname.split("/")
@@ -55,18 +57,20 @@ export default class Companies_Pages_RetailCashierController extends Controller 
   }
 
   addToCart(event) {
-    const { id, name, price } = event.params
+    if (this.orderId) return
+    const { id, name, price, stockId } = event.params
     if (!this.activeTab) return
     const existing = this.activeTab.items.find(i => i.id === id)
     if (existing) {
       existing.qty++
     } else {
-      this.activeTab.items.push({ id, name, price, qty: 1 })
+      this.activeTab.items.push({ id, name, price, qty: 1, stockId })
     }
     this.renderContent()
   }
 
   removeFromCart(event) {
+    if (this.orderId) return
     const { id } = event.params
     if (!this.activeTab) return
     this.activeTab.items = this.activeTab.items.filter(i => i.id !== id)
@@ -74,6 +78,7 @@ export default class Companies_Pages_RetailCashierController extends Controller 
   }
 
   updateQty(event) {
+    if (this.orderId) return
     const { id, delta } = event.params
     if (!this.activeTab) return
     const item = this.activeTab.items.find(i => i.id === id)
@@ -96,20 +101,57 @@ export default class Companies_Pages_RetailCashierController extends Controller 
     this.renderContent()
   }
 
-  pay() {
+  async initiateOrder() {
     const tab = this.activeTab
     if (!tab || tab.items.length === 0) {
       toast({ type: 'warning', message: 'Cart is empty' })
       return
     }
 
-    const total = this.getTotal()
-    const method = this.activePaymentMethod
+    const companyId = this.getCompanyId()
+    const items = tab.items
+      .filter(i => i.stockId)
+      .map(i => ({ stock_id: i.stockId, product_id: i.id, quantity: i.qty, unit_price: i.price }))
 
-    toast({ type: 'success', message: `Transaction completed! ${tab.name} paid $${total.toFixed(2)} via ${method}` })
+    if (items.length === 0) {
+      toast({ type: 'warning', message: 'No stock-tracked items in cart' })
+      return
+    }
 
-    tab.items = []
-    this.cashReceived = 0
+    try {
+      const res = await fetchJson(Helpers.order_processing_v1_checkout_path(companyId), {
+        method: 'POST',
+        body: { branch_id: this.page.branch.id, items }
+      })
+      this.orderId = res.order_id
+      this.orderTotal = res.total_price || 0
+      this.renderContent()
+      toast({ type: 'success', message: 'Order created' })
+    } catch (error) {
+      toast({ type: 'error', message: error.errors?.join(', ') || error.message || 'Failed to create order' })
+    }
+  }
+
+  async pay() {
+    try {
+      await fetchJson(Helpers.order_processing_v1_pay_path(this.getCompanyId()), {
+        method: 'POST',
+        body: { order_id: this.orderId }
+      })
+      toast({ type: 'success', message: 'Payment completed' })
+      this.activeTab.items = []
+      this.orderId = null
+      this.orderTotal = 0
+      this.cashReceived = 0
+      this.renderContent()
+    } catch (error) {
+      toast({ type: 'error', message: error.errors?.join(', ') || error.message || 'Payment failed' })
+    }
+  }
+
+  cancelOrder() {
+    this.orderId = null
+    this.orderTotal = 0
     this.renderContent()
   }
 
@@ -246,6 +288,7 @@ export default class Companies_Pages_RetailCashierController extends Controller 
     return `
       <div data-action="click->${this.identifier}#addToCart"
         data-${this.identifier}-id-param="${p.id}"
+        data-${this.identifier}-stock-id-param="${p.stock_id || ''}"
         data-${this.identifier}-name-param="${(p.name || '').replace(/"/g, '&quot;')}"
         data-${this.identifier}-price-param="${p.price || 0}"
         class="bg-white rounded-xl overflow-hidden shadow-sm border border-gray-200 hover:shadow-lg transition-all cursor-pointer flex flex-col group active:scale-[0.98]">
@@ -342,36 +385,54 @@ export default class Companies_Pages_RetailCashierController extends Controller 
     if (!this.activeTab || this.activeTab.items.length === 0) {
       return '<div class="text-center text-gray-400 py-8 text-sm">Cart is empty</div>'
     }
-    return this.activeTab.items.map(item => `
-      <div class="flex gap-3 bg-gray-50 p-3 rounded-xl border border-gray-200/50 group">
-        <div class="w-16 h-16 rounded-lg bg-white overflow-hidden flex-shrink-0 border border-gray-200 flex items-center justify-center">
-          <span class="material-symbols-outlined text-gray-400">inventory_2</span>
-        </div>
-        <div class="flex-1 flex flex-col justify-between min-w-0">
-          <div class="flex justify-between items-start gap-2">
-            <h5 class="text-sm font-bold text-gray-900 truncate">${item.name}</h5>
-            <button data-action="click->${this.identifier}#removeFromCart" data-${this.identifier}-id-param="${item.id}"
-              class="text-gray-400 hover:text-red-600 transition-colors shrink-0 cursor-pointer">
-              <span class="material-symbols-outlined text-sm">close</span>
-            </button>
+    return this.activeTab.items.map(item => {
+      if (this.orderId) {
+        return `
+          <div class="flex gap-3 bg-gray-50 p-3 rounded-xl border border-gray-200/50">
+            <div class="w-16 h-16 rounded-lg bg-white overflow-hidden flex-shrink-0 border border-gray-200 flex items-center justify-center">
+              <span class="material-symbols-outlined text-gray-400">inventory_2</span>
+            </div>
+            <div class="flex-1 flex flex-col justify-between min-w-0">
+              <h5 class="text-sm font-bold text-gray-900 truncate">${item.name}</h5>
+              <div class="flex justify-between items-center mt-1">
+                <span class="text-xs text-gray-500">Qty: ${item.qty}</span>
+                <span class="text-sm font-bold text-gray-900">$${(item.price * item.qty).toFixed(2)}</span>
+              </div>
+            </div>
           </div>
-          <div class="flex justify-between items-center mt-1">
-            <div class="flex items-center gap-3 bg-white border border-gray-200 rounded-md px-1 py-0.5">
-              <button data-action="click->${this.identifier}#updateQty" data-${this.identifier}-id-param="${item.id}" data-${this.identifier}-delta-param="-1"
-                class="w-5 h-5 flex items-center justify-center text-gray-500 hover:text-blue-600 cursor-pointer">
-                <span class="material-symbols-outlined text-xs">remove</span>
-              </button>
-              <span class="text-xs font-bold w-4 text-center text-gray-900">${item.qty}</span>
-              <button data-action="click->${this.identifier}#updateQty" data-${this.identifier}-id-param="${item.id}" data-${this.identifier}-delta-param="1"
-                class="w-5 h-5 flex items-center justify-center text-gray-500 hover:text-blue-600 cursor-pointer">
-                <span class="material-symbols-outlined text-xs">add</span>
+        `
+      }
+      return `
+        <div class="flex gap-3 bg-gray-50 p-3 rounded-xl border border-gray-200/50 group">
+          <div class="w-16 h-16 rounded-lg bg-white overflow-hidden flex-shrink-0 border border-gray-200 flex items-center justify-center">
+            <span class="material-symbols-outlined text-gray-400">inventory_2</span>
+          </div>
+          <div class="flex-1 flex flex-col justify-between min-w-0">
+            <div class="flex justify-between items-start gap-2">
+              <h5 class="text-sm font-bold text-gray-900 truncate">${item.name}</h5>
+              <button data-action="click->${this.identifier}#removeFromCart" data-${this.identifier}-id-param="${item.id}"
+                class="text-gray-400 hover:text-red-600 transition-colors shrink-0 cursor-pointer">
+                <span class="material-symbols-outlined text-sm">close</span>
               </button>
             </div>
-            <span class="text-sm font-bold text-gray-900">$${(item.price * item.qty).toFixed(2)}</span>
+            <div class="flex justify-between items-center mt-1">
+              <div class="flex items-center gap-3 bg-white border border-gray-200 rounded-md px-1 py-0.5">
+                <button data-action="click->${this.identifier}#updateQty" data-${this.identifier}-id-param="${item.id}" data-${this.identifier}-delta-param="-1"
+                  class="w-5 h-5 flex items-center justify-center text-gray-500 hover:text-blue-600 cursor-pointer">
+                  <span class="material-symbols-outlined text-xs">remove</span>
+                </button>
+                <span class="text-xs font-bold w-4 text-center text-gray-900">${item.qty}</span>
+                <button data-action="click->${this.identifier}#updateQty" data-${this.identifier}-id-param="${item.id}" data-${this.identifier}-delta-param="1"
+                  class="w-5 h-5 flex items-center justify-center text-gray-500 hover:text-blue-600 cursor-pointer">
+                  <span class="material-symbols-outlined text-xs">add</span>
+                </button>
+              </div>
+              <span class="text-sm font-bold text-gray-900">$${(item.price * item.qty).toFixed(2)}</span>
+            </div>
           </div>
         </div>
-      </div>
-    `).join('')
+      `
+    }).join('')
   }
 
   renderPaymentSection() {
@@ -429,11 +490,25 @@ export default class Companies_Pages_RetailCashierController extends Controller 
           </div>
         </div>
 
-        <button data-action="click->${this.identifier}#pay"
-          class="w-full bg-blue-600 text-white py-4 rounded-xl text-lg font-black shadow-lg shadow-blue-600/20 hover:brightness-110 active:scale-[0.98] transition-all flex items-center justify-center gap-3 cursor-pointer">
-          <span class="material-symbols-outlined">point_of_sale</span>
-          COMPLETE TRANSACTION
-        </button>
+        ${this.orderId ? `
+          <div class="grid grid-cols-2 gap-3">
+            <button data-action="click->${this.identifier}#cancelOrder"
+              class="w-full bg-white border-2 border-slate-200 text-slate-700 py-4 rounded-xl text-lg font-black hover:bg-slate-50 active:scale-[0.98] transition-all flex items-center justify-center gap-3 cursor-pointer">
+              Cancel
+            </button>
+            <button data-action="click->${this.identifier}#pay"
+              class="w-full bg-emerald-600 text-white py-4 rounded-xl text-lg font-black shadow-lg shadow-emerald-600/20 hover:brightness-110 active:scale-[0.98] transition-all flex items-center justify-center gap-3 cursor-pointer">
+              <span class="material-symbols-outlined">point_of_sale</span>
+              COMPLETE PAYMENT
+            </button>
+          </div>
+        ` : `
+          <button data-action="click->${this.identifier}#initiateOrder"
+            class="w-full bg-blue-600 text-white py-4 rounded-xl text-lg font-black shadow-lg shadow-blue-600/20 hover:brightness-110 active:scale-[0.98] transition-all flex items-center justify-center gap-3 cursor-pointer">
+            <span class="material-symbols-outlined">shopping_cart</span>
+            ORDER
+          </button>
+        `}
       </div>
     `
   }
