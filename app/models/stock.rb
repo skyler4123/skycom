@@ -30,6 +30,6 @@ class Stock < ApplicationRecord
   private
 
   def sync_available_counter
-    available_counter.value = [quantity - reserved_quantity, 0].max
+    available_counter.value = [ quantity - reserved_quantity, 0 ].max
   end
 end
