@@ -8,7 +8,7 @@ module SessionsController::OmniauthConcern
     # 2. Now that Rails knows it exists, you can safely skip it for OmniAuth routes
     # Skip CSRF check only if you trust OmniAuth middleware's internal protection
     # skip_before_action :verify_authenticity_token, only: :create_from_omniauth
-    skip_before_action :concern_skip_before_action, only: %i[ create_from_omniauth auth_failure ]
+    skip_before_action :concern_skip_before_action, only: %i[ create_from_omniauth auth_failure create sign_out sign_in_for_test ]
   end
 
   # POST/GET /auth/:provider/callback

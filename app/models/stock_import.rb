@@ -7,6 +7,7 @@ class StockImport < ApplicationRecord
 
   belongs_to :company
   belongs_to :branch, optional: true
+  belongs_to :warehouse
   belongs_to :product
   belongs_to :category
   belongs_to :property_mapping

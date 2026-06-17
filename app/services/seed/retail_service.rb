@@ -1388,6 +1388,7 @@ class Seed::RetailService
         Seed::StockTransferService.create(
           company: @retail,
           branch: warehouse.branch,
+          warehouse: warehouse,
           product: product,
           appoint_from: warehouse,
           appoint_to: warehouse.branch,
@@ -1404,10 +1405,12 @@ class Seed::RetailService
       branch_products = @products.select { |p| p.branch_id == branch.id }
       next if branch_products.empty?
 
+      branch_warehouse = @warehouses.find { |w| w.branch_id == branch.id }
       branch_products.sample(rand(2..4)).each do |product|
         Seed::StockImportService.create(
           company: @retail,
           branch: branch,
+          warehouse: branch_warehouse,
           product: product,
           code: "STKIM-#{SecureRandom.hex(4).upcase}",
           quantity: rand(10..100),
@@ -1424,10 +1427,12 @@ class Seed::RetailService
       branch_products = @products.select { |p| p.branch_id == branch.id }
       next if branch_products.empty?
 
+      branch_warehouse = @warehouses.find { |w| w.branch_id == branch.id }
       branch_products.sample(rand(2..4)).each do |product|
         Seed::StockExportService.create(
           company: @retail,
           branch: branch,
+          warehouse: branch_warehouse,
           product: product,
           code: "STKEX-#{SecureRandom.hex(4).upcase}",
           quantity: rand(5..50),

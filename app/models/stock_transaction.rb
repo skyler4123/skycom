@@ -11,7 +11,7 @@ class StockTransaction < ApplicationRecord
   belongs_to :appoint_for, polymorphic: true, optional: true # Anchor document (Import/Export/Transfer)
   belongs_to :appoint_by, polymorphic: true, optional: true  # Operator identity profile
 
-  enum :direction, { increment: 0, decrement: 1 }
+  enum :direction, { add: 0, remove: 1 }
   enum :transaction_type, { import: 0, export: 1, transfer: 2, adjustment: 3 }
 
   validates :quantity, presence: true, numericality: { only_integer: true, greater_than: 0 }
@@ -31,9 +31,9 @@ class StockTransaction < ApplicationRecord
       property_mapping_id: property_mapping_id
     )
 
-    if increment?
+    if add?
       stock.quantity += quantity
-    elsif decrement?
+    elsif remove?
       stock.quantity -= quantity
     end
 

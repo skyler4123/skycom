@@ -26,7 +26,7 @@ class CreateStockTransactions < ActiveRecord::Migration[8.0]
 
       # --- Operational Metrics ---
       t.integer :quantity, null: false
-      t.integer :direction, null: false, index: true        # 0: increment, 1: decrement
+      t.integer :direction, null: false, index: true        # 0: add, 1: remove
       t.integer :transaction_type, null: false, index: true  # e.g., import, export, transfer, adjustment
 
       # --- System Fields ---
