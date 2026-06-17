@@ -31,6 +31,22 @@ RSpec.describe OrderProcessingV1::CheckAvailabilityService do
       end
     end
 
+    context "when Redis counter is missing" do
+      before { Kredis.redis.del("stock:#{stock.id}:available") }
+
+      it "seeds the counter from DB and returns available: true" do
+        stock.update!(quantity: 10, reserved_quantity: 0)
+        expect(result).to eq({ available: true })
+        expect(Kredis.redis.get("stock:#{stock.id}:available").to_i).to eq(10)
+      end
+
+      it "returns available: false when DB also has zero stock" do
+        stock.update!(quantity: 0, reserved_quantity: 0)
+        expect(result[:available]).to be false
+        expect(result[:failed_item]).to eq(stock.id)
+      end
+    end
+
     context "with string quantity param" do
       let(:items) { [ { stock_id: stock.id, quantity: "3" } ] }
 

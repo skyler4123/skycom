@@ -9,15 +9,12 @@ RSpec.describe "Companies::OrderProcessing::V1", type: :request do
   let(:product) { create(:product, company: company) }
   let(:warehouse) { create(:warehouse, company: company) }
   let!(:stock) do
-    cat = Seed::CategoryService.find_or_create_for(company: company, resource_name: "stocks")
     Stock.create!(
       company: company,
       warehouse: warehouse,
       product: product,
       quantity: 10,
-      reserved_quantity: 0,
-      category: cat,
-      property_mapping: cat.property_mapping
+      reserved_quantity: 0
     )
   end
   let(:headers) { { "ACCEPT" => "application/json" } }
@@ -55,8 +52,7 @@ RSpec.describe "Companies::OrderProcessing::V1", type: :request do
     context "with multiple items" do
       let(:product2) { create(:product, company: company) }
       let!(:stock2) do
-        Stock.create!(company:, warehouse:, product: product2, quantity: 5, reserved_quantity: 0,
-          category: stock.category, property_mapping: stock.property_mapping)
+        Stock.create!(company:, warehouse:, product: product2, quantity: 5, reserved_quantity: 0)
           .tap { |s| s.send(:sync_available_counter) }
       end
       let(:checkout_params) do
