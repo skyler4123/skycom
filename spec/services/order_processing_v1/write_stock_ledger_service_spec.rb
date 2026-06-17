@@ -6,9 +6,19 @@ RSpec.describe OrderProcessingV1::WriteStockLedgerService do
     let(:branch) { create(:branch, company: company) }
     let(:product) { create(:product, company: company, branch: branch) }
     let(:warehouse) { create(:warehouse, company: company) }
+    let(:customer) { create(:customer, company: company) }
     let!(:stock) { create(:stock, company: company, product: product, warehouse: warehouse, quantity: 10) }
-    let(:order) { create(:order, company: company, branch: branch, workflow_status: :paid) }
-    let!(:oa) { create(:order_appointment, order: order, company: company, appoint_to: product, quantity: 2, unit_price: 50, total_price: 100) }
+    let(:order) { create(:order, company: company, branch: branch, customer: customer, workflow_status: :paid) }
+    let!(:oa) do
+      OrderAppointment.create!(
+        company: company,
+        order: order,
+        appoint_to: product,
+        quantity: 2,
+        unit_price: 50,
+        total_price: 100
+      )
+    end
 
     it "creates StockTransaction records" do
       expect { described_class.call(order: order) }.to change(StockTransaction, :count).by(1)
