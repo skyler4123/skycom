@@ -6,7 +6,7 @@ module OrderProcessingV1
       items.each do |item|
         stock = Stock.find(item[:stock_id])
         available = stock.available_counter.value
-        return { available: false, failed_item: item[:stock_id] } if available < item[:quantity]
+        return { available: false, failed_item: item[:stock_id] } if available < item[:quantity].to_i
       end
       { available: true }
     end

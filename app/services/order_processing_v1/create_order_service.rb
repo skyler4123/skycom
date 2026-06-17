@@ -5,10 +5,15 @@ module OrderProcessingV1
     def self.call(company:, branch:, items:, customer: nil)
       total_price = items.sum { |i| i[:quantity].to_i * i[:unit_price].to_f }
 
+      order_customer = customer || company.customers.create!(
+        name: "Walk-in Customer #{Time.current.to_i}",
+        business_type: :individual
+      )
+
       order = Order.create!(
         company: company,
         branch: branch,
-        customer: customer,
+        customer: order_customer,
         name: "POS Order #{Time.current.to_i}",
         workflow_status: :pending,
         currency_code: :usd,
