@@ -7,7 +7,7 @@ FactoryBot.define do
     initialize_with do
       Seed::StockService.new(
         warehouse: warehouse,
-        product: product,
+        product_id: product.id,
         company: warehouse.company,
         branch: warehouse.branch
       ).tap do |record|

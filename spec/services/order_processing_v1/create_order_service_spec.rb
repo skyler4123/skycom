@@ -13,7 +13,7 @@ RSpec.describe OrderProcessingV1::CreateOrderService do
     let!(:stock) { create(:stock, company: company, product: product, warehouse: warehouse, quantity: 10) }
     let(:customer) { create(:customer, company: company, branch: branch) }
     let(:items) do
-      [{ stock_id: stock.id, product_id: product.id, quantity: 2, unit_price: 50.00 }]
+      [ { stock_id: stock.id, product_id: product.id, quantity: 2, unit_price: 50.00 } ]
     end
 
     it "creates an Order with workflow_status pending" do
