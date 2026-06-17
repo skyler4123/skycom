@@ -20,4 +20,6 @@ class Stock < ApplicationRecord
     finished_good: 2,
     return: 3
   }
+  validates :quantity, :reserved_quantity, presence: true, numericality: { only_integer: true }
+  validates :warehouse_id, uniqueness: { scope: :product_id, message: "already holds a tracking SKU row mapping for this layout" }
 end

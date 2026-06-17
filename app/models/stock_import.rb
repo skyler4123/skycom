@@ -7,6 +7,7 @@ class StockImport < ApplicationRecord
 
   belongs_to :company
   belongs_to :branch, optional: true
+  belongs_to :warehouse
   belongs_to :product
   belongs_to :category
   belongs_to :property_mapping
@@ -23,4 +24,8 @@ class StockImport < ApplicationRecord
     transfer_in: 2,
     adjustment: 3
   }
+  # Documents connect directly to the logs they spawn via appoint_for anchor context
+  has_many :stock_transactions, as: :appoint_for, dependent: :restrict_with_error
+
+  validates :code, presence: true, uniqueness: true
 end

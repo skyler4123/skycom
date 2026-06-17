@@ -2,6 +2,7 @@ class Seed::StockExportService
   def self.new(
     company:,
     branch: nil,
+    warehouse: nil,
     product:,
     category: nil,
     property_mapping: nil,
@@ -27,6 +28,7 @@ class Seed::StockExportService
     StockExport.new(
       company: company,
       branch: branch,
+      warehouse: warehouse,
       product: product,
       category: category,
       property_mapping: property_mapping,

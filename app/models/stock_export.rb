@@ -7,6 +7,7 @@ class StockExport < ApplicationRecord
 
   belongs_to :company
   belongs_to :branch, optional: true
+  belongs_to :warehouse
   belongs_to :product
   belongs_to :category
   belongs_to :property_mapping
@@ -25,4 +26,7 @@ class StockExport < ApplicationRecord
     damaged: 4,
     expired: 5
   }
+  has_many :stock_transactions, as: :appoint_for, dependent: :restrict_with_error
+
+  validates :code, presence: true, uniqueness: true
 end

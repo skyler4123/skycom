@@ -7,6 +7,7 @@ class StockTransfer < ApplicationRecord
 
   belongs_to :company
   belongs_to :branch, optional: true
+  belongs_to :warehouse
   belongs_to :product
   belongs_to :category
   belongs_to :property_mapping
@@ -23,4 +24,7 @@ class StockTransfer < ApplicationRecord
     return: 2,
     exchange: 3
   }
+  has_many :stock_transactions, as: :appoint_for, dependent: :restrict_with_error
+
+  validates :code, presence: true, uniqueness: true
 end

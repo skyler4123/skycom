@@ -5,6 +5,14 @@ RSpec.feature "Companies::StockExports Management", type: :feature, js: true do
   let(:company) { branch.company }
   let(:owner) { company.user }
 
+  let(:warehouse) do
+    Seed::WarehouseService.create(
+      company: company,
+      branch: branch,
+      name: "Test Warehouse"
+    )
+  end
+
   let(:product) do
     Seed::ProductService.create(
       company: company,
@@ -15,6 +23,7 @@ RSpec.feature "Companies::StockExports Management", type: :feature, js: true do
   let!(:export1) do
     Seed::StockExportService.create(
       company: company,
+      warehouse: warehouse,
       product: product,
       branch: branch,
       code: "STKEX001",
@@ -27,6 +36,7 @@ RSpec.feature "Companies::StockExports Management", type: :feature, js: true do
   let!(:export2) do
     Seed::StockExportService.create(
       company: company,
+      warehouse: warehouse,
       product: product,
       branch: branch,
       code: "STKEX002",

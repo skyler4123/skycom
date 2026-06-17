@@ -31,6 +31,7 @@ RSpec.feature "Companies::StockTransfers Management", type: :feature, js: true d
   let!(:transfer1) do
     Seed::StockTransferService.create(
       company: company,
+      warehouse: warehouse_from,
       product: product,
       branch: branch,
       appoint_from: warehouse_from,
@@ -45,6 +46,7 @@ RSpec.feature "Companies::StockTransfers Management", type: :feature, js: true d
   let!(:transfer2) do
     t = Seed::StockTransferService.create(
       company: company,
+      warehouse: warehouse_to,
       product: product,
       branch: branch,
       appoint_from: warehouse_to,
