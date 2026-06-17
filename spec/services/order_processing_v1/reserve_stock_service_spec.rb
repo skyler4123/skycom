@@ -2,8 +2,7 @@
 
 require "rails_helper"
 
-# Ensure the root module file is loaded (defines InsufficientStockError)
-OrderProcessingV1
+Rails.root.join("app/services/order_processing_v1.rb").then { |f| require f if File.exist?(f) }
 
 RSpec.describe OrderProcessingV1::ReserveStockService do
   describe ".call" do
@@ -23,7 +22,7 @@ RSpec.describe OrderProcessingV1::ReserveStockService do
         property_mapping: property_mapping
       )
     end
-    let(:items) { [{ stock_id: stock.id, quantity: 2 }] }
+    let(:items) { [ { stock_id: stock.id, quantity: 2 } ] }
 
     context "when stock is sufficient" do
       it "decrements the Redis counter and returns success" do
@@ -34,7 +33,7 @@ RSpec.describe OrderProcessingV1::ReserveStockService do
     end
 
     context "when stock runs out" do
-      let(:items) { [{ stock_id: stock.id, quantity: 10 }] }
+      let(:items) { [ { stock_id: stock.id, quantity: 10 } ] }
 
       it "rolls back and raises InsufficientStockError" do
         expect { described_class.call(items: items) }
