@@ -39,6 +39,8 @@ class Companies::OrderProcessing::V1Controller < Companies::ApplicationControlle
       order_id: order.id,
       payment_id: payment_result[:payment_id]
     }
+  rescue OrderProcessingV1::InsufficientStockError
+    render json: { error: "Insufficient stock for payment" }, status: :unprocessable_entity
   end
 
   private

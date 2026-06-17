@@ -52,5 +52,12 @@ RSpec.describe OrderProcessingV1::FinalizeOrderService do
       expect(export.business_type).to eq("sale")
       expect(export.quantity).to eq(2)
     end
+
+    it "links StockExport to the order" do
+      described_class.call(order: order)
+      export = StockExport.last
+      expect(export.appoint_for_type).to eq("Order")
+      expect(export.appoint_for_id).to eq(order.id)
+    end
   end
 end

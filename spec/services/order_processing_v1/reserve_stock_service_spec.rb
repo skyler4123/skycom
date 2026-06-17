@@ -32,6 +32,15 @@ RSpec.describe OrderProcessingV1::ReserveStockService do
       end
     end
 
+    context "with string quantity param" do
+      let(:items) { [ { stock_id: stock.id, quantity: "2" } ] }
+
+      it "decrements the Redis counter" do
+        described_class.call(items: items)
+        expect(stock.available_counter.value).to eq(3)
+      end
+    end
+
     context "when stock runs out" do
       let(:items) { [ { stock_id: stock.id, quantity: 10 } ] }
 

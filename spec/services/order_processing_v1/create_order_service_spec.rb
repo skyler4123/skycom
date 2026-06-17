@@ -32,5 +32,24 @@ RSpec.describe OrderProcessingV1::CreateOrderService do
       expect(result[:order_id]).to be_present
       expect(result[:total_price]).to eq(100.00)
     end
+
+    context "with multiple items" do
+      let(:product2) { create(:product, company: company, branch: branch) }
+      let!(:stock2) { create(:stock, company:, product: product2, warehouse:, quantity: 5) }
+      let(:items) do
+        [
+          { stock_id: stock.id, product_id: product.id, quantity: 2, unit_price: 50.00 },
+          { stock_id: stock2.id, product_id: product2.id, quantity: 3, unit_price: 10.00 }
+        ]
+      end
+
+      it "creates OrderAppointments for each item" do
+        expect { result }.to change(OrderAppointment, :count).by(2)
+      end
+
+      it "returns correct total_price" do
+        expect(result[:total_price]).to eq(130.0)
+      end
+    end
   end
 end

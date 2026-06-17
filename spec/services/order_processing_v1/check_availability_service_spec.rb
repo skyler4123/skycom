@@ -31,6 +31,14 @@ RSpec.describe OrderProcessingV1::CheckAvailabilityService do
       end
     end
 
+    context "with string quantity param" do
+      let(:items) { [ { stock_id: stock.id, quantity: "3" } ] }
+
+      it "returns available: true (handles .to_i)" do
+        expect(result).to eq({ available: true })
+      end
+    end
+
     context "when an item has insufficient stock" do
       let(:items) { [ { stock_id: stock.id, quantity: 20 } ] }
 

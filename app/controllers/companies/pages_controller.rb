@@ -38,9 +38,11 @@ class Companies::PagesController < Companies::ApplicationController
     respond_to do |format|
       format.html { render html: "", layout: true }
       format.json do
+        warehouse_ids = page.branch.warehouse_ids
         products = current_company.products.where(branch_id: page.branch_id).limit(50).map { |p|
           price = p.price
-          { id: p.id, name: p.name, code: p.code, price: price&.to_f || 0, currency: price&.currency.iso_code || "USD", image_url: p.image_attachments.first&.variant(:thumb)&.processed&.url }
+          stock = Stock.find_by(product_id: p.id, warehouse_id: warehouse_ids)
+          { id: p.id, name: p.name, code: p.code, stock_id: stock&.id, price: price&.to_f || 0, currency: price&.currency.iso_code || "USD", image_url: p.image_attachments.first&.variant(:thumb)&.processed&.url }
         }
         services = current_company.services.where(branch_id: page.branch_id).limit(50).map { |s|
           { id: s.id, name: s.name, code: s.code, price: 0, currency: "usd", image_url: s.image_attachments.first&.variant(:thumb)&.processed&.url }

@@ -25,5 +25,13 @@ RSpec.describe OrderProcessingV1::ProcessPaymentService do
     it "returns payment_id" do
       expect(result[:payment_id]).to be_present
     end
+
+    context "when called twice on the same order" do
+      before { described_class.call(order: order) }
+
+      it "raises a validation error on duplicate invoice name" do
+        expect { described_class.call(order: order) }.to raise_error(ActiveRecord::RecordInvalid)
+      end
+    end
   end
 end
