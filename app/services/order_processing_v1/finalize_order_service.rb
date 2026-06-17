@@ -16,7 +16,9 @@ module OrderProcessingV1
           quantity: oa.quantity,
           business_type: :sale,
           code: "EXP-#{Time.current.to_i}-#{SecureRandom.hex(3).upcase}",
-          workflow_status: :completed
+          workflow_status: :completed,
+          appoint_for_type: "Order",
+          appoint_for_id: order.id
         )
 
         export_ids << export.id
