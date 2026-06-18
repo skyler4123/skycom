@@ -42,6 +42,15 @@ class Seed::StockService
 
   def self.create(...)
     stock = new(...)
+    if stock.category.nil? && stock.company.present?
+      stock.category = Seed::CategoryService.random_for(
+        company: stock.company,
+        resource_name: Stock.model_name.plural
+      )
+    end
+    if stock.property_mapping.nil? && stock.category.present?
+      stock.property_mapping = stock.category.property_mapping
+    end
     Seed::PropertyPopulator.populate(stock)
     stock.save!
     stock

@@ -228,9 +228,7 @@ All services live under `OrderProcessingV1` module and use `self.call(...)` — 
 | `items` | `Array` | `[{ stock_id, quantity }]` |
 
 **Behavior:**
-- Checks `Kredis.redis.exists?("stock:<id>:available")` for each item
-- If the Redis key is **missing** (crash/migration), seeds it from `[stock.quantity - stock.reserved_quantity, 0].max` — reads from DB and writes to Redis; subsequent calls use the fast path
-- If the key exists, reads `stock.available_counter.value` (KRedis integer) directly
+- Reads `stock.available_counter.value` (KRedis integer) for each item
 - Returns failure as soon as any item has insufficient quantity
 - String quantities are auto-converted via `.to_i`
 
@@ -255,11 +253,6 @@ All services live under `OrderProcessingV1` module and use `self.call(...)` — 
 - `DECRBY stock:<id>:available` for each item
 - **Rollback**: If any decrement produces a negative result, rolls back ALL prior decrements within the same Redis transaction
 - **Raises**: `OrderProcessingV1::InsufficientStockError` on failure
-
-**Cache miss resilience (before the MULTI block):**
-- Calls `ensure_counters_exist(items, redis)` which runs `EXISTS stock:<id>:available` for each item
-- If any key is missing, seeds it from `[stock.quantity - stock.reserved_quantity, 0].max` via `SET`
-- Prevents `DECRBY` from operating on a zero-default key and triggering a false-negative rollback after a Redis restart
 
 **Returns:**
 ```ruby
@@ -434,27 +427,6 @@ Finalize ─► UPDATE DB quantity, reserved_quantity
          ─► after_save syncs available_counter from DB
 ```
 
-### Cache Miss Recovery
-
-Both `CheckAvailabilityService` and `ReserveStockService` handle Redis cache misses gracefully:
-
-```
-Redis restart/migration → all stock:<id>:available keys gone
-
-Checkout: Stock A
-  ─► exists?("stock:A:available") → false
-  ─► seed from DB: [Stock.quantity - Stock.reserved_quantity, 0].max
-  ─► SET stock:A:available <seeded_value>
-  ─► subsequent calls → key exists → fast path (no DB read)
-
-Pay: Stock A
-  ─► ensure_counters_exist (runs before MULTI block)
-  ─► same exists? check + seed from DB if missing
-  ─► DECRBY operates on a real value, no false-negative rollback
-```
-
-This means the system self-heals after a Redis restart — the first checkout or pay seeds each counter from the database, and all subsequent operations use the fast Redis path.
-
 ---
 
 ## 8. Related Models
@@ -522,9 +494,9 @@ export const order_processing_v1_pay_path = (companyId) =>
 
 | Spec File | Scenarios | Key Fixture Detail |
 |-----------|-----------|-------------------|
-| `spec/services/order_processing_v1/check_availability_service_spec.rb` | Basic availability, insufficient stock, string quantity param, **Redis cache miss seed, DB-zero edge case** | 3 products with stock, KRedis counter setup |
+| `spec/services/order_processing_v1/check_availability_service_spec.rb` | Basic availability, insufficient stock, string quantity param | 3 products with stock, KRedis counter setup |
 | `spec/services/order_processing_v1/create_order_service_spec.rb` | Single item, multiple items, walk-in customer fallback, string quantity param | Company, branch, 3 products |
-| `spec/services/order_processing_v1/reserve_stock_service_spec.rb` | Successful reservation, insufficient stock (rollback), string quantity param, **Redis cache miss seed + decrement** | Stock records with KRedis counter |
+| `spec/services/order_processing_v1/reserve_stock_service_spec.rb` | Successful reservation, insufficient stock (rollback), string quantity param | Stock records with KRedis counter |
 | `spec/services/order_processing_v1/process_payment_service_spec.rb` | Creates invoice + payment, updates order status, double-call raises error | Pending order with order_appointments |
 | `spec/services/order_processing_v1/write_stock_ledger_service_spec.rb` | Creates stock transactions with correct direction/type | Paid order, stock records per product |
 | `spec/services/order_processing_v1/update_stock_balances_service_spec.rb` | Decrements quantity and reserved_quantity, multiple items | Paid order with order_appointments |
