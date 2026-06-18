@@ -36,7 +36,7 @@ RSpec.feature "Companies::Invoices Management", type: :feature, js: true do
     TableConfig.create!(
       company: company,
       category: default_category,
-      property_mapping: default_category.property_mapping,
+      property_mapping: default_category.default_property_mapping,
       resource_name: "invoices",
       columns_metadata: [
         { "key" => "name", "label" => "Invoice Name", "visible" => true, "sortable" => true, "align" => "left", "pinned" => nil, "width" => nil, "roles" => [], "is_virtual" => false, "render_config" => {} },

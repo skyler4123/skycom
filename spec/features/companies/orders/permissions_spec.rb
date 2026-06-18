@@ -12,7 +12,7 @@ RSpec.feature "Companies::Orders Permissions", type: :feature, js: true do
     TableConfig.create!(
       company: company,
       category: default_category,
-      property_mapping: default_category.property_mapping,
+      property_mapping: default_category.default_property_mapping,
       resource_name: "orders",
       columns_metadata: [
         { "key" => "name", "label" => "Order Name", "visible" => true, "sortable" => true, "align" => "left", "pinned" => nil, "width" => nil, "roles" => [], "is_virtual" => false, "render_config" => {} },

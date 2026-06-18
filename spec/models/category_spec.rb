@@ -4,7 +4,7 @@ require 'rails_helper'
 RSpec.describe Category, type: :model do
   describe "associations" do
     it { should belong_to(:company) }
-    it { should have_one(:property_mapping).dependent(:destroy) }
+    it { should have_many(:property_mappings).dependent(:destroy) }
     it { should have_many(:employee_groups).dependent(:nullify) }
     it { should have_many(:employees).dependent(:nullify) }
     it { should have_many(:departments).dependent(:nullify) }

@@ -9,24 +9,24 @@ RSpec.feature "Companies::Pages::RetailCashier", type: :feature, js: true do
   let(:warehouse) { create(:warehouse, company: company, branch: branch) }
   let(:page_record) { create(:page, company: company, branch: branch, target_role: :retail_cashier) }
 
-  let(:cat) { Seed::CategoryService.find_or_create_for(company: company, resource_name: "stocks") }
-  let(:pm) { cat.property_mapping }
-
   let!(:product_a) { create(:product, company: company, branch: branch, name: "Widget Alpha") }
   let!(:product_b) { create(:product, company: company, branch: branch, name: "Widget Beta") }
   let!(:product_c) { create(:product, company: company, branch: branch, name: "Widget Gamma") }
 
   let!(:stock_a) do
+    cat = product_a.category
     Stock.create!(company:, warehouse:, product: product_a, quantity: 10, reserved_quantity: 0, category: cat,
-property_mapping: pm).tap { |s| s.send(:sync_available_counter) }
+property_mapping: cat.default_property_mapping).tap { |s| s.send(:sync_available_counter) }
   end
   let!(:stock_b) do
+    cat = product_b.category
     Stock.create!(company:, warehouse:, product: product_b, quantity: 5, reserved_quantity: 0, category: cat,
-property_mapping: pm).tap { |s| s.send(:sync_available_counter) }
+property_mapping: cat.default_property_mapping).tap { |s| s.send(:sync_available_counter) }
   end
   let!(:stock_c) do
+    cat = product_c.category
     Stock.create!(company:, warehouse:, product: product_c, quantity: 0, reserved_quantity: 0, category: cat,
-property_mapping: pm).tap { |s| s.send(:sync_available_counter) }
+property_mapping: cat.default_property_mapping).tap { |s| s.send(:sync_available_counter) }
   end
 
   before do

@@ -9,7 +9,7 @@ RSpec.describe "Companies::OrderProcessing::V1", type: :request do
   let(:product) { create(:product, company: company) }
   let(:warehouse) { create(:warehouse, company: company) }
   let!(:stock) do
-    cat = Seed::CategoryService.find_or_create_for(company: company, resource_name: "stocks")
+    cat = product.category
     Stock.create!(
       company: company,
       warehouse: warehouse,
@@ -17,7 +17,7 @@ RSpec.describe "Companies::OrderProcessing::V1", type: :request do
       quantity: 10,
       reserved_quantity: 0,
       category: cat,
-      property_mapping: cat.property_mapping
+      property_mapping: cat.default_property_mapping
     )
   end
   let(:headers) { { "ACCEPT" => "application/json" } }

@@ -2,7 +2,7 @@ RSpec.shared_examples "property_mapping concern" do |model_class|
   describe "category and property_mapping consistency" do
     let(:company) { create(:company) }
     let(:category) { create(:category, name: "Test Category #{SecureRandom.uuid}", company: company) }
-    let(:property_mapping) { category.property_mapping }
+    let(:property_mapping) { category.default_property_mapping }
     let(:other_category) { create(:category, name: "Other Category #{SecureRandom.uuid}", company: company) }
     let(:other_property_mapping) { create(:property_mapping, company: company, category: other_category) }
 

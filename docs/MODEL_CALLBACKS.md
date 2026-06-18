@@ -200,11 +200,11 @@ Auto-assigns a default category on create if none is provided. Ensures every res
 
 ### PropertyMappingConcern (`app/models/concerns/property_mapping_concern.rb`)
 
-Auto-assigns a default property_mapping on create if none is provided. Derives `property_mapping` from `category.property_mapping`.
+Auto-assigns a default property_mapping on create if none is provided. Derives `property_mapping` from `category.default_property_mapping`.
 
 | Callback | Line | Method | Description |
 |----------|------|--------|-------------|
-| `before_validation :ensure_property_mapping, on: :create` | 10 | `ensure_property_mapping` | If `property_mapping` is nil and `category` is present, sets `self.property_mapping = category.property_mapping`. Ensures every resource record has a property_mapping for dynamic property resolution. |
+| `before_validation :ensure_property_mapping, on: :create` | 10 | `ensure_property_mapping` | If `property_mapping` is nil and `category` is present, sets `self.property_mapping = category.default_property_mapping`. Ensures every resource record has a property_mapping for dynamic property resolution. |
 | `validate :category_matches_property_mapping_category` | 11 | `category_matches_property_mapping_category` | Ensures the resource's `category_id` matches the `property_mapping.category_id`. Prevents inconsistency on update or manual assignment. Returns early if either association is blank. |
 
 **Included in (48 models):** All models that include `CategoryConcern` (18 models) plus additional managed resources: `Answer`, `Article`, `ArticleGroup`, `Cart`, `CartGroup`, `CustomerGroup`, `Document`, `DocumentGroup`, `Event`, `EventGroup`, `Exam`, `ExamGroup`, `FacilityGroup`, `Membership`, `Notification`, `NotificationGroup`, `OrderGroup`, `Payment`, `ProductGroup`, `Project`, `ProjectGroup`, `Purchase`, `PurchaseItem`, `Question`, `Reservation`, `ServiceGroup`, `Setting`, `SettingGroup`, `Task`, `TaskGroup`

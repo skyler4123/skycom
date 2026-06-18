@@ -3,7 +3,7 @@ class Companies::CategoriesController < Companies::ApplicationController
     respond_to do |format|
       format.html { render html: "", layout: true }
       format.json do
-        scope = current_company.categories.includes(:property_mapping)
+        scope = current_company.categories.includes(:property_mappings)
         scope = scope.where(resource_name: params[:resource_name]) if params[:resource_name].present?
 
         @pagy, @categories = pagy(:offset, scope, jsonapi: true)
@@ -17,7 +17,7 @@ class Companies::CategoriesController < Companies::ApplicationController
   end
 
   def show
-    category = current_company.categories.includes(:property_mapping).find(params[:id])
+    category = current_company.categories.includes(:property_mappings).find(params[:id])
 
     respond_to do |format|
       format.html { render html: "", layout: true }
@@ -37,7 +37,7 @@ class Companies::CategoriesController < Companies::ApplicationController
   end
 
   def edit
-    category = current_company.categories.includes(:property_mapping).find(params[:id])
+    category = current_company.categories.includes(:property_mappings).find(params[:id])
 
     respond_to do |format|
       format.html { render html: "", layout: true }
@@ -61,7 +61,7 @@ class Companies::CategoriesController < Companies::ApplicationController
   end
 
   def update
-    category = current_company.categories.includes(:property_mapping).find(params[:id])
+    category = current_company.categories.includes(:property_mappings).find(params[:id])
 
     if category.update(category_params)
       redirect_to company_category_path(current_company, category), notice: "Category updated successfully."
@@ -82,7 +82,7 @@ class Companies::CategoriesController < Companies::ApplicationController
   def format_category(category)
     category.as_json(
       only: [ :id, :name, :description, :resource_name, :created_at, :updated_at ],
-      include: :property_mapping
+      include: :property_mappings
     )
   end
 

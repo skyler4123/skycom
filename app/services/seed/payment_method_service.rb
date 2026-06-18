@@ -58,7 +58,7 @@ class Seed::PaymentMethodService
         pm.description = "Payment method for #{method_attrs[:name]} transactions."
         pm.business_type = method_attrs[:business_type]
         pm.category = category if category
-        pm.property_mapping = category.property_mapping if category
+        pm.property_mapping = category.default_property_mapping if category
       end
     end
 

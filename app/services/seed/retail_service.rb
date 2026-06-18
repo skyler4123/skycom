@@ -1049,7 +1049,7 @@ class Seed::RetailService
           company: @retail,
           resource_name: resource_name.to_s,
           category: category,
-          property_mapping: category.property_mapping,
+          property_mapping: category.default_property_mapping,
           columns_metadata: keys.map { |k| field_hash(k, entry[:properties]) },
           name: "#{name} table config"
         )

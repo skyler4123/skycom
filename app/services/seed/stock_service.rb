@@ -46,7 +46,7 @@ class Seed::StockService
       stock.category = stock.product.category
     end
     if stock.property_mapping.nil? && stock.category.present?
-      stock.property_mapping = stock.category.property_mapping
+      stock.property_mapping = stock.category.default_property_mapping
     end
     Seed::PropertyPopulator.populate(stock)
     stock.save!

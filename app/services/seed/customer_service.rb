@@ -38,7 +38,7 @@ class Seed::CustomerService
       )
     end
     if customer.property_mapping.nil? && customer.category.present?
-      customer.property_mapping = customer.category.property_mapping
+      customer.property_mapping = customer.category.default_property_mapping
     end
     Seed::PropertyPopulator.populate(customer)
     customer.save!

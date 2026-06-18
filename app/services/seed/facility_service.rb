@@ -34,7 +34,7 @@ class Seed::FacilityService
       )
     end
     if facility.property_mapping.nil? && facility.category.present?
-      facility.property_mapping = facility.category.property_mapping
+      facility.property_mapping = facility.category.default_property_mapping
     end
     Seed::PropertyPopulator.populate(facility)
     facility.save!

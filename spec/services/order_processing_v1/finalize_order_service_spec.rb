@@ -7,22 +7,21 @@ RSpec.describe OrderProcessingV1::FinalizeOrderService do
     let(:product) { create(:product, company: company, branch: branch) }
     let(:customer) { create(:customer, company: company) }
     let(:warehouse) { create(:warehouse, company: company) }
-    let(:category) { Seed::CategoryService.find_or_create_for(company: company, resource_name: "stocks") }
-    let(:property_mapping) { category.property_mapping }
     let!(:stock) do
+      category = product.category
       Stock.create!(
         company: company,
         warehouse: warehouse,
         product: product,
         category: category,
-        property_mapping: property_mapping,
+        property_mapping: category.default_property_mapping,
         quantity: 10,
         reserved_quantity: 0
       )
     end
     let(:order) do
-      order_cat = Seed::CategoryService.find_or_create_for(company: company, resource_name: "orders")
-      order_pm = order_cat.property_mapping
+      order_cat = product.category
+      order_pm = order_cat.default_property_mapping
       Order.create!(
         company: company,
         branch: branch,

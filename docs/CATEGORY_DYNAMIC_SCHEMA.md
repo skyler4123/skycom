@@ -119,7 +119,7 @@ category = Category.create!(
 # => PropertyMapping is auto-created with name "Cosmetics mappings"
 
 # Update property labels on the mapping (array of config objects)
-category.property_mapping.update!(
+category.default_property_mapping.update!(
   property_metadata: [
     { "key" => "property_string_1", "name" => "skin_type_suitability",
       "type" => "string", "label" => "Skin Type Suitability", "validates" => {} },
@@ -384,7 +384,7 @@ Labels live in the `property_metadata` array on the PropertyMapping record:
 ```javascript
 // Get category for current product
 const category = product.category
-const mapping = category.property_mapping || {}
+const mapping = category.property_mappings?.[0] || {}
 
 // Build label map from property_metadata array
 const labelMap = {}
@@ -417,7 +417,7 @@ const columns = (config?.columns_metadata || []).map(f => ({
 
 ```javascript
 function renderDynamicFields(product, category) {
-  const mapping = category.property_mapping || {}
+  const mapping = category.property_mappings?.[0] || {}
   const metadatas = mapping.property_metadata || []
 
   return metadatas.map(config => {
@@ -451,10 +451,18 @@ function renderDynamicFields(product, category) {
 class Category < ApplicationRecord
   belongs_to :company
 
-  has_one :property_mapping, dependent: :destroy
-  has_one :table_config, dependent: :destroy
+  has_many :property_mappings, dependent: :destroy
+  has_many :table_configs, dependent: :destroy
 
   after_create :create_default_property_mapping
+
+  def default_property_mapping
+    property_mappings.first
+  end
+
+  def default_table_config
+    table_configs.first
+  end
 
   has_many :products
   has_many :services

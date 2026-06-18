@@ -60,7 +60,7 @@ class Seed::ProductService
       )
     end
     if product.property_mapping.nil? && product.category.present?
-      product.property_mapping = product.category.property_mapping
+      product.property_mapping = product.category.default_property_mapping
     end
     Seed::PropertyPopulator.populate(product)
     product.save!

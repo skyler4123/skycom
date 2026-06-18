@@ -72,7 +72,7 @@ class Seed::PropertyPopulator
   LABEL_MATCHERS = STRING_VALUES.keys.map { |k| [ /#{Regexp.escape(k)}/i, STRING_VALUES[k] ] }.freeze
 
   def self.populate(record)
-    mapping = record.category&.property_mapping
+    mapping = record.category&.default_property_mapping
     return unless mapping
 
     record.property_mapping ||= mapping

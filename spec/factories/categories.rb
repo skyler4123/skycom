@@ -8,11 +8,11 @@ FactoryBot.define do
     end
 
     after(:create) do |category|
-      next unless category.property_mapping
+      next unless category.default_property_mapping
 
       all_properties = Seed::CategoryService.random_property_labels
       metadatas = Seed::CategoryService.build_property_metadata(all_properties)
-      category.property_mapping.update!(property_metadata: metadatas) if metadatas.present?
+      category.default_property_mapping.update!(property_metadata: metadatas) if metadatas.present?
     end
   end
 end

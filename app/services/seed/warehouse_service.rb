@@ -36,7 +36,7 @@ class Seed::WarehouseService
       )
     end
     if warehouse.property_mapping.nil? && warehouse.category.present?
-      warehouse.property_mapping = warehouse.category.property_mapping
+      warehouse.property_mapping = warehouse.category.default_property_mapping
     end
     Seed::PropertyPopulator.populate(warehouse)
     warehouse.save!

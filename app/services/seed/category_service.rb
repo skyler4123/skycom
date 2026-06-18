@@ -57,7 +57,7 @@ class Seed::CategoryService
     )
     category.save!
     metadatas = build_property_metadata(properties.presence || random_property_labels)
-    category.property_mapping.update!(property_metadata: metadatas) if metadatas.present?
+    category.default_property_mapping.update!(property_metadata: metadatas) if metadatas.present?
 
     category
   end

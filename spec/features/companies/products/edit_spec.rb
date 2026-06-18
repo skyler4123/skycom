@@ -37,7 +37,7 @@ RSpec.feature "Companies::Products Edit", type: :feature, js: true do
         description: Faker::Lorem.sentence(word_count: 12),
         code: "PRD-#{SecureRandom.hex(4).upcase}",
         category: category_cosmetics,
-        property_mapping: category_cosmetics.property_mapping,
+        property_mapping: category_cosmetics.default_property_mapping,
         business_type: Product.business_types.keys.sample,
         workflow_status: Product.workflow_statuses.keys.sample,
         lifecycle_status: Product.lifecycle_statuses.keys.sample

@@ -61,7 +61,7 @@ class Seed::BranchService
       )
     end
     if branch.property_mapping.nil? && branch.category.present?
-      branch.property_mapping = branch.category.property_mapping
+      branch.property_mapping = branch.category.default_property_mapping
     end
     Seed::PropertyPopulator.populate(branch)
     branch.save!

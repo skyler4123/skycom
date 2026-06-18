@@ -10,8 +10,8 @@ RSpec.describe OrderProcessingV1::ReserveStockService do
     let(:product) { create(:product, company: company) }
     let(:warehouse) { create(:warehouse, company: company) }
     let(:stock) do
-      category = Seed::CategoryService.find_or_create_for(company: company, resource_name: "stocks")
-      property_mapping = category.property_mapping
+      category = product.category
+      property_mapping = category.default_property_mapping
       Stock.create!(
         company: company,
         warehouse: warehouse,

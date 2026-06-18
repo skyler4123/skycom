@@ -1,7 +1,7 @@
 import Companies_LayoutController from "controllers/companies/layout_controller"
 
 export default class Companies_Categories_ShowController extends Companies_LayoutController {
-  /** @type {(Category & { property_mapping: any }) | null} */
+  /** @type {(Category & { property_mappings: any[] }) | null} */
   category = null
 
   async connect() {
@@ -37,7 +37,7 @@ export default class Companies_Categories_ShowController extends Companies_Layou
     if (!c) return '<div class="p-8 text-center">Category not found.</div>'
 
     const companyId = window.location.pathname.split("/")[2]
-    const propertyMappingCount = c.property_mapping?.property_metadata?.length || 0
+    const propertyMappingCount = c.property_mappings?.[0]?.property_metadata?.length || 0
 
     return `
       <div class="p-4 overflow-y-auto">

@@ -56,7 +56,7 @@ class Seed::StockTransferService
       )
     end
     if transfer.property_mapping.nil? && transfer.category.present?
-      transfer.property_mapping = transfer.category.property_mapping
+      transfer.property_mapping = transfer.category.default_property_mapping
     end
     Seed::PropertyPopulator.populate(transfer)
     transfer.save!
