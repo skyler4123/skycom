@@ -83,6 +83,7 @@ class Seed::PropertyPopulator
 
       label = config["label"]
       next if label.blank?
+      next unless record.class.column_names.include?(key)
 
       type = config["type"] || key.split("_")[1]
 

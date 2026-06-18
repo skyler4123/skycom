@@ -705,53 +705,6 @@ class Seed::RetailService
       }
     },
 
-    stocks: {
-      "High Value" => {
-        properties: {
-          property_decimal_1: "Unit Cost (VND)",
-          property_decimal_2: "Inventory Insurance Declared Valuation Multiplier Buffer",
-          property_integer_1: "Reorder Threshold Level",
-          property_integer_2: "Mandatory Cycle Count Frequency Window Framework Days",
-          property_boolean_1: "Requires Manager Approval",
-          property_boolean_2: "Tamper Evident Security Tag Strip Seal Required Enclosure",
-          property_string_1: "Protected Reinforced Cage Enclosure Key Allocation Pass",
-          property_string_2: "High-Security Transit Escort Vehicle Classification Protocol",
-          property_string_3: "Specific Serial Number Tracking Format Regex Validator",
-          property_datetime_1: "Next High Value Physical Reconciliation Verification Count"
-        },
-        visible_columns: %w[name property_decimal_1 property_integer_1 property_boolean_1 property_integer_2 property_string_1]
-      },
-      "Fast Moving" => {
-        properties: {
-          property_integer_1: "Daily Turnover Rate",
-          property_integer_2: "Safety Stock Level",
-          property_integer_3: "Cross-Dock Priority Staging Lane ID Placement",
-          property_string_1: "Preferred Bin Location Zone",
-          property_string_2: "Bulk Repackaging Box Unit Layer Optimization Model",
-          property_string_3: "Associated High-Velocity Marketing Campaign Catalyst ID",
-          property_boolean_1: "Eligible for Automatic EDI Replenishment Dispatches",
-          property_boolean_2: "Velocity Class Level-A Strict Racking Proximity Match",
-          property_decimal_1: "Stockout Probability Penalty Volatility Cost Index Factor",
-          property_datetime_1: "Last Vendor Lead Time Consistency Assessment Calibration"
-        },
-        visible_columns: %w[name property_integer_1 property_string_1 property_integer_2 property_boolean_1]
-      },
-      "Slow Moving" => {
-        properties: {
-          property_integer_1: "Days Since Last Movement",
-          property_integer_2: "Observed Consumer Demand Atrophy Progression Index",
-          property_datetime_1: "Inventory Aging Date",
-          property_datetime_2: "Impairment Charge Write-Down Execution Window Deadline",
-          property_boolean_1: "Marked for Clearance",
-          property_boolean_2: "Alternative Outlet Inter-Store Liquidation Routing Candidate",
-          property_string_1: "Deep Long-Term Racking Storage Row Bay Allocation ID",
-          property_string_2: "Markdown Strategy Matrix Tier Classification Reference",
-          property_decimal_1: "Carrying Cost Holding Penalty Overhead Accumulation Factor",
-          property_decimal_2: "Proposed Bundling Promotion Discount Elasticity Percent"
-        },
-        visible_columns: %w[name property_integer_1 property_datetime_1 property_boolean_1 property_string_1]
-      }
-    },
 
     stock_transfers: {
       "Inter-Branch Transfer" => {

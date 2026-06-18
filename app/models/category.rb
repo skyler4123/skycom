@@ -16,6 +16,7 @@ class Category < ApplicationRecord
   has_many :brands, dependent: :nullify
   has_many :customers, dependent: :nullify
   has_many :facilities, dependent: :nullify
+  has_many :stocks, dependent: :nullify
 
   validates :name, uniqueness: { scope: [ :company_id, :resource_name ] }
 

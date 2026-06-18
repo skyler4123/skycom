@@ -1,6 +1,7 @@
 class Stock < ApplicationRecord
-  include CategoryConcern
+  before_validation :inherit_category_from_product, on: :create
   include PropertyMappingConcern
+  validate :category_must_match_product_category
   attribute :permission_resource_name, :string, default: -> { self.name }
 
   include TagConcern
@@ -28,6 +29,19 @@ class Stock < ApplicationRecord
   after_save :sync_available_counter, if: -> { saved_change_to_quantity? || saved_change_to_reserved_quantity? }
 
   private
+
+  def inherit_category_from_product
+    return if category.present?
+    self.category = product.category if product.present?
+  end
+
+  def category_must_match_product_category
+    return unless category.present? && product.present?
+
+    if category_id != product.category_id
+      errors.add(:category, "must match product's category")
+    end
+  end
 
   def sync_available_counter
     available_counter.value = [ quantity - reserved_quantity, 0 ].max

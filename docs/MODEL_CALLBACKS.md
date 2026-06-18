@@ -114,6 +114,15 @@ Callbacks defined directly in the model file (not inherited from a concern).
 
 ---
 
+### Stock (`app/models/stock.rb`)
+
+| Callback | Line | Method | Description |
+|----------|------|--------|-------------|
+| `before_validation :inherit_category_from_product, on: :create` | 3 | `inherit_category_from_product` | Sets `category` from `product.category` if category is nil on create. Ensures stock inherits its product's category. |
+| `validate :category_must_match_product_category` | 4 | `category_must_match_product_category` | Validates that stock's `category_id` matches `product.category_id`. Prevents stocks from belonging to a different category than their product. |
+
+---
+
 ### System (`app/models/system.rb`)
 
 | Callback | Line | Method | Description |
@@ -185,7 +194,7 @@ Auto-assigns a default category on create if none is provided. Ensures every res
 |----------|------|--------|-------------|
 | `before_validation :ensure_category, on: :create` | 10 | `ensure_category` | If `category` is nil and `company` is present, finds or creates a default `Category` record using `find_or_create_by!(company:, resource_name:)` with the model's plural name. Uses the same `find_or_create_for` pattern as seed services. |
 
-**Included in (18 models):** `Branch`, `Brand`, `Customer`, `Department`, `Employee`, `EmployeeGroup`, `Facility`, `Invoice`, `Order`, `Product`, `PropertyMapping`, `Service`, `Stock`, `StockExport`, `StockImport`, `StockTransfer`, `TableConfig`, `Warehouse`
+**Included in (17 models):** `Branch`, `Brand`, `Customer`, `Department`, `Employee`, `EmployeeGroup`, `Facility`, `Invoice`, `Order`, `Product`, `PropertyMapping`, `Service`, `StockExport`, `StockImport`, `StockTransfer`, `TableConfig`, `Warehouse`
 
 ---
 
