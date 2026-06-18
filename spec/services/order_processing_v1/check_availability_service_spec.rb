@@ -16,7 +16,7 @@ RSpec.describe OrderProcessingV1::CheckAvailabilityService do
         product: product,
         company: company,
         quantity: 10,
-        reserved_quantity: 0,
+        reorder: 0,
         name: "Test Stock",
         code: "STK-TEST"
       )

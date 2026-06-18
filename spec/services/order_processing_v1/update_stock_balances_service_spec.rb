@@ -7,7 +7,7 @@ RSpec.describe OrderProcessingV1::UpdateStockBalancesService do
     let(:product) { create(:product, company: company, branch: branch) }
     let(:warehouse) { create(:warehouse, company: company) }
     let(:customer) { create(:customer, company: company) }
-    let!(:stock) { create(:stock, company: company, product: product, warehouse: warehouse, quantity: 10, reserved_quantity: 5) }
+    let!(:stock) { create(:stock, company: company, product: product, warehouse: warehouse, quantity: 10, reorder: 5) }
     let(:order) { create(:order, company: company, branch: branch, customer: customer, workflow_status: :paid) }
     let!(:oa) do
       OrderAppointment.create!(
@@ -20,11 +20,11 @@ RSpec.describe OrderProcessingV1::UpdateStockBalancesService do
       )
     end
 
-    it "reduces quantity and reserved_quantity" do
+    it "reduces quantity and reorder" do
       described_class.call(order: order)
       stock.reload
       expect(stock.quantity).to eq(8)
-      expect(stock.reserved_quantity).to eq(3)
+      expect(stock.reorder).to eq(3)
     end
 
     it "returns updated stock ids" do
@@ -34,7 +34,7 @@ RSpec.describe OrderProcessingV1::UpdateStockBalancesService do
 
     context "with multiple items" do
       let(:product2) { create(:product, company: company, branch: branch) }
-      let!(:stock2) { create(:stock, company:, product: product2, warehouse:, quantity: 20, reserved_quantity: 5) }
+      let!(:stock2) { create(:stock, company:, product: product2, warehouse:, quantity: 20, reorder: 5) }
       let!(:oa2) do
         OrderAppointment.create!(
           company: company, order: order, appoint_to: product2,
@@ -47,9 +47,9 @@ RSpec.describe OrderProcessingV1::UpdateStockBalancesService do
         stock.reload
         stock2.reload
         expect(stock.quantity).to eq(8)
-        expect(stock.reserved_quantity).to eq(3)
+        expect(stock.reorder).to eq(3)
         expect(stock2.quantity).to eq(17)
-        expect(stock2.reserved_quantity).to eq(2)
+        expect(stock2.reorder).to eq(2)
       end
 
       it "returns both stock ids" do

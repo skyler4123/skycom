@@ -20,7 +20,7 @@ class CreateStocks < ActiveRecord::Migration[8.0]
 
       # --- Quantities ---
       t.integer :quantity, null: false, default: 0
-      t.integer :reserved_quantity, null: false, default: 0
+      t.integer :reorder, null: false, default: 0
 
       # --- System Fields ---
       t.integer  :lifecycle_status, index: true

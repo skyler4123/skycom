@@ -15,7 +15,7 @@ RSpec.describe "Companies::OrderProcessing::V1", type: :request do
       warehouse: warehouse,
       product: product,
       quantity: 10,
-      reserved_quantity: 0,
+      reorder: 0,
       category: cat,
       property_mapping: cat.default_property_mapping
     )
@@ -55,7 +55,7 @@ RSpec.describe "Companies::OrderProcessing::V1", type: :request do
     context "with multiple items" do
       let(:product2) { create(:product, company: company) }
       let!(:stock2) do
-        Stock.create!(company:, warehouse:, product: product2, quantity: 5, reserved_quantity: 0,
+        Stock.create!(company:, warehouse:, product: product2, quantity: 5, reorder: 0,
           category: stock.category, property_mapping: stock.property_mapping)
           .tap { |s| s.send(:sync_available_counter) }
       end
