@@ -33,7 +33,7 @@ export default class Companies_Stocks_IndexController extends Companies_LayoutCo
   }
 
   stocksCategories() {
-    return currentCategories().filter(c => c.resource_name === "products")
+    return currentCategories().filter(c => c.resource_name === "stocks")
   }
 
   defaultFilterCategory() {

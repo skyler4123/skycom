@@ -4,9 +4,6 @@ module OrderProcessingV1
   class ReserveStockService
     def self.call(items:)
       redis = Kredis.redis
-
-      ensure_counters_exist(items, redis)
-
       results = redis.multi do |multi|
         items.each do |item|
           multi.decrby("stock:#{item[:stock_id]}:available", item[:quantity])
@@ -27,17 +24,6 @@ module OrderProcessingV1
       end
 
       { success: true }
-    end
-
-    def self.ensure_counters_exist(items, redis)
-      items.each do |item|
-        redis_key = "stock:#{item[:stock_id]}:available"
-        next if redis.exists?(redis_key)
-
-        stock = Stock.find(item[:stock_id])
-        value = [ stock.quantity.to_i - stock.reserved_quantity.to_i, 0 ].max
-        redis.set(redis_key, value)
-      end
     end
   end
 end
