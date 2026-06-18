@@ -28,7 +28,7 @@ RSpec.feature "Companies::Products Management", type: :feature, js: true do
     TableConfig.create!(
       company: company,
       category: default_category,
-      property_mapping: default_category.property_mapping,
+      property_mapping: default_category.default_property_mapping,
       resource_name: "products",
       columns_metadata: [
         { "key" => "name", "label" => "Product Name", "visible" => true, "sortable" => true, "align" => "left", "pinned" => nil, "width" => nil, "roles" => [], "is_virtual" => false, "render_config" => {} },
@@ -88,7 +88,7 @@ RSpec.feature "Companies::Products Management", type: :feature, js: true do
 
   scenario "filter by category updates URL and filters table" do
     category = Seed::CategoryService.create(company: company, name: "Test Category", resource_name: "products")
-    product.update!(category: category, property_mapping: category.property_mapping)
+    product.update!(category: category, property_mapping: category.default_property_mapping)
     visit company_products_path(company)
     expect(page).to have_selector('table', wait: 10)
 
@@ -149,7 +149,7 @@ RSpec.feature "Companies::Products Management", type: :feature, js: true do
       TableConfig.create!(
         company: company,
         category: category_cosmetics,
-        property_mapping: category_cosmetics.property_mapping,
+        property_mapping: category_cosmetics.default_property_mapping,
         resource_name: "products",
         columns_metadata: [
           { "key" => "name", "label" => "Product Name", "visible" => true, "sortable" => true, "align" => "left", "pinned" => nil, "width" => nil, "roles" => [], "is_virtual" => false, "render_config" => {} },
@@ -168,7 +168,7 @@ RSpec.feature "Companies::Products Management", type: :feature, js: true do
       TableConfig.create!(
         company: company,
         category: category_supplements,
-        property_mapping: category_supplements.property_mapping,
+        property_mapping: category_supplements.default_property_mapping,
         resource_name: "products",
         columns_metadata: [
           { "key" => "name", "label" => "Product Name", "visible" => true, "sortable" => true, "align" => "left", "pinned" => nil, "width" => nil, "roles" => [], "is_virtual" => false, "render_config" => {} },
@@ -190,7 +190,7 @@ RSpec.feature "Companies::Products Management", type: :feature, js: true do
           description: Faker::Lorem.sentence(word_count: 12),
           code: "PRD-#{SecureRandom.hex(4).upcase}",
           category: category_cosmetics,
-          property_mapping: category_cosmetics.property_mapping,
+          property_mapping: category_cosmetics.default_property_mapping,
           business_type: Product.business_types.keys.sample,
           workflow_status: Product.workflow_statuses.keys.sample,
           lifecycle_status: Product.lifecycle_statuses.keys.sample
@@ -210,7 +210,7 @@ RSpec.feature "Companies::Products Management", type: :feature, js: true do
           description: Faker::Lorem.sentence(word_count: 12),
           code: "PRD-#{SecureRandom.hex(4).upcase}",
           category: category_supplements,
-          property_mapping: category_supplements.property_mapping,
+          property_mapping: category_supplements.default_property_mapping,
           business_type: Product.business_types.keys.sample,
           workflow_status: Product.workflow_statuses.keys.sample,
           lifecycle_status: Product.lifecycle_statuses.keys.sample

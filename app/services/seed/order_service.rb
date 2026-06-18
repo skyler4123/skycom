@@ -38,7 +38,7 @@ class Seed::OrderService
       )
     end
     if order.property_mapping.nil? && order.category.present?
-      order.property_mapping = order.category.property_mapping
+      order.property_mapping = order.category.default_property_mapping
     end
     Seed::PropertyPopulator.populate(order)
     order.save!

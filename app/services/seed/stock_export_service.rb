@@ -56,7 +56,7 @@ class Seed::StockExportService
       )
     end
     if stock_export.property_mapping.nil? && stock_export.category.present?
-      stock_export.property_mapping = stock_export.category.property_mapping
+      stock_export.property_mapping = stock_export.category.default_property_mapping
     end
     Seed::PropertyPopulator.populate(stock_export)
     stock_export.save!

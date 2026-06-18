@@ -43,7 +43,7 @@ class Seed::ServiceService
       )
     end
     if service.property_mapping.nil? && service.category.present?
-      service.property_mapping = service.category.property_mapping
+      service.property_mapping = service.category.default_property_mapping
     end
     Seed::PropertyPopulator.populate(service)
     service.save!

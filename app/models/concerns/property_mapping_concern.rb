@@ -12,7 +12,7 @@ module PropertyMappingConcern
     return if property_mapping.present?
     return unless category.present?
 
-    self.property_mapping = category.property_mapping
+    self.property_mapping = category.default_property_mapping
   end
 
   def category_matches_property_mapping_category

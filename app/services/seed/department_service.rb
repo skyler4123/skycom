@@ -26,7 +26,7 @@ class Seed::DepartmentService
       )
     end
     if department.property_mapping.nil? && department.category.present?
-      department.property_mapping = department.category.property_mapping
+      department.property_mapping = department.category.default_property_mapping
     end
     Seed::PropertyPopulator.populate(department)
     department.save!

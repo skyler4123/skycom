@@ -114,6 +114,15 @@ Callbacks defined directly in the model file (not inherited from a concern).
 
 ---
 
+### Stock (`app/models/stock.rb`)
+
+| Callback | Line | Method | Description |
+|----------|------|--------|-------------|
+| `before_validation :inherit_category_from_product, on: :create` | 3 | `inherit_category_from_product` | Sets `category` from `product.category` if category is nil on create. Ensures stock inherits its product's category. |
+| `validate :category_must_match_product_category` | 4 | `category_must_match_product_category` | Validates that stock's `category_id` matches `product.category_id`. Prevents stocks from belonging to a different category than their product. |
+
+---
+
 ### System (`app/models/system.rb`)
 
 | Callback | Line | Method | Description |
@@ -185,17 +194,17 @@ Auto-assigns a default category on create if none is provided. Ensures every res
 |----------|------|--------|-------------|
 | `before_validation :ensure_category, on: :create` | 10 | `ensure_category` | If `category` is nil and `company` is present, finds or creates a default `Category` record using `find_or_create_by!(company:, resource_name:)` with the model's plural name. Uses the same `find_or_create_for` pattern as seed services. |
 
-**Included in (18 models):** `Branch`, `Brand`, `Customer`, `Department`, `Employee`, `EmployeeGroup`, `Facility`, `Invoice`, `Order`, `Product`, `PropertyMapping`, `Service`, `Stock`, `StockExport`, `StockImport`, `StockTransfer`, `TableConfig`, `Warehouse`
+**Included in (17 models):** `Branch`, `Brand`, `Customer`, `Department`, `Employee`, `EmployeeGroup`, `Facility`, `Invoice`, `Order`, `Product`, `PropertyMapping`, `Service`, `StockExport`, `StockImport`, `StockTransfer`, `TableConfig`, `Warehouse`
 
 ---
 
 ### PropertyMappingConcern (`app/models/concerns/property_mapping_concern.rb`)
 
-Auto-assigns a default property_mapping on create if none is provided. Derives `property_mapping` from `category.property_mapping`.
+Auto-assigns a default property_mapping on create if none is provided. Derives `property_mapping` from `category.default_property_mapping`.
 
 | Callback | Line | Method | Description |
 |----------|------|--------|-------------|
-| `before_validation :ensure_property_mapping, on: :create` | 10 | `ensure_property_mapping` | If `property_mapping` is nil and `category` is present, sets `self.property_mapping = category.property_mapping`. Ensures every resource record has a property_mapping for dynamic property resolution. |
+| `before_validation :ensure_property_mapping, on: :create` | 10 | `ensure_property_mapping` | If `property_mapping` is nil and `category` is present, sets `self.property_mapping = category.default_property_mapping`. Ensures every resource record has a property_mapping for dynamic property resolution. |
 | `validate :category_matches_property_mapping_category` | 11 | `category_matches_property_mapping_category` | Ensures the resource's `category_id` matches the `property_mapping.category_id`. Prevents inconsistency on update or manual assignment. Returns early if either association is blank. |
 
 **Included in (48 models):** All models that include `CategoryConcern` (18 models) plus additional managed resources: `Answer`, `Article`, `ArticleGroup`, `Cart`, `CartGroup`, `CustomerGroup`, `Document`, `DocumentGroup`, `Event`, `EventGroup`, `Exam`, `ExamGroup`, `FacilityGroup`, `Membership`, `Notification`, `NotificationGroup`, `OrderGroup`, `Payment`, `ProductGroup`, `Project`, `ProjectGroup`, `Purchase`, `PurchaseItem`, `Question`, `Reservation`, `ServiceGroup`, `Setting`, `SettingGroup`, `Task`, `TaskGroup`

@@ -27,7 +27,7 @@ class Seed::BrandService
       )
     end
     if brand.property_mapping.nil? && brand.category.present?
-      brand.property_mapping = brand.category.property_mapping
+      brand.property_mapping = brand.category.default_property_mapping
     end
     Seed::PropertyPopulator.populate(brand)
     brand.save!

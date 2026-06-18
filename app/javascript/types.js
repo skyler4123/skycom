@@ -85,7 +85,7 @@
 
 // --- 13. TAXONOMY (TAGS, CATEGORIES, BRANDS) ---
 /** @typedef {Object} PropertyMapping @property {string} id @property {string} company_id @property {string} [category_id] @property {string} name @property {Object[]} property_metadata @property {Metadata} metadata */
-/** @typedef {Object} Category @property {string} id @property {string} company_id @property {string} name @property {string} description @property {string} resource_name @property {PropertyMapping} [property_mapping] @property {Metadata} metadata */
+/** @typedef {Object} Category @property {string} id @property {string} company_id @property {string} name @property {string} description @property {string} resource_name @property {PropertyMapping[]} [property_mappings] @property {Metadata} metadata */
 /** @typedef {Object} Tag @property {string} id @property {string} company_id @property {string} name @property {string} description @property {string} code */
 /** @typedef {Object} Brand @property {string} id @property {string} category_id @property {string} name @property {string} description @property {string} code @property {number} lifecycle_status @property {string} workflow_status @property {string} business_type @property {string} discarded_at @property {Metadata} metadata */
 

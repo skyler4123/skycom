@@ -33,7 +33,7 @@ RSpec.feature "Companies::Customers Management", type: :feature, js: true do
     TableConfig.create!(
       company: company,
       category: default_category,
-      property_mapping: default_category.property_mapping,
+      property_mapping: default_category.default_property_mapping,
       resource_name: "customers",
       columns_metadata: [
         { "key" => "name", "label" => "Customer Name", "visible" => true, "sortable" => true, "align" => "left", "pinned" => nil, "width" => nil, "roles" => [], "is_virtual" => false, "render_config" => {} },
@@ -91,7 +91,7 @@ RSpec.feature "Companies::Customers Management", type: :feature, js: true do
 
   scenario "filter by category updates URL and filters table" do
     category = Seed::CategoryService.create(company: company, name: "Test Category", resource_name: "customers")
-    customer.update!(category: category, property_mapping: category.property_mapping)
+    customer.update!(category: category, property_mapping: category.default_property_mapping)
     visit company_customers_path(company)
     expect(page).to have_selector('table', wait: 10)
 

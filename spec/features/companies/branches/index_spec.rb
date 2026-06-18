@@ -15,7 +15,7 @@ RSpec.feature "Companies::Branches Management", type: :feature, js: true do
     TableConfig.create!(
       company: company,
       category: default_category,
-      property_mapping: default_category.property_mapping,
+      property_mapping: default_category.default_property_mapping,
       resource_name: "branches",
       columns_metadata: [
         { "key" => "name", "label" => "Branch Name", "visible" => true, "sortable" => true, "align" => "left", "pinned" => nil, "width" => nil, "roles" => [], "is_virtual" => false, "render_config" => {} },
@@ -75,7 +75,7 @@ RSpec.feature "Companies::Branches Management", type: :feature, js: true do
 
   scenario "filter by category updates URL and filters table" do
     category = Seed::CategoryService.create(company: company, name: "Test Category", resource_name: "branches")
-    branch.update!(category: category, property_mapping: category.property_mapping)
+    branch.update!(category: category, property_mapping: category.default_property_mapping)
     visit company_branches_path(company)
     expect(page).to have_selector('table', wait: 10)
 

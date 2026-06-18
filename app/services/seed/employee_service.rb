@@ -50,7 +50,7 @@ class Seed::EmployeeService
       )
     end
     if employee.property_mapping.nil? && employee.category.present?
-      employee.property_mapping = employee.category.property_mapping
+      employee.property_mapping = employee.category.default_property_mapping
     end
     Seed::PropertyPopulator.populate(employee)
     employee.save!

@@ -16,7 +16,7 @@ FactoryBot.define do
     before(:create) do |record, evaluator|
       category = evaluator.pm_category || create(:category)
       record.category = category
-      record.property_mapping = category.property_mapping
+      record.property_mapping = category.default_property_mapping
     end
   end
 end
