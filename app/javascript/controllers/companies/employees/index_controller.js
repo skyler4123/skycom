@@ -1,7 +1,7 @@
 import Companies_LayoutController from "controllers/companies/layout_controller"
 
 export default class Companies_Employees_IndexController extends Companies_LayoutController {
-  static targets = ["categorySelect", "employeesList"]
+  static targets = ["employeesList"]
 
   /** @type {(Employee & { departments: Department[], roles: Role[], branch: Branch })[]} */
   employees = []
@@ -76,8 +76,6 @@ export default class Companies_Employees_IndexController extends Companies_Layou
                   <select
                     name="category_id"
                     class="pl-3 pr-10 py-2 text-sm border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300"
-                    data-${this.identifier}-target="categorySelect"
-                    data-action="change->${this.identifier}#onCategoryChange"
                   >
                     ${selectOptionsHTML(cloneNewKey(categoryFilter, "id", "value"), categoryValue)}
                   </select>
@@ -139,26 +137,4 @@ export default class Companies_Employees_IndexController extends Companies_Layou
     `
   }
 
-  onCategoryChange(event) {
-    const categoryId = event.target.value
-    this.categoryIdValue = categoryId
-
-    const propertyMapping = currentPropertyMappings().find(m => m.category_id === categoryId)
-    if (propertyMapping) this.propertyMappingIdValue = propertyMapping.id
-
-    const tableConfig = currentTableConfigs().find(c => c.property_mapping_id === this.propertyMappingIdValue)
-    if (tableConfig) this.tableConfigIdValue = tableConfig.id
-
-    this.employees = []
-
-    fetchJson({ params: { category_id: categoryId } })
-      .then(response => {
-        this.employees = response.employees || []
-        this.pagination = response.pagination || {}
-        this.renderContent()
-      })
-      .catch(error => {
-        toast({ type: "error", message: "Failed to load employees" })
-      })
-  }
 }

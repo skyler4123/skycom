@@ -273,8 +273,6 @@ export default class Companies_Products_IndexController extends Companies_Layout
                   <select
                     name="category_id"
                     class="pl-3 pr-10 py-2 text-sm border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300"
-                    data-${this.identifier}-target="categorySelect"
-                    data-action="change->${this.identifier}#onCategoryChange"
                   >
                     ${selectOptionsHTML(cloneNewKey(categoryFilter, "id", "value"), categoryValue)}
                   </select>
@@ -334,25 +332,6 @@ export default class Companies_Products_IndexController extends Companies_Layout
       </div>
     `
   }
-
-  onCategoryChange(event) {
-    const categoryId = event.target.value
-    this.categoryIdValue = categoryId
-
-    const propertyMapping = currentPropertyMappings().find(m => m.category_id === categoryId)
-    if (propertyMapping) this.propertyMappingIdValue = propertyMapping.id
-
-    const tableConfig = currentTableConfigs().find(c => c.property_mapping_id === this.propertyMappingIdValue)
-    if (tableConfig) this.tableConfigIdValue = tableConfig.id
-
-    this.products = []
-    fetchJson({ params: { category_id: categoryId } })
-      .then(response => {
-        this.products = response.products || []
-        this.pagination = response.pagination || {}
-        this.renderContent()
-      })
-  }
 }
 ```
 
@@ -366,7 +345,6 @@ export default class Companies_Products_IndexController extends Companies_Layout
 | `table()` helper | Renders dynamic column table with `mappingLookup` |
 | `renderActions` callback | Renders the "Edit" column with links to `/edit` |
 | Name `<a>` link | Each record name links to the show page |
-| `onCategoryChange()` | Client-side category switch without page reload |
 | `productsCategories()` / `defaultFilterCategory()` | Category helpers scoped to resource |
 
 ### Category Filter Rules
