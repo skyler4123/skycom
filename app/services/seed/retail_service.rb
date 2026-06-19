@@ -1325,6 +1325,7 @@ class Seed::RetailService
           warehouse: warehouse,
           product_id: product.id,
           quantity: rand(50..200),
+          reorder: rand(10..30),
           name: product.name
         )
       end

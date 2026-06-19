@@ -4889,7 +4889,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_06_13_235333) do
     t.integer "country_code", default: 1
     t.string "timezone", default: "UTC"
     t.integer "quantity", default: 0, null: false
-    t.integer "reserved_quantity", default: 0, null: false
+    t.integer "reorder", default: 0, null: false
     t.integer "lifecycle_status"
     t.integer "workflow_status"
     t.integer "business_type"

@@ -98,7 +98,15 @@ export default class Companies_Pages_RetailCashierController extends Controller 
 
   updateCashReceived(event) {
     this.cashReceived = parseFloat(event.target.value) || 0
-    this.renderContent()
+    this.refreshChangeDue()
+  }
+
+  refreshChangeDue() {
+    const el = document.getElementById('cashier-change-due')
+    if (!el) return
+    const changeDue = this.getChangeDue()
+    el.textContent = (changeDue >= 0 ? '$' : '-$') + Math.abs(changeDue).toFixed(2)
+    el.className = `text-lg font-black ${changeDue >= 0 ? 'text-green-600' : 'text-red-600'}`
   }
 
   async initiateOrder() {
@@ -193,7 +201,7 @@ export default class Companies_Pages_RetailCashierController extends Controller 
             ${this.renderProductsSection()}
             ${this.renderServicesSection()}
           </div>
-          <aside class="w-[420px] bg-white border-l border-gray-200 flex flex-col shrink-0 relative z-10">
+          <aside class="w-1/3 bg-white border-l border-gray-200 flex flex-col shrink-0 relative z-10">
             ${this.renderOrderHeader()}
             <div class="flex-1 overflow-y-auto p-4 space-y-3">${this.renderCartItems()}</div>
             ${this.renderPaymentSection()}
@@ -484,7 +492,7 @@ export default class Companies_Pages_RetailCashierController extends Controller 
             <label class="block text-[10px] uppercase tracking-widest text-gray-500 font-bold mb-1.5">Change Due</label>
             <div class="w-full bg-green-50 border border-green-200 rounded-lg px-3 py-3 flex items-center justify-center">
               <span class="text-lg font-black ${changeDue >= 0 ? 'text-green-600' : 'text-red-600'}">
-                ${changeDue >= 0 ? '$' + changeDue.toFixed(2) : '-$' + Math.abs(changeDue).toFixed(2)}
+                <span id="cashier-change-due">${changeDue >= 0 ? '$' + changeDue.toFixed(2) : '-$' + Math.abs(changeDue).toFixed(2)}</span>
               </span>
             </div>
           </div>

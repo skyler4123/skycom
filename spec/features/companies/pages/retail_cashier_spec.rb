@@ -15,17 +15,17 @@ RSpec.feature "Companies::Pages::RetailCashier", type: :feature, js: true do
 
   let!(:stock_a) do
     cat = product_a.category
-    Stock.create!(company:, warehouse:, product: product_a, quantity: 10, reserved_quantity: 0, category: cat,
+    Stock.create!(company:, warehouse:, product: product_a, quantity: 10, reorder: 0, category: cat,
 property_mapping: cat.default_property_mapping).tap { |s| s.send(:sync_available_counter) }
   end
   let!(:stock_b) do
     cat = product_b.category
-    Stock.create!(company:, warehouse:, product: product_b, quantity: 5, reserved_quantity: 0, category: cat,
+    Stock.create!(company:, warehouse:, product: product_b, quantity: 5, reorder: 0, category: cat,
 property_mapping: cat.default_property_mapping).tap { |s| s.send(:sync_available_counter) }
   end
   let!(:stock_c) do
     cat = product_c.category
-    Stock.create!(company:, warehouse:, product: product_c, quantity: 0, reserved_quantity: 0, category: cat,
+    Stock.create!(company:, warehouse:, product: product_c, quantity: 0, reorder: 0, category: cat,
 property_mapping: cat.default_property_mapping).tap { |s| s.send(:sync_available_counter) }
   end
 

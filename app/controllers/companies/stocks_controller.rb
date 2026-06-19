@@ -22,13 +22,14 @@ class Companies::StocksController < Companies::ApplicationController
 
   def format_stock(stock)
     stock.as_json(only: [
-      :id, :name, :quantity,
+      :id, :name, :quantity, :reorder,
       :business_type, :lifecycle_status, :workflow_status,
       :created_at, :updated_at
     ]).merge(
       product_name: stock.product&.name,
       warehouse_name: stock.warehouse&.name,
-      branch_name: stock.branch&.name
+      branch_name: stock.branch&.name,
+      category_name: stock.category&.name
     )
   end
 

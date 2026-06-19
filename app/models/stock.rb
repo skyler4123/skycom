@@ -21,12 +21,12 @@ class Stock < ApplicationRecord
     finished_good: 2,
     return: 3
   }
-  validates :quantity, :reserved_quantity, presence: true, numericality: { only_integer: true }
+  validates :quantity, :reorder, presence: true, numericality: { only_integer: true }
   validates :warehouse_id, uniqueness: { scope: :product_id, message: "already holds a tracking SKU row mapping for this layout" }
 
   kredis_integer :available_counter, key: ->(s) { "stock:#{s.id}:available" }
 
-  after_save :sync_available_counter, if: -> { saved_change_to_quantity? || saved_change_to_reserved_quantity? }
+  after_save :sync_available_counter, if: -> { saved_change_to_quantity? || saved_change_to_reorder? }
 
   private
 
@@ -44,6 +44,6 @@ class Stock < ApplicationRecord
   end
 
   def sync_available_counter
-    available_counter.value = [ quantity - reserved_quantity, 0 ].max
+    available_counter.value = [ quantity - reorder, 0 ].max
   end
 end

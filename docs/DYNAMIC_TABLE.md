@@ -100,33 +100,20 @@ const resolvedLabel = col.key.startsWith("property_")
 | `code` key | Monospace badge |
 | `workflow_status` key | `Helpers.statusBadge()` |
 
-### 2.4 Client-Side Category Switch
+### 2.4 Page-Navigation Category Switch
 
-`onCategoryChange()` handles category `<select>` changes without page reload:
+Category filter uses a `<form method="get">` with the Search button for full page navigation:
 
 ```javascript
-onCategoryChange(event) {
-  const categoryId = event.target.value
-  this.categoryIdValue = categoryId
-
-  // Re-resolve PropertyMapping + TableConfig from cache
-  const propertyMapping = currentPropertyMappings().find(m => m.category_id === categoryId)
-  if (propertyMapping) this.propertyMappingIdValue = propertyMapping.id
-
-  const tableConfig = currentTableConfigs().find(c => c.property_mapping_id === this.propertyMappingIdValue)
-  if (tableConfig) this.tableConfigIdValue = tableConfig.id
-
-  // Clear + fetch new data
-  this.products = []
-  fetchJson({ params: { category_id: categoryId } })
-    .then(response => {
-      this.products = response.products || []
-      this.renderContent()
-    })
-}
+<form method="get" action="${pathname()}">
+  <select name="category_id">
+    ${selectOptionsHTML(cloneNewKey(categoryFilter, "id", "value"), categoryValue)}
+  </select>
+  <button type="submit">Search</button>
+</form>
 ```
 
-The `<select>` element has `data-action="change->${this.identifier}#onCategoryChange"` and does NOT navigate — it re-fetches and re-renders in place.
+The `<select>` has no JS change handler — changing the category requires clicking "Search" to navigate to `?category_id=X` (full page reload).
 
 ---
 
@@ -300,7 +287,7 @@ end
    - `connect()` with PM/TC resolution
    - `contentHTML()` with dynamic `visibleColumns.map()`
    - `renderCellContent()` with type-aware switch
-   - `onCategoryChange()` for client-side category switch
+   - Category filter via `<form method="get">` + Search button (page navigation)
    - `productsCategories()` / `defaultFilterCategory()` helpers
 
 2. **NewModalController** — `extends Controller`, implement:

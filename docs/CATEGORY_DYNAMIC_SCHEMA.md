@@ -15,7 +15,7 @@ The **Category + PropertyMapping + TableConfig** system provides a complete **Dy
 | **TableConfig** | Defines visible columns, layout, and permissions | **JSONB array** of column hashes (e.g., `[{ "key": "name", "label": "Name", "visible": true, ... }]`) |
 | **Resource (Product, Employee, etc.)** | Stores actual data | **Typed values** (string, integer, boolean, etc.) in individual `property_*` columns |
 
-Each Category `has_one` PropertyMapping — they are created together. The `after_create` callback on Category guarantees every category has a dedicated PropertyMapping. Each Category also `has_one` TableConfig.
+Each Category `has_one` PropertyMapping — they are created together. The `after_create` callback on Category guarantees every category has a dedicated PropertyMapping. Each Category also `has_many` TableConfigs (with `default_table_config` returning `.first`).
 
 The same `property_string_1` column can mean "Skin Type Suitability" for Cosmetics products, but "Corporate Level" for Management employees — determined by the PropertyMapping attached to the Category. The TableConfig then decides whether that column is visible in the table view.
 
@@ -154,7 +154,7 @@ Each Category has a TableConfig that defines which columns are visible, their di
 
 ```ruby
 # TableConfig for the Cosmetics category
-cosmetics_category.table_config.columns_metadata
+cosmetics_category.default_table_config.columns_metadata
 # => [{ "key" => "name", "label" => "Name", "visible" => true, "sortable" => true, "align" => "left", "pinned" => "left", "width" => 250, "roles" => [], "is_virtual" => false, "render_config" => {} },
 #     { "key" => "property_string_1", "label" => "Skin Type Suitability", "visible" => true, "sortable" => true, "align" => "left", ... },
 #     ...]
@@ -400,7 +400,7 @@ The frontend combines `TableConfig.columns_metadata` with `PropertyMapping` labe
 
 ```javascript
 // Load table config + property mapping to build column array
-const config = category.table_config
+const config = category.table_configs?.[0]
 const columns = (config?.columns_metadata || []).map(f => ({
   field: f.key,
   title: f.key.startsWith("property_") ? (f.label || f.key) : f.label,
@@ -618,7 +618,8 @@ This returns `[]` when the cache hasn't loaded, so `defaultFilterCategory()` ret
 | **Resource stores** | Actual typed data in individual `property_*` columns |
 | **Link** | `category_id` on resource tables; `property_mapping.category_id` on PropertyMapping; `table_config.category_id` on TableConfig |
 | **Category ↔ PropertyMapping** | `has_one` — auto-created via `after_create` callback |
-| **Category ↔ TableConfig** | `has_one` — explicitly seeded from `visible_columns`, auto-converted to field hashes |
+| **Category ↔ TableConfig** | `has_many` — explicitly seeded from `visible_columns`, auto-converted to field hashes |
+| **PropertyMapping ↔ TableConfig** | `has_many` — `default_table_config` returns `.first` |
 | **Uniqueness** | `name` + `resource_name` scoped to `company_id` |
 
 This system allows different industries (retail, clinic, etc.) to have completely different metadata schemas for the same generic `property_*` columns without code changes.

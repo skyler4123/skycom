@@ -60,10 +60,12 @@ export default class Companies_Stocks_IndexController extends Companies_LayoutCo
               </div>
 
 
-              <button type="submit" class="h-[38px] px-6 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors font-medium text-sm flex items-center gap-2">
-                <span class="material-symbols-outlined text-[18px]">search</span>
-                Search
-              </button>
+              <div class="flex gap-2 mt-auto">
+                <button type="submit" class="h-[38px] px-6 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors font-medium text-sm flex items-center gap-2">
+                  <span class="material-symbols-outlined text-[18px]">search</span>
+                  Search
+                </button>
+              </div>
             </div>
           </form>
 
@@ -72,6 +74,7 @@ export default class Companies_Stocks_IndexController extends Companies_LayoutCo
               <thead>
                 <tr class="text-sm text-slate-500 dark:text-slate-400 bg-slate-50 dark:bg-slate-800/50 border-b border-slate-200 dark:border-slate-700">
                   <th class="py-4 px-6 font-medium whitespace-nowrap">Product</th>
+                  <th class="py-4 px-6 font-medium whitespace-nowrap">Category</th>
                   <th class="py-4 px-6 font-medium whitespace-nowrap">Warehouse</th>
                   <th class="py-4 px-6 font-medium whitespace-nowrap">Quantity</th>
                   <th class="py-4 px-6 font-medium whitespace-nowrap">Reorder</th>
@@ -87,6 +90,7 @@ export default class Companies_Stocks_IndexController extends Companies_LayoutCo
                     <td class="py-4 px-6 text-sm">
                       <p class="font-medium text-slate-900 dark:text-white">${stock.product_name || 'N/A'}</p>
                     </td>
+                    <td class="py-4 px-6 text-sm text-slate-600 dark:text-slate-300">${stock.category_name || '—'}</td>
                     <td class="py-4 px-6 text-sm text-slate-600 dark:text-slate-300">${stock.warehouse_name || 'N/A'}</td>
                     <td class="py-4 px-6 text-sm">
                       <span class="font-medium ${stock.quantity <= stock.reorder ? 'text-red-600 dark:text-red-400' : 'text-slate-900 dark:text-white'}">

@@ -17,7 +17,7 @@ RSpec.describe OrderProcessingV1::ReserveStockService do
         warehouse: warehouse,
         product: product,
         quantity: 5,
-        reserved_quantity: 0,
+        reorder: 0,
         category: category,
         property_mapping: property_mapping
       )

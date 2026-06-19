@@ -28,6 +28,7 @@ class Companies::StockTransfersController < Companies::ApplicationController
     ]).merge(
       product_name: transfer.product&.name,
       branch_name: transfer.branch&.name,
+      category_name: transfer.category&.name,
       from_name: format_polymorphic_name(transfer.appoint_from),
       to_name: format_polymorphic_name(transfer.appoint_to)
     )

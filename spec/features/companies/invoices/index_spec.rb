@@ -78,6 +78,7 @@ RSpec.feature "Companies::Invoices Management", type: :feature, js: true do
     expect(page).to have_selector('table', wait: 10)
 
     expect(page).to have_selector('th', text: 'Invoice Name')
+    expect(page).to have_selector('th', text: 'Category')
     expect(page).to have_selector('th', text: 'Status')
 
     expect(page).to have_selector('tbody tr')

@@ -60,10 +60,12 @@ export default class Companies_StockTransfers_IndexController extends Companies_
               </div>
 
 
-              <button type="submit" class="h-[38px] px-6 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors font-medium text-sm flex items-center gap-2">
-                <span class="material-symbols-outlined text-[18px]">search</span>
-                Search
-              </button>
+              <div class="flex gap-2 mt-auto">
+                <button type="submit" class="h-[38px] px-6 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors font-medium text-sm flex items-center gap-2">
+                  <span class="material-symbols-outlined text-[18px]">search</span>
+                  Search
+                </button>
+              </div>
             </div>
           </form>
 
@@ -73,6 +75,7 @@ export default class Companies_StockTransfers_IndexController extends Companies_
                 <tr class="text-sm text-slate-500 dark:text-slate-400 bg-slate-50 dark:bg-slate-800/50 border-b border-slate-200 dark:border-slate-700">
                   <th class="py-4 px-6 font-medium whitespace-nowrap">Code</th>
                   <th class="py-4 px-6 font-medium whitespace-nowrap">Product</th>
+                  <th class="py-4 px-6 font-medium whitespace-nowrap">Category</th>
                   <th class="py-4 px-6 font-medium whitespace-nowrap">From</th>
                   <th class="py-4 px-6 font-medium whitespace-nowrap">To</th>
                   <th class="py-4 px-6 font-medium whitespace-nowrap">Quantity</th>
@@ -87,6 +90,7 @@ export default class Companies_StockTransfers_IndexController extends Companies_
                       <span class="font-mono font-medium text-slate-900 dark:text-white">${transfer.code || 'N/A'}</span>
                     </td>
                     <td class="py-4 px-6 text-sm text-slate-600 dark:text-slate-300">${transfer.product_name || 'N/A'}</td>
+                    <td class="py-4 px-6 text-sm text-slate-600 dark:text-slate-300">${transfer.category_name || '—'}</td>
                     <td class="py-4 px-6 text-sm text-slate-600 dark:text-slate-300">${transfer.from_name || 'N/A'}</td>
                     <td class="py-4 px-6 text-sm text-slate-600 dark:text-slate-300">${transfer.to_name || 'N/A'}</td>
                     <td class="py-4 px-6 text-sm text-slate-900 dark:text-white font-medium">${transfer.quantity || 0}</td>

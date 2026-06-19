@@ -25,7 +25,7 @@ RSpec.describe Stock, type: :model do
         warehouse: warehouse,
         category: category,
         quantity: 10,
-        reserved_quantity: 0
+        reorder: 0
       )
       stock.valid?
       expect(stock.errors[:category]).to be_blank
@@ -39,7 +39,7 @@ RSpec.describe Stock, type: :model do
         warehouse: warehouse,
         category: other_category,
         quantity: 10,
-        reserved_quantity: 0
+        reorder: 0
       )
       stock.valid?
       expect(stock.errors[:category]).to include("must match product's category")
@@ -51,7 +51,7 @@ RSpec.describe Stock, type: :model do
         product: product,
         warehouse: warehouse,
         quantity: 10,
-        reserved_quantity: 0
+        reorder: 0
       )
       stock.validate
       expect(stock.category_id).to eq(product.category_id)

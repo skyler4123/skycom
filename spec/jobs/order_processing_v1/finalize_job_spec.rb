@@ -6,7 +6,7 @@ RSpec.describe OrderProcessingV1::FinalizeJob do
     let(:branch) { create(:branch, company: company) }
     let(:product) { create(:product, company: company, branch: branch) }
     let(:warehouse) { create(:warehouse, company: company) }
-    let!(:stock) { create(:stock, company: company, product: product, warehouse: warehouse, quantity: 10, reserved_quantity: 5) }
+    let!(:stock) { create(:stock, company: company, product: product, warehouse: warehouse, quantity: 10, reorder: 5) }
     let(:customer) { create(:customer, company: company) }
     let(:category) { create(:category, company: company, resource_name: "orders") }
     let(:order) { create(:order, company: company, branch: branch, customer: customer, category: category, workflow_status: :paid) }
@@ -28,7 +28,7 @@ RSpec.describe OrderProcessingV1::FinalizeJob do
 
       stock.reload
       expect(stock.quantity).to eq(8)
-      expect(stock.reserved_quantity).to eq(3)
+      expect(stock.reorder).to eq(3)
     end
 
     it "is idempotent" do

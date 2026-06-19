@@ -15,6 +15,7 @@ RSpec.feature "Companies::Facilities Management", type: :feature, js: true do
     visit company_facilities_path(company)
 
     expect(page).to have_selector('table', wait: 10)
+    expect(page).to have_selector('th', text: 'Category')
     expect(page).to have_selector('thead th', minimum: 2)
     expect(page).to have_selector('tbody tr')
     expect(page).to have_content(facility.name)

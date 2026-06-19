@@ -54,7 +54,11 @@ class PropertyMapping < ApplicationRecord
   belongs_to :company
   belongs_to :category
 
-  has_one :table_config, dependent: :destroy
+  has_many :table_configs, dependent: :destroy
+
+  def default_table_config
+    table_configs.first
+  end
 
   has_many :answers, dependent: :restrict_with_error
   has_many :articles, dependent: :restrict_with_error
