@@ -58,6 +58,7 @@ RSpec.feature "Companies::Branches Management", type: :feature, js: true do
     expect(page).to have_selector('table', wait: 10)
 
     expect(page).to have_selector('th', text: 'Branch Name')
+    expect(page).to have_selector('th', text: 'Category')
     expect(page).to have_selector('th', text: 'Type')
     expect(page).to have_selector('th', text: 'Status')
 

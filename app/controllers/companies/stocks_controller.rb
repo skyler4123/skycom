@@ -28,7 +28,8 @@ class Companies::StocksController < Companies::ApplicationController
     ]).merge(
       product_name: stock.product&.name,
       warehouse_name: stock.warehouse&.name,
-      branch_name: stock.branch&.name
+      branch_name: stock.branch&.name,
+      category_name: stock.category&.name
     )
   end
 

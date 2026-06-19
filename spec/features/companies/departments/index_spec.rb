@@ -65,6 +65,7 @@ RSpec.feature "Companies::Departments Management", type: :feature, js: true do
     expect(page).to have_selector('table', wait: 10)
 
     expect(page).to have_selector('th', text: 'Department Name')
+    expect(page).to have_selector('th', text: 'Category')
     expect(page).to have_selector('th', text: 'Status')
 
     expect(page).to have_selector('tbody tr')

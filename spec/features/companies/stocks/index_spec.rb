@@ -58,6 +58,7 @@ RSpec.feature "Companies::Stocks Management", type: :feature, js: true do
     expect(page).to have_selector('table', wait: 10)
 
     expect(page).to have_selector('th', text: 'Product')
+    expect(page).to have_selector('th', text: 'Category')
     expect(page).to have_selector('th', text: 'Warehouse')
     expect(page).to have_selector('th', text: 'Type')
     expect(page).to have_selector('th', text: 'Status')

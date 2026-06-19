@@ -75,6 +75,7 @@ export default class Companies_StockImports_IndexController extends Companies_La
                 <tr class="text-sm text-slate-500 dark:text-slate-400 bg-slate-50 dark:bg-slate-800/50 border-b border-slate-200 dark:border-slate-700">
                   <th class="py-4 px-6 font-medium whitespace-nowrap">Code</th>
                   <th class="py-4 px-6 font-medium whitespace-nowrap">Product</th>
+                  <th class="py-4 px-6 font-medium whitespace-nowrap">Category</th>
                   <th class="py-4 px-6 font-medium whitespace-nowrap">From</th>
                   <th class="py-4 px-6 font-medium whitespace-nowrap">To</th>
                   <th class="py-4 px-6 font-medium whitespace-nowrap">Quantity</th>
@@ -89,6 +90,7 @@ export default class Companies_StockImports_IndexController extends Companies_La
                       <span class="font-mono font-medium text-slate-900 dark:text-white">${import_data.code || 'N/A'}</span>
                     </td>
                     <td class="py-4 px-6 text-sm text-slate-600 dark:text-slate-300">${import_data.product_name || 'N/A'}</td>
+                    <td class="py-4 px-6 text-sm text-slate-600 dark:text-slate-300">${import_data.category_name || '—'}</td>
                     <td class="py-4 px-6 text-sm text-slate-600 dark:text-slate-300">${import_data.from_name || 'N/A'}</td>
                     <td class="py-4 px-6 text-sm text-slate-600 dark:text-slate-300">${import_data.to_name || 'N/A'}</td>
                     <td class="py-4 px-6 text-sm text-slate-900 dark:text-white font-medium">${import_data.quantity || 0}</td>

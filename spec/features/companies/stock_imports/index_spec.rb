@@ -57,6 +57,7 @@ RSpec.feature "Companies::StockImports Management", type: :feature, js: true do
 
     expect(page).to have_selector('th', text: 'Code')
     expect(page).to have_selector('th', text: 'Product')
+    expect(page).to have_selector('th', text: 'Category')
     expect(page).to have_selector('th', text: 'From')
     expect(page).to have_selector('th', text: 'To')
     expect(page).to have_selector('th', text: 'Quantity')

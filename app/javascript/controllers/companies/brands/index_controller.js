@@ -58,6 +58,11 @@ export default class Companies_Brands_IndexController extends Companies_LayoutCo
     const rawColumns = tableConfig?.columns_metadata || fallbackColumns
     const visibleColumns = rawColumns.filter(col => col.visible !== false)
 
+    if (!visibleColumns.some(c => c.key === "category")) {
+      const nameIdx = visibleColumns.findIndex(c => c.key === "name")
+      if (nameIdx >= 0) visibleColumns.splice(nameIdx + 1, 0, { key: "category", label: "Category" })
+    }
+
     const mappingLookup = (propertyMapping?.property_metadata || []).reduce((acc, field) => {
       acc[field.key] = field
       return acc
@@ -115,7 +120,8 @@ export default class Companies_Brands_IndexController extends Companies_LayoutCo
                   </div>
                 `,
                 code: (value) => `<span class="font-mono text-xs bg-slate-100 dark:bg-slate-800/60 px-2 py-0.5 rounded text-slate-600 dark:text-slate-300 font-medium">${value || '—'}</span>`,
-                workflow_status: (value) => `${Helpers.statusBadge(value)}`
+                workflow_status: (value) => `${Helpers.statusBadge(value)}`,
+                category: (value, record) => record.category?.name || '<span class="text-slate-300 dark:text-slate-700">—</span>',
               },
               renderActions: (record) => `
                 <td class="py-4 px-6 text-sm text-right whitespace-nowrap">

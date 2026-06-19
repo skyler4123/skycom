@@ -59,6 +59,11 @@ export default class Companies_Facilities_IndexController extends Companies_Layo
     const rawColumns = tableConfig?.columns_metadata || fallbackColumns
     const visibleColumns = rawColumns.filter(col => col.visible !== false)
 
+    if (!visibleColumns.some(c => c.key === "category")) {
+      const nameIdx = visibleColumns.findIndex(c => c.key === "name")
+      if (nameIdx >= 0) visibleColumns.splice(nameIdx + 1, 0, { key: "category", label: "Category" })
+    }
+
     const mappingLookup = (propertyMapping?.property_metadata || []).reduce((acc, field) => {
       acc[field.key] = field
       return acc
@@ -117,7 +122,8 @@ export default class Companies_Facilities_IndexController extends Companies_Layo
                 `,
                 code: (value) => `<span class="font-mono text-xs bg-slate-100 dark:bg-slate-800/60 px-2 py-0.5 rounded text-slate-600 dark:text-slate-300 font-medium">${value || '—'}</span>`,
                 business_type: (value) => `<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900/50 dark:text-blue-300">${Helpers.capitalize(value?.replace('_', ' ') || '')}</span>`,
-                workflow_status: (value) => `${Helpers.statusBadge(value)}`
+                workflow_status: (value) => `${Helpers.statusBadge(value)}`,
+                category: (value, record) => record.category?.name || '<span class="text-slate-300 dark:text-slate-700">—</span>',
               },
               renderActions: (record) => `
                 <td class="py-4 px-6 text-sm text-right whitespace-nowrap">

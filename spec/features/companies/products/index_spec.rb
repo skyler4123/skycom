@@ -71,6 +71,7 @@ RSpec.feature "Companies::Products Management", type: :feature, js: true do
     expect(page).to have_selector('table', wait: 10)
 
     expect(page).to have_selector('th', text: 'Product Name')
+    expect(page).to have_selector('th', text: 'Category')
     expect(page).to have_selector('th', text: 'Type')
     expect(page).to have_selector('th', text: 'Status')
 
@@ -255,6 +256,7 @@ RSpec.feature "Companies::Products Management", type: :feature, js: true do
       expect(page).to have_selector('table', wait: 10)
 
       expect(page).to have_selector('th', text: 'Product Name', wait: 10)
+      expect(page).to have_selector('th', text: 'Category', wait: 10)
       expect(page).to have_selector('th', text: 'Code', wait: 10)
       expect(page).to have_selector('th', text: 'Skin Type', wait: 10)
       expect(page).to have_selector('th', text: 'Key Ingredients', wait: 10)
@@ -275,6 +277,7 @@ RSpec.feature "Companies::Products Management", type: :feature, js: true do
 
       expect(page).to have_selector('table', wait: 10)
       expect(page).to have_selector('th', text: 'Key Ingredients', wait: 10)
+      expect(page).to have_selector('th', text: 'Category', wait: 10)
 
       select(category_supplements.name, from: 'category_id')
       click_button "Search"

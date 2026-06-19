@@ -58,6 +58,7 @@ RSpec.feature "Companies::Brands Management", type: :feature, js: true do
     expect(page).to have_selector('table', wait: 10)
 
     expect(page).to have_selector('th', text: 'Brand Name')
+    expect(page).to have_selector('th', text: 'Category')
     expect(page).to have_selector('th', text: 'Status')
 
     expect(page).to have_selector('tbody tr')
