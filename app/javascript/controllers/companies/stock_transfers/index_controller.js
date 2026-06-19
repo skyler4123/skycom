@@ -60,10 +60,12 @@ export default class Companies_StockTransfers_IndexController extends Companies_
               </div>
 
 
-              <button type="submit" class="h-[38px] px-6 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors font-medium text-sm flex items-center gap-2">
-                <span class="material-symbols-outlined text-[18px]">search</span>
-                Search
-              </button>
+              <div class="flex gap-2 mt-auto">
+                <button type="submit" class="h-[38px] px-6 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors font-medium text-sm flex items-center gap-2">
+                  <span class="material-symbols-outlined text-[18px]">search</span>
+                  Search
+                </button>
+              </div>
             </div>
           </form>
 
