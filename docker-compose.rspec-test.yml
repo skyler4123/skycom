@@ -15,6 +15,7 @@ services:
       - sqlite_storage:/rails/storage
     depends_on:
       - postgres
+      - postgres_pulse
 
   job:
     build: .
