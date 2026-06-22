@@ -802,6 +802,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_06_13_235333) do
     t.integer "employee_count"
     t.integer "fiscal_year_end_month"
     t.text "resource_names", default: [], array: true
+    t.jsonb "features", default: [], array: true
     t.integer "lifecycle_status"
     t.integer "workflow_status"
     t.integer "business_type"
