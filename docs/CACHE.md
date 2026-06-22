@@ -234,4 +234,10 @@ When the cookie has expired, `serverVersion` is `undefined`. The `sync()` method
 
 ---
 
+## 12. See Also
+
+- `docs/LOCAL_AND_GLOBAL_CACHE.md` — Server-side dual cache (Solid Cache + Redis) used by Rails backend
+
+---
+
 *End of file*

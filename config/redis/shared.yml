@@ -1,3 +1,5 @@
+# config/redis/shared.yml
+
 production: &production
   url: <%= Rails.application.credentials.dig(:redis_url_production) || "redis://127.0.0.1:6379/0" %>
   timeout: 1
