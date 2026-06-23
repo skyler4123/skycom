@@ -166,10 +166,6 @@ test:
   cache:
     <<: *cache
     database: storage/test_cache.sqlite3
-  # ADDED
-  rails_pulse:
-    <<: *rails_pulse
-    database: skycom_pulse_test
 
 production:
   primary:

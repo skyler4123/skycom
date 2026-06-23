@@ -15,7 +15,6 @@ services:
       - sqlite_storage:/rails/storage
     depends_on:
       - postgres
-      - pulse_postgres
 
   job:
     build: .
@@ -37,14 +36,6 @@ services:
     # No volume mapping here to ensure a fresh DB state for every test run
     ports:
       - "5432:5432"
-
-  pulse_postgres:
-    image: postgres:18.3
-    environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: password
-    ports:
-      - "5433:5432" # Exposed on 5433 host-side to avoid conflict with main postgres
 
   redis:
     image: redis:7.2-alpine
