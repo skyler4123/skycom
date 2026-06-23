@@ -1,220 +1,800 @@
-# Skycom Platform Roadmap: Feature-Tier Growth Model
+# Skycom Platform Roadmap
 
-This roadmap organizes Skycom's capabilities into four progressive feature tiers. Each tier unlocks new functionality as a company grows — from a solo shop to a multi-branch enterprise. Features are stored as an array of objects in the `features` JSONB column on the `Company` record, enabling programmatic gating of UI and backend behavior.
+> This roadmap documents every feature Skycom offers and how they combine with the usage-based billing engine. Features are organized into progressive phases — each unlocks new business capabilities. Use this to track where you are and what comes next.
 
 ---
 
-## Feature Object Schema
+## Preface: The Pay-for-Use Architecture
 
-Each feature in the `features` array:
+Skycom uses a **decoupled billing model**: what features you can **access** is separate from what you **pay for usage** on.
+
+- **Access** is governed by `BillingContract.enabled_features` — controls which UI modules and API endpoints are available
+- **Usage billing** is governed by `BillingContract.included_allowance` + `unit_prices` — controls how much you pay for exceeding limits
+
+This means Skycom can charge for premium features today, and **flip a single switch** tomorrow to make all features free while keeping usage-based billing. No code changes needed.
+
+### The Pay-As-You-Go Model
+
+Pricing is linear and consumption-based, like AWS S3:
+
+| What | How It's Charged | Example |
+|------|-----------------|---------|
+| **Core features** (Tier 1) | Always free | pos_basic, inventory_basic, crm_basic, finance_basic |
+| **Advanced features** (Tiers 2-4) | Per-feature monthly add-on | inventory_advanced: $3/mo, analytics_dashboard: $5/mo |
+| **Usage overage** | Pay-as-you-go per unit | $0.10 per extra order, $0.01 per extra MB |
+| **Enterprise** | Custom negotiated contract | All features + custom allowances + custom pricing |
+
+### Money Flow Diagram
+
+```
+[User completes an action] ──► Platform records 1 usage unit
+         │
+         ▼
+   [Redis daily counter increments: orders_today +1]
+         │
+    ─ ─ midnight ─ ─
+         │
+   [DailyUsageLog snapshot: 45 orders today]
+         │
+    ─ ─ month end ─ ─
+         │
+   [BillingContract check: allowance vs actual]
+         ├── Within allowance ► $0 charge
+         └── Over allowance   ► total_charge calculated
+                                │
+                   [Apply promo_balance credit first]
+                                │
+                   [Apply main_balance credit second]
+                                │
+                   [remaining > 0?]
+                   ├── No ► Done (covered by credits)
+                   └── Yes ►
+                            ├── [VISA card on file?]
+                            │   ├── Yes ► Auto-charge card
+                            │   │         ├── Success ► Done
+                            │   │         └── Declined ► Retry daily
+                            │   │                       ├── Paid within grace ► Done
+                            │   │                       └── Still failing ► Send QR
+                            │   └── No ► Send QR for bank transfer
+                            │
+                            └── [Company pays via QR] ► Done
+```
+
+Every business action (order placed, employee added, file uploaded) is a countable resource. The platform meters it, tallies it, and generates a charge at month end. The company's credit balances (promo + main) offset the charge first; any remaining amount is paid via auto-charge to registered card, with QR/bank transfer as fallback.
+
+---
+
+## Architecture: How Feature Access is Evaluated
+
+```
+[User clicks "Advanced Analytics"]
+                    │
+                    ▼
+       [Company.workflow_status == "active"?]
+          ├── No ► Blocked (read_only/suspended)
+          └── Yes ► Continue
+                    │
+                    ▼
+        [Company.active_billing_contract
+           .feature_enabled?("analytics_dashboard")]
+           ├── False ► "Enable for $5/mo"
+           └── True ► Grant access
+                      │
+                      ▼
+              [Execute action, meter usage]
+```
+
+The source of truth for feature gating is **always** the company's active BillingContract — never hardcoded plan tiers, never role checks.
+
+---
+
+## Phase 0: Foundation Already Built
+
+Skycom's core business domain is production-ready and operational.
+
+### Core Infrastructure
+- **Multi-tenant architecture**: All data scoped by `company_id` with full data isolation across 61 managed resource tables
+- **ABAC permission system**: Attribute-based access control with policies, roles, and tag conditions — inspired by AWS IAM
+- **Owner protection**: Owner roles/policies are immutable, only one owner per company, cannot be deleted
+- **Shell-First SPA**: Stimulus + JSON API architecture — server returns empty HTML shell, JavaScript fetches JSON and renders client-side
+- **Dynamic schema system**: Categories + PropertyMappings let different industries define different data fields on the same `property_*` columns
+- **Multi-language**: 5-language client-side translation system (EN, ES, FR, DE, VI)
+- **Client cache**: localStorage-based cache for fast frontend data access across all Stimulus controllers
+- **Dual caching**: Server-side Solid Cache (SQLite) for per-server data + Redis for cross-cluster shared state
+
+### Working Features
+
+| Feature | Description |
+|---------|-------------|
+| **Products Catalog** | Full CRUD with dynamic properties per category, brands, product groups |
+| **Services Catalog** | Service offerings with dynamic properties, service groups |
+| **Stock Management** | Per-warehouse stock levels, imports (receiving), exports (write-offs), transfers between warehouses |
+| **Order Processing V1** | Full checkout-to-payment pipeline with atomic Redis stock reservation, invoice + payment creation, async finalization via background job |
+| **Customer Management** | Customer profiles, groups, purchase history |
+| **Branches** | Multi-location structure with branch-specific data scoping |
+| **Departments** | Organizational hierarchy |
+| **Employees** | Staff records with role assignments and attendance tracking (shifts, daily/monthly logs) |
+| **ABAC Permissions UI** | Role-based permission management with policy-to-role checkbox interface |
+| **Dynamic Tables** | Category-filtered tables with configurable visible columns via TableConfig |
+| **Inline Editing** | Click-to-edit fields with state-to-template reactivity and event-driven synchronization |
+| **Address System** | Shared immutable address records with fingerprint-based deduplication |
+| **Period/Price System** | Shared immutable time-range and monetary-value records with polymorphic join |
+| **Image Processing** | ActiveStorage-backed avatar system with variants (thumb, medium, profile, full) |
+| **Operating Pages** | Dedicated full-screen POS interfaces — retail cashier is the reference implementation |
+| **Dashboard Pattern** | Full CRUD shell-first dashboards for all major resources |
+
+---
+
+## Phase 1: Core Platform Infrastructure (The Base)
+
+> Establish the circuit breaker, the BillingContract (source of truth for gating), and feature gating itself.
+
+### 1A — Company Circuit Breaker
+
+Every Company's `workflow_status` controls operational state:
+
+| Status | Behavior | Trigger |
+|--------|----------|---------|
+| `active` | Full operations — all features work normally | Default for paying/good-standing companies |
+| `read_only` | Can view data, CANNOT create/update/delete any records | Unpaid balance after grace period |
+| `suspended` | No access at all — login redirects to payment page | Extended non-payment |
+| `disabled` | Permanently closed — data preserved but inaccessible | Company deletion request |
+
+**Every create/update/delete operation** across the entire platform checks company `workflow_status`. If not `active`, the operation is blocked at the data layer.
+
+**UI behavior in `read_only` mode:**
+- All forms, buttons, and interactive controls are visually muted
+- "Add", "Edit", "Delete" actions are hidden
+- A persistent banner displays: *"Your account is restricted. Top up to continue."*
+- Only navigation and data viewing remain functional
+
+### 1B — BillingContract (The Source of Truth)
+
+Every company has exactly one active `BillingContract`. This single record controls **everything** about what the company can do and what they pay. It is created automatically during company signup (free tier by default).
+
+**The `enabled_features` field** is a JSONB key-value map where each feature key is mapped to `true` (enabled) or `false` (disabled). Each advanced feature has a corresponding price in `feature_prices`:
 
 ```json
 {
-  "key": "pos_basic",
-  "enabled": true
+  "enabled_features": {
+    "pos_basic": true,
+    "inventory_basic": true,
+    "crm_basic": true,
+    "hrm_attendance": false,
+    "inventory_advanced": false,
+    "analytics_dashboard": false
+  },
+  "feature_prices": {
+    "hrm_attendance": 2,
+    "inventory_advanced": 3,
+    "analytics_dashboard": 5,
+    "crm_loyalty": 2,
+    "multi_branch": 4,
+    "automation_engine": 3,
+    "payment_gateways": 3,
+    "hrm_payroll_commissions": 3,
+    "audit_logs": 3,
+    "custom_roles": 5,
+    "open_api": 7,
+    "sso_saml": 10
+  },
+  "included_allowance": {
+    "orders": 200,
+    "storage_mb": 500,
+    "employees": 3,
+    "branches": 1
+  },
+  "unit_prices": {
+    "orders": 0.10,
+    "storage_mb": 0.01,
+    "employees": 5,
+    "branches": 10
+  },
+  "soft_debt_threshold": -200,
+  "contract_type": "free_tier"
 }
 ```
 
----
+Prices are stored per-company on the BillingContract, allowing custom pricing for promotions or negotiations. When a company enables an advanced feature, the UI shows its price before confirmation: "Enable inventory_advanced for $3/mo?"
 
-## Tier 1: The Solo Shop (Essential Core)
+**`feature_enabled?(:key)`** is the single entry point used everywhere:
 
-**Turned on by default for every new company.** Lightweight, fast, and simple — covers the essentials of running a single-location business.
+| Layer | Check |
+|-------|-------|
+| **Backend (Ruby)** | `Company#feature_enabled?(:analytics_dashboard)` → checks `active_billing_contract.enabled_features` |
+| **Frontend (JS)** | `currentContract().feature_enabled?("analytics_dashboard")` → from client cache |
+| **API** | Endpoint returns 403 with `{ error: "Feature not available" }` |
 
-### `pos_basic` — Basic Point of Sale & Invoicing
-Quick checkout flow, cash/transfer payment tracking, digital receipt generation, and basic invoice creation. Covers the full order lifecycle from cart creation through payment confirmation.
+### 1C — Feature Gating
 
-**Dependencies:** None
-
-**Disabled behavior:** All cart, checkout, invoice, and payment UIs are hidden. No orders can be created.
-
----
-
-### `inventory_basic` — Single-Location Inventory
-Basic product catalog with categories and dynamic property fields. Stock counts, low-stock alerts, simple stock imports/exports, and stock write-offs. Barcode/SKU tracking for physical goods.
-
-**Dependencies:** None
-
-**Disabled behavior:** Products, stocks, stock transfers, stock imports/exports menus are hidden.
-
----
-
-### `crm_basic` — Customer Directory
-Simple customer profile management — capture name, phone, birthday, and contact info. Purchase history view. Basic customer group segmentation.
-
-**Dependencies:** None
-
-**Disabled behavior:** Customers menu and customer-related appointment UIs are hidden.
-
----
-
-### `finance_basic` — Income & Expense Tracking
-Basic cash flow tracking, daily sales summaries, manual expense logging, and invoice history. Single-currency support with configurable timezone.
-
-**Dependencies:** `pos_basic` (for income data)
-
-**Disabled behavior:** Financial reports, invoice history dashboards are hidden.
-
----
-
-## Tier 2: The Growing Team (Operations & Teamwork)
-
-Unlocked when a store hires its first employees and expands operations.
-
-### `hrm_attendance` — Time & Attendance
-Employee clock-in/out tracking, shift logs, attendance summaries (daily/monthly), and location/IP verification for branch presence. Shift definition and scheduling.
-
-**Dependencies:** None
-
-**Disabled behavior:** Shifts, attendance logs, attendance days/months UIs are hidden. Clock-in/out buttons are removed.
-
----
-
-### `hrm_payroll_commissions` — Payroll & Sales Commissions
-Base salary components in employee metadata. Commission engine that ties order processing to employee IDs for performance bonuses and service commissions (e.g., 5% per treatment session). Leave management workflows.
-
-**Dependencies:** `hrm_attendance`, `pos_basic`
-
-**Disabled behavior:** Payroll config, commission rules, leave request UIs are hidden.
-
----
-
-### `inventory_advanced` — Multi-Warehouse & Supplier Management
-Stock transfers between rooms/warehouses, supplier purchase orders (POs), bin location tracking, Cost of Goods Sold (COGS) calculation, batch/expiry management for sensitive products.
-
-**Dependencies:** `inventory_basic`
-
-**Disabled behavior:** Stock transfer, supplier management, purchase order, batch tracking UIs are hidden.
-
----
-
-### `crm_loyalty` — Loyalty & Rewards Program
-Store credits, points multipliers, automated customer tiering (Gold, Platinum, etc.). Reward catalog linking points to free products or service discounts. Wishlist and saved-items tracking.
-
-**Dependencies:** `crm_basic`, `pos_basic`
-
-**Disabled behavior:** Loyalty points display, reward redemption, tier badges on customer profiles are hidden.
-
----
-
-## Tier 3: The Multi-Branch Retailer (Scale & Control)
-
-For businesses managing multiple physical storefronts or high-volume operations.
-
-### `multi_branch` — Multi-Branch Management
-Isolates data views by branch while keeping global financial visibility for the owner. Branch-specific operating hours, warehouse assignments, and staff rosters.
-
-**Dependencies:** `inventory_advanced`
-
-**Disabled behavior:** Branch switcher in header is hidden. Company operates as single-branch only.
-
----
-
-### `automation_engine` — Automated Workflows
-Webhooks or background jobs that trigger actions (e.g., "When stock drops below threshold, auto-generate a Purchase Order draft to Supplier X"). Automated customer reminders (Zalo/Email 2 hours before service). Post-service follow-up scheduling.
-
-**Dependencies:** `inventory_advanced`, `crm_basic`
-
-**Disabled behavior:** Automation rules UI, webhook configuration are hidden.
-
----
-
-### `analytics_dashboard` — Advanced Analytics & Reporting
-Profit-margin deep dives, predictive inventory velocity, shift-efficiency reports, staff performance (service ratings, booking volume per doctor), customer lifetime value (CLV), financial reporting per branch, inventory turnover analysis.
-
-**Dependencies:** `multi_branch` or `inventory_advanced`
-
-**Disabled behavior:** Analytics tabs, report generation buttons are hidden.
-
----
-
-### `payment_gateways` — Integrated Payment Processing
-Native integrations with hardware card terminals, payment gateways (MoMo, ZaloPay, VNPay), automated QR code generation, multi-currency support, refund workflow to original payment source.
-
-**Dependencies:** `pos_basic`
-
-**Disabled behavior:** Payment gateway configuration, non-cash payment options in POS are hidden.
-
----
-
-## Tier 4: The Enterprise (Compliance, Security & Customization)
-
-For multi-million-dollar operations requiring strict governance, heavy auditing, and custom integrations.
-
-### `audit_logs` — Advanced Auditing
-Tamper-evident log of every resource modification, permission change, or financial edit. PaperTrail version history. Track who changed a product price, stock count, or employee role.
-
-**Dependencies:** None
-
-**Disabled behavior:** Audit log viewer, version history tabs are hidden.
-
----
-
-### `custom_roles` — Granular RBAC
-Beyond basic Admin/Manager/Staff roles — allows enterprise IT teams to build completely custom permission matrices using the ABAC system. Custom policy creation, role-to-policy assignment UI, workflow status toggling for permissions.
-
-**Dependencies:** None
-
-**Disabled behavior:** Custom role editor, policy builder UI are hidden. Falls back to the default fixed role set.
-
----
-
-### `open_api` — Developer API & Access Tokens
-Public API endpoints for internal IT teams to integrate Skycom with legacy systems or ERPs. API access token management, rate limits, webhook event types configuration.
-
-**Dependencies:** `audit_logs`
-
-**Disabled behavior:** API tokens section in settings, API documentation links are hidden.
-
----
-
-### `sso_saml` — Single Sign-On
-Centralized login control via Okta, Azure AD, or Google Workspace for enterprise employees. SAML/SSO configuration UI, identity provider management, automatic user provisioning.
-
-**Dependencies:** `custom_roles`
-
-**Disabled behavior:** SSO settings page, identity provider configuration are hidden.
-
----
-
-## Feature Dependency Graph
+Every feature has a unique key (e.g., `pos_basic`, `inventory_advanced`). The runtime check follows this chain:
 
 ```
-Tier 1 (Default)
+Company
+  └── active_billing_contract
+        └── enabled_features
+              └── feature_enabled?(:analytics_dashboard) → true/false
+```
+
+**Platform layer**: All controllers, services, and model callbacks call `Company#feature_enabled?(:key)` before executing. If disabled, the operation returns a "feature not available" response.
+
+**UI layer**: Sidebar items, action buttons, and tabs conditionally render based on `currentContract().enabled_features` from the client cache. A disabled feature is never shown — not hidden, not grayed out, simply absent.
+
+### 1D — Subscription Lifecycle (Plan Catalog)
+
+The `SystemSubscriptionPlan` is **not** the source of truth for gating — it is simply the plan catalog that defines templates for creating BillingContracts.
+
+| Concept | Description |
+|---------|-------------|
+| **Plan** | A market-aware template with default `enabled_features`, `feature_prices`, `included_allowance`, and `unit_prices` per country |
+| **Subscription** | Links a company to a plan with start/end dates |
+| **Plan change** | Creates a new BillingContract from the new plan's template — features enable/disable immediately |
+| **Expiration** | Expired subscription → company transitions to `read_only` |
+
+New companies start with a **Free plan** BillingContract at signup.
+
+---
+
+## Phase 2: Core ERP Features (The Value)
+
+> The baseline feature set that every business needs. Organized into four progressive tiers.
+>
+> **Core features** (Tier 1) are enabled on every free-tier BillingContract.
+> **Advanced features** (Tiers 2-4) are gated by `enabled_features` — paid today, flippable to free tomorrow.
+
+### Tier 1: The Solo Shop (Core — Always Free)
+
+Essentials for a single-location business. Included in every new company's BillingContract by default.
+
+#### `pos_basic` — Point of Sale & Invoicing
+- Quick checkout flow with product/service lookup
+- Cash and transfer payment tracking
+- Digital receipt generation
+- Basic invoice creation (code: INV-xxxxx)
+- Full order lifecycle: cart → checkout → payment → finalize
+
+**Disabled behavior:** All cart, checkout, invoice, and payment UIs are hidden. No orders can be created.
+**Dependencies:** None
+
+#### `inventory_basic` — Single-Location Inventory
+- Product catalog with dynamic property fields per category
+- Stock counts per warehouse with low-stock alerts
+- Barcode/SKU tracking for physical goods
+- Simple stock imports (supplier receipts) and exports (write-offs, damages)
+- Stock levels visible per product
+
+**Disabled behavior:** Products, stocks, stock transfers, stock imports/exports menus are hidden.
+**Dependencies:** None
+
+#### `crm_basic` — Customer Directory
+- Customer profile management (name, phone, birthday, contact info)
+- Purchase history view per customer
+- Customer group segmentation for marketing
+- Walk-in customer auto-creation at checkout
+
+**Disabled behavior:** Customers menu and customer-related appointment UIs are hidden.
+**Dependencies:** None
+
+#### `finance_basic` — Income & Expense Tracking
+- Daily sales summaries
+- Manual expense logging
+- Invoice history and payment tracking
+- Single-currency with configurable timezone
+
+**Disabled behavior:** Financial reports, invoice history dashboards are hidden.
+**Dependencies:** `pos_basic`
+
+---
+
+### Tier 2: The Growing Team (Advanced — Add-on $2/mo)
+
+For businesses that hire employees and need operational tooling. Each feature in this tier can be enabled individually for a monthly add-on fee.
+
+#### `hrm_attendance` ($2/mo) — Time & Attendance
+- Employee clock-in/clock-out tracking
+- Shift definition and scheduling
+- Daily and monthly attendance summaries
+- Branch-based location verification for attendance
+
+**Disabled behavior:** Shifts, attendance logs, attendance days/months UIs are hidden. Clock-in/out buttons are removed.
+**Dependencies:** None
+
+#### `hrm_payroll_commissions` ($3/mo) — Payroll & Commissions
+- Commission engine: ties employee ID to order line items, auto-calculates commissions per sale
+- Base salary components in employee metadata
+- Leave management workflows (request → approve → log)
+
+**Disabled behavior:** Payroll config, commission rules, leave request UIs are hidden.
+**Dependencies:** `hrm_attendance`, `pos_basic`
+
+#### `inventory_advanced` ($3/mo) — Multi-Warehouse & Supplier Management
+- Stock transfers between warehouses
+- Supplier purchase order (PO) creation and fulfillment tracking
+- Bin location tracking per warehouse
+- Cost of Goods Sold (COGS) calculation per product
+- Batch/expiry tracking for sensitive products
+
+**Disabled behavior:** Stock transfer, supplier management, purchase order, batch tracking UIs are hidden.
+**Dependencies:** `inventory_basic`
+
+#### `crm_loyalty` ($2/mo) — Loyalty & Rewards Program
+- Store credits and points multipliers
+- Automated customer tiering (Silver, Gold, Platinum) based on spending
+- Reward catalog linking points to free products or service discounts
+- Wishlist and saved-items tracking per customer
+
+**Disabled behavior:** Loyalty points display, reward redemption, tier badges on customer profiles are hidden.
+**Dependencies:** `crm_basic`, `pos_basic`
+
+---
+
+### Tier 3: The Multi-Branch Retailer (Advanced — Paid Today)
+
+For businesses operating multiple locations or high-volume operations. Each feature in this tier can be enabled individually for a monthly add-on fee.
+
+#### `multi_branch` ($4/mo) — Multi-Branch Management
+- Branch switcher in header allows viewing data per location
+- Branch-specific operating hours, warehouse assignments, and staff rosters
+- Global financial visibility for owner across all branches
+- Branch-level inventory isolation with cross-branch transfer
+
+**Disabled behavior:** Branch switcher in header is hidden. Company operates as single-branch only.
+**Dependencies:** `inventory_advanced`
+
+#### `automation_engine` ($3/mo) — Automated Workflows
+- Rule-based triggers: "When stock drops below 10, create PO draft for Supplier X"
+- Automated customer reminders: Zalo/Email/SMS 2 hours before appointment
+- Post-service follow-up scheduling
+- Webhook configuration for external integrations
+
+**Disabled behavior:** Automation rules UI, webhook configuration are hidden.
+**Dependencies:** `inventory_advanced`, `crm_basic`
+
+#### `analytics_dashboard` ($5/mo) — Advanced Analytics
+- Profit-margin deep dives per product/category
+- Inventory velocity and turnover analysis
+- Shift-efficiency and staff performance reports
+- Customer lifetime value (CLV) tracking
+- Financial reporting per branch
+- Month-over-month trend charts
+
+**Disabled behavior:** Analytics tabs, report generation buttons are hidden.
+**Dependencies:** `multi_branch` or `inventory_advanced`
+
+#### `payment_gateways` ($3/mo) — Integrated Payments
+- Native integration with MoMo, ZaloPay, VNPay
+- Automated QR code generation per invoice
+- Refund workflow to original payment source
+- Multi-currency support for international customers
+
+**Disabled behavior:** Payment gateway configuration, non-cash payment options in POS are hidden.
+**Dependencies:** `pos_basic`
+
+---
+
+### Tier 4: The Enterprise (Advanced — Paid Today)
+
+For large operations requiring audit trails, custom permissions, and developer access. Each feature in this tier can be enabled individually for a monthly add-on fee.
+
+#### `audit_logs` ($3/mo) — Advanced Auditing
+- Tamper-evident log of every resource modification
+- Track who changed a price, stock count, employee role, or permission
+- Version history with before/after diff view
+- Exportable audit trails for compliance
+
+**Disabled behavior:** Audit log viewer, version history tabs are hidden.
+**Dependencies:** None
+
+#### `custom_roles` ($5/mo) — Granular RBAC
+- Custom policy creation with specific action/resource rules
+- Role-to-policy assignment with workflow status toggling
+- Beyond basic roles: build permission matrices using the ABAC system
+- Complex tag-condition rules for granular resource-level access
+
+**Disabled behavior:** Custom role editor, policy builder UI are hidden. Falls back to default fixed role set.
+**Dependencies:** None
+
+#### `open_api` ($7/mo) — Developer API & Access Tokens
+- Public REST API for custom integrations
+- API token management with rate limits
+- Webhook event type configuration
+- Developer documentation and sandbox environment
+
+**Disabled behavior:** API tokens section in settings, API documentation links are hidden.
+**Dependencies:** `audit_logs`
+
+#### `sso_saml` ($10/mo) — Single Sign-On
+- Centralized login via Okta, Azure AD, Google Workspace
+- SAML/SSO configuration UI
+- Identity provider management
+- Automatic user provisioning and de-provisioning
+
+**Disabled behavior:** SSO settings page, identity provider configuration are hidden.
+**Dependencies:** `custom_roles`
+
+---
+
+### Feature Dependency Graph
+
+```
+Tier 1 (Core — Always Free)
 ├── pos_basic
 ├── inventory_basic
 ├── crm_basic
 └── finance_basic → pos_basic
 
-Tier 2
-├── hrm_attendance
-├── hrm_payroll_commissions → hrm_attendance + pos_basic
-├── inventory_advanced → inventory_basic
-└── crm_loyalty → crm_basic + pos_basic
+Tier 2 (Advanced — Add-on $2-3/mo)
+├── hrm_attendance ($2/mo)
+├── hrm_payroll_commissions ($3/mo) → hrm_attendance + pos_basic
+├── inventory_advanced ($3/mo) → inventory_basic
+└── crm_loyalty ($2/mo) → crm_basic + pos_basic
 
-Tier 3
-├── multi_branch → inventory_advanced
-├── automation_engine → inventory_advanced + crm_basic
-├── analytics_dashboard → multi_branch | inventory_advanced
-└── payment_gateways → pos_basic
+Tier 3 (Advanced — Add-on $3-5/mo)
+├── multi_branch ($4/mo) → inventory_advanced
+├── automation_engine ($3/mo) → inventory_advanced + crm_basic
+├── analytics_dashboard ($5/mo) → multi_branch | inventory_advanced
+└── payment_gateways ($3/mo) → pos_basic
 
-Tier 4
-├── audit_logs
-├── custom_roles
-├── open_api → audit_logs
-└── sso_saml → custom_roles
+Tier 4 (Advanced — Add-on $3-10/mo)
+├── audit_logs ($3/mo)
+├── custom_roles ($5/mo)
+├── open_api ($7/mo) → audit_logs
+└── sso_saml ($10/mo) → custom_roles
 ```
 
 ---
 
-## Gating Strategy
+## Phase 3: The Metering Subsystem (The Counters)
 
-| Layer | Mechanism |
-|-------|-----------|
-| **Backend (Ruby)** | `Company#feature_enabled?(:pos_basic)` — gate controllers, services, and model callbacks |
-| **Frontend (JS)** | `currentFeatures()` from client cache — conditionally render sidebar items, buttons, and tabs |
-| **API (JSON)** | Feature presence in `/client_cache` response — frontend reads and reacts |
-| **Seed** | Default features assigned at company creation in `setup_owner_records` |
+> Count every business action so Skycom knows what each company is using.
+
+### Countable Resources
+
+Every feature generates countable usage. These are the metered resources:
+
+| Resource | Unit | Counted When | Example |
+|----------|------|--------------|---------|
+| `orders` | per order | Order is marked as paid | 450 orders this month |
+| `storage_mb` | MB per day | File uploaded to ActiveStorage | 320 MB stored |
+| `employees` | per active employee | Employee has active lifecycle_status | 12 active employees |
+| `branches` | per active branch | Branch is created and active | 3 branches |
+| `customers` | per customer record | Customer is created | 890 customers |
+| `api_calls` | per API request | API token is used | 12,400 API calls |
+| `stock_mutations` | per stock change | Stock import/export/transfer is created | 230 operations |
+
+### Real-Time Counters (Redis)
+
+Every countable action fires an atomic `INCR` on a daily-keyed Redis key:
+
+```
+skycom:orders:company_<uuid>:20260623
+skycom:storage:company_<uuid>:20260623
+skycom:employees:company_<uuid>:20260623
+```
+
+These keys are lightweight, never block the main operation, and are the source of truth for the current day's usage.
+
+### Daily Snapshots (PostgreSQL)
+
+Every night at 23:55, a background job:
+1. Reads all Redis counters for the day
+2. Writes one `DailyUsageLog` row per company per resource per day
+3. Zeros out the Redis keys for the new day
+
+This creates a permanent, queryable history. The `DailyUsageLog` table stores:
+- `company_id`, `resource_name`, `logged_date`
+- `quantity` (total for that day)
+- `created_at` / `updated_at`
+
+### Monthly Rollup & Billing Trigger
+
+At month end (or on-demand):
+1. `SUM` all `DailyUsageLog` rows for the billing period
+2. Compare against the company's `BillingContract` allowances
+3. Compute overage charges
+4. Total = overage + feature add-ons, offset by promo/main balance credits; collect any remaining via card or QR
+
+### Usage Analytics API
+
+**`GET /companies/:id/usage`** returns current month usage vs allowances plus 6-month history. Powers the frontend usage charts and the 80%/95% guardrail warnings.
+
+---
+
+## Phase 4: Flexible Billing Engine (The Money)
+
+> Convert metered usage into charges and automate the deduction cycle.
+
+### BillingContract (Full Definition)
+
+Each company has one active `BillingContract` that controls everything:
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `enabled_features` | JSONB | Feature key → boolean (e.g., `{"analytics_dashboard": true}`) |
+| `feature_prices` | JSONB | Per-feature monthly add-on prices in cents (e.g., `{"analytics_dashboard": 5000}`) |
+| `included_allowance` | JSONB | Per-resource monthly limits (e.g., 200 orders, 500MB storage) |
+| `unit_prices` | JSONB | Per-resource overage pricing (e.g., $0.10/additional order) |
+| `soft_debt_threshold` | integer | Max negative balance before auto-suspend |
+| `contract_type` | enum | `free_tier`, `enterprise`, `custom` |
+
+#### Contract Examples
+
+| Type | enabled_features | feature_prices (add-ons) | Allowances | Overage Pricing |
+|------|-----------------|--------------------------|------------|-----------------|
+| **Free Tier** | Core only (Tier 1) | Per-feature add-on prices apply | 200 orders, 500MB, 3 employees, 1 branch | $0.10/order, $0.01/MB |
+| **Enterprise** | All features | Included (no add-on charges) | Unlimited orders, 50GB, unlimited employees | No overage — everything included |
+| **Custom** | Per deal | Per deal | Per deal | Negotiated |
+
+### Dual-Wallet System
+
+Each company has two balance accounts. These are **credit balances** — they offset the month-end charge rather than being auto-deducted in real time:
+
+| Balance | Source | Applied at Month End |
+|---------|--------|----------------------|
+| **`promo_balance`** | Promotional credits from Skycom (e.g., +$10 new company bonus) | Deducted FIRST from total charge |
+| **`main_balance`** | Company deposits from past payments or overpayments | Deducted SECOND |
+
+Every balance change is recorded in `WalletTransaction`:
+- **Type**: `top_up`, `deduction`, `refund`, `promo_credit`
+- **Amounts**: Before/after snapshots of both balances
+- **Reference**: Links to the triggering event (order, invoice, top-up)
+- **Description**: Human-readable explanation
+
+### The Deduction Algorithm
+
+When billing runs (month-end or on-demand):
+
+```
+1. total_charge = Σ(overage_units × unit_price) + Σ(enabled_feature_prices)
+2. If total_charge == 0: done (within allowance)
+3. Deduct from promo_balance first:
+     if promo_balance >= total_charge:
+         promo_balance -= total_charge; remaining = 0
+     else:
+         remaining = total_charge - promo_balance; promo_balance = 0
+4. Deduct from main_balance second:
+     if main_balance >= remaining:
+         main_balance -= remaining; remaining = 0
+     else:
+         remaining -= main_balance; main_balance = 0
+5. If remaining > 0:
+     ┌─ [VISA card registered?]
+     ├── Yes ► Auto-charge card
+     │         ├── Success ► Done (overpayment → main_balance)
+     │         └── Declined ► Retry daily for grace period
+     │                       ├── Paid ► Done
+     │                       └── Still failing ► Send QR
+     └── No ► Send QR for bank transfer
+              └── Company pays ► Done
+6. Record WalletTransaction for audit
+```
+
+The `Σ(enabled_feature_prices)` component is what companies pay for **premium add-on features** (Tiers 2-4) they've enabled. The overage component is what they pay for **exceeding usage limits**. Both are summed together as the total charge, which is offset by credits (promo + main) and then collected via card auto-charge or QR bank transfer.
+
+**Mid-cycle proration**: When a feature is enabled mid-cycle, its price is prorated by days remaining:
+
+```
+proration_factor = days_remaining_in_cycle / total_days_in_cycle
+current_cycle_charge = feature_price × proration_factor
+```
+
+The prorated amount is recorded at enable time and included in the next billing run. From the following cycle onward, the full `feature_price` applies automatically.
+
+### Auto-Suspend & Recovery
+
+When billing runs and the remaining amount cannot be collected:
+1. **Auto-charge retries**: If the registered VISA card declines, Skycom retries daily for a grace period (3-5 days)
+2. **QR fallback**: If the card continues to fail or no card is registered, a QR code is generated for bank transfer — sent to the owner's email and displayed in-app
+3. **If paid within grace** → company remains active; overpayment credits go to `main_balance`
+4. **If grace period expires unpaid** → company transitions to `read_only`
+5. **Recovery**: Owner pays the outstanding amount (via card or QR) → balance settles → company auto-reactivates to `active`
+
+---
+
+## Phase 5: Monetization Funnel (The Onboarding & Growth)
+
+> Guide new users from signup to paying usage, with clear guardrails and upgrade paths.
+
+### Free-Tier Onboarding
+
+Every new company starts with a **Free Tier** BillingContract:
+
+| Setting | Value |
+|---------|-------|
+| `enabled_features` | Core only (Tier 1: pos_basic, inventory_basic, crm_basic, finance_basic) |
+| Orders included | 200/month |
+| Storage included | 500 MB |
+| Employees included | 3 |
+| Branches included | 1 |
+| Overage pricing | Standard per-unit rates |
+| Contract type | `free_tier` |
+
+No credit card required. The free tier is not a trial — it's a permanent usage tier. The company simply pays for what they use beyond the included allowance.
+
+### Usage Guardrails
+
+As a company approaches resource limits, the UI provides progressive warnings:
+
+| Threshold | Behavior |
+|-----------|----------|
+| **80% of allowance** | Subtle inline indicator: "187/200 orders used this month" |
+| **95% of allowance** | Warning toast: "You've used 95% of your monthly order allowance. Overage charges apply beyond 200 orders." Upgrade CTA in sidebar. |
+| **100% (overage begins)** | Banner appears: "Pay-for-use is now active for orders." |
+| **Balance approaching threshold** | Warning toast + email: "Your wallet balance is low. Top up to avoid service restriction." |
+
+### Top-Up Flow (Manual)
+
+When a company needs to add funds:
+1. Owner navigates to Billing → Top Up
+2. Selects an amount ($10, $20, $50, $100, $500 or custom)
+3. System provides payment instructions (bank transfer details)
+4. Owner transfers the amount
+5. Owner contacts support to confirm
+6. Support credits `main_balance`
+7. If company was `read_only`, auto-reactivates to `active`
+
+### Feature Add-on Flow
+
+Company owners can enable individual add-on features from the billing or settings page:
+1. Billing → Feature Store shows each available add-on with its monthly price
+2. Each add-on card displays: feature description, price, and dependency warnings
+3. Enabling is instant — `BillingContract.enabled_features` updates immediately, feature gates open
+4. Disabling hides/restricts features at next billing cycle — no proration or refund
+5. Add-on charges appear as line items in the monthly deduction algorithm (`Σ(enabled_feature_prices)`)
+6. **Mid-cycle enable** — first month is prorated by days remaining in the current billing cycle; full price applies from next cycle onward
+
+---
+
+## Phase 6: Enterprise & Scaling (The Expansion)
+
+> Handle large accounts, platform growth, and the future pivot to pure usage-based pricing.
+
+### 6A — Enterprise Contracts
+
+Large accounts get custom `BillingContract` entries:
+- **`enabled_features`**: All features set to `true`
+- **Unlimited allowances** (orders: 999999999, storage: 999999 GB)
+- **No overage charges** — everything included in the fixed fee
+- **Custom support SLA** (dedicated account manager, priority support)
+
+The billing engine handles these identically — same deduction algorithm, same wallet system. It simply never finds overage charges because allowances are effectively infinite.
+
+### 6B — Scenario B: The Free Features Flip
+
+This is the architectural flexibility that `BillingContract.enabled_features` provides. When you decide to make all features free:
+
+**Step 1**: Update the default BillingContract template for new signups:
+```json
+{
+  "enabled_features": {
+    "pos_basic": true,
+    "inventory_basic": true,
+    "crm_basic": true,
+    "finance_basic": true,
+    "hrm_attendance": true,
+    "inventory_advanced": true,
+    "analytics_dashboard": true,
+    "custom_roles": true,
+    "open_api": true
+  },
+  "included_allowance": { "orders": 200, "storage_mb": 500, "employees": 3, "branches": 1 },
+  "unit_prices": { "orders": 1000, "storage_mb": 100 },
+  "contract_type": "free_tier"
+}
+```
+
+**Step 2**: Run a one-off migration to update existing companies' BillingContracts with the same `enabled_features` map.
+
+**Step 3**: Remove paid tiers from the plans catalog (or keep them for historical accounts).
+
+**Result**: The `Company#feature_enabled?(:analytics_dashboard)` check returns `true` for every company. Monetization shifts entirely to usage overage. Zero backend code changes.
+
+### Tenant Growth
+
+The meter-plus-bill architecture scales with the platform:
+
+| Scale | Infrastructure |
+|-------|----------------|
+| **Up to 100 companies** | Single Redis instance, single DailyUsageLog table |
+| **Up to 1,000 companies** | Partition DailyUsageLog by month, single Redis |
+| **10,000+ companies** | Shard Redis by company_id range, archive old logs to cold storage |
+
+No changes to billing contracts, feature gating, or deduction algorithms are needed at any scale — only the storage layer scales.
+
+### Multi-Market Readiness
+
+The billing engine is currency-aware and supports multiple markets:
+
+| Market | Currency | Typical Price Range |
+|--------|----------|-------------------|
+| Vietnam | VND | Thousands to millions |
+| United States | USD | Dollars to hundreds |
+| Future markets | Local currency | Configurable per contract |
+
+Contract allowances and feature access are universal; only the unit prices and feature add-on prices are localizable per market.
+
+#### Country-Based Pricing Templates
+
+When a company signs up, the system detects its market (via `country_code` on the company record) and applies the appropriate pricing template. Each market has its own set of default prices for features and overage:
+
+| Market | Currency | `hrm_attendance` | `analytics_dashboard` | Overage: per order |
+|--------|----------|-------------------|----------------------|--------------------|
+| US | USD | $2/mo | $5/mo | $0.10 |
+| VN | VND | 50,000/mo | 125,000/mo | 2,500 |
+
+These templates live in the `SystemSubscriptionPlan` catalog alongside the default contract configuration. When creating a `BillingContract` at signup, the country-specific `feature_prices` and `unit_prices` are populated from the matching template. Prices can still be overridden per-company for promotions or custom negotiated deals.
+
+---
+
+## Appendix: Feature Key Reference
+
+Every feature in Skycom has a unique key used for gating, billing, and documentation:
+
+| Key | Tier | Type | Default in Free Tier | Description |
+|-----|------|------|---------------------|-------------|
+| `pos_basic` | 1 | Core feature | ✅ Enabled | Point of Sale & Invoicing |
+| `inventory_basic` | 1 | Core feature | ✅ Enabled | Single-location inventory |
+| `crm_basic` | 1 | Core feature | ✅ Enabled | Customer directory |
+| `finance_basic` | 1 | Core feature | ✅ Enabled | Income & expense tracking |
+| `hrm_attendance` | 2 | Advanced feature | ❌ Disabled | Time & attendance |
+| `hrm_payroll_commissions` | 2 | Advanced feature | ❌ Disabled | Payroll & commissions |
+| `inventory_advanced` | 2 | Advanced feature | ❌ Disabled | Multi-warehouse & supplier management |
+| `crm_loyalty` | 2 | Advanced feature | ❌ Disabled | Loyalty & rewards program |
+| `multi_branch` | 3 | Advanced feature | ❌ Disabled | Multi-branch management |
+| `automation_engine` | 3 | Advanced feature | ❌ Disabled | Automated workflows |
+| `analytics_dashboard` | 3 | Advanced feature | ❌ Disabled | Advanced analytics |
+| `payment_gateways` | 3 | Advanced feature | ❌ Disabled | Integrated payment processing |
+| `audit_logs` | 4 | Advanced feature | ❌ Disabled | Advanced auditing |
+| `custom_roles` | 4 | Advanced feature | ❌ Disabled | Granular RBAC |
+| `open_api` | 4 | Advanced feature | ❌ Disabled | Developer API |
+| `sso_saml` | 4 | Advanced feature | ❌ Disabled | Single sign-on |
+
+---
+
+## Appendix: Pay-for-Use Architecture Reference
+
+### Decoupled Dimensions
+
+Skycom separates **access** from **usage billing**:
+
+| Dimension | Controls | Field on BillingContract |
+|-----------|----------|--------------------------|
+| **What features you can use** | UI visibility + API access | `enabled_features` |
+| **What you pay monthly** | Per-feature add-on prices for premium features | `feature_prices` |
+| **What usage is included** | Free allowance before overage | `included_allowance` |
+| **What overage costs** | Per-unit pricing | `unit_prices` |
+| **What stops you** | Unpaid balance after grace period | `soft_debt_threshold` |
+
+### Pay-for-Use Pure Model (The Flip)
+
+When all features are free, the architecture simplifies:
+
+```
+total_bill = Σ(overage × unit_price) for all resources
+
+remaining = apply_credits(total_bill, promo_balance, main_balance)
+if remaining > 0:
+    collect(remaining) via card or QR
+```
+
+No feature gates ever return `false`. Monetization is 100% consumption-based.
+
+---
+
+## How to Read This Roadmap
+
+| Phase | What It Covers | Status |
+|-------|----------------|--------|
+| **Phase 0** | Features already built and working | ✅ Live |
+| **Phase 1** | Infrastructure: circuit breaker, BillingContract, feature gating, subscription lifecycle | ⬜ Next |
+| **Phase 2** | Business features organized into 4 tiers (core free + advanced paid) | 🔄 In progress |
+| **Phase 3** | Metering: count every business action (Redis + DailyUsageLog) | ⬜ Future |
+| **Phase 4** | Billing: contract pricing, wallets, deduction algorithms | ⬜ Future |
+| **Phase 5** | Commercial: free tier, top-ups, plan upgrades | ⬜ Future |
+| **Phase 6** | Enterprise: custom contracts, tenant growth, the Free Features Flip | ⬜ Future |
+
+At any point you can ask: *"What features does company X have?"* → check `BillingContract.enabled_features`.  
+*"How much do they owe?"* → metering × BillingContract overage + feature add-on prices.
 
 ---
 
