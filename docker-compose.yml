@@ -9,7 +9,7 @@ name: skycom_development
 services:
   web:
     build: .
-    command: bash -c "sleep 5 && rm -f tmp/pids/server.pid && bundle exec rails db:prepare && bundle exec rails assets:precompile && bundle exec thrust bin/rails s"
+    command: bash -c "sleep 30 && rm -f tmp/pids/server.pid && bundle exec rails db:prepare && bundle exec rails assets:precompile && bundle exec thrust bin/rails s"
     environment:
       RAILS_ENV: development
       RAILS_MASTER_KEY: ${RAILS_MASTER_KEY}
@@ -23,10 +23,11 @@ services:
     tty: true
     depends_on:
       - postgres
-      - postgres_pulse
+      - pulse_postgres
+      - minio
   job:
     build: .
-    command: bash -c "sleep 30 && bundle exec rails db:prepare && bin/jobs"
+    command: bash -c "sleep 15 && bundle exec rails db:prepare && bin/jobs"
     environment:
       RAILS_ENV: development
       RAILS_MASTER_KEY: ${RAILS_MASTER_KEY}
@@ -35,7 +36,7 @@ services:
       - sqlite_storage:/rails/storage
     depends_on:
       - web
-      - postgres_pulse
+      - pulse_postgres
 
   postgres:
     image: postgres:18.3
@@ -47,7 +48,7 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql
 
-  postgres_pulse:
+  pulse_postgres:
     image: postgres:18.3
     environment:
       POSTGRES_USER: postgres
@@ -55,7 +56,7 @@ services:
     ports:
       - "5433:5432" # Exposed on 5433 host-side to avoid conflict with main postgres
     volumes:
-      - postgres_pulse_data:/var/lib/postgresql
+      - pulse_postgres_data:/var/lib/postgresql
 
   # mongo:
   #   image: mongo
@@ -138,7 +139,7 @@ services:
 
 volumes:
   postgres_data:
-  postgres_pulse_data:
+  pulse_postgres_data:
   mongo_data:
   grafana_data:
   minio_data:

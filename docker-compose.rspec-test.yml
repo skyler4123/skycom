@@ -15,7 +15,7 @@ services:
       - sqlite_storage:/rails/storage
     depends_on:
       - postgres
-      - postgres_pulse
+      - pulse_postgres
 
   job:
     build: .
@@ -38,7 +38,7 @@ services:
     ports:
       - "5432:5432"
 
-  postgres_pulse:
+  pulse_postgres:
     image: postgres:18.3
     environment:
       POSTGRES_USER: postgres

@@ -130,7 +130,8 @@ rails_pulse: &rails_pulse
   pool: 5
   username: <%= Rails.application.credentials.dig(:pulse_postgres_username) || "postgres" %>
   password: <%= Rails.application.credentials.dig(:pulse_postgres_password) || "password" %>
-  host: <%= Rails.application.credentials.dig(:pulse_postgres_host) || "postgres_pulse" %>
+  host: <%= Rails.application.credentials.dig(:pulse_postgres_host) || "localhost" %>
+  # host: pulse_postgres
   port: <%= Rails.application.credentials.dig(:pulse_postgres_port) || "5433" %>
   migrations_paths: db/rails_pulse_migrate
 
