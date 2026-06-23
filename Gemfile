@@ -93,4 +93,5 @@ gem "money-rails"
 gem "discard"
 gem "paper_trail"
 gem "kredis"
+gem "rails_pulse"
 # ----------------------------------------------------------------------------------------------------

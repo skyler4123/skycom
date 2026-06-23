@@ -19,7 +19,6 @@ services:
     ports:
       - "5432:5432"
 
-  
   redis:
     image: redis:7.2-alpine
     ports:
