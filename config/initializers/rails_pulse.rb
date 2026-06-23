@@ -1,3 +1,5 @@
+return if Rails.env.test?
+
 RailsPulse.configure do |config|
   # ====================================================================================================
   #                                         GLOBAL CONFIGURATION
