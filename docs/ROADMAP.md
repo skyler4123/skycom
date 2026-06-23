@@ -21,7 +21,7 @@ Pricing is linear and consumption-based, like AWS S3:
 |------|-----------------|---------|
 | **Core features** (Tier 1) | Always free | pos_basic, inventory_basic, crm_basic, finance_basic |
 | **Advanced features** (Tiers 2-4) | Per-feature monthly add-on | inventory_advanced: $3/mo, analytics_dashboard: $5/mo |
-| **Usage overage** | Pay-as-you-go per unit | 1,000 VND per extra order, 100 VND per extra MB |
+| **Usage overage** | Pay-as-you-go per unit | $0.10 per extra order, $0.01 per extra MB |
 | **Enterprise** | Custom negotiated contract | All features + custom allowances + custom pricing |
 
 ### Money Flow Diagram
@@ -165,18 +165,18 @@ Every company has exactly one active `BillingContract`. This single record contr
     "analytics_dashboard": false
   },
   "feature_prices": {
-    "hrm_attendance": 2000,
-    "inventory_advanced": 3000,
-    "analytics_dashboard": 5000,
-    "crm_loyalty": 2000,
-    "multi_branch": 4000,
-    "automation_engine": 5000,
-    "payment_gateways": 3000,
-    "hrm_payroll_commissions": 3000,
-    "audit_logs": 3000,
-    "custom_roles": 5000,
-    "open_api": 7000,
-    "sso_saml": 10000
+    "hrm_attendance": 2,
+    "inventory_advanced": 3,
+    "analytics_dashboard": 5,
+    "crm_loyalty": 2,
+    "multi_branch": 4,
+    "automation_engine": 3,
+    "payment_gateways": 3,
+    "hrm_payroll_commissions": 3,
+    "audit_logs": 3,
+    "custom_roles": 5,
+    "open_api": 7,
+    "sso_saml": 10
   },
   "included_allowance": {
     "orders": 200,
@@ -185,12 +185,12 @@ Every company has exactly one active `BillingContract`. This single record contr
     "branches": 1
   },
   "unit_prices": {
-    "orders": 1000,
-    "storage_mb": 100,
-    "employees": 50000,
-    "branches": 100000
+    "orders": 0.10,
+    "storage_mb": 0.01,
+    "employees": 5,
+    "branches": 10
   },
-  "soft_debt_threshold": -20000,
+  "soft_debt_threshold": -200,
   "contract_type": "free_tier"
 }
 ```
@@ -226,7 +226,7 @@ The `SystemSubscriptionPlan` is **not** the source of truth for gating — it is
 
 | Concept | Description |
 |---------|-------------|
-| **Plan** | A template with default `enabled_features`, `included_allowance`, and `unit_prices` |
+| **Plan** | A market-aware template with default `enabled_features`, `feature_prices`, `included_allowance`, and `unit_prices` per country |
 | **Subscription** | Links a company to a plan with start/end dates |
 | **Plan change** | Creates a new BillingContract from the new plan's template — features enable/disable immediately |
 | **Expiration** | Expired subscription → company transitions to `read_only` |
@@ -341,7 +341,7 @@ For businesses operating multiple locations or high-volume operations. Each feat
 **Disabled behavior:** Branch switcher in header is hidden. Company operates as single-branch only.
 **Dependencies:** `inventory_advanced`
 
-#### `automation_engine` — Automated Workflows
+#### `automation_engine` ($3/mo) — Automated Workflows
 - Rule-based triggers: "When stock drops below 10, create PO draft for Supplier X"
 - Automated customer reminders: Zalo/Email/SMS 2 hours before appointment
 - Post-service follow-up scheduling
@@ -431,7 +431,7 @@ Tier 2 (Advanced — Add-on $2-3/mo)
 
 Tier 3 (Advanced — Add-on $3-5/mo)
 ├── multi_branch ($4/mo) → inventory_advanced
-├── automation_engine → inventory_advanced + crm_basic
+├── automation_engine ($3/mo) → inventory_advanced + crm_basic
 ├── analytics_dashboard ($5/mo) → multi_branch | inventory_advanced
 └── payment_gateways ($3/mo) → pos_basic
 
@@ -513,7 +513,7 @@ Each company has one active `BillingContract` that controls everything:
 | `enabled_features` | JSONB | Feature key → boolean (e.g., `{"analytics_dashboard": true}`) |
 | `feature_prices` | JSONB | Per-feature monthly add-on prices in cents (e.g., `{"analytics_dashboard": 5000}`) |
 | `included_allowance` | JSONB | Per-resource monthly limits (e.g., 200 orders, 500MB storage) |
-| `unit_prices` | JSONB | Per-resource overage pricing (e.g., 1,000 VND/additional order) |
+| `unit_prices` | JSONB | Per-resource overage pricing (e.g., $0.10/additional order) |
 | `soft_debt_threshold` | integer | Max negative balance before auto-suspend |
 | `contract_type` | enum | `free_tier`, `enterprise`, `custom` |
 
@@ -521,7 +521,7 @@ Each company has one active `BillingContract` that controls everything:
 
 | Type | enabled_features | feature_prices (add-ons) | Allowances | Overage Pricing |
 |------|-----------------|--------------------------|------------|-----------------|
-| **Free Tier** | Core only (Tier 1) | Per-feature add-on prices apply | 200 orders, 500MB, 3 employees, 1 branch | 1,000 VND/order, 100 VND/MB |
+| **Free Tier** | Core only (Tier 1) | Per-feature add-on prices apply | 200 orders, 500MB, 3 employees, 1 branch | $0.10/order, $0.01/MB |
 | **Enterprise** | All features | Included (no add-on charges) | Unlimited orders, 50GB, unlimited employees | No overage — everything included |
 | **Custom** | Per deal | Per deal | Per deal | Negotiated |
 
@@ -626,7 +626,7 @@ As a company approaches resource limits, the UI provides progressive warnings:
 
 When a company needs to add funds:
 1. Owner navigates to Billing → Top Up
-2. Selects an amount (50K, 100K, 200K, 500K, 1M VND or custom)
+2. Selects an amount ($10, $20, $50, $100, $500 or custom)
 3. System provides payment instructions (bank transfer details)
 4. Owner transfers the amount
 5. Owner contacts support to confirm
@@ -712,6 +712,17 @@ The billing engine is currency-aware and supports multiple markets:
 | Future markets | Local currency | Configurable per contract |
 
 Contract allowances and feature access are universal; only the unit prices and feature add-on prices are localizable per market.
+
+#### Country-Based Pricing Templates
+
+When a company signs up, the system detects its market (via `country_code` on the company record) and applies the appropriate pricing template. Each market has its own set of default prices for features and overage:
+
+| Market | Currency | `hrm_attendance` | `analytics_dashboard` | Overage: per order |
+|--------|----------|-------------------|----------------------|--------------------|
+| US | USD | $2/mo | $5/mo | $0.10 |
+| VN | VND | 50,000/mo | 125,000/mo | 2,500 |
+
+These templates live in the `SystemSubscriptionPlan` catalog alongside the default contract configuration. When creating a `BillingContract` at signup, the country-specific `feature_prices` and `unit_prices` are populated from the matching template. Prices can still be overridden per-company for promotions or custom negotiated deals.
 
 ---
 
