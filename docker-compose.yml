@@ -23,7 +23,7 @@ services:
     tty: true
     depends_on:
       - postgres
-      # - mongo
+      - postgres_pulse
   job:
     build: .
     command: bash -c "sleep 30 && bundle exec rails db:prepare && bin/jobs"
@@ -35,6 +35,7 @@ services:
       - sqlite_storage:/rails/storage
     depends_on:
       - web
+      - postgres_pulse
 
   postgres:
     image: postgres:18.3

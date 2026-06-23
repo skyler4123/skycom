@@ -124,16 +124,15 @@ cache: &cache
   <<: *sqlite3
   migrations_paths: db/cache_migrate
 
-# NEW BLOCK: Configuration structure for Rails Pulse DB
 rails_pulse: &rails_pulse
   adapter: postgresql
   encoding: unicode
   pool: 5
   username: <%= Rails.application.credentials.dig(:pulse_postgres_username) || "postgres" %>
   password: <%= Rails.application.credentials.dig(:pulse_postgres_password) || "password" %>
-  host: <%= Rails.application.credentials.dig(:pulse_postgres_host) || "localhost" %> # Matches docker service name
+  host: <%= Rails.application.credentials.dig(:pulse_postgres_host) || "postgres_pulse" %>
   port: <%= Rails.application.credentials.dig(:pulse_postgres_port) || "5433" %>
-  migrations_paths: db/pulse_migrate
+  migrations_paths: db/rails_pulse_migrate
 
 development:
   primary:
