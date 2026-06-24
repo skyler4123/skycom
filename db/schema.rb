@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_06_24_160000) do
+ActiveRecord::Schema[8.0].define(version: 2026_06_24_161000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pgcrypto"
@@ -5561,6 +5561,24 @@ ActiveRecord::Schema[8.0].define(version: 2026_06_24_160000) do
     t.index ["item_type", "item_id"], name: "index_versions_on_item_type_and_item_id"
   end
 
+  create_table "wallet_transactions", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "company_id", null: false
+    t.uuid "billing_invoice_id"
+    t.integer "transaction_type", null: false
+    t.integer "amount_cents", default: 0, null: false
+    t.string "currency", default: "USD", null: false
+    t.integer "balance_before_cents", default: 0, null: false
+    t.integer "balance_after_cents", default: 0, null: false
+    t.integer "promo_balance_before_cents", default: 0, null: false
+    t.integer "promo_balance_after_cents", default: 0, null: false
+    t.text "description"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["billing_invoice_id"], name: "index_wallet_transactions_on_billing_invoice_id"
+    t.index ["company_id", "created_at"], name: "idx_wallet_tx_company_chrono"
+    t.index ["company_id"], name: "index_wallet_transactions_on_company_id"
+  end
+
   create_table "warehouses", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
     t.uuid "company_id", null: false
     t.uuid "branch_id"
@@ -5997,6 +6015,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_06_24_160000) do
   add_foreign_key "tasks", "property_mappings"
   add_foreign_key "tasks", "task_groups"
   add_foreign_key "users", "users", column: "parent_user_id"
+  add_foreign_key "wallet_transactions", "billing_invoices"
+  add_foreign_key "wallet_transactions", "companies"
   add_foreign_key "warehouses", "branches"
   add_foreign_key "warehouses", "categories"
   add_foreign_key "warehouses", "companies"
