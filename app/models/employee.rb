@@ -11,6 +11,9 @@ class Employee < ApplicationRecord
   include TagConcern
   include Discard::Model
   include Cache::RecordsConcern
+  include MeteringConcern
+
+  metered_as :employees
 
   attribute :permission_resource_name, :string, default: -> { self.name }
 

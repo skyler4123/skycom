@@ -6,6 +6,9 @@ class Branch < ApplicationRecord
   include AddressConcern
   include TagConcern
   include Branch::ImageConcern
+  include MeteringConcern
+
+  metered_as :branches
 
   belongs_to :company
   belongs_to :category

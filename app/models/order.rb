@@ -4,6 +4,9 @@ class Order < ApplicationRecord
   attribute :permission_resource_name, :string, default: -> { self.name }
 
   include TagConcern
+  include MeteringConcern
+
+  metered_as :orders
 
   # --- Associations ---
   belongs_to :company
