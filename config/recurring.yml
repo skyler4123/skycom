@@ -29,7 +29,7 @@ default: &default
   sync_daily_usage:
     class: Billing::SyncDailyUsageJob
     queue: default
-    schedule: at 23:55 every day
+    schedule: every 4 hours
 
   monthly_billing:
     class: Billing::MonthlyBillingJob

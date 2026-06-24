@@ -6,7 +6,16 @@ RSpec.describe Company::BillingConcern do
   subject(:company) { create(:company) }
 
   let!(:billing_resource) { create(:billing_resource, :addon_feature, name: "inventory_advanced") }
+  let!(:volumetric_resource) { create(:billing_resource, :volumetric, name: "orders") }
   let!(:billing_contract) { create(:billing_contract, company: company, lifecycle_status: :active, start_date: 1.month.ago) }
+
+  before do
+    Kredis.redis.flushdb
+  end
+
+  after do
+    Kredis.redis.flushdb
+  end
 
   describe "#active_billing_contract" do
     it "returns the currently active contract" do
@@ -76,6 +85,43 @@ RSpec.describe Company::BillingConcern do
     it "returns true when balance drops below threshold" do
       company.update!(main_balance_cents: -2000, promo_balance_cents: 0)
       expect(company.debt_ceiling_reached?).to be true
+    end
+  end
+
+  describe "#daily_meter" do
+    it "returns a Kredis integer proxy" do
+      meter = company.daily_meter("orders")
+      expect(meter).to respond_to(:value)
+      expect(meter).to respond_to(:value=)
+    end
+
+    it "defaults to 0 when no usage exists" do
+      expect(company.meter_usage("orders")).to eq(0)
+    end
+
+    it "reads accumulated value after record_usage!" do
+      company.record_usage!("orders")
+      company.record_usage!("orders")
+      expect(company.meter_usage("orders")).to eq(2)
+    end
+
+    it "falls back to DailyUsageLog when Redis key is missing" do
+      company.record_usage!("orders")
+      expect(company.meter_usage("orders")).to eq(1)
+
+      Kredis.redis.del("skycom:company:#{company.id}:orders:#{Date.current.strftime('%Y%m%d')}")
+
+      create(:daily_usage_log, company: company, billing_resource: volumetric_resource,
+             log_date: Date.current, usage_count: 5)
+
+      expect(company.meter_usage("orders")).to eq(5)
+    end
+
+    it "accepts a custom log_date" do
+      past_date = 2.days.ago.to_date
+      create(:daily_usage_log, company: company, billing_resource: volumetric_resource,
+             log_date: past_date, usage_count: 10)
+      expect(company.meter_usage("orders", log_date: past_date)).to eq(10)
     end
   end
 

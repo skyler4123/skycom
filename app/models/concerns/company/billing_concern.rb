@@ -25,6 +25,21 @@ module Company::BillingConcern
     wallet_balance_cents < soft_debt_threshold_cents
   end
 
+  def daily_meter(resource_key, log_date: Date.current)
+    key = "skycom:company:#{id}:#{resource_key}:#{log_date.strftime('%Y%m%d')}"
+    Kredis.integer(key, default: -> {
+      DailyUsageLog.where(company_id: id)
+                   .joins(:billing_resource)
+                   .where(billing_resources: { name: resource_key.to_s })
+                   .where(log_date: log_date)
+                   .sum(:usage_count)
+    })
+  end
+
+  def meter_usage(resource_key, log_date: Date.current)
+    daily_meter(resource_key, log_date: log_date).value.to_i
+  end
+
   def record_usage!(resource_key, quantity: 1)
     date_key = Date.current.strftime("%Y%m%d")
     redis_key = "skycom:company:#{id}:#{resource_key}:#{date_key}"

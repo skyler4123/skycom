@@ -37,7 +37,7 @@ module Billing
         return
       end
 
-      value = Kredis.redis.get(key).to_i
+      value = company.meter_usage(resource_name, log_date: log_date)
       return if value.zero?
 
       DailyUsageLog.find_or_initialize_by(
