@@ -1,0 +1,72 @@
+# frozen_string_literal: true
+
+require "rails_helper"
+
+RSpec.describe Billing::MonthlyBillingJob do
+  subject(:perform_job) { described_class.perform_now }
+
+  let(:company) { create(:company, lifecycle_status: :active) }
+  let!(:contract) do
+    create(:billing_contract, company: company, lifecycle_status: :active,
+           start_date: 3.months.ago, fixed_monthly_price_cents: 1000)
+  end
+
+  context "when company has an active contract with base price" do
+    before do
+      company.update!(promo_balance_cents: 2000, main_balance_cents: 0, lifecycle_status: :active)
+    end
+
+    it "creates a BillingInvoice" do
+      expect { perform_job }.to change(BillingInvoice, :count).by(1)
+    end
+
+    it "deducts from wallet" do
+      expect { perform_job }
+        .to change { company.reload.promo_balance_cents }.from(2000).to(1000)
+    end
+
+    it "marks invoice as paid" do
+      perform_job
+      expect(BillingInvoice.last.payment_status).to eq("paid")
+    end
+  end
+
+  context "when company has no active contract" do
+    before do
+      company.update!(lifecycle_status: :active)
+      contract.update!(lifecycle_status: :expired)
+    end
+
+    it "does not create an invoice" do
+      expect { perform_job }.not_to change(BillingInvoice, :count)
+    end
+  end
+
+  context "when company has zero total charges" do
+    before do
+      company.update!(lifecycle_status: :active)
+      contract.update!(fixed_monthly_price_cents: 0)
+    end
+
+    it "does not create an invoice for zero charges" do
+      expect { perform_job }.not_to change(BillingInvoice, :count)
+    end
+  end
+
+  context "with multiple companies" do
+    let(:company2) { create(:company, lifecycle_status: :active) }
+    let!(:contract2) do
+      create(:billing_contract, company: company2, lifecycle_status: :active,
+             start_date: 3.months.ago, fixed_monthly_price_cents: 500)
+    end
+
+    before do
+      company.update!(promo_balance_cents: 2000, main_balance_cents: 0, lifecycle_status: :active)
+      company2.update!(promo_balance_cents: 1000, main_balance_cents: 0)
+    end
+
+    it "processes all active companies" do
+      expect { perform_job }.to change(BillingInvoice, :count).by(2)
+    end
+  end
+end
