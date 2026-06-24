@@ -18,6 +18,7 @@ class Company < ApplicationRecord
   include Company::RestaurantConcern
   include Company::PermissionConcern
   include Company::BillingConcern
+  include Company::CircuitBreakerConcern
 
   belongs_to :user
 
