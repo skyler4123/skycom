@@ -20,6 +20,10 @@ class Company < ApplicationRecord
 
   belongs_to :user
 
+  has_many :billing_contracts, dependent: :destroy
+  has_many :billing_invoices, dependent: :destroy
+  has_many :daily_usage_logs, dependent: :destroy
+
   has_many :property_mappings, dependent: :destroy
   has_many :table_configs, dependent: :destroy
   has_many :brands, dependent: :destroy
