@@ -32,7 +32,6 @@ class Seed::ApplicationService
       sa.currency_code = :usd
     end
     Seed::PaymentMethodService.create # Ensure global payment methods are seeded first
-    Seed::SystemSubscriptionPlanService.seeding # Seed subscription plans
     # User
     super_admin_1 = Seed::UserService.create(email: "super_admin_1@example.com", system_role: :super_admin)
     super_admin_2 = Seed::UserService.create(email: "super_admin_2@example.com", system_role: :super_admin)

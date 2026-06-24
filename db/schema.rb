@@ -5031,86 +5031,6 @@ ActiveRecord::Schema[8.0].define(version: 2026_06_13_235333) do
     t.index ["workflow_status"], name: "index_subscription_plans_on_workflow_status"
   end
 
-  create_table "system_subscription_groups", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
-    t.uuid "system_subscription_plan_id", null: false
-    t.uuid "company_id", null: false
-    t.uuid "branch_id"
-    t.string "name"
-    t.string "description"
-    t.string "code"
-    t.integer "country_code", null: false
-    t.integer "timezone"
-    t.boolean "auto_renew"
-    t.integer "lifecycle_status"
-    t.integer "workflow_status"
-    t.integer "business_type"
-    t.datetime "expiration_date"
-    t.jsonb "metadata", default: {}
-    t.datetime "discarded_at"
-    t.string "permission_resource_name"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.index ["branch_id"], name: "index_system_subscription_groups_on_branch_id"
-    t.index ["business_type"], name: "index_system_subscription_groups_on_business_type"
-    t.index ["company_id"], name: "index_system_subscription_groups_on_company_id"
-    t.index ["discarded_at"], name: "index_system_subscription_groups_on_discarded_at"
-    t.index ["lifecycle_status"], name: "index_system_subscription_groups_on_lifecycle_status"
-    t.index ["system_subscription_plan_id"], name: "idx_on_system_subscription_plan_id_2f2a083a8b"
-    t.index ["workflow_status"], name: "index_system_subscription_groups_on_workflow_status"
-  end
-
-  create_table "system_subscription_plans", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
-    t.string "name", null: false
-    t.string "description"
-    t.string "code"
-    t.integer "duration_days"
-    t.integer "country_code"
-    t.jsonb "features", default: {}
-    t.jsonb "limits", default: {}
-    t.integer "lifecycle_status"
-    t.integer "workflow_status"
-    t.integer "business_type"
-    t.datetime "expiration_date"
-    t.jsonb "metadata", default: {}
-    t.datetime "discarded_at"
-    t.string "permission_resource_name"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.index ["business_type"], name: "index_system_subscription_plans_on_business_type"
-    t.index ["discarded_at"], name: "index_system_subscription_plans_on_discarded_at"
-    t.index ["lifecycle_status"], name: "index_system_subscription_plans_on_lifecycle_status"
-    t.index ["workflow_status"], name: "index_system_subscription_plans_on_workflow_status"
-  end
-
-  create_table "system_subscriptions", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
-    t.uuid "system_subscription_plan_id", null: false
-    t.uuid "system_subscription_group_id"
-    t.uuid "company_id", null: false
-    t.uuid "branch_id"
-    t.string "name"
-    t.string "description"
-    t.string "code"
-    t.integer "country_code", null: false
-    t.boolean "auto_renew"
-    t.integer "lifecycle_status"
-    t.integer "workflow_status"
-    t.integer "business_type"
-    t.datetime "expiration_date"
-    t.jsonb "metadata", default: {}
-    t.datetime "discarded_at"
-    t.string "permission_resource_name"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.index ["branch_id"], name: "index_system_subscriptions_on_branch_id"
-    t.index ["business_type"], name: "index_system_subscriptions_on_business_type"
-    t.index ["company_id"], name: "index_system_subscriptions_on_company_id"
-    t.index ["discarded_at"], name: "index_system_subscriptions_on_discarded_at"
-    t.index ["lifecycle_status"], name: "index_system_subscriptions_on_lifecycle_status"
-    t.index ["system_subscription_group_id"], name: "index_system_subscriptions_on_system_subscription_group_id"
-    t.index ["system_subscription_plan_id"], name: "index_system_subscriptions_on_system_subscription_plan_id"
-    t.index ["workflow_status"], name: "index_system_subscriptions_on_workflow_status"
-  end
-
   create_table "systems", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
     t.string "email"
     t.string "name", default: "System", null: false
@@ -5945,13 +5865,6 @@ ActiveRecord::Schema[8.0].define(version: 2026_06_13_235333) do
   add_foreign_key "subscription_plan_appointments", "subscription_plans"
   add_foreign_key "subscription_plans", "branches"
   add_foreign_key "subscription_plans", "companies"
-  add_foreign_key "system_subscription_groups", "branches"
-  add_foreign_key "system_subscription_groups", "companies"
-  add_foreign_key "system_subscription_groups", "system_subscription_plans"
-  add_foreign_key "system_subscriptions", "branches"
-  add_foreign_key "system_subscriptions", "companies"
-  add_foreign_key "system_subscriptions", "system_subscription_groups"
-  add_foreign_key "system_subscriptions", "system_subscription_plans"
   add_foreign_key "table_configs", "categories"
   add_foreign_key "table_configs", "companies"
   add_foreign_key "table_configs", "property_mappings"
