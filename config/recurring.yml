@@ -26,6 +26,16 @@ default: &default
     queue: statistic_job
     schedule: every 1 hours
 
+  sync_daily_usage:
+    class: Billing::SyncDailyUsageJob
+    queue: default
+    schedule: at 23:55 every day
+
+  monthly_billing:
+    class: Billing::MonthlyBillingJob
+    queue: default
+    schedule: at 00:00 day 1 every month
+
 development:
   <<: *default
 
