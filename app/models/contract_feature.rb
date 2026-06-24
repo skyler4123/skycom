@@ -3,9 +3,9 @@ class ContractFeature < ApplicationRecord
   belongs_to :billing_contract
 
   # Prevent assigning the same feature multiple times to one contract
-  validates :billing_resource_id, uniqueness: { scope: :billing_contract_id, 
+  validates :billing_resource_id, uniqueness: { scope: :billing_contract_id,
                                                 message: "is already assigned to this contract" }
-  validates :monthly_flat_price, presence: true, numericality: { greater_than_or_equal_to: 0 }
+  validates :monthly_flat_price_cents, presence: true, numericality: { greater_than_or_equal_to: 0 }
 
   enum :lifecycle_status, { active: 0, disabled: 1 }, default: :active
 

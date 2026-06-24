@@ -17,12 +17,14 @@ class Company < ApplicationRecord
   include Company::HospitalConcern
   include Company::RestaurantConcern
   include Company::PermissionConcern
+  include Company::BillingConcern
 
   belongs_to :user
 
   has_many :billing_contracts, dependent: :destroy
   has_many :billing_invoices, dependent: :destroy
   has_many :daily_usage_logs, dependent: :destroy
+  has_many :wallet_transactions, dependent: :destroy
 
   has_many :property_mappings, dependent: :destroy
   has_many :table_configs, dependent: :destroy

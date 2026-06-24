@@ -3,10 +3,10 @@ class ContractMetric < ApplicationRecord
   belongs_to :billing_contract
 
   # Protect against duplicate configuration rows
-  validates :billing_resource_id, uniqueness: { scope: :billing_contract_id, 
+  validates :billing_resource_id, uniqueness: { scope: :billing_contract_id,
                                                 message: "is already metered on this contract" }
   validates :free_allowance, presence: true, numericality: { greater_than_or_equal_to: 0 }
-  validates :unit_price, presence: true, numericality: { greater_than_or_equal_to: 0 }
+  validates :unit_price_cents, presence: true, numericality: { greater_than_or_equal_to: 0 }
 
   enum :lifecycle_status, { active: 0, disabled: 1 }, default: :active
 
