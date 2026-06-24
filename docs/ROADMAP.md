@@ -222,7 +222,7 @@ Company
 
 ### 1D — Subscription Lifecycle (Plan Catalog)
 
-The `SystemSubscriptionPlan` is **not** the source of truth for gating — it is simply the plan catalog that defines templates for creating BillingContracts.
+`BillingContract` is the source of truth for gating. Plan templates define the default `enabled_features`, `feature_prices`, `included_allowance`, and `unit_prices` for new contracts.
 
 | Concept | Description |
 |---------|-------------|
@@ -722,7 +722,7 @@ When a company signs up, the system detects its market (via `country_code` on th
 | US | USD | $2/mo | $5/mo | $0.10 |
 | VN | VND | 50,000/mo | 125,000/mo | 2,500 |
 
-These templates live in the `SystemSubscriptionPlan` catalog alongside the default contract configuration. When creating a `BillingContract` at signup, the country-specific `feature_prices` and `unit_prices` are populated from the matching template. Prices can still be overridden per-company for promotions or custom negotiated deals.
+These templates live alongside the default contract configuration. When creating a `BillingContract` at signup, the country-specific `feature_prices` and `unit_prices` are populated from the matching template. Prices can still be overridden per-company for promotions or custom negotiated deals.
 
 ---
 

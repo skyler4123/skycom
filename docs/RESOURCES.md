@@ -33,11 +33,8 @@ Platform-level tables that span across all companies. Identity, auth, shared ref
 | 6 | `periods` | Shared immutable time-range reference |
 | 7 | `prices` | Shared immutable monetary-value reference |
 | 8 | `statistics` | Polymorphic analytics / metric snapshots |
-| 9 | `system_subscription_plans` | Platform-wide subscription plan definitions |
-| 10 | `system_subscription_groups` | Subscription group (company grouping) |
-| 11 | `system_subscriptions` | Company subscription instances |
 
-**Total: 11 tables**
+**Total: 8 tables**
 
 ---
 
