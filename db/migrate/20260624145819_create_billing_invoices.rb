@@ -5,11 +5,11 @@ class CreateBillingInvoices < ActiveRecord::Migration[8.0]
       t.references :billing_contract, null: false, foreign_key: true, type: :uuid
 
       t.string   :invoice_number, null: false
-      
+
       # money-rails format for the finalized invoice amount
       t.integer  :price_cents, default: 0, null: false
       t.string   :price_currency, default: "USD", null: false
-      
+
       t.datetime :period_start, null: false
       t.datetime :period_end, null: false
       t.datetime :due_at

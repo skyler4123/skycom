@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_06_13_235333) do
+ActiveRecord::Schema[8.0].define(version: 2026_06_24_160000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pgcrypto"
@@ -325,6 +325,57 @@ ActiveRecord::Schema[8.0].define(version: 2026_06_13_235333) do
     t.index ["customer_id"], name: "index_attendance_months_on_customer_id"
     t.index ["logable_type", "logable_id"], name: "index_attendance_months_on_logable"
     t.index ["period_id"], name: "index_attendance_months_on_period_id"
+  end
+
+  create_table "billing_contracts", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "company_id", null: false
+    t.string "name", null: false
+    t.string "description"
+    t.integer "contract_type", default: 0, null: false
+    t.integer "fixed_monthly_price_cents", default: 0, null: false
+    t.string "fixed_monthly_price_currency", default: "USD", null: false
+    t.datetime "start_date", null: false
+    t.datetime "end_time"
+    t.integer "lifecycle_status", default: 0
+    t.integer "workflow_status", default: 0
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["company_id"], name: "index_billing_contracts_on_company_id"
+    t.index ["lifecycle_status"], name: "index_billing_contracts_on_lifecycle_status"
+    t.index ["workflow_status"], name: "index_billing_contracts_on_workflow_status"
+  end
+
+  create_table "billing_invoices", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "company_id", null: false
+    t.uuid "billing_contract_id", null: false
+    t.string "invoice_number", null: false
+    t.integer "price_cents", default: 0, null: false
+    t.string "price_currency", default: "USD", null: false
+    t.datetime "period_start", null: false
+    t.datetime "period_end", null: false
+    t.datetime "due_at"
+    t.integer "payment_status", default: 0
+    t.integer "lifecycle_status", default: 0
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["billing_contract_id"], name: "index_billing_invoices_on_billing_contract_id"
+    t.index ["company_id"], name: "index_billing_invoices_on_company_id"
+    t.index ["invoice_number"], name: "index_billing_invoices_on_invoice_number", unique: true
+    t.index ["lifecycle_status"], name: "index_billing_invoices_on_lifecycle_status"
+    t.index ["payment_status"], name: "index_billing_invoices_on_payment_status"
+  end
+
+  create_table "billing_resources", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.string "name", null: false
+    t.text "description"
+    t.integer "resource_type", default: 0, null: false
+    t.integer "lifecycle_status", default: 0
+    t.integer "workflow_status", default: 0
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["lifecycle_status"], name: "index_billing_resources_on_lifecycle_status"
+    t.index ["name"], name: "index_billing_resources_on_name", unique: true
+    t.index ["workflow_status"], name: "index_billing_resources_on_workflow_status"
   end
 
   create_table "branches", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
@@ -812,11 +863,51 @@ ActiveRecord::Schema[8.0].define(version: 2026_06_13_235333) do
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer "promo_balance_cents", default: 0, null: false
+    t.integer "main_balance_cents", default: 0, null: false
+    t.integer "soft_debt_threshold_cents", default: -10000, null: false
     t.index ["business_type"], name: "index_companies_on_business_type"
     t.index ["discarded_at"], name: "index_companies_on_discarded_at"
     t.index ["lifecycle_status"], name: "index_companies_on_lifecycle_status"
     t.index ["user_id"], name: "index_companies_on_user_id"
     t.index ["workflow_status"], name: "index_companies_on_workflow_status"
+  end
+
+  create_table "contract_features", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "billing_resource_id", null: false
+    t.uuid "billing_contract_id", null: false
+    t.string "name"
+    t.string "description"
+    t.integer "monthly_flat_price_cents", default: 0, null: false
+    t.string "monthly_flat_price_currency", default: "USD", null: false
+    t.integer "lifecycle_status", default: 0
+    t.integer "workflow_status", default: 0
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["billing_contract_id", "billing_resource_id"], name: "index_contract_features_on_contract_and_resource", unique: true
+    t.index ["billing_contract_id"], name: "index_contract_features_on_billing_contract_id"
+    t.index ["billing_resource_id"], name: "index_contract_features_on_billing_resource_id"
+    t.index ["lifecycle_status"], name: "index_contract_features_on_lifecycle_status"
+    t.index ["workflow_status"], name: "index_contract_features_on_workflow_status"
+  end
+
+  create_table "contract_metrics", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "billing_resource_id", null: false
+    t.uuid "billing_contract_id", null: false
+    t.string "name"
+    t.string "description"
+    t.integer "free_allowance", default: 0, null: false
+    t.integer "unit_price_cents", default: 0, null: false
+    t.string "unit_price_currency", default: "USD", null: false
+    t.integer "lifecycle_status", default: 0
+    t.integer "workflow_status", default: 0
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["billing_contract_id", "billing_resource_id"], name: "index_contract_metrics_on_contract_and_resource", unique: true
+    t.index ["billing_contract_id"], name: "index_contract_metrics_on_billing_contract_id"
+    t.index ["billing_resource_id"], name: "index_contract_metrics_on_billing_resource_id"
+    t.index ["lifecycle_status"], name: "index_contract_metrics_on_lifecycle_status"
+    t.index ["workflow_status"], name: "index_contract_metrics_on_workflow_status"
   end
 
   create_table "customer_appointments", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
@@ -1089,6 +1180,18 @@ ActiveRecord::Schema[8.0].define(version: 2026_06_13_235333) do
     t.index ["property_mapping_id"], name: "index_customers_on_property_mapping_id"
     t.index ["user_id"], name: "index_customers_on_user_id"
     t.index ["workflow_status"], name: "index_customers_on_workflow_status"
+  end
+
+  create_table "daily_usage_logs", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "company_id", null: false
+    t.uuid "billing_resource_id", null: false
+    t.integer "usage_count", default: 0, null: false
+    t.date "log_date", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["billing_resource_id"], name: "index_daily_usage_logs_on_billing_resource_id"
+    t.index ["company_id", "billing_resource_id", "log_date"], name: "idx_daily_usage_lookup"
+    t.index ["company_id"], name: "index_daily_usage_logs_on_company_id"
   end
 
   create_table "department_appointments", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
@@ -5589,6 +5692,9 @@ ActiveRecord::Schema[8.0].define(version: 2026_06_13_235333) do
   add_foreign_key "attendance_months", "companies"
   add_foreign_key "attendance_months", "customers"
   add_foreign_key "attendance_months", "periods"
+  add_foreign_key "billing_contracts", "companies"
+  add_foreign_key "billing_invoices", "billing_contracts"
+  add_foreign_key "billing_invoices", "companies"
   add_foreign_key "branches", "branches", column: "parent_branch_id"
   add_foreign_key "branches", "categories"
   add_foreign_key "branches", "companies"
@@ -5609,6 +5715,10 @@ ActiveRecord::Schema[8.0].define(version: 2026_06_13_235333) do
   add_foreign_key "carts", "property_mappings"
   add_foreign_key "categories", "companies"
   add_foreign_key "companies", "users"
+  add_foreign_key "contract_features", "billing_contracts"
+  add_foreign_key "contract_features", "billing_resources"
+  add_foreign_key "contract_metrics", "billing_contracts"
+  add_foreign_key "contract_metrics", "billing_resources"
   add_foreign_key "customer_appointments", "companies"
   add_foreign_key "customer_appointments", "customers"
   add_foreign_key "customer_group_appointments", "companies"
@@ -5622,6 +5732,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_06_13_235333) do
   add_foreign_key "customers", "companies"
   add_foreign_key "customers", "property_mappings"
   add_foreign_key "customers", "users"
+  add_foreign_key "daily_usage_logs", "billing_resources"
+  add_foreign_key "daily_usage_logs", "companies"
   add_foreign_key "department_appointments", "companies"
   add_foreign_key "department_appointments", "departments"
   add_foreign_key "departments", "categories"

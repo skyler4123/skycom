@@ -6,7 +6,7 @@ class CreateContractFeatures < ActiveRecord::Migration[8.0]
 
       t.string :name
       t.string :description
-      
+
       # money-rails formatting for flat monthly add-on pricing
       t.integer :monthly_flat_price_cents, default: 0, null: false
       t.string :monthly_flat_price_currency, default: "USD", null: false
@@ -15,8 +15,8 @@ class CreateContractFeatures < ActiveRecord::Migration[8.0]
       t.integer  :workflow_status, default: 0, index: true
       t.timestamps
     end
-    
+
     # Critical index to prevent attaching the same add-on twice to the same contract
-    add_index :contract_features, [:billing_contract_id, :billing_resource_id], unique: true, name: "index_contract_features_on_contract_and_resource"
+    add_index :contract_features, [ :billing_contract_id, :billing_resource_id ], unique: true, name: "index_contract_features_on_contract_and_resource"
   end
 end
