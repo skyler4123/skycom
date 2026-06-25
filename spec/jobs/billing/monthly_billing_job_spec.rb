@@ -53,6 +53,37 @@ RSpec.describe Billing::MonthlyBillingJob do
     end
   end
 
+  context "when company is past_due" do
+    before do
+      company.update!(lifecycle_status: :past_due, promo_balance_cents: 2000, main_balance_cents: 0)
+    end
+
+    it "still creates a BillingInvoice" do
+      expect { perform_job }.to change(BillingInvoice, :count).by(1)
+    end
+  end
+
+  context "when company is suspended" do
+    before do
+      company.update!(lifecycle_status: :suspended, promo_balance_cents: 0,
+                      main_balance_cents: -5000, soft_debt_threshold_cents: -1000)
+    end
+
+    it "does not create an invoice" do
+      expect { perform_job }.not_to change(BillingInvoice, :count)
+    end
+  end
+
+  context "when company is disabled" do
+    before do
+      company.update!(lifecycle_status: :disabled, promo_balance_cents: 0,
+                      main_balance_cents: -5000, soft_debt_threshold_cents: -1000)
+    end
+
+    it "does not create an invoice" do
+      expect { perform_job }.not_to change(BillingInvoice, :count)
+    end
+  end
   context "with multiple companies" do
     let(:company2) { create(:company, lifecycle_status: :active) }
     let!(:contract2) do
