@@ -1,8 +1,17 @@
+# Links a volumetric BillingResource to a BillingContract with allowance and overage pricing.
+# Only volumetric-type resources can be attached here (validated).
+#
+#   @contract.contract_metrics.active.each do |metric|
+#     metric.free_allowance      # e.g. 200 orders/month included free
+#     metric.unit_price_cents    # e.g. 10 cents per additional order
+#   end
+#
+# CalculatorService computes overages by comparing DailyUsageLog sums against allowances.
+#
 class ContractMetric < ApplicationRecord
   belongs_to :billing_resource
   belongs_to :billing_contract
 
-  # Protect against duplicate configuration rows
   validates :billing_resource_id, uniqueness: { scope: :billing_contract_id,
                                                 message: "is already metered on this contract" }
   validates :free_allowance, presence: true, numericality: { greater_than_or_equal_to: 0 }
@@ -10,7 +19,6 @@ class ContractMetric < ApplicationRecord
 
   enum :lifecycle_status, { active: 0, disabled: 1 }, default: :active
 
-  # Validate that we aren't putting an feature gate inside the usage meter bridge
   validate :must_be_volumetric_type
 
   private

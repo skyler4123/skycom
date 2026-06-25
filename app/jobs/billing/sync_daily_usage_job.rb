@@ -1,5 +1,17 @@
 # frozen_string_literal: true
 
+# Scans Redis for today's metering counters and persists them to DailyUsageLog.
+# Runs every 4 hours (configured in config/recurring.yml).
+#
+# Flow:
+#   1. SCAN Redis for keys matching "skycom:company:*:*:<YYYYMMDD>"
+#   2. For each key: read via company.meter_usage (Kredis with DB fallback)
+#   3. Upsert DailyUsageLog row
+#   4. DEL the Redis counter key (resets for next sync window)
+#
+# After Redis restart, meter_usage's Kredis default lambda re-hydrates
+# from DailyUsageLog, so no data is lost within the 4-hour window.
+#
 module Billing
   class SyncDailyUsageJob < ApplicationJob
     queue_as :default

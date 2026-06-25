@@ -1,5 +1,15 @@
 # frozen_string_literal: true
 
+# Suspends a company when its wallet balance drops below the debt threshold,
+# and auto-reactivates when funds are restored.
+#
+# SettlementService calls trip! when payment cannot be collected:
+#   company.circuit_breaker_trip!  # lifecycle_status → :suspended
+#
+# The auto-reset callback fires on any balance change:
+#   company.update!(main_balance_cents: 5000)
+#   → if suspended + balance above threshold → lifecycle_status back to :active
+#
 module Company::CircuitBreakerConcern
   extend ActiveSupport::Concern
 

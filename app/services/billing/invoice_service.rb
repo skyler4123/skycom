@@ -1,5 +1,14 @@
 # frozen_string_literal: true
 
+# Creates a BillingInvoice from a CalculatorService Result.
+# Called by MonthlyBillingJob as step 2 of the billing pipeline.
+#
+#   result = CalculatorService.call(company)
+#   invoice = InvoiceService.call(company, result)
+#   # => BillingInvoice(price_cents: 1500, payment_status: :unpaid, lifecycle_status: :final)
+#
+# Returns nil if no active contract exists (e.g. company between plans).
+#
 module Billing
   class InvoiceService
     def self.call(company, calculator_result, period_start: nil, period_end: nil)

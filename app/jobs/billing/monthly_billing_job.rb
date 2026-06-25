@@ -1,5 +1,16 @@
 # frozen_string_literal: true
 
+# Orchestrates the monthly billing pipeline for every active company.
+# Runs on the 1st of each month at 00:00 (configured in config/recurring.yml).
+#
+# Pipeline per company:
+#   1. CalculatorService.call(company)         → Result (total_cents + breakdown)
+#   2. InvoiceService.call(company, result)     → BillingInvoice
+#   3. SettlementService.call(invoice)          → deducts wallet, or trips breaker
+#
+# Skips companies with zero total (nothing to bill).
+# Isolated per company — one failure doesn't affect others.
+#
 module Billing
   class MonthlyBillingJob < ApplicationJob
     queue_as :default

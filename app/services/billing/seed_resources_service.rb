@@ -1,5 +1,17 @@
 # frozen_string_literal: true
 
+# Seeds the BillingResource catalog with all known metered resources and add-on features.
+# Must be called during onboarding (e.g. rake task or company setup).
+#
+#   Billing::SeedResourcesService.call
+#   # => 7 volumetric + 12 addon_feature BillingResource records created
+#
+# Volumetric resources (usage-based metering):
+#   orders, storage_mb, employees, branches, customers, api_calls, stock_mutations
+#
+# Addon features (flat monthly fee):
+#   hrm_attendance, inventory_advanced, analytics_dashboard, custom_roles, ...
+#
 module Billing
   class SeedResourcesService
     VOLUMETRIC_RESOURCES = {

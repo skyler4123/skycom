@@ -1,5 +1,16 @@
 # frozen_string_literal: true
 
+# Computes the total monthly charge for a company by summing three components:
+#   1. Base price — contract.fixed_monthly_price_cents
+#   2. Features   — sum of contract_features.active.monthly_flat_price_cents
+#   3. Overages   — usage above free_allowance × unit_price_cents
+#
+#   result = CalculatorService.call(company)
+#   result.total_cents          # => 1500 (i.e. $15.00)
+#   result.breakdown.base_cents      # => 0
+#   result.breakdown.features_cents  # => 500
+#   result.breakdown.overages        # => { "orders" => 1000 }
+#
 module Billing
   class CalculatorService
     Result = Struct.new(:total_cents, :breakdown, keyword_init: true) do

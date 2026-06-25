@@ -1,5 +1,16 @@
 # frozen_string_literal: true
 
+# Auto-increment Redis usage counters when business records are created.
+# Include in any model that should count toward billing volumetric metrics.
+#
+#   class Order < ApplicationRecord
+#     include MeteringConcern
+#     metered_as :orders  # key must match a BillingResource name
+#   end
+#
+# On Order.create → after_commit fires → company.record_usage!("orders")
+#   → Kredis.redis.incrby("skycom:company:<uuid>:orders:20260624", 1)
+#
 module MeteringConcern
   extend ActiveSupport::Concern
 

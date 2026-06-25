@@ -1,5 +1,22 @@
 # frozen_string_literal: true
 
+# Feature gating, wallet helpers, and Redis-backed usage metering.
+# Included in Company — all methods available on any company instance.
+#
+#   # Feature check (gates UI and API access)
+#   company.feature_enabled?("analytics_dashboard")  # => true/false
+#
+#   # Wallet balance
+#   company.wallet_balance_cents            # promo + main
+#   company.debt_ceiling_reached?           # below soft_debt_threshold?
+#
+#   # Metering (called by MeteringConcern after_commit)
+#   company.record_usage!("orders")         # atomic INCRBY in Redis
+#
+#   # Read with Redis restart safety (Kredis default → DailyUsageLog)
+#   company.meter_usage("orders")           # today's count
+#   company.meter_usage("orders", log_date: 5.days.ago.to_date)
+#
 module Company::BillingConcern
   extend ActiveSupport::Concern
 

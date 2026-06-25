@@ -1,5 +1,21 @@
 # frozen_string_literal: true
 
+# Deducts invoice amount from company wallet: promo_balance first, then main_balance.
+# If both are exhausted, trips the circuit breaker (suspends the company).
+#
+# Called by MonthlyBillingJob as step 3 of the billing pipeline.
+#
+#   SettlementService.call(invoice)
+#   # → promo_balance 500 → 0, main_balance 1000 → 700
+#   # → invoice.payment_status → :paid
+#
+# Deduction algorithm:
+#   1. Deduct from promo_balance (promotional credits expire first)
+#   2. Deduct remainder from main_balance (customer's real money)
+#   3. If still remaining → circuit_breaker_trip! + invoice marked :overdue
+#
+# Every balance change is recorded as a WalletTransaction with before/after snapshots.
+#
 module Billing
   class SettlementService
     def self.call(invoice)
