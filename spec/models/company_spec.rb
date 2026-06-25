@@ -73,6 +73,27 @@ RSpec.describe Company, type: :model do
     it { should define_enum_for(:fiscal_year_end_month) }
   end
 
+  describe "lifecycle_status" do
+    it "defines company-specific billing values" do
+      expect(Company.lifecycle_statuses).to eq({
+        "active" => 0,
+        "past_due" => 10,
+        "suspended" => 20,
+        "disabled" => 30
+      })
+    end
+
+    it "defaults to active" do
+      expect(Company.new.lifecycle_status).to eq("active")
+    end
+
+    it "provides predicate methods" do
+      company = Company.new(lifecycle_status: :past_due)
+      expect(company).to be_lifecycle_status_past_due
+      expect(company).not_to be_lifecycle_status_active
+    end
+  end
+
   describe "#create_first_cloned_company method exists" do
     it "responds to create_first_cloned_company" do
       expect(Company.new).to respond_to(:create_first_cloned_company)

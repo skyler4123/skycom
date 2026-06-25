@@ -73,7 +73,12 @@ class Company < ApplicationRecord
     hotel: 4000,
     fitness: 5000
   }, prefix: true
-  enum :lifecycle_status, LIFECYCLE_STATUS, prefix: true
+  enum :lifecycle_status, {
+    active: 0,
+    past_due: 10,
+    suspended: 20,
+    disabled: 30
+  }, prefix: true, default: :active
   enum :workflow_status, WORKFLOW_STATUS, prefix: true
   enum :timezone, TIMEZONES, prefix: true
   enum :currency_code, CURRENCIE_CODES, prefix: true
