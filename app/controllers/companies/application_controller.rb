@@ -1,6 +1,8 @@
 class Companies::ApplicationController < ApplicationController
   before_action :set_company
   before_action :set_employee
+  before_action :block_suspended!
+  before_action :set_past_due_warning
 
   # Order reason: Companies::Authorizable need current_employee
   include Companies::Authorizable
@@ -24,5 +26,13 @@ class Companies::ApplicationController < ApplicationController
 
   def current_employee
     @current_employee
+  end
+
+  def set_past_due_warning
+    return unless current_company&.lifecycle_status_past_due?
+    return if current_company.hide_billing_alerts?
+    return unless Time.current.day >= 15
+
+    flash.now[:alert] = "Your account is past due. Please settle outstanding invoices to avoid suspension."
   end
 end

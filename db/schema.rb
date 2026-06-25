@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_06_25_121309) do
+ActiveRecord::Schema[8.0].define(version: 2026_06_25_133633) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pgcrypto"
@@ -866,6 +866,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_06_25_121309) do
     t.integer "promo_balance_cents", default: 0, null: false
     t.integer "main_balance_cents", default: 0, null: false
     t.integer "soft_debt_threshold_cents", default: -10000, null: false
+    t.datetime "suspension_at"
+    t.boolean "hide_billing_alerts", default: false, null: false
     t.index ["business_type"], name: "index_companies_on_business_type"
     t.index ["discarded_at"], name: "index_companies_on_discarded_at"
     t.index ["lifecycle_status"], name: "index_companies_on_lifecycle_status"

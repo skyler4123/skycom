@@ -94,6 +94,13 @@ RSpec.describe Company, type: :model do
     end
   end
 
+  describe "hide_billing_alerts" do
+    it "defaults to false" do
+      company = Company.new
+      expect(company.hide_billing_alerts).to be false
+    end
+  end
+
   describe "#create_first_cloned_company method exists" do
     it "responds to create_first_cloned_company" do
       expect(Company.new).to respond_to(:create_first_cloned_company)
