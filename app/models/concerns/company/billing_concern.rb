@@ -11,7 +11,7 @@
 #   company.debt_ceiling_reached?           # below soft_debt_threshold?
 #
 #   # Metering (called by MeteringConcern after_commit)
-#   company.record_usage!("orders")         # atomic INCRBY in Redis
+#   company.record_usage!("orders")         # Redis-backed with Kredis (DB fallback on restart)
 #
 #   # Read with Redis restart safety (Kredis default → DailyUsageLog)
 #   company.meter_usage("orders")           # today's count
@@ -50,7 +50,7 @@ module Company::BillingConcern
                    .where(billing_resources: { name: resource_key.to_s })
                    .where(log_date: log_date)
                    .sum(:usage_count)
-    })
+    }, expires_in: 36.hours)
   end
 
   def meter_usage(resource_key, log_date: Date.current)
@@ -58,10 +58,8 @@ module Company::BillingConcern
   end
 
   def record_usage!(resource_key, quantity: 1)
-    date_key = Date.current.strftime("%Y%m%d")
-    redis_key = "skycom:company:#{id}:#{resource_key}:#{date_key}"
-
-    Kredis.redis.incrby(redis_key, quantity)
+    meter = daily_meter(resource_key)
+    meter.value = meter.value.to_i + quantity
   rescue Redis::BaseConnectionError => e
     Rails.logger.warn("Metering Redis unavailable for company #{id}: #{e.message}")
   end

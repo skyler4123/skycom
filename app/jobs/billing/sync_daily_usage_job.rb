@@ -7,7 +7,7 @@
 #   1. SCAN Redis for keys matching "skycom:company:*:*:<YYYYMMDD>"
 #   2. For each key: read via company.meter_usage (Kredis with DB fallback)
 #   3. Upsert DailyUsageLog row
-#   4. DEL the Redis counter key (resets for next sync window)
+#   4. Key remains in Redis with 36h TTL (set by Kredis) — no manual clean-up needed
 #
 # After Redis restart, meter_usage's Kredis default lambda re-hydrates
 # from DailyUsageLog, so no data is lost within the 4-hour window.
@@ -57,8 +57,6 @@ module Billing
         billing_resource: resource,
         log_date: log_date
       ).update!(usage_count: value)
-
-      Kredis.redis.del(key)
     rescue ActiveRecord::RecordInvalid, Redis::BaseConnectionError => e
       Rails.logger.warn("SyncDailyUsageJob: Error processing key #{key}: #{e.message}")
     end

@@ -476,10 +476,10 @@ These keys are lightweight, never block the main operation, and are the source o
 
 ### Daily Snapshots (PostgreSQL)
 
-Every night at 23:55, a background job:
-1. Reads all Redis counters for the day
-2. Writes one `DailyUsageLog` row per company per resource per day
-3. Zeros out the Redis keys for the new day
+Every hour, `SyncDailyUsageJob` syncs Redis counters to `DailyUsageLog`:
+1. Reads counters via `company.meter_usage` (Kredis proxy with DB fallback on restart)
+2. Upserts one `DailyUsageLog` row per company per resource per day
+3. Keys remain in Redis with 36h TTL — no manual deletion needed
 
 This creates a permanent, queryable history. The `DailyUsageLog` table stores:
 - `company_id`, `resource_name`, `logged_date`

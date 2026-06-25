@@ -24,11 +24,11 @@ Three-phase backend pipeline built on existing billing models (last commit). Rel
                             │
                             ▼
 ┌─────────────────────────────────────────────────────────┐
-│ Phase 2: Nightly Sync (23:55 daily)                      │
+│ Phase 2: Hourly Sync (every 1 hour)                      │
 │                                                         │
 │  SyncDailyUsageJob                                       │
-│    └── Scan Redis keys → DailyUsageLog upsert           │
-│    └── Delete processed Redis keys                      │
+│    ├── Scan Redis keys → DailyUsageLog upsert           │
+│    └── Keys remain with 36h TTL — no DEL needed         │
 └─────────────────────────────────────────────────────────┘
                             │
                             ▼
@@ -110,19 +110,19 @@ MeteringConcern#increment_usage_counter
 
 Key pattern: `skycom:company:<uuid>:<resource_name>:<YYYYMMDD>`
 
-### 3.3 Nightly Sync (Phase 2)
+### 3.3 Hourly Sync (Phase 2)
 
 ```
-SyncDailyUsageJob (23:55 daily)
+SyncDailyUsageJob (every 1 hour)
   │
-  ├── SCAN Redis for keys matching "skycom:company:*:*:#{yesterday_yyyymmdd}"
+  ├── SCAN Redis for keys matching "skycom:company:*:*:#{today_yyyymmdd}"
   │
   ├── For each key:
   │     ├── Parse: company_id, resource_name, date
   │     ├── resource = BillingResource.find_by(name: resource_name)
   │     ├── DailyUsageLog.find_or_initialize_by(...)
-  │     │     .update!(usage_count: redis_value)
-  │     └── Redis.del(key)
+  │     │     .update!(usage_count: value)    # read via Kredis proxy
+  │     └── No DEL — 36h TTL handles cleanup
 ```
 
 ### 3.4 Monthly Billing (Phase 3)
@@ -222,7 +222,7 @@ When a company is `read_only`:
 | 8 | `app/services/billing/invoice_service.rb` | Service | Create BillingInvoice from calculator result |
 | 9 | `app/services/billing/settlement_service.rb` | Service | Deduct wallets, record transactions, trip breaker |
 | 10 | `app/services/billing/seed_resources_service.rb` | Service | Populate billing_resources table |
-| 11 | `app/jobs/billing/sync_daily_usage_job.rb` | Job | Nightly Redis → DailyUsageLog sync |
+| 11 | `app/jobs/billing/sync_daily_usage_job.rb` | Job | Hourly Redis → DailyUsageLog sync |
 | 12 | `app/jobs/billing/monthly_billing_job.rb` | Job | Monthly billing orchestration |
 
 ### Modified Files
@@ -230,7 +230,7 @@ When a company is `read_only`:
 | # | File | Change |
 |---|------|--------|
 | 1 | `app/models/company.rb` | Add `include Company::BillingConcern`, `include Company::CircuitBreakerConcern`, `has_many :wallet_transactions` |
-| 2 | `config/recurring.yml` | Add SyncDailyUsageJob schedule (23:55 daily) and MonthlyBillingJob (1st 00:00) |
+| 2 | `config/recurring.yml` | Add SyncDailyUsageJob schedule (every 1 hour) and MonthlyBillingJob (1st 00:00) |
 
 ### Files That Include `MeteringConcern`
 
@@ -277,7 +277,7 @@ Countable models that trigger Redis counters on create:
 |-----------|-----------|----------------|
 | `Company::BillingConcern` | Unit | `feature_enabled?` returns true/false based on ContractFeature existence |
 | `MeteringConcern` | Unit | Redis INCR called on create with correct key pattern |
-| `SyncDailyUsageJob` | System | Redis keys → DailyUsageLog records, keys deleted |
+| `SyncDailyUsageJob` | System | Redis keys → DailyUsageLog records, keys persist with TTL |
 | `Billing::CalculatorService` | Unit | Correct total with overages, features, base price |
 | `Billing::InvoiceService` | Unit | Creates BillingInvoice with correct amounts |
 | `Billing::SettlementService` | Unit | Wallet deduction order, WalletTransaction creation, circuit breaker trip |

@@ -126,16 +126,21 @@ RSpec.describe Company::BillingConcern do
   end
 
   describe "#record_usage!" do
-    it "increments Redis counter" do
-      redis_key = "skycom:company:#{company.id}:orders:#{Date.current.strftime('%Y%m%d')}"
-      redis = Kredis.redis
+    it "increments the meter value" do
+      expect { company.record_usage!("orders") }
+        .to change { company.meter_usage("orders") }.by(1)
+    end
 
-      expect(redis).to receive(:incrby).with(redis_key, 1)
-      company.record_usage!("orders")
+    it "accepts custom quantity" do
+      expect { company.record_usage!("orders", quantity: 5) }
+        .to change { company.meter_usage("orders") }.by(5)
     end
 
     it "handles Redis errors gracefully" do
-      allow(Kredis.redis).to receive(:incrby).and_raise(Redis::BaseConnectionError)
+      meter = company.daily_meter("orders")
+      allow(meter).to receive(:value).and_raise(Redis::CannotConnectError)
+      allow(company).to receive(:daily_meter).and_return(meter)
+
       expect { company.record_usage!("orders") }.not_to raise_error
     end
   end

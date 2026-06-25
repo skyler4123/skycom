@@ -37,9 +37,9 @@ RSpec.describe Billing::SyncDailyUsageJob do
       expect(log.log_date).to eq(log_date)
     end
 
-    it "deletes the Redis key after sync" do
+    it "leaves the Redis key in place (TTL handles clean-up)" do
       perform_job
-      expect(Kredis.redis.exists?(redis_key)).to be(false)
+      expect(Kredis.redis.exists?(redis_key)).to be(true)
     end
   end
 
