@@ -75,9 +75,9 @@ RSpec.describe Billing::SettlementService do
       expect(invoice.reload.payment_status).to eq("overdue")
     end
 
-    it "trips the circuit breaker" do
+    it "marks company as past_due" do
       expect { settle }
-        .to change { company.reload.lifecycle_status }.from("active").to("suspended")
+        .to change { company.reload.lifecycle_status }.from("active").to("past_due")
     end
   end
 
