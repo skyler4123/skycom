@@ -20,7 +20,20 @@ RSpec.describe Billing::MonthlyBillingJob do
       expect { perform_job }.to change(BillingInvoice, :count).by(1)
     end
 
-    it "invoice is created as unpaid (no auto-settlement)" do
+    it "auto-settles the invoice from wallet" do
+      perform_job
+      invoice = BillingInvoice.last
+      expect(invoice.payment_status).to eq("paid")
+      expect(company.reload.promo_balance_cents).to eq(1000)
+    end
+  end
+
+  context "when company has empty wallet" do
+    before do
+      company.update!(promo_balance_cents: 0, main_balance_cents: 0, lifecycle_status: :active)
+    end
+
+    it "creates invoice as unpaid" do
       perform_job
       expect(BillingInvoice.last.payment_status).to eq("unpaid")
     end
@@ -52,7 +65,7 @@ RSpec.describe Billing::MonthlyBillingJob do
     end
   end
 
-  context "when company is past_due" do
+  context "when company is past_due with sufficient wallet" do
     before do
       company.update!(lifecycle_status: :past_due, promo_balance_cents: 2000, main_balance_cents: 0)
     end
@@ -61,9 +74,11 @@ RSpec.describe Billing::MonthlyBillingJob do
       expect { perform_job }.to change(BillingInvoice, :count).by(1)
     end
 
-    it "does not auto-settle (invoice stays unpaid)" do
+    it "auto-settles and reactivates the company" do
       perform_job
-      expect(BillingInvoice.last.payment_status).to eq("unpaid")
+      invoice = BillingInvoice.last
+      expect(invoice.payment_status).to eq("paid")
+      expect(company.reload.lifecycle_status).to eq("active")
     end
   end
 

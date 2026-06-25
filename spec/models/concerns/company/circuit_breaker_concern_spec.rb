@@ -71,9 +71,10 @@ RSpec.describe Company::CircuitBreakerConcern do
     end
   end
 
-  describe "attempt_settle_outstanding on balance change" do
-    it "does not fire for active companies" do
-      expect(Billing::SettlementService).not_to receive(:settle_all)
+  describe "auto_settle_unpaid_invoices on balance change" do
+    it "fires for active companies with unpaid invoices" do
+      create(:billing_invoice, company: company, payment_status: :unpaid, price_cents: 1000)
+      expect(Billing::SettlementService).to receive(:settle_all).with(company).and_call_original
       company.update!(main_balance_cents: 5000)
     end
 
@@ -81,6 +82,13 @@ RSpec.describe Company::CircuitBreakerConcern do
       company.update!(lifecycle_status: :past_due)
       create(:billing_invoice, company: company, payment_status: :unpaid, price_cents: 1000)
       expect(Billing::SettlementService).to receive(:settle_all).with(company).and_call_original
+      company.update!(main_balance_cents: 5000)
+    end
+
+    it "does not fire for disabled companies" do
+      company.update!(lifecycle_status: :disabled)
+      create(:billing_invoice, company: company, payment_status: :unpaid, price_cents: 1000)
+      expect(Billing::SettlementService).not_to receive(:settle_all)
       company.update!(main_balance_cents: 5000)
     end
   end

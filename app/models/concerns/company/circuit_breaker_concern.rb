@@ -13,7 +13,9 @@
 # try_reactivate! is called after an invoice is marked paid:
 #   - If no unpaid invoices remain + sets lifecycle_status +:active, clears suspension_at
 #
-# On balance change (main or promo), attempt_settle_outstanding fires:
+# auto_settle_unpaid_invoices fires:
+#   - On balance change (main or promo)
+#   - After an unpaid BillingInvoice is created (via BillingInvoice callback)
 #   Tries to settle unpaid invoices oldest-first from wallet.
 #
 # disabled is terminal + no transitions out of it.
@@ -24,7 +26,7 @@ module Company::CircuitBreakerConcern
   TERMINAL_STATES = %w[disabled].freeze
 
   included do
-    after_update :attempt_settle_outstanding, if: -> { saved_change_to_main_balance_cents? || saved_change_to_promo_balance_cents? }
+    after_update :auto_settle_unpaid_invoices, if: -> { saved_change_to_main_balance_cents? || saved_change_to_promo_balance_cents? }
   end
 
   def mark_past_due!
@@ -48,18 +50,9 @@ module Company::CircuitBreakerConcern
     suspension_at.present? && suspension_at <= Time.current
   end
 
-  private
-
-  def assert_not_terminal!
-    return unless lifecycle_status.to_s.in?(TERMINAL_STATES)
-
-    errors.add(:base, "Cannot transition from terminal state: #{lifecycle_status}")
-    raise ActiveRecord::RecordInvalid.new(self)
-  end
-
-  def attempt_settle_outstanding
+  def auto_settle_unpaid_invoices
     return if Thread.current[:__settling_company_id] == id
-    return unless lifecycle_status_past_due?
+    return if lifecycle_status_disabled?
     return unless main_balance_cents.positive? || promo_balance_cents.positive?
     return unless billing_invoices.where(payment_status: %i[unpaid overdue]).exists?
 
@@ -69,5 +62,14 @@ module Company::CircuitBreakerConcern
     ensure
       Thread.current[:__settling_company_id] = nil
     end
+  end
+
+  private
+
+  def assert_not_terminal!
+    return unless lifecycle_status.to_s.in?(TERMINAL_STATES)
+
+    errors.add(:base, "Cannot transition from terminal state: #{lifecycle_status}")
+    raise ActiveRecord::RecordInvalid.new(self)
   end
 end

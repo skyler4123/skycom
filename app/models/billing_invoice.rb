@@ -20,11 +20,16 @@ class BillingInvoice < ApplicationRecord
 
   before_validation :generate_invoice_number, on: :create
   after_update :try_reactivate_company, if: -> { saved_change_to_payment_status? && paid? }
+  after_create_commit :attempt_auto_settlement, if: -> { unpaid? }
 
   private
 
   def try_reactivate_company
     company.try_reactivate!
+  end
+
+  def attempt_auto_settlement
+    company.auto_settle_unpaid_invoices
   end
 
   def generate_invoice_number
