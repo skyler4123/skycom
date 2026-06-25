@@ -70,9 +70,9 @@ Every business action (order placed, employee added, file uploaded) is a countab
 [User clicks "Advanced Analytics"]
                     │
                     ▼
-       [Company.workflow_status == "active"?]
-          ├── No ► Blocked (read_only/suspended)
-          └── Yes ► Continue
+        [Company.access_blocked?]  (suspension_at present + past)
+           ├── Yes ► Redirect to /billing
+           └── No  ► Continue
                     │
                     ▼
         [Company.active_billing_contract
@@ -131,22 +131,27 @@ Skycom's core business domain is production-ready and operational.
 
 ### 1A — Company Circuit Breaker
 
-Every Company's `workflow_status` controls operational state:
+Every Company's `lifecycle_status` + `suspension_at` control operational state:
 
 | Status | Behavior | Trigger |
 |--------|----------|---------|
-| `active` | Full operations — all features work normally | Default for paying/good-standing companies |
-| `read_only` | Can view data, CANNOT create/update/delete any records | Unpaid balance after grace period |
-| `suspended` | No access at all — login redirects to payment page | Extended non-payment |
-| `disabled` | Permanently closed — data preserved but inaccessible | Company deletion request |
+| `active` | Full operations — all features work normally | Default; reached via `try_reactivate!` when all invoices paid |
+| `past_due` | Has unpaid invoices; access still allowed unless `suspension_at` has passed | `mark_past_due!` when unpaid invoices exist |
+| `disabled` | Terminal — no transitions out | Company deletion request |
 
-**Every create/update/delete operation** across the entire platform checks company `workflow_status`. If not `active`, the operation is blocked at the data layer.
+> **Note**: There is no `suspended` status. Access blocking is governed solely by `suspension_at` (a timestamp), not by `lifecycle_status`.
 
-**UI behavior in `read_only` mode:**
-- All forms, buttons, and interactive controls are visually muted
-- "Add", "Edit", "Delete" actions are hidden
-- A persistent banner displays: *"Your account is restricted. Top up to continue."*
+The `block_access!` before_action (in `Companies::Authorizable`) checks `current_company&.access_blocked?` on every request:
+- `access_blocked?` returns `true` when `suspension_at.present? && suspension_at <= Time.current`
+- Past `suspension_at` → blocked → redirects to `/billing`
+- Future `suspension_at` → not blocked (in runway)
+- No `suspension_at` → not blocked
+
+**UI behavior when access is blocked:**
+- Access-protected actions redirect to `/billing`
+- A persistent flash warning displays: *"Your account is past due. Top up to continue."*
 - Only navigation and data viewing remain functional
+- `hide_billing_alerts` (boolean on Company) suppresses the warning banner when set to `true`
 
 ### 1B — BillingContract (The Source of Truth)
 
@@ -229,7 +234,7 @@ Company
 | **Plan** | A market-aware template with default `enabled_features`, `feature_prices`, `included_allowance`, and `unit_prices` per country |
 | **Subscription** | Links a company to a plan with start/end dates |
 | **Plan change** | Creates a new BillingContract from the new plan's template — features enable/disable immediately |
-| **Expiration** | Expired subscription → company transitions to `read_only` |
+| **Expiration** | Expired subscription → company transitions to `past_due` |
 
 New companies start with a **Free plan** BillingContract at signup.
 
@@ -582,12 +587,12 @@ The prorated amount is recorded at enable time and included in the next billing 
 
 ### Auto-Suspend & Recovery
 
-When billing runs and the remaining amount cannot be collected:
-1. **Auto-charge retries**: If the registered VISA card declines, Skycom retries daily for a grace period (3-5 days)
-2. **QR fallback**: If the card continues to fail or no card is registered, a QR code is generated for bank transfer — sent to the owner's email and displayed in-app
-3. **If paid within grace** → company remains active; overpayment credits go to `main_balance`
-4. **If grace period expires unpaid** → company transitions to `read_only`
-5. **Recovery**: Owner pays the outstanding amount (via card or QR) → balance settles → company auto-reactivates to `active`
+When billing runs and the wallet is insufficient to cover the charge:
+1. **Invoice created as overdue**: `mark_past_due!` sets `suspension_at` to the end of the current month (runway)
+2. **QR fallback**: A QR code is generated for bank transfer — sent to the owner's email and displayed in-app
+3. **If paid before `suspension_at`** → company remains active; overpayment credits go to `main_balance`
+4. **If `suspension_at` passes unpaid** → `access_blocked?` returns true → `block_access!` redirects all access-protected actions to `/billing`
+5. **Recovery**: Owner tops up wallet → `after_update` callback triggers `auto_settle_unpaid_invoices` → invoice paid → `try_reactivate!` sets `lifecycle_status: :active`, clears `suspension_at`
 
 ---
 
@@ -631,7 +636,7 @@ When a company needs to add funds:
 4. Owner transfers the amount
 5. Owner contacts support to confirm
 6. Support credits `main_balance`
-7. If company was `read_only`, auto-reactivates to `active`
+7. If company was `past_due`, auto-reactivates to `active` via `try_reactivate!`
 
 ### Feature Add-on Flow
 

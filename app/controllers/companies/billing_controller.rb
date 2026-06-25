@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
-# Billing portal accessible by suspended companies to view and pay outstanding invoices.
-# This controller is exempt from the block_suspended! before_action.
+# Billing portal accessible by blocked companies to view and pay outstanding invoices.
+# This controller is exempt from the block_access! before_action.
 #
 # Routes (nested under companies):
 #   GET  /companies/:company_id/billing      → billing#show (suspended portal)

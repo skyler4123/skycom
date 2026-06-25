@@ -165,7 +165,8 @@ Managed attribute caching in Rails.cache. Keeps model attributes synchronized wi
 
 | Callback | Line | Method | Description |
 |----------|------|--------|-------------|
-| `after_update :try_reactivate_company, if: -> { saved_change_to_payment_status? && payment_status_paid? }` | 13 | `try_reactivate_company` | When an invoice's `payment_status` changes to `paid`, calls `company.try_reactivate!`. If no unpaid invoices remain, the company's lifecycle_status transitions back to `:active` and `suspension_at` is cleared. |
+| `after_update :try_reactivate_company, if: -> { saved_change_to_payment_status? && paid? }` | 22 | `try_reactivate_company` | When an invoice's `payment_status` changes to `paid`, calls `company.try_reactivate!`. If no unpaid invoices remain, the company's lifecycle_status transitions back to `:active` and `suspension_at` is cleared. |
+| `after_create_commit :attempt_auto_settlement, if: -> { unpaid? }` | 23 | `attempt_auto_settlement` | When a new unpaid invoice is committed to the database, calls `company.auto_settle_unpaid_invoices` → `SettlementService.settle_all`. Attempts to pay the invoice from the company's wallet (promo_balance first, then main_balance). |
 
 ---
 
@@ -175,7 +176,7 @@ Manages Company lifecycle transitions based on unpaid invoices. `suspension_at` 
 
 | Callback | Line | Method | Description |
 |----------|------|--------|-------------|
-| `after_update :attempt_settle_outstanding, if: -> { saved_change_to_main_balance_cents? \|\| saved_change_to_promo_balance_cents? }` | 17 | `attempt_settle_outstanding` | When company balance changes (top-up or settlement), attempts to settle all unpaid invoices oldest-first via `SettlementService.settle_all`. Idempotent — returns early if no unpaid invoices exist. |
+| `after_update :auto_settle_unpaid_invoices, if: -> { saved_change_to_main_balance_cents? \|\| saved_change_to_promo_balance_cents? }` | 29 | `auto_settle_unpaid_invoices` | When company balance changes (top-up or settlement), attempts to settle all unpaid invoices oldest-first via `SettlementService.settle_all`. Idempotent — returns early if no unpaid invoices exist, no wallet balance, or company is `disabled`. Re-entry guarded via `Thread.current[:__settling_company_id]`. |
 
 **Included in (1 model):** `Company` only.
 
@@ -183,6 +184,7 @@ Manages Company lifecycle transitions based on unpaid invoices. `suspension_at` 
 - `mark_past_due!` — transitions to `:past_due`, sets `suspension_at` to end of month (raises if `disabled`); idempotent
 - `try_reactivate!` — checks for unpaid/overdue invoices; if none remain, transitions to `:active` and clears `suspension_at`
 - `access_blocked?` — returns `true` when `suspension_at.present? && suspension_at <= Time.current`
+- `auto_settle_unpaid_invoices` — public method; called by the `after_update` callback and by `BillingInvoice#attempt_auto_settlement`. Guards: skips if already settling, disabled, no positive balance, or no unpaid invoices.
 
 ---
 
