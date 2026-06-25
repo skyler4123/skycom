@@ -20,14 +20,13 @@ RSpec.describe Billing::MonthlyBillingJob do
       expect { perform_job }.to change(BillingInvoice, :count).by(1)
     end
 
-    it "deducts from wallet" do
-      expect { perform_job }
-        .to change { company.reload.promo_balance_cents }.from(2000).to(1000)
+    it "invoice is created as unpaid (no auto-settlement)" do
+      perform_job
+      expect(BillingInvoice.last.payment_status).to eq("unpaid")
     end
 
-    it "marks invoice as paid" do
-      perform_job
-      expect(BillingInvoice.last.payment_status).to eq("paid")
+    it "does not deduct from wallet" do
+      expect { perform_job }.not_to(change { company.reload.promo_balance_cents })
     end
   end
 
@@ -61,16 +60,10 @@ RSpec.describe Billing::MonthlyBillingJob do
     it "still creates a BillingInvoice" do
       expect { perform_job }.to change(BillingInvoice, :count).by(1)
     end
-  end
 
-  context "when company is suspended" do
-    before do
-      company.update!(lifecycle_status: :suspended, promo_balance_cents: 0,
-                      main_balance_cents: -5000, soft_debt_threshold_cents: -1000)
-    end
-
-    it "does not create an invoice" do
-      expect { perform_job }.not_to change(BillingInvoice, :count)
+    it "does not auto-settle (invoice stays unpaid)" do
+      perform_job
+      expect(BillingInvoice.last.payment_status).to eq("unpaid")
     end
   end
 
@@ -84,6 +77,7 @@ RSpec.describe Billing::MonthlyBillingJob do
       expect { perform_job }.not_to change(BillingInvoice, :count)
     end
   end
+
   context "with multiple companies" do
     let(:company2) { create(:company, lifecycle_status: :active) }
     let!(:contract2) do
@@ -96,7 +90,7 @@ RSpec.describe Billing::MonthlyBillingJob do
       company2.update!(promo_balance_cents: 1000, main_balance_cents: 0)
     end
 
-    it "processes all active companies" do
+    it "processes all non-disabled companies" do
       expect { perform_job }.to change(BillingInvoice, :count).by(2)
     end
   end

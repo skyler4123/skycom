@@ -117,6 +117,9 @@ export const company_policies_path = (companyId) => `/companies/${companyId}/pol
 export const company_tasks_path = (companyId) => `/companies/${companyId}/tasks`
 export const company_payslips_path = (companyId) => `/companies/${companyId}/payslips`
 
+export const company_billing_path = (companyId) => `/companies/${companyId}/billing`
+export const company_billing_pay_all_path = (companyId) => `/companies/${companyId}/billing/pay_all`
+
 export const company_invoices_path = (companyId) => `/companies/${companyId}/invoices`
 export const create_company_invoices_path = (companyId) => `/companies/${companyId}/invoices`
 export const company_invoice_path = (companyId, invoiceId) => `/companies/${companyId}/invoices/${invoiceId}`

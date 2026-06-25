@@ -41,6 +41,19 @@ module Companies::Authorizable
     end
   end
 
+  def block_access!
+    return unless current_company&.access_blocked?
+
+    respond_to do |format|
+      format.html do
+        redirect_to company_billing_path(current_company), alert: "Your account is suspended. Please resolve outstanding invoices."
+      end
+      format.json do
+        render json: { errors: [ "Account is suspended" ] }, status: :forbidden
+      end
+    end
+  end
+
   def user_not_authorized(exception)
     message = "You are not authorized to perform this action."
 

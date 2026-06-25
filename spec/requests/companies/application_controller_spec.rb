@@ -17,24 +17,40 @@ RSpec.describe "Companies::ApplicationController", type: :request do
     ActionController::Base.allow_forgery_protection = original
   end
 
+  describe "block_access!" do
+    it "redirects to billing page when suspension_at is in the past" do
+      company.update!(suspension_at: 1.day.ago)
+      get "/companies/#{company.id}/dashboards"
+      expect(response).to redirect_to(company_billing_path(company))
+    end
+
+    it "allows access when suspension_at is nil" do
+      company.update!(suspension_at: nil)
+      get "/companies/#{company.id}/dashboards"
+      expect(response).to have_http_status(:ok)
+    end
+
+    it "allows access when suspension_at is in the future" do
+      company.update!(suspension_at: 1.week.from_now)
+      get "/companies/#{company.id}/dashboards"
+      expect(response).to have_http_status(:ok)
+    end
+  end
+
   describe "set_past_due_warning" do
     before do
-      # Ensure day is >= 15 so the day guard doesn't interfere
       allow(Time).to receive(:current).and_return(Time.new(2026, 6, 20, 10, 0, 0))
-      company.update_columns(lifecycle_status: Company.lifecycle_statuses[:past_due],
-                              suspension_at: 1.week.from_now)
+      company.update!(lifecycle_status: :past_due, suspension_at: 1.week.from_now)
     end
 
     it "skips the past_due warning when hide_billing_alerts is true" do
-      company.update_columns(hide_billing_alerts: true)
-      company.reload
+      company.update!(hide_billing_alerts: true)
       get "/companies/#{company.id}/dashboards"
       expect(flash[:alert]).to be_blank
     end
 
     it "shows the past_due warning when hide_billing_alerts is false" do
-      company.update_columns(hide_billing_alerts: false)
-      company.reload
+      company.update!(hide_billing_alerts: false)
       get "/companies/#{company.id}/dashboards"
       expect(flash[:alert]).to be_present
     end

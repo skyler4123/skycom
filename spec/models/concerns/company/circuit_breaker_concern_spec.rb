@@ -16,54 +16,72 @@ RSpec.describe Company::CircuitBreakerConcern do
         .to change { company.reload.lifecycle_status }.from("active").to("past_due")
     end
 
+    it "sets suspension_at to end of current month" do
+      company.mark_past_due!
+      expect(company.reload.suspension_at).to be_within(1.day).of(Time.current.end_of_month)
+    end
+
     it "is idempotent when already past_due" do
       company.update!(lifecycle_status: :past_due)
       expect { company.mark_past_due! }.not_to raise_error
     end
   end
 
-  describe "#suspend!" do
-    it "sets lifecycle_status to suspended" do
-      expect { company.suspend! }
-        .to change { company.reload.lifecycle_status }.from("active").to("suspended")
+  describe "#access_blocked?" do
+    it "returns true when suspension_at is in the past" do
+      company.update!(suspension_at: 1.day.ago)
+      expect(company.access_blocked?).to be true
     end
 
-    it "is idempotent when already suspended" do
-      company.update!(lifecycle_status: :suspended)
-      expect { company.suspend! }.not_to raise_error
+    it "returns false when suspension_at is nil" do
+      expect(company.access_blocked?).to be false
+    end
+
+    it "returns false when suspension_at is in the future" do
+      company.update!(suspension_at: 1.day.from_now)
+      expect(company.access_blocked?).to be false
     end
   end
 
-  describe "#circuit_breaker_reset!" do
-    it "sets lifecycle_status from past_due to active" do
+  describe "#try_reactivate!" do
+    it "transitions from past_due to active when no unpaid invoices exist" do
+      company.update!(lifecycle_status: :past_due, suspension_at: Time.current.end_of_month)
+      company.try_reactivate!
+      expect(company.reload.lifecycle_status).to eq("active")
+    end
+
+    it "clears suspension_at on reactivation" do
+      company.update!(lifecycle_status: :past_due, suspension_at: Time.current.end_of_month)
+      company.try_reactivate!
+      expect(company.reload.suspension_at).to be_nil
+    end
+
+    it "stays past_due when unpaid invoices exist" do
       company.update!(lifecycle_status: :past_due)
-      expect { company.circuit_breaker_reset! }
-        .to change { company.reload.lifecycle_status }.from("past_due").to("active")
+      create(:billing_invoice, company: company, payment_status: :unpaid, price_cents: 1000)
+      company.try_reactivate!
+      expect(company.reload.lifecycle_status).to eq("past_due")
     end
 
-    it "sets lifecycle_status from suspended to active" do
-      company.update!(lifecycle_status: :suspended)
-      expect { company.circuit_breaker_reset! }
-        .to change { company.reload.lifecycle_status }.from("suspended").to("active")
+    it "transitions when all invoices are paid" do
+      company.update!(lifecycle_status: :past_due)
+      create(:billing_invoice, company: company, payment_status: :paid, price_cents: 1000)
+      company.try_reactivate!
+      expect(company.reload.lifecycle_status).to eq("active")
     end
   end
 
-  describe "auto-recovery on balance change" do
-    before { company.update!(lifecycle_status: :past_due) }
-
-    it "recovers from past_due when balance rises above threshold" do
+  describe "attempt_settle_outstanding on balance change" do
+    it "does not fire for active companies" do
+      expect(Billing::SettlementService).not_to receive(:settle_all)
       company.update!(main_balance_cents: 5000)
-      expect(company.reload.lifecycle_status).to eq("active")
     end
 
-    it "recovers from suspended when balance rises above threshold" do
-      company.update!(lifecycle_status: :suspended, main_balance_cents: 5000)
-      expect(company.reload.lifecycle_status).to eq("active")
-    end
-
-    it "stays past_due if balance is still below threshold" do
-      company.update!(main_balance_cents: -2000)
-      expect(company.reload.lifecycle_status).to eq("past_due")
+    it "fires for past_due companies with unpaid invoices" do
+      company.update!(lifecycle_status: :past_due)
+      create(:billing_invoice, company: company, payment_status: :unpaid, price_cents: 1000)
+      expect(Billing::SettlementService).to receive(:settle_all).with(company).and_call_original
+      company.update!(main_balance_cents: 5000)
     end
   end
 
@@ -76,11 +94,6 @@ RSpec.describe Company::CircuitBreakerConcern do
     it "does not allow mark_past_due! on disabled company" do
       expect { company.mark_past_due! }
         .to raise_error(ActiveRecord::RecordInvalid, /disabled/)
-    end
-
-    it "stays disabled even with balance recovery" do
-      company.update!(main_balance_cents: 5000)
-      expect(company.reload.lifecycle_status).to eq("disabled")
     end
   end
 end

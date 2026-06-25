@@ -15,7 +15,8 @@ RSpec.describe Billing::SettlementService do
 
   context "when promo balance covers the full amount" do
     before do
-      company.update!(promo_balance_cents: 2000, main_balance_cents: 0)
+      company.update_columns(promo_balance_cents: 2000, main_balance_cents: 0)
+      company.reload
     end
 
     it "deducts from promo balance" do
@@ -35,7 +36,8 @@ RSpec.describe Billing::SettlementService do
 
   context "when promo covers partial and main covers the rest" do
     before do
-      company.update!(promo_balance_cents: 500, main_balance_cents: 2000)
+      company.update_columns(promo_balance_cents: 500, main_balance_cents: 2000)
+      company.reload
     end
 
     it "drains promo first" do
@@ -60,8 +62,10 @@ RSpec.describe Billing::SettlementService do
 
   context "when neither balance covers the amount" do
     before do
-      company.update!(promo_balance_cents: 500, main_balance_cents: 500,
-                      lifecycle_status: :active, soft_debt_threshold_cents: -10000)
+      company.update_columns(promo_balance_cents: 500, main_balance_cents: 500,
+                              lifecycle_status: Company.lifecycle_statuses[:active],
+                              soft_debt_threshold_cents: -10000)
+      company.reload
     end
 
     it "drains both balances" do
@@ -78,6 +82,56 @@ RSpec.describe Billing::SettlementService do
     it "marks company as past_due" do
       expect { settle }
         .to change { company.reload.lifecycle_status }.from("active").to("past_due")
+    end
+  end
+
+  describe ".settle_all" do
+    let!(:invoice1) do
+      create(:billing_invoice, company: company, billing_contract: contract,
+             price_cents: 1000, period_start: 2.months.ago.beginning_of_month,
+             period_end: 2.months.ago.end_of_month)
+    end
+    let!(:invoice2) do
+      create(:billing_invoice, company: company, billing_contract: contract,
+             price_cents: 2000, period_start: 1.month.ago.beginning_of_month,
+             period_end: 1.month.ago.end_of_month)
+    end
+
+    before do
+      company.update_columns(
+        lifecycle_status: Company.lifecycle_statuses[:past_due],
+        main_balance_cents: 3500,
+        promo_balance_cents: 0,
+        soft_debt_threshold_cents: -10000
+      )
+      company.reload
+    end
+
+    it "returns paid_count and remaining_cents" do
+      result = described_class.settle_all(company)
+      expect(result).to eq({ paid_count: 2, remaining_cents: 0 })
+    end
+
+    it "settles all unpaid invoices oldest-first" do
+      described_class.settle_all(company)
+      expect(invoice1.reload.payment_status).to eq("paid")
+      expect(invoice2.reload.payment_status).to eq("paid")
+    end
+
+    it "stops when wallet is exhausted" do
+      company.update_columns(main_balance_cents: 1500)
+      company.reload
+      result = described_class.settle_all(company)
+      expect(result[:paid_count]).to eq(1)
+      expect(result[:remaining_cents]).to eq(2000)
+      expect(invoice1.reload.payment_status).to eq("paid")
+      expect(invoice2.reload.payment_status).to eq("overdue")
+    end
+
+    it "does not settle already-paid invoices" do
+      invoice1.update!(payment_status: :paid)
+      result = described_class.settle_all(company)
+      expect(result[:paid_count]).to eq(1)
     end
   end
 

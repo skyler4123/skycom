@@ -78,7 +78,6 @@ RSpec.describe Company, type: :model do
       expect(Company.lifecycle_statuses).to eq({
         "active" => 0,
         "past_due" => 10,
-        "suspended" => 20,
         "disabled" => 30
       })
     end

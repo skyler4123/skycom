@@ -1,18 +1,22 @@
 # frozen_string_literal: true
 
-# Manages Company lifecycle transitions based on billing and enforcement state.
+# Manages Company lifecycle based on unpaid invoices.
 #
-# mark_past_due! is called by SettlementService when payment collection fails:
-#   company.mark_past_due!  # lifecycle_status → :past_due
+# mark_past_due! is called when unpaid invoices exist:
+#   - Sets lifecycle_status +:past_due
+#   - Sets suspension_at + end of current month (gives runway)
 #
-# suspend! is the enforcement trip (admin or separate process):
-#   company.suspend!         # lifecycle_status → :suspended
+# Admin can extend suspension_at to give more time.
+# Access is blocked when suspension_at.present? && suspension_at <= Time.current
+# (checked in block_access! in Authorizable concern).
 #
-# The auto-reset callback fires on any balance change:
-#   company.update!(main_balance_cents: 5000)
-#   → if past_due/suspended + balance above threshold → lifecycle_status back to :active
+# try_reactivate! is called after an invoice is marked paid:
+#   - If no unpaid invoices remain + sets lifecycle_status +:active, clears suspension_at
 #
-# disabled is terminal — no transitions out of it.
+# On balance change (main or promo), attempt_settle_outstanding fires:
+#   Tries to settle unpaid invoices oldest-first from wallet.
+#
+# disabled is terminal + no transitions out of it.
 #
 module Company::CircuitBreakerConcern
   extend ActiveSupport::Concern
@@ -20,23 +24,28 @@ module Company::CircuitBreakerConcern
   TERMINAL_STATES = %w[disabled].freeze
 
   included do
-    after_update :auto_reset_circuit_breaker, if: -> { saved_change_to_main_balance_cents? || saved_change_to_promo_balance_cents? }
+    after_update :attempt_settle_outstanding, if: -> { saved_change_to_main_balance_cents? || saved_change_to_promo_balance_cents? }
   end
 
   def mark_past_due!
     assert_not_terminal!
-    update!(lifecycle_status: :past_due) unless lifecycle_status_past_due?
+    return if lifecycle_status_past_due?
+
+    update!(
+      lifecycle_status: :past_due,
+      suspension_at: Time.current.end_of_month
+    )
   end
 
-  def suspend!
-    assert_not_terminal!
-    update!(lifecycle_status: :suspended) unless lifecycle_status_suspended?
+  def try_reactivate!
+    return if lifecycle_status_disabled?
+    return if billing_invoices.where(payment_status: %i[unpaid overdue]).exists?
+
+    update!(lifecycle_status: :active, suspension_at: nil)
   end
 
-  def circuit_breaker_reset!
-    return unless lifecycle_status_past_due? || lifecycle_status_suspended?
-
-    update!(lifecycle_status: :active)
+  def access_blocked?
+    suspension_at.present? && suspension_at <= Time.current
   end
 
   private
@@ -48,10 +57,17 @@ module Company::CircuitBreakerConcern
     raise ActiveRecord::RecordInvalid.new(self)
   end
 
-  def auto_reset_circuit_breaker
-    return unless lifecycle_status_past_due? || lifecycle_status_suspended?
-    return if debt_ceiling_reached?
+  def attempt_settle_outstanding
+    return if Thread.current[:__settling_company_id] == id
+    return unless lifecycle_status_past_due?
+    return unless main_balance_cents.positive? || promo_balance_cents.positive?
+    return unless billing_invoices.where(payment_status: %i[unpaid overdue]).exists?
 
-    circuit_breaker_reset!
+    Thread.current[:__settling_company_id] = id
+    begin
+      Billing::SettlementService.settle_all(self)
+    ensure
+      Thread.current[:__settling_company_id] = nil
+    end
   end
 end

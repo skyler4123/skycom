@@ -19,8 +19,13 @@ class BillingInvoice < ApplicationRecord
   enum :lifecycle_status, { final: 0, draft: 1 }, default: :final
 
   before_validation :generate_invoice_number, on: :create
+  after_update :try_reactivate_company, if: -> { saved_change_to_payment_status? && paid? }
 
   private
+
+  def try_reactivate_company
+    company.try_reactivate!
+  end
 
   def generate_invoice_number
     return if invoice_number.present?

@@ -161,20 +161,28 @@ Managed attribute caching in Rails.cache. Keeps model attributes synchronized wi
 
 ---
 
-### Company::CircuitBreakerConcern (`app/models/concerns/company/circuit_breaker_concern.rb`)
-
-Manages Company lifecycle transitions (past_due / suspended / active) based on billing and enforcement state. Auto-recovers when wallet balance rises above the debt threshold.
+### BillingInvoice (`app/models/billing_invoice.rb`)
 
 | Callback | Line | Method | Description |
 |----------|------|--------|-------------|
-| `after_update :auto_reset_circuit_breaker, if: -> { saved_change_to_main_balance_cents? \|\| saved_change_to_promo_balance_cents? }` | ~17 | `auto_reset_circuit_breaker` | If company is `past_due?` or `suspended?` and the total balance (`main + promo`) is no longer below `soft_debt_threshold_cents`, transitions lifecycle_status back to `:active`. |
+| `after_update :try_reactivate_company, if: -> { saved_change_to_payment_status? && payment_status_paid? }` | 13 | `try_reactivate_company` | When an invoice's `payment_status` changes to `paid`, calls `company.try_reactivate!`. If no unpaid invoices remain, the company's lifecycle_status transitions back to `:active` and `suspension_at` is cleared. |
+
+---
+
+### Company::CircuitBreakerConcern (`app/models/concerns/company/circuit_breaker_concern.rb`)
+
+Manages Company lifecycle transitions based on unpaid invoices. `suspension_at` is the sole gate for access blocking (checked by `block_access!` in Authorizable concern). On wallet balance change, automatically attempts to settle outstanding invoices via `SettlementService.settle_all`.
+
+| Callback | Line | Method | Description |
+|----------|------|--------|-------------|
+| `after_update :attempt_settle_outstanding, if: -> { saved_change_to_main_balance_cents? \|\| saved_change_to_promo_balance_cents? }` | 17 | `attempt_settle_outstanding` | When company balance changes (top-up or settlement), attempts to settle all unpaid invoices oldest-first via `SettlementService.settle_all`. Idempotent — returns early if no unpaid invoices exist. |
 
 **Included in (1 model):** `Company` only.
 
 **Methods added:**
-- `mark_past_due!` — transitions to `:past_due` (raises if already `disabled`); idempotent
-- `suspend!` — transitions to `:suspended` (raises if already `disabled`); idempotent
-- `circuit_breaker_reset!` — transitions from `past_due` or `suspended` to `:active`
+- `mark_past_due!` — transitions to `:past_due`, sets `suspension_at` to end of month (raises if `disabled`); idempotent
+- `try_reactivate!` — checks for unpaid/overdue invoices; if none remain, transitions to `:active` and clears `suspension_at`
+- `access_blocked?` — returns `true` when `suspension_at.present? && suspension_at <= Time.current`
 
 ---
 
@@ -258,7 +266,7 @@ Each concern defines the same callback:
 | `before_create` | 1 | Session |
 | `after_create` | 4 | Category, Company, PolicyAppointment, RoleAppointment |
 | `after_update` | 2 | Policy, User (block) |
-| `after_update` (conditional) | 2 | PolicyAppointment, (Company::CircuitBreakerConcern → 1 model) |
+| `after_update` (conditional) | 3 | PolicyAppointment, BillingInvoice, (Company::CircuitBreakerConcern → 1 model) |
 | `before_update` | 3 | PolicyAppointment, RoleAppointment, (ImmutableRecordConcern → 5 models) |
 | `before_destroy` | 5 | Employee, System, PolicyAppointment, RoleAppointment, (ImmutableRecordConcern → 5 models) |
 | `before_discard` | 1 | Employee |
@@ -266,7 +274,7 @@ Each concern defines the same callback:
 | `after_commit` | 2 | (Cache::RecordsConcern → 5 models) |
 | `validate` | 2 | (PropertyMappingConcern → 48 models), (ImageAttachmentsConcern → 6 models + Product) |
 
-**Total unique callback declarations: ~27 directly across 12 model files + 5 concern files propagating to ~63+ models.**
+**Total unique callback declarations: ~28 directly across 13 model files + 5 concern files propagating to ~63+ models.**
 
 > **Note:** `ImageAttachmentsConcern` in the validate row covers the 6 per-model ImageConcern files (Branch, Brand, Customer, Department, Employee, Service) + the pre-existing `Product::ImageConcern`, all of which define the same `validate :acceptable_image_attachments` callback.
 
