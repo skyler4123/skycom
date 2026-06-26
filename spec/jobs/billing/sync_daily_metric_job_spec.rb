@@ -2,7 +2,7 @@
 
 require "rails_helper"
 
-RSpec.describe Billing::SyncDailyUsageJob do
+RSpec.describe Billing::SyncDailyMetricJob do
   subject(:perform_job) { described_class.perform_now(log_date: log_date) }
 
   let(:log_date) { Date.current }
@@ -24,13 +24,13 @@ RSpec.describe Billing::SyncDailyUsageJob do
       Kredis.redis.set(redis_key, 42)
     end
 
-    it "creates a DailyUsageLog record" do
-      expect { perform_job }.to change(DailyUsageLog, :count).by(1)
+    it "creates a DailyMetricLog record" do
+      expect { perform_job }.to change(DailyMetricLog, :count).by(1)
     end
 
     it "records the correct usage count" do
       perform_job
-      log = DailyUsageLog.last
+      log = DailyMetricLog.last
       expect(log.usage_count).to eq(42)
       expect(log.company).to eq(company)
       expect(log.billing_resource).to eq(resource)
@@ -48,8 +48,8 @@ RSpec.describe Billing::SyncDailyUsageJob do
       Kredis.redis.set(redis_key, 0)
     end
 
-    it "does not create a DailyUsageLog" do
-      expect { perform_job }.not_to change(DailyUsageLog, :count)
+    it "does not create a DailyMetricLog" do
+      expect { perform_job }.not_to change(DailyMetricLog, :count)
     end
   end
 
@@ -65,7 +65,7 @@ RSpec.describe Billing::SyncDailyUsageJob do
 
   context "when no Redis keys exist" do
     it "does nothing" do
-      expect { perform_job }.not_to change(DailyUsageLog, :count)
+      expect { perform_job }.not_to change(DailyMetricLog, :count)
     end
   end
 end

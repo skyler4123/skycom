@@ -11,6 +11,8 @@ class ContractFeature < ApplicationRecord
   belongs_to :billing_resource
   belongs_to :billing_contract
 
+  has_many :daily_feature_logs, dependent: :destroy
+
   validates :billing_resource_id, uniqueness: { scope: :billing_contract_id,
                                                 message: "is already assigned to this contract" }
   validates :monthly_flat_price_cents, presence: true, numericality: { greater_than_or_equal_to: 0 }

@@ -105,13 +105,13 @@ RSpec.describe Company::BillingConcern do
       expect(company.meter_usage("orders")).to eq(2)
     end
 
-    it "falls back to DailyUsageLog when Redis key is missing" do
+    it "falls back to DailyMetricLog when Redis key is missing" do
       company.record_usage!("orders")
       expect(company.meter_usage("orders")).to eq(1)
 
       Kredis.redis.del("skycom:company:#{company.id}:orders:#{Date.current.strftime('%Y%m%d')}")
 
-      create(:daily_usage_log, company: company, billing_resource: volumetric_resource,
+      create(:daily_metric_log, company: company, billing_resource: volumetric_resource,
              log_date: Date.current, usage_count: 5)
 
       expect(company.meter_usage("orders")).to eq(5)
@@ -119,7 +119,7 @@ RSpec.describe Company::BillingConcern do
 
     it "accepts a custom log_date" do
       past_date = 2.days.ago.to_date
-      create(:daily_usage_log, company: company, billing_resource: volumetric_resource,
+      create(:daily_metric_log, company: company, billing_resource: volumetric_resource,
              log_date: past_date, usage_count: 10)
       expect(company.meter_usage("orders", log_date: past_date)).to eq(10)
     end

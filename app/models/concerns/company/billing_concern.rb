@@ -13,7 +13,7 @@
 #   # Metering (called by MeteringConcern after_commit)
 #   company.record_usage!("orders")         # Redis-backed with Kredis (DB fallback on restart)
 #
-#   # Read with Redis restart safety (Kredis default → DailyUsageLog)
+#   # Read with Redis restart safety (Kredis default → DailyMetricLog)
 #   company.meter_usage("orders")           # today's count
 #   company.meter_usage("orders", log_date: 5.days.ago.to_date)
 #
@@ -45,11 +45,11 @@ module Company::BillingConcern
   def daily_meter(resource_key, log_date: Date.current)
     key = "skycom:company:#{id}:#{resource_key}:#{log_date.strftime('%Y%m%d')}"
     Kredis.integer(key, default: -> {
-      DailyUsageLog.where(company_id: id)
-                   .joins(:billing_resource)
-                   .where(billing_resources: { name: resource_key.to_s })
-                   .where(log_date: log_date)
-                   .sum(:usage_count)
+      DailyMetricLog.where(company_id: id)
+                    .joins(:billing_resource)
+                    .where(billing_resources: { name: resource_key.to_s })
+                    .where(log_date: log_date)
+                    .sum(:usage_count)
     }, expires_in: 36.hours)
   end
 

@@ -6,7 +6,7 @@ RSpec.describe BillingResource, type: :model do
   describe "associations" do
     it { is_expected.to have_many(:contract_features).dependent(:destroy) }
     it { is_expected.to have_many(:contract_metrics).dependent(:destroy) }
-    it { is_expected.to have_many(:daily_usage_logs).dependent(:destroy) }
+    it { is_expected.to have_many(:daily_metric_logs).dependent(:destroy) }
   end
 
   describe "validations" do

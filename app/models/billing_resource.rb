@@ -12,7 +12,7 @@
 class BillingResource < ApplicationRecord
   has_many :contract_features, dependent: :destroy
   has_many :contract_metrics, dependent: :destroy
-  has_many :daily_usage_logs, dependent: :destroy
+  has_many :daily_metric_logs, dependent: :destroy
 
   validates :name, presence: true, uniqueness: true
 

@@ -1,18 +1,18 @@
-# Persisted daily snapshot of Redis metering counters.
-# Written by Billing::SyncDailyUsageJob (runs every 4 hours).
+# Persisted daily snapshot of Redis metering counters for volumetric metrics.
+# Written by Billing::SyncDailyMetricJob (runs every 4 hours).
 # Read by Billing::CalculatorService during monthly billing.
 #
 #   # Record usage for a day
-#   DailyUsageLog.create!(company: c, billing_resource: r, log_date: Date.today, usage_count: 42)
+#   DailyMetricLog.create!(company: c, billing_resource: r, log_date: Date.today, usage_count: 42)
 #
 #   # Sum usage over a billing period
-#   DailyUsageLog.where(company: c, billing_resource: r)
+#   DailyMetricLog.where(company: c, billing_resource: r)
 #                .for_period(start_date, end_date)
 #                .sum(:usage_count)
 #
 # One row per company + resource + day (uniqueness enforced).
 #
-class DailyUsageLog < ApplicationRecord
+class DailyMetricLog < ApplicationRecord
   belongs_to :company
   belongs_to :billing_resource
 

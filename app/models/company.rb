@@ -24,7 +24,8 @@ class Company < ApplicationRecord
 
   has_many :billing_contracts, dependent: :destroy
   has_many :billing_invoices, dependent: :destroy
-  has_many :daily_usage_logs, dependent: :destroy
+  has_many :daily_metric_logs, dependent: :destroy
+  has_many :daily_feature_logs, dependent: :destroy
   has_many :wallet_transactions, dependent: :destroy
 
   has_many :property_mappings, dependent: :destroy
