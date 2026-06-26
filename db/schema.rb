@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_06_25_142119) do
+ActiveRecord::Schema[8.0].define(version: 2026_06_26_162531) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pgcrypto"
@@ -1182,6 +1182,16 @@ ActiveRecord::Schema[8.0].define(version: 2026_06_25_142119) do
     t.index ["property_mapping_id"], name: "index_customers_on_property_mapping_id"
     t.index ["user_id"], name: "index_customers_on_user_id"
     t.index ["workflow_status"], name: "index_customers_on_workflow_status"
+  end
+
+  create_table "daily_active_logs", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "company_id", null: false
+    t.date "log_date", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["company_id", "log_date"], name: "idx_daily_active_logs_unique", unique: true
+    t.index ["company_id"], name: "index_daily_active_logs_on_company_id"
+    t.index ["log_date"], name: "index_daily_active_logs_on_log_date"
   end
 
   create_table "daily_usage_logs", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -5909,6 +5919,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_06_25_142119) do
   add_foreign_key "customers", "companies"
   add_foreign_key "customers", "property_mappings"
   add_foreign_key "customers", "users"
+  add_foreign_key "daily_active_logs", "companies"
   add_foreign_key "daily_usage_logs", "billing_resources"
   add_foreign_key "daily_usage_logs", "companies"
   add_foreign_key "department_appointments", "companies"

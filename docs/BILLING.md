@@ -9,7 +9,9 @@ Skycom implements a **usage-based billing engine** with a **dual-wallet system**
 ```
 [MeteringConcern] ──► record_usage! ──► Redis daily counter (Kredis)
                                           │
-                   ┌─ SyncDailyUsageJob (4h) ─► DailyUsageLog (PostgreSQL)
+                   ┌─ SyncDailyUsageJob (1h)  ─► DailyUsageLog (PostgreSQL) ──► overages
+                   │
+[SyncDailyActiveJob (6h)] ──► DailyActiveLog (PostgreSQL) ──► feature proration
                    │
 [MonthlyBillingJob] ──► CalculatorService ──► InvoiceService ──► BillingInvoice (unpaid)
                                                                  │
@@ -24,7 +26,7 @@ Skycom implements a **usage-based billing engine** with a **dual-wallet system**
                           └── Wallet insufficient ─► invoice.overdue, mark_past_due!
                                                     │
                                                     ▼
-                          suspension_at set ─► access_blocked? ─► block_access! (Authorizable)
+                           suspension_at set ─► is_accessible? false ─► block_access! (Authorizable)
                                                     │
                           [Voluntary payment via BillingController#pay_all]
                                                     │
@@ -187,10 +189,20 @@ end
 
 Computes monthly charge from:
 1. Base contract price (if any)
-2. Add-on feature flat prices (`ContractFeature.monthly_flat_price_cents`)
-3. Volumetric overage: `(usage − free_allowance) × unit_price` per `ContractMetric`
+2. Add-on feature flat prices (`ContractFeature.monthly_flat_price_cents`), **daily-prorated** by the number of calendar days the company was actually accessible (see Section 10.5)
+3. Volumetric overage: `(usage − free_allowance) × unit_price` per `ContractMetric` (NOT prorated — pure usage-based)
 
-Returns a `Result` struct with `total_cents` and a `breakdown` of all components.
+**Add-on feature proration rules:**
+- `active_days == 0` → $0 (company was inaccessible the entire month)
+- `active_days >= days_in_period` → full monthly total (exact advertised price, no rounding drift)
+- otherwise → `(monthly_flat_price × active_days) / days_in_period` (integer division → cents)
+
+Returns a `Result` struct with `total_cents` and a `Breakdown` struct exposing:
+- `base_cents` — contract fixed monthly price
+- `features_cents` — sum of prorated add-on feature prices
+- `overages` — hash of `resource_name => overage_cents`
+- `active_days` — count of `DailyActiveLog` rows for the billing period
+- `days_in_period` — calendar days in the month (e.g., 28–31)
 
 ### 5.3 InvoiceService
 
@@ -384,6 +396,28 @@ This creates a permanent, queryable history. The `DailyUsageLog` table stores `c
 | `wallet_balance_cents` | `promo_balance_cents + main_balance_cents` |
 | `debt_ceiling_reached?` | `wallet_balance_cents < soft_debt_threshold_cents` |
 
+### 10.5 Active-Day Tracking (Daily Proration Source of Truth)
+
+Add-on feature prices are daily-prorated. The source of truth for "did this company get value today?" is `DailyActiveLog`.
+
+**File**: `app/models/daily_active_log.rb`
+
+- One row per company per calendar date (uniqueness enforced by `[company_id, log_date]` index)
+- A row existing means "accessible on that date"; absence means the company was inaccessible (or not yet created)
+- Read by `CalculatorService#compute_prorated_features` at invoice time
+
+**File**: `app/jobs/billing/sync_daily_active_job.rb`
+
+Idempotent 6-hour snapshot job:
+1. Iterates all non-disabled companies via `find_each(batch_size: 50)`
+2. Calls `company.is_accessible?` — if true, `DailyActiveLog.find_or_create_by!(company:, log_date:)`
+3. The unique index collapses duplicate inserts across the 4 daily runs into a single row
+4. Per-company rescue so one bad record doesn't abort the batch
+
+**Why 6-hour frequency?** If an admin suspends a company at 10:00 AM, the 06:00 or 12:00 job already recorded the day. The company got 10 hours of value → fair to bill them for that 1 calendar date. The unique index guarantees no double-counting regardless of how many runs fire.
+
+**Schedule** (`config/recurring.yml`): `every 6 hours`
+
 ---
 
 ## 11. File Reference
@@ -396,16 +430,18 @@ This creates a permanent, queryable history. The `DailyUsageLog` table stores `c
 | `app/models/contract_feature.rb` | 29 | Join: BillingContract ↔ addon_feature (flat monthly price) |
 | `app/models/contract_metric.rb` | 31 | Join: BillingContract ↔ volumetric (allowance + overage price) |
 | `app/models/daily_usage_log.rb` | 26 | Persisted daily usage snapshot from Redis |
+| `app/models/daily_active_log.rb` | 25 | Persisted daily active-day snapshot (source of truth for proration) |
 | `app/models/wallet_transaction.rb` | 34 | Audit trail for every wallet balance change |
 | `app/models/concerns/company/billing_concern.rb` | 66 | Feature gating, wallet helpers, Redis metering |
-| `app/models/concerns/company/circuit_breaker_concern.rb` | 75 | Lifecycle transitions, suspension_at, auto_settle_unpaid_invoices |
+| `app/models/concerns/company/circuit_breaker_concern.rb` | 75 | Lifecycle transitions, suspension_at, is_accessible?, auto_settle_unpaid_invoices |
 | `app/models/concerns/metering_concern.rb` | 39 | Auto-increments Redis counters on record creation |
-| `app/services/billing/calculator_service.rb` | 76 | Computes monthly charge (base + features + overages) |
+| `app/services/billing/calculator_service.rb` | 96 | Computes monthly charge (base + prorated features + overages) |
 | `app/services/billing/invoice_service.rb` | 45 | Creates BillingInvoice from CalculatorService result |
 | `app/services/billing/settlement_service.rb` | 162 | Deducts invoice from wallet; re-entry guarded; returns paid_count + remaining_cents |
 | `app/services/billing/seed_resources_service.rb` | 58 | Seeds BillingResource catalog (7 volumetric + 12 addon) |
 | `app/jobs/billing/monthly_billing_job.rb` | 42 | Monthly invoice creation for non-disabled companies |
-| `app/jobs/billing/sync_daily_usage_job.rb` | 64 | 4-hourly sync of Redis counters → DailyUsageLog |
+| `app/jobs/billing/sync_daily_usage_job.rb` | 64 | Hourly sync of Redis counters → DailyUsageLog |
+| `app/jobs/billing/sync_daily_active_job.rb` | 33 | 6-hourly snapshot of accessible companies → DailyActiveLog |
 | `app/controllers/companies/billing_controller.rb` | 56 | Billing portal: view + pay outstanding invoices; exempt from block_access! |
 
 ---
@@ -459,4 +495,4 @@ Day 3: Owner transfers $15, support credits main_balance
 
 ---
 
-*End of documentation*
+*End of documentation*/se

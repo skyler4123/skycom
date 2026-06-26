@@ -1,14 +1,24 @@
 # frozen_string_literal: true
 
 # Computes the total monthly charge for a company by summing three components:
-#   1. Base price — contract.fixed_monthly_price_cents
-#   2. Features   — sum of contract_features.active.monthly_flat_price_cents
-#   3. Overages   — usage above free_allowance × unit_price_cents
+#   1. Base price    — contract.fixed_monthly_price_cents
+#   2. Features      — sum of contract_features.active.monthly_flat_price_cents,
+#                      prorated by the number of calendar days the company was
+#                      actually accessible (DailyActiveLog count for the period)
+#   3. Overages      — usage above free_allowance × unit_price_cents
+#                      (NOT prorated: pure usage-based via DailyUsageLog)
+#
+# Add-on Feature proration rules:
+#   active_days = 0                → $0 (company was suspended all month)
+#   active_days >= days_in_period  → full monthly total (exact advertised price)
+#   otherwise                      → (monthly_flat_price × active_days) / days_in_period
 #
 #   result = CalculatorService.call(company)
 #   result.total_cents          # => 1500 (i.e. $15.00)
 #   result.breakdown.base_cents      # => 0
-#   result.breakdown.features_cents  # => 500
+#   result.breakdown.features_cents  # => 500  (full month — exact advertised price)
+#   result.breakdown.active_days     # => 31
+#   result.breakdown.days_in_period  # => 31
 #   result.breakdown.overages        # => { "orders" => 1000 }
 #
 module Billing
@@ -19,7 +29,8 @@ module Billing
       end
     end
 
-    Breakdown = Struct.new(:base_cents, :features_cents, :overages, keyword_init: true) do
+    Breakdown = Struct.new(:base_cents, :features_cents, :overages,
+                           :active_days, :days_in_period, keyword_init: true) do
       def total_cents
         base_cents.to_i + features_cents.to_i + overages.values.sum
       end
@@ -40,13 +51,17 @@ module Billing
       return zero_result unless contract
 
       base_cents = contract.fixed_monthly_price_cents
-      features_cents = contract.contract_features.active.sum(:monthly_flat_price_cents)
+      active_days = compute_active_days
+      days_in_period = (period_end.to_date - period_start.to_date).to_i + 1
+      features_cents = compute_prorated_features(contract, active_days, days_in_period)
       overages = compute_overages(contract)
 
       breakdown = Breakdown.new(
         base_cents: base_cents,
         features_cents: features_cents,
-        overages: overages
+        overages: overages,
+        active_days: active_days,
+        days_in_period: days_in_period
       )
 
       Result.new(total_cents: breakdown.total_cents, breakdown: breakdown)
@@ -58,6 +73,27 @@ module Billing
 
     def zero_result
       Result.new
+    end
+
+    def compute_active_days
+      DailyActiveLog.where(company: company)
+                   .for_period(period_start.to_date, period_end.to_date)
+                   .count
+    end
+
+    def compute_prorated_features(contract, active_days, days_in_period)
+      active_features = contract.contract_features.active.to_a
+      return 0 if active_features.empty?
+      return 0 if active_days.zero?
+
+      # Full-month bypass: guarantees the exact advertised price (no rounding drift).
+      # e.g. monthly_flat_price 300 cents passed through unmodified for a 30-day month.
+      return active_features.sum(&:monthly_flat_price_cents) if active_days >= days_in_period
+
+      # Prorated: (monthly × active_days) / days_in_period  (integer division → cents)
+      active_features.sum do |feature|
+        (feature.monthly_flat_price_cents * active_days) / days_in_period
+      end
     end
 
     def compute_overages(contract)

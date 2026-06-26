@@ -31,6 +31,14 @@ default: &default
     queue: default
     schedule: every 1 hours
 
+  # 6-hour idempotent snapshot of which companies are currently accessible.
+  # A row in daily_active_logs == "bill this company for 1 calendar date".
+  # The unique index on [company_id, log_date] prevents double-counting.
+  sync_daily_active:
+    class: Billing::SyncDailyActiveJob
+    queue: default
+    schedule: every 6 hours
+
   monthly_billing:
     class: Billing::MonthlyBillingJob
     queue: default

@@ -18,19 +18,19 @@ RSpec.describe "Companies::ApplicationController", type: :request do
   end
 
   describe "block_access!" do
-    it "redirects to billing page when suspension_at is in the past" do
+    it "redirects to billing page when suspension_at is in the past (not accessible)" do
       company.update!(suspension_at: 1.day.ago)
       get "/companies/#{company.id}/dashboards"
       expect(response).to redirect_to(company_billing_path(company))
     end
 
-    it "allows access when suspension_at is nil" do
+    it "allows access when suspension_at is nil (accessible)" do
       company.update!(suspension_at: nil)
       get "/companies/#{company.id}/dashboards"
       expect(response).to have_http_status(:ok)
     end
 
-    it "allows access when suspension_at is in the future" do
+    it "allows access when suspension_at is in the future (accessible)" do
       company.update!(suspension_at: 1.week.from_now)
       get "/companies/#{company.id}/dashboards"
       expect(response).to have_http_status(:ok)

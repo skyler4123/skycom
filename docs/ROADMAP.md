@@ -70,8 +70,8 @@ Every business action (order placed, employee added, file uploaded) is a countab
 [User clicks "Advanced Analytics"]
                     │
                     ▼
-        [Company.access_blocked?]  (suspension_at present + past)
-           ├── Yes ► Redirect to /billing
+        [Company.is_accessible?]  (suspension_at nil or future)
+           ├── No  ► Redirect to /billing
            └── No  ► Continue
                     │
                     ▼
@@ -141,9 +141,9 @@ Every Company's `lifecycle_status` + `suspension_at` control operational state:
 
 > **Note**: There is no `suspended` status. Access blocking is governed solely by `suspension_at` (a timestamp), not by `lifecycle_status`.
 
-The `block_access!` before_action (in `Companies::Authorizable`) checks `current_company&.access_blocked?` on every request:
-- `access_blocked?` returns `true` when `suspension_at.present? && suspension_at <= Time.current`
-- Past `suspension_at` → blocked → redirects to `/billing`
+The `block_access!` before_action (in `Companies::Authorizable`) checks `current_company&.is_accessible?` on every request:
+- `is_accessible?` returns `false` when `suspension_at.present? && suspension_at <= Time.current`
+- Past `suspension_at` → not accessible → redirects to `/billing`
 - Future `suspension_at` → not blocked (in runway)
 - No `suspension_at` → not blocked
 
@@ -591,7 +591,7 @@ When billing runs and the wallet is insufficient to cover the charge:
 1. **Invoice created as overdue**: `mark_past_due!` sets `suspension_at` to the end of the current month (runway)
 2. **QR fallback**: A QR code is generated for bank transfer — sent to the owner's email and displayed in-app
 3. **If paid before `suspension_at`** → company remains active; overpayment credits go to `main_balance`
-4. **If `suspension_at` passes unpaid** → `access_blocked?` returns true → `block_access!` redirects all access-protected actions to `/billing`
+4. **If `suspension_at` passes unpaid** → `is_accessible?` returns false → `block_access!` redirects all access-protected actions to `/billing`
 5. **Recovery**: Owner tops up wallet → `after_update` callback triggers `auto_settle_unpaid_invoices` → invoice paid → `try_reactivate!` sets `lifecycle_status: :active`, clears `suspension_at`
 
 ---

@@ -42,7 +42,7 @@ module Companies::Authorizable
   end
 
   def block_access!
-    return unless current_company&.access_blocked?
+    return if current_company&.is_accessible?
 
     respond_to do |format|
       format.html do

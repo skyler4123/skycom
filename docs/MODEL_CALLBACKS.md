@@ -172,7 +172,7 @@ Managed attribute caching in Rails.cache. Keeps model attributes synchronized wi
 
 ### Company::CircuitBreakerConcern (`app/models/concerns/company/circuit_breaker_concern.rb`)
 
-Manages Company lifecycle transitions based on unpaid invoices. `suspension_at` is the sole gate for access blocking (checked by `block_access!` in Authorizable concern). On wallet balance change, automatically attempts to settle outstanding invoices via `SettlementService.settle_all`.
+Manages Company lifecycle transitions based on unpaid invoices. `suspension_at` is the sole gate for access blocking (the positive `is_accessible?` predicate is checked by `block_access!` in Authorizable concern). On wallet balance change, automatically attempts to settle outstanding invoices via `SettlementService.settle_all`.
 
 | Callback | Line | Method | Description |
 |----------|------|--------|-------------|
@@ -183,7 +183,7 @@ Manages Company lifecycle transitions based on unpaid invoices. `suspension_at` 
 **Methods added:**
 - `mark_past_due!` — transitions to `:past_due`, sets `suspension_at` to end of month (raises if `disabled`); idempotent
 - `try_reactivate!` — checks for unpaid/overdue invoices; if none remain, transitions to `:active` and clears `suspension_at`
-- `access_blocked?` — returns `true` when `suspension_at.present? && suspension_at <= Time.current`
+- `is_accessible?` — returns `true` when `suspension_at.nil? || suspension_at > Time.current`
 - `auto_settle_unpaid_invoices` — public method; called by the `after_update` callback and by `BillingInvoice#attempt_auto_settlement`. Guards: skips if already settling, disabled, no positive balance, or no unpaid invoices.
 
 ---

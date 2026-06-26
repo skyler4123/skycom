@@ -7,8 +7,8 @@
 #   - Sets suspension_at + end of current month (gives runway)
 #
 # Admin can extend suspension_at to give more time.
-# Access is blocked when suspension_at.present? && suspension_at <= Time.current
-# (checked in block_access! in Authorizable concern).
+# A company is NOT accessible when suspension_at.present? && suspension_at <= Time.current
+# (checked via is_accessible?, gated by block_access! in Authorizable concern).
 #
 # try_reactivate! is called after an invoice is marked paid:
 #   - If no unpaid invoices remain + sets lifecycle_status +:active, clears suspension_at
@@ -46,8 +46,8 @@ module Company::CircuitBreakerConcern
     update!(lifecycle_status: :active, suspension_at: nil)
   end
 
-  def access_blocked?
-    suspension_at.present? && suspension_at <= Time.current
+  def is_accessible?
+    suspension_at.nil? || suspension_at > Time.current
   end
 
   def auto_settle_unpaid_invoices

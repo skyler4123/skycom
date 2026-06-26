@@ -27,19 +27,19 @@ RSpec.describe Company::CircuitBreakerConcern do
     end
   end
 
-  describe "#access_blocked?" do
-    it "returns true when suspension_at is in the past" do
+  describe "#is_accessible?" do
+    it "returns false when suspension_at is in the past" do
       company.update!(suspension_at: 1.day.ago)
-      expect(company.access_blocked?).to be true
+      expect(company.is_accessible?).to be false
     end
 
-    it "returns false when suspension_at is nil" do
-      expect(company.access_blocked?).to be false
+    it "returns true when suspension_at is nil" do
+      expect(company.is_accessible?).to be true
     end
 
-    it "returns false when suspension_at is in the future" do
+    it "returns true when suspension_at is in the future" do
       company.update!(suspension_at: 1.day.from_now)
-      expect(company.access_blocked?).to be false
+      expect(company.is_accessible?).to be true
     end
   end
 
