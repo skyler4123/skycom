@@ -26,7 +26,7 @@ Skycom implements a **usage-based billing engine** with a **dual-wallet system**
                           └── Wallet insufficient ─► invoice.overdue, mark_past_due!
                                                     │
                                                     ▼
-                           suspension_at set ─► is_accessible? false ─► block_access! (Authorizable)
+                           suspension_at set ─► is_accessible? false ─► check_accessable (Authorizable)
                                                     │
                           [Voluntary payment via BillingController#pay_all]
                                                     │
@@ -60,12 +60,12 @@ The circuit breaker controls company operational state via `lifecycle_status` an
 - **Extendable** by admin — push the date forward to keep the company accessible
 - **Cleared** by `try_reactivate!` when all invoices are paid
 
-**`access_blocked?`** returns `true` when `suspension_at.present? && suspension_at <= Time.current`:
-- Past `suspension_at` → blocked
-- Future `suspension_at` → not blocked (in runway)
-- No `suspension_at` → not blocked
+**`is_accessible?`** returns `false` when `suspension_at.present? && suspension_at <= Time.current`:
+- Past `suspension_at` → not accessible
+- Future `suspension_at` → accessible (in runway)
+- No `suspension_at` → accessible
 
-**`block_access!`** is a `before_action` in the `Companies::Authorizable` concern that redirects to `company_billing_path` when `current_company&.access_blocked?`.
+**`check_accessable`** is a `before_action` in the `Companies::Authorizable` concern that redirects to `company_billing_path` when `!current_company.is_accessible?`.
 
 ### 2.3 State Transitions
 
@@ -88,7 +88,7 @@ The circuit breaker controls company operational state via `lifecycle_status` an
 |--------|-------------|
 | `mark_past_due!` | Sets `lifecycle_status: :past_due` + `suspension_at: end_of_month`. Idempotent. Raises if `disabled`. |
 | `try_reactivate!` | If no unpaid/overdue invoices remain → `lifecycle_status: :active`, `suspension_at: nil`. No-op if `disabled`. |
-| `access_blocked?` | `true` when `suspension_at.present? && suspension_at <= Time.current` |
+| `is_accessible?` | `true` when `suspension_at.nil? || suspension_at > Time.current` |
 | `auto_settle_unpaid_invoices` | Triggered on balance change + after unpaid invoice creation. Calls `SettlementService.settle_all`. Re-entry guarded. |
 
 ---
@@ -313,7 +313,7 @@ When the wallet is insufficient, the company owner must pay the remaining amount
 | `/companies/:id/billing` | GET | View outstanding invoices + wallet balances |
 | `/companies/:id/billing/pay` | POST | Settle all outstanding invoices |
 
-The controller is **exempt from `block_access!`** so blocked companies can still pay their bills.
+The controller is **exempt from `check_accessable`** so blocked companies can still pay their bills.
 
 ### 8.2 pay_all Response
 
@@ -339,7 +339,7 @@ When `true`, suppresses the past_due warning flash message displayed by `Applica
 | Effect | Behavior |
 |--------|----------|
 | Past due flash warning | **Suppressed** |
-| `block_access!` (access blocking) | **Unaffected** — still blocks when `suspension_at` passes |
+| `check_accessable` (access blocking) | **Unaffected** — still blocks when `suspension_at` passes |
 | `mark_past_due!` / `try_reactivate!` | **Unaffected** — lifecycle transitions still fire |
 
 This is a **passive UI toggle** — it does not affect billing logic, access control, or settlement. It only hides the visual warning banner for past_due companies.
@@ -442,7 +442,7 @@ Idempotent 6-hour snapshot job:
 | `app/jobs/billing/monthly_billing_job.rb` | 42 | Monthly invoice creation for non-disabled companies |
 | `app/jobs/billing/sync_daily_metric_job.rb` | 64 | Hourly sync of Redis counters → DailyMetricLog |
 | `app/jobs/billing/sync_daily_feature_job.rb` | 34 | 6-hourly snapshot of active features → DailyFeatureLog |
-| `app/controllers/companies/billing_controller.rb` | 56 | Billing portal: view + pay outstanding invoices; exempt from block_access! |
+| `app/controllers/companies/billing_controller.rb` | 56 | Billing portal: view + pay outstanding invoices; exempt from check_accessable |
 
 ---
 

@@ -8,7 +8,7 @@
 #
 # Admin can extend suspension_at to give more time.
 # A company is NOT accessible when suspension_at.present? && suspension_at <= Time.current
-# (checked via is_accessible?, gated by block_access! in Authorizable concern).
+# (checked via is_accessible?, gated by check_accessable in Authorizable concern).
 #
 # try_reactivate! is called after an invoice is marked paid:
 #   - If no unpaid invoices remain + sets lifecycle_status +:active, clears suspension_at

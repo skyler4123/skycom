@@ -17,7 +17,7 @@ RSpec.describe "Companies::ApplicationController", type: :request do
     ActionController::Base.allow_forgery_protection = original
   end
 
-  describe "block_access!" do
+  describe "check_accessable" do
     it "redirects to billing page when suspension_at is in the past (not accessible)" do
       company.update!(suspension_at: 1.day.ago)
       get "/companies/#{company.id}/dashboards"

@@ -41,7 +41,7 @@ module Companies::Authorizable
     end
   end
 
-  def block_access!
+  def check_accessable
     return if current_company&.is_accessible?
 
     respond_to do |format|

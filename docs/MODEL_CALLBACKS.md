@@ -172,7 +172,7 @@ Managed attribute caching in Rails.cache. Keeps model attributes synchronized wi
 
 ### Company::CircuitBreakerConcern (`app/models/concerns/company/circuit_breaker_concern.rb`)
 
-Manages Company lifecycle transitions based on unpaid invoices. `suspension_at` is the sole gate for access blocking (the positive `is_accessible?` predicate is checked by `block_access!` in Authorizable concern). On wallet balance change, automatically attempts to settle outstanding invoices via `SettlementService.settle_all`.
+Manages Company lifecycle transitions based on unpaid invoices. `suspension_at` is the sole gate for access blocking (the positive `is_accessible?` predicate is checked by `check_accessable` in Authorizable concern). On wallet balance change, automatically attempts to settle outstanding invoices via `SettlementService.settle_all`.
 
 | Callback | Line | Method | Description |
 |----------|------|--------|-------------|

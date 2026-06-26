@@ -1,14 +1,14 @@
 # frozen_string_literal: true
 
 # Billing portal accessible by blocked companies to view and pay outstanding invoices.
-# This controller is exempt from the block_access! before_action.
+# This controller is exempt from the check_accessable before_action.
 #
 # Routes (nested under companies):
 #   GET  /companies/:company_id/billing      → billing#show (suspended portal)
 #   POST /companies/:company_id/billing/pay  → billing#pay_all (pay outstanding invoices)
 #
 class Companies::BillingController < Companies::ApplicationController
-  skip_before_action :block_access!, only: %i[show pay_all]
+  skip_before_action :check_accessable, only: %i[show pay_all]
 
   def show
     respond_to do |format|

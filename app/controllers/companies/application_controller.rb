@@ -1,11 +1,12 @@
 class Companies::ApplicationController < ApplicationController
   before_action :set_company
   before_action :set_employee
-  before_action :block_access!
-  before_action :set_past_due_warning
 
   # Order reason: Companies::Authorizable need current_employee
   include Companies::Authorizable
+
+  before_action :check_accessable
+  before_action :set_past_due_warning
 
   private
 
