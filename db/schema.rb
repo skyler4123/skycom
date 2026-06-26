@@ -861,13 +861,13 @@ ActiveRecord::Schema[8.0].define(version: 2026_06_26_162531) do
     t.jsonb "metadata", default: {}
     t.datetime "discarded_at"
     t.string "permission_resource_name"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
     t.integer "promo_balance_cents", default: 0, null: false
     t.integer "main_balance_cents", default: 0, null: false
     t.integer "soft_debt_threshold_cents", default: -10000, null: false
     t.datetime "suspension_at"
     t.boolean "hide_billing_alerts", default: false, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
     t.index ["business_type"], name: "index_companies_on_business_type"
     t.index ["discarded_at"], name: "index_companies_on_discarded_at"
     t.index ["lifecycle_status"], name: "index_companies_on_lifecycle_status"
