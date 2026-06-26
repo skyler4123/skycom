@@ -9,9 +9,10 @@ RSpec.describe Billing::InvoiceService do
   let(:period_start) { 1.month.ago.beginning_of_month }
   let(:period_end) { 1.month.ago.end_of_month }
 
-  let!(:contract) do
-    create(:billing_contract, company: company, lifecycle_status: :active, start_date: 3.months.ago)
-  end
+  # Auto-seeded free-tier contract (active); update start_date when needed
+  let!(:contract) { company.active_billing_contract }
+
+  before { contract.update!(start_date: 3.months.ago) }
 
   let(:calculator_result) do
     Billing::CalculatorService::Result.new(

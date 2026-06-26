@@ -6,13 +6,12 @@ RSpec.describe Billing::MonthlyBillingJob do
   subject(:perform_job) { described_class.perform_now }
 
   let(:company) { create(:company, lifecycle_status: :active) }
-  let!(:contract) do
-    create(:billing_contract, company: company, lifecycle_status: :active,
-           start_date: 3.months.ago, fixed_monthly_price_cents: 1000)
-  end
+  # Auto-seeded free-tier contract (active, base=$0); update base price when needed
+  let!(:contract) { company.active_billing_contract }
 
   context "when company has an active contract with base price" do
     before do
+      contract.update!(start_date: 3.months.ago, fixed_monthly_price_cents: 1000)
       company.update!(promo_balance_cents: 2000, main_balance_cents: 0, lifecycle_status: :active)
     end
 
@@ -30,6 +29,7 @@ RSpec.describe Billing::MonthlyBillingJob do
 
   context "when company has empty wallet" do
     before do
+      contract.update!(start_date: 3.months.ago, fixed_monthly_price_cents: 1000)
       company.update!(promo_balance_cents: 0, main_balance_cents: 0, lifecycle_status: :active)
     end
 
@@ -45,6 +45,7 @@ RSpec.describe Billing::MonthlyBillingJob do
 
   context "when company has no active contract" do
     before do
+      contract.update!(start_date: 3.months.ago)
       company.update!(lifecycle_status: :active)
       contract.update!(lifecycle_status: :expired)
     end
@@ -56,6 +57,7 @@ RSpec.describe Billing::MonthlyBillingJob do
 
   context "when company has zero total charges" do
     before do
+      contract.update!(start_date: 3.months.ago)
       company.update!(lifecycle_status: :active)
       contract.update!(fixed_monthly_price_cents: 0)
     end
@@ -67,6 +69,7 @@ RSpec.describe Billing::MonthlyBillingJob do
 
   context "when company is past_due with sufficient wallet" do
     before do
+      contract.update!(start_date: 3.months.ago, fixed_monthly_price_cents: 1000)
       company.update!(lifecycle_status: :past_due, promo_balance_cents: 2000, main_balance_cents: 0)
     end
 
@@ -95,12 +98,11 @@ RSpec.describe Billing::MonthlyBillingJob do
 
   context "with multiple companies" do
     let(:company2) { create(:company, lifecycle_status: :active) }
-    let!(:contract2) do
-      create(:billing_contract, company: company2, lifecycle_status: :active,
-             start_date: 3.months.ago, fixed_monthly_price_cents: 500)
-    end
+    let!(:contract2) { company2.active_billing_contract }
 
     before do
+      contract.update!(start_date: 3.months.ago, fixed_monthly_price_cents: 1000)
+      contract2.update!(start_date: 3.months.ago, fixed_monthly_price_cents: 500)
       company.update!(promo_balance_cents: 2000, main_balance_cents: 0, lifecycle_status: :active)
       company2.update!(promo_balance_cents: 1000, main_balance_cents: 0)
     end

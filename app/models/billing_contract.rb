@@ -32,7 +32,7 @@ class BillingContract < ApplicationRecord
       billing_resource: resource,
       name: resource.name,
       free_allowance: allowance,
-      unit_price: pricing
+      unit_price_cents: pricing
     )
   end
 end

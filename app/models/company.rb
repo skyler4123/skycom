@@ -172,6 +172,8 @@ class Company < ApplicationRecord
       workflow_status: :active,
       business_type: :owner
     )
+
+    Seed::BillingContractService.create(company: self)
   end
 
   private

@@ -9,12 +9,14 @@ RSpec.describe Billing::CalculatorService do
   let(:period_start) { 1.month.ago.beginning_of_month }
   let(:period_end) { 1.month.ago.end_of_month }
 
-  let!(:contract) do
-    create(:billing_contract, company: company, lifecycle_status: :active,
-           start_date: 3.months.ago, fixed_monthly_price_cents: 1000)
-  end
+  # Auto-seeded free-tier contract (base=$0); update base price when needed
+  let!(:contract) { company.active_billing_contract }
+
+  before { contract.update!(start_date: 3.months.ago) }
 
   context "when contract has no features or metrics" do
+    before { contract.update!(fixed_monthly_price_cents: 1000) }
+
     it "returns total_cents equal to base price" do
       expect(result.total_cents).to eq(1000)
     end
@@ -36,6 +38,7 @@ RSpec.describe Billing::CalculatorService do
     let!(:feature_resource) { create(:billing_resource, :addon_feature, name: "analytics_dashboard") }
 
     before do
+      contract.update!(fixed_monthly_price_cents: 1000)
       create(:contract_feature, billing_contract: contract,
              billing_resource: feature_resource, monthly_flat_price_cents: 500, lifecycle_status: :active)
     end
@@ -53,6 +56,7 @@ RSpec.describe Billing::CalculatorService do
     let!(:metric_resource) { create(:billing_resource, :volumetric, name: "orders") }
 
     before do
+      contract.update!(fixed_monthly_price_cents: 1000)
       create(:contract_metric, billing_contract: contract,
              billing_resource: metric_resource, free_allowance: 100, unit_price_cents: 10)
 
@@ -75,6 +79,7 @@ RSpec.describe Billing::CalculatorService do
     let!(:metric_resource) { create(:billing_resource, :volumetric, name: "orders") }
 
     before do
+      contract.update!(fixed_monthly_price_cents: 1000)
       create(:contract_metric, billing_contract: contract,
              billing_resource: metric_resource, free_allowance: 100, unit_price_cents: 10)
 

@@ -7,7 +7,7 @@ RSpec.describe Company::BillingConcern do
 
   let!(:billing_resource) { create(:billing_resource, :addon_feature, name: "inventory_advanced") }
   let!(:volumetric_resource) { create(:billing_resource, :volumetric, name: "orders") }
-  let!(:billing_contract) { create(:billing_contract, company: company, lifecycle_status: :active, start_date: 1.month.ago) }
+  let!(:billing_contract) { company.active_billing_contract }
 
   before do
     Kredis.redis.flushdb

@@ -6,7 +6,7 @@ RSpec.describe Billing::SettlementService do
   subject(:settle) { described_class.call(invoice) }
 
   let(:company) { create(:company) }
-  let(:contract) { create(:billing_contract, company: company, lifecycle_status: :active, start_date: 3.months.ago) }
+  let(:contract) { company.active_billing_contract }
   let(:invoice) do
     create(:billing_invoice, company: company, billing_contract: contract,
            price_cents: 1500, period_start: 1.month.ago.beginning_of_month,
