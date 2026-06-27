@@ -50,6 +50,47 @@ RSpec.describe "Companies::BillingController", type: :request do
       get "/companies/#{company.id}/billing", as: :json
       expect(response).to have_http_status(:ok)
     end
+
+    it "returns billing_contract data" do
+      get "/companies/#{company.id}/billing", as: :json
+      body = JSON.parse(response.body)
+      expect(body["billing_contract"]).to be_present
+      expect(body["billing_contract"]["contract_type"]).to be_present
+      expect(body["billing_contract"]["included_allowance"]).to be_a(Hash)
+      expect(body["billing_contract"]["unit_prices"]).to be_a(Hash)
+    end
+
+    it "returns wallet with total_cents" do
+      company.update!(main_balance_cents: 10_000, promo_balance_cents: 5_000)
+      get "/companies/#{company.id}/billing", as: :json
+      body = JSON.parse(response.body)
+      expect(body["wallet"]["total_cents"]).to eq(15_000)
+    end
+
+    it "returns daily_metric_totals" do
+      get "/companies/#{company.id}/billing", as: :json
+      body = JSON.parse(response.body)
+      expect(body["daily_metric_totals"]).to be_a(Hash)
+    end
+
+    it "returns addon_features list" do
+      get "/companies/#{company.id}/billing", as: :json
+      body = JSON.parse(response.body)
+      expect(body["addon_features"]).to be_an(Array)
+    end
+
+    it "returns estimate with days_remaining" do
+      get "/companies/#{company.id}/billing", as: :json
+      body = JSON.parse(response.body)
+      expect(body["estimate"]).to be_present
+      expect(body["estimate"]["days_remaining"]).to be >= 0
+    end
+
+    it "returns company is_accessible flag" do
+      get "/companies/#{company.id}/billing", as: :json
+      body = JSON.parse(response.body)
+      expect(body["company"]["is_accessible"]).to be_in([true, false])
+    end
   end
 
   describe "POST /companies/:company_id/billing/pay_all" do

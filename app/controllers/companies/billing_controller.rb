@@ -13,24 +13,129 @@ class Companies::BillingController < Companies::ApplicationController
   def show
     respond_to do |format|
       format.html { render html: "", layout: true }
-      format.json do
-        invoices = current_company.billing_invoices
-                                  .where(payment_status: %i[unpaid overdue])
-                                  .order(:created_at)
-
-        render json: {
-          company: { name: current_company.name, lifecycle_status: current_company.lifecycle_status },
-          invoices: invoices.map { |inv|
-            { id: inv.id, invoice_number: inv.invoice_number,
-              price_cents: inv.price_cents, payment_status: inv.payment_status,
-              created_at: inv.created_at }
-          },
-          wallet: { main_balance_cents: current_company.main_balance_cents,
-                    promo_balance_cents: current_company.promo_balance_cents }
-        }
-      end
+      format.json { render json: billing_show_json }
     end
   end
+
+  private
+
+  def billing_show_json
+    company = current_company
+    contract = company.active_billing_contract
+
+    period_start = Time.current.beginning_of_month.to_date
+    period_end = Time.current.end_of_month.to_date
+    days_elapsed = (Date.current - period_start).to_i + 1
+    days_remaining = (period_end - Date.current).to_i
+
+    wallet = {
+      main_balance_cents: company.main_balance_cents,
+      promo_balance_cents: company.promo_balance_cents,
+      total_cents: company.wallet_balance_cents
+    }
+
+    billing_contract = nil
+    daily_metric_totals = {}
+    addon_features = []
+    estimate = { total_cents: 0, days_remaining: days_remaining, breakdown: {} }
+
+    if contract
+      allowances = {}
+      unit_prices = {}
+      contract.contract_metrics.active.each do |m|
+        allowances[m.billing_resource.name] = m.free_allowance
+        unit_prices[m.billing_resource.name] = m.unit_price_cents
+      end
+
+      feature_prices = {}
+      contract.contract_features.active.each do |f|
+        feature_prices[f.billing_resource.name] = f.monthly_flat_price_cents
+      end
+
+      billing_contract = {
+        contract_type: contract.contract_type,
+        included_allowance: allowances,
+        unit_prices: unit_prices,
+        feature_prices: feature_prices
+      }
+
+      total_overage_cents = 0
+      contract.contract_metrics.active.each do |metric|
+        resource_name = metric.billing_resource.name
+        current_usage = DailyMetricLog.where(company: company, billing_resource: metric.billing_resource)
+                                      .for_period(period_start, Date.current)
+                                      .sum(:usage_count)
+
+        projected = days_elapsed > 0 ? (current_usage.to_f / days_elapsed * (days_elapsed + days_remaining)).round : 0
+        overage_cents = [current_usage - metric.free_allowance, 0].max * metric.unit_price_cents
+        total_overage_cents += overage_cents
+        projected_overage_cents = [projected - metric.free_allowance, 0].max * metric.unit_price_cents
+        usage_pct = metric.free_allowance > 0 ? (current_usage.to_f / metric.free_allowance * 100).round(1) : 0
+
+        daily_metric_totals[resource_name] = {
+          current: current_usage,
+          allowance: metric.free_allowance,
+          usage_pct: usage_pct,
+          projected: projected,
+          overage_cents: overage_cents,
+          projected_overage_cents: projected_overage_cents,
+          unit_price_cents: metric.unit_price_cents
+        }
+      end
+
+      contract.contract_features.active.includes(:billing_resource).each do |f|
+        addon_features << {
+          key: f.billing_resource.name,
+          name: f.billing_resource.name.humanize,
+          monthly_price_cents: f.monthly_flat_price_cents,
+          active: true
+        }
+      end
+
+      features_cents = addon_features.sum { |f| f[:monthly_price_cents] }
+
+      estimate = {
+        total_cents: features_cents + total_overage_cents,
+        days_remaining: [days_remaining, 0].max,
+        breakdown: {
+          features_cents: features_cents,
+          overage_cents: total_overage_cents,
+          base_cents: contract.fixed_monthly_price_cents
+        }
+      }
+    end
+
+    invoices = company.billing_invoices
+                      .where(payment_status: %i[unpaid overdue])
+                      .order(:created_at)
+                      .map { |inv|
+                        {
+                          id: inv.id,
+                          invoice_number: inv.invoice_number,
+                          price_cents: inv.price_cents,
+                          payment_status: inv.payment_status,
+                          created_at: inv.created_at
+                        }
+                      }
+
+    {
+      company: {
+        id: company.id,
+        name: company.name,
+        lifecycle_status: company.lifecycle_status,
+        suspension_at: company.suspension_at,
+        is_accessible: company.is_accessible?
+      },
+      billing_contract: billing_contract,
+      wallet: wallet,
+      invoices: invoices,
+      daily_metric_totals: daily_metric_totals,
+      addon_features: addon_features,
+      estimate: estimate
+    }
+  end
+
+  public
 
   def pay_all
     invoices = current_company.billing_invoices
