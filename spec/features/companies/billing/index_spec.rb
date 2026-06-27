@@ -33,12 +33,6 @@ RSpec.feature "Companies::Billing", type: :feature, js: true do
   scenario "page loads with KPI cards" do
     visit company_billing_path(company)
 
-    body_html = page.evaluate_script('document.body ? document.body.innerHTML.substring(0, 1000) : "no body"')
-    puts "=== Body HTML: #{body_html}"
-
-    page_title = page.evaluate_script('document.title')
-    puts "=== Title: #{page_title}"
-
     expect(page).to have_text("Billing Status", wait: 10)
     expect(page).to have_text("Wallet Balance", wait: 10)
     expect(page).to have_text("This Month Estimate", wait: 10)
