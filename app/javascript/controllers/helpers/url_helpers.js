@@ -21,6 +21,9 @@ export const sign_up_path = () => `/sign_up`
 export const sign_out_path = () => `/sign_out`
 export const auth_google_oauth2_path = () => `/auth/google_oauth2`
 
+export const admin_companies_path = () => `/admin/companies`
+export const admin_company_path = (companyId) => `/admin/companies/${companyId}`
+
 export const users_path = () => `/users`
 export const users_update_avatar_path = () => `/users/update_avatar`
 

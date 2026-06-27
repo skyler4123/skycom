@@ -1,6 +1,9 @@
 # config/routes.rb
 
 Rails.application.routes.draw do
+  namespace :admin do
+    resources :companies
+  end
   resources :client_cache, only: [ :index ]
   resources :redirect do
     collection do
