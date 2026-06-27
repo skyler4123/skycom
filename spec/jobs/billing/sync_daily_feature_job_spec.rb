@@ -88,6 +88,7 @@ RSpec.describe Billing::SyncDailyFeatureJob do
     end
 
     it "continues processing other companies when one fails" do
+      allow_any_instance_of(described_class).to receive(:log_features_for_company).and_call_original
       allow_any_instance_of(described_class).to receive(:log_features_for_company)
         .with(active_company, anything).and_raise(StandardError, "Boom!")
 

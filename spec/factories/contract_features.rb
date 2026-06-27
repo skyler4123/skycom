@@ -2,7 +2,7 @@
 
 FactoryBot.define do
   factory :contract_feature do
-    billing_resource
+    association :billing_resource, :addon_feature
     billing_contract
     name { "Test Feature" }
     monthly_flat_price_cents { 0 }

@@ -3,7 +3,7 @@
 require "rails_helper"
 
 RSpec.describe DailyFeatureLog, type: :model do
-  subject(:log) { build(:daily_feature_log) }
+  subject(:log) { create(:daily_feature_log) }
 
   it { is_expected.to belong_to(:company) }
   it { is_expected.to belong_to(:contract_feature) }

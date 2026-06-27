@@ -21,8 +21,8 @@ ActiveRecord::Schema[8.0].define(version: 0) do
     t.text "metadata", comment: "JSON object of arbitrary deployment metadata"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index [ "revision" ], name: "index_rails_pulse_deployments_on_revision"
-    t.index [ "started_at" ], name: "index_rails_pulse_deployments_on_started_at"
+    t.index ["revision"], name: "index_rails_pulse_deployments_on_revision"
+    t.index ["started_at"], name: "index_rails_pulse_deployments_on_started_at"
   end
 
   create_table "rails_pulse_job_runs", force: :cascade do |t|
@@ -40,12 +40,12 @@ ActiveRecord::Schema[8.0].define(version: 0) do
     t.text "tags", comment: "Execution tags"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index [ "job_id", "occurred_at" ], name: "index_rails_pulse_job_runs_on_job_and_occurred"
-    t.index [ "job_id", "status" ], name: "index_rails_pulse_job_runs_on_job_and_status"
-    t.index [ "job_id" ], name: "index_rails_pulse_job_runs_on_job_id"
-    t.index [ "occurred_at" ], name: "index_rails_pulse_job_runs_on_occurred_at"
-    t.index [ "run_id" ], name: "index_rails_pulse_job_runs_on_run_id", unique: true
-    t.index [ "status" ], name: "index_rails_pulse_job_runs_on_status"
+    t.index ["job_id", "occurred_at"], name: "index_rails_pulse_job_runs_on_job_and_occurred"
+    t.index ["job_id", "status"], name: "index_rails_pulse_job_runs_on_job_and_status"
+    t.index ["job_id"], name: "index_rails_pulse_job_runs_on_job_id"
+    t.index ["occurred_at"], name: "index_rails_pulse_job_runs_on_occurred_at"
+    t.index ["run_id"], name: "index_rails_pulse_job_runs_on_run_id", unique: true
+    t.index ["status"], name: "index_rails_pulse_job_runs_on_status"
   end
 
   create_table "rails_pulse_jobs", force: :cascade do |t|
@@ -61,9 +61,9 @@ ActiveRecord::Schema[8.0].define(version: 0) do
     t.text "tags", comment: "JSON array of tags"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index [ "name" ], name: "index_rails_pulse_jobs_on_name", unique: true
-    t.index [ "queue_name" ], name: "index_rails_pulse_jobs_on_queue"
-    t.index [ "runs_count" ], name: "index_rails_pulse_jobs_on_runs_count"
+    t.index ["name"], name: "index_rails_pulse_jobs_on_name", unique: true
+    t.index ["queue_name"], name: "index_rails_pulse_jobs_on_queue"
+    t.index ["runs_count"], name: "index_rails_pulse_jobs_on_runs_count"
   end
 
   create_table "rails_pulse_operations", force: :cascade do |t|
@@ -83,13 +83,13 @@ ActiveRecord::Schema[8.0].define(version: 0) do
     t.integer "repetition_count", comment: "Number of times this query pattern repeated in the request"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index [ "created_at", "query_id" ], name: "idx_operations_for_aggregation"
-    t.index [ "job_run_id" ], name: "index_rails_pulse_operations_on_job_run_id"
-    t.index [ "occurred_at", "duration", "operation_type" ], name: "index_rails_pulse_operations_on_time_duration_type"
-    t.index [ "operation_type" ], name: "index_rails_pulse_operations_on_operation_type"
-    t.index [ "query_id", "duration", "occurred_at" ], name: "index_rails_pulse_operations_query_performance"
-    t.index [ "query_id", "occurred_at" ], name: "index_rails_pulse_operations_on_query_and_time"
-    t.index [ "request_id" ], name: "index_rails_pulse_operations_on_request_id"
+    t.index ["created_at", "query_id"], name: "idx_operations_for_aggregation"
+    t.index ["job_run_id"], name: "index_rails_pulse_operations_on_job_run_id"
+    t.index ["occurred_at", "duration", "operation_type"], name: "index_rails_pulse_operations_on_time_duration_type"
+    t.index ["operation_type"], name: "index_rails_pulse_operations_on_operation_type"
+    t.index ["query_id", "duration", "occurred_at"], name: "index_rails_pulse_operations_query_performance"
+    t.index ["query_id", "occurred_at"], name: "index_rails_pulse_operations_on_query_and_time"
+    t.index ["request_id"], name: "index_rails_pulse_operations_on_request_id"
     t.check_constraint "request_id IS NOT NULL OR job_run_id IS NOT NULL", name: "rails_pulse_operations_request_or_job_run"
   end
 
@@ -108,7 +108,7 @@ ActiveRecord::Schema[8.0].define(version: 0) do
     t.text "tags", comment: "JSON array of tags for filtering and categorization"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index [ "hashed_sql" ], name: "index_rails_pulse_queries_on_hashed_sql", unique: true
+    t.index ["hashed_sql"], name: "index_rails_pulse_queries_on_hashed_sql", unique: true
   end
 
   create_table "rails_pulse_requests", force: :cascade do |t|
@@ -123,11 +123,11 @@ ActiveRecord::Schema[8.0].define(version: 0) do
     t.integer "response_size_bytes", comment: "HTTP response body size in bytes"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index [ "created_at", "route_id" ], name: "idx_requests_for_aggregation"
-    t.index [ "occurred_at" ], name: "index_rails_pulse_requests_on_occurred_at"
-    t.index [ "request_uuid" ], name: "index_rails_pulse_requests_on_request_uuid", unique: true
-    t.index [ "route_id", "occurred_at" ], name: "index_rails_pulse_requests_on_route_id_and_occurred_at"
-    t.index [ "route_id" ], name: "index_rails_pulse_requests_on_route_id"
+    t.index ["created_at", "route_id"], name: "idx_requests_for_aggregation"
+    t.index ["occurred_at"], name: "index_rails_pulse_requests_on_occurred_at"
+    t.index ["request_uuid"], name: "index_rails_pulse_requests_on_request_uuid", unique: true
+    t.index ["route_id", "occurred_at"], name: "index_rails_pulse_requests_on_route_id_and_occurred_at"
+    t.index ["route_id"], name: "index_rails_pulse_requests_on_route_id"
   end
 
   create_table "rails_pulse_routes", force: :cascade do |t|
@@ -136,8 +136,8 @@ ActiveRecord::Schema[8.0].define(version: 0) do
     t.text "tags", comment: "JSON array of tags for filtering and categorization"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index [ "method", "path" ], name: "index_rails_pulse_routes_on_method_and_path", unique: true
-    t.index [ "path" ], name: "index_rails_pulse_routes_on_path"
+    t.index ["method", "path"], name: "index_rails_pulse_routes_on_method_and_path", unique: true
+    t.index ["path"], name: "index_rails_pulse_routes_on_path"
   end
 
   create_table "rails_pulse_summaries", force: :cascade do |t|
@@ -163,12 +163,12 @@ ActiveRecord::Schema[8.0].define(version: 0) do
     t.integer "status_5xx", default: 0, comment: "Number of 5xx responses"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index [ "created_at" ], name: "index_rails_pulse_summaries_on_created_at"
-    t.index [ "period_start" ], name: "index_rails_pulse_summaries_on_period_start"
-    t.index [ "period_type", "period_start" ], name: "index_rails_pulse_summaries_on_period"
-    t.index [ "summarizable_id" ], name: "index_rails_pulse_summaries_on_summarizable_id"
-    t.index [ "summarizable_type", "summarizable_id", "period_type", "period_start" ], name: "idx_pulse_summaries_unique", unique: true
-    t.index [ "summarizable_type", "summarizable_id" ], name: "index_rails_pulse_summaries_on_summarizable"
+    t.index ["created_at"], name: "index_rails_pulse_summaries_on_created_at"
+    t.index ["period_start"], name: "index_rails_pulse_summaries_on_period_start"
+    t.index ["period_type", "period_start"], name: "index_rails_pulse_summaries_on_period"
+    t.index ["summarizable_id"], name: "index_rails_pulse_summaries_on_summarizable_id"
+    t.index ["summarizable_type", "summarizable_id", "period_type", "period_start"], name: "idx_pulse_summaries_unique", unique: true
+    t.index ["summarizable_type", "summarizable_id"], name: "index_rails_pulse_summaries_on_summarizable"
   end
 
   add_foreign_key "rails_pulse_job_runs", "rails_pulse_jobs", column: "job_id"
