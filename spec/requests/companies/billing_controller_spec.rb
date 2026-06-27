@@ -89,7 +89,7 @@ RSpec.describe "Companies::BillingController", type: :request do
     it "returns company is_accessible flag" do
       get "/companies/#{company.id}/billing", as: :json
       body = JSON.parse(response.body)
-      expect(body["company"]["is_accessible"]).to be_in([true, false])
+      expect(body["company"]["is_accessible"]).to be_in([ true, false ])
     end
   end
 

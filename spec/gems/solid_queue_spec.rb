@@ -43,7 +43,7 @@ RSpec.describe 'solid_queue', type: :job do
   describe 'job execution' do
     it 'successfully performs an enqueued job via the adapter' do
       TestJob.perform_later(job_arg)
-      
+
       # Step 1: Ensure the job successfully landed in Solid Queue's ready table
       ready_execution = SolidQueue::ReadyExecution.last
       expect(ready_execution).to_not be_nil
@@ -54,7 +54,7 @@ RSpec.describe 'solid_queue', type: :job do
       expect {
         # Step 3: Run the underlying ActiveJob payload inline
         ActiveJob::Base.execute(solid_queue_job.arguments)
-        
+
         # Step 4: Simulate worker cleanup by removing it from the ready queue
         ready_execution.destroy
       }.to change { SolidQueue::ReadyExecution.count }.by(-1)
@@ -66,7 +66,7 @@ RSpec.describe 'solid_queue', type: :job do
       # Fixes the missing freeze_time method by using ActiveSupport's helper directly
       travel_to Time.current do
         TestJob.set(wait: 5.minutes).perform_later(job_arg)
-        
+
         scheduled_job = SolidQueue::ScheduledExecution.last
         expect(scheduled_job.scheduled_at).to eq(5.minutes.from_now)
       end

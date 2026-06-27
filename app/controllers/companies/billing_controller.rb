@@ -67,9 +67,9 @@ class Companies::BillingController < Companies::ApplicationController
                                       .sum(:usage_count)
 
         projected = days_elapsed > 0 ? (current_usage.to_f / days_elapsed * (days_elapsed + days_remaining)).round : 0
-        overage_cents = [current_usage - metric.free_allowance, 0].max * metric.unit_price_cents
+        overage_cents = [ current_usage - metric.free_allowance, 0 ].max * metric.unit_price_cents
         total_overage_cents += overage_cents
-        projected_overage_cents = [projected - metric.free_allowance, 0].max * metric.unit_price_cents
+        projected_overage_cents = [ projected - metric.free_allowance, 0 ].max * metric.unit_price_cents
         usage_pct = metric.free_allowance > 0 ? (current_usage.to_f / metric.free_allowance * 100).round(1) : 0
 
         daily_metric_totals[resource_name] = {
@@ -96,7 +96,7 @@ class Companies::BillingController < Companies::ApplicationController
 
       estimate = {
         total_cents: features_cents + total_overage_cents,
-        days_remaining: [days_remaining, 0].max,
+        days_remaining: [ days_remaining, 0 ].max,
         breakdown: {
           features_cents: features_cents,
           overage_cents: total_overage_cents,
