@@ -218,7 +218,7 @@ export default class Companies_Dashboards_IndexController extends Companies_Layo
                 </div>
                 <div class="min-w-0">
                   <p class="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase">Timezone</p>
-                  <p class="text-sm text-slate-900 dark:text-white">${c?.timezone ? `UTC${c.timezone > 0 ? "+" : ""}${c.timezone}` : "—"}</p>
+                  <p class="text-sm text-slate-900 dark:text-white">${(() => { if (!c?.timezone) return "—"; const m = c.timezone.match(/minus_(\d+)/); if (m) return `UTC-${m[1]}`; const p = c.timezone.match(/plus_(\d+)/); if (p) return `UTC+${p[1]}`; return c.timezone === "utc" ? "UTC" : c.timezone; })()}</p>
                 </div>
               </div>
               <div class="flex items-center gap-3">
