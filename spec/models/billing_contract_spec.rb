@@ -15,7 +15,7 @@ RSpec.describe BillingContract, type: :model do
   end
 
   describe "enums" do
-    it { is_expected.to define_enum_for(:contract_type).with_values(free_tier: 0, pay_as_you_go: 1, enterprise: 2) }
+    it { is_expected.to define_enum_for(:contract_type).with_values(basic: 0, pay_as_you_go: 1, enterprise: 2) }
     it { is_expected.to define_enum_for(:lifecycle_status).with_values(draft: 0, active: 1, expired: 2, terminated: 3) }
   end
 

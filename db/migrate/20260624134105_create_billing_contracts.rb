@@ -5,7 +5,7 @@ class CreateBillingContracts < ActiveRecord::Migration[8.0]
 
       t.string :name, null: false
       t.string :description
-      t.integer :contract_type, default: 0, null: false # enum: free_tier, pay_as_you_go, enterprise
+      t.integer :contract_type, default: 0, null: false # enum: basic, pay_as_you_go, enterprise
 
       # money-rails flat column format
       t.integer :fixed_monthly_price_cents, default: 0, null: false

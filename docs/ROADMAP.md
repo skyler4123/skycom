@@ -196,7 +196,7 @@ Every company has exactly one active `BillingContract`. This single record contr
     "branches": 10
   },
   "soft_debt_threshold": -200,
-  "contract_type": "free_tier"
+  "contract_type": "basic"
 }
 ```
 
@@ -520,7 +520,7 @@ Each company has one active `BillingContract` that controls everything:
 | `included_allowance` | JSONB | Per-resource monthly limits (e.g., 200 orders, 500MB storage) |
 | `unit_prices` | JSONB | Per-resource overage pricing (e.g., $0.10/additional order) |
 | `soft_debt_threshold` | integer | Max negative balance before auto-suspend |
-| `contract_type` | enum | `free_tier`, `enterprise`, `custom` |
+| `contract_type` | enum | `basic`, `enterprise`, `custom` |
 
 #### Contract Examples
 
@@ -612,7 +612,7 @@ Every new company starts with a **Free Tier** BillingContract:
 | Employees included | 3 |
 | Branches included | 1 |
 | Overage pricing | Standard per-unit rates |
-| Contract type | `free_tier` |
+| Contract type | `basic` |
 
 No credit card required. The free tier is not a trial — it's a permanent usage tier. The company simply pays for what they use beyond the included allowance.
 
@@ -684,7 +684,7 @@ This is the architectural flexibility that `BillingContract.enabled_features` pr
   },
   "included_allowance": { "orders": 200, "storage_mb": 500, "employees": 3, "branches": 1 },
   "unit_prices": { "orders": 1000, "storage_mb": 100 },
-  "contract_type": "free_tier"
+  "contract_type": "basic"
 }
 ```
 

@@ -9,7 +9,7 @@ export default class Companies_Billing_ShowController extends Companies_LayoutCo
   /** @type {object|null} */ wallet = null
   /** @type {Array} */ invoices = []
   /** @type {object} */ dailyMetricTotals = {}
-  /** @type {Array} */ addonFeatures = []
+  /** @type {Array} */ catalogAddonFeatures = []
   /** @type {object} */ estimate = {}
 
   async connect() {
@@ -24,7 +24,7 @@ export default class Companies_Billing_ShowController extends Companies_LayoutCo
       this.wallet = response.wallet
       this.invoices = response.invoices || []
       this.dailyMetricTotals = response.daily_metric_totals || {}
-      this.addonFeatures = response.addon_features || []
+      this.catalogAddonFeatures = Helpers.sortObjectArray(response.catalog_addon_features || [])
       this.estimate = response.estimate || {}
     } catch (error) {
       toast({ type: "error", message: "Failed to load billing data" })
@@ -38,6 +38,16 @@ export default class Companies_Billing_ShowController extends Companies_LayoutCo
       }
       return false
     })
+  }
+
+  displayValue(value, unit) {
+    if (unit === "x1000") return Math.round(value / 1000)
+    return value
+  }
+
+  displayLabel(key, unit) {
+    const label = key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())
+    return unit === "x1000" ? `${label} (x1000)` : label
   }
 
   renderCharts() {
@@ -55,9 +65,9 @@ export default class Companies_Billing_ShowController extends Companies_LayoutCo
       return
     }
 
-    const labels = metrics.map(k => k.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase()))
-    const currentData = metrics.map(k => this.dailyMetricTotals[k].current)
-    const allowanceData = metrics.map(k => this.dailyMetricTotals[k].allowance)
+    const labels = metrics.map(k => this.displayLabel(k, this.dailyMetricTotals[k].display_unit))
+    const currentData = metrics.map(k => this.displayValue(this.dailyMetricTotals[k].current, this.dailyMetricTotals[k].display_unit))
+    const allowanceData = metrics.map(k => this.displayValue(this.dailyMetricTotals[k].allowance, this.dailyMetricTotals[k].display_unit))
 
     const options = {
       series: [
@@ -192,6 +202,13 @@ export default class Companies_Billing_ShowController extends Companies_LayoutCo
     return `<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold ${cls}">${status?.replace(/_/g, ' ') || "Unknown"}</span>`
   }
 
+  statusBadge(active) {
+    if (active) {
+      return '<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-xs font-bold bg-emerald-50 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400"><span class="material-symbols-outlined text-[12px]">check_circle</span>Enabled</span>'
+    }
+    return '<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-xs font-medium bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-400"><span class="material-symbols-outlined text-[12px]">remove_circle</span>Disabled</span>'
+  }
+
   usageBar(pct) {
     const color = pct >= 100 ? "bg-red-500" : pct >= 80 ? "bg-amber-500" : "bg-emerald-500"
     const barWidth = Math.min(pct, 100)
@@ -290,32 +307,37 @@ export default class Companies_Billing_ShowController extends Companies_LayoutCo
                   <th class="pb-3 pr-4">Metric</th>
                   <th class="pb-3 pr-4 text-right">Current</th>
                   <th class="pb-3 pr-4 text-right">Allowance</th>
+                  <th class="pb-3 pr-4 text-right">Unit Price</th>
+                  <th class="pb-3 pr-4 text-right">Current Cost</th>
                   <th class="pb-3 pr-4">Usage</th>
-                  <th class="pb-3 pr-4 text-right">Projected EOM</th>
-                  <th class="pb-3 text-right">Est. Overage</th>
+                  <th class="pb-3 text-right">Projected EOM</th>
                 </tr>
               </thead>
               <tbody>
                 ${Object.entries(this.dailyMetricTotals).map(([key, metric]) => {
-                  const label = key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())
+                  const label = this.displayLabel(key, metric.display_unit)
+                  const displayCurrent = this.displayValue(metric.current, metric.display_unit)
+                  const displayAllowance = this.displayValue(metric.allowance, metric.display_unit)
+                  const displayProjected = this.displayValue(metric.projected, metric.display_unit)
                   return `
                     <tr class="border-b border-slate-100 dark:border-slate-800 text-sm">
                       <td class="py-3 pr-4 font-medium text-slate-900 dark:text-white">${label}</td>
-                      <td class="py-3 pr-4 text-right text-slate-700 dark:text-slate-300">${metric.current}</td>
-                      <td class="py-3 pr-4 text-right text-slate-500">${metric.allowance}</td>
+                      <td class="py-3 pr-4 text-right text-slate-700 dark:text-slate-300">${displayCurrent}</td>
+                      <td class="py-3 pr-4 text-right text-slate-500">${displayAllowance}</td>
+                      <td class="py-3 pr-4 text-right text-slate-500">${this.formatCents(metric.unit_price_cents)}</td>
+                      <td class="py-3 pr-4 text-right ${metric.overage_cents > 0 ? "text-amber-600 font-bold" : "text-slate-400"}">${this.formatCents(metric.overage_cents)}</td>
                       <td class="py-3 pr-4">
                         <div class="flex items-center gap-2">
                           <div class="flex-1 max-w-[100px]">${this.usageBar(metric.usage_pct)}</div>
                           <span class="text-xs ${metric.usage_pct >= 100 ? "text-red-600 font-bold" : metric.usage_pct >= 80 ? "text-amber-600 font-bold" : "text-slate-500"}">${metric.usage_pct}%</span>
                         </div>
                       </td>
-                      <td class="py-3 pr-4 text-right text-slate-700 dark:text-slate-300">${metric.projected}</td>
-                      <td class="py-3 text-right ${metric.overage_cents > 0 ? "text-amber-600 font-bold" : "text-slate-400"}">${this.formatCents(metric.overage_cents)}</td>
+                      <td class="py-3 text-right text-slate-700 dark:text-slate-300">${displayProjected}</td>
                     </tr>
                   `
                 }).join("")}
                 ${Object.keys(this.dailyMetricTotals).length === 0
-                  ? '<tr><td colspan="6" class="py-6 text-center text-sm text-slate-400">No usage data yet</td></tr>'
+                  ? '<tr><td colspan="7" class="py-6 text-center text-sm text-slate-400">No usage data yet</td></tr>'
                   : ""}
               </tbody>
             </table>
@@ -324,19 +346,32 @@ export default class Companies_Billing_ShowController extends Companies_LayoutCo
 
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
           <div class="p-5 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800">
-            <h3 class="text-sm font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-4">Enabled Add-on Features</h3>
-            ${this.addonFeatures.length > 0
-              ? `<div class="flex flex-wrap gap-2">
-                  ${this.addonFeatures.map(f => `
-                    <div class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 text-xs font-medium text-blue-700 dark:text-blue-300">
-                      <span class="material-symbols-outlined text-[14px]">check_circle</span>
-                      ${f.name}
-                      <span class="text-blue-400 dark:text-blue-500">${this.formatCents(f.monthly_price_cents)}/mo</span>
-                    </div>
-                  `).join("")}
-                </div>`
-              : '<p class="text-sm text-slate-400">No add-on features enabled on your current plan.</p>'
-            }
+            <h3 class="text-sm font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-4">Add-on Features Catalog</h3>
+            <div class="overflow-x-auto">
+              <table class="w-full text-left">
+                <thead>
+                  <tr class="text-[10px] font-bold text-slate-400 dark:text-slate-300 uppercase tracking-wider border-b border-slate-200 dark:border-slate-700">
+                    <th class="pb-3 pr-4">Add-on Feature</th>
+                    <th class="pb-3 pr-4 text-right">Price/mo</th>
+                    <th class="pb-3 pr-4">Status</th>
+                    <th class="pb-3 text-right">Active Days</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  ${this.catalogAddonFeatures.length > 0
+                    ? this.catalogAddonFeatures.map(f => `
+                      <tr class="border-b border-slate-100 dark:border-slate-800 text-sm">
+                        <td class="py-3 pr-4 font-medium text-slate-900 dark:text-white">${f.name}</td>
+                        <td class="py-3 pr-4 text-right text-slate-700 dark:text-slate-300">${this.formatCents(f.monthly_price_cents)}/mo</td>
+                        <td class="py-3 pr-4">${this.statusBadge(f.active)}</td>
+                        <td class="py-3 text-right ${f.active_days > 0 ? "text-slate-700 dark:text-slate-300" : "text-slate-400"}">${f.active_days}</td>
+                      </tr>
+                    `).join("")
+                    : '<tr><td colspan="4" class="py-6 text-center text-sm text-slate-400">No add-on features available.</td></tr>'
+                  }
+                </tbody>
+              </table>
+            </div>
           </div>
           <div class="p-5 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 flex flex-col justify-center">
             <h3 class="text-sm font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-3">Outstanding Invoices</h3>

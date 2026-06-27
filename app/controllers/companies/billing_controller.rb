@@ -72,6 +72,8 @@ class Companies::BillingController < Companies::ApplicationController
         projected_overage_cents = [ projected - metric.free_allowance, 0 ].max * metric.unit_price_cents
         usage_pct = metric.free_allowance > 0 ? (current_usage.to_f / metric.free_allowance * 100).round(1) : 0
 
+        display_unit = "x1000" if resource_name == "api_calls"
+
         daily_metric_totals[resource_name] = {
           current: current_usage,
           allowance: metric.free_allowance,
@@ -79,20 +81,38 @@ class Companies::BillingController < Companies::ApplicationController
           projected: projected,
           overage_cents: overage_cents,
           projected_overage_cents: projected_overage_cents,
-          unit_price_cents: metric.unit_price_cents
+          unit_price_cents: metric.unit_price_cents,
+          display_unit: display_unit
         }
       end
 
-      contract.contract_features.active.includes(:billing_resource).each do |f|
-        addon_features << {
-          key: f.billing_resource.name,
-          name: f.billing_resource.name.humanize,
-          monthly_price_cents: f.monthly_flat_price_cents,
-          active: true
+      active_feature_ids = contract.contract_features.active.pluck(:billing_resource_id).to_set
+
+      catalog_addon_features = BillingResource.addon_feature
+                                              .where(country_code: company.country_code)
+                                              .order(:name)
+                                              .map do |resource|
+        is_active = active_feature_ids.include?(resource.id)
+        active_days = 0
+
+        if is_active
+          cf = contract.contract_features.active.find_by(billing_resource: resource)
+          active_days = DailyFeatureLog.where(contract_feature: cf)
+                                       .for_period(period_start, Date.current)
+                                       .count if cf
+        end
+
+        {
+          key: resource.name,
+          name: resource.description.presence || resource.name.humanize,
+          monthly_price_cents: resource.price_cents,
+          currency: resource.currency,
+          active: is_active,
+          active_days: active_days
         }
       end
 
-      features_cents = addon_features.sum { |f| f[:monthly_price_cents] }
+      features_cents = contract.contract_features.active.sum(:monthly_flat_price_cents)
 
       estimate = {
         total_cents: features_cents + total_overage_cents,
@@ -130,7 +150,7 @@ class Companies::BillingController < Companies::ApplicationController
       wallet: wallet,
       invoices: invoices,
       daily_metric_totals: daily_metric_totals,
-      addon_features: addon_features,
+      catalog_addon_features: catalog_addon_features,
       estimate: estimate
     }
   end

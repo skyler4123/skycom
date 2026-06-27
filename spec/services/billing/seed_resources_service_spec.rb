@@ -4,12 +4,12 @@ require "rails_helper"
 
 RSpec.describe Billing::SeedResourcesService do
   describe ".call" do
-    it "creates volumetric billing resources" do
-      expect { described_class.call }.to change(BillingResource.volumetric, :count).by(7)
+    it "creates volumetric billing resources for all countries" do
+      expect { described_class.call }.to change(BillingResource.volumetric, :count).by(14)
     end
 
-    it "creates addon feature billing resources" do
-      expect { described_class.call }.to change(BillingResource.addon_feature, :count).by(12)
+    it "creates addon feature billing resources for all countries" do
+      expect { described_class.call }.to change(BillingResource.addon_feature, :count).by(32)
     end
 
     it "is idempotent" do
@@ -17,14 +17,24 @@ RSpec.describe Billing::SeedResourcesService do
       expect { described_class.call }.not_to change(BillingResource, :count)
     end
 
-    it "creates an orders resource" do
+    it "creates an orders resource for US" do
       described_class.call
-      expect(BillingResource.find_by(name: "orders")).to be_present
+      expect(BillingResource.find_by(name: "orders", country_code: :us)).to be_present
     end
 
-    it "creates an analytics_dashboard resource" do
+    it "creates an orders resource for VN" do
       described_class.call
-      expect(BillingResource.find_by(name: "analytics_dashboard")).to be_present
+      expect(BillingResource.find_by(name: "orders", country_code: :vn)).to be_present
+    end
+
+    it "creates an analytics_dashboard resource for US" do
+      described_class.call
+      expect(BillingResource.find_by(name: "analytics_dashboard", country_code: :us)).to be_present
+    end
+
+    it "creates an analytics_dashboard resource for VN" do
+      described_class.call
+      expect(BillingResource.find_by(name: "analytics_dashboard", country_code: :vn)).to be_present
     end
   end
 end

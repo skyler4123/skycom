@@ -4,7 +4,7 @@ FactoryBot.define do
   factory :billing_contract do
     company
     name { "Test Contract" }
-    contract_type { :free_tier }
+    contract_type { :basic }
     lifecycle_status { :active }
     start_date { Time.current }
     fixed_monthly_price_cents { 0 }

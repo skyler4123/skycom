@@ -73,10 +73,10 @@ RSpec.describe "Companies::BillingController", type: :request do
       expect(body["daily_metric_totals"]).to be_a(Hash)
     end
 
-    it "returns addon_features list" do
+    it "returns catalog_addon_features list" do
       get "/companies/#{company.id}/billing", as: :json
       body = JSON.parse(response.body)
-      expect(body["addon_features"]).to be_an(Array)
+      expect(body["catalog_addon_features"]).to be_an(Array)
     end
 
     it "returns estimate with days_remaining" do
