@@ -1,7 +1,7 @@
 import Companies_LayoutController from "controllers/companies/layout_controller"
 import ApexCharts from "apexcharts"
 
-export default class Companies_Billing_IndexController extends Companies_LayoutController {
+export default class Companies_Billing_ShowController extends Companies_LayoutController {
   static targets = ["usageChart", "costChart"]
 
   /** @type {object|null} */ company = null
