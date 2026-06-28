@@ -3,7 +3,7 @@
 # Manages Company lifecycle based on unpaid invoices.
 #
 # flag_unpaid! is called when unpaid invoices exist:
-#   - Sets has_unpaid_invoices = true
+#   - Sets has_unpaid_invoices_at = Time.current
 #   - Sets suspension_at = end of current month (gives runway before suspension)
 #
 # Admin can extend suspension_at to give more time.
@@ -17,7 +17,7 @@
 # check_accessable in Authorizable concern gates access using is_accessible?.
 #
 # try_reactivate! is called after an invoice is marked paid:
-#   - Clears has_unpaid_invoices, clears suspension_at
+#   - Clears has_unpaid_invoices_at, clears suspension_at
 #   - Sets lifecycle_status to :active (unsuspends the company)
 #
 # auto_settle_unpaid_invoices fires:
@@ -38,10 +38,10 @@ module Company::CircuitBreakerConcern
 
   def flag_unpaid!
     assert_not_terminal!
-    return if has_unpaid_invoices?
+    return if has_unpaid_invoices_at.present?
 
     update!(
-      has_unpaid_invoices: true,
+      has_unpaid_invoices_at: Time.current,
       suspension_at: Time.current.end_of_month
     )
   end
@@ -57,7 +57,7 @@ module Company::CircuitBreakerConcern
     return if lifecycle_status_disabled?
     return if billing_invoices.where(payment_status: %i[unpaid overdue]).exists?
 
-    update!(lifecycle_status: :active, suspension_at: nil, has_unpaid_invoices: false)
+    update!(lifecycle_status: :active, suspension_at: nil, has_unpaid_invoices_at: nil)
   end
 
   def is_accessible?

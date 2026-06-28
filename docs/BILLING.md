@@ -38,7 +38,7 @@ Skycom implements a **usage-based billing engine** with a **dual-wallet system**
 
 ## 2. Company Circuit Breaker
 
-The circuit breaker controls company operational state via `lifecycle_status`, `has_unpaid_invoices`, and `suspension_at`.
+The circuit breaker controls company operational state via `lifecycle_status`, `has_unpaid_invoices_at`, and `suspension_at`.
 
 **File**: `app/models/concerns/company/circuit_breaker_concern.rb`
 
@@ -50,13 +50,13 @@ The circuit breaker controls company operational state via `lifecycle_status`, `
 | `suspended` | 3 | Blocked — redirected to billing page; `is_accessible?` returns false | `SyncSuspensionJob` runs daily at midnight when `suspension_at` has passed |
 | `disabled` | 30 | Terminal — no transitions out | Company deletion request |
 
-### 2.2 has_unpaid_invoices (Billing Flag)
+### 2.2 has_unpaid_invoices_at (Billing Timestamp)
 
-A boolean column on `companies` that indicates the company has outstanding invoices. This is a **billing indicator only** — it does not affect operational access. The billing dashboard uses it to show a warning banner.
+A datetime column on `companies` that records when the company first had unpaid invoices. This is a **billing indicator only** — it does not affect operational access. The billing dashboard uses it to show a warning banner.
 
-- **Set** by `flag_unpaid!` when unpaid invoices exist
+- **Set** by `flag_unpaid!` to `Time.current` when unpaid invoices exist
 - **Cleared** by `try_reactivate!` when all invoices are paid
-- Checked by `set_billing_warning` in `ApplicationController` to show flash messages
+- Checked by `set_billing_warning` in `ApplicationController`: shows flash message when invoices have been unpaid for more than 5 days
 
 ### 2.3 suspension_at (The Deadline)
 
@@ -98,9 +98,9 @@ A boolean column on `companies` that indicates the company has outstanding invoi
 
 | Method | Description |
 |--------|-------------|
-| `flag_unpaid!` | Sets `has_unpaid_invoices: true` + `suspension_at: end_of_month`. Does NOT change `lifecycle_status`. Idempotent. Raises if `disabled`. |
+| `flag_unpaid!` | Sets `has_unpaid_invoices_at: Time.current` + `suspension_at: end_of_month`. Does NOT change `lifecycle_status`. Idempotent. Raises if `disabled`. |
 | `mark_suspended!` | Sets `lifecycle_status: :suspended`. Called by `SyncSuspensionJob` when deadline passes. Idempotent. |
-| `try_reactivate!` | If no unpaid/overdue invoices remain → `lifecycle_status: :active`, `suspension_at: nil`, `has_unpaid_invoices: false`. No-op if `disabled`. |
+| `try_reactivate!` | If no unpaid/overdue invoices remain → `lifecycle_status: :active`, `suspension_at: nil`, `has_unpaid_invoices_at: nil`. No-op if `disabled`. |
 | `is_accessible?` | `true` when not `lifecycle_status_suspended?` |
 | `auto_settle_unpaid_invoices` | Triggered on balance change + after unpaid invoice creation. Calls `SettlementService.settle_all`. Re-entry guarded. |
 
@@ -309,7 +309,7 @@ Processes all unpaid/overdue invoices **oldest first** (ordered by `created_at`)
 When an invoice is marked `paid`:
 - `BillingInvoice#after_update :try_reactivate_company` fires
 - This calls `company.try_reactivate!`
-- If no unpaid/overdue invoices remain → `lifecycle_status: :active`, `suspension_at: nil`, `has_unpaid_invoices: false`
+- If no unpaid/overdue invoices remain → `lifecycle_status: :active`, `suspension_at: nil`, `has_unpaid_invoices_at: nil`
 
 ---
 
@@ -355,7 +355,7 @@ When `true`, suppresses the past_due warning flash message displayed by `Applica
 | `check_accessable` (access blocking) | **Unaffected** — still blocks when `suspended` |
 | `flag_unpaid!` / `try_reactivate!` | **Unaffected** — lifecycle transitions still fire |
 
-This is a **passive UI toggle** — it does not affect billing logic, access control, or settlement. It only hides the visual warning banner for companies with `has_unpaid_invoices`.
+This is a **passive UI toggle** — it does not affect billing logic, access control, or settlement. It only hides the visual warning banner for companies with `has_unpaid_invoices_at` set.
 
 ---
 
@@ -476,7 +476,7 @@ Day 1 (00:00): MonthlyBillingJob runs
     → Invoice #1 ($10): deduct from promo_balance ($10 → $0), remaining = 0
     → invoice.payment_status = :paid
     → try_reactivate! → already active, no-op
-  → flag_unpaid! NOT called (no unpaid invoices remain)
+  → flag_unpaid! NOT called (already paid, no unpaid invoices remain)
 
 Day 15: Company used another 100 orders overage = $10 more owed
         (but this only bills at next month — no mid-month invoices)
@@ -503,7 +503,7 @@ Day 3: Owner transfers $15, support credits main_balance
   → SettlementService.settle_all
     → Invoice: deduct from main_balance ($15 → $0), remaining = 0
     → invoice.payment_status = :paid
-    → try_reactivate! → lifecycle_status: active, suspension_at: nil, has_unpaid_invoices: false
+    → try_reactivate! → lifecycle_status: active, suspension_at: nil, has_unpaid_invoices_at: nil
     → Company fully restored
 ```
 

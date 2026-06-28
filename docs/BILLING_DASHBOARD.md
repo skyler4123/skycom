@@ -385,7 +385,7 @@ if (currency === "EUR") {
 | `DailyFeatureLog` | Active day counts per feature |
 | `BillingInvoice` | Invoice records with payment status |
 | `BillingResource` | Catalog of all metered resources and add-on features per country |
-| `Company` | Wallet balances, lifecycle status, suspension, currency |
+| `Company` | Wallet balances, lifecycle status, suspension, has_unpaid_invoices_at, currency |
 
 ---
 

@@ -181,9 +181,9 @@ Manages Company lifecycle transitions based on unpaid invoices. `suspension_at` 
 **Included in (1 model):** `Company` only.
 
 **Methods added:**
-- `flag_unpaid!` — sets `has_unpaid_invoices: true`, sets `suspension_at` to end of month (raises if `disabled`); idempotent. Does NOT change `lifecycle_status`
+- `flag_unpaid!` — sets `has_unpaid_invoices_at: Time.current`, sets `suspension_at` to end of month (raises if `disabled`); idempotent. Does NOT change `lifecycle_status`
 - `mark_suspended!` — sets `lifecycle_status: :suspended`. Called by `SyncSuspensionJob`
-- `try_reactivate!` — checks for unpaid/overdue invoices; if none remain, transitions to `:active`, clears `suspension_at`, and sets `has_unpaid_invoices: false`
+- `try_reactivate!` — checks for unpaid/overdue invoices; if none remain, transitions to `:active`, clears `suspension_at`, and sets `has_unpaid_invoices_at: nil`
 - `is_accessible?` — returns `true` when not `lifecycle_status_suspended?`
 - `auto_settle_unpaid_invoices` — public method; called by the `after_update` callback and by `BillingInvoice#attempt_auto_settlement`. Guards: skips if already settling, disabled, no positive balance, or no unpaid invoices.
 

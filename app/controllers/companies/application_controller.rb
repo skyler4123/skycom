@@ -29,10 +29,12 @@ class Companies::ApplicationController < ApplicationController
     @current_employee
   end
 
+  UNPAID_WARNING_THRESHOLD = 5.days
+
   def set_billing_warning
-    return unless current_company&.has_unpaid_invoices?
+    return unless current_company&.has_unpaid_invoices_at?
     return if current_company.hide_billing_alerts?
-    return unless Time.current.day >= 15
+    return if current_company.has_unpaid_invoices_at > UNPAID_WARNING_THRESHOLD.ago
 
     flash.now[:alert] = "Your account has outstanding invoices. Please settle them to avoid suspension."
   end
