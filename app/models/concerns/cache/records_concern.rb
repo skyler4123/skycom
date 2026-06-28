@@ -12,7 +12,7 @@ module Cache::RecordsConcern
   class_methods do
     # Usage: Employee.cached_where(company_id: 'uuid', expires_in: 1.hour)
     def cached_where(**filters)
-      expires_in = filters.delete(:expires_in) || 5.minutes
+      expires_in = filters.delete(:expires_in) || DEFAULT_CACHE_EXPIRY
 
       relation = where(filters)
       sql_hash = Digest::SHA256.base64digest(relation.to_sql.squish).tr("+/", "-_").first(12)
@@ -34,7 +34,7 @@ module Cache::RecordsConcern
     def cached_find(id, **options)
       return nil if id.blank?
 
-      expires_in = options.delete(:expires_in) || 5.minutes
+      expires_in = options.delete(:expires_in) || DEFAULT_CACHE_EXPIRY
       cache_key  = "#{model_name.plural}_#{id}"
 
       attributes = Rails.cache.fetch(cache_key, expires_in: expires_in) do

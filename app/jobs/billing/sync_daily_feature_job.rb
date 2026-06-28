@@ -21,7 +21,7 @@ module Billing
     queue_as :default
 
     def perform(log_date: Date.current)
-      Company.where.not(lifecycle_status: %i[disabled suspended]).find_each(batch_size: 50) do |company|
+      Company.where.not(lifecycle_status: %i[disabled suspended]).find_each(batch_size: COMPANY_PROCESSING_BATCH_SIZE) do |company|
         log_features_for_company(company, log_date)
       rescue StandardError => e
         Rails.logger.error("SyncDailyFeatureJob: Failed for company #{company.id}: #{e.message}")

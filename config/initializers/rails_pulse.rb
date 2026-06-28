@@ -275,15 +275,10 @@ RailsPulse.configure do |config|
   config.archiving_enabled = true
 
   # Time-based retention - delete records older than this period
-  config.full_retention_period = 2.weeks
+  config.full_retention_period = RAILS_PULSE_RETENTION_PERIOD
 
   # Count-based retention - maximum records to keep per table
   # After time-based cleanup, if tables still exceed these limits,
   # the oldest remaining records will be deleted to stay under the limit
-  config.max_table_records = {
-    rails_pulse_requests: 10000,    # HTTP requests (moderate volume)
-    rails_pulse_operations: 50000,  # Operations within requests (high volume)
-    rails_pulse_routes: 1000,       # Unique routes (low volume)
-    rails_pulse_queries: 500        # Normalized SQL queries (low volume)
-  }
+  config.max_table_records = RAILS_PULSE_MAX_TABLE_RECORDS
 end

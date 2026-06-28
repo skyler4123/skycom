@@ -27,12 +27,12 @@ class RoleAppointment < ApplicationRecord
   end
 
   def prevent_modification_if_owner
-    return unless business_type == "owner"
+    return unless business_type == OWNER_BUSINESS_TYPE
     raise ActiveRecord::ReadOnlyRecord, "Owner records cannot be modified."
   end
 
   def only_one_owner_appointment_per_company
-    return unless business_type.to_s == "owner" && company_id.present?
+    return unless business_type.to_s == OWNER_BUSINESS_TYPE && company_id.present?
 
     # Only one owner appointment per company (exclude self for updates)
     owner_exists = RoleAppointment.where(
@@ -48,7 +48,7 @@ class RoleAppointment < ApplicationRecord
     # Owner role can only be assigned to employees with owner business_type
     if appoint_to_type == "Employee" && appoint_to_id.present?
       employee = Employee.find_by(id: appoint_to_id)
-      if employee && employee.business_type.to_s != "owner"
+      if employee && employee.business_type.to_s != OWNER_BUSINESS_TYPE
         errors.add(:base, "Owner role can only be assigned to owner employees.")
       end
     end

@@ -96,7 +96,7 @@ class Branch < ApplicationRecord
 
   # Validation for contact fields
   validates :email, format: { with: URI::MailTo::EMAIL_REGEXP }, allow_blank: true
-  validates :phone_number, length: { maximum: 20 }, allow_blank: true
+  validates :phone_number, length: { maximum: MAX_PHONE_NUMBER_LENGTH }, allow_blank: true
 
   # NOTE: website column was removed from schema
   # validates :website, format: URI.regexp(%w[http https]), allow_blank: true

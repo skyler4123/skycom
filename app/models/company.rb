@@ -109,7 +109,7 @@ class Company < ApplicationRecord
 
   # Validation for contact fields
   validates :email, format: { with: URI::MailTo::EMAIL_REGEXP }, allow_blank: true
-  validates :phone_number, length: { maximum: 20 }, allow_blank: true
+  validates :phone_number, length: { maximum: MAX_PHONE_NUMBER_LENGTH }, allow_blank: true
   validates :website, format: URI.regexp(%w[http https]), allow_blank: true
 
   # validates :city, presence: true
@@ -136,15 +136,15 @@ class Company < ApplicationRecord
 
     role = Seed::RoleService.create(
       company: self,
-      name: "owner",
+      name: OWNER_BUSINESS_TYPE,
       business_type: :owner
     )
 
     policy = Seed::PolicyService.create(
       company: self,
       name: "Owner All Access",
-      resource: "all",
-      action: "all",
+      resource: OWNER_POLICY_RESOURCE,
+      action: OWNER_POLICY_ACTION,
       business_type: :owner,
       lifecycle_status: :active
     )

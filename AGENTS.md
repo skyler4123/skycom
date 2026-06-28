@@ -8,6 +8,7 @@
 
 ## Pre-Commit Checklist
 - **Update** `docs/MODEL_CALLBACKS.md` if model/concern callbacks were added or modified
+- **Constants** — All app-wide constants must be in `config/initializers/constants.rb`, never hardcoded inline. See `docs/CONSTANTS.md`.
 
 ## Architecture
 - **Type**: Rails 7+ multi-tenant platform with Hybrid SPA (Stimulus + Tailwind)

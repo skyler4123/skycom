@@ -20,7 +20,7 @@ module Billing
     def perform
       Company.where.not(lifecycle_status: %i[suspended disabled])
              .where(suspension_at: ..Time.current)
-             .find_each(batch_size: 50, &:mark_suspended!)
+              .find_each(batch_size: COMPANY_PROCESSING_BATCH_SIZE, &:mark_suspended!)
     end
   end
 end

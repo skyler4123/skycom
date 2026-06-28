@@ -3,11 +3,11 @@ class User < ApplicationRecord
 
   has_secure_password
 
-  generates_token_for :email_verification, expires_in: 2.days do
+  generates_token_for :email_verification, expires_in: EMAIL_VERIFICATION_TOKEN_EXPIRY do
     email
   end
 
-  generates_token_for :password_reset, expires_in: 20.minutes do
+  generates_token_for :password_reset, expires_in: PASSWORD_RESET_TOKEN_EXPIRY do
     password_salt.last(10)
   end
 

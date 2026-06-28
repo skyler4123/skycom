@@ -24,7 +24,7 @@ module Billing
 
       cursor = "0"
       loop do
-        cursor, keys = Kredis.redis.scan(cursor, match: scan_match, count: 100)
+        cursor, keys = Kredis.redis.scan(cursor, match: scan_match, count: REDIS_SCAN_COUNT)
         break if cursor == "0" && keys.empty?
 
         keys.each { |key| process_key(key, log_date) }

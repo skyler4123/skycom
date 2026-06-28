@@ -50,7 +50,7 @@ module Company::BillingConcern
                     .where(billing_resources: { name: resource_key.to_s })
                     .where(log_date: log_date)
                     .sum(:usage_count)
-    }, expires_in: 36.hours)
+    }, expires_in: REDIS_COUNTER_TTL)
   end
 
   def meter_usage(resource_key, log_date: Date.current)
