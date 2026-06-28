@@ -38,6 +38,7 @@ class CreateCompanies < ActiveRecord::Migration[8.0]
       t.integer  :soft_debt_threshold_cents, default: -10000, null: false
       t.datetime :suspension_at
       t.boolean  :hide_billing_alerts, default: false, null: false
+      t.datetime :has_unpaid_invoices_at
 
       t.timestamps
     end

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_06_28_031502) do
+ActiveRecord::Schema[8.0].define(version: 2026_06_26_162531) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pgcrypto"
@@ -369,13 +369,13 @@ ActiveRecord::Schema[8.0].define(version: 2026_06_28_031502) do
     t.string "name", null: false
     t.text "description"
     t.integer "resource_type", default: 0, null: false
+    t.integer "country_code"
+    t.integer "price_cents", default: 0, null: false
+    t.string "currency", default: "USD", null: false
     t.integer "lifecycle_status", default: 0
     t.integer "workflow_status", default: 0
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.integer "country_code"
-    t.integer "price_cents", default: 0, null: false
-    t.string "currency", default: "USD", null: false
     t.index ["lifecycle_status"], name: "index_billing_resources_on_lifecycle_status"
     t.index ["name", "country_code"], name: "index_billing_resources_on_name_and_country_code", unique: true
     t.index ["workflow_status"], name: "index_billing_resources_on_workflow_status"
@@ -869,9 +869,9 @@ ActiveRecord::Schema[8.0].define(version: 2026_06_28_031502) do
     t.integer "soft_debt_threshold_cents", default: -10000, null: false
     t.datetime "suspension_at"
     t.boolean "hide_billing_alerts", default: false, null: false
+    t.datetime "has_unpaid_invoices_at"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.datetime "has_unpaid_invoices_at"
     t.index ["business_type"], name: "index_companies_on_business_type"
     t.index ["discarded_at"], name: "index_companies_on_discarded_at"
     t.index ["lifecycle_status"], name: "index_companies_on_lifecycle_status"
