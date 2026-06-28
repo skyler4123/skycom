@@ -28,10 +28,13 @@ class Companies::BillingController < Companies::ApplicationController
     days_elapsed = (Date.current - period_start).to_i + 1
     days_remaining = (period_end - Date.current).to_i
 
+    currency = company.currency_code.to_s.upcase
+
     wallet = {
       main_balance_cents: company.main_balance_cents,
       promo_balance_cents: company.promo_balance_cents,
-      total_cents: company.wallet_balance_cents
+      total_cents: company.wallet_balance_cents,
+      currency: currency
     }
 
     billing_contract = nil
@@ -133,12 +136,14 @@ class Companies::BillingController < Companies::ApplicationController
                           id: inv.id,
                           invoice_number: inv.invoice_number,
                           price_cents: inv.price_cents,
+                          price_currency: inv.price_currency,
                           payment_status: inv.payment_status,
                           created_at: inv.created_at
                         }
                       }
 
     {
+      currency: currency,
       company: {
         id: company.id,
         name: company.name,

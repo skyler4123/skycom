@@ -943,9 +943,17 @@ class Seed::RetailService
     "J.P. Morgan", "Goldman Sachs", "Morgan Stanley", "Netflix", "Spotify"
   ].freeze
 
-  def initialize(user:, email: Faker::Internet.email, name: nil)
+  def initialize(user:, email: Faker::Internet.email, name: nil,
+                 country_code: :us, currency_code: :usd, timezone: :minus_5,
+                 address_line_1: nil, city: nil, postal_code: nil)
     @multi_company_owner = user
     @name = name
+    @country_code = country_code
+    @currency_code = currency_code
+    @timezone = timezone
+    @address_line_1 = address_line_1
+    @city = city
+    @postal_code = postal_code
     @retail = nil
     @branches = []
     @facilities = []
@@ -1019,7 +1027,13 @@ class Seed::RetailService
       name: @name || "Company #{Company.count + 1}",
       email: @email,
       description: "A group for multiple retail branch branches",
-      business_type: COMPANY_GROUP_BUSINESS_TYPE
+      business_type: COMPANY_GROUP_BUSINESS_TYPE,
+      country_code: @country_code,
+      currency_code: @currency_code,
+      timezone: @timezone,
+      address_line_1: @address_line_1,
+      city: @city,
+      postal_code: @postal_code
     )
   end
 
@@ -1081,7 +1095,7 @@ class Seed::RetailService
         company: @retail
       )
       branch.attach_tag(key: "Branch #{branch.id} Tag")
-      branch.address = Seed::AddressService.create
+      branch.address = Seed::AddressService.create(country_code: @country_code)
       branch.save!
 
       @branches << branch

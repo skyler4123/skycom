@@ -4,6 +4,7 @@ import ApexCharts from "apexcharts"
 export default class Companies_Billing_ShowController extends Companies_LayoutController {
   static targets = ["usageChart", "costChart"]
 
+  /** @type {string} */ currency = "USD"
   /** @type {object|null} */ company = null
   /** @type {object|null} */ billingContract = null
   /** @type {object|null} */ wallet = null
@@ -19,6 +20,7 @@ export default class Companies_Billing_ShowController extends Companies_LayoutCo
 
     try {
       const response = await fetchJson(`/companies/${companyId}/billing.json`)
+      this.currency = response.currency || "USD"
       this.company = response.company
       this.billingContract = response.billing_contract
       this.wallet = response.wallet
@@ -122,22 +124,23 @@ export default class Companies_Billing_ShowController extends Companies_LayoutCo
       return
     }
 
-    const formatCents = (cents) => `$${(cents / 100).toFixed(2)}`
+    const currency = this.currency
+    const fmt = (cents) => this.formatCents(cents)
 
     const series = []
     const labels = []
 
     if (breakdown.base_cents > 0) {
       series.push(breakdown.base_cents)
-      labels.push(`Base Plan (${formatCents(breakdown.base_cents)})`)
+      labels.push(`Base Plan (${fmt(breakdown.base_cents)})`)
     }
     if (breakdown.features_cents > 0) {
       series.push(breakdown.features_cents)
-      labels.push(`Add-ons (${formatCents(breakdown.features_cents)})`)
+      labels.push(`Add-ons (${fmt(breakdown.features_cents)})`)
     }
     if (breakdown.overage_cents > 0) {
       series.push(breakdown.overage_cents)
-      labels.push(`Overage (${formatCents(breakdown.overage_cents)})`)
+      labels.push(`Overage (${fmt(breakdown.overage_cents)})`)
     }
 
     if (series.length === 0) {
@@ -166,7 +169,7 @@ export default class Companies_Billing_ShowController extends Companies_LayoutCo
         }
       },
       tooltip: {
-        y: { formatter: (val) => formatCents(val) }
+        y: { formatter: (val) => fmt(val) }
       },
       plotOptions: {
         pie: {
@@ -176,7 +179,7 @@ export default class Companies_Billing_ShowController extends Companies_LayoutCo
               total: {
                 show: true,
                 label: "Total",
-                formatter: () => formatCents(series.reduce((a, b) => a + b, 0))
+                formatter: () => fmt(series.reduce((a, b) => a + b, 0))
               }
             }
           }
@@ -188,8 +191,12 @@ export default class Companies_Billing_ShowController extends Companies_LayoutCo
   }
 
   formatCents(cents) {
-    if (cents == null) return "$0.00"
-    return `$${(cents / 100).toFixed(2)}`
+    if (cents == null) cents = 0
+    const currency = this.currency || "USD"
+    if (currency === "VND") {
+      return `${Number(cents).toLocaleString("vi-VN")}₫`
+    }
+    return `$${(Number(cents) / 100).toFixed(2)}`
   }
 
   lifecycleBadge(status) {
