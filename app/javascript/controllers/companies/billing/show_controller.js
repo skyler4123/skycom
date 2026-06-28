@@ -202,7 +202,7 @@ export default class Companies_Billing_ShowController extends Companies_LayoutCo
   lifecycleBadge(status) {
     const colors = {
       active: "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400",
-      past_due: "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400",
+      suspended: "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400",
       disabled: "bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400"
     }
     const cls = colors[status] || "bg-slate-100 text-slate-600"

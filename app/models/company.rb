@@ -76,7 +76,7 @@ class Company < ApplicationRecord
   }, prefix: true
   enum :lifecycle_status, {
     active: 0,
-    past_due: 10,
+    suspended: 3,
     disabled: 30
   }, prefix: true, default: :active
   enum :workflow_status, WORKFLOW_STATUS, prefix: true

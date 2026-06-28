@@ -39,6 +39,11 @@ default: &default
     queue: default
     schedule: every 6 hours
 
+  sync_suspension:
+    class: Billing::SyncSuspensionJob
+    queue: default
+    schedule: at 0am every day
+
   monthly_billing:
     class: Billing::MonthlyBillingJob
     queue: default

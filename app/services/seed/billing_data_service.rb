@@ -157,6 +157,8 @@ module Seed
           updated_at: date
         )
       end
+
+      company.flag_unpaid! if company.billing_invoices.where(payment_status: %i[unpaid overdue]).exists?
     end
   end
 end

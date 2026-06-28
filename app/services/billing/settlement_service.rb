@@ -130,7 +130,7 @@ module Billing
     end
 
     def handle_shortfall(remaining)
-      company.mark_past_due!
+      company.flag_unpaid!
       invoice.update!(payment_status: :overdue)
 
       record_transaction(:deduction, 0,

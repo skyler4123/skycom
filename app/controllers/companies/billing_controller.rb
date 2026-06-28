@@ -149,7 +149,8 @@ class Companies::BillingController < Companies::ApplicationController
         name: company.name,
         lifecycle_status: company.lifecycle_status,
         suspension_at: company.suspension_at,
-        is_accessible: company.is_accessible?
+        is_accessible: company.is_accessible?,
+        has_unpaid_invoices: company.has_unpaid_invoices?
       },
       billing_contract: billing_contract,
       wallet: wallet,

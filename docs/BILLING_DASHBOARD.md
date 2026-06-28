@@ -259,7 +259,7 @@ The dashboard renders 7 sections:
 Three cards in a 3-column grid:
 
 **Billing Status**
-- Lifecycle badge (active/past_due/disabled)
+- Lifecycle badge (active/suspended/disabled)
 - Contract type (basic/enterprise)
 - Suspended warning banner (when `is_accessible` is false)
 
