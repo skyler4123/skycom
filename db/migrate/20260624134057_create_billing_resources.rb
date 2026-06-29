@@ -10,7 +10,7 @@ class CreateBillingResources < ActiveRecord::Migration[8.0]
 
       t.integer  :lifecycle_status, default: 0, index: true
       t.integer  :workflow_status, default: 0, index: true
-      t.index [:name, :country_code], unique: true
+      t.index [ :name, :country_code ], unique: true
       t.timestamps
     end
   end
