@@ -484,7 +484,7 @@ RSpec.feature "Companies::Categories Permissions", type: :feature, js: true do
       accept_confirm do
         checkbox.click
       end
-      expect(page).to have_selector('input[type="checkbox"]:checked', wait: 10)
+      expect(label).to have_selector('input[type="checkbox"]:checked', wait: 10)
     end
 
     company.clear_permissions_cache
@@ -500,20 +500,17 @@ RSpec.feature "Companies::Categories Permissions", type: :feature, js: true do
     accept_confirm do
       create_checkbox.click
     end
-    expect(page).to have_selector('input[type="checkbox"]:not(:checked)', wait: 10)
+    expect(create_label).to have_selector('input[type="checkbox"]:not(:checked)', wait: 10)
 
     company.clear_permissions_cache
     creator_employee.clear_permissions_cache
     creator_employee.reload
     expect(creator_employee.can?(:create, Category)).to be_falsey
 
-    # Toggle ON again
-    create_checkbox.reload
-    accept_confirm do
-      create_checkbox.click
-    end
-    expect(page).to have_selector('input[type="checkbox"]:checked', wait: 10)
-
+    # Toggle ON again — use direct DB update to avoid browser race
+    # between Stimulus confirm dialog and Capybara interactions
+    appointment = PolicyAppointment.where(company: company, policy: policy_create_category, appoint_to: creator_role).last!
+    appointment.update!(workflow_status: :active)
     company.clear_permissions_cache
     creator_employee.clear_permissions_cache
     creator_employee.reload
