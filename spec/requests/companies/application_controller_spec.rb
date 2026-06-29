@@ -18,41 +18,40 @@ RSpec.describe "Companies::ApplicationController", type: :request do
   end
 
   describe "check_accessable" do
-    it "redirects to billing page when suspension_at is in the past (not accessible)" do
-      company.update!(suspension_at: 1.day.ago)
+    it "redirects to billing page when lifecycle_status is suspended (not accessible)" do
+      company.update!(lifecycle_status: :suspended)
       get "/companies/#{company.id}/dashboards"
       expect(response).to redirect_to(company_billing_path(company))
     end
 
-    it "allows access when suspension_at is nil (accessible)" do
-      company.update!(suspension_at: nil)
+    it "allows access when lifecycle_status is active (accessible)" do
       get "/companies/#{company.id}/dashboards"
       expect(response).to have_http_status(:ok)
     end
 
-    it "allows access when suspension_at is in the future (accessible)" do
+    it "allows access when lifecycle_status is active even with future suspension_at" do
       company.update!(suspension_at: 1.week.from_now)
       get "/companies/#{company.id}/dashboards"
       expect(response).to have_http_status(:ok)
     end
   end
 
-  describe "set_past_due_warning" do
+  describe "set_billing_warning" do
     before do
       allow(Time).to receive(:current).and_return(Time.new(2026, 6, 20, 10, 0, 0))
-      company.update!(lifecycle_status: :past_due, suspension_at: 1.week.from_now)
+      company.update!(has_unpaid_invoices_at: 7.days.ago)
     end
 
-    it "skips the past_due warning when hide_billing_alerts is true" do
+    it "skips the billing warning when hide_billing_alerts is true" do
       company.update!(hide_billing_alerts: true)
       get "/companies/#{company.id}/dashboards"
       expect(flash[:alert]).to be_blank
     end
 
-    it "shows the past_due warning when hide_billing_alerts is false" do
+    it "shows the billing warning when hide_billing_alerts is false" do
       company.update!(hide_billing_alerts: false)
       get "/companies/#{company.id}/dashboards"
-      expect(flash[:alert]).to be_present
+      expect(flash[:alert]).not_to be_blank
     end
   end
 end

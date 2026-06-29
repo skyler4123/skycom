@@ -5,7 +5,7 @@ FactoryBot.define do
     company
     name { "Test Contract" }
     contract_type { :basic }
-    lifecycle_status { :active }
+    lifecycle_status { :draft }
     start_date { Time.current }
     fixed_monthly_price_cents { 0 }
     fixed_monthly_price_currency { "USD" }

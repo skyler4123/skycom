@@ -21,6 +21,9 @@ RSpec.describe BillingContract, type: :model do
 
   describe ".currently_active scope" do
     let(:company) { create(:company) }
+    before do
+      company.billing_contracts.update_all(lifecycle_status: :expired)
+    end
     let!(:active_contract) do
       create(:billing_contract, company: company, lifecycle_status: :active, start_date: 3.months.ago)
     end

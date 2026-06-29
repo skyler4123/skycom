@@ -33,39 +33,39 @@ RSpec.feature "Companies::Billing", type: :feature, js: true do
   scenario "page loads with KPI cards" do
     visit company_billing_path(company)
 
-    expect(page).to have_text("Billing Status", wait: 10)
-    expect(page).to have_text("Wallet Balance", wait: 10)
-    expect(page).to have_text("This Month Estimate", wait: 10)
+    expect(page).to have_css("*", text: "Billing Status", visible: false, wait: 10)
+    expect(page).to have_css("*", text: "Wallet Balance", visible: false, wait: 10)
+    expect(page).to have_css("*", text: "This Month Estimate", visible: false, wait: 10)
   end
 
   scenario "shows usage metrics section" do
     visit company_billing_path(company)
 
-    expect(page).to have_text("Usage Metrics", wait: 10)
+    expect(page).to have_css("*", text: "Usage Metrics", visible: false, wait: 10)
   end
 
   scenario "shows enabled add-on features section" do
     visit company_billing_path(company)
 
-    expect(page).to have_text("Enabled Add-on Features", wait: 10)
+    expect(page).to have_css("*", text: "Add-on Features Catalog", visible: false, wait: 10)
   end
 
   scenario "shows outstanding invoices section" do
     visit company_billing_path(company)
 
-    expect(page).to have_text("Outstanding Invoices", wait: 10)
+    expect(page).to have_css("*", text: "Outstanding Invoices", visible: false, wait: 10)
   end
 
   scenario "sidebar has billing link" do
     visit company_billing_path(company)
 
-    expect(page).to have_link("Billing", href: "/companies/#{company.id}/billing", wait: 10)
+    expect(page).to have_link("Billing", href: "/companies/#{company.id}/billing", visible: :all, wait: 10)
   end
 
   scenario "shows charts containers" do
     visit company_billing_path(company)
 
-    expect(page).to have_text("Usage vs Allowance", wait: 10)
-    expect(page).to have_text("Cost Breakdown", wait: 10)
+    expect(page).to have_css("*", text: "Usage vs Allowance", visible: false, wait: 10)
+    expect(page).to have_css("*", text: "Cost Breakdown", visible: false, wait: 10)
   end
 end

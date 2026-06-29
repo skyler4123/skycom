@@ -77,7 +77,7 @@ RSpec.describe Company, type: :model do
     it "defines company-specific billing values" do
       expect(Company.lifecycle_statuses).to eq({
         "active" => 0,
-        "past_due" => 10,
+        "suspended" => 3,
         "disabled" => 30
       })
     end
@@ -87,8 +87,8 @@ RSpec.describe Company, type: :model do
     end
 
     it "provides predicate methods" do
-      company = Company.new(lifecycle_status: :past_due)
-      expect(company).to be_lifecycle_status_past_due
+      company = Company.new(lifecycle_status: :suspended)
+      expect(company).to be_lifecycle_status_suspended
       expect(company).not_to be_lifecycle_status_active
     end
   end

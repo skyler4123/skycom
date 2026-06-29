@@ -40,7 +40,7 @@ RSpec.describe Billing::SyncDailyFeatureJob do
 
   context "when company is not accessible" do
     before do
-      active_company.update!(suspension_at: 1.day.ago)
+      active_company.update!(lifecycle_status: :suspended)
     end
 
     it "does not log a feature log" do

@@ -88,9 +88,9 @@ RSpec.describe Billing::SettlementService do
       expect(invoice.reload.payment_status).to eq("overdue")
     end
 
-    it "marks company as past_due" do
+    it "flags company as unpaid" do
       expect { settle }
-        .to change { company.reload.lifecycle_status }.from("active").to("past_due")
+        .to change { company.reload.has_unpaid_invoices_at }.from(nil)
     end
   end
 
@@ -106,7 +106,8 @@ RSpec.describe Billing::SettlementService do
                          price_cents: 2000, period_start: 1.month.ago.beginning_of_month,
                          period_end: 1.month.ago.end_of_month)
       company.update_columns(
-        lifecycle_status: Company.lifecycle_statuses[:past_due],
+        has_unpaid_invoices_at: Time.current,
+        suspension_at: Time.current.end_of_month,
         main_balance_cents: 3500,
         promo_balance_cents: 0,
         soft_debt_threshold_cents: -10000

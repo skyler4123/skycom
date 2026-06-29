@@ -67,17 +67,18 @@ RSpec.describe Billing::MonthlyBillingJob do
     end
   end
 
-  context "when company is past_due with sufficient wallet" do
+  context "when company has unpaid invoices with sufficient wallet" do
     before do
       contract.update!(start_date: 3.months.ago, fixed_monthly_price_cents: 1000)
-      company.update!(lifecycle_status: :past_due, promo_balance_cents: 2000, main_balance_cents: 0)
+      company.update!(promo_balance_cents: 2000, main_balance_cents: 0,
+                      has_unpaid_invoices_at: 5.days.ago)
     end
 
     it "still creates a BillingInvoice" do
       expect { perform_job }.to change(BillingInvoice, :count).by(1)
     end
 
-    it "auto-settles and reactivates the company" do
+    it "auto-settles and keeps the company active" do
       perform_job
       invoice = BillingInvoice.last
       expect(invoice.payment_status).to eq("paid")

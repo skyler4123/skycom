@@ -35,7 +35,7 @@ RSpec.describe BillingInvoice do
       it "marks invoice as overdue", :aggregate_failures do
         invoice.save!
         expect(invoice.reload.payment_status).to eq("overdue")
-        expect(company.reload.lifecycle_status).to eq("past_due")
+        expect(company.reload.has_unpaid_invoices_at).not_to be_nil
       end
     end
 
