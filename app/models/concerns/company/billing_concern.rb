@@ -21,7 +21,9 @@ module Company::BillingConcern
   extend ActiveSupport::Concern
 
   def active_billing_contract
-    billing_contracts.currently_active.first
+    billing_contracts.currently_active.sole
+  rescue ActiveRecord::RecordNotFound
+    nil
   end
 
   def feature_enabled?(feature_key)
@@ -43,7 +45,7 @@ module Company::BillingConcern
   end
 
   def daily_meter(resource_key, log_date: Date.current)
-    key = "skycom:company:#{id}:#{resource_key}:#{log_date.strftime('%Y%m%d')}"
+    key = "c:#{id}:#{resource_key}:#{log_date.strftime('%Y%m%d')}"
     Kredis.integer(key, default: -> {
       DailyMetricLog.where(company_id: id)
                     .joins(:billing_resource)
@@ -57,9 +59,13 @@ module Company::BillingConcern
     daily_meter(resource_key, log_date: log_date).value.to_i
   end
 
+  # Uses atomic Redis INCRBY (single trip) instead of GET+SET (two trips).
+  # After a Redis restart, the first increment for a given day starts from 0
+  # instead of the DailyMetricLog-backed value. The SyncDailyMetricJob (every
+  # 4h) eventually re-hydrates from DailyMetricLog via the "value" getter's
+  # default lambda. This is an acceptable trade-off for atomicity.
   def record_usage!(resource_key, quantity: 1)
-    meter = daily_meter(resource_key)
-    meter.value = meter.value.to_i + quantity
+    Kredis.redis.incrby(daily_meter(resource_key).key, quantity)
   rescue Redis::BaseConnectionError => e
     Rails.logger.warn("Metering Redis unavailable for company #{id}: #{e.message}")
   end

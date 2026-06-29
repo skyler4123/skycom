@@ -109,7 +109,7 @@ RSpec.describe Company::BillingConcern do
       company.record_usage!("orders")
       expect(company.meter_usage("orders")).to eq(1)
 
-      Kredis.redis.del("skycom:company:#{company.id}:orders:#{Date.current.strftime('%Y%m%d')}")
+      Kredis.redis.del("c:#{company.id}:orders:#{Date.current.strftime('%Y%m%d')}")
 
       create(:daily_metric_log, company: company, billing_resource: volumetric_resource,
              log_date: Date.current, usage_count: 5)

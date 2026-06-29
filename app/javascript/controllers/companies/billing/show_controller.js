@@ -16,10 +16,8 @@ export default class Companies_Billing_ShowController extends Companies_LayoutCo
   async connect() {
     super.connect()
 
-    const companyId = window.location.pathname.split("/")[2]
-
     try {
-      const response = await fetchJson(`/companies/${companyId}/billing.json`)
+      const response = await fetchJson()
       this.currency = response.currency || "USD"
       this.company = response.company
       this.billingContract = response.billing_contract
@@ -234,7 +232,7 @@ export default class Companies_Billing_ShowController extends Companies_LayoutCo
       const response = await fetchJson(`/companies/${companyId}/billing/pay_all`, { method: "POST" })
       toast({ type: "success", message: response.message || "Payment processed" })
 
-      const fresh = await fetchJson(`/companies/${companyId}/billing.json`)
+      const fresh = await fetchJson()
       this.company = fresh.company
       this.wallet = fresh.wallet
       this.invoices = fresh.invoices || []

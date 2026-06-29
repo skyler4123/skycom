@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_06_26_162531) do
+ActiveRecord::Schema[8.0].define(version: 2026_06_26_162532) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pgcrypto"
@@ -340,6 +340,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_06_26_162531) do
     t.integer "workflow_status", default: 0
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["company_id"], name: "idx_billing_contracts_active_company", unique: true, where: "(lifecycle_status = 1)"
     t.index ["company_id"], name: "index_billing_contracts_on_company_id"
     t.index ["lifecycle_status"], name: "index_billing_contracts_on_lifecycle_status"
     t.index ["workflow_status"], name: "index_billing_contracts_on_workflow_status"

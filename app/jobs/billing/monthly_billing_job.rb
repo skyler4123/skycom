@@ -20,7 +20,7 @@ module Billing
     queue_as :default
 
     def perform
-      Company.where.not(lifecycle_status: %i[disabled suspended]).find_each(batch_size: COMPANY_PROCESSING_BATCH_SIZE) do |company|
+      Company.where(lifecycle_status: :active).find_each(batch_size: COMPANY_PROCESSING_BATCH_SIZE) do |company|
         process_company(company)
       rescue StandardError => e
         Rails.logger.error("MonthlyBillingJob: Failed for company #{company.id}: #{e.message}")

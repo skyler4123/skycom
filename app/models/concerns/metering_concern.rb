@@ -9,7 +9,7 @@
 #   end
 #
 # On Order.create → after_commit fires → company.record_usage!("orders")
-#   → Kredis.redis.incrby("skycom:company:<uuid>:orders:20260624", 1)
+#   → Kredis.redis.incrby("c:<uuid>:orders:20260624", 1)
 #
 module MeteringConcern
   extend ActiveSupport::Concern

@@ -20,7 +20,7 @@ RSpec.describe MeteringConcern do
 
     it "increments Redis counter when order is created" do
       date_str = Date.current.strftime("%Y%m%d")
-      redis_key = "skycom:company:#{company.id}:orders:#{date_str}"
+      redis_key = "c:#{company.id}:orders:#{date_str}"
 
       create(:order, company: company, branch: branch, customer: customer)
       expect(Kredis.redis.exists?(redis_key)).to be(true)

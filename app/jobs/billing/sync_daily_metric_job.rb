@@ -4,7 +4,7 @@
 # Runs every 4 hours (configured in config/recurring.yml).
 #
 # Flow:
-#   1. SCAN Redis for keys matching "skycom:company:*:*:<YYYYMMDD>"
+#   1. SCAN Redis for keys matching "c:*:*:<YYYYMMDD>"
 #   2. For each key: read via company.meter_usage (Kredis with DB fallback)
 #   3. Upsert DailyMetricLog row
 #   4. Key remains in Redis with 36h TTL (set by Kredis) — no manual clean-up needed
@@ -16,7 +16,7 @@ module Billing
   class SyncDailyMetricJob < ApplicationJob
     queue_as :default
 
-    SCAN_PATTERN = "skycom:company:*:*:"
+    SCAN_PATTERN = "c:*:*:"
 
     def perform(log_date: Date.current)
       date_str = log_date.strftime("%Y%m%d")
@@ -36,10 +36,10 @@ module Billing
     private
 
     def process_key(key, log_date)
-      # Key format: skycom:company:<uuid>:<resource_name>:<YYYYMMDD>
+      # Key format: c:<uuid>:<resource_name>:<YYYYMMDD>
       parts = key.split(":")
-      company_id = parts[2]
-      resource_name = parts[3]
+      company_id = parts[1]
+      resource_name = parts[2]
 
       company = Company.find_by(id: company_id)
       resource = BillingResource.find_by(name: resource_name)

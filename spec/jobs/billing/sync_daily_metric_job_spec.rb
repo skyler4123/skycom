@@ -9,7 +9,7 @@ RSpec.describe Billing::SyncDailyMetricJob do
   let(:company) { create(:company) }
   let!(:resource) { create(:billing_resource, :volumetric, name: "orders") }
   let(:date_str) { log_date.strftime("%Y%m%d") }
-  let(:redis_key) { "skycom:company:#{company.id}:orders:#{date_str}" }
+  let(:redis_key) { "c:#{company.id}:orders:#{date_str}" }
 
   before do
     Kredis.redis.flushdb
@@ -55,7 +55,7 @@ RSpec.describe Billing::SyncDailyMetricJob do
 
   context "when the key references a deleted company" do
     before do
-      Kredis.redis.set("skycom:company:nonexistent:orders:#{date_str}", 10)
+      Kredis.redis.set("c:nonexistent:orders:#{date_str}", 10)
     end
 
     it "skips gracefully without error" do

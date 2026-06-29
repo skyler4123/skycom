@@ -21,6 +21,8 @@ class BillingContract < ApplicationRecord
   enum :contract_type, { basic: 0, pay_as_you_go: 1, enterprise: 2 }
   enum :lifecycle_status, { draft: 0, active: 1, expired: 2, terminated: 3 }, default: :draft
 
+  validate :only_one_active_per_company, if: -> { active? && company_id.present? }
+
   scope :currently_active, -> {
     where(lifecycle_status: :active)
       .where("start_date <= ?", Time.current)
@@ -34,5 +36,14 @@ class BillingContract < ApplicationRecord
       free_allowance: allowance,
       unit_price_cents: pricing
     )
+  end
+
+  private
+
+  def only_one_active_per_company
+    existing = BillingContract.where(company_id: company_id, lifecycle_status: :active)
+                              .where.not(id: id)
+                              .exists?
+    errors.add(:base, "Company already has an active contract") if existing
   end
 end

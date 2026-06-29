@@ -379,10 +379,10 @@ On `Order.create` → `after_commit` fires → `company.record_usage!("orders")`
 ### 10.2 Redis Counter Key Pattern
 
 ```
-skycom:company:<uuid>:<resource_key>:<YYYYMMDD>
+c:<uuid>:<resource_key>:<YYYYMMDD>
 ```
 
-Example: `skycom:company:abc-123:orders:20260623`
+Example: `c:abc-123:orders:20260623`
 
 Counters use `Kredis.integer` with a 36h TTL — Redis is the source of truth for the current day.
 

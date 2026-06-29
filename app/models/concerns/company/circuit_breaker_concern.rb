@@ -64,6 +64,12 @@ module Company::CircuitBreakerConcern
     !lifecycle_status_suspended?
   end
 
+  # Uses Thread.current instead of with_lock because this is a re-entry guard
+  # (defensive against the after_update callback loop), not a synchronization
+  # mechanism. with_lock would serialize concurrent requests for the same
+  # company and risk deadlocks since SettlementService itself updates balances
+  # and invoice statuses — which trigger their own callbacks. Thread.current
+  # is lighter, deadlock-free, and scoped to the current request thread.
   def auto_settle_unpaid_invoices
     return if Thread.current[:__settling_company_id] == id
     return if lifecycle_status_disabled?
