@@ -31,6 +31,12 @@ module Billing
     #
     # Re-entrance guard: if this company is already being settled (e.g. from an
     # attempt_settle_outstanding callback), returns 0 immediately.
+    # Re-entry guard: prevents auto_settle_unpaid_invoices callback from
+    # re-entering settle_all when invoice.update! triggers company.update!
+    # (via BillingInvoice → try_reactivate_company → Company after_update).
+    # Thread.current scoped to request thread — avoids cross-request pollution
+    # without the deadlock risk of with_lock (which would conflict with the
+    # inner with_lock in #call).
     def self.settle_all(company)
       settling = (Thread.current[:__settling_companies] ||= Set.new)
       return { paid_count: 0, remaining_cents: 0 } unless settling.add?(company.id)
@@ -64,6 +70,10 @@ module Billing
       return mark_paid if total.zero?
 
       # Invoice-level re-entry guard (safety net)
+      # Invoice-level safety net: prevents the same invoice from being settled
+      # twice within a settlement run. Complements the company-level guard —
+      # catches edge cases where settle_all could see the same invoice again
+      # after a callback-triggered re-entry is blocked at the company level.
       guard_set = (Thread.current[:__settling_invoice_ids] ||= Set.new)
       return if guard_set.include?(invoice.id)
       guard_set.add(invoice.id)
