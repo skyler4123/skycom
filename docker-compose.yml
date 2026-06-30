@@ -128,7 +128,8 @@ services:
     # profiles: ["no-start"] # Optional: Prevents this service from running on 'docker compose up' by default, if you only want it on explicit 'docker compose run'
 
   redis:
-    image: redis:7.2-alpine
+    # image: redis:7.2-alpine
+    image: valkey/valkey:9.1-alpine
     # container_name: redis_central_cache
     # --appendonly yes ensures your flash sale data is saved to disk continuously
     # command: redis-server --appendonly yes --requirepass "${REDIS_PASSWORD:-secretpassword}"

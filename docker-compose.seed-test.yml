@@ -20,6 +20,7 @@ services:
       - "5432:5432"
 
   redis:
-    image: redis:7.2-alpine
+    # image: redis:7.2-alpine
+    image: valkey/valkey:9.1-alpine
     ports:
       - "6379:6379"
