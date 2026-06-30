@@ -21,16 +21,18 @@ module TagConcern
       ApplicationRecord.transaction do
         # 1. Find or create the Tag (the Key) scoped to the company
         tag = company.tags.find_or_create_by!(key: key)
-        # 2. Find or initialize the TagAppointment (the Assignment).
+        # 2. Sync value on Tag (used by ABAC evaluate_tag_conditions via target.tags)
+        tag.update!(value: value) if tag.value != value
+        # 3. Find or initialize the TagAppointment (the Assignment).
         # This handles the uniqueness constraint: only one Appointment per (Tag + Resource).
         appointment = tag_appointments.find_or_initialize_by(tag: tag)
 
-        # 3. Update the fields
+        # 4. Update the fields
         appointment.value = value
         appointment.description = description
         appointment.company = company
 
-        # 4. Save the appointment (creates if new, updates if existing)
+        # 5. Save the appointment (creates if new, updates if existing)
         appointment.save!
 
         appointment # Return the resulting appointment

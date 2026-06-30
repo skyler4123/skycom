@@ -119,40 +119,62 @@ RSpec.feature "Companies::Permissions Management", type: :feature, js: true do
     expect(page).to have_content("cashier")
   end
 
-  scenario "check checkbox to activate permission" do
+  scenario "click badge to activate permission via modal" do
     sign_in(owner)
     visit company_permissions_path(company)
 
     expect(page).to have_selector('.role-section', text: "admin", wait: 20)
 
     admin_section = find('.role-section', text: "admin")
-    label = admin_section.all('label').find { |l| l.has_css?('input[type="checkbox"]') && !l.find('input[type="checkbox"]').checked? }
+    resource_section = admin_section.find('.resource-section', text: 'Product')
+    inactive_badge = resource_section.all('button').find { |b| b.text.match?(/create/i) }
+    expect(inactive_badge).to have_text(/create/i)
+    inactive_badge.click
 
-    accept_confirm do
-      label.click
+    expect(page).to have_selector('.swal2-html-container')
+    expect(page).to have_content("Configure permission and tag conditions")
+
+    within(".swal2-html-container") do
+      toggle = find('[data-status-toggle]')
+      expect(toggle).to have_text(/inactive/i)
+      toggle.click
+      expect(toggle).to have_text(/active/i)
+
+      click_button "Save"
     end
 
-    expect(page).to have_selector('.role-section input[type="checkbox"][data-controller="checkbox"]:checked', wait: 10)
+    expect(page).to have_content("create permission updated", wait: 10)
+    admin_section = find('.role-section', text: "admin")
+    expect(admin_section).to have_selector('button:not([data-controller]) .bg-blue-600, button.bg-blue-600', text: /create/, wait: 10)
   end
 
-  scenario "uncheck checkbox to deactivate permission" do
+  scenario "click badge to deactivate permission via modal" do
     sign_in(owner)
     visit company_permissions_path(company)
 
     expect(page).to have_selector('.role-section', text: "admin", wait: 20)
 
     admin_section = find('.role-section', text: "admin")
-    checked_checkbox = admin_section.all('input[type="checkbox"][data-controller="checkbox"]:checked').first
-    label = checked_checkbox.find(:xpath, '..')
+    resource_section = admin_section.find('.resource-section', text: 'Product')
+    active_badge = resource_section.all('button').find { |b| b.text.match?(/read/i) }
+    expect(active_badge).to have_text(/read/i)
+    active_badge.click
 
-    accept_confirm do
-      label.click
+    expect(page).to have_selector('.swal2-html-container')
+
+    within(".swal2-html-container") do
+      toggle = find('[data-status-toggle]')
+      expect(toggle).to have_text(/active/i)
+      toggle.click
+      expect(toggle).to have_text(/inactive/i)
+
+      click_button "Save"
     end
 
-    expect(admin_section).to have_selector('input[type="checkbox"][data-controller="checkbox"]:not(:checked)', wait: 10)
+    expect(page).to have_content("read permission updated", wait: 10)
   end
 
-  scenario "checked to unchecked changes can? to return false", :js do
+  scenario "active to inactive changes can? to return false", :js do
     company.clear_permissions_cache
     admin_employee.clear_permissions_cache
     admin_employee.reload
@@ -165,14 +187,18 @@ RSpec.feature "Companies::Permissions Management", type: :feature, js: true do
     expect(page).to have_selector('.role-section', text: "admin", wait: 20)
 
     admin_section = find('.role-section', text: "admin")
-    checked_checkbox = admin_section.all('input[type="checkbox"][data-controller="checkbox"]:checked').first
-    label = checked_checkbox.find(:xpath, '..')
+    resource_section = admin_section.find('.resource-section', text: 'Product')
+    active_badge = resource_section.all('button').find { |b| b.text.match?(/read/i) }
+    active_badge.click
 
-    accept_confirm do
-      label.click
+    expect(page).to have_selector('.swal2-html-container')
+
+    within(".swal2-html-container") do
+      find('[data-status-toggle]').click
+      click_button "Save"
     end
 
-    expect(admin_section).to have_selector('input[type="checkbox"][data-controller="checkbox"]:not(:checked)', wait: 10)
+    expect(page).to have_content("read permission updated", wait: 10)
 
     company.clear_permissions_cache
     admin_employee.clear_permissions_cache
@@ -181,22 +207,25 @@ RSpec.feature "Companies::Permissions Management", type: :feature, js: true do
     expect(admin_employee.can?(:read, policy_read_product.resource.constantize)).to be_falsey
   end
 
-  scenario "unchecked to checked changes can? to return true", :js do
+  scenario "inactive to active changes can? to return true", :js do
     sign_in(owner)
     visit company_permissions_path(company)
 
     expect(page).to have_selector('.role-section', text: "admin", wait: 20)
 
     admin_section = find('.role-section', text: "admin")
+    resource_section = admin_section.find('.resource-section', text: 'Product')
+    inactive_badge = resource_section.all('button').find { |b| b.text.match?(/create/i) }
+    inactive_badge.click
 
-    policy_label = admin_section.all('label').find { |l| l.text.include?("Can create Product") }
-    checkbox = policy_label.find('input[type="checkbox"]')
+    expect(page).to have_selector('.swal2-html-container')
 
-    accept_confirm do
-      checkbox.click
+    within(".swal2-html-container") do
+      find('[data-status-toggle]').click
+      click_button "Save"
     end
 
-    expect(admin_section).to have_selector('input[type="checkbox"]:checked', wait: 10)
+    expect(page).to have_content("create permission updated", wait: 10)
 
     company.clear_permissions_cache
     admin_employee.clear_permissions_cache
@@ -413,5 +442,215 @@ scenario "submit shows success toast and closes modal" do
 
     manager_section = find('.role-section', text: "manager")
     expect(manager_section).to have_content("Customer")
+  end
+
+  scenario "add and save tag conditions via modal" do
+    sign_in(owner)
+    visit company_permissions_path(company)
+
+    expect(page).to have_selector('.role-section', text: "admin", wait: 20)
+
+    admin_section = find('.role-section', text: "admin")
+    resource_section = admin_section.find('.resource-section', text: 'Product')
+    inactive_badge = resource_section.all('button').find { |b| b.text.match?(/create/i) }
+    inactive_badge.click
+
+    expect(page).to have_selector('.swal2-html-container')
+
+    within(".swal2-html-container") do
+      find('[data-status-toggle]').click
+
+      find('[data-tag-key]').set("usage_status")
+      find('[data-tag-value]').set("secondhand")
+
+      click_button "Add Condition"
+      expect(page).to have_selector('[data-tag-row]', count: 2)
+
+      all('[data-tag-row]').last.find('[data-tag-key]').set("brand")
+      all('[data-tag-row]').last.find('[data-tag-value]').set("Apple")
+
+      click_button "Save"
+    end
+
+    expect(page).to have_content("create permission updated", wait: 10)
+
+    admin_section = find('.role-section', text: "admin")
+    resource_section = admin_section.find('.resource-section', text: 'Product')
+    badge = resource_section.all('button').find { |b| b.text.match?(/create/i) }
+    badge.click
+
+    expect(page).to have_selector('.swal2-html-container')
+
+    within(".swal2-html-container") do
+      expect(page).to have_selector('[data-tag-row]', count: 2)
+      expect(page).to have_field("Key", with: "usage_status")
+      expect(page).to have_field("Value", with: "secondhand")
+      expect(page).to have_field("Key", with: "brand")
+      expect(page).to have_field("Value", with: "Apple")
+    end
+  end
+
+  scenario "clear all tag conditions via modal" do
+    sign_in(owner)
+    visit company_permissions_path(company)
+
+    expect(page).to have_selector('.role-section', text: "admin", wait: 20)
+
+    find('.role-section', text: "admin").find('.resource-section', text: 'Product')
+      .find('button', text: /create/i).click
+
+    within(".swal2-html-container") do
+      find('[data-tag-key]').set("usage_status")
+      find('[data-tag-value]').set("secondhand")
+      click_button "Save"
+    end
+
+    expect(page).to have_content("create permission updated", wait: 10)
+
+    find('.role-section', text: "admin").find('.resource-section', text: 'Product')
+      .find('button', text: /create/i).click
+
+    within(".swal2-html-container") do
+      all('[data-tag-row]').each do |row|
+        row.find('button[data-action*="removeTagRow"]').click
+      end
+      click_button "Save"
+    end
+
+    expect(page).to have_content("create permission updated", wait: 10)
+
+    find('.role-section', text: "admin").find('.resource-section', text: 'Product')
+      .find('button', text: /create/i).click
+
+    within(".swal2-html-container") do
+      rows = all('[data-tag-row]')
+      expect(rows.length).to eq(1)
+      expect(rows.first.find('[data-tag-key]').value).to be_blank
+      expect(rows.first.find('[data-tag-value]').value).to be_blank
+    end
+  end
+
+  scenario "toggle permission preserves tag conditions" do
+    sign_in(owner)
+    visit company_permissions_path(company)
+
+    expect(page).to have_selector('.role-section', text: "admin", wait: 20)
+
+    find('.role-section', text: "admin").find('.resource-section', text: 'Product')
+      .all('button').find { |b| b.text.match?(/create/i) }.click
+
+    within(".swal2-html-container") do
+      find('[data-status-toggle]').click
+      find('[data-tag-key]').set("usage_status")
+      find('[data-tag-value]').set("secondhand")
+      click_button "Save"
+    end
+
+    expect(page).to have_content("create permission updated", wait: 10)
+
+    find('.role-section', text: "admin").find('.resource-section', text: 'Product')
+      .find('button', text: /create/i).click
+
+    within(".swal2-html-container") do
+      find('[data-status-toggle]').click
+      click_button "Save"
+    end
+
+    expect(page).to have_content("create permission updated", wait: 10)
+
+    find('.role-section', text: "admin").find('.resource-section', text: 'Product')
+      .find('button', text: /create/i).click
+
+    within(".swal2-html-container") do
+      find('[data-status-toggle]').click
+      click_button "Save"
+    end
+
+    expect(page).to have_content("create permission updated", wait: 10)
+
+    find('.role-section', text: "admin").find('.resource-section', text: 'Product')
+      .find('button', text: /create/i).click
+
+    within(".swal2-html-container") do
+      expect(page).to have_selector('[data-tag-row]', count: 1)
+      expect(page).to have_field("Key", with: "usage_status")
+      expect(page).to have_field("Value", with: "secondhand")
+    end
+  end
+
+  scenario "tag conditions affect can? for instance-level check", :js do
+    tagged_product = create(:product, company: company, branch: branch, name: "Tagged Product")
+    tagged_product.attach_tag(key: "usage_status", value: "secondhand")
+
+    untagged_product = create(:product, company: company, branch: branch, name: "Untagged Product")
+
+    sign_in(owner)
+    visit company_permissions_path(company)
+
+    expect(page).to have_selector('.role-section', text: "admin", wait: 20)
+
+    admin_section = find('.role-section', text: "admin")
+    resource_section = admin_section.find('.resource-section', text: 'Product')
+    resource_section.all('button').find { |b| b.text.match?(/read/i) }.click
+
+    within(".swal2-html-container") do
+      find('[data-tag-key]').set("usage_status")
+      find('[data-tag-value]').set("secondhand")
+      click_button "Save"
+    end
+
+    expect(page).to have_content("read permission updated", wait: 10)
+
+    policy_read_product.reload
+    expect(policy_read_product.tag_conditions).to eq("usage_status" => "secondhand")
+
+    company.clear_permissions_cache
+    admin_employee.clear_permissions_cache
+    admin_employee.reload
+
+    expect(admin_employee.can?(:read, tagged_product)).to be_truthy
+    expect(admin_employee.can?(:read, untagged_product)).to be_falsey
+  end
+
+  scenario "multiple tag conditions use AND logic for can? check", :js do
+    product_both_tags = create(:product, company: company, branch: branch, name: "Apple Featured")
+    product_both_tags.attach_tag(key: "brand", value: "Apple")
+    product_both_tags.attach_tag(key: "is_featured", value: "true")
+
+    product_brand_only = create(:product, company: company, branch: branch, name: "Apple Regular")
+    product_brand_only.attach_tag(key: "brand", value: "Apple")
+
+    product_neither = create(:product, company: company, branch: branch, name: "Other Product")
+
+    sign_in(owner)
+    visit company_permissions_path(company)
+
+    expect(page).to have_selector('.role-section', text: "admin", wait: 20)
+
+    admin_section = find('.role-section', text: "admin")
+    resource_section = admin_section.find('.resource-section', text: 'Product')
+    resource_section.all('button').find { |b| b.text.match?(/read/i) }.click
+
+    within(".swal2-html-container") do
+      find('[data-tag-key]').set("brand")
+      find('[data-tag-value]').set("Apple")
+      click_button "Add Condition"
+      all('[data-tag-row]').last.find('[data-tag-key]').set("is_featured")
+      all('[data-tag-row]').last.find('[data-tag-value]').set("true")
+      click_button "Save"
+    end
+
+    expect(page).to have_content("read permission updated", wait: 10)
+
+    policy_read_product.reload
+    expect(policy_read_product.tag_conditions).to eq("brand" => "Apple", "is_featured" => "true")
+
+    company.clear_permissions_cache
+    admin_employee.clear_permissions_cache
+    admin_employee.reload
+
+    expect(admin_employee.can?(:read, product_both_tags)).to be_truthy
+    expect(admin_employee.can?(:read, product_brand_only)).to be_falsey
+    expect(admin_employee.can?(:read, product_neither)).to be_falsey
   end
 end

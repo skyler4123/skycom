@@ -93,6 +93,19 @@ RSpec.feature "Companies::Brands Permissions", type: :feature, js: true do
     appointment
   end
 
+  def toggle_policy(role_text:, action:, resource:)
+    role_el = find('.role-section', text: role_text)
+    resource_el = role_el.find('.resource-section', text: resource)
+    badge = resource_el.all('button').find { |b| b.text.match?(/#{action}/i) }
+
+    badge.click
+    within(".swal2-html-container") do
+      find('[data-status-toggle]').click
+      click_button "Save"
+    end
+    expect(page).to have_content("#{action} permission updated", wait: 10)
+  end
+
   before do
     company.clear_permissions_cache
   end
@@ -192,16 +205,7 @@ RSpec.feature "Companies::Brands Permissions", type: :feature, js: true do
       expect(page).to have_content("Resource added successfully", wait: 10)
     end
 
-    no_permission_section = find('.role-section', text: "NoPermission")
-    read_label = no_permission_section.all('label').find { |l| l.text.include?("Can read Brand") }
-    read_checkbox = read_label.find('input[type="checkbox"]')
-
-    unless read_checkbox.checked?
-      accept_confirm do
-        read_checkbox.click
-      end
-      expect(page).to have_selector('input[type="checkbox"]:checked', wait: 10)
-    end
+    toggle_policy(role_text: "NoPermission", action: "read", resource: "Brand")
 
     company.clear_permissions_cache
 
@@ -258,7 +262,7 @@ RSpec.feature "Companies::Brands Permissions", type: :feature, js: true do
 
     editor_section = find('.role-section', text: "Editor")
 
-    unless editor_section.has_content?("Can update Brand")
+    unless editor_section.has_css?('.resource-section', text: 'Brand')
       editor_section.click_button("Add Resource")
       within(".swal2-html-container") do
         select "Brand", from: "permission[resource_name]"
@@ -319,17 +323,7 @@ RSpec.feature "Companies::Brands Permissions", type: :feature, js: true do
       expect(page).to have_content("Resource added successfully", wait: 10)
     end
 
-    no_permission_section = find('.role-section', text: "NoPermission")
-    create_label = no_permission_section.all('label').find { |l| l.text.include?("Can create Brand") }
-
-    if create_label
-      create_checkbox = create_label.find('input[type="checkbox"]')
-      unless create_checkbox.checked?
-        accept_confirm do
-          create_checkbox.click
-        end
-      end
-    end
+    toggle_policy(role_text: "NoPermission", action: "create", resource: "Brand")
 
     company.clear_permissions_cache
     no_permission_employee.clear_permissions_cache

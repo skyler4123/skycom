@@ -1,5 +1,6 @@
 import Companies_LayoutController from "controllers/companies/layout_controller"
 import Companies_Permissions_AddResourceModalController from "controllers/companies/permissions/add_resource_modal_controller"
+import Companies_Permissions_EditPolicyModalController from "controllers/companies/permissions/edit_policy_modal_controller"
 
 export default class Companies_Permissions_IndexController extends Companies_LayoutController {
   async connect() {
@@ -109,32 +110,57 @@ export default class Companies_Permissions_IndexController extends Companies_Lay
             <span class="text-xs text-slate-500">${activeCount} / ${totalCount} active</span>
           </summary>
           <div class="p-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
-            ${policies.map(policy => this.policyCheckboxHTML(policy)).join('')}
+            ${policies.map(policy => this.policyBadgeHTML(policy)).join('')}
           </div>
         </details>
       </div>
     `
   }
 
-  policyCheckboxHTML(policy) {
+  policyBadgeHTML(policy) {
     const isActive = policy.policy_appointment?.workflow_status === 'active'
     const appointmentId = policy.policy_appointment?.id
-    const companyId = currentCompany()?.id || this.extractCompanyIdFromUrl()
+    const tagConditions = JSON.stringify(policy.tag_conditions || {})
+
     return `
-      <label class="flex items-center gap-3 p-3 rounded-lg border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800/50 cursor-pointer transition-colors">
-        ${Helpers.checkbox({
-          url: Helpers.edit_company_permission_path(companyId, appointmentId),
-          name: "policy_appointment_workflow_status",
-          value: isActive,
-          confirm: true,
-          confirmMessage: `Are you sure you want this change?`
-        })}
-        <div class="flex-1 min-w-0">
-          <p class="text-sm font-medium text-slate-900 dark:text-white truncate">${policy.name}</p>
-          <p class="text-xs text-slate-500">${policy.resource} · ${policy.action}</p>
-        </div>
-      </label>
+      <button
+        type="button"
+        data-action="click->${this.identifier}#openEditPolicyModal"
+        data-appointment-id="${appointmentId || ''}"
+        data-policy-id="${policy.id}"
+        data-policy-action="${policy.action}"
+        data-policy-resource="${policy.resource}"
+        data-tag-conditions='${tagConditions}'
+        data-workflow-status="${policy.policy_appointment?.workflow_status || 'inactive'}"
+        class="flex items-center gap-2 px-3 py-2 rounded-lg border text-sm font-medium transition-colors cursor-pointer ${isActive ? 'bg-blue-600 text-white border-blue-600 hover:bg-blue-700' : 'bg-slate-50 text-slate-500 border-slate-200 hover:bg-slate-100 dark:bg-slate-800 dark:text-slate-400 dark:border-slate-700 dark:hover:bg-slate-700'}"
+      >
+        <span class="material-symbols-outlined text-[16px]">${isActive ? 'toggle_on' : 'toggle_off'}</span>
+        ${policy.action}
+      </button>
     `
+  }
+
+  openEditPolicyModal(event) {
+    const btn = event.currentTarget
+    const p = {
+      appointmentId: btn.dataset.appointmentId || '',
+      policyId: btn.dataset.policyId || '',
+      policyAction: btn.dataset.policyAction || '',
+      policyResource: btn.dataset.policyResource || '',
+      tagConditions: btn.dataset.tagConditions || '{}',
+      workflowStatus: btn.dataset.workflowStatus || 'inactive'
+    }
+    openModal({
+      html: `<div
+        data-controller="${identifier(Companies_Permissions_EditPolicyModalController)}"
+        data-${identifier(Companies_Permissions_EditPolicyModalController)}-appointment-id-value="${p.appointmentId}"
+        data-${identifier(Companies_Permissions_EditPolicyModalController)}-policy-id-value="${p.policyId}"
+        data-${identifier(Companies_Permissions_EditPolicyModalController)}-action-name-value="${p.policyAction}"
+        data-${identifier(Companies_Permissions_EditPolicyModalController)}-resource-name-value="${p.policyResource}"
+        data-${identifier(Companies_Permissions_EditPolicyModalController)}-tag-conditions-value='${p.tagConditions}'
+        data-${identifier(Companies_Permissions_EditPolicyModalController)}-workflow-status-value="${p.workflowStatus}"
+      ></div>`
+    })
   }
 
   emptyStateHTML() {

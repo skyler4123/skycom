@@ -12,16 +12,24 @@ class Companies::PermissionsController < Companies::ApplicationController
   end
 
   def update
-    # This endpoint belongs to Permission but we dont create this model, in this endpoint, id is id of PolicyAppointment
     return render json: { error: "Unauthorized" }, status: :forbidden unless can_manage_permissions?
     appointment = current_company.policy_appointments.find(params[:id])
-    workflow_status = params[:policy_appointment_workflow_status] ? :active : :inactive
-    if appointment.update!(workflow_status: workflow_status)
-      current_company.clear_permissions_cache
-      render json: { policy_appointment: appointment }
-    else
-      render json: { errors: appointment.errors.full_messages }, status: :unprocessable_entity
+    policy = appointment.policy
+
+    if params.dig(:policy_appointment, :workflow_status).in?([ true, false ])
+      ws = params[:policy_appointment][:workflow_status] ? :active : :inactive
+      appointment.update!(workflow_status: ws)
     end
+
+    if params.dig(:policy, :tag_conditions).is_a?(ActionController::Parameters)
+      policy.update!(tag_conditions: params[:policy][:tag_conditions].to_unsafe_h)
+    end
+
+    current_company.clear_permissions_cache
+    render json: {
+      policy_appointment: { id: appointment.id, workflow_status: appointment.workflow_status },
+      policy: { id: policy.id, tag_conditions: policy.reload.tag_conditions }
+    }
   end
 
   def create
