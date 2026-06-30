@@ -93,6 +93,19 @@ RSpec.feature "Companies::Employees Permissions", type: :feature, js: true do
     appointment
   end
 
+  def toggle_policy(role_text:, action:, resource:)
+    role_el = find('.role-section', text: role_text)
+    resource_el = role_el.find('.resource-section', text: resource)
+    badge = resource_el.all('button').find { |b| b.text.match?(/#{action}/i) }
+
+    badge.click
+    within(".swal2-html-container") do
+      find('[data-status-toggle]').click
+      click_button "Save"
+    end
+    expect(page).to have_content("#{action} permission updated", wait: 10)
+  end
+
   def seed_client_cache
     page.execute_script("localStorage.clear()")
 
@@ -223,7 +236,7 @@ RSpec.feature "Companies::Employees Permissions", type: :feature, js: true do
 
     no_permission_section = find('.role-section', text: "NoPermission")
 
-    unless no_permission_section.has_content?("Can read Employee")
+    unless no_permission_section.has_selector?('.resource-section', text: 'Employee')
       no_permission_section.click_button("Add Resource")
       within(".swal2-html-container") do
         select "Employee", from: "permission[resource_name]"
@@ -232,16 +245,7 @@ RSpec.feature "Companies::Employees Permissions", type: :feature, js: true do
       expect(page).to have_content("Resource added successfully", wait: 10)
     end
 
-    no_permission_section = find('.role-section', text: "NoPermission")
-    read_label = no_permission_section.all('label').find { |l| l.text.include?("Can read Employee") }
-    read_checkbox = read_label.find('input[type="checkbox"]')
-
-    unless read_checkbox.checked?
-      accept_confirm do
-        read_checkbox.click
-      end
-      expect(page).to have_selector('input[type="checkbox"]:checked', wait: 10)
-    end
+    toggle_policy(role_text: "NoPermission", action: "read", resource: "Employee")
 
     company.clear_permissions_cache
 
@@ -298,7 +302,7 @@ RSpec.feature "Companies::Employees Permissions", type: :feature, js: true do
 
     editor_section = find('.role-section', text: "Editor")
 
-    unless editor_section.has_content?("Can update Employee")
+    unless editor_section.has_selector?('.resource-section', text: 'Employee')
       editor_section.click_button("Add Resource")
       within(".swal2-html-container") do
         select "Employee", from: "permission[resource_name]"
@@ -349,7 +353,7 @@ RSpec.feature "Companies::Employees Permissions", type: :feature, js: true do
 
     no_permission_section = find('.role-section', text: "NoPermission")
 
-    unless no_permission_section.has_content?("Can create Employee")
+    unless no_permission_section.has_selector?('.resource-section', text: 'Employee')
       no_permission_section.click_button("Add Resource")
       within(".swal2-html-container") do
         select "Employee", from: "permission[resource_name]"
@@ -358,17 +362,7 @@ RSpec.feature "Companies::Employees Permissions", type: :feature, js: true do
       expect(page).to have_content("Resource added successfully", wait: 10)
     end
 
-    no_permission_section = find('.role-section', text: "NoPermission")
-    create_label = no_permission_section.all('label').find { |l| l.text.include?("Can create Employee") }
-
-    if create_label
-      create_checkbox = create_label.find('input[type="checkbox"]')
-      unless create_checkbox.checked?
-        accept_confirm do
-          create_checkbox.click
-        end
-      end
-    end
+    toggle_policy(role_text: "NoPermission", action: "create", resource: "Employee")
 
     company.clear_permissions_cache
     no_permission_employee.clear_permissions_cache
@@ -417,7 +411,7 @@ RSpec.feature "Companies::Employees Permissions", type: :feature, js: true do
     expect(page).to have_selector('.role-section', text: "NoPermission", wait: 20)
 
     no_permission_section = find('.role-section', text: "NoPermission")
-    expect(no_permission_section).not_to have_content("Can create Employee")
+    expect(no_permission_section).not_to have_selector('.resource-section', text: 'Employee')
 
     no_permission_section.click_button("Add Resource")
 
@@ -428,15 +422,7 @@ RSpec.feature "Companies::Employees Permissions", type: :feature, js: true do
 
     expect(page).to have_content("Resource added successfully", wait: 10)
 
-    no_permission_section = find('.role-section', text: "NoPermission")
-    create_label = no_permission_section.all('label').find { |l| l.text.include?("Can create Employee") }
-    create_checkbox = create_label.find('input[type="checkbox"]')
-
-    accept_confirm do
-      create_checkbox.click
-    end
-
-    expect(page).to have_selector('input[type="checkbox"]:checked', wait: 10)
+    toggle_policy(role_text: "NoPermission", action: "create", resource: "Employee")
 
     company.clear_permissions_cache
     no_permission_employee.clear_permissions_cache
@@ -453,18 +439,9 @@ RSpec.feature "Companies::Employees Permissions", type: :feature, js: true do
     visit company_permissions_path(company)
 
     reader_section = find('.role-section', text: "Reader")
-    expect(reader_section).to have_content("Can read Employee")
+    expect(reader_section).to have_selector('.resource-section', text: 'Employee')
 
-    read_label = reader_section.all('label').find { |l| l.text.include?("Can read Employee") }
-    read_checkbox = read_label.find('input[type="checkbox"]')
-
-    if read_checkbox.checked?
-      accept_confirm do
-        read_checkbox.click
-      end
-
-      expect(page).to have_selector('input[type="checkbox"]:not(:checked)', wait: 10)
-    end
+    toggle_policy(role_text: "Reader", action: "read", resource: "Employee")
 
     company.clear_permissions_cache
     reader_employee.clear_permissions_cache
@@ -482,7 +459,7 @@ RSpec.feature "Companies::Employees Permissions", type: :feature, js: true do
 
     no_permission_section = find('.role-section', text: "NoPermission")
 
-    unless no_permission_section.has_content?("Can read Employee")
+    unless no_permission_section.has_selector?('.resource-section', text: 'Employee')
       no_permission_section.click_button("Add Resource")
       within(".swal2-html-container") do
         select "Employee", from: "permission[resource_name]"
@@ -491,27 +468,8 @@ RSpec.feature "Companies::Employees Permissions", type: :feature, js: true do
       expect(page).to have_content("Resource added successfully", wait: 10)
     end
 
-    no_permission_section = find('.role-section', text: "NoPermission")
-    read_label = no_permission_section.all('label').find { |l| l.text.include?("Can read Employee") }
-    read_checkbox = read_label.find('input[type="checkbox"]')
-    unless read_checkbox.checked?
-      accept_confirm do
-        read_checkbox.click
-      end
-      expect(page).to have_selector('input[type="checkbox"]:checked', wait: 10)
-    end
-
-    no_permission_section = find('.role-section', text: "NoPermission")
-    create_label = no_permission_section.all('label').find { |l| l.text.include?("Can create Employee") }
-
-    unless create_label&.find('input[type="checkbox"]')&.checked?
-      if create_label
-        accept_confirm do
-          create_label.find('input[type="checkbox"]').click
-        end
-      end
-      expect(page).to have_selector('input[type="checkbox"]:checked', wait: 10)
-    end
+    toggle_policy(role_text: "NoPermission", action: "read", resource: "Employee")
+    toggle_policy(role_text: "NoPermission", action: "create", resource: "Employee")
 
     company.clear_permissions_cache
     no_permission_employee.clear_permissions_cache
@@ -541,30 +499,15 @@ RSpec.feature "Companies::Employees Permissions", type: :feature, js: true do
   # SCENARIO 11: Employee with create permission removed cannot create
   # =========================================================================
   scenario "employee with create permission removed cannot create new employee" do
-    sign_in(owner)
-    visit company_permissions_path(company)
-
-    creator_section = find('.role-section', text: "Creator")
-    create_label = creator_section.all('label').find { |l| l.text.include?("Can create Employee") }
-    create_checkbox = create_label.find('input[type="checkbox"]')
-
-    unless create_checkbox.checked?
-      accept_confirm do
-        create_checkbox.click
-      end
-      expect(page).to have_selector('input[type="checkbox"]:checked', wait: 10)
-    end
-
     company.clear_permissions_cache
     creator_employee.clear_permissions_cache
     creator_employee.reload
     expect(creator_employee.can?(:create, Employee)).to be_truthy
 
-    create_checkbox.reload
-    accept_confirm do
-      create_checkbox.click
-    end
-    expect(page).to have_selector('input[type="checkbox"]:not(:checked)', wait: 10)
+    sign_in(owner)
+    visit company_permissions_path(company)
+
+    toggle_policy(role_text: "Creator", action: "create", resource: "Employee")
 
     company.clear_permissions_cache
     creator_employee.clear_permissions_cache
@@ -582,34 +525,16 @@ RSpec.feature "Companies::Employees Permissions", type: :feature, js: true do
   # SCENARIO 12: Permission toggle off then on verifies cache clears
   # =========================================================================
   scenario "permission toggle off then on works correctly" do
-    sign_in(owner)
-    visit company_permissions_path(company)
-
-    creator_section = find('.role-section', text: "Creator")
-    %w[read create].each do |action|
-      label = creator_section.all('label').find { |l| l.text.include?("Can #{action} Employee") }
-      checkbox = label&.find('input[type="checkbox"]')
-      next unless checkbox && !checkbox.checked?
-      accept_confirm do
-        checkbox.click
-      end
-      expect(label).to have_selector('input[type="checkbox"]:checked', wait: 10)
-    end
-
     company.clear_permissions_cache
     creator_employee.clear_permissions_cache
     creator_employee.reload
     expect(creator_employee.can?(:create, Employee)).to be_truthy
 
-    # Toggle OFF
-    creator_section = find('.role-section', text: "Creator")
-    create_label = creator_section.all('label').find { |l| l.text.include?("Can create Employee") }
-    create_checkbox = create_label.find('input[type="checkbox"]')
+    sign_in(owner)
+    visit company_permissions_path(company)
 
-    accept_confirm do
-      create_checkbox.click
-    end
-    expect(create_label).to have_selector('input[type="checkbox"]:not(:checked)', wait: 10)
+    # Toggle OFF
+    toggle_policy(role_text: "Creator", action: "create", resource: "Employee")
 
     company.clear_permissions_cache
     creator_employee.clear_permissions_cache
@@ -617,7 +542,6 @@ RSpec.feature "Companies::Employees Permissions", type: :feature, js: true do
     expect(creator_employee.can?(:create, Employee)).to be_falsey
 
     # Toggle ON again — use direct DB update to avoid browser race
-    # between Stimulus confirm dialog and Capybara interactions
     appointment = PolicyAppointment.where(company: company, policy: policy_create_employee, appoint_to: creator_role).last!
     appointment.update!(workflow_status: :active)
     company.clear_permissions_cache
