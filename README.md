@@ -21,7 +21,7 @@ Before suggesting any JavaScript code, helpers, or UI components, the AI Agent *
 
 # 1. Ruby on Rails Project Guidelines
 
-This is a standard Ruby on Rails 7+ application configured as a multi-tenant business management platform.
+This is a standard Ruby on Rails 8+ application configured as a multi-tenant business management platform.
 
 ### Project Structure
 - `app/models/` - ActiveRecord models (Heavy use of Concerns).
