@@ -155,7 +155,27 @@ This ensures the fallback works correctly: when Vietnamese translation is missin
 
 ---
 
-## 7. How to Switch Language
+## 7. Translation Policy
+
+Skycom supports multi-language, so every new "word" added to the UI should use `translate()`. This ensures the platform is accessible to Vietnamese-speaking users.
+
+However, this is a practical rule, not an absolute one. Some words are globally understood and translating them can make the interface more confusing than helpful:
+
+| Skip Translation | Reason |
+|-----------------|--------|
+| `username`, `password` | Universal tech terms — users expect them in English |
+| `admin`, `administrator` | Role names universally recognized |
+| `email`, `login`, `logout` | Standard UI vocabulary |
+| Brand names, product codes | Proper nouns — no translation needed |
+| Placeholder code examples | Technical examples (JSON, URLs) — translating would confuse |
+
+**Rule of thumb**: If a word looks awkward or unrecognizable when translated, leave it in English. The `translate()` fallback guarantees English display when no translation exists, so it's always safe to start without a dictionary entry.
+
+**Do NOT skip `translate()` for**: labels, section headings, button text, navigation items, error messages, status labels, empty-state messages, or tooltip text. These should always have a Vietnamese entry in `dictionary.js`.
+
+---
+
+## 8. How to Switch Language
 
 ### Via Code
 
@@ -170,7 +190,7 @@ The language switcher is in the header (see `layout_controller.js`). Click trigg
 
 ---
 
-## 8. Adding a New Language
+## 9. Adding a New Language
 
 The project currently supports only English and Vietnamese. To add a new language (e.g., `ja` for Japanese):
 
@@ -185,7 +205,7 @@ The project currently supports only English and Vietnamese. To add a new languag
 
 ---
 
-## 9. File Reference
+## 10. File Reference
 
 | File | Description |
 |------|-----------|
@@ -197,7 +217,7 @@ The project currently supports only English and Vietnamese. To add a new languag
 
 ---
 
-## 10. Best Practices
+## 11. Best Practices
 
 1. **Always use translate()** - Never hardcode display strings
 2. **Keep keys in English** - The key should be the English version (source of truth)
