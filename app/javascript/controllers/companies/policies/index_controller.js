@@ -19,11 +19,11 @@ export default class Companies_Policies_IndexController extends Companies_Layout
             <table class="w-full text-left border-collapse">
               <thead>
                 <tr class="text-sm text-slate-500 dark:text-slate-400 bg-slate-50 dark:bg-slate-800/50 border-b border-slate-200 dark:border-slate-700">
-                  <th class="py-4 px-6 font-medium whitespace-nowrap">Policy Name</th>
-                  <th class="py-4 px-6 font-medium whitespace-nowrap">Resource</th>
-                  <th class="py-4 px-6 font-medium whitespace-nowrap">Action</th>
-                  <th class="py-4 px-6 font-medium whitespace-nowrap">Branch</th>
-                  <th class="py-4 px-6 font-medium whitespace-nowrap">Status</th>
+                  <th class="py-4 px-6 font-medium whitespace-nowrap">${translate("Policy Name")}</th>
+                  <th class="py-4 px-6 font-medium whitespace-nowrap">${translate("Resource")}</th>
+                  <th class="py-4 px-6 font-medium whitespace-nowrap">${translate("Action")}</th>
+                  <th class="py-4 px-6 font-medium whitespace-nowrap">${translate("Branch")}</th>
+                  <th class="py-4 px-6 font-medium whitespace-nowrap">${translate("Status")}</th>
                 </tr>
               </thead>
               <tbody data-${this.identifier}-target="policiesList" class="divide-y divide-slate-200 dark:divide-slate-800">
@@ -33,10 +33,10 @@ export default class Companies_Policies_IndexController extends Companies_Layout
           </div>
 
           <div class="p-4 border-t border-slate-200 dark:border-slate-800 flex items-center justify-between">
-            <span class="text-sm text-slate-500 dark:text-slate-400">Showing ${this.policies.length} policies</span>
+            <span class="text-sm text-slate-500 dark:text-slate-400">${translate("Showing")} ${this.policies.length} ${translate("policies")}</span>
             <div class="flex items-center gap-2">
-              <button class="px-3 py-1 text-sm border border-slate-200 dark:border-slate-700 rounded-lg text-slate-400 cursor-not-allowed" disabled>Previous</button>
-              <button class="px-3 py-1 text-sm border border-slate-200 dark:border-slate-700 rounded-lg text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">Next</button>
+              <button class="px-3 py-1 text-sm border border-slate-200 dark:border-slate-700 rounded-lg text-slate-400 cursor-not-allowed" disabled>${translate("Previous")}</button>
+              <button class="px-3 py-1 text-sm border border-slate-200 dark:border-slate-700 rounded-lg text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">${translate("Next")}</button>
             </div>
           </div>
         </div>
@@ -46,20 +46,20 @@ export default class Companies_Policies_IndexController extends Companies_Layout
 
   policiesHTML() {
     if (this.policies.length === 0) {
-      return `<tr><td colspan="5" class="text-center py-4 text-slate-500">No policies found</td></tr>`
+      return `<tr><td colspan="5" class="text-center py-4 text-slate-500">${translate("No policies found")}</td></tr>`
     }
     return this.policies.map(policy => `
       <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
         <td class="py-4 px-6 text-sm">
           <div class="flex flex-col">
             <p class="font-medium text-slate-900 dark:text-white">${policy.name}</p>
-            <p class="text-xs text-slate-500">${policy.code || 'No code'}</p>
+            <p class="text-xs text-slate-500">${policy.code || translate('No code')}</p>
           </div>
         </td>
         <td class="py-4 px-6 text-sm text-slate-600 dark:text-slate-300">${policy.resource}</td>
         <td class="py-4 px-6 text-sm text-slate-600 dark:text-slate-300">${policy.action}</td>
         <td class="py-4 px-6 text-sm">
-          <span class="text-slate-900 dark:text-white">${policy.branch ? policy.branch.name : 'All branches'}</span>
+          <span class="text-slate-900 dark:text-white">${policy.branch ? policy.branch.name : translate('All branches')}</span>
         </td>
         <td class="py-4 px-6 text-sm">
           ${Helpers.statusBadge(policy.lifecycle_status)}

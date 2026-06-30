@@ -33,7 +33,7 @@ export default class Companies_Brands_EditController extends Companies_LayoutCon
     } catch (error) {
       poll(() => {
         if (this.hasContentTarget) {
-          this.contentTarget.innerHTML = `<div class="p-8 text-center text-red-600">Failed to load brand.</div>`
+          this.contentTarget.innerHTML = `<div class="p-8 text-center text-red-600">${translate("Failed to load brand.")}</div>`
           return true
         }
         return false
@@ -43,7 +43,7 @@ export default class Companies_Brands_EditController extends Companies_LayoutCon
 
   contentHTML() {
     const b = this.brand
-    if (!b) return '<div class="p-8 text-center">Brand not found.</div>'
+    if (!b) return `<div class="p-8 text-center">${translate('Brand not found.')}</div>`
 
     const companyId = window.location.pathname.split("/")[2]
     const businessTypes = Enums()?.brand?.business_types || []
@@ -51,7 +51,7 @@ export default class Companies_Brands_EditController extends Companies_LayoutCon
 
     const dynamicFields = this.propertyMetadata.length > 0 ? `
       <div class="border-t border-slate-200 dark:border-gray-800 pt-6 mt-6">
-        <h3 class="text-sm font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-4">Properties</h3>
+        <h3 class="text-sm font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-4">${translate("Properties")}</h3>
         <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
           ${this.propertyMetadata.map(field => {
             const value = b[field.key]
@@ -90,24 +90,24 @@ export default class Companies_Brands_EditController extends Companies_LayoutCon
 
     const fields = `
       <div class="space-y-6">
-        <h2 class="text-xl font-bold text-slate-900 dark:text-white">Edit Brand</h2>
+        <h2 class="text-xl font-bold text-slate-900 dark:text-white">${translate("Edit Brand")}</h2>
         <p class="text-sm text-slate-500">${b.name}</p>
 
         <div class="grid grid-cols-2 gap-4">
           <div class="col-span-2 space-y-1">
-            <label class="text-xs font-medium text-slate-500 dark:text-gray-400">Name</label>
+            <label class="text-xs font-medium text-slate-500 dark:text-gray-400">${translate("Name")}</label>
             <input type="text" name="brand[name]" value="${b.name || ''}" required
               class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-sm">
           </div>
 
           <div class="col-span-2 space-y-1">
-            <label class="text-xs font-medium text-slate-500 dark:text-gray-400">Description</label>
+            <label class="text-xs font-medium text-slate-500 dark:text-gray-400">${translate("Description")}</label>
             <textarea name="brand[description]" rows="2"
               class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-sm">${b.description || ''}</textarea>
           </div>
 
           <div class="space-y-1">
-            <label class="text-xs font-medium text-slate-500 dark:text-gray-400">Type</label>
+            <label class="text-xs font-medium text-slate-500 dark:text-gray-400">${translate("Type")}</label>
             <select name="brand[business_type]"
               class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-sm">
               ${selectOptionsHTML(businessTypes, b.business_type || '')}
@@ -115,7 +115,7 @@ export default class Companies_Brands_EditController extends Companies_LayoutCon
           </div>
 
           <div class="space-y-1">
-            <label class="text-xs font-medium text-slate-500 dark:text-gray-400">Status</label>
+            <label class="text-xs font-medium text-slate-500 dark:text-gray-400">${translate("Status")}</label>
             <select name="brand[workflow_status]"
               class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-sm">
               ${selectOptionsHTML(workflowStatuses, b.workflow_status)}
@@ -123,20 +123,20 @@ export default class Companies_Brands_EditController extends Companies_LayoutCon
           </div>
 
           <div class="space-y-1">
-            <label class="text-xs font-medium text-slate-500 dark:text-gray-400">Category</label>
+            <label class="text-xs font-medium text-slate-500 dark:text-gray-400">${translate("Category")}</label>
             <input type="text" value="${currentCategories().find(c => c.id === b.category_id)?.name || ''}" disabled
               class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-slate-50 dark:bg-slate-700 text-sm text-slate-400">
             <input type="hidden" name="brand[category_id]" value="${b.category_id}">
           </div>
 
           <div class="space-y-1">
-            <label class="text-xs font-medium text-slate-500 dark:text-gray-400">Phone</label>
+            <label class="text-xs font-medium text-slate-500 dark:text-gray-400">${translate("Phone")}</label>
             <input type="text" name="brand[phone_number]" value="${b.phone_number || ''}"
               class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-sm">
           </div>
 
           <div class="col-span-2 space-y-1">
-            <label class="text-xs font-medium text-slate-500 dark:text-gray-400">Email</label>
+            <label class="text-xs font-medium text-slate-500 dark:text-gray-400">${translate("Email")}</label>
             <input type="email" name="brand[email]" value="${b.email || ''}"
               class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-sm">
           </div>
@@ -147,11 +147,11 @@ export default class Companies_Brands_EditController extends Companies_LayoutCon
         <div class="flex justify-end gap-3 pt-2">
           <a href="${Helpers.company_brand_path(companyId, b.id)}"
             class="px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-100 rounded-lg cursor-pointer">
-            Cancel
+            ${translate("Cancel")}
           </a>
           <button type="submit"
             class="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-bold text-sm cursor-pointer">
-            Save Changes
+            ${translate("Save Changes")}
           </button>
         </div>
       </div>

@@ -26,7 +26,7 @@ export default class Companies_Pages_RetailCashierController extends Controller 
 
       this.addTab()
     } catch (error) {
-      this.element.innerHTML = `<div class="flex items-center justify-center h-screen text-red-600 text-lg font-semibold">Failed to load cashier page.</div>`
+      this.element.innerHTML = `<div class="flex items-center justify-center h-screen text-red-600 text-lg font-semibold">${translate("Failed to load cashier page.")}</div>`
     }
   }
 
@@ -112,7 +112,7 @@ export default class Companies_Pages_RetailCashierController extends Controller 
   async initiateOrder() {
     const tab = this.activeTab
     if (!tab || tab.items.length === 0) {
-      toast({ type: 'warning', message: 'Cart is empty' })
+      toast({ type: 'warning', message: translate('Cart is empty') })
       return
     }
 
@@ -122,7 +122,7 @@ export default class Companies_Pages_RetailCashierController extends Controller 
       .map(i => ({ stock_id: i.stockId, product_id: i.id, quantity: i.qty, unit_price: i.price }))
 
     if (items.length === 0) {
-      toast({ type: 'warning', message: 'No stock-tracked items in cart' })
+      toast({ type: 'warning', message: translate('No stock-tracked items in cart') })
       return
     }
 
@@ -134,9 +134,9 @@ export default class Companies_Pages_RetailCashierController extends Controller 
       this.orderId = res.order_id
       this.orderTotal = res.total_price || 0
       this.renderContent()
-      toast({ type: 'success', message: 'Order created' })
+      toast({ type: 'success', message: translate('Order created') })
     } catch (error) {
-      toast({ type: 'error', message: error.errors?.join(', ') || error.message || 'Failed to create order' })
+      toast({ type: 'error', message: error.errors?.join(', ') || error.message || translate('Failed to create order') })
     }
   }
 
@@ -146,14 +146,14 @@ export default class Companies_Pages_RetailCashierController extends Controller 
         method: 'POST',
         body: { order_id: this.orderId }
       })
-      toast({ type: 'success', message: 'Payment completed' })
+      toast({ type: 'success', message: translate('Payment completed') })
       this.activeTab.items = []
       this.orderId = null
       this.orderTotal = 0
       this.cashReceived = 0
       this.renderContent()
     } catch (error) {
-      toast({ type: 'error', message: error.errors?.join(', ') || error.message || 'Payment failed' })
+      toast({ type: 'error', message: error.errors?.join(', ') || error.message || translate('Payment failed') })
     }
   }
 
@@ -187,9 +187,9 @@ export default class Companies_Pages_RetailCashierController extends Controller 
   contentHTML() {
     const p = this.page || {}
     const branchName = p.branch?.name || ''
-    const pageName = p.name || 'Cashier'
-    const userName = window.currentUser?.name || 'Admin User'
-    const userRole = window.currentUser?.role || 'Administrator'
+    const pageName = p.name || translate('Cashier')
+    const userName = window.currentUser?.name || translate('Admin User')
+    const userRole = window.currentUser?.role || translate('Administrator')
     const avatarUrl = window.currentUser?.avatar || ''
 
     return `
@@ -220,13 +220,13 @@ export default class Companies_Pages_RetailCashierController extends Controller 
           <div class="h-6 w-px bg-gray-200 mx-2"></div>
           <div class="flex items-center gap-2">
             <span class="material-symbols-outlined text-gray-500">storefront</span>
-            <span class="text-sm font-medium">${branchName || 'Branch'}</span>
+            <span class="text-sm font-medium">${branchName || translate('Branch')}</span>
           </div>
         </div>
         <div class="flex-1 max-w-xl mx-12">
           <div class="relative">
             <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 text-lg">search</span>
-            <input type="text" placeholder="Search products (F1)..."
+            <input type="text" placeholder="${translate("Search products (F1)...")}"
               class="w-full bg-gray-100 border-none rounded-lg pl-10 pr-4 py-2 text-sm focus:ring-2 focus:ring-blue-600 transition-all outline-none" />
           </div>
         </div>
@@ -258,7 +258,7 @@ export default class Companies_Pages_RetailCashierController extends Controller 
 
   renderCategoryPills() {
     const categories = [
-      'All Products', 'Tech Accessories', 'Apparel', 'Office Supplies', 'Electronics', 'Services'
+      translate('All Products'), translate('Tech Accessories'), translate('Apparel'), translate('Office Supplies'), translate('Electronics'), translate('Services')
     ]
     return `
       <div class="flex items-center gap-3 mb-6 overflow-x-auto pb-2">
@@ -276,7 +276,7 @@ export default class Companies_Pages_RetailCashierController extends Controller 
 
     return `
       <div class="flex justify-between items-end mb-4">
-        <h3 class="text-xs font-bold text-gray-500 uppercase tracking-widest">Products Gallery</h3>
+        <h3 class="text-xs font-bold text-gray-500 uppercase tracking-widest">${translate("Products Gallery")}</h3>
         <div class="flex gap-2">
           <button class="p-1.5 rounded bg-white border border-gray-200 hover:bg-gray-50 cursor-pointer">
             <span class="material-symbols-outlined text-sm text-gray-500">grid_view</span>
@@ -311,7 +311,7 @@ export default class Companies_Pages_RetailCashierController extends Controller 
         </div>
         <div class="p-4 flex flex-col flex-1">
           <span class="text-[10px] uppercase tracking-tighter text-gray-500 mb-1">${p.code || 'SKU-' + p.id}</span>
-          <h4 class="font-bold text-gray-900 leading-tight mb-2 text-sm">${p.name || 'Unnamed Product'}</h4>
+          <h4 class="font-bold text-gray-900 leading-tight mb-2 text-sm">${p.name || translate('Unnamed Product')}</h4>
           <div class="mt-auto flex justify-between items-center">
             <span class="text-blue-600 font-black">$${(p.price || 0).toFixed(2)}</span>
             <span class="material-symbols-outlined text-blue-600 opacity-0 group-hover:opacity-100 transition-opacity">add_circle</span>
@@ -338,7 +338,7 @@ export default class Companies_Pages_RetailCashierController extends Controller 
 
     return `
       <div class="mt-12 mb-6">
-        <h3 class="text-xs font-bold text-gray-500 uppercase tracking-widest mb-4">Retail Services</h3>
+        <h3 class="text-xs font-bold text-gray-500 uppercase tracking-widest mb-4">${translate("Retail Services")}</h3>
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           ${this.services.map(s => {
             const sName = (s.name || '').toLowerCase()
@@ -353,7 +353,7 @@ export default class Companies_Pages_RetailCashierController extends Controller 
                   <span class="material-symbols-outlined">${icon}</span>
                 </div>
                 <div>
-                  <h4 class="text-sm font-bold text-gray-900">${s.name || 'Service'}</h4>
+                  <h4 class="text-sm font-bold text-gray-900">${s.name || translate('Service')}</h4>
                   <p class="text-xs text-gray-500">$${(s.price || 0).toFixed(2)}</p>
                 </div>
               </div>
@@ -382,7 +382,7 @@ export default class Companies_Pages_RetailCashierController extends Controller 
           <button data-action="click->${this.identifier}#addTab"
             class="flex items-center gap-1 px-3 py-1.5 text-sm text-blue-600 hover:bg-blue-50 rounded-lg cursor-pointer whitespace-nowrap">
             <span class="material-symbols-outlined text-[16px]">add</span>
-            Add
+            ${translate("Add")}
           </button>
         </div>
       </div>
@@ -391,7 +391,7 @@ export default class Companies_Pages_RetailCashierController extends Controller 
 
   renderCartItems() {
     if (!this.activeTab || this.activeTab.items.length === 0) {
-      return '<div class="text-center text-gray-400 py-8 text-sm">Cart is empty</div>'
+      return `<div class="text-center text-gray-400 py-8 text-sm">${translate("Cart is empty")}</div>`
     }
     return this.activeTab.items.map(item => {
       if (this.orderId) {
@@ -403,7 +403,7 @@ export default class Companies_Pages_RetailCashierController extends Controller 
             <div class="flex-1 flex flex-col justify-between min-w-0">
               <h5 class="text-sm font-bold text-gray-900 truncate">${item.name}</h5>
               <div class="flex justify-between items-center mt-1">
-                <span class="text-xs text-gray-500">Qty: ${item.qty}</span>
+                <span class="text-xs text-gray-500">${translate("Qty:")} ${item.qty}</span>
                 <span class="text-sm font-bold text-gray-900">$${(item.price * item.qty).toFixed(2)}</span>
               </div>
             </div>
@@ -455,33 +455,33 @@ export default class Companies_Pages_RetailCashierController extends Controller 
           <button data-action="click->${this.identifier}#setPaymentMethod" data-${this.identifier}-method-param="cash"
             class="flex items-center justify-center gap-2 py-2.5 rounded-lg ${this.activePaymentMethod === 'cash' ? 'bg-white shadow-sm border border-gray-200 text-blue-600 font-bold' : 'text-gray-500 font-medium hover:bg-white/50'} transition-all cursor-pointer">
             <span class="material-symbols-outlined text-sm">payments</span>
-            <span class="text-sm">Cash</span>
+            <span class="text-sm">${translate("Cash")}</span>
           </button>
           <button data-action="click->${this.identifier}#setPaymentMethod" data-${this.identifier}-method-param="card"
             class="flex items-center justify-center gap-2 py-2.5 rounded-lg ${this.activePaymentMethod === 'card' ? 'bg-white shadow-sm border border-gray-200 text-blue-600 font-bold' : 'text-gray-500 font-medium hover:bg-white/50'} transition-all cursor-pointer">
             <span class="material-symbols-outlined text-sm">credit_card</span>
-            <span class="text-sm">Card</span>
+            <span class="text-sm">${translate("Card")}</span>
           </button>
         </div>
 
         <div class="space-y-3 mb-6">
           <div class="flex justify-between text-sm text-gray-500">
-            <span>Subtotal</span>
+            <span>${translate("Subtotal")}</span>
             <span>$${subtotal.toFixed(2)}</span>
           </div>
           <div class="flex justify-between text-sm text-gray-500">
-            <span>Tax (10%)</span>
+            <span>${translate("Tax (10%)")}</span>
             <span>$${tax.toFixed(2)}</span>
           </div>
           <div class="flex justify-between items-center pt-2 border-t border-dashed border-gray-200">
-            <span class="font-bold text-gray-900">Total Amount</span>
+            <span class="font-bold text-gray-900">${translate("Total Amount")}</span>
             <span class="text-3xl font-black text-blue-600">$${total.toFixed(2)}</span>
           </div>
         </div>
 
         <div class="grid grid-cols-2 gap-4 mb-6">
           <div>
-            <label class="block text-[10px] uppercase tracking-widest text-gray-500 font-bold mb-1.5">Received</label>
+            <label class="block text-[10px] uppercase tracking-widest text-gray-500 font-bold mb-1.5">${translate("Received")}</label>
             <div class="relative">
               <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 font-bold text-sm">$</span>
               <input type="number" value="${this.cashReceived || ''}" data-action="input->${this.identifier}#updateCashReceived"
@@ -489,7 +489,7 @@ export default class Companies_Pages_RetailCashierController extends Controller 
             </div>
           </div>
           <div>
-            <label class="block text-[10px] uppercase tracking-widest text-gray-500 font-bold mb-1.5">Change Due</label>
+            <label class="block text-[10px] uppercase tracking-widest text-gray-500 font-bold mb-1.5">${translate("Change Due")}</label>
             <div class="w-full bg-green-50 border border-green-200 rounded-lg px-3 py-3 flex items-center justify-center">
               <span class="text-lg font-black ${changeDue >= 0 ? 'text-green-600' : 'text-red-600'}">
                 <span id="cashier-change-due">${changeDue >= 0 ? '$' + changeDue.toFixed(2) : '-$' + Math.abs(changeDue).toFixed(2)}</span>
@@ -502,19 +502,19 @@ export default class Companies_Pages_RetailCashierController extends Controller 
           <div class="grid grid-cols-2 gap-3">
             <button data-action="click->${this.identifier}#cancelOrder"
               class="w-full bg-white border-2 border-slate-200 text-slate-700 py-4 rounded-xl text-lg font-black hover:bg-slate-50 active:scale-[0.98] transition-all flex items-center justify-center gap-3 cursor-pointer">
-              Cancel
+              ${translate("Cancel")}
             </button>
             <button data-action="click->${this.identifier}#pay"
               class="w-full bg-emerald-600 text-white py-4 rounded-xl text-lg font-black shadow-lg shadow-emerald-600/20 hover:brightness-110 active:scale-[0.98] transition-all flex items-center justify-center gap-3 cursor-pointer">
               <span class="material-symbols-outlined">point_of_sale</span>
-              COMPLETE PAYMENT
+              ${translate("COMPLETE PAYMENT")}
             </button>
           </div>
         ` : `
           <button data-action="click->${this.identifier}#initiateOrder"
             class="w-full bg-blue-600 text-white py-4 rounded-xl text-lg font-black shadow-lg shadow-blue-600/20 hover:brightness-110 active:scale-[0.98] transition-all flex items-center justify-center gap-3 cursor-pointer">
             <span class="material-symbols-outlined">shopping_cart</span>
-            ORDER
+            ${translate("ORDER")}
           </button>
         `}
       </div>

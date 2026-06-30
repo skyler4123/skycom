@@ -27,7 +27,7 @@ export default class Companies_Billing_ShowController extends Companies_LayoutCo
       this.catalogAddonFeatures = Helpers.sortObjectArray(response.catalog_addon_features || [])
       this.estimate = response.estimate || {}
     } catch (error) {
-      toast({ type: "error", message: "Failed to load billing data" })
+      toast({ type: "error", message: translate("Failed to load billing data") })
     }
 
     poll(() => {
@@ -61,7 +61,7 @@ export default class Companies_Billing_ShowController extends Companies_LayoutCo
 
     const metrics = Object.keys(this.dailyMetricTotals)
     if (metrics.length === 0) {
-      container.innerHTML = '<div class="flex items-center justify-center h-[200px] text-slate-400 text-sm">No usage data yet</div>'
+      container.innerHTML = `<div class="flex items-center justify-center h-[200px] text-slate-400 text-sm">${translate("No usage data yet")}</div>`
       return
     }
 
@@ -71,8 +71,8 @@ export default class Companies_Billing_ShowController extends Companies_LayoutCo
 
     const options = {
       series: [
-        { name: "Current Usage", data: currentData },
-        { name: "Allowance", data: allowanceData }
+        { name: translate("Current Usage"), data: currentData },
+        { name: translate("Allowance"), data: allowanceData }
       ],
       chart: {
         height: 230,
@@ -102,7 +102,7 @@ export default class Companies_Billing_ShowController extends Companies_LayoutCo
         labels: { style: { fontSize: "11px", fontWeight: 500 } }
       },
       yaxis: {
-        title: { text: "Count" }
+        title: { text: translate("Count") }
       },
       tooltip: {
         y: { formatter: (val) => `${val}` }
@@ -118,7 +118,7 @@ export default class Companies_Billing_ShowController extends Companies_LayoutCo
 
     const breakdown = this.estimate?.breakdown
     if (!breakdown || (breakdown.features_cents === 0 && breakdown.overage_cents === 0 && breakdown.base_cents === 0)) {
-      container.innerHTML = '<div class="flex items-center justify-center h-[200px] text-slate-400 text-sm">No costs yet</div>'
+      container.innerHTML = `<div class="flex items-center justify-center h-[200px] text-slate-400 text-sm">${translate("No costs yet")}</div>`
       return
     }
 
@@ -130,19 +130,19 @@ export default class Companies_Billing_ShowController extends Companies_LayoutCo
 
     if (breakdown.base_cents > 0) {
       series.push(breakdown.base_cents)
-      labels.push(`Base Plan (${fmt(breakdown.base_cents)})`)
+      labels.push(`${translate("Base Plan")} (${fmt(breakdown.base_cents)})`)
     }
     if (breakdown.features_cents > 0) {
       series.push(breakdown.features_cents)
-      labels.push(`Add-ons (${fmt(breakdown.features_cents)})`)
+      labels.push(`${translate("Add-ons")} (${fmt(breakdown.features_cents)})`)
     }
     if (breakdown.overage_cents > 0) {
       series.push(breakdown.overage_cents)
-      labels.push(`Overage (${fmt(breakdown.overage_cents)})`)
+      labels.push(`${translate("Overage")} (${fmt(breakdown.overage_cents)})`)
     }
 
     if (series.length === 0) {
-      container.innerHTML = '<div class="flex items-center justify-center h-[200px] text-slate-400 text-sm">No costs yet</div>'
+      container.innerHTML = `<div class="flex items-center justify-center h-[200px] text-slate-400 text-sm">${translate("No costs yet")}</div>`
       return
     }
 
@@ -176,7 +176,7 @@ export default class Companies_Billing_ShowController extends Companies_LayoutCo
               show: true,
               total: {
                 show: true,
-                label: "Total",
+                label: translate("Total"),
                 formatter: () => fmt(series.reduce((a, b) => a + b, 0))
               }
             }
@@ -204,14 +204,14 @@ export default class Companies_Billing_ShowController extends Companies_LayoutCo
       disabled: "bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400"
     }
     const cls = colors[status] || "bg-slate-100 text-slate-600"
-    return `<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold ${cls}">${status?.replace(/_/g, ' ') || "Unknown"}</span>`
+    return `<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold ${cls}">${status?.replace(/_/g, ' ') || translate("Unknown")}</span>`
   }
 
   statusBadge(active) {
     if (active) {
-      return '<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-xs font-bold bg-emerald-50 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400"><span class="material-symbols-outlined text-[12px]">check_circle</span>Enabled</span>'
+      return `<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-xs font-bold bg-emerald-50 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400"><span class="material-symbols-outlined text-[12px]">check_circle</span>${translate("Enabled")}</span>`
     }
-    return '<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-xs font-medium bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-400"><span class="material-symbols-outlined text-[12px]">remove_circle</span>Disabled</span>'
+    return `<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-xs font-medium bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-400"><span class="material-symbols-outlined text-[12px]">remove_circle</span>${translate("Disabled")}</span>`
   }
 
   usageBar(pct) {
@@ -230,7 +230,7 @@ export default class Companies_Billing_ShowController extends Companies_LayoutCo
 
     try {
       const response = await fetchJson(`/companies/${companyId}/billing/pay_all`, { method: "POST" })
-      toast({ type: "success", message: response.message || "Payment processed" })
+      toast({ type: "success", message: response.message || translate("Payment processed") })
 
       const fresh = await fetchJson()
       this.company = fresh.company
@@ -240,7 +240,7 @@ export default class Companies_Billing_ShowController extends Companies_LayoutCo
       this.renderContent()
       setTimeout(() => this.renderCharts(), 100)
     } catch (error) {
-      toast({ type: "error", message: error.errors?.join(", ") || "Payment failed" })
+      toast({ type: "error", message: error.errors?.join(", ") || translate("Payment failed") })
     }
   }
 
@@ -250,43 +250,43 @@ export default class Companies_Billing_ShowController extends Companies_LayoutCo
 
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div class="p-5 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800">
-            <div class="text-[10px] font-bold text-slate-400 dark:text-slate-300 uppercase tracking-wider mb-2">Billing Status</div>
+            <div class="text-[10px] font-bold text-slate-400 dark:text-slate-300 uppercase tracking-wider mb-2">${translate("Billing Status")}</div>
             <div class="flex items-center gap-3">
               <div class="flex items-center justify-center w-10 h-10 rounded-lg bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400">
                 <span class="material-symbols-outlined text-[22px]">account_balance</span>
               </div>
               <div>
                 <div>${this.lifecycleBadge(this.company?.lifecycle_status)}</div>
-                <div class="text-xs text-slate-500 mt-1">${this.billingContract?.contract_type?.replace(/_/g, ' ') || "No contract"}</div>
+                <div class="text-xs text-slate-500 mt-1">${this.billingContract?.contract_type?.replace(/_/g, ' ') || translate("No contract")}</div>
               </div>
             </div>
             ${this.company && !this.company.is_accessible
-              ? `<div class="mt-3 text-xs font-medium text-red-600 bg-red-50 dark:bg-red-900/20 dark:text-red-400 px-3 py-2 rounded-lg">Account suspended — top up to resume</div>`
+              ? `<div class="mt-3 text-xs font-medium text-red-600 bg-red-50 dark:bg-red-900/20 dark:text-red-400 px-3 py-2 rounded-lg">${translate("Account suspended — top up to resume")}</div>`
               : ""}
           </div>
 
           <div class="p-5 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800">
-            <div class="text-[10px] font-bold text-slate-400 dark:text-slate-300 uppercase tracking-wider mb-2">Wallet Balance</div>
+            <div class="text-[10px] font-bold text-slate-400 dark:text-slate-300 uppercase tracking-wider mb-2">${translate("Wallet Balance")}</div>
             <div class="flex items-center gap-3">
               <div class="flex items-center justify-center w-10 h-10 rounded-lg bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400">
                 <span class="material-symbols-outlined text-[22px]">account_balance_wallet</span>
               </div>
               <div>
                 <div class="text-2xl font-black text-slate-900 dark:text-white">${this.formatCents(this.wallet?.total_cents)}</div>
-                <div class="text-xs text-slate-500">Main: ${this.formatCents(this.wallet?.main_balance_cents)} · Promo: ${this.formatCents(this.wallet?.promo_balance_cents)}</div>
+                <div class="text-xs text-slate-500">${translate("Main:")} ${this.formatCents(this.wallet?.main_balance_cents)} · ${translate("Promo:")} ${this.formatCents(this.wallet?.promo_balance_cents)}</div>
               </div>
             </div>
           </div>
 
           <div class="p-5 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800">
-            <div class="text-[10px] font-bold text-slate-400 dark:text-slate-300 uppercase tracking-wider mb-2">This Month Estimate</div>
+            <div class="text-[10px] font-bold text-slate-400 dark:text-slate-300 uppercase tracking-wider mb-2">${translate("This Month Estimate")}</div>
             <div class="flex items-center gap-3">
               <div class="flex items-center justify-center w-10 h-10 rounded-lg bg-purple-100 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400">
                 <span class="material-symbols-outlined text-[22px]">trending_up</span>
               </div>
               <div>
                 <div class="text-2xl font-black text-slate-900 dark:text-white">${this.formatCents(this.estimate?.total_cents)}</div>
-                <div class="text-xs text-slate-500">${this.estimate?.days_remaining || 0} days remaining</div>
+                <div class="text-xs text-slate-500">${this.estimate?.days_remaining || 0} ${translate("days remaining")}</div>
               </div>
             </div>
           </div>
@@ -294,28 +294,28 @@ export default class Companies_Billing_ShowController extends Companies_LayoutCo
 
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
           <div class="lg:col-span-2 p-5 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800">
-            <h3 class="text-sm font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-4">Usage vs Allowance</h3>
+            <h3 class="text-sm font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-4">${translate("Usage vs Allowance")}</h3>
             <div data-${this.identifier}-target="usageChart"></div>
           </div>
           <div class="p-5 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800">
-            <h3 class="text-sm font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-4">Cost Breakdown</h3>
+            <h3 class="text-sm font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-4">${translate("Cost Breakdown")}</h3>
             <div data-${this.identifier}-target="costChart"></div>
           </div>
         </div>
 
         <div class="p-5 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800">
-          <h3 class="text-sm font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-4">Usage Metrics</h3>
+          <h3 class="text-sm font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-4">${translate("Usage Metrics")}</h3>
           <div class="overflow-x-auto">
             <table class="w-full text-left">
               <thead>
                 <tr class="text-[10px] font-bold text-slate-400 dark:text-slate-300 uppercase tracking-wider border-b border-slate-200 dark:border-slate-700">
-                  <th class="pb-3 pr-4">Metric</th>
-                  <th class="pb-3 pr-4 text-right">Current</th>
-                  <th class="pb-3 pr-4 text-right">Allowance</th>
-                  <th class="pb-3 pr-4 text-right">Unit Price</th>
-                  <th class="pb-3 pr-4 text-right">Current Cost</th>
-                  <th class="pb-3 pr-4">Usage</th>
-                  <th class="pb-3 text-right">Projected EOM</th>
+                  <th class="pb-3 pr-4">${translate("Metric")}</th>
+                  <th class="pb-3 pr-4 text-right">${translate("Current")}</th>
+                  <th class="pb-3 pr-4 text-right">${translate("Allowance")}</th>
+                  <th class="pb-3 pr-4 text-right">${translate("Unit Price")}</th>
+                  <th class="pb-3 pr-4 text-right">${translate("Current Cost")}</th>
+                  <th class="pb-3 pr-4">${translate("Usage")}</th>
+                  <th class="pb-3 text-right">${translate("Projected EOM")}</th>
                 </tr>
               </thead>
               <tbody>
@@ -342,7 +342,7 @@ export default class Companies_Billing_ShowController extends Companies_LayoutCo
                   `
                 }).join("")}
                 ${Object.keys(this.dailyMetricTotals).length === 0
-                  ? '<tr><td colspan="7" class="py-6 text-center text-sm text-slate-400">No usage data yet</td></tr>'
+                  ? `<tr><td colspan="7" class="py-6 text-center text-sm text-slate-400">${translate("No usage data yet")}</td></tr>`
                   : ""}
               </tbody>
             </table>
@@ -351,15 +351,15 @@ export default class Companies_Billing_ShowController extends Companies_LayoutCo
 
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
           <div class="p-5 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800">
-            <h3 class="text-sm font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-4">Add-on Features Catalog</h3>
+            <h3 class="text-sm font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-4">${translate("Add-on Features Catalog")}</h3>
             <div class="overflow-x-auto">
               <table class="w-full text-left">
                 <thead>
                   <tr class="text-[10px] font-bold text-slate-400 dark:text-slate-300 uppercase tracking-wider border-b border-slate-200 dark:border-slate-700">
-                    <th class="pb-3 pr-4">Add-on Feature</th>
-                    <th class="pb-3 pr-4 text-right">Price/mo</th>
-                    <th class="pb-3 pr-4">Status</th>
-                    <th class="pb-3 text-right">Active Days</th>
+                    <th class="pb-3 pr-4">${translate("Add-on Feature")}</th>
+                    <th class="pb-3 pr-4 text-right">${translate("Price/mo")}</th>
+                    <th class="pb-3 pr-4">${translate("Status")}</th>
+                    <th class="pb-3 text-right">${translate("Active Days")}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -372,14 +372,14 @@ export default class Companies_Billing_ShowController extends Companies_LayoutCo
                         <td class="py-3 text-right ${f.active_days > 0 ? "text-slate-700 dark:text-slate-300" : "text-slate-400"}">${f.active_days}</td>
                       </tr>
                     `).join("")
-                    : '<tr><td colspan="4" class="py-6 text-center text-sm text-slate-400">No add-on features available.</td></tr>'
+                    : `<tr><td colspan="4" class="py-6 text-center text-sm text-slate-400">${translate("No add-on features available.")}</td></tr>`
                   }
                 </tbody>
               </table>
             </div>
           </div>
           <div class="p-5 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 flex flex-col justify-center">
-            <h3 class="text-sm font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-3">Outstanding Invoices</h3>
+            <h3 class="text-sm font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-3">${translate("Outstanding Invoices")}</h3>
             ${this.invoices.length > 0
               ? `<div class="space-y-2 mb-4">
                   ${this.invoices.slice(0, 5).map(inv => `
@@ -395,12 +395,12 @@ export default class Companies_Billing_ShowController extends Companies_LayoutCo
                   data-action="click->${this.identifier}#payAll"
                   class="w-full px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-bold text-sm cursor-pointer transition-colors"
                 >
-                  Pay All Outstanding (${this.formatCents(this.invoices.reduce((s, i) => s + i.price_cents, 0))})
+                  ${translate("Pay All Outstanding")} (${this.formatCents(this.invoices.reduce((s, i) => s + i.price_cents, 0))})
                 </button>`
               : `<div class="text-center py-4">
                   <span class="material-symbols-outlined text-3xl text-emerald-500 block mb-2">check_circle</span>
-                  <p class="text-sm text-slate-500 font-medium">All invoices paid</p>
-                  <p class="text-xs text-slate-400 mt-1">No outstanding balances</p>
+                  <p class="text-sm text-slate-500 font-medium">${translate("All invoices paid")}</p>
+                  <p class="text-xs text-slate-400 mt-1">${translate("No outstanding balances")}</p>
                 </div>`
             }
           </div>

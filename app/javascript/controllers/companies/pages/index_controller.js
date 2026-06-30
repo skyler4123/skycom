@@ -15,7 +15,7 @@ export default class Companies_Pages_IndexController extends Companies_LayoutCon
       const response = await fetchJson({ params: { branch_id: this.branchIdValue || undefined } })
       this.pages = response.pages || []
     } catch (error) {
-      toast({ type: "error", message: "Failed to load pages" })
+      toast({ type: "error", message: translate("Failed to load pages") })
     }
 
     poll(() => {
@@ -36,13 +36,13 @@ export default class Companies_Pages_IndexController extends Companies_LayoutCon
 
           <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
             <div class="flex flex-col gap-1">
-              <label class="text-[10px] font-bold text-slate-400 uppercase ml-1">Branch</label>
+              <label class="text-[10px] font-bold text-slate-400 uppercase ml-1">${translate("Branch")}</label>
               <select
                 data-${this.identifier}-target="branchSelect"
                 data-action="change->${this.identifier}#onBranchChange"
                 class="pl-3 pr-10 py-2 text-sm border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300"
               >
-                <option value="">All Branches</option>
+                <option value="">${translate("All Branches")}</option>
                 ${branches.map(b =>
                   `<option value="${b.id}" ${b.id === this.branchIdValue ? "selected" : ""}>${b.name}</option>`
                 ).join("")}
@@ -51,7 +51,7 @@ export default class Companies_Pages_IndexController extends Companies_LayoutCon
             <a href="${Helpers.new_company_page_path(currentCompany().id)}"
               class="flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium text-sm whitespace-nowrap cursor-pointer">
               <span class="material-symbols-outlined text-[20px]">add</span>
-              Add
+              ${translate("Add")}
             </a>
           </div>
 
@@ -59,31 +59,31 @@ export default class Companies_Pages_IndexController extends Companies_LayoutCon
             <table class="w-full text-sm">
               <thead>
                 <tr class="border-b border-slate-200 dark:border-slate-700">
-                  <th class="text-left py-4 px-6 font-semibold text-slate-900 dark:text-white">Name</th>
-                  <th class="text-left py-4 px-6 font-semibold text-slate-900 dark:text-white">Launch</th>
-                  <th class="text-left py-4 px-6 font-semibold text-slate-900 dark:text-white">Code</th>
-                  <th class="text-left py-4 px-6 font-semibold text-slate-900 dark:text-white">Branch</th>
-                  <th class="text-left py-4 px-6 font-semibold text-slate-900 dark:text-white">Target Role</th>
-                  <th class="text-left py-4 px-6 font-semibold text-slate-900 dark:text-white">Resolution</th>
-                  <th class="text-left py-4 px-6 font-semibold text-slate-900 dark:text-white">Status</th>
-                  <th class="text-right py-4 px-6 font-semibold text-slate-900 dark:text-white w-20">Actions</th>
+                  <th class="text-left py-4 px-6 font-semibold text-slate-900 dark:text-white">${translate("Name")}</th>
+                  <th class="text-left py-4 px-6 font-semibold text-slate-900 dark:text-white">${translate("Launch")}</th>
+                  <th class="text-left py-4 px-6 font-semibold text-slate-900 dark:text-white">${translate("Code")}</th>
+                  <th class="text-left py-4 px-6 font-semibold text-slate-900 dark:text-white">${translate("Branch")}</th>
+                  <th class="text-left py-4 px-6 font-semibold text-slate-900 dark:text-white">${translate("Target Role")}</th>
+                  <th class="text-left py-4 px-6 font-semibold text-slate-900 dark:text-white">${translate("Resolution")}</th>
+                  <th class="text-left py-4 px-6 font-semibold text-slate-900 dark:text-white">${translate("Status")}</th>
+                  <th class="text-right py-4 px-6 font-semibold text-slate-900 dark:text-white w-20">${translate("Actions")}</th>
                 </tr>
               </thead>
               <tbody data-${this.identifier}-target="pagesList">
                 ${this.pages.length === 0
-                  ? `<tr><td colspan="8" class="py-8 text-center text-slate-400">No pages found.</td></tr>`
+                  ? `<tr><td colspan="8" class="py-8 text-center text-slate-400">${translate("No pages found.")}</td></tr>`
                   : this.pages.map(p => `
                     <tr class="border-b border-slate-100 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800/50">
                       <td class="py-4 px-6">
                         <a href="${Helpers.company_page_path(currentCompany().id, p.id)}"
                           class="font-medium text-slate-900 dark:text-white hover:text-blue-600 dark:hover:text-blue-400 transition-colors cursor-pointer">
-                          ${p.name || "Unnamed Page"}
+                          ${p.name || translate("Unnamed Page")}
                         </a>
                       </td>
                       <td class="py-4 px-6 whitespace-nowrap">
                         <a href="${Helpers.retail_cashier_company_page_path(currentCompany().id, p.id)}"
                           class="inline-flex items-center justify-center p-2 text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50 dark:hover:bg-slate-800 rounded-lg cursor-pointer"
-                          title="Launch Cashier">
+                          title="${translate("Launch Cashier")}">
                           <span class="material-symbols-outlined text-[20px]">open_in_new</span>
                         </a>
                       </td>

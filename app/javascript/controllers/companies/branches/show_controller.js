@@ -32,7 +32,7 @@ export default class Companies_Branches_ShowController extends Companies_LayoutC
     } catch (error) {
       poll(() => {
         if (this.hasContentTarget) {
-          this.contentTarget.innerHTML = `<div class="p-8 text-center text-red-600">Failed to load branch.</div>`
+          this.contentTarget.innerHTML = `<div class="p-8 text-center text-red-600">${translate("Failed to load branch.")}</div>`
           return true
         }
         return false
@@ -48,7 +48,7 @@ export default class Companies_Branches_ShowController extends Companies_LayoutC
     if (value === null || value === undefined) return '<span class="text-slate-300 dark:text-slate-700">—</span>'
     switch (type) {
       case 'boolean':
-        return `<span class="inline-flex items-center px-2 py-0.5 text-xs font-medium rounded-md ${value ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400' : 'bg-slate-50 text-slate-700 dark:bg-slate-800 dark:text-slate-400'}">${value ? 'Yes' : 'No'}</span>`
+        return `<span class="inline-flex items-center px-2 py-0.5 text-xs font-medium rounded-md ${value ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400' : 'bg-slate-50 text-slate-700 dark:bg-slate-800 dark:text-slate-400'}">${value ? translate("Yes") : translate("No")}</span>`
       case 'integer':
         return `<span class="font-mono text-slate-900 dark:text-slate-100">${Number(value).toLocaleString()}</span>`
       case 'decimal':
@@ -64,7 +64,7 @@ export default class Companies_Branches_ShowController extends Companies_LayoutC
 
   showHTML() {
     const b = this.branch
-    if (!b) return '<div class="p-8 text-center">Branch not found.</div>'
+    if (!b) return `<div class="p-8 text-center">${translate("Branch not found.")}</div>`
 
     const companyId = window.location.pathname.split("/")[2]
     const category = currentCategories().find(c => c.id === b.category_id)
@@ -76,7 +76,7 @@ export default class Companies_Branches_ShowController extends Companies_LayoutC
           <span class="material-symbols-outlined">location_on</span>
         </div>
         <div>
-          <p class="text-xs font-medium text-slate-500 dark:text-gray-400">Address</p>
+          <p class="text-xs font-medium text-slate-500 dark:text-gray-400">${translate("Address")}</p>
           <p class="text-sm font-semibold text-slate-900 dark:text-white">${address.line_1}${address.line_2 ? ', ' + address.line_2 : ''}, ${address.city}${address.state_or_province ? ', ' + address.state_or_province : ''}</p>
         </div>
       </div>
@@ -84,7 +84,7 @@ export default class Companies_Branches_ShowController extends Companies_LayoutC
 
     const dynamicFields = this.propertyMetadata.length > 0 ? `
       <div class="border-t border-slate-200 dark:border-gray-800 pt-6 mt-6">
-        <h3 class="text-sm font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-4">Properties</h3>
+        <h3 class="text-sm font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-4">${translate("Properties")}</h3>
         <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
           ${this.propertyMetadata.map(field => `
             <div class="flex items-center gap-3">
@@ -106,7 +106,7 @@ export default class Companies_Branches_ShowController extends Companies_LayoutC
         <div class="p-6 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800">
           <a href="${Helpers.company_branches_path(companyId)}" class="inline-flex items-center gap-1 text-sm text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 mb-6">
             <span class="material-symbols-outlined text-[18px]">arrow_back</span>
-            Back to Branches
+            ${translate("Back to Branches")}
           </a>
 
           <div class="flex flex-col items-center gap-4 sm:flex-row sm:items-start mb-6">
@@ -117,7 +117,7 @@ export default class Companies_Branches_ShowController extends Companies_LayoutC
               <h2 class="text-2xl font-black text-slate-900 dark:text-white">${b.name}</h2>
               <p class="font-semibold text-blue-600 dark:text-blue-400">${b.description || ''}</p>
               <div class="mt-4 flex flex-wrap justify-center gap-2 sm:justify-start">
-                <span class="inline-flex items-center rounded-lg bg-blue-100 dark:bg-blue-900/40 px-3 py-1 text-xs font-bold text-blue-700 dark:text-blue-300 uppercase">${b.code || 'N/A'}</span>
+                <span class="inline-flex items-center rounded-lg bg-blue-100 dark:bg-blue-900/40 px-3 py-1 text-xs font-bold text-blue-700 dark:text-blue-300 uppercase">${b.code || translate("N/A")}</span>
               </div>
             </div>
           </div>
@@ -128,8 +128,8 @@ export default class Companies_Branches_ShowController extends Companies_LayoutC
                 <span class="material-symbols-outlined">category</span>
               </div>
               <div>
-                <p class="text-xs font-medium text-slate-500 dark:text-gray-400">Type</p>
-                <p class="text-sm font-semibold text-slate-900 dark:text-white">${Helpers.capitalize(b.business_type?.replace('_', ' ') || 'storefront')}</p>
+                <p class="text-xs font-medium text-slate-500 dark:text-gray-400">${translate("Type")}</p>
+                <p class="text-sm font-semibold text-slate-900 dark:text-white">${Helpers.capitalize(b.business_type?.replace('_', ' ') || translate("storefront"))}</p>
               </div>
             </div>
 
@@ -138,7 +138,7 @@ export default class Companies_Branches_ShowController extends Companies_LayoutC
                 <span class="material-symbols-outlined">toggle_on</span>
               </div>
               <div>
-                <p class="text-xs font-medium text-slate-500 dark:text-gray-400">Status</p>
+                <p class="text-xs font-medium text-slate-500 dark:text-gray-400">${translate("Status")}</p>
                 <p class="text-sm font-semibold">${Helpers.statusBadge(b.workflow_status)}</p>
               </div>
             </div>
@@ -148,8 +148,8 @@ export default class Companies_Branches_ShowController extends Companies_LayoutC
                 <span class="material-symbols-outlined">folder</span>
               </div>
               <div>
-                <p class="text-xs font-medium text-slate-500 dark:text-gray-400">Category</p>
-                <p class="text-sm font-semibold text-slate-900 dark:text-white">${category?.name || b.category?.name || 'N/A'}</p>
+                <p class="text-xs font-medium text-slate-500 dark:text-gray-400">${translate("Category")}</p>
+                <p class="text-sm font-semibold text-slate-900 dark:text-white">${category?.name || b.category?.name || translate("N/A")}</p>
               </div>
             </div>
 
@@ -158,8 +158,8 @@ export default class Companies_Branches_ShowController extends Companies_LayoutC
                 <span class="material-symbols-outlined">phone</span>
               </div>
               <div>
-                <p class="text-xs font-medium text-slate-500 dark:text-gray-400">Phone</p>
-                <p class="text-sm font-semibold text-slate-900 dark:text-white">${b.phone_number || 'N/A'}</p>
+                <p class="text-xs font-medium text-slate-500 dark:text-gray-400">${translate("Phone")}</p>
+                <p class="text-sm font-semibold text-slate-900 dark:text-white">${b.phone_number || translate("N/A")}</p>
               </div>
             </div>
 
@@ -168,8 +168,8 @@ export default class Companies_Branches_ShowController extends Companies_LayoutC
                 <span class="material-symbols-outlined">mail</span>
               </div>
               <div>
-                <p class="text-xs font-medium text-slate-500 dark:text-gray-400">Email</p>
-                <p class="text-sm font-semibold text-slate-900 dark:text-white">${b.email || 'N/A'}</p>
+                <p class="text-xs font-medium text-slate-500 dark:text-gray-400">${translate("Email")}</p>
+                <p class="text-sm font-semibold text-slate-900 dark:text-white">${b.email || translate("N/A")}</p>
               </div>
             </div>
 
@@ -181,7 +181,7 @@ export default class Companies_Branches_ShowController extends Companies_LayoutC
           <div class="mt-8 flex justify-end gap-3 pt-6 border-t border-slate-200 dark:border-gray-800">
             <a href="${Helpers.edit_company_branch_path(companyId, b.id)}"
               class="inline-flex items-center px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium text-sm transition-colors cursor-pointer">
-              Edit Branch
+              ${translate("Edit Branch")}
             </a>
           </div>
         </div>

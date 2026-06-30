@@ -86,7 +86,7 @@ export default class Companies_Employees_NewController extends Companies_LayoutC
 
     return `
       <div class="border-t border-slate-200 dark:border-slate-700 pt-6">
-        <h3 class="text-sm font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-4">Properties</h3>
+        <h3 class="text-sm font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-4">${translate("Properties")}</h3>
         <div class="grid grid-cols-2 gap-4">
           ${this.propertyMetadata.map(f => this.renderField(f)).join('')}
         </div>
@@ -110,20 +110,20 @@ export default class Companies_Employees_NewController extends Companies_LayoutC
     const categoryFilter = this.employeesCategories()
     const branchFilter = currentBranches()
     const typeOptions = (Enums()?.employee?.business_types || [
-      { name: "Full Time", value: "full_time" },
-      { name: "Part Time", value: "part_time" },
-      { name: "Contractor", value: "contractor" },
-      { name: "Intern", value: "intern" }
+      { name: translate("Full Time"), value: "full_time" },
+      { name: translate("Part Time"), value: "part_time" },
+      { name: translate("Contractor"), value: "contractor" },
+      { name: translate("Intern"), value: "intern" }
     ]).filter(t => t.value !== 'owner').map(t =>
       `<option value="${t.value}">${t.name}</option>`
     ).join('')
 
     const fields = `
       <div class="space-y-6">
-        <h2 class="text-xl font-bold text-slate-900 dark:text-white">New Employee</h2>
+        <h2 class="text-xl font-bold text-slate-900 dark:text-white">${translate("New Employee")}</h2>
 
         <div class="space-y-1">
-          <label class="text-[10px] font-bold text-slate-400 dark:text-slate-300 uppercase tracking-wider">Category</label>
+          <label class="text-[10px] font-bold text-slate-400 dark:text-slate-300 uppercase tracking-wider">${translate("Category")}</label>
           <select
             name="employee[category_id]"
             data-action="change->${this.identifier}#onCategoryChange"
@@ -135,13 +135,13 @@ export default class Companies_Employees_NewController extends Companies_LayoutC
 
         <div class="grid grid-cols-2 gap-4">
           <div class="col-span-2 space-y-1">
-            <label class="text-[10px] font-bold text-slate-400 dark:text-slate-300 uppercase tracking-wider">Full Name</label>
-            <input type="text" name="employee[name]" required placeholder="e.g. John Doe"
+            <label class="text-[10px] font-bold text-slate-400 dark:text-slate-300 uppercase tracking-wider">${translate("Full Name")}</label>
+            <input type="text" name="employee[name]" required placeholder="${translate("e.g. John Doe")}"
               class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-sm text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none placeholder:text-slate-400 dark:placeholder:text-slate-500">
           </div>
 
           <div class="space-y-1">
-            <label class="text-[10px] font-bold text-slate-400 dark:text-slate-300 uppercase tracking-wider">Employment Type</label>
+            <label class="text-[10px] font-bold text-slate-400 dark:text-slate-300 uppercase tracking-wider">${translate("Employment Type")}</label>
             <select name="employee[business_type]"
               class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-sm text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none">
               ${typeOptions}
@@ -149,16 +149,16 @@ export default class Companies_Employees_NewController extends Companies_LayoutC
           </div>
 
           <div class="space-y-1">
-            <label class="text-[10px] font-bold text-slate-400 dark:text-slate-300 uppercase tracking-wider">Branch</label>
+            <label class="text-[10px] font-bold text-slate-400 dark:text-slate-300 uppercase tracking-wider">${translate("Branch")}</label>
             <select name="employee[branch_id]"
               class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-sm text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none">
-              <option value="">Select Branch</option>
+              <option value="">${translate("Select Branch")}</option>
               ${branchFilter.map(b => `<option value="${b.id}">${b.name}</option>`).join('')}
             </select>
           </div>
 
           <div class="col-span-2 space-y-1">
-            <label class="text-[10px] font-bold text-slate-400 dark:text-slate-300 uppercase tracking-wider">Description</label>
+            <label class="text-[10px] font-bold text-slate-400 dark:text-slate-300 uppercase tracking-wider">${translate("Description")}</label>
             <textarea name="employee[description]" rows="3"
               class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-sm text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none placeholder:text-slate-400 dark:placeholder:text-slate-500"></textarea>
           </div>
@@ -171,7 +171,7 @@ export default class Companies_Employees_NewController extends Companies_LayoutC
         <div class="flex justify-end pt-6 border-t border-slate-200 dark:border-slate-700">
           <button type="submit"
             class="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-bold text-sm transition-colors cursor-pointer">
-            Save Employee
+            ${translate("Save Employee")}
           </button>
         </div>
       </div>

@@ -26,7 +26,7 @@ export default class Companies_Orders_IndexController extends Companies_LayoutCo
       this.orders = response.orders || []
       this.pagination = response.pagination || {}
     } catch (error) {
-      toast({ type: "error", message: "Failed to load orders" })
+      toast({ type: "error", message: translate("Failed to load orders") })
     }
 
     poll(() => {
@@ -57,9 +57,9 @@ export default class Companies_Orders_IndexController extends Companies_LayoutCo
     }, {})
 
     const fallbackColumns = [
-      { key: "name", label: "Order Name" },
-      { key: "code", label: "Order Code" },
-      { key: "workflow_status", label: "Status" }
+      { key: "name", label: translate("Order Name") },
+      { key: "code", label: translate("Order Code") },
+      { key: "workflow_status", label: translate("Status") }
     ]
 
     const rawColumns = this.currentTableConfig()?.columns_metadata || fallbackColumns
@@ -67,7 +67,7 @@ export default class Companies_Orders_IndexController extends Companies_LayoutCo
 
     if (!visibleColumns.some(c => c.key === "category")) {
       const nameIdx = visibleColumns.findIndex(c => c.key === "name")
-      if (nameIdx >= 0) visibleColumns.splice(nameIdx + 1, 0, { key: "category", label: "Category" })
+      if (nameIdx >= 0) visibleColumns.splice(nameIdx + 1, 0, { key: "category", label: translate("Category") })
     }
 
     return `
@@ -78,7 +78,7 @@ export default class Companies_Orders_IndexController extends Companies_LayoutCo
             <form method="get" action="${pathname()}" class="flex flex-col lg:flex-row items-end justify-between gap-4 w-full">
               <div class="flex flex-wrap items-center gap-3 w-full lg:w-auto">
                 <div class="flex flex-col gap-1">
-                  <label class="text-[10px] font-bold text-slate-400 uppercase ml-1">Category</label>
+                  <label class="text-[10px] font-bold text-slate-400 uppercase ml-1">${translate("Category")}</label>
                   <select
                     name="category_id"
                     class="pl-3 pr-10 py-2 text-sm border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300"
@@ -90,7 +90,7 @@ export default class Companies_Orders_IndexController extends Companies_LayoutCo
                 <div class="flex gap-2 mt-auto">
                   <button type="submit" class="h-[38px] px-6 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium text-sm flex items-center gap-2">
                     <span class="material-symbols-outlined text-[18px]">search</span>
-                    Search
+                    ${translate("Search")}
                   </button>
                 </div>
               </div>
@@ -98,7 +98,7 @@ export default class Companies_Orders_IndexController extends Companies_LayoutCo
               <a href="${Helpers.new_company_order_path(currentCompany().id)}"
                 class="flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium text-sm whitespace-nowrap cursor-pointer">
                 <span class="material-symbols-outlined text-[20px]">add</span>
-                Add
+                ${translate("Add")}
               </a>
             </form>
           </div>
@@ -118,7 +118,7 @@ export default class Companies_Orders_IndexController extends Companies_LayoutCo
                     </div>
                     <a href="${Helpers.company_order_path(currentCompany().id, record.id)}"
                       class="font-medium text-slate-900 dark:text-white overflow-visible whitespace-normal hover:text-blue-600 dark:hover:text-blue-400 transition-colors cursor-pointer">
-                      ${value || 'Unnamed Order'}
+                      ${value || translate("Unnamed Order")}
                     </a>
                   </div>
                 `,

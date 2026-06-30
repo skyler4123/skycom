@@ -32,8 +32,8 @@ export default class Companies_Permissions_IndexController extends Companies_Lay
       <div class="p-8 overflow-y-auto">
         <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 flex flex-col">
           <div class="p-6 border-b border-slate-200 dark:border-slate-800">
-            <h2 class="text-xl font-semibold text-slate-900 dark:text-white">Permissions</h2>
-            <p class="text-sm text-slate-500 mt-1">Manage role-based permissions by toggling policies</p>
+            <h2 class="text-xl font-semibold text-slate-900 dark:text-white">${translate("Permissions")}</h2>
+            <p class="text-sm text-slate-500 mt-1">${translate("Manage role-based permissions by toggling policies")}</p>
           </div>
 
           <div class="divide-y divide-slate-200 dark:divide-slate-800">
@@ -58,10 +58,10 @@ export default class Companies_Permissions_IndexController extends Companies_Lay
         <div class="px-6 py-4 bg-slate-50 dark:bg-slate-800/50 flex items-center justify-between">
           <div>
             <h3 class="text-lg font-semibold text-slate-900 dark:text-white">${role.name}</h3>
-            <p class="text-sm text-slate-500">${role.description || 'No description'}</p>
+            <p class="text-sm text-slate-500">${role.description || translate('No description')}</p>
           </div>
           <div class="text-sm text-slate-500">
-            ${role.policies.filter(p => p.policy_appointment?.workflow_status === 'active').length} / ${role.policies.length} active
+            ${role.policies.filter(p => p.policy_appointment?.workflow_status === 'active').length} / ${role.policies.length} ${translate("active")}
           </div>
         </div>
         <div class="p-6 space-y-4">
@@ -77,7 +77,7 @@ export default class Companies_Permissions_IndexController extends Companies_Lay
             class="flex items-center gap-2 px-4 py-2 text-sm font-medium text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition-colors"
           >
             <span class="material-symbols-outlined text-[18px]">add</span>
-            Add Resource
+            ${translate("Add Resource")}
           </button>
         </div>
       </div>
@@ -86,7 +86,7 @@ export default class Companies_Permissions_IndexController extends Companies_Lay
 
   groupPoliciesByResource(policies) {
     return policies.reduce((groups, policy) => {
-      const resource = policy.resource || 'Unknown'
+      const resource = policy.resource || translate('Unknown')
       if (!groups[resource]) {
         groups[resource] = []
       }
@@ -107,7 +107,7 @@ export default class Companies_Permissions_IndexController extends Companies_Lay
               <span class="material-symbols-outlined text-lg text-slate-500 group-open:rotate-90 transition-transform">chevron_right</span>
               <span class="text-sm font-semibold text-slate-900 dark:text-white">${resourceName}</span>
             </div>
-            <span class="text-xs text-slate-500">${activeCount} / ${totalCount} active</span>
+            <span class="text-xs text-slate-500">${activeCount} / ${totalCount} ${translate("active")}</span>
           </summary>
           <div class="p-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
             ${policies.map(policy => this.policyBadgeHTML(policy)).join('')}
@@ -169,8 +169,8 @@ export default class Companies_Permissions_IndexController extends Companies_Lay
         <div class="w-16 h-16 mx-auto mb-4 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center">
           <span class="material-symbols-outlined text-2xl text-slate-400">shield</span>
         </div>
-        <h3 class="text-lg font-medium text-slate-900 dark:text-white mb-2">No Roles Found</h3>
-        <p class="text-sm text-slate-500">Create roles first to manage permissions</p>
+        <h3 class="text-lg font-medium text-slate-900 dark:text-white mb-2">${translate("No Roles Found")}</h3>
+        <p class="text-sm text-slate-500">${translate("Create roles first to manage permissions")}</p>
       </div>
     `
   }

@@ -33,7 +33,7 @@ export default class Companies_Orders_EditController extends Companies_LayoutCon
     } catch (error) {
       poll(() => {
         if (this.hasContentTarget) {
-          this.contentTarget.innerHTML = '<div class="p-8 text-center text-red-600">Failed to load order.</div>'
+          this.contentTarget.innerHTML = `<div class="p-8 text-center text-red-600">${translate("Failed to load order.")}</div>`
           return true
         }
         return false
@@ -43,7 +43,7 @@ export default class Companies_Orders_EditController extends Companies_LayoutCon
 
   contentHTML() {
     const o = this.order
-    if (!o) return '<div class="p-8 text-center">Order not found.</div>'
+    if (!o) return `<div class="p-8 text-center">${translate("Order not found.")}</div>`
 
     const companyId = window.location.pathname.split("/")[2]
     const businessTypes = Enums()?.order?.business_types || []
@@ -52,7 +52,7 @@ export default class Companies_Orders_EditController extends Companies_LayoutCon
 
     const dynamicFields = this.propertyMetadata.length > 0 ? `
       <div class="border-t border-slate-200 dark:border-gray-800 pt-6 mt-6">
-        <h3 class="text-sm font-bold text-slate-500 dark:text-slate-400 uppercase mb-4">Properties</h3>
+        <h3 class="text-sm font-bold text-slate-500 dark:text-slate-400 uppercase mb-4">${translate("Properties")}</h3>
         <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
           ${this.propertyMetadata.map(field => {
             const value = o[field.key]
@@ -97,24 +97,24 @@ export default class Companies_Orders_EditController extends Companies_LayoutCon
 
     const fields = `
       <div class="space-y-6">
-        <h2 class="text-xl font-bold text-slate-900 dark:text-white">Edit Order</h2>
+        <h2 class="text-xl font-bold text-slate-900 dark:text-white">${translate("Edit Order")}</h2>
         <p class="text-sm text-slate-500">${o.name}</p>
 
         <div class="grid grid-cols-2 gap-4">
           <div class="col-span-2 space-y-1">
-            <label class="text-xs font-medium text-slate-500">Name</label>
+            <label class="text-xs font-medium text-slate-500">${translate("Name")}</label>
             <input type="text" name="order[name]" value="${o.name || ''}" required
               class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-sm">
           </div>
 
           <div class="col-span-2 space-y-1">
-            <label class="text-xs font-medium text-slate-500">Description</label>
+            <label class="text-xs font-medium text-slate-500">${translate("Description")}</label>
             <textarea name="order[description]" rows="2"
               class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-sm">${o.description || ''}</textarea>
           </div>
 
           <div class="space-y-1">
-            <label class="text-xs font-medium text-slate-500">Type</label>
+            <label class="text-xs font-medium text-slate-500">${translate("Type")}</label>
             <select name="order[business_type]"
               class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-sm">
               ${selectOptionsHTML(businessTypes, o.business_type)}
@@ -122,7 +122,7 @@ export default class Companies_Orders_EditController extends Companies_LayoutCon
           </div>
 
           <div class="space-y-1">
-            <label class="text-xs font-medium text-slate-500">Status</label>
+            <label class="text-xs font-medium text-slate-500">${translate("Status")}</label>
             <select name="order[workflow_status]"
               class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-sm">
               ${selectOptionsHTML(workflowStatuses, o.workflow_status)}
@@ -130,7 +130,7 @@ export default class Companies_Orders_EditController extends Companies_LayoutCon
           </div>
 
           <div class="space-y-1">
-            <label class="text-xs font-medium text-slate-500">Currency</label>
+            <label class="text-xs font-medium text-slate-500">${translate("Currency")}</label>
             <select name="order[currency_code]"
               class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-sm">
               ${selectOptionsHTML(currencyCodes, o.currency_code)}
@@ -138,13 +138,13 @@ export default class Companies_Orders_EditController extends Companies_LayoutCon
           </div>
 
           <div class="space-y-1">
-            <label class="text-xs font-medium text-slate-500">Code</label>
+            <label class="text-xs font-medium text-slate-500">${translate("Code")}</label>
             <input type="text" name="order[code]" value="${o.code || ''}"
               class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-sm">
           </div>
 
           <div class="space-y-1">
-            <label class="text-xs font-medium text-slate-500">Category</label>
+            <label class="text-xs font-medium text-slate-500">${translate("Category")}</label>
             <input type="text" value="${currentCategories().find(c => c.id === o.category_id)?.name || ''}" disabled
               class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-sm text-slate-400">
             <input type="hidden" name="order[category_id]" value="${o.category_id}">
@@ -156,11 +156,11 @@ export default class Companies_Orders_EditController extends Companies_LayoutCon
         <div class="flex justify-end gap-3 pt-2">
           <a href="${Helpers.company_order_path(companyId, o.id)}"
             class="px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-100 rounded-lg cursor-pointer">
-            Cancel
+            ${translate("Cancel")}
           </a>
           <button type="submit"
             class="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-bold text-sm cursor-pointer">
-            Save Changes
+            ${translate("Save Changes")}
           </button>
         </div>
       </div>

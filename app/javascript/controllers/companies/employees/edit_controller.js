@@ -32,7 +32,7 @@ export default class Companies_Employees_EditController extends Companies_Layout
     } catch (error) {
       poll(() => {
         if (this.hasContentTarget) {
-          this.contentTarget.innerHTML = '<div class="p-8 text-center text-red-600">Failed to load employee.</div>'
+          this.contentTarget.innerHTML = `<div class="p-8 text-center text-red-600">${translate("Failed to load employee.")}</div>`
           return true
         }
         return false
@@ -94,7 +94,7 @@ export default class Companies_Employees_EditController extends Companies_Layout
 
     return `
       <div class="border-t border-slate-200 dark:border-slate-700 pt-6 mt-6">
-        <h3 class="text-sm font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-4">Properties</h3>
+        <h3 class="text-sm font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-4">${translate("Properties")}</h3>
         <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
           ${this.propertyMetadata.map(f => this.renderField({ ...f, value: this.employee?.[f.key] })).join('')}
         </div>
@@ -104,47 +104,47 @@ export default class Companies_Employees_EditController extends Companies_Layout
 
   contentHTML() {
     const e = this.employee
-    if (!e) return '<div class="p-8 text-center">Employee not found.</div>'
+    if (!e) return `<div class="p-8 text-center">${translate("Employee not found.")}</div>`
 
     const companyId = window.location.pathname.split("/")[2]
     const branchFilter = currentBranches()
     const typeOptions = (Enums()?.employee?.business_types || [
-      { name: "Full Time", value: "full_time" },
-      { name: "Part Time", value: "part_time" },
-      { name: "Contractor", value: "contractor" },
-      { name: "Intern", value: "intern" }
+      { name: translate("Full Time"), value: "full_time" },
+      { name: translate("Part Time"), value: "part_time" },
+      { name: translate("Contractor"), value: "contractor" },
+      { name: translate("Intern"), value: "intern" }
     ]).filter(t => t.value !== 'owner').map(t =>
       `<option value="${t.value}" ${t.value === e.business_type ? 'selected' : ''}>${t.name}</option>`
     ).join('')
     const workflowOptions = (Enums()?.employee?.workflow_statuses || [
-      { name: "Draft", value: "draft" },
-      { name: "Pending", value: "pending" },
-      { name: "Active", value: "active" },
-      { name: "Inactive", value: "inactive" }
+      { name: translate("Draft"), value: "draft" },
+      { name: translate("Pending"), value: "pending" },
+      { name: translate("Active"), value: "active" },
+      { name: translate("Inactive"), value: "inactive" }
     ]).map(t =>
       `<option value="${t.value}" ${t.value === e.workflow_status ? 'selected' : ''}>${t.name}</option>`
     ).join('')
 
     const fields = `
       <div class="space-y-6">
-        <h2 class="text-xl font-bold text-slate-900 dark:text-white">Edit Employee</h2>
+        <h2 class="text-xl font-bold text-slate-900 dark:text-white">${translate("Edit Employee")}</h2>
         <p class="text-sm text-slate-500 dark:text-slate-400">${e.name}</p>
 
         <div class="grid grid-cols-2 gap-4">
           <div class="col-span-2 space-y-1">
-            <label class="text-[10px] font-bold text-slate-400 dark:text-slate-300 uppercase tracking-wider">Full Name</label>
+            <label class="text-[10px] font-bold text-slate-400 dark:text-slate-300 uppercase tracking-wider">${translate("Full Name")}</label>
             <input type="text" name="employee[name]" value="${e.name || ''}" required
               class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-sm text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none placeholder:text-slate-400 dark:placeholder:text-slate-500">
           </div>
 
           <div class="col-span-2 space-y-1">
-            <label class="text-[10px] font-bold text-slate-400 dark:text-slate-300 uppercase tracking-wider">Description</label>
+            <label class="text-[10px] font-bold text-slate-400 dark:text-slate-300 uppercase tracking-wider">${translate("Description")}</label>
             <textarea name="employee[description]" rows="2"
               class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-sm text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none placeholder:text-slate-400 dark:placeholder:text-slate-500">${e.description || ''}</textarea>
           </div>
 
           <div class="space-y-1">
-            <label class="text-[10px] font-bold text-slate-400 dark:text-slate-300 uppercase tracking-wider">Employment Type</label>
+            <label class="text-[10px] font-bold text-slate-400 dark:text-slate-300 uppercase tracking-wider">${translate("Employment Type")}</label>
             <select name="employee[business_type]"
               class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-sm text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none">
               ${typeOptions}
@@ -152,7 +152,7 @@ export default class Companies_Employees_EditController extends Companies_Layout
           </div>
 
           <div class="space-y-1">
-            <label class="text-[10px] font-bold text-slate-400 dark:text-slate-300 uppercase tracking-wider">Status</label>
+            <label class="text-[10px] font-bold text-slate-400 dark:text-slate-300 uppercase tracking-wider">${translate("Status")}</label>
             <select name="employee[workflow_status]"
               class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-sm text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none">
               ${workflowOptions}
@@ -160,16 +160,16 @@ export default class Companies_Employees_EditController extends Companies_Layout
           </div>
 
           <div class="space-y-1">
-            <label class="text-[10px] font-bold text-slate-400 dark:text-slate-300 uppercase tracking-wider">Branch</label>
+            <label class="text-[10px] font-bold text-slate-400 dark:text-slate-300 uppercase tracking-wider">${translate("Branch")}</label>
             <select name="employee[branch_id]"
               class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-sm text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none">
-              <option value="">Select Branch</option>
+              <option value="">${translate("Select Branch")}</option>
               ${branchFilter.map(b => `<option value="${b.id}" ${b.id === e.branch_id ? 'selected' : ''}>${b.name}</option>`).join('')}
             </select>
           </div>
 
           <div class="space-y-1">
-            <label class="text-[10px] font-bold text-slate-400 dark:text-slate-300 uppercase tracking-wider">Category</label>
+            <label class="text-[10px] font-bold text-slate-400 dark:text-slate-300 uppercase tracking-wider">${translate("Category")}</label>
             <input type="text" value="${(currentCategories().find(c => c.id === e.category_id) || {}).name || ''}" disabled
               class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-slate-50 dark:bg-slate-800/40 text-sm text-slate-500 dark:text-slate-400">
             <input type="hidden" name="employee[category_id]" value="${e.category_id}">
@@ -181,11 +181,11 @@ export default class Companies_Employees_EditController extends Companies_Layout
         <div class="flex justify-end gap-3 pt-2">
           <a href="${Helpers.company_employee_path(companyId, e.id)}"
             class="px-4 py-2 text-sm font-medium text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors cursor-pointer">
-            Cancel
+            ${translate("Cancel")}
           </a>
           <button type="submit"
             class="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-bold text-sm transition-colors cursor-pointer">
-            Save Changes
+            ${translate("Save Changes")}
           </button>
         </div>
       </div>
