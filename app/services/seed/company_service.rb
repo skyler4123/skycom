@@ -4,7 +4,7 @@ class Seed::CompanyService
     email: "company_#{SecureRandom.hex}@gmail.com",
     name: Faker::Name.name,
     description: Faker::Company.catch_phrase,
-    lifecycle_status: Company.lifecycle_statuses.keys.sample,
+    lifecycle_status: :active,
     workflow_status: Company.workflow_statuses.keys.sample,
     ownership_type: Company.ownership_types.keys.sample,
     business_type: Company.business_types.keys.sample,

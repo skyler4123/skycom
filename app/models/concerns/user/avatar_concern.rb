@@ -3,22 +3,21 @@ module User::AvatarConcern
 
   included do
     has_one_attached :avatar_attachment, dependent: :purge_later do |attachable|
-      attachable.variant :thumb, resize_to_limit: [ 50, 50 ]
-      attachable.variant :medium, resize_to_limit: [ 150, 150 ]
-      attachable.variant :profile, resize_to_limit: [ 300, 300 ]
-      attachable.variant :full, resize_to_limit: [ 800, 800 ]
+      attachable.variant :thumb, resize_to_limit: AVATAR_THUMB_DIMENSIONS
+      attachable.variant :medium, resize_to_limit: AVATAR_MEDIUM_DIMENSIONS
+      attachable.variant :profile, resize_to_limit: AVATAR_PROFILE_DIMENSIONS
+      attachable.variant :full, resize_to_limit: AVATAR_FULL_DIMENSIONS
     end
 
     validate :acceptable_avatar_attachment
 
     def acceptable_avatar_attachment
       return unless avatar_attachment.attached?
-      unless avatar_attachment.blob.byte_size <= 500.kilobytes
-        errors.add(:avatar_attachment, "is too big (500KB)")
+      unless avatar_attachment.blob.byte_size <= MAX_AVATAR_FILE_SIZE
+        errors.add(:avatar_attachment, "is too big (#{MAX_AVATAR_FILE_SIZE / 1.kilobyte}KB)")
       end
 
-      acceptable_types = [ "image/jpeg", "image/png" ]
-      unless acceptable_types.include?(avatar_attachment.content_type)
+      unless ACCEPTABLE_AVATAR_TYPES.include?(avatar_attachment.content_type)
         errors.add(:avatar_attachment, "must be a JPEG or PNG")
       end
     end

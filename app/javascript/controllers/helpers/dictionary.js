@@ -336,5 +336,12 @@ export const dictionary = () => {
       de: "Unternehmen Erfolgreich Erstellt!",
       vi: "Tạo Công Ty Thành Công!",
     },
+    "Billing": {
+      en: "Billing",
+      es: "Facturación",
+      fr: "Facturation",
+      de: "Abrechnung",
+      vi: "Thanh Toán",
+    },
   }
 }

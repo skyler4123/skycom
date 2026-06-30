@@ -38,7 +38,7 @@ module Employee::PermissionConcern
     # Check if employee has owner role (business_type = :owner)
     def owner_role?
       # role_appointments.any? { |ra| ra.business_type == "owner" }
-      RoleAppointment.cached_where(appoint_to: self).any? { |ra| ra.business_type == "owner" }
+      RoleAppointment.cached_where(appoint_to: self).any? { |ra| ra.business_type == OWNER_BUSINESS_TYPE }
     end
 
     # 2. The ABAC Engine
@@ -68,7 +68,7 @@ module Employee::PermissionConcern
     # Used for Permissions UI page
     def permissions
       cache_key = "#{cache_key_with_version}/permissions"
-      Rails.cache.fetch(cache_key, expires_in: 1.minutes) do
+      Rails.cache.fetch(cache_key, expires_in: PERMISSIONS_CACHE_EXPIRY) do
         load_permissions_from_db
       end
     end
@@ -109,7 +109,7 @@ module Employee::PermissionConcern
     # 5. Only active PolicyAppointments - used for can? checks
     def permissions_by_role
       cache_key = "#{cache_key_with_version}/permissions_by_role"
-      Rails.cache.fetch(cache_key, expires_in: 1.minutes) do
+      Rails.cache.fetch(cache_key, expires_in: PERMISSIONS_CACHE_EXPIRY) do
         roles.includes(:policy_appointments).each_with_object({}) do |role, hash|
           active_appointments = role.policy_appointments.active.includes(:policy)
 

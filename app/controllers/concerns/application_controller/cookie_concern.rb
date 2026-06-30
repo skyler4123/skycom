@@ -7,18 +7,18 @@ module ApplicationController::CookieConcern
     cookies.signed[:session_token] = {
       value: session.id,
       httponly: true,
-      expires: 1.day
+      expires: COOKIE_EXPIRY
     }
 
     # Standard public cookies with explicit 1-day expiration
     cookies[:is_signed_in] = {
       value: true,
-      expires: 1.day
+      expires: COOKIE_EXPIRY
     }
 
     cookies[:client_cache_version] = {
       value: cache_version(user: user),
-      expires: 1.day
+      expires: COOKIE_EXPIRY
     }
   end
 
@@ -31,7 +31,7 @@ module ApplicationController::CookieConcern
     # Refresh the version value and extend its lifetime for another day
     cookies[:client_cache_version] = {
       value: current_version,
-      expires: 1.day
+      expires: COOKIE_EXPIRY
     }
   end
 

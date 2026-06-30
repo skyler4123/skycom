@@ -5,6 +5,9 @@ class Companies::ApplicationController < ApplicationController
   # Order reason: Companies::Authorizable need current_employee
   include Companies::Authorizable
 
+  before_action :check_accessable
+  before_action :set_billing_warning
+
   private
 
   def set_company
@@ -24,5 +27,13 @@ class Companies::ApplicationController < ApplicationController
 
   def current_employee
     @current_employee
+  end
+
+  def set_billing_warning
+    return unless current_company&.has_unpaid_invoices_at?
+    return if current_company.hide_billing_alerts?
+    return if current_company.has_unpaid_invoices_at > UNPAID_WARNING_THRESHOLD.ago
+
+    flash.now[:alert] = "Your account has outstanding invoices. Please settle them to avoid suspension."
   end
 end

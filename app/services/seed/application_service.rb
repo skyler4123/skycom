@@ -32,6 +32,7 @@ class Seed::ApplicationService
       sa.currency_code = :usd
     end
     Seed::PaymentMethodService.create # Ensure global payment methods are seeded first
+    Billing::SeedResourcesService.call # Seed global billing resource catalog (19 records)
     # User
     super_admin_1 = Seed::UserService.create(email: "super_admin_1@example.com", system_role: :super_admin)
     super_admin_2 = Seed::UserService.create(email: "super_admin_2@example.com", system_role: :super_admin)
@@ -46,8 +47,11 @@ class Seed::ApplicationService
     user_3.address = Seed::AddressService.create
 
     # Create company groups
-    Seed::RetailService.new(user: user_1, email: "retail1@company1.com", name: "Grocery 1")
-    # Seed::RetailService.new(user: user_1, email: "retail1@company2.com", name: "Grocery 2")
+    Seed::RetailService.new(user: user_1, email: "retail_us@company1.com", name: "Grocery 1",
+      country_code: :us, currency_code: :usd, timezone: :minus_5)
+    Seed::RetailService.new(user: user_2, email: "retail_vn@company2.com", name: "Grocery VN",
+      country_code: :vn, currency_code: :vnd, timezone: :plus_7,
+      city: "Ho Chi Minh City", address_line_1: "123 Le Loi Street")
     # Seed::RestaurantService.new(user: user_1, email: "restaurant1@company1.com")
     # Seed::HospitalService.new(user: user_1, email: "hospital1@company1.com")
     # Seed::EducationService.new(user: user_1, email: "education1@company1.com")

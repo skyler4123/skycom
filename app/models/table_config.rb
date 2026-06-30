@@ -85,8 +85,8 @@ class TableConfig < ApplicationRecord
   #   }
   # ---------------------------------------------------------------------------
 
-  ALLOWED_ALIGNS  = %w[left center right].freeze
-  ALLOWED_PINNEDS = %w[left right].freeze
+  ALLOWED_ALIGNS  = ALLOWED_TABLE_ALIGNS
+  ALLOWED_PINNEDS = ALLOWED_TABLE_PINNEDS
 
   validate :columns_metadata_must_conform_to_schema
 

@@ -25,7 +25,7 @@ class PolicyAppointment < ApplicationRecord
   end
 
   def prevent_modification_if_owner
-    return unless business_type == "owner"
+    return unless business_type == OWNER_BUSINESS_TYPE
     raise ActiveRecord::ReadOnlyRecord, "Owner records cannot be modified."
   end
 end

@@ -17,8 +17,16 @@ class Company < ApplicationRecord
   include Company::HospitalConcern
   include Company::RestaurantConcern
   include Company::PermissionConcern
+  include Company::BillingConcern
+  include Company::CircuitBreakerConcern
 
   belongs_to :user
+
+  has_many :billing_contracts, dependent: :destroy
+  has_many :billing_invoices, dependent: :destroy
+  has_many :daily_metric_logs, dependent: :destroy
+  has_many :daily_feature_logs, dependent: :destroy
+  has_many :wallet_transactions, dependent: :destroy
 
   has_many :property_mappings, dependent: :destroy
   has_many :table_configs, dependent: :destroy
@@ -66,7 +74,11 @@ class Company < ApplicationRecord
     hotel: 4000,
     fitness: 5000
   }, prefix: true
-  enum :lifecycle_status, LIFECYCLE_STATUS, prefix: true
+  enum :lifecycle_status, {
+    active: 0,
+    suspended: 3,
+    disabled: 30
+  }, prefix: true, default: :active
   enum :workflow_status, WORKFLOW_STATUS, prefix: true
   enum :timezone, TIMEZONES, prefix: true
   enum :currency_code, CURRENCIE_CODES, prefix: true
@@ -97,7 +109,7 @@ class Company < ApplicationRecord
 
   # Validation for contact fields
   validates :email, format: { with: URI::MailTo::EMAIL_REGEXP }, allow_blank: true
-  validates :phone_number, length: { maximum: 20 }, allow_blank: true
+  validates :phone_number, length: { maximum: MAX_PHONE_NUMBER_LENGTH }, allow_blank: true
   validates :website, format: URI.regexp(%w[http https]), allow_blank: true
 
   # validates :city, presence: true
@@ -124,15 +136,15 @@ class Company < ApplicationRecord
 
     role = Seed::RoleService.create(
       company: self,
-      name: "owner",
+      name: OWNER_BUSINESS_TYPE,
       business_type: :owner
     )
 
     policy = Seed::PolicyService.create(
       company: self,
       name: "Owner All Access",
-      resource: "all",
-      action: "all",
+      resource: OWNER_POLICY_RESOURCE,
+      action: OWNER_POLICY_ACTION,
       business_type: :owner,
       lifecycle_status: :active
     )
@@ -161,6 +173,8 @@ class Company < ApplicationRecord
       workflow_status: :active,
       business_type: :owner
     )
+
+    Seed::BillingContractService.create(company: self)
   end
 
   private

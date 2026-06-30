@@ -11,6 +11,9 @@ class Employee < ApplicationRecord
   include TagConcern
   include Discard::Model
   include Cache::RecordsConcern
+  include MeteringConcern
+
+  metered_as :employees
 
   attribute :permission_resource_name, :string, default: -> { self.name }
 
@@ -60,13 +63,13 @@ class Employee < ApplicationRecord
   private
 
   def only_one_owner_per_company
-    return unless business_type.to_s == "owner" && company_id.present?
+    return unless business_type.to_s == OWNER_BUSINESS_TYPE && company_id.present?
 
     # Only one owner employee per company
     # Allow if this employee is updating their own record (same id)
-    return if persisted? && self.id == Employee.find_by(company_id: company_id, business_type: :owner)&.id
+    return if persisted? && self.id == Employee.find_by(company_id: company_id, business_type: OWNER_BUSINESS_TYPE)&.id
 
-    owner_exists = Employee.where(company_id: company_id, business_type: :owner)
+    owner_exists = Employee.where(company_id: company_id, business_type: OWNER_BUSINESS_TYPE)
       .where.not(id: self.id)
       .exists?
 
@@ -76,13 +79,13 @@ class Employee < ApplicationRecord
   end
 
   def prevent_discard_if_owner
-    return unless business_type.to_s == "owner"
+    return unless business_type.to_s == OWNER_BUSINESS_TYPE
     errors.add(:base, "Owner employee cannot be discarded.")
     throw(:abort)
   end
 
   def prevent_destroy_if_owner
-    return unless business_type.to_s == "owner"
+    return unless business_type.to_s == OWNER_BUSINESS_TYPE
     errors.add(:base, "Owner employee cannot be destroyed.")
     throw(:abort)
   end

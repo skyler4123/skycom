@@ -8,7 +8,7 @@ module Kernel
   end
 
   # Caches the result of an ActiveRecord Relation
-  def cache_query(relation, expires_in: 1.hour)
+  def cache_query(relation, expires_in: QUERY_CACHE_EXPIRY)
     # 1. Convert the Active Record relation to a raw SQL string.
     #    This handles the interpolation of values (e.g., "WHERE id = 5").
     sql = relation.to_sql

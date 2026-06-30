@@ -3,8 +3,8 @@ module Employee::ImageConcern
 
   included do
     has_many_attached :image_attachments, dependent: :purge_later do |attachable|
-      attachable.variant :full, resize_to_limit: [ 300, 300 ]
-      attachable.variant :thumb, resize_to_limit: [ 50, 50 ]
+      attachable.variant :full, resize_to_limit: IMAGE_FULL_DIMENSIONS
+      attachable.variant :thumb, resize_to_limit: IMAGE_THUMB_DIMENSIONS
     end
 
     validate :acceptable_image_attachments
@@ -12,17 +12,16 @@ module Employee::ImageConcern
     def acceptable_image_attachments
       return unless image_attachments.attached?
 
-      if image_attachments.length > 3
-        errors.add(:image_attachments, "cannot have more than 3 images")
+      if image_attachments.length > MAX_IMAGE_ATTACHMENTS
+        errors.add(:image_attachments, "cannot have more than #{MAX_IMAGE_ATTACHMENTS} images")
       end
 
       image_attachments.each do |image|
-        unless image.blob.byte_size <= 1.megabyte
-          errors.add(:image_attachments, "contains a file that is too big (max 1MB)")
+        unless image.blob.byte_size <= MAX_IMAGE_FILE_SIZE
+          errors.add(:image_attachments, "contains a file that is too big (max #{MAX_IMAGE_FILE_SIZE / 1.megabyte}MB)")
         end
 
-        acceptable_types = [ "image/jpeg", "image/png", "image/gif" ]
-        unless acceptable_types.include?(image.content_type)
+        unless ACCEPTABLE_IMAGE_TYPES.include?(image.content_type)
           errors.add(:image_attachments, "must be JPEG, PNG, or GIF")
         end
       end
