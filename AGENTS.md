@@ -11,7 +11,7 @@
 - **Constants** — All app-wide constants must be in `config/initializers/constants.rb`, never hardcoded inline. See `docs/CONSTANTS.md`.
 
 ## Architecture
-- **Type**: Rails 7+ multi-tenant platform with Hybrid SPA (Stimulus + Tailwind)
+- **Type**: Rails 8+ multi-tenant platform with Hybrid SPA (Stimulus + Tailwind)
 - **Data Flow**: JSON API, avoid server-side HTML partials
 - **Frontend**: Importmap (no node_modules), ES6 template literals in `contentHTML()`
 

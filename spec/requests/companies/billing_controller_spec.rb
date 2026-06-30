@@ -125,7 +125,7 @@ RSpec.describe "Companies::BillingController", type: :request do
       end
 
       it "returns reactivated status" do
-        company.update_columns(lifecycle_status: Company.lifecycle_statuses[:past_due], suspension_at: 1.day.ago)
+        company.update_columns(lifecycle_status: Company.lifecycle_statuses[:suspended], suspension_at: 1.day.ago)
         post "/companies/#{company.id}/billing/pay_all", as: :json
         body = JSON.parse(response.body)
         expect(body["reactivated"]).to be_truthy
@@ -156,7 +156,7 @@ RSpec.describe "Companies::BillingController", type: :request do
       end
 
       it "does not mark company as reactivated" do
-        company.update_columns(lifecycle_status: Company.lifecycle_statuses[:past_due], suspension_at: 1.day.ago)
+        company.update_columns(lifecycle_status: Company.lifecycle_statuses[:suspended], suspension_at: 1.day.ago)
         post "/companies/#{company.id}/billing/pay_all", as: :json
         body = JSON.parse(response.body)
         expect(body["reactivated"]).to be_falsey

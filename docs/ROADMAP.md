@@ -136,20 +136,31 @@ Every Company's `lifecycle_status` + `suspension_at` control operational state:
 | Status | Behavior | Trigger |
 |--------|----------|---------|
 | `active` | Full operations — all features work normally | Default; reached via `try_reactivate!` when all invoices paid |
-| `past_due` | Has unpaid invoices; access still allowed unless `suspension_at` has passed | `mark_past_due!` when unpaid invoices exist |
+| `suspended` | Blocked — `is_accessible?` returns false, redirected to billing page | SyncSuspensionJob sets this when `suspension_at` deadline has passed |
 | `disabled` | Terminal — no transitions out | Company deletion request |
 
-> **Note**: There is no `suspended` status. Access blocking is governed solely by `suspension_at` (a timestamp), not by `lifecycle_status`.
+The lifecycle flow:
+
+```
+flag_unpaid! — sets has_unpaid_invoices_at + suspension_at (end of month)
+    active ──► active (has_unpaid_invoices flag set, suspension deadline ahead)
+       │
+       │  suspension_at passes → SyncSuspensionJob
+       ▼
+    suspended  ──► is_accessible? returns false → redirects to /billing
+       ▲
+       │  try_reactivate! (all invoices paid)
+       └──────────── active (suspension_at cleared, has_unpaid_invoices cleared)
+```
 
 The `check_accessable` before_action (in `Companies::Authorizable`) checks `current_company&.is_accessible?` on every request:
-- `is_accessible?` returns `false` when `suspension_at.present? && suspension_at <= Time.current`
-- Past `suspension_at` → not accessible → redirects to `/billing`
-- Future `suspension_at` → not blocked (in runway)
-- No `suspension_at` → not blocked
+- `is_accessible?` returns `false` when `lifecycle_status_suspended?`
+- `suspended` → not accessible → redirects to `/billing`
+- `active` / `disabled` → accessible (disabled is terminal but still reachable)
 
 **UI behavior when access is blocked:**
 - Access-protected actions redirect to `/billing`
-- A persistent flash warning displays: *"Your account is past due. Top up to continue."*
+- A persistent flash warning displays: *"Your account has outstanding invoices. Please settle them to avoid suspension."*
 - Only navigation and data viewing remain functional
 - `hide_billing_alerts` (boolean on Company) suppresses the warning banner when set to `true`
 
@@ -234,7 +245,7 @@ Company
 | **Plan** | A market-aware template with default `enabled_features`, `feature_prices`, `included_allowance`, and `unit_prices` per country |
 | **Subscription** | Links a company to a plan with start/end dates |
 | **Plan change** | Creates a new BillingContract from the new plan's template — features enable/disable immediately |
-| **Expiration** | Expired subscription → company transitions to `past_due` |
+| **Expiration** | Expired subscription → `flag_unpaid!` sets billing flags; `SyncSuspensionJob` suspends if unpaid |
 
 New companies start with a **Free plan** BillingContract at signup.
 
@@ -588,7 +599,7 @@ The prorated amount is recorded at enable time and included in the next billing 
 ### Auto-Suspend & Recovery
 
 When billing runs and the wallet is insufficient to cover the charge:
-1. **Invoice created as overdue**: `mark_past_due!` sets `suspension_at` to the end of the current month (runway)
+1. **Invoice created as overdue**: `flag_unpaid!` sets `suspension_at` to the end of the current month (runway)
 2. **QR fallback**: A QR code is generated for bank transfer — sent to the owner's email and displayed in-app
 3. **If paid before `suspension_at`** → company remains active; overpayment credits go to `main_balance`
 4. **If `suspension_at` passes unpaid** → `is_accessible?` returns false → `check_accessable` redirects all access-protected actions to `/billing`
@@ -636,7 +647,7 @@ When a company needs to add funds:
 4. Owner transfers the amount
 5. Owner contacts support to confirm
 6. Support credits `main_balance`
-7. If company was `past_due`, auto-reactivates to `active` via `try_reactivate!`
+7. If company was `suspended`, auto-reactivates to `active` via `try_reactivate!`
 
 ### Feature Add-on Flow
 

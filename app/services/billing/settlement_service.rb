@@ -12,7 +12,7 @@
 # Deduction algorithm:
 #   1. Deduct from promo_balance (promotional credits expire first)
 #   2. Deduct remainder from main_balance (customer's real money)
-#   3. If still remaining → mark_past_due! + invoice marked :overdue
+#   3. If still remaining → flag_unpaid! + invoice marked :overdue
 #
 # Every balance change is recorded as a WalletTransaction with before/after snapshots.
 #

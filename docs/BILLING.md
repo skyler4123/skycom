@@ -347,11 +347,11 @@ When `remaining_cents > 0`, the frontend displays QR/bank transfer instructions 
 
 **Column**: `companies.hide_billing_alerts` (boolean, default `false`, null `false`)
 
-When `true`, suppresses the past_due warning flash message displayed by `ApplicationController#set_billing_warning`.
+When `true`, suppresses the unpaid-invoice warning flash message displayed by `ApplicationController#set_billing_warning`.
 
 | Effect | Behavior |
 |--------|----------|
-| Past due flash warning | **Suppressed** |
+| Unpaid invoice flash warning | **Suppressed** |
 | `check_accessable` (access blocking) | **Unaffected** — still blocks when `suspended` |
 | `flag_unpaid!` / `try_reactivate!` | **Unaffected** — lifecycle transitions still fire |
 
