@@ -86,7 +86,7 @@ export default class Companies_Customers_NewController extends Companies_LayoutC
 
     return `
       <div class="border-t border-slate-200 dark:border-slate-700 pt-6">
-        <h3 class="text-sm font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-4">Properties</h3>
+        <h3 class="text-sm font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-4">${translate("Properties")}</h3>
         <div class="grid grid-cols-2 gap-4">
           ${this.propertyMetadata.map(f => this.renderField(f)).join('')}
         </div>
@@ -109,19 +109,19 @@ export default class Companies_Customers_NewController extends Companies_LayoutC
   contentHTML() {
     const categoryFilter = this.customersCategories()
     const typeOptions = (Enums()?.customer?.business_types || [
-      { name: "Individual", value: "individual" },
-      { name: "Small Business", value: "small_business" },
-      { name: "Enterprise", value: "enterprise" }
+      { name: translate("Individual"), value: "individual" },
+      { name: translate("Small Business"), value: "small_business" },
+      { name: translate("Enterprise"), value: "enterprise" }
     ]).map(t =>
-      `<option value="${t.value}">${t.name === 'small_business' ? 'Small Business' : t.name}</option>`
+      `<option value="${t.value}">${t.name === 'small_business' ? translate("Small Business") : t.name}</option>`
     ).join('')
 
     const fields = `
       <div class="space-y-6">
-        <h2 class="text-xl font-bold text-slate-900 dark:text-white">New Customer</h2>
+        <h2 class="text-xl font-bold text-slate-900 dark:text-white">${translate("New Customer")}</h2>
 
         <div class="space-y-1">
-          <label class="text-[10px] font-bold text-slate-400 dark:text-slate-300 uppercase tracking-wider">Category</label>
+          <label class="text-[10px] font-bold text-slate-400 dark:text-slate-300 uppercase tracking-wider">${translate("Category")}</label>
           <select
             name="customer[category_id]"
             data-action="change->${this.identifier}#onCategoryChange"
@@ -133,19 +133,19 @@ export default class Companies_Customers_NewController extends Companies_LayoutC
 
         <div class="grid grid-cols-2 gap-4">
           <div class="col-span-2 space-y-1">
-            <label class="text-[10px] font-bold text-slate-400 dark:text-slate-300 uppercase tracking-wider">Customer Name</label>
-            <input type="text" name="customer[name]" required placeholder="e.g. John Doe"
+            <label class="text-[10px] font-bold text-slate-400 dark:text-slate-300 uppercase tracking-wider">${translate("Customer Name")}</label>
+            <input type="text" name="customer[name]" required placeholder="${translate("e.g. John Doe")}"
               class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-sm text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none placeholder:text-slate-400 dark:placeholder:text-slate-500">
           </div>
 
           <div class="col-span-2 space-y-1">
-            <label class="text-[10px] font-bold text-slate-400 dark:text-slate-300 uppercase tracking-wider">Email</label>
-            <input type="email" name="customer[email]" placeholder="e.g. john@example.com"
+            <label class="text-[10px] font-bold text-slate-400 dark:text-slate-300 uppercase tracking-wider">${translate("Email")}</label>
+            <input type="email" name="customer[email]" placeholder="${translate("e.g. john@example.com")}"
               class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-sm text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none placeholder:text-slate-400 dark:placeholder:text-slate-500">
           </div>
 
           <div class="space-y-1">
-            <label class="text-[10px] font-bold text-slate-400 dark:text-slate-300 uppercase tracking-wider">Type</label>
+            <label class="text-[10px] font-bold text-slate-400 dark:text-slate-300 uppercase tracking-wider">${translate("Type")}</label>
             <select name="customer[business_type]"
               class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-sm text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none">
               ${typeOptions}
@@ -153,14 +153,14 @@ export default class Companies_Customers_NewController extends Companies_LayoutC
           </div>
 
           <div class="space-y-1">
-            <label class="text-[10px] font-bold text-slate-400 dark:text-slate-300 uppercase tracking-wider">Code</label>
-            <input type="text" name="customer[code]" placeholder="e.g. CUST-001"
+            <label class="text-[10px] font-bold text-slate-400 dark:text-slate-300 uppercase tracking-wider">${translate("Code")}</label>
+            <input type="text" name="customer[code]" placeholder="${translate("e.g. CUST-001")}"
               class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-sm text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none placeholder:text-slate-400 dark:placeholder:text-slate-500">
           </div>
         </div>
 
         <div class="space-y-1">
-          <label class="text-[10px] font-bold text-slate-400 dark:text-slate-300 uppercase tracking-wider">Description</label>
+          <label class="text-[10px] font-bold text-slate-400 dark:text-slate-300 uppercase tracking-wider">${translate("Description")}</label>
           <textarea name="customer[description]" rows="3"
             class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-sm text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none placeholder:text-slate-400 dark:placeholder:text-slate-500"></textarea>
         </div>
@@ -172,7 +172,7 @@ export default class Companies_Customers_NewController extends Companies_LayoutC
         <div class="flex justify-end pt-6 border-t border-slate-200 dark:border-slate-700">
           <button type="submit"
             class="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-bold text-sm transition-colors cursor-pointer">
-            Save Customer
+            ${translate("Save Customer")}
           </button>
         </div>
       </div>

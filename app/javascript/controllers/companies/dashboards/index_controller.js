@@ -16,7 +16,7 @@ export default class Companies_Dashboards_IndexController extends Companies_Layo
       this.company = response.company
       this.counts = response.counts
     } catch (error) {
-      toast({ type: "error", message: "Failed to load dashboard data" })
+      toast({ type: "error", message: translate("Failed to load dashboard data") })
     }
 
     poll(() => {
@@ -31,11 +31,11 @@ export default class Companies_Dashboards_IndexController extends Companies_Layo
 
   renderCharts() {
     const resources = [
-      { key: "products",  label: "Products",  icon: "inventory_2" },
-      { key: "stocks",    label: "Stocks",    icon: "warehouse" },
-      { key: "services",  label: "Services",  icon: "concierge" },
-      { key: "orders",    label: "Orders",    icon: "receipt_long" },
-      { key: "employees", label: "Employees", icon: "badge" },
+      { key: "products",  label: translate("Products"),  icon: "inventory_2" },
+      { key: "stocks",    label: translate("Stocks"),    icon: "warehouse" },
+      { key: "services",  label: translate("Services"),  icon: "concierge" },
+      { key: "orders",    label: translate("Orders"),    icon: "receipt_long" },
+      { key: "employees", label: translate("Employees"), icon: "badge" },
     ]
 
     const colors = ["#008FFB", "#00E396", "#FEB019", "#FF4560", "#775DD0", "#546E7A", "#26a69a", "#D10CE8"]
@@ -49,7 +49,7 @@ export default class Companies_Dashboards_IndexController extends Companies_Layo
       if (!container) return
 
       if (categories.length === 0) {
-        container.innerHTML = `<div class="flex items-center justify-center h-[200px] text-slate-400 dark:text-slate-500 text-sm">No data</div>`
+        container.innerHTML = `<div class="flex items-center justify-center h-[200px] text-slate-400 dark:text-slate-500 text-sm">${translate("No data")}</div>`
         return
       }
 
@@ -103,11 +103,11 @@ export default class Companies_Dashboards_IndexController extends Companies_Layo
     const c = this.company
     const counts = this.counts || {}
     const resources = [
-      { key: "products",  label: "Products",  icon: "inventory_2" },
-      { key: "stocks",    label: "Stocks",    icon: "warehouse" },
-      { key: "services",  label: "Services",  icon: "concierge" },
-      { key: "orders",    label: "Orders",    icon: "receipt_long" },
-      { key: "employees", label: "Employees", icon: "badge" },
+      { key: "products",  label: translate("Products"),  icon: "inventory_2" },
+      { key: "stocks",    label: translate("Stocks"),    icon: "warehouse" },
+      { key: "services",  label: translate("Services"),  icon: "concierge" },
+      { key: "orders",    label: translate("Orders"),    icon: "receipt_long" },
+      { key: "employees", label: translate("Employees"), icon: "badge" },
     ]
 
     const total = (key) => {
@@ -155,7 +155,7 @@ export default class Companies_Dashboards_IndexController extends Companies_Layo
                   <span class="material-symbols-outlined text-3xl text-blue-600 dark:text-blue-400">business</span>
                 </div>
                 <div>
-                  <h2 class="text-2xl font-black text-slate-900 dark:text-white">${c?.name || "Company"}</h2>
+                  <h2 class="text-2xl font-black text-slate-900 dark:text-white">${c?.name || translate("Company")}</h2>
                   <div class="flex flex-wrap items-center gap-2 mt-1">
                     ${c?.code ? `<span class="font-mono text-xs bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded text-slate-500 dark:text-slate-400">${c.code}</span>` : ""}
                     ${businessTypeBadge(c?.business_type)}
@@ -172,7 +172,7 @@ export default class Companies_Dashboards_IndexController extends Companies_Layo
                   <span class="material-symbols-outlined text-[18px]">location_on</span>
                 </div>
                 <div class="min-w-0">
-                  <p class="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase">Address</p>
+                  <p class="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase">${translate("Address")}</p>
                   <p class="text-sm text-slate-900 dark:text-white truncate">${[c?.address_line_1, c?.city, c?.postal_code].filter(Boolean).join(", ") || "—"}</p>
                 </div>
               </div>
@@ -181,7 +181,7 @@ export default class Companies_Dashboards_IndexController extends Companies_Layo
                   <span class="material-symbols-outlined text-[18px]">call</span>
                 </div>
                 <div class="min-w-0">
-                  <p class="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase">Phone</p>
+                  <p class="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase">${translate("Phone")}</p>
                   <p class="text-sm text-slate-900 dark:text-white">${c?.phone_number || "—"}</p>
                 </div>
               </div>
@@ -190,7 +190,7 @@ export default class Companies_Dashboards_IndexController extends Companies_Layo
                   <span class="material-symbols-outlined text-[18px]">mail</span>
                 </div>
                 <div class="min-w-0">
-                  <p class="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase">Email</p>
+                  <p class="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase">${translate("Email")}</p>
                   <p class="text-sm text-slate-900 dark:text-white truncate">${c?.email || "—"}</p>
                 </div>
               </div>
@@ -199,7 +199,7 @@ export default class Companies_Dashboards_IndexController extends Companies_Layo
                   <span class="material-symbols-outlined text-[18px]">language</span>
                 </div>
                 <div class="min-w-0">
-                  <p class="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase">Website</p>
+                  <p class="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase">${translate("Website")}</p>
                   <p class="text-sm text-slate-900 dark:text-white truncate">${c?.website || "—"}</p>
                 </div>
               </div>
@@ -208,7 +208,7 @@ export default class Companies_Dashboards_IndexController extends Companies_Layo
                   <span class="material-symbols-outlined text-[18px]">currency_exchange</span>
                 </div>
                 <div class="min-w-0">
-                  <p class="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase">Currency</p>
+                  <p class="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase">${translate("Currency")}</p>
                   <p class="text-sm text-slate-900 dark:text-white uppercase">${c?.currency_code || "—"}</p>
                 </div>
               </div>
@@ -217,7 +217,7 @@ export default class Companies_Dashboards_IndexController extends Companies_Layo
                   <span class="material-symbols-outlined text-[18px]">schedule</span>
                 </div>
                 <div class="min-w-0">
-                  <p class="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase">Timezone</p>
+                  <p class="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase">${translate("Timezone")}</p>
                   <p class="text-sm text-slate-900 dark:text-white">${(() => { if (!c?.timezone) return "—"; const m = c.timezone.match(/minus_(\d+)/); if (m) return `UTC-${m[1]}`; const p = c.timezone.match(/plus_(\d+)/); if (p) return `UTC+${p[1]}`; return c.timezone === "utc" ? "UTC" : c.timezone; })()}</p>
                 </div>
               </div>
@@ -226,7 +226,7 @@ export default class Companies_Dashboards_IndexController extends Companies_Layo
                   <span class="material-symbols-outlined text-[18px]">person</span>
                 </div>
                 <div class="min-w-0">
-                  <p class="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase">Owner</p>
+                  <p class="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase">${translate("Owner")}</p>
                   <p class="text-sm text-slate-900 dark:text-white truncate">${c?.owner ? `${c.owner.first_name || ""} ${c.owner.last_name || ""}`.trim() || c.owner.email : "—"}</p>
                 </div>
               </div>
@@ -235,7 +235,7 @@ export default class Companies_Dashboards_IndexController extends Companies_Layo
                   <span class="material-symbols-outlined text-[18px]">calendar_today</span>
                 </div>
                 <div class="min-w-0">
-                  <p class="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase">Created</p>
+                  <p class="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase">${translate("Created")}</p>
                   <p class="text-sm text-slate-900 dark:text-white">${c?.created_at ? new Date(c.created_at).toLocaleDateString() : "—"}</p>
                 </div>
               </div>

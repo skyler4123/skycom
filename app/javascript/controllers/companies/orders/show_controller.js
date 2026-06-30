@@ -33,7 +33,7 @@ export default class Companies_Orders_ShowController extends Companies_LayoutCon
     } catch (error) {
       poll(() => {
         if (this.hasContentTarget) {
-          this.contentTarget.innerHTML = '<div class="p-8 text-center text-red-600">Failed to load order.</div>'
+          this.contentTarget.innerHTML = `<div class="p-8 text-center text-red-600">${translate("Failed to load order.")}</div>`
           return true
         }
         return false
@@ -45,7 +45,7 @@ export default class Companies_Orders_ShowController extends Companies_LayoutCon
     if (value === null || value === undefined) return '<span class="text-slate-300 dark:text-slate-700">—</span>'
     switch (type) {
       case 'boolean':
-        return `<span class="inline-flex items-center px-2 py-0.5 text-xs font-medium rounded-md ${value ? 'bg-emerald-50 text-emerald-700' : 'bg-slate-50 text-slate-700'}">${value ? 'Yes' : 'No'}</span>`
+        return `<span class="inline-flex items-center px-2 py-0.5 text-xs font-medium rounded-md ${value ? 'bg-emerald-50 text-emerald-700' : 'bg-slate-50 text-slate-700'}">${value ? translate("Yes") : translate("No")}</span>`
       case 'integer':
         return `<span class="font-mono text-slate-900 dark:text-slate-100">${Number(value).toLocaleString()}</span>`
       case 'decimal':
@@ -63,17 +63,17 @@ export default class Companies_Orders_ShowController extends Companies_LayoutCon
 
   showHTML() {
     const o = this.order
-    if (!o) return '<div class="p-8 text-center">Order not found.</div>'
+    if (!o) return `<div class="p-8 text-center">${translate("Order not found.")}</div>`
 
     const companyId = window.location.pathname.split("/")[2]
     const category = currentCategories().find(c => c.id === o.category_id)
 
-    const businessTypeLabel = o.business_type === 'in_store' ? 'In Store'
-      : o.business_type?.charAt(0).toUpperCase() + o.business_type?.slice(1) || 'Online'
+    const businessTypeLabel = o.business_type === 'in_store' ? translate("In Store")
+      : o.business_type?.charAt(0).toUpperCase() + o.business_type?.slice(1) || translate("Online")
 
     const dynamicFields = this.propertyMetadata.length > 0 ? `
       <div class="border-t border-slate-200 dark:border-gray-800 pt-6 mt-6">
-        <h3 class="text-sm font-bold text-slate-500 dark:text-slate-400 uppercase mb-4">Properties</h3>
+        <h3 class="text-sm font-bold text-slate-500 dark:text-slate-400 uppercase mb-4">${translate("Properties")}</h3>
         <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
           ${this.propertyMetadata.map(field => `
             <div class="flex items-center gap-3">
@@ -96,7 +96,7 @@ export default class Companies_Orders_ShowController extends Companies_LayoutCon
           <a href="${Helpers.company_orders_path(companyId)}"
             class="inline-flex items-center gap-1 text-sm text-slate-500 hover:text-slate-700 mb-6">
             <span class="material-symbols-outlined text-[18px]">arrow_back</span>
-            Back to Orders
+            ${translate("Back to Orders")}
           </a>
 
           <div class="flex flex-col items-center gap-4 sm:flex-row sm:items-start mb-6">
@@ -104,9 +104,9 @@ export default class Companies_Orders_ShowController extends Companies_LayoutCon
               <span class="material-symbols-outlined text-4xl text-amber-600">receipt_long</span>
             </div>
             <div class="flex flex-1 flex-col text-center sm:text-left">
-              <h2 class="text-2xl font-black text-slate-900 dark:text-white">${o.name || 'Unnamed Order'}</h2>
+              <h2 class="text-2xl font-black text-slate-900 dark:text-white">${o.name || translate('Unnamed Order')}</h2>
               <p class="font-semibold text-amber-600">${o.description || ''}</p>
-              <span class="inline-flex items-center rounded-lg bg-amber-100 px-3 py-1 text-xs font-bold text-amber-700 uppercase mt-2">${o.code || 'N/A'}</span>
+                <span class="inline-flex items-center rounded-lg bg-amber-100 px-3 py-1 text-xs font-bold text-amber-700 uppercase mt-2">${o.code || translate("N/A")}</span>
             </div>
           </div>
 
@@ -116,7 +116,7 @@ export default class Companies_Orders_ShowController extends Companies_LayoutCon
                 <span class="material-symbols-outlined">category</span>
               </div>
               <div>
-                <p class="text-xs font-medium text-slate-500">Type</p>
+                <p class="text-xs font-medium text-slate-500">${translate("Type")}</p>
                 <p class="text-sm font-semibold text-slate-900">${businessTypeLabel}</p>
               </div>
             </div>
@@ -126,7 +126,7 @@ export default class Companies_Orders_ShowController extends Companies_LayoutCon
                 <span class="material-symbols-outlined">toggle_on</span>
               </div>
               <div>
-                <p class="text-xs font-medium text-slate-500">Status</p>
+                <p class="text-xs font-medium text-slate-500">${translate("Status")}</p>
                 <p class="text-sm font-semibold">${Helpers.statusBadge(o.workflow_status)}</p>
               </div>
             </div>
@@ -136,7 +136,7 @@ export default class Companies_Orders_ShowController extends Companies_LayoutCon
                 <span class="material-symbols-outlined">payments</span>
               </div>
               <div>
-                <p class="text-xs font-medium text-slate-500">Currency</p>
+                <p class="text-xs font-medium text-slate-500">${translate("Currency")}</p>
                 <p class="text-sm font-semibold text-slate-900 font-mono">${o.currency_code?.toUpperCase() || 'USD'}</p>
               </div>
             </div>
@@ -146,8 +146,8 @@ export default class Companies_Orders_ShowController extends Companies_LayoutCon
                 <span class="material-symbols-outlined">folder</span>
               </div>
               <div>
-                <p class="text-xs font-medium text-slate-500">Category</p>
-                <p class="text-sm font-semibold text-slate-900">${category?.name || 'N/A'}</p>
+                <p class="text-xs font-medium text-slate-500">${translate("Category")}</p>
+                <p class="text-sm font-semibold text-slate-900">${category?.name || translate("N/A")}</p>
               </div>
             </div>
           </div>
@@ -157,7 +157,7 @@ export default class Companies_Orders_ShowController extends Companies_LayoutCon
           <div class="mt-8 flex justify-end gap-3 pt-6 border-t border-slate-200 dark:border-gray-800">
             <a href="${Helpers.edit_company_order_path(companyId, o.id)}"
               class="inline-flex items-center px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium text-sm cursor-pointer">
-              Edit Order
+              ${translate("Edit Order")}
             </a>
           </div>
         </div>

@@ -76,7 +76,7 @@ export default class Companies_Orders_NewController extends Companies_LayoutCont
     if (this.propertyMetadata.length === 0) return ''
     return `
       <div class="border-t border-slate-200 dark:border-slate-700 pt-6">
-        <h3 class="text-sm font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-4">Properties</h3>
+        <h3 class="text-sm font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-4">${translate("Properties")}</h3>
         <div class="grid grid-cols-2 gap-4">
           ${this.propertyMetadata.map(f => this.renderField(f)).join('')}
         </div>
@@ -88,7 +88,7 @@ export default class Companies_Orders_NewController extends Companies_LayoutCont
     const categoryFilter = this.ordersCategories()
 
     const typeOptions = (Enums()?.order?.business_types || []).map(t =>
-      `<option value="${t.value}">${t.name === 'in_store' ? 'In Store' : (t.name ? t.name.charAt(0).toUpperCase() + t.name.slice(1) : t.value)}</option>`
+      `<option value="${t.value}">${t.name === 'in_store' ? translate("In Store") : (t.name ? t.name.charAt(0).toUpperCase() + t.name.slice(1) : t.value)}</option>`
     ).join('')
 
     const currencyOptions = (Enums()?.order?.currency_codes || []).map(c =>
@@ -97,10 +97,10 @@ export default class Companies_Orders_NewController extends Companies_LayoutCont
 
     const fields = `
       <div class="space-y-6">
-        <h2 class="text-xl font-bold text-slate-900 dark:text-white">New Order</h2>
+        <h2 class="text-xl font-bold text-slate-900 dark:text-white">${translate("New Order")}</h2>
 
         <div class="space-y-1">
-          <label class="text-[10px] font-bold text-slate-400 uppercase">Category</label>
+          <label class="text-[10px] font-bold text-slate-400 uppercase">${translate("Category")}</label>
           <select name="order[category_id]" data-action="change->${this.identifier}#onCategoryChange"
             class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-sm">
             ${selectOptionsHTML(cloneNewKey(categoryFilter, "id", "value"), this.categoryId)}
@@ -109,13 +109,13 @@ export default class Companies_Orders_NewController extends Companies_LayoutCont
 
         <div class="grid grid-cols-2 gap-4">
           <div class="col-span-2 space-y-1">
-            <label class="text-[10px] font-bold text-slate-400 uppercase">Name</label>
-            <input type="text" name="order[name]" required placeholder="e.g. Order #12345"
+            <label class="text-[10px] font-bold text-slate-400 uppercase">${translate("Name")}</label>
+            <input type="text" name="order[name]" required placeholder="${translate("e.g. Order #12345")}"
               class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-sm">
           </div>
 
           <div class="space-y-1">
-            <label class="text-[10px] font-bold text-slate-400 uppercase">Type</label>
+            <label class="text-[10px] font-bold text-slate-400 uppercase">${translate("Type")}</label>
             <select name="order[business_type]"
               class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-sm">
               ${typeOptions}
@@ -123,7 +123,7 @@ export default class Companies_Orders_NewController extends Companies_LayoutCont
           </div>
 
           <div class="space-y-1">
-            <label class="text-[10px] font-bold text-slate-400 uppercase">Currency</label>
+            <label class="text-[10px] font-bold text-slate-400 uppercase">${translate("Currency")}</label>
             <select name="order[currency_code]"
               class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-sm">
               ${currencyOptions}
@@ -133,13 +133,13 @@ export default class Companies_Orders_NewController extends Companies_LayoutCont
           <div class="col-span-2 space-y-1">
             <input type="hidden" name="order[customer_id]" value="">
 
-            <label class="text-[10px] font-bold text-slate-400 uppercase">Code</label>
-            <input type="text" name="order[code]" placeholder="e.g. ORD-001"
+            <label class="text-[10px] font-bold text-slate-400 uppercase">${translate("Code")}</label>
+            <input type="text" name="order[code]" placeholder="${translate("e.g. ORD-001")}"
               class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-sm">
           </div>
 
           <div class="col-span-2 space-y-1">
-            <label class="text-[10px] font-bold text-slate-400 uppercase">Description</label>
+            <label class="text-[10px] font-bold text-slate-400 uppercase">${translate("Description")}</label>
             <textarea name="order[description]" rows="3"
               class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-sm"></textarea>
           </div>
@@ -150,7 +150,7 @@ export default class Companies_Orders_NewController extends Companies_LayoutCont
         <div class="flex justify-end pt-6 border-t border-slate-200 dark:border-slate-700">
           <button type="submit"
             class="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-bold text-sm cursor-pointer">
-            Save Order
+            ${translate("Save Order")}
           </button>
         </div>
       </div>

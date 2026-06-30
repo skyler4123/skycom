@@ -28,7 +28,7 @@ export default class Companies_StockImports_IndexController extends Companies_La
       })
 
     } catch (error) {
-      toast({ type: "error", message: "Failed to load stock imports" })
+      toast({ type: "error", message: translate("Failed to load stock imports") })
     }
   }
 
@@ -53,7 +53,7 @@ export default class Companies_StockImports_IndexController extends Companies_La
           <form method="get" action="${pathname()}" class="flex flex-wrap items-end gap-3 mb-6 w-full">
             <div class="flex flex-wrap items-center gap-3">
               <div class="flex flex-col gap-1">
-                <label class="text-[10px] font-bold text-slate-400 uppercase ml-1">Category</label>
+                <label class="text-[10px] font-bold text-slate-400 uppercase ml-1">${translate("Category")}</label>
                 <select name="category_id" class="pl-3 pr-10 py-2 text-sm border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300">
                   ${selectOptionsHTML(cloneNewKey(categoryFilter, "id", "value"), categoryValue)}
                 </select>
@@ -63,7 +63,7 @@ export default class Companies_StockImports_IndexController extends Companies_La
               <div class="flex gap-2 mt-auto">
                 <button type="submit" class="h-[38px] px-6 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors font-medium text-sm flex items-center gap-2">
                   <span class="material-symbols-outlined text-[18px]">search</span>
-                  Search
+                  ${translate("Search")}
                 </button>
               </div>
             </div>
@@ -73,26 +73,26 @@ export default class Companies_StockImports_IndexController extends Companies_La
             <table class="w-full text-left border-collapse">
               <thead>
                 <tr class="text-sm text-slate-500 dark:text-slate-400 bg-slate-50 dark:bg-slate-800/50 border-b border-slate-200 dark:border-slate-700">
-                  <th class="py-4 px-6 font-medium whitespace-nowrap">Code</th>
-                  <th class="py-4 px-6 font-medium whitespace-nowrap">Product</th>
-                  <th class="py-4 px-6 font-medium whitespace-nowrap">Category</th>
-                  <th class="py-4 px-6 font-medium whitespace-nowrap">From</th>
-                  <th class="py-4 px-6 font-medium whitespace-nowrap">To</th>
-                  <th class="py-4 px-6 font-medium whitespace-nowrap">Quantity</th>
-                  <th class="py-4 px-6 font-medium whitespace-nowrap">Type</th>
-                  <th class="py-4 px-6 font-medium whitespace-nowrap">Status</th>
+                  <th class="py-4 px-6 font-medium whitespace-nowrap">${translate("Code")}</th>
+                  <th class="py-4 px-6 font-medium whitespace-nowrap">${translate("Product")}</th>
+                  <th class="py-4 px-6 font-medium whitespace-nowrap">${translate("Category")}</th>
+                  <th class="py-4 px-6 font-medium whitespace-nowrap">${translate("From")}</th>
+                  <th class="py-4 px-6 font-medium whitespace-nowrap">${translate("To")}</th>
+                  <th class="py-4 px-6 font-medium whitespace-nowrap">${translate("Quantity")}</th>
+                  <th class="py-4 px-6 font-medium whitespace-nowrap">${translate("Type")}</th>
+                  <th class="py-4 px-6 font-medium whitespace-nowrap">${translate("Status")}</th>
                 </tr>
               </thead>
               <tbody data-${this.identifier}-target="importsList" class="divide-y divide-slate-200 dark:divide-slate-800">
                 ${this.imports.map(import_data => `
                   <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
                     <td class="py-4 px-6 text-sm">
-                      <span class="font-mono font-medium text-slate-900 dark:text-white">${import_data.code || 'N/A'}</span>
+                      <span class="font-mono font-medium text-slate-900 dark:text-white">${import_data.code || translate('N/A')}</span>
                     </td>
-                    <td class="py-4 px-6 text-sm text-slate-600 dark:text-slate-300">${import_data.product_name || 'N/A'}</td>
+                    <td class="py-4 px-6 text-sm text-slate-600 dark:text-slate-300">${import_data.product_name || translate('N/A')}</td>
                     <td class="py-4 px-6 text-sm text-slate-600 dark:text-slate-300">${import_data.category_name || '—'}</td>
-                    <td class="py-4 px-6 text-sm text-slate-600 dark:text-slate-300">${import_data.from_name || 'N/A'}</td>
-                    <td class="py-4 px-6 text-sm text-slate-600 dark:text-slate-300">${import_data.to_name || 'N/A'}</td>
+                    <td class="py-4 px-6 text-sm text-slate-600 dark:text-slate-300">${import_data.from_name || translate('N/A')}</td>
+                    <td class="py-4 px-6 text-sm text-slate-600 dark:text-slate-300">${import_data.to_name || translate('N/A')}</td>
                     <td class="py-4 px-6 text-sm text-slate-900 dark:text-white font-medium">${import_data.quantity || 0}</td>
                     <td class="py-4 px-6 text-sm">
                       <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
@@ -101,7 +101,7 @@ export default class Companies_StockImports_IndexController extends Companies_La
                         import_data.business_type === 'transfer_in' ? 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400' :
                         'bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-400'
                       }">
-                        ${Helpers.capitalize(import_data.business_type?.replace(/_/g, ' ') || 'N/A')}
+                        ${Helpers.capitalize(import_data.business_type?.replace(/_/g, ' ') || translate('N/A'))}
                       </span>
                     </td>
                     <td class="py-4 px-6 text-sm">

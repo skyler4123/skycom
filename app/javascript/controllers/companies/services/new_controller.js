@@ -86,7 +86,7 @@ export default class Companies_Services_NewController extends Companies_LayoutCo
 
     return `
       <div class="border-t border-slate-200 dark:border-slate-700 pt-6">
-        <h3 class="text-sm font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-4">Properties</h3>
+        <h3 class="text-sm font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-4">${translate("Properties")}</h3>
         <div class="grid grid-cols-2 gap-4">
           ${this.propertyMetadata.map(f => this.renderField(f)).join('')}
         </div>
@@ -114,10 +114,10 @@ export default class Companies_Services_NewController extends Companies_LayoutCo
 
     const fields = `
       <div class="space-y-6">
-        <h2 class="text-xl font-bold text-slate-900 dark:text-white">New Service</h2>
+        <h2 class="text-xl font-bold text-slate-900 dark:text-white">${translate("New Service")}</h2>
 
         <div class="space-y-1">
-          <label class="text-[10px] font-bold text-slate-400 dark:text-slate-300 uppercase tracking-wider">Category</label>
+          <label class="text-[10px] font-bold text-slate-400 dark:text-slate-300 uppercase tracking-wider">${translate("Category")}</label>
           <select
             name="service[category_id]"
             data-action="change->${this.identifier}#onCategoryChange"
@@ -129,13 +129,13 @@ export default class Companies_Services_NewController extends Companies_LayoutCo
 
         <div class="grid grid-cols-2 gap-4">
           <div class="col-span-2 space-y-1">
-            <label class="text-[10px] font-bold text-slate-400 dark:text-slate-300 uppercase tracking-wider">Service Name</label>
-            <input type="text" name="service[name]" required placeholder="e.g. Skincare Consultation"
+            <label class="text-[10px] font-bold text-slate-400 dark:text-slate-300 uppercase tracking-wider">${translate("Service Name")}</label>
+            <input type="text" name="service[name]" required placeholder="${translate("e.g. Skincare Consultation")}"
               class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-sm text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none placeholder:text-slate-400 dark:placeholder:text-slate-500">
           </div>
 
           <div class="space-y-1">
-            <label class="text-[10px] font-bold text-slate-400 dark:text-slate-300 uppercase tracking-wider">Type</label>
+            <label class="text-[10px] font-bold text-slate-400 dark:text-slate-300 uppercase tracking-wider">${translate("Type")}</label>
             <select name="service[business_type]"
               class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-sm text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none">
               ${typeOptions}
@@ -143,13 +143,13 @@ export default class Companies_Services_NewController extends Companies_LayoutCo
           </div>
 
           <div class="space-y-1">
-            <label class="text-[10px] font-bold text-slate-400 dark:text-slate-300 uppercase tracking-wider">Code</label>
-            <input type="text" name="service[code]" placeholder="e.g. SVC-001"
+            <label class="text-[10px] font-bold text-slate-400 dark:text-slate-300 uppercase tracking-wider">${translate("Code")}</label>
+            <input type="text" name="service[code]" placeholder="${translate("e.g. SVC-001")}"
               class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-sm text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none placeholder:text-slate-400 dark:placeholder:text-slate-500">
           </div>
 
           <div class="col-span-2 space-y-1">
-            <label class="text-[10px] font-bold text-slate-400 dark:text-slate-300 uppercase tracking-wider">Description</label>
+            <label class="text-[10px] font-bold text-slate-400 dark:text-slate-300 uppercase tracking-wider">${translate("Description")}</label>
             <textarea name="service[description]" rows="3"
               class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-sm text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none placeholder:text-slate-400 dark:placeholder:text-slate-500"></textarea>
           </div>
@@ -162,7 +162,7 @@ export default class Companies_Services_NewController extends Companies_LayoutCo
         <div class="flex justify-end pt-6 border-t border-slate-200 dark:border-slate-700">
           <button type="submit"
             class="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-bold text-sm transition-colors cursor-pointer">
-            Save Service
+            ${translate("Save Service")}
           </button>
         </div>
       </div>

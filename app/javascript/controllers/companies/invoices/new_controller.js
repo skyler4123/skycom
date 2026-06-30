@@ -76,7 +76,7 @@ export default class Companies_Invoices_NewController extends Companies_LayoutCo
     if (this.propertyMetadata.length === 0) return ''
     return `
       <div class="border-t border-slate-200 dark:border-slate-700 pt-6">
-        <h3 class="text-sm font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-4">Properties</h3>
+        <h3 class="text-sm font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-4">${translate("Properties")}</h3>
         <div class="grid grid-cols-2 gap-4">
           ${this.propertyMetadata.map(f => this.renderField(f)).join('')}
         </div>
@@ -88,7 +88,7 @@ export default class Companies_Invoices_NewController extends Companies_LayoutCo
     const categoryFilter = this.invoicesCategories()
 
     const typeOptions = (Enums()?.invoice?.business_types || []).map(t =>
-      `<option value="${t.value}">${t.name === 'subscription' ? 'Subscription' : (t.name ? t.name.charAt(0).toUpperCase() + t.name.slice(1) : t.value)}</option>`
+      `<option value="${t.value}">${t.name === 'subscription' ? translate("Subscription") : (t.name ? t.name.charAt(0).toUpperCase() + t.name.slice(1) : t.value)}</option>`
     ).join('')
 
     const currencyOptions = (Enums()?.invoice?.currency_codes || []).map(c =>
@@ -97,10 +97,10 @@ export default class Companies_Invoices_NewController extends Companies_LayoutCo
 
     const fields = `
       <div class="space-y-6">
-        <h2 class="text-xl font-bold text-slate-900 dark:text-white">New Invoice</h2>
+        <h2 class="text-xl font-bold text-slate-900 dark:text-white">${translate("New Invoice")}</h2>
 
         <div class="space-y-1">
-          <label class="text-[10px] font-bold text-slate-400 uppercase">Category</label>
+          <label class="text-[10px] font-bold text-slate-400 uppercase">${translate("Category")}</label>
           <select name="invoice[category_id]" data-action="change->${this.identifier}#onCategoryChange"
             class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-sm">
             ${selectOptionsHTML(cloneNewKey(categoryFilter, "id", "value"), this.categoryId)}
@@ -109,25 +109,25 @@ export default class Companies_Invoices_NewController extends Companies_LayoutCo
 
         <div class="grid grid-cols-2 gap-4">
           <div class="col-span-2 space-y-1">
-            <label class="text-[10px] font-bold text-slate-400 uppercase">Name</label>
-            <input type="text" name="invoice[name]" required placeholder="e.g. Invoice for Order #12345"
+            <label class="text-[10px] font-bold text-slate-400 uppercase">${translate("Name")}</label>
+            <input type="text" name="invoice[name]" required placeholder="${translate("e.g. Invoice for Order #12345")}"
               class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-sm">
           </div>
 
           <div class="space-y-1">
-            <label class="text-[10px] font-bold text-slate-400 uppercase">Code</label>
-            <input type="text" name="invoice[code]" required placeholder="e.g. INV-001"
+            <label class="text-[10px] font-bold text-slate-400 uppercase">${translate("Code")}</label>
+            <input type="text" name="invoice[code]" required placeholder="${translate("e.g. INV-001")}"
               class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-sm">
           </div>
 
           <div class="space-y-1">
-            <label class="text-[10px] font-bold text-slate-400 uppercase">Total Price</label>
-            <input type="number" name="invoice[total_price]" step="0.01" placeholder="e.g. 100.00"
+            <label class="text-[10px] font-bold text-slate-400 uppercase">${translate("Total Price")}</label>
+            <input type="number" name="invoice[total_price]" step="0.01" placeholder="${translate("e.g. 100.00")}"
               class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-sm">
           </div>
 
           <div class="space-y-1">
-            <label class="text-[10px] font-bold text-slate-400 uppercase">Type</label>
+            <label class="text-[10px] font-bold text-slate-400 uppercase">${translate("Type")}</label>
             <select name="invoice[business_type]"
               class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-sm">
               ${typeOptions}
@@ -135,7 +135,7 @@ export default class Companies_Invoices_NewController extends Companies_LayoutCo
           </div>
 
           <div class="space-y-1">
-            <label class="text-[10px] font-bold text-slate-400 uppercase">Currency</label>
+            <label class="text-[10px] font-bold text-slate-400 uppercase">${translate("Currency")}</label>
             <select name="invoice[currency_code]"
               class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-sm">
               ${currencyOptions}
@@ -143,13 +143,13 @@ export default class Companies_Invoices_NewController extends Companies_LayoutCo
           </div>
 
           <div class="space-y-1">
-            <label class="text-[10px] font-bold text-slate-400 uppercase">Due Date</label>
+            <label class="text-[10px] font-bold text-slate-400 uppercase">${translate("Due Date")}</label>
             <input type="date" name="invoice[due_date]"
               class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-sm">
           </div>
 
           <div class="col-span-2 space-y-1">
-            <label class="text-[10px] font-bold text-slate-400 uppercase">Description</label>
+            <label class="text-[10px] font-bold text-slate-400 uppercase">${translate("Description")}</label>
             <textarea name="invoice[description]" rows="3"
               class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-sm"></textarea>
           </div>
@@ -160,7 +160,7 @@ export default class Companies_Invoices_NewController extends Companies_LayoutCo
         <div class="flex justify-end pt-6 border-t border-slate-200 dark:border-slate-700">
           <button type="submit"
             class="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-bold text-sm cursor-pointer">
-            Save Invoice
+            ${translate("Save Invoice")}
           </button>
         </div>
       </div>

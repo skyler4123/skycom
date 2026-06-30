@@ -74,7 +74,7 @@ export default class Companies_LayoutController extends Controller {
                   href="${Helpers.company_dashboards_path(currentCompany().id)}"
                   ${openByPathname()}
                   ${tooltip({
-                    html: "Dashboard",
+                    html: translate("Dashboard"),
                     classes: "bg-gray-900 text-white dark:bg-gray-100 dark:text-gray-900 px-2 py-1 text-xs"
                   })}
                 >
@@ -87,7 +87,7 @@ export default class Companies_LayoutController extends Controller {
                   ${openByPathname()}
                 >
                   <span class="material-symbols-outlined">apartment</span>
-                  <p class="text-sm font-medium leading-normal">Branches</p>
+                   <p class="text-sm font-medium leading-normal">${translate("Branches")}</p>
                 </a>
                 <a
                   class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:bg-blue-100 open:text-blue-600"
@@ -95,7 +95,7 @@ export default class Companies_LayoutController extends Controller {
                   ${openByPathname()}
                 >
                   <span class="material-symbols-outlined">family_group</span>
-                  <p class="text-sm font-medium leading-normal">Departments</p>
+                   <p class="text-sm font-medium leading-normal">${translate("Departments")}</p>
                 </a>
                 <a
                   class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:bg-blue-100 open:text-blue-600"
@@ -103,7 +103,7 @@ export default class Companies_LayoutController extends Controller {
                   ${openByPathname()}
                 >
                   <span class="material-symbols-outlined">category</span>
-                  <p class="text-sm font-medium leading-normal">Categories</p>
+                   <p class="text-sm font-medium leading-normal">${translate("Categories")}</p>
                 </a>
                 <a
                   class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:bg-blue-100 open:text-blue-600"
@@ -111,7 +111,7 @@ export default class Companies_LayoutController extends Controller {
                   ${openByPathname()}
                 >
                   <span class="material-symbols-outlined">inventory_2</span>
-                  <p class="text-sm font-medium leading-normal">Products</p>
+                   <p class="text-sm font-medium leading-normal">${translate("Products")}</p>
                 </a>
                 <a
                   class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:bg-blue-100 open:text-blue-600"
@@ -119,7 +119,7 @@ export default class Companies_LayoutController extends Controller {
                   ${openByPathname()}
                 >
                   <span class="material-symbols-outlined">diamond</span>
-                  <p class="text-sm font-medium leading-normal">Brands</p>
+                   <p class="text-sm font-medium leading-normal">${translate("Brands")}</p>
                 </a>
                 <a
                   class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:bg-blue-100 open:text-blue-600"
@@ -127,7 +127,7 @@ export default class Companies_LayoutController extends Controller {
                   ${openByPathname()}
                 >
                   <span class="material-symbols-outlined">concierge</span>
-                  <p class="text-sm font-medium leading-normal">Services</p>
+                   <p class="text-sm font-medium leading-normal">${translate("Services")}</p>
                 </a>
                 <a
                   class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:bg-blue-100 open:text-blue-600"
@@ -135,7 +135,7 @@ export default class Companies_LayoutController extends Controller {
                   ${openByPathname()}
                 >
                   <span class="material-symbols-outlined">order_approve</span>
-                  <p class="text-sm font-medium leading-normal">Orders</p>
+                   <p class="text-sm font-medium leading-normal">${translate("Orders")}</p>
                 </a>
 
                 <a
@@ -144,7 +144,7 @@ export default class Companies_LayoutController extends Controller {
                   ${openByPathname()}
                 >
                   <span class="material-symbols-outlined">groups</span>
-                  <p class="text-sm font-medium leading-normal">Employees</p>
+                   <p class="text-sm font-medium leading-normal">${translate("Employees")}</p>
                 </a>
                 <a
                   class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:bg-blue-100 open:text-blue-600"
@@ -152,7 +152,7 @@ export default class Companies_LayoutController extends Controller {
                   ${openByPathname()}
                 >
                   <span class="material-symbols-outlined">inventory</span>
-                  <p class="text-sm font-medium leading-normal">Stocks</p>
+                   <p class="text-sm font-medium leading-normal">${translate("Stocks")}</p>
                 </a>
                 <a
                   class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:bg-blue-100 open:text-blue-600"
@@ -160,7 +160,7 @@ export default class Companies_LayoutController extends Controller {
                   ${openByPathname()}
                 >
                   <span class="material-symbols-outlined">swap_horiz</span>
-                  <p class="text-sm font-medium leading-normal">Stock Transfers</p>
+                   <p class="text-sm font-medium leading-normal">${translate("Stock Transfers")}</p>
                 </a>
                 <a
                   class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:bg-blue-100 open:text-blue-600"
@@ -168,7 +168,7 @@ export default class Companies_LayoutController extends Controller {
                   ${openByPathname()}
                 >
                   <span class="material-symbols-outlined">download</span>
-                  <p class="text-sm font-medium leading-normal">Stock Imports</p>
+                   <p class="text-sm font-medium leading-normal">${translate("Stock Imports")}</p>
                 </a>
                 <a
                   class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:bg-blue-100 open:text-blue-600"
@@ -176,7 +176,7 @@ export default class Companies_LayoutController extends Controller {
                   ${openByPathname()}
                 >
                   <span class="material-symbols-outlined">upload</span>
-                  <p class="text-sm font-medium leading-normal">Stock Exports</p>
+                   <p class="text-sm font-medium leading-normal">${translate("Stock Exports")}</p>
                 </a>
                 <a
                   class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:bg-blue-100 open:text-blue-600"
@@ -184,7 +184,7 @@ export default class Companies_LayoutController extends Controller {
                   ${openByPathname()}
                 >
                   <span class="material-symbols-outlined">person_add</span>
-                  <p class="text-sm font-medium leading-normal">Customers</p>
+                   <p class="text-sm font-medium leading-normal">${translate("Customers")}</p>
                 </a>
                 <a
                   class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:bg-blue-100 open:text-blue-600"
@@ -192,7 +192,7 @@ export default class Companies_LayoutController extends Controller {
                   ${openByPathname()}
                 >
                   <span class="material-symbols-outlined">receipt_long</span>
-                  <p class="text-sm font-medium leading-normal">Invoices</p>
+                   <p class="text-sm font-medium leading-normal">${translate("Invoices")}</p>
                 </a>
 
                 <a
@@ -201,7 +201,7 @@ export default class Companies_LayoutController extends Controller {
                   ${openByPathname()}
                 >
                   <span class="material-symbols-outlined">security</span>
-                  <p class="text-sm font-medium leading-normal">Policies</p>
+                   <p class="text-sm font-medium leading-normal">${translate("Policies")}</p>
                 </a>
                 <a
                   class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:bg-blue-100 open:text-blue-600"
@@ -209,7 +209,7 @@ export default class Companies_LayoutController extends Controller {
                   ${openByPathname()}
                 >
                   <span class="material-symbols-outlined">description</span>
-                  <p class="text-sm font-medium leading-normal">Pages</p>
+                   <p class="text-sm font-medium leading-normal">${translate("Pages")}</p>
                 </a>
 
                 <a
@@ -218,7 +218,7 @@ export default class Companies_LayoutController extends Controller {
                   ${openByPathname()}
                 >
                   <span class="material-symbols-outlined">shield</span>
-                  <p class="text-sm font-medium leading-normal">Permissions</p>
+                   <p class="text-sm font-medium leading-normal">${translate("Permissions")}</p>
                 </a>
 
                 <a
@@ -236,7 +236,7 @@ export default class Companies_LayoutController extends Controller {
                   ${openByPathname()}
                 >
                   <span class="material-symbols-outlined">warehouse</span>
-                  <p class="text-sm font-medium leading-normal">Facilities</p>
+                   <p class="text-sm font-medium leading-normal">${translate("Facilities")}</p>
                 </a>
               </div>
             </nav>
@@ -290,7 +290,7 @@ export default class Companies_LayoutController extends Controller {
                     </div>
                     <input
                       class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-gray-900 dark:text-white focus:outline-0 focus:ring-0 border-none bg-gray-100 dark:bg-gray-800 h-full placeholder:text-gray-500 px-4 rounded-l-none border-l-0 pl-2 text-base font-normal leading-normal"
-                      placeholder="Search for products, customers..." value="" />
+                      placeholder="${translate("Search for products, customers...")}" value="" />
                   </div>
                 </label>
               </div>

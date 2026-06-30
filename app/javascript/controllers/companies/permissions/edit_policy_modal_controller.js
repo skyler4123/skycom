@@ -26,11 +26,11 @@ export default class Companies_Permissions_EditPolicyModalController extends Con
         ? 'flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium bg-blue-600 text-white cursor-pointer'
         : 'flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium bg-slate-100 text-slate-500 dark:bg-slate-700 dark:text-slate-400 cursor-pointer'
       toggle.innerHTML = this.isActive
-        ? '<span class="material-symbols-outlined text-[16px] leading-none">toggle_on</span> Active'
-        : '<span class="material-symbols-outlined text-[16px] leading-none">toggle_off</span> Inactive'
+        ? `<span class="material-symbols-outlined text-[16px] leading-none">toggle_on</span> ${translate("Active")}`
+        : `<span class="material-symbols-outlined text-[16px] leading-none">toggle_off</span> ${translate("Inactive")}`
     }
     if (indicator) {
-      indicator.textContent = this.isActive ? 'Active' : 'Inactive'
+      indicator.textContent = this.isActive ? translate('Active') : translate('Inactive')
     }
   }
 
@@ -41,8 +41,8 @@ export default class Companies_Permissions_EditPolicyModalController extends Con
     row.setAttribute('data-tag-row', '')
     row.className = 'flex items-center gap-2'
     row.innerHTML = `
-      <input type="text" data-tag-key placeholder="Key" class="flex-1 min-w-0 px-3 py-2 text-sm border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 placeholder-slate-400">
-      <input type="text" data-tag-value placeholder="Value" class="flex-1 min-w-0 px-3 py-2 text-sm border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 placeholder-slate-400">
+      <input type="text" data-tag-key placeholder="${translate("Key")}" class="flex-1 min-w-0 px-3 py-2 text-sm border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 placeholder-slate-400">
+      <input type="text" data-tag-value placeholder="${translate("Value")}" class="flex-1 min-w-0 px-3 py-2 text-sm border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 placeholder-slate-400">
       <button type="button" data-action="click->${this.identifier}#removeTagRow" class="p-2 text-slate-400 hover:text-red-500 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20 cursor-pointer">
         <span class="material-symbols-outlined text-[18px]">close</span>
       </button>
@@ -77,9 +77,9 @@ export default class Companies_Permissions_EditPolicyModalController extends Con
         }
       })
 
-      reloadThenToast({ type: "success", message: `${this.actionNameValue} permission updated` })
+      reloadThenToast({ type: "success", message: `${this.actionNameValue} ${translate("permission updated")}` })
     } catch (error) {
-      toast({ type: "error", message: error.error || "Failed to update permission" })
+      toast({ type: "error", message: error.error || translate("Failed to update permission") })
     }
   }
 
@@ -88,8 +88,8 @@ export default class Companies_Permissions_EditPolicyModalController extends Con
     if (entries.length === 0) {
       return `
         <div data-tag-row class="flex items-center gap-2">
-          <input type="text" data-tag-key placeholder="Key" class="flex-1 min-w-0 px-3 py-2 text-sm border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 placeholder-slate-400">
-          <input type="text" data-tag-value placeholder="Value" class="flex-1 min-w-0 px-3 py-2 text-sm border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 placeholder-slate-400">
+          <input type="text" data-tag-key placeholder="${translate("Key")}" class="flex-1 min-w-0 px-3 py-2 text-sm border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 placeholder-slate-400">
+          <input type="text" data-tag-value placeholder="${translate("Value")}" class="flex-1 min-w-0 px-3 py-2 text-sm border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 placeholder-slate-400">
           <button type="button" data-action="click->${this.identifier}#removeTagRow" class="p-2 text-slate-400 hover:text-red-500 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20 cursor-pointer">
             <span class="material-symbols-outlined text-[18px]">close</span>
           </button>
@@ -98,8 +98,8 @@ export default class Companies_Permissions_EditPolicyModalController extends Con
     }
     return entries.map(([key, value]) => `
       <div data-tag-row class="flex items-center gap-2">
-        <input type="text" data-tag-key value="${key}" placeholder="Key" class="flex-1 min-w-0 px-3 py-2 text-sm border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 placeholder-slate-400">
-        <input type="text" data-tag-value value="${value ?? ''}" placeholder="Value" class="flex-1 min-w-0 px-3 py-2 text-sm border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 placeholder-slate-400">
+        <input type="text" data-tag-key value="${key}" placeholder="${translate("Key")}" class="flex-1 min-w-0 px-3 py-2 text-sm border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 placeholder-slate-400">
+        <input type="text" data-tag-value value="${value ?? ''}" placeholder="${translate("Value")}" class="flex-1 min-w-0 px-3 py-2 text-sm border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 placeholder-slate-400">
         <button type="button" data-action="click->${this.identifier}#removeTagRow" class="p-2 text-slate-400 hover:text-red-500 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20 cursor-pointer">
           <span class="material-symbols-outlined text-[18px]">close</span>
         </button>
@@ -113,11 +113,11 @@ export default class Companies_Permissions_EditPolicyModalController extends Con
         <div class="space-y-6">
           <div>
             <h2 class="text-xl font-bold text-slate-900 dark:text-white capitalize">${this.actionNameValue} ${this.resourceNameValue}</h2>
-            <p class="text-sm text-slate-500 mt-1">Configure permission and tag conditions</p>
+            <p class="text-sm text-slate-500 mt-1">${translate("Configure permission and tag conditions")}</p>
           </div>
 
           <div class="space-y-2">
-            <label class="text-[10px] font-bold text-slate-400 dark:text-slate-300 uppercase">Status</label>
+            <label class="text-[10px] font-bold text-slate-400 dark:text-slate-300 uppercase">${translate("Status")}</label>
             <button
               type="button"
               data-action="click->${this.identifier}#toggleStatus"
@@ -125,34 +125,34 @@ export default class Companies_Permissions_EditPolicyModalController extends Con
               class="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium cursor-pointer ${this.isActive ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-500 dark:bg-slate-700 dark:text-slate-400'}"
             >
               <span class="material-symbols-outlined text-[16px] leading-none">${this.isActive ? 'toggle_on' : 'toggle_off'}</span>
-              <span data-status-indicator>${this.isActive ? 'Active' : 'Inactive'}</span>
+              <span data-status-indicator>${this.isActive ? translate('Active') : translate('Inactive')}</span>
             </button>
           </div>
 
           <div class="space-y-3">
             <div class="flex items-center justify-between">
-              <label class="text-[10px] font-bold text-slate-400 dark:text-slate-300 uppercase">Tag Conditions</label>
+              <label class="text-[10px] font-bold text-slate-400 dark:text-slate-300 uppercase">${translate("Tag Conditions")}</label>
               <button
                 type="button"
                 data-action="click->${this.identifier}#addTagRow"
                 class="flex items-center gap-1 px-3 py-1.5 text-xs font-medium text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg cursor-pointer"
               >
                 <span class="material-symbols-outlined text-[14px]">add</span>
-                Add Condition
+                ${translate("Add Condition")}
               </button>
             </div>
             <div class="p-3 bg-slate-50 dark:bg-slate-800/50 rounded-lg border border-slate-200 dark:border-slate-700 space-y-2" data-tag-rows>
               ${this.tagRowsHTML()}
             </div>
-            <p class="text-[11px] text-slate-400">Tag conditions use AND logic. Leave empty for no tag filtering.</p>
+            <p class="text-[11px] text-slate-400">${translate("Tag conditions use AND logic. Leave empty for no tag filtering.")}</p>
           </div>
 
           <div class="flex justify-end gap-3 pt-2">
             <button type="button" data-action="click->modal#close" class="px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg cursor-pointer">
-              Cancel
+              ${translate("Cancel")}
             </button>
             <button type="button" data-action="click->${this.identifier}#handleSubmit" class="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-bold text-sm cursor-pointer">
-              Save
+              ${translate("Save")}
             </button>
           </div>
         </div>
