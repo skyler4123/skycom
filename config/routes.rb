@@ -48,7 +48,8 @@ Rails.application.routes.draw do
       resources :permissions
       resources :policies
       resources :policy_appointments
-      resources :property_mappings, only: [ :create, :update, :show, :destroy ]
+      resources :property_mappings
+      resources :table_configs
       resources :pages do
         member do
           get :retail_cashier
