@@ -100,6 +100,11 @@ PERMISSIONS_CACHE_EXPIRY = 1.minute
 # expires_in is provided.
 DEFAULT_CACHE_EXPIRY = 5.minutes
 
+# Per-session cache TTL for Session.cached_find in AuthenticationConcern.
+# Longer than DEFAULT_CACHE_EXPIRY because session records rarely change
+# and the global cache (Redis) provides cross-instance invalidation.
+SESSION_CACHE_EXPIRY = 1.hour
+
 # TTL for Redis daily usage counter keys (Kredis).
 # After this period, Redis may evict the key; DailyMetricLog serves
 # as fallback. Used by Company::BillingConcern#daily_meter.

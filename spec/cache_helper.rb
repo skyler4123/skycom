@@ -3,5 +3,6 @@ RSpec.configure do |config|
     Rails.cache.clear
     Rails.local_cache.clear  rescue nil
     Rails.global_cache.clear rescue nil
+    Rails.global_session_cache.clear rescue nil
   end
 end

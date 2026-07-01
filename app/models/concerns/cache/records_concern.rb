@@ -18,7 +18,7 @@ module Cache::RecordsConcern
       sql_hash = Digest::SHA256.base64digest(relation.to_sql.squish).tr("+/", "-_").first(12)
       cache_key = "#{model_name.plural.underscore}/q#{sql_hash}"
 
-      attributes_array = Rails.cache.fetch(cache_key, expires_in: expires_in) do
+      attributes_array = Rails.local_cache.fetch(cache_key, expires_in: expires_in) do
         relation.map(&:attributes)
       end
 
@@ -37,7 +37,7 @@ module Cache::RecordsConcern
       expires_in = options.delete(:expires_in) || DEFAULT_CACHE_EXPIRY
       cache_key  = "#{model_name.plural}_#{id}"
 
-      attributes = Rails.cache.fetch(cache_key, expires_in: expires_in) do
+      attributes = Rails.local_cache.fetch(cache_key, expires_in: expires_in) do
         find_by(id: id)&.attributes
       end
 
@@ -68,11 +68,11 @@ module Cache::RecordsConcern
   def write_attribute_cache
     cache_key = "#{self.class.model_name.plural}_#{id}"
     # We store only the attributes hash
-    Rails.cache.write(cache_key, attributes)
+    Rails.local_cache.write(cache_key, attributes)
   end
 
   def remove_attribute_cache
     cache_key = "#{self.class.model_name.plural}_#{id}"
-    Rails.cache.delete(cache_key)
+    Rails.local_cache.delete(cache_key)
   end
 end
