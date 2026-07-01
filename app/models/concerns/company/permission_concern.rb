@@ -13,7 +13,7 @@ module Company::PermissionConcern
     def permissions
       cache_key = "#{cache_key_with_version}/permissions"
 
-      Rails.cache.fetch(cache_key, expires_in: PERMISSIONS_CACHE_EXPIRY) do
+      Rails.local_cache.fetch(cache_key, expires_in: PERMISSIONS_CACHE_EXPIRY) do
         all_policies = policies.where.not(business_type: :owner).to_a
 
         roles.where.not(business_type: :owner).map do |role|
@@ -50,7 +50,7 @@ module Company::PermissionConcern
     def permissions_by_role
       cache_key = "#{cache_key_with_version}/permissions_by_role"
 
-      Rails.cache.fetch(cache_key, expires_in: PERMISSIONS_CACHE_EXPIRY) do
+      Rails.local_cache.fetch(cache_key, expires_in: PERMISSIONS_CACHE_EXPIRY) do
         roles.includes(:policy_appointments).each_with_object({}) do |role, hash|
           active_appointments = role.policy_appointments.active.includes(:policy)
 
@@ -75,7 +75,7 @@ module Company::PermissionConcern
     def permissions_by_resource
       cache_key = "#{cache_key_with_version}/permissions_by_resource"
 
-      Rails.cache.fetch(cache_key, expires_in: PERMISSIONS_CACHE_EXPIRY) do
+      Rails.local_cache.fetch(cache_key, expires_in: PERMISSIONS_CACHE_EXPIRY) do
         roles.includes(:policy_appointments).each_with_object({}) do |role, hash|
           active_appointments = role.policy_appointments.active.includes(:policy)
           role_permissions = active_appointments.group_by { |a| a.policy.resource }.transform_values do |appointments|
@@ -88,9 +88,9 @@ module Company::PermissionConcern
     end
 
     def clear_permissions_cache
-      Rails.cache.delete("#{cache_key_with_version}/permissions")
-      Rails.cache.delete("#{cache_key_with_version}/permissions_by_role")
-      Rails.cache.delete("#{cache_key_with_version}/permissions_by_resource")
+      Rails.local_cache.delete("#{cache_key_with_version}/permissions")
+      Rails.local_cache.delete("#{cache_key_with_version}/permissions_by_role")
+      Rails.local_cache.delete("#{cache_key_with_version}/permissions_by_resource")
 
       touch
     end

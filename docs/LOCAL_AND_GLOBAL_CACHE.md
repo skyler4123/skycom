@@ -220,8 +220,9 @@ Rails.global_cache.clear
 ## 9. Related Documentation
 
 - `docs/CACHE.md` — Client-side browser cache (localStorage)
+- `docs/AUTHENTICATION.md` — Authentication system using the dual-cache architecture
 - `docs/ORDER_PROCESSING_V1.md` — Kredis counters used for stock reservation
-- `config/initializers/local_and_global_cache.rb` — Initializer source
+- `config/initializers/multi_cache_store.rb` — Initializer source
 - `config/redis/shared.yml` — Redis configuration per environment
 
 ---

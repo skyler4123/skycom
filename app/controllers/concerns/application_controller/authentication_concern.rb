@@ -33,11 +33,33 @@ module ApplicationController::AuthenticationConcern
     token = cookies.signed[:session_token]
     return unless token
 
-    session_record = Session.cached_find(token)
+    # Global cache check — source of truth for session existence
+    unless Rails.global_session_cache.exist?(token)
+      cleanup_invalid_session(token)
+      return
+    end
+
+    # Local cache / DB fallback
+    session_record = Session.cached_find(token, expires_in: SESSION_CACHE_EXPIRY)
+    unless session_record
+      Rails.global_session_cache.delete(token)
+      cleanup_invalid_session(token)
+      return
+    end
+
+    # Extend global cache TTL for active users (write with fresh expires_in)
+    Rails.global_session_cache.write(token, true, expires_in: COOKIE_EXPIRY)
+
     Current.session = session_record
   end
 
   def authenticate
     redirect_to main_app.root_path if !is_signed_in?
+  end
+
+  def cleanup_invalid_session(token)
+    Rails.local_cache.delete("sessions_#{token}")
+    cookies.delete(:session_token)
+    cookies.delete(:is_signed_in)
   end
 end
