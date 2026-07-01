@@ -10,8 +10,18 @@ export default class Companies_Dashboards_IndexController extends Companies_Layo
   async connect() {
     super.connect()
 
+    poll(() => {
+      if (currentCompany()) {
+        this.loadData()
+        return true
+      }
+      return false
+    })
+  }
+
+  async loadData() {
     try {
-      const companyId = window.location.pathname.split("/")[2]
+      const companyId = currentCompany().id
       const response = await fetchJson(`/companies/${companyId}/dashboards.json`)
       this.company = response.company
       this.counts = response.counts
