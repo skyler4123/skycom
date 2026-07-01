@@ -1,6 +1,6 @@
 require "rails_helper"
 
-RSpec.describe "Global Session Cache", type: :system do
+RSpec.describe "Global Session Cache", type: :feature, js: true do
   let(:user) { create(:user, system_role: :company_owner, password: "Password@1234", password_confirmation: "Password@1234") }
 
   after(:each) do
