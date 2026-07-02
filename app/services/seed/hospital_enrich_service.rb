@@ -191,7 +191,7 @@ class Seed::HospitalEnrichService
         service = Seed::ServiceService.create(
           company: @company,
           branch: branch,
-          name: svc_name,
+          name: "#{svc_name} - #{branch.name}",
           duration: [ 30, 45, 60, 90 ].sample,
           category: service_categories[i % service_categories.length]
         )
