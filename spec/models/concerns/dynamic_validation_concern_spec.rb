@@ -30,8 +30,19 @@ RSpec.describe DynamicValidationConcern do
     ])
   end
 
+  def fill_baseline
+    product.property_string_1 = "BrandName"
+    product.property_string_2 = "SKU-001"
+    product.property_integer_1 = 10
+    product.property_decimal_1 = 5.0
+    product.property_decimal_2 = 3
+    product.property_boolean_1 = true
+    product.property_text_1 = "notes"
+  end
+
   describe "presence" do
     it "adds error when value is blank" do
+      fill_baseline
       product.property_string_1 = ""
       product.valid?
       expect(product.errors[:property_string_1]).to include("can't be blank")
@@ -94,6 +105,7 @@ RSpec.describe DynamicValidationConcern do
     end
 
     it "adds error for nil value (must use allow_nil: true to permit nil)" do
+      fill_baseline
       product.property_integer_1 = nil
       product.valid?
       expect(product.errors[:property_integer_1]).to include("is not a number")
@@ -102,6 +114,7 @@ RSpec.describe DynamicValidationConcern do
 
   describe "inclusion" do
     it "adds error when value is not in the list" do
+      fill_baseline
       product.property_boolean_1 = nil
       product.valid?
       expect(product.errors[:property_boolean_1]).to include("is not included in the list")

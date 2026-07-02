@@ -11,6 +11,18 @@ module DynamicValidationConcern
 
   private
 
+  def auto_populate_property_fields
+    return unless respond_to?(:property_mapping) && property_mapping.present?
+
+    metadata = property_mapping.property_metadata || []
+    property_keys = metadata.map { |e| e["key"] }.compact
+    return if property_keys.empty?
+    return unless property_keys.any? { |k| respond_to?(k) }
+    return if property_keys.any? { |k| respond_to?(k) && send(k).present? }
+
+    Seed::PropertyPopulator.populate(self)
+  end
+
   def dynamic_property_validations
     mapping = respond_to?(:property_mapping) ? property_mapping : nil
     return unless mapping
@@ -19,6 +31,7 @@ module DynamicValidationConcern
       key = entry["key"]
       validates_hash = entry["validates"]
       next if validates_hash.blank?
+      next unless respond_to?(key)
 
       validates_hash.each do |validator_name, options|
         next unless ALLOWED_VALIDATORS.include?(validator_name)
