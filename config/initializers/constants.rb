@@ -763,7 +763,7 @@ RETAIL_INIT_CATEGORIES = {
 # =============================================================================
 
 HOSPITAL_INIT_ROLES = [
-  :Receptionist, :Dentist, :DentalAssistant, :Hygienist, :Manager, :SystemAdmin
+  :Receptionist, :Dentist, :DentalAssistant, :Hygienist, :Manager, :Admin
 ].freeze
 
 HOSPITAL_INIT_COMPANY_GROUP_BUSINESS_TYPE = :hospital

@@ -152,7 +152,7 @@ class Seed::HospitalInitService
         "StockImport" => { create: true, read: true, update: true, delete: true },
         "StockTransfer" => { create: true, read: true, update: true, delete: true }
       },
-      SystemAdmin: {
+      Admin: {
         "PolicyAppointment" => { create: true, read: true, update: true, delete: true }
       }
     }
