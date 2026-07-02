@@ -1,4 +1,31 @@
 class Seed::RetailEnrichService
+  RETAIL_ENRICH_EMPLOYEE_COUNTS = {
+    Manager: 1,
+    Cashier: 10,
+    Seller: 10,
+    Security: 1,
+    Admin: 1,
+    Doctor: 3,
+    Therapist: 8,
+    Consultant: 5
+  }.freeze
+
+  RETAIL_ENRICH_CUSTOMER_COUNTS = { Customer: 50 }.freeze
+
+  RETAIL_ENRICH_CLINIC_FACILITIES = [
+    "Clinic Room A", "Clinic Room B", "Laser Machine 01", "HIFU Machine"
+  ].freeze
+
+  RETAIL_ENRICH_POPULAR_BRANDS = [
+    "Apple", "Samsung", "Google", "Microsoft", "Amazon", "Facebook", "Tesla",
+    "Toyota", "Coca-Cola", "McDonald's", "Disney", "Nike", "Adidas", "Louis Vuitton",
+    "Gucci", "Mercedes-Benz", "BMW", "Intel", "IBM", "Cisco", "Oracle", "SAP",
+    "Accenture", "Deloitte", "PwC", "KPMG", "EY", "GE", "Honda", "Ford", "Pepsi",
+    "Starbucks", "IKEA", "H&M", "Zara", "Uniqlo", "L'Oréal", "Gillette", "Pampers",
+    "Colgate", "Nescafé", "Red Bull", "Mastercard", "Visa", "American Express",
+    "J.P. Morgan", "Goldman Sachs", "Morgan Stanley", "Netflix", "Spotify"
+  ].freeze
+
   def initialize(user:, email: Faker::Internet.email, name: nil, company: nil,
                  country_code: :us, currency_code: :usd, timezone: :minus_5,
                  address_line_1: nil, city: nil, postal_code: nil)
@@ -91,7 +118,7 @@ class Seed::RetailEnrichService
   end
 
   def create_brands
-    RETAIL_INIT_POPULAR_BRANDS.each do |brand_name|
+    RETAIL_ENRICH_POPULAR_BRANDS.each do |brand_name|
       Seed::BrandService.create(company: @retail, name: brand_name)
     end
   end
@@ -226,7 +253,7 @@ class Seed::RetailEnrichService
     @branches.each_with_index do |branch, index|
       branch_employees = []
 
-      RETAIL_INIT_EMPLOYEE_COUNTS.each do |role_name, count|
+      RETAIL_ENRICH_EMPLOYEE_COUNTS.each do |role_name, count|
         count.times do |i|
           user = Seed::UserService.create(
             parent_user: @multi_company_owner,
@@ -260,7 +287,7 @@ class Seed::RetailEnrichService
 
   def create_customers_for_company
     @branches.each do |branch|
-      RETAIL_INIT_CUSTOMER_COUNTS.each do |role_name, count|
+      RETAIL_ENRICH_CUSTOMER_COUNTS.each do |role_name, count|
         count.times do |i|
           user = Seed::UserService.create(
             parent_user: @multi_company_owner,
