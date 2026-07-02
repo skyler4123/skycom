@@ -93,10 +93,10 @@ RSpec.describe DynamicValidationConcern do
       expect(product.errors[:property_decimal_2]).to include("must be less than or equal to 100")
     end
 
-    it "allows nil value (no numericality error for nil)" do
+    it "adds error for nil value (must use allow_nil: true to permit nil)" do
       product.property_integer_1 = nil
       product.valid?
-      expect(product.errors[:property_integer_1]).to be_blank
+      expect(product.errors[:property_integer_1]).to include("is not a number")
     end
   end
 
