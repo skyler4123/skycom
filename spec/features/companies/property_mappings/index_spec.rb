@@ -103,4 +103,26 @@ RSpec.feature "Companies::PropertyMappings Management", type: :feature, js: true
     expect(added['name']).to eq('texture')
     expect(added['label']).to eq('Texture Type')
   end
+
+  scenario "edit validates hash persists through save" do
+    visit edit_company_property_mapping_path(company, property_mapping)
+    expect(page).to have_selector('form', wait: 10)
+
+    validates_textarea = page.all('textarea[name*="[validates]"]', wait: 10).first
+    validates_textarea.set('{"presence":true,"numericality":{"only_integer":true}}')
+
+    click_button 'Save Changes'
+    expect(page).to have_content("Property mapping updated successfully", wait: 10)
+
+    click_link 'Edit Property Mapping', match: :first
+    expect(page).to have_selector('form', wait: 10)
+
+    textarea = page.all('textarea[name*="[validates]"]').first
+    expect(textarea.value).to include('"presence"')
+    expect(textarea.value).to include('"only_integer"')
+
+    property_mapping.reload
+    entry = property_mapping.property_metadata.first
+    expect(entry['validates']).to eq({ 'presence' => true, 'numericality' => { 'only_integer' => true } })
+  end
 end
