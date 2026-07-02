@@ -44,7 +44,7 @@ RSpec.feature "Companies::Categories Management", type: :feature, js: true do
     visit company_categories_path(company)
     expect(page).to have_selector('table', wait: 10)
 
-    click_link category.name, match: :first
+    find("a[href*='/categories/#{category.id}']", text: category.name, match: :first).click
     expect(page).to have_current_path(/categories\/#{category.id}$/, wait: 10)
     expect(page).to have_content(category.name)
   end
