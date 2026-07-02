@@ -1088,11 +1088,13 @@ class Seed::RetailService
 
   def create_branches(count: 2)
     puts "Creating #{count} branches..."
+    branch_categories = Category.where(company: @retail, resource_name: "branches").to_a
     count.times do |i|
       branch = Seed::BranchService.create(
         name: "Branch #{i + 1}",
         description: "Description for Branch #{i + 1}",
-        company: @retail
+        company: @retail,
+        category: branch_categories[i % branch_categories.length]
       )
       branch.attach_tag(key: "Branch #{branch.id} Tag")
       branch.address = Seed::AddressService.create(country_code: @country_code)
@@ -1207,11 +1209,13 @@ class Seed::RetailService
   end
 
   def create_departments_for_company
-    [ "Electronics", "Clothing", "Home Goods", "Customer Service" ].each do |dept_name|
+    dept_categories = Category.where(company: @retail, resource_name: "departments").to_a
+    [ "Electronics", "Clothing", "Home Goods", "Customer Service" ].each_with_index do |dept_name, i|
       department = Seed::DepartmentService.create(
         company: @retail,
         name: dept_name,
-        description: "Department: #{dept_name}"
+        description: "Department: #{dept_name}",
+        category: dept_categories[i % dept_categories.length]
       )
       department.attach_tag(key: "Department #{department.id} Tag")
       department.save!
