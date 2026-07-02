@@ -341,7 +341,7 @@ SUBSCRIPTION_LIMITS = {
 # Used in development/test for Google OAuth sign-in.
 # =============================================================================
 
-MOCK_OAUTH_EMAIL = "manager_1_retail_branch_1@company2.com".freeze
+MOCK_OAUTH_EMAIL = "PracticeManager_1_clinic_1@company3.com".freeze
 
 # =============================================================================
 # Retail Init Defaults
