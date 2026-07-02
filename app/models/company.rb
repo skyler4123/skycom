@@ -179,9 +179,9 @@ class Company < ApplicationRecord
     Seed::BillingContractService.create(company: self)
 
     unless self.class.skip_retail_init
-      if retail?
+      if business_type_retail?
         Seed::RetailInitService.call(company: self)
-      elsif hospital?
+      elsif business_type_hospital?
         Seed::HospitalInitService.call(company: self)
       end
     end
