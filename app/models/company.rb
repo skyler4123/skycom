@@ -1,4 +1,6 @@
 class Company < ApplicationRecord
+  class_attribute :skip_retail_init, default: false
+
   attribute :permission_resource_name, :string, default: -> { self.name }
   attribute :resource_names, :string, array: true, default: %w[
     Product Order Customer Employee Branch Department
@@ -176,7 +178,7 @@ class Company < ApplicationRecord
 
     Seed::BillingContractService.create(company: self)
 
-    Seed::RetailInitService.call(company: self)
+    Seed::RetailInitService.call(company: self) unless self.class.skip_retail_init
   end
 
   private
