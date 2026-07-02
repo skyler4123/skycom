@@ -65,7 +65,16 @@ class Companies::PropertyMappingsController < Companies::ApplicationController
 
     p_params = property_mapping_params
     if p_params[:property_metadata].is_a?(ActionController::Parameters) && !p_params[:property_metadata].is_a?(Array)
-      p_params[:property_metadata] = p_params[:property_metadata].values.to_a
+      metadata = p_params[:property_metadata].values.to_a
+
+      # Parse validates from JSON string to hash (submitted via textarea)
+      metadata.each do |entry|
+        if entry["validates"].is_a?(String) && entry["validates"].present?
+          entry["validates"] = JSON.parse(entry["validates"]) rescue {}
+        end
+      end
+
+      p_params[:property_metadata] = metadata
     end
 
     if mapping.update(p_params)

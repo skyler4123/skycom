@@ -62,6 +62,10 @@ export default class Companies_PropertyMappings_EditController extends Companies
             placeholder="Display Label"
             class="w-full px-2 py-1 text-sm border border-slate-200 dark:border-slate-600 rounded bg-white dark:bg-slate-800 text-slate-900 dark:text-white">
         </td>
+        <td class="py-3 px-4">
+          <textarea name="property_mapping[property_metadata][${index}][validates]" rows="3"
+            class="w-full min-w-[200px] px-2 py-1 text-xs font-mono border border-slate-200 dark:border-slate-600 rounded bg-white dark:bg-slate-800 text-slate-900 dark:text-white resize-y">${JSON.stringify(field.validates || {}, null, 2)}</textarea>
+        </td>
         <td class="py-3 px-4 text-right">
           <button type="button" data-action="click->${this.identifier}#removeProperty" data-index="${index}"
             class="inline-flex items-center justify-center p-1.5 text-red-500 hover:text-red-700 hover:bg-red-50 rounded-lg cursor-pointer">
@@ -126,6 +130,7 @@ export default class Companies_PropertyMappings_EditController extends Companies
                   <th class="py-3 px-4 font-medium whitespace-nowrap">${translate("Key")}</th>
                   <th class="py-3 px-4 font-medium whitespace-nowrap">${translate("Name")}</th>
                   <th class="py-3 px-4 font-medium whitespace-nowrap">${translate("Label")}</th>
+                  <th class="py-3 px-4 font-medium whitespace-nowrap">${translate("Validates")}</th>
                   <th class="py-3 px-4 font-medium text-right whitespace-nowrap">${translate("Actions")}</th>
                 </tr>
               </thead>
@@ -172,7 +177,8 @@ export default class Companies_PropertyMappings_EditController extends Companies
     this.propertyMetadata.push({
       key: select.value,
       name: '',
-      label: ''
+      label: '',
+      validates: '{}'
     })
 
     this.rerenderEditor()
@@ -210,6 +216,10 @@ export default class Companies_PropertyMappings_EditController extends Companies
           <input type="text" name="property_mapping[property_metadata][${index}][label]" value="${field.label || ''}"
             placeholder="Display Label"
             class="w-full px-2 py-1 text-sm border border-slate-200 dark:border-slate-600 rounded bg-white dark:bg-slate-800 text-slate-900 dark:text-white">
+        </td>
+        <td class="py-3 px-4">
+          <textarea name="property_mapping[property_metadata][${index}][validates]" rows="3"
+            class="w-full min-w-[200px] px-2 py-1 text-xs font-mono border border-slate-200 dark:border-slate-600 rounded bg-white dark:bg-slate-800 text-slate-900 dark:text-white resize-y">${JSON.stringify(field.validates || {}, null, 2)}</textarea>
         </td>
         <td class="py-3 px-4 text-right">
           <button type="button" data-action="click->${this.identifier}#removeProperty" data-index="${index}"
