@@ -2,7 +2,7 @@
 
 # Generates 7 days of historical billing data during seeding so the billing
 # dashboard shows non-zero usage metrics, meaningful charts, and invoices
-# with varied dates. Called by Seed::RetailService#seeding.
+# with varied dates. Called by Seed::RetailEnrichService#seeding.
 #
 #   Seed::BillingDataService.create(company: company)
 #

@@ -47,9 +47,9 @@ class Seed::ApplicationService
     user_3.address = Seed::AddressService.create
 
     # Create company groups
-    Seed::RetailService.new(user: user_1, email: "retail_us@company1.com", name: "Grocery 1",
+    Seed::RetailEnrichService.new(user: user_1, email: "retail_us@company1.com", name: "Grocery 1",
       country_code: :us, currency_code: :usd, timezone: :minus_5)
-    Seed::RetailService.new(user: user_2, email: "retail_vn@company2.com", name: "Grocery VN",
+    Seed::RetailEnrichService.new(user: user_2, email: "retail_vn@company2.com", name: "Grocery VN",
       country_code: :vn, currency_code: :vnd, timezone: :plus_7,
       city: "Ho Chi Minh City", address_line_1: "123 Le Loi Street")
     # Seed::RestaurantService.new(user: user_1, email: "restaurant1@company1.com")
@@ -57,7 +57,7 @@ class Seed::ApplicationService
     # Seed::EducationService.new(user: user_1, email: "education1@company1.com")
     # Seed::HotelService.new(user: user_1, email: "hotel1@company1.com")
     # Seed::FitnessService.new(user: user_1, email: "fitness1@company1.com")
-    # Seed::RetailService.new(user: user_2, email: "retail1@company3.com")
+    # Seed::RetailEnrichService.new(user: user_2, email: "retail1@company3.com")
 
     self.puts_count
 
