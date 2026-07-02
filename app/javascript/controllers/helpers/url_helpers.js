@@ -50,7 +50,16 @@ export const company_category_path = (companyId, categoryId) => `/companies/${co
 export const edit_company_category_path = (companyId, categoryId) => `/companies/${companyId}/categories/${categoryId}/edit`
 
 export const company_property_mappings_path = (companyId) => `/companies/${companyId}/property_mappings`
-export const edit_company_property_mapping_path = (companyId, mappingId) => `/companies/${companyId}/property_mappings/${mappingId}`
+export const new_company_property_mapping_path = (companyId) => `/companies/${companyId}/property_mappings/new`
+export const create_company_property_mappings_path = (companyId) => `/companies/${companyId}/property_mappings`
+export const company_property_mapping_path = (companyId, mappingId) => `/companies/${companyId}/property_mappings/${mappingId}`
+export const edit_company_property_mapping_path = (companyId, mappingId) => `/companies/${companyId}/property_mappings/${mappingId}/edit`
+
+export const company_table_configs_path = (companyId) => `/companies/${companyId}/table_configs`
+export const new_company_table_config_path = (companyId) => `/companies/${companyId}/table_configs/new`
+export const create_company_table_configs_path = (companyId) => `/companies/${companyId}/table_configs`
+export const company_table_config_path = (companyId, configId) => `/companies/${companyId}/table_configs/${configId}`
+export const edit_company_table_config_path = (companyId, configId) => `/companies/${companyId}/table_configs/${configId}/edit`
 
 export const company_products_path = (companyId) => `/companies/${companyId}/products`
 export const new_company_product_path = (companyId) => `/companies/${companyId}/products/new`

@@ -1506,6 +1506,7 @@ class Seed::RetailService
         "Customer" => { create: true, read: true, update: true, delete: true },
         "Category" => { create: true, read: true, update: true, delete: true },
         "PropertyMapping" => { create: true, read: true, update: true, delete: true },
+        "TableConfig" => { create: true, read: true, update: true, delete: true },
         "PolicyAppointment" => { create: true, read: true, update: true, delete: false },
         "Brand" => { create: true, read: true, update: true, delete: true },
         "Facility" => { create: true, read: true, update: true, delete: true }
@@ -1531,6 +1532,7 @@ class Seed::RetailService
         "PolicyAppointment" => { create: false, read: true, update: false, delete: false },
         "Product" => { create: true, read: true, update: true, delete: true },
         "PropertyMapping" => { create: true, read: true, update: true, delete: true },
+        "TableConfig" => { create: true, read: true, update: true, delete: true },
         "Reservation" => { create: true, read: true, update: true, delete: true },
         "Room" => { create: true, read: true, update: true, delete: true },
         "Service" => { create: true, read: true, update: true, delete: true },

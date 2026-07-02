@@ -2,7 +2,9 @@ module PropertyMappingConcern
   extend ActiveSupport::Concern
 
   included do
+    include DynamicValidationConcern
     before_validation :ensure_property_mapping, on: :create
+    before_validation :auto_populate_property_fields, on: [ :create, :update ]
     validate :category_matches_property_mapping_category
   end
 

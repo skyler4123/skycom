@@ -859,6 +859,98 @@ export default class Companies_Products_EditController extends Companies_LayoutC
 
 ---
 
+## JSONB Array Form Builder Pattern
+
+Some resources (PropertyMapping, TableConfig) store their config as a JSONB array in a single column. Their edit pages use a dynamic row-table pattern where users can add, edit, and remove array entries before submitting as a standard HTML form.
+
+### When to Use
+
+| Resource | JSONB Column | Array Entry Shape |
+|----------|-------------|-------------------|
+| PropertyMapping | `property_metadata` | `{key, name, label, type, validates}` |
+| TableConfig | `columns_metadata` | `{key, label, visible, sortable, align, pinned, width, roles, is_virtual, render_config}` |
+
+### Pattern: Dynamic Row Table
+
+The edit page stores the JSONB array as a JavaScript property on the controller. A `contentHTML()` method renders each entry as a table row with `<input>` and `<select>` fields. A `rerenderEditor()` method rebuilds the table HTML after add/remove operations.
+
+**Key methods:**
+
+| Method | Description |
+|--------|-------------|
+| `addXxx()` | Pushes a new entry (with defaults) to the array, calls `rerenderEditor()` |
+| `removeXxx(event)` | Splices the entry at `data-index`, calls `rerenderEditor()` |
+| `rerenderEditor()` | Replaces `innerHTML` of the table body and add-area with freshly indexed form fields |
+
+**Form field naming:** Each entry's inputs use bracket notation with a sequential index:
+
+```html
+<input name="resource[jsonb_column][0][key]" value="property_string_1">
+<input name="resource[jsonb_column][0][label]" value="Skin Type">
+<input name="resource[jsonb_column][1][key]" value="property_integer_1">
+```
+
+On add/remove, `rerenderEditor()` re-indexes all rows (0, 1, 2, ...) so that Rails interprets the POST body as a hash with numeric keys, which the controller converts back to an array.
+
+### Controller-Side Normalization
+
+HTML forms send JSONB arrays as hashes with string keys (`{"0" => {...}, "1" => {...}}`) wrapped in `ActionController::Parameters`. Two normalizations are required in the `update` action:
+
+**1. Hash-to-Array conversion** — Rails form parsing produces `{"0" => {...}, "1" => {...}}` instead of `[{...}, {...}]`. Convert before assigning to the JSONB column:
+
+```ruby
+p_params = resource_params
+if p_params[:jsonb_column].is_a?(ActionController::Parameters) && !p_params[:jsonb_column].is_a?(Array)
+  p_params[:jsonb_column] = p_params[:jsonb_column].values.to_a
+end
+```
+
+**2. Type normalization** (TableConfig only) — HTML forms send booleans as `"true"`/`"false"` strings, integers as strings, and arrays as comma-separated strings. Convert each entry:
+
+```ruby
+def normalize_column_types(columns)
+  columns.map do |col|
+    h = col.to_h
+    h["visible"] = to_boolean(h["visible"]) if h.key?("visible")
+    h["sortable"] = to_boolean(h["sortable"]) if h.key?("sortable")
+    h["width"] = h["width"].present? ? h["width"].to_i : nil
+    h["roles"] = h["roles"].present? ? h["roles"].split(",").map(&:strip) : []
+    h
+  end
+end
+```
+
+### Example: PropertyMapping Slot Picker
+
+The PropertyMapping edit page exposes all 65 available property slots (10 string, 5 text, 20 integer, 10 decimal, 10 boolean, 10 datetime). Used slots are filtered out. The "Add Property" dropdown shows only unused slots:
+
+```javascript
+allPropertySlots() {
+  const slots = []
+  for (let i = 1; i <= 10; i++) slots.push({ key: `property_string_${i}`, type: 'string' })
+  for (let i = 1; i <= 20; i++) slots.push({ key: `property_integer_${i}`, type: 'integer' })
+  // ...
+  return slots
+}
+
+addProperty() {
+  const select = document.getElementById('new-property-slot')
+  this.propertyMetadata.push({ key: select.value, name: '', label: '' })
+  this.rerenderEditor()
+}
+```
+
+### Example: TableConfig Column Builder
+
+Each column entry renders individual inputs for all fields. Checkboxes use hidden fields to send `"false"` when unchecked:
+
+```html
+<input type="hidden" name="resource[columns_metadata][0][visible]" value="false">
+<input type="checkbox" name="resource[columns_metadata][0][visible]" value="true" checked>
+```
+
+---
+
 ## Adding a New Resource Dashboard
 
 ### Step 1: Add Route
@@ -1041,6 +1133,9 @@ Three critical steps:
 | Customers | `/companies/:id/customers` | `customers/index_controller.js` |
 | Invoices | `/companies/:id/invoices` | `invoices/index_controller.js` |
 | Employees | `/companies/:id/employees` | `employees/index_controller.js` |
+| Categories | `/companies/:id/categories` | `categories/index_controller.js` |
+| Dynamic Properties | `/companies/:id/property_mappings` | `property_mappings/index_controller.js` |
+| Dynamic Tables | `/companies/:id/table_configs` | `table_configs/index_controller.js` |
 | Permissions | `/companies/:id/permissions` | `permissions/index_controller.js` |
 | Policies | `/companies/:id/policies` | `policies/index_controller.js` |
 

@@ -3,7 +3,7 @@ class Company < ApplicationRecord
   attribute :resource_names, :string, array: true, default: %w[
     Product Order Customer Employee Branch Department
     PolicyAppointment Invoice Payment Service
-     Category PropertyMapping Brand Facility
+     Category PropertyMapping TableConfig Brand Facility
      Table Reservation Room Guest
     Patient Appointment Course Student Exam
     Membership
