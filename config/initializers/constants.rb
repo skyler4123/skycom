@@ -335,3 +335,10 @@ SUBSCRIPTION_LIMITS = {
   max_of_branches: 3,
   max_of_employees: 5
 }.freeze
+
+# =============================================================================
+# OmniAuth Mock Credentials
+# Used in development/test for Google OAuth sign-in.
+# =============================================================================
+
+MOCK_OAUTH_EMAIL = "manager_1_retail_branch_1@company2.com".freeze

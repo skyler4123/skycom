@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 RSpec.feature "OmniAuth Google Sign-In", type: :feature, js: true do
-  let(:test_email) { "manager_1_retail_branch_1@company1.com" }
+  let(:test_email) { MOCK_OAUTH_EMAIL }
 
   before do
     OmniAuth.config.mock_auth[:google_oauth2] = OmniAuth::AuthHash.new({

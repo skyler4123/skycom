@@ -17,7 +17,7 @@ if Rails.env.development? || Rails.env.test?
     provider: "google_oauth2",
     uid: "google-mock-123456789",
     info: {
-      email: "manager_1_retail_branch_1@company1.com",
+      email: MOCK_OAUTH_EMAIL,
       name: "Manager One",
       first_name: "Manager",
       last_name: "One",
