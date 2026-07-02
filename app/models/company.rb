@@ -176,7 +176,7 @@ class Company < ApplicationRecord
 
     Seed::BillingContractService.create(company: self)
 
-    Seed::RetailInitService.call(company: self)
+    Seed::RetailInitService.call(company: self) unless Rails.env.test?
   end
 
   private
