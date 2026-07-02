@@ -71,6 +71,16 @@ class Seed::ApplicationService
     Seed::RetailEnrichService.new(company: company_2, user: user_2, email: "retail_vn@company2.com")
     # company_3 is init only (no enrichment)
 
+    # Hospital company (init via after_create, enrich via HospitalEnrichService)
+    company_4 = Seed::CompanyService.create(
+      user: user_3, name: "Smile Dental Center", email: "hospital@company3.com",
+      description: "A multi-specialty dental clinic group",
+      business_type: :hospital,
+      country_code: :us, currency_code: :usd, timezone: :minus_5
+    )
+
+    Seed::HospitalEnrichService.new(company: company_4, user: user_3, email: "hospital@company3.com")
+
     self.puts_count
 
     puts "\n========================================================="

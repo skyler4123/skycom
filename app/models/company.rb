@@ -178,7 +178,13 @@ class Company < ApplicationRecord
 
     Seed::BillingContractService.create(company: self)
 
-    Seed::RetailInitService.call(company: self) unless self.class.skip_retail_init
+    unless self.class.skip_retail_init
+      if retail?
+        Seed::RetailInitService.call(company: self)
+      elsif hospital?
+        Seed::HospitalInitService.call(company: self)
+      end
+    end
   end
 
   private
