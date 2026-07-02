@@ -130,7 +130,7 @@ class Seed::HospitalInitService
         "Service" => { read: true },
         "Appointment" => { read: true }
       },
-      PracticeManager: {
+      Manager: {
         "Customer" => { create: true, read: true, update: true, delete: true },
         "Patient" => { create: true, read: true, update: true, delete: true },
         "Order" => { create: true, read: true, update: true, delete: true },

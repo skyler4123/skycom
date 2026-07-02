@@ -341,7 +341,7 @@ SUBSCRIPTION_LIMITS = {
 # Used in development/test for Google OAuth sign-in.
 # =============================================================================
 
-MOCK_OAUTH_EMAIL = "PracticeManager_1_clinic_1@company3.com".freeze
+MOCK_OAUTH_EMAIL = "Manager_1_clinic_1@company3.com".freeze
 
 # =============================================================================
 # Retail Init Defaults
@@ -763,7 +763,7 @@ RETAIL_INIT_CATEGORIES = {
 # =============================================================================
 
 HOSPITAL_INIT_ROLES = [
-  :Receptionist, :Dentist, :DentalAssistant, :Hygienist, :PracticeManager, :SystemAdmin
+  :Receptionist, :Dentist, :DentalAssistant, :Hygienist, :Manager, :SystemAdmin
 ].freeze
 
 HOSPITAL_INIT_COMPANY_GROUP_BUSINESS_TYPE = :hospital

@@ -4,7 +4,7 @@ class Seed::HospitalEnrichService
     DentalAssistant: 8,
     Receptionist: 5,
     Hygienist: 3,
-    PracticeManager: 1
+    Manager: 1
   }.freeze
 
   HOSPITAL_ENRICH_CUSTOMER_COUNTS = { Patient: 50 }.freeze
