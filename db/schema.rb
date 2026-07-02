@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_06_26_162532) do
+ActiveRecord::Schema[8.0].define(version: 2026_07_02_184932) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pgcrypto"
@@ -4632,15 +4632,15 @@ ActiveRecord::Schema[8.0].define(version: 2026_06_26_162532) do
   create_table "shifts", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
     t.uuid "company_id", null: false
     t.uuid "branch_id"
-    t.uuid "period_id", null: false
     t.string "name"
     t.string "description"
     t.jsonb "metadata", default: {}
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.time "start_time", null: false
+    t.time "end_time", null: false
     t.index ["branch_id"], name: "index_shifts_on_branch_id"
     t.index ["company_id"], name: "index_shifts_on_company_id"
-    t.index ["period_id"], name: "index_shifts_on_period_id"
   end
 
   create_table "sign_in_tokens", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
@@ -5974,7 +5974,6 @@ ActiveRecord::Schema[8.0].define(version: 2026_06_26_162532) do
   add_foreign_key "settings", "setting_groups"
   add_foreign_key "shifts", "branches"
   add_foreign_key "shifts", "companies"
-  add_foreign_key "shifts", "periods"
   add_foreign_key "sign_in_tokens", "users"
   add_foreign_key "stock_exports", "branches"
   add_foreign_key "stock_exports", "categories"

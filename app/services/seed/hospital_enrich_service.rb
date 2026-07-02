@@ -47,6 +47,7 @@ class Seed::HospitalEnrichService
     create_patients
     create_services
     create_appointments
+    create_shifts
     create_billing_data
 
     print_footer
@@ -230,5 +231,22 @@ class Seed::HospitalEnrichService
   def create_billing_data
     puts "Generating billing data..."
     Seed::BillingDataService.create(company: @company)
+  end
+
+  def create_shifts
+    puts "Creating shifts..."
+    @branches.each do |branch|
+      [ { name: "Morning",   start: "07:00", end: "15:00" },
+        { name: "Afternoon", start: "15:00", end: "23:00" },
+        { name: "Night",     start: "23:00", end: "07:00" }
+      ].each do |shift_data|
+        Seed::ShiftService.create(
+          company: @company, branch: branch,
+          name: shift_data[:name],
+          start_time: shift_data[:start],
+          end_time: shift_data[:end]
+        )
+      end
+    end
   end
 end
