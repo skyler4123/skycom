@@ -1,16 +1,16 @@
 class Seed::RetailEnrichService
-  def initialize(user:, email: Faker::Internet.email, name: nil,
+  def initialize(user:, email: Faker::Internet.email, name: nil, company: nil,
                  country_code: :us, currency_code: :usd, timezone: :minus_5,
                  address_line_1: nil, city: nil, postal_code: nil)
     @multi_company_owner = user
-    @name = name
-    @country_code = country_code
-    @currency_code = currency_code
-    @timezone = timezone
+    @name = name || company&.name
+    @country_code = country_code || company&.country_code || :us
+    @currency_code = currency_code || company&.currency_code || :usd
+    @timezone = timezone || company&.timezone || :minus_5
     @address_line_1 = address_line_1
     @city = city
     @postal_code = postal_code
-    @retail = nil
+    @retail = company
     @branches = []
     @facilities = []
     @departments = []
@@ -34,7 +34,7 @@ class Seed::RetailEnrichService
   def seeding
     print_header
 
-    create_retail_company
+    create_retail_company unless @retail
     create_brands
     create_branches
     create_pages

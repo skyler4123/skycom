@@ -47,17 +47,29 @@ class Seed::ApplicationService
     user_3.address = Seed::AddressService.create
 
     # Create company groups
-    Seed::RetailEnrichService.new(user: user_1, email: "retail_us@company1.com", name: "Grocery 1",
-      country_code: :us, currency_code: :usd, timezone: :minus_5)
-    Seed::RetailEnrichService.new(user: user_2, email: "retail_vn@company2.com", name: "Grocery VN",
+    company_1 = Seed::CompanyService.create(
+      user: user_1, name: "Grocery 1", email: "retail_us@company1.com",
+      description: "A group for multiple retail branch branches",
+      business_type: RETAIL_INIT_COMPANY_GROUP_BUSINESS_TYPE,
+      country_code: :us, currency_code: :usd, timezone: :minus_5
+    )
+    company_2 = Seed::CompanyService.create(
+      user: user_2, name: "Grocery VN", email: "retail_vn@company2.com",
+      description: "A group for multiple retail branch branches",
+      business_type: RETAIL_INIT_COMPANY_GROUP_BUSINESS_TYPE,
       country_code: :vn, currency_code: :vnd, timezone: :plus_7,
-      city: "Ho Chi Minh City", address_line_1: "123 Le Loi Street")
-    # Seed::RestaurantService.new(user: user_1, email: "restaurant1@company1.com")
-    # Seed::HospitalService.new(user: user_1, email: "hospital1@company1.com")
-    # Seed::EducationService.new(user: user_1, email: "education1@company1.com")
-    # Seed::HotelService.new(user: user_1, email: "hotel1@company1.com")
-    # Seed::FitnessService.new(user: user_1, email: "fitness1@company1.com")
-    # Seed::RetailEnrichService.new(user: user_2, email: "retail1@company3.com")
+      address_line_1: "123 Le Loi Street", city: "Ho Chi Minh City"
+    )
+    company_3 = Seed::CompanyService.create(
+      user: user_3, name: "Company 3", email: "retail1@company3.com",
+      description: "A group for multiple retail branch branches",
+      business_type: RETAIL_INIT_COMPANY_GROUP_BUSINESS_TYPE,
+      country_code: :us, currency_code: :usd, timezone: :minus_5
+    )
+
+    Seed::RetailEnrichService.new(company: company_1, user: user_1, email: "retail_us@company1.com")
+    Seed::RetailEnrichService.new(company: company_2, user: user_2, email: "retail_vn@company2.com")
+    # company_3 is init only (no enrichment)
 
     self.puts_count
 
