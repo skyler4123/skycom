@@ -1,5 +1,5 @@
 class Company < ApplicationRecord
-  class_attribute :skip_retail_init, default: false
+  class_attribute :skip_init, default: false
 
   attribute :permission_resource_name, :string, default: -> { self.name }
   attribute :resource_names, :string, array: true, default: %w[
@@ -178,7 +178,7 @@ class Company < ApplicationRecord
 
     Seed::BillingContractService.create(company: self)
 
-    unless self.class.skip_retail_init
+    unless self.class.skip_init
       if business_type_retail?
         Seed::RetailInitService.call(company: self)
       elsif business_type_hospital?
