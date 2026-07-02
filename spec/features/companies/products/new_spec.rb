@@ -99,6 +99,7 @@ RSpec.feature "Companies::Products New", type: :feature, js: true do
     select(category_cosmetics.name, from: 'product[category_id]')
 
     fill_in 'product[property_string_1]', with: 'Oily'
+    fill_in 'product[property_string_2]', with: 'Hyaluronic Acid'
     fill_in 'product[property_integer_1]', with: '200'
 
     click_button "Save Product"
