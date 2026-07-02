@@ -175,6 +175,8 @@ class Company < ApplicationRecord
     )
 
     Seed::BillingContractService.create(company: self)
+
+    Seed::RetailInitService.call(company: self)
   end
 
   private
