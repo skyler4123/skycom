@@ -4,12 +4,15 @@ export default class Companies_ShiftTemplates_EditController extends Companies_L
   /** @type {Object|null} */
   shiftTemplate = null
 
+  /** @type {string} */
+  templateId = ""
+
   async connect() {
     super.connect()
     const pathParts = window.location.pathname.split("/")
-    const id = pathParts[pathParts.length - 2]
+    this.templateId = pathParts[pathParts.length - 2]
     try {
-      const response = await fetchJson(`${Helpers.company_shift_template_path(currentCompany().id, id)}.json`)
+      const response = await fetchJson(`${Helpers.company_shift_template_path(currentCompany().id, this.templateId)}.json`)
       this.shiftTemplate = response.shift_template
     } catch (error) {
       toast({ type: "error", message: translate("Failed to load shift template") })
@@ -23,7 +26,6 @@ export default class Companies_ShiftTemplates_EditController extends Companies_L
   contentHTML() {
     const st = this.shiftTemplate
     if (!st) return '<div class="p-8 text-center">Not found.</div>'
-    const id = window.location.pathname.split("/").pop()
 
     const fields = `
       <div class="space-y-6">
@@ -55,7 +57,7 @@ export default class Companies_ShiftTemplates_EditController extends Companies_L
           </div>
         </div>
         <div class="flex justify-end gap-3 pt-2">
-          <a href="${Helpers.company_shift_template_path(currentCompany().id, id)}"
+          <a href="${Helpers.company_shift_template_path(currentCompany().id, this.templateId)}"
             class="px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-100 rounded-lg cursor-pointer">
             ${translate("Cancel")}
           </a>
@@ -70,7 +72,7 @@ export default class Companies_ShiftTemplates_EditController extends Companies_L
     return `
       <div class="p-4 overflow-y-auto">
         ${form({
-          action: Helpers.company_shift_template_path(currentCompany().id, id),
+          action: Helpers.company_shift_template_path(currentCompany().id, this.templateId),
           method: "PATCH",
           attributes: `class="p-6 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800" data-turbo="false" novalidate`,
           html: fields
