@@ -8,6 +8,10 @@ class CreateShiftTemplates < ActiveRecord::Migration[8.0]
       t.time :end_time, null: false
       t.integer :grace_period_minutes, default: 15, null: false
       t.integer :unpaid_break_minutes, default: 60, null: false
+      t.string :policy_type, default: "fixed", null: false
+      t.integer :full_day_minutes, default: 480, null: false
+      t.time :core_start_time
+      t.time :core_end_time
       t.string :description
 
       t.integer :lifecycle_status

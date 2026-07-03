@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_07_02_190003) do
+ActiveRecord::Schema[8.0].define(version: 2026_07_03_223342) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pgcrypto"
@@ -334,6 +334,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_02_190003) do
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer "total_deficit_minutes"
     t.index ["branch_id"], name: "index_attendance_months_on_branch_id"
     t.index ["company_id"], name: "index_attendance_months_on_company_id"
     t.index ["discarded_at"], name: "index_attendance_months_on_discarded_at"
@@ -406,7 +407,6 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_02_190003) do
     t.integer "workflow_status", default: 0
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["company_id"], name: "idx_billing_contracts_active_company", unique: true, where: "(lifecycle_status = 1)"
     t.index ["company_id"], name: "index_billing_contracts_on_company_id"
     t.index ["lifecycle_status"], name: "index_billing_contracts_on_lifecycle_status"
     t.index ["workflow_status"], name: "index_billing_contracts_on_workflow_status"
@@ -4729,6 +4729,10 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_02_190003) do
     t.time "end_time", null: false
     t.integer "grace_period_minutes", default: 15, null: false
     t.integer "unpaid_break_minutes", default: 60, null: false
+    t.string "policy_type", default: "fixed", null: false
+    t.integer "full_day_minutes", default: 480, null: false
+    t.time "core_start_time"
+    t.time "core_end_time"
     t.string "description"
     t.integer "lifecycle_status"
     t.integer "workflow_status"
@@ -4742,20 +4746,6 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_02_190003) do
     t.index ["branch_id"], name: "index_shift_templates_on_branch_id"
     t.index ["company_id"], name: "index_shift_templates_on_company_id"
     t.index ["discarded_at"], name: "index_shift_templates_on_discarded_at"
-  end
-
-  create_table "shifts", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
-    t.uuid "company_id", null: false
-    t.uuid "branch_id"
-    t.string "name"
-    t.string "description"
-    t.jsonb "metadata", default: {}
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.time "start_time", null: false
-    t.time "end_time", null: false
-    t.index ["branch_id"], name: "index_shifts_on_branch_id"
-    t.index ["company_id"], name: "index_shifts_on_company_id"
   end
 
   create_table "sign_in_tokens", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
@@ -6096,8 +6086,6 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_02_190003) do
   add_foreign_key "settings", "setting_groups"
   add_foreign_key "shift_templates", "branches"
   add_foreign_key "shift_templates", "companies"
-  add_foreign_key "shifts", "branches"
-  add_foreign_key "shifts", "companies"
   add_foreign_key "sign_in_tokens", "users"
   add_foreign_key "stock_exports", "branches"
   add_foreign_key "stock_exports", "categories"
