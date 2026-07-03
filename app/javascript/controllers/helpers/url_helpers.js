@@ -123,6 +123,7 @@ export const company_shift_templates_path = (companyId) => `/companies/${company
 export const new_company_shift_template_path = (companyId) => `/companies/${companyId}/shift_templates/new`
 export const company_shift_template_path = (companyId, id) => `/companies/${companyId}/shift_templates/${id}`
 export const edit_company_shift_template_path = (companyId, id) => `/companies/${companyId}/shift_templates/${id}/edit`
+export const create_company_shift_templates_path = (companyId) => `/companies/${companyId}/shift_templates`
 export const company_reports_path = (companyId) => `/companies/${companyId}/reports`
 export const company_documents_path = (companyId) => `/companies/${companyId}/documents`
 export const company_announcements_path = (companyId) => `/companies/${companyId}/announcements`
