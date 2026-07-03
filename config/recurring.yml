@@ -9,53 +9,7 @@
 #     priority: 2
 #     schedule: at 5am every day
 
-# ----------------------------------------------------------------------------------------------------
-# production:
-#   clear_solid_queue_finished_jobs:
-#     command: "SolidQueue::Job.clear_finished_in_batches(sleep_between_batches: 0.3)"
-#     schedule: every hour at minute 12
-# ----------------------------------------------------------------------------------------------------
-
-default: &default
-  # demo_job:
-  #   class: DemoJob
-  #   queue: demo_job
-  #   schedule: every 1 minutes
-  statistic_job:
-    class: StatisticJob
-    queue: statistic_job
-    schedule: every 1 hours
-
-  sync_daily_usage:
-    class: Billing::SyncDailyMetricJob
-    queue: default
-    schedule: every 1 hours
-
-  # 6-hour idempotent snapshot of which addon features are active per accessible company.
-  # A row in daily_feature_logs == "bill this feature for 1 calendar date".
-  # The unique index on [company_id, contract_feature_id, log_date] prevents double-counting.
-  sync_daily_feature:
-    class: Billing::SyncDailyFeatureJob
-    queue: default
-    schedule: every 6 hours
-
-  sync_suspension:
-    class: Billing::SyncSuspensionJob
-    queue: default
-    schedule: at 0am every day
-
-  monthly_billing:
-    class: Billing::MonthlyBillingJob
-    queue: default
-    schedule: "0 0 1 * *" # Midnight on the 1st of every month
-
-
-development:
-  <<: *default
-
-test:
-  <<: *default
-
 production:
-  <<: *default
-# ----------------------------------------------------------------------------------------------------
+  clear_solid_queue_finished_jobs:
+    command: "SolidQueue::Job.clear_finished_in_batches(sleep_between_batches: 0.3)"
+    schedule: every hour at minute 12

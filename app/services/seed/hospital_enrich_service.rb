@@ -338,14 +338,6 @@ class Seed::HospitalEnrichService
           computed_status: status
         )
 
-        # Accumulate daily data
-        days_data[date] ||= {}
-        days_data[date][employee.id] ||= { total_seconds: 0, late_seconds: 0, early_seconds: 0, overtime_seconds: 0, records: 0 }
-        days_data[date][employee.id][:total_seconds] += net_work * 60
-        days_data[date][employee.id][:late_seconds] += late * 60
-        days_data[date][employee.id][:early_seconds] += early * 60
-        days_data[date][employee.id][:overtime_seconds] += overtime * 60
-        days_data[date][employee.id][:records] += 1
       end
     end
 

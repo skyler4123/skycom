@@ -1,11 +1,9 @@
 default: &default
-  database: cache
   store_options:
     # Cap age of oldest cache entry to fulfill retention policies
     # max_age: <%= 60.days.to_i %>
     max_size: <%= 256.megabytes %>
-    # We dont need to prefix with namespace like development:key1 because we tend to use sqlite for each instance-environment
-    # namespace: <%= Rails.env %>
+    namespace: <%= Rails.env %>
 
 development:
   <<: *default
@@ -14,4 +12,5 @@ test:
   <<: *default
 
 production:
+  database: cache
   <<: *default
