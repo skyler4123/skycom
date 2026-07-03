@@ -103,25 +103,26 @@ Steps:
 
 ## 5. Dashboards
 
-Two dashboards following the Shell-First pattern:
+Three dashboards following the Shell-First pattern, all with pagination:
 
 | Dashboard | Route | Controller | Stimulus |
 |-----------|-------|------------|----------|
 | Shift Templates | `/companies/:id/shift_templates` | `Companies::ShiftTemplatesController` | `companies/shift_templates/*` |
+| Schedules | `/companies/:id/schedules` | `Companies::SchedulesController` | `companies/schedules/*` |
 | Attendance | `/companies/:id/attendances` | `Companies::AttendancesController` | `companies/attendances/*` |
 
-Shift Templates has full CRUD (index, new, create, show, edit, update). Attendance has index (with date/employee filters) and show.
+Shift Templates has full CRUD (index, new, create, show, edit, update). Schedules shows employee rosters with date/status filters and pagination. Attendance has index (with date/employee filters, pagination) and show.
 
 ---
 
 ## 6. Permission Matrix
 
-| Role | ShiftTemplate | AttendanceRecord |
-|------|--------------|-----------------|
-| Owner (bypass) | Full CRUD | Full CRUD |
-| Admin | Full CRUD | Full CRUD |
-| Manager | Full CRUD | Full CRUD |
-| Other roles | No access | No access |
+| Role | ShiftTemplate | ScheduledShift | AttendanceRecord |
+|------|--------------|---------------|-----------------|
+| Owner (bypass) | Full CRUD | Full CRUD | Full CRUD |
+| Admin | Full CRUD | Full CRUD | Full CRUD |
+| Manager | Full CRUD | Full CRUD | Full CRUD |
+| Other roles | No access | No access | No access |
 
 Only Owner (via `owner_role?` bypass) and Admin/Manager roles have access. Other roles (Receptionist, Dentist, etc.) cannot access HR dashboards unless explicitly granted by Owner via the Permissions UI.
 
@@ -160,7 +161,9 @@ Shift seeds include realistic edge cases:
 | CheckInService | Done |
 | CheckOutService | Done |
 | Shift Templates dashboard (CRUD) | Done |
+| Schedules dashboard (list) | Done |
 | Attendance dashboard (list) | Done |
+| Pagination on all HR dashboards | Done |
 | Sidebar navigation links | Done |
 | Hospital seeding (shift/attendance data) | Done |
 | MOCK_OAUTH_EMAIL → hospital Manager | Done |
@@ -204,9 +207,12 @@ Shift seeds include realistic edge cases:
 | `app/services/attendance/check_out_service.rb` | Service |
 | `app/services/seed/shift_template_service.rb` | Seed service |
 | `app/controllers/companies/shift_templates_controller.rb` | Controller |
+| `app/controllers/companies/schedules_controller.rb` | Controller |
 | `app/controllers/companies/attendances_controller.rb` | Controller |
 | `app/policies/companies/shift_templates_policy.rb` | Pundit policy |
+| `app/policies/companies/schedules_policy.rb` | Pundit policy |
 | `app/policies/companies/attendances_policy.rb` | Pundit policy |
 | `app/javascript/controllers/companies/shift_templates/*` | Stimulus (5 files) |
+| `app/javascript/controllers/companies/schedules/*` | Stimulus (1 file) |
 | `app/javascript/controllers/companies/attendances/*` | Stimulus (1 file) |
 | `spec/models/*_spec.rb` | Model specs (7 files) |
