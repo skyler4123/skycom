@@ -115,12 +115,22 @@ AttendanceLogs (raw sequential timestamps)
 
 ### Step 1: Segment Fusion
 
-Gather all AttendanceLog entries for one employee on one day, sorted chronologically. Pair them sequentially:
+Gather all AttendanceLog entries for one employee on one day, sorted chronologically.
+
+**With check_out events:** Pair them sequentially:
 
 - Punch 1 (In) → Punch 2 (Out) = Work Segment A
 - Punch 3 (In) → Punch 4 (Out) = Work Segment B
 
 If an "In" has no matching "Out" before end of day, the segment is invalid — flagged for manager review.
+
+**Check-in only devices (no check_out):** Some companies use devices that only record check-in events. In this case, create a single virtual segment from the **first check_in** to the **last check_in**:
+
+- First check_in = arrival time
+- Last check_in = last known presence at work
+- Duration = last_check_in - first_check_in
+
+This gives the total time span at work. Break deduction and policy matching proceed normally. If the last check_in is before the expected end time, the employee is flagged with under-hours or early departure.
 
 ### Step 2: Calculate Gross Minutes
 
@@ -220,6 +230,8 @@ Shift seeds include realistic edge cases:
 | Model specs (35 examples) | Done |
 | CheckInService | Done |
 | CheckOutService | Done |
+| DailyResolutionService + SegmentFuser + PolicyMatcher | Done |
+| Check-in only device support (virtual segments) | Done |
 | Shift Templates dashboard (CRUD) | Done |
 | Shifts dashboard (list) | Done |
 | Attendance dashboard (list) | Done |
