@@ -48,6 +48,7 @@ class Seed::HospitalEnrichService
     create_services
     create_appointments
     create_shifts
+    create_attendance_policies
     create_billing_data
 
     print_footer
@@ -234,19 +235,47 @@ class Seed::HospitalEnrichService
   end
 
   def create_shifts
-    puts "Creating shifts..."
+    puts "Creating shift templates and schedules..."
+    templates = []
     @branches.each do |branch|
       [ { name: "Morning",   start: "07:00", end: "15:00" },
         { name: "Afternoon", start: "15:00", end: "23:00" },
         { name: "Night",     start: "23:00", end: "07:00" }
       ].each do |shift_data|
-        Seed::ShiftService.create(
+        template = Seed::ShiftTemplateService.create(
           company: @company, branch: branch,
           name: shift_data[:name],
           start_time: shift_data[:start],
           end_time: shift_data[:end]
         )
+        templates << template
       end
+    end
+
+    # Create scheduled shifts for employees
+    @employees.each do |employee|
+      template = templates.select { |t| t.branch_id == employee.branch_id }.sample
+      next unless template
+
+      date = Date.current + rand(0..7).days
+      ScheduledShift.create!(
+        company: @company, branch: employee.branch, employee: employee,
+        shift_template: template, work_date: date,
+        expected_start_at: date.to_time.change(hour: template.start_time.hour, min: template.start_time.min),
+        expected_end_at: date.to_time.change(hour: template.end_time.hour, min: template.end_time.min),
+        status: :scheduled
+      )
+    end
+  end
+
+  def create_attendance_policies
+    puts "Creating attendance policies..."
+    @branches.each do |branch|
+      AttendancePolicy.create!(
+        company: @company, branch: branch,
+        latitude: 10.773, longitude: 106.694,
+        allowed_radius_meters: 100
+      )
     end
   end
 end
