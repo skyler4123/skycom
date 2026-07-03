@@ -47,16 +47,17 @@ export default class Companies_ShiftTemplates_IndexController extends Companies_
               <tbody data-${this.identifier}-target="shiftTemplatesList" class="divide-y divide-slate-200 dark:divide-slate-800">
                 ${this.shiftTemplates.map(st => `
                   <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/50">
-                    <td class="py-4 px-6 text-sm font-medium text-slate-900 dark:text-white">${st.name}</td>
+                    <td class="py-4 px-6 text-sm font-medium">
+                      <a href="${Helpers.company_shift_template_path(currentCompany().id, st.id)}"
+                        class="text-slate-900 dark:text-white hover:text-blue-600 dark:hover:text-blue-400 cursor-pointer">
+                        ${st.name}
+                      </a>
+                    </td>
                     <td class="py-4 px-6 text-sm text-slate-600">${st.start_time}</td>
                     <td class="py-4 px-6 text-sm text-slate-600">${st.end_time}</td>
                     <td class="py-4 px-6 text-sm text-slate-600">${st.grace_period_minutes}min</td>
                     <td class="py-4 px-6 text-sm text-slate-600">${st.unpaid_break_minutes}min</td>
                     <td class="py-4 px-6 text-sm text-right">
-                      <a href="${Helpers.company_shift_template_path(currentCompany().id, st.id)}"
-                        class="inline-flex items-center justify-center p-2 text-slate-500 hover:text-blue-600 hover:bg-blue-50 rounded-lg cursor-pointer">
-                        <span class="material-symbols-outlined text-[20px]">visibility</span>
-                      </a>
                       <a href="${Helpers.edit_company_shift_template_path(currentCompany().id, st.id)}"
                         class="inline-flex items-center justify-center p-2 text-slate-500 hover:text-blue-600 hover:bg-blue-50 rounded-lg cursor-pointer">
                         <span class="material-symbols-outlined text-[20px]">edit</span>
