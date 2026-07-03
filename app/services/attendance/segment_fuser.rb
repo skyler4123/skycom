@@ -9,6 +9,35 @@ module Attendance
     end
 
     def fuse
+      return [] if @logs.empty?
+
+      # Detect check_in-only scenario: no check_out events at all
+      check_ins = @logs.select { |l| l.log_type == "check_in" }
+      check_outs = @logs.select { |l| l.log_type == "check_out" }
+
+      if check_outs.empty? && check_ins.length >= 1
+        return fuse_check_in_only(check_ins)
+      end
+
+      fuse_paired
+    end
+
+    private
+
+    def fuse_check_in_only(check_ins)
+      first = check_ins.first
+      last = check_ins.last
+      duration = ((last.logged_at - first.logged_at) / 60).to_i
+      [ {
+        start_at: first.logged_at,
+        end_at: last.logged_at,
+        duration_minutes: duration,
+        has_check_out: true,
+        is_virtual: true
+      } ]
+    end
+
+    def fuse_paired
       segments = []
       i = 0
       while i < @logs.length

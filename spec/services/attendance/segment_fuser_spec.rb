@@ -29,13 +29,26 @@ RSpec.describe Attendance::SegmentFuser do
     expect(segments[1][:duration_minutes]).to eq(240)
   end
 
-  it "flags missing check_out" do
+  it "creates virtual segment for check_in-only logs" do
     logs = [
       log("check_in", Time.zone.parse("2026-07-02 08:00"))
     ]
     segments = described_class.fuse(logs)
     expect(segments.length).to eq(1)
-    expect(segments[0][:has_check_out]).to be false
+    expect(segments[0][:has_check_out]).to be true
+    expect(segments[0][:is_virtual]).to be true
+    expect(segments[0][:duration_minutes]).to eq(0)
+  end
+
+  it "creates virtual segment from first to last check_in" do
+    logs = [
+      log("check_in", Time.zone.parse("2026-07-02 08:00")),
+      log("check_in", Time.zone.parse("2026-07-02 17:00"))
+    ]
+    segments = described_class.fuse(logs)
+    expect(segments.length).to eq(1)
+    expect(segments[0][:duration_minutes]).to eq(540)
+    expect(segments[0][:is_virtual]).to be true
   end
 
   it "ignores orphan check_out" do

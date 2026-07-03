@@ -337,7 +337,6 @@ class Seed::HospitalEnrichService
           early_leave_minutes: early, overtime_minutes: overtime,
           computed_status: status
         )
-
       end
     end
 

@@ -22,7 +22,7 @@ RSpec.describe Attendance::PolicyMatcher do
     shift = ScheduledShift.new(expected_start_at: date.to_time.change(hour: 8))
     allow(ScheduledShift).to receive(:find_by).and_return(shift)
     template = ShiftTemplate.new(policy_type: "fixed", grace_period_minutes: 15)
-    segments = [{ start_at: date.to_time.change(hour: 8, min: 5), has_check_out: true }]
+    segments = [ { start_at: date.to_time.change(hour: 8, min: 5), has_check_out: true } ]
     result = described_class.match(480, segments, template, employee, date)
     expect(result[:status]).to eq(:present)
   end
@@ -33,7 +33,7 @@ RSpec.describe Attendance::PolicyMatcher do
     shift = ScheduledShift.new(expected_start_at: date.to_time.change(hour: 8))
     allow(ScheduledShift).to receive(:find_by).and_return(shift)
     template = ShiftTemplate.new(policy_type: "fixed", grace_period_minutes: 15)
-    segments = [{ start_at: date.to_time.change(hour: 9), has_check_out: true }]
+    segments = [ { start_at: date.to_time.change(hour: 9), has_check_out: true } ]
     result = described_class.match(480, segments, template, employee, date)
     expect(result[:status]).to eq(:late)
   end
