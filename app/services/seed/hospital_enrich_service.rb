@@ -247,7 +247,9 @@ class Seed::HospitalEnrichService
           company: @company, branch: branch,
           name: shift_data[:name],
           start_time: shift_data[:start],
-          end_time: shift_data[:end]
+          end_time: shift_data[:end],
+          policy_type: "fixed",
+          full_day_minutes: 480
         )
         templates << template
       end
@@ -282,8 +284,6 @@ class Seed::HospitalEnrichService
 
   def create_attendance_event_data
     puts "Creating attendance event data..."
-    days_data = {}
-    months_data = {}
 
     @employees.each do |employee|
       next unless employee.branch
@@ -349,44 +349,14 @@ class Seed::HospitalEnrichService
       end
     end
 
-    # Create attendance_days
-    puts "  -> Creating daily attendance records..."
-    days_data.each do |date, emp_data|
-      emp_data.each do |employee_id, data|
-        AttendanceDay.create!(
-          company: @company, branch: Employee.find(employee_id).branch,
-          employee_id: employee_id, attendance_date: date,
-          check_in: (date.to_time + 7.hours), check_out: (date.to_time + 15.hours),
-          total_seconds_present: data[:total_seconds],
-          total_seconds_break: 3600,
-          total_seconds_worked: data[:total_seconds] - 3600,
-          total_seconds_overtime: data[:overtime_seconds],
-          attendance_status: :present, recorded_method: :mobile
-        )
-      end
-    end
-
-    # Create attendance_months
-    puts "  -> Creating monthly attendance records..."
-    monthly = {}
-    AttendanceDay.where(company: @company).find_each do |day|
-      month_key = day.attendance_date.beginning_of_month.to_date
-      monthly[month_key] ||= {}
-      monthly[month_key][day.employee_id] ||= { total: 0, late: 0, early: 0, overtime: 0, absent: 0, present: 0, count: 0 }
-      monthly[month_key][day.employee_id][:total] += day.total_seconds_worked || 0
-      monthly[month_key][day.employee_id][:present] += 1
-      monthly[month_key][day.employee_id][:count] += 1
-    end
-
-    monthly.each do |month_key, emp_data|
-      emp_data.each do |employee_id, data|
-        AttendanceMonth.create!(
-          company: @company, employee_id: employee_id,
-          month: month_key,
-          total_work_minutes: (data[:total] / 60).to_i,
-          total_present_days: data[:present],
-          total_records: data[:count]
-        )
+    # Run resolution engine
+    puts "  -> Running daily resolution..."
+    resolved_dates = (1..14).map { |i| Date.current - i.days }.reject { |d| d.saturday? || d.sunday? }
+    @employees.each do |emp|
+      resolved_dates.each do |date|
+        Attendance::DailyResolutionService.new.call(employee: emp, date: date)
+      rescue => e
+        Rails.logger.warn("Resolution failed for #{emp.id} on #{date}: #{e.message}")
       end
     end
   end
