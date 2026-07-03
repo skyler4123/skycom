@@ -9,7 +9,7 @@ class Company < ApplicationRecord
      Table Reservation Room Guest
     Patient Appointment Course Student Exam
     Membership
-    Page
+    Page ShiftTemplate AttendanceRecord
     Stock StockTransfer StockImport StockExport
   ]
 
