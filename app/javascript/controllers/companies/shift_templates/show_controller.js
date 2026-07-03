@@ -35,11 +35,11 @@ export default class Companies_ShiftTemplates_ShowController extends Companies_L
           <div class="grid grid-cols-2 gap-6">
             <div>
               <p class="text-xs font-medium text-slate-500">${translate("Start Time")}</p>
-              <p class="text-sm font-semibold text-slate-900">${(st.start_time || '').slice(0, 5)}</p>
+              <p class="text-sm font-semibold text-slate-900">${this.formatTime(st.start_time)}</p>
             </div>
             <div>
               <p class="text-xs font-medium text-slate-500">${translate("End Time")}</p>
-              <p class="text-sm font-semibold text-slate-900">${(st.end_time || '').slice(0, 5)}</p>
+              <p class="text-sm font-semibold text-slate-900">${this.formatTime(st.end_time)}</p>
             </div>
             <div>
               <p class="text-xs font-medium text-slate-500">${translate("Grace Period")}</p>
@@ -63,5 +63,10 @@ export default class Companies_ShiftTemplates_ShowController extends Companies_L
         </div>
       </div>
     `
+  }
+
+  formatTime(timeStr) {
+    if (!timeStr) return ''
+    return new Date(timeStr).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', hour12: false })
   }
 }
