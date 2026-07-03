@@ -172,7 +172,8 @@ class Seed::HospitalInitService
       next unless role
 
       resources.each do |resource_name, actions_hash|
-        actions_hash.each do |action, is_active|
+        %w[create read update delete].each do |action|
+          is_active = actions_hash[action.to_sym]
           policy = Policy.find_by!(company: @company, resource: resource_name, action: action)
           appointment = PolicyAppointment.find_or_create_by!(
             company: @company,
