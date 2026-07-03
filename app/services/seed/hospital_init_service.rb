@@ -134,7 +134,6 @@ class Seed::HospitalInitService
         "Product" => { create: true, read: true, update: true, delete: true },
         "Page" => { create: true, read: true, update: true, delete: true },
         "Brand" => { create: true, read: true, update: true, delete: true },
-        "Policy" => { read: true },
         "Membership" => { create: true, read: true, update: true, delete: true },
         "Reservation" => { create: true, read: true, update: true, delete: true },
         "Room" => { create: true, read: true, update: true, delete: true },
