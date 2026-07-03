@@ -11,6 +11,7 @@ export default class Companies_Attendances_IndexController extends Companies_Lay
     try {
       const response = await fetchJson()
       this.attendanceRecords = response.attendance_records || []
+      this.pagination = response.pagination || {}
     } catch (error) {
       toast({ type: "error", message: translate("Failed to load attendance records") })
     }
@@ -69,6 +70,9 @@ export default class Companies_Attendances_IndexController extends Companies_Lay
                 `).join('')}
               </tbody>
             </table>
+          </div>
+          <div class="flex justify-center pt-6">
+            ${pagination(this.pagination)}
           </div>
         </div>
       </div>

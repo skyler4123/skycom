@@ -8,7 +8,8 @@ class Companies::SchedulesController < Companies::ApplicationController
         scope = scope.where("work_date >= ?", params[:from]) if params[:from].present?
         scope = scope.where("work_date <= ?", params[:to]) if params[:to].present?
         scope = scope.where(status: params[:status]) if params[:status].present?
-        render json: { scheduled_shifts: scope.order(work_date: :asc, expected_start_at: :asc).map { |s| format_shift(s) } }
+        @pagy, @results = pagy(:offset, scope.order(work_date: :asc, expected_start_at: :asc), jsonapi: true)
+        render json: { scheduled_shifts: @results.map { |s| format_shift(s) }, pagination: @pagy.data_hash }
       end
     end
   end

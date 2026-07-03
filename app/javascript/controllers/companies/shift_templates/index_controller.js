@@ -11,6 +11,7 @@ export default class Companies_ShiftTemplates_IndexController extends Companies_
     try {
       const response = await fetchJson()
       this.shiftTemplates = response.shift_templates || []
+      this.pagination = response.pagination || {}
     } catch (error) {
       toast({ type: "error", message: translate("Failed to load shift templates") })
     }
@@ -67,6 +68,9 @@ export default class Companies_ShiftTemplates_IndexController extends Companies_
                 `).join('')}
               </tbody>
             </table>
+          </div>
+          <div class="flex justify-center pt-6">
+            ${pagination(this.pagination)}
           </div>
         </div>
       </div>

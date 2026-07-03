@@ -11,6 +11,7 @@ export default class Companies_Schedules_IndexController extends Companies_Layou
     try {
       const response = await fetchJson()
       this.scheduledShifts = response.scheduled_shifts || []
+      this.pagination = response.pagination || {}
     } catch (error) {
       toast({ type: "error", message: translate("Failed to load schedules") })
     }
@@ -72,6 +73,9 @@ export default class Companies_Schedules_IndexController extends Companies_Layou
                 `).join('')}
               </tbody>
             </table>
+          </div>
+          <div class="flex justify-center pt-6">
+            ${pagination(this.pagination)}
           </div>
         </div>
       </div>

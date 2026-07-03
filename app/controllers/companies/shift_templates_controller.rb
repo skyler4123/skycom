@@ -4,7 +4,8 @@ class Companies::ShiftTemplatesController < Companies::ApplicationController
       format.html { render html: "", layout: true }
       format.json do
         scope = current_company.shift_templates
-        render json: { shift_templates: scope.map { |st| format_shift_template(st) } }
+        @pagy, @results = pagy(:offset, scope, jsonapi: true)
+        render json: { shift_templates: @results.map { |st| format_shift_template(st) }, pagination: @pagy.data_hash }
       end
     end
   end

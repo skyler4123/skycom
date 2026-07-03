@@ -7,7 +7,8 @@ class Companies::AttendancesController < Companies::ApplicationController
         scope = scope.where(employee_id: params[:employee_id]) if params[:employee_id].present?
         scope = scope.where("check_in_at >= ?", params[:from]) if params[:from].present?
         scope = scope.where("check_in_at <= ?", params[:to]) if params[:to].present?
-        render json: { attendance_records: scope.order(check_in_at: :desc).limit(50).map { |r| format_record(r) } }
+        @pagy, @results = pagy(:offset, scope.order(check_in_at: :desc), jsonapi: true)
+        render json: { attendance_records: @results.map { |r| format_record(r) }, pagination: @pagy.data_hash }
       end
     end
   end
