@@ -105,8 +105,7 @@ class Seed::HospitalInitService
         "Payment" => { create: true, read: true, update: false, delete: false },
         "Appointment" => { create: true, read: true, update: true, delete: true },
         "Patient" => { create: true, read: true, update: true, delete: false },
-        "Room" => { read: true },
-        "PolicyAppointment" => { read: false }
+        "Room" => { read: true }
       },
       Dentist: {
         "Customer" => { create: false, read: true, update: true, delete: false },
@@ -157,14 +156,42 @@ class Seed::HospitalInitService
         "Category" => { create: true, read: true, update: true, delete: true },
         "PropertyMapping" => { create: true, read: true, update: true, delete: true },
         "TableConfig" => { create: true, read: true, update: true, delete: true },
-        "PolicyAppointment" => { create: false, read: true, update: false, delete: false },
         "Stock" => { create: true, read: true, update: true, delete: true },
         "StockExport" => { create: true, read: true, update: true, delete: true },
         "StockImport" => { create: true, read: true, update: true, delete: true },
         "StockTransfer" => { create: true, read: true, update: true, delete: true }
       },
       Admin: {
-        "PolicyAppointment" => { create: true, read: true, update: true, delete: true }
+        "Product" => { create: true, read: true, update: true, delete: true },
+        "Page" => { create: true, read: true, update: true, delete: true },
+        "Brand" => { create: true, read: true, update: true, delete: true },
+        "Policy" => { read: true },
+        "Membership" => { create: true, read: true, update: true, delete: true },
+        "Reservation" => { create: true, read: true, update: true, delete: true },
+        "Room" => { create: true, read: true, update: true, delete: true },
+        "Guest" => { create: true, read: true, update: true, delete: true },
+        "Course" => { create: true, read: true, update: true, delete: true },
+        "Student" => { create: true, read: true, update: true, delete: true },
+        "Exam" => { create: true, read: true, update: true, delete: true },
+        "Table" => { create: true, read: true, update: true, delete: true },
+        "Customer" => { create: true, read: true, update: true, delete: true },
+        "Patient" => { create: true, read: true, update: true, delete: true },
+        "Order" => { create: true, read: true, update: true, delete: true },
+        "Invoice" => { create: true, read: true, update: true, delete: true },
+        "Payment" => { create: true, read: true, update: true, delete: true },
+        "Employee" => { create: true, read: true, update: true, delete: true },
+        "Appointment" => { create: true, read: true, update: true, delete: true },
+        "Facility" => { create: true, read: true, update: true, delete: true },
+        "Service" => { create: true, read: true, update: true, delete: true },
+        "Branch" => { create: true, read: true, update: true, delete: true },
+        "Department" => { create: true, read: true, update: true, delete: true },
+        "Category" => { create: true, read: true, update: true, delete: true },
+        "PropertyMapping" => { create: true, read: true, update: true, delete: true },
+        "TableConfig" => { create: true, read: true, update: true, delete: true },
+        "Stock" => { create: true, read: true, update: true, delete: true },
+        "StockExport" => { create: true, read: true, update: true, delete: true },
+        "StockImport" => { create: true, read: true, update: true, delete: true },
+        "StockTransfer" => { create: true, read: true, update: true, delete: true }
       }
     }
 
