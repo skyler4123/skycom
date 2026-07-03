@@ -49,6 +49,7 @@ class Seed::HospitalEnrichService
     create_appointments
     create_shifts
     create_attendance_policies
+    create_attendance_event_data
     create_billing_data
 
     print_footer
@@ -276,6 +277,117 @@ class Seed::HospitalEnrichService
         latitude: 10.773, longitude: 106.694,
         allowed_radius_meters: 100
       )
+    end
+  end
+
+  def create_attendance_event_data
+    puts "Creating attendance event data..."
+    days_data = {}
+    months_data = {}
+
+    @employees.each do |employee|
+      next unless employee.branch
+
+      template = ShiftTemplate.where(company: @company, branch: employee.branch).sample
+      next unless template
+
+      # Create past shifts for the last 14 days
+      (1..14).each do |day_offset|
+        date = Date.current - day_offset.days
+        next if date.saturday? || date.sunday? # Skip weekends
+
+        expected_start = date.to_time.change(hour: template.start_time.hour, min: template.start_time.min)
+        expected_end = date.to_time.change(hour: template.end_time.hour, min: template.end_time.min)
+
+        shift = ScheduledShift.create!(
+          company: @company, branch: employee.branch, employee: employee,
+          shift_template: template, work_date: date,
+          expected_start_at: expected_start, expected_end_at: expected_end,
+          status: :completed
+        )
+
+        # Simulate check-in (5-15 min early)
+        grace = rand(5..15)
+        check_in = expected_start - grace.minutes
+
+        # Simulate check-out (on time or slightly late)
+        check_out = expected_end + rand(0..10).minutes
+
+        AttendanceLog.create!(
+          company: @company, branch: employee.branch, employee: employee,
+          log_type: "check_in", logged_at: check_in
+        )
+        AttendanceLog.create!(
+          company: @company, branch: employee.branch, employee: employee,
+          log_type: "check_out", logged_at: check_out
+        )
+
+        total_work = ((check_out - check_in) / 60).to_i
+        break_min = template.unpaid_break_minutes
+        net_work = [ total_work - break_min, 0 ].max
+        late = check_in > expected_start ? ((check_in - expected_start) / 60).to_i : 0
+        early = check_out < expected_end ? ((expected_end - check_out) / 60).to_i : 0
+        overtime = check_out > expected_end ? ((check_out - expected_end) / 60).to_i : 0
+        status = early > 60 ? :half_day : :present
+
+        record = AttendanceRecord.create!(
+          company: @company, branch: employee.branch, employee: employee,
+          scheduled_shift: shift, check_in_at: check_in, check_out_at: check_out,
+          total_work_minutes: net_work, late_minutes: late,
+          early_leave_minutes: early, overtime_minutes: overtime,
+          computed_status: status
+        )
+
+        # Accumulate daily data
+        days_data[date] ||= {}
+        days_data[date][employee.id] ||= { total_seconds: 0, late_seconds: 0, early_seconds: 0, overtime_seconds: 0, records: 0 }
+        days_data[date][employee.id][:total_seconds] += net_work * 60
+        days_data[date][employee.id][:late_seconds] += late * 60
+        days_data[date][employee.id][:early_seconds] += early * 60
+        days_data[date][employee.id][:overtime_seconds] += overtime * 60
+        days_data[date][employee.id][:records] += 1
+      end
+    end
+
+    # Create attendance_days
+    puts "  -> Creating daily attendance records..."
+    days_data.each do |date, emp_data|
+      emp_data.each do |employee_id, data|
+        AttendanceDay.create!(
+          company: @company, branch: Employee.find(employee_id).branch,
+          employee_id: employee_id, attendance_date: date,
+          check_in: (date.to_time + 7.hours), check_out: (date.to_time + 15.hours),
+          total_seconds_present: data[:total_seconds],
+          total_seconds_break: 3600,
+          total_seconds_worked: data[:total_seconds] - 3600,
+          total_seconds_overtime: data[:overtime_seconds],
+          attendance_status: :present, recorded_method: :mobile
+        )
+      end
+    end
+
+    # Create attendance_months
+    puts "  -> Creating monthly attendance records..."
+    monthly = {}
+    AttendanceDay.where(company: @company).find_each do |day|
+      month_key = day.attendance_date.beginning_of_month.to_date
+      monthly[month_key] ||= {}
+      monthly[month_key][day.employee_id] ||= { total: 0, late: 0, early: 0, overtime: 0, absent: 0, present: 0, count: 0 }
+      monthly[month_key][day.employee_id][:total] += day.total_seconds_worked || 0
+      monthly[month_key][day.employee_id][:present] += 1
+      monthly[month_key][day.employee_id][:count] += 1
+    end
+
+    monthly.each do |month_key, emp_data|
+      emp_data.each do |employee_id, data|
+        AttendanceMonth.create!(
+          company: @company, employee_id: employee_id,
+          month: month_key,
+          total_work_minutes: (data[:total] / 60).to_i,
+          total_present_days: data[:present],
+          total_records: data[:count]
+        )
+      end
     end
   end
 end
