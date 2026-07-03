@@ -1,5 +1,6 @@
 class Shift < ApplicationRecord
   belongs_to :company
   belongs_to :branch, optional: true
-  belongs_to :period
+
+  validates :start_time, :end_time, presence: true
 end

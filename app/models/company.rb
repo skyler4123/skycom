@@ -1,10 +1,10 @@
 class Company < ApplicationRecord
-  class_attribute :skip_retail_init, default: false
+  class_attribute :skip_init, default: false
 
   attribute :permission_resource_name, :string, default: -> { self.name }
   attribute :resource_names, :string, array: true, default: %w[
     Product Order Customer Employee Branch Department
-    PolicyAppointment Invoice Payment Service
+    PolicyAppointment Invoice Payment Service Policy
      Category PropertyMapping TableConfig Brand Facility
      Table Reservation Room Guest
     Patient Appointment Course Student Exam
@@ -178,7 +178,13 @@ class Company < ApplicationRecord
 
     Seed::BillingContractService.create(company: self)
 
-    Seed::RetailInitService.call(company: self) unless self.class.skip_retail_init
+    unless self.class.skip_init
+      if business_type_retail?
+        Seed::RetailInitService.call(company: self)
+      elsif business_type_hospital?
+        Seed::HospitalInitService.call(company: self)
+      end
+    end
   end
 
   private

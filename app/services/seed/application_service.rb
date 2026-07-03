@@ -41,10 +41,8 @@ class Seed::ApplicationService
 
     user_1 = Seed::UserService.create(email: "user_1@company1.com", system_role: :company_owner)
     user_2 = Seed::UserService.create(email: "user_1@company2.com", system_role: :company_owner)
-    user_3 = Seed::UserService.create(email: "user_1@company3.com", system_role: :company_owner)
     user_1.address = Seed::AddressService.create
     user_2.address = Seed::AddressService.create
-    user_3.address = Seed::AddressService.create
 
     # Create company groups
     company_1 = Seed::CompanyService.create(
@@ -61,15 +59,15 @@ class Seed::ApplicationService
       address_line_1: "123 Le Loi Street", city: "Ho Chi Minh City"
     )
     company_3 = Seed::CompanyService.create(
-      user: user_3, name: "Company 3", email: "retail1@company3.com",
-      description: "A group for multiple retail branch branches",
-      business_type: RETAIL_INIT_COMPANY_GROUP_BUSINESS_TYPE,
-      country_code: :us, currency_code: :usd, timezone: :minus_5
+      user: user_2, name: "Smile Dental Center", email: "hospital@company3.com",
+      description: "A multi-specialty dental clinic group",
+      business_type: :hospital,
+      country_code: :vn, currency_code: :vnd, timezone: :plus_7
     )
 
     Seed::RetailEnrichService.new(company: company_1, user: user_1, email: "retail_us@company1.com")
     Seed::RetailEnrichService.new(company: company_2, user: user_2, email: "retail_vn@company2.com")
-    # company_3 is init only (no enrichment)
+    Seed::HospitalEnrichService.new(company: company_3, user: user_2, email: "hospital@company3.com")
 
     self.puts_count
 
