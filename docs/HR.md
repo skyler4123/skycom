@@ -108,10 +108,10 @@ Three dashboards following the Shell-First pattern, all with pagination:
 | Dashboard | Route | Controller | Stimulus |
 |-----------|-------|------------|----------|
 | Shift Templates | `/companies/:id/shift_templates` | `Companies::ShiftTemplatesController` | `companies/shift_templates/*` |
-| Schedules | `/companies/:id/schedules` | `Companies::SchedulesController` | `companies/schedules/*` |
+| Shifts | `/companies/:id/schedules` | `Companies::SchedulesController` | `companies/schedules/*` |
 | Attendance | `/companies/:id/attendances` | `Companies::AttendancesController` | `companies/attendances/*` |
 
-Shift Templates has full CRUD (index, new, create, show, edit, update). Schedules shows employee rosters with date/status filters and pagination. Attendance has index (with date/employee filters, pagination) and show.
+Shift Templates has full CRUD (index, new, create, show, edit, update). Shifts shows employee rosters with date/status filters and pagination. Attendance has index (with date/employee filters, pagination) and show.
 
 ---
 
@@ -161,7 +161,7 @@ Shift seeds include realistic edge cases:
 | CheckInService | Done |
 | CheckOutService | Done |
 | Shift Templates dashboard (CRUD) | Done |
-| Schedules dashboard (list) | Done |
+| Shifts dashboard (list) | Done |
 | Attendance dashboard (list) | Done |
 | Pagination on all HR dashboards | Done |
 | Sidebar navigation links | Done |
