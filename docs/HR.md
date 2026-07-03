@@ -101,7 +101,67 @@ Steps:
 
 ---
 
-## 5. Dashboards
+## 5. Daily Resolution Engine
+
+Phase 1 (AttendanceLogs) collects raw timestamps. Phase 2 resolves them into daily attendance states via a 4-step pipeline:
+
+```
+AttendanceLogs (raw sequential timestamps)
+  → Linear Segment Fusion (pair In/Out into work segments)
+    → Break Deduction (fixed lunch, multi-punch, or auto-deduct)
+      → Policy Match (compare net minutes against shift template)
+        → AttendanceDay (daily status: full_day, half_day, underhours)
+```
+
+### Step 1: Segment Fusion
+
+Gather all AttendanceLog entries for one employee on one day, sorted chronologically. Pair them sequentially:
+
+- Punch 1 (In) → Punch 2 (Out) = Work Segment A
+- Punch 3 (In) → Punch 4 (Out) = Work Segment B
+
+If an "In" has no matching "Out" before end of day, the segment is invalid — flagged for manager review.
+
+### Step 2: Calculate Gross Minutes
+
+Sum all segment durations:
+
+```
+Gross = Duration(A) + Duration(B) + ...
+```
+
+### Step 3: Break Deduction
+
+| Scenario | Behavior |
+|----------|----------|
+| **Fixed Lunch Window** (e.g. 12:00-13:00 unpaid) | Auto-deduct break time if segments overlap the window |
+| **Multi-Punch Breaks** (employee clocks out for lunch) | Break is already absent from segments — no deduction needed |
+| **Auto-Deduct** (no lunch punch, but policy requires break) | Subtract mandatory break (e.g. 60min) from gross if gross exceeds threshold (e.g. 5 hours) |
+
+### Step 4: Policy Match
+
+Three policy configurations determine the final attendance state:
+
+| Policy | Rule | Evaluation |
+|--------|------|------------|
+| **Fixed Shift** | Must work specific clock hours | Net ≥ 480min AND check-in within grace window of expected start |
+| **Pure Flexible** | 8 hours anytime (e.g. 06:00-22:00 window) | Net ≥ 480min = full day; 240-479min = half day; < 240 = absent |
+| **Core-Hours Flexible** | 8 hours + must cover mandatory core block | Net ≥ 480min AND a single segment covers the core block (e.g. 13:00-16:00) |
+
+### Under-hours Deficit
+
+Minutes below the full-time target (480min/day for 8h shift) are tracked in a monthly deficit account:
+
+```
+Daily Deficit = max(0, 480 - Net Worked Minutes)
+Monthly Deficit = Σ Daily Deficits
+```
+
+This deficit rolls month-to-month. The company can set a maximum deficit threshold before triggering alerts or payroll deductions.
+
+---
+
+## 6. Dashboards
 
 Three dashboards following the Shell-First pattern, all with pagination:
 
@@ -115,7 +175,7 @@ Shift Templates has full CRUD (index, new, create, show, edit, update). Shifts s
 
 ---
 
-## 6. Permission Matrix
+## 7. Permission Matrix
 
 | Role | ShiftTemplate | ScheduledShift | AttendanceRecord |
 |------|--------------|---------------|-----------------|
@@ -128,7 +188,7 @@ Only Owner (via `owner_role?` bypass) and Admin/Manager roles have access. Other
 
 ---
 
-## 7. Seeding
+## 8. Seeding
 
 Hospital enrich service creates:
 
@@ -149,7 +209,7 @@ Shift seeds include realistic edge cases:
 
 ---
 
-## 8. What's Built vs What's Next
+## 9. What's Built vs What's Next
 
 ### ✅ Built
 
@@ -178,6 +238,11 @@ Shift seeds include realistic edge cases:
 | **QR code check-in** | Generate per-branch QR codes; scanning validates location and creates log |
 | **Mobile GPS native** | Native mobile app integration with background location tracking |
 | **Nightly SyncAttendanceJob** | Cron job to auto-close stale sessions (>16h open) and aggregate days → months |
+| **Daily Resolution Engine** | Background job that fuses AttendanceLogs into segments, deducts breaks, evaluates against policy (Fixed Shift, Pure Flexible, Core-Hours Flexible) |
+| **Multi-punch support** | Handle multiple In/Out pairs per day for lunch breaks and flexible schedules |
+| **Flexible time policies** | Support Pure Flexible and Core-Hours Flexible in addition to Fixed Shift |
+| **Under-hours deficit tracking** | Monthly account tracking minutes below full-time target |
+| **Core hours enforcement** | Flag policy violations when core hours are missed even if total hours are met |
 | **Midnight crossover** | Handle shifts crossing midnight (e.g., 23:00-07:00) in attendance_records association |
 | **Payroll integration** | Link attendance_months to payroll/commission engine |
 | **Employee self-service** | Employee-facing dashboard to view their own attendance_days and flag issues |
@@ -185,7 +250,7 @@ Shift seeds include realistic edge cases:
 
 ---
 
-## 9. File Reference
+## 10. File Reference
 
 | File | Purpose |
 |------|---------|
