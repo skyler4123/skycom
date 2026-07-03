@@ -37,11 +37,11 @@ export default class Companies_ShiftTemplates_EditController extends Companies_L
           </div>
           <div class="space-y-1">
             <label class="text-[10px] font-bold text-slate-400 uppercase">${translate("Start Time")}</label>
-            <input type="time" name="shift_template[start_time]" value="${st.start_time || ''}" required class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-sm">
+            <input type="time" name="shift_template[start_time]" value="${(st.start_time || '').slice(0, 5)}" required class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-sm">
           </div>
           <div class="space-y-1">
             <label class="text-[10px] font-bold text-slate-400 uppercase">${translate("End Time")}</label>
-            <input type="time" name="shift_template[end_time]" value="${st.end_time || ''}" required class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-sm">
+            <input type="time" name="shift_template[end_time]" value="${(st.end_time || '').slice(0, 5)}" required class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-sm">
           </div>
           <div class="space-y-1">
             <label class="text-[10px] font-bold text-slate-400 uppercase">${translate("Grace Period (min)")}</label>

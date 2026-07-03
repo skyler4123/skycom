@@ -35,11 +35,11 @@ export default class Companies_ShiftTemplates_ShowController extends Companies_L
           <div class="grid grid-cols-2 gap-6">
             <div>
               <p class="text-xs font-medium text-slate-500">${translate("Start Time")}</p>
-              <p class="text-sm font-semibold text-slate-900">${st.start_time}</p>
+              <p class="text-sm font-semibold text-slate-900">${(st.start_time || '').slice(0, 5)}</p>
             </div>
             <div>
               <p class="text-xs font-medium text-slate-500">${translate("End Time")}</p>
-              <p class="text-sm font-semibold text-slate-900">${st.end_time}</p>
+              <p class="text-sm font-semibold text-slate-900">${(st.end_time || '').slice(0, 5)}</p>
             </div>
             <div>
               <p class="text-xs font-medium text-slate-500">${translate("Grace Period")}</p>

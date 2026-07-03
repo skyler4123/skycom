@@ -53,8 +53,8 @@ export default class Companies_ShiftTemplates_IndexController extends Companies_
                         ${st.name}
                       </a>
                     </td>
-                    <td class="py-4 px-6 text-sm text-slate-600">${st.start_time}</td>
-                    <td class="py-4 px-6 text-sm text-slate-600">${st.end_time}</td>
+                    <td class="py-4 px-6 text-sm text-slate-600">${(st.start_time || '').slice(0, 5)}</td>
+                    <td class="py-4 px-6 text-sm text-slate-600">${(st.end_time || '').slice(0, 5)}</td>
                     <td class="py-4 px-6 text-sm text-slate-600">${st.grace_period_minutes}min</td>
                     <td class="py-4 px-6 text-sm text-slate-600">${st.unpaid_break_minutes}min</td>
                     <td class="py-4 px-6 text-sm text-right">
