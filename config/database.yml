@@ -124,17 +124,6 @@ cache: &cache
   <<: *sqlite3
   migrations_paths: db/cache_migrate
 
-rails_pulse: &rails_pulse
-  adapter: postgresql
-  encoding: unicode
-  pool: 5
-  username: <%= Rails.application.credentials.dig(:pulse_postgres_username) || "postgres" %>
-  password: <%= Rails.application.credentials.dig(:pulse_postgres_password) || "password" %>
-  host: <%= Rails.application.credentials.dig(:pulse_postgres_host) || "localhost" %>
-  # host: pulse_postgres
-  port: <%= Rails.application.credentials.dig(:pulse_postgres_port) || "5433" %>
-  migrations_paths: db/rails_pulse_migrate
-
 development:
   primary:
     <<: *postgresql
@@ -148,11 +137,7 @@ development:
   cache:
     <<: *cache
     database: storage/development_cache.sqlite3
-  # ADDED
-  rails_pulse:
-    <<: *rails_pulse
-    database: skycom_pulse_development
-    
+
 test:
   primary:
     <<: *postgresql
@@ -180,7 +165,3 @@ production:
   cache:
     <<: *cache
     database: storage/production_cache.sqlite3
-  # ADDED
-  rails_pulse:
-    <<: *rails_pulse
-    database: skycom_pulse_production

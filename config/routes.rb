@@ -82,7 +82,6 @@ Rails.application.routes.draw do
     end
   end
   mount MissionControl::Jobs::Engine, at: "/jobs"
-  mount RailsPulse::Engine => "/rails_pulse"
   get "sign_out", to: "sessions#sign_out"
   get "/sign_in_for_test", to: "sessions#sign_in_for_test", as: :sign_in_for_test if Rails.env.test?
 
