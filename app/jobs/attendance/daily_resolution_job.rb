@@ -1,3 +1,6 @@
+# Nightly cron job that runs the DailyResolutionService for every employee
+# who has AttendanceLogs on the given date. Resolves raw check-in/out events
+# into AttendanceDay records (daily status, net minutes, late/overtime).
 module Attendance
   class DailyResolutionJob < ApplicationJob
     queue_as :default

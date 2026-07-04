@@ -1,3 +1,6 @@
+# Base class for attendance resolution strategies.
+# Each strategy implements #call(logs, employee, date, shift_template) and
+# returns { status:, net_minutes:, segments:, late_minutes:, ... }.
 module Attendance
   module Strategies
     class BaseStrategy

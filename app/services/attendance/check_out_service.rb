@@ -1,3 +1,6 @@
+# Handles employee check-out.
+# Creates an immutable AttendanceLog with log_type "check_out".
+# Metrics like total_work_minutes are computed later by DailyResolutionService.
 module Attendance
   class CheckOutService
     def initialize(employee:, latitude: nil, longitude: nil)

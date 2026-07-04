@@ -1,3 +1,7 @@
+# Handles employee check-in at a branch location.
+# Validates geofence against attendance_policy, finds today's scheduled shift,
+# creates an immutable AttendanceLog, and marks the shift as active.
+# Returns Result.success or Result.failure.
 module Attendance
   class Result
     def self.success(data) = new(true, data, nil)

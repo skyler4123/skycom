@@ -1,3 +1,7 @@
+# Check-in only strategy for devices that only record arrivals (no check_out).
+# Creates a single virtual segment from first check_in to last check_in.
+# Duration = last_check_in - first_check_in.
+# If the last check_in is before expected end time → early departure / half_day.
 module Attendance
   module Strategies
     class CheckInOnlyStrategy < BaseStrategy

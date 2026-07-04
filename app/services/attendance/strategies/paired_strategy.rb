@@ -1,3 +1,7 @@
+# Standard paired strategy: check_in → check_out pairs form work segments.
+# Supports fixed, pure_flexible, and core_hours_flexible policies.
+# Multi-punch (lunch break) → no break deduction.
+# Single segment > 5 hours → auto-deduct unpaid_break_minutes.
 module Attendance
   module Strategies
     class PairedStrategy < BaseStrategy

@@ -1,3 +1,8 @@
+# Orchestrates the daily attendance resolution pipeline.
+# Loads AttendanceLogs for an employee on a date, dispatches to the configured
+# ResolutionStrategy (PairedStrategy or CheckInOnlyStrategy), then creates or
+# updates the AttendanceDay and AttendanceMonth records with computed metrics
+# (net minutes, late, overtime, deficit).
 module Attendance
   class DailyResolutionService
     STRATEGIES = {
