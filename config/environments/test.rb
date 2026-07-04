@@ -60,9 +60,6 @@ Rails.application.configure do
   # Change to :null_store to avoid any caching.
   config.cache_store = :solid_cache_store
 
-  # Tell Solid Cache to use your dedicated :cache database block from database.yml
-  config.solid_cache.connects_to = { database: { writing: :cache } }
-  
   # Replace the default in-process and non-durable queuing backend for Active Job.
   config.active_job.queue_adapter = :solid_queue
 
