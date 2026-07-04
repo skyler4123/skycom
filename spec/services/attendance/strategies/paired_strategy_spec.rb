@@ -59,6 +59,29 @@ RSpec.describe Attendance::Strategies::PairedStrategy do
     expect(result[:status]).to eq(:half_day)
   end
 
+  it "does not deduct break when gross under 5 hours" do
+    logs = [
+      log("check_in", date.to_time.change(hour: 8)),
+      log("check_out", date.to_time.change(hour: 12))
+    ]
+    template = ShiftTemplate.new(policy_type: "pure_flexible", unpaid_break_minutes: 60, full_day_minutes: 480)
+
+    result = described_class.new.call(logs, Employee.new, date, template)
+    # gross = 240, < 300 threshold, no deduction
+    expect(result[:status]).to eq(:half_day)
+  end
+
+  it "pure flexible absent when net under 240" do
+    logs = [
+      log("check_in", date.to_time.change(hour: 10)),
+      log("check_out", date.to_time.change(hour: 12))
+    ]
+    template = ShiftTemplate.new(policy_type: "pure_flexible", full_day_minutes: 480)
+
+    result = described_class.new.call(logs, Employee.new, date, template)
+    expect(result[:status]).to eq(:absent)
+  end
+
   it "absent when no check_out segments" do
     logs = [
       log("check_in", date.to_time.change(hour: 8))

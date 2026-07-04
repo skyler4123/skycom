@@ -47,6 +47,18 @@ RSpec.describe Attendance::Strategies::CheckInOnlyStrategy do
     expect(result[:status]).to eq(:late)
   end
 
+  it "does not deduct break when gross under 5 hours" do
+    logs = [
+      log("check_in", date.to_time.change(hour: 10)),
+      log("check_in", date.to_time.change(hour: 13))
+    ]
+    template = ShiftTemplate.new(policy_type: "pure_flexible", unpaid_break_minutes: 60, full_day_minutes: 480)
+
+    result = described_class.new.call(logs, Employee.new, date, template)
+    # gross = 180, < 300 threshold, no deduction
+    expect(result[:status]).to eq(:absent)
+  end
+
   it "absent when no check_in logs" do
     result = described_class.new.call([], Employee.new, date, nil)
     expect(result[:status]).to eq(:absent)
