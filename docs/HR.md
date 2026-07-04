@@ -219,7 +219,6 @@ Hospital enrich service creates:
 | Shift Templates | 6 | 3 per clinic (Morning 07-15, Afternoon 15-23, Night 23-07) |
 | Scheduled Shifts | ~440 | 14 days of past shifts + future shifts per employee |
 | Attendance Logs | ~800 | 2 per shift (check_in + check_out) |
-| Attendance Records | ~400 | 1 per shift with computed metrics |
 | Attendance Days | ~400 | Aggregated per employee per date |
 | Attendance Months | ~80 | Monthly payroll rollups |
 | Attendance Policies | 2 | 1 per clinic (GPS: 10.773, 106.694 / 100m radius) |
@@ -242,7 +241,7 @@ Shift seeds include realistic edge cases:
 | Model specs (35 examples) | Done |
 | CheckInService | Done |
 | CheckOutService | Done |
-| DailyResolutionService + SegmentFuser + PolicyMatcher | Done |
+| DailyResolutionService with Strategy classes (PairedStrategy, CheckInOnlyStrategy) | Done |
 | Check-in only device support (virtual segments) | Done |
 | Shift Templates dashboard (CRUD) | Done |
 | Shifts dashboard (list) | Done |
