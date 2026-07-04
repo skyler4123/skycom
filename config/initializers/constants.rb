@@ -278,23 +278,6 @@ COMPANY_PROCESSING_BATCH_SIZE = 50
 REDIS_SCAN_COUNT = 100
 
 # =============================================================================
-# RailsPulse Retention
-# Performance monitoring data retention settings.
-# Applied in config/initializers/rails_pulse.rb.
-# =============================================================================
-
-# How long raw request/query data is retained before automatic cleanup.
-RAILS_PULSE_RETENTION_PERIOD = 2.weeks
-
-# Max rows per table before oldest records are pruned during cleanup.
-RAILS_PULSE_MAX_TABLE_RECORDS = {
-  rails_pulse_requests: 10000,
-  rails_pulse_operations: 50000,
-  rails_pulse_routes: 1000,
-  rails_pulse_queries: 500
-}.freeze
-
-# =============================================================================
 # Property Mapping & Table Config (Dynamic Schema Validation)
 # =============================================================================
 
