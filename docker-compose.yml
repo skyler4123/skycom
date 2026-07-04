@@ -48,16 +48,6 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql
 
-  pulse_postgres:
-    image: postgres:18.3
-    environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: password
-    ports:
-      - "5433:5432" # Exposed on 5433 host-side to avoid conflict with main postgres
-    volumes:
-      - pulse_postgres_data:/var/lib/postgresql
-
   # mongo:
   #   image: mongo
   #   ports:
@@ -138,6 +128,17 @@ services:
     volumes:
       - redis_data:/data
 
+  openobserve:
+    image: openobserve/openobserve:latest
+    environment:
+      - ZO_DATA_DIR=/data
+      - ZO_ROOT_USER_EMAIL=admin@example.com
+      - ZO_ROOT_USER_PASSWORD=Password@123
+    ports:
+      - "5080:5080" # UI and OTel endpoint
+    volumes:
+      - openobserve_data:/data
+
 volumes:
   postgres_data:
   pulse_postgres_data:
@@ -146,3 +147,4 @@ volumes:
   minio_data:
   sqlite_storage:
   redis_data:
+  openobserve_data:

@@ -85,5 +85,26 @@ Rails.application.configure do
 
   # Store uploaded files on the local file system (see config/storage.yml for options).
   config.active_storage.service = :minio
+
+  # 1. Enable Lograge for structured JSON logs
+  config.lograge.enabled = true
+  config.lograge.formatter = Lograge::Formatters::Json.new
+
+  # 2. Add extra metadata to Lograge (we will inject Trace IDs here too!)
+  config.lograge.custom_options = lambda do |event|
+    # Get current trace context from the OpenTelemetry SDK
+    current_span = OpenTelemetry::Trace.current_span
+    
+    { 
+      environment: Rails.env.to_s,
+      time: Time.current.iso8601,
+      # These tags will connect your logs to your traces in OpenObserve!
+      trace_id: current_span.context.valid? ? current_span.context.hex_trace_id : nil,
+      span_id: current_span.context.valid? ? current_span.context.hex_span_id : nil
+    }
+  end
+
+  # 3. Log normally to stdout; OpenTelemetry's LoggerProvider will handle the transport
+  config.logger = ActiveSupport::Logger.new($stdout)
 end
 # ----------------------------------------------------------------------------------------------------
