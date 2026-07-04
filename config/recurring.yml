@@ -1,3 +1,5 @@
+# config/recurring.yml
+
 # examples:
 #   periodic_cleanup:
 #     class: CleanSoftDeletedRecordsJob

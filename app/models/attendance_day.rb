@@ -2,8 +2,8 @@ class AttendanceDay < ApplicationRecord
   belongs_to :company
   belongs_to :branch, optional: true
   belongs_to :employee
-  belongs_to :logable, polymorphic: true
-  belongs_to :period
-  belongs_to :approved_by
-  belongs_to :edited_by
+
+  enum :attendance_status, { present: 0, half_day: 1, late: 2, absent: 3, missing_checkout: 4 }, prefix: true
+
+  validates :attendance_date, presence: true
 end

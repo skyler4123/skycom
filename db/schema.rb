@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_07_02_184932) do
+ActiveRecord::Schema[8.0].define(version: 2026_07_04_004208) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pgcrypto"
@@ -254,77 +254,115 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_02_184932) do
     t.uuid "company_id", null: false
     t.uuid "branch_id"
     t.uuid "employee_id", null: false
-    t.string "logable_type", null: false
-    t.uuid "logable_id", null: false
-    t.uuid "period_id", null: false
-    t.date "attendance_date"
+    t.date "attendance_date", null: false
     t.datetime "check_in"
     t.datetime "check_out"
     t.datetime "break_start"
     t.datetime "break_end"
-    t.integer "total_seconds_present"
-    t.integer "total_seconds_break"
-    t.integer "total_seconds_worked"
-    t.integer "total_seconds_overtime"
-    t.integer "shift_id"
+    t.integer "total_seconds_present", default: 0
+    t.integer "total_seconds_break", default: 0
+    t.integer "total_seconds_worked", default: 0
+    t.integer "total_seconds_overtime", default: 0
     t.integer "attendance_status"
     t.integer "recorded_method"
-    t.string "ip_address"
-    t.string "device_id"
-    t.decimal "location_lat"
-    t.decimal "location_lng"
     t.text "notes"
-    t.string "approved_by_type", null: false
-    t.uuid "approved_by_id", null: false
+    t.string "approved_by_type"
+    t.uuid "approved_by_id"
     t.datetime "approved_at"
-    t.string "edited_by_type", null: false
-    t.uuid "edited_by_id", null: false
+    t.string "edited_by_type"
+    t.uuid "edited_by_id"
     t.datetime "edited_at"
+    t.integer "lifecycle_status"
+    t.integer "workflow_status"
+    t.integer "business_type"
+    t.datetime "expiration_date"
+    t.jsonb "metadata", default: {}
+    t.datetime "discarded_at"
+    t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["approved_by_type", "approved_by_id"], name: "index_attendance_days_on_approved_by"
     t.index ["branch_id"], name: "index_attendance_days_on_branch_id"
     t.index ["company_id"], name: "index_attendance_days_on_company_id"
-    t.index ["edited_by_type", "edited_by_id"], name: "index_attendance_days_on_edited_by"
+    t.index ["discarded_at"], name: "index_attendance_days_on_discarded_at"
     t.index ["employee_id"], name: "index_attendance_days_on_employee_id"
-    t.index ["logable_type", "logable_id"], name: "index_attendance_days_on_logable"
-    t.index ["period_id"], name: "index_attendance_days_on_period_id"
   end
 
   create_table "attendance_logs", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
     t.uuid "company_id", null: false
     t.uuid "branch_id"
-    t.uuid "customer_id", null: false
-    t.string "logable_type", null: false
-    t.uuid "logable_id", null: false
-    t.uuid "period_id", null: false
-    t.string "location"
-    t.string "id_address"
-    t.string "device_info"
-    t.text "notes"
+    t.uuid "employee_id", null: false
+    t.string "log_type", null: false
+    t.datetime "logged_at", null: false
+    t.decimal "latitude", precision: 10, scale: 6
+    t.decimal "longitude", precision: 10, scale: 6
+    t.string "wifi_ssid"
+    t.string "device_fingerprint"
+    t.string "photo_url"
+    t.integer "lifecycle_status"
+    t.integer "workflow_status"
+    t.integer "business_type"
+    t.datetime "expiration_date"
+    t.jsonb "metadata", default: {}
+    t.datetime "discarded_at"
+    t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["branch_id"], name: "index_attendance_logs_on_branch_id"
     t.index ["company_id"], name: "index_attendance_logs_on_company_id"
-    t.index ["customer_id"], name: "index_attendance_logs_on_customer_id"
-    t.index ["logable_type", "logable_id"], name: "index_attendance_logs_on_logable"
-    t.index ["period_id"], name: "index_attendance_logs_on_period_id"
+    t.index ["discarded_at"], name: "index_attendance_logs_on_discarded_at"
+    t.index ["employee_id"], name: "index_attendance_logs_on_employee_id"
   end
 
   create_table "attendance_months", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
     t.uuid "company_id", null: false
     t.uuid "branch_id"
-    t.uuid "customer_id", null: false
-    t.string "logable_type", null: false
-    t.uuid "logable_id", null: false
-    t.uuid "period_id", null: false
+    t.uuid "employee_id", null: false
+    t.date "month", null: false
+    t.integer "total_work_minutes", default: 0
+    t.integer "total_late_minutes", default: 0
+    t.integer "total_early_leave_minutes", default: 0
+    t.integer "total_overtime_minutes", default: 0
+    t.integer "total_absent_days", default: 0
+    t.integer "total_present_days", default: 0
+    t.integer "total_records", default: 0
+    t.integer "lifecycle_status"
+    t.integer "workflow_status"
+    t.integer "business_type"
+    t.datetime "expiration_date"
+    t.jsonb "metadata", default: {}
+    t.datetime "discarded_at"
+    t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer "total_deficit_minutes"
     t.index ["branch_id"], name: "index_attendance_months_on_branch_id"
     t.index ["company_id"], name: "index_attendance_months_on_company_id"
-    t.index ["customer_id"], name: "index_attendance_months_on_customer_id"
-    t.index ["logable_type", "logable_id"], name: "index_attendance_months_on_logable"
-    t.index ["period_id"], name: "index_attendance_months_on_period_id"
+    t.index ["discarded_at"], name: "index_attendance_months_on_discarded_at"
+    t.index ["employee_id", "month"], name: "index_attendance_months_on_employee_id_and_month", unique: true
+    t.index ["employee_id"], name: "index_attendance_months_on_employee_id"
+  end
+
+  create_table "attendance_policies", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
+    t.uuid "company_id", null: false
+    t.uuid "branch_id", null: false
+    t.decimal "latitude", precision: 10, scale: 6, null: false
+    t.decimal "longitude", precision: 10, scale: 6, null: false
+    t.integer "allowed_radius_meters", default: 100, null: false
+    t.string "allowed_wifi_ssid"
+    t.boolean "require_photo", default: false, null: false
+    t.integer "lifecycle_status"
+    t.integer "workflow_status"
+    t.integer "business_type"
+    t.datetime "expiration_date"
+    t.jsonb "metadata", default: {}
+    t.datetime "discarded_at"
+    t.string "permission_resource_name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.integer "resolution_strategy", default: 0, null: false
+    t.index ["branch_id"], name: "index_attendance_policies_on_branch_id", unique: true
+    t.index ["company_id"], name: "index_attendance_policies_on_company_id"
+    t.index ["discarded_at"], name: "index_attendance_policies_on_discarded_at"
   end
 
   create_table "billing_contracts", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -340,7 +378,6 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_02_184932) do
     t.integer "workflow_status", default: 0
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["company_id"], name: "idx_billing_contracts_active_company", unique: true, where: "(lifecycle_status = 1)"
     t.index ["company_id"], name: "index_billing_contracts_on_company_id"
     t.index ["lifecycle_status"], name: "index_billing_contracts_on_lifecycle_status"
     t.index ["workflow_status"], name: "index_billing_contracts_on_workflow_status"
@@ -4213,6 +4250,32 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_02_184932) do
     t.index ["workflow_status"], name: "index_roles_on_workflow_status"
   end
 
+  create_table "scheduled_shifts", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
+    t.uuid "company_id", null: false
+    t.uuid "branch_id", null: false
+    t.uuid "employee_id", null: false
+    t.uuid "shift_template_id"
+    t.date "work_date", null: false
+    t.datetime "expected_start_at", null: false
+    t.datetime "expected_end_at", null: false
+    t.string "status", default: "scheduled", null: false
+    t.integer "lifecycle_status"
+    t.integer "workflow_status"
+    t.integer "business_type"
+    t.datetime "expiration_date"
+    t.jsonb "metadata", default: {}
+    t.datetime "discarded_at"
+    t.string "permission_resource_name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["branch_id"], name: "index_scheduled_shifts_on_branch_id"
+    t.index ["company_id"], name: "index_scheduled_shifts_on_company_id"
+    t.index ["discarded_at"], name: "index_scheduled_shifts_on_discarded_at"
+    t.index ["employee_id", "work_date"], name: "index_scheduled_shifts_on_employee_id_and_work_date", unique: true
+    t.index ["employee_id"], name: "index_scheduled_shifts_on_employee_id"
+    t.index ["shift_template_id"], name: "index_scheduled_shifts_on_shift_template_id"
+  end
+
   create_table "service_appointments", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
     t.uuid "company_id", null: false
     t.uuid "service_id", null: false
@@ -4629,18 +4692,31 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_02_184932) do
     t.index ["workflow_status"], name: "index_settings_on_workflow_status"
   end
 
-  create_table "shifts", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
+  create_table "shift_templates", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
     t.uuid "company_id", null: false
     t.uuid "branch_id"
-    t.string "name"
-    t.string "description"
-    t.jsonb "metadata", default: {}
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.string "name", null: false
     t.time "start_time", null: false
     t.time "end_time", null: false
-    t.index ["branch_id"], name: "index_shifts_on_branch_id"
-    t.index ["company_id"], name: "index_shifts_on_company_id"
+    t.integer "grace_period_minutes", default: 15, null: false
+    t.integer "unpaid_break_minutes", default: 60, null: false
+    t.string "policy_type", default: "fixed", null: false
+    t.integer "full_day_minutes", default: 480, null: false
+    t.time "core_start_time"
+    t.time "core_end_time"
+    t.string "description"
+    t.integer "lifecycle_status"
+    t.integer "workflow_status"
+    t.integer "business_type"
+    t.datetime "expiration_date"
+    t.jsonb "metadata", default: {}
+    t.datetime "discarded_at"
+    t.string "permission_resource_name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["branch_id"], name: "index_shift_templates_on_branch_id"
+    t.index ["company_id"], name: "index_shift_templates_on_company_id"
+    t.index ["discarded_at"], name: "index_shift_templates_on_discarded_at"
   end
 
   create_table "sign_in_tokens", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
@@ -5720,15 +5796,14 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_02_184932) do
   add_foreign_key "attendance_days", "branches"
   add_foreign_key "attendance_days", "companies"
   add_foreign_key "attendance_days", "employees"
-  add_foreign_key "attendance_days", "periods"
   add_foreign_key "attendance_logs", "branches"
   add_foreign_key "attendance_logs", "companies"
-  add_foreign_key "attendance_logs", "customers"
-  add_foreign_key "attendance_logs", "periods"
+  add_foreign_key "attendance_logs", "employees"
   add_foreign_key "attendance_months", "branches"
   add_foreign_key "attendance_months", "companies"
-  add_foreign_key "attendance_months", "customers"
-  add_foreign_key "attendance_months", "periods"
+  add_foreign_key "attendance_months", "employees"
+  add_foreign_key "attendance_policies", "branches"
+  add_foreign_key "attendance_policies", "companies"
   add_foreign_key "billing_contracts", "companies"
   add_foreign_key "billing_invoices", "billing_contracts"
   add_foreign_key "billing_invoices", "companies"
@@ -5946,6 +6021,10 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_02_184932) do
   add_foreign_key "role_appointments", "roles"
   add_foreign_key "roles", "branches"
   add_foreign_key "roles", "companies"
+  add_foreign_key "scheduled_shifts", "branches"
+  add_foreign_key "scheduled_shifts", "companies"
+  add_foreign_key "scheduled_shifts", "employees"
+  add_foreign_key "scheduled_shifts", "shift_templates"
   add_foreign_key "service_appointments", "companies"
   add_foreign_key "service_appointments", "services"
   add_foreign_key "service_group_appointments", "companies"
@@ -5972,8 +6051,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_02_184932) do
   add_foreign_key "settings", "companies"
   add_foreign_key "settings", "property_mappings"
   add_foreign_key "settings", "setting_groups"
-  add_foreign_key "shifts", "branches"
-  add_foreign_key "shifts", "companies"
+  add_foreign_key "shift_templates", "branches"
+  add_foreign_key "shift_templates", "companies"
   add_foreign_key "sign_in_tokens", "users"
   add_foreign_key "stock_exports", "branches"
   add_foreign_key "stock_exports", "categories"

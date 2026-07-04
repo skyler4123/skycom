@@ -9,7 +9,7 @@ class Company < ApplicationRecord
      Table Reservation Room Guest
     Patient Appointment Course Student Exam
     Membership
-    Page
+    Page ShiftTemplate ScheduledShift
     Stock StockTransfer StockImport StockExport
   ]
 
@@ -40,6 +40,12 @@ class Company < ApplicationRecord
   has_many :roles, dependent: :destroy
   has_many :policies, dependent: :destroy
   has_many :policy_appointments, dependent: :destroy
+  has_many :shift_templates, dependent: :destroy
+  has_many :scheduled_shifts, dependent: :destroy
+  has_many :attendance_logs, dependent: :destroy
+  has_many :attendance_days, dependent: :destroy
+  has_many :attendance_months, dependent: :destroy
+  has_many :attendance_policies, dependent: :destroy
   has_many :facility_groups, dependent: :destroy
   has_many :facilities, dependent: :destroy
   has_many :service_groups, dependent: :destroy

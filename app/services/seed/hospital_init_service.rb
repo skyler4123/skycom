@@ -132,6 +132,8 @@ class Seed::HospitalInitService
       Manager: {
         "Product" => { create: true, read: true, update: true, delete: true },
         "Page" => { create: true, read: true, update: true, delete: true },
+        "ShiftTemplate" => { create: true, read: true, update: true, delete: true },
+        "ScheduledShift" => { create: true, read: true, update: true, delete: true },
         "Brand" => { create: true, read: true, update: true, delete: true },
         "Policy" => { read: true },
         "Membership" => { create: true, read: true, update: true, delete: true },
@@ -164,6 +166,8 @@ class Seed::HospitalInitService
       Admin: {
         "Product" => { create: true, read: true, update: true, delete: true },
         "Page" => { create: true, read: true, update: true, delete: true },
+        "ShiftTemplate" => { create: true, read: true, update: true, delete: true },
+        "ScheduledShift" => { create: true, read: true, update: true, delete: true },
         "Brand" => { create: true, read: true, update: true, delete: true },
         "Policy" => { read: true },
         "Membership" => { create: true, read: true, update: true, delete: true },

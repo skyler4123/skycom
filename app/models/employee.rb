@@ -28,6 +28,10 @@ class Employee < ApplicationRecord
 
   has_many :role_appointments, as: :appoint_to, dependent: :destroy, inverse_of: :appoint_to
   has_many :roles, through: :role_appointments
+  has_many :scheduled_shifts, dependent: :destroy
+  has_many :attendance_logs, dependent: :destroy
+  has_many :attendance_days, dependent: :destroy
+  has_many :attendance_months, dependent: :destroy
 
   has_many :service_appointments, dependent: :destroy, as: :appoint_to
   has_many :services, through: :service_appointments

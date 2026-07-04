@@ -33,6 +33,7 @@ Rails.application.routes.draw do
       resources :stock_exports
       resources :customers
       resources :invoices
+      resources :shift_templates
       resources :schedules
       resources :attendances
       resources :reports

@@ -48,6 +48,8 @@ class Seed::HospitalEnrichService
     create_services
     create_appointments
     create_shifts
+    create_attendance_policies
+    create_attendance_event_data
     create_billing_data
 
     print_footer
@@ -234,18 +236,102 @@ class Seed::HospitalEnrichService
   end
 
   def create_shifts
-    puts "Creating shifts..."
+    puts "Creating shift templates and schedules..."
+    templates = []
     @branches.each do |branch|
       [ { name: "Morning",   start: "07:00", end: "15:00" },
         { name: "Afternoon", start: "15:00", end: "23:00" },
         { name: "Night",     start: "23:00", end: "07:00" }
       ].each do |shift_data|
-        Seed::ShiftService.create(
+        template = Seed::ShiftTemplateService.create(
           company: @company, branch: branch,
           name: shift_data[:name],
           start_time: shift_data[:start],
-          end_time: shift_data[:end]
+          end_time: shift_data[:end],
+          policy_type: "fixed",
+          full_day_minutes: 480
         )
+        templates << template
+      end
+    end
+
+    # Create scheduled shifts for employees
+    @employees.each do |employee|
+      template = templates.select { |t| t.branch_id == employee.branch_id }.sample
+      next unless template
+
+      date = Date.current + rand(0..7).days
+      ScheduledShift.create!(
+        company: @company, branch: employee.branch, employee: employee,
+        shift_template: template, work_date: date,
+        expected_start_at: date.to_time.change(hour: template.start_time.hour, min: template.start_time.min),
+        expected_end_at: date.to_time.change(hour: template.end_time.hour, min: template.end_time.min),
+        status: :scheduled
+      )
+    end
+  end
+
+  def create_attendance_policies
+    puts "Creating attendance policies..."
+    @branches.each do |branch|
+      AttendancePolicy.create!(
+        company: @company, branch: branch,
+        latitude: 10.773, longitude: 106.694,
+        allowed_radius_meters: 100
+      )
+    end
+  end
+
+  def create_attendance_event_data
+    puts "Creating attendance event data..."
+
+    @employees.each do |employee|
+      next unless employee.branch
+
+      template = ShiftTemplate.where(company: @company, branch: employee.branch).sample
+      next unless template
+
+      # Create past shifts for the last 14 days
+      (1..14).each do |day_offset|
+        date = Date.current - day_offset.days
+        next if date.saturday? || date.sunday? # Skip weekends
+
+        expected_start = date.to_time.change(hour: template.start_time.hour, min: template.start_time.min)
+        expected_end = date.to_time.change(hour: template.end_time.hour, min: template.end_time.min)
+
+        shift = ScheduledShift.create!(
+          company: @company, branch: employee.branch, employee: employee,
+          shift_template: template, work_date: date,
+          expected_start_at: expected_start, expected_end_at: expected_end,
+          status: :completed
+        )
+
+        # Simulate check-in (5-15 min early)
+        grace = rand(5..15)
+        check_in = expected_start - grace.minutes
+
+        # Simulate check-out (on time or slightly late)
+        check_out = expected_end + rand(0..10).minutes
+
+        AttendanceLog.create!(
+          company: @company, branch: employee.branch, employee: employee,
+          log_type: "check_in", logged_at: check_in
+        )
+        AttendanceLog.create!(
+          company: @company, branch: employee.branch, employee: employee,
+          log_type: "check_out", logged_at: check_out
+        )
+      end
+    end
+
+    # Run resolution engine
+    puts "  -> Running daily resolution..."
+    resolved_dates = (1..14).map { |i| Date.current - i.days }.reject { |d| d.saturday? || d.sunday? }
+    @employees.each do |emp|
+      resolved_dates.each do |date|
+        Attendance::DailyResolutionService.new.call(employee: emp, date: date)
+      rescue => e
+        Rails.logger.warn("Resolution failed for #{emp.id} on #{date}: #{e.message}")
       end
     end
   end
