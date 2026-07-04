@@ -19,7 +19,7 @@ module Attendance
       shift = ScheduledShift.find_by(employee: employee, work_date: date)
       template = shift&.shift_template
 
-      result = strategy.call(logs, employee, date, template)
+      result = strategy.new.call(logs, employee, date, template)
 
       day = AttendanceDay.find_or_initialize_by(employee: employee, attendance_date: date)
       day.company = employee.company

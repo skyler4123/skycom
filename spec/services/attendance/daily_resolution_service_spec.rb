@@ -1,14 +1,14 @@
 require 'rails_helper'
 
 RSpec.describe Attendance::DailyResolutionService do
-  it "runs without error when no logs exist", skip: "Requires full factory setup" do
+  it "marks absent when no logs exist" do
     employee = create(:employee)
     result = described_class.new.call(employee: employee, date: Date.yesterday)
     expect(result).to be_persisted
     expect(result.attendance_status).to eq("absent")
   end
 
-  it "creates attendance_day from logs", skip: "Requires full factory setup" do
+  it "creates attendance_day from logs" do
     company = create(:company)
     branch = create(:branch, company: company)
     employee = create(:employee, company: company, branch: branch)
