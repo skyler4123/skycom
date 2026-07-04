@@ -105,7 +105,7 @@ Rails.application.configure do
   # 3. Add your custom metadata options
   config.lograge.custom_options = lambda do |event|
     current_span = OpenTelemetry::Trace.current_span
-    { 
+    {
       environment: Rails.env.to_s,
       time: Time.current.iso8601,
       trace_id: current_span.context.valid? ? current_span.context.hex_trace_id : nil,
