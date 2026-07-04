@@ -38,13 +38,8 @@ module Attendance
           latitude: @latitude, longitude: @longitude, wifi_ssid: @wifi_ssid
         )
 
-        late_min = [ ((@time - shift.expected_start_at) / 60).to_i, 0 ].max
-        record = AttendanceRecord.create!(
-          company: @employee.company, branch: @branch, employee: @employee,
-          scheduled_shift: shift, check_in_at: @time, late_minutes: late_min
-        )
         shift.update!(status: :active)
-        Result.success(record)
+        Result.success(shift)
       end
     end
 
@@ -64,7 +59,7 @@ module Attendance
       dlon = rad.call(lon2 - lon1)
       a = Math.sin(dlat / 2)**2 + Math.cos(rad.call(lat1)) * Math.cos(rad.call(lat2)) * Math.sin(dlon / 2)**2
       c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
-      6_371_000 * c # Earth radius in meters
+      6_371_000 * c
     end
   end
 end

@@ -29,7 +29,6 @@ class Branch < ApplicationRecord
   has_many :orders, dependent: :destroy
   has_many :payment_method_appointments, dependent: :destroy
   has_many :scheduled_shifts, dependent: :destroy
-  has_many :attendance_records, dependent: :destroy
   has_one :attendance_policy, dependent: :destroy
   has_many :task_groups, dependent: :destroy
   has_many :project_groups, dependent: :destroy

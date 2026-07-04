@@ -321,22 +321,6 @@ class Seed::HospitalEnrichService
           company: @company, branch: employee.branch, employee: employee,
           log_type: "check_out", logged_at: check_out
         )
-
-        total_work = ((check_out - check_in) / 60).to_i
-        break_min = template.unpaid_break_minutes
-        net_work = [ total_work - break_min, 0 ].max
-        late = check_in > expected_start ? ((check_in - expected_start) / 60).to_i : 0
-        early = check_out < expected_end ? ((expected_end - check_out) / 60).to_i : 0
-        overtime = check_out > expected_end ? ((check_out - expected_end) / 60).to_i : 0
-        status = early > 60 ? :half_day : :present
-
-        record = AttendanceRecord.create!(
-          company: @company, branch: employee.branch, employee: employee,
-          scheduled_shift: shift, check_in_at: check_in, check_out_at: check_out,
-          total_work_minutes: net_work, late_minutes: late,
-          early_leave_minutes: early, overtime_minutes: overtime,
-          computed_status: status
-        )
       end
     end
 

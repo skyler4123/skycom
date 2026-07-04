@@ -365,36 +365,6 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_04_004208) do
     t.index ["discarded_at"], name: "index_attendance_policies_on_discarded_at"
   end
 
-  create_table "attendance_records", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
-    t.uuid "company_id", null: false
-    t.uuid "branch_id"
-    t.uuid "employee_id", null: false
-    t.uuid "scheduled_shift_id"
-    t.datetime "check_in_at", null: false
-    t.datetime "check_out_at"
-    t.datetime "break_start"
-    t.datetime "break_end"
-    t.integer "total_work_minutes", default: 0
-    t.integer "late_minutes", default: 0
-    t.integer "early_leave_minutes", default: 0
-    t.integer "overtime_minutes", default: 0
-    t.string "computed_status", default: "pending", null: false
-    t.integer "lifecycle_status"
-    t.integer "workflow_status"
-    t.integer "business_type"
-    t.datetime "expiration_date"
-    t.jsonb "metadata", default: {}
-    t.datetime "discarded_at"
-    t.string "permission_resource_name"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.index ["branch_id"], name: "index_attendance_records_on_branch_id"
-    t.index ["company_id"], name: "index_attendance_records_on_company_id"
-    t.index ["discarded_at"], name: "index_attendance_records_on_discarded_at"
-    t.index ["employee_id"], name: "index_attendance_records_on_employee_id"
-    t.index ["scheduled_shift_id"], name: "index_attendance_records_on_scheduled_shift_id"
-  end
-
   create_table "billing_contracts", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.uuid "company_id", null: false
     t.string "name", null: false
@@ -4754,17 +4724,6 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_04_004208) do
     t.index ["user_id"], name: "index_sign_in_tokens_on_user_id"
   end
 
-  create_table "solid_cache_entries", force: :cascade do |t|
-    t.binary "key", null: false
-    t.binary "value", null: false
-    t.datetime "created_at", null: false
-    t.bigint "key_hash", null: false
-    t.integer "byte_size", null: false
-    t.index ["byte_size"], name: "index_solid_cache_entries_on_byte_size"
-    t.index ["key_hash", "byte_size"], name: "index_solid_cache_entries_on_key_hash_and_byte_size"
-    t.index ["key_hash"], name: "index_solid_cache_entries_on_key_hash", unique: true
-  end
-
   create_table "statistics", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
     t.string "owner_type", null: false
     t.uuid "owner_id", null: false
@@ -5845,10 +5804,6 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_04_004208) do
   add_foreign_key "attendance_months", "employees"
   add_foreign_key "attendance_policies", "branches"
   add_foreign_key "attendance_policies", "companies"
-  add_foreign_key "attendance_records", "branches"
-  add_foreign_key "attendance_records", "companies"
-  add_foreign_key "attendance_records", "employees"
-  add_foreign_key "attendance_records", "scheduled_shifts"
   add_foreign_key "billing_contracts", "companies"
   add_foreign_key "billing_invoices", "billing_contracts"
   add_foreign_key "billing_invoices", "companies"
