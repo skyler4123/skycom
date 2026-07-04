@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_07_03_223342) do
+ActiveRecord::Schema[8.0].define(version: 2026_07_04_004208) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pgcrypto"
@@ -359,6 +359,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_03_223342) do
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer "resolution_strategy", default: 0, null: false
     t.index ["branch_id"], name: "index_attendance_policies_on_branch_id", unique: true
     t.index ["company_id"], name: "index_attendance_policies_on_company_id"
     t.index ["discarded_at"], name: "index_attendance_policies_on_discarded_at"
