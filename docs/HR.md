@@ -6,9 +6,8 @@ The HR module handles shift scheduling and attendance check-in/out tracking. Thi
 
 ```
 AttendanceLogs (raw check-in/out events)
-  → AttendanceRecords (per-session computed metrics)
-    → AttendanceDays (daily rollup per employee)
-      → AttendanceMonths (monthly payroll rollup)
+  → AttendanceDays (daily rollup per employee)
+    → AttendanceMonths (monthly payroll rollup)
 ```
 
 The system supports multiple business types (retail, hospital) through the same shift/attendance tables, with different shift templates per clinic/branch.
@@ -69,15 +68,13 @@ Attendance::CheckInService.new(
 ).call
 ```
 
-Returns `Result.success(attendance_record)` or `Result.failure("error message")`.
+Returns `Result.success(scheduled_shift)` or `Result.failure("error message")`.
 
 Steps:
 1. Load branch's `AttendancePolicy` → validate GPS distance or WiFi SSID
 2. Find today's `ScheduledShift` for the employee
 3. Create `AttendanceLog` (immutable audit)
-4. Compute late minutes: `max(actual check-in - expected_start - grace_period, 0)`
-5. Create `AttendanceRecord` with computed metrics
-6. Update `ScheduledShift.status` → `:active`
+4. Update `ScheduledShift.status` → `:active`
 
 ### Attendance::CheckOutService
 
@@ -90,11 +87,8 @@ Attendance::CheckOutService.new(
 ```
 
 Steps:
-1. Find open `AttendanceRecord` (check_out_at IS NULL) for the employee
-2. Create `AttendanceLog`
-3. Compute: total_work_minutes, early_leave_minutes, overtime_minutes
-4. Update `AttendanceRecord` with computed metrics
-5. Update `ScheduledShift.status` → `:completed`
+1. Create `AttendanceLog` (immutable check-out event)
+2. The daily resolution engine (see Section 5) computes metrics from logs
 
 ---
 
@@ -205,8 +199,8 @@ Shift Templates has full CRUD (index, new, create, show, edit, update). Shifts s
 
 ## 7. Permission Matrix
 
-| Role | ShiftTemplate | ScheduledShift | AttendanceRecord |
-|------|--------------|---------------|-----------------|
+| Role | ShiftTemplate | ScheduledShift | AttendanceDay |
+|------|--------------|---------------|--------------|
 | Owner (bypass) | Full CRUD | Full CRUD | Full CRUD |
 | Admin | Full CRUD | Full CRUD | Full CRUD |
 | Manager | Full CRUD | Full CRUD | Full CRUD |
@@ -273,7 +267,7 @@ Shift seeds include realistic edge cases:
 | **Flexible time policies** | Support Pure Flexible and Core-Hours Flexible in addition to Fixed Shift |
 | **Under-hours deficit tracking** | Monthly account tracking minutes below full-time target |
 | **Core hours enforcement** | Flag policy violations when core hours are missed even if total hours are met |
-| **Midnight crossover** | Handle shifts crossing midnight (e.g., 23:00-07:00) in attendance_records association |
+| **Midnight crossover** | Handle shifts crossing midnight (e.g., 23:00-07:00) in scheduled_shift association |
 | **Payroll integration** | Link attendance_months to payroll/commission engine |
 | **Employee self-service** | Employee-facing dashboard to view their own attendance_days and flag issues |
 | **Attendance policies UI** | CRUD dashboard for per-branch geofence configuration |
@@ -286,14 +280,12 @@ Shift seeds include realistic edge cases:
 |------|---------|
 | `db/migrate/*create_shift_templates.rb` | Migration |
 | `db/migrate/*create_scheduled_shifts.rb` | Migration |
-| `db/migrate/*create_attendance_records.rb` | Migration |
 | `db/migrate/*create_attendance_logs.rb` | Migration (redesigned) |
 | `db/migrate/*create_attendance_days.rb` | Migration (redesigned) |
 | `db/migrate/*create_attendance_months.rb` | Migration (redesigned) |
 | `db/migrate/*create_attendance_policies.rb` | Migration |
 | `app/models/shift_template.rb` | Model |
 | `app/models/scheduled_shift.rb` | Model |
-| `app/models/attendance_record.rb` | Model |
 | `app/models/attendance_log.rb` | Model (redesigned) |
 | `app/models/attendance_day.rb` | Model (redesigned) |
 | `app/models/attendance_month.rb` | Model (redesigned) |
