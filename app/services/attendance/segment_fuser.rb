@@ -1,3 +1,5 @@
+# Superseded by Strategies::PairedStrategy and Strategies::CheckInOnlyStrategy.
+# Segment fusion logic is now embedded in each strategy's #fuse_* method.
 module Attendance
   class SegmentFuser
     def self.fuse(logs)

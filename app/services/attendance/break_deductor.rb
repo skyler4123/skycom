@@ -1,3 +1,5 @@
+# Superseded by Strategies::PairedStrategy and Strategies::CheckInOnlyStrategy.
+# Break deduction logic is now embedded in each strategy's #deduct_break method.
 module Attendance
   class BreakDeductor
     def self.deduct(gross_minutes, shift_template, segments)

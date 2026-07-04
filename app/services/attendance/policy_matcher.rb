@@ -1,3 +1,5 @@
+# Superseded by Strategies::PairedStrategy and Strategies::CheckInOnlyStrategy.
+# Policy matching logic is now embedded in each strategy's #match_policy method.
 module Attendance
   class PolicyMatcher
     def self.match(net_minutes, segments, shift_template, employee, date)
