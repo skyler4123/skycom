@@ -36,13 +36,13 @@ module Attendance
       def match_policy(net, segments, template, employee, date)
         full_day = template&.full_day_minutes || 480
         case template&.policy_type
-        when "pure_flexible" then flexible_match(net, full_day)
+        when "pure_flexible" then flexible_match(net, full_day, segments)
         when "core_hours_flexible" then core_hours_match(net, segments, template, date, full_day)
         else fixed_match(net, segments, template, employee, date, full_day)
         end
       end
 
-      def flexible_match(net, full_day)
+      def flexible_match(net, full_day, segments)
         if net >= full_day
           success_result(net - full_day, net, segments)
         elsif net >= full_day / 2
