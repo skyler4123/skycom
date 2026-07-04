@@ -103,15 +103,36 @@ Steps:
 
 ## 5. Daily Resolution Engine
 
-Phase 1 (AttendanceLogs) collects raw timestamps. Phase 2 resolves them into daily attendance states via a 4-step pipeline:
+Phase 1 (AttendanceLogs) collects raw timestamps. Phase 2 resolves them into daily attendance states using a **strategy pattern** dispatched by `Attendance::DailyResolutionService`:
 
 ```
 AttendanceLogs (raw sequential timestamps)
-  → Linear Segment Fusion (pair In/Out into work segments)
-    → Break Deduction (fixed lunch, multi-punch, or auto-deduct)
-      → Policy Match (compare net minutes against shift template)
-        → AttendanceDay (daily status: full_day, half_day, underhours)
+  → ResolutionStrategy (configured per branch via AttendancePolicy)
+    → Segment Fusion (pair In/Out into work segments)
+      → Break Deduction (fixed lunch, multi-punch, or auto-deduct)
+        → Policy Match (compare net minutes against shift template)
+          → AttendanceDay (daily status: full_day, half_day, underhours)
 ```
+
+### Strategy Architecture
+
+Each branch's `AttendancePolicy` has a `resolution_strategy` enum that determines how logs are resolved:
+
+| Enum | Strategy Class | Behavior |
+|------|---------------|----------|
+| `paired` (default) | `Strategies::PairedStrategy` | Standard check_in → check_out paired segments |
+| `check_in_only` | `Strategies::CheckInOnlyStrategy` | First-to-last check_in virtual segment for devices that only record arrivals |
+
+`DailyResolutionService` loads the branch's policy and dispatches to the correct strategy class:
+
+```ruby
+STRATEGIES = {
+  "paired" => Strategies::PairedStrategy,
+  "check_in_only" => Strategies::CheckInOnlyStrategy
+}.freeze
+```
+
+To add a new resolution strategy, create a class under `Strategies::` that implements `call(logs, employee, date, shift_template)` returning `{ status:, net_minutes:, segments:, late_minutes:, early_leave_minutes:, overtime_minutes: }`, register it in `STRATEGIES`, and add the enum value to `AttendancePolicy`.
 
 ### Step 1: Segment Fusion
 
