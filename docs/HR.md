@@ -21,11 +21,10 @@ The system supports multiple business types (retail, hospital) through the same 
 |---|-------|---------|-------------|
 | 1 | `shift_templates` | Reusable shift definitions | name, start_time, end_time, grace_period_minutes, unpaid_break_minutes |
 | 2 | `scheduled_shifts` | Employee roster (who works when) | employee_id, work_date, expected_start_at, expected_end_at, status |
-| 3 | `attendance_records` | Per check-in/check-out session with metrics | employee_id, check_in_at, check_out_at, total_work_minutes, late_minutes, overtime_minutes, computed_status |
-| 4 | `attendance_logs` | Immutable raw audit trail | employee_id, log_type, logged_at, latitude, longitude, wifi_ssid, device_fingerprint |
-| 5 | `attendance_days` | Employee-facing daily view | employee_id, attendance_date, check_in, check_out, total_seconds_* |
-| 6 | `attendance_months` | Payroll-ready monthly rollup | employee_id, month, total_work_minutes, total_late_minutes, total_overtime_minutes, total_present_days, total_absent_days |
-| 7 | `attendance_policies` | Per-branch geofence configuration | branch_id, latitude, longitude, allowed_radius_meters, allowed_wifi_ssid |
+| 3 | `attendance_logs` | Immutable raw audit trail | employee_id, log_type, logged_at, latitude, longitude, wifi_ssid, device_fingerprint |
+| 4 | `attendance_days` | Employee-facing daily view | employee_id, attendance_date, check_in, check_out, total_seconds_* |
+| 5 | `attendance_months` | Payroll-ready monthly rollup | employee_id, month, total_work_minutes, total_late_minutes, total_overtime_minutes, total_present_days, total_absent_days |
+| 6 | `attendance_policies` | Per-branch geofence + resolution config | branch_id, latitude, longitude, allowed_radius_meters, resolution_strategy |
 
 All tables include the standard System Fields Block (lifecycle_status, workflow_status, business_type, metadata, discarded_at, permission_resource_name).
 
@@ -43,16 +42,14 @@ All tables include the standard System Fields Block (lifecycle_status, workflow_
 ```
 Employee checks in via mobile app
   → AttendanceLog created (log_type: check_in, with GPS)
-    → AttendanceRecord created (check_in_at set, late_minutes computed)
-      → ScheduledShift updated (status: active)
-      
+    → ScheduledShift updated (status: active)
+
 Employee checks out
   → AttendanceLog created (log_type: check_out)
-    → AttendanceRecord updated (check_out_at, total_work_minutes, overtime, computed_status)
-      → ScheduledShift updated (status: completed)
+    → ScheduledShift updated (status: completed)
 
-Nightly aggregation job
-  → AttendanceRecords grouped by employee + date → AttendanceDays
+Daily resolution engine (nightly or on-demand)
+  → AttendanceLogs grouped by employee + date → segments → AttendanceDay
     → AttendanceDays grouped by employee + month → AttendanceMonths
 ```
 
@@ -246,7 +243,7 @@ Shift seeds include realistic edge cases:
 
 | Component | Status |
 |-----------|--------|
-| Database tables (7) | Done |
+| Database tables (6) | Done |
 | Models with validations | Done |
 | Model specs (35 examples) | Done |
 | CheckInService | Done |
