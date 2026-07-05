@@ -14,8 +14,8 @@ class CreateBillingInvoices < ActiveRecord::Migration[8.0]
       t.datetime :period_end, null: false
       t.datetime :due_at
 
-      t.integer  :payment_status, default: 0, index: true # enum: unpaid, paid, voided, overdue
-      t.integer  :lifecycle_status, default: 0, index: true # enum: draft, final
+      t.integer  :payment_status, index: true # enum: unpaid, paid, voided, overdue
+      t.integer  :lifecycle_status, index: true # enum: draft, final
       t.timestamps
     end
 

@@ -16,11 +16,11 @@ class CreatePages < ActiveRecord::Migration[8.0]
       t.string  :timezone,      default: "UTC" # Global Standard
 
       # --- System Configurations (Enums) ---
-      t.integer :business_type,      null: false, default: 10, index: true
-      t.integer :target_role,        null: false, default: 20, index: true
-      t.integer :target_resolution,  null: false, default: 30, index: true
-      t.integer :lifecycle_status,   null: false, default: 20, index: true # Defaults to draft
-      t.integer :workflow_status,    null: false, default: 10, index: true
+      t.integer :business_type,      null: false, index: true
+      t.integer :target_role,        null: false, index: true
+      t.integer :target_resolution,  null: false, index: true
+      t.integer :lifecycle_status,   null: false, index: true
+      t.integer :workflow_status,    null: false, index: true
 
       # --- Core Engine Layout Configurations ---
       # This stores grid rules, component placements, hidden widgets, or feature flags

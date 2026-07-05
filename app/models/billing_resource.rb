@@ -21,7 +21,7 @@ class BillingResource < ApplicationRecord
   validates :name, presence: true
   validates :name, uniqueness: { scope: :country_code }
 
-  enum :resource_type, { volumetric: 0, addon_feature: 1 }
+  enum :resource_type, { volumetric: 0, addon_feature: 1 }, default: :volumetric
   enum :lifecycle_status, { active: 0, deprecated: 1, archived: 2 }, default: :active
   enum :country_code, COUNTRIE_CODES, prefix: true
 end

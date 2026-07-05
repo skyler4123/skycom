@@ -8,6 +8,7 @@ class CreateAttendancePolicies < ActiveRecord::Migration[8.0]
       t.integer :allowed_radius_meters, default: 100, null: false
       t.string :allowed_wifi_ssid
       t.boolean :require_photo, default: false, null: false
+      t.integer :resolution_strategy, null: false
 
       t.integer :lifecycle_status
       t.integer :workflow_status

@@ -5,8 +5,7 @@ class CreatePeriods < ActiveRecord::Migration[8.0]
       t.datetime :end_at # Allow nil (forever)
 
       # Store the offset as an integer (e.g., 7, -5, 0)
-      # default: 0 (UTC)
-      t.integer :timezone, default: 0, null: false
+      t.integer :timezone, null: false
 
       t.timestamps
     end

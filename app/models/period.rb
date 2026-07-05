@@ -6,7 +6,7 @@ class Period < ApplicationRecord
   # --- Enums ---
   # 1. Define the Enum with Valid Method Names
   # We map safe names (e.g., :plus_7) to your values (7).
-  enum :timezone, TIMEZONES, prefix: true, default: -12
+  enum :timezone, TIMEZONES, prefix: true, default: :utc
 
   # 2. Validations
   validates :start_at, presence: true

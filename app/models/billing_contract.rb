@@ -18,7 +18,7 @@ class BillingContract < ApplicationRecord
   validates :contract_type, presence: true
   validates :start_date, presence: true
 
-  enum :contract_type, { basic: 0, pay_as_you_go: 1, enterprise: 2 }
+  enum :contract_type, { basic: 0, pay_as_you_go: 1, enterprise: 2 }, default: :basic
   enum :lifecycle_status, { draft: 0, active: 1, expired: 2, terminated: 3 }, default: :draft
 
   validate :only_one_active_per_company, if: -> { active? && company_id.present? }
