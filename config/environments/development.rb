@@ -77,13 +77,50 @@ Rails.application.configure do
   # Change to :null_store to avoid any caching.
   config.cache_store = :solid_cache_store
 
-  # Replace the default in-process and non-durable queuing backend for Active Job.
-  config.active_job.queue_adapter = :solid_queue
-
-  config.solid_queue.connects_to = { database: { writing: :queue } }
-  config.solid_queue.logger = ActiveSupport::Logger.new(STDOUT)
-
   # Store uploaded files on the local file system (see config/storage.yml for options).
   config.active_storage.service = :minio
+
+  # 1. Enable Lograge
+  config.lograge.enabled = true
+  config.lograge.formatter = Lograge::Formatters::Json.new
+
+  # 2. FIX: Ignore ActiveStorage controller routes completely
+  config.lograge.ignore_actions = [
+    "ActiveStorage::Representations::RedirectController#show",
+    "ActiveStorage::Blobs::RedirectController#show",
+    "ActiveStorage::DiskController#show"
+  ]
+
+  # Alternatively, you can catch any custom assets/storage routes by path matching:
+  # config.lograge.ignore_custom = lambda do |event|
+  #   event.payload[:path]&.start_with?("/rails/active_storage")
+  # end
+
+  # 3. Add your custom metadata options
+  config.lograge.custom_options = lambda do |event|
+    current_span = OpenTelemetry::Trace.current_span
+    {
+      environment: Rails.env.to_s,
+      time: Time.current.iso8601,
+      trace_id: current_span.context.valid? ? current_span.context.hex_trace_id : nil,
+      span_id: current_span.context.valid? ? current_span.context.hex_span_id : nil
+    }
+  end
+
+  config.log_level = :info
+  # FIX: Only output to stdout if running via 'rails server' (puma/dev processes)
+  if defined?(Rails::Server) || ENV["RAILS_LOG_TO_STDOUT"].present?
+    config.logger = ActiveSupport::Logger.new($stdout)
+  else
+    # Keep seeds, migrations, and console quiet by writing to the log file instead
+    config.logger = ActiveSupport::Logger.new(Rails.root.join("log", "#{Rails.env}.log"))
+  end
+
+  # Replace the default in-process and non-durable queuing backend for Active Job.
+  config.active_job.queue_adapter = :solid_queue
+  config.solid_queue.connects_to = { database: { writing: :queue } }
+  # Let Solid Queue gracefully follow whatever strategy the environment demands
+  config.solid_queue.logger = config.logger
+  config.active_job.verbose_enqueue_logs = false
 end
 # ----------------------------------------------------------------------------------------------------
