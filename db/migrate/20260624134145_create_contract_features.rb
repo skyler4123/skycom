@@ -11,7 +11,7 @@ class CreateContractFeatures < ActiveRecord::Migration[8.0]
       t.integer :monthly_flat_price_cents, default: 0, null: false
       t.string :monthly_flat_price_currency, default: "USD", null: false
 
-      t.integer  :lifecycle_status, default: 0, index: true
+      t.integer  :lifecycle_status, index: true
       t.integer  :workflow_status, default: 0, index: true
       t.timestamps
     end

@@ -3,12 +3,12 @@ class CreateBillingResources < ActiveRecord::Migration[8.0]
     create_table :billing_resources, id: :uuid do |t|
       t.string :name, null: false
       t.text   :description
-      t.integer :resource_type, default: 0, null: false # enum: volumetric, addon_feature
+      t.integer :resource_type, null: false # enum: volumetric, addon_feature
       t.integer :country_code
       t.integer :price_cents, default: 0, null: false
       t.string  :currency, default: "USD", null: false
 
-      t.integer  :lifecycle_status, default: 0, index: true
+      t.integer  :lifecycle_status, index: true
       t.integer  :workflow_status, default: 0, index: true
       t.index [ :name, :country_code ], unique: true
       t.timestamps

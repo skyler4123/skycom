@@ -350,7 +350,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_02_190003) do
     t.integer "allowed_radius_meters", default: 100, null: false
     t.string "allowed_wifi_ssid"
     t.boolean "require_photo", default: false, null: false
-    t.integer "resolution_strategy", default: 0, null: false
+    t.integer "resolution_strategy", null: false
     t.integer "lifecycle_status"
     t.integer "workflow_status"
     t.integer "business_type"
@@ -369,12 +369,12 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_02_190003) do
     t.uuid "company_id", null: false
     t.string "name", null: false
     t.string "description"
-    t.integer "contract_type", default: 0, null: false
+    t.integer "contract_type", null: false
     t.integer "fixed_monthly_price_cents", default: 0, null: false
     t.string "fixed_monthly_price_currency", default: "USD", null: false
     t.datetime "start_date", null: false
     t.datetime "end_time"
-    t.integer "lifecycle_status", default: 0
+    t.integer "lifecycle_status"
     t.integer "workflow_status", default: 0
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
@@ -392,8 +392,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_02_190003) do
     t.datetime "period_start", null: false
     t.datetime "period_end", null: false
     t.datetime "due_at"
-    t.integer "payment_status", default: 0
-    t.integer "lifecycle_status", default: 0
+    t.integer "payment_status"
+    t.integer "lifecycle_status"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["billing_contract_id"], name: "index_billing_invoices_on_billing_contract_id"
@@ -406,11 +406,11 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_02_190003) do
   create_table "billing_resources", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.string "name", null: false
     t.text "description"
-    t.integer "resource_type", default: 0, null: false
+    t.integer "resource_type", null: false
     t.integer "country_code"
     t.integer "price_cents", default: 0, null: false
     t.string "currency", default: "USD", null: false
-    t.integer "lifecycle_status", default: 0
+    t.integer "lifecycle_status"
     t.integer "workflow_status", default: 0
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
@@ -924,7 +924,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_02_190003) do
     t.string "description"
     t.integer "monthly_flat_price_cents", default: 0, null: false
     t.string "monthly_flat_price_currency", default: "USD", null: false
-    t.integer "lifecycle_status", default: 0
+    t.integer "lifecycle_status"
     t.integer "workflow_status", default: 0
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
@@ -943,7 +943,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_02_190003) do
     t.integer "free_allowance", default: 0, null: false
     t.integer "unit_price_cents", default: 0, null: false
     t.string "unit_price_currency", default: "USD", null: false
-    t.integer "lifecycle_status", default: 0
+    t.integer "lifecycle_status"
     t.integer "workflow_status", default: 0
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
@@ -2948,11 +2948,11 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_02_190003) do
     t.integer "currency_code", default: 840
     t.integer "country_code", default: 1
     t.string "timezone", default: "UTC"
-    t.integer "business_type", default: 10, null: false
-    t.integer "target_role", default: 20, null: false
-    t.integer "target_resolution", default: 30, null: false
-    t.integer "lifecycle_status", default: 20, null: false
-    t.integer "workflow_status", default: 10, null: false
+    t.integer "business_type", null: false
+    t.integer "target_role", null: false
+    t.integer "target_resolution", null: false
+    t.integer "lifecycle_status", null: false
+    t.integer "workflow_status", null: false
     t.jsonb "layout_manifest", default: {}, null: false
     t.jsonb "metadata", default: {}, null: false
     t.string "permission_resource_name", null: false
@@ -3164,7 +3164,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_02_190003) do
   create_table "periods", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
     t.datetime "start_at", null: false
     t.datetime "end_at"
-    t.integer "timezone", default: 0, null: false
+    t.integer "timezone", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["start_at", "end_at", "timezone"], name: "index_periods_on_start_at_and_end_at_and_timezone", unique: true, nulls_not_distinct: true
