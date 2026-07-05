@@ -109,13 +109,13 @@ Rails.application.configure do
 
   config.log_level = :info
   # FIX: Only output to stdout if running via 'rails server' (puma/dev processes)
-  if defined?(Rails::Server) || ENV['RAILS_LOG_TO_STDOUT'].present?
+  if defined?(Rails::Server) || ENV["RAILS_LOG_TO_STDOUT"].present?
     config.logger = ActiveSupport::Logger.new($stdout)
   else
     # Keep seeds, migrations, and console quiet by writing to the log file instead
     config.logger = ActiveSupport::Logger.new(Rails.root.join("log", "#{Rails.env}.log"))
   end
-  
+
   # Replace the default in-process and non-durable queuing backend for Active Job.
   config.active_job.queue_adapter = :solid_queue
   config.solid_queue.connects_to = { database: { writing: :queue } }

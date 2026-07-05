@@ -4,6 +4,6 @@ class DemoJob < ApplicationJob
   def perform
     Rails.logger.info("Demo Rails.logger.info in DemoJob")
     sleep 5 # Simulate a long-running job
-    return true
+    true
   end
 end
