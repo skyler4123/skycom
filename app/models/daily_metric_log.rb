@@ -13,6 +13,8 @@
 # One row per company + resource + day (uniqueness enforced).
 #
 class DailyMetricLog < ApplicationRecord
+  attribute :usage_count, :integer, default: 0
+
   belongs_to :company
   belongs_to :billing_resource
 

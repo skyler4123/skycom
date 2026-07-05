@@ -7,8 +7,8 @@ class CreateBillingInvoices < ActiveRecord::Migration[8.0]
       t.string   :invoice_number, null: false
 
       # money-rails format for the finalized invoice amount
-      t.integer  :price_cents, default: 0, null: false
-      t.string   :price_currency, default: "USD", null: false
+      t.integer  :price_cents, null: false
+      t.string   :price_currency, null: false
 
       t.datetime :period_start, null: false
       t.datetime :period_end, null: false

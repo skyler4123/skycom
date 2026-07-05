@@ -11,9 +11,9 @@ class CreatePages < ActiveRecord::Migration[8.0]
       t.text   :description
       t.string :code, index: { unique: true }
       t.string :phone_number
-      t.integer :currency_code, default: 840 # USD
-      t.integer :country_code,  default: 1   # US
-      t.string  :timezone,      default: "UTC" # Global Standard
+      t.integer :currency_code
+      t.integer :country_code
+      t.string  :timezone
 
       # --- System Configurations (Enums) ---
       t.integer :business_type,      null: false, index: true
@@ -24,8 +24,8 @@ class CreatePages < ActiveRecord::Migration[8.0]
 
       # --- Core Engine Layout Configurations ---
       # This stores grid rules, component placements, hidden widgets, or feature flags
-      t.jsonb :layout_manifest, default: {}, null: false
-      t.jsonb :metadata,        default: {}, null: false
+      t.jsonb :layout_manifest, null: false
+      t.jsonb :metadata, null: false
 
       # --- Security and System Tracking ---
       t.string   :permission_resource_name, null: false

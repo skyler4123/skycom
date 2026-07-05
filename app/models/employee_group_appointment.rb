@@ -2,6 +2,7 @@ class EmployeeGroupAppointment < ApplicationRecord
   include SetDefaultCompanyConcern
 
   attribute :permission_resource_name, :string, default: -> { self.name }
+  attribute :metadata, :jsonb, default: {}
 
   belongs_to :company
   belongs_to :employee_group

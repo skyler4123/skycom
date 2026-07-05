@@ -8,11 +8,11 @@ class CreateContractFeatures < ActiveRecord::Migration[8.0]
       t.string :description
 
       # money-rails formatting for flat monthly add-on pricing
-      t.integer :monthly_flat_price_cents, default: 0, null: false
-      t.string :monthly_flat_price_currency, default: "USD", null: false
+      t.integer :monthly_flat_price_cents, null: false
+      t.string :monthly_flat_price_currency, null: false
 
       t.integer  :lifecycle_status, index: true
-      t.integer  :workflow_status, default: 0, index: true
+      t.integer  :workflow_status, index: true
       t.timestamps
     end
 

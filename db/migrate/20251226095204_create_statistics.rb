@@ -4,7 +4,7 @@ class CreateStatistics < ActiveRecord::Migration[8.0]
       t.references :owner, polymorphic: true, null: false, type: :uuid
       t.json :data
       t.datetime :recorded_at
-      t.jsonb :metadata, default: {}
+      t.jsonb :metadata
 
       t.timestamps
     end

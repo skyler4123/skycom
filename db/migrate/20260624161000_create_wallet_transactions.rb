@@ -5,13 +5,13 @@ class CreateWalletTransactions < ActiveRecord::Migration[8.0]
       t.references :billing_invoice, null: true, foreign_key: true, type: :uuid
 
       t.integer :transaction_type, null: false
-      t.integer :amount_cents, default: 0, null: false
-      t.string  :currency, default: "USD", null: false
+      t.integer :amount_cents, null: false
+      t.string  :currency, null: false
 
-      t.integer :balance_before_cents, default: 0, null: false
-      t.integer :balance_after_cents, default: 0, null: false
-      t.integer :promo_balance_before_cents, default: 0, null: false
-      t.integer :promo_balance_after_cents, default: 0, null: false
+      t.integer :balance_before_cents, null: false
+      t.integer :balance_after_cents, null: false
+      t.integer :promo_balance_before_cents, null: false
+      t.integer :promo_balance_after_cents, null: false
 
       t.text :description
 

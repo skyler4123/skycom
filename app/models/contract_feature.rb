@@ -8,6 +8,9 @@
 # CalculatorService sums these for the features portion of the monthly bill.
 #
 class ContractFeature < ApplicationRecord
+  attribute :monthly_flat_price_cents, :integer, default: 0
+  attribute :monthly_flat_price_currency, :string, default: "USD"
+
   belongs_to :billing_resource
   belongs_to :billing_contract
 

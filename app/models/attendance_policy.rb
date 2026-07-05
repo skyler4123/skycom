@@ -1,4 +1,7 @@
 class AttendancePolicy < ApplicationRecord
+  attribute :allowed_radius_meters, :integer, default: 100
+  attribute :require_photo, :boolean, default: false
+
   belongs_to :company
   belongs_to :branch
 

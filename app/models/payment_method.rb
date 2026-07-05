@@ -1,6 +1,11 @@
 class PaymentMethod < ApplicationRecord
   attribute :permission_resource_name, :string, default: -> { self.name }
 
+  attribute :metadata, :jsonb, default: {}
+  attribute :currency_code, :integer, default: 840
+  attribute :country_code, :integer, default: 1
+  attribute :timezone, :string, default: "UTC"
+
   # --- Associations ---
   # This model is intended to be global, so it does not belong to a branch.
   has_many :payment_method_appointments, dependent: :destroy

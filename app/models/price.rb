@@ -2,6 +2,8 @@
 
 # app/models/price.rb
 class Price < ApplicationRecord
+  attribute :currency_code, :integer, default: 0
+
   include ImmutableRecordConcern
 
   # 1. Standard Rails Enum for Currencies

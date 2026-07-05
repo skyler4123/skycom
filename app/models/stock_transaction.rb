@@ -1,4 +1,9 @@
 class StockTransaction < ApplicationRecord
+  attribute :metadata, :jsonb, default: {}
+  attribute :currency_code, :integer, default: 840
+  attribute :country_code, :integer, default: 1
+  attribute :timezone, :string, default: "UTC"
+
   belongs_to :company
   belongs_to :branch, optional: true
   belongs_to :warehouse

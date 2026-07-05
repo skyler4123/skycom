@@ -1,4 +1,6 @@
 class ScheduledShift < ApplicationRecord
+  attribute :status, :string, default: "scheduled"
+
   belongs_to :company
   belongs_to :branch
   belongs_to :employee

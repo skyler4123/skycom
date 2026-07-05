@@ -61,7 +61,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_02_190003) do
     t.integer "workflow_status"
     t.integer "business_type"
     t.datetime "expiration_date"
-    t.jsonb "metadata", default: {}
+    t.jsonb "metadata"
     t.datetime "discarded_at"
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
@@ -103,7 +103,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_02_190003) do
     t.integer "workflow_status"
     t.integer "business_type"
     t.datetime "expiration_date"
-    t.jsonb "metadata", default: {}
+    t.jsonb "metadata"
     t.datetime "discarded_at"
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
@@ -136,7 +136,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_02_190003) do
     t.integer "workflow_status"
     t.integer "business_type"
     t.datetime "expiration_date"
-    t.jsonb "metadata", default: {}
+    t.jsonb "metadata"
     t.datetime "discarded_at"
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
@@ -172,7 +172,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_02_190003) do
     t.integer "workflow_status"
     t.integer "business_type"
     t.datetime "expiration_date"
-    t.jsonb "metadata", default: {}
+    t.jsonb "metadata"
     t.datetime "discarded_at"
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
@@ -204,7 +204,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_02_190003) do
     t.integer "workflow_status"
     t.integer "business_type"
     t.datetime "expiration_date"
-    t.jsonb "metadata", default: {}
+    t.jsonb "metadata"
     t.datetime "discarded_at"
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
@@ -234,7 +234,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_02_190003) do
     t.integer "workflow_status"
     t.integer "business_type"
     t.datetime "expiration_date"
-    t.jsonb "metadata", default: {}
+    t.jsonb "metadata"
     t.datetime "discarded_at"
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
@@ -259,10 +259,10 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_02_190003) do
     t.datetime "check_out"
     t.datetime "break_start"
     t.datetime "break_end"
-    t.integer "total_seconds_present", default: 0
-    t.integer "total_seconds_break", default: 0
-    t.integer "total_seconds_worked", default: 0
-    t.integer "total_seconds_overtime", default: 0
+    t.integer "total_seconds_present"
+    t.integer "total_seconds_break"
+    t.integer "total_seconds_worked"
+    t.integer "total_seconds_overtime"
     t.integer "attendance_status"
     t.integer "recorded_method"
     t.text "notes"
@@ -276,7 +276,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_02_190003) do
     t.integer "workflow_status"
     t.integer "business_type"
     t.datetime "expiration_date"
-    t.jsonb "metadata", default: {}
+    t.jsonb "metadata"
     t.datetime "discarded_at"
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
@@ -302,7 +302,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_02_190003) do
     t.integer "workflow_status"
     t.integer "business_type"
     t.datetime "expiration_date"
-    t.jsonb "metadata", default: {}
+    t.jsonb "metadata"
     t.datetime "discarded_at"
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
@@ -318,19 +318,19 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_02_190003) do
     t.uuid "branch_id"
     t.uuid "employee_id", null: false
     t.date "month", null: false
-    t.integer "total_work_minutes", default: 0
-    t.integer "total_late_minutes", default: 0
-    t.integer "total_early_leave_minutes", default: 0
-    t.integer "total_overtime_minutes", default: 0
-    t.integer "total_absent_days", default: 0
-    t.integer "total_present_days", default: 0
-    t.integer "total_records", default: 0
-    t.integer "total_deficit_minutes", default: 0
+    t.integer "total_work_minutes"
+    t.integer "total_late_minutes"
+    t.integer "total_early_leave_minutes"
+    t.integer "total_overtime_minutes"
+    t.integer "total_absent_days"
+    t.integer "total_present_days"
+    t.integer "total_records"
+    t.integer "total_deficit_minutes"
     t.integer "lifecycle_status"
     t.integer "workflow_status"
     t.integer "business_type"
     t.datetime "expiration_date"
-    t.jsonb "metadata", default: {}
+    t.jsonb "metadata"
     t.datetime "discarded_at"
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
@@ -347,15 +347,15 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_02_190003) do
     t.uuid "branch_id", null: false
     t.decimal "latitude", precision: 10, scale: 6, null: false
     t.decimal "longitude", precision: 10, scale: 6, null: false
-    t.integer "allowed_radius_meters", default: 100, null: false
+    t.integer "allowed_radius_meters", null: false
     t.string "allowed_wifi_ssid"
-    t.boolean "require_photo", default: false, null: false
+    t.boolean "require_photo", null: false
     t.integer "resolution_strategy", null: false
     t.integer "lifecycle_status"
     t.integer "workflow_status"
     t.integer "business_type"
     t.datetime "expiration_date"
-    t.jsonb "metadata", default: {}
+    t.jsonb "metadata"
     t.datetime "discarded_at"
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
@@ -370,12 +370,12 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_02_190003) do
     t.string "name", null: false
     t.string "description"
     t.integer "contract_type", null: false
-    t.integer "fixed_monthly_price_cents", default: 0, null: false
-    t.string "fixed_monthly_price_currency", default: "USD", null: false
+    t.integer "fixed_monthly_price_cents", null: false
+    t.string "fixed_monthly_price_currency", null: false
     t.datetime "start_date", null: false
     t.datetime "end_time"
     t.integer "lifecycle_status"
-    t.integer "workflow_status", default: 0
+    t.integer "workflow_status"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["company_id"], name: "index_billing_contracts_on_company_id"
@@ -387,8 +387,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_02_190003) do
     t.uuid "company_id", null: false
     t.uuid "billing_contract_id", null: false
     t.string "invoice_number", null: false
-    t.integer "price_cents", default: 0, null: false
-    t.string "price_currency", default: "USD", null: false
+    t.integer "price_cents", null: false
+    t.string "price_currency", null: false
     t.datetime "period_start", null: false
     t.datetime "period_end", null: false
     t.datetime "due_at"
@@ -408,10 +408,10 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_02_190003) do
     t.text "description"
     t.integer "resource_type", null: false
     t.integer "country_code"
-    t.integer "price_cents", default: 0, null: false
-    t.string "currency", default: "USD", null: false
+    t.integer "price_cents", null: false
+    t.string "currency", null: false
     t.integer "lifecycle_status"
-    t.integer "workflow_status", default: 0
+    t.integer "workflow_status"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["lifecycle_status"], name: "index_billing_resources_on_lifecycle_status"
@@ -429,16 +429,16 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_02_190003) do
     t.text "description"
     t.string "code"
     t.string "phone_number"
-    t.integer "currency_code", default: 840
-    t.integer "country_code", default: 1
-    t.string "timezone", default: "UTC"
+    t.integer "currency_code"
+    t.integer "country_code"
+    t.string "timezone"
     t.integer "lifecycle_status"
     t.integer "workflow_status"
     t.integer "business_type"
     t.datetime "expiration_date"
-    t.jsonb "metadata", default: {}
+    t.jsonb "metadata"
     t.datetime "discarded_at"
-    t.string "permission_resource_name", default: "Branch"
+    t.string "permission_resource_name"
     t.string "property_string_1"
     t.string "property_string_2"
     t.string "property_string_3"
@@ -527,14 +527,14 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_02_190003) do
     t.text "description"
     t.string "code"
     t.string "phone_number"
-    t.integer "currency_code", default: 840
-    t.integer "country_code", default: 1
-    t.string "timezone", default: "UTC"
+    t.integer "currency_code"
+    t.integer "country_code"
+    t.string "timezone"
     t.integer "lifecycle_status"
     t.integer "workflow_status"
     t.integer "business_type"
     t.datetime "expiration_date"
-    t.jsonb "metadata", default: {}
+    t.jsonb "metadata"
     t.datetime "discarded_at"
     t.string "permission_resource_name"
     t.string "property_string_1"
@@ -633,7 +633,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_02_190003) do
     t.integer "workflow_status"
     t.integer "business_type"
     t.datetime "expiration_date"
-    t.jsonb "metadata", default: {}
+    t.jsonb "metadata"
     t.datetime "discarded_at"
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
@@ -661,14 +661,14 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_02_190003) do
     t.text "description"
     t.string "code"
     t.string "phone_number"
-    t.integer "currency_code", default: 840
-    t.integer "country_code", default: 1
-    t.string "timezone", default: "UTC"
+    t.integer "currency_code"
+    t.integer "country_code"
+    t.string "timezone"
     t.integer "lifecycle_status"
     t.integer "workflow_status"
     t.integer "business_type"
     t.datetime "expiration_date"
-    t.jsonb "metadata", default: {}
+    t.jsonb "metadata"
     t.datetime "discarded_at"
     t.string "permission_resource_name"
     t.string "property_string_1"
@@ -761,14 +761,14 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_02_190003) do
     t.text "description"
     t.string "code"
     t.string "phone_number"
-    t.integer "currency_code", default: 840
-    t.integer "country_code", default: 1
-    t.string "timezone", default: "UTC"
+    t.integer "currency_code"
+    t.integer "country_code"
+    t.string "timezone"
     t.integer "lifecycle_status"
     t.integer "workflow_status"
     t.integer "business_type"
     t.datetime "expiration_date"
-    t.jsonb "metadata", default: {}
+    t.jsonb "metadata"
     t.datetime "discarded_at"
     t.string "permission_resource_name"
     t.string "property_string_1"
@@ -860,7 +860,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_02_190003) do
     t.integer "workflow_status"
     t.integer "business_type"
     t.datetime "expiration_date"
-    t.jsonb "metadata", default: {}
+    t.jsonb "metadata"
     t.datetime "discarded_at"
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
@@ -893,20 +893,20 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_02_190003) do
     t.string "website"
     t.integer "employee_count"
     t.integer "fiscal_year_end_month"
-    t.text "resource_names", default: [], array: true
-    t.jsonb "features", default: [], array: true
+    t.text "resource_names", array: true
+    t.jsonb "features", array: true
     t.integer "lifecycle_status"
     t.integer "workflow_status"
     t.integer "business_type"
     t.datetime "expiration_date"
-    t.jsonb "metadata", default: {}
+    t.jsonb "metadata"
     t.datetime "discarded_at"
     t.string "permission_resource_name"
-    t.integer "promo_balance_cents", default: 0, null: false
-    t.integer "main_balance_cents", default: 0, null: false
-    t.integer "soft_debt_threshold_cents", default: -10000, null: false
+    t.integer "promo_balance_cents", null: false
+    t.integer "main_balance_cents", null: false
+    t.integer "soft_debt_threshold_cents", null: false
     t.datetime "suspension_at"
-    t.boolean "hide_billing_alerts", default: false, null: false
+    t.boolean "hide_billing_alerts", null: false
     t.datetime "has_unpaid_invoices_at"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
@@ -922,10 +922,10 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_02_190003) do
     t.uuid "billing_contract_id", null: false
     t.string "name"
     t.string "description"
-    t.integer "monthly_flat_price_cents", default: 0, null: false
-    t.string "monthly_flat_price_currency", default: "USD", null: false
+    t.integer "monthly_flat_price_cents", null: false
+    t.string "monthly_flat_price_currency", null: false
     t.integer "lifecycle_status"
-    t.integer "workflow_status", default: 0
+    t.integer "workflow_status"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["billing_contract_id", "billing_resource_id"], name: "index_contract_features_on_contract_and_resource", unique: true
@@ -940,11 +940,11 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_02_190003) do
     t.uuid "billing_contract_id", null: false
     t.string "name"
     t.string "description"
-    t.integer "free_allowance", default: 0, null: false
-    t.integer "unit_price_cents", default: 0, null: false
-    t.string "unit_price_currency", default: "USD", null: false
+    t.integer "free_allowance", null: false
+    t.integer "unit_price_cents", null: false
+    t.string "unit_price_currency", null: false
     t.integer "lifecycle_status"
-    t.integer "workflow_status", default: 0
+    t.integer "workflow_status"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["billing_contract_id", "billing_resource_id"], name: "index_contract_metrics_on_contract_and_resource", unique: true
@@ -972,7 +972,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_02_190003) do
     t.integer "workflow_status"
     t.integer "business_type"
     t.datetime "expiration_date"
-    t.jsonb "metadata", default: {}
+    t.jsonb "metadata"
     t.datetime "discarded_at"
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
@@ -1008,7 +1008,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_02_190003) do
     t.integer "workflow_status"
     t.integer "business_type"
     t.datetime "expiration_date"
-    t.jsonb "metadata", default: {}
+    t.jsonb "metadata"
     t.datetime "discarded_at"
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
@@ -1036,14 +1036,14 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_02_190003) do
     t.text "description"
     t.string "code"
     t.string "phone_number"
-    t.integer "currency_code", default: 840
-    t.integer "country_code", default: 1
-    t.string "timezone", default: "UTC"
+    t.integer "currency_code"
+    t.integer "country_code"
+    t.string "timezone"
     t.integer "lifecycle_status"
     t.integer "workflow_status"
     t.integer "business_type"
     t.datetime "expiration_date"
-    t.jsonb "metadata", default: {}
+    t.jsonb "metadata"
     t.datetime "discarded_at"
     t.string "permission_resource_name"
     t.string "property_string_1"
@@ -1136,14 +1136,14 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_02_190003) do
     t.text "description"
     t.string "code"
     t.string "phone_number"
-    t.integer "currency_code", default: 840
-    t.integer "country_code", default: 1
-    t.string "timezone", default: "UTC"
+    t.integer "currency_code"
+    t.integer "country_code"
+    t.string "timezone"
     t.integer "lifecycle_status"
     t.integer "workflow_status"
     t.integer "business_type"
     t.datetime "expiration_date"
-    t.jsonb "metadata", default: {}
+    t.jsonb "metadata"
     t.datetime "discarded_at"
     t.string "permission_resource_name"
     t.string "property_string_1"
@@ -1241,7 +1241,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_02_190003) do
   create_table "daily_metric_logs", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.uuid "company_id", null: false
     t.uuid "billing_resource_id", null: false
-    t.integer "usage_count", default: 0, null: false
+    t.integer "usage_count", null: false
     t.date "log_date", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
@@ -1268,7 +1268,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_02_190003) do
     t.integer "workflow_status"
     t.integer "business_type"
     t.datetime "expiration_date"
-    t.jsonb "metadata", default: {}
+    t.jsonb "metadata"
     t.datetime "discarded_at"
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
@@ -1295,14 +1295,14 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_02_190003) do
     t.text "description"
     t.string "code"
     t.string "phone_number"
-    t.integer "currency_code", default: 840
-    t.integer "country_code", default: 1
-    t.string "timezone", default: "UTC"
+    t.integer "currency_code"
+    t.integer "country_code"
+    t.string "timezone"
     t.integer "lifecycle_status"
     t.integer "workflow_status"
     t.integer "business_type"
     t.datetime "expiration_date"
-    t.jsonb "metadata", default: {}
+    t.jsonb "metadata"
     t.datetime "discarded_at"
     t.string "permission_resource_name"
     t.string "property_string_1"
@@ -1401,7 +1401,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_02_190003) do
     t.integer "workflow_status"
     t.integer "business_type"
     t.datetime "expiration_date"
-    t.jsonb "metadata", default: {}
+    t.jsonb "metadata"
     t.datetime "discarded_at"
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
@@ -1437,7 +1437,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_02_190003) do
     t.integer "workflow_status"
     t.integer "business_type"
     t.datetime "expiration_date"
-    t.jsonb "metadata", default: {}
+    t.jsonb "metadata"
     t.datetime "discarded_at"
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
@@ -1469,7 +1469,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_02_190003) do
     t.integer "workflow_status"
     t.integer "business_type"
     t.datetime "expiration_date"
-    t.jsonb "metadata", default: {}
+    t.jsonb "metadata"
     t.datetime "discarded_at"
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
@@ -1499,7 +1499,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_02_190003) do
     t.integer "workflow_status"
     t.integer "business_type"
     t.datetime "expiration_date"
-    t.jsonb "metadata", default: {}
+    t.jsonb "metadata"
     t.datetime "discarded_at"
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
@@ -1534,7 +1534,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_02_190003) do
     t.integer "workflow_status"
     t.integer "business_type"
     t.datetime "expiration_date"
-    t.jsonb "metadata", default: {}
+    t.jsonb "metadata"
     t.datetime "discarded_at"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
@@ -1570,7 +1570,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_02_190003) do
     t.integer "workflow_status"
     t.integer "business_type"
     t.datetime "expiration_date"
-    t.jsonb "metadata", default: {}
+    t.jsonb "metadata"
     t.datetime "discarded_at"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
@@ -1597,14 +1597,14 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_02_190003) do
     t.text "description"
     t.string "code"
     t.string "phone_number"
-    t.integer "currency_code", default: 840
-    t.integer "country_code", default: 1
-    t.string "timezone", default: "UTC"
+    t.integer "currency_code"
+    t.integer "country_code"
+    t.string "timezone"
     t.integer "lifecycle_status"
     t.integer "workflow_status"
     t.integer "business_type"
     t.datetime "expiration_date"
-    t.jsonb "metadata", default: {}
+    t.jsonb "metadata"
     t.datetime "discarded_at"
     t.string "permission_resource_name"
     t.string "property_string_1"
@@ -1697,14 +1697,14 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_02_190003) do
     t.text "description"
     t.string "code"
     t.string "phone_number"
-    t.integer "currency_code", default: 840
-    t.integer "country_code", default: 1
-    t.string "timezone", default: "UTC"
+    t.integer "currency_code"
+    t.integer "country_code"
+    t.string "timezone"
     t.integer "lifecycle_status"
     t.integer "workflow_status"
     t.integer "business_type"
     t.datetime "expiration_date"
-    t.jsonb "metadata", default: {}
+    t.jsonb "metadata"
     t.datetime "discarded_at"
     t.string "permission_resource_name"
     t.string "property_string_1"
@@ -1805,7 +1805,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_02_190003) do
     t.integer "workflow_status"
     t.integer "business_type"
     t.datetime "expiration_date"
-    t.jsonb "metadata", default: {}
+    t.jsonb "metadata"
     t.datetime "discarded_at"
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
@@ -1841,7 +1841,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_02_190003) do
     t.integer "workflow_status"
     t.integer "business_type"
     t.datetime "expiration_date"
-    t.jsonb "metadata", default: {}
+    t.jsonb "metadata"
     t.datetime "discarded_at"
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
@@ -1871,7 +1871,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_02_190003) do
     t.integer "workflow_status"
     t.integer "business_type"
     t.datetime "expiration_date"
-    t.jsonb "metadata", default: {}
+    t.jsonb "metadata"
     t.datetime "discarded_at"
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
@@ -1899,7 +1899,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_02_190003) do
     t.integer "workflow_status"
     t.integer "business_type"
     t.datetime "expiration_date"
-    t.jsonb "metadata", default: {}
+    t.jsonb "metadata"
     t.datetime "discarded_at"
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
@@ -1933,7 +1933,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_02_190003) do
     t.integer "workflow_status"
     t.integer "business_type"
     t.datetime "expiration_date"
-    t.jsonb "metadata", default: {}
+    t.jsonb "metadata"
     t.datetime "discarded_at"
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
@@ -1963,7 +1963,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_02_190003) do
     t.integer "workflow_status"
     t.integer "business_type"
     t.datetime "expiration_date"
-    t.jsonb "metadata", default: {}
+    t.jsonb "metadata"
     t.datetime "discarded_at"
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
@@ -1991,7 +1991,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_02_190003) do
     t.integer "workflow_status"
     t.integer "business_type"
     t.datetime "expiration_date"
-    t.jsonb "metadata", default: {}
+    t.jsonb "metadata"
     t.datetime "discarded_at"
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
@@ -2017,14 +2017,14 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_02_190003) do
     t.text "description"
     t.string "code"
     t.string "phone_number"
-    t.integer "currency_code", default: 840
-    t.integer "country_code", default: 1
-    t.string "timezone", default: "UTC"
+    t.integer "currency_code"
+    t.integer "country_code"
+    t.string "timezone"
     t.integer "lifecycle_status"
     t.integer "workflow_status"
     t.integer "business_type"
     t.datetime "expiration_date"
-    t.jsonb "metadata", default: {}
+    t.jsonb "metadata"
     t.datetime "discarded_at"
     t.string "permission_resource_name"
     t.string "property_string_1"
@@ -2124,7 +2124,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_02_190003) do
     t.integer "workflow_status"
     t.integer "business_type"
     t.datetime "expiration_date"
-    t.jsonb "metadata", default: {}
+    t.jsonb "metadata"
     t.datetime "discarded_at"
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
@@ -2160,7 +2160,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_02_190003) do
     t.integer "workflow_status"
     t.integer "business_type"
     t.datetime "expiration_date"
-    t.jsonb "metadata", default: {}
+    t.jsonb "metadata"
     t.datetime "discarded_at"
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
@@ -2188,14 +2188,14 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_02_190003) do
     t.text "description"
     t.string "code"
     t.string "phone_number"
-    t.integer "currency_code", default: 840
-    t.integer "country_code", default: 1
-    t.string "timezone", default: "UTC"
+    t.integer "currency_code"
+    t.integer "country_code"
+    t.string "timezone"
     t.integer "lifecycle_status"
     t.integer "workflow_status"
     t.integer "business_type"
     t.datetime "expiration_date"
-    t.jsonb "metadata", default: {}
+    t.jsonb "metadata"
     t.datetime "discarded_at"
     t.string "permission_resource_name"
     t.string "property_string_1"
@@ -2290,14 +2290,14 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_02_190003) do
     t.string "phone_number"
     t.decimal "total_price", precision: 15, scale: 2
     t.datetime "due_date"
-    t.integer "currency_code", default: 840
-    t.integer "country_code", default: 1
-    t.string "timezone", default: "UTC"
+    t.integer "currency_code"
+    t.integer "country_code"
+    t.string "timezone"
     t.integer "lifecycle_status"
     t.integer "workflow_status"
     t.integer "business_type"
     t.datetime "expiration_date"
-    t.jsonb "metadata", default: {}
+    t.jsonb "metadata"
     t.datetime "discarded_at"
     t.string "permission_resource_name"
     t.string "property_string_1"
@@ -2398,7 +2398,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_02_190003) do
     t.integer "workflow_status"
     t.integer "business_type"
     t.datetime "expiration_date"
-    t.jsonb "metadata", default: {}
+    t.jsonb "metadata"
     t.datetime "discarded_at"
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
@@ -2426,14 +2426,14 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_02_190003) do
     t.text "description"
     t.string "code"
     t.string "phone_number"
-    t.integer "currency_code", default: 840
-    t.integer "country_code", default: 1
-    t.string "timezone", default: "UTC"
+    t.integer "currency_code"
+    t.integer "country_code"
+    t.string "timezone"
     t.integer "lifecycle_status"
     t.integer "workflow_status"
     t.integer "business_type"
     t.datetime "expiration_date"
-    t.jsonb "metadata", default: {}
+    t.jsonb "metadata"
     t.datetime "discarded_at"
     t.string "permission_resource_name"
     t.string "property_string_1"
@@ -2533,7 +2533,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_02_190003) do
     t.integer "workflow_status"
     t.integer "business_type"
     t.datetime "expiration_date"
-    t.jsonb "metadata", default: {}
+    t.jsonb "metadata"
     t.datetime "discarded_at"
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
@@ -2569,7 +2569,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_02_190003) do
     t.integer "workflow_status"
     t.integer "business_type"
     t.datetime "expiration_date"
-    t.jsonb "metadata", default: {}
+    t.jsonb "metadata"
     t.datetime "discarded_at"
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
@@ -2597,14 +2597,14 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_02_190003) do
     t.text "description"
     t.string "code"
     t.string "phone_number"
-    t.integer "currency_code", default: 840
-    t.integer "country_code", default: 1
-    t.string "timezone", default: "UTC"
+    t.integer "currency_code"
+    t.integer "country_code"
+    t.string "timezone"
     t.integer "lifecycle_status"
     t.integer "workflow_status"
     t.integer "business_type"
     t.datetime "expiration_date"
-    t.jsonb "metadata", default: {}
+    t.jsonb "metadata"
     t.datetime "discarded_at"
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
@@ -2632,14 +2632,14 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_02_190003) do
     t.text "description"
     t.string "code"
     t.string "phone_number"
-    t.integer "currency_code", default: 840
-    t.integer "country_code", default: 1
-    t.string "timezone", default: "UTC"
+    t.integer "currency_code"
+    t.integer "country_code"
+    t.string "timezone"
     t.integer "lifecycle_status"
     t.integer "workflow_status"
     t.integer "business_type"
     t.datetime "expiration_date"
-    t.jsonb "metadata", default: {}
+    t.jsonb "metadata"
     t.datetime "discarded_at"
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
@@ -2678,7 +2678,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_02_190003) do
     t.integer "workflow_status"
     t.integer "business_type"
     t.datetime "expiration_date"
-    t.jsonb "metadata", default: {}
+    t.jsonb "metadata"
     t.datetime "discarded_at"
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
@@ -2717,7 +2717,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_02_190003) do
     t.integer "workflow_status"
     t.integer "business_type"
     t.datetime "expiration_date"
-    t.jsonb "metadata", default: {}
+    t.jsonb "metadata"
     t.datetime "discarded_at"
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
@@ -2746,14 +2746,14 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_02_190003) do
     t.text "description"
     t.string "code"
     t.string "phone_number"
-    t.integer "currency_code", default: 840
-    t.integer "country_code", default: 1
-    t.string "timezone", default: "UTC"
+    t.integer "currency_code"
+    t.integer "country_code"
+    t.string "timezone"
     t.integer "lifecycle_status"
     t.integer "workflow_status"
     t.integer "business_type"
     t.datetime "expiration_date"
-    t.jsonb "metadata", default: {}
+    t.jsonb "metadata"
     t.datetime "discarded_at"
     t.string "permission_resource_name"
     t.string "property_string_1"
@@ -2847,14 +2847,14 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_02_190003) do
     t.text "description"
     t.string "code"
     t.string "phone_number"
-    t.integer "currency_code", default: 840
-    t.integer "country_code", default: 1
-    t.string "timezone", default: "UTC"
+    t.integer "currency_code"
+    t.integer "country_code"
+    t.string "timezone"
     t.integer "lifecycle_status"
     t.integer "workflow_status"
     t.integer "business_type"
     t.datetime "expiration_date"
-    t.jsonb "metadata", default: {}
+    t.jsonb "metadata"
     t.datetime "discarded_at"
     t.string "permission_resource_name"
     t.string "property_string_1"
@@ -2945,16 +2945,16 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_02_190003) do
     t.text "description"
     t.string "code"
     t.string "phone_number"
-    t.integer "currency_code", default: 840
-    t.integer "country_code", default: 1
-    t.string "timezone", default: "UTC"
+    t.integer "currency_code"
+    t.integer "country_code"
+    t.string "timezone"
     t.integer "business_type", null: false
     t.integer "target_role", null: false
     t.integer "target_resolution", null: false
     t.integer "lifecycle_status", null: false
     t.integer "workflow_status", null: false
-    t.jsonb "layout_manifest", default: {}, null: false
-    t.jsonb "metadata", default: {}, null: false
+    t.jsonb "layout_manifest", null: false
+    t.jsonb "metadata", null: false
     t.string "permission_resource_name", null: false
     t.datetime "expiration_date"
     t.datetime "discarded_at"
@@ -2984,7 +2984,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_02_190003) do
     t.integer "workflow_status"
     t.integer "business_type"
     t.datetime "expiration_date"
-    t.jsonb "metadata", default: {}
+    t.jsonb "metadata"
     t.datetime "discarded_at"
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
@@ -3005,14 +3005,14 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_02_190003) do
     t.text "description"
     t.string "code"
     t.string "phone_number"
-    t.integer "currency_code", default: 840
-    t.integer "country_code", default: 1
-    t.string "timezone", default: "UTC"
+    t.integer "currency_code"
+    t.integer "country_code"
+    t.string "timezone"
     t.integer "lifecycle_status"
     t.integer "workflow_status"
     t.integer "business_type"
     t.datetime "expiration_date"
-    t.jsonb "metadata", default: {}
+    t.jsonb "metadata"
     t.datetime "discarded_at"
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
@@ -3036,14 +3036,14 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_02_190003) do
     t.text "description"
     t.string "code"
     t.string "phone_number"
-    t.integer "currency_code", default: 840
-    t.integer "country_code", default: 1
-    t.string "timezone", default: "UTC"
+    t.integer "currency_code"
+    t.integer "country_code"
+    t.string "timezone"
     t.integer "lifecycle_status"
     t.integer "workflow_status"
     t.integer "business_type"
     t.datetime "expiration_date"
-    t.jsonb "metadata", default: {}
+    t.jsonb "metadata"
     t.datetime "discarded_at"
     t.string "permission_resource_name"
     t.string "property_string_1"
@@ -3144,7 +3144,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_02_190003) do
     t.integer "workflow_status"
     t.integer "business_type"
     t.datetime "expiration_date"
-    t.jsonb "metadata", default: {}
+    t.jsonb "metadata"
     t.datetime "discarded_at"
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
@@ -3178,12 +3178,12 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_02_190003) do
     t.string "code"
     t.string "resource"
     t.string "action"
-    t.jsonb "tag_conditions", default: {}
+    t.jsonb "tag_conditions"
     t.integer "lifecycle_status"
     t.integer "workflow_status"
     t.integer "business_type"
     t.datetime "expiration_date"
-    t.jsonb "metadata", default: {}
+    t.jsonb "metadata"
     t.datetime "discarded_at"
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
@@ -3208,7 +3208,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_02_190003) do
     t.integer "workflow_status"
     t.integer "business_type"
     t.datetime "expiration_date"
-    t.jsonb "metadata", default: {}
+    t.jsonb "metadata"
     t.datetime "discarded_at"
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
@@ -3242,7 +3242,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_02_190003) do
     t.integer "workflow_status"
     t.integer "business_type"
     t.datetime "expiration_date"
-    t.jsonb "metadata", default: {}
+    t.jsonb "metadata"
     t.datetime "discarded_at"
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
@@ -3262,7 +3262,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_02_190003) do
 
   create_table "prices", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
     t.integer "amount"
-    t.integer "currency_code", default: 0, null: false
+    t.integer "currency_code", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["amount", "currency_code"], name: "index_prices_on_amount_and_currency_code", unique: true
@@ -3286,7 +3286,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_02_190003) do
     t.integer "workflow_status"
     t.integer "business_type"
     t.datetime "expiration_date"
-    t.jsonb "metadata", default: {}
+    t.jsonb "metadata"
     t.datetime "discarded_at"
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
@@ -3322,7 +3322,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_02_190003) do
     t.integer "workflow_status"
     t.integer "business_type"
     t.datetime "expiration_date"
-    t.jsonb "metadata", default: {}
+    t.jsonb "metadata"
     t.datetime "discarded_at"
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
@@ -3350,14 +3350,14 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_02_190003) do
     t.text "description"
     t.string "code"
     t.string "phone_number"
-    t.integer "currency_code", default: 840
-    t.integer "country_code", default: 1
-    t.string "timezone", default: "UTC"
+    t.integer "currency_code"
+    t.integer "country_code"
+    t.string "timezone"
     t.integer "lifecycle_status"
     t.integer "workflow_status"
     t.integer "business_type"
     t.datetime "expiration_date"
-    t.jsonb "metadata", default: {}
+    t.jsonb "metadata"
     t.datetime "discarded_at"
     t.string "permission_resource_name"
     t.string "property_string_1"
@@ -3450,14 +3450,14 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_02_190003) do
     t.text "description"
     t.string "code"
     t.string "phone_number"
-    t.integer "currency_code", default: 840
-    t.integer "country_code", default: 1
-    t.string "timezone", default: "UTC"
+    t.integer "currency_code"
+    t.integer "country_code"
+    t.string "timezone"
     t.integer "lifecycle_status"
     t.integer "workflow_status"
     t.integer "business_type"
     t.datetime "expiration_date"
-    t.jsonb "metadata", default: {}
+    t.jsonb "metadata"
     t.datetime "discarded_at"
     t.string "permission_resource_name"
     t.string "property_string_1"
@@ -3558,7 +3558,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_02_190003) do
     t.integer "workflow_status"
     t.integer "business_type"
     t.datetime "expiration_date"
-    t.jsonb "metadata", default: {}
+    t.jsonb "metadata"
     t.datetime "discarded_at"
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
@@ -3594,7 +3594,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_02_190003) do
     t.integer "workflow_status"
     t.integer "business_type"
     t.datetime "expiration_date"
-    t.jsonb "metadata", default: {}
+    t.jsonb "metadata"
     t.datetime "discarded_at"
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
@@ -3622,14 +3622,14 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_02_190003) do
     t.text "description"
     t.string "code"
     t.string "phone_number"
-    t.integer "currency_code", default: 840
-    t.integer "country_code", default: 1
-    t.string "timezone", default: "UTC"
+    t.integer "currency_code"
+    t.integer "country_code"
+    t.string "timezone"
     t.integer "lifecycle_status"
     t.integer "workflow_status"
     t.integer "business_type"
     t.datetime "expiration_date"
-    t.jsonb "metadata", default: {}
+    t.jsonb "metadata"
     t.datetime "discarded_at"
     t.string "permission_resource_name"
     t.string "property_string_1"
@@ -3722,14 +3722,14 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_02_190003) do
     t.text "description"
     t.string "code"
     t.string "phone_number"
-    t.integer "currency_code", default: 840
-    t.integer "country_code", default: 1
-    t.string "timezone", default: "UTC"
+    t.integer "currency_code"
+    t.integer "country_code"
+    t.string "timezone"
     t.integer "lifecycle_status"
     t.integer "workflow_status"
     t.integer "business_type"
     t.datetime "expiration_date"
-    t.jsonb "metadata", default: {}
+    t.jsonb "metadata"
     t.datetime "discarded_at"
     t.string "permission_resource_name"
     t.string "property_string_1"
@@ -3818,12 +3818,12 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_02_190003) do
     t.string "name"
     t.string "description"
     t.string "resource_name"
-    t.jsonb "property_metadata", default: [], null: false
+    t.jsonb "property_metadata", null: false
     t.integer "lifecycle_status"
     t.integer "workflow_status"
     t.integer "business_type"
     t.datetime "expiration_date"
-    t.jsonb "metadata", default: {}
+    t.jsonb "metadata"
     t.datetime "discarded_at"
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
@@ -3848,14 +3848,14 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_02_190003) do
     t.text "description"
     t.string "code"
     t.string "phone_number"
-    t.integer "currency_code", default: 840
-    t.integer "country_code", default: 1
-    t.string "timezone", default: "UTC"
+    t.integer "currency_code"
+    t.integer "country_code"
+    t.string "timezone"
     t.integer "lifecycle_status"
     t.integer "workflow_status"
     t.integer "business_type"
     t.datetime "expiration_date"
-    t.jsonb "metadata", default: {}
+    t.jsonb "metadata"
     t.datetime "discarded_at"
     t.string "permission_resource_name"
     t.string "property_string_1"
@@ -3948,14 +3948,14 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_02_190003) do
     t.text "description"
     t.string "code"
     t.string "phone_number"
-    t.integer "currency_code", default: 840
-    t.integer "country_code", default: 1
-    t.string "timezone", default: "UTC"
+    t.integer "currency_code"
+    t.integer "country_code"
+    t.string "timezone"
     t.integer "lifecycle_status"
     t.integer "workflow_status"
     t.integer "business_type"
     t.datetime "expiration_date"
-    t.jsonb "metadata", default: {}
+    t.jsonb "metadata"
     t.datetime "discarded_at"
     t.string "permission_resource_name"
     t.string "property_string_1"
@@ -4049,7 +4049,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_02_190003) do
     t.integer "workflow_status"
     t.integer "business_type"
     t.datetime "expiration_date"
-    t.jsonb "metadata", default: {}
+    t.jsonb "metadata"
     t.datetime "discarded_at"
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
@@ -4082,7 +4082,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_02_190003) do
     t.integer "workflow_status"
     t.integer "business_type"
     t.datetime "expiration_date"
-    t.jsonb "metadata", default: {}
+    t.jsonb "metadata"
     t.datetime "discarded_at"
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
@@ -4110,14 +4110,14 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_02_190003) do
     t.text "description"
     t.string "code"
     t.string "phone_number"
-    t.integer "currency_code", default: 840
-    t.integer "country_code", default: 1
-    t.string "timezone", default: "UTC"
+    t.integer "currency_code"
+    t.integer "country_code"
+    t.string "timezone"
     t.integer "lifecycle_status"
     t.integer "workflow_status"
     t.integer "business_type"
     t.datetime "expiration_date"
-    t.jsonb "metadata", default: {}
+    t.jsonb "metadata"
     t.datetime "discarded_at"
     t.string "permission_resource_name"
     t.string "property_string_1"
@@ -4211,7 +4211,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_02_190003) do
     t.integer "workflow_status"
     t.integer "business_type"
     t.datetime "expiration_date"
-    t.jsonb "metadata", default: {}
+    t.jsonb "metadata"
     t.datetime "discarded_at"
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
@@ -4237,7 +4237,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_02_190003) do
     t.integer "workflow_status"
     t.integer "business_type"
     t.datetime "expiration_date"
-    t.jsonb "metadata", default: {}
+    t.jsonb "metadata"
     t.datetime "discarded_at"
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
@@ -4258,12 +4258,12 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_02_190003) do
     t.date "work_date", null: false
     t.datetime "expected_start_at", null: false
     t.datetime "expected_end_at", null: false
-    t.string "status", default: "scheduled", null: false
+    t.string "status", null: false
     t.integer "lifecycle_status"
     t.integer "workflow_status"
     t.integer "business_type"
     t.datetime "expiration_date"
-    t.jsonb "metadata", default: {}
+    t.jsonb "metadata"
     t.datetime "discarded_at"
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
@@ -4296,7 +4296,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_02_190003) do
     t.integer "workflow_status"
     t.integer "business_type"
     t.datetime "expiration_date"
-    t.jsonb "metadata", default: {}
+    t.jsonb "metadata"
     t.datetime "discarded_at"
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
@@ -4334,7 +4334,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_02_190003) do
     t.integer "workflow_status"
     t.integer "business_type"
     t.datetime "expiration_date"
-    t.jsonb "metadata", default: {}
+    t.jsonb "metadata"
     t.datetime "discarded_at"
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
@@ -4362,14 +4362,14 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_02_190003) do
     t.text "description"
     t.string "code"
     t.string "phone_number"
-    t.integer "currency_code", default: 840
-    t.integer "country_code", default: 1
-    t.string "timezone", default: "UTC"
+    t.integer "currency_code"
+    t.integer "country_code"
+    t.string "timezone"
     t.integer "lifecycle_status"
     t.integer "workflow_status"
     t.integer "business_type"
     t.datetime "expiration_date"
-    t.jsonb "metadata", default: {}
+    t.jsonb "metadata"
     t.datetime "discarded_at"
     t.string "permission_resource_name"
     t.string "property_string_1"
@@ -4461,14 +4461,14 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_02_190003) do
     t.text "description"
     t.string "code"
     t.string "phone_number"
-    t.integer "currency_code", default: 840
-    t.integer "country_code", default: 1
-    t.string "timezone", default: "UTC"
+    t.integer "currency_code"
+    t.integer "country_code"
+    t.string "timezone"
     t.integer "lifecycle_status"
     t.integer "workflow_status"
     t.integer "business_type"
     t.datetime "expiration_date"
-    t.jsonb "metadata", default: {}
+    t.jsonb "metadata"
     t.datetime "discarded_at"
     t.string "permission_resource_name"
     t.string "property_string_1"
@@ -4555,7 +4555,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_02_190003) do
     t.string "user_agent"
     t.string "ip_address"
     t.string "single_access_token"
-    t.jsonb "metadata", default: {}
+    t.jsonb "metadata"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["single_access_token"], name: "index_sessions_on_single_access_token", unique: true
@@ -4580,7 +4580,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_02_190003) do
     t.integer "workflow_status"
     t.integer "business_type"
     t.datetime "expiration_date"
-    t.jsonb "metadata", default: {}
+    t.jsonb "metadata"
     t.datetime "discarded_at"
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
@@ -4616,7 +4616,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_02_190003) do
     t.integer "workflow_status"
     t.integer "business_type"
     t.datetime "expiration_date"
-    t.jsonb "metadata", default: {}
+    t.jsonb "metadata"
     t.datetime "discarded_at"
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
@@ -4647,7 +4647,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_02_190003) do
     t.integer "workflow_status"
     t.integer "business_type"
     t.datetime "expiration_date"
-    t.jsonb "metadata", default: {}
+    t.jsonb "metadata"
     t.datetime "discarded_at"
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
@@ -4676,7 +4676,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_02_190003) do
     t.integer "workflow_status"
     t.integer "business_type"
     t.datetime "expiration_date"
-    t.jsonb "metadata", default: {}
+    t.jsonb "metadata"
     t.datetime "discarded_at"
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
@@ -4698,10 +4698,10 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_02_190003) do
     t.string "name", null: false
     t.time "start_time", null: false
     t.time "end_time", null: false
-    t.integer "grace_period_minutes", default: 15, null: false
-    t.integer "unpaid_break_minutes", default: 60, null: false
-    t.string "policy_type", default: "fixed", null: false
-    t.integer "full_day_minutes", default: 480, null: false
+    t.integer "grace_period_minutes", null: false
+    t.integer "unpaid_break_minutes", null: false
+    t.string "policy_type", null: false
+    t.integer "full_day_minutes", null: false
     t.time "core_start_time"
     t.time "core_end_time"
     t.string "description"
@@ -4709,7 +4709,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_02_190003) do
     t.integer "workflow_status"
     t.integer "business_type"
     t.datetime "expiration_date"
-    t.jsonb "metadata", default: {}
+    t.jsonb "metadata"
     t.datetime "discarded_at"
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
@@ -4729,7 +4729,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_02_190003) do
     t.uuid "owner_id", null: false
     t.json "data"
     t.datetime "recorded_at"
-    t.jsonb "metadata", default: {}
+    t.jsonb "metadata"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["owner_type", "owner_id"], name: "index_statistics_on_owner"
@@ -4756,15 +4756,15 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_02_190003) do
     t.text "description"
     t.string "code"
     t.string "phone_number"
-    t.integer "currency_code", default: 840
-    t.integer "country_code", default: 1
-    t.string "timezone", default: "UTC"
+    t.integer "currency_code"
+    t.integer "country_code"
+    t.string "timezone"
     t.integer "quantity"
     t.integer "lifecycle_status"
     t.integer "workflow_status"
     t.integer "business_type"
     t.datetime "expiration_date"
-    t.jsonb "metadata", default: {}
+    t.jsonb "metadata"
     t.datetime "discarded_at"
     t.string "permission_resource_name"
     t.string "property_string_1"
@@ -4839,15 +4839,15 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_02_190003) do
     t.text "description"
     t.string "code"
     t.string "phone_number"
-    t.integer "currency_code", default: 840
-    t.integer "country_code", default: 1
-    t.string "timezone", default: "UTC"
+    t.integer "currency_code"
+    t.integer "country_code"
+    t.string "timezone"
     t.integer "quantity"
     t.integer "lifecycle_status"
     t.integer "workflow_status"
     t.integer "business_type"
     t.datetime "expiration_date"
-    t.jsonb "metadata", default: {}
+    t.jsonb "metadata"
     t.datetime "discarded_at"
     t.string "permission_resource_name"
     t.string "property_string_1"
@@ -4922,9 +4922,9 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_02_190003) do
     t.text "description"
     t.string "code"
     t.string "phone_number"
-    t.integer "currency_code", default: 840
-    t.integer "country_code", default: 1
-    t.string "timezone", default: "UTC"
+    t.integer "currency_code"
+    t.integer "country_code"
+    t.string "timezone"
     t.integer "quantity", null: false
     t.integer "direction", null: false
     t.integer "transaction_type", null: false
@@ -4932,7 +4932,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_02_190003) do
     t.integer "workflow_status"
     t.integer "business_type"
     t.datetime "expiration_date"
-    t.jsonb "metadata", default: {}
+    t.jsonb "metadata"
     t.datetime "discarded_at"
     t.string "permission_resource_name"
     t.string "property_string_1"
@@ -5009,15 +5009,15 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_02_190003) do
     t.text "description"
     t.string "code"
     t.string "phone_number"
-    t.integer "currency_code", default: 840
-    t.integer "country_code", default: 1
-    t.string "timezone", default: "UTC"
+    t.integer "currency_code"
+    t.integer "country_code"
+    t.string "timezone"
     t.integer "quantity"
     t.integer "lifecycle_status"
     t.integer "workflow_status"
     t.integer "business_type"
     t.datetime "expiration_date"
-    t.jsonb "metadata", default: {}
+    t.jsonb "metadata"
     t.datetime "discarded_at"
     t.string "permission_resource_name"
     t.string "property_string_1"
@@ -5084,16 +5084,16 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_02_190003) do
     t.text "description"
     t.string "code"
     t.string "phone_number"
-    t.integer "currency_code", default: 840
-    t.integer "country_code", default: 1
-    t.string "timezone", default: "UTC"
-    t.integer "quantity", default: 0, null: false
-    t.integer "reorder", default: 0, null: false
+    t.integer "currency_code"
+    t.integer "country_code"
+    t.string "timezone"
+    t.integer "quantity", null: false
+    t.integer "reorder", null: false
     t.integer "lifecycle_status"
     t.integer "workflow_status"
     t.integer "business_type"
     t.datetime "expiration_date"
-    t.jsonb "metadata", default: {}
+    t.jsonb "metadata"
     t.datetime "discarded_at"
     t.string "permission_resource_name"
     t.string "property_string_1"
@@ -5158,7 +5158,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_02_190003) do
     t.integer "workflow_status"
     t.integer "business_type"
     t.datetime "expiration_date"
-    t.jsonb "metadata", default: {}
+    t.jsonb "metadata"
     t.datetime "discarded_at"
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
@@ -5187,7 +5187,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_02_190003) do
     t.integer "workflow_status"
     t.integer "business_type"
     t.datetime "expiration_date"
-    t.jsonb "metadata", default: {}
+    t.jsonb "metadata"
     t.datetime "discarded_at"
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
@@ -5210,13 +5210,13 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_02_190003) do
     t.string "code"
     t.integer "duration_days"
     t.integer "country_code"
-    t.jsonb "features", default: {}
-    t.jsonb "limits", default: {}
+    t.jsonb "features"
+    t.jsonb "limits"
     t.integer "lifecycle_status"
     t.integer "workflow_status"
     t.integer "business_type"
     t.datetime "expiration_date"
-    t.jsonb "metadata", default: {}
+    t.jsonb "metadata"
     t.datetime "discarded_at"
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
@@ -5231,17 +5231,17 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_02_190003) do
 
   create_table "systems", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
     t.string "email"
-    t.string "name", default: "System", null: false
+    t.string "name", null: false
     t.string "code", null: false, comment: "System"
-    t.integer "balance_cents", default: 0, null: false
+    t.integer "balance_cents", null: false
     t.integer "currency_code"
     t.integer "country_code"
-    t.boolean "active", default: true, null: false
+    t.boolean "active", null: false
     t.integer "lifecycle_status"
     t.integer "workflow_status"
     t.integer "business_type"
     t.datetime "expiration_date"
-    t.jsonb "metadata", default: {}
+    t.jsonb "metadata"
     t.datetime "discarded_at"
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
@@ -5260,12 +5260,12 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_02_190003) do
     t.string "name"
     t.string "description"
     t.string "resource_name"
-    t.jsonb "columns_metadata", default: [], null: false
+    t.jsonb "columns_metadata", null: false
     t.integer "lifecycle_status"
     t.integer "workflow_status"
     t.integer "business_type"
     t.datetime "expiration_date"
-    t.jsonb "metadata", default: {}
+    t.jsonb "metadata"
     t.datetime "discarded_at"
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
@@ -5297,7 +5297,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_02_190003) do
     t.integer "workflow_status"
     t.integer "business_type"
     t.datetime "expiration_date"
-    t.jsonb "metadata", default: {}
+    t.jsonb "metadata"
     t.datetime "discarded_at"
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
@@ -5326,7 +5326,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_02_190003) do
     t.integer "workflow_status"
     t.integer "business_type"
     t.datetime "expiration_date"
-    t.jsonb "metadata", default: {}
+    t.jsonb "metadata"
     t.datetime "discarded_at"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
@@ -5355,7 +5355,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_02_190003) do
     t.integer "workflow_status"
     t.integer "business_type"
     t.datetime "expiration_date"
-    t.jsonb "metadata", default: {}
+    t.jsonb "metadata"
     t.datetime "discarded_at"
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
@@ -5391,7 +5391,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_02_190003) do
     t.integer "workflow_status"
     t.integer "business_type"
     t.datetime "expiration_date"
-    t.jsonb "metadata", default: {}
+    t.jsonb "metadata"
     t.datetime "discarded_at"
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
@@ -5419,14 +5419,14 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_02_190003) do
     t.text "description"
     t.string "code"
     t.string "phone_number"
-    t.integer "currency_code", default: 840
-    t.integer "country_code", default: 1
-    t.string "timezone", default: "UTC"
+    t.integer "currency_code"
+    t.integer "country_code"
+    t.string "timezone"
     t.integer "lifecycle_status"
     t.integer "workflow_status"
     t.integer "business_type"
     t.datetime "expiration_date"
-    t.jsonb "metadata", default: {}
+    t.jsonb "metadata"
     t.datetime "discarded_at"
     t.string "permission_resource_name"
     t.string "property_string_1"
@@ -5519,14 +5519,14 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_02_190003) do
     t.text "description"
     t.string "code"
     t.string "phone_number"
-    t.integer "currency_code", default: 840
-    t.integer "country_code", default: 1
-    t.string "timezone", default: "UTC"
+    t.integer "currency_code"
+    t.integer "country_code"
+    t.string "timezone"
     t.integer "lifecycle_status"
     t.integer "workflow_status"
     t.integer "business_type"
     t.datetime "expiration_date"
-    t.jsonb "metadata", default: {}
+    t.jsonb "metadata"
     t.datetime "discarded_at"
     t.string "permission_resource_name"
     t.string "property_string_1"
@@ -5612,7 +5612,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_02_190003) do
   create_table "users", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
     t.string "email", null: false
     t.string "password_digest", null: false
-    t.boolean "verified", default: false, null: false
+    t.boolean "verified", null: false
     t.string "provider"
     t.string "uid"
     t.uuid "parent_user_id"
@@ -5629,7 +5629,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_02_190003) do
     t.integer "workflow_status"
     t.integer "business_type"
     t.datetime "expiration_date"
-    t.jsonb "metadata", default: {}
+    t.jsonb "metadata"
     t.datetime "discarded_at"
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
@@ -5660,12 +5660,12 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_02_190003) do
     t.uuid "company_id", null: false
     t.uuid "billing_invoice_id"
     t.integer "transaction_type", null: false
-    t.integer "amount_cents", default: 0, null: false
-    t.string "currency", default: "USD", null: false
-    t.integer "balance_before_cents", default: 0, null: false
-    t.integer "balance_after_cents", default: 0, null: false
-    t.integer "promo_balance_before_cents", default: 0, null: false
-    t.integer "promo_balance_after_cents", default: 0, null: false
+    t.integer "amount_cents", null: false
+    t.string "currency", null: false
+    t.integer "balance_before_cents", null: false
+    t.integer "balance_after_cents", null: false
+    t.integer "promo_balance_before_cents", null: false
+    t.integer "promo_balance_after_cents", null: false
     t.text "description"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
@@ -5684,14 +5684,14 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_02_190003) do
     t.text "description"
     t.string "code"
     t.string "phone_number"
-    t.integer "currency_code", default: 840
-    t.integer "country_code", default: 1
-    t.string "timezone", default: "UTC"
+    t.integer "currency_code"
+    t.integer "country_code"
+    t.string "timezone"
     t.integer "lifecycle_status"
     t.integer "workflow_status"
     t.integer "business_type"
     t.datetime "expiration_date"
-    t.jsonb "metadata", default: {}
+    t.jsonb "metadata"
     t.datetime "discarded_at"
     t.string "permission_resource_name"
     t.string "property_string_1"

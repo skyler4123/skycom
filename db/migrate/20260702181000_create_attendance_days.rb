@@ -9,10 +9,10 @@ class CreateAttendanceDays < ActiveRecord::Migration[8.0]
       t.datetime :check_out
       t.datetime :break_start
       t.datetime :break_end
-      t.integer :total_seconds_present, default: 0
-      t.integer :total_seconds_break, default: 0
-      t.integer :total_seconds_worked, default: 0
-      t.integer :total_seconds_overtime, default: 0
+      t.integer :total_seconds_present
+      t.integer :total_seconds_break
+      t.integer :total_seconds_worked
+      t.integer :total_seconds_overtime
       t.integer :attendance_status
       t.integer :recorded_method
       t.text :notes
@@ -27,7 +27,7 @@ class CreateAttendanceDays < ActiveRecord::Migration[8.0]
       t.integer :workflow_status
       t.integer :business_type
       t.datetime :expiration_date
-      t.jsonb :metadata, default: {}
+      t.jsonb :metadata
       t.datetime :discarded_at, index: true
       t.string :permission_resource_name
 

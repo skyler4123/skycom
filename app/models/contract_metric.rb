@@ -9,6 +9,10 @@
 # CalculatorService computes overages by comparing DailyUsageLog sums against allowances.
 #
 class ContractMetric < ApplicationRecord
+  attribute :free_allowance, :integer, default: 0
+  attribute :unit_price_cents, :integer, default: 0
+  attribute :unit_price_currency, :string, default: "USD"
+
   belongs_to :billing_resource
   belongs_to :billing_contract
 

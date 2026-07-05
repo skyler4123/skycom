@@ -8,13 +8,13 @@ class CreateScheduledShifts < ActiveRecord::Migration[8.0]
       t.date :work_date, null: false
       t.datetime :expected_start_at, null: false
       t.datetime :expected_end_at, null: false
-      t.string :status, default: "scheduled", null: false
+      t.string :status, null: false
 
       t.integer :lifecycle_status
       t.integer :workflow_status
       t.integer :business_type
       t.datetime :expiration_date
-      t.jsonb :metadata, default: {}
+      t.jsonb :metadata
       t.datetime :discarded_at, index: true
       t.string :permission_resource_name
 

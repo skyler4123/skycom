@@ -1,6 +1,10 @@
 # app/models/system.rb
 class System < ApplicationRecord
   attribute :permission_resource_name, :string, default: -> { self.name }
+  attribute :name, :string, default: "System"
+  attribute :balance_cents, :integer, default: 0
+  attribute :active, :boolean, default: true
+  attribute :metadata, :jsonb, default: {}
 
   # --- Associations ---
   # --- Validations ---

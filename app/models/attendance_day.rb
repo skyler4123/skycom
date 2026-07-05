@@ -1,4 +1,9 @@
 class AttendanceDay < ApplicationRecord
+  attribute :total_seconds_present, :integer, default: 0
+  attribute :total_seconds_break, :integer, default: 0
+  attribute :total_seconds_worked, :integer, default: 0
+  attribute :total_seconds_overtime, :integer, default: 0
+
   belongs_to :company
   belongs_to :branch, optional: true
   belongs_to :employee
