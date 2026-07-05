@@ -52,7 +52,7 @@ class Companies::AttendancePoliciesController < Companies::ApplicationController
   end
 
   def format_ap(ap)
-    ap.as_json(only: %i[id latitude longitude allowed_radius_meters allowed_wifi_ssid require_photo resolution_strategy created_at]).merge(
+    ap.as_json(only: %i[id branch_id latitude longitude allowed_radius_meters allowed_wifi_ssid require_photo resolution_strategy created_at]).merge(
       branch: ap.branch.as_json(only: %i[id name])
     )
   end

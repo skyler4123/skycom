@@ -56,7 +56,7 @@ class Companies::ScheduledShiftsController < Companies::ApplicationController
   end
 
   def format_shift(s)
-    s.as_json(only: %i[id work_date expected_start_at expected_end_at status created_at]).merge(
+    s.as_json(only: %i[id employee_id branch_id shift_template_id work_date expected_start_at expected_end_at status created_at]).merge(
       employee: s.employee.as_json(only: %i[id name]),
       shift_template: s.shift_template.as_json(only: %i[id name])
     )
