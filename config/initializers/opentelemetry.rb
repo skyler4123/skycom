@@ -1,5 +1,7 @@
 # config/initializers/opentelemetry.rb
 
+return if Rails.env.test?
+
 require "opentelemetry/sdk"
 require "opentelemetry/instrumentation/rails"
 require "opentelemetry-logs-sdk"
