@@ -26,9 +26,17 @@ module Skycom
   end
 end
 
+
+
+
+
+
 # Custom configuration
+require_relative "../app/middleware/opentelemetry_tenant_middleware"
+
 module Skycom
   class Application < Rails::Application
     config.generators.orm :active_record, primary_key_type: :uuid
+    config.middleware.insert_before 0, OpentelemetryTenantMiddleware
   end
 end
