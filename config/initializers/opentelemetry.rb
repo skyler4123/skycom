@@ -1,5 +1,7 @@
 # config/initializers/opentelemetry.rb
 
+return if Rails.env.test?
+
 require "opentelemetry/sdk"
 require "opentelemetry/instrumentation/rails"
 require "opentelemetry-logs-sdk"
@@ -30,6 +32,7 @@ OpenTelemetry::SDK.configure do |c|
     "OpenTelemetry::Instrumentation::Faraday"      => { enabled: false },
     "OpenTelemetry::Instrumentation::Mongo"        => { enabled: false },
     "OpenTelemetry::Instrumentation::Rails"        => { enabled: false },
+    "OpenTelemetry::Instrumentation::Redis"        => { enabled: false },
   )
 end
 
