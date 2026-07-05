@@ -172,7 +172,7 @@ export default class Companies_LayoutController extends Controller {
                 </a>
                 <a
                   class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:bg-blue-100 open:text-blue-600"
-                  href="${Helpers.company_schedules_path(currentCompany().id)}"
+                  href="${Helpers.company_scheduled_shifts_path(currentCompany().id)}"
                   ${openByPathname()}
                 >
                   <span class="material-symbols-outlined">calendar_month</span>
@@ -180,11 +180,35 @@ export default class Companies_LayoutController extends Controller {
                 </a>
                 <a
                   class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:bg-blue-100 open:text-blue-600"
-                  href="${Helpers.company_attendances_path(currentCompany().id)}"
+                  href="${Helpers.company_attendance_days_path(currentCompany().id)}"
                   ${openByPathname()}
                 >
                   <span class="material-symbols-outlined">badge</span>
-                   <p class="text-sm font-medium leading-normal">${translate("Attendance")}</p>
+                   <p class="text-sm font-medium leading-normal">${translate("Attendance Days")}</p>
+                </a>
+                <a
+                  class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:bg-blue-100 open:text-blue-600"
+                  href="${Helpers.company_attendance_policies_path(currentCompany().id)}"
+                  ${openByPathname()}
+                >
+                  <span class="material-symbols-outlined">gps_fixed</span>
+                   <p class="text-sm font-medium leading-normal">${translate("Attendance Policies")}</p>
+                </a>
+                <a
+                  class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:bg-blue-100 open:text-blue-600"
+                  href="${Helpers.company_attendance_logs_path(currentCompany().id)}"
+                  ${openByPathname()}
+                >
+                  <span class="material-symbols-outlined">receipt_long</span>
+                   <p class="text-sm font-medium leading-normal">${translate("Attendance Logs")}</p>
+                </a>
+                <a
+                  class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:bg-blue-100 open:text-blue-600"
+                  href="${Helpers.company_attendance_months_path(currentCompany().id)}"
+                  ${openByPathname()}
+                >
+                  <span class="material-symbols-outlined">calendar_view_month</span>
+                   <p class="text-sm font-medium leading-normal">${translate("Attendance Months")}</p>
                 </a>
                 <a
                   class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:bg-blue-100 open:text-blue-600"

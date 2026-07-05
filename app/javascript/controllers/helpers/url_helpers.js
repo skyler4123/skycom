@@ -117,8 +117,27 @@ export const company_roles_path = (companyId) => `/companies/${companyId}/roles`
 export const company_settings_path = (companyId) => `/companies/${companyId}/settings`
 export const company_users_path = (companyId) => `/companies/${companyId}/users`
 export const company_payments_path = (companyId) => `/companies/${companyId}/payments`
-export const company_schedules_path = (companyId) => `/companies/${companyId}/schedules`
-export const company_attendances_path = (companyId) => `/companies/${companyId}/attendances`
+export const company_scheduled_shifts_path = (companyId) => `/companies/${companyId}/scheduled_shifts`
+export const new_company_scheduled_shift_path = (companyId) => `/companies/${companyId}/scheduled_shifts/new`
+export const company_scheduled_shift_path = (companyId, id) => `/companies/${companyId}/scheduled_shifts/${id}`
+export const edit_company_scheduled_shift_path = (companyId, id) => `/companies/${companyId}/scheduled_shifts/${id}/edit`
+export const create_company_scheduled_shifts_path = (companyId) => `/companies/${companyId}/scheduled_shifts`
+
+export const company_attendance_policies_path = (companyId) => `/companies/${companyId}/attendance_policies`
+export const new_company_attendance_policy_path = (companyId) => `/companies/${companyId}/attendance_policies/new`
+export const company_attendance_policy_path = (companyId, id) => `/companies/${companyId}/attendance_policies/${id}`
+export const edit_company_attendance_policy_path = (companyId, id) => `/companies/${companyId}/attendance_policies/${id}/edit`
+export const create_company_attendance_policies_path = (companyId) => `/companies/${companyId}/attendance_policies`
+
+export const company_attendance_logs_path = (companyId) => `/companies/${companyId}/attendance_logs`
+export const company_attendance_log_path = (companyId, id) => `/companies/${companyId}/attendance_logs/${id}`
+
+export const company_attendance_days_path = (companyId) => `/companies/${companyId}/attendance_days`
+export const company_attendance_day_path = (companyId, id) => `/companies/${companyId}/attendance_days/${id}`
+
+export const company_attendance_months_path = (companyId) => `/companies/${companyId}/attendance_months`
+export const company_attendance_month_path = (companyId, id) => `/companies/${companyId}/attendance_months/${id}`
+
 export const company_shift_templates_path = (companyId) => `/companies/${companyId}/shift_templates`
 export const new_company_shift_template_path = (companyId) => `/companies/${companyId}/shift_templates/new`
 export const company_shift_template_path = (companyId, id) => `/companies/${companyId}/shift_templates/${id}`

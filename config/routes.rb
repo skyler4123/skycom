@@ -34,8 +34,11 @@ Rails.application.routes.draw do
       resources :customers
       resources :invoices
       resources :shift_templates
-      resources :schedules
-      resources :attendances
+      resources :scheduled_shifts
+      resources :attendance_policies
+      resources :attendance_logs
+      resources :attendance_days
+      resources :attendance_months
       resources :reports
       resources :documents
       resources :announcements
