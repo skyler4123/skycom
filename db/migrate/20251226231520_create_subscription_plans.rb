@@ -8,15 +8,15 @@ class CreateSubscriptionPlans < ActiveRecord::Migration[8.0]
       t.string :code
       t.integer :duration_days
       t.integer :country_code
-      t.jsonb :features, default: {}
-      t.jsonb :limits, default: {}
+      t.jsonb :features
+      t.jsonb :limits
 
       # --- System Fields ---
       t.integer  :lifecycle_status, index: true
       t.integer  :workflow_status, index: true
       t.integer  :business_type, index: true
       t.datetime :expiration_date
-      t.jsonb    :metadata,       default: {}
+      t.jsonb    :metadata
       t.datetime :discarded_at,   index: true
       t.string   :permission_resource_name
 

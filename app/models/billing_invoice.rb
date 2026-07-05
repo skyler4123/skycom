@@ -8,6 +8,9 @@
 # Invoice numbers auto-generate like "INV-202606-A1B2C3"
 #
 class BillingInvoice < ApplicationRecord
+  attribute :price_cents, :integer, default: 0
+  attribute :price_currency, :string, default: "USD"
+
   belongs_to :company
   belongs_to :billing_contract
   has_many :wallet_transactions

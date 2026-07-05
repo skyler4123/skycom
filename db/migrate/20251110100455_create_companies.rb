@@ -20,24 +20,24 @@ class CreateCompanies < ActiveRecord::Migration[8.0]
       t.string :website
       t.integer :employee_count
       t.integer :fiscal_year_end_month
-      t.text :resource_names, array: true, default: []
-      t.jsonb :features, array: true, default: []
+      t.text :resource_names, array: true
+      t.jsonb :features, array: true
 
       # --- System Fields ---
       t.integer  :lifecycle_status, index: true
       t.integer  :workflow_status, index: true
       t.integer  :business_type, index: true
       t.datetime :expiration_date
-      t.jsonb    :metadata,       default: {}
+      t.jsonb    :metadata
       t.datetime :discarded_at,   index: true
       t.string   :permission_resource_name
 
       # --- Billing Fields ---
-      t.integer  :promo_balance_cents, default: 0, null: false
-      t.integer  :main_balance_cents, default: 0, null: false
-      t.integer  :soft_debt_threshold_cents, default: -10000, null: false
+      t.integer  :promo_balance_cents, null: false
+      t.integer  :main_balance_cents, null: false
+      t.integer  :soft_debt_threshold_cents, null: false
       t.datetime :suspension_at
-      t.boolean  :hide_billing_alerts, default: false, null: false
+      t.boolean  :hide_billing_alerts, null: false
       t.datetime :has_unpaid_invoices_at
 
       t.timestamps

@@ -15,7 +15,7 @@ class CreateAnswers < ActiveRecord::Migration[8.0]
       t.integer  :workflow_status, index: true
       t.integer  :business_type, index: true
       t.datetime :expiration_date
-      t.jsonb    :metadata,       default: {}
+      t.jsonb    :metadata
       t.datetime :discarded_at,   index: true
       t.string   :permission_resource_name
 

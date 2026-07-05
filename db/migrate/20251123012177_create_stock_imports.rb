@@ -20,9 +20,9 @@ class CreateStockImports < ActiveRecord::Migration[8.0]
       t.text   :description
       t.string :code, index: { unique: true }
       t.string :phone_number
-      t.integer :currency_code, default: 840 # USD
-      t.integer :country_code,  default: 1   # US
-      t.string  :timezone,      default: "UTC" # Global Standard
+      t.integer :currency_code
+      t.integer :country_code
+      t.string  :timezone
 
       t.integer :quantity
 
@@ -31,7 +31,7 @@ class CreateStockImports < ActiveRecord::Migration[8.0]
       t.integer  :workflow_status, index: true
       t.integer  :business_type, index: true
       t.datetime :expiration_date
-      t.jsonb    :metadata,       default: {}
+      t.jsonb    :metadata
       t.datetime :discarded_at,   index: true
       t.string   :permission_resource_name
 

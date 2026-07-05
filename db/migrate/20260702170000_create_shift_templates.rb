@@ -6,10 +6,10 @@ class CreateShiftTemplates < ActiveRecord::Migration[8.0]
       t.string :name, null: false
       t.time :start_time, null: false
       t.time :end_time, null: false
-      t.integer :grace_period_minutes, default: 15, null: false
-      t.integer :unpaid_break_minutes, default: 60, null: false
-      t.string :policy_type, default: "fixed", null: false
-      t.integer :full_day_minutes, default: 480, null: false
+      t.integer :grace_period_minutes, null: false
+      t.integer :unpaid_break_minutes, null: false
+      t.string :policy_type, null: false
+      t.integer :full_day_minutes, null: false
       t.time :core_start_time
       t.time :core_end_time
       t.string :description
@@ -18,7 +18,7 @@ class CreateShiftTemplates < ActiveRecord::Migration[8.0]
       t.integer :workflow_status
       t.integer :business_type
       t.datetime :expiration_date
-      t.jsonb :metadata, default: {}
+      t.jsonb :metadata
       t.datetime :discarded_at, index: true
       t.string :permission_resource_name
 

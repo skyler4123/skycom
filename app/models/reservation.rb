@@ -1,5 +1,10 @@
 # app/models/reservation.rb
 class Reservation < ApplicationRecord
+  attribute :metadata, :jsonb, default: {}
+  attribute :currency_code, :integer, default: 840
+  attribute :country_code, :integer, default: 1
+  attribute :timezone, :string, default: "UTC"
+
   include CategoryConcern
   include PropertyMappingConcern
 

@@ -2,6 +2,8 @@
 class ReservationAppointment < ApplicationRecord
   include SetDefaultCompanyConcern
 
+  attribute :metadata, :jsonb, default: {}
+
   belongs_to :company
   belongs_to :reservation
 

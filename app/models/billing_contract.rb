@@ -11,6 +11,9 @@
 #   contract.contract_metrics.active.each { |m| m.free_allowance }
 #
 class BillingContract < ApplicationRecord
+  attribute :fixed_monthly_price_cents, :integer, default: 0
+  attribute :fixed_monthly_price_currency, :string, default: "USD"
+
   belongs_to :company
   has_many :contract_features, dependent: :destroy
   has_many :contract_metrics, dependent: :destroy

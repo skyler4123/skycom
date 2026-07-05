@@ -19,6 +19,13 @@
 # Types: top_up (0), deduction (1), refund (2), promo_credit (3)
 #
 class WalletTransaction < ApplicationRecord
+  attribute :amount_cents, :integer, default: 0
+  attribute :currency, :string, default: "USD"
+  attribute :balance_before_cents, :integer, default: 0
+  attribute :balance_after_cents, :integer, default: 0
+  attribute :promo_balance_before_cents, :integer, default: 0
+  attribute :promo_balance_after_cents, :integer, default: 0
+
   belongs_to :company
   belongs_to :billing_invoice, optional: true
 

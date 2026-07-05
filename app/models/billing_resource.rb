@@ -14,6 +14,9 @@
 #   resource.volumetric?           # => true
 #
 class BillingResource < ApplicationRecord
+  attribute :price_cents, :integer, default: 0
+  attribute :currency, :string, default: "USD"
+
   has_many :contract_features, dependent: :destroy
   has_many :contract_metrics, dependent: :destroy
   has_many :daily_metric_logs, dependent: :destroy

@@ -6,7 +6,7 @@ class CreatePrices < ActiveRecord::Migration[8.0]
 
       # Changed to integer for enum usage.
       # default: 0 usually maps to your primary currency (e.g., USD)
-      t.integer :currency_code, default: 0, null: false
+      t.integer :currency_code, null: false
 
       t.timestamps
     end
