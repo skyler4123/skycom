@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_07_04_004208) do
+ActiveRecord::Schema[8.0].define(version: 2026_07_02_190003) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pgcrypto"
@@ -325,6 +325,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_04_004208) do
     t.integer "total_absent_days", default: 0
     t.integer "total_present_days", default: 0
     t.integer "total_records", default: 0
+    t.integer "total_deficit_minutes", default: 0
     t.integer "lifecycle_status"
     t.integer "workflow_status"
     t.integer "business_type"
@@ -334,7 +335,6 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_04_004208) do
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.integer "total_deficit_minutes"
     t.index ["branch_id"], name: "index_attendance_months_on_branch_id"
     t.index ["company_id"], name: "index_attendance_months_on_company_id"
     t.index ["discarded_at"], name: "index_attendance_months_on_discarded_at"
@@ -350,6 +350,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_04_004208) do
     t.integer "allowed_radius_meters", default: 100, null: false
     t.string "allowed_wifi_ssid"
     t.boolean "require_photo", default: false, null: false
+    t.integer "resolution_strategy", default: 0, null: false
     t.integer "lifecycle_status"
     t.integer "workflow_status"
     t.integer "business_type"
@@ -359,7 +360,6 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_04_004208) do
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.integer "resolution_strategy", default: 0, null: false
     t.index ["branch_id"], name: "index_attendance_policies_on_branch_id", unique: true
     t.index ["company_id"], name: "index_attendance_policies_on_company_id"
     t.index ["discarded_at"], name: "index_attendance_policies_on_discarded_at"
