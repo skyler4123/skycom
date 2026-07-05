@@ -16,7 +16,7 @@ class OpentelemetryTenantMiddleware
     current_span = OpenTelemetry::Trace.current_span
     # If this evaluates to false, it means OpenTelemetry Rack instrumentation is completely turned off
     if current_span.recording?
-      current_span.set_attribute('company_id', company_id)
+      current_span.set_attribute("company_id", company_id)
     else
       # Fallback log warning to your local Rails console if the span isn't tracking yet
       Rails.logger.warn "OpenTelemetry: No active recording span found for path #{env['PATH_INFO']}"
