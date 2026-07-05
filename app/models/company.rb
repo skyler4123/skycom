@@ -10,6 +10,7 @@ class Company < ApplicationRecord
     Patient Appointment Course Student Exam
     Membership
     Page ShiftTemplate ScheduledShift
+    AttendancePolicy AttendanceLog AttendanceDay AttendanceMonth
     Stock StockTransfer StockImport StockExport
   ]
 

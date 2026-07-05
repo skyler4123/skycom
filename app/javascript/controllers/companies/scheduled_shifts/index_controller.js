@@ -1,7 +1,7 @@
 import Companies_LayoutController from "controllers/companies/layout_controller"
 
-export default class Companies_Schedules_IndexController extends Companies_LayoutController {
-  static targets = ["scheduleList"]
+export default class Companies_ScheduledShifts_IndexController extends Companies_LayoutController {
+  static targets = ["scheduledShiftsList"]
 
   /** @type {Array<{id: string, employee_name: string, shift_template_name: string, work_date: string, expected_start_at: string, expected_end_at: string, status: string}>} */
   scheduledShifts = []
@@ -13,7 +13,7 @@ export default class Companies_Schedules_IndexController extends Companies_Layou
       this.scheduledShifts = response.scheduled_shifts || []
       this.pagination = response.pagination || {}
     } catch (error) {
-      toast({ type: "error", message: translate("Failed to load schedules") })
+      toast({ type: "error", message: translate("Failed to load scheduled shifts") })
     }
     poll(() => {
       if (this.hasContentTarget) { this.renderContent(); return true }
@@ -47,7 +47,14 @@ export default class Companies_Schedules_IndexController extends Companies_Layou
     return `
       <div class="p-4 overflow-y-auto">
         <div class="p-4 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 flex flex-col">
-          <h2 class="text-xl font-bold text-slate-900 dark:text-white mb-6">${translate("Schedules")}</h2>
+          <div class="flex justify-between items-center mb-6">
+            <h2 class="text-xl font-bold text-slate-900 dark:text-white">${translate("Scheduled Shifts")}</h2>
+            <a href="${Helpers.new_company_scheduled_shift_path(currentCompany().id)}"
+              class="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium text-sm cursor-pointer">
+              <span class="material-symbols-outlined text-[20px]">add</span>
+              ${translate("Add Shift")}
+            </a>
+          </div>
           <div class="overflow-x-auto">
             <table class="w-full text-left border-collapse">
               <thead>
@@ -58,17 +65,29 @@ export default class Companies_Schedules_IndexController extends Companies_Layou
                   <th class="py-4 px-6 font-medium">${translate("Start")}</th>
                   <th class="py-4 px-6 font-medium">${translate("End")}</th>
                   <th class="py-4 px-6 font-medium">${translate("Status")}</th>
+                  <th class="py-4 px-6 text-right font-medium">${translate("Actions")}</th>
                 </tr>
               </thead>
-              <tbody data-${this.identifier}-target="scheduleList" class="divide-y divide-slate-200 dark:divide-slate-800">
+              <tbody data-${this.identifier}-target="scheduledShiftsList" class="divide-y divide-slate-200 dark:divide-slate-800">
                 ${this.scheduledShifts.map(s => `
                   <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/50">
-                    <td class="py-4 px-6 text-sm font-medium text-slate-900 dark:text-white">${s.employee_name || '—'}</td>
+                    <td class="py-4 px-6 text-sm font-medium">
+                      <a href="${Helpers.company_scheduled_shift_path(currentCompany().id, s.id)}"
+                        class="text-slate-900 dark:text-white hover:text-blue-600 dark:hover:text-blue-400 cursor-pointer">
+                        ${s.employee_name || '—'}
+                      </a>
+                    </td>
                     <td class="py-4 px-6 text-sm text-slate-600">${this.formatDate(s.work_date)}</td>
                     <td class="py-4 px-6 text-sm text-slate-600">${s.shift_template_name || '—'}</td>
                     <td class="py-4 px-6 text-sm text-slate-600">${this.formatTime(s.expected_start_at)}</td>
                     <td class="py-4 px-6 text-sm text-slate-600">${this.formatTime(s.expected_end_at)}</td>
                     <td class="py-4 px-6 text-sm">${this.statusBadge(s.status)}</td>
+                    <td class="py-4 px-6 text-sm text-right">
+                      <a href="${Helpers.edit_company_scheduled_shift_path(currentCompany().id, s.id)}"
+                        class="inline-flex items-center justify-center p-2 text-slate-500 hover:text-blue-600 hover:bg-blue-50 rounded-lg cursor-pointer">
+                        <span class="material-symbols-outlined text-[20px]">edit</span>
+                      </a>
+                    </td>
                   </tr>
                 `).join('')}
               </tbody>
