@@ -95,6 +95,13 @@ export default class Companies_Customers_IndexController extends Companies_Layou
                 <span class="material-symbols-outlined text-[20px]">add</span>
                 ${translate("Add")}
               </a>
+              ${this.tableConfigIdValue ? `
+                <a href="${Helpers.edit_company_table_config_path(currentCompany().id, this.tableConfigIdValue)}"
+                  class="flex items-center justify-center gap-2 px-4 py-2 border border-slate-300 dark:border-slate-600 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 rounded-lg transition-colors font-medium text-sm whitespace-nowrap cursor-pointer">
+                  <span class="material-symbols-outlined text-[20px]">table</span>
+                  ${translate("Config Table")}
+                </a>
+              ` : ''}
             </form>
           </div>
 

@@ -117,4 +117,62 @@ RSpec.feature "Companies::Customers Management", type: :feature, js: true do
     name_link = find("a[href*='/customers/#{customer.id}']", match: :first)
     expect(name_link).to be_present
   end
+
+  # =========================================================================
+  # SCENARIO: Config Table button appears when table config exists
+  # =========================================================================
+  scenario "shows Config Table button when table config exists" do
+    visit company_customers_path(company, category_id: default_category.id)
+    expect(page).to have_selector('table', wait: 10)
+
+    config_link = find("a[href*='/table_configs/#{default_table_config.id}/edit']", match: :first)
+    expect(config_link).to be_present
+    expect(config_link.text).to include("Config Table")
+  end
+
+  # =========================================================================
+  # SCENARIO: Config Table button links to edit page
+  # =========================================================================
+  scenario "Config Table button navigates to table config edit page" do
+    visit company_customers_path(company, category_id: default_category.id)
+    expect(page).to have_selector('table', wait: 10)
+
+    click_link "Config Table", match: :first
+    expect(page).to have_current_path(/table_configs\/#{default_table_config.id}\/edit/, wait: 10)
+  end
+
+  # =========================================================================
+  # SCENARIO: Config Table button absent when no table config
+  # =========================================================================
+  scenario "does not show Config Table button when no table config exists" do
+    category_no_tc = Category.create!(
+      company: company,
+      name: "No Table Config",
+      resource_name: "customers"
+    )
+
+    page.execute_script("localStorage.clear()")
+    company_data = JSON.parse(company.to_json).merge(
+      "property_mappings" => company.property_mappings.reset.map { |pm| JSON.parse(pm.to_json) },
+      "table_configs" => company.table_configs.reset.map { |tc| JSON.parse(tc.to_json) },
+      "categories" => company.categories.reset.map { |c| JSON.parse(c.to_json) },
+      "branches" => [],
+      "departments" => [],
+      "roles" => []
+    )
+    payload = {
+      user: JSON.parse(owner.to_json),
+      companies: [ company_data ],
+      enums: {},
+      employees: []
+    }
+    page.execute_script("localStorage.setItem('client_cache_data', arguments[0])", payload.to_json)
+    page.execute_script("localStorage.setItem('client_cache_version', 'forced')")
+    page.execute_script("document.cookie = 'client_cache_version=forced; path=/'")
+
+    visit company_customers_path(company, category_id: category_no_tc.id)
+    expect(page).to have_selector('table', wait: 10)
+
+    expect(page).not_to have_link("Config Table")
+  end
 end

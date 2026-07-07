@@ -149,4 +149,50 @@ RSpec.feature "Companies::TableConfigs Management", type: :feature, js: true do
 
     expect(page).to have_selector('th', text: 'Product Title')
   end
+
+  # =========================================================================
+  # SCENARIO: Property Mapping name links to Property Mapping edit page
+  # =========================================================================
+  scenario "show page Property Mapping name links to edit page" do
+    visit company_table_config_path(company, table_config)
+    expect(page).to have_content(table_config.name, wait: 10)
+
+    pm_link = find("a[href*='/property_mappings/#{property_mapping.id}/edit']", match: :first)
+    expect(pm_link).to be_present
+    expect(pm_link.text).to include(property_mapping.name)
+  end
+
+  # =========================================================================
+  # SCENARIO: Edit Property Mapping button in show page footer
+  # =========================================================================
+  scenario "show page has Edit Property Mapping button" do
+    visit company_table_config_path(company, table_config)
+    expect(page).to have_content(table_config.name, wait: 10)
+
+    expect(page).to have_link("Edit Property Mapping",
+      href: /property_mappings\/#{property_mapping.id}\/edit/)
+  end
+
+  # =========================================================================
+  # SCENARIO: Edit Property Mapping button on show page navigates
+  # =========================================================================
+  scenario "Edit Property Mapping navigates to property mapping edit page" do
+    visit company_table_config_path(company, table_config)
+    expect(page).to have_content(table_config.name, wait: 10)
+
+    click_link "Edit Property Mapping"
+    expect(page).to have_current_path(/property_mappings\/#{property_mapping.id}\/edit/, wait: 10)
+  end
+
+  # =========================================================================
+  # SCENARIO: Edit Property Mapping button on edit page
+  # =========================================================================
+  scenario "edit page has Edit Property Mapping button" do
+    visit edit_company_table_config_path(company, table_config)
+    expect(page).to have_selector('form', wait: 10)
+
+    pm_link = find("a[href*='/property_mappings/#{property_mapping.id}/edit']", match: :first)
+    expect(pm_link).to be_present
+    expect(pm_link.text).to include("Edit")
+  end
 end
