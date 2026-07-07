@@ -431,5 +431,7 @@ export const dictionary = () => {
     "Virt": { vi: "Ảo" },
     "system_name": { vi: "tên_hệ_thống" },
     "Display Label": { vi: "Nhãn hiển thị" },
+    "Config Table": { vi: "Cấu hình bảng" },
+    "View Property Mapping": { vi: "Xem ánh xạ thuộc tính" },
   }
 }
