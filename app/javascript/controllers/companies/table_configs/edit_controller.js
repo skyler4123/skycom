@@ -128,17 +128,8 @@ export default class Companies_TableConfigs_EditController extends Companies_Lay
 
           <div class="space-y-1">
             <label class="text-[10px] font-bold text-slate-400 dark:text-slate-300 uppercase tracking-wider">${translate("Property Mapping")}</label>
-            <div class="flex items-center gap-2">
-              <input type="text" value="${c.property_mapping?.name || ''}" disabled
-                class="flex-1 px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-slate-50 dark:bg-slate-700 text-sm text-slate-400">
-              ${c.property_mapping_id ? `
-                <a href="${Helpers.edit_company_property_mapping_path(companyId, c.property_mapping_id)}"
-                  class="inline-flex items-center gap-1 px-3 py-2 text-sm font-medium text-blue-600 hover:text-blue-700 bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors whitespace-nowrap cursor-pointer">
-                  <span class="material-symbols-outlined text-[16px]">edit</span>
-                  ${translate("Edit")}
-                </a>
-              ` : ''}
-            </div>
+            <input type="text" value="${c.property_mapping?.name || ''}" disabled
+              class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-slate-50 dark:bg-slate-700 text-sm text-slate-400">
             <input type="hidden" name="table_config[property_mapping_id]" value="${c.property_mapping_id}">
           </div>
         </div>

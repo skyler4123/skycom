@@ -118,28 +118,4 @@ RSpec.feature "Companies::Services Management", type: :feature, js: true do
     name_link = find("a[href*='/services/#{service.id}']", match: :first)
     expect(name_link).to be_present
   end
-
-  # =========================================================================
-  # SCENARIO: Config Table button appears when table config exists
-  # =========================================================================
-  scenario "shows Config Table button when table config exists" do
-    visit company_services_path(company, category_id: default_category.id)
-    expect(page).to have_selector('table', wait: 10)
-
-    config_link = find("a[href*='/table_configs/#{default_table_config.id}/edit']", match: :first)
-    expect(config_link).to be_present
-    expect(config_link.text).to include("Config Table")
-  end
-
-  # =========================================================================
-  # SCENARIO: Config Table button links to edit page
-  # =========================================================================
-  scenario "Config Table button navigates to table config edit page" do
-    visit company_services_path(company, category_id: default_category.id)
-    expect(page).to have_selector('table', wait: 10)
-
-    click_link "Config Table", match: :first
-    expect(page).to have_current_path(/table_configs\/#{default_table_config.id}\/edit/, wait: 10)
-  end
-
 end

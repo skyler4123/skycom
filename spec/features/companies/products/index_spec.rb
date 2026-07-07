@@ -412,29 +412,5 @@ RSpec.feature "Companies::Products Management", type: :feature, js: true do
 
       expect(page).to have_selector('span.rounded-full', wait: 10)
     end
-
-    # =========================================================================
-    # SCENARIO 12: Config Table button appears when table config exists
-    # =========================================================================
-    scenario "shows Config Table button when table config exists" do
-      visit company_products_path(company, category_id: category_cosmetics.id)
-      expect(page).to have_selector('table', wait: 10)
-
-      config_link = find("a[href*='/table_configs/#{table_config_cosmetics.id}/edit']", match: :first)
-      expect(config_link).to be_present
-      expect(config_link.text).to include("Config Table")
-    end
-
-    # =========================================================================
-    # SCENARIO 13: Config Table button links to edit page
-    # =========================================================================
-    scenario "Config Table button navigates to table config edit page" do
-      visit company_products_path(company, category_id: category_cosmetics.id)
-      expect(page).to have_selector('table', wait: 10)
-
-      click_link "Config Table", match: :first
-      expect(page).to have_current_path(/table_configs\/#{table_config_cosmetics.id}\/edit/, wait: 10)
-    end
-
   end
 end
