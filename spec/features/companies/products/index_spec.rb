@@ -412,29 +412,75 @@ RSpec.feature "Companies::Products Management", type: :feature, js: true do
 
       expect(page).to have_selector('span.rounded-full', wait: 10)
     end
+  end
 
-    # =========================================================================
-    # SCENARIO 12: Config Table button appears when table config exists
-    # =========================================================================
-    scenario "shows Config Table button when table config exists" do
+  # ============================================================================
+  # Table Title Tests
+  # ============================================================================
+  describe "table title" do
+    let(:category_cosmetics) do
+      Seed::CategoryService.create(
+        company: company,
+        name: "Cosmetics",
+        resource_name: "products"
+      )
+    end
+
+    let!(:table_config_cosmetics) do
+      category_cosmetics.default_property_mapping.table_configs.destroy_all
+      tc = TableConfig.create!(
+        company: company,
+        category: category_cosmetics,
+        property_mapping: category_cosmetics.default_property_mapping,
+        resource_name: "products",
+        columns_metadata: [
+          { "key" => "name", "label" => "Name", "visible" => true, "sortable" => true, "align" => "left", "pinned" => nil, "width" => nil, "roles" => [], "is_virtual" => false, "render_config" => {} },
+          { "key" => "code", "label" => "Code", "visible" => true, "sortable" => true, "align" => "left", "pinned" => nil, "width" => nil, "roles" => [], "is_virtual" => false, "render_config" => {} }
+        ]
+      )
+      company.clear_permissions_cache
+      tc
+    end
+
+    let!(:product_cosmetics) do
+      create(:product, company: company, category: category_cosmetics, property_mapping: category_cosmetics.default_property_mapping, name: "Test Cosmetic")
+    end
+
+    before do
+      company_data = JSON.parse(company.to_json).merge(
+        "property_mappings" => company.property_mappings.reset.map { |pm| JSON.parse(pm.to_json) },
+        "table_configs" => company.table_configs.reset.map { |tc| JSON.parse(tc.to_json) },
+        "categories" => company.categories.reset.map { |c| JSON.parse(c.to_json) },
+        "branches" => [],
+        "departments" => [],
+        "roles" => []
+      )
+
+      page.execute_script("localStorage.clear()")
+      payload = {
+        user: JSON.parse(owner.to_json),
+        companies: [ company_data ],
+        enums: {},
+        employees: []
+      }
+      page.execute_script("localStorage.setItem('client_cache_data', arguments[0])", payload.to_json)
+      page.execute_script("localStorage.setItem('client_cache_version', 'forced')")
+      page.execute_script("document.cookie = 'client_cache_version=forced; path=/'")
+    end
+
+    scenario "shows table title with resource name and category name" do
       visit company_products_path(company, category_id: category_cosmetics.id)
       expect(page).to have_selector('table', wait: 10)
 
-      config_link = find("a[href*='/table_configs/#{table_config_cosmetics.id}/edit']", match: :first)
-      expect(config_link).to be_present
-      expect(config_link.text).to include("Config Table")
+      expect(page).to have_selector('h2', text: /Products - Cosmetics/)
     end
 
-    # =========================================================================
-    # SCENARIO 13: Config Table button links to edit page
-    # =========================================================================
-    scenario "Config Table button navigates to table config edit page" do
+    scenario "edit icon links to table config edit page" do
       visit company_products_path(company, category_id: category_cosmetics.id)
       expect(page).to have_selector('table', wait: 10)
 
-      click_link "Config Table", match: :first
-      expect(page).to have_current_path(/table_configs\/#{table_config_cosmetics.id}\/edit/, wait: 10)
+      edit_link = find("a[href*='/table_configs/#{table_config_cosmetics.id}/edit']", match: :first)
+      expect(edit_link).to be_present
     end
-
   end
 end

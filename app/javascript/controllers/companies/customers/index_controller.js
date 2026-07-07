@@ -70,6 +70,8 @@ export default class Companies_Customers_IndexController extends Companies_Layou
       <div class="p-4 overflow-y-auto">
         <div class="p-4 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 flex flex-col">
 
+          ${this.renderTableTitle()}
+
           <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
             <form method="get" action="${pathname()}" class="flex flex-col lg:flex-row items-end justify-between gap-4 w-full">
               <div class="flex flex-wrap items-center gap-3 w-full lg:w-auto">
@@ -95,13 +97,6 @@ export default class Companies_Customers_IndexController extends Companies_Layou
                 <span class="material-symbols-outlined text-[20px]">add</span>
                 ${translate("Add")}
               </a>
-              ${this.tableConfigIdValue ? `
-                <a href="${Helpers.edit_company_table_config_path(currentCompany().id, this.tableConfigIdValue)}"
-                  class="flex items-center justify-center gap-2 px-4 py-2 border border-slate-300 dark:border-slate-600 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 rounded-lg transition-colors font-medium text-sm whitespace-nowrap cursor-pointer">
-                  <span class="material-symbols-outlined text-[20px]">table</span>
-                  ${translate("Config Table")}
-                </a>
-              ` : ''}
             </form>
           </div>
 

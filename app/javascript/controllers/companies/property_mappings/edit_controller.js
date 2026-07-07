@@ -90,7 +90,7 @@ export default class Companies_PropertyMappings_EditController extends Companies
     const fields = `
       <div class="space-y-6">
         <h2 class="text-xl font-bold text-slate-900 dark:text-white">${translate("Edit Property Mapping")}</h2>
-        <p class="text-sm text-slate-500">${m.name}</p>
+        <p class="text-sm text-slate-500">${translate("Add, remove, update, or add validation rules for columns of this category.")}</p>
 
         <div class="grid grid-cols-2 gap-4">
           <div class="col-span-2 space-y-1">
