@@ -121,7 +121,13 @@ export default class Companies_TableConfigs_ShowController extends Companies_Lay
               </div>
               <div>
                 <p class="text-xs font-medium text-slate-500 dark:text-gray-400">${translate("Property Mapping")}</p>
-                <p class="text-sm font-semibold text-slate-900 dark:text-white">${c.property_mapping?.name || 'N/A'}</p>
+                ${c.property_mapping_id
+                  ? `<a href="${Helpers.company_property_mapping_path(companyId, c.property_mapping_id)}"
+                       class="inline-flex items-center gap-1 text-sm font-semibold text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 transition-colors cursor-pointer">
+                       <span class="material-symbols-outlined text-[16px]">open_in_new</span>
+                       ${c.property_mapping?.name || 'N/A'}
+                     </a>`
+                  : `<p class="text-sm font-semibold text-slate-900 dark:text-white">N/A</p>`}
               </div>
             </div>
           </div>
@@ -131,6 +137,7 @@ export default class Companies_TableConfigs_ShowController extends Companies_Lay
           <div class="mt-8 flex justify-end gap-3 pt-6 border-t border-slate-200 dark:border-gray-800">
             <a href="${Helpers.edit_company_table_config_path(companyId, c.id)}"
               class="inline-flex items-center px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium text-sm transition-colors cursor-pointer"
+              ${tooltip(translate("Edit or add columns to this table configuration"))}
             >
               ${translate("Edit Table Config")}
             </a>

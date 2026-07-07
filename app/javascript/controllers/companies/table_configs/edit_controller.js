@@ -104,7 +104,7 @@ export default class Companies_TableConfigs_EditController extends Companies_Lay
     const fields = `
       <div class="space-y-6">
         <h2 class="text-xl font-bold text-slate-900 dark:text-white">${translate("Edit Table Config")}</h2>
-        <p class="text-sm text-slate-500">${c.name}</p>
+        <p class="text-sm text-slate-500">${translate("Controls how data is displayed in this table. To show/hide columns, add constraints or validation rules, click the Property Mapping link below.")}</p>
 
         <div class="grid grid-cols-2 gap-4">
           <div class="col-span-2 space-y-1">
@@ -128,9 +128,20 @@ export default class Companies_TableConfigs_EditController extends Companies_Lay
 
           <div class="space-y-1">
             <label class="text-[10px] font-bold text-slate-400 dark:text-slate-300 uppercase tracking-wider">${translate("Property Mapping")}</label>
-            <input type="text" value="${c.property_mapping?.name || ''}" disabled
-              class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-slate-50 dark:bg-slate-700 text-sm text-slate-400">
-            <input type="hidden" name="table_config[property_mapping_id]" value="${c.property_mapping_id}">
+            <div class="flex items-center gap-2">
+              <input type="text" value="${c.property_mapping?.name || ''}" disabled
+                class="flex-1 px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-slate-50 dark:bg-slate-700 text-sm text-slate-400">
+              <input type="hidden" name="table_config[property_mapping_id]" value="${c.property_mapping_id}">
+              ${c.property_mapping_id ? `
+                <a href="${Helpers.edit_company_property_mapping_path(companyId, c.property_mapping_id)}"
+                  class="inline-flex items-center gap-1 px-3 py-2 text-sm font-medium text-blue-600 hover:text-blue-700 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition-colors cursor-pointer whitespace-nowrap"
+                  ${tooltip(translate("Manage property fields: show/hide columns, add constraints or validation rules"))}
+                >
+                  <span class="material-symbols-outlined text-[18px]">open_in_new</span>
+                  ${translate("Edit")}
+                </a>
+              ` : ''}
+            </div>
           </div>
         </div>
 

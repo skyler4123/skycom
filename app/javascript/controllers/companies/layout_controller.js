@@ -41,6 +41,33 @@ export default class Companies_LayoutController extends Controller {
     return currentTableConfigs().find(config => config.id === this.tableConfigIdValue)
   }
 
+  renderTableTitle() {
+    const config = this.currentTableConfig()
+    const category = this.currentCategory()
+    if (!config || !category) return ''
+
+    const companyId = currentCompany()?.id
+    const resourceName = this.identifier
+      .split('--')[1]
+      .replace(/-/g, ' ')
+      .replace(/\b\w/g, c => c.toUpperCase())
+
+    return `
+      <div class="flex items-center justify-between mb-4">
+        <h2 class="text-lg font-bold text-slate-900 dark:text-white">
+          ${resourceName} - ${category.name}
+        </h2>
+        <a href="${Helpers.edit_company_table_config_path(companyId, config.id)}"
+          class="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-slate-600 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition-colors cursor-pointer"
+          ${tooltip(translate("Edit table configuration"))}
+        >
+          <span class="material-symbols-outlined text-[18px]">edit</span>
+          ${translate("Edit")}
+        </a>
+      </div>
+    `
+  }
+
   renderLayout() {
     this.element.className = 'min-h-screen flex flex-col';
     this.element.innerHTML = this.layoutHTML();

@@ -34,6 +34,21 @@ export const dictionary = () => {
     "Next": { vi: "Tiếp" },
     "Previous": { vi: "Trước" },
     "Actions": { vi: "Thao tác" },
+    "Edit table configuration": {
+      vi: "Chỉnh sửa cấu hình bảng",
+    },
+    "Edit or add columns to this table configuration": {
+      vi: "Chỉnh sửa hoặc thêm cột cho cấu hình bảng này",
+    },
+    "Controls how data is displayed in this table. To show/hide columns, add constraints or validation rules, click the Property Mapping link below.": {
+      vi: "Kiểm soát cách dữ liệu hiển thị trong bảng này. Để ẩn/hiện cột, thêm ràng buộc hoặc quy tắc xác thực, nhấp vào liên kết Ánh xạ thuộc tính bên dưới.",
+    },
+    "Manage property fields: show/hide columns, add constraints or validation rules": {
+      vi: "Quản lý trường thuộc tính: ẩn/hiện cột, thêm ràng buộc hoặc quy tắc xác thực",
+    },
+    "Add, remove, update, or add validation rules for columns of this category.": {
+      vi: "Thêm, xóa, cập nhật hoặc thêm quy tắc xác thực cho các cột của danh mục này.",
+    },
 
     // === Common Field Labels ===
     "Name": { vi: "Tên" },

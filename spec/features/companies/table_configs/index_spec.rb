@@ -150,4 +150,21 @@ RSpec.feature "Companies::TableConfigs Management", type: :feature, js: true do
 
     expect(page).to have_selector('th', text: 'Product Title')
   end
+
+  scenario "show page has clickable property mapping link" do
+    visit company_table_config_path(company, table_config)
+    expect(page).to have_content(table_config.name, wait: 10)
+
+    pm_link = find("a[href*='/property_mappings/#{property_mapping.id}']", match: :first)
+    expect(pm_link).to be_present
+    expect(pm_link).to have_text(property_mapping.name)
+  end
+
+  scenario "edit page has property mapping edit link" do
+    visit edit_company_table_config_path(company, table_config)
+    expect(page).to have_selector('form', wait: 10)
+
+    pm_link = find("a[href*='/property_mappings/#{property_mapping.id}/edit']", match: :first)
+    expect(pm_link).to be_present
+  end
 end
