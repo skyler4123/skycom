@@ -28,14 +28,14 @@ export default class Admin_Companies_IndexController extends Admin_LayoutControl
 
   contentHTML() {
     const columns = [
-      { key: "name", label: "Company Name" },
-      { key: "code", label: "Code" },
-      { key: "business_type", label: "Type" },
-      { key: "email", label: "Email" },
-      { key: "phone_number", label: "Phone" },
-      { key: "owner", label: "Owner" },
-      { key: "workflow_status", label: "Status" },
-      { key: "created_at", label: "Created" }
+      { key: "name", name: "Company Name" },
+      { key: "code", name: "Code" },
+      { key: "business_type", name: "Type" },
+      { key: "email", name: "Email" },
+      { key: "phone_number", name: "Phone" },
+      { key: "owner", name: "Owner" },
+      { key: "workflow_status", name: "Status" },
+      { key: "created_at", name: "Created" }
     ]
 
     return `

@@ -12,15 +12,15 @@ RSpec.feature "Products Dynamic Validation", type: :feature, js: true do
 
   before do
     category.default_property_mapping.update!(property_metadata: [
-      { "key" => "property_string_1", "name" => "presence_test", "type" => "string", "label" => "Presence Test",
+      { "key" => "property_string_1", "type" => "string", "name" => "Presence Test",
         "validates" => { "presence" => true } },
-      { "key" => "property_integer_1", "name" => "numericality_test", "type" => "integer", "label" => "Num Test",
+      { "key" => "property_integer_1", "type" => "integer", "name" => "Num Test",
         "validates" => { "numericality" => { "only_integer" => true, "greater_than_or_equal_to" => 0, "less_than" => 100 } } },
-      { "key" => "property_string_2", "name" => "inclusion_test", "type" => "string", "label" => "Incl Test",
+      { "key" => "property_string_2", "type" => "string", "name" => "Incl Test",
         "validates" => { "inclusion" => { "in" => [ "Option A", "Option B" ] } } },
-      { "key" => "property_string_3", "name" => "format_test", "type" => "string", "label" => "Fmt Test",
+      { "key" => "property_string_3", "type" => "string", "name" => "Fmt Test",
         "validates" => { "format" => { "with" => "^SKU-" } } },
-      { "key" => "property_string_4", "name" => "length_test", "type" => "string", "label" => "Len Test",
+      { "key" => "property_string_4", "type" => "string", "name" => "Len Test",
         "validates" => { "length" => { "minimum" => 2, "maximum" => 50 } } }
     ])
 
