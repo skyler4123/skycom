@@ -57,6 +57,7 @@ class PropertyMapping < ApplicationRecord
   belongs_to :category
 
   has_many :table_configs, dependent: :destroy
+  after_create :create_default_table_config
 
   def default_table_config
     table_configs.first
@@ -113,8 +114,20 @@ class PropertyMapping < ApplicationRecord
   VALID_INPUT_TYPES = PROPERTY_MAPPING_VALID_INPUT_TYPES
 
   validate :validate_property_metadata
+  validate :must_have_table_config
 
   private
+
+  def create_default_table_config
+    table_configs.create!(company: company, category: category)
+  end
+
+  def must_have_table_config
+    return unless persisted?
+    return if table_configs.any?
+
+    errors.add(:base, "must have at least one table config")
+  end
 
   def validate_property_metadata
     unless property_metadata.is_a?(Array)

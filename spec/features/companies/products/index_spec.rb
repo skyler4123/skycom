@@ -25,6 +25,7 @@ RSpec.feature "Companies::Products Management", type: :feature, js: true do
   end
 
   let!(:default_table_config) do
+    default_category.default_property_mapping.table_configs.destroy_all
     TableConfig.create!(
       company: company,
       category: default_category,
@@ -147,6 +148,7 @@ RSpec.feature "Companies::Products Management", type: :feature, js: true do
     end
 
     let!(:table_config_cosmetics) do
+      category_cosmetics.default_property_mapping.table_configs.destroy_all
       TableConfig.create!(
         company: company,
         category: category_cosmetics,
@@ -166,6 +168,7 @@ RSpec.feature "Companies::Products Management", type: :feature, js: true do
     end
 
     let!(:table_config_supplements) do
+      category_supplements.default_property_mapping.table_configs.destroy_all
       TableConfig.create!(
         company: company,
         category: category_supplements,
@@ -433,42 +436,5 @@ RSpec.feature "Companies::Products Management", type: :feature, js: true do
       expect(page).to have_current_path(/table_configs\/#{table_config_cosmetics.id}\/edit/, wait: 10)
     end
 
-    # =========================================================================
-    # SCENARIO 14: Config Table button absent when no table config
-    # =========================================================================
-    scenario "does not show Config Table button when no table config exists" do
-      category_no_tc = Category.create!(
-        company: company,
-        name: "No Table Config",
-        resource_name: "products"
-      )
-
-      create(:product, company: company, name: "Orphan Product",
-        category: category_no_tc, property_mapping: category_no_tc.default_property_mapping)
-
-      page.execute_script("localStorage.clear()")
-      company_data = JSON.parse(company.to_json).merge(
-        "property_mappings" => company.property_mappings.reset.map { |pm| JSON.parse(pm.to_json) },
-        "table_configs" => company.table_configs.reset.map { |tc| JSON.parse(tc.to_json) },
-        "categories" => company.categories.reset.map { |c| JSON.parse(c.to_json) },
-        "branches" => [],
-        "departments" => [],
-        "roles" => []
-      )
-      payload = {
-        user: JSON.parse(owner.to_json),
-        companies: [ company_data ],
-        enums: {},
-        employees: []
-      }
-      page.execute_script("localStorage.setItem('client_cache_data', arguments[0])", payload.to_json)
-      page.execute_script("localStorage.setItem('client_cache_version', 'forced')")
-      page.execute_script("document.cookie = 'client_cache_version=forced; path=/'")
-
-      visit company_products_path(company, category_id: category_no_tc.id)
-      expect(page).to have_selector('table', wait: 10)
-
-      expect(page).not_to have_link("Config Table")
-    end
   end
 end

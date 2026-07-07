@@ -14,6 +14,7 @@ RSpec.feature "Companies::TableConfigs Management", type: :feature, js: true do
   end
 
   let!(:table_config) do
+    property_mapping.table_configs.destroy_all
     create(:table_config, company: company, category: category, property_mapping: property_mapping,
       name: "Cosmetics Table",
       columns_metadata: [

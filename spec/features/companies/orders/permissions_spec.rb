@@ -9,6 +9,7 @@ RSpec.feature "Companies::Orders Permissions", type: :feature, js: true do
   end
 
   let!(:default_table_config) do
+    default_category.default_property_mapping.table_configs.destroy_all
     TableConfig.create!(
       company: company,
       category: default_category,

@@ -25,15 +25,24 @@ class Seed::TableConfigService
     columns_metadata: [],
     name: nil
   )
-    record = new(
-      company: company,
-      resource_name: resource_name,
-      category: category,
-      property_mapping: property_mapping,
-      columns_metadata: columns_metadata,
-      name: name
-    )
-    record.save!
-    record
+    pm = property_mapping || category.default_property_mapping
+    name ||= "#{category&.name || resource_name} table config"
+
+    existing = pm.table_configs.first
+    if existing
+      existing.update!(columns_metadata: columns_metadata, name: name)
+      existing
+    else
+      record = new(
+        company: company,
+        resource_name: resource_name,
+        category: category,
+        property_mapping: pm,
+        columns_metadata: columns_metadata,
+        name: name
+      )
+      record.save!
+      record
+    end
   end
 end
