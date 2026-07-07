@@ -71,7 +71,8 @@ Callbacks defined directly in the model file (not inherited from a concern).
 
 | Callback | Line | Method | Description |
 |----------|------|--------|-------------|
-| `before_validation :normalize_string_values` | 62 | `normalize_string_values` | Auto-wraps plain string values on all `property_*` columns into `{"label" => value}` hashes to support the JSONB object format used by the frontend. Only wraps values that are strings (not hashes). |
+| `after_create :create_default_table_config` | 60 | `create_default_table_config` | Auto-creates a default `TableConfig` (with default `columns_metadata`) linked to the same `company` and `category`. Guarantees every PropertyMapping has at least one TableConfig. |
+| `validate :must_have_table_config` | 117 | `must_have_table_config` | Safety net — validates that at least one `TableConfig` exists for persisted records. Skipped for new records (where `after_create` hasn't run yet). |
 
 ---
 
@@ -292,7 +293,7 @@ Each concern defines the same callback:
 | `before_validation` | 5 | Address, User, (SetDefaultCompanyConcern → 34+ appointment models), (CategoryConcern → 18 models), (PropertyMappingConcern → 48 models) |
 | `after_initialize` | 1 | Branch |
 | `before_create` | 1 | Session |
-| `after_create` | 4 | Category, Company, PolicyAppointment, RoleAppointment |
+| `after_create` | 5 | Category, Company, PolicyAppointment, PropertyMapping, RoleAppointment |
 | `after_update` | 2 | Policy, User (block) |
 | `after_update` (conditional) | 3 | PolicyAppointment, BillingInvoice, (Company::CircuitBreakerConcern → 1 model) |
 | `before_update` | 3 | PolicyAppointment, RoleAppointment, (ImmutableRecordConcern → 5 models) |
@@ -300,9 +301,9 @@ Each concern defines the same callback:
 | `before_discard` | 1 | Employee |
 | `after_touch` | 2* | Role (duplicate declaration on lines 30 and 87) |
 | `after_commit` | 3 | (Cache::RecordsConcern → 5 models), (Session::GlobalCacheConcern → 1 model) |
-| `validate` | 3 | (DynamicValidationConcern → 48 models), (PropertyMappingConcern → 48 models), (ImageAttachmentsConcern → 6 models + Product) |
+| `validate` | 4 | PropertyMapping, (DynamicValidationConcern → 48 models), (PropertyMappingConcern → 48 models), (ImageAttachmentsConcern → 6 models + Product) |
 
-**Total unique callback declarations: ~29 directly across 13 model files + 7 concern files propagating to ~63+ models.**
+**Total unique callback declarations: ~31 directly across 14 model files + 7 concern files propagating to ~63+ models.**
 
 > **Note:** `ImageAttachmentsConcern` in the validate row covers the 6 per-model ImageConcern files (Branch, Brand, Customer, Department, Employee, Service) + the pre-existing `Product::ImageConcern`, all of which define the same `validate :acceptable_image_attachments` callback.
 

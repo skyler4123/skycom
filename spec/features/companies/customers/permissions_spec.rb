@@ -153,6 +153,7 @@ RSpec.feature "Companies::Customers Permissions", type: :feature, js: true do
 
   before do
     company.clear_permissions_cache
+    company.table_configs.destroy_all
   end
 
   # =========================================================================

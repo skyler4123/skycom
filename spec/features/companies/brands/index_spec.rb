@@ -12,6 +12,7 @@ RSpec.feature "Companies::Brands Management", type: :feature, js: true do
   let!(:brand2) { create(:brand, company: company, category: default_category, business_type: "retailer", workflow_status: "pending") }
 
   let!(:default_table_config) do
+    default_category.default_property_mapping.table_configs.destroy_all
     TableConfig.create!(
       company: company,
       category: default_category,
@@ -116,38 +117,4 @@ RSpec.feature "Companies::Brands Management", type: :feature, js: true do
     expect(page).to have_current_path(/table_configs\/#{default_table_config.id}\/edit/, wait: 10)
   end
 
-  # =========================================================================
-  # SCENARIO: Config Table button absent when no table config
-  # =========================================================================
-  scenario "does not show Config Table button when no table config exists" do
-    category_no_tc = Category.create!(
-      company: company,
-      name: "No Table Config",
-      resource_name: "brands"
-    )
-
-    page.execute_script("localStorage.clear()")
-    company_data = JSON.parse(company.to_json).merge(
-      "property_mappings" => company.property_mappings.reset.map { |pm| JSON.parse(pm.to_json) },
-      "table_configs" => company.table_configs.reset.map { |tc| JSON.parse(tc.to_json) },
-      "categories" => company.categories.reset.map { |c| JSON.parse(c.to_json) },
-      "branches" => [],
-      "departments" => [],
-      "roles" => []
-    )
-    payload = {
-      user: JSON.parse(owner.to_json),
-      companies: [ company_data ],
-      enums: {},
-      employees: []
-    }
-    page.execute_script("localStorage.setItem('client_cache_data', arguments[0])", payload.to_json)
-    page.execute_script("localStorage.setItem('client_cache_version', 'forced')")
-    page.execute_script("document.cookie = 'client_cache_version=forced; path=/'")
-
-    visit company_brands_path(company, category_id: category_no_tc.id)
-    expect(page).to have_selector('table', wait: 10)
-
-    expect(page).not_to have_link("Config Table")
-  end
 end
