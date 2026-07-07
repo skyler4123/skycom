@@ -91,6 +91,7 @@ class Companies::TableConfigsController < Companies::ApplicationController
       h["width"] = h["width"].present? ? h["width"].to_i : nil
       h["roles"] = h["roles"].present? ? h["roles"].split(",").map(&:strip) : []
       h["pinned"] = nil if h["pinned"].blank?
+    h["name"] = h["key"].humanize if h["name"].blank?
       h
     end
   end

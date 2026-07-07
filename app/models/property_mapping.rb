@@ -41,10 +41,9 @@
 #
 #   key:        String  — The resource column this config describes
 #                        (e.g. "property_string_1"). Required.
-#   name:       String  — System identifier (underscored, e.g. "skin_type").
+#   name:       String  — Human-readable display name. Required.
 #   type:       String  — One of: string, text, integer, decimal, boolean,
 #                        datetime. Derivable from the key prefix.
-#   label:      String  — Human-readable display name. Required.
 #   validates:  Hash    — Validation rules (future use, currently {}).
 
 class PropertyMapping < ApplicationRecord
@@ -147,16 +146,16 @@ class PropertyMapping < ApplicationRecord
         next
       end
 
-      label = entry["label"]
-      if label.blank?
-        errors.add(:property_metadata, "element #{idx}: label is required")
+      name = entry["name"]
+      if name.blank?
+        errors.add(:property_metadata, "element #{idx}: name is required")
       end
 
       prefix = key.to_s.sub(/_\d+\z/, "").to_sym
       supported = SUPPORTED_KEYS[prefix]
 
       if supported
-        unexpected = entry.keys - supported - %w[key name type label validates]
+        unexpected = entry.keys - supported - %w[key type name validates]
         if unexpected.any?
           errors.add(:property_metadata, "element #{idx}: unsupported keys #{unexpected.join(", ")} for #{key}. Supported: #{supported.join(", ")}")
         end

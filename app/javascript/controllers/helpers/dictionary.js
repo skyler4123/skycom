@@ -445,6 +445,9 @@ export const dictionary = () => {
     "Roles": { vi: "Vai trò" },
     "Virt": { vi: "Ảo" },
     "system_name": { vi: "tên_hệ_thống" },
-    "Display Label": { vi: "Nhãn hiển thị" },
+    "Display Name": { vi: "Tên hiển thị" },
+    "This field is synced from PropertyMapping. Please access the Property Mapping edit page to update this name.": {
+      vi: "Trường này được đồng bộ từ PropertyMapping. Vui lòng truy cập trang chỉnh sửa Property Mapping để cập nhật tên này.",
+    },
   }
 }

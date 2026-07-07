@@ -4,7 +4,7 @@ export default class Companies_PropertyMappings_EditController extends Companies
   /** @type {any | null} */
   mapping = null
 
-  /** @type {Array<{key: string, name: string, label: string}>} */
+  /** @type {Array<{key: string, name: string}>} */
   propertyMetadata = []
 
   async connect() {
@@ -54,12 +54,7 @@ export default class Companies_PropertyMappings_EditController extends Companies
         </td>
         <td class="py-3 px-4">
           <input type="text" name="property_mapping[property_metadata][${index}][name]" value="${field.name || ''}"
-            placeholder="system_name"
-            class="w-full px-2 py-1 text-sm border border-slate-200 dark:border-slate-600 rounded bg-white dark:bg-slate-800 text-slate-900 dark:text-white">
-        </td>
-        <td class="py-3 px-4">
-          <input type="text" name="property_mapping[property_metadata][${index}][label]" value="${field.label || ''}"
-            placeholder="Display Label"
+            placeholder="Display Name"
             class="w-full px-2 py-1 text-sm border border-slate-200 dark:border-slate-600 rounded bg-white dark:bg-slate-800 text-slate-900 dark:text-white">
         </td>
         <td class="py-3 px-4">
@@ -129,7 +124,7 @@ export default class Companies_PropertyMappings_EditController extends Companies
                 <tr class="text-sm text-slate-500 dark:text-slate-400 bg-slate-50 dark:bg-slate-800/50 border-b border-slate-200 dark:border-gray-800">
                   <th class="py-3 px-4 font-medium whitespace-nowrap">${translate("Key")}</th>
                   <th class="py-3 px-4 font-medium whitespace-nowrap">${translate("Name")}</th>
-                  <th class="py-3 px-4 font-medium whitespace-nowrap">${translate("Label")}</th>
+                  <th class="py-3 px-4 font-medium whitespace-nowrap">${translate("Name")}</th>
                   <th class="py-3 px-4 font-medium whitespace-nowrap">${translate("Validates")}</th>
                   <th class="py-3 px-4 font-medium text-right whitespace-nowrap">${translate("Actions")}</th>
                 </tr>
@@ -177,7 +172,6 @@ export default class Companies_PropertyMappings_EditController extends Companies
     this.propertyMetadata.push({
       key: select.value,
       name: '',
-      label: '',
       validates: '{}'
     })
 
@@ -209,12 +203,7 @@ export default class Companies_PropertyMappings_EditController extends Companies
         </td>
         <td class="py-3 px-4">
           <input type="text" name="property_mapping[property_metadata][${index}][name]" value="${field.name || ''}"
-            placeholder="system_name"
-            class="w-full px-2 py-1 text-sm border border-slate-200 dark:border-slate-600 rounded bg-white dark:bg-slate-800 text-slate-900 dark:text-white">
-        </td>
-        <td class="py-3 px-4">
-          <input type="text" name="property_mapping[property_metadata][${index}][label]" value="${field.label || ''}"
-            placeholder="Display Label"
+            placeholder="Display Name"
             class="w-full px-2 py-1 text-sm border border-slate-200 dark:border-slate-600 rounded bg-white dark:bg-slate-800 text-slate-900 dark:text-white">
         </td>
         <td class="py-3 px-4">

@@ -3,7 +3,7 @@ class TableConfig < ApplicationRecord
   include PropertyMappingConcern
   attribute :permission_resource_name, :string, default: -> { self.name }
   attribute :columns_metadata, :jsonb, default: -> {
-    [ { "key" => "name", "label" => "Name", "visible" => true, "sortable" => true,
+    [ { "key" => "name", "name" => "Name", "visible" => true, "sortable" => true,
        "align" => "left", "pinned" => nil, "width" => nil, "roles" => [],
        "is_virtual" => false, "render_config" => {} } ]
   }
@@ -16,8 +16,8 @@ class TableConfig < ApplicationRecord
   # TableConfig layout configuration for the Cashier/Accountant Grid View
   # [
   #   {
-  #     "key" => "code",                     # System default hardcoded column
-  #     "label" => "Invoice No.",
+  #     "key" => "code",
+  #     "name" => "Invoice No.",
   #     "visible" => true,
   #     "width" => 150,
   #     "align" => "left",
@@ -25,8 +25,8 @@ class TableConfig < ApplicationRecord
   #     "roles" => []
   #   },
   #   {
-  #     "key" => "property_string_1",        # Matches property_string_1 (payment_method)
-  #     "label" => "Payment Type",
+  #     "key" => "property_string_1",
+  #     "name" => "Payment Type",
   #     "visible" => true,
   #     "width" => 130,
   #     "align" => "center",
@@ -34,8 +34,8 @@ class TableConfig < ApplicationRecord
   #     "roles" => []
   #   },
   #   {
-  #     "key" => "property_integer_1",       # Matches property_integer_1 (total_items_quantity)
-  #     "label" => "Qty Items",
+  #     "key" => "property_integer_1",
+  #     "name" => "Qty Items",
   #     "visible" => true,
   #     "width" => 100,
   #     "align" => "right",
@@ -43,21 +43,21 @@ class TableConfig < ApplicationRecord
   #     "roles" => []
   #   },
   #   {
-  #     "key" => "property_decimal_1",       # Matches property_decimal_1 (vat_amount_vnd)
-  #     "label" => "VAT Tax Amount",
+  #     "key" => "property_decimal_1",
+  #     "name" => "VAT Tax Amount",
   #     "visible" => true,
   #     "width" => 160,
   #     "align" => "right",
   #     "pinned" => nil,
-  #     "roles" => ["admin", "accountant"],  # Only visible to administrative/accounting roles
+  #     "roles" => ["admin", "accountant"],
   #     "render_config" => {
   #       "format" => "currency",
   #       "currency_symbol" => "₫"
   #     }
   #   },
   #   {
-  #     "key" => "property_boolean_1",       # Matches property_boolean_1 (is_e_invoice_sent)
-  #     "label" => "E-Receipt Sent",
+  #     "key" => "property_boolean_1",
+  #     "name" => "E-Receipt Sent",
   #     "visible" => true,
   #     "width" => 120,
   #     "align" => "center",
@@ -74,7 +74,7 @@ class TableConfig < ApplicationRecord
   # PATTERN — each element must follow this shape:
   #   {
   #     key:           String   # Column identifier (e.g. "name", "property_integer_1")
-  #     label:         String   # Display name in the table header
+  #     name:          String   # Display name in the table header
   #     is_virtual:    Boolean  # false = real DB column, true = computed client-side
   #     visible:       Boolean  # true = shown, false = hidden (preserves config)
   #     width:         Integer  # Column width in pixels (null = auto)
@@ -105,15 +105,15 @@ class TableConfig < ApplicationRecord
         next
       end
 
-      key   = field["key"]
-      label = field["label"]
+      key      = field["key"]
+      name_val = field["name"]
 
       if !key.is_a?(String) || key.blank?
         errors.add(:columns_metadata, "element #{idx}: key is required and must be a non-blank string")
       end
 
-      if !label.is_a?(String) || label.blank?
-        errors.add(:columns_metadata, "element #{idx}: label is required and must be a non-blank string")
+      if !name_val.is_a?(String) || name_val.blank?
+        errors.add(:columns_metadata, "element #{idx}: name is required and must be a non-blank string")
       end
 
       errors.add(:columns_metadata, "element #{idx}: visible must be a boolean")       if field.key?("visible")   && ![ true, false ].include?(field["visible"])
@@ -124,6 +124,13 @@ class TableConfig < ApplicationRecord
       errors.add(:columns_metadata, "element #{idx}: width must be an integer or null") if field.key?("width") && !field["width"].nil? && !field["width"].is_a?(Integer)
       errors.add(:columns_metadata, "element #{idx}: roles must be an array of strings") if field.key?("roles") && !field["roles"].nil? && !(field["roles"].is_a?(Array) && field["roles"].all? { |r| r.is_a?(String) })
       errors.add(:columns_metadata, "element #{idx}: render_config must be a hash")   if field.key?("render_config") && !field["render_config"].nil? && !field["render_config"].is_a?(Hash)
+
+      if key.to_s.start_with?("property_") && name_val.present? && property_mapping.present?
+        pm_entry = property_mapping.property_metadata.find { |pm| pm["key"] == key }
+        if pm_entry && pm_entry["name"] != name_val
+          errors.add(:columns_metadata, "element #{idx}: name '#{name_val}' must match PropertyMapping value '#{pm_entry['name']}'. Edit the PropertyMapping to change this name.")
+        end
+      end
     end
   end
 end

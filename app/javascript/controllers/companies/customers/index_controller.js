@@ -53,9 +53,9 @@ export default class Companies_Customers_IndexController extends Companies_Layou
     }, {})
 
     const fallbackColumns = [
-      { key: "name", label: translate("Customer Name") },
-      { key: "code", label: translate("Code") },
-      { key: "workflow_status", label: translate("Status") }
+      { key: "name", name: translate("Customer Name") },
+      { key: "code", name: translate("Code") },
+      { key: "workflow_status", name: translate("Status") }
     ]
 
     const rawColumns = this.currentTableConfig()?.columns_metadata || fallbackColumns
@@ -63,7 +63,7 @@ export default class Companies_Customers_IndexController extends Companies_Layou
 
     if (!visibleColumns.some(c => c.key === "category")) {
       const nameIdx = visibleColumns.findIndex(c => c.key === "name")
-      if (nameIdx >= 0) visibleColumns.splice(nameIdx + 1, 0, { key: "category", label: translate("Category") })
+      if (nameIdx >= 0) visibleColumns.splice(nameIdx + 1, 0, { key: "category", name: translate("Category") })
     }
 
     return `

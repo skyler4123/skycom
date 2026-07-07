@@ -9,8 +9,8 @@ RSpec.feature "Companies::PropertyMappings Management", type: :feature, js: true
   let!(:property_mapping) do
     create(:property_mapping, company: company, category: category, name: "Cosmetics Mapping",
       property_metadata: [
-        { "key" => "property_string_1", "name" => "skin_type", "type" => "string", "label" => "Skin Type" },
-        { "key" => "property_integer_1", "name" => "volume_ml", "type" => "integer", "label" => "Volume (ml)" }
+        { "key" => "property_string_1", "type" => "string", "name" => "Skin Type" },
+        { "key" => "property_integer_1", "type" => "integer", "name" => "Volume (ml)" }
       ])
   end
 
@@ -89,9 +89,7 @@ RSpec.feature "Companies::PropertyMappings Management", type: :feature, js: true
     find('button', text: 'Add Property').click
 
     name_input = find(:xpath, '//input[@name="property_mapping[property_metadata][2][name]"]', wait: 10)
-    name_input.set('texture')
-    label_input = find(:xpath, '//input[@name="property_mapping[property_metadata][2][label]"]')
-    label_input.set('Texture Type')
+    name_input.set('Texture Type')
     click_button 'Save Changes'
 
     expect(page).to have_current_path(/property_mappings\/#{property_mapping.id}$/, wait: 10)
@@ -100,8 +98,7 @@ RSpec.feature "Companies::PropertyMappings Management", type: :feature, js: true
     expect(property_mapping.property_metadata.length).to eq(3)
     added = property_mapping.property_metadata.find { |m| m['key'] == 'property_string_2' }
     expect(added).to be_present
-    expect(added['name']).to eq('texture')
-    expect(added['label']).to eq('Texture Type')
+    expect(added['name']).to eq('Texture Type')
   end
 
   scenario "edit validates hash persists through save" do

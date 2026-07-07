@@ -12,7 +12,7 @@ RSpec.describe TableConfig, type: :model do
     it "has a sensible default for columns_metadata" do
       config = TableConfig.new
       expect(config.columns_metadata).to be_an(Array)
-      expect(config.columns_metadata.first).to include("key" => "name", "label" => "Name")
+      expect(config.columns_metadata.first).to include("key" => "name", "name" => "Name")
     end
   end
 
@@ -26,11 +26,11 @@ RSpec.describe TableConfig, type: :model do
 
       it "accepts a full valid hash array" do
         config.columns_metadata = [
-          { "key" => "name", "label" => "Product Name", "visible" => true,
+          { "key" => "name", "name" => "Product Name", "visible" => true,
             "width" => 250, "align" => "left", "pinned" => "left",
             "sortable" => true, "roles" => [ "admin", "manager" ],
             "is_virtual" => false, "render_config" => {} },
-          { "key" => "property_integer_1", "label" => "Unit Cost",
+          { "key" => "property_integer_1", "name" => "Unit Cost",
             "visible" => true, "width" => 120, "align" => "right",
             "sortable" => true, "roles" => [], "is_virtual" => false,
             "render_config" => { "format" => "currency" } }
@@ -62,114 +62,114 @@ RSpec.describe TableConfig, type: :model do
 
     context "with missing or blank key" do
       it "rejects when key is missing" do
-        config.columns_metadata = [ { "label" => "No Key" } ]
+        config.columns_metadata = [ { "name" => "No Key" } ]
         expect(config).not_to be_valid
         expect(config.errors[:columns_metadata]).to include(match(/key is required/))
       end
 
       it "rejects when key is blank" do
-        config.columns_metadata = [ { "key" => "", "label" => "Blank Key" } ]
+        config.columns_metadata = [ { "key" => "", "name" => "Blank Key" } ]
         expect(config).not_to be_valid
         expect(config.errors[:columns_metadata]).to include(match(/key is required/))
       end
     end
 
-    context "with missing or blank label" do
-      it "rejects when label is missing" do
+    context "with missing or blank name" do
+      it "rejects when name is missing" do
         config.columns_metadata = [ { "key" => "name" } ]
         expect(config).not_to be_valid
-        expect(config.errors[:columns_metadata]).to include(match(/label is required/))
+        expect(config.errors[:columns_metadata]).to include(match(/name is required/))
       end
 
-      it "rejects when label is blank" do
-        config.columns_metadata = [ { "key" => "name", "label" => "" } ]
+      it "rejects when name is blank" do
+        config.columns_metadata = [ { "key" => "name", "name" => "" } ]
         expect(config).not_to be_valid
-        expect(config.errors[:columns_metadata]).to include(match(/label is required/))
+        expect(config.errors[:columns_metadata]).to include(match(/name is required/))
       end
     end
 
     context "with invalid column property types" do
       it "rejects visible when not boolean" do
-        config.columns_metadata = [ { "key" => "name", "label" => "N", "visible" => "yes" } ]
+        config.columns_metadata = [ { "key" => "name", "name" => "N", "visible" => "yes" } ]
         expect(config).not_to be_valid
         expect(config.errors[:columns_metadata]).to include(match(/visible must be a boolean/))
       end
 
       it "rejects sortable when not boolean" do
-        config.columns_metadata = [ { "key" => "name", "label" => "N", "sortable" => "yes" } ]
+        config.columns_metadata = [ { "key" => "name", "name" => "N", "sortable" => "yes" } ]
         expect(config).not_to be_valid
         expect(config.errors[:columns_metadata]).to include(match(/sortable must be a boolean/))
       end
 
       it "rejects is_virtual when not boolean" do
-        config.columns_metadata = [ { "key" => "name", "label" => "N", "is_virtual" => "yes" } ]
+        config.columns_metadata = [ { "key" => "name", "name" => "N", "is_virtual" => "yes" } ]
         expect(config).not_to be_valid
         expect(config.errors[:columns_metadata]).to include(match(/is_virtual must be a boolean/))
       end
 
       it "rejects align with invalid value" do
-        config.columns_metadata = [ { "key" => "name", "label" => "N", "align" => "top" } ]
+        config.columns_metadata = [ { "key" => "name", "name" => "N", "align" => "top" } ]
         expect(config).not_to be_valid
         expect(config.errors[:columns_metadata]).to include(match(/align/))
       end
 
       it "accepts align as left, center, or right" do
         %w[left center right].each do |val|
-          config.columns_metadata = [ { "key" => "name", "label" => "N", "align" => val } ]
+          config.columns_metadata = [ { "key" => "name", "name" => "N", "align" => val } ]
           expect(config).to be_valid
         end
       end
 
       it "rejects pinned with invalid value" do
-        config.columns_metadata = [ { "key" => "name", "label" => "N", "pinned" => "top" } ]
+        config.columns_metadata = [ { "key" => "name", "name" => "N", "pinned" => "top" } ]
         expect(config).not_to be_valid
         expect(config.errors[:columns_metadata]).to include(match(/pinned/))
       end
 
       it "accepts pinned as left, right, or nil" do
         [ "left", "right" ].each do |val|
-          config.columns_metadata = [ { "key" => "name", "label" => "N", "pinned" => val } ]
+          config.columns_metadata = [ { "key" => "name", "name" => "N", "pinned" => val } ]
           expect(config).to be_valid
         end
-        config.columns_metadata = [ { "key" => "name", "label" => "N", "pinned" => nil } ]
+        config.columns_metadata = [ { "key" => "name", "name" => "N", "pinned" => nil } ]
         expect(config).to be_valid
       end
 
       it "rejects width when not an integer" do
-        config.columns_metadata = [ { "key" => "name", "label" => "N", "width" => "auto" } ]
+        config.columns_metadata = [ { "key" => "name", "name" => "N", "width" => "auto" } ]
         expect(config).not_to be_valid
         expect(config.errors[:columns_metadata]).to include(match(/width must be an integer/))
       end
 
       it "accepts width as nil" do
-        config.columns_metadata = [ { "key" => "name", "label" => "N", "width" => nil } ]
+        config.columns_metadata = [ { "key" => "name", "name" => "N", "width" => nil } ]
         expect(config).to be_valid
       end
 
       it "accepts width as an integer" do
-        config.columns_metadata = [ { "key" => "name", "label" => "N", "width" => 250 } ]
+        config.columns_metadata = [ { "key" => "name", "name" => "N", "width" => 250 } ]
         expect(config).to be_valid
       end
 
       it "rejects roles when not an array of strings" do
-        config.columns_metadata = [ { "key" => "name", "label" => "N", "roles" => "admin" } ]
+        config.columns_metadata = [ { "key" => "name", "name" => "N", "roles" => "admin" } ]
         expect(config).not_to be_valid
         expect(config.errors[:columns_metadata]).to include(match(/roles/))
       end
 
       it "accepts roles as nil" do
-        config.columns_metadata = [ { "key" => "name", "label" => "N", "roles" => nil } ]
+        config.columns_metadata = [ { "key" => "name", "name" => "N", "roles" => nil } ]
         expect(config).to be_valid
       end
 
       it "rejects render_config when not a hash" do
-        config.columns_metadata = [ { "key" => "name", "label" => "N", "render_config" => "string" } ]
+        config.columns_metadata = [ { "key" => "name", "name" => "N", "render_config" => "string" } ]
         expect(config).not_to be_valid
         expect(config.errors[:columns_metadata]).to include(match(/render_config must be a hash/))
       end
 
       it "accepts render_config as nil" do
-        config.columns_metadata = [ { "key" => "name", "label" => "N", "render_config" => nil } ]
+        config.columns_metadata = [ { "key" => "name", "name" => "N", "render_config" => nil } ]
         expect(config).to be_valid
       end
     end

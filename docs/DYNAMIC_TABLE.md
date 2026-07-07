@@ -2,7 +2,7 @@
 
 > **Prerequisites**: Read `CATEGORY_DYNAMIC_SCHEMA.md` for the PropertyMapping/TableConfig data model. Read `DASHBOARD_PATTERN.md` for the base dashboard architecture.
 >
-> This document covers only the dynamic column system — how `property_*` columns get their labels, how tables render them, and how modals generate form fields.
+> This document covers only the dynamic column system — how `property_*` columns get their display names, how tables render them, and how modals generate form fields.
 
 ---
 
@@ -15,7 +15,7 @@ ProductsController#index
         ▼
   ClientCache (localStorage)
   ├─ categories[]         — available categories per resource_name
-  ├─ property_mappings[]  — property_metadata (label, type per slot)
+  ├─ property_mappings[]  — property_metadata (name, type per slot)
   └─ table_configs[]      — columns_metadata (visible columns, order, alignment)
         │
         ▼
@@ -68,23 +68,19 @@ async connect() {
 - TableConfigs are indexed by `property_mapping_id`, not `category_id` — always traverse through the PropertyMapping.
 - `currentPropertyMappings()` and `currentTableConfigs()` read from `currentCompany().property_mappings` / `.table_configs` in the client cache.
 
-### 2.2 Label Resolution
+### 2.2 Name Resolution
+
+The `name` value from `TableConfig.columns_metadata[].name` is used directly as the table header display text. For `property_*` columns, the `name` in `columns_metadata` is validated to match the `name` in `PropertyMapping.property_metadata`, and the edit field is read-only — changes must be made via the PropertyMapping edit page.
 
 ```javascript
-const mappingLookup = (propertyMapping?.property_metadata || []).reduce((acc, field) => {
-  acc[field.key] = field
-  return acc
-}, {})
-
-const resolvedLabel = col.key.startsWith("property_")
-  ? (mappedField?.label || col.label || col.key)   // PropertyMapping > TableConfig > raw key
-  : (col.label || col.key)                          // TableConfig > raw key
+// In ui_helpers.js table() helper:
+<th>${col.name || "N/A"}</th>
 ```
 
-| Column Type | Priority Order |
-|-------------|----------------|
-| `property_*` (dynamic) | `PropertyMapping.label` > `TableConfig.columns_metadata[].label` > raw key |
-| Standard (name, code, workflow_status) | `TableConfig.columns_metadata[].label` > raw key |
+| Column Type | Source |
+|-------------|--------|
+| `property_*` (dynamic) | `TableConfig.columns_metadata[].name` (synced from PropertyMapping) |
+| Standard (name, code, workflow_status) | `TableConfig.columns_metadata[].name` |
 
 ### 2.3 Type-Aware Cell Rendering
 
@@ -142,7 +138,7 @@ const categoryValue = this.categoryIdValue || this.defaultFilterCategory()?.id
 The `NewModalController` reads `PropertyMapping.property_metadata` and renders form fields per type:
 
 ```javascript
-renderField({ key, label, type }) {
+renderField({ key, name, type }) {
   switch (type) {
     case 'boolean':
       return `<input type="checkbox" name="product[${key}]" value="true">
@@ -186,8 +182,8 @@ this.propertyMetadata.map(field => {
     url: Helpers.edit_company_product_path(currentCompany().id, p.id),
     type: inputType,
     html: this.formatDisplayValue(p[field.key], field.type),
-    confirmMessage: `Change ${field.label} to '{{value}}'?`,
-    successMessage: `${field.label} updated!`,
+    confirmMessage: `Change ${field.name} to '{{value}}'?`,
+    successMessage: `${field.name} updated!`,
   })
 })
 ```
@@ -291,7 +287,7 @@ end
    - `productsCategories()` / `defaultFilterCategory()` helpers
 
 2. **NewModalController** — `extends Controller`, implement:
-   - `renderField({ key, label, type })` for all 6 types
+   - `renderField({ key, name, type })` for all 6 types
    - `handleSubmit()` with `fetchJson` + `reloadThenToast`
 
 3. **ShowModalController** — `extends Controller`, implement:
@@ -306,7 +302,7 @@ end
 2. Use `.reset` before serializing associations to JSON for cache seeding
 3. Lock cookie version to prevent `ClientCacheController` overwrite
 4. Use deterministic product names (no Faker)
-5. Assert dynamic column headers by label (e.g., `have_selector('th', text: 'Skin Type')`)
+5. Assert dynamic column headers by name (e.g., `have_selector('th', text: 'Skin Type')`)
 
 ---
 

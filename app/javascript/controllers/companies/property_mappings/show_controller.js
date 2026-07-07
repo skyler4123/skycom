@@ -54,7 +54,7 @@ export default class Companies_PropertyMappings_ShowController extends Companies
                 <th class="py-3 px-4 font-medium whitespace-nowrap">${translate("Key")}</th>
                 <th class="py-3 px-4 font-medium whitespace-nowrap">${translate("Name")}</th>
                 <th class="py-3 px-4 font-medium whitespace-nowrap">${translate("Type")}</th>
-                <th class="py-3 px-4 font-medium whitespace-nowrap">${translate("Label")}</th>
+                <th class="py-3 px-4 font-medium whitespace-nowrap">${translate("Name")}</th>
                 <th class="py-3 px-4 font-medium whitespace-nowrap">${translate("Validates")}</th>
               </tr>
             </thead>
@@ -68,7 +68,7 @@ export default class Companies_PropertyMappings_ShowController extends Companies
                       ${field.type || field.key?.replace(/_\d+$/, '').replace('property_', '') || '-'}
                     </span>
                   </td>
-                  <td class="py-3 px-4 text-sm font-medium text-slate-900 dark:text-white">${field.label || '-'}</td>
+                  <td class="py-3 px-4 text-sm font-medium text-slate-900 dark:text-white">${field.name || '-'}</td>
                   <td class="py-3 px-4 text-sm">
                     ${this.renderValidates(field.validates)}
                   </td>

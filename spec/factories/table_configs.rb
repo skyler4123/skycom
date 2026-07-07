@@ -9,7 +9,7 @@ FactoryBot.define do
     resource_name { "products" }
 
     columns_metadata do
-      [ { "key" => "name", "label" => "Name", "visible" => true, "sortable" => true,
+      [ { "key" => "name", "name" => "Name", "visible" => true, "sortable" => true,
          "align" => "left", "pinned" => nil, "width" => nil, "roles" => [],
          "is_virtual" => false, "render_config" => {} } ]
     end

@@ -766,13 +766,6 @@ export const table = ({
   className = "w-full text-left border-collapse table-auto",
   renderActions
 }) => {
-  const resolveLabel = (col) => {
-    if (col.key.startsWith("property_")) {
-      return mappingLookup[col.key]?.label || col.label || col.key
-    }
-    return col.label || col.key
-  }
-
   const renderCell = (record, col) => {
     const value = record[col.key]
 
@@ -820,7 +813,7 @@ export const table = ({
       <thead>
         <tr class="text-sm text-slate-500 dark:text-slate-400 bg-slate-50 dark:bg-slate-800/50 border-b border-slate-200 dark:border-slate-700">
           ${columns.map(col => `
-            <th ${widthStyle(col)} class="py-4 px-6 font-medium whitespace-nowrap ${alignmentClass(col)}">${resolveLabel(col)}</th>
+            <th ${widthStyle(col)} class="py-4 px-6 font-medium whitespace-nowrap ${alignmentClass(col)}">${col.name || "N/A"}</th>
           `).join('')}
           ${renderActions ? `<th class="py-4 px-6 font-medium text-right whitespace-nowrap w-[100px]">Edit</th>` : ''}
         </tr>

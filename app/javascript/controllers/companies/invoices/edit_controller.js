@@ -86,7 +86,7 @@ export default class Companies_Invoices_EditController extends Companies_LayoutC
             }
             return `
               <div>
-                <label class="text-xs font-medium text-slate-500">${field.label}</label>
+                <label class="text-xs font-medium text-slate-500">${field.name}</label>
                 ${inputHTML}
               </div>
             `

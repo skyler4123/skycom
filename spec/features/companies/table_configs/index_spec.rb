@@ -8,7 +8,7 @@ RSpec.feature "Companies::TableConfigs Management", type: :feature, js: true do
   let(:property_mapping) do
     pm = category.default_property_mapping || create(:property_mapping, company: company, category: category, name: "Cosmetics Mapping")
     pm.update!(property_metadata: [
-      { "key" => "property_string_1", "name" => "skin_type", "type" => "string", "label" => "Skin Type" }
+      { "key" => "property_string_1", "type" => "string", "name" => "Skin Type" }
     ])
     pm
   end
@@ -18,8 +18,8 @@ RSpec.feature "Companies::TableConfigs Management", type: :feature, js: true do
     create(:table_config, company: company, category: category, property_mapping: property_mapping,
       name: "Cosmetics Table",
       columns_metadata: [
-        { "key" => "name", "label" => "Name", "visible" => true, "sortable" => true, "align" => "left", "pinned" => nil, "width" => nil, "roles" => [], "is_virtual" => false, "render_config" => {} },
-        { "key" => "property_string_1", "label" => "Skin Type", "visible" => true, "sortable" => true, "align" => "left", "pinned" => nil, "width" => nil, "roles" => [], "is_virtual" => false, "render_config" => {} }
+        { "key" => "name", "name" => "Name", "visible" => true, "sortable" => true, "align" => "left", "pinned" => nil, "width" => nil, "roles" => [], "is_virtual" => false, "render_config" => {} },
+        { "key" => "property_string_1", "name" => "Skin Type", "visible" => true, "sortable" => true, "align" => "left", "pinned" => nil, "width" => nil, "roles" => [], "is_virtual" => false, "render_config" => {} }
       ])
   end
 
@@ -118,7 +118,7 @@ RSpec.feature "Companies::TableConfigs Management", type: :feature, js: true do
     visit edit_company_table_config_path(company, table_config)
     expect(page).to have_selector('form', wait: 10)
 
-    first_label_input = find(:xpath, '//input[@name="table_config[columns_metadata][0][label]"]')
+    first_label_input = find(:xpath, '//input[@name="table_config[columns_metadata][0][name]"]')
     first_label_input.set('Product Title')
 
     click_button 'Save Changes'

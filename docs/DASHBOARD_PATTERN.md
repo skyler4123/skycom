@@ -599,7 +599,7 @@ export default class Companies_Products_ShowController extends Companies_LayoutC
                 <span class="material-symbols-outlined text-[20px]">${field.type === 'boolean' ? 'check_circle' : field.type === 'datetime' ? 'calendar_month' : 'text_fields'}</span>
               </div>
               <div class="min-w-0 flex-1">
-                <p class="text-xs font-medium text-slate-500 dark:text-gray-400">${field.label}</p>
+                <p class="text-xs font-medium text-slate-500 dark:text-gray-400">${field.name}</p>
                 <p class="text-sm font-semibold text-slate-900 dark:text-white">${this.formatDisplayValue(p[field.key], field.type)}</p>
               </div>
             </div>
@@ -769,7 +769,7 @@ export default class Companies_Products_EditController extends Companies_LayoutC
             }
             return `
               <div>
-                <label class="text-xs font-medium text-slate-500">${field.label}</label>
+                <label class="text-xs font-medium text-slate-500">${field.name}</label>
                 ${inputHTML}
               </div>
             `
