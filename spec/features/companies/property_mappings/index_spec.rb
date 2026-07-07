@@ -122,4 +122,65 @@ RSpec.feature "Companies::PropertyMappings Management", type: :feature, js: true
     entry = property_mapping.property_metadata.first
     expect(entry['validates']).to eq({ 'presence' => true, 'numericality' => { 'only_integer' => true } })
   end
+
+  describe "sync with TableConfig" do
+    let(:table_config) { property_mapping.default_table_config }
+
+    before do
+      table_config.update!(columns_metadata: [
+        { "key" => "name", "name" => "Name", "visible" => true, "sortable" => true, "align" => "left", "pinned" => nil, "width" => nil, "roles" => [], "is_virtual" => false, "render_config" => {} },
+        { "key" => "property_string_1", "name" => "Skin Type", "visible" => true, "sortable" => true, "align" => "left", "pinned" => nil, "width" => nil, "roles" => [], "is_virtual" => false, "render_config" => {} },
+        { "key" => "property_integer_1", "name" => "Volume (ml)", "visible" => true, "sortable" => true, "align" => "right", "pinned" => nil, "width" => nil, "roles" => [], "is_virtual" => false, "render_config" => {} }
+      ])
+    end
+
+    scenario "adding a field in PropertyMapping syncs to TableConfig" do
+      visit edit_company_property_mapping_path(company, property_mapping)
+      expect(page).to have_selector('form', wait: 10)
+
+      page.execute_script("document.getElementById('new-property-slot').value = 'property_boolean_1'")
+      click_button 'Add Property'
+
+      name_input = find(:xpath, '//input[@name="property_mapping[property_metadata][2][name]"]', wait: 10)
+      name_input.set('Active')
+
+      click_button 'Save Changes'
+      expect(page).to have_current_path(/property_mappings\/#{property_mapping.id}$/, wait: 10)
+
+      visit company_table_config_path(company, table_config)
+      expect(page).to have_selector('table', wait: 10)
+      expect(page).to have_content('property_boolean_1')
+      expect(page).to have_content('Active')
+    end
+
+    scenario "updating a field name in PropertyMapping syncs to TableConfig" do
+      visit edit_company_property_mapping_path(company, property_mapping)
+      expect(page).to have_selector('form', wait: 10)
+
+      name_input = find(:xpath, '//input[@name="property_mapping[property_metadata][0][name]"]')
+      name_input.set('Skin Type Suitability')
+
+      click_button 'Save Changes'
+      expect(page).to have_current_path(/property_mappings\/#{property_mapping.id}$/, wait: 10)
+
+      visit company_table_config_path(company, table_config)
+      expect(page).to have_selector('table', wait: 10)
+      expect(page).to have_content('Skin Type Suitability')
+    end
+
+    scenario "removing a field in PropertyMapping syncs to TableConfig" do
+      visit edit_company_property_mapping_path(company, property_mapping)
+      expect(page).to have_selector('form', wait: 10)
+
+      first_delete = first('[data-action*="removeProperty"]')
+      first_delete.click
+
+      click_button 'Save Changes'
+      expect(page).to have_current_path(/property_mappings\/#{property_mapping.id}$/, wait: 10)
+
+      visit company_table_config_path(company, table_config)
+      expect(page).to have_selector('table', wait: 10)
+      expect(page).not_to have_content('Skin Type')
+    end
+  end
 end
