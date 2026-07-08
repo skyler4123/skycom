@@ -4,7 +4,10 @@ class HomeController < ApplicationController
   def index
     respond_to do |format|
       format.html do
-        cookies.clear if !current_session
+        if !current_session
+          cookies.delete(:session_token)
+          cookies.delete(:is_signed_in)
+        end
       end
       # format.json do
       # end

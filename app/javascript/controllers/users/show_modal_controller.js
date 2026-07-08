@@ -78,6 +78,6 @@ export default class Users_ShowModalController extends Controller {
 
   close(event) {
     event.preventDefault()
-    closeModal()
+    window.closeModal()
   }
 }

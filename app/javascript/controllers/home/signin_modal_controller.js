@@ -7,7 +7,7 @@ export default class Home_SigninModalController extends Controller {
 
   closeModal(event) {
     event.preventDefault()
-    closeModal()
+    window.closeModal()
   }
 
   modalHTML() {
@@ -53,6 +53,7 @@ export default class Home_SigninModalController extends Controller {
               role="sign-in-form"
               action="${Helpers.sign_in_path()}"
               method="POST"
+              data-turbo="false"
               class="">
               ${Helpers.formPostSecurityTags()}
               <div class="space-y-4">
