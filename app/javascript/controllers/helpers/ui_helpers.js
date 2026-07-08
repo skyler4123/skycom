@@ -328,7 +328,7 @@ export const pagination = (dataValue, classNames = "") => `
  * @param {('success'|'error'|'info'|'warning'|'normal')} options.type - The status type.
  * @param {string} options.message - The text to display.
  */
-export const toast = ({ type = "normal", message = "" }) => {
+export const toast = ({ type = "normal", message = "", duration = 3000 }) => {
   const themes = {
     success: "!bg-green-600 text-white border-green-700 shadow-lg",
     error:   "!bg-red-600 text-white border-red-700 shadow-lg",
@@ -341,7 +341,7 @@ export const toast = ({ type = "normal", message = "" }) => {
 
   Toastify({
     text: message || (type === "success" ? "Success!" : "Notice"),
-    duration: 3000,
+    duration: duration,
     gravity: "top",
     position: "right",
     stopOnFocus: true,

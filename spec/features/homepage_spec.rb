@@ -84,11 +84,33 @@ RSpec.feature "Homepage", type: :feature, js: true do
 
       click_button "Create Company"
 
-      # Modal closes after success - wait for it to disappear
-      expect(page).not_to have_selector('input[name="company[name]"]', wait: 10)
+      # Wait for page transition and check path
+      expect(page).to have_current_path(%r{/companies/[^/]+/dashboards}, wait: 10)
+      expect(page).to have_text("Company created successfully!", wait: 10)
 
       # Verify database record created
       expect(Company.find_by(name: "Test New Company")).to be_present
+    end
+
+    it "shows error when company name is duplicate" do
+      create(:company, user: user, name: "Test Company")
+
+      visit root_path
+
+      click_button "New Company"
+
+      expect(page).to have_selector('input[name="company[name]"]', wait: 10)
+      fill_in "company[name]", with: "Test Company"
+      select "Retail", from: "company[business_type]"
+
+      click_button "Create Company"
+
+      # Validation failure redirects to root with an alert
+      expect(page).to have_current_path(root_path, wait: 10)
+      expect(page).to have_content(/already been taken|error/i)
+
+      # Verify no duplicate was created
+      expect(Company.where(name: "Test Company").count).to eq(1)
     end
   end
 end
