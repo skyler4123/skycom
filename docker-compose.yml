@@ -25,6 +25,8 @@ services:
       - postgres
       - pulse_postgres
       - minio
+      - centrifugo
+
   job:
     build: .
     command: bash -c "sleep 15 && bundle exec rails db:prepare && bin/jobs"
@@ -37,6 +39,7 @@ services:
     depends_on:
       - web
       - pulse_postgres
+      - centrifugo
 
   postgres:
     image: postgres:18.3
@@ -47,35 +50,6 @@ services:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql
-
-  # mongo:
-  #   image: mongo
-  #   ports:
-  #     - "27017:27017"
-  #   volumes:
-  #     - mongo_data:/data/db
-
-  # grafana:
-  #   # username: admin
-  #   # password: admin
-  #   image: grafana/otel-lgtm
-  #   volumes:
-  #     - grafana_data:/data
-  #   ports:
-  #     - "3000:3000" # Grafana
-  #     - "4317:4317" # OpenTelemetry
-  #     - "4318:4318" # OpenTelemetry
-  #     - "9090:9090" # Prometheus
-  #     - "3100:3100" # Loki
-
-  # For Selenium test
-  # selenium-chromium:
-  #   image: selenium/standalone-chromium:latest
-  #   shm_size: '2gb'
-  #   ports:
-  #     - "4444:4444"
-  #     - "5900:5900"
-  #     - "7900:7900"
  
   # MinIO Service
   minio:
@@ -139,12 +113,35 @@ services:
     volumes:
       - openobserve_data:/data
 
+  # Centrifugo Real-time Core WebSocket Engine
+  centrifugo:
+    image: centrifugo/centrifugo:v5
+    volumes:
+      - centrifugo_data:/centrifugo
+    ports:
+      - "8000:8000"
+    command: centrifugo --client_insecure=false --api_insecure=false
+    environment:
+      CENTRIFUGO_ALLOWED_ORIGINS: "http://localhost:3000"
+      # Administrative Backend API Token (Matches Rails CENTRIFUGO_API_KEY)
+      CENTRIFUGO_API_KEY: "skycom_super_secret_api_key_2026"
+      # Secure Verification Engine Token (Matches Rails CENTRIFUGO_TOKEN_HMAC_SECRET_KEY)
+      CENTRIFUGO_TOKEN_HMAC_SECRET_KEY: "skycom_jwt_hmac_secret_token_key_2026"
+      # Enable Centrifugo Administrative Dashboard Interface
+      CENTRIFUGO_ADMIN: "true"
+      CENTRIFUGO_ADMIN_PASSWORD: "Password@123"
+      CENTRIFUGO_ADMIN_SECRET: "Password@123"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
 volumes:
   postgres_data:
-  pulse_postgres_data:
   mongo_data:
   grafana_data:
   minio_data:
   sqlite_storage:
   redis_data:
   openobserve_data:
+  centrifugo_data:
