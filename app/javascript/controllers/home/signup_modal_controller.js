@@ -7,7 +7,7 @@ export default class Home_SignupModalController extends Controller {
 
   closeModal(event) {
     event.preventDefault()
-    closeModal()
+    window.closeModal()
   }
 
   modalHTML() {
@@ -55,6 +55,7 @@ export default class Home_SignupModalController extends Controller {
               role="sign-up-form"
               action="${Helpers.sign_up_path()}"
               method="POST"
+              data-turbo="false"
               class="">
               ${Helpers.formPostSecurityTags()}
               <div class="space-y-4">

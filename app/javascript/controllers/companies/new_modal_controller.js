@@ -7,6 +7,11 @@ export default class Companies_NewModalController extends Controller {
     this.element.innerHTML = this.modalHTML()
   }
 
+  closeModal(event) {
+    event.preventDefault()
+    window.closeModal()
+  }
+
   handleSubmit() {
     toast({
       type: "info",
