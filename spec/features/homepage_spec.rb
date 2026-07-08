@@ -73,6 +73,28 @@ RSpec.feature "Homepage", type: :feature, js: true do
       expect(page).to have_selector('select[name="company[business_type]"]')
     end
 
+    it "closes New Company modal via X button" do
+      visit root_path
+
+      click_button "New Company"
+      expect(page).to have_selector('input[name="company[name]"]', wait: 10)
+
+      find('[data-action*="closeModal"]', match: :first).click
+
+      expect(page).not_to have_selector('input[name="company[name]"]', wait: 5)
+    end
+
+    it "closes New Company modal via Cancel button" do
+      visit root_path
+
+      click_button "New Company"
+      expect(page).to have_selector('input[name="company[name]"]', wait: 10)
+
+      click_button "Cancel"
+
+      expect(page).not_to have_selector('input[name="company[name]"]', wait: 5)
+    end
+
     it "can create a new company via modal form" do
       visit root_path
 
