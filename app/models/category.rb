@@ -1,7 +1,7 @@
 class Category < ApplicationRecord
   attribute :permission_resource_name, :string, default: -> { self.name }
 
-  belongs_to :company
+  belongs_to :company, touch: true
 
   has_many :property_mappings, dependent: :destroy
   has_many :table_configs, dependent: :destroy

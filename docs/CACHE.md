@@ -234,7 +234,52 @@ When the cookie has expired, `serverVersion` is `undefined`. The `sync()` method
 
 ---
 
-## 12. See Also
+## 12. Client Cache Invalidation
+
+The client cache auto-refreshes when the `client_cache_version` cookie changes on the server side.
+
+### How Invalidation Works
+
+1. **Cookie version** is computed from `user.updated_at` + `Company.maximum(:updated_at)` in `ApplicationController::CookieConcern#cache_version`
+2. **`touch: true` propagation**: When a cache-affecting record changes, it touches its parent company, bumping `company.updated_at`
+3. **`sync_client_cache_version`** (before_action on every request) detects the version change and updates the `client_cache_version` cookie
+4. **Frontend `ClientCacheController.sync()`** (on every page load) reads the cookie and compares with localStorage — if they differ, it re-fetches `/client_cache`
+
+### Models That Auto-Invalidate
+
+These models have `belongs_to :company, touch: true`, so any create/update/destroy propagates to the company's `updated_at`:
+
+| Model | File |
+|-------|------|
+| `Branch` | `app/models/branch.rb:18` |
+| `Department` | `app/models/department.rb:29` |
+| `Category` | `app/models/category.rb:4` |
+| `PropertyMapping` | `app/models/property_mapping.rb:55` |
+| `TableConfig` | `app/models/table_config.rb:12` |
+| `Role` | `app/models/role.rb:10` |
+
+### Manual Invalidation
+
+```ruby
+company.invalidate_client_cache!  # bumps company.updated_at, triggers refresh
+```
+
+This is defined in `app/models/company.rb`.
+
+### The Propagation Chain
+
+```
+PropertyMapping.create/update/destroy
+  → belongs_to :company, touch: true
+    → company.touch → company.updated_at changes
+      → sync_client_cache_version updates cookie
+        → ClientCacheController.sync() detects mismatch
+          → re-fetches /client_cache → localStorage refreshed
+```
+
+---
+
+## 13. See Also
 
 - `docs/LOCAL_AND_GLOBAL_CACHE.md` — Server-side dual cache (Solid Cache + Redis) used by Rails backend
 

@@ -134,6 +134,10 @@ class Company < ApplicationRecord
 
   after_create :setup_owner_records
 
+  def invalidate_client_cache!
+    touch
+  end
+
   def create_first_cloned_company
     return if branches.size > 1
     branches.create(

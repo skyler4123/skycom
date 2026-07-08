@@ -13,19 +13,19 @@ RSpec.describe DynamicValidationConcern do
 
   before do
     property_mapping.update!(property_metadata: [
-      { "key" => "property_string_1", "name" => "brand", "type" => "string", "label" => "Brand",
+      { "key" => "property_string_1", "type" => "string", "name" => "Brand",
         "validates" => { "presence" => true, "length" => { "minimum" => 2, "maximum" => 50 } } },
-      { "key" => "property_string_2", "name" => "sku_code", "type" => "string", "label" => "SKU Code",
+      { "key" => "property_string_2", "type" => "string", "name" => "SKU Code",
         "validates" => { "format" => { "with" => "^SKU-" } } },
-      { "key" => "property_integer_1", "name" => "quantity", "type" => "integer", "label" => "Quantity",
+      { "key" => "property_integer_1", "type" => "integer", "name" => "Quantity",
         "validates" => { "numericality" => { "greater_than_or_equal_to" => 0, "less_than" => 10000 } } },
-      { "key" => "property_decimal_1", "name" => "price", "type" => "decimal", "label" => "Price",
+      { "key" => "property_decimal_1", "type" => "decimal", "name" => "Price",
         "validates" => { "numericality" => { "greater_than_or_equal_to" => 0 } } },
-      { "key" => "property_boolean_1", "name" => "is_active", "type" => "boolean", "label" => "Active",
+      { "key" => "property_boolean_1", "type" => "boolean", "name" => "Active",
         "validates" => { "inclusion" => { "in" => [ true, false ] } } },
-      { "key" => "property_text_1", "name" => "notes", "type" => "text", "label" => "Notes",
+      { "key" => "property_text_1", "type" => "text", "name" => "Notes",
         "validates" => {} },
-      { "key" => "property_decimal_2", "name" => "discount", "type" => "decimal", "label" => "Discount",
+      { "key" => "property_decimal_2", "type" => "decimal", "name" => "Discount",
         "validates" => { "numericality" => { "only_integer" => true, "greater_than_or_equal_to" => 0, "less_than_or_equal_to" => 100 } } }
     ])
   end

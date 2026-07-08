@@ -41,10 +41,9 @@
 #
 #   key:        String  — The resource column this config describes
 #                        (e.g. "property_string_1"). Required.
-#   name:       String  — System identifier (underscored, e.g. "skin_type").
+#   name:       String  — Human-readable display name. Required.
 #   type:       String  — One of: string, text, integer, decimal, boolean,
 #                        datetime. Derivable from the key prefix.
-#   label:      String  — Human-readable display name. Required.
 #   validates:  Hash    — Validation rules (future use, currently {}).
 
 class PropertyMapping < ApplicationRecord
@@ -53,7 +52,7 @@ class PropertyMapping < ApplicationRecord
   attribute :property_metadata, :jsonb, default: []
   attribute :metadata, :jsonb, default: {}
 
-  belongs_to :company
+  belongs_to :company, touch: true
   belongs_to :category
 
   has_many :table_configs, dependent: :destroy
@@ -115,6 +114,51 @@ class PropertyMapping < ApplicationRecord
 
   validate :validate_property_metadata
   validate :must_have_table_config
+  after_update :sync_table_configs, if: :saved_change_to_property_metadata?
+
+  def sync_table_configs
+    pm_property_keys = property_metadata.select { |pm| pm["key"].to_s.start_with?("property_") }
+    pm_keys = pm_property_keys.map { |pm| pm["key"] }
+
+    table_configs.reset.each do |tc|
+      columns = tc.columns_metadata.dup
+      changed = false
+
+      original_size = columns.size
+      columns.reject! { |col| col["key"].to_s.start_with?("property_") && !pm_keys.include?(col["key"]) }
+      changed ||= columns.size != original_size
+
+      columns.each do |col|
+        next unless col["key"].to_s.start_with?("property_")
+        pm_entry = pm_property_keys.find { |pm| pm["key"] == col["key"] }
+        next unless pm_entry
+        next if pm_entry["name"] == col["name"]
+
+        col["name"] = pm_entry["name"]
+        changed = true
+      end
+
+      pm_keys.each do |key|
+        next if columns.any? { |c| c["key"] == key }
+        pm_entry = pm_property_keys.find { |pm| pm["key"] == key }
+        columns << {
+          "key" => key,
+          "name" => pm_entry["name"],
+          "visible" => true,
+          "sortable" => true,
+          "align" => "left",
+          "pinned" => nil,
+          "width" => nil,
+          "roles" => [],
+          "is_virtual" => false,
+          "render_config" => {}
+        }
+        changed = true
+      end
+
+      tc.update_columns(columns_metadata: columns) if changed
+    end
+  end
 
   private
 
@@ -147,16 +191,16 @@ class PropertyMapping < ApplicationRecord
         next
       end
 
-      label = entry["label"]
-      if label.blank?
-        errors.add(:property_metadata, "element #{idx}: label is required")
+      name = entry["name"]
+      if name.blank?
+        errors.add(:property_metadata, "element #{idx}: name is required")
       end
 
       prefix = key.to_s.sub(/_\d+\z/, "").to_sym
       supported = SUPPORTED_KEYS[prefix]
 
       if supported
-        unexpected = entry.keys - supported - %w[key name type label validates]
+        unexpected = entry.keys - supported - %w[key type name validates]
         if unexpected.any?
           errors.add(:property_metadata, "element #{idx}: unsupported keys #{unexpected.join(", ")} for #{key}. Supported: #{supported.join(", ")}")
         end

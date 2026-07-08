@@ -57,9 +57,9 @@ export default class Companies_Orders_IndexController extends Companies_LayoutCo
     }, {})
 
     const fallbackColumns = [
-      { key: "name", label: translate("Order Name") },
-      { key: "code", label: translate("Order Code") },
-      { key: "workflow_status", label: translate("Status") }
+      { key: "name", name: translate("Order Name") },
+      { key: "code", name: translate("Order Code") },
+      { key: "workflow_status", name: translate("Status") }
     ]
 
     const rawColumns = this.currentTableConfig()?.columns_metadata || fallbackColumns
@@ -67,7 +67,7 @@ export default class Companies_Orders_IndexController extends Companies_LayoutCo
 
     if (!visibleColumns.some(c => c.key === "category")) {
       const nameIdx = visibleColumns.findIndex(c => c.key === "name")
-      if (nameIdx >= 0) visibleColumns.splice(nameIdx + 1, 0, { key: "category", label: translate("Category") })
+      if (nameIdx >= 0) visibleColumns.splice(nameIdx + 1, 0, { key: "category", name: translate("Category") })
     }
 
     return `

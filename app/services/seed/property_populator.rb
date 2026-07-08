@@ -81,7 +81,7 @@ class Seed::PropertyPopulator
       key = config["key"]
       next if key.blank?
 
-      label = config["label"]
+      label = config["name"]
       next if label.blank?
       next unless record.class.column_names.include?(key)
 

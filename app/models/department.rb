@@ -26,7 +26,7 @@ class Department < ApplicationRecord
   }, prefix: true
 
   # --- Associations ---
-  belongs_to :company
+  belongs_to :company, touch: true
   belongs_to :category
   belongs_to :property_mapping
 

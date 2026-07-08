@@ -50,10 +50,10 @@ export default class Companies_Facilities_IndexController extends Companies_Layo
     const propertyMapping = this.currentPropertyMapping()
 
     const fallbackColumns = [
-      { key: "name", label: translate("Facility Name") },
-      { key: "code", label: translate("Code") },
-      { key: "business_type", label: translate("Type") },
-      { key: "workflow_status", label: translate("Status") }
+      { key: "name", name: translate("Facility Name") },
+      { key: "code", name: translate("Code") },
+      { key: "business_type", name: translate("Type") },
+      { key: "workflow_status", name: translate("Status") }
     ]
 
     const rawColumns = tableConfig?.columns_metadata || fallbackColumns
@@ -61,7 +61,7 @@ export default class Companies_Facilities_IndexController extends Companies_Layo
 
     if (!visibleColumns.some(c => c.key === "category")) {
       const nameIdx = visibleColumns.findIndex(c => c.key === "name")
-      if (nameIdx >= 0) visibleColumns.splice(nameIdx + 1, 0, { key: "category", label: translate("Category") })
+      if (nameIdx >= 0) visibleColumns.splice(nameIdx + 1, 0, { key: "category", name: translate("Category") })
     }
 
     const mappingLookup = (propertyMapping?.property_metadata || []).reduce((acc, field) => {

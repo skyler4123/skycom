@@ -86,7 +86,7 @@ export default class Companies_Orders_EditController extends Companies_LayoutCon
             }
             return `
               <div>
-                <label class="text-xs font-medium text-slate-500">${field.label}</label>
+                <label class="text-xs font-medium text-slate-500">${field.name}</label>
                 ${inputHTML}
               </div>
             `

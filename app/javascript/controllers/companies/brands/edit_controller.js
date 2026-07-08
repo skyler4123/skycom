@@ -80,7 +80,7 @@ export default class Companies_Brands_EditController extends Companies_LayoutCon
             }
             return `
               <div>
-                <label class="text-xs font-medium text-slate-500 dark:text-gray-400">${field.label}</label>
+                <label class="text-xs font-medium text-slate-500 dark:text-gray-400">${field.name}</label>
                 ${inputHTML}
               </div>`
           }).join('')}

@@ -67,12 +67,10 @@ class Seed::CategoryService
   def self.build_property_metadata(entries)
     entries.map do |key, label|
       type = TYPE_FROM_KEY[key.to_s] || "string"
-      name = label.to_s.parameterize.underscore.tr("-", "_")
       {
         "key" => key.to_s,
-        "name" => name,
         "type" => type,
-        "label" => label.to_s,
+        "name" => label.to_s,
         "validates" => build_validates(type)
       }
     end

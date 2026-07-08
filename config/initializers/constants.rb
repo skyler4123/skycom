@@ -284,12 +284,12 @@ REDIS_SCAN_COUNT = 100
 # Allowed metadata keys per property type in PropertyMapping#property_metadata.
 # Used by PropertyMapping#validate_property_metadata.
 PROPERTY_MAPPING_SUPPORTED_KEYS = {
-  property_string:  %w[label input_type placeholder suffix prefix default].freeze,
-  property_text:    %w[label input_type placeholder default].freeze,
-  property_integer: %w[label input_type placeholder suffix prefix default min max options].freeze,
-  property_decimal: %w[label input_type placeholder suffix prefix default currency precision].freeze,
-  property_boolean: %w[label input_type placeholder suffix prefix default true_label false_label].freeze,
-  property_datetime: %w[label input_type placeholder suffix prefix default format timezone].freeze
+  property_string:  %w[input_type placeholder suffix prefix default].freeze,
+  property_text:    %w[input_type placeholder default].freeze,
+  property_integer: %w[input_type placeholder suffix prefix default min max options].freeze,
+  property_decimal: %w[input_type placeholder suffix prefix default currency precision].freeze,
+  property_boolean: %w[input_type placeholder suffix prefix default true_label false_label].freeze,
+  property_datetime: %w[input_type placeholder suffix prefix default format timezone].freeze
 }.freeze
 
 # Allowed input_type values per property type.

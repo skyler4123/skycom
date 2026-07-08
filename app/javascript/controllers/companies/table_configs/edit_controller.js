@@ -50,8 +50,16 @@ export default class Companies_TableConfigs_EditController extends Companies_Lay
             class="w-full px-2 py-1 text-xs font-mono border border-slate-200 dark:border-slate-600 rounded bg-white dark:bg-slate-800 text-slate-900 dark:text-white">
         </td>
         <td class="py-2 px-3">
-          <input type="text" name="table_config[columns_metadata][${index}][label]" value="${col.label || ''}"
-            class="w-full px-2 py-1 text-xs border border-slate-200 dark:border-slate-600 rounded bg-white dark:bg-slate-800 text-slate-900 dark:text-white">
+          ${col.key.startsWith('property_') ? `
+            <input type="text" name="table_config[columns_metadata][${index}][name]" value="${col.name || ''}"
+              class="w-full px-2 py-1 text-xs border border-slate-200 dark:border-slate-600 rounded bg-slate-50 dark:bg-slate-700 text-slate-400 cursor-not-allowed"
+              readonly
+              ${tooltip(translate("This field is synced from PropertyMapping. Please access the Property Mapping edit page to update this name."))}
+            >
+          ` : `
+            <input type="text" name="table_config[columns_metadata][${index}][name]" value="${col.name || ''}"
+              class="w-full px-2 py-1 text-xs border border-slate-200 dark:border-slate-600 rounded bg-white dark:bg-slate-800 text-slate-900 dark:text-white">
+          `}
         </td>
         <td class="py-2 px-3 text-center">
           <input type="hidden" name="table_config[columns_metadata][${index}][visible]" value="false">
@@ -153,7 +161,7 @@ export default class Companies_TableConfigs_EditController extends Companies_Lay
               <thead>
                 <tr class="text-xs text-slate-500 dark:text-slate-400 bg-slate-50 dark:bg-slate-800/50 border-b border-slate-200 dark:border-gray-800">
                   <th class="py-2 px-3 font-medium">${translate("Key")}</th>
-                  <th class="py-2 px-3 font-medium">${translate("Label")}</th>
+                  <th class="py-2 px-3 font-medium">${translate("Name")}</th>
                   <th class="py-2 px-3 font-medium text-center">${translate("Vis")}</th>
                   <th class="py-2 px-3 font-medium text-center">${translate("Sort")}</th>
                   <th class="py-2 px-3 font-medium">${translate("Align")}</th>
@@ -204,7 +212,7 @@ export default class Companies_TableConfigs_EditController extends Companies_Lay
   addColumn() {
     this.columnsMetadata.push({
       key: 'name',
-      label: '',
+      name: '',
       visible: true,
       sortable: true,
       align: 'left',
@@ -236,8 +244,16 @@ export default class Companies_TableConfigs_EditController extends Companies_Lay
             class="w-full px-2 py-1 text-xs font-mono border border-slate-200 dark:border-slate-600 rounded bg-white dark:bg-slate-800 text-slate-900 dark:text-white">
         </td>
         <td class="py-2 px-3">
-          <input type="text" name="table_config[columns_metadata][${index}][label]" value="${col.label || ''}"
-            class="w-full px-2 py-1 text-xs border border-slate-200 dark:border-slate-600 rounded bg-white dark:bg-slate-800 text-slate-900 dark:text-white">
+          ${col.key.startsWith('property_') ? `
+            <input type="text" name="table_config[columns_metadata][${index}][name]" value="${col.name || ''}"
+              class="w-full px-2 py-1 text-xs border border-slate-200 dark:border-slate-600 rounded bg-slate-50 dark:bg-slate-700 text-slate-400 cursor-not-allowed"
+              readonly
+              ${tooltip(translate("This field is synced from PropertyMapping. Please access the Property Mapping edit page to update this name."))}
+            >
+          ` : `
+            <input type="text" name="table_config[columns_metadata][${index}][name]" value="${col.name || ''}"
+              class="w-full px-2 py-1 text-xs border border-slate-200 dark:border-slate-600 rounded bg-white dark:bg-slate-800 text-slate-900 dark:text-white">
+          `}
         </td>
         <td class="py-2 px-3 text-center">
           <input type="hidden" name="table_config[columns_metadata][${index}][visible]" value="false">

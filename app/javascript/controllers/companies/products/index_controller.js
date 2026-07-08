@@ -50,9 +50,9 @@ export default class Companies_Products_IndexController extends Companies_Layout
     const propertyMapping = this.currentPropertyMapping()
 
     const fallbackColumns = [
-      { key: "name", label: translate("Product Name") },
-      { key: "code", label: translate("Product Code") },
-      { key: "workflow_status", label: translate("Status") }
+      { key: "name", name: translate("Product Name") },
+      { key: "code", name: translate("Product Code") },
+      { key: "workflow_status", name: translate("Status") }
     ]
 
     const rawColumns = tableConfig?.columns_metadata || fallbackColumns
@@ -60,7 +60,7 @@ export default class Companies_Products_IndexController extends Companies_Layout
 
     if (!visibleColumns.some(c => c.key === "category")) {
       const nameIdx = visibleColumns.findIndex(c => c.key === "name")
-      if (nameIdx >= 0) visibleColumns.splice(nameIdx + 1, 0, { key: "category", label: translate("Category") })
+      if (nameIdx >= 0) visibleColumns.splice(nameIdx + 1, 0, { key: "category", name: translate("Category") })
     }
 
     const mappingLookup = (propertyMapping?.property_metadata || []).reduce((acc, field) => {
