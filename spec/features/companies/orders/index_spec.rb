@@ -168,4 +168,9 @@ RSpec.feature "Companies::Orders Management", type: :feature, js: true do
       expect(edit_link).to be_present
     end
   end
+
+  describe "client cache invalidation" do
+    include_examples "client cache invalidation",
+      resource_name: "orders"
+  end
 end

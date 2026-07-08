@@ -52,7 +52,7 @@ class PropertyMapping < ApplicationRecord
   attribute :property_metadata, :jsonb, default: []
   attribute :metadata, :jsonb, default: {}
 
-  belongs_to :company
+  belongs_to :company, touch: true
   belongs_to :category
 
   has_many :table_configs, dependent: :destroy

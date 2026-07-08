@@ -7,6 +7,10 @@ RSpec.feature "Companies::Facilities Management", type: :feature, js: true do
 
   let!(:facility) { create(:facility, company: company, branch: branch) }
 
+  let!(:default_category) do
+    Seed::CategoryService.find_or_create_for(company: company, resource_name: "facilities")
+  end
+
   before do
     sign_in(owner)
   end
@@ -102,5 +106,10 @@ RSpec.feature "Companies::Facilities Management", type: :feature, js: true do
       edit_link = find("a[href*='/table_configs/#{test_table_config.id}/edit']", match: :first)
       expect(edit_link).to be_present
     end
+  end
+
+  describe "client cache invalidation" do
+    include_examples "client cache invalidation",
+      resource_name: "facilities"
   end
 end

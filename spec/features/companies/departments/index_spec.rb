@@ -159,4 +159,9 @@ RSpec.feature "Companies::Departments Management", type: :feature, js: true do
       expect(edit_link).to be_present
     end
   end
+
+  describe "client cache invalidation" do
+    include_examples "client cache invalidation",
+      resource_name: "departments"
+  end
 end
