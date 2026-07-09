@@ -224,6 +224,86 @@ export default class Companies_Billing_ShowController extends Companies_LayoutCo
     `
   }
 
+  toggleSwitchHTML(f) {
+    const checked = f.active ? 'checked' : ''
+    return `
+      <label class="relative inline-flex items-center cursor-pointer">
+        <input type="checkbox" ${checked}
+          data-action="change->${this.identifier}#toggleFeature"
+          data-${this.identifier}-feature-key-param="${f.key}"
+          class="sr-only peer" />
+        <div class="w-9 h-5 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-blue-600 dark:bg-slate-600 dark:peer-checked:bg-blue-500"></div>
+      </label>
+    `
+  }
+
+  openTopUpModal() {
+    openModal({
+      html: `
+        <div class="p-6 bg-white dark:bg-slate-900 rounded-xl w-[420px] shadow-2xl">
+          <div class="flex items-center justify-between mb-4">
+            <h2 class="text-lg font-bold text-slate-900 dark:text-white">${translate("Top Up Wallet")}</h2>
+            <button data-action="click->modal#close" class="p-1 text-slate-400 hover:text-slate-600 cursor-pointer">
+              <span class="material-symbols-outlined">close</span>
+            </button>
+          </div>
+          <div class="space-y-4">
+            <div>
+              <label class="text-[10px] font-bold text-slate-400 dark:text-slate-300 uppercase tracking-wider">${translate("Amount")} (${this.currency})</label>
+              <input type="number" id="top-up-amount" min="1" step="1" required
+                placeholder="e.g. 1000"
+                class="w-full mt-1 px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-sm text-slate-900 dark:text-white" />
+              <p class="text-xs text-slate-400 mt-1">${translate("Amount in cents (1000 = $10.00)")}</p>
+            </div>
+            <button type="button" data-action="click->${this.identifier}#confirmTopUp"
+              class="w-full px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-bold text-sm cursor-pointer transition-colors">
+              ${translate("Confirm Top Up")}
+            </button>
+          </div>
+        </div>
+      `
+    })
+  }
+
+  async confirmTopUp(event) {
+    const amountInput = document.getElementById("top-up-amount")
+    if (!amountInput) return
+
+    const amountCents = parseInt(amountInput.value, 10)
+    if (!amountCents || amountCents <= 0) {
+      toast({ type: "error", message: translate("Please enter a valid amount") })
+      return
+    }
+
+    const companyId = window.location.pathname.split("/")[2]
+
+    try {
+      await fetchJson(`/companies/${companyId}/billing/top_up`, {
+        method: "POST",
+        body: JSON.stringify({ amount_cents: amountCents })
+      })
+      closeModal()
+      reloadThenToast({ type: "success", message: translate("Wallet topped up successfully") })
+    } catch (error) {
+      toast({ type: "error", message: error.errors?.join(", ") || translate("Top up failed") })
+    }
+  }
+
+  async toggleFeature(event) {
+    const featureKey = event.params.featureKey
+    const companyId = window.location.pathname.split("/")[2]
+
+    try {
+      await fetchJson(`/companies/${companyId}/billing/toggle_feature`, {
+        method: "POST",
+        body: JSON.stringify({ feature_key: featureKey })
+      })
+      reloadThenToast({ type: "success", message: translate("Feature updated") })
+    } catch (error) {
+      toast({ type: "error", message: error.errors?.join(", ") || translate("Failed to toggle feature") })
+    }
+  }
+
   async payAll(event) {
     event.preventDefault()
     const companyId = window.location.pathname.split("/")[2]
@@ -271,10 +351,15 @@ export default class Companies_Billing_ShowController extends Companies_LayoutCo
               <div class="flex items-center justify-center w-10 h-10 rounded-lg bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400">
                 <span class="material-symbols-outlined text-[22px]">account_balance_wallet</span>
               </div>
-              <div>
+              <div class="flex-1">
                 <div class="text-2xl font-black text-slate-900 dark:text-white">${this.formatCents(this.wallet?.total_cents)}</div>
                 <div class="text-xs text-slate-500">${translate("Main:")} ${this.formatCents(this.wallet?.main_balance_cents)} · ${translate("Promo:")} ${this.formatCents(this.wallet?.promo_balance_cents)}</div>
               </div>
+              <button type="button"
+                data-action="click->${this.identifier}#openTopUpModal"
+                class="px-3 py-1.5 text-xs font-bold bg-blue-600 hover:bg-blue-700 text-white rounded-lg cursor-pointer transition-colors whitespace-nowrap">
+                ${translate("Top Up")}
+              </button>
             </div>
           </div>
 
@@ -368,7 +453,7 @@ export default class Companies_Billing_ShowController extends Companies_LayoutCo
                       <tr class="border-b border-slate-100 dark:border-slate-800 text-sm">
                         <td class="py-3 pr-4 font-medium text-slate-900 dark:text-white">${f.name}</td>
                         <td class="py-3 pr-4 text-right text-slate-700 dark:text-slate-300">${this.formatCents(f.monthly_price_cents)}/mo</td>
-                        <td class="py-3 pr-4">${this.statusBadge(f.active)}</td>
+                        <td class="py-3 pr-4">${this.toggleSwitchHTML(f)}</td>
                         <td class="py-3 text-right ${f.active_days > 0 ? "text-slate-700 dark:text-slate-300" : "text-slate-400"}">${f.active_days}</td>
                       </tr>
                     `).join("")

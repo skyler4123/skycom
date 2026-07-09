@@ -16,6 +16,7 @@ The client cache stores:
 - **Roles**: Roles per company
 - **Enums**: Lifecycle statuses and other enum values
 - **Employees**: Employee records for the current company
+- **Billing Contract Summary**: Per-company contract type and enabled feature list (used by `featureEnabled()` for frontend gating)
 
 ---
 
@@ -38,7 +39,17 @@ The client cache stores:
 {
   "user": { "id": "...", "email": "...", "name": "...", "avatar": "..." },
   "companies": [
-    { "id": "...", "name": "...", "branches": [...], "departments": [...], "roles": [...] }
+    {
+      "id": "...",
+      "name": "...",
+      "branches": [...],
+      "departments": [...],
+      "roles": [...],
+      "billing_contract_summary": {
+        "contract_type": "basic",
+        "enabled_features": ["pos_basic", "inventory_basic", "crm_basic", "finance_basic"]
+      }
+    }
   ],
   "enums": {
     "employee": { "lifecycle_statuses": [{ "name": "Active", "value": "active" }] }
@@ -136,10 +147,43 @@ const cache = Helpers.getCache()  // → { user, companies, enums, employees }
 | `currentRoles()` | Returns roles of current company |
 | `Enums()` | Returns all enum definitions |
 | `getCache()` | Returns full cache object |
+| `currentBillingContractSummary()` | Returns `{ contract_type, enabled_features }` or null |
+| `featureEnabled(key)` | Checks if a feature key is in `enabled_features` |
 
 ---
 
-## 9. Example: Permission Check with Cached Roles
+## 9. Example: Feature Gating with Cached Billing Contract
+
+```javascript
+import { featureEnabled } from "controllers/helpers/auth_helpers"
+
+export default class Companies_ProductsIndexController extends Companies_LayoutController {
+  canAccessAdvancedInventory() {
+    return featureEnabled("inventory_advanced")
+  }
+}
+```
+
+### Sidebar Usage
+
+The `layout_controller.js` uses `featureEnabled()` to conditionally render sidebar links:
+
+```javascript
+sidebarItems() {
+  const cid = currentCompany().id
+  const link = (featureKey, href, icon, label) => {
+    if (featureKey && !featureEnabled(featureKey)) return ''
+    return `<a href="${href}">${label}</a>`
+  }
+  // ...
+}
+```
+
+When a feature is disabled, its sidebar link is absent — not grayed out, simply not rendered.
+
+---
+
+## 10. Example: Permission Check with Cached Roles
 
 ```javascript
 import { currentRoles } from "controllers/helpers/auth_helpers"
@@ -155,7 +199,7 @@ export default class Companies_ProductsIndexController extends Companies_LayoutC
 
 ---
 
-## 10. When to Clear Cache
+## 11. When to Clear Cache
 
 Clear the cache when:
 - User creates a new company
@@ -165,7 +209,7 @@ Clear the cache when:
 
 ---
 
-## 11. Cookie Expiration & Daily Re-authentication
+## 12. Cookie Expiration & Daily Re-authentication
 
 All session and cache cookies use a **1-day expiration** to force daily re-authentication.
 
@@ -225,7 +269,7 @@ When the cookie has expired, `serverVersion` is `undefined`. The `sync()` method
 
 ---
 
-## 12. Client Cache Invalidation
+## 13. Client Cache Invalidation
 
 The client cache auto-refreshes when the `client_cache_version` cookie changes on the server side.
 
@@ -270,9 +314,10 @@ PropertyMapping.create/update/destroy
 
 ---
 
-## 13. See Also
+## 14. See Also
 
 - `docs/LOCAL_AND_GLOBAL_CACHE.md` — Server-side dual cache (Solid Cache + Redis) used by Rails backend
+- `docs/BILLING.md` — Billing system, feature gating, and wallet management
 
 ---
 

@@ -1,6 +1,8 @@
 # app/controllers/companies/orders_controller.rb
 
 class Companies::OrdersController < Companies::ApplicationController
+  feature_key :pos_basic
+
   def index
     respond_to do |format|
       format.html { render html: "", layout: true }
