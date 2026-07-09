@@ -195,6 +195,8 @@ class Company < ApplicationRecord
 
     Seed::BillingContractService.create(company: self)
 
+    user.update!(system_role: :company_owner)
+
     unless self.class.skip_init
       if business_type_retail?
         Seed::RetailInitService.call(company: self)
