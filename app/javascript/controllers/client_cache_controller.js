@@ -53,9 +53,7 @@ export default class ClientCacheController extends Controller {
       const newCount = parseInt(localStorage.getItem(SYNC_COUNT_KEY) || "0", 10) + 1
       localStorage.setItem(SYNC_COUNT_KEY, String(newCount))
 
-      console.log(`Client cache: synced (run #${newCount}) to version ${newVersion}. Reloading page...`)
-
-      window.location.reload()
+      console.log(`Client cache: synced (run #${newCount}) to version ${newVersion}.`)
     } catch (error) {
       console.error("Client cache: fetch failed —", error)
     }
