@@ -46,7 +46,7 @@ Callbacks defined directly in the model file (not inherited from a concern).
 
 | Callback | Line | Method | Description |
 |----------|------|--------|-------------|
-| `after_create :setup_owner_records` | 104 | `setup_owner_records` | Creates owner infrastructure: (1) Owner `Role` with `business_type: :owner`, (2) "Owner All Access" `Policy` with `resource: "all"` / `action: "all"`, (3) Owner `Employee` linked to the creating user, (4) Both `PolicyAppointment` and `RoleAppointment` with `business_type: :owner`. |
+| `after_create :setup_owner_records` | 104 | `setup_owner_records` | Creates owner infrastructure: (1) Owner `Role` with `business_type: :owner`, (2) "Owner All Access" `Policy` with `resource: "all"` / `action: "all"`, (3) Owner `Employee` linked to the creating user, (4) Both `PolicyAppointment` and `RoleAppointment` with `business_type: :owner`, (5) Sets `user.system_role` to `company_owner` so `accessible_companies` returns the new company. |
 
 ---
 
