@@ -85,6 +85,7 @@ export default class Companies_LayoutController extends Controller {
       link(null, Helpers.company_pages_path(cid), 'description', translate('Pages')),
       link('custom_roles', Helpers.company_permissions_path(cid), 'shield', translate('Permissions')),
       link(null, Helpers.company_billing_path(cid), 'account_balance_wallet', translate('Billing')),
+      link('analytics_dashboard', Helpers.company_analytics_path(cid), 'insights', translate('Analytics')),
       link(null, Helpers.company_facilities_path(cid), 'warehouse', translate('Facilities')),
     ].join('\n')
   }
