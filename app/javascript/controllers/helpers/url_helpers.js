@@ -168,3 +168,5 @@ export const company_stocks_path = (companyId) => `/companies/${companyId}/stock
 export const company_stock_transfers_path = (companyId) => `/companies/${companyId}/stock_transfers`
 export const company_stock_imports_path = (companyId) => `/companies/${companyId}/stock_imports`
 export const company_stock_exports_path = (companyId) => `/companies/${companyId}/stock_exports`
+
+export const company_analytics_path = (companyId) => `/companies/${companyId}/analytics`
