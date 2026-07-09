@@ -28,6 +28,9 @@ export const users_path = () => `/users`
 export const users_update_avatar_path = () => `/users/update_avatar`
 
 export const create_companies_path = () => `/companies`
+export const company_companies_path = (companyId) => `/companies/${companyId}/companies`
+export const edit_company_company_path = (companyId, id) => `/companies/${companyId}/companies/${id}/edit`
+export const company_company_path = (companyId, id) => `/companies/${companyId}/companies/${id}`
 export const company_dashboards_path = (companyId) => `/companies/${companyId}/dashboards`
 
 export const company_branches_path = (companyId) => `/companies/${companyId}/branches`

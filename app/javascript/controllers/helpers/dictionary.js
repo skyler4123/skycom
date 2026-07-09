@@ -107,6 +107,10 @@ export const dictionary = () => {
     "Layout Manifest (JSON)": { vi: "Bố cục (JSON)" },
     "Lifecycle": { vi: "Vòng đời" },
     "Company": { vi: "Công ty" },
+    "Edit company": { vi: "Sửa công ty" },
+    "Edit Company": { vi: "Sửa công ty" },
+    "Company not found.": { vi: "Không tìm thấy công ty." },
+    "Failed to load company.": { vi: "Không thể tải thông tin công ty." },
     "Product": { vi: "Sản phẩm" },
 
     // === Page Titles ===

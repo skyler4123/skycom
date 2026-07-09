@@ -353,10 +353,17 @@ export default class Companies_LayoutController extends Controller {
                         html: `
                           <div class="flex flex-col gap-y-1 w-64">
                             ${currentCompanies().map((company) => `
-                              <a href="${Helpers.company_dashboards_path(company.id)}" 
-                                class="flex items-center gap-3 px-3 py-2 rounded-lg text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 ${currentCompany().id === company.id ? 'bg-gray-100 dark:bg-gray-800 font-bold' : ''}">
-                                <span class="text-sm">${company.name}</span>
-                              </a>`).join("")}
+                              <div class="flex items-center justify-between px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 ${currentCompany().id === company.id ? 'bg-gray-100 dark:bg-gray-800' : ''}">
+                                <a href="${Helpers.company_dashboards_path(company.id)}" 
+                                  class="flex items-center gap-3 flex-1 min-w-0 text-gray-800 dark:text-gray-200 ${currentCompany().id === company.id ? 'font-bold' : ''}">
+                                  <span class="text-sm truncate">${company.name}</span>
+                                </a>
+                                <a href="${Helpers.edit_company_company_path(company.id, company.id)}"
+                                  class="flex items-center justify-center p-1.5 text-slate-400 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg cursor-pointer shrink-0"
+                                  ${tooltip(translate("Edit company"))}>
+                                  <span class="material-symbols-outlined text-[16px]">edit</span>
+                                </a>
+                              </div>`).join("")}
                           </div>
                         `
                       })}
