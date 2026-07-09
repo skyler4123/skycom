@@ -60,6 +60,8 @@ Rails.application.routes.draw do
         end
       end
 
+      resources :companies, only: [ :edit, :update ]
+
       resource :billing, only: :show, controller: :billing do
         post :pay_all, on: :collection
       end
