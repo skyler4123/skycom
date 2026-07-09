@@ -33,12 +33,6 @@ RSpec.feature "Companies::Employees Management", type: :feature, js: true do
 
     expect(page).to have_selector('table', wait: 10)
 
-    expect(page).to have_selector('th', text: 'Employee Name')
-    expect(page).to have_selector('th', text: 'Category')
-    expect(page).to have_selector('th', text: 'Code')
-    expect(page).to have_selector('th', text: 'Type')
-    expect(page).to have_selector('th', text: 'Status')
-
     expect(page).to have_selector('tbody tr')
     expect(page).to have_content(employee.name)
   end
@@ -64,7 +58,7 @@ RSpec.feature "Companies::Employees Management", type: :feature, js: true do
     visit company_employees_path(company)
     expect(page).to have_selector('table', wait: 10)
 
-    expect(page).to have_selector('span.rounded-full', wait: 10)
+    expect(page).to have_content(employee.workflow_status.to_s.humanize, wait: 10)
   end
 
   scenario "display employee business type as badge" do

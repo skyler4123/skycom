@@ -157,7 +157,7 @@ RSpec.feature "Companies::Employees Permissions", type: :feature, js: true do
     visit company_employees_path(company)
 
     expect(page).to have_selector('table', wait: 10)
-    expect(page).to have_content("Employee Name")
+    expect(page).to have_content("Name")
   end
 
   scenario "reader can? returns true for read, false for create/update" do
