@@ -25,6 +25,7 @@ The client cache stores:
 |-----|-------------|
 | `client_cache_data` | JSON blob containing all cached data |
 | `client_cache_version` | Version string for cache invalidation |
+| `client_cache_sync_count` | Auto-sync counter (max 1, resets on version match) |
 
 ---
 
@@ -58,10 +59,9 @@ The backend also sets a `client_cache_version` cookie with a timestamp.
 
 | Method | Description |
 |--------|-------------|
-| `connect()` | Auto-syncs cache on page load |
-| `sync()` | Checks version and refreshes if needed |
-| `refreshCache(newVersion)` | Fetches fresh data from `/client_cache` |
-| `clearClientCache()` | Removes localStorage cache |
+| `connect()` | Guards for signed-in user, then calls `sync()` |
+| `sync()` | Checks version, sync counter, and refreshes if needed |
+| `refreshCache(newVersion)` | Fetches fresh data from `/client_cache`, stores, logs, increments counter, then reloads page |
 
 ### Usage in Layout
 
@@ -78,7 +78,8 @@ Place this in the main layout to ensure cache sync on every page load.
 1. **Page Load**: `ClientCacheController#connect()` calls `sync()`
 2. **Version Check**: Compares `client_cache_version` cookie vs localStorage
 3. **If Mismatch or No Cache**: Fetches from `/client_cache`, stores in localStorage
-4. **Global Event**: Dispatches `client-cache:updated` after refresh
+4. **Reload**: Increments `client_cache_sync_count` counter and reloads the current page so all controllers and components get fresh data from localStorage
+5. **Sync Guard**: Only runs when signed in. Max 1 auto-sync per page session — the `client_cache_sync_count` counter prevents loops. Resets to 0 when versions match.
 
 ---
 
@@ -100,16 +101,6 @@ if (controller) {
   controller.clearClientCache()
   controller.refreshCache('manual')
 }
-```
-
-### Listen for Updates
-Other controllers can listen to the global event:
-
-```javascript
-window.addEventListener('client-cache:updated', (event) => {
-  console.log('Cache updated:', event.detail)
-  // Re-fetch data from Helpers if needed
-})
 ```
 
 ### Using Cache in Controllers
@@ -218,7 +209,7 @@ end
 
 ### Frontend Effect
 
-In `client_cache_controller.js:12`:
+In `client_cache_controller.js`:
 ```javascript
 const serverVersion = Cookie('client_cache_version')
 ```
@@ -243,7 +234,7 @@ The client cache auto-refreshes when the `client_cache_version` cookie changes o
 1. **Cookie version** is computed from `user.updated_at` + `Company.maximum(:updated_at)` in `ApplicationController::CookieConcern#cache_version`
 2. **`touch: true` propagation**: When a cache-affecting record changes, it touches its parent company, bumping `company.updated_at`
 3. **`sync_client_cache_version`** (before_action on every request) detects the version change and updates the `client_cache_version` cookie
-4. **Frontend `ClientCacheController.sync()`** (on every page load) reads the cookie and compares with localStorage — if they differ, it re-fetches `/client_cache`
+4. **Frontend `ClientCacheController.sync()`** (on every page load) reads the cookie and compares with localStorage — if they differ, it re-fetches `/client_cache` and reloads the page
 
 ### Models That Auto-Invalidate
 
@@ -274,7 +265,7 @@ PropertyMapping.create/update/destroy
     → company.touch → company.updated_at changes
       → sync_client_cache_version updates cookie
         → ClientCacheController.sync() detects mismatch
-          → re-fetches /client_cache → localStorage refreshed
+          → re-fetches /client_cache → localStorage refreshed → page reloaded
 ```
 
 ---
