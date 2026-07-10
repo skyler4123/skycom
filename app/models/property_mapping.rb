@@ -50,7 +50,7 @@ class PropertyMapping < ApplicationRecord
   include CategoryConcern
   attribute :permission_resource_name, :string, default: -> { self.name }
   attribute :property_metadata, :jsonb, default: []
-  attribute :metadata, :jsonb, default: {}
+  attribute :metadata, :jsonb, array: true, default: []
 
   belongs_to :company, touch: true
   belongs_to :category

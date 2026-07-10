@@ -1,6 +1,6 @@
 # app/models/price_appointment.rb
 class PriceAppointment < ApplicationRecord
-  attribute :metadata, :jsonb, default: {}
+  attribute :metadata, :jsonb, array: true, default: []
 
   # The "What" (Immutable Facts)
   belongs_to :price

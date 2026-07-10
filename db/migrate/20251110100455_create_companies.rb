@@ -22,6 +22,7 @@ class CreateCompanies < ActiveRecord::Migration[8.0]
       t.integer :fiscal_year_end_month
       t.text :resource_names, array: true
       t.jsonb :features, array: true
+      t.jsonb :ui_configs, array: true
 
       # --- System Fields ---
       t.integer  :lifecycle_status, index: true

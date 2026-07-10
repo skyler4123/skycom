@@ -14,11 +14,12 @@ class Company < ApplicationRecord
     Stock StockTransfer StockImport StockExport
   ]
   attribute :features, :jsonb, array: true, default: []
+  attribute :ui_configs, :jsonb, array: true, default: []
   attribute :promo_balance_cents, :integer, default: 0
   attribute :main_balance_cents, :integer, default: 0
   attribute :soft_debt_threshold_cents, :integer, default: -10000
   attribute :hide_billing_alerts, :boolean, default: false
-  attribute :metadata, :jsonb, default: {}
+  attribute :metadata, :jsonb, array: true, default: []
 
   include AddressConcern
   include Cache::RecordsConcern
