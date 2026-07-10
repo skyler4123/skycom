@@ -7,7 +7,7 @@ class TableConfig < ApplicationRecord
        "align" => "left", "pinned" => nil, "width" => nil, "roles" => [],
        "is_virtual" => false, "render_config" => {} } ]
   }
-  attribute :metadata, :jsonb, default: {}
+  attribute :metadata, :jsonb, array: true, default: []
 
   belongs_to :company, touch: true
   belongs_to :category

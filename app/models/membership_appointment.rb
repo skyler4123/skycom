@@ -1,6 +1,6 @@
 # app/models/membership_appointment.rb
 class MembershipAppointment < ApplicationRecord
-  attribute :metadata, :jsonb, default: {}
+  attribute :metadata, :jsonb, array: true, default: []
 
   belongs_to :membership
   belongs_to :appoint_from, polymorphic: true, optional: true
