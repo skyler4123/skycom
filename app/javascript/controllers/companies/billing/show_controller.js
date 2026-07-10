@@ -355,11 +355,10 @@ export default class Companies_Billing_ShowController extends Companies_LayoutCo
                 <div class="text-2xl font-black text-slate-900 dark:text-white">${this.formatCents(this.wallet?.total_cents)}</div>
                 <div class="text-xs text-slate-500">${translate("Main:")} ${this.formatCents(this.wallet?.main_balance_cents)} · ${translate("Promo:")} ${this.formatCents(this.wallet?.promo_balance_cents)}</div>
               </div>
-              <button type="button"
-                data-action="click->${this.identifier}#openTopUpModal"
-                class="px-3 py-1.5 text-xs font-bold bg-blue-600 hover:bg-blue-700 text-white rounded-lg cursor-pointer transition-colors whitespace-nowrap">
+              <a href="${Helpers.new_company_top_up_path(currentCompany()?.id)}"
+                class="inline-flex items-center px-3 py-1.5 text-xs font-bold bg-blue-600 hover:bg-blue-700 text-white rounded-lg cursor-pointer transition-colors whitespace-nowrap">
                 ${translate("Top Up")}
-              </button>
+              </a>
             </div>
           </div>
 
