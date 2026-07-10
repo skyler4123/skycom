@@ -1,7 +1,7 @@
 class User < ApplicationRecord
   attribute :permission_resource_name, :string, default: -> { self.name }
   attribute :verified, :boolean, default: false
-  attribute :metadata, :jsonb, default: {}
+  attribute :metadata, :jsonb, array: true, default: []
 
   has_secure_password
 

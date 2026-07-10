@@ -2,7 +2,7 @@ class FacilityAppointment < ApplicationRecord
   include SetDefaultCompanyConcern
 
   attribute :permission_resource_name, :string, default: -> { self.name }
-  attribute :metadata, :jsonb, default: {}
+  attribute :metadata, :jsonb, array: true, default: []
 
   belongs_to :company
   belongs_to :facility
