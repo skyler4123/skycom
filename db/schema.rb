@@ -432,6 +432,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_02_190003) do
     t.integer "currency_code"
     t.integer "country_code"
     t.string "timezone"
+    t.jsonb "ui_configs", array: true
     t.integer "lifecycle_status"
     t.integer "workflow_status"
     t.integer "business_type"
@@ -895,6 +896,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_02_190003) do
     t.integer "fiscal_year_end_month"
     t.text "resource_names", array: true
     t.jsonb "features", array: true
+    t.jsonb "ui_configs", array: true
     t.integer "lifecycle_status"
     t.integer "workflow_status"
     t.integer "business_type"
@@ -1700,6 +1702,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_02_190003) do
     t.integer "currency_code"
     t.integer "country_code"
     t.string "timezone"
+    t.jsonb "ui_configs", array: true
     t.integer "lifecycle_status"
     t.integer "workflow_status"
     t.integer "business_type"

@@ -2,7 +2,7 @@ class SubscriptionPlanAppointment < ApplicationRecord
   include TagConcern
   include SetDefaultCompanyConcern
 
-  attribute :metadata, :jsonb, default: {}
+  attribute :metadata, :jsonb, array: true, default: []
 
   # --- Associations ---
   belongs_to :company

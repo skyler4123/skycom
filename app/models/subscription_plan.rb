@@ -1,7 +1,7 @@
 class SubscriptionPlan < ApplicationRecord
   attribute :features, :jsonb, default: {}
   attribute :limits, :jsonb, default: {}
-  attribute :metadata, :jsonb, default: {}
+  attribute :metadata, :jsonb, array: true, default: []
 
   has_many :subscription_plan_appointments, dependent: :destroy
 

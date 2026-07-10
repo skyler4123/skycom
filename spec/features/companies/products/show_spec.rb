@@ -27,7 +27,7 @@ RSpec.feature "Companies::Products Show", type: :feature, js: true do
   end
 
   let!(:products_cosmetics) do
-    names = [ "Gorgeous Steel Plate", "Practical Wool Shoes" ]
+    names = Array.new(2) { "Product-#{SecureRandom.hex(8)}" }
     names.map.with_index do |nm, i|
       product = Product.new(
         company: company,

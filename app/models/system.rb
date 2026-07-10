@@ -4,7 +4,7 @@ class System < ApplicationRecord
   attribute :name, :string, default: "System"
   attribute :balance_cents, :integer, default: 0
   attribute :active, :boolean, default: true
-  attribute :metadata, :jsonb, default: {}
+  attribute :metadata, :jsonb, array: true, default: []
 
   # --- Associations ---
   # --- Validations ---
