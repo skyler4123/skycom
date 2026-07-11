@@ -65,7 +65,6 @@ Rails.application.routes.draw do
       resource :billing, only: :show, controller: :billing do
         post :pay_all, on: :collection
         post :toggle_feature, on: :collection
-        post :top_up, on: :collection
       end
 
       resources :top_ups, only: %i[new create], controller: :top_ups

@@ -10,8 +10,4 @@ class Companies::BillingPolicy < ApplicationPolicy
   def toggle_feature?
     record.can?(:update, BillingContract)
   end
-
-  def top_up?
-    record.can?(:update, BillingContract)
-  end
 end

@@ -124,39 +124,6 @@ RSpec.describe "Feature Gating API", type: :request do
   end
 
   # ==========================================================================
-  # Top-up endpoint failure cases
-  # ==========================================================================
-
-  describe "POST /companies/:id/billing/top_up" do
-    context "when amount_cents is zero" do
-      it "returns 422 with error message" do
-        post "/companies/#{company.id}/billing/top_up", params: { amount_cents: 0 }, as: :json
-        expect(response).to have_http_status(:unprocessable_content)
-        body = JSON.parse(response.body)
-        expect(body["error"]).to eq("amount_cents must be positive")
-      end
-    end
-
-    context "when amount_cents is negative" do
-      it "returns 422 with error message" do
-        post "/companies/#{company.id}/billing/top_up", params: { amount_cents: -100 }, as: :json
-        expect(response).to have_http_status(:unprocessable_content)
-        body = JSON.parse(response.body)
-        expect(body["error"]).to eq("amount_cents must be positive")
-      end
-    end
-
-    context "when amount_cents is missing" do
-      it "returns 422 with error message" do
-        post "/companies/#{company.id}/billing/top_up", params: {}, as: :json
-        expect(response).to have_http_status(:unprocessable_content)
-        body = JSON.parse(response.body)
-        expect(body["error"]).to eq("amount_cents must be positive")
-      end
-    end
-  end
-
-  # ==========================================================================
   # Ungated controller always works regardless of feature state
   # ==========================================================================
 
