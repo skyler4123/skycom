@@ -16,9 +16,8 @@ class PaymentMethod < ApplicationRecord
   enum :workflow_status, WORKFLOW_STATUS, prefix: true
 
   enum :business_type, {
-    online: 0,
-    offline: 1,
-    global: 2
+    b2c: 0,
+    b2b: 1
   }
 
   # --- Validations ---

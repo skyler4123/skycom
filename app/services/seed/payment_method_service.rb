@@ -3,26 +3,43 @@
 # available payment options across the application.
 
 class Seed::PaymentMethodService
-  # A predefined list of common payment methods to create.
-  PAYMENT_METHODS = [
-    { name: "Credit Card", code: "CREDIT_CARD", business_type: :global, status: :active },
-    { name: "PayPal", code: "PAYPAL", business_type: :online, status: :active },
-    { name: "Bank Transfer", code: "BANK_TRANSFER", business_type: :global, status: :active },
-    { name: "Cash", code: "CASH", business_type: :offline, status: :active },
-    { name: "Apple Pay", code: "APPLE_PAY", business_type: :online, status: :active },
-    { name: "Google Pay", code: "GOOGLE_PAY", business_type: :online, status: :active },
-    { name: "Stripe", code: "STRIPE", business_type: :online, status: :restricted }
-  ].freeze
+  COUNTRY_CODES = {
+    us: 840,
+    vn: 704
+  }.freeze
+
+  PAYMENT_METHODS = {
+    us: [
+      { name: "Credit Card",       code: "CREDIT_CARD",   business_type: :b2c, country_code: COUNTRY_CODES[:us] },
+      { name: "Debit Card",        code: "DEBIT_CARD",    business_type: :b2c, country_code: COUNTRY_CODES[:us] },
+      { name: "PayPal",            code: "PAYPAL",        business_type: :b2c, country_code: COUNTRY_CODES[:us] },
+      { name: "Apple Pay",         code: "APPLE_PAY",     business_type: :b2c, country_code: COUNTRY_CODES[:us] },
+      { name: "Google Pay",        code: "GOOGLE_PAY",    business_type: :b2c, country_code: COUNTRY_CODES[:us] },
+      { name: "Cash",              code: "CASH_US",        business_type: :b2c, country_code: COUNTRY_CODES[:us] },
+      { name: "ACH Bank Transfer", code: "ACH_TRANSFER",  business_type: :b2b, country_code: COUNTRY_CODES[:us] },
+      { name: "Wire Transfer",     code: "WIRE_TRANSFER", business_type: :b2b, country_code: COUNTRY_CODES[:us] },
+      { name: "Stripe",            code: "STRIPE",        business_type: :b2b, country_code: COUNTRY_CODES[:us] }
+    ].freeze,
+    vn: [
+      { name: "MoMo",             code: "MOMO",           business_type: :b2c, country_code: COUNTRY_CODES[:vn] },
+      { name: "ZaloPay",          code: "ZALOPAY",        business_type: :b2c, country_code: COUNTRY_CODES[:vn] },
+      { name: "VNPay",            code: "VNPAY",          business_type: :b2c, country_code: COUNTRY_CODES[:vn] },
+      { name: "Cash (VN)",        code: "CASH_VN",        business_type: :b2c, country_code: COUNTRY_CODES[:vn] },
+      { name: "Credit Card (VN)", code: "CREDIT_CARD_VN", business_type: :b2c, country_code: COUNTRY_CODES[:vn] },
+      { name: "ShopeePay",        code: "SHOPEEPAY",      business_type: :b2c, country_code: COUNTRY_CODES[:vn] },
+      { name: "VietQR Transfer",  code: "VIETQR",         business_type: :b2b, country_code: COUNTRY_CODES[:vn] },
+      { name: "Direct Debit",     code: "DIRECT_DEBIT",   business_type: :b2b, country_code: COUNTRY_CODES[:vn] }
+    ].freeze
+  }.freeze
 
   def self.new(
     name:,
     description: nil,
     code: nil,
-    category: nil,
-    property_mapping: nil,
     lifecycle_status: PaymentMethod.lifecycle_statuses.keys.sample,
     workflow_status: PaymentMethod.workflow_statuses.keys.sample,
     business_type: PaymentMethod.business_types.keys.sample,
+    country_code: 840,
     discarded_at: nil
   )
     should_discard = rand(10) == 0
@@ -32,11 +49,10 @@ class Seed::PaymentMethodService
       name: name,
       description: description || "Payment method for #{name}.",
       code: code || "PM-#{SecureRandom.hex(4).upcase}",
-      category: category,
-      property_mapping: property_mapping,
       lifecycle_status: lifecycle_status,
       workflow_status: workflow_status,
       business_type: business_type,
+      country_code: country_code,
       discarded_at: discarded_at
     )
   end
@@ -44,21 +60,15 @@ class Seed::PaymentMethodService
   def self.create(company: nil)
     puts "Seeding PaymentMethod records..."
 
-    category = if company
-      Seed::CategoryService.find_or_create_for(
-        company: company,
-        resource_name: PaymentMethod.model_name.plural
-      )
-    end
-
-    # Use find_or_create_by to avoid duplicates on subsequent runs.
-    PAYMENT_METHODS.each do |method_attrs|
-      PaymentMethod.find_or_create_by!(code: method_attrs[:code]) do |pm|
-        pm.name = method_attrs[:name]
-        pm.description = "Payment method for #{method_attrs[:name]} transactions."
-        pm.business_type = method_attrs[:business_type]
-        pm.category = category if category
-        pm.property_mapping = category.default_property_mapping if category
+    PAYMENT_METHODS.each do |country_key, methods|
+      methods.each do |method_attrs|
+        PaymentMethod.find_or_create_by!(code: method_attrs[:code]) do |pm|
+          pm.name = method_attrs[:name]
+          pm.description = "Payment method for #{method_attrs[:name]} transactions."
+          pm.business_type = method_attrs[:business_type]
+          pm.country_code = method_attrs[:country_code]
+          pm.workflow_status = :active
+        end
       end
     end
 

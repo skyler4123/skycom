@@ -19,6 +19,6 @@ RSpec.describe PaymentMethod, type: :model do
   describe "enums" do
     it { should define_enum_for(:lifecycle_status) }
     it { should define_enum_for(:workflow_status) }
-    it { should define_enum_for(:business_type).with_values(online: 0, offline: 1, global: 2) }
+    it { should define_enum_for(:business_type).with_values(b2c: 0, b2b: 1) }
   end
 end
