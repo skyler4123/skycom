@@ -2,6 +2,7 @@ import Swal from 'sweetalert2';
 import dayjs from 'dayjs';
 import Toastify from 'toastify-js';
 import { capitalize, isDefined } from "controllers/helpers/data_helpers" 
+import qrcode from "qrcode"
 
 /**
  * Fetches JSON data from a URL with built-in support for query params, CSRF tokens, and JSON bodies.
@@ -833,3 +834,53 @@ export const table = ({
     </table>
   `
 }
+
+/**
+ * Automatically builds and injects a responsive QR code image tag into a target container
+ * Sizing scales automatically based on the container's runtime layout width (Tailwind classes)
+ * * @param {HTMLElement} element - The parent layout placeholder box (e.g., a Tailwind <div>)
+ * @param {string} text - The raw data string payload to serialize (Defaults to fallback root)
+ */
+export const renderQrCode = (element, text = "https://skycom.vn") => {
+  if (!element) {
+    console.error("❌ Target placeholder container is missing.");
+    return;
+  }
+
+  // 1. Flush out stale matrix layout code inside the target container wrapper
+  element.innerHTML = "";
+
+  // 2. Query the active grid box dimension sizing driven by Tailwind CSS rules
+  const containerWidth = element.clientWidth || 150; 
+
+  // 3. Convert container pixels into the module matrix scale factor
+  // The library uses a base cellSize multiplier (pixels per black module block grid).
+  // Type 4 QR code has 33 grid modules across. Let's compute a proportional size.
+  const computedCellSize = Math.max(2, Math.floor(containerWidth / 37));
+
+  try {
+    const typeNumber = 4;
+    const errorCorrectionLevel = "M"; // Medium balance layout
+    
+    const qr = qrcode(typeNumber, errorCorrectionLevel);
+    qr.addData(text);
+    qr.make();
+
+    // 4. Generate the image string using the dynamic computed layout cell width size
+    const margin = 2;
+    const qrImageHtml = qr.createImgTag(computedCellSize, margin);
+
+    // 5. Inject the compiled string asset into the DOM framework container target
+    element.innerHTML = qrImageHtml;
+
+    // 6. Force fluid full-width scaling layout rules on the injected image element
+    const img = element.querySelector("img");
+    if (img) {
+      img.style.width = "100%";
+      img.style.height = "auto";
+      img.style.display = "block";
+    }
+  } catch (error) {
+    console.error("🚨 QR Responsive Engine compilation exception caught:", error);
+  }
+};
