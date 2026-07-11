@@ -136,6 +136,18 @@ services:
       interval: 10s
       timeout: 5s
       retries: 3
+
+  mock-api:
+    image: golang:1.22-alpine
+    working_dir: /go/src/app
+    # Line A: Mount your local folder inside the container
+    volumes:
+      - ./mock_api:/go/src/app
+    # Line B: Execute the file right out of the mounted folder
+    command: go run main.go
+    ports:
+      - "4000:4000"
+
 volumes:
   postgres_data:
   mongo_data:
