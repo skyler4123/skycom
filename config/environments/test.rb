@@ -65,5 +65,14 @@ Rails.application.configure do
   config.active_job.queue_adapter = :solid_queue
 
   config.solid_queue.connects_to = { database: { writing: :queue } }
+
+  # Rails Active Record encryption keys for tests.
+  # Required because PaymentMethod uses `encrypts :secret_key`.
+  # Every save (encrypt) or read (decrypt) needs these keys.
+  # Dummy values are fine — they just need to be stable for the round-trip.
+  # In production these come from `Rails.application.credentials` instead.
+  config.active_record.encryption.primary_key = "test_primary_key_abcdef1234567890"
+  config.active_record.encryption.deterministic_key = "test_deterministic_key_abcdef1234567890"
+  config.active_record.encryption.key_derivation_salt = "test_key_derivation_salt_abcdef1234567890"
 end
 # ----------------------------------------------------------------------------------------------------
