@@ -64,6 +64,17 @@ module Company::BillingConcern
   # instead of the DailyMetricLog-backed value. The SyncDailyMetricJob (every
   # 4h) eventually re-hydrates from DailyMetricLog via the "value" getter's
   # default lambda. This is an acceptable trade-off for atomicity.
+  def billing_contract_summary
+    contract = active_billing_contract
+    return nil unless contract
+
+    enabled = contract.contract_features.active.joins(:billing_resource).pluck("billing_resources.name")
+    {
+      contract_type: contract.contract_type,
+      enabled_features: enabled
+    }
+  end
+
   def record_usage!(resource_key, quantity: 1)
     Kredis.redis.incrby(daily_meter(resource_key).key, quantity)
   rescue Redis::BaseConnectionError => e

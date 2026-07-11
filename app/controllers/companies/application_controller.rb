@@ -2,6 +2,9 @@ class Companies::ApplicationController < ApplicationController
   before_action :set_company
   before_action :set_employee
 
+  # Order reason: Feature gating checks run before Pundit authorization
+  include Companies::FeatureGatingConcern
+
   # Order reason: Companies::Authorizable need current_employee
   include Companies::Authorizable
 

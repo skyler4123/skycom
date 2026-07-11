@@ -1,4 +1,6 @@
 class Companies::AttendancePoliciesController < Companies::ApplicationController
+  feature_key :hrm_attendance
+
   def index
     respond_to do |format|
       format.html { render html: "", layout: true }

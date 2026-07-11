@@ -41,6 +41,54 @@ export default class Companies_LayoutController extends Controller {
     return currentTableConfigs().find(config => config.id === this.tableConfigIdValue)
   }
 
+  sidebarItems() {
+    const cid = currentCompany().id
+    const link = (featureKey, href, icon, label) => {
+      if (featureKey && !featureEnabled(featureKey)) return ''
+      return `
+        <a
+          class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:bg-blue-100 open:text-blue-600"
+          href="${href}"
+          ${openByPathname()}
+        >
+          <span class="material-symbols-outlined">${icon}</span>
+          <p class="text-sm font-medium leading-normal">${label}</p>
+        </a>
+      `
+    }
+
+    return [
+      link(null, Helpers.company_dashboards_path(cid), 'dashboard', translate('Dashboard')),
+      link('multi_branch', Helpers.company_branches_path(cid), 'apartment', translate('Branches')),
+      link(null, Helpers.company_departments_path(cid), 'family_group', translate('Departments')),
+      link(null, Helpers.company_categories_path(cid), 'category', translate('Categories')),
+      link(null, Helpers.company_property_mappings_path(cid), 'settings_applications', translate('Dynamic Properties')),
+      link(null, Helpers.company_table_configs_path(cid), 'table', translate('Dynamic Tables')),
+      link('inventory_basic', Helpers.company_products_path(cid), 'inventory_2', translate('Products')),
+      link('inventory_basic', Helpers.company_brands_path(cid), 'diamond', translate('Brands')),
+      link('inventory_basic', Helpers.company_services_path(cid), 'concierge', translate('Services')),
+      link('pos_basic', Helpers.company_orders_path(cid), 'order_approve', translate('Orders')),
+      link('hrm_attendance', Helpers.company_employees_path(cid), 'groups', translate('Employees')),
+      link('hrm_attendance', Helpers.company_shift_templates_path(cid), 'schedule', translate('Shift Templates')),
+      link('hrm_attendance', Helpers.company_scheduled_shifts_path(cid), 'calendar_month', translate('Shifts')),
+      link('hrm_attendance', Helpers.company_attendance_days_path(cid), 'badge', translate('Attendance Days')),
+      link('hrm_attendance', Helpers.company_attendance_policies_path(cid), 'gps_fixed', translate('Attendance Policies')),
+      link('hrm_attendance', Helpers.company_attendance_logs_path(cid), 'receipt_long', translate('Attendance Logs')),
+      link('hrm_attendance', Helpers.company_attendance_months_path(cid), 'calendar_view_month', translate('Attendance Months')),
+      link('inventory_basic', Helpers.company_stocks_path(cid), 'inventory', translate('Stocks')),
+      link('inventory_advanced', Helpers.company_stock_transfers_path(cid), 'swap_horiz', translate('Stock Transfers')),
+      link('inventory_basic', Helpers.company_stock_imports_path(cid), 'download', translate('Stock Imports')),
+      link('inventory_basic', Helpers.company_stock_exports_path(cid), 'upload', translate('Stock Exports')),
+      link('crm_basic', Helpers.company_customers_path(cid), 'person_add', translate('Customers')),
+      link('finance_basic', Helpers.company_invoices_path(cid), 'receipt_long', translate('Invoices')),
+      link('custom_roles', Helpers.company_policies_path(cid), 'security', translate('Policies')),
+      link(null, Helpers.company_pages_path(cid), 'description', translate('Pages')),
+      link('custom_roles', Helpers.company_permissions_path(cid), 'shield', translate('Permissions')),
+      link(null, Helpers.company_billing_path(cid), 'account_balance_wallet', translate('Billing')),
+      link(null, Helpers.company_facilities_path(cid), 'warehouse', translate('Facilities')),
+    ].join('\n')
+  }
+
   renderTableTitle() {
     const config = this.currentTableConfig()
     const category = this.currentCategory()
@@ -96,239 +144,7 @@ export default class Companies_LayoutController extends Controller {
             <!-- Sidebar Navigation Links -->
             <nav class="w-full p-4">
               <div role="navigation" class="flex flex-col gap-2">
-                <a
-                  class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:bg-blue-100 open:text-blue-600"
-                  href="${Helpers.company_dashboards_path(currentCompany().id)}"
-                  ${openByPathname()}
-                  ${tooltip({
-                    html: translate("Dashboard"),
-                    classes: "bg-gray-900 text-white dark:bg-gray-100 dark:text-gray-900 px-2 py-1 text-xs"
-                  })}
-                >
-                  <span class="material-symbols-outlined">dashboard</span>
-                  <p class="text-sm font-medium leading-normal">${translate("Dashboard")}</p>
-                </a>
-                <a
-                  class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:bg-blue-100 open:text-blue-600"
-                  href="${Helpers.company_branches_path(currentCompany().id)}"
-                  ${openByPathname()}
-                >
-                  <span class="material-symbols-outlined">apartment</span>
-                   <p class="text-sm font-medium leading-normal">${translate("Branches")}</p>
-                </a>
-                <a
-                  class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:bg-blue-100 open:text-blue-600"
-                  href="${Helpers.company_departments_path(currentCompany().id)}"
-                  ${openByPathname()}
-                >
-                  <span class="material-symbols-outlined">family_group</span>
-                   <p class="text-sm font-medium leading-normal">${translate("Departments")}</p>
-                </a>
-                <a
-                  class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:bg-blue-100 open:text-blue-600"
-                  href="${Helpers.company_categories_path(currentCompany().id)}"
-                  ${openByPathname()}
-                >
-                  <span class="material-symbols-outlined">category</span>
-                   <p class="text-sm font-medium leading-normal">${translate("Categories")}</p>
-                </a>
-                <a
-                  class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:bg-blue-100 open:text-blue-600"
-                  href="${Helpers.company_property_mappings_path(currentCompany().id)}"
-                  ${openByPathname()}
-                >
-                  <span class="material-symbols-outlined">settings_applications</span>
-                   <p class="text-sm font-medium leading-normal">${translate("Dynamic Properties")}</p>
-                </a>
-                <a
-                  class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:bg-blue-100 open:text-blue-600"
-                  href="${Helpers.company_table_configs_path(currentCompany().id)}"
-                  ${openByPathname()}
-                >
-                  <span class="material-symbols-outlined">table</span>
-                   <p class="text-sm font-medium leading-normal">${translate("Dynamic Tables")}</p>
-                </a>
-                <a
-                  class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:bg-blue-100 open:text-blue-600"
-                  href="${Helpers.company_products_path(currentCompany().id)}"
-                  ${openByPathname()}
-                >
-                  <span class="material-symbols-outlined">inventory_2</span>
-                   <p class="text-sm font-medium leading-normal">${translate("Products")}</p>
-                </a>
-                <a
-                  class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:bg-blue-100 open:text-blue-600"
-                  href="${Helpers.company_brands_path(currentCompany().id)}"
-                  ${openByPathname()}
-                >
-                  <span class="material-symbols-outlined">diamond</span>
-                   <p class="text-sm font-medium leading-normal">${translate("Brands")}</p>
-                </a>
-                <a
-                  class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:bg-blue-100 open:text-blue-600"
-                  href="${Helpers.company_services_path(currentCompany().id)}"
-                  ${openByPathname()}
-                >
-                  <span class="material-symbols-outlined">concierge</span>
-                   <p class="text-sm font-medium leading-normal">${translate("Services")}</p>
-                </a>
-                <a
-                  class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:bg-blue-100 open:text-blue-600"
-                  href="${Helpers.company_orders_path(currentCompany().id)}"
-                  ${openByPathname()}
-                >
-                  <span class="material-symbols-outlined">order_approve</span>
-                   <p class="text-sm font-medium leading-normal">${translate("Orders")}</p>
-                </a>
-
-                <a
-                  class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:bg-blue-100 open:text-blue-600"
-                  href="${Helpers.company_employees_path(currentCompany().id)}"
-                  ${openByPathname()}
-                >
-                  <span class="material-symbols-outlined">groups</span>
-                   <p class="text-sm font-medium leading-normal">${translate("Employees")}</p>
-                </a>
-                <a
-                  class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:bg-blue-100 open:text-blue-600"
-                  href="${Helpers.company_shift_templates_path(currentCompany().id)}"
-                  ${openByPathname()}
-                >
-                  <span class="material-symbols-outlined">schedule</span>
-                   <p class="text-sm font-medium leading-normal">${translate("Shift Templates")}</p>
-                </a>
-                <a
-                  class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:bg-blue-100 open:text-blue-600"
-                  href="${Helpers.company_scheduled_shifts_path(currentCompany().id)}"
-                  ${openByPathname()}
-                >
-                  <span class="material-symbols-outlined">calendar_month</span>
-                   <p class="text-sm font-medium leading-normal">${translate("Shifts")}</p>
-                </a>
-                <a
-                  class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:bg-blue-100 open:text-blue-600"
-                  href="${Helpers.company_attendance_days_path(currentCompany().id)}"
-                  ${openByPathname()}
-                >
-                  <span class="material-symbols-outlined">badge</span>
-                   <p class="text-sm font-medium leading-normal">${translate("Attendance Days")}</p>
-                </a>
-                <a
-                  class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:bg-blue-100 open:text-blue-600"
-                  href="${Helpers.company_attendance_policies_path(currentCompany().id)}"
-                  ${openByPathname()}
-                >
-                  <span class="material-symbols-outlined">gps_fixed</span>
-                   <p class="text-sm font-medium leading-normal">${translate("Attendance Policies")}</p>
-                </a>
-                <a
-                  class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:bg-blue-100 open:text-blue-600"
-                  href="${Helpers.company_attendance_logs_path(currentCompany().id)}"
-                  ${openByPathname()}
-                >
-                  <span class="material-symbols-outlined">receipt_long</span>
-                   <p class="text-sm font-medium leading-normal">${translate("Attendance Logs")}</p>
-                </a>
-                <a
-                  class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:bg-blue-100 open:text-blue-600"
-                  href="${Helpers.company_attendance_months_path(currentCompany().id)}"
-                  ${openByPathname()}
-                >
-                  <span class="material-symbols-outlined">calendar_view_month</span>
-                   <p class="text-sm font-medium leading-normal">${translate("Attendance Months")}</p>
-                </a>
-                <a
-                  class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:bg-blue-100 open:text-blue-600"
-                  href="${Helpers.company_stocks_path(currentCompany().id)}"
-                  ${openByPathname()}
-                >
-                  <span class="material-symbols-outlined">inventory</span>
-                   <p class="text-sm font-medium leading-normal">${translate("Stocks")}</p>
-                </a>
-                <a
-                  class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:bg-blue-100 open:text-blue-600"
-                  href="${Helpers.company_stock_transfers_path(currentCompany().id)}"
-                  ${openByPathname()}
-                >
-                  <span class="material-symbols-outlined">swap_horiz</span>
-                   <p class="text-sm font-medium leading-normal">${translate("Stock Transfers")}</p>
-                </a>
-                <a
-                  class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:bg-blue-100 open:text-blue-600"
-                  href="${Helpers.company_stock_imports_path(currentCompany().id)}"
-                  ${openByPathname()}
-                >
-                  <span class="material-symbols-outlined">download</span>
-                   <p class="text-sm font-medium leading-normal">${translate("Stock Imports")}</p>
-                </a>
-                <a
-                  class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:bg-blue-100 open:text-blue-600"
-                  href="${Helpers.company_stock_exports_path(currentCompany().id)}"
-                  ${openByPathname()}
-                >
-                  <span class="material-symbols-outlined">upload</span>
-                   <p class="text-sm font-medium leading-normal">${translate("Stock Exports")}</p>
-                </a>
-                <a
-                  class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:bg-blue-100 open:text-blue-600"
-                  href="${Helpers.company_customers_path(currentCompany().id)}"
-                  ${openByPathname()}
-                >
-                  <span class="material-symbols-outlined">person_add</span>
-                   <p class="text-sm font-medium leading-normal">${translate("Customers")}</p>
-                </a>
-                <a
-                  class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:bg-blue-100 open:text-blue-600"
-                  href="${Helpers.company_invoices_path(currentCompany().id)}"
-                  ${openByPathname()}
-                >
-                  <span class="material-symbols-outlined">receipt_long</span>
-                   <p class="text-sm font-medium leading-normal">${translate("Invoices")}</p>
-                </a>
-
-                <a
-                  class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:bg-blue-100 open:text-blue-600"
-                  href="${Helpers.company_policies_path(currentCompany().id)}"
-                  ${openByPathname()}
-                >
-                  <span class="material-symbols-outlined">security</span>
-                   <p class="text-sm font-medium leading-normal">${translate("Policies")}</p>
-                </a>
-                <a
-                  class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:bg-blue-100 open:text-blue-600"
-                  href="${Helpers.company_pages_path(currentCompany().id)}"
-                  ${openByPathname()}
-                >
-                  <span class="material-symbols-outlined">description</span>
-                   <p class="text-sm font-medium leading-normal">${translate("Pages")}</p>
-                </a>
-
-                <a
-                  class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:bg-blue-100 open:text-blue-600"
-                  href="${Helpers.company_permissions_path(currentCompany().id)}"
-                  ${openByPathname()}
-                >
-                  <span class="material-symbols-outlined">shield</span>
-                   <p class="text-sm font-medium leading-normal">${translate("Permissions")}</p>
-                </a>
-
-                <a
-                  class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:bg-blue-100 open:text-blue-600"
-                  href="${Helpers.company_billing_path(currentCompany().id)}"
-                  ${openByPathname()}
-                >
-                  <span class="material-symbols-outlined">account_balance_wallet</span>
-                  <p class="text-sm font-medium leading-normal">${translate("Billing")}</p>
-                </a>
-
-                <a
-                  class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:bg-blue-100 open:text-blue-600"
-                  href="${Helpers.company_facilities_path(currentCompany().id)}"
-                  ${openByPathname()}
-                >
-                  <span class="material-symbols-outlined">warehouse</span>
-                   <p class="text-sm font-medium leading-normal">${translate("Facilities")}</p>
-                </a>
+                ${this.sidebarItems()}
               </div>
             </nav>
 

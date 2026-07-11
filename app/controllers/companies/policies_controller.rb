@@ -1,4 +1,6 @@
 class Companies::PoliciesController < Companies::ApplicationController
+  feature_key :custom_roles
+
   def index
     respond_to do |format|
       format.html { render html: "", layout: true }
