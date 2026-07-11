@@ -10,6 +10,9 @@ class CreatePaymentMethods < ActiveRecord::Migration[8.0]
       t.integer :currency_code
       t.integer :country_code
       t.string  :timezone
+      t.integer :payment_mode, index: true
+      t.string :gateway_url
+      t.string :secret_key
 
       # --- System Fields ---
       t.integer  :lifecycle_status, index: true
