@@ -1,11 +1,13 @@
-# frozen_string_literal: true
-
 class Companies::BillingPolicy < ApplicationPolicy
   def show?
-    true
+    record.can?(:read, BillingContract)
   end
 
   def pay_all?
-    true
+    record.can?(:update, BillingContract)
+  end
+
+  def toggle_feature?
+    record.can?(:update, BillingContract)
   end
 end

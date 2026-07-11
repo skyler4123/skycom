@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class Companies::OrderProcessing::V1Controller < Companies::ApplicationController
+  feature_key :pos_basic
+
   def checkout
     result = OrderProcessingV1::CheckAvailabilityService.call(items: checkout_params[:items])
 

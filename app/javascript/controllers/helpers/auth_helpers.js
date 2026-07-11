@@ -117,3 +117,13 @@ export const currentPropertyMappings = () => {
 export const currentTableConfigs = () => {
   return currentCompany()?.table_configs || []
 }
+
+export const currentBillingContractSummary = () => {
+  return currentCompany()?.billing_contract_summary || null
+}
+
+export const featureEnabled = (key) => {
+  const contract = currentBillingContractSummary()
+  if (!contract?.enabled_features) return true
+  return contract.enabled_features.includes(key)
+}

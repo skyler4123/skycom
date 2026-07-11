@@ -1,6 +1,8 @@
 # app/controllers/companies/invoices_controller.rb
 
 class Companies::InvoicesController < Companies::ApplicationController
+  feature_key :finance_basic
+
   def index
     respond_to do |format|
       format.html { render html: "", layout: true }

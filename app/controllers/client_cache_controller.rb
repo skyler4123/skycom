@@ -15,8 +15,9 @@ class ClientCacheController < ApplicationController
               roles:             {},
               categories:        {},
               property_mappings: {},
-              table_configs:     {} # Your updated layout schema engine holding the fields JSONB array
-            }
+              table_configs:     {}
+            },
+            methods: [ :billing_contract_summary ]
           ),
           enums: {
             employee: {
