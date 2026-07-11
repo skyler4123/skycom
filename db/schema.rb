@@ -3011,6 +3011,9 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_02_190003) do
     t.integer "currency_code"
     t.integer "country_code"
     t.string "timezone"
+    t.integer "payment_mode"
+    t.string "gateway_url"
+    t.string "secret_key"
     t.integer "lifecycle_status"
     t.integer "workflow_status"
     t.integer "business_type"
@@ -3025,6 +3028,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_02_190003) do
     t.index ["discarded_at"], name: "index_payment_methods_on_discarded_at"
     t.index ["email"], name: "index_payment_methods_on_email", unique: true
     t.index ["lifecycle_status"], name: "index_payment_methods_on_lifecycle_status"
+    t.index ["payment_mode"], name: "index_payment_methods_on_payment_mode"
     t.index ["workflow_status"], name: "index_payment_methods_on_workflow_status"
   end
 
