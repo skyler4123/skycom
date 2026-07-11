@@ -25,7 +25,7 @@ services:
       - postgres
       - pulse_postgres
       - minio
-      - centrifugo
+      - websocket
 
   job:
     build: .
@@ -39,7 +39,7 @@ services:
     depends_on:
       - web
       - pulse_postgres
-      - centrifugo
+      - websocket
 
   postgres:
     image: postgres:18.3
@@ -114,10 +114,10 @@ services:
       - openobserve_data:/data
 
   # Centrifugo Real-time Core WebSocket Engine
-  centrifugo:
+  websocket:
     image: centrifugo/centrifugo:v5
     volumes:
-      - centrifugo_data:/centrifugo
+      - websocket_data:/centrifugo
     ports:
       - "8000:8000"
     command: centrifugo --client_insecure=false --api_insecure=false
@@ -144,4 +144,4 @@ volumes:
   sqlite_storage:
   redis_data:
   openobserve_data:
-  centrifugo_data:
+  websocket_data:
