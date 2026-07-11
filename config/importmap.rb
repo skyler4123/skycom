@@ -12,3 +12,4 @@ pin "apexcharts" # @5.3.6
 pin "swiper" # @12.1.3
 pin "toastify-js" # @1.12.0
 pin "centrifuge" # @5.7.0
+pin "qrcode" # @5.39.0
