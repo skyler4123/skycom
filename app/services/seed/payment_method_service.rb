@@ -12,27 +12,30 @@ class Seed::PaymentMethodService
   MOCK_REDIRECT_URL = "#{MOCK_API_BASE}/api/v1/bank/redirect-session".freeze
   MOCK_QR_URL = "#{MOCK_API_BASE}/api/v1/bank/qr-generate".freeze
 
+  # NOTE: secret_key is intentionally nil here. It's a real credential that must
+  # be set per-deployment via the admin UI or environment configuration — never
+  # hardcoded in seed data.
   PAYMENT_METHODS = {
     us: [
-      { name: "Credit Card",       code: "CREDIT_CARD",   business_type: :b2c, country_code: COUNTRY_CODES[:us], payment_mode: :redirect, gateway_url: MOCK_REDIRECT_URL, secret_key: "sk_test_credit_card_#{SecureRandom.hex(8)}" },
-      { name: "Debit Card",        code: "DEBIT_CARD",    business_type: :b2c, country_code: COUNTRY_CODES[:us], payment_mode: :redirect, gateway_url: MOCK_REDIRECT_URL, secret_key: "sk_test_debit_card_#{SecureRandom.hex(8)}" },
-      { name: "PayPal",            code: "PAYPAL",        business_type: :b2c, country_code: COUNTRY_CODES[:us], payment_mode: :redirect, gateway_url: MOCK_REDIRECT_URL, secret_key: "sk_test_paypal_#{SecureRandom.hex(8)}" },
-      { name: "Apple Pay",         code: "APPLE_PAY",     business_type: :b2c, country_code: COUNTRY_CODES[:us], payment_mode: :redirect, gateway_url: MOCK_REDIRECT_URL, secret_key: "sk_test_apple_pay_#{SecureRandom.hex(8)}" },
-      { name: "Google Pay",        code: "GOOGLE_PAY",    business_type: :b2c, country_code: COUNTRY_CODES[:us], payment_mode: :redirect, gateway_url: MOCK_REDIRECT_URL, secret_key: "sk_test_google_pay_#{SecureRandom.hex(8)}" },
-      { name: "Cash",              code: "CASH_US",        business_type: :b2c, country_code: COUNTRY_CODES[:us], payment_mode: :cash,     gateway_url: nil,                                  secret_key: nil },
-      { name: "ACH Bank Transfer", code: "ACH_TRANSFER",  business_type: :b2b, country_code: COUNTRY_CODES[:us], payment_mode: :qr,       gateway_url: MOCK_QR_URL,                         secret_key: "sk_test_ach_#{SecureRandom.hex(8)}" },
-      { name: "Wire Transfer",     code: "WIRE_TRANSFER", business_type: :b2b, country_code: COUNTRY_CODES[:us], payment_mode: :qr,       gateway_url: MOCK_QR_URL,                         secret_key: "sk_test_wire_#{SecureRandom.hex(8)}" },
-      { name: "Stripe",            code: "STRIPE",        business_type: :b2b, country_code: COUNTRY_CODES[:us], payment_mode: :redirect, gateway_url: MOCK_REDIRECT_URL,                    secret_key: "sk_test_stripe_#{SecureRandom.hex(8)}" }
+      { name: "Credit Card",       code: "CREDIT_CARD",   business_type: :b2c, country_code: COUNTRY_CODES[:us], payment_mode: :redirect, gateway_url: MOCK_REDIRECT_URL },
+      { name: "Debit Card",        code: "DEBIT_CARD",    business_type: :b2c, country_code: COUNTRY_CODES[:us], payment_mode: :redirect, gateway_url: MOCK_REDIRECT_URL },
+      { name: "PayPal",            code: "PAYPAL",        business_type: :b2c, country_code: COUNTRY_CODES[:us], payment_mode: :redirect, gateway_url: MOCK_REDIRECT_URL },
+      { name: "Apple Pay",         code: "APPLE_PAY",     business_type: :b2c, country_code: COUNTRY_CODES[:us], payment_mode: :redirect, gateway_url: MOCK_REDIRECT_URL },
+      { name: "Google Pay",        code: "GOOGLE_PAY",    business_type: :b2c, country_code: COUNTRY_CODES[:us], payment_mode: :redirect, gateway_url: MOCK_REDIRECT_URL },
+      { name: "Cash",              code: "CASH_US",        business_type: :b2c, country_code: COUNTRY_CODES[:us], payment_mode: :cash,     gateway_url: nil },
+      { name: "ACH Bank Transfer", code: "ACH_TRANSFER",  business_type: :b2b, country_code: COUNTRY_CODES[:us], payment_mode: :qr,       gateway_url: MOCK_QR_URL },
+      { name: "Wire Transfer",     code: "WIRE_TRANSFER", business_type: :b2b, country_code: COUNTRY_CODES[:us], payment_mode: :qr,       gateway_url: MOCK_QR_URL },
+      { name: "Stripe",            code: "STRIPE",        business_type: :b2b, country_code: COUNTRY_CODES[:us], payment_mode: :redirect, gateway_url: MOCK_REDIRECT_URL }
     ].freeze,
     vn: [
-      { name: "MoMo",             code: "MOMO",           business_type: :b2c, country_code: COUNTRY_CODES[:vn], payment_mode: :redirect, gateway_url: MOCK_REDIRECT_URL, secret_key: "sk_test_momo_#{SecureRandom.hex(8)}" },
-      { name: "ZaloPay",          code: "ZALOPAY",        business_type: :b2c, country_code: COUNTRY_CODES[:vn], payment_mode: :redirect, gateway_url: MOCK_REDIRECT_URL, secret_key: "sk_test_zalopay_#{SecureRandom.hex(8)}" },
-      { name: "VNPay",            code: "VNPAY",          business_type: :b2c, country_code: COUNTRY_CODES[:vn], payment_mode: :redirect, gateway_url: MOCK_REDIRECT_URL, secret_key: "sk_test_vnpay_#{SecureRandom.hex(8)}" },
-      { name: "Cash (VN)",        code: "CASH_VN",        business_type: :b2c, country_code: COUNTRY_CODES[:vn], payment_mode: :cash,     gateway_url: nil,                                  secret_key: nil },
-      { name: "Credit Card (VN)", code: "CREDIT_CARD_VN", business_type: :b2c, country_code: COUNTRY_CODES[:vn], payment_mode: :redirect, gateway_url: MOCK_REDIRECT_URL,                    secret_key: "sk_test_credit_card_vn_#{SecureRandom.hex(8)}" },
-      { name: "ShopeePay",        code: "SHOPEEPAY",      business_type: :b2c, country_code: COUNTRY_CODES[:vn], payment_mode: :redirect, gateway_url: MOCK_REDIRECT_URL,                    secret_key: "sk_test_shopeepay_#{SecureRandom.hex(8)}" },
-      { name: "VietQR Transfer",  code: "VIETQR",         business_type: :b2b, country_code: COUNTRY_CODES[:vn], payment_mode: :qr,       gateway_url: MOCK_QR_URL,                         secret_key: "sk_test_vietqr_#{SecureRandom.hex(8)}" },
-      { name: "Direct Debit",     code: "DIRECT_DEBIT",   business_type: :b2b, country_code: COUNTRY_CODES[:vn], payment_mode: :qr,       gateway_url: MOCK_QR_URL,                         secret_key: "sk_test_direct_debit_#{SecureRandom.hex(8)}" }
+      { name: "MoMo",             code: "MOMO",           business_type: :b2c, country_code: COUNTRY_CODES[:vn], payment_mode: :redirect, gateway_url: MOCK_REDIRECT_URL },
+      { name: "ZaloPay",          code: "ZALOPAY",        business_type: :b2c, country_code: COUNTRY_CODES[:vn], payment_mode: :redirect, gateway_url: MOCK_REDIRECT_URL },
+      { name: "VNPay",            code: "VNPAY",          business_type: :b2c, country_code: COUNTRY_CODES[:vn], payment_mode: :redirect, gateway_url: MOCK_REDIRECT_URL },
+      { name: "Cash (VN)",        code: "CASH_VN",        business_type: :b2c, country_code: COUNTRY_CODES[:vn], payment_mode: :cash,     gateway_url: nil },
+      { name: "Credit Card (VN)", code: "CREDIT_CARD_VN", business_type: :b2c, country_code: COUNTRY_CODES[:vn], payment_mode: :redirect, gateway_url: MOCK_REDIRECT_URL },
+      { name: "ShopeePay",        code: "SHOPEEPAY",      business_type: :b2c, country_code: COUNTRY_CODES[:vn], payment_mode: :redirect, gateway_url: MOCK_REDIRECT_URL },
+      { name: "VietQR Transfer",  code: "VIETQR",         business_type: :b2b, country_code: COUNTRY_CODES[:vn], payment_mode: :qr,       gateway_url: MOCK_QR_URL },
+      { name: "Direct Debit",     code: "DIRECT_DEBIT",   business_type: :b2b, country_code: COUNTRY_CODES[:vn], payment_mode: :qr,       gateway_url: MOCK_QR_URL }
     ].freeze
   }.freeze
 
@@ -79,8 +82,7 @@ class Seed::PaymentMethodService
           pm.country_code = method_attrs[:country_code]
           pm.payment_mode = method_attrs[:payment_mode]
           pm.gateway_url = method_attrs[:gateway_url]
-          pm.secret_key = method_attrs[:secret_key]
-          pm.workflow_status = :active
+          pm.workflow_status = :confirmed
         end
       end
     end
