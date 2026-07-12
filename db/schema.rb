@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_07_02_190003) do
+ActiveRecord::Schema[8.0].define(version: 2026_07_12_101603) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pgcrypto"
@@ -386,7 +386,12 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_02_190003) do
   create_table "billing_invoices", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.uuid "company_id", null: false
     t.uuid "billing_contract_id", null: false
+    t.string "name"
+    t.text "description"
     t.string "invoice_number", null: false
+    t.integer "movement_type"
+    t.integer "target_balance"
+    t.integer "created_by"
     t.integer "price_cents", null: false
     t.string "price_currency", null: false
     t.datetime "period_start", null: false
@@ -398,9 +403,12 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_02_190003) do
     t.datetime "updated_at", null: false
     t.index ["billing_contract_id"], name: "index_billing_invoices_on_billing_contract_id"
     t.index ["company_id"], name: "index_billing_invoices_on_company_id"
-    t.index ["invoice_number"], name: "index_billing_invoices_on_invoice_number", unique: true
+    t.index ["created_by"], name: "index_billing_invoices_on_created_by"
+    t.index ["invoice_number"], name: "index_billing_invoices_on_invoice_number"
     t.index ["lifecycle_status"], name: "index_billing_invoices_on_lifecycle_status"
+    t.index ["movement_type"], name: "index_billing_invoices_on_movement_type"
     t.index ["payment_status"], name: "index_billing_invoices_on_payment_status"
+    t.index ["target_balance"], name: "index_billing_invoices_on_target_balance"
   end
 
   create_table "billing_resources", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -417,6 +425,24 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_02_190003) do
     t.index ["lifecycle_status"], name: "index_billing_resources_on_lifecycle_status"
     t.index ["name", "country_code"], name: "index_billing_resources_on_name_and_country_code", unique: true
     t.index ["workflow_status"], name: "index_billing_resources_on_workflow_status"
+  end
+
+  create_table "billing_transactions", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "company_id", null: false
+    t.uuid "billing_invoice_id", null: false
+    t.integer "transaction_type", null: false
+    t.integer "amount_cents", null: false
+    t.string "currency", null: false
+    t.integer "balance_before_cents", null: false
+    t.integer "balance_after_cents", null: false
+    t.integer "promo_balance_before_cents", null: false
+    t.integer "promo_balance_after_cents", null: false
+    t.text "description"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["billing_invoice_id"], name: "index_billing_transactions_on_billing_invoice_id"
+    t.index ["company_id", "created_at"], name: "idx_wallet_tx_company_chrono"
+    t.index ["company_id"], name: "index_billing_transactions_on_company_id"
   end
 
   create_table "branches", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
@@ -5663,24 +5689,6 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_02_190003) do
     t.index ["item_type", "item_id"], name: "index_versions_on_item_type_and_item_id"
   end
 
-  create_table "wallet_transactions", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
-    t.uuid "company_id", null: false
-    t.uuid "billing_invoice_id"
-    t.integer "transaction_type", null: false
-    t.integer "amount_cents", null: false
-    t.string "currency", null: false
-    t.integer "balance_before_cents", null: false
-    t.integer "balance_after_cents", null: false
-    t.integer "promo_balance_before_cents", null: false
-    t.integer "promo_balance_after_cents", null: false
-    t.text "description"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.index ["billing_invoice_id"], name: "index_wallet_transactions_on_billing_invoice_id"
-    t.index ["company_id", "created_at"], name: "idx_wallet_tx_company_chrono"
-    t.index ["company_id"], name: "index_wallet_transactions_on_company_id"
-  end
-
   create_table "warehouses", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
     t.uuid "company_id", null: false
     t.uuid "branch_id"
@@ -5814,6 +5822,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_02_190003) do
   add_foreign_key "billing_contracts", "companies"
   add_foreign_key "billing_invoices", "billing_contracts"
   add_foreign_key "billing_invoices", "companies"
+  add_foreign_key "billing_transactions", "billing_invoices"
+  add_foreign_key "billing_transactions", "companies"
   add_foreign_key "branches", "branches", column: "parent_branch_id"
   add_foreign_key "branches", "categories"
   add_foreign_key "branches", "companies"
@@ -6121,8 +6131,6 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_02_190003) do
   add_foreign_key "tasks", "property_mappings"
   add_foreign_key "tasks", "task_groups"
   add_foreign_key "users", "users", column: "parent_user_id"
-  add_foreign_key "wallet_transactions", "billing_invoices"
-  add_foreign_key "wallet_transactions", "companies"
   add_foreign_key "warehouses", "branches"
   add_foreign_key "warehouses", "categories"
   add_foreign_key "warehouses", "companies"

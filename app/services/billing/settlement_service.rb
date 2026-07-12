@@ -14,7 +14,7 @@
 #   2. Deduct remainder from main_balance (customer's real money)
 #   3. If still remaining → flag_unpaid! + invoice marked :overdue
 #
-# Every balance change is recorded as a WalletTransaction with before/after snapshots.
+# Every balance change is recorded as a BillingTransaction with before/after snapshots.
 #
 # Balance mutations use update_columns (bypasses callbacks) to prevent the
 # CircuitBreakerConcern's attempt_settle_outstanding from re-entering settlement
@@ -87,10 +87,13 @@ module Billing
 
         if remaining > 0
           handle_shortfall(remaining)
-        else
-          mark_paid
         end
       end
+
+      # After settlement, try to reactivate the company if invoice is now paid
+      # (the BillingTransaction callback handles setting payment_status)
+      invoice.reload
+      company.try_reactivate! if invoice.paid?
     ensure
       Thread.current[:__settling_invoice_ids]&.delete(invoice&.id)
     end
@@ -155,7 +158,7 @@ module Billing
     def record_transaction(type, amount,
                            before_main, after_main,
                            before_promo, after_promo)
-      WalletTransaction.create!(
+      BillingTransaction.create!(
         company: company,
         billing_invoice: invoice,
         transaction_type: type,
