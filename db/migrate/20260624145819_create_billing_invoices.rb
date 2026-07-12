@@ -4,7 +4,13 @@ class CreateBillingInvoices < ActiveRecord::Migration[8.0]
       t.references :company, null: false, foreign_key: true, type: :uuid
       t.references :billing_contract, null: false, foreign_key: true, type: :uuid
 
-      t.string   :invoice_number, null: false
+      t.string :name
+      t.text :description
+      t.string   :invoice_number, null: false, index: true
+
+      t.integer :movement_type, index: true
+      t.integer :target_balance, index: true
+      t.integer :created_by, index: true
 
       # money-rails format for the finalized invoice amount
       t.integer  :price_cents, null: false
@@ -19,6 +25,5 @@ class CreateBillingInvoices < ActiveRecord::Migration[8.0]
       t.timestamps
     end
 
-    add_index :billing_invoices, :invoice_number, unique: true
   end
 end
