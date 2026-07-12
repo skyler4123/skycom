@@ -1,8 +1,9 @@
 # frozen_string_literal: true
 
 FactoryBot.define do
-  factory :wallet_transaction do
+  factory :billing_transaction do
     company
+    association :billing_invoice
     transaction_type { :top_up }
     amount_cents { 1000 }
     currency { "USD" }

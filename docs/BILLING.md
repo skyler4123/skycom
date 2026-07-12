@@ -149,7 +149,7 @@ Company
 
 ---
 
-## 4. Wallet System
+## 4. Wallet System & Billing Transactions
 
 Each company has two balance accounts (stored as `*_balance_cents` integer columns on Company):
 
@@ -158,19 +158,33 @@ Each company has two balance accounts (stored as `*_balance_cents` integer colum
 | **`promo_balance_cents`** | Promotional credits from Skycom (e.g., +$10 new company bonus) | FIRST |
 | **`main_balance_cents`** | Company deposits from past payments or overpayments | SECOND |
 
-### 4.1 WalletTransaction (Audit Trail)
+### 4.1 BillingTransaction (Source of Truth for Money Movement)
 
-Every balance change is recorded in `WalletTransaction`:
+Every money movement must belong to a BillingInvoice as a BillingTransaction.
+The invoice's `payment_status` is derived from the sum of its transactions:
+
+```
+SUM(transactions.amount_cents) >= invoice.price_cents  →  paid
+```
+
+Each BillingInvoice has two classifying enums:
+
+| Enum | Values | Description |
+|------|--------|-------------|
+| `movement_type` | `deposit` (money in), `charge` (money out) | Direction of flow |
+| `target_balance` | `main_balance`, `promo_balance` | Which wallet is affected |
+| `created_by` | `system`, `customer` | Who initiated the invoice |
+
+Every BillingTransaction records:
 
 | Field | Description |
 |-------|-------------|
-| `transaction_type` | `top_up`, `deduction`, `refund`, `promo_credit` |
 | `amount_cents` | Amount of this transaction |
 | `balance_before_cents` / `balance_after_cents` | Main balance snapshots |
 | `promo_balance_before_cents` / `promo_balance_after_cents` | Promo balance snapshots |
-| `billing_invoice` | Reference to the triggering invoice |
+| `billing_invoice` | Required reference — every transaction belongs to an invoice |
 
-**File**: `app/models/wallet_transaction.rb`
+**File**: `app/models/billing_transaction.rb`
 
 ---
 
@@ -290,7 +304,7 @@ Deduction algorithm:
       - invoice.payment_status = :overdue
    d. Else:
       - invoice.payment_status = :paid
-4. Record WalletTransaction (before/after snapshots)
+4. Record BillingTransaction (before/after snapshots) — callback auto-syncs invoice.payment_status
 ```
 
 ### 7.2 SettlementService.settle_all (Batch)
@@ -444,7 +458,7 @@ Idempotent 6-hour snapshot job:
 | `app/models/contract_metric.rb` | 31 | Join: BillingContract ↔ volumetric (allowance + overage price) |
 | `app/models/daily_metric_log.rb` | 26 | Persisted daily metric snapshot from Redis (volumetric) |
 | `app/models/daily_feature_log.rb` | 30 | Persisted daily feature-active-day snapshot (source of truth for per-feature proration) |
-| `app/models/wallet_transaction.rb` | 34 | Audit trail for every wallet balance change |
+| `app/models/billing_transaction.rb` | 41 | Source of truth for money movement; callback syncs invoice status |
 | `app/models/concerns/company/billing_concern.rb` | 66 | Feature gating, wallet helpers, Redis metering |
 | `app/models/concerns/company/circuit_breaker_concern.rb` | 75 | Lifecycle transitions, suspension_at, is_accessible?, auto_settle_unpaid_invoices |
 | `app/jobs/billing/sync_suspension_job.rb` | 28 | Daily midnight cron: marks companies suspended when suspension_at passes |
