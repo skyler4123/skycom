@@ -24,4 +24,15 @@ class PaymentMethodAppointment < ApplicationRecord
   validates :code, presence: true, uniqueness: { scope: :company_id, message: "This payment method code is already assigned to this company group." }
 
   validates :business_type, presence: true
+
+  validate :payment_method_country_matches_company
+
+  private
+
+  def payment_method_country_matches_company
+    return unless payment_method && company
+    return if payment_method.country_code == company.country_code
+
+    errors.add(:payment_method, "country code (#{payment_method.country_code}) does not match company country code (#{company.country_code})")
+  end
 end
