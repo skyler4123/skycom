@@ -7,8 +7,15 @@ RSpec.feature "Feature Gating", type: :feature, js: true do
 
   # --- Helpers ---
 
+  def server_cache_version
+    Rails.local_cache.clear
+    [owner.updated_at.to_i, Company.maximum(:updated_at).to_i].compact.max.to_s
+  end
+
   def seed_client_cache(billing_contract_data = nil)
     page.execute_script("localStorage.clear()")
+
+    version = server_cache_version
 
     company_data = JSON.parse(company.to_json).merge(
       "billing_contract_summary" => billing_contract_data,
@@ -28,8 +35,8 @@ RSpec.feature "Feature Gating", type: :feature, js: true do
     }
 
     page.execute_script("localStorage.setItem('client_cache_data', arguments[0])", payload.to_json)
-    page.execute_script("localStorage.setItem('client_cache_version', 'forced')")
-    page.execute_script("document.cookie = 'client_cache_version=forced; path=/'")
+    page.execute_script("localStorage.setItem('client_cache_version', arguments[0])", version)
+    page.execute_script("document.cookie = 'client_cache_version=#{version}; path=/'")
   end
 
   def core_only_features
@@ -204,7 +211,9 @@ RSpec.feature "Feature Gating", type: :feature, js: true do
       page.execute_script("document.querySelector('[data-companies--billing--show-feature-key-param=\"hrm_attendance\"]').checked = true")
       page.execute_script("document.querySelector('[data-companies--billing--show-feature-key-param=\"hrm_attendance\"]').dispatchEvent(new Event('change', { bubbles: true }))")
 
-      sleep 2
+      # Wait for the toggle AJAX to complete (reloadThenToast triggers a page reload).
+      # Then the version-matched cache seed ensures sync() doesn't overwrite on the next visit.
+      visit company_billing_path(company)
 
       seed_client_cache(core_only_features)
       visit company_billing_path(company)
@@ -220,7 +229,8 @@ RSpec.feature "Feature Gating", type: :feature, js: true do
       page.execute_script("document.querySelector('[data-companies--billing--show-feature-key-param=\"hrm_attendance\"]').checked = true")
       page.execute_script("document.querySelector('[data-companies--billing--show-feature-key-param=\"hrm_attendance\"]').dispatchEvent(new Event('change', { bubbles: true }))")
 
-      sleep 2
+      # Wait for the toggle AJAX to complete (reloadThenToast triggers a page reload).
+      visit company_billing_path(company)
 
       seed_client_cache(with_feature(:hrm_attendance))
       visit company_billing_path(company)
