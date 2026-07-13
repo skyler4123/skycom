@@ -97,7 +97,7 @@ RSpec.describe "Companies::OrderProcessing::V1", type: :request do
         post "/companies/#{company.id}/order_processing/v1/checkout", params: checkout_params, headers: headers
         expect(response).to have_http_status(:unprocessable_content)
         body = JSON.parse(response.body)
-        expect(body["error"]).to eq("Insufficient stock")
+        expect(body["errors"]).to contain_exactly("Insufficient stock")
       end
     end
   end

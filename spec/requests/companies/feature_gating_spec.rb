@@ -84,7 +84,7 @@ RSpec.describe "Feature Gating API", type: :request do
         post "/companies/#{company.id}/billing/toggle_feature", params: { feature_key: "pos_basic" }, as: :json
         expect(response).to have_http_status(:unprocessable_content)
         body = JSON.parse(response.body)
-        expect(body["error"]).to eq("Core features cannot be toggled")
+        expect(body["errors"]).to contain_exactly("Core features cannot be toggled")
       end
     end
 
@@ -93,7 +93,7 @@ RSpec.describe "Feature Gating API", type: :request do
         post "/companies/#{company.id}/billing/toggle_feature", params: {}, as: :json
         expect(response).to have_http_status(:unprocessable_content)
         body = JSON.parse(response.body)
-        expect(body["error"]).to eq("feature_key required")
+        expect(body["errors"]).to contain_exactly("feature_key required")
       end
     end
 
@@ -118,7 +118,7 @@ RSpec.describe "Feature Gating API", type: :request do
         post "/companies/#{company.id}/billing/toggle_feature", params: { feature_key: "analytics_dashboard" }, as: :json
         expect(response).to have_http_status(:unprocessable_content)
         body = JSON.parse(response.body)
-        expect(body["error"]).to eq("No active billing contract")
+        expect(body["errors"]).to contain_exactly("No active billing contract")
       end
     end
   end

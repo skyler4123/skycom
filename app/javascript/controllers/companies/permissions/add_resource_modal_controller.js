@@ -28,7 +28,7 @@ export default class Companies_Permissions_AddResourceModalController extends Co
 
       reloadThenToast({ type: "success", message: response.message || translate("Resource added successfully") })
     } catch (error) {
-      toast({ type: "error", message: error.error || translate("Failed to add resource") })
+      toast({ type: "error", message: error.errors?.join(", ") || translate("Failed to add resource") })
     }
   }
 
