@@ -9,7 +9,7 @@ RSpec.feature "Feature Gating", type: :feature, js: true do
 
   def server_cache_version
     Rails.local_cache.clear
-    [owner.updated_at.to_i, Company.maximum(:updated_at).to_i].compact.max.to_s
+    [ owner.updated_at.to_i, Company.maximum(:updated_at).to_i ].compact.max.to_s
   end
 
   def seed_client_cache(billing_contract_data = nil)

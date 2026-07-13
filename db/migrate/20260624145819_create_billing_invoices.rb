@@ -6,7 +6,7 @@ class CreateBillingInvoices < ActiveRecord::Migration[8.0]
 
       t.string :name
       t.text :description
-      t.string   :invoice_number, null: false, index: true
+      t.string :invoice_number, null: false, index: true
 
       t.integer :movement_type, index: true
       t.integer :target_balance, index: true
@@ -24,6 +24,5 @@ class CreateBillingInvoices < ActiveRecord::Migration[8.0]
       t.integer  :lifecycle_status, index: true # enum: draft, final
       t.timestamps
     end
-
   end
 end
