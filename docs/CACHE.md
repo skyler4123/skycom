@@ -99,20 +99,47 @@ Place this in the main layout to ensure cache sync on every page load.
 ### Automatic Refresh
 When the server version (cookie) differs from local version, the cache auto-refreshes on next page load.
 
-### Manual Clear
-To force a refresh (e.g., after creating a new company):
+### Manual Clear (Global Method)
+
+`window.clearClientCache()` clears all cached data from localStorage (`client_cache_data`, `client_cache_version`, `client_cache_sync_count`). On the next page load, the `ClientCacheController` detects an empty cache and automatically re-fetches fresh data — the layout waits for the sync to complete before rendering.
 
 ```javascript
-// Get the controller and call clearClientCache
-const controller = application.getControllerForElementAndTarget(
-  document.querySelector('[data-controller="client-cache"]'),
-  'client-cache'
-)
-if (controller) {
-  controller.clearClientCache()
-  controller.refreshCache('manual')
-}
+// Clear client cache anywhere in your Stimulus controller or JS:
+Helpers.clearClientCache()
+// or via global window reference:
+clearClientCache()
 ```
+
+### clearClientCacheAndReload
+
+Convenience method that clears the cache AND reloads the page in one call. Useful after mutations that affect cache-dependent UI (sidebar links, feature gating, roles, etc.):
+
+```javascript
+clearClientCacheAndReload({ type: "success", message: "Feature updated" })
+```
+
+This ensures the page re-renders with fresh data from the server — the layout waits for the client cache sync before drawing anything, so there's no flash of stale content.
+
+### When to Use
+
+Call `clearClientCache()` or `clearClientCacheAndReload()` after any mutation that changes data stored in the client cache:
+
+| Mutation | Cached Data Affected |
+|----------|---------------------|
+| Toggling a feature on/off | `billing_contract_summary.enabled_features` |
+| Creating/updating/deleting a branch | `branches[]` |
+| Creating/updating/deleting a department | `departments[]` |
+| Creating/updating/deleting a role | `roles[]` |
+| Creating/updating/deleting a category | `categories[]` |
+| Creating/updating/deleting a property mapping | `property_mappings[]` |
+| Creating/updating/deleting a table config | `table_configs[]` |
+| Adding/removing an employee | `employees[]` |
+
+**Rule of thumb**: If the mutation touches a resource listed in `currentCompany()` from the client cache, call `clearClientCacheAndReload()` after the server confirms the change.
+
+### Backend-Triggered Invalidation
+
+The backend also supports invalidation via `Company#invalidate_client_cache!` (bumps `updated_at`, which changes the `client_cache_version` cookie). This is called automatically by `toggle_feature` and other billing actions. The frontend detects the version mismatch on next page load and re-syncs. However, for immediate UI consistency (sidebars, permission checks), always prefer `clearClientCacheAndReload()` on the frontend so the layout waits for fresh data before rendering.
 
 ### Using Cache in Controllers
 ```javascript

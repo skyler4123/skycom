@@ -9,6 +9,7 @@
 ## Pre-Commit Checklist
 - **Update** `docs/MODEL_CALLBACKS.md` if model/concern callbacks were added or modified
 - **Constants** — All app-wide constants must be in `config/initializers/constants.rb`, never hardcoded inline. See `docs/CONSTANTS.md`.
+- **Client cache** — If any mutation affects data stored in `currentCompany()` (branches, roles, categories, permissions, features, etc.), call `clearClientCacheAndReload()` after the server confirms the change, OR call `clearClientCache()` followed by a page reload.
 
 ## Architecture
 - **Type**: Rails 8+ multi-tenant platform with Hybrid SPA (Stimulus + Tailwind)
@@ -32,6 +33,7 @@
 - Use `Helpers.form()` for all form submissions (handles CSRF + method spoofing)
 - Listen for `form:success` events to refresh parent UI
 - **API Errors** — Backend must return `errors` (plural array) key, never `error` (singular). See `docs/API_ERROR_FORMAT.md`.
+- **Toast messages** — Never use generic hardcoded messages. Always use the server's response (e.g., `response.message` for success, `error.errors` for failure). The message must describe the exact action completed so the client knows what happened. Prefer messages returned from the Backend (BE).
 
 ## Database
 - Check `db/schema.rb` first for columns/indexes

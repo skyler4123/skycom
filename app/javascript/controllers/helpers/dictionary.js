@@ -453,5 +453,32 @@ export const dictionary = () => {
     "This field is synced from PropertyMapping. Please access the Property Mapping edit page to update this name.": {
       vi: "Trường này được đồng bộ từ PropertyMapping. Vui lòng truy cập trang chỉnh sửa Property Mapping để cập nhật tên này.",
     },
+
+    // === Analytics Dashboard ===
+    "Analytics": { vi: "Phân tích" },
+    "This Month": { vi: "Tháng này" },
+    "Last Month": { vi: "Tháng trước" },
+    "Last 6 Months": { vi: "6 tháng qua" },
+    "This Year": { vi: "Năm nay" },
+    "Revenue": { vi: "Doanh thu" },
+    "Active Customers": { vi: "Khách hàng hoạt động" },
+    "Active Employees": { vi: "Nhân viên hoạt động" },
+    "Revenue & Profit Margins": { vi: "Doanh thu & Biên lợi nhuận" },
+    "Overall margin": { vi: "Biên lợi nhuận tổng thể" },
+    "Inventory Velocity": { vi: "Tốc độ hàng tồn kho" },
+    "low stock items": { vi: "sản phẩm tồn kho thấp" },
+    "Stock levels healthy": { vi: "Mức tồn kho ổn định" },
+    "Customer CLV": { vi: "Giá trị khách hàng" },
+    "new customers in 30 days": { vi: "khách hàng mới trong 30 ngày" },
+    "Staff Performance": { vi: "Hiệu suất nhân viên" },
+    "Cost": { vi: "Chi phí" },
+    "Margin %": { vi: "Biên lợi nhuận %" },
+    "Units Sold (30d)": { vi: "Đã bán (30 ngày)" },
+    "Total Spent": { vi: "Tổng chi tiêu" },
+    "Hours Worked": { vi: "Giờ làm việc" },
+    "Overtime": { vi: "Làm thêm" },
+    "Hours": { vi: "Giờ" },
+    "Failed to load analytics": { vi: "Không thể tải dữ liệu phân tích" },
+    "Low stock items": { vi: "Sản phẩm tồn kho thấp" },
   }
 }

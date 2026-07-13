@@ -30,7 +30,7 @@ module Company::BillingConcern
     contract = active_billing_contract
     return false unless contract
 
-    resource = BillingResource.find_by(name: feature_key.to_s, resource_type: :addon_feature)
+    resource = BillingResource.find_by(name: feature_key.to_s, resource_type: :addon_feature, country_code: country_code)
     return false unless resource
 
     contract.contract_features.active.exists?(billing_resource: resource)

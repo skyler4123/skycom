@@ -68,6 +68,7 @@ Rails.application.routes.draw do
         post :toggle_feature, on: :collection
       end
 
+      get "analytics", to: "analytics#index"
       resources :top_ups, only: %i[new create], controller: :top_ups
 
       post "order_processing/v1/checkout", to: "order_processing/v1#checkout"

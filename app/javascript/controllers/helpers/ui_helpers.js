@@ -366,12 +366,17 @@ export const PENDING_TOASTS_KEY = "pending_toasts";
  * @returns {void}
  */
 export const reloadThenToasts = (toastsArray = []) => {
-  // Get existing or start fresh
-  const existing = JSON.parse(localStorage.getItem(PENDING_TOASTS_KEY) || "[]");
-  const updated = [...existing, ...toastsArray];
-  
-  localStorage.setItem(PENDING_TOASTS_KEY, JSON.stringify(updated));
-  window.location.reload();
+  let existing = []
+  try {
+    existing = JSON.parse(localStorage.getItem(PENDING_TOASTS_KEY) || "[]")
+  } catch (e) {
+    console.error("Corrupted pending toasts, resetting:", e)
+    localStorage.removeItem(PENDING_TOASTS_KEY)
+  }
+  const updated = [...existing, ...toastsArray]
+
+  localStorage.setItem(PENDING_TOASTS_KEY, JSON.stringify(updated))
+  window.location.reload()
 };
 
 /**
@@ -384,6 +389,29 @@ export const reloadThenToasts = (toastsArray = []) => {
 export const reloadThenToast = (toastObj) => {
   reloadThenToasts([toastObj]);
 };
+
+/**
+ * Clears all client-cached data from localStorage.
+ * On next page load, ClientCacheController.sync() detects no cache
+ * and automatically re-fetches fresh data from /client_cache.
+ */
+export const clearClientCache = () => {
+  localStorage.removeItem("client_cache_data")
+  localStorage.removeItem("client_cache_version")
+  localStorage.removeItem("client_cache_sync_count")
+}
+
+/**
+ * Clears the client cache, stores a toast message, then reloads the page.
+ * On reload the ClientCacheController fetches fresh data and the layout
+ * waits for it before rendering — ensuring sidebar and other cache-dependent
+ * UI reflect the latest state.
+ * @param {ToastOptions} toastObj - The toast configuration object.
+ */
+export const clearClientCacheAndReload = (toastObj) => {
+  clearClientCache()
+  reloadThenToast(toastObj)
+}
 
 
 /**

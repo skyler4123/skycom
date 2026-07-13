@@ -131,7 +131,7 @@ RSpec.feature "Feature Gating", type: :feature, js: true do
 
       visit company_employees_path(company)
 
-      expect(page).to have_text("Upgrade your plan to enable Hrm attendance", wait: 10)
+      expect(page).to have_text("Upgrade your plan to enable Test billing resource", wait: 10)
     end
 
     scenario "loads the page normally when feature is enabled" do

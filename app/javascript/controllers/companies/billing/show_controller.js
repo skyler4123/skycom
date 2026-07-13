@@ -242,12 +242,13 @@ export default class Companies_Billing_ShowController extends Companies_LayoutCo
     const companyId = window.location.pathname.split("/")[2]
 
     try {
-      await fetchJson(`/companies/${companyId}/billing/toggle_feature`, {
+      const response = await fetchJson(`/companies/${companyId}/billing/toggle_feature`, {
         method: "POST",
         body: { feature_key: featureKey }
       })
-      reloadThenToast({ type: "success", message: translate("Feature updated") })
+      clearClientCacheAndReload({ type: "success", message: response.message })
     } catch (error) {
+      console.error("Toggle feature error:", error)
       toast({ type: "error", message: error.errors?.join(", ") || translate("Failed to toggle feature") })
     }
   }
