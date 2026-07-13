@@ -3,6 +3,7 @@
 Rails.application.routes.draw do
   namespace :admin do
     resources :companies
+    resources :payment_methods
   end
   resources :client_cache, only: [ :index ]
   resources :redirect do
@@ -65,10 +66,10 @@ Rails.application.routes.draw do
       resource :billing, only: :show, controller: :billing do
         post :pay_all, on: :collection
         post :toggle_feature, on: :collection
-        post :top_up, on: :collection
       end
 
       get "analytics", to: "analytics#index"
+      resources :top_ups, only: %i[new create], controller: :top_ups
 
       post "order_processing/v1/checkout", to: "order_processing/v1#checkout"
       post "order_processing/v1/pay", to: "order_processing/v1#pay"

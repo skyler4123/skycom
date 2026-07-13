@@ -36,8 +36,8 @@ RSpec.describe Billing::SettlementService do
       expect(invoice.reload.payment_status).to eq("paid")
     end
 
-    it "creates a WalletTransaction" do
-      expect { settle }.to change(WalletTransaction, :count).by(1)
+    it "creates a BillingTransaction" do
+      expect { settle }.to change(BillingTransaction, :count).by(1)
     end
   end
 
@@ -63,8 +63,8 @@ RSpec.describe Billing::SettlementService do
       expect(invoice.reload.payment_status).to eq("paid")
     end
 
-    it "records two WalletTransactions" do
-      expect { settle }.to change(WalletTransaction, :count).by(2)
+    it "records two BillingTransactions" do
+      expect { settle }.to change(BillingTransaction, :count).by(2)
     end
   end
 
@@ -154,8 +154,8 @@ RSpec.describe Billing::SettlementService do
       expect(invoice.reload.payment_status).to eq("paid")
     end
 
-    it "does not create WalletTransactions" do
-      expect { settle }.not_to change(WalletTransaction, :count)
+    it "does not create BillingTransactions" do
+      expect { settle }.not_to change(BillingTransaction, :count)
     end
   end
 end

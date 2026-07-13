@@ -8,7 +8,7 @@
 #   POST /companies/:company_id/billing/pay  → billing#pay_all (pay outstanding invoices)
 #
 class Companies::BillingController < Companies::ApplicationController
-  skip_before_action :check_accessable, only: %i[show pay_all toggle_feature top_up]
+  skip_before_action :check_accessable, only: %i[show pay_all toggle_feature]
 
   def show
     respond_to do |format|
@@ -41,17 +41,17 @@ class Companies::BillingController < Companies::ApplicationController
 
   def toggle_feature
     feature_key = params[:feature_key]
-    return render(json: { error: "feature_key required" }, status: :unprocessable_content) unless feature_key
+    return render(json: { errors: [ "feature_key required" ] }, status: :unprocessable_content) unless feature_key
 
     if CORE_FREE_FEATURES.include?(feature_key.to_s)
-      return render(json: { error: "Core features cannot be toggled" }, status: :unprocessable_content)
+      return render(json: { errors: [ "Core features cannot be toggled" ] }, status: :unprocessable_content)
     end
 
     resource = BillingResource.addon_feature.find_by!(name: feature_key, country_code: current_company.country_code)
     contract = current_company.active_billing_contract
 
     unless contract
-      return render(json: { error: "No active billing contract" }, status: :unprocessable_content)
+      return render(json: { errors: [ "No active billing contract" ] }, status: :unprocessable_content)
     end
 
     cf = contract.contract_features.find_or_initialize_by(billing_resource: resource) do |f|
@@ -60,7 +60,7 @@ class Companies::BillingController < Companies::ApplicationController
       f.monthly_flat_price_currency = resource.currency
     end
 
-    new_status = cf.active? ? :disabled : :active
+    new_status = cf.new_record? ? :active : (cf.active? ? :disabled : :active)
     cf.update!(lifecycle_status: new_status)
 
     current_company.invalidate_client_cache!
@@ -70,40 +70,6 @@ class Companies::BillingController < Companies::ApplicationController
       feature_key: feature_key,
       active: cf.active?,
       message: cf.active? ? "#{feature_key.humanize} enabled" : "#{feature_key.humanize} disabled"
-    }
-  end
-
-  def top_up
-    amount_cents = params[:amount_cents].to_i
-
-    if amount_cents <= 0
-      return render(json: { error: "amount_cents must be positive" }, status: :unprocessable_content)
-    end
-
-    company = current_company
-    old_main = company.main_balance_cents
-    old_promo = company.promo_balance_cents
-
-    company.update!(main_balance_cents: old_main + amount_cents)
-
-    WalletTransaction.create!(
-      company: company,
-      transaction_type: :top_up,
-      amount_cents: amount_cents,
-      balance_before_cents: old_main,
-      balance_after_cents: company.main_balance_cents,
-      promo_balance_before_cents: old_promo,
-      promo_balance_after_cents: company.promo_balance_cents,
-      description: params[:description].presence || "Manual top-up"
-    )
-
-    company.invalidate_client_cache!
-    Rails.local_cache.delete("billing/#{company.id}/#{Time.current.beginning_of_month.to_date}")
-
-    render json: {
-      message: "Wallet topped up successfully",
-      main_balance_cents: company.reload.main_balance_cents,
-      total_cents: company.wallet_balance_cents
     }
   end
 

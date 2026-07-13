@@ -237,58 +237,6 @@ export default class Companies_Billing_ShowController extends Companies_LayoutCo
     `
   }
 
-  openTopUpModal() {
-    openModal({
-      html: `
-        <div class="p-6 bg-white dark:bg-slate-900 rounded-xl w-[420px] shadow-2xl">
-          <div class="flex items-center justify-between mb-4">
-            <h2 class="text-lg font-bold text-slate-900 dark:text-white">${translate("Top Up Wallet")}</h2>
-            <button data-action="click->modal#close" class="p-1 text-slate-400 hover:text-slate-600 cursor-pointer">
-              <span class="material-symbols-outlined">close</span>
-            </button>
-          </div>
-          <div class="space-y-4">
-            <div>
-              <label class="text-[10px] font-bold text-slate-400 dark:text-slate-300 uppercase tracking-wider">${translate("Amount")} (${this.currency})</label>
-              <input type="number" id="top-up-amount" min="1" step="1" required
-                placeholder="e.g. 1000"
-                class="w-full mt-1 px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-sm text-slate-900 dark:text-white" />
-              <p class="text-xs text-slate-400 mt-1">${translate("Amount in cents (1000 = $10.00)")}</p>
-            </div>
-            <button type="button" data-action="click->${this.identifier}#confirmTopUp"
-              class="w-full px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-bold text-sm cursor-pointer transition-colors">
-              ${translate("Confirm Top Up")}
-            </button>
-          </div>
-        </div>
-      `
-    })
-  }
-
-  async confirmTopUp(event) {
-    const amountInput = document.getElementById("top-up-amount")
-    if (!amountInput) return
-
-    const amountCents = parseInt(amountInput.value, 10)
-    if (!amountCents || amountCents <= 0) {
-      toast({ type: "error", message: translate("Please enter a valid amount") })
-      return
-    }
-
-    const companyId = window.location.pathname.split("/")[2]
-
-    try {
-      await fetchJson(`/companies/${companyId}/billing/top_up`, {
-        method: "POST",
-        body: JSON.stringify({ amount_cents: amountCents })
-      })
-      closeModal()
-      reloadThenToast({ type: "success", message: translate("Wallet topped up successfully") })
-    } catch (error) {
-      toast({ type: "error", message: error.errors?.join(", ") || translate("Top up failed") })
-    }
-  }
-
   async toggleFeature(event) {
     const featureKey = event.params.featureKey
     const companyId = window.location.pathname.split("/")[2]
@@ -296,7 +244,7 @@ export default class Companies_Billing_ShowController extends Companies_LayoutCo
     try {
       await fetchJson(`/companies/${companyId}/billing/toggle_feature`, {
         method: "POST",
-        body: JSON.stringify({ feature_key: featureKey })
+        body: { feature_key: featureKey }
       })
       reloadThenToast({ type: "success", message: translate("Feature updated") })
     } catch (error) {
@@ -355,11 +303,10 @@ export default class Companies_Billing_ShowController extends Companies_LayoutCo
                 <div class="text-2xl font-black text-slate-900 dark:text-white">${this.formatCents(this.wallet?.total_cents)}</div>
                 <div class="text-xs text-slate-500">${translate("Main:")} ${this.formatCents(this.wallet?.main_balance_cents)} · ${translate("Promo:")} ${this.formatCents(this.wallet?.promo_balance_cents)}</div>
               </div>
-              <button type="button"
-                data-action="click->${this.identifier}#openTopUpModal"
-                class="px-3 py-1.5 text-xs font-bold bg-blue-600 hover:bg-blue-700 text-white rounded-lg cursor-pointer transition-colors whitespace-nowrap">
+              <a href="${Helpers.new_company_top_up_path(currentCompany()?.id)}"
+                class="inline-flex items-center px-3 py-1.5 text-xs font-bold bg-blue-600 hover:bg-blue-700 text-white rounded-lg cursor-pointer transition-colors whitespace-nowrap">
                 ${translate("Top Up")}
-              </button>
+              </a>
             </div>
           </div>
 

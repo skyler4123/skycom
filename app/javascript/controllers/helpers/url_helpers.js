@@ -24,6 +24,12 @@ export const auth_google_oauth2_path = () => `/auth/google_oauth2`
 export const admin_companies_path = () => `/admin/companies`
 export const admin_company_path = (companyId) => `/admin/companies/${companyId}`
 
+export const admin_payment_methods_path = () => `/admin/payment_methods`
+export const new_admin_payment_method_path = () => `/admin/payment_methods/new`
+export const admin_payment_method_path = (id) => `/admin/payment_methods/${id}`
+export const edit_admin_payment_method_path = (id) => `/admin/payment_methods/${id}/edit`
+export const create_admin_payment_methods_path = () => `/admin/payment_methods`
+
 export const users_path = () => `/users`
 export const users_update_avatar_path = () => `/users/update_avatar`
 
@@ -158,6 +164,9 @@ export const company_payslips_path = (companyId) => `/companies/${companyId}/pay
 
 export const company_billing_path = (companyId) => `/companies/${companyId}/billing`
 export const company_billing_pay_all_path = (companyId) => `/companies/${companyId}/billing/pay_all`
+
+export const new_company_top_up_path = (companyId) => `/companies/${companyId}/top_ups/new`
+export const create_company_top_ups_path = (companyId) => `/companies/${companyId}/top_ups`
 
 export const company_invoices_path = (companyId) => `/companies/${companyId}/invoices`
 export const create_company_invoices_path = (companyId) => `/companies/${companyId}/invoices`

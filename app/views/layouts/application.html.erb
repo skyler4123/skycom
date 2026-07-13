@@ -33,7 +33,10 @@
   </head>
 
   <body
-    data-controller="responsive language svg img link open notification darkmode modal toasts client-cache authentication"
+    data-controller="responsive language svg img link open notification darkmode modal toasts client-cache authentication websocket"
+   data-websocket-url-value="ws://127.0.0.1:8000/connection/websocket"
+    data-websocket-channel-value="company_1_notifications"
+    data-websocket-token-value="<%= Websocket.token(sub: 'test_user_99', channels: ['company_1_notifications']) %>"
   >
     <div class="w-full flex justify-center items-center">
       <% if notice.present? %>

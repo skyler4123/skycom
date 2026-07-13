@@ -550,7 +550,7 @@ Each company has two balance accounts. These are **credit balances** — they of
 | **`promo_balance`** | Promotional credits from Skycom (e.g., +$10 new company bonus) | Deducted FIRST from total charge |
 | **`main_balance`** | Company deposits from past payments or overpayments | Deducted SECOND |
 
-Every balance change is recorded in `WalletTransaction`:
+Every balance change is recorded in `BillingTransaction`:
 - **Type**: `top_up`, `deduction`, `refund`, `promo_credit`
 - **Amounts**: Before/after snapshots of both balances
 - **Reference**: Links to the triggering event (order, invoice, top-up)
@@ -582,7 +582,7 @@ When billing runs (month-end or on-demand):
      │                       └── Still failing ► Send QR
      └── No ► Send QR for bank transfer
               └── Company pays ► Done
-6. Record WalletTransaction for audit
+6. Record BillingTransaction for audit
 ```
 
 The `Σ(enabled_feature_prices)` component is what companies pay for **premium add-on features** (Tiers 2-4) they've enabled. The overage component is what they pay for **exceeding usage limits**. Both are summed together as the total charge, which is offset by credits (promo + main) and then collected via card auto-charge or QR bank transfer.

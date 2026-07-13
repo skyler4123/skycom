@@ -14,7 +14,7 @@ class Companies::PermissionsController < Companies::ApplicationController
   end
 
   def update
-    return render json: { error: "Unauthorized" }, status: :forbidden unless can_manage_permissions?
+    return render json: { errors: [ "Unauthorized" ] }, status: :forbidden unless can_manage_permissions?
     appointment = current_company.policy_appointments.find(params[:id])
     policy = appointment.policy
 
@@ -40,11 +40,11 @@ class Companies::PermissionsController < Companies::ApplicationController
 
     # Validate role exists and belongs to company
     role = current_company.roles.find_by(id: role_id)
-    return render json: { error: "Role not found" }, status: :not_found unless role
+    return render json: { errors: [ "Role not found" ] }, status: :not_found unless role
 
     # Validate resource_name is in company's resource_names
     unless current_company.resource_names.include?(resource_name)
-      return render json: { error: "Invalid resource name" }, status: :unprocessable_entity
+      return render json: { errors: [ "Invalid resource name" ] }, status: :unprocessable_entity
     end
 
     # Check if resource already has policies for this role
@@ -54,7 +54,7 @@ class Companies::PermissionsController < Companies::ApplicationController
                              .exists?
 
     if existing_policies
-      return render json: { error: "Resource already assigned to this role" }, status: :unprocessable_entity
+      return render json: { errors: [ "Resource already assigned to this role" ] }, status: :unprocessable_entity
     end
 
     # Create policies for the role
@@ -80,6 +80,6 @@ class Companies::PermissionsController < Companies::ApplicationController
   end
 
   def authorize_permission_management
-    render json: { error: "Unauthorized" }, status: :forbidden unless can_manage_permissions?
+    render json: { errors: [ "Unauthorized" ] }, status: :forbidden unless can_manage_permissions?
   end
 end

@@ -101,4 +101,6 @@ gem "opentelemetry-exporter-otlp-logs"
 gem "opentelemetry-instrumentation-all"
 gem "opentelemetry-instrumentation-logger"
 gem "lograge"
+
+gem "cent"
 # ----------------------------------------------------------------------------------------------------

@@ -4,19 +4,17 @@ FactoryBot.define do
     name { Faker::Company.name }
     code { "PM-#{SecureRandom.hex(4).upcase}" }
     business_type { PaymentMethod.business_types.keys.sample }
-
-    transient do
-      pm_category { nil }
-    end
+    payment_mode { :redirect }
+    gateway_url { Seed::PaymentMethodService::MOCK_REDIRECT_URL }
 
     initialize_with do
-      Seed::PaymentMethodService.new(name: name, code: code, business_type: business_type)
-    end
-
-    before(:create) do |record, evaluator|
-      category = evaluator.pm_category || create(:category)
-      record.category = category
-      record.property_mapping = category.default_property_mapping
+      Seed::PaymentMethodService.new(
+        name: name,
+        code: code,
+        business_type: business_type,
+        payment_mode: payment_mode,
+        gateway_url: gateway_url
+      )
     end
   end
 end

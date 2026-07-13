@@ -2,8 +2,8 @@
 
 require "rails_helper"
 
-RSpec.describe WalletTransaction do
-  subject(:tx) { build(:wallet_transaction, company: company) }
+RSpec.describe BillingTransaction do
+  subject(:tx) { build(:billing_transaction, company: company) }
 
   let(:company) { create(:company) }
 
@@ -13,18 +13,17 @@ RSpec.describe WalletTransaction do
       expect(tx.company).to eq(company)
     end
 
-    it "belongs to billing_invoice (optional)" do
-      tx.billing_invoice = nil
+    it "belongs to billing_invoice" do
       tx.save!
-      expect(tx.billing_invoice).to be_nil
+      expect(tx.billing_invoice).to be_present
     end
   end
 
   describe "validations" do
-    it "requires transaction_type" do
-      tx.transaction_type = nil
+    it "requires billing_invoice" do
+      tx.billing_invoice = nil
       expect(tx).not_to be_valid
-      expect(tx.errors[:transaction_type]).to be_present
+      expect(tx.errors[:billing_invoice]).to be_present
     end
 
     it "validates amount_cents is >= 0" do

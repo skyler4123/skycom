@@ -1,8 +1,8 @@
-class CreateWalletTransactions < ActiveRecord::Migration[8.0]
+class CreateBillingTransactions < ActiveRecord::Migration[8.0]
   def change
-    create_table :wallet_transactions, id: :uuid do |t|
+    create_table :billing_transactions, id: :uuid do |t|
       t.references :company, null: false, foreign_key: true, type: :uuid
-      t.references :billing_invoice, null: true, foreign_key: true, type: :uuid
+      t.references :billing_invoice, null: false, foreign_key: true, type: :uuid
 
       t.integer :transaction_type, null: false
       t.integer :amount_cents, null: false
@@ -18,6 +18,6 @@ class CreateWalletTransactions < ActiveRecord::Migration[8.0]
       t.timestamps
     end
 
-    add_index :wallet_transactions, [ :company_id, :created_at ], name: "idx_wallet_tx_company_chrono"
+    add_index :billing_transactions, [ :company_id, :created_at ], name: "idx_wallet_tx_company_chrono"
   end
 end

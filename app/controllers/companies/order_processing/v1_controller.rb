@@ -7,7 +7,7 @@ class Companies::OrderProcessing::V1Controller < Companies::ApplicationControlle
     result = OrderProcessingV1::CheckAvailabilityService.call(items: checkout_params[:items])
 
     unless result[:available]
-      render json: { error: "Insufficient stock", failed_item: result[:failed_item] }, status: :unprocessable_entity
+      render json: { errors: [ "Insufficient stock" ], failed_item: result[:failed_item] }, status: :unprocessable_entity
       return
     end
 
@@ -42,7 +42,7 @@ class Companies::OrderProcessing::V1Controller < Companies::ApplicationControlle
       payment_id: payment_result[:payment_id]
     }
   rescue OrderProcessingV1::InsufficientStockError
-    render json: { error: "Insufficient stock for payment" }, status: :unprocessable_entity
+    render json: { errors: [ "Insufficient stock for payment" ] }, status: :unprocessable_entity
   end
 
   private

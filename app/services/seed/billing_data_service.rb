@@ -4,6 +4,11 @@
 # dashboard shows non-zero usage metrics, meaningful charts, and invoices
 # with varied dates. Called by Seed::RetailEnrichService#seeding.
 #
+# Follows the BillingTransaction source-of-truth pattern:
+# - Invoices are created as unpaid
+# - BillingTransactions settle them and the callback sets payment_status
+# - Update balances explicitly (no auto-settlement interference)
+#
 #   Seed::BillingDataService.create(company: company)
 #
 module Seed
@@ -124,25 +129,32 @@ module Seed
       invoice_pairs.each do |pair|
         date = pair[:days_ago].days.ago
 
+        # Create invoice as unpaid — the BillingTransaction callback will
+        # set payment_status to :paid when we create the transaction below.
         invoice = BillingInvoice.create!(
           company: company,
           billing_contract: company.active_billing_contract,
           price_cents: pair[:price],
           price_currency: company.currency_code.to_s.upcase,
-          payment_status: pair[:status],
-          lifecycle_status: :final,
+          movement_type: :charge,
+          target_balance: :main_balance,
+          created_by: :system,
+          name: "Monthly Billing - #{date.strftime('%B %Y')}",
           period_start: date.beginning_of_month,
-          period_end: date.end_of_month
+          period_end: date.end_of_month,
+          payment_status: :unpaid,
+          lifecycle_status: :final
         )
 
-        invoice.update_columns(
-          created_at: date,
-          updated_at: date
-        )
+        invoice.update_columns(created_at: date, updated_at: date)
 
-        next unless invoice.paid?
+        next unless pair[:status] == :paid
 
-        WalletTransaction.create!(
+        # Use update_columns to set balance without triggering auto-settlement
+        promo_before = pair[:price]
+        company.update_columns(promo_balance_cents: promo_before)
+
+        txn = BillingTransaction.create!(
           company: company,
           billing_invoice: invoice,
           transaction_type: :deduction,
@@ -150,15 +162,27 @@ module Seed
           currency: company.currency_code.to_s.upcase,
           balance_before_cents: company.main_balance_cents,
           balance_after_cents: company.main_balance_cents,
-          promo_balance_before_cents: company.promo_balance_cents,
-          promo_balance_after_cents: company.promo_balance_cents,
-          description: "Auto-payment for #{invoice.invoice_number}",
-          created_at: date,
-          updated_at: date
+          promo_balance_before_cents: promo_before,
+          promo_balance_after_cents: 0,
+          description: "Auto-payment for #{invoice.invoice_number}"
         )
+
+        # Reset balance and backdate records
+        company.update_columns(promo_balance_cents: 0)
+        txn.update_columns(created_at: date, updated_at: date)
+        invoice.update_columns(updated_at: date)
       end
 
-      company.flag_unpaid! if company.billing_invoices.where(payment_status: %i[unpaid overdue]).exists?
+      if company.billing_invoices.where(payment_status: %i[unpaid overdue]).exists?
+        unpaid_data = invoice_pairs.select { |p| p[:status] == :unpaid }.first
+        if unpaid_data
+          unpaid_date = unpaid_data[:days_ago].days.ago
+          company.update_columns(
+            has_unpaid_invoices_at: unpaid_date,
+            suspension_at: unpaid_date.end_of_month
+          )
+        end
+      end
     end
   end
 end
