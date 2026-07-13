@@ -37,7 +37,9 @@ RSpec.describe Analytics::DashboardService do
 
     context "with orders and products" do
       let!(:product) do
-        create(:product, company: company, metadata: { "cost_price_cents" => 500 })
+        create(:product, company: company).tap { |p|
+          p.update_column(:metadata, [ 500 ].to_json)
+        }
       end
       let!(:customer) { create(:customer, company: company, branch: branch) }
       let!(:order) do

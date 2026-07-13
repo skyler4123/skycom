@@ -80,8 +80,10 @@ module Analytics
         monthly_data[month][:revenue_cents] += revenue
         total_revenue += revenue
 
-        if oa.appoint_to.respond_to?(:metadata) && oa.appoint_to.metadata.present?
-          cost_price = oa.appoint_to.metadata["cost_price_cents"].to_i
+        if oa.appoint_to.respond_to?(:metadata)
+          raw = oa.appoint_to.read_attribute_before_type_cast(:metadata)
+          meta = JSON.parse(raw) if raw.is_a?(::String)
+          cost_price = Array(meta).first.to_i
           cost = cost_price * (oa.quantity || 1)
           monthly_data[month][:cost_cents] += cost
           total_cost += cost

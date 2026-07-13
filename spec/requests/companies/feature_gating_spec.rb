@@ -200,10 +200,44 @@ RSpec.describe "Feature Gating API", type: :request do
     end
 
     context "when feature exists only for a different country" do
+      let(:company) do
+        create(:company).tap { |c| c.update!(country_code: :us) }
+      end
+      let(:owner_user) { company.reload.user }
+
+      before do
+        get sign_in_for_test_path(email: owner_user.email)
+      end
+
       it "returns 404" do
         create(:billing_resource, :addon_feature, :vn, name: "analytics_dashboard")
         post "/companies/#{company.id}/billing/toggle_feature", params: { feature_key: "analytics_dashboard" }, as: :json
         expect(response).to have_http_status(:not_found)
+      end
+    end
+
+    context "when feature exists for both countries but only enabled on correct one" do
+      let(:company) do
+        create(:company).tap { |c| c.update!(country_code: :us) }
+      end
+      let(:owner_user) { company.reload.user }
+      let!(:us_resource) do
+        create(:billing_resource, :addon_feature, name: "analytics_dashboard", country_code: :us)
+      end
+      let!(:vn_resource) do
+        create(:billing_resource, :addon_feature, name: "analytics_dashboard", country_code: :vn)
+      end
+      let(:contract) { company.active_billing_contract }
+
+      before do
+        get sign_in_for_test_path(email: owner_user.email)
+        create(:contract_feature, billing_contract: contract, billing_resource: us_resource, lifecycle_status: :active)
+        Rails.local_cache.clear
+      end
+
+      it "returns 200 when feature is enabled on this country's resource" do
+        get "/companies/#{company.id}/analytics", as: :json
+        expect(response).to have_http_status(:ok)
       end
     end
 
