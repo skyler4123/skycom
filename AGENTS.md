@@ -31,6 +31,7 @@
 - Input names must use bracket notation: `name="employee[email]"` (required for Rails strong params nesting)
 - Use `Helpers.form()` for all form submissions (handles CSRF + method spoofing)
 - Listen for `form:success` events to refresh parent UI
+- **API Errors** — Backend must return `errors` (plural array) key, never `error` (singular). See `docs/API_ERROR_FORMAT.md`.
 
 ## Database
 - Check `db/schema.rb` first for columns/indexes

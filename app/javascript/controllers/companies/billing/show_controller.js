@@ -244,7 +244,7 @@ export default class Companies_Billing_ShowController extends Companies_LayoutCo
     try {
       await fetchJson(`/companies/${companyId}/billing/toggle_feature`, {
         method: "POST",
-        body: JSON.stringify({ feature_key: featureKey })
+        body: { feature_key: featureKey }
       })
       reloadThenToast({ type: "success", message: translate("Feature updated") })
     } catch (error) {

@@ -79,7 +79,7 @@ export default class Companies_Permissions_EditPolicyModalController extends Con
 
       reloadThenToast({ type: "success", message: `${this.actionNameValue} ${translate("permission updated")}` })
     } catch (error) {
-      toast({ type: "error", message: error.error || translate("Failed to update permission") })
+      toast({ type: "error", message: error.errors?.join(", ") || translate("Failed to update permission") })
     }
   }
 
