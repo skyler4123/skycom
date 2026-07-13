@@ -60,7 +60,7 @@ class Companies::BillingController < Companies::ApplicationController
       f.monthly_flat_price_currency = resource.currency
     end
 
-    new_status = cf.active? ? :disabled : :active
+    new_status = cf.new_record? ? :active : (cf.active? ? :disabled : :active)
     cf.update!(lifecycle_status: new_status)
 
     current_company.invalidate_client_cache!
