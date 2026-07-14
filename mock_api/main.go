@@ -1,5 +1,3 @@
-// mock_api/main.go
-
 package main
 
 import (
@@ -11,6 +9,27 @@ import (
 	"time"
 )
 
+// =========================================================================
+// GLOBAL CONFIGURATION (Constants)
+// =========================================================================
+const (
+	// Server Network Config
+	ServerPort = ":4000"
+	BaseIP     = "192.168.0.100" // Change this in one place to update all routes!
+
+	// Client Redirection Target
+	ClientSuccessURL = "http://" + BaseIP + ":3000/checkout/success"
+
+	// Webhook Settings
+	WebhookTargetURL     = "http://" + BaseIP + ":3000/webhooks/bank_payment"
+	WebhookSecureSecret  = "local_secure_dev_secret"
+	WebhookClientTimeout = 5 * time.Second
+)
+
+// =========================================================================
+// TYPES & MEMORY STORE
+// =========================================================================
+
 type PaymentRequest struct {
 	Amount    int    `json:"amount"`
 	InvoiceID string `json:"invoice_id"`
@@ -19,16 +38,19 @@ type PaymentRequest struct {
 
 var activeSessions = make(map[string]PaymentRequest)
 
+// =========================================================================
+// MAIN ENGINE
+// =========================================================================
+
 func main() {
-	// =========================================================================
-	// ROUTE GROUP 0: DEPLOYMENT & NETWORK DIAGNOSTIC TOOLS
-	// =========================================================================
-	
-	// New Connection Diagnostic Test Endpoint
+	// 🚀 Dynamic Base URL for this server's hosted checkout
+	hostedCheckoutBase := fmt.Sprintf("http://%s%s", BaseIP, ServerPort)
+
+	// -------------------------------------------------------------------------
+	// ROUTE 0: DIAGNOSTICS
+	// -------------------------------------------------------------------------
 	http.HandleFunc("/api/v1/ping", func(w http.ResponseWriter, r *http.Request) {
-		/* 💬 What the Browser says: "Are you alive over there?" */
-		/* 💬 What the Go Server thinks: "Let's log this network check and say hi to Skyler." */
-		fmt.Printf("📡 [Diagnostic Alert] Received active ping test from client IP: %s\n", r.RemoteAddr)
+		logAction("PING", fmt.Sprintf("Active ping test from client IP: %s", r.RemoteAddr))
 		
 		w.Header().Set("Content-Type", "application/json")
 		json.NewEncoder(w).Encode(map[string]interface{}{
@@ -39,41 +61,80 @@ func main() {
 		})
 	})
 
-	// =========================================================================
-	// ROUTE GROUP 1: BANKING SUITE (QR & REDIRECT FLOWS)
-	// =========================================================================
-	
-	// QR Flow
+	// -------------------------------------------------------------------------
+	// ROUTE 1: QR GENERATE
+	// -------------------------------------------------------------------------
 	http.HandleFunc("/api/v1/bank/qr-generate", func(w http.ResponseWriter, r *http.Request) {
+		logAction("QR FLOW", "Received generation request")
 		var req PaymentRequest
-		json.NewDecoder(r.Body).Decode(&req)
+		
+		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+			logError("QR FLOW", fmt.Sprintf("Failed to decode JSON: %v", err))
+			w.WriteHeader(http.StatusBadRequest)
+			json.NewEncoder(w).Encode(map[string]interface{}{"success": false, "error": "Invalid JSON request payload"})
+			return
+		}
+
+		if req.Amount <= 0 || req.InvoiceID == "" {
+			logWarn("QR FLOW", "Validation Failed. Missing Amount or InvoiceID.")
+			w.WriteHeader(http.StatusBadRequest)
+			json.NewEncoder(w).Encode(map[string]interface{}{
+				"success":    false,
+				"error":      "Missing required fields",
+				"debug_hint": fmt.Sprintf("Received -> Amount: %d, InvoiceID: '%s'", req.Amount, req.InvoiceID),
+			})
+			return
+		}
+
 		txnID := fmt.Sprintf("TXN_QR_%d", time.Now().UnixNano())
-		qrString := fmt.Sprintf("00020101021238580010A0000...%d...%s", req.Amount, req.Memo)
+		qrString := fmt.Sprintf("00020101021238580010A0000|AMT:%d|INV:%s|MEMO:%s|TXN:%s", req.Amount, req.InvoiceID, req.Memo, txnID)
+		
+		logSuccess("QR FLOW", fmt.Sprintf("Generated Txn: %s -> QR: %s", txnID, qrString))
 
 		go fireWebhookCallback(txnID, req.InvoiceID, req.Amount)
 
 		w.Header().Set("Content-Type", "application/json")
-		json.NewEncoder(w).Encode(map[string]interface{}{"success": true, "qr_string": qrString})
+		json.NewEncoder(w).Encode(map[string]interface{}{
+			"success":   true, 
+			"qr_string": qrString,
+			"received":  req,
+		})
 	})
 
-	// Redirect Session Setup
+	// -------------------------------------------------------------------------
+	// ROUTE 2: REDIRECT SESSION SETUP
+	// -------------------------------------------------------------------------
 	http.HandleFunc("/api/v1/bank/redirect-session", func(w http.ResponseWriter, r *http.Request) {
+		logAction("REDIRECT FLOW", "Setting up checkout session")
 		var req PaymentRequest
-		json.NewDecoder(r.Body).Decode(&req)
+		
+		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+			logError("REDIRECT FLOW", fmt.Sprintf("Failed to decode JSON: %v", err))
+			w.WriteHeader(http.StatusBadRequest)
+			return
+		}
+
 		sessionID := fmt.Sprintf("SESS_%d", time.Now().UnixNano())
 		activeSessions[sessionID] = req
-		// redirectURL := fmt.Sprintf("http://localhost:4000/bank/hosted-checkout?session_id=%s", sessionID)
-		redirectURL := fmt.Sprintf("http://192.168.0.100:4000/bank/hosted-checkout?session_id=%s", sessionID)
+		
+		// Build redirect URL using our central config and base IP
+		redirectURL := fmt.Sprintf("%s/bank/hosted-checkout?session_id=%s", hostedCheckoutBase, sessionID)
+		logSuccess("REDIRECT FLOW", fmt.Sprintf("Created Session: %s -> Target Redirect: %s", sessionID, redirectURL))
 
 		w.Header().Set("Content-Type", "application/json")
 		json.NewEncoder(w).Encode(map[string]interface{}{"success": true, "redirect_url": redirectURL})
 	})
 
-	// Hosted Checkout Page View
+	// -------------------------------------------------------------------------
+	// ROUTE 3: HOSTED CHECKOUT PAGE (HTML)
+	// -------------------------------------------------------------------------
 	http.HandleFunc("/bank/hosted-checkout", func(w http.ResponseWriter, r *http.Request) {
 		sessionID := r.URL.Query().Get("session_id")
+		logAction("WEB VIEW", fmt.Sprintf("Serving Checkout Page for Session: %s", sessionID))
+		
 		sessionData, exists := activeSessions[sessionID]
 		if !exists {
+			logError("WEB VIEW", fmt.Sprintf("Session ID %s not found in memory!", sessionID))
 			http.Error(w, "Invalid Payment Session", http.StatusBadRequest)
 			return
 		}
@@ -106,42 +167,87 @@ func main() {
 		t.Execute(w, map[string]interface{}{"SessionID": sessionID, "InvoiceID": sessionData.InvoiceID, "Amount": sessionData.Amount})
 	})
 
-	// Hosted Checkout Processing Submission
+	// -------------------------------------------------------------------------
+	// ROUTE 4: FORM SUBMISSION PROCESSOR
+	// -------------------------------------------------------------------------
 	http.HandleFunc("/bank/hosted-checkout/submit", func(w http.ResponseWriter, r *http.Request) {
+		logAction("FORM SUBMIT", "Processing browser payment submission")
 		r.ParseForm()
 		sessionID := r.FormValue("session_id")
-		sessionData := activeSessions[sessionID]
+		
+		sessionData, exists := activeSessions[sessionID]
+		if !exists {
+			logError("FORM SUBMIT", fmt.Sprintf("Submitted with expired Session ID: %s", sessionID))
+			http.Error(w, "Session expired", http.StatusBadRequest)
+			return
+		}
+
 		txnID := fmt.Sprintf("TXN_CARD_%d", time.Now().UnixNano())
+		logSuccess("FORM SUBMIT", fmt.Sprintf("Processed Card. Session: %s -> Txn ID: %s", sessionID, txnID))
 
-		fireWebhookCallback(txnID, sessionData.InvoiceID, sessionData.Amount)
+		go fireWebhookCallback(txnID, sessionData.InvoiceID, sessionData.Amount)
+		
 		delete(activeSessions, sessionID)
+		logAction("DATABASE", fmt.Sprintf("Cleaned up session %s from active memory map.", sessionID))
 
-		// http.Redirect(w, r, "http://localhost:3000/checkout/success", http.StatusSeeOther)
-		http.Redirect(w, r, "http://192.168.0.100:3000/checkout/success", http.StatusSeeOther)
+		logAction("REDIRECT", fmt.Sprintf("Redirecting user back to App Success Page: %s", ClientSuccessURL))
+		http.Redirect(w, r, ClientSuccessURL, http.StatusSeeOther)
 	})
 
-	// Future extension hook spot examples:
-	// http.HandleFunc("/api/v1/sms/send", func(...) {})
-	// http.HandleFunc("/api/v1/shipping/calculate", func(...) {})
-
-	fmt.Println("🚀 Multipurpose Mock API Engine running smoothly on port 4000...")
-	http.ListenAndServe(":4000", nil)
+	fmt.Printf("🚀 Multipurpose Mock API Engine running smoothly on port %s (IP: %s)...\n", ServerPort, BaseIP)
+	http.ListenAndServe(ServerPort, nil)
 }
 
+// =========================================================================
+// BACKGROUND WORKERS & HELPERS
+// =========================================================================
+
 func fireWebhookCallback(txnID string, invoiceID string, amount int) {
-	// webhookURL := "http://localhost:3000/webhooks/bank_payment"
-	webhookURL := "http://192.168.0.100:3000/webhooks/bank_payment"
+	logAction("WEBHOOK", fmt.Sprintf("Preparing dispatch payload for Txn: %s", txnID))
+
 	payload, _ := json.Marshal(map[string]interface{}{
 		"event": "transaction.completed",
-		"data":  map[string]interface{}{"transaction_id": txnID, "invoice_id": invoiceID, "amount": amount, "paid_at": time.Now().Format(time.RFC3339)},
+		"data": map[string]interface{}{
+			"transaction_id": txnID, 
+			"invoice_id":     invoiceID, 
+			"amount":         amount, 
+			"paid_at":        time.Now().Format(time.RFC3339),
+		},
 	})
-	req, _ := http.NewRequest("POST", webhookURL, bytes.NewBuffer(payload))
-	req.Header.Set("X-Skycom-Bank-Signature", "local_secure_dev_secret")
+	
+	req, _ := http.NewRequest("POST", WebhookTargetURL, bytes.NewBuffer(payload))
+	req.Header.Set("X-Skycom-Bank-Signature", WebhookSecureSecret)
 	req.Header.Set("Content-Type", "application/json")
 
-	client := &http.Client{Timeout: 5 * time.Second}
+	client := &http.Client{Timeout: WebhookClientTimeout}
+	
+	logAction("WEBHOOK", fmt.Sprintf("POSTing event to %s...", WebhookTargetURL))
 	resp, err := client.Do(req)
-	if err == nil {
-		defer resp.Body.Close()
+	if err != nil {
+		logError("WEBHOOK", fmt.Sprintf("Failed to reach consumer app: %v\n", err))
+		return
 	}
+	defer resp.Body.Close()
+
+	logSuccess("WEBHOOK", fmt.Sprintf("Target application processed event. Response Status: %s\n", resp.Status))
+}
+
+// =========================================================================
+// UNIFIED LOGGING UTILITIES
+// =========================================================================
+
+func logAction(context string, message string) {
+	fmt.Printf("📥 [%-14s] %s\n", context, message)
+}
+
+func logSuccess(context string, message string) {
+	fmt.Printf("🟢 [%-14s] SUCCESS: %s\n", context, message)
+}
+
+func logWarn(context string, message string) {
+	fmt.Printf("⚠️  [%-14s] WARNING: %s\n", context, message)
+}
+
+func logError(context string, message string) {
+	fmt.Printf("❌ [%-14s] ERROR: %s\n", context, message)
 }
