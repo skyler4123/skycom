@@ -15,7 +15,7 @@ class CreateEmployees < ActiveRecord::Migration[8.0]
       t.string :phone_number
       t.integer :currency_code
       t.integer :country_code
-      t.string  :timezone
+      t.integer  :timezone
       t.jsonb :ui_configs, array: true
 
       # --- System Fields ---

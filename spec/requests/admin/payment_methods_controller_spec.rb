@@ -99,7 +99,7 @@ RSpec.describe "Admin::PaymentMethods", type: :request do
             name: "Test Method",
             code: "TEST_METHOD",
             business_type: "b2c",
-            country_code: "840",
+            country_code: "us",
             payment_mode: "redirect",
             gateway_url: "http://localhost:4000/api/v1/bank/redirect-session"
           }
@@ -116,7 +116,7 @@ RSpec.describe "Admin::PaymentMethods", type: :request do
             name: "",
             code: "",
             business_type: "b2c",
-            country_code: "840",
+            country_code: "us",
             payment_mode: ""
           }
         }

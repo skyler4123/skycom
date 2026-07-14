@@ -4,9 +4,8 @@ class Order < ApplicationRecord
   attribute :permission_resource_name, :string, default: -> { self.name }
 
   attribute :metadata, :jsonb, array: true, default: []
-  attribute :currency_code, :integer, default: 840
-  attribute :country_code, :integer, default: 1
-  attribute :timezone, :string, default: "UTC"
+  enum :country_code, COUNTRY_CODES, prefix: true, default: :us
+  enum :timezone, TIMEZONES, prefix: true, default: :utc
 
   include TagConcern
   include MeteringConcern
@@ -29,7 +28,7 @@ class Order < ApplicationRecord
   # --- Enums ---
   enum :lifecycle_status, LIFECYCLE_STATUS, prefix: true
   enum :workflow_status, WORKFLOW_STATUS, prefix: true
-  enum :currency_code, CURRENCIE_CODES, prefix: true
+  enum :currency_code, CURRENCIE_CODES, prefix: true, default: :usd
   enum :business_type, {
     online: 0,
     in_store: 1,

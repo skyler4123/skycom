@@ -26,5 +26,5 @@ class BillingResource < ApplicationRecord
 
   enum :resource_type, { volumetric: 0, addon_feature: 1 }, default: :volumetric
   enum :lifecycle_status, { active: 0, deprecated: 1, archived: 2 }, default: :active
-  enum :country_code, COUNTRIE_CODES, prefix: true
+  enum :country_code, COUNTRY_CODES, prefix: true, default: :us
 end

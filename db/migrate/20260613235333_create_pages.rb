@@ -13,7 +13,7 @@ class CreatePages < ActiveRecord::Migration[8.0]
       t.string :phone_number
       t.integer :currency_code
       t.integer :country_code
-      t.string  :timezone
+      t.integer  :timezone
 
       # --- System Configurations (Enums) ---
       t.integer :business_type,      null: false, index: true

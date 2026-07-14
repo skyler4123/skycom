@@ -14,7 +14,7 @@ class CreateWarehouses < ActiveRecord::Migration[8.0]
       t.string :phone_number
       t.integer :currency_code
       t.integer :country_code
-      t.string  :timezone
+      t.integer  :timezone
 
       # --- System Fields ---
       t.integer  :lifecycle_status, index: true

@@ -5,9 +5,8 @@ class Invoice < ApplicationRecord
   attribute :permission_resource_name, :string, default: -> { self.name }
 
   attribute :metadata, :jsonb, array: true, default: []
-  attribute :currency_code, :integer, default: 840
-  attribute :country_code, :integer, default: 1
-  attribute :timezone, :string, default: "UTC"
+  enum :country_code, COUNTRY_CODES, prefix: true, default: :us
+  enum :timezone, TIMEZONES, prefix: true, default: :utc
 
   include TagConcern
 
@@ -30,7 +29,7 @@ class Invoice < ApplicationRecord
     subscription: 2
   }
 
-  enum :currency_code, CURRENCIE_CODES, prefix: true
+  enum :currency_code, CURRENCIE_CODES, prefix: true, default: :usd
 
   # --- Validations ---
   validates :name, presence: true, uniqueness: { scope: :company_id }, length: { maximum: 255 }

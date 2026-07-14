@@ -5,9 +5,8 @@ class Task < ApplicationRecord
   attribute :permission_resource_name, :string, default: -> { self.name }
 
   attribute :metadata, :jsonb, array: true, default: []
-  attribute :currency_code, :integer, default: 840
-  attribute :country_code, :integer, default: 1
-  attribute :timezone, :string, default: "UTC"
+  enum :country_code, COUNTRY_CODES, prefix: true, default: :us
+  enum :timezone, TIMEZONES, prefix: true, default: :utc
 
   include TagConcern
 
@@ -32,7 +31,7 @@ class Task < ApplicationRecord
     usd: 0,
     eur: 1,
     gbp: 2
-  }
+  }, default: :usd
 
   # --- Validations ---
   validates :name, presence: true, uniqueness: { scope: :company_id }, length: { maximum: 255 }

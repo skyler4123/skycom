@@ -231,7 +231,7 @@ class Seed::RetailEnrichService
   end
 
   def appoint_payment_methods_to_company
-    country_code_value = COUNTRIE_CODES[@country_code.to_s.to_sym] || @country_code
+    country_code_value = COUNTRY_CODES[@country_code.to_s.to_sym] || @country_code
     country_methods = PaymentMethod.where(country_code: country_code_value)
 
     @branches.each do |branch|
