@@ -77,7 +77,7 @@ export default class Admin_PaymentMethods_IndexController extends Admin_LayoutCo
                   return `<span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium capitalize ${colorClass}">${value?.toUpperCase() || '—'}</span>`
                 },
                 country_code: (value) => {
-                  const names = { 840: 'US', 704: 'VN' }
+                  const names = { us: 'US', vn: 'VN' }
                   return `<span class="text-sm text-slate-600 dark:text-slate-400">${names[value] || value || '—'}</span>`
                 },
                 lifecycle_status: (value) => `${Helpers.statusBadge(value)}`,

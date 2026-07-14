@@ -5,9 +5,6 @@ class Branch < ApplicationRecord
 
   attribute :ui_configs, :jsonb, array: true, default: []
   attribute :metadata, :jsonb, array: true, default: []
-  attribute :currency_code, :integer, default: 840
-  attribute :country_code, :integer, default: 1
-  attribute :timezone, :string, default: "UTC"
 
   include AddressConcern
   include TagConcern
@@ -53,7 +50,7 @@ class Branch < ApplicationRecord
   # has_many :child_branches, class_name: "Company", foreign_key: "parent_branch_id", dependent: :destroy, inverse_of: :parent_company
 
   # --- Enums ---
-  enum :country_code, COUNTRIE_CODES, prefix: true
+  enum :country_code, COUNTRY_CODES, prefix: true, default: :us
   enum :business_type, {
     # Physical Points of Sale
     storefront: 0,        # Main retail/customer-facing shop
@@ -76,8 +73,8 @@ class Branch < ApplicationRecord
 
     virtual: 99           # Online-only branch
   }, prefix: true
-  enum :timezone, TIMEZONES, prefix: true
-  enum :currency_code, CURRENCIE_CODES, prefix: true
+  enum :timezone, TIMEZONES, prefix: true, default: :utc
+  enum :currency_code, CURRENCIE_CODES, prefix: true, default: :usd
   enum :lifecycle_status, LIFECYCLE_STATUS, prefix: true
   enum :workflow_status, WORKFLOW_STATUS, prefix: true
 

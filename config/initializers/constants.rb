@@ -17,7 +17,7 @@ CURRENCIE_CODES = {
 }
 
 # Country ISO numeric codes used by User (user.country_code enum).
-COUNTRIE_CODES = {
+COUNTRY_CODES = {
   us: 840,
   vn: 704
 }

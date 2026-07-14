@@ -23,8 +23,8 @@ RSpec.describe PaymentMethodAppointment, type: :model do
   describe "country code validation" do
     let(:company) { create(:company) }
     let(:payment_method) { create(:payment_method) }
-    let(:country_code_us) { COUNTRIE_CODES[:us] }
-    let(:country_code_vn) { COUNTRIE_CODES[:vn] }
+    let(:country_code_us) { COUNTRY_CODES[:us] }
+    let(:country_code_vn) { COUNTRY_CODES[:vn] }
 
     before do
       company.update_column(:country_code, country_code_us)

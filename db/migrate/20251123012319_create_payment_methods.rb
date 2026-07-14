@@ -9,7 +9,7 @@ class CreatePaymentMethods < ActiveRecord::Migration[8.0]
       t.string :phone_number
       t.integer :currency_code
       t.integer :country_code
-      t.string  :timezone
+      t.integer  :timezone
       t.integer :payment_mode, index: true
       t.string :gateway_url
       t.string :secret_key

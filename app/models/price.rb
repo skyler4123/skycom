@@ -2,8 +2,6 @@
 
 # app/models/price.rb
 class Price < ApplicationRecord
-  attribute :currency_code, :integer, default: 0
-
   include ImmutableRecordConcern
 
   # 1. Standard Rails Enum for Currencies
@@ -13,7 +11,7 @@ class Price < ApplicationRecord
     vnd: 1,
     aud: 2,
     eur: 3
-  }, prefix: true
+  }, prefix: true, default: :usd
 
   # 2. Money-Rails Configuration
   # We map the gem's 'cents' logic to your 'amount' column.
