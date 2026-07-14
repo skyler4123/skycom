@@ -62,7 +62,8 @@ func main() {
 		json.NewDecoder(r.Body).Decode(&req)
 		sessionID := fmt.Sprintf("SESS_%d", time.Now().UnixNano())
 		activeSessions[sessionID] = req
-		redirectURL := fmt.Sprintf("http://localhost:4000/bank/hosted-checkout?session_id=%s", sessionID)
+		// redirectURL := fmt.Sprintf("http://localhost:4000/bank/hosted-checkout?session_id=%s", sessionID)
+		redirectURL := fmt.Sprintf("http://192.168.0.100:4000/bank/hosted-checkout?session_id=%s", sessionID)
 
 		w.Header().Set("Content-Type", "application/json")
 		json.NewEncoder(w).Encode(map[string]interface{}{"success": true, "redirect_url": redirectURL})
@@ -115,7 +116,8 @@ func main() {
 		fireWebhookCallback(txnID, sessionData.InvoiceID, sessionData.Amount)
 		delete(activeSessions, sessionID)
 
-		http.Redirect(w, r, "http://localhost:3000/checkout/success", http.StatusSeeOther)
+		// http.Redirect(w, r, "http://localhost:3000/checkout/success", http.StatusSeeOther)
+		http.Redirect(w, r, "http://192.168.0.100:3000/checkout/success", http.StatusSeeOther)
 	})
 
 	// Future extension hook spot examples:
@@ -127,7 +129,8 @@ func main() {
 }
 
 func fireWebhookCallback(txnID string, invoiceID string, amount int) {
-	webhookURL := "http://skycom-web:3000/webhooks/bank_payment"
+	// webhookURL := "http://localhost:3000/webhooks/bank_payment"
+	webhookURL := "http://192.168.0.100:3000/webhooks/bank_payment"
 	payload, _ := json.Marshal(map[string]interface{}{
 		"event": "transaction.completed",
 		"data":  map[string]interface{}{"transaction_id": txnID, "invoice_id": invoiceID, "amount": amount, "paid_at": time.Now().Format(time.RFC3339)},
