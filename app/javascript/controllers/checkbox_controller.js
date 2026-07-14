@@ -51,7 +51,7 @@ export default class CheckboxController extends Controller {
       toast({ type: "success", message: response?.message || "Updated successfully!" })
     } catch (error) {
       event.target.checked = this.previousState
-      toast({ type: "error", message: error?.message || "Update failed." })
+      toast({ type: "error", message: error.errors?.join(", ") || error?.message || "Update failed." })
     }
   }
 }

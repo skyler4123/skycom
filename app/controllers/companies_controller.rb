@@ -6,7 +6,7 @@ class CompaniesController < ApplicationController
       current_user.touch
       respond_to do |format|
         format.html { redirect_to company_dashboards_path(company), notice: "Company created successfully!" }
-        format.json { render json: { company: company }, status: :created }
+        format.json { render json: { company: company, message: "Company created successfully" }, status: :created }
       end
     else
       respond_to do |format|

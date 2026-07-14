@@ -22,7 +22,8 @@ export default class Companies_Employees_IndexController extends Companies_Layou
       this.employees = response.employees || []
       this.pagination = response.pagination || {}
     } catch (error) {
-      toast({ type: "error", message: translate("Failed to load employees") })
+      const __errDetail = error.errors?.join(", ") || error.message
+      toast({ type: "error", message: `${ translate("Failed to load employees") }${__errDetail ? ": " + __errDetail : ""}` })
     }
 
     poll(() => {

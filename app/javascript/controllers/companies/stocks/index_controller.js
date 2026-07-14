@@ -28,7 +28,8 @@ export default class Companies_Stocks_IndexController extends Companies_LayoutCo
       })
 
     } catch (error) {
-      toast({ type: "error", message: translate("Failed to load stocks") })
+      const __errDetail = error.errors?.join(", ") || error.message
+      toast({ type: "error", message: `${ translate("Failed to load stocks") }${__errDetail ? ": " + __errDetail : ""}` })
     }
   }
 

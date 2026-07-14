@@ -22,7 +22,8 @@ export default class Companies_Brands_IndexController extends Companies_LayoutCo
       this.brands = response.brands || []
       this.pagination = response.pagination || {}
     } catch (error) {
-      toast({ type: "error", message: translate("Failed to load brands") })
+      const __errDetail = error.errors?.join(", ") || error.message
+      toast({ type: "error", message: `${ translate("Failed to load brands") }${__errDetail ? ": " + __errDetail : ""}` })
     }
 
     poll(() => {

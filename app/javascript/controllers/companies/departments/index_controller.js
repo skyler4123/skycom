@@ -22,7 +22,8 @@ export default class Companies_Departments_IndexController extends Companies_Lay
       this.departments = response.departments || []
       this.pagination = response.pagination || {}
     } catch (error) {
-      toast({ type: "error", message: translate("Failed to load departments") })
+      const __errDetail = error.errors?.join(", ") || error.message
+      toast({ type: "error", message: `${ translate("Failed to load departments") }${__errDetail ? ": " + __errDetail : ""}` })
     }
 
     poll(() => {

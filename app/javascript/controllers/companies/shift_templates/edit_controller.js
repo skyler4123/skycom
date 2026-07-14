@@ -15,7 +15,8 @@ export default class Companies_ShiftTemplates_EditController extends Companies_L
       const response = await fetchJson(`${Helpers.company_shift_template_path(currentCompany().id, this.templateId)}.json`)
       this.shiftTemplate = response.shift_template
     } catch (error) {
-      toast({ type: "error", message: translate("Failed to load shift template") })
+      const __errDetail = error.errors?.join(", ") || error.message
+      toast({ type: "error", message: `${ translate("Failed to load shift template") }${__errDetail ? ": " + __errDetail : ""}` })
     }
     poll(() => {
       if (this.hasContentTarget) { this.renderContent(); return true }

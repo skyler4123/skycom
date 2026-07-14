@@ -22,7 +22,8 @@ export default class Companies_Services_IndexController extends Companies_Layout
       this.services = response.services || []
       this.pagination = response.pagination || {}
     } catch (error) {
-      toast({ type: "error", message: translate("Failed to load services") })
+      const __errDetail = error.errors?.join(", ") || error.message
+      toast({ type: "error", message: `${ translate("Failed to load services") }${__errDetail ? ": " + __errDetail : ""}` })
     }
 
     poll(() => {

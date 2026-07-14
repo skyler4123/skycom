@@ -11,7 +11,8 @@ export default class Companies_AttendancePolicies_ShowController extends Compani
       const response = await fetchJson(`${Helpers.company_attendance_policy_path(currentCompany().id, id)}.json`)
       this.attendancePolicy = response.attendance_policy
     } catch (error) {
-      toast({ type: "error", message: translate("Failed to load attendance policy") })
+      const __errDetail = error.errors?.join(", ") || error.message
+      toast({ type: "error", message: `${ translate("Failed to load attendance policy") }${__errDetail ? ": " + __errDetail : ""}` })
     }
     poll(() => {
       if (this.hasContentTarget) { this.renderContent(); return true }

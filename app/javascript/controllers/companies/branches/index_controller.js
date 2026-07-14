@@ -22,7 +22,8 @@ export default class Companies_Branches_IndexController extends Companies_Layout
       this.branches = response.branches || []
       this.pagination = response.pagination || {}
     } catch (error) {
-      toast({ type: "error", message: translate("Failed to load branches") })
+      const __errDetail = error.errors?.join(", ") || error.message
+      toast({ type: "error", message: `${ translate("Failed to load branches") }${__errDetail ? ": " + __errDetail : ""}` })
     }
 
     poll(() => {

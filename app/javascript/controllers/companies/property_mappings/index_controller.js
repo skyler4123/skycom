@@ -22,7 +22,8 @@ export default class Companies_PropertyMappings_IndexController extends Companie
         return false
       })
     } catch (error) {
-      toast({ type: "error", message: translate("Failed to load property mappings") })
+      const __errDetail = error.errors?.join(", ") || error.message
+      toast({ type: "error", message: `${ translate("Failed to load property mappings") }${__errDetail ? ": " + __errDetail : ""}` })
     }
   }
 

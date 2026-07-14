@@ -13,7 +13,8 @@ export default class Companies_AttendanceMonths_IndexController extends Companie
       this.attendanceMonths = response.attendance_months || []
       this.pagination = response.pagination || {}
     } catch (error) {
-      toast({ type: "error", message: translate("Failed to load attendance months") })
+      const __errDetail = error.errors?.join(", ") || error.message
+      toast({ type: "error", message: `${ translate("Failed to load attendance months") }${__errDetail ? ": " + __errDetail : ""}` })
     }
     poll(() => {
       if (this.hasContentTarget) { this.renderContent(); return true }

@@ -22,7 +22,8 @@ export default class Companies_Facilities_IndexController extends Companies_Layo
       this.facilities = response.facilities || []
       this.pagination = response.pagination || {}
     } catch (error) {
-      toast({ type: "error", message: translate("Failed to load facilities") })
+      const __errDetail = error.errors?.join(", ") || error.message
+      toast({ type: "error", message: `${ translate("Failed to load facilities") }${__errDetail ? ": " + __errDetail : ""}` })
     }
 
     poll(() => {

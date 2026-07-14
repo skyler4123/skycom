@@ -26,7 +26,8 @@ export default class Companies_Orders_IndexController extends Companies_LayoutCo
       this.orders = response.orders || []
       this.pagination = response.pagination || {}
     } catch (error) {
-      toast({ type: "error", message: translate("Failed to load orders") })
+      const __errDetail = error.errors?.join(", ") || error.message
+      toast({ type: "error", message: `${ translate("Failed to load orders") }${__errDetail ? ": " + __errDetail : ""}` })
     }
 
     poll(() => {

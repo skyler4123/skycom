@@ -27,7 +27,8 @@ export default class Companies_Billing_ShowController extends Companies_LayoutCo
       this.catalogAddonFeatures = Helpers.sortObjectArray(response.catalog_addon_features || [])
       this.estimate = response.estimate || {}
     } catch (error) {
-      toast({ type: "error", message: translate("Failed to load billing data") })
+      const __errDetail = error.errors?.join(", ") || error.message
+      toast({ type: "error", message: `${ translate("Failed to load billing data") }${__errDetail ? ": " + __errDetail : ""}` })
     }
 
     poll(() => {
