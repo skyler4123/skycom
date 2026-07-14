@@ -15,7 +15,8 @@ export default class Companies_Pages_IndexController extends Companies_LayoutCon
       const response = await fetchJson({ params: { branch_id: this.branchIdValue || undefined } })
       this.pages = response.pages || []
     } catch (error) {
-      toast({ type: "error", message: translate("Failed to load pages") })
+      const __errDetail = error.errors?.join(", ") || error.message
+      toast({ type: "error", message: `${ translate("Failed to load pages") }${__errDetail ? ": " + __errDetail : ""}` })
     }
 
     poll(() => {

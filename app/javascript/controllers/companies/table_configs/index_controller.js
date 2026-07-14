@@ -22,7 +22,8 @@ export default class Companies_TableConfigs_IndexController extends Companies_La
         return false
       })
     } catch (error) {
-      toast({ type: "error", message: translate("Failed to load table configs") })
+      const __errDetail = error.errors?.join(", ") || error.message
+      toast({ type: "error", message: `${ translate("Failed to load table configs") }${__errDetail ? ": " + __errDetail : ""}` })
     }
   }
 

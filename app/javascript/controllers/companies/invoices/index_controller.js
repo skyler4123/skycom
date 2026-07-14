@@ -26,7 +26,8 @@ export default class Companies_Invoices_IndexController extends Companies_Layout
       this.invoices = response.invoices || []
       this.pagination = response.pagination || {}
     } catch (error) {
-      toast({ type: "error", message: translate("Failed to load invoices") })
+      const __errDetail = error.errors?.join(", ") || error.message
+      toast({ type: "error", message: `${ translate("Failed to load invoices") }${__errDetail ? ": " + __errDetail : ""}` })
     }
 
     poll(() => {

@@ -134,7 +134,7 @@ export default class Companies_Pages_RetailCashierController extends Controller 
       this.orderId = res.order_id
       this.orderTotal = res.total_price || 0
       this.renderContent()
-      toast({ type: 'success', message: translate('Order created') })
+      toast({ type: 'success', message: res.message || translate('Order created') })
     } catch (error) {
       toast({ type: 'error', message: error.errors?.join(', ') || error.message || translate('Failed to create order') })
     }
@@ -142,11 +142,11 @@ export default class Companies_Pages_RetailCashierController extends Controller 
 
   async pay() {
     try {
-      await fetchJson(Helpers.order_processing_v1_pay_path(this.getCompanyId()), {
+      const res = await fetchJson(Helpers.order_processing_v1_pay_path(this.getCompanyId()), {
         method: 'POST',
         body: { order_id: this.orderId }
       })
-      toast({ type: 'success', message: translate('Payment completed') })
+      toast({ type: 'success', message: res.message || translate('Payment completed') })
       this.activeTab.items = []
       this.orderId = null
       this.orderTotal = 0

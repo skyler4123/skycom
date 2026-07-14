@@ -15,7 +15,8 @@ export default class Companies_ScheduledShifts_EditController extends Companies_
       const response = await fetchJson(`${Helpers.company_scheduled_shift_path(currentCompany().id, this.shiftId)}.json`)
       this.scheduledShift = response.scheduled_shift
     } catch (error) {
-      toast({ type: "error", message: translate("Failed to load scheduled shift") })
+      const __errDetail = error.errors?.join(", ") || error.message
+      toast({ type: "error", message: `${ translate("Failed to load scheduled shift") }${__errDetail ? ": " + __errDetail : ""}` })
     }
     poll(() => {
       if (this.hasContentTarget) { this.renderContent(); return true }

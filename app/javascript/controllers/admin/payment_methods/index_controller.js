@@ -14,7 +14,8 @@ export default class Admin_PaymentMethods_IndexController extends Admin_LayoutCo
       this.paymentMethods = response.payment_methods || []
       this.pagination = response.pagination || {}
     } catch (error) {
-      toast({ type: "error", message: "Failed to load payment methods" })
+      const __errDetail = error.errors?.join(", ") || error.message
+      toast({ type: "error", message: `Failed to load payment methods${__errDetail ? ": " + __errDetail : ""}` })
     }
 
     poll(() => {

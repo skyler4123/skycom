@@ -69,7 +69,7 @@ class Companies::BranchesController < Companies::ApplicationController
       end
       format.json do
         if branch.update(branch_params)
-          render json: { branch: format_branch(branch) }, status: :ok
+          render json: { branch: format_branch(branch), message: "Branch updated successfully" }, status: :ok
         else
           render json: { errors: branch.errors.full_messages }, status: :unprocessable_entity
         end

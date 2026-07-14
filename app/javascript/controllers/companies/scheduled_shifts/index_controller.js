@@ -13,7 +13,8 @@ export default class Companies_ScheduledShifts_IndexController extends Companies
       this.scheduledShifts = response.scheduled_shifts || []
       this.pagination = response.pagination || {}
     } catch (error) {
-      toast({ type: "error", message: translate("Failed to load scheduled shifts") })
+      const __errDetail = error.errors?.join(", ") || error.message
+      toast({ type: "error", message: `${ translate("Failed to load scheduled shifts") }${__errDetail ? ": " + __errDetail : ""}` })
     }
     poll(() => {
       if (this.hasContentTarget) { this.renderContent(); return true }

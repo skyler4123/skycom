@@ -102,7 +102,7 @@ export default class EditableController extends Controller {
       this.valueValue = newValue
       this.displayElement.innerText = newValue
       
-      toast({ type: "success", message: this.successMessageValue })
+      toast({ type: "success", message: response.message || this.successMessageValue })
 
       if (this.hasDispatchValue) {
         // Dispatching with 'editable:' prefix is a Stimulus convention

@@ -11,7 +11,8 @@ export default class Companies_AttendanceMonths_ShowController extends Companies
       const response = await fetchJson(`${Helpers.company_attendance_month_path(currentCompany().id, id)}.json`)
       this.attendanceMonth = response.attendance_month
     } catch (error) {
-      toast({ type: "error", message: translate("Failed to load attendance month") })
+      const __errDetail = error.errors?.join(", ") || error.message
+      toast({ type: "error", message: `${ translate("Failed to load attendance month") }${__errDetail ? ": " + __errDetail : ""}` })
     }
     poll(() => {
       if (this.hasContentTarget) { this.renderContent(); return true }

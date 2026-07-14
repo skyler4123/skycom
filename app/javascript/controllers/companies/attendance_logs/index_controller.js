@@ -13,7 +13,8 @@ export default class Companies_AttendanceLogs_IndexController extends Companies_
       this.attendanceLogs = response.attendance_logs || []
       this.pagination = response.pagination || {}
     } catch (error) {
-      toast({ type: "error", message: translate("Failed to load attendance logs") })
+      const __errDetail = error.errors?.join(", ") || error.message
+      toast({ type: "error", message: `${ translate("Failed to load attendance logs") }${__errDetail ? ": " + __errDetail : ""}` })
     }
     poll(() => {
       if (this.hasContentTarget) { this.renderContent(); return true }

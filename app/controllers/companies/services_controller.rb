@@ -67,7 +67,7 @@ class Companies::ServicesController < Companies::ApplicationController
       end
       format.json do
         if service.update(service_params)
-          render json: { service: format_service(service) }, status: :ok
+          render json: { service: format_service(service), message: "Service updated successfully" }, status: :ok
         else
           render json: { errors: service.errors.full_messages }, status: :unprocessable_entity
         end

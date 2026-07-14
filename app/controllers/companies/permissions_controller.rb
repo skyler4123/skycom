@@ -29,6 +29,7 @@ class Companies::PermissionsController < Companies::ApplicationController
 
     current_company.clear_permissions_cache
     render json: {
+      message: "Permission updated successfully",
       policy_appointment: { id: appointment.id, workflow_status: appointment.workflow_status },
       policy: { id: policy.id, tag_conditions: policy.reload.tag_conditions }
     }

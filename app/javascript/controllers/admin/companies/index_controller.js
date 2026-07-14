@@ -14,7 +14,8 @@ export default class Admin_Companies_IndexController extends Admin_LayoutControl
       this.companies = response.companies || []
       this.pagination = response.pagination || {}
     } catch (error) {
-      toast({ type: "error", message: "Failed to load companies" })
+      const __errDetail = error.errors?.join(", ") || error.message
+      toast({ type: "error", message: `Failed to load companies${__errDetail ? ": " + __errDetail : ""}` })
     }
 
     poll(() => {

@@ -22,7 +22,8 @@ export default class Companies_Customers_IndexController extends Companies_Layou
       this.customers = response.customers || []
       this.pagination = response.pagination || {}
     } catch (error) {
-      toast({ type: "error", message: translate("Failed to load customers") })
+      const __errDetail = error.errors?.join(", ") || error.message
+      toast({ type: "error", message: `${ translate("Failed to load customers") }${__errDetail ? ": " + __errDetail : ""}` })
     }
 
     poll(() => {

@@ -13,7 +13,8 @@ export default class Companies_AttendancePolicies_IndexController extends Compan
       this.attendancePolicies = response.attendance_policies || []
       this.pagination = response.pagination || {}
     } catch (error) {
-      toast({ type: "error", message: translate("Failed to load attendance policies") })
+      const __errDetail = error.errors?.join(", ") || error.message
+      toast({ type: "error", message: `${ translate("Failed to load attendance policies") }${__errDetail ? ": " + __errDetail : ""}` })
     }
     poll(() => {
       if (this.hasContentTarget) { this.renderContent(); return true }

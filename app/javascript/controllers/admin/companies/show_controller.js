@@ -13,7 +13,8 @@ export default class Admin_Companies_ShowController extends Admin_LayoutControll
       const response = await fetchJson(`${Helpers.admin_company_path(companyId)}.json`)
       this.company = response.company
     } catch (error) {
-      toast({ type: "error", message: "Failed to load company" })
+      const __errDetail = error.errors?.join(", ") || error.message
+      toast({ type: "error", message: `Failed to load company${__errDetail ? ": " + __errDetail : ""}` })
     }
 
     poll(() => {

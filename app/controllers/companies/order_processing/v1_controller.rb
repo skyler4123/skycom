@@ -18,7 +18,7 @@ class Companies::OrderProcessing::V1Controller < Companies::ApplicationControlle
       customer: checkout_params[:customer_id] ? current_company.customers.find_by(id: checkout_params[:customer_id]) : nil
     )
 
-    render json: order_result, status: :created
+    render json: order_result.merge(message: "Order created"), status: :created
   end
 
   def pay
@@ -39,7 +39,8 @@ class Companies::OrderProcessing::V1Controller < Companies::ApplicationControlle
     render json: {
       status: "paid",
       order_id: order.id,
-      payment_id: payment_result[:payment_id]
+      payment_id: payment_result[:payment_id],
+      message: "Payment completed"
     }
   rescue OrderProcessingV1::InsufficientStockError
     render json: { errors: [ "Insufficient stock for payment" ] }, status: :unprocessable_entity

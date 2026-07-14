@@ -40,7 +40,8 @@ export default class Companies_Analytics_IndexController extends Companies_Layou
       this.staffPerformance = response.staff_performance || this.staffPerformance
       this.customerCLV = response.customer_clv || this.customerCLV
     } catch (error) {
-      toast({ type: "error", message: translate("Failed to load analytics") })
+      const __errDetail = error.errors?.join(", ") || error.message
+      toast({ type: "error", message: `${ translate("Failed to load analytics") }${__errDetail ? ": " + __errDetail : ""}` })
     }
 
     poll(() => {
@@ -66,7 +67,8 @@ export default class Companies_Analytics_IndexController extends Companies_Layou
       this.renderContent()
       setTimeout(() => this.renderCharts(), 150)
     } catch (error) {
-      toast({ type: "error", message: translate("Failed to load analytics") })
+      const __errDetail = error.errors?.join(", ") || error.message
+      toast({ type: "error", message: `${ translate("Failed to load analytics") }${__errDetail ? ": " + __errDetail : ""}` })
     }
   }
 

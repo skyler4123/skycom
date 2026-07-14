@@ -22,7 +22,8 @@ export default class Companies_Categories_IndexController extends Companies_Layo
         return false
       })
     } catch (error) {
-      toast({ type: "error", message: translate("Failed to load categories") })
+      const __errDetail = error.errors?.join(", ") || error.message
+      toast({ type: "error", message: `${ translate("Failed to load categories") }${__errDetail ? ": " + __errDetail : ""}` })
     }
   }
 

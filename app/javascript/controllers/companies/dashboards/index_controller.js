@@ -26,7 +26,8 @@ export default class Companies_Dashboards_IndexController extends Companies_Layo
       this.company = response.company
       this.counts = response.counts
     } catch (error) {
-      toast({ type: "error", message: translate("Failed to load dashboard data") })
+      const __errDetail = error.errors?.join(", ") || error.message
+      toast({ type: "error", message: `${ translate("Failed to load dashboard data") }${__errDetail ? ": " + __errDetail : ""}` })
     }
 
     poll(() => {
