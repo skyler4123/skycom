@@ -370,7 +370,7 @@ if (currency === "EUR") {
 | `app/controllers/companies/billing_controller.rb` | 186 | Backend: JSON API + pay_all action |
 | `app/javascript/controllers/companies/billing/show_controller.rb` | 414 | Frontend: Stimulus controller, rendering, charts |
 | `config/routes.rb` | 58-60 | Route definition (nested under companies) |
-| `docs/BILLING.md` | 498 | Backend billing system (contracts, metering, settlement) |
+| `docs/MONEY_FLOW.md` | — | Backend billing system (contracts, metering, settlement) |
 
 ---
 

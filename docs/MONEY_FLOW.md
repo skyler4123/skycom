@@ -40,6 +40,34 @@ The central system model is **`BillingResource`**. It is Skycom's "menu" — a g
 
 Each `BillingResource` is seeded **per country** (`country_code: :us` or `:vn`) with market-specific pricing. For example, `analytics_dashboard` costs 500¢/mo in the US market but 125,000₫/mo in VN. Companies do not create, edit, or delete `BillingResource` records.
 
+### Feature Gating via BillingContract
+
+The `BillingContract` is the source of truth for what features a company can access:
+
+```ruby
+company.feature_enabled?("analytics_dashboard")  # => true/false
+```
+
+The check traverses:
+```
+Company
+  └── active_billing_contract (currently_active)
+        └── contract_features (active)
+              └── matches BillingResource by name + resource_type: :addon_feature
+```
+
+| Layer | Check |
+|-------|-------|
+| **Backend (Ruby)** | `Company#feature_enabled?(:key)` via `BillingConcern` |
+| **Frontend (JS)** | `currentContract().feature_enabled?("key")` from client cache |
+
+Pricing is stored in join tables:
+
+| Join Table | Stores | Links |
+|------------|--------|-------|
+| `ContractFeature` | `monthly_flat_price_cents` | BillingContract ↔ addon_feature BillingResource |
+| `ContractMetric` | `free_allowance` + `unit_price_cents` | BillingContract ↔ volumetric BillingResource |
+
 ### Company-Scoped (No `Billing*` Prefix) — Controlled by the Company
 
 Company-facing business models (`Product`, `Service`, `SubscriptionPlan`, `Order`, `Invoice`, etc.) have **no `Billing*` prefix**. They have:
@@ -83,7 +111,7 @@ Catalog / Resource
        │
        ▼
    Transaction          ◄── Source of truth for money movement
-       │
+       │                      AND the sole gateway interface
        ▼
   PaymentMethod         ◄── Defines HOW money moves (qr / redirect / cash)
 ```
@@ -94,8 +122,8 @@ Each domain maps real models to this chain:
 |-------|---------------|----------------|
 | **Catalog** | `BillingResource` — **System-level global catalog**. Seeded by Skycom. Country-scoped pricing (US/VN). Two types: `volumetric` (metered usage counters: orders, storage_mb, employees, branches, customers, api_calls, stock_mutations) and `addon_feature` (flat monthly add-on fees: analytics_dashboard, hrm_attendance, custom_roles, etc.). No `company_id`. Companies **never** create `BillingResource` records. | `Product` / `Service` / `SubscriptionPlan` / etc. — **Company-scoped business catalog**. Belongs to a `company_id`. Company creates them, sets prices, defines categories/properties. Companies own their catalog entirely — Skycom only provides the schema. |
 | **Contract** | `BillingContract` — per-company pricing plan, allowances, feature toggles, base price | `Order` — captures items (via `OrderAppointment`), quantities, unit prices, customer, branch |
-| **Invoice** | `BillingInvoice` — monthly charge; `movement_type: :charge`, `target_balance: :main_balance`, `payment_status: unpaid/paid/overdue` | `Invoice` — bill to customer; `total_price`, `workflow_status` tracks lifecycle, `payment_status` derived from transactions |
-| **Transaction** | `BillingTransaction` — ledger entry; records `amount_cents`, before/after snapshots of both wallet balances | Transaction record — records `amount_cents`, `payment_method_id`, gateway transaction ID, etc. |
+| **Invoice** | `BillingInvoice` — monthly charge; `movement_type: :charge`, `target_balance: :main_balance`, `payment_status: unpaid/paid/overdue` | `Invoice` — bill to customer; `total_price`, `workflow_status` tracks lifecycle, `payment_status` derived from transaction sum (target) |
+| **Transaction** | `BillingTransaction` — ledger entry; records `amount_cents`, before/after snapshots of both wallet balances | `Payment` — payment record; needs `amount_cents`, `payment_method_id`, gateway fields + sync callback (target) |
 | **Balance** | `BillingWallet` (future separate model; currently `company.main_balance_cents` + `company.promo_balance_cents`) | N/A — the customer pays directly, the company does not hold a balance for them |
 | **PaymentMethod** | `PaymentMethod` where `business_type: :b2b` — system-level: wallet auto-debit, card-on-file, QR fallback for bank transfer | `PaymentMethod` where `business_type: :b2c` — customer-facing: Cash, MoMo, ZaloPay, VNPay, Credit Card, etc. |
 
@@ -139,6 +167,67 @@ end
 ### Exception: `price_cents == 0`
 
 When an invoice has zero price (within-allowance usage), it may be auto-marked `paid` without a transaction. This is the only exception — nothing moved, nothing to record.
+
+### 4.1 Transaction as the Sole Gateway Interface
+
+The Transaction record (BillingTransaction for B2B, Payment for B2C) is the **only** object that communicates with external payment gateways. Neither invoices nor orders interact with gateways directly.
+
+```
+ Transaction                           Payment Gateway
+    │                                       │
+    ├── payment_method_id ────► determines how to call
+    │     ├── mode: :qr       → generate QR code (offline)
+    │     ├── mode: :redirect → redirect to hosted payment page
+    │     ├── mode: :cash     → no gateway (manual receipt)
+    │     └── mode: :api      → direct API call (Stripe, PayPal, etc.)
+    │
+    ├── gateway sends response
+    │     ├── gateway_transaction_id (external reference)
+    │     ├── status (success / failure / pending)
+    │     └── settlement details (timestamp, fees, etc.)
+    │
+    ├── Transaction updates itself from gateway response
+    │     └── after_update :sync_invoice_payment_status
+    │           └── Invoice.payment_status derived from SUM(transactions)
+    │
+    └── Invoice / Order never talk to gateway
+```
+
+**How it works:**
+
+1. A Transaction is created with a `payment_method_id` FK pointing to a `PaymentMethod`
+2. The `PaymentMethod.payment_mode` (qr/redirect/cash) determines HOW the gateway interaction works
+3. For online payments, the Transaction initiates the gateway call (API request or redirect)
+4. The gateway responds — either synchronously (API callback) or asynchronously (webhook)
+5. The gateway response updates the Transaction record (gateway_transaction_id, status, etc.)
+6. The Transaction's `after_create`/`after_update`/`after_destroy` callback calls `sync_invoice_payment_status`
+7. The parent Invoice's `payment_status` is updated based on the sum of all its Transactions
+
+**B2B example (QR bank transfer):**
+```
+BillingInvoice (unpaid)
+  → BillingTransaction.create!(payment_method: b2b_qr)
+    → PaymentMethod.payment_mode == :qr
+      → render QR code for company to scan & pay
+      → bank sends webhook → Rails receives it
+        → Transaction.update!(gateway_transaction_id: "ref-123", status: "completed")
+          → after_update :sync_invoice_payment_status
+            → BillingInvoice.payment_status → :paid
+```
+
+**B2C example (redirect to MoMo):**
+```
+Payment.create!(payment_method: momo, invoice: invoice)
+  → PaymentMethod.payment_mode == :redirect
+    → redirect customer to MoMo hosted page
+    → customer authorizes and completes payment
+    → MoMo redirects back with result params
+    → Payment.update!(gateway_txn_id: "MOMO-456", ...)
+      → after_update :sync_invoice_payment_status
+        → Invoice.payment_status → :paid
+```
+
+**Key rule:** The Transaction is the bridge between Skycom's internal money flow and external financial systems. No other record type may initiate or receive gateway communication.
 
 ---
 
@@ -229,9 +318,203 @@ MonthlyBillingJob (1st of month @ 00:00)
                 └── suspension_at passed? → mark_suspended!
 ```
 
-### 5.3 Wallet Concept
+#### 5.2.1 MonthlyBillingJob
 
-The company's ability to pay is backed by `BillingWallet` (currently stored as columns on `Company`, to be extracted):
+**File**: `app/jobs/billing/monthly_billing_job.rb`
+**Schedule**: 1st of each month at 00:00 (`config/recurring.yml`)
+**Scope**: `Company.where.not(lifecycle_status: %i[disabled suspended])`
+
+```ruby
+def process_company(company)
+  result = CalculatorService.call(company)        # 1. Compute charge
+  return if result.total_cents.zero?
+
+  invoice = InvoiceService.call(company, result)   # 2. Create unpaid BillingInvoice
+  return unless invoice
+
+  company.flag_unpaid! if company.billing_invoices.unpaid_or_overdue.exists?  # 3. Set deadline
+end
+```
+
+The job does NOT call SettlementService directly. Auto-settlement happens reactively via the `after_create_commit` callback on BillingInvoice.
+
+#### 5.2.2 CalculatorService
+
+**File**: `app/services/billing/calculator_service.rb`
+
+Computes monthly charge from:
+1. Base contract price (if any)
+2. Add-on feature flat prices (`ContractFeature.monthly_flat_price_cents`), **daily-prorated per feature** by the number of calendar days that specific feature was active
+3. Volumetric overage: `(usage − free_allowance) × unit_price` per `ContractMetric` (NOT prorated — pure usage-based)
+
+**Per-feature proration rules:**
+- `feature_active_days == 0` → $0 (feature was never enabled, or company was suspended the entire period)
+- `feature_active_days >= days_in_period` → full monthly total (exact advertised price, no rounding drift)
+- otherwise → `(monthly_flat_price × feature_active_days) / days_in_period` (integer division → cents)
+
+Returns a `Result` struct with `total_cents` and a `Breakdown` struct exposing:
+- `base_cents` — contract fixed monthly price
+- `features_cents` — sum of per-feature prorated add-on feature prices
+- `overages` — hash of `resource_name => overage_cents`
+- `days_in_period` — calendar days in the month (e.g., 28–31)
+
+#### 5.2.3 InvoiceService
+
+**File**: `app/services/billing/invoice_service.rb`
+
+Creates a `BillingInvoice` from the CalculatorService result:
+- Links to the company's active `BillingContract`
+- Sets `price_cents`, `period_start`, `period_end`
+- Sets `payment_status: :unpaid`
+- Auto-generates `invoice_number` like `INV-202606-A1B2C3`
+
+The `after_create_commit :attempt_auto_settlement` callback fires immediately after the invoice is committed to the database.
+
+### 5.3 Auto-Settlement
+
+Auto-settlement attempts to pay unpaid invoices from the company's wallet immediately after they are created or when the wallet balance changes.
+
+#### 5.3.1 The Dual Trigger
+
+`auto_settle_unpaid_invoices` fires on two events:
+
+| Trigger | Callback | When |
+|---------|----------|------|
+| Balance change | `after_update` on Company (CircuitBreakerConcern) | `main_balance_cents` or `promo_balance_cents` changed (e.g., top-up) |
+| New unpaid invoice | `after_create_commit` on BillingInvoice | Invoice created with `payment_status: :unpaid` |
+
+Both call `company.auto_settle_unpaid_invoices` → `Billing::SettlementService.settle_all(company)`.
+
+#### 5.3.2 SettlementService.call (Single Invoice)
+
+**File**: `app/services/billing/settlement_service.rb`
+
+Deduction algorithm:
+
+```
+1. total = invoice.price_cents
+2. If total == 0 → mark_paid, done
+3. company.with_lock do:
+   a. remaining = deduct_from_promo(total)
+      - If promo >= total: promo -= total, remaining = 0
+      - Else: promo = 0, remaining = total - promo_before
+   b. remaining = deduct_from_main(remaining)
+      - If main >= remaining: main -= remaining, remaining = 0
+      - Else: main = 0, remaining -= main_before
+   c. If remaining > 0:
+      - flag_unpaid! (sets has_unpaid_invoices + suspension_at)
+      - invoice.payment_status = :overdue
+   d. Else:
+      - invoice.payment_status = :paid
+4. Record BillingTransaction (before/after snapshots) — callback auto-syncs invoice.payment_status
+```
+
+#### 5.3.3 Batch Settlement
+
+```ruby
+result = Billing::SettlementService.settle_all(company)
+# => { paid_count: Integer, remaining_cents: Integer }
+```
+
+Processes all unpaid/overdue invoices **oldest first** (ordered by `created_at`), stopping when the wallet is exhausted. Returns:
+- `paid_count` — number of invoices fully paid
+- `remaining_cents` — total unpaid amount still outstanding (for QR/bank transfer display)
+
+#### 5.3.4 Re-Entry Guards
+
+Three levels of guards prevent infinite loops:
+
+1. **Company-level** (CircuitBreakerConcern): `Thread.current[:__settling_company_id]` — prevents the same company from being settled concurrently
+2. **Company set** (SettlementService.settle_all): `Thread.current[:__settling_companies]` Set — prevents nested `settle_all` calls
+3. **Invoice-level** (SettlementService.call): `Thread.current[:__settling_invoice_ids]` Set — prevents the same invoice from being settled twice
+
+Balance mutations inside SettlementService use `update_columns` (bypasses callbacks) to prevent the CircuitBreakerConcern `after_update` from re-entering settlement.
+
+```ruby
+def auto_settle_unpaid_invoices
+  return if Thread.current[:__settling_company_id] == id  # already settling
+  return if lifecycle_status_disabled?                     # terminal state (suspended jobs skip via scope)
+  return unless main_balance_cents.positive? || promo_balance_cents.positive?  # no money
+  return unless billing_invoices.unpaid_or_overdue.exists? # nothing to pay
+  # ... proceed to settle
+end
+```
+
+#### 5.3.5 Balance Update Patterns
+
+Company balances (`main_balance_cents`, `promo_balance_cents`) are updated **by the same service that creates the BillingTransaction**. The balance update and the transaction creation happen together as a unit:
+
+**Deduction (SettlementService):**
+```ruby
+company.update_columns(main_balance_cents: main_after)  # bypasses callbacks
+BillingTransaction.create!(
+  company: company,
+  billing_invoice: invoice,
+  transaction_type: :deduction,
+  amount_cents: amount,
+  balance_before_cents: main_before,
+  balance_after_cents: main_after,
+)
+```
+
+**Top-Up:**
+```ruby
+invoice = BillingInvoice.create!(
+  company: company, movement_type: :deposit,
+  target_balance: :main_balance, price_cents: amount,
+)
+
+# After payment confirmation:
+company.update_columns(main_balance_cents: company.main_balance_cents + amount)
+BillingTransaction.create!(
+  company: company, billing_invoice: invoice,
+  transaction_type: :top_up, amount_cents: amount,
+)
+```
+
+#### 5.3.6 Balance Recovery
+
+If balances ever drift (e.g., manual DB changes), they can be reconstructed from transactions:
+
+```ruby
+def recompute_balances!
+  update_columns(main_balance_cents: 0, promo_balance_cents: 0)
+  billing_transactions.includes(:billing_invoice).find_each do |txn|
+    invoice = txn.billing_invoice
+    next unless invoice
+    case [invoice.movement_type, invoice.target_balance]
+    when ["deposit", "main_balance"]
+      self.class.increment_counter(:main_balance_cents, id, by: txn.amount_cents)
+    when ["charge", "main_balance"]
+      self.class.decrement_counter(:main_balance_cents, id, by: txn.amount_cents)
+    when ["deposit", "promo_balance"]
+      self.class.increment_counter(:promo_balance_cents, id, by: txn.amount_cents)
+    when ["charge", "promo_balance"]
+      self.class.decrement_counter(:promo_balance_cents, id, by: txn.amount_cents)
+    end
+  end
+end
+```
+
+### 5.4 Wallet System
+
+Each BillingInvoice uses two classifying enums to describe the money movement:
+
+| Enum | Values | Description |
+|------|--------|-------------|
+| `movement_type` | `deposit` (money in), `charge` (money out) | Direction of flow |
+| `target_balance` | `main_balance`, `promo_balance` | Which wallet is affected |
+| `created_by` | `system`, `customer` | Who initiated the invoice |
+
+#### Example Invoice Combinations
+
+| Invoice Type | movement_type | target_balance | created_by | Effect |
+|-------------|---------------|----------------|------------|--------|
+| Monthly billing charge | `charge` | `main_balance` | `system` | Decreases `main_balance_cents` |
+| Company top-up | `deposit` | `main_balance` | `customer` | Increases `main_balance_cents` |
+| Promotional credit | `deposit` | `promo_balance` | `system` | Increases `promo_balance_cents` |
+
+The company's ability to pay is backed by `BillingWallet` (currently stored as columns on `Company`, to be extracted as a separate model):
 
 | Balance | Priority | Source |
 |---------|----------|--------|
@@ -239,6 +522,116 @@ The company's ability to pay is backed by `BillingWallet` (currently stored as c
 | `main_balance_cents` | Deducted SECOND | Real money deposited by the company |
 
 When both balances are insufficient, the invoice goes `overdue` and a `PaymentMethod` (with `payment_mode: :qr`) generates a QR code for the company to pay via bank transfer.
+
+### 5.5 Company Circuit Breaker
+
+The circuit breaker controls company operational state via `lifecycle_status`, `has_unpaid_invoices_at`, and `suspension_at`.
+
+**File**: `app/models/concerns/company/circuit_breaker_concern.rb`
+
+#### Lifecycle Status
+
+| Status | Value | Behavior | Trigger |
+|--------|-------|----------|---------|
+| `active` | 0 | Full operations — all features work normally | Default; reached via `try_reactivate!` when all invoices paid |
+| `suspended` | 3 | Blocked — redirected to billing page; `is_accessible?` returns false | `SyncSuspensionJob` runs daily at midnight when `suspension_at` has passed |
+| `disabled` | 30 | Terminal — no transitions out | Company deletion request |
+
+#### has_unpaid_invoices_at (Billing Timestamp)
+
+A datetime column on `companies` that records when the company first had unpaid invoices. This is a **billing indicator only** — it does not affect operational access.
+
+- **Set** by `flag_unpaid!` to `Time.current` when unpaid invoices exist
+- **Cleared** by `try_reactivate!` when all invoices are paid
+- Checked by `set_billing_warning` in `ApplicationController`: shows flash message when invoices have been unpaid for more than 5 days
+
+#### suspension_at (The Deadline)
+
+`suspension_at` is the timestamp deadline before automatic suspension. It is set as a grace period (end of month) and cleared on reactivation.
+
+- **Set** by `flag_unpaid!` to `Time.current.end_of_month` (gives runway until month end)
+- **Extendable** by admin — push the date forward to keep the company accessible
+- **Cleared** by `try_reactivate!` when all invoices are paid
+- **Checked** by `SyncSuspensionJob` daily at midnight:
+  - If `suspension_at <= Time.current` and company is not already `suspended` or `disabled` → `mark_suspended!`
+
+#### is_accessible? (Access Gate)
+
+**`is_accessible?`** returns `false` when `lifecycle_status_suspended?`:
+- `suspended` → not accessible → `check_accessable` redirects to billing page
+- `active` / `disabled` → accessible (disabled is terminal but still returnable)
+
+**`check_accessable`** is a `before_action` in `Companies::Authorizable` that redirects to `company_billing_path` when `!current_company.is_accessible?`.
+
+#### State Transitions
+
+```
+                  flag_unpaid! (unpaid invoices exist)
+    active  ────────────────────────────────────────►  active (*)
+       ▲      (has_unpaid_invoices = true,                  │
+       │       suspension_at = end_of_month)                │
+       │                                                    │  suspension_at passes
+       │                                                    ▼
+       │                                              suspended
+       │                                                    │
+       │              try_reactivate!                       │
+       └────────────────────────────────────────────────────┘
+              (all invoices paid)
+
+(*) Company stays active until suspension_at passes and SyncSuspensionJob marks it suspended.
+```
+
+#### Key Methods
+
+| Method | Description |
+|--------|-------------|
+| `flag_unpaid!` | Sets `has_unpaid_invoices_at: Time.current` + `suspension_at: end_of_month`. Does NOT change `lifecycle_status`. Idempotent. Raises if `disabled`. |
+| `mark_suspended!` | Sets `lifecycle_status: :suspended`. Called by `SyncSuspensionJob` when deadline passes. Idempotent. |
+| `try_reactivate!` | If no unpaid/overdue invoices remain → `lifecycle_status: :active`, `suspension_at: nil`, `has_unpaid_invoices_at: nil`. No-op if `disabled`. |
+| `is_accessible?` | `true` when not `lifecycle_status_suspended?` |
+| `auto_settle_unpaid_invoices` | Triggered on balance change + after unpaid invoice creation. Calls `SettlementService.settle_all`. Re-entry guarded. |
+
+### 5.6 Voluntary Payment & QR Fallback
+
+When the wallet is insufficient, the company owner must pay the remaining amount via QR/bank transfer.
+
+#### BillingController
+
+**File**: `app/controllers/companies/billing_controller.rb`
+
+| Endpoint | Method | Purpose |
+|----------|--------|---------|
+| `/companies/:id/billing` | GET | View outstanding invoices + wallet balances |
+| `/companies/:id/billing/pay` | POST | Settle all outstanding invoices |
+
+The controller is **exempt from `check_accessable`** so blocked companies can still pay their bills.
+
+#### pay_all Response
+
+```json
+{
+  "message": "All invoices paid. Account reactivated!",
+  "paid_count": 3,
+  "reactivated": true,
+  "remaining_cents": 0
+}
+```
+
+When `remaining_cents > 0`, the frontend displays QR/bank transfer instructions for the remaining amount. Once the owner tops up their wallet externally, the `after_update` callback on Company (balance change) triggers `auto_settle_unpaid_invoices` again — automatically paying any remaining invoices.
+
+### 5.7 hide_billing_alerts
+
+**Column**: `companies.hide_billing_alerts` (boolean, default `false`, null `false`)
+
+When `true`, suppresses the unpaid-invoice warning flash message displayed by `ApplicationController#set_billing_warning`.
+
+| Effect | Behavior |
+|--------|----------|
+| Unpaid invoice flash warning | **Suppressed** |
+| `check_accessable` (access blocking) | **Unaffected** — still blocks when `suspended` |
+| `flag_unpaid!` / `try_reactivate!` | **Unaffected** — lifecycle transitions still fire |
+
+This is a **passive UI toggle** — it does not affect billing logic, access control, or settlement. It only hides the visual warning banner for companies with `has_unpaid_invoices_at` set.
 
 ---
 
@@ -260,20 +653,20 @@ Invoice (bill to customer)
        │
        ├── total_price (sum of line items)
        ├── workflow_status (general lifecycle — not the payment status)
-       ├── payment_status ← DERIVED FROM Transaction sum
+       ├── payment_status ← DERIVED FROM Payment sum (target)
        │
-       └── has_many :transactions
+       └── has_many :payments
              │
              ▼
-Transaction (record)
+Payment (record)
        │
-       ├── amount_cents ← HOW MUCH was paid
-       ├── payment_method_id ← WHICH method was used (FK → PaymentMethod)
+       ├── amount_cents ← HOW MUCH was paid (target)
+       ├── payment_method_id ← WHICH method was used (target: FK → PaymentMethod)
        ├── gateway_transaction_id (for online payments: MoMo txn ID, etc.)
        ├── currency_code
-       ├── after_create → sync_invoice_payment_status
+       ├── after_create → sync_invoice_payment_status (target)
        │
-       └── belongs_to :payment_method
+       └── belongs_to :payment_method (target)
              │
              ▼
 PaymentMethod (business_type: :b2c)
@@ -282,6 +675,8 @@ PaymentMethod (business_type: :b2c)
        ├── gateway_url (for online payments)
        └── defines HOW the customer pays the company
 ```
+
+> **Note:** Items marked "(target)" are aspiration — the current `Payment` model is stripped of `amount_cents`, `payment_method_id`, and payments callback. See [Section 11](#11-current-implementation-status) for status.
 
 ### 6.2 How Company Resources Connect to Orders (via OrderAppointment)
 
@@ -339,16 +734,24 @@ Frontend (POS / Web / Mobile)
        │
        ├── Invoice.create!(total_price: ..., payment_status: :unpaid)
        │
-       ├── Transaction.create!(
+       ├── Payment.create!(                          ← Sole gateway interface
        │       invoice: invoice,
        │       amount_cents: amount,
-       │       payment_method_id: payment_method_id,
-       │       gateway_transaction_id: "...",   # from mock or real gateway
+       │       payment_method_id: payment_method_id,  ← determines gateway behavior
+       │       gateway_transaction_id: "...",          ← from gateway response
        │       currency_code: order.currency_code
        │     )
        │     │
-       │     └── after_create → sync_invoice_payment_status
-       │           ├── SUM(transactions.amount_cents) >= invoice.total_price?
+       │     ├── PaymentMethod.payment_mode:
+       │     │     ├── :cash   → no gateway interaction
+       │     │     ├── :qr     → render QR code, wait for scan
+       │     │     └── :redirect → redirect to gateway page
+       │     │
+       │     ├── gateway sends response (sync callback or webhook)
+       │     │     └── Payment.update!(gateway_status, gateway_txn_id)
+       │     │
+       │     └── after_create / after_update → sync_invoice_payment_status
+       │           ├── SUM(payments.amount_cents) >= invoice.total_price?
        │           └── invoice.update!(payment_status: :paid)
        │
        └── Order.update!(workflow_status: :paid)
@@ -379,7 +782,7 @@ If Transaction #2 is later refunded (destroyed):
 
 ## 7. PaymentMethod: The Global Bridge
 
-`PaymentMethod` is a **global catalog** — it does not belong to any company. It defines **how money moves** in both domains.
+`PaymentMethod` is a **global catalog** — it does not belong to any company. It defines **how money moves** in both domains. The Transaction uses its `payment_method_id` to determine the gateway interaction pattern.
 
 ### 7.1 The Enum
 
@@ -410,7 +813,19 @@ PaymentMethodAppointment
 
 This allows each company to enable only the payment methods relevant to their market (e.g., MoMo + Cash for VN companies, Stripe + Cash for US companies).
 
-### 7.3 B2B Payment Methods
+### 7.3 Transaction <-> PaymentMethod Interaction
+
+The `PaymentMethod.payment_mode` defines how the Transaction interacts with the gateway:
+
+| `payment_mode` | Interaction Pattern | What Happens |
+|----------------|-------------------|--------------|
+| `:cash` | No gateway | Transaction is created directly. No external API call. Payment is manual/onsite. |
+| `:qr` | Offline async | Transaction creates a QR code encoding payment details. Customer scans with banking app. Bank sends webhook on completion → Transaction updated. |
+| `:redirect` | Online sync+async | Transaction initiates redirect to gateway (MoMo, VNPay, Stripe). Customer authorizes on gateway page. Gateway calls back via redirect or webhook → Transaction updated. |
+
+The Transaction is created FIRST with a `payment_method_id`. The system uses the PaymentMethod to determine the gateway service/endpoint to call. The gateway response always updates the Transaction record, never the Invoice or Order directly.
+
+### 7.4 B2B Payment Methods
 
 B2B payment methods are used by the platform to collect from companies:
 
@@ -420,7 +835,7 @@ B2B payment methods are used by the platform to collect from companies:
 | QR bank transfer | `:qr` | Generate QR for outstanding amount, company pays via banking app | ✅ Mock API |
 | Card auto-charge | `:redirect` | Auto-charge registered card on month-end | 🔜 Future (P1 #11) |
 
-### 7.4 B2C Payment Methods
+### 7.5 B2C Payment Methods
 
 B2C payment methods are used by the company's customers:
 
@@ -476,7 +891,7 @@ Every Transaction must record enough context to reconstruct the financial state 
 | `currency_code` | In what denomination |
 | `balance_before_cents` / `balance_after_cents` | Wallet snapshots (B2B only) |
 | `promo_balance_before_cents` / `promo_balance_after_cents` | Promo wallet snapshots (B2B only) |
-| `payment_method_id` | Which method was used |
+| `payment_method_id` | Which method was used (determines gateway interaction) |
 | `gateway_transaction_id` | External gateway reference (for online payments) |
 | `billing_invoice_id` / `invoice_id` | Which invoice this settles |
 
@@ -503,6 +918,21 @@ after_update :auto_settle_unpaid_invoices,
 ```
 
 This ensures that a company that tops up enough to cover outstanding invoices is reactivated immediately — no manual intervention needed.
+
+### Tenet 7: Transaction Is the Sole Gateway Interface
+
+Only Transaction records (BillingTransaction for B2B, Payment for B2C) may communicate with external payment gateways. Invoices and orders never interact with gateways.
+
+```
+Gateway API call / webhook → Transaction.update!(gateway_status, gateway_txn_id)
+                                │
+                                └── after_update :sync_invoice_payment_status
+                                      └── Invoice.payment_status derived
+
+Invoice / Order → NEVER talks to gateway
+```
+
+The Transaction's `payment_method_id` FK determines which gateway to use and which interaction pattern (qr/redirect/cash) to follow.
 
 ---
 
@@ -568,55 +998,197 @@ expect(company.reload.promo_balance_cents).to eq(expected_promo)
 | `Transaction.create!` without `amount_cents` | ❌ No monetary value — impossible to derive status |
 | `Transaction.create!` without `payment_method_id` | ❌ No link to PaymentMethod — can't tell HOW money moved |
 | `BillingTransaction.create!` without balance snapshots | ❌ No audit trail — can't reconstruct wallet state |
+| `Invoice.gateway_call()` or `Order.gateway_call()` | ❌ Only Transaction talks to gateways |
 | Creating an Invoice without a Transaction in the same flow | ❌ Orphan invoice — will never become `paid` |
 
 ---
 
-## 10. Current Implementation Status
+## 10. Usage Metering Subsystem
+
+The metering subsystem counts every business action so Skycom knows how much each company is using. It is the upstream data source for the [CalculatorService](#522-calculatorservice) that generates monthly charges.
+
+### 10.1 MeteringConcern
+
+**File**: `app/models/concerns/metering_concern.rb`
+
+Auto-increments Redis usage counters when business records are created. Included by models that should count toward billing volumetric metrics:
+
+```ruby
+class Order < ApplicationRecord
+  include MeteringConcern
+  metered_as :orders  # key must match a BillingResource name
+end
+```
+
+On `Order.create` → `after_commit` fires → `company.record_usage!("orders")` → Kredis `INCR` on a daily-keyed Redis key.
+
+### 10.2 Redis Counter Key Pattern
+
+```
+c:<uuid>:<resource_key>:<YYYYMMDD>
+```
+
+Example: `c:abc-123:orders:20260623`
+
+Counters use `Kredis.integer` with a 36h TTL — Redis is the source of truth for the current day.
+
+### 10.3 DailyMetricLog (PostgreSQL Persistence)
+
+**File**: `app/models/daily_metric_log.rb`
+
+Every 4 hours, `SyncDailyMetricJob`:
+1. SCANs Redis for metering keys
+2. Reads counters via `company.meter_usage` (Kredis with DB fallback on Redis restart)
+3. Upserts one `DailyMetricLog` row per company + resource + day
+
+This creates a permanent, queryable history. The `DailyMetricLog` table stores `company_id`, `billing_resource_id`, `log_date`, and `usage_count`.
+
+### 10.4 Billing Concern Helpers
+
+**File**: `app/models/concerns/company/billing_concern.rb`
+
+| Method | Description |
+|--------|-------------|
+| `record_usage!(key, quantity: 1)` | Increments today's Redis counter |
+| `meter_usage(key, log_date:)` | Reads counter (Redis today, or DailyMetricLog for past dates) |
+| `wallet_balance_cents` | `promo_balance_cents + main_balance_cents` |
+| `debt_ceiling_reached?` | `wallet_balance_cents < soft_debt_threshold_cents` |
+
+### 10.5 Per-Feature Day Tracking (Daily Proration Source of Truth)
+
+Add-on feature prices are daily-prorated per feature. The source of truth for "was this feature active on this date?" is `DailyFeatureLog`.
+
+**File**: `app/models/daily_feature_log.rb`
+
+- One row per company + contract_feature + calendar date (uniqueness enforced by `[company_id, contract_feature_id, log_date]` index)
+- A row existing means "the feature was active AND the company was accessible on that date"; absence means the feature was disabled or the company was suspended
+- Read by `CalculatorService#compute_prorated_features` at invoice time — each feature is prorated independently
+
+**File**: `app/jobs/billing/sync_daily_feature_job.rb`
+
+Idempotent 6-hour snapshot job:
+1. Iterates all non-disabled, non-suspended companies via `find_each(batch_size: 50)`
+2. Calls `company.is_accessible?` — if true, iterates all active `ContractFeature` records
+3. `DailyFeatureLog.find_or_create_by!(company:, contract_feature:, log_date:)` per feature
+4. The unique index collapses duplicate inserts across the 4 daily runs into a single row
+5. Per-company rescue so one bad record doesn't abort the batch
+
+**Why 6-hour frequency?** If a feature is enabled at 10:00 AM, the 06:00 or 12:00 run already recorded it. The company got 10+ hours of value → fair to bill for that 1 calendar date. The unique index guarantees no double-counting regardless of how many runs fire.
+
+**Schedule** (`config/recurring.yml`): `every 6 hours`
+
+---
+
+## 11. Current Implementation Status
 
 | Component | Status | Notes |
 |-----------|--------|-------|
 | **BillingResource** | ✅ Complete | Global catalog with country-scoped pricing |
 | **BillingContract** | ✅ Complete | Per-company active contract with features + metrics |
 | **BillingInvoice** | ✅ Complete | `payment_status` derived from BillingTransaction sum |
-| **BillingTransaction** | ✅ Complete | Full audit trail with balance snapshots |
+| **BillingTransaction** | ✅ Complete | Full audit trail with balance snapshots, `sync_invoice_payment_status` callback |
 | **SettlementService** | ✅ Complete | Wallet deduction with re-entry guards |
 | **PaymentMethod** | ✅ Complete | Global catalog with `business_type` (b2b/b2c) and `payment_mode` (qr/redirect/cash) |
 | **PaymentMethodAppointment** | ✅ Complete | Links PaymentMethod to companies/branches |
+| **MeteringConcern** | ✅ Complete | Auto-increments Redis counters on record creation |
+| **DailyMetricLog** | ✅ Complete | Persisted hourly metric snapshots |
+| **DailyFeatureLog** | ✅ Complete | Persisted 6-hourly feature-active-day snapshots |
+| **MonthlyBillingJob** | ✅ Complete | Monthly invoice creation for non-disabled companies |
+| **CalculatorService** | ✅ Complete | Monthly charge computation with per-feature proration |
+| **InvoiceService** | ✅ Complete | BillingInvoice creation from CalculatorService result |
+| **SyncDailyMetricJob** | ✅ Complete | Hourly sync of Redis counters → DailyMetricLog |
+| **SyncDailyFeatureJob** | ✅ Complete | 6-hourly snapshot of active features → DailyFeatureLog |
+| **SyncSuspensionJob** | ✅ Complete | Daily midnight suspension cron |
 | **BillingWallet** | ⬜ Separate model | Currently columns on `Company` — extract to `BillingWallet` model |
-| **POS Transaction model** | ⬜ Needs rework | Missing `amount_cents` and `payment_method_id`; no `sync_invoice_payment_status` callback |
-| **Commerce Invoice** | ⬜ Needs rework | Missing `payment_status` column derived from Transaction sum |
+| **Billing Dashboard** | ✅ Complete | Self-service portal with usage charts, wallet, pay-all |
+| **BillingController** | ✅ Complete | View + pay outstanding invoices; exempt from `check_accessable` |
+| **POS Payment model (`Payment`)** | ⬜ Needs rework | Missing `amount_cents`, `payment_method_id`, and `sync_invoice_payment_status` callback |
+| **Commerce Invoice** | ⬜ Needs rework | Missing `payment_status` column derived from Payment sum |
 | **Gateway integration (MoMo/VNPay/Stripe)** | ⬜ Future | P1 #11 on roadmap — will create real gateway transactions with `payment_mode: :qr` and `:redirect` |
 
 ---
 
-## 11. Reference
+## 12. Complete Lifecycle Scenario
+
+This example traces a company through a full billing cycle — from active operations through overage, auto-settlement, suspension, and recovery.
+
+```
+Day 1:  Company active, promo_balance $10, main_balance $0
+        Orders: 250 (allowance 200, overage 50 × $0.10 = $5)
+        Add-on features: analytics_dashboard ($5/mo)
+
+Day 1 (00:00): MonthlyBillingJob runs
+  → CalculatorService: total_cents = $5 (overage) + $5 (feature) = $10
+  → InvoiceService: creates BillingInvoice(price_cents: 1000, unpaid)
+  → after_create_commit fires
+  → auto_settle_unpaid_invoices
+  → SettlementService.settle_all
+    → Invoice #1 ($10): deduct from promo_balance ($10 → $0), remaining = 0
+    → invoice.payment_status = :paid
+    → try_reactivate! → already active, no-op
+  → flag_unpaid! NOT called (already paid, no unpaid invoices remain)
+
+Day 15: Company used another 100 orders overage = $10 more owed
+        (but this only bills at next month — no mid-month invoices)
+
+Next month (Day 1): MonthlyBillingJob runs again
+  → CalculatorService: total_cents = $10 (new overage) + $5 (feature) = $15
+  → InvoiceService: creates BillingInvoice(price_cents: 1500, unpaid)
+  → after_create_commit fires
+  → auto_settle_unpaid_invoices
+  → SettlementService.settle_all
+    → promo_balance $0, main_balance $0 → nothing to deduct
+    → remaining $15 > 0 → flag_unpaid!, invoice.overdue
+  → suspension_at set to end of month
+
+Day 1 (afternoon): Owner sees warning, navigates to /billing
+  → BillingController#pay_all
+  → settle_all → still no wallet → remaining_cents: 1500
+  → Frontend shows QR for $15 bank transfer
+
+Day 3: Owner transfers $15, support credits main_balance
+  → Company.update! (main_balance_cents: 1500)
+  → after_update fires (saved_change_to_main_balance_cents?)
+  → auto_settle_unpaid_invoices
+  → SettlementService.settle_all
+    → Invoice: deduct from main_balance ($15 → $0), remaining = 0
+    → invoice.payment_status = :paid
+    → try_reactivate! → lifecycle_status: active, suspension_at: nil, has_unpaid_invoices_at: nil
+    → Company fully restored
+```
+
+---
+
+## 13. Reference
 
 | File | Purpose |
 |------|---------|
 | `app/models/billing_invoice.rb` | B2B invoice with derived payment_status |
 | `app/models/billing_transaction.rb` | B2B ledger entry with sync callback |
-| `app/models/billing_contract.rb` | Per-company pricing contract |
+| `app/models/billing_contract.rb` | Per-company pricing contract (feature gating, allowances, pricing) |
 | `app/models/billing_resource.rb` | Global catalog of metered + addon resources |
-| `app/models/contract_feature.rb` | BillingContract ↔ addon_feature bridge |
-| `app/models/contract_metric.rb` | BillingContract ↔ volumetric bridge |
+| `app/models/contract_feature.rb` | BillingContract ↔ addon_feature bridge (flat monthly price) |
+| `app/models/contract_metric.rb` | BillingContract ↔ volumetric bridge (allowance + overage price) |
 | `app/models/payment_method.rb` | Global payment gateway registry (b2b + b2c) |
 | `app/models/payment_method_appointment.rb` | Company-to-payment-method link |
 | `app/models/daily_metric_log.rb` | Volumetric usage snapshots |
 | `app/models/daily_feature_log.rb` | Feature-active-day snapshots for proration |
+| `app/models/payment.rb` | B2C payment record (needs amount_cents, payment_method_id, callback) |
+| `app/models/invoice.rb` | B2C invoice (needs payment_status column) |
+| `app/models/concerns/metering_concern.rb` | Auto-increments Redis counters on record creation |
+| `app/models/concerns/company/billing_concern.rb` | feature_enabled?, record_usage!, wallet helpers |
+| `app/models/concerns/company/circuit_breaker_concern.rb` | Lifecycle transitions, flag_unpaid!, try_reactivate! |
+| `app/models/concerns/order_concern.rb` | Gives order line-item capability to any company resource |
 | `app/services/billing/calculator_service.rb` | Monthly charge computation |
 | `app/services/billing/invoice_service.rb` | BillingInvoice creation |
 | `app/services/billing/settlement_service.rb` | Wallet deduction + BillingTransaction creation |
-| `app/models/concerns/company/circuit_breaker_concern.rb` | Lifecycle transitions, flag_unpaid!, try_reactivate! |
-| `app/models/concerns/company/billing_concern.rb` | feature_enabled?, record_usage!, wallet helpers |
+| `app/services/billing/seed_resources_service.rb` | Seeds BillingResource catalog |
 | `app/jobs/billing/monthly_billing_job.rb` | Monthly invoice creation cron |
 | `app/jobs/billing/sync_suspension_job.rb` | Daily suspension cron |
 | `app/jobs/billing/sync_daily_metric_job.rb` | Hourly Redis → DailyMetricLog sync |
 | `app/jobs/billing/sync_daily_feature_job.rb` | 6-hourly DailyFeatureLog snapshot |
-| `app/models/invoice.rb` | B2C invoice (needs payment_status column) |
+| `app/controllers/companies/billing_controller.rb` | Billing portal: view + pay; exempt from check_accessable |
 | `app/controllers/companies/order_processing/v1_controller.rb` | POS checkout + pay API |
-| `docs/BILLING.md` | Full billing system documentation |
-| `docs/BILLING_TRANSACTIONS.md` | BillingTransaction source-of-truth pattern |
 | `docs/ORDER_PROCESSING_V1.md` | POS order pipeline documentation |
-| `app/models/concerns/order_concern.rb` | Gives order line-item capability to any company resource |
+| `docs/BILLING_DASHBOARD.md` | Billing dashboard frontend documentation |
 | `config/initializers/constants.rb` (billing section) | `BILLING_VOLUMETRIC_RESOURCES`, `BILLING_ADDON_FEATURES`, `BILLING_PRICES_BY_COUNTRY`, `DEFAULT_FREE_TIER_ALLOWANCES` |
