@@ -344,7 +344,7 @@ PropertyMapping.create/update/destroy
 ## 14. See Also
 
 - `docs/LOCAL_AND_GLOBAL_CACHE.md` — Server-side dual cache (Solid Cache + Redis) used by Rails backend
-- `docs/BILLING.md` — Billing system, feature gating, and wallet management
+- `docs/MONEY_FLOW.md` — Billing system, feature gating, and wallet management
 
 ---
 
