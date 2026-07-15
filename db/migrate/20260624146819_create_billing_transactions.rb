@@ -6,7 +6,7 @@ class CreateBillingTransactions < ActiveRecord::Migration[8.0]
 
       t.integer :transaction_type, null: false
       t.integer :amount_cents, null: false
-      t.string  :currency, null: false
+      t.integer :currency, null: false
 
       t.integer :balance_before_cents, null: false
       t.integer :balance_after_cents, null: false

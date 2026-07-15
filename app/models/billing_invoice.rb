@@ -15,7 +15,6 @@
 #
 class BillingInvoice < ApplicationRecord
   attribute :price_cents, :integer, default: 0
-  attribute :price_currency, :string, default: "USD"
 
   belongs_to :company
   belongs_to :billing_contract
@@ -30,6 +29,7 @@ class BillingInvoice < ApplicationRecord
   enum :movement_type, { deposit: 0, charge: 1 }
   enum :target_balance, { main_balance: 0, promo_balance: 1 }
   enum :created_by, { system: 0, customer: 1 }
+  enum :currency, CURRENCIE_CODES, prefix: true, default: :usd
 
   before_validation :generate_invoice_number, on: :create
   after_update :try_reactivate_company, if: -> { saved_change_to_payment_status? && paid? }

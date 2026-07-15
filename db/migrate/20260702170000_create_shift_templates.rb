@@ -4,15 +4,16 @@ class CreateShiftTemplates < ActiveRecord::Migration[8.0]
       t.references :company, null: false, foreign_key: true, type: :uuid
       t.references :branch, null: true, foreign_key: true, type: :uuid
       t.string :name, null: false
+      t.text :description
+
       t.time :start_time, null: false
       t.time :end_time, null: false
       t.integer :grace_period_minutes, null: false
       t.integer :unpaid_break_minutes, null: false
-      t.string :policy_type, null: false
+      t.integer :policy_type, null: false
       t.integer :full_day_minutes, null: false
       t.time :core_start_time
       t.time :core_end_time
-      t.string :description
 
       t.integer :lifecycle_status
       t.integer :workflow_status

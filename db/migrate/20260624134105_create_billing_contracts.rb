@@ -9,7 +9,7 @@ class CreateBillingContracts < ActiveRecord::Migration[8.0]
 
       # money-rails flat column format
       t.integer :fixed_monthly_price_cents, null: false
-      t.string :fixed_monthly_price_currency, null: false
+      t.integer :currency, null: false
 
       t.datetime :start_date, null: false
       t.datetime :end_time

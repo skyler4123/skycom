@@ -8,6 +8,6 @@ FactoryBot.define do
     lifecycle_status { :draft }
     start_date { Time.current }
     fixed_monthly_price_cents { 0 }
-    fixed_monthly_price_currency { "USD" }
+    currency { :usd }
   end
 end

@@ -54,7 +54,7 @@ module Seed
         ) do |feature|
           feature.name = feature_name
           feature.monthly_flat_price_cents = 0
-          feature.monthly_flat_price_currency = resource.currency
+          feature.currency = resource.currency
           feature.lifecycle_status = :active
         end
       end

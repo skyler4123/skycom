@@ -371,7 +371,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_02_190003) do
     t.string "description"
     t.integer "contract_type", null: false
     t.integer "fixed_monthly_price_cents", null: false
-    t.string "fixed_monthly_price_currency", null: false
+    t.integer "currency", null: false
     t.datetime "start_date", null: false
     t.datetime "end_time"
     t.integer "lifecycle_status"
@@ -393,7 +393,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_02_190003) do
     t.integer "target_balance"
     t.integer "created_by"
     t.integer "price_cents", null: false
-    t.string "price_currency", null: false
+    t.integer "currency", null: false
     t.datetime "period_start", null: false
     t.datetime "period_end", null: false
     t.datetime "due_at"
@@ -417,7 +417,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_02_190003) do
     t.integer "resource_type", null: false
     t.integer "country_code"
     t.integer "price_cents", null: false
-    t.string "currency", null: false
+    t.integer "currency", null: false
     t.integer "lifecycle_status"
     t.integer "workflow_status"
     t.datetime "created_at", null: false
@@ -432,7 +432,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_02_190003) do
     t.uuid "billing_invoice_id", null: false
     t.integer "transaction_type", null: false
     t.integer "amount_cents", null: false
-    t.string "currency", null: false
+    t.integer "currency", null: false
     t.integer "balance_before_cents", null: false
     t.integer "balance_after_cents", null: false
     t.integer "promo_balance_before_cents", null: false
@@ -951,7 +951,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_02_190003) do
     t.string "name"
     t.string "description"
     t.integer "monthly_flat_price_cents", null: false
-    t.string "monthly_flat_price_currency", null: false
+    t.integer "currency", null: false
     t.integer "lifecycle_status"
     t.integer "workflow_status"
     t.datetime "created_at", null: false
@@ -970,7 +970,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_02_190003) do
     t.string "description"
     t.integer "free_allowance", null: false
     t.integer "unit_price_cents", null: false
-    t.string "unit_price_currency", null: false
+    t.integer "currency", null: false
     t.integer "lifecycle_status"
     t.integer "workflow_status"
     t.datetime "created_at", null: false
@@ -4291,7 +4291,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_02_190003) do
     t.date "work_date", null: false
     t.datetime "expected_start_at", null: false
     t.datetime "expected_end_at", null: false
-    t.string "status", null: false
+    t.integer "status", null: false
     t.integer "lifecycle_status"
     t.integer "workflow_status"
     t.integer "business_type"
@@ -4729,15 +4729,15 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_02_190003) do
     t.uuid "company_id", null: false
     t.uuid "branch_id"
     t.string "name", null: false
+    t.text "description"
     t.time "start_time", null: false
     t.time "end_time", null: false
     t.integer "grace_period_minutes", null: false
     t.integer "unpaid_break_minutes", null: false
-    t.string "policy_type", null: false
+    t.integer "policy_type", null: false
     t.integer "full_day_minutes", null: false
     t.time "core_start_time"
     t.time "core_end_time"
-    t.string "description"
     t.integer "lifecycle_status"
     t.integer "workflow_status"
     t.integer "business_type"

@@ -14,7 +14,6 @@
 #
 class BillingTransaction < ApplicationRecord
   attribute :amount_cents, :integer, default: 0
-  attribute :currency, :string, default: "USD"
   attribute :balance_before_cents, :integer, default: 0
   attribute :balance_after_cents, :integer, default: 0
   attribute :promo_balance_before_cents, :integer, default: 0
@@ -25,6 +24,8 @@ class BillingTransaction < ApplicationRecord
 
   validates :amount_cents, numericality: { greater_than_or_equal_to: 0 }
   validates :billing_invoice, presence: true
+
+  enum :currency, CURRENCIE_CODES, prefix: true, default: :usd
 
   enum :transaction_type, {
     top_up: 0,
