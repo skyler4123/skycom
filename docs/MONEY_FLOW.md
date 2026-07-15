@@ -17,7 +17,60 @@ Both domains follow **the same canonical chain** of models. The rule is simple: 
 
 ---
 
-## 2. The Canonical Chain
+## 2. The `Billing*` Naming Convention — System vs Company Resources
+
+Skycom uses the `Billing*` prefix as a **namespace signal** to distinguish system-controlled money models from company-scoped business models.
+
+### System-Level (Billing*) — Controlled by Skycom
+
+Models prefixed with `Billing*` (e.g., `BillingResource`, `BillingContract`, `BillingInvoice`, `BillingTransaction`) are **platform-internal**. They have:
+
+| Attribute | Detail |
+|-----------|--------|
+| **Scope** | Global (no `company_id`) or system-scoped — they are not company resources |
+| **Who creates** | Skycom seeds them (rake task, onboarding). Companies **never** create `Billing*` records |
+| **Who controls pricing** | Skycom sets prices centrally (per country via `country_code`). Companies do not set or negotiate individual `BillingResource` prices |
+| **Purpose** | Define the platform's billing catalog and track internal money movement (what Skycom charges companies) |
+| **Examples** | `BillingResource` (global catalog of metered resources + add-on features), `BillingContract` (per-company pricing plan), `BillingTransaction` (ledger entry) |
+
+The central system model is **`BillingResource`**. It is Skycom's "menu" — a global catalog that lists **everything the platform can charge a company for**, with two resource types:
+
+- **`volumetric`** — Usage-based metered counters (e.g., orders, storage in MB, employees, branches). These are tracked by the `MeteringConcern` and priced by overage unit.
+- **`addon_feature`** — Flat monthly fees for premium features (e.g., `analytics_dashboard`, `hrm_attendance`, `custom_roles`).
+
+Each `BillingResource` is seeded **per country** (`country_code: :us` or `:vn`) with market-specific pricing. For example, `analytics_dashboard` costs 500¢/mo in the US market but 125,000₫/mo in VN. Companies do not create, edit, or delete `BillingResource` records.
+
+### Company-Scoped (No `Billing*` Prefix) — Controlled by the Company
+
+Company-facing business models (`Product`, `Service`, `SubscriptionPlan`, `Order`, `Invoice`, etc.) have **no `Billing*` prefix**. They have:
+
+| Attribute | Detail |
+|-----------|--------|
+| **Scope** | Per-company (`company_id` on every record) |
+| **Who creates** | The company's employees (via dashboards, APIs, POS) |
+| **Who controls pricing** | The company sets its own prices for its products/services |
+| **Purpose** | Run the company's business — sell goods and services to its customers |
+| **Examples** | `Product` (what the company sells), `Order` (a customer's purchase), `Invoice` (bill to customer) |
+
+### Why the Distinction Matters
+
+```
+BillingResource.volumetric.first
+# => #<BillingResource:0x... name: "orders", country_code: "us", resource_type: "volumetric">
+# ↑ Skycom decides: "we charge $0.10 per overage order"
+# ↑ NO company_id — this is a global catalog entry
+
+Product.first
+# => #<Product:0x... name: "Face Cream", company_id: "abc-123", price_cents: 2999>
+# ↑ The company decides: "we sell Face Cream for $29.99"
+# ↑ HAS company_id — this is the company's own catalog
+```
+
+The two catalogs never cross. A `BillingResource` is not a thing a company sells — it is a thing **Skycom sells to the company**. A `Product` is not something Skycom meters — it is something **the company sells to its customers**.
+
+---
+
+## 3. The Canonical Chain
 
 ```
 Catalog / Resource
@@ -39,7 +92,7 @@ Each domain maps real models to this chain:
 
 | Layer | Billing (B2B) | Commerce (B2C) |
 |-------|---------------|----------------|
-| **Catalog** | `BillingResource` — volumetric metrics (orders, storage, employees) + addon features (analytics, custom_roles, etc.) | `Product` / `Service` / etc. — chargeable items the company sells |
+| **Catalog** | `BillingResource` — **System-level global catalog**. Seeded by Skycom. Country-scoped pricing (US/VN). Two types: `volumetric` (metered usage counters: orders, storage_mb, employees, branches, customers, api_calls, stock_mutations) and `addon_feature` (flat monthly add-on fees: analytics_dashboard, hrm_attendance, custom_roles, etc.). No `company_id`. Companies **never** create `BillingResource` records. | `Product` / `Service` / `SubscriptionPlan` / etc. — **Company-scoped business catalog**. Belongs to a `company_id`. Company creates them, sets prices, defines categories/properties. Companies own their catalog entirely — Skycom only provides the schema. |
 | **Contract** | `BillingContract` — per-company pricing plan, allowances, feature toggles, base price | `Order` — captures items (via `OrderAppointment`), quantities, unit prices, customer, branch |
 | **Invoice** | `BillingInvoice` — monthly charge; `movement_type: :charge`, `target_balance: :main_balance`, `payment_status: unpaid/paid/overdue` | `Invoice` — bill to customer; `total_price`, `workflow_status` tracks lifecycle, `payment_status` derived from transactions |
 | **Transaction** | `BillingTransaction` — ledger entry; records `amount_cents`, before/after snapshots of both wallet balances | Transaction record — records `amount_cents`, `payment_method_id`, gateway transaction ID, etc. |
@@ -48,7 +101,7 @@ Each domain maps real models to this chain:
 
 ---
 
-## 3. The Absolute Rule
+## 4. The Absolute Rule
 
 > **`Invoice.payment_status` MUST be derived from the sum of its `Transactions`.**
 
@@ -89,9 +142,9 @@ When an invoice has zero price (within-allowance usage), it may be auto-marked `
 
 ---
 
-## 4. Domain 1: Billing (B2B) — Skycom Charges the Company
+## 5. Domain 1: Billing (B2B) — Skycom Charges the Company
 
-### 4.1 The Models
+### 5.1 The Models
 
 ```
 BillingResource (global catalog)
@@ -134,7 +187,7 @@ BillingResource (global catalog)
                                                          └── defines HOW the company pays Skycom
 ```
 
-### 4.2 The Settlement Chain
+### 5.2 The Settlement Chain
 
 ```
 MonthlyBillingJob (1st of month @ 00:00)
@@ -176,7 +229,7 @@ MonthlyBillingJob (1st of month @ 00:00)
                 └── suspension_at passed? → mark_suspended!
 ```
 
-### 4.3 Wallet Concept
+### 5.3 Wallet Concept
 
 The company's ability to pay is backed by `BillingWallet` (currently stored as columns on `Company`, to be extracted):
 
@@ -189,9 +242,9 @@ When both balances are insufficient, the invoice goes `overdue` and a `PaymentMe
 
 ---
 
-## 5. Domain 2: Commerce (B2C) — Company Charges the Customer
+## 6. Domain 2: Commerce (B2C) — Company Charges the Customer
 
-### 5.1 The Models
+### 6.1 The Models
 
 ```
 Chargeable Item (Product / Service / Subscription / etc.)
@@ -230,7 +283,45 @@ PaymentMethod (business_type: :b2c)
        └── defines HOW the customer pays the company
 ```
 
-### 5.2 The Payment Chain
+### 6.2 How Company Resources Connect to Orders (via OrderAppointment)
+
+Any chargeable resource — `Product`, `Service`, `SubscriptionPlan`, or any other company-scoped model — can become a line item in an `Order` through the **`OrderConcern`** and the polymorphic `OrderAppointment` join table.
+
+```ruby
+# app/models/concerns/order_concern.rb
+module OrderConcern
+  extend ActiveSupport::Concern
+  included do
+    has_many :order_appointments, as: :appoint_to, dependent: :destroy
+    has_many :orders, through: :order_appointments
+  end
+end
+```
+
+Models that include `OrderConcern` (Product, Service, etc.) automatically get:
+
+| Association | Type | Purpose |
+|-------------|------|---------|
+| `order_appointments` | `has_many :as => :appoint_to` | Polymorphic link: this resource acts as a line item in orders |
+| `orders` | `has_many :through` | All orders containing this resource |
+
+The `OrderAppointment` table stores the line-item context:
+
+```ruby
+OrderAppointment
+  ├── appoint_to_type / appoint_to_id   → polymorphic FK to the chargeable resource (Product, Service, etc.)
+  ├── order_id                          → FK to the Order
+  ├── company_id                        → always matches the Order's company
+  ├── quantity                          → how many units
+  ├── unit_price                        → price per unit at time of order
+  └── total_price                       → quantity × unit_price (denormalized)
+```
+
+This polymorphic pattern means the `Order` can contain **any mix of different resource types** — a single order can include a Product, a Service, and a SubscriptionPlan — without needing separate join tables or schema changes. The `OrderAppointment` captures the **price snapshot at time of order**, so changes to the Product's current price don't affect existing orders.
+
+**The chain is always:** `Resource → OrderAppointment (line item) → Order (aggregate) → Invoice (bill)`. The `OrderAppointment` is how the company's own catalog items enter the money flow.
+
+### 6.3 The Payment Chain
 
 ```
 Frontend (POS / Web / Mobile)
@@ -268,7 +359,7 @@ Frontend (POS / Web / Mobile)
                    └── FinalizeOrderService
 ```
 
-### 5.3 Multiple Transactions Per Invoice
+### 6.4 Multiple Transactions Per Invoice
 
 A single invoice may be paid in multiple installments (split tender: cash + card, or partial payments):
 
@@ -286,11 +377,11 @@ If Transaction #2 is later refunded (destroyed):
 
 ---
 
-## 6. PaymentMethod: The Global Bridge
+## 7. PaymentMethod: The Global Bridge
 
 `PaymentMethod` is a **global catalog** — it does not belong to any company. It defines **how money moves** in both domains.
 
-### 6.1 The Enum
+### 7.1 The Enum
 
 ```ruby
 enum :business_type, {
@@ -305,7 +396,7 @@ enum :payment_mode, {
 }
 ```
 
-### 6.2 How Companies Access Payment Methods
+### 7.2 How Companies Access Payment Methods
 
 Companies link to global `PaymentMethod` records via `PaymentMethodAppointment`:
 
@@ -319,7 +410,7 @@ PaymentMethodAppointment
 
 This allows each company to enable only the payment methods relevant to their market (e.g., MoMo + Cash for VN companies, Stripe + Cash for US companies).
 
-### 6.3 B2B Payment Methods
+### 7.3 B2B Payment Methods
 
 B2B payment methods are used by the platform to collect from companies:
 
@@ -329,7 +420,7 @@ B2B payment methods are used by the platform to collect from companies:
 | QR bank transfer | `:qr` | Generate QR for outstanding amount, company pays via banking app | ✅ Mock API |
 | Card auto-charge | `:redirect` | Auto-charge registered card on month-end | 🔜 Future (P1 #11) |
 
-### 6.4 B2C Payment Methods
+### 7.4 B2C Payment Methods
 
 B2C payment methods are used by the company's customers:
 
@@ -343,7 +434,7 @@ B2C payment methods are used by the company's customers:
 
 ---
 
-## 7. The Money Flow Tenets
+## 8. The Money Flow Tenets
 
 These are immutable. Every developer and AI agent **must** follow them.
 
@@ -415,9 +506,9 @@ This ensures that a company that tops up enough to cover outstanding invoices is
 
 ---
 
-## 8. Enforcement Mechanisms
+## 9. Enforcement Mechanisms
 
-### 8.1 Callback Pattern
+### 9.1 Callback Pattern
 
 Every Transaction model **must** implement:
 
@@ -435,7 +526,7 @@ def sync_invoice_payment_status
 end
 ```
 
-### 8.2 Invoice-Level Guard
+### 9.2 Invoice-Level Guard
 
 Every Invoice model **should** guard against direct payment_status manipulation:
 
@@ -455,7 +546,7 @@ end
 
 Real enforcement is through **code review** and **architectural convention** — no service object, controller, or job should ever call `invoice.update!(payment_status:)`.
 
-### 8.3 Spec Requirements
+### 9.3 Spec Requirements
 
 Every feature test that exercises payment **must** assert:
 
@@ -469,7 +560,7 @@ expect(company.reload.main_balance_cents).to eq(expected_main)
 expect(company.reload.promo_balance_cents).to eq(expected_promo)
 ```
 
-### 8.4 What to Check In Code Review
+### 9.4 What to Check In Code Review
 
 | Smell | Problem |
 |-------|---------|
@@ -481,7 +572,7 @@ expect(company.reload.promo_balance_cents).to eq(expected_promo)
 
 ---
 
-## 9. Current Implementation Status
+## 10. Current Implementation Status
 
 | Component | Status | Notes |
 |-----------|--------|-------|
@@ -499,7 +590,7 @@ expect(company.reload.promo_balance_cents).to eq(expected_promo)
 
 ---
 
-## 10. Reference
+## 11. Reference
 
 | File | Purpose |
 |------|---------|
@@ -527,3 +618,5 @@ expect(company.reload.promo_balance_cents).to eq(expected_promo)
 | `docs/BILLING.md` | Full billing system documentation |
 | `docs/BILLING_TRANSACTIONS.md` | BillingTransaction source-of-truth pattern |
 | `docs/ORDER_PROCESSING_V1.md` | POS order pipeline documentation |
+| `app/models/concerns/order_concern.rb` | Gives order line-item capability to any company resource |
+| `config/initializers/constants.rb` (billing section) | `BILLING_VOLUMETRIC_RESOURCES`, `BILLING_ADDON_FEATURES`, `BILLING_PRICES_BY_COUNTRY`, `DEFAULT_FREE_TIER_ALLOWANCES` |
