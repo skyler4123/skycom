@@ -8,7 +8,7 @@ class CreateScheduledShifts < ActiveRecord::Migration[8.0]
       t.date :work_date, null: false
       t.datetime :expected_start_at, null: false
       t.datetime :expected_end_at, null: false
-      t.string :status, null: false
+      t.integer :status, null: false
 
       t.integer :lifecycle_status
       t.integer :workflow_status

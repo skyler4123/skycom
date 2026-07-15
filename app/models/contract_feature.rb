@@ -9,7 +9,6 @@
 #
 class ContractFeature < ApplicationRecord
   attribute :monthly_flat_price_cents, :integer, default: 0
-  attribute :monthly_flat_price_currency, :string, default: "USD"
 
   belongs_to :billing_resource
   belongs_to :billing_contract
@@ -21,6 +20,7 @@ class ContractFeature < ApplicationRecord
   validates :monthly_flat_price_cents, presence: true, numericality: { greater_than_or_equal_to: 0 }
 
   enum :lifecycle_status, { active: 0, disabled: 1 }, default: :active
+  enum :currency, CURRENCIE_CODES, prefix: true, default: :usd
 
   validate :must_be_addon_feature_type
 

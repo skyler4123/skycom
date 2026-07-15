@@ -15,7 +15,6 @@
 #
 class BillingResource < ApplicationRecord
   attribute :price_cents, :integer, default: 0
-  attribute :currency, :string, default: "USD"
 
   has_many :contract_features, dependent: :destroy
   has_many :contract_metrics, dependent: :destroy
@@ -27,4 +26,5 @@ class BillingResource < ApplicationRecord
   enum :resource_type, { volumetric: 0, addon_feature: 1 }, default: :volumetric
   enum :lifecycle_status, { active: 0, deprecated: 1, archived: 2 }, default: :active
   enum :country_code, COUNTRY_CODES, prefix: true, default: :us
+  enum :currency, CURRENCIE_CODES, prefix: true, default: :usd
 end

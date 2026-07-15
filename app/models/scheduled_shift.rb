@@ -1,5 +1,5 @@
 class ScheduledShift < ApplicationRecord
-  attribute :status, :string, default: "scheduled"
+  enum :status, { scheduled: 0, active: 1, completed: 2 }, prefix: true, default: :scheduled
 
   belongs_to :company
   belongs_to :branch

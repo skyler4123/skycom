@@ -12,7 +12,6 @@
 #
 class BillingContract < ApplicationRecord
   attribute :fixed_monthly_price_cents, :integer, default: 0
-  attribute :fixed_monthly_price_currency, :string, default: "USD"
 
   belongs_to :company
   has_many :contract_features, dependent: :destroy
@@ -23,6 +22,7 @@ class BillingContract < ApplicationRecord
 
   enum :contract_type, { basic: 0, pay_as_you_go: 1, enterprise: 2 }, default: :basic
   enum :lifecycle_status, { draft: 0, active: 1, expired: 2, terminated: 3 }, default: :draft
+  enum :currency, CURRENCIE_CODES, prefix: true, default: :usd
 
   validate :only_one_active_per_company, if: -> { active? && company_id.present? }
 

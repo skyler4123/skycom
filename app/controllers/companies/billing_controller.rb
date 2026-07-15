@@ -57,7 +57,7 @@ class Companies::BillingController < Companies::ApplicationController
     cf = contract.contract_features.find_or_initialize_by(billing_resource: resource) do |f|
       f.name = feature_key
       f.monthly_flat_price_cents = resource.price_cents
-      f.monthly_flat_price_currency = resource.currency
+      f.currency = resource.currency
     end
 
     new_status = cf.new_record? ? :active : (cf.active? ? :disabled : :active)
@@ -193,7 +193,7 @@ class Companies::BillingController < Companies::ApplicationController
                           id: inv.id,
                           invoice_number: inv.invoice_number,
                           price_cents: inv.price_cents,
-                          price_currency: inv.price_currency,
+                          currency: inv.currency,
                           payment_status: inv.payment_status,
                           created_at: inv.created_at
                         }

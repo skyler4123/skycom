@@ -70,7 +70,7 @@ module Seed
         ) do |feature|
           feature.name = name
           feature.monthly_flat_price_cents = resource.price_cents
-          feature.monthly_flat_price_currency = resource.currency
+          feature.currency = resource.currency
           feature.lifecycle_status = :active
         end
       end
@@ -135,7 +135,7 @@ module Seed
           company: company,
           billing_contract: company.active_billing_contract,
           price_cents: pair[:price],
-          price_currency: company.currency_code.to_s.upcase,
+          currency: company.currency_code,
           movement_type: :charge,
           target_balance: :main_balance,
           created_by: :system,
@@ -159,7 +159,7 @@ module Seed
           billing_invoice: invoice,
           transaction_type: :deduction,
           amount_cents: pair[:price],
-          currency: company.currency_code.to_s.upcase,
+          currency: company.currency_code,
           balance_before_cents: company.main_balance_cents,
           balance_after_cents: company.main_balance_cents,
           promo_balance_before_cents: promo_before,

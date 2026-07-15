@@ -163,7 +163,7 @@ module Billing
         billing_invoice: invoice,
         transaction_type: type,
         amount_cents: amount,
-        currency: "USD",
+        currency: :usd,
         balance_before_cents: before_main,
         balance_after_cents: after_main,
         promo_balance_before_cents: before_promo,

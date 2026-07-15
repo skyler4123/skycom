@@ -6,7 +6,7 @@ FactoryBot.define do
     association :billing_invoice
     transaction_type { :top_up }
     amount_cents { 1000 }
-    currency { "USD" }
+    currency { :usd }
     balance_before_cents { 0 }
     balance_after_cents { 1000 }
     promo_balance_before_cents { 0 }

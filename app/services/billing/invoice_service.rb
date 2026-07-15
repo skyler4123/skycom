@@ -30,7 +30,7 @@ module Billing
         company: company,
         billing_contract: contract,
         price_cents: calculator_result.total_cents,
-        price_currency: "USD",
+        currency: :usd,
         movement_type: :charge,
         target_balance: :main_balance,
         created_by: :system,

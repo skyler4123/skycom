@@ -23,7 +23,7 @@ module Billing
             r.description = description
             r.resource_type = :volumetric
             r.price_cents = 0
-            r.currency = country[:currency]
+            r.currency = country[:currency].downcase.to_sym
           end
         end
 
@@ -33,7 +33,7 @@ module Billing
             r.description = description
             r.resource_type = :addon_feature
             r.price_cents = prices[name]
-            r.currency = country[:currency]
+            r.currency = country[:currency].downcase.to_sym
           end
         end
       end

@@ -10,7 +10,7 @@ class CreateContractMetrics < ActiveRecord::Migration[8.0]
 
       # money-rails metrics formatting
       t.integer :unit_price_cents, null: false
-      t.string :unit_price_currency, null: false
+      t.integer :currency, null: false
 
       t.integer  :lifecycle_status, index: true
       t.integer  :workflow_status, index: true
