@@ -13,7 +13,7 @@ Skycom has two distinct domains where money moves:
 | **Billing (B2B)** | Skycom → Company | Skycom charges the company for platform usage (metrics, features, plan) |
 | **Commerce (B2C)** | Company → Customer | The company charges its customers for goods and services |
 
-Both domains follow **the same canonical chain** of models. The rule is simple: **every cent that moves must leave a trail** — from catalog to contract to invoice to transaction to payment method. No orphan money, no direct status flips.
+Both domains follow **the same canonical chain** of models. The rule is simple: **every cent that moves must leave a trail** — from catalog to contract to invoice to payment to payment method. No orphan money, no direct status flips.
 
 ---
 
@@ -110,8 +110,9 @@ Catalog / Resource
      Invoice
        │
        ▼
-   Transaction          ◄── Source of truth for money movement
-       │                      AND the sole gateway interface
+BillingTransaction /   ◄── Source of truth for money movement
+     Payment                AND the sole gateway interface
+       │
        ▼
   PaymentMethod         ◄── Defines HOW money moves (qr / redirect / cash)
 ```
@@ -122,8 +123,8 @@ Each domain maps real models to this chain:
 |-------|---------------|----------------|
 | **Catalog** | `BillingResource` — **System-level global catalog**. Seeded by Skycom. Country-scoped pricing (US/VN). Two types: `volumetric` (metered usage counters: orders, storage_mb, employees, branches, customers, api_calls, stock_mutations) and `addon_feature` (flat monthly add-on fees: analytics_dashboard, hrm_attendance, custom_roles, etc.). No `company_id`. Companies **never** create `BillingResource` records. | `Product` / `Service` / `SubscriptionPlan` / etc. — **Company-scoped business catalog**. Belongs to a `company_id`. Company creates them, sets prices, defines categories/properties. Companies own their catalog entirely — Skycom only provides the schema. |
 | **Contract** | `BillingContract` — per-company pricing plan, allowances, feature toggles, base price | `Order` — captures items (via `OrderAppointment`), quantities, unit prices, customer, branch |
-| **Invoice** | `BillingInvoice` — monthly charge; `movement_type: :charge`, `target_balance: :main_balance`, `payment_status: unpaid/paid/overdue` | `Invoice` — bill to customer; `total_price`, `workflow_status` tracks lifecycle, `payment_status` derived from transaction sum (target) |
-| **Transaction** | `BillingTransaction` — ledger entry; records `amount_cents`, before/after snapshots of both wallet balances | `Payment` — payment record; needs `amount_cents`, `payment_method_id`, gateway fields + sync callback (target) |
+| **Invoice** | `BillingInvoice` — monthly charge; `movement_type: :charge`, `target_balance: :main_balance`, `payment_status: unpaid/paid/overdue` | `Invoice` — bill to customer; `total_price`, `workflow_status` tracks lifecycle, `payment_status` derived from Payment sum (target) |
+| **BillingTransaction** (B2B) / **Payment** (B2C) | `BillingTransaction` — ledger entry; records `amount_cents`, before/after snapshots of both wallet balances | `Payment` — payment record; needs `amount_cents`, `payment_method_id`, gateway fields + sync callback (target) |
 | **Balance** | `BillingWallet` (future separate model; currently `company.main_balance_cents` + `company.promo_balance_cents`) | N/A — the customer pays directly, the company does not hold a balance for them |
 | **PaymentMethod** | `PaymentMethod` where `business_type: :b2b` — system-level: wallet auto-debit, card-on-file, QR fallback for bank transfer | `PaymentMethod` where `business_type: :b2c` — customer-facing: Cash, MoMo, ZaloPay, VNPay, Credit Card, etc. |
 
@@ -131,15 +132,15 @@ Each domain maps real models to this chain:
 
 ## 4. The Absolute Rule
 
-> **`Invoice.payment_status` MUST be derived from the sum of its `Transactions`.**
+> **`Invoice.payment_status` MUST be derived from the sum of its `Payment`/`BillingTransaction` records.**
 
 ```
-Invoice.payment_status  =  SUM(Transaction.amount_cents) >= Invoice.price_cents
+Invoice.payment_status  =  SUM(Payment/BillingTransaction.amount_cents) >= Invoice.price_cents
                               ? :paid
                               : :unpaid
 ```
 
-This rule is enforced by callback on the Transaction model:
+This rule is enforced by callback on the model that records money movement:
 
 ```ruby
 # BillingTransaction (already enforces this):
@@ -158,22 +159,22 @@ end
 
 | Scenario | Behavior | Enforced By |
 |----------|----------|-------------|
-| Create a paid invoice without any transaction | ❌ **FORBIDDEN** — callback never fires, invoice stays `unpaid` | Transaction `after_create` callback |
-| Delete a transaction (refund/void) | ✅ Invoice auto-reverts to `unpaid` | Transaction `after_destroy` callback |
-| Sum of transactions exactly equals invoice price | ✅ Invoice transitions to `paid` | Callback computes `total >= price_cents` |
+| Create a paid invoice without any payment record | ❌ **FORBIDDEN** — callback never fires, invoice stays `unpaid` | `after_create` callback on the payment model |
+| Delete a payment (refund/void) | ✅ Invoice auto-reverts to `unpaid` | `after_destroy` callback on the payment model |
+| Sum of payments exactly equals invoice price | ✅ Invoice transitions to `paid` | Callback computes `total >= price_cents` |
 | Sum exceeds invoice price | ✅ Invoice is `paid` (overpayment credits go to wallet) | Callback computes `total >= price_cents` |
 | Set `invoice.payment_status = :paid` directly in any code path | ❌ **FORBIDDEN** — no code may bypass the derivation | Review + lint |
 
 ### Exception: `price_cents == 0`
 
-When an invoice has zero price (within-allowance usage), it may be auto-marked `paid` without a transaction. This is the only exception — nothing moved, nothing to record.
+When an invoice has zero price (within-allowance usage), it may be auto-marked `paid` without a payment record. This is the only exception — nothing moved, nothing to record.
 
-### 4.1 Transaction as the Sole Gateway Interface
+### 4.1 Payment/BillingTransaction as the Sole Gateway Interface
 
-The Transaction record (BillingTransaction for B2B, Payment for B2C) is the **only** object that communicates with external payment gateways. Neither invoices nor orders interact with gateways directly.
+`BillingTransaction` (B2B) and `Payment` (B2C) are the **only** objects that communicate with external payment gateways. Neither invoices nor orders interact with gateways directly.
 
 ```
- Transaction                           Payment Gateway
+ BillingTransaction / Payment            Payment Gateway
     │                                       │
     ├── payment_method_id ────► determines how to call
     │     ├── mode: :qr       → generate QR code (offline)
@@ -186,22 +187,22 @@ The Transaction record (BillingTransaction for B2B, Payment for B2C) is the **on
     │     ├── status (success / failure / pending)
     │     └── settlement details (timestamp, fees, etc.)
     │
-    ├── Transaction updates itself from gateway response
+    ├── BillingTransaction/Payment updates itself from gateway response
     │     └── after_update :sync_invoice_payment_status
-    │           └── Invoice.payment_status derived from SUM(transactions)
+    │           └── Invoice.payment_status derived from SUM(payments)
     │
     └── Invoice / Order never talk to gateway
 ```
 
 **How it works:**
 
-1. A Transaction is created with a `payment_method_id` FK pointing to a `PaymentMethod`
+1. A `BillingTransaction` or `Payment` is created with a `payment_method_id` FK pointing to a `PaymentMethod`
 2. The `PaymentMethod.payment_mode` (qr/redirect/cash) determines HOW the gateway interaction works
-3. For online payments, the Transaction initiates the gateway call (API request or redirect)
+3. For online payments, the record initiates the gateway call (API request or redirect)
 4. The gateway responds — either synchronously (API callback) or asynchronously (webhook)
-5. The gateway response updates the Transaction record (gateway_transaction_id, status, etc.)
-6. The Transaction's `after_create`/`after_update`/`after_destroy` callback calls `sync_invoice_payment_status`
-7. The parent Invoice's `payment_status` is updated based on the sum of all its Transactions
+5. The gateway response updates the record (gateway_transaction_id, status, etc.)
+6. The record's `after_create`/`after_update`/`after_destroy` callback calls `sync_invoice_payment_status`
+7. The parent Invoice's `payment_status` is updated based on the sum of all its `BillingTransaction`/`Payment` records
 
 **B2B example (QR bank transfer):**
 ```
@@ -210,7 +211,7 @@ BillingInvoice (unpaid)
     → PaymentMethod.payment_mode == :qr
       → render QR code for company to scan & pay
       → bank sends webhook → Rails receives it
-        → Transaction.update!(gateway_transaction_id: "ref-123", status: "completed")
+        → BillingTransaction.update!(gateway_transaction_id: "ref-123", status: "completed")
           → after_update :sync_invoice_payment_status
             → BillingInvoice.payment_status → :paid
 ```
@@ -227,7 +228,7 @@ Payment.create!(payment_method: momo, invoice: invoice)
         → Invoice.payment_status → :paid
 ```
 
-**Key rule:** The Transaction is the bridge between Skycom's internal money flow and external financial systems. No other record type may initiate or receive gateway communication.
+**Key rule:** `BillingTransaction`/`Payment` is the bridge between Skycom's internal money flow and external financial systems. No other record type may initiate or receive gateway communication.
 
 ---
 
@@ -762,27 +763,27 @@ Frontend (POS / Web / Mobile)
                    └── FinalizeOrderService
 ```
 
-### 6.4 Multiple Transactions Per Invoice
+### 6.4 Multiple Payments Per Invoice
 
 A single invoice may be paid in multiple installments (split tender: cash + card, or partial payments):
 
 ```ruby
 Invoice # total_price: 50_00 ($50.00)
-  ├── Transaction #1: amount_cents: 20_00 (cash)
+  ├── Payment #1: amount_cents: 20_00 (cash)
   │     └── after_create → SUM = 20_00 < 50_00 → payment_status: :unpaid
   │
-  └── Transaction #2: amount_cents: 30_00 (credit card)
+  └── Payment #2: amount_cents: 30_00 (credit card)
         └── after_create → SUM = 50_00 >= 50_00 → payment_status: :paid
 ```
 
-If Transaction #2 is later refunded (destroyed):
+If Payment #2 is later refunded (destroyed):
 `after_destroy → SUM = 20_00 < 50_00 → payment_status: :unpaid` (invoice reverts)
 
 ---
 
 ## 7. PaymentMethod: The Global Bridge
 
-`PaymentMethod` is a **global catalog** — it does not belong to any company. It defines **how money moves** in both domains. The Transaction uses its `payment_method_id` to determine the gateway interaction pattern.
+`PaymentMethod` is a **global catalog** — it does not belong to any company. It defines **how money moves** in both domains. The `BillingTransaction`/`Payment` uses its `payment_method_id` to determine the gateway interaction pattern.
 
 ### 7.1 The Enum
 
@@ -813,17 +814,17 @@ PaymentMethodAppointment
 
 This allows each company to enable only the payment methods relevant to their market (e.g., MoMo + Cash for VN companies, Stripe + Cash for US companies).
 
-### 7.3 Transaction <-> PaymentMethod Interaction
+### 7.3 BillingTransaction/Payment <-> PaymentMethod Interaction
 
-The `PaymentMethod.payment_mode` defines how the Transaction interacts with the gateway:
+The `PaymentMethod.payment_mode` defines how the `BillingTransaction`/`Payment` interacts with the gateway:
 
 | `payment_mode` | Interaction Pattern | What Happens |
 |----------------|-------------------|--------------|
-| `:cash` | No gateway | Transaction is created directly. No external API call. Payment is manual/onsite. |
-| `:qr` | Offline async | Transaction creates a QR code encoding payment details. Customer scans with banking app. Bank sends webhook on completion → Transaction updated. |
-| `:redirect` | Online sync+async | Transaction initiates redirect to gateway (MoMo, VNPay, Stripe). Customer authorizes on gateway page. Gateway calls back via redirect or webhook → Transaction updated. |
+| `:cash` | No gateway | Record is created directly. No external API call. Payment is manual/onsite. |
+| `:qr` | Offline async | Record triggers QR code generation encoding payment details. Customer scans with banking app. Bank sends webhook on completion → record updated. |
+| `:redirect` | Online sync+async | Record initiates redirect to gateway (MoMo, VNPay, Stripe). Customer authorizes on gateway page. Gateway calls back via redirect or webhook → record updated. |
 
-The Transaction is created FIRST with a `payment_method_id`. The system uses the PaymentMethod to determine the gateway service/endpoint to call. The gateway response always updates the Transaction record, never the Invoice or Order directly.
+The `BillingTransaction`/`Payment` is created FIRST with a `payment_method_id`. The system uses the PaymentMethod to determine the gateway service/endpoint to call. The gateway response always updates the record, never the Invoice or Order directly.
 
 ### 7.4 B2B Payment Methods
 
@@ -853,28 +854,28 @@ B2C payment methods are used by the company's customers:
 
 These are immutable. Every developer and AI agent **must** follow them.
 
-### Tenet 1: Transaction Is the Source of Truth
+### Tenet 1: Payment/BillingTransaction Is the Source of Truth
 
-Company balances, invoice payment statuses, and financial reports are all **derived** from Transaction records. Never the other way around.
+Company balances, invoice payment statuses, and financial reports are all **derived** from `BillingTransaction`/`Payment` records. Never the other way around.
 
 ```
-Transactions → Invoice.payment_status
-Transactions → Company.main_balance_cents  (recomputed from BillingTransaction sum)
+BillingTransaction/Payment → Invoice.payment_status
+BillingTransaction         → Company.main_balance_cents  (recomputed from sum)
 ```
 
-If balances ever drift, they must be reconstructed from Transactions — not the reverse.
+If balances ever drift, they must be reconstructed from `BillingTransaction` records — not the reverse.
 
 ### Tenet 2: No Orphan Money
 
-Every Transaction **must** belong to an Invoice (`billing_invoice_id` / `invoice_id` is `NOT NULL`). Every Invoice **must** have a `movement_type` (`:charge` or `:deposit`) that explains the direction of flow.
+Every `BillingTransaction`/`Payment` **must** belong to an Invoice (`billing_invoice_id` / `invoice_id` is `NOT NULL`). Every Invoice **must** have a `movement_type` (`:charge` or `:deposit`) that explains the direction of flow.
 
 ### Tenet 3: No Direct Status Assignment
 
-No code path may set `invoice.payment_status = :paid` directly. The only way an invoice becomes `paid` is through the `sync_invoice_payment_status` callback triggered by a Transaction lifecycle event.
+No code path may set `invoice.payment_status = :paid` directly. The only way an invoice becomes `paid` is through the `sync_invoice_payment_status` callback triggered by a `BillingTransaction`/`Payment` lifecycle event.
 
 ```ruby
 # ✅ CORRECT
-Transaction.create!(invoice: invoice, amount_cents: 1000)
+BillingTransaction.create!(invoice: invoice, amount_cents: 1000)
   # → after_create fires → sync_invoice_payment_status → paid
 
 # ❌ FORBIDDEN
@@ -883,7 +884,7 @@ invoice.update!(payment_status: :paid)
 
 ### Tenet 4: Full Audit Trail
 
-Every Transaction must record enough context to reconstruct the financial state without consulting external systems:
+Every `BillingTransaction`/`Payment` must record enough context to reconstruct the financial state without consulting external systems:
 
 | Field | Purpose |
 |-------|---------|
@@ -900,11 +901,11 @@ Every Transaction must record enough context to reconstruct the financial state 
 Every money flow terminates at a `PaymentMethod` that defines the actual transfer mechanism:
 
 ```
-Flow: Catalog → Contract → Invoice → Transaction → PaymentMethod
-                                                       │
-                                                       ├── :qr       → QR code generated, customer scans & pays
-                                                       ├── :redirect → Customer redirected to gateway page
-                                                       └── :cash     → Manual receipt, no gateway
+Flow: Catalog → Contract → Invoice → BillingTransaction/Payment → PaymentMethod
+                                                                     │
+                                                                     ├── :qr       → QR code generated, customer scans & pays
+                                                                     ├── :redirect → Customer redirected to gateway page
+                                                                     └── :cash     → Manual receipt, no gateway
 ```
 
 ### Tenet 6: Balance Changes Trigger Re-Settlement
@@ -919,12 +920,12 @@ after_update :auto_settle_unpaid_invoices,
 
 This ensures that a company that tops up enough to cover outstanding invoices is reactivated immediately — no manual intervention needed.
 
-### Tenet 7: Transaction Is the Sole Gateway Interface
+### Tenet 7: BillingTransaction/Payment Is the Sole Gateway Interface
 
-Only Transaction records (BillingTransaction for B2B, Payment for B2C) may communicate with external payment gateways. Invoices and orders never interact with gateways.
+Only `BillingTransaction` (B2B) and `Payment` (B2C) may communicate with external payment gateways. Invoices and orders never interact with gateways.
 
 ```
-Gateway API call / webhook → Transaction.update!(gateway_status, gateway_txn_id)
+Gateway API call / webhook → BillingTransaction/Payment.update!(gateway_status, gateway_txn_id)
                                 │
                                 └── after_update :sync_invoice_payment_status
                                       └── Invoice.payment_status derived
@@ -932,7 +933,7 @@ Gateway API call / webhook → Transaction.update!(gateway_status, gateway_txn_i
 Invoice / Order → NEVER talks to gateway
 ```
 
-The Transaction's `payment_method_id` FK determines which gateway to use and which interaction pattern (qr/redirect/cash) to follow.
+The `BillingTransaction`/`Payment`'s `payment_method_id` FK determines which gateway to use and which interaction pattern (qr/redirect/cash) to follow.
 
 ---
 
@@ -940,7 +941,7 @@ The Transaction's `payment_method_id` FK determines which gateway to use and whi
 
 ### 9.1 Callback Pattern
 
-Every Transaction model **must** implement:
+Every `BillingTransaction` and `Payment` model **must** implement:
 
 ```ruby
 after_create_commit :sync_invoice_payment_status, unless: -> { amount_cents.zero? }
@@ -956,6 +957,8 @@ def sync_invoice_payment_status
 end
 ```
 
+Where `invoice.transactions` is `billing_invoice.billing_transactions` (B2B) or `invoice.payments` (B2C).
+
 ### 9.2 Invoice-Level Guard
 
 Every Invoice model **should** guard against direct payment_status manipulation:
@@ -967,8 +970,8 @@ def payment_status_not_manually_set
   return unless payment_status_changed?
   return unless persisted? # allow initial :unpaid on create
 
-  # Check if this change was triggered by a transaction callback
-  # (Transaction callback fires inside the same request, so we can't
+  # Check if this change was triggered by a Payment/BillingTransaction callback
+  # (the callback fires inside the same request, so we can't
   # easily distinguish. The real enforcement is: no code outside of
   # the callback should change payment_status.)
 end
@@ -983,7 +986,7 @@ Every feature test that exercises payment **must** assert:
 ```ruby
 # Verify payment_status was derived, not set directly
 expect(invoice.reload.payment_status).to eq("paid")
-expect(invoice.transactions.sum(:amount_cents)).to be >= invoice.price_cents
+expect(invoice.payments.sum(:amount_cents)).to be >= invoice.price_cents
 
 # Verify balance was updated (B2B only)
 expect(company.reload.main_balance_cents).to eq(expected_main)
@@ -994,12 +997,12 @@ expect(company.reload.promo_balance_cents).to eq(expected_promo)
 
 | Smell | Problem |
 |-------|---------|
-| `invoice.update!(payment_status: :paid)` | ❌ Direct status assignment — should come from Transaction |
-| `Transaction.create!` without `amount_cents` | ❌ No monetary value — impossible to derive status |
-| `Transaction.create!` without `payment_method_id` | ❌ No link to PaymentMethod — can't tell HOW money moved |
+| `invoice.update!(payment_status: :paid)` | ❌ Direct status assignment — should come from Payment/BillingTransaction |
+| `Payment.create!` without `amount_cents` | ❌ No monetary value — impossible to derive status |
+| `Payment.create!` without `payment_method_id` | ❌ No link to PaymentMethod — can't tell HOW money moved |
 | `BillingTransaction.create!` without balance snapshots | ❌ No audit trail — can't reconstruct wallet state |
-| `Invoice.gateway_call()` or `Order.gateway_call()` | ❌ Only Transaction talks to gateways |
-| Creating an Invoice without a Transaction in the same flow | ❌ Orphan invoice — will never become `paid` |
+| `Invoice.gateway_call()` or `Order.gateway_call()` | ❌ Only BillingTransaction/Payment talks to gateways |
+| Creating an Invoice without a Payment/BillingTransaction in the same flow | ❌ Orphan invoice — will never become `paid` |
 
 ---
 
