@@ -125,7 +125,11 @@ export const edit_company_permission_path = (companyId, permissionId) => `/compa
 export const company_roles_path = (companyId) => `/companies/${companyId}/roles`
 export const company_settings_path = (companyId) => `/companies/${companyId}/settings`
 export const company_users_path = (companyId) => `/companies/${companyId}/users`
-export const company_payments_path = (companyId) => `/companies/${companyId}/payments`
+export const company_transactions_path = (companyId) => `/companies/${companyId}/transactions`
+export const new_company_transaction_path = (companyId) => `/companies/${companyId}/transactions/new`
+export const company_transaction_path = (companyId, id) => `/companies/${companyId}/transactions/${id}`
+export const edit_company_transaction_path = (companyId, id) => `/companies/${companyId}/transactions/${id}/edit`
+export const create_company_transactions_path = (companyId) => `/companies/${companyId}/transactions`
 export const company_scheduled_shifts_path = (companyId) => `/companies/${companyId}/scheduled_shifts`
 export const new_company_scheduled_shift_path = (companyId) => `/companies/${companyId}/scheduled_shifts/new`
 export const company_scheduled_shift_path = (companyId, id) => `/companies/${companyId}/scheduled_shifts/${id}`

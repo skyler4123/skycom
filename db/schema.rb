@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_07_02_190003) do
+ActiveRecord::Schema[8.0].define(version: 2026_07_16_094950) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pgcrypto"
@@ -411,6 +411,36 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_02_190003) do
     t.index ["target_balance"], name: "index_billing_invoices_on_target_balance"
   end
 
+  create_table "billing_payment_methods", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
+    t.string "email"
+    t.string "name"
+    t.text "description"
+    t.string "code"
+    t.string "phone_number"
+    t.integer "currency_code"
+    t.integer "country_code"
+    t.integer "timezone"
+    t.integer "payment_mode"
+    t.string "gateway_url"
+    t.string "secret_key"
+    t.integer "lifecycle_status"
+    t.integer "workflow_status"
+    t.integer "business_type"
+    t.datetime "expiration_date"
+    t.jsonb "metadata"
+    t.datetime "discarded_at"
+    t.string "permission_resource_name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["business_type"], name: "index_billing_payment_methods_on_business_type"
+    t.index ["code"], name: "index_billing_payment_methods_on_code", unique: true
+    t.index ["discarded_at"], name: "index_billing_payment_methods_on_discarded_at"
+    t.index ["email"], name: "index_billing_payment_methods_on_email", unique: true
+    t.index ["lifecycle_status"], name: "index_billing_payment_methods_on_lifecycle_status"
+    t.index ["payment_mode"], name: "index_billing_payment_methods_on_payment_mode"
+    t.index ["workflow_status"], name: "index_billing_payment_methods_on_workflow_status"
+  end
+
   create_table "billing_resources", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.string "name", null: false
     t.text "description"
@@ -430,6 +460,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_02_190003) do
   create_table "billing_transactions", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.uuid "company_id", null: false
     t.uuid "billing_invoice_id", null: false
+    t.uuid "billing_payment_method_id", null: false
     t.integer "transaction_type", null: false
     t.integer "amount_cents", null: false
     t.integer "currency", null: false
@@ -441,6 +472,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_02_190003) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["billing_invoice_id"], name: "index_billing_transactions_on_billing_invoice_id"
+    t.index ["billing_payment_method_id"], name: "index_billing_transactions_on_billing_payment_method_id"
     t.index ["company_id", "created_at"], name: "idx_wallet_tx_company_chrono"
     t.index ["company_id"], name: "index_billing_transactions_on_company_id"
   end
@@ -2418,6 +2450,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_02_190003) do
     t.datetime "property_datetime_10"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer "payment_status", default: 0, null: false
     t.index ["branch_id"], name: "index_invoices_on_branch_id"
     t.index ["business_type"], name: "index_invoices_on_business_type"
     t.index ["category_id"], name: "index_invoices_on_category_id"
@@ -3078,107 +3111,6 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_02_190003) do
     t.index ["lifecycle_status"], name: "index_payment_methods_on_lifecycle_status"
     t.index ["payment_mode"], name: "index_payment_methods_on_payment_mode"
     t.index ["workflow_status"], name: "index_payment_methods_on_workflow_status"
-  end
-
-  create_table "payments", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
-    t.uuid "company_id", null: false
-    t.uuid "branch_id"
-    t.uuid "invoice_id", null: false
-    t.uuid "category_id", null: false
-    t.uuid "property_mapping_id", null: false
-    t.string "email"
-    t.string "name"
-    t.text "description"
-    t.string "code"
-    t.string "phone_number"
-    t.integer "currency_code"
-    t.integer "country_code"
-    t.integer "timezone"
-    t.integer "lifecycle_status"
-    t.integer "workflow_status"
-    t.integer "business_type"
-    t.datetime "expiration_date"
-    t.jsonb "metadata"
-    t.datetime "discarded_at"
-    t.string "permission_resource_name"
-    t.string "property_string_1"
-    t.string "property_string_2"
-    t.string "property_string_3"
-    t.string "property_string_4"
-    t.string "property_string_5"
-    t.string "property_string_6"
-    t.string "property_string_7"
-    t.string "property_string_8"
-    t.string "property_string_9"
-    t.string "property_string_10"
-    t.text "property_text_1"
-    t.text "property_text_2"
-    t.text "property_text_3"
-    t.text "property_text_4"
-    t.text "property_text_5"
-    t.integer "property_integer_1"
-    t.integer "property_integer_2"
-    t.integer "property_integer_3"
-    t.integer "property_integer_4"
-    t.integer "property_integer_5"
-    t.integer "property_integer_6"
-    t.integer "property_integer_7"
-    t.integer "property_integer_8"
-    t.integer "property_integer_9"
-    t.integer "property_integer_10"
-    t.integer "property_integer_11"
-    t.integer "property_integer_12"
-    t.integer "property_integer_13"
-    t.integer "property_integer_14"
-    t.integer "property_integer_15"
-    t.integer "property_integer_16"
-    t.integer "property_integer_17"
-    t.integer "property_integer_18"
-    t.integer "property_integer_19"
-    t.integer "property_integer_20"
-    t.decimal "property_decimal_1", precision: 15, scale: 4
-    t.decimal "property_decimal_2", precision: 15, scale: 4
-    t.decimal "property_decimal_3", precision: 15, scale: 4
-    t.decimal "property_decimal_4", precision: 15, scale: 4
-    t.decimal "property_decimal_5", precision: 15, scale: 4
-    t.decimal "property_decimal_6", precision: 15, scale: 4
-    t.decimal "property_decimal_7", precision: 15, scale: 4
-    t.decimal "property_decimal_8", precision: 15, scale: 4
-    t.decimal "property_decimal_9", precision: 15, scale: 4
-    t.decimal "property_decimal_10", precision: 15, scale: 4
-    t.boolean "property_boolean_1"
-    t.boolean "property_boolean_2"
-    t.boolean "property_boolean_3"
-    t.boolean "property_boolean_4"
-    t.boolean "property_boolean_5"
-    t.boolean "property_boolean_6"
-    t.boolean "property_boolean_7"
-    t.boolean "property_boolean_8"
-    t.boolean "property_boolean_9"
-    t.boolean "property_boolean_10"
-    t.datetime "property_datetime_1"
-    t.datetime "property_datetime_2"
-    t.datetime "property_datetime_3"
-    t.datetime "property_datetime_4"
-    t.datetime "property_datetime_5"
-    t.datetime "property_datetime_6"
-    t.datetime "property_datetime_7"
-    t.datetime "property_datetime_8"
-    t.datetime "property_datetime_9"
-    t.datetime "property_datetime_10"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.index ["branch_id"], name: "index_payments_on_branch_id"
-    t.index ["business_type"], name: "index_payments_on_business_type"
-    t.index ["category_id"], name: "index_payments_on_category_id"
-    t.index ["code"], name: "index_payments_on_code", unique: true
-    t.index ["company_id"], name: "index_payments_on_company_id"
-    t.index ["discarded_at"], name: "index_payments_on_discarded_at"
-    t.index ["email"], name: "index_payments_on_email", unique: true
-    t.index ["invoice_id"], name: "index_payments_on_invoice_id"
-    t.index ["lifecycle_status"], name: "index_payments_on_lifecycle_status"
-    t.index ["property_mapping_id"], name: "index_payments_on_property_mapping_id"
-    t.index ["workflow_status"], name: "index_payments_on_workflow_status"
   end
 
   create_table "period_appointments", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
@@ -5664,6 +5596,111 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_02_190003) do
     t.index ["workflow_status"], name: "index_tasks_on_workflow_status"
   end
 
+  create_table "transactions", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
+    t.uuid "company_id", null: false
+    t.uuid "branch_id"
+    t.uuid "invoice_id", null: false
+    t.uuid "category_id", null: false
+    t.uuid "property_mapping_id", null: false
+    t.uuid "payment_method_id"
+    t.string "email"
+    t.string "name"
+    t.text "description"
+    t.string "code"
+    t.string "phone_number"
+    t.integer "currency_code"
+    t.integer "country_code"
+    t.integer "timezone"
+    t.integer "lifecycle_status"
+    t.integer "workflow_status"
+    t.integer "business_type"
+    t.datetime "expiration_date"
+    t.jsonb "metadata"
+    t.datetime "discarded_at"
+    t.string "permission_resource_name"
+    t.string "property_string_1"
+    t.string "property_string_2"
+    t.string "property_string_3"
+    t.string "property_string_4"
+    t.string "property_string_5"
+    t.string "property_string_6"
+    t.string "property_string_7"
+    t.string "property_string_8"
+    t.string "property_string_9"
+    t.string "property_string_10"
+    t.text "property_text_1"
+    t.text "property_text_2"
+    t.text "property_text_3"
+    t.text "property_text_4"
+    t.text "property_text_5"
+    t.integer "property_integer_1"
+    t.integer "property_integer_2"
+    t.integer "property_integer_3"
+    t.integer "property_integer_4"
+    t.integer "property_integer_5"
+    t.integer "property_integer_6"
+    t.integer "property_integer_7"
+    t.integer "property_integer_8"
+    t.integer "property_integer_9"
+    t.integer "property_integer_10"
+    t.integer "property_integer_11"
+    t.integer "property_integer_12"
+    t.integer "property_integer_13"
+    t.integer "property_integer_14"
+    t.integer "property_integer_15"
+    t.integer "property_integer_16"
+    t.integer "property_integer_17"
+    t.integer "property_integer_18"
+    t.integer "property_integer_19"
+    t.integer "property_integer_20"
+    t.decimal "property_decimal_1", precision: 15, scale: 4
+    t.decimal "property_decimal_2", precision: 15, scale: 4
+    t.decimal "property_decimal_3", precision: 15, scale: 4
+    t.decimal "property_decimal_4", precision: 15, scale: 4
+    t.decimal "property_decimal_5", precision: 15, scale: 4
+    t.decimal "property_decimal_6", precision: 15, scale: 4
+    t.decimal "property_decimal_7", precision: 15, scale: 4
+    t.decimal "property_decimal_8", precision: 15, scale: 4
+    t.decimal "property_decimal_9", precision: 15, scale: 4
+    t.decimal "property_decimal_10", precision: 15, scale: 4
+    t.boolean "property_boolean_1"
+    t.boolean "property_boolean_2"
+    t.boolean "property_boolean_3"
+    t.boolean "property_boolean_4"
+    t.boolean "property_boolean_5"
+    t.boolean "property_boolean_6"
+    t.boolean "property_boolean_7"
+    t.boolean "property_boolean_8"
+    t.boolean "property_boolean_9"
+    t.boolean "property_boolean_10"
+    t.datetime "property_datetime_1"
+    t.datetime "property_datetime_2"
+    t.datetime "property_datetime_3"
+    t.datetime "property_datetime_4"
+    t.datetime "property_datetime_5"
+    t.datetime "property_datetime_6"
+    t.datetime "property_datetime_7"
+    t.datetime "property_datetime_8"
+    t.datetime "property_datetime_9"
+    t.datetime "property_datetime_10"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.integer "amount_cents", default: 0, null: false
+    t.integer "payment_status", default: 0, null: false
+    t.index ["branch_id"], name: "index_transactions_on_branch_id"
+    t.index ["business_type"], name: "index_transactions_on_business_type"
+    t.index ["category_id"], name: "index_transactions_on_category_id"
+    t.index ["code"], name: "index_transactions_on_code", unique: true
+    t.index ["company_id"], name: "index_transactions_on_company_id"
+    t.index ["discarded_at"], name: "index_transactions_on_discarded_at"
+    t.index ["email"], name: "index_transactions_on_email", unique: true
+    t.index ["invoice_id"], name: "index_transactions_on_invoice_id"
+    t.index ["lifecycle_status"], name: "index_transactions_on_lifecycle_status"
+    t.index ["payment_method_id"], name: "index_transactions_on_payment_method_id"
+    t.index ["property_mapping_id"], name: "index_transactions_on_property_mapping_id"
+    t.index ["workflow_status"], name: "index_transactions_on_workflow_status"
+  end
+
   create_table "users", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
     t.string "email", null: false
     t.string "password_digest", null: false
@@ -5845,6 +5882,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_02_190003) do
   add_foreign_key "billing_invoices", "billing_contracts"
   add_foreign_key "billing_invoices", "companies"
   add_foreign_key "billing_transactions", "billing_invoices"
+  add_foreign_key "billing_transactions", "billing_payment_methods"
   add_foreign_key "billing_transactions", "companies"
   add_foreign_key "billing_wallets", "companies"
   add_foreign_key "branches", "branches", column: "parent_branch_id"
@@ -5998,11 +6036,6 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_02_190003) do
   add_foreign_key "payment_method_appointments", "branches"
   add_foreign_key "payment_method_appointments", "companies"
   add_foreign_key "payment_method_appointments", "payment_methods"
-  add_foreign_key "payments", "branches"
-  add_foreign_key "payments", "categories"
-  add_foreign_key "payments", "companies"
-  add_foreign_key "payments", "invoices"
-  add_foreign_key "payments", "property_mappings"
   add_foreign_key "period_appointments", "periods"
   add_foreign_key "policies", "branches"
   add_foreign_key "policies", "companies"
@@ -6153,6 +6186,12 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_02_190003) do
   add_foreign_key "tasks", "companies"
   add_foreign_key "tasks", "property_mappings"
   add_foreign_key "tasks", "task_groups"
+  add_foreign_key "transactions", "branches"
+  add_foreign_key "transactions", "categories"
+  add_foreign_key "transactions", "companies"
+  add_foreign_key "transactions", "invoices"
+  add_foreign_key "transactions", "payment_methods"
+  add_foreign_key "transactions", "property_mappings"
   add_foreign_key "users", "users", column: "parent_user_id"
   add_foreign_key "warehouses", "branches"
   add_foreign_key "warehouses", "categories"

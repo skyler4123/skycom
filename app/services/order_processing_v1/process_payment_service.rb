@@ -13,10 +13,11 @@ module OrderProcessingV1
         business_type: :sales
       )
 
-      payment = Payment.create!(
+      transaction = Transaction.create!(
         company_id: order.company_id,
         branch_id: order.branch_id,
         invoice_id: invoice.id,
+        amount_cents: invoice.total_price_cents,
         currency_code: order.currency_code,
         workflow_status: :completed,
         business_type: :standard_payment
@@ -24,7 +25,7 @@ module OrderProcessingV1
 
       order.update!(workflow_status: :paid)
 
-      { payment_id: payment.id }
+      { transaction_id: transaction.id }
     end
   end
 end

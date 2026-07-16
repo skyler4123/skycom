@@ -21,6 +21,7 @@ class BillingTransaction < ApplicationRecord
 
   belongs_to :company
   belongs_to :billing_invoice
+  belongs_to :billing_payment_method, optional: true
 
   validates :amount_cents, numericality: { greater_than_or_equal_to: 0 }
   validates :billing_invoice, presence: true

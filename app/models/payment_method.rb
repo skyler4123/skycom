@@ -14,6 +14,7 @@ class PaymentMethod < ApplicationRecord
   # This model is intended to be global, so it does not belong to a branch.
   has_many :payment_method_appointments, dependent: :destroy
   has_many :branches, through: :payment_method_appointments
+  has_many :transactions, dependent: :nullify
 
   # --- Enums ---
   enum :lifecycle_status, LIFECYCLE_STATUS, prefix: true

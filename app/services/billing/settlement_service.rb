@@ -163,9 +163,17 @@ module Billing
     def record_transaction(type, amount,
                            before_main, after_main,
                            before_promo, after_promo)
+      bpm = BillingPaymentMethod.find_or_create_by!(code: "WALLET_AUTO_DEBIT") do |bpm|
+        bpm.name = "Wallet Auto-Debit"
+        bpm.business_type = :b2b
+        bpm.payment_mode = :cash
+        bpm.gateway_url = nil
+        bpm.workflow_status = :confirmed
+      end
       BillingTransaction.create!(
         company: company,
         billing_invoice: invoice,
+        billing_payment_method: bpm,
         transaction_type: type,
         amount_cents: amount,
         currency: :usd,

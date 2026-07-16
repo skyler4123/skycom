@@ -17,7 +17,7 @@ class Invoice < ApplicationRecord
   belongs_to :category
   belongs_to :property_mapping
 
-  has_many :payments, dependent: :destroy
+  has_many :transactions, dependent: :destroy
 
   # --- Enums ---
   enum :lifecycle_status, LIFECYCLE_STATUS, prefix: true
@@ -30,6 +30,7 @@ class Invoice < ApplicationRecord
   }
 
   enum :currency_code, CURRENCIE_CODES, prefix: true, default: :usd
+  enum :payment_status, { unpaid: 0, paid: 1, voided: 2 }, default: :unpaid
 
   # --- Validations ---
   validates :name, presence: true, uniqueness: { scope: :company_id }, length: { maximum: 255 }
@@ -38,4 +39,8 @@ class Invoice < ApplicationRecord
   validates :total_price, presence: true, numericality: { greater_than_or_equal_to: 0 }
 
   validates :business_type, presence: true
+
+  def total_price_cents
+    (total_price * 100).to_i
+  end
 end

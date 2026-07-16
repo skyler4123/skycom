@@ -32,15 +32,16 @@ class Seed::ApplicationService
       sa.currency_code = :usd
     end
     Seed::PaymentMethodService.create # Ensure global payment methods are seeded first
+    Seed::BillingPaymentMethodService.create # Seed B2B billing payment methods
     Billing::SeedResourcesService.call # Seed global billing resource catalog (19 records)
     # User
-    super_admin_1 = Seed::UserService.create(email: "super_admin_1@example.com", system_role: :super_admin)
-    super_admin_2 = Seed::UserService.create(email: "super_admin_2@example.com", system_role: :super_admin)
-    admin_1 = Seed::UserService.create(email: "admin_1@example.com", system_role: :admin)
-    admin_2 = Seed::UserService.create(email: "admin_2@example.com", system_role: :admin)
+    super_admin_1 = User.find_by(email: "super_admin_1@example.com") || Seed::UserService.create(email: "super_admin_1@example.com", system_role: :super_admin)
+    super_admin_2 = User.find_by(email: "super_admin_2@example.com") || Seed::UserService.create(email: "super_admin_2@example.com", system_role: :super_admin)
+    admin_1 = User.find_by(email: "admin_1@example.com") || Seed::UserService.create(email: "admin_1@example.com", system_role: :admin)
+    admin_2 = User.find_by(email: "admin_2@example.com") || Seed::UserService.create(email: "admin_2@example.com", system_role: :admin)
 
-    user_1 = Seed::UserService.create(email: "user_1@company1.com", system_role: :company_owner)
-    user_2 = Seed::UserService.create(email: "user_1@company2.com", system_role: :company_owner)
+    user_1 = User.find_by(email: "user_1@company1.com") || Seed::UserService.create(email: "user_1@company1.com", system_role: :company_owner)
+    user_2 = User.find_by(email: "user_1@company2.com") || Seed::UserService.create(email: "user_1@company2.com", system_role: :company_owner)
     user_1.address = Seed::AddressService.create
     user_2.address = Seed::AddressService.create
 
