@@ -97,7 +97,7 @@ property_mapping: cat.default_property_mapping).tap { |s| s.send(:sync_available
     order = Order.last
     expect(order.workflow_status).to eq("paid")
     expect(Invoice.where(order_id: order.id)).to be_present
-    expect(Payment.joins(:invoice).where(invoice: { order_id: order.id })).to be_present
+    expect(Transaction.joins(:invoice).where(invoice: { order_id: order.id })).to be_present
   end
 
   scenario "cart is locked after ORDER is placed" do

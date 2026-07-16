@@ -128,7 +128,7 @@ RSpec.describe "Companies::OrderProcessing::V1", type: :request do
       body = JSON.parse(response.body)
       expect(body["status"]).to eq("paid")
       expect(body["order_id"]).to eq(order.id)
-      expect(body["payment_id"]).to be_present
+      expect(body["transaction_id"]).to be_present
     end
 
     it "transitions order to paid" do
@@ -165,7 +165,7 @@ RSpec.describe "Companies::OrderProcessing::V1", type: :request do
       order = Order.find(order_id)
       expect(order.workflow_status).to eq("paid")
       expect(Invoice.where(order_id: order.id)).to be_present
-      expect(Payment.joins(:invoice).where(invoice: { order_id: order.id })).to be_present
+      expect(Transaction.joins(:invoice).where(invoice: { order_id: order.id })).to be_present
     end
   end
 end

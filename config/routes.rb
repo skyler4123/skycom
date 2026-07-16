@@ -26,7 +26,7 @@ Rails.application.routes.draw do
       resources :brands
       resources :services
       resources :orders
-      resources :payments
+      resources :transactions
       resources :employees
       resources :stocks
       resources :stock_transfers

@@ -138,9 +138,11 @@ class Seed::HospitalEnrichService
     @branches.each_with_index do |branch, index|
       HOSPITAL_ENRICH_EMPLOYEE_COUNTS.each do |role_name, count|
         count.times do |i|
+          email = "#{role_name}_#{i + 1}_clinic_#{index + 1}@#{@email_domain}"
+          next if User.exists?(email: email)
           user = Seed::UserService.create(
             parent_user: @multi_company_owner,
-            email: "#{role_name}_#{i + 1}_clinic_#{index + 1}@#{@email_domain}",
+            email: email,
             system_role: :company_employee
           )
           @employee_counter += 1
@@ -171,9 +173,11 @@ class Seed::HospitalEnrichService
     @branches.each do |branch|
       HOSPITAL_ENRICH_CUSTOMER_COUNTS.each do |_, count|
         count.times do |i|
+          email = "patient_#{i + 1}_#{branch.id}@example.com"
+          next if User.exists?(email: email)
           user = Seed::UserService.create(
             parent_user: @multi_company_owner,
-            email: "patient_#{i + 1}_#{branch.id}@example.com",
+            email: email,
             system_role: :company_customer
           )
           @patient_counter += 1

@@ -158,6 +158,7 @@ module Seed
         txn = BillingTransaction.create!(
           company: company,
           billing_invoice: invoice,
+          billing_payment_method: BillingPaymentMethod.find_by!(code: "WALLET_AUTO_DEBIT"),
           transaction_type: :deduction,
           amount_cents: pair[:price],
           currency: company.currency_code,

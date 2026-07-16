@@ -39,7 +39,7 @@ class Companies::OrderProcessing::V1Controller < Companies::ApplicationControlle
     render json: {
       status: "paid",
       order_id: order.id,
-      payment_id: payment_result[:payment_id],
+      transaction_id: payment_result[:transaction_id],
       message: "Payment completed"
     }
   rescue OrderProcessingV1::InsufficientStockError

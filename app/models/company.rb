@@ -4,7 +4,7 @@ class Company < ApplicationRecord
   attribute :permission_resource_name, :string, default: -> { self.name }
   attribute :resource_names, :string, array: true, default: %w[
     Product Order Customer Employee Branch Department
-    PolicyAppointment Invoice Payment Service Policy
+    PolicyAppointment Invoice Transaction Service Policy
      Category PropertyMapping TableConfig Brand Facility
      Table Reservation Room Guest
     Patient Appointment Course Student Exam

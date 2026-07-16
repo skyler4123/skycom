@@ -3,6 +3,7 @@ class CreateBillingTransactions < ActiveRecord::Migration[8.0]
     create_table :billing_transactions, id: :uuid do |t|
       t.references :company, null: false, foreign_key: true, type: :uuid
       t.references :billing_invoice, null: false, foreign_key: true, type: :uuid
+      t.references :billing_payment_method, null: false, foreign_key: true, type: :uuid
 
       t.integer :transaction_type, null: false
       t.integer :amount_cents, null: false

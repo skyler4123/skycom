@@ -22,6 +22,7 @@ class CreateInvoices < ActiveRecord::Migration[8.0]
       # --- System Fields ---
       t.integer  :lifecycle_status, index: true
       t.integer  :workflow_status, index: true
+      t.integer  :payment_status, null: false, default: 0
       t.integer  :business_type, index: true
       t.datetime :expiration_date
       t.jsonb    :metadata

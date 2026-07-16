@@ -1,8 +1,9 @@
-class Payment < ApplicationRecord
+class Transaction < ApplicationRecord
   include CategoryConcern
   include PropertyMappingConcern
 
   attribute :permission_resource_name, :string, default: -> { self.name }
+  attribute :amount_cents, :integer, default: 0
 
   attribute :metadata, :jsonb, array: true, default: []
   enum :country_code, COUNTRY_CODES, prefix: true, default: :us
@@ -11,14 +12,13 @@ class Payment < ApplicationRecord
 
   include TagConcern
 
-  # --- Associations ---
   belongs_to :company
   belongs_to :branch, optional: true
   belongs_to :invoice
   belongs_to :category
   belongs_to :property_mapping
+  belongs_to :payment_method, optional: true
 
-  # --- Enums ---
   enum :lifecycle_status, LIFECYCLE_STATUS, prefix: true
   enum :workflow_status, WORKFLOW_STATUS, prefix: true
   enum :business_type, {
@@ -27,18 +27,19 @@ class Payment < ApplicationRecord
     final_payment: 2
   }
 
-  # NOTE: payment_method and amount columns were removed from schema
-  # enum :payment_method, {
-  #   credit_card: 0,
-  #   bank_transfer: 1,
-  #   paypal: 2,
-  #   cash: 3
-  # }
+  enum :payment_status, { unpaid: 0, paid: 1, voided: 2 }, default: :unpaid
 
-  # --- Validations ---
   validates :currency_code, presence: true
 
-  # NOTE: amount and payment_method columns were removed from schema
-  # validates :amount, presence: true, numericality: { greater_than: 0 }
-  # validates :payment_method, presence: true
+  after_create :sync_invoice_payment_status, unless: -> { amount_cents.zero? }
+  after_destroy :sync_invoice_payment_status
+
+  private
+
+  def sync_invoice_payment_status
+    total = invoice.transactions.sum(:amount_cents)
+    new_status = total >= invoice.total_price_cents ? :paid : :unpaid
+    return if invoice.payment_status == new_status.to_s
+    invoice.update!(payment_status: new_status)
+  end
 end

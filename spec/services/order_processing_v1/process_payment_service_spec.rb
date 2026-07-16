@@ -13,8 +13,8 @@ RSpec.describe OrderProcessingV1::ProcessPaymentService do
       expect { result }.to change(Invoice, :count).by(1)
     end
 
-    it "creates a Payment" do
-      expect { result }.to change(Payment, :count).by(1)
+    it "creates a Transaction" do
+      expect { result }.to change(Transaction, :count).by(1)
     end
 
     it "sets Order workflow_status to paid" do
@@ -22,8 +22,8 @@ RSpec.describe OrderProcessingV1::ProcessPaymentService do
       expect(order.reload.workflow_status).to eq("paid")
     end
 
-    it "returns payment_id" do
-      expect(result[:payment_id]).to be_present
+    it "returns transaction_id" do
+      expect(result[:transaction_id]).to be_present
     end
 
     context "when called twice on the same order" do
