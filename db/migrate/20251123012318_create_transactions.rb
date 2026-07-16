@@ -6,7 +6,7 @@ class CreateTransactions < ActiveRecord::Migration[8.0]
       t.references :invoice, null: false, foreign_key: true, type: :uuid
       t.references :category, null: false, foreign_key: true, type: :uuid
       t.references :property_mapping, null: false, foreign_key: true, type: :uuid
-      t.references :payment_method, null: false, foreign_key: true, type: :uuid
+      t.references :payment_method, null: true, foreign_key: true, type: :uuid
 
       # --- Identity ---
       t.string :email, null: true, index: { unique: true }
@@ -15,12 +15,14 @@ class CreateTransactions < ActiveRecord::Migration[8.0]
       t.string :code, index: { unique: true }
       t.string :phone_number
       t.integer :currency_code
+      t.integer :amount_cents, null: false, default: 0
       t.integer :country_code
       t.integer  :timezone
 
       # --- System Fields ---
       t.integer  :lifecycle_status, index: true
       t.integer  :workflow_status, index: true
+      t.integer  :payment_status, null: false, default: 0
       t.integer  :business_type, index: true
       t.datetime :expiration_date
       t.jsonb    :metadata
