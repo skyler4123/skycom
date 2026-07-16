@@ -33,14 +33,6 @@ class CreateCompanies < ActiveRecord::Migration[8.0]
       t.datetime :discarded_at,   index: true
       t.string   :permission_resource_name
 
-      # --- Billing Fields ---
-      t.integer  :promo_balance_cents, null: false
-      t.integer  :main_balance_cents, null: false
-      t.integer  :soft_debt_threshold_cents, null: false
-      t.datetime :suspension_at
-      t.boolean  :hide_billing_alerts, null: false
-      t.datetime :has_unpaid_invoices_at
-
       t.timestamps
     end
   end

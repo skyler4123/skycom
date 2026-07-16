@@ -6,7 +6,9 @@ RSpec.describe Billing::SyncSuspensionJob do
   subject(:perform_job) { described_class.perform_now }
 
   context "when suspension_at has passed" do
-    let!(:company) { create(:company, lifecycle_status: :active, suspension_at: 1.day.ago) }
+    let!(:company) do
+      create(:company, lifecycle_status: :active).tap { |c| c.billing_wallet.update!(suspension_at: 1.day.ago) }
+    end
 
     it "marks the company as suspended" do
       expect { perform_job }.to change { company.reload.lifecycle_status }
@@ -14,12 +16,14 @@ RSpec.describe Billing::SyncSuspensionJob do
     end
 
     it "does not change suspension_at" do
-      expect { perform_job }.not_to(change { company.reload.suspension_at })
+      expect { perform_job }.not_to(change { company.reload.billing_wallet.suspension_at })
     end
   end
 
   context "when suspension_at is in the future" do
-    let!(:company) { create(:company, lifecycle_status: :active, suspension_at: 1.day.from_now) }
+    let!(:company) do
+      create(:company, lifecycle_status: :active).tap { |c| c.billing_wallet.update!(suspension_at: 1.day.from_now) }
+    end
 
     it "does not suspend the company" do
       expect { perform_job }.not_to(change { company.reload.lifecycle_status })
@@ -27,7 +31,7 @@ RSpec.describe Billing::SyncSuspensionJob do
   end
 
   context "when suspension_at is nil" do
-    let!(:company) { create(:company, lifecycle_status: :active, suspension_at: nil) }
+    let!(:company) { create(:company, lifecycle_status: :active) }
 
     it "does not suspend the company" do
       expect { perform_job }.not_to(change { company.reload.lifecycle_status })
@@ -35,7 +39,9 @@ RSpec.describe Billing::SyncSuspensionJob do
   end
 
   context "when company is already suspended" do
-    let!(:company) { create(:company, lifecycle_status: :suspended, suspension_at: 1.day.ago) }
+    let!(:company) do
+      create(:company, lifecycle_status: :suspended).tap { |c| c.billing_wallet.update!(suspension_at: 1.day.ago) }
+    end
 
     it "does not change lifecycle_status" do
       expect { perform_job }.not_to(change { company.reload.lifecycle_status })
@@ -43,7 +49,9 @@ RSpec.describe Billing::SyncSuspensionJob do
   end
 
   context "when company is disabled" do
-    let!(:company) { create(:company, lifecycle_status: :disabled, suspension_at: 1.day.ago) }
+    let!(:company) do
+      create(:company, lifecycle_status: :disabled).tap { |c| c.billing_wallet.update!(suspension_at: 1.day.ago) }
+    end
 
     it "does not change lifecycle_status" do
       expect { perform_job }.not_to(change { company.reload.lifecycle_status })
@@ -51,8 +59,12 @@ RSpec.describe Billing::SyncSuspensionJob do
   end
 
   context "with multiple eligible companies" do
-    let!(:company1) { create(:company, lifecycle_status: :active, suspension_at: 1.day.ago) }
-    let!(:company2) { create(:company, lifecycle_status: :active, suspension_at: 2.days.ago) }
+    let!(:company1) do
+      create(:company, lifecycle_status: :active).tap { |c| c.billing_wallet.update!(suspension_at: 1.day.ago) }
+    end
+    let!(:company2) do
+      create(:company, lifecycle_status: :active).tap { |c| c.billing_wallet.update!(suspension_at: 2.days.ago) }
+    end
 
     it "suspends all eligible companies" do
       perform_job
@@ -62,9 +74,15 @@ RSpec.describe Billing::SyncSuspensionJob do
   end
 
   context "with mixed eligibility" do
-    let!(:due) { create(:company, lifecycle_status: :active, suspension_at: 1.day.ago) }
-    let!(:future) { create(:company, lifecycle_status: :active, suspension_at: 1.day.from_now) }
-    let!(:already_suspended) { create(:company, lifecycle_status: :suspended, suspension_at: 1.day.ago) }
+    let!(:due) do
+      create(:company, lifecycle_status: :active).tap { |c| c.billing_wallet.update!(suspension_at: 1.day.ago) }
+    end
+    let!(:future) do
+      create(:company, lifecycle_status: :active).tap { |c| c.billing_wallet.update!(suspension_at: 1.day.from_now) }
+    end
+    let!(:already_suspended) do
+      create(:company, lifecycle_status: :suspended).tap { |c| c.billing_wallet.update!(suspension_at: 1.day.ago) }
+    end
 
     it "only suspends companies with past deadline" do
       perform_job

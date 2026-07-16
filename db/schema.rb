@@ -445,6 +445,34 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_02_190003) do
     t.index ["company_id"], name: "index_billing_transactions_on_company_id"
   end
 
+  create_table "billing_wallets", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "company_id", null: false
+    t.string "name", null: false
+    t.text "description"
+    t.integer "country_code"
+    t.integer "currency", null: false
+    t.integer "promo_balance_cents", null: false
+    t.integer "main_balance_cents", null: false
+    t.integer "soft_debt_threshold_cents", null: false
+    t.datetime "suspension_at"
+    t.boolean "hide_billing_alerts", null: false
+    t.datetime "has_unpaid_invoices_at"
+    t.integer "lifecycle_status"
+    t.integer "workflow_status"
+    t.integer "business_type"
+    t.datetime "expiration_date"
+    t.jsonb "metadata"
+    t.datetime "discarded_at"
+    t.string "permission_resource_name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["business_type"], name: "index_billing_wallets_on_business_type"
+    t.index ["company_id"], name: "index_billing_wallets_on_company_id"
+    t.index ["discarded_at"], name: "index_billing_wallets_on_discarded_at"
+    t.index ["lifecycle_status"], name: "index_billing_wallets_on_lifecycle_status"
+    t.index ["workflow_status"], name: "index_billing_wallets_on_workflow_status"
+  end
+
   create_table "branches", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
     t.uuid "company_id", null: false
     t.uuid "category_id", null: false
@@ -930,12 +958,6 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_02_190003) do
     t.jsonb "metadata"
     t.datetime "discarded_at"
     t.string "permission_resource_name"
-    t.integer "promo_balance_cents", null: false
-    t.integer "main_balance_cents", null: false
-    t.integer "soft_debt_threshold_cents", null: false
-    t.datetime "suspension_at"
-    t.boolean "hide_billing_alerts", null: false
-    t.datetime "has_unpaid_invoices_at"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["business_type"], name: "index_companies_on_business_type"
@@ -5824,6 +5846,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_02_190003) do
   add_foreign_key "billing_invoices", "companies"
   add_foreign_key "billing_transactions", "billing_invoices"
   add_foreign_key "billing_transactions", "companies"
+  add_foreign_key "billing_wallets", "companies"
   add_foreign_key "branches", "branches", column: "parent_branch_id"
   add_foreign_key "branches", "categories"
   add_foreign_key "branches", "companies"

@@ -6,13 +6,14 @@ RSpec.describe Billing::MonthlyBillingJob do
   subject(:perform_job) { described_class.perform_now }
 
   let(:company) { create(:company, lifecycle_status: :active) }
+  let(:wallet) { company.billing_wallet }
   # Auto-seeded free-tier contract (active, base=$0); update base price when needed
   let!(:contract) { company.active_billing_contract }
 
   context "when company has an active contract with base price" do
     before do
       contract.update!(start_date: 3.months.ago, fixed_monthly_price_cents: 1000)
-      company.update!(promo_balance_cents: 2000, main_balance_cents: 0, lifecycle_status: :active)
+      wallet.update!(promo_balance_cents: 2000, main_balance_cents: 0)
     end
 
     it "creates a BillingInvoice" do
@@ -23,14 +24,14 @@ RSpec.describe Billing::MonthlyBillingJob do
       perform_job
       invoice = BillingInvoice.last
       expect(invoice.payment_status).to eq("paid")
-      expect(company.reload.promo_balance_cents).to eq(1000)
+      expect(wallet.reload.promo_balance_cents).to eq(1000)
     end
   end
 
   context "when company has empty wallet" do
     before do
       contract.update!(start_date: 3.months.ago, fixed_monthly_price_cents: 1000)
-      company.update!(promo_balance_cents: 0, main_balance_cents: 0, lifecycle_status: :active)
+      wallet.update!(promo_balance_cents: 0, main_balance_cents: 0)
     end
 
     it "creates invoice as unpaid" do
@@ -39,7 +40,7 @@ RSpec.describe Billing::MonthlyBillingJob do
     end
 
     it "does not deduct from wallet" do
-      expect { perform_job }.not_to(change { company.reload.promo_balance_cents })
+      expect { perform_job }.not_to(change { wallet.reload.promo_balance_cents })
     end
   end
 
@@ -70,7 +71,7 @@ RSpec.describe Billing::MonthlyBillingJob do
   context "when company has unpaid invoices with sufficient wallet" do
     before do
       contract.update!(start_date: 3.months.ago, fixed_monthly_price_cents: 1000)
-      company.update!(promo_balance_cents: 2000, main_balance_cents: 0,
+      wallet.update!(promo_balance_cents: 2000, main_balance_cents: 0,
                       has_unpaid_invoices_at: 5.days.ago)
     end
 
@@ -88,8 +89,9 @@ RSpec.describe Billing::MonthlyBillingJob do
 
   context "when company is disabled" do
     before do
-      company.update!(lifecycle_status: :disabled, promo_balance_cents: 0,
-                      main_balance_cents: -5000, soft_debt_threshold_cents: -1000)
+      company.update!(lifecycle_status: :disabled)
+      wallet.update_columns(promo_balance_cents: 0, main_balance_cents: -5000,
+                             soft_debt_threshold_cents: -1000)
     end
 
     it "does not create an invoice" do
@@ -99,13 +101,14 @@ RSpec.describe Billing::MonthlyBillingJob do
 
   context "with multiple companies" do
     let(:company2) { create(:company, lifecycle_status: :active) }
+    let(:wallet2) { company2.billing_wallet }
     let!(:contract2) { company2.active_billing_contract }
 
     before do
       contract.update!(start_date: 3.months.ago, fixed_monthly_price_cents: 1000)
       contract2.update!(start_date: 3.months.ago, fixed_monthly_price_cents: 500)
-      company.update!(promo_balance_cents: 2000, main_balance_cents: 0, lifecycle_status: :active)
-      company2.update!(promo_balance_cents: 1000, main_balance_cents: 0)
+      wallet.update!(promo_balance_cents: 2000, main_balance_cents: 0)
+      wallet2.update!(promo_balance_cents: 1000, main_balance_cents: 0)
     end
 
     it "processes all non-disabled companies" do

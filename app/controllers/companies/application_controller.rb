@@ -33,9 +33,9 @@ class Companies::ApplicationController < ApplicationController
   end
 
   def set_billing_warning
-    return unless current_company&.has_unpaid_invoices_at?
-    return if current_company.hide_billing_alerts?
-    return if current_company.has_unpaid_invoices_at > UNPAID_WARNING_THRESHOLD.ago
+    return unless current_company&.billing_wallet&.has_unpaid_invoices_at?
+    return if current_company.billing_wallet&.hide_billing_alerts?
+    return if current_company.billing_wallet.has_unpaid_invoices_at > UNPAID_WARNING_THRESHOLD.ago
 
     flash.now[:alert] = "Your account has outstanding invoices. Please settle them to avoid suspension."
   end

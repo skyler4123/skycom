@@ -151,8 +151,9 @@ module Seed
         next unless pair[:status] == :paid
 
         # Use update_columns to set balance without triggering auto-settlement
+        wallet = company.billing_wallet
         promo_before = pair[:price]
-        company.update_columns(promo_balance_cents: promo_before)
+        wallet.update_columns(promo_balance_cents: promo_before)
 
         txn = BillingTransaction.create!(
           company: company,
@@ -160,15 +161,15 @@ module Seed
           transaction_type: :deduction,
           amount_cents: pair[:price],
           currency: company.currency_code,
-          balance_before_cents: company.main_balance_cents,
-          balance_after_cents: company.main_balance_cents,
+          balance_before_cents: wallet.main_balance_cents,
+          balance_after_cents: wallet.main_balance_cents,
           promo_balance_before_cents: promo_before,
           promo_balance_after_cents: 0,
           description: "Auto-payment for #{invoice.invoice_number}"
         )
 
         # Reset balance and backdate records
-        company.update_columns(promo_balance_cents: 0)
+        wallet.update_columns(promo_balance_cents: 0)
         txn.update_columns(created_at: date, updated_at: date)
         invoice.update_columns(updated_at: date)
       end
@@ -177,7 +178,7 @@ module Seed
         unpaid_data = invoice_pairs.select { |p| p[:status] == :unpaid }.first
         if unpaid_data
           unpaid_date = unpaid_data[:days_ago].days.ago
-          company.update_columns(
+          company.billing_wallet.update_columns(
             has_unpaid_invoices_at: unpaid_date,
             suspension_at: unpaid_date.end_of_month
           )

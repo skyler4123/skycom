@@ -12,23 +12,24 @@ RSpec.describe Billing::SettlementService do
            price_cents: 1500, period_start: 1.month.ago.beginning_of_month,
            period_end: 1.month.ago.end_of_month)
   end
+  let(:wallet) { company.billing_wallet }
 
   before do
-    company.update_columns(promo_balance_cents: 0, main_balance_cents: 0,
-                           lifecycle_status: 0) # active
-    company.reload
+    wallet.update_columns(promo_balance_cents: 0, main_balance_cents: 0)
+    company.update_columns(lifecycle_status: 0) # active
+    wallet.reload
   end
 
   context "when promo balance covers the full amount" do
     before do
       invoice # force creation (balances are 0 → no auto-settlement)
-      company.update_columns(promo_balance_cents: 2000, main_balance_cents: 0)
-      company.reload
+      wallet.update_columns(promo_balance_cents: 2000, main_balance_cents: 0)
+      wallet.reload
     end
 
     it "deducts from promo balance" do
       expect { settle }
-        .to change { company.reload.promo_balance_cents }.from(2000).to(500)
+        .to change { wallet.reload.promo_balance_cents }.from(2000).to(500)
     end
 
     it "marks invoice as paid" do
@@ -44,18 +45,18 @@ RSpec.describe Billing::SettlementService do
   context "when promo covers partial and main covers the rest" do
     before do
       invoice # force creation (balances are 0 → no auto-settlement)
-      company.update_columns(promo_balance_cents: 500, main_balance_cents: 2000)
-      company.reload
+      wallet.update_columns(promo_balance_cents: 500, main_balance_cents: 2000)
+      wallet.reload
     end
 
     it "drains promo first" do
       settle
-      expect(company.reload.promo_balance_cents).to eq(0)
+      expect(wallet.reload.promo_balance_cents).to eq(0)
     end
 
     it "deducts remaining from main" do
       expect { settle }
-        .to change { company.reload.main_balance_cents }.from(2000).to(1000)
+        .to change { wallet.reload.main_balance_cents }.from(2000).to(1000)
     end
 
     it "marks invoice as paid" do
@@ -71,16 +72,16 @@ RSpec.describe Billing::SettlementService do
   context "when neither balance covers the amount" do
     before do
       invoice # force creation (balances are 0 → no auto-settlement)
-      company.update_columns(promo_balance_cents: 500, main_balance_cents: 500,
-                              lifecycle_status: Company.lifecycle_statuses[:active],
+      wallet.update_columns(promo_balance_cents: 500, main_balance_cents: 500,
                               soft_debt_threshold_cents: -10000)
-      company.reload
+      company.update_columns(lifecycle_status: Company.lifecycle_statuses[:active])
+      wallet.reload
     end
 
     it "drains both balances" do
       settle
-      expect(company.reload.promo_balance_cents).to eq(0)
-      expect(company.reload.main_balance_cents).to eq(0)
+      expect(wallet.reload.promo_balance_cents).to eq(0)
+      expect(wallet.reload.main_balance_cents).to eq(0)
     end
 
     it "marks invoice as overdue" do
@@ -90,29 +91,29 @@ RSpec.describe Billing::SettlementService do
 
     it "flags company as unpaid" do
       expect { settle }
-        .to change { company.reload.has_unpaid_invoices_at }.from(nil)
+        .to change { wallet.reload.has_unpaid_invoices_at }.from(nil)
     end
   end
 
   describe ".settle_all" do
     before do
-      company.update_columns(promo_balance_cents: 0, main_balance_cents: 0,
-                             lifecycle_status: 0) # active
-      company.reload
+      wallet.update_columns(promo_balance_cents: 0, main_balance_cents: 0)
+      company.update_columns(lifecycle_status: 0) # active
+      wallet.reload
       @invoice1 = create(:billing_invoice, company: company, billing_contract: contract,
                          price_cents: 1000, period_start: 2.months.ago.beginning_of_month,
                          period_end: 2.months.ago.end_of_month)
       @invoice2 = create(:billing_invoice, company: company, billing_contract: contract,
                          price_cents: 2000, period_start: 1.month.ago.beginning_of_month,
                          period_end: 1.month.ago.end_of_month)
-      company.update_columns(
+      wallet.update_columns(
         has_unpaid_invoices_at: Time.current,
         suspension_at: Time.current.end_of_month,
         main_balance_cents: 3500,
         promo_balance_cents: 0,
         soft_debt_threshold_cents: -10000
       )
-      company.reload
+      wallet.reload
     end
 
     it "returns paid_count and remaining_cents" do
@@ -127,8 +128,8 @@ RSpec.describe Billing::SettlementService do
     end
 
     it "stops when wallet is exhausted" do
-      company.update_columns(main_balance_cents: 1500)
-      company.reload
+      wallet.update_columns(main_balance_cents: 1500)
+      wallet.reload
       result = described_class.settle_all(company)
       expect(result[:paid_count]).to eq(1)
       expect(result[:remaining_cents]).to eq(2000)

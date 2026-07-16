@@ -15,10 +15,6 @@ class Company < ApplicationRecord
   ]
   attribute :features, :jsonb, array: true, default: []
   attribute :ui_configs, :jsonb, array: true, default: []
-  attribute :promo_balance_cents, :integer, default: 0
-  attribute :main_balance_cents, :integer, default: 0
-  attribute :soft_debt_threshold_cents, :integer, default: -10000
-  attribute :hide_billing_alerts, :boolean, default: false
   attribute :metadata, :jsonb, array: true, default: []
 
   include AddressConcern
@@ -37,6 +33,7 @@ class Company < ApplicationRecord
   has_many :daily_metric_logs, dependent: :destroy
   has_many :daily_feature_logs, dependent: :destroy
   has_many :billing_transactions, dependent: :destroy
+  has_one :billing_wallet, dependent: :destroy
 
   has_many :property_mappings, dependent: :destroy
   has_many :table_configs, dependent: :destroy
@@ -133,6 +130,7 @@ class Company < ApplicationRecord
   # Validation for operational fields
   # validates :fiscal_year_end_month, presence: true, numericality: { in: 1..12 }
 
+  after_create :ensure_billing_wallet
   after_create :setup_owner_records
 
   def invalidate_client_cache!
@@ -205,6 +203,11 @@ class Company < ApplicationRecord
         Seed::HospitalInitService.call(company: self)
       end
     end
+  end
+
+  def ensure_billing_wallet
+    return if billing_wallet.present?
+    create_billing_wallet!(currency: currency_code_before_type_cast)
   end
 
   private
