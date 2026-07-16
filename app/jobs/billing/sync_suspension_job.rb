@@ -18,9 +18,10 @@ module Billing
     queue_as :default
 
     def perform
-      Company.where.not(lifecycle_status: %i[suspended disabled])
-             .where(suspension_at: ..Time.current)
-              .find_each(batch_size: COMPANY_PROCESSING_BATCH_SIZE, &:mark_suspended!)
+      Company.joins(:billing_wallet)
+             .where.not(lifecycle_status: %i[suspended disabled])
+             .where(billing_wallets: { suspension_at: ..Time.current })
+             .find_each(batch_size: COMPANY_PROCESSING_BATCH_SIZE, &:mark_suspended!)
     end
   end
 end

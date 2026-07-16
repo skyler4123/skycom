@@ -30,7 +30,7 @@ RSpec.describe "Companies::ApplicationController", type: :request do
     end
 
     it "allows access when lifecycle_status is active even with future suspension_at" do
-      company.update!(suspension_at: 1.week.from_now)
+      company.billing_wallet.update!(suspension_at: 1.week.from_now)
       get "/companies/#{company.id}/dashboards"
       expect(response).to have_http_status(:ok)
     end
@@ -39,17 +39,17 @@ RSpec.describe "Companies::ApplicationController", type: :request do
   describe "set_billing_warning" do
     before do
       allow(Time).to receive(:current).and_return(Time.new(2026, 6, 20, 10, 0, 0))
-      company.update!(has_unpaid_invoices_at: 7.days.ago)
+      company.billing_wallet.update!(has_unpaid_invoices_at: 7.days.ago)
     end
 
     it "skips the billing warning when hide_billing_alerts is true" do
-      company.update!(hide_billing_alerts: true)
+      company.billing_wallet.update!(hide_billing_alerts: true)
       get "/companies/#{company.id}/dashboards"
       expect(flash[:alert]).to be_blank
     end
 
     it "shows the billing warning when hide_billing_alerts is false" do
-      company.update!(hide_billing_alerts: false)
+      company.billing_wallet.update!(hide_billing_alerts: false)
       get "/companies/#{company.id}/dashboards"
       expect(flash[:alert]).not_to be_blank
     end

@@ -8,11 +8,11 @@ FactoryBot.define do
     end
 
     trait :with_main_balance do
-      after(:create) { |c| c.update!(main_balance_cents: 10_000) }
+      after(:create) { |c| c.billing_wallet.update!(main_balance_cents: 10_000) }
     end
 
     trait :with_promo_balance do
-      after(:create) { |c| c.update!(promo_balance_cents: 10_000) }
+      after(:create) { |c| c.billing_wallet.update!(promo_balance_cents: 10_000) }
     end
   end
 end

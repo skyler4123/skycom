@@ -66,7 +66,7 @@ RSpec.describe Company::BillingConcern do
 
   describe "#wallet_balance_cents" do
     before do
-      company.update!(promo_balance_cents: 500, main_balance_cents: 1000)
+      company.billing_wallet.update!(promo_balance_cents: 500, main_balance_cents: 1000)
     end
 
     it "returns sum of both balances" do
@@ -75,15 +75,15 @@ RSpec.describe Company::BillingConcern do
   end
 
   describe "#debt_ceiling_reached?" do
-    before { company.update!(soft_debt_threshold_cents: -1000) }
+    before { company.billing_wallet.update!(soft_debt_threshold_cents: -1000) }
 
     it "returns false when balance is above threshold" do
-      company.update!(main_balance_cents: 0, promo_balance_cents: 0)
+      company.billing_wallet.update!(main_balance_cents: 0, promo_balance_cents: 0)
       expect(company.debt_ceiling_reached?).to be false
     end
 
     it "returns true when balance drops below threshold" do
-      company.update!(main_balance_cents: -2000, promo_balance_cents: 0)
+      company.billing_wallet.update!(main_balance_cents: -2000, promo_balance_cents: 0)
       expect(company.debt_ceiling_reached?).to be true
     end
   end

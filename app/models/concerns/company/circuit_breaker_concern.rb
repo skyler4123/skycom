@@ -21,7 +21,7 @@
 #   - Sets lifecycle_status to :active (unsuspends the company)
 #
 # auto_settle_unpaid_invoices fires:
-#   - On balance change (main or promo)
+#   - On balance change (main or promo) — triggered by BillingWallet after_update
 #   - After an unpaid BillingInvoice is created (via BillingInvoice callback)
 #   Tries to settle unpaid invoices oldest-first from wallet.
 #
@@ -32,15 +32,11 @@ module Company::CircuitBreakerConcern
 
   TERMINAL_STATES = %w[disabled].freeze
 
-  included do
-    after_update :auto_settle_unpaid_invoices, if: -> { saved_change_to_main_balance_cents? || saved_change_to_promo_balance_cents? }
-  end
-
   def flag_unpaid!
     assert_not_terminal!
-    return if has_unpaid_invoices_at.present?
+    return if billing_wallet&.has_unpaid_invoices_at.present?
 
-    update!(
+    billing_wallet.update!(
       has_unpaid_invoices_at: Time.current,
       suspension_at: Time.current.end_of_month
     )
@@ -57,7 +53,8 @@ module Company::CircuitBreakerConcern
     return if lifecycle_status_disabled?
     return if billing_invoices.where(payment_status: %i[unpaid overdue]).exists?
 
-    update!(lifecycle_status: :active, suspension_at: nil, has_unpaid_invoices_at: nil)
+    billing_wallet.update!(suspension_at: nil, has_unpaid_invoices_at: nil)
+    update!(lifecycle_status: :active)
   end
 
   def is_accessible?
@@ -73,7 +70,7 @@ module Company::CircuitBreakerConcern
   def auto_settle_unpaid_invoices
     return if Thread.current[:__settling_company_id] == id
     return if lifecycle_status_disabled?
-    return unless main_balance_cents.positive? || promo_balance_cents.positive?
+    return unless billing_wallet&.main_balance_cents.to_i.positive? || billing_wallet&.promo_balance_cents.to_i.positive?
     return unless billing_invoices.where(payment_status: %i[unpaid overdue]).exists?
 
     Thread.current[:__settling_company_id] = id

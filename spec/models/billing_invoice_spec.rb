@@ -6,12 +6,13 @@ RSpec.describe BillingInvoice do
   subject(:invoice) { build(:billing_invoice, company: company, price_cents: 1000) }
 
   let(:company) { create(:company) }
+  let(:wallet) { company.billing_wallet }
 
   before do
-    company.update_columns(promo_balance_cents: promo_balance,
-                           main_balance_cents: 0,
-                           lifecycle_status: 0) # active
-    company.reload
+    wallet.update_columns(promo_balance_cents: promo_balance,
+                           main_balance_cents: 0)
+    company.update_columns(lifecycle_status: 0) # active
+    wallet.reload
   end
 
   describe "after_create_commit" do
@@ -25,7 +26,7 @@ RSpec.describe BillingInvoice do
 
       it "deducts from promo balance" do
         invoice.save!
-        expect(company.reload.promo_balance_cents).to eq(1000)
+        expect(wallet.reload.promo_balance_cents).to eq(1000)
       end
     end
 
@@ -35,7 +36,7 @@ RSpec.describe BillingInvoice do
       it "marks invoice as overdue", :aggregate_failures do
         invoice.save!
         expect(invoice.reload.payment_status).to eq("overdue")
-        expect(company.reload.has_unpaid_invoices_at).not_to be_nil
+        expect(wallet.reload.has_unpaid_invoices_at).not_to be_nil
       end
     end
 

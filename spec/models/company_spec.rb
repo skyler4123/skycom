@@ -94,9 +94,9 @@ RSpec.describe Company, type: :model do
   end
 
   describe "hide_billing_alerts" do
-    it "defaults to false" do
-      company = Company.new
-      expect(company.hide_billing_alerts).to be false
+    it "defaults to false on billing_wallet" do
+      company = create(:company)
+      expect(company.billing_wallet.hide_billing_alerts).to be false
     end
   end
 

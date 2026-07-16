@@ -37,11 +37,11 @@ module Company::BillingConcern
   end
 
   def wallet_balance_cents
-    main_balance_cents + promo_balance_cents
+    billing_wallet&.main_balance_cents.to_i + billing_wallet&.promo_balance_cents.to_i
   end
 
   def debt_ceiling_reached?
-    wallet_balance_cents < soft_debt_threshold_cents
+    wallet_balance_cents < billing_wallet&.soft_debt_threshold_cents.to_i
   end
 
   def daily_meter(resource_key, log_date: Date.current)

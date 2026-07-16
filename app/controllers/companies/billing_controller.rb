@@ -87,9 +87,10 @@ class Companies::BillingController < Companies::ApplicationController
 
     currency = company.currency_code.to_s.upcase
 
+    w = company.billing_wallet
     wallet = {
-      main_balance_cents: company.main_balance_cents,
-      promo_balance_cents: company.promo_balance_cents,
+      main_balance_cents: w&.main_balance_cents.to_i,
+      promo_balance_cents: w&.promo_balance_cents.to_i,
       total_cents: company.wallet_balance_cents,
       currency: currency
     }
@@ -205,9 +206,9 @@ class Companies::BillingController < Companies::ApplicationController
         id: company.id,
         name: company.name,
         lifecycle_status: company.lifecycle_status,
-        suspension_at: company.suspension_at,
+        suspension_at: w&.suspension_at,
         is_accessible: company.is_accessible?,
-        has_unpaid_invoices: company.has_unpaid_invoices_at?
+        has_unpaid_invoices: w&.has_unpaid_invoices_at?
       },
       billing_contract: billing_contract,
       wallet: wallet,

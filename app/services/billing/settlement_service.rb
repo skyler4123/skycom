@@ -79,11 +79,13 @@ module Billing
       guard_set.add(invoice.id)
 
       company.with_lock do
+        company.billing_wallet.reload
         remaining = deduct_from_promo(total)
         remaining = deduct_from_main(remaining)
 
         # Reload to get fresh balance values after update_columns
         company.reload
+        company.billing_wallet.reload
 
         if remaining > 0
           handle_shortfall(remaining)
@@ -103,42 +105,44 @@ module Billing
     attr_reader :invoice, :company
 
     def deduct_from_promo(amount)
-      promo_before = company.promo_balance_cents
+      wallet = company.billing_wallet
+      promo_before = wallet.promo_balance_cents
 
       if promo_before >= amount
         promo_after = promo_before - amount
-        company.update_columns(promo_balance_cents: promo_after)
+        wallet.update_columns(promo_balance_cents: promo_after)
         record_transaction(:deduction, amount,
                            promo_before, promo_after,
-                           company.main_balance_cents, company.main_balance_cents)
+                           wallet.main_balance_cents, wallet.main_balance_cents)
         return 0
       end
 
-      company.update_columns(promo_balance_cents: 0)
+      wallet.update_columns(promo_balance_cents: 0)
       record_transaction(:deduction, promo_before,
-                         promo_before, 0,
-                         company.main_balance_cents, company.main_balance_cents) if promo_before > 0
+                          promo_before, 0,
+                          wallet.main_balance_cents, wallet.main_balance_cents) if promo_before > 0
       amount - promo_before
     end
 
     def deduct_from_main(amount)
+      wallet = company.billing_wallet
       return 0 if amount.zero?
 
-      main_before = company.main_balance_cents
+      main_before = wallet.main_balance_cents
 
       if main_before >= amount
         main_after = main_before - amount
-        company.update_columns(main_balance_cents: main_after)
+        wallet.update_columns(main_balance_cents: main_after)
         record_transaction(:deduction, amount,
                            main_before, main_after,
-                           company.promo_balance_cents, company.promo_balance_cents)
+                           wallet.promo_balance_cents, wallet.promo_balance_cents)
         return 0
       end
 
-      company.update_columns(main_balance_cents: 0)
+      wallet.update_columns(main_balance_cents: 0)
       record_transaction(:deduction, main_before,
-                         main_before, 0,
-                         company.promo_balance_cents, company.promo_balance_cents) if main_before > 0
+                          main_before, 0,
+                          wallet.promo_balance_cents, wallet.promo_balance_cents) if main_before > 0
       amount - main_before
     end
 
@@ -146,9 +150,10 @@ module Billing
       company.flag_unpaid!
       invoice.update!(payment_status: :overdue)
 
+      wallet = company.billing_wallet
       record_transaction(:deduction, 0,
-                         company.main_balance_cents, company.main_balance_cents,
-                         company.promo_balance_cents, company.promo_balance_cents)
+                         wallet.main_balance_cents, wallet.main_balance_cents,
+                         wallet.promo_balance_cents, wallet.promo_balance_cents)
     end
 
     def mark_paid

@@ -39,14 +39,14 @@ RSpec.describe "Companies::BillingController", type: :request do
     end
 
     it "returns wallet balances" do
-      company.update!(main_balance_cents: 10_000)
+      company.billing_wallet.update!(main_balance_cents: 10_000)
       get "/companies/#{company.id}/billing", as: :json
       body = JSON.parse(response.body)
       expect(body["wallet"]["main_balance_cents"]).to eq(10_000)
     end
 
     it "is accessible even when access is blocked" do
-      company.update!(suspension_at: 1.day.ago)
+      company.billing_wallet.update!(suspension_at: 1.day.ago)
       get "/companies/#{company.id}/billing", as: :json
       expect(response).to have_http_status(:ok)
     end
@@ -61,7 +61,7 @@ RSpec.describe "Companies::BillingController", type: :request do
     end
 
     it "returns wallet with total_cents" do
-      company.update!(main_balance_cents: 10_000, promo_balance_cents: 5_000)
+      company.billing_wallet.update!(main_balance_cents: 10_000, promo_balance_cents: 5_000)
       get "/companies/#{company.id}/billing", as: :json
       body = JSON.parse(response.body)
       expect(body["wallet"]["total_cents"]).to eq(15_000)
@@ -105,12 +105,8 @@ RSpec.describe "Companies::BillingController", type: :request do
 
     context "when wallet covers all invoices" do
       before do
-        # Create invoice with zero balance (no auto-settlement),
-        # then set balance via update_columns (bypasses after_update auto-settle
-        # on the Company + doesn't refresh the cache). The pay_all action reloads
-        # via with_lock inside SettlementService, so it sees the fresh DB value.
         create(:billing_invoice, company: company, billing_contract: contract, price_cents: 1500)
-        company.update_columns(main_balance_cents: 50_000)
+        company.billing_wallet.update_columns(main_balance_cents: 50_000)
       end
 
       it "pays all invoices" do
@@ -125,7 +121,8 @@ RSpec.describe "Companies::BillingController", type: :request do
       end
 
       it "returns reactivated status" do
-        company.update_columns(lifecycle_status: Company.lifecycle_statuses[:suspended], suspension_at: 1.day.ago)
+        company.update_columns(lifecycle_status: Company.lifecycle_statuses[:suspended])
+        company.billing_wallet.update_columns(suspension_at: 1.day.ago)
         post "/companies/#{company.id}/billing/pay_all", as: :json
         body = JSON.parse(response.body)
         expect(body["reactivated"]).to be_truthy
@@ -156,7 +153,8 @@ RSpec.describe "Companies::BillingController", type: :request do
       end
 
       it "does not mark company as reactivated" do
-        company.update_columns(lifecycle_status: Company.lifecycle_statuses[:suspended], suspension_at: 1.day.ago)
+        company.update_columns(lifecycle_status: Company.lifecycle_statuses[:suspended])
+        company.billing_wallet.update_columns(suspension_at: 1.day.ago)
         post "/companies/#{company.id}/billing/pay_all", as: :json
         body = JSON.parse(response.body)
         expect(body["reactivated"]).to be_falsey
