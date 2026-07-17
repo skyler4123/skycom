@@ -14,7 +14,7 @@ export default class Companies_Invoices_NewController extends Companies_LayoutCo
       || this.defaultFilterCategory()?.id || null
 
     const propertyMapping = currentPropertyMappings().find(m => m.category_id === this.categoryId)
-    this.propertyMetadata = propertyMapping?.property_metadata || []
+    this.propertyMetadata = propertyMapping?.metadata?.properties || []
 
     poll(() => {
       if (this.hasContentTarget) {
@@ -36,7 +36,7 @@ export default class Companies_Invoices_NewController extends Companies_LayoutCo
   onCategoryChange(event) {
     this.categoryId = event.target.value
     const propertyMapping = currentPropertyMappings().find(m => m.category_id === this.categoryId)
-    this.propertyMetadata = propertyMapping?.property_metadata || []
+    this.propertyMetadata = propertyMapping?.metadata?.properties || []
     const dynamicDiv = this.element.querySelector('#dynamic-fields')
     if (dynamicDiv) {
       dynamicDiv.innerHTML = this.dynamicFieldsHTML()

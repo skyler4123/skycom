@@ -64,17 +64,17 @@ class Companies::PropertyMappingsController < Companies::ApplicationController
     mapping = current_company.property_mappings.find(params[:id])
 
     p_params = property_mapping_params
-    if p_params[:property_metadata].is_a?(ActionController::Parameters) && !p_params[:property_metadata].is_a?(Array)
-      metadata = p_params[:property_metadata].values.to_a
-
-      # Parse validates from JSON string to hash (submitted via textarea)
-      metadata.each do |entry|
-        if entry["validates"].is_a?(String) && entry["validates"].present?
-          entry["validates"] = JSON.parse(entry["validates"]) rescue {}
+    if p_params[:metadata].is_a?(ActionController::Parameters)
+      meta = p_params[:metadata].to_unsafe_h
+      if meta["properties"].is_a?(Hash)
+        meta["properties"] = meta["properties"].values.to_a
+        meta["properties"].each do |entry|
+          if entry["validates"].is_a?(String) && entry["validates"].present?
+            entry["validates"] = JSON.parse(entry["validates"]) rescue {}
+          end
         end
       end
-
-      p_params[:property_metadata] = metadata
+      p_params[:metadata] = meta
     end
 
     if mapping.update(p_params)
@@ -98,11 +98,11 @@ class Companies::PropertyMappingsController < Companies::ApplicationController
   private
 
   def property_mapping_params
-    params.require(:property_mapping).permit(:category_id, :name, :description, property_metadata: {})
+    params.require(:property_mapping).permit(:category_id, :name, :description, metadata: {})
   end
 
   def format_mapping(mapping)
-    mapping.as_json(only: [ :id, :category_id, :name, :description, :property_metadata, :resource_name, :created_at, :updated_at ]).merge(
+    mapping.as_json(only: [ :id, :category_id, :name, :description, :metadata, :resource_name, :created_at, :updated_at ]).merge(
       category: mapping.category&.as_json(only: [ :id, :name ])
     )
   end

@@ -31,12 +31,12 @@ RSpec.feature "Companies::Products Management", type: :feature, js: true do
       category: default_category,
       property_mapping: default_category.default_property_mapping,
       resource_name: "products",
-      columns_metadata: [
+      metadata: { "columns" => [
         { "key" => "name", "name" => "Product Name", "visible" => true, "sortable" => true, "align" => "left", "pinned" => nil, "width" => nil, "roles" => [], "is_virtual" => false, "render_config" => {} },
         { "key" => "code", "name" => "Product Code", "visible" => true, "sortable" => true, "align" => "left", "pinned" => nil, "width" => nil, "roles" => [], "is_virtual" => false, "render_config" => {} },
         { "key" => "business_type", "name" => "Type", "visible" => true, "sortable" => true, "align" => "center", "pinned" => nil, "width" => nil, "roles" => [], "is_virtual" => false, "render_config" => {} },
         { "key" => "workflow_status", "name" => "Status", "visible" => true, "sortable" => true, "align" => "center", "pinned" => nil, "width" => nil, "roles" => [], "is_virtual" => false, "render_config" => {} }
-      ]
+      ] }
     )
   end
 
@@ -154,7 +154,7 @@ RSpec.feature "Companies::Products Management", type: :feature, js: true do
         category: category_cosmetics,
         property_mapping: category_cosmetics.default_property_mapping,
         resource_name: "products",
-        columns_metadata: [
+        metadata: { "columns" => [
           { "key" => "name", "name" => "Product Name", "visible" => true, "sortable" => true, "align" => "left", "pinned" => nil, "width" => nil, "roles" => [], "is_virtual" => false, "render_config" => {} },
           { "key" => "code", "name" => "Code", "visible" => true, "sortable" => true, "align" => "left", "pinned" => nil, "width" => nil, "roles" => [], "is_virtual" => false, "render_config" => {} },
           { "key" => "property_string_1", "name" => "Skin Type", "visible" => true, "sortable" => true, "align" => "left", "pinned" => nil, "width" => nil, "roles" => [], "is_virtual" => false, "render_config" => {} },
@@ -163,7 +163,7 @@ RSpec.feature "Companies::Products Management", type: :feature, js: true do
           { "key" => "property_boolean_1", "name" => "Organic Certified", "visible" => true, "sortable" => true, "align" => "center", "pinned" => nil, "width" => nil, "roles" => [], "is_virtual" => false, "render_config" => {} },
           { "key" => "business_type", "name" => "Type", "visible" => true, "sortable" => true, "align" => "center", "pinned" => nil, "width" => nil, "roles" => [], "is_virtual" => false, "render_config" => {} },
           { "key" => "workflow_status", "name" => "Status", "visible" => true, "sortable" => true, "align" => "center", "pinned" => nil, "width" => nil, "roles" => [], "is_virtual" => false, "render_config" => {} }
-        ]
+        ] }
       )
     end
 
@@ -174,14 +174,14 @@ RSpec.feature "Companies::Products Management", type: :feature, js: true do
         category: category_supplements,
         property_mapping: category_supplements.default_property_mapping,
         resource_name: "products",
-        columns_metadata: [
+        metadata: { "columns" => [
           { "key" => "name", "name" => "Product Name", "visible" => true, "sortable" => true, "align" => "left", "pinned" => nil, "width" => nil, "roles" => [], "is_virtual" => false, "render_config" => {} },
           { "key" => "code", "name" => "Code", "visible" => true, "sortable" => true, "align" => "left", "pinned" => nil, "width" => nil, "roles" => [], "is_virtual" => false, "render_config" => {} },
           { "key" => "property_text_1", "name" => "Benefits", "visible" => true, "sortable" => true, "align" => "left", "pinned" => nil, "width" => nil, "roles" => [], "is_virtual" => false, "render_config" => {} },
           { "key" => "property_decimal_1", "name" => "Potency %", "visible" => true, "sortable" => true, "align" => "right", "pinned" => nil, "width" => nil, "roles" => [], "is_virtual" => false, "render_config" => {} },
           { "key" => "property_datetime_1", "name" => "Expiry Date", "visible" => true, "sortable" => true, "align" => "center", "pinned" => nil, "width" => nil, "roles" => [], "is_virtual" => false, "render_config" => {} },
           { "key" => "workflow_status", "name" => "Status", "visible" => true, "sortable" => true, "align" => "center", "pinned" => nil, "width" => nil, "roles" => [], "is_virtual" => false, "render_config" => {} }
-        ]
+        ] }
       )
     end
 
@@ -433,10 +433,10 @@ RSpec.feature "Companies::Products Management", type: :feature, js: true do
         category: category_cosmetics,
         property_mapping: category_cosmetics.default_property_mapping,
         resource_name: "products",
-        columns_metadata: [
+        metadata: { "columns" => [
           { "key" => "name", "name" => "Name", "visible" => true, "sortable" => true, "align" => "left", "pinned" => nil, "width" => nil, "roles" => [], "is_virtual" => false, "render_config" => {} },
           { "key" => "code", "name" => "Code", "visible" => true, "sortable" => true, "align" => "left", "pinned" => nil, "width" => nil, "roles" => [], "is_virtual" => false, "render_config" => {} }
-        ]
+        ] }
       )
       company.clear_permissions_cache
       tc

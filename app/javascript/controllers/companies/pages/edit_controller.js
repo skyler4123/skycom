@@ -57,8 +57,8 @@ export default class Companies_Pages_EditController extends Companies_LayoutCont
       { name: translate("Deployed"), value: "deployed" }
     ]
 
-    const manifestStr = p.layout_manifest
-      ? (typeof p.layout_manifest === 'object' ? JSON.stringify(p.layout_manifest, null, 2) : p.layout_manifest)
+    const manifestStr = p.metadata?.layout_manifest
+      ? (typeof p.metadata?.layout_manifest === 'object' ? JSON.stringify(p.metadata?.layout_manifest, null, 2) : p.metadata?.layout_manifest)
       : ''
 
     const fields = `
@@ -141,7 +141,7 @@ export default class Companies_Pages_EditController extends Companies_LayoutCont
 
           <div class="col-span-2 space-y-1">
             <label class="text-xs font-medium text-slate-500 dark:text-gray-400">${translate("Layout Manifest (JSON)")}</label>
-            <textarea name="page[layout_manifest]" rows="4"
+            <textarea name="page[metadata][layout_manifest]" rows="4"
               class="w-full px-3 py-2 font-mono text-xs border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none">${manifestStr}</textarea>
           </div>
         </div>

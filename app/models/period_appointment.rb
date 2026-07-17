@@ -1,6 +1,5 @@
 class PeriodAppointment < ApplicationRecord
   attribute :permission_resource_name, :string, default: -> { self.name }
-  attribute :metadata, :jsonb, array: true, default: []
 
   belongs_to :period
   belongs_to :appoint_from, polymorphic: true, optional: true

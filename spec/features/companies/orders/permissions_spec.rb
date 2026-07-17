@@ -15,11 +15,11 @@ RSpec.feature "Companies::Orders Permissions", type: :feature, js: true do
       category: default_category,
       property_mapping: default_category.default_property_mapping,
       resource_name: "orders",
-      columns_metadata: [
+      metadata: { "columns" => [
         { "key" => "name", "name" => "Order Name", "visible" => true, "sortable" => true, "align" => "left", "pinned" => nil, "width" => nil, "roles" => [], "is_virtual" => false, "render_config" => {} },
         { "key" => "code", "name" => "Code", "visible" => true, "sortable" => true, "align" => "left", "pinned" => nil, "width" => nil, "roles" => [], "is_virtual" => false, "render_config" => {} },
         { "key" => "workflow_status", "name" => "Status", "visible" => true, "sortable" => true, "align" => "center", "pinned" => nil, "width" => nil, "roles" => [], "is_virtual" => false, "render_config" => {} }
-      ]
+      ] }
     )
   end
 
@@ -160,8 +160,7 @@ RSpec.feature "Companies::Orders Permissions", type: :feature, js: true do
           currency_codes: [
             { name: "usd", value: "usd" },
             { name: "vnd", value: "vnd" }
-          ]
-        }
+          ] }
       },
       employees: []
     }

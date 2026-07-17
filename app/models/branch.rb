@@ -3,9 +3,6 @@ class Branch < ApplicationRecord
   include PropertyMappingConcern
   attribute :permission_resource_name, :string, default: -> { self.name }
 
-  attribute :ui_configs, :jsonb, array: true, default: []
-  attribute :metadata, :jsonb, array: true, default: []
-
   include AddressConcern
   include TagConcern
   include Branch::ImageConcern

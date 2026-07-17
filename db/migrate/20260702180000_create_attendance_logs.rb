@@ -4,7 +4,7 @@ class CreateAttendanceLogs < ActiveRecord::Migration[8.0]
       t.references :company, null: false, foreign_key: true, type: :uuid
       t.references :branch, null: true, foreign_key: true, type: :uuid
       t.references :employee, null: false, foreign_key: true, type: :uuid
-      t.string :log_type, null: false
+      t.integer :log_type, null: false
       t.datetime :logged_at, null: false
       t.decimal :latitude, precision: 10, scale: 6
       t.decimal :longitude, precision: 10, scale: 6

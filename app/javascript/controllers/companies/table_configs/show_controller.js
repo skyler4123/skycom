@@ -42,7 +42,7 @@ export default class Companies_TableConfigs_ShowController extends Companies_Lay
 
     const companyId = window.location.pathname.split("/")[2]
     const category = currentCategories().find(cat => cat.id === c.category_id)
-    const columns = c.columns_metadata || []
+    const columns = c.metadata?.columns || []
 
     const columnsTable = columns.length > 0 ? `
       <div class="border-t border-slate-200 dark:border-gray-800 pt-6 mt-6">

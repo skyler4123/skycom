@@ -12,7 +12,7 @@ FactoryBot.define do
 
       all_properties = Seed::CategoryService.random_property_labels
       metadatas = Seed::CategoryService.build_property_metadata(all_properties)
-      category.default_property_mapping.update!(property_metadata: metadatas) if metadatas.present?
+      category.default_property_mapping.update!(metadata: { "properties" => metadatas }) if metadatas.present?
     end
   end
 end

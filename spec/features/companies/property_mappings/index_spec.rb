@@ -8,10 +8,10 @@ RSpec.feature "Companies::PropertyMappings Management", type: :feature, js: true
 
   let!(:property_mapping) do
     create(:property_mapping, company: company, category: category, name: "Cosmetics Mapping",
-      property_metadata: [
+      metadata: { "properties" => [
         { "key" => "property_string_1", "type" => "string", "name" => "Skin Type" },
         { "key" => "property_integer_1", "type" => "integer", "name" => "Volume (ml)" }
-      ])
+      ] })
   end
 
   before do
@@ -78,7 +78,7 @@ RSpec.feature "Companies::PropertyMappings Management", type: :feature, js: true
     expect(page).to have_content("Edit Property Mapping")
     expect(page).to have_content(/Property Fields/i)
 
-    expect(page).to have_selector('input[name*="[property_metadata]"][name*="[name]"]', wait: 10)
+    expect(page).to have_selector('input[name*="[metadata]"][name*="[properties]"][name*="[name]"]', wait: 10)
   end
 
   scenario "edit adds a property field and persists to database" do
@@ -88,15 +88,15 @@ RSpec.feature "Companies::PropertyMappings Management", type: :feature, js: true
     select 'property_string_2 (string)', from: 'new-property-slot'
     find('button', text: 'Add Property').click
 
-    name_input = find(:xpath, '//input[@name="property_mapping[property_metadata][2][name]"]', wait: 10)
+    name_input = find(:xpath, '//input[@name="property_mapping[metadata][properties][2][name]"]', wait: 10)
     name_input.set('Texture Type')
     click_button 'Save Changes'
 
     expect(page).to have_current_path(/property_mappings\/#{property_mapping.id}$/, wait: 10)
 
     property_mapping.reload
-    expect(property_mapping.property_metadata.length).to eq(3)
-    added = property_mapping.property_metadata.find { |m| m['key'] == 'property_string_2' }
+    expect(property_mapping.metadata["properties"].length).to eq(3)
+    added = property_mapping.metadata["properties"].find { |m| m['key'] == 'property_string_2' }
     expect(added).to be_present
     expect(added['name']).to eq('Texture Type')
   end
@@ -119,7 +119,7 @@ RSpec.feature "Companies::PropertyMappings Management", type: :feature, js: true
     expect(textarea.value).to include('"only_integer"')
 
     property_mapping.reload
-    entry = property_mapping.property_metadata.first
+    entry = property_mapping.metadata["properties"].first
     expect(entry['validates']).to eq({ 'presence' => true, 'numericality' => { 'only_integer' => true } })
   end
 
@@ -127,11 +127,11 @@ RSpec.feature "Companies::PropertyMappings Management", type: :feature, js: true
     let(:table_config) { property_mapping.default_table_config }
 
     before do
-      table_config.update!(columns_metadata: [
+      table_config.update!(metadata: { "columns" => [
         { "key" => "name", "name" => "Name", "visible" => true, "sortable" => true, "align" => "left", "pinned" => nil, "width" => nil, "roles" => [], "is_virtual" => false, "render_config" => {} },
         { "key" => "property_string_1", "name" => "Skin Type", "visible" => true, "sortable" => true, "align" => "left", "pinned" => nil, "width" => nil, "roles" => [], "is_virtual" => false, "render_config" => {} },
         { "key" => "property_integer_1", "name" => "Volume (ml)", "visible" => true, "sortable" => true, "align" => "right", "pinned" => nil, "width" => nil, "roles" => [], "is_virtual" => false, "render_config" => {} }
-      ])
+      ] })
     end
 
     scenario "adding a field in PropertyMapping syncs to TableConfig" do
@@ -141,7 +141,7 @@ RSpec.feature "Companies::PropertyMappings Management", type: :feature, js: true
       page.execute_script("document.getElementById('new-property-slot').value = 'property_boolean_1'")
       click_button 'Add Property'
 
-      name_input = find(:xpath, '//input[@name="property_mapping[property_metadata][2][name]"]', wait: 10)
+      name_input = find(:xpath, '//input[@name="property_mapping[metadata][properties][2][name]"]', wait: 10)
       name_input.set('Active')
 
       click_button 'Save Changes'
@@ -157,7 +157,7 @@ RSpec.feature "Companies::PropertyMappings Management", type: :feature, js: true
       visit edit_company_property_mapping_path(company, property_mapping)
       expect(page).to have_selector('form', wait: 10)
 
-      name_input = find(:xpath, '//input[@name="property_mapping[property_metadata][0][name]"]')
+      name_input = find(:xpath, '//input[@name="property_mapping[metadata][properties][0][name]"]')
       name_input.set('Skin Type Suitability')
 
       click_button 'Save Changes'

@@ -49,8 +49,6 @@
 class PropertyMapping < ApplicationRecord
   include CategoryConcern
   attribute :permission_resource_name, :string, default: -> { self.name }
-  attribute :property_metadata, :jsonb, default: []
-  attribute :metadata, :jsonb, array: true, default: []
 
   belongs_to :company, touch: true
   belongs_to :category
@@ -114,14 +112,16 @@ class PropertyMapping < ApplicationRecord
 
   validate :validate_property_metadata
   validate :must_have_table_config
-  after_update :sync_table_configs, if: :saved_change_to_property_metadata?
+  after_update :sync_table_configs, if: :saved_change_to_metadata?
 
   def sync_table_configs
-    pm_property_keys = property_metadata.select { |pm| pm["key"].to_s.start_with?("property_") }
+    props = (metadata || {})["properties"] || []
+    pm_property_keys = props.select { |pm| pm["key"].to_s.start_with?("property_") }
     pm_keys = pm_property_keys.map { |pm| pm["key"] }
 
     table_configs.reset.each do |tc|
-      columns = tc.columns_metadata.dup
+      tc_meta = tc.metadata || {}
+      columns = (tc_meta["columns"] || []).dup
       changed = false
 
       original_size = columns.size
@@ -156,7 +156,10 @@ class PropertyMapping < ApplicationRecord
         changed = true
       end
 
-      tc.update_columns(columns_metadata: columns) if changed
+      if changed
+        tc_meta["columns"] = columns
+        tc.update_columns(metadata: tc_meta)
+      end
     end
   end
 
@@ -174,26 +177,27 @@ class PropertyMapping < ApplicationRecord
   end
 
   def validate_property_metadata
-    unless property_metadata.is_a?(Array)
-      errors.add(:property_metadata, "must be an array")
+    props = (metadata || {})["properties"] || []
+    unless props.is_a?(Array)
+      errors.add(:metadata, "properties must be an array")
       return
     end
 
-    property_metadata.each_with_index do |entry, idx|
+    props.each_with_index do |entry, idx|
       unless entry.is_a?(Hash)
-        errors.add(:property_metadata, "element #{idx} must be a hash")
+        errors.add(:metadata, "properties element #{idx} must be a hash")
         next
       end
 
       key = entry["key"]
       if key.blank?
-        errors.add(:property_metadata, "element #{idx}: key is required")
+        errors.add(:metadata, "properties element #{idx}: key is required")
         next
       end
 
       name = entry["name"]
       if name.blank?
-        errors.add(:property_metadata, "element #{idx}: name is required")
+        errors.add(:metadata, "properties element #{idx}: name is required")
       end
 
       prefix = key.to_s.sub(/_\d+\z/, "").to_sym
@@ -202,7 +206,7 @@ class PropertyMapping < ApplicationRecord
       if supported
         unexpected = entry.keys - supported - %w[key type name validates]
         if unexpected.any?
-          errors.add(:property_metadata, "element #{idx}: unsupported keys #{unexpected.join(", ")} for #{key}. Supported: #{supported.join(", ")}")
+          errors.add(:metadata, "properties element #{idx}: unsupported keys #{unexpected.join(", ")} for #{key}. Supported: #{supported.join(", ")}")
         end
       end
 
@@ -211,14 +215,14 @@ class PropertyMapping < ApplicationRecord
 
       valid_types = VALID_INPUT_TYPES[prefix]
       if valid_types && !valid_types.include?(input_type)
-        errors.add(:property_metadata, "element #{idx}: input_type must be one of: #{valid_types.join(", ")}")
+        errors.add(:metadata, "properties element #{idx}: input_type must be one of: #{valid_types.join(", ")}")
         next
       end
 
       if input_type == "select"
         options = entry["options"]
         unless options.is_a?(Array) && options.all? { |o| o.is_a?(Hash) && o.key?("value") && o.key?("label") }
-          errors.add(:property_metadata, "element #{idx}: options must be an array of objects with value and label keys")
+          errors.add(:metadata, "properties element #{idx}: options must be an array of objects with value and label keys")
         end
       end
     end

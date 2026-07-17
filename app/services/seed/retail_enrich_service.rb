@@ -152,7 +152,7 @@ class Seed::RetailEnrichService
         name: "Retail Cashier",
         target_role: :retail_cashier,
         target_resolution: :desktop_widescreen,
-        layout_manifest: {
+        metadata: { "layout_manifest" => {
           grid_columns: 12,
           default_sidebar: "customer_loyalty_panel",
           enabled_components: [
@@ -164,7 +164,7 @@ class Seed::RetailEnrichService
             quick_cash_buttons: [ 10000, 20000, 50000, 100000, 200000, 500000 ],
             gift_card_redemption: true
           }
-        }
+        } }
       )
 
       Seed::PageService.create(
@@ -173,7 +173,7 @@ class Seed::RetailEnrichService
         name: "Retail Store Manager",
         target_role: :retail_store_manager,
         target_resolution: :desktop_widescreen,
-        layout_manifest: {
+        metadata: { "layout_manifest" => {
           grid_columns: 12,
           default_sidebar: "analytics_panel",
           enabled_components: [
@@ -187,7 +187,7 @@ class Seed::RetailEnrichService
             view_profit_margins: true,
             export_reports: true
           }
-        }
+        } }
       )
     end
   end

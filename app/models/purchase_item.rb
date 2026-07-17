@@ -1,5 +1,4 @@
 class PurchaseItem < ApplicationRecord
-  attribute :metadata, :jsonb, array: true, default: []
   enum :country_code, COUNTRY_CODES, prefix: true, default: :us
   enum :timezone, TIMEZONES, prefix: true, default: :utc
   enum :currency_code, CURRENCIE_CODES, prefix: true, default: :usd

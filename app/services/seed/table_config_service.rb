@@ -13,7 +13,7 @@ class Seed::TableConfigService
       category: category,
       property_mapping: property_mapping,
       name: name || "#{category&.name || resource_name} table config",
-      columns_metadata: columns_metadata
+      metadata: { "columns" => columns_metadata }
     )
   end
 
@@ -30,7 +30,7 @@ class Seed::TableConfigService
 
     existing = pm.table_configs.first
     if existing
-      existing.update!(columns_metadata: columns_metadata, name: name)
+      existing.update!(metadata: { "columns" => columns_metadata }, name: name)
       existing
     else
       record = new(

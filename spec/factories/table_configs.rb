@@ -8,10 +8,10 @@ FactoryBot.define do
     name { "Test table config" }
     resource_name { "products" }
 
-    columns_metadata do
-      [ { "key" => "name", "name" => "Name", "visible" => true, "sortable" => true,
+    metadata do
+      { "columns" => [ { "key" => "name", "name" => "Name", "visible" => true, "sortable" => true,
          "align" => "left", "pinned" => nil, "width" => nil, "roles" => [],
-         "is_virtual" => false, "render_config" => {} } ]
+         "is_virtual" => false, "render_config" => {} } ] }
     end
   end
 end

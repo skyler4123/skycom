@@ -42,7 +42,7 @@ export default class Companies_PropertyMappings_ShowController extends Companies
 
     const companyId = window.location.pathname.split("/")[2]
     const category = currentCategories().find(c => c.id === m.category_id)
-    const metadata = m.property_metadata || []
+    const metadata = m.metadata?.properties || []
 
     const fieldsTable = metadata.length > 0 ? `
       <div class="border-t border-slate-200 dark:border-gray-800 pt-6 mt-6">

@@ -602,7 +602,7 @@ scenario "submit shows success toast and closes modal" do
     expect(page).to have_content("read permission updated", wait: 10)
 
     policy_read_product.reload
-    expect(policy_read_product.tag_conditions).to eq("usage_status" => "secondhand")
+    expect((policy_read_product.metadata || {})["tag_conditions"]).to eq("usage_status" => "secondhand")
 
     company.clear_permissions_cache
     admin_employee.clear_permissions_cache
@@ -643,7 +643,7 @@ scenario "submit shows success toast and closes modal" do
     expect(page).to have_content("read permission updated", wait: 10)
 
     policy_read_product.reload
-    expect(policy_read_product.tag_conditions).to eq("brand" => "Apple", "is_featured" => "true")
+    expect((policy_read_product.metadata || {})["tag_conditions"]).to eq("brand" => "Apple", "is_featured" => "true")
 
     company.clear_permissions_cache
     admin_employee.clear_permissions_cache

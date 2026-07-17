@@ -64,11 +64,13 @@ class Companies::TableConfigsController < Companies::ApplicationController
     config = current_company.table_configs.find(params[:id])
 
     p_params = table_config_params
-    if p_params[:columns_metadata].is_a?(ActionController::Parameters) && !p_params[:columns_metadata].is_a?(Array)
-      p_params[:columns_metadata] = p_params[:columns_metadata].values.to_a
+    if p_params[:metadata].is_a?(ActionController::Parameters)
+      meta = p_params[:metadata].to_unsafe_h
+      if meta["columns"].is_a?(Hash)
+        meta["columns"] = normalize_column_types(meta["columns"].values.to_a)
+      end
+      p_params[:metadata] = meta
     end
-
-    p_params[:columns_metadata] = normalize_column_types(p_params[:columns_metadata]) if p_params[:columns_metadata].is_a?(Array)
 
     if config.update(p_params)
       redirect_to company_table_config_path(current_company, config), notice: "Table config updated successfully."
@@ -104,11 +106,11 @@ class Companies::TableConfigsController < Companies::ApplicationController
   end
 
   def table_config_params
-    params.require(:table_config).permit(:category_id, :property_mapping_id, :name, :description, columns_metadata: {})
+    params.require(:table_config).permit(:category_id, :property_mapping_id, :name, :description, metadata: {})
   end
 
   def format_config(config)
-    config.as_json(only: [ :id, :category_id, :property_mapping_id, :name, :description, :columns_metadata, :resource_name, :created_at, :updated_at ]).merge(
+    config.as_json(only: [ :id, :category_id, :property_mapping_id, :name, :description, :metadata, :resource_name, :created_at, :updated_at ]).merge(
       category: config.category&.as_json(only: [ :id, :name ]),
       property_mapping: config.property_mapping&.as_json(only: [ :id, :name ])
     )

@@ -2,7 +2,6 @@ class PaymentMethodAppointment < ApplicationRecord
   include SetDefaultCompanyConcern
 
   attribute :permission_resource_name, :string, default: -> { self.name }
-  attribute :metadata, :jsonb, array: true, default: []
 
   # --- Associations ---
   belongs_to :payment_method

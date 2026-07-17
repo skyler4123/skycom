@@ -23,15 +23,16 @@ class Companies::PermissionsController < Companies::ApplicationController
       appointment.update!(workflow_status: ws)
     end
 
-    if params.dig(:policy, :tag_conditions).is_a?(ActionController::Parameters)
-      policy.update!(tag_conditions: params[:policy][:tag_conditions].to_unsafe_h)
+    if params.dig(:policy, :metadata, :tag_conditions).is_a?(ActionController::Parameters)
+      new_meta = (policy.metadata || {}).merge("tag_conditions" => params[:policy][:metadata][:tag_conditions].to_unsafe_h)
+      policy.update!(metadata: new_meta)
     end
 
     current_company.clear_permissions_cache
     render json: {
       message: "Permission updated successfully",
       policy_appointment: { id: appointment.id, workflow_status: appointment.workflow_status },
-      policy: { id: policy.id, tag_conditions: policy.reload.tag_conditions }
+      policy: { id: policy.id, tag_conditions: (policy.reload.metadata || {})["tag_conditions"] }
     }
   end
 

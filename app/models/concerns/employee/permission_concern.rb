@@ -95,7 +95,7 @@ module Employee::PermissionConcern
               resource: policy.resource,
               action: policy.action,
               business_type: policy.business_type,
-              tag_conditions: policy.tag_conditions || {},
+              tag_conditions: (policy.metadata || {})["tag_conditions"] || {},
               policy_appointment: appointment ? {
                 id: appointment.id,
                 workflow_status: appointment.workflow_status
@@ -123,7 +123,7 @@ module Employee::PermissionConcern
                 resource: appointment.policy.resource,
                 action: appointment.policy.action,
                 name: appointment.policy.name,
-                tag_conditions: appointment.policy.tag_conditions || {},
+                tag_conditions: (appointment.policy.metadata || {})["tag_conditions"] || {},
                 business_type: appointment.policy.business_type
               }
             end

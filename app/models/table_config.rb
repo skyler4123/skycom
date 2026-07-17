@@ -2,12 +2,6 @@ class TableConfig < ApplicationRecord
   include CategoryConcern
   include PropertyMappingConcern
   attribute :permission_resource_name, :string, default: -> { self.name }
-  attribute :columns_metadata, :jsonb, default: -> {
-    [ { "key" => "name", "name" => "Name", "visible" => true, "sortable" => true,
-       "align" => "left", "pinned" => nil, "width" => nil, "roles" => [],
-       "is_virtual" => false, "render_config" => {} } ]
-  }
-  attribute :metadata, :jsonb, array: true, default: []
 
   belongs_to :company, touch: true
   belongs_to :category
@@ -90,18 +84,20 @@ class TableConfig < ApplicationRecord
   ALLOWED_PINNEDS = ALLOWED_TABLE_PINNEDS
 
   validate :columns_metadata_must_conform_to_schema
+  after_initialize :set_default_columns, if: :new_record?
 
   private
 
   def columns_metadata_must_conform_to_schema
-    unless columns_metadata.is_a?(Array)
-      errors.add(:columns_metadata, "must be an array")
+    columns = (metadata || {})["columns"] || []
+    unless columns.is_a?(Array)
+      errors.add(:metadata, "columns must be an array")
       return
     end
 
-    columns_metadata.each_with_index do |field, idx|
+    columns.each_with_index do |field, idx|
       unless field.is_a?(Hash)
-        errors.add(:columns_metadata, "element #{idx} must be a hash")
+        errors.add(:metadata, "columns element #{idx} must be a hash")
         next
       end
 
@@ -109,28 +105,37 @@ class TableConfig < ApplicationRecord
       name_val = field["name"]
 
       if !key.is_a?(String) || key.blank?
-        errors.add(:columns_metadata, "element #{idx}: key is required and must be a non-blank string")
+        errors.add(:metadata, "columns element #{idx}: key is required and must be a non-blank string")
       end
 
       if !name_val.is_a?(String) || name_val.blank?
-        errors.add(:columns_metadata, "element #{idx}: name is required and must be a non-blank string")
+        errors.add(:metadata, "columns element #{idx}: name is required and must be a non-blank string")
       end
 
-      errors.add(:columns_metadata, "element #{idx}: visible must be a boolean")       if field.key?("visible")   && ![ true, false ].include?(field["visible"])
-      errors.add(:columns_metadata, "element #{idx}: sortable must be a boolean")      if field.key?("sortable")  && ![ true, false ].include?(field["sortable"])
-      errors.add(:columns_metadata, "element #{idx}: is_virtual must be a boolean")    if field.key?("is_virtual") && ![ true, false ].include?(field["is_virtual"])
-      errors.add(:columns_metadata, "element #{idx}: align must be one of #{ALLOWED_ALIGNS}")  if field.key?("align") && field["align"].present? && ALLOWED_ALIGNS.exclude?(field["align"])
-      errors.add(:columns_metadata, "element #{idx}: pinned must be one of #{ALLOWED_PINNEDS}") if field.key?("pinned") && field["pinned"].present? && ALLOWED_PINNEDS.exclude?(field["pinned"])
-      errors.add(:columns_metadata, "element #{idx}: width must be an integer or null") if field.key?("width") && !field["width"].nil? && !field["width"].is_a?(Integer)
-      errors.add(:columns_metadata, "element #{idx}: roles must be an array of strings") if field.key?("roles") && !field["roles"].nil? && !(field["roles"].is_a?(Array) && field["roles"].all? { |r| r.is_a?(String) })
-      errors.add(:columns_metadata, "element #{idx}: render_config must be a hash")   if field.key?("render_config") && !field["render_config"].nil? && !field["render_config"].is_a?(Hash)
+      errors.add(:metadata, "columns element #{idx}: visible must be a boolean")       if field.key?("visible")   && ![ true, false ].include?(field["visible"])
+      errors.add(:metadata, "columns element #{idx}: sortable must be a boolean")      if field.key?("sortable")  && ![ true, false ].include?(field["sortable"])
+      errors.add(:metadata, "columns element #{idx}: is_virtual must be a boolean")    if field.key?("is_virtual") && ![ true, false ].include?(field["is_virtual"])
+      errors.add(:metadata, "columns element #{idx}: align must be one of #{ALLOWED_ALIGNS}")  if field.key?("align") && field["align"].present? && ALLOWED_ALIGNS.exclude?(field["align"])
+      errors.add(:metadata, "columns element #{idx}: pinned must be one of #{ALLOWED_PINNEDS}") if field.key?("pinned") && field["pinned"].present? && ALLOWED_PINNEDS.exclude?(field["pinned"])
+      errors.add(:metadata, "columns element #{idx}: width must be an integer or null") if field.key?("width") && !field["width"].nil? && !field["width"].is_a?(Integer)
+      errors.add(:metadata, "columns element #{idx}: roles must be an array of strings") if field.key?("roles") && !field["roles"].nil? && !(field["roles"].is_a?(Array) && field["roles"].all? { |r| r.is_a?(String) })
+      errors.add(:metadata, "columns element #{idx}: render_config must be a hash")   if field.key?("render_config") && !field["render_config"].nil? && !field["render_config"].is_a?(Hash)
 
       if key.to_s.start_with?("property_") && name_val.present? && property_mapping.present?
-        pm_entry = property_mapping.property_metadata.find { |pm| pm["key"] == key }
+        pm_entry = (property_mapping.metadata || {})["properties"].to_a.find { |pm| pm["key"] == key }
         if pm_entry && pm_entry["name"] != name_val
-          errors.add(:columns_metadata, "element #{idx}: name '#{name_val}' must match PropertyMapping value '#{pm_entry['name']}'. Edit the PropertyMapping to change this name.")
+          errors.add(:metadata, "columns element #{idx}: name '#{name_val}' must match PropertyMapping value '#{pm_entry['name']}'. Edit the PropertyMapping to change this name.")
         end
       end
     end
+  end
+
+  def set_default_columns
+    self.metadata ||= {}
+    self.metadata["columns"] ||= [
+      { "key" => "name", "name" => "Name", "visible" => true, "sortable" => true,
+        "align" => "left", "pinned" => nil, "width" => nil, "roles" => [],
+        "is_virtual" => false, "render_config" => {} }
+    ]
   end
 end

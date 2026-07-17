@@ -13,7 +13,7 @@ export default class Companies_Services_NewController extends Companies_LayoutCo
     this.categoryId = new URLSearchParams(window.location.search).get('category_id') || this.defaultFilterCategory()?.id || null
 
     const propertyMapping = currentPropertyMappings().find(m => m.category_id === this.categoryId)
-    this.propertyMetadata = propertyMapping?.property_metadata || []
+    this.propertyMetadata = propertyMapping?.metadata?.properties || []
 
     poll(() => {
       if (this.hasContentTarget) {
@@ -98,7 +98,7 @@ export default class Companies_Services_NewController extends Companies_LayoutCo
     this.categoryId = event.target.value
 
     const propertyMapping = currentPropertyMappings().find(m => m.category_id === this.categoryId)
-    this.propertyMetadata = propertyMapping?.property_metadata || []
+    this.propertyMetadata = propertyMapping?.metadata?.properties || []
 
     const dynamicDiv = this.element.querySelector('#dynamic-fields')
     if (dynamicDiv) {

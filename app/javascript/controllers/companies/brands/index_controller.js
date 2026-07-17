@@ -56,7 +56,7 @@ export default class Companies_Brands_IndexController extends Companies_LayoutCo
       { key: "workflow_status", name: translate("Status") }
     ]
 
-    const rawColumns = tableConfig?.columns_metadata || fallbackColumns
+    const rawColumns = tableConfig?.metadata?.columns || fallbackColumns
     const visibleColumns = rawColumns.filter(col => col.visible !== false)
 
     if (!visibleColumns.some(c => c.key === "category")) {
@@ -64,7 +64,7 @@ export default class Companies_Brands_IndexController extends Companies_LayoutCo
       if (nameIdx >= 0) visibleColumns.splice(nameIdx + 1, 0, { key: "category", name: translate("Category") })
     }
 
-    const mappingLookup = (propertyMapping?.property_metadata || []).reduce((acc, field) => {
+    const mappingLookup = (propertyMapping?.metadata?.properties || []).reduce((acc, field) => {
       acc[field.key] = field
       return acc
     }, {})

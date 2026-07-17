@@ -327,6 +327,24 @@ SUBSCRIPTION_LIMITS = {
 MOCK_OAUTH_EMAIL = "Manager_1_clinic_1@company3.com".freeze
 
 # =============================================================================
+# Company Defaults
+# =============================================================================
+
+# Default resource names for new companies. Used by Company#resource_names
+# (which reads from metadata with this as a fallback).
+DEFAULT_RESOURCE_NAMES = %w[
+  Product Order Customer Employee Branch Department
+  PolicyAppointment Invoice Transaction Service Policy
+  Category PropertyMapping TableConfig Brand Facility
+  Table Reservation Room Guest
+  Patient Appointment Course Student Exam
+  Membership
+  Page ShiftTemplate ScheduledShift
+  AttendancePolicy AttendanceLog AttendanceDay AttendanceMonth
+  Stock StockTransfer StockImport StockExport
+].freeze
+
+# =============================================================================
 # Retail Init Defaults
 # Used by Seed::RetailInitService to bootstrap a new retail company with
 # system records (roles, categories, property_mappings, table_configs).

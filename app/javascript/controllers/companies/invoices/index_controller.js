@@ -52,7 +52,7 @@ export default class Companies_Invoices_IndexController extends Companies_Layout
     const categoryValue = this.categoryIdValue || this.defaultFilterCategory()?.id
     const propertyMapping = this.currentPropertyMapping()
 
-    const mappingLookup = (propertyMapping?.property_metadata || []).reduce((acc, field) => {
+    const mappingLookup = (propertyMapping?.metadata?.properties || []).reduce((acc, field) => {
       acc[field.key] = field
       return acc
     }, {})
@@ -63,7 +63,7 @@ export default class Companies_Invoices_IndexController extends Companies_Layout
       { key: "workflow_status", name: translate("Status") }
     ]
 
-    const rawColumns = this.currentTableConfig()?.columns_metadata || fallbackColumns
+    const rawColumns = this.currentTableConfig()?.metadata?.columns || fallbackColumns
     const visibleColumns = rawColumns.filter(col => col.visible !== false)
 
     if (!visibleColumns.some(c => c.key === "category")) {

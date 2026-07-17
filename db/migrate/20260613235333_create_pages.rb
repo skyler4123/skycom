@@ -24,7 +24,6 @@ class CreatePages < ActiveRecord::Migration[8.0]
 
       # --- Core Engine Layout Configurations ---
       # This stores grid rules, component placements, hidden widgets, or feature flags
-      t.jsonb :layout_manifest, null: false
       t.jsonb :metadata, null: false
 
       # --- Security and System Tracking ---

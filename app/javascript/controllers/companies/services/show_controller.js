@@ -19,7 +19,7 @@ export default class Companies_Services_ShowController extends Companies_LayoutC
 
       if (this.service?.category_id) {
         const propertyMapping = currentPropertyMappings().find(m => m.category_id === this.service.category_id)
-        this.propertyMetadata = propertyMapping?.property_metadata || []
+        this.propertyMetadata = propertyMapping?.metadata?.properties || []
       }
 
       poll(() => {
