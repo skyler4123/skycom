@@ -39,7 +39,7 @@ module AddressConcern
       line_2:            attributes[:line_2],
       city:              attributes[:city],
       state_or_province: attributes[:state_or_province],
-      country_code:      attributes[:country_code] || :vn,
+      country:      attributes[:country] || :vn,
       postal_code:       attributes[:postal_code]
     )
 

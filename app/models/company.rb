@@ -64,7 +64,7 @@ class Company < ApplicationRecord
   has_many :pages, dependent: :destroy
 
   # --- Enums ---
-  enum :country_code, COUNTRY_CODES, prefix: true, default: :us
+  enum :country, COUNTRY_CODES, prefix: true, default: :us
   enum :business_type, {
     retail: 0,
     restaurant: 1000,
@@ -80,7 +80,7 @@ class Company < ApplicationRecord
   }, prefix: true, default: :active
   enum :workflow_status, WORKFLOW_STATUS, prefix: true
   enum :timezone, TIMEZONES, prefix: true, default: :utc
-  enum :currency_code, CURRENCIE_CODES, prefix: true, default: :usd
+  enum :currency, CURRENCIE_CODES, prefix: true, default: :usd
   enum :ownership_type, {
     publicly_traded: 0,
     privately_held: 1
@@ -136,7 +136,7 @@ class Company < ApplicationRecord
     branches.create(
       name: name,
       phone_number: phone_number,
-      currency_code: currency_code,
+      currency: currency,
       country: country,
       business_type: business_type,
       timezone: timezone
@@ -201,7 +201,7 @@ class Company < ApplicationRecord
 
   def ensure_billing_wallet
     return if billing_wallet.present?
-    create_billing_wallet!(currency: currency_code_before_type_cast)
+    create_billing_wallet!(currency: currency_before_type_cast)
   end
 
   private

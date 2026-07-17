@@ -18,7 +18,7 @@ class BillingWallet < ApplicationRecord
 
   def set_defaults
     self.name ||= "#{company&.name || 'Company'} Wallet"
-    self.currency ||= company&.currency_code_before_type_cast || 0
+    self.currency ||= company&.currency_before_type_cast || 0
     self.promo_balance_cents ||= 0
     self.main_balance_cents ||= 0
     self.soft_debt_threshold_cents ||= -10000

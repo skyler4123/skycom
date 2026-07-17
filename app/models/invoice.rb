@@ -4,7 +4,7 @@ class Invoice < ApplicationRecord
 
   attribute :permission_resource_name, :string, default: -> { self.name }
 
-  enum :country_code, COUNTRY_CODES, prefix: true, default: :us
+  enum :country, COUNTRY_CODES, prefix: true, default: :us
   enum :timezone, TIMEZONES, prefix: true, default: :utc
 
   include TagConcern
@@ -28,18 +28,23 @@ class Invoice < ApplicationRecord
     subscription: 2
   }
 
-  enum :currency_code, CURRENCIE_CODES, prefix: true, default: :usd
+  enum :currency, CURRENCIE_CODES, prefix: true, default: :usd
   enum :payment_status, { unpaid: 0, paid: 1, voided: 2 }, default: :unpaid
+
+  monetize :price_cents,
+           as: "price",
+           with_model_currency: :currency,
+           disable_validation: true
 
   # --- Validations ---
   validates :name, presence: true, uniqueness: { scope: :company_id }, length: { maximum: 255 }
-  validates :currency_code, presence: true
+  validates :currency, presence: true
   validates :code, presence: true, uniqueness: true
-  validates :total_price, presence: true, numericality: { greater_than_or_equal_to: 0 }
+  validates :price_cents, presence: true, numericality: { greater_than_or_equal_to: 0 }
 
   validates :business_type, presence: true
 
   def total_price_cents
-    (total_price * 100).to_i
+    price_cents
   end
 end

@@ -7,7 +7,9 @@ class CreateSubscriptionPlans < ActiveRecord::Migration[8.0]
       t.string :description
       t.string :code
       t.integer :duration_days
-      t.integer :country_code
+      t.integer :price_cents
+      t.integer :currency
+      t.integer :country
 
       # --- System Fields ---
       t.integer  :lifecycle_status, index: true

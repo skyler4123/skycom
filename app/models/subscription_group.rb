@@ -7,8 +7,6 @@ class SubscriptionGroup < ApplicationRecord
   # --- Associations ---
   belongs_to :company
   belongs_to :branch, optional: true
-  belongs_to :price
-  belongs_to :period
   belongs_to :seller, polymorphic: true
   belongs_to :buyer, polymorphic: true
   belongs_to :resource, polymorphic: true, optional: true
@@ -22,9 +20,7 @@ class SubscriptionGroup < ApplicationRecord
   validates :code, uniqueness: true, allow_blank: true
 
   # Ensure the definition components are always present
-  validates :price, :period, presence: true
-
-  enum :country_code, COUNTRY_CODES, prefix: true, default: :us
+  enum :country, COUNTRY_CODES, prefix: true, default: :us
   enum :lifecycle_status, LIFECYCLE_STATUS, prefix: true
   enum :workflow_status, WORKFLOW_STATUS, prefix: true
   enum :timezone, TIMEZONES, prefix: true, default: :utc

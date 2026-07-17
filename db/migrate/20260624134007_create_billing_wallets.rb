@@ -5,7 +5,7 @@ class CreateBillingWallets < ActiveRecord::Migration[8.0]
 
       t.string :name, null: false
       t.text   :description
-      t.integer :country_code
+      t.integer :country
       t.integer :currency, null: false
 
       # --- Billing Fields ---

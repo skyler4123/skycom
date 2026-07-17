@@ -16,15 +16,20 @@
 class BillingResource < ApplicationRecord
   attribute :price_cents, :integer, default: 0
 
+  monetize :price_cents,
+           as: "price",
+           with_model_currency: :currency,
+           disable_validation: true
+
   has_many :contract_features, dependent: :destroy
   has_many :contract_metrics, dependent: :destroy
   has_many :daily_metric_logs, dependent: :destroy
 
   validates :name, presence: true
-  validates :name, uniqueness: { scope: :country_code }
+  validates :name, uniqueness: { scope: :country }
 
   enum :resource_type, { volumetric: 0, addon_feature: 1 }, default: :volumetric
   enum :lifecycle_status, { active: 0, deprecated: 1, archived: 2 }, default: :active
-  enum :country_code, COUNTRY_CODES, prefix: true, default: :us
+  enum :country, COUNTRY_CODES, prefix: true, default: :us
   enum :currency, CURRENCIE_CODES, prefix: true, default: :usd
 end

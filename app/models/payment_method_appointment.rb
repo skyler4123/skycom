@@ -30,8 +30,8 @@ class PaymentMethodAppointment < ApplicationRecord
 
   def payment_method_country_matches_company
     return unless payment_method && company
-    return if payment_method.country_code_before_type_cast == company.country_code_before_type_cast
+    return if payment_method.country_before_type_cast == company.country_before_type_cast
 
-    errors.add(:payment_method, "country code (#{payment_method.country_code_before_type_cast}) does not match company country code (#{company.country_code_before_type_cast})")
+    errors.add(:payment_method, "country (#{payment_method.country_before_type_cast}) does not match company country (#{company.country_before_type_cast})")
   end
 end

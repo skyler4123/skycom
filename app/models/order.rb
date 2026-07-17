@@ -3,7 +3,7 @@ class Order < ApplicationRecord
   include PropertyMappingConcern
   attribute :permission_resource_name, :string, default: -> { self.name }
 
-  enum :country_code, COUNTRY_CODES, prefix: true, default: :us
+  enum :country, COUNTRY_CODES, prefix: true, default: :us
   enum :timezone, TIMEZONES, prefix: true, default: :utc
 
   include TagConcern
@@ -27,7 +27,7 @@ class Order < ApplicationRecord
   # --- Enums ---
   enum :lifecycle_status, LIFECYCLE_STATUS, prefix: true
   enum :workflow_status, WORKFLOW_STATUS, prefix: true
-  enum :currency_code, CURRENCIE_CODES, prefix: true, default: :usd
+  enum :currency, CURRENCIE_CODES, prefix: true, default: :usd
   enum :business_type, {
     online: 0,
     in_store: 1,
@@ -36,7 +36,7 @@ class Order < ApplicationRecord
 
   # --- Validations ---
   validates :name, presence: true, uniqueness: { scope: :company_id }, length: { maximum: 255 }
-  validates :currency_code, presence: true
+  validates :currency, presence: true
 
   validates :business_type, presence: true
 end
