@@ -8,9 +8,14 @@ class Product < ApplicationRecord
   enum :timezone, TIMEZONES, prefix: true, default: :utc
   enum :currency_code, CURRENCIE_CODES, prefix: true, default: :usd
 
+  # money-rails integration
+  monetize :price_cents,
+           as: "price",
+           with_model_currency: :price_currency,
+           disable_validation: true
+
   include TagConcern
   include OrderConcern
-  include PriceConcern
   include Product::ImageConcern
 
   # --- Associations ---
@@ -52,4 +57,11 @@ class Product < ApplicationRecord
   # --- Validations ---
   validates :name, presence: true, uniqueness: { scope: :company_id }, length: { maximum: 255 }
   validates :business_type, presence: true
+  validates :price_cents, numericality: { only_integer: true, greater_than_or_equal_to: 0, allow_nil: true }
+
+  private
+
+  def price_currency
+    currency_code&.upcase || "USD"
+  end
 end
