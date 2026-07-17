@@ -94,14 +94,14 @@ class Companies::PagesController < Companies::ApplicationController
   def page_params
     params.require(:page).permit(
       :name, :description, :branch_id, :target_role, :target_resolution,
-      :business_type, :lifecycle_status, :workflow_status, :layout_manifest
+      :business_type, :lifecycle_status, :workflow_status, metadata: {}
     )
   end
 
   def format_page(page)
     page.as_json(only: %i[
       id name code description target_role target_resolution
-      business_type lifecycle_status workflow_status layout_manifest
+      business_type lifecycle_status workflow_status metadata
     ]).merge(
       branch: { id: page.branch_id, name: page.branch.name }
     )

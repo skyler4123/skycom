@@ -40,11 +40,11 @@ RSpec.feature "Companies::Orders Management", type: :feature, js: true do
       category: default_category,
       property_mapping: default_category.default_property_mapping,
       resource_name: "orders",
-      columns_metadata: [
+      metadata: { "columns" => [
         { "key" => "name", "name" => "Order Name", "visible" => true, "sortable" => true, "align" => "left", "pinned" => nil, "width" => nil, "roles" => [], "is_virtual" => false, "render_config" => {} },
         { "key" => "code", "name" => "Code", "visible" => true, "sortable" => true, "align" => "left", "pinned" => nil, "width" => nil, "roles" => [], "is_virtual" => false, "render_config" => {} },
         { "key" => "workflow_status", "name" => "Status", "visible" => true, "sortable" => true, "align" => "center", "pinned" => nil, "width" => nil, "roles" => [], "is_virtual" => false, "render_config" => {} }
-      ]
+      ] }
     )
   end
 
@@ -122,10 +122,10 @@ RSpec.feature "Companies::Orders Management", type: :feature, js: true do
         category: test_category,
         property_mapping: test_category.default_property_mapping,
         resource_name: "orders",
-        columns_metadata: [
+        metadata: { "columns" => [
           { "key" => "name", "name" => "Name", "visible" => true, "sortable" => true, "align" => "left", "pinned" => nil, "width" => nil, "roles" => [], "is_virtual" => false, "render_config" => {} },
           { "key" => "code", "name" => "Code", "visible" => true, "sortable" => true, "align" => "left", "pinned" => nil, "width" => nil, "roles" => [], "is_virtual" => false, "render_config" => {} }
-        ]
+        ] }
       )
       company.clear_permissions_cache
       tc

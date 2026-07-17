@@ -19,7 +19,7 @@ export default class Companies_Employees_ShowController extends Companies_Layout
 
       if (this.employee?.category_id) {
         const propertyMapping = currentPropertyMappings().find(m => m.category_id === this.employee.category_id)
-        this.propertyMetadata = propertyMapping?.property_metadata || []
+        this.propertyMetadata = propertyMapping?.metadata?.properties || []
       }
 
       poll(() => {

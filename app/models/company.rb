@@ -2,20 +2,6 @@ class Company < ApplicationRecord
   class_attribute :skip_init, default: false
 
   attribute :permission_resource_name, :string, default: -> { self.name }
-  attribute :resource_names, :string, array: true, default: %w[
-    Product Order Customer Employee Branch Department
-    PolicyAppointment Invoice Transaction Service Policy
-     Category PropertyMapping TableConfig Brand Facility
-     Table Reservation Room Guest
-    Patient Appointment Course Student Exam
-    Membership
-    Page ShiftTemplate ScheduledShift
-    AttendancePolicy AttendanceLog AttendanceDay AttendanceMonth
-    Stock StockTransfer StockImport StockExport
-  ]
-  attribute :features, :jsonb, array: true, default: []
-  attribute :ui_configs, :jsonb, array: true, default: []
-  attribute :metadata, :jsonb, array: true, default: []
 
   include AddressConcern
   include Cache::RecordsConcern
@@ -132,6 +118,14 @@ class Company < ApplicationRecord
 
   after_create :ensure_billing_wallet
   after_create :setup_owner_records
+
+  def resource_names
+    (metadata || {})["resource_names"] || DEFAULT_RESOURCE_NAMES
+  end
+
+  def as_json(options = {})
+    super.merge("resource_names" => resource_names)
+  end
 
   def invalidate_client_cache!
     touch

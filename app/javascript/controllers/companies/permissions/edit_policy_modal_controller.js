@@ -73,7 +73,7 @@ export default class Companies_Permissions_EditPolicyModalController extends Con
         method: "PATCH",
         body: {
           policy_appointment: { workflow_status: this.isActive },
-          policy: { tag_conditions: tagConditions }
+          policy: { metadata: { tag_conditions: tagConditions } }
         }
       })
 

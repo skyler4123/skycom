@@ -34,7 +34,7 @@ module Company::PermissionConcern
                 resource: policy.resource,
                 action: policy.action,
                 business_type: policy.business_type,
-                tag_conditions: policy.tag_conditions || {},
+                tag_conditions: (policy.metadata || {})["tag_conditions"] || {},
                 policy_appointment: appointment ? {
                   id: appointment.id,
                   workflow_status: appointment.workflow_status

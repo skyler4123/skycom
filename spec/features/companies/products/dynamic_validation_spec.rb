@@ -11,7 +11,7 @@ RSpec.feature "Products Dynamic Validation", type: :feature, js: true do
   end
 
   before do
-    category.default_property_mapping.update!(property_metadata: [
+    category.default_property_mapping.update!(metadata: { "properties" => [
       { "key" => "property_string_1", "type" => "string", "name" => "Presence Test",
         "validates" => { "presence" => true } },
       { "key" => "property_integer_1", "type" => "integer", "name" => "Num Test",
@@ -22,7 +22,7 @@ RSpec.feature "Products Dynamic Validation", type: :feature, js: true do
         "validates" => { "format" => { "with" => "^SKU-" } } },
       { "key" => "property_string_4", "type" => "string", "name" => "Len Test",
         "validates" => { "length" => { "minimum" => 2, "maximum" => 50 } } }
-    ])
+    ] })
 
     sign_in(owner)
 

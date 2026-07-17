@@ -17,7 +17,7 @@ export default class Companies_TableConfigs_EditController extends Companies_Lay
     try {
       const response = await fetchJson(`${Helpers.company_table_config_path(companyId, configId)}.json`)
       this.config = response.table_config
-      this.columnsMetadata = this.config?.columns_metadata || []
+      this.columnsMetadata = this.config?.metadata?.columns || []
 
       poll(() => {
         if (this.hasContentTarget) {
@@ -46,33 +46,33 @@ export default class Companies_TableConfigs_EditController extends Companies_Lay
     const rowsHTML = this.columnsMetadata.map((col, index) => `
       <tr class="border-b border-slate-100 dark:border-gray-800 last:border-0">
         <td class="py-2 px-3">
-          <input type="text" name="table_config[columns_metadata][${index}][key]" value="${col.key || ''}"
+          <input type="text" name="table_config[metadata][columns][${index}][key]" value="${col.key || ''}"
             class="w-full px-2 py-1 text-xs font-mono border border-slate-200 dark:border-slate-600 rounded bg-white dark:bg-slate-800 text-slate-900 dark:text-white">
         </td>
         <td class="py-2 px-3">
           ${col.key.startsWith('property_') ? `
-            <input type="text" name="table_config[columns_metadata][${index}][name]" value="${col.name || ''}"
+            <input type="text" name="table_config[metadata][columns][${index}][name]" value="${col.name || ''}"
               class="w-full px-2 py-1 text-xs border border-slate-200 dark:border-slate-600 rounded bg-slate-50 dark:bg-slate-700 text-slate-400 cursor-not-allowed"
               readonly
               ${tooltip(translate("This field is synced from PropertyMapping. Please access the Property Mapping edit page to update this name."))}
             >
           ` : `
-            <input type="text" name="table_config[columns_metadata][${index}][name]" value="${col.name || ''}"
+            <input type="text" name="table_config[metadata][columns][${index}][name]" value="${col.name || ''}"
               class="w-full px-2 py-1 text-xs border border-slate-200 dark:border-slate-600 rounded bg-white dark:bg-slate-800 text-slate-900 dark:text-white">
           `}
         </td>
         <td class="py-2 px-3 text-center">
-          <input type="hidden" name="table_config[columns_metadata][${index}][visible]" value="false">
-          <input type="checkbox" name="table_config[columns_metadata][${index}][visible]" value="true" ${col.visible !== false ? 'checked' : ''}
+          <input type="hidden" name="table_config[metadata][columns][${index}][visible]" value="false">
+          <input type="checkbox" name="table_config[metadata][columns][${index}][visible]" value="true" ${col.visible !== false ? 'checked' : ''}
             class="rounded border-slate-300 text-blue-600 cursor-pointer">
         </td>
         <td class="py-2 px-3 text-center">
-          <input type="hidden" name="table_config[columns_metadata][${index}][sortable]" value="false">
-          <input type="checkbox" name="table_config[columns_metadata][${index}][sortable]" value="true" ${col.sortable ? 'checked' : ''}
+          <input type="hidden" name="table_config[metadata][columns][${index}][sortable]" value="false">
+          <input type="checkbox" name="table_config[metadata][columns][${index}][sortable]" value="true" ${col.sortable ? 'checked' : ''}
             class="rounded border-slate-300 text-blue-600 cursor-pointer">
         </td>
         <td class="py-2 px-3">
-          <select name="table_config[columns_metadata][${index}][align]"
+          <select name="table_config[metadata][columns][${index}][align]"
             class="w-full px-1 py-1 text-xs border border-slate-200 dark:border-slate-600 rounded bg-white dark:bg-slate-800 text-slate-900 dark:text-white">
             <option value="left" ${col.align === 'left' ? 'selected' : ''}>left</option>
             <option value="center" ${col.align === 'center' ? 'selected' : ''}>center</option>
@@ -80,7 +80,7 @@ export default class Companies_TableConfigs_EditController extends Companies_Lay
           </select>
         </td>
         <td class="py-2 px-3">
-          <select name="table_config[columns_metadata][${index}][pinned]"
+          <select name="table_config[metadata][columns][${index}][pinned]"
             class="w-full px-1 py-1 text-xs border border-slate-200 dark:border-slate-600 rounded bg-white dark:bg-slate-800 text-slate-900 dark:text-white">
             <option value="" ${!col.pinned ? 'selected' : ''}>none</option>
             <option value="left" ${col.pinned === 'left' ? 'selected' : ''}>left</option>
@@ -88,16 +88,16 @@ export default class Companies_TableConfigs_EditController extends Companies_Lay
           </select>
         </td>
         <td class="py-2 px-3">
-          <input type="number" name="table_config[columns_metadata][${index}][width]" value="${col.width ?? ''}" placeholder="auto"
+          <input type="number" name="table_config[metadata][columns][${index}][width]" value="${col.width ?? ''}" placeholder="auto"
             class="w-16 px-1 py-1 text-xs border border-slate-200 dark:border-slate-600 rounded bg-white dark:bg-slate-800 text-slate-900 dark:text-white">
         </td>
         <td class="py-2 px-3">
-          <input type="text" name="table_config[columns_metadata][${index}][roles]" value="${(col.roles || []).join(', ')}" placeholder="admin, mgr"
+          <input type="text" name="table_config[metadata][columns][${index}][roles]" value="${(col.roles || []).join(', ')}" placeholder="admin, mgr"
             class="w-full px-1 py-1 text-xs border border-slate-200 dark:border-slate-600 rounded bg-white dark:bg-slate-800 text-slate-900 dark:text-white">
         </td>
         <td class="py-2 px-3 text-center">
-          <input type="hidden" name="table_config[columns_metadata][${index}][is_virtual]" value="false">
-          <input type="checkbox" name="table_config[columns_metadata][${index}][is_virtual]" value="true" ${col.is_virtual ? 'checked' : ''}
+          <input type="hidden" name="table_config[metadata][columns][${index}][is_virtual]" value="false">
+          <input type="checkbox" name="table_config[metadata][columns][${index}][is_virtual]" value="true" ${col.is_virtual ? 'checked' : ''}
             class="rounded border-slate-300 text-blue-600 cursor-pointer">
         </td>
         <td class="py-2 px-3 text-right">
@@ -240,33 +240,33 @@ export default class Companies_TableConfigs_EditController extends Companies_Lay
     tbody.innerHTML = this.columnsMetadata.map((col, index) => `
       <tr class="border-b border-slate-100 dark:border-gray-800 last:border-0">
         <td class="py-2 px-3">
-          <input type="text" name="table_config[columns_metadata][${index}][key]" value="${col.key || ''}"
+          <input type="text" name="table_config[metadata][columns][${index}][key]" value="${col.key || ''}"
             class="w-full px-2 py-1 text-xs font-mono border border-slate-200 dark:border-slate-600 rounded bg-white dark:bg-slate-800 text-slate-900 dark:text-white">
         </td>
         <td class="py-2 px-3">
           ${col.key.startsWith('property_') ? `
-            <input type="text" name="table_config[columns_metadata][${index}][name]" value="${col.name || ''}"
+            <input type="text" name="table_config[metadata][columns][${index}][name]" value="${col.name || ''}"
               class="w-full px-2 py-1 text-xs border border-slate-200 dark:border-slate-600 rounded bg-slate-50 dark:bg-slate-700 text-slate-400 cursor-not-allowed"
               readonly
               ${tooltip(translate("This field is synced from PropertyMapping. Please access the Property Mapping edit page to update this name."))}
             >
           ` : `
-            <input type="text" name="table_config[columns_metadata][${index}][name]" value="${col.name || ''}"
+            <input type="text" name="table_config[metadata][columns][${index}][name]" value="${col.name || ''}"
               class="w-full px-2 py-1 text-xs border border-slate-200 dark:border-slate-600 rounded bg-white dark:bg-slate-800 text-slate-900 dark:text-white">
           `}
         </td>
         <td class="py-2 px-3 text-center">
-          <input type="hidden" name="table_config[columns_metadata][${index}][visible]" value="false">
-          <input type="checkbox" name="table_config[columns_metadata][${index}][visible]" value="true" ${col.visible !== false ? 'checked' : ''}
+          <input type="hidden" name="table_config[metadata][columns][${index}][visible]" value="false">
+          <input type="checkbox" name="table_config[metadata][columns][${index}][visible]" value="true" ${col.visible !== false ? 'checked' : ''}
             class="rounded border-slate-300 text-blue-600 cursor-pointer">
         </td>
         <td class="py-2 px-3 text-center">
-          <input type="hidden" name="table_config[columns_metadata][${index}][sortable]" value="false">
-          <input type="checkbox" name="table_config[columns_metadata][${index}][sortable]" value="true" ${col.sortable ? 'checked' : ''}
+          <input type="hidden" name="table_config[metadata][columns][${index}][sortable]" value="false">
+          <input type="checkbox" name="table_config[metadata][columns][${index}][sortable]" value="true" ${col.sortable ? 'checked' : ''}
             class="rounded border-slate-300 text-blue-600 cursor-pointer">
         </td>
         <td class="py-2 px-3">
-          <select name="table_config[columns_metadata][${index}][align]"
+          <select name="table_config[metadata][columns][${index}][align]"
             class="w-full px-1 py-1 text-xs border border-slate-200 dark:border-slate-600 rounded bg-white dark:bg-slate-800 text-slate-900 dark:text-white">
             <option value="left" ${col.align === 'left' ? 'selected' : ''}>left</option>
             <option value="center" ${col.align === 'center' ? 'selected' : ''}>center</option>
@@ -274,7 +274,7 @@ export default class Companies_TableConfigs_EditController extends Companies_Lay
           </select>
         </td>
         <td class="py-2 px-3">
-          <select name="table_config[columns_metadata][${index}][pinned]"
+          <select name="table_config[metadata][columns][${index}][pinned]"
             class="w-full px-1 py-1 text-xs border border-slate-200 dark:border-slate-600 rounded bg-white dark:bg-slate-800 text-slate-900 dark:text-white">
             <option value="" ${!col.pinned ? 'selected' : ''}>none</option>
             <option value="left" ${col.pinned === 'left' ? 'selected' : ''}>left</option>
@@ -282,16 +282,16 @@ export default class Companies_TableConfigs_EditController extends Companies_Lay
           </select>
         </td>
         <td class="py-2 px-3">
-          <input type="number" name="table_config[columns_metadata][${index}][width]" value="${col.width ?? ''}" placeholder="auto"
+          <input type="number" name="table_config[metadata][columns][${index}][width]" value="${col.width ?? ''}" placeholder="auto"
             class="w-16 px-1 py-1 text-xs border border-slate-200 dark:border-slate-600 rounded bg-white dark:bg-slate-800 text-slate-900 dark:text-white">
         </td>
         <td class="py-2 px-3">
-          <input type="text" name="table_config[columns_metadata][${index}][roles]" value="${(col.roles || []).join(', ')}" placeholder="admin, mgr"
+          <input type="text" name="table_config[metadata][columns][${index}][roles]" value="${(col.roles || []).join(', ')}" placeholder="admin, mgr"
             class="w-full px-1 py-1 text-xs border border-slate-200 dark:border-slate-600 rounded bg-white dark:bg-slate-800 text-slate-900 dark:text-white">
         </td>
         <td class="py-2 px-3 text-center">
-          <input type="hidden" name="table_config[columns_metadata][${index}][is_virtual]" value="false">
-          <input type="checkbox" name="table_config[columns_metadata][${index}][is_virtual]" value="true" ${col.is_virtual ? 'checked' : ''}
+          <input type="hidden" name="table_config[metadata][columns][${index}][is_virtual]" value="false">
+          <input type="checkbox" name="table_config[metadata][columns][${index}][is_virtual]" value="true" ${col.is_virtual ? 'checked' : ''}
             class="rounded border-slate-300 text-blue-600 cursor-pointer">
         </td>
         <td class="py-2 px-3 text-right">

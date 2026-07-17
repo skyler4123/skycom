@@ -1,7 +1,5 @@
 # app/models/price_appointment.rb
 class PriceAppointment < ApplicationRecord
-  attribute :metadata, :jsonb, array: true, default: []
-
   # The "What" (Immutable Facts)
   belongs_to :price
   belongs_to :period, optional: true

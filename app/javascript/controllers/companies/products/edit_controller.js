@@ -20,7 +20,7 @@ export default class Companies_Products_EditController extends Companies_LayoutC
 
       if (this.product?.category_id) {
         const propertyMapping = currentPropertyMappings().find(m => m.category_id === this.product.category_id)
-        this.propertyMetadata = propertyMapping?.property_metadata || []
+        this.propertyMetadata = propertyMapping?.metadata?.properties || []
       }
 
       poll(() => {

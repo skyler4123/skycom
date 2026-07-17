@@ -41,8 +41,8 @@ export default class Companies_Pages_ShowController extends Companies_LayoutCont
     if (!p) return `<div class="p-8 text-center">${translate("Page not found.")}</div>`
 
     const companyId = window.location.pathname.split("/")[2]
-    const manifestStr = p.layout_manifest
-      ? (typeof p.layout_manifest === 'object' ? JSON.stringify(p.layout_manifest, null, 2) : p.layout_manifest)
+    const manifestStr = p.metadata?.layout_manifest
+      ? (typeof p.metadata?.layout_manifest === 'object' ? JSON.stringify(p.metadata?.layout_manifest, null, 2) : p.metadata?.layout_manifest)
       : null
 
     return `

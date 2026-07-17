@@ -14,7 +14,7 @@ module DynamicValidationConcern
   def auto_populate_property_fields
     return unless respond_to?(:property_mapping) && property_mapping.present?
 
-    metadata = property_mapping.property_metadata || []
+    metadata = (property_mapping.metadata || {})["properties"] || []
     property_keys = metadata.map { |e| e["key"] }.compact
     return if property_keys.empty?
     return unless property_keys.any? { |k| respond_to?(k) }
@@ -27,7 +27,7 @@ module DynamicValidationConcern
     mapping = respond_to?(:property_mapping) ? property_mapping : nil
     return unless mapping
 
-    (mapping.property_metadata || []).each do |entry|
+    ((mapping.metadata || {})["properties"] || []).each do |entry|
       key = entry["key"]
       validates_hash = entry["validates"]
       next if validates_hash.blank?

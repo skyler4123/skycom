@@ -19,7 +19,7 @@ export default class Companies_Facilities_ShowController extends Companies_Layou
 
       if (this.facility?.category_id) {
         const propertyMapping = currentPropertyMappings().find(m => m.category_id === this.facility.category_id)
-        this.propertyMetadata = propertyMapping?.property_metadata || []
+        this.propertyMetadata = propertyMapping?.metadata?.properties || []
       }
 
       poll(() => {

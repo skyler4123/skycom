@@ -12,7 +12,7 @@ RSpec.describe DynamicValidationConcern do
   end
 
   before do
-    property_mapping.update!(property_metadata: [
+    property_mapping.update!(metadata: { "properties" => [
       { "key" => "property_string_1", "type" => "string", "name" => "Brand",
         "validates" => { "presence" => true, "length" => { "minimum" => 2, "maximum" => 50 } } },
       { "key" => "property_string_2", "type" => "string", "name" => "SKU Code",
@@ -27,7 +27,7 @@ RSpec.describe DynamicValidationConcern do
         "validates" => {} },
       { "key" => "property_decimal_2", "type" => "decimal", "name" => "Discount",
         "validates" => { "numericality" => { "only_integer" => true, "greater_than_or_equal_to" => 0, "less_than_or_equal_to" => 100 } } }
-    ])
+    ] })
   end
 
   def fill_baseline

@@ -19,7 +19,7 @@ export default class Companies_Departments_ShowController extends Companies_Layo
 
       if (this.department?.category_id) {
         const propertyMapping = currentPropertyMappings().find(m => m.category_id === this.department.category_id)
-        this.propertyMetadata = propertyMapping?.property_metadata || []
+        this.propertyMetadata = propertyMapping?.metadata?.properties || []
       }
 
       poll(() => {

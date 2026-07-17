@@ -8,8 +8,6 @@ class CreateSubscriptionPlans < ActiveRecord::Migration[8.0]
       t.string :code
       t.integer :duration_days
       t.integer :country_code
-      t.jsonb :features
-      t.jsonb :limits
 
       # --- System Fields ---
       t.integer  :lifecycle_status, index: true

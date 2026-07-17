@@ -33,9 +33,9 @@ RSpec.shared_examples "client cache invalidation" do |resource_name:|
   end
 
   before do
-    property_mapping.update!(property_metadata: [
+    property_mapping.update!(metadata: { "properties" => [
       { "key" => "property_string_1", "name" => "Original Field", "type" => "string", "validates" => {} }
-    ])
+    ] })
 
     page.execute_script("localStorage.clear()")
     seed_company_cache(company)
@@ -61,7 +61,7 @@ RSpec.shared_examples "client cache invalidation" do |resource_name:|
 
     select "property_string_2 (string)", from: "new-property-slot"
     click_button "Add Property"
-    fill_in "property_mapping[property_metadata][1][name]", with: "Added Field"
+    fill_in "property_mapping[metadata][properties][1][name]", with: "Added Field"
     click_button "Save Changes"
     expect(page).to have_content("Property mapping updated successfully", wait: 10)
 
@@ -75,7 +75,7 @@ RSpec.shared_examples "client cache invalidation" do |resource_name:|
     visit edit_company_property_mapping_path(company, property_mapping)
     expect(page).to have_selector("#new-property-slot", wait: 10)
 
-    fill_in "property_mapping[property_metadata][0][name]", with: "Renamed Field"
+    fill_in "property_mapping[metadata][properties][0][name]", with: "Renamed Field"
     click_button "Save Changes"
     expect(page).to have_content("Property mapping updated successfully", wait: 10)
 

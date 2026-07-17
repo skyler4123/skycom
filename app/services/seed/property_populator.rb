@@ -77,7 +77,7 @@ class Seed::PropertyPopulator
 
     record.property_mapping ||= mapping
 
-    mapping.property_metadata.each do |config|
+    ((mapping.metadata || {})["properties"] || []).each do |config|
       key = config["key"]
       next if key.blank?
 

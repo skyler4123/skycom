@@ -9,7 +9,6 @@ class CreatePolicies < ActiveRecord::Migration[8.0]
       t.string :code
       t.string :resource
       t.string :action
-      t.jsonb :tag_conditions
 
       # --- System Fields ---
       t.integer  :lifecycle_status, index: true

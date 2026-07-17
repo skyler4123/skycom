@@ -291,7 +291,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_02_190003) do
     t.uuid "company_id", null: false
     t.uuid "branch_id"
     t.uuid "employee_id", null: false
-    t.string "log_type", null: false
+    t.integer "log_type", null: false
     t.datetime "logged_at", null: false
     t.decimal "latitude", precision: 10, scale: 6
     t.decimal "longitude", precision: 10, scale: 6
@@ -518,7 +518,6 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_02_190003) do
     t.integer "currency_code"
     t.integer "country_code"
     t.integer "timezone"
-    t.jsonb "ui_configs", array: true
     t.integer "lifecycle_status"
     t.integer "workflow_status"
     t.integer "business_type"
@@ -980,9 +979,6 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_02_190003) do
     t.string "website"
     t.integer "employee_count"
     t.integer "fiscal_year_end_month"
-    t.text "resource_names", array: true
-    t.jsonb "features", array: true
-    t.jsonb "ui_configs", array: true
     t.integer "lifecycle_status"
     t.integer "workflow_status"
     t.integer "business_type"
@@ -1782,7 +1778,6 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_02_190003) do
     t.integer "currency_code"
     t.integer "country_code"
     t.integer "timezone"
-    t.jsonb "ui_configs", array: true
     t.integer "lifecycle_status"
     t.integer "workflow_status"
     t.integer "business_type"
@@ -2378,6 +2373,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_02_190003) do
     t.integer "timezone"
     t.integer "lifecycle_status"
     t.integer "workflow_status"
+    t.integer "payment_status", default: 0, null: false
     t.integer "business_type"
     t.datetime "expiration_date"
     t.jsonb "metadata"
@@ -2450,7 +2446,6 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_02_190003) do
     t.datetime "property_datetime_10"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.integer "payment_status", default: 0, null: false
     t.index ["branch_id"], name: "index_invoices_on_branch_id"
     t.index ["business_type"], name: "index_invoices_on_business_type"
     t.index ["category_id"], name: "index_invoices_on_category_id"
@@ -3037,7 +3032,6 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_02_190003) do
     t.integer "target_resolution", null: false
     t.integer "lifecycle_status", null: false
     t.integer "workflow_status", null: false
-    t.jsonb "layout_manifest", null: false
     t.jsonb "metadata", null: false
     t.string "permission_resource_name", null: false
     t.datetime "expiration_date"
@@ -3165,7 +3159,6 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_02_190003) do
     t.string "code"
     t.string "resource"
     t.string "action"
-    t.jsonb "tag_conditions"
     t.integer "lifecycle_status"
     t.integer "workflow_status"
     t.integer "business_type"
@@ -3805,7 +3798,6 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_02_190003) do
     t.string "name"
     t.string "description"
     t.string "resource_name"
-    t.jsonb "property_metadata", null: false
     t.integer "lifecycle_status"
     t.integer "workflow_status"
     t.integer "business_type"
@@ -5197,8 +5189,6 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_02_190003) do
     t.string "code"
     t.integer "duration_days"
     t.integer "country_code"
-    t.jsonb "features"
-    t.jsonb "limits"
     t.integer "lifecycle_status"
     t.integer "workflow_status"
     t.integer "business_type"
@@ -5247,7 +5237,6 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_02_190003) do
     t.string "name"
     t.string "description"
     t.string "resource_name"
-    t.jsonb "columns_metadata", null: false
     t.integer "lifecycle_status"
     t.integer "workflow_status"
     t.integer "business_type"
@@ -5609,10 +5598,12 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_02_190003) do
     t.string "code"
     t.string "phone_number"
     t.integer "currency_code"
+    t.integer "amount_cents", default: 0, null: false
     t.integer "country_code"
     t.integer "timezone"
     t.integer "lifecycle_status"
     t.integer "workflow_status"
+    t.integer "payment_status", default: 0, null: false
     t.integer "business_type"
     t.datetime "expiration_date"
     t.jsonb "metadata"
@@ -5685,8 +5676,6 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_02_190003) do
     t.datetime "property_datetime_10"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.integer "amount_cents", default: 0, null: false
-    t.integer "payment_status", default: 0, null: false
     t.index ["branch_id"], name: "index_transactions_on_branch_id"
     t.index ["business_type"], name: "index_transactions_on_business_type"
     t.index ["category_id"], name: "index_transactions_on_category_id"

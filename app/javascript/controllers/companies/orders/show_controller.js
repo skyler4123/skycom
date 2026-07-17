@@ -20,7 +20,7 @@ export default class Companies_Orders_ShowController extends Companies_LayoutCon
 
       if (this.order?.category_id) {
         const propertyMapping = currentPropertyMappings().find(m => m.category_id === this.order.category_id)
-        this.propertyMetadata = propertyMapping?.property_metadata || []
+        this.propertyMetadata = propertyMapping?.metadata?.properties || []
       }
 
       poll(() => {

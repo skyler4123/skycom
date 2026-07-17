@@ -37,7 +37,7 @@ export default class Companies_Categories_ShowController extends Companies_Layou
     if (!c) return `<div class="p-8 text-center">${translate("Category not found.")}</div>`
 
     const companyId = window.location.pathname.split("/")[2]
-    const propertyMappingCount = c.property_mappings?.[0]?.property_metadata?.length || 0
+    const propertyMappingCount = c.property_mappings?.[0]?.metadata?.properties?.length || 0
 
     return `
       <div class="p-4 overflow-y-auto">

@@ -1,7 +1,5 @@
 class Policy < ApplicationRecord
   attribute :permission_resource_name, :string, default: -> { self.name }
-  attribute :tag_conditions, :jsonb, default: {}
-  attribute :metadata, :jsonb, array: true, default: []
 
   # --- Associations ---
   # REASON: If a global Policy definition (like its name or resource type) is edited, we touch the Company to invalidate any cached permission sets that include this policy.

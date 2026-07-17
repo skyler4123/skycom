@@ -16,7 +16,6 @@ class CreateEmployees < ActiveRecord::Migration[8.0]
       t.integer :currency_code
       t.integer :country_code
       t.integer :timezone
-      t.jsonb :ui_configs, array: true
 
       # --- System Fields ---
       t.integer  :lifecycle_status, index: true

@@ -17,7 +17,7 @@ export default class Companies_PropertyMappings_EditController extends Companies
     try {
       const response = await fetchJson(`${Helpers.company_property_mapping_path(companyId, mappingId)}.json`)
       this.mapping = response.property_mapping
-      this.propertyMetadata = this.mapping?.property_metadata || []
+      this.propertyMetadata = this.mapping?.metadata?.properties || []
 
       poll(() => {
         if (this.hasContentTarget) {
@@ -50,15 +50,15 @@ export default class Companies_PropertyMappings_EditController extends Companies
       <tr class="border-b border-slate-100 dark:border-gray-800 last:border-0">
         <td class="py-3 px-4 text-sm">
           <span class="font-mono text-xs bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded text-slate-600 dark:text-slate-400">${field.key}</span>
-          <input type="hidden" name="property_mapping[property_metadata][${index}][key]" value="${field.key}">
+          <input type="hidden" name="property_mapping[metadata][properties][${index}][key]" value="${field.key}">
         </td>
         <td class="py-3 px-4">
-          <input type="text" name="property_mapping[property_metadata][${index}][name]" value="${field.name || ''}"
+          <input type="text" name="property_mapping[metadata][properties][${index}][name]" value="${field.name || ''}"
             placeholder="Display Name"
             class="w-full px-2 py-1 text-sm border border-slate-200 dark:border-slate-600 rounded bg-white dark:bg-slate-800 text-slate-900 dark:text-white">
         </td>
         <td class="py-3 px-4">
-          <textarea name="property_mapping[property_metadata][${index}][validates]" rows="3"
+          <textarea name="property_mapping[metadata][properties][${index}][validates]" rows="3"
             class="w-full min-w-[200px] px-2 py-1 text-xs font-mono border border-slate-200 dark:border-slate-600 rounded bg-white dark:bg-slate-800 text-slate-900 dark:text-white resize-y">${JSON.stringify(field.validates || {}, null, 2)}</textarea>
         </td>
         <td class="py-3 px-4 text-right">
@@ -199,15 +199,15 @@ export default class Companies_PropertyMappings_EditController extends Companies
       <tr class="border-b border-slate-100 dark:border-gray-800 last:border-0">
         <td class="py-3 px-4 text-sm">
           <span class="font-mono text-xs bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded text-slate-600 dark:text-slate-400">${field.key}</span>
-          <input type="hidden" name="property_mapping[property_metadata][${index}][key]" value="${field.key}">
+          <input type="hidden" name="property_mapping[metadata][properties][${index}][key]" value="${field.key}">
         </td>
         <td class="py-3 px-4">
-          <input type="text" name="property_mapping[property_metadata][${index}][name]" value="${field.name || ''}"
+          <input type="text" name="property_mapping[metadata][properties][${index}][name]" value="${field.name || ''}"
             placeholder="Display Name"
             class="w-full px-2 py-1 text-sm border border-slate-200 dark:border-slate-600 rounded bg-white dark:bg-slate-800 text-slate-900 dark:text-white">
         </td>
         <td class="py-3 px-4">
-          <textarea name="property_mapping[property_metadata][${index}][validates]" rows="3"
+          <textarea name="property_mapping[metadata][properties][${index}][validates]" rows="3"
             class="w-full min-w-[200px] px-2 py-1 text-xs font-mono border border-slate-200 dark:border-slate-600 rounded bg-white dark:bg-slate-800 text-slate-900 dark:text-white resize-y">${JSON.stringify(field.validates || {}, null, 2)}</textarea>
         </td>
         <td class="py-3 px-4 text-right">

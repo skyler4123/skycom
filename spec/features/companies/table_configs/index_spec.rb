@@ -7,9 +7,9 @@ RSpec.feature "Companies::TableConfigs Management", type: :feature, js: true do
   let(:category) { create(:category, company: company, name: "Cosmetics", resource_name: "products") }
   let(:property_mapping) do
     pm = category.default_property_mapping || create(:property_mapping, company: company, category: category, name: "Cosmetics Mapping")
-    pm.update!(property_metadata: [
+    pm.update!(metadata: { "properties" => [
       { "key" => "property_string_1", "type" => "string", "name" => "Skin Type" }
-    ])
+    ] })
     pm
   end
 
@@ -17,10 +17,10 @@ RSpec.feature "Companies::TableConfigs Management", type: :feature, js: true do
     property_mapping.table_configs.destroy_all
     create(:table_config, company: company, category: category, property_mapping: property_mapping,
       name: "Cosmetics Table",
-      columns_metadata: [
+      metadata: { "columns" => [
         { "key" => "name", "name" => "Name", "visible" => true, "sortable" => true, "align" => "left", "pinned" => nil, "width" => nil, "roles" => [], "is_virtual" => false, "render_config" => {} },
         { "key" => "property_string_1", "name" => "Skin Type", "visible" => true, "sortable" => true, "align" => "left", "pinned" => nil, "width" => nil, "roles" => [], "is_virtual" => false, "render_config" => {} }
-      ])
+      ] })
   end
 
   let!(:product) do
@@ -111,14 +111,14 @@ RSpec.feature "Companies::TableConfigs Management", type: :feature, js: true do
     expect(page).to have_content("Edit Table Config")
     expect(page).to have_content(/Column Config/i)
 
-    expect(page).to have_selector('input[name*="[columns_metadata]"][name*="[key]"]', wait: 10)
+    expect(page).to have_selector('input[name*="[metadata]"][name*="[columns]"][name*="[key]"]', wait: 10)
   end
 
   scenario "edit columns and verify Products table reflects changes" do
     visit edit_company_table_config_path(company, table_config)
     expect(page).to have_selector('form', wait: 10)
 
-    first_label_input = find(:xpath, '//input[@name="table_config[columns_metadata][0][name]"]')
+    first_label_input = find(:xpath, '//input[@name="table_config[metadata][columns][0][name]"]')
     first_label_input.set('Product Title')
 
     click_button 'Save Changes'

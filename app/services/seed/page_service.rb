@@ -13,7 +13,7 @@ class Seed::PageService
     business_type: :retail,
     target_role:,
     target_resolution: :desktop_widescreen,
-    layout_manifest: {},
+    metadata: {},
     lifecycle_status: :active,
     workflow_status: :approved,
     permission_resource_name: "Page"
@@ -30,7 +30,7 @@ class Seed::PageService
       business_type: business_type,
       target_role: target_role,
       target_resolution: target_resolution,
-      layout_manifest: layout_manifest,
+      metadata: metadata,
       lifecycle_status: lifecycle_status,
       workflow_status: workflow_status,
       permission_resource_name: permission_resource_name

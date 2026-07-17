@@ -20,7 +20,7 @@ export default class Companies_Branches_EditController extends Companies_LayoutC
 
       if (this.branch?.category_id) {
         const propertyMapping = currentPropertyMappings().find(m => m.category_id === this.branch.category_id)
-        this.propertyMetadata = propertyMapping?.property_metadata || []
+        this.propertyMetadata = propertyMapping?.metadata?.properties || []
       }
 
       poll(() => {
