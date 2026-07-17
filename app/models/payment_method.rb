@@ -31,6 +31,9 @@ class PaymentMethod < ApplicationRecord
     cash: 2          # Frontend: Display manual receipt instructions
   }
 
+  # --- Strategy ---
+  enum :strategy, GATEWAY_STRATEGIES, prefix: true
+
   # --- Validations ---
   validates :name, presence: true, uniqueness: true, length: { maximum: 255 }
   validates :code, presence: true, uniqueness: true
@@ -39,9 +42,14 @@ class PaymentMethod < ApplicationRecord
 
   # 🚀 NEW VALIDATIONS: Ensure online gateways always possess their routing targets
   validates :payment_mode, presence: true
-  validates :gateway_url, presence: true, unless: :cash_payment?
+  validates :strategy, presence: true, unless: :system_payment?
+  validates :gateway_url, presence: true, unless: :system_payment?
 
   def cash_payment?
-    payment_mode == "cash"
+    strategy_cash?
+  end
+
+  def system_payment?
+    strategy_cash? || strategy_wallet_auto_debit?
   end
 end

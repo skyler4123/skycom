@@ -4,6 +4,7 @@ class CreateBillingPaymentMethods < ActiveRecord::Migration[8.0]
       # --- Identity ---
       t.string :email, null: true, index: { unique: true }
       t.string :name
+      t.integer :strategy
       t.text   :description
       t.string :code, index: { unique: true }
       t.string :phone_number
