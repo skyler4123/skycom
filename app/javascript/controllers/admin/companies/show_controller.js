@@ -45,13 +45,13 @@ export default class Admin_Companies_ShowController extends Admin_LayoutControll
       { label: "Phone", value: c.phone_number, type: "link", href: `tel:${c.phone_number}` },
       { label: "Website", value: c.website, type: "link", href: c.website },
       { label: "City", value: c.city },
-      { label: "Country", value: c.country_code?.toUpperCase() },
+      { label: "Country", value: c.country?.toUpperCase() },
       { label: "Employee Count", value: c.employee_count != null ? String(c.employee_count) : null },
       { label: "Registration Number", value: c.registration_number },
       { label: "Tax ID", value: c.tax_id },
       { label: "VAT ID", value: c.vat_id },
       { label: "Ownership", value: c.ownership_type ? c.ownership_type.replace('_', ' ') : null },
-      { label: "Currency", value: c.currency_code?.toUpperCase() },
+      { label: "Currency", value: c.currency?.toUpperCase() },
       { label: "Timezone", value: c.timezone != null ? `UTC${c.timezone > 0 ? '+' : ''}${c.timezone}` : null },
       { label: "Description", value: c.description, type: "full" }
     ]

@@ -48,7 +48,7 @@ export default class Companies_Invoices_EditController extends Companies_LayoutC
     const companyId = window.location.pathname.split("/")[2]
     const businessTypes = Enums()?.invoice?.business_types || []
     const workflowStatuses = Enums()?.invoice?.workflow_statuses || []
-    const currencyCodes = Enums()?.invoice?.currency_codes || []
+    const currencyCodes = Enums()?.invoice?.currencies || []
 
     const dynamicFields = this.propertyMetadata.length > 0 ? `
       <div class="border-t border-slate-200 dark:border-gray-800 pt-6 mt-6">
@@ -120,8 +120,8 @@ export default class Companies_Invoices_EditController extends Companies_LayoutC
           </div>
 
           <div class="space-y-1">
-            <label class="text-xs font-medium text-slate-500">${translate("Total Price")}</label>
-            <input type="number" name="invoice[total_price]" step="0.01" value="${i.total_price || ''}"
+            <label class="text-xs font-medium text-slate-500">${translate("Total Price (cents)")}</label>
+            <input type="number" name="invoice[price_cents]" value="${i.price_cents || ''}"
               class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-sm">
           </div>
 
@@ -143,9 +143,9 @@ export default class Companies_Invoices_EditController extends Companies_LayoutC
 
           <div class="space-y-1">
             <label class="text-xs font-medium text-slate-500">${translate("Currency")}</label>
-            <select name="invoice[currency_code]"
+            <select name="invoice[currency]"
               class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-sm">
-              ${selectOptionsHTML(currencyCodes, i.currency_code)}
+              ${selectOptionsHTML(currencyCodes, i.currency)}
             </select>
           </div>
 

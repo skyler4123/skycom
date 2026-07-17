@@ -3,7 +3,7 @@ import Companies_LayoutController from "controllers/companies/layout_controller"
 export default class Companies_Branches_IndexController extends Companies_LayoutController {
   static targets = ["branchesList"]
 
-  /** @type {(Branch & { country_code: string })[]} */
+  /** @type {(Branch & { country: string })[]} */
   branches = []
 
   async connect() {

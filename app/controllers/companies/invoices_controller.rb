@@ -86,7 +86,7 @@ class Companies::InvoicesController < Companies::ApplicationController
       :business_type,
       :workflow_status,
       :currency,
-      :total_price,
+      :price_cents,
       :due_date,
       :category_id,
       :order_id,
@@ -98,7 +98,7 @@ class Companies::InvoicesController < Companies::ApplicationController
     invoice.as_json(only: [
       :id, :name, :description, :code,
       :lifecycle_status, :workflow_status, :business_type,
-      :currency, :total_price, :due_date,
+      :currency, :price_cents, :due_date,
       :category_id, :order_id,
       :created_at, :updated_at,
       *property_keys

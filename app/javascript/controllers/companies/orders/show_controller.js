@@ -137,7 +137,7 @@ export default class Companies_Orders_ShowController extends Companies_LayoutCon
               </div>
               <div>
                 <p class="text-xs font-medium text-slate-500">${translate("Currency")}</p>
-                <p class="text-sm font-semibold text-slate-900 font-mono">${o.currency_code?.toUpperCase() || 'USD'}</p>
+                <p class="text-sm font-semibold text-slate-900 font-mono">${o.currency?.toUpperCase() || 'USD'}</p>
               </div>
             </div>
 

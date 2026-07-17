@@ -137,7 +137,7 @@ export default class Companies_Invoices_ShowController extends Companies_LayoutC
               </div>
               <div>
                 <p class="text-xs font-medium text-slate-500">${translate("Amount")}</p>
-                <p class="text-sm font-semibold text-slate-900 font-mono">${i.currency_code?.toUpperCase() || 'USD'} ${i.total_price || '0.00'}</p>
+                <p class="text-sm font-semibold text-slate-900 font-mono">${i.currency?.toUpperCase() || 'USD'} ${((i.price_cents || 0) / 100).toFixed(2)}</p>
               </div>
             </div>
 

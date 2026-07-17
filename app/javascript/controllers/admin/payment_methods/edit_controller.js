@@ -77,10 +77,10 @@ export default class Admin_PaymentMethods_EditController extends Admin_LayoutCon
 
           <div class="space-y-1">
             <label class="text-[10px] font-bold text-slate-400 dark:text-slate-300 uppercase">Country</label>
-            <select name="payment_method[country_code]" required
+            <select name="payment_method[country]" required
               class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-sm">
-              <option value="us" ${pm.country_code === 'us' ? 'selected' : ''}>US</option>
-              <option value="vn" ${pm.country_code === 'vn' ? 'selected' : ''}>VN</option>
+              <option value="us" ${pm.country === 'us' ? 'selected' : ''}>US</option>
+              <option value="vn" ${pm.country === 'vn' ? 'selected' : ''}>VN</option>
             </select>
           </div>
 

@@ -32,7 +32,7 @@ export default class Admin_PaymentMethods_IndexController extends Admin_LayoutCo
       { key: "name", name: "Name" },
       { key: "code", name: "Code" },
       { key: "business_type", name: "Type" },
-      { key: "country_code", name: "Country" },
+      { key: "country", name: "Country" },
       { key: "lifecycle_status", name: "Status" },
       { key: "created_at", name: "Created" }
     ]
@@ -76,7 +76,7 @@ export default class Admin_PaymentMethods_IndexController extends Admin_LayoutCo
                   const colorClass = colors[value] || 'bg-slate-50 text-slate-700'
                   return `<span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium capitalize ${colorClass}">${value?.toUpperCase() || '—'}</span>`
                 },
-                country_code: (value) => {
+                country: (value) => {
                   const names = { us: 'US', vn: 'VN' }
                   return `<span class="text-sm text-slate-600 dark:text-slate-400">${names[value] || value || '—'}</span>`
                 },

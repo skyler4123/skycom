@@ -91,7 +91,7 @@ export default class Companies_Invoices_NewController extends Companies_LayoutCo
       `<option value="${t.value}">${t.name === 'subscription' ? translate("Subscription") : (t.name ? t.name.charAt(0).toUpperCase() + t.name.slice(1) : t.value)}</option>`
     ).join('')
 
-    const currencyOptions = (Enums()?.invoice?.currency_codes || []).map(c =>
+    const currencyOptions = (Enums()?.invoice?.currencies || []).map(c =>
       `<option value="${c.value}">${c.name?.toUpperCase() || c.value?.toUpperCase()}</option>`
     ).join('')
 
@@ -121,8 +121,8 @@ export default class Companies_Invoices_NewController extends Companies_LayoutCo
           </div>
 
           <div class="space-y-1">
-            <label class="text-[10px] font-bold text-slate-400 uppercase">${translate("Total Price")}</label>
-            <input type="number" name="invoice[total_price]" step="0.01" placeholder="${translate("e.g. 100.00")}"
+            <label class="text-[10px] font-bold text-slate-400 uppercase">${translate("Total Price (cents)")}</label>
+            <input type="number" name="invoice[price_cents]" placeholder="${translate("e.g. 10000")}"
               class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-sm">
           </div>
 
@@ -136,7 +136,7 @@ export default class Companies_Invoices_NewController extends Companies_LayoutCo
 
           <div class="space-y-1">
             <label class="text-[10px] font-bold text-slate-400 uppercase">${translate("Currency")}</label>
-            <select name="invoice[currency_code]"
+            <select name="invoice[currency]"
               class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-sm">
               ${currencyOptions}
             </select>

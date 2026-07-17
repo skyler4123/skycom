@@ -220,7 +220,7 @@ export default class Companies_Dashboards_IndexController extends Companies_Layo
                 </div>
                 <div class="min-w-0">
                   <p class="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase">${translate("Currency")}</p>
-                  <p class="text-sm text-slate-900 dark:text-white uppercase">${c?.currency_code || "—"}</p>
+                  <p class="text-sm text-slate-900 dark:text-white uppercase">${c?.currency || "—"}</p>
                 </div>
               </div>
               <div class="flex items-center gap-3">
