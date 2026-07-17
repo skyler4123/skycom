@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_07_02_190003) do
+ActiveRecord::Schema[8.0].define(version: 2026_07_17_091030) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pgcrypto"
@@ -3107,50 +3107,6 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_02_190003) do
     t.index ["workflow_status"], name: "index_payment_methods_on_workflow_status"
   end
 
-  create_table "period_appointments", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
-    t.uuid "period_id", null: false
-    t.string "appoint_from_type"
-    t.uuid "appoint_from_id"
-    t.string "appoint_to_type", null: false
-    t.uuid "appoint_to_id", null: false
-    t.string "appoint_for_type"
-    t.uuid "appoint_for_id"
-    t.string "appoint_by_type"
-    t.uuid "appoint_by_id"
-    t.string "name"
-    t.string "description"
-    t.string "code"
-    t.string "value"
-    t.integer "lifecycle_status"
-    t.integer "workflow_status"
-    t.integer "business_type"
-    t.datetime "expiration_date"
-    t.jsonb "metadata"
-    t.datetime "discarded_at"
-    t.string "permission_resource_name"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.index ["appoint_by_type", "appoint_by_id"], name: "index_period_appointments_on_appoint_by"
-    t.index ["appoint_for_type", "appoint_for_id"], name: "index_period_appointments_on_appoint_for"
-    t.index ["appoint_from_type", "appoint_from_id"], name: "index_period_appointments_on_appoint_from"
-    t.index ["appoint_to_type", "appoint_to_id"], name: "index_period_appointments_on_appoint_to"
-    t.index ["appoint_to_type", "appoint_to_id"], name: "index_period_appointments_on_appoint_to_type_and_appoint_to_id"
-    t.index ["business_type"], name: "index_period_appointments_on_business_type"
-    t.index ["discarded_at"], name: "index_period_appointments_on_discarded_at"
-    t.index ["lifecycle_status"], name: "index_period_appointments_on_lifecycle_status"
-    t.index ["period_id"], name: "index_period_appointments_on_period_id"
-    t.index ["workflow_status"], name: "index_period_appointments_on_workflow_status"
-  end
-
-  create_table "periods", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
-    t.datetime "start_at", null: false
-    t.datetime "end_at"
-    t.integer "timezone", null: false
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.index ["start_at", "end_at", "timezone"], name: "index_periods_on_start_at_and_end_at_and_timezone", unique: true, nulls_not_distinct: true
-  end
-
   create_table "policies", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
     t.uuid "company_id", null: false
     t.uuid "branch_id"
@@ -3201,51 +3157,6 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_02_190003) do
     t.index ["lifecycle_status"], name: "index_policy_appointments_on_lifecycle_status"
     t.index ["policy_id"], name: "index_policy_appointments_on_policy_id"
     t.index ["workflow_status"], name: "index_policy_appointments_on_workflow_status"
-  end
-
-  create_table "price_appointments", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
-    t.uuid "price_id", null: false
-    t.uuid "period_id"
-    t.string "appoint_from_type"
-    t.uuid "appoint_from_id"
-    t.string "appoint_to_type", null: false
-    t.uuid "appoint_to_id", null: false
-    t.string "appoint_for_type"
-    t.uuid "appoint_for_id"
-    t.string "appoint_by_type"
-    t.uuid "appoint_by_id"
-    t.string "name"
-    t.string "description"
-    t.string "code"
-    t.string "value"
-    t.integer "lifecycle_status"
-    t.integer "workflow_status"
-    t.integer "business_type"
-    t.datetime "expiration_date"
-    t.jsonb "metadata"
-    t.datetime "discarded_at"
-    t.string "permission_resource_name"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.index ["appoint_by_type", "appoint_by_id"], name: "index_price_appointments_on_appoint_by"
-    t.index ["appoint_for_type", "appoint_for_id"], name: "index_price_appointments_on_appoint_for"
-    t.index ["appoint_from_type", "appoint_from_id"], name: "index_price_appointments_on_appoint_from"
-    t.index ["appoint_to_type", "appoint_to_id"], name: "index_price_appointments_on_appoint_to"
-    t.index ["appoint_to_type", "appoint_to_id"], name: "index_price_appointments_on_appoint_to_type_and_appoint_to_id"
-    t.index ["business_type"], name: "index_price_appointments_on_business_type"
-    t.index ["discarded_at"], name: "index_price_appointments_on_discarded_at"
-    t.index ["lifecycle_status"], name: "index_price_appointments_on_lifecycle_status"
-    t.index ["period_id"], name: "index_price_appointments_on_period_id"
-    t.index ["price_id"], name: "index_price_appointments_on_price_id"
-    t.index ["workflow_status"], name: "index_price_appointments_on_workflow_status"
-  end
-
-  create_table "prices", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
-    t.integer "amount"
-    t.integer "currency_code", null: false
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.index ["amount", "currency_code"], name: "index_prices_on_amount_and_currency_code", unique: true
   end
 
   create_table "product_appointments", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
@@ -3507,6 +3418,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_02_190003) do
     t.datetime "property_datetime_10"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer "price_cents", default: 0, null: false
     t.index ["branch_id"], name: "index_products_on_branch_id"
     t.index ["brand_id"], name: "index_products_on_brand_id"
     t.index ["business_type"], name: "index_products_on_business_type"
@@ -6025,13 +5937,10 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_02_190003) do
   add_foreign_key "payment_method_appointments", "branches"
   add_foreign_key "payment_method_appointments", "companies"
   add_foreign_key "payment_method_appointments", "payment_methods"
-  add_foreign_key "period_appointments", "periods"
   add_foreign_key "policies", "branches"
   add_foreign_key "policies", "companies"
   add_foreign_key "policy_appointments", "companies"
   add_foreign_key "policy_appointments", "policies"
-  add_foreign_key "price_appointments", "periods"
-  add_foreign_key "price_appointments", "prices"
   add_foreign_key "product_appointments", "companies"
   add_foreign_key "product_appointments", "products"
   add_foreign_key "product_group_appointments", "companies"

@@ -24,14 +24,11 @@ class Seed::ProductService
     description ||= Faker::Lorem.sentence(word_count: 12)
     code ||= "PRD-#{SecureRandom.hex(4).upcase}"
 
-    # Default price: convert Faker float to hash with company currency
+    # Convert price to cents using money-rails
     raw_price = price || Faker::Commerce.price(range: 50..2000.0)
-    price_hash = {
-      amount: raw_price,
-      currency_code: company.currency_code
-    }
+    price_cents = Money.from_amount(raw_price, company.currency_code&.upcase || "USD").cents
 
-    product = Product.new(
+    Product.new(
       company: company,
       branch: branch,
       brand: brand,
@@ -40,15 +37,12 @@ class Seed::ProductService
       name: name,
       description: description,
       code: code,
+      price_cents: price_cents,
       lifecycle_status: lifecycle_status,
       workflow_status: workflow_status,
       business_type: business_type,
       discarded_at: discarded_at
     )
-    # Store price_hash temporarily on the object
-    product.singleton_class.attr_accessor :_pending_price_hash
-    product._pending_price_hash = price_hash
-    product
   end
 
   def self.create(...)
@@ -64,11 +58,6 @@ class Seed::ProductService
     end
     Seed::PropertyPopulator.populate(product)
     product.save!
-    # Set price after save (uses PriceConcern's setter which creates PriceAppointment)
-    if product.respond_to?(:_pending_price_hash) && product._pending_price_hash
-      product.price = product._pending_price_hash
-      product.save!
-    end
     Seed::AttachmentService.attach(record: product, relation: :image_attachments, number: 2)
     product
   end

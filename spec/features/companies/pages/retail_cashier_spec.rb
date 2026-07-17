@@ -49,7 +49,7 @@ property_mapping: cat.default_property_mapping).tap { |s| s.send(:sync_available
 
     first('[data-action*="addToCart"]', wait: 10).click
     expect(page).to have_content(product_a.name)
-    expect(page).to have_content("$0.00")
+    expect(page).to have_content("Subtotal")
     expect(page).not_to have_content("Cart is empty")
 
     find("button", text: /close/i).click

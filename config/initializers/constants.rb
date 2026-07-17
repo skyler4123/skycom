@@ -1,5 +1,5 @@
-# Timezone offsets used by the Period model (periods.timezone enum),
-# Branch model, and Company model. Keyed as Rails enum values.
+# Timezone offsets used by Branch model, Company model, and Product model.
+# Keyed as Rails enum values.
 TIMEZONES = {
   minus_12: -12, minus_11: -11, minus_10: -10, minus_9:  -9,
   minus_8:  -8,  minus_7:  -7,  minus_6:  -6,  minus_5:  -5,
@@ -10,7 +10,7 @@ TIMEZONES = {
   plus_12:  12
 }.freeze
 
-# Currency ISO numeric codes used by the Price model (prices.currency_code enum).
+# Currency ISO numeric codes used by Product (products.currency_code enum).
 CURRENCIE_CODES = {
   usd: 840,
   vnd: 704

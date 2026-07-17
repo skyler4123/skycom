@@ -117,9 +117,7 @@ Polymorphic join tables using the `appoint_to` / `appoint_from` / `appoint_for` 
 | # | Table | Links To | Description |
 |---|-------|----------|-------------|
 | 1 | `address_appointments` | Address | Link any resource to an address |
-| 2 | `period_appointments` | Period | Link any resource to a time range |
-| 3 | `price_appointments` | Price | Link any resource to a price |
-| 4 | `tag_appointments` | Tag | Link any resource to a tag |
+| 2 | `tag_appointments` | Tag | Link any resource to a tag |
 | 5 | `policy_appointments` | Policy | Assign policy to role (many-to-many) |
 | 6 | `role_appointments` | Role | Assign role to employee |
 | 7 | `department_appointments` | Department | Link employee/entity to a department |

@@ -1,4 +1,6 @@
-# Skycom Period-Price-Address System
+# Skycom Address System (Legacy: Period-Price-Address)
+
+> **⚠️ 2026-07-17:** Price and Period models have been removed. Product price is now stored directly via `price_cents` column with money-rails. The Address system continues unchanged. See `docs/ADDRESS.md` for the current Address documentation.
 
 ## 1. Overview
 
