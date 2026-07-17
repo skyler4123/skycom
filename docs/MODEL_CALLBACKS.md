@@ -245,7 +245,7 @@ Renders records read-only after creation. Prevents both updates and deletion.
 | `before_update :prevent_modification` | 7 | `prevent_modification` | Raises `ActiveRecord::ReadOnlyRecord` with message: `"#{self.class} is shared and immutable. You can only create new records."` |
 | `before_destroy :prevent_modification` | 10 | `prevent_modification` | Same guard applied to deletion. |
 
-**Included in (5 models):** `Address`, `Period`, `Price`, `SubscriptionGroup`, `Membership`
+**Included in (3 models):** `Address`, `SubscriptionGroup`, `Membership`
 
 ---
 
@@ -329,8 +329,8 @@ Each concern defines the same callback:
 | `after_create` | 5 | Category, Company, PolicyAppointment, PropertyMapping, RoleAppointment |
 | `belongs_to :company, touch: true` | 6 | Branch, Department, Category, PropertyMapping, TableConfig, Role |
 | `after_update` (conditional) | 3 | PolicyAppointment, BillingInvoice, (Company::CircuitBreakerConcern → 1 model) |
-| `before_update` | 3 | PolicyAppointment, RoleAppointment, (ImmutableRecordConcern → 5 models) |
-| `before_destroy` | 5 | Employee, System, PolicyAppointment, RoleAppointment, (ImmutableRecordConcern → 5 models) |
+| `before_update` | 3 | PolicyAppointment, RoleAppointment, (ImmutableRecordConcern → 3 models) |
+| `before_destroy` | 5 | Employee, System, PolicyAppointment, RoleAppointment, (ImmutableRecordConcern → 3 models) |
 | `before_discard` | 1 | Employee |
 | `after_touch` | 2* | Role (duplicate declaration on lines 30 and 87) |
 | `after_commit` | 3 | (Cache::RecordsConcern → 5 models), (Session::GlobalCacheConcern → 1 model) |

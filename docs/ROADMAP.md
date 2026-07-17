@@ -118,7 +118,7 @@ Skycom's core business domain is production-ready and operational.
 | **Dynamic Tables** | Category-filtered tables with configurable visible columns via TableConfig |
 | **Inline Editing** | Click-to-edit fields with state-to-template reactivity and event-driven synchronization |
 | **Address System** | Shared immutable address records with fingerprint-based deduplication |
-| **Period/Price System** | Shared immutable time-range and monetary-value records with polymorphic join |
+| **Price on Product** | Product price stored directly via `price_cents` column with money-rails |
 | **Image Processing** | ActiveStorage-backed avatar system with variants (thumb, medium, profile, full) |
 | **Operating Pages** | Dedicated full-screen POS interfaces — retail cashier is the reference implementation |
 | **Dashboard Pattern** | Full CRUD shell-first dashboards for all major resources |
