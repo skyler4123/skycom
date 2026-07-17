@@ -59,8 +59,6 @@ class Product < ApplicationRecord
   validates :business_type, presence: true
   validates :price_cents, numericality: { only_integer: true, greater_than_or_equal_to: 0, allow_nil: true }
 
-  private
-
   def price_currency
     currency_code&.upcase || "USD"
   end
