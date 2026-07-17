@@ -19,10 +19,7 @@ module Payments
       gateway = gateway_class.new(
         amount_cents: amount_cents,
         invoice_id: invoice.id,
-        memo: "SKYCOM #{invoice.id}",
-        gateway_url: payment_method.gateway_url,
-        secret_key: payment_method.secret_key,
-        redirect_url: payment_method.respond_to?(:redirect_url) ? payment_method.redirect_url : nil
+        memo: "SKYCOM #{invoice.id}"
       )
 
       result = gateway.call

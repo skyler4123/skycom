@@ -5,10 +5,6 @@ class PaymentMethod < ApplicationRecord
   enum :timezone, TIMEZONES, prefix: true, default: :utc
   enum :currency, CURRENCIE_CODES, prefix: true, default: :usd
 
-  # 🚀 SECURITY ENHANCEMENT: Automatically encrypts the secret_key in the database.
-  # It safely decrypts on-the-fly when read in your backend controller code.
-  encrypts :secret_key
-
   # --- Associations ---
   # This model is intended to be global, so it does not belong to a branch.
   has_many :payment_method_appointments, dependent: :destroy
@@ -43,7 +39,6 @@ class PaymentMethod < ApplicationRecord
   # 🚀 NEW VALIDATIONS: Ensure online gateways always possess their routing targets
   validates :payment_mode, presence: true
   validates :strategy, presence: true, unless: :system_payment?
-  validates :gateway_url, presence: true, unless: :system_payment?
 
   def cash_payment?
     strategy_cash?

@@ -5,8 +5,6 @@ class BillingPaymentMethod < ApplicationRecord
   enum :timezone, TIMEZONES, prefix: true, default: :utc
   enum :currency, CURRENCIE_CODES, prefix: true, default: :usd
 
-  encrypts :secret_key
-
   has_many :billing_transactions, dependent: :nullify
 
   enum :lifecycle_status, LIFECYCLE_STATUS, prefix: true
@@ -30,7 +28,6 @@ class BillingPaymentMethod < ApplicationRecord
   validates :business_type, presence: true
   validates :payment_mode, presence: true
   validates :strategy, presence: true, unless: :system_payment?
-  validates :gateway_url, presence: true, unless: :system_payment?
 
   def cash_payment?
     strategy_cash?

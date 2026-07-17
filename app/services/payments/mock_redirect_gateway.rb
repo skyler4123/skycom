@@ -1,14 +1,13 @@
 # app/services/payments/mock_redirect_gateway.rb
 module Payments
   class MockRedirectGateway
-    def initialize(amount_cents:, invoice_id:, transaction_token:, memo:, gateway_url:, redirect_url:, secret_key:, **_args)
+    def initialize(amount_cents:, invoice_id:, memo:, redirect_url: nil, **_args)
       @amount_cents = amount_cents
       @invoice_id = invoice_id
-      @transaction_token = transaction_token
       @memo = memo
-      @gateway_url = gateway_url
       @redirect_url = redirect_url
-      @secret_key = secret_key
+      @gateway_url = GATEWAY_CONFIGS[:mock_redirect_gateway][:gateway_url]
+      @secret_key = GATEWAY_CONFIGS[:mock_redirect_gateway][:secret_key]
     end
 
     def call
@@ -24,7 +23,6 @@ module Payments
         req.body = {
           amount: @amount_cents,
           invoice_id: @invoice_id,
-          transaction_token: @transaction_token,
           memo: @memo,
           return_url: @redirect_url
         }

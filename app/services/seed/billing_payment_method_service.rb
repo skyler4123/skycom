@@ -1,6 +1,4 @@
 class Seed::BillingPaymentMethodService
-  MOCK_API_BASE = "http://localhost:4000"
-
   def self.create
     puts "Seeding BillingPaymentMethod records..."
 
@@ -10,7 +8,6 @@ class Seed::BillingPaymentMethodService
       bpm.business_type = :b2b
       bpm.payment_mode = :cash
       bpm.strategy = :cash
-      bpm.gateway_url = nil
       bpm.workflow_status = :confirmed
     end
 
@@ -20,7 +17,6 @@ class Seed::BillingPaymentMethodService
       bpm.business_type = :b2b
       bpm.payment_mode = :cash
       bpm.strategy = :wallet_auto_debit
-      bpm.gateway_url = nil
       bpm.workflow_status = :confirmed
     end
 
@@ -30,7 +26,6 @@ class Seed::BillingPaymentMethodService
       bpm.business_type = :b2b
       bpm.payment_mode = :qr
       bpm.strategy = :mock_qr_gateway
-      bpm.gateway_url = "#{MOCK_API_BASE}/api/v1/bank/qr-generate"
       bpm.workflow_status = :confirmed
     end
 
@@ -40,7 +35,6 @@ class Seed::BillingPaymentMethodService
       bpm.business_type = :b2b
       bpm.payment_mode = :redirect
       bpm.strategy = :mock_redirect_gateway
-      bpm.gateway_url = "#{MOCK_API_BASE}/api/v1/bank/redirect-session"
       bpm.workflow_status = :confirmed
     end
 
@@ -50,7 +44,6 @@ class Seed::BillingPaymentMethodService
       bpm.business_type = :b2b
       bpm.payment_mode = :redirect
       bpm.strategy = :stripe_gateway
-      bpm.gateway_url = nil
       bpm.workflow_status = :confirmed
     end
 
@@ -60,7 +53,6 @@ class Seed::BillingPaymentMethodService
       bpm.business_type = :b2b
       bpm.payment_mode = :qr
       bpm.strategy = :viet_qr_gateway
-      bpm.gateway_url = nil
       bpm.workflow_status = :confirmed
     end
 

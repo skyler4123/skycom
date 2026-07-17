@@ -64,6 +64,20 @@ GATEWAY_STRATEGY_CLASSES = {
   viet_qr_gateway: "Payments::VietQrGateway"
 }.freeze
 
+# Gateway connection config — stored in code, not DB.
+GATEWAY_CONFIGS = {
+  mock_qr_gateway: {
+    gateway_url: "http://localhost:4000/api/v1/bank/qr-generate",
+    secret_key: "local_secure_dev_secret"
+  },
+  mock_redirect_gateway: {
+    gateway_url: "http://localhost:4000/api/v1/bank/redirect-session",
+    secret_key: "local_secure_dev_secret"
+  },
+  stripe_gateway:   { gateway_url: nil, secret_key: nil },
+  viet_qr_gateway:  { gateway_url: nil, secret_key: nil }
+}.freeze
+
 # =============================================================================
 # Image & Avatar Constraints
 # Applied across 7 model concerns (Branch, Brand, Customer, Department,

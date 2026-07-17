@@ -85,6 +85,19 @@ export default class Admin_PaymentMethods_EditController extends Admin_LayoutCon
           </div>
 
           <div class="space-y-1">
+            <label class="text-[10px] font-bold text-slate-400 dark:text-slate-300 uppercase">Strategy</label>
+            <select name="payment_method[strategy]" required
+              class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-sm">
+              <option value="cash" ${pm.strategy === 'cash' ? 'selected' : ''}>Cash</option>
+              <option value="wallet_auto_debit" ${pm.strategy === 'wallet_auto_debit' ? 'selected' : ''}>Wallet Auto-Debit</option>
+              <option value="mock_qr_gateway" ${pm.strategy === 'mock_qr_gateway' ? 'selected' : ''}>Mock QR Gateway</option>
+              <option value="mock_redirect_gateway" ${pm.strategy === 'mock_redirect_gateway' ? 'selected' : ''}>Mock Redirect Gateway</option>
+              <option value="stripe_gateway" ${pm.strategy === 'stripe_gateway' ? 'selected' : ''}>Stripe Gateway</option>
+              <option value="viet_qr_gateway" ${pm.strategy === 'viet_qr_gateway' ? 'selected' : ''}>VietQR Gateway</option>
+            </select>
+          </div>
+
+          <div class="space-y-1">
             <label class="text-[10px] font-bold text-slate-400 dark:text-slate-300 uppercase">Status</label>
             <select name="payment_method[lifecycle_status]"
               class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-sm">
@@ -99,20 +112,6 @@ export default class Admin_PaymentMethods_EditController extends Admin_LayoutCon
           <label class="text-[10px] font-bold text-slate-400 dark:text-slate-300 uppercase">Description</label>
           <textarea name="payment_method[description]" rows="3"
             class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-sm">${pm.description || ''}</textarea>
-        </div>
-
-        <div class="col-span-2 space-y-1">
-          <label class="text-[10px] font-bold text-slate-400 dark:text-slate-300 uppercase">Gateway URL</label>
-          <input type="url" name="payment_method[gateway_url]" value="${pm.gateway_url || ''}" placeholder="e.g. http://localhost:4000/api/v1/bank/redirect-session"
-            class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-sm font-mono">
-          <p class="text-[10px] text-slate-400">Required for QR and Redirect modes. Leave blank for Cash.</p>
-        </div>
-
-        <div class="col-span-2 space-y-1">
-          <label class="text-[10px] font-bold text-slate-400 dark:text-slate-300 uppercase">Secret Key</label>
-          <input type="password" name="payment_method[secret_key]" value="${pm.secret_key || ''}" placeholder="e.g. sk_test_..."
-            class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-sm font-mono">
-          <p class="text-[10px] text-slate-400">Encrypted at rest. Leave blank for Cash methods.</p>
         </div>
 
         <div class="flex justify-end gap-3 pt-2">

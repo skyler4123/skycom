@@ -5,7 +5,7 @@ FactoryBot.define do
     code { "PM-#{SecureRandom.hex(4).upcase}" }
     business_type { PaymentMethod.business_types.keys.sample }
     payment_mode { :redirect }
-    gateway_url { Seed::PaymentMethodService::MOCK_REDIRECT_URL }
+    strategy { :mock_redirect_gateway }
 
     initialize_with do
       Seed::PaymentMethodService.new(
@@ -13,7 +13,7 @@ FactoryBot.define do
         code: code,
         business_type: business_type,
         payment_mode: payment_mode,
-        gateway_url: gateway_url
+        strategy: strategy
       )
     end
   end
