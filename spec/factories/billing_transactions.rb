@@ -9,6 +9,7 @@ FactoryBot.define do
         bpm.name = "Wallet Auto-Debit"
         bpm.business_type = :b2b
         bpm.payment_mode = :cash
+        bpm.strategy = :wallet_auto_debit
         bpm.workflow_status = :confirmed
       end
     }
