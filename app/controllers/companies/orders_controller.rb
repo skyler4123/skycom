@@ -85,7 +85,7 @@ class Companies::OrdersController < Companies::ApplicationController
       :code,
       :business_type,
       :workflow_status,
-      :currency_code,
+      :currency,
       :category_id,
       :customer_id,
       *property_keys
@@ -96,7 +96,7 @@ class Companies::OrdersController < Companies::ApplicationController
     order.as_json(only: [
       :id, :name, :description, :code,
       :lifecycle_status, :workflow_status, :business_type,
-      :currency_code, :category_id, :customer_id,
+      :currency, :category_id, :customer_id,
       :created_at, :updated_at,
       *property_keys
     ]).merge(

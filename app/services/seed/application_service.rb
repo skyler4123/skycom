@@ -29,7 +29,7 @@ class Seed::ApplicationService
     System.find_or_create_by!(code: "System") do |sa|
       sa.name = "System"
       sa.balance_cents = 0
-      sa.currency_code = :usd
+      sa.currency = :usd
     end
     Seed::PaymentMethodService.create # Ensure global payment methods are seeded first
     Seed::BillingPaymentMethodService.create # Seed B2B billing payment methods
@@ -50,20 +50,20 @@ class Seed::ApplicationService
       user: user_1, name: "Grocery 1", email: "retail_us@company1.com",
       description: "A group for multiple retail branch branches",
       business_type: RETAIL_INIT_COMPANY_GROUP_BUSINESS_TYPE,
-      country_code: :us, currency_code: :usd, timezone: :minus_5
+      country: :us, currency: :usd, timezone: :minus_5
     )
     company_2 = Seed::CompanyService.create(
       user: user_2, name: "Grocery VN", email: "retail_vn@company2.com",
       description: "A group for multiple retail branch branches",
       business_type: RETAIL_INIT_COMPANY_GROUP_BUSINESS_TYPE,
-      country_code: :vn, currency_code: :vnd, timezone: :plus_7,
+      country: :vn, currency: :vnd, timezone: :plus_7,
       address_line_1: "123 Le Loi Street", city: "Ho Chi Minh City"
     )
     company_3 = Seed::CompanyService.create(
       user: user_2, name: "Smile Dental Center", email: "hospital@company3.com",
       description: "A multi-specialty dental clinic group",
       business_type: :hospital,
-      country_code: :vn, currency_code: :vnd, timezone: :plus_7
+      country: :vn, currency: :vnd, timezone: :plus_7
     )
 
     Seed::RetailEnrichService.new(company: company_1, user: user_1, email: "retail_us@company1.com")

@@ -10,12 +10,12 @@ class Seed::HospitalEnrichService
   HOSPITAL_ENRICH_CUSTOMER_COUNTS = { Patient: 50 }.freeze
 
   def initialize(user:, email: Faker::Internet.email, name: nil, company: nil,
-                 country_code: :us, currency_code: :usd, timezone: :minus_5,
+                 country: :us, currency: :usd, timezone: :minus_5,
                  address_line_1: nil, city: nil, postal_code: nil)
     @multi_company_owner = user
     @name = name || company&.name
-    @country_code = country_code || company&.country_code || :us
-    @currency_code = currency_code || company&.currency_code || :usd
+    @country = country || company&.country || :us
+    @currency = currency || company&.currency || :usd
     @timezone = timezone || company&.timezone || :minus_5
     @address_line_1 = address_line_1
     @city = city
@@ -76,8 +76,8 @@ class Seed::HospitalEnrichService
       email: @email,
       description: "A dental clinic group",
       business_type: HOSPITAL_INIT_COMPANY_GROUP_BUSINESS_TYPE,
-      country_code: @country_code,
-      currency_code: @currency_code,
+      country: @country,
+      currency: @currency,
       timezone: @timezone,
       address_line_1: @address_line_1,
       city: @city,
@@ -95,7 +95,7 @@ class Seed::HospitalEnrichService
         company: @company,
         category: branch_categories[i % branch_categories.length]
       )
-      branch.address = Seed::AddressService.create(country_code: @country_code)
+      branch.address = Seed::AddressService.create(country: @country)
       branch.save!
       @branches << branch
     end

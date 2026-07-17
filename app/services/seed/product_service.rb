@@ -26,7 +26,7 @@ class Seed::ProductService
 
     # Convert price to cents using money-rails
     raw_price = price || Faker::Commerce.price(range: 50..2000.0)
-    price_cents = Money.from_amount(raw_price, company.currency_code&.upcase || "USD").cents
+    price_cents = Money.from_amount(raw_price, company.currency&.upcase || "USD").cents
 
     Product.new(
       company: company,

@@ -26,7 +26,7 @@ module Companies::FeatureGatingConcern
     return if current_company.feature_enabled?(key)
 
     display_name = BillingResource.find_by(
-      name: key, resource_type: :addon_feature, country_code: current_company.country_code
+      name: key, resource_type: :addon_feature, country: current_company.country
     )&.description || key.humanize
 
     respond_to do |format|

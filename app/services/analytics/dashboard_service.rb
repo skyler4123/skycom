@@ -33,8 +33,8 @@ module Analytics
       end
     end
 
-    def currency_code
-      code = CURRENCIE_CODES.key(company.currency_code) || :usd
+    def currency
+      code = CURRENCIE_CODES.key(company.currency) || :usd
       code.to_s.upcase
     end
 
@@ -48,7 +48,7 @@ module Analytics
         active_customers: company.customers.count,
         active_employees: company.employees.where(lifecycle_status: :active).count,
         avg_order_value_cents: orders.count.positive? ? (revenue / orders.count).to_i : 0,
-        currency: currency_code
+        currency: currency
       }
     end
 

@@ -27,14 +27,12 @@ class Seed::RetailEnrichService
   ].freeze
 
   def initialize(user:, email: Faker::Internet.email, name: nil, company: nil,
-                 country_code: nil, currency_code: nil, timezone: nil,
+                 country: nil, currency: nil, timezone: nil,
                  address_line_1: nil, city: nil, postal_code: nil)
     @multi_company_owner = user
     @name = name || company&.name
-    @country_code = country_code || company&.country_code || :us
-    @currency_code = currency_code || company&.currency_code || :usd
-    @timezone = timezone || company&.timezone || :minus_5
-    @currency_code = currency_code || company&.currency_code || :usd
+    @country = country || company&.country || :us
+    @currency = currency || company&.currency || :usd
     @timezone = timezone || company&.timezone || :minus_5
     @address_line_1 = address_line_1
     @city = city
@@ -110,8 +108,8 @@ class Seed::RetailEnrichService
       email: @email,
       description: "A group for multiple retail branch branches",
       business_type: RETAIL_INIT_COMPANY_GROUP_BUSINESS_TYPE,
-      country_code: @country_code,
-      currency_code: @currency_code,
+      country: @country,
+      currency: @currency,
       timezone: @timezone,
       address_line_1: @address_line_1,
       city: @city,
@@ -136,7 +134,7 @@ class Seed::RetailEnrichService
         category: branch_categories[i % branch_categories.length]
       )
       branch.attach_tag(key: "Branch #{branch.id} Tag")
-      branch.address = Seed::AddressService.create(country_code: @country_code)
+      branch.address = Seed::AddressService.create(country: @country)
       branch.save!
 
       @branches << branch
@@ -231,8 +229,8 @@ class Seed::RetailEnrichService
   end
 
   def appoint_payment_methods_to_company
-    country_code_value = COUNTRY_CODES[@country_code.to_s.to_sym] || @country_code
-    country_methods = PaymentMethod.where(country_code: country_code_value)
+    country_value = COUNTRY_CODES[@country.to_s.to_sym] || @country
+    country_methods = PaymentMethod.where(country: country_value)
 
     @branches.each do |branch|
       country_methods.each do |pm|

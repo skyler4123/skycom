@@ -8,8 +8,8 @@ class Seed::BranchService
     code: nil,
     phone_number: nil,
     email: nil,
-    currency_code: nil,
-    country_code: nil,
+    currency: nil,
+    country: nil,
     timezone: nil,
     lifecycle_status: nil,
     workflow_status: nil,
@@ -20,8 +20,8 @@ class Seed::BranchService
     workflow_status ||= Branch.workflow_statuses.keys.sample
     lifecycle_status ||= Branch.lifecycle_statuses.keys.sample
 
-    currency_code ||= company.currency_code
-    country_code ||= company.country_code
+    currency ||= company.currency
+    country ||= company.country
     timezone ||= company.timezone
     name ||= "#{Faker::Company.name} #{branch_type}"
     description ||= Faker::Lorem.sentence(word_count: 10)
@@ -42,8 +42,8 @@ class Seed::BranchService
       code: code,
       phone_number: phone_number,
       email: email,
-      currency_code: currency_code,
-      country_code: country_code,
+      currency: currency,
+      country: country,
       timezone: timezone,
       lifecycle_status: lifecycle_status,
       workflow_status: workflow_status,
