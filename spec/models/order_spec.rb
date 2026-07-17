@@ -14,7 +14,7 @@ RSpec.describe Order, type: :model do
 
   describe "validations" do
     it { should validate_presence_of(:name) }
-    it { should validate_presence_of(:currency_code) }
+    it { should validate_presence_of(:currency) }
     it { should validate_presence_of(:business_type) }
     it { should validate_length_of(:name).is_at_most(255) }
   end
@@ -22,7 +22,7 @@ RSpec.describe Order, type: :model do
   describe "enums" do
     it { should define_enum_for(:lifecycle_status) }
     it { should define_enum_for(:workflow_status) }
-    it { should define_enum_for(:currency_code) }
+    it { should define_enum_for(:currency) }
     it { should define_enum_for(:business_type).with_values(online: 0, in_store: 1, phone: 2) }
   end
   it_behaves_like "property_mapping concern", Order

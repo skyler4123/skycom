@@ -6,7 +6,7 @@ FactoryBot.define do
     association :invoice
     amount_cents { 1000 }
 
-    currency_code { :usd }
+    currency { :usd }
     workflow_status { :completed }
     business_type { :standard_payment }
   end

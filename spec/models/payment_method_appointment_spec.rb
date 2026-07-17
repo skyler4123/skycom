@@ -23,16 +23,16 @@ RSpec.describe PaymentMethodAppointment, type: :model do
   describe "country code validation" do
     let(:company) { create(:company) }
     let(:payment_method) { create(:payment_method) }
-    let(:country_code_us) { COUNTRY_CODES[:us] }
-    let(:country_code_vn) { COUNTRY_CODES[:vn] }
+    let(:country_us) { COUNTRY_CODES[:us] }
+    let(:country_vn) { COUNTRY_CODES[:vn] }
 
     before do
-      company.update_column(:country_code, country_code_us)
+      company.update_column(:country, country_us)
     end
 
     context "when country codes match" do
       before do
-        payment_method.update_column(:country_code, country_code_us)
+        payment_method.update_column(:country, country_us)
       end
 
       it "is valid" do
@@ -43,14 +43,14 @@ RSpec.describe PaymentMethodAppointment, type: :model do
 
     context "when country codes do not match" do
       before do
-        payment_method.update_column(:country_code, country_code_vn)
+        payment_method.update_column(:country, country_vn)
       end
 
       it "is invalid with a mismatch error" do
         appointment = build(:payment_method_appointment, company: company, payment_method: payment_method)
         expect(appointment).not_to be_valid
         expect(appointment.errors[:payment_method]).to include(
-          "country code (#{country_code_vn}) does not match company country code (#{country_code_us})"
+          "country (#{country_vn}) does not match company country (#{country_us})"
         )
       end
     end

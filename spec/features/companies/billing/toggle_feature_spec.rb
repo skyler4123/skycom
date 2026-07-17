@@ -12,7 +12,7 @@ RSpec.feature "Companies::Billing::ToggleFeature", type: :feature, js: true do
     create(:billing_resource, :addon_feature,
       name: "analytics_dashboard",
       description: "Advanced analytics and reporting",
-      country_code: company.country_code)
+      country: company.country)
 
     sign_in(owner)
 

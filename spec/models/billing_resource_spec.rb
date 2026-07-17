@@ -12,7 +12,7 @@ RSpec.describe BillingResource, type: :model do
   describe "validations" do
     subject { build(:billing_resource, name: "unique_test_resource") }
     it { is_expected.to validate_presence_of(:name) }
-    it { is_expected.to validate_uniqueness_of(:name).scoped_to(:country_code) }
+    it { is_expected.to validate_uniqueness_of(:name).scoped_to(:country) }
   end
 
   describe "enums" do

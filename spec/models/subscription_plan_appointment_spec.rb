@@ -10,7 +10,7 @@ RSpec.describe SubscriptionPlanAppointment, type: :model do
   end
 
   describe "enums" do
-    it { should define_enum_for(:country_code) }
+    it { should define_enum_for(:country) }
     it { should define_enum_for(:lifecycle_status) }
     it { should define_enum_for(:workflow_status) }
     it { should define_enum_for(:timezone) }

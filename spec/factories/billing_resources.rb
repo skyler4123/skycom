@@ -5,7 +5,7 @@ FactoryBot.define do
     name { "test_resource" }
     description { "Test billing resource" }
     resource_type { :volumetric }
-    country_code { :us }
+    country { :us }
 
     trait :addon_feature do
       resource_type { :addon_feature }
@@ -16,7 +16,7 @@ FactoryBot.define do
     end
 
     trait :vn do
-      country_code { :vn }
+      country { :vn }
     end
   end
 end

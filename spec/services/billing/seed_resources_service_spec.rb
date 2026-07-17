@@ -19,22 +19,22 @@ RSpec.describe Billing::SeedResourcesService do
 
     it "creates an orders resource for US" do
       described_class.call
-      expect(BillingResource.find_by(name: "orders", country_code: :us)).to be_present
+      expect(BillingResource.find_by(name: "orders", country: :us)).to be_present
     end
 
     it "creates an orders resource for VN" do
       described_class.call
-      expect(BillingResource.find_by(name: "orders", country_code: :vn)).to be_present
+      expect(BillingResource.find_by(name: "orders", country: :vn)).to be_present
     end
 
     it "creates an analytics_dashboard resource for US" do
       described_class.call
-      expect(BillingResource.find_by(name: "analytics_dashboard", country_code: :us)).to be_present
+      expect(BillingResource.find_by(name: "analytics_dashboard", country: :us)).to be_present
     end
 
     it "creates an analytics_dashboard resource for VN" do
       described_class.call
-      expect(BillingResource.find_by(name: "analytics_dashboard", country_code: :vn)).to be_present
+      expect(BillingResource.find_by(name: "analytics_dashboard", country: :vn)).to be_present
     end
   end
 end
