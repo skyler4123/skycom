@@ -31,9 +31,9 @@ class Admin::CompaniesController < Admin::ApplicationController
     company.as_json(only: [
       :id, :name, :description, :code,
       :business_type, :lifecycle_status, :workflow_status,
-      :ownership_type, :currency_code, :timezone,
+      :ownership_type, :currency, :timezone,
       :email, :phone_number, :website,
-      :city, :country_code, :employee_count,
+      :city, :country, :employee_count,
       :registration_number, :vat_id, :tax_id,
       :created_at, :updated_at
     ]).merge(

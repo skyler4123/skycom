@@ -7,8 +7,8 @@ module OrderProcessingV1
         order_id: order.id,
         name: "Invoice for Order #{order.id}",
         code: "INV-#{Time.current.to_i}-#{SecureRandom.hex(3).upcase}",
-        total_price: order.order_appointments.sum(:total_price) || 0,
-        currency_code: order.currency_code,
+        price_cents: (order.order_appointments.sum(:total_price) * 100).to_i || 0,
+        currency: order.currency,
         workflow_status: :paid,
         business_type: :sales
       )
@@ -17,8 +17,8 @@ module OrderProcessingV1
         company_id: order.company_id,
         branch_id: order.branch_id,
         invoice_id: invoice.id,
-        amount_cents: invoice.total_price_cents,
-        currency_code: order.currency_code,
+        price_cents: invoice.price_cents,
+        currency: order.currency,
         workflow_status: :completed,
         business_type: :standard_payment
       )

@@ -4,7 +4,7 @@ class Task < ApplicationRecord
 
   attribute :permission_resource_name, :string, default: -> { self.name }
 
-  enum :country_code, COUNTRY_CODES, prefix: true, default: :us
+  enum :country, COUNTRY_CODES, prefix: true, default: :us
   enum :timezone, TIMEZONES, prefix: true, default: :utc
 
   include TagConcern
@@ -26,11 +26,7 @@ class Task < ApplicationRecord
     administrative: 2
   }
 
-  enum :currency_code, {
-    usd: 0,
-    eur: 1,
-    gbp: 2
-  }, default: :usd
+  enum :currency, CURRENCIE_CODES, prefix: true, default: :usd
 
   # --- Validations ---
   validates :name, presence: true, uniqueness: { scope: :company_id }, length: { maximum: 255 }

@@ -17,7 +17,7 @@ class CreateUsers < ActiveRecord::Migration[8.0]
       t.string :last_name
       t.string :avatar
       t.string :phone_number
-      t.integer :country_code
+      t.integer :country
       t.string :single_access_token
 
       # --- System Fields ---

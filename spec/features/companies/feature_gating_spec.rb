@@ -48,7 +48,7 @@ RSpec.feature "Feature Gating", type: :feature, js: true do
   end
 
   def create_billing_resource(name)
-    create(:billing_resource, :addon_feature, name: name, country_code: company.country_code)
+    create(:billing_resource, :addon_feature, name: name, country: company.country)
   end
 
   def enable_feature(name)
@@ -196,7 +196,7 @@ RSpec.feature "Feature Gating", type: :feature, js: true do
   describe "feature store toggling" do
     before do
       Rails.local_cache.clear
-      create(:billing_resource, :addon_feature, name: "hrm_attendance", country_code: company.country_code)
+      create(:billing_resource, :addon_feature, name: "hrm_attendance", country: company.country)
     end
 
     scenario "toggling a feature OFF hides it from sidebar after reload" do

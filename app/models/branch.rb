@@ -47,7 +47,7 @@ class Branch < ApplicationRecord
   # has_many :child_branches, class_name: "Company", foreign_key: "parent_branch_id", dependent: :destroy, inverse_of: :parent_company
 
   # --- Enums ---
-  enum :country_code, COUNTRY_CODES, prefix: true, default: :us
+  enum :country, COUNTRY_CODES, prefix: true, default: :us
   enum :business_type, {
     # Physical Points of Sale
     storefront: 0,        # Main retail/customer-facing shop
@@ -71,7 +71,7 @@ class Branch < ApplicationRecord
     virtual: 99           # Online-only branch
   }, prefix: true
   enum :timezone, TIMEZONES, prefix: true, default: :utc
-  enum :currency_code, CURRENCIE_CODES, prefix: true, default: :usd
+  enum :currency, CURRENCIE_CODES, prefix: true, default: :usd
   enum :lifecycle_status, LIFECYCLE_STATUS, prefix: true
   enum :workflow_status, WORKFLOW_STATUS, prefix: true
 
@@ -115,6 +115,6 @@ class Branch < ApplicationRecord
     return unless company
 
     self.timezone ||= company.timezone
-    self.currency_code ||= company.currency_code
+      self.currency ||= company.currency
   end
 end

@@ -5,8 +5,8 @@ require "rails_helper"
 RSpec.describe Company::BillingConcern do
   subject(:company) { create(:company) }
 
-  let!(:billing_resource) { create(:billing_resource, :addon_feature, name: "inventory_advanced", country_code: company.country_code) }
-  let!(:volumetric_resource) { create(:billing_resource, :volumetric, name: "orders", country_code: company.country_code) }
+  let!(:billing_resource) { create(:billing_resource, :addon_feature, name: "inventory_advanced", country: company.country) }
+  let!(:volumetric_resource) { create(:billing_resource, :volumetric, name: "orders", country: company.country) }
   let!(:billing_contract) { company.active_billing_contract }
 
   before do

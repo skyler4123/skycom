@@ -24,9 +24,9 @@ class Companies::DashboardsController < Companies::ApplicationController
   def format_company(company)
     company.as_json(only: %i[
       id name description code business_type ownership_type
-      currency_code timezone lifecycle_status workflow_status
+      currency timezone lifecycle_status workflow_status
       registration_number vat_id tax_id email phone_number website
-      address_line_1 city postal_code country_code
+      address_line_1 city postal_code country
       employee_count fiscal_year_end_month created_at
     ]).merge(
       owner: company.user&.as_json(only: %i[id email first_name last_name])

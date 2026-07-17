@@ -3,8 +3,8 @@ require "rails_helper"
 RSpec.describe "Admin::PaymentMethods", type: :request do
   let(:admin) { create(:user, :admin) }
   let(:company_owner) { create(:user, :company_owner) }
-  let!(:payment_method1) { create(:payment_method, business_type: :b2c, country_code: 840) }
-  let!(:payment_method2) { create(:payment_method, business_type: :b2b, country_code: 704) }
+  let!(:payment_method1) { create(:payment_method, business_type: :b2c, country: 840) }
+  let!(:payment_method2) { create(:payment_method, business_type: :b2b, country: 704) }
 
   let(:json_headers) { { "ACCEPT" => "application/json" } }
 
@@ -46,7 +46,7 @@ RSpec.describe "Admin::PaymentMethods", type: :request do
         expect(pm).to have_key("name")
         expect(pm).to have_key("code")
         expect(pm).to have_key("business_type")
-        expect(pm).to have_key("country_code")
+        expect(pm).to have_key("country")
         expect(pm).to have_key("lifecycle_status")
       end
     end
@@ -99,7 +99,7 @@ RSpec.describe "Admin::PaymentMethods", type: :request do
             name: "Test Method",
             code: "TEST_METHOD",
             business_type: "b2c",
-            country_code: "us",
+            country: "us",
             payment_mode: "redirect",
             gateway_url: "http://localhost:4000/api/v1/bank/redirect-session"
           }
@@ -116,7 +116,7 @@ RSpec.describe "Admin::PaymentMethods", type: :request do
             name: "",
             code: "",
             business_type: "b2c",
-            country_code: "us",
+            country: "us",
             payment_mode: ""
           }
         }

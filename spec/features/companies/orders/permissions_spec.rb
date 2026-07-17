@@ -157,7 +157,7 @@ RSpec.feature "Companies::Orders Permissions", type: :feature, js: true do
             { name: "Refunded", value: "refunded" },
             { name: "Failed", value: "failed" }
           ],
-          currency_codes: [
+          currencies: [
             { name: "usd", value: "usd" },
             { name: "vnd", value: "vnd" }
           ] }

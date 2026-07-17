@@ -7,8 +7,8 @@ class CreateSystems < ActiveRecord::Migration[8.0]
       t.string :code, null: false, comment: "System"
 
       t.integer :balance_cents, null: false
-      t.integer :currency_code
-      t.integer :country_code
+      t.integer :currency
+      t.integer :country
 
       t.boolean :active, null: false
 

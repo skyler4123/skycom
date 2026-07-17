@@ -13,7 +13,7 @@ module User::OmniauthConcern
           email: auth_data.info.email,
           verified: true, # Google emails are pre-verified
           system_role: :company_employee,
-          country_code: "vn" # Default fallback matching your schema context
+          country: "vn"
         )
       else
         # Ensure provider and uid are synced if they logged in via email previously

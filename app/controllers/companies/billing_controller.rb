@@ -47,7 +47,7 @@ class Companies::BillingController < Companies::ApplicationController
       return render(json: { errors: [ "Core features cannot be toggled" ] }, status: :unprocessable_content)
     end
 
-    resource = BillingResource.addon_feature.find_by!(name: feature_key, country_code: current_company.country_code)
+    resource = BillingResource.addon_feature.find_by!(name: feature_key, country: current_company.country)
     contract = current_company.active_billing_contract
 
     unless contract
@@ -85,7 +85,7 @@ class Companies::BillingController < Companies::ApplicationController
     days_elapsed = (Date.current - period_start).to_i + 1
     days_remaining = (period_end - Date.current).to_i
 
-    currency = company.currency_code.to_s.upcase
+    currency = company.currency.to_s.upcase
 
     w = company.billing_wallet
     wallet = {
@@ -150,7 +150,7 @@ class Companies::BillingController < Companies::ApplicationController
       active_feature_ids = contract.contract_features.active.pluck(:billing_resource_id).to_set
 
       catalog_addon_features = BillingResource.addon_feature
-                                              .where(country_code: company.country_code)
+                                              .where(country: company.country)
                                               .order(:name)
                                               .map do |resource|
         is_active = active_feature_ids.include?(resource.id)

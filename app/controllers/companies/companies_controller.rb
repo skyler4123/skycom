@@ -18,13 +18,13 @@ class Companies::CompaniesController < Companies::ApplicationController
   private
 
   def company_params
-    params.require(:company).permit(:name, :description, :email, :phone_number, :website, :timezone, :currency_code)
+    params.require(:company).permit(:name, :description, :email, :phone_number, :website, :timezone, :currency)
   end
 
   def format_company
     current_company.as_json(only: [
       :id, :name, :description, :email, :phone_number, :website,
-      :timezone, :currency_code, :business_type, :country_code
+      :timezone, :currency, :business_type, :country
     ])
   end
 end

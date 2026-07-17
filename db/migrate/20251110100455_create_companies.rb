@@ -6,7 +6,7 @@ class CreateCompanies < ActiveRecord::Migration[8.0]
       t.string :description
       t.string :code
       t.integer :ownership_type
-      t.integer :currency_code
+      t.integer :currency
       t.string :registration_number
       t.string :vat_id
       t.string :tax_id
@@ -14,7 +14,7 @@ class CreateCompanies < ActiveRecord::Migration[8.0]
       t.string :address_line_1
       t.string :city
       t.string :postal_code
-      t.integer :country_code
+      t.integer :country
       t.string :email
       t.string :phone_number
       t.string :website

@@ -96,7 +96,7 @@ class Companies::BranchesController < Companies::ApplicationController
       :description,
       :business_type,
       :workflow_status,
-      :country_code,
+      :country,
       :phone_number,
       :email,
       :category_id,
@@ -108,7 +108,7 @@ class Companies::BranchesController < Companies::ApplicationController
     branch.as_json(only: [
       :id, :name, :description, :code, :category_id,
       :business_type, :lifecycle_status, :workflow_status,
-      :country_code, :phone_number, :email,
+      :country, :phone_number, :email,
       :created_at, :updated_at,
       :property_string_1, :property_string_2, :property_string_3, :property_string_4, :property_string_5,
       :property_string_6, :property_string_7, :property_string_8, :property_string_9, :property_string_10,
@@ -124,7 +124,7 @@ class Companies::BranchesController < Companies::ApplicationController
       :property_datetime_1, :property_datetime_2, :property_datetime_3, :property_datetime_4, :property_datetime_5,
       :property_datetime_6, :property_datetime_7, :property_datetime_8, :property_datetime_9, :property_datetime_10
     ]).merge(
-      address: branch.address&.as_json(only: [ :line_1, :line_2, :city, :state_or_province, :postal_code, :country_code ]),
+      address: branch.address&.as_json(only: [ :line_1, :line_2, :city, :state_or_province, :postal_code, :country ]),
       category: branch.category&.as_json(only: [ :id, :name ])
     )
   end

@@ -19,7 +19,7 @@ module Billing
     def self.call
       BILLING_COUNTRIES.each do |country|
         BILLING_VOLUMETRIC_RESOURCES.each do |name, description|
-          BillingResource.find_or_create_by!(name: name.to_s, country_code: country[:code]) do |r|
+          BillingResource.find_or_create_by!(name: name.to_s, country: country[:code]) do |r|
             r.description = description
             r.resource_type = :volumetric
             r.price_cents = 0
@@ -29,7 +29,7 @@ module Billing
 
         BILLING_ADDON_FEATURES.each do |name, description|
           prices = BILLING_PRICES_BY_COUNTRY[country[:code]]
-          BillingResource.find_or_create_by!(name: name.to_s, country_code: country[:code]) do |r|
+          BillingResource.find_or_create_by!(name: name.to_s, country: country[:code]) do |r|
             r.description = description
             r.resource_type = :addon_feature
             r.price_cents = prices[name]

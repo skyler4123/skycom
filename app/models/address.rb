@@ -13,8 +13,7 @@ class Address < ApplicationRecord
   has_many :departments, through: :address_appointments, source: :appoint_to, source_type: "Department"
 
   # 1. Validations
-  validates :line_1, :city, :country_code, presence: true
-  validates :country_code, length: { is: 2 }
+  validates :line_1, :city, :country, presence: true
 
   # Ensure the fingerprint is unique
   validates :fingerprint, uniqueness: true
@@ -23,7 +22,7 @@ class Address < ApplicationRecord
   # Calculate fingerprint before checking validation or saving
   before_validation :generate_fingerprint
 
-  enum :country_code, COUNTRY_CODES, prefix: true, default: :us
+  enum :country, COUNTRY_CODES, prefix: true, default: :us
 
   # 4. Fingerprint Generator
   # Normalizes text (downcase, strip) and hashes it
@@ -36,7 +35,7 @@ class Address < ApplicationRecord
       city,
       state_or_province,
       postal_code,
-      country_code
+      country
     ].map { |val| val.to_s.strip.downcase }
 
     raw_string = components.join("|")

@@ -19,6 +19,11 @@ class ContractFeature < ApplicationRecord
                                                 message: "is already assigned to this contract" }
   validates :monthly_flat_price_cents, presence: true, numericality: { greater_than_or_equal_to: 0 }
 
+  monetize :price_cents,
+           as: "price",
+           with_model_currency: :currency,
+           disable_validation: true
+
   enum :lifecycle_status, { active: 0, disabled: 1 }, default: :active
   enum :currency, CURRENCIE_CODES, prefix: true, default: :usd
 

@@ -16,7 +16,7 @@ module OrderProcessingV1
         customer: order_customer,
         name: "POS Order #{Time.current.to_i}",
         workflow_status: :pending,
-        currency_code: :usd,
+        currency: :usd,
         business_type: :in_store
       )
 

@@ -23,7 +23,7 @@ RSpec.feature "Companies::Companies Edit", type: :feature, js: true do
 
     expect(page).to have_selector('input[name="company[name]"]', wait: 10)
     expect(page).to have_selector('select[name="company[timezone]"]', wait: 5)
-    expect(page).to have_selector('select[name="company[currency_code]"]', wait: 5)
+    expect(page).to have_selector('select[name="company[currency]"]', wait: 5)
   end
 
   scenario "owner can update company name" do

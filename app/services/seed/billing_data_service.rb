@@ -61,7 +61,7 @@ module Seed
 
     def attach_paid_features(contract)
       PAID_FEATURE_NAMES.each do |name|
-        resource = BillingResource.find_by(name: name, country_code: company.country_code)
+        resource = BillingResource.find_by(name: name, country: company.country)
         next unless resource&.addon_feature?
 
         ContractFeature.find_or_create_by!(
@@ -135,7 +135,7 @@ module Seed
           company: company,
           billing_contract: company.active_billing_contract,
           price_cents: pair[:price],
-          currency: company.currency_code,
+          currency: company.currency,
           movement_type: :charge,
           target_balance: :main_balance,
           created_by: :system,
@@ -161,7 +161,7 @@ module Seed
           billing_payment_method: BillingPaymentMethod.find_by!(code: "WALLET_AUTO_DEBIT"),
           transaction_type: :deduction,
           amount_cents: pair[:price],
-          currency: company.currency_code,
+          currency: company.currency,
           balance_before_cents: wallet.main_balance_cents,
           balance_after_cents: wallet.main_balance_cents,
           promo_balance_before_cents: promo_before,

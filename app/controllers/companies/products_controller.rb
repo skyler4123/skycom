@@ -91,7 +91,7 @@ class Companies::ProductsController < Companies::ApplicationController
 
     params.require(:product).permit(
       :name, :description, :business_type, :workflow_status, :category_id,
-      :price_cents, :currency_code,
+      :price_cents, :currency,
       *property_keys
     )
   end
@@ -101,7 +101,7 @@ class Companies::ProductsController < Companies::ApplicationController
       :id, :name, :description, :code, :category_id,
       :lifecycle_status, :workflow_status, :business_type,
       :created_at, :updated_at,
-      :price_cents, :currency_code,
+      :price_cents, :currency,
       :property_string_1, :property_string_2, :property_string_3, :property_string_4, :property_string_5,
       :property_string_6, :property_string_7, :property_string_8, :property_string_9, :property_string_10,
       :property_text_1, :property_text_2, :property_text_3, :property_text_4, :property_text_5,

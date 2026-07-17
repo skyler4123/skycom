@@ -64,7 +64,7 @@ class ClientCacheController < ApplicationController
               lifecycle_statuses: Order.lifecycle_statuses.keys.map { |s| { name: s.humanize, value: s } },
               workflow_statuses: Order.workflow_statuses.keys.map { |s| { name: s.humanize, value: s } },
               business_types: Order.business_types.keys.map { |t| { name: t.humanize, value: t } },
-              currency_codes: Order.currency_codes.keys.map { |c| { name: c.humanize, value: c } }
+              currencies: Order.currencies.keys.map { |c| { name: c.humanize, value: c } }
             },
             customer: {
               lifecycle_statuses: Customer.lifecycle_statuses.keys.map { |s| { name: s.humanize, value: s } },
@@ -75,7 +75,7 @@ class ClientCacheController < ApplicationController
               lifecycle_statuses: Invoice.lifecycle_statuses.keys.map { |s| { name: s.humanize, value: s } },
               workflow_statuses: Invoice.workflow_statuses.keys.map { |s| { name: s.humanize, value: s } },
               business_types: Invoice.business_types.keys.map { |t| { name: t.humanize, value: t } },
-              currency_codes: Invoice.currency_codes.keys.map { |c| { name: c.humanize, value: c } }
+              currencies: Invoice.currencies.keys.map { |c| { name: c.humanize, value: c } }
             },
             company: {
               business_types: Company.business_types.keys.map { |t| { name: t.humanize, value: t } }

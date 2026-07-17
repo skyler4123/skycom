@@ -8,7 +8,9 @@ class CreateSubscriptionPlanAppointments < ActiveRecord::Migration[8.0]
 
       t.string :name
       t.string :description
-      t.integer :country_code, null: false
+      t.integer :price_cents
+      t.integer :currency
+      t.integer :country, null: false
       t.integer :timezone
       t.boolean :auto_renew
 

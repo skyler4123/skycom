@@ -11,7 +11,7 @@ class Seed::UserService
     first_name: Faker::Name.first_name,
     last_name: Faker::Name.last_name,
     phone_number: Faker::PhoneNumber.phone_number,
-    country_code: User.country_codes.keys.sample,
+    country: User.countries.keys.sample,
     index: nil
   )
     email ||= "#{email}#{index}@example.com"
@@ -26,7 +26,7 @@ class Seed::UserService
       first_name: first_name,
       last_name: last_name,
       phone_number: phone_number,
-      country_code: country_code,
+      country: country,
       verified: verified
     )
   end

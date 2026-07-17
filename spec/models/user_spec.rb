@@ -35,7 +35,7 @@ describe "name uniqueness" do
 
   describe "enums" do
     it { should define_enum_for(:system_role).with_values(super_admin: 0, admin: 1, company_owner: 2, company_employee: 3, company_customer: 4).with_prefix(:system_role) }
-    it { should define_enum_for(:country_code) }
+    it { should define_enum_for(:country) }
   end
 
   describe "#company_owner" do

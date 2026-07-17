@@ -48,7 +48,7 @@ export default class Companies_Orders_EditController extends Companies_LayoutCon
     const companyId = window.location.pathname.split("/")[2]
     const businessTypes = Enums()?.order?.business_types || []
     const workflowStatuses = Enums()?.order?.workflow_statuses || []
-    const currencyCodes = Enums()?.order?.currency_codes || []
+    const currencyCodes = Enums()?.order?.currencies || []
 
     const dynamicFields = this.propertyMetadata.length > 0 ? `
       <div class="border-t border-slate-200 dark:border-gray-800 pt-6 mt-6">
@@ -131,9 +131,9 @@ export default class Companies_Orders_EditController extends Companies_LayoutCon
 
           <div class="space-y-1">
             <label class="text-xs font-medium text-slate-500">${translate("Currency")}</label>
-            <select name="order[currency_code]"
+            <select name="order[currency]"
               class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-sm">
-              ${selectOptionsHTML(currencyCodes, o.currency_code)}
+              ${selectOptionsHTML(currencyCodes, o.currency)}
             </select>
           </div>
 

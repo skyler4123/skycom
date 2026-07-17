@@ -4,9 +4,9 @@ class Product < ApplicationRecord
   include PropertyMappingConcern
   attribute :permission_resource_name, :string, default: -> { self.name }
 
-  enum :country_code, COUNTRY_CODES, prefix: true, default: :us
+  enum :country, COUNTRY_CODES, prefix: true, default: :us
   enum :timezone, TIMEZONES, prefix: true, default: :utc
-  enum :currency_code, CURRENCIE_CODES, prefix: true, default: :usd
+  enum :currency, CURRENCIE_CODES, prefix: true, default: :usd
 
   # money-rails integration
   monetize :price_cents,
@@ -60,6 +60,6 @@ class Product < ApplicationRecord
   validates :price_cents, numericality: { only_integer: true, greater_than_or_equal_to: 0, allow_nil: true }
 
   def price_currency
-    currency_code&.upcase || "USD"
+    currency&.upcase || "USD"
   end
 end

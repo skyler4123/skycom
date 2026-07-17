@@ -21,7 +21,7 @@ RSpec.describe "Companies::Analytics", type: :request do
         resource = BillingResource.find_or_create_by!(
           name: "analytics_dashboard",
           resource_type: :addon_feature,
-          country_code: company.country_code
+          country: company.country
         )
         contract = company.active_billing_contract
         contract.contract_features.find_or_create_by!(billing_resource: resource) do |cf|
@@ -59,7 +59,7 @@ RSpec.describe "Companies::Analytics", type: :request do
         BillingResource.find_or_create_by!(
           name: "analytics_dashboard",
           resource_type: :addon_feature,
-          country_code: company.country_code
+          country: company.country
         )
       end
 

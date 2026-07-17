@@ -16,6 +16,11 @@
 class BillingInvoice < ApplicationRecord
   attribute :price_cents, :integer, default: 0
 
+  monetize :price_cents,
+           as: "price",
+           with_model_currency: :currency,
+           disable_validation: true
+
   belongs_to :company
   belongs_to :billing_contract
   has_many :billing_transactions

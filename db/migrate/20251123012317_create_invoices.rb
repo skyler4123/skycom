@@ -13,10 +13,10 @@ class CreateInvoices < ActiveRecord::Migration[8.0]
       t.text   :description
       t.string :code, index: { unique: true }
       t.string :phone_number
-      t.decimal :total_price, precision: 15, scale: 2
       t.datetime :due_date
-      t.integer :currency_code
-      t.integer :country_code
+      t.integer :price_cents
+      t.integer :currency
+      t.integer :country
       t.integer  :timezone
 
       # --- System Fields ---

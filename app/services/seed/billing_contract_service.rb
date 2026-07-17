@@ -28,7 +28,7 @@ module Seed
 
     def self.attach_volumetric_metrics(contract, company)
       DEFAULT_FREE_TIER_ALLOWANCES.each do |resource_name, config|
-        resource = BillingResource.find_by(name: resource_name.to_s, country_code: company.country_code)
+        resource = BillingResource.find_by(name: resource_name.to_s, country: company.country)
         next unless resource&.volumetric?
 
         ContractMetric.find_or_create_by!(
@@ -45,7 +45,7 @@ module Seed
 
     def self.attach_core_features(contract, company)
       CORE_FREE_FEATURES.each do |feature_name|
-        resource = BillingResource.find_by(name: feature_name, country_code: company.country_code)
+        resource = BillingResource.find_by(name: feature_name, country: company.country)
         next unless resource&.addon_feature?
 
         ContractFeature.find_or_create_by!(

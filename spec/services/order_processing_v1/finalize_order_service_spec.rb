@@ -30,7 +30,7 @@ RSpec.describe OrderProcessingV1::FinalizeOrderService do
         property_mapping: order_pm,
         name: "Test Order",
         business_type: :online,
-        currency_code: :usd,
+        currency: :usd,
         workflow_status: :paid
       )
     end

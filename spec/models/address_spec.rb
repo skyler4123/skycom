@@ -17,10 +17,10 @@ RSpec.describe Address, type: :model do
   describe "validations" do
     it { should validate_presence_of(:line_1) }
     it { should validate_presence_of(:city) }
-    it { should validate_presence_of(:country_code) }
+    it { should validate_presence_of(:country) }
   end
 
   describe "enums" do
-    it { should define_enum_for(:country_code) }
+    it { should define_enum_for(:country) }
   end
 end

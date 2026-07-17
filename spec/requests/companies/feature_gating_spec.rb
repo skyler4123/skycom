@@ -23,7 +23,7 @@ RSpec.describe "Feature Gating API", type: :request do
 
   describe "GET /companies/:id/employees.json when feature is disabled" do
     let!(:hrm_resource) do
-      create(:billing_resource, :addon_feature, name: "hrm_attendance", country_code: company.country_code)
+      create(:billing_resource, :addon_feature, name: "hrm_attendance", country: company.country)
     end
 
     it "returns 403 Forbidden" do
@@ -52,7 +52,7 @@ RSpec.describe "Feature Gating API", type: :request do
 
   describe "GET /companies/:id/employees.json when feature is enabled" do
     let!(:hrm_resource) do
-      create(:billing_resource, :addon_feature, name: "hrm_attendance", country_code: company.country_code)
+      create(:billing_resource, :addon_feature, name: "hrm_attendance", country: company.country)
     end
     let(:contract) { company.active_billing_contract }
 
@@ -114,7 +114,7 @@ RSpec.describe "Feature Gating API", type: :request do
       end
 
       it "returns 422 with error message" do
-        create(:billing_resource, :addon_feature, name: "analytics_dashboard", country_code: company.country_code)
+        create(:billing_resource, :addon_feature, name: "analytics_dashboard", country: company.country)
         post "/companies/#{company.id}/billing/toggle_feature", params: { feature_key: "analytics_dashboard" }, as: :json
         expect(response).to have_http_status(:unprocessable_content)
         body = JSON.parse(response.body)
@@ -132,7 +132,7 @@ RSpec.describe "Feature Gating API", type: :request do
 
     context "when toggling ON a disabled addon feature (first time)" do
       let!(:resource) do
-        create(:billing_resource, :addon_feature, name: "analytics_dashboard", country_code: company.country_code)
+        create(:billing_resource, :addon_feature, name: "analytics_dashboard", country: company.country)
       end
 
       it "returns 200 and active: true" do
@@ -153,7 +153,7 @@ RSpec.describe "Feature Gating API", type: :request do
 
     context "when toggling OFF an active addon feature" do
       let!(:resource) do
-        create(:billing_resource, :addon_feature, name: "analytics_dashboard", country_code: company.country_code)
+        create(:billing_resource, :addon_feature, name: "analytics_dashboard", country: company.country)
       end
       let!(:contract_feature) do
         create(:contract_feature, billing_contract: contract, billing_resource: resource, lifecycle_status: :active)
@@ -180,7 +180,7 @@ RSpec.describe "Feature Gating API", type: :request do
 
     context "when toggling ON a disabled addon feature (previously disabled)" do
       let!(:resource) do
-        create(:billing_resource, :addon_feature, name: "analytics_dashboard", country_code: company.country_code)
+        create(:billing_resource, :addon_feature, name: "analytics_dashboard", country: company.country)
       end
       let!(:contract_feature) do
         create(:contract_feature, billing_contract: contract, billing_resource: resource, lifecycle_status: :disabled)
@@ -201,7 +201,7 @@ RSpec.describe "Feature Gating API", type: :request do
 
     context "when feature exists only for a different country" do
       let(:company) do
-        create(:company).tap { |c| c.update!(country_code: :us) }
+        create(:company).tap { |c| c.update!(country: :us) }
       end
       let(:owner_user) { company.reload.user }
 
@@ -218,14 +218,14 @@ RSpec.describe "Feature Gating API", type: :request do
 
     context "when feature exists for both countries but only enabled on correct one" do
       let(:company) do
-        create(:company).tap { |c| c.update!(country_code: :us) }
+        create(:company).tap { |c| c.update!(country: :us) }
       end
       let(:owner_user) { company.reload.user }
       let!(:us_resource) do
-        create(:billing_resource, :addon_feature, name: "analytics_dashboard", country_code: :us)
+        create(:billing_resource, :addon_feature, name: "analytics_dashboard", country: :us)
       end
       let!(:vn_resource) do
-        create(:billing_resource, :addon_feature, name: "analytics_dashboard", country_code: :vn)
+        create(:billing_resource, :addon_feature, name: "analytics_dashboard", country: :vn)
       end
       let(:contract) { company.active_billing_contract }
 
@@ -243,7 +243,7 @@ RSpec.describe "Feature Gating API", type: :request do
 
     context "when toggling by an unauthorized user" do
       let!(:resource) do
-        create(:billing_resource, :addon_feature, name: "analytics_dashboard", country_code: company.country_code)
+        create(:billing_resource, :addon_feature, name: "analytics_dashboard", country: company.country)
       end
       let(:other_user) { create(:user) }
 
