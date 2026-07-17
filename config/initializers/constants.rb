@@ -44,6 +44,40 @@ WORKFLOW_STATUS = {
   failed: 8
 }
 
+GATEWAY_STRATEGIES = {
+  # System payments (value < 10 — no external gateway call)
+  cash: 0,
+  wallet_auto_debit: 1,
+  # External gateway strategies (value >= 10)
+  mock_qr_gateway: 10,
+  mock_redirect_gateway: 11,
+  stripe_gateway: 12,
+  viet_qr_gateway: 13
+}.freeze
+
+GATEWAY_STRATEGY_CLASSES = {
+  cash: "Payments::Cash",
+  wallet_auto_debit: "Payments::WalletAutoDebit",
+  mock_qr_gateway: "Payments::MockQrGateway",
+  mock_redirect_gateway: "Payments::MockRedirectGateway",
+  stripe_gateway: "Payments::StripeGateway",
+  viet_qr_gateway: "Payments::VietQrGateway"
+}.freeze
+
+# Gateway connection config — stored in code, not DB.
+GATEWAY_CONFIGS = {
+  mock_qr_gateway: {
+    gateway_url: "http://localhost:4000/api/v1/bank/qr-generate",
+    secret_key: "local_secure_dev_secret"
+  },
+  mock_redirect_gateway: {
+    gateway_url: "http://localhost:4000/api/v1/bank/redirect-session",
+    secret_key: "local_secure_dev_secret"
+  },
+  stripe_gateway:   { gateway_url: nil, secret_key: nil },
+  viet_qr_gateway:  { gateway_url: nil, secret_key: nil }
+}.freeze
+
 # =============================================================================
 # Image & Avatar Constraints
 # Applied across 7 model concerns (Branch, Brand, Customer, Department,

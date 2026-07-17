@@ -101,7 +101,7 @@ RSpec.describe "Admin::PaymentMethods", type: :request do
             business_type: "b2c",
             country: "us",
             payment_mode: "redirect",
-            gateway_url: "http://localhost:4000/api/v1/bank/redirect-session"
+            strategy: "mock_redirect_gateway"
           }
         }
 

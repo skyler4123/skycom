@@ -1195,3 +1195,98 @@ Day 3: Owner transfers $15, support credits main_balance
 | `docs/ORDER_PROCESSING_V1.md` | POS order pipeline documentation |
 | `docs/BILLING_DASHBOARD.md` | Billing dashboard frontend documentation |
 | `config/initializers/constants.rb` (billing section) | `BILLING_VOLUMETRIC_RESOURCES`, `BILLING_ADDON_FEATURES`, `BILLING_PRICES_BY_COUNTRY`, `DEFAULT_FREE_TIER_ALLOWANCES` |
+
+---
+
+## 14. Payment Gateway Architecture
+
+### Core Principle
+
+The payment process does one thing: **move a transaction from `pending` to `completed` (or `failed`).**
+
+There is no payment logic in controllers, models, or jobs. Every gateway strategy is a self-contained service class that follows the same contract.
+
+### Architecture
+
+```
+Transaction (BillingTransaction or Transaction)
+       │
+       ▼
+Payments::InitiateService
+       │
+       ├── Reads payment_method.strategy
+       ├── Resolves class via GATEWAY_STRATEGY_CLASSES
+       └── Instantiates and calls the gateway class
+               │
+               ▼
+         Gateway Service (e.g., Payments::MockQrGateway)
+               │
+               ├── Builds API request
+               ├── Calls external gateway (or returns immediately for system payments)
+               └── Returns { success:, gateway_reference:, gateway_payload: }
+```
+
+### The Contract
+
+Every gateway service class must:
+
+1. Accept keyword arguments via `**kwargs` (splat) — each gateway receives all common params but only uses what it needs
+2. Implement `#call` returning:
+   - `{ success: true, gateway_reference: "...", gateway_payload: { ... } }` on success
+   - `{ success: false, error: "..." }` on failure
+
+### Adding a New Gateway
+
+Three steps — no changes to InitiateService or controllers.
+
+**1. Create the service class:**
+
+```ruby
+# app/services/payments/my_gateway.rb
+module Payments
+  class MyGateway
+    def initialize(amount_cents:, invoice_id:, memo:, gateway_url:, secret_key:, **_args)
+      @amount_cents = amount_cents
+      @invoice_id = invoice_id
+      @memo = memo
+      @gateway_url = gateway_url
+      @secret_key = secret_key
+    end
+
+    def call
+      response = call_external_api(...)
+
+      if response.success?
+        { success: true, gateway_reference: response.txn_id, gateway_payload: response.body }
+      else
+        { success: false, error: response.error }
+      end
+    end
+  end
+end
+```
+
+**2. Register the strategy:**
+
+```ruby
+# config/initializers/constants.rb
+
+GATEWAY_STRATEGIES = {
+  # ...
+  my_gateway: 14   # next available number >= 10
+}.freeze
+
+GATEWAY_STRATEGY_CLASSES = {
+  # ...
+  my_gateway: "Payments::MyGateway"
+}.freeze
+```
+
+**3. Create a PaymentMethod / BillingPaymentMethod record** with the new strategy.
+
+### Strategy Types
+
+| Type | Value Range | Behavior | Examples |
+|------|-------------|----------|---------|
+| **System payments** | < 10 | Return success immediately — no external call | `Payments::Cash`, `Payments::WalletAutoDebit` |
+| **External gateways** | >= 10 | Call external API, return result | `Payments::MockQrGateway`, `Payments::MockRedirectGateway` |

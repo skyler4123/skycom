@@ -414,6 +414,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_02_190003) do
   create_table "billing_payment_methods", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
     t.string "email"
     t.string "name"
+    t.integer "strategy"
     t.text "description"
     t.string "code"
     t.string "phone_number"
@@ -421,8 +422,6 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_02_190003) do
     t.integer "country"
     t.integer "timezone"
     t.integer "payment_mode"
-    t.string "gateway_url"
-    t.string "secret_key"
     t.integer "lifecycle_status"
     t.integer "workflow_status"
     t.integer "business_type"
@@ -3081,6 +3080,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_02_190003) do
   create_table "payment_methods", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
     t.string "email"
     t.string "name"
+    t.integer "strategy"
     t.text "description"
     t.string "code"
     t.string "phone_number"
@@ -3088,8 +3088,6 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_02_190003) do
     t.integer "country"
     t.integer "timezone"
     t.integer "payment_mode"
-    t.string "gateway_url"
-    t.string "secret_key"
     t.integer "lifecycle_status"
     t.integer "workflow_status"
     t.integer "business_type"

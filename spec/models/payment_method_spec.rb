@@ -24,32 +24,30 @@ RSpec.describe PaymentMethod, type: :model do
     it { should define_enum_for(:payment_mode).with_values(qr: 0, redirect: 1, cash: 2) }
   end
 
-  describe "conditional gateway_url validation" do
+  describe "strategy validation" do
     let(:pm) { build(:payment_method) }
 
-    it "validates gateway_url presence when payment_mode is not cash" do
+    it "validates strategy presence when not a system payment" do
       pm.payment_mode = :redirect
-      pm.gateway_url = nil
+      pm.strategy = nil
       expect(pm).not_to be_valid
-      expect(pm.errors[:gateway_url]).to include("can't be blank")
+      expect(pm.errors[:strategy]).to include("can't be blank")
     end
 
-    it "skips gateway_url validation when payment_mode is cash" do
+    it "skips strategy validation when payment_mode is cash" do
       pm.payment_mode = :cash
-      pm.gateway_url = nil
+      pm.strategy = :cash
       expect(pm).to be_valid
     end
   end
 
-  describe "encryption" do
-    it "encrypts secret_key" do
-      pm = create(:payment_method, secret_key: "sk_test_abc123")
-      expect(pm.secret_key).to eq("sk_test_abc123")
-      # Verify it's stored encrypted in the database
-      raw = PaymentMethod.connection.execute(
-        "SELECT secret_key FROM payment_methods WHERE id = '#{pm.id}'"
-      ).first["secret_key"]
-      expect(raw).not_to eq("sk_test_abc123")
+  describe "strategy enum" do
+    it do
+      should define_enum_for(:strategy).with_values(
+        cash: 0, wallet_auto_debit: 1,
+        mock_qr_gateway: 10, mock_redirect_gateway: 11,
+        stripe_gateway: 12, viet_qr_gateway: 13
+      ).with_prefix
     end
   end
 end

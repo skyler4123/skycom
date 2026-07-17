@@ -1,55 +1,25 @@
-# This service seeds the database with a predefined list of global PaymentMethod
-# records. These are not tied to any specific company and represent the
-# available payment options across the application.
+# Seeds the global PaymentMethod catalog — one record per gateway strategy.
+# Cash is a system payment (no gateway). Other strategies resolve to a
+# gateway implementation class via GATEWAY_STRATEGY_CLASSES.
 
 class Seed::PaymentMethodService
-  COUNTRY_CODES = {
-    us: 840,
-    vn: 704
-  }.freeze
-
-  MOCK_API_BASE = "http://localhost:4000"
-  MOCK_REDIRECT_URL = "#{MOCK_API_BASE}/api/v1/bank/redirect-session".freeze
-  MOCK_QR_URL = "#{MOCK_API_BASE}/api/v1/bank/qr-generate".freeze
-
-  # NOTE: secret_key is intentionally nil here. It's a real credential that must
-  # be set per-deployment via the admin UI or environment configuration — never
-  # hardcoded in seed data.
-  PAYMENT_METHODS = {
-    us: [
-      { name: "Credit Card",       code: "CREDIT_CARD",   business_type: :b2c, country: COUNTRY_CODES[:us], payment_mode: :redirect, gateway_url: MOCK_REDIRECT_URL },
-      { name: "Debit Card",        code: "DEBIT_CARD",    business_type: :b2c, country: COUNTRY_CODES[:us], payment_mode: :redirect, gateway_url: MOCK_REDIRECT_URL },
-      { name: "PayPal",            code: "PAYPAL",        business_type: :b2c, country: COUNTRY_CODES[:us], payment_mode: :redirect, gateway_url: MOCK_REDIRECT_URL },
-      { name: "Apple Pay",         code: "APPLE_PAY",     business_type: :b2c, country: COUNTRY_CODES[:us], payment_mode: :redirect, gateway_url: MOCK_REDIRECT_URL },
-      { name: "Google Pay",        code: "GOOGLE_PAY",    business_type: :b2c, country: COUNTRY_CODES[:us], payment_mode: :redirect, gateway_url: MOCK_REDIRECT_URL },
-      { name: "Cash",              code: "CASH_US",        business_type: :b2c, country: COUNTRY_CODES[:us], payment_mode: :cash,     gateway_url: nil },
-      { name: "ACH Bank Transfer", code: "ACH_TRANSFER",  business_type: :b2b, country: COUNTRY_CODES[:us], payment_mode: :qr,       gateway_url: MOCK_QR_URL },
-      { name: "Wire Transfer",     code: "WIRE_TRANSFER", business_type: :b2b, country: COUNTRY_CODES[:us], payment_mode: :qr,       gateway_url: MOCK_QR_URL },
-      { name: "Stripe",            code: "STRIPE",        business_type: :b2b, country: COUNTRY_CODES[:us], payment_mode: :redirect, gateway_url: MOCK_REDIRECT_URL }
-    ].freeze,
-    vn: [
-      { name: "MoMo",             code: "MOMO",           business_type: :b2c, country: COUNTRY_CODES[:vn], payment_mode: :redirect, gateway_url: MOCK_REDIRECT_URL },
-      { name: "ZaloPay",          code: "ZALOPAY",        business_type: :b2c, country: COUNTRY_CODES[:vn], payment_mode: :redirect, gateway_url: MOCK_REDIRECT_URL },
-      { name: "VNPay",            code: "VNPAY",          business_type: :b2c, country: COUNTRY_CODES[:vn], payment_mode: :redirect, gateway_url: MOCK_REDIRECT_URL },
-      { name: "Cash (VN)",        code: "CASH_VN",        business_type: :b2c, country: COUNTRY_CODES[:vn], payment_mode: :cash,     gateway_url: nil },
-      { name: "Credit Card (VN)", code: "CREDIT_CARD_VN", business_type: :b2c, country: COUNTRY_CODES[:vn], payment_mode: :redirect, gateway_url: MOCK_REDIRECT_URL },
-      { name: "ShopeePay",        code: "SHOPEEPAY",      business_type: :b2c, country: COUNTRY_CODES[:vn], payment_mode: :redirect, gateway_url: MOCK_REDIRECT_URL },
-      { name: "VietQR Transfer",  code: "VIETQR",         business_type: :b2b, country: COUNTRY_CODES[:vn], payment_mode: :qr,       gateway_url: MOCK_QR_URL },
-      { name: "Direct Debit",     code: "DIRECT_DEBIT",   business_type: :b2b, country: COUNTRY_CODES[:vn], payment_mode: :qr,       gateway_url: MOCK_QR_URL }
-    ].freeze
-  }.freeze
+  PAYMENT_METHODS = [
+    { name: "Cash",              code: "CASH",          business_type: :b2c, strategy: :cash,              payment_mode: :cash },
+    { name: "QR Payment",        code: "MOCK_QR",       business_type: :b2c, strategy: :mock_qr_gateway,   payment_mode: :qr },
+    { name: "Online Payment",    code: "MOCK_REDIRECT", business_type: :b2c, strategy: :mock_redirect_gateway, payment_mode: :redirect },
+    { name: "Credit Card",       code: "STRIPE",        business_type: :b2c, strategy: :stripe_gateway,    payment_mode: :redirect },
+    { name: "VietQR Transfer",   code: "VIETQR",        business_type: :b2c, strategy: :viet_qr_gateway,   payment_mode: :qr }
+  ].freeze
 
   def self.new(
     name:,
     description: nil,
     code: nil,
+    strategy: nil,
     lifecycle_status: PaymentMethod.lifecycle_statuses.keys.sample,
     workflow_status: PaymentMethod.workflow_statuses.keys.sample,
     business_type: PaymentMethod.business_types.keys.sample,
-    country: 840,
     payment_mode: nil,
-    gateway_url: nil,
-    secret_key: nil,
     discarded_at: nil
   )
     should_discard = rand(10) == 0
@@ -59,13 +29,11 @@ class Seed::PaymentMethodService
       name: name,
       description: description || "Payment method for #{name}.",
       code: code || "PM-#{SecureRandom.hex(4).upcase}",
+      strategy: strategy,
       lifecycle_status: lifecycle_status,
       workflow_status: workflow_status,
       business_type: business_type,
-      country: country,
       payment_mode: payment_mode,
-      gateway_url: gateway_url,
-      secret_key: secret_key,
       discarded_at: discarded_at
     )
   end
@@ -73,17 +41,14 @@ class Seed::PaymentMethodService
   def self.create(company: nil)
     puts "Seeding PaymentMethod records..."
 
-    PAYMENT_METHODS.each do |country_key, methods|
-      methods.each do |method_attrs|
-        PaymentMethod.find_or_create_by!(code: method_attrs[:code]) do |pm|
-          pm.name = method_attrs[:name]
-          pm.description = "Payment method for #{method_attrs[:name]} transactions."
-          pm.business_type = method_attrs[:business_type]
-          pm.country = method_attrs[:country]
-          pm.payment_mode = method_attrs[:payment_mode]
-          pm.gateway_url = method_attrs[:gateway_url]
-          pm.workflow_status = :confirmed
-        end
+    PAYMENT_METHODS.each do |attrs|
+      PaymentMethod.find_or_create_by!(code: attrs[:code]) do |pm|
+        pm.name = attrs[:name]
+        pm.description = "Payment method for #{attrs[:name]} transactions."
+        pm.business_type = attrs[:business_type]
+        pm.strategy = attrs[:strategy]
+        pm.payment_mode = attrs[:payment_mode]
+        pm.workflow_status = :confirmed
       end
     end
 

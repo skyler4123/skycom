@@ -71,7 +71,7 @@ RSpec.feature "Admin::PaymentMethods", type: :feature, js: true do
     select "B2C", from: "payment_method[business_type]"
     select "US", from: "payment_method[country]"
     select "QR Code", from: "payment_method[payment_mode]"
-    fill_in "payment_method[gateway_url]", with: "http://localhost:4000/api/v1/bank/qr-generate"
+    select "Mock QR Gateway", from: "payment_method[strategy]"
     click_button "Save Payment Method"
 
     expect(page).to have_current_path(admin_payment_methods_path, wait: 10)

@@ -4,6 +4,7 @@ class CreatePaymentMethods < ActiveRecord::Migration[8.0]
       # --- Identity ---
       t.string :email, null: true, index: { unique: true }
       t.string :name
+      t.integer :strategy
       t.text   :description
       t.string :code, index: { unique: true }
       t.string :phone_number
@@ -11,8 +12,6 @@ class CreatePaymentMethods < ActiveRecord::Migration[8.0]
       t.integer :country
       t.integer :timezone
       t.integer :payment_mode, index: true
-      t.string :gateway_url
-      t.string :secret_key
 
       # --- System Fields ---
       t.integer  :lifecycle_status, index: true

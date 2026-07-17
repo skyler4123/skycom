@@ -54,8 +54,7 @@ class Admin::PaymentMethodsController < Admin::ApplicationController
   def format_payment_method(pm)
     pm.as_json(only: [
       :id, :name, :code, :description,
-      :business_type, :country, :payment_mode,
-      :gateway_url,
+      :business_type, :country, :payment_mode, :strategy,
       :lifecycle_status,
       :created_at, :updated_at
     ])
@@ -68,8 +67,7 @@ class Admin::PaymentMethodsController < Admin::ApplicationController
   def payment_method_params
     params.require(:payment_method).permit(
       :name, :code, :description,
-      :business_type, :country, :payment_mode,
-      :gateway_url, :secret_key,
+      :business_type, :country, :payment_mode, :strategy,
       :lifecycle_status
     )
   end
