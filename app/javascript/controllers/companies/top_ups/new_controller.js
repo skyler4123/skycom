@@ -4,7 +4,6 @@ import { Centrifuge } from "centrifuge"
 export default class Companies_TopUps_NewController extends Companies_LayoutController {
   /** @type {Array} */ paymentMethods = []
   /** @type {string|null} */ selectedMethodId = null
-  /** @type {number} */ amountCents = 0
   /** @type {Centrifuge|null} */ centrifuge = null
   /** @type {any|null} */ subscription = null
 
@@ -41,7 +40,6 @@ export default class Companies_TopUps_NewController extends Companies_LayoutCont
       ? this.paymentMethods.map(m => {
           const isQr = m.strategy === "mock_qr_gateway"
           const isRedirect = m.strategy === "mock_redirect_gateway"
-          const isSelected = this.selectedMethodId === m.id
           const possible = isQr || isRedirect
           const icon = isQr ? "qr_code_scanner" : isRedirect ? "open_in_new" : "credit_card"
 
@@ -51,8 +49,9 @@ export default class Companies_TopUps_NewController extends Companies_LayoutCont
 
           return `
             <div ${clickAttr}
-              class="relative flex items-start gap-4 p-4 rounded-xl border-2 cursor-pointer transition-all
-                ${isSelected ? "border-blue-500 bg-blue-50 dark:bg-blue-900/20 dark:border-blue-400" : "border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900"}
+              data-method-id="${m.id}"
+              class="payment-method-card relative flex items-start gap-4 p-4 rounded-xl border-2 cursor-pointer transition-all
+                border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900
                 ${!possible ? "opacity-50 cursor-not-allowed" : "hover:border-blue-300 dark:hover:border-blue-600"}">
               <div class="flex items-center justify-center w-10 h-10 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 shrink-0">
                 <span class="material-symbols-outlined text-[22px]">${icon}</span>
@@ -65,13 +64,10 @@ export default class Companies_TopUps_NewController extends Companies_LayoutCont
                 </div>
                 <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">${m.description || ""}</p>
               </div>
-              ${isSelected ? `<span class="material-symbols-outlined text-blue-600 dark:text-blue-400 text-[20px]">check_circle</span>` : ""}
             </div>
           `
         }).join("")
       : `<p class="text-sm text-slate-500">${translate("No payment methods available")}</p>`
-
-    const canSubmit = this.selectedMethodId && this.amountCents > 0
 
     return `
       <div class="p-4 md:p-6 overflow-y-auto">
@@ -90,21 +86,19 @@ export default class Companies_TopUps_NewController extends Companies_LayoutCont
               <div class="space-y-1">
                 <label class="text-[10px] font-bold text-slate-400 dark:text-slate-300 uppercase tracking-wider">${translate("Amount")}</label>
                 <input type="number" id="top-up-amount" min="1" step="1" required placeholder="e.g. 1000"
-                  data-action="input->${this.identifier}#updateAmount"
                   class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-sm text-slate-900 dark:text-white" />
               </div>
 
               <div class="space-y-3">
                 <label class="text-[10px] font-bold text-slate-400 dark:text-slate-300 uppercase tracking-wider">${translate("Payment Method")}</label>
-                <div class="space-y-2">
+                <div class="space-y-2" id="payment-methods-list">
                   ${methodCards}
                 </div>
               </div>
 
               <button type="button"
                 data-action="click->${this.identifier}#handleSubmit"
-                class="w-full px-4 py-2.5 ${canSubmit ? "bg-blue-600 hover:bg-blue-700 cursor-pointer" : "bg-slate-300 dark:bg-slate-700 cursor-not-allowed"} text-white rounded-lg font-bold text-sm transition-colors"
-                ${canSubmit ? "" : "disabled"}>
+                class="w-full px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-bold text-sm transition-colors cursor-pointer">
                 ${translate("Confirm Top Up")}
               </button>
             </div>
@@ -115,36 +109,55 @@ export default class Companies_TopUps_NewController extends Companies_LayoutCont
   }
 
   selectMethod(event) {
-    this.selectedMethodId = event.params.methodId
-    this.renderContent()
-  }
+    const methodId = event.params.methodId
 
-  updateAmount(event) {
-    this.amountCents = parseInt(event.target.value) || 0
-    this.renderContent()
+    document.querySelectorAll(".payment-method-card").forEach(card => {
+      const isSelected = card.getAttribute("data-method-id") === methodId
+      card.classList.remove(
+        "border-blue-500", "bg-blue-50", "dark:bg-blue-900/20", "dark:border-blue-400",
+        "border-slate-200", "dark:border-slate-700", "bg-white", "dark:bg-slate-900"
+      )
+      if (isSelected) {
+        card.classList.add("border-blue-500", "bg-blue-50", "dark:bg-blue-900/20", "dark:border-blue-400")
+      } else {
+        card.classList.add("border-slate-200", "dark:border-slate-700", "bg-white", "dark:bg-slate-900")
+      }
+
+      const checkEl = card.querySelector(".selected-check")
+      if (isSelected && !checkEl) {
+        card.insertAdjacentHTML("beforeend",
+          `<span class="selected-check material-symbols-outlined text-blue-600 dark:text-blue-400 text-[20px]">check_circle</span>`
+        )
+      } else if (!isSelected && checkEl) {
+        checkEl.remove()
+      }
+    })
+
+    this.selectedMethodId = methodId
   }
 
   async handleSubmit(event) {
     event.preventDefault()
     const cid = currentCompany()?.id
-    if (!cid || !this.selectedMethodId || this.amountCents <= 0) return
+    const amountCents = parseInt(document.getElementById("top-up-amount")?.value) || 0
+    if (!cid || !this.selectedMethodId || amountCents <= 0) return
 
     try {
       const response = await fetchJson(Helpers.create_company_top_ups_path(cid), {
         method: "POST",
         body: {
-          amount_cents: this.amountCents,
+          amount_cents: amountCents,
           billing_payment_method_id: this.selectedMethodId
         }
       })
 
-      this.renderQRWait(response, cid)
+      this.renderQRWait(response, amountCents, cid)
     } catch (error) {
       toast({ type: "error", message: error.errors?.join(", ") || translate("Top-up failed") })
     }
   }
 
-  renderQRWait(response, companyId) {
+  renderQRWait(response, amountCents, companyId) {
     const { qr_string, websocket_url, websocket_token, websocket_channel } = response
     const formEl = document.getElementById("top-up-form")
     if (!formEl) return
@@ -153,7 +166,7 @@ export default class Companies_TopUps_NewController extends Companies_LayoutCont
       <div class="space-y-6 text-center">
         <h2 class="text-xl font-bold text-slate-900 dark:text-white">${translate("Scan to Pay")}</h2>
         <p class="text-sm text-slate-500">${translate("Scan the QR code with your banking app to complete the top-up.")}</p>
-        <p class="text-lg font-black text-slate-900 dark:text-white">${this.formatCents(this.amountCents)}</p>
+        <p class="text-lg font-black text-slate-900 dark:text-white">${this.formatCents(amountCents)}</p>
         <div class="flex justify-center">
           <div class="w-64 h-64 bg-white rounded-xl p-4 border border-slate-200 dark:border-slate-700 flex items-center justify-center" id="qr-container"></div>
         </div>
@@ -191,6 +204,7 @@ export default class Companies_TopUps_NewController extends Companies_LayoutCont
       this.centrifuge.disconnect()
       this.centrifuge = null
     }
+    this.selectedMethodId = null
     this.renderContent()
   }
 
