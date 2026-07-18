@@ -78,6 +78,9 @@ GATEWAY_CONFIGS = {
   viet_qr_gateway:  { gateway_url: nil, secret_key: nil }
 }.freeze
 
+# --- Webhooks ---
+WEBHOOK_BANK_PAYMENT_SECRET = ENV.fetch("WEBHOOK_BANK_PAYMENT_SECRET", "local_secure_dev_secret").freeze
+
 # =============================================================================
 # Image & Avatar Constraints
 # Applied across 7 model concerns (Branch, Brand, Customer, Department,
