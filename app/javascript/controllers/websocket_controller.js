@@ -1,5 +1,3 @@
-// app/javascript/controllers/websocket_controller.js
-
 import { Controller } from "@hotwired/stimulus"
 import { Centrifuge } from "centrifuge"
 
@@ -7,55 +5,60 @@ export default class WebsocketController extends Controller {
   static values = {
     url: String,
     token: String,
-    channel: Array // Changed from String to Array
+    channel: Array
   }
 
   connect() {
-    console.log("WebSocket Stimulus Controller Connected to DOM.")
-    this.subscriptions = {} // Track active subscription objects here
+    this.subscriptions = {}
     this.initializeCentrifuge()
+    document.addEventListener("ws:subscribe", this)
   }
 
   disconnect() {
+    document.removeEventListener("ws:subscribe", this)
     if (this.centrifuge) {
       this.centrifuge.disconnect()
-      console.log("Centrifugo connection closed cleanly.")
+    }
+  }
+
+  handleEvent(event) {
+    if (event.type === "ws:subscribe") {
+      const { channel, token } = event.detail
+      if (!channel) return
+
+      if (this.subscriptions[channel]) return
+
+      const sub = this.centrifuge.newSubscription(channel)
+
+      sub.on("publication", (ctx) => {
+        document.dispatchEvent(
+          new CustomEvent(`ws:${channel}`, { detail: ctx.data })
+        )
+      })
+
+      sub.subscribe()
+      this.subscriptions[channel] = sub
     }
   }
 
   initializeCentrifuge() {
-    // 1. Initialize the root client connection
     this.centrifuge = new Centrifuge(this.urlValue, {
       token: this.tokenValue
     })
 
-    // 2. Iterate through each channel passed in the Array value
     this.channelValue.forEach((channelName) => {
-      console.log(`Setting up subscription for channel: ${channelName}`)
-      
-      // Create subscription instance for this specific channel string
       const sub = this.centrifuge.newSubscription(channelName)
 
-      // Bind data reception logic
-      sub.on('publication', (ctx) => {
-        this.handleIncomingMessage(channelName, ctx.data)
+      sub.on("publication", (ctx) => {
+        document.dispatchEvent(
+          new CustomEvent(`ws:${channelName}`, { detail: ctx.data })
+        )
       })
 
-      // Activate sub stream and store reference
       sub.subscribe()
       this.subscriptions[channelName] = sub
     })
 
-    // 3. Connect to the Centrifugo cluster engine
     this.centrifuge.connect()
-  }
-
-  // Centrally handle data events, routing logic based on channel origins
-  handleIncomingMessage(channel, data) {
-    console.log(`🚀 Live Message Arrived from [${channel}]:`)
-    console.dir(data)
-
-    // Example routing: You can dispatch customized events up your DOM tree if needed
-    // this.element.dispatchEvent(new CustomEvent(`ws:${channel}`, { detail: data }))
   }
 }
