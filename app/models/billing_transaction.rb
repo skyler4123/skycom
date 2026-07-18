@@ -35,6 +35,10 @@ class BillingTransaction < ApplicationRecord
     promo_credit: 3
   }
 
+  enum :status, { pending: 0, completed: 1, failed: 2 }, default: :pending, prefix: true
+
+  validates :gateway_reference, uniqueness: true, allow_nil: true
+
   after_create :sync_invoice_payment_status, unless: -> { amount_cents.zero? }
   after_destroy :sync_invoice_payment_status
 
