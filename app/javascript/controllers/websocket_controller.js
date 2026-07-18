@@ -4,45 +4,58 @@ import { Controller } from "@hotwired/stimulus"
 import { Centrifuge } from "centrifuge"
 
 export default class WebsocketController extends Controller {
-  // Read configuration values passed safely from the HTML view template
   static values = {
     url: String,
     token: String,
-    channel: String
+    channel: Array // Changed from String to Array
   }
 
   connect() {
-    console.log("WebSocket Test Stimulus Controller Connected to DOM.")
+    console.log("WebSocket Stimulus Controller Connected to DOM.")
+    this.subscriptions = {} // Track active subscription objects here
     this.initializeCentrifuge()
   }
 
   disconnect() {
-    // Gracefully clean up the connection if the user leaves the page
     if (this.centrifuge) {
       this.centrifuge.disconnect()
-      console.log("Centrifugo disconnected cleanly.")
+      console.log("Centrifugo connection closed cleanly.")
     }
   }
 
   initializeCentrifuge() {
-    // 1. Initialize the Centrifugo client using the signed token
+    // 1. Initialize the root client connection
     this.centrifuge = new Centrifuge(this.urlValue, {
       token: this.tokenValue
     })
 
-    // 2. Create a subscription to your dynamic channel target
-    this.subscription = this.centrifuge.newSubscription(this.channelValue)
+    // 2. Iterate through each channel passed in the Array value
+    this.channelValue.forEach((channelName) => {
+      console.log(`Setting up subscription for channel: ${channelName}`)
+      
+      // Create subscription instance for this specific channel string
+      const sub = this.centrifuge.newSubscription(channelName)
 
-    // 3. Bind the live event hook to listen for data updates
-    this.subscription.on('publication', (ctx) => {
-      console.log("🚀 Live Message Arrived From Rails Backend:")
-      console.dir(ctx.data) // Prints the interactive JSON object directly to the console
+      // Bind data reception logic
+      sub.on('publication', (ctx) => {
+        this.handleIncomingMessage(channelName, ctx.data)
+      })
+
+      // Activate sub stream and store reference
+      sub.subscribe()
+      this.subscriptions[channelName] = sub
     })
 
-    // 4. Activate the stream
-    this.subscription.subscribe()
+    // 3. Connect to the Centrifugo cluster engine
     this.centrifuge.connect()
+  }
 
-    console.log(`Centrifugo listening closely to channel: ${this.channelValue}`)
+  // Centrally handle data events, routing logic based on channel origins
+  handleIncomingMessage(channel, data) {
+    console.log(`🚀 Live Message Arrived from [${channel}]:`)
+    console.dir(data)
+
+    // Example routing: You can dispatch customized events up your DOM tree if needed
+    // this.element.dispatchEvent(new CustomEvent(`ws:${channel}`, { detail: data }))
   }
 }
