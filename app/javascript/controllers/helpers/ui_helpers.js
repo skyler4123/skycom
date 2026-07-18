@@ -887,7 +887,7 @@ export const renderQrCode = (element, text = "https://skycom.vn") => {
   const computedCellSize = Math.max(2, Math.floor(containerWidth / 37));
 
   try {
-    const typeNumber = 0; // 0 = auto-detect, handles any length
+    const typeNumber = 4;
     const errorCorrectionLevel = "M"; // Medium balance layout
     
     const qr = qrcode(typeNumber, errorCorrectionLevel);
