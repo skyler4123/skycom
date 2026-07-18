@@ -11,19 +11,26 @@ class Companies::TopUpsController < Companies::ApplicationController
   end
 
   def create
-    bpm = BillingPaymentMethod.find(params[:billing_payment_method_id])
+    # bpm = BillingPaymentMethod.find(params[:billing_payment_method_id])
 
-    result = TopUps::CreateService.new(
-      company: current_company,
-      amount_cents: params[:amount_cents],
-      billing_payment_method: bpm
-    ).call
+    # result = TopUps::CreateService.new(
+    #   company: current_company,
+    #   amount_cents: params[:amount_cents],
+    #   billing_payment_method: bpm
+    # ).call
+
+    # render json: {
+    #   qr_string: result.qr_string,
+    #   websocket_url: result.websocket_url,
+    #   websocket_token: result.websocket_token,
+    #   websocket_channel: result.websocket_channel
+    # }
 
     render json: {
-      qr_string: result.qr_string,
-      websocket_url: result.websocket_url,
-      websocket_token: result.websocket_token,
-      websocket_channel: result.websocket_channel
+      "qr_string": "00020101021238580010A0000|AMT:1000000|INV:9f33e4d5-5627-4a30-b5c4-cc156cacd9e7|TOKEN:TOPUP_94fe52f5f583d2130be7618b713e7d80|TXN:TXN_QR_1784363606344135871",
+      "websocket_url": "ws://localhost:8000/connection/websocket",
+      "websocket_token": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJkZjBmOTk1MC00ZDgyLTRkY2EtYmEzMi1hMGQxZTFhOGRmMTAiLCJjaGFubmVscyI6WyJjb21wYW55XzAxOWY3MWZmLTk0NWMtNzk3ZS05OTU2LTZjZTRkOWQzYThhNl90b3BfdXAiXX0.i3FklRwe099ESyGBAKuceX52hfak6JofHjyvazYirY8",
+      "websocket_channel": "company_019f71ff-945c-797e-9956-6ce4d9d3a8a6_top_up"
     }
   rescue TopUps::Error => e
     render json: { errors: [ e.message ] }, status: :unprocessable_entity

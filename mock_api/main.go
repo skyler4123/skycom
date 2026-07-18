@@ -21,7 +21,7 @@ const (
 	WebhookTargetURL     = "http://" + BaseIP + ":3000/webhooks/bank_payment"
 	WebhookSecureSecret  = "local_secure_dev_secret"
 	WebhookClientTimeout = 5 * time.Second
-	MockQRWebhookDelay   = 8 * time.Second
+	MockQRWebhookDelay   = 80 * time.Second
 )
 
 // =========================================================================
