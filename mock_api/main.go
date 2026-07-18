@@ -20,7 +20,8 @@ const (
 
 	WebhookTargetURL     = "http://" + BaseIP + ":3000/webhooks/bank_payment"
 	WebhookSecureSecret  = "local_secure_dev_secret"
-	WebhookClientTimeout = 50 * time.Second
+	WebhookClientTimeout = 5 * time.Second
+	MockQRWebhookDelay   = 8 * time.Second
 )
 
 // =========================================================================
@@ -86,12 +87,15 @@ func main() {
 		
 		logSuccess("QR FLOW", fmt.Sprintf("Generated Txn: %s for Rails Token: %s", txnID, req.TransactionToken))
 
-		// Pass the Rails transaction token down to the webhook pipeline
-		targetURL := req.WebhookURL
-		if targetURL == "" {
-			targetURL = WebhookTargetURL
-		}
-		go fireWebhookCallback(txnID, req.InvoiceID, req.TransactionToken, req.Amount, targetURL)
+		// Simulate user scanning QR with their phone — wait before firing webhook
+		go func() {
+			time.Sleep(MockQRWebhookDelay)
+			targetURL := req.WebhookURL
+			if targetURL == "" {
+				targetURL = WebhookTargetURL
+			}
+			fireWebhookCallback(txnID, req.InvoiceID, req.TransactionToken, req.Amount, targetURL)
+		}()
 
 		w.Header().Set("Content-Type", "application/json")
 		json.NewEncoder(w).Encode(map[string]interface{}{
