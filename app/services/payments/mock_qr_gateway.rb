@@ -8,6 +8,7 @@ module Payments
       @transaction_token = transaction_token
       @gateway_url = GATEWAY_CONFIGS[:mock_qr_gateway][:gateway_url]
       @secret_key = GATEWAY_CONFIGS[:mock_qr_gateway][:secret_key]
+      @webhook_url = GATEWAY_CONFIGS[:mock_qr_gateway][:webhook_url]
     end
 
     def call
@@ -24,7 +25,8 @@ module Payments
           amount: @amount_cents,
           invoice_id: @invoice_id,
           memo: @memo,
-          transaction_token: @transaction_token
+          transaction_token: @transaction_token,
+          webhook_url: @webhook_url
         }
       end
 

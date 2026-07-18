@@ -33,6 +33,7 @@ type PaymentRequest struct {
 	TransactionToken string `json:"transaction_token"` // Added to track specific transaction
 	Memo             string `json:"memo"`
 	ReturnURL        string `json:"return_url,omitempty"`
+	WebhookURL       string `json:"webhook_url,omitempty"`
 }
 
 var activeSessions = make(map[string]PaymentRequest)
@@ -86,7 +87,11 @@ func main() {
 		logSuccess("QR FLOW", fmt.Sprintf("Generated Txn: %s for Rails Token: %s", txnID, req.TransactionToken))
 
 		// Pass the Rails transaction token down to the webhook pipeline
-		go fireWebhookCallback(txnID, req.InvoiceID, req.TransactionToken, req.Amount)
+		targetURL := req.WebhookURL
+		if targetURL == "" {
+			targetURL = WebhookTargetURL
+		}
+		go fireWebhookCallback(txnID, req.InvoiceID, req.TransactionToken, req.Amount, targetURL)
 
 		w.Header().Set("Content-Type", "application/json")
 		json.NewEncoder(w).Encode(map[string]interface{}{
@@ -186,7 +191,11 @@ func main() {
 		logSuccess("FORM SUBMIT", fmt.Sprintf("Processed Card. Rails Token: %s -> Bank Txn ID: %s", sessionData.TransactionToken, txnID))
 
 		// Fire webhook containing both the Rails Transaction Token and the internal bank Txn ID
-		go fireWebhookCallback(txnID, sessionData.InvoiceID, sessionData.TransactionToken, sessionData.Amount)
+		targetURL := sessionData.WebhookURL
+		if targetURL == "" {
+			targetURL = WebhookTargetURL
+		}
+		go fireWebhookCallback(txnID, sessionData.InvoiceID, sessionData.TransactionToken, sessionData.Amount, targetURL)
 		
 		delete(activeSessions, sessionID)
 		logAction("DATABASE", fmt.Sprintf("Cleaned up session %s from active memory map.", sessionID))
@@ -203,7 +212,7 @@ func main() {
 // BACKGROUND WORKERS & HELPERS
 // =========================================================================
 
-func fireWebhookCallback(txnID string, invoiceID string, transactionToken string, amount int) {
+func fireWebhookCallback(txnID string, invoiceID string, transactionToken string, amount int, webhookURL string) {
 	logAction("WEBHOOK", fmt.Sprintf("Preparing dispatch payload for Txn: %s", txnID))
 
 	// Including transaction_token in the callback so Rails can identify the exact transaction!
@@ -218,13 +227,13 @@ func fireWebhookCallback(txnID string, invoiceID string, transactionToken string
 		},
 	})
 	
-	req, _ := http.NewRequest("POST", WebhookTargetURL, bytes.NewBuffer(payload))
+	req, _ := http.NewRequest("POST", webhookURL, bytes.NewBuffer(payload))
 	req.Header.Set("X-Skycom-Bank-Signature", WebhookSecureSecret)
 	req.Header.Set("Content-Type", "application/json")
 
 	client := &http.Client{Timeout: WebhookClientTimeout}
 	
-	logAction("WEBHOOK", fmt.Sprintf("POSTing event to %s...", WebhookTargetURL))
+	logAction("WEBHOOK", fmt.Sprintf("POSTing event to %s...", webhookURL))
 	resp, err := client.Do(req)
 	if err != nil {
 		logError("WEBHOOK", fmt.Sprintf("Failed to reach consumer app: %v\n", err))
