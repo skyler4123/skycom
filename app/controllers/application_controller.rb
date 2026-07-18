@@ -27,6 +27,7 @@ class ApplicationController < ActionController::Base
   def set_websocket_channels
     @channels = []
     @channels << "company_#{current_company&.id}_notifications" if current_company
+    @channels << "company_#{current_company&.id}_top_up" if current_company
     @channels << "user_#{current_user&.id}_alerts" if current_user
   end
 
