@@ -60,7 +60,7 @@ module TopUps
 
         qr_string = txn.gateway_payload&.dig("qr_string") || txn.gateway_payload&.dig(:qr_string)
 
-        channel_name = "company:#{@company.id}:top_up"
+        channel_name = "company_#{@company.id}_top_up"
         ws_token = Websocket.token(sub: txn.id, channels: [ channel_name ])
 
         Result.new(

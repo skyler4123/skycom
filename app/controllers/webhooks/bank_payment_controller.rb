@@ -41,7 +41,7 @@ module Webhooks
         )
       end
 
-      channel = "company:#{company.id}:top_up"
+      channel = "company_#{company.id}_top_up"
       Websocket.publish(
         channel: channel,
         data: {
