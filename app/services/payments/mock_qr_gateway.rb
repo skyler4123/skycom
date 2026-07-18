@@ -1,10 +1,11 @@
 # app/services/payments/mock_qr_gateway.rb
 module Payments
   class MockQrGateway
-    def initialize(amount_cents:, invoice_id:, memo:, **_args)
+    def initialize(amount_cents:, invoice_id:, memo:, transaction_token: nil, **_args)
       @amount_cents = amount_cents
       @invoice_id = invoice_id
       @memo = memo
+      @transaction_token = transaction_token
       @gateway_url = GATEWAY_CONFIGS[:mock_qr_gateway][:gateway_url]
       @secret_key = GATEWAY_CONFIGS[:mock_qr_gateway][:secret_key]
     end
@@ -22,7 +23,8 @@ module Payments
         req.body = {
           amount: @amount_cents,
           invoice_id: @invoice_id,
-          memo: @memo
+          memo: @memo,
+          transaction_token: @transaction_token
         }
       end
 
