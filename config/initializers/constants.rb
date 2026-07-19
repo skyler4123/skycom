@@ -69,11 +69,12 @@ GATEWAY_CONFIGS = {
   mock_qr_gateway: {
     gateway_url: "http://localhost:4000/api/v1/bank/qr-generate",
     secret_key: "local_secure_dev_secret",
-    webhook_url: ENV.fetch("MOCK_QR_WEBHOOK_URL", "http://192.168.0.100:3000/webhooks/bank_payment")
+    webhook_url: ENV.fetch("MOCK_QR_WEBHOOK_URL", "http://192.168.0.100:3000/webhooks/payments/mock_qr_gateway")
   },
   mock_redirect_gateway: {
     gateway_url: "http://localhost:4000/api/v1/bank/redirect-session",
-    secret_key: "local_secure_dev_secret"
+    secret_key: "local_secure_dev_secret",
+    webhook_url: ENV.fetch("MOCK_REDIRECT_WEBHOOK_URL", "http://192.168.0.100:3000/webhooks/payments/mock_redirect_gateway")
   },
   stripe_gateway:   { gateway_url: nil, secret_key: nil },
   viet_qr_gateway:  { gateway_url: nil, secret_key: nil }
@@ -81,6 +82,7 @@ GATEWAY_CONFIGS = {
 
 # --- Webhooks ---
 WEBHOOK_BANK_PAYMENT_SECRET = ENV.fetch("WEBHOOK_BANK_PAYMENT_SECRET", "local_secure_dev_secret").freeze
+WEBHOOK_REDIRECT_PAYMENT_SECRET = ENV.fetch("WEBHOOK_REDIRECT_PAYMENT_SECRET", "local_secure_dev_secret").freeze
 
 # =============================================================================
 # Image & Avatar Constraints

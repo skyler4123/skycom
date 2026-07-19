@@ -10,16 +10,29 @@ class Companies::TopUpsController < Companies::ApplicationController
     end
   end
 
-  def create
-    bpm = BillingPaymentMethod.find(params[:billing_payment_method_id])
-
+  def mock_qr_gateway
+    bpm = BillingPaymentMethod.find_by!(strategy: :mock_qr_gateway)
     result = TopUps::CreateService.new(
       company: current_company,
       amount_cents: params[:amount_cents],
       billing_payment_method: bpm
     ).call
-
     render json: { qr_string: result.qr_string }
+  rescue TopUps::Error => e
+    render json: { errors: [ e.message ] }, status: :unprocessable_entity
+  rescue ActiveRecord::RecordInvalid => e
+    render json: { errors: e.record.errors.full_messages }, status: :unprocessable_entity
+  end
+
+  def mock_redirect_gateway
+    bpm = BillingPaymentMethod.find_by!(strategy: :mock_redirect_gateway)
+    result = TopUps::CreateService.new(
+      company: current_company,
+      amount_cents: params[:amount_cents],
+      billing_payment_method: bpm,
+      redirect_url: company_billing_url(current_company)
+    ).call
+    render json: { redirect_url: result.redirect_url }
   rescue TopUps::Error => e
     render json: { errors: [ e.message ] }, status: :unprocessable_entity
   rescue ActiveRecord::RecordInvalid => e
@@ -30,7 +43,6 @@ class Companies::TopUpsController < Companies::ApplicationController
 
   def billing_payment_methods_json
     methods = BillingPaymentMethod.where(business_type: :b2b)
-                                  .where(strategy: GATEWAY_STRATEGIES.values_at(:mock_qr_gateway, :mock_redirect_gateway))
                                   .map do |bpm|
       {
         id: bpm.id,
