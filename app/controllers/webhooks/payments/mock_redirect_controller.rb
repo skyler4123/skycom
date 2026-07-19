@@ -2,7 +2,7 @@
 
 module Webhooks
   module Payments
-    class RedirectController < ActionController::Base
+    class MockRedirectController < ActionController::Base
       skip_before_action :verify_authenticity_token
 
       def create

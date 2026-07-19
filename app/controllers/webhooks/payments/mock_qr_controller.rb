@@ -2,7 +2,7 @@
 
 module Webhooks
   module Payments
-    class QrController < ActionController::Base
+    class MockQrController < ActionController::Base
       skip_before_action :verify_authenticity_token
 
       def create
