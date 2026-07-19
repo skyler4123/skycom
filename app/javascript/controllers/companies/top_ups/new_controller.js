@@ -184,7 +184,7 @@ export default class Companies_TopUps_NewController extends Companies_LayoutCont
       toast({ type: "success", message: translate("Top-up successful! Redirecting...") })
       setTimeout(() => {
         window.location.href = Helpers.company_billing_path(companyId)
-      }, 1500)
+      }, 500)
     })
   }
 

@@ -41,15 +41,15 @@ type QRPaymentResponse struct {
 }
 
 // =========================================================================
-// STRUCTS & SCHEMAS FOR BANK SYSTEM 2: HOSTED REDIRECT PORTAL
+// STRUCTS & SCHEMAS FOR BANK SYSTEM 2: AUTO-REDIRECT PORTAL
 // =========================================================================
 
 type RedirectSessionRequest struct {
-	AmountCents     int    `json:"amount_cents"`      // Custom naming format
-	InvoiceUUID     string `json:"invoice_uuid"`      // Custom naming format
-	TxnChannelToken string `json:"txn_channel_token"` // Custom naming format
-	RedirectURL     string `json:"redirect_url"`      // Dynamic return URL requested by user
-	CallbackWebhook string `json:"callback_webhook"`   // Dedicated webhooks destination
+	AmountCents     int    `json:"amount_cents"`      
+	InvoiceUUID     string `json:"invoice_uuid"`      
+	TxnChannelToken string `json:"txn_channel_token"` 
+	RedirectURL     string `json:"redirect_url"`      
+	CallbackWebhook string `json:"callback_webhook"`   
 	CancelURL       string `json:"cancel_url,omitempty"`
 }
 
@@ -77,7 +77,7 @@ func main() {
 		w.Header().Set("Content-Type", "application/json")
 		json.NewEncoder(w).Encode(map[string]interface{}{
 			"status":  "online",
-			"message": "🚀 Skycom Multi-Bank Gateway Sandbox is humming smoothly!",
+			"message": "🚀 Skycom Auto-Redirect Multi-Bank Sandbox is active!",
 		})
 	})
 
@@ -110,12 +110,11 @@ func main() {
 		
 		logSuccess("BANK_1_QR", fmt.Sprintf("Generated Txn: %s for Rails Token: %s", txnID, req.TransactionToken))
 
-		// Fire dedicated Bank 1 pipeline callback
 		go func() {
 			time.Sleep(MockQRWebhookDelay)
 			targetURL := req.WebhookURL
 			if targetURL == "" {
-				targetURL = "http://" + BaseIP + ":3000/webhooks/bank_payment" // Fallback fallback route
+				targetURL = "http://" + BaseIP + ":3000/webhooks/bank_payment"
 			}
 			fireBank1QRWebhook(txnID, req.InvoiceID, req.TransactionToken, req.Amount, targetURL)
 		}()
@@ -129,7 +128,7 @@ func main() {
 	})
 
 	// -------------------------------------------------------------------------
-	// ROUTE 2: REDIRECT SESSION SETUP (Bank System 2 - Accepts redirect_url)
+	// ROUTE 2: REDIRECT SESSION SETUP (Bank System 2)
 	// -------------------------------------------------------------------------
 	http.HandleFunc("/api/v1/bank/redirect-session", func(w http.ResponseWriter, r *http.Request) {
 		logAction("BANK_2_RED", "Setting up unique checkout session")
@@ -141,9 +140,8 @@ func main() {
 			return
 		}
 
-		// Validation checking the newly added dynamic redirect_url parameter
 		if req.AmountCents <= 0 || req.InvoiceUUID == "" || req.TxnChannelToken == "" || req.RedirectURL == "" || req.CallbackWebhook == "" {
-			logWarn("BANK_2_RED", "Validation Failed. Missing unique checkout or routing params.")
+			logWarn("BANK_2_RED", "Validation Failed. Missing critical parameters.")
 			w.WriteHeader(http.StatusBadRequest)
 			return
 		}
@@ -163,80 +161,63 @@ func main() {
 	})
 
 	// -------------------------------------------------------------------------
-	// ROUTE 3: HOSTED CHECKOUT PAGE (HTML)
+	// ROUTE 3: HOSTED CHECKOUT PAGE (Fires Webhook instantly & auto-redirects)
 	// -------------------------------------------------------------------------
 	http.HandleFunc("/bank/hosted-checkout", func(w http.ResponseWriter, r *http.Request) {
 		sessionID := r.URL.Query().Get("session_id")
-		logAction("BANK_2_WEB", fmt.Sprintf("Serving Checkout Page for Session: %s", sessionID))
+		logAction("BANK_2_WEB", fmt.Sprintf("Access detected for Session: %s. Payment implicitly successful.", sessionID))
 		
 		sessionData, exists := activeSessions[sessionID]
 		if !exists {
-			logError("BANK_2_WEB", fmt.Sprintf("Session ID %s not found in memory!", sessionID))
-			http.Error(w, "Invalid Payment Session", http.StatusBadRequest)
+			logError("BANK_2_WEB", fmt.Sprintf("Session ID %s not found in active memory map!", sessionID))
+			http.Error(w, "Invalid or Expired Payment Session", http.StatusBadRequest)
 			return
 		}
 
+		// 1. Instantly trigger the async backend callback webhook because access = success
+		txnID := fmt.Sprintf("BANK2_AUTO_%d", time.Now().UnixNano())
+		logSuccess("BANK_2_WEB", fmt.Sprintf("Auto-processing payment. Rails Token: %s -> Bank Txn ID: %s", sessionData.TxnChannelToken, txnID))
+		
+		go fireBank2RedirectWebhook(txnID, sessionData.InvoiceUUID, sessionData.TxnChannelToken, sessionData.AmountCents, sessionData.CallbackWebhook)
+
+		// 2. Clear state memory since transaction processing is complete
+		delete(activeSessions, sessionID)
+		logAction("DATABASE", fmt.Sprintf("Cleaned up session %s from active memory map.", sessionID))
+
+		// 3. Output HTML containing clean client-side JS auto-redirect logic
 		tmpl := `<!DOCTYPE html>
 		<html>
 		<head>
-			<title>🏦 Mock Hosted Checkout</title>
+			<title>🏦 Bank Auto Redirecting...</title>
 			<style>
-				body { font-family: sans-serif; background: #1e1e2e; color: #cdd6f4; padding: 50px; text-align: center; }
-				.card { background: #313244; padding: 30px; border-radius: 8px; display: inline-block; width: 400px; }
-				input { width: 90%; padding: 10px; margin: 10px 0; background: #11111b; color: #fff; border: 1px solid #45475a; }
-				button { background: #a6e3a1; color: #11111b; border: 0; padding: 12px 20px; font-weight: bold; width: 95%; cursor: pointer; }
+				body { font-family: sans-serif; background: #1e1e2e; color: #cdd6f4; padding: 100px; text-align: center; }
+				.box { background: #313244; padding: 40px; border-radius: 8px; display: inline-block; min-width: 350px; }
+				.spinner { border: 4px solid rgba(255,255,255,0.1); width: 36px; height: 36px; border-radius: 50%; border-left-color: #a6e3a1; animation: spin 1s linear infinite; margin: 20px auto; }
+				@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 			</style>
+			<script>
+				// Auto-redirect the browser back to Skycom instantly upon receipt
+				window.onload = function() {
+					setTimeout(function() {
+						window.location.href = "{{.RedirectURL}}";
+					}, 800); // 800ms buffer just so the developer visually witnesses the auto-handshake transition
+				};
+			</script>
 		</head>
 		<body>
-			<div class="card">
-				<h2>🔒 SECURE HOSTED PORTAL</h2>
-				<form action="/bank/hosted-checkout/submit" method="POST">
-					<input type="hidden" name="session_id" value="{{.SessionID}}">
-					<input type="text" value="Invoice Reference: {{.InvoiceUUID}}" disabled>
-					<input type="text" value="Transaction Token: {{.TxnChannelToken}}" disabled>
-					<input type="text" value="Amount: {{.Amount}} cents" disabled>
-					<button type="submit">🔒 CONFIRM & SUBMIT</button>
-				</form>
+			<div class="box">
+				<h2>🏦 BANK SIMULATOR PORTAL</h2>
+				<p style="color: #a6e3a1; font-weight: bold;">✓ PAYMENT AUTHORIZED SUCCESSFULLY</p>
+				<p>Securing connection pipe, transferring back to Skycom...</p>
+				<div class="spinner"></div>
 			</div>
 		</body>
 		</html>`
 
 		t, _ := template.New("webpage").Parse(tmpl)
 		t.Execute(w, map[string]interface{}{
-			"SessionID":        sessionID, 
-			"InvoiceUUID":      sessionData.InvoiceUUID, 
-			"TxnChannelToken":  sessionData.TxnChannelToken,
-			"Amount":           sessionData.AmountCents,
+			"RedirectURL": sessionData.RedirectURL,
 		})
-	})
-
-	// -------------------------------------------------------------------------
-	// ROUTE 4: FORM SUBMISSION PROCESSOR (Redirects to client custom dynamic URL)
-	// -------------------------------------------------------------------------
-	http.HandleFunc("/bank/hosted-checkout/submit", func(w http.ResponseWriter, r *http.Request) {
-		logAction("BANK_2_SUBMIT", "Processing browser payment submission")
-		r.ParseForm()
-		sessionID := r.FormValue("session_id")
-		
-		sessionData, exists := activeSessions[sessionID]
-		if !exists {
-			logError("BANK_2_SUBMIT", fmt.Sprintf("Submitted with expired Session ID: %s", sessionID))
-			http.Error(w, "Session expired", http.StatusBadRequest)
-			return
-		}
-
-		txnID := fmt.Sprintf("BANK2_REDR_%d", time.Now().UnixNano())
-		logSuccess("BANK_2_SUBMIT", fmt.Sprintf("Processed Card. Rails Token: %s -> Bank Txn ID: %s", sessionData.TxnChannelToken, txnID))
-
-		// Fire dedicated Bank 2 pipeline callback asynchronous engine
-		go fireBank2RedirectWebhook(txnID, sessionData.InvoiceUUID, sessionData.TxnChannelToken, sessionData.AmountCents, sessionData.CallbackWebhook)
-		
-		destinationURL := sessionData.RedirectURL
-		delete(activeSessions, sessionID)
-		logAction("DATABASE", fmt.Sprintf("Cleaned up session %s from active memory map.", sessionID))
-
-		logAction("REDIRECT", fmt.Sprintf("Redirecting user back to customized dynamic app page: %s", destinationURL))
-		http.Redirect(w, r, destinationURL, http.StatusSeeOther)
 	})
 
 	fmt.Printf("🚀 Multi-Banking Interface Architecture Server running on port %s...\n", ServerPort)
@@ -244,13 +225,12 @@ func main() {
 }
 
 // =========================================================================
-// BANK PIPELINE 1: DISPATCHER (QR PAYMENTS payload layout structure)
+// BANK PIPELINE 1: DISPATCHER (QR PAYMENTS)
 // =========================================================================
 
 func fireBank1QRWebhook(txnID string, invoiceID string, transactionToken string, amount int, webhookURL string) {
 	logAction("CB_BANK_1", fmt.Sprintf("Preparing dispatch payload for Txn: %s", txnID))
 
-	// Traditional original format structure maintained completely
 	payload, _ := json.Marshal(map[string]interface{}{
 		"event": "transaction.completed",
 		"data": map[string]interface{}{
@@ -266,13 +246,12 @@ func fireBank1QRWebhook(txnID string, invoiceID string, transactionToken string,
 }
 
 // =========================================================================
-// BANK PIPELINE 2: DISPATCHER (HOSTED REDIRECT entirely unique payload structure)
+// BANK PIPELINE 2: DISPATCHER (HOSTED REDIRECT)
 // =========================================================================
 
 func fireBank2RedirectWebhook(referenceID string, referenceUUID string, channelToken string, values int, targetURL string) {
 	logAction("CB_BANK_2", fmt.Sprintf("Preparing distinct system webhooks structure for ref: %s", referenceID))
 
-	// Totally unique JSON schema structure for Bank system 2 scaling verification
 	payload, _ := json.Marshal(map[string]interface{}{
 		"bank_code":         "VIET_BANK_DIRECT_2026",
 		"reference_code":    referenceID,
@@ -283,7 +262,6 @@ func fireBank2RedirectWebhook(referenceID string, referenceUUID string, channelT
 		"timestamp_epoch":   time.Now().Unix(),
 	})
 
-	// Different custom header signature token to isolate security context completely
 	executePostRequest(targetURL, payload, "X-Skycom-RedirectBank-Signature")
 }
 
