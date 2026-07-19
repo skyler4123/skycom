@@ -13,13 +13,20 @@ class Companies::TopUpsController < Companies::ApplicationController
   def create
     bpm = BillingPaymentMethod.find(params[:billing_payment_method_id])
 
+    redirect_url = company_billing_url(current_company)
+
     result = TopUps::CreateService.new(
       company: current_company,
       amount_cents: params[:amount_cents],
-      billing_payment_method: bpm
+      billing_payment_method: bpm,
+      redirect_url: redirect_url
     ).call
 
-    render json: { qr_string: result.qr_string }
+    if result.gateway_type == "redirect"
+      render json: { gateway_type: "redirect", redirect_url: result.redirect_url }
+    else
+      render json: { gateway_type: "qr", qr_string: result.qr_string }
+    end
   rescue TopUps::Error => e
     render json: { errors: [ e.message ] }, status: :unprocessable_entity
   rescue ActiveRecord::RecordInvalid => e
@@ -30,7 +37,6 @@ class Companies::TopUpsController < Companies::ApplicationController
 
   def billing_payment_methods_json
     methods = BillingPaymentMethod.where(business_type: :b2b)
-                                  .where(strategy: GATEWAY_STRATEGIES.values_at(:mock_qr_gateway, :mock_redirect_gateway))
                                   .map do |bpm|
       {
         id: bpm.id,
