@@ -69,10 +69,10 @@ Rails.application.routes.draw do
       end
 
       get "analytics", to: "analytics#index"
-      resources :top_ups, only: %i[new], controller: :top_ups do
+      resources :top_ups, only: %i[new] do
         collection do
-          post :qr, to: "top_ups#qr"
-          post :redirect, to: "top_ups#redirect"
+          post :qr
+          post :redirect
         end
       end
 
