@@ -120,7 +120,10 @@ Rails.application.routes.draw do
 
   # Webhooks
   namespace :webhooks do
-    post "bank_payment", to: "bank_payment#create"
+    namespace :payments do
+      post "qr",       to: "qr#create"
+      post "redirect", to: "redirect#create"
+    end
   end
 
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
