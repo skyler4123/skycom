@@ -10,23 +10,29 @@ class Companies::TopUpsController < Companies::ApplicationController
     end
   end
 
-  def create
-    bpm = BillingPaymentMethod.find(params[:billing_payment_method_id])
+  def qr
+    bpm = BillingPaymentMethod.find_by!(strategy: :mock_qr_gateway)
+    result = TopUps::CreateService.new(
+      company: current_company,
+      amount_cents: params[:amount_cents],
+      billing_payment_method: bpm
+    ).call
+    render json: { gateway_type: "qr", qr_string: result.qr_string }
+  rescue TopUps::Error => e
+    render json: { errors: [ e.message ] }, status: :unprocessable_entity
+  rescue ActiveRecord::RecordInvalid => e
+    render json: { errors: e.record.errors.full_messages }, status: :unprocessable_entity
+  end
 
-    redirect_url = company_billing_url(current_company)
-
+  def redirect
+    bpm = BillingPaymentMethod.find_by!(strategy: :mock_redirect_gateway)
     result = TopUps::CreateService.new(
       company: current_company,
       amount_cents: params[:amount_cents],
       billing_payment_method: bpm,
-      redirect_url: redirect_url
+      redirect_url: company_billing_url(current_company)
     ).call
-
-    if result.gateway_type == "redirect"
-      render json: { gateway_type: "redirect", redirect_url: result.redirect_url }
-    else
-      render json: { gateway_type: "qr", qr_string: result.qr_string }
-    end
+    render json: { gateway_type: "redirect", redirect_url: result.redirect_url }
   rescue TopUps::Error => e
     render json: { errors: [ e.message ] }, status: :unprocessable_entity
   rescue ActiveRecord::RecordInvalid => e
