@@ -20,15 +20,8 @@ class ApplicationController < ActionController::Base
   # We only sync client_cache when user signed in that require current_user
   before_action :sync_client_cache_version, if: :current_user
   before_action :set_paper_trail_whodunnit
-  before_action :set_websocket_channels
 
   private
-
-  def set_websocket_channels
-    @channels = []
-    @channels << "company_#{current_company&.id}_notifications" if current_company
-    @channels << "user_#{current_user&.id}_alerts" if current_user
-  end
 
   # --------------------------------------------------------------------------
   # SINGLE-SESSION MODE

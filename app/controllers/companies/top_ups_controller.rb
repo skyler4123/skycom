@@ -19,12 +19,7 @@ class Companies::TopUpsController < Companies::ApplicationController
       billing_payment_method: bpm
     ).call
 
-    render json: {
-      qr_string: result.qr_string,
-      websocket_url: result.websocket_url,
-      websocket_token: result.websocket_token,
-      websocket_channel: result.websocket_channel
-    }
+    render json: { qr_string: result.qr_string }
   rescue TopUps::Error => e
     render json: { errors: [ e.message ] }, status: :unprocessable_entity
   rescue ActiveRecord::RecordInvalid => e

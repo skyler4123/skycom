@@ -34,9 +34,10 @@
 
   <body
     data-controller="responsive language svg img link open notification darkmode modal toasts client-cache authentication websocket"
-    data-websocket-url-value="ws://127.0.0.1:8000/connection/websocket"
-    data-websocket-channel-value="<%= (@channels || []).to_json %>"
-    data-websocket-token-value="<%= Websocket.token(sub: current_user&.id.to_s || 'anon', channels: @channels || []) if @channels.present? %>"
+    <% if is_signed_in? && @channels.present? %>
+      data-websocket-url-value="ws://127.0.0.1:8000/connection/websocket"
+      data-websocket-token-value="<%= WEBSOCKET.token(sub: current_user.id.to_s, channels: @channels) %>"
+    <% end %>
   >
     <div class="w-full flex justify-center items-center">
       <% if notice.present? %>

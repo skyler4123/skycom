@@ -6,56 +6,118 @@ import { Centrifuge } from "centrifuge"
 export default class WebsocketController extends Controller {
   static values = {
     url: String,
-    token: String,
-    channel: Array // Changed from String to Array
+    token: String
   }
 
   connect() {
-    console.log("WebSocket Stimulus Controller Connected to DOM.")
-    this.subscriptions = {} // Track active subscription objects here
+    console.log("⚡ Core WebSockets Gateway mounted.")
+    this.initializeGlobalInterface()
     this.initializeCentrifuge()
   }
 
   disconnect() {
-    if (this.centrifuge) {
-      this.centrifuge.disconnect()
-      console.log("Centrifugo connection closed cleanly.")
+    if (window.WEBSOCKET && window.WEBSOCKET.cable) {
+      window.WEBSOCKET.cable.disconnect()
+      console.log("🔌 Connection closed cleanly.")
+    }
+    // Wipe the object on teardown to prevent memory leaks across page transitions
+    window.WEBSOCKET = null
+  }
+
+  initializeGlobalInterface() {
+    // Expose the global namespace matching your backend naming strategy
+    window.WEBSOCKET = {
+      // 1. Manually synced Event Registry from BE (Websocket::EVENTS)
+      EVENTS: {
+        test: "test",
+        top_up_completed: "top_up.completed",
+        invoice_paid:     "invoice.paid",
+        balance_updated:  "balance.updated",
+        alert_triggered:  "alert.triggered"
+      },
+
+      // 2. Channel Generators mirroring your Ruby methods
+      companyChannel(companyId) {
+        return companyId ? `${companyId}` : null
+      },
+
+      userChannel(userId) {
+        return userId ? `${userId}` : null
+      },
+
+      // 3. System references managed by the engine
+      cable: null,
+      activeSubscriptions: {},
+
+      // 4. The Global Subscription Hook used by other controllers
+      subscribe(channelName, eventKey, callback) {
+        if (!this.cable) {
+          console.warn(`⚠️ WEBSOCKET connection engine is not ready yet.`)
+          return null
+        }
+
+        const expectedEvent = this.EVENTS[eventKey]
+        if (!expectedEvent) {
+          console.error(`🛑 Unregistered event key rejected: [${eventKey}]`)
+          return null
+        }
+
+        // Multiplexing check: reuse subscription if it already exists for this channel
+        let sub = this.activeSubscriptions[channelName]
+        if (!sub) {
+          sub = this.cable.newSubscription(channelName)
+          sub.subscribe()
+          this.activeSubscriptions[channelName] = sub
+          console.log(`🔗 Pipeline subscribed to channel stream: [${channelName}]`)
+        }
+
+        // Listen for incoming publications and execute the matching callback type
+        sub.on('publication', (ctx) => {
+          if (ctx.data?.event === expectedEvent) {
+            callback(ctx.data.id, ctx.data.payload)
+          }
+        })
+
+        return sub
+      }
     }
   }
 
   initializeCentrifuge() {
-    // 1. Initialize the root client connection
-    this.centrifuge = new Centrifuge(this.urlValue, {
+    // Initialize root engine
+    const centrifuge = new Centrifuge(this.urlValue, {
       token: this.tokenValue
     })
 
-    // 2. Iterate through each channel passed in the Array value
-    this.channelValue.forEach((channelName) => {
-      console.log(`Setting up subscription for channel: ${channelName}`)
-      
-      // Create subscription instance for this specific channel string
-      const sub = this.centrifuge.newSubscription(channelName)
+    // Mount references onto the global gateway
+    window.WEBSOCKET.cable = centrifuge
 
-      // Bind data reception logic
-      sub.on('publication', (ctx) => {
-        this.handleIncomingMessage(channelName, ctx.data)
-      })
-
-      // Activate sub stream and store reference
-      sub.subscribe()
-      this.subscriptions[channelName] = sub
-    })
-
-    // 3. Connect to the Centrifugo cluster engine
-    this.centrifuge.connect()
-  }
-
-  // Centrally handle data events, routing logic based on channel origins
-  handleIncomingMessage(channel, data) {
-    console.log(`🚀 Live Message Arrived from [${channel}]:`)
-    console.dir(data)
-
-    // Example routing: You can dispatch customized events up your DOM tree if needed
-    // this.element.dispatchEvent(new CustomEvent(`ws:${channel}`, { detail: data }))
+    // Open the connection pipe
+    centrifuge.connect()
   }
 }
+
+
+// How to use
+
+// // app/javascript/controllers/billing_page_controller.js
+// import { Controller } from "@hotwired/stimulus"
+
+// export default class extends Controller {
+//   static values = { companyId: String }
+
+//   connect() {
+//     // 1. Generate the channel name matching the backend format
+//     const channel = window.WEBSOCKET.companyChannel(this.companyIdValue)
+
+//     // 2. Safely attach a dynamic listener using the synced event registry key
+//     window.WEBSOCKET.subscribe(channel, "top_up_completed", (resourceId, payload) => {
+//       this.handleInvoiceSuccess(resourceId, payload)
+//     })
+//   }
+
+//   handleInvoiceSuccess(id, payload) {
+//     console.log(`🟢 Top Up completed for entity ID: ${id}`)
+//     // Update your UI state or run local actions here...
+//   }
+// }

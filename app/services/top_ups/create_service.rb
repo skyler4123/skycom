@@ -4,7 +4,7 @@ module TopUps
   class Error < StandardError; end
 
   class CreateService
-    Result = Struct.new(:qr_string, :websocket_url, :websocket_token, :websocket_channel, keyword_init: true)
+    Result = Struct.new(:qr_string, keyword_init: true)
 
     def initialize(company:, amount_cents:, billing_payment_method:)
       @company = company
@@ -60,15 +60,7 @@ module TopUps
 
         qr_string = txn.gateway_payload&.dig("qr_string") || txn.gateway_payload&.dig(:qr_string)
 
-        channel_name = "company_#{@company.id}_top_up"
-        ws_token = Websocket.token(sub: txn.id, channels: [ channel_name ])
-
-        Result.new(
-          qr_string: qr_string,
-          websocket_url: "ws://localhost:8000/connection/websocket",
-          websocket_token: ws_token,
-          websocket_channel: channel_name
-        )
+        Result.new(qr_string: qr_string)
       end
     end
   end

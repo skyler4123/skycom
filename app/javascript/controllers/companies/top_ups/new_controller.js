@@ -1,11 +1,8 @@
 import Companies_LayoutController from "controllers/companies/layout_controller"
-import { Centrifuge } from "centrifuge"
 
 export default class Companies_TopUps_NewController extends Companies_LayoutController {
   /** @type {Array} */ paymentMethods = []
   /** @type {string|null} */ selectedMethodId = null
-  /** @type {Centrifuge|null} */ centrifuge = null
-  /** @type {any|null} */ subscription = null
 
   async connect() {
     super.connect()
@@ -24,13 +21,6 @@ export default class Companies_TopUps_NewController extends Companies_LayoutCont
       }
       return false
     })
-  }
-
-  disconnect() {
-    if (this.centrifuge) {
-      this.centrifuge.disconnect()
-      this.centrifuge = null
-    }
   }
 
   contentHTML() {
@@ -158,7 +148,7 @@ export default class Companies_TopUps_NewController extends Companies_LayoutCont
   }
 
   renderQRWait(response, amountCents, companyId) {
-    const { qr_string, websocket_url, websocket_token, websocket_channel } = response
+    const { qr_string } = response
     const formEl = document.getElementById("top-up-form")
     if (!formEl) return
 
@@ -188,7 +178,14 @@ export default class Companies_TopUps_NewController extends Companies_LayoutCont
       }
     }, 50)
 
-    this.subscribeToWebSocket(websocket_url, websocket_token, websocket_channel, companyId)
+    const channel = WEBSOCKET.companyChannel(currentCompany().id)
+    WEBSOCKET.subscribe(channel, "top_up_completed", (resourceId, payload) => {
+      console.log(resourceId, payload)
+      toast({ type: "success", message: translate("Top-up successful! Redirecting...") })
+      setTimeout(() => {
+        window.location.href = Helpers.company_billing_path(companyId)
+      }, 1500)
+    })
   }
 
   formatCents(cents) {
@@ -200,32 +197,7 @@ export default class Companies_TopUps_NewController extends Companies_LayoutCont
   }
 
   cancelWait() {
-    if (this.centrifuge) {
-      this.centrifuge.disconnect()
-      this.centrifuge = null
-    }
     this.selectedMethodId = null
     this.renderContent()
-  }
-
-  subscribeToWebSocket(url, token, channel, companyId) {
-    if (this.centrifuge) {
-      this.centrifuge.disconnect()
-    }
-
-    this.centrifuge = new Centrifuge(url, { token })
-    this.subscription = this.centrifuge.newSubscription(channel)
-
-    this.subscription.on("publication", (ctx) => {
-      if (ctx.data?.event === "top_up.completed") {
-        toast({ type: "success", message: translate("Top-up successful! Redirecting...") })
-        setTimeout(() => {
-          window.location.href = Helpers.company_billing_path(companyId)
-        }, 1500)
-      }
-    })
-
-    this.subscription.subscribe()
-    this.centrifuge.connect()
   }
 }

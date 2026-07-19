@@ -41,11 +41,10 @@ module Webhooks
         )
       end
 
-      channel = "company_#{company.id}_top_up"
-      Websocket.publish(
-        channel: channel,
+      WEBSOCKET.publish_event(
+        channel: WEBSOCKET.company_channel(company&.id),
+        event_key: :top_up_completed,
         data: {
-          event: "top_up.completed",
           amount_cents: amount,
           transaction_id: txn.id
         }
