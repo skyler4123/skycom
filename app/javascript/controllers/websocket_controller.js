@@ -10,6 +10,10 @@ export default class WebsocketController extends Controller {
   }
 
   connect() {
+    if (!this.hasUrlValue) {
+      console.log("⚡ WebSocket skipped (not authenticated)")
+      return
+    }
     console.log("⚡ Core WebSockets Gateway mounted.")
     this.initializeGlobalInterface()
     this.initializeCentrifuge()
