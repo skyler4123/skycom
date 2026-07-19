@@ -69,7 +69,12 @@ Rails.application.routes.draw do
       end
 
       get "analytics", to: "analytics#index"
-      resources :top_ups, only: %i[new create], controller: :top_ups
+      resources :top_ups, only: %i[new], controller: :top_ups do
+        collection do
+          post :qr, to: "top_ups#qr"
+          post :redirect, to: "top_ups#redirect"
+        end
+      end
 
       post "order_processing/v1/checkout", to: "order_processing/v1#checkout"
       post "order_processing/v1/pay", to: "order_processing/v1#pay"
@@ -121,8 +126,8 @@ Rails.application.routes.draw do
   # Webhooks
   namespace :webhooks do
     namespace :payments do
-      post "qr",       to: "qr#create"
-      post "redirect", to: "redirect#create"
+      post "mock_qr",       to: "mock_qr#create"
+      post "mock_redirect", to: "mock_redirect#create"
     end
   end
 
