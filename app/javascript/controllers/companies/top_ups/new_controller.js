@@ -138,7 +138,7 @@ export default class Companies_TopUps_NewController extends Companies_LayoutCont
     try {
       const selectedMethod = this.paymentMethods.find(m => m.id === this.selectedMethodId)
       const isRedirect = selectedMethod?.strategy === "mock_redirect_gateway"
-      const url = isRedirect ? Helpers.redirect_company_top_ups_path(cid) : Helpers.qr_company_top_ups_path(cid)
+      const url = isRedirect ? Helpers.mock_redirect_gateway_company_top_ups_path(cid) : Helpers.mock_qr_gateway_company_top_ups_path(cid)
 
       const response = await fetchJson(url, {
         method: "POST",

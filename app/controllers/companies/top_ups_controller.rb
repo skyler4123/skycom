@@ -10,7 +10,7 @@ class Companies::TopUpsController < Companies::ApplicationController
     end
   end
 
-  def qr
+  def mock_qr_gateway
     bpm = BillingPaymentMethod.find_by!(strategy: :mock_qr_gateway)
     result = TopUps::CreateService.new(
       company: current_company,
@@ -24,7 +24,7 @@ class Companies::TopUpsController < Companies::ApplicationController
     render json: { errors: e.record.errors.full_messages }, status: :unprocessable_entity
   end
 
-  def redirect
+  def mock_redirect_gateway
     bpm = BillingPaymentMethod.find_by!(strategy: :mock_redirect_gateway)
     result = TopUps::CreateService.new(
       company: current_company,

@@ -71,8 +71,8 @@ Rails.application.routes.draw do
       get "analytics", to: "analytics#index"
       resources :top_ups, only: %i[new] do
         collection do
-          post :qr
-          post :redirect
+          post :mock_qr_gateway
+          post :mock_redirect_gateway
         end
       end
 
