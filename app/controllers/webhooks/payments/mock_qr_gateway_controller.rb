@@ -2,24 +2,24 @@
 
 module Webhooks
   module Payments
-    class MockRedirectController < ActionController::Base
+    class MockQrGatewayController < ActionController::Base
       skip_before_action :verify_authenticity_token
 
       def create
-        received_sig = request.headers["X-Skycom-RedirectBank-Signature"]
-        unless received_sig == WEBHOOK_REDIRECT_PAYMENT_SECRET
+        received_sig = request.headers["X-Skycom-Bank-Signature"]
+        unless received_sig == WEBHOOK_BANK_PAYMENT_SECRET
           return render json: { error: "Invalid signature" }, status: :unauthorized
         end
 
-        data = params
-        authorized_token = data[:authorized_token]
-        settlement_amount = data[:settlement_amount].to_i
+        data = params[:data] || params
+        transaction_token = data[:transaction_token]
+        amount = data[:amount].to_i
 
-        unless authorized_token.present? && settlement_amount.positive?
-          return render json: { error: "Missing authorized_token or settlement_amount" }, status: :unprocessable_content
+        unless transaction_token.present? && amount.positive?
+          return render json: { error: "Missing transaction_token or amount" }, status: :unprocessable_content
         end
 
-        txn = BillingTransaction.find_by(gateway_reference: authorized_token)
+        txn = BillingTransaction.find_by(gateway_reference: transaction_token)
         unless txn
           return render json: { error: "Transaction not found" }, status: :not_found
         end
@@ -32,12 +32,12 @@ module Webhooks
 
         ActiveRecord::Base.transaction do
           wallet = company.billing_wallet.lock!
-          new_main = wallet.main_balance_cents + settlement_amount
+          new_main = wallet.main_balance_cents + amount
           wallet.update!(main_balance_cents: new_main)
 
           txn.update!(
             status: :completed,
-            gateway_reference: data[:reference_code] || txn.gateway_reference,
+            gateway_reference: data[:transaction_id] || txn.gateway_reference,
             balance_after_cents: new_main
           )
         end
@@ -46,7 +46,7 @@ module Webhooks
           channel: WEBSOCKET.company_channel(company&.id),
           event_key: :top_up_completed,
           data: {
-            amount_cents: settlement_amount,
+            amount_cents: amount,
             transaction_id: txn.id
           }
         )

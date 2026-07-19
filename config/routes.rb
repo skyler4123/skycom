@@ -126,8 +126,8 @@ Rails.application.routes.draw do
   # Webhooks
   namespace :webhooks do
     namespace :payments do
-      post "mock_qr",       to: "mock_qr#create"
-      post "mock_redirect", to: "mock_redirect#create"
+      post "mock_qr_gateway",       to: "mock_qr_gateway#create"
+      post "mock_redirect_gateway", to: "mock_redirect_gateway#create"
     end
   end
 
