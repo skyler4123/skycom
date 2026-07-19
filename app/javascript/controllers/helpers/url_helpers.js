@@ -170,7 +170,8 @@ export const company_billing_path = (companyId) => `/companies/${companyId}/bill
 export const company_billing_pay_all_path = (companyId) => `/companies/${companyId}/billing/pay_all`
 
 export const new_company_top_up_path = (companyId) => `/companies/${companyId}/top_ups/new`
-export const create_company_top_ups_path = (companyId) => `/companies/${companyId}/top_ups`
+export const qr_company_top_ups_path = (companyId) => `/companies/${companyId}/top_ups/qr`
+export const redirect_company_top_ups_path = (companyId) => `/companies/${companyId}/top_ups/redirect`
 
 export const company_invoices_path = (companyId) => `/companies/${companyId}/invoices`
 export const create_company_invoices_path = (companyId) => `/companies/${companyId}/invoices`
