@@ -4,12 +4,13 @@ module TopUps
   class Error < StandardError; end
 
   class CreateService
-    Result = Struct.new(:qr_string, keyword_init: true)
+    Result = Struct.new(:gateway_type, :qr_string, :redirect_url, keyword_init: true)
 
-    def initialize(company:, amount_cents:, billing_payment_method:)
+    def initialize(company:, amount_cents:, billing_payment_method:, redirect_url: nil)
       @company = company
       @amount_cents = amount_cents.to_i
       @billing_payment_method = billing_payment_method
+      @redirect_url = redirect_url
     end
 
     def call
@@ -54,13 +55,19 @@ module TopUps
           description: "Wallet top-up of #{@amount_cents} cents via #{@billing_payment_method.name}"
         )
 
-        Payments::InitiateService.new(transaction: txn).call
+        Payments::InitiateService.new(transaction: txn, redirect_url: @redirect_url).call
 
         txn.reload
 
-        qr_string = txn.gateway_payload&.dig("qr_string") || txn.gateway_payload&.dig(:qr_string)
+        payload = txn.gateway_payload || {}
 
-        Result.new(qr_string: qr_string)
+        if payload["redirect_url"].present?
+          Result.new(gateway_type: "redirect", redirect_url: payload["redirect_url"])
+        elsif payload["qr_string"].present?
+          Result.new(gateway_type: "qr", qr_string: payload["qr_string"])
+        else
+          Result.new(gateway_type: "unknown")
+        end
       end
     end
   end
