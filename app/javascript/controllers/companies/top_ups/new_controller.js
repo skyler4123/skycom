@@ -136,17 +136,18 @@ export default class Companies_TopUps_NewController extends Companies_LayoutCont
     if (!cid || !this.selectedMethodId || amountCents <= 0) return
 
     try {
-      const response = await fetchJson(Helpers.create_company_top_ups_path(cid), {
+      const selectedMethod = this.paymentMethods.find(m => m.id === this.selectedMethodId)
+      const isRedirect = selectedMethod?.strategy === "mock_redirect_gateway"
+      const url = isRedirect ? Helpers.redirect_company_top_ups_path(cid) : Helpers.qr_company_top_ups_path(cid)
+
+      const response = await fetchJson(url, {
         method: "POST",
-        body: {
-          amount_cents: amountCents,
-          billing_payment_method_id: this.selectedMethodId
-        }
+        body: { amount_cents: amountCents }
       })
 
-      if (response.gateway_type === "redirect") {
+      if (isRedirect) {
         window.location.href = response.redirect_url
-      } else if (response.gateway_type === "qr") {
+      } else {
         this.renderQRWait(response, amountCents, cid)
       }
     } catch (error) {

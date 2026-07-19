@@ -17,7 +17,7 @@ class Companies::TopUpsController < Companies::ApplicationController
       amount_cents: params[:amount_cents],
       billing_payment_method: bpm
     ).call
-    render json: { gateway_type: "qr", qr_string: result.qr_string }
+    render json: { qr_string: result.qr_string }
   rescue TopUps::Error => e
     render json: { errors: [ e.message ] }, status: :unprocessable_entity
   rescue ActiveRecord::RecordInvalid => e
@@ -32,7 +32,7 @@ class Companies::TopUpsController < Companies::ApplicationController
       billing_payment_method: bpm,
       redirect_url: company_billing_url(current_company)
     ).call
-    render json: { gateway_type: "redirect", redirect_url: result.redirect_url }
+    render json: { redirect_url: result.redirect_url }
   rescue TopUps::Error => e
     render json: { errors: [ e.message ] }, status: :unprocessable_entity
   rescue ActiveRecord::RecordInvalid => e
