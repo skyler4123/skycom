@@ -1,6 +1,13 @@
 # config/routes.rb
 
 Rails.application.routes.draw do
+  # Webhooks
+  namespace :webhooks do
+    namespace :payments do
+      post "mock_qr_gateway",       to: "mock_qr_gateway#create"
+      post "mock_redirect_gateway", to: "mock_redirect_gateway#create"
+    end
+  end
   namespace :admin do
     resources :companies
     resources :payment_methods
@@ -122,14 +129,6 @@ Rails.application.routes.draw do
   end
   resource :invitation, only: [ :new, :create ]
   root "home#index"
-
-  # Webhooks
-  namespace :webhooks do
-    namespace :payments do
-      post "mock_qr_gateway",       to: "mock_qr_gateway#create"
-      post "mock_redirect_gateway", to: "mock_redirect_gateway#create"
-    end
-  end
 
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
 
