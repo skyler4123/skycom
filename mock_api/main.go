@@ -14,7 +14,7 @@ import (
 // =========================================================================
 const (
 	ServerPort = ":4000"
-	BaseIP     = "192.168.0.100" 
+	BaseIP     = "192.168.0.100"
 
 	ClientSuccessURL = "http://" + BaseIP + ":3000/checkout/success"
 
@@ -28,16 +28,39 @@ const (
 // TYPES & MEMORY STORE
 // =========================================================================
 
-type PaymentRequest struct {
+// QR Flow Structs (UNCHANGED JSON mappings to match original behavior)
+type QRPaymentRequest struct {
 	Amount           int    `json:"amount"`
 	InvoiceID        string `json:"invoice_id"`
-	TransactionToken string `json:"transaction_token"` // Added to track specific transaction
+	TransactionToken string `json:"transaction_token"`
 	Memo             string `json:"memo"`
 	ReturnURL        string `json:"return_url,omitempty"`
 	WebhookURL       string `json:"webhook_url,omitempty"`
 }
 
-var activeSessions = make(map[string]PaymentRequest)
+type QRPaymentResponse struct {
+	Success  bool             `json:"success"`
+	QRString string           `json:"qr_string"`
+	Received QRPaymentRequest `json:"received"`
+}
+
+// Redirect Flow Structs (Distinct parameters and response structures)
+type RedirectSessionRequest struct {
+	Amount           int    `json:"amount_cents"`      // Custom parameter
+	InvoiceUUID      string `json:"invoice_uuid"`      // Custom parameter
+	TxnChannelToken  string `json:"txn_channel_token"` // Custom parameter
+	CallbackWebhook  string `json:"callback_webhook,omitempty"`
+	CancelURL        string `json:"cancel_url,omitempty"`
+}
+
+type RedirectSessionResponse struct {
+	SessionID  string    `json:"session_id"`
+	CheckoutURL string   `json:"checkout_url"`
+	ExpiresAt  time.Time `json:"expires_at"`
+}
+
+// Memory store tracking the structured session data
+var activeSessions = make(map[string]RedirectSessionRequest)
 
 // =========================================================================
 // MAIN ENGINE
@@ -59,11 +82,11 @@ func main() {
 	})
 
 	// -------------------------------------------------------------------------
-	// ROUTE 1: QR GENERATE
+	// ROUTE 1: QR GENERATE (Input & Output formats preserved)
 	// -------------------------------------------------------------------------
 	http.HandleFunc("/api/v1/bank/qr-generate", func(w http.ResponseWriter, r *http.Request) {
 		logAction("QR FLOW", "Received generation request")
-		var req PaymentRequest
+		var req QRPaymentRequest
 		
 		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 			logError("QR FLOW", fmt.Sprintf("Failed to decode JSON: %v", err))
@@ -74,6 +97,7 @@ func main() {
 		if req.Amount <= 0 || req.InvoiceID == "" || req.TransactionToken == "" {
 			logWarn("QR FLOW", "Validation Failed. Missing critical fields.")
 			w.WriteHeader(http.StatusBadRequest)
+			w.Header().Set("Content-Type", "application/json")
 			json.NewEncoder(w).Encode(map[string]interface{}{
 				"success": false,
 				"error":   "Missing required fields (amount, invoice_id, or transaction_token)",
@@ -82,12 +106,10 @@ func main() {
 		}
 
 		txnID := fmt.Sprintf("TXN_QR_%d", time.Now().UnixNano())
-		// Embedded the rails transaction token in the QR payload
 		qrString := fmt.Sprintf("00020101021238580010A0000|AMT:%d|INV:%s|TOKEN:%s|TXN:%s", req.Amount, req.InvoiceID, req.TransactionToken, txnID)
 		
 		logSuccess("QR FLOW", fmt.Sprintf("Generated Txn: %s for Rails Token: %s", txnID, req.TransactionToken))
 
-		// Simulate user scanning QR with their phone — wait before firing webhook
 		go func() {
 			time.Sleep(MockQRWebhookDelay)
 			targetURL := req.WebhookURL
@@ -98,19 +120,19 @@ func main() {
 		}()
 
 		w.Header().Set("Content-Type", "application/json")
-		json.NewEncoder(w).Encode(map[string]interface{}{
-			"success":   true, 
-			"qr_string": qrString,
-			"received":  req,
+		json.NewEncoder(w).Encode(QRPaymentResponse{
+			Success:  true,
+			QRString: qrString,
+			Received: req,
 		})
 	})
 
 	// -------------------------------------------------------------------------
-	// ROUTE 2: REDIRECT SESSION SETUP
+	// ROUTE 2: REDIRECT SESSION SETUP (Completely new signature)
 	// -------------------------------------------------------------------------
 	http.HandleFunc("/api/v1/bank/redirect-session", func(w http.ResponseWriter, r *http.Request) {
-		logAction("REDIRECT FLOW", "Setting up checkout session")
-		var req PaymentRequest
+		logAction("REDIRECT FLOW", "Setting up unique checkout session")
+		var req RedirectSessionRequest
 		
 		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 			logError("REDIRECT FLOW", fmt.Sprintf("Failed to decode JSON: %v", err))
@@ -118,14 +140,24 @@ func main() {
 			return
 		}
 
+		if req.Amount <= 0 || req.InvoiceUUID == "" || req.TxnChannelToken == "" {
+			logWarn("REDIRECT FLOW", "Validation Failed. Missing unique checkout params.")
+			w.WriteHeader(http.StatusBadRequest)
+			return
+		}
+
 		sessionID := fmt.Sprintf("SESS_%d", time.Now().UnixNano())
-		activeSessions[sessionID] = req // Saves the transaction_token into memory
+		activeSessions[sessionID] = req 
 		
 		redirectURL := fmt.Sprintf("%s/bank/hosted-checkout?session_id=%s", hostedCheckoutBase, sessionID)
-		logSuccess("REDIRECT FLOW", fmt.Sprintf("Created Session for Token %s -> Redirect: %s", req.TransactionToken, redirectURL))
+		logSuccess("REDIRECT FLOW", fmt.Sprintf("Created Session for Token %s -> Redirect: %s", req.TxnChannelToken, redirectURL))
 
 		w.Header().Set("Content-Type", "application/json")
-		json.NewEncoder(w).Encode(map[string]interface{}{"success": true, "redirect_url": redirectURL})
+		json.NewEncoder(w).Encode(RedirectSessionResponse{
+			SessionID:   sessionID,
+			CheckoutURL: redirectURL,
+			ExpiresAt:   time.Now().Add(15 * time.Minute),
+		})
 	})
 
 	// -------------------------------------------------------------------------
@@ -158,8 +190,8 @@ func main() {
 				<h2>🔒 SECURE HOSTED PORTAL</h2>
 				<form action="/bank/hosted-checkout/submit" method="POST">
 					<input type="hidden" name="session_id" value="{{.SessionID}}">
-					<input type="text" value="Invoice Reference: {{.InvoiceID}}" disabled>
-					<input type="text" value="Transaction Token: {{.TransactionToken}}" disabled>
+					<input type="text" value="Invoice Reference: {{.InvoiceUUID}}" disabled>
+					<input type="text" value="Transaction Token: {{.TxnChannelToken}}" disabled>
 					<input type="text" value="Amount: {{.Amount}} cents" disabled>
 					<button type="submit">🔒 CONFIRM & SUBMIT</button>
 				</form>
@@ -170,8 +202,8 @@ func main() {
 		t, _ := template.New("webpage").Parse(tmpl)
 		t.Execute(w, map[string]interface{}{
 			"SessionID":        sessionID, 
-			"InvoiceID":        sessionData.InvoiceID, 
-			"TransactionToken": sessionData.TransactionToken,
+			"InvoiceUUID":      sessionData.InvoiceUUID, 
+			"TxnChannelToken":  sessionData.TxnChannelToken,
 			"Amount":           sessionData.Amount,
 		})
 	})
@@ -192,14 +224,13 @@ func main() {
 		}
 
 		txnID := fmt.Sprintf("TXN_CARD_%d", time.Now().UnixNano())
-		logSuccess("FORM SUBMIT", fmt.Sprintf("Processed Card. Rails Token: %s -> Bank Txn ID: %s", sessionData.TransactionToken, txnID))
+		logSuccess("FORM SUBMIT", fmt.Sprintf("Processed Card. Rails Token: %s -> Bank Txn ID: %s", sessionData.TxnChannelToken, txnID))
 
-		// Fire webhook containing both the Rails Transaction Token and the internal bank Txn ID
-		targetURL := sessionData.WebhookURL
+		targetURL := sessionData.CallbackWebhook
 		if targetURL == "" {
 			targetURL = WebhookTargetURL
 		}
-		go fireWebhookCallback(txnID, sessionData.InvoiceID, sessionData.TransactionToken, sessionData.Amount, targetURL)
+		go fireWebhookCallback(txnID, sessionData.InvoiceUUID, sessionData.TxnChannelToken, sessionData.Amount, targetURL)
 		
 		delete(activeSessions, sessionID)
 		logAction("DATABASE", fmt.Sprintf("Cleaned up session %s from active memory map.", sessionID))
@@ -219,13 +250,12 @@ func main() {
 func fireWebhookCallback(txnID string, invoiceID string, transactionToken string, amount int, webhookURL string) {
 	logAction("WEBHOOK", fmt.Sprintf("Preparing dispatch payload for Txn: %s", txnID))
 
-	// Including transaction_token in the callback so Rails can identify the exact transaction!
 	payload, _ := json.Marshal(map[string]interface{}{
 		"event": "transaction.completed",
 		"data": map[string]interface{}{
 			"transaction_id":    txnID, 
 			"invoice_id":        invoiceID, 
-			"transaction_token": transactionToken, // This maps to Rails' channel_token
+			"transaction_token": transactionToken, 
 			"amount":            amount, 
 			"paid_at":           time.Now().Format(time.RFC3339),
 		},
@@ -252,18 +282,7 @@ func fireWebhookCallback(txnID string, invoiceID string, transactionToken string
 // UNIFIED LOGGING UTILITIES
 // =========================================================================
 
-func logAction(context string, message string) {
-	fmt.Printf("📥 [%-14s] %s\n", context, message)
-}
-
-func logSuccess(context string, message string) {
-	fmt.Printf("🟢 [%-14s] SUCCESS: %s\n", context, message)
-}
-
-func logWarn(context string, message string) {
-	fmt.Printf("⚠️  [%-14s] WARNING: %s\n", context, message)
-}
-
-func logError(context string, message string) {
-	fmt.Printf("❌ [%-14s] ERROR: %s\n", context, message)
-}
+func logAction(context string, message string)  { fmt.Printf("📥 [%-14s] %s\n", context, message) }
+func logSuccess(context string, message string) { fmt.Printf("🟢 [%-14s] SUCCESS: %s\n", context, message) }
+func logWarn(context string, message string)    { fmt.Printf("⚠️  [%-14s] WARNING: %s\n", context, message) }
+func logError(context string, message string)   { fmt.Printf("❌ [%-14s] ERROR: %s\n", context, message) }

@@ -21,8 +21,6 @@ class ApplicationController < ActionController::Base
   before_action :sync_client_cache_version, if: :current_user
   before_action :set_paper_trail_whodunnit
 
-  private
-
   # --------------------------------------------------------------------------
   # SINGLE-SESSION MODE
   #
