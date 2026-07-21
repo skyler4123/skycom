@@ -9,7 +9,7 @@ module ApplicationController::WebsocketConcern
   def set_websocket_channels
     return unless is_signed_in? && @current_company
     @channels = []
-
+    @channels << WEBSOCKET::EVENTS[:test] if !Rails.env.production?
     @channels << WEBSOCKET.company_channel(current_company&.id) if current_company
     @channels << WEBSOCKET.user_channel(current_user&.id)       if current_user
 

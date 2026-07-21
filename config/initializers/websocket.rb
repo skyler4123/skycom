@@ -50,5 +50,20 @@ class WEBSOCKET
     def token(sub:, channels:)
       NOTARY.issue_connection_token(sub: sub, channels: Array(channels))
     end
+
+    # Test WEBSOCKET, make sure use the valid and same channel. FE must run this code to subscribe
+    # window.WEBSOCKET.subscribe(window.WEBSOCKET.companyChannel(currentCompany().id), "test", (data) => {
+    #   console.log(data)
+    # })
+    def test(channel)
+      publish_event(
+        channel: WEBSOCKET.company_channel(channel),
+        event_key: :test,
+        data: {
+          project: "Skycom",
+          project_type: "ERP"
+        }
+      )
+    end
   end
 end

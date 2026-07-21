@@ -1,7 +1,5 @@
 // app/javascript/controllers/websocket_controller.js
-
 import { Controller } from "@hotwired/stimulus"
-import { Centrifuge } from "centrifuge"
 
 export default class WebsocketController extends Controller {
   static values = {
@@ -14,24 +12,137 @@ export default class WebsocketController extends Controller {
       console.log("⚡ WebSocket skipped (not authenticated)")
       return
     }
-    console.log("⚡ Core WebSockets Gateway mounted.")
+
+    if (!window.SharedWorker) {
+      console.warn("⚠️ SharedWorker is not supported in this browser.")
+      return
+    }
+
+    // 1. Resolve local fingerprinted path of Centrifugo from importmap in <head>
+    this.centrifugePath = this.getImportMapPath("centrifuge")
+    if (!this.centrifugePath) {
+      console.error("🛑 Could not find 'centrifuge' pinned in importmap!")
+      return
+    }
+
+    console.log(`⚡ SharedWorker WebSockets Gateway mounted (Centrifugo: ${this.centrifugePath})`)
+    
+    // 2. Initialize SharedWorker & global window interface
+    this.initializeSharedWorker()
     this.initializeGlobalInterface()
-    this.initializeCentrifuge()
   }
 
   disconnect() {
-    if (window.WEBSOCKET && window.WEBSOCKET.cable) {
-      window.WEBSOCKET.cable.disconnect()
-      console.log("🔌 Connection closed cleanly.")
+    if (this.workerPort) {
+      this.workerPort.close()
     }
-    // Wipe the object on teardown to prevent memory leaks across page transitions
     window.WEBSOCKET = null
   }
 
+  getImportMapPath(moduleName) {
+    const importMapScript = document.querySelector('script[type="importmap"]')
+    if (!importMapScript) return null
+
+    try {
+      const importMap = JSON.parse(importMapScript.textContent)
+      return importMap.imports[moduleName] || null
+    } catch (e) {
+      return null
+    }
+  }
+
+  initializeSharedWorker() {
+    // Construct worker script using native ES module import
+    const workerScript = `
+      import { Centrifuge } from "${window.location.origin}${this.centrifugePath}";
+
+      const ports = new Set();
+      let centrifuge = null;
+      let activeSubscriptions = {};
+
+      self.onconnect = (e) => {
+        const port = e.ports[0];
+        ports.add(port);
+
+        port.onmessage = (event) => {
+          const { action, payload } = event.data;
+
+          switch (action) {
+            case "INIT_CENTRIFUGO":
+              initCentrifugo(payload.url, payload.token);
+              break;
+            case "SUBSCRIBE":
+              subscribeChannel(payload.channel);
+              break;
+          }
+        };
+
+        port.start();
+      };
+
+      function initCentrifugo(url, token) {
+        if (centrifuge) return;
+
+        centrifuge = new Centrifuge(url, { token });
+        centrifuge.connect();
+      }
+
+      function subscribeChannel(channel) {
+        if (!centrifuge || activeSubscriptions[channel]) return;
+
+        const sub = centrifuge.newSubscription(channel);
+        sub.on("publication", (ctx) => {
+          broadcast({
+            action: "PUBLICATION",
+            channel: channel,
+            data: ctx.data
+          });
+        });
+
+        sub.subscribe();
+        activeSubscriptions[channel] = sub;
+      }
+
+      function broadcast(message) {
+        ports.forEach((port) => {
+          try {
+            port.postMessage(message);
+          } catch (err) {
+            ports.delete(port);
+          }
+        });
+      }
+    `
+
+    // Encode into a Data URL to prevent Blob URL CORS/opaque origin blocks on reload
+    const dataUrl = `data:text/javascript;charset=utf-8,${encodeURIComponent(workerScript)}`
+
+    // Instantiate as an ES module worker
+    this.worker = new SharedWorker(dataUrl, { type: "module" })
+    this.workerPort = this.worker.port
+
+    // Listen for events fan-outed from the SharedWorker
+    this.workerPort.onmessage = (event) => {
+      const { action, channel, data } = event.data
+      if (action === "PUBLICATION" && window.WEBSOCKET) {
+        window.WEBSOCKET.handleIncomingPublication(channel, data)
+      }
+    }
+
+    this.workerPort.start()
+
+    // Initialize Centrifugo connection inside worker thread
+    this.workerPort.postMessage({
+      action: "INIT_CENTRIFUGO",
+      payload: { url: this.urlValue, token: this.tokenValue }
+    })
+  }
+
   initializeGlobalInterface() {
-    // Expose the global namespace matching your backend naming strategy
+    const self = this
+
     window.WEBSOCKET = {
-      // 1. Manually synced Event Registry from BE (Websocket::EVENTS)
+      // 1. Event Registry
       EVENTS: {
         test: "test",
         top_up_completed: "top_up.completed",
@@ -40,7 +151,7 @@ export default class WebsocketController extends Controller {
         alert_triggered:  "alert.triggered"
       },
 
-      // 2. Channel Generators mirroring your Ruby methods
+      // 2. Channel Generators
       companyChannel(companyId) {
         return companyId ? `${companyId}` : null
       },
@@ -49,79 +160,54 @@ export default class WebsocketController extends Controller {
         return userId ? `${userId}` : null
       },
 
-      // 3. System references managed by the engine
-      cable: null,
-      activeSubscriptions: {},
+      // 3. Local tab listener registry
+      listeners: {},
 
-      // 4. The Global Subscription Hook used by other controllers
+      // 4. Global Subscription Hook
       subscribe(channelName, eventKey, callback) {
-        if (!this.cable) {
-          console.warn(`⚠️ WEBSOCKET connection engine is not ready yet.`)
-          return null
-        }
-
         const expectedEvent = this.EVENTS[eventKey]
         if (!expectedEvent) {
           console.error(`🛑 Unregistered event key rejected: [${eventKey}]`)
           return null
         }
 
-        // Multiplexing check: reuse subscription if it already exists for this channel
-        let sub = this.activeSubscriptions[channelName]
-        if (!sub) {
-          sub = this.cable.newSubscription(channelName)
-          sub.subscribe()
-          this.activeSubscriptions[channelName] = sub
-          console.log(`🔗 Pipeline subscribed to channel stream: [${channelName}]`)
+        if (!this.listeners[channelName]) {
+          this.listeners[channelName] = []
+
+          // Tell SharedWorker to subscribe on Centrifugo if not already active
+          self.workerPort.postMessage({
+            action: "SUBSCRIBE",
+            payload: { channel: channelName }
+          })
         }
 
-        // Listen for incoming publications and execute the matching callback type
-        sub.on('publication', (ctx) => {
-          if (ctx.data?.event === expectedEvent) {
-            callback(ctx.data.id, ctx.data.payload)
+        const listener = { eventKey: expectedEvent, callback }
+        this.listeners[channelName].push(listener)
+
+        return {
+          unsubscribe: () => {
+            this.listeners[channelName] = this.listeners[channelName].filter(l => l !== listener)
+          }
+        }
+      },
+
+      // Internal publication dispatcher
+      handleIncomingPublication(channel, data) {
+        const channelListeners = this.listeners[channel]
+        if (!channelListeners || !data?.event) return
+
+        channelListeners.forEach(({ eventKey, callback }) => {
+          if (data.event === eventKey) {
+            callback(data)
           }
         })
-
-        return sub
       }
     }
   }
-
-  initializeCentrifuge() {
-    // Initialize root engine
-    const centrifuge = new Centrifuge(this.urlValue, {
-      token: this.tokenValue
-    })
-
-    // Mount references onto the global gateway
-    window.WEBSOCKET.cable = centrifuge
-
-    // Open the connection pipe
-    centrifuge.connect()
-  }
 }
 
+// How to use:
 
-// How to use
-
-// // app/javascript/controllers/billing_page_controller.js
-// import { Controller } from "@hotwired/stimulus"
-
-// export default class extends Controller {
-//   static values = { companyId: String }
-
-//   connect() {
-//     // 1. Generate the channel name matching the backend format
-//     const channel = window.WEBSOCKET.companyChannel(this.companyIdValue)
-
-//     // 2. Safely attach a dynamic listener using the synced event registry key
-//     window.WEBSOCKET.subscribe(channel, "top_up_completed", (resourceId, payload) => {
-//       this.handleInvoiceSuccess(resourceId, payload)
-//     })
-//   }
-
-//   handleInvoiceSuccess(id, payload) {
-//     console.log(`🟢 Top Up completed for entity ID: ${id}`)
-//     // Update your UI state or run local actions here...
-//   }
-// }
+// window.WEBSOCKET.subscribe(window.WEBSOCKET.companyChannel(currentCompany().id), "test", (data) => {
+//   console.log(data)
+// })

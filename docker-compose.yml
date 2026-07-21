@@ -7,39 +7,39 @@
 
 name: skycom_development
 services:
-  web:
-    build: .
-    command: bash -c "sleep 30 && rm -f tmp/pids/server.pid && bundle exec rails db:prepare && bundle exec rails assets:precompile && bundle exec thrust bin/rails s"
-    environment:
-      RAILS_ENV: development
-      RAILS_MASTER_KEY: ${RAILS_MASTER_KEY}
-    volumes:
-      - .:/rails
-      - sqlite_storage:/rails/storage
-    ports:
-      - "80:80"
-      - "443:443"
-    stdin_open: true
-    tty: true
-    depends_on:
-      - postgres
-      - pulse_postgres
-      - minio
-      - websocket
+  # web:
+  #   build: .
+  #   command: bash -c "sleep 30 && rm -f tmp/pids/server.pid && bundle exec rails db:prepare && bundle exec rails assets:precompile && bundle exec thrust bin/rails s"
+  #   environment:
+  #     RAILS_ENV: development
+  #     RAILS_MASTER_KEY: ${RAILS_MASTER_KEY}
+  #   volumes:
+  #     - .:/rails
+  #     - sqlite_storage:/rails/storage
+  #   ports:
+  #     - "80:80"
+  #     - "443:443"
+  #   stdin_open: true
+  #   tty: true
+  #   depends_on:
+  #     - postgres
+  #     - pulse_postgres
+  #     - minio
+  #     - websocket
 
-  job:
-    build: .
-    command: bash -c "sleep 15 && bundle exec rails db:prepare && bin/jobs"
-    environment:
-      RAILS_ENV: development
-      RAILS_MASTER_KEY: ${RAILS_MASTER_KEY}
-    volumes:
-      - .:/rails
-      - sqlite_storage:/rails/storage
-    depends_on:
-      - web
-      - pulse_postgres
-      - websocket
+  # job:
+  #   build: .
+  #   command: bash -c "sleep 15 && bundle exec rails db:prepare && bin/jobs"
+  #   environment:
+  #     RAILS_ENV: development
+  #     RAILS_MASTER_KEY: ${RAILS_MASTER_KEY}
+  #   volumes:
+  #     - .:/rails
+  #     - sqlite_storage:/rails/storage
+  #   depends_on:
+  #     - web
+  #     - pulse_postgres
+  #     - websocket
 
   postgres:
     image: postgres:18.3
@@ -122,7 +122,8 @@ services:
       - "8000:8000"
     command: centrifugo --client_insecure=false --api_insecure=false
     environment:
-      CENTRIFUGO_ALLOWED_ORIGINS: "http://localhost:3000"
+      # 🚀 Include "null" to allow SharedWorker Data URLs
+      CENTRIFUGO_ALLOWED_ORIGINS: "http://localhost:3000 http://127.0.0.1:3000 null"
       # Administrative Backend API Token (Matches Rails CENTRIFUGO_API_KEY)
       CENTRIFUGO_API_KEY: "skycom_super_secret_api_key_2026"
       # Secure Verification Engine Token (Matches Rails CENTRIFUGO_TOKEN_HMAC_SECRET_KEY)
