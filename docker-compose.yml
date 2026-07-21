@@ -7,39 +7,39 @@
 
 name: skycom_development
 services:
-  # web:
-  #   build: .
-  #   command: bash -c "sleep 30 && rm -f tmp/pids/server.pid && bundle exec rails db:prepare && bundle exec rails assets:precompile && bundle exec thrust bin/rails s"
-  #   environment:
-  #     RAILS_ENV: development
-  #     RAILS_MASTER_KEY: ${RAILS_MASTER_KEY}
-  #   volumes:
-  #     - .:/rails
-  #     - sqlite_storage:/rails/storage
-  #   ports:
-  #     - "80:80"
-  #     - "443:443"
-  #   stdin_open: true
-  #   tty: true
-  #   depends_on:
-  #     - postgres
-  #     - pulse_postgres
-  #     - minio
-  #     - websocket
+  web:
+    build: .
+    command: bash -c "sleep 30 && rm -f tmp/pids/server.pid && bundle exec rails db:prepare && bundle exec rails assets:precompile && bundle exec thrust bin/rails s"
+    environment:
+      RAILS_ENV: development
+      RAILS_MASTER_KEY: ${RAILS_MASTER_KEY}
+    volumes:
+      - .:/rails
+      - sqlite_storage:/rails/storage
+    ports:
+      - "80:80"
+      - "443:443"
+    stdin_open: true
+    tty: true
+    depends_on:
+      - postgres
+      - pulse_postgres
+      - minio
+      - websocket
 
-  # job:
-  #   build: .
-  #   command: bash -c "sleep 15 && bundle exec rails db:prepare && bin/jobs"
-  #   environment:
-  #     RAILS_ENV: development
-  #     RAILS_MASTER_KEY: ${RAILS_MASTER_KEY}
-  #   volumes:
-  #     - .:/rails
-  #     - sqlite_storage:/rails/storage
-  #   depends_on:
-  #     - web
-  #     - pulse_postgres
-  #     - websocket
+  job:
+    build: .
+    command: bash -c "sleep 15 && bundle exec rails db:prepare && bin/jobs"
+    environment:
+      RAILS_ENV: development
+      RAILS_MASTER_KEY: ${RAILS_MASTER_KEY}
+    volumes:
+      - .:/rails
+      - sqlite_storage:/rails/storage
+    depends_on:
+      - web
+      - pulse_postgres
+      - websocket
 
   postgres:
     image: postgres:18.3
