@@ -4,9 +4,9 @@
 
 class Seed::PaymentMethodService
   PAYMENT_METHODS = [
-    { name: "Cash",              code: "CASH",          business_type: :b2c, strategy: :cash,              payment_mode: :cash },
-    { name: "QR Payment",        code: "MOCK_QR",       business_type: :b2c, strategy: :mock_qr_gateway,   payment_mode: :qr },
-    { name: "Online Payment",    code: "MOCK_REDIRECT", business_type: :b2c, strategy: :mock_redirect_gateway, payment_mode: :redirect },
+    { name: "Cash",              code: "CASH",          business_type: :b2c, strategy: :cash,              payment_mode: :cash,    lifecycle_status: :active },
+    { name: "Mock QR",           code: "MOCK_QR",       business_type: :b2c, strategy: :mock_qr_gateway,   payment_mode: :qr,      lifecycle_status: :active },
+    { name: "Mock Redirect",     code: "MOCK_REDIRECT", business_type: :b2c, strategy: :mock_redirect_gateway, payment_mode: :redirect, lifecycle_status: :active },
     { name: "Credit Card",       code: "STRIPE",        business_type: :b2c, strategy: :stripe_gateway,    payment_mode: :redirect },
     { name: "VietQR Transfer",   code: "VIETQR",        business_type: :b2c, strategy: :viet_qr_gateway,   payment_mode: :qr }
   ].freeze
@@ -49,6 +49,7 @@ class Seed::PaymentMethodService
         pm.strategy = attrs[:strategy]
         pm.payment_mode = attrs[:payment_mode]
         pm.workflow_status = :confirmed
+        pm.lifecycle_status = attrs[:lifecycle_status] || :draft
       end
     end
 

@@ -43,6 +43,7 @@ class Companies::TopUpsController < Companies::ApplicationController
 
   def billing_payment_methods_json
     methods = BillingPaymentMethod.where(business_type: :b2b)
+                                  .where(lifecycle_status: :active)
                                   .map do |bpm|
       {
         id: bpm.id,
@@ -50,7 +51,8 @@ class Companies::TopUpsController < Companies::ApplicationController
         description: bpm.description,
         code: bpm.code,
         strategy: bpm.strategy,
-        payment_mode: bpm.payment_mode
+        payment_mode: bpm.payment_mode,
+        lifecycle_status: bpm.lifecycle_status
       }
     end
 

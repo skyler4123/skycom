@@ -28,25 +28,20 @@ export default class Companies_TopUps_NewController extends Companies_LayoutCont
 
     const methodCards = this.paymentMethods.length > 0
       ? this.paymentMethods.map(m => {
-          const isQr = m.strategy === "mock_qr_gateway"
-          const isRedirect = m.strategy === "mock_redirect_gateway"
-          const possible = isQr || isRedirect
-          const icon = isQr ? "qr_code_scanner" : isRedirect ? "open_in_new" : "credit_card"
+          const possible = m.lifecycle_status === "active"
+          const iconMap = { qr: "qr_code_scanner", redirect: "open_in_new" }
+          const icon = iconMap[m.payment_mode] || "credit_card"
 
           const clickAttr = possible
             ? `data-action="click->${this.identifier}#selectMethod" data-${this.identifier}-method-id-param="${m.id}"`
             : `title="${translate("Not available")}"`
-
-          const hoverCls = !possible ? "opacity-50 cursor-not-allowed"
-            : isRedirect ? "hover:border-amber-300 dark:hover:border-amber-600"
-            : "hover:border-blue-300 dark:hover:border-blue-600"
 
           return `
             <div ${clickAttr}
               data-method-id="${m.id}"
               class="payment-method-card relative flex items-start gap-4 p-4 rounded-xl border-2 cursor-pointer transition-all
                 border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900
-                ${hoverCls}">
+                ${!possible ? "opacity-50 cursor-not-allowed" : "hover:border-blue-300 dark:hover:border-blue-600"}">
               <div class="flex items-center justify-center w-10 h-10 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 shrink-0">
                 <span class="material-symbols-outlined text-[22px]">${icon}</span>
               </div>
@@ -54,6 +49,7 @@ export default class Companies_TopUps_NewController extends Companies_LayoutCont
                 <div class="flex items-center gap-2 flex-wrap">
                   <span class="text-sm font-semibold text-slate-900 dark:text-white">${m.name}</span>
                   ${!possible ? `<span class="text-[10px] font-bold text-slate-400 uppercase">${translate("Not available")}</span>` : ""}
+                  ${m.payment_mode === "redirect" ? `<span class="px-2 py-0.5 text-[10px] font-bold text-amber-700 bg-amber-50 dark:text-amber-400 dark:bg-amber-900/30 rounded-full uppercase">${translate("Coming soon")}</span>` : ""}
                 </div>
                 <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">${m.description || ""}</p>
               </div>
@@ -137,7 +133,7 @@ export default class Companies_TopUps_NewController extends Companies_LayoutCont
 
     try {
       const selectedMethod = this.paymentMethods.find(m => m.id === this.selectedMethodId)
-      const isRedirect = selectedMethod?.strategy === "mock_redirect_gateway"
+      const isRedirect = selectedMethod?.payment_mode === "redirect"
       const url = isRedirect ? Helpers.mock_redirect_gateway_company_top_ups_path(cid) : Helpers.mock_qr_gateway_company_top_ups_path(cid)
 
       const response = await fetchJson(url, {
@@ -186,9 +182,8 @@ export default class Companies_TopUps_NewController extends Companies_LayoutCont
       }
     }, 50)
 
-    const channel = WEBSOCKET.companyChannel(currentCompany().id)
-    WEBSOCKET.subscribe(channel, "top_up_completed", (resourceId, payload) => {
-      console.log(resourceId, payload)
+    const channel = window.WEBSOCKET.companyChannel(currentCompany().id)
+    window.WEBSOCKET.subscribe(channel, "top_up_completed", (data) => {
       toast({ type: "success", message: translate("Top-up successful! Redirecting...") })
       setTimeout(() => {
         window.location.href = Helpers.company_billing_path(companyId)
