@@ -20,6 +20,7 @@ class Seed::PaymentMethodService
     workflow_status: PaymentMethod.workflow_statuses.keys.sample,
     business_type: PaymentMethod.business_types.keys.sample,
     payment_mode: nil,
+    country: nil,
     discarded_at: nil
   )
     should_discard = rand(10) == 0
@@ -34,6 +35,7 @@ class Seed::PaymentMethodService
       workflow_status: workflow_status,
       business_type: business_type,
       payment_mode: payment_mode,
+      country: country,
       discarded_at: discarded_at
     )
   end
@@ -41,15 +43,20 @@ class Seed::PaymentMethodService
   def self.create(company: nil)
     puts "Seeding PaymentMethod records..."
 
-    PAYMENT_METHODS.each do |attrs|
-      PaymentMethod.find_or_create_by!(code: attrs[:code]) do |pm|
-        pm.name = attrs[:name]
-        pm.description = "Payment method for #{attrs[:name]} transactions."
-        pm.business_type = attrs[:business_type]
-        pm.strategy = attrs[:strategy]
-        pm.payment_mode = attrs[:payment_mode]
-        pm.workflow_status = :confirmed
-        pm.lifecycle_status = attrs[:lifecycle_status] || :draft
+    COUNTRY_CODES.keys.each do |country_code|
+      PAYMENT_METHODS.each do |attrs|
+        suffix = country_code.to_s.upcase
+        code = "#{attrs[:code]}_#{suffix}"
+        PaymentMethod.find_or_create_by!(code: code) do |pm|
+          pm.name = "#{attrs[:name]} (#{suffix})"
+          pm.description = "Payment method for #{attrs[:name]} transactions."
+          pm.business_type = attrs[:business_type]
+          pm.strategy = attrs[:strategy]
+          pm.payment_mode = attrs[:payment_mode]
+          pm.country = country_code
+          pm.workflow_status = :confirmed
+          pm.lifecycle_status = attrs[:lifecycle_status] || :draft
+        end
       end
     end
 
