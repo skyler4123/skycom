@@ -166,6 +166,15 @@ export const company_policies_path = (companyId) => `/companies/${companyId}/pol
 export const company_tasks_path = (companyId) => `/companies/${companyId}/tasks`
 export const company_payslips_path = (companyId) => `/companies/${companyId}/payslips`
 
+export const company_payment_method_appointments_path = (companyId) =>
+  `/companies/${companyId}/payment_method_appointments`
+
+export const edit_company_payment_method_appointment_path = (companyId, id) =>
+  `/companies/${companyId}/payment_method_appointments/${id}/edit`
+
+export const company_payment_method_appointment_path = (companyId, id) =>
+  `/companies/${companyId}/payment_method_appointments/${id}`
+
 export const company_billing_path = (companyId) => `/companies/${companyId}/billing`
 export const company_billing_pay_all_path = (companyId) => `/companies/${companyId}/billing/pay_all`
 
