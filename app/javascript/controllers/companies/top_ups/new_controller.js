@@ -49,7 +49,6 @@ export default class Companies_TopUps_NewController extends Companies_LayoutCont
                 <div class="flex items-center gap-2 flex-wrap">
                   <span class="text-sm font-semibold text-slate-900 dark:text-white">${m.name}</span>
                   ${!possible ? `<span class="text-[10px] font-bold text-slate-400 uppercase">${translate("Not available")}</span>` : ""}
-                  ${m.payment_mode === "redirect" ? `<span class="px-2 py-0.5 text-[10px] font-bold text-amber-700 bg-amber-50 dark:text-amber-400 dark:bg-amber-900/30 rounded-full uppercase">${translate("Coming soon")}</span>` : ""}
                 </div>
                 <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">${m.description || ""}</p>
               </div>
