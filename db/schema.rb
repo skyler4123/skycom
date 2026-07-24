@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_07_02_190003) do
+ActiveRecord::Schema[8.0].define(version: 2026_07_18_073839) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pgcrypto"
@@ -394,8 +394,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_02_190003) do
     t.integer "created_by"
     t.integer "price_cents", null: false
     t.integer "currency", null: false
-    t.datetime "period_start", null: false
-    t.datetime "period_end", null: false
+    t.datetime "period_start"
+    t.datetime "period_end"
     t.datetime "due_at"
     t.integer "payment_status"
     t.integer "lifecycle_status"
@@ -470,10 +470,15 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_02_190003) do
     t.text "description"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer "status", default: 0, null: false
+    t.string "gateway_reference"
+    t.jsonb "gateway_payload", default: {}
     t.index ["billing_invoice_id"], name: "index_billing_transactions_on_billing_invoice_id"
     t.index ["billing_payment_method_id"], name: "index_billing_transactions_on_billing_payment_method_id"
     t.index ["company_id", "created_at"], name: "idx_wallet_tx_company_chrono"
     t.index ["company_id"], name: "index_billing_transactions_on_company_id"
+    t.index ["gateway_reference"], name: "index_billing_transactions_on_gateway_reference", unique: true
+    t.index ["status"], name: "index_billing_transactions_on_status"
   end
 
   create_table "billing_wallets", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|

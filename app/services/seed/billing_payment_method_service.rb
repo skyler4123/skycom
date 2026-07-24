@@ -2,58 +2,24 @@ class Seed::BillingPaymentMethodService
   def self.create
     puts "Seeding BillingPaymentMethod records..."
 
-    BillingPaymentMethod.find_or_create_by!(code: "CASH") do |bpm|
-      bpm.name = "Cash"
-      bpm.description = "Cash payment"
-      bpm.business_type = :b2b
-      bpm.payment_mode = :cash
-      bpm.strategy = :cash
-      bpm.workflow_status = :confirmed
-    end
+    records = [
+      { code: "CASH",            name: "Cash",              business_type: :b2b, payment_mode: :cash,    strategy: :cash,              lifecycle_status: nil },
+      { code: "WALLET_AUTO_DEBIT", name: "Wallet Auto-Debit", business_type: :b2b, payment_mode: :cash,    strategy: :wallet_auto_debit, lifecycle_status: nil },
+      { code: "QR_BANK_TRANSFER",  name: "Mock QR",           business_type: :b2b, payment_mode: :qr,      strategy: :mock_qr_gateway,       lifecycle_status: :active },
+      { code: "REDIRECT_SESSION",  name: "Mock Redirect",     business_type: :b2b, payment_mode: :redirect, strategy: :mock_redirect_gateway, lifecycle_status: :active },
+      { code: "STRIPE_GATEWAY",    name: "Stripe",            business_type: :b2b, payment_mode: :redirect, strategy: :stripe_gateway,    lifecycle_status: nil },
+      { code: "VIETQR_GATEWAY",    name: "VietQR",            business_type: :b2b, payment_mode: :qr,      strategy: :viet_qr_gateway,   lifecycle_status: nil }
+    ]
 
-    BillingPaymentMethod.find_or_create_by!(code: "WALLET_AUTO_DEBIT") do |bpm|
-      bpm.name = "Wallet Auto-Debit"
-      bpm.description = "Automatic deduction from company wallet"
-      bpm.business_type = :b2b
-      bpm.payment_mode = :cash
-      bpm.strategy = :wallet_auto_debit
-      bpm.workflow_status = :confirmed
-    end
-
-    BillingPaymentMethod.find_or_create_by!(code: "QR_BANK_TRANSFER") do |bpm|
-      bpm.name = "QR Bank Transfer"
-      bpm.description = "Pay via QR code and bank transfer"
-      bpm.business_type = :b2b
-      bpm.payment_mode = :qr
-      bpm.strategy = :mock_qr_gateway
-      bpm.workflow_status = :confirmed
-    end
-
-    BillingPaymentMethod.find_or_create_by!(code: "REDIRECT_SESSION") do |bpm|
-      bpm.name = "Redirect Payment"
-      bpm.description = "Pay via hosted redirect session"
-      bpm.business_type = :b2b
-      bpm.payment_mode = :redirect
-      bpm.strategy = :mock_redirect_gateway
-      bpm.workflow_status = :confirmed
-    end
-
-    BillingPaymentMethod.find_or_create_by!(code: "STRIPE_GATEWAY") do |bpm|
-      bpm.name = "Stripe"
-      bpm.description = "Pay via Stripe"
-      bpm.business_type = :b2b
-      bpm.payment_mode = :redirect
-      bpm.strategy = :stripe_gateway
-      bpm.workflow_status = :confirmed
-    end
-
-    BillingPaymentMethod.find_or_create_by!(code: "VIETQR_GATEWAY") do |bpm|
-      bpm.name = "VietQR"
-      bpm.description = "Pay via VietQR"
-      bpm.business_type = :b2b
-      bpm.payment_mode = :qr
-      bpm.strategy = :viet_qr_gateway
-      bpm.workflow_status = :confirmed
+    records.each do |attrs|
+      BillingPaymentMethod.find_or_create_by!(code: attrs[:code]) do |bpm|
+        bpm.name = attrs[:name]
+        bpm.business_type = attrs[:business_type]
+        bpm.payment_mode = attrs[:payment_mode]
+        bpm.strategy = attrs[:strategy]
+        bpm.workflow_status = :confirmed
+        bpm.lifecycle_status = attrs[:lifecycle_status] || :draft
+      end
     end
 
     puts "Successfully created #{BillingPaymentMethod.count} BillingPaymentMethod records."

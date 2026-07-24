@@ -1,7 +1,8 @@
 module Payments
   class InitiateService
-    def initialize(transaction:)
+    def initialize(transaction:, redirect_url: nil)
       @transaction = transaction
+      @redirect_url = redirect_url
     end
 
     def call
@@ -19,20 +20,21 @@ module Payments
       gateway = gateway_class.new(
         amount_cents: amount_cents,
         invoice_id: invoice.id,
-        memo: "SKYCOM #{invoice.id}"
+        memo: "SKYCOM #{invoice.id}",
+        transaction_token: @transaction.gateway_reference,
+        redirect_url: @redirect_url
       )
 
       result = gateway.call
 
       if result[:success]
         @transaction.update!(
-          gateway_reference: result[:gateway_reference],
-          gateway_payload: result[:gateway_payload],
-          status: :pending
+          status: :pending,
+          gateway_payload: result[:gateway_payload]
         )
         @transaction
       else
-        @transaction.update!(status: :failed)
+        @transaction.update!(status: :failed, gateway_payload: result[:gateway_payload] || {})
         raise "Gateway execution failed: #{result[:error]}"
       end
     end
