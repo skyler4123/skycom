@@ -5,30 +5,21 @@ class Companies::PaymentMethodAppointmentsController < Companies::ApplicationCon
     respond_to do |format|
       format.html { render html: "", layout: true }
       format.json do
-        payment_methods = PaymentMethod.where(country: current_company.country)
+        appointments = current_company.payment_method_appointments.includes(:payment_method)
 
-        appointments = payment_methods.map do |pm|
-          appointment = PaymentMethodAppointment.find_or_create_by!(
-            company: current_company,
-            payment_method: pm
-          ) do |a|
-            a.name = "#{pm.name} for #{current_company.name}"
-            a.code = "#{pm.code}-#{SecureRandom.hex(4).upcase}"
-            a.business_type = :in_store
-            a.lifecycle_status = :inactive
-          end
-
-          {
-            id: appointment.id,
-            name: pm.name,
-            code: pm.code,
-            payment_mode: pm.payment_mode,
-            lifecycle_status: appointment.lifecycle_status,
-            strategy: pm.strategy
+        render json: {
+          payment_method_appointments: appointments.map { |a|
+            pm = a.payment_method
+            {
+              id: a.id,
+              name: pm.name,
+              code: pm.code,
+              payment_mode: pm.payment_mode,
+              lifecycle_status: a.lifecycle_status,
+              strategy: pm.strategy
+            }
           }
-        end
-
-        render json: { payment_method_appointments: appointments }
+        }
       end
     end
   end

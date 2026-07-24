@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 # Creates a free-tier BillingContract for a company with default metrics and features.
-# Called automatically by Company#setup_owner_records after owner role/policy/employee setup.
+# Called automatically by Company#initialize_company after owner role/policy/employee setup.
 #
 #   Seed::BillingContractService.create(company: company)
 #   # => BillingContract (active, basic) + 7 ContractMetrics + 4 ContractFeatures

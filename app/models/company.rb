@@ -117,7 +117,7 @@ class Company < ApplicationRecord
   # validates :fiscal_year_end_month, presence: true, numericality: { in: 1..12 }
 
   after_create :ensure_billing_wallet
-  after_create :setup_owner_records
+  after_create :initialize_company
 
   def resource_names
     (metadata || {})["resource_names"] || DEFAULT_RESOURCE_NAMES
@@ -143,7 +143,7 @@ class Company < ApplicationRecord
     )
   end
 
-  def setup_owner_records
+  def initialize_company
     return unless user
 
     role = Seed::RoleService.create(
@@ -195,6 +195,23 @@ class Company < ApplicationRecord
         Seed::RetailInitService.call(company: self)
       elsif business_type_hospital?
         Seed::HospitalInitService.call(company: self)
+      end
+    end
+
+    setup_payment_method_appointments
+  end
+
+  def setup_payment_method_appointments
+    country_payment_methods = PaymentMethod.where(country: country_before_type_cast)
+    country_payment_methods.each do |pm|
+      PaymentMethodAppointment.find_or_create_by!(
+        company: self,
+        payment_method: pm
+      ) do |a|
+        a.name = "#{pm.name} for #{name}"
+        a.code = "#{pm.code}-#{SecureRandom.hex(4).upcase}"
+        a.business_type = :in_store
+        a.lifecycle_status = :inactive
       end
     end
   end

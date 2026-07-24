@@ -4,12 +4,17 @@
 
 class Seed::PaymentMethodService
   PAYMENT_METHODS = [
-    { name: "Cash",              code: "CASH",          business_type: :b2c, strategy: :cash,              payment_mode: :cash,    lifecycle_status: :active },
-    { name: "Mock QR",           code: "MOCK_QR",       business_type: :b2c, strategy: :mock_qr_gateway,   payment_mode: :qr,      lifecycle_status: :active },
-    { name: "Mock Redirect",     code: "MOCK_REDIRECT", business_type: :b2c, strategy: :mock_redirect_gateway, payment_mode: :redirect, lifecycle_status: :active },
-    { name: "Credit Card",       code: "STRIPE",        business_type: :b2c, strategy: :stripe_gateway,    payment_mode: :redirect },
-    { name: "VietQR Transfer",   code: "VIETQR",        business_type: :b2c, strategy: :viet_qr_gateway,   payment_mode: :qr }
+    { name: "Cash",            code: "CASH",        business_type: :b2c, strategy: :cash,              payment_mode: :cash,    lifecycle_status: :active },
+    { name: "Credit Card",     code: "STRIPE",      business_type: :b2c, strategy: :stripe_gateway,    payment_mode: :redirect },
+    { name: "VietQR Transfer", code: "VIETQR",      business_type: :b2c, strategy: :viet_qr_gateway,   payment_mode: :qr }
   ].freeze
+
+  MOCK_PAYMENT_METHODS = [
+    { name: "Mock QR",         code: "MOCK_QR",     business_type: :b2c, strategy: :mock_qr_gateway,   payment_mode: :qr,      lifecycle_status: :active },
+    { name: "Mock Redirect",   code: "MOCK_REDIRECT", business_type: :b2c, strategy: :mock_redirect_gateway, payment_mode: :redirect, lifecycle_status: :active }
+  ].freeze
+
+  ALL_PAYMENT_METHODS = (PAYMENT_METHODS + (Rails.env.production? ? [] : MOCK_PAYMENT_METHODS)).freeze
 
   def self.new(
     name:,
@@ -44,7 +49,7 @@ class Seed::PaymentMethodService
     puts "Seeding PaymentMethod records..."
 
     COUNTRY_CODES.keys.each do |country_code|
-      PAYMENT_METHODS.each do |attrs|
+      ALL_PAYMENT_METHODS.each do |attrs|
         suffix = country_code.to_s.upcase
         code = "#{attrs[:code]}_#{suffix}"
         PaymentMethod.find_or_create_by!(code: code) do |pm|

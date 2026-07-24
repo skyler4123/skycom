@@ -105,4 +105,41 @@ RSpec.describe Company, type: :model do
       expect(Company.new).to respond_to(:create_first_cloned_company)
     end
   end
+
+  describe "#setup_payment_method_appointments" do
+    let(:company) { create(:company).tap { |c| c.update_column(:country, 840) } }
+
+    before do
+      create(:payment_method, code: "CASH_US", strategy: :cash, country: 840)
+      create(:payment_method, code: "STRIPE_US", strategy: :stripe_gateway, country: 840)
+      create(:payment_method, code: "CASH_VN", strategy: :cash, country: 704)
+    end
+
+    it "creates appointments for all PaymentMethods matching the company's country" do
+      expect { company.setup_payment_method_appointments }
+        .to change(PaymentMethodAppointment, :count).by(2)
+    end
+
+    it "creates appointments with lifecycle_status: :inactive" do
+      company.setup_payment_method_appointments
+      expect(company.payment_method_appointments).to all(have_attributes(lifecycle_status: "inactive"))
+    end
+
+    it "creates appointments with business_type: :in_store" do
+      company.setup_payment_method_appointments
+      expect(company.payment_method_appointments).to all(have_attributes(business_type: "in_store"))
+    end
+
+    it "is idempotent on re-run" do
+      company.setup_payment_method_appointments
+      expect { company.setup_payment_method_appointments }
+        .not_to change(PaymentMethodAppointment, :count)
+    end
+
+    it "does not create appointments for non-matching countries" do
+      company.setup_payment_method_appointments
+      vn_pm = PaymentMethod.find_by(code: "CASH_VN")
+      expect(company.payment_method_appointments.where(payment_method: vn_pm)).to be_empty
+    end
+  end
 end

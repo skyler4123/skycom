@@ -67,7 +67,6 @@ class Seed::RetailEnrichService
     create_pages
     create_subscription_plans_for_company
     create_facilities_for_branches
-    appoint_payment_methods_to_company
     create_departments_for_company
     create_employees
     assign_employees_to_departments
@@ -224,35 +223,6 @@ class Seed::RetailEnrichService
         facility.attach_tag(key: "Facility #{facility.id} Tag")
         facility.save!
         @facilities << facility
-      end
-    end
-  end
-
-  def appoint_payment_methods_to_company
-    suffix = @country.to_s.upcase
-
-    # Company-level: enable Cash, Mock QR, Mock Redirect
-    %w[CASH MOCK_QR MOCK_REDIRECT].each do |code_base|
-      pm = PaymentMethod.find_by!(code: "#{code_base}_#{suffix}")
-      Seed::PaymentMethodAppointmentService.create(
-        company: @retail,
-        payment_method: pm,
-        lifecycle_status: :active,
-        business_type: :in_store
-      )
-    end
-
-    # Branch-level: enable Cash, Mock QR only
-    @branches.each do |branch|
-      %w[CASH MOCK_QR].each do |code_base|
-        pm = PaymentMethod.find_by!(code: "#{code_base}_#{suffix}")
-        Seed::PaymentMethodAppointmentService.create(
-          company: @retail,
-          payment_method: pm,
-          branch: branch,
-          lifecycle_status: :active,
-          business_type: :in_store
-        )
       end
     end
   end

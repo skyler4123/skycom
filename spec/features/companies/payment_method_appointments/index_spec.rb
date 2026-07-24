@@ -65,6 +65,19 @@ RSpec.feature "Companies::PaymentMethodAppointments Management", type: :feature,
     company.clear_permissions_cache
   end
 
+  def create_all_appointments
+    [pm_cash, pm_qr, pm_redirect, pm_card, pm_vietqr].each do |pm|
+      PaymentMethodAppointment.find_or_create_by!(
+        company: company, payment_method: pm
+      ) do |a|
+        a.name = "#{pm.name} for #{company.name}"
+        a.code = "#{pm.code}-#{SecureRandom.hex(4).upcase}"
+        a.business_type = :in_store
+        a.lifecycle_status = :inactive
+      end
+    end
+  end
+
   def seed_client_cache
     page.execute_script("localStorage.clear()")
 
@@ -122,6 +135,7 @@ RSpec.feature "Companies::PaymentMethodAppointments Management", type: :feature,
 
   describe "index page content" do
     before do
+      create_all_appointments
       sign_in(admin_user)
       seed_client_cache
       visit company_payment_method_appointments_path(company)
@@ -218,7 +232,8 @@ RSpec.feature "Companies::PaymentMethodAppointments Management", type: :feature,
   end
 
   describe "edge cases" do
-    scenario "appointments auto-created as inactive for all matching payment methods" do
+    scenario "appointments are pre-created as inactive for all matching payment methods" do
+      create_all_appointments
       sign_in(admin_user)
       seed_client_cache
       visit company_payment_method_appointments_path(company)
