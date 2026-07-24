@@ -379,7 +379,7 @@ DEFAULT_RESOURCE_NAMES = %w[
   Table Reservation Room Guest
   Patient Appointment Course Student Exam
   Membership
-  Page ShiftTemplate ScheduledShift
+  Page PaymentMethodAppointment ShiftTemplate ScheduledShift
   AttendancePolicy AttendanceLog AttendanceDay AttendanceMonth
   Stock StockTransfer StockImport StockExport
 ].freeze

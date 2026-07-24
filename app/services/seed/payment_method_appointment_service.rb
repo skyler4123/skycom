@@ -6,6 +6,7 @@ class Seed::PaymentMethodAppointmentService
   def self.new(
     company:,
     payment_method: PaymentMethod.all.sample,
+    branch: nil,
     name: nil,
     description: nil,
     code: nil,
@@ -25,6 +26,7 @@ class Seed::PaymentMethodAppointmentService
     PaymentMethodAppointment.new(
       company: company,
       payment_method: payment_method,
+      branch: branch,
       name: name,
       description: description,
       code: code,

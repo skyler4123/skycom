@@ -229,12 +229,30 @@ class Seed::RetailEnrichService
   end
 
   def appoint_payment_methods_to_company
-    country_value = COUNTRY_CODES[@country.to_s.to_sym] || @country
-    country_methods = PaymentMethod.where(country: country_value)
+    suffix = @country.to_s.upcase
 
+    # Company-level: enable Cash, Mock QR, Mock Redirect
+    %w[CASH MOCK_QR MOCK_REDIRECT].each do |code_base|
+      pm = PaymentMethod.find_by!(code: "#{code_base}_#{suffix}")
+      Seed::PaymentMethodAppointmentService.create(
+        company: @retail,
+        payment_method: pm,
+        lifecycle_status: :active,
+        business_type: :in_store
+      )
+    end
+
+    # Branch-level: enable Cash, Mock QR only
     @branches.each do |branch|
-      country_methods.each do |pm|
-        Seed::PaymentMethodAppointmentService.create(company: @retail, payment_method: pm)
+      %w[CASH MOCK_QR].each do |code_base|
+        pm = PaymentMethod.find_by!(code: "#{code_base}_#{suffix}")
+        Seed::PaymentMethodAppointmentService.create(
+          company: @retail,
+          payment_method: pm,
+          branch: branch,
+          lifecycle_status: :active,
+          business_type: :in_store
+        )
       end
     end
   end

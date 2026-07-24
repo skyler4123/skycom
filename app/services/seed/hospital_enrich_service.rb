@@ -40,6 +40,7 @@ class Seed::HospitalEnrichService
 
     create_hospital_company unless @company
     create_branches
+    appoint_payment_methods_to_company
     create_departments
     create_facilities
     create_employees
@@ -337,6 +338,19 @@ class Seed::HospitalEnrichService
       rescue => e
         Rails.logger.warn("Resolution failed for #{emp.id} on #{date}: #{e.message}")
       end
+    end
+  end
+
+  def appoint_payment_methods_to_company
+    suffix = @company.country.to_s.upcase
+    %w[CASH MOCK_QR MOCK_REDIRECT].each do |code_base|
+      pm = PaymentMethod.find_by!(code: "#{code_base}_#{suffix}")
+      Seed::PaymentMethodAppointmentService.create(
+        company: @company,
+        payment_method: pm,
+        lifecycle_status: :active,
+        business_type: :in_store
+      )
     end
   end
 end

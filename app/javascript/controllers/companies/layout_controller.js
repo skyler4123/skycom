@@ -83,6 +83,7 @@ export default class Companies_LayoutController extends Controller {
       link('finance_basic', Helpers.company_invoices_path(cid), 'receipt_long', translate('Invoices')),
       link('custom_roles', Helpers.company_policies_path(cid), 'security', translate('Policies')),
       link(null, Helpers.company_pages_path(cid), 'description', translate('Pages')),
+      link(null, Helpers.company_payment_method_appointments_path(cid), 'payments', translate('Payment Methods')),
       link('custom_roles', Helpers.company_permissions_path(cid), 'shield', translate('Permissions')),
       link(null, Helpers.company_billing_path(cid), 'account_balance_wallet', translate('Billing')),
       link('analytics_dashboard', Helpers.company_analytics_path(cid), 'insights', translate('Analytics')),
