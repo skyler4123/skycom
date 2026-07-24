@@ -122,7 +122,8 @@ services:
       - "8000:8000"
     command: centrifugo --client_insecure=false --api_insecure=false
     environment:
-      CENTRIFUGO_ALLOWED_ORIGINS: "http://localhost:3000"
+      # 🚀 Include "null" to allow SharedWorker Data URLs
+      CENTRIFUGO_ALLOWED_ORIGINS: "http://localhost:3000 http://127.0.0.1:3000 null"
       # Administrative Backend API Token (Matches Rails CENTRIFUGO_API_KEY)
       CENTRIFUGO_API_KEY: "skycom_super_secret_api_key_2026"
       # Secure Verification Engine Token (Matches Rails CENTRIFUGO_TOKEN_HMAC_SECRET_KEY)

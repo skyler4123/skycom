@@ -80,6 +80,14 @@ Rails.application.configure do
   # Store uploaded files on the local file system (see config/storage.yml for options).
   config.active_storage.service = :minio
 
+  # Replace the default in-process and non-durable queuing backend for Active Job.
+  config.active_job.queue_adapter = :solid_queue
+  config.solid_queue.connects_to = { database: { writing: :queue } }
+  # Let Solid Queue gracefully follow whatever strategy the environment demands
+  config.solid_queue.logger = config.logger
+  config.active_job.verbose_enqueue_logs = false
+
+
   # 1. Enable Lograge
   config.lograge.enabled = true
   config.lograge.formatter = Lograge::Formatters::Json.new
@@ -115,12 +123,5 @@ Rails.application.configure do
     # Keep seeds, migrations, and console quiet by writing to the log file instead
     config.logger = ActiveSupport::Logger.new(Rails.root.join("log", "#{Rails.env}.log"))
   end
-
-  # Replace the default in-process and non-durable queuing backend for Active Job.
-  config.active_job.queue_adapter = :solid_queue
-  config.solid_queue.connects_to = { database: { writing: :queue } }
-  # Let Solid Queue gracefully follow whatever strategy the environment demands
-  config.solid_queue.logger = config.logger
-  config.active_job.verbose_enqueue_logs = false
 end
 # ----------------------------------------------------------------------------------------------------

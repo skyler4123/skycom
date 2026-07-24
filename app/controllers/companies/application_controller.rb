@@ -7,9 +7,11 @@ class Companies::ApplicationController < ApplicationController
 
   # Order reason: Companies::Authorizable need current_employee
   include Companies::Authorizable
+  include ApplicationController::WebsocketConcern
 
   before_action :check_accessable
   before_action :set_billing_warning
+  before_action :set_websocket_channels
 
   private
 

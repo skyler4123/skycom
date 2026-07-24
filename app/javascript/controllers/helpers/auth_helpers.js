@@ -127,3 +127,17 @@ export const featureEnabled = (key) => {
   if (!contract?.enabled_features) return true
   return contract.enabled_features.includes(key)
 }
+
+// Helper method inside your controller or JS file
+export const getImportMapPath = (moduleName) => {
+  const importMapScript = document.querySelector('script[type="importmap"]')
+  if (!importMapScript) return null
+
+  try {
+    const importMap = JSON.parse(importMapScript.textContent)
+    return importMap.imports[moduleName] || null
+  } catch (e) {
+    console.error("Failed to parse importmap JSON:", e)
+    return null
+  }
+}

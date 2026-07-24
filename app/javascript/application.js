@@ -61,6 +61,7 @@ window.reloadThenToasts = Helpers.reloadThenToasts
 window.renderQrCode = Helpers.renderQrCode
 window.clearClientCache = Helpers.clearClientCache
 window.clearClientCacheAndReload = Helpers.clearClientCacheAndReload
+window.getImportMapPath = Helpers.getImportMapPath
 
 // 4. Data Getters (Safe from Race Conditions)
 // This allows you to use 'currentCompany()' as a variable that always fetches fresh data
