@@ -7,7 +7,13 @@ export default class Companies_Policies_IndexController extends Companies_Layout
     super.connect()
     const response = await fetchJson();
     this.policies = response.policies || []
-    this.renderContent()
+    poll(() => {
+      if (this.hasContentTarget) {
+        this.renderContent()
+        return true
+      }
+      return false
+    })
   }
 
   contentHTML() {
