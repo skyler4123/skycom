@@ -6,6 +6,7 @@ FactoryBot.define do
     business_type { PaymentMethod.business_types.keys.sample }
     payment_mode { :redirect }
     strategy { :mock_redirect_gateway }
+    country { :us }
 
     initialize_with do
       Seed::PaymentMethodService.new(
@@ -13,7 +14,8 @@ FactoryBot.define do
         code: code,
         business_type: business_type,
         payment_mode: payment_mode,
-        strategy: strategy
+        strategy: strategy,
+        country: country
       )
     end
   end

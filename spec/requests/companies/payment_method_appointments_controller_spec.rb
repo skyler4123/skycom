@@ -6,9 +6,16 @@ RSpec.describe "Companies::PaymentMethodAppointmentsController", type: :request 
   let(:company) { create(:company).tap { |c| c.update_column(:country, 840) } }
   let(:owner_user) { company.user }
 
-  # PaymentMethod matching the company's country — setup_payment_method_appointments
-  # will create an appointment automatically during company creation.
   let!(:pm_cash) { create(:payment_method, name: "Cash", code: "CASH", country: 840, strategy: :cash, payment_mode: :cash) }
+
+  let!(:appointment_cash) do
+    PaymentMethodAppointment.create!(
+      company: company, payment_method: pm_cash,
+      name: "Cash for #{company.name}",
+      code: "CASH-#{SecureRandom.hex(4).upcase}",
+      business_type: :in_store, lifecycle_status: :active
+    )
+  end
 
   before do
     get sign_in_for_test_path(email: owner_user.email)
@@ -40,7 +47,7 @@ RSpec.describe "Companies::PaymentMethodAppointmentsController", type: :request 
       expect(app["name"]).to eq("Cash")
       expect(app["code"]).to eq("CASH")
       expect(app["payment_mode"]).to eq("cash")
-      expect(app["lifecycle_status"]).to eq("inactive")
+      expect(app["lifecycle_status"]).to eq("active")
       expect(app["strategy"]).to eq("cash")
     end
 

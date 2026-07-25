@@ -266,3 +266,50 @@ This works only when the controller fallback (Fix 1) is in place — the browser
 - Search the codebase for `Enums()?.` calls in page controllers to audit whether fallbacks are missing.
 
 ---
+
+### 7. Shell-First `contentTarget` Race Condition
+
+**Problem**: Page controllers that call `this.renderContent()` in `connect()` after an async fetch fail silently — the page renders as a bare layout shell with no content, but no error is visible. The failure appears flaky because it depends on timing between `renderLayout()` (from the parent `LayoutController`) and the child controller's fetch completion.
+
+**Root Cause**: In the Shell-First architecture, `LayoutController.connect()` uses a `poll()` to wait for `currentCompany()` before calling `renderLayout()`. Only `renderLayout()` creates the `contentTarget` in the DOM. When a child controller calls `this.renderContent()` after its async fetch, `renderLayout()` may not have run yet. The guard `if (!this.hasContentTarget) return;` in `renderContent()` silently exits — no content, no error.
+
+**Timeline of the race**:
+```
+super.connect()
+  └─ poll() waits for currentCompany()     ← async, may not fire immediately
+      └─ renderLayout()                    ← creates contentTarget in DOM
+
+child.fetchJson(...)                        ← async, may complete before poll fires
+  └─ this.renderContent()
+      └─ hasContentTarget? → false         ← renderLayout hasn't run yet
+      └─ return                            ← silently exits, page stays empty
+```
+
+**Fix — Always use `poll()` when calling `renderContent()` in `connect()`**:
+
+Every page controller's `connect()` that fetches data and renders must wrap `renderContent()` in a `poll()` that waits for `hasContentTarget`:
+
+```javascript
+async connect() {
+  super.connect()
+
+  // ... fetch data ...
+
+  poll(() => {
+    if (this.hasContentTarget) {
+      this.renderContent()
+      return true
+    }
+    return false
+  })
+}
+```
+
+This is **required** for all controllers that extend `Companies_LayoutController`. Without it, the page will randomly render as an empty layout shell.
+
+**Checklist for new page controllers**:
+- Does it extend `Companies_LayoutController`?
+- Does it call `this.renderContent()` in `connect()`?
+- If yes, wrap it in `poll(() => { if (this.hasContentTarget) { ...; return true } })`
+
+---

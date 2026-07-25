@@ -18,7 +18,13 @@ export default class Companies_PaymentMethodAppointments_EditController extends 
       toast({ type: "error", message: "Failed to load payment method" })
     }
 
-    this.renderContent()
+    poll(() => {
+      if (this.hasContentTarget) {
+        this.renderContent()
+        return true
+      }
+      return false
+    })
   }
 
   contentHTML() {

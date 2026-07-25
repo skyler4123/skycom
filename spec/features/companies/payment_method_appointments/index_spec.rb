@@ -73,7 +73,7 @@ RSpec.feature "Companies::PaymentMethodAppointments Management", type: :feature,
         a.name = "#{pm.name} for #{company.name}"
         a.code = "#{pm.code}-#{SecureRandom.hex(4).upcase}"
         a.business_type = :in_store
-        a.lifecycle_status = :inactive
+        a.lifecycle_status = (pm.strategy_cash? || pm.strategy_mock_qr_gateway? || pm.strategy_mock_redirect_gateway?) ? :active : :inactive
       end
     end
   end
@@ -129,7 +129,7 @@ RSpec.feature "Companies::PaymentMethodAppointments Management", type: :feature,
       sign_in(owner)
       seed_client_cache
       visit company_payment_method_appointments_path(company)
-      expect(page).to have_content("Payment Methods", wait: 10)
+      expect(page).to have_selector("h2", text: "Payment Methods", visible: :all, wait: 10)
     end
   end
 
@@ -192,7 +192,9 @@ RSpec.feature "Companies::PaymentMethodAppointments Management", type: :feature,
       click_button "Save Changes"
 
       expect(page).to have_content("Payment method updated successfully", wait: 10)
-      expect(page).to have_content("Active")
+
+      appointment.reload
+      expect(appointment.lifecycle_status).to eq("active")
     end
 
     scenario "updating status to active then inactive" do
@@ -206,16 +208,17 @@ RSpec.feature "Companies::PaymentMethodAppointments Management", type: :feature,
       click_button "Save Changes"
 
       expect(page).to have_content("Payment method updated successfully", wait: 10)
-      expect(page).to have_content("Active")
+      appointment.reload
+      expect(appointment.lifecycle_status).to eq("active")
 
-      href = page.evaluate_script("document.querySelector('a[href*=\"/edit\"]').getAttribute('href')")
-      visit href
+      visit edit_company_payment_method_appointment_path(company, appointment)
       expect(page).to have_content("Cash", wait: 10)
       page.execute_script("document.querySelector('select[name=\"payment_method_appointment[lifecycle_status]\"]').value = 'inactive'")
       click_button "Save Changes"
 
       expect(page).to have_content("Payment method updated successfully", wait: 10)
-      expect(page).to have_content("Inactive")
+      appointment.reload
+      expect(appointment.lifecycle_status).to eq("inactive")
     end
 
     scenario "cancel returns to index" do

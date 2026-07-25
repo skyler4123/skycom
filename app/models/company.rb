@@ -196,9 +196,9 @@ class Company < ApplicationRecord
       elsif business_type_hospital?
         Seed::HospitalInitService.call(company: self)
       end
-    end
 
-    setup_payment_method_appointments
+      setup_payment_method_appointments
+    end
   end
 
   def setup_payment_method_appointments
@@ -211,7 +211,11 @@ class Company < ApplicationRecord
         a.name = "#{pm.name} for #{name}"
         a.code = "#{pm.code}-#{SecureRandom.hex(4).upcase}"
         a.business_type = :in_store
-        a.lifecycle_status = :inactive
+        a.lifecycle_status = if pm.strategy_cash? || pm.strategy_mock_qr_gateway? || pm.strategy_mock_redirect_gateway?
+          :active
+        else
+          :inactive
+        end
       end
     end
   end

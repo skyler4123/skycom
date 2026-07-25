@@ -120,9 +120,16 @@ RSpec.describe Company, type: :model do
         .to change(PaymentMethodAppointment, :count).by(2)
     end
 
-    it "creates appointments with lifecycle_status: :inactive" do
+    it "creates appointments with lifecycle_status: :active for cash strategies" do
       company.setup_payment_method_appointments
-      expect(company.payment_method_appointments).to all(have_attributes(lifecycle_status: "inactive"))
+      cash_appt = company.payment_method_appointments.joins(:payment_method).find_by(payment_method: { strategy: :cash })
+      expect(cash_appt.lifecycle_status).to eq("active")
+    end
+
+    it "creates appointments with lifecycle_status: :inactive for non-cash strategies" do
+      company.setup_payment_method_appointments
+      stripe_appt = company.payment_method_appointments.joins(:payment_method).find_by(payment_method: { strategy: :stripe_gateway })
+      expect(stripe_appt.lifecycle_status).to eq("inactive")
     end
 
     it "creates appointments with business_type: :in_store" do
