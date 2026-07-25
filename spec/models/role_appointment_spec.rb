@@ -52,7 +52,7 @@ RSpec.describe RoleAppointment, type: :model do
 
     context "when creating a non-owner role_appointment" do
       # Use build instead of create to avoid triggering owner validation
-      # Company has already created owner employee via setup_owner_records
+      # Company has already created owner employee via initialize_company
       let(:owner_employee) { company.employees.find_by(business_type: :owner) }
 
       it "allows creation" do

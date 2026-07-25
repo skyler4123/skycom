@@ -67,7 +67,6 @@ class Seed::RetailEnrichService
     create_pages
     create_subscription_plans_for_company
     create_facilities_for_branches
-    appoint_payment_methods_to_company
     create_departments_for_company
     create_employees
     assign_employees_to_departments
@@ -224,17 +223,6 @@ class Seed::RetailEnrichService
         facility.attach_tag(key: "Facility #{facility.id} Tag")
         facility.save!
         @facilities << facility
-      end
-    end
-  end
-
-  def appoint_payment_methods_to_company
-    country_value = COUNTRY_CODES[@country.to_s.to_sym] || @country
-    country_methods = PaymentMethod.where(country: country_value)
-
-    @branches.each do |branch|
-      country_methods.each do |pm|
-        Seed::PaymentMethodAppointmentService.create(company: @retail, payment_method: pm)
       end
     end
   end

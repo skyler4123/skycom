@@ -13,17 +13,9 @@ export default class Companies_Dashboards_IndexController extends Companies_Layo
     poll(() => {
       if (currentCompany()) {
         this.loadData()
-        // Test WEBSOCKET
-        // window.WEBSOCKET.subscribe("019f7eff-0364-7b5c-97d6-53d93481c6f9", "test", (data) => {
-        //   console.log(data)
-        // })
         return true
       }
       return false
-    })
-
-    window.WEBSOCKET.subscribe(window.WEBSOCKET.companyChannel("019f7db7-2324-7848-b2a6-144a097fa759"), "test", (data) => {
-      console.log(data)
     })
   }
 

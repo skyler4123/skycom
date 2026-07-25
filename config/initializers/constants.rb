@@ -44,16 +44,25 @@ WORKFLOW_STATUS = {
   failed: 8
 }
 
-GATEWAY_STRATEGIES = {
-  # System payments (value < 10 — no external gateway call)
-  cash: 0,
-  wallet_auto_debit: 1,
-  # External gateway strategies (value >= 10)
-  mock_qr_gateway: 10,
-  mock_redirect_gateway: 11,
-  stripe_gateway: 12,
-  viet_qr_gateway: 13
-}.freeze
+GATEWAY_STRATEGIES = begin
+  base = {
+    # System payments (value < 10 — no external gateway call)
+    cash: 0,
+    wallet_auto_debit: 1,
+    # External gateway strategies (value >= 10)
+    stripe_gateway: 12,
+    viet_qr_gateway: 13
+  }
+  mock = {
+    mock_qr_gateway: 10,
+    mock_redirect_gateway: 11
+  }
+  if Rails.env.production?
+    base
+  else
+    base.merge(mock)
+  end
+end.freeze
 
 GATEWAY_STRATEGY_CLASSES = {
   cash: "Payments::Cash",
@@ -379,7 +388,7 @@ DEFAULT_RESOURCE_NAMES = %w[
   Table Reservation Room Guest
   Patient Appointment Course Student Exam
   Membership
-  Page ShiftTemplate ScheduledShift
+  Page PaymentMethodAppointment ShiftTemplate ScheduledShift
   AttendancePolicy AttendanceLog AttendanceDay AttendanceMonth
   Stock StockTransfer StockImport StockExport
 ].freeze

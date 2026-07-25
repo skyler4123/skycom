@@ -17,7 +17,7 @@ class Seed::EmployeeService
   )
     workflow_status ||= Employee.workflow_statuses.keys.sample
     lifecycle_status ||= Employee.lifecycle_statuses.keys.sample
-    # Exclude "owner" from random selection - owner is created via Company#setup_owner_records
+    # Exclude "owner" from random selection - owner is created via Company#initialize_company
     business_type ||= (Employee.business_types.keys - [ OWNER_BUSINESS_TYPE ]).sample
     email ||= "employee_#{SecureRandom.hex}@gmail.com"
     name ||= Faker::Name.name

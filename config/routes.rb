@@ -58,6 +58,7 @@ Rails.application.routes.draw do
       resources :settings
       resources :subscription_plan_appointments
       resources :permissions
+      resources :payment_method_appointments, only: [ :index, :edit, :update ]
       resources :policies
       resources :policy_appointments
       resources :property_mappings
