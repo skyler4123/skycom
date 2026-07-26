@@ -42,7 +42,7 @@ RSpec.feature "Companies::TopUps::RedirectFlow", type: :feature, js: true do
   scenario "creates a pending transaction after redirect submission" do
     expect {
       visit new_company_top_up_path(company)
-      fill_in "top-up-amount", with: "15000"
+      fill_in "top-up-amount", with: "150"
       find(".payment-method-card", text: "Mock Redirect").click
       click_button "Confirm Top Up"
       sleep 0.5

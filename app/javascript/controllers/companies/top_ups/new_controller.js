@@ -127,7 +127,9 @@ export default class Companies_TopUps_NewController extends Companies_LayoutCont
   async handleSubmit(event) {
     event.preventDefault()
     const cid = currentCompany()?.id
-    const amountCents = parseInt(document.getElementById("top-up-amount")?.value) || 0
+    const rawAmount = parseInt(document.getElementById("top-up-amount")?.value) || 0
+    const currency = currentCompany()?.currency || "usd"
+    const amountCents = currency === "usd" ? rawAmount * 100 : rawAmount
     if (!cid || !this.selectedMethodId || amountCents <= 0) return
 
     try {

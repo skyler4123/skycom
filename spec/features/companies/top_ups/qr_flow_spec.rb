@@ -48,7 +48,7 @@ RSpec.feature "Companies::TopUps::QrFlow", type: :feature, js: true do
     visit new_company_top_up_path(company)
     expect(page).to have_css("*", text: "Top Up Wallet", visible: false, wait: 10)
 
-    fill_in "top-up-amount", with: "5000"
+    fill_in "top-up-amount", with: "50"
     find(".payment-method-card", text: "Mock QR").click
     click_button "Confirm Top Up"
 
@@ -58,7 +58,7 @@ RSpec.feature "Companies::TopUps::QrFlow", type: :feature, js: true do
 
   scenario "shows formatted amount on QR screen (USD)" do
     visit new_company_top_up_path(company)
-    fill_in "top-up-amount", with: "5000"
+    fill_in "top-up-amount", with: "50"
     find(".payment-method-card", text: "Mock QR").click
     click_button "Confirm Top Up"
 
@@ -67,7 +67,7 @@ RSpec.feature "Companies::TopUps::QrFlow", type: :feature, js: true do
 
   scenario "QR container is rendered on the wait screen" do
     visit new_company_top_up_path(company)
-    fill_in "top-up-amount", with: "2500"
+    fill_in "top-up-amount", with: "25"
     find(".payment-method-card", text: "Mock QR").click
     click_button "Confirm Top Up"
 
@@ -76,7 +76,7 @@ RSpec.feature "Companies::TopUps::QrFlow", type: :feature, js: true do
 
   scenario "Cancel button returns to form" do
     visit new_company_top_up_path(company)
-    fill_in "top-up-amount", with: "5000"
+    fill_in "top-up-amount", with: "50"
     find(".payment-method-card", text: "Mock QR").click
     click_button "Confirm Top Up"
 
