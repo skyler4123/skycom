@@ -17,7 +17,7 @@ class CreateTransactions < ActiveRecord::Migration[8.0]
       t.integer :price_cents
       t.integer :currency
       t.integer :country
-      t.integer  :timezone
+      t.integer :timezone
 
       t.integer :status, default: 0, null: false
       t.string :gateway_reference
