@@ -18,8 +18,7 @@ class CreateBillingTransactions < ActiveRecord::Migration[8.0]
 
       t.integer :status, default: 0, null: false
       t.string :gateway_reference
-      t.jsonb :gateway_payload, default: {}
-
+      t.jsonb    :metadata
       t.timestamps
     end
 

@@ -3,12 +3,12 @@
 # We define it as a clean, structured Module/Class bound directly to the WEBSOCKET constant
 class WEBSOCKET
   CLIENT = Cent::Client.new(
-    api_key: "skycom_super_secret_api_key_2026",
-    endpoint: "http://localhost:8000/api"
+    api_key: ENV["CENTRIFUGO_API_KEY"] || Rails.application.credentials.centrifugo_api_key || "skycom_super_secret_api_key_2026",
+    endpoint: ENV["CENTRIFUGO_ENDPOINT"] || Rails.application.credentials.centrifugo_endpoint || "http://localhost:8000/api"
   )
 
   NOTARY = Cent::Notary.new(
-    secret: "skycom_jwt_hmac_secret_token_key_2026"
+    secret: ENV["CENTRIFUGO_TOKEN_HMAC_SECRET_KEY"] || Rails.application.credentials.centrifugo_token_hmac_secret_key || "skycom_jwt_hmac_secret_token_key_2026"
   )
 
   # --- Unified Event Types (Registry) ---
@@ -44,6 +44,14 @@ class WEBSOCKET
       }
 
       CLIENT.publish(channel: channel, data: envelope)
+    end
+
+    # --- Connectivity Check ---
+    def ping
+      response = CLIENT.info
+      response.dig("result", "nodes", 0, "version").present?
+    rescue => e
+      false
     end
 
     # --- Core Connection Token Handshake ---

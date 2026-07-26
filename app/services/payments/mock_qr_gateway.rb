@@ -1,14 +1,18 @@
 # app/services/payments/mock_qr_gateway.rb
 module Payments
   class MockQrGateway
+    GATEWAY_URL  = ENV["MOCK_QR_GATEWAY_URL"]  || Rails.application.credentials.mock_qr_gateway_url  || "http://localhost:4000/api/v1/bank/qr-generate"
+    SECRET_KEY   = ENV["MOCK_QR_SECRET_KEY"]    || Rails.application.credentials.mock_qr_secret_key    || "local_secure_dev_secret"
+    WEBHOOK_URL  = ENV["MOCK_QR_WEBHOOK_URL"]   || Rails.application.credentials.mock_qr_webhook_url   || "http://192.168.0.100:3000/webhooks/payments/mock_qr_gateway"
+
     def initialize(amount_cents:, invoice_id:, memo:, transaction_token: nil, **_args)
       @amount_cents = amount_cents
       @invoice_id = invoice_id
       @memo = memo
       @transaction_token = transaction_token
-      @gateway_url = GATEWAY_CONFIGS[:mock_qr_gateway][:gateway_url]
-      @secret_key = GATEWAY_CONFIGS[:mock_qr_gateway][:secret_key]
-      @webhook_url = GATEWAY_CONFIGS[:mock_qr_gateway][:webhook_url]
+      @gateway_url = GATEWAY_URL
+      @secret_key = SECRET_KEY
+      @webhook_url = WEBHOOK_URL
     end
 
     def call

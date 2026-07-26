@@ -1,15 +1,19 @@
 # app/services/payments/mock_redirect_gateway.rb
 module Payments
   class MockRedirectGateway
+    GATEWAY_URL  = ENV["MOCK_REDIRECT_GATEWAY_URL"]  || Rails.application.credentials.mock_redirect_gateway_url  || "http://localhost:4000/api/v1/bank/redirect-session"
+    SECRET_KEY   = ENV["MOCK_REDIRECT_SECRET_KEY"]    || Rails.application.credentials.mock_redirect_secret_key    || "local_secure_dev_secret"
+    WEBHOOK_URL  = ENV["MOCK_REDIRECT_WEBHOOK_URL"]   || Rails.application.credentials.mock_redirect_webhook_url   || "http://192.168.0.100:3000/webhooks/payments/mock_redirect_gateway"
+
     def initialize(amount_cents:, invoice_id:, memo:, transaction_token: nil, redirect_url: nil, **_args)
       @amount_cents = amount_cents
       @invoice_id = invoice_id
       @memo = memo
       @transaction_token = transaction_token
       @redirect_url = redirect_url
-      @gateway_url = GATEWAY_CONFIGS[:mock_redirect_gateway][:gateway_url]
-      @secret_key = GATEWAY_CONFIGS[:mock_redirect_gateway][:secret_key]
-      @webhook_url = GATEWAY_CONFIGS[:mock_redirect_gateway][:webhook_url]
+      @gateway_url = GATEWAY_URL
+      @secret_key = SECRET_KEY
+      @webhook_url = WEBHOOK_URL
     end
 
     def call

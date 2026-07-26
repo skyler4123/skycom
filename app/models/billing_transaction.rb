@@ -13,6 +13,8 @@
 #   SUM(transactions.amount_cents) >= invoice.price_cents  →  paid
 #
 class BillingTransaction < ApplicationRecord
+  store_accessor :metadata, :gateway_payload
+
   attribute :amount_cents, :integer, default: 0
   attribute :balance_before_cents, :integer, default: 0
   attribute :balance_after_cents, :integer, default: 0
