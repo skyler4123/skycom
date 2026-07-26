@@ -66,7 +66,7 @@ RSpec.feature "Companies::PaymentMethodAppointments Management", type: :feature,
   end
 
   def create_all_appointments
-    [pm_cash, pm_qr, pm_redirect, pm_card, pm_vietqr].each do |pm|
+    [ pm_cash, pm_qr, pm_redirect, pm_card, pm_vietqr ].each do |pm|
       PaymentMethodAppointment.find_or_create_by!(
         company: company, payment_method: pm
       ) do |a|

@@ -12,7 +12,6 @@ class CreateDailyMetricLogs < ActiveRecord::Migration[8.0]
 
     # This composite index is critical. It optimizes the query:
     # WHERE company_id = X AND billing_resource_id = Y AND log_date BETWEEN Start AND End
-    add_index :daily_metric_logs, [ :company_id, :billing_resource_id, :log_date ],
-              name: "idx_daily_metric_lookup"
+    add_index :daily_metric_logs, [ :company_id, :billing_resource_id, :log_date ]
   end
 end

@@ -9,7 +9,7 @@ module Webhooks
       def create
         received_sig = request.headers["X-Skycom-Bank-Signature"]
         unless received_sig == WEBHOOK_BANK_PAYMENT_SECRET
-          return render json: { errors: ["Invalid signature"] }, status: :unauthorized
+          return render json: { errors: [ "Invalid signature" ] }, status: :unauthorized
         end
 
         data = params[:data] || params
@@ -17,12 +17,12 @@ module Webhooks
         amount = data[:amount].to_i
 
         unless transaction_token.present? && amount.positive?
-          return render json: { errors: ["Missing transaction_token or amount"] }, status: :unprocessable_content
+          return render json: { errors: [ "Missing transaction_token or amount" ] }, status: :unprocessable_content
         end
 
         txn = BillingTransaction.find_by(gateway_reference: transaction_token)
         unless txn
-          return render json: { errors: ["Transaction not found"] }, status: :not_found
+          return render json: { errors: [ "Transaction not found" ] }, status: :not_found
         end
 
         if txn.status_completed?
@@ -59,7 +59,7 @@ module Webhooks
 
       def ensure_not_production
         return unless Rails.env.production?
-        render json: { errors: ["Mock gateway not available in production"] }, status: :not_found
+        render json: { errors: [ "Mock gateway not available in production" ] }, status: :not_found
       end
     end
   end

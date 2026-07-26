@@ -16,9 +16,15 @@ class CreateBillingTransactions < ActiveRecord::Migration[8.0]
 
       t.text :description
 
+      t.integer :status, default: 0, null: false
+      t.string :gateway_reference
+      t.jsonb :gateway_payload, default: {}
+
       t.timestamps
     end
 
-    add_index :billing_transactions, [ :company_id, :created_at ], name: "idx_wallet_tx_company_chrono"
+    add_index :billing_transactions, :gateway_reference, unique: true
+    add_index :billing_transactions, :status
+    add_index :billing_transactions, [ :company_id, :created_at ]
   end
 end

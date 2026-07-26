@@ -16,8 +16,8 @@ class CreateBillingInvoices < ActiveRecord::Migration[8.0]
       t.integer  :price_cents, null: false
       t.integer  :currency, null: false
 
-      t.datetime :period_start, null: false
-      t.datetime :period_end, null: false
+      t.datetime :period_start
+      t.datetime :period_end
       t.datetime :due_at
 
       t.integer  :payment_status, index: true # enum: unpaid, paid, voided, overdue

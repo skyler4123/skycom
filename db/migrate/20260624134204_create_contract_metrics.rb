@@ -18,6 +18,6 @@ class CreateContractMetrics < ActiveRecord::Migration[8.0]
     end
 
     # Critical index to prevent attaching duplicate metrics to the same contract
-    add_index :contract_metrics, [ :billing_contract_id, :billing_resource_id ], unique: true, name: "index_contract_metrics_on_contract_and_resource"
+    add_index :contract_metrics, [ :billing_contract_id, :billing_resource_id ], unique: true
   end
 end
