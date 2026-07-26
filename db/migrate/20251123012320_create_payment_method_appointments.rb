@@ -9,6 +9,11 @@ class CreatePaymentMethodAppointments < ActiveRecord::Migration[8.0]
       t.string :description
       t.string :code
 
+      # --- Merchant Bank Account Credentials ---
+      t.string :merchant_number           # Merchant's bank account number
+      t.string :merchant_name             # Merchant's bank account holder name
+      t.string :merchant_id              # Terminal / Merchant ID given by gateway
+
       # --- System Fields ---
       t.integer  :lifecycle_status, index: true
       t.integer  :workflow_status, index: true

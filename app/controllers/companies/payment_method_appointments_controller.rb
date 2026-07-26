@@ -16,7 +16,10 @@ class Companies::PaymentMethodAppointmentsController < Companies::ApplicationCon
               code: pm.code,
               payment_mode: pm.payment_mode,
               lifecycle_status: a.lifecycle_status,
-              strategy: pm.strategy
+              strategy: pm.strategy,
+              merchant_number: a.merchant_number,
+              merchant_name: a.merchant_name,
+              merchant_id: a.merchant_id
             }
           }
         }
@@ -34,6 +37,9 @@ class Companies::PaymentMethodAppointmentsController < Companies::ApplicationCon
           payment_method_appointment: {
             id: @appointment.id,
             lifecycle_status: @appointment.lifecycle_status,
+            merchant_number: @appointment.merchant_number,
+            merchant_name: @appointment.merchant_name,
+            merchant_id: @appointment.merchant_id,
             payment_method: {
               name: @appointment.payment_method.name,
               code: @appointment.payment_method.code,
@@ -61,6 +67,6 @@ class Companies::PaymentMethodAppointmentsController < Companies::ApplicationCon
   private
 
   def update_params
-    params.require(:payment_method_appointment).permit(:lifecycle_status)
+    params.require(:payment_method_appointment).permit(:lifecycle_status, :merchant_number, :merchant_name, :merchant_id)
   end
 end

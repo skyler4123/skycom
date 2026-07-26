@@ -352,6 +352,7 @@ export const dictionary = () => {
     "N/A": { vi: "N/A" },
     "Yes": { vi: "Có" },
     "No": { vi: "Không" },
+    "Optional": { vi: "Tùy chọn" },
     "Loading...": { vi: "Đang tải..." },
     "Employee Name": { vi: "Tên nhân viên" },
     "e.g. Premium Widget": { vi: "VD: Premium Widget" },
@@ -466,6 +467,30 @@ export const dictionary = () => {
     "This field is synced from PropertyMapping. Please access the Property Mapping edit page to update this name.": {
       vi: "Trường này được đồng bộ từ PropertyMapping. Vui lòng truy cập trang chỉnh sửa Property Mapping để cập nhật tên này.",
     },
+
+    // === HR / Attendance ===
+    "Shift Templates": { vi: "Mẫu ca làm việc" },
+    "Shifts": { vi: "Ca làm việc" },
+    "Attendance Days": { vi: "Chấm công ngày" },
+    "Attendance Policies": { vi: "Chính sách chấm công" },
+    "Attendance Logs": { vi: "Nhật ký chấm công" },
+    "Attendance Months": { vi: "Chấm công tháng" },
+
+    // === Payment Methods ===
+    "Payment Methods": { vi: "Phương thức thanh toán" },
+    "Bank Account Configuration": { vi: "Cấu hình tài khoản ngân hàng" },
+    "Enter your banking details to receive payments via this method.": { vi: "Nhập thông tin ngân hàng để nhận thanh toán qua phương thức này." },
+    "Bank Account Number": { vi: "Số tài khoản ngân hàng" },
+    "Account Holder Name": { vi: "Tên chủ tài khoản" },
+    "Merchant / Terminal ID": { vi: "Mã người bán / Mã terminal" },
+    "e.g. 1234567890": { vi: "VD: 1234567890" },
+    "e.g. Business Name or Individual": { vi: "VD: Tên doanh nghiệp hoặc cá nhân" },
+    "e.g. T-1A2B or MID-3C4D": { vi: "VD: T-1A2B hoặc MID-3C4D" },
+    "Mode": { vi: "Phương thức" },
+    "Payment Mode": { vi: "Phương thức thanh toán" },
+    "Banking": { vi: "Ngân hàng" },
+    "Configured": { vi: "Đã cấu hình" },
+    "Not Set": { vi: "Chưa thiết lập" },
 
     // === Analytics Dashboard ===
     "Analytics": { vi: "Phân tích" },

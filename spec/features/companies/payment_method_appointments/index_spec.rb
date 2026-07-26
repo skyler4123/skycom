@@ -221,16 +221,65 @@ RSpec.feature "Companies::PaymentMethodAppointments Management", type: :feature,
       expect(appointment.lifecycle_status).to eq("inactive")
     end
 
-    scenario "cancel returns to index" do
+    scenario "does not show banking fields for cash payment mode" do
       sign_in(admin_user)
       seed_client_cache
 
       visit edit_company_payment_method_appointment_path(company, appointment)
 
-      expect(page).to have_content("Cancel", wait: 10)
-      click_link "Cancel"
+      expect(page).to have_content("Cash", wait: 10)
+      expect(page).not_to have_content("BANK ACCOUNT CONFIGURATION")
+      expect(page).not_to have_field("payment_method_appointment[merchant_number]")
+    end
+  end
 
-      expect(page).to have_current_path(company_payment_method_appointments_path(company))
+  describe "edit page - qr payment" do
+    let!(:qr_appointment) do
+      pm = pm_qr
+      PaymentMethodAppointment.create!(
+        company: company,
+        payment_method: pm,
+        name: "#{pm.name} for #{company.name}",
+        code: "QR-EDIT-TEST-#{SecureRandom.hex(4).upcase}",
+        business_type: :in_store,
+        lifecycle_status: :active,
+        merchant_number: "1234567890",
+        merchant_name: company.name,
+        merchant_id: "T-TEST"
+      )
+    end
+
+    scenario "shows banking fields for qr payment mode" do
+      sign_in(admin_user)
+      seed_client_cache
+
+      visit edit_company_payment_method_appointment_path(company, qr_appointment)
+
+      expect(page).to have_content("Mock QR", wait: 10)
+      expect(page).to have_content("BANK ACCOUNT CONFIGURATION")
+      expect(page).to have_field("payment_method_appointment[merchant_number]")
+      expect(page).to have_field("payment_method_appointment[merchant_name]")
+      expect(page).to have_field("payment_method_appointment[merchant_id]")
+    end
+
+    scenario "updates merchant banking fields" do
+      sign_in(admin_user)
+      seed_client_cache
+
+      visit edit_company_payment_method_appointment_path(company, qr_appointment)
+
+      expect(page).to have_content("Mock QR", wait: 10)
+      page.execute_script("document.querySelector('input[name=\"payment_method_appointment[merchant_number]\"]').value = '0987654321'")
+      page.execute_script("document.querySelector('input[name=\"payment_method_appointment[merchant_name]\"]').value = 'Updated Business Name'")
+      page.execute_script("document.querySelector('input[name=\"payment_method_appointment[merchant_id]\"]').value = 'MID-UPDATED'")
+      click_button "Save Changes"
+
+      expect(page).to have_content("Payment method updated successfully", wait: 10)
+
+      qr_appointment.reload
+      expect(qr_appointment.merchant_number).to eq("0987654321")
+      expect(qr_appointment.merchant_name).to eq("Updated Business Name")
+      expect(qr_appointment.merchant_id).to eq("MID-UPDATED")
     end
   end
 
