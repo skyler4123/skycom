@@ -1,0 +1,39 @@
+<div class="flex min-h-screen flex-col items-center justify-center px-6">
+  <div class="w-full max-w-sm">
+
+    <h1 class="text-2xl font-bold mb-6">Employee Info</h1>
+
+    <dl class="space-y-4 text-sm">
+      <div class="flex justify-between">
+        <dt class="text-gray-500">Name</dt>
+        <dd class="font-semibold"><%= @employee.name %></dd>
+      </div>
+      <div class="flex justify-between">
+        <dt class="text-gray-500">Email</dt>
+        <dd class="font-semibold"><%= @employee.email %></dd>
+      </div>
+      <div class="flex justify-between">
+        <dt class="text-gray-500">Type</dt>
+        <dd class="font-semibold"><%= @employee.business_type&.humanize || "—" %></dd>
+      </div>
+      <div class="flex justify-between">
+        <dt class="text-gray-500">Branch</dt>
+        <dd class="font-semibold"><%= @employee.branch&.name || "—" %></dd>
+      </div>
+      <div class="flex justify-between">
+        <dt class="text-gray-500">Company</dt>
+        <dd class="font-semibold"><%= @employee.company.name %></dd>
+      </div>
+      <div class="flex justify-between">
+        <dt class="text-gray-500">Roles</dt>
+        <dd class="font-semibold"><%= @employee.roles.map(&:name).join(", ").presence || "—" %></dd>
+      </div>
+    </dl>
+
+    <div class="mt-8">
+      <%= link_to "Back to Home", mobile_home_path,
+            class: "block text-center w-full rounded-lg bg-gray-600 px-4 py-3 text-base font-semibold text-white hover:bg-gray-700 cursor-pointer" %>
+    </div>
+
+  </div>
+</div>

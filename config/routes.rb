@@ -1,6 +1,14 @@
 # config/routes.rb
 
 Rails.application.routes.draw do
+  namespace :mobile do
+    get "sign_in", to: "sessions#new"
+    post "sign_in", to: "sessions#create"
+    delete "sign_out", to: "sessions#destroy"
+    get "home", to: "home#index"
+    get "employee", to: "employees#show"
+    post "attendances", to: "attendances#create"
+  end
   # Webhooks
   namespace :webhooks do
     namespace :payments do
