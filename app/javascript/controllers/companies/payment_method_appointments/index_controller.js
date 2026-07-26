@@ -1,7 +1,7 @@
 import Companies_LayoutController from "controllers/companies/layout_controller"
 
 export default class Companies_PaymentMethodAppointments_IndexController extends Companies_LayoutController {
-  /** @type {Array<{id: string, name: string, code: string, payment_mode: string, lifecycle_status: string, strategy: string}>} */
+  /** @type {Array<{id: string, name: string, code: string, payment_mode: string, lifecycle_status: string, strategy: string, merchant_number: string|null, merchant_name: string|null, merchant_id: string|null}>} */
   paymentMethodAppointments = []
 
   async connect() {
@@ -25,11 +25,17 @@ export default class Companies_PaymentMethodAppointments_IndexController extends
 
   contentHTML() {
     const rows = this.paymentMethodAppointments.length > 0
-      ? this.paymentMethodAppointments.map(pma => `
+      ? this.paymentMethodAppointments.map(pma => {
+        const hasBanking = pma.payment_mode !== 'cash' && (pma.merchant_number || pma.merchant_name || pma.merchant_id)
+        const bankingLabel = pma.payment_mode === 'cash' ? '—'
+          : hasBanking ? `<span class="text-emerald-600 dark:text-emerald-400 font-medium">Configured</span>`
+          : `<span class="text-amber-600 dark:text-amber-400 font-medium">Not Set</span>`
+        return `
         <tr class="border-b border-slate-100 dark:border-slate-800 last:border-0">
           <td class="py-4 px-6 text-sm font-medium text-slate-900 dark:text-white">${pma.name}</td>
           <td class="py-4 px-6 text-sm text-slate-500 dark:text-slate-400">${pma.code}</td>
           <td class="py-4 px-6 text-sm text-slate-500 dark:text-slate-400">${pma.payment_mode}</td>
+          <td class="py-4 px-6 text-sm">${bankingLabel}</td>
           <td class="py-4 px-6">${Helpers.statusBadge(pma.lifecycle_status === 'active' ? 'active' : 'inactive')}</td>
           <td class="py-4 px-6 text-right">
             <a href="${Helpers.edit_company_payment_method_appointment_path(currentCompany().id, pma.id)}"
@@ -38,8 +44,8 @@ export default class Companies_PaymentMethodAppointments_IndexController extends
             </a>
           </td>
         </tr>
-      `).join('')
-      : `<tr><td colspan="5" class="py-8 text-center text-sm text-slate-400">No payment methods available for your region.</td></tr>`
+      `}).join('')
+      : `<tr><td colspan="6" class="py-8 text-center text-sm text-slate-400">No payment methods available for your region.</td></tr>`
 
     return `
       <div class="p-4 overflow-y-auto">
@@ -54,6 +60,7 @@ export default class Companies_PaymentMethodAppointments_IndexController extends
                   <th class="py-3 px-6 text-left text-xs font-bold text-slate-400 uppercase tracking-wider">Name</th>
                   <th class="py-3 px-6 text-left text-xs font-bold text-slate-400 uppercase tracking-wider">Code</th>
                   <th class="py-3 px-6 text-left text-xs font-bold text-slate-400 uppercase tracking-wider">Mode</th>
+                  <th class="py-3 px-6 text-left text-xs font-bold text-slate-400 uppercase tracking-wider">Banking</th>
                   <th class="py-3 px-6 text-left text-xs font-bold text-slate-400 uppercase tracking-wider">Status</th>
                   <th class="py-3 px-6 text-right text-xs font-bold text-slate-400 uppercase tracking-wider">Actions</th>
                 </tr>

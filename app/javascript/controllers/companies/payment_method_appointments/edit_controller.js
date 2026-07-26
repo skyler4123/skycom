@@ -1,7 +1,7 @@
 import Companies_LayoutController from "controllers/companies/layout_controller"
 
 export default class Companies_PaymentMethodAppointments_EditController extends Companies_LayoutController {
-  /** @type {{id: string, lifecycle_status: string, payment_method: {name: string, code: string, payment_mode: string, business_type: string}} | null} */
+  /** @type {{id: string, lifecycle_status: string, merchant_number: string|null, merchant_name: string|null, merchant_id: string|null, payment_method: {name: string, code: string, payment_mode: string, business_type: string}} | null} */
   appointment = null
 
   async connect() {
@@ -34,6 +34,8 @@ export default class Companies_PaymentMethodAppointments_EditController extends 
     const pm = a.payment_method
     const companyId = window.location.pathname.split("/")[2]
 
+    const showBanking = pm.payment_mode !== 'cash'
+
     const fields = `
       <div class="space-y-6">
         <div class="flex items-center gap-4 mb-6">
@@ -65,6 +67,36 @@ export default class Companies_PaymentMethodAppointments_EditController extends 
             <option value="inactive" ${a.lifecycle_status === 'inactive' ? 'selected' : ''}>Disabled</option>
           </select>
         </div>
+
+        ${showBanking ? `
+          <div class="border-t border-slate-200 dark:border-slate-700 pt-6">
+            <h3 class="text-sm font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-4">Bank Account Configuration</h3>
+            <p class="text-xs text-slate-400 mb-4">Enter your banking details to receive payments via this method.</p>
+            <div class="grid grid-cols-1 gap-4">
+              <div class="space-y-1">
+                <label class="text-[10px] font-bold text-slate-400 uppercase">Bank Account Number</label>
+                <input type="text" name="payment_method_appointment[merchant_number]"
+                  value="${a.merchant_number || ''}"
+                  placeholder="e.g. 1234567890"
+                  class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-sm">
+              </div>
+              <div class="space-y-1">
+                <label class="text-[10px] font-bold text-slate-400 uppercase">Account Holder Name</label>
+                <input type="text" name="payment_method_appointment[merchant_name]"
+                  value="${a.merchant_name || ''}"
+                  placeholder="e.g. Business Name or Individual"
+                  class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-sm">
+              </div>
+              <div class="space-y-1">
+                <label class="text-[10px] font-bold text-slate-400 uppercase">Merchant / Terminal ID</label>
+                <input type="text" name="payment_method_appointment[merchant_id]"
+                  value="${a.merchant_id || ''}"
+                  placeholder="e.g. T-1A2B or MID-3C4D"
+                  class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-sm">
+              </div>
+            </div>
+          </div>
+        ` : ''}
 
         <div class="flex justify-end gap-3 pt-2">
           <a href="${Helpers.company_payment_method_appointments_path(companyId)}"
