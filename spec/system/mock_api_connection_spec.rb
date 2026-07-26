@@ -21,9 +21,7 @@ RSpec.describe "Mock API Server Connection", type: :request do
 
   it "returns expected JSON body" do
     response = connection.get
-    body = JSON.parse(response.body)
-
-    expect(body).to include(
+    expect(response.body).to include(
       "status" => "online",
       "message" => "🚀 Skycom Auto-Redirect Multi-Bank Sandbox is active!"
     )
