@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_07_18_073839) do
+ActiveRecord::Schema[8.0].define(version: 2026_07_02_190003) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pgcrypto"
@@ -468,14 +468,14 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_18_073839) do
     t.integer "promo_balance_before_cents", null: false
     t.integer "promo_balance_after_cents", null: false
     t.text "description"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
     t.integer "status", default: 0, null: false
     t.string "gateway_reference"
     t.jsonb "gateway_payload", default: {}
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
     t.index ["billing_invoice_id"], name: "index_billing_transactions_on_billing_invoice_id"
     t.index ["billing_payment_method_id"], name: "index_billing_transactions_on_billing_payment_method_id"
-    t.index ["company_id", "created_at"], name: "idx_wallet_tx_company_chrono"
+    t.index ["company_id", "created_at"], name: "index_billing_transactions_on_company_id_and_created_at"
     t.index ["company_id"], name: "index_billing_transactions_on_company_id"
     t.index ["gateway_reference"], name: "index_billing_transactions_on_gateway_reference", unique: true
     t.index ["status"], name: "index_billing_transactions_on_status"
@@ -1011,7 +1011,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_18_073839) do
     t.integer "workflow_status"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["billing_contract_id", "billing_resource_id"], name: "index_contract_features_on_contract_and_resource", unique: true
+    t.index ["billing_contract_id", "billing_resource_id"], name: "idx_on_billing_contract_id_billing_resource_id_27af2f769a", unique: true
     t.index ["billing_contract_id"], name: "index_contract_features_on_billing_contract_id"
     t.index ["billing_resource_id"], name: "index_contract_features_on_billing_resource_id"
     t.index ["lifecycle_status"], name: "index_contract_features_on_lifecycle_status"
@@ -1030,7 +1030,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_18_073839) do
     t.integer "workflow_status"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["billing_contract_id", "billing_resource_id"], name: "index_contract_metrics_on_contract_and_resource", unique: true
+    t.index ["billing_contract_id", "billing_resource_id"], name: "idx_on_billing_contract_id_billing_resource_id_ede18c9680", unique: true
     t.index ["billing_contract_id"], name: "index_contract_metrics_on_billing_contract_id"
     t.index ["billing_resource_id"], name: "index_contract_metrics_on_billing_resource_id"
     t.index ["lifecycle_status"], name: "index_contract_metrics_on_lifecycle_status"
@@ -1315,7 +1315,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_18_073839) do
     t.date "log_date", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["company_id", "contract_feature_id", "log_date"], name: "idx_daily_feature_logs_unique", unique: true
+    t.index ["company_id", "contract_feature_id", "log_date"], name: "idx_on_company_id_contract_feature_id_log_date_0a0d58f2d6", unique: true
     t.index ["company_id"], name: "index_daily_feature_logs_on_company_id"
     t.index ["contract_feature_id"], name: "index_daily_feature_logs_on_contract_feature_id"
     t.index ["log_date"], name: "index_daily_feature_logs_on_log_date"
@@ -1329,7 +1329,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_18_073839) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["billing_resource_id"], name: "index_daily_metric_logs_on_billing_resource_id"
-    t.index ["company_id", "billing_resource_id", "log_date"], name: "idx_daily_metric_lookup"
+    t.index ["company_id", "billing_resource_id", "log_date"], name: "idx_on_company_id_billing_resource_id_log_date_83c86c76c0"
     t.index ["company_id"], name: "index_daily_metric_logs_on_company_id"
   end
 

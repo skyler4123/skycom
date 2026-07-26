@@ -18,6 +18,6 @@ class CreateContractFeatures < ActiveRecord::Migration[8.0]
     end
 
     # Critical index to prevent attaching the same add-on twice to the same contract
-    add_index :contract_features, [ :billing_contract_id, :billing_resource_id ], unique: true, name: "index_contract_features_on_contract_and_resource"
+    add_index :contract_features, [ :billing_contract_id, :billing_resource_id ], unique: true
   end
 end
