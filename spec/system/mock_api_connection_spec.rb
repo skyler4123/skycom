@@ -4,8 +4,10 @@ require "rails_helper"
 require "net/http"
 require "json"
 
+MOCK_API_PING_URL = ENV["MOCK_API_PING_URL"] || Rails.application.credentials.mock_api_ping_url || "http://localhost:4000/api/v1/ping"
+
 RSpec.describe "Mock API Server Connection", type: :request do
-  let(:uri) { URI("http://mock-api:4000/api/v1/ping") }
+  let(:uri) { URI(MOCK_API_PING_URL) }
 
   it "responds to ping endpoint" do
     response = Net::HTTP.get_response(uri)
