@@ -28,8 +28,8 @@ export default class Companies_PaymentMethodAppointments_IndexController extends
       ? this.paymentMethodAppointments.map(pma => {
         const hasBanking = pma.payment_mode !== 'cash' && (pma.merchant_number || pma.merchant_name || pma.merchant_id)
         const bankingLabel = pma.payment_mode === 'cash' ? '—'
-          : hasBanking ? `<span class="text-emerald-600 dark:text-emerald-400 font-medium">Configured</span>`
-          : `<span class="text-amber-600 dark:text-amber-400 font-medium">Not Set</span>`
+          : hasBanking ? `<span class="text-emerald-600 dark:text-emerald-400 font-medium">${translate("Configured")}</span>`
+          : `<span class="text-amber-600 dark:text-amber-400 font-medium">${translate("Not Set")}</span>`
         return `
         <tr class="border-b border-slate-100 dark:border-slate-800 last:border-0">
           <td class="py-4 px-6 text-sm font-medium text-slate-900 dark:text-white">${pma.name}</td>
@@ -57,12 +57,12 @@ export default class Companies_PaymentMethodAppointments_IndexController extends
             <table class="w-full">
               <thead>
                 <tr class="border-b border-slate-200 dark:border-slate-700">
-                  <th class="py-3 px-6 text-left text-xs font-bold text-slate-400 uppercase tracking-wider">Name</th>
-                  <th class="py-3 px-6 text-left text-xs font-bold text-slate-400 uppercase tracking-wider">Code</th>
-                  <th class="py-3 px-6 text-left text-xs font-bold text-slate-400 uppercase tracking-wider">Mode</th>
-                  <th class="py-3 px-6 text-left text-xs font-bold text-slate-400 uppercase tracking-wider">Banking</th>
-                  <th class="py-3 px-6 text-left text-xs font-bold text-slate-400 uppercase tracking-wider">Status</th>
-                  <th class="py-3 px-6 text-right text-xs font-bold text-slate-400 uppercase tracking-wider">Actions</th>
+                  <th class="py-3 px-6 text-left text-xs font-bold text-slate-400 uppercase tracking-wider">${translate("Name")}</th>
+                  <th class="py-3 px-6 text-left text-xs font-bold text-slate-400 uppercase tracking-wider">${translate("Code")}</th>
+                  <th class="py-3 px-6 text-left text-xs font-bold text-slate-400 uppercase tracking-wider">${translate("Mode")}</th>
+                  <th class="py-3 px-6 text-left text-xs font-bold text-slate-400 uppercase tracking-wider">${translate("Banking")}</th>
+                  <th class="py-3 px-6 text-left text-xs font-bold text-slate-400 uppercase tracking-wider">${translate("Status")}</th>
+                  <th class="py-3 px-6 text-right text-xs font-bold text-slate-400 uppercase tracking-wider">${translate("Actions")}</th>
                 </tr>
               </thead>
               <tbody>${rows}</tbody>
