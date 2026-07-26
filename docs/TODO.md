@@ -1,0 +1,12 @@
+# TODO — Undecided / Future Work
+
+## Payment Method "Configured" Logic
+
+The Banking column on the index page uses `merchant_number || merchant_name || merchant_id` to determine if a payment method is "Configured". This heuristic is not final — it's unclear which of these three fields are truly required vs optional.
+
+For example, a `redirect`-mode gateway (Stripe) might only need a `merchant_id` (API terminal ID), not a bank account number or holder name. But the current OR logic would mark it "Configured" with just an ID filled, which might be confusing since the user sees an empty "Bank Account Number" field on the same record.
+
+**Needs decision:**
+- Define per-payment-mode required fields (e.g., `qr` → merchant_number + merchant_name required; `redirect` → merchant_id only)
+- Update the `Configured` / `Not Set` badge logic to only check required fields for each mode
+- Possibly add inline hints in the edit form showing which fields are required per mode

@@ -352,6 +352,7 @@ export const dictionary = () => {
     "N/A": { vi: "N/A" },
     "Yes": { vi: "Có" },
     "No": { vi: "Không" },
+    "Optional": { vi: "Tùy chọn" },
     "Loading...": { vi: "Đang tải..." },
     "Employee Name": { vi: "Tên nhân viên" },
     "e.g. Premium Widget": { vi: "VD: Premium Widget" },

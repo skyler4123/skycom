@@ -74,21 +74,21 @@ export default class Companies_PaymentMethodAppointments_EditController extends 
             <p class="text-xs text-slate-400 mb-4">${translate("Enter your banking details to receive payments via this method.")}</p>
             <div class="grid grid-cols-1 gap-4">
               <div class="space-y-1">
-                <label class="text-[10px] font-bold text-slate-400 uppercase">${translate("Bank Account Number")}</label>
+                <label class="text-[10px] font-bold text-slate-400 uppercase">${translate("Bank Account Number")} <span class="text-red-500">*</span></label>
                 <input type="text" name="payment_method_appointment[merchant_number]"
                   value="${a.merchant_number || ''}"
                   placeholder="${translate("e.g. 1234567890")}"
                   class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-sm">
               </div>
               <div class="space-y-1">
-                <label class="text-[10px] font-bold text-slate-400 uppercase">${translate("Account Holder Name")}</label>
+                <label class="text-[10px] font-bold text-slate-400 uppercase">${translate("Account Holder Name")} <span class="text-xs text-slate-400 font-normal">(${translate("Optional")})</span></label>
                 <input type="text" name="payment_method_appointment[merchant_name]"
                   value="${a.merchant_name || ''}"
                   placeholder="${translate("e.g. Business Name or Individual")}"
                   class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-sm">
               </div>
               <div class="space-y-1">
-                <label class="text-[10px] font-bold text-slate-400 uppercase">${translate("Merchant / Terminal ID")}</label>
+                <label class="text-[10px] font-bold text-slate-400 uppercase">${translate("Merchant / Terminal ID")} <span class="text-xs text-slate-400 font-normal">(${translate("Optional")})</span></label>
                 <input type="text" name="payment_method_appointment[merchant_id]"
                   value="${a.merchant_id || ''}"
                   placeholder="${translate("e.g. T-1A2B or MID-3C4D")}"
