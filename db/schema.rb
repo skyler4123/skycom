@@ -470,7 +470,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_02_190003) do
     t.text "description"
     t.integer "status", default: 0, null: false
     t.string "gateway_reference"
-    t.jsonb "gateway_payload", default: {}
+    t.jsonb "metadata"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["billing_invoice_id"], name: "index_billing_transactions_on_billing_invoice_id"
@@ -5523,6 +5523,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_02_190003) do
     t.integer "currency"
     t.integer "country"
     t.integer "timezone"
+    t.integer "status", default: 0, null: false
+    t.string "gateway_reference"
     t.integer "lifecycle_status"
     t.integer "workflow_status"
     t.integer "payment_status", default: 0, null: false

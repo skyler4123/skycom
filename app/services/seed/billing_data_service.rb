@@ -162,6 +162,7 @@ module Seed
           transaction_type: :deduction,
           amount_cents: pair[:price],
           currency: company.currency,
+          status: :completed,
           balance_before_cents: wallet.main_balance_cents,
           balance_after_cents: wallet.main_balance_cents,
           promo_balance_before_cents: promo_before,
