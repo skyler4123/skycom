@@ -45,8 +45,6 @@ services:
 
   websocket:
     image: centrifugo/centrifugo:v5
-    volumes:
-      - websocket_data:/centrifugo
     ports:
       - "8000:8000"
     command: centrifugo --client_insecure=false --api_insecure=false
@@ -61,19 +59,11 @@ services:
       CENTRIFUGO_ADMIN: "true"
       CENTRIFUGO_ADMIN_PASSWORD: "Password@123"
       CENTRIFUGO_ADMIN_SECRET: "Password@123"
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
-      interval: 10s
-      timeout: 5s
-      retries: 3
 
   mock-api:
     image: golang:1.22-alpine
     working_dir: /go/src/app
     # Line A: Mount your local folder inside the container
-    volumes:
-      - ./mock_api:/go/src/app
-    # Line B: Execute the file right out of the mounted folder
     command: go run main.go
     ports:
       - "4000:4000"
