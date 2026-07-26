@@ -5,7 +5,7 @@ require "net/http"
 require "json"
 
 RSpec.describe "Mock API Server Connection", type: :request do
-  let(:uri) { URI("http://localhost:4000/api/v1/ping") }
+  let(:uri) { URI("http://mock-api:4000/api/v1/ping") }
 
   it "responds to ping endpoint" do
     response = Net::HTTP.get_response(uri)
