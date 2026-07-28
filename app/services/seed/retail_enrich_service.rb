@@ -81,6 +81,7 @@ class Seed::RetailEnrichService
     create_customer_orders
     create_invoices
     create_billing_data
+    seed_payment_method_merchant_data
 
     print_footer
     true
@@ -484,5 +485,28 @@ class Seed::RetailEnrichService
     puts "  -> Billing data generated (DailyMetricLog: #{DailyMetricLog.where(company: @retail).count}, " \
          "DailyFeatureLog: #{DailyFeatureLog.where(company: @retail).count}, " \
          "Invoices: #{BillingInvoice.where(company: @retail).count})"
+  end
+
+  def seed_payment_method_merchant_data
+    puts "Seeding merchant banking data for payment methods..."
+    PaymentMethodAppointment.where(company: @retail).includes(:payment_method).find_each do |a|
+      pm = a.payment_method
+      case pm.payment_mode
+      when "qr"
+        a.update_columns(
+          merchant_number: "1234567890",
+          merchant_name: @retail.name,
+          merchant_id: "T-#{SecureRandom.hex(4).upcase}"
+        )
+        puts "    #{pm.name}: merchant data set (bank account + terminal ID)"
+      when "redirect"
+        a.update_columns(
+          merchant_id: "MID-#{SecureRandom.hex(4).upcase}"
+        )
+        puts "    #{pm.name}: merchant ID set"
+      else
+        puts "    #{pm.name}: no merchant data needed (cash)"
+      end
+    end
   end
 end

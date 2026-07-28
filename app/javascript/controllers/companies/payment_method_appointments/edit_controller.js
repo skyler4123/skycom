@@ -1,7 +1,7 @@
 import Companies_LayoutController from "controllers/companies/layout_controller"
 
 export default class Companies_PaymentMethodAppointments_EditController extends Companies_LayoutController {
-  /** @type {{id: string, lifecycle_status: string, payment_method: {name: string, code: string, payment_mode: string, business_type: string}} | null} */
+  /** @type {{id: string, lifecycle_status: string, merchant_number: string|null, merchant_name: string|null, merchant_id: string|null, payment_method: {name: string, code: string, payment_mode: string, business_type: string}} | null} */
   appointment = null
 
   async connect() {
@@ -34,6 +34,8 @@ export default class Companies_PaymentMethodAppointments_EditController extends 
     const pm = a.payment_method
     const companyId = window.location.pathname.split("/")[2]
 
+      const showBanking = pm.payment_mode !== 'cash'
+
     const fields = `
       <div class="space-y-6">
         <div class="flex items-center gap-4 mb-6">
@@ -48,32 +50,62 @@ export default class Companies_PaymentMethodAppointments_EditController extends 
 
         <div class="grid grid-cols-2 gap-4">
           <div class="space-y-1">
-            <label class="text-[10px] font-bold text-slate-400 uppercase">Payment Mode</label>
+            <label class="text-[10px] font-bold text-slate-400 uppercase">${translate("Payment Mode")}</label>
             <p class="text-sm text-slate-900 dark:text-white font-medium">${pm.payment_mode}</p>
           </div>
           <div class="space-y-1">
-            <label class="text-[10px] font-bold text-slate-400 uppercase">Business Type</label>
+            <label class="text-[10px] font-bold text-slate-400 uppercase">${translate("Business Type")}</label>
             <p class="text-sm text-slate-900 dark:text-white font-medium">${pm.business_type}</p>
           </div>
         </div>
 
         <div class="border-t border-slate-200 dark:border-slate-700 pt-6 space-y-1">
-          <label class="text-[10px] font-bold text-slate-400 uppercase">Status</label>
+          <label class="text-[10px] font-bold text-slate-400 uppercase">${translate("Status")}</label>
           <select name="payment_method_appointment[lifecycle_status]"
             class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-sm">
-            <option value="active" ${a.lifecycle_status === 'active' ? 'selected' : ''}>Enabled</option>
-            <option value="inactive" ${a.lifecycle_status === 'inactive' ? 'selected' : ''}>Disabled</option>
+            <option value="active" ${a.lifecycle_status === 'active' ? 'selected' : ''}>${translate("Enabled")}</option>
+            <option value="inactive" ${a.lifecycle_status === 'inactive' ? 'selected' : ''}>${translate("Disabled")}</option>
           </select>
         </div>
+
+        ${showBanking ? `
+          <div class="border-t border-slate-200 dark:border-slate-700 pt-6">
+            <h3 class="text-sm font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-4">${translate("Bank Account Configuration")}</h3>
+            <p class="text-xs text-slate-400 mb-4">${translate("Enter your banking details to receive payments via this method.")}</p>
+            <div class="grid grid-cols-1 gap-4">
+              <div class="space-y-1">
+                <label class="text-[10px] font-bold text-slate-400 uppercase">${translate("Bank Account Number")} <span class="text-red-500">*</span></label>
+                <input type="text" name="payment_method_appointment[merchant_number]"
+                  value="${a.merchant_number || ''}"
+                  placeholder="${translate("e.g. 1234567890")}"
+                  class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-sm">
+              </div>
+              <div class="space-y-1">
+                <label class="text-[10px] font-bold text-slate-400 uppercase">${translate("Account Holder Name")} <span class="text-xs text-slate-400 font-normal">(${translate("Optional")})</span></label>
+                <input type="text" name="payment_method_appointment[merchant_name]"
+                  value="${a.merchant_name || ''}"
+                  placeholder="${translate("e.g. Business Name or Individual")}"
+                  class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-sm">
+              </div>
+              <div class="space-y-1">
+                <label class="text-[10px] font-bold text-slate-400 uppercase">${translate("Merchant / Terminal ID")} <span class="text-xs text-slate-400 font-normal">(${translate("Optional")})</span></label>
+                <input type="text" name="payment_method_appointment[merchant_id]"
+                  value="${a.merchant_id || ''}"
+                  placeholder="${translate("e.g. T-1A2B or MID-3C4D")}"
+                  class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-sm">
+              </div>
+            </div>
+          </div>
+        ` : ''}
 
         <div class="flex justify-end gap-3 pt-2">
           <a href="${Helpers.company_payment_method_appointments_path(companyId)}"
             class="px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-100 rounded-lg cursor-pointer">
-            Cancel
+            ${translate("Cancel")}
           </a>
           <button type="submit"
             class="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-bold text-sm cursor-pointer">
-            Save Changes
+            ${translate("Save Changes")}
           </button>
         </div>
       </div>
@@ -84,7 +116,7 @@ export default class Companies_PaymentMethodAppointments_EditController extends 
         ${Helpers.form({
           action: Helpers.company_payment_method_appointment_path(companyId, a.id),
           method: "PATCH",
-          attributes: `class="p-6 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 max-w-lg" data-turbo="false"`,
+          attributes: `class="p-6 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800" data-turbo="false"`,
           html: fields
         })}
       </div>
