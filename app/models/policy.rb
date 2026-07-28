@@ -1,4 +1,5 @@
 class Policy < ApplicationRecord
+  store_accessor :metadata, :tag_conditions
   attribute :permission_resource_name, :string, default: -> { self.name }
 
   # --- Associations ---

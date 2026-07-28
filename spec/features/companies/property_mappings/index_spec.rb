@@ -95,8 +95,8 @@ RSpec.feature "Companies::PropertyMappings Management", type: :feature, js: true
     expect(page).to have_current_path(/property_mappings\/#{property_mapping.id}$/, wait: 10)
 
     property_mapping.reload
-    expect(property_mapping.metadata["properties"].length).to eq(3)
-    added = property_mapping.metadata["properties"].find { |m| m['key'] == 'property_string_2' }
+    expect(property_mapping.properties.length).to eq(3)
+    added = property_mapping.properties.find { |m| m['key'] == 'property_string_2' }
     expect(added).to be_present
     expect(added['name']).to eq('Texture Type')
   end
@@ -119,7 +119,7 @@ RSpec.feature "Companies::PropertyMappings Management", type: :feature, js: true
     expect(textarea.value).to include('"only_integer"')
 
     property_mapping.reload
-    entry = property_mapping.metadata["properties"].first
+    entry = property_mapping.properties.first
     expect(entry['validates']).to eq({ 'presence' => true, 'numericality' => { 'only_integer' => true } })
   end
 

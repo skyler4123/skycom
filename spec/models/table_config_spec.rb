@@ -11,8 +11,8 @@ RSpec.describe TableConfig, type: :model do
   describe "default attributes" do
     it "has a sensible default for columns_metadata" do
       config = TableConfig.new
-      expect(config.metadata["columns"]).to be_an(Array)
-      expect(config.metadata["columns"].first).to include("key" => "name", "name" => "Name")
+      expect(config.columns).to be_an(Array)
+      expect(config.columns.first).to include("key" => "name", "name" => "Name")
     end
   end
 
