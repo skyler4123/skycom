@@ -228,7 +228,7 @@ RSpec.feature "Companies::PaymentMethodAppointments Management", type: :feature,
       visit edit_company_payment_method_appointment_path(company, appointment)
 
       expect(page).to have_content("Cash", wait: 10)
-      expect(page).not_to have_content("BANK ACCOUNT CONFIGURATION")
+      expect(page).not_to have_content(/Bank Account Configuration/i)
       expect(page).not_to have_field("payment_method_appointment[merchant_number]")
     end
   end
@@ -256,7 +256,7 @@ RSpec.feature "Companies::PaymentMethodAppointments Management", type: :feature,
       visit edit_company_payment_method_appointment_path(company, qr_appointment)
 
       expect(page).to have_content("Mock QR", wait: 10)
-      expect(page).to have_content("BANK ACCOUNT CONFIGURATION")
+      expect(page).to have_content(/Bank Account Configuration/i)
       expect(page).to have_field("payment_method_appointment[merchant_number]")
       expect(page).to have_field("payment_method_appointment[merchant_name]")
       expect(page).to have_field("payment_method_appointment[merchant_id]")

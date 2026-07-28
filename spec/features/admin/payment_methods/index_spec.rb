@@ -36,7 +36,7 @@ RSpec.feature "Admin::PaymentMethods", type: :feature, js: true do
     visit admin_payment_methods_path
 
     expect(page).to have_selector("table", wait: 10)
-    click_link "Visa Card", match: :first
+    find("a[href='#{edit_admin_payment_method_path(pm1)}']", match: :first).click
 
     expect(page).to have_current_path(edit_admin_payment_method_path(pm1), wait: 10)
   end
