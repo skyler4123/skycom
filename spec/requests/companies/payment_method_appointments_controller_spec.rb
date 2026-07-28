@@ -3,7 +3,7 @@
 require "rails_helper"
 
 RSpec.describe "Companies::PaymentMethodAppointmentsController", type: :request do
-  let(:company) { create(:company).tap { |c| c.update_column(:country, 840) } }
+  let(:company) { create(:company).tap { |c| c.update!(country: :us) } }
   let(:owner_user) { company.user }
 
   let!(:pm_cash) { create(:payment_method, name: "Cash", code: "CASH", country: 840, strategy: :cash, payment_mode: :cash) }
@@ -91,7 +91,7 @@ RSpec.describe "Companies::PaymentMethodAppointmentsController", type: :request 
 
   describe "scoping" do
     it "scopes appointments to the current company" do
-      other_company = create(:company).tap { |c| c.update_column(:country, 840) }
+      other_company = create(:company).tap { |c| c.update!(country: :us) }
       other_pm = create(:payment_method, country: 840, strategy: :cash)
       PaymentMethodAppointment.create!(
         company: other_company, payment_method: other_pm,

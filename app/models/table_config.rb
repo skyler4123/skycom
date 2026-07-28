@@ -1,6 +1,7 @@
 class TableConfig < ApplicationRecord
   include CategoryConcern
   include PropertyMappingConcern
+  store_accessor :metadata, :columns
   attribute :permission_resource_name, :string, default: -> { self.name }
 
   belongs_to :company, touch: true
@@ -89,7 +90,7 @@ class TableConfig < ApplicationRecord
   private
 
   def columns_metadata_must_conform_to_schema
-    columns = (metadata || {})["columns"] || []
+    columns = self.columns || []
     unless columns.is_a?(Array)
       errors.add(:metadata, "columns must be an array")
       return
@@ -122,7 +123,7 @@ class TableConfig < ApplicationRecord
       errors.add(:metadata, "columns element #{idx}: render_config must be a hash")   if field.key?("render_config") && !field["render_config"].nil? && !field["render_config"].is_a?(Hash)
 
       if key.to_s.start_with?("property_") && name_val.present? && property_mapping.present?
-        pm_entry = (property_mapping.metadata || {})["properties"].to_a.find { |pm| pm["key"] == key }
+        pm_entry = (property_mapping.properties || []).find { |pm| pm["key"] == key }
         if pm_entry && pm_entry["name"] != name_val
           errors.add(:metadata, "columns element #{idx}: name '#{name_val}' must match PropertyMapping value '#{pm_entry['name']}'. Edit the PropertyMapping to change this name.")
         end
@@ -132,7 +133,7 @@ class TableConfig < ApplicationRecord
 
   def set_default_columns
     self.metadata ||= {}
-    self.metadata["columns"] ||= [
+    self.columns ||= [
       { "key" => "name", "name" => "Name", "visible" => true, "sortable" => true,
         "align" => "left", "pinned" => nil, "width" => nil, "roles" => [],
         "is_virtual" => false, "render_config" => {} }

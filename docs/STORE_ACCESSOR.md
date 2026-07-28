@@ -83,6 +83,9 @@ store_accessor :metadata, :gateway_payload, :callback_data
 | Model | JSONB Column | Accessors | Purpose |
 |-------|-------------|-----------|---------|
 | `BillingTransaction` | `metadata` | `gateway_payload` | Gateway response payload (QR string, redirect URL, etc.) |
+| `PropertyMapping` | `metadata` | `properties` | Dynamic property metadata array (key, name, type, validates) |
+| `TableConfig` | `metadata` | `columns` | Column display configuration (key, name, visible, width, align, etc.) |
+| `Policy` | `metadata` | `tag_conditions` | ABAC permission conditions hash (key-value rules) |
 
 For any future JSONB-backed attribute, first check if the target model already uses `store_accessor`. If it does, add your key to the existing declaration. If it doesn't, add a new `store_accessor` line.
 

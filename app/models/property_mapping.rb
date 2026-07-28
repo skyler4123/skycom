@@ -48,6 +48,7 @@
 
 class PropertyMapping < ApplicationRecord
   include CategoryConcern
+  store_accessor :metadata, :properties
   attribute :permission_resource_name, :string, default: -> { self.name }
 
   belongs_to :company, touch: true
@@ -115,13 +116,12 @@ class PropertyMapping < ApplicationRecord
   after_update :sync_table_configs, if: :saved_change_to_metadata?
 
   def sync_table_configs
-    props = (metadata || {})["properties"] || []
+    props = self.properties || []
     pm_property_keys = props.select { |pm| pm["key"].to_s.start_with?("property_") }
     pm_keys = pm_property_keys.map { |pm| pm["key"] }
 
     table_configs.reset.each do |tc|
-      tc_meta = tc.metadata || {}
-      columns = (tc_meta["columns"] || []).dup
+      columns = (tc.columns || []).dup
       changed = false
 
       original_size = columns.size
@@ -157,8 +157,7 @@ class PropertyMapping < ApplicationRecord
       end
 
       if changed
-        tc_meta["columns"] = columns
-        tc.update_columns(metadata: tc_meta)
+        tc.update!(columns: columns)
       end
     end
   end
@@ -177,7 +176,7 @@ class PropertyMapping < ApplicationRecord
   end
 
   def validate_property_metadata
-    props = (metadata || {})["properties"] || []
+    props = self.properties || []
     unless props.is_a?(Array)
       errors.add(:metadata, "properties must be an array")
       return
