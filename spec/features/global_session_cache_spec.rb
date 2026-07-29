@@ -1,14 +1,14 @@
 require "rails_helper"
 
+# Session caching uses sync_cache (local SQLite + Redis pub/sub invalidation).
+# - Session create → cached in local_cache + Redis pub/sub notification.
+# - Session destroy → evicted from local_cache + pub/sub notification.
+# - No global (Redis) read on any request — reads hit local_cache only.
 RSpec.describe "Global Session Cache", type: :feature, js: true do
   let(:user) { create(:user, system_role: :company_owner, password: "Password@1234", password_confirmation: "Password@1234") }
 
-  after(:each) do
-    Rails.global_session_cache.delete("rspec_session_test")
-  end
-
-  describe "global cache lifecycle" do
-    it "writes session id to global cache on sign-in" do
+  describe "sync_cache session lifecycle" do
+    it "caches session in sync_cache on sign-in and evicts on destroy" do
       expect(user.sessions.count).to eq(0)
 
       visit root_path
@@ -24,20 +24,13 @@ RSpec.describe "Global Session Cache", type: :feature, js: true do
       expect(page).to have_selector('[data-controller="avatar"]', wait: 10)
 
       session_id = user.sessions.last.id
-      expect(Rails.global_session_cache.exist?(session_id)).to be true
+      expect(Rails.sync_cache.read("sessions_#{session_id}")).not_to be_nil
+
+      user.sessions.last.destroy
+      expect(Rails.sync_cache.read("sessions_#{session_id}")).to be_nil
     end
 
-    it "removes session id from global cache when session is destroyed" do
-      session = user.sessions.create!
-      expect(Rails.global_session_cache.exist?(session.id)).to be true
-
-      session.destroy
-      expect(Rails.global_session_cache.exist?(session.id)).to be false
-    end
-  end
-
-  describe "global cache check in set_current_session" do
-    it "rejects requests when session is missing from global cache" do
+    it "rejects requests when session is destroyed" do
       visit root_path
       expect(page).to have_selector('button[role="sign-in-button"]', wait: 10)
       find('button[role="sign-in-button"]', wait: 10).click
@@ -48,27 +41,10 @@ RSpec.describe "Global Session Cache", type: :feature, js: true do
       end
       expect(page).to have_selector('[data-controller="avatar"]', wait: 10)
 
-      session_id = user.sessions.last.id
-      expect(Rails.global_session_cache.exist?(session_id)).to be true
-
-      Rails.global_session_cache.delete(session_id)
+      user.sessions.last.destroy
 
       visit root_path
       expect(page).not_to have_selector('[data-controller="avatar"]', wait: 10)
-    end
-  end
-
-  describe "Rails.global_session_cache" do
-    it "exists and delegates to global_cache" do
-      Rails.global_session_cache.write("rspec_session_test", true, expires_in: 60)
-      expect(Rails.global_session_cache.exist?("rspec_session_test")).to be true
-      expect(Rails.global_session_cache.read("rspec_session_test")).to be true
-    end
-
-    it "deletes values" do
-      Rails.global_session_cache.write("rspec_session_test", true, expires_in: 60)
-      Rails.global_session_cache.delete("rspec_session_test")
-      expect(Rails.global_session_cache.exist?("rspec_session_test")).to be false
     end
   end
 end
