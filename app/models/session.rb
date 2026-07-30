@@ -1,7 +1,6 @@
 # app/models/session.rb
 class Session < ApplicationRecord
   include Cache::RecordsConcern
-  include Session::GlobalCacheConcern
 
   belongs_to :user
 

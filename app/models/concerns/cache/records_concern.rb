@@ -3,14 +3,11 @@ module Cache::RecordsConcern
   extend ActiveSupport::Concern
 
   included do
-    # Hooks to keep the cache in sync with the database
     after_commit :write_attribute_cache, on: [ :create, :update ]
     after_commit :remove_attribute_cache, on: :destroy
   end
 
-  # Class methods for fetching
   class_methods do
-    # Usage: Employee.cached_where(company_id: 'uuid', expires_in: 1.hour)
     def cached_where(**filters)
       expires_in = filters.delete(:expires_in) || DEFAULT_CACHE_EXPIRY
 
@@ -18,7 +15,8 @@ module Cache::RecordsConcern
       sql_hash = Digest::SHA256.base64digest(relation.to_sql.squish).tr("+/", "-_").first(12)
       cache_key = "#{model_name.plural.underscore}/q#{sql_hash}"
 
-      attributes_array = Rails.local_cache.fetch(cache_key, expires_in: expires_in) do
+      # Switched to sync_cache
+      attributes_array = Rails.sync_cache.fetch(cache_key, expires_in: expires_in) do
         relation.map(&:attributes)
       end
 
@@ -29,31 +27,25 @@ module Cache::RecordsConcern
       end
     end
 
-    # Usage: User.cached_find(id, expires_in: 10.minutes)
-    # Or: User.cached_find(id)
     def cached_find(id, **options)
       return nil if id.blank?
 
       expires_in = options.delete(:expires_in) || DEFAULT_CACHE_EXPIRY
       cache_key  = "#{model_name.plural}_#{id}"
 
-      attributes = Rails.local_cache.fetch(cache_key, expires_in: expires_in) do
+      # Switched to sync_cache
+      attributes = Rails.sync_cache.fetch(cache_key, expires_in: expires_in) do
         find_by(id: id)&.attributes
       end
 
       return nil if attributes.blank?
 
-      # Rails 8: #attributes returns enum values as strings ("company_owner")
-      # but instantiate expects raw database integers (2).
-      # Mismatch causes wrong enum values (e.g. "company_owner" → "super_admin").
       normalize_enum_attributes!(attributes)
       instantiate(attributes)
     end
 
     private
 
-    # Rails 8: #attributes returns enum values as strings, but instantiate
-    # expects raw integers. Convert strings back to avoid wrong enum mapping.
     def normalize_enum_attributes!(attrs)
       defined_enums.each do |enum_name, mapping|
         value = attrs[enum_name]
@@ -64,15 +56,14 @@ module Cache::RecordsConcern
     end
   end
 
-  # Instance methods for synchronization
+  # Instance methods trigger cluster-wide invalidation via sync_cache
   def write_attribute_cache
     cache_key = "#{self.class.model_name.plural}_#{id}"
-    # We store only the attributes hash
-    Rails.local_cache.write(cache_key, attributes)
+    Rails.sync_cache.write(cache_key, attributes)
   end
 
   def remove_attribute_cache
     cache_key = "#{self.class.model_name.plural}_#{id}"
-    Rails.local_cache.delete(cache_key)
+    Rails.sync_cache.delete(cache_key)
   end
 end
