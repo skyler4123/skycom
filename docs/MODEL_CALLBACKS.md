@@ -182,29 +182,16 @@ Callbacks defined in shared concerns that apply to any model that includes them.
 
 ### Cache::RecordsConcern (`app/models/concerns/cache/records_concern.rb`)
 
-Managed attribute caching in `Rails.local_cache` (Solid Cache SQLite). Keeps model attributes synchronized with the per-server cache store.
+Managed attribute caching in `Rails.sync_cache` (Solid Cache SQLite + Redis pub/sub invalidation). Keeps model attributes synchronized across all server instances. Reads are local SQLite only (no Redis per request); writes and deletes broadcast invalidation via Redis pub/sub so all instances evict stale keys.
 
 | Callback | Line | Method | Description |
 |----------|------|--------|-------------|
-| `after_commit :write_attribute_cache, on: [ :create, :update ]` | 7 | `write_attribute_cache` | Writes model attributes hash to `Rails.local_cache` after successful create or update. Cache key pattern: `"#{plural_model_name}_#{id}"`. |
-| `after_commit :remove_attribute_cache, on: :destroy` | 8 | `remove_attribute_cache` | Deletes model attributes hash from `Rails.local_cache` after successful destroy. |
+| `after_commit :write_attribute_cache, on: [ :create, :update ]` | 7 | `write_attribute_cache` | Writes model attributes hash to `Rails.sync_cache` after successful create or update. Cache key pattern: `"#{plural_model_name}_#{id}"`. Also publishes pub/sub invalidation for cross-instance sync. |
+| `after_commit :remove_attribute_cache, on: :destroy` | 8 | `remove_attribute_cache` | Deletes model attributes hash from `Rails.sync_cache` after successful destroy. Also publishes pub/sub invalidation so other instances evict immediately. |
 
 **Included in (5 models):** `Company`, `Employee`, `Session`, `User`, `RoleAppointment`
 
-**Usage example:** `User.cached_find(id)` or `Employee.cached_where(company_id: id)` use the cache populated by these callbacks.
-
----
-
-### Session::GlobalCacheConcern (`app/models/concerns/session/global_cache_concern.rb`)
-
-Manages global session cache lifecycle. Writes session ID to `Rails.global_session_cache` (Redis) on creation, removes on destruction. Enables cross-instance session invalidation.
-
-| Callback | Line | Method | Description |
-|----------|------|--------|-------------|
-| `after_create_commit :write_session_to_global_cache` | 7 | `write_session_to_global_cache` | Writes session ID to Redis with `COOKIE_EXPIRY` TTL after successful creation. Powers cross-instance session existence checks in `set_current_session`. |
-| `after_commit :remove_session_from_global_cache, on: :destroy` | 8 | `remove_session_from_global_cache` | Deletes session ID from Redis after successful destruction. Ensures other instances reject the session immediately on next request. |
-
-**Included in (1 model):** `Session`
+**Usage example:** `User.cached_find(id)` or `Employee.cached_where(company_id: id)` use `Rails.sync_cache` populated by these callbacks.
 
 ---
 
@@ -333,7 +320,7 @@ Each concern defines the same callback:
 | `before_destroy` | 5 | Employee, System, PolicyAppointment, RoleAppointment, (ImmutableRecordConcern → 3 models) |
 | `before_discard` | 1 | Employee |
 | `after_touch` | 2* | Role (duplicate declaration on lines 30 and 87) |
-| `after_commit` | 3 | (Cache::RecordsConcern → 5 models), (Session::GlobalCacheConcern → 1 model) |
+| `after_commit` | 2 | (Cache::RecordsConcern → 5 models) |
 | `validate` | 4 | PropertyMapping, (DynamicValidationConcern → 48 models), (PropertyMappingConcern → 48 models), (ImageAttachmentsConcern → 6 models + Product) |
 
 **Total unique callback declarations: ~31 directly across 14 model files + 7 concern files propagating to ~63+ models.**
