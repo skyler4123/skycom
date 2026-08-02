@@ -51,5 +51,53 @@ RSpec.describe Branch, type: :model do
       expect(branch.subscription_buyer).to eq(company.user)
     end
   end
+
+  describe "after_create payment method initialization" do
+    let(:company) { create(:company) }
+    let(:payment_method) { create(:payment_method) }
+
+    before do
+      company.update_column(:country, COUNTRY_CODES[:us])
+    end
+
+    it "copies active company-level payment method appointments to the new branch" do
+      active_appointment = PaymentMethodAppointment.create!(
+        appoint_to: company,
+        payment_method: payment_method,
+        name: "Cash for #{company.name}",
+        code: "CSH-#{SecureRandom.hex(4).upcase}",
+        business_type: :in_store,
+        lifecycle_status: :active
+      )
+
+      branch = create(:branch, company: company)
+
+      branch_appointment = branch.payment_method_appointments.find_by(
+        payment_method_id: active_appointment.payment_method_id
+      )
+      expect(branch_appointment).to be_present
+      expect(branch_appointment.lifecycle_status).to eq("active")
+      expect(branch_appointment.appoint_to).to eq(branch)
+      expect(branch_appointment.merchant_number).to eq(active_appointment.merchant_number)
+      expect(branch_appointment.merchant_name).to eq(active_appointment.merchant_name)
+      expect(branch_appointment.merchant_id).to eq(active_appointment.merchant_id)
+    end
+
+    it "does not copy inactive company-level payment method appointments" do
+      PaymentMethodAppointment.create!(
+        appoint_to: company,
+        payment_method: payment_method,
+        name: "Cash for #{company.name}",
+        code: "CSH-#{SecureRandom.hex(4).upcase}",
+        business_type: :in_store,
+        lifecycle_status: :inactive
+      )
+
+      branch = create(:branch, company: company)
+
+      expect(branch.payment_method_appointments).to be_empty
+    end
+  end
+
   it_behaves_like "property_mapping concern", Branch
 end

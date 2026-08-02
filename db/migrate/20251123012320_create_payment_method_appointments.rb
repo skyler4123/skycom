@@ -2,8 +2,12 @@ class CreatePaymentMethodAppointments < ActiveRecord::Migration[8.0]
   def change
     create_table :payment_method_appointments, id: :uuid, default: -> { "uuidv7()" } do |t|
       t.references :company, null: false, foreign_key: true, type: :uuid
-      t.references :branch, null: true, foreign_key: true, type: :uuid
       t.references :payment_method, null: false, foreign_key: true, type: :uuid
+
+      t.references :appoint_from, polymorphic: true, null: true, type: :uuid
+      t.references :appoint_to, polymorphic: true, null: false, type: :uuid
+      t.references :appoint_for, polymorphic: true, null: true, type: :uuid
+      t.references :appoint_by, polymorphic: true, null: true, type: :uuid
 
       t.string :name
       t.string :description

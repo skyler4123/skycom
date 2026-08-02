@@ -5,7 +5,7 @@ class Companies::PaymentMethodAppointmentsController < Companies::ApplicationCon
     respond_to do |format|
       format.html { render html: "", layout: true }
       format.json do
-        appointments = current_company.payment_method_appointments.includes(:payment_method)
+        appointments = current_company.payment_method_appointments.company_level.includes(:payment_method)
 
         render json: {
           payment_method_appointments: appointments.map { |a|

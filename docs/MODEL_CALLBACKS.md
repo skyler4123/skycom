@@ -31,6 +31,7 @@ Callbacks defined directly in the model file (not inherited from a concern).
 | Callback | Line | Method | Description |
 |----------|------|--------|-------------|
 | `after_initialize :set_defaults_from_company, if: :new_record?` | 97 | `set_defaults_from_company` | Copies `timezone` and `currency_code` from parent `Company` to new Branch records (only on new record creation, not on find). |
+| `after_create :initialize_payment_methods` | 107 | `initialize_payment_methods` | Auto-creates a **branch-level** `PaymentMethodAppointment` for each **active** company-level appointment (`company.payment_method_appointments.company_level` with `lifecycle_status: :active`). Copies the company appointment's name (suffixed `" for #{branch.name}"`), code (suffixed `-BR-<hex>`), `business_type`, `workflow_status`, and merchant fields; sets `lifecycle_status: :active`. Ensures every new branch inherits the company's payment methods. |
 
 ---
 
@@ -98,6 +99,16 @@ Callbacks defined directly in the model file (not inherited from a concern).
 | `belongs_to :company, touch: true` | 55 | ActiveRecord `touch` | Touches the parent `Company` on create, update, and destroy of a PropertyMapping. Invalidates the client cache. |
 | `after_create :create_default_table_config` | 60 | `create_default_table_config` | Auto-creates a default `TableConfig` (with default `columns_metadata`) linked to the same `company` and `category`. Guarantees every PropertyMapping has at least one TableConfig. |
 | `validate :must_have_table_config` | 117 | `must_have_table_config` | Safety net — validates that at least one `TableConfig` exists for persisted records. Skipped for new records (where `after_create` hasn't run yet). |
+
+---
+
+### PaymentMethodAppointment (`app/models/payment_method_appointment.rb`)
+
+| Callback | Line | Method | Description |
+|----------|------|--------|-------------|
+| `before_validation :default_appoint_to_to_company` | 30 | `default_appoint_to_to_company` | Sets `appoint_to` to the appointment's `company` if `appoint_to` is blank. Guarantees every appointment resolves to a polymorphic source type (Company by default, or Branch when passed explicitly). |
+| `after_update :cascade_lifecycle_to_branch_appointments, if: :company_level_lifecycle_change?` | 31 | `cascade_lifecycle_to_branch_appointments` | When a **company-level** appointment's `lifecycle_status` changes, mirrors that status to all **branch-level** appointments for the same company + payment method via `update_all(lifecycle_status:)`. Runs only when `appoint_to_type == "Company"` and `saved_change_to_lifecycle_status?` — branch-level updates never recurse. |
+| `validate :payment_method_must_be_active_in_company` | 32 | `payment_method_must_be_active_in_company` | Only for `appoint_to_type == "Branch"` — requires an active (`lifecycle_status: :active`) **company-level** appointment for the same company + payment method. Adds `appoint_to: "payment method is not active at the company level"` otherwise. |
 
 ---
 
@@ -313,17 +324,17 @@ Each concern defines the same callback:
 | `before_validation` | 5 | Address, User, (SetDefaultCompanyConcern → 34+ appointment models), (CategoryConcern → 18 models), (PropertyMappingConcern → 48 models) |
 | `after_initialize` | 1 | Branch |
 | `before_create` | 1 | Session |
-| `after_create` | 5 | Category, Company, PolicyAppointment, PropertyMapping, RoleAppointment |
+| `after_create` | 6 | Category, Company, Branch, PolicyAppointment, PropertyMapping, RoleAppointment |
 | `belongs_to :company, touch: true` | 6 | Branch, Department, Category, PropertyMapping, TableConfig, Role |
-| `after_update` (conditional) | 3 | PolicyAppointment, BillingInvoice, (Company::CircuitBreakerConcern → 1 model) |
+| `after_update` (conditional) | 4 | PaymentMethodAppointment, PolicyAppointment, BillingInvoice, (Company::CircuitBreakerConcern → 1 model) |
 | `before_update` | 3 | PolicyAppointment, RoleAppointment, (ImmutableRecordConcern → 3 models) |
 | `before_destroy` | 5 | Employee, System, PolicyAppointment, RoleAppointment, (ImmutableRecordConcern → 3 models) |
 | `before_discard` | 1 | Employee |
 | `after_touch` | 2* | Role (duplicate declaration on lines 30 and 87) |
 | `after_commit` | 2 | (Cache::RecordsConcern → 5 models) |
-| `validate` | 4 | PropertyMapping, (DynamicValidationConcern → 48 models), (PropertyMappingConcern → 48 models), (ImageAttachmentsConcern → 6 models + Product) |
+| `validate` | 5 | PaymentMethodAppointment, PropertyMapping, (DynamicValidationConcern → 48 models), (PropertyMappingConcern → 48 models), (ImageAttachmentsConcern → 6 models + Product) |
 
-**Total unique callback declarations: ~31 directly across 14 model files + 7 concern files propagating to ~63+ models.**
+**Total unique callback declarations: ~34 directly across 15 model files + 7 concern files propagating to ~63+ models.**
 
 > **Note:** `ImageAttachmentsConcern` in the validate row covers the 6 per-model ImageConcern files (Branch, Brand, Customer, Department, Employee, Service) + the pre-existing `Product::ImageConcern`, all of which define the same `validate :acceptable_image_attachments` callback.
 

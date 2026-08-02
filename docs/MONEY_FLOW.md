@@ -802,17 +802,20 @@ enum :payment_mode, {
 
 ### 7.2 How Companies Access Payment Methods
 
-Companies link to global `PaymentMethod` records via `PaymentMethodAppointment`:
+Companies link to global `PaymentMethod` records via the polymorphic `PaymentMethodAppointment` bridge:
 
 ```ruby
 PaymentMethodAppointment
-  ├── company_id      → scopes to the company
+  ├── company_id        → tenant scope (always, derived from appoint_to)
   ├── payment_method_id → FK to global PaymentMethod
-  ├── branch_id       → optional: scope to a specific branch
-  └── business_type   → :online | :in_store | :recurring
+  ├── appoint_to        → polymorphic: "Company" (default) | "Branch"
+  ├── merchant_number / merchant_name / merchant_id → gateway credentials
+  └── business_type     → :online | :in_store | :recurring
 ```
 
-This allows each company to enable only the payment methods relevant to their market (e.g., MoMo + Cash for VN companies, Stripe + Cash for US companies).
+This allows each company to enable only the payment methods relevant to their market (e.g., MoMo + Cash for VN companies, Stripe + Cash for US companies), and each branch to inherit and override them per location.
+
+> **Design in brief:** Company-level appointments are seeded at company init (`Company#setup_payment_method_appointments`) and listed in the Payments dashboard. Branch-level appointments are auto-copied from the company's active appointments when a branch is created (`Branch#after_create`), and mirror the company appointment's `lifecycle_status` live. A branch appointment can only exist while its company-level method is active. See `docs/PAYMENT_METHODS.md` for the full model, scoping, and cascade documentation.
 
 ### 7.3 BillingTransaction/Payment <-> PaymentMethod Interaction
 

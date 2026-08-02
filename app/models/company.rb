@@ -51,11 +51,11 @@ class Company < ApplicationRecord
   has_many :customer_groups, dependent: :destroy
   has_many :orders, dependent: :destroy
   has_many :invoices, dependent: :destroy
-  has_many :payment_method_appointments, dependent: :destroy
   has_many :task_groups, dependent: :destroy
   has_many :project_groups, dependent: :destroy
   has_many :cart_groups, dependent: :destroy
   has_many :notification_groups, dependent: :destroy
+  has_many :payment_method_appointments, as: :appoint_to, dependent: :destroy
   has_many :payment_methods, through: :payment_method_appointments
   has_many :statistics, as: :owner
   has_many :categories, dependent: :destroy
@@ -205,6 +205,7 @@ class Company < ApplicationRecord
     country_payment_methods = PaymentMethod.where(country: country_before_type_cast)
     country_payment_methods.each do |pm|
       PaymentMethodAppointment.find_or_create_by!(
+        appoint_to: self,
         company: self,
         payment_method: pm
       ) do |a|
