@@ -96,12 +96,12 @@ end
 Rails.application.config.after_initialize do
   # Ensure we only start the subscriber in web server processes (Puma/Unicorn/Pitchfork)
   # and explicitly bypass for CLI tasks (rake, db:seed, rails console, rspec)
-  is_server = defined?(Rails::Server) || 
-              $PROGRAM_NAME.include?("puma") || 
+  is_server = defined?(Rails::Server) ||
+              $PROGRAM_NAME.include?("puma") ||
               $PROGRAM_NAME.include?("bin/rails server")
 
-  is_cli_or_test = Rails.env.test? || 
-                   defined?(Rails::Console) || 
+  is_cli_or_test = Rails.env.test? ||
+                   defined?(Rails::Console) ||
                    File.basename($PROGRAM_NAME) == "rake"
 
   if is_server && !is_cli_or_test
