@@ -93,18 +93,33 @@ end
 # and evicts stale entries from local_cache when another instance broadcasts
 # a write/delete. Runs only on server processes (Puma), not during tests
 # or rake tasks.
-if (defined?(Rails::Server) || defined?(Puma)) && !Rails.env.test?
-  Thread.new do
-    Rails.application.config.after_initialize do
-      Kredis.redis.subscribe(SyncCache::CHANNEL) do |on|
-        on.message do |_channel, message|
-          Rails.sync_cache.handle_invalidation(message)
+Rails.application.config.after_initialize do
+  # Ensure we only start the subscriber in web server processes (Puma/Unicorn/Pitchfork)
+  # and explicitly bypass for CLI tasks (rake, db:seed, rails console, rspec)
+  is_server = defined?(Rails::Server) || 
+              $PROGRAM_NAME.include?("puma") || 
+              $PROGRAM_NAME.include?("bin/rails server")
+
+  is_cli_or_test = Rails.env.test? || 
+                   defined?(Rails::Console) || 
+                   File.basename($PROGRAM_NAME) == "rake"
+
+  if is_server && !is_cli_or_test
+    Thread.new do
+      # CRITICAL: Use a dedicated Redis connection for Pub/Sub!
+      # Reusing Kredis.redis will hijack the shared app connection pool.
+      redis_sub = Kredis.redis.dup
+
+      loop do
+        redis_sub.subscribe(SyncCache::CHANNEL) do |on|
+          on.message do |_channel, message|
+            Rails.sync_cache.handle_invalidation(message)
+          end
         end
+      rescue => e
+        Rails.logger.error("[SyncCache Listener] Connection lost: #{e.message}")
+        sleep 5
       end
-    rescue => e
-      Rails.logger.error("[SyncCache Listener] Connection lost: #{e.message}")
-      sleep 5
-      retry
     end
   end
 end
