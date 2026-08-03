@@ -2,6 +2,9 @@
 module ApplicationController::CookieConcern
   extend ActiveSupport::Concern
 
+  # How long session/cache cookies persist in the browser (set via expires:).
+  COOKIE_EXPIRY = 1.day
+
   def update_cookie(session:, user:)
     # signed + explicit 1-day expiration
     cookies.signed[:session_token] = {

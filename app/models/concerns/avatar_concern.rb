@@ -1,6 +1,9 @@
 module AvatarConcern
   extend ActiveSupport::Concern
 
+  AVATAR_CARD_DIMENSIONS = [ 400, 250 ].freeze
+  AVATAR_COMMON_FULL_DIMENSIONS = [ 1200, 1200 ].freeze
+
   included do
     has_one_attached :avatar_attachment, dependent: :purge_later do |attachable|
       attachable.variant :thumb, resize_to_limit: AVATAR_THUMB_DIMENSIONS

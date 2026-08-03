@@ -10,6 +10,17 @@
 #
 module Seed
   class BillingContractService
+    # Default allowances and overage unit prices for new free-tier contracts.
+    DEFAULT_FREE_TIER_ALLOWANCES = {
+      orders:           { allowance: 200,   unit_price_cents: 10 },
+      storage_mb:       { allowance: 500,   unit_price_cents: 1 },
+      employees:        { allowance: 3,     unit_price_cents: 500 },
+      branches:         { allowance: 1,     unit_price_cents: 1000 },
+      customers:        { allowance: 100,   unit_price_cents: 5 },
+      api_calls:        { allowance: 10_000, unit_price_cents: 0 },
+      stock_mutations:  { allowance: 500,   unit_price_cents: 2 }
+    }.freeze
+
     def self.create(company:)
       contract = BillingContract.find_or_create_by!(
         company: company,

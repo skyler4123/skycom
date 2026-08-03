@@ -1,4 +1,6 @@
 class Seed::HospitalEnrichService
+  HOSPITAL_INIT_COMPANY_GROUP_BUSINESS_TYPE = :hospital
+
   HOSPITAL_ENRICH_EMPLOYEE_COUNTS = {
     Dentist: 3,
     DentalAssistant: 8,

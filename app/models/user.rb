@@ -1,4 +1,7 @@
 class User < ApplicationRecord
+  EMAIL_VERIFICATION_TOKEN_EXPIRY = 2.days
+  PASSWORD_RESET_TOKEN_EXPIRY = 20.minutes
+
   attribute :permission_resource_name, :string, default: -> { self.name }
   attribute :verified, :boolean, default: false
 

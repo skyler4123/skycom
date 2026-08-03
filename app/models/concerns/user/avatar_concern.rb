@@ -1,6 +1,10 @@
 module User::AvatarConcern
   extend ActiveSupport::Concern
 
+  AVATAR_FULL_DIMENSIONS = [ 800, 800 ].freeze
+  MAX_AVATAR_FILE_SIZE = 500.kilobytes
+  ACCEPTABLE_AVATAR_TYPES = %w[image/jpeg image/png].freeze
+
   included do
     has_one_attached :avatar_attachment, dependent: :purge_later do |attachable|
       attachable.variant :thumb, resize_to_limit: AVATAR_THUMB_DIMENSIONS

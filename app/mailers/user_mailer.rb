@@ -1,4 +1,6 @@
 class UserMailer < ApplicationMailer
+  SIGN_IN_TOKEN_EXPIRY = 1.day
+
   def password_reset
     @user = params[:user]
     @signed_id = @user.generate_token_for(:password_reset)
