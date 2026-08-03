@@ -20,6 +20,11 @@
 module Company::BillingConcern
   extend ActiveSupport::Concern
 
+  # TTL for daily Redis metering counters (Kredis integer keys).
+  # 36h ensures today's counter survives into the next day, when SyncDailyMetricJob
+  # reads it and persists to DailyMetricLog.
+  REDIS_COUNTER_TTL = 36.hours
+
   def active_billing_contract
     billing_contracts.currently_active.sole
   rescue ActiveRecord::RecordNotFound

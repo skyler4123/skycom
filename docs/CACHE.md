@@ -348,14 +348,14 @@ When Redis is down, order processing stock reservations fail safely (no incorrec
 
 ## 5. Cache Constants
 
-**File**: `config/initializers/constants.rb`
+Per the `docs/CONSTANTS.md` convention, single-file constants live at their usage site. Only multi-file constants remain in `config/initializers/constants.rb`.
 
-| Constant | Value | Purpose |
-|----------|-------|---------|
-| `DEFAULT_CACHE_EXPIRY` | 5 minutes | Default TTL for `cached_find` / `cached_where` |
-| `SESSION_CACHE_EXPIRY` | 1 hour | Session record cache TTL (longer — sessions rarely change) |
-| `PERMISSIONS_CACHE_EXPIRY` | 1 minute | Permissions hash cache TTL |
-| `COOKIE_EXPIRY` | 1 day | Session and client cache cookie lifetime |
+| Constant | Value | Defined In | Purpose |
+|----------|-------|------------|---------|
+| `DEFAULT_CACHE_EXPIRY` | 5 minutes | `app/models/concerns/cache/records_concern.rb` | Default TTL for `cached_find` / `cached_where` |
+| `SESSION_CACHE_EXPIRY` | 1 hour | `app/controllers/concerns/application_controller/authentication_concern.rb` | Session record cache TTL (longer — sessions rarely change) |
+| `PERMISSIONS_CACHE_EXPIRY` | 1 minute | `config/initializers/constants.rb` | Permissions hash cache TTL (used by both permission concerns) |
+| `COOKIE_EXPIRY` | 1 day | `app/controllers/concerns/application_controller/cookie_concern.rb` | Session and client cache cookie lifetime |
 
 ---
 
@@ -528,11 +528,11 @@ Rails.global_cache.clear
 | File | Purpose |
 |------|---------|
 | `config/initializers/cache.rb` | `Rails.local_cache`, `Rails.sync_cache`, `Rails.global_cache` definitions + SyncCache class + pub/sub listener |
-| `config/initializers/constants.rb` | `DEFAULT_CACHE_EXPIRY`, `SESSION_CACHE_EXPIRY`, `PERMISSIONS_CACHE_EXPIRY`, `COOKIE_EXPIRY` |
+| `config/initializers/constants.rb` | `PERMISSIONS_CACHE_EXPIRY` |
 | `config/redis/shared.yml` | Redis connection configuration per environment |
-| `app/models/concerns/cache/records_concern.rb` | `cached_find` / `cached_where` + auto-sync callbacks (uses `sync_cache`) |
-| `app/controllers/concerns/application_controller/authentication_concern.rb` | `set_current_session` with `sync_cache` reads |
-| `app/controllers/concerns/application_controller/cookie_concern.rb` | Session and client cache version cookies |
+| `app/models/concerns/cache/records_concern.rb` | `cached_find` / `cached_where` + auto-sync callbacks + `DEFAULT_CACHE_EXPIRY` |
+| `app/controllers/concerns/application_controller/authentication_concern.rb` | `set_current_session` with `sync_cache` reads + `SESSION_CACHE_EXPIRY` |
+| `app/controllers/concerns/application_controller/cookie_concern.rb` | Session and client cache version cookies + `COOKIE_EXPIRY` |
 | `app/controllers/client_cache_controller.rb` | `/client_cache` JSON endpoint |
 | `app/javascript/controllers/client_cache_controller.js` | Frontend client cache sync |
 | `app/javascript/controllers/helpers/auth_helpers.js` | `currentUser()`, `currentCompany()`, `featureEnabled()`, etc. |

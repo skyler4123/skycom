@@ -2,6 +2,11 @@
 module ApplicationController::AuthenticationConcern
   extend ActiveSupport::Concern
 
+  # Per-session cache TTL for Session.cached_find. Longer than DEFAULT_CACHE_EXPIRY
+  # because session records rarely change and the global cache (Redis) provides
+  # cross-instance invalidation.
+  SESSION_CACHE_EXPIRY = 1.hour
+
   included do
     helper_method :current_user, :is_signed_in?
   end

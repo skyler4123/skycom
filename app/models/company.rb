@@ -1,6 +1,23 @@
 class Company < ApplicationRecord
   class_attribute :skip_init, default: false
 
+  OWNER_POLICY_RESOURCE = "all".freeze
+  OWNER_POLICY_ACTION = "all".freeze
+
+  # Default resource names for new companies. Used by #resource_names
+  # (which reads from metadata with this as a fallback).
+  DEFAULT_RESOURCE_NAMES = %w[
+    Product Order Customer Employee Branch Department
+    PolicyAppointment Invoice Transaction Service Policy
+    Category PropertyMapping TableConfig Brand Facility
+    Table Reservation Room Guest
+    Patient Appointment Course Student Exam
+    Membership
+    Page PaymentMethodAppointment ShiftTemplate ScheduledShift
+    AttendancePolicy AttendanceLog AttendanceDay AttendanceMonth
+    Stock StockTransfer StockImport StockExport
+  ].freeze
+
   attribute :permission_resource_name, :string, default: -> { self.name }
 
   include AddressConcern

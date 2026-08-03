@@ -17,6 +17,7 @@ module Billing
     queue_as :default
 
     SCAN_PATTERN = "c:*:*:"
+    REDIS_SCAN_COUNT = 100
 
     def perform(log_date: Date.current)
       date_str = log_date.strftime("%Y%m%d")

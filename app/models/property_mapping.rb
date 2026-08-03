@@ -108,8 +108,25 @@ class PropertyMapping < ApplicationRecord
   has_many :task_groups, dependent: :restrict_with_error
   has_many :warehouses, dependent: :restrict_with_error
 
-  SUPPORTED_KEYS = PROPERTY_MAPPING_SUPPORTED_KEYS
-  VALID_INPUT_TYPES = PROPERTY_MAPPING_VALID_INPUT_TYPES
+  # Allowed metadata keys per property type in #property_metadata.
+  SUPPORTED_KEYS = {
+    property_string:  %w[input_type placeholder suffix prefix default].freeze,
+    property_text:    %w[input_type placeholder default].freeze,
+    property_integer: %w[input_type placeholder suffix prefix default min max options].freeze,
+    property_decimal: %w[input_type placeholder suffix prefix default currency precision].freeze,
+    property_boolean: %w[input_type placeholder suffix prefix default true_label false_label].freeze,
+    property_datetime: %w[input_type placeholder suffix prefix default format timezone].freeze
+  }.freeze
+
+  # Allowed input_type values per property type.
+  VALID_INPUT_TYPES = {
+    property_string:  %w[text].freeze,
+    property_text:    %w[textarea].freeze,
+    property_integer: %w[select progress_bar slider star].freeze,
+    property_decimal: %w[currency number percentage].freeze,
+    property_boolean: %w[toggle].freeze,
+    property_datetime: nil
+  }.freeze
 
   validate :validate_property_metadata
   validate :must_have_table_config

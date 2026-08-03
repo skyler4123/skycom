@@ -1,4 +1,8 @@
 class Companies::ApplicationController < ApplicationController
+  # Show the unpaid-invoice warning flash when invoices have been unpaid
+  # for longer than this duration.
+  UNPAID_WARNING_THRESHOLD = 5.days
+
   before_action :set_company
   before_action :set_employee
 

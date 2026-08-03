@@ -2,6 +2,10 @@
 module Cache::RecordsConcern
   extend ActiveSupport::Concern
 
+  # Default TTL for model attribute caching. Used by cached_find /
+  # cached_where class methods when no explicit expires_in is provided.
+  DEFAULT_CACHE_EXPIRY = 5.minutes
+
   included do
     after_commit :write_attribute_cache, on: [ :create, :update ]
     after_commit :remove_attribute_cache, on: :destroy

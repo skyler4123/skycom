@@ -234,7 +234,7 @@ When sync_cache was introduced, existing session cache entries in `Rails.local_c
 - `docs/MODEL_CALLBACKS.md` — Cache::RecordsConcern callback reference
 - `docs/ABAC.md` — Permission-based authorization (Pundit on top of auth)
 - `config/initializers/cache.rb` — Cache store definitions
-- `config/initializers/constants.rb` — `COOKIE_EXPIRY`, `DEFAULT_CACHE_EXPIRY`, `PERMISSIONS_CACHE_EXPIRY`
+- `config/initializers/constants.rb` — `PERMISSIONS_CACHE_EXPIRY`
 
 ---
 

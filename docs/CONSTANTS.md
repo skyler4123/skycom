@@ -4,6 +4,11 @@
 All app-wide constant values **MUST** be defined in `config/initializers/constants.rb`.
 Never hardcode values inline in models, controllers, jobs, services, or concerns.
 
+**Single-file exception**: Any constant used by exactly **one** file should be declared
+directly in that file (model, controller, concern, service, job) instead of globally.
+See `docs/CACHE.md` §5 for examples (e.g., `SESSION_CACHE_EXPIRY` lives in
+`authentication_concern.rb`; `DEFAULT_CACHE_EXPIRY` lives in `cache/records_concern.rb`).
+
 ## Why
 - **Single source of truth** — change one place, not 7+
 - **Eliminates duplication** — image limits, owner strings, cache TTLs were duplicated across up to 9 files
@@ -14,11 +19,11 @@ Never hardcode values inline in models, controllers, jobs, services, or concerns
 | Type | Examples |
 |------|----------|
 | Numeric limits/thresholds | `MAX_IMAGE_ATTACHMENTS`, `COMPANY_PROCESSING_BATCH_SIZE` |
-| Time durations | `COOKIE_EXPIRY`, `EMAIL_VERIFICATION_TOKEN_EXPIRY` |
-| Magic strings | `OWNER_BUSINESS_TYPE`, `OWNER_POLICY_RESOURCE` |
+| Time durations | `COOKIE_EXPIRY` (single-file, in `cookie_concern.rb`) |
+| Magic strings | `OWNER_BUSINESS_TYPE`, `OWNER_POLICY_RESOURCE` (single-file, in `company.rb`) |
 | File/upload constraints | `MAX_IMAGE_FILE_SIZE`, `ACCEPTABLE_IMAGE_TYPES` |
 | Image variant dimensions | `IMAGE_FULL_DIMENSIONS`, `AVATAR_PROFILE_DIMENSIONS` |
-| Cache TTLs | `PERMISSIONS_CACHE_EXPIRY`, `DEFAULT_CACHE_EXPIRY` |
+| Cache TTLs | `PERMISSIONS_CACHE_EXPIRY`, `DEFAULT_CACHE_EXPIRY` (single-file, in `cache/records_concern.rb`) |
 | Billing defaults & pricing | `DEFAULT_FREE_TIER_ALLOWANCES`, `BILLING_US_PRICES` |
 | Array configs | `ALLOWED_TABLE_ALIGNS`, `PROPERTY_MAPPING_SUPPORTED_KEYS` |
 | Enum mappings | `TIMEZONES`, `CURRENCIE_CODES`, `LIFECYCLE_STATUS`, `WORKFLOW_STATUS` |
@@ -27,6 +32,7 @@ Never hardcode values inline in models, controllers, jobs, services, or concerns
 
 | Scope | Reason |
 |-------|--------|
+| Single-file constants | Used in exactly one file — declared at the usage site |
 | Environment-specific infrastructure config (`database.yml`, `cache.yml`, `queue.yml`) | Per-environment, not app-wide |
 | Migration/schema defaults | Historical snapshots, not runtime config |
 | Seed/fixture data (brand names, facility names, test counts) | Test/fixture data, not configuration |
@@ -41,11 +47,18 @@ Never hardcode values inline in models, controllers, jobs, services, or concerns
 4. Replace all inline usages with the constant name
 5. Run `bin/rubocop` to verify
 
+> If the constant will be used by only one file, add it to that file directly
+> (with a comment) instead of `constants.rb`. If it later gains a second caller,
+> promote it to `config/initializers/constants.rb`.
+
 ## Examples
 
 ```ruby
-# Good — defined in config/initializers/constants.rb, referenced everywhere
+# Good — multi-file constant, defined in config/initializers/constants.rb
 MAX_IMAGE_ATTACHMENTS = 3
+
+# Good — single-file constant, defined in app/models/company.rb
+OWNER_POLICY_RESOURCE = "all"
 
 # Bad — hardcoded inline (DO NOT DO THIS)
 if image_attachments.length > 3
