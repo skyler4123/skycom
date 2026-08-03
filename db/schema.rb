@@ -3058,8 +3058,15 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_02_190003) do
 
   create_table "payment_method_appointments", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
     t.uuid "company_id", null: false
-    t.uuid "branch_id"
     t.uuid "payment_method_id", null: false
+    t.string "appoint_from_type"
+    t.uuid "appoint_from_id"
+    t.string "appoint_to_type", null: false
+    t.uuid "appoint_to_id", null: false
+    t.string "appoint_for_type"
+    t.uuid "appoint_for_id"
+    t.string "appoint_by_type"
+    t.uuid "appoint_by_id"
     t.string "name"
     t.string "description"
     t.string "code"
@@ -3075,7 +3082,10 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_02_190003) do
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["branch_id"], name: "index_payment_method_appointments_on_branch_id"
+    t.index ["appoint_by_type", "appoint_by_id"], name: "index_payment_method_appointments_on_appoint_by"
+    t.index ["appoint_for_type", "appoint_for_id"], name: "index_payment_method_appointments_on_appoint_for"
+    t.index ["appoint_from_type", "appoint_from_id"], name: "index_payment_method_appointments_on_appoint_from"
+    t.index ["appoint_to_type", "appoint_to_id"], name: "index_payment_method_appointments_on_appoint_to"
     t.index ["business_type"], name: "index_payment_method_appointments_on_business_type"
     t.index ["company_id"], name: "index_payment_method_appointments_on_company_id"
     t.index ["discarded_at"], name: "index_payment_method_appointments_on_discarded_at"
@@ -5949,7 +5959,6 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_02_190003) do
   add_foreign_key "orders", "property_mappings"
   add_foreign_key "pages", "branches"
   add_foreign_key "pages", "companies"
-  add_foreign_key "payment_method_appointments", "branches"
   add_foreign_key "payment_method_appointments", "companies"
   add_foreign_key "payment_method_appointments", "payment_methods"
   add_foreign_key "policies", "branches"

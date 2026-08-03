@@ -17,7 +17,9 @@ class PaymentMethod < ApplicationRecord
 
   # --- Associations ---
   has_many :payment_method_appointments, dependent: :destroy
-  has_many :branches, through: :payment_method_appointments
+  has_many :companies, through: :payment_method_appointments, source: :appoint_to, source_type: "Company"
+  has_many :branches, through: :payment_method_appointments, source: :appoint_to, source_type: "Branch"
+
   has_many :transactions, dependent: :nullify
 
   # --- Enums ---

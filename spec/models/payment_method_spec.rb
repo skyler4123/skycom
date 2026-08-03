@@ -5,6 +5,7 @@ RSpec.describe PaymentMethod, type: :model do
   describe "associations" do
     it { should have_many(:payment_method_appointments).dependent(:destroy) }
     it { should have_many(:branches).through(:payment_method_appointments) }
+    it { should have_many(:companies).through(:payment_method_appointments) }
   end
 
   describe "validations" do

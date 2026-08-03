@@ -27,7 +27,7 @@ class Branch < ApplicationRecord
   has_many :customers, dependent: :destroy
   has_many :customer_groups, dependent: :destroy
   has_many :orders, dependent: :destroy
-  has_many :payment_method_appointments, dependent: :destroy
+  has_many :payment_method_appointments, as: :appoint_to, dependent: :destroy
   has_many :scheduled_shifts, dependent: :destroy
   has_one :attendance_policy, dependent: :destroy
   has_many :task_groups, dependent: :destroy
@@ -104,12 +104,34 @@ class Branch < ApplicationRecord
   # validates :website, format: URI.regexp(%w[http https]), allow_blank: true
 
   after_initialize :set_defaults_from_company, if: :new_record?
+  after_create :initialize_payment_methods
 
   def subscription_buyer
     self.company.user
   end
 
   private
+
+  def initialize_payment_methods
+    return unless company
+
+    company.payment_method_appointments.company_level.where(lifecycle_status: LIFECYCLE_STATUS.fetch(:active)).find_each do |appointment|
+      PaymentMethodAppointment.find_or_create_by!(
+        appoint_to: self,
+        payment_method: appointment.payment_method,
+        company: company
+      ) do |a|
+        a.name = "#{appointment.name} for #{name}"
+        a.code = "#{appointment.code}-BR-#{SecureRandom.hex(3).upcase}"
+        a.business_type = appointment.business_type
+        a.lifecycle_status = :active
+        a.workflow_status = appointment.workflow_status
+        a.merchant_number = appointment.merchant_number
+        a.merchant_name = appointment.merchant_name
+        a.merchant_id = appointment.merchant_id
+      end
+    end
+  end
 
   def set_defaults_from_company
     return unless company

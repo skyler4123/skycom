@@ -103,5 +103,19 @@ RSpec.describe "Companies::PaymentMethodAppointmentsController", type: :request 
       body = JSON.parse(response.body)
       expect(body["payment_method_appointments"].size).to eq(1)
     end
+
+    it "excludes branch-level appointments from the index" do
+      branch = create(:branch, company: company)
+      PaymentMethodAppointment.create!(
+        appoint_to: branch, payment_method: pm_cash,
+        name: "Cash for #{branch.name}", code: "BR-CASH-#{SecureRandom.hex(4).upcase}",
+        business_type: :in_store, lifecycle_status: :active
+      )
+
+      get "/companies/#{company.id}/payment_method_appointments", as: :json
+      body = JSON.parse(response.body)
+      expect(body["payment_method_appointments"].size).to eq(1)
+      expect(body["payment_method_appointments"].map { |a| a["id"] }).to eq([ appointment_cash.id ])
+    end
   end
 end
