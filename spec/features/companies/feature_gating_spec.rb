@@ -65,15 +65,15 @@ RSpec.feature "Feature Gating", type: :feature, js: true do
   # ==========================================================================
 
   describe "sidebar gating" do
-    scenario "hides disabled feature link when feature is not in enabled_features" do
+    scenario "shows feature-gated links even when feature is not in enabled_features" do
       seed_client_cache(core_only_features)
       visit company_billing_path(company)
 
       expect(page).to have_link("Dashboard", href: "/companies/#{company.id}/dashboards", visible: :all, wait: 10)
       expect(page).to have_link("Products", href: "/companies/#{company.id}/products", visible: :all, wait: 10)
-      expect(page).not_to have_link("Employees", href: "/companies/#{company.id}/employees", visible: :all)
-      expect(page).not_to have_link("Shift Templates", href: "/companies/#{company.id}/shift_templates", visible: :all)
-      expect(page).not_to have_link("Permissions", href: "/companies/#{company.id}/permissions", visible: :all)
+      expect(page).to have_link("Employees", href: "/companies/#{company.id}/employees", visible: :all, wait: 10)
+      expect(page).to have_link("Shift Templates", href: "/companies/#{company.id}/shift_templates", visible: :all, wait: 10)
+      expect(page).to have_link("Permissions", href: "/companies/#{company.id}/permissions", visible: :all, wait: 10)
     end
 
     scenario "shows enabled feature link when feature is in enabled_features" do
@@ -94,19 +94,19 @@ RSpec.feature "Feature Gating", type: :feature, js: true do
       expect(page).to have_link("Facilities", visible: :all, wait: 10)
     end
 
-    scenario "hides multiple disabled features at once" do
+    scenario "shows multiple feature-gated links even when disabled" do
       seed_client_cache(core_only_features)
       visit company_billing_path(company)
 
-      expect(page).not_to have_link("Stock Transfers", href: "/companies/#{company.id}/stock_transfers", visible: :all)
-      expect(page).not_to have_link("Policies", href: "/companies/#{company.id}/policies", visible: :all)
+      expect(page).to have_link("Stock Transfers", href: "/companies/#{company.id}/stock_transfers", visible: :all, wait: 10)
+      expect(page).to have_link("Policies", href: "/companies/#{company.id}/policies", visible: :all, wait: 10)
     end
 
-    scenario "branches link is hidden when multi_branch is disabled" do
+    scenario "shows branches link even when multi_branch is disabled" do
       seed_client_cache(core_only_features)
       visit company_billing_path(company)
 
-      expect(page).not_to have_link("Branches", href: "/companies/#{company.id}/branches", visible: :all)
+      expect(page).to have_link("Branches", href: "/companies/#{company.id}/branches", visible: :all, wait: 10)
     end
   end
 
@@ -199,7 +199,7 @@ RSpec.feature "Feature Gating", type: :feature, js: true do
       create(:billing_resource, :addon_feature, name: "hrm_attendance", country: company.country)
     end
 
-    scenario "toggling a feature OFF hides it from sidebar after reload" do
+    scenario "toggling a feature OFF disables it while keeping the sidebar link visible" do
       resource = BillingResource.find_by(name: "hrm_attendance")
       create(:contract_feature, billing_contract: contract, billing_resource: resource, lifecycle_status: :active)
 
@@ -212,18 +212,22 @@ RSpec.feature "Feature Gating", type: :feature, js: true do
       page.execute_script("document.querySelector('[data-companies--billing--show-feature-key-param=\"hrm_attendance\"]').dispatchEvent(new Event('change', { bubbles: true }))")
 
       # Wait for the toggle AJAX to complete (reloadThenToast triggers a page reload).
-      # Then the version-matched cache seed ensures sync() doesn't overwrite on the next visit.
       visit company_billing_path(company)
 
+      expect(contract.contract_features.find_by(billing_resource: resource).reload.lifecycle_status).to eq("disabled")
+
+      # The sidebar always shows every link; feature state only gates backend access.
       seed_client_cache(core_only_features)
       visit company_billing_path(company)
-      expect(page).not_to have_link("Employees", href: "/companies/#{company.id}/employees", visible: :all)
+      expect(page).to have_link("Employees", href: "/companies/#{company.id}/employees", visible: :all, wait: 10)
     end
 
-    scenario "toggling a feature ON makes sidebar link appear after reload" do
+    scenario "toggling a feature ON creates an active contract feature" do
+      resource = BillingResource.find_by(name: "hrm_attendance")
+
       seed_client_cache(core_only_features)
       visit company_billing_path(company)
-      expect(page).not_to have_link("Employees", href: "/companies/#{company.id}/employees", visible: :all)
+      expect(page).to have_link("Employees", href: "/companies/#{company.id}/employees", visible: :all, wait: 10)
       expect(page).to have_css("[data-companies--billing--show-feature-key-param='hrm_attendance']", visible: false, wait: 10)
 
       page.execute_script("document.querySelector('[data-companies--billing--show-feature-key-param=\"hrm_attendance\"]').checked = true")
@@ -231,6 +235,8 @@ RSpec.feature "Feature Gating", type: :feature, js: true do
 
       # Wait for the toggle AJAX to complete (reloadThenToast triggers a page reload).
       visit company_billing_path(company)
+
+      expect(contract.contract_features.reload.find_by(billing_resource: resource).lifecycle_status).to eq("active")
 
       seed_client_cache(with_feature(:hrm_attendance))
       visit company_billing_path(company)

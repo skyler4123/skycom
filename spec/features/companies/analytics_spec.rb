@@ -44,11 +44,11 @@ RSpec.feature "Analytics Dashboard", type: :feature, js: true do
   end
 
   describe "sidebar link" do
-    scenario "is hidden when analytics_dashboard feature is not enabled" do
+    scenario "is visible even when analytics_dashboard feature is not enabled" do
       seed_client_cache(without_analytics)
       visit company_billing_path(company)
 
-      expect(page).not_to have_link("Analytics", href: /analytics/, visible: :all)
+      expect(page).to have_link("Analytics", href: /analytics/, visible: :all, wait: 10)
     end
 
     scenario "is visible when analytics_dashboard feature is enabled" do
