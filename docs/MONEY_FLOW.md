@@ -1197,7 +1197,7 @@ Day 3: Owner transfers $15, support credits main_balance
 | `app/controllers/companies/order_processing/v1_controller.rb` | POS checkout + pay API |
 | `docs/ORDER_PROCESSING_V1.md` | POS order pipeline documentation |
 | `docs/BILLING_DASHBOARD.md` | Billing dashboard frontend documentation |
-| `config/initializers/constants.rb` (billing section) | `BILLING_VOLUMETRIC_RESOURCES`, `BILLING_ADDON_FEATURES`, `BILLING_PRICES_BY_COUNTRY`, `DEFAULT_FREE_TIER_ALLOWANCES` |
+| `app/models/billing_resource.rb` | BillingResource catalog constants: `VOLUMETRIC_RESOURCES`, `ADDON_FEATURES`, `COUNTRIES`, `US_PRICES`, `VN_PRICES`, `PRICES_BY_COUNTRY` |
 
 ---
 

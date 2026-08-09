@@ -24,7 +24,7 @@ See `docs/CACHE.md` §5 for examples (e.g., `SESSION_CACHE_EXPIRY` lives in
 | File/upload constraints | `MAX_IMAGE_FILE_SIZE`, `ACCEPTABLE_IMAGE_TYPES` |
 | Image variant dimensions | `IMAGE_FULL_DIMENSIONS`, `AVATAR_PROFILE_DIMENSIONS` |
 | Cache TTLs | `PERMISSIONS_CACHE_EXPIRY`, `DEFAULT_CACHE_EXPIRY` (single-file, in `cache/records_concern.rb`) |
-| Billing defaults & pricing | `DEFAULT_FREE_TIER_ALLOWANCES`, `BILLING_US_PRICES` |
+| Billing defaults & pricing | `DEFAULT_FREE_TIER_ALLOWANCES` (single-file, in `seed/billing_contract_service.rb`), `US_PRICES` / `VN_PRICES` / `PRICES_BY_COUNTRY` (in `app/models/billing_resource.rb`) |
 | Array configs | `ALLOWED_TABLE_ALIGNS`, `PROPERTY_MAPPING_SUPPORTED_KEYS` |
 | Enum mappings | `TIMEZONES`, `CURRENCIE_CODES`, `LIFECYCLE_STATUS`, `WORKFLOW_STATUS` |
 
