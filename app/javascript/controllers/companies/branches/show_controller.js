@@ -1,4 +1,5 @@
 import Companies_LayoutController from "controllers/companies/layout_controller"
+import Companies_Branches_PaymentMethodAppointmentsModalController from "controllers/companies/branches/payment_method_appointments_modal_controller"
 
 export default class Companies_Branches_ShowController extends Companies_LayoutController {
   /** @type {Branch | null} */
@@ -42,6 +43,16 @@ export default class Companies_Branches_ShowController extends Companies_LayoutC
 
   contentHTML() {
     return this.showHTML()
+  }
+
+  openPaymentMethodsModal() {
+    if (!this.branch) return
+    openModal({
+      html: `<div
+        data-controller="${identifier(Companies_Branches_PaymentMethodAppointmentsModalController)}"
+        data-${identifier(Companies_Branches_PaymentMethodAppointmentsModalController)}-branch-id-value="${this.branch.id}"
+      ></div>`
+    })
   }
 
   formatDisplayValue(value, type) {
@@ -179,6 +190,14 @@ export default class Companies_Branches_ShowController extends Companies_LayoutC
           ${dynamicFields}
 
           <div class="mt-8 flex justify-end gap-3 pt-6 border-t border-slate-200 dark:border-gray-800">
+            <button
+              type="button"
+              data-action="click->${this.identifier}#openPaymentMethodsModal"
+              class="inline-flex items-center justify-center px-6 py-2 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-lg font-medium text-sm transition-colors cursor-pointer"
+            >
+              <span class="material-symbols-outlined text-[18px] mr-2">payments</span>
+              ${translate("Payment Methods")}
+            </button>
             <a href="${Helpers.edit_company_branch_path(companyId, b.id)}"
               class="inline-flex items-center px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium text-sm transition-colors cursor-pointer">
               ${translate("Edit Branch")}

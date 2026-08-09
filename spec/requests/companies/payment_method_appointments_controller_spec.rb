@@ -106,16 +106,55 @@ RSpec.describe "Companies::PaymentMethodAppointmentsController", type: :request 
 
     it "excludes branch-level appointments from the index" do
       branch = create(:branch, company: company)
-      PaymentMethodAppointment.create!(
-        appoint_to: branch, payment_method: pm_cash,
-        name: "Cash for #{branch.name}", code: "BR-CASH-#{SecureRandom.hex(4).upcase}",
-        business_type: :in_store, lifecycle_status: :active
-      )
+      branch.payment_method_appointments.find_by!(payment_method: pm_cash)
 
       get "/companies/#{company.id}/payment_method_appointments", as: :json
       body = JSON.parse(response.body)
       expect(body["payment_method_appointments"].size).to eq(1)
       expect(body["payment_method_appointments"].map { |a| a["id"] }).to eq([ appointment_cash.id ])
+    end
+
+    it "returns branch-level appointments when filtered by branch_id" do
+      branch = create(:branch, company: company)
+      branch_appointment = branch.payment_method_appointments.find_by!(payment_method: pm_cash)
+
+      get "/companies/#{company.id}/payment_method_appointments", params: { branch_id: branch.id }, as: :json
+      body = JSON.parse(response.body)
+      expect(body["payment_method_appointments"].size).to eq(1)
+      expect(body["payment_method_appointments"].first["id"]).to eq(branch_appointment.id)
+      expect(body["payment_method_appointments"].first["company_level_active"]).to eq(true)
+    end
+
+    it "reports company_level_active false when the company-level method is inactive" do
+      branch = create(:branch, company: company)
+      branch.payment_method_appointments.find_by!(payment_method: pm_cash)
+      appointment_cash.update_column(:lifecycle_status, PaymentMethodAppointment.lifecycle_statuses.fetch("inactive"))
+
+      get "/companies/#{company.id}/payment_method_appointments", params: { branch_id: branch.id }, as: :json
+      body = JSON.parse(response.body)
+      expect(body["payment_method_appointments"].first["company_level_active"]).to eq(false)
+    end
+  end
+
+  describe "branch-level appointment lifecycle" do
+    let!(:branch) { create(:branch, company: company) }
+    let!(:branch_appointment) { branch.payment_method_appointments.find_by!(payment_method: pm_cash) }
+
+    it "returns the branch-level appointment in edit JSON" do
+      get "/companies/#{company.id}/payment_method_appointments/#{branch_appointment.id}/edit", as: :json
+      expect(response).to have_http_status(:ok)
+      body = JSON.parse(response.body)
+      expect(body["payment_method_appointment"]["id"]).to eq(branch_appointment.id)
+      expect(body["payment_method_appointment"]["lifecycle_status"]).to eq("active")
+    end
+
+    it "updates branch-level lifecycle_status via PATCH" do
+      patch "/companies/#{company.id}/payment_method_appointments/#{branch_appointment.id}",
+        params: { payment_method_appointment: { lifecycle_status: "inactive" } }
+      expect(response).to have_http_status(:redirect)
+
+      branch_appointment.reload
+      expect(branch_appointment.lifecycle_status).to eq("inactive")
     end
   end
 end

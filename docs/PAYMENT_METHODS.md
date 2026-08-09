@@ -272,6 +272,18 @@ end
 
 The Payments dashboard **index is scoped to `company_level`** — branch-level appointments are management detail and never listed in the dashboard. `edit`/`update` still resolve appointments within `current_company` scope.
 
+### 8.1 Branch Payment Methods Modal
+
+Branch pages (show + edit) expose a **"Payment Methods"** button that opens a modal listing the branch's appointments.
+
+- **Trigger**: `app/javascript/controllers/companies/branches/show_controller.js` + `edit_controller.js` → `openPaymentMethodsModal()`
+- **Controller**: `app/javascript/controllers/companies/branches/payment_method_appointments_modal_controller.js`
+- **Index request**: `GET /companies/:id/payment_method_appointments?branch_id=<uuid>` — the `index` action scopes to `branch.payment_method_appointments` when `branch_id` is present, and each item includes `company_level_active` (whether the company has an active company-level appointment for that method).
+
+The modal shows each appointment with a lifecycle toggle. When `company_level_active` is `false` (the company has disabled the method company-wide), the toggle is rendered **disabled** with an "Enable at company level first" hint — the model validation `payment_method_must_be_active_in_company` would reject a branch activation anyway, so the UI prevents the attempt up front.
+
+- **Toggle request**: `PATCH /companies/:id/payment_method_appointments/:id` with `{ payment_method_appointment: { lifecycle_status: "active"|"inactive" } }` — uses `reloadThenToast()` so the branch page refreshes and reflects the new state.
+
 ---
 
 ## 9. Design Rules / Invariants
@@ -294,7 +306,8 @@ The Payments dashboard **index is scoped to `company_level`** — branch-level a
 | `app/models/branch.rb` | `as: :appoint_to` association + `after_create :initialize_payment_methods` |
 | `app/models/company.rb` | `as: :appoint_to` association + `setup_payment_method_appointments` |
 | `app/services/seed/payment_method_appointment_service.rb` | Seed service (accepts `appoint_to:`, defaults to company) |
-| `app/controllers/companies/payment_method_appointments_controller.rb` | Payments dashboard (index scoped to `company_level`) |
+| `app/controllers/companies/payment_method_appointments_controller.rb` | Payments dashboard (index scoped to `company_level`; `branch_id` param scopes to a branch) |
+| `app/javascript/controllers/companies/branches/payment_method_appointments_modal_controller.js` | Branch payment methods modal (list + lifecycle toggles) |
 | `db/migrate/20251123012320_create_payment_method_appointments.rb` | Schema (polymorphic + merchant fields) |
 | `db/schema.rb:3059` | Current schema |
 | `spec/models/payment_method_appointment_spec.rb` | Model specs (23 examples: defaults, scopes, validations, cascade) |
