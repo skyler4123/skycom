@@ -478,6 +478,13 @@ export const dictionary = () => {
 
     // === Payment Methods ===
     "Payment Methods": { vi: "Phương thức thanh toán" },
+    "Manage payment methods for this branch": { vi: "Quản lý phương thức thanh toán cho chi nhánh này" },
+    "Enable at company level first": { vi: "Vui lòng kích hoạt ở cấp công ty trước" },
+    "No payment methods available": { vi: "Không có phương thức thanh toán nào" },
+    "Loading...": { vi: "Đang tải..." },
+    "Payment method updated successfully": { vi: "Đã cập nhật phương thức thanh toán" },
+    "Failed to update payment method": { vi: "Cập nhật phương thức thanh toán thất bại" },
+    "Failed to load payment methods": { vi: "Tải danh sách phương thức thanh toán thất bại" },
     "Bank Account Configuration": { vi: "Cấu hình tài khoản ngân hàng" },
     "Enter your banking details to receive payments via this method.": { vi: "Nhập thông tin ngân hàng để nhận thanh toán qua phương thức này." },
     "Bank Account Number": { vi: "Số tài khoản ngân hàng" },

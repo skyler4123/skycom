@@ -1,4 +1,5 @@
 import Companies_LayoutController from "controllers/companies/layout_controller"
+import Companies_Branches_PaymentMethodAppointmentsModalController from "controllers/companies/branches/payment_method_appointments_modal_controller"
 
 export default class Companies_Branches_EditController extends Companies_LayoutController {
   /** @type {Branch | null} */
@@ -39,6 +40,16 @@ export default class Companies_Branches_EditController extends Companies_LayoutC
         return false
       })
     }
+  }
+
+  openPaymentMethodsModal() {
+    if (!this.branch) return
+    openModal({
+      html: `<div
+        data-controller="${identifier(Companies_Branches_PaymentMethodAppointmentsModalController)}"
+        data-${identifier(Companies_Branches_PaymentMethodAppointmentsModalController)}-branch-id-value="${this.branch.id}"
+      ></div>`
+    })
   }
 
   contentHTML() {
@@ -149,6 +160,11 @@ export default class Companies_Branches_EditController extends Companies_LayoutC
             class="px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-100 rounded-lg cursor-pointer">
             ${translate("Cancel")}
           </a>
+          <button type="button" data-action="click->${this.identifier}#openPaymentMethodsModal"
+            class="inline-flex items-center justify-center px-4 py-2 text-sm font-medium bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-lg transition-colors cursor-pointer">
+            <span class="material-symbols-outlined text-[18px] mr-2">payments</span>
+            ${translate("Payment Methods")}
+          </button>
           <button type="submit"
             class="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-bold text-sm cursor-pointer">
             ${translate("Save Changes")}
