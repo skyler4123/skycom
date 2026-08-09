@@ -268,4 +268,53 @@ RSpec.describe "Feature Gating API", type: :request do
       expect(response).to have_http_status(:ok)
     end
   end
+
+  # ==========================================================================
+  # Per-action gating (feature_key with only: / except:)
+  # ==========================================================================
+
+  describe "Branches with feature_key :multi_branch, only: [:new, :create]" do
+    context "when multi_branch is disabled" do
+      let!(:multi_branch_resource) do
+        create(:billing_resource, :addon_feature, name: "multi_branch", country: company.country)
+      end
+      let!(:branch) { create(:branch, company: company) }
+
+      it "returns 200 for index (ungated action)" do
+        get "/companies/#{company.id}/branches", as: :json
+        expect(response).to have_http_status(:ok)
+      end
+
+      it "returns 200 for show (ungated action)" do
+        get "/companies/#{company.id}/branches/#{branch.id}", as: :json
+        expect(response).to have_http_status(:ok)
+      end
+
+      it "returns 403 for new (gated action)" do
+        get "/companies/#{company.id}/branches/new", as: :json
+        expect(response).to have_http_status(:forbidden)
+      end
+
+      it "returns 403 for create (gated action)" do
+        post "/companies/#{company.id}/branches", params: { branch: { name: "New Branch" } }, as: :json
+        expect(response).to have_http_status(:forbidden)
+      end
+    end
+
+    context "when multi_branch is enabled" do
+      let!(:multi_branch_resource) do
+        create(:billing_resource, :addon_feature, name: "multi_branch", country: company.country)
+      end
+      let(:contract) { company.active_billing_contract }
+
+      before do
+        create(:contract_feature, billing_contract: contract, billing_resource: multi_branch_resource, lifecycle_status: :active)
+      end
+
+      it "returns 200 for new (gated action, feature enabled)" do
+        get "/companies/#{company.id}/branches/new", as: :json
+        expect(response).to have_http_status(:ok)
+      end
+    end
+  end
 end

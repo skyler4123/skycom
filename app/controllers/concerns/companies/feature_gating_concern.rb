@@ -7,11 +7,31 @@ module Companies::FeatureGatingConcern
   end
 
   class_methods do
-    def feature_key(key = nil)
+    def feature_key(key = nil, only: nil, except: nil)
       if key
         @feature_key = key.to_s.freeze
+        @feature_key_only = normalize_action_names(only)
+        @feature_key_except = normalize_action_names(except)
       else
         @feature_key
+      end
+    end
+
+    def feature_key_only
+      @feature_key_only
+    end
+
+    def feature_key_except
+      @feature_key_except
+    end
+
+    private
+
+    def normalize_action_names(actions)
+      case actions
+      when nil then nil
+      when Array then actions.map(&:to_s).map(&:freeze)
+      else [ actions.to_s ].freeze
       end
     end
   end
@@ -21,6 +41,7 @@ module Companies::FeatureGatingConcern
   def check_feature_enabled!
     key = self.class.feature_key
     return unless key
+    return if feature_gate_exempted?
     return unless current_company
     return unless BillingResource.exists?
     return if current_company.feature_enabled?(key)
@@ -42,5 +63,14 @@ module Companies::FeatureGatingConcern
         }, status: :forbidden
       end
     end
+  end
+
+  def feature_gate_exempted?
+    only = self.class.feature_key_only
+    except = self.class.feature_key_except
+    return true if only && !only.include?(action_name)
+    return true if except&.include?(action_name)
+
+    false
   end
 end
