@@ -1,5 +1,5 @@
 class Companies::PermissionsController < Companies::ApplicationController
-  feature_key :custom_roles
+  feature_key :custom_roles, only: [ :create ]
 
   before_action :authorize_permission_management, only: [ :update, :create ]
 
