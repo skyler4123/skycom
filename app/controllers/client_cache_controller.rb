@@ -17,7 +17,7 @@ class ClientCacheController < ApplicationController
               property_mappings: {},
               table_configs:     {}
             },
-            methods: [ :billing_contract_summary, :resource_names ]
+            methods: [ :resource_names ]
           ),
           enums: {
             employee: {

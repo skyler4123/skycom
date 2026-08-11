@@ -1,5 +1,11 @@
 # frozen_string_literal: true
 
+# PLACEHOLDER CONTROLLER — future Token implementation.
+#
+# This is the payment API webhook that the bank gateway calls when a hosted
+# redirect checkout completes. The API contract is preserved (signature
+# check, param validation, idempotency, response shapes) but the money
+# movement logic is a placeholder for the future Token system.
 module Webhooks
   module Payments
     class MockRedirectGatewayController < ActionController::Base
@@ -20,38 +26,12 @@ module Webhooks
           return render json: { errors: [ "Missing authorized_token or settlement_amount" ] }, status: :unprocessable_content
         end
 
-        txn = BillingTransaction.find_by(gateway_reference: authorized_token)
-        unless txn
-          return render json: { errors: [ "Transaction not found" ] }, status: :not_found
-        end
-
-        if txn.status_completed?
-          return render json: { status: "already_completed" }, status: :ok
-        end
-
-        company = txn.company
-
-        ActiveRecord::Base.transaction do
-          wallet = company.billing_wallet.lock!
-          new_main = wallet.main_balance_cents + settlement_amount
-          wallet.update!(main_balance_cents: new_main)
-
-          txn.update!(
-            status: :completed,
-            gateway_reference: data[:reference_code] || txn.gateway_reference,
-            balance_after_cents: new_main
-          )
-        end
-
-        WEBSOCKET.publish_event(
-          channel: WEBSOCKET.company_channel(company&.id),
-          event_key: :top_up_completed,
-          data: {
-            amount_cents: settlement_amount,
-            transaction_id: txn.id
-          }
-        )
-
+        # TODO: Token implementation — on confirmed redirect payment:
+        #   1. Look up the pending top-up by gateway_reference (authorized_token)
+        #   2. Credit the company's token balance (settlement_amount → token conversion)
+        #   3. Publish the top_up_completed websocket event to the company channel
+        # Previously this credited billing_wallet.main_balance_cents; that model
+        # was removed with the billing system.
         render json: { status: "completed" }
       end
 

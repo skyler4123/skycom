@@ -14,20 +14,9 @@ RSpec.describe "Companies::Analytics", type: :request do
   end
 
   describe "GET /companies/:id/analytics" do
-    context "when feature is enabled" do
+    context "when authenticated" do
       before do
         get sign_in_for_test_path(email: owner_user.email)
-
-        resource = BillingResource.find_or_create_by!(
-          name: "analytics_dashboard",
-          resource_type: :addon_feature,
-          country: company.country
-        )
-        contract = company.active_billing_contract
-        contract.contract_features.find_or_create_by!(billing_resource: resource) do |cf|
-          cf.lifecycle_status = :active
-          cf.monthly_flat_price_cents = 500
-        end
       end
 
       it "returns HTML shell" do
@@ -49,23 +38,6 @@ RSpec.describe "Companies::Analytics", type: :request do
       it "accepts period param" do
         get company_analytics_path(company, format: :json, params: { period: "last_month" })
         expect(response).to have_http_status(:ok)
-      end
-    end
-
-    context "when feature is disabled" do
-      before do
-        get sign_in_for_test_path(email: owner_user.email)
-
-        BillingResource.find_or_create_by!(
-          name: "analytics_dashboard",
-          resource_type: :addon_feature,
-          country: company.country
-        )
-      end
-
-      it "returns 403 for JSON" do
-        get company_analytics_path(company, format: :json)
-        expect(response).to have_http_status(:forbidden)
       end
     end
 

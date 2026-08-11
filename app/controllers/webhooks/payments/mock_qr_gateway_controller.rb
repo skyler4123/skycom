@@ -1,5 +1,11 @@
 # frozen_string_literal: true
 
+# PLACEHOLDER CONTROLLER — future Token implementation.
+#
+# This is the payment API webhook that the bank gateway calls when a QR
+# payment completes. The API contract is preserved (signature check, param
+# validation, idempotency, response shapes) but the money movement logic is
+# a placeholder for the future Token system.
 module Webhooks
   module Payments
     class MockQrGatewayController < ActionController::Base
@@ -20,38 +26,12 @@ module Webhooks
           return render json: { errors: [ "Missing transaction_token or amount" ] }, status: :unprocessable_content
         end
 
-        txn = BillingTransaction.find_by(gateway_reference: transaction_token)
-        unless txn
-          return render json: { errors: [ "Transaction not found" ] }, status: :not_found
-        end
-
-        if txn.status_completed?
-          return render json: { status: "already_completed" }, status: :ok
-        end
-
-        company = txn.company
-
-        ActiveRecord::Base.transaction do
-          wallet = company.billing_wallet.lock!
-          new_main = wallet.main_balance_cents + amount
-          wallet.update!(main_balance_cents: new_main)
-
-          txn.update!(
-            status: :completed,
-            gateway_reference: data[:transaction_id] || txn.gateway_reference,
-            balance_after_cents: new_main
-          )
-        end
-
-        WEBSOCKET.publish_event(
-          channel: WEBSOCKET.company_channel(company&.id),
-          event_key: :top_up_completed,
-          data: {
-            amount_cents: amount,
-            transaction_id: txn.id
-          }
-        )
-
+        # TODO: Token implementation — on confirmed QR payment:
+        #   1. Look up the pending top-up by gateway_reference (transaction_token)
+        #   2. Credit the company's token balance (amount → token conversion)
+        #   3. Publish the top_up_completed websocket event to the company channel
+        # Previously this credited billing_wallet.main_balance_cents; that model
+        # was removed with the billing system.
         render json: { status: "completed" }
       end
 

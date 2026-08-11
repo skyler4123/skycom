@@ -1,6 +1,4 @@
 class Companies::PermissionsController < Companies::ApplicationController
-  feature_key :custom_roles, only: [ :create ]
-
   before_action :authorize_permission_management, only: [ :update, :create ]
 
   # Shell First pattern - index action returns empty HTML, Stimulus renders content

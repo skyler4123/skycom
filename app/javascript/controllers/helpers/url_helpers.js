@@ -175,12 +175,8 @@ export const edit_company_payment_method_appointment_path = (companyId, id) =>
 export const company_payment_method_appointment_path = (companyId, id) =>
   `/companies/${companyId}/payment_method_appointments/${id}`
 
+// PLACEHOLDER — future Token implementation. Billing page itself is future work.
 export const company_billing_path = (companyId) => `/companies/${companyId}/billing`
-export const company_billing_pay_all_path = (companyId) => `/companies/${companyId}/billing/pay_all`
-
-export const new_company_top_up_path = (companyId) => `/companies/${companyId}/top_ups/new`
-export const mock_qr_gateway_company_top_ups_path = (companyId) => `/companies/${companyId}/top_ups/mock_qr_gateway`
-export const mock_redirect_gateway_company_top_ups_path = (companyId) => `/companies/${companyId}/top_ups/mock_redirect_gateway`
 
 export const company_invoices_path = (companyId) => `/companies/${companyId}/invoices`
 export const create_company_invoices_path = (companyId) => `/companies/${companyId}/invoices`

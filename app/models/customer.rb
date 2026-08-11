@@ -5,10 +5,6 @@ class Customer < ApplicationRecord
   include AddressConcern
   include TagConcern
   include Customer::ImageConcern
-  include MeteringConcern
-
-  metered_as :customers
-
   attribute :permission_resource_name, :string, default: -> { self.name }
 
   enum :country, COUNTRY_CODES, prefix: true, default: :us

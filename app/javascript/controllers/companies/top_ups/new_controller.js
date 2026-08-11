@@ -1,5 +1,10 @@
 import Companies_LayoutController from "controllers/companies/layout_controller"
 
+// PLACEHOLDER CONTROLLER — future Token implementation.
+// The UI (amount input, payment-method cards, selection, QR wait) is kept
+// intact. API calls were removed — wire the new token payment flow here
+// (e.g. deposit $10 → receive 1,000,000 tokens; an order consumes 10 tokens;
+// dashboard access costs 2 tokens per visit).
 export default class Companies_TopUps_NewController extends Companies_LayoutController {
   /** @type {Array} */ paymentMethods = []
   /** @type {string|null} */ selectedMethodId = null
@@ -7,12 +12,9 @@ export default class Companies_TopUps_NewController extends Companies_LayoutCont
   async connect() {
     super.connect()
 
-    try {
-      const response = await fetchJson()
-      this.paymentMethods = response.billing_payment_methods || []
-    } catch (error) {
-      toast({ type: "error", message: error.errors?.join(", ") || translate("Failed to load payment methods") })
-    }
+    // TODO: Token implementation — fetch available payment methods from the
+    // server (e.g. `const response = await fetchJson()` then
+    // `this.paymentMethods = response.billing_payment_methods || []`).
 
     poll(() => {
       if (this.hasContentTarget) {
@@ -126,30 +128,12 @@ export default class Companies_TopUps_NewController extends Companies_LayoutCont
 
   async handleSubmit(event) {
     event.preventDefault()
-    const cid = currentCompany()?.id
     const rawAmount = parseInt(document.getElementById("top-up-amount")?.value) || 0
-    const currency = currentCompany()?.currency || "usd"
-    const amountCents = currency === "usd" ? rawAmount * 100 : rawAmount
-    if (!cid || !this.selectedMethodId || amountCents <= 0) return
+    if (!this.selectedMethodId || rawAmount <= 0) return
 
-    try {
-      const selectedMethod = this.paymentMethods.find(m => m.id === this.selectedMethodId)
-      const isRedirect = selectedMethod?.payment_mode === "redirect"
-      const url = isRedirect ? Helpers.mock_redirect_gateway_company_top_ups_path(cid) : Helpers.mock_qr_gateway_company_top_ups_path(cid)
-
-      const response = await fetchJson(url, {
-        method: "POST",
-        body: { amount_cents: amountCents }
-      })
-
-      if (isRedirect) {
-        window.location.href = response.redirect_url
-      } else {
-        this.renderQRWait(response, amountCents, cid)
-      }
-    } catch (error) {
-      toast({ type: "error", message: error.errors?.join(", ") || translate("Top-up failed") })
-    }
+    // TODO: Token implementation — submit the top-up to the token payment
+    // flow (e.g. POST to the gateway with amount_cents, then either redirect
+    // to a hosted checkout or render the QR wait screen via renderQRWait()).
   }
 
   renderQRWait(response, amountCents, companyId) {
