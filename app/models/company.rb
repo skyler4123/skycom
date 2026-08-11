@@ -26,17 +26,8 @@ class Company < ApplicationRecord
   include Company::HospitalConcern
   include Company::RestaurantConcern
   include Company::PermissionConcern
-  include Company::BillingConcern
-  include Company::CircuitBreakerConcern
 
   belongs_to :user
-
-  has_many :billing_contracts, dependent: :destroy
-  has_many :billing_invoices, dependent: :destroy
-  has_many :daily_metric_logs, dependent: :destroy
-  has_many :daily_feature_logs, dependent: :destroy
-  has_many :billing_transactions, dependent: :destroy
-  has_one :billing_wallet, dependent: :destroy
 
   has_many :property_mappings, dependent: :destroy
   has_many :table_configs, dependent: :destroy
@@ -92,7 +83,6 @@ class Company < ApplicationRecord
   }, prefix: true
   enum :lifecycle_status, {
     active: 0,
-    suspended: 3,
     disabled: 30
   }, prefix: true, default: :active
   enum :workflow_status, WORKFLOW_STATUS, prefix: true
@@ -133,7 +123,6 @@ class Company < ApplicationRecord
   # Validation for operational fields
   # validates :fiscal_year_end_month, presence: true, numericality: { in: 1..12 }
 
-  after_create :ensure_billing_wallet
   after_create :initialize_company
 
   def resource_names
@@ -203,8 +192,6 @@ class Company < ApplicationRecord
       business_type: :owner
     )
 
-    Seed::BillingContractService.create(company: self)
-
     user.update!(system_role: :company_owner)
 
     unless self.class.skip_init
@@ -236,11 +223,6 @@ class Company < ApplicationRecord
         end
       end
     end
-  end
-
-  def ensure_billing_wallet
-    return if billing_wallet.present?
-    create_billing_wallet!(currency: currency_before_type_cast)
   end
 
   private

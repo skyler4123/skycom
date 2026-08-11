@@ -75,5 +75,3 @@ window.currentRoles = Helpers.currentRoles
 window.currentCategories = Helpers.currentCategories
 window.currentPropertyMappings = Helpers.currentPropertyMappings
 window.currentTableConfigs = Helpers.currentTableConfigs
-window.currentBillingContractSummary = Helpers.currentBillingContractSummary
-window.featureEnabled = Helpers.featureEnabled

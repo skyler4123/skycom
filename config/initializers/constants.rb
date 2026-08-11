@@ -27,7 +27,6 @@ LIFECYCLE_STATUS = {
   active: 0,
   inactive: 1,
   archived: 2,
-  suspended: 3,
   deleted: 4
 }
 
@@ -64,16 +63,8 @@ GATEWAY_STRATEGIES = begin
   end
 end.freeze
 
-GATEWAY_STRATEGY_CLASSES = {
-  cash: "Payments::Cash",
-  wallet_auto_debit: "Payments::WalletAutoDebit",
-  mock_qr_gateway: "Payments::MockQrGateway",
-  mock_redirect_gateway: "Payments::MockRedirectGateway",
-  stripe_gateway: "Payments::StripeGateway",
-  viet_qr_gateway: "Payments::VietQrGateway"
-}.freeze
-
 # --- Webhooks ---
+# Payment API callback secrets for the mock bank gateways (future Token implementation).
 WEBHOOK_BANK_PAYMENT_SECRET = ENV.fetch("WEBHOOK_BANK_PAYMENT_SECRET", "local_secure_dev_secret").freeze
 WEBHOOK_REDIRECT_PAYMENT_SECRET = ENV.fetch("WEBHOOK_REDIRECT_PAYMENT_SECRET", "local_secure_dev_secret").freeze
 
@@ -130,20 +121,8 @@ OWNER_BUSINESS_TYPE = "owner".freeze
 MAX_PHONE_NUMBER_LENGTH = 20
 
 # =============================================================================
-# Free Tier Defaults
-# =============================================================================
-
-# Feature keys auto-enabled on every new free-tier contract.
-# (Default allowances/unit prices live in Seed::BillingContractService.)
-CORE_FREE_FEATURES = %w[pos_basic inventory_basic crm_basic finance_basic].freeze
-
-# =============================================================================
 # Job Processing Defaults
 # =============================================================================
-
-# Number of records per batch when iterating companies in billing jobs.
-# Used by SyncSuspensionJob, SyncDailyFeatureJob, MonthlyBillingJob.
-COMPANY_PROCESSING_BATCH_SIZE = 50
 
 # =============================================================================
 # Seed Defaults

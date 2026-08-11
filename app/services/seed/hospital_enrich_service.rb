@@ -52,7 +52,6 @@ class Seed::HospitalEnrichService
     create_shifts
     create_attendance_policies
     create_attendance_event_data
-    create_billing_data
 
     print_footer
     true
@@ -234,11 +233,6 @@ class Seed::HospitalEnrichService
         quantity: 1, unit_price: rand(50.0..500.0).round(2), total_price: 0
       )
     end
-  end
-
-  def create_billing_data
-    puts "Generating billing data..."
-    Seed::BillingDataService.create(company: @company)
   end
 
   def create_shifts

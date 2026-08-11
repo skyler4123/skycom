@@ -15,8 +15,6 @@ class BillingPaymentMethod < ApplicationRecord
   enum :timezone, TIMEZONES, prefix: true, default: :utc
   enum :currency, CURRENCIE_CODES, prefix: true, default: :usd
 
-  has_many :billing_transactions, dependent: :nullify
-
   # --- Lifecycle Enum with Real-Life Map ---
   enum :lifecycle_status, LIFECYCLE_STATUSES, prefix: true, default: :draft
   enum :workflow_status, WORKFLOW_STATUS, prefix: true

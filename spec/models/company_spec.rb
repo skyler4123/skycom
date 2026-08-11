@@ -74,29 +74,15 @@ RSpec.describe Company, type: :model do
   end
 
   describe "lifecycle_status" do
-    it "defines company-specific billing values" do
+    it "defines company-specific lifecycle values" do
       expect(Company.lifecycle_statuses).to eq({
         "active" => 0,
-        "suspended" => 3,
         "disabled" => 30
       })
     end
 
     it "defaults to active" do
       expect(Company.new.lifecycle_status).to eq("active")
-    end
-
-    it "provides predicate methods" do
-      company = Company.new(lifecycle_status: :suspended)
-      expect(company).to be_lifecycle_status_suspended
-      expect(company).not_to be_lifecycle_status_active
-    end
-  end
-
-  describe "hide_billing_alerts" do
-    it "defaults to false on billing_wallet" do
-      company = create(:company)
-      expect(company.billing_wallet.hide_billing_alerts).to be false
     end
   end
 

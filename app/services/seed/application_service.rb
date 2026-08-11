@@ -33,7 +33,6 @@ class Seed::ApplicationService
     end
     Seed::PaymentMethodService.create # Ensure global payment methods are seeded first
     Seed::BillingPaymentMethodService.create # Seed B2B billing payment methods
-    Billing::SeedResourcesService.call # Seed global billing resource catalog (19 records)
     # User
     super_admin_1 = User.find_by(email: "super_admin_1@system.com") || Seed::UserService.create(email: "super_admin_1@system.com", system_role: :super_admin)
     super_admin_2 = User.find_by(email: "super_admin_2@system.com") || Seed::UserService.create(email: "super_admin_2@system.com", system_role: :super_admin)

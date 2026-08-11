@@ -3,14 +3,12 @@ require "rails_helper"
 RSpec.feature "Analytics Dashboard", type: :feature, js: true do
   let(:company) { create(:company) }
   let(:owner) { company.user }
-  let(:contract) { company.active_billing_contract }
   let(:branch) { create(:branch, company: company) }
 
-  def seed_client_cache(billing_contract_data = nil)
+  def seed_client_cache
     page.execute_script("localStorage.clear()")
 
     company_data = JSON.parse(company.to_json).merge(
-      "billing_contract_summary" => billing_contract_data,
       "property_mappings" => [],
       "table_configs" => [],
       "categories" => [],
@@ -31,29 +29,14 @@ RSpec.feature "Analytics Dashboard", type: :feature, js: true do
     page.execute_script("document.cookie = 'client_cache_version=forced; path=/'")
   end
 
-  def with_analytics
-    { "contract_type" => "basic", "enabled_features" => %w[pos_basic inventory_basic crm_basic finance_basic analytics_dashboard] }
-  end
-
-  def without_analytics
-    { "contract_type" => "basic", "enabled_features" => %w[pos_basic inventory_basic crm_basic finance_basic] }
-  end
-
   before do
     sign_in(owner)
   end
 
   describe "sidebar link" do
-    scenario "is visible even when analytics_dashboard feature is not enabled" do
-      seed_client_cache(without_analytics)
-      visit company_billing_path(company)
-
-      expect(page).to have_link("Analytics", href: /analytics/, visible: :all, wait: 10)
-    end
-
-    scenario "is visible when analytics_dashboard feature is enabled" do
-      seed_client_cache(with_analytics)
-      visit company_billing_path(company)
+    scenario "is visible" do
+      seed_client_cache
+      visit company_dashboards_path(company)
 
       expect(page).to have_link("Analytics", href: /analytics/, visible: :all, wait: 10)
     end
@@ -61,7 +44,7 @@ RSpec.feature "Analytics Dashboard", type: :feature, js: true do
 
   describe "page load" do
     scenario "loads the analytics page with summary cards" do
-      seed_client_cache(with_analytics)
+      seed_client_cache
       visit company_analytics_path(company)
 
       expect(page).to have_content("Analytics", wait: 10)
@@ -70,7 +53,7 @@ RSpec.feature "Analytics Dashboard", type: :feature, js: true do
     end
 
     scenario "shows period selector" do
-      seed_client_cache(with_analytics)
+      seed_client_cache
       visit company_analytics_path(company)
 
       expect(page).to have_selector("select", wait: 10)

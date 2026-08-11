@@ -1,8 +1,6 @@
 # app/controllers/companies/branches_controller.rb
 
 class Companies::BranchesController < Companies::ApplicationController
-  feature_key :multi_branch, only: [ :new, :create ]
-
   def index
     respond_to do |format|
       format.html { render html: "", layout: true }

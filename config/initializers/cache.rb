@@ -6,7 +6,7 @@ module Rails
     SYNC_CACHE_CHANNEL = "sync_cache:invalidation".freeze
 
     # Per-server Solid Cache (SQLite). Fast local reads, no network cost.
-    # Used directly by AnalyticsController, BillingController, and PermissionConcern
+    # Used directly by AnalyticsController and PermissionConcern
     # for cached data that doesn't need cross-instance synchronization.
     def local_cache
       @local_cache ||= ActiveSupport::Cache.lookup_store(:solid_cache_store)
