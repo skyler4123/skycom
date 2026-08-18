@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_07_02_190003) do
+ActiveRecord::Schema[8.0].define(version: 2026_08_18_000101) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pgcrypto"
@@ -882,6 +882,27 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_02_190003) do
     t.index ["lifecycle_status"], name: "index_companies_on_lifecycle_status"
     t.index ["user_id"], name: "index_companies_on_user_id"
     t.index ["workflow_status"], name: "index_companies_on_workflow_status"
+  end
+
+  create_table "company_wallets", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
+    t.uuid "company_id", null: false
+    t.string "walletable_type", null: false
+    t.uuid "walletable_id", null: false
+    t.bigint "credit_balance", default: 0, null: false
+    t.integer "lock_version", default: 0, null: false
+    t.datetime "usage_logging_until"
+    t.integer "lifecycle_status"
+    t.integer "workflow_status"
+    t.integer "business_type"
+    t.datetime "expiration_date"
+    t.jsonb "metadata", default: {}, null: false
+    t.datetime "discarded_at"
+    t.string "permission_resource_name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["company_id"], name: "index_company_wallets_on_company_id", unique: true
+    t.index ["discarded_at"], name: "index_company_wallets_on_discarded_at"
+    t.index ["walletable_type", "walletable_id"], name: "index_company_wallets_on_walletable_type_and_walletable_id"
   end
 
   create_table "customer_appointments", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
@@ -5647,6 +5668,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_02_190003) do
   add_foreign_key "carts", "property_mappings"
   add_foreign_key "categories", "companies"
   add_foreign_key "companies", "users"
+  add_foreign_key "company_wallets", "companies"
   add_foreign_key "customer_appointments", "companies"
   add_foreign_key "customer_appointments", "customers"
   add_foreign_key "customer_group_appointments", "companies"

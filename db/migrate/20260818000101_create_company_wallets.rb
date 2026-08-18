@@ -3,7 +3,7 @@
 class CreateCompanyWallets < ActiveRecord::Migration[8.0]
   def change
     create_table :company_wallets, id: :uuid, default: -> { "uuidv7()" } do |t|
-      t.references :company, null: false, foreign_key: true, type: :uuid
+      t.references :company, null: false, foreign_key: true, type: :uuid, index: { unique: true }
       t.string :walletable_type, null: false
       t.uuid :walletable_id, null: false
       t.bigint :credit_balance, null: false, default: 0
@@ -21,7 +21,6 @@ class CreateCompanyWallets < ActiveRecord::Migration[8.0]
       t.timestamps
     end
 
-    add_index :company_wallets, :company_id, unique: true
     add_index :company_wallets, [ :walletable_type, :walletable_id ]
   end
 end
