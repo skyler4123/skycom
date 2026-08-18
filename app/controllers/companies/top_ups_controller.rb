@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
 # Top-up page — displays the country-based top-up options (from CREDIT_RATES)
-# and the company's payment options (b2b BillingPaymentMethod catalog).
-# Submission/payment flow is still future work.
+# and the company's payment options (b2b BillingPaymentMethod catalog), and
+# initiates the selected gateway flow (Mock QR / Mock Redirect).
 class Companies::TopUpsController < Companies::ApplicationController
   def new
     respond_to do |format|
@@ -22,12 +22,31 @@ class Companies::TopUpsController < Companies::ApplicationController
   end
 
   def mock_qr_gateway
-    # TODO: Token implementation — generate a QR payment for a token top-up.
-    render json: { status: "ok" }
+    bpm = BillingPaymentMethod.find_by!(strategy: :mock_qr_gateway)
+    result = TopUps::CreateService.new(
+      company: current_company,
+      money_amount_cents: params[:money_amount_cents],
+      billing_payment_method: bpm
+    ).call
+    render json: { qr_string: result.qr_string }
+  rescue TopUps::Error => e
+    render json: { errors: [ e.message ] }, status: :unprocessable_content
+  rescue ActiveRecord::RecordInvalid => e
+    render json: { errors: e.record.errors.full_messages }, status: :unprocessable_content
   end
 
   def mock_redirect_gateway
-    # TODO: Token implementation — create a hosted redirect session for a token top-up.
-    render json: { status: "ok" }
+    bpm = BillingPaymentMethod.find_by!(strategy: :mock_redirect_gateway)
+    result = TopUps::CreateService.new(
+      company: current_company,
+      money_amount_cents: params[:money_amount_cents],
+      billing_payment_method: bpm,
+      redirect_url: company_billing_url(current_company)
+    ).call
+    render json: { redirect_url: result.redirect_url }
+  rescue TopUps::Error => e
+    render json: { errors: [ e.message ] }, status: :unprocessable_content
+  rescue ActiveRecord::RecordInvalid => e
+    render json: { errors: e.record.errors.full_messages }, status: :unprocessable_content
   end
 end

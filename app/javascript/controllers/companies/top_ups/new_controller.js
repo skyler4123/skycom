@@ -154,7 +154,7 @@ export default class Companies_TopUps_NewController extends Companies_LayoutCont
             ${translate("Back to Billing")}
           </a>
 
-          <div class="space-y-8">
+          <div class="space-y-8" id="top-up-form">
             <div class="space-y-3">
               <h2 class="text-xl font-bold text-slate-900 dark:text-white">${translate("Top Up")}</h2>
               <div class="space-y-2">
@@ -183,6 +183,91 @@ export default class Companies_TopUps_NewController extends Companies_LayoutCont
 
   async handleSubmit(event) {
     event.preventDefault()
-    toast({ type: "warning", message: translate("Top-up flow is not implemented yet") })
+
+    const cid = currentCompany()?.id
+    if (!cid) return
+
+    const rawAmount = parseInt(this.selectedTier || "0", 10)
+    if (!this.selectedTier || rawAmount <= 0) {
+      toast({ type: "warning", message: translate("Please select a top-up option") })
+      return
+    }
+
+    const method = this.paymentMethods.find(m => m.id === this.selectedMethodId)
+    if (!method) {
+      toast({ type: "warning", message: translate("Please select a payment method") })
+      return
+    }
+
+    try {
+      const payload = { money_amount_cents: rawAmount }
+
+      if (method.strategy === "mock_qr_gateway") {
+        const response = await fetchJson(Helpers.mock_qr_gateway_company_top_ups_path(cid), {
+          method: "POST",
+          body: payload
+        })
+        this.renderQRWait(response, rawAmount, cid)
+      } else if (method.strategy === "mock_redirect_gateway") {
+        const response = await fetchJson(Helpers.mock_redirect_gateway_company_top_ups_path(cid), {
+          method: "POST",
+          body: payload
+        })
+        window.location.href = response.redirect_url
+      } else {
+        toast({ type: "warning", message: translate("This payment method is not available yet") })
+      }
+    } catch (error) {
+      toast({ type: "error", message: error.errors?.join(", ") || translate("Top-up failed") })
+    }
+  }
+
+  renderQRWait(response, amountCents, companyId) {
+    const { qr_string } = response
+    const formEl = document.getElementById("top-up-form")
+    if (!formEl) return
+
+    formEl.innerHTML = `
+      <div class="space-y-6 text-center">
+        <h2 class="text-xl font-bold text-slate-900 dark:text-white">${translate("Scan to Pay")}</h2>
+        <p class="text-sm text-slate-500">${translate("Scan the QR code with your banking app to complete the top-up.")}</p>
+        <p class="text-lg font-black text-slate-900 dark:text-white">${this.formatCents(amountCents)}</p>
+        <div class="flex justify-center">
+          <div class="w-64 h-64 bg-white rounded-xl p-4 border border-slate-200 dark:border-slate-700 flex items-center justify-center" id="qr-container"></div>
+        </div>
+        <div class="flex items-center justify-center gap-2 text-sm text-amber-600">
+          <span class="material-symbols-outlined text-[18px] animate-pulse">hourglass_top</span>
+          ${translate("Waiting for payment confirmation...")}
+        </div>
+        <button type="button" data-action="click->${this.identifier}#cancelWait"
+          class="px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg cursor-pointer">
+          ${translate("Cancel")}
+        </button>
+      </div>
+    `
+
+    setTimeout(() => {
+      const qrContainer = document.getElementById("qr-container")
+      if (qrContainer && window.renderQrCode) {
+        window.renderQrCode(qrContainer, qr_string)
+      }
+    }, 50)
+
+    const ws = window.WEBSOCKET
+    if (ws?.companyChannel && ws?.subscribe) {
+      const channel = ws.companyChannel(currentCompany()?.id)
+      ws.subscribe(channel, "top_up_completed", () => {
+        toast({ type: "success", message: translate("Top-up successful! Redirecting...") })
+        setTimeout(() => {
+          window.location.href = Helpers.company_billing_path(companyId)
+        }, 500)
+      })
+    }
+  }
+
+  cancelWait() {
+    this.selectedTier = null
+    this.selectedMethodId = null
+    this.renderContent()
   }
 }

@@ -1,11 +1,9 @@
 # frozen_string_literal: true
 
-# PLACEHOLDER CONTROLLER — future Token implementation.
-#
-# This is the payment API webhook that the bank gateway calls when a hosted
-# redirect checkout completes. The API contract is preserved (signature
-# check, param validation, idempotency, response shapes) but the money
-# movement logic is a placeholder for the future Token system.
+# Payment API webhook called by the Mock API server when a hosted-redirect
+# payment completes. Completing the CompanyTransaction fires the credit chain
+# (invoice paid → order completed → wallet credited) — this controller never
+# touches balances directly.
 module Webhooks
   module Payments
     class MockRedirectGatewayController < ActionController::Base
@@ -26,12 +24,30 @@ module Webhooks
           return render json: { errors: [ "Missing authorized_token or settlement_amount" ] }, status: :unprocessable_content
         end
 
-        # TODO: Token implementation — on confirmed redirect payment:
-        #   1. Look up the pending top-up by gateway_reference (authorized_token)
-        #   2. Credit the company's token balance (settlement_amount → token conversion)
-        #   3. Publish the top_up_completed websocket event to the company channel
-        # Previously this credited billing_wallet.main_balance_cents; that model
-        # was removed with the billing system.
+        txn = CompanyTransaction.find_by(gateway_reference: authorized_token)
+        unless txn
+          return render json: { errors: [ "Transaction not found" ] }, status: :not_found
+        end
+
+        if txn.completed?
+          return render json: { status: "already_completed" }, status: :ok
+        end
+
+        unless settlement_amount == txn.money_amount_cents
+          return render json: { errors: [ "Amount mismatch" ] }, status: :unprocessable_content
+        end
+
+        txn.update!(status: :completed)
+
+        WEBSOCKET.publish_event(
+          channel: WEBSOCKET.company_channel(txn.company_id),
+          event_key: :top_up_completed,
+          data: {
+            amount_cents: settlement_amount,
+            transaction_id: txn.id
+          }
+        )
+
         render json: { status: "completed" }
       end
 
