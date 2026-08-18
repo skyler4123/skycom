@@ -1,10 +1,11 @@
 # frozen_string_literal: true
 
-# Drains the Kredis credit-usage delta counters into the persisted usage tables.
-# Counters are DELTAS since the last run: each counter's value is added to the
-# DB (CompanyDailyUsage h<HH>, CompanyMonthlyUsage d<DD>) and then reset to 0,
-# so the DB holds the cumulative total and a crash mid-run only loses the
-# unsynced delta (re-synced on the next run).
+# Drains the Kredis credit-usage delta counter into the persisted usage tables.
+# The counter only counts and resets — it is agnostic to this job's period:
+# whatever accumulated since the last run is added to the DB (CompanyDailyUsage
+# h<drain hour>, CompanyMonthlyUsage d<drain day>) and then the counter is reset
+# to 0. The DB holds the cumulative total; a coarser schedule only coarsens
+# hour-slot attribution, never loses or double-counts data.
 class CompanyUsageSyncJob < ApplicationJob
   queue_as :default
 
@@ -19,25 +20,19 @@ class CompanyUsageSyncJob < ApplicationJob
   private
 
   def sync_company(company)
+    counter = company.credit_usage
+    delta = counter.value.to_i
+    return if delta.zero?
+
     now = Time.current
     date = now.to_date
 
     daily_usage = CompanyDailyUsage.find_or_create_for(company, date)
-    (0..23).each do |hour|
-      counter = company.public_send("credit_usage_hour_#{hour}")
-      delta = counter.value.to_i
-      next if delta.zero?
-
-      daily_usage.add_hour_usage(hour, delta)
-      counter.decrement(by: delta)
-    end
+    daily_usage.add_hour_usage(now.hour, delta)
 
     monthly_usage = CompanyMonthlyUsage.find_or_create_for(company, date.beginning_of_month)
-    daily_counter = company.credit_usage_daily
-    daily_delta = daily_counter.value.to_i
-    return if daily_delta.zero?
+    monthly_usage.add_day_usage(date.day, delta)
 
-    monthly_usage.add_day_usage(date.day, daily_delta)
-    daily_counter.decrement(by: daily_delta)
+    counter.decrement(by: delta)
   end
 end

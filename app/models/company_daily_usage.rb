@@ -2,8 +2,10 @@
 
 # CompanyDailyUsage — Atomic purpose: persist hourly credit usage (metadata
 # keys h0..h23) for one company/day. Values are credits consumed per hour.
-# Written by CompanyUsageSyncJob draining Kredis counters; read through the
+# Written by CompanyUsageSyncJob draining the Kredis counter; read through the
 # hour_usage/add_hour_usage helpers — never access metadata directly.
+# total_credits is a denormalized sum of the slots, maintained by the helpers
+# as a debug aid.
 class CompanyDailyUsage < ApplicationRecord
   HOURS = (0..23).freeze
 
@@ -29,22 +31,23 @@ class CompanyDailyUsage < ApplicationRecord
   def set_hour_usage(hour, value)
     validate_hour!(hour)
     public_send("h#{hour}=", value.to_i)
-    save!
+    recompute_total_credits!
   end
 
   def add_hour_usage(hour, delta)
     validate_hour!(hour)
     public_send("h#{hour}=", hour_usage(hour) + delta.to_i)
-    save!
-  end
-
-  def total_credits
-    HOURS.sum { |hour| public_send("h#{hour}").to_i }
+    recompute_total_credits!
   end
 
   private
 
   def validate_hour!(hour)
     raise ArgumentError, "hour must be within #{HOURS}" unless HOURS.cover?(hour.to_i)
+  end
+
+  def recompute_total_credits!
+    self.total_credits = HOURS.sum { |hour| public_send("h#{hour}").to_i }
+    save!
   end
 end

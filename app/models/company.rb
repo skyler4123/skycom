@@ -137,28 +137,22 @@ class Company < ApplicationRecord
     (metadata || {})["resource_names"] || DEFAULT_RESOURCE_NAMES
   end
 
-  # --- Credit usage counters (Kredis — hot path, no DB writes per action) ---
-  # Declared via the kredis_counter DSL with auto-generated keys
-  # ("companies:<id>:credit_usage_daily", "companies:<id>:credit_usage_hour_<H>").
-  # Counters hold UNSYNCED DELTAS since the last CompanyUsageSyncJob run; the
-  # job drains them (attributing to the current day/hour slot) and resets to 0.
-  kredis_counter :credit_usage_daily
-
-  (0..23).each do |hour|
-    kredis_counter :"credit_usage_hour_#{hour}"
-  end
+  # --- Credit usage counter (Kredis — hot path, no DB writes per action) ---
+  # A plain accumulator ("companies:<id>:credit_usage", auto-generated key).
+  # It only counts and resets — agnostic to the sync job's period; it never
+  # tracks when usage happened. The job drains the accumulated delta into the
+  # DB's hourly/daily slots and resets it to 0, so the counter always holds
+  # the UNSYNCED delta since the last run.
+  kredis_counter :credit_usage
 
   def record_credit_usage!(credits)
     return unless credits.is_a?(Integer) && credits.positive?
 
-    credit_usage_daily.increment(by: credits)
-    public_send("credit_usage_hour_#{Time.current.hour}").increment(by: credits)
+    credit_usage.increment(by: credits)
   end
 
-  def credit_usage_delta(hour: nil)
-    return credit_usage_daily.value.to_i if hour.nil?
-
-    public_send("credit_usage_hour_#{hour}").value.to_i
+  def credit_usage_delta
+    credit_usage.value.to_i
   end
 
   def as_json(options = {})

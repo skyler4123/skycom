@@ -38,6 +38,17 @@ RSpec.describe CompanyDailyUsage, type: :model do
       expect(usage.total_credits).to eq(25)
     end
 
+    it "starts with a zero total" do
+      expect(usage.total_credits).to eq(0)
+    end
+
+    it "recomputes the total when a slot is overwritten" do
+      usage.add_hour_usage(9, 10)
+      usage.add_hour_usage(14, 15)
+      usage.set_hour_usage(9, 100)
+      expect(usage.reload.total_credits).to eq(115)
+    end
+
     it "rejects out-of-range hours" do
       expect { usage.hour_usage(24) }.to raise_error(ArgumentError)
       expect { usage.set_hour_usage(-1, 5) }.to raise_error(ArgumentError)

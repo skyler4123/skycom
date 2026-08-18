@@ -145,19 +145,15 @@ RSpec.describe Company, type: :model do
     end
   end
 
-  describe "credit usage counters (Kredis)" do
-    include ActiveSupport::Testing::TimeHelpers
-
+  describe "credit usage counter (Kredis)" do
     let(:company) { create(:company) }
 
-    it "records usage into daily and hourly declared counters" do
-      travel_to(Time.zone.local(2026, 8, 18, 14, 30)) { company.record_credit_usage!(10) }
-      travel_to(Time.zone.local(2026, 8, 18, 14, 45)) { company.record_credit_usage!(5) }
+    it "records usage into the credit usage counter" do
+      company.record_credit_usage!(10)
+      company.record_credit_usage!(5)
 
-      expect(company.credit_usage_daily.value).to eq(15)
-      expect(company.credit_usage_hour_14.value).to eq(15)
+      expect(company.credit_usage.value).to eq(15)
       expect(company.credit_usage_delta).to eq(15)
-      expect(company.credit_usage_delta(hour: 14)).to eq(15)
     end
 
     it "returns zero deltas when nothing was recorded" do

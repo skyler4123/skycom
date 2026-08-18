@@ -50,27 +50,29 @@ Per-action credit consumption is too hot for DB writes:
 
 ```
 Service → company.record_credit_usage!(10)     Kredis INCR (unsynced delta)
-CompanyUsageSyncJob (periodic)                 drain counters → DB → reset to 0
+CompanyUsageSyncJob (periodic)                 drain counter → DB → reset to 0
 Reads: today = DB total + Redis delta; past = DB only
 ```
 
-- Counters are declared on `Company` with the **`kredis_counter` DSL** (never raw
-  `Kredis.counter`, no hardcoded keys — the DSL generates them from the model
-  and attribute name):
+- One counter per company, declared with the **`kredis_counter` DSL** (never raw
+  `Kredis.counter`, no hardcoded keys — the DSL generates
+  `companies:<id>:credit_usage`):
   ```ruby
-  kredis_counter :credit_usage_daily
-  (0..23).each do |hour|
-    kredis_counter :"credit_usage_hour_#{hour}"
-  end
+  kredis_counter :credit_usage
   ```
-  Keys: `companies:<id>:credit_usage_daily`, `companies:<id>:credit_usage_hour_<H>`.
-  They are company-lifetime deltas — the sync job drains them (attributing to
-  the current day/hour slot) and resets to 0, so `record_credit_usage!` never
-  touches the DB and the job must run regularly for accurate day attribution.
+- The counter is a **plain accumulator — it only counts and resets**. It is
+  agnostic to the sync job's period: whatever accumulated since the last run is
+  drained into the DB (CompanyDailyUsage h<drain hour>, CompanyMonthlyUsage
+  d<drain day>) and reset to 0. A coarser schedule (2h, 4h, …) only coarsens
+  hour-slot attribution — it never loses or double-counts data; the DB is
+  always cumulative (e.g. drain at 2H: counter 500 → DB 500; drain at 6H:
+  counter 400 → DB 900).
 - Recording/reading goes through the model helpers:
-  `company.record_credit_usage!(credits)` and `company.credit_usage_delta(hour: nil)`.
+  `company.record_credit_usage!(credits)` and `company.credit_usage_delta`.
 - `CompanyDailyUsage`/`CompanyMonthlyUsage` persist snapshots; their metadata is
-  accessed ONLY through `hour_usage`/`day_usage` helpers (store_accessor).
+  accessed ONLY through `hour_usage`/`day_usage` helpers (store_accessor), and
+  their `total_credits` column (a denormalized slot sum, maintained by the
+  helpers) is the debug aid for verifying drained totals.
 - Counters are DELTAS since the last sync — after draining, reset with
   `counter.decrement(by: delta)` (never `reset`/`del`, which could wipe a delta
   written by another process in between).

@@ -38,6 +38,17 @@ RSpec.describe CompanyMonthlyUsage, type: :model do
       expect(usage.total_credits).to eq(55)
     end
 
+    it "starts with a zero total" do
+      expect(usage.total_credits).to eq(0)
+    end
+
+    it "recomputes the total when a slot is overwritten" do
+      usage.add_day_usage(1, 25)
+      usage.add_day_usage(2, 30)
+      usage.set_day_usage(1, 100)
+      expect(usage.reload.total_credits).to eq(130)
+    end
+
     it "rejects out-of-range days" do
       expect { usage.day_usage(0) }.to raise_error(ArgumentError)
       expect { usage.set_day_usage(32, 5) }.to raise_error(ArgumentError)
