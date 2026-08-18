@@ -70,6 +70,14 @@ class Company < ApplicationRecord
   has_many :subscription_plans, dependent: :destroy
   has_many :departments, dependent: :destroy
   has_many :pages, dependent: :destroy
+  has_one :wallet, class_name: "CompanyWallet", dependent: :destroy
+  has_many :company_wallet_logs, dependent: :destroy
+  has_many :company_orders, dependent: :destroy
+  has_many :company_invoices, dependent: :destroy
+  has_many :company_transactions, dependent: :destroy
+  has_many :company_daily_usages, dependent: :destroy
+  has_many :company_monthly_usages, dependent: :destroy
+  has_many :company_usage_logs, dependent: :destroy
 
   # --- Enums ---
   enum :country, COUNTRY_CODES, prefix: true, default: :us
@@ -127,6 +135,32 @@ class Company < ApplicationRecord
 
   def resource_names
     (metadata || {})["resource_names"] || DEFAULT_RESOURCE_NAMES
+  end
+
+  # --- Credit usage counters (Kredis — hot path, no DB writes per action) ---
+  # Counters hold UNSYNCED DELTAS since the last CompanyUsageSyncJob run.
+  # Keys: c:<company_id>:credit_usage:<YYYYMMDD>[:<HH>]
+
+  def self.credit_usage_day_key(company_id, date)
+    "c:#{company_id}:credit_usage:#{date.strftime('%Y%m%d')}"
+  end
+
+  def self.credit_usage_hour_key(company_id, date, hour)
+    "#{credit_usage_day_key(company_id, date)}:#{hour}"
+  end
+
+  def record_credit_usage!(credits, at: Time.current)
+    return unless credits.is_a?(Integer) && credits.positive?
+
+    day = at.to_date
+    Kredis.counter(self.class.credit_usage_day_key(id, day)).increment(by: credits)
+    Kredis.counter(self.class.credit_usage_hour_key(id, day, at.hour)).increment(by: credits)
+  end
+
+  def credit_usage_delta(date: Time.current.to_date, hour: nil)
+    key = self.class.credit_usage_day_key(id, date)
+    key = self.class.credit_usage_hour_key(id, date, hour) if hour.present?
+    Kredis.counter(key).value.to_i
   end
 
   def as_json(options = {})
@@ -193,6 +227,8 @@ class Company < ApplicationRecord
     )
 
     user.update!(system_role: :company_owner)
+
+    create_wallet!(walletable: self, credit_balance: 0)
 
     unless self.class.skip_init
       if business_type_retail?
