@@ -77,5 +77,26 @@ RSpec.describe CompanyTransaction, type: :model do
       expect(company.company_wallet.reload.credit_balance).to eq(500_000)
       expect(CompanyWalletLog.count).to eq(1)
     end
+
+    it "fires the chain when a pending transaction becomes completed" do
+      txn = create(:company_transaction, company: company, company_invoice: invoice,
+        billing_payment_method: payment_method, money_amount_cents: 500, status: :pending)
+      expect(invoice.reload.payment_status).to eq("unpaid")
+
+      expect {
+        txn.update!(status: :completed)
+      }.to change { invoice.reload.payment_status }.from("unpaid").to("paid")
+        .and change { order.reload.workflow_status }.from("pending").to("completed")
+        .and change { company.company_wallet.reload.credit_balance }.by(500_000)
+    end
+
+    it "stores gateway payload in metadata via store_accessor" do
+      txn = create(:company_transaction, company: company, company_invoice: invoice,
+        billing_payment_method: payment_method, money_amount_cents: 500, status: :pending,
+        gateway_payload: { "qr_string" => "MOCKQR123" })
+
+      expect(txn.gateway_payload).to eq({ "qr_string" => "MOCKQR123" })
+      expect(txn.metadata["gateway_payload"]).to eq({ "qr_string" => "MOCKQR123" })
+    end
   end
 end

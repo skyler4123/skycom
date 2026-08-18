@@ -6,6 +6,8 @@
 # completed payment transactions. This is a rare money event — the only
 # callbacks in the credit system.
 class CompanyTransaction < ApplicationRecord
+  store_accessor :metadata, :gateway_payload
+
   attribute :permission_resource_name, :string, default: -> { self.name }
 
   belongs_to :company
@@ -22,6 +24,7 @@ class CompanyTransaction < ApplicationRecord
   validates :gateway_reference, uniqueness: true, allow_nil: true
 
   after_create :sync_invoice_payment_status, if: :completed?
+  after_update :sync_invoice_payment_status, if: :completed?
   after_destroy :sync_invoice_payment_status
 
   private
