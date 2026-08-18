@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_08_18_000107) do
+ActiveRecord::Schema[8.0].define(version: 2026_08_18_000108) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pgcrypto"
@@ -987,6 +987,32 @@ ActiveRecord::Schema[8.0].define(version: 2026_08_18_000107) do
     t.index ["company_invoice_id"], name: "index_company_transactions_on_company_invoice_id"
     t.index ["discarded_at"], name: "index_company_transactions_on_discarded_at"
     t.index ["gateway_reference"], name: "index_company_transactions_on_gateway_reference", unique: true
+  end
+
+  create_table "company_usage_logs", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
+    t.uuid "company_id", null: false
+    t.uuid "company_wallet_id", null: false
+    t.string "source_type"
+    t.uuid "source_id"
+    t.string "action_type", null: false
+    t.bigint "change_amount", null: false
+    t.bigint "balance_after", null: false
+    t.text "description"
+    t.integer "lifecycle_status"
+    t.integer "workflow_status"
+    t.integer "business_type"
+    t.datetime "expiration_date"
+    t.jsonb "metadata", default: {}, null: false
+    t.datetime "discarded_at"
+    t.string "permission_resource_name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["action_type"], name: "index_company_usage_logs_on_action_type"
+    t.index ["company_id"], name: "index_company_usage_logs_on_company_id"
+    t.index ["company_wallet_id", "created_at"], name: "index_company_usage_logs_on_company_wallet_id_and_created_at"
+    t.index ["company_wallet_id"], name: "index_company_usage_logs_on_company_wallet_id"
+    t.index ["discarded_at"], name: "index_company_usage_logs_on_discarded_at"
+    t.index ["source_type", "source_id"], name: "index_company_usage_logs_on_source_type_and_source_id"
   end
 
   create_table "company_wallet_logs", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
@@ -5808,6 +5834,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_08_18_000107) do
   add_foreign_key "company_transactions", "billing_payment_methods"
   add_foreign_key "company_transactions", "companies"
   add_foreign_key "company_transactions", "company_invoices"
+  add_foreign_key "company_usage_logs", "companies"
+  add_foreign_key "company_usage_logs", "company_wallets"
   add_foreign_key "company_wallet_logs", "companies"
   add_foreign_key "company_wallet_logs", "company_wallets"
   add_foreign_key "company_wallets", "companies"
