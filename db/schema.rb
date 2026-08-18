@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_08_18_000103) do
+ActiveRecord::Schema[8.0].define(version: 2026_08_18_000104) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pgcrypto"
@@ -882,6 +882,30 @@ ActiveRecord::Schema[8.0].define(version: 2026_08_18_000103) do
     t.index ["lifecycle_status"], name: "index_companies_on_lifecycle_status"
     t.index ["user_id"], name: "index_companies_on_user_id"
     t.index ["workflow_status"], name: "index_companies_on_workflow_status"
+  end
+
+  create_table "company_invoices", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
+    t.uuid "company_id", null: false
+    t.uuid "company_order_id"
+    t.string "invoice_number", null: false
+    t.bigint "money_amount_cents", null: false
+    t.bigint "credit_amount", null: false
+    t.integer "currency", null: false
+    t.integer "payment_status", default: 0, null: false
+    t.integer "lifecycle_status"
+    t.integer "workflow_status"
+    t.integer "business_type"
+    t.datetime "expiration_date"
+    t.jsonb "metadata", default: {}, null: false
+    t.datetime "discarded_at"
+    t.string "permission_resource_name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["company_id", "created_at"], name: "index_company_invoices_on_company_id_and_created_at"
+    t.index ["company_id"], name: "index_company_invoices_on_company_id"
+    t.index ["company_order_id"], name: "index_company_invoices_on_company_order_id", unique: true
+    t.index ["discarded_at"], name: "index_company_invoices_on_discarded_at"
+    t.index ["invoice_number"], name: "index_company_invoices_on_invoice_number", unique: true
   end
 
   create_table "company_orders", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
@@ -5715,6 +5739,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_08_18_000103) do
   add_foreign_key "carts", "property_mappings"
   add_foreign_key "categories", "companies"
   add_foreign_key "companies", "users"
+  add_foreign_key "company_invoices", "companies"
+  add_foreign_key "company_invoices", "company_orders"
   add_foreign_key "company_orders", "companies"
   add_foreign_key "company_orders", "users"
   add_foreign_key "company_wallet_logs", "companies"
