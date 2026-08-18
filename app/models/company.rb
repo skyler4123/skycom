@@ -138,16 +138,14 @@ class Company < ApplicationRecord
   end
 
   # --- Credit usage counters (Kredis — hot path, no DB writes per action) ---
-  # Counters hold UNSYNCED DELTAS since the last CompanyUsageSyncJob run.
-  # Declared via the kredis_counter DSL: keys resolve at first access using
-  # Time.current, so credit_usage_daily points at today and each hour counter
-  # at today:hour. Keys: c:<company_id>:credit_usage:<YYYYMMDD>[:<HH>]
-  kredis_counter :credit_usage_daily,
-    key: ->(company) { "c:#{company.id}:credit_usage:#{Time.current.strftime('%Y%m%d')}" }
+  # Declared via the kredis_counter DSL with auto-generated keys
+  # ("companies:<id>:credit_usage_daily", "companies:<id>:credit_usage_hour_<H>").
+  # Counters hold UNSYNCED DELTAS since the last CompanyUsageSyncJob run; the
+  # job drains them (attributing to the current day/hour slot) and resets to 0.
+  kredis_counter :credit_usage_daily
 
   (0..23).each do |hour|
-    kredis_counter :"credit_usage_hour_#{hour}",
-      key: ->(company) { "c:#{company.id}:credit_usage:#{Time.current.strftime('%Y%m%d')}:#{hour}" }
+    kredis_counter :"credit_usage_hour_#{hour}"
   end
 
   def record_credit_usage!(credits)

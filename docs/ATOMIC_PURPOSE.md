@@ -55,17 +55,18 @@ Reads: today = DB total + Redis delta; past = DB only
 ```
 
 - Counters are declared on `Company` with the **`kredis_counter` DSL** (never raw
-  `Kredis.counter`):
+  `Kredis.counter`, no hardcoded keys — the DSL generates them from the model
+  and attribute name):
   ```ruby
-  kredis_counter :credit_usage_daily, key: ->(company) { "c:#{company.id}:credit_usage:#{Time.current.strftime('%Y%m%d')}" }
+  kredis_counter :credit_usage_daily
   (0..23).each do |hour|
-    kredis_counter :"credit_usage_hour_#{hour}",
-      key: ->(company) { "c:#{company.id}:credit_usage:#{Time.current.strftime('%Y%m%d')}:#{hour}" }
+    kredis_counter :"credit_usage_hour_#{hour}"
   end
   ```
-- Keys resolve at first access via `Time.current` and the proxy is memoized per
-  instance — always use short-lived instances (a fresh request or a `find_each`
-  row), never a long-lived record held across hour/date boundaries.
+  Keys: `companies:<id>:credit_usage_daily`, `companies:<id>:credit_usage_hour_<H>`.
+  They are company-lifetime deltas — the sync job drains them (attributing to
+  the current day/hour slot) and resets to 0, so `record_credit_usage!` never
+  touches the DB and the job must run regularly for accurate day attribution.
 - Recording/reading goes through the model helpers:
   `company.record_credit_usage!(credits)` and `company.credit_usage_delta(hour: nil)`.
 - `CompanyDailyUsage`/`CompanyMonthlyUsage` persist snapshots; their metadata is
