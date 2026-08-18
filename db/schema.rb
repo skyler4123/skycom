@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_08_18_000106) do
+ActiveRecord::Schema[8.0].define(version: 2026_08_18_000107) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pgcrypto"
@@ -923,6 +923,23 @@ ActiveRecord::Schema[8.0].define(version: 2026_08_18_000106) do
     t.index ["company_order_id"], name: "index_company_invoices_on_company_order_id", unique: true
     t.index ["discarded_at"], name: "index_company_invoices_on_discarded_at"
     t.index ["invoice_number"], name: "index_company_invoices_on_invoice_number", unique: true
+  end
+
+  create_table "company_monthly_usages", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
+    t.uuid "company_id", null: false
+    t.date "usage_month", null: false
+    t.integer "lifecycle_status"
+    t.integer "workflow_status"
+    t.integer "business_type"
+    t.datetime "expiration_date"
+    t.jsonb "metadata", default: {}, null: false
+    t.datetime "discarded_at"
+    t.string "permission_resource_name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["company_id", "usage_month"], name: "index_company_monthly_usages_on_company_id_and_usage_month", unique: true
+    t.index ["company_id"], name: "index_company_monthly_usages_on_company_id"
+    t.index ["discarded_at"], name: "index_company_monthly_usages_on_discarded_at"
   end
 
   create_table "company_orders", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
@@ -5785,6 +5802,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_08_18_000106) do
   add_foreign_key "company_daily_usages", "companies"
   add_foreign_key "company_invoices", "companies"
   add_foreign_key "company_invoices", "company_orders"
+  add_foreign_key "company_monthly_usages", "companies"
   add_foreign_key "company_orders", "companies"
   add_foreign_key "company_orders", "users"
   add_foreign_key "company_transactions", "billing_payment_methods"
