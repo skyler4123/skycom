@@ -26,6 +26,8 @@ class Companies::DashboardsController < Companies::ApplicationController
   private
 
   def deduct_dashboard_credits
+    return nil unless request.format.json?
+
     wallet = current_company.company_wallet
     return nil unless wallet
 

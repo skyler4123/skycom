@@ -58,6 +58,9 @@ export default class Companies_LayoutController extends Controller {
 
     return [
       link(null, Helpers.company_dashboards_path(cid), 'dashboard', translate('Dashboard')),
+      link(null, Helpers.company_usage_path(cid), 'monitoring', translate('Usage')),
+      link(null, Helpers.new_company_top_up_path(cid), 'account_balance_wallet', translate('Top Up')),
+      link(null, Helpers.company_billing_path(cid), 'receipt_long', translate('Billing')),
       link('multi_branch', Helpers.company_branches_path(cid), 'apartment', translate('Branches')),
       link(null, Helpers.company_departments_path(cid), 'family_group', translate('Departments')),
       link(null, Helpers.company_categories_path(cid), 'category', translate('Categories')),

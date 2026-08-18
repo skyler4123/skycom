@@ -6,6 +6,7 @@ export default class Companies_Dashboards_IndexController extends Companies_Layo
 
   /** @type {object | null} */ company = null
   /** @type {object | null} */ counts = null
+  /** @type {string | null} */ creditWarning = null
 
   async connect() {
     super.connect()
@@ -25,6 +26,7 @@ export default class Companies_Dashboards_IndexController extends Companies_Layo
       const response = await fetchJson(`/companies/${companyId}/dashboards.json`)
       this.company = response.company
       this.counts = response.counts
+      this.creditWarning = response.credit_warning || null
     } catch (error) {
       const __errDetail = error.errors?.join(", ") || error.message
       toast({ type: "error", message: `${ translate("Failed to load dashboard data") }${__errDetail ? ": " + __errDetail : ""}` })
@@ -157,6 +159,12 @@ export default class Companies_Dashboards_IndexController extends Companies_Layo
 
     return `
       <div class="p-4 overflow-y-auto space-y-6">
+        ${this.creditWarning ? `
+        <div class="bg-amber-50 dark:bg-amber-900/30 border border-amber-200 dark:border-amber-700 rounded-xl p-4 flex items-center gap-3">
+          <span class="material-symbols-outlined text-amber-600 dark:text-amber-400">warning</span>
+          <p class="text-sm font-medium text-amber-800 dark:text-amber-200">${this.creditWarning}</p>
+        </div>
+        ` : ""}
         <!-- Company Profile Card -->
         <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm">
           <div class="p-6">

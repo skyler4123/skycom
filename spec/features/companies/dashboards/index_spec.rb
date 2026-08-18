@@ -100,4 +100,26 @@ RSpec.feature "Companies::Dashboards", type: :feature, js: true do
     chart_container = find('[data-chart="products"]', wait: 10)
     expect(chart_container).to have_selector("svg", wait: 10)
   end
+
+  scenario "deducts 2 credits per visit and records usage" do
+    company.company_wallet.add_credits!(amount: 100)
+
+    visit company_dashboards_path(company)
+
+    expect(page).to have_content(company.name, wait: 10)
+    expect(company.company_wallet.reload.credit_balance).to eq(98)
+    expect(CompanyWalletLog.last.change_type).to eq("debit")
+    expect(company.credit_usage_delta).to eq(2)
+  end
+
+  scenario "warns and still renders when the balance is insufficient" do
+    company.company_wallet.add_credits!(amount: 1)
+
+    visit company_dashboards_path(company)
+
+    expect(page).to have_content(company.name, wait: 10)
+    expect(page).to have_content("Insufficient credits", wait: 10)
+    expect(company.company_wallet.reload.credit_balance).to eq(1)
+    expect(CompanyWalletLog.count).to eq(1)
+  end
 end
