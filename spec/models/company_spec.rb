@@ -135,4 +135,36 @@ RSpec.describe Company, type: :model do
       expect(company.payment_method_appointments.where(payment_method: vn_pm)).to be_empty
     end
   end
+
+  describe "credit wallet" do
+    it "auto-creates a company wallet on create" do
+      company = create(:company)
+      expect(company.wallet).to be_present
+      expect(company.wallet.credit_balance).to eq(0)
+      expect(company.wallet.walletable).to eq(company)
+    end
+  end
+
+  describe "credit usage counter (Kredis)" do
+    let(:company) { create(:company) }
+
+    it "records usage into the credit usage counter" do
+      company.record_credit_usage!(10)
+      company.record_credit_usage!(5)
+
+      expect(company.credit_usage.value).to eq(15)
+      expect(company.credit_usage_delta).to eq(15)
+    end
+
+    it "returns zero deltas when nothing was recorded" do
+      expect(company.credit_usage_delta).to eq(0)
+    end
+
+    it "ignores non-positive or non-integer credits" do
+      company.record_credit_usage!(0)
+      company.record_credit_usage!(-5)
+      company.record_credit_usage!("10")
+      expect(company.credit_usage_delta).to eq(0)
+    end
+  end
 end

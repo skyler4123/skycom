@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_07_02_190003) do
+ActiveRecord::Schema[8.0].define(version: 2026_08_18_000202) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pgcrypto"
@@ -882,6 +882,186 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_02_190003) do
     t.index ["lifecycle_status"], name: "index_companies_on_lifecycle_status"
     t.index ["user_id"], name: "index_companies_on_user_id"
     t.index ["workflow_status"], name: "index_companies_on_workflow_status"
+  end
+
+  create_table "company_daily_usages", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
+    t.uuid "company_id", null: false
+    t.date "usage_date", null: false
+    t.integer "lifecycle_status"
+    t.integer "workflow_status"
+    t.integer "business_type"
+    t.datetime "expiration_date"
+    t.jsonb "metadata", default: {}, null: false
+    t.datetime "discarded_at"
+    t.string "permission_resource_name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "total_credits", default: 0, null: false
+    t.index ["company_id", "usage_date"], name: "index_company_daily_usages_on_company_id_and_usage_date", unique: true
+    t.index ["company_id"], name: "index_company_daily_usages_on_company_id"
+    t.index ["discarded_at"], name: "index_company_daily_usages_on_discarded_at"
+  end
+
+  create_table "company_invoices", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
+    t.uuid "company_id", null: false
+    t.uuid "company_order_id"
+    t.string "invoice_number", null: false
+    t.bigint "money_amount_cents", null: false
+    t.bigint "credit_amount", null: false
+    t.integer "currency", null: false
+    t.integer "payment_status", default: 0, null: false
+    t.integer "lifecycle_status"
+    t.integer "workflow_status"
+    t.integer "business_type"
+    t.datetime "expiration_date"
+    t.jsonb "metadata", default: {}, null: false
+    t.datetime "discarded_at"
+    t.string "permission_resource_name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["company_id", "created_at"], name: "index_company_invoices_on_company_id_and_created_at"
+    t.index ["company_id"], name: "index_company_invoices_on_company_id"
+    t.index ["company_order_id"], name: "index_company_invoices_on_company_order_id", unique: true
+    t.index ["discarded_at"], name: "index_company_invoices_on_discarded_at"
+    t.index ["invoice_number"], name: "index_company_invoices_on_invoice_number", unique: true
+  end
+
+  create_table "company_monthly_usages", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
+    t.uuid "company_id", null: false
+    t.date "usage_month", null: false
+    t.integer "lifecycle_status"
+    t.integer "workflow_status"
+    t.integer "business_type"
+    t.datetime "expiration_date"
+    t.jsonb "metadata", default: {}, null: false
+    t.datetime "discarded_at"
+    t.string "permission_resource_name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "total_credits", default: 0, null: false
+    t.index ["company_id", "usage_month"], name: "index_company_monthly_usages_on_company_id_and_usage_month", unique: true
+    t.index ["company_id"], name: "index_company_monthly_usages_on_company_id"
+    t.index ["discarded_at"], name: "index_company_monthly_usages_on_discarded_at"
+  end
+
+  create_table "company_orders", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
+    t.uuid "company_id", null: false
+    t.uuid "user_id", null: false
+    t.bigint "money_amount_cents", null: false
+    t.bigint "credit_amount", null: false
+    t.integer "currency", null: false
+    t.integer "lifecycle_status"
+    t.integer "workflow_status"
+    t.integer "business_type"
+    t.datetime "expiration_date"
+    t.jsonb "metadata", default: {}, null: false
+    t.datetime "discarded_at"
+    t.string "permission_resource_name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["company_id", "created_at"], name: "index_company_orders_on_company_id_and_created_at"
+    t.index ["company_id"], name: "index_company_orders_on_company_id"
+    t.index ["discarded_at"], name: "index_company_orders_on_discarded_at"
+    t.index ["user_id"], name: "index_company_orders_on_user_id"
+  end
+
+  create_table "company_transactions", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
+    t.uuid "company_id", null: false
+    t.uuid "company_invoice_id", null: false
+    t.uuid "billing_payment_method_id", null: false
+    t.integer "transaction_type", null: false
+    t.bigint "money_amount_cents", null: false
+    t.integer "currency", null: false
+    t.integer "status", default: 0, null: false
+    t.string "gateway_reference"
+    t.integer "lifecycle_status"
+    t.integer "workflow_status"
+    t.integer "business_type"
+    t.datetime "expiration_date"
+    t.jsonb "metadata", default: {}, null: false
+    t.datetime "discarded_at"
+    t.string "permission_resource_name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["billing_payment_method_id"], name: "index_company_transactions_on_billing_payment_method_id"
+    t.index ["company_id", "created_at"], name: "index_company_transactions_on_company_id_and_created_at"
+    t.index ["company_id"], name: "index_company_transactions_on_company_id"
+    t.index ["company_invoice_id"], name: "index_company_transactions_on_company_invoice_id"
+    t.index ["discarded_at"], name: "index_company_transactions_on_discarded_at"
+    t.index ["gateway_reference"], name: "index_company_transactions_on_gateway_reference", unique: true
+  end
+
+  create_table "company_usage_logs", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
+    t.uuid "company_id", null: false
+    t.uuid "company_wallet_id", null: false
+    t.string "source_type"
+    t.uuid "source_id"
+    t.string "action_type", null: false
+    t.bigint "change_amount", null: false
+    t.bigint "balance_after", null: false
+    t.text "description"
+    t.integer "lifecycle_status"
+    t.integer "workflow_status"
+    t.integer "business_type"
+    t.datetime "expiration_date"
+    t.jsonb "metadata", default: {}, null: false
+    t.datetime "discarded_at"
+    t.string "permission_resource_name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["action_type"], name: "index_company_usage_logs_on_action_type"
+    t.index ["company_id"], name: "index_company_usage_logs_on_company_id"
+    t.index ["company_wallet_id", "created_at"], name: "index_company_usage_logs_on_company_wallet_id_and_created_at"
+    t.index ["company_wallet_id"], name: "index_company_usage_logs_on_company_wallet_id"
+    t.index ["discarded_at"], name: "index_company_usage_logs_on_discarded_at"
+    t.index ["source_type", "source_id"], name: "index_company_usage_logs_on_source_type_and_source_id"
+  end
+
+  create_table "company_wallet_logs", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
+    t.uuid "company_id", null: false
+    t.uuid "company_wallet_id", null: false
+    t.string "source_type"
+    t.uuid "source_id"
+    t.integer "change_type", null: false
+    t.bigint "change_amount", null: false
+    t.bigint "balance_before", null: false
+    t.bigint "balance_after", null: false
+    t.text "description"
+    t.integer "lifecycle_status"
+    t.integer "workflow_status"
+    t.integer "business_type"
+    t.datetime "expiration_date"
+    t.jsonb "metadata", default: {}, null: false
+    t.datetime "discarded_at"
+    t.string "permission_resource_name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["company_id"], name: "index_company_wallet_logs_on_company_id"
+    t.index ["company_wallet_id", "created_at"], name: "index_company_wallet_logs_on_company_wallet_id_and_created_at"
+    t.index ["company_wallet_id"], name: "index_company_wallet_logs_on_company_wallet_id"
+    t.index ["discarded_at"], name: "index_company_wallet_logs_on_discarded_at"
+    t.index ["source_type", "source_id"], name: "index_company_wallet_logs_on_source_type_and_source_id"
+  end
+
+  create_table "company_wallets", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
+    t.uuid "company_id", null: false
+    t.string "walletable_type", null: false
+    t.uuid "walletable_id", null: false
+    t.bigint "credit_balance", default: 0, null: false
+    t.integer "lock_version", default: 0, null: false
+    t.datetime "usage_logging_until"
+    t.integer "lifecycle_status"
+    t.integer "workflow_status"
+    t.integer "business_type"
+    t.datetime "expiration_date"
+    t.jsonb "metadata", default: {}, null: false
+    t.datetime "discarded_at"
+    t.string "permission_resource_name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["company_id"], name: "index_company_wallets_on_company_id", unique: true
+    t.index ["discarded_at"], name: "index_company_wallets_on_discarded_at"
+    t.index ["walletable_type", "walletable_id"], name: "index_company_wallets_on_walletable_type_and_walletable_id"
   end
 
   create_table "customer_appointments", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
@@ -5647,6 +5827,20 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_02_190003) do
   add_foreign_key "carts", "property_mappings"
   add_foreign_key "categories", "companies"
   add_foreign_key "companies", "users"
+  add_foreign_key "company_daily_usages", "companies"
+  add_foreign_key "company_invoices", "companies"
+  add_foreign_key "company_invoices", "company_orders"
+  add_foreign_key "company_monthly_usages", "companies"
+  add_foreign_key "company_orders", "companies"
+  add_foreign_key "company_orders", "users"
+  add_foreign_key "company_transactions", "billing_payment_methods"
+  add_foreign_key "company_transactions", "companies"
+  add_foreign_key "company_transactions", "company_invoices"
+  add_foreign_key "company_usage_logs", "companies"
+  add_foreign_key "company_usage_logs", "company_wallets"
+  add_foreign_key "company_wallet_logs", "companies"
+  add_foreign_key "company_wallet_logs", "company_wallets"
+  add_foreign_key "company_wallets", "companies"
   add_foreign_key "customer_appointments", "companies"
   add_foreign_key "customer_appointments", "customers"
   add_foreign_key "customer_group_appointments", "companies"

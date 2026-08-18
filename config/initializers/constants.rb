@@ -138,3 +138,22 @@ RETAIL_INIT_COMPANY_GROUP_BUSINESS_TYPE = :retail
 # =============================================================================
 
 MOCK_OAUTH_EMAIL = "Manager_1_clinic_1@company3.com".freeze
+
+# =============================================================================
+# Credit System (Pay-as-You-Go)
+# =============================================================================
+
+# Per-country credit purchase tiers: money in CENTS → credits.
+# CompanyOrder validates its money_amount_cents/credit_amount against these.
+CREDIT_RATES = {
+  us: { 500 => 500_000, 1_000 => 1_000_000 },
+  vn: { 10_000_000 => 400_000, 100_000_000 => 800_000 }
+}.freeze
+
+# Per-action credit cost (global — not country-based).
+# CompanyUsageLog.action_type strings mirror these keys.
+CREDIT_USAGE_RATES = {
+  create_order: 10,
+  access_dashboard: 2,
+  create_customer: 7
+}.freeze

@@ -27,6 +27,10 @@ default: &default
     class: StatisticJob
     queue: statistic_job
     schedule: every 1 hours
+  company_usage_sync_job:
+    class: CompanyUsageSyncJob
+    queue: default
+    schedule: every 1 hours
 
 
 development:

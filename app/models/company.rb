@@ -70,6 +70,14 @@ class Company < ApplicationRecord
   has_many :subscription_plans, dependent: :destroy
   has_many :departments, dependent: :destroy
   has_many :pages, dependent: :destroy
+  has_one :wallet, class_name: "CompanyWallet", dependent: :destroy
+  has_many :company_wallet_logs, dependent: :destroy
+  has_many :company_orders, dependent: :destroy
+  has_many :company_invoices, dependent: :destroy
+  has_many :company_transactions, dependent: :destroy
+  has_many :company_daily_usages, dependent: :destroy
+  has_many :company_monthly_usages, dependent: :destroy
+  has_many :company_usage_logs, dependent: :destroy
 
   # --- Enums ---
   enum :country, COUNTRY_CODES, prefix: true, default: :us
@@ -127,6 +135,24 @@ class Company < ApplicationRecord
 
   def resource_names
     (metadata || {})["resource_names"] || DEFAULT_RESOURCE_NAMES
+  end
+
+  # --- Credit usage counter (Kredis — hot path, no DB writes per action) ---
+  # A plain accumulator ("companies:<id>:credit_usage", auto-generated key).
+  # It only counts and resets — agnostic to the sync job's period; it never
+  # tracks when usage happened. The job drains the accumulated delta into the
+  # DB's hourly/daily slots and resets it to 0, so the counter always holds
+  # the UNSYNCED delta since the last run.
+  kredis_counter :credit_usage
+
+  def record_credit_usage!(credits)
+    return unless credits.is_a?(Integer) && credits.positive?
+
+    credit_usage.increment(by: credits)
+  end
+
+  def credit_usage_delta
+    credit_usage.value.to_i
   end
 
   def as_json(options = {})
@@ -193,6 +219,8 @@ class Company < ApplicationRecord
     )
 
     user.update!(system_role: :company_owner)
+
+    create_wallet!(walletable: self, credit_balance: 0)
 
     unless self.class.skip_init
       if business_type_retail?
