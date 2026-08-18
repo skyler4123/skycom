@@ -24,7 +24,7 @@ class CompanyUsageSyncJob < ApplicationJob
 
     daily_usage = CompanyDailyUsage.find_or_create_for(company, date)
     (0..23).each do |hour|
-      counter = Kredis.counter(Company.credit_usage_hour_key(company.id, date, hour))
+      counter = company.public_send("credit_usage_hour_#{hour}")
       delta = counter.value.to_i
       next if delta.zero?
 
@@ -33,7 +33,7 @@ class CompanyUsageSyncJob < ApplicationJob
     end
 
     monthly_usage = CompanyMonthlyUsage.find_or_create_for(company, date.beginning_of_month)
-    daily_counter = Kredis.counter(Company.credit_usage_day_key(company.id, date))
+    daily_counter = company.credit_usage_daily
     daily_delta = daily_counter.value.to_i
     return if daily_delta.zero?
 

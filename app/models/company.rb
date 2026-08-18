@@ -139,28 +139,28 @@ class Company < ApplicationRecord
 
   # --- Credit usage counters (Kredis — hot path, no DB writes per action) ---
   # Counters hold UNSYNCED DELTAS since the last CompanyUsageSyncJob run.
-  # Keys: c:<company_id>:credit_usage:<YYYYMMDD>[:<HH>]
+  # Declared via the kredis_counter DSL: keys resolve at first access using
+  # Time.current, so credit_usage_daily points at today and each hour counter
+  # at today:hour. Keys: c:<company_id>:credit_usage:<YYYYMMDD>[:<HH>]
+  kredis_counter :credit_usage_daily,
+    key: ->(company) { "c:#{company.id}:credit_usage:#{Time.current.strftime('%Y%m%d')}" }
 
-  def self.credit_usage_day_key(company_id, date)
-    "c:#{company_id}:credit_usage:#{date.strftime('%Y%m%d')}"
+  (0..23).each do |hour|
+    kredis_counter :"credit_usage_hour_#{hour}",
+      key: ->(company) { "c:#{company.id}:credit_usage:#{Time.current.strftime('%Y%m%d')}:#{hour}" }
   end
 
-  def self.credit_usage_hour_key(company_id, date, hour)
-    "#{credit_usage_day_key(company_id, date)}:#{hour}"
-  end
-
-  def record_credit_usage!(credits, at: Time.current)
+  def record_credit_usage!(credits)
     return unless credits.is_a?(Integer) && credits.positive?
 
-    day = at.to_date
-    Kredis.counter(self.class.credit_usage_day_key(id, day)).increment(by: credits)
-    Kredis.counter(self.class.credit_usage_hour_key(id, day, at.hour)).increment(by: credits)
+    credit_usage_daily.increment(by: credits)
+    public_send("credit_usage_hour_#{Time.current.hour}").increment(by: credits)
   end
 
-  def credit_usage_delta(date: Time.current.to_date, hour: nil)
-    key = self.class.credit_usage_day_key(id, date)
-    key = self.class.credit_usage_hour_key(id, date, hour) if hour.present?
-    Kredis.counter(key).value.to_i
+  def credit_usage_delta(hour: nil)
+    return credit_usage_daily.value.to_i if hour.nil?
+
+    public_send("credit_usage_hour_#{hour}").value.to_i
   end
 
   def as_json(options = {})

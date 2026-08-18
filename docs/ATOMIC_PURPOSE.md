@@ -54,8 +54,20 @@ CompanyUsageSyncJob (periodic)                 drain counters → DB → reset t
 Reads: today = DB total + Redis delta; past = DB only
 ```
 
-- Counters are declared on `Company` via `Kredis.counter` with keys
-  `c:<company_id>:credit_usage:<YYYYMMDD>[:<HH>]`.
+- Counters are declared on `Company` with the **`kredis_counter` DSL** (never raw
+  `Kredis.counter`):
+  ```ruby
+  kredis_counter :credit_usage_daily, key: ->(company) { "c:#{company.id}:credit_usage:#{Time.current.strftime('%Y%m%d')}" }
+  (0..23).each do |hour|
+    kredis_counter :"credit_usage_hour_#{hour}",
+      key: ->(company) { "c:#{company.id}:credit_usage:#{Time.current.strftime('%Y%m%d')}:#{hour}" }
+  end
+  ```
+- Keys resolve at first access via `Time.current` and the proxy is memoized per
+  instance — always use short-lived instances (a fresh request or a `find_each`
+  row), never a long-lived record held across hour/date boundaries.
+- Recording/reading goes through the model helpers:
+  `company.record_credit_usage!(credits)` and `company.credit_usage_delta(hour: nil)`.
 - `CompanyDailyUsage`/`CompanyMonthlyUsage` persist snapshots; their metadata is
   accessed ONLY through `hour_usage`/`day_usage` helpers (store_accessor).
 - Counters are DELTAS since the last sync — after draining, reset with
