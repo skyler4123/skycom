@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_08_18_000108) do
+ActiveRecord::Schema[8.0].define(version: 2026_08_18_000202) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pgcrypto"
@@ -896,6 +896,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_08_18_000108) do
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.bigint "total_credits", default: 0, null: false
     t.index ["company_id", "usage_date"], name: "index_company_daily_usages_on_company_id_and_usage_date", unique: true
     t.index ["company_id"], name: "index_company_daily_usages_on_company_id"
     t.index ["discarded_at"], name: "index_company_daily_usages_on_discarded_at"
@@ -937,6 +938,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_08_18_000108) do
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.bigint "total_credits", default: 0, null: false
     t.index ["company_id", "usage_month"], name: "index_company_monthly_usages_on_company_id_and_usage_month", unique: true
     t.index ["company_id"], name: "index_company_monthly_usages_on_company_id"
     t.index ["discarded_at"], name: "index_company_monthly_usages_on_discarded_at"
