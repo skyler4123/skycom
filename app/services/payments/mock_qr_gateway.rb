@@ -11,7 +11,7 @@ module Payments
       "http://localhost:4000/api/v1/bank/qr-generate"
     WEBHOOK_URL = ENV["MOCK_QR_WEBHOOK_URL"] ||
       Rails.application.credentials.mock_qr_webhook_url ||
-      "http://host.docker.internal:3000/webhooks/payments/mock_qr_gateway"
+      "http://192.168.0.100:3000/webhooks/payments/mock_qr_gateway"
 
     def initialize(amount_cents:, invoice_id:, memo:, transaction_token:, **_args)
       @amount_cents = amount_cents

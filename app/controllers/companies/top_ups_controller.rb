@@ -41,7 +41,7 @@ class Companies::TopUpsController < Companies::ApplicationController
       company: current_company,
       money_amount_cents: params[:money_amount_cents],
       billing_payment_method: bpm,
-      redirect_url: company_billing_url(current_company)
+      redirect_url: company_usage_url(current_company)
     ).call
     render json: { redirect_url: result.redirect_url }
   rescue TopUps::Error => e

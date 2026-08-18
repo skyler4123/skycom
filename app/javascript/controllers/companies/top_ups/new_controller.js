@@ -259,7 +259,7 @@ export default class Companies_TopUps_NewController extends Companies_LayoutCont
       ws.subscribe(channel, "top_up_completed", () => {
         toast({ type: "success", message: translate("Top-up successful! Redirecting...") })
         setTimeout(() => {
-          window.location.href = Helpers.company_billing_path(companyId)
+          window.location.href = Helpers.company_usage_path(companyId)
         }, 500)
       })
     }

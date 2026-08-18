@@ -12,7 +12,7 @@ module Payments
       "http://localhost:4000/api/v1/bank/redirect-session"
     WEBHOOK_URL = ENV["MOCK_REDIRECT_WEBHOOK_URL"] ||
       Rails.application.credentials.mock_redirect_webhook_url ||
-      "http://host.docker.internal:3000/webhooks/payments/mock_redirect_gateway"
+      "http://192.168.0.100:3000/webhooks/payments/mock_redirect_gateway"
 
     def initialize(amount_cents:, invoice_id:, memo:, transaction_token:, redirect_url:, **_args)
       @amount_cents = amount_cents
