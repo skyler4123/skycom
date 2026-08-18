@@ -28,7 +28,7 @@ RSpec.describe CompanyTransaction, type: :model do
     let(:payment_method) { create(:billing_payment_method, :mock_qr) }
 
     it "derives invoice paid and completes the chain when a completed payment covers the invoice" do
-      wallet = company.wallet
+      wallet = company.company_wallet
 
       expect {
         create(:company_transaction, company: company, company_invoice: invoice,
@@ -67,14 +67,14 @@ RSpec.describe CompanyTransaction, type: :model do
     it "does not double-credit the wallet when a second payment is added to an already-paid invoice" do
       create(:company_transaction, company: company, company_invoice: invoice,
         billing_payment_method: payment_method, money_amount_cents: 500, status: :completed)
-      expect(company.wallet.credit_balance).to eq(500_000)
+      expect(company.company_wallet.credit_balance).to eq(500_000)
 
       create(:company_transaction, company: company, company_invoice: invoice,
         billing_payment_method: payment_method, money_amount_cents: 500, status: :completed)
 
       expect(invoice.reload.payment_status).to eq("paid")
       expect(order.reload.workflow_status).to eq("completed")
-      expect(company.wallet.reload.credit_balance).to eq(500_000)
+      expect(company.company_wallet.reload.credit_balance).to eq(500_000)
       expect(CompanyWalletLog.count).to eq(1)
     end
   end

@@ -36,7 +36,7 @@ RSpec.describe CompanyInvoice, type: :model do
 
       expect { invoice.update!(payment_status: :paid) }
         .to change { order.reload.workflow_status }.from("pending").to("completed")
-      expect(company.wallet.reload.credit_balance).to eq(500_000)
+      expect(company.company_wallet.reload.credit_balance).to eq(500_000)
     end
 
     it "does nothing for invoices without an order" do

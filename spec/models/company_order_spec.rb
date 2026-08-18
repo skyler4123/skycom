@@ -48,7 +48,7 @@ RSpec.describe CompanyOrder, type: :model do
     it "credits the company wallet exactly once and marks the order completed" do
       company = create(:company, country: :us)
       order = create(:company_order, company: company, money_amount_cents: 500, credit_amount: 500_000)
-      wallet = company.wallet
+      wallet = company.company_wallet
 
       expect {
         order.complete!
@@ -68,7 +68,7 @@ RSpec.describe CompanyOrder, type: :model do
       order = create(:company_order, company: company, money_amount_cents: 500, credit_amount: 500_000, workflow_status: :completed)
 
       expect { order.complete! }.not_to change(CompanyWalletLog, :count)
-      expect(company.wallet.credit_balance).to eq(0)
+      expect(company.company_wallet.credit_balance).to eq(0)
     end
   end
 end

@@ -94,4 +94,4 @@ Reads: today = DB total + Redis delta; past = DB only
 | New purchase tier | Add `{ money_cents => credits }` entry to `CREDIT_RATES[country]` |
 | New money flow | Place the model in the chain with ONE purpose; wire it through the model above it |
 | New usage metric | Add a Kredis counter key + a persisted usage model with store_accessor helpers |
-| Turn on live credit inspection | `company.wallet.enable_usage_logging!` — detail rows for 5 minutes (see `CompanyUsageLog`) |
+| Turn on live credit inspection | `company.company_wallet.enable_usage_logging!` — detail rows for 5 minutes (see `CompanyUsageLog`) |

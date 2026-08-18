@@ -14,7 +14,7 @@ RSpec.describe CompanyWallet, type: :model do
 
   describe "credit balance mutations" do
     let(:company) { create(:company) }
-    let(:wallet) { company.wallet }
+    let(:wallet) { company.company_wallet }
 
     it "adds credits and records an audit log with before/after snapshots" do
       expect {
@@ -72,7 +72,7 @@ RSpec.describe CompanyWallet, type: :model do
 
   describe "usage logging toggle" do
     let(:company) { create(:company) }
-    let(:wallet) { company.wallet }
+    let(:wallet) { company.company_wallet }
 
     it "is inactive by default" do
       expect(wallet.usage_logging_active?).to be false

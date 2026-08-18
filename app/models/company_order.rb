@@ -30,7 +30,7 @@ class CompanyOrder < ApplicationRecord
     return if %w[completed cancelled failed].include?(workflow_status)
 
     transaction do
-      wallet = company.wallet
+      wallet = company.company_wallet
       wallet.update!(walletable: self)
       wallet.add_credits!(amount: credit_amount, source: self, description: "Credits purchased via order #{id}")
       update!(workflow_status: :completed)
