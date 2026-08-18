@@ -50,6 +50,29 @@ RSpec.describe CompanyUsageSyncJob do
       expect(daily.reload.total_credits).to eq(25)
     end
 
+    it "accumulates across drains like the 2H/6H example" do
+      dedicated = create(:company)
+      dedicated.record_credit_usage!(500)
+      travel_to(Time.zone.local(2026, 8, 18, 14, 5)) { described_class.perform_now }
+
+      daily = CompanyDailyUsage.find_by!(company: dedicated, usage_date: today)
+      monthly = CompanyMonthlyUsage.find_by!(company: dedicated, usage_month: today.beginning_of_month)
+      expect(daily.hour_usage(14)).to eq(500)
+      expect(daily.total_credits).to eq(500)
+      expect(monthly.day_usage(18)).to eq(500)
+      expect(monthly.total_credits).to eq(500)
+      expect(dedicated.credit_usage.value).to eq(0)
+
+      dedicated.record_credit_usage!(400)
+      travel_to(Time.zone.local(2026, 8, 18, 15, 5)) { described_class.perform_now }
+
+      expect(daily.reload.hour_usage(15)).to eq(400)
+      expect(daily.reload.total_credits).to eq(900)
+      expect(monthly.reload.day_usage(18)).to eq(900)
+      expect(monthly.reload.total_credits).to eq(900)
+      expect(dedicated.credit_usage.value).to eq(0)
+    end
+
     it "does not raise when one company fails" do
       allow(CompanyDailyUsage).to receive(:find_or_create_for).and_raise(StandardError, "boom")
 

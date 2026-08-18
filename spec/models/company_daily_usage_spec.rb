@@ -11,9 +11,25 @@ RSpec.describe CompanyDailyUsage, type: :model do
     it { should validate_presence_of(:usage_date) }
   end
 
+  describe ".find_or_create_for" do
+    let(:company) { create(:company) }
+
+    it "creates one row per company/day and returns it on re-fetch" do
+      first = CompanyDailyUsage.find_or_create_for(company, Date.new(2026, 8, 18))
+      second = CompanyDailyUsage.find_or_create_for(company, Date.new(2026, 8, 18))
+      expect(first).to eq(second)
+      expect(CompanyDailyUsage.count).to eq(1)
+    end
+  end
+
   describe "hourly helpers" do
     let(:company) { create(:company) }
     let(:usage) { CompanyDailyUsage.find_or_create_for(company, Date.new(2026, 8, 18)) }
+
+    it "persists hour values into metadata via store_accessor" do
+      usage.set_hour_usage(14, 10)
+      expect(usage.metadata["h14"]).to eq(10)
+    end
 
     it "returns 0 for empty hour slots" do
       expect(usage.hour_usage(0)).to eq(0)

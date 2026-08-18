@@ -159,5 +159,12 @@ RSpec.describe Company, type: :model do
     it "returns zero deltas when nothing was recorded" do
       expect(company.credit_usage_delta).to eq(0)
     end
+
+    it "ignores non-positive or non-integer credits" do
+      company.record_credit_usage!(0)
+      company.record_credit_usage!(-5)
+      company.record_credit_usage!("10")
+      expect(company.credit_usage_delta).to eq(0)
+    end
   end
 end

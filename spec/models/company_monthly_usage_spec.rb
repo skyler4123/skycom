@@ -11,9 +11,25 @@ RSpec.describe CompanyMonthlyUsage, type: :model do
     it { should validate_presence_of(:usage_month) }
   end
 
+  describe ".find_or_create_for" do
+    let(:company) { create(:company) }
+
+    it "creates one row per company/month and returns it on re-fetch" do
+      first = CompanyMonthlyUsage.find_or_create_for(company, Date.new(2026, 8, 1))
+      second = CompanyMonthlyUsage.find_or_create_for(company, Date.new(2026, 8, 1))
+      expect(first).to eq(second)
+      expect(CompanyMonthlyUsage.count).to eq(1)
+    end
+  end
+
   describe "daily helpers" do
     let(:company) { create(:company) }
     let(:usage) { CompanyMonthlyUsage.find_or_create_for(company, Date.new(2026, 8, 1)) }
+
+    it "persists day values into metadata via store_accessor" do
+      usage.set_day_usage(15, 120)
+      expect(usage.metadata["d15"]).to eq(120)
+    end
 
     it "returns 0 for empty day slots" do
       expect(usage.day_usage(1)).to eq(0)
