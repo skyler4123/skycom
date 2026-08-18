@@ -52,6 +52,7 @@ class Seed::HospitalEnrichService
     create_shifts
     create_attendance_policies
     create_attendance_event_data
+    seed_credit_data
 
     print_footer
     true
@@ -334,5 +335,10 @@ class Seed::HospitalEnrichService
         Rails.logger.warn("Resolution failed for #{emp.id} on #{date}: #{e.message}")
       end
     end
+  end
+
+  def seed_credit_data
+    puts "Seeding credit data..."
+    Seed::CreditDataService.create(company: @company)
   end
 end

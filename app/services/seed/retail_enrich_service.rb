@@ -80,6 +80,7 @@ class Seed::RetailEnrichService
     create_stock_exports
     create_customer_orders
     create_invoices
+    seed_credit_data
     seed_payment_method_merchant_data
 
     print_footer
@@ -476,6 +477,11 @@ class Seed::RetailEnrichService
       end
     end
     puts "  -> #{Invoice.where(company: @retail).count} invoices created"
+  end
+
+  def seed_credit_data
+    puts "Seeding credit data..."
+    Seed::CreditDataService.create(company: @retail)
   end
 
   def seed_payment_method_merchant_data
