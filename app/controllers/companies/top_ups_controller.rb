@@ -1,18 +1,23 @@
 # frozen_string_literal: true
 
-# PLACEHOLDER CONTROLLER — future Token implementation.
-#
-# The billing system was removed; company-level payments will use a Token
-# system instead (e.g. deposit $10 → receive 1,000,000 tokens, an order
-# consumes 10 tokens, dashboard access costs 2 tokens per visit).
-#
-# Actions are kept as placeholders — no logic yet. Wire the token flow here
-# when the Token model/ledger is implemented.
+# Top-up page — displays the country-based top-up options (from CREDIT_RATES)
+# and the company's payment options (b2b BillingPaymentMethod catalog).
+# Submission/payment flow is still future work.
 class Companies::TopUpsController < Companies::ApplicationController
   def new
     respond_to do |format|
       format.html { render html: "", layout: true }
-      format.json { render json: { billing_payment_methods: [] } }
+      format.json do
+        rates = CREDIT_RATES[current_company.country.to_sym] || {}
+        render json: {
+          top_up_options: rates.map { |money_cents, credits|
+            { money_amount_cents: money_cents, credit_amount: credits }
+          },
+          payment_methods: BillingPaymentMethod.where(business_type: :b2b).order(:lifecycle_status).map { |m|
+            m.as_json(only: %i[id name code payment_mode strategy lifecycle_status])
+          }
+        }
+      end
     end
   end
 
