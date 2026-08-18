@@ -27,6 +27,8 @@ See `docs/CACHE.md` §5 for examples (e.g., `SESSION_CACHE_EXPIRY` lives in
 | Billing defaults & pricing | `DEFAULT_FREE_TIER_ALLOWANCES` (single-file, in `seed/billing_contract_service.rb`), `US_PRICES` / `VN_PRICES` / `PRICES_BY_COUNTRY` (in `app/models/billing_resource.rb`) |
 | Array configs | `ALLOWED_TABLE_ALIGNS`, `PROPERTY_MAPPING_SUPPORTED_KEYS` |
 | Enum mappings | `TIMEZONES`, `CURRENCIE_CODES`, `LIFECYCLE_STATUS`, `WORKFLOW_STATUS` |
+| Credit purchase tiers | `CREDIT_RATES` — per-country `{ money_cents => credits }` map |
+| Credit action costs | `CREDIT_USAGE_RATES` — global per-action credit cost (not country-based) |
 
 ## What Stays Local
 

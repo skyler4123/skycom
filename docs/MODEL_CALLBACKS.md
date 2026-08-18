@@ -48,6 +48,25 @@ Callbacks defined directly in the model file (not inherited from a concern).
 | Callback | Line | Method | Description |
 |----------|------|--------|-------------|
 | `after_create :setup_owner_records` | 104 | `setup_owner_records` | Creates owner infrastructure: (1) Owner `Role` with `business_type: :owner`, (2) "Owner All Access" `Policy` with `resource: "all"` / `action: "all"`, (3) Owner `Employee` linked to the creating user, (4) Both `PolicyAppointment` and `RoleAppointment` with `business_type: :owner`, (5) Sets `user.system_role` to `company_owner` so `accessible_companies` returns the new company. |
+| `after_create :initialize_company` | 126 | `initialize_company` | Also creates the company's `CompanyWallet` (`credit_balance: 0`, `walletable: company`) — unconditional, like the owner records. The wallet is the chain's bottom node: `CompanyTransaction → CompanyInvoice → CompanyOrder → CompanyWallet`. |
+
+---
+
+### CompanyInvoice (`app/models/company_invoice.rb`)
+
+| Callback | Line | Method | Description |
+|----------|------|--------|-------------|
+| `before_validation :generate_invoice_number, on: :create` | — | `generate_invoice_number` | Auto-generates `INV-YYYYMM-HEX` when `invoice_number` is blank. |
+| `after_update :complete_order_if_paid!, if: :saved_change_to_payment_status? && paid?` | — | `complete_order_if_paid!` | When the invoice's `payment_status` transitions to `paid`, completes the linked `CompanyOrder` (idempotent — `complete!` no-ops when already completed). Part of the credit chain. |
+
+---
+
+### CompanyTransaction (`app/models/company_transaction.rb`)
+
+| Callback | Line | Method | Description |
+|----------|------|--------|-------------|
+| `after_create :sync_invoice_payment_status, if: :completed?` | — | `sync_invoice_payment_status` | Derives the invoice's `payment_status` from `SUM(money_amount_cents)` of its `completed` `payment` transactions: `>= invoice.money_amount_cents → paid`, else `unpaid`. Never set directly — this is the credit chain's entry point. |
+| `after_destroy :sync_invoice_payment_status` | — | `sync_invoice_payment_status` | Re-derives (reverts to `unpaid`) when a payment is destroyed. |
 
 ---
 
