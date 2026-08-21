@@ -7,7 +7,7 @@
 # action (e.g. CompanyCreditDeduction::Companies::Dashboards::IndexService) because the
 # deduction rules can differ between places even for the same action type
 # (cost, description, guards). Controllers trigger deduction via the
-# CompanyCreditDeductionConcern after_action DSL — never inline in actions.
+# CreditDeductionConcern after_action DSL — never inline in actions.
 #
 # Deduction priority: promo balance first, then main balance; any
 # uncovered remainder is absorbed by the debt balance (normally 0).

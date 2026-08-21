@@ -12,7 +12,7 @@
 #   - runs only after a SUCCESSFUL JSON response (no HTML, no 4xx/5xx)
 #   - delegates the whole deduction to the declared service class
 #   - rescues all deduction errors so the request is never broken
-module Companies::CompanyCreditDeductionConcern
+module Companies::CreditDeductionConcern
   extend ActiveSupport::Concern
 
   included do

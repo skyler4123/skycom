@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 # Deducts dashboard-access credits (action_type: "access_dashboard").
-# Triggered by Companies::DashboardsController via the CompanyCreditDeductionConcern
+# Triggered by Companies::DashboardsController via the CreditDeductionConcern
 # after_action — this service never runs inline in the action.
 module CompanyCreditDeduction
   module Companies

@@ -29,7 +29,7 @@ Because rules differ per place even for the same action type, each (controller, 
 
 ## 2. The after_action Filter (Controller Layer)
 
-**File**: `app/controllers/concerns/companies/company_credit_deduction_concern.rb`
+**File**: `app/controllers/concerns/companies/credit_deduction_concern.rb`
 
 Included in `Companies::ApplicationController`, so every company-scoped controller inherits a single `after_action :run_credit_deduction`.
 
@@ -226,7 +226,7 @@ end
 
 | File | Purpose |
 |------|---------|
-| `app/controllers/concerns/companies/company_credit_deduction_concern.rb` | `after_action :run_credit_deduction` + `deduct_company_credits_for` DSL |
+| `app/controllers/concerns/companies/credit_deduction_concern.rb` | `after_action :run_credit_deduction` + `deduct_company_credits_for` DSL |
 | `app/controllers/companies/application_controller.rb` | Includes the concern for all company controllers |
 | `app/services/company_credit_deduction/base_service.rb` | Epic service: priority deduction + metering, subclass contract |
 | `app/services/company_credit_deduction/companies/dashboards/index_service.rb` | Dashboard-access deduction (reference implementation) |
