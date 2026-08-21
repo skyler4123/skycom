@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_08_18_000202) do
+ActiveRecord::Schema[8.0].define(version: 2026_08_18_000108) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pgcrypto"
@@ -363,35 +363,6 @@ ActiveRecord::Schema[8.0].define(version: 2026_08_18_000202) do
     t.index ["branch_id"], name: "index_attendance_policies_on_branch_id", unique: true
     t.index ["company_id"], name: "index_attendance_policies_on_company_id"
     t.index ["discarded_at"], name: "index_attendance_policies_on_discarded_at"
-  end
-
-  create_table "billing_payment_methods", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
-    t.string "email"
-    t.string "name"
-    t.integer "strategy"
-    t.text "description"
-    t.string "code"
-    t.string "phone_number"
-    t.integer "currency"
-    t.integer "country"
-    t.integer "timezone"
-    t.integer "payment_mode"
-    t.integer "lifecycle_status"
-    t.integer "workflow_status"
-    t.integer "business_type"
-    t.datetime "expiration_date"
-    t.jsonb "metadata"
-    t.datetime "discarded_at"
-    t.string "permission_resource_name"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.index ["business_type"], name: "index_billing_payment_methods_on_business_type"
-    t.index ["code"], name: "index_billing_payment_methods_on_code", unique: true
-    t.index ["discarded_at"], name: "index_billing_payment_methods_on_discarded_at"
-    t.index ["email"], name: "index_billing_payment_methods_on_email", unique: true
-    t.index ["lifecycle_status"], name: "index_billing_payment_methods_on_lifecycle_status"
-    t.index ["payment_mode"], name: "index_billing_payment_methods_on_payment_mode"
-    t.index ["workflow_status"], name: "index_billing_payment_methods_on_workflow_status"
   end
 
   create_table "branches", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
@@ -894,9 +865,9 @@ ActiveRecord::Schema[8.0].define(version: 2026_08_18_000202) do
     t.jsonb "metadata", default: {}, null: false
     t.datetime "discarded_at"
     t.string "permission_resource_name"
+    t.bigint "total_credits", default: 0, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.bigint "total_credits", default: 0, null: false
     t.index ["company_id", "usage_date"], name: "index_company_daily_usages_on_company_id_and_usage_date", unique: true
     t.index ["company_id"], name: "index_company_daily_usages_on_company_id"
     t.index ["discarded_at"], name: "index_company_daily_usages_on_discarded_at"
@@ -936,9 +907,9 @@ ActiveRecord::Schema[8.0].define(version: 2026_08_18_000202) do
     t.jsonb "metadata", default: {}, null: false
     t.datetime "discarded_at"
     t.string "permission_resource_name"
+    t.bigint "total_credits", default: 0, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.bigint "total_credits", default: 0, null: false
     t.index ["company_id", "usage_month"], name: "index_company_monthly_usages_on_company_id_and_usage_month", unique: true
     t.index ["company_id"], name: "index_company_monthly_usages_on_company_id"
     t.index ["discarded_at"], name: "index_company_monthly_usages_on_discarded_at"
@@ -965,10 +936,39 @@ ActiveRecord::Schema[8.0].define(version: 2026_08_18_000202) do
     t.index ["user_id"], name: "index_company_orders_on_user_id"
   end
 
+  create_table "company_payment_methods", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
+    t.string "email"
+    t.string "name"
+    t.integer "strategy"
+    t.text "description"
+    t.string "code"
+    t.string "phone_number"
+    t.integer "currency"
+    t.integer "country"
+    t.integer "timezone"
+    t.integer "payment_mode"
+    t.integer "lifecycle_status"
+    t.integer "workflow_status"
+    t.integer "business_type"
+    t.datetime "expiration_date"
+    t.jsonb "metadata"
+    t.datetime "discarded_at"
+    t.string "permission_resource_name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["business_type"], name: "index_company_payment_methods_on_business_type"
+    t.index ["code"], name: "index_company_payment_methods_on_code", unique: true
+    t.index ["discarded_at"], name: "index_company_payment_methods_on_discarded_at"
+    t.index ["email"], name: "index_company_payment_methods_on_email", unique: true
+    t.index ["lifecycle_status"], name: "index_company_payment_methods_on_lifecycle_status"
+    t.index ["payment_mode"], name: "index_company_payment_methods_on_payment_mode"
+    t.index ["workflow_status"], name: "index_company_payment_methods_on_workflow_status"
+  end
+
   create_table "company_transactions", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
     t.uuid "company_id", null: false
     t.uuid "company_invoice_id", null: false
-    t.uuid "billing_payment_method_id", null: false
+    t.uuid "company_payment_method_id", null: false
     t.integer "transaction_type", null: false
     t.bigint "money_amount_cents", null: false
     t.integer "currency", null: false
@@ -983,10 +983,10 @@ ActiveRecord::Schema[8.0].define(version: 2026_08_18_000202) do
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["billing_payment_method_id"], name: "index_company_transactions_on_billing_payment_method_id"
     t.index ["company_id", "created_at"], name: "index_company_transactions_on_company_id_and_created_at"
     t.index ["company_id"], name: "index_company_transactions_on_company_id"
     t.index ["company_invoice_id"], name: "index_company_transactions_on_company_invoice_id"
+    t.index ["company_payment_method_id"], name: "index_company_transactions_on_company_payment_method_id"
     t.index ["discarded_at"], name: "index_company_transactions_on_discarded_at"
     t.index ["gateway_reference"], name: "index_company_transactions_on_gateway_reference", unique: true
   end
@@ -1027,6 +1027,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_08_18_000202) do
     t.bigint "balance_before", null: false
     t.bigint "balance_after", null: false
     t.text "description"
+    t.integer "balance_type"
     t.integer "lifecycle_status"
     t.integer "workflow_status"
     t.integer "business_type"
@@ -1047,7 +1048,9 @@ ActiveRecord::Schema[8.0].define(version: 2026_08_18_000202) do
     t.uuid "company_id", null: false
     t.string "walletable_type", null: false
     t.uuid "walletable_id", null: false
-    t.bigint "credit_balance", default: 0, null: false
+    t.bigint "main_credit_balance", default: 0, null: false
+    t.bigint "promo_credit_balance", default: 0, null: false
+    t.bigint "debt_credit_balance", default: 0, null: false
     t.integer "lock_version", default: 0, null: false
     t.datetime "usage_logging_until"
     t.integer "lifecycle_status"
@@ -5833,9 +5836,9 @@ ActiveRecord::Schema[8.0].define(version: 2026_08_18_000202) do
   add_foreign_key "company_monthly_usages", "companies"
   add_foreign_key "company_orders", "companies"
   add_foreign_key "company_orders", "users"
-  add_foreign_key "company_transactions", "billing_payment_methods"
   add_foreign_key "company_transactions", "companies"
   add_foreign_key "company_transactions", "company_invoices"
+  add_foreign_key "company_transactions", "company_payment_methods"
   add_foreign_key "company_usage_logs", "companies"
   add_foreign_key "company_usage_logs", "company_wallets"
   add_foreign_key "company_wallet_logs", "companies"

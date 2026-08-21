@@ -4,7 +4,7 @@ FactoryBot.define do
   factory :company_transaction do
     company_invoice { create(:company_invoice) }
     company { company_invoice.company }
-    billing_payment_method { create(:billing_payment_method, :mock_qr) }
+    company_payment_method { create(:company_payment_method, :mock_qr) }
     transaction_type { :payment }
     money_amount_cents { company_invoice.money_amount_cents }
     currency { :usd }

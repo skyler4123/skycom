@@ -1,4 +1,4 @@
-class Seed::BillingPaymentMethodService
+class Seed::CompanyPaymentMethodService
   RECORDS = [
     { code: "CASH",             name: "Cash",              business_type: :b2b, payment_mode: :cash,    strategy: :cash,              lifecycle_status: nil },
     { code: "WALLET_AUTO_DEBIT", name: "Wallet Auto-Debit", business_type: :b2b, payment_mode: :cash,    strategy: :wallet_auto_debit, lifecycle_status: nil },
@@ -14,10 +14,10 @@ class Seed::BillingPaymentMethodService
   ALL_RECORDS = (RECORDS + (Rails.env.production? ? [] : MOCK_RECORDS)).freeze
 
   def self.create
-    puts "Seeding BillingPaymentMethod records..."
+    puts "Seeding CompanyPaymentMethod records..."
 
     ALL_RECORDS.each do |attrs|
-      BillingPaymentMethod.find_or_create_by!(code: attrs[:code]) do |bpm|
+      CompanyPaymentMethod.find_or_create_by!(code: attrs[:code]) do |bpm|
         bpm.name = attrs[:name]
         bpm.business_type = attrs[:business_type]
         bpm.payment_mode = attrs[:payment_mode]
@@ -27,6 +27,6 @@ class Seed::BillingPaymentMethodService
       end
     end
 
-    puts "Successfully created #{BillingPaymentMethod.count} BillingPaymentMethod records."
+    puts "Successfully created #{CompanyPaymentMethod.count} CompanyPaymentMethod records."
   end
 end

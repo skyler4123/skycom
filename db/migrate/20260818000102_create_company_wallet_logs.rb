@@ -12,6 +12,7 @@ class CreateCompanyWalletLogs < ActiveRecord::Migration[8.0]
       t.bigint :balance_before, null: false
       t.bigint :balance_after, null: false
       t.text :description
+      t.integer :balance_type
 
       t.integer :lifecycle_status
       t.integer :workflow_status

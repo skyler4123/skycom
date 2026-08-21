@@ -1,4 +1,4 @@
-class BillingPaymentMethod < ApplicationRecord
+class CompanyPaymentMethod < ApplicationRecord
   attribute :permission_resource_name, :string, default: -> { self.name }
 
   # --- Specific Real-World Lifecycle Map ---

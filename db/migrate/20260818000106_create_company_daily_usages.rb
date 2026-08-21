@@ -13,6 +13,7 @@ class CreateCompanyDailyUsages < ActiveRecord::Migration[8.0]
       t.jsonb :metadata, null: false, default: {}
       t.datetime :discarded_at, index: true
       t.string :permission_resource_name
+      t.bigint :total_credits, null: false, default: 0
 
       t.timestamps
     end

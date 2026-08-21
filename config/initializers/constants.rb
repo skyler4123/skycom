@@ -63,6 +63,13 @@ GATEWAY_STRATEGIES = begin
   end
 end.freeze
 
+# Strategy key → gateway service class (used by Payments::InitiateService).
+# Only implemented strategies are registered; others raise at initiation.
+GATEWAY_STRATEGY_CLASSES = {
+  mock_qr_gateway: "Payments::MockQrGateway",
+  mock_redirect_gateway: "Payments::MockRedirectGateway"
+}.freeze
+
 # --- Webhooks ---
 # Payment API callback secrets for the mock bank gateways (future Token implementation).
 WEBHOOK_BANK_PAYMENT_SECRET = ENV.fetch("WEBHOOK_BANK_PAYMENT_SECRET", "local_secure_dev_secret").freeze

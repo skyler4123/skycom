@@ -1,13 +1,27 @@
 # frozen_string_literal: true
 
-# CompanyWallet — Atomic purpose: store the credit balance NUMBER only.
+# CompanyWallet — Atomic purpose: store the credit balance NUMBERS only.
 # No business logic. Balance changes flow exclusively through the chain
-# (CompanyTransaction → CompanyInvoice → CompanyOrder → CompanyWallet);
-# the wallet exposes only low-level add_credits!/deduct_credits! entry points.
-# Atomicity: deduct uses a conditional UPDATE (balance >= amount) so no
-# concurrent deduction can overdraw; lock_version provides optimistic locking.
+# (CompanyTransaction → CompanyInvoice → CompanyOrder → CompanyWallet) and
+# through the CompanyCreditDeduction::* services; the wallet exposes only low-level per-balance
+# mutation entry points (add_to! / deduct_from!).
+#
+# Balances:
+#   main  — real purchased credits (top-ups land here via add_credits!)
+#   promo — promotional credits (deducted FIRST by CompanyCreditDeduction::* services)
+#   debt  — absorbed shortfall when promo + main are exhausted (normally 0)
+#
+# Atomicity: every mutation uses a conditional UPDATE, so no concurrent
+# operation can overdraw; lock_version provides optimistic locking.
 class CompanyWallet < ApplicationRecord
   USAGE_LOGGING_WINDOW = 5.minutes
+
+  # Single-file constant: map balance key → column name.
+  BALANCES = {
+    main: "main_credit_balance",
+    promo: "promo_credit_balance",
+    debt: "debt_credit_balance"
+  }.freeze
 
   attribute :permission_resource_name, :string, default: -> { self.name }
 
@@ -21,50 +35,63 @@ class CompanyWallet < ApplicationRecord
 
   class InsufficientCreditsError < StandardError; end
 
-  # The only mutation entry points — called exclusively by the chain
-  # (CompanyOrder#complete!) and by usage-deduction services.
+  # Top-up entry point (used by the credit-purchase chain via CompanyOrder#complete!).
+  # Always lands on the MAIN balance — promotional credits are granted separately.
 
   def add_credits!(amount:, source: nil, description: nil, action_type: "top_up")
+    add_to!(balance: :main, amount: amount, source: source, description: description, action_type: action_type)
+  end
+
+  # Low-level atomic mutation entry points — called by CompanyCreditDeduction::* services.
+
+  def add_to!(balance:, amount:, source: nil, description: nil, action_type: nil)
+    column = balance_column!(balance)
     raise ArgumentError, "amount must be a positive integer" unless amount.is_a?(Integer) && amount.positive?
 
-    before = credit_balance
+    before = public_send(column)
     ActiveRecord::Base.transaction do
       self.class.where(id: id)
-        .update_all([ "credit_balance = credit_balance + ?, lock_version = lock_version + 1", amount ])
+        .update_all([ "#{column} = #{column} + ?, lock_version = lock_version + 1", amount ])
       reload
       CompanyWalletLog.create!(
         company: company, company_wallet: self, change_type: :credit,
-        change_amount: amount, balance_before: before, balance_after: credit_balance,
-        source: source, description: description
+        change_amount: amount, balance_before: before, balance_after: public_send(column),
+        balance_type: balance, source: source, description: description
       )
       record_usage_log!(action_type: action_type, source: source, change_amount: amount, description: description)
     end
-    credit_balance
+    public_send(column)
   end
 
-  def deduct_credits!(amount:, source: nil, description: nil, action_type: "deduction")
+  def deduct_from!(balance:, amount:, source: nil, description: nil, action_type: "deduction")
+    column = balance_column!(balance)
     raise ArgumentError, "amount must be a positive integer" unless amount.is_a?(Integer) && amount.positive?
 
-    before = credit_balance
+    before = public_send(column)
     ActiveRecord::Base.transaction do
       updated = self.class.where(id: id)
-        .where("credit_balance >= ?", amount)
-        .update_all([ "credit_balance = credit_balance - ?, lock_version = lock_version + 1", amount ])
+        .where("#{column} >= ?", amount)
+        .update_all([ "#{column} = #{column} - ?, lock_version = lock_version + 1", amount ])
       raise InsufficientCreditsError, "Insufficient credits (balance: #{before}, required: #{amount})" unless updated == 1
 
       reload
       CompanyWalletLog.create!(
         company: company, company_wallet: self, change_type: :debit,
-        change_amount: -amount, balance_before: before, balance_after: credit_balance,
-        source: source, description: description
+        change_amount: -amount, balance_before: before, balance_after: public_send(column),
+        balance_type: balance, source: source, description: description
       )
       record_usage_log!(action_type: action_type, source: source, change_amount: -amount, description: description)
     end
-    credit_balance
+    public_send(column)
   end
 
   def usage_logging_active?
     usage_logging_until.present? && usage_logging_until > Time.current
+  end
+
+  # Usable balance = purchased + promotional credits (debt is not spendable).
+  def total_credit_balance
+    main_credit_balance + promo_credit_balance
   end
 
   def enable_usage_logging!(window: USAGE_LOGGING_WINDOW)
@@ -77,13 +104,20 @@ class CompanyWallet < ApplicationRecord
 
   private
 
+  def balance_column!(balance)
+    column = BALANCES[balance.to_sym]
+    raise ArgumentError, "unknown balance: #{balance}" unless column
+
+    column
+  end
+
   def record_usage_log!(action_type:, source:, change_amount:, description:)
     return unless usage_logging_active?
 
     CompanyUsageLog.create!(
       company: company, company_wallet: self,
       action_type: action_type, change_amount: change_amount,
-      balance_after: credit_balance, source: source, description: description
+      balance_after: total_credit_balance, source: source, description: description
     )
   end
 end

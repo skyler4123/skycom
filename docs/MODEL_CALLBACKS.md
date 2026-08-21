@@ -66,6 +66,7 @@ Callbacks defined directly in the model file (not inherited from a concern).
 | Callback | Line | Method | Description |
 |----------|------|--------|-------------|
 | `after_create :sync_invoice_payment_status, if: :completed?` | — | `sync_invoice_payment_status` | Derives the invoice's `payment_status` from `SUM(money_amount_cents)` of its `completed` `payment` transactions: `>= invoice.money_amount_cents → paid`, else `unpaid`. Never set directly — this is the credit chain's entry point. |
+| `after_update :sync_invoice_payment_status, if: :completed?` | — | `sync_invoice_payment_status` | Same derivation when a pending transaction is completed by a gateway webhook (top-up flow). |
 | `after_destroy :sync_invoice_payment_status` | — | `sync_invoice_payment_status` | Re-derives (reverts to `unpaid`) when a payment is destroyed. |
 
 ---

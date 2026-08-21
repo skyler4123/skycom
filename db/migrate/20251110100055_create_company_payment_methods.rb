@@ -1,6 +1,6 @@
-class CreateBillingPaymentMethods < ActiveRecord::Migration[8.0]
+class CreateCompanyPaymentMethods < ActiveRecord::Migration[8.0]
   def change
-    create_table :billing_payment_methods, id: :uuid, default: -> { "uuidv7()" } do |t|
+    create_table :company_payment_methods, id: :uuid, default: -> { "uuidv7()" } do |t|
       # --- Identity ---
       t.string :email, null: true, index: { unique: true }
       t.string :name

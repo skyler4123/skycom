@@ -70,7 +70,7 @@ class Company < ApplicationRecord
   has_many :subscription_plans, dependent: :destroy
   has_many :departments, dependent: :destroy
   has_many :pages, dependent: :destroy
-  has_one :wallet, class_name: "CompanyWallet", dependent: :destroy
+  has_one :company_wallet, dependent: :destroy
   has_many :company_wallet_logs, dependent: :destroy
   has_many :company_orders, dependent: :destroy
   has_many :company_invoices, dependent: :destroy
@@ -220,7 +220,7 @@ class Company < ApplicationRecord
 
     user.update!(system_role: :company_owner)
 
-    create_wallet!(walletable: self, credit_balance: 0)
+    create_company_wallet!(walletable: self, main_credit_balance: 0)
 
     unless self.class.skip_init
       if business_type_retail?

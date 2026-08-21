@@ -83,6 +83,9 @@ Rails.application.routes.draw do
         end
       end
 
+      resource :usage, only: :show, controller: :usage
+      resource :billing, only: :show, controller: :billing
+
       post "order_processing/v1/checkout", to: "order_processing/v1#checkout"
       post "order_processing/v1/pay", to: "order_processing/v1#pay"
     end

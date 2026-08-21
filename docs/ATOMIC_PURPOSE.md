@@ -30,7 +30,7 @@ CompanyInvoice      (the bill — payment_status DERIVED from transaction sum, n
 CompanyOrder        (the deal — money tier → credits; complete! guarded/idempotent)
         │  wallet.update!(walletable:) + wallet.add_credits!(...)
         ▼
-CompanyWallet       (stores the balance NUMBER only — no business logic)
+CompanyWallet       (stores balance NUMBERS only — main/promo/debt — no business logic)
 ```
 
 Rules:
@@ -39,10 +39,14 @@ Rules:
   callbacks are allowed. The hot usage path NEVER uses callbacks.
 - **Every link is idempotent-guarded.** `CompanyOrder#complete!` no-ops when
   already completed; the invoice only completes once (`saved_change_to_payment_status?`).
-- **Wallet atomicity.** Deduct uses one conditional UPDATE
-  (`SET credit_balance = credit_balance - ?, lock_version = lock_version + 1
-   WHERE id = ? AND credit_balance >= ?`) so concurrent deductions can never
+- **Wallet atomicity.** Every mutation uses a per-balance conditional UPDATE
+  (`SET <balance> = <balance> - ?, lock_version = lock_version + 1
+   WHERE id = ? AND <balance> >= ?`) so concurrent deductions can never
   overdraw. `lock_version` provides optimistic locking.
+- **Usage deduction flows through `CompanyCreditDeduction::*` services** (see `docs/CREDIT_DEDUCTION.md`).
+  The chain above handles money IN; the `CompanyCreditDeduction::BaseService` hierarchy handles
+  credit OUT (deduct promo → main → debt), triggered by an `after_action` filter
+  at the controller action level — never inline in actions.
 
 ## The Hot Path Rule (usage tracking)
 
@@ -91,7 +95,8 @@ Reads: today = DB total + Redis delta; past = DB only
 | Task | What to do |
 |------|------------|
 | New credit cost action | Add key to `CREDIT_USAGE_RATES` (e.g. `create_export: 5`) |
+| New deduction point | Create a `CompanyCreditDeduction::*` service subclass + declare it via `deduct_company_credits_for` (see `docs/CREDIT_DEDUCTION.md` §6) |
 | New purchase tier | Add `{ money_cents => credits }` entry to `CREDIT_RATES[country]` |
 | New money flow | Place the model in the chain with ONE purpose; wire it through the model above it |
 | New usage metric | Add a Kredis counter key + a persisted usage model with store_accessor helpers |
-| Turn on live credit inspection | `company.wallet.enable_usage_logging!` — detail rows for 5 minutes (see `CompanyUsageLog`) |
+| Turn on live credit inspection | `company.company_wallet.enable_usage_logging!` — detail rows for 5 minutes (see `CompanyUsageLog`) |

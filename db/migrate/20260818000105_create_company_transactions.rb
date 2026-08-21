@@ -5,7 +5,7 @@ class CreateCompanyTransactions < ActiveRecord::Migration[8.0]
     create_table :company_transactions, id: :uuid, default: -> { "uuidv7()" } do |t|
       t.references :company, null: false, foreign_key: true, type: :uuid
       t.references :company_invoice, null: false, foreign_key: true, type: :uuid
-      t.references :billing_payment_method, null: false, foreign_key: true, type: :uuid
+      t.references :company_payment_method, null: false, foreign_key: true, type: :uuid
       t.integer :transaction_type, null: false
       t.bigint :money_amount_cents, null: false
       t.integer :currency, null: false
