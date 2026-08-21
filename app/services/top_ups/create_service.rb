@@ -10,10 +10,10 @@ module TopUps
   class CreateService
     Result = Struct.new(:gateway_type, :qr_string, :redirect_url, keyword_init: true)
 
-    def initialize(company:, money_amount_cents:, billing_payment_method:, redirect_url: nil)
+    def initialize(company:, money_amount_cents:, company_payment_method:, redirect_url: nil)
       @company = company
       @money_amount_cents = money_amount_cents.to_i
-      @billing_payment_method = billing_payment_method
+      @company_payment_method = company_payment_method
       @redirect_url = redirect_url
     end
 
@@ -36,7 +36,7 @@ module TopUps
         )
         txn = CompanyTransaction.create!(
           company: @company, company_invoice: invoice,
-          billing_payment_method: @billing_payment_method,
+          company_payment_method: @company_payment_method,
           transaction_type: :payment, money_amount_cents: @money_amount_cents,
           currency: @company.currency, status: :pending,
           gateway_reference: "TOPUP_#{SecureRandom.hex(16)}",

@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 # Top-up page — displays the country-based top-up options (from CREDIT_RATES)
-# and the company's payment options (b2b BillingPaymentMethod catalog), and
+# and the company's payment options (b2b CompanyPaymentMethod catalog), and
 # initiates the selected gateway flow (Mock QR / Mock Redirect).
 class Companies::TopUpsController < Companies::ApplicationController
   def new
@@ -13,7 +13,7 @@ class Companies::TopUpsController < Companies::ApplicationController
           top_up_options: rates.map { |money_cents, credits|
             { money_amount_cents: money_cents, credit_amount: credits }
           },
-          payment_methods: BillingPaymentMethod.where(business_type: :b2b).order(:lifecycle_status).map { |m|
+          payment_methods: CompanyPaymentMethod.where(business_type: :b2b).order(:lifecycle_status).map { |m|
             m.as_json(only: %i[id name code payment_mode strategy lifecycle_status])
           }
         }
@@ -22,11 +22,11 @@ class Companies::TopUpsController < Companies::ApplicationController
   end
 
   def mock_qr_gateway
-    bpm = BillingPaymentMethod.find_by!(strategy: :mock_qr_gateway)
+    bpm = CompanyPaymentMethod.find_by!(strategy: :mock_qr_gateway)
     result = TopUps::CreateService.new(
       company: current_company,
       money_amount_cents: params[:money_amount_cents],
-      billing_payment_method: bpm
+      company_payment_method: bpm
     ).call
     render json: { qr_string: result.qr_string }
   rescue TopUps::Error => e
@@ -36,11 +36,11 @@ class Companies::TopUpsController < Companies::ApplicationController
   end
 
   def mock_redirect_gateway
-    bpm = BillingPaymentMethod.find_by!(strategy: :mock_redirect_gateway)
+    bpm = CompanyPaymentMethod.find_by!(strategy: :mock_redirect_gateway)
     result = TopUps::CreateService.new(
       company: current_company,
       money_amount_cents: params[:money_amount_cents],
-      billing_payment_method: bpm,
+      company_payment_method: bpm,
       redirect_url: company_usage_url(current_company)
     ).call
     render json: { redirect_url: result.redirect_url }

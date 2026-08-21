@@ -43,7 +43,7 @@ module Seed
     attr_reader :company
 
     def seed_wallet_purchases
-      payment_method = BillingPaymentMethod.find_by!(code: "QR_BANK_TRANSFER")
+      payment_method = CompanyPaymentMethod.find_by!(code: "QR_BANK_TRANSFER")
 
       CREDIT_RATES[company.country.to_sym].first(2).each do |money_cents, credits|
         order = CompanyOrder.create!(
@@ -58,7 +58,7 @@ module Seed
         )
         CompanyTransaction.create!(
           company: company, company_invoice: invoice,
-          billing_payment_method: payment_method,
+          company_payment_method: payment_method,
           transaction_type: :payment, money_amount_cents: money_cents,
           currency: company.currency, status: :completed,
           gateway_reference: "SEED-#{SecureRandom.hex(6).upcase}"

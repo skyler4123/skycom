@@ -7,8 +7,8 @@ RSpec.feature "Companies::TopUps", type: :feature, js: true do
   let(:owner) { company.user }
 
   before do
-    create(:billing_payment_method, :mock_qr)
-    create(:billing_payment_method, :mock_redirect)
+    create(:company_payment_method, :mock_qr)
+    create(:company_payment_method, :mock_redirect)
 
     sign_in(owner)
 

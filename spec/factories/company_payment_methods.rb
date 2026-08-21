@@ -1,5 +1,5 @@
 FactoryBot.define do
-  factory :billing_payment_method do
+  factory :company_payment_method do
     name { Faker::Company.name }
     code { "BPM-#{SecureRandom.hex(4).upcase}" }
     business_type { :b2b }

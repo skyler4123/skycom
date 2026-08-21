@@ -75,7 +75,7 @@ export default class Companies_Billing_ShowController extends Companies_LayoutCo
                 ${transactions.length > 0
                   ? transactions.map(t => `
                       <div class="flex items-center gap-2 py-0.5">
-                        <span class="text-xs text-slate-600 dark:text-slate-300">${t.billing_payment_method || "—"}</span>
+                        <span class="text-xs text-slate-600 dark:text-slate-300">${t.company_payment_method || "—"}</span>
                         ${Helpers.statusBadge(t.status)}
                         <span class="font-mono text-[10px] text-slate-400 truncate max-w-[120px]">${t.gateway_reference || ""}</span>
                       </div>

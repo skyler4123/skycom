@@ -5,8 +5,8 @@ require "rails_helper"
 RSpec.describe "Companies::TopUpsController", type: :request do
   let(:company) { create(:company, country: :us, currency: :usd) }
   let(:owner_user) { company.user }
-  let!(:mock_qr) { create(:billing_payment_method, :mock_qr) }
-  let!(:mock_redirect) { create(:billing_payment_method, :mock_redirect) }
+  let!(:mock_qr) { create(:company_payment_method, :mock_qr) }
+  let!(:mock_redirect) { create(:company_payment_method, :mock_redirect) }
 
   before do
     get sign_in_for_test_path(email: owner_user.email)

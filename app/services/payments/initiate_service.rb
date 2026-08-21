@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-# Resolves a CompanyTransaction's billing_payment_method strategy to its
+# Resolves a CompanyTransaction's company_payment_method strategy to its
 # gateway service class and executes the gateway call. On success the
 # transaction keeps status :pending (the webhook later completes it); on
 # failure it is marked :failed and an error is raised.
@@ -12,7 +12,7 @@ module Payments
     end
 
     def call
-      payment_method = @transaction.billing_payment_method
+      payment_method = @transaction.company_payment_method
       strategy_key = payment_method.strategy&.to_sym
 
       gateway_class_name = GATEWAY_STRATEGY_CLASSES[strategy_key]

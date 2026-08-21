@@ -1285,7 +1285,7 @@ GATEWAY_STRATEGY_CLASSES = {
 }.freeze
 ```
 
-**3. Create a PaymentMethod / BillingPaymentMethod record** with the new strategy.
+**3. Create a PaymentMethod / CompanyPaymentMethod record** with the new strategy.
 
 ### Strategy Types
 

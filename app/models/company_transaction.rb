@@ -12,7 +12,7 @@ class CompanyTransaction < ApplicationRecord
 
   belongs_to :company
   belongs_to :company_invoice
-  belongs_to :billing_payment_method
+  belongs_to :company_payment_method
 
   enum :transaction_type, { payment: 0, refund: 1 }, default: :payment
   enum :status, { pending: 0, completed: 1, failed: 2 }, default: :pending

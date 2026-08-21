@@ -10,7 +10,7 @@ RSpec.feature "Companies::Billing", type: :feature, js: true do
     order = create(:company_order, company: company, money_amount_cents: 500, credit_amount: 500_000)
     invoice = create(:company_invoice, company: company, company_order: order, money_amount_cents: 500, credit_amount: 500_000)
     create(:company_transaction, company: company, company_invoice: invoice,
-      billing_payment_method: create(:billing_payment_method, :mock_qr),
+      company_payment_method: create(:company_payment_method, :mock_qr),
       money_amount_cents: 500, status: :completed, gateway_reference: "TXN-FEATURE-001")
     order
   end

@@ -8,7 +8,7 @@ RSpec.describe "Webhooks::Payments::MockRedirectGatewayController", type: :reque
   let!(:invoice) { create(:company_invoice, company: company, company_order: order, money_amount_cents: 1_000, credit_amount: 1_000_000) }
   let!(:txn) do
     create(:company_transaction, company: company, company_invoice: invoice,
-      billing_payment_method: create(:billing_payment_method, :mock_redirect),
+      company_payment_method: create(:company_payment_method, :mock_redirect),
       money_amount_cents: 1_000, status: :pending, gateway_reference: "TOPUP_XYZ789")
   end
 

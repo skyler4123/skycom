@@ -6,7 +6,7 @@ RSpec.describe CompanyTransaction, type: :model do
   describe "associations" do
     it { should belong_to(:company) }
     it { should belong_to(:company_invoice) }
-    it { should belong_to(:billing_payment_method) }
+    it { should belong_to(:company_payment_method) }
   end
 
   describe "enums" do
@@ -25,14 +25,14 @@ RSpec.describe CompanyTransaction, type: :model do
     let(:company) { create(:company, country: :us) }
     let(:order) { create(:company_order, company: company, money_amount_cents: 500, credit_amount: 500_000) }
     let(:invoice) { create(:company_invoice, company: company, company_order: order, money_amount_cents: 500, credit_amount: 500_000) }
-    let(:payment_method) { create(:billing_payment_method, :mock_qr) }
+    let(:payment_method) { create(:company_payment_method, :mock_qr) }
 
     it "derives invoice paid and completes the chain when a completed payment covers the invoice" do
       wallet = company.company_wallet
 
       expect {
         create(:company_transaction, company: company, company_invoice: invoice,
-          billing_payment_method: payment_method, money_amount_cents: 500, status: :completed)
+          company_payment_method: payment_method, money_amount_cents: 500, status: :completed)
       }.to change { invoice.reload.payment_status }.from("unpaid").to("paid")
         .and change { order.reload.workflow_status }.from("pending").to("completed")
         .and change { wallet.reload.main_credit_balance }.by(500_000)
@@ -41,7 +41,7 @@ RSpec.describe CompanyTransaction, type: :model do
 
     it "leaves the invoice unpaid when the payment does not cover the full amount" do
       create(:company_transaction, company: company, company_invoice: invoice,
-        billing_payment_method: payment_method, money_amount_cents: 200, status: :completed)
+        company_payment_method: payment_method, money_amount_cents: 200, status: :completed)
 
       expect(invoice.reload.payment_status).to eq("unpaid")
       expect(order.reload.workflow_status).to eq("pending")
@@ -49,16 +49,16 @@ RSpec.describe CompanyTransaction, type: :model do
 
     it "does not derive paid from pending or failed transactions" do
       create(:company_transaction, company: company, company_invoice: invoice,
-        billing_payment_method: payment_method, money_amount_cents: 500, status: :pending)
+        company_payment_method: payment_method, money_amount_cents: 500, status: :pending)
       create(:company_transaction, company: company, company_invoice: invoice,
-        billing_payment_method: payment_method, money_amount_cents: 500, status: :failed)
+        company_payment_method: payment_method, money_amount_cents: 500, status: :failed)
 
       expect(invoice.reload.payment_status).to eq("unpaid")
     end
 
     it "reverts the invoice to unpaid when its only payment is destroyed" do
       txn = create(:company_transaction, company: company, company_invoice: invoice,
-        billing_payment_method: payment_method, money_amount_cents: 500, status: :completed)
+        company_payment_method: payment_method, money_amount_cents: 500, status: :completed)
       expect(invoice.reload.payment_status).to eq("paid")
 
       expect { txn.destroy! }.to change { invoice.reload.payment_status }.from("paid").to("unpaid")
@@ -66,11 +66,11 @@ RSpec.describe CompanyTransaction, type: :model do
 
     it "does not double-credit the wallet when a second payment is added to an already-paid invoice" do
       create(:company_transaction, company: company, company_invoice: invoice,
-        billing_payment_method: payment_method, money_amount_cents: 500, status: :completed)
+        company_payment_method: payment_method, money_amount_cents: 500, status: :completed)
       expect(company.company_wallet.main_credit_balance).to eq(500_000)
 
       create(:company_transaction, company: company, company_invoice: invoice,
-        billing_payment_method: payment_method, money_amount_cents: 500, status: :completed)
+        company_payment_method: payment_method, money_amount_cents: 500, status: :completed)
 
       expect(invoice.reload.payment_status).to eq("paid")
       expect(order.reload.workflow_status).to eq("completed")
@@ -80,7 +80,7 @@ RSpec.describe CompanyTransaction, type: :model do
 
     it "fires the chain when a pending transaction becomes completed" do
       txn = create(:company_transaction, company: company, company_invoice: invoice,
-        billing_payment_method: payment_method, money_amount_cents: 500, status: :pending)
+        company_payment_method: payment_method, money_amount_cents: 500, status: :pending)
       expect(invoice.reload.payment_status).to eq("unpaid")
 
       expect {
@@ -92,7 +92,7 @@ RSpec.describe CompanyTransaction, type: :model do
 
     it "stores gateway payload in metadata via store_accessor" do
       txn = create(:company_transaction, company: company, company_invoice: invoice,
-        billing_payment_method: payment_method, money_amount_cents: 500, status: :pending,
+        company_payment_method: payment_method, money_amount_cents: 500, status: :pending,
         gateway_payload: { "qr_string" => "MOCKQR123" })
 
       expect(txn.gateway_payload).to eq({ "qr_string" => "MOCKQR123" })

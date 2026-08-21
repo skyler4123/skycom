@@ -8,7 +8,7 @@ RSpec.describe Seed::CreditDataService do
     let(:today) { Time.current.to_date }
 
     before do
-      create(:billing_payment_method, :mock_qr, code: "QR_BANK_TRANSFER")
+      create(:company_payment_method, :mock_qr, code: "QR_BANK_TRANSFER")
     end
 
     it "credits the wallet through the purchase chain" do

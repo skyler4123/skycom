@@ -28,9 +28,9 @@ class Companies::BillingController < Companies::ApplicationController
         id: invoice.id,
         invoice_number: invoice.invoice_number,
         payment_status: invoice.payment_status,
-        transactions: invoice.company_transactions.includes(:billing_payment_method).map { |t|
+        transactions: invoice.company_transactions.includes(:company_payment_method).map { |t|
           t.as_json(only: %i[id money_amount_cents status gateway_reference created_at]).merge(
-            billing_payment_method: t.billing_payment_method&.name
+            company_payment_method: t.company_payment_method&.name
           )
         }
       }
