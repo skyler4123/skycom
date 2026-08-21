@@ -2,7 +2,7 @@
 
 require "rails_helper"
 
-RSpec.describe Deduct::Companies::Dashboards::IndexService do
+RSpec.describe CompanyCreditDeduction::Companies::Dashboards::IndexService do
   let(:company) { create(:company) }
   let(:wallet) { company.company_wallet }
 

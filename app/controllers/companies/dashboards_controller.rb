@@ -2,7 +2,7 @@
 
 class Companies::DashboardsController < Companies::ApplicationController
   # Credit deduction is handled by the after_action filter — never inline.
-  deduct_credits_for :index, with: Deduct::Companies::Dashboards::IndexService
+  deduct_company_credits_for :index, with: CompanyCreditDeduction::Companies::Dashboards::IndexService
 
   def index
     respond_to do |format|

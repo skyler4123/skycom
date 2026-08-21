@@ -57,7 +57,7 @@ RSpec.describe "Credit deduction via after_action", type: :request do
     end
 
     it "never breaks the response when the deduction raises" do
-      allow(Deduct::Companies::Dashboards::IndexService).to receive(:call).and_raise(RuntimeError, "boom")
+      allow(CompanyCreditDeduction::Companies::Dashboards::IndexService).to receive(:call).and_raise(RuntimeError, "boom")
       company.company_wallet.add_to!(balance: :main, amount: 100)
 
       get "/companies/#{company.id}/dashboards.json"

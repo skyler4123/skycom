@@ -43,8 +43,8 @@ Rules:
   (`SET <balance> = <balance> - ?, lock_version = lock_version + 1
    WHERE id = ? AND <balance> >= ?`) so concurrent deductions can never
   overdraw. `lock_version` provides optimistic locking.
-- **Usage deduction flows through `Deduct::*` services** (see `docs/CREDIT_DEDUCTION.md`).
-  The chain above handles money IN; the `Deduct::BaseService` hierarchy handles
+- **Usage deduction flows through `CompanyCreditDeduction::*` services** (see `docs/CREDIT_DEDUCTION.md`).
+  The chain above handles money IN; the `CompanyCreditDeduction::BaseService` hierarchy handles
   credit OUT (deduct promo → main → debt), triggered by an `after_action` filter
   at the controller action level — never inline in actions.
 
@@ -95,7 +95,7 @@ Reads: today = DB total + Redis delta; past = DB only
 | Task | What to do |
 |------|------------|
 | New credit cost action | Add key to `CREDIT_USAGE_RATES` (e.g. `create_export: 5`) |
-| New deduction point | Create a `Deduct::*` service subclass + declare it via `deduct_credits_for` (see `docs/CREDIT_DEDUCTION.md` §6) |
+| New deduction point | Create a `CompanyCreditDeduction::*` service subclass + declare it via `deduct_company_credits_for` (see `docs/CREDIT_DEDUCTION.md` §6) |
 | New purchase tier | Add `{ money_cents => credits }` entry to `CREDIT_RATES[country]` |
 | New money flow | Place the model in the chain with ONE purpose; wire it through the model above it |
 | New usage metric | Add a Kredis counter key + a persisted usage model with store_accessor helpers |

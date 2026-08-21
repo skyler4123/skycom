@@ -2,7 +2,7 @@
 
 require "rails_helper"
 
-RSpec.describe Deduct::BaseService do
+RSpec.describe CompanyCreditDeduction::BaseService do
   let(:company) { create(:company) }
   let(:wallet) { company.company_wallet }
 

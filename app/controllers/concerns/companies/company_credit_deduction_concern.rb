@@ -2,17 +2,17 @@
 
 # Credit deduction is controlled at the CONTROLLER ACTION level via an
 # after_action filter — never inline inside actions. Controllers declare
-# which Deduct::* service runs for which action:
+# which CompanyCreditDeduction::* service runs for which action:
 #
 #   class Companies::DashboardsController < Companies::ApplicationController
-#     deduct_credits_for :index, with: Deduct::Companies::Dashboards::IndexService
+#     deduct_company_credits_for :index, with: CompanyCreditDeduction::Companies::Dashboards::IndexService
 #   end
 #
 # The filter:
 #   - runs only after a SUCCESSFUL JSON response (no HTML, no 4xx/5xx)
 #   - delegates the whole deduction to the declared service class
 #   - rescues all deduction errors so the request is never broken
-module Companies::CreditDeductionConcern
+module Companies::CompanyCreditDeductionConcern
   extend ActiveSupport::Concern
 
   included do
@@ -21,8 +21,8 @@ module Companies::CreditDeductionConcern
 
   class_methods do
     # Declarative DSL — maps one or more actions to their dedicated
-    # Deduct::* service subclass.
-    def deduct_credits_for(*actions, with:)
+    # CompanyCreditDeduction::* service subclass.
+    def deduct_company_credits_for(*actions, with:)
       @credit_deduction_services ||= {}
       Array(actions).each { |action| @credit_deduction_services[action.to_sym] = with }
     end
@@ -39,6 +39,6 @@ module Companies::CreditDeductionConcern
     service_class.call(company: current_company)
   rescue StandardError => e
     # A deduction failure must never break the request — log and continue.
-    Rails.logger.warn("[CreditDeduction] #{self.class}##{action_name}: #{e.message}")
+    Rails.logger.warn("[CompanyCreditDeduction] #{self.class}##{action_name}: #{e.message}")
   end
 end

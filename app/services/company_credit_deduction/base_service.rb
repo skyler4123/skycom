@@ -1,18 +1,18 @@
 # frozen_string_literal: true
 
-# Deduct::BaseService — the epic credit-deduction service.
+# CompanyCreditDeduction::BaseService — the epic credit-deduction service.
 #
 # One purpose: move credits out of the company wallet for a single
 # action (and meter the usage). Subclasses represent ONE place/controller
-# action (e.g. Deduct::Companies::Dashboards::IndexService) because the
+# action (e.g. CompanyCreditDeduction::Companies::Dashboards::IndexService) because the
 # deduction rules can differ between places even for the same action type
 # (cost, description, guards). Controllers trigger deduction via the
-# CreditDeductionConcern after_action DSL — never inline in actions.
+# CompanyCreditDeductionConcern after_action DSL — never inline in actions.
 #
 # Deduction priority: promo balance first, then main balance; any
 # uncovered remainder is absorbed by the debt balance (normally 0).
 # The service never raises for an insufficient balance — debt absorbs.
-module Deduct
+module CompanyCreditDeduction
   class BaseService
     def self.call(company:, **kwargs)
       new(company: company, **kwargs).call

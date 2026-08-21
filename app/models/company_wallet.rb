@@ -3,12 +3,12 @@
 # CompanyWallet — Atomic purpose: store the credit balance NUMBERS only.
 # No business logic. Balance changes flow exclusively through the chain
 # (CompanyTransaction → CompanyInvoice → CompanyOrder → CompanyWallet) and
-# through the Deduct::* services; the wallet exposes only low-level per-balance
+# through the CompanyCreditDeduction::* services; the wallet exposes only low-level per-balance
 # mutation entry points (add_to! / deduct_from!).
 #
 # Balances:
 #   main  — real purchased credits (top-ups land here via add_credits!)
-#   promo — promotional credits (deducted FIRST by Deduct::* services)
+#   promo — promotional credits (deducted FIRST by CompanyCreditDeduction::* services)
 #   debt  — absorbed shortfall when promo + main are exhausted (normally 0)
 #
 # Atomicity: every mutation uses a conditional UPDATE, so no concurrent
@@ -42,7 +42,7 @@ class CompanyWallet < ApplicationRecord
     add_to!(balance: :main, amount: amount, source: source, description: description, action_type: action_type)
   end
 
-  # Low-level atomic mutation entry points — called by Deduct::* services.
+  # Low-level atomic mutation entry points — called by CompanyCreditDeduction::* services.
 
   def add_to!(balance:, amount:, source: nil, description: nil, action_type: nil)
     column = balance_column!(balance)
