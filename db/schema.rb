@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_08_21_000001) do
+ActiveRecord::Schema[8.0].define(version: 2026_08_18_000108) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pgcrypto"
@@ -894,9 +894,9 @@ ActiveRecord::Schema[8.0].define(version: 2026_08_21_000001) do
     t.jsonb "metadata", default: {}, null: false
     t.datetime "discarded_at"
     t.string "permission_resource_name"
+    t.bigint "total_credits", default: 0, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.bigint "total_credits", default: 0, null: false
     t.index ["company_id", "usage_date"], name: "index_company_daily_usages_on_company_id_and_usage_date", unique: true
     t.index ["company_id"], name: "index_company_daily_usages_on_company_id"
     t.index ["discarded_at"], name: "index_company_daily_usages_on_discarded_at"
@@ -936,9 +936,9 @@ ActiveRecord::Schema[8.0].define(version: 2026_08_21_000001) do
     t.jsonb "metadata", default: {}, null: false
     t.datetime "discarded_at"
     t.string "permission_resource_name"
+    t.bigint "total_credits", default: 0, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.bigint "total_credits", default: 0, null: false
     t.index ["company_id", "usage_month"], name: "index_company_monthly_usages_on_company_id_and_usage_month", unique: true
     t.index ["company_id"], name: "index_company_monthly_usages_on_company_id"
     t.index ["discarded_at"], name: "index_company_monthly_usages_on_discarded_at"
@@ -1027,6 +1027,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_08_21_000001) do
     t.bigint "balance_before", null: false
     t.bigint "balance_after", null: false
     t.text "description"
+    t.integer "balance_type"
     t.integer "lifecycle_status"
     t.integer "workflow_status"
     t.integer "business_type"
@@ -1036,7 +1037,6 @@ ActiveRecord::Schema[8.0].define(version: 2026_08_21_000001) do
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.integer "balance_type"
     t.index ["company_id"], name: "index_company_wallet_logs_on_company_id"
     t.index ["company_wallet_id", "created_at"], name: "index_company_wallet_logs_on_company_wallet_id_and_created_at"
     t.index ["company_wallet_id"], name: "index_company_wallet_logs_on_company_wallet_id"
@@ -1049,6 +1049,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_08_21_000001) do
     t.string "walletable_type", null: false
     t.uuid "walletable_id", null: false
     t.bigint "main_credit_balance", default: 0, null: false
+    t.bigint "promo_credit_balance", default: 0, null: false
+    t.bigint "debt_credit_balance", default: 0, null: false
     t.integer "lock_version", default: 0, null: false
     t.datetime "usage_logging_until"
     t.integer "lifecycle_status"
@@ -1060,8 +1062,6 @@ ActiveRecord::Schema[8.0].define(version: 2026_08_21_000001) do
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.bigint "promo_credit_balance", default: 0, null: false
-    t.bigint "debt_credit_balance", default: 0, null: false
     t.index ["company_id"], name: "index_company_wallets_on_company_id", unique: true
     t.index ["discarded_at"], name: "index_company_wallets_on_discarded_at"
     t.index ["walletable_type", "walletable_id"], name: "index_company_wallets_on_walletable_type_and_walletable_id"

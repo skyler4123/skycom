@@ -6,7 +6,9 @@ class CreateCompanyWallets < ActiveRecord::Migration[8.0]
       t.references :company, null: false, foreign_key: true, type: :uuid, index: { unique: true }
       t.string :walletable_type, null: false
       t.uuid :walletable_id, null: false
-      t.bigint :credit_balance, null: false, default: 0
+      t.bigint :main_credit_balance, null: false, default: 0
+      t.bigint :promo_credit_balance, null: false, default: 0
+      t.bigint :debt_credit_balance, null: false, default: 0
       t.integer :lock_version, null: false, default: 0
       t.datetime :usage_logging_until
 
