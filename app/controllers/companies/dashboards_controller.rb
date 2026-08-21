@@ -1,9 +1,10 @@
 # app/controllers/companies/dashboards_controller.rb
 
 class Companies::DashboardsController < Companies::ApplicationController
-  def index
-    credit_warning = deduct_dashboard_credits
+  # Credit deduction is handled by the after_action filter — never inline.
+  deduct_credits_for :index, with: Deduct::Companies::Dashboards::IndexService
 
+  def index
     respond_to do |format|
       format.html { render html: "", layout: true }
       format.json do
@@ -16,8 +17,7 @@ class Companies::DashboardsController < Companies::ApplicationController
             orders:    count_by_category(current_company.orders),
             employees: count_by_category(current_company.employees)
           },
-          credit_warning: credit_warning,
-          wallet: { credit_balance: current_company.company_wallet.credit_balance, currency: current_company.currency }
+          wallet: format_wallet(current_company.company_wallet)
         }
       end
     end
@@ -25,18 +25,13 @@ class Companies::DashboardsController < Companies::ApplicationController
 
   private
 
-  def deduct_dashboard_credits
-    return nil unless request.format.json?
-
-    wallet = current_company.company_wallet
-    return nil unless wallet
-
-    cost = CREDIT_USAGE_RATES[:access_dashboard]
-    wallet.deduct_credits!(amount: cost, description: "Dashboard access", action_type: "access_dashboard")
-    current_company.record_credit_usage!(cost)
-    nil
-  rescue CompanyWallet::InsufficientCreditsError => e
-    e.message
+  def format_wallet(wallet)
+    {
+      main_credit_balance: wallet&.main_credit_balance || 0,
+      promo_credit_balance: wallet&.promo_credit_balance || 0,
+      debt_credit_balance: wallet&.debt_credit_balance || 0,
+      currency: current_company.currency
+    }
   end
 
   def format_company(company)

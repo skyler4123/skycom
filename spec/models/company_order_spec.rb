@@ -52,14 +52,14 @@ RSpec.describe CompanyOrder, type: :model do
 
       expect {
         order.complete!
-      }.to change(wallet, :credit_balance).by(500_000)
+      }.to change(wallet, :main_credit_balance).by(500_000)
         .and change(CompanyWalletLog, :count).by(1)
       expect(order.reload.workflow_status).to eq("completed")
       expect(wallet.reload.walletable).to eq(order)
 
       expect {
         order.complete!
-      }.not_to change(wallet, :credit_balance)
+      }.not_to change(wallet, :main_credit_balance)
       expect(CompanyWalletLog.count).to eq(1)
     end
 
@@ -68,7 +68,7 @@ RSpec.describe CompanyOrder, type: :model do
       order = create(:company_order, company: company, money_amount_cents: 500, credit_amount: 500_000, workflow_status: :completed)
 
       expect { order.complete! }.not_to change(CompanyWalletLog, :count)
-      expect(company.company_wallet.credit_balance).to eq(0)
+      expect(company.company_wallet.main_credit_balance).to eq(0)
     end
   end
 end

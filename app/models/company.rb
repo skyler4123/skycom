@@ -220,7 +220,7 @@ class Company < ApplicationRecord
 
     user.update!(system_role: :company_owner)
 
-    create_company_wallet!(walletable: self, credit_balance: 0)
+    create_company_wallet!(walletable: self, main_credit_balance: 0)
 
     unless self.class.skip_init
       if business_type_retail?

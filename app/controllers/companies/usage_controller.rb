@@ -19,7 +19,12 @@ class Companies::UsageController < Companies::ApplicationController
         end
 
         render json: {
-          wallet: { credit_balance: wallet.credit_balance, currency: current_company.currency },
+          wallet: {
+            main_credit_balance: wallet&.main_credit_balance || 0,
+            promo_credit_balance: wallet&.promo_credit_balance || 0,
+            debt_credit_balance: wallet&.debt_credit_balance || 0,
+            currency: current_company.currency
+          },
           daily_usage: daily_usage,
           today_total: daily_usage.last[:total_credits],
           live_delta: live_delta,

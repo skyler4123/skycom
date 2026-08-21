@@ -23,7 +23,7 @@ RSpec.describe Seed::CreditDataService do
       expect(company.company_invoices.map(&:payment_status)).to all(eq("paid"))
 
       expected_balance = CREDIT_RATES[:us].first(2).to_h.values.sum
-      expect(company.company_wallet.reload.credit_balance).to eq(expected_balance)
+      expect(company.company_wallet.reload.main_credit_balance).to eq(expected_balance)
     end
 
     it "seeds 7 days of daily usage with consistent totals" do

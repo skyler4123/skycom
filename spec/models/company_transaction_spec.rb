@@ -35,7 +35,7 @@ RSpec.describe CompanyTransaction, type: :model do
           billing_payment_method: payment_method, money_amount_cents: 500, status: :completed)
       }.to change { invoice.reload.payment_status }.from("unpaid").to("paid")
         .and change { order.reload.workflow_status }.from("pending").to("completed")
-        .and change { wallet.reload.credit_balance }.by(500_000)
+        .and change { wallet.reload.main_credit_balance }.by(500_000)
         .and change(CompanyWalletLog, :count).by(1)
     end
 
@@ -67,14 +67,14 @@ RSpec.describe CompanyTransaction, type: :model do
     it "does not double-credit the wallet when a second payment is added to an already-paid invoice" do
       create(:company_transaction, company: company, company_invoice: invoice,
         billing_payment_method: payment_method, money_amount_cents: 500, status: :completed)
-      expect(company.company_wallet.credit_balance).to eq(500_000)
+      expect(company.company_wallet.main_credit_balance).to eq(500_000)
 
       create(:company_transaction, company: company, company_invoice: invoice,
         billing_payment_method: payment_method, money_amount_cents: 500, status: :completed)
 
       expect(invoice.reload.payment_status).to eq("paid")
       expect(order.reload.workflow_status).to eq("completed")
-      expect(company.company_wallet.reload.credit_balance).to eq(500_000)
+      expect(company.company_wallet.reload.main_credit_balance).to eq(500_000)
       expect(CompanyWalletLog.count).to eq(1)
     end
 
@@ -87,7 +87,7 @@ RSpec.describe CompanyTransaction, type: :model do
         txn.update!(status: :completed)
       }.to change { invoice.reload.payment_status }.from("unpaid").to("paid")
         .and change { order.reload.workflow_status }.from("pending").to("completed")
-        .and change { company.company_wallet.reload.credit_balance }.by(500_000)
+        .and change { company.company_wallet.reload.main_credit_balance }.by(500_000)
     end
 
     it "stores gateway payload in metadata via store_accessor" do

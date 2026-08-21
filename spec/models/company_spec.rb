@@ -140,7 +140,7 @@ RSpec.describe Company, type: :model do
     it "auto-creates a company wallet on create" do
       company = create(:company)
       expect(company.company_wallet).to be_present
-      expect(company.company_wallet.credit_balance).to eq(0)
+      expect(company.company_wallet.main_credit_balance).to eq(0)
       expect(company.company_wallet.walletable).to eq(company)
     end
   end

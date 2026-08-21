@@ -52,7 +52,7 @@ export default class Companies_Billing_ShowController extends Companies_LayoutCo
   }
 
   contentHTML() {
-    const balance = this.formatCredits(this.wallet?.credit_balance)
+    const balance = this.formatCredits(this.wallet?.main_credit_balance)
 
     const rows = this.orders.length > 0
       ? this.orders.map(o => {

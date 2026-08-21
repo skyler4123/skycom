@@ -60,7 +60,7 @@ RSpec.describe "Webhooks::Payments::MockQrGatewayController", type: :request do
       }.to change { txn.reload.status }.from("pending").to("completed")
         .and change { invoice.reload.payment_status }.from("unpaid").to("paid")
         .and change { order.reload.workflow_status }.from("pending").to("completed")
-        .and change { company.company_wallet.reload.credit_balance }.by(500_000)
+        .and change { company.company_wallet.reload.main_credit_balance }.by(500_000)
 
       expect(response).to have_http_status(:ok)
       expect(JSON.parse(response.body)["status"]).to eq("completed")
@@ -78,13 +78,13 @@ RSpec.describe "Webhooks::Payments::MockQrGatewayController", type: :request do
 
     it "is idempotent when the transaction is already completed" do
       txn.update!(status: :completed)
-      wallet_before = company.company_wallet.reload.credit_balance
+      wallet_before = company.company_wallet.reload.main_credit_balance
 
       post_webhook(valid_payload)
 
       expect(response).to have_http_status(:ok)
       expect(JSON.parse(response.body)["status"]).to eq("already_completed")
-      expect(company.company_wallet.reload.credit_balance).to eq(wallet_before)
+      expect(company.company_wallet.reload.main_credit_balance).to eq(wallet_before)
       expect(CompanyWalletLog.count).to eq(1)
     end
   end

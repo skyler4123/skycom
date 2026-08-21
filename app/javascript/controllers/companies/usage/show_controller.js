@@ -69,7 +69,7 @@ export default class Companies_Usage_ShowController extends Companies_LayoutCont
 
   contentHTML() {
     const cards = [
-      { label: translate("Credit Balance"), value: this.formatCredits(this.wallet?.credit_balance), icon: "account_balance_wallet", color: "bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400" },
+      { label: translate("Credit Balance"), value: this.formatCredits(this.wallet?.main_credit_balance), icon: "account_balance_wallet", color: "bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400" },
       { label: translate("Today"), value: this.formatCredits(this.todayTotal), icon: "today", color: "bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400" },
       { label: translate("Live Delta"), value: this.formatCredits(this.liveDelta), icon: "bolt", color: "bg-amber-100 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400" },
       { label: translate("Monthly Total"), value: this.formatCredits(this.monthlyTotal), icon: "calendar_month", color: "bg-purple-100 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400" },

@@ -46,7 +46,7 @@ RSpec.describe "Webhooks::Payments::MockRedirectGatewayController", type: :reque
       }.to change { txn.reload.status }.from("pending").to("completed")
         .and change { invoice.reload.payment_status }.from("unpaid").to("paid")
         .and change { order.reload.workflow_status }.from("pending").to("completed")
-        .and change { company.company_wallet.reload.credit_balance }.by(1_000_000)
+        .and change { company.company_wallet.reload.main_credit_balance }.by(1_000_000)
 
       expect(response).to have_http_status(:ok)
       expect(JSON.parse(response.body)["status"]).to eq("completed")

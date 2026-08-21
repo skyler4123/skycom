@@ -12,14 +12,14 @@ RSpec.describe CompanyWallet, type: :model do
     it { should have_many(:company_usage_logs).dependent(:destroy) }
   end
 
-  describe "credit balance mutations" do
+  describe "balance mutations" do
     let(:company) { create(:company) }
     let(:wallet) { company.company_wallet }
 
-    it "adds credits and records an audit log with before/after snapshots" do
+    it "adds credits to the main balance and records an audit log with before/after snapshots" do
       expect {
         wallet.add_credits!(amount: 500_000, source: nil, description: "Top-up")
-      }.to change(wallet, :credit_balance).by(500_000)
+      }.to change(wallet, :main_credit_balance).by(500_000)
         .and change(CompanyWalletLog, :count).by(1)
 
       log = CompanyWalletLog.last
@@ -27,15 +27,16 @@ RSpec.describe CompanyWallet, type: :model do
       expect(log.change_amount).to eq(500_000)
       expect(log.balance_before).to eq(0)
       expect(log.balance_after).to eq(500_000)
+      expect(log.balance_type).to eq("main")
       expect(wallet.lock_version).to eq(1)
     end
 
-    it "deducts credits when the balance is sufficient" do
+    it "deducts from a single balance when the balance is sufficient" do
       wallet.add_credits!(amount: 100)
 
       expect {
-        wallet.deduct_credits!(amount: 30, source: nil, description: "Order creation")
-      }.to change(wallet, :credit_balance).by(-30)
+        wallet.deduct_from!(balance: :main, amount: 30, source: nil, description: "Order creation")
+      }.to change(wallet, :main_credit_balance).by(-30)
         .and change(CompanyWalletLog, :count).by(1)
 
       log = CompanyWalletLog.last
@@ -43,22 +44,43 @@ RSpec.describe CompanyWallet, type: :model do
       expect(log.change_amount).to eq(-30)
       expect(log.balance_before).to eq(100)
       expect(log.balance_after).to eq(70)
+      expect(log.balance_type).to eq("main")
     end
 
     it "raises InsufficientCreditsError and leaves the balance unchanged" do
       wallet.add_credits!(amount: 10)
 
       expect {
-        wallet.deduct_credits!(amount: 20)
+        wallet.deduct_from!(balance: :main, amount: 20)
       }.to raise_error(CompanyWallet::InsufficientCreditsError)
 
-      expect(wallet.reload.credit_balance).to eq(10)
+      expect(wallet.reload.main_credit_balance).to eq(10)
       expect(CompanyWalletLog.count).to eq(1)
     end
 
+    it "keeps each balance independent" do
+      wallet.add_to!(balance: :promo, amount: 50)
+      wallet.add_to!(balance: :debt, amount: 5)
+
+      expect(wallet.main_credit_balance).to eq(0)
+      expect(wallet.promo_credit_balance).to eq(50)
+      expect(wallet.debt_credit_balance).to eq(5)
+
+      wallet.deduct_from!(balance: :promo, amount: 10)
+      expect(wallet.promo_credit_balance).to eq(40)
+      expect(wallet.main_credit_balance).to eq(0)
+
+      expect(CompanyWalletLog.pluck(:balance_type)).to eq(%w[promo debt promo])
+    end
+
     it "rejects non-positive amounts" do
-      expect { wallet.add_credits!(amount: 0) }.to raise_error(ArgumentError)
-      expect { wallet.deduct_credits!(amount: -5) }.to raise_error(ArgumentError)
+      expect { wallet.add_to!(balance: :main, amount: 0) }.to raise_error(ArgumentError)
+      expect { wallet.deduct_from!(balance: :main, amount: -5) }.to raise_error(ArgumentError)
+    end
+
+    it "rejects unknown balance keys" do
+      expect { wallet.add_to!(balance: :savings, amount: 10) }.to raise_error(ArgumentError)
+      expect { wallet.deduct_from!(balance: :savings, amount: 10) }.to raise_error(ArgumentError)
     end
 
     it "raises StaleObjectError when a stale object is saved" do
@@ -66,7 +88,7 @@ RSpec.describe CompanyWallet, type: :model do
       stale = CompanyWallet.find(wallet.id)
       wallet.add_credits!(amount: 50)
 
-      expect { stale.update!(credit_balance: 999) }.to raise_error(ActiveRecord::StaleObjectError)
+      expect { stale.update!(main_credit_balance: 999) }.to raise_error(ActiveRecord::StaleObjectError)
     end
   end
 
@@ -101,7 +123,7 @@ RSpec.describe CompanyWallet, type: :model do
 
       wallet.enable_usage_logging!(window: 5.minutes)
       expect {
-        wallet.deduct_credits!(amount: 10, source: nil, description: "Order", action_type: "create_order")
+        wallet.deduct_from!(balance: :main, amount: 10, source: nil, description: "Order", action_type: "create_order")
       }.to change(CompanyUsageLog, :count).by(1)
 
       log = CompanyUsageLog.last

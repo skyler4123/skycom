@@ -7,7 +7,12 @@ class Companies::BillingController < Companies::ApplicationController
       format.json do
         orders = current_company.company_orders.includes(:company_invoice).order(created_at: :desc)
         render json: {
-          wallet: { credit_balance: current_company.company_wallet.credit_balance, currency: current_company.currency },
+          wallet: {
+            main_credit_balance: current_company.company_wallet&.main_credit_balance || 0,
+            promo_credit_balance: current_company.company_wallet&.promo_credit_balance || 0,
+            debt_credit_balance: current_company.company_wallet&.debt_credit_balance || 0,
+            currency: current_company.currency
+          },
           orders: orders.map { |o| format_order(o) }
         }
       end
