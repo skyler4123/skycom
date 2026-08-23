@@ -222,7 +222,52 @@ end
 
 ---
 
-## 7. File Reference
+## 7. Testing — Wallet Seeding Requirement
+
+All deduction tests **must** seed the wallet via `RandomizedWalletHelper`. `create(:company)` creates a wallet with `0/0/0` (`main/promo/debt` via `Company#initialize_company` at `app/models/company.rb:223`), so without seeding the `CompanyCreditDeduction::BaseService` drain (`app/services/company_credit_deduction/base_service.rb:65` `promo → main → debt`) still succeeds but takes the **debt path** (`debt_credit_balance` absorbs the shortfall, `main/promo` stay `0`). Symptom: wallet assertions fail while `CompanyDailyUsage`/`CompanyMonthlyUsage` still show the usage.
+
+### The Pitfall
+
+| Without seeding | With `seed_random_wallet!` |
+|-----------------|---------------------------|
+| `main_credit_balance: 0`, `promo: 0` → visit deducts 2 → `main 0`, `promo 0`, `debt 2` | `main 200..500`, `promo 200..500` → visit deducts 2 → `promo -2`, `main` unchanged, `debt 0` |
+
+Old tests that never asserted wallet balances passed by accident; new E2E that asserts `promo-2/main` or `credit_usage_delta` will fail if seeding is missed.
+
+### Reusable Helper
+
+**File**: `spec/support/credit_wallet_helper.rb:1`
+
+```ruby
+# Dual-both seeding — validates promo-first priority and exercises both columns in one run.
+snapshot = seed_random_wallet!(company) # => { promo_start: 200..500, main_start: 200..500 }
+# or custom ranges:
+snapshot = seed_random_wallet!(company, promo_range: 300..600, main_range: 300..600)
+
+visit company_dashboards_path(company)
+expect(company.company_wallet.reload.promo_credit_balance).to eq(snapshot[:promo_start] - 2)
+expect(company.company_wallet.reload.main_credit_balance).to eq(snapshot[:main_start])
+expect(company.company_wallet.reload.debt_credit_balance).to eq(0)
+expect(company.credit_usage_delta).to eq(CREDIT_USAGE_RATES[:access_dashboard])
+```
+
+Auto-loaded via `spec/rails_helper.rb:26` (`Rails.root.glob('spec/support/**/*.rb')`), so no per-file `require` needed — works for `type: :feature` (js), `:request`, and `:job`.
+
+### The Full E2E Chain (Redis → DB)
+
+This is the canonical pattern proven in `spec/features/companies/credit_deduction_e2e_spec.rb:1`:
+
+```
+visit (trigger after_action deduct → Kredis INCR) → assert credit_usage_delta
+  → CompanyUsageSyncJob.perform_now (drain counter → DB)
+  → assert CompanyDailyUsage h<HH> / CompanyMonthlyUsage d<DD> / total_credits
+```
+
+See `docs/ATOMIC_PURPOSE.md` § Hot Path Rule for the `kredis_counter :credit_usage` + `CompanyUsageSyncJob` drain details.
+
+---
+
+## 8. File Reference
 
 | File | Purpose |
 |------|---------|
@@ -234,14 +279,16 @@ end
 | `app/models/company_wallet_log.rb` | Audit log with `balance_type` enum |
 | `config/initializers/constants.rb` | `CREDIT_USAGE_RATES` (per-action costs) |
 | `db/migrate/20260821000001_add_multi_balance_to_company_wallets.rb` | `main_credit_balance` rename + `promo_credit_balance` + `debt_credit_balance` + `balance_type` |
+| `spec/support/credit_wallet_helper.rb` | **Reusable `seed_random_wallet!` helper (dual-both randomized seeding)** |
 | `spec/services/company_credit_deduction/base_service_spec.rb` | Priority/deduction/metering coverage |
 | `spec/services/company_credit_deduction/companies/dashboards/index_service_spec.rb` | Dashboard service contract |
 | `spec/requests/companies/credit_deduction_spec.rb` | after_action filter behavior (JSON-only, rescue, payload) |
 | `spec/features/companies/dashboards/index_spec.rb` | End-to-end dashboard deduction scenarios |
+| `spec/features/companies/credit_deduction_e2e_spec.rb` | **E2E js:true — Kredis delta → SyncJob → Daily/Monthly DB** |
 
 ---
 
-## 8. See Also
+## 9. See Also
 
 - `docs/ATOMIC_PURPOSE.md` — the credit chain (`CompanyTransaction → CompanyInvoice → CompanyOrder → CompanyWallet`) and the atomic-purpose pattern; the wallet's per-balance entry points are called by `CompanyCreditDeduction::*` services
 - `docs/CONSTANTS.md` — constant conventions (`CREDIT_USAGE_RATES` is the single source of action costs)
