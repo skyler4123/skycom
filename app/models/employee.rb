@@ -19,6 +19,16 @@ class Employee < ApplicationRecord
 
   # has_paper_trail
 
+  # --- Enums ---
+  enum :business_type, {
+    owner: 0,
+    full_time: 1,
+    part_time: 2,
+    contractor: 3,
+    intern: 4
+  }
+  enum :lifecycle_status, LIFECYCLE_STATUS, prefix: true
+  enum :workflow_status, WORKFLOW_STATUS, prefix: true
   # --- Associations ---
   belongs_to :company
   belongs_to :branch, optional: true
@@ -44,17 +54,6 @@ class Employee < ApplicationRecord
 
   has_many :tag_appointments, dependent: :destroy, as: :appoint_to
   has_many :tags, through: :tag_appointments
-
-  # --- Enums ---
-  enum :business_type, {
-    owner: 0,
-    full_time: 1,
-    part_time: 2,
-    contractor: 3,
-    intern: 4
-  }
-  enum :lifecycle_status, LIFECYCLE_STATUS, prefix: true
-  enum :workflow_status, WORKFLOW_STATUS, prefix: true
 
   # --- Validations ---
   validates :name, presence: true, uniqueness: { scope: :company_id }

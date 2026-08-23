@@ -2,6 +2,18 @@ class Policy < ApplicationRecord
   store_accessor :metadata, :tag_conditions
   attribute :permission_resource_name, :string, default: -> { self.name }
 
+  # --- Enums ---
+  # Using full path to avoid potential method clashes
+  enum :lifecycle_status, LIFECYCLE_STATUS, prefix: true
+  enum :workflow_status, WORKFLOW_STATUS, prefix: true
+  # Policy business_types based on common organizational categories
+  enum :business_type, {
+    owner: 0,
+    security: 1,
+    regulatory: 2,
+    operational: 3,
+    compliance: 4
+  }
   # --- Associations ---
   # REASON: If a global Policy definition (like its name or resource type) is edited, we touch the Company to invalidate any cached permission sets that include this policy.
   belongs_to :company, touch: true
@@ -17,20 +29,6 @@ class Policy < ApplicationRecord
   # If you are using a gem like 'Discard' or similar for soft deletion:
   # include Discard::Model
   # default_scope -> { kept }
-
-  # --- Enums ---
-  # Using full path to avoid potential method clashes
-  enum :lifecycle_status, LIFECYCLE_STATUS, prefix: true
-  enum :workflow_status, WORKFLOW_STATUS, prefix: true
-
-  # Policy business_types based on common organizational categories
-  enum :business_type, {
-    owner: 0,
-    security: 1,
-    regulatory: 2,
-    operational: 3,
-    compliance: 4
-  }
 
   # --- Validations ---
   validates :name, presence: true, length: { maximum: 150 }

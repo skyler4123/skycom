@@ -3,6 +3,14 @@ class PaymentMethodAppointment < ApplicationRecord
 
   attribute :permission_resource_name, :string, default: -> { self.name }
 
+  # --- Enums ---
+  enum :lifecycle_status, LIFECYCLE_STATUS, prefix: true
+  enum :workflow_status, WORKFLOW_STATUS, prefix: true
+  enum :business_type, {
+    online: 0,
+    in_store: 1,
+    recurring: 2
+  }
   # --- Associations ---
   belongs_to :payment_method
   belongs_to :company
@@ -12,32 +20,19 @@ class PaymentMethodAppointment < ApplicationRecord
   belongs_to :appoint_for, polymorphic: true, optional: true
   belongs_to :appoint_by, polymorphic: true, optional: true
 
-  # --- Enums ---
-  enum :lifecycle_status, LIFECYCLE_STATUS, prefix: true
-  enum :workflow_status, WORKFLOW_STATUS, prefix: true
-
-  enum :business_type, {
-    online: 0,
-    in_store: 1,
-    recurring: 2
-  }
-
   # --- Scopes ---
   scope :company_level, -> { where(appoint_to_type: "Company") }
   scope :branch_level, -> { where(appoint_to_type: "Branch") }
 
-  # --- Callbacks ---
-  before_validation :default_appoint_to_to_company
-  after_update :cascade_lifecycle_to_branch_appointments, if: :company_level_lifecycle_change?
-
   # --- Validations ---
   validates :name, presence: true, length: { maximum: 255 }
   validates :code, presence: true, uniqueness: { scope: :company_id, message: "This payment method code is already assigned to this company group." }
-
   validates :business_type, presence: true
-
   validate :payment_method_country_matches_company
   validate :payment_method_must_be_active_in_company
+  # --- Callbacks ---
+  before_validation :default_appoint_to_to_company
+  after_update :cascade_lifecycle_to_branch_appointments, if: :company_level_lifecycle_change?
 
   private
 

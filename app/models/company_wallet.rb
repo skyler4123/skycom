@@ -25,13 +25,12 @@ class CompanyWallet < ApplicationRecord
 
   attribute :permission_resource_name, :string, default: -> { self.name }
 
+  enum :lifecycle_status, LIFECYCLE_STATUS, prefix: true, default: :active
+  enum :workflow_status, WORKFLOW_STATUS, prefix: true, default: :confirmed
   belongs_to :company
   belongs_to :walletable, polymorphic: true
   has_many :company_wallet_logs, dependent: :destroy
   has_many :company_usage_logs, dependent: :destroy
-
-  enum :lifecycle_status, LIFECYCLE_STATUS, prefix: true, default: :active
-  enum :workflow_status, WORKFLOW_STATUS, prefix: true, default: :confirmed
 
   class InsufficientCreditsError < StandardError; end
 

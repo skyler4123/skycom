@@ -7,21 +7,19 @@
 class CompanyInvoice < ApplicationRecord
   attribute :permission_resource_name, :string, default: -> { self.name }
 
-  belongs_to :company
-  belongs_to :company_order, optional: true
-  has_many :company_transactions, dependent: :destroy
-
   enum :payment_status, { unpaid: 0, paid: 1, overdue: 2, refunded: 3 }, default: :unpaid
   enum :currency, CURRENCIE_CODES, prefix: true, default: :usd
   enum :lifecycle_status, LIFECYCLE_STATUS, prefix: true, default: :active
   enum :workflow_status, WORKFLOW_STATUS, prefix: true, default: :confirmed
-
-  validates :invoice_number, presence: true, uniqueness: true
-  validates :money_amount_cents, :credit_amount,
-    presence: true, numericality: { only_integer: true, greater_than_or_equal_to: 0 }
+  belongs_to :company
+  belongs_to :company_order, optional: true
+  has_many :company_transactions, dependent: :destroy
 
   scope :unpaid, -> { where(payment_status: :unpaid) }
   scope :paid, -> { where(payment_status: :paid) }
+  validates :invoice_number, presence: true, uniqueness: true
+  validates :money_amount_cents, :credit_amount,
+    presence: true, numericality: { only_integer: true, greater_than_or_equal_to: 0 }
 
   before_validation :generate_invoice_number, on: :create
   after_update :complete_order_if_paid!, if: -> { saved_change_to_payment_status? && paid? }

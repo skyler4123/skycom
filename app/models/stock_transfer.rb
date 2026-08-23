@@ -1,14 +1,21 @@
 class StockTransfer < ApplicationRecord
   include CategoryConcern
   include PropertyMappingConcern
+  include TagConcern
   attribute :permission_resource_name, :string, default: -> { self.name }
 
   enum :country, COUNTRY_CODES, prefix: true, default: :us
   enum :timezone, TIMEZONES, prefix: true, default: :utc
   enum :currency, CURRENCIE_CODES, prefix: true, default: :usd
 
-  include TagConcern
-
+  enum :lifecycle_status, LIFECYCLE_STATUS, prefix: true
+  enum :workflow_status, WORKFLOW_STATUS, prefix: true
+  enum :business_type, {
+    transfer: 0,
+    adjustment: 1,
+    return: 2,
+    exchange: 3
+  }
   belongs_to :company
   belongs_to :branch, optional: true
   belongs_to :warehouse
@@ -20,14 +27,6 @@ class StockTransfer < ApplicationRecord
   belongs_to :appoint_for, polymorphic: true, optional: true
   belongs_to :appoint_by, polymorphic: true, optional: true
 
-  enum :lifecycle_status, LIFECYCLE_STATUS, prefix: true
-  enum :workflow_status, WORKFLOW_STATUS, prefix: true
-  enum :business_type, {
-    transfer: 0,
-    adjustment: 1,
-    return: 2,
-    exchange: 3
-  }
   has_many :stock_transactions, as: :appoint_for, dependent: :restrict_with_error
 
   validates :code, presence: true, uniqueness: true

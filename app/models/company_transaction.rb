@@ -10,15 +10,14 @@ class CompanyTransaction < ApplicationRecord
 
   attribute :permission_resource_name, :string, default: -> { self.name }
 
-  belongs_to :company
-  belongs_to :company_invoice
-  belongs_to :company_payment_method
-
   enum :transaction_type, { payment: 0, refund: 1 }, default: :payment
   enum :status, { pending: 0, completed: 1, failed: 2 }, default: :pending
   enum :currency, CURRENCIE_CODES, prefix: true, default: :usd
   enum :lifecycle_status, LIFECYCLE_STATUS, prefix: true, default: :active
   enum :workflow_status, WORKFLOW_STATUS, prefix: true, default: :confirmed
+  belongs_to :company
+  belongs_to :company_invoice
+  belongs_to :company_payment_method
 
   validates :money_amount_cents, presence: true, numericality: { only_integer: true, greater_than: 0 }
   validates :gateway_reference, uniqueness: true, allow_nil: true

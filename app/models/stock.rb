@@ -1,29 +1,21 @@
 class Stock < ApplicationRecord
+  # NOTE: before_validation callback is registered before PropertyMappingConcern
+  # to preserve callback order (inherit_category_from_product → ensure_property_mapping).
+  # Moving the include above would flip execution order and break stock creation
+  # without an explicit category. See docs/MODEL_STRUCTURE.md §3.
   before_validation :inherit_category_from_product, on: :create
-  include PropertyMappingConcern
-  validate :category_must_match_product_category
-  attribute :permission_resource_name, :string, default: -> { self.name }
 
-  enum :country, COUNTRY_CODES, prefix: true, default: :us
-  enum :timezone, TIMEZONES, prefix: true, default: :utc
-  enum :currency, CURRENCIE_CODES, prefix: true, default: :usd
+  include PropertyMappingConcern # rubocop:disable Layout/ClassStructure
+  include TagConcern # rubocop:enable Layout/ClassStructure
+
+  attribute :permission_resource_name, :string, default: -> { self.name }
   attribute :quantity, :integer, default: 0
   attribute :reorder, :integer, default: 0
 
-  monetize :price_cents,
-           as: "price",
-           with_model_currency: :currency,
-           disable_validation: true
-
-  include TagConcern
-
-  belongs_to :company
-  belongs_to :branch, optional: true
-  belongs_to :product
-  belongs_to :warehouse
-  belongs_to :category
-  belongs_to :property_mapping
-
+  # --- Enums ---
+  enum :country, COUNTRY_CODES, prefix: true, default: :us
+  enum :timezone, TIMEZONES, prefix: true, default: :utc
+  enum :currency, CURRENCIE_CODES, prefix: true, default: :usd
   enum :lifecycle_status, LIFECYCLE_STATUS, prefix: true
   enum :workflow_status, WORKFLOW_STATUS, prefix: true
   enum :business_type, {
@@ -32,10 +24,26 @@ class Stock < ApplicationRecord
     finished_good: 2,
     return: 3
   }
-  validates :quantity, :reorder, presence: true, numericality: { only_integer: true }
-  validates :warehouse_id, uniqueness: { scope: :product_id, message: "already holds a tracking SKU row mapping for this layout" }
+
+  monetize :price_cents,
+           as: "price",
+           with_model_currency: :currency,
+           disable_validation: true
 
   kredis_integer :available_counter, key: ->(s) { "stock:#{s.id}:available" }
+
+  # --- Associations ---
+  belongs_to :company
+  belongs_to :branch, optional: true
+  belongs_to :product
+  belongs_to :warehouse
+  belongs_to :category
+  belongs_to :property_mapping
+
+  # --- Validations ---
+  validate :category_must_match_product_category
+  validates :quantity, :reorder, presence: true, numericality: { only_integer: true }
+  validates :warehouse_id, uniqueness: { scope: :product_id, message: "already holds a tracking SKU row mapping for this layout" }
 
   after_save :sync_available_counter, if: -> { saved_change_to_quantity? || saved_change_to_reorder? }
 

@@ -1,28 +1,25 @@
 class Notification < ApplicationRecord
+  include CategoryConcern
+  include PropertyMappingConcern
+  include TagConcern
   enum :country, COUNTRY_CODES, prefix: true, default: :us
   enum :timezone, TIMEZONES, prefix: true, default: :utc
   enum :currency, CURRENCIE_CODES, prefix: true, default: :usd
 
-  include CategoryConcern
-  include PropertyMappingConcern
-  include TagConcern
-
+  # --- Enums ---
+  enum :lifecycle_status, LIFECYCLE_STATUS, prefix: true
+  enum :workflow_status, WORKFLOW_STATUS, prefix: true
+  enum :business_type, {
+    email: 0,
+    sms: 1,
+    push_notification: 2
+  }
   # --- Associations ---
   belongs_to :company
   belongs_to :branch, optional: true
   belongs_to :notification_group
   belongs_to :category
   belongs_to :property_mapping
-
-  # --- Enums ---
-  enum :lifecycle_status, LIFECYCLE_STATUS, prefix: true
-  enum :workflow_status, WORKFLOW_STATUS, prefix: true
-
-  enum :business_type, {
-    email: 0,
-    sms: 1,
-    push_notification: 2
-  }
 
   # --- Validations ---
   validates :name, presence: true, length: { maximum: 255 }

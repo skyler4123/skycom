@@ -3,15 +3,14 @@ class PolicyAppointment < ApplicationRecord
 
   attribute :permission_resource_name, :string, default: -> { self.name }
 
-  belongs_to :company
-  belongs_to :policy
-  belongs_to :appoint_to, polymorphic: true, touch: true
   enum :workflow_status, {
     inactive: 0,
     active: 1
   }
-
   enum :business_type, { owner: 0 }
+  belongs_to :company
+  belongs_to :policy
+  belongs_to :appoint_to, polymorphic: true, touch: true
 
   after_create :clear_company_permissions_cache
   after_update :clear_company_permissions_cache, if: :workflow_status_changed?

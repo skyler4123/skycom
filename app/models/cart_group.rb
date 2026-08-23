@@ -8,22 +8,20 @@ class CartGroup < ApplicationRecord
   enum :timezone, TIMEZONES, prefix: true, default: :utc
   enum :currency, CURRENCIE_CODES, prefix: true, default: :usd
 
+  # --- Enums ---
+  enum :lifecycle_status, LIFECYCLE_STATUS, prefix: true
+  enum :workflow_status, WORKFLOW_STATUS, prefix: true
+  enum :business_type, {
+    abandoned: 0,
+    active_carts: 1,
+    wishlists: 2
+  }
   # --- Associations ---
   belongs_to :company
   belongs_to :branch, optional: true
   belongs_to :category
   belongs_to :property_mapping
   # has_many :cart_group_appointments, dependent: :destroy # This can be added later
-
-  # --- Enums ---
-  enum :lifecycle_status, LIFECYCLE_STATUS, prefix: true
-  enum :workflow_status, WORKFLOW_STATUS, prefix: true
-
-  enum :business_type, {
-    abandoned: 0,
-    active_carts: 1,
-    wishlists: 2
-  }
 
   # --- Validations ---
   validates :name, presence: true, uniqueness: { scope: :company_id }, length: { maximum: 255 }

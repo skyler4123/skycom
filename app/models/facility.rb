@@ -1,14 +1,19 @@
 class Facility < ApplicationRecord
   include CategoryConcern
   include PropertyMappingConcern
+  include TagConcern
   attribute :permission_resource_name, :string, default: -> { self.name }
 
   enum :country, COUNTRY_CODES, prefix: true, default: :us
   enum :timezone, TIMEZONES, prefix: true, default: :utc
   enum :currency, CURRENCIE_CODES, prefix: true, default: :usd
 
-  include TagConcern
-
+  enum :lifecycle_status, LIFECYCLE_STATUS, prefix: true
+  enum :workflow_status, WORKFLOW_STATUS, prefix: true
+  enum :business_type, {
+    publicly_traded: 0,
+    privately_held: 1
+  }
   belongs_to :company
   belongs_to :branch, optional: true
   belongs_to :category
@@ -17,14 +22,6 @@ class Facility < ApplicationRecord
   has_many :facility_groups, through: :facility_group_appointments
   has_many :tag_appointments, dependent: :destroy, as: :appoint_to
   has_many :tags, through: :tag_appointments
-
-  enum :lifecycle_status, LIFECYCLE_STATUS, prefix: true
-  enum :workflow_status, WORKFLOW_STATUS, prefix: true
-
-  enum :business_type, {
-    publicly_traded: 0,
-    privately_held: 1
-  }
 
   validates :name, presence: true, uniqueness: { scope: :company_id }, length: { maximum: 255 }
   validates :description, length: { maximum: 5000 }, allow_blank: true

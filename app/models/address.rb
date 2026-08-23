@@ -2,6 +2,7 @@
 class Address < ApplicationRecord
   include ImmutableRecordConcern
 
+  enum :country, COUNTRY_CODES, prefix: true, default: :us
   has_many :address_appointments, dependent: :destroy
   has_many :users, through: :address_appointments, source: :appoint_to, source_type: "User"
   has_many :companies, through: :address_appointments, source: :appoint_to, source_type: "Company"
@@ -21,8 +22,6 @@ class Address < ApplicationRecord
   # 2. Callbacks
   # Calculate fingerprint before checking validation or saving
   before_validation :generate_fingerprint
-
-  enum :country, COUNTRY_CODES, prefix: true, default: :us
 
   # 4. Fingerprint Generator
   # Normalizes text (downcase, strip) and hashes it
@@ -44,7 +43,6 @@ class Address < ApplicationRecord
     self.fingerprint = Digest::SHA256.hexdigest(raw_string)
   end
 end
-
 
 # # User creates an order with an address
 # addr = Address.reusable_address(

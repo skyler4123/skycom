@@ -1,26 +1,17 @@
 class Brand < ApplicationRecord
   include CategoryConcern
   include PropertyMappingConcern
+  include TagConcern
+  include Brand::ImageConcern
   attribute :permission_resource_name, :string, default: -> { self.name }
 
   enum :country, COUNTRY_CODES, prefix: true, default: :us
   enum :timezone, TIMEZONES, prefix: true, default: :utc
   enum :currency, CURRENCIE_CODES, prefix: true, default: :usd
 
-  include TagConcern
-  include Brand::ImageConcern
-
-  # --- Associations ---
-  belongs_to :company
-  belongs_to :category
-  belongs_to :property_mapping
-
-  has_many :products, dependent: :nullify
-
   # --- Enums ---
   enum :lifecycle_status, LIFECYCLE_STATUS, prefix: true
   enum :workflow_status, WORKFLOW_STATUS, prefix: true
-
   # Defines the general business category of the brand.
   enum :business_type, {
     manufacturer: 0,
@@ -28,6 +19,12 @@ class Brand < ApplicationRecord
     service_provider: 2,
     technology: 3
   }
+  # --- Associations ---
+  belongs_to :company
+  belongs_to :category
+  belongs_to :property_mapping
+
+  has_many :products, dependent: :nullify
 
   # --- Validations ---
   validates :name, presence: true, uniqueness: { scope: :company_id }, length: { maximum: 255 }

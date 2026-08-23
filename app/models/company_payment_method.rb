@@ -1,6 +1,4 @@
 class CompanyPaymentMethod < ApplicationRecord
-  attribute :permission_resource_name, :string, default: -> { self.name }
-
   # --- Specific Real-World Lifecycle Map ---
   LIFECYCLE_STATUSES = {
     draft: 0,       # Initial creation phase; waiting for provider API keys or webhook secrets
@@ -10,6 +8,7 @@ class CompanyPaymentMethod < ApplicationRecord
     deprecated: 4,  # End-of-life status; blocked for new invoices, allows pending settlement
     archived: 5     # Permanently retired for accounting audit compliance
   }.freeze
+  attribute :permission_resource_name, :string, default: -> { self.name }
 
   enum :country, COUNTRY_CODES, prefix: true, default: :us
   enum :timezone, TIMEZONES, prefix: true, default: :utc
