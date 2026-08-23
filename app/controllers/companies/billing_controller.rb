@@ -1,5 +1,11 @@
 # frozen_string_literal: true
 
+# Companies::BillingController — Billing dashboard (read-only).
+# Shell-first GET /companies/:id/billing: HTML shell + JSON with wallet snapshot
+# (main/promo/debt from CompanyWallet, app/models/company_wallet.rb:10) and
+# credit purchase history CompanyOrder → CompanyInvoice → CompanyTransactions.
+# No mutations here — top-ups flow via CompanyOrder#complete! → wallet.add_credits!,
+# deductions via CompanyCreditDeduction::* after_action (see docs/CREDIT_DEDUCTION.md).
 class Companies::BillingController < Companies::ApplicationController
   def show
     respond_to do |format|

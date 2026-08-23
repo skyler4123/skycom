@@ -1,5 +1,13 @@
 # frozen_string_literal: true
 
+# Companies::UsageController — Usage dashboard (read-only, hot-path aware).
+# Shell-first GET /companies/:id/usage: HTML shell + JSON with wallet snapshot +
+# 7-day daily totals (CompanyDailyUsage, app/models/company_daily_usage.rb:9) +
+# live Redis delta (company.credit_usage_delta, app/models/company.rb:154 kredis_counter) +
+# monthly total (CompanyMonthlyUsage, app/models/company_monthly_usage.rb:9).
+# today_total = DB total_credits + live_delta per docs/ATOMIC_PURPOSE.md Hot Path Rule;
+# past days = DB only. No mutations — usage is metered by CompanyCreditDeduction::*
+# → record_credit_usage! and drained by CompanyUsageSyncJob (app/jobs/company_usage_sync_job.rb:30).
 class Companies::UsageController < Companies::ApplicationController
   def show
     respond_to do |format|
