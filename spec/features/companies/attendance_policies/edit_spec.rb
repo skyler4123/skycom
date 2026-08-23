@@ -49,10 +49,10 @@ RSpec.feature "Companies::AttendancePolicies Edit", type: :feature, js: true do
     fill_in "attendance_policy[longitude]", with: attendance_policy.longitude
     click_button "Save Changes"
 
+    expect(page).to have_current_path(company_attendance_policy_path(company, attendance_policy), wait: 10)
     expect(page).to have_content("11.0", wait: 10)
     attendance_policy.reload
     expect(attendance_policy.latitude).to eq(11.0)
-    expect(page).to have_current_path(company_attendance_policy_path(company, attendance_policy), wait: 10)
   end
 
   scenario "handles validation error" do
