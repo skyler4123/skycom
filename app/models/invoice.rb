@@ -2,13 +2,26 @@ class Invoice < ApplicationRecord
   include CategoryConcern
   include PropertyMappingConcern
 
+  include TagConcern
   attribute :permission_resource_name, :string, default: -> { self.name }
 
   enum :country, COUNTRY_CODES, prefix: true, default: :us
   enum :timezone, TIMEZONES, prefix: true, default: :utc
 
-  include TagConcern
-
+  # --- Enums ---
+  enum :lifecycle_status, LIFECYCLE_STATUS, prefix: true
+  enum :workflow_status, WORKFLOW_STATUS, prefix: true
+  enum :business_type, {
+    sales: 0,
+    service: 1,
+    subscription: 2
+  }
+  enum :currency, CURRENCIE_CODES, prefix: true, default: :usd
+  enum :payment_status, { unpaid: 0, paid: 1, voided: 2 }, default: :unpaid
+  monetize :price_cents,
+           as: "price",
+           with_model_currency: :currency,
+           disable_validation: true
   # --- Associations ---
   belongs_to :company
   belongs_to :branch, optional: true
@@ -17,24 +30,6 @@ class Invoice < ApplicationRecord
   belongs_to :property_mapping
 
   has_many :transactions, dependent: :destroy
-
-  # --- Enums ---
-  enum :lifecycle_status, LIFECYCLE_STATUS, prefix: true
-  enum :workflow_status, WORKFLOW_STATUS, prefix: true
-
-  enum :business_type, {
-    sales: 0,
-    service: 1,
-    subscription: 2
-  }
-
-  enum :currency, CURRENCIE_CODES, prefix: true, default: :usd
-  enum :payment_status, { unpaid: 0, paid: 1, voided: 2 }, default: :unpaid
-
-  monetize :price_cents,
-           as: "price",
-           with_model_currency: :currency,
-           disable_validation: true
 
   # --- Validations ---
   validates :name, presence: true, uniqueness: { scope: :company_id }, length: { maximum: 255 }

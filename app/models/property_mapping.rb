@@ -48,6 +48,27 @@
 
 class PropertyMapping < ApplicationRecord
   include CategoryConcern
+
+  # Allowed metadata keys per property type in #property_metadata.
+  SUPPORTED_KEYS = {
+    property_string:  %w[input_type placeholder suffix prefix default].freeze,
+    property_text:    %w[input_type placeholder default].freeze,
+    property_integer: %w[input_type placeholder suffix prefix default min max options].freeze,
+    property_decimal: %w[input_type placeholder suffix prefix default currency precision].freeze,
+    property_boolean: %w[input_type placeholder suffix prefix default true_label false_label].freeze,
+    property_datetime: %w[input_type placeholder suffix prefix default format timezone].freeze
+  }.freeze
+
+  # Allowed input_type values per property type.
+  VALID_INPUT_TYPES = {
+    property_string:  %w[text].freeze,
+    property_text:    %w[textarea].freeze,
+    property_integer: %w[select progress_bar slider star].freeze,
+    property_decimal: %w[currency number percentage].freeze,
+    property_boolean: %w[toggle].freeze,
+    property_datetime: nil
+  }.freeze
+
   store_accessor :metadata, :properties
   attribute :permission_resource_name, :string, default: -> { self.name }
 
@@ -55,12 +76,6 @@ class PropertyMapping < ApplicationRecord
   belongs_to :category
 
   has_many :table_configs, dependent: :destroy
-  after_create :create_default_table_config
-
-  def default_table_config
-    table_configs.first
-  end
-
   has_many :answers, dependent: :restrict_with_error
   has_many :articles, dependent: :restrict_with_error
   has_many :article_groups, dependent: :restrict_with_error
@@ -108,29 +123,16 @@ class PropertyMapping < ApplicationRecord
   has_many :task_groups, dependent: :restrict_with_error
   has_many :warehouses, dependent: :restrict_with_error
 
-  # Allowed metadata keys per property type in #property_metadata.
-  SUPPORTED_KEYS = {
-    property_string:  %w[input_type placeholder suffix prefix default].freeze,
-    property_text:    %w[input_type placeholder default].freeze,
-    property_integer: %w[input_type placeholder suffix prefix default min max options].freeze,
-    property_decimal: %w[input_type placeholder suffix prefix default currency precision].freeze,
-    property_boolean: %w[input_type placeholder suffix prefix default true_label false_label].freeze,
-    property_datetime: %w[input_type placeholder suffix prefix default format timezone].freeze
-  }.freeze
-
-  # Allowed input_type values per property type.
-  VALID_INPUT_TYPES = {
-    property_string:  %w[text].freeze,
-    property_text:    %w[textarea].freeze,
-    property_integer: %w[select progress_bar slider star].freeze,
-    property_decimal: %w[currency number percentage].freeze,
-    property_boolean: %w[toggle].freeze,
-    property_datetime: nil
-  }.freeze
-
+  # --- Validations ---
   validate :validate_property_metadata
   validate :must_have_table_config
+
+  after_create :create_default_table_config
   after_update :sync_table_configs, if: :saved_change_to_metadata?
+
+  def default_table_config
+    table_configs.first
+  end
 
   def sync_table_configs
     props = self.properties || []

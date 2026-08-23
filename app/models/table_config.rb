@@ -1,6 +1,9 @@
 class TableConfig < ApplicationRecord
   include CategoryConcern
   include PropertyMappingConcern
+  # Valid values for column alignment and pinned position.
+  ALLOWED_ALIGNS  = %w[left center right].freeze
+  ALLOWED_PINNEDS = %w[left right].freeze
   store_accessor :metadata, :columns
   attribute :permission_resource_name, :string, default: -> { self.name }
 
@@ -80,10 +83,6 @@ class TableConfig < ApplicationRecord
   #     render_config: Hash     # Formatting options (e.g. { "format" => "currency" })
   #   }
   # ---------------------------------------------------------------------------
-
-  # Valid values for column alignment and pinned position.
-  ALLOWED_ALIGNS  = %w[left center right].freeze
-  ALLOWED_PINNEDS = %w[left right].freeze
 
   validate :columns_metadata_must_conform_to_schema
   after_initialize :set_default_columns, if: :new_record?

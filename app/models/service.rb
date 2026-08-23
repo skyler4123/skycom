@@ -1,20 +1,26 @@
 class Service < ApplicationRecord
   include CategoryConcern
   include PropertyMappingConcern
+  include TagConcern
+  include OrderConcern
+  include Service::ImageConcern
   attribute :permission_resource_name, :string, default: -> { self.name }
 
   enum :country, COUNTRY_CODES, prefix: true, default: :us
   enum :timezone, TIMEZONES, prefix: true, default: :utc
   enum :currency, CURRENCIE_CODES, prefix: true, default: :usd
 
+  # --- Enums ---
+  enum :lifecycle_status, LIFECYCLE_STATUS, prefix: true
+  enum :workflow_status, WORKFLOW_STATUS, prefix: true
+  enum :business_type, {
+    b2b: 0,
+    b2c: 1
+  }
   monetize :price_cents,
            as: "price",
            with_model_currency: :currency,
            disable_validation: true
-
-  include TagConcern
-  include OrderConcern
-  include Service::ImageConcern
 
   belongs_to :company
   belongs_to :branch, optional: true
@@ -38,15 +44,6 @@ class Service < ApplicationRecord
   has_many :service_appointments, dependent: :destroy
   has_many :customers, through: :service_appointments, source: :appoint_to, source_type: "Customer"
   has_many :employees, through: :service_appointments, source: :appoint_to, source_type: "Employee"
-
-  # --- Enums ---
-  enum :lifecycle_status, LIFECYCLE_STATUS, prefix: true
-  enum :workflow_status, WORKFLOW_STATUS, prefix: true
-
-  enum :business_type, {
-    b2b: 0,
-    b2c: 1
-  }
 
   # --- Validations ---
   validates :name, presence: true, uniqueness: { scope: :company_id }, length: { maximum: 255 }

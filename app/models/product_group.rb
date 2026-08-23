@@ -2,15 +2,22 @@ class ProductGroup < ApplicationRecord
   include CategoryConcern
   include PropertyMappingConcern
 
+  include TagConcern
+  include OrderConcern
   attribute :permission_resource_name, :string, default: -> { self.name }
 
   enum :country, COUNTRY_CODES, prefix: true, default: :us
   enum :timezone, TIMEZONES, prefix: true, default: :utc
   enum :currency, CURRENCIE_CODES, prefix: true, default: :usd
 
-  include TagConcern
-  include OrderConcern
-
+  # --- Enums ---
+  enum :lifecycle_status, LIFECYCLE_STATUS, prefix: true
+  enum :workflow_status, WORKFLOW_STATUS, prefix: true
+  enum :business_type, {
+    category: 0,
+    collection: 1,
+    line: 2
+  }
   # --- Associations ---
   belongs_to :company
   belongs_to :branch, optional: true
@@ -18,16 +25,6 @@ class ProductGroup < ApplicationRecord
   belongs_to :property_mapping
   has_many :product_group_appointments, dependent: :destroy
   has_many :products, through: :product_group_appointments, source: :appoint_to, source_type: "Product"
-
-  # --- Enums ---
-  enum :lifecycle_status, LIFECYCLE_STATUS, prefix: true
-  enum :workflow_status, WORKFLOW_STATUS, prefix: true
-
-  enum :business_type, {
-    category: 0,
-    collection: 1,
-    line: 2
-  }
 
   # --- Validations ---
   validates :name, presence: true, uniqueness: { scope: :company_id }, length: { maximum: 255 }

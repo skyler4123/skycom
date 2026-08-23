@@ -6,7 +6,6 @@ class Category < ApplicationRecord
   has_many :property_mappings, dependent: :destroy
   has_many :table_configs, dependent: :destroy
 
-  after_create :create_default_property_mapping
   has_many :employee_groups, dependent: :nullify
   has_many :employees, dependent: :nullify
   has_many :departments, dependent: :nullify
@@ -17,8 +16,8 @@ class Category < ApplicationRecord
   has_many :customers, dependent: :nullify
   has_many :facilities, dependent: :nullify
   has_many :stocks, dependent: :nullify
-
   validates :name, uniqueness: { scope: [ :company_id, :resource_name ] }
+  after_create :create_default_property_mapping
 
   def default_property_mapping
     property_mappings.first

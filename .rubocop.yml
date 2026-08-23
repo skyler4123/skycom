@@ -7,6 +7,71 @@ inherit_gem: { rubocop-rails-omakase: rubocop.yml }
 # Layout/SpaceInsideArrayLiteralBrackets:
 #   Enabled: false
 
+Layout/ClassStructure:
+  Enabled: true
+  Include:
+    - "app/models/*.rb"
+  Categories:
+    attribute_macros:
+      - attribute
+      - store_accessor
+      - normalizes
+      - class_attribute
+    enum:
+      - enum
+    association:
+      - belongs_to
+      - has_one
+      - has_many
+      - has_many_attached
+      - has_one_attached
+      - has_and_belongs_to_many
+    validation:
+      - validates
+      - validate
+    callback:
+      - before_validation
+      - before_create
+      - before_save
+      - before_update
+      - before_destroy
+      - before_discard
+      - after_validation
+      - after_create
+      - after_commit
+      - after_save
+      - after_update
+      - after_destroy
+      - after_touch
+      - after_initialize
+      - around_save
+      - around_create
+      - around_update
+      - around_destroy
+    scope:
+      - scope
+    macro:
+      - monetize
+      - kredis_counter
+      - kredis_integer
+      - kredis_flag
+      - kredis_list
+      - has_secure_password
+      - generates_token_for
+      - has_paper_trail
+  ExpectedOrder:
+    - module_inclusion
+    - constants
+    - attribute_macros
+    - enum
+    - macro
+    - association
+    - scope
+    - validation
+    - callback
+    - public_methods
+    - private_methods
+
 AllCops:
   Exclude:
     - "db/cable_schema.rb"

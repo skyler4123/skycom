@@ -8,6 +8,7 @@ RSpec.feature "Companies::Products Management", type: :feature, js: true do
   let!(:product) do
     create(:product,
       company: company,
+      name: "Base Physical Product #{SecureRandom.hex(4)}",
       business_type: "physical"
     )
   end
@@ -15,6 +16,7 @@ RSpec.feature "Companies::Products Management", type: :feature, js: true do
   let!(:product2) do
     create(:product,
       company: company,
+      name: "Base Digital Product #{SecureRandom.hex(4)}",
       business_type: "digital",
       workflow_status: "pending"
     )

@@ -313,3 +313,125 @@ This is **required** for all controllers that extend `Companies_LayoutController
 - If yes, wrap it in `poll(() => { if (this.hasContentTarget) { ...; return true } })`
 
 ---
+
+### 8. Stale DOM / Navigation Race After Form Submit (PATCH Redirect)
+
+**Problem**: `spec/features/companies/attendance_policies/edit_spec.rb:43` fails intermittently with Selenium `UnknownError: Node with given id does not belong to the document` on `have_content` right after `click_button "Save Changes"`.
+
+**Stack trace excerpt**:
+```
+Selenium::WebDriver::Error::UnknownError:
+  unknown error: unhandled inspector error: {"code":-32000,"message":"Node with given id does not belong to the document"}
+    # capybara/selenium/node.rb:187:in `visible?'
+    # capybara/node/element.rb:306:in `visible?'
+    # capybara/queries/selector_query.rb:572:in `matches_visibility_filters?'
+```
+
+**Root Cause**: The edit page uses `Helpers.form()` with `data-turbo="false"` → `PATCH` → `302 redirect` → show page. `click_button` triggers a full-page navigation that detaches the old DOM. If the next assertion is `have_content` (which queries `visible?` on the old document), Selenium holds a stale node handle that no longer belongs to the new document. Capybara's retry does not help because the error is `UnknownError`, not `StaleElementReferenceError`. The race is timing-dependent: if navigation is slow, `have_content` may still query the old DOM and throw.
+
+The failure is **order-dependent**: checking `have_content` before `have_current_path` queries content while the old DOM is still attached but mid-teardown.
+
+**Timeline**:
+```
+click_button "Save Changes"  →  browser starts navigation (old DOM detaches)
+expect(page).to have_content("11.0")  ← queries old DOM → stale node → UnknownError
+expect(page).to have_current_path(...)  ← never reached
+```
+
+**Fix — Always assert navigation first**:
+
+Swap order so Capybara waits for the new document before querying content:
+
+```ruby
+# ❌ Flaky — content queried on old DOM
+click_button "Save Changes"
+expect(page).to have_content("11.0", wait: 10)
+expect(page).to have_current_path(company_attendance_policy_path(company, attendance_policy), wait: 10)
+
+# ✅ Stable — wait for new document, then query content
+click_button "Save Changes"
+expect(page).to have_current_path(company_attendance_policy_path(company, attendance_policy), wait: 10)
+expect(page).to have_content("11.0", wait: 10)  # now queries show page after Stimulus fetch
+```
+
+`have_current_path` with `wait: 10` polls `window.location` until the redirect completes. Only then does `have_content` query the new show page (which itself async-fetches via `fetchJson` + `poll()` → `renderContent()`).
+
+**Why this works for all Shell-First edit flows**:
+- Edit controllers (`app/javascript/controllers/companies/*/edit_controller.js`) submit via standard HTML `form` (`data-turbo="false"`), not `fetchJson`. The server does `redirect_to company_*_path`.
+- Show controllers load data via `fetchJson(...json)` + `poll(() => hasContentTarget)`. Content appears *after* navigation, so asserting `have_current_path` first gates the content check until the new Stimulus controller has mounted.
+
+**Prevention Checklist for every edit/update feature spec**:
+- After `click_button "Save Changes"` / `click_button "Update"`, the **very next** expectation must be `have_current_path` (the redirect target) with `wait: 10`.
+- Only then assert `have_content` / `have_selector` for the updated value.
+- Never assert content on the show page before asserting the URL — it re-introduces the stale-DOM race.
+- Same rule applies to `create` flows (`have_current_path(new → show)`).
+
+---
+
+### 9. Faker + Uniqueness Collision (Deterministic Fixtures vs Factory)
+
+**Problem**: `spec/features/companies/products/index_spec.rb:315` fails intermittently with:
+
+```
+ActiveRecord::RecordInvalid:
+  Validation failed: Name has already been taken
+  # ./spec/features/companies/products/index_spec.rb:223:in `block (4 levels) in <top (required)>'
+  #   product.save!
+```
+
+The failure occurs in `let!` setup, before any `visit` — the feature test never reaches the browser.
+
+**Root Cause**: Two sources of product names collide within the same `company_id` scope (`validates :name, uniqueness: { scope: :company_id }` at `app/models/product.rb:58`):
+
+| Source | How name is generated | Example |
+|--------|----------------------|---------|
+| `let!(:product)` / `let!(:product2)` (top-level) | `create(:product)` → `Seed::ProductService.new` → `Faker::Commerce.product_name` (random) | `"Gorgeous Steel Plate"` |
+| `let!(:products_cosmetics)` (dynamic-table block) | Deterministic array `["Gorgeous Steel Plate", "Practical Wool Shoes"]` at `spec/features/companies/products/index_spec.rb:189` | `"Gorgeous Steel Plate"` |
+
+`Faker::Commerce.product_name` has a small pool (≈ dozens of distinct names). Probability that one of the two random products equals one of the 4 deterministic names is ~8% per example → flaky across the 1747-example suite. The `spec/factories/products.rb` `initialize_with` block does not prevent collision; overriding `name:` via `create(:product, name: "...")` does overwrite the Faker value *before save*, but the top-level lets did not pass an explicit `name`, so they kept the Faker value and collided.
+
+**Timeline of the failing example** (`"integer property displays with numeric value"`):
+```
+let!(:product)  → Faker picks "Gorgeous Steel Plate" → saved as product.name
+let!(:products_cosmetics) → tries to save "Gorgeous Steel Plate" again in same company
+  → uniqueness validation fires → RecordInvalid → example fails in setup
+```
+
+**Fix — Give random fixtures unique, non-Faker names**:
+
+Use `SecureRandom.hex` so the random products can never collide with the deterministic list:
+
+```ruby
+# spec/features/companies/products/index_spec.rb
+let!(:product) do
+  create(:product,
+    company: company,
+    name: "Base Physical Product #{SecureRandom.hex(4)}",  # unique, not in Faker pool
+    business_type: "physical"
+  )
+end
+
+let!(:product2) do
+  create(:product,
+    company: company,
+    name: "Base Digital Product #{SecureRandom.hex(4)}",
+    business_type: "digital",
+    workflow_status: "pending"
+  )
+end
+```
+
+`create(:product, name: "...")` works because FactoryBot applies the override *after* `initialize_with` (the Faker name is overwritten before `save!`).
+
+**Alternative fixes** (if you need deterministic names elsewhere):
+- Append `SecureRandom.hex` to deterministic fixtures too: `"Gorgeous Steel Plate #{SecureRandom.hex(2)}"`
+- Or use a sequence: `sequence(:name) { |n| "Product #{n} #{Faker::Commerce.product_name}" }` in the factory
+- Or scope the deterministic list to `SecureRandom`-prefixed names to guarantee uniqueness
+
+**Prevention Checklist**:
+- Any spec that creates **two or more** products in the same `company` must ensure names are unique *within that company scope*. Check `validates :name, uniqueness: { scope: :company_id }` in the model before using `Faker`.
+- If a `describe` block defines deterministic fixtures (like `products_cosmetics`), ensure all other `let!(:product)` in that file use explicit `name: "Unique ... #{SecureRandom.hex}"`, not bare `create(:product)`.
+- Do not trust `Faker` for uniqueness when the model enforces `uniqueness` scoped to `company_id`. Always pass an explicit unique name when multiple records share a company in one example.
+- Search for similar risk: `grep -rn 'create(:product' spec/features` and verify each file that mixes `Faker` products with hardcoded names.
+
+---

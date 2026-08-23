@@ -39,6 +39,9 @@
 - Check `db/schema.rb` first for columns/indexes
 - Use `includes`/`eager_load`/`preload` to prevent N+1
 
+## Model Structure
+- All `app/models/*.rb` follow the canonical order in `docs/MODEL_STRUCTURE.md` (concerns → constants → attributes → enums → macros → associations → scopes → validations → callbacks → methods). Run `bin/rubocop` to verify.
+
 ## Full Guidelines
 See `README.md` for detailed coverage of:
 - Stimulus naming conventions & inheritance

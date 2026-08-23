@@ -1,15 +1,14 @@
 class Department < ApplicationRecord
   include CategoryConcern
   include PropertyMappingConcern
+  include AddressConcern
+  include TagConcern
+  include Department::ImageConcern
   attribute :permission_resource_name, :string, default: -> { self.name }
 
   enum :country, COUNTRY_CODES, prefix: true, default: :us
   enum :timezone, TIMEZONES, prefix: true, default: :utc
   enum :currency, CURRENCIE_CODES, prefix: true, default: :usd
-
-  include AddressConcern
-  include TagConcern
-  include Department::ImageConcern
 
   enum :business_type, {
     sales: 0,

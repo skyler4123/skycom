@@ -12,10 +12,9 @@ class CompanyDailyUsage < ApplicationRecord
   store_accessor :metadata, *(0..23).map { |i| "h#{i}" }
   attribute :permission_resource_name, :string, default: -> { self.name }
 
-  belongs_to :company
-
   enum :lifecycle_status, LIFECYCLE_STATUS, prefix: true, default: :active
   enum :workflow_status, WORKFLOW_STATUS, prefix: true, default: :confirmed
+  belongs_to :company
 
   validates :usage_date, presence: true
 

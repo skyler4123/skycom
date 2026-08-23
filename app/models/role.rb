@@ -1,44 +1,13 @@
 class Role < ApplicationRecord
   include TagConcern
 
-  attribute :permission_resource_name, :string, default: -> { self.name }
-
   CRUD_ACTIONS = %w[create read update delete].freeze
-
-  # --- Associations ---
-  # REASON: When a Role's timestamp is updated (either directly or via PolicyAppointment), it touches the Company. This ensures the Company's cache_key changes.
-  belongs_to :company, touch: true
-  belongs_to :branch, optional: true
-
-  has_many :policy_appointments, dependent: :destroy, as: :appoint_to
-  has_many :policies, through: :policy_appointments
-
-  has_many :tag_appointments, dependent: :destroy, as: :appoint_to
-  has_many :tags, through: :tag_appointments
-
-  has_many :employee_group_appointments, dependent: :destroy, as: :appoint_to
-  has_many :employee_groups, through: :employee_group_appointments
-
-  has_many :role_appointments, dependent: :destroy
-  has_many :employee_groups, through: :role_appointments, source: :appoint_to, source_type: "EmployeeGroup"
-  has_many :employees, through: :role_appointments, source: :appoint_to, source_type: "Employee"
-  has_many :customer_groups, through: :role_appointments, source: :appoint_to, source_type: "CustomerGroup"
-  has_many :customers, through: :role_appointments, source: :appoint_to, source_type: "Customer"
-  has_many :departments, through: :role_appointments, source: :appoint_to, source_type: "Department"
-
-  # This fires whenever the Role is touched (e.g., by a PolicyAppointment change)
-  after_touch :invalidate_employee_caches
-
-  # --- Soft Deletion (Discard) ---
-  # If you are using a gem like 'Discard' or similar for soft deletion:
-  # include Discard::Model
-  # default_scope -> { kept }
+  attribute :permission_resource_name, :string, default: -> { self.name }
 
   # --- Enums ---
   # Using full path to avoid potential method clashes, as seen in Employee model
   enum :lifecycle_status, LIFECYCLE_STATUS, prefix: true
   enum :workflow_status, WORKFLOW_STATUS, prefix: true
-
   # Standardized role kinds for categorization
   enum :business_type, {
     owner: 0,
@@ -71,6 +40,26 @@ class Role < ApplicationRecord
     notification_group: 19,
     payment_method: 20
   }, prefix: :model_type
+  # --- Associations ---
+  # REASON: When a Role's timestamp is updated (either directly or via PolicyAppointment), it touches the Company. This ensures the Company's cache_key changes.
+  belongs_to :company, touch: true
+  belongs_to :branch, optional: true
+
+  has_many :policy_appointments, dependent: :destroy, as: :appoint_to
+  has_many :policies, through: :policy_appointments
+
+  has_many :tag_appointments, dependent: :destroy, as: :appoint_to
+  has_many :tags, through: :tag_appointments
+
+  has_many :employee_group_appointments, dependent: :destroy, as: :appoint_to
+  has_many :employee_groups, through: :employee_group_appointments
+
+  has_many :role_appointments, dependent: :destroy
+  has_many :employee_groups, through: :role_appointments, source: :appoint_to, source_type: "EmployeeGroup"
+  has_many :employees, through: :role_appointments, source: :appoint_to, source_type: "Employee"
+  has_many :customer_groups, through: :role_appointments, source: :appoint_to, source_type: "CustomerGroup"
+  has_many :customers, through: :role_appointments, source: :appoint_to, source_type: "Customer"
+  has_many :departments, through: :role_appointments, source: :appoint_to, source_type: "Department"
 
   # --- Validations ---
   validates :name,
@@ -80,8 +69,14 @@ class Role < ApplicationRecord
             scope: :company_id,
             message: "A role with this name already exists."
           }
-
   validates :business_type, presence: true
+  # This fires whenever the Role is touched (e.g., by a PolicyAppointment change)
+  after_touch :invalidate_employee_caches
+
+  # --- Soft Deletion (Discard) ---
+  # If you are using a gem like 'Discard' or similar for soft deletion:
+  # include Discard::Model
+  # default_scope -> { kept }
 
   # This fires whenever the Role is touched (e.g., by a PolicyAppointment change)
   after_touch :invalidate_employee_caches

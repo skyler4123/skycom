@@ -8,22 +8,20 @@ class Cart < ApplicationRecord
   enum :timezone, TIMEZONES, prefix: true, default: :utc
   enum :currency, CURRENCIE_CODES, prefix: true, default: :usd
 
+  # --- Enums ---
+  enum :lifecycle_status, LIFECYCLE_STATUS, prefix: true
+  enum :workflow_status, WORKFLOW_STATUS, prefix: true
+  enum :business_type, {
+    shopping: 0,
+    wishlist: 1,
+    saved_for_later: 2
+  }
   # --- Associations ---
   belongs_to :company
   belongs_to :branch, optional: true
   belongs_to :cart_group
   belongs_to :category
   belongs_to :property_mapping
-
-  # --- Enums ---
-  enum :lifecycle_status, LIFECYCLE_STATUS, prefix: true
-  enum :workflow_status, WORKFLOW_STATUS, prefix: true
-
-  enum :business_type, {
-    shopping: 0,
-    wishlist: 1,
-    saved_for_later: 2
-  }
 
   # --- Validations ---
   validates :name, presence: true, uniqueness: { scope: :company_id }, length: { maximum: 255 }

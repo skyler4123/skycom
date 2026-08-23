@@ -4,6 +4,12 @@ class SubscriptionGroup < ApplicationRecord
   # Assuming you use Discard for the 'discarded_at' column in migration
   # include Discard::Model
 
+  # Ensure the definition components are always present
+  enum :country, COUNTRY_CODES, prefix: true, default: :us
+  enum :lifecycle_status, LIFECYCLE_STATUS, prefix: true
+  enum :workflow_status, WORKFLOW_STATUS, prefix: true
+  enum :timezone, TIMEZONES, prefix: true, default: :utc
+  enum :business_type, { system_to_business: 0, business_to_business: 1, business_to_customer: 2 }, prefix: true
   # --- Associations ---
   belongs_to :company
   belongs_to :branch, optional: true
@@ -18,11 +24,4 @@ class SubscriptionGroup < ApplicationRecord
   # --- Validations ---
   validates :name, presence: true
   validates :code, uniqueness: true, allow_blank: true
-
-  # Ensure the definition components are always present
-  enum :country, COUNTRY_CODES, prefix: true, default: :us
-  enum :lifecycle_status, LIFECYCLE_STATUS, prefix: true
-  enum :workflow_status, WORKFLOW_STATUS, prefix: true
-  enum :timezone, TIMEZONES, prefix: true, default: :utc
-  enum :business_type, { system_to_business: 0, business_to_business: 1, business_to_customer: 2 }, prefix: true
 end

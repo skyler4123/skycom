@@ -8,13 +8,12 @@
 class CompanyOrder < ApplicationRecord
   attribute :permission_resource_name, :string, default: -> { self.name }
 
-  belongs_to :company
-  belongs_to :user
-  has_one :company_invoice, dependent: :destroy
-
   enum :currency, CURRENCIE_CODES, prefix: true, default: :usd
   enum :lifecycle_status, LIFECYCLE_STATUS, prefix: true, default: :active
   enum :workflow_status, WORKFLOW_STATUS, prefix: true, default: :pending
+  belongs_to :company
+  belongs_to :user
+  has_one :company_invoice, dependent: :destroy
 
   validates :money_amount_cents, :credit_amount,
     presence: true, numericality: { only_integer: true, greater_than: 0 }

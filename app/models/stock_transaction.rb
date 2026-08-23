@@ -3,6 +3,8 @@ class StockTransaction < ApplicationRecord
   enum :timezone, TIMEZONES, prefix: true, default: :utc
   enum :currency, CURRENCIE_CODES, prefix: true, default: :usd
 
+  enum :direction, { add: 0, remove: 1 }
+  enum :transaction_type, { import: 0, export: 1, transfer: 2, adjustment: 3 }
   belongs_to :company
   belongs_to :branch, optional: true
   belongs_to :warehouse
@@ -14,9 +16,6 @@ class StockTransaction < ApplicationRecord
   belongs_to :appoint_to, polymorphic: true, optional: true
   belongs_to :appoint_for, polymorphic: true, optional: true # Anchor document (Import/Export/Transfer)
   belongs_to :appoint_by, polymorphic: true, optional: true  # Operator identity profile
-
-  enum :direction, { add: 0, remove: 1 }
-  enum :transaction_type, { import: 0, export: 1, transfer: 2, adjustment: 3 }
 
   validates :quantity, presence: true, numericality: { only_integer: true, greater_than: 0 }
 

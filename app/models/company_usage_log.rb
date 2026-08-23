@@ -11,12 +11,11 @@ class CompanyUsageLog < ApplicationRecord
 
   attribute :permission_resource_name, :string, default: -> { self.name }
 
+  enum :lifecycle_status, LIFECYCLE_STATUS, prefix: true, default: :active
+  enum :workflow_status, WORKFLOW_STATUS, prefix: true, default: :confirmed
   belongs_to :company
   belongs_to :company_wallet
   belongs_to :source, polymorphic: true, optional: true
-
-  enum :lifecycle_status, LIFECYCLE_STATUS, prefix: true, default: :active
-  enum :workflow_status, WORKFLOW_STATUS, prefix: true, default: :confirmed
 
   validates :action_type, presence: true, inclusion: { in: VALID_ACTION_TYPES }
   validates :change_amount, :balance_after, presence: true, numericality: { only_integer: true }

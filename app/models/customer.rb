@@ -11,6 +11,14 @@ class Customer < ApplicationRecord
   enum :timezone, TIMEZONES, prefix: true, default: :utc
   enum :currency, CURRENCIE_CODES, prefix: true, default: :usd
 
+  # --- Enums ---
+  enum :lifecycle_status, LIFECYCLE_STATUS, prefix: true
+  enum :workflow_status, WORKFLOW_STATUS, prefix: true
+  enum :business_type, {
+    individual: 0,
+    small_business: 1,
+    enterprise: 2
+  }
   # --- Associations ---
   belongs_to :user, optional: true
   belongs_to :company, optional: true
@@ -30,15 +38,6 @@ class Customer < ApplicationRecord
 
   has_many :service_appointments, dependent: :destroy, as: :appoint_to
   has_many :services, through: :service_appointments
-
-  # --- Enums ---
-  enum :lifecycle_status, LIFECYCLE_STATUS, prefix: true
-  enum :workflow_status, WORKFLOW_STATUS, prefix: true
-  enum :business_type, {
-    individual: 0,
-    small_business: 1,
-    enterprise: 2
-  }
 
   # --- Validations ---
   validates :name, presence: true, uniqueness: { scope: :company_id }, length: { maximum: 255 }

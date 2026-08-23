@@ -2,7 +2,8 @@
 class ReservationAppointment < ApplicationRecord
   include SetDefaultCompanyConcern
 
-
+  enum :lifecycle_status, { active: 0, archived: 1 }
+  enum :workflow_status, { pending: 0, approved: 1, rejected: 2 }
   belongs_to :company
   belongs_to :reservation
 
@@ -11,7 +12,4 @@ class ReservationAppointment < ApplicationRecord
   belongs_to :appoint_to, polymorphic: true
   belongs_to :appoint_for, polymorphic: true, optional: true
   belongs_to :appoint_by, polymorphic: true, optional: true
-
-  enum :lifecycle_status, { active: 0, archived: 1 }
-  enum :workflow_status, { pending: 0, approved: 1, rejected: 2 }
 end

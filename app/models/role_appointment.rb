@@ -4,14 +4,13 @@ class RoleAppointment < ApplicationRecord
 
   attribute :permission_resource_name, :string, default: -> { self.name }
 
+  enum :business_type, { owner: 0 }
   belongs_to :company
   belongs_to :role
   belongs_to :appoint_to, polymorphic: true, touch: true
   belongs_to :appoint_from, polymorphic: true, optional: true, touch: true
   belongs_to :appoint_for, polymorphic: true, optional: true, touch: true
   belongs_to :appoint_by, polymorphic: true, optional: true, touch: true
-
-  enum :business_type, { owner: 0 }
 
   validates :appoint_to_type, presence: true
   validate :only_one_owner_appointment_per_company, on: :create

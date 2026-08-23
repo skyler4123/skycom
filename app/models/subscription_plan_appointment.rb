@@ -2,7 +2,15 @@ class SubscriptionPlanAppointment < ApplicationRecord
   include TagConcern
   include SetDefaultCompanyConcern
 
-
+  enum :country, COUNTRY_CODES, prefix: true, default: :us
+  enum :lifecycle_status, LIFECYCLE_STATUS, prefix: true
+  enum :workflow_status, WORKFLOW_STATUS, prefix: true
+  enum :timezone, TIMEZONES, prefix: true, default: :utc
+  enum :business_type, { system_to_business: 0, business_to_business: 1, business_to_customer: 2 }, prefix: true
+  monetize :price_cents,
+           as: "price",
+           with_model_currency: :currency,
+           disable_validation: true
   # --- Associations ---
   belongs_to :company
   belongs_to :branch, optional: true
@@ -12,15 +20,4 @@ class SubscriptionPlanAppointment < ApplicationRecord
   belongs_to :buyer, polymorphic: true
   belongs_to :resource, polymorphic: true, optional: true
   belongs_to :processer, polymorphic: true, optional: true
-
-  enum :country, COUNTRY_CODES, prefix: true, default: :us
-  enum :lifecycle_status, LIFECYCLE_STATUS, prefix: true
-  enum :workflow_status, WORKFLOW_STATUS, prefix: true
-  enum :timezone, TIMEZONES, prefix: true, default: :utc
-  enum :business_type, { system_to_business: 0, business_to_business: 1, business_to_customer: 2 }, prefix: true
-
-  monetize :price_cents,
-           as: "price",
-           with_model_currency: :currency,
-           disable_validation: true
 end

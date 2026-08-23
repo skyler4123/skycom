@@ -1,9 +1,12 @@
 class Company < ApplicationRecord
-  class_attribute :skip_init, default: false
-
+  include AddressConcern
+  include Cache::RecordsConcern
+  include Company::EducationConcern
+  include Company::HospitalConcern
+  include Company::RestaurantConcern
+  include Company::PermissionConcern
   OWNER_POLICY_RESOURCE = "all".freeze
   OWNER_POLICY_ACTION = "all".freeze
-
   # Default resource names for new companies. Used by #resource_names
   # (which reads from metadata with this as a fallback).
   DEFAULT_RESOURCE_NAMES = %w[
@@ -17,16 +20,44 @@ class Company < ApplicationRecord
     AttendancePolicy AttendanceLog AttendanceDay AttendanceMonth
     Stock StockTransfer StockImport StockExport
   ].freeze
+  class_attribute :skip_init, default: false
 
   attribute :permission_resource_name, :string, default: -> { self.name }
 
-  include AddressConcern
-  include Cache::RecordsConcern
-  include Company::EducationConcern
-  include Company::HospitalConcern
-  include Company::RestaurantConcern
-  include Company::PermissionConcern
-
+  # --- Enums ---
+  enum :country, COUNTRY_CODES, prefix: true, default: :us
+  enum :business_type, {
+    retail: 0,
+    restaurant: 1000,
+    hospital: 2000,
+    education: 3000,
+    hotel: 4000,
+    fitness: 5000
+  }, prefix: true
+  enum :lifecycle_status, {
+    active: 0,
+    disabled: 30
+  }, prefix: true, default: :active
+  enum :workflow_status, WORKFLOW_STATUS, prefix: true
+  enum :timezone, TIMEZONES, prefix: true, default: :utc
+  enum :currency, CURRENCIE_CODES, prefix: true, default: :usd
+  enum :ownership_type, {
+    publicly_traded: 0,
+    privately_held: 1
+  }
+  # Enum for the new fiscal_year_end_month column (1=January, 12=December)
+  enum :fiscal_year_end_month, {
+    january: 1, february: 2, march: 3, april: 4,
+    may: 5, june: 6, july: 7, august: 8,
+    september: 9, october: 10, november: 11, december: 12
+  }
+  # --- Credit usage counter (Kredis — hot path, no DB writes per action) ---
+  # A plain accumulator ("companies:<id>:credit_usage", auto-generated key).
+  # It only counts and resets — agnostic to the sync job's period; it never
+  # tracks when usage happened. The job drains the accumulated delta into the
+  # DB's hourly/daily slots and resets it to 0, so the counter always holds
+  # the UNSYNCED delta since the last run.
+  kredis_counter :credit_usage
   belongs_to :user
 
   has_many :property_mappings, dependent: :destroy
@@ -79,35 +110,6 @@ class Company < ApplicationRecord
   has_many :company_monthly_usages, dependent: :destroy
   has_many :company_usage_logs, dependent: :destroy
 
-  # --- Enums ---
-  enum :country, COUNTRY_CODES, prefix: true, default: :us
-  enum :business_type, {
-    retail: 0,
-    restaurant: 1000,
-    hospital: 2000,
-    education: 3000,
-    hotel: 4000,
-    fitness: 5000
-  }, prefix: true
-  enum :lifecycle_status, {
-    active: 0,
-    disabled: 30
-  }, prefix: true, default: :active
-  enum :workflow_status, WORKFLOW_STATUS, prefix: true
-  enum :timezone, TIMEZONES, prefix: true, default: :utc
-  enum :currency, CURRENCIE_CODES, prefix: true, default: :usd
-  enum :ownership_type, {
-    publicly_traded: 0,
-    privately_held: 1
-  }
-
-  # Enum for the new fiscal_year_end_month column (1=January, 12=December)
-  enum :fiscal_year_end_month, {
-    january: 1, february: 2, march: 3, april: 4,
-    may: 5, june: 6, july: 7, august: 8,
-    september: 9, october: 10, november: 11, december: 12
-  }
-
   # --- Validations ---
   validates :name, presence: true, uniqueness: { scope: :user_id }, length: { maximum: 255 }
   validates :description, length: { maximum: 5000 }, allow_blank: true
@@ -136,14 +138,6 @@ class Company < ApplicationRecord
   def resource_names
     (metadata || {})["resource_names"] || DEFAULT_RESOURCE_NAMES
   end
-
-  # --- Credit usage counter (Kredis — hot path, no DB writes per action) ---
-  # A plain accumulator ("companies:<id>:credit_usage", auto-generated key).
-  # It only counts and resets — agnostic to the sync job's period; it never
-  # tracks when usage happened. The job drains the accumulated delta into the
-  # DB's hourly/daily slots and resets it to 0, so the counter always holds
-  # the UNSYNCED delta since the last run.
-  kredis_counter :credit_usage
 
   def record_credit_usage!(credits)
     return unless credits.is_a?(Integer) && credits.positive?

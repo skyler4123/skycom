@@ -2,21 +2,28 @@
 class Product < ApplicationRecord
   include CategoryConcern
   include PropertyMappingConcern
+  include TagConcern
+  include OrderConcern
+  include Product::ImageConcern
   attribute :permission_resource_name, :string, default: -> { self.name }
 
   enum :country, COUNTRY_CODES, prefix: true, default: :us
   enum :timezone, TIMEZONES, prefix: true, default: :utc
   enum :currency, CURRENCIE_CODES, prefix: true, default: :usd
 
+  # --- Enums ---
+  enum :lifecycle_status, LIFECYCLE_STATUS, prefix: true
+  enum :workflow_status, WORKFLOW_STATUS, prefix: true
+  enum :business_type, {
+    physical: 0,
+    digital: 1,
+    service_based: 2
+  }
   # money-rails integration
   monetize :price_cents,
            as: "price",
            with_model_currency: :price_currency,
            disable_validation: true
-
-  include TagConcern
-  include OrderConcern
-  include Product::ImageConcern
 
   # --- Associations ---
   belongs_to :company
@@ -43,16 +50,6 @@ class Product < ApplicationRecord
   has_many :stock_imports,   through: :stock_transactions, source: :appoint_for, source_type: "StockImport"
   has_many :stock_exports,   through: :stock_transactions, source: :appoint_for, source_type: "StockExport"
   has_many :stock_transfers, through: :stock_transactions, source: :appoint_for, source_type: "StockTransfer"
-
-  # --- Enums ---
-  enum :lifecycle_status, LIFECYCLE_STATUS, prefix: true
-  enum :workflow_status, WORKFLOW_STATUS, prefix: true
-
-  enum :business_type, {
-    physical: 0,
-    digital: 1,
-    service_based: 2
-  }
 
   # --- Validations ---
   validates :name, presence: true, uniqueness: { scope: :company_id }, length: { maximum: 255 }

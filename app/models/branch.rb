@@ -1,11 +1,39 @@
 class Branch < ApplicationRecord
   include CategoryConcern
   include PropertyMappingConcern
-  attribute :permission_resource_name, :string, default: -> { self.name }
-
   include AddressConcern
   include TagConcern
   include Branch::ImageConcern
+  attribute :permission_resource_name, :string, default: -> { self.name }
+
+  # --- Enums ---
+  enum :country, COUNTRY_CODES, prefix: true, default: :us
+  enum :business_type, {
+    # Physical Points of Sale
+    storefront: 0,        # Main retail/customer-facing shop
+    kiosk: 1,             # Small booth, pop-up, or sub-counter
+    showroom: 2,          # Display only (common in high-end retail/fitness)
+
+    # Fulfillment & Logistics
+    warehouse: 10,        # Storage only, no walk-in customers
+    distribution_center: 11, # Hub for moving goods to other branches
+    dark_store: 12,       # Dedicated for online order picking
+
+    # Service & Support
+    service_point: 20,    # Repairs, customer support, or intake
+    clinic_wing: 21,      # Specific to Hospital companies
+    classroom_annex: 22,  # Specific to Education companies
+
+    # Administrative
+    headquarters: 90,     # Main office / Corporate
+    administrative: 91,   # Back-office branch (Accounting, HR)
+
+    virtual: 99           # Online-only branch
+  }, prefix: true
+  enum :timezone, TIMEZONES, prefix: true, default: :utc
+  enum :currency, CURRENCIE_CODES, prefix: true, default: :usd
+  enum :lifecycle_status, LIFECYCLE_STATUS, prefix: true
+  enum :workflow_status, WORKFLOW_STATUS, prefix: true
   belongs_to :company, touch: true
   belongs_to :category
   belongs_to :property_mapping
@@ -41,35 +69,6 @@ class Branch < ApplicationRecord
   # Self-referencing association for company hierarchy
   # belongs_to :parent_company, class_name: "Company", optional: true
   # has_many :child_branches, class_name: "Company", foreign_key: "parent_branch_id", dependent: :destroy, inverse_of: :parent_company
-
-  # --- Enums ---
-  enum :country, COUNTRY_CODES, prefix: true, default: :us
-  enum :business_type, {
-    # Physical Points of Sale
-    storefront: 0,        # Main retail/customer-facing shop
-    kiosk: 1,             # Small booth, pop-up, or sub-counter
-    showroom: 2,          # Display only (common in high-end retail/fitness)
-
-    # Fulfillment & Logistics
-    warehouse: 10,        # Storage only, no walk-in customers
-    distribution_center: 11, # Hub for moving goods to other branches
-    dark_store: 12,       # Dedicated for online order picking
-
-    # Service & Support
-    service_point: 20,    # Repairs, customer support, or intake
-    clinic_wing: 21,      # Specific to Hospital companies
-    classroom_annex: 22,  # Specific to Education companies
-
-    # Administrative
-    headquarters: 90,     # Main office / Corporate
-    administrative: 91,   # Back-office branch (Accounting, HR)
-
-    virtual: 99           # Online-only branch
-  }, prefix: true
-  enum :timezone, TIMEZONES, prefix: true, default: :utc
-  enum :currency, CURRENCIE_CODES, prefix: true, default: :usd
-  enum :lifecycle_status, LIFECYCLE_STATUS, prefix: true
-  enum :workflow_status, WORKFLOW_STATUS, prefix: true
 
   # NOTE: ownership_type and fiscal_year_end_month columns were removed from schema
   # These enums are kept for future use when custom columns are re-added
