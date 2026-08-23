@@ -1,20 +1,12 @@
 class Companies::ApplicationController < ApplicationController
-  # Show the unpaid-invoice warning flash when invoices have been unpaid
-  # for longer than this duration.
-  UNPAID_WARNING_THRESHOLD = 5.days
-
   before_action :set_company
   before_action :set_employee
-
-  # Order reason: Feature gating checks run before Pundit authorization
-  include Companies::FeatureGatingConcern
 
   # Order reason: Companies::Authorizable need current_employee
   include Companies::Authorizable
   include ApplicationController::WebsocketConcern
+  include Companies::CreditDeductionConcern
 
-  before_action :check_accessable
-  before_action :set_billing_warning
   before_action :set_websocket_channels
 
   private
@@ -36,13 +28,5 @@ class Companies::ApplicationController < ApplicationController
 
   def current_employee
     @current_employee
-  end
-
-  def set_billing_warning
-    return unless current_company&.billing_wallet&.has_unpaid_invoices_at?
-    return if current_company.billing_wallet&.hide_billing_alerts?
-    return if current_company.billing_wallet.has_unpaid_invoices_at > UNPAID_WARNING_THRESHOLD.ago
-
-    flash.now[:alert] = "Your account has outstanding invoices. Please settle them to avoid suspension."
   end
 end

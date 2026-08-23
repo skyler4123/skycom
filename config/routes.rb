@@ -9,13 +9,6 @@ Rails.application.routes.draw do
     get "employee", to: "employees#show"
     post "attendances", to: "attendances#create"
   end
-  # Webhooks
-  namespace :webhooks do
-    namespace :payments do
-      post "mock_qr_gateway",       to: "mock_qr_gateway#create"
-      post "mock_redirect_gateway", to: "mock_redirect_gateway#create"
-    end
-  end
   namespace :admin do
     resources :companies
     resources :payment_methods
@@ -79,12 +72,10 @@ Rails.application.routes.draw do
 
       resources :companies, only: [ :edit, :update ]
 
-      resource :billing, only: :show, controller: :billing do
-        post :pay_all, on: :collection
-        post :toggle_feature, on: :collection
-      end
-
       get "analytics", to: "analytics#index"
+
+      # PLACEHOLDER routes — future Token implementation. Actions exist but
+      # contain no logic yet (see Companies::TopUpsController).
       resources :top_ups, only: %i[new] do
         collection do
           post :mock_qr_gateway
@@ -92,8 +83,19 @@ Rails.application.routes.draw do
         end
       end
 
+      resource :usage, only: :show, controller: :usage
+      resource :billing, only: :show, controller: :billing
+
       post "order_processing/v1/checkout", to: "order_processing/v1#checkout"
       post "order_processing/v1/pay", to: "order_processing/v1#pay"
+    end
+  end
+
+  # Webhooks — payment API callbacks (placeholder for future Token implementation)
+  namespace :webhooks do
+    namespace :payments do
+      post "mock_qr_gateway",       to: "mock_qr_gateway#create"
+      post "mock_redirect_gateway", to: "mock_redirect_gateway#create"
     end
   end
 

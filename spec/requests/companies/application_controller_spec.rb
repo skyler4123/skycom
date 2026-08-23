@@ -17,41 +17,10 @@ RSpec.describe "Companies::ApplicationController", type: :request do
     ActionController::Base.allow_forgery_protection = original
   end
 
-  describe "check_accessable" do
-    it "redirects to billing page when lifecycle_status is suspended (not accessible)" do
-      company.update!(lifecycle_status: :suspended)
-      get "/companies/#{company.id}/dashboards"
-      expect(response).to redirect_to(company_billing_path(company))
-    end
-
-    it "allows access when lifecycle_status is active (accessible)" do
+  describe "access" do
+    it "allows access when lifecycle_status is active" do
       get "/companies/#{company.id}/dashboards"
       expect(response).to have_http_status(:ok)
-    end
-
-    it "allows access when lifecycle_status is active even with future suspension_at" do
-      company.billing_wallet.update!(suspension_at: 1.week.from_now)
-      get "/companies/#{company.id}/dashboards"
-      expect(response).to have_http_status(:ok)
-    end
-  end
-
-  describe "set_billing_warning" do
-    before do
-      allow(Time).to receive(:current).and_return(Time.new(2026, 6, 20, 10, 0, 0))
-      company.billing_wallet.update!(has_unpaid_invoices_at: 7.days.ago)
-    end
-
-    it "skips the billing warning when hide_billing_alerts is true" do
-      company.billing_wallet.update!(hide_billing_alerts: true)
-      get "/companies/#{company.id}/dashboards"
-      expect(flash[:alert]).to be_blank
-    end
-
-    it "shows the billing warning when hide_billing_alerts is false" do
-      company.billing_wallet.update!(hide_billing_alerts: false)
-      get "/companies/#{company.id}/dashboards"
-      expect(flash[:alert]).not_to be_blank
     end
   end
 end

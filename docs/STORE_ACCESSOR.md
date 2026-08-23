@@ -86,6 +86,9 @@ store_accessor :metadata, :gateway_payload, :callback_data
 | `PropertyMapping` | `metadata` | `properties` | Dynamic property metadata array (key, name, type, validates) |
 | `TableConfig` | `metadata` | `columns` | Column display configuration (key, name, visible, width, align, etc.) |
 | `Policy` | `metadata` | `tag_conditions` | ABAC permission conditions hash (key-value rules) |
+| `CompanyDailyUsage` | `metadata` | `h0`..`h23` | Hourly credit usage (dynamically declared: `store_accessor :metadata, *(0..23).map { |i| "h#{i}" }`) |
+| `CompanyMonthlyUsage` | `metadata` | `d1`..`d31` | Daily credit usage (dynamically declared: `store_accessor :metadata, *(1..31).map { |i| "d#{i}" }`) |
+| `CompanyTransaction` | `metadata` | `gateway_payload` | Gateway response payload (QR string, redirect URL, etc.) |
 
 For any future JSONB-backed attribute, first check if the target model already uses `store_accessor`. If it does, add your key to the existing declaration. If it doesn't, add a new `store_accessor` line.
 

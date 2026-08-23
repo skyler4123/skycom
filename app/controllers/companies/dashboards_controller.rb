@@ -1,6 +1,9 @@
 # app/controllers/companies/dashboards_controller.rb
 
 class Companies::DashboardsController < Companies::ApplicationController
+  # Credit deduction is handled by the after_action filter — never inline.
+  deduct_company_credits_for :index, with: CompanyCreditDeduction::Companies::Dashboards::IndexService
+
   def index
     respond_to do |format|
       format.html { render html: "", layout: true }
@@ -13,13 +16,23 @@ class Companies::DashboardsController < Companies::ApplicationController
             services:  count_by_category(current_company.services),
             orders:    count_by_category(current_company.orders),
             employees: count_by_category(current_company.employees)
-          }
+          },
+          wallet: format_wallet(current_company.company_wallet)
         }
       end
     end
   end
 
   private
+
+  def format_wallet(wallet)
+    {
+      main_credit_balance: wallet&.main_credit_balance || 0,
+      promo_credit_balance: wallet&.promo_credit_balance || 0,
+      debt_credit_balance: wallet&.debt_credit_balance || 0,
+      currency: current_company.currency
+    }
+  end
 
   def format_company(company)
     company.as_json(only: %i[

@@ -1,3 +1,9 @@
+# frozen_string_literal: true
+
+# Resolves a CompanyTransaction's company_payment_method strategy to its
+# gateway service class and executes the gateway call. On success the
+# transaction keeps status :pending (the webhook later completes it); on
+# failure it is marked :failed and an error is raised.
 module Payments
   class InitiateService
     def initialize(transaction:, redirect_url: nil)
@@ -6,21 +12,16 @@ module Payments
     end
 
     def call
-      payment_method = @transaction.try(:payment_method) || @transaction.try(:billing_payment_method)
-      invoice = @transaction.try(:invoice) || @transaction.try(:billing_invoice)
-      amount_cents = @transaction.try(:amount_cents) || @transaction.try(:price_cents)
-
+      payment_method = @transaction.company_payment_method
       strategy_key = payment_method.strategy&.to_sym
 
       gateway_class_name = GATEWAY_STRATEGY_CLASSES[strategy_key]
-      raise "Unsupported payment strategy: #{strategy_key}" unless gateway_class_name
+      raise TopUps::Error, "Unsupported payment strategy: #{strategy_key}" unless gateway_class_name
 
-      gateway_class = gateway_class_name.constantize
-
-      gateway = gateway_class.new(
-        amount_cents: amount_cents,
-        invoice_id: invoice.id,
-        memo: "SKYCOM #{invoice.id}",
+      gateway = gateway_class_name.constantize.new(
+        amount_cents: @transaction.money_amount_cents,
+        invoice_id: @transaction.company_invoice.id,
+        memo: "SKYCOM #{@transaction.company_invoice.id}",
         transaction_token: @transaction.gateway_reference,
         redirect_url: @redirect_url
       )
@@ -35,7 +36,7 @@ module Payments
         @transaction
       else
         @transaction.update!(status: :failed, gateway_payload: result[:gateway_payload] || {})
-        raise "Gateway execution failed: #{result[:error]}"
+        raise TopUps::Error, "Gateway execution failed: #{result[:error]}"
       end
     end
   end

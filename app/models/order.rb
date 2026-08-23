@@ -7,10 +7,6 @@ class Order < ApplicationRecord
   enum :timezone, TIMEZONES, prefix: true, default: :utc
 
   include TagConcern
-  include MeteringConcern
-
-  metered_as :orders
-
   # --- Associations ---
   belongs_to :company
   belongs_to :branch, optional: true

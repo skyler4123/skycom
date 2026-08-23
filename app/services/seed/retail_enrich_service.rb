@@ -80,7 +80,7 @@ class Seed::RetailEnrichService
     create_stock_exports
     create_customer_orders
     create_invoices
-    create_billing_data
+    seed_credit_data
     seed_payment_method_merchant_data
 
     print_footer
@@ -479,12 +479,9 @@ class Seed::RetailEnrichService
     puts "  -> #{Invoice.where(company: @retail).count} invoices created"
   end
 
-  def create_billing_data
-    puts "Generating 7 days of billing history..."
-    Seed::BillingDataService.create(company: @retail)
-    puts "  -> Billing data generated (DailyMetricLog: #{DailyMetricLog.where(company: @retail).count}, " \
-         "DailyFeatureLog: #{DailyFeatureLog.where(company: @retail).count}, " \
-         "Invoices: #{BillingInvoice.where(company: @retail).count})"
+  def seed_credit_data
+    puts "Seeding credit data..."
+    Seed::CreditDataService.create(company: @retail)
   end
 
   def seed_payment_method_merchant_data

@@ -1,8 +1,6 @@
 # frozen_string_literal: true
 
 class Companies::AnalyticsController < Companies::ApplicationController
-  feature_key :analytics_dashboard
-
   def index
     respond_to do |format|
       format.html { render html: "", layout: true }

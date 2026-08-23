@@ -148,6 +148,9 @@ services:
     command: go run main.go
     ports:
       - "4000:4000"
+    # Allows the mock to reach a Rails app running on the host (bin/dev)
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
 
 volumes:
   postgres_data:

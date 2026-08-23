@@ -1,8 +1,6 @@
 # app/controllers/companies/customers_controller.rb
 
 class Companies::CustomersController < Companies::ApplicationController
-  feature_key :crm_basic
-
   def index
     respond_to do |format|
       format.html { render html: "", layout: true }

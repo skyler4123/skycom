@@ -58,6 +58,9 @@ export default class Companies_LayoutController extends Controller {
 
     return [
       link(null, Helpers.company_dashboards_path(cid), 'dashboard', translate('Dashboard')),
+      link(null, Helpers.company_usage_path(cid), 'monitoring', translate('Usage')),
+      link(null, Helpers.new_company_top_up_path(cid), 'account_balance_wallet', translate('Top Up')),
+      link(null, Helpers.company_billing_path(cid), 'receipt_long', translate('Billing')),
       link('multi_branch', Helpers.company_branches_path(cid), 'apartment', translate('Branches')),
       link(null, Helpers.company_departments_path(cid), 'family_group', translate('Departments')),
       link(null, Helpers.company_categories_path(cid), 'category', translate('Categories')),
@@ -84,7 +87,6 @@ export default class Companies_LayoutController extends Controller {
       link(null, Helpers.company_pages_path(cid), 'description', translate('Pages')),
       link(null, Helpers.company_payment_method_appointments_path(cid), 'payments', translate('Payment Methods')),
       link('custom_roles', Helpers.company_permissions_path(cid), 'shield', translate('Permissions')),
-      link(null, Helpers.company_billing_path(cid), 'account_balance_wallet', translate('Billing')),
       link('analytics_dashboard', Helpers.company_analytics_path(cid), 'insights', translate('Analytics')),
       link(null, Helpers.company_facilities_path(cid), 'warehouse', translate('Facilities')),
     ].join('\n')

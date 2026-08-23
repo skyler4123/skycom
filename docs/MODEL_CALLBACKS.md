@@ -48,6 +48,26 @@ Callbacks defined directly in the model file (not inherited from a concern).
 | Callback | Line | Method | Description |
 |----------|------|--------|-------------|
 | `after_create :setup_owner_records` | 104 | `setup_owner_records` | Creates owner infrastructure: (1) Owner `Role` with `business_type: :owner`, (2) "Owner All Access" `Policy` with `resource: "all"` / `action: "all"`, (3) Owner `Employee` linked to the creating user, (4) Both `PolicyAppointment` and `RoleAppointment` with `business_type: :owner`, (5) Sets `user.system_role` to `company_owner` so `accessible_companies` returns the new company. |
+| `after_create :initialize_company` | 126 | `initialize_company` | Also creates the company's `CompanyWallet` (`credit_balance: 0`, `walletable: company`) — unconditional, like the owner records. The wallet is the chain's bottom node: `CompanyTransaction → CompanyInvoice → CompanyOrder → CompanyWallet`. |
+
+---
+
+### CompanyInvoice (`app/models/company_invoice.rb`)
+
+| Callback | Line | Method | Description |
+|----------|------|--------|-------------|
+| `before_validation :generate_invoice_number, on: :create` | — | `generate_invoice_number` | Auto-generates `INV-YYYYMM-HEX` when `invoice_number` is blank. |
+| `after_update :complete_order_if_paid!, if: :saved_change_to_payment_status? && paid?` | — | `complete_order_if_paid!` | When the invoice's `payment_status` transitions to `paid`, completes the linked `CompanyOrder` (idempotent — `complete!` no-ops when already completed). Part of the credit chain. |
+
+---
+
+### CompanyTransaction (`app/models/company_transaction.rb`)
+
+| Callback | Line | Method | Description |
+|----------|------|--------|-------------|
+| `after_create :sync_invoice_payment_status, if: :completed?` | — | `sync_invoice_payment_status` | Derives the invoice's `payment_status` from `SUM(money_amount_cents)` of its `completed` `payment` transactions: `>= invoice.money_amount_cents → paid`, else `unpaid`. Never set directly — this is the credit chain's entry point. |
+| `after_update :sync_invoice_payment_status, if: :completed?` | — | `sync_invoice_payment_status` | Same derivation when a pending transaction is completed by a gateway webhook (top-up flow). |
+| `after_destroy :sync_invoice_payment_status` | — | `sync_invoice_payment_status` | Re-derives (reverts to `unpaid`) when a payment is destroyed. |
 
 ---
 
@@ -206,34 +226,6 @@ Managed attribute caching in `Rails.sync_cache` (Solid Cache SQLite + Redis pub/
 
 ---
 
-### BillingInvoice (`app/models/billing_invoice.rb`)
-
-| Callback | Line | Method | Description |
-|----------|------|--------|-------------|
-| `after_update :try_reactivate_company, if: -> { saved_change_to_payment_status? && paid? }` | 22 | `try_reactivate_company` | When an invoice's `payment_status` changes to `paid`, calls `company.try_reactivate!`. If no unpaid invoices remain, the company's lifecycle_status transitions back to `:active`, `suspension_at` is cleared, and `has_unpaid_invoices` is set to `false`. |
-| `after_create_commit :attempt_auto_settlement, if: -> { unpaid? }` | 23 | `attempt_auto_settlement` | When a new unpaid invoice is committed to the database, calls `company.auto_settle_unpaid_invoices` → `SettlementService.settle_all`. Attempts to pay the invoice from the company's wallet (promo_balance first, then main_balance). |
-
----
-
-### Company::CircuitBreakerConcern (`app/models/concerns/company/circuit_breaker_concern.rb`)
-
-Manages Company lifecycle transitions based on unpaid invoices. `suspension_at` is the deadline before automatic suspension — `SyncSuspensionJob` runs daily at midnight to mark companies as `suspended` when their deadline passes. `is_accessible?` checks `lifecycle_status_suspended?`. On wallet balance change, automatically attempts to settle outstanding invoices via `SettlementService.settle_all`.
-
-| Callback | Line | Method | Description |
-|----------|------|--------|-------------|
-| `after_update :auto_settle_unpaid_invoices, if: -> { saved_change_to_main_balance_cents? \|\| saved_change_to_promo_balance_cents? }` | 29 | `auto_settle_unpaid_invoices` | When company balance changes (top-up or settlement), attempts to settle all unpaid invoices oldest-first via `SettlementService.settle_all`. Idempotent — returns early if no unpaid invoices exist, no wallet balance, or company is `disabled`. Re-entry guarded via `Thread.current[:__settling_company_id]`. |
-
-**Included in (1 model):** `Company` only.
-
-**Methods added:**
-- `flag_unpaid!` — sets `has_unpaid_invoices_at: Time.current`, sets `suspension_at` to end of month (raises if `disabled`); idempotent. Does NOT change `lifecycle_status`
-- `mark_suspended!` — sets `lifecycle_status: :suspended`. Called by `SyncSuspensionJob`
-- `try_reactivate!` — checks for unpaid/overdue invoices; if none remain, transitions to `:active`, clears `suspension_at`, and sets `has_unpaid_invoices_at: nil`
-- `is_accessible?` — returns `true` when not `lifecycle_status_suspended?`
-- `auto_settle_unpaid_invoices` — public method; called by the `after_update` callback and by `BillingInvoice#attempt_auto_settlement`. Guards: skips if already settling, disabled, no positive balance, or no unpaid invoices.
-
----
-
 ### ImmutableRecordConcern (`app/models/concerns/immutable_record_concern.rb`)
 
 Renders records read-only after creation. Prevents both updates and deletion.
@@ -326,7 +318,7 @@ Each concern defines the same callback:
 | `before_create` | 1 | Session |
 | `after_create` | 6 | Category, Company, Branch, PolicyAppointment, PropertyMapping, RoleAppointment |
 | `belongs_to :company, touch: true` | 6 | Branch, Department, Category, PropertyMapping, TableConfig, Role |
-| `after_update` (conditional) | 4 | PaymentMethodAppointment, PolicyAppointment, BillingInvoice, (Company::CircuitBreakerConcern → 1 model) |
+| `after_update` (conditional) | 2 | PaymentMethodAppointment, PolicyAppointment |
 | `before_update` | 3 | PolicyAppointment, RoleAppointment, (ImmutableRecordConcern → 3 models) |
 | `before_destroy` | 5 | Employee, System, PolicyAppointment, RoleAppointment, (ImmutableRecordConcern → 3 models) |
 | `before_discard` | 1 | Employee |
@@ -340,4 +332,4 @@ Each concern defines the same callback:
 
 ---
 
-*Last updated: 2026-07-08. Auto-generated by codebase exploration.*
+*Last updated: 2026-08-10. Auto-generated by codebase exploration.*

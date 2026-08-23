@@ -27,7 +27,6 @@ LIFECYCLE_STATUS = {
   active: 0,
   inactive: 1,
   archived: 2,
-  suspended: 3,
   deleted: 4
 }
 
@@ -64,16 +63,15 @@ GATEWAY_STRATEGIES = begin
   end
 end.freeze
 
+# Strategy key → gateway service class (used by Payments::InitiateService).
+# Only implemented strategies are registered; others raise at initiation.
 GATEWAY_STRATEGY_CLASSES = {
-  cash: "Payments::Cash",
-  wallet_auto_debit: "Payments::WalletAutoDebit",
   mock_qr_gateway: "Payments::MockQrGateway",
-  mock_redirect_gateway: "Payments::MockRedirectGateway",
-  stripe_gateway: "Payments::StripeGateway",
-  viet_qr_gateway: "Payments::VietQrGateway"
+  mock_redirect_gateway: "Payments::MockRedirectGateway"
 }.freeze
 
 # --- Webhooks ---
+# Payment API callback secrets for the mock bank gateways (future Token implementation).
 WEBHOOK_BANK_PAYMENT_SECRET = ENV.fetch("WEBHOOK_BANK_PAYMENT_SECRET", "local_secure_dev_secret").freeze
 WEBHOOK_REDIRECT_PAYMENT_SECRET = ENV.fetch("WEBHOOK_REDIRECT_PAYMENT_SECRET", "local_secure_dev_secret").freeze
 
@@ -130,20 +128,8 @@ OWNER_BUSINESS_TYPE = "owner".freeze
 MAX_PHONE_NUMBER_LENGTH = 20
 
 # =============================================================================
-# Free Tier Defaults
-# =============================================================================
-
-# Feature keys auto-enabled on every new free-tier contract.
-# (Default allowances/unit prices live in Seed::BillingContractService.)
-CORE_FREE_FEATURES = %w[pos_basic inventory_basic crm_basic finance_basic].freeze
-
-# =============================================================================
 # Job Processing Defaults
 # =============================================================================
-
-# Number of records per batch when iterating companies in billing jobs.
-# Used by SyncSuspensionJob, SyncDailyFeatureJob, MonthlyBillingJob.
-COMPANY_PROCESSING_BATCH_SIZE = 50
 
 # =============================================================================
 # Seed Defaults
@@ -159,3 +145,22 @@ RETAIL_INIT_COMPANY_GROUP_BUSINESS_TYPE = :retail
 # =============================================================================
 
 MOCK_OAUTH_EMAIL = "Manager_1_clinic_1@company3.com".freeze
+
+# =============================================================================
+# Credit System (Pay-as-You-Go)
+# =============================================================================
+
+# Per-country credit purchase tiers: money in CENTS → credits.
+# CompanyOrder validates its money_amount_cents/credit_amount against these.
+CREDIT_RATES = {
+  us: { 500 => 500_000, 1_000 => 1_000_000 },
+  vn: { 10_000_000 => 400_000, 100_000_000 => 800_000 }
+}.freeze
+
+# Per-action credit cost (global — not country-based).
+# CompanyUsageLog.action_type strings mirror these keys.
+CREDIT_USAGE_RATES = {
+  create_order: 10,
+  access_dashboard: 2,
+  create_customer: 7
+}.freeze

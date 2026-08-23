@@ -26,17 +26,8 @@ class Company < ApplicationRecord
   include Company::HospitalConcern
   include Company::RestaurantConcern
   include Company::PermissionConcern
-  include Company::BillingConcern
-  include Company::CircuitBreakerConcern
 
   belongs_to :user
-
-  has_many :billing_contracts, dependent: :destroy
-  has_many :billing_invoices, dependent: :destroy
-  has_many :daily_metric_logs, dependent: :destroy
-  has_many :daily_feature_logs, dependent: :destroy
-  has_many :billing_transactions, dependent: :destroy
-  has_one :billing_wallet, dependent: :destroy
 
   has_many :property_mappings, dependent: :destroy
   has_many :table_configs, dependent: :destroy
@@ -79,6 +70,14 @@ class Company < ApplicationRecord
   has_many :subscription_plans, dependent: :destroy
   has_many :departments, dependent: :destroy
   has_many :pages, dependent: :destroy
+  has_one :company_wallet, dependent: :destroy
+  has_many :company_wallet_logs, dependent: :destroy
+  has_many :company_orders, dependent: :destroy
+  has_many :company_invoices, dependent: :destroy
+  has_many :company_transactions, dependent: :destroy
+  has_many :company_daily_usages, dependent: :destroy
+  has_many :company_monthly_usages, dependent: :destroy
+  has_many :company_usage_logs, dependent: :destroy
 
   # --- Enums ---
   enum :country, COUNTRY_CODES, prefix: true, default: :us
@@ -92,7 +91,6 @@ class Company < ApplicationRecord
   }, prefix: true
   enum :lifecycle_status, {
     active: 0,
-    suspended: 3,
     disabled: 30
   }, prefix: true, default: :active
   enum :workflow_status, WORKFLOW_STATUS, prefix: true
@@ -133,11 +131,28 @@ class Company < ApplicationRecord
   # Validation for operational fields
   # validates :fiscal_year_end_month, presence: true, numericality: { in: 1..12 }
 
-  after_create :ensure_billing_wallet
   after_create :initialize_company
 
   def resource_names
     (metadata || {})["resource_names"] || DEFAULT_RESOURCE_NAMES
+  end
+
+  # --- Credit usage counter (Kredis — hot path, no DB writes per action) ---
+  # A plain accumulator ("companies:<id>:credit_usage", auto-generated key).
+  # It only counts and resets — agnostic to the sync job's period; it never
+  # tracks when usage happened. The job drains the accumulated delta into the
+  # DB's hourly/daily slots and resets it to 0, so the counter always holds
+  # the UNSYNCED delta since the last run.
+  kredis_counter :credit_usage
+
+  def record_credit_usage!(credits)
+    return unless credits.is_a?(Integer) && credits.positive?
+
+    credit_usage.increment(by: credits)
+  end
+
+  def credit_usage_delta
+    credit_usage.value.to_i
   end
 
   def as_json(options = {})
@@ -203,9 +218,9 @@ class Company < ApplicationRecord
       business_type: :owner
     )
 
-    Seed::BillingContractService.create(company: self)
-
     user.update!(system_role: :company_owner)
+
+    create_company_wallet!(walletable: self, main_credit_balance: 0)
 
     unless self.class.skip_init
       if business_type_retail?
@@ -236,11 +251,6 @@ class Company < ApplicationRecord
         end
       end
     end
-  end
-
-  def ensure_billing_wallet
-    return if billing_wallet.present?
-    create_billing_wallet!(currency: currency_before_type_cast)
   end
 
   private

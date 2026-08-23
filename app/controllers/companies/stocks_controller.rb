@@ -1,8 +1,6 @@
 # app/controllers/companies/stocks_controller.rb
 
 class Companies::StocksController < Companies::ApplicationController
-  feature_key :inventory_basic
-
   def index
     respond_to do |format|
       format.html { render html: "", layout: true }

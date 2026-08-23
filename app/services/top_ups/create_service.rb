@@ -1,64 +1,51 @@
 # frozen_string_literal: true
 
+# Creates the credit purchase chain for a top-up (CompanyOrder →
+# CompanyInvoice → CompanyTransaction pending) and initiates the gateway
+# interaction. The chain is created in one transaction; the gateway's
+# webhook later completes the transaction, which credits the wallet.
 module TopUps
   class Error < StandardError; end
 
   class CreateService
     Result = Struct.new(:gateway_type, :qr_string, :redirect_url, keyword_init: true)
 
-    def initialize(company:, amount_cents:, billing_payment_method:, redirect_url: nil)
+    def initialize(company:, money_amount_cents:, company_payment_method:, redirect_url: nil)
       @company = company
-      @amount_cents = amount_cents.to_i
-      @billing_payment_method = billing_payment_method
+      @money_amount_cents = money_amount_cents.to_i
+      @company_payment_method = company_payment_method
       @redirect_url = redirect_url
     end
 
     def call
-      raise Error, "Amount must be positive" unless @amount_cents.positive?
+      raise Error, "Amount must be positive" unless @money_amount_cents.positive?
+
+      credit_amount = CREDIT_RATES[@company.country.to_sym]&.fetch(@money_amount_cents, nil)
+      raise Error, "Unsupported top-up amount" unless credit_amount
 
       ActiveRecord::Base.transaction do
-        wallet = @company.billing_wallet
-        raise Error, "No billing wallet found" unless wallet
-
-        gateway_ref = "TOPUP_#{SecureRandom.hex(16)}"
-
-        contract = @company.active_billing_contract
-        raise Error, "No active billing contract" unless contract
-
-        invoice = BillingInvoice.create!(
-          company: @company,
-          billing_contract: contract,
-          movement_type: :deposit,
-          target_balance: :main_balance,
-          created_by: :customer,
-          price_cents: @amount_cents,
-          payment_status: :unpaid
+        order = CompanyOrder.create!(
+          company: @company, user: @company.user,
+          money_amount_cents: @money_amount_cents, credit_amount: credit_amount,
+          currency: @company.currency
         )
-
-        promo_before = wallet.promo_balance_cents
-        main_before = wallet.main_balance_cents
-
-        txn = BillingTransaction.create!(
-          company: @company,
-          billing_invoice: invoice,
-          billing_payment_method: @billing_payment_method,
-          transaction_type: :top_up,
-          amount_cents: @amount_cents,
-          gateway_reference: gateway_ref,
-          gateway_payload: {},
-          status: :pending,
-          balance_before_cents: main_before,
-          balance_after_cents: main_before,
-          promo_balance_before_cents: promo_before,
-          promo_balance_after_cents: promo_before,
-          currency: @company.currency || :usd,
-          description: "Wallet top-up of #{@amount_cents} cents via #{@billing_payment_method.name}"
+        invoice = CompanyInvoice.create!(
+          company: @company, company_order: order,
+          money_amount_cents: @money_amount_cents, credit_amount: credit_amount,
+          currency: @company.currency
+        )
+        txn = CompanyTransaction.create!(
+          company: @company, company_invoice: invoice,
+          company_payment_method: @company_payment_method,
+          transaction_type: :payment, money_amount_cents: @money_amount_cents,
+          currency: @company.currency, status: :pending,
+          gateway_reference: "TOPUP_#{SecureRandom.hex(16)}",
+          gateway_payload: {}
         )
 
         Payments::InitiateService.new(transaction: txn, redirect_url: @redirect_url).call
 
         txn.reload
-
         payload = txn.gateway_payload || {}
 
         if payload["redirect_url"].present?

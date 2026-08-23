@@ -14,10 +14,7 @@ class WEBSOCKET
   # --- Unified Event Types (Registry) ---
   EVENTS = {
     test: "test",
-    top_up_completed: "top_up.completed",
-    invoice_paid:     "invoice.paid",
-    balance_updated:  "balance.updated",
-    alert_triggered:  "alert.triggered"
+    top_up_completed: "top_up.completed"
   }.freeze
 
   class << self

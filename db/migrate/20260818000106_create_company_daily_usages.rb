@@ -1,0 +1,23 @@
+# frozen_string_literal: true
+
+class CreateCompanyDailyUsages < ActiveRecord::Migration[8.0]
+  def change
+    create_table :company_daily_usages, id: :uuid, default: -> { "uuidv7()" } do |t|
+      t.references :company, null: false, foreign_key: true, type: :uuid
+      t.date :usage_date, null: false
+
+      t.integer :lifecycle_status
+      t.integer :workflow_status
+      t.integer :business_type
+      t.datetime :expiration_date
+      t.jsonb :metadata, null: false, default: {}
+      t.datetime :discarded_at, index: true
+      t.string :permission_resource_name
+      t.bigint :total_credits, null: false, default: 0
+
+      t.timestamps
+    end
+
+    add_index :company_daily_usages, [ :company_id, :usage_date ], unique: true
+  end
+end

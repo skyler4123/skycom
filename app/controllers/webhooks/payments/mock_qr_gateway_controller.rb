@@ -1,5 +1,9 @@
 # frozen_string_literal: true
 
+# Payment API webhook called by the Mock API server when a QR payment
+# completes. Completing the CompanyTransaction fires the credit chain
+# (invoice paid → order completed → wallet credited) — this controller never
+# touches balances directly.
 module Webhooks
   module Payments
     class MockQrGatewayController < ActionController::Base
@@ -20,31 +24,23 @@ module Webhooks
           return render json: { errors: [ "Missing transaction_token or amount" ] }, status: :unprocessable_content
         end
 
-        txn = BillingTransaction.find_by(gateway_reference: transaction_token)
+        txn = CompanyTransaction.find_by(gateway_reference: transaction_token)
         unless txn
           return render json: { errors: [ "Transaction not found" ] }, status: :not_found
         end
 
-        if txn.status_completed?
+        if txn.completed?
           return render json: { status: "already_completed" }, status: :ok
         end
 
-        company = txn.company
-
-        ActiveRecord::Base.transaction do
-          wallet = company.billing_wallet.lock!
-          new_main = wallet.main_balance_cents + amount
-          wallet.update!(main_balance_cents: new_main)
-
-          txn.update!(
-            status: :completed,
-            gateway_reference: data[:transaction_id] || txn.gateway_reference,
-            balance_after_cents: new_main
-          )
+        unless amount == txn.money_amount_cents
+          return render json: { errors: [ "Amount mismatch" ] }, status: :unprocessable_content
         end
 
+        txn.update!(status: :completed)
+
         WEBSOCKET.publish_event(
-          channel: WEBSOCKET.company_channel(company&.id),
+          channel: WEBSOCKET.company_channel(txn.company_id),
           event_key: :top_up_completed,
           data: {
             amount_cents: amount,

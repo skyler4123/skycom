@@ -1,22 +1,27 @@
-# app/services/payments/mock_qr_gateway.rb
+# frozen_string_literal: true
+
+# Gateway strategy for QR bank-transfer payments (dev mock).
+# Calls the Mock API server's QR generator; the mock later fires a webhook to
+# WEBHOOK_URL marking the payment completed. Contract: #call returns
+# { success:, gateway_reference:, gateway_payload: } or { success: false, error: }.
 module Payments
   class MockQrGateway
-    GATEWAY_URL  = ENV["MOCK_QR_GATEWAY_URL"]  || Rails.application.credentials.mock_qr_gateway_url  || "http://localhost:4000/api/v1/bank/qr-generate"
-    SECRET_KEY   = ENV["MOCK_QR_SECRET_KEY"]    || Rails.application.credentials.mock_qr_secret_key    || "local_secure_dev_secret"
-    WEBHOOK_URL  = ENV["MOCK_QR_WEBHOOK_URL"]   || Rails.application.credentials.mock_qr_webhook_url   || "http://192.168.0.100:3000/webhooks/payments/mock_qr_gateway"
+    GATEWAY_URL = ENV["MOCK_QR_GATEWAY_URL"] ||
+      Rails.application.credentials.mock_qr_gateway_url ||
+      "http://localhost:4000/api/v1/bank/qr-generate"
+    WEBHOOK_URL = ENV["MOCK_QR_WEBHOOK_URL"] ||
+      Rails.application.credentials.mock_qr_webhook_url ||
+      "http://192.168.0.100:3000/webhooks/payments/mock_qr_gateway"
 
-    def initialize(amount_cents:, invoice_id:, memo:, transaction_token: nil, **_args)
+    def initialize(amount_cents:, invoice_id:, memo:, transaction_token:, **_args)
       @amount_cents = amount_cents
       @invoice_id = invoice_id
       @memo = memo
       @transaction_token = transaction_token
-      @gateway_url = GATEWAY_URL
-      @secret_key = SECRET_KEY
-      @webhook_url = WEBHOOK_URL
     end
 
     def call
-      conn = Faraday.new(url: @gateway_url) do |f|
+      conn = Faraday.new(url: GATEWAY_URL) do |f|
         f.request :json
         f.response :json
         f.options.timeout = 5
@@ -24,13 +29,12 @@ module Payments
 
       response = conn.post do |req|
         req.headers["Content-Type"] = "application/json"
-        req.headers["Authorization"] = "Bearer #{@secret_key}"
         req.body = {
           amount: @amount_cents,
           invoice_id: @invoice_id,
           memo: @memo,
           transaction_token: @transaction_token,
-          webhook_url: @webhook_url
+          webhook_url: WEBHOOK_URL
         }
       end
 

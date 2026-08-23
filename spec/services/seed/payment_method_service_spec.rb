@@ -23,7 +23,7 @@ RSpec.describe Seed::PaymentMethodService do
   end
 end
 
-RSpec.describe Seed::BillingPaymentMethodService do
+RSpec.describe Seed::CompanyPaymentMethodService do
   describe "ALL_RECORDS" do
     it "includes base billing payment methods" do
       codes = described_class::ALL_RECORDS.map { |r| r[:code] }
@@ -37,9 +37,9 @@ RSpec.describe Seed::BillingPaymentMethodService do
   end
 
   describe ".create" do
-    it "creates BillingPaymentMethod records" do
+    it "creates CompanyPaymentMethod records" do
       expect { described_class.create }
-        .to change(BillingPaymentMethod, :count).by(6) # 4 base + 2 mock
+        .to change(CompanyPaymentMethod, :count).by(6) # 4 base + 2 mock
     end
   end
 end
