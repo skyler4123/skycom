@@ -181,7 +181,7 @@ export default class Companies_Usage_ShowController extends Companies_LayoutCont
               <th class="py-2 px-4">${translate("Time")}</th>
               <th class="py-2 px-4">${translate("Action")}</th>
               <th class="py-2 px-4">${translate("Change")}</th>
-              <th class="py-2 px-4">${translate("Balance After")}</th>
+              <th class="py-2 px-4">${translate("Credits Remaining")}</th>
               <th class="py-2 px-4">${translate("Description")}</th>
             </tr>
           </thead>
@@ -193,23 +193,30 @@ export default class Companies_Usage_ShowController extends Companies_LayoutCont
 
   contentHTML() {
     const cards = [
-      { label: translate("Credit Balance"), value: this.formatCredits(this.wallet?.main_credit_balance), icon: "account_balance_wallet", color: "bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400" },
-      { label: translate("Today"), value: this.formatCredits(this.todayTotal), icon: "today", color: "bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400" },
-      { label: translate("Live Delta"), value: this.formatCredits(this.liveDelta), icon: "bolt", color: "bg-amber-100 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400" },
-      { label: translate("Monthly Total"), value: this.formatCredits(this.monthlyTotal), icon: "calendar_month", color: "bg-purple-100 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400" },
+      { label: translate("Main Credits"), value: this.formatCredits(this.wallet?.main_credit_balance), icon: "savings", color: "bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400", hint: translate("Credits purchased through top-ups. Used after promotional credits run out.") },
+      { label: translate("Promo Credits"), value: this.formatCredits(this.wallet?.promo_credit_balance), icon: "redeem", color: "bg-pink-100 dark:bg-pink-900/30 text-pink-600 dark:text-pink-400", hint: translate("Free promotional credits. Spent first automatically.") },
+      { label: translate("Used Today"), value: this.formatCredits(this.todayTotal), icon: "today", color: "bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400", hint: translate("Credits consumed since midnight today — already includes the latest-hour amount shown beside it.") },
+      { label: translate("Latest Hour Usage"), value: this.formatCredits(this.liveDelta), icon: "hourglass_top", color: "bg-amber-100 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400", hint: translate("Credits used since the last hourly system update. Included in Used Today. Resets every hour.") },
+      { label: translate("Used This Month"), value: this.formatCredits(this.monthlyTotal), icon: "calendar_month", color: "bg-purple-100 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400", hint: translate("Total credits consumed this calendar month.") },
     ]
 
     return `
       <div class="p-4 md:p-6 overflow-y-auto space-y-6">
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
           ${cards.map(card => `
             <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-5">
               <div class="flex items-center gap-3">
-                <div class="size-10 rounded-lg ${card.color} flex items-center justify-center">
+                <div class="size-10 rounded-lg ${card.color} flex items-center justify-center shrink-0">
                   <span class="material-symbols-outlined text-[22px]">${card.icon}</span>
                 </div>
                 <div class="min-w-0">
-                  <p class="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase">${card.label}</p>
+                  <div class="flex items-center gap-1">
+                    <p class="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase truncate">${card.label}</p>
+                    <span
+                      ${tooltip(card.hint)}
+                      class="material-symbols-outlined text-[14px] text-slate-300 dark:text-slate-600 hover:text-slate-400 dark:hover:text-slate-500 cursor-pointer shrink-0"
+                    >info</span>
+                  </div>
                   <p class="text-xl font-black text-slate-900 dark:text-white">${card.value}</p>
                 </div>
               </div>
@@ -218,14 +225,26 @@ export default class Companies_Usage_ShowController extends Companies_LayoutCont
         </div>
 
         <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-5">
-          <h3 class="text-sm font-bold text-slate-700 dark:text-slate-300 mb-4">${translate("Daily Usage")}</h3>
+          <div class="flex items-center gap-1.5 mb-4">
+            <h3 class="text-sm font-bold text-slate-700 dark:text-slate-300">${translate("Daily Usage")}</h3>
+            <span
+              ${tooltip(translate("Credits used per day over the last 7 days."))}
+              class="material-symbols-outlined text-[16px] text-slate-300 dark:text-slate-600 hover:text-slate-400 dark:hover:text-slate-500 cursor-pointer"
+            >info</span>
+          </div>
           <div data-${this.identifier}-target="usageChart"></div>
         </div>
 
         <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-5">
           <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
             <div class="flex items-center gap-3">
-              <h3 class="text-sm font-bold text-slate-700 dark:text-slate-300">${translate("Usage Logs")}</h3>
+              <div class="flex items-center gap-1.5">
+                <h3 class="text-sm font-bold text-slate-700 dark:text-slate-300">${translate("Usage Logs")}</h3>
+                <span
+                  ${tooltip(translate("Per-action record of credit movements. Enable logging to capture them live."))}
+                  class="material-symbols-outlined text-[16px] text-slate-300 dark:text-slate-600 hover:text-slate-400 dark:hover:text-slate-500 cursor-pointer"
+                >info</span>
+              </div>
               ${this.statusBadgeHTML()}
             </div>
             <div class="flex items-center gap-2">

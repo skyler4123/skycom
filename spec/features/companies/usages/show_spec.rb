@@ -43,6 +43,22 @@ RSpec.feature "Usage logging toggle", type: :feature, js: true do
     expect(page).to have_no_selector("tbody tr")
   end
 
+  scenario "summary cards show friendly labels with explanatory tooltips" do
+    visit company_usage_path(company)
+
+    expect(page).to have_content(/main credits/i, wait: 10)
+    expect(page).to have_content(/promo credits/i)
+    expect(page).to have_content(/used today/i)
+    expect(page).to have_content(/latest hour usage/i)
+    expect(page).to have_content(/used this month/i)
+
+    expect(page).to have_no_content(/live delta/i)
+    expect(page).to have_no_content(/monthly total/i)
+
+    # 5 card tooltips + Daily Usage + Usage Logs section tooltips + refresh
+    expect(page).to have_selector('[data-controller="tooltip"]', minimum: 6)
+  end
+
   scenario "enabling logging records wallet movements and stopping clears the table" do
     seed_random_wallet!(company)
 
