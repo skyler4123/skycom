@@ -132,7 +132,7 @@ RSpec.describe "Toast message responses", type: :request do
         warehouse: warehouse,
         product: product,
         quantity: 10,
-        reorder: 0,
+        pending: 0,
         category: cat,
         property_mapping: cat.default_property_mapping
       )
@@ -164,7 +164,7 @@ RSpec.describe "Toast message responses", type: :request do
         warehouse: warehouse,
         product: product,
         quantity: 10,
-        reorder: 0,
+        pending: 0,
         category: cat,
         property_mapping: cat.default_property_mapping
       )

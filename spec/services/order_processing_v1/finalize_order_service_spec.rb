@@ -16,7 +16,7 @@ RSpec.describe OrderProcessingV1::FinalizeOrderService do
         category: category,
         property_mapping: category.default_property_mapping,
         quantity: 10,
-        reorder: 0
+        pending: 0
       )
     end
     let(:order) do

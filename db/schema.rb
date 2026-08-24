@@ -5004,7 +5004,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_08_18_000108) do
     t.integer "country"
     t.integer "timezone"
     t.integer "quantity", null: false
-    t.integer "reorder", null: false
+    t.integer "pending", null: false
     t.integer "lifecycle_status"
     t.integer "workflow_status"
     t.integer "business_type"

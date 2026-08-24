@@ -17,7 +17,7 @@ RSpec.describe OrderProcessingV1::ReserveStockService do
         warehouse: warehouse,
         product: product,
         quantity: 5,
-        reorder: 0,
+        pending: 0,
         category: category,
         property_mapping: property_mapping
       )
@@ -29,6 +29,11 @@ RSpec.describe OrderProcessingV1::ReserveStockService do
         result = described_class.call(items: items)
         expect(result[:success]).to be true
         expect(stock.available_counter.value).to eq(3)
+      end
+
+      it "promises the units in DB by incrementing pending" do
+        described_class.call(items: items)
+        expect(stock.reload.pending).to eq(2)
       end
     end
 
@@ -48,6 +53,16 @@ RSpec.describe OrderProcessingV1::ReserveStockService do
         expect { described_class.call(items: items) }
           .to raise_error(OrderProcessingV1::InsufficientStockError)
         expect(stock.available_counter.value).to eq(5)
+      end
+    end
+
+    context "when the Redis counter is missing" do
+      before { Kredis.redis.del("stock:#{stock.id}:available") }
+
+      it "heals from DB before reserving and returns success" do
+        result = described_class.call(items: items)
+        expect(result[:success]).to be true
+        expect(stock.available_counter.value).to eq(3)
       end
     end
   end

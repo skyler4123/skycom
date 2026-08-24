@@ -168,7 +168,7 @@ RSpec.feature "Companies::ToastMessages", type: :feature, js: true do
     let!(:product_a) { create(:product, company: company, branch: branch, name: "Widget Alpha") }
     let!(:stock_a) do
       cat = product_a.category
-      Stock.create!(company:, warehouse:, product: product_a, quantity: 10, reorder: 5, category: cat,
+      Stock.create!(company:, warehouse:, product: product_a, quantity: 10, pending: 5, category: cat,
         property_mapping: cat.default_property_mapping).tap { |s| s.send(:sync_available_counter) }
     end
 

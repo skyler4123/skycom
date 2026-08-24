@@ -10,3 +10,10 @@ For example, a `redirect`-mode gateway (Stripe) might only need a `merchant_id` 
 - Define per-payment-mode required fields (e.g., `qr` → merchant_number + merchant_name required; `redirect` → merchant_id only)
 - Update the `Configured` / `Not Set` badge logic to only check required fields for each mode
 - Possibly add inline hints in the edit form showing which fields are required per mode
+
+## Low-Stock Alert Threshold
+
+The stocks table previously used the `reorder` column as a minimum-stock threshold (red highlight when `quantity <= reorder`). The column was renamed to `pending` with proper reserved-units semantics (`docs/ORDER_PROCESSING_V1.md` §7), so low-stock highlighting was removed.
+
+**Needs decision:**
+- If low-stock alerts are wanted again, add a dedicated `min_stock` column (threshold semantics, never decremented by the order pipeline)

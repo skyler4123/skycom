@@ -325,8 +325,8 @@ The write-side invalidation ensures Instance B evicts any stale (pre-creation) v
 ### Example
 
 ```ruby
-# Order processing — atomic stock reservation via Kredis (backed by global_cache)
-stock.available_counter.value = [ quantity - reserved_quantity, 0 ].max
+# Order processing — atomic reservation via the model wrapper (docs/KREDIS.md)
+stock.reserve_stock!(quantity)   # atomic decrement + DB pending increment; false when insufficient
 ```
 
 ### Error Handling

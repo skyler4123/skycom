@@ -78,7 +78,7 @@ export default class Companies_Stocks_IndexController extends Companies_LayoutCo
                   <th class="py-4 px-6 font-medium whitespace-nowrap">${translate("Category")}</th>
                   <th class="py-4 px-6 font-medium whitespace-nowrap">${translate("Warehouse")}</th>
                   <th class="py-4 px-6 font-medium whitespace-nowrap">${translate("Quantity")}</th>
-                  <th class="py-4 px-6 font-medium whitespace-nowrap">${translate("Reorder")}</th>
+                  <th class="py-4 px-6 font-medium whitespace-nowrap">${translate("Pending")}</th>
                   <th class="py-4 px-6 font-medium whitespace-nowrap">${translate("SKU")}</th>
                   <th class="py-4 px-6 font-medium whitespace-nowrap">${translate("Barcode")}</th>
                   <th class="py-4 px-6 font-medium whitespace-nowrap">${translate("Type")}</th>
@@ -94,11 +94,11 @@ export default class Companies_Stocks_IndexController extends Companies_LayoutCo
                     <td class="py-4 px-6 text-sm text-slate-600 dark:text-slate-300">${stock.category_name || '—'}</td>
                     <td class="py-4 px-6 text-sm text-slate-600 dark:text-slate-300">${stock.warehouse_name || translate('N/A')}</td>
                     <td class="py-4 px-6 text-sm">
-                      <span class="font-medium ${stock.quantity <= stock.reorder ? 'text-red-600 dark:text-red-400' : 'text-slate-900 dark:text-white'}">
+                      <span class="font-medium text-slate-900 dark:text-white">
                         ${stock.quantity || 0}
                       </span>
                     </td>
-                    <td class="py-4 px-6 text-sm text-slate-500">${stock.reorder || 0}</td>
+                    <td class="py-4 px-6 text-sm text-slate-500">${stock.pending || 0}</td>
                     <td class="py-4 px-6 text-sm text-slate-600 dark:text-slate-300 font-mono">${stock.sku || translate('N/A')}</td>
                     <td class="py-4 px-6 text-sm text-slate-600 dark:text-slate-300 font-mono">${stock.barcode || translate('N/A')}</td>
                     <td class="py-4 px-6 text-sm">

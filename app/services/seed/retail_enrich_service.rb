@@ -366,7 +366,7 @@ class Seed::RetailEnrichService
           warehouse: warehouse,
           product_id: product.id,
           quantity: rand(50..200),
-          reorder: rand(10..30),
+          pending: 0,
           name: product.name
         )
       end

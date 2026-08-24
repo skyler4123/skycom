@@ -42,6 +42,9 @@
 ## Model Structure
 - All `app/models/*.rb` follow the canonical order in `docs/MODEL_STRUCTURE.md` (concerns → constants → attributes → enums → macros → associations → scopes → validations → callbacks → methods). Run `bin/rubocop` to verify.
 
+## Kredis (Cache Store) Rule
+- **Never** use low-level `Kredis.redis` or kredis proxy built-ins (`.value`, `.increment`, ...) in services/controllers/jobs. The owning model wraps them behind domain-named methods (e.g., `Stock#available_count`, `Company#record_credit_usage!`) so the backend can swap Kredis ↔ DB without changing callers. See `docs/KREDIS.md`.
+
 ## Full Guidelines
 See `README.md` for detailed coverage of:
 - Stimulus naming conventions & inheritance

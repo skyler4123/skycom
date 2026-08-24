@@ -64,6 +64,8 @@ Reads: today = DB total + Redis delta; past = DB only
   ```ruby
   kredis_counter :credit_usage
   ```
+- Access goes through model wrapper methods only — see `docs/KREDIS.md`
+  (`record_credit_usage!` / `credit_usage_delta`; callers never touch the proxy).
 - The counter is a **plain accumulator — it only counts and resets**. It is
   agnostic to the sync job's period: whatever accumulated since the last run is
   drained into the DB (CompanyDailyUsage h<drain hour>, CompanyMonthlyUsage
