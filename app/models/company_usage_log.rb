@@ -7,7 +7,10 @@
 # tracking can be enabled for a short period (default 5 minutes) to inspect
 # live credit changes.
 class CompanyUsageLog < ApplicationRecord
-  VALID_ACTION_TYPES = CREDIT_USAGE_RATES.keys.map(&:to_s).freeze
+  # Dual vocabulary: deduction-point actions (CREDIT_USAGE_RATES keys, e.g.
+  # "access_dashboard") + wallet movement defaults ("top_up" / "deduction"
+  # from CompanyWallet#add_to! / #deduct_from!).
+  VALID_ACTION_TYPES = (CREDIT_USAGE_RATES.keys.map(&:to_s) + %w[top_up deduction]).freeze
 
   attribute :permission_resource_name, :string, default: -> { self.name }
 

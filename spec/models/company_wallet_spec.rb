@@ -131,5 +131,17 @@ RSpec.describe CompanyWallet, type: :model do
       expect(log.change_amount).to eq(-10)
       expect(log.balance_after).to eq(90)
     end
+
+    it "logs wallet movements that rely on default action types while active" do
+      wallet.enable_usage_logging!(window: 5.minutes)
+
+      expect {
+        wallet.add_credits!(amount: 50)
+        wallet.deduct_from!(balance: :main, amount: 10)
+        wallet.add_to!(balance: :promo, amount: 5)
+      }.to change(CompanyUsageLog, :count).by(3)
+
+      expect(CompanyUsageLog.pluck(:action_type)).to contain_exactly("top_up", "deduction", "top_up")
+    end
   end
 end

@@ -43,7 +43,7 @@ class CompanyWallet < ApplicationRecord
 
   # Low-level atomic mutation entry points — called by CompanyCreditDeduction::* services.
 
-  def add_to!(balance:, amount:, source: nil, description: nil, action_type: nil)
+  def add_to!(balance:, amount:, source: nil, description: nil, action_type: "top_up")
     column = balance_column!(balance)
     raise ArgumentError, "amount must be a positive integer" unless amount.is_a?(Integer) && amount.positive?
 
