@@ -56,11 +56,36 @@ export default class Companies_LayoutController extends Controller {
       `
     }
 
-    return [
+    // Placeholder entry for a not-yet-built page — muted, inert, explains itself.
+    const placeholderLink = (icon, label) => {
+      return `
+        <a
+          class="flex items-center gap-3 px-3 py-2 rounded-lg text-slate-400 dark:text-slate-600 cursor-not-allowed"
+          href="#"
+          aria-disabled="true"
+          ${tooltip(translate("Coming soon"))}
+        >
+          <span class="material-symbols-outlined">${icon}</span>
+          <p class="text-sm font-medium leading-normal">${label}</p>
+        </a>
+      `
+    }
+
+    const sectionHeading = (label) => `
+      <p class="px-3 pt-1 pb-2 text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">${label}</p>
+    `
+
+    const divider = `<div class="my-3 border-t border-gray-200 dark:border-gray-700"></div>`
+
+    const group = (name, items) => `
+      <div class="flex flex-col gap-2" data-sidebar-group="${name}">
+        ${sectionHeading(translate(name === "company" ? "Company" : "System"))}
+        ${items.join("\n")}
+      </div>
+    `
+
+    const companyItems = [
       link(null, Helpers.company_dashboards_path(cid), 'dashboard', translate('Dashboard')),
-      link(null, Helpers.company_usage_path(cid), 'monitoring', translate('Usage')),
-      link(null, Helpers.new_company_top_up_path(cid), 'account_balance_wallet', translate('Top Up')),
-      link(null, Helpers.company_billing_path(cid), 'receipt_long', translate('Billing')),
       link('multi_branch', Helpers.company_branches_path(cid), 'apartment', translate('Branches')),
       link(null, Helpers.company_departments_path(cid), 'family_group', translate('Departments')),
       link(null, Helpers.company_categories_path(cid), 'category', translate('Categories')),
@@ -89,6 +114,19 @@ export default class Companies_LayoutController extends Controller {
       link('custom_roles', Helpers.company_permissions_path(cid), 'shield', translate('Permissions')),
       link('analytics_dashboard', Helpers.company_analytics_path(cid), 'insights', translate('Analytics')),
       link(null, Helpers.company_facilities_path(cid), 'warehouse', translate('Facilities')),
+    ]
+
+    const systemItems = [
+      link(null, Helpers.company_usage_path(cid), 'monitoring', translate('Usage')),
+      link(null, Helpers.new_company_top_up_path(cid), 'account_balance_wallet', translate('Top Up')),
+      link(null, Helpers.company_billing_path(cid), 'receipt_long', translate('Billing')),
+      placeholderLink('settings', translate('Settings')),
+    ]
+
+    return [
+      group("company", companyItems),
+      divider,
+      group("system", systemItems)
     ].join('\n')
   }
 
