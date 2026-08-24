@@ -9,7 +9,6 @@ class CreateCompanyWallets < ActiveRecord::Migration[8.0]
       t.bigint :main_credit_balance, null: false, default: 0
       t.bigint :promo_credit_balance, null: false, default: 0
       t.bigint :debt_credit_balance, null: false, default: 0
-      t.integer :lock_version, null: false, default: 0
       t.datetime :usage_logging_until
 
       t.integer :lifecycle_status

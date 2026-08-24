@@ -1051,7 +1051,6 @@ ActiveRecord::Schema[8.0].define(version: 2026_08_18_000108) do
     t.bigint "main_credit_balance", default: 0, null: false
     t.bigint "promo_credit_balance", default: 0, null: false
     t.bigint "debt_credit_balance", default: 0, null: false
-    t.integer "lock_version", default: 0, null: false
     t.datetime "usage_logging_until"
     t.integer "lifecycle_status"
     t.integer "workflow_status"

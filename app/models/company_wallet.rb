@@ -11,8 +11,9 @@
 #   promo — promotional credits (deducted FIRST by CompanyCreditDeduction::* services)
 #   debt  — absorbed shortfall when promo + main are exhausted (normally 0)
 #
-# Atomicity: every mutation uses a conditional UPDATE, so no concurrent
-# operation can overdraw; lock_version provides optimistic locking.
+# Atomicity: every mutation runs inside with_lock (transaction + row-level
+# FOR UPDATE), so concurrent operations serialize on the wallet row and can
+# never overdraw — Rails' own locking, no manual version bookkeeping.
 class CompanyWallet < ApplicationRecord
   USAGE_LOGGING_WINDOW = 5.minutes
 
@@ -47,11 +48,9 @@ class CompanyWallet < ApplicationRecord
     column = balance_column!(balance)
     raise ArgumentError, "amount must be a positive integer" unless amount.is_a?(Integer) && amount.positive?
 
-    before = public_send(column)
-    ActiveRecord::Base.transaction do
-      self.class.where(id: id)
-        .update_all([ "#{column} = #{column} + ?, lock_version = lock_version + 1", amount ])
-      reload
+    with_lock do
+      before = public_send(column)
+      update_columns(column => public_send(column) + amount)
       CompanyWalletLog.create!(
         company: company, company_wallet: self, change_type: :credit,
         change_amount: amount, balance_before: before, balance_after: public_send(column),
@@ -66,17 +65,14 @@ class CompanyWallet < ApplicationRecord
     column = balance_column!(balance)
     raise ArgumentError, "amount must be a positive integer" unless amount.is_a?(Integer) && amount.positive?
 
-    before = public_send(column)
-    ActiveRecord::Base.transaction do
-      updated = self.class.where(id: id)
-        .where("#{column} >= ?", amount)
-        .update_all([ "#{column} = #{column} - ?, lock_version = lock_version + 1", amount ])
-      raise InsufficientCreditsError, "Insufficient credits (balance: #{before}, required: #{amount})" unless updated == 1
+    with_lock do
+      current = public_send(column)
+      raise InsufficientCreditsError, "Insufficient credits (balance: #{current}, required: #{amount})" if current < amount
 
-      reload
+      update_columns(column => current - amount)
       CompanyWalletLog.create!(
         company: company, company_wallet: self, change_type: :debit,
-        change_amount: -amount, balance_before: before, balance_after: public_send(column),
+        change_amount: -amount, balance_before: current, balance_after: public_send(column),
         balance_type: balance, source: source, description: description
       )
       record_usage_log!(action_type: action_type, source: source, change_amount: -amount, description: description)

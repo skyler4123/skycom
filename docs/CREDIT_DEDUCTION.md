@@ -146,7 +146,7 @@ wallet.add_to!(balance: :promo, amount:, source:, description:)        # grant p
 wallet.deduct_from!(balance: :main, amount:, source:, description:)   # atomic per-balance deduct
 ```
 
-- Every mutation is a **conditional UPDATE** (single balance ≥ amount) — no concurrent overdraw; `lock_version` provides optimistic locking.
+- Every mutation runs inside **`with_lock`** (transaction + row-level `FOR UPDATE`) — concurrent deductions serialize on the wallet row, so no overdraw is possible.
 - `deduct_from!` raises `CompanyWallet::InsufficientCreditsError` only when that **single** balance lacks funds — the `CompanyCreditDeduction::BaseService` orchestrates across balances so this never surfaces in the deduction path.
 - Every mutation writes a `CompanyWalletLog` audit row with `balance_type` (`main` / `promo` / `debt`) + before/after snapshots.
 - Balance keys are validated against `CompanyWallet::BALANCES` (single-file constant) — unknown keys raise `ArgumentError`.

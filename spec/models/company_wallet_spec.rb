@@ -28,7 +28,6 @@ RSpec.describe CompanyWallet, type: :model do
       expect(log.balance_before).to eq(0)
       expect(log.balance_after).to eq(500_000)
       expect(log.balance_type).to eq("main")
-      expect(wallet.lock_version).to eq(1)
     end
 
     it "deducts from a single balance when the balance is sufficient" do
@@ -81,14 +80,6 @@ RSpec.describe CompanyWallet, type: :model do
     it "rejects unknown balance keys" do
       expect { wallet.add_to!(balance: :savings, amount: 10) }.to raise_error(ArgumentError)
       expect { wallet.deduct_from!(balance: :savings, amount: 10) }.to raise_error(ArgumentError)
-    end
-
-    it "raises StaleObjectError when a stale object is saved" do
-      wallet.add_credits!(amount: 100)
-      stale = CompanyWallet.find(wallet.id)
-      wallet.add_credits!(amount: 50)
-
-      expect { stale.update!(main_credit_balance: 999) }.to raise_error(ActiveRecord::StaleObjectError)
     end
   end
 

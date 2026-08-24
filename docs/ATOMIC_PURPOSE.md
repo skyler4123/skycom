@@ -39,10 +39,9 @@ Rules:
   callbacks are allowed. The hot usage path NEVER uses callbacks.
 - **Every link is idempotent-guarded.** `CompanyOrder#complete!` no-ops when
   already completed; the invoice only completes once (`saved_change_to_payment_status?`).
-- **Wallet atomicity.** Every mutation uses a per-balance conditional UPDATE
-  (`SET <balance> = <balance> - ?, lock_version = lock_version + 1
-   WHERE id = ? AND <balance> >= ?`) so concurrent deductions can never
-  overdraw. `lock_version` provides optimistic locking.
+- **Wallet atomicity.** Every mutation runs inside `with_lock` (transaction +
+  row-level `FOR UPDATE`) so concurrent deductions serialize on the wallet row
+  and can never overdraw — Rails' own locking, no manual version bookkeeping.
 - **Usage deduction flows through `CompanyCreditDeduction::*` services** (see `docs/CREDIT_DEDUCTION.md`).
   The chain above handles money IN; the `CompanyCreditDeduction::BaseService` hierarchy handles
   credit OUT (deduct promo → main → debt), triggered by an `after_action` filter
