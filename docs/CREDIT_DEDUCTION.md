@@ -170,6 +170,17 @@ The deduction service **only cares about deducting**. It returns no warning mess
 
 The frontend (or future alerting logic) decides what to surface from those numbers. The old `credit_warning` JSON key was removed with the demo pattern.
 
+### 5.1 Opt-in Detail Logging (Usage Page)
+
+Per-action detail rows (`CompanyUsageLog` — *why* a balance moved) are **opt-in** and hot-table safe. The Usage page (`GET /companies/:id/usage`) exposes the toggle:
+
+| Control | Endpoint | Effect |
+|---------|----------|--------|
+| **Enable Logging** button | `POST .../usage/enable_logging` | `wallet.enable_usage_logging!` — opens a 5-minute recording window |
+| **Stop Logging** button | `POST .../usage/disable_logging` | `wallet.disable_usage_logging!` — closes the window immediately |
+
+While active, the page shows a table of that window's log rows; when off (the default), the table renders as an empty layout.
+
 ---
 
 ## 6. Adding a New Deduction Point (Step by Step)
@@ -283,6 +294,8 @@ See `docs/ATOMIC_PURPOSE.md` § Hot Path Rule for the `kredis_counter :credit_us
 | `spec/services/company_credit_deduction/base_service_spec.rb` | Priority/deduction/metering coverage |
 | `spec/services/company_credit_deduction/companies/dashboards/index_service_spec.rb` | Dashboard service contract |
 | `spec/requests/companies/credit_deduction_spec.rb` | after_action filter behavior (JSON-only, rescue, payload) |
+| `app/controllers/companies/usage_controller.rb` | Usage page: wallet/daily/monthly JSON + opt-in `enable_logging` / `disable_logging` endpoints + window log feed |
+| `spec/features/companies/usages/show_spec.rb` | Usage-page toggle E2E (empty default layout → record → stop clears) |
 | `spec/features/companies/dashboards/index_spec.rb` | End-to-end dashboard deduction scenarios |
 | `spec/features/companies/credit_deduction_e2e_spec.rb` | **E2E js:true — Kredis delta → SyncJob → Daily/Monthly DB** |
 

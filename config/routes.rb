@@ -83,7 +83,10 @@ Rails.application.routes.draw do
         end
       end
 
-      resource :usage, only: :show, controller: :usage
+      resource :usage, only: :show, controller: :usage do
+        post :enable_logging
+        post :disable_logging
+      end
       resource :billing, only: :show, controller: :billing
 
       post "order_processing/v1/checkout", to: "order_processing/v1#checkout"

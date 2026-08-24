@@ -17,10 +17,18 @@ RSpec.describe CompanyUsageLog, type: :model do
   end
 
   describe "action type catalog" do
-    it "mirrors CREDIT_USAGE_RATES keys" do
-      described_class::VALID_ACTION_TYPES.each do |action|
-        expect(CREDIT_USAGE_RATES).to have_key(action.to_sym)
+    it "includes every CREDIT_USAGE_RATES key" do
+      CREDIT_USAGE_RATES.each_key do |key|
+        expect(described_class::VALID_ACTION_TYPES).to include(key.to_s)
       end
+    end
+
+    it "includes the wallet movement defaults (top_up, deduction)" do
+      expect(described_class::VALID_ACTION_TYPES).to include("top_up", "deduction")
+    end
+
+    it "has no duplicate entries" do
+      expect(described_class::VALID_ACTION_TYPES.uniq).to eq(described_class::VALID_ACTION_TYPES)
     end
   end
 end
