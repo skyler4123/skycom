@@ -48,10 +48,17 @@ class Companies::PagesController < Companies::ApplicationController
           { id: s.id, name: s.name, code: s.code, price: 0, currency: "usd", image_url: s.image_attachments.first&.variant(:thumb)&.processed&.url }
         }
 
+        payment_methods = page.branch.payment_method_appointments
+          .includes(:payment_method)
+          .where(lifecycle_status: LIFECYCLE_STATUS.fetch(:active))
+          .reject { |appointment| appointment.payment_method.redirect? }
+          .map { |appointment| { id: appointment.id }.merge(appointment.payment_method.slice(:name, :code, :payment_mode, :strategy)) }
+
         render json: {
           page: format_page(page),
           products: products,
-          services: services
+          services: services,
+          payment_methods: payment_methods
         }
       end
     end
