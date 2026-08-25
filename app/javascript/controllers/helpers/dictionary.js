@@ -241,6 +241,7 @@ export const dictionary = () => {
     "Not available": { vi: "Không khả dụng" },
     "Scan to Pay": { vi: "Quét Mã QR Để Thanh Toán" },
     "Scan the QR code with your banking app to complete the top-up.": { vi: "Quét mã QR bằng ứng dụng ngân hàng để hoàn tất nạp tiền." },
+    "Scan the QR code with your banking app to complete the payment.": { vi: "Quét mã QR bằng ứng dụng ngân hàng để hoàn tất thanh toán." },
     "Waiting for payment confirmation...": { vi: "Đang chờ xác nhận thanh toán..." },
     "Top-up failed": { vi: "Nạp tiền thất bại" },
     "Top-up successful! Redirecting...": { vi: "Nạp tiền thành công! Đang chuyển hướng..." },

@@ -145,7 +145,8 @@ export default class WebsocketController extends Controller {
       // 1. Event Registry
       EVENTS: {
         test: "test",
-        top_up_completed: "top_up.completed"
+        top_up_completed: "top_up.completed",
+        pos_payment_completed: "pos_payment.completed"
       },
 
       // 2. Channel Generators
