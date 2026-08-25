@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"html/template"
 	"net/http"
+	"strings"
 	"sync"
 	"time"
 )
@@ -31,6 +32,9 @@ type QRPaymentRequest struct {
 	InvoiceID        string `json:"invoice_id"`
 	TransactionToken string `json:"transaction_token"`
 	Memo             string `json:"memo"`
+	MerchantNumber   string `json:"merchant_number,omitempty"`
+	MerchantName     string `json:"merchant_name,omitempty"`
+	MerchantID       string `json:"merchant_id,omitempty"`
 	ReturnURL        string `json:"return_url,omitempty"`
 	WebhookURL       string `json:"webhook_url,omitempty"`
 }
@@ -119,7 +123,23 @@ func main() {
 		}
 
 		txnID := fmt.Sprintf("TXN_QR_%d", time.Now().UnixNano())
-		qrString := fmt.Sprintf("00020101021238580010A0000|AMT:%d|INV:%s|TOKEN:%s|TXN:%s", req.Amount, req.InvoiceID, req.TransactionToken, txnID)
+
+		segments := []string{"00020101021238580010A0000"}
+		if req.MerchantNumber != "" {
+			segments = append(segments, "ACC:"+req.MerchantNumber)
+		}
+		if req.MerchantName != "" {
+			segments = append(segments, "NAME:"+req.MerchantName)
+		}
+		if req.MerchantID != "" {
+			segments = append(segments, "MCC:"+req.MerchantID)
+		}
+		segments = append(segments,
+			fmt.Sprintf("AMT:%d", req.Amount),
+			"INV:"+req.InvoiceID,
+			"TOKEN:"+req.TransactionToken,
+			"TXN:"+txnID)
+		qrString := strings.Join(segments, "|")
 
 		logSuccess("BANK_1_QR", fmt.Sprintf("Generated TxnID: %s | QR String: %s", txnID, qrString))
 
