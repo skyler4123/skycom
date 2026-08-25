@@ -21,27 +21,30 @@ class Companies::OrderProcessing::V1Controller < Companies::ApplicationControlle
 
   def pay
     order = current_company.orders.find(params[:order_id])
+    appointment = PaymentMethodAppointment.branch_level
+      .find_by!(id: params[:payment_method_appointment_id], company_id: current_company.id)
 
-    items = order.order_appointments.map do |oa|
-      product = oa.appoint_to
-      stock = current_company.stocks.find_by!(product_id: product.id)
-      { stock_id: stock.id, quantity: oa.quantity }
-    end
+    result = OrderProcessingV1::InitiatePaymentService.call(order: order, appointment: appointment)
 
-    OrderProcessingV1::ReserveStockService.call(items: items)
+    payload = { status: result.status, order_id: result.order_id }
+    payload[:transaction_id] = result.transaction_id if result.transaction_id
+    payload[:transaction_token] = result.transaction_token if result.transaction_token
+    payload[:qr_string] = result.qr_string if result.qr_string
+    payload[:message] = result.status == "paid" ? "Payment completed" : "Awaiting QR payment"
 
-    payment_result = OrderProcessingV1::ProcessPaymentService.call(order: order)
-
-    OrderProcessingV1::FinalizeJob.perform_later(order.id)
-
-    render json: {
-      status: "paid",
-      order_id: order.id,
-      transaction_id: payment_result[:transaction_id],
-      message: "Payment completed"
-    }
+    render json: payload
   rescue OrderProcessingV1::InsufficientStockError
     render json: { errors: [ "Insufficient stock for payment" ] }, status: :unprocessable_entity
+  rescue OrderProcessingV1::InvalidPaymentMethodError => e
+    render json: { errors: [ e.message ] }, status: :unprocessable_entity
+  end
+
+  def pay_cancel
+    cancelled = OrderProcessingV1::CancelPaymentService.call(
+      transaction_token: params[:transaction_token],
+      company: current_company
+    )
+    render json: { status: cancelled ? "cancelled" : "not_pending", message: "Payment cancelled" }
   end
 
   private

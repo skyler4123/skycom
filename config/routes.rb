@@ -91,6 +91,7 @@ Rails.application.routes.draw do
 
       post "order_processing/v1/checkout", to: "order_processing/v1#checkout"
       post "order_processing/v1/pay", to: "order_processing/v1#pay"
+      post "order_processing/v1/pay_cancel", to: "order_processing/v1#pay_cancel"
     end
   end
 
