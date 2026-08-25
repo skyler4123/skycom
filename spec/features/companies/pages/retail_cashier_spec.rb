@@ -168,7 +168,7 @@ property_mapping: cat.default_property_mapping).tap { |s| s.send(:sync_available
     expect(page).not_to have_button("Card")
   end
 
-  scenario "mock QR payment shows QR wait screen and cancel restores the cart" do
+  scenario "mock QR one-click opens payment modal and cancel releases stock" do
     allow(Payments::MockQrGateway).to receive(:new).and_return(
       double(call: { success: true, gateway_reference: "MOCK_QR_FE", gateway_payload: { "qr_string" => "FEQRDATA" } })
     )
@@ -178,16 +178,18 @@ property_mapping: cat.default_property_mapping).tap { |s| s.send(:sync_available
     first('[data-action*="addToCart"]', wait: 10).click
     click_button "Mock QR"
     click_button "ORDER"
-    expect(page).to have_button("COMPLETE PAYMENT", wait: 10)
 
-    click_button "COMPLETE PAYMENT"
     expect(page).to have_content("Scan to Pay", wait: 10)
     expect(page).to have_selector("#cashier-qr-container", wait: 5)
+    expect(page).not_to have_button("COMPLETE PAYMENT")
 
+    expect(Order.count).to eq(1)
+    expect(Order.last.workflow_status).to eq("pending")
     expect(Transaction.last.status).to eq("pending")
 
     click_button "Cancel"
     expect(page).to have_button("ORDER", wait: 10)
+    expect(page).to have_content(product_a.name, wait: 5)
     expect(Transaction.last.status).to eq("failed")
     expect(stock_a.reload.pending).to eq(0)
   end
