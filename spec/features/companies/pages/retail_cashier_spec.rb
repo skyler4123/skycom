@@ -3,7 +3,8 @@
 require "rails_helper"
 
 RSpec.feature "Companies::Pages::RetailCashier", type: :feature, js: true do
-  let(:company) { create(:company) }
+  let(:company_user) { create(:user, :company_owner) }
+  let(:company) { Seed::CompanyService.new(user: company_user, country: :us, business_type: :education).tap(&:save!) }
   let(:owner) { company.user }
   let(:branch) { create(:branch, company: company) }
   let(:warehouse) { create(:warehouse, company: company, branch: branch) }
@@ -27,6 +28,30 @@ property_mapping: cat.default_property_mapping).tap { |s| s.send(:sync_available
     cat = product_c.category
     Stock.create!(company:, warehouse:, product: product_c, quantity: 0, pending: 0, category: cat,
 property_mapping: cat.default_property_mapping).tap { |s| s.send(:sync_available_counter) }
+  end
+
+  let(:cash_pm) do
+    PaymentMethod.create!(name: "Cash", code: "FE_CASH", business_type: :b2c,
+      payment_mode: :cash, strategy: :cash)
+  end
+  let(:qr_pm) do
+    PaymentMethod.create!(name: "Mock QR", code: "FE_MQR", business_type: :b2c,
+      payment_mode: :qr, strategy: :mock_qr_gateway)
+  end
+  let!(:method_appts) do
+    [
+      PaymentMethodAppointment.create!(appoint_to: company, company: company, payment_method: cash_pm,
+        name: "Co cash", code: "FE_CO_CASH", business_type: :in_store, lifecycle_status: :active),
+      PaymentMethodAppointment.create!(appoint_to: company, company: company, payment_method: qr_pm,
+        name: "Co qr", code: "FE_CO_MQR", business_type: :in_store, lifecycle_status: :active,
+        merchant_number: "5555555555", merchant_name: company.name, merchant_id: "T-FE02"),
+      PaymentMethodAppointment.create!(appoint_to: branch, company: company, payment_method: cash_pm,
+        name: "Br cash", code: "FE_BR_CASH", business_type: :in_store, lifecycle_status: :active,
+        merchant_number: "4444444444", merchant_name: company.name, merchant_id: "T-FE01"),
+      PaymentMethodAppointment.create!(appoint_to: branch, company: company, payment_method: qr_pm,
+        name: "Br qr", code: "FE_BR_MQR", business_type: :in_store, lifecycle_status: :active,
+        merchant_number: "5555555555", merchant_name: company.name, merchant_id: "T-FE02")
+    ]
   end
 
   before do
@@ -133,5 +158,37 @@ property_mapping: cat.default_property_mapping).tap { |s| s.send(:sync_available
     expect(page).to have_button("ORDER")
     expect(page).not_to have_button("COMPLETE PAYMENT")
     expect(Order.count).to eq(0)
+  end
+
+  scenario "shows the branch-appointed payment methods instead of hardcoded Card" do
+    visit "/companies/#{company.id}/pages/#{page_record.id}/retail_cashier"
+
+    expect(page).to have_button("Cash", wait: 10)
+    expect(page).to have_button("Mock QR")
+    expect(page).not_to have_button("Card")
+  end
+
+  scenario "mock QR payment shows QR wait screen and cancel restores the cart" do
+    allow(Payments::MockQrGateway).to receive(:new).and_return(
+      double(call: { success: true, gateway_reference: "MOCK_QR_FE", gateway_payload: { "qr_string" => "FEQRDATA" } })
+    )
+
+    visit "/companies/#{company.id}/pages/#{page_record.id}/retail_cashier"
+
+    first('[data-action*="addToCart"]', wait: 10).click
+    click_button "Mock QR"
+    click_button "ORDER"
+    expect(page).to have_button("COMPLETE PAYMENT", wait: 10)
+
+    click_button "COMPLETE PAYMENT"
+    expect(page).to have_content("Scan to Pay", wait: 10)
+    expect(page).to have_selector("#cashier-qr-container", wait: 5)
+
+    expect(Transaction.last.status).to eq("pending")
+
+    click_button "Cancel"
+    expect(page).to have_button("ORDER", wait: 10)
+    expect(Transaction.last.status).to eq("failed")
+    expect(stock_a.reload.pending).to eq(0)
   end
 end
