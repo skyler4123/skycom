@@ -168,7 +168,8 @@ export default class Companies_Pages_RetailCashierController extends Controller 
       if (res.status === 'pending') {
         this.awaitingToken = res.transaction_token
         this.subscribePaymentCompleted()
-        this.openQrModal(res.qr_string)
+        this.renderContent()
+        this.renderQrCodeInto(res.qr_string)
         return
       }
 
@@ -187,41 +188,16 @@ export default class Companies_Pages_RetailCashierController extends Controller 
     const channel = ws.companyChannel(this.getCompanyId())
     ws.subscribe(channel, 'pos_payment_completed', (_resourceId, payload) => {
       if (payload?.transaction_token !== this.awaitingToken) return
-      closeModal()
       toast({ type: 'success', message: translate('Payment completed') })
       this.resetAfterPayment()
     })
   }
 
-  openQrModal(qrString) {
-    openModal({
-      html: `
-        <div class="w-[320px] bg-white rounded-2xl p-6 text-center space-y-4">
-          <h3 class="text-lg font-bold text-gray-900">${translate("Scan to Pay")}</h3>
-          <p class="text-xs text-gray-500">${translate("Scan the QR code with your banking app to complete the payment.")}</p>
-          <p class="text-2xl font-black text-blue-600">$${this.getTotal().toFixed(2)}</p>
-          <div class="flex justify-center">
-            <div id="cashier-qr-container" class="w-56 h-56 bg-white rounded-xl p-3 border border-gray-200 flex items-center justify-center"></div>
-          </div>
-          <div class="flex items-center justify-center gap-2 text-sm text-amber-600">
-            <span class="material-symbols-outlined text-[18px] animate-pulse">hourglass_top</span>
-            ${translate("Waiting for payment confirmation...")}
-          </div>
-          <button id="cashier-qr-cancel"
-            class="w-full bg-white border-2 border-slate-200 text-slate-700 py-3 rounded-xl font-black hover:bg-slate-50 transition-all cursor-pointer">
-            ${translate("Cancel")}
-          </button>
-        </div>
-      `,
-      allowOutsideClick: false,
-      allowEscapeKey: false,
-      didOpen: () => {
-        const container = document.getElementById('cashier-qr-container')
-        if (container && window.renderQrCode) window.renderQrCode(container, qrString)
-        const cancelButton = document.getElementById('cashier-qr-cancel')
-        cancelButton?.addEventListener('click', () => this.cancelAwaitingPayment())
-      }
-    })
+  renderQrCodeInto(qrString) {
+    setTimeout(() => {
+      const container = document.getElementById('cashier-qr-container')
+      if (container && window.renderQrCode) window.renderQrCode(container, qrString)
+    }, 50)
   }
 
   async cancelAwaitingPayment() {
@@ -234,7 +210,6 @@ export default class Companies_Pages_RetailCashierController extends Controller 
       toast({ type: 'error', message: error.errors?.join(', ') || translate('Cancellation failed') })
     }
     this.awaitingToken = null
-    closeModal()
     this.cancelOrder()
   }
 
@@ -541,9 +516,21 @@ export default class Companies_Pages_RetailCashierController extends Controller 
     if (this.awaitingToken) {
       return `
         <div class="p-6 bg-white border-t border-gray-200">
-          <div class="flex items-center justify-center gap-2 text-sm text-amber-600 py-8">
-            <span class="material-symbols-outlined text-[18px] animate-pulse">hourglass_top</span>
-            ${translate("Waiting for payment confirmation...")}
+          <div class="space-y-4 text-center">
+            <h3 class="text-sm font-bold text-gray-900">${translate("Scan to Pay")}</h3>
+            <p class="text-xs text-gray-500">${translate("Scan the QR code with your banking app to complete the payment.")}</p>
+            <p class="text-2xl font-black text-blue-600">$${total.toFixed(2)}</p>
+            <div class="flex justify-center">
+              <div id="cashier-qr-container" class="w-56 h-56 bg-white rounded-xl p-3 border border-gray-200 flex items-center justify-center"></div>
+            </div>
+            <div class="flex items-center justify-center gap-2 text-sm text-amber-600">
+              <span class="material-symbols-outlined text-[18px] animate-pulse">hourglass_top</span>
+              ${translate("Waiting for payment confirmation...")}
+            </div>
+            <button data-action="click->${this.identifier}#cancelAwaitingPayment"
+              class="w-full bg-white border-2 border-slate-200 text-slate-700 py-3 rounded-xl font-black hover:bg-slate-50 transition-all cursor-pointer">
+              ${translate("Cancel")}
+            </button>
           </div>
         </div>
       `

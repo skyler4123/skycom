@@ -168,7 +168,7 @@ property_mapping: cat.default_property_mapping).tap { |s| s.send(:sync_available
     expect(page).not_to have_button("Card")
   end
 
-  scenario "mock QR one-click opens payment modal and cancel releases stock" do
+  scenario "mock QR one-click shows inline QR wait panel and cancel releases stock" do
     allow(Payments::MockQrGateway).to receive(:new).and_return(
       double(call: { success: true, gateway_reference: "MOCK_QR_FE", gateway_payload: { "qr_string" => "FEQRDATA" } })
     )
