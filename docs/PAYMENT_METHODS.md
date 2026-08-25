@@ -250,12 +250,25 @@ def setup_payment_method_appointments
       else
         :inactive
       end
+      apply_merchant_identity(a, pm)   # private — placeholder merchant identity per payment_mode
     end
   end
 end
 ```
 
 Called automatically on company creation. Seeds one appointment per country-matching `PaymentMethod`, with cash/mock strategies started `active` and external gateways started `inactive` (until the owner configures merchant credentials).
+
+### 7.1 Merchant Identity Seeding (init-time placeholders)
+
+`apply_merchant_identity` fills placeholder merchant credentials on every appointment at creation, so POS/gateway flows work out of the box (owners replace them later via the Payments dashboard):
+
+| payment_mode | merchant_number | merchant_name | merchant_id |
+|--------------|-----------------|---------------|-------------|
+| `qr` | generated 10-digit account number | company name | `T-<hex4>` |
+| `redirect` | — | — | `MID-<hex4>` |
+| `cash` | — | — | — |
+
+Branches inherit these values through copy-on-create (`Branch#initialize_payment_methods` copies all three merchant columns). The POS pay pipeline (`OrderProcessingV1::InitiatePaymentService`) forwards them to the gateway so the mock bank can embed merchant identity in generated QR strings (`ACC:`/`NAME:`/`MCC:` segments).
 
 ---
 

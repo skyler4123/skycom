@@ -71,6 +71,18 @@ Callbacks defined directly in the model file (not inherited from a concern).
 
 ---
 
+### Transaction (`app/models/transaction.rb`) — B2C POS sales
+
+Mirrors the `CompanyTransaction` gating: the invoice's `payment_status` is derived from `SUM(price_cents)` of `completed` transactions only, so pending Mock QR payments never pay the invoice early. The model also carries a `status` enum (`pending/completed/failed`, DB default 0) and `store_accessor :metadata, :gateway_payload` for raw gateway responses.
+
+| Callback | Line | Method | Description |
+|----------|------|--------|-------------|
+| `after_create :sync_invoice_payment_status, if: -> { completed? && !price_cents.zero? }` | — | `sync_invoice_payment_status` | Derives `Invoice.payment_status` from `SUM(transactions.price_cents)` — fires only when the transaction is created already `completed` (instant cash path). Pending QR creations are silent. |
+| `after_update :sync_invoice_payment_status, if: :completed?` | — | `sync_invoice_payment_status` | Same derivation when a webhook completes a pending transaction (`OrderProcessingV1::CompletePaymentService`). |
+| `after_destroy :sync_invoice_payment_status` | — | `sync_invoice_payment_status` | Re-derives (reverts to `unpaid`) when any transaction row is destroyed. |
+
+---
+
 ### Branch (`app/models/branch.rb`)
 
 | Callback | Line | Method | Description |

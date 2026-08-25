@@ -83,7 +83,7 @@ The `fireWebhookCallback` helper sends this with a 5-second timeout. It silently
 | Group | Method | Path | Purpose | Request | Response |
 |-------|--------|------|---------|---------|----------|
 | Diagnostic | `GET` | `/api/v1/ping` | Health check | — | `{ status, message, current_time, environment }` |
-| Banking | `POST` | `/api/v1/bank/qr-generate` | Generate QR payment code | `{ amount, invoice_id, memo }` | `{ success, qr_string }` + fires webhook |
+| Banking | `POST` | `/api/v1/bank/qr-generate` | Generate QR payment code | `{ amount, invoice_id, memo, transaction_token, merchant_number?, merchant_name?, merchant_id? }` | `{ success, qr_string }` + fires webhook |
 | Banking | `POST` | `/api/v1/bank/redirect-session` | Create hosted checkout session | `{ amount, invoice_id, memo }` | `{ success, redirect_url }` |
 | Banking | `GET` | `/bank/hosted-checkout` | Render mock checkout form (HTML) | `?session_id=` | Renders HTML page with form |
 | Banking | `POST` | `/bank/hosted-checkout/submit` | Process checkout form submission | `session_id`, `amount` (form) | Redirects to `/checkout/success` + fires webhook |
