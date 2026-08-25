@@ -17,7 +17,7 @@ module OrderProcessingV1
         reserved << { stock: stock, qty: item[:quantity].to_i }
       end
 
-      { success: true }
+      { success: true, reserved: reserved }
     end
   end
 end
