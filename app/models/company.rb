@@ -243,9 +243,21 @@ class Company < ApplicationRecord
         else
           :inactive
         end
+        apply_merchant_identity(a, pm)
       end
     end
   end
 
   private
+
+  def apply_merchant_identity(appointment, payment_method)
+    case payment_method.payment_mode
+    when "qr"
+      appointment.merchant_number = Array.new(10) { rand(10) }.join
+      appointment.merchant_name = name
+      appointment.merchant_id = "T-#{SecureRandom.hex(4).upcase}"
+    when "redirect"
+      appointment.merchant_id = "MID-#{SecureRandom.hex(4).upcase}"
+    end
+  end
 end

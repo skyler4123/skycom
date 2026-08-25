@@ -167,4 +167,49 @@ RSpec.describe Company, type: :model do
       expect(company.credit_usage_delta).to eq(0)
     end
   end
+
+  describe "payment method appointment merchant seeding" do
+    let!(:pm_cash) do
+      PaymentMethod.create!(name: "Spec Cash", code: "SPEC_CASH", business_type: :b2c,
+        payment_mode: :cash, strategy: :cash)
+    end
+    let!(:pm_qr) do
+      PaymentMethod.create!(name: "Spec Mock QR", code: "SPEC_MQR", business_type: :b2c,
+        payment_mode: :qr, strategy: :mock_qr_gateway)
+    end
+    let!(:pm_redirect) do
+      PaymentMethod.create!(name: "Spec Mock Redirect", code: "SPEC_RD", business_type: :b2c,
+        payment_mode: :redirect, strategy: :mock_redirect_gateway)
+    end
+    let(:company_user) { create(:user, :company_owner) }
+    let(:company) { Seed::CompanyService.new(user: company_user, country: :us, business_type: :education).tap(&:save!) }
+
+    around do |example|
+      Company.skip_init = false
+      example.run
+    ensure
+      Company.skip_init = true
+    end
+
+    it "fills merchant account, name and terminal id for qr-mode appointments" do
+      appt = company.payment_method_appointments.find_by(payment_method: pm_qr)
+      expect(appt.merchant_number).to match(/\A\d{10}\z/)
+      expect(appt.merchant_name).to eq(company.name)
+      expect(appt.merchant_id).to start_with("T-")
+    end
+
+    it "fills only a terminal id for redirect-mode appointments" do
+      appt = company.payment_method_appointments.find_by(payment_method: pm_redirect)
+      expect(appt.merchant_id).to start_with("MID-")
+      expect(appt.merchant_number).to be_nil
+      expect(appt.merchant_name).to be_nil
+    end
+
+    it "leaves cash appointments without merchant data" do
+      appt = company.payment_method_appointments.find_by(payment_method: pm_cash)
+      expect(appt.merchant_number).to be_nil
+      expect(appt.merchant_name).to be_nil
+      expect(appt.merchant_id).to be_nil
+    end
+  end
 end

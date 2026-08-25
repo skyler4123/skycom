@@ -5,12 +5,14 @@ class Transaction < ApplicationRecord
   include TagConcern
   attribute :permission_resource_name, :string, default: -> { self.name }
   attribute :price_cents, :integer, default: 0
+  store_accessor :metadata, :gateway_payload
 
   enum :country, COUNTRY_CODES, prefix: true, default: :us
   enum :timezone, TIMEZONES, prefix: true, default: :utc
   enum :currency, CURRENCIE_CODES, prefix: true, default: :usd
   enum :lifecycle_status, LIFECYCLE_STATUS, prefix: true
   enum :workflow_status, WORKFLOW_STATUS, prefix: true
+  enum :status, { pending: 0, completed: 1, failed: 2 }, default: :pending
   enum :business_type, {
     standard_payment: 0,
     prepayment: 1,
@@ -30,8 +32,10 @@ class Transaction < ApplicationRecord
   belongs_to :payment_method, optional: true
 
   validates :currency, presence: true
+  validates :gateway_reference, uniqueness: true, allow_nil: true
 
-  after_create :sync_invoice_payment_status, unless: -> { price_cents.zero? }
+  after_create :sync_invoice_payment_status, if: -> { completed? && !price_cents.zero? }
+  after_update :sync_invoice_payment_status, if: :completed?
   after_destroy :sync_invoice_payment_status
 
   private

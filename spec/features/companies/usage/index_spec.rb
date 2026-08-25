@@ -44,14 +44,15 @@ RSpec.feature "Companies::Usage", type: :feature, js: true do
     page.execute_script("document.cookie = 'client_cache_version=forced; path=/'")
   end
 
-  scenario "displays the credit balance and stat cards" do
+  scenario "displays the credit stat cards" do
     visit company_usage_path(company)
 
-    expect(page).to have_content(/credit balance/i, wait: 10)
+    expect(page).to have_content(/main credits/i, wait: 10)
+    expect(page).to have_content(/promo credits/i)
     expect(page).to have_content("1,500,000", wait: 10)
-    expect(page).to have_content(/live delta/i, wait: 10)
+    expect(page).to have_content(/latest hour usage/i, wait: 10)
     expect(page).to have_content("50", wait: 10)
-    expect(page).to have_content(/monthly total/i, wait: 10)
+    expect(page).to have_content(/used this month/i, wait: 10)
   end
 
   scenario "renders the 7-day usage chart" do
@@ -61,10 +62,10 @@ RSpec.feature "Companies::Usage", type: :feature, js: true do
     expect(chart_container).to have_selector("svg", wait: 10)
   end
 
-  scenario "includes the live delta in today's total" do
+  scenario "includes the latest hour usage in today's total" do
     visit company_usage_path(company)
 
-    # i=0 → today: 100 credits + 50 live delta = 150
+    # i=0 → today: 100 credits + 50 latest-hour delta = 150
     expect(page).to have_content("150", wait: 10)
   end
 end

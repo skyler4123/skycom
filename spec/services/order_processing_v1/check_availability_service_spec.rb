@@ -16,7 +16,7 @@ RSpec.describe OrderProcessingV1::CheckAvailabilityService do
         product: product,
         company: company,
         quantity: 10,
-        reorder: 0,
+        pending: 0,
         name: "Test Stock",
         code: "STK-TEST"
       )
@@ -43,6 +43,28 @@ RSpec.describe OrderProcessingV1::CheckAvailabilityService do
       let(:items) { [ { stock_id: stock.id, quantity: 20 } ] }
 
       it "returns available: false with the failed item" do
+        expect(result[:available]).to be false
+        expect(result[:failed_item]).to eq(stock.id)
+      end
+    end
+
+    context "when the Redis counter is missing" do
+      let(:items) { [ { stock_id: stock.id, quantity: 3 } ] }
+
+      before { Kredis.redis.del("stock:#{stock.id}:available") }
+
+      it "falls back to DB availability and heals the counter" do
+        expect(result).to eq({ available: true })
+        expect(stock.available_counter.value).to eq(10)
+      end
+    end
+
+    context "when the Redis counter is missing and DB quantity is insufficient" do
+      let(:items) { [ { stock_id: stock.id, quantity: 20 } ] }
+
+      before { Kredis.redis.del("stock:#{stock.id}:available") }
+
+      it "returns available: false based on DB values" do
         expect(result[:available]).to be false
         expect(result[:failed_item]).to eq(stock.id)
       end

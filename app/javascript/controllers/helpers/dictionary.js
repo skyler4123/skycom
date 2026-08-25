@@ -72,7 +72,6 @@ export const dictionary = () => {
     "Warehouse": { vi: "Kho" },
     "Barcode": { vi: "Mã vạch" },
     "SKU": { vi: "Mã SKU" },
-    "Reorder": { vi: "Đặt hàng lại" },
     "From": { vi: "Từ" },
     "To": { vi: "Đến" },
     "All Branches": { vi: "Tất cả chi nhánh" },

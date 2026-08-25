@@ -15,7 +15,7 @@ RSpec.describe "Companies::OrderProcessing::V1", type: :request do
       warehouse: warehouse,
       product: product,
       quantity: 10,
-      reorder: 0,
+      pending: 0,
       category: cat,
       property_mapping: cat.default_property_mapping
     )
@@ -55,7 +55,7 @@ RSpec.describe "Companies::OrderProcessing::V1", type: :request do
     context "with multiple items" do
       let(:product2) { create(:product, company: company) }
       let!(:stock2) do
-        Stock.create!(company:, warehouse:, product: product2, quantity: 5, reorder: 0,
+        Stock.create!(company:, warehouse:, product: product2, quantity: 5, pending: 0,
           category: stock.category, property_mapping: stock.property_mapping)
           .tap { |s| s.send(:sync_available_counter) }
       end
@@ -98,6 +98,15 @@ RSpec.describe "Companies::OrderProcessing::V1", type: :request do
         expect(response).to have_http_status(:unprocessable_content)
         body = JSON.parse(response.body)
         expect(body["errors"]).to contain_exactly("Insufficient stock")
+      end
+    end
+
+    context "when the Redis counter is missing" do
+      before { Kredis.redis.del("stock:#{stock.id}:available") }
+
+      it "returns 201 instead of crashing" do
+        post "/companies/#{company.id}/order_processing/v1/checkout", params: checkout_params, headers: headers
+        expect(response).to have_http_status(:created)
       end
     end
   end

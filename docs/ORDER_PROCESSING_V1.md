@@ -81,7 +81,7 @@ pay()                              PAY
                                                     │     └── StockTransaction.insert_all(direction: :remove)
                                                     │
                                                     ├── UpdateStockBalancesService.call(order:)
-                                                    │     └── SQL UPDATE quantity -= qty, reserved_quantity -= qty
+                                                    │     └── SQL UPDATE quantity -= qty, pending -= qty
                                                     │         └── triggers Stock#after_save → sync_available_counter
                                                     │
                                                     └── FinalizeOrderService.call(order:)
@@ -334,7 +334,7 @@ All services live under `OrderProcessingV1` module and use `self.call(...)` — 
 
 **Behavior:**
 - Iterates `order.order_appointments`
-- For each line item, runs direct SQL `UPDATE stocks SET quantity = quantity - qty, reserved_quantity = reserved_quantity - qty`
+- For each line item, runs direct SQL `UPDATE stocks SET quantity = quantity - qty, pending = pending - qty`
 - Uses `update_all` with array SQL fragment
 
 **Returns:**
@@ -395,36 +395,51 @@ All services live under `OrderProcessingV1` module and use `self.call(...)` — 
 **File**: `app/models/stock.rb`
 
 ```ruby
-kredis_integer :available_counter
+kredis_counter :available_counter, key: ->(s) { "stock:#{s.id}:available" }
 ```
 
-The Redis key pattern is `stock:<id>:available`. The counter is synced from the database via:
+The counter is synced from the database via (accessed only through model
+wrappers — see `docs/KREDIS.md`):
 
 ```ruby
-after_save :sync_available_counter
+after_save :sync_available_counter,
+  if: -> { saved_change_to_quantity? || saved_change_to_pending? }
 
+# private
 def sync_available_counter
-  available_counter.value = [ quantity - reserved_quantity, 0 ].max
+  target = [ quantity - pending, 0 ].max
+  delta = target - available_counter.value
+  return if delta.zero?
+
+  delta.positive? ? available_counter.increment(by: delta) : available_counter.decrement(by: -delta)
 end
 ```
 
-This ensures the Redis counter is always consistent with the DB after any stock mutation.
+This keeps the Redis counter consistent with the DB after any stock save.
+`update_all` bypasses callbacks — the order pipeline keeps Redis and DB in step
+explicitly. If a counter key goes missing (Redis restart/flush),
+`Stock#available_count` heals it from `quantity - pending` on first read.
 
 ### Atomic Reservation Flow
 
-`ReserveStockService` uses a Redis `MULTI` block to atomically decrement counters. If any decrement produces a negative result:
+Reservation lives on the model (`Stock#reserve_stock!`) — an atomic Redis
+decrement that returns false and reverts itself when stock is insufficient:
 
-1. All prior decrements within the `MULTI` block are rolled back
-2. `InsufficientStockError` is raised
-3. The pay action returns 422
+1. `ReserveStockService` heals missing keys via `available_count`, then calls
+   `reserve_stock!(qty)` per item
+2. On the first `false`, all previously reserved items are rolled back via
+   `release_reserved!(qty)`
+3. `InsufficientStockError` is raised → the pay action returns 422
+
+On success, each `reserve_stock!` also increments the DB `pending` column so
+`quantity - pending` reflects the reservation between pay and finalize.
 
 ### Counter Lifecycle
 
 ```
-Checkout ─► reads available_counter (check only)
-Pay      ─► DECRBY available_counter (reserves stock)
-Finalize ─► UPDATE DB quantity, reserved_quantity
-         ─► after_save syncs available_counter from DB
+Checkout ─► reads availability (Redis counter; heals from DB if missing)
+Pay      ─► reserve_stock!: DECRBY available_counter + DB pending += qty
+Finalize ─► UPDATE DB quantity -= qty, pending -= qty
 ```
 
 ---
@@ -435,7 +450,7 @@ Finalize ─► UPDATE DB quantity, reserved_quantity
 |-------|------|-----------------|
 | `Order` | `app/models/order.rb` | Pending/paid order record; `workflow_status` tracks state |
 | `OrderAppointment` | `app/models/order_appointment.rb` | Polymorphic line items (Product/Service), stores `quantity`, `unit_price`, `total_price` |
-| `Stock` | `app/models/stock.rb` | Inventory record with `quantity`, `reserved_quantity`, KRedis `available_counter` |
+| `Stock` | `app/models/stock.rb` | Inventory record with `quantity`, `pending`, KRedis `available_counter` |
 | `StockTransaction` | `app/models/stock_transaction.rb` | Ledger entries; `after_create` recalibrates stock metrics |
 | `StockExport` | `app/models/stock_export.rb` | Export documents linked to Order via polymorphic `appoint_for` |
 | `Invoice` | `app/models/invoice.rb` | Payment invoice; created by `ProcessPaymentService` |
@@ -499,7 +514,7 @@ export const order_processing_v1_pay_path = (companyId) =>
 | `spec/services/order_processing_v1/reserve_stock_service_spec.rb` | Successful reservation, insufficient stock (rollback), string quantity param | Stock records with KRedis counter |
 | `spec/services/order_processing_v1/process_payment_service_spec.rb` | Creates invoice + payment, updates order status, double-call raises error | Pending order with order_appointments |
 | `spec/services/order_processing_v1/write_stock_ledger_service_spec.rb` | Creates stock transactions with correct direction/type | Paid order, stock records per product |
-| `spec/services/order_processing_v1/update_stock_balances_service_spec.rb` | Decrements quantity and reserved_quantity, multiple items | Paid order with order_appointments |
+| `spec/services/order_processing_v1/update_stock_balances_service_spec.rb` | Decrements quantity and pending, multiple items | Paid order with order_appointments |
 | `spec/services/order_processing_v1/finalize_order_service_spec.rb` | Creates stock exports with sale business_type, links to Order via appoint_for | Paid order with order_appointments |
 | `spec/requests/companies/order_processing/v1_controller_spec.rb` | Checkout success, insufficient stock, missing fields, multiple items, string quantity, non-existent order pay, full checkout+pay flow | Company, branch, products, stock |
 | `spec/features/companies/pages/retail_cashier_spec.rb` | Page load, add/remove cart, ORDER → COMPLETE PAYMENT, Cancel, cart locked, insufficient stock, empty cart guard | Company, branch, products, stock, page record |

@@ -14,7 +14,7 @@ class Seed::StockService
     business_type: nil,
     discarded_at: nil,
     quantity: 0,
-    reorder: 0
+    pending: 0
   )
     raise "Cannot create stock: No warehouse provided." if warehouse.nil?
 
@@ -38,7 +38,7 @@ class Seed::StockService
       workflow_status: workflow_status || Stock.workflow_statuses.keys.sample,
       business_type: business_type || Stock.business_types.keys.sample,
       quantity: quantity,
-      reorder: reorder,
+      pending: pending,
       discarded_at: discarded_at
     )
   end

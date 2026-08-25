@@ -3,24 +3,18 @@
 module OrderProcessingV1
   class ReserveStockService
     def self.call(items:)
-      redis = Kredis.redis
-      results = redis.multi do |multi|
-        items.each do |item|
-          multi.decrby("stock:#{item[:stock_id]}:available", item[:quantity])
+      # Heal missing counters from DB first — a decrement on a missing key
+      # would falsely report insufficient stock.
+      items.each { |item| Stock.find(item[:stock_id]).available_count }
+
+      reserved = []
+      items.each do |item|
+        stock = Stock.find(item[:stock_id])
+        unless stock.reserve_stock!(item[:quantity])
+          reserved.each { |r| r[:stock].release_reserved!(r[:qty]) }
+          raise InsufficientStockError, "Insufficient stock for item #{item[:stock_id]}"
         end
-      end
-
-      items.each_with_index do |item, idx|
-        next unless results[idx].to_i < 0
-
-        redis.multi do |multi|
-          items.each_with_index do |rollback_item, ridx|
-            next if ridx > idx
-            multi.incrby("stock:#{rollback_item[:stock_id]}:available", rollback_item[:quantity])
-          end
-        end
-
-        raise InsufficientStockError, "Insufficient stock for item #{item[:stock_id]}"
+        reserved << { stock: stock, qty: item[:quantity].to_i }
       end
 
       { success: true }
