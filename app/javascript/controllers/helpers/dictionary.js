@@ -223,6 +223,8 @@ export const dictionary = () => {
     "Order created": { vi: "Đã tạo đơn hàng" },
     "Payment completed": { vi: "Đã hoàn tất thanh toán" },
     "Cancellation failed": { vi: "Hủy thanh toán thất bại" },
+    "Receipt": { vi: "Biên lai" },
+    "New Sale": { vi: "Bán hàng mới" },
     "No stock-tracked items in cart": { vi: "Không có sản phẩm tồn kho trong giỏ hàng" },
     "Tax (10%)": { vi: "Thuế (10%)" },
     "e.g. Acme Inc.": { vi: "VD: Công ty ABC" },

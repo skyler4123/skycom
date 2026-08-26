@@ -13,6 +13,7 @@ export default class Companies_Pages_RetailCashierController extends Controller 
   /** @type {any[]} */ paymentMethods = []
   /** @type {string | null} */ selectedMethodId = null
   /** @type {string | null} */ awaitingToken = null
+  /** @type {any | null} */ receipt = null
 
   async connect() {
     const pathParts = window.location.pathname.split("/")
@@ -174,7 +175,7 @@ export default class Companies_Pages_RetailCashierController extends Controller 
       }
 
       toast({ type: 'success', message: res.message || translate('Payment completed') })
-      this.resetAfterPayment()
+      await this.showReceipt()
     } catch (error) {
       toast({ type: 'error', message: error.errors?.join(', ') || error.message || translate('Payment failed') })
       if (this.isQrMode && !this.awaitingToken) this.orderId = null
@@ -182,14 +183,34 @@ export default class Companies_Pages_RetailCashierController extends Controller 
     }
   }
 
+  async showReceipt() {
+    try {
+      const res = await fetchJson(Helpers.receipt_company_order_path(this.getCompanyId(), this.orderId))
+      this.receipt = res.receipt || null
+    } catch (error) {
+      toast({ type: 'error', message: error.errors?.join(', ') || translate('Failed to load receipt') })
+    }
+    this.activeTab.items = []
+    this.cashReceived = 0
+    this.awaitingToken = null
+    this.renderContent()
+  }
+
+  newSale() {
+    this.receipt = null
+    this.orderId = null
+    this.orderTotal = 0
+    this.renderContent()
+  }
+
   subscribePaymentCompleted() {
     const ws = window.WEBSOCKET
     if (!ws?.companyChannel || !ws?.subscribe) return
     const channel = ws.companyChannel(this.getCompanyId())
-    ws.subscribe(channel, 'pos_payment_completed', (_resourceId, payload) => {
-      if (payload?.transaction_token !== this.awaitingToken) return
+    ws.subscribe(channel, 'pos_payment_completed', (data) => {
+      if (data?.payload?.transaction_token !== this.awaitingToken) return
       toast({ type: 'success', message: translate('Payment completed') })
-      this.resetAfterPayment()
+      this.showReceipt()
     })
   }
 
@@ -211,15 +232,6 @@ export default class Companies_Pages_RetailCashierController extends Controller 
     }
     this.awaitingToken = null
     this.cancelOrder()
-  }
-
-  resetAfterPayment() {
-    this.activeTab.items = []
-    this.orderId = null
-    this.orderTotal = 0
-    this.cashReceived = 0
-    this.awaitingToken = null
-    this.renderContent()
   }
 
   cancelOrder() {
@@ -513,6 +525,43 @@ export default class Companies_Pages_RetailCashierController extends Controller 
     const tax = this.getTax()
     const total = this.getTotal()
 
+    if (this.receipt) {
+      const r = this.receipt
+      return `
+        <div class="p-6 bg-white border-t border-gray-200">
+          <div class="space-y-4">
+            <div class="flex items-center justify-between">
+              <h3 class="text-sm font-black uppercase tracking-widest text-gray-500">${translate("Receipt")}</h3>
+              ${Helpers.statusBadge(r.payment_status)}
+            </div>
+            <div class="text-xs text-gray-500 font-mono">${r.invoice_code || ''}${r.issued_at ? ` · ${new Date(r.issued_at).toLocaleString()}` : ''}</div>
+            <div class="border-t border-dashed border-gray-200 pt-3 space-y-2">
+              ${(r.items || []).map(i => `
+                <div class="flex justify-between text-sm text-gray-700">
+                  <span>${i.quantity} × ${i.name}</span>
+                  <span class="font-bold">$${Number(i.total_price).toFixed(2)}</span>
+                </div>
+              `).join('')}
+            </div>
+            <div class="border-t border-dashed border-gray-200 pt-3 space-y-1.5">
+              <div class="flex justify-between text-sm text-gray-500"><span>${translate("Subtotal")}</span><span>$${Number(r.subtotal).toFixed(2)}</span></div>
+              <div class="flex justify-between text-sm text-gray-500"><span>${translate("Tax (10%)")}</span><span>$${Number(r.tax).toFixed(2)}</span></div>
+              <div class="flex justify-between items-center pt-1">
+                <span class="font-bold text-gray-900">${translate("Total Amount")}</span>
+                <span class="text-xl font-black text-blue-600">$${Number(r.total).toFixed(2)}</span>
+              </div>
+            </div>
+            ${r.payment_method_name ? `<div class="text-xs text-gray-500">${translate("Payment Method")}: <span class="font-bold text-gray-900">${r.payment_method_name}</span></div>` : ''}
+            <button data-action="click->${this.identifier}#newSale"
+              class="w-full bg-blue-600 text-white py-4 rounded-xl text-lg font-black shadow-lg shadow-blue-600/20 hover:brightness-110 active:scale-[0.98] transition-all flex items-center justify-center gap-3 cursor-pointer">
+              <span class="material-symbols-outlined">add_shopping_cart</span>
+              ${translate("New Sale")}
+            </button>
+          </div>
+        </div>
+      `
+    }
+
     if (this.awaitingToken) {
       return `
         <div class="p-6 bg-white border-t border-gray-200">
@@ -521,7 +570,7 @@ export default class Companies_Pages_RetailCashierController extends Controller 
             <p class="text-xs text-gray-500">${translate("Scan the QR code with your banking app to complete the payment.")}</p>
             <p class="text-2xl font-black text-blue-600">$${total.toFixed(2)}</p>
             <div class="flex justify-center">
-              <div id="cashier-qr-container" class="w-56 h-56 bg-white rounded-xl p-3 border border-gray-200 flex items-center justify-center"></div>
+              <div id="cashier-qr-container" data-transaction-token="${this.awaitingToken}" class="w-56 h-56 bg-white rounded-xl p-3 border border-gray-200 flex items-center justify-center"></div>
             </div>
             <div class="flex items-center justify-center gap-2 text-sm text-amber-600">
               <span class="material-symbols-outlined text-[18px] animate-pulse">hourglass_top</span>

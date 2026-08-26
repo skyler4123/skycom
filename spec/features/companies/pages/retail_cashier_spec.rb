@@ -108,7 +108,7 @@ property_mapping: cat.default_property_mapping).tap { |s| s.send(:sync_available
     expect(Order.count).to eq(1)
   end
 
-  scenario "COMPLETE PAYMENT processes order and clears cart" do
+  scenario "COMPLETE PAYMENT processes order and shows the receipt" do
     visit "/companies/#{company.id}/pages/#{page_record.id}/retail_cashier"
 
     first('[data-action*="addToCart"]', wait: 10).click
@@ -116,13 +116,21 @@ property_mapping: cat.default_property_mapping).tap { |s| s.send(:sync_available
     expect(page).to have_button("COMPLETE PAYMENT", wait: 10)
 
     click_button "COMPLETE PAYMENT"
-    expect(page).to have_content("Cart is empty", wait: 10)
-    expect(page).to have_button("ORDER", wait: 10)
+
+    expect(page).to have_content(/receipt/i, wait: 10)
+    expect(page).to have_content("INV-", wait: 5)
+    expect(page).to have_content("Paid", wait: 5)
+    expect(page).to have_content(product_a.name, wait: 5)
+    expect(page).to have_button("New Sale")
 
     order = Order.last
-    expect(order.workflow_status).to eq("paid")
+    expect(order.reload.workflow_status).to eq("paid")
     expect(Invoice.where(order_id: order.id)).to be_present
     expect(Transaction.joins(:invoice).where(invoice: { order_id: order.id })).to be_present
+
+    click_button "New Sale"
+    expect(page).to have_button("ORDER", wait: 10)
+    expect(page).to have_content("Cart is empty", wait: 5)
   end
 
   scenario "cart is locked after ORDER is placed" do
@@ -168,7 +176,7 @@ property_mapping: cat.default_property_mapping).tap { |s| s.send(:sync_available
     expect(page).not_to have_button("Card")
   end
 
-  scenario "mock QR one-click shows inline QR wait panel and cancel releases stock" do
+  scenario "mock QR one-click completes via websocket and shows the receipt" do
     allow(Payments::MockQrGateway).to receive(:new).and_return(
       double(call: { success: true, gateway_reference: "MOCK_QR_FE", gateway_payload: { "qr_string" => "FEQRDATA" } })
     )
@@ -186,6 +194,49 @@ property_mapping: cat.default_property_mapping).tap { |s| s.send(:sync_available
     expect(Order.count).to eq(1)
     expect(Order.last.workflow_status).to eq("pending")
     expect(Transaction.last.status).to eq("pending")
+
+    token = page.find("#cashier-qr-container")["data-transaction-token"]
+
+    page.execute_script(
+      "return fetch('/webhooks/payments/mock_qr_gateway', { method: 'POST'," \
+      " headers: { 'Content-Type': 'application/json', 'X-Skycom-Bank-Signature': 'local_secure_dev_secret' }," \
+      " body: JSON.stringify({ event: 'transaction.completed', data: { transaction_token: arguments[0], amount: arguments[1] } }) })" \
+      ".then(r => r.status)",
+      token, Transaction.last.reload.price_cents
+    )
+
+    expect(Transaction.last.reload.status).to eq("completed")
+    expect(Order.last.reload.workflow_status).to eq("paid")
+
+    page.execute_script(
+      "window.WEBSOCKET.handleIncomingPublication(window.location.pathname.split('/')[2], { event: 'pos_payment.completed', id: 'sim', payload: { transaction_token: arguments[0] } })",
+      token
+    )
+
+    expect(page).to have_content(/receipt/i, wait: 10)
+    expect(page).to have_content("Paid", wait: 5)
+    expect(page).to have_content("INV-", wait: 5)
+    expect(page).to have_button("New Sale", wait: 5)
+
+    expect(Order.last.reload.workflow_status).to eq("paid")
+    expect(Transaction.last.status).to eq("completed")
+
+    click_button "New Sale"
+    expect(page).to have_button("ORDER", wait: 10)
+    expect(page).to have_content("Cart is empty", wait: 5)
+  end
+
+  scenario "mock QR cancel releases stock and restores the cart" do
+    allow(Payments::MockQrGateway).to receive(:new).and_return(
+      double(call: { success: true, gateway_reference: "MOCK_QR_FE2", gateway_payload: { "qr_string" => "FEQRDATA2" } })
+    )
+
+    visit "/companies/#{company.id}/pages/#{page_record.id}/retail_cashier"
+
+    first('[data-action*="addToCart"]', wait: 10).click
+    click_button "Mock QR"
+    click_button "ORDER"
+    expect(page).to have_selector("#cashier-qr-container", wait: 10)
 
     click_button "Cancel"
     expect(page).to have_button("ORDER", wait: 10)
