@@ -230,6 +230,15 @@ params.permit(:order_id, :payment_method_appointment_id)
    - Cash: `{ status: "paid", order_id, transaction_id, message }`
    - QR: `{ status: "pending", order_id, transaction_token, qr_string, message }`
 
+### `receipt`
+
+**GET** `/companies/:company_id/orders/:order_id/receipt`
+
+POS receipt payload for the post-payment panel: invoice code, issued_at,
+payment_status, item lines (snapshot name/qty/unit/total), subtotal from
+`invoice.price_cents`, cart-mirrored 10% tax, total, and payment method name.
+404 when the order is unknown or belongs to another company.
+
 ### `pay_cancel`
 
 **POST** `/companies/:company_id/order_processing/v1/pay_cancel`
@@ -533,6 +542,9 @@ export const order_processing_v1_pay_path = (companyId) =>
 
 export const order_processing_v1_pay_cancel_path = (companyId) =>
   `/companies/${companyId}/order_processing/v1/pay_cancel`
+
+export const receipt_company_order_path = (companyId, orderId) =>
+  `/companies/${companyId}/orders/${orderId}/receipt`
 ```
 
 ---
