@@ -1,6 +1,13 @@
 # frozen_string_literal: true
 
+# Companies::OrderProcessing::V1Controller — POS checkout → pay JSON API.
+# Shell: docs/ORDER_PROCESSING_V1.md
+# - checkout: CheckAvailabilityService + CreateOrderService (no payment yet)
+# - pay: branch-scoped PaymentMethodAppointment → InitiatePaymentService
+#        cash → CompletePaymentService synchronously; QR → gateway → webhook → WS pos_payment_completed
+# - pay_cancel: CancelPaymentService (pending → failed + ReleaseReservedStockService)
 class Companies::OrderProcessing::V1Controller < Companies::ApplicationController
+  # Creates a pending Order after availability check. Does not touch stock/invoices.
   def checkout
     result = OrderProcessingV1::CheckAvailabilityService.call(items: checkout_params[:items])
 
@@ -19,8 +26,15 @@ class Companies::OrderProcessing::V1Controller < Companies::ApplicationControlle
     render json: order_result.merge(message: "Order created"), status: :created
   end
 
+  # Pays a pending Order via a branch-appointed payment method.
+  # - Validates appointment is branch_level, belongs to order.branch and is active.
+  # - Delegates to InitiatePaymentService: cash completes synchronously via CompletePaymentService,
+  #   QR calls GATEWAY_STRATEGY_CLASSES with merchant identity and leaves txn pending for webhook.
+  # - Rescues InsufficientStockError / InvalidPaymentMethodError → 422.
   def pay
     order = current_company.orders.find(params[:order_id])
+    # Scoped by company_id (not current_company.payment_method_appointments) to avoid
+    # polymorphic has_many ... as: :appoint_to injecting appoint_to_type = 'Company' conflicting with branch_level.
     appointment = PaymentMethodAppointment.branch_level
       .find_by!(id: params[:payment_method_appointment_id], company_id: current_company.id)
 
@@ -39,6 +53,9 @@ class Companies::OrderProcessing::V1Controller < Companies::ApplicationControlle
     render json: { errors: [ e.message ] }, status: :unprocessable_entity
   end
 
+  # Cancels an abandoned QR payment. Only a pending Transaction can be cancelled:
+  # releases reserved stock (ReleaseReservedStockService) and marks txn failed.
+  # Returns cancelled / not_pending — never raises for already completed/cancelled txns.
   def pay_cancel
     cancelled = OrderProcessingV1::CancelPaymentService.call(
       transaction_token: params[:transaction_token],

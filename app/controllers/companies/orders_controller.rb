@@ -1,5 +1,7 @@
 # app/controllers/companies/orders_controller.rb
-
+# Companies::OrdersController — CRUD for sales Orders plus POS receipt.
+# Shell-First for index/show/new/edit (format.html empty + format.json hydrated).
+# create/update are HTML redirects; receipt is JSON-only for the retail-cashier panel.
 class Companies::OrdersController < Companies::ApplicationController
   def index
     respond_to do |format|
@@ -27,6 +29,11 @@ class Companies::OrdersController < Companies::ApplicationController
     end
   end
 
+  # GET /companies/:company_id/orders/:id/receipt
+  # Tenant-scoped receipt for the POS post-payment panel. Finds the order via
+  # current_company (404 if foreign), then the latest invoice + transaction.
+  # Totals mirror the cart (subtotal from invoice.price_cents or items sum, 10% tax)
+  # so the receipt matches what the cashier displayed. Requires OrdersPolicy#receipt?.
   def receipt
     order = current_company.orders.includes(order_appointments: { appoint_to: {} }).find(params[:id])
     invoice = order.invoices.order(:created_at).last

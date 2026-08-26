@@ -1,5 +1,7 @@
 # app/controllers/companies/pages_controller.rb
-
+# Companies::PagesController — Operating Pages (Shell-First). Standard CRUD for
+# Page records plus retail_cashier: branch-scoped product/service catalog
+# hydrated for the POS. See docs/OPERATING_PAGES.md, docs/ORDER_PROCESSING_V1.md.
 class Companies::PagesController < Companies::ApplicationController
   def index
     respond_to do |format|
@@ -32,6 +34,11 @@ class Companies::PagesController < Companies::ApplicationController
     end
   end
 
+  # GET /companies/:company_id/pages/:id/retail_cashier(.json)
+  # Hydrates the retail-cashier POS: products/services limited to page.branch
+  # (50 each, thumb variants) and the branch's appointed payment methods.
+  # Payment methods: only active branch-level appointments where !redirect?
+  # (POS can't handle hosted redirects); serialized as {id} + payment_method.slice.
   def retail_cashier
     page = current_company.pages.includes(:branch).find(params[:id])
 
