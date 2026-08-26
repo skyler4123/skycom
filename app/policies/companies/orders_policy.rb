@@ -8,6 +8,10 @@ class Companies::OrdersPolicy < ApplicationPolicy
     record.can?(:read, Order)
   end
 
+  def receipt?
+    record.can?(:read, Order)
+  end
+
   def new?
     record.can?(:create, Order)
   end

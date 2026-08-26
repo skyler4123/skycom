@@ -27,6 +27,38 @@ class Companies::OrdersController < Companies::ApplicationController
     end
   end
 
+  def receipt
+    order = current_company.orders.includes(order_appointments: { appoint_to: {} }).find(params[:id])
+    invoice = order.invoices.order(:created_at).last
+    transaction = invoice&.transactions&.order(:created_at)&.last
+
+    items = order.order_appointments.map do |oa|
+      {
+        name: oa.name.presence || oa.appoint_to&.name || "Item",
+        quantity: oa.quantity,
+        unit_price: oa.unit_price.to_f,
+        total_price: oa.total_price.to_f
+      }
+    end
+
+    subtotal = invoice ? invoice.price_cents / 100.0 : items.sum { |i| i[:total_price] }.round(2)
+    tax = (subtotal * 0.10).round(2)
+
+    render json: {
+      receipt: {
+        invoice_code: invoice&.code,
+        issued_at: invoice&.created_at,
+        payment_status: invoice&.payment_status,
+        currency: order.currency,
+        items: items,
+        subtotal: subtotal.round(2),
+        tax: tax,
+        total: (subtotal + tax).round(2),
+        payment_method_name: transaction&.payment_method&.name
+      }
+    }
+  end
+
   def new
     respond_to do |format|
       format.html { render html: "", layout: true }

@@ -33,7 +33,11 @@ Rails.application.routes.draw do
       resources :products
       resources :brands
       resources :services
-      resources :orders
+      resources :orders do
+        member do
+          get :receipt
+        end
+      end
       resources :transactions
       resources :employees
       resources :stocks
