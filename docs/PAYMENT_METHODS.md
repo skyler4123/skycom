@@ -224,6 +224,19 @@ end
 
 Inactive company-level appointments are **not** copied to new branches. If the company later activates the method, the existing branches will not auto-create it — new branches inherit it; existing branches would need the appointment created explicitly (or via re-sync).
 
+### 6.1 Branch Bank-Account Strategy (Money-Flow Routing)
+
+Each `PaymentMethodAppointment` keeps its own bank-account identity (`merchant_number` / `merchant_name` / `merchant_id`). The POS pay pipeline (`OrderProcessingV1::InitiatePaymentService`) forwards the **branch-level** appointment's credentials to the gateway, which embeds them in the QR string (`ACC:`/`NAME:`/`MCC:`). This lets a company route money two ways without code changes:
+
+| Strategy | How to configure | Effect |
+|----------|------------------|--------|
+| **Multi-account (per-branch treasury)** | Give each branch appointment a distinct `merchant_number` / `merchant_id` (e.g., Hanoi branch → `9704-001`, Saigon branch → `9704-002`). Edit via the branch Payment Methods modal. | Customer QR payments land in the branch's own bank account — isolated money flow per branch. |
+| **Single-account (centralized treasury)** | Set the **same** `merchant_number` / `merchant_id` on every branch appointment (copy the company-level value or paste one account ID across branches). | All branches’ QR payments land in one company account — consolidated flow. Switching strategies is just updating the `merchant_*` columns; no schema or gateway change. |
+
+Notes:
+- `lifecycle_status` cascades from company → branches (`cascade_lifecycle_to_branch_appointments`), but `merchant_*` columns do **not** cascade after copy-on-create — editing a branch’s bank account never affects siblings or the company-level record.
+- A branch appointment can only be `active` while its company-level method is `active` (`payment_method_must_be_active_in_company`), so a company can centrally disable a method and all branches follow, while still keeping per-branch bank identities.
+
 ---
 
 ## 7. Company Integration
