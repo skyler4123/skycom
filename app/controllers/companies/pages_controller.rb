@@ -1,5 +1,9 @@
 # app/controllers/companies/pages_controller.rb
-
+# Companies::PagesController — Operating Pages (Shell-First). Standard CRUD for
+# Page records plus retail_cashier: branch-scoped product/service catalog
+# hydrated for the POS. See docs/OPERATING_PAGES.md, docs/ORDER_PROCESSING_V1.md.
+# Serves Stimulus: Companies_Pages_RetailCashierController (hydrate: products/services/payment_methods)
+# Endpoint: GET retail_cashier — see Helpers.retail_cashier_company_page_path
 class Companies::PagesController < Companies::ApplicationController
   def index
     respond_to do |format|
@@ -32,6 +36,11 @@ class Companies::PagesController < Companies::ApplicationController
     end
   end
 
+  # GET /companies/:company_id/pages/:id/retail_cashier(.json)
+  # Hydrates the retail-cashier POS: products/services limited to page.branch
+  # (50 each, thumb variants) and the branch's appointed payment methods.
+  # Payment methods: only active branch-level appointments where !redirect?
+  # (POS can't handle hosted redirects); serialized as {id} + payment_method.slice.
   def retail_cashier
     page = current_company.pages.includes(:branch).find(params[:id])
 
@@ -48,10 +57,17 @@ class Companies::PagesController < Companies::ApplicationController
           { id: s.id, name: s.name, code: s.code, price: 0, currency: "usd", image_url: s.image_attachments.first&.variant(:thumb)&.processed&.url }
         }
 
+        payment_methods = page.branch.payment_method_appointments
+          .includes(:payment_method)
+          .where(lifecycle_status: LIFECYCLE_STATUS.fetch(:active))
+          .reject { |appointment| appointment.payment_method.redirect? }
+          .map { |appointment| { id: appointment.id }.merge(appointment.payment_method.slice(:name, :code, :payment_mode, :strategy)) }
+
         render json: {
           page: format_page(page),
           products: products,
-          services: services
+          services: services,
+          payment_methods: payment_methods
         }
       end
     end

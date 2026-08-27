@@ -10,6 +10,7 @@
 - **Update** `docs/MODEL_CALLBACKS.md` if model/concern callbacks were added or modified
 - **Constants** — All app-wide constants must be in `config/initializers/constants.rb`, never hardcoded inline. See `docs/CONSTANTS.md`.
 - **Client cache** — If any mutation affects data stored in `currentCompany()` (branches, roles, categories, permissions, features, etc.), call `clearClientCacheAndReload()` after the server confirms the change, OR call `clearClientCache()` followed by a page reload.
+- **BE↔FE link** — When you add, remove, or change an endpoint, update the file-header link comments in **both** the BE controller (`Serves Stimulus:`) and the FE Stimulus controller (`Depends on BE:` / `Endpoints:`). See the template in `V1Controller`, `OrdersController`, `PagesController`, `MockQrGatewayController`, `RetailCashierController`. Links are living — remove stale pairs, add new ones per feature.
 
 ## Architecture
 - **Type**: Rails 8+ multi-tenant platform with Hybrid SPA (Stimulus + Tailwind)
@@ -44,6 +45,9 @@
 
 ## Kredis (Cache Store) Rule
 - **Never** use low-level `Kredis.redis` or kredis proxy built-ins (`.value`, `.increment`, ...) in services/controllers/jobs. The owning model wraps them behind domain-named methods (e.g., `Stock#available_count`, `Company#record_credit_usage!`) so the backend can swap Kredis ↔ DB without changing callers. See `docs/KREDIS.md`.
+
+## BE↔FE Documentation
+- Headers are the source of truth for which Stimulus controller calls which BE action. Keep them accurate; delete entries when an endpoint/pair is removed. See `V1Controller`, `OrdersController`, `PagesController`, `MockQrGatewayController`, `RetailCashierController` for the template.
 
 ## Full Guidelines
 See `README.md` for detailed coverage of:

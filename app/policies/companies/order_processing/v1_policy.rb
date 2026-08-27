@@ -8,4 +8,8 @@ class Companies::OrderProcessing::V1Policy < ApplicationPolicy
   def pay?
     record.can?(:update, Order)
   end
+
+  def pay_cancel?
+    record.can?(:update, Order)
+  end
 end

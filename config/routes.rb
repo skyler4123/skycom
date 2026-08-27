@@ -33,7 +33,11 @@ Rails.application.routes.draw do
       resources :products
       resources :brands
       resources :services
-      resources :orders
+      resources :orders do
+        member do
+          get :receipt
+        end
+      end
       resources :transactions
       resources :employees
       resources :stocks
@@ -91,6 +95,7 @@ Rails.application.routes.draw do
 
       post "order_processing/v1/checkout", to: "order_processing/v1#checkout"
       post "order_processing/v1/pay", to: "order_processing/v1#pay"
+      post "order_processing/v1/pay_cancel", to: "order_processing/v1#pay_cancel"
     end
   end
 

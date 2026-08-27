@@ -13,11 +13,15 @@ module Payments
       Rails.application.credentials.mock_qr_webhook_url ||
       "http://192.168.0.100:3000/webhooks/payments/mock_qr_gateway"
 
-    def initialize(amount_cents:, invoice_id:, memo:, transaction_token:, **_args)
+    def initialize(amount_cents:, invoice_id:, memo:, transaction_token:,
+                   merchant_number: nil, merchant_name: nil, merchant_id: nil, **_args)
       @amount_cents = amount_cents
       @invoice_id = invoice_id
       @memo = memo
       @transaction_token = transaction_token
+      @merchant_number = merchant_number
+      @merchant_name = merchant_name
+      @merchant_id = merchant_id
     end
 
     def call
@@ -34,6 +38,9 @@ module Payments
           invoice_id: @invoice_id,
           memo: @memo,
           transaction_token: @transaction_token,
+          merchant_number: @merchant_number,
+          merchant_name: @merchant_name,
+          merchant_id: @merchant_id,
           webhook_url: WEBHOOK_URL
         }
       end

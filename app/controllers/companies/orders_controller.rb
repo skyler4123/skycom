@@ -1,5 +1,10 @@
 # app/controllers/companies/orders_controller.rb
-
+# Companies::OrdersController — CRUD for sales Orders plus POS receipt.
+# Shell-First for index/show/new/edit (format.html empty + format.json hydrated).
+# create/update are HTML redirects; receipt is JSON-only for the retail-cashier panel.
+# Serves Stimulus: Companies_Pages_RetailCashierController#showReceipt (GET receipt),
+#                  Companies_Orders_IndexController (index/show)
+# Endpoint: GET receipt — see config/routes.rb:36 + Helpers.receipt_company_order_path
 class Companies::OrdersController < Companies::ApplicationController
   def index
     respond_to do |format|
@@ -25,6 +30,43 @@ class Companies::OrdersController < Companies::ApplicationController
       format.html { render html: "", layout: true }
       format.json { render json: { order: format_order(order) } }
     end
+  end
+
+  # GET /companies/:company_id/orders/:id/receipt
+  # Tenant-scoped receipt for the POS post-payment panel. Finds the order via
+  # current_company (404 if foreign), then the latest invoice + transaction.
+  # Totals mirror the cart (subtotal from invoice.price_cents or items sum, 10% tax)
+  # so the receipt matches what the cashier displayed. Requires OrdersPolicy#receipt?.
+  def receipt
+    order = current_company.orders.includes(order_appointments: { appoint_to: {} }).find(params[:id])
+    invoice = order.invoices.order(:created_at).last
+    transaction = invoice&.transactions&.order(:created_at)&.last
+
+    items = order.order_appointments.map do |oa|
+      {
+        name: oa.name.presence || oa.appoint_to&.name || "Item",
+        quantity: oa.quantity,
+        unit_price: oa.unit_price.to_f,
+        total_price: oa.total_price.to_f
+      }
+    end
+
+    subtotal = invoice ? invoice.price_cents / 100.0 : items.sum { |i| i[:total_price] }.round(2)
+    tax = (subtotal * 0.10).round(2)
+
+    render json: {
+      receipt: {
+        invoice_code: invoice&.code,
+        issued_at: invoice&.created_at,
+        payment_status: invoice&.payment_status,
+        currency: order.currency,
+        items: items,
+        subtotal: subtotal.round(2),
+        tax: tax,
+        total: (subtotal + tax).round(2),
+        payment_method_name: transaction&.payment_method&.name
+      }
+    }
   end
 
   def new

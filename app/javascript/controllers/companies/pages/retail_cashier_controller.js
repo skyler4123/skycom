@@ -1,16 +1,27 @@
 import { Controller } from "@hotwired/stimulus"
 
 export default class Companies_Pages_RetailCashierController extends Controller {
+  // Retail Cashier POS — Cart (tabs[].items[] in memory) → ORDER → pay → receipt.
+  // Click card → addToCart mutates local cart only; ORDER flushes to Order+OrderAppointment; pay reads DB snapshots.
+  // Depends on BE: Companies::PagesController#retail_cashier (hydrate products/services/payment_methods),
+  //               Companies::OrderProcessing::V1Controller#checkout|pay|pay_cancel,
+  //               Companies::OrdersController#receipt,
+  //               Webhooks::Payments::MockQrGatewayController (QR webhook → WS pos_payment_completed)
+  // Endpoints: Helpers.retail_cashier_company_page_path, order_processing_v1_*_path, receipt_company_order_path
+  // Docs: docs/ORDER_PROCESSING_V1.md
   /** @type {any | null} */ page = null
   /** @type {any[]} */ products = []
   /** @type {any[]} */ services = []
   /** @type {{ id: number, name: string, items: { id: number, name: string, price: number, qty: number, stockId?: string }[] }[]} */ tabs = []
   /** @type {number} */ activeTabIndex = 0
   /** @type {number} */ tabCounter = 0
-  /** @type {string} */ activePaymentMethod = 'cash'
   /** @type {number} */ cashReceived = 0
   /** @type {string | null} */ orderId = null
   /** @type {number} */ orderTotal = 0
+  /** @type {any[]} */ paymentMethods = []
+  /** @type {string | null} */ selectedMethodId = null
+  /** @type {string | null} */ awaitingToken = null
+  /** @type {any | null} */ receipt = null
 
   async connect() {
     const pathParts = window.location.pathname.split("/")
@@ -23,6 +34,8 @@ export default class Companies_Pages_RetailCashierController extends Controller 
       this.page = response.page
       this.products = response.products || []
       this.services = response.services || []
+      this.paymentMethods = response.payment_methods || []
+      this.selectedMethodId = this.paymentMethods[0]?.id || null
 
       this.addTab()
     } catch (error) {
@@ -56,6 +69,7 @@ export default class Companies_Pages_RetailCashierController extends Controller 
     return this.tabs[this.activeTabIndex]
   }
 
+  // Card click → local cart (no API). Locked when orderId exists. Dupe → qty++.
   addToCart(event) {
     if (this.orderId) return
     const { id, name, price, stockId } = event.params
@@ -92,8 +106,16 @@ export default class Companies_Pages_RetailCashierController extends Controller 
   }
 
   setPaymentMethod(event) {
-    this.activePaymentMethod = event.params.method
+    this.selectedMethodId = event.params.methodId
     this.renderContent()
+  }
+
+  getSelectedMethod() {
+    return this.paymentMethods.find(m => m.id === this.selectedMethodId)
+  }
+
+  get isQrMode() {
+    return this.getSelectedMethod()?.payment_mode === 'qr'
   }
 
   updateCashReceived(event) {
@@ -133,6 +155,12 @@ export default class Companies_Pages_RetailCashierController extends Controller 
       })
       this.orderId = res.order_id
       this.orderTotal = res.total_price || 0
+
+      if (this.isQrMode) {
+        await this.pay()
+        return
+      }
+
       this.renderContent()
       toast({ type: 'success', message: res.message || translate('Order created') })
     } catch (error) {
@@ -144,17 +172,75 @@ export default class Companies_Pages_RetailCashierController extends Controller 
     try {
       const res = await fetchJson(Helpers.order_processing_v1_pay_path(this.getCompanyId()), {
         method: 'POST',
-        body: { order_id: this.orderId }
+        body: { order_id: this.orderId, payment_method_appointment_id: this.selectedMethodId }
       })
+
+      if (res.status === 'pending') {
+        this.awaitingToken = res.transaction_token
+        this.subscribePaymentCompleted()
+        this.renderContent()
+        this.renderQrCodeInto(res.qr_string)
+        return
+      }
+
       toast({ type: 'success', message: res.message || translate('Payment completed') })
-      this.activeTab.items = []
-      this.orderId = null
-      this.orderTotal = 0
-      this.cashReceived = 0
-      this.renderContent()
+      await this.showReceipt()
     } catch (error) {
       toast({ type: 'error', message: error.errors?.join(', ') || error.message || translate('Payment failed') })
+      if (this.isQrMode && !this.awaitingToken) this.orderId = null
+      this.renderContent()
     }
+  }
+
+  async showReceipt() {
+    try {
+      const res = await fetchJson(Helpers.receipt_company_order_path(this.getCompanyId(), this.orderId))
+      this.receipt = res.receipt || null
+    } catch (error) {
+      toast({ type: 'error', message: error.errors?.join(', ') || translate('Failed to load receipt') })
+    }
+    this.activeTab.items = []
+    this.cashReceived = 0
+    this.awaitingToken = null
+    this.renderContent()
+  }
+
+  newSale() {
+    this.receipt = null
+    this.orderId = null
+    this.orderTotal = 0
+    this.renderContent()
+  }
+
+  subscribePaymentCompleted() {
+    const ws = window.WEBSOCKET
+    if (!ws?.companyChannel || !ws?.subscribe) return
+    const channel = ws.companyChannel(this.getCompanyId())
+    ws.subscribe(channel, 'pos_payment_completed', (data) => {
+      if (data?.payload?.transaction_token !== this.awaitingToken) return
+      toast({ type: 'success', message: translate('Payment completed') })
+      this.showReceipt()
+    })
+  }
+
+  renderQrCodeInto(qrString) {
+    setTimeout(() => {
+      const container = document.getElementById('cashier-qr-container')
+      if (container && window.renderQrCode) window.renderQrCode(container, qrString)
+    }, 50)
+  }
+
+  async cancelAwaitingPayment() {
+    try {
+      await fetchJson(Helpers.order_processing_v1_pay_cancel_path(this.getCompanyId()), {
+        method: 'POST',
+        body: { transaction_token: this.awaitingToken }
+      })
+    } catch (error) {
+      toast({ type: 'error', message: error.errors?.join(', ') || translate('Cancellation failed') })
+    }
+    this.awaitingToken = null
+    this.cancelOrder()
   }
 
   cancelOrder() {
@@ -447,38 +533,80 @@ export default class Companies_Pages_RetailCashierController extends Controller 
     const subtotal = this.getSubtotal()
     const tax = this.getTax()
     const total = this.getTotal()
+
+    if (this.receipt) {
+      const r = this.receipt
+      return `
+        <div class="p-6 bg-white border-t border-gray-200">
+          <div class="space-y-4">
+            <div class="flex items-center justify-between">
+              <h3 class="text-sm font-black uppercase tracking-widest text-gray-500">${translate("Receipt")}</h3>
+              ${Helpers.statusBadge(r.payment_status)}
+            </div>
+            <div class="text-xs text-gray-500 font-mono">${r.invoice_code || ''}${r.issued_at ? ` · ${new Date(r.issued_at).toLocaleString()}` : ''}</div>
+            <div class="border-t border-dashed border-gray-200 pt-3 space-y-2">
+              ${(r.items || []).map(i => `
+                <div class="flex justify-between text-sm text-gray-700">
+                  <span>${i.quantity} × ${i.name}</span>
+                  <span class="font-bold">$${Number(i.total_price).toFixed(2)}</span>
+                </div>
+              `).join('')}
+            </div>
+            <div class="border-t border-dashed border-gray-200 pt-3 space-y-1.5">
+              <div class="flex justify-between text-sm text-gray-500"><span>${translate("Subtotal")}</span><span>$${Number(r.subtotal).toFixed(2)}</span></div>
+              <div class="flex justify-between text-sm text-gray-500"><span>${translate("Tax (10%)")}</span><span>$${Number(r.tax).toFixed(2)}</span></div>
+              <div class="flex justify-between items-center pt-1">
+                <span class="font-bold text-gray-900">${translate("Total Amount")}</span>
+                <span class="text-xl font-black text-blue-600">$${Number(r.total).toFixed(2)}</span>
+              </div>
+            </div>
+            ${r.payment_method_name ? `<div class="text-xs text-gray-500">${translate("Payment Method")}: <span class="font-bold text-gray-900">${r.payment_method_name}</span></div>` : ''}
+            <button data-action="click->${this.identifier}#newSale"
+              class="w-full bg-blue-600 text-white py-4 rounded-xl text-lg font-black shadow-lg shadow-blue-600/20 hover:brightness-110 active:scale-[0.98] transition-all flex items-center justify-center gap-3 cursor-pointer">
+              <span class="material-symbols-outlined">add_shopping_cart</span>
+              ${translate("New Sale")}
+            </button>
+          </div>
+        </div>
+      `
+    }
+
+    if (this.awaitingToken) {
+      return `
+        <div class="p-6 bg-white border-t border-gray-200">
+          <div class="space-y-4 text-center">
+            <h3 class="text-sm font-bold text-gray-900">${translate("Scan to Pay")}</h3>
+            <p class="text-xs text-gray-500">${translate("Scan the QR code with your banking app to complete the payment.")}</p>
+            <p class="text-2xl font-black text-blue-600">$${total.toFixed(2)}</p>
+            <div class="flex justify-center">
+              <div id="cashier-qr-container" data-transaction-token="${this.awaitingToken}" class="w-56 h-56 bg-white rounded-xl p-3 border border-gray-200 flex items-center justify-center"></div>
+            </div>
+            <div class="flex items-center justify-center gap-2 text-sm text-amber-600">
+              <span class="material-symbols-outlined text-[18px] animate-pulse">hourglass_top</span>
+              ${translate("Waiting for payment confirmation...")}
+            </div>
+            <button data-action="click->${this.identifier}#cancelAwaitingPayment"
+              class="w-full bg-white border-2 border-slate-200 text-slate-700 py-3 rounded-xl font-black hover:bg-slate-50 transition-all cursor-pointer">
+              ${translate("Cancel")}
+            </button>
+          </div>
+        </div>
+      `
+    }
+
+    const icons = { cash: 'payments', qr: 'qr_code_scanner' }
+    const methodButtons = this.paymentMethods.map(m => `
+      <button data-action="click->${this.identifier}#setPaymentMethod"
+        data-${this.identifier}-method-id-param="${m.id}"
+        class="flex flex-1 items-center justify-center gap-2 py-2.5 rounded-lg ${this.selectedMethodId === m.id ? 'bg-white shadow-sm border border-gray-200 text-blue-600 font-bold' : 'text-gray-500 font-medium hover:bg-white/50'} transition-all cursor-pointer">
+        <span class="material-symbols-outlined text-sm">${icons[m.payment_mode] || 'credit_card'}</span>
+        <span class="text-sm">${m.name}</span>
+      </button>
+    `).join('')
+
+    const isCashMode = this.getSelectedMethod()?.payment_mode === 'cash'
     const changeDue = this.getChangeDue()
-
-    return `
-      <div class="p-6 bg-white border-t border-gray-200">
-        <div class="grid grid-cols-2 gap-2 mb-6 p-1 bg-gray-100 rounded-xl border border-gray-200">
-          <button data-action="click->${this.identifier}#setPaymentMethod" data-${this.identifier}-method-param="cash"
-            class="flex items-center justify-center gap-2 py-2.5 rounded-lg ${this.activePaymentMethod === 'cash' ? 'bg-white shadow-sm border border-gray-200 text-blue-600 font-bold' : 'text-gray-500 font-medium hover:bg-white/50'} transition-all cursor-pointer">
-            <span class="material-symbols-outlined text-sm">payments</span>
-            <span class="text-sm">${translate("Cash")}</span>
-          </button>
-          <button data-action="click->${this.identifier}#setPaymentMethod" data-${this.identifier}-method-param="card"
-            class="flex items-center justify-center gap-2 py-2.5 rounded-lg ${this.activePaymentMethod === 'card' ? 'bg-white shadow-sm border border-gray-200 text-blue-600 font-bold' : 'text-gray-500 font-medium hover:bg-white/50'} transition-all cursor-pointer">
-            <span class="material-symbols-outlined text-sm">credit_card</span>
-            <span class="text-sm">${translate("Card")}</span>
-          </button>
-        </div>
-
-        <div class="space-y-3 mb-6">
-          <div class="flex justify-between text-sm text-gray-500">
-            <span>${translate("Subtotal")}</span>
-            <span>$${subtotal.toFixed(2)}</span>
-          </div>
-          <div class="flex justify-between text-sm text-gray-500">
-            <span>${translate("Tax (10%)")}</span>
-            <span>$${tax.toFixed(2)}</span>
-          </div>
-          <div class="flex justify-between items-center pt-2 border-t border-dashed border-gray-200">
-            <span class="font-bold text-gray-900">${translate("Total Amount")}</span>
-            <span class="text-3xl font-black text-blue-600">$${total.toFixed(2)}</span>
-          </div>
-        </div>
-
+    const cashPanel = isCashMode ? `
         <div class="grid grid-cols-2 gap-4 mb-6">
           <div>
             <label class="block text-[10px] uppercase tracking-widest text-gray-500 font-bold mb-1.5">${translate("Received")}</label>
@@ -497,6 +625,30 @@ export default class Companies_Pages_RetailCashierController extends Controller 
             </div>
           </div>
         </div>
+    ` : ''
+
+    return `
+      <div class="p-6 bg-white border-t border-gray-200">
+        <div class="flex gap-2 mb-6 p-1 bg-gray-100 rounded-xl border border-gray-200">
+          ${methodButtons}
+        </div>
+
+        <div class="space-y-3 mb-6">
+          <div class="flex justify-between text-sm text-gray-500">
+            <span>${translate("Subtotal")}</span>
+            <span>$${subtotal.toFixed(2)}</span>
+          </div>
+          <div class="flex justify-between text-sm text-gray-500">
+            <span>${translate("Tax (10%)")}</span>
+            <span>$${tax.toFixed(2)}</span>
+          </div>
+          <div class="flex justify-between items-center pt-2 border-t border-dashed border-gray-200">
+            <span class="font-bold text-gray-900">${translate("Total Amount")}</span>
+            <span class="text-3xl font-black text-blue-600">$${total.toFixed(2)}</span>
+          </div>
+        </div>
+
+        ${cashPanel}
 
         ${this.orderId ? `
           <div class="grid grid-cols-2 gap-3">

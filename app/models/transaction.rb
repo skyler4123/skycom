@@ -1,3 +1,6 @@
+# TODO: Unify transaction_token / gateway_reference naming — column is gateway_reference
+# but API/service layer exposes transaction_token (pay response, pay_cancel, Initiate/Cancel services).
+# Pick one canonical name and migrate the other.
 class Transaction < ApplicationRecord
   include CategoryConcern
   include PropertyMappingConcern

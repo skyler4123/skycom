@@ -3,6 +3,9 @@ import Companies_LayoutController from "controllers/companies/layout_controller"
 // Top-up page — displays the country-based top-up tiers (from CREDIT_RATES)
 // and the company's b2b payment options. Selection UI only; the actual
 // payment flow is future work (handleSubmit is a placeholder).
+// Depends on BE: Companies::TopUpsController#new|mock_qr_gateway (+ mock_redirect),
+//               Webhooks::Payments::MockQrGatewayController (top_up_completed)
+// Endpoints: Helpers.new_company_top_up_path, mock_qr_gateway_company_top_ups_path
 export default class Companies_TopUps_NewController extends Companies_LayoutController {
   static targets = ["tierList"]
 

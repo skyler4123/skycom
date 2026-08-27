@@ -1,6 +1,16 @@
 # frozen_string_literal: true
 
+# Companies::OrderProcessing::V1Controller — POS checkout → pay JSON API.
+# Shell: docs/ORDER_PROCESSING_V1.md
+# - checkout: CheckAvailabilityService + CreateOrderService (no payment yet)
+# - pay: branch-scoped PaymentMethodAppointment → InitiatePaymentService
+#        cash → CompletePaymentService synchronously; QR → gateway → webhook → WS pos_payment_completed
+# - pay_cancel: CancelPaymentService (pending → failed + ReleaseReservedStockService)
+# Serves Stimulus: Companies_Pages_RetailCashierController (checkout via initiateOrder, pay, pay_cancel, receipt fetch)
+#                  Companies_TopUps_NewController (shares MockQrGateway/webhook path, not this controller)
+# Endpoints: POST checkout, POST pay, POST pay_cancel — see config/routes.rb:36 + Helpers.order_processing_v1_*_path
 class Companies::OrderProcessing::V1Controller < Companies::ApplicationController
+  # Creates a pending Order after availability check. Does not touch stock/invoices.
   def checkout
     result = OrderProcessingV1::CheckAvailabilityService.call(items: checkout_params[:items])
 
@@ -19,29 +29,44 @@ class Companies::OrderProcessing::V1Controller < Companies::ApplicationControlle
     render json: order_result.merge(message: "Order created"), status: :created
   end
 
+  # Pays a pending Order via a branch-appointed payment method.
+  # - Validates appointment is branch_level, belongs to order.branch and is active.
+  # - Delegates to InitiatePaymentService: cash completes synchronously via CompletePaymentService,
+  #   QR calls GATEWAY_STRATEGY_CLASSES with merchant identity and leaves txn pending for webhook.
+  # - Rescues InsufficientStockError / InvalidPaymentMethodError → 422.
   def pay
     order = current_company.orders.find(params[:order_id])
+    # Scoped by company_id (not current_company.payment_method_appointments) to avoid
+    # polymorphic has_many ... as: :appoint_to injecting appoint_to_type = 'Company' conflicting with branch_level.
+    appointment = PaymentMethodAppointment.branch_level
+      .find_by!(id: params[:payment_method_appointment_id], company_id: current_company.id)
 
-    items = order.order_appointments.map do |oa|
-      product = oa.appoint_to
-      stock = current_company.stocks.find_by!(product_id: product.id)
-      { stock_id: stock.id, quantity: oa.quantity }
-    end
+    result = OrderProcessingV1::InitiatePaymentService.call(order: order, appointment: appointment)
 
-    OrderProcessingV1::ReserveStockService.call(items: items)
+    # TODO: transaction_token (API) vs gateway_reference (DB) naming mismatch — unify later.
+    payload = { status: result.status, order_id: result.order_id }
+    payload[:transaction_id] = result.transaction_id if result.transaction_id
+    payload[:transaction_token] = result.transaction_token if result.transaction_token
+    payload[:qr_string] = result.qr_string if result.qr_string
+    payload[:message] = result.status == "paid" ? "Payment completed" : "Awaiting QR payment"
 
-    payment_result = OrderProcessingV1::ProcessPaymentService.call(order: order)
-
-    OrderProcessingV1::FinalizeJob.perform_later(order.id)
-
-    render json: {
-      status: "paid",
-      order_id: order.id,
-      transaction_id: payment_result[:transaction_id],
-      message: "Payment completed"
-    }
+    render json: payload
   rescue OrderProcessingV1::InsufficientStockError
     render json: { errors: [ "Insufficient stock for payment" ] }, status: :unprocessable_entity
+  rescue OrderProcessingV1::InvalidPaymentMethodError => e
+    render json: { errors: [ e.message ] }, status: :unprocessable_entity
+  end
+
+  # Cancels an abandoned QR payment. Only a pending Transaction can be cancelled:
+  # releases reserved stock (ReleaseReservedStockService) and marks txn failed.
+  # Returns cancelled / not_pending — never raises for already completed/cancelled txns.
+  # TODO: param transaction_token vs column gateway_reference naming — unify later.
+  def pay_cancel
+    cancelled = OrderProcessingV1::CancelPaymentService.call(
+      transaction_token: params[:transaction_token],
+      company: current_company
+    )
+    render json: { status: cancelled ? "cancelled" : "not_pending", message: "Payment cancelled" }
   end
 
   private

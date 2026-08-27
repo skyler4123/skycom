@@ -259,7 +259,7 @@ Use `window.WEBSOCKET.subscribe()` from any Stimulus controller:
 
 ```javascript
 const channel = WEBSOCKET.companyChannel(currentCompany().id)
-WEBSOCKET.subscribe(channel, "top_up_completed", (resourceId, payload) => {
+WEBSOCKET.subscribe(channel, "top_up_completed", (data) => {
   toast({ type: "success", message: "Top-up successful!" })
   window.location.href = Helpers.company_billing_path(companyId)
 })
@@ -275,12 +275,11 @@ subscribe(channelName, eventKey, callback)
 |-------|------|-------------|
 | `channelName` | String | Target channel (use `companyChannel` or `userChannel` helpers) |
 | `eventKey` | String | Key into `EVENTS` — rejected if unregistered |
-| `callback` | Function | `(resourceId, payload) => {}` — called when an event matches |
+| `callback` | Function | `(data) => {}` — called with the full envelope `{ event, id, payload }` when an event matches |
 
-### The `callback` receives two arguments:
+### The `callback` receives one argument:
 
-1. **`resourceId`** — the `id` field from the envelope (the UUID of the resource)
-2. **`payload`** — the `payload` object from the envelope (everything except `id`)
+The **full envelope object**: `{ event, id, payload }`. Use `data.id` for the resource UUID and `data.payload` for the body.
 
 ### Multiplexing Behavior
 
@@ -348,7 +347,7 @@ WEBSOCKET.publish_event(
 ```javascript
 // In any Stimulus controller:
 const channel = WEBSOCKET.companyChannel(currentCompany().id)
-WEBSOCKET.subscribe(channel, "stock_low", (resourceId, payload) => {
+WEBSOCKET.subscribe(channel, "stock_low", (data) => {
   toast({
     type: "warning",
     message: `Low stock: ${payload.product_name} (${payload.remaining_quantity} left)`
@@ -400,7 +399,7 @@ renderQRWait(response, amountCents, companyId) {
 
   // ── Subscribe to the company channel ──
   const channel = WEBSOCKET.companyChannel(currentCompany().id)
-  WEBSOCKET.subscribe(channel, "top_up_completed", (resourceId, payload) => {
+  WEBSOCKET.subscribe(channel, "top_up_completed", (data) => {
     toast({ type: "success", message: translate("Top-up successful! Redirecting...") })
     setTimeout(() => {
       window.location.href = Helpers.company_billing_path(companyId)

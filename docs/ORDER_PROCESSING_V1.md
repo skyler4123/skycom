@@ -53,24 +53,49 @@ initiateOrder()                  CHECKOUT
 pay()                              PAY
   │
   └── POST /order_processing/v1/pay
-        body: { order_id }
+        body: { order_id, payment_method_appointment_id }
         │
         ▼
     V1Controller#pay
       │
-      ├── ReserveStockService.call(items:)
-      │     └── KRedis DECRBY stock:<id>:available
-      │         ├── success → continues
-      │         └── negative → rollback + InsufficientStockError → 422
+      ├── PaymentMethodAppointment.branch_level.find_by!(id:, company_id:)   ← branch-scoped
       │
-      ├── ProcessPaymentService.call(order:)
-      │     ├── Invoice.create!(workflow_status: :paid)
-      │     ├── Payment.create!(workflow_status: :completed)
-      │     └── Order.update!(workflow_status: :paid)
-      │
-      ├── FinalizeJob.perform_later(order.id)
-      │
-      └── 200 { status: "paid", order_id, payment_id }
+      └── InitiatePaymentService.call(order:, appointment:)
+            │
+            ├── validates: appoint_to == order.branch + lifecycle active
+            ├── ReserveStockService.call(items:)  → { reserved: [...] }
+            │     └── KRedis DECRBY stock:<id>:available
+            ├── Invoice.create! (payment_status: unpaid)
+            ├── Transaction.create!(status: :pending, payment_method_id:,
+            │     gateway_reference: "POS_<hex16>")
+            │
+            ├── CASH mode → CompletePaymentService.call(transaction:)   (synchronous)
+            │     └── txn completed → invoice paid → order paid
+            │
+            └── QR mode → GATEWAY_STRATEGY_CLASSES[strategy] gateway call
+                  │     (merchant_number/name/id from the appointment)
+                  └── txn.gateway_payload = { qr_string }
+                        │
+                        ▼
+              Mock API webhook → Webhooks::Payments::MockQrGatewayController
+                    ├── resolves CompanyTransaction (top-ups) first, else Transaction (POS)
+                    └── CompletePaymentService.call(transaction:)
+                          │
+                          ├── Transaction.update!(status: :completed)
+                          │     └── after_update callback derives Invoice.payment_status
+                          ├── invoice/order workflow_status = :paid
+                          └── WEBSOCKET pos_payment_completed { transaction_token, order_id }
+
+pay_cancel()                       PAY CANCEL (abandoned QR)
+  │
+  └── POST /order_processing/v1/pay_cancel
+        body: { transaction_token }
+        │
+        ▼
+    V1Controller#pay_cancel
+      └── CancelPaymentService.call(transaction_token:, company:)
+            ├── ReleaseReservedStockService.call(order:)   ← restores availability + pending
+            └── Transaction.update!(status: :failed)
 
                                                     ┌─ FinalizeJob#perform(order_id)
                                                     │   (idempotent guards)
@@ -96,6 +121,25 @@ pay()                              PAY
 **File**: `app/javascript/controllers/companies/pages/retail_cashier_controller.js`
 **Class**: `Companies_Pages_RetailCashierController`
 **Extends**: `Controller` (standalone, not layout)
+
+### 3.1 Cart → Order Link (click item to DB)
+
+Clicking a product/service card does **not** hit the backend — it mutates local `tabs[].items[]` only. The DB link is created later by `ORDER`.
+
+```
+Card (renderProductCard) ── data-action="click->...#addToCart" + params {id, name, price, stockId}
+        │
+        ▼ addToCart(event) :64
+        ├── if (this.orderId) return  // locked after checkout
+        ├── existing ? qty++ : push({ id, name, price, qty:1, stockId })
+        └── renderContent() → cart + Subtotal/Tax/Total (client-side)
+        │
+        ▼ initiateOrder() :125 — only here does the cart flush to DB
+        items = activeTab.items.filter(i=>i.stockId).map(i=>({ stock_id, product_id, quantity: i.qty, unit_price: i.price }))
+        POST /order_processing/v1/checkout { branch_id, items } → CreateOrderService
+                └── Order.create! + OrderAppointment.insert_all!({ order_id, appoint_to_type:"Product", quantity, unit_price, total_price: qty*unit_price })
+        pay later reads order.order_appointments.sum(:total_price) — never trusts the click params again.
+```
 
 ### State Machine
 
@@ -124,7 +168,7 @@ State ──► ORDER phase ──► COMPLETE PAYMENT phase ──► back to O
 | Method | Signature | Description |
 |--------|-----------|-------------|
 | `initiateOrder()` | `async ()` | POSTs cart items to `checkout`, sets `orderId`/`orderTotal` from response. Shows toast on success/error. |
-| `pay()` | `async ()` | POSTs `{ order_id }` to `pay`. On success: clears cart, resets state, re-renders. |
+| `pay()` | `async ()` | POSTs `{ order_id, payment_method_appointment_id }` to `pay`. `paid` → clears cart; `pending` → renders QR wait screen + subscribes to `pos_payment_completed`. |
 | `cancelOrder()` | `()` | Resets `orderId`/`orderTotal` to null/0. No API call — unlocks cart locally. |
 
 ### Cart Locking Rules
@@ -193,16 +237,34 @@ params.permit(:branch_id, :customer_id, items: [ :stock_id, :product_id, :quanti
 
 **Params:**
 ```ruby
-params.permit(:order_id)
+params.permit(:order_id, :payment_method_appointment_id)
 ```
 
 **Flow:**
 1. Loads `current_company.orders.find(params[:order_id])` — returns 404 if not found
-2. Maps `order.order_appointments` to items `{ stock_id, quantity }`
-3. Calls `ReserveStockService.call(items:)` — rescues `InsufficientStockError` → 422 `{ error: "Insufficient stock for payment" }`
-4. Calls `ProcessPaymentService.call(order:)` — creates Invoice + Payment, marks Order as paid
-5. Enqueues `FinalizeJob.perform_later(order.id)`
-6. Returns `200 OK` with `{ status: "paid", order_id: "uuid", payment_id: "uuid" }`
+2. Loads the branch-level appointment scoped to `current_company` — 404 if unknown, 422 `{ errors: [...] }` if it belongs to another branch / is inactive
+3. Calls `InitiatePaymentService.call(order:, appointment:)`
+4. Cash → instant completion; QR → gateway call returning `qr_string`; both create Invoice + pending Transaction audit row
+5. Returns `200 OK`:
+   - Cash: `{ status: "paid", order_id, transaction_id, message }`
+   - QR: `{ status: "pending", order_id, transaction_token, qr_string, message }`
+
+### `receipt`
+
+**GET** `/companies/:company_id/orders/:order_id/receipt`
+
+POS receipt payload for the post-payment panel: invoice code, issued_at,
+payment_status, item lines (snapshot name/qty/unit/total), subtotal from
+`invoice.price_cents`, cart-mirrored 10% tax, total, and payment method name.
+404 when the order is unknown or belongs to another company.
+
+### `pay_cancel`
+
+**POST** `/companies/:company_id/order_processing/v1/pay_cancel`
+
+**Params:** `{ transaction_token }`
+
+Cancels an abandoned QR payment: releases reserved stock and marks the pending Transaction `failed`. Returns `{ status: "cancelled" | "not_pending" }`.
 
 ### Error Responses
 
@@ -210,7 +272,8 @@ params.permit(:order_id)
 |----------|--------|------|
 | Insufficient stock (checkout) | 422 | `{ error: "Insufficient stock for item ..." }` |
 | Insufficient stock (pay) | 422 | `{ error: "Insufficient stock for payment" }` |
-| Order not found (pay) | 404 | Rails default 404 |
+| Invalid/inactive/foreign-branch payment method | 422 | `{ errors: ["Payment method is not available for this branch"] }` |
+| Order or appointment not found (pay) | 404 | Rails default 404 |
 
 ---
 
@@ -283,26 +346,43 @@ All services live under `OrderProcessingV1` module and use `self.call(...)` — 
 { order_id: "uuid", total_price: 49.99 }
 ```
 
-### 5.4 `ProcessPaymentService`
+### 5.4 `InitiatePaymentService`
 
-**File**: `app/services/order_processing_v1/process_payment_service.rb`
-**Signature**: `call(order:)`
+**File**: `app/services/order_processing_v1/initiate_payment_service.rb`
+**Signature**: `call(order:, appointment:)`
 
 | Param | Type | Description |
 |-------|------|-------------|
-| `order` | `Order` | The pending Order to process payment for |
+| `order` | `Order` | The pending Order to pay |
+| `appointment` | `PaymentMethodAppointment` | Branch-level appointment (must match `order.branch`, lifecycle active) |
 
 **Behavior:**
-- Creates `Invoice` with `workflow_status: :paid`, `code: "INV-{timestamp}-{random}"`
-- Creates `Payment` with `workflow_status: :completed`, `business_type: :standard_payment`
-- Updates `Order.workflow_status` to `:paid`
+- Validates the appointment (branch scope + active) — raises `InvalidPaymentMethodError`
+- Maps line items → stocks, reserves via `ReserveStockService` (releases on any later failure)
+- Creates `Invoice` (unpaid defaults) + `Transaction` (`status: :pending`, `payment_method_id`, `gateway_reference: "POS_<hex16>"`)
+- **Cash mode** → `CompletePaymentService.call` synchronously; returns `{ status: "paid" }`
+- **QR mode** → resolves `GATEWAY_STRATEGY_CLASSES[strategy]`, invokes the gateway with the appointment's merchant identity, stores `qr_string` in `txn.gateway_payload`; returns `{ status: "pending", qr_string, transaction_token }`
 
-**NOT idempotent:** Calling `pay` twice on the same order creates a duplicate Invoice with `name: "Invoice for Order #{order.id}"` — fails with `ActiveRecord::RecordInvalid` on the uniqueness validation.
+**Returns:** `InitiatePaymentService::Result` struct (`status, order_id, transaction_id, transaction_token, qr_string`)
 
-**Returns:**
-```ruby
-{ payment_id: "uuid" }
-```
+### 5.4b `CompletePaymentService`
+
+**File**: `app/services/order_processing_v1/complete_payment_service.rb`
+**Signature**: `call(transaction:)`
+
+Idempotent — only a **pending** Transaction completes (row-locked):
+1. `txn.update!(status: :completed)` → gated callback derives `Invoice.payment_status`
+2. Invoice + Order `workflow_status = :paid`
+3. Enqueues `FinalizeJob.perform_later(order.id)`
+
+Returns `true` once, `false` afterwards / for non-pending transactions.
+
+### 5.4c `CancelPaymentService` + `ReleaseReservedStockService`
+
+**Files**: `cancel_payment_service.rb`, `release_reserved_stock_service.rb`
+**Signature**: `call(transaction_token:, company:)` / `call(order:)`
+
+Cancel: finds the company's Transaction by token (`find_by!` → 404), releases reservations first (`release_reserved!` per line item), then marks the txn `failed`. Only pending transactions cancel — returns `false` otherwise.
 
 ### 5.5 `WriteStockLedgerService`
 
@@ -384,7 +464,7 @@ All services live under `OrderProcessingV1` module and use `self.call(...)` — 
 4. Calls `UpdateStockBalancesService.call(order:)` — decrements DB stock balances
 5. Calls `FinalizeOrderService.call(order:)` — creates export docs
 
-**Triggered by:** `V1Controller#pay` via `perform_later(order.id)`.
+**Triggered by:** `CompletePaymentService` (cash path synchronously, QR path from the mock-bank webhook).
 
 ---
 
@@ -453,8 +533,8 @@ Finalize ─► UPDATE DB quantity -= qty, pending -= qty
 | `Stock` | `app/models/stock.rb` | Inventory record with `quantity`, `pending`, KRedis `available_counter` |
 | `StockTransaction` | `app/models/stock_transaction.rb` | Ledger entries; `after_create` recalibrates stock metrics |
 | `StockExport` | `app/models/stock_export.rb` | Export documents linked to Order via polymorphic `appoint_for` |
-| `Invoice` | `app/models/invoice.rb` | Payment invoice; created by `ProcessPaymentService` |
-| `Payment` | `app/models/payment.rb` | Payment transaction; created by `ProcessPaymentService` |
+| `Invoice` | `app/models/invoice.rb` | Payment invoice; created by `InitiatePaymentService` (unpaid) |
+| `Transaction` | `app/models/transaction.rb` | Payment audit row (`pending/completed/failed`, `payment_method_id`, `gateway_reference`); created by `InitiatePaymentService`, completed by webhook/cash path |
 
 ---
 
@@ -464,7 +544,8 @@ Finalize ─► UPDATE DB quantity -= qty, pending -= qty
 
 ```ruby
 post "order_processing/v1/checkout", to: "order_processing/v1#checkout"
-post "order_processing/v1/pay",      to: "order_processing/v1#pay"
+post "order_processing/v1/pay",        to: "order_processing/v1#pay"
+post "order_processing/v1/pay_cancel", to: "order_processing/v1#pay_cancel"
 ```
 
 Both are nested inside `resources :companies` (scoped to `/companies/:company_id/`).
@@ -477,6 +558,12 @@ export const order_processing_v1_checkout_path = (companyId) =>
 
 export const order_processing_v1_pay_path = (companyId) =>
   `/companies/${companyId}/order_processing/v1/pay`
+
+export const order_processing_v1_pay_cancel_path = (companyId) =>
+  `/companies/${companyId}/order_processing/v1/pay_cancel`
+
+export const receipt_company_order_path = (companyId, orderId) =>
+  `/companies/${companyId}/orders/${orderId}/receipt`
 ```
 
 ---
@@ -490,7 +577,7 @@ export const order_processing_v1_pay_path = (companyId) =>
 | Controller | `CheckAvailabilityService` returns unavailable | Returns 422 | 422 |
 | Controller | `ReserveStockService` raises `InsufficientStockError` | Rescue in `pay` action | 422 |
 | Controller | Order not found | `find!` raises 404 | 404 |
-| Service | `ProcessPaymentService` double-call | `ActiveRecord::RecordInvalid` (no rescue) | 500 |
+| Service | Gateway failure / invalid appointment | `InitiatePaymentService` raises → rescued in `pay` | 422 |
 | Job | Double execution | Idempotency guards (status check + StockExport check) | N/A |
 
 ### Idempotency Strategy
@@ -500,6 +587,8 @@ export const order_processing_v1_pay_path = (companyId) =>
 | `checkout` | No (creates new Order each call) | Frontend only calls once per order |
 | `pay` (controller) | No | Frontend shows COMPLETE PAYMENT once |
 | `pay` (service) | No | Invoice name uniqueness blocks second call |
+| `pay_cancel` / `CancelPaymentService` | Partial | Only pending transactions cancel; repeats return `not_pending` |
+| Webhook completion (`CompletePaymentService`) | **Yes** | Pending-only guard + row lock; cancelled txns are logged no-ops |
 | `FinalizeJob` | **Yes** | Checks `workflow_status` + `StockExport.exists?` |
 | `FinalizeOrderService` | No | Creates new StockExport each call (guarded by Job) |
 
@@ -512,7 +601,9 @@ export const order_processing_v1_pay_path = (companyId) =>
 | `spec/services/order_processing_v1/check_availability_service_spec.rb` | Basic availability, insufficient stock, string quantity param | 3 products with stock, KRedis counter setup |
 | `spec/services/order_processing_v1/create_order_service_spec.rb` | Single item, multiple items, walk-in customer fallback, string quantity param | Company, branch, 3 products |
 | `spec/services/order_processing_v1/reserve_stock_service_spec.rb` | Successful reservation, insufficient stock (rollback), string quantity param | Stock records with KRedis counter |
-| `spec/services/order_processing_v1/process_payment_service_spec.rb` | Creates invoice + payment, updates order status, double-call raises error | Pending order with order_appointments |
+| `spec/services/order_processing_v1/initiate_payment_service_spec.rb` | Cash instant-complete, QR pending + merchant kwargs, rollback, validation | Branch appointments for cash + mock QR |
+| `spec/services/order_processing_v1/complete_payment_service_spec.rb` | Completes txn, derives invoice paid, idempotency, failed no-op | Pending Transaction on unpaid Invoice |
+| `spec/services/order_processing_v1/cancel_payment_service_spec.rb` (+ release spec) | Cancel fails txn + releases stock, non-pending no-op | Reserved stock + pending transaction |
 | `spec/services/order_processing_v1/write_stock_ledger_service_spec.rb` | Creates stock transactions with correct direction/type | Paid order, stock records per product |
 | `spec/services/order_processing_v1/update_stock_balances_service_spec.rb` | Decrements quantity and pending, multiple items | Paid order with order_appointments |
 | `spec/services/order_processing_v1/finalize_order_service_spec.rb` | Creates stock exports with sale business_type, links to Order via appoint_for | Paid order with order_appointments |

@@ -1,5 +1,13 @@
 # TODO — Undecided / Future Work
 
+## Transaction Token Naming
+
+`Transaction.gateway_reference` (DB column, value e.g. `POS_<hex>`) is exposed as `transaction_token` in the API/service layer (`V1Controller#pay` response, `pay_cancel` param, `InitiatePaymentService::Result`, `CancelPaymentService`). The seam `Transaction.find_by!(gateway_reference: transaction_token, company_id: company.id)` makes the inconsistency explicit. Unify to one canonical name later (rename column or param + migrate callers).
+
+## BE↔FE Controller Link Comments
+
+Expand link headers (Serves Stimulus / Depends on BE) to remaining `Companies::*` controllers + their Stimulus pairs. Follow the template added to `V1Controller`, `OrdersController`, `PagesController`, `MockQrGatewayController`, `RetailCashierController`, and `TopUps::NewController` — file header lists counterpart + endpoints + docs.
+
 ## Payment Method "Configured" Logic
 
 The Banking column on the index page uses `merchant_number || merchant_name || merchant_id` to determine if a payment method is "Configured". This heuristic is not final — it's unclear which of these three fields are truly required vs optional.

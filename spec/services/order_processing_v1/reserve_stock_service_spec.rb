@@ -31,6 +31,14 @@ RSpec.describe OrderProcessingV1::ReserveStockService do
         expect(stock.available_counter.value).to eq(3)
       end
 
+      it "returns the reservation list so callers can roll back later" do
+        result = described_class.call(items: items)
+
+        expect(result[:reserved].length).to eq(1)
+        expect(result[:reserved].first[:qty]).to eq(2)
+        expect(result[:reserved].first[:stock].id).to eq(stock.id)
+      end
+
       it "promises the units in DB by incrementing pending" do
         described_class.call(items: items)
         expect(stock.reload.pending).to eq(2)
