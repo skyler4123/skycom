@@ -2,6 +2,9 @@
 # Companies::OrdersController — CRUD for sales Orders plus POS receipt.
 # Shell-First for index/show/new/edit (format.html empty + format.json hydrated).
 # create/update are HTML redirects; receipt is JSON-only for the retail-cashier panel.
+# Serves Stimulus: Companies_Pages_RetailCashierController#showReceipt (GET receipt),
+#                  Companies_Orders_IndexController (index/show)
+# Endpoint: GET receipt — see config/routes.rb:36 + Helpers.receipt_company_order_path
 class Companies::OrdersController < Companies::ApplicationController
   def index
     respond_to do |format|

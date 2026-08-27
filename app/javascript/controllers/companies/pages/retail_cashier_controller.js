@@ -3,6 +3,12 @@ import { Controller } from "@hotwired/stimulus"
 export default class Companies_Pages_RetailCashierController extends Controller {
   // Retail Cashier POS — Cart (tabs[].items[] in memory) → ORDER → pay → receipt.
   // Click card → addToCart mutates local cart only; ORDER flushes to Order+OrderAppointment; pay reads DB snapshots.
+  // Depends on BE: Companies::PagesController#retail_cashier (hydrate products/services/payment_methods),
+  //               Companies::OrderProcessing::V1Controller#checkout|pay|pay_cancel,
+  //               Companies::OrdersController#receipt,
+  //               Webhooks::Payments::MockQrGatewayController (QR webhook → WS pos_payment_completed)
+  // Endpoints: Helpers.retail_cashier_company_page_path, order_processing_v1_*_path, receipt_company_order_path
+  // Docs: docs/ORDER_PROCESSING_V1.md
   /** @type {any | null} */ page = null
   /** @type {any[]} */ products = []
   /** @type {any[]} */ services = []

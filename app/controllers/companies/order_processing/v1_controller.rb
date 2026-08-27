@@ -6,6 +6,9 @@
 # - pay: branch-scoped PaymentMethodAppointment → InitiatePaymentService
 #        cash → CompletePaymentService synchronously; QR → gateway → webhook → WS pos_payment_completed
 # - pay_cancel: CancelPaymentService (pending → failed + ReleaseReservedStockService)
+# Serves Stimulus: Companies_Pages_RetailCashierController (checkout via initiateOrder, pay, pay_cancel, receipt fetch)
+#                  Companies_TopUps_NewController (shares MockQrGateway/webhook path, not this controller)
+# Endpoints: POST checkout, POST pay, POST pay_cancel — see config/routes.rb:36 + Helpers.order_processing_v1_*_path
 class Companies::OrderProcessing::V1Controller < Companies::ApplicationController
   # Creates a pending Order after availability check. Does not touch stock/invoices.
   def checkout

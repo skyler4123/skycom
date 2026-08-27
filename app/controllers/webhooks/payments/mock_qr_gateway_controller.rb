@@ -5,6 +5,10 @@
 # (CompanyTransaction — wallet top-ups) first, then against POS sales
 # Transactions. Completion side-effects live in the models/services — this
 # controller never touches balances directly.
+# Serves Stimulus: Companies_TopUps_NewController (top_up_completed),
+#                  Companies_Pages_RetailCashierController (pos_payment_completed)
+# Subscribed via: window.WEBSOCKET.subscribe(companyChannel, eventKey, (data) => ...)
+# Docs: docs/WEBSOCKET.md, docs/ORDER_PROCESSING_V1.md
 module Webhooks
   module Payments
     class MockQrGatewayController < ActionController::Base

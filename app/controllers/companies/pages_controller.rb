@@ -2,6 +2,8 @@
 # Companies::PagesController — Operating Pages (Shell-First). Standard CRUD for
 # Page records plus retail_cashier: branch-scoped product/service catalog
 # hydrated for the POS. See docs/OPERATING_PAGES.md, docs/ORDER_PROCESSING_V1.md.
+# Serves Stimulus: Companies_Pages_RetailCashierController (hydrate: products/services/payment_methods)
+# Endpoint: GET retail_cashier — see Helpers.retail_cashier_company_page_path
 class Companies::PagesController < Companies::ApplicationController
   def index
     respond_to do |format|
