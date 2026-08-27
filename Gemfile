@@ -103,4 +103,6 @@ gem "opentelemetry-instrumentation-logger"
 gem "lograge"
 
 gem "cent"
+
+gem "mini_magick"
 # ----------------------------------------------------------------------------------------------------

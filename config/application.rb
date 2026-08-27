@@ -38,5 +38,9 @@ module Skycom
   class Application < Rails::Application
     config.generators.orm :active_record, primary_key_type: :uuid
     config.middleware.insert_before 0, OpentelemetryTenantMiddleware
+
+    # Configures Active Storage to use MiniMagick (ImageMagick) for image processing.
+    # Overrides the Rails default (:vips) to avoid requiring the libvips C-library dependency.
+    config.active_storage.variant_processor = :mini_magick
   end
 end

@@ -1,17 +1,7 @@
 class Stock < ApplicationRecord
-  # NOTE: before_validation callback is registered before PropertyMappingConcern
-  # to preserve callback order (inherit_category_from_product → ensure_property_mapping).
-  # Moving the include above would flip execution order and break stock creation
-  # without an explicit category. See docs/MODEL_STRUCTURE.md §3.
-  before_validation :inherit_category_from_product, on: :create
-
-  include PropertyMappingConcern # rubocop:disable Layout/ClassStructure
-  include TagConcern # rubocop:enable Layout/ClassStructure
-
   attribute :permission_resource_name, :string, default: -> { self.name }
   attribute :quantity, :integer, default: 0
   attribute :pending, :integer, default: 0
-
   # --- Enums ---
   enum :country, COUNTRY_CODES, prefix: true, default: :us
   enum :timezone, TIMEZONES, prefix: true, default: :utc
@@ -24,17 +14,14 @@ class Stock < ApplicationRecord
     finished_good: 2,
     return: 3
   }
-
   monetize :price_cents,
            as: "price",
            with_model_currency: :currency,
            disable_validation: true
-
   # Hot-path availability counter. Business code must go through the wrapper
   # methods below (available_count / reserve_stock! / release_reserved!) —
   # never the kredis proxy directly. See docs/KREDIS.md.
   kredis_counter :available_counter, key: ->(s) { "stock:#{s.id}:available" }
-
   # --- Associations ---
   belongs_to :company
   belongs_to :branch, optional: true
@@ -42,11 +29,19 @@ class Stock < ApplicationRecord
   belongs_to :warehouse
   belongs_to :category
   belongs_to :property_mapping
-
   # --- Validations ---
   validate :category_must_match_product_category
   validates :quantity, :pending, presence: true, numericality: { only_integer: true }
   validates :warehouse_id, uniqueness: { scope: :product_id, message: "already holds a tracking SKU row mapping for this layout" }
+  # NOTE: before_validation callback is registered before PropertyMappingConcern
+  # to preserve callback order (inherit_category_from_product → ensure_property_mapping).
+  # Moving the include above would flip execution order and break stock creation
+  # without an explicit category. See docs/MODEL_STRUCTURE.md §3.
+  before_validation :inherit_category_from_product, on: :create
+
+  include PropertyMappingConcern # rubocop:disable Layout/ClassStructure
+  include TagConcern # rubocop:enable Layout/ClassStructure
+
 
   after_save :sync_available_counter, if: -> { saved_change_to_quantity? || saved_change_to_pending? }
 

@@ -187,13 +187,26 @@ RSpec.describe "Toast message responses", type: :request do
       )
     end
 
+    let!(:cash_payment_method) do
+      PaymentMethod.create!(name: "Cash Toast", code: "TST_CASH", business_type: :b2c,
+        payment_mode: :cash, strategy: :cash, country: company.country)
+    end
+    let!(:cash_appointment) do
+      PaymentMethodAppointment.create!(appoint_to: company, company: company,
+        payment_method: cash_payment_method, name: "Co cash", code: "TST_CO_CASH",
+        business_type: :in_store, lifecycle_status: :active)
+      PaymentMethodAppointment.create!(appoint_to: branch, company: company,
+        payment_method: cash_payment_method, name: "Br cash", code: "TST_BR_CASH",
+        business_type: :in_store, lifecycle_status: :active)
+    end
+
     before do
       stock.send(:sync_available_counter)
     end
 
     it "returns message in pay response" do
       post "/companies/#{company.id}/order_processing/v1/pay",
-        params: { order_id: order.id }, headers: headers
+        params: { order_id: order.id, payment_method_appointment_id: cash_appointment.id }, headers: headers
       expect(response).to have_http_status(:ok)
       body = JSON.parse(response.body)
       expect(body["message"]).to eq("Payment completed")
