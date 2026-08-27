@@ -4,6 +4,7 @@
 # Transaction audit row, then either completes synchronously (cash) or hands
 # off to the configured gateway strategy (QR) using the branch appointment's
 # merchant identity. Any post-reservation failure releases the reservation.
+# TODO: transaction_token (Result/API) vs gateway_reference (Transaction DB column) name mismatch — unify later.
 module OrderProcessingV1
   class InitiatePaymentService
     Result = Struct.new(:status, :order_id, :transaction_id, :transaction_token, :qr_string, keyword_init: true)
@@ -82,7 +83,7 @@ module OrderProcessingV1
         status: :pending,
         business_type: :standard_payment,
         payment_method_id: @appointment.payment_method_id,
-        gateway_reference: "POS_#{SecureRandom.hex(16)}"
+        gateway_reference: "POS_#{SecureRandom.hex(16)}" # TODO: column gateway_reference exposed as transaction_token — unify naming
       )
     end
 

@@ -40,6 +40,7 @@ class Companies::OrderProcessing::V1Controller < Companies::ApplicationControlle
 
     result = OrderProcessingV1::InitiatePaymentService.call(order: order, appointment: appointment)
 
+    # TODO: transaction_token (API) vs gateway_reference (DB) naming mismatch — unify later.
     payload = { status: result.status, order_id: result.order_id }
     payload[:transaction_id] = result.transaction_id if result.transaction_id
     payload[:transaction_token] = result.transaction_token if result.transaction_token
@@ -56,6 +57,7 @@ class Companies::OrderProcessing::V1Controller < Companies::ApplicationControlle
   # Cancels an abandoned QR payment. Only a pending Transaction can be cancelled:
   # releases reserved stock (ReleaseReservedStockService) and marks txn failed.
   # Returns cancelled / not_pending — never raises for already completed/cancelled txns.
+  # TODO: param transaction_token vs column gateway_reference naming — unify later.
   def pay_cancel
     cancelled = OrderProcessingV1::CancelPaymentService.call(
       transaction_token: params[:transaction_token],
