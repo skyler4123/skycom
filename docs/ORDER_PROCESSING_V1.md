@@ -122,6 +122,25 @@ pay_cancel()                       PAY CANCEL (abandoned QR)
 **Class**: `Companies_Pages_RetailCashierController`
 **Extends**: `Controller` (standalone, not layout)
 
+### 3.1 Cart → Order Link (click item to DB)
+
+Clicking a product/service card does **not** hit the backend — it mutates local `tabs[].items[]` only. The DB link is created later by `ORDER`.
+
+```
+Card (renderProductCard) ── data-action="click->...#addToCart" + params {id, name, price, stockId}
+        │
+        ▼ addToCart(event) :64
+        ├── if (this.orderId) return  // locked after checkout
+        ├── existing ? qty++ : push({ id, name, price, qty:1, stockId })
+        └── renderContent() → cart + Subtotal/Tax/Total (client-side)
+        │
+        ▼ initiateOrder() :125 — only here does the cart flush to DB
+        items = activeTab.items.filter(i=>i.stockId).map(i=>({ stock_id, product_id, quantity: i.qty, unit_price: i.price }))
+        POST /order_processing/v1/checkout { branch_id, items } → CreateOrderService
+                └── Order.create! + OrderAppointment.insert_all!({ order_id, appoint_to_type:"Product", quantity, unit_price, total_price: qty*unit_price })
+        pay later reads order.order_appointments.sum(:total_price) — never trusts the click params again.
+```
+
 ### State Machine
 
 The controller implements a two-phase POS flow:

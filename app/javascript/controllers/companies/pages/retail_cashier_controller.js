@@ -1,6 +1,8 @@
 import { Controller } from "@hotwired/stimulus"
 
 export default class Companies_Pages_RetailCashierController extends Controller {
+  // Retail Cashier POS — Cart (tabs[].items[] in memory) → ORDER → pay → receipt.
+  // Click card → addToCart mutates local cart only; ORDER flushes to Order+OrderAppointment; pay reads DB snapshots.
   /** @type {any | null} */ page = null
   /** @type {any[]} */ products = []
   /** @type {any[]} */ services = []
@@ -61,6 +63,7 @@ export default class Companies_Pages_RetailCashierController extends Controller 
     return this.tabs[this.activeTabIndex]
   }
 
+  // Card click → local cart (no API). Locked when orderId exists. Dupe → qty++.
   addToCart(event) {
     if (this.orderId) return
     const { id, name, price, stockId } = event.params
