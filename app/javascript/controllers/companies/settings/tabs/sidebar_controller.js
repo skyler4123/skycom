@@ -1,4 +1,5 @@
 import { Controller } from "@hotwired/stimulus"
+import { currentSettings } from "controllers/helpers/auth_helpers"
 import { SIDEBAR_ITEMS, DEFAULT_SETTINGS_CODE } from "controllers/companies/sidebar_items"
 
 export default class Companies_Settings_Tabs_SidebarController extends Controller {
