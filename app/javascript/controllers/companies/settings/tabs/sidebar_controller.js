@@ -1,6 +1,6 @@
 import { Controller } from "@hotwired/stimulus"
 import { currentSettings } from "controllers/helpers/auth_helpers"
-import { SIDEBAR_ITEMS, DEFAULT_SETTINGS_CODE } from "controllers/companies/sidebar_items"
+import { SIDEBAR_ITEMS, SYSTEM_ITEM_KEYS, DEFAULT_SETTINGS_CODE } from "controllers/companies/sidebar_items"
 
 export default class Companies_Settings_Tabs_SidebarController extends Controller {
   /** @type {Setting | null} */
@@ -58,14 +58,16 @@ export default class Companies_Settings_Tabs_SidebarController extends Controlle
   }
 
   rowHTML(item) {
+    const locked = item.group === "system"
     const checked = item.visible ? 'checked' : ''
     return `
-      <label class="flex items-center justify-between gap-3 px-4 py-3 rounded-lg border border-slate-200 dark:border-slate-700 cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800/50">
+      <label class="flex items-center justify-between gap-3 px-4 py-3 rounded-lg border border-slate-200 dark:border-slate-700 ${locked ? 'bg-slate-50 dark:bg-slate-800/50 cursor-not-allowed' : 'cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800/50'}">
         <span class="flex items-center gap-3 min-w-0">
-          <span class="material-symbols-outlined text-slate-500 dark:text-slate-400">${item.icon}</span>
-          <span class="text-sm font-medium text-slate-900 dark:text-white truncate">${translate(item.label)}</span>
+          <span class="material-symbols-outlined text-slate-500 dark:text-slate-400 shrink-0">${item.icon}</span>
+          <span class="flex-1 text-sm font-medium text-slate-900 dark:text-white truncate">${translate(item.label)}</span>
+          ${locked ? `<span class="shrink-0 text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">${translate("System")}</span>` : ''}
         </span>
-        <input type="checkbox" data-key="${item.key}" ${checked} class="h-4 w-4 rounded border-slate-300 text-blue-600 cursor-pointer" />
+        <input type="checkbox" data-key="${item.key}" ${checked} ${locked ? 'disabled' : ''} class="h-4 w-4 rounded border-slate-300 text-blue-600 shrink-0 ${locked ? 'opacity-50' : 'cursor-pointer'}" />
       </label>
     `
   }
@@ -77,6 +79,7 @@ export default class Companies_Settings_Tabs_SidebarController extends Controlle
     }
 
     const sidebar_items = Array.from(this.element.querySelectorAll('input[type="checkbox"][data-key]'))
+      .filter(cb => !SYSTEM_ITEM_KEYS.has(cb.dataset.key))
       .map(cb => ({ key: cb.dataset.key, visible: cb.checked }))
 
     try {

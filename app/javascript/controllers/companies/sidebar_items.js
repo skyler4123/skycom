@@ -41,14 +41,25 @@ export const SIDEBAR_ITEMS = [
   { key: "settings", group: "system", icon: "settings", label: "Settings", href: (cid) => Helpers.company_settings_path(cid) }
 ]
 
+// System sidebar items (Usage, Top Up, Billing, Settings) are platform-managed:
+// they can never be hidden via company settings.
+export const SYSTEM_ITEM_KEYS = new Set(
+  SIDEBAR_ITEMS.filter(i => i.group === "system").map(i => i.key)
+)
+
 /**
  * Returns the set of sidebar keys the default company setting hides.
  * Absent keys default to visible (the seeded default marks everything visible).
+ * System items are never hidden, even if stale metadata says otherwise.
  * @returns {Set<string>}
  */
 export const hiddenSidebarKeys = () => {
   const settings = currentSettings() || []
   const defaultSetting = settings.find(s => s.code === DEFAULT_SETTINGS_CODE) || settings[0]
   const items = defaultSetting?.metadata?.sidebar_items || []
-  return new Set(items.filter(i => i.visible === false).map(i => i.key))
+  return new Set(
+    items
+      .filter(i => i.visible === false && !SYSTEM_ITEM_KEYS.has(i.key))
+      .map(i => i.key)
+  )
 }

@@ -29,6 +29,7 @@ RSpec.feature "Companies::Settings Management", type: :feature, js: true do
     page.execute_script("localStorage.setItem('client_cache_data', arguments[0])", payload.to_json)
     page.execute_script("localStorage.setItem('client_cache_version', 'forced')")
     page.execute_script("document.cookie = 'client_cache_version=forced; path=/'")
+    page.execute_script("localStorage.setItem('open-cache-sidebar', 'sidebar')")
   end
 
   scenario "shows all sidebar items by default" do
@@ -46,10 +47,9 @@ RSpec.feature "Companies::Settings Management", type: :feature, js: true do
 
     expect(page).to have_content("Sidebar Items", wait: 10)
 
-    products_row = page.find("label", text: "Products")
-    checkbox = products_row.find('input[type="checkbox"]')
-    expect(checkbox).to be_checked
-    checkbox.click
+    products_checkbox = page.find('input[type="checkbox"][data-key="products"]')
+    expect(products_checkbox).to be_checked
+    products_checkbox.click
 
     click_button "Save Changes"
     expect(page).to have_current_path(company_settings_path(company), wait: 10)
@@ -58,5 +58,20 @@ RSpec.feature "Companies::Settings Management", type: :feature, js: true do
       expect(page).to have_content("Dashboard", wait: 10)
       expect(page).not_to have_content("Products")
     end
+  end
+
+  scenario "locks the system sidebar items so they cannot be hidden" do
+    visit company_settings_path(company)
+
+    expect(page).to have_content("Sidebar Items", wait: 10)
+
+    %w[usage top_up billing settings].each do |key|
+      checkbox = page.find("input[type=\"checkbox\"][data-key=\"#{key}\"]")
+      expect(checkbox).to be_checked
+      expect(checkbox).to be_disabled
+    end
+
+    products_checkbox = page.find('input[type="checkbox"][data-key="products"]')
+    expect(products_checkbox).not_to be_disabled
   end
 end
