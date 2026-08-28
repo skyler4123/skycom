@@ -46,6 +46,7 @@ export default class Companies_Services_IndexController extends Companies_Layout
   contentHTML() {
     const categoryFilter = this.servicesCategories()
     const categoryValue = this.categoryIdValue || this.defaultFilterCategory()?.id
+    const branchValue = new URLSearchParams(window.location.search).get('branch_id') || ''
 
     const tableConfig = this.currentTableConfig()
     const propertyMapping = this.currentPropertyMapping()
@@ -85,6 +86,15 @@ export default class Companies_Services_IndexController extends Companies_Layout
                     class="pl-3 pr-10 py-2 text-sm border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300"
                   >
                     ${selectOptionsHTML(cloneNewKey(categoryFilter, "id", "value"), categoryValue)}
+                  </select>
+                </div>
+                <div class="flex flex-col gap-1">
+                  <label class="text-[10px] font-bold text-slate-400 uppercase ml-1">${translate("Branch")}</label>
+                  <select
+                    name="branch_id"
+                    class="pl-3 pr-10 py-2 text-sm border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300"
+                  >
+                    ${selectOptionsHTML(cloneNewKey(currentBranches(), "id", "value"), branchValue, translate("All Branches"))}
                   </select>
                 </div>
                 <div class="flex gap-2 mt-auto">
