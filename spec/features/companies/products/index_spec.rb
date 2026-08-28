@@ -486,6 +486,90 @@ RSpec.feature "Companies::Products Management", type: :feature, js: true do
     end
   end
 
+  # ============================================================================
+  # Branch Filter Tests
+  # ============================================================================
+  describe "branch filter" do
+    let(:branch2) { create(:branch, company: company) }
+
+    let!(:product_branch_a) do
+      create(:product,
+        company: company,
+        branch: branch,
+        category: default_category,
+        property_mapping: default_category.default_property_mapping,
+        name: "Branch A Product #{SecureRandom.hex(4)}",
+        business_type: "physical"
+      )
+    end
+
+    let!(:product_branch_b) do
+      create(:product,
+        company: company,
+        branch: branch2,
+        category: default_category,
+        property_mapping: default_category.default_property_mapping,
+        name: "Branch B Product #{SecureRandom.hex(4)}",
+        business_type: "physical"
+      )
+    end
+
+    before do
+      page.execute_script("localStorage.clear()")
+
+      company_data = JSON.parse(company.to_json).merge(
+        "property_mappings" => company.property_mappings.reset.map { |pm| JSON.parse(pm.to_json) },
+        "table_configs" => company.table_configs.reset.map { |tc| JSON.parse(tc.to_json) },
+        "categories" => company.categories.reset.map { |c| JSON.parse(c.to_json) },
+        "branches" => company.branches.map { |b| JSON.parse(b.to_json) },
+        "departments" => [],
+        "roles" => []
+      )
+
+      payload = {
+        user: JSON.parse(owner.to_json),
+        companies: [ company_data ],
+        enums: {},
+        employees: []
+      }
+
+      page.execute_script("localStorage.setItem('client_cache_data', arguments[0])", payload.to_json)
+      page.execute_script("localStorage.setItem('client_cache_version', 'forced')")
+      page.execute_script("document.cookie = 'client_cache_version=forced; path=/'")
+    end
+
+    scenario "shows branch dropdown with All Branches and branch options" do
+      visit company_products_path(company, category_id: default_category.id)
+
+      expect(page).to have_selector('table', wait: 10)
+      expect(page).to have_selector('select[name="branch_id"]')
+      expect(page).to have_selector('option', text: 'All Branches')
+      expect(page).to have_selector('option', text: branch.name)
+      expect(page).to have_selector('option', text: branch2.name)
+    end
+
+    scenario "defaults to All Branches showing all products" do
+      visit company_products_path(company, category_id: default_category.id)
+
+      expect(page).to have_selector('table', wait: 10)
+      expect(page).to have_content(product_branch_a.name, wait: 5)
+      expect(page).to have_content(product_branch_b.name, wait: 5)
+    end
+
+    scenario "filters by branch and updates URL" do
+      visit company_products_path(company, category_id: default_category.id)
+      expect(page).to have_selector('table', wait: 10)
+
+      select(branch2.name, from: 'branch_id')
+      click_button "Search"
+
+      expect(page).to have_current_path(/branch_id=#{branch2.id}/)
+      expect(page).to have_selector('tbody tr', wait: 10)
+      expect(page).to have_content(product_branch_b.name, wait: 5)
+      expect(page).not_to have_content(product_branch_a.name)
+    end
+  end
+
   describe "client cache invalidation" do
     include_examples "client cache invalidation",
       resource_name: "products"

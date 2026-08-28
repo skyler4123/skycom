@@ -209,7 +209,7 @@ property_mapping: cat.default_property_mapping).tap { |s| s.send(:sync_available
     expect(Order.last.reload.workflow_status).to eq("paid")
 
     page.execute_script(
-      "window.WEBSOCKET.handleIncomingPublication(window.location.pathname.split('/')[2], { event: 'pos_payment.completed', id: 'sim', payload: { transaction_token: arguments[0] } })",
+      "window.WEBSOCKET.handleIncomingPublication(window.location.pathname.split('/')[2], { event: 'pos_payment_completed', id: 'sim', payload: { transaction_token: arguments[0] } })",
       token
     )
 

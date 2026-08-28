@@ -139,7 +139,7 @@ Skycom is a multi-tenant retail ERP with a **usage-based credit** monetization m
 
 ### 2.4 Low-stock alerts
 - **Status**: ⬜ Not started | **Complexity**: S
-- Add a dedicated `min_stock` threshold column (never decremented by the pipeline); red-highlight + optional WS `stock.low` event (`docs/TODO.md` § Low-Stock Alert Threshold)
+- Add a dedicated `min_stock` threshold column (never decremented by the pipeline); red-highlight + optional WS `stock_low` event (`docs/TODO.md` § Low-Stock Alert Threshold)
 
 ### 2.5 Automation engine
 - **Status**: ⬜ Not started | **Complexity**: XL

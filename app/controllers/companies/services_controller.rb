@@ -5,6 +5,7 @@ class Companies::ServicesController < Companies::ApplicationController
       format.json do
         scope = current_company.services
         scope = scope.where(category_id: params[:category_id]) if params[:category_id].present?
+        scope = scope.where(branch_id: params[:branch_id]) if params[:branch_id].present?
 
         @pagy, @services_results = pagy(:offset, scope, jsonapi: true)
 
