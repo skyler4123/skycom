@@ -26,6 +26,7 @@ services:
       - pulse_postgres
       - minio
       - websocket
+      - meilisearch
 
   job:
     build: .
@@ -40,6 +41,7 @@ services:
       - web
       - pulse_postgres
       - websocket
+      - meilisearch
 
   postgres:
     image: postgres:18.3
@@ -138,6 +140,21 @@ services:
       timeout: 5s
       retries: 3
 
+  # Meilisearch Service
+  meilisearch:
+    image: getmeili/meilisearch:v1.53.1
+    ports:
+      - "7700:7700"
+    volumes:
+      - meilisearch_data:/meili_data
+    environment:
+      MEILI_MASTER_KEY: "skycom_master_key_password_2026"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:7700/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
   mock-api:
     image: golang:1.22-alpine
     working_dir: /go/src/app
@@ -161,3 +178,4 @@ volumes:
   redis_data:
   openobserve_data:
   websocket_data:
+  meilisearch_data:

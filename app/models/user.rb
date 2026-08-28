@@ -8,6 +8,7 @@ class User < ApplicationRecord
   include AddressConcern
   include User::OmniauthConcern
   include User::RetailConcern
+  include User::SearchConcern
   EMAIL_VERIFICATION_TOKEN_EXPIRY = 2.days
   PASSWORD_RESET_TOKEN_EXPIRY = 20.minutes
 

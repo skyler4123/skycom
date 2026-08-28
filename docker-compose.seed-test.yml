@@ -24,3 +24,11 @@ services:
     image: valkey/valkey:9.1-alpine
     ports:
       - "6379:6379"
+
+  # Meilisearch Service
+  meilisearch:
+    image: getmeili/meilisearch:v1.53.1
+    ports:
+      - "7700:7700"
+    environment:
+      MEILI_MASTER_KEY: "skycom_master_key_password_2026"
