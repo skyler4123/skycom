@@ -1,6 +1,7 @@
 //  https://fonts.google.com/icons
 
 import { Controller } from "@hotwired/stimulus"
+import { SIDEBAR_ITEMS, hiddenSidebarKeys } from "controllers/companies/sidebar_items"
 
 export default class Companies_LayoutController extends Controller {
   static targets = ["content", "profileDropdown"]
@@ -42,34 +43,8 @@ export default class Companies_LayoutController extends Controller {
   }
 
   sidebarItems() {
-    const cid = currentCompany().id
-    const link = (featureKey, href, icon, label) => {
-      return `
-        <a
-          class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:bg-blue-100 open:text-blue-600"
-          href="${href}"
-          ${openByPathname()}
-        >
-          <span class="material-symbols-outlined">${icon}</span>
-          <p class="text-sm font-medium leading-normal">${label}</p>
-        </a>
-      `
-    }
-
-    // Placeholder entry for a not-yet-built page — muted, inert, explains itself.
-    const placeholderLink = (icon, label) => {
-      return `
-        <a
-          class="flex items-center gap-3 px-3 py-2 rounded-lg text-slate-400 dark:text-slate-600 cursor-not-allowed"
-          href="#"
-          aria-disabled="true"
-          ${tooltip(translate("Coming soon"))}
-        >
-          <span class="material-symbols-outlined">${icon}</span>
-          <p class="text-sm font-medium leading-normal">${label}</p>
-        </a>
-      `
-    }
+    const hidden = hiddenSidebarKeys()
+    const visible = SIDEBAR_ITEMS.filter(item => !hidden.has(item.key))
 
     const sectionHeading = (label) => `
       <p class="px-3 pt-1 pb-2 text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">${label}</p>
@@ -84,44 +59,22 @@ export default class Companies_LayoutController extends Controller {
       </div>
     `
 
-    const companyItems = [
-      link(null, Helpers.company_dashboards_path(cid), 'dashboard', translate('Dashboard')),
-      link('multi_branch', Helpers.company_branches_path(cid), 'apartment', translate('Branches')),
-      link(null, Helpers.company_departments_path(cid), 'family_group', translate('Departments')),
-      link(null, Helpers.company_categories_path(cid), 'category', translate('Categories')),
-      link(null, Helpers.company_property_mappings_path(cid), 'settings_applications', translate('Dynamic Properties')),
-      link(null, Helpers.company_table_configs_path(cid), 'table', translate('Dynamic Tables')),
-      link('inventory_basic', Helpers.company_products_path(cid), 'inventory_2', translate('Products')),
-      link('inventory_basic', Helpers.company_brands_path(cid), 'diamond', translate('Brands')),
-      link('inventory_basic', Helpers.company_services_path(cid), 'concierge', translate('Services')),
-      link('pos_basic', Helpers.company_orders_path(cid), 'order_approve', translate('Orders')),
-      link('hrm_attendance', Helpers.company_employees_path(cid), 'groups', translate('Employees')),
-      link('hrm_attendance', Helpers.company_shift_templates_path(cid), 'schedule', translate('Shift Templates')),
-      link('hrm_attendance', Helpers.company_scheduled_shifts_path(cid), 'calendar_month', translate('Shifts')),
-      link('hrm_attendance', Helpers.company_attendance_days_path(cid), 'badge', translate('Attendance Days')),
-      link('hrm_attendance', Helpers.company_attendance_policies_path(cid), 'gps_fixed', translate('Attendance Policies')),
-      link('hrm_attendance', Helpers.company_attendance_logs_path(cid), 'receipt_long', translate('Attendance Logs')),
-      link('hrm_attendance', Helpers.company_attendance_months_path(cid), 'calendar_view_month', translate('Attendance Months')),
-      link('inventory_basic', Helpers.company_stocks_path(cid), 'inventory', translate('Stocks')),
-      link('inventory_advanced', Helpers.company_stock_transfers_path(cid), 'swap_horiz', translate('Stock Transfers')),
-      link('inventory_basic', Helpers.company_stock_imports_path(cid), 'download', translate('Stock Imports')),
-      link('inventory_basic', Helpers.company_stock_exports_path(cid), 'upload', translate('Stock Exports')),
-      link('crm_basic', Helpers.company_customers_path(cid), 'person_add', translate('Customers')),
-      link('finance_basic', Helpers.company_invoices_path(cid), 'receipt_long', translate('Invoices')),
-      link('custom_roles', Helpers.company_policies_path(cid), 'security', translate('Policies')),
-      link(null, Helpers.company_pages_path(cid), 'description', translate('Pages')),
-      link(null, Helpers.company_payment_method_appointments_path(cid), 'payments', translate('Payment Methods')),
-      link('custom_roles', Helpers.company_permissions_path(cid), 'shield', translate('Permissions')),
-      link('analytics_dashboard', Helpers.company_analytics_path(cid), 'insights', translate('Analytics')),
-      link(null, Helpers.company_facilities_path(cid), 'warehouse', translate('Facilities')),
-    ]
+    const linkHTML = (item) => {
+      const cid = currentCompany().id
+      return `
+        <a
+          class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:bg-blue-100 open:text-blue-600"
+          href="${item.href(cid)}"
+          ${openByPathname()}
+        >
+          <span class="material-symbols-outlined">${item.icon}</span>
+          <p class="text-sm font-medium leading-normal">${translate(item.label)}</p>
+        </a>
+      `
+    }
 
-    const systemItems = [
-      link(null, Helpers.company_usage_path(cid), 'monitoring', translate('Usage')),
-      link(null, Helpers.new_company_top_up_path(cid), 'account_balance_wallet', translate('Top Up')),
-      link(null, Helpers.company_billing_path(cid), 'receipt_long', translate('Billing')),
-      placeholderLink('settings', translate('Settings')),
-    ]
+    const companyItems = visible.filter(i => i.group === "company").map(linkHTML)
+    const systemItems  = visible.filter(i => i.group === "system").map(linkHTML)
 
     return [
       group("company", companyItems),
