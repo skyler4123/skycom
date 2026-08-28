@@ -15,7 +15,8 @@ class ClientCacheController < ApplicationController
               roles:             {},
               categories:        {},
               property_mappings: {},
-              table_configs:     {}
+              table_configs:     {},
+              settings:          {}
             },
             methods: [ :resource_names ]
           ),
