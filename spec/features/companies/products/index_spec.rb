@@ -142,7 +142,7 @@ RSpec.feature "Companies::Products Management", type: :feature, js: true do
         name: "Supplements",
         resource_name: "products",
         properties: {
-          "property_text_1" => "Benefits",
+          "property_string_3" => "Benefits",
           "property_decimal_1" => "Potency %",
           "property_datetime_1" => "Expiry Date"
         }
@@ -179,7 +179,7 @@ RSpec.feature "Companies::Products Management", type: :feature, js: true do
         metadata: { "columns" => [
           { "key" => "name", "name" => "Product Name", "visible" => true, "sortable" => true, "align" => "left", "pinned" => nil, "width" => nil, "roles" => [], "is_virtual" => false, "render_config" => {} },
           { "key" => "code", "name" => "Code", "visible" => true, "sortable" => true, "align" => "left", "pinned" => nil, "width" => nil, "roles" => [], "is_virtual" => false, "render_config" => {} },
-          { "key" => "property_text_1", "name" => "Benefits", "visible" => true, "sortable" => true, "align" => "left", "pinned" => nil, "width" => nil, "roles" => [], "is_virtual" => false, "render_config" => {} },
+          { "key" => "property_string_3", "name" => "Benefits", "visible" => true, "sortable" => true, "align" => "left", "pinned" => nil, "width" => nil, "roles" => [], "is_virtual" => false, "render_config" => {} },
           { "key" => "property_decimal_1", "name" => "Potency %", "visible" => true, "sortable" => true, "align" => "right", "pinned" => nil, "width" => nil, "roles" => [], "is_virtual" => false, "render_config" => {} },
           { "key" => "property_datetime_1", "name" => "Expiry Date", "visible" => true, "sortable" => true, "align" => "center", "pinned" => nil, "width" => nil, "roles" => [], "is_virtual" => false, "render_config" => {} },
           { "key" => "workflow_status", "name" => "Status", "visible" => true, "sortable" => true, "align" => "center", "pinned" => nil, "width" => nil, "roles" => [], "is_virtual" => false, "render_config" => {} }
@@ -355,16 +355,16 @@ RSpec.feature "Companies::Products Management", type: :feature, js: true do
     end
 
     # =========================================================================
-    # SCENARIO 7: Text property renders
+    # SCENARIO 7: String property renders
     # =========================================================================
-    scenario "text property displays" do
+    scenario "string property displays" do
       visit company_products_path(company, category_id: category_supplements.id)
       expect(page).to have_selector('table', wait: 10)
 
       first_product = products_supplements.first
-      expect(first_product.property_text_1).to be_present
+      expect(first_product.property_string_3).to be_present
 
-      text_preview = first_product.property_text_1[0, 50]
+      text_preview = first_product.property_string_3[0, 50]
       expect(page).to have_content(text_preview, wait: 10)
     end
 

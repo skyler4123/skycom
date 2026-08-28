@@ -23,7 +23,7 @@ RSpec.describe DynamicValidationConcern do
         "validates" => { "numericality" => { "greater_than_or_equal_to" => 0 } } },
       { "key" => "property_boolean_1", "type" => "boolean", "name" => "Active",
         "validates" => { "inclusion" => { "in" => [ true, false ] } } },
-      { "key" => "property_text_1", "type" => "text", "name" => "Notes",
+      { "key" => "property_string_3", "type" => "string", "name" => "Notes",
         "validates" => {} },
       { "key" => "property_decimal_2", "type" => "decimal", "name" => "Discount",
         "validates" => { "numericality" => { "only_integer" => true, "greater_than_or_equal_to" => 0, "less_than_or_equal_to" => 100 } } }
@@ -37,7 +37,7 @@ RSpec.describe DynamicValidationConcern do
     product.property_decimal_1 = 5.0
     product.property_decimal_2 = 3
     product.property_boolean_1 = true
-    product.property_text_1 = "notes"
+    product.property_string_3 = "notes"
   end
 
   describe "presence" do
@@ -157,9 +157,9 @@ RSpec.describe DynamicValidationConcern do
 
   describe "empty validates hash" do
     it "skips validation for entries with {} validates" do
-      product.property_text_1 = ""
+      product.property_string_3 = ""
       product.valid?
-      expect(product.errors[:property_text_1]).to be_blank
+      expect(product.errors[:property_string_3]).to be_blank
     end
   end
 

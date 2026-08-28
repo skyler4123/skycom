@@ -93,7 +93,6 @@ class Seed::PropertyPopulator
       when "boolean" then [ true, false ].sample
       when "decimal" then rand(1.0..500.0).round(2)
       when "datetime" then Faker::Time.between(from: 2.years.ago, to: 2.years.from_now)
-      when "text"    then Faker::Lorem.paragraph(sentence_count: 3)
       end
     end
   end

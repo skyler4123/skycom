@@ -80,7 +80,6 @@ class Companies::ServicesController < Companies::ApplicationController
 
   def property_keys
     (1..10).map { |i| "property_string_#{i}" } +
-      (1..5).map { |i| "property_text_#{i}" } +
       (1..20).map { |i| "property_integer_#{i}" } +
       (1..10).map { |i| "property_decimal_#{i}" } +
       (1..10).map { |i| "property_boolean_#{i}" } +
@@ -106,7 +105,6 @@ class Companies::ServicesController < Companies::ApplicationController
       :created_at, :updated_at,
       :property_string_1, :property_string_2, :property_string_3, :property_string_4, :property_string_5,
       :property_string_6, :property_string_7, :property_string_8, :property_string_9, :property_string_10,
-      :property_text_1, :property_text_2, :property_text_3, :property_text_4, :property_text_5,
       :property_integer_1, :property_integer_2, :property_integer_3, :property_integer_4, :property_integer_5,
       :property_integer_6, :property_integer_7, :property_integer_8, :property_integer_9, :property_integer_10,
       :property_integer_11, :property_integer_12, :property_integer_13, :property_integer_14, :property_integer_15,

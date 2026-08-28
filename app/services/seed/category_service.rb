@@ -2,7 +2,6 @@ class Seed::CategoryService
   PROPERTY_SLOT_KEYS = %w[
     property_string_1 property_string_2 property_string_3 property_string_4 property_string_5
     property_string_6 property_string_7 property_string_8 property_string_9 property_string_10
-    property_text_1 property_text_2 property_text_3 property_text_4 property_text_5
     property_integer_1 property_integer_2 property_integer_3 property_integer_4 property_integer_5
     property_integer_6 property_integer_7 property_integer_8 property_integer_9 property_integer_10
     property_integer_11 property_integer_12 property_integer_13 property_integer_14 property_integer_15
@@ -16,7 +15,6 @@ class Seed::CategoryService
   ].freeze
 
   STRING_LABELS = %w[SKU Brand Color Size Material Category Origin Scent Grade Variant Model Type Label]
-  TEXT_LABELS = %w[Description Notes Instructions Ingredients Warnings Summary Details Specifications]
   INTEGER_LABELS = [ "Quantity", "Units per Box", "Shelf Number", "Min Stock", "Reorder Point",
                      "Max Capacity", "Lead Time", "Page Count", "Slot Number", "Priority" ]
   DECIMAL_LABELS = [ "Weight (kg)", "Unit Price", "Discount %", "Tax Rate", "Rating",
@@ -109,7 +107,6 @@ class Seed::CategoryService
   def self.label_for(column)
     case column
     when /^property_string_/   then STRING_LABELS.sample
-    when /^property_text_/     then TEXT_LABELS.sample
     when /^property_integer_/  then INTEGER_LABELS.sample
     when /^property_decimal_/  then DECIMAL_LABELS.sample
     when /^property_boolean_/  then BOOLEAN_LABELS.sample

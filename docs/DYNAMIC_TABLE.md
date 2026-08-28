@@ -10,7 +10,7 @@
 
 ```
 ProductsController#index
-  └─ format_product() — emits all 55 property_* columns + category_id
+  └─ format_product() — emits all 60 property_* columns + category_id
         │
         ▼
   ClientCache (localStorage)
@@ -91,7 +91,7 @@ The `name` value from `TableConfig.columns_metadata[].name` is used directly as 
 | `boolean` | Badge — `Yes` (emerald) / `No` (slate) |
 | `integer` | Locale-formatted number (`1,234`) |
 | `decimal` | 2 decimal places, blue (`1,234.00`) |
-| `text` / `string` / default | Raw value, or `—` for null |
+| `string` / default | Raw value, or `—` for null |
 | `name` key | Icon + name layout |
 | `code` key | Monospace badge |
 | `workflow_status` key | `Helpers.statusBadge()` |
@@ -148,8 +148,6 @@ renderField({ key, name, type }) {
       return `<input type="number" name="product[${key}]" step="${type === 'decimal' ? '0.01' : '1'}">`
     case 'datetime':
       return `<input type="datetime-local" name="product[${key}]">`
-    case 'text':
-      return `<textarea name="product[${key}]" rows="3"></textarea>`
     default:
       return `<input type="text" name="product[${key}]">`
   }
@@ -287,11 +285,11 @@ end
    - `productsCategories()` / `defaultFilterCategory()` helpers
 
 2. **NewModalController** — `extends Controller`, implement:
-   - `renderField({ key, name, type })` for all 6 types
+   - `renderField({ key, name, type })` for all 5 types
    - `handleSubmit()` with `fetchJson` + `reloadThenToast`
 
 3. **ShowModalController** — `extends Controller`, implement:
-   - `formatDisplayValue(value, type)` for all 6 types
+   - `formatDisplayValue(value, type)` for all 5 types
    - Dynamic `Helpers.editable()` fields from `propertyMetadata`
 
 4. **LayoutController** — register in sidebar navigation.
