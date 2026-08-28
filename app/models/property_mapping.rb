@@ -42,7 +42,7 @@
 #   key:        String  — The resource column this config describes
 #                        (e.g. "property_string_1"). Required.
 #   name:       String  — Human-readable display name. Required.
-#   type:       String  — One of: string, text, integer, decimal, boolean,
+#   type:       String  — One of: string, integer, decimal, boolean,
 #                        datetime. Derivable from the key prefix.
 #   validates:  Hash    — Validation rules (future use, currently {}).
 
@@ -52,7 +52,6 @@ class PropertyMapping < ApplicationRecord
   # Allowed metadata keys per property type in #property_metadata.
   SUPPORTED_KEYS = {
     property_string:  %w[input_type placeholder suffix prefix default].freeze,
-    property_text:    %w[input_type placeholder default].freeze,
     property_integer: %w[input_type placeholder suffix prefix default min max options].freeze,
     property_decimal: %w[input_type placeholder suffix prefix default currency precision].freeze,
     property_boolean: %w[input_type placeholder suffix prefix default true_label false_label].freeze,
@@ -62,7 +61,6 @@ class PropertyMapping < ApplicationRecord
   # Allowed input_type values per property type.
   VALID_INPUT_TYPES = {
     property_string:  %w[text].freeze,
-    property_text:    %w[textarea].freeze,
     property_integer: %w[select progress_bar slider star].freeze,
     property_decimal: %w[currency number percentage].freeze,
     property_boolean: %w[toggle].freeze,

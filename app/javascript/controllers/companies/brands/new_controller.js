@@ -62,14 +62,6 @@ export default class Companies_Brands_NewController extends Companies_LayoutCont
               class="${baseClass}">
           </div>
         `
-      case 'text':
-        return `
-          <div class="space-y-1">
-            <label class="text-[10px] font-bold text-slate-400 dark:text-slate-300 uppercase tracking-wider">${label}</label>
-            <textarea name="brand[${key}]" rows="3" placeholder="${label}"
-              class="${baseClass}"></textarea>
-          </div>
-        `
       default:
         return `
           <div class="space-y-1">

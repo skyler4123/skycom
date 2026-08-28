@@ -57,7 +57,7 @@ When a Property Mapping is created via `Seed::CategoryService`, it seeds type-ap
 | `integer` | `{ "numericality" => { "only_integer" => true, "greater_than_or_equal_to" => 0 } }` |
 | `decimal` | `{ "numericality" => { "greater_than_or_equal_to" => 0 } }` |
 | `boolean` | `{ "inclusion" => { "in" => [true, false] } }` |
-| `text` / `datetime` | `{}` (no validation) |
+| `datetime` | `{}` (no validation) |
 
 ## 6. File Reference
 

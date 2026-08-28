@@ -70,14 +70,6 @@ export default class Companies_Employees_EditController extends Companies_Layout
               class="${baseClass}">
           </div>
         `
-      case 'text':
-        return `
-          <div class="space-y-1">
-            <label class="text-[10px] font-bold text-slate-400 dark:text-slate-300 uppercase tracking-wider">${label}</label>
-            <textarea name="employee[${key}]" rows="3"
-              class="${baseClass}">${value ?? ''}</textarea>
-          </div>
-        `
       default:
         return `
           <div class="space-y-1">

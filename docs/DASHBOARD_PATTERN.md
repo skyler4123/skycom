@@ -126,7 +126,6 @@ class Companies::ProductsController < Companies::ApplicationController
       :created_at, :updated_at,
       # Include ALL property_* columns for the frontend
       :property_string_1, :property_string_2, # ... through 10
-      :property_text_1, :property_text_2,      # ... through 5
       :property_integer_1, :property_integer_2, # ... through 20
       :property_decimal_1, :property_decimal_2, # ... through 10
       :property_boolean_1, :property_boolean_2, # ... through 10
@@ -139,7 +138,6 @@ class Companies::ProductsController < Companies::ApplicationController
   # Strong params must permit all property_* columns
   def product_params
     property_keys = (1..10).map { |i| "property_string_#{i}" } +
-                    (1..5).map { |i| "property_text_#{i}" } +
                     (1..20).map { |i| "property_integer_#{i}" } +
                     (1..10).map { |i| "property_decimal_#{i}" } +
                     (1..10).map { |i| "property_boolean_#{i}" } +
@@ -419,8 +417,6 @@ export default class Companies_Products_NewController extends Companies_LayoutCo
         return `<input type="number" step="0.01" name="product[${key}]" placeholder="${label}" class="...">`
       case 'datetime':
         return `<input type="datetime-local" name="product[${key}]" class="...">`
-      case 'text':
-        return `<textarea name="product[${key}]" rows="3" placeholder="${label}" class="..."></textarea>`
       default:
         return `<input type="text" name="product[${key}]" placeholder="${label}" class="...">`
     }
@@ -509,7 +505,7 @@ export default class Companies_Products_NewController extends Companies_LayoutCo
 | `data-turbo="false"` | Disables Turbo — full page POST |
 | `name="resource[field]"` | Bracket notation for Rails Strong Params |
 | `onCategoryChange()` | Client-side swap of dynamic property fields |
-| `renderField({ key, label, type })` | Type-aware input rendering (6 types) |
+| `renderField({ key, label, type })` | Type-aware input rendering (5 types) |
 | Server redirects | Success → show page; Error → new page with flash |
 
 ---
@@ -761,9 +757,6 @@ export default class Companies_Products_EditController extends Companies_LayoutC
               case 'datetime':
                 inputHTML = `<input type="datetime-local" name="product[${field.key}]" value="${value ?? ''}" class="...">`
                 break
-              case 'text':
-                inputHTML = `<textarea name="product[${field.key}]" rows="3" class="...">${value ?? ''}</textarea>`
-                break
               default:
                 inputHTML = `<input type="text" name="product[${field.key}]" value="${value ?? ''}" class="...">`
             }
@@ -922,7 +915,7 @@ end
 
 ### Example: PropertyMapping Slot Picker
 
-The PropertyMapping edit page exposes all 65 available property slots (10 string, 5 text, 20 integer, 10 decimal, 10 boolean, 10 datetime). Used slots are filtered out. The "Add Property" dropdown shows only unused slots:
+The PropertyMapping edit page exposes all 60 available property slots (10 string, 20 integer, 10 decimal, 10 boolean, 10 datetime). Used slots are filtered out. The "Add Property" dropdown shows only unused slots:
 
 ```javascript
 allPropertySlots() {

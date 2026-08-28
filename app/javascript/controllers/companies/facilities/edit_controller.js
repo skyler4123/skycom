@@ -73,9 +73,6 @@ export default class Companies_Facilities_EditController extends Companies_Layou
               case 'datetime':
                 inputHTML = `<input type="datetime-local" name="facility[${field.key}]" value="${value ?? ''}" class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-sm">`
                 break
-              case 'text':
-                inputHTML = `<textarea name="facility[${field.key}]" rows="3" class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-sm">${value ?? ''}</textarea>`
-                break
               default:
                 inputHTML = `<input type="text" name="facility[${field.key}]" value="${value ?? ''}" class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-sm">`
             }

@@ -72,9 +72,6 @@ export default class Companies_Departments_EditController extends Companies_Layo
               case 'datetime':
                 inputHTML = `<input type="datetime-local" name="department[${field.key}]" value="${value ?? ''}" class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-sm">`
                 break
-              case 'text':
-                inputHTML = `<textarea name="department[${field.key}]" rows="3" class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-sm">${value ?? ''}</textarea>`
-                break
               default:
                 inputHTML = `<input type="text" name="department[${field.key}]" value="${value ?? ''}" class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-sm">`
             }

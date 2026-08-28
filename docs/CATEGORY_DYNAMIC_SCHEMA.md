@@ -274,7 +274,6 @@ Category can define schemas for these resources (via `resource_name`):
 | Property Metadatas Entry Key | Resource Column | Type in Resource |
 |------------------------------|-----------------|------------------|
 | `"key": "property_string_1"` | `property_string_1` | `t.string` |
-| `"key": "property_text_1"` | `property_text_1` | `t.text` |
 | `"key": "property_integer_1"` | `property_integer_1` | `t.integer` |
 | `"key": "property_decimal_1"` | `property_decimal_1` | `t.decimal(15,4)` |
 | `"key": "property_boolean_1"` | `property_boolean_1` | `t.boolean` |
@@ -287,7 +286,7 @@ Each element in `property_metadata` is a Hash with these keys:
 | Key | Type | Description |
 |-----|------|-------------|
 | `key` | String | The resource column this config describes (e.g. `"property_string_1"`). Required. |
-| `type` | String | Data type: `string`, `text`, `integer`, `decimal`, `boolean`, or `datetime`. Derivable from the key prefix. |
+| `type` | String | Data type: `string`, `integer`, `decimal`, `boolean`, or `datetime`. Derivable from the key prefix. |
 | `name` | String | Human-readable display name. Required. |
 | `validates` | Hash | Validation rules (future use, currently `{}`). |
 
@@ -296,7 +295,6 @@ Each element in `property_metadata` is a Hash with these keys:
 | Type | Slots Available | Example Keys |
 |------|----------------|--------------|
 | String | 10 | `property_string_1` through `property_string_10` |
-| Text | 5 | `property_text_1` through `property_text_5` |
 | Integer | 20 | `property_integer_1` through `property_integer_20` |
 | Decimal | 10 | `property_decimal_1` through `property_decimal_10` |
 | Boolean | 10 | `property_boolean_1` through `property_boolean_10` |
