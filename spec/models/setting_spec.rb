@@ -59,12 +59,14 @@ RSpec.describe Setting, type: :model do
         lifecycle_status: :active, workflow_status: :confirmed, business_type: :system
       )
       branch = create(:branch, company: company)
-      described_class.create!(
+      branch_setting = described_class.create!(
         company: company, appoint_to: branch, code: "BRANCH",
         lifecycle_status: :active, workflow_status: :confirmed, business_type: :system
       )
 
-      expect(described_class.company_level).to match_array([ company_setting ])
+      expect(described_class.company_level).to include(company_setting)
+      expect(described_class.company_level).not_to include(branch_setting)
+      expect(described_class.company_level.map(&:appoint_to_type)).to all(eq("Company"))
     end
   end
 end
