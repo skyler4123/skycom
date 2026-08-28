@@ -4577,12 +4577,16 @@ ActiveRecord::Schema[8.0].define(version: 2026_08_18_000108) do
   end
 
   create_table "settings", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
-    t.uuid "setting_group_id", null: false
+    t.uuid "setting_group_id"
     t.uuid "company_id", null: false
-    t.uuid "branch_id"
-    t.uuid "category_id", null: false
-    t.uuid "property_mapping_id", null: false
-    t.json "content"
+    t.string "appoint_from_type"
+    t.uuid "appoint_from_id"
+    t.string "appoint_to_type", null: false
+    t.uuid "appoint_to_id", null: false
+    t.string "appoint_for_type"
+    t.uuid "appoint_for_id"
+    t.string "appoint_by_type"
+    t.uuid "appoint_by_id"
     t.string "name"
     t.string "description"
     t.string "code"
@@ -4595,13 +4599,14 @@ ActiveRecord::Schema[8.0].define(version: 2026_08_18_000108) do
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["branch_id"], name: "index_settings_on_branch_id"
+    t.index ["appoint_by_type", "appoint_by_id"], name: "index_settings_on_appoint_by"
+    t.index ["appoint_for_type", "appoint_for_id"], name: "index_settings_on_appoint_for"
+    t.index ["appoint_from_type", "appoint_from_id"], name: "index_settings_on_appoint_from"
+    t.index ["appoint_to_type", "appoint_to_id"], name: "index_settings_on_appoint_to"
     t.index ["business_type"], name: "index_settings_on_business_type"
-    t.index ["category_id"], name: "index_settings_on_category_id"
     t.index ["company_id"], name: "index_settings_on_company_id"
     t.index ["discarded_at"], name: "index_settings_on_discarded_at"
     t.index ["lifecycle_status"], name: "index_settings_on_lifecycle_status"
-    t.index ["property_mapping_id"], name: "index_settings_on_property_mapping_id"
     t.index ["setting_group_id"], name: "index_settings_on_setting_group_id"
     t.index ["workflow_status"], name: "index_settings_on_workflow_status"
   end
@@ -6045,10 +6050,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_08_18_000108) do
   add_foreign_key "setting_groups", "categories"
   add_foreign_key "setting_groups", "companies"
   add_foreign_key "setting_groups", "property_mappings"
-  add_foreign_key "settings", "branches"
-  add_foreign_key "settings", "categories"
   add_foreign_key "settings", "companies"
-  add_foreign_key "settings", "property_mappings"
   add_foreign_key "settings", "setting_groups"
   add_foreign_key "shift_templates", "branches"
   add_foreign_key "shift_templates", "companies"
