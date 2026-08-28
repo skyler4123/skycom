@@ -1,27 +1,29 @@
+# app/services/seed/setting_service.rb
 class Seed::SettingService
   def self.new(
-    setting_group:,
+    appoint_to: nil,
     company: nil,
-    branch: nil,
-    name: Faker::Lorem.word,
-    description: Faker::Lorem.sentence(word_count: 5),
-    content: "",
+    setting_group: nil,
+    name: "Default settings",
+    description: nil,
     code: nil,
-    lifecycle_status: Setting.lifecycle_statuses.keys.sample,
-    workflow_status: Setting.workflow_statuses.keys.sample,
-    business_type: Setting.business_types.keys.sample,
+    metadata: {},
+    lifecycle_status: :active,
+    workflow_status: :confirmed,
+    business_type: :system,
     discarded_at: nil
   )
-    company ||= setting_group.company
+    appoint_to ||= company
+    company ||= appoint_to.respond_to?(:company) ? appoint_to.company : appoint_to
 
     Setting.new(
       setting_group: setting_group,
       company: company,
-      branch: branch,
+      appoint_to: appoint_to,
       name: name,
       description: description,
-      content: content,
       code: code || "SETTING-#{SecureRandom.hex(4).upcase}",
+      metadata: metadata,
       lifecycle_status: lifecycle_status,
       workflow_status: workflow_status,
       business_type: business_type,

@@ -1,13 +1,14 @@
 class CreateSettings < ActiveRecord::Migration[8.0]
   def change
     create_table :settings, id: :uuid, default: -> { "uuidv7()" } do |t|
-      t.references :setting_group, null: false, foreign_key: true, type: :uuid
+      t.references :setting_group, null: true, foreign_key: true, type: :uuid
       t.references :company, null: false, foreign_key: true, type: :uuid
-      t.references :branch, null: true, foreign_key: true, type: :uuid
-      t.references :category, null: false, foreign_key: true, type: :uuid
-      t.references :property_mapping, null: false, foreign_key: true, type: :uuid
 
-      t.json :content
+      t.references :appoint_from, polymorphic: true, null: true, type: :uuid
+      t.references :appoint_to, polymorphic: true, null: false, type: :uuid
+      t.references :appoint_for, polymorphic: true, null: true, type: :uuid
+      t.references :appoint_by, polymorphic: true, null: true, type: :uuid
+
       t.string :name
       t.string :description
       t.string :code

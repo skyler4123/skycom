@@ -20,6 +20,18 @@ class Company < ApplicationRecord
     AttendancePolicy AttendanceLog AttendanceDay AttendanceMonth
     Stock StockTransfer StockImport StockExport
   ].freeze
+  # Default company-appointed setting code + the canonical sidebar item keys.
+  # Must stay in sync with `SIDEBAR_ITEMS` in
+  # app/javascript/controllers/companies/sidebar_items.js.
+  DEFAULT_SETTINGS_CODE = "SETTINGS-DEFAULT".freeze
+  SIDEBAR_ITEM_KEYS = %w[
+    dashboard branches departments categories property_mappings table_configs
+    products brands services orders employees shift_templates scheduled_shifts
+    attendance_days attendance_policies attendance_logs attendance_months
+    stocks stock_transfers stock_imports stock_exports customers invoices
+    policies pages payment_methods permissions analytics facilities
+    usage top_up billing settings
+  ].freeze
   class_attribute :skip_init, default: false
 
   attribute :permission_resource_name, :string, default: -> { self.name }
@@ -101,6 +113,7 @@ class Company < ApplicationRecord
   has_many :subscription_plans, dependent: :destroy
   has_many :departments, dependent: :destroy
   has_many :pages, dependent: :destroy
+  has_many :settings, as: :appoint_to, dependent: :destroy
   has_one :company_wallet, dependent: :destroy
   has_many :company_wallet_logs, dependent: :destroy
   has_many :company_orders, dependent: :destroy
@@ -216,6 +229,8 @@ class Company < ApplicationRecord
 
     create_company_wallet!(walletable: self, main_credit_balance: 0)
 
+    create_default_setting
+
     unless self.class.skip_init
       if business_type_retail?
         Seed::RetailInitService.call(company: self)
@@ -245,6 +260,17 @@ class Company < ApplicationRecord
         end
         apply_merchant_identity(a, pm)
       end
+    end
+  end
+
+  def create_default_setting
+    settings.find_or_create_by!(code: DEFAULT_SETTINGS_CODE) do |s|
+      s.name = "Default settings"
+      s.appoint_to = self
+      s.lifecycle_status = :active
+      s.workflow_status = :confirmed
+      s.business_type = :system
+      s.sidebar_items = SIDEBAR_ITEM_KEYS.map { |key| { "key" => key, "visible" => true } }
     end
   end
 
