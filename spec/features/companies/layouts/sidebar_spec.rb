@@ -13,6 +13,7 @@ RSpec.feature "Sidebar grouping", type: :feature, js: true do
     page.execute_script("localStorage.clear()")
 
     company_data = JSON.parse(company.to_json).merge(
+      "settings" => company.settings.reset.map { |s| JSON.parse(s.to_json) },
       "property_mappings" => company.property_mappings.reset.map { |pm| JSON.parse(pm.to_json) },
       "table_configs" => company.table_configs.reset.map { |tc| JSON.parse(tc.to_json) },
       "categories" => company.categories.reset.map { |c| JSON.parse(c.to_json) },
@@ -57,8 +58,8 @@ RSpec.feature "Sidebar grouping", type: :feature, js: true do
       expect(page).to have_link("Billing", href: /billing/, visible: :all)
 
       settings_link = find_link("Settings", visible: :all)
-      expect(settings_link["aria-disabled"]).to eq("true")
-      expect(settings_link[:href]).to end_with("#")
+      expect(settings_link["aria-disabled"]).to be_nil
+      expect(settings_link[:href]).to end_with("/settings")
     end
   end
 end
