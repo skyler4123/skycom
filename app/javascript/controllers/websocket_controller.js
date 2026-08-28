@@ -142,11 +142,11 @@ export default class WebsocketController extends Controller {
     const self = this
 
     window.WEBSOCKET = {
-      // 1. Event Registry
+      // 1. Event Registry (key === value — the wire string matches the symbol key)
       EVENTS: {
         test: "test",
-        top_up_completed: "top_up.completed",
-        pos_payment_completed: "pos_payment.completed"
+        top_up_completed: "top_up_completed",
+        pos_payment_completed: "pos_payment_completed"
       },
 
       // 2. Channel Generators

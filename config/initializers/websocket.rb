@@ -12,10 +12,12 @@ class WEBSOCKET
   )
 
   # --- Unified Event Types (Registry) ---
+  # Convention: key == value — the wire string is identical to the symbol key,
+  # so only one string needs to be remembered/declared per event.
   EVENTS = {
     test: "test",
-    top_up_completed: "top_up.completed",
-    pos_payment_completed: "pos_payment.completed"
+    top_up_completed: "top_up_completed",
+    pos_payment_completed: "pos_payment_completed"
   }.freeze
 
   class << self

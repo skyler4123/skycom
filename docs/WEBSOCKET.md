@@ -167,7 +167,7 @@ All WebSocket messages use a standard envelope with a registered event name. The
 
 ```json
 {
-  "event": "top_up.completed",
+  "event": "top_up_completed",
   "id": "txn-uuid-here",
   "payload": {
     "amount_cents": 10000,
@@ -178,7 +178,7 @@ All WebSocket messages use a standard envelope with a registered event name. The
 
 | Field | Type | Description |
 |-------|------|-------------|
-| `event` | string | Dot-separated event name (must be registered in EVENTS) |
+| `event` | string | Event name (must be registered in EVENTS; key == value, see below) |
 | `id` | string | UUID of the resource this event concerns |
 | `payload` | object | Arbitrary data body (everything except `id` from the `data:` hash) |
 
@@ -186,35 +186,31 @@ All WebSocket messages use a standard envelope with a registered event name. The
 
 Both BE and FE maintain a synchronized `EVENTS` constant. **When adding a new event, you must update both.**
 
+> **Convention**: `key == value` — the wire string is identical to the symbol key, so only one string needs to be remembered per event.
+
 ```ruby
 # Ruby — config/initializers/websocket.rb
 EVENTS = {
-  test:             "test",
-  top_up_completed: "top_up.completed",
-  invoice_paid:     "invoice.paid",
-  balance_updated:  "balance.updated",
-  alert_triggered:  "alert.triggered"
+  test:                 "test",
+  top_up_completed:     "top_up_completed",
+  pos_payment_completed: "pos_payment_completed"
 }.freeze
 ```
 
 ```javascript
 // JavaScript — app/javascript/controllers/websocket_controller.js
 EVENTS: {
-  test:             "test",
-  top_up_completed: "top_up.completed",
-  invoice_paid:     "invoice.paid",
-  balance_updated:  "balance.updated",
-  alert_triggered:  "alert.triggered"
+  test:                 "test",
+  top_up_completed:     "top_up_completed",
+  pos_payment_completed: "pos_payment_completed"
 }
 ```
 
 | Key (BE Symbol / FE String) | Event Name | Current Subscribers | Payload Fields |
 |----------------------------|------------|-------------------|----------------|
 | `test` | `"test"` | None (dev only) | `{ test: true }` |
-| `top_up_completed` | `"top_up.completed"` | `top_ups/new_controller.js` | `{ amount_cents, transaction_id }` |
-| `invoice_paid` | `"invoice.paid"` | — | (reserved) |
-| `balance_updated` | `"balance.updated"` | — | (reserved) |
-| `alert_triggered` | `"alert.triggered"` | — | (reserved) |
+| `top_up_completed` | `"top_up_completed"` | `top_ups/new_controller.js` | `{ amount_cents, transaction_id }` |
+| `pos_payment_completed` | `"pos_payment_completed"` | `companies/pages/retail_cashier_controller.js` | `{ transaction_token, order_id }` |
 
 ---
 
@@ -307,13 +303,15 @@ sub.on('publication', (ctx) => {
 
 ## 8. Adding a New Event (Step by Step)
 
+> **Convention**: `key == value` — the wire string equals the symbol key (e.g. `stock_low: "stock_low"`). Only one string to remember.
+
 ### Step 1: Register in BE EVENTS
 
 ```ruby
 # config/initializers/websocket.rb
 EVENTS = {
   # ... existing events ...
-  stock_low: "stock.low",
+  stock_low: "stock_low",
 }.freeze
 ```
 
@@ -323,7 +321,7 @@ EVENTS = {
 // app/javascript/controllers/websocket_controller.js
 EVENTS: {
   // ... existing events ...
-  stock_low: "stock.low"
+  stock_low: "stock_low"
 }
 ```
 
@@ -419,7 +417,7 @@ Bank Webhook (BE)                  Centrifugo                   Browser (FE)
       │                               │                             │
       └── WEBSOCKET.publish_event(    │                             │
             channel: company.id,      │                             │
-            event: "top_up.completed) │                             │
+            event: "top_up_completed) │                             │
            │                          │                             │
            │  HTTP POST /api          │                             │
            ├─────────────────────────►│                             │
