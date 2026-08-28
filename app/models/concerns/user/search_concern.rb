@@ -7,8 +7,8 @@ module User::SearchConcern
     meilisearch do
       attribute :email, :username, :name, :first_name, :last_name, :phone_number # only the attributes 'title', and 'author' will be sent to Meilisearch
       # all attributes will be sent to Meilisearch if block is left empty
-      
-      searchable_attributes [:email, :username, :name, :first_name, :last_name, :phone_number] # only the attributes 'title', and 'author' will be sent to Meilisearch
+
+      searchable_attributes [ :email, :username, :name, :first_name, :last_name, :phone_number ] # only the attributes 'title', and 'author' will be sent to Meilisearch
     end
   end
 end
