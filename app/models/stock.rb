@@ -40,6 +40,7 @@ class Stock < ApplicationRecord
   before_validation :inherit_category_from_product, on: :create
 
   include PropertyMappingConcern # rubocop:disable Layout/ClassStructure
+  include DynamicSearchConcern
   include TagConcern # rubocop:enable Layout/ClassStructure
 
 

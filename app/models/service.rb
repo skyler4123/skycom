@@ -1,6 +1,7 @@
 class Service < ApplicationRecord
   include CategoryConcern
   include PropertyMappingConcern
+  include DynamicSearchConcern
   include TagConcern
   include OrderConcern
   include Service::ImageConcern

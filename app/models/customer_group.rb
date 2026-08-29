@@ -1,6 +1,7 @@
 class CustomerGroup < ApplicationRecord
   include CategoryConcern
   include PropertyMappingConcern
+  include DynamicSearchConcern
   include AddressConcern
   include TagConcern
 

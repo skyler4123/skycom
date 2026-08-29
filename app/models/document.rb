@@ -1,6 +1,7 @@
 class Document < ApplicationRecord
   include CategoryConcern
   include PropertyMappingConcern
+  include DynamicSearchConcern
   include TagConcern
 
   belongs_to :document_group

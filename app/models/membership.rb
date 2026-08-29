@@ -2,6 +2,7 @@
 class Membership < ApplicationRecord
   include CategoryConcern
   include PropertyMappingConcern
+  include DynamicSearchConcern
   include ImmutableRecordConcern
   enum :country, COUNTRY_CODES, prefix: true, default: :us
   enum :timezone, TIMEZONES, prefix: true, default: :utc

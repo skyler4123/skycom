@@ -1,6 +1,7 @@
 class Answer < ApplicationRecord
   include CategoryConcern
   include PropertyMappingConcern
+  include DynamicSearchConcern
   include TagConcern
 
   belongs_to :company

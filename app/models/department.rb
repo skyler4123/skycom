@@ -1,6 +1,7 @@
 class Department < ApplicationRecord
   include CategoryConcern
   include PropertyMappingConcern
+  include DynamicSearchConcern
   include AddressConcern
   include TagConcern
   include Department::ImageConcern
