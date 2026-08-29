@@ -1,6 +1,7 @@
 class Exam < ApplicationRecord
   include CategoryConcern
   include PropertyMappingConcern
+  include DynamicSearchConcern
   include TagConcern
 
   belongs_to :exam_group

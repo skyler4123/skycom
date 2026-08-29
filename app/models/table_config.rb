@@ -1,6 +1,7 @@
 class TableConfig < ApplicationRecord
   include CategoryConcern
   include PropertyMappingConcern
+  include DynamicSearchConcern
   # Valid values for column alignment and pinned position.
   ALLOWED_ALIGNS  = %w[left center right].freeze
   ALLOWED_PINNEDS = %w[left right].freeze

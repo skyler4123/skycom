@@ -1,6 +1,7 @@
 class Cart < ApplicationRecord
   include CategoryConcern
   include PropertyMappingConcern
+  include DynamicSearchConcern
 
   attribute :permission_resource_name, :string, default: -> { self.name }
 

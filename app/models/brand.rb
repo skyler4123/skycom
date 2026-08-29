@@ -1,6 +1,7 @@
 class Brand < ApplicationRecord
   include CategoryConcern
   include PropertyMappingConcern
+  include DynamicSearchConcern
   include TagConcern
   include Brand::ImageConcern
   attribute :permission_resource_name, :string, default: -> { self.name }

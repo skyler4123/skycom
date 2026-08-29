@@ -2,6 +2,7 @@
 class Product < ApplicationRecord
   include CategoryConcern
   include PropertyMappingConcern
+  include DynamicSearchConcern
   include TagConcern
   include OrderConcern
   include Product::ImageConcern

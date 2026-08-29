@@ -4,6 +4,7 @@
 class Transaction < ApplicationRecord
   include CategoryConcern
   include PropertyMappingConcern
+  include DynamicSearchConcern
 
   include TagConcern
   attribute :permission_resource_name, :string, default: -> { self.name }

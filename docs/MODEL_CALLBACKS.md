@@ -295,6 +295,19 @@ Reads `validates` hashes from `property_mapping.property_metadata` and applies t
 
 ---
 
+### DynamicSearchConcern (`app/models/concerns/dynamic_search_concern.rb`)
+
+Includes `Meilisearch::Rails` and declares one `meilisearch` block for every included model. Indexes `name`/`description`/`code` (when the columns exist) plus all `property_*` dynamic columns; `company_id`/`category_id`/`branch_id`/`workflow_status`/`business_type` + numeric/boolean/datetime properties are filterable. Auto-sync runs through the gem's callbacks, enqueued to `MeilisearchIndexJob` (Solid Queue) via the `enqueue:` proc.
+
+| Callback | Method | Description |
+|----------|--------|-------------|
+| `after_commit :ms_perform_index_tasks` (via `Meilisearch::Rails`) | gem-internal | Indexes create/update in Meilisearch (async via `MeilisearchIndexJob` through the `enqueue:` proc). |
+| `after_commit(on: :destroy) :ms_enqueue_remove_from_index!` (via `Meilisearch::Rails`) | gem-internal | Removes the document from the Meilisearch index on destroy (async via `MeilisearchIndexJob`). |
+
+**Included in (46 models):** All models that include `PropertyMappingConcern` (products, services, branches, employees, customers, etc. — see the PropertyMappingConcern list, minus `PropertyMapping` itself).
+
+---
+
 ### PropertyMappingConcern (`app/models/concerns/property_mapping_concern.rb`)
 
 Auto-assigns a default property_mapping on create if none is provided. Derives `property_mapping` from `category.default_property_mapping`.

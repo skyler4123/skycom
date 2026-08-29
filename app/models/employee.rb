@@ -3,6 +3,7 @@
 class Employee < ApplicationRecord
   include CategoryConcern
   include PropertyMappingConcern
+  include DynamicSearchConcern
   include AddressConcern
   include AvatarConcern
   include Employee::ImageConcern

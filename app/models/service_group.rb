@@ -1,6 +1,7 @@
 class ServiceGroup < ApplicationRecord
   include CategoryConcern
   include PropertyMappingConcern
+  include DynamicSearchConcern
 
   include TagConcern
   include OrderConcern
