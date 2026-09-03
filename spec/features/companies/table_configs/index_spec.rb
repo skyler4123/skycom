@@ -8,7 +8,8 @@ RSpec.feature "Companies::TableConfigs Management", type: :feature, js: true do
   let(:property_mapping) do
     pm = category.default_property_mapping || create(:property_mapping, company: company, category: category, name: "Cosmetics Mapping")
     pm.update!(metadata: { "properties" => [
-      { "key" => "property_string_1", "type" => "string", "name" => "Skin Type" }
+      { "key" => "property_string_1", "type" => "string", "name" => "Skin Type" },
+      { "key" => "property_integer_1", "type" => "integer", "name" => "Volume" }
     ] })
     pm
   end
@@ -18,7 +19,6 @@ RSpec.feature "Companies::TableConfigs Management", type: :feature, js: true do
     create(:table_config, company: company, category: category, property_mapping: property_mapping,
       name: "Cosmetics Table",
       metadata: { "columns" => [
-        { "key" => "name", "name" => "Name", "visible" => true, "sortable" => true, "align" => "left", "pinned" => nil, "width" => nil, "roles" => [], "is_virtual" => false, "render_config" => {} },
         { "key" => "property_string_1", "name" => "Skin Type", "visible" => true, "sortable" => true, "align" => "left", "pinned" => nil, "width" => nil, "roles" => [], "is_virtual" => false, "render_config" => {} }
       ] })
   end
@@ -118,8 +118,9 @@ RSpec.feature "Companies::TableConfigs Management", type: :feature, js: true do
     visit edit_company_table_config_path(company, table_config)
     expect(page).to have_selector('form', wait: 10)
 
-    first_label_input = find(:xpath, '//input[@name="table_config[metadata][columns][0][name]"]')
-    first_label_input.set('Product Title')
+    select 'Volume (property_integer_1)', from: 'new-property-slot'
+    click_button 'Add Property'
+    expect(page).to have_selector('input[name="table_config[metadata][columns][1][key]"][value="property_integer_1"]', wait: 10)
 
     click_button 'Save Changes'
     expect(page).to have_current_path(/table_configs\/#{table_config.id}$/, wait: 10)
@@ -148,7 +149,8 @@ RSpec.feature "Companies::TableConfigs Management", type: :feature, js: true do
     visit company_products_path(company, category_id: category.id)
     expect(page).to have_selector('table', wait: 10)
 
-    expect(page).to have_selector('th', text: 'Product Title')
+    expect(page).to have_selector('th', text: 'Skin Type')
+    expect(page).to have_selector('th', text: 'Volume')
   end
 
   scenario "show page has clickable property mapping link" do

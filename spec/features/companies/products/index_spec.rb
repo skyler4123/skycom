@@ -10,7 +10,7 @@ RSpec.feature "Companies::Products Management", type: :feature, js: true do
       company: company,
       name: "Base Physical Product #{SecureRandom.hex(4)}",
       business_type: "physical"
-    )
+    ).tap { |p| p.update!(property_string_1: "Oily", property_integer_1: 150) }
   end
 
   let!(:product2) do
@@ -19,11 +19,18 @@ RSpec.feature "Companies::Products Management", type: :feature, js: true do
       name: "Base Digital Product #{SecureRandom.hex(4)}",
       business_type: "digital",
       workflow_status: "pending"
-    )
+    ).tap { |p| p.update!(property_string_1: "Dry", property_integer_1: 250) }
   end
 
   let!(:default_category) do
-    Seed::CategoryService.find_or_create_for(company: company, resource_name: "products")
+    category = Seed::CategoryService.find_or_create_for(company: company, resource_name: "products")
+    category.default_property_mapping.update!(
+      metadata: { "properties" => [
+        { "key" => "property_string_1", "type" => "string", "name" => "Skin Type" },
+        { "key" => "property_integer_1", "type" => "integer", "name" => "Volume (ml)" }
+      ] }
+    )
+    category
   end
 
   let!(:default_table_config) do
@@ -34,10 +41,8 @@ RSpec.feature "Companies::Products Management", type: :feature, js: true do
       property_mapping: default_category.default_property_mapping,
       resource_name: "products",
       metadata: { "columns" => [
-        { "key" => "name", "name" => "Product Name", "visible" => true, "sortable" => true, "align" => "left", "pinned" => nil, "width" => nil, "roles" => [], "is_virtual" => false, "render_config" => {} },
-        { "key" => "code", "name" => "Product Code", "visible" => true, "sortable" => true, "align" => "left", "pinned" => nil, "width" => nil, "roles" => [], "is_virtual" => false, "render_config" => {} },
-        { "key" => "business_type", "name" => "Type", "visible" => true, "sortable" => true, "align" => "center", "pinned" => nil, "width" => nil, "roles" => [], "is_virtual" => false, "render_config" => {} },
-        { "key" => "workflow_status", "name" => "Status", "visible" => true, "sortable" => true, "align" => "center", "pinned" => nil, "width" => nil, "roles" => [], "is_virtual" => false, "render_config" => {} }
+        { "key" => "property_string_1", "name" => "Skin Type", "visible" => true, "sortable" => true, "align" => "left", "pinned" => nil, "width" => nil, "roles" => [], "is_virtual" => false, "render_config" => {} },
+        { "key" => "property_integer_1", "name" => "Volume (ml)", "visible" => true, "sortable" => true, "align" => "right", "pinned" => nil, "width" => nil, "roles" => [], "is_virtual" => false, "render_config" => {} }
       ] }
     )
   end
@@ -73,13 +78,11 @@ RSpec.feature "Companies::Products Management", type: :feature, js: true do
 
     expect(page).to have_selector('table', wait: 10)
 
-    expect(page).to have_selector('th', text: 'Product Name')
-    expect(page).to have_selector('th', text: 'Category')
-    expect(page).to have_selector('th', text: 'Type')
-    expect(page).to have_selector('th', text: 'Status')
+    expect(page).to have_selector('th', text: 'Skin Type', wait: 10)
+    expect(page).to have_selector('th', text: 'Volume (ml)', wait: 10)
 
     expect(page).to have_selector('tbody tr')
-    expect(page).to have_content(product.name)
+    expect(page).to have_content("Oily")
   end
 
   scenario "edit button links to show page for product" do
@@ -92,7 +95,10 @@ RSpec.feature "Companies::Products Management", type: :feature, js: true do
 
   scenario "filter by category updates URL and filters table" do
     category = Seed::CategoryService.create(company: company, name: "Test Category", resource_name: "products")
-    product.update!(category: category, property_mapping: category.default_property_mapping)
+    product.category = category
+    product.property_mapping = category.default_property_mapping
+    Seed::PropertyPopulator.populate(product)
+    product.save!
     visit company_products_path(company)
     expect(page).to have_selector('table', wait: 10)
 
@@ -103,19 +109,12 @@ RSpec.feature "Companies::Products Management", type: :feature, js: true do
     expect(page).to have_selector('tbody tr', wait: 10)
   end
 
-  scenario "display product business type as badge" do
+  scenario "displays property string values in cells" do
     visit company_products_path(company, category_id: default_category.id)
     expect(page).to have_selector('table', wait: 10)
 
-    expect(page).to have_content("physical", minimum: 1)
-    expect(page).to have_content("digital", minimum: 1)
-  end
-
-  scenario "display product workflow status as badge" do
-    visit company_products_path(company)
-    expect(page).to have_selector('table', wait: 10)
-
-    expect(page).to have_selector('span.rounded-full', wait: 10)
+    expect(page).to have_content("Oily", minimum: 1)
+    expect(page).to have_content("Dry", minimum: 1)
   end
 
   # ============================================================================
@@ -157,14 +156,10 @@ RSpec.feature "Companies::Products Management", type: :feature, js: true do
         property_mapping: category_cosmetics.default_property_mapping,
         resource_name: "products",
         metadata: { "columns" => [
-          { "key" => "name", "name" => "Product Name", "visible" => true, "sortable" => true, "align" => "left", "pinned" => nil, "width" => nil, "roles" => [], "is_virtual" => false, "render_config" => {} },
-          { "key" => "code", "name" => "Code", "visible" => true, "sortable" => true, "align" => "left", "pinned" => nil, "width" => nil, "roles" => [], "is_virtual" => false, "render_config" => {} },
           { "key" => "property_string_1", "name" => "Skin Type", "visible" => true, "sortable" => true, "align" => "left", "pinned" => nil, "width" => nil, "roles" => [], "is_virtual" => false, "render_config" => {} },
           { "key" => "property_string_2", "name" => "Key Ingredients", "visible" => true, "sortable" => true, "align" => "left", "pinned" => nil, "width" => nil, "roles" => [], "is_virtual" => false, "render_config" => {} },
           { "key" => "property_integer_1", "name" => "Volume (ml)", "visible" => true, "sortable" => true, "align" => "right", "pinned" => nil, "width" => nil, "roles" => [], "is_virtual" => false, "render_config" => {} },
-          { "key" => "property_boolean_1", "name" => "Organic Certified", "visible" => true, "sortable" => true, "align" => "center", "pinned" => nil, "width" => nil, "roles" => [], "is_virtual" => false, "render_config" => {} },
-          { "key" => "business_type", "name" => "Type", "visible" => true, "sortable" => true, "align" => "center", "pinned" => nil, "width" => nil, "roles" => [], "is_virtual" => false, "render_config" => {} },
-          { "key" => "workflow_status", "name" => "Status", "visible" => true, "sortable" => true, "align" => "center", "pinned" => nil, "width" => nil, "roles" => [], "is_virtual" => false, "render_config" => {} }
+          { "key" => "property_boolean_1", "name" => "Organic Certified", "visible" => true, "sortable" => true, "align" => "center", "pinned" => nil, "width" => nil, "roles" => [], "is_virtual" => false, "render_config" => {} }
         ] }
       )
     end
@@ -177,12 +172,9 @@ RSpec.feature "Companies::Products Management", type: :feature, js: true do
         property_mapping: category_supplements.default_property_mapping,
         resource_name: "products",
         metadata: { "columns" => [
-          { "key" => "name", "name" => "Product Name", "visible" => true, "sortable" => true, "align" => "left", "pinned" => nil, "width" => nil, "roles" => [], "is_virtual" => false, "render_config" => {} },
-          { "key" => "code", "name" => "Code", "visible" => true, "sortable" => true, "align" => "left", "pinned" => nil, "width" => nil, "roles" => [], "is_virtual" => false, "render_config" => {} },
           { "key" => "property_string_3", "name" => "Benefits", "visible" => true, "sortable" => true, "align" => "left", "pinned" => nil, "width" => nil, "roles" => [], "is_virtual" => false, "render_config" => {} },
           { "key" => "property_decimal_1", "name" => "Potency %", "visible" => true, "sortable" => true, "align" => "right", "pinned" => nil, "width" => nil, "roles" => [], "is_virtual" => false, "render_config" => {} },
-          { "key" => "property_datetime_1", "name" => "Expiry Date", "visible" => true, "sortable" => true, "align" => "center", "pinned" => nil, "width" => nil, "roles" => [], "is_virtual" => false, "render_config" => {} },
-          { "key" => "workflow_status", "name" => "Status", "visible" => true, "sortable" => true, "align" => "center", "pinned" => nil, "width" => nil, "roles" => [], "is_virtual" => false, "render_config" => {} }
+          { "key" => "property_datetime_1", "name" => "Expiry Date", "visible" => true, "sortable" => true, "align" => "center", "pinned" => nil, "width" => nil, "roles" => [], "is_virtual" => false, "render_config" => {} }
         ] }
       )
     end
@@ -260,18 +252,12 @@ RSpec.feature "Companies::Products Management", type: :feature, js: true do
 
       expect(page).to have_selector('table', wait: 10)
 
-      expect(page).to have_selector('th', text: 'Product Name', wait: 10)
-      expect(page).to have_selector('th', text: 'Category', wait: 10)
-      expect(page).to have_selector('th', text: 'Code', wait: 10)
       expect(page).to have_selector('th', text: 'Skin Type', wait: 10)
       expect(page).to have_selector('th', text: 'Key Ingredients', wait: 10)
       expect(page).to have_selector('th', text: 'Volume (ml)', wait: 10)
       expect(page).to have_selector('th', text: 'Organic', wait: 10)
-      expect(page).to have_selector('th', text: 'Status', wait: 10)
 
-      products_cosmetics.each do |p|
-        expect(page).to have_content(p.name, wait: 5)
-      end
+      expect(page).to have_selector('tbody tr', count: products_cosmetics.size, wait: 10)
     end
 
     # =========================================================================
@@ -282,7 +268,6 @@ RSpec.feature "Companies::Products Management", type: :feature, js: true do
 
       expect(page).to have_selector('table', wait: 10)
       expect(page).to have_selector('th', text: 'Key Ingredients', wait: 10)
-      expect(page).to have_selector('th', text: 'Category', wait: 10)
 
       select(category_supplements.name, from: 'category_id')
       click_button "Search"
@@ -294,9 +279,7 @@ RSpec.feature "Companies::Products Management", type: :feature, js: true do
       expect(page).to have_selector('th', text: 'Potency %', wait: 10)
       expect(page).to have_selector('th', text: 'Expiry', wait: 10)
 
-      products_supplements.each do |p|
-        expect(page).to have_content(p.name, wait: 5)
-      end
+      expect(page).to have_selector('tbody tr', count: products_supplements.size, wait: 10)
     end
 
     # =========================================================================
@@ -330,13 +313,12 @@ RSpec.feature "Companies::Products Management", type: :feature, js: true do
     scenario "boolean property displays as Yes or No badge" do
       visit company_products_path(company, category_id: category_cosmetics.id)
       expect(page).to have_selector('table', wait: 10)
+      expect(page).to have_selector('th', text: 'Organic', wait: 10)
 
-      products_cosmetics.each do |p|
-        next if p.property_boolean_1.nil?
-
-        expected_text = p.property_boolean_1 ? "Yes" : "No"
-        row = find('tbody tr', text: p.name)
-        expect(row).to have_content(expected_text, wait: 5)
+      rows = all('tbody tr', wait: 10)
+      expect(rows.size).to eq(products_cosmetics.size)
+      rows.each do |row|
+        expect(row).to have_content("Yes").or have_content("No")
       end
     end
 
@@ -380,40 +362,6 @@ RSpec.feature "Companies::Products Management", type: :feature, js: true do
 
       expect(page).to have_selector('th', text: 'Expiry', wait: 10)
     end
-
-    # =========================================================================
-    # SCENARIO 9: Code field renders
-    # =========================================================================
-    scenario "code field displays" do
-      visit company_products_path(company, category_id: category_cosmetics.id)
-      expect(page).to have_selector('table', wait: 10)
-
-      first_product = products_cosmetics.first
-      expect(page).to have_content(first_product.code, wait: 10)
-    end
-
-    # =========================================================================
-    # SCENARIO 10: Business type badge renders
-    # =========================================================================
-    scenario "business type badge displays" do
-      visit company_products_path(company, category_id: category_cosmetics.id)
-      expect(page).to have_selector('table', wait: 10)
-
-      products_cosmetics.each do |p|
-        row = find('tbody tr', text: p.name, match: :prefer_exact)
-        expect(row).to have_content(p.business_type.to_s, wait: 5)
-      end
-    end
-
-    # =========================================================================
-    # SCENARIO 11: Workflow status badge renders
-    # =========================================================================
-    scenario "workflow status badge displays" do
-      visit company_products_path(company, category_id: category_cosmetics.id)
-      expect(page).to have_selector('table', wait: 10)
-
-      expect(page).to have_selector('span.rounded-full', wait: 10)
-    end
   end
 
   # ============================================================================
@@ -429,6 +377,11 @@ RSpec.feature "Companies::Products Management", type: :feature, js: true do
     end
 
     let!(:table_config_cosmetics) do
+      category_cosmetics.default_property_mapping.update!(
+        metadata: { "properties" => [
+          { "key" => "property_string_1", "type" => "string", "name" => "Skin Type" }
+        ] }
+      )
       category_cosmetics.default_property_mapping.table_configs.destroy_all
       tc = TableConfig.create!(
         company: company,
@@ -436,8 +389,7 @@ RSpec.feature "Companies::Products Management", type: :feature, js: true do
         property_mapping: category_cosmetics.default_property_mapping,
         resource_name: "products",
         metadata: { "columns" => [
-          { "key" => "name", "name" => "Name", "visible" => true, "sortable" => true, "align" => "left", "pinned" => nil, "width" => nil, "roles" => [], "is_virtual" => false, "render_config" => {} },
-          { "key" => "code", "name" => "Code", "visible" => true, "sortable" => true, "align" => "left", "pinned" => nil, "width" => nil, "roles" => [], "is_virtual" => false, "render_config" => {} }
+          { "key" => "property_string_1", "name" => "Skin Type", "visible" => true, "sortable" => true, "align" => "left", "pinned" => nil, "width" => nil, "roles" => [], "is_virtual" => false, "render_config" => {} }
         ] }
       )
       company.clear_permissions_cache
@@ -500,7 +452,7 @@ RSpec.feature "Companies::Products Management", type: :feature, js: true do
         property_mapping: default_category.default_property_mapping,
         name: "Branch A Product #{SecureRandom.hex(4)}",
         business_type: "physical"
-      )
+      ).tap { |p| p.update!(property_string_1: "Oily") }
     end
 
     let!(:product_branch_b) do
@@ -511,7 +463,7 @@ RSpec.feature "Companies::Products Management", type: :feature, js: true do
         property_mapping: default_category.default_property_mapping,
         name: "Branch B Product #{SecureRandom.hex(4)}",
         business_type: "physical"
-      )
+      ).tap { |p| p.update!(property_string_1: "Dry") }
     end
 
     before do
@@ -552,8 +504,8 @@ RSpec.feature "Companies::Products Management", type: :feature, js: true do
       visit company_products_path(company, category_id: default_category.id)
 
       expect(page).to have_selector('table', wait: 10)
-      expect(page).to have_content(product_branch_a.name, wait: 5)
-      expect(page).to have_content(product_branch_b.name, wait: 5)
+      expect(page).to have_content("Oily", wait: 5)
+      expect(page).to have_content("Dry", wait: 5)
     end
 
     scenario "filters by branch and updates URL" do
@@ -565,8 +517,8 @@ RSpec.feature "Companies::Products Management", type: :feature, js: true do
 
       expect(page).to have_current_path(/branch_id=#{branch2.id}/)
       expect(page).to have_selector('tbody tr', wait: 10)
-      expect(page).to have_content(product_branch_b.name, wait: 5)
-      expect(page).not_to have_content(product_branch_a.name)
+      expect(page).to have_content("Dry", wait: 5)
+      expect(page).not_to have_content("Oily")
     end
   end
 

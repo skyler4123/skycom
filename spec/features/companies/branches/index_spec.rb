@@ -1,14 +1,21 @@
 require "rails_helper"
 
 RSpec.feature "Companies::Branches Management", type: :feature, js: true do
-  let(:branch) { create(:branch) }
+  let(:branch) { create(:branch).tap { |b| b.update!(property_string_1: "Downtown", property_integer_1: 50) } }
   let(:company) { branch.company }
   let(:owner) { company.user }
 
-  let!(:branch2) { create(:branch, company: company) }
+  let!(:branch2) { create(:branch, company: company).tap { |b| b.update!(property_string_1: "Airport", property_integer_1: 30) } }
 
   let!(:default_category) do
-    Seed::CategoryService.find_or_create_for(company: company, resource_name: "branches")
+    category = Seed::CategoryService.find_or_create_for(company: company, resource_name: "branches")
+    category.default_property_mapping.update!(
+      metadata: { "properties" => [
+        { "key" => "property_string_1", "type" => "string", "name" => "District" },
+        { "key" => "property_integer_1", "type" => "integer", "name" => "Capacity" }
+      ] }
+    )
+    category
   end
 
   let!(:default_table_config) do
@@ -19,10 +26,8 @@ RSpec.feature "Companies::Branches Management", type: :feature, js: true do
       property_mapping: default_category.default_property_mapping,
       resource_name: "branches",
       metadata: { "columns" => [
-        { "key" => "name", "name" => "Branch Name", "visible" => true, "sortable" => true, "align" => "left", "pinned" => nil, "width" => nil, "roles" => [], "is_virtual" => false, "render_config" => {} },
-        { "key" => "code", "name" => "Code", "visible" => true, "sortable" => true, "align" => "left", "pinned" => nil, "width" => nil, "roles" => [], "is_virtual" => false, "render_config" => {} },
-        { "key" => "business_type", "name" => "Type", "visible" => true, "sortable" => true, "align" => "center", "pinned" => nil, "width" => nil, "roles" => [], "is_virtual" => false, "render_config" => {} },
-        { "key" => "workflow_status", "name" => "Status", "visible" => true, "sortable" => true, "align" => "center", "pinned" => nil, "width" => nil, "roles" => [], "is_virtual" => false, "render_config" => {} }
+        { "key" => "property_string_1", "name" => "District", "visible" => true, "sortable" => true, "align" => "left", "pinned" => nil, "width" => nil, "roles" => [], "is_virtual" => false, "render_config" => {} },
+        { "key" => "property_integer_1", "name" => "Capacity", "visible" => true, "sortable" => true, "align" => "right", "pinned" => nil, "width" => nil, "roles" => [], "is_virtual" => false, "render_config" => {} }
       ] }
     )
   end
@@ -58,13 +63,11 @@ RSpec.feature "Companies::Branches Management", type: :feature, js: true do
 
     expect(page).to have_selector('table', wait: 10)
 
-    expect(page).to have_selector('th', text: 'Branch Name')
-    expect(page).to have_selector('th', text: 'Category')
-    expect(page).to have_selector('th', text: 'Type')
-    expect(page).to have_selector('th', text: 'Status')
+    expect(page).to have_selector('th', text: 'District', wait: 10)
+    expect(page).to have_selector('th', text: 'Capacity', wait: 10)
 
     expect(page).to have_selector('tbody tr')
-    expect(page).to have_content(branch.name)
+    expect(page).to have_content("Downtown")
   end
 
   scenario "edit button links to show page for branch" do
@@ -77,7 +80,10 @@ RSpec.feature "Companies::Branches Management", type: :feature, js: true do
 
   scenario "filter by category updates URL and filters table" do
     category = Seed::CategoryService.create(company: company, name: "Test Category", resource_name: "branches")
-    branch.update!(category: category, property_mapping: category.default_property_mapping)
+    branch.category = category
+    branch.property_mapping = category.default_property_mapping
+    Seed::PropertyPopulator.populate(branch)
+    branch.save!
     visit company_branches_path(company)
     expect(page).to have_selector('table', wait: 10)
 
@@ -88,16 +94,14 @@ RSpec.feature "Companies::Branches Management", type: :feature, js: true do
     expect(page).to have_selector('tbody tr', wait: 10)
   end
 
-  scenario "display branch workflow status as badge" do
-    visit company_branches_path(company)
-    expect(page).to have_selector('table', wait: 10)
-
-    expect(page).to have_selector('span.rounded-full', wait: 10)
-  end
-
   describe "table title" do
     let(:test_category) do
-      Seed::CategoryService.create(company: company, name: "Test Category", resource_name: "branches")
+      Seed::CategoryService.create(
+        company: company,
+        name: "Test Category",
+        resource_name: "branches",
+        properties: { "property_string_1" => "District" }
+      )
     end
 
     let!(:test_table_config) do
@@ -108,8 +112,7 @@ RSpec.feature "Companies::Branches Management", type: :feature, js: true do
         property_mapping: test_category.default_property_mapping,
         resource_name: "branches",
         metadata: { "columns" => [
-          { "key" => "name", "name" => "Name", "visible" => true, "sortable" => true, "align" => "left", "pinned" => nil, "width" => nil, "roles" => [], "is_virtual" => false, "render_config" => {} },
-          { "key" => "code", "name" => "Code", "visible" => true, "sortable" => true, "align" => "left", "pinned" => nil, "width" => nil, "roles" => [], "is_virtual" => false, "render_config" => {} }
+          { "key" => "property_string_1", "name" => "District", "visible" => true, "sortable" => true, "align" => "left", "pinned" => nil, "width" => nil, "roles" => [], "is_virtual" => false, "render_config" => {} }
         ] }
       )
       company.clear_permissions_cache

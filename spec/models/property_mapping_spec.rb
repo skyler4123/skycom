@@ -18,9 +18,7 @@ RSpec.describe PropertyMapping, type: :model do
         property_mapping = create(:property_mapping)
 
         tc = property_mapping.table_configs.first
-        expect(tc.columns).to be_present
-        expect(tc.columns).to be_an(Array)
-        expect(tc.columns.first["key"]).to eq("name")
+        expect(tc.columns).to eq([])
       end
     end
   end
@@ -53,7 +51,6 @@ RSpec.describe PropertyMapping, type: :model do
         { "key" => "property_integer_1", "type" => "integer", "name" => "Quantity" }
       ])
       table_config.update!(columns: [
-        { "key" => "name", "name" => "Name", "visible" => true, "sortable" => true, "align" => "left", "pinned" => nil, "width" => nil, "roles" => [], "is_virtual" => false, "render_config" => {} },
         { "key" => "property_string_1", "name" => "Brand", "visible" => true, "sortable" => true, "align" => "left", "pinned" => nil, "width" => nil, "roles" => [], "is_virtual" => false, "render_config" => {} },
         { "key" => "property_integer_1", "name" => "Quantity", "visible" => true, "sortable" => true, "align" => "right", "pinned" => nil, "width" => nil, "roles" => [], "is_virtual" => false, "render_config" => {} }
       ])
@@ -92,15 +89,6 @@ RSpec.describe PropertyMapping, type: :model do
       table_config.reload
       keys = table_config.columns.map { |c| c["key"] }
       expect(keys).not_to include("property_integer_1")
-    end
-
-    it "does not affect non-property columns" do
-      property_mapping.update!(properties: [
-        { "key" => "property_string_1", "type" => "string", "name" => "Brand" }
-      ])
-
-      table_config.reload
-      expect(table_config.columns.map { |c| c["key"] }).to include("name")
     end
 
     it "syncs all associated table configs" do

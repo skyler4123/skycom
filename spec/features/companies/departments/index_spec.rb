@@ -7,14 +7,23 @@ RSpec.feature "Companies::Departments Management", type: :feature, js: true do
 
   let!(:department) do
     create(:department, company: company, business_type: "sales")
+      .tap { |d| d.update!(property_string_1: "North", property_integer_1: 12) }
   end
 
   let!(:department2) do
     create(:department, company: company, business_type: "marketing")
+      .tap { |d| d.update!(property_string_1: "South", property_integer_1: 24) }
   end
 
   let!(:default_category) do
-    Seed::CategoryService.find_or_create_for(company: company, resource_name: "departments")
+    category = Seed::CategoryService.find_or_create_for(company: company, resource_name: "departments")
+    category.default_property_mapping.update!(
+      metadata: { "properties" => [
+        { "key" => "property_string_1", "type" => "string", "name" => "Region" },
+        { "key" => "property_integer_1", "type" => "integer", "name" => "Headcount" }
+      ] }
+    )
+    category
   end
 
   let!(:default_table_config) do
@@ -25,16 +34,13 @@ RSpec.feature "Companies::Departments Management", type: :feature, js: true do
       property_mapping: default_category.default_property_mapping,
       resource_name: "departments",
       metadata: { "columns" => [
-        { "key" => "name", "name" => "Department Name", "visible" => true, "sortable" => true, "align" => "left", "pinned" => nil, "width" => nil, "roles" => [], "is_virtual" => false, "render_config" => {} },
-        { "key" => "code", "name" => "Code", "visible" => true, "sortable" => true, "align" => "left", "pinned" => nil, "width" => nil, "roles" => [], "is_virtual" => false, "render_config" => {} },
-        { "key" => "workflow_status", "name" => "Status", "visible" => true, "sortable" => true, "align" => "center", "pinned" => nil, "width" => nil, "roles" => [], "is_virtual" => false, "render_config" => {} }
+        { "key" => "property_string_1", "name" => "Region", "visible" => true, "sortable" => true, "align" => "left", "pinned" => nil, "width" => nil, "roles" => [], "is_virtual" => false, "render_config" => {} },
+        { "key" => "property_integer_1", "name" => "Headcount", "visible" => true, "sortable" => true, "align" => "right", "pinned" => nil, "width" => nil, "roles" => [], "is_virtual" => false, "render_config" => {} }
       ] }
     )
   end
 
   before do
-    department2.update_column(:workflow_status, 1)
-
     sign_in(owner)
 
     page.execute_script("localStorage.clear()")
@@ -65,12 +71,11 @@ RSpec.feature "Companies::Departments Management", type: :feature, js: true do
 
     expect(page).to have_selector('table', wait: 10)
 
-    expect(page).to have_selector('th', text: 'Department Name')
-    expect(page).to have_selector('th', text: 'Category')
-    expect(page).to have_selector('th', text: 'Status')
+    expect(page).to have_selector('th', text: 'Region', wait: 10)
+    expect(page).to have_selector('th', text: 'Headcount', wait: 10)
 
     expect(page).to have_selector('tbody tr')
-    expect(page).to have_content(department.name)
+    expect(page).to have_content("North")
   end
 
   scenario "edit button links to edit page for department" do
@@ -83,7 +88,10 @@ RSpec.feature "Companies::Departments Management", type: :feature, js: true do
 
   scenario "filter by category updates URL and filters table" do
     category = Seed::CategoryService.create(company: company, name: "Test Category", resource_name: "departments")
-    department.update!(category: category, property_mapping: category.default_property_mapping)
+    department.category = category
+    department.property_mapping = category.default_property_mapping
+    Seed::PropertyPopulator.populate(department)
+    department.save!
     visit company_departments_path(company)
     expect(page).to have_selector('table', wait: 10)
 
@@ -94,16 +102,14 @@ RSpec.feature "Companies::Departments Management", type: :feature, js: true do
     expect(page).to have_selector('tbody tr', wait: 10)
   end
 
-  scenario "display department workflow status as badge" do
-    visit company_departments_path(company)
-    expect(page).to have_selector('table', wait: 10)
-
-    expect(page).to have_selector('span.rounded-full', wait: 10)
-  end
-
   describe "table title" do
     let(:test_category) do
-      Seed::CategoryService.create(company: company, name: "Test Category", resource_name: "departments")
+      Seed::CategoryService.create(
+        company: company,
+        name: "Test Category",
+        resource_name: "departments",
+        properties: { "property_string_1" => "Region" }
+      )
     end
 
     let!(:test_table_config) do
@@ -114,8 +120,7 @@ RSpec.feature "Companies::Departments Management", type: :feature, js: true do
         property_mapping: test_category.default_property_mapping,
         resource_name: "departments",
         metadata: { "columns" => [
-          { "key" => "name", "name" => "Name", "visible" => true, "sortable" => true, "align" => "left", "pinned" => nil, "width" => nil, "roles" => [], "is_virtual" => false, "render_config" => {} },
-          { "key" => "code", "name" => "Code", "visible" => true, "sortable" => true, "align" => "left", "pinned" => nil, "width" => nil, "roles" => [], "is_virtual" => false, "render_config" => {} }
+          { "key" => "property_string_1", "name" => "Region", "visible" => true, "sortable" => true, "align" => "left", "pinned" => nil, "width" => nil, "roles" => [], "is_virtual" => false, "render_config" => {} }
         ] }
       )
       company.clear_permissions_cache

@@ -48,23 +48,7 @@ export default class Companies_Employees_IndexController extends Companies_Layou
     const categoryValue = this.categoryIdValue || this.defaultFilterCategory()?.id
     const branchValue = new URLSearchParams(window.location.search).get('branch_id') || ''
 
-    const tableConfig = this.currentTableConfig()
     const propertyMapping = this.currentPropertyMapping()
-
-    const fallbackColumns = [
-      { key: "name", name: translate("Employee Name") },
-      { key: "code", name: translate("Code") },
-      { key: "business_type", name: translate("Type") },
-      { key: "workflow_status", name: translate("Status") }
-    ]
-
-    const rawColumns = tableConfig?.metadata?.columns || fallbackColumns
-    const visibleColumns = rawColumns.filter(col => col.visible !== false)
-
-    if (!visibleColumns.some(c => c.key === "category")) {
-      const nameIdx = visibleColumns.findIndex(c => c.key === "name")
-      if (nameIdx >= 0) visibleColumns.splice(nameIdx + 1, 0, { key: "category", name: translate("Category") })
-    }
 
     const mappingLookup = (propertyMapping?.metadata?.properties || []).reduce((acc, field) => {
       acc[field.key] = field
@@ -115,29 +99,10 @@ export default class Companies_Employees_IndexController extends Companies_Layou
           </div>
 
           <div class="overflow-x-auto">
-            ${table({
+            ${this.dynamicTableHTML({
               rows: this.employees,
-              columns: visibleColumns,
-              identifier: this.identifier,
               target: "employeesList",
               mappingLookup,
-              renderers: {
-                name: (value, record) => `
-                  <div class="flex items-center gap-4">
-                    <div class="w-8 h-8 rounded-lg bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex items-center justify-center shrink-0">
-                      <span class="material-symbols-outlined text-slate-400 text-[18px]">person</span>
-                    </div>
-                    <a href="${Helpers.company_employee_path(currentCompany().id, record.id)}"
-                      class="font-medium text-slate-900 dark:text-white overflow-visible whitespace-normal hover:text-blue-600 dark:hover:text-blue-400 transition-colors cursor-pointer">
-                      ${value || translate("Unnamed Employee")}
-                    </a>
-                  </div>
-                `,
-                code: (value) => `<span class="font-mono text-xs bg-slate-100 dark:bg-slate-800/60 px-2 py-0.5 rounded text-slate-600 dark:text-slate-300 font-medium">${value || '—'}</span>`,
-                business_type: (value) => `<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${value === 'full_time' ? 'bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-300' : 'bg-blue-100 text-blue-800 dark:bg-blue-900/50 dark:text-blue-300'}">${Helpers.capitalize(value?.replace('_', ' ') || '')}</span>`,
-                workflow_status: (value) => `${Helpers.statusBadge(value)}`,
-                category: (value, record) => record.category?.name || '<span class="text-slate-300 dark:text-slate-700">—</span>',
-              },
               renderActions: (record) => `
                 <td class="py-4 px-6 text-sm text-right whitespace-nowrap">
                   <a href="${Helpers.edit_company_employee_path(currentCompany().id, record.id)}"
