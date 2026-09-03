@@ -160,15 +160,33 @@ export default class Companies_TableConfigs_EditController extends Companies_Lay
             <table class="w-full text-left border-collapse">
               <thead>
                 <tr class="text-xs text-slate-500 dark:text-slate-400 bg-slate-50 dark:bg-slate-800/50 border-b border-slate-200 dark:border-gray-800">
-                  <th class="py-2 px-3 font-medium">${translate("Key")}</th>
-                  <th class="py-2 px-3 font-medium">${translate("Name")}</th>
-                  <th class="py-2 px-3 font-medium text-center">${translate("Vis")}</th>
-                  <th class="py-2 px-3 font-medium text-center">${translate("Sort")}</th>
-                  <th class="py-2 px-3 font-medium">${translate("Align")}</th>
-                  <th class="py-2 px-3 font-medium">${translate("Pin")}</th>
-                  <th class="py-2 px-3 font-medium">${translate("W")}</th>
-                  <th class="py-2 px-3 font-medium">${translate("Roles")}</th>
-                  <th class="py-2 px-3 font-medium text-center">${translate("Virt")}</th>
+                  <th class="py-2 px-3 font-medium"
+                    ${tooltip(translate("Field key stored in the database (e.g. name, property_string_1)"))}
+                  >${translate("Key")}</th>
+                  <th class="py-2 px-3 font-medium"
+                    ${tooltip(translate("Display name shown as the column header"))}
+                  >${translate("Name")}</th>
+                  <th class="py-2 px-3 font-medium text-center"
+                    ${tooltip(translate("Show or hide this column in the table"))}
+                  >${translate("Visible")}</th>
+                  <th class="py-2 px-3 font-medium text-center"
+                    ${tooltip(translate("Allow users to sort by this column"))}
+                  >${translate("Sortable")}</th>
+                  <th class="py-2 px-3 font-medium"
+                    ${tooltip(translate("Text alignment inside the column: left, center, or right"))}
+                  >${translate("Align")}</th>
+                  <th class="py-2 px-3 font-medium"
+                    ${tooltip(translate("Freeze this column to the left or right edge"))}
+                  >${translate("Pinned")}</th>
+                  <th class="py-2 px-3 font-medium"
+                    ${tooltip(translate("Fixed column width in pixels (leave empty for auto)"))}
+                  >${translate("Width")}</th>
+                  <th class="py-2 px-3 font-medium"
+                    ${tooltip(translate("Restrict visibility to these role codes, comma-separated (empty = all roles)"))}
+                  >${translate("Roles")}</th>
+                  <th class="py-2 px-3 font-medium text-center"
+                    ${tooltip(translate("Virtual column — computed at render time, not stored in the database"))}
+                  >${translate("Virtual")}</th>
                   <th class="py-2 px-3 font-medium text-right"></th>
                 </tr>
               </thead>

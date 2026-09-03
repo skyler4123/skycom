@@ -433,6 +433,25 @@ export const dictionary = () => {
     "This field is synced from PropertyMapping. Please access the Property Mapping edit page to update this name.": {
       vi: "Trường này được đồng bộ từ PropertyMapping. Vui lòng truy cập trang chỉnh sửa Property Mapping để cập nhật tên này.",
     },
+    "Field key stored in the database (e.g. name, property_string_1)": {
+      vi: "Khóa trường được lưu trong cơ sở dữ liệu (vd: name, property_string_1)",
+    },
+    "Display name shown as the column header": { vi: "Tên hiển thị làm tiêu đề cột" },
+    "Show or hide this column in the table": { vi: "Hiển thị hoặc ẩn cột này trong bảng" },
+    "Allow users to sort by this column": { vi: "Cho phép người dùng sắp xếp theo cột này" },
+    "Text alignment inside the column: left, center, or right": {
+      vi: "Căn chỉnh văn bản trong cột: trái, giữa, hoặc phải",
+    },
+    "Freeze this column to the left or right edge": { vi: "Cố định cột này vào cạnh trái hoặc phải" },
+    "Fixed column width in pixels (leave empty for auto)": {
+      vi: "Độ rộng cố định của cột theo pixel (để trống để tự động)",
+    },
+    "Restrict visibility to these role codes, comma-separated (empty = all roles)": {
+      vi: "Giới hạn hiển thị cho các mã vai trò này, phân cách bằng dấu phẩy (để trống = tất cả vai trò)",
+    },
+    "Virtual column — computed at render time, not stored in the database": {
+      vi: "Cột ảo — được tính khi hiển thị, không lưu trong cơ sở dữ liệu",
+    },
 
     // === HR / Attendance ===
     "Shift Templates": { vi: "Mẫu ca làm việc" },
