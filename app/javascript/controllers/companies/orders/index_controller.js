@@ -58,20 +58,6 @@ export default class Companies_Orders_IndexController extends Companies_LayoutCo
       return acc
     }, {})
 
-    const fallbackColumns = [
-      { key: "name", name: translate("Order Name") },
-      { key: "code", name: translate("Order Code") },
-      { key: "workflow_status", name: translate("Status") }
-    ]
-
-    const rawColumns = this.currentTableConfig()?.metadata?.columns || fallbackColumns
-    const visibleColumns = rawColumns.filter(col => col.visible !== false)
-
-    if (!visibleColumns.some(c => c.key === "category")) {
-      const nameIdx = visibleColumns.findIndex(c => c.key === "name")
-      if (nameIdx >= 0) visibleColumns.splice(nameIdx + 1, 0, { key: "category", name: translate("Category") })
-    }
-
     return `
       <div class="p-4 overflow-y-auto">
         <div class="p-4 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 flex flex-col">
@@ -117,27 +103,10 @@ export default class Companies_Orders_IndexController extends Companies_LayoutCo
           </div>
 
           <div class="overflow-x-auto">
-            ${table({
+            ${this.dynamicTableHTML({
               rows: this.orders,
-              columns: visibleColumns,
-              identifier: this.identifier,
               target: "ordersList",
               mappingLookup,
-              renderers: {
-                name: (value, record) => `
-                  <div class="flex items-center gap-4">
-                    <div class="w-8 h-8 rounded-lg bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center shrink-0">
-                      <span class="material-symbols-outlined text-amber-600 dark:text-amber-400 text-[18px]">receipt_long</span>
-                    </div>
-                    <a href="${Helpers.company_order_path(currentCompany().id, record.id)}"
-                      class="font-medium text-slate-900 dark:text-white overflow-visible whitespace-normal hover:text-blue-600 dark:hover:text-blue-400 transition-colors cursor-pointer">
-                      ${value || translate("Unnamed Order")}
-                    </a>
-                  </div>
-                `,
-                code: (value) => `<span class="font-mono text-xs bg-slate-100 dark:bg-slate-800/60 px-2 py-0.5 rounded text-slate-600 dark:text-slate-300 font-medium">${value || '—'}</span>`,
-                category: (value, record) => record.category?.name || '<span class="text-slate-300 dark:text-slate-700">—</span>',
-              },
               renderActions: (record) => `
                 <td class="py-4 px-6 text-sm text-right whitespace-nowrap">
                   <a href="${Helpers.edit_company_order_path(currentCompany().id, record.id)}"

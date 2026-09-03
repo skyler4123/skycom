@@ -12,7 +12,7 @@ RSpec.describe TableConfig, type: :model do
     it "has a sensible default for columns_metadata" do
       config = TableConfig.new
       expect(config.columns).to be_an(Array)
-      expect(config.columns.first).to include("key" => "name", "name" => "Name")
+      expect(config.columns).to eq([])
     end
   end
 
@@ -26,7 +26,7 @@ RSpec.describe TableConfig, type: :model do
 
       it "accepts a full valid hash array" do
         config.metadata = { "columns" => [
-          { "key" => "name", "name" => "Product Name", "visible" => true,
+          { "key" => "property_string_1", "name" => "Product Name", "visible" => true,
             "width" => 250, "align" => "left", "pinned" => "left",
             "sortable" => true, "roles" => [ "admin", "manager" ],
             "is_virtual" => false, "render_config" => {} },
@@ -76,100 +76,121 @@ RSpec.describe TableConfig, type: :model do
 
     context "with missing or blank name" do
       it "rejects when name is missing" do
-        config.metadata = { "columns" => [ { "key" => "name" } ] }
+        config.metadata = { "columns" => [ { "key" => "property_string_1" } ] }
         expect(config).not_to be_valid
         expect(config.errors[:metadata]).to include(match(/name is required/))
       end
 
       it "rejects when name is blank" do
-        config.metadata = { "columns" => [ { "key" => "name", "name" => "" } ] }
+        config.metadata = { "columns" => [ { "key" => "property_string_1", "name" => "" } ] }
         expect(config).not_to be_valid
         expect(config.errors[:metadata]).to include(match(/name is required/))
       end
     end
 
+    context "with non-property keys" do
+      it "rejects default property keys (property-only rule)" do
+        config.metadata = { "columns" => [ { "key" => "name", "name" => "Name" } ] }
+        expect(config).not_to be_valid
+        expect(config.errors[:metadata]).to include(match(/only property_\* columns are supported/))
+      end
+
+      it "rejects workflow_status keys" do
+        config.metadata = { "columns" => [ { "key" => "workflow_status", "name" => "Status" } ] }
+        expect(config).not_to be_valid
+        expect(config.errors[:metadata]).to include(match(/only property_\* columns are supported/))
+      end
+
+      it "accepts any property_* key" do
+        %w[property_string_1 property_integer_20 property_decimal_10 property_boolean_5 property_datetime_3].each do |key|
+          config.metadata = { "columns" => [ { "key" => key, "name" => "N" } ] }
+          expect(config).to be_valid
+        end
+      end
+    end
+
     context "with invalid column property types" do
       it "rejects visible when not boolean" do
-        config.metadata = { "columns" => [ { "key" => "name", "name" => "N", "visible" => "yes" } ] }
+        config.metadata = { "columns" => [ { "key" => "property_string_1", "name" => "N", "visible" => "yes" } ] }
         expect(config).not_to be_valid
         expect(config.errors[:metadata]).to include(match(/visible must be a boolean/))
       end
 
       it "rejects sortable when not boolean" do
-        config.metadata = { "columns" => [ { "key" => "name", "name" => "N", "sortable" => "yes" } ] }
+        config.metadata = { "columns" => [ { "key" => "property_string_1", "name" => "N", "sortable" => "yes" } ] }
         expect(config).not_to be_valid
         expect(config.errors[:metadata]).to include(match(/sortable must be a boolean/))
       end
 
       it "rejects is_virtual when not boolean" do
-        config.metadata = { "columns" => [ { "key" => "name", "name" => "N", "is_virtual" => "yes" } ] }
+        config.metadata = { "columns" => [ { "key" => "property_string_1", "name" => "N", "is_virtual" => "yes" } ] }
         expect(config).not_to be_valid
         expect(config.errors[:metadata]).to include(match(/is_virtual must be a boolean/))
       end
 
       it "rejects align with invalid value" do
-        config.metadata = { "columns" => [ { "key" => "name", "name" => "N", "align" => "top" } ] }
+        config.metadata = { "columns" => [ { "key" => "property_string_1", "name" => "N", "align" => "top" } ] }
         expect(config).not_to be_valid
         expect(config.errors[:metadata]).to include(match(/align/))
       end
 
       it "accepts align as left, center, or right" do
         %w[left center right].each do |val|
-          config.metadata = { "columns" => [ { "key" => "name", "name" => "N", "align" => val } ] }
+          config.metadata = { "columns" => [ { "key" => "property_string_1", "name" => "N", "align" => val } ] }
           expect(config).to be_valid
         end
       end
 
       it "rejects pinned with invalid value" do
-        config.metadata = { "columns" => [ { "key" => "name", "name" => "N", "pinned" => "top" } ] }
+        config.metadata = { "columns" => [ { "key" => "property_string_1", "name" => "N", "pinned" => "top" } ] }
         expect(config).not_to be_valid
         expect(config.errors[:metadata]).to include(match(/pinned/))
       end
 
       it "accepts pinned as left, right, or nil" do
         [ "left", "right" ].each do |val|
-          config.metadata = { "columns" => [ { "key" => "name", "name" => "N", "pinned" => val } ] }
+          config.metadata = { "columns" => [ { "key" => "property_string_1", "name" => "N", "pinned" => val } ] }
           expect(config).to be_valid
         end
-        config.metadata = { "columns" => [ { "key" => "name", "name" => "N", "pinned" => nil } ] }
+        config.metadata = { "columns" => [ { "key" => "property_string_1", "name" => "N", "pinned" => nil } ] }
         expect(config).to be_valid
       end
 
       it "rejects width when not an integer" do
-        config.metadata = { "columns" => [ { "key" => "name", "name" => "N", "width" => "auto" } ] }
+        config.metadata = { "columns" => [ { "key" => "property_string_1", "name" => "N", "width" => "auto" } ] }
         expect(config).not_to be_valid
         expect(config.errors[:metadata]).to include(match(/width must be an integer/))
       end
 
       it "accepts width as nil" do
-        config.metadata = { "columns" => [ { "key" => "name", "name" => "N", "width" => nil } ] }
+        config.metadata = { "columns" => [ { "key" => "property_string_1", "name" => "N", "width" => nil } ] }
         expect(config).to be_valid
       end
 
       it "accepts width as an integer" do
-        config.metadata = { "columns" => [ { "key" => "name", "name" => "N", "width" => 250 } ] }
+        config.metadata = { "columns" => [ { "key" => "property_string_1", "name" => "N", "width" => 250 } ] }
         expect(config).to be_valid
       end
 
       it "rejects roles when not an array of strings" do
-        config.metadata = { "columns" => [ { "key" => "name", "name" => "N", "roles" => "admin" } ] }
+        config.metadata = { "columns" => [ { "key" => "property_string_1", "name" => "N", "roles" => "admin" } ] }
         expect(config).not_to be_valid
         expect(config.errors[:metadata]).to include(match(/roles/))
       end
 
       it "accepts roles as nil" do
-        config.metadata = { "columns" => [ { "key" => "name", "name" => "N", "roles" => nil } ] }
+        config.metadata = { "columns" => [ { "key" => "property_string_1", "name" => "N", "roles" => nil } ] }
         expect(config).to be_valid
       end
 
       it "rejects render_config when not a hash" do
-        config.metadata = { "columns" => [ { "key" => "name", "name" => "N", "render_config" => "string" } ] }
+        config.metadata = { "columns" => [ { "key" => "property_string_1", "name" => "N", "render_config" => "string" } ] }
         expect(config).not_to be_valid
         expect(config.errors[:metadata]).to include(match(/render_config must be a hash/))
       end
 
       it "accepts render_config as nil" do
-        config.metadata = { "columns" => [ { "key" => "name", "name" => "N", "render_config" => nil } ] }
+        config.metadata = { "columns" => [ { "key" => "property_string_1", "name" => "N", "render_config" => nil } ] }
         expect(config).to be_valid
       end
     end

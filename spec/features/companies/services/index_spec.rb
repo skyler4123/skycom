@@ -6,7 +6,14 @@ RSpec.feature "Companies::Services Management", type: :feature, js: true do
   let(:owner) { company.user }
 
   let!(:default_category) do
-    Seed::CategoryService.find_or_create_for(company: company, resource_name: "services")
+    category = Seed::CategoryService.find_or_create_for(company: company, resource_name: "services")
+    category.default_property_mapping.update!(
+      metadata: { "properties" => [
+        { "key" => "property_string_1", "type" => "string", "name" => "Duration" },
+        { "key" => "property_integer_1", "type" => "integer", "name" => "Sessions" }
+      ] }
+    )
+    category
   end
 
   let!(:service) do
@@ -16,7 +23,7 @@ RSpec.feature "Companies::Services Management", type: :feature, js: true do
       business_type: "b2b",
       workflow_status: "draft",
       category: default_category
-    )
+    ).tap { |s| s.update!(property_string_1: "Premium", property_integer_1: 12) }
   end
 
   let!(:service2) do
@@ -26,7 +33,7 @@ RSpec.feature "Companies::Services Management", type: :feature, js: true do
       business_type: "b2c",
       workflow_status: "pending",
       category: default_category
-    )
+    ).tap { |s| s.update!(property_string_1: "Basic", property_integer_1: 6) }
   end
 
   let!(:default_table_config) do
@@ -37,9 +44,8 @@ RSpec.feature "Companies::Services Management", type: :feature, js: true do
       property_mapping: default_category.default_property_mapping,
       resource_name: "services",
       metadata: { "columns" => [
-        { "key" => "name", "name" => "Service Name", "visible" => true, "sortable" => true, "align" => "left", "pinned" => nil, "width" => nil, "roles" => [], "is_virtual" => false, "render_config" => {} },
-        { "key" => "code", "name" => "Code", "visible" => true, "sortable" => true, "align" => "left", "pinned" => nil, "width" => nil, "roles" => [], "is_virtual" => false, "render_config" => {} },
-        { "key" => "workflow_status", "name" => "Status", "visible" => true, "sortable" => true, "align" => "center", "pinned" => nil, "width" => nil, "roles" => [], "is_virtual" => false, "render_config" => {} }
+        { "key" => "property_string_1", "name" => "Duration", "visible" => true, "sortable" => true, "align" => "left", "pinned" => nil, "width" => nil, "roles" => [], "is_virtual" => false, "render_config" => {} },
+        { "key" => "property_integer_1", "name" => "Sessions", "visible" => true, "sortable" => true, "align" => "right", "pinned" => nil, "width" => nil, "roles" => [], "is_virtual" => false, "render_config" => {} }
       ] }
     )
   end
@@ -75,12 +81,11 @@ RSpec.feature "Companies::Services Management", type: :feature, js: true do
 
     expect(page).to have_selector('table', wait: 10)
 
-    expect(page).to have_selector('th', text: 'Service Name')
-    expect(page).to have_selector('th', text: 'Category')
-    expect(page).to have_selector('th', text: 'Status')
+    expect(page).to have_selector('th', text: 'Duration', wait: 10)
+    expect(page).to have_selector('th', text: 'Sessions', wait: 10)
 
     expect(page).to have_selector('tbody tr')
-    expect(page).to have_content(service.name)
+    expect(page).to have_content("Premium")
   end
 
   scenario "edit button links to edit page for service" do
@@ -93,7 +98,10 @@ RSpec.feature "Companies::Services Management", type: :feature, js: true do
 
   scenario "filter by category updates URL and filters table" do
     category = Seed::CategoryService.create(company: company, name: "Test Category", resource_name: "services")
-    service.update!(category: category, property_mapping: category.default_property_mapping)
+    service.category = category
+    service.property_mapping = category.default_property_mapping
+    Seed::PropertyPopulator.populate(service)
+    service.save!
     visit company_services_path(company)
     expect(page).to have_selector('table', wait: 10)
 
@@ -104,27 +112,17 @@ RSpec.feature "Companies::Services Management", type: :feature, js: true do
     expect(page).to have_selector('tbody tr', wait: 10)
   end
 
-  scenario "display service workflow status as badge" do
-    visit company_services_path(company)
-    expect(page).to have_selector('table', wait: 10)
-
-    expect(page).to have_selector('span.rounded-full', wait: 10)
-  end
-
-  scenario "name link goes to show page" do
-    visit company_services_path(company)
-    expect(page).to have_selector('table', wait: 10)
-
-    name_link = find("a[href*='/services/#{service.id}']", match: :first)
-    expect(name_link).to be_present
-  end
-
   describe "table title" do
     let(:test_category) do
       Seed::CategoryService.create(company: company, name: "Test Category", resource_name: "services")
     end
 
     let!(:test_table_config) do
+      test_category.default_property_mapping.update!(
+        metadata: { "properties" => [
+          { "key" => "property_string_1", "type" => "string", "name" => "Duration" }
+        ] }
+      )
       test_category.default_property_mapping.table_configs.destroy_all
       tc = TableConfig.create!(
         company: company,
@@ -132,8 +130,7 @@ RSpec.feature "Companies::Services Management", type: :feature, js: true do
         property_mapping: test_category.default_property_mapping,
         resource_name: "services",
         metadata: { "columns" => [
-          { "key" => "name", "name" => "Name", "visible" => true, "sortable" => true, "align" => "left", "pinned" => nil, "width" => nil, "roles" => [], "is_virtual" => false, "render_config" => {} },
-          { "key" => "code", "name" => "Code", "visible" => true, "sortable" => true, "align" => "left", "pinned" => nil, "width" => nil, "roles" => [], "is_virtual" => false, "render_config" => {} }
+          { "key" => "property_string_1", "name" => "Duration", "visible" => true, "sortable" => true, "align" => "left", "pinned" => nil, "width" => nil, "roles" => [], "is_virtual" => false, "render_config" => {} }
         ] }
       )
       company.clear_permissions_cache

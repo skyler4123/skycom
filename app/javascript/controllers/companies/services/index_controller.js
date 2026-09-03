@@ -48,22 +48,7 @@ export default class Companies_Services_IndexController extends Companies_Layout
     const categoryValue = this.categoryIdValue || this.defaultFilterCategory()?.id
     const branchValue = new URLSearchParams(window.location.search).get('branch_id') || ''
 
-    const tableConfig = this.currentTableConfig()
     const propertyMapping = this.currentPropertyMapping()
-
-    const fallbackColumns = [
-      { key: "name", name: translate("Service Name") },
-      { key: "code", name: translate("Code") },
-      { key: "workflow_status", name: translate("Status") }
-    ]
-
-    const rawColumns = tableConfig?.metadata?.columns || fallbackColumns
-    const visibleColumns = rawColumns.filter(col => col.visible !== false)
-
-    if (!visibleColumns.some(c => c.key === "category")) {
-      const nameIdx = visibleColumns.findIndex(c => c.key === "name")
-      if (nameIdx >= 0) visibleColumns.splice(nameIdx + 1, 0, { key: "category", name: translate("Category") })
-    }
 
     const mappingLookup = (propertyMapping?.metadata?.properties || []).reduce((acc, field) => {
       acc[field.key] = field
@@ -114,28 +99,10 @@ export default class Companies_Services_IndexController extends Companies_Layout
           </div>
 
           <div class="overflow-x-auto">
-            ${table({
+            ${this.dynamicTableHTML({
               rows: this.services,
-              columns: visibleColumns,
-              identifier: this.identifier,
               target: "servicesList",
               mappingLookup,
-              renderers: {
-                name: (value, record) => `
-                  <div class="flex items-center gap-4">
-                    <div class="w-8 h-8 rounded-lg bg-sky-100 dark:bg-sky-900/30 flex items-center justify-center shrink-0">
-                      <span class="material-symbols-outlined text-sky-600 dark:text-sky-400 text-[18px]">medical_services</span>
-                    </div>
-                    <a href="${Helpers.company_service_path(currentCompany().id, record.id)}"
-                      class="font-medium text-slate-900 dark:text-white overflow-visible whitespace-normal hover:text-sky-600 dark:hover:text-sky-400 transition-colors cursor-pointer">
-                      ${value || translate('Unnamed Service')}
-                    </a>
-                  </div>
-                `,
-                code: (value) => `<span class="font-mono text-xs bg-slate-100 dark:bg-slate-800/60 px-2 py-0.5 rounded text-slate-600 dark:text-slate-300 font-medium">${value || '—'}</span>`,
-                workflow_status: (value) => `${Helpers.statusBadge(value)}`,
-                category: (value, record) => record.category?.name || '<span class="text-slate-300 dark:text-slate-700">—</span>',
-              },
               renderActions: (record) => `
                 <td class="py-4 px-6 text-sm text-right whitespace-nowrap">
                   <a href="${Helpers.edit_company_service_path(currentCompany().id, record.id)}"

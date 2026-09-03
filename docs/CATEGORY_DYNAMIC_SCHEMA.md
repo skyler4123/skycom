@@ -320,7 +320,7 @@ METADATA_CATEGORIES = {
         property_integer_1: "Volume (ml)",
         property_boolean_1: "Organic Certified"
       },
-      visible_columns: %w[name code property_string_1 property_string_2 property_integer_1 property_boolean_1]
+      visible_columns: %w[property_string_1 property_string_2 property_integer_1 property_boolean_1]
     },
     "Perfumes" => {
       properties: {
@@ -328,12 +328,14 @@ METADATA_CATEGORIES = {
         property_integer_1: "Volume (ml)",
         property_boolean_1: "Includes Tester Unit"
       },
-      visible_columns: %w[name code property_string_1 property_integer_1 property_boolean_1]
+      visible_columns: %w[property_string_1 property_integer_1 property_boolean_1]
     }
   },
   # ... etc
 }
 ```
+
+> **Property-only rule**: `visible_columns` may contain **`property_*` keys only** — default properties (`name`, `code`, `workflow_status`, ...) are no longer part of TableConfig. At seed time the init services grep `visible_columns` down to `property_*` keys; when nothing remains, all properties defined in the entry's `properties:` hash become the visible columns.
 
 ### Seed Service Flow
 
@@ -362,7 +364,7 @@ Seed::TableConfigService.create(
   company: company,
   resource_name: "products",
   category: cosmetics_category,
-  columns_metadata: %w[name code property_string_1 property_integer_1 property_boolean_1].map { |k|
+  columns_metadata: %w[property_string_1 property_integer_1 property_boolean_1].map { |k|
     { "key" => k, "name" => k.humanize, "visible" => true, "sortable" => true,
       "align" => "left", "pinned" => nil, "width" => nil, "roles" => [],
       "is_virtual" => false, "render_config" => {} }
@@ -437,7 +439,7 @@ function renderDynamicFields(product, category) {
 4. **Empty = Skip** - If a property has no name, don't render that field in UI
 5. **Separate concerns** - PropertyMapping defines what data means via `property_metadata`; TableConfig defines what's visible via `columns_metadata`. A named property can be hidden from the table by setting `visible: false` in the column hash
 6. **Keep in sync** - Properties and their table visibility live in the same `METADATA_CATEGORIES` entry — never define them separately
-7. **`name` is universal** - The `name` column is prepended automatically by `TableConfig`'s default. Always include it first in the seed `visible_columns` array
+7. **Property columns only** - TableConfig accepts only `property_*` keys (model-enforced). Default properties (`name`, `code`, status) are rendered by their own future system, not the dynamic table
 
 ---
 

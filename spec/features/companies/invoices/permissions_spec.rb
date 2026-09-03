@@ -5,7 +5,13 @@ RSpec.feature "Companies::Invoices Permissions", type: :feature, js: true do
   let(:owner) { company.user }
 
   let!(:default_category) do
-    Seed::CategoryService.find_or_create_for(company: company, resource_name: "invoices")
+    category = Seed::CategoryService.find_or_create_for(company: company, resource_name: "invoices")
+    category.default_property_mapping.update!(
+      metadata: { "properties" => [
+        { "key" => "property_string_1", "type" => "string", "name" => "Billing Cycle" }
+      ] }
+    )
+    category
   end
 
   let!(:default_table_config) do
@@ -16,9 +22,7 @@ RSpec.feature "Companies::Invoices Permissions", type: :feature, js: true do
       property_mapping: default_category.default_property_mapping,
       resource_name: "invoices",
       metadata: { "columns" => [
-        { "key" => "name", "name" => "Invoice Name", "visible" => true, "sortable" => true, "align" => "left", "pinned" => nil, "width" => nil, "roles" => [], "is_virtual" => false, "render_config" => {} },
-        { "key" => "code", "name" => "Code", "visible" => true, "sortable" => true, "align" => "left", "pinned" => nil, "width" => nil, "roles" => [], "is_virtual" => false, "render_config" => {} },
-        { "key" => "workflow_status", "name" => "Status", "visible" => true, "sortable" => true, "align" => "center", "pinned" => nil, "width" => nil, "roles" => [], "is_virtual" => false, "render_config" => {} }
+        { "key" => "property_string_1", "name" => "Billing Cycle", "visible" => true, "sortable" => true, "align" => "left", "pinned" => nil, "width" => nil, "roles" => [], "is_virtual" => false, "render_config" => {} }
       ] }
     )
   end
@@ -99,7 +103,7 @@ RSpec.feature "Companies::Invoices Permissions", type: :feature, js: true do
       name: "Invoice for Permissions",
       business_type: "sales",
       workflow_status: "draft"
-    )
+    ).tap { |i| i.update!(property_string_1: "Monthly") }
   end
 
   # =========================================================================
@@ -185,7 +189,7 @@ RSpec.feature "Companies::Invoices Permissions", type: :feature, js: true do
     visit company_invoices_path(company)
 
     expect(page).to have_selector('table', wait: 10)
-    expect(page).to have_content(invoice.name)
+    expect(page).to have_content("Monthly")
   end
 
   # =========================================================================
