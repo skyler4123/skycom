@@ -23,7 +23,6 @@ services:
     tty: true
     depends_on:
       - postgres
-      - pulse_postgres
       - minio
       - websocket
       - meilisearch
@@ -39,7 +38,6 @@ services:
       - sqlite_storage:/rails/storage
     depends_on:
       - web
-      - pulse_postgres
       - websocket
       - meilisearch
 
