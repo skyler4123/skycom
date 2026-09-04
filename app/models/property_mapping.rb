@@ -124,30 +124,102 @@ class PropertyMapping < ApplicationRecord
   # --- Validations ---
   validate :validate_property_metadata
   validate :must_have_table_config
+  validate :defined_properties_present
 
+  before_validation :merge_defined_properties
   after_create :create_default_table_config
   after_update :sync_table_configs, if: :saved_change_to_metadata?
+
+  class << self
+    # Entry hashes for the model's defined (BE-owned) properties, intersected
+    # with its real columns. e.g. Product → [{ "key" => "name", "name" => "Name",
+    # "type" => "string", "validates" => {}, "defined" => true }, ...]
+    def defined_property_entries(resource_name)
+      klass = resource_name.to_s.singularize.classify.safe_constantize
+      return [] unless klass&.respond_to?(:standard_property_entries)
+
+      columns = klass.column_names
+      klass.standard_property_entries.select { |entry| columns.include?(entry["key"]) }
+    end
+
+    def defined_property_keys(resource_name)
+      defined_property_entries(resource_name).map { |entry| entry["key"] }
+    end
+
+    def defined_property_label(resource_name, key)
+      defined_property_entries(resource_name).find { |entry| entry["key"] == key.to_s }&.dig("name")
+    end
+  end
 
   def default_table_config
     table_configs.first
   end
 
+  def defined_property_keys
+    self.class.defined_property_keys(resolved_resource_name)
+  end
+
+  private
+
+  # Prefer the PM's own resource_name; fall back to the category's. The
+  # Category#create_default_property_mapping callback never sets PM.resource_name.
+  def resolved_resource_name
+    resource_name.presence || category&.resource_name
+  end
+
+  # Runs BEFORE validations — appends missing defined entries and restores
+  # renamed ones from the model constant, so normal flows are always consistent.
+  def merge_defined_properties
+    entries = self.class.defined_property_entries(resolved_resource_name)
+    return if entries.blank?
+
+    self.metadata ||= {}
+    props = (self.properties || []).dup
+
+    entries.each do |entry|
+      key = entry["key"]
+      existing = props.find { |p| p["key"] == key }
+      if existing
+        existing["name"] = entry["name"]
+        existing["type"] = entry["type"]
+        existing["validates"] = entry["validates"]
+        existing["defined"] = true
+      else
+        props << entry.deep_dup
+      end
+    end
+
+    self.properties = props
+  end
+
+  # Safety net — fails loudly if a defined key is still missing after the merge
+  # (e.g. direct JSONB writes or a constant expansion mid-flight).
+  def defined_properties_present
+    keys = defined_property_keys
+    return if keys.blank?
+
+    missing = keys - (properties || []).map { |p| p["key"] }
+    return if missing.blank?
+
+    errors.add(:metadata, "must include defined properties: #{missing.join(", ")}")
+  end
+
   def sync_table_configs
     props = self.properties || []
-    pm_property_keys = props.select { |pm| pm["key"].to_s.start_with?("property_") }
-    pm_keys = pm_property_keys.map { |pm| pm["key"] }
+    pm_keys = props.map { |pm| pm["key"] }
+    defined_keys = defined_property_keys
 
     table_configs.reset.each do |tc|
       columns = (tc.columns || []).dup
       changed = false
 
       original_size = columns.size
-      columns.reject! { |col| col["key"].to_s.start_with?("property_") && !pm_keys.include?(col["key"]) }
+      columns.reject! { |col| managed_key?(col["key"], defined_keys) && !pm_keys.include?(col["key"]) }
       changed ||= columns.size != original_size
 
       columns.each do |col|
-        next unless col["key"].to_s.start_with?("property_")
-        pm_entry = pm_property_keys.find { |pm| pm["key"] == col["key"] }
+        next unless managed_key?(col["key"], defined_keys)
+        pm_entry = props.find { |pm| pm["key"] == col["key"] }
         next unless pm_entry
         next if pm_entry["name"] == col["name"]
 
@@ -157,7 +229,8 @@ class PropertyMapping < ApplicationRecord
 
       pm_keys.each do |key|
         next if columns.any? { |c| c["key"] == key }
-        pm_entry = pm_property_keys.find { |pm| pm["key"] == key }
+        next unless managed_key?(key, defined_keys)
+        pm_entry = props.find { |pm| pm["key"] == key }
         columns << {
           "key" => key,
           "name" => pm_entry["name"],
@@ -177,6 +250,10 @@ class PropertyMapping < ApplicationRecord
         tc.update!(columns: columns)
       end
     end
+  end
+
+  def managed_key?(key, defined_keys = defined_property_keys)
+    key.to_s.start_with?("property_") || defined_keys.include?(key.to_s)
   end
 
   private
@@ -208,6 +285,11 @@ class PropertyMapping < ApplicationRecord
       key = entry["key"]
       if key.blank?
         errors.add(:metadata, "properties element #{idx}: key is required")
+        next
+      end
+
+      unless managed_key?(key)
+        errors.add(:metadata, "properties element #{idx}: key '#{key}' is not a property_* slot or defined property")
         next
       end
 

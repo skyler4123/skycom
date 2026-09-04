@@ -41,6 +41,69 @@ RSpec.describe PropertyMapping, type: :model do
     end
   end
 
+  describe "defined properties (StandardPropertiesConcern)" do
+    let(:products_category) do
+      create(:category, name: "Cosmetics") { |c| c.update!(resource_name: "products") }
+    end
+
+    def products_pm
+      products_category.default_property_mapping.tap { |pm| pm.update!(resource_name: "products") }
+    end
+
+    describe ".defined_property_entries" do
+      it "returns entry hashes for the resource's standard set" do
+        keys = PropertyMapping.defined_property_entries("products").map { |e| e["key"] }
+        expect(keys).to contain_exactly("name", "description", "code", "workflow_status")
+      end
+
+      it "returns [] for an unknown resource" do
+        expect(PropertyMapping.defined_property_entries("space_widgets")).to eq([])
+      end
+
+      it "returns [] for a resource whose model does not include the concern" do
+        expect(PropertyMapping.defined_property_entries("stocks")).to eq([])
+      end
+    end
+
+    describe "merge on create/update" do
+      it "auto-adds defined entries to a property mapping" do
+        pm = products_pm
+        keys = pm.reload.properties.map { |p| p["key"] }
+        expect(keys).to include("name", "code", "workflow_status")
+        name_entry = pm.properties.find { |p| p["key"] == "name" }
+        expect(name_entry["name"]).to eq("Name")
+        expect(name_entry["type"]).to eq("string")
+        expect(name_entry["defined"]).to be(true)
+      end
+
+      it "restores a renamed defined key from the constant" do
+        pm = products_pm
+        pm.update!(properties: pm.properties.map { |p| p["key"] == "name" ? p.merge("name" => "Nickname") : p })
+        name_entry = pm.reload.properties.find { |p| p["key"] == "name" }
+        expect(name_entry["name"]).to eq("Name")
+      end
+    end
+
+    describe "defined_properties_present" do
+      it "errors when defined keys are missing and the merge is bypassed" do
+        pm = products_pm
+        pm.metadata = { "properties" => [ { "key" => "property_string_2", "type" => "string", "name" => "X" } ] }
+        allow(pm).to receive(:merge_defined_properties) # simulate bypassing the merge
+        expect(pm).not_to be_valid
+        expect(pm.errors[:metadata]).to include(match(/must include defined properties/))
+      end
+    end
+
+    describe "validate_property_metadata" do
+      it "rejects keys that are neither property_* nor defined" do
+        pm = products_pm
+        pm.properties = pm.properties + [ { "key" => "email", "type" => "string", "name" => "Email" } ]
+        expect(pm).not_to be_valid
+        expect(pm.errors[:metadata]).to include(match(/not a property_\* slot or defined property/))
+      end
+    end
+  end
+
   describe "after_update :sync_table_configs" do
     let(:property_mapping) { create(:property_mapping) }
     let(:table_config) { property_mapping.default_table_config }

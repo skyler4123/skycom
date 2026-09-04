@@ -5,6 +5,7 @@ class Branch < ApplicationRecord
   include AddressConcern
   include TagConcern
   include Branch::ImageConcern
+  include StandardPropertiesConcern
   attribute :permission_resource_name, :string, default: -> { self.name }
 
   # --- Enums ---

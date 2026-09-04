@@ -15,7 +15,9 @@ module DynamicValidationConcern
     return unless respond_to?(:property_mapping) && property_mapping.present?
 
     metadata = property_mapping.properties || []
-    property_keys = metadata.map { |e| e["key"] }.compact
+    # Defined properties (name, code, workflow_status, ...) are real columns
+    # seeded by the caller — only dynamic property_* slots are auto-populated.
+    property_keys = metadata.filter_map { |e| e["key"] if e["key"].to_s.start_with?("property_") }
     return if property_keys.empty?
     return unless property_keys.any? { |k| respond_to?(k) }
     return if property_keys.any? { |k| respond_to?(k) && send(k).present? }

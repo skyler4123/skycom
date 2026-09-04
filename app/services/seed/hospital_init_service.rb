@@ -123,9 +123,14 @@ class Seed::HospitalInitService
 
   def create_table_configs
     HOSPITAL_INIT_CATEGORIES.each do |resource_name, categories|
+      defined_entries = PropertyMapping.defined_property_entries(resource_name.to_s)
+        .index_by { |entry| entry["key"] }
+
       categories.each do |name, entry|
-        # Dynamic tables support property_* columns only — default properties are excluded.
-        keys = (entry[:visible_columns] || []).grep(/\Aproperty_/)
+        keys = (entry[:visible_columns] || []).select do |k|
+          k.start_with?("property_") || defined_entries.key?(k)
+        end
+        keys = defined_entries.keys if keys.blank? && defined_entries.present?
         keys = entry[:properties].keys.map(&:to_s) if keys.blank? && entry[:properties].present?
         next unless keys.present?
 
@@ -137,15 +142,15 @@ class Seed::HospitalInitService
           resource_name: resource_name.to_s,
           category: category,
           property_mapping: category.default_property_mapping,
-          columns_metadata: keys.map { |k| field_hash(k, entry[:properties]) },
+          columns_metadata: keys.map { |k| field_hash(k, entry[:properties], defined_entries) },
           name: "#{name} table config"
         )
       end
     end
   end
 
-  def field_hash(key, properties = {})
-    name = properties[key.to_sym] || key.humanize
+  def field_hash(key, properties = {}, defined_entries = {})
+    name = properties[key.to_sym] || defined_entries[key]&.dig("name") || key.humanize
     { "key" => key, "name" => name, "visible" => true,
       "sortable" => true, "align" => "left", "pinned" => nil,
       "width" => nil, "roles" => [], "is_virtual" => false,

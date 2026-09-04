@@ -93,6 +93,19 @@ export default class Companies_Branches_IndexController extends Companies_Layout
               rows: this.branches,
               target: "branchesList",
               mappingLookup,
+              renderers: {
+                name: (value, record) => `
+                  <div class="flex items-center gap-4">
+                    <div class="w-8 h-8 rounded-lg bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center shrink-0">
+                      <span class="material-symbols-outlined text-blue-600 dark:text-blue-400 text-[18px]">store</span>
+                    </div>
+                    <a href="${Helpers.company_branch_path(currentCompany().id, record.id)}"
+                      class="font-medium text-slate-900 dark:text-white overflow-visible whitespace-normal hover:text-blue-600 dark:hover:text-blue-400 transition-colors cursor-pointer">
+                      ${value || translate("Unnamed Branch")}
+                    </a>
+                  </div>
+                `
+              },
               renderActions: (record) => `
                 <td class="py-4 px-6 text-sm text-right whitespace-nowrap">
                   <a href="${Helpers.edit_company_branch_path(currentCompany().id, record.id)}"

@@ -61,7 +61,8 @@ RSpec.shared_examples "client cache invalidation" do |resource_name:|
 
     select "property_string_2 (string)", from: "new-property-slot"
     click_button "Add Property"
-    fill_in "property_mapping[metadata][properties][1][name]", with: "Added Field"
+    row = find("tr", text: "property_string_2")
+    row.find("input[name$='[name]']").fill_in(with: "Added Field")
     click_button "Save Changes"
     expect(page).to have_content("Property mapping updated successfully", wait: 10)
 
@@ -75,7 +76,8 @@ RSpec.shared_examples "client cache invalidation" do |resource_name:|
     visit edit_company_property_mapping_path(company, property_mapping)
     expect(page).to have_selector("#new-property-slot", wait: 10)
 
-    fill_in "property_mapping[metadata][properties][0][name]", with: "Renamed Field"
+    row = find("tr", text: "property_string_1")
+    row.find("input[name$='[name]']").fill_in(with: "Renamed Field")
     click_button "Save Changes"
     expect(page).to have_content("Property mapping updated successfully", wait: 10)
 
@@ -90,7 +92,8 @@ RSpec.shared_examples "client cache invalidation" do |resource_name:|
     visit edit_company_property_mapping_path(company, property_mapping)
     expect(page).to have_selector("#new-property-slot", wait: 10)
 
-    find("button[data-index='0']").click
+    row = find("tr", text: "property_string_1")
+    row.find("button[data-action*='removeProperty']").click
     click_button "Save Changes"
     expect(page).to have_content("Property mapping updated successfully", wait: 10)
 

@@ -103,6 +103,19 @@ export default class Companies_Services_IndexController extends Companies_Layout
               rows: this.services,
               target: "servicesList",
               mappingLookup,
+              renderers: {
+                name: (value, record) => `
+                  <div class="flex items-center gap-4">
+                    <div class="w-8 h-8 rounded-lg bg-sky-100 dark:bg-sky-900/30 flex items-center justify-center shrink-0">
+                      <span class="material-symbols-outlined text-sky-600 dark:text-sky-400 text-[18px]">medical_services</span>
+                    </div>
+                    <a href="${Helpers.company_service_path(currentCompany().id, record.id)}"
+                      class="font-medium text-slate-900 dark:text-white overflow-visible whitespace-normal hover:text-sky-600 dark:hover:text-sky-400 transition-colors cursor-pointer">
+                      ${value || translate("Unnamed Service")}
+                    </a>
+                  </div>
+                `
+              },
               renderActions: (record) => `
                 <td class="py-4 px-6 text-sm text-right whitespace-nowrap">
                   <a href="${Helpers.edit_company_service_path(currentCompany().id, record.id)}"

@@ -38,6 +38,7 @@ window.getQueryParam = Helpers.getQueryParam
 window.pagination = Helpers.pagination
 window.randomId = Helpers.randomId
 window.cloneNewKey = Helpers.cloneNewKey
+window.dynamicProperties = Helpers.dynamicProperties
 window.openModal = Helpers.openModal
 window.closeModal = Helpers.closeModal
 window.openPopover = Helpers.openPopover

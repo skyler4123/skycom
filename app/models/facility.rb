@@ -3,6 +3,7 @@ class Facility < ApplicationRecord
   include PropertyMappingConcern
   include DynamicSearchConcern
   include TagConcern
+  include StandardPropertiesConcern
   attribute :permission_resource_name, :string, default: -> { self.name }
 
   enum :country, COUNTRY_CODES, prefix: true, default: :us

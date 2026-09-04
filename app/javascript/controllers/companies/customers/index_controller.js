@@ -102,6 +102,19 @@ export default class Companies_Customers_IndexController extends Companies_Layou
               rows: this.customers,
               target: "customersList",
               mappingLookup,
+              renderers: {
+                name: (value, record) => `
+                  <div class="flex items-center gap-4">
+                    <div class="w-8 h-8 rounded-lg bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center shrink-0">
+                      <span class="material-symbols-outlined text-purple-600 dark:text-purple-400 text-[18px]">person</span>
+                    </div>
+                    <a href="${Helpers.company_customer_path(currentCompany().id, record.id)}"
+                      class="font-medium text-slate-900 dark:text-white overflow-visible whitespace-normal hover:text-blue-600 dark:hover:text-blue-400 transition-colors cursor-pointer">
+                      ${value || translate("Unnamed Customer")}
+                    </a>
+                  </div>
+                `
+              },
               renderActions: (record) => `
                 <td class="py-4 px-6 text-sm text-right whitespace-nowrap">
                   <a href="${Helpers.edit_company_customer_path(currentCompany().id, record.id)}"

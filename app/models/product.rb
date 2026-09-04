@@ -6,6 +6,7 @@ class Product < ApplicationRecord
   include TagConcern
   include OrderConcern
   include Product::ImageConcern
+  include StandardPropertiesConcern
   attribute :permission_resource_name, :string, default: -> { self.name }
 
   enum :country, COUNTRY_CODES, prefix: true, default: :us

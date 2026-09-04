@@ -304,6 +304,13 @@ RSpec.feature "Companies::Customers Permissions", type: :feature, js: true do
 
     expect(page).to have_selector('table', wait: 10)
     expect(page).to have_link(href: /\/edit$/, minimum: 1)
+
+    # Restore a clean property state so later (randomized) scenarios that
+    # submit or assert empty tables do not inherit this scenario's
+    # property table config and dynamic validations.
+    property_mapping.update!(metadata: { "properties" => [] })
+    table_config.destroy!
+    page.execute_script("localStorage.clear()")
   end
 
   scenario "editor can? returns true for read and update" do
@@ -323,7 +330,14 @@ RSpec.feature "Companies::Customers Permissions", type: :feature, js: true do
     company.clear_permissions_cache
     editor_employee.reload
 
+    # The property-table scenario may have added dynamic validations to this
+    # category's PM and seeded localStorage — neutralize both so this run does
+    # not depend on scenario order.
+    pm = target_customer.category.default_property_mapping
+    company.table_configs.create!(category: target_customer.category, property_mapping: pm, resource_name: "customers") unless pm.table_configs.any?
+    pm.update!(metadata: { "properties" => [] })
     sign_in(editor_user)
+    page.execute_script("localStorage.clear()")
     seed_client_cache
     visit edit_company_customer_path(company, target_customer)
 
