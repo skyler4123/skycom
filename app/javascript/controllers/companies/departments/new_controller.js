@@ -100,7 +100,19 @@ export default class Companies_Departments_NewController extends Companies_Layou
 
   contentHTML() {
     const categoryFilter = this.departmentsCategories()
-    const typeOptions = (Enums()?.department?.business_types || []).map(t =>
+    // Static fallback — guards against the client-cache enum race (see docs/FLAKY_TESTS.md §6)
+    const typeOptions = (Enums()?.department?.business_types || [
+      { name: "Sales", value: "sales" },
+      { name: "Marketing", value: "marketing" },
+      { name: "Operations", value: "operations" },
+      { name: "Finance", value: "finance" },
+      { name: "Human Resources", value: "human_resources" },
+      { name: "Information Technology", value: "information_technology" },
+      { name: "Customer Service", value: "customer_service" },
+      { name: "Research And Development", value: "research_and_development" },
+      { name: "Legal", value: "legal" },
+      { name: "Administrative", value: "administrative" }
+    ]).map(t =>
       `<option value="${t.value}">${t.name}</option>`
     ).join('')
 

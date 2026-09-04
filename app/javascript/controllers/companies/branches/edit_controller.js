@@ -57,7 +57,20 @@ export default class Companies_Branches_EditController extends Companies_LayoutC
     if (!b) return `<div class="p-8 text-center">${translate("Branch not found.")}</div>`
 
     const companyId = window.location.pathname.split("/")[2]
-    const businessTypes = Enums()?.branch?.business_types || []
+    const businessTypes = Enums()?.branch?.business_types || [
+      { name: "Storefront", value: "storefront" },
+      { name: "Kiosk", value: "kiosk" },
+      { name: "Showroom", value: "showroom" },
+      { name: "Warehouse", value: "warehouse" },
+      { name: "Distribution Center", value: "distribution_center" },
+      { name: "Dark Store", value: "dark_store" },
+      { name: "Service Point", value: "service_point" },
+      { name: "Clinic Wing", value: "clinic_wing" },
+      { name: "Classroom Annex", value: "classroom_annex" },
+      { name: "Headquarters", value: "headquarters" },
+      { name: "Administrative", value: "administrative" },
+      { name: "Virtual", value: "virtual" }
+    ]
     const workflowStatuses = Enums()?.branch?.workflow_statuses || []
 
     const dynamicFields = this.propertyMetadata.length > 0 ? `

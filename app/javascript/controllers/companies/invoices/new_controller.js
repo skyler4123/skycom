@@ -84,11 +84,19 @@ export default class Companies_Invoices_NewController extends Companies_LayoutCo
   contentHTML() {
     const categoryFilter = this.invoicesCategories()
 
-    const typeOptions = (Enums()?.invoice?.business_types || []).map(t =>
+    // Static fallback — guards against the client-cache enum race (see docs/FLAKY_TESTS.md §6)
+    const typeOptions = (Enums()?.invoice?.business_types || [
+      { name: "Sales", value: "sales" },
+      { name: "Service", value: "service" },
+      { name: "Subscription", value: "subscription" }
+    ]).map(t =>
       `<option value="${t.value}">${t.name === 'subscription' ? translate("Subscription") : (t.name ? t.name.charAt(0).toUpperCase() + t.name.slice(1) : t.value)}</option>`
     ).join('')
 
-    const currencyOptions = (Enums()?.invoice?.currencies || []).map(c =>
+    const currencyOptions = (Enums()?.invoice?.currencies || [
+      { name: "USD", value: "usd" },
+      { name: "VND", value: "vnd" }
+    ]).map(c =>
       `<option value="${c.value}">${c.name?.toUpperCase() || c.value?.toUpperCase()}</option>`
     ).join('')
 

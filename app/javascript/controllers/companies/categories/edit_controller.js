@@ -38,7 +38,7 @@ export default class Companies_Categories_EditController extends Companies_Layou
 
     const companyId = window.location.pathname.split("/")[2]
 
-    const resourceOptions = (Enums()?.category?.resource_names || []).map(r => ({
+    const resourceOptions = (Enums()?.category?.resource_names || [ "products", "employees", "branches", "departments", "brands", "customers", "services", "facilities" ]).map(r => ({
       name: r.charAt(0).toUpperCase() + r.slice(1),
       value: r
     })).map(opt => `<option value="${opt.value}" ${opt.value === c.resource_name ? 'selected' : ''}>${opt.name}</option>`).join('')

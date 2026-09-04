@@ -46,7 +46,18 @@ export default class Companies_Departments_EditController extends Companies_Layo
     if (!d) return `<div class="p-8 text-center">${translate("Department not found.")}</div>`
 
     const companyId = window.location.pathname.split("/")[2]
-    const businessTypes = Enums()?.department?.business_types || []
+    const businessTypes = Enums()?.department?.business_types || [
+      { name: "Sales", value: "sales" },
+      { name: "Marketing", value: "marketing" },
+      { name: "Operations", value: "operations" },
+      { name: "Finance", value: "finance" },
+      { name: "Human Resources", value: "human_resources" },
+      { name: "Information Technology", value: "information_technology" },
+      { name: "Customer Service", value: "customer_service" },
+      { name: "Research And Development", value: "research_and_development" },
+      { name: "Legal", value: "legal" },
+      { name: "Administrative", value: "administrative" }
+    ]
     const workflowStatuses = Enums()?.department?.workflow_statuses || []
 
     const dynamicFields = this.propertyMetadata.length > 0 ? `

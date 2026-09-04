@@ -110,7 +110,14 @@ DYNAMIC_SEARCH_MODELS = {
   StockTransfer => ->(company) { create_seed_record(Seed::StockTransferService, company, "stock_transfers", product: create(:product, company: company), warehouse: create(:warehouse, company: company)) },
   TableConfig => ->(company) {
     category = create(:category, company: company, resource_name: "products")
-    create(:table_config, company: company, category: category, property_mapping: category.default_property_mapping)
+    # The factory's TableConfig columns expect property_string_1 to be named
+    # "Skin Type", but the category factory assigns random labels — force the
+    # mapping to match so the column name validation never flakes.
+    pm = category.default_property_mapping
+    props = (pm.properties || []).reject { |p| p["key"] == "property_string_1" }
+    props << { "key" => "property_string_1", "type" => "string", "name" => "Skin Type", "validates" => {} }
+    pm.update!(metadata: { "properties" => props })
+    create(:table_config, company: company, category: category, property_mapping: pm)
   },
   Task => ->(company) {
     task_group = create_searchable_record(TaskGroup, company, "task_groups")

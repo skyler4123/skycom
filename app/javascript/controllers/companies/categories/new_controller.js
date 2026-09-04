@@ -14,7 +14,7 @@ export default class Companies_Categories_NewController extends Companies_Layout
   }
 
   contentHTML() {
-    const resourceOptions = (Enums()?.category?.resource_names || []).map(r => ({
+    const resourceOptions = (Enums()?.category?.resource_names || [ "products", "employees", "branches", "departments", "brands", "customers", "services", "facilities" ]).map(r => ({
       name: r.charAt(0).toUpperCase() + r.slice(1),
       value: r
     }))

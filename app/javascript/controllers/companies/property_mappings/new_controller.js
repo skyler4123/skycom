@@ -18,7 +18,7 @@ export default class Companies_PropertyMappings_NewController extends Companies_
       `<option value="${c.id}">${c.name}</option>`
     ).join('')
 
-    const resourceOptions = (Enums()?.category?.resource_names || []).map(r =>
+    const resourceOptions = (Enums()?.category?.resource_names || [ "products", "employees", "branches", "departments", "brands", "customers", "services", "facilities" ]).map(r =>
       `<option value="${r}">${r.charAt(0).toUpperCase() + r.slice(1)}</option>`
     ).join('')
 

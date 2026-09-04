@@ -46,9 +46,16 @@ export default class Companies_Orders_EditController extends Companies_LayoutCon
     if (!o) return `<div class="p-8 text-center">${translate("Order not found.")}</div>`
 
     const companyId = window.location.pathname.split("/")[2]
-    const businessTypes = Enums()?.order?.business_types || []
+    const businessTypes = Enums()?.order?.business_types || [
+      { name: "Online", value: "online" },
+      { name: "In Store", value: "in_store" },
+      { name: "Phone", value: "phone" }
+    ]
     const workflowStatuses = Enums()?.order?.workflow_statuses || []
-    const currencyCodes = Enums()?.order?.currencies || []
+    const currencyCodes = Enums()?.order?.currencies || [
+      { name: "USD", value: "usd" },
+      { name: "VND", value: "vnd" }
+    ]
 
     const dynamicFields = this.propertyMetadata.length > 0 ? `
       <div class="border-t border-slate-200 dark:border-gray-800 pt-6 mt-6">
