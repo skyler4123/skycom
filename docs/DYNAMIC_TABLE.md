@@ -4,8 +4,6 @@
 >
 > This document covers only the dynamic column system — how `property_*` columns get their display names, how tables render them, and how modals generate form fields.
 
-> **Property-only rule**: The dynamic table system supports **`property_*` columns only**. Default properties (`name`, `code`, `workflow_status`, `business_type`, `category`, ...) are NOT part of TableConfig — the model validation rejects any non-`property_*` key, seeds strip them from `visible_columns`, and index controllers render only configured property columns (via `dynamicColumns()`/`dynamicTableHTML()` on `Companies_LayoutController`, with a "No columns configured" empty state). Default properties will get their own rendering system later.
-
 ---
 
 ## 1. Data Flow

@@ -447,9 +447,7 @@ class Seed::RetailInitService
   def create_table_configs
     RETAIL_INIT_CATEGORIES.each do |resource_name, categories|
       categories.each do |name, entry|
-        # Dynamic tables support property_* columns only — default properties are excluded.
-        keys = (entry[:visible_columns] || []).grep(/\Aproperty_/)
-        keys = entry[:properties].keys.map(&:to_s) if keys.blank? && entry[:properties].present?
+        keys = entry[:visible_columns]
         next unless keys.present?
 
         category = Category.find_by(company: @company, resource_name: resource_name.to_s, name: name)

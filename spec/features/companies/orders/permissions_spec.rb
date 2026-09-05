@@ -5,13 +5,7 @@ RSpec.feature "Companies::Orders Permissions", type: :feature, js: true do
   let(:owner) { company.user }
 
   let!(:default_category) do
-    category = Seed::CategoryService.find_or_create_for(company: company, resource_name: "orders")
-    category.default_property_mapping.update!(
-      metadata: { "properties" => [
-        { "key" => "property_string_1", "type" => "string", "name" => "Priority" }
-      ] }
-    )
-    category
+    Seed::CategoryService.find_or_create_for(company: company, resource_name: "orders")
   end
 
   let!(:default_table_config) do
@@ -22,7 +16,9 @@ RSpec.feature "Companies::Orders Permissions", type: :feature, js: true do
       property_mapping: default_category.default_property_mapping,
       resource_name: "orders",
       metadata: { "columns" => [
-        { "key" => "property_string_1", "name" => "Priority", "visible" => true, "sortable" => true, "align" => "left", "pinned" => nil, "width" => nil, "roles" => [], "is_virtual" => false, "render_config" => {} }
+        { "key" => "name", "name" => "Order Name", "visible" => true, "sortable" => true, "align" => "left", "pinned" => nil, "width" => nil, "roles" => [], "is_virtual" => false, "render_config" => {} },
+        { "key" => "code", "name" => "Code", "visible" => true, "sortable" => true, "align" => "left", "pinned" => nil, "width" => nil, "roles" => [], "is_virtual" => false, "render_config" => {} },
+        { "key" => "workflow_status", "name" => "Status", "visible" => true, "sortable" => true, "align" => "center", "pinned" => nil, "width" => nil, "roles" => [], "is_virtual" => false, "render_config" => {} }
       ] }
     )
   end
@@ -101,7 +97,7 @@ RSpec.feature "Companies::Orders Permissions", type: :feature, js: true do
       business_type: "online",
       workflow_status: "draft",
       category: default_category
-    ).tap { |o| o.update!(property_string_1: "High") }
+    )
   end
 
   # =========================================================================
@@ -187,7 +183,7 @@ RSpec.feature "Companies::Orders Permissions", type: :feature, js: true do
     visit company_orders_path(company)
 
     expect(page).to have_selector('table', wait: 10)
-    expect(page).to have_content("High")
+    expect(page).to have_content(order.name)
   end
 
   # =========================================================================
