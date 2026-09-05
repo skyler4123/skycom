@@ -25,7 +25,7 @@ RSpec.shared_examples "client cache invalidation" do |resource_name:|
     payload = {
       user: JSON.parse(company.user.to_json),
       companies: [ company_data ],
-      enums: {},
+      enums: ClientCache::EnumsBuilder.build,
       employees: []
     }
 
