@@ -1,7 +1,5 @@
 # Skycom Category Dynamic Schema System
 
-> **Name rule**: The three-layer rule for friendly vs raw dynamic property names (BE raw / FE maps / User friendly) is documented in `docs/DYNAMIC_NAME_MAPPING.md` — read it before building anything that touches `property_*` columns.
-
 ## 1. Overview
 
 The **Category + PropertyMapping + TableConfig** system provides a complete **Dynamic Schema + Display Configuration** for the UI. It defines:
