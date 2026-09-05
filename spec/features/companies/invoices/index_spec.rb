@@ -11,13 +11,7 @@ RSpec.feature "Companies::Invoices Management", type: :feature, js: true do
   end
 
   let!(:default_category) do
-    category = Seed::CategoryService.find_or_create_for(company: company, resource_name: "invoices")
-    category.default_property_mapping.update!(
-      metadata: { "properties" => [
-        { "key" => "property_string_1", "type" => "string", "name" => "Billing Cycle" }
-      ] }
-    )
-    category
+    Seed::CategoryService.find_or_create_for(company: company, resource_name: "invoices")
   end
 
   let!(:invoice) do
@@ -26,7 +20,7 @@ RSpec.feature "Companies::Invoices Management", type: :feature, js: true do
       name: "Test Invoice 1",
       business_type: "sales",
       workflow_status: "draft"
-    ).tap { |i| i.update!(property_string_1: "Monthly") }
+    )
   end
 
   let!(:invoice2) do
@@ -35,7 +29,7 @@ RSpec.feature "Companies::Invoices Management", type: :feature, js: true do
       name: "Test Invoice 2",
       business_type: "service",
       workflow_status: "pending"
-    ).tap { |i| i.update!(property_string_1: "Annual") }
+    )
   end
 
   let!(:default_table_config) do
@@ -46,7 +40,9 @@ RSpec.feature "Companies::Invoices Management", type: :feature, js: true do
       property_mapping: default_category.default_property_mapping,
       resource_name: "invoices",
       metadata: { "columns" => [
-        { "key" => "property_string_1", "name" => "Billing Cycle", "visible" => true, "sortable" => true, "align" => "left", "pinned" => nil, "width" => nil, "roles" => [], "is_virtual" => false, "render_config" => {} }
+        { "key" => "name", "name" => "Invoice Name", "visible" => true, "sortable" => true, "align" => "left", "pinned" => nil, "width" => nil, "roles" => [], "is_virtual" => false, "render_config" => {} },
+        { "key" => "code", "name" => "Code", "visible" => true, "sortable" => true, "align" => "left", "pinned" => nil, "width" => nil, "roles" => [], "is_virtual" => false, "render_config" => {} },
+        { "key" => "workflow_status", "name" => "Status", "visible" => true, "sortable" => true, "align" => "center", "pinned" => nil, "width" => nil, "roles" => [], "is_virtual" => false, "render_config" => {} }
       ] }
     )
   end
@@ -78,14 +74,16 @@ RSpec.feature "Companies::Invoices Management", type: :feature, js: true do
   end
 
   scenario "index page loads and displays invoices table" do
-    visit company_invoices_path(company, category_id: default_category.id)
+    visit company_invoices_path(company)
 
     expect(page).to have_selector('table', wait: 10)
 
-    expect(page).to have_selector('th', text: 'Billing Cycle', wait: 10)
+    expect(page).to have_selector('th', text: 'Invoice Name')
+    expect(page).to have_selector('th', text: 'Category')
+    expect(page).to have_selector('th', text: 'Status')
 
     expect(page).to have_selector('tbody tr')
-    expect(page).to have_content("Monthly")
+    expect(page).to have_content(invoice.name)
   end
 
   scenario "edit button links to edit page for invoice" do
@@ -96,17 +94,27 @@ RSpec.feature "Companies::Invoices Management", type: :feature, js: true do
     expect(edit_link).to be_present
   end
 
+  scenario "name link goes to show page" do
+    visit company_invoices_path(company)
+    expect(page).to have_selector('table', wait: 10)
+
+    name_link = find("a[href*='/invoices/#{invoice.id}']", match: :first)
+    expect(name_link).to be_present
+  end
+
+  scenario "displays invoice workflow status as badge" do
+    visit company_invoices_path(company)
+    expect(page).to have_selector('table', wait: 10)
+
+    expect(page).to have_selector('span.rounded-full', wait: 10)
+  end
+
   describe "table title" do
     let(:test_category) do
       Seed::CategoryService.create(company: company, name: "Test Category", resource_name: "invoices")
     end
 
     let!(:test_table_config) do
-      test_category.default_property_mapping.update!(
-        metadata: { "properties" => [
-          { "key" => "property_string_1", "type" => "string", "name" => "Billing Cycle" }
-        ] }
-      )
       test_category.default_property_mapping.table_configs.destroy_all
       tc = TableConfig.create!(
         company: company,
@@ -114,7 +122,8 @@ RSpec.feature "Companies::Invoices Management", type: :feature, js: true do
         property_mapping: test_category.default_property_mapping,
         resource_name: "invoices",
         metadata: { "columns" => [
-          { "key" => "property_string_1", "name" => "Billing Cycle", "visible" => true, "sortable" => true, "align" => "left", "pinned" => nil, "width" => nil, "roles" => [], "is_virtual" => false, "render_config" => {} }
+          { "key" => "name", "name" => "Name", "visible" => true, "sortable" => true, "align" => "left", "pinned" => nil, "width" => nil, "roles" => [], "is_virtual" => false, "render_config" => {} },
+          { "key" => "code", "name" => "Code", "visible" => true, "sortable" => true, "align" => "left", "pinned" => nil, "width" => nil, "roles" => [], "is_virtual" => false, "render_config" => {} }
         ] }
       )
       company.clear_permissions_cache

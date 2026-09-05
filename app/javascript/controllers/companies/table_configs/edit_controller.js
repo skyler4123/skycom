@@ -17,9 +17,7 @@ export default class Companies_TableConfigs_EditController extends Companies_Lay
     try {
       const response = await fetchJson(`${Helpers.company_table_config_path(companyId, configId)}.json`)
       this.config = response.table_config
-      this.propertyMappingIdValue = this.config?.property_mapping_id
-      // Dynamic tables support property_* columns only — drop legacy default-property rows.
-      this.columnsMetadata = (this.config?.metadata?.columns || []).filter(col => col.key?.startsWith("property_"))
+      this.columnsMetadata = this.config?.metadata?.columns || []
 
       poll(() => {
         if (this.hasContentTarget) {
@@ -45,7 +43,71 @@ export default class Companies_TableConfigs_EditController extends Companies_Lay
 
     const companyId = window.location.pathname.split("/")[2]
 
-    const rowsHTML = this.columnsMetadata.map((col, index) => this.columnRowHTML(col, index)).join('')
+    const rowsHTML = this.columnsMetadata.map((col, index) => `
+      <tr class="border-b border-slate-100 dark:border-gray-800 last:border-0">
+        <td class="py-2 px-3">
+          <input type="text" name="table_config[metadata][columns][${index}][key]" value="${col.key || ''}"
+            class="w-full px-2 py-1 text-xs font-mono border border-slate-200 dark:border-slate-600 rounded bg-white dark:bg-slate-800 text-slate-900 dark:text-white">
+        </td>
+        <td class="py-2 px-3">
+          ${col.key.startsWith('property_') ? `
+            <input type="text" name="table_config[metadata][columns][${index}][name]" value="${col.name || ''}"
+              class="w-full px-2 py-1 text-xs border border-slate-200 dark:border-slate-600 rounded bg-slate-50 dark:bg-slate-700 text-slate-400 cursor-not-allowed"
+              readonly
+              ${tooltip(translate("This field is synced from PropertyMapping. Please access the Property Mapping edit page to update this name."))}
+            >
+          ` : `
+            <input type="text" name="table_config[metadata][columns][${index}][name]" value="${col.name || ''}"
+              class="w-full px-2 py-1 text-xs border border-slate-200 dark:border-slate-600 rounded bg-white dark:bg-slate-800 text-slate-900 dark:text-white">
+          `}
+        </td>
+        <td class="py-2 px-3 text-center">
+          <input type="hidden" name="table_config[metadata][columns][${index}][visible]" value="false">
+          <input type="checkbox" name="table_config[metadata][columns][${index}][visible]" value="true" ${col.visible !== false ? 'checked' : ''}
+            class="rounded border-slate-300 text-blue-600 cursor-pointer">
+        </td>
+        <td class="py-2 px-3 text-center">
+          <input type="hidden" name="table_config[metadata][columns][${index}][sortable]" value="false">
+          <input type="checkbox" name="table_config[metadata][columns][${index}][sortable]" value="true" ${col.sortable ? 'checked' : ''}
+            class="rounded border-slate-300 text-blue-600 cursor-pointer">
+        </td>
+        <td class="py-2 px-3">
+          <select name="table_config[metadata][columns][${index}][align]"
+            class="w-full px-1 py-1 text-xs border border-slate-200 dark:border-slate-600 rounded bg-white dark:bg-slate-800 text-slate-900 dark:text-white">
+            <option value="left" ${col.align === 'left' ? 'selected' : ''}>left</option>
+            <option value="center" ${col.align === 'center' ? 'selected' : ''}>center</option>
+            <option value="right" ${col.align === 'right' ? 'selected' : ''}>right</option>
+          </select>
+        </td>
+        <td class="py-2 px-3">
+          <select name="table_config[metadata][columns][${index}][pinned]"
+            class="w-full px-1 py-1 text-xs border border-slate-200 dark:border-slate-600 rounded bg-white dark:bg-slate-800 text-slate-900 dark:text-white">
+            <option value="" ${!col.pinned ? 'selected' : ''}>none</option>
+            <option value="left" ${col.pinned === 'left' ? 'selected' : ''}>left</option>
+            <option value="right" ${col.pinned === 'right' ? 'selected' : ''}>right</option>
+          </select>
+        </td>
+        <td class="py-2 px-3">
+          <input type="number" name="table_config[metadata][columns][${index}][width]" value="${col.width ?? ''}" placeholder="auto"
+            class="w-16 px-1 py-1 text-xs border border-slate-200 dark:border-slate-600 rounded bg-white dark:bg-slate-800 text-slate-900 dark:text-white">
+        </td>
+        <td class="py-2 px-3">
+          <input type="text" name="table_config[metadata][columns][${index}][roles]" value="${(col.roles || []).join(', ')}" placeholder="admin, mgr"
+            class="w-full px-1 py-1 text-xs border border-slate-200 dark:border-slate-600 rounded bg-white dark:bg-slate-800 text-slate-900 dark:text-white">
+        </td>
+        <td class="py-2 px-3 text-center">
+          <input type="hidden" name="table_config[metadata][columns][${index}][is_virtual]" value="false">
+          <input type="checkbox" name="table_config[metadata][columns][${index}][is_virtual]" value="true" ${col.is_virtual ? 'checked' : ''}
+            class="rounded border-slate-300 text-blue-600 cursor-pointer">
+        </td>
+        <td class="py-2 px-3 text-right">
+          <button type="button" data-action="click->${this.identifier}#removeColumn" data-index="${index}"
+            class="inline-flex items-center justify-center p-1 text-red-500 hover:text-red-700 hover:bg-red-50 rounded-lg cursor-pointer">
+            <span class="material-symbols-outlined text-[16px]">delete</span>
+          </button>
+        </td>
+      </tr>
+    `).join('')
 
     const fields = `
       <div class="space-y-6">
@@ -99,7 +161,7 @@ export default class Companies_TableConfigs_EditController extends Companies_Lay
               <thead>
                 <tr class="text-xs text-slate-500 dark:text-slate-400 bg-slate-50 dark:bg-slate-800/50 border-b border-slate-200 dark:border-gray-800">
                   <th class="py-2 px-3 font-medium"
-                    ${tooltip(translate("Raw property column key defined by the PropertyMapping (e.g. property_string_1)"))}
+                    ${tooltip(translate("Field key stored in the database (e.g. name, property_string_1)"))}
                   >${translate("Key")}</th>
                   <th class="py-2 px-3 font-medium"
                     ${tooltip(translate("Display name shown as the column header"))}
@@ -134,9 +196,10 @@ export default class Companies_TableConfigs_EditController extends Companies_Lay
             </table>
           </div>
 
-          <div id="add-column-area">
-            ${this.addColumnHTML()}
-          </div>
+          <button type="button" data-action="click->${this.identifier}#addColumn"
+            class="mt-3 px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-medium transition-colors cursor-pointer">
+            ${translate("Add Column")}
+          </button>
         </div>
 
         <div class="flex justify-end gap-3 pt-2">
@@ -164,42 +227,10 @@ export default class Companies_TableConfigs_EditController extends Companies_Lay
     `
   }
 
-  definedProperties() {
-    return this.currentPropertyMapping()?.metadata?.properties || []
-  }
-
-  unusedPropertySlots() {
-    return this.definedProperties().filter(p => !this.columnsMetadata.some(col => col.key === p.key))
-  }
-
-  addColumnHTML() {
-    const slots = this.unusedPropertySlots()
-    if (slots.length === 0) {
-      return `<p class="mt-3 text-xs text-slate-400 dark:text-slate-500">${translate("All defined properties are already added.")}</p>`
-    }
-
-    return `
-      <div class="mt-3 flex items-center gap-2">
-        <select id="new-property-slot"
-          class="px-3 py-2 text-sm border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-slate-900 dark:text-white">
-          ${slots.map(p => `<option value="${p.key}">${p.name || p.key} (${p.key})</option>`).join('')}
-        </select>
-        <button type="button" data-action="click->${this.identifier}#addColumn"
-          class="px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-medium transition-colors cursor-pointer">
-          ${translate("Add Property")}
-        </button>
-      </div>
-    `
-  }
-
   addColumn() {
-    const key = document.getElementById('new-property-slot')?.value
-    const field = this.definedProperties().find(p => p.key === key)
-    if (!field || this.columnsMetadata.some(col => col.key === key)) return
-
     this.columnsMetadata.push({
-      key: field.key,
-      name: field.name || field.key,
+      key: 'name',
+      name: '',
       visible: true,
       sortable: true,
       align: 'left',
@@ -222,30 +253,25 @@ export default class Companies_TableConfigs_EditController extends Companies_Lay
 
   rerenderEditor() {
     const tbody = document.getElementById('columns-body')
-    if (tbody) {
-      tbody.innerHTML = this.columnsMetadata.map((col, index) => this.columnRowHTML(col, index)).join('')
-    }
+    if (!tbody) return
 
-    const addArea = document.getElementById('add-column-area')
-    if (addArea) addArea.innerHTML = this.addColumnHTML()
-  }
-
-  columnRowHTML(col, index) {
-    return `
+    tbody.innerHTML = this.columnsMetadata.map((col, index) => `
       <tr class="border-b border-slate-100 dark:border-gray-800 last:border-0">
         <td class="py-2 px-3">
           <input type="text" name="table_config[metadata][columns][${index}][key]" value="${col.key || ''}"
-            class="w-full px-2 py-1 text-xs font-mono border border-slate-200 dark:border-slate-600 rounded bg-slate-50 dark:bg-slate-700 text-slate-400 cursor-not-allowed"
-            readonly
-            ${tooltip(translate("Raw property column key defined by the PropertyMapping (e.g. property_string_1)"))}
-          >
+            class="w-full px-2 py-1 text-xs font-mono border border-slate-200 dark:border-slate-600 rounded bg-white dark:bg-slate-800 text-slate-900 dark:text-white">
         </td>
         <td class="py-2 px-3">
-          <input type="text" name="table_config[metadata][columns][${index}][name]" value="${col.name || ''}"
-            class="w-full px-2 py-1 text-xs border border-slate-200 dark:border-slate-600 rounded bg-slate-50 dark:bg-slate-700 text-slate-400 cursor-not-allowed"
-            readonly
-            ${tooltip(translate("This field is synced from PropertyMapping. Please access the Property Mapping edit page to update this name."))}
-          >
+          ${col.key.startsWith('property_') ? `
+            <input type="text" name="table_config[metadata][columns][${index}][name]" value="${col.name || ''}"
+              class="w-full px-2 py-1 text-xs border border-slate-200 dark:border-slate-600 rounded bg-slate-50 dark:bg-slate-700 text-slate-400 cursor-not-allowed"
+              readonly
+              ${tooltip(translate("This field is synced from PropertyMapping. Please access the Property Mapping edit page to update this name."))}
+            >
+          ` : `
+            <input type="text" name="table_config[metadata][columns][${index}][name]" value="${col.name || ''}"
+              class="w-full px-2 py-1 text-xs border border-slate-200 dark:border-slate-600 rounded bg-white dark:bg-slate-800 text-slate-900 dark:text-white">
+          `}
         </td>
         <td class="py-2 px-3 text-center">
           <input type="hidden" name="table_config[metadata][columns][${index}][visible]" value="false">
@@ -293,6 +319,6 @@ export default class Companies_TableConfigs_EditController extends Companies_Lay
           </button>
         </td>
       </tr>
-    `
+    `).join('')
   }
 }

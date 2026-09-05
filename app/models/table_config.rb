@@ -13,11 +13,9 @@ class TableConfig < ApplicationRecord
   belongs_to :property_mapping
 
   # TableConfig layout configuration for the Cashier/Accountant Grid View
-  # ONLY dynamic property_* columns are supported here — default properties
-  # (name, code, workflow_status, ...) are rendered by their own future system.
   # [
   #   {
-  #     "key" => "property_string_2",
+  #     "key" => "code",
   #     "name" => "Invoice No.",
   #     "visible" => true,
   #     "width" => 150,
@@ -74,7 +72,7 @@ class TableConfig < ApplicationRecord
   # ---------------------------------------------------------------------------
   # PATTERN — each element must follow this shape:
   #   {
-  #     key:           String   # Column identifier — MUST be a property_* column (e.g. "property_integer_1")
+  #     key:           String   # Column identifier (e.g. "name", "property_integer_1")
   #     name:          String   # Display name in the table header
   #     is_virtual:    Boolean  # false = real DB column, true = computed client-side
   #     visible:       Boolean  # true = shown, false = hidden (preserves config)
@@ -110,8 +108,6 @@ class TableConfig < ApplicationRecord
 
       if !key.is_a?(String) || key.blank?
         errors.add(:metadata, "columns element #{idx}: key is required and must be a non-blank string")
-      elsif !key.start_with?("property_")
-        errors.add(:metadata, "columns element #{idx}: only property_* columns are supported")
       end
 
       if !name_val.is_a?(String) || name_val.blank?
@@ -138,6 +134,10 @@ class TableConfig < ApplicationRecord
 
   def set_default_columns
     self.metadata ||= {}
-    self.columns ||= []
+    self.columns ||= [
+      { "key" => "name", "name" => "Name", "visible" => true, "sortable" => true,
+        "align" => "left", "pinned" => nil, "width" => nil, "roles" => [],
+        "is_virtual" => false, "render_config" => {} }
+    ]
   end
 end

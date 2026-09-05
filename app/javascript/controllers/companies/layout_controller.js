@@ -42,21 +42,6 @@ export default class Companies_LayoutController extends Controller {
     return currentTableConfigs().find(config => config.id === this.tableConfigIdValue)
   }
 
-  // Dynamic tables support property_* columns only — default properties (name, code,
-  // workflow_status, ...) are excluded both from TableConfig data and legacy rows.
-  dynamicColumns() {
-    const columns = this.currentTableConfig()?.metadata?.columns || []
-    return columns.filter(col => col.key?.startsWith("property_") && col.visible !== false)
-  }
-
-  dynamicTableHTML({ rows, target, mappingLookup = {}, renderers = {}, renderActions }) {
-    const columns = this.dynamicColumns()
-    if (columns.length === 0) {
-      return `<div class="py-12 text-center text-sm text-slate-400 dark:text-slate-500">${translate("No columns configured")}</div>`
-    }
-    return table({ rows, columns, identifier: this.identifier, target, mappingLookup, renderers, renderActions })
-  }
-
   sidebarItems() {
     const hidden = hiddenSidebarKeys()
     const visible = SIDEBAR_ITEMS.filter(item => !hidden.has(item.key))

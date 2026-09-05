@@ -433,11 +433,9 @@ export const dictionary = () => {
     "This field is synced from PropertyMapping. Please access the Property Mapping edit page to update this name.": {
       vi: "Trường này được đồng bộ từ PropertyMapping. Vui lòng truy cập trang chỉnh sửa Property Mapping để cập nhật tên này.",
     },
-    "Raw property column key defined by the PropertyMapping (e.g. property_string_1)": {
-      vi: "Khóa cột thuộc tính được định nghĩa bởi PropertyMapping (vd: property_string_1)",
+    "Field key stored in the database (e.g. name, property_string_1)": {
+      vi: "Khóa trường được lưu trong cơ sở dữ liệu (vd: name, property_string_1)",
     },
-    "No columns configured": { vi: "Chưa có cột nào được cấu hình" },
-    "All defined properties are already added.": { vi: "Tất cả thuộc tính đã định nghĩa đã được thêm." },
     "Display name shown as the column header": { vi: "Tên hiển thị làm tiêu đề cột" },
     "Show or hide this column in the table": { vi: "Hiển thị hoặc ẩn cột này trong bảng" },
     "Allow users to sort by this column": { vi: "Cho phép người dùng sắp xếp theo cột này" },

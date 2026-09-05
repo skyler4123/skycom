@@ -5,25 +5,11 @@ RSpec.feature "Companies::Brands Management", type: :feature, js: true do
   let(:owner) { company.user }
 
   let!(:default_category) do
-    category = Seed::CategoryService.find_or_create_for(company: company, resource_name: "brands")
-    category.default_property_mapping.update!(
-      metadata: { "properties" => [
-        { "key" => "property_string_1", "type" => "string", "name" => "Origin Country" },
-        { "key" => "property_integer_1", "type" => "integer", "name" => "Year Founded" }
-      ] }
-    )
-    category
+    Seed::CategoryService.find_or_create_for(company: company, resource_name: "brands")
   end
 
-  let!(:brand) do
-    create(:brand, company: company, category: default_category, business_type: "manufacturer")
-      .tap { |b| b.update!(property_string_1: "Acme", property_integer_1: 1985) }
-  end
-
-  let!(:brand2) do
-    create(:brand, company: company, category: default_category, business_type: "retailer", workflow_status: "pending")
-      .tap { |b| b.update!(property_string_1: "Zenith", property_integer_1: 1992) }
-  end
+  let!(:brand) { create(:brand, company: company, category: default_category, business_type: "manufacturer") }
+  let!(:brand2) { create(:brand, company: company, category: default_category, business_type: "retailer", workflow_status: "pending") }
 
   let!(:default_table_config) do
     default_category.default_property_mapping.table_configs.destroy_all
@@ -33,8 +19,10 @@ RSpec.feature "Companies::Brands Management", type: :feature, js: true do
       property_mapping: default_category.default_property_mapping,
       resource_name: "brands",
       metadata: { "columns" => [
-        { "key" => "property_string_1", "name" => "Origin Country", "visible" => true, "sortable" => true, "align" => "left", "pinned" => nil, "width" => nil, "roles" => [], "is_virtual" => false, "render_config" => {} },
-        { "key" => "property_integer_1", "name" => "Year Founded", "visible" => true, "sortable" => true, "align" => "right", "pinned" => nil, "width" => nil, "roles" => [], "is_virtual" => false, "render_config" => {} }
+        { "key" => "name", "name" => "Brand Name", "visible" => true, "sortable" => true, "align" => "left", "pinned" => nil, "width" => nil, "roles" => [], "is_virtual" => false, "render_config" => {} },
+        { "key" => "code", "name" => "Code", "visible" => true, "sortable" => true, "align" => "left", "pinned" => nil, "width" => nil, "roles" => [], "is_virtual" => false, "render_config" => {} },
+        { "key" => "business_type", "name" => "Type", "visible" => true, "sortable" => true, "align" => "center", "pinned" => nil, "width" => nil, "roles" => [], "is_virtual" => false, "render_config" => {} },
+        { "key" => "workflow_status", "name" => "Status", "visible" => true, "sortable" => true, "align" => "center", "pinned" => nil, "width" => nil, "roles" => [], "is_virtual" => false, "render_config" => {} }
       ] }
     )
   end
@@ -70,11 +58,12 @@ RSpec.feature "Companies::Brands Management", type: :feature, js: true do
 
     expect(page).to have_selector('table', wait: 10)
 
-    expect(page).to have_selector('th', text: 'Origin Country', wait: 10)
-    expect(page).to have_selector('th', text: 'Year Founded', wait: 10)
+    expect(page).to have_selector('th', text: 'Brand Name')
+    expect(page).to have_selector('th', text: 'Category')
+    expect(page).to have_selector('th', text: 'Status')
 
     expect(page).to have_selector('tbody tr')
-    expect(page).to have_content("Acme")
+    expect(page).to have_content(brand.name)
   end
 
   scenario "edit button links to edit page for brand" do
@@ -87,10 +76,7 @@ RSpec.feature "Companies::Brands Management", type: :feature, js: true do
 
   scenario "filter by category updates URL and filters table" do
     category = Seed::CategoryService.create(company: company, name: "Test Category", resource_name: "brands")
-    brand.category = category
-    brand.property_mapping = category.default_property_mapping
-    Seed::PropertyPopulator.populate(brand)
-    brand.save!
+    brand.update!(category: category, property_mapping: category.default_property_mapping)
     visit company_brands_path(company)
     expect(page).to have_selector('table', wait: 10)
 
@@ -101,14 +87,16 @@ RSpec.feature "Companies::Brands Management", type: :feature, js: true do
     expect(page).to have_selector('tbody tr', wait: 10)
   end
 
+  scenario "display brand workflow status as badge" do
+    visit company_brands_path(company)
+    expect(page).to have_selector('table', wait: 10)
+
+    expect(page).to have_selector('span.rounded-full', wait: 10)
+  end
+
   describe "table title" do
     let(:test_category) do
-      Seed::CategoryService.create(
-        company: company,
-        name: "Test Category",
-        resource_name: "brands",
-        properties: { "property_string_1" => "Origin Country" }
-      )
+      Seed::CategoryService.create(company: company, name: "Test Category", resource_name: "brands")
     end
 
     let!(:test_table_config) do
@@ -119,7 +107,8 @@ RSpec.feature "Companies::Brands Management", type: :feature, js: true do
         property_mapping: test_category.default_property_mapping,
         resource_name: "brands",
         metadata: { "columns" => [
-          { "key" => "property_string_1", "name" => "Origin Country", "visible" => true, "sortable" => true, "align" => "left", "pinned" => nil, "width" => nil, "roles" => [], "is_virtual" => false, "render_config" => {} }
+          { "key" => "name", "name" => "Name", "visible" => true, "sortable" => true, "align" => "left", "pinned" => nil, "width" => nil, "roles" => [], "is_virtual" => false, "render_config" => {} },
+          { "key" => "code", "name" => "Code", "visible" => true, "sortable" => true, "align" => "left", "pinned" => nil, "width" => nil, "roles" => [], "is_virtual" => false, "render_config" => {} }
         ] }
       )
       company.clear_permissions_cache

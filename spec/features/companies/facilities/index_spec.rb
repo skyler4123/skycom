@@ -5,89 +5,53 @@ RSpec.feature "Companies::Facilities Management", type: :feature, js: true do
   let(:owner) { company.user }
   let(:branch) { create(:branch, company: company) }
 
-  let!(:facility) do
-    create(:facility, company: company, branch: branch)
-      .tap { |f| f.update!(property_string_1: "Main Floor", property_integer_1: 8) }
-  end
+  let!(:facility) { create(:facility, company: company, branch: branch) }
 
   let!(:default_category) do
-    category = Seed::CategoryService.find_or_create_for(company: company, resource_name: "facilities")
-    category.default_property_mapping.update!(
-      metadata: { "properties" => [
-        { "key" => "property_string_1", "type" => "string", "name" => "Floor" },
-        { "key" => "property_integer_1", "type" => "integer", "name" => "Room Count" }
-      ] }
-    )
-    category
-  end
-
-  let!(:default_table_config) do
-    default_category.default_property_mapping.table_configs.destroy_all
-    TableConfig.create!(
-      company: company,
-      category: default_category,
-      property_mapping: default_category.default_property_mapping,
-      resource_name: "facilities",
-      metadata: { "columns" => [
-        { "key" => "property_string_1", "name" => "Floor", "visible" => true, "sortable" => true, "align" => "left", "pinned" => nil, "width" => nil, "roles" => [], "is_virtual" => false, "render_config" => {} },
-        { "key" => "property_integer_1", "name" => "Room Count", "visible" => true, "sortable" => true, "align" => "right", "pinned" => nil, "width" => nil, "roles" => [], "is_virtual" => false, "render_config" => {} }
-      ] }
-    )
+    Seed::CategoryService.find_or_create_for(company: company, resource_name: "facilities")
   end
 
   before do
     sign_in(owner)
-
-    page.execute_script("localStorage.clear()")
-
-    company_data = JSON.parse(company.to_json).merge(
-      "property_mappings" => company.property_mappings.reset.map { |pm| JSON.parse(pm.to_json) },
-      "table_configs" => company.table_configs.reset.map { |tc| JSON.parse(tc.to_json) },
-      "categories" => company.categories.reset.map { |c| JSON.parse(c.to_json) },
-      "branches" => [],
-      "departments" => [],
-      "roles" => []
-    )
-
-    payload = {
-      user: JSON.parse(owner.to_json),
-      companies: [ company_data ],
-      enums: {},
-      employees: []
-    }
-
-    page.execute_script("localStorage.setItem('client_cache_data', arguments[0])", payload.to_json)
-    page.execute_script("localStorage.setItem('client_cache_version', 'forced')")
-    page.execute_script("document.cookie = 'client_cache_version=forced; path=/'")
   end
 
   scenario "index page loads and displays facilities table" do
-    visit company_facilities_path(company, category_id: default_category.id)
+    visit company_facilities_path(company)
 
     expect(page).to have_selector('table', wait: 10)
-    expect(page).to have_selector('th', text: 'Floor', wait: 10)
-    expect(page).to have_selector('th', text: 'Room Count', wait: 10)
+    expect(page).to have_selector('th', text: 'Category')
     expect(page).to have_selector('thead th', minimum: 2)
     expect(page).to have_selector('tbody tr')
-    expect(page).to have_content("Main Floor")
+    expect(page).to have_content(facility.name)
   end
 
   scenario "edit button links to edit page for facility" do
-    visit company_facilities_path(company, category_id: default_category.id)
+    visit company_facilities_path(company)
     expect(page).to have_selector('table', wait: 10)
 
     edit_link = find("a[href*='/edit']", match: :first)
     expect(edit_link).to be_present
   end
 
+  scenario "name link goes to show page" do
+    visit company_facilities_path(company)
+    expect(page).to have_selector('table', wait: 10)
+
+    click_link facility.name, match: :first
+    expect(page).to have_current_path(/facilities\/#{facility.id}$/, wait: 10)
+    expect(page).to have_content(facility.name)
+  end
+
+  scenario "displays facility workflow status as badge" do
+    visit company_facilities_path(company)
+    expect(page).to have_selector('table', wait: 10)
+
+    expect(page).to have_selector('span.rounded-full', wait: 10)
+  end
+
   describe "table title" do
     let(:test_category) do
-      Seed::CategoryService.create(
-        company: company,
-        name: "Test Category",
-        resource_name: "facilities",
-        properties: { "property_string_1" => "Floor" }
-      )
+      Seed::CategoryService.create(company: company, name: "Test Category", resource_name: "facilities")
     end
 
     let!(:test_table_config) do
@@ -98,7 +62,8 @@ RSpec.feature "Companies::Facilities Management", type: :feature, js: true do
         property_mapping: test_category.default_property_mapping,
         resource_name: "facilities",
         metadata: { "columns" => [
-          { "key" => "property_string_1", "name" => "Floor", "visible" => true, "sortable" => true, "align" => "left", "pinned" => nil, "width" => nil, "roles" => [], "is_virtual" => false, "render_config" => {} }
+          { "key" => "name", "name" => "Name", "visible" => true, "sortable" => true, "align" => "left", "pinned" => nil, "width" => nil, "roles" => [], "is_virtual" => false, "render_config" => {} },
+          { "key" => "code", "name" => "Code", "visible" => true, "sortable" => true, "align" => "left", "pinned" => nil, "width" => nil, "roles" => [], "is_virtual" => false, "render_config" => {} }
         ] }
       )
       company.clear_permissions_cache

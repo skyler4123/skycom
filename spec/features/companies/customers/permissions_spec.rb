@@ -164,7 +164,8 @@ RSpec.feature "Companies::Customers Permissions", type: :feature, js: true do
     seed_client_cache
     visit company_customers_path(company)
 
-    expect(page).to have_content("No columns configured", wait: 10)
+    expect(page).to have_selector('table', wait: 10)
+    expect(page).to have_content("Customer Name")
   end
 
   scenario "reader can? returns true for read, false for create/update" do
@@ -182,7 +183,7 @@ RSpec.feature "Companies::Customers Permissions", type: :feature, js: true do
     seed_client_cache
     visit company_customers_path(company)
 
-    expect(page).to have_content("No columns configured", wait: 10)
+    expect(page).to have_selector('table', wait: 10)
     expect(page).to have_link('Add', wait: 10)
   end
 
@@ -195,7 +196,7 @@ RSpec.feature "Companies::Customers Permissions", type: :feature, js: true do
     seed_client_cache
     visit company_customers_path(company)
 
-    expect(page).to have_content("No columns configured", wait: 10)
+    expect(page).to have_selector('table', wait: 10)
     expect(page).to have_link('Add', wait: 5)
   end
 
@@ -278,29 +279,8 @@ RSpec.feature "Companies::Customers Permissions", type: :feature, js: true do
   scenario "employee with update permission can see table with edit links" do
     editor_employee.clear_permissions_cache
     sign_in(editor_user)
-
-    # Recreate a property-only table config so the index renders rows with edit links.
-    category = Seed::CategoryService.find_or_create_for(company: company, resource_name: "customers")
-    property_mapping = category.default_property_mapping
-    table_config = company.table_configs.create!(
-      category: category,
-      property_mapping: property_mapping,
-      resource_name: "customers"
-    )
-    property_mapping.update!(
-      metadata: { "properties" => [
-        { "key" => "property_string_1", "type" => "string", "name" => "Loyalty Tier" }
-      ] }
-    )
-    table_config.update!(
-      metadata: { "columns" => [
-        { "key" => "property_string_1", "name" => "Loyalty Tier", "visible" => true, "sortable" => true, "align" => "left", "pinned" => nil, "width" => nil, "roles" => [], "is_virtual" => false, "render_config" => {} }
-      ] }
-    )
-    target_customer.update!(property_string_1: "Gold")
-
     seed_client_cache
-    visit company_customers_path(company, category_id: category.id)
+    visit company_customers_path(company)
 
     expect(page).to have_selector('table', wait: 10)
     expect(page).to have_link(href: /\/edit$/, minimum: 1)

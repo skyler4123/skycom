@@ -8,13 +8,7 @@ RSpec.feature "Companies::Orders Management", type: :feature, js: true do
   end
 
   let!(:default_category) do
-    category = Seed::CategoryService.find_or_create_for(company: company, resource_name: "orders")
-    category.default_property_mapping.update!(
-      metadata: { "properties" => [
-        { "key" => "property_string_1", "type" => "string", "name" => "Priority" }
-      ] }
-    )
-    category
+    Seed::CategoryService.find_or_create_for(company: company, resource_name: "orders")
   end
 
   let!(:order) do
@@ -25,7 +19,7 @@ RSpec.feature "Companies::Orders Management", type: :feature, js: true do
       business_type: "online",
       workflow_status: "draft",
       category: default_category
-    ).tap { |o| o.update!(property_string_1: "High") }
+    )
   end
 
   let!(:order2) do
@@ -36,7 +30,7 @@ RSpec.feature "Companies::Orders Management", type: :feature, js: true do
       business_type: "in_store",
       workflow_status: "pending",
       category: default_category
-    ).tap { |o| o.update!(property_string_1: "Low") }
+    )
   end
 
   let!(:default_table_config) do
@@ -47,7 +41,9 @@ RSpec.feature "Companies::Orders Management", type: :feature, js: true do
       property_mapping: default_category.default_property_mapping,
       resource_name: "orders",
       metadata: { "columns" => [
-        { "key" => "property_string_1", "name" => "Priority", "visible" => true, "sortable" => true, "align" => "left", "pinned" => nil, "width" => nil, "roles" => [], "is_virtual" => false, "render_config" => {} }
+        { "key" => "name", "name" => "Order Name", "visible" => true, "sortable" => true, "align" => "left", "pinned" => nil, "width" => nil, "roles" => [], "is_virtual" => false, "render_config" => {} },
+        { "key" => "code", "name" => "Code", "visible" => true, "sortable" => true, "align" => "left", "pinned" => nil, "width" => nil, "roles" => [], "is_virtual" => false, "render_config" => {} },
+        { "key" => "workflow_status", "name" => "Status", "visible" => true, "sortable" => true, "align" => "center", "pinned" => nil, "width" => nil, "roles" => [], "is_virtual" => false, "render_config" => {} }
       ] }
     )
   end
@@ -79,14 +75,16 @@ RSpec.feature "Companies::Orders Management", type: :feature, js: true do
   end
 
   scenario "index page loads and displays orders table" do
-    visit company_orders_path(company, category_id: default_category.id)
+    visit company_orders_path(company)
 
     expect(page).to have_selector('table', wait: 10)
 
-    expect(page).to have_selector('th', text: 'Priority', wait: 10)
+    expect(page).to have_selector('th', text: 'Order Name')
+    expect(page).to have_selector('th', text: 'Category')
+    expect(page).to have_selector('th', text: 'Status')
 
     expect(page).to have_selector('tbody tr')
-    expect(page).to have_content("High")
+    expect(page).to have_content(order.name)
   end
 
   scenario "edit button links to edit page for order" do
@@ -97,17 +95,27 @@ RSpec.feature "Companies::Orders Management", type: :feature, js: true do
     expect(edit_link).to be_present
   end
 
+  scenario "name link goes to show page" do
+    visit company_orders_path(company)
+    expect(page).to have_selector('table', wait: 10)
+
+    name_link = find("a[href*='/orders/#{order.id}']", match: :first)
+    expect(name_link).to be_present
+  end
+
+  scenario "displays order workflow status as badge" do
+    visit company_orders_path(company)
+    expect(page).to have_selector('table', wait: 10)
+
+    expect(page).to have_selector('span.rounded-full', wait: 10)
+  end
+
   describe "table title" do
     let(:test_category) do
       Seed::CategoryService.create(company: company, name: "Test Category", resource_name: "orders")
     end
 
     let!(:test_table_config) do
-      test_category.default_property_mapping.update!(
-        metadata: { "properties" => [
-          { "key" => "property_string_1", "type" => "string", "name" => "Priority" }
-        ] }
-      )
       test_category.default_property_mapping.table_configs.destroy_all
       tc = TableConfig.create!(
         company: company,
@@ -115,7 +123,8 @@ RSpec.feature "Companies::Orders Management", type: :feature, js: true do
         property_mapping: test_category.default_property_mapping,
         resource_name: "orders",
         metadata: { "columns" => [
-          { "key" => "property_string_1", "name" => "Priority", "visible" => true, "sortable" => true, "align" => "left", "pinned" => nil, "width" => nil, "roles" => [], "is_virtual" => false, "render_config" => {} }
+          { "key" => "name", "name" => "Name", "visible" => true, "sortable" => true, "align" => "left", "pinned" => nil, "width" => nil, "roles" => [], "is_virtual" => false, "render_config" => {} },
+          { "key" => "code", "name" => "Code", "visible" => true, "sortable" => true, "align" => "left", "pinned" => nil, "width" => nil, "roles" => [], "is_virtual" => false, "render_config" => {} }
         ] }
       )
       company.clear_permissions_cache
