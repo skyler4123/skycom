@@ -46,16 +46,9 @@ export default class Companies_Invoices_EditController extends Companies_LayoutC
     if (!i) return `<div class="p-8 text-center">${translate("Invoice not found.")}</div>`
 
     const companyId = window.location.pathname.split("/")[2]
-    const businessTypes = Enums()?.invoice?.business_types || [
-      { name: "Sales", value: "sales" },
-      { name: "Service", value: "service" },
-      { name: "Subscription", value: "subscription" }
-    ]
+    const businessTypes = Enums()?.invoice?.business_types || []
     const workflowStatuses = Enums()?.invoice?.workflow_statuses || []
-    const currencyCodes = Enums()?.invoice?.currencies || [
-      { name: "USD", value: "usd" },
-      { name: "VND", value: "vnd" }
-    ]
+    const currencyCodes = Enums()?.invoice?.currencies || []
 
     const dynamicFields = this.propertyMetadata.length > 0 ? `
       <div class="border-t border-slate-200 dark:border-gray-800 pt-6 mt-6">

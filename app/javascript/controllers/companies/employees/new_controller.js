@@ -101,12 +101,7 @@ export default class Companies_Employees_NewController extends Companies_LayoutC
   contentHTML() {
     const categoryFilter = this.employeesCategories()
     const branchFilter = currentBranches()
-    const typeOptions = (Enums()?.employee?.business_types || [
-      { name: translate("Full Time"), value: "full_time" },
-      { name: translate("Part Time"), value: "part_time" },
-      { name: translate("Contractor"), value: "contractor" },
-      { name: translate("Intern"), value: "intern" }
-    ]).filter(t => t.value !== 'owner').map(t =>
+    const typeOptions = (Enums()?.employee?.business_types || []).filter(t => t.value !== 'owner').map(t =>
       `<option value="${t.value}">${t.name}</option>`
     ).join('')
 

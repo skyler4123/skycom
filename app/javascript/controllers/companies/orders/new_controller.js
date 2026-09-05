@@ -84,19 +84,11 @@ export default class Companies_Orders_NewController extends Companies_LayoutCont
   contentHTML() {
     const categoryFilter = this.ordersCategories()
 
-    // Static fallback — guards against the client-cache enum race (see docs/FLAKY_TESTS.md §6)
-    const typeOptions = (Enums()?.order?.business_types || [
-      { name: "Online", value: "online" },
-      { name: "In Store", value: "in_store" },
-      { name: "Phone", value: "phone" }
-    ]).map(t =>
+    const typeOptions = (Enums()?.order?.business_types || []).map(t =>
       `<option value="${t.value}">${t.name === 'in_store' ? translate("In Store") : (t.name ? t.name.charAt(0).toUpperCase() + t.name.slice(1) : t.value)}</option>`
     ).join('')
 
-    const currencyOptions = (Enums()?.order?.currencies || [
-      { name: "USD", value: "usd" },
-      { name: "VND", value: "vnd" }
-    ]).map(c =>
+    const currencyOptions = (Enums()?.order?.currencies || []).map(c =>
       `<option value="${c.value}">${c.name?.toUpperCase() || c.value?.toUpperCase()}</option>`
     ).join('')
 

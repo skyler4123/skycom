@@ -100,11 +100,7 @@ export default class Companies_Services_NewController extends Companies_LayoutCo
 
   contentHTML() {
     const categoryFilter = this.servicesCategories()
-    // Static fallback — guards against the client-cache enum race (see docs/FLAKY_TESTS.md §6)
-    const typeOptions = (Enums()?.service?.business_types || [
-      { name: "B2b", value: "b2b" },
-      { name: "B2c", value: "b2c" }
-    ]).map(t =>
+    const typeOptions = (Enums()?.service?.business_types || []).map(t =>
       `<option value="${t.value}">${t.name}</option>`
     ).join('')
 

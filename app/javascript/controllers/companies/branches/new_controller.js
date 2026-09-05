@@ -100,21 +100,7 @@ export default class Companies_Branches_NewController extends Companies_LayoutCo
 
   contentHTML() {
     const categoryFilter = this.branchesCategories()
-    // Static fallback — guards against the client-cache enum race (see docs/FLAKY_TESTS.md §6)
-    const typeOptions = (Enums()?.branch?.business_types || [
-      { name: "Storefront", value: "storefront" },
-      { name: "Kiosk", value: "kiosk" },
-      { name: "Showroom", value: "showroom" },
-      { name: "Warehouse", value: "warehouse" },
-      { name: "Distribution Center", value: "distribution_center" },
-      { name: "Dark Store", value: "dark_store" },
-      { name: "Service Point", value: "service_point" },
-      { name: "Clinic Wing", value: "clinic_wing" },
-      { name: "Classroom Annex", value: "classroom_annex" },
-      { name: "Headquarters", value: "headquarters" },
-      { name: "Administrative", value: "administrative" },
-      { name: "Virtual", value: "virtual" }
-    ]).map(t =>
+    const typeOptions = (Enums()?.branch?.business_types || []).map(t =>
       `<option value="${t.value}">${t.name}</option>`
     ).join('')
 
