@@ -88,17 +88,52 @@ RSpec.describe TableConfig, type: :model do
       end
     end
 
-    context "with non-property keys" do
-      it "rejects default property keys (property-only rule)" do
-        config.metadata = { "columns" => [ { "key" => "name", "name" => "Name" } ] }
-        expect(config).not_to be_valid
-        expect(config.errors[:metadata]).to include(match(/only property_\* columns are supported/))
+    context "with non-property / non-defined keys" do
+      let(:products_category) do
+        create(:category).tap { |c| c.update!(resource_name: "products") }
+      end
+      let(:products_pm) do
+        products_category.default_property_mapping.tap { |pm| pm.update!(resource_name: "products") }
       end
 
-      it "rejects workflow_status keys" do
-        config.metadata = { "columns" => [ { "key" => "workflow_status", "name" => "Status" } ] }
+      it "accepts a defined key (name) from the resource's standard set" do
+        config = build(:table_config, category: products_category, property_mapping: products_pm, resource_name: "products")
+        config.metadata = { "columns" => [ { "key" => "name", "name" => "Name" } ] }
+        expect(config).to be_valid
+      end
+
+      it "accepts workflow_status, code, and description defined keys" do
+        config = build(:table_config, category: products_category, property_mapping: products_pm, resource_name: "products")
+        {
+          "workflow_status" => "Workflow Status",
+          "code" => "Code",
+          "description" => "Description"
+        }.each do |key, name|
+          config.metadata = { "columns" => [ { "key" => key, "name" => name } ] }
+          expect(config).to be_valid
+        end
+      end
+
+      it "rejects a defined key when the resource PM is unknown" do
+        config.metadata = { "columns" => [ { "key" => "name", "name" => "Name" } ] }
         expect(config).not_to be_valid
-        expect(config.errors[:metadata]).to include(match(/only property_\* columns are supported/))
+        expect(config.errors[:metadata]).to include(match(/only property_\* and defined columns are supported/))
+      end
+
+      it "rejects unknown keys (business_type, category)" do
+        %w[business_type category email].each do |key|
+          config = build(:table_config, category: products_category, property_mapping: products_pm, resource_name: "products")
+          config.metadata = { "columns" => [ { "key" => key, "name" => "N" } ] }
+          expect(config).not_to be_valid
+          expect(config.errors[:metadata]).to include(match(/only property_\* and defined columns are supported/))
+        end
+      end
+
+      it "rejects a defined key with a mismatched name" do
+        config = build(:table_config, category: products_category, property_mapping: products_pm, resource_name: "products")
+        config.metadata = { "columns" => [ { "key" => "name", "name" => "Nickname" } ] }
+        expect(config).not_to be_valid
+        expect(config.errors[:metadata]).to include(match(/does not match PropertyMapping value/))
       end
 
       it "accepts any property_* key" do
@@ -192,6 +227,17 @@ RSpec.describe TableConfig, type: :model do
       it "accepts render_config as nil" do
         config.metadata = { "columns" => [ { "key" => "property_string_1", "name" => "N", "render_config" => nil } ] }
         expect(config).to be_valid
+      end
+    end
+  end
+
+  describe "factory pair consistency" do
+    it "table_config columns always match the category PM property names" do
+      category = create(:category)
+      config = create(:table_config, category: category, property_mapping: category.default_property_mapping)
+      expected = category.default_property_mapping.properties.map { |p| [ p["key"], p["name"] ] }.to_h
+      config.columns.each do |col|
+        expect(expected[col["key"]]).to eq(col["name"])
       end
     end
   end

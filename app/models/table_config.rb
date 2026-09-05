@@ -13,8 +13,9 @@ class TableConfig < ApplicationRecord
   belongs_to :property_mapping
 
   # TableConfig layout configuration for the Cashier/Accountant Grid View
-  # ONLY dynamic property_* columns are supported here — default properties
-  # (name, code, workflow_status, ...) are rendered by their own future system.
+  # Dynamic property_* columns plus defined properties (name, code,
+  # description, workflow_status — BE-owned labels via each model's
+  # STANDARD_PROPERTIES / StandardPropertiesConcern) are supported.
   # [
   #   {
   #     "key" => "property_string_2",
@@ -74,7 +75,7 @@ class TableConfig < ApplicationRecord
   # ---------------------------------------------------------------------------
   # PATTERN — each element must follow this shape:
   #   {
-  #     key:           String   # Column identifier — MUST be a property_* column (e.g. "property_integer_1")
+  #     key:           String   # Column identifier — property_* or a defined key (e.g. "property_integer_1", "name")
   #     name:          String   # Display name in the table header
   #     is_virtual:    Boolean  # false = real DB column, true = computed client-side
   #     visible:       Boolean  # true = shown, false = hidden (preserves config)
@@ -107,11 +108,12 @@ class TableConfig < ApplicationRecord
 
       key      = field["key"]
       name_val = field["name"]
+      defined_keys = property_mapping&.defined_property_keys || []
 
       if !key.is_a?(String) || key.blank?
         errors.add(:metadata, "columns element #{idx}: key is required and must be a non-blank string")
-      elsif !key.start_with?("property_")
-        errors.add(:metadata, "columns element #{idx}: only property_* columns are supported")
+      elsif !key.start_with?("property_") && !defined_keys.include?(key)
+        errors.add(:metadata, "columns element #{idx}: only property_* and defined columns are supported")
       end
 
       if !name_val.is_a?(String) || name_val.blank?
@@ -127,10 +129,10 @@ class TableConfig < ApplicationRecord
       errors.add(:metadata, "columns element #{idx}: roles must be an array of strings") if field.key?("roles") && !field["roles"].nil? && !(field["roles"].is_a?(Array) && field["roles"].all? { |r| r.is_a?(String) })
       errors.add(:metadata, "columns element #{idx}: render_config must be a hash")   if field.key?("render_config") && !field["render_config"].nil? && !field["render_config"].is_a?(Hash)
 
-      if key.to_s.start_with?("property_") && name_val.present? && property_mapping.present?
+      if (key.to_s.start_with?("property_") || defined_keys.include?(key)) && name_val.present? && property_mapping.present?
         pm_entry = (property_mapping.properties || []).find { |pm| pm["key"] == key }
         if pm_entry && pm_entry["name"] != name_val
-          errors.add(:metadata, "columns element #{idx}: name '#{name_val}' must match PropertyMapping value '#{pm_entry['name']}'. Edit the PropertyMapping to change this name.")
+          errors.add(:metadata, "columns element #{idx}: name '#{name_val}' does not match PropertyMapping value '#{pm_entry['name']}'. Edit the PropertyMapping to change this name.")
         end
       end
     end

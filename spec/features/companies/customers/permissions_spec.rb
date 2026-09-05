@@ -114,42 +114,9 @@ RSpec.feature "Companies::Customers Permissions", type: :feature, js: true do
     expect(page).to have_content("#{action} permission updated", wait: 10)
   end
 
-  def seed_client_cache
-    page.execute_script("localStorage.clear()")
-
-    company_data = JSON.parse(company.reload.to_json).merge(
-      "property_mappings" => company.property_mappings.reset.map { |pm| JSON.parse(pm.to_json) },
-      "table_configs" => company.table_configs.reset.map { |tc| JSON.parse(tc.to_json) },
-      "categories" => company.categories.reset.map { |c| JSON.parse(c.to_json) },
-      "branches" => [],
-      "departments" => [],
-      "roles" => []
-    )
-
-    payload = {
-      user: JSON.parse(owner.reload.to_json),
-      companies: [ company_data ],
-      enums: {
-        customer: {
-          business_types: [
-            { name: "Individual", value: "individual" },
-            { name: "Small business", value: "small_business" },
-            { name: "Enterprise", value: "enterprise" }
-          ],
-          workflow_statuses: [
-            { name: "Draft", value: "draft" },
-            { name: "Pending", value: "pending" },
-            { name: "Confirmed", value: "confirmed" }
-          ]
-        }
-      },
-      employees: []
-    }
-
-    page.execute_script("localStorage.setItem('client_cache_data', arguments[0])", payload.to_json)
-    page.execute_script("localStorage.setItem('client_cache_version', 'forced')")
-    page.execute_script("document.cookie = 'client_cache_version=forced; path=/'")
-  end
+def seed_client_cache
+  seed_full_client_cache(company: company, user: owner)
+end
 
   before do
     company.clear_permissions_cache
@@ -304,6 +271,13 @@ RSpec.feature "Companies::Customers Permissions", type: :feature, js: true do
 
     expect(page).to have_selector('table', wait: 10)
     expect(page).to have_link(href: /\/edit$/, minimum: 1)
+
+    # Restore a clean property state so later (randomized) scenarios that
+    # submit or assert empty tables do not inherit this scenario's
+    # property table config and dynamic validations.
+    property_mapping.update!(metadata: { "properties" => [] })
+    table_config.destroy!
+    page.execute_script("localStorage.clear()")
   end
 
   scenario "editor can? returns true for read and update" do
@@ -323,7 +297,14 @@ RSpec.feature "Companies::Customers Permissions", type: :feature, js: true do
     company.clear_permissions_cache
     editor_employee.reload
 
+    # The property-table scenario may have added dynamic validations to this
+    # category's PM and seeded localStorage — neutralize both so this run does
+    # not depend on scenario order.
+    pm = target_customer.category.default_property_mapping
+    company.table_configs.create!(category: target_customer.category, property_mapping: pm, resource_name: "customers") unless pm.table_configs.any?
+    pm.update!(metadata: { "properties" => [] })
     sign_in(editor_user)
+    page.execute_script("localStorage.clear()")
     seed_client_cache
     visit edit_company_customer_path(company, target_customer)
 

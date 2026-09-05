@@ -81,6 +81,10 @@ class Seed::PropertyPopulator
       key = config["key"]
       next if key.blank?
 
+      # Defined properties are BE-owned real columns (name, code, workflow_status, ...)
+      # — seeded by the record's own service, never randomized here.
+      next if config["defined"]
+
       label = config["name"]
       next if label.blank?
       next unless record.class.column_names.include?(key)

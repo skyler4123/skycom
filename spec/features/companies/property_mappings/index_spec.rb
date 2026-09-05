@@ -88,14 +88,15 @@ RSpec.feature "Companies::PropertyMappings Management", type: :feature, js: true
     select 'property_string_2 (string)', from: 'new-property-slot'
     find('button', text: 'Add Property').click
 
-    name_input = find(:xpath, '//input[@name="property_mapping[metadata][properties][2][name]"]', wait: 10)
-    name_input.set('Texture Type')
+    add_row = find("tr", text: "property_string_2", wait: 10)
+    add_row.find("input[name$='[name]']").set('Texture Type')
     click_button 'Save Changes'
 
     expect(page).to have_current_path(/property_mappings\/#{property_mapping.id}$/, wait: 10)
 
     property_mapping.reload
-    expect(property_mapping.properties.length).to eq(3)
+    dynamic_count = property_mapping.properties.count { |p| p['key'].start_with?('property_') }
+    expect(dynamic_count).to eq(3)
     added = property_mapping.properties.find { |m| m['key'] == 'property_string_2' }
     expect(added).to be_present
     expect(added['name']).to eq('Texture Type')
@@ -140,8 +141,8 @@ RSpec.feature "Companies::PropertyMappings Management", type: :feature, js: true
       page.execute_script("document.getElementById('new-property-slot').value = 'property_boolean_1'")
       click_button 'Add Property'
 
-      name_input = find(:xpath, '//input[@name="property_mapping[metadata][properties][2][name]"]', wait: 10)
-      name_input.set('Active')
+      add_row = find("tr", text: "property_boolean_1", wait: 10)
+      add_row.find("input[name$='[name]']").set('Active')
 
       click_button 'Save Changes'
       expect(page).to have_current_path(/property_mappings\/#{property_mapping.id}$/, wait: 10)

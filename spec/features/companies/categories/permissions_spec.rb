@@ -149,6 +149,7 @@ RSpec.feature "Companies::Categories Permissions", type: :feature, js: true do
     creator_employee.reload
 
     sign_in(creator_user)
+    seed_full_client_cache(company: company, user: owner)
     visit new_company_category_path(company)
 
     expect(page).to have_selector('input[name="category[name]"]', wait: 10)
@@ -366,6 +367,7 @@ RSpec.feature "Companies::Categories Permissions", type: :feature, js: true do
     no_permission_employee.reload
 
     sign_in(no_permission_user)
+    seed_full_client_cache(company: company, user: owner)
     visit new_company_category_path(company)
 
     expect(page).to have_selector('input[name="category[name]"]', wait: 10)

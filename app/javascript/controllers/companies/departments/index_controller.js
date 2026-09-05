@@ -93,6 +93,19 @@ export default class Companies_Departments_IndexController extends Companies_Lay
               rows: this.departments,
               target: "departmentsList",
               mappingLookup,
+              renderers: {
+                name: (value, record) => `
+                  <div class="flex items-center gap-4">
+                    <div class="w-8 h-8 rounded-lg bg-indigo-100 dark:bg-indigo-900/30 flex items-center justify-center shrink-0">
+                      <span class="material-symbols-outlined text-indigo-600 dark:text-indigo-400 text-[18px]">corporate_fare</span>
+                    </div>
+                    <a href="${Helpers.company_department_path(currentCompany().id, record.id)}"
+                      class="font-medium text-slate-900 dark:text-white overflow-visible whitespace-normal hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors cursor-pointer">
+                      ${value || translate("Unnamed Department")}
+                    </a>
+                  </div>
+                `
+              },
               renderActions: (record) => `
                 <td class="py-4 px-6 text-sm text-right whitespace-nowrap">
                   <a href="${Helpers.edit_company_department_path(currentCompany().id, record.id)}"

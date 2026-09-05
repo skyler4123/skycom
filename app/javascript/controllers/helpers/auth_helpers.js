@@ -118,6 +118,18 @@ export const currentTableConfigs = () => {
   return currentCompany()?.table_configs || []
 }
 
+// All property entries (dynamic property_* + defined) for a mapping.
+export const propertyEntries = (propertyMapping) => {
+  return propertyMapping?.metadata?.properties || []
+}
+
+// Dynamic-only entries — excludes defined properties (name, code,
+// description, workflow_status) which are BE-owned real columns edited through
+// their own static form fields on new/edit/show pages.
+export const dynamicProperties = (propertyMapping) => {
+  return propertyEntries(propertyMapping).filter(p => p.defined !== true)
+}
+
 export const currentSettings = () => {
   return currentCompany()?.settings || []
 }

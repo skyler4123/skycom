@@ -42,11 +42,12 @@ export default class Companies_LayoutController extends Controller {
     return currentTableConfigs().find(config => config.id === this.tableConfigIdValue)
   }
 
-  // Dynamic tables support property_* columns only — default properties (name, code,
-  // workflow_status, ...) are excluded both from TableConfig data and legacy rows.
+  // Dynamic tables render whatever columns are configured in the TableConfig —
+  // property_* slots plus defined properties (name, code, workflow_status, ...).
+  // BE validation (TableConfig.columns_metadata_must_conform_to_schema) is the gate.
   dynamicColumns() {
     const columns = this.currentTableConfig()?.metadata?.columns || []
-    return columns.filter(col => col.key?.startsWith("property_") && col.visible !== false)
+    return columns.filter(col => col.visible !== false)
   }
 
   dynamicTableHTML({ rows, target, mappingLookup = {}, renderers = {}, renderActions }) {

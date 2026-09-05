@@ -6,6 +6,7 @@ class Customer < ApplicationRecord
   include AddressConcern
   include TagConcern
   include Customer::ImageConcern
+  include StandardPropertiesConcern
   attribute :permission_resource_name, :string, default: -> { self.name }
 
   enum :country, COUNTRY_CODES, prefix: true, default: :us

@@ -128,51 +128,9 @@ RSpec.feature "Companies::Orders Permissions", type: :feature, js: true do
     appointment
   end
 
-  def seed_client_cache
-    page.execute_script("localStorage.clear()")
-
-    company_data = JSON.parse(company.reload.to_json).merge(
-      "property_mappings" => company.property_mappings.reset.map { |pm| JSON.parse(pm.to_json) },
-      "table_configs" => company.table_configs.reset.map { |tc| JSON.parse(tc.to_json) },
-      "categories" => company.categories.reset.map { |c| JSON.parse(c.to_json) },
-      "branches" => [],
-      "departments" => [],
-      "roles" => []
-    )
-
-    payload = {
-      user: JSON.parse(owner.reload.to_json),
-      companies: [ company_data ],
-      enums: {
-        order: {
-          business_types: [
-            { name: "online", value: "online" },
-            { name: "in_store", value: "in_store" },
-            { name: "phone", value: "phone" }
-          ],
-          workflow_statuses: [
-            { name: "Draft", value: "draft" },
-            { name: "Pending", value: "pending" },
-            { name: "Confirmed", value: "confirmed" },
-            { name: "In progress", value: "in_progress" },
-            { name: "Completed", value: "completed" },
-            { name: "Paid", value: "paid" },
-            { name: "Cancelled", value: "cancelled" },
-            { name: "Refunded", value: "refunded" },
-            { name: "Failed", value: "failed" }
-          ],
-          currencies: [
-            { name: "usd", value: "usd" },
-            { name: "vnd", value: "vnd" }
-          ] }
-      },
-      employees: []
-    }
-
-    page.execute_script("localStorage.setItem('client_cache_data', arguments[0])", payload.to_json)
-    page.execute_script("localStorage.setItem('client_cache_version', 'forced')")
-    page.execute_script("document.cookie = 'client_cache_version=forced; path=/'")
-  end
+def seed_client_cache
+  seed_full_client_cache(company: company, user: owner)
+end
 
   before do
     company.clear_permissions_cache

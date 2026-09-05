@@ -544,6 +544,8 @@ export const dictionary = () => {
     "Per-action record of credit movements. Enable logging to capture them live.": { vi: "Ghi nhận biến động tín dụng theo từng hành động. Bật ghi nhật ký để theo dõi trực tiếp." },
     "Credits Remaining": { vi: "Tín Dụng Còn Lại" },
     "System": { vi: "Hệ Thống" },
+    "Defined by system. This label comes from the backend constant and cannot be renamed.": { "vi": "Được hệ thống xác định. Nhãn này đến từ hằng số hậu đài và không thể đổi tên." },
+    "Defined by system — no validation rules": { "vi": "Được hệ thống xác định — không có quy tắc xác thực." },
     "Coming soon": { vi: "Sắp Ra Mắt" },
     "Settings": { vi: "Cài Đặt" },
     "Usage Logs": { vi: "Nhật Ký Sử Dụng" },

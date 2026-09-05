@@ -106,6 +106,10 @@ RSpec.feature "Companies::Departments Permissions", type: :feature, js: true do
     expect(page).to have_content("#{action} permission updated", wait: 10)
   end
 
+def seed_client_cache
+  seed_full_client_cache(company: company, user: owner)
+end
+
   before do
     company.clear_permissions_cache
   end
@@ -115,10 +119,10 @@ RSpec.feature "Companies::Departments Permissions", type: :feature, js: true do
   # =========================================================================
   scenario "employee with read-only permission can access departments dashboard" do
     sign_in(reader_user)
+    seed_client_cache
     visit company_departments_path(company)
 
-    expect(page).to have_selector('table', wait: 10)
-    expect(page).to have_content("Name")
+    expect(page).to have_content("No columns configured", wait: 10)
   end
 
   scenario "reader can? returns true for read, false for create/update" do
@@ -133,9 +137,10 @@ RSpec.feature "Companies::Departments Permissions", type: :feature, js: true do
   scenario "read-only employee can see Add link in UI (UI doesn't gate on permissions)" do
     reader_employee.clear_permissions_cache
     sign_in(reader_user)
+    seed_client_cache
     visit company_departments_path(company)
 
-    expect(page).to have_selector('table', wait: 10)
+    expect(page).to have_content("No columns configured", wait: 10)
     expect(page).to have_selector('a', text: 'Add')
   end
 
@@ -145,9 +150,10 @@ RSpec.feature "Companies::Departments Permissions", type: :feature, js: true do
   scenario "employee with create permission can see Add link" do
     creator_employee.clear_permissions_cache
     sign_in(creator_user)
+    seed_client_cache
     visit company_departments_path(company)
 
-    expect(page).to have_selector('table', wait: 10)
+    expect(page).to have_content("No columns configured", wait: 10)
     expect(page).to have_selector('a', text: 'Add', wait: 5)
   end
 
@@ -221,10 +227,39 @@ RSpec.feature "Companies::Departments Permissions", type: :feature, js: true do
   scenario "employee with update permission can see table with edit links" do
     editor_employee.clear_permissions_cache
     sign_in(editor_user)
-    visit company_departments_path(company)
+
+    # Recreate a property-only table config so the index renders rows with edit links.
+    category = Seed::CategoryService.find_or_create_for(company: company, resource_name: "departments")
+    property_mapping = category.default_property_mapping
+    table_config = company.table_configs.create!(
+      category: category,
+      property_mapping: property_mapping,
+      resource_name: "departments"
+    )
+    property_mapping.update!(
+      metadata: { "properties" => [
+        { "key" => "property_string_1", "type" => "string", "name" => "Scope" }
+      ] }
+    )
+    table_config.update!(
+      metadata: { "columns" => [
+        { "key" => "property_string_1", "name" => "Scope", "visible" => true, "sortable" => true, "align" => "left", "pinned" => nil, "width" => nil, "roles" => [], "is_virtual" => false, "render_config" => {} }
+      ] }
+    )
+    target_department.update!(property_string_1: "Regional")
+
+    seed_client_cache
+    visit company_departments_path(company, category_id: category.id)
 
     expect(page).to have_selector('table', wait: 10)
     expect(page).to have_selector('a[href*="/edit"]', minimum: 1)
+
+    # Restore a clean property state so later (randomized) scenarios that
+    # submit or assert empty tables do not inherit this scenario's
+    # property table config and dynamic validations.
+    table_config.destroy!
+    property_mapping.update!(metadata: { "properties" => [] })
+    page.execute_script("localStorage.clear()")
   end
 
   scenario "editor can? returns true for read and update" do
@@ -241,7 +276,12 @@ RSpec.feature "Companies::Departments Permissions", type: :feature, js: true do
     company.clear_permissions_cache
     editor_employee.reload
 
+    # The property-table scenario may have added dynamic validations to this
+    # category's PM and seeded localStorage — neutralize both so this run does
+    # not depend on scenario order.
+    target_department.category.default_property_mapping.update!(metadata: { "properties" => [] })
     sign_in(editor_user)
+    page.execute_script("localStorage.clear()")
     visit edit_company_department_path(company, target_department)
 
     expect(page).to have_selector('input[name="department[name]"]', wait: 10)

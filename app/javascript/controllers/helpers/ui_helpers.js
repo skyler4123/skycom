@@ -806,6 +806,12 @@ export const table = ({
       return statusBadge(value)
     }
 
+    if (col.key === "code") {
+      return value
+        ? `<span class="font-mono text-xs bg-slate-100 dark:bg-slate-800/60 px-2 py-0.5 rounded text-slate-600 dark:text-slate-300 font-medium">${value}</span>`
+        : `<span class="text-slate-300 dark:text-slate-700">—</span>`
+    }
+
     if (value === null || value === undefined) {
       return `<span class="text-slate-300 dark:text-slate-700">—</span>`
     }

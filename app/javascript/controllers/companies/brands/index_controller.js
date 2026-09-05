@@ -93,6 +93,19 @@ export default class Companies_Brands_IndexController extends Companies_LayoutCo
               rows: this.brands,
               target: "brandsList",
               mappingLookup,
+              renderers: {
+                name: (value, record) => `
+                  <div class="flex items-center gap-4">
+                    <div class="w-8 h-8 rounded-lg bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center shrink-0">
+                      <span class="material-symbols-outlined text-amber-600 dark:text-amber-400 text-[18px]">diamond</span>
+                    </div>
+                    <a href="${Helpers.company_brand_path(currentCompany().id, record.id)}"
+                      class="font-medium text-slate-900 dark:text-white overflow-visible whitespace-normal hover:text-amber-600 dark:hover:text-amber-400 transition-colors cursor-pointer">
+                      ${value || translate("Unnamed Brand")}
+                    </a>
+                  </div>
+                `
+              },
               renderActions: (record) => `
                 <td class="py-4 px-6 text-sm text-right whitespace-nowrap">
                   <a href="${Helpers.edit_company_brand_path(currentCompany().id, record.id)}"

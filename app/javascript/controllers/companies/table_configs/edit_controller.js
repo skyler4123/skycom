@@ -18,8 +18,7 @@ export default class Companies_TableConfigs_EditController extends Companies_Lay
       const response = await fetchJson(`${Helpers.company_table_config_path(companyId, configId)}.json`)
       this.config = response.table_config
       this.propertyMappingIdValue = this.config?.property_mapping_id
-      // Dynamic tables support property_* columns only — drop legacy default-property rows.
-      this.columnsMetadata = (this.config?.metadata?.columns || []).filter(col => col.key?.startsWith("property_"))
+      this.columnsMetadata = this.config?.metadata?.columns || []
 
       poll(() => {
         if (this.hasContentTarget) {

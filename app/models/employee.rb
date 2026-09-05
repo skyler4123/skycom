@@ -10,6 +10,7 @@ class Employee < ApplicationRecord
   include RoleConcern
   include Employee::PermissionConcern
   include TagConcern
+  include StandardPropertiesConcern
   include Discard::Model
   include Cache::RecordsConcern
   attribute :permission_resource_name, :string, default: -> { self.name }

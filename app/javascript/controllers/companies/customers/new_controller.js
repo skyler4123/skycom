@@ -13,7 +13,7 @@ export default class Companies_Customers_NewController extends Companies_LayoutC
     this.categoryId = new URLSearchParams(window.location.search).get('category_id') || this.defaultFilterCategory()?.id || null
 
     const propertyMapping = currentPropertyMappings().find(m => m.category_id === this.categoryId)
-    this.propertyMetadata = propertyMapping?.metadata?.properties || []
+    this.propertyMetadata = dynamicProperties(propertyMapping)
 
     poll(() => {
       if (this.hasContentTarget) {
@@ -90,7 +90,7 @@ export default class Companies_Customers_NewController extends Companies_LayoutC
     this.categoryId = event.target.value
 
     const propertyMapping = currentPropertyMappings().find(m => m.category_id === this.categoryId)
-    this.propertyMetadata = propertyMapping?.metadata?.properties || []
+    this.propertyMetadata = dynamicProperties(propertyMapping)
 
     const dynamicDiv = this.element.querySelector('#dynamic-fields')
     if (dynamicDiv) {
@@ -100,11 +100,7 @@ export default class Companies_Customers_NewController extends Companies_LayoutC
 
   contentHTML() {
     const categoryFilter = this.customersCategories()
-    const typeOptions = (Enums()?.customer?.business_types || [
-      { name: translate("Individual"), value: "individual" },
-      { name: translate("Small Business"), value: "small_business" },
-      { name: translate("Enterprise"), value: "enterprise" }
-    ]).map(t =>
+    const typeOptions = (Enums()?.customer?.business_types || []).map(t =>
       `<option value="${t.value}">${t.name === 'small_business' ? translate("Small Business") : t.name}</option>`
     ).join('')
 

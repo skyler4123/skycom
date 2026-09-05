@@ -46,29 +46,7 @@ export default class Companies_PropertyMappings_EditController extends Companies
     const allPropertyKeys = this.allPropertySlots()
     const availableSlots = allPropertyKeys.filter(s => !usedKeys.has(s.key))
 
-    const rowsHTML = this.propertyMetadata.map((field, index) => `
-      <tr class="border-b border-slate-100 dark:border-gray-800 last:border-0">
-        <td class="py-3 px-4 text-sm">
-          <span class="font-mono text-xs bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded text-slate-600 dark:text-slate-400">${field.key}</span>
-          <input type="hidden" name="property_mapping[metadata][properties][${index}][key]" value="${field.key}">
-        </td>
-        <td class="py-3 px-4">
-          <input type="text" name="property_mapping[metadata][properties][${index}][name]" value="${field.name || ''}"
-            placeholder="Display Name"
-            class="w-full px-2 py-1 text-sm border border-slate-200 dark:border-slate-600 rounded bg-white dark:bg-slate-800 text-slate-900 dark:text-white">
-        </td>
-        <td class="py-3 px-4">
-          <textarea name="property_mapping[metadata][properties][${index}][validates]" rows="3"
-            class="w-full min-w-[200px] px-2 py-1 text-xs font-mono border border-slate-200 dark:border-slate-600 rounded bg-white dark:bg-slate-800 text-slate-900 dark:text-white resize-y">${JSON.stringify(field.validates || {}, null, 2)}</textarea>
-        </td>
-        <td class="py-3 px-4 text-right">
-          <button type="button" data-action="click->${this.identifier}#removeProperty" data-index="${index}"
-            class="inline-flex items-center justify-center p-1.5 text-red-500 hover:text-red-700 hover:bg-red-50 rounded-lg cursor-pointer">
-            <span class="material-symbols-outlined text-[18px]">delete</span>
-          </button>
-        </td>
-      </tr>
-    `).join('')
+    const rowsHTML = this.propertyMetadata.map((field, index) => this.propertyRow(field, index)).join('')
 
     const addDropdownHTML = availableSlots.length > 0 ? `
       <div class="flex items-center gap-2 mt-3">
@@ -195,7 +173,58 @@ export default class Companies_PropertyMappings_EditController extends Companies
     const allKeys = this.allPropertySlots()
     const availableSlots = allKeys.filter(s => !usedKeys.has(s.key))
 
-    tbody.innerHTML = this.propertyMetadata.map((field, index) => `
+    tbody.innerHTML = this.propertyMetadata.map((field, index) => this.propertyRow(field, index)).join('')
+
+    addArea.innerHTML = availableSlots.length > 0 ? `
+      <div class="flex items-center gap-2 mt-3">
+        <select id="new-property-slot" class="pl-3 pr-10 py-2 text-sm border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300">
+          ${availableSlots.map(s => `<option value="${s.key}">${s.key} (${s.type})</option>`).join('')}
+        </select>
+        <button type="button" data-action="click->${this.identifier}#addProperty"
+          class="px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-medium transition-colors cursor-pointer">
+          ${translate("Add Property")}
+        </button>
+      </div>
+    ` : `<p class="text-sm text-slate-400 mt-3">${translate("All property slots are in use.")}</p>`
+  }
+
+  propertyRow(field, index) {
+    const isDefined = field.defined === true
+
+    // Defined properties are BE-owned (StandardPropertiesConcern): readonly
+    // name, no validates editor, no delete button — the label lives in the constant.
+    if (isDefined) {
+      return `
+        <tr class="border-b border-slate-100 dark:border-gray-800 last:border-0">
+          <td class="py-3 px-4 text-sm">
+            <span class="font-mono text-xs bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded text-slate-600 dark:text-slate-400">${field.key}</span>
+            <input type="hidden" name="property_mapping[metadata][properties][${index}][key]" value="${field.key}">
+            <input type="hidden" name="property_mapping[metadata][properties][${index}][name]" value="${field.name || ''}">
+            <input type="hidden" name="property_mapping[metadata][properties][${index}][type]" value="string">
+            <input type="hidden" name="property_mapping[metadata][properties][${index}][defined]" value="true">
+          </td>
+          <td class="py-3 px-4">
+            <input type="text" value="${field.name || ''}"
+              readonly
+              class="w-full px-2 py-1 text-sm border border-slate-200 dark:border-slate-600 rounded bg-slate-50 dark:bg-slate-700 text-slate-400"
+              ${tooltip(translate("Defined by system. This label comes from the backend constant and cannot be renamed."))}
+            >
+          </td>
+          <td class="py-3 px-4">
+            <span class="inline-flex items-center px-2 py-1 text-xs font-medium text-slate-400 dark:text-slate-500"
+              ${tooltip(translate("Defined by system — no validation rules"))}
+            >${translate("System")}</span>
+          </td>
+          <td class="py-3 px-4 text-right">
+            <span class="inline-flex items-center justify-center p-1.5 text-slate-300 dark:text-slate-600">
+              <span class="material-symbols-outlined text-[18px]">lock</span>
+            </span>
+          </td>
+        </tr>
+      `
+    }
+
+    return `
       <tr class="border-b border-slate-100 dark:border-gray-800 last:border-0">
         <td class="py-3 px-4 text-sm">
           <span class="font-mono text-xs bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded text-slate-600 dark:text-slate-400">${field.key}</span>
@@ -217,19 +246,7 @@ export default class Companies_PropertyMappings_EditController extends Companies
           </button>
         </td>
       </tr>
-    `).join('')
-
-    addArea.innerHTML = availableSlots.length > 0 ? `
-      <div class="flex items-center gap-2 mt-3">
-        <select id="new-property-slot" class="pl-3 pr-10 py-2 text-sm border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300">
-          ${availableSlots.map(s => `<option value="${s.key}">${s.key} (${s.type})</option>`).join('')}
-        </select>
-        <button type="button" data-action="click->${this.identifier}#addProperty"
-          class="px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-medium transition-colors cursor-pointer">
-          ${translate("Add Property")}
-        </button>
-      </div>
-    ` : `<p class="text-sm text-slate-400 mt-3">${translate("All property slots are in use.")}</p>`
+    `
   }
 
   allPropertySlots() {

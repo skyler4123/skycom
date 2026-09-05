@@ -13,7 +13,7 @@ export default class Companies_Employees_NewController extends Companies_LayoutC
     this.categoryId = new URLSearchParams(window.location.search).get('category_id') || this.defaultFilterCategory()?.id || null
 
     const propertyMapping = currentPropertyMappings().find(m => m.category_id === this.categoryId)
-    this.propertyMetadata = propertyMapping?.metadata?.properties || []
+    this.propertyMetadata = dynamicProperties(propertyMapping)
 
     poll(() => {
       if (this.hasContentTarget) {
@@ -90,7 +90,7 @@ export default class Companies_Employees_NewController extends Companies_LayoutC
     this.categoryId = event.target.value
 
     const propertyMapping = currentPropertyMappings().find(m => m.category_id === this.categoryId)
-    this.propertyMetadata = propertyMapping?.metadata?.properties || []
+    this.propertyMetadata = dynamicProperties(propertyMapping)
 
     const dynamicDiv = this.element.querySelector('#dynamic-fields')
     if (dynamicDiv) {
@@ -101,12 +101,7 @@ export default class Companies_Employees_NewController extends Companies_LayoutC
   contentHTML() {
     const categoryFilter = this.employeesCategories()
     const branchFilter = currentBranches()
-    const typeOptions = (Enums()?.employee?.business_types || [
-      { name: translate("Full Time"), value: "full_time" },
-      { name: translate("Part Time"), value: "part_time" },
-      { name: translate("Contractor"), value: "contractor" },
-      { name: translate("Intern"), value: "intern" }
-    ]).filter(t => t.value !== 'owner').map(t =>
+    const typeOptions = (Enums()?.employee?.business_types || []).filter(t => t.value !== 'owner').map(t =>
       `<option value="${t.value}">${t.name}</option>`
     ).join('')
 
