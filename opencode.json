@@ -8,5 +8,19 @@
   "plugin": [
     "superpowers@git+https://github.com/obra/superpowers.git",
     "opencode-model-stats"
-  ]
+  ],
+  "provider": {
+    "openrouter": {
+      "models": {
+        "deepseek/deepseek-v4-flash-0731": {
+          "options": {
+            "provider": {
+              "only": ["baidu/fp8"],
+              "allow_fallbacks": false
+            }
+          }
+        }
+      }
+    }
+  }
 }
