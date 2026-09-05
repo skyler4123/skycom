@@ -230,5 +230,16 @@ RSpec.describe TableConfig, type: :model do
       end
     end
   end
+
+  describe "factory pair consistency" do
+    it "table_config columns always match the category PM property names" do
+      category = create(:category)
+      config = create(:table_config, category: category, property_mapping: category.default_property_mapping)
+      expected = category.default_property_mapping.properties.map { |p| [ p["key"], p["name"] ] }.to_h
+      config.columns.each do |col|
+        expect(expected[col["key"]]).to eq(col["name"])
+      end
+    end
+  end
   it_behaves_like "property_mapping concern", TableConfig
 end
