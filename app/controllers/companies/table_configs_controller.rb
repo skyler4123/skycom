@@ -88,10 +88,23 @@ class Companies::TableConfigsController < Companies::ApplicationController
     columns.map do |col|
       h = col.to_h
       h["visible"] = to_boolean(h["visible"]) if h.key?("visible")
+      h["search"] = to_boolean(h["search"]) if h.key?("search")
+      h["filter"] = parse_filter_config(h["filter"]) if h.key?("filter")
+      h.delete("filter") if h["filter"].blank?
       h["width"] = h["width"].present? ? h["width"].to_i : nil
       h["name"] = h["key"].humanize if h["name"].blank?
       h
     end
+  end
+
+  # The filter cell submits raw JSON text. Parse it back into a hash; invalid JSON stays a
+  # string so the TableConfig model validation rejects the save with a useful error.
+  def parse_filter_config(value)
+    return value if value.is_a?(Hash)
+    return nil if value.blank?
+    JSON.parse(value)
+  rescue JSON::ParserError
+    value
   end
 
   def to_boolean(value)
