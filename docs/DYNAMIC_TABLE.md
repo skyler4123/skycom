@@ -141,12 +141,14 @@ backward compatible):
 The textarea submits raw JSON text; `TableConfigsController#normalize_column_types` parses it back
 to a hash (invalid JSON stays a string → model validation rejects the save → flash alert).
 
-**Index page (Products today):** the search input + one `<select>` per filter column render inside
-the existing GET form. Option values encode buckets as `min:max` (`:100`, `100:500`, `500:`,
+**Index page (Products + Customers today):** the search input + one `<select>` per filter column render inside
+the existing GET form via the shared helpers `dynamicSearchHTML` / `dynamicFiltersHTML` (`ui_helpers.js`).
+Option values encode buckets as `min:max` (`:100`, `100:500`, `500:`,
 years likewise); booleans `true|false`; enums the PM option value. Keys travel on the wire
 (`filters[property_integer_1]=:100`); display names are render-time only. BE execution:
-`Products::SearchQueryService` whitelists params against the TableConfig, builds the Meilisearch
-filter string (always `company_id`-scoped), and returns ids fed into pagy via `in_order_of`.
+per-resource `X::SearchQueryService` subclasses of `DynamicSearch::BaseQueryService` whitelist params
+against the TableConfig, build the Meilisearch filter string (always `company_id`-scoped), and return
+ids fed into pagy via `in_order_of`. Rolling the pattern out to another page: **§8**.
 See `docs/MEILISEARCH.md` §4 and `docs/superpowers/specs/2026-09-06-dynamic-search-filter-design.md`.
 
 ---
@@ -342,7 +344,76 @@ end
 
 ---
 
-## 8. File Reference
+## 8. Rolling Out Dynamic Search/Filter to Another Index Page
+
+The engine is generic — `DynamicSearch::BaseQueryService` (BE) + `dynamicSearchHTML` /
+`dynamicFiltersHTML` (FE, `ui_helpers.js`). **Products** and **Customers** are wired; any other
+dynamic-table page adopts in 4 steps (~30 min incl. specs). Design context:
+`docs/superpowers/specs/2026-09-06-dynamic-search-filter-design.md`.
+
+**Step 0 — TableConfig: nothing to do.** The editor is resource-agnostic; per category/PM/TableConfig
+the owner toggles Search/Filter for that resource's columns already (see §2.5).
+
+**Step 1 — BE service subclass** (3 lines; `model` + `fallback_resource_name` only):
+
+```ruby
+# app/services/<resources>/search_query_service.rb
+class Orders::SearchQueryService < DynamicSearch::BaseQueryService
+  def self.model = Order
+  def self.fallback_resource_name = "orders"
+end
+```
+
+**Step 2 — controller index block** (paste into the `format.json` of `<X>sController#index`,
+after the existing scope filters; replace class/ivar names):
+
+```ruby
+search = Orders::SearchQueryService.new(company: current_company, params: params)
+if search.active?
+  begin
+    ids = search.record_ids
+  rescue Meilisearch::Error => e
+    Rails.logger.error("[Orders::SearchQueryService] #{e.message}")
+    return render json: { errors: [ "Search is temporarily unavailable. Please try again." ] },
+      status: :service_unavailable
+  end
+  scope = Order.where(id: ids).in_order_of(:id, ids)
+end
+```
+
+Update the file-header `Serves Stimulus:` comment with the new param support (AGENTS.md rule).
+
+**Step 3 — FE index controller** (2 edits, copy from `companies/customers/index_controller.js`):
+
+```javascript
+// connect(): replace the fetch so the whole query string (q, filters[...]) passes through
+const urlParams = new URLSearchParams(window.location.search)
+if (!urlParams.get('category_id') && this.categoryIdValue) urlParams.set('category_id', this.categoryIdValue)
+const response = await fetchJson(`${pathname()}.json?${urlParams.toString()}`)
+
+// contentHTML(): render from the raw config columns and inject into the existing GET form
+const searchHTML = dynamicSearchHTML({ searchCols: rawColumns.filter(c => c.search === true), urlParams })
+const filtersHTML = dynamicFiltersHTML({
+  filterCols: rawColumns.filter(c => c.filter && typeof c.filter === "object" && c.filter.type),
+  urlParams, mappingLookup
+})
+// ... inside the form, after the Branch select: ${searchHTML}${filtersHTML}
+```
+
+**Step 4 — specs:**
+
+| Spec | Do |
+|------|----|
+| `spec/services/orders/search_query_service_spec.rb` | 10 lines: `it_behaves_like "dynamic search query service"` with `service_class` / `resource_name` / `index_class` / `record` lets (see customers version) |
+| `spec/requests/companies/orders_controller_spec.rb` | DB-path unchanged without params; `?q=`; `?filters[...]`; 503 on `Meilisearch::Error` (stub) — template: `customers_controller_spec.rb` |
+| `spec/features/companies/orders/search_filter_spec.rb` | config → input/dropdown render → q + bucket filter E2E — template: `customers/search_filter_spec.rb` |
+
+Meilisearch fixtures: call `record.ms_index!(true)` explicitly (transactional tests suppress the
+after_commit auto-sync) and `Model.ms_clear_index!` before/after — see `docs/MEILISEARCH.md` §6.
+
+---
+
+## 9. File Reference
 
 | File | Purpose |
 |------|---------|
