@@ -88,12 +88,8 @@ class Companies::TableConfigsController < Companies::ApplicationController
     columns.map do |col|
       h = col.to_h
       h["visible"] = to_boolean(h["visible"]) if h.key?("visible")
-      h["sortable"] = to_boolean(h["sortable"]) if h.key?("sortable")
-      h["is_virtual"] = to_boolean(h["is_virtual"]) if h.key?("is_virtual")
       h["width"] = h["width"].present? ? h["width"].to_i : nil
-      h["roles"] = h["roles"].present? ? h["roles"].split(",").map(&:strip) : []
-      h["pinned"] = nil if h["pinned"].blank?
-    h["name"] = h["key"].humanize if h["name"].blank?
+      h["name"] = h["key"].humanize if h["name"].blank?
       h
     end
   end

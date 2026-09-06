@@ -2,9 +2,8 @@ class TableConfig < ApplicationRecord
   include CategoryConcern
   include PropertyMappingConcern
   include DynamicSearchConcern
-  # Valid values for column alignment and pinned position.
-  ALLOWED_ALIGNS  = %w[left center right].freeze
-  ALLOWED_PINNEDS = %w[left right].freeze
+  # Valid values for column alignment.
+  ALLOWED_ALIGNS = %w[left center right].freeze
   store_accessor :metadata, :columns
   attribute :permission_resource_name, :string, default: -> { self.name }
 
@@ -19,69 +18,31 @@ class TableConfig < ApplicationRecord
   #     "name" => "Invoice No.",
   #     "visible" => true,
   #     "width" => 150,
-  #     "align" => "left",
-  #     "pinned" => "left",
-  #     "roles" => []
+  #     "align" => "left"
   #   },
   #   {
   #     "key" => "property_string_1",
   #     "name" => "Payment Type",
   #     "visible" => true,
   #     "width" => 130,
-  #     "align" => "center",
-  #     "pinned" => nil,
-  #     "roles" => []
+  #     "align" => "center"
   #   },
   #   {
   #     "key" => "property_integer_1",
   #     "name" => "Qty Items",
   #     "visible" => true,
   #     "width" => 100,
-  #     "align" => "right",
-  #     "pinned" => nil,
-  #     "roles" => []
-  #   },
-  #   {
-  #     "key" => "property_decimal_1",
-  #     "name" => "VAT Tax Amount",
-  #     "visible" => true,
-  #     "width" => 160,
-  #     "align" => "right",
-  #     "pinned" => nil,
-  #     "roles" => ["admin", "accountant"],
-  #     "render_config" => {
-  #       "format" => "currency",
-  #       "currency_symbol" => "₫"
-  #     }
-  #   },
-  #   {
-  #     "key" => "property_boolean_1",
-  #     "name" => "E-Receipt Sent",
-  #     "visible" => true,
-  #     "width" => 120,
-  #     "align" => "center",
-  #     "pinned" => nil,
-  #     "roles" => [],
-  #     "render_config" => {
-  #       "format" => "badge",
-  #       "truthy_color" => "green",
-  #       "falsy_color" => "gray"
-  #     }
+  #     "align" => "right"
   #   }
   # ]
   # ---------------------------------------------------------------------------
   # PATTERN — each element must follow this shape:
   #   {
-  #     key:           String   # Column identifier (e.g. "name", "property_integer_1")
-  #     name:          String   # Display name in the table header
-  #     is_virtual:    Boolean  # false = real DB column, true = computed client-side
-  #     visible:       Boolean  # true = shown, false = hidden (preserves config)
-  #     width:         Integer  # Column width in pixels (null = auto)
-  #     align:         String   # "left" | "center" | "right"
-  #     pinned:        String   # "left" | "right" | null (sticky column)
-  #     sortable:      Boolean  # Whether this column supports sorting
-  #     roles:         String[] # Role keys allowed to see this column ([] = all)
-  #     render_config: Hash     # Formatting options (e.g. { "format" => "currency" })
+  #     key:     String   # Column identifier (e.g. "name", "property_integer_1")
+  #     name:    String   # Display name in the table header
+  #     visible: Boolean  # true = shown, false = hidden (preserves config)
+  #     width:   Integer  # Column width in pixels (null = auto)
+  #     align:   String   # "left" | "center" | "right"
   #   }
   # ---------------------------------------------------------------------------
 
@@ -114,14 +75,9 @@ class TableConfig < ApplicationRecord
         errors.add(:metadata, "columns element #{idx}: name is required and must be a non-blank string")
       end
 
-      errors.add(:metadata, "columns element #{idx}: visible must be a boolean")       if field.key?("visible")   && ![ true, false ].include?(field["visible"])
-      errors.add(:metadata, "columns element #{idx}: sortable must be a boolean")      if field.key?("sortable")  && ![ true, false ].include?(field["sortable"])
-      errors.add(:metadata, "columns element #{idx}: is_virtual must be a boolean")    if field.key?("is_virtual") && ![ true, false ].include?(field["is_virtual"])
+      errors.add(:metadata, "columns element #{idx}: visible must be a boolean")       if field.key?("visible") && ![ true, false ].include?(field["visible"])
       errors.add(:metadata, "columns element #{idx}: align must be one of #{ALLOWED_ALIGNS}")  if field.key?("align") && field["align"].present? && ALLOWED_ALIGNS.exclude?(field["align"])
-      errors.add(:metadata, "columns element #{idx}: pinned must be one of #{ALLOWED_PINNEDS}") if field.key?("pinned") && field["pinned"].present? && ALLOWED_PINNEDS.exclude?(field["pinned"])
       errors.add(:metadata, "columns element #{idx}: width must be an integer or null") if field.key?("width") && !field["width"].nil? && !field["width"].is_a?(Integer)
-      errors.add(:metadata, "columns element #{idx}: roles must be an array of strings") if field.key?("roles") && !field["roles"].nil? && !(field["roles"].is_a?(Array) && field["roles"].all? { |r| r.is_a?(String) })
-      errors.add(:metadata, "columns element #{idx}: render_config must be a hash")   if field.key?("render_config") && !field["render_config"].nil? && !field["render_config"].is_a?(Hash)
 
       if key.to_s.start_with?("property_") && name_val.present? && property_mapping.present?
         pm_entry = (property_mapping.properties || []).find { |pm| pm["key"] == key }
@@ -135,9 +91,8 @@ class TableConfig < ApplicationRecord
   def set_default_columns
     self.metadata ||= {}
     self.columns ||= [
-      { "key" => "name", "name" => "Name", "visible" => true, "sortable" => true,
-        "align" => "left", "pinned" => nil, "width" => nil, "roles" => [],
-        "is_virtual" => false, "render_config" => {} }
+      { "key" => "name", "name" => "Name", "visible" => true,
+        "align" => "left", "width" => nil }
     ]
   end
 end

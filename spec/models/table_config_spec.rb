@@ -27,13 +27,9 @@ RSpec.describe TableConfig, type: :model do
       it "accepts a full valid hash array" do
         config.metadata = { "columns" => [
           { "key" => "name", "name" => "Product Name", "visible" => true,
-            "width" => 250, "align" => "left", "pinned" => "left",
-            "sortable" => true, "roles" => [ "admin", "manager" ],
-            "is_virtual" => false, "render_config" => {} },
+            "width" => 250, "align" => "left" },
           { "key" => "property_integer_1", "name" => "Unit Cost",
-            "visible" => true, "width" => 120, "align" => "right",
-            "sortable" => true, "roles" => [], "is_virtual" => false,
-            "render_config" => { "format" => "currency" } }
+            "visible" => true, "width" => 120, "align" => "right" }
         ] }
         expect(config).to be_valid
       end
@@ -95,18 +91,6 @@ RSpec.describe TableConfig, type: :model do
         expect(config.errors[:metadata]).to include(match(/visible must be a boolean/))
       end
 
-      it "rejects sortable when not boolean" do
-        config.metadata = { "columns" => [ { "key" => "name", "name" => "N", "sortable" => "yes" } ] }
-        expect(config).not_to be_valid
-        expect(config.errors[:metadata]).to include(match(/sortable must be a boolean/))
-      end
-
-      it "rejects is_virtual when not boolean" do
-        config.metadata = { "columns" => [ { "key" => "name", "name" => "N", "is_virtual" => "yes" } ] }
-        expect(config).not_to be_valid
-        expect(config.errors[:metadata]).to include(match(/is_virtual must be a boolean/))
-      end
-
       it "rejects align with invalid value" do
         config.metadata = { "columns" => [ { "key" => "name", "name" => "N", "align" => "top" } ] }
         expect(config).not_to be_valid
@@ -118,21 +102,6 @@ RSpec.describe TableConfig, type: :model do
           config.metadata = { "columns" => [ { "key" => "name", "name" => "N", "align" => val } ] }
           expect(config).to be_valid
         end
-      end
-
-      it "rejects pinned with invalid value" do
-        config.metadata = { "columns" => [ { "key" => "name", "name" => "N", "pinned" => "top" } ] }
-        expect(config).not_to be_valid
-        expect(config.errors[:metadata]).to include(match(/pinned/))
-      end
-
-      it "accepts pinned as left, right, or nil" do
-        [ "left", "right" ].each do |val|
-          config.metadata = { "columns" => [ { "key" => "name", "name" => "N", "pinned" => val } ] }
-          expect(config).to be_valid
-        end
-        config.metadata = { "columns" => [ { "key" => "name", "name" => "N", "pinned" => nil } ] }
-        expect(config).to be_valid
       end
 
       it "rejects width when not an integer" do
@@ -148,28 +117,6 @@ RSpec.describe TableConfig, type: :model do
 
       it "accepts width as an integer" do
         config.metadata = { "columns" => [ { "key" => "name", "name" => "N", "width" => 250 } ] }
-        expect(config).to be_valid
-      end
-
-      it "rejects roles when not an array of strings" do
-        config.metadata = { "columns" => [ { "key" => "name", "name" => "N", "roles" => "admin" } ] }
-        expect(config).not_to be_valid
-        expect(config.errors[:metadata]).to include(match(/roles/))
-      end
-
-      it "accepts roles as nil" do
-        config.metadata = { "columns" => [ { "key" => "name", "name" => "N", "roles" => nil } ] }
-        expect(config).to be_valid
-      end
-
-      it "rejects render_config when not a hash" do
-        config.metadata = { "columns" => [ { "key" => "name", "name" => "N", "render_config" => "string" } ] }
-        expect(config).not_to be_valid
-        expect(config.errors[:metadata]).to include(match(/render_config must be a hash/))
-      end
-
-      it "accepts render_config as nil" do
-        config.metadata = { "columns" => [ { "key" => "name", "name" => "N", "render_config" => nil } ] }
         expect(config).to be_valid
       end
     end

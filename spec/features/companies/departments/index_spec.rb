@@ -25,9 +25,9 @@ RSpec.feature "Companies::Departments Management", type: :feature, js: true do
       property_mapping: default_category.default_property_mapping,
       resource_name: "departments",
       metadata: { "columns" => [
-        { "key" => "name", "name" => "Department Name", "visible" => true, "sortable" => true, "align" => "left", "pinned" => nil, "width" => nil, "roles" => [], "is_virtual" => false, "render_config" => {} },
-        { "key" => "code", "name" => "Code", "visible" => true, "sortable" => true, "align" => "left", "pinned" => nil, "width" => nil, "roles" => [], "is_virtual" => false, "render_config" => {} },
-        { "key" => "workflow_status", "name" => "Status", "visible" => true, "sortable" => true, "align" => "center", "pinned" => nil, "width" => nil, "roles" => [], "is_virtual" => false, "render_config" => {} }
+        { "key" => "name", "name" => "Department Name", "visible" => true, "align" => "left", "width" => nil },
+        { "key" => "code", "name" => "Code", "visible" => true, "align" => "left", "width" => nil },
+        { "key" => "workflow_status", "name" => "Status", "visible" => true, "align" => "center", "width" => nil }
       ] }
     )
   end
@@ -114,8 +114,8 @@ RSpec.feature "Companies::Departments Management", type: :feature, js: true do
         property_mapping: test_category.default_property_mapping,
         resource_name: "departments",
         metadata: { "columns" => [
-          { "key" => "name", "name" => "Name", "visible" => true, "sortable" => true, "align" => "left", "pinned" => nil, "width" => nil, "roles" => [], "is_virtual" => false, "render_config" => {} },
-          { "key" => "code", "name" => "Code", "visible" => true, "sortable" => true, "align" => "left", "pinned" => nil, "width" => nil, "roles" => [], "is_virtual" => false, "render_config" => {} }
+          { "key" => "name", "name" => "Name", "visible" => true, "align" => "left", "width" => nil },
+          { "key" => "code", "name" => "Code", "visible" => true, "align" => "left", "width" => nil }
         ] }
       )
       company.clear_permissions_cache

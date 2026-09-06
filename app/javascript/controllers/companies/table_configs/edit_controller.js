@@ -66,11 +66,6 @@ export default class Companies_TableConfigs_EditController extends Companies_Lay
           <input type="checkbox" name="table_config[metadata][columns][${index}][visible]" value="true" ${col.visible !== false ? 'checked' : ''}
             class="rounded border-slate-300 text-blue-600 cursor-pointer">
         </td>
-        <td class="py-2 px-3 text-center">
-          <input type="hidden" name="table_config[metadata][columns][${index}][sortable]" value="false">
-          <input type="checkbox" name="table_config[metadata][columns][${index}][sortable]" value="true" ${col.sortable ? 'checked' : ''}
-            class="rounded border-slate-300 text-blue-600 cursor-pointer">
-        </td>
         <td class="py-2 px-3">
           <select name="table_config[metadata][columns][${index}][align]"
             class="w-full px-1 py-1 text-xs border border-slate-200 dark:border-slate-600 rounded bg-white dark:bg-slate-800 text-slate-900 dark:text-white">
@@ -80,25 +75,8 @@ export default class Companies_TableConfigs_EditController extends Companies_Lay
           </select>
         </td>
         <td class="py-2 px-3">
-          <select name="table_config[metadata][columns][${index}][pinned]"
-            class="w-full px-1 py-1 text-xs border border-slate-200 dark:border-slate-600 rounded bg-white dark:bg-slate-800 text-slate-900 dark:text-white">
-            <option value="" ${!col.pinned ? 'selected' : ''}>none</option>
-            <option value="left" ${col.pinned === 'left' ? 'selected' : ''}>left</option>
-            <option value="right" ${col.pinned === 'right' ? 'selected' : ''}>right</option>
-          </select>
-        </td>
-        <td class="py-2 px-3">
           <input type="number" name="table_config[metadata][columns][${index}][width]" value="${col.width ?? ''}" placeholder="auto"
             class="w-16 px-1 py-1 text-xs border border-slate-200 dark:border-slate-600 rounded bg-white dark:bg-slate-800 text-slate-900 dark:text-white">
-        </td>
-        <td class="py-2 px-3">
-          <input type="text" name="table_config[metadata][columns][${index}][roles]" value="${(col.roles || []).join(', ')}" placeholder="admin, mgr"
-            class="w-full px-1 py-1 text-xs border border-slate-200 dark:border-slate-600 rounded bg-white dark:bg-slate-800 text-slate-900 dark:text-white">
-        </td>
-        <td class="py-2 px-3 text-center">
-          <input type="hidden" name="table_config[metadata][columns][${index}][is_virtual]" value="false">
-          <input type="checkbox" name="table_config[metadata][columns][${index}][is_virtual]" value="true" ${col.is_virtual ? 'checked' : ''}
-            class="rounded border-slate-300 text-blue-600 cursor-pointer">
         </td>
         <td class="py-2 px-3 text-right">
           <button type="button" data-action="click->${this.identifier}#removeColumn" data-index="${index}"
@@ -169,24 +147,12 @@ export default class Companies_TableConfigs_EditController extends Companies_Lay
                   <th class="py-2 px-3 font-medium text-center"
                     ${tooltip(translate("Show or hide this column in the table"))}
                   >${translate("Visible")}</th>
-                  <th class="py-2 px-3 font-medium text-center"
-                    ${tooltip(translate("Allow users to sort by this column"))}
-                  >${translate("Sortable")}</th>
                   <th class="py-2 px-3 font-medium"
                     ${tooltip(translate("Text alignment inside the column: left, center, or right"))}
                   >${translate("Align")}</th>
                   <th class="py-2 px-3 font-medium"
-                    ${tooltip(translate("Freeze this column to the left or right edge"))}
-                  >${translate("Pinned")}</th>
-                  <th class="py-2 px-3 font-medium"
                     ${tooltip(translate("Fixed column width in pixels (leave empty for auto)"))}
                   >${translate("Width")}</th>
-                  <th class="py-2 px-3 font-medium"
-                    ${tooltip(translate("Restrict visibility to these role codes, comma-separated (empty = all roles)"))}
-                  >${translate("Roles")}</th>
-                  <th class="py-2 px-3 font-medium text-center"
-                    ${tooltip(translate("Virtual column — computed at render time, not stored in the database"))}
-                  >${translate("Virtual")}</th>
                   <th class="py-2 px-3 font-medium text-right"></th>
                 </tr>
               </thead>
@@ -232,13 +198,8 @@ export default class Companies_TableConfigs_EditController extends Companies_Lay
       key: 'name',
       name: '',
       visible: true,
-      sortable: true,
       align: 'left',
-      pinned: null,
-      width: null,
-      roles: [],
-      is_virtual: false,
-      render_config: {}
+      width: null
     })
     this.rerenderEditor()
   }
@@ -278,11 +239,6 @@ export default class Companies_TableConfigs_EditController extends Companies_Lay
           <input type="checkbox" name="table_config[metadata][columns][${index}][visible]" value="true" ${col.visible !== false ? 'checked' : ''}
             class="rounded border-slate-300 text-blue-600 cursor-pointer">
         </td>
-        <td class="py-2 px-3 text-center">
-          <input type="hidden" name="table_config[metadata][columns][${index}][sortable]" value="false">
-          <input type="checkbox" name="table_config[metadata][columns][${index}][sortable]" value="true" ${col.sortable ? 'checked' : ''}
-            class="rounded border-slate-300 text-blue-600 cursor-pointer">
-        </td>
         <td class="py-2 px-3">
           <select name="table_config[metadata][columns][${index}][align]"
             class="w-full px-1 py-1 text-xs border border-slate-200 dark:border-slate-600 rounded bg-white dark:bg-slate-800 text-slate-900 dark:text-white">
@@ -292,25 +248,8 @@ export default class Companies_TableConfigs_EditController extends Companies_Lay
           </select>
         </td>
         <td class="py-2 px-3">
-          <select name="table_config[metadata][columns][${index}][pinned]"
-            class="w-full px-1 py-1 text-xs border border-slate-200 dark:border-slate-600 rounded bg-white dark:bg-slate-800 text-slate-900 dark:text-white">
-            <option value="" ${!col.pinned ? 'selected' : ''}>none</option>
-            <option value="left" ${col.pinned === 'left' ? 'selected' : ''}>left</option>
-            <option value="right" ${col.pinned === 'right' ? 'selected' : ''}>right</option>
-          </select>
-        </td>
-        <td class="py-2 px-3">
           <input type="number" name="table_config[metadata][columns][${index}][width]" value="${col.width ?? ''}" placeholder="auto"
             class="w-16 px-1 py-1 text-xs border border-slate-200 dark:border-slate-600 rounded bg-white dark:bg-slate-800 text-slate-900 dark:text-white">
-        </td>
-        <td class="py-2 px-3">
-          <input type="text" name="table_config[metadata][columns][${index}][roles]" value="${(col.roles || []).join(', ')}" placeholder="admin, mgr"
-            class="w-full px-1 py-1 text-xs border border-slate-200 dark:border-slate-600 rounded bg-white dark:bg-slate-800 text-slate-900 dark:text-white">
-        </td>
-        <td class="py-2 px-3 text-center">
-          <input type="hidden" name="table_config[metadata][columns][${index}][is_virtual]" value="false">
-          <input type="checkbox" name="table_config[metadata][columns][${index}][is_virtual]" value="true" ${col.is_virtual ? 'checked' : ''}
-            class="rounded border-slate-300 text-blue-600 cursor-pointer">
         </td>
         <td class="py-2 px-3 text-right">
           <button type="button" data-action="click->${this.identifier}#removeColumn" data-index="${index}"

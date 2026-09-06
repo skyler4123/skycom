@@ -53,9 +53,9 @@ RSpec.describe PropertyMapping, type: :model do
         { "key" => "property_integer_1", "type" => "integer", "name" => "Quantity" }
       ])
       table_config.update!(columns: [
-        { "key" => "name", "name" => "Name", "visible" => true, "sortable" => true, "align" => "left", "pinned" => nil, "width" => nil, "roles" => [], "is_virtual" => false, "render_config" => {} },
-        { "key" => "property_string_1", "name" => "Brand", "visible" => true, "sortable" => true, "align" => "left", "pinned" => nil, "width" => nil, "roles" => [], "is_virtual" => false, "render_config" => {} },
-        { "key" => "property_integer_1", "name" => "Quantity", "visible" => true, "sortable" => true, "align" => "right", "pinned" => nil, "width" => nil, "roles" => [], "is_virtual" => false, "render_config" => {} }
+        { "key" => "name", "name" => "Name", "visible" => true, "align" => "left", "width" => nil },
+        { "key" => "property_string_1", "name" => "Brand", "visible" => true, "align" => "left", "width" => nil },
+        { "key" => "property_integer_1", "name" => "Quantity", "visible" => true, "align" => "right", "width" => nil }
       ])
     end
 

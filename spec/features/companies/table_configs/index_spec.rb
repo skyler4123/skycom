@@ -18,8 +18,8 @@ RSpec.feature "Companies::TableConfigs Management", type: :feature, js: true do
     create(:table_config, company: company, category: category, property_mapping: property_mapping,
       name: "Cosmetics Table",
       metadata: { "columns" => [
-        { "key" => "name", "name" => "Name", "visible" => true, "sortable" => true, "align" => "left", "pinned" => nil, "width" => nil, "roles" => [], "is_virtual" => false, "render_config" => {} },
-        { "key" => "property_string_1", "name" => "Skin Type", "visible" => true, "sortable" => true, "align" => "left", "pinned" => nil, "width" => nil, "roles" => [], "is_virtual" => false, "render_config" => {} }
+        { "key" => "name", "name" => "Name", "visible" => true, "align" => "left", "width" => nil },
+        { "key" => "property_string_1", "name" => "Skin Type", "visible" => true, "align" => "left", "width" => nil }
       ] })
   end
 
