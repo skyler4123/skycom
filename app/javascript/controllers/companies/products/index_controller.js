@@ -18,7 +18,9 @@ export default class Companies_Products_IndexController extends Companies_Layout
     if (tableConfig) this.tableConfigIdValue = tableConfig.id
 
     try {
-      const response = await fetchJson({ params: { category_id: this.categoryIdValue } })
+      const urlParams = new URLSearchParams(window.location.search)
+      if (!urlParams.get('category_id') && this.categoryIdValue) urlParams.set('category_id', this.categoryIdValue)
+      const response = await fetchJson(`${pathname()}.json?${urlParams.toString()}`)
       this.products = response.products || []
       this.pagination = response.pagination || {}
     } catch (error) {
@@ -70,6 +72,22 @@ export default class Companies_Products_IndexController extends Companies_Layout
       return acc
     }, {})
 
+    const urlParams = new URLSearchParams(window.location.search)
+    const searchCols = rawColumns.filter(c => c.search === true)
+    const filterCols = rawColumns.filter(c => c.filter && typeof c.filter === "object" && c.filter.type)
+
+    const searchHTML = searchCols.length > 0 ? `
+      <div class="flex flex-col gap-1">
+        <label class="text-[10px] font-bold text-slate-400 uppercase ml-1">${translate("Search")}</label>
+        <input type="text" name="q" value="${urlParams.get('q') || ''}"
+          placeholder="${translate("Search")} ${searchCols.map(c => c.name).join(", ")}…"
+          class="pl-3 pr-3 py-2 text-sm border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300"
+          ${tooltip(translate("Keyword search across searchable columns"))}>
+      </div>
+    ` : ''
+
+    const filtersHTML = filterCols.map(col => this.filterSelectHTML(col, urlParams, mappingLookup)).join('')
+
     return `
       <div class="p-4 overflow-y-auto" data-action="filter:changed@window->${this.identifier}#handleFilter">
         <div class="p-4 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 flex flex-col">
@@ -97,6 +115,8 @@ export default class Companies_Products_IndexController extends Companies_Layout
                     ${selectOptionsHTML(cloneNewKey(currentBranches(), "id", "value"), branchValue, translate("All Branches"))}
                   </select>
                 </div>
+                ${searchHTML}
+                ${filtersHTML}
                 <div class="flex gap-2 mt-auto">
                   <button type="submit" class="h-[38px] px-6 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors font-medium text-sm flex items-center gap-2">
                     <span class="material-symbols-outlined text-[18px]">search</span>
@@ -153,5 +173,43 @@ export default class Companies_Products_IndexController extends Companies_Layout
     `
   }
 
+  filterSelectHTML(col, urlParams, mappingLookup) {
+    const f = col.filter
+    let options = []
+    if (f.type === "boolean") {
+      const labels = f.yes_no === true ? [ translate("Yes"), translate("No") ] : [ translate("True"), translate("False") ]
+      options = [ { value: "true", label: labels[0] }, { value: "false", label: labels[1] } ]
+    } else if (f.type === "enum") {
+      options = (mappingLookup[col.key]?.options || []).map(o => ({ value: String(o.value), label: o.label }))
+    } else if (f.type === "range" || f.type === "date") {
+      options = (f.buckets || []).map(b => this.bucketOption(f.type, b)).filter(Boolean)
+    }
+    if (options.length === 0) return ""
 
+    const paramName = `filters[${col.key}]`
+    const current = urlParams.get(paramName) || ""
+    return `
+      <div class="flex flex-col gap-1">
+        <label class="text-[10px] font-bold text-slate-400 uppercase ml-1">${col.name}</label>
+        <select name="${paramName}"
+          class="pl-3 pr-10 py-2 text-sm border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300"
+          ${tooltip(`${translate("Filter by")} ${col.name}`)}>
+          <option value="">${translate("All")}</option>
+          ${options.map(o => `<option value="${o.value}" ${current === o.value ? "selected" : ""}>${o.label}</option>`).join('')}
+        </select>
+      </div>
+    `
+  }
+
+  bucketOption(type, bucket) {
+    if (!Array.isArray(bucket) || bucket.length !== 2) return null
+    const [ from, to ] = bucket
+    const value = `${from ?? ""}:${to ?? ""}`
+    let label
+    if (from == null) label = `&lt; ${to}`
+    else if (to == null) label = `≥ ${from}`
+    else if (type === "date") label = (to === from + 1) ? `${from}` : `${from} – ${to - 1}`
+    else label = `${from} – ${to}`
+    return { value, label }
+  }
 }
