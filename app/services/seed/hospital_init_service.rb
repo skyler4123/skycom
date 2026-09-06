@@ -145,9 +145,7 @@ class Seed::HospitalInitService
   def field_hash(key, properties = {})
     name = properties[key.to_sym] || key.humanize
     { "key" => key, "name" => name, "visible" => true,
-      "sortable" => true, "align" => "left", "pinned" => nil,
-      "width" => nil, "roles" => [], "is_virtual" => false,
-      "render_config" => {} }
+      "align" => "left", "width" => nil }
   end
 
   def configure_hospital_permissions

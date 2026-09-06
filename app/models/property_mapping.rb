@@ -162,13 +162,8 @@ class PropertyMapping < ApplicationRecord
           "key" => key,
           "name" => pm_entry["name"],
           "visible" => true,
-          "sortable" => true,
           "align" => "left",
-          "pinned" => nil,
-          "width" => nil,
-          "roles" => [],
-          "is_virtual" => false,
-          "render_config" => {}
+          "width" => nil
         }
         changed = true
       end

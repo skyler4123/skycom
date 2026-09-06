@@ -54,11 +54,8 @@ export default class Companies_TableConfigs_ShowController extends Companies_Lay
                 <th class="py-3 px-4 font-medium whitespace-nowrap">${translate("Key")}</th>
                 <th class="py-3 px-4 font-medium whitespace-nowrap">${translate("Name")}</th>
                 <th class="py-3 px-4 font-medium whitespace-nowrap">${translate("Visible")}</th>
-                <th class="py-3 px-4 font-medium whitespace-nowrap">${translate("Sortable")}</th>
                 <th class="py-3 px-4 font-medium whitespace-nowrap">${translate("Align")}</th>
-                <th class="py-3 px-4 font-medium whitespace-nowrap">${translate("Pinned")}</th>
                 <th class="py-3 px-4 font-medium whitespace-nowrap">${translate("Width")}</th>
-                <th class="py-3 px-4 font-medium whitespace-nowrap">${translate("Virtual")}</th>
               </tr>
             </thead>
             <tbody>
@@ -67,11 +64,8 @@ export default class Companies_TableConfigs_ShowController extends Companies_Lay
                   <td class="py-3 px-4 text-sm font-mono text-slate-700 dark:text-slate-300">${col.key}</td>
                   <td class="py-3 px-4 text-sm font-medium text-slate-900 dark:text-white">${col.name}</td>
                   <td class="py-3 px-4">${col.visible !== false ? `<span class="text-emerald-600 text-sm">${translate("Yes")}</span>` : `<span class="text-slate-400 text-sm">${translate("No")}</span>`}</td>
-                  <td class="py-3 px-4">${col.sortable ? `<span class="text-emerald-600 text-sm">${translate("Yes")}</span>` : `<span class="text-slate-400 text-sm">${translate("No")}</span>`}</td>
                   <td class="py-3 px-4 text-sm text-slate-600 dark:text-slate-300">${col.align || 'left'}</td>
-                  <td class="py-3 px-4 text-sm text-slate-600 dark:text-slate-300">${col.pinned || '-'}</td>
                   <td class="py-3 px-4 text-sm text-slate-600 dark:text-slate-300">${col.width || '-'}</td>
-                  <td class="py-3 px-4">${col.is_virtual ? `<span class="text-blue-600 text-sm">${translate("Yes")}</span>` : `<span class="text-slate-400 text-sm">${translate("No")}</span>`}</td>
                 </tr>
               `).join('')}
             </tbody>
