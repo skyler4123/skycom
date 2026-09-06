@@ -1,6 +1,12 @@
 import Companies_LayoutController from "controllers/companies/layout_controller"
 
 export default class Companies_TableConfigs_EditController extends Companies_LayoutController {
+  // TableConfig editor — rows carry key/name/visible/search/filter/align/width.
+  // `search` checkbox: string-capable columns only; `filter` textarea: raw JSON
+  // ({type: range|enum|boolean|date, buckets}) — parsed + validated server-side.
+  // Depends on BE: Companies::TableConfigsController#show (JSON hydration),
+  //               Companies::TableConfigsController#update (form PATCH + normalize_column_types)
+  // Docs: docs/DYNAMIC_TABLE.md, docs/superpowers/specs/2026-09-06-dynamic-search-filter-design.md
   /** @type {any | null} */
   config = null
 

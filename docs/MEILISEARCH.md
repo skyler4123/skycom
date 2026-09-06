@@ -1,6 +1,6 @@
 # Skycom Meilisearch Integration
 
-> **Status**: Live (2026-08-29). Meilisearch powers backend search for every dynamic-property model. Backend-only — no search UI/endpoints yet.
+> **Status**: Live (2026-08-29). Meilisearch powers backend search for every dynamic-property model. Live consumer since 2026-09-06: the **Products index** dynamic search/filter (`Products::SearchQueryService`) — other dashboards await rollout (TableConfig config is already usable on any page).
 
 ---
 
@@ -169,6 +169,18 @@ Meilisearch::Rails.multi_search(
 
 Always pass `filter: "company_id = <id>"` — the indexes are shared across all companies. The `filterable_attributes` set already includes `company_id`, `category_id`, `branch_id`, `workflow_status`, `business_type`.
 
+### Live caller: Products dynamic search/filter (2026-09-06)
+
+`Products::SearchQueryService` (`app/services/products/search_query_service.rb`) is the first request-path consumer:
+
+1. Reads the active TableConfig for the requested category and **whitelists** `q` + `filters[key]` params against the columns' `search`/`filter` settings (`docs/DYNAMIC_TABLE.md` §2.5).
+2. Builds the Meilisearch filter string (always `company_id`-scoped; half-open numeric/year buckets `key >= a AND key < b`, `key = true/false` for booleans, PM option values for enum ints).
+3. Restricts keyword search to the configured columns via `attributes_to_search_on` (verified working through meilisearch-rails 0.16 → client 0.32, which camelizes the option).
+4. Returns ids in relevance order; `ProductsController#index` feeds them into the existing pagy flow via `Product.where(id: ids).in_order_of(:id, ids)` — zero changes to the pagination contract. No `q`/`filters` params → the plain DB path (Meilisearch never called).
+5. `Meilisearch::Error` → 503 `{ errors: [...] }` — never silent unfiltered results.
+
+Specs: `spec/services/products/search_query_service_spec.rb`, `spec/requests/companies/products_controller_spec.rb`, `spec/features/companies/products/search_filter_spec.rb`. Design: `docs/superpowers/specs/2026-09-06-dynamic-search-filter-design.md`.
+
 ---
 
 ## 5. Updating the Index Schema (How To Change Settings)
@@ -276,6 +288,10 @@ To opt a model **out** of searchable: do not include the concern (or add `meilis
 | `spec/models/concerns/dynamic_search_concern_spec.rb` | Connection + settings + 46-model search coverage |
 | `spec/support/shared_examples/dynamic_search.rb` | Shared per-model search examples |
 | `spec/jobs/meilisearch_index_job_spec.rb` | Job behaviors |
+| `app/services/products/search_query_service.rb` | First live caller — TableConfig-driven search/filter query translation |
+| `spec/services/products/search_query_service_spec.rb` | Whitelist + filter-string building + ms integration |
+| `spec/requests/companies/products_controller_spec.rb` | Search path wiring (DB path unchanged, 503 on ms down) |
+| `spec/features/companies/products/search_filter_spec.rb` | E2E: configured columns → input/dropdowns → results |
 | `docs/MODEL_CALLBACKS.md` | `DynamicSearchConcern` callback documentation |
 | `docs/superpowers/specs/2026-08-29-meilisearch-dynamic-search-design.md` | Design spec (uncommitted, gitignored) |
 | `docs/superpowers/plans/2026-08-29-meilisearch-dynamic-search.md` | Implementation plan (uncommitted, gitignored) |

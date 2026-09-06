@@ -1,6 +1,12 @@
 import Companies_LayoutController from "controllers/companies/layout_controller"
 
 export default class Companies_Products_IndexController extends Companies_LayoutController {
+  // Products dashboard — table hydrates from the index JSON of the current URL.
+  // Search/filter form controls render from the active TableConfig columns
+  // (`search: true` → keyword input, `filter: {type,...}` → dropdown with bucket/option labels).
+  // Depends on BE: Companies::ProductsController#index (list + Meilisearch q / filters[key])
+  // Endpoints: GET <pathname>.json?category_id&q&filters[key] — traditional GET form, full-page submit
+  // Docs: docs/DYNAMIC_TABLE.md, docs/MEILISEARCH.md
   static targets = ["productsList"]
 
   /** @type {(Product & { name: string })[]} */

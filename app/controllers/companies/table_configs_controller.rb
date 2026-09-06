@@ -1,3 +1,12 @@
+# app/controllers/companies/table_configs_controller.rb
+#
+# TableConfig dashboard API + editor form handling.
+# update: metadata[columns] accepts per-column `search` (boolean, string columns) and
+#         `filter` (range/enum/boolean/date hash; submitted as raw JSON text, parsed in
+#         normalize_column_types, shape-validated in TableConfig).
+# Serves Stimulus: Companies_TableConfigs_IndexController|ShowController|NewController|EditController
+# Endpoints: GET/POST/PATCH /companies/:company_id/table_configs... — see config/routes.rb
+# Docs: docs/DYNAMIC_TABLE.md (column pattern), docs/MEILISEARCH.md (consumers of search/filter config)
 class Companies::TableConfigsController < Companies::ApplicationController
   def index
     respond_to do |format|

@@ -48,8 +48,10 @@ async connect() {
   const tableConfig = currentTableConfigs().find(c => c.property_mapping_id === this.propertyMappingIdValue)
   if (tableConfig) this.tableConfigIdValue = tableConfig.id
 
-  // Fetch products
-  const response = await fetchJson({ params: { category_id: this.categoryIdValue } })
+  // Fetch data — the full page query string (category_id, q, filters[...]) is passed through:
+  const urlParams = new URLSearchParams(window.location.search)
+  if (!urlParams.get('category_id') && this.categoryIdValue) urlParams.set('category_id', this.categoryIdValue)
+  const response = await fetchJson(`${pathname()}.json?${urlParams.toString()}`)
   this.products = response.products || []
 
   // Two-phase render
@@ -110,6 +112,42 @@ Category filter uses a `<form method="get">` with the Search button for full pag
 ```
 
 The `<select>` has no JS change handler — changing the category requires clicking "Search" to navigate to `?category_id=X` (full page reload).
+
+### 2.5 Dynamic Search & Filter (Column Settings)
+
+Each `columns_metadata[]` entry may additionally carry two optional keys (absent = disabled,
+backward compatible):
+
+| Key | Type | Allowed on | Meaning |
+|-----|------|-----------|---------|
+| `search` | Boolean | `name` / `description` / `code` / `property_string_*` | Column participates in the index page keyword search box |
+| `filter` | Hash | `property_integer_*` / `property_decimal_*` / `property_boolean_*` / `property_datetime_*` | Column renders a filter dropdown on the index page |
+
+`filter` shape by column type (validated in `TableConfig`):
+
+```jsonc
+// integer / decimal — half-open buckets [from, to), null = open side
+{ "type": "range", "buckets": [[null, 100], [100, 500], [500, null]] }
+// integer with PropertyMapping input_type=select — options render from PM options[]
+{ "type": "enum" }
+// boolean — dropdown labels; yes_no wins if both true
+{ "type": "boolean", "true_false": true, "yes_no": false }
+// datetime — year buckets, half-open ([2024, 2025] == the year 2024)
+{ "type": "date", "buckets": [[null, 2024], [2024, 2025], [2025, null]] }
+```
+
+**Editor** (`companies/table_configs/edit_controller.js`): per-row **Search** checkbox
+(disabled for non-string keys) + **Filter** JSON textarea (type-aware skeleton as placeholder).
+The textarea submits raw JSON text; `TableConfigsController#normalize_column_types` parses it back
+to a hash (invalid JSON stays a string → model validation rejects the save → flash alert).
+
+**Index page (Products today):** the search input + one `<select>` per filter column render inside
+the existing GET form. Option values encode buckets as `min:max` (`:100`, `100:500`, `500:`,
+years likewise); booleans `true|false`; enums the PM option value. Keys travel on the wire
+(`filters[property_integer_1]=:100`); display names are render-time only. BE execution:
+`Products::SearchQueryService` whitelists params against the TableConfig, builds the Meilisearch
+filter string (always `company_id`-scoped), and returns ids fed into pagy via `in_order_of`.
+See `docs/MEILISEARCH.md` §4 and `docs/superpowers/specs/2026-09-06-dynamic-search-filter-design.md`.
 
 ---
 
@@ -311,7 +349,10 @@ end
 | `app/javascript/controllers/companies/products/index_controller.js` | Main dynamic table controller |
 | `app/javascript/controllers/companies/products/new_modal_controller.js` | Dynamic form fields |
 | `app/javascript/controllers/companies/products/show_modal_controller.js` | Dynamic editable fields |
-| `app/controllers/companies/products_controller.rb` | JSON API with all `property_*` columns |
+ | `app/controllers/companies/products_controller.rb` | JSON API with all `property_*` columns |
+ | `app/services/products/search_query_service.rb` | TableConfig → Meilisearch search/filter query translation |
+ | `app/javascript/controllers/companies/table_configs/edit_controller.js` | Column editor incl. Search/Filter settings |
+ | `spec/features/companies/products/search_filter_spec.rb` | Dynamic search + filter dropdowns E2E |
 | `app/javascript/controllers/companies/layout_controller.js` | `currentTableConfig()`, `currentPropertyMapping()` helpers |
 | `app/javascript/controllers/helpers/auth_helpers.js` | `currentPropertyMappings()`, `currentTableConfigs()` |
 | `app/javascript/controllers/client_cache_controller.js` | localStorage seeding (must be locked in tests) |

@@ -82,14 +82,16 @@ class Products::SearchQueryService
   end
 
   # Handles both ActionController::Parameters (form requests) and plain Hashes (JSON APIs/specs).
+  # Read-only: keys are whitelisted against the TableConfig and values are parsed with strict
+  # regexes before reaching Meilisearch — no model assignment, so to_unsafe_h is safe here.
   def requested_filters
     return @requested_filters if defined?(@requested_filters)
 
     raw = params[:filters]
     @requested_filters = if raw.blank?
       {}
-    elsif raw.respond_to?(:permit!)
-      raw.permit!.to_h
+    elsif raw.respond_to?(:to_unsafe_h)
+      raw.to_unsafe_h
     else
       raw.to_h
     end
