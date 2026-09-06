@@ -19,6 +19,10 @@ export default class Companies_TableConfigs_EditController extends Companies_Lay
       this.config = response.table_config
       this.columnsMetadata = this.config?.metadata?.columns || []
 
+      const pm = currentPropertyMappings().find(m => m.id === this.config?.property_mapping_id)
+      /** @type {Array} */
+      this.propertyEntries = pm?.metadata?.properties || []
+
       poll(() => {
         if (this.hasContentTarget) {
           this.renderContent()
@@ -43,49 +47,7 @@ export default class Companies_TableConfigs_EditController extends Companies_Lay
 
     const companyId = window.location.pathname.split("/")[2]
 
-    const rowsHTML = this.columnsMetadata.map((col, index) => `
-      <tr class="border-b border-slate-100 dark:border-gray-800 last:border-0">
-        <td class="py-2 px-3">
-          <input type="text" name="table_config[metadata][columns][${index}][key]" value="${col.key || ''}"
-            class="w-full px-2 py-1 text-xs font-mono border border-slate-200 dark:border-slate-600 rounded bg-white dark:bg-slate-800 text-slate-900 dark:text-white">
-        </td>
-        <td class="py-2 px-3">
-          ${col.key.startsWith('property_') ? `
-            <input type="text" name="table_config[metadata][columns][${index}][name]" value="${col.name || ''}"
-              class="w-full px-2 py-1 text-xs border border-slate-200 dark:border-slate-600 rounded bg-slate-50 dark:bg-slate-700 text-slate-400 cursor-not-allowed"
-              readonly
-              ${tooltip(translate("This field is synced from PropertyMapping. Please access the Property Mapping edit page to update this name."))}
-            >
-          ` : `
-            <input type="text" name="table_config[metadata][columns][${index}][name]" value="${col.name || ''}"
-              class="w-full px-2 py-1 text-xs border border-slate-200 dark:border-slate-600 rounded bg-white dark:bg-slate-800 text-slate-900 dark:text-white">
-          `}
-        </td>
-        <td class="py-2 px-3 text-center">
-          <input type="hidden" name="table_config[metadata][columns][${index}][visible]" value="false">
-          <input type="checkbox" name="table_config[metadata][columns][${index}][visible]" value="true" ${col.visible !== false ? 'checked' : ''}
-            class="rounded border-slate-300 text-blue-600 cursor-pointer">
-        </td>
-        <td class="py-2 px-3">
-          <select name="table_config[metadata][columns][${index}][align]"
-            class="w-full px-1 py-1 text-xs border border-slate-200 dark:border-slate-600 rounded bg-white dark:bg-slate-800 text-slate-900 dark:text-white">
-            <option value="left" ${col.align === 'left' ? 'selected' : ''}>left</option>
-            <option value="center" ${col.align === 'center' ? 'selected' : ''}>center</option>
-            <option value="right" ${col.align === 'right' ? 'selected' : ''}>right</option>
-          </select>
-        </td>
-        <td class="py-2 px-3">
-          <input type="number" name="table_config[metadata][columns][${index}][width]" value="${col.width ?? ''}" placeholder="auto"
-            class="w-16 px-1 py-1 text-xs border border-slate-200 dark:border-slate-600 rounded bg-white dark:bg-slate-800 text-slate-900 dark:text-white">
-        </td>
-        <td class="py-2 px-3 text-right">
-          <button type="button" data-action="click->${this.identifier}#removeColumn" data-index="${index}"
-            class="inline-flex items-center justify-center p-1 text-red-500 hover:text-red-700 hover:bg-red-50 rounded-lg cursor-pointer">
-            <span class="material-symbols-outlined text-[16px]">delete</span>
-          </button>
-        </td>
-      </tr>
-    `).join('')
+    const rowsHTML = this.columnsMetadata.map((col, index) => this.columnRowHTML(col, index)).join('')
 
     const fields = `
       <div class="space-y-6">
@@ -147,6 +109,12 @@ export default class Companies_TableConfigs_EditController extends Companies_Lay
                   <th class="py-2 px-3 font-medium text-center"
                     ${tooltip(translate("Show or hide this column in the table"))}
                   >${translate("Visible")}</th>
+                  <th class="py-2 px-3 font-medium text-center"
+                    ${tooltip(translate("Include this column in the keyword search box (string columns only)"))}
+                  >${translate("Search")}</th>
+                  <th class="py-2 px-3 font-medium"
+                    ${tooltip(translate("Filter config JSON — how this column filters (range / enum / boolean / date). Leave empty for no filter."))}
+                  >${translate("Filter")}</th>
                   <th class="py-2 px-3 font-medium"
                     ${tooltip(translate("Text alignment inside the column: left, center, or right"))}
                   >${translate("Align")}</th>
@@ -198,6 +166,7 @@ export default class Companies_TableConfigs_EditController extends Companies_Lay
       key: 'name',
       name: '',
       visible: true,
+      search: false,
       align: 'left',
       width: null
     })
@@ -216,14 +185,62 @@ export default class Companies_TableConfigs_EditController extends Companies_Lay
     const tbody = document.getElementById('columns-body')
     if (!tbody) return
 
-    tbody.innerHTML = this.columnsMetadata.map((col, index) => `
+    tbody.innerHTML = this.columnsMetadata.map((col, index) => this.columnRowHTML(col, index)).join('')
+  }
+
+  propertyEntryFor(key) {
+    return this.propertyEntries.find(p => p.key === key) || null
+  }
+
+  columnType(key) {
+    const entry = this.propertyEntryFor(key)
+    if (entry?.type) return entry.type
+    const match = /^property_(string|integer|decimal|boolean|datetime)_\d+$/.exec(key)
+    return match ? match[1] : null
+  }
+
+  isSearchableColumn(key) {
+    return key === "name" || key === "description" || key === "code" || key.startsWith("property_string_")
+  }
+
+  canFilter(col) {
+    const type = this.columnType(col.key)
+    return type === "integer" || type === "decimal" || type === "boolean" || type === "datetime"
+  }
+
+  filterSkeleton(col) {
+    const type = this.columnType(col.key)
+    const isEnum = type === "integer" && this.propertyEntryFor(col.key)?.input_type === "select"
+    switch (type) {
+      case 'integer':
+        return isEnum ? '{"type":"enum"}' : '{"type":"range","buckets":[[null,10],[10,null]]}'
+      case 'decimal':
+        return '{"type":"range","buckets":[[null,10.5],[10.5,null]]}'
+      case 'boolean':
+        return '{"type":"boolean","true_false":true,"yes_no":false}'
+      case 'datetime':
+        return '{"type":"date","buckets":[[null,2025],[2025,2026],[2026,null]]}'
+      default:
+        return ''
+    }
+  }
+
+  escapeHTML(str) {
+    return String(str).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
+  }
+
+  columnRowHTML(col, index) {
+    const filterValue = col.filter && typeof col.filter === "object" ? JSON.stringify(col.filter) : ""
+    const key = col.key || ''
+
+    return `
       <tr class="border-b border-slate-100 dark:border-gray-800 last:border-0">
         <td class="py-2 px-3">
-          <input type="text" name="table_config[metadata][columns][${index}][key]" value="${col.key || ''}"
+          <input type="text" name="table_config[metadata][columns][${index}][key]" value="${key}"
             class="w-full px-2 py-1 text-xs font-mono border border-slate-200 dark:border-slate-600 rounded bg-white dark:bg-slate-800 text-slate-900 dark:text-white">
         </td>
         <td class="py-2 px-3">
-          ${col.key.startsWith('property_') ? `
+          ${key.startsWith('property_') ? `
             <input type="text" name="table_config[metadata][columns][${index}][name]" value="${col.name || ''}"
               class="w-full px-2 py-1 text-xs border border-slate-200 dark:border-slate-600 rounded bg-slate-50 dark:bg-slate-700 text-slate-400 cursor-not-allowed"
               readonly
@@ -238,6 +255,20 @@ export default class Companies_TableConfigs_EditController extends Companies_Lay
           <input type="hidden" name="table_config[metadata][columns][${index}][visible]" value="false">
           <input type="checkbox" name="table_config[metadata][columns][${index}][visible]" value="true" ${col.visible !== false ? 'checked' : ''}
             class="rounded border-slate-300 text-blue-600 cursor-pointer">
+        </td>
+        <td class="py-2 px-3 text-center">
+          ${this.isSearchableColumn(key) ? `
+            <input type="hidden" name="table_config[metadata][columns][${index}][search]" value="false">
+            <input type="checkbox" id="col-search-${index}" name="table_config[metadata][columns][${index}][search]" value="true" ${col.search === true ? 'checked' : ''}
+              class="rounded border-slate-300 text-blue-600 cursor-pointer"
+              ${tooltip(translate("Allow keyword search on this column"))}>
+          ` : `<span class="text-slate-300 dark:text-slate-700">—</span>`}
+        </td>
+        <td class="py-2 px-3">
+          ${this.canFilter(col) ? `
+            <textarea id="col-filter-${index}" name="table_config[metadata][columns][${index}][filter]" rows="2" placeholder='${this.filterSkeleton(col)}'
+              class="w-44 px-2 py-1 text-xs font-mono border border-slate-200 dark:border-slate-600 rounded bg-white dark:bg-slate-800 text-slate-900 dark:text-white">${this.escapeHTML(filterValue)}</textarea>
+          ` : `<span class="text-slate-300 dark:text-slate-700">—</span>`}
         </td>
         <td class="py-2 px-3">
           <select name="table_config[metadata][columns][${index}][align]"
@@ -258,6 +289,6 @@ export default class Companies_TableConfigs_EditController extends Companies_Lay
           </button>
         </td>
       </tr>
-    `).join('')
+    `
   }
 }
