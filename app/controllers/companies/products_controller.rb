@@ -9,6 +9,18 @@ class Companies::ProductsController < Companies::ApplicationController
         scope = scope.where(category_id: params[:category_id]) if params[:category_id].present?
         scope = scope.where(branch_id: params[:branch_id]) if params[:branch_id].present?
 
+        search = Products::SearchQueryService.new(company: current_company, params: params)
+        if search.active?
+          begin
+            ids = search.record_ids
+          rescue Meilisearch::Error => e
+            Rails.logger.error("[Products::SearchQueryService] #{e.message}")
+            return render json: { errors: [ "Search is temporarily unavailable. Please try again." ] },
+              status: :service_unavailable
+          end
+          scope = Product.where(id: ids).in_order_of(:id, ids)
+        end
+
         @pagy, @products_results = pagy(:offset, scope, jsonapi: true)
 
         render json: {
