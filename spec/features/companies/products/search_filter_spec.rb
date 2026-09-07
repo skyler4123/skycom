@@ -55,6 +55,7 @@ RSpec.feature "Companies::Products dynamic search/filter", type: :feature, js: t
     visit company_products_path(company, category_id: category.id)
 
     expect(page).to have_field("q", wait: 10)
+    expect(page).to have_css("form div.flex.flex-wrap > div:first-child input[name='q']", wait: 10)
     expect(page).to have_select("filters[property_integer_1]", options: [ "All", "< 100", "≥ 100" ])
     expect(page).to have_select("filters[property_boolean_1]", options: [ "All", "Yes", "No" ])
   end

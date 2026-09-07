@@ -93,6 +93,7 @@ export default class Companies_Customers_IndexController extends Companies_Layou
           <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
             <form method="get" action="${pathname()}" class="flex flex-col lg:flex-row items-end justify-between gap-4 w-full">
               <div class="flex flex-wrap items-center gap-3 w-full lg:w-auto">
+                ${searchHTML}
                 <div class="flex flex-col gap-1">
                   <label class="text-[10px] font-bold text-slate-400 uppercase ml-1">${translate("Category")}</label>
                   <select
@@ -111,7 +112,6 @@ export default class Companies_Customers_IndexController extends Companies_Layou
                     ${selectOptionsHTML(cloneNewKey(currentBranches(), "id", "value"), branchValue, translate("All Branches"))}
                   </select>
                 </div>
-                ${searchHTML}
                 ${filtersHTML}
                 <div class="flex gap-2 mt-auto">
                   <button type="submit" class="h-[38px] px-6 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium text-sm flex items-center gap-2">

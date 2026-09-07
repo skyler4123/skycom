@@ -145,7 +145,8 @@ parses it back to a hash and merges the checkbox as `active` (checkbox always wi
 without the checkbox key backfill `active: true` — legacy-safe). Invalid JSON stays a string →
 model validation rejects the save → flash alert. API/JSON writes must include `active` explicitly.
 
-**Index page (Products + Customers today):** the search input + one `<select>` per filter column render inside
+**Index page (Products + Customers today):** the search input (always the **first** control in the filter
+row, before the Category select) + one `<select>` per filter column render inside
 the existing GET form via the shared helpers `dynamicSearchHTML` / `dynamicFiltersHTML` (`ui_helpers.js`).
 Option values encode buckets as `min:max` (`:100`, `100:500`, `500:`,
 years likewise); booleans `true|false`; enums the PM option value. Keys travel on the wire
@@ -407,7 +408,9 @@ const filtersHTML = dynamicFiltersHTML({
   filterCols: rawColumns.filter(c => c.filter && typeof c.filter === "object" && c.filter.type && c.filter.active !== false),
   urlParams, mappingLookup
 })
-// ... inside the form, after the Branch select: ${searchHTML}${filtersHTML}
+// ... inside the filter row: ${searchHTML} FIRST (before the Category select), then the
+// existing Category/Branch selects, then ${filtersHTML} after them, then the Search button.
+// The keyword input is the first control so it reads "search → narrow with dropdowns".
 ```
 
 **Step 4 — specs:**
