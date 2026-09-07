@@ -17,16 +17,7 @@ class Companies::CustomersController < Companies::ApplicationController
         scope = scope.where(branch_id: params[:branch_id]) if params[:branch_id].present?
 
         search = Customers::SearchQueryService.new(company: current_company, params: params)
-        if search.active?
-          begin
-            ids = search.record_ids
-          rescue Meilisearch::Error => e
-            Rails.logger.error("[Customers::SearchQueryService] #{e.message}")
-            return render json: { errors: [ "Search is temporarily unavailable. Please try again." ] },
-              status: :service_unavailable
-          end
-          scope = Customer.where(id: ids).in_order_of(:id, ids)
-        end
+        scope = scope.where(id: search.record_ids).in_order_of(:id, search.record_ids) if search.active?
 
         @pagy, @customers_results = pagy(:offset, scope, jsonapi: true)
 
