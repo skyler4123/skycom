@@ -95,6 +95,7 @@ RSpec.shared_examples "dynamic search query service" do
     end
 
     it "adds branch scope when present" do
+      skip "model has no branch_id column (BaseQueryService guard)" unless index_class.column_names.include?("branch_id")
       branch = create(:branch, company: company)
       s = service_class.new(company: company, params: ActionController::Parameters.new(branch_id: branch.id, q: "red"))
       expect(s.search_options[:filter]).to include(%(branch_id = "#{branch.id}"))

@@ -50,7 +50,8 @@ class DynamicSearch::BaseQueryService
   def record_ids
     return nil unless active?
 
-    self.class.model.ms_raw_search(query, **search_options).fetch("hits", []).map { |hit| hit["id"] }
+    # Memoized: controllers call it twice (where + in_order_of) — one Meilisearch request.
+    @record_ids ||= self.class.model.ms_raw_search(query, **search_options).fetch("hits", []).map { |hit| hit["id"] }
   end
 
   # Public for specs: the Meilisearch search payload (without `q`).
@@ -61,15 +62,22 @@ class DynamicSearch::BaseQueryService
   end
 
   # Public for specs: the full Meilisearch filter expression.
+  # Scope clauses are only added when the indexed model actually carries the column —
+  # filterable_attributes is static per index, so an unknown column would raise (docs/MEILISEARCH.md §10).
   def filter_string
     parts = [ %(company_id = "#{company.id}") ]
-    parts << %(category_id = "#{params[:category_id]}") if params[:category_id].present?
-    parts << %(branch_id = "#{params[:branch_id]}") if params[:branch_id].present?
+    parts << %(category_id = "#{params[:category_id]}") if params[:category_id].present? && model_has_column?("category_id")
+    parts << %(branch_id = "#{params[:branch_id]}") if params[:branch_id].present? && model_has_column?("branch_id")
     parts.concat(filter_expressions)
     parts.join(" AND ")
   end
 
   private
+
+  def model_has_column?(name)
+    @model_columns ||= self.class.model.column_names
+    @model_columns.include?(name)
+  end
 
   def query
     params[:q].to_s.strip
