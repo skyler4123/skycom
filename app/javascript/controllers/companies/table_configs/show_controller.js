@@ -63,7 +63,7 @@ export default class Companies_TableConfigs_ShowController extends Companies_Lay
                 <tr class="border-b border-slate-100 dark:border-gray-800 last:border-0 hover:bg-slate-50 dark:hover:bg-slate-800/50">
                   <td class="py-3 px-4 text-sm font-mono text-slate-700 dark:text-slate-300">${col.key}</td>
                   <td class="py-3 px-4 text-sm font-medium text-slate-900 dark:text-white">${col.name}</td>
-                  <td class="py-3 px-4">${col.visible !== false ? `<span class="text-emerald-600 text-sm">${translate("Yes")}</span>` : `<span class="text-slate-400 text-sm">${translate("No")}</span>`}</td>
+                  <td class="py-3 px-4">${col.visible !== false ? `<span class="text-emerald-600 text-sm">${translate("True")}</span>` : `<span class="text-slate-400 text-sm">${translate("False")}</span>`}</td>
                   <td class="py-3 px-4 text-sm text-slate-600 dark:text-slate-300">${col.align || 'left'}</td>
                   <td class="py-3 px-4 text-sm text-slate-600 dark:text-slate-300">${col.width || '-'}</td>
                 </tr>
