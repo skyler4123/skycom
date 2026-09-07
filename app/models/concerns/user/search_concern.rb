@@ -1,40 +1,30 @@
 module User::SearchConcern
   extend ActiveSupport::Concern
 
+  INDEXED_COLUMNS = %w[
+    id email username name first_name last_name phone_number
+    system_role country lifecycle_status workflow_status business_type
+  ].freeze
+
+  SEARCHABLE_COLUMNS = %w[email username name first_name last_name phone_number].freeze
+
+  FILTERABLE_COLUMNS = %w[system_role country workflow_status business_type].freeze
+
   included do
     include Meilisearch::Rails
 
-    meilisearch do
-      attribute :email, :username, :name, :first_name, :last_name, :phone_number # only the attributes 'title', and 'author' will be sent to Meilisearch
-      # all attributes will be sent to Meilisearch if block is left empty
+    indexed_columns    = column_names & INDEXED_COLUMNS
+    searchable_columns = column_names & SEARCHABLE_COLUMNS
+    filterable_columns = column_names & FILTERABLE_COLUMNS
 
-      searchable_attributes [ :email, :username, :name, :first_name, :last_name, :phone_number ] # only the attributes 'title', and 'author' will be sent to Meilisearch
+    meilisearch(
+      synchronous: false,
+      enqueue: ->(record, remove) { MeilisearchIndexJob.perform_later(record.class.name, record.id, remove) }
+    ) do
+      attribute(*indexed_columns)
+
+      searchable_attributes searchable_columns
+      filterable_attributes filterable_columns
     end
   end
 end
-
-# Example:
-
-# meilisearch do
-#   searchable_attributes [:title, :author, :publisher, :description]
-#   filterable_attributes [:genre]
-#   sortable_attributes [:title]
-#   ranking_rules [
-#     'proximity',
-#     'typo',
-#     'words',
-#     'attribute',
-#     'sort',
-#     'exactness',
-#     'publication_year:desc'
-#   ]
-#   synonyms nyc: ['new york']
-
-#   # The following parameters are applied when calling the search() method:
-#   attributes_to_highlight ['*']
-#   attributes_to_crop [:description]
-#   crop_length 10
-#   faceting max_values_per_facet: 2000
-#   pagination max_total_hits: 1000
-#   proximity_precision 'byWord'
-# end
