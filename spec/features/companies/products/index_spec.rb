@@ -325,16 +325,16 @@ RSpec.feature "Companies::Products Management", type: :feature, js: true do
     end
 
     # =========================================================================
-    # SCENARIO 5: Boolean property renders as Yes/No badge
+    # SCENARIO 5: Boolean property renders as True/False badge
     # =========================================================================
-    scenario "boolean property displays as Yes or No badge" do
+    scenario "boolean property displays as True or False badge" do
       visit company_products_path(company, category_id: category_cosmetics.id)
       expect(page).to have_selector('table', wait: 10)
 
       products_cosmetics.each do |p|
         next if p.property_boolean_1.nil?
 
-        expected_text = p.property_boolean_1 ? "Yes" : "No"
+        expected_text = p.property_boolean_1 ? "True" : "False"
         row = find('tbody tr', text: p.name)
         expect(row).to have_content(expected_text, wait: 5)
       end

@@ -815,7 +815,7 @@ export const table = ({
     if (fieldType === "boolean") {
       const isTrue = value === true || value === "true"
       const badgeColor = isTrue ? "emerald" : "slate"
-      return `<span class="inline-flex items-center px-2 py-0.5 text-xs font-medium rounded-md bg-${badgeColor}-50 text-${badgeColor}-700 dark:bg-${badgeColor}-900/30 dark:text-${badgeColor}-400">${isTrue ? 'Yes' : 'No'}</span>`
+      return `<span class="inline-flex items-center px-2 py-0.5 text-xs font-medium rounded-md bg-${badgeColor}-50 text-${badgeColor}-700 dark:bg-${badgeColor}-900/30 dark:text-${badgeColor}-400">${isTrue ? translate("True") : translate("False")}</span>`
     }
 
     if (fieldType === "integer") {
@@ -904,8 +904,7 @@ export const dynamicFiltersHTML = ({ filterCols = [], urlParams, mappingLookup =
     const f = col.filter || {}
     let options = []
     if (f.type === "boolean") {
-      const labels = f.yes_no === true ? [ translate("Yes"), translate("No") ] : [ translate("True"), translate("False") ]
-      options = [ { value: "true", label: labels[0] }, { value: "false", label: labels[1] } ]
+      options = [ { value: "true", label: translate("True") }, { value: "false", label: translate("False") } ]
     } else if (f.type === "enum") {
       options = (mappingLookup[col.key]?.options || []).map(o => ({ value: String(o.value), label: o.label }))
     } else if (f.type === "range" || f.type === "date") {

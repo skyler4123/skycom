@@ -17,7 +17,7 @@ RSpec.feature "Companies::Products dynamic search/filter", type: :feature, js: t
         { "key" => "property_integer_1", "name" => "Qty", "visible" => true,
           "filter" => { "type" => "range", "active" => true, "buckets" => [ [ nil, 100 ], [ 100, nil ] ] } },
         { "key" => "property_boolean_1", "name" => "Active", "visible" => true,
-          "filter" => { "type" => "boolean", "active" => true, "true_false" => false, "yes_no" => true } }
+          "filter" => { "type" => "boolean", "active" => true } }
       ] })
   end
 
@@ -57,7 +57,7 @@ RSpec.feature "Companies::Products dynamic search/filter", type: :feature, js: t
     expect(page).to have_field("q", wait: 10)
     expect(page).to have_css("form div.flex.flex-wrap > div:first-child input[name='q']", wait: 10)
     expect(page).to have_select("filters[property_integer_1]", options: [ "All", "< 100", "≥ 100" ])
-    expect(page).to have_select("filters[property_boolean_1]", options: [ "All", "Yes", "No" ])
+    expect(page).to have_select("filters[property_boolean_1]", options: [ "All", "True", "False" ])
   end
 
   scenario "keyword search via GET form narrows the table" do
