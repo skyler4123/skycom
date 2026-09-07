@@ -28,7 +28,7 @@ Skycom uses **Meilisearch** (open-source typo-tolerant search engine) to index b
 
 ### Multi-Tenant Isolation
 
-One index per model (index UID = class name, e.g. `Product`). Tenant isolation is done at **query time** with a filter, not per-company indexes:
+One index per model **per environment** (index UID = `ClassName_<env>`, e.g. `Product_development` / `Product_test` — via the gem's `per_environment: true` in `config/initializers/meilisearch.rb`, so local rspec `ms_clear_index!` can never wipe dev data). Tenant isolation is done at **query time** with a filter, not per-company indexes:
 
 ```ruby
 Product.ms_raw_search("face cream", filter: "company_id = #{company.id}")
@@ -62,7 +62,7 @@ This keeps index count == model count (46) and avoids per-company index manageme
         │  synchronous .await (waits for Meilisearch task)
         ▼
    Meilisearch server (docker compose service, port 7700)
-        └── one index per model: Product, Branch, Employee, ...
+         └── one index per model per env: Product_development, Branch_test, ...
 ```
 
 ### The Files
@@ -296,7 +296,7 @@ To opt a model **out** of searchable: do not include the concern (or add `meilis
 | Server | Meilisearch v1.53.1 (`docker-compose.yml`, port 7700) |
 | URL | `MEILISEARCH_HOST` / credentials `meilisearch_host`, default `http://localhost:7700` |
 | API key | `MEILISEARCH_API_KEY` / credentials `meilisearch_api_key`, default `skycom_master_key_password_2026` |
-| Index UID | class name (e.g. `Product`) |
+| Index UID | `ClassName_<env>` (e.g. `Product_development`) — `per_environment: true` |
 | Queue | `meilisearch` (Solid Queue, `queues: "*"`) |
 | `raise_on_failure` | not set (default false — failures log, don't raise) |
 
