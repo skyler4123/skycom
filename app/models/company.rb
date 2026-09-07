@@ -12,7 +12,7 @@ class Company < ApplicationRecord
   DEFAULT_RESOURCE_NAMES = %w[
     Product Order Customer Employee Branch Department
     PolicyAppointment Invoice Transaction Service Policy
-    Category PropertyMapping TableConfig Brand Facility
+    Category PropertyMapping TableConfig Brand Facility Warehouse
     Table Reservation Room Guest
     Patient Appointment Course Student Exam
     Membership
