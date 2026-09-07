@@ -123,23 +123,27 @@ backward compatible):
 | `search` | Boolean | `name` / `description` / `code` / `property_string_*` | Column participates in the index page keyword search box |
 | `filter` | Hash | `property_integer_*` / `property_decimal_*` / `property_boolean_*` / `property_datetime_*` | Column renders a filter dropdown on the index page |
 
-`filter` shape by column type (validated in `TableConfig`):
+`filter` shape by column type (validated in `TableConfig` — `active` is **required** and gates
+everything: the filter only renders/applies while `"active": true`):
 
 ```jsonc
 // integer / decimal — half-open buckets [from, to), null = open side
-{ "type": "range", "buckets": [[null, 100], [100, 500], [500, null]] }
+{ "type": "range", "active": true, "buckets": [[null, 100], [100, 500], [500, null]] }
 // integer with PropertyMapping input_type=select — options render from PM options[]
-{ "type": "enum" }
+{ "type": "enum", "active": true }
 // boolean — dropdown labels; yes_no wins if both true
-{ "type": "boolean", "true_false": true, "yes_no": false }
+{ "type": "boolean", "active": true, "true_false": true, "yes_no": false }
 // datetime — year buckets, half-open ([2024, 2025] == the year 2024)
-{ "type": "date", "buckets": [[null, 2024], [2024, 2025], [2025, null]] }
+{ "type": "date", "active": true, "buckets": [[null, 2024], [2024, 2025], [2025, null]] }
 ```
 
 **Editor** (`companies/table_configs/edit_controller.js`): per-row **Search** checkbox
-(disabled for non-string keys) + **Filter** JSON textarea (type-aware skeleton as placeholder).
-The textarea submits raw JSON text; `TableConfigsController#normalize_column_types` parses it back
-to a hash (invalid JSON stays a string → model validation rejects the save → flash alert).
+(disabled for non-string keys) + **Filter** cell = **Active checkbox** (writes `filter.active`,
+legacy configs without the key render as checked) above a **JSON textarea** (type-aware
+skeleton as placeholder). The textarea submits raw JSON text; `TableConfigsController#normalize_column_types`
+parses it back to a hash and merges the checkbox as `active` (checkbox always wins; submissions
+without the checkbox key backfill `active: true` — legacy-safe). Invalid JSON stays a string →
+model validation rejects the save → flash alert. API/JSON writes must include `active` explicitly.
 
 **Index page (Products + Customers today):** the search input + one `<select>` per filter column render inside
 the existing GET form via the shared helpers `dynamicSearchHTML` / `dynamicFiltersHTML` (`ui_helpers.js`).
@@ -148,8 +152,14 @@ years likewise); booleans `true|false`; enums the PM option value. Keys travel o
 (`filters[property_integer_1]=:100`); display names are render-time only. BE execution:
 per-resource `X::SearchQueryService` subclasses of `DynamicSearch::BaseQueryService` whitelist params
 against the TableConfig, build the Meilisearch filter string (always `company_id`-scoped), and return
-ids fed into pagy via `in_order_of`. Rolling the pattern out to another page: **§8**.
+ids fed into pagy via `in_order_of`. Disabled filters (`active: false`) are skipped on **both** sides —
+no dropdown renders, no filter applies. Rolling the pattern out to another page: **§8**.
 See `docs/MEILISEARCH.md` §4 and `docs/superpowers/specs/2026-09-06-dynamic-search-filter-design.md`.
+
+**Seeding default:** `Seed::TableConfigService.field_hash` turns ON every applicable option
+(`search: true` for string-capable columns; active `range`/`boolean`/`date` filters for
+integer/decimal/boolean/datetime) — so every new company starts fully searchable/filterable and
+owners dial it back per column. Enum filters stay off (no seeded `input_type=select` properties yet).
 
 ---
 
@@ -394,7 +404,7 @@ const response = await fetchJson(`${pathname()}.json?${urlParams.toString()}`)
 // contentHTML(): render from the raw config columns and inject into the existing GET form
 const searchHTML = dynamicSearchHTML({ searchCols: rawColumns.filter(c => c.search === true), urlParams })
 const filtersHTML = dynamicFiltersHTML({
-  filterCols: rawColumns.filter(c => c.filter && typeof c.filter === "object" && c.filter.type),
+  filterCols: rawColumns.filter(c => c.filter && typeof c.filter === "object" && c.filter.type && c.filter.active !== false),
   urlParams, mappingLookup
 })
 // ... inside the form, after the Branch select: ${searchHTML}${filtersHTML}

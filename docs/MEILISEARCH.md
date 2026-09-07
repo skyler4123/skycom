@@ -195,7 +195,7 @@ Always pass `filter: "company_id = <id>"` — the indexes are shared across all 
 consumer core; each wired page adds a 3-line subclass (`self.model`, `self.fallback_resource_name`) —
 `Products::SearchQueryService`, `Customers::SearchQueryService`. Flow:
 
-1. Reads the active TableConfig for the requested category and **whitelists** `q` + `filters[key]` params against the columns' `search`/`filter` settings (`docs/DYNAMIC_TABLE.md` §2.5).
+1. Reads the active TableConfig for the requested category and **whitelists** `q` + `filters[key]` params against the columns' `search`/`filter` settings (`docs/DYNAMIC_TABLE.md` §2.5). Disabled filters (`active: false`) never match the whitelist.
 2. Builds the Meilisearch filter string (always `company_id`-scoped; half-open numeric/year buckets `key >= a AND key < b`, `key = true/false` for booleans, PM option values for enum ints).
 3. Restricts keyword search to the configured columns via `attributes_to_search_on` (verified working through meilisearch-rails 0.16 → client 0.32, which camelizes the option).
 4. Returns ids in relevance order; the controller feeds them into the existing pagy flow via `Model.where(id: ids).in_order_of(:id, ids)` — zero changes to the pagination contract. No `q`/`filters` params → the plain DB path (Meilisearch never called).
