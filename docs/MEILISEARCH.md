@@ -71,7 +71,7 @@ This keeps index count == model count (46) and avoids per-company index manageme
 |------|----------------|
 | `app/models/concerns/dynamic_search_concern.rb` | Declares the `meilisearch` block for every included model; computes attributes/settings per-model from `column_names` |
 | `app/jobs/meilisearch_index_job.rb` | Async index/remove job (receives `model_name + id`, never a serialized record, so it survives destroy) |
-| `app/models/concerns/user/search_concern.rb` | Pre-existing demo (static attributes) — User is NOT dynamic-property, keeps its own block |
+| `app/models/concerns/user/search_concern.rb` | User — static field set (not a dynamic-property model), but same async pipeline: `synchronous: false` + `enqueue:` → `MeilisearchIndexJob` |
 | `config/initializers/meilisearch.rb` | `Meilisearch::Rails.configuration` (URL + API key) |
 | `docker-compose.yml` / `docker-compose.rspec-test.yml` | Meilisearch v1.53.1 service |
 
@@ -133,6 +133,26 @@ Auto-sync is provided by the gem's callbacks, installed when the concern is incl
 The `true` argument makes the call **synchronous** (`.await` on the Meilisearch task). Inside a background job this is correct — it guarantees the document exists before the job finishes (the record could be indexed then re-searched in the same request flow). The public commit path stays async (no request blocking).
 
 > **Queue**: `queue_as :meilisearch`. `config/queue.yml` workers run `queues: "*"`, so no queue config change was needed.
+
+### 3.1 Seed-time index wipe (`Seed::ApplicationService`)
+
+Seeding wipes the DB with `delete_all`, which bypasses AR callbacks — the gem's auto-remove-from-index never fires, so stale docs from the previous seed would survive. The seeder therefore drops **every** Meilisearch index up front (right after `eager_load!`, before any record is created) and recreates each one empty:
+
+```ruby
+meili_client = Meilisearch::Rails.client
+ApplicationRecord.descendants.select { |m| m.respond_to?(:ms_index_uid) }.each do |model|
+  uid = model.ms_index_uid
+  meili_client.delete_index(uid).await
+  meili_client.create_index(uid, { primary_key: "id" }).await
+  model.instance_variable_set(:@ms_indexes, nil) # forget the dropped index so the gem rebuilds it fresh
+rescue StandardError => e
+  Rails.logger.warn("[Seed] Meilisearch index delete failed for #{model}: #{e.message}")
+end
+```
+
+- The awaited recreate is deliberate: the gem's own recreation (`SafeIndex.new`) is a fire-and-forget task whose **primary key is never awaited** — combined with a racing first write it can leave an index with `primaryKey: null`, and every document add then fails with `index_primary_key_multiple_candidates_found` (this bit the dev instance once). An empty recreated index is still fully "cleared"; the gem syncs settings (searchable/filterable) via `update_settings_if_changed` on the first write anyway.
+- Failures per model are rescued + logged — a down Meilisearch never blocks seeding.
+- Models covered = everything that includes `DynamicSearchConcern` **or** `User::SearchConcern` (anything responding to `ms_index_uid`).
 
 ---
 
@@ -270,7 +290,7 @@ To opt a model **out** of searchable: do not include the concern (or add `meilis
 |------|---------|
 | `app/models/concerns/dynamic_search_concern.rb` | The concern — meilisearch block + schema derivation |
 | `app/jobs/meilisearch_index_job.rb` | Async index/remove job |
-| `app/models/concerns/user/search_concern.rb` | User demo (static attributes, pre-existing) |
+| `app/models/concerns/user/search_concern.rb` | User search — static attributes (email/username/name/first_name/last_name/phone_number searchable; system_role/country/workflow_status/business_type filterable), async via `MeilisearchIndexJob` |
 | `config/initializers/meilisearch.rb` | Client configuration |
 | `docker-compose.yml` (:143) / `docker-compose.rspec-test.yml` (:77) | Meilisearch services |
 | `spec/models/concerns/dynamic_search_concern_spec.rb` | Connection + settings + 46-model search coverage |
@@ -292,6 +312,7 @@ To opt a model **out** of searchable: do not include the concern (or add `meilis
 | Destroyed record still in index | The `enqueue:` proc passes `remove: true`; the job removes via `klass.ms_remove_from_index!(klass.new(id:))` without AR load. |
 | Meilisearch down in dev | `docker compose up -d meilisearch`; tests raise a clear health-check error. |
 | Adding a new property doesn't appear | Property column keys already indexed — just reindex (`ms_reindex!`) if you changed settings; data syncs automatically for new/updated records. |
+| Document adds fail with `index_primary_key_multiple_candidates_found` | The index exists with `primaryKey: null` (created outside the gem, or by a racing recreation). Drop + recreate the index with a primary key, or re-seed (the seed wipe now does this). |
 
 ---
 

@@ -222,6 +222,8 @@ Mirrors the `CompanyTransaction` gating: the invoice's `payment_status` is deriv
 |----------|------|-------------|-------------|
 | `before_validation if: :email_changed?, on: :update do` | 23 | Block | Invalidates email verification by setting `self.verified = false` when the email address is changed on an update. |
 | `after_update if: :password_digest_previously_changed? do` | 27 | Block | Invalidates all other sessions (except current session) when the password changes. Uses `sessions.where.not(id: current_session).delete_all` for security. |
+| `after_commit :ms_perform_index_tasks` (via `Meilisearch::Rails`, declared in `User::SearchConcern`) | — | gem-internal | Enqueues `MeilisearchIndexJob("User", id, false)` on create/update — async indexing, same pipeline as `DynamicSearchConcern` models. |
+| `after_commit(on: :destroy) :ms_enqueue_remove_from_index!` (via `Meilisearch::Rails`) | — | gem-internal | Enqueues `MeilisearchIndexJob("User", id, true)` to remove the document from the `User` index. |
 
 ---
 
