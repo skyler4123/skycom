@@ -1,0 +1,115 @@
+require "rails_helper"
+
+RSpec.feature "Companies::Warehouses Management", type: :feature, js: true do
+  let(:company) { create(:company) }
+  let(:owner) { company.user }
+  let(:branch) { create(:branch, company: company) }
+
+  let!(:warehouse) { create(:warehouse, company: company, branch: branch) }
+
+  let!(:default_category) do
+    Seed::CategoryService.find_or_create_for(company: company, resource_name: "warehouses")
+  end
+
+  before do
+    sign_in(owner)
+  end
+
+  scenario "index page loads and displays warehouses table" do
+    visit company_warehouses_path(company)
+
+    expect(page).to have_selector('table', wait: 10)
+    expect(page).to have_selector('th', text: 'Category')
+    expect(page).to have_selector('thead th', minimum: 2)
+    expect(page).to have_selector('tbody tr')
+    expect(page).to have_content(warehouse.name)
+  end
+
+  scenario "edit button links to edit page for warehouse" do
+    visit company_warehouses_path(company)
+    expect(page).to have_selector('table', wait: 10)
+
+    edit_link = find("a[href*='/edit']", match: :first)
+    expect(edit_link).to be_present
+  end
+
+  scenario "name link goes to show page" do
+    visit company_warehouses_path(company)
+    expect(page).to have_selector('table', wait: 10)
+
+    click_link warehouse.name, match: :first
+    expect(page).to have_current_path(/warehouses\/#{warehouse.id}$/, wait: 10)
+    expect(page).to have_content(warehouse.name)
+  end
+
+  scenario "displays warehouse workflow status as badge" do
+    visit company_warehouses_path(company)
+    expect(page).to have_selector('table', wait: 10)
+
+    expect(page).to have_selector('span.rounded-full', wait: 10)
+  end
+
+  describe "table title" do
+    let(:test_category) do
+      Seed::CategoryService.create(company: company, name: "Test Category", resource_name: "warehouses")
+    end
+
+    let!(:test_table_config) do
+      test_category.default_property_mapping.table_configs.destroy_all
+      tc = TableConfig.create!(
+        company: company,
+        category: test_category,
+        property_mapping: test_category.default_property_mapping,
+        resource_name: "warehouses",
+        metadata: { "columns" => [
+          { "key" => "name", "name" => "Name", "visible" => true, "align" => "left", "width" => nil },
+          { "key" => "code", "name" => "Code", "visible" => true, "align" => "left", "width" => nil }
+        ] }
+      )
+      company.clear_permissions_cache
+      tc
+    end
+
+    before do
+      company_data = JSON.parse(company.to_json).merge(
+        "property_mappings" => company.property_mappings.reset.map { |pm| JSON.parse(pm.to_json) },
+        "table_configs" => company.table_configs.reset.map { |tc| JSON.parse(tc.to_json) },
+        "categories" => company.categories.reset.map { |c| JSON.parse(c.to_json) },
+        "branches" => [],
+        "departments" => [],
+        "roles" => []
+      )
+
+      page.execute_script("localStorage.clear()")
+      payload = {
+        user: JSON.parse(owner.to_json),
+        companies: [ company_data ],
+        enums: {},
+        employees: []
+      }
+      page.execute_script("localStorage.setItem('client_cache_data', arguments[0])", payload.to_json)
+      page.execute_script("localStorage.setItem('client_cache_version', 'forced')")
+      page.execute_script("document.cookie = 'client_cache_version=forced; path=/'")
+    end
+
+    scenario "shows table title with resource name and category name" do
+      visit company_warehouses_path(company, category_id: test_category.id)
+      expect(page).to have_selector('table', wait: 10)
+
+      expect(page).to have_selector('h2', text: /Warehouses - Test Category/)
+    end
+
+    scenario "edit icon links to table config edit page" do
+      visit company_warehouses_path(company, category_id: test_category.id)
+      expect(page).to have_selector('table', wait: 10)
+
+      edit_link = find("a[href*='/table_configs/#{test_table_config.id}/edit']", match: :first)
+      expect(edit_link).to be_present
+    end
+  end
+
+  describe "client cache invalidation" do
+    include_examples "client cache invalidation",
+      resource_name: "warehouses"
+  end
+end
