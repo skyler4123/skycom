@@ -1,3 +1,13 @@
+# app/controllers/companies/employees_controller.rb
+#
+# Employees dashboard API (Shell-First). index supports the same TableConfig-driven
+# dynamic search/filter as Products (?q= / ?filters[key]= → Meilisearch via
+# Employees::SearchQueryService; plain DB path otherwise). The search path chains on
+# the kept scope, so discarded employees never resurface.
+# Serves Stimulus: Companies_Employees_IndexController (index JSON incl. q/filters passthrough),
+#                  Companies_Employees_NewController|ShowController|EditController
+# Endpoints: GET /companies/:company_id/employees(.json) + nested CRUD — see config/routes.rb
+# Docs: docs/DYNAMIC_TABLE.md §2.5, docs/MEILISEARCH.md
 class Companies::EmployeesController < Companies::ApplicationController
   def index
     respond_to do |format|
@@ -6,6 +16,9 @@ class Companies::EmployeesController < Companies::ApplicationController
         scope = current_company.employees.kept.includes(:user, :branch)
         scope = scope.where(category_id: params[:category_id]) if params[:category_id].present?
         scope = scope.where(branch_id: params[:branch_id]) if params[:branch_id].present?
+
+        search = Employees::SearchQueryService.new(company: current_company, params: params)
+        scope = scope.where(id: search.record_ids).in_order_of(:id, search.record_ids) if search.active?
 
         @pagy, @employees_results = pagy(:offset, scope, jsonapi: true)
 
