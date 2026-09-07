@@ -45,7 +45,24 @@ RSpec.describe "Companies::TableConfigsController", type: :request do
       expect(cols[0]).to include("search" => true)
       expect(cols[0]).not_to have_key("filter")
       expect(cols[1]).to include("search" => false,
-        "filter" => { "type" => "range", "buckets" => [ [ nil, 100 ], [ 100, nil ] ] })
+        "filter" => { "type" => "range", "buckets" => [ [ nil, 100 ], [ 100, nil ] ], "active" => true })
+    end
+
+    it "stores the filter with active: false when the Filter checkbox is off" do
+      patch_columns({ "0" => { "key" => "property_integer_1", "name" => "Qty", "visible" => "true",
+                               "filter" => '{"type":"range","buckets":[[null,100]]}', "filter_active" => "false" } })
+
+      cols = config.reload.columns
+      expect(cols[0]["filter"]).to eq("type" => "range", "buckets" => [ [ nil, 100 ] ], "active" => false)
+      expect(cols[0]).not_to have_key("filter_active")
+    end
+
+    it "checkbox wins over an active key inside the JSON text" do
+      patch_columns({ "0" => { "key" => "property_integer_1", "name" => "Qty", "visible" => "true",
+                               "filter" => '{"type":"range","active":true,"buckets":[[null,100]]}',
+                               "filter_active" => "false" } })
+
+      expect(config.reload.columns[0]["filter"]["active"]).to eq(false)
     end
 
     it "rejects invalid filter JSON with a redirect back to the edit page" do

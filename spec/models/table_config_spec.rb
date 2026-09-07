@@ -150,47 +150,47 @@ RSpec.describe TableConfig, type: :model do
 
     it "accepts a valid range filter on an integer column" do
       col = { "key" => "property_integer_1", "name" => "Qty", "visible" => true,
-              "filter" => { "type" => "range", "buckets" => [ [ nil, 100 ], [ 100, 500 ], [ 500, nil ] ] } }
+              "filter" => { "type" => "range", "active" => true, "buckets" => [ [ nil, 100 ], [ 100, 500 ], [ 500, nil ] ] } }
       expect(with_column(col)).to be_valid
     end
 
     it "rejects range with an empty or malformed buckets array" do
       expect(with_column({ "key" => "property_integer_1", "name" => "Qty", "visible" => true,
-                           "filter" => { "type" => "range", "buckets" => [] } })).not_to be_valid
+                           "filter" => { "type" => "range", "active" => true, "buckets" => [] } })).not_to be_valid
       expect(with_column({ "key" => "property_integer_1", "name" => "Qty", "visible" => true,
-                           "filter" => { "type" => "range", "buckets" => [ [ nil, nil ] ] } })).not_to be_valid
+                           "filter" => { "type" => "range", "active" => true, "buckets" => [ [ nil, nil ] ] } })).not_to be_valid
       expect(with_column({ "key" => "property_integer_1", "name" => "Qty", "visible" => true,
-                           "filter" => { "type" => "range", "buckets" => [ [ 500, 100 ] ] } })).not_to be_valid
+                           "filter" => { "type" => "range", "active" => true, "buckets" => [ [ 500, 100 ] ] } })).not_to be_valid
     end
 
     it "rejects range filter on a datetime column" do
       expect(with_column({ "key" => "property_datetime_1", "name" => "Released", "visible" => true,
-                           "filter" => { "type" => "range", "buckets" => [ [ 2024, 2025 ] ] } })).not_to be_valid
+                           "filter" => { "type" => "range", "active" => true, "buckets" => [ [ 2024, 2025 ] ] } })).not_to be_valid
     end
 
     it "accepts date (year) buckets on a datetime column" do
       expect(with_column({ "key" => "property_datetime_1", "name" => "Released", "visible" => true,
-                           "filter" => { "type" => "date", "buckets" => [ [ nil, 2024 ], [ 2024, 2025 ], [ 2025, nil ] ] } })).to be_valid
+                           "filter" => { "type" => "date", "active" => true, "buckets" => [ [ nil, 2024 ], [ 2024, 2025 ], [ 2025, nil ] ] } })).to be_valid
     end
 
     it "rejects date buckets with non-integer years" do
       expect(with_column({ "key" => "property_datetime_1", "name" => "Released", "visible" => true,
-                           "filter" => { "type" => "date", "buckets" => [ [ "2024a", 2025 ] ] } })).not_to be_valid
+                           "filter" => { "type" => "date", "active" => true, "buckets" => [ [ "2024a", 2025 ] ] } })).not_to be_valid
     end
 
     it "accepts boolean filter with a label style" do
       expect(with_column({ "key" => "property_boolean_1", "name" => "Active", "visible" => true,
-                           "filter" => { "type" => "boolean", "true_false" => true, "yes_no" => false } })).to be_valid
+                           "filter" => { "type" => "boolean", "active" => true, "true_false" => true, "yes_no" => false } })).to be_valid
     end
 
     it "rejects boolean filter without a label style" do
       expect(with_column({ "key" => "property_boolean_1", "name" => "Active", "visible" => true,
-                           "filter" => { "type" => "boolean" } })).not_to be_valid
+                           "filter" => { "type" => "boolean", "active" => true } })).not_to be_valid
     end
 
     it "rejects boolean filter on a non-boolean column" do
       expect(with_column({ "key" => "property_string_1", "name" => "Color", "visible" => true,
-                           "filter" => { "type" => "boolean", "yes_no" => true } })).not_to be_valid
+                           "filter" => { "type" => "boolean", "active" => true, "yes_no" => true } })).not_to be_valid
     end
 
     it "accepts enum filter when the PropertyMapping entry is a select" do
@@ -199,22 +199,47 @@ RSpec.describe TableConfig, type: :model do
           "input_type" => "select", "options" => [ { "value" => 1, "label" => "Gold" } ] }
       ]
       expect(with_column({ "key" => "property_integer_2", "name" => "Tier", "visible" => true,
-                           "filter" => { "type" => "enum" } })).to be_valid
+                           "filter" => { "type" => "enum", "active" => true } })).to be_valid
     end
 
     it "rejects enum filter without a PM select entry" do
       expect(with_column({ "key" => "property_integer_2", "name" => "Tier", "visible" => true,
-                           "filter" => { "type" => "enum" } })).not_to be_valid
+                           "filter" => { "type" => "enum", "active" => true } })).not_to be_valid
     end
 
     it "rejects unknown keys inside filter" do
       expect(with_column({ "key" => "property_integer_1", "name" => "Qty", "visible" => true,
-                           "filter" => { "type" => "range", "buckets" => [ [ nil, 10 ] ], "extra" => 1 } })).not_to be_valid
+                           "filter" => { "type" => "range", "active" => true, "buckets" => [ [ nil, 10 ] ], "extra" => 1 } })).not_to be_valid
     end
 
     it "rejects a non-hash filter value (e.g. unparsed invalid JSON)" do
       expect(with_column({ "key" => "property_integer_1", "name" => "Qty", "visible" => true,
                            "filter" => '{"type":"range"' })).not_to be_valid
+    end
+
+    it "rejects a filter hash without an explicit active key" do
+      config.metadata = { "columns" => [
+        { "key" => "property_integer_1", "name" => "Qty", "visible" => true,
+          "filter" => { "type" => "range", "buckets" => [ [ nil, 10 ] ] } }
+      ] }
+      expect(config).not_to be_valid
+      expect(config.errors[:metadata].join).to match(/filter requires "active" true or false/)
+    end
+
+    it "rejects a non-boolean active value" do
+      config.metadata = { "columns" => [
+        { "key" => "property_integer_1", "name" => "Qty", "visible" => true,
+          "filter" => { "type" => "range", "active" => "yes", "buckets" => [ [ nil, 10 ] ] } }
+      ] }
+      expect(config).not_to be_valid
+    end
+
+    it "accepts an explicit active: false (filter stored but disabled)" do
+      config.metadata = { "columns" => [
+        { "key" => "property_integer_1", "name" => "Qty", "visible" => true,
+          "filter" => { "type" => "range", "active" => false, "buckets" => [ [ nil, 10 ] ] } }
+      ] }
+      expect(config).to be_valid
     end
 
     it "accepts configs without search/filter keys (old pattern)" do

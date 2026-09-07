@@ -21,11 +21,11 @@ RSpec.shared_examples "dynamic search query service" do
         { "key" => "name", "name" => "Name", "visible" => true, "search" => true },
         { "key" => "property_string_1", "name" => "Color", "visible" => true },
         { "key" => "property_integer_1", "name" => "Qty", "visible" => true,
-          "filter" => { "type" => "range", "buckets" => [ [ nil, 100 ], [ 100, nil ] ] } },
+          "filter" => { "type" => "range", "active" => true, "buckets" => [ [ nil, 100 ], [ 100, nil ] ] } },
         { "key" => "property_boolean_1", "name" => "Active", "visible" => true,
-          "filter" => { "type" => "boolean", "true_false" => true, "yes_no" => false } },
+          "filter" => { "type" => "boolean", "active" => true, "true_false" => true, "yes_no" => false } },
         { "key" => "property_datetime_1", "name" => "Released", "visible" => true,
-          "filter" => { "type" => "date", "buckets" => [ [ 2024, 2025 ] ] } }
+          "filter" => { "type" => "date", "active" => true, "buckets" => [ [ 2024, 2025 ] ] } }
       ] })
   end
 
@@ -64,6 +64,23 @@ RSpec.shared_examples "dynamic search query service" do
 
     it "is false with a blank filter value" do
       expect(service(filters: { "property_integer_1" => "" }).active?).to be false
+    end
+
+    it "ignores filters whose config is explicitly deactivated (active: false)" do
+      cols = table_config.columns.map(&:deep_dup)
+      cols.find { |c| c["key"] == "property_integer_1" }["filter"]["active"] = false
+      table_config.update!(columns: cols)
+
+      expect(service(filters: { "property_integer_1" => ":100" }).active?).to be false
+    end
+
+    it "treats a legacy filter config without active key as enabled" do
+      cols = table_config.columns.map(&:deep_dup)
+      cols.find { |c| c["key"] == "property_integer_1" }["filter"].delete("active")
+      # update_columns bypasses validation — legacy rows predate the required key
+      table_config.update_columns(metadata: { "columns" => cols })
+
+      expect(service(filters: { "property_integer_1" => ":100" }).active?).to be true
     end
 
     it "is false when q is blank and no filters" do

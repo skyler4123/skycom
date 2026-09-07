@@ -74,7 +74,7 @@ export default class Companies_Customers_IndexController extends Companies_Layou
     const urlParams = new URLSearchParams(window.location.search)
     const searchHTML = dynamicSearchHTML({ searchCols: rawColumns.filter(c => c.search === true), urlParams })
     const filtersHTML = dynamicFiltersHTML({
-      filterCols: rawColumns.filter(c => c.filter && typeof c.filter === "object" && c.filter.type),
+      filterCols: rawColumns.filter(c => c.filter && typeof c.filter === "object" && c.filter.type && c.filter.active !== false),
       urlParams,
       mappingLookup
     })

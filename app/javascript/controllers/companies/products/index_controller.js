@@ -80,7 +80,7 @@ export default class Companies_Products_IndexController extends Companies_Layout
 
     const urlParams = new URLSearchParams(window.location.search)
     const searchCols = rawColumns.filter(c => c.search === true)
-    const filterCols = rawColumns.filter(c => c.filter && typeof c.filter === "object" && c.filter.type)
+    const filterCols = rawColumns.filter(c => c.filter && typeof c.filter === "object" && c.filter.type && c.filter.active !== false)
 
     const searchHTML = dynamicSearchHTML({ searchCols, urlParams })
     const filtersHTML = dynamicFiltersHTML({ filterCols, urlParams, mappingLookup })

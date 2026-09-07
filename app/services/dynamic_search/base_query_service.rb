@@ -112,8 +112,10 @@ class DynamicSearch::BaseQueryService
     end
   end
 
+  # A filter column is honored when it carries a valid type hash and is not explicitly
+  # deactivated (`active` defaults to true for legacy configs written before the flag existed).
   def column_with_filter(key)
-    columns.find { |c| c["key"] == key.to_s && c["filter"].is_a?(Hash) && c["filter"]["type"].present? }
+    columns.find { |c| c["key"] == key.to_s && c["filter"].is_a?(Hash) && c["filter"]["type"].present? && c["filter"]["active"] != false }
   end
 
   def filter_expressions

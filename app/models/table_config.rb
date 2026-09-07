@@ -9,7 +9,7 @@ class TableConfig < ApplicationRecord
   # Valid strategy types for a column's "filter" setting.
   FILTER_TYPES = %w[range enum boolean date].freeze
   # Allowed keys inside a column "filter" hash (strict shape).
-  FILTER_ALLOWED_KEYS = %w[type buckets true_false yes_no].freeze
+  FILTER_ALLOWED_KEYS = %w[type active buckets true_false yes_no].freeze
   store_accessor :metadata, :columns
   attribute :permission_resource_name, :string, default: -> { self.name }
 
@@ -50,12 +50,14 @@ class TableConfig < ApplicationRecord
   #     width:   Integer  # Column width in pixels (null = auto)
   #     align:   String   # "left" | "center" | "right"
   #     search:  Boolean  # Optional. Keyword-searchable column (string columns only)
-  #     filter:  Hash     # Optional. Dropdown filter config, shape depends on column type:
-  #                       #   integer/decimal: { "type" => "range", "buckets" => [[from, to], ...] }
+  #     filter:  Hash     # Optional. Dropdown filter config, shape depends on column type.
+  #                       # "active" (boolean, REQUIRED) gates the filter — it only applies
+  #                       # on index pages while active: true.
+  #                       #   integer/decimal: { "type" => "range", "active" => bool, "buckets" => [[from, to], ...] }
   #                       #                    half-open [from, to); null = open side
-  #                       #   integer (PM input_type=select): { "type" => "enum" }
-  #                       #   boolean: { "type" => "boolean", "true_false" => bool, "yes_no" => bool }
-  #                       #   datetime: { "type" => "date", "buckets" => [[from_year, to_year], ...] }
+  #                       #   integer (PM input_type=select): { "type" => "enum", "active" => bool }
+  #                       #   boolean: { "type" => "boolean", "active" => bool, "true_false" => bool, "yes_no" => bool }
+  #                       #   datetime: { "type" => "date", "active" => bool, "buckets" => [[from_year, to_year], ...] }
   #   }
   # ---------------------------------------------------------------------------
 
@@ -140,6 +142,10 @@ class TableConfig < ApplicationRecord
     unless FILTER_TYPES.include?(type)
       errors.add(:metadata, "columns element #{idx}: filter type must be one of #{FILTER_TYPES.join(", ")}")
       return
+    end
+
+    unless filter.key?("active") && [ true, false ].include?(filter["active"])
+      errors.add(:metadata, "columns element #{idx}: filter requires \"active\" true or false")
     end
 
     column_type = infer_column_type(key)

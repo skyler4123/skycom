@@ -59,7 +59,7 @@ class Companies::TableConfigsController < Companies::ApplicationController
   end
 
   def create
-    config = current_company.table_configs.new(table_config_params)
+    config = current_company.table_configs.new(normalize_metadata(table_config_params))
 
     if config.save
       redirect_to company_table_config_path(current_company, config), notice: "Table config created successfully."
@@ -72,14 +72,7 @@ class Companies::TableConfigsController < Companies::ApplicationController
   def update
     config = current_company.table_configs.find(params[:id])
 
-    p_params = table_config_params
-    if p_params[:metadata].is_a?(ActionController::Parameters)
-      meta = p_params[:metadata].to_unsafe_h
-      if meta["columns"].is_a?(Hash)
-        meta["columns"] = normalize_column_types(meta["columns"].values.to_a)
-      end
-      p_params[:metadata] = meta
-    end
+    p_params = normalize_metadata(table_config_params)
 
     if config.update(p_params)
       redirect_to company_table_config_path(current_company, config), notice: "Table config updated successfully."
@@ -93,16 +86,43 @@ class Companies::TableConfigsController < Companies::ApplicationController
 
   private
 
+  # Shared by create/update: converts the metadata[columns] hash-of-indexes form payload
+  # into an array and type-normalizes each column (see normalize_column_types).
+  def normalize_metadata(p_params)
+    return p_params unless p_params[:metadata].is_a?(ActionController::Parameters)
+
+    meta = p_params[:metadata].to_unsafe_h
+    meta["columns"] = normalize_column_types(meta["columns"].values.to_a) if meta["columns"].is_a?(Hash)
+    p_params[:metadata] = meta
+    p_params
+  end
+
   def normalize_column_types(columns)
     columns.map do |col|
       h = col.to_h
       h["visible"] = to_boolean(h["visible"]) if h.key?("visible")
       h["search"] = to_boolean(h["search"]) if h.key?("search")
       h["filter"] = parse_filter_config(h["filter"]) if h.key?("filter")
+      merge_filter_active(h)
       h.delete("filter") if h["filter"].blank?
       h["width"] = h["width"].present? ? h["width"].to_i : nil
       h["name"] = h["key"].humanize if h["name"].blank?
       h
+    end
+  end
+
+  # The Filter cell pairs a JSON textarea with an "active" checkbox (temp key filter_active).
+  # The checkbox always wins when present; configs submitted without it (legacy/API) keep
+  # an explicit active and default to enabled when missing.
+  def merge_filter_active(h)
+    h.delete("filter_active").then do |submitted|
+      next unless h["filter"].is_a?(Hash)
+
+      h["filter"]["active"] = if submitted.nil?
+        h["filter"].fetch("active", true)
+      else
+        to_boolean(submitted)
+      end
     end
   end
 
