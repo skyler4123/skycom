@@ -1,3 +1,12 @@
+# app/controllers/companies/facilities_controller.rb
+#
+# Facilities dashboard API (Shell-First). index supports the same TableConfig-driven
+# dynamic search/filter as Products (?q= / ?filters[key]= → Meilisearch via
+# Facilities::SearchQueryService; plain DB path otherwise).
+# Serves Stimulus: Companies_Facilities_IndexController (index JSON incl. q/filters passthrough),
+#                  Companies_Facilities_NewController|ShowController|EditController
+# Endpoints: GET /companies/:company_id/facilities(.json) + nested CRUD — see config/routes.rb
+# Docs: docs/DYNAMIC_TABLE.md §2.5, docs/MEILISEARCH.md
 class Companies::FacilitiesController < Companies::ApplicationController
   def index
     respond_to do |format|
@@ -6,6 +15,9 @@ class Companies::FacilitiesController < Companies::ApplicationController
         scope = current_company.facilities
         scope = scope.where(category_id: params[:category_id]) if params[:category_id].present?
         scope = scope.where(branch_id: params[:branch_id]) if params[:branch_id].present?
+
+        search = Facilities::SearchQueryService.new(company: current_company, params: params)
+        scope = scope.where(id: search.record_ids).in_order_of(:id, search.record_ids) if search.active?
 
         @pagy, @facilities_results = pagy(:offset, scope, jsonapi: true)
 
