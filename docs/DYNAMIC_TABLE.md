@@ -145,8 +145,8 @@ parses it back to a hash and merges the checkbox as `active` (checkbox always wi
 without the checkbox key backfill `active: true` — legacy-safe). Invalid JSON stays a string →
 model validation rejects the save → flash alert. API/JSON writes must include `active` explicitly.
 
-**Index page (all 10 dynamic-table pages — Products, Customers, Branches, Brands, Departments,
-Employees, Facilities, Invoices, Orders, Services):** the search input (always the **first** control in the filter
+**Index page (all 11 dynamic-table pages — Products, Customers, Branches, Brands, Departments,
+Employees, Facilities, Invoices, Orders, Services, Warehouses):** the search input (always the **first** control in the filter
 row, before the Category select) + one `<select>` per filter column render inside
 the existing GET form via the shared helpers `dynamicSearchHTML` / `dynamicFiltersHTML` (`ui_helpers.js`).
 Option values encode buckets as `min:max` (`:100`, `100:500`, `500:`,
@@ -361,7 +361,7 @@ end
 The engine is generic — `DynamicSearch::BaseQueryService` (BE) + `dynamicSearchHTML` /
 `dynamicFiltersHTML` (FE, `ui_helpers.js`). All dynamic-table pages are wired
 (Products, Customers 2026-09-06; Branches, Brands, Departments, Employees, Facilities,
-Invoices, Orders, Services 2026-09-07); a new dynamic-table page adopts in 4 steps (~30 min incl. specs). Design context:
+Invoices, Orders, Services 2026-09-07; Warehouses 2026-09-08); a new dynamic-table page adopts in 4 steps (~30 min incl. specs). Design context:
 `docs/superpowers/specs/2026-09-06-dynamic-search-filter-design.md`.
 
 **Step 0 — TableConfig: nothing to do.** The editor is resource-agnostic; per category/PM/TableConfig
@@ -434,7 +434,7 @@ after_commit auto-sync) and `Model.ms_clear_index!` before/after — see `docs/M
 | `app/javascript/controllers/companies/products/show_modal_controller.js` | Dynamic editable fields |
  | `app/controllers/companies/products_controller.rb` | JSON API with all `property_*` columns |
  | `app/services/products/search_query_service.rb` | TableConfig → Meilisearch search/filter query translation |
- | `app/services/{branches,brands,departments,employees,facilities,invoices,orders,services}/search_query_service.rb` | One 3-line subclass per wired index page |
+ | `app/services/{branches,brands,departments,employees,facilities,invoices,orders,services,warehouses}/search_query_service.rb` | One 3-line subclass per wired index page |
  | `app/javascript/controllers/companies/table_configs/edit_controller.js` | Column editor incl. Search/Filter settings |
  | `spec/features/companies/products/search_filter_spec.rb` | Dynamic search + filter dropdowns E2E |
 | `app/javascript/controllers/companies/layout_controller.js` | `currentTableConfig()`, `currentPropertyMapping()` helpers |

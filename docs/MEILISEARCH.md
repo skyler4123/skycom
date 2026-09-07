@@ -1,6 +1,6 @@
 # Skycom Meilisearch Integration
 
-> **Status**: Live (2026-08-29). Meilisearch powers backend search for every dynamic-property model. Live consumers since 2026-09-06/07: ALL dynamic-table index pages (Products, Customers, Branches, Brands, Departments, Employees, Facilities, Invoices, Orders, Services) run dynamic search/filter (`DynamicSearch::BaseQueryService` subclasses) — per-page rollout recipe: `docs/DYNAMIC_TABLE.md` §8.
+> **Status**: Live (2026-08-29). Meilisearch powers backend search for every dynamic-property model. Live consumers since 2026-09-06/07/08: ALL dynamic-table index pages (Products, Customers, Branches, Brands, Departments, Employees, Facilities, Invoices, Orders, Services, Warehouses) run dynamic search/filter (`DynamicSearch::BaseQueryService` subclasses) — per-page rollout recipe: `docs/DYNAMIC_TABLE.md` §8.
 
 ---
 
@@ -193,7 +193,7 @@ Always pass `filter: "company_id = <id>"` — the indexes are shared across all 
 
 `DynamicSearch::BaseQueryService` (`app/services/dynamic_search/base_query_service.rb`) is the request-path
 consumer core; each wired page adds a 3-line subclass (`self.model`, `self.fallback_resource_name`) —
-Products / Customers / Branches / Brands / Departments / Employees / Facilities / Invoices / Orders / Services. Flow:
+Products / Customers / Branches / Brands / Departments / Employees / Facilities / Invoices / Orders / Services / Warehouses. Flow:
 
 1. Reads the active TableConfig for the requested category and **whitelists** `q` + `filters[key]` params against the columns' `search`/`filter` settings (`docs/DYNAMIC_TABLE.md` §2.5). Disabled filters (`active: false`) never match the whitelist.
 2. Builds the Meilisearch filter string (always `company_id`-scoped; `category_id`/`branch_id` scope clauses only when the model has the column; half-open numeric/year buckets `key >= a AND key < b`, `key = true/false` for booleans, PM option values for enum ints).
@@ -315,7 +315,7 @@ To opt a model **out** of searchable: do not include the concern (or add `meilis
 | `spec/jobs/meilisearch_index_job_spec.rb` | Job behaviors |
 | `app/services/products/search_query_service.rb` | Products subclass — TableConfig-driven search/filter query translation |
 | `app/services/customers/search_query_service.rb` | Customers subclass (proof of the 3-line rollout) |
-| `app/services/{branches,brands,departments,employees,facilities,invoices,orders,services}/search_query_service.rb` | Remaining 8 subclasses — all dynamic-table index pages wired (2026-09-07) |
+| `app/services/{branches,brands,departments,employees,facilities,invoices,orders,services,warehouses}/search_query_service.rb` | Remaining 9 subclasses — all dynamic-table index pages wired (2026-09-07/08) |
 | `app/services/dynamic_search/base_query_service.rb` | Generic search/filter core (whitelist + filter-string building); pages subclass it — rollout: `docs/DYNAMIC_TABLE.md` §8 |
 | `spec/support/shared_examples/dynamic_search_service.rb` | Shared behavioral contract for every subclass |
 | `spec/support/shared_examples/dynamic_search_index_controller.rb` | Shared request-level contract for every wired index controller |
