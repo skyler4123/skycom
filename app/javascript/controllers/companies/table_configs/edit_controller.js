@@ -223,7 +223,7 @@ export default class Companies_TableConfigs_EditController extends Companies_Lay
       case 'decimal':
         return '{"type":"range","buckets":[[null,10.5],[10.5,null]]}'
       case 'boolean':
-        return '{"type":"boolean","true_false":true,"yes_no":false}'
+        return '{"type":"boolean"}'
       case 'datetime':
         return '{"type":"date","buckets":[[null,2025],[2025,2026],[2026,null]]}'
       default:
