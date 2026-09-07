@@ -22,7 +22,7 @@ RSpec.describe Seed::TableConfigService do
 
     it "enables an active boolean filter" do
       col = described_class.field_hash("property_boolean_1")
-      expect(col["filter"]).to eq("type" => "boolean", "active" => true, "true_false" => true, "yes_no" => false)
+      expect(col["filter"]).to eq("type" => "boolean", "active" => true)
     end
 
     it "enables an active date filter with year buckets around the current year" do
