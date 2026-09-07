@@ -1,4 +1,13 @@
 # app/controllers/companies/branches_controller.rb
+#
+# Branches dashboard API (Shell-First). index supports the same TableConfig-driven
+# dynamic search/filter as Products (?q= / ?filters[key]= → Meilisearch via
+# Branches::SearchQueryService; plain DB path otherwise).
+# Serves Stimulus: Companies_Branches_IndexController (index JSON incl. q/filters passthrough),
+#                  Companies_Branches_NewController|ShowController|EditController,
+#                  Companies_Branches_PaymentMethodAppointmentsModalController
+# Endpoints: GET /companies/:company_id/branches(.json) + nested CRUD — see config/routes.rb
+# Docs: docs/DYNAMIC_TABLE.md §2.5, docs/MEILISEARCH.md
 
 class Companies::BranchesController < Companies::ApplicationController
   def index
@@ -7,6 +16,9 @@ class Companies::BranchesController < Companies::ApplicationController
       format.json do
         scope = current_company.branches
         scope = scope.where(category_id: params[:category_id]) if params[:category_id].present?
+
+        search = Branches::SearchQueryService.new(company: current_company, params: params)
+        scope = scope.where(id: search.record_ids).in_order_of(:id, search.record_ids) if search.active?
 
         @pagy, @branches_results = pagy(:offset, scope, jsonapi: true)
 
