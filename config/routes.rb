@@ -41,6 +41,7 @@ Rails.application.routes.draw do
       resources :transactions
       resources :employees
       resources :stocks
+      resources :warehouses
       resources :stock_transfers
       resources :stock_imports
       resources :stock_exports

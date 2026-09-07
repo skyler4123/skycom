@@ -28,7 +28,7 @@ class Company < ApplicationRecord
     dashboard branches departments categories property_mappings table_configs
     products brands services orders employees shift_templates scheduled_shifts
     attendance_days attendance_policies attendance_logs attendance_months
-    stocks stock_transfers stock_imports stock_exports customers invoices
+    warehouses stocks stock_transfers stock_imports stock_exports customers invoices
     policies pages payment_methods permissions analytics facilities
     usage top_up billing settings
   ].freeze
@@ -95,6 +95,7 @@ class Company < ApplicationRecord
   has_many :product_groups, dependent: :destroy
   has_many :products, dependent: :destroy
   has_many :stocks, dependent: :destroy
+  has_many :warehouses, dependent: :destroy
   has_many :stock_transfers, dependent: :destroy
   has_many :stock_imports, dependent: :destroy
   has_many :stock_exports, dependent: :destroy
