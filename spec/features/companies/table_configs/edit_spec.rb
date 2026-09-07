@@ -49,15 +49,32 @@ RSpec.feature "Companies::TableConfigs edit search/filter", type: :feature, js: 
 
     check "col-search-0"
     fill_in "col-filter-1", with: '{"type":"range","buckets":[[null,100],[100,null]]}'
+    expect(page).to have_field("col-filter-active-1", checked: true)
     click_button "Save Changes"
 
     expect(page).to have_current_path(company_table_config_path(company, config), wait: 10)
     expect(config.reload.columns[0]).to include("search" => true)
-    expect(config.columns[1]["filter"]).to eq("type" => "range", "buckets" => [ [ nil, 100 ], [ 100, nil ] ])
+    expect(config.columns[1]["filter"]).to eq("type" => "range", "active" => true, "buckets" => [ [ nil, 100 ], [ 100, nil ] ])
 
     visit edit_company_table_config_path(company, config)
     expect(page).to have_checked_field("col-search-0", wait: 10)
+    expect(page).to have_checked_field("col-filter-active-1")
     expect(page).to have_field("col-filter-1", with: /"type":"range"/)
+  end
+
+  scenario "unchecking the Filter active box stores the config disabled" do
+    visit edit_company_table_config_path(company, config)
+    expect(page).to have_field("col-filter-1", wait: 10)
+
+    fill_in "col-filter-1", with: '{"type":"range","buckets":[[null,100]]}'
+    uncheck "col-filter-active-1"
+    click_button "Save Changes"
+
+    expect(page).to have_current_path(company_table_config_path(company, config), wait: 10)
+    expect(config.reload.columns[1]["filter"]).to eq("type" => "range", "active" => false, "buckets" => [ [ nil, 100 ] ])
+
+    visit edit_company_table_config_path(company, config)
+    expect(page).to have_unchecked_field("col-filter-active-1", wait: 10)
   end
 
   scenario "string column has no filter editor; integer column offers a range skeleton placeholder" do

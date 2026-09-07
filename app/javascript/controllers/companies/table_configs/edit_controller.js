@@ -119,7 +119,7 @@ export default class Companies_TableConfigs_EditController extends Companies_Lay
                     ${tooltip(translate("Include this column in the keyword search box (string columns only)"))}
                   >${translate("Search")}</th>
                   <th class="py-2 px-3 font-medium"
-                    ${tooltip(translate("Filter config JSON — how this column filters (range / enum / boolean / date). Leave empty for no filter."))}
+                    ${tooltip(translate("Filter config JSON — how this column filters (range / enum / boolean / date). The Active checkbox enables it; leave the JSON empty for no filter."))}
                   >${translate("Filter")}</th>
                   <th class="py-2 px-3 font-medium"
                     ${tooltip(translate("Text alignment inside the column: left, center, or right"))}
@@ -272,6 +272,13 @@ export default class Companies_TableConfigs_EditController extends Companies_Lay
         </td>
         <td class="py-2 px-3">
           ${this.canFilter(col) ? `
+            <div class="flex items-center gap-2 mb-1">
+              <input type="hidden" name="table_config[metadata][columns][${index}][filter_active]" value="false">
+              <input type="checkbox" id="col-filter-active-${index}" name="table_config[metadata][columns][${index}][filter_active]" value="true" ${col.filter?.active !== false ? 'checked' : ''}
+                class="rounded border-slate-300 text-blue-600 cursor-pointer"
+                ${tooltip(translate("Enable this filter on the index page"))}>
+              <span class="text-[10px] font-bold text-slate-400 uppercase">${translate("Active")}</span>
+            </div>
             <textarea id="col-filter-${index}" name="table_config[metadata][columns][${index}][filter]" rows="2" placeholder='${this.filterSkeleton(col)}'
               class="w-44 px-2 py-1 text-xs font-mono border border-slate-200 dark:border-slate-600 rounded bg-white dark:bg-slate-800 text-slate-900 dark:text-white">${this.escapeHTML(filterValue)}</textarea>
           ` : `<span class="text-slate-300 dark:text-slate-700">—</span>`}

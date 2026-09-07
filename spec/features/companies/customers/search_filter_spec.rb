@@ -14,7 +14,7 @@ RSpec.feature "Companies::Customers dynamic search/filter", type: :feature, js: 
       metadata: { "columns" => [
         { "key" => "name", "name" => "Name", "visible" => true, "search" => true },
         { "key" => "property_integer_1", "name" => "Visits", "visible" => true,
-          "filter" => { "type" => "range", "buckets" => [ [ nil, 100 ], [ 100, nil ] ] } }
+          "filter" => { "type" => "range", "active" => true, "buckets" => [ [ nil, 100 ], [ 100, nil ] ] } }
       ] })
   end
 

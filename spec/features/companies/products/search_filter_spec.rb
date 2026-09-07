@@ -15,9 +15,9 @@ RSpec.feature "Companies::Products dynamic search/filter", type: :feature, js: t
         { "key" => "name", "name" => "Name", "visible" => true, "search" => true },
         { "key" => "property_string_1", "name" => "Color", "visible" => true, "search" => true },
         { "key" => "property_integer_1", "name" => "Qty", "visible" => true,
-          "filter" => { "type" => "range", "buckets" => [ [ nil, 100 ], [ 100, nil ] ] } },
+          "filter" => { "type" => "range", "active" => true, "buckets" => [ [ nil, 100 ], [ 100, nil ] ] } },
         { "key" => "property_boolean_1", "name" => "Active", "visible" => true,
-          "filter" => { "type" => "boolean", "true_false" => false, "yes_no" => true } }
+          "filter" => { "type" => "boolean", "active" => true, "true_false" => false, "yes_no" => true } }
       ] })
   end
 
@@ -97,6 +97,27 @@ RSpec.feature "Companies::Products dynamic search/filter", type: :feature, js: t
     expect(page).to have_field("q", with: "Crimson", wait: 10)
     select "< 100", from: "filters[property_integer_1]"
     expect(page).to have_select("filters[property_integer_1]", selected: "< 100")
+  end
+
+  scenario "deactivated filter (active: false) does not render a dropdown" do
+    cols = table_config.columns.map(&:deep_dup)
+    cols.find { |c| c["key"] == "property_integer_1" }["filter"]["active"] = false
+    table_config.update!(columns: cols)
+
+    page.execute_script("localStorage.clear()")
+    company_data = JSON.parse(company.to_json).merge(
+      "property_mappings" => company.property_mappings.reset.map { |pm| JSON.parse(pm.to_json) },
+      "table_configs" => company.table_configs.reset.map { |tc| JSON.parse(tc.to_json) },
+      "categories" => company.categories.reset.map { |c| JSON.parse(c.to_json) },
+      "branches" => [], "departments" => [], "roles" => []
+    )
+    payload = { user: JSON.parse(owner.to_json), companies: [ company_data ], enums: {}, employees: [] }
+    page.execute_script("localStorage.setItem('client_cache_data', arguments[0])", payload.to_json)
+
+    visit company_products_path(company, category_id: category.id)
+    expect(page).to have_field("q", wait: 10)
+    expect(page).to have_no_css('select[name="filters[property_integer_1]"]')
+    expect(page).to have_css('select[name="filters[property_boolean_1]"]')
   end
 
   scenario "pages with no search config render the plain table" do
