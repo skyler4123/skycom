@@ -178,19 +178,21 @@ RSpec.describe TableConfig, type: :model do
                            "filter" => { "type" => "date", "active" => true, "buckets" => [ [ "2024a", 2025 ] ] } })).not_to be_valid
     end
 
-    it "accepts boolean filter with a label style" do
+    it "accepts boolean filter with only type and active" do
       expect(with_column({ "key" => "property_boolean_1", "name" => "Active", "visible" => true,
-                           "filter" => { "type" => "boolean", "active" => true, "true_false" => true, "yes_no" => false } })).to be_valid
+                           "filter" => { "type" => "boolean", "active" => true } })).to be_valid
     end
 
-    it "rejects boolean filter without a label style" do
+    it "rejects boolean filter carrying legacy label-style keys" do
       expect(with_column({ "key" => "property_boolean_1", "name" => "Active", "visible" => true,
-                           "filter" => { "type" => "boolean", "active" => true } })).not_to be_valid
+                           "filter" => { "type" => "boolean", "active" => true, "true_false" => true } })).not_to be_valid
+      expect(with_column({ "key" => "property_boolean_1", "name" => "Active", "visible" => true,
+                           "filter" => { "type" => "boolean", "active" => true, "yes_no" => false } })).not_to be_valid
     end
 
     it "rejects boolean filter on a non-boolean column" do
       expect(with_column({ "key" => "property_string_1", "name" => "Color", "visible" => true,
-                           "filter" => { "type" => "boolean", "active" => true, "yes_no" => true } })).not_to be_valid
+                           "filter" => { "type" => "boolean", "active" => true } })).not_to be_valid
     end
 
     it "accepts enum filter when the PropertyMapping entry is a select" do

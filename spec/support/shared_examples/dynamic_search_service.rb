@@ -23,7 +23,7 @@ RSpec.shared_examples "dynamic search query service" do
         { "key" => "property_integer_1", "name" => "Qty", "visible" => true,
           "filter" => { "type" => "range", "active" => true, "buckets" => [ [ nil, 100 ], [ 100, nil ] ] } },
         { "key" => "property_boolean_1", "name" => "Active", "visible" => true,
-          "filter" => { "type" => "boolean", "active" => true, "true_false" => true, "yes_no" => false } },
+          "filter" => { "type" => "boolean", "active" => true } },
         { "key" => "property_datetime_1", "name" => "Released", "visible" => true,
           "filter" => { "type" => "date", "active" => true, "buckets" => [ [ 2024, 2025 ] ] } }
       ] })
