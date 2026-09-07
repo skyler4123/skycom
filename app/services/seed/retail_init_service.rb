@@ -466,9 +466,7 @@ class Seed::RetailInitService
   end
 
   def field_hash(key, properties = {})
-    name = properties[key.to_sym] || key.humanize
-    { "key" => key, "name" => name, "visible" => true,
-      "align" => "left", "width" => nil }
+    Seed::TableConfigService.field_hash(key, properties[key.to_sym])
   end
 
   def configure_retail_permissions
