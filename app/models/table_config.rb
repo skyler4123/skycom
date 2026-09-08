@@ -9,7 +9,7 @@ class TableConfig < ApplicationRecord
   # Valid strategy types for a column's "filter" setting.
   FILTER_TYPES = %w[range enum boolean date].freeze
   # Allowed keys inside a column "filter" hash (strict shape).
-  FILTER_ALLOWED_KEYS = %w[type active buckets true_false yes_no].freeze
+  FILTER_ALLOWED_KEYS = %w[type active buckets].freeze
   store_accessor :metadata, :columns
   attribute :permission_resource_name, :string, default: -> { self.name }
 
@@ -56,7 +56,7 @@ class TableConfig < ApplicationRecord
   #                       #   integer/decimal: { "type" => "range", "active" => bool, "buckets" => [[from, to], ...] }
   #                       #                    half-open [from, to); null = open side
   #                       #   integer (PM input_type=select): { "type" => "enum", "active" => bool }
-  #                       #   boolean: { "type" => "boolean", "active" => bool, "true_false" => bool, "yes_no" => bool }
+  #                       #   boolean: { "type" => "boolean", "active" => bool }
   #                       #   datetime: { "type" => "date", "active" => bool, "buckets" => [[from_year, to_year], ...] }
   #   }
   # ---------------------------------------------------------------------------
@@ -163,9 +163,6 @@ class TableConfig < ApplicationRecord
       end
     when "boolean"
       errors.add(:metadata, "columns element #{idx}: boolean filter is only allowed on boolean columns") unless column_type == "boolean"
-      unless filter["true_false"] == true || filter["yes_no"] == true
-        errors.add(:metadata, "columns element #{idx}: boolean filter requires true_false or yes_no to be true")
-      end
     end
   end
 

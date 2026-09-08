@@ -327,8 +327,6 @@ export const dictionary = () => {
     "Service": { vi: "Dịch vụ" },
     "Roles": { vi: "Vai trò" },
     "N/A": { vi: "N/A" },
-    "Yes": { vi: "Có" },
-    "No": { vi: "Không" },
     "Optional": { vi: "Tùy chọn" },
     "Loading...": { vi: "Đang tải..." },
     "Employee Name": { vi: "Tên nhân viên" },

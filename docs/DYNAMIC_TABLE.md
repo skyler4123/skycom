@@ -131,8 +131,8 @@ everything: the filter only renders/applies while `"active": true`):
 { "type": "range", "active": true, "buckets": [[null, 100], [100, 500], [500, null]] }
 // integer with PropertyMapping input_type=select — options render from PM options[]
 { "type": "enum", "active": true }
-// boolean — dropdown labels; yes_no wins if both true
-{ "type": "boolean", "active": true, "true_false": true, "yes_no": false }
+// boolean — dropdown options render True/False
+{ "type": "boolean", "active": true }
 // datetime — year buckets, half-open ([2024, 2025] == the year 2024)
 { "type": "date", "active": true, "buckets": [[null, 2024], [2024, 2025], [2025, null]] }
 ```

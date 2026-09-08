@@ -56,7 +56,7 @@ export default class Companies_AttendancePolicies_ShowController extends Compani
             </div>
             <div>
               <p class="text-xs font-medium text-slate-500">${translate("Require Photo")}</p>
-              <p class="text-sm font-semibold text-slate-900">${ap.require_photo ? 'Yes' : 'No'}</p>
+              <p class="text-sm font-semibold text-slate-900">${ap.require_photo ? translate("True") : translate("False")}</p>
             </div>
           </div>
           <div class="mt-8 flex justify-end">
