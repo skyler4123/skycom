@@ -3,19 +3,21 @@
 # spec/support/shared_examples/dynamic_search_index_controller.rb
 #
 # Request-level contract for controller indexes wired to a DynamicSearch::BaseQueryService
-# subclass. Host specs provide five lets:
+# subclass. Three groups:
+#   "dynamic search index controller"            — generic core, every wired page includes it
+#   "dynamic search index scope intersection"    — opt-in, see its comment below
+#   "dynamic search index controller setup"      — shared fixture layer (included by both)
+#
+# Host specs provide five lets:
 #   resource_name    — Category/TableConfig resource_name, e.g. "branches"
 #   index_class      — the AR class, e.g. Branch
 #   json_key         — the index JSON list key, e.g. "branches"
 #   base_json_path   — lambda-free string using `company`, e.g. "/companies/#{company.id}/branches.json"
 #   record           — lambda: .call(company:, category:, **attrs) creating one record
-# Optional: hidden_record — a keyword-matching record the controller's pre-search scope
-#   must exclude (e.g. a discarded employee); enables the scope-intersection example.
 
-RSpec.shared_examples "dynamic search index controller" do
+RSpec.shared_examples "dynamic search index controller setup" do
   let(:company) { create(:company) }
   let(:category) { Seed::CategoryService.find_or_create_for(company: company, resource_name: resource_name) }
-  let(:hidden_record) { nil }
   let!(:table_config) do
     category.default_property_mapping.table_configs.destroy_all
     TableConfig.create!(company: company, category: category,
@@ -35,6 +37,19 @@ RSpec.shared_examples "dynamic search index controller" do
     "#{base_json_path}?#{ { category_id: category.id }.merge(extra).to_query }"
   end
 
+  def ensure_meilisearch!
+    raise "Meilisearch not reachable. Run `docker compose up -d meilisearch`." unless
+      begin
+        Meilisearch::Rails.client.health["status"] == "available"
+      rescue StandardError
+        false
+      end
+  end
+end
+
+RSpec.shared_examples "dynamic search index controller" do
+  include_examples "dynamic search index controller setup"
+
   describe "DB path (no search params)" do
     let!(:plain) { record.call(company: company, category: category, name: "NoIndex Plain") }
 
@@ -52,12 +67,7 @@ RSpec.shared_examples "dynamic search index controller" do
     let(:large) { record.call(company: company, category: category, name: "Crimson Large", property_integer_1: 250) }
 
     before do
-      raise "Meilisearch not reachable. Run `docker compose up -d meilisearch`." unless
-        begin
-          Meilisearch::Rails.client.health["status"] == "available"
-        rescue StandardError
-          false
-        end
+      ensure_meilisearch!
       index_class.ms_clear_index!
     end
 
@@ -90,9 +100,29 @@ RSpec.shared_examples "dynamic search index controller" do
       expect(response).to have_http_status(:service_unavailable)
       expect(JSON.parse(response.body)["errors"]).to include("Search is temporarily unavailable. Please try again.")
     end
+  end
+end
+
+# Opt-in scope-intersection contract. Only meaningful where the controller's index scope
+# carries a DB-only narrowing the Meilisearch filter cannot express (e.g.
+# `current_company.employees.kept` — a discarded record stays in the index and must still
+# never resurface). Hosts including this must define, in addition to the five standard lets:
+#   hidden_record — an AR record matching the search keyword that the pre-search scope
+#   must exclude (built via the `record` lambda or a factory).
+RSpec.shared_examples "dynamic search index scope intersection" do
+  include_examples "dynamic search index controller setup"
+
+  describe "Meilisearch path (scope intersection)" do
+    before do
+      ensure_meilisearch!
+      index_class.ms_clear_index!
+    end
+
+    after { index_class.ms_clear_index! }
 
     it "intersects search ids with pre-existing scope filters" do
-      skip "host spec provides no hidden_record" if hidden_record.nil?
+      small = record.call(company: company, category: category, name: "Crimson Small", property_integer_1: 50)
+      large = record.call(company: company, category: category, name: "Crimson Large", property_integer_1: 250)
       [ small, large, hidden_record ].each { |r| r.ms_index!(true) }
 
       get index_url(q: "Crimson")

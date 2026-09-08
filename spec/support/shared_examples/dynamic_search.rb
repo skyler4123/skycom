@@ -21,7 +21,8 @@ RSpec.shared_examples "dynamic meilisearch model" do |model_class, builder|
           record.update!(name: search_term)
         end
       else
-        skip "model has no searchable attribute"
+        raise "#{model_class} has no searchable attribute (name/property_string_1) — " \
+              "give it one or drop it from DYNAMIC_SEARCH_MODELS"
       end
 
       record.ms_index!(true)

@@ -417,7 +417,7 @@ const filtersHTML = dynamicFiltersHTML({
 | Spec | Do |
 |------|----|
 | `spec/services/orders/search_query_service_spec.rb` | 10 lines: `it_behaves_like "dynamic search query service"` with `service_class` / `resource_name` / `index_class` / `record` lets (see customers version) |
-| `spec/requests/companies/orders_controller_spec.rb` | ~12 lines: `it_behaves_like "dynamic search index controller"` with `resource_name` / `index_class` / `json_key` / `base_json_path` / `record` lets (`hidden_record` opt-in adds the scope-intersection example — see the employees version for `.kept`) |
+| `spec/requests/companies/orders_controller_spec.rb` | ~12 lines: `it_behaves_like "dynamic search index controller"` with `resource_name` / `index_class` / `json_key` / `base_json_path` / `record` lets (controllers whose index scope carries a DB-only narrowing — e.g. `.kept` — also include `it_behaves_like "dynamic search index scope intersection"` with a `hidden_record` let; see the employees version) |
 | `spec/features/companies/orders/search_filter_spec.rb` | config → input/dropdown render → q + bucket filter E2E — template: `customers/search_filter_spec.rb` |
 
 Meilisearch fixtures: call `record.ms_index!(true)` explicitly (transactional tests suppress the

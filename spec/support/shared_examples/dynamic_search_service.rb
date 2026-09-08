@@ -94,11 +94,17 @@ RSpec.shared_examples "dynamic search query service" do
         .to eq(%(company_id = "#{company.id}" AND category_id = "#{category.id}"))
     end
 
-    it "adds branch scope when present" do
-      skip "model has no branch_id column (BaseQueryService guard)" unless index_class.column_names.include?("branch_id")
+    it "only adds branch scope when the model has a branch_id column" do
       branch = create(:branch, company: company)
       s = service_class.new(company: company, params: ActionController::Parameters.new(branch_id: branch.id, q: "red"))
-      expect(s.search_options[:filter]).to include(%(branch_id = "#{branch.id}"))
+      filter = s.search_options[:filter]
+      # BaseQueryService#filter_string guard: the index settings are static per index, so
+      # emitting a clause for a column the model lacks would raise (docs/MEILISEARCH.md §10).
+      if index_class.column_names.include?("branch_id")
+        expect(filter).to include(%(branch_id = "#{branch.id}"))
+      else
+        expect(filter).not_to include("branch_id")
+      end
     end
 
     it "passes configured search columns via attributes_to_search_on" do
