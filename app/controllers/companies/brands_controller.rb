@@ -1,3 +1,12 @@
+# app/controllers/companies/brands_controller.rb
+#
+# Brands dashboard API (Shell-First). index supports the same TableConfig-driven
+# dynamic search/filter as Products (?q= / ?filters[key]= → Meilisearch via
+# Brands::SearchQueryService; plain DB path otherwise).
+# Serves Stimulus: Companies_Brands_IndexController (index JSON incl. q/filters passthrough),
+#                  Companies_Brands_NewController|ShowController|EditController
+# Endpoints: GET /companies/:company_id/brands(.json) + nested CRUD — see config/routes.rb
+# Docs: docs/DYNAMIC_TABLE.md §2.5, docs/MEILISEARCH.md
 class Companies::BrandsController < Companies::ApplicationController
   def index
     respond_to do |format|
@@ -5,6 +14,9 @@ class Companies::BrandsController < Companies::ApplicationController
       format.json do
         scope = current_company.brands
         scope = scope.where(category_id: params[:category_id]) if params[:category_id].present?
+
+        search = Brands::SearchQueryService.new(company: current_company, params: params)
+        scope = scope.where(id: search.record_ids).in_order_of(:id, search.record_ids) if search.active?
 
         @pagy, @brands_results = pagy(:offset, scope, jsonapi: true)
 

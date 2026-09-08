@@ -9,6 +9,15 @@ class Companies::ApplicationController < ApplicationController
 
   before_action :set_websocket_channels
 
+  # Dynamic search/filter services (DynamicSearch::BaseQueryService subclasses) raise
+  # Meilisearch::Error when the search backend is down — surface it as a JSON 503,
+  # never silent unfiltered results (docs/DYNAMIC_TABLE.md §2.5).
+  rescue_from Meilisearch::Error do |e|
+    Rails.logger.error("[DynamicSearch] #{e.message}")
+    render json: { errors: [ "Search is temporarily unavailable. Please try again." ] },
+      status: :service_unavailable
+  end
+
   private
 
   def set_company

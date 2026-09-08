@@ -2,9 +2,12 @@
 # Companies::OrdersController — CRUD for sales Orders plus POS receipt.
 # Shell-First for index/show/new/edit (format.html empty + format.json hydrated).
 # create/update are HTML redirects; receipt is JSON-only for the retail-cashier panel.
+# index additionally supports the TableConfig-driven dynamic search/filter
+# (?q= / ?filters[key]= → Meilisearch via Orders::SearchQueryService; plain DB path otherwise).
 # Serves Stimulus: Companies_Pages_RetailCashierController#showReceipt (GET receipt),
-#                  Companies_Orders_IndexController (index/show)
+#                  Companies_Orders_IndexController (index/show; index JSON incl. q/filters passthrough)
 # Endpoint: GET receipt — see config/routes.rb:36 + Helpers.receipt_company_order_path
+# Docs: docs/DYNAMIC_TABLE.md §2.5, docs/MEILISEARCH.md
 class Companies::OrdersController < Companies::ApplicationController
   def index
     respond_to do |format|
@@ -13,6 +16,9 @@ class Companies::OrdersController < Companies::ApplicationController
         scope = current_company.orders.includes(:category)
         scope = scope.where(category_id: params[:category_id]) if params[:category_id].present?
         scope = scope.where(branch_id: params[:branch_id]) if params[:branch_id].present?
+
+        search = Orders::SearchQueryService.new(company: current_company, params: params)
+        scope = scope.where(id: search.record_ids).in_order_of(:id, search.record_ids) if search.active?
 
         @pagy, @orders_results = pagy(:offset, scope, jsonapi: true)
 

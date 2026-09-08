@@ -145,7 +145,8 @@ parses it back to a hash and merges the checkbox as `active` (checkbox always wi
 without the checkbox key backfill `active: true` — legacy-safe). Invalid JSON stays a string →
 model validation rejects the save → flash alert. API/JSON writes must include `active` explicitly.
 
-**Index page (Products + Customers today):** the search input (always the **first** control in the filter
+**Index page (all 10 dynamic-table pages — Products, Customers, Branches, Brands, Departments,
+Employees, Facilities, Invoices, Orders, Services):** the search input (always the **first** control in the filter
 row, before the Category select) + one `<select>` per filter column render inside
 the existing GET form via the shared helpers `dynamicSearchHTML` / `dynamicFiltersHTML` (`ui_helpers.js`).
 Option values encode buckets as `min:max` (`:100`, `100:500`, `500:`,
@@ -154,7 +155,7 @@ years likewise); booleans `true|false`; enums the PM option value. Keys travel o
 per-resource `X::SearchQueryService` subclasses of `DynamicSearch::BaseQueryService` whitelist params
 against the TableConfig, build the Meilisearch filter string (always `company_id`-scoped), and return
 ids fed into pagy via `in_order_of`. Disabled filters (`active: false`) are skipped on **both** sides —
-no dropdown renders, no filter applies. Rolling the pattern out to another page: **§8**.
+no dropdown renders, no filter applies. New dynamic-table pages adopt via **§8**.
 See `docs/MEILISEARCH.md` §4 and `docs/superpowers/specs/2026-09-06-dynamic-search-filter-design.md`.
 
 **Seeding default:** `Seed::TableConfigService.field_hash` turns ON every applicable option
@@ -358,8 +359,9 @@ end
 ## 8. Rolling Out Dynamic Search/Filter to Another Index Page
 
 The engine is generic — `DynamicSearch::BaseQueryService` (BE) + `dynamicSearchHTML` /
-`dynamicFiltersHTML` (FE, `ui_helpers.js`). **Products** and **Customers** are wired; any other
-dynamic-table page adopts in 4 steps (~30 min incl. specs). Design context:
+`dynamicFiltersHTML` (FE, `ui_helpers.js`). All dynamic-table pages are wired
+(Products, Customers 2026-09-06; Branches, Brands, Departments, Employees, Facilities,
+Invoices, Orders, Services 2026-09-07); a new dynamic-table page adopts in 4 steps (~30 min incl. specs). Design context:
 `docs/superpowers/specs/2026-09-06-dynamic-search-filter-design.md`.
 
 **Step 0 — TableConfig: nothing to do.** The editor is resource-agnostic; per category/PM/TableConfig
@@ -380,17 +382,14 @@ after the existing scope filters; replace class/ivar names):
 
 ```ruby
 search = Orders::SearchQueryService.new(company: current_company, params: params)
-if search.active?
-  begin
-    ids = search.record_ids
-  rescue Meilisearch::Error => e
-    Rails.logger.error("[Orders::SearchQueryService] #{e.message}")
-    return render json: { errors: [ "Search is temporarily unavailable. Please try again." ] },
-      status: :service_unavailable
-  end
-  scope = Order.where(id: ids).in_order_of(:id, ids)
-end
+scope = scope.where(id: search.record_ids).in_order_of(:id, search.record_ids) if search.active?
 ```
+
+Insert AFTER the existing scope filters, BEFORE `pagy`. Chaining on `scope` (not
+`Model.where`) preserves pre-existing filters — e.g. `employees.kept` never resurfaces
+discarded records through search. `record_ids` is memoized on the service (one Meilisearch
+request). `Meilisearch::Error` is rescued once for all company controllers by `rescue_from`
+in `Companies::ApplicationController` (503 `{ errors: [...] }`, never silent unfiltered results).
 
 Update the file-header `Serves Stimulus:` comment with the new param support (AGENTS.md rule).
 
@@ -418,7 +417,7 @@ const filtersHTML = dynamicFiltersHTML({
 | Spec | Do |
 |------|----|
 | `spec/services/orders/search_query_service_spec.rb` | 10 lines: `it_behaves_like "dynamic search query service"` with `service_class` / `resource_name` / `index_class` / `record` lets (see customers version) |
-| `spec/requests/companies/orders_controller_spec.rb` | DB-path unchanged without params; `?q=`; `?filters[...]`; 503 on `Meilisearch::Error` (stub) — template: `customers_controller_spec.rb` |
+| `spec/requests/companies/orders_controller_spec.rb` | ~12 lines: `it_behaves_like "dynamic search index controller"` with `resource_name` / `index_class` / `json_key` / `base_json_path` / `record` lets (`hidden_record` opt-in adds the scope-intersection example — see the employees version for `.kept`) |
 | `spec/features/companies/orders/search_filter_spec.rb` | config → input/dropdown render → q + bucket filter E2E — template: `customers/search_filter_spec.rb` |
 
 Meilisearch fixtures: call `record.ms_index!(true)` explicitly (transactional tests suppress the
@@ -435,6 +434,7 @@ after_commit auto-sync) and `Model.ms_clear_index!` before/after — see `docs/M
 | `app/javascript/controllers/companies/products/show_modal_controller.js` | Dynamic editable fields |
  | `app/controllers/companies/products_controller.rb` | JSON API with all `property_*` columns |
  | `app/services/products/search_query_service.rb` | TableConfig → Meilisearch search/filter query translation |
+ | `app/services/{branches,brands,departments,employees,facilities,invoices,orders,services}/search_query_service.rb` | One 3-line subclass per wired index page |
  | `app/javascript/controllers/companies/table_configs/edit_controller.js` | Column editor incl. Search/Filter settings |
  | `spec/features/companies/products/search_filter_spec.rb` | Dynamic search + filter dropdowns E2E |
 | `app/javascript/controllers/companies/layout_controller.js` | `currentTableConfig()`, `currentPropertyMapping()` helpers |

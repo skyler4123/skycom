@@ -1,6 +1,12 @@
 import Companies_LayoutController from "controllers/companies/layout_controller"
 
 export default class Companies_Services_IndexController extends Companies_LayoutController {
+  // Services dashboard — table hydrates from the index JSON of the current URL.
+  // Search/filter controls render from the active TableConfig via the shared helpers
+  // (dynamicSearchHTML / dynamicFiltersHTML).
+  // Depends on BE: Companies::ServicesController#index (list + Meilisearch q / filters[key])
+  // Endpoints: GET <pathname>.json?category_id&branch_id&q&filters[key] — traditional GET form, full-page submit
+  // Docs: docs/DYNAMIC_TABLE.md §2.5
   static targets = ["servicesList"]
 
   /** @type {(Service & { name: string })[]} */
@@ -18,7 +24,9 @@ export default class Companies_Services_IndexController extends Companies_Layout
     if (tableConfig) this.tableConfigIdValue = tableConfig.id
 
     try {
-      const response = await fetchJson({ params: { category_id: this.categoryIdValue } })
+      const urlParams = new URLSearchParams(window.location.search)
+      if (!urlParams.get('category_id') && this.categoryIdValue) urlParams.set('category_id', this.categoryIdValue)
+      const response = await fetchJson(`${pathname()}.json?${urlParams.toString()}`)
       this.services = response.services || []
       this.pagination = response.pagination || {}
     } catch (error) {
@@ -70,6 +78,14 @@ export default class Companies_Services_IndexController extends Companies_Layout
       return acc
     }, {})
 
+    const urlParams = new URLSearchParams(window.location.search)
+    const searchHTML = dynamicSearchHTML({ searchCols: rawColumns.filter(c => c.search === true), urlParams })
+    const filtersHTML = dynamicFiltersHTML({
+      filterCols: rawColumns.filter(c => c.filter && typeof c.filter === "object" && c.filter.type && c.filter.active !== false),
+      urlParams,
+      mappingLookup
+    })
+
     return `
       <div class="p-4 overflow-y-auto" data-action="filter:changed@window->${this.identifier}#handleFilter">
         <div class="p-4 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 flex flex-col">
@@ -79,6 +95,7 @@ export default class Companies_Services_IndexController extends Companies_Layout
           <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
             <form method="get" action="${pathname()}" class="flex flex-col lg:flex-row items-end justify-between gap-4 w-full">
               <div class="flex flex-wrap items-center gap-3 w-full lg:w-auto">
+                ${searchHTML}
                 <div class="flex flex-col gap-1">
                   <label class="text-[10px] font-bold text-slate-400 uppercase ml-1">${translate("Category")}</label>
                   <select
@@ -97,6 +114,7 @@ export default class Companies_Services_IndexController extends Companies_Layout
                     ${selectOptionsHTML(cloneNewKey(currentBranches(), "id", "value"), branchValue, translate("All Branches"))}
                   </select>
                 </div>
+                ${filtersHTML}
                 <div class="flex gap-2 mt-auto">
                   <button type="submit" class="h-[38px] px-6 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors font-medium text-sm flex items-center gap-2">
                     <span class="material-symbols-outlined text-[18px]">search</span>

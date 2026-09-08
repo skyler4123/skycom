@@ -1,4 +1,12 @@
 # app/controllers/companies/departments_controller.rb
+#
+# Departments dashboard API (Shell-First). index supports the same TableConfig-driven
+# dynamic search/filter as Products (?q= / ?filters[key]= → Meilisearch via
+# Departments::SearchQueryService; plain DB path otherwise).
+# Serves Stimulus: Companies_Departments_IndexController (index JSON incl. q/filters passthrough),
+#                  Companies_Departments_NewController|ShowController|EditController
+# Endpoints: GET /companies/:company_id/departments(.json) + nested CRUD — see config/routes.rb
+# Docs: docs/DYNAMIC_TABLE.md §2.5, docs/MEILISEARCH.md
 
 class Companies::DepartmentsController < Companies::ApplicationController
   def index
@@ -7,6 +15,9 @@ class Companies::DepartmentsController < Companies::ApplicationController
       format.json do
         scope = current_company.departments
         scope = scope.where(category_id: params[:category_id]) if params[:category_id].present?
+
+        search = Departments::SearchQueryService.new(company: current_company, params: params)
+        scope = scope.where(id: search.record_ids).in_order_of(:id, search.record_ids) if search.active?
 
         @pagy, @departments_results = pagy(:offset, scope, jsonapi: true)
 
