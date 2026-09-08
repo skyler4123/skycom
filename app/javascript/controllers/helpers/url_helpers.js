@@ -95,6 +95,11 @@ export const create_company_facilities_path = (companyId) => `/companies/${compa
 export const company_facility_path = (companyId, facilityId) => `/companies/${companyId}/facilities/${facilityId}`
 export const new_company_facility_path = (companyId) => `/companies/${companyId}/facilities/new`
 export const edit_company_facility_path = (companyId, facilityId) => `/companies/${companyId}/facilities/${facilityId}/edit`
+export const company_warehouses_path = (companyId) => `/companies/${companyId}/warehouses`
+export const create_company_warehouses_path = (companyId) => `/companies/${companyId}/warehouses`
+export const company_warehouse_path = (companyId, warehouseId) => `/companies/${companyId}/warehouses/${warehouseId}`
+export const new_company_warehouse_path = (companyId) => `/companies/${companyId}/warehouses/new`
+export const edit_company_warehouse_path = (companyId, warehouseId) => `/companies/${companyId}/warehouses/${warehouseId}/edit`
 
 export const company_employees_path = (companyId) => `/companies/${companyId}/employees`
 export const create_company_employees_path = (companyId) => `/companies/${companyId}/employees`
