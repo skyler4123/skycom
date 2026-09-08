@@ -1,6 +1,6 @@
 # Skycom Meilisearch Integration
 
-> **Status**: Live (2026-08-29). Meilisearch powers backend search for every dynamic-property model. Backend-only — no search UI/endpoints yet.
+> **Status**: Live (2026-08-29). Meilisearch powers backend search for every dynamic-property model. Live consumers since 2026-09-06: the **Products** and **Customers** index dynamic search/filter (`DynamicSearch::BaseQueryService` subclasses) — per-page rollout recipe: `docs/DYNAMIC_TABLE.md` §8.
 
 ---
 
@@ -28,7 +28,7 @@ Skycom uses **Meilisearch** (open-source typo-tolerant search engine) to index b
 
 ### Multi-Tenant Isolation
 
-One index per model (index UID = class name, e.g. `Product`). Tenant isolation is done at **query time** with a filter, not per-company indexes:
+One index per model **per environment** (index UID = `ClassName_<env>`, e.g. `Product_development` / `Product_test` — via the gem's `per_environment: true` in `config/initializers/meilisearch.rb`, so local rspec `ms_clear_index!` can never wipe dev data). Tenant isolation is done at **query time** with a filter, not per-company indexes:
 
 ```ruby
 Product.ms_raw_search("face cream", filter: "company_id = #{company.id}")
@@ -62,7 +62,7 @@ This keeps index count == model count (46) and avoids per-company index manageme
         │  synchronous .await (waits for Meilisearch task)
         ▼
    Meilisearch server (docker compose service, port 7700)
-        └── one index per model: Product, Branch, Employee, ...
+         └── one index per model per env: Product_development, Branch_test, ...
 ```
 
 ### The Files
@@ -189,6 +189,24 @@ Meilisearch::Rails.multi_search(
 
 Always pass `filter: "company_id = <id>"` — the indexes are shared across all companies. The `filterable_attributes` set already includes `company_id`, `category_id`, `branch_id`, `workflow_status`, `business_type`.
 
+### Live caller: dynamic search/filter (Products + Customers, 2026-09-06)
+
+`DynamicSearch::BaseQueryService` (`app/services/dynamic_search/base_query_service.rb`) is the request-path
+consumer core; each wired page adds a 3-line subclass (`self.model`, `self.fallback_resource_name`) —
+`Products::SearchQueryService`, `Customers::SearchQueryService`. Flow:
+
+1. Reads the active TableConfig for the requested category and **whitelists** `q` + `filters[key]` params against the columns' `search`/`filter` settings (`docs/DYNAMIC_TABLE.md` §2.5). Disabled filters (`active: false`) never match the whitelist.
+2. Builds the Meilisearch filter string (always `company_id`-scoped; half-open numeric/year buckets `key >= a AND key < b`, `key = true/false` for booleans, PM option values for enum ints).
+3. Restricts keyword search to the configured columns via `attributes_to_search_on` (verified working through meilisearch-rails 0.16 → client 0.32, which camelizes the option).
+4. Returns ids in relevance order; the controller feeds them into the existing pagy flow via `Model.where(id: ids).in_order_of(:id, ids)` — zero changes to the pagination contract. No `q`/`filters` params → the plain DB path (Meilisearch never called).
+5. `Meilisearch::Error` → 503 `{ errors: [...] }` — never silent unfiltered results.
+
+Specs: shared contract in `spec/support/shared_examples/dynamic_search_service.rb` (consumed by
+`spec/services/{products,customers}/search_query_service_spec.rb`), page wiring in
+`spec/requests/companies/{products,customers}_controller_spec.rb`, E2E in
+`spec/features/companies/{products,customers}/search_filter_spec.rb`. Design:
+`docs/superpowers/specs/2026-09-06-dynamic-search-filter-design.md`.
+
 ---
 
 ## 5. Updating the Index Schema (How To Change Settings)
@@ -278,7 +296,7 @@ To opt a model **out** of searchable: do not include the concern (or add `meilis
 | Server | Meilisearch v1.53.1 (`docker-compose.yml`, port 7700) |
 | URL | `MEILISEARCH_HOST` / credentials `meilisearch_host`, default `http://localhost:7700` |
 | API key | `MEILISEARCH_API_KEY` / credentials `meilisearch_api_key`, default `skycom_master_key_password_2026` |
-| Index UID | class name (e.g. `Product`) |
+| Index UID | `ClassName_<env>` (e.g. `Product_development`) — `per_environment: true` |
 | Queue | `meilisearch` (Solid Queue, `queues: "*"`) |
 | `raise_on_failure` | not set (default false — failures log, don't raise) |
 
@@ -296,6 +314,13 @@ To opt a model **out** of searchable: do not include the concern (or add `meilis
 | `spec/models/concerns/dynamic_search_concern_spec.rb` | Connection + settings + 46-model search coverage |
 | `spec/support/shared_examples/dynamic_search.rb` | Shared per-model search examples |
 | `spec/jobs/meilisearch_index_job_spec.rb` | Job behaviors |
+| `app/services/products/search_query_service.rb` | First live caller — TableConfig-driven search/filter query translation |
+| `app/services/dynamic_search/base_query_service.rb` | Generic search/filter core (whitelist + filter-string building); pages subclass it — rollout: `docs/DYNAMIC_TABLE.md` §8 |
+| `app/services/customers/search_query_service.rb` | Customers subclass (proof of the 3-line rollout) |
+| `spec/support/shared_examples/dynamic_search_service.rb` | Shared behavioral contract for every subclass |
+| `spec/services/products/search_query_service_spec.rb` | Whitelist + filter-string building + ms integration |
+| `spec/requests/companies/products_controller_spec.rb` | Search path wiring (DB path unchanged, 503 on ms down) |
+| `spec/features/companies/products/search_filter_spec.rb` | E2E: configured columns → input/dropdowns → results |
 | `docs/MODEL_CALLBACKS.md` | `DynamicSearchConcern` callback documentation |
 | `docs/superpowers/specs/2026-08-29-meilisearch-dynamic-search-design.md` | Design spec (uncommitted, gitignored) |
 | `docs/superpowers/plans/2026-08-29-meilisearch-dynamic-search.md` | Implementation plan (uncommitted, gitignored) |

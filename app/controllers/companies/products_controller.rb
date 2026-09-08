@@ -1,4 +1,13 @@
 # app/controllers/companies/products_controller.rb
+#
+# Products dashboard API (Shell-First: HTML shell + JSON for Stimulus hydration).
+# index: plain DB list, OR Meilisearch-backed when ?q= / ?filters[key]= params are
+#        present AND the category's TableConfig enables search/filter per column
+#        (whitelist + query building live in Products::SearchQueryService).
+# Serves Stimulus: Companies_Products_IndexController (index JSON incl. q/filters passthrough),
+#                  Companies_Products_NewController|ShowController|EditController (record JSON + form mutations)
+# Endpoints: GET /companies/:company_id/products(.json) + nested CRUD — see config/routes.rb
+# Docs: docs/DYNAMIC_TABLE.md, docs/MEILISEARCH.md
 
 class Companies::ProductsController < Companies::ApplicationController
   def index
@@ -8,6 +17,18 @@ class Companies::ProductsController < Companies::ApplicationController
         scope = current_company.products
         scope = scope.where(category_id: params[:category_id]) if params[:category_id].present?
         scope = scope.where(branch_id: params[:branch_id]) if params[:branch_id].present?
+
+        search = Products::SearchQueryService.new(company: current_company, params: params)
+        if search.active?
+          begin
+            ids = search.record_ids
+          rescue Meilisearch::Error => e
+            Rails.logger.error("[Products::SearchQueryService] #{e.message}")
+            return render json: { errors: [ "Search is temporarily unavailable. Please try again." ] },
+              status: :service_unavailable
+          end
+          scope = Product.where(id: ids).in_order_of(:id, ids)
+        end
 
         @pagy, @products_results = pagy(:offset, scope, jsonapi: true)
 

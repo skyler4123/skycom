@@ -48,8 +48,10 @@ async connect() {
   const tableConfig = currentTableConfigs().find(c => c.property_mapping_id === this.propertyMappingIdValue)
   if (tableConfig) this.tableConfigIdValue = tableConfig.id
 
-  // Fetch products
-  const response = await fetchJson({ params: { category_id: this.categoryIdValue } })
+  // Fetch data — the full page query string (category_id, q, filters[...]) is passed through:
+  const urlParams = new URLSearchParams(window.location.search)
+  if (!urlParams.get('category_id') && this.categoryIdValue) urlParams.set('category_id', this.categoryIdValue)
+  const response = await fetchJson(`${pathname()}.json?${urlParams.toString()}`)
   this.products = response.products || []
 
   // Two-phase render
@@ -110,6 +112,55 @@ Category filter uses a `<form method="get">` with the Search button for full pag
 ```
 
 The `<select>` has no JS change handler — changing the category requires clicking "Search" to navigate to `?category_id=X` (full page reload).
+
+### 2.5 Dynamic Search & Filter (Column Settings)
+
+Each `columns_metadata[]` entry may additionally carry two optional keys (absent = disabled,
+backward compatible):
+
+| Key | Type | Allowed on | Meaning |
+|-----|------|-----------|---------|
+| `search` | Boolean | `name` / `description` / `code` / `property_string_*` | Column participates in the index page keyword search box |
+| `filter` | Hash | `property_integer_*` / `property_decimal_*` / `property_boolean_*` / `property_datetime_*` | Column renders a filter dropdown on the index page |
+
+`filter` shape by column type (validated in `TableConfig` — `active` is **required** and gates
+everything: the filter only renders/applies while `"active": true`):
+
+```jsonc
+// integer / decimal — half-open buckets [from, to), null = open side
+{ "type": "range", "active": true, "buckets": [[null, 100], [100, 500], [500, null]] }
+// integer with PropertyMapping input_type=select — options render from PM options[]
+{ "type": "enum", "active": true }
+// boolean — dropdown labels; yes_no wins if both true
+{ "type": "boolean", "active": true, "true_false": true, "yes_no": false }
+// datetime — year buckets, half-open ([2024, 2025] == the year 2024)
+{ "type": "date", "active": true, "buckets": [[null, 2024], [2024, 2025], [2025, null]] }
+```
+
+**Editor** (`companies/table_configs/edit_controller.js`): per-row **Search** checkbox
+(disabled for non-string keys) + **Filter** cell = **Active checkbox** (writes `filter.active`,
+legacy configs without the key render as checked) above a **JSON textarea** (type-aware
+skeleton as placeholder). The textarea submits raw JSON text; `TableConfigsController#normalize_column_types`
+parses it back to a hash and merges the checkbox as `active` (checkbox always wins; submissions
+without the checkbox key backfill `active: true` — legacy-safe). Invalid JSON stays a string →
+model validation rejects the save → flash alert. API/JSON writes must include `active` explicitly.
+
+**Index page (Products + Customers today):** the search input (always the **first** control in the filter
+row, before the Category select) + one `<select>` per filter column render inside
+the existing GET form via the shared helpers `dynamicSearchHTML` / `dynamicFiltersHTML` (`ui_helpers.js`).
+Option values encode buckets as `min:max` (`:100`, `100:500`, `500:`,
+years likewise); booleans `true|false`; enums the PM option value. Keys travel on the wire
+(`filters[property_integer_1]=:100`); display names are render-time only. BE execution:
+per-resource `X::SearchQueryService` subclasses of `DynamicSearch::BaseQueryService` whitelist params
+against the TableConfig, build the Meilisearch filter string (always `company_id`-scoped), and return
+ids fed into pagy via `in_order_of`. Disabled filters (`active: false`) are skipped on **both** sides —
+no dropdown renders, no filter applies. Rolling the pattern out to another page: **§8**.
+See `docs/MEILISEARCH.md` §4 and `docs/superpowers/specs/2026-09-06-dynamic-search-filter-design.md`.
+
+**Seeding default:** `Seed::TableConfigService.field_hash` turns ON every applicable option
+(`search: true` for string-capable columns; active `range`/`boolean`/`date` filters for
+integer/decimal/boolean/datetime) — so every new company starts fully searchable/filterable and
+owners dial it back per column. Enum filters stay off (no seeded `input_type=select` properties yet).
 
 ---
 
@@ -304,14 +355,88 @@ end
 
 ---
 
-## 8. File Reference
+## 8. Rolling Out Dynamic Search/Filter to Another Index Page
+
+The engine is generic — `DynamicSearch::BaseQueryService` (BE) + `dynamicSearchHTML` /
+`dynamicFiltersHTML` (FE, `ui_helpers.js`). **Products** and **Customers** are wired; any other
+dynamic-table page adopts in 4 steps (~30 min incl. specs). Design context:
+`docs/superpowers/specs/2026-09-06-dynamic-search-filter-design.md`.
+
+**Step 0 — TableConfig: nothing to do.** The editor is resource-agnostic; per category/PM/TableConfig
+the owner toggles Search/Filter for that resource's columns already (see §2.5).
+
+**Step 1 — BE service subclass** (3 lines; `model` + `fallback_resource_name` only):
+
+```ruby
+# app/services/<resources>/search_query_service.rb
+class Orders::SearchQueryService < DynamicSearch::BaseQueryService
+  def self.model = Order
+  def self.fallback_resource_name = "orders"
+end
+```
+
+**Step 2 — controller index block** (paste into the `format.json` of `<X>sController#index`,
+after the existing scope filters; replace class/ivar names):
+
+```ruby
+search = Orders::SearchQueryService.new(company: current_company, params: params)
+if search.active?
+  begin
+    ids = search.record_ids
+  rescue Meilisearch::Error => e
+    Rails.logger.error("[Orders::SearchQueryService] #{e.message}")
+    return render json: { errors: [ "Search is temporarily unavailable. Please try again." ] },
+      status: :service_unavailable
+  end
+  scope = Order.where(id: ids).in_order_of(:id, ids)
+end
+```
+
+Update the file-header `Serves Stimulus:` comment with the new param support (AGENTS.md rule).
+
+**Step 3 — FE index controller** (2 edits, copy from `companies/customers/index_controller.js`):
+
+```javascript
+// connect(): replace the fetch so the whole query string (q, filters[...]) passes through
+const urlParams = new URLSearchParams(window.location.search)
+if (!urlParams.get('category_id') && this.categoryIdValue) urlParams.set('category_id', this.categoryIdValue)
+const response = await fetchJson(`${pathname()}.json?${urlParams.toString()}`)
+
+// contentHTML(): render from the raw config columns and inject into the existing GET form
+const searchHTML = dynamicSearchHTML({ searchCols: rawColumns.filter(c => c.search === true), urlParams })
+const filtersHTML = dynamicFiltersHTML({
+  filterCols: rawColumns.filter(c => c.filter && typeof c.filter === "object" && c.filter.type && c.filter.active !== false),
+  urlParams, mappingLookup
+})
+// ... inside the filter row: ${searchHTML} FIRST (before the Category select), then the
+// existing Category/Branch selects, then ${filtersHTML} after them, then the Search button.
+// The keyword input is the first control so it reads "search → narrow with dropdowns".
+```
+
+**Step 4 — specs:**
+
+| Spec | Do |
+|------|----|
+| `spec/services/orders/search_query_service_spec.rb` | 10 lines: `it_behaves_like "dynamic search query service"` with `service_class` / `resource_name` / `index_class` / `record` lets (see customers version) |
+| `spec/requests/companies/orders_controller_spec.rb` | DB-path unchanged without params; `?q=`; `?filters[...]`; 503 on `Meilisearch::Error` (stub) — template: `customers_controller_spec.rb` |
+| `spec/features/companies/orders/search_filter_spec.rb` | config → input/dropdown render → q + bucket filter E2E — template: `customers/search_filter_spec.rb` |
+
+Meilisearch fixtures: call `record.ms_index!(true)` explicitly (transactional tests suppress the
+after_commit auto-sync) and `Model.ms_clear_index!` before/after — see `docs/MEILISEARCH.md` §6.
+
+---
+
+## 9. File Reference
 
 | File | Purpose |
 |------|---------|
 | `app/javascript/controllers/companies/products/index_controller.js` | Main dynamic table controller |
 | `app/javascript/controllers/companies/products/new_modal_controller.js` | Dynamic form fields |
 | `app/javascript/controllers/companies/products/show_modal_controller.js` | Dynamic editable fields |
-| `app/controllers/companies/products_controller.rb` | JSON API with all `property_*` columns |
+ | `app/controllers/companies/products_controller.rb` | JSON API with all `property_*` columns |
+ | `app/services/products/search_query_service.rb` | TableConfig → Meilisearch search/filter query translation |
+ | `app/javascript/controllers/companies/table_configs/edit_controller.js` | Column editor incl. Search/Filter settings |
+ | `spec/features/companies/products/search_filter_spec.rb` | Dynamic search + filter dropdowns E2E |
 | `app/javascript/controllers/companies/layout_controller.js` | `currentTableConfig()`, `currentPropertyMapping()` helpers |
 | `app/javascript/controllers/helpers/auth_helpers.js` | `currentPropertyMappings()`, `currentTableConfigs()` |
 | `app/javascript/controllers/client_cache_controller.js` | localStorage seeding (must be locked in tests) |

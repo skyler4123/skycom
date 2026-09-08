@@ -864,6 +864,86 @@ export const table = ({
 }
 
 /**
+ * Renders the keyword-search input for a dynamic index page (TableConfig-driven).
+ * Returns "" when no column is search-enabled — callers paste the result straight
+ * into the existing GET filter form. See docs/DYNAMIC_TABLE.md §2.5.
+ *
+ * @param {object} options
+ * @param {Array<{key: string, name: string, search?: boolean}>} options.searchCols - columns with `search: true`
+ * @param {URLSearchParams} options.urlParams - current query string (prefill)
+ * @returns {string} HTML for the search field, or ""
+ */
+export const dynamicSearchHTML = ({ searchCols = [], urlParams }) => {
+  if (searchCols.length === 0) return ""
+
+  return `
+    <div class="flex flex-col gap-1">
+      <label class="text-[10px] font-bold text-slate-400 uppercase ml-1">${translate("Search")}</label>
+      <input type="text" name="q" value="${urlParams.get("q") || ""}"
+        placeholder="${translate("Search")} ${searchCols.map(c => c.name).join(", ")}…"
+        class="pl-3 pr-3 py-2 text-sm border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300"
+        ${tooltip(translate("Keyword search across searchable columns"))}>
+    </div>
+  `
+}
+
+/**
+ * Renders one `<select>` per filter-enabled column (TableConfig `filter` hashes).
+ * Option values encode the wire format: buckets `min:max` ("" = open), booleans
+ * "true"/"false", enums the PM option value. Unknown/broken configs are skipped
+ * defensively so the page never crashes. See docs/DYNAMIC_TABLE.md §2.5.
+ *
+ * @param {object} options
+ * @param {Array<{key: string, name: string, filter?: object}>} options.filterCols - columns with a `filter` hash
+ * @param {URLSearchParams} options.urlParams - current query string (prefill/selection)
+ * @param {Object<string, {type?: string, options?: Array<{value: any, label: string}>}>} [options.mappingLookup] - PropertyMapping metadata per column key (enum options)
+ * @returns {string} HTML for all filter dropdowns
+ */
+export const dynamicFiltersHTML = ({ filterCols = [], urlParams, mappingLookup = {} }) => {
+  const filterSelectHTML = (col) => {
+    const f = col.filter || {}
+    let options = []
+    if (f.type === "boolean") {
+      const labels = f.yes_no === true ? [ translate("Yes"), translate("No") ] : [ translate("True"), translate("False") ]
+      options = [ { value: "true", label: labels[0] }, { value: "false", label: labels[1] } ]
+    } else if (f.type === "enum") {
+      options = (mappingLookup[col.key]?.options || []).map(o => ({ value: String(o.value), label: o.label }))
+    } else if (f.type === "range" || f.type === "date") {
+      options = (f.buckets || []).map(b => bucketOption(f.type, b)).filter(Boolean)
+    }
+    if (options.length === 0) return ""
+
+    const paramName = `filters[${col.key}]`
+    const current = urlParams.get(paramName) || ""
+    return `
+      <div class="flex flex-col gap-1">
+        <label class="text-[10px] font-bold text-slate-400 uppercase ml-1">${col.name}</label>
+        <select name="${paramName}"
+          class="pl-3 pr-10 py-2 text-sm border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300"
+          ${tooltip(`${translate("Filter by")} ${col.name}`)}>
+          <option value="">${translate("All")}</option>
+          ${options.map(o => `<option value="${o.value}" ${current === o.value ? "selected" : ""}>${o.label}</option>`).join('')}
+        </select>
+      </div>
+    `
+  }
+
+  const bucketOption = (type, bucket) => {
+    if (!Array.isArray(bucket) || bucket.length !== 2) return null
+    const [ from, to ] = bucket
+    const value = `${from ?? ""}:${to ?? ""}`
+    let label
+    if (from == null) label = `&lt; ${to}`
+    else if (to == null) label = `≥ ${from}`
+    else if (type === "date") label = (to === from + 1) ? `${from}` : `${from} – ${to - 1}`
+    else label = `${from} – ${to}`
+    return { value, label }
+  }
+
+  return filterCols.map(col => filterSelectHTML(col)).join("")
+}
+
+/**
  * Automatically builds and injects a responsive QR code image tag into a target container
  * Sizing scales automatically based on the container's runtime layout width (Tailwind classes)
  * * @param {HTMLElement} element - The parent layout placeholder box (e.g., a Tailwind <div>)

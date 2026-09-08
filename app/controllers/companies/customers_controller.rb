@@ -1,5 +1,12 @@
 # app/controllers/companies/customers_controller.rb
-
+#
+# Customers dashboard API (Shell-First). index supports the same TableConfig-driven
+# dynamic search/filter as Products (?q= / ?filters[key]= → Meilisearch via
+# Customers::SearchQueryService; plain DB path otherwise).
+# Serves Stimulus: Companies_Customers_IndexController (index JSON incl. q/filters passthrough),
+#                  Companies_Customers_NewController|ShowController|EditController
+# Endpoints: GET /companies/:company_id/customers(.json) + nested CRUD — see config/routes.rb
+# Docs: docs/DYNAMIC_TABLE.md §2.5, docs/MEILISEARCH.md
 class Companies::CustomersController < Companies::ApplicationController
   def index
     respond_to do |format|
@@ -8,6 +15,18 @@ class Companies::CustomersController < Companies::ApplicationController
         scope = current_company.customers
         scope = scope.where(category_id: params[:category_id]) if params[:category_id].present?
         scope = scope.where(branch_id: params[:branch_id]) if params[:branch_id].present?
+
+        search = Customers::SearchQueryService.new(company: current_company, params: params)
+        if search.active?
+          begin
+            ids = search.record_ids
+          rescue Meilisearch::Error => e
+            Rails.logger.error("[Customers::SearchQueryService] #{e.message}")
+            return render json: { errors: [ "Search is temporarily unavailable. Please try again." ] },
+              status: :service_unavailable
+          end
+          scope = Customer.where(id: ids).in_order_of(:id, ids)
+        end
 
         @pagy, @customers_results = pagy(:offset, scope, jsonapi: true)
 
