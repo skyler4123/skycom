@@ -59,15 +59,42 @@ class Seed::HospitalInitService
       "Consultation Room" => { properties: { property_string_1: "Purpose", property_boolean_1: "Has TV/Display" }, visible_columns: %w[name code property_string_1 workflow_status] },
       "Recovery Area" => { properties: { property_integer_1: "Bed Count", property_boolean_1: "Has Monitoring" }, visible_columns: %w[name code property_integer_1 workflow_status] }
     },
+    warehouses: {
+      # Warehouse semantics are generic for clinics — property slots get numbered labels.
+      "Main Warehouse" => {
+        properties: { property_string_1: "String Name 1", property_integer_1: "Integer Name 1", property_boolean_1: "Boolean Name 1" },
+        visible_columns: %w[name code property_string_1 property_integer_1 workflow_status]
+      },
+      "Pharmacy Storage" => {
+        properties: { property_string_1: "String Name 2", property_datetime_1: "Datetime Name 1", property_boolean_1: "Boolean Name 2" },
+        visible_columns: %w[name code property_string_1 property_datetime_1 workflow_status]
+      }
+    },
+    stocks: {
+      "Pharmacy Stock" => {
+        properties: { property_string_1: "String Name 3", property_integer_1: "Integer Name 2", property_boolean_1: "Boolean Name 3" },
+        visible_columns: %w[name code product_name category_name warehouse_name quantity pending property_string_1 workflow_status]
+      },
+      "Medical Supplies" => {
+        properties: { property_string_1: "String Name 4", property_datetime_1: "Datetime Name 2" },
+        visible_columns: %w[name code product_name category_name warehouse_name quantity property_string_1 property_datetime_1 workflow_status]
+      }
+    },
+    stock_transfers: {
+      "Clinic Transfer" => {
+        properties: { property_string_1: "String Name 5", property_string_2: "String Name 6" },
+        visible_columns: %w[name code product_name category_name from_name to_name quantity property_string_1 workflow_status]
+      }
+    },
     stock_exports: {
-      "Patient Sale" => { properties: { property_string_1: "Patient Name", property_string_2: "Treatment Code" }, visible_columns: %w[name code workflow_status] },
-      "Damaged Write-off" => { properties: { property_string_1: "Damage Description", property_string_2: "Reported By" }, visible_columns: %w[name code workflow_status] },
-      "Expired Disposal" => { properties: { property_string_1: "Expiry Date Range", property_string_2: "Disposal Method" }, visible_columns: %w[name code workflow_status] }
+      "Patient Sale" => { properties: { property_string_1: "Patient Name", property_string_2: "Treatment Code" }, visible_columns: %w[name code product_name category_name from_name to_name quantity property_string_1 workflow_status] },
+      "Damaged Write-off" => { properties: { property_string_1: "Damage Description", property_string_2: "Reported By" }, visible_columns: %w[name code product_name category_name from_name to_name quantity property_string_1 workflow_status] },
+      "Expired Disposal" => { properties: { property_string_1: "Expiry Date Range", property_string_2: "Disposal Method" }, visible_columns: %w[name code product_name category_name from_name to_name quantity property_string_1 workflow_status] }
     },
     stock_imports: {
-      "Supplier Purchase" => { properties: { property_string_1: "Supplier Name", property_string_2: "Purchase Order Ref" }, visible_columns: %w[name code workflow_status] },
-      "Customer Return" => { properties: { property_string_1: "Return Reason", property_string_2: "Return Authorization" }, visible_columns: %w[name code workflow_status] },
-      "Transfer In" => { properties: { property_string_1: "Source Clinic", property_string_2: "Transfer Reference" }, visible_columns: %w[name code workflow_status] }
+      "Supplier Purchase" => { properties: { property_string_1: "Supplier Name", property_string_2: "Purchase Order Ref" }, visible_columns: %w[name code product_name category_name from_name to_name quantity property_string_1 property_string_2 workflow_status] },
+      "Customer Return" => { properties: { property_string_1: "Return Reason", property_string_2: "Return Authorization" }, visible_columns: %w[name code product_name category_name from_name to_name quantity property_string_1 workflow_status] },
+      "Transfer In" => { properties: { property_string_1: "Source Clinic", property_string_2: "Transfer Reference" }, visible_columns: %w[name code product_name category_name from_name to_name quantity property_string_1 workflow_status] }
     },
     orders: {
       "In-Clinic Treatment" => { properties: { property_string_1: "Treating Dentist", property_string_2: "Chair Number" }, visible_columns: %w[name code workflow_status] },
@@ -242,6 +269,7 @@ class Seed::HospitalInitService
         "PropertyMapping" => { create: true, read: true, update: true, delete: true },
         "TableConfig" => { create: true, read: true, update: true, delete: true },
         "Stock" => { create: true, read: true, update: true, delete: true },
+        "Warehouse" => { create: true, read: true, update: true, delete: true },
         "StockExport" => { create: true, read: true, update: true, delete: true },
         "StockImport" => { create: true, read: true, update: true, delete: true },
         "StockTransfer" => { create: true, read: true, update: true, delete: true }
@@ -281,6 +309,7 @@ class Seed::HospitalInitService
         "PropertyMapping" => { create: true, read: true, update: true, delete: true },
         "TableConfig" => { create: true, read: true, update: true, delete: true },
         "Stock" => { create: true, read: true, update: true, delete: true },
+        "Warehouse" => { create: true, read: true, update: true, delete: true },
         "StockExport" => { create: true, read: true, update: true, delete: true },
         "StockImport" => { create: true, read: true, update: true, delete: true },
         "StockTransfer" => { create: true, read: true, update: true, delete: true }

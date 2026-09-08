@@ -24,6 +24,17 @@ RSpec.describe "DynamicSearchConcern" do
       expect(settings["searchableAttributes"]).to include("name", "description", "code", "property_string_1", "property_integer_1")
       expect(settings["filterableAttributes"]).to include("company_id", "property_integer_1", "property_boolean_1")
     end
+
+    it "merges model-declared extra filterable metrics into the index settings" do
+      filterable = Stock.meilisearch_settings.get_setting(:filterable_attributes)
+      attributes = Stock.meilisearch_settings.get_setting(:attributes).keys.map(&:to_s)
+      expect(filterable).to include("quantity", "pending")
+      expect(attributes).to include("quantity", "pending")
+    end
+
+    it "keeps models without extra metrics free of them" do
+      expect(Product.meilisearch_settings.get_setting(:filterable_attributes)).not_to include("quantity")
+    end
   end
 end
 

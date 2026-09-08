@@ -22,13 +22,18 @@ When a user creates a new company (either via signup or during seeding), the `Co
 | Record | Count | Purpose |
 |--------|-------|---------|
 | Roles | 8 | Manager, Cashier, Seller, Security, Admin, Doctor, Therapist, Consultant |
-| Categories | ~36 | Per-resource groupings (Cosmetics, Flagship Store, Operations, etc.) |
-| PropertyMappings | ~36 | Dynamic property labels per category |
-| TableConfigs | ~36 | Visible column configuration per category |
+| Categories | ~40 | Per-resource groupings (Cosmetics, Flagship Store, Operations, Stocks, Warehouses, etc.) |
+| PropertyMappings | ~40 | Dynamic property labels per category |
+| TableConfigs | ~40 | Visible column configuration per category |
 | Policies | ~600 | CRUD policies for all resource x action combinations |
 | PolicyAppointments | ~80 | Role-to-policy assignments with active/inactive status |
 
 After init, the company is ready to use — users can navigate dashboards, create records, and manage the business.
+
+**Stocks are their own taxonomy (2026-09-09).** A `Stock` record belongs to a `stocks`-resource
+category (not its product's category) — `Seed::StockService` assigns one and `CategoryConcern`
+falls back to a default `stocks` category. This lets the Stocks index render + search/filter its
+own dynamic columns like every other table (`docs/DYNAMIC_TABLE.md` §8).
 
 ## Enrich Phase (Development Only)
 
@@ -65,15 +70,34 @@ Seed::ApplicationService.run
   |   +- Company.create! -> after_create -> RetailInitService -> roles, categories, etc.
   |
   |- Enrich Company 1 (RetailEnrichService)
-  |   +- Brands, branches, employees, products, orders...
+  |   +- Brands, branches, employees, products, stocks, orders...
   |- Enrich Company 2 (RetailEnrichService)
-  |   +- Brands, branches, employees, products, orders...
+  |   +- Brands, branches, employees, products, stocks, orders...
   |
-  +- Company 3: init only -- no enrichment
+  +- Enrich Company 3 (HospitalEnrichService)
+      +- Branches, departments, facilities, employees, patients, services,
+         pharmacy products, warehouses, stocks, transfers/imports/exports,
+         shifts + attendance, credit data
 ```
 
-Future business types (Restaurant, Hospital, Education) will follow the same pattern
+Future business types (Restaurant, Education) will follow the same pattern
 with their own `*InitService` and `*EnrichService`.
+
+### Seeding naming convention — "number name" fallback
+
+When a seeded record's semantic label is hard to pin down for the business type
+(e.g. a clinic warehouse, or an arbitrary dynamic property slot), use a
+**numbered name** instead of inventing a fake-meaning label or pulling a random
+Faker phrase:
+
+| Case | Pattern | Examples |
+|------|---------|----------|
+| Record name with unclear semantics | `"<Resource> N"` | `"Warehouse 1"`, `"Warehouse 2"`, `"Product 3"` |
+| Property label with unclear semantics | `"<Type> Name N"` | `"String Name 1"`, `"Integer Name 2"`, `"Datetime Name 4"` |
+
+Use meaningful names wherever the domain is genuinely clear (`"Distribution Center"`,
+`"Skin Type Suitability"`, `"Supplier Purchase"`); the numbered form is only the
+fallback so seeded data stays honest about what the seeder actually knows.
 
 ## Key Benefits
 

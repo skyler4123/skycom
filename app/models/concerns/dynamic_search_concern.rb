@@ -12,6 +12,10 @@ module DynamicSearchConcern
 
   STANDARD_COLUMNS = %w[id company_id category_id branch_id name description code workflow_status business_type].freeze
 
+  # Per-model hook: models that need plain metric columns (e.g. Stock quantity/pending)
+  # filterable in Meilisearch declare `def self.ms_extra_filterable_columns` BEFORE
+  # `include DynamicSearchConcern` — the meilisearch settings block is evaluated at
+  # include time, so a later definition would be silently ignored.
   included do
     include Meilisearch::Rails
 
@@ -20,11 +24,12 @@ module DynamicSearchConcern
     number_columns    = column_names & (PROPERTY_INTEGER_COLUMNS + PROPERTY_DECIMAL_COLUMNS)
     boolean_columns   = column_names & PROPERTY_BOOLEAN_COLUMNS
     datetime_columns  = column_names & PROPERTY_DATETIME_COLUMNS
+    extra_filterable  = respond_to?(:ms_extra_filterable_columns) ? Array(ms_extra_filterable_columns) & column_names : []
 
-    indexed_attributes = standard_columns + string_columns + number_columns + boolean_columns + datetime_columns
+    indexed_attributes = standard_columns + string_columns + number_columns + boolean_columns + datetime_columns + extra_filterable
     searchable_columns = (standard_columns & %w[name description code]) + string_columns + number_columns
     filterable_columns = (standard_columns & %w[company_id category_id branch_id workflow_status business_type]) +
-      number_columns + boolean_columns + datetime_columns
+      number_columns + boolean_columns + datetime_columns + extra_filterable
 
     meilisearch(
       synchronous: false,

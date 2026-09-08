@@ -29,9 +29,12 @@ class Seed::HospitalEnrichService
     @patients = []
     @services = []
     @facilities = []
+    @products = []
+    @warehouses = []
     @employee_counter = 0
     @patient_counter = 0
     @facility_counter = 0
+    @product_counter = 0
     @email = email
     @email_domain = EmailService.new(email).full_domain
     seeding
@@ -48,6 +51,12 @@ class Seed::HospitalEnrichService
     assign_employees_to_departments
     create_patients
     create_services
+    create_pharmacy_products
+    create_warehouses_for_branches
+    create_stocks_for_products
+    create_stock_transfers
+    create_stock_imports
+    create_stock_exports
     create_appointments
     create_shifts
     create_attendance_policies
@@ -205,6 +214,117 @@ class Seed::HospitalEnrichService
           category: service_categories[i % service_categories.length]
         )
         @services << service
+      end
+    end
+  end
+
+  def create_pharmacy_products
+    puts "Creating pharmacy products..."
+    @branches.each do |branch|
+      5.times do
+        @product_counter += 1
+        product = Seed::ProductService.create(
+          company: @company,
+          branch: branch,
+          name: "Product #{@product_counter}",
+          description: "Pharmacy item for #{branch.name}"
+        )
+        @products << product
+      end
+    end
+  end
+
+  def create_warehouses_for_branches
+    puts "Creating warehouses..."
+    @branches.each_with_index do |branch, i|
+      warehouse = Seed::WarehouseService.create(
+        company: @company,
+        branch: branch,
+        name: "Warehouse #{i + 1}",
+        business_type: :distribution
+      )
+      @warehouses << warehouse
+    end
+  end
+
+  def create_stocks_for_products
+    puts "Creating stock records..."
+    @warehouses.each do |warehouse|
+      warehouse_products = @products.select { |p| p.branch_id == warehouse.branch_id }
+      warehouse_products.each do |product|
+        Seed::StockService.create(
+          warehouse: warehouse,
+          product_id: product.id,
+          quantity: rand(20..120),
+          pending: 0,
+          name: product.name
+        )
+      end
+    end
+  end
+
+  def create_stock_transfers
+    puts "Creating stock transfers..."
+    @warehouses.each do |warehouse|
+      warehouse_products = @products.select { |p| p.branch_id == warehouse.branch_id }
+      warehouse_products.sample(2).each do |product|
+        Seed::StockTransferService.create(
+          company: @company,
+          branch: warehouse.branch,
+          warehouse: warehouse,
+          product: product,
+          appoint_from: warehouse,
+          appoint_to: warehouse.branch,
+          quantity: rand(1..50),
+          workflow_status: :completed,
+          lifecycle_status: :active
+        )
+      end
+    end
+  end
+
+  def create_stock_imports
+    puts "Creating stock imports..."
+    @branches.each do |branch|
+      branch_products = @products.select { |p| p.branch_id == branch.id }
+      next if branch_products.empty?
+
+      branch_warehouse = @warehouses.find { |w| w.branch_id == branch.id }
+      branch_products.sample(rand(2..4)).each do |product|
+        Seed::StockImportService.create(
+          company: @company,
+          branch: branch,
+          warehouse: branch_warehouse,
+          product: product,
+          code: "STKIM-#{SecureRandom.hex(4).upcase}",
+          quantity: rand(10..100),
+          business_type: StockImport.business_types.keys.sample,
+          workflow_status: StockImport.workflow_statuses.keys.sample,
+          lifecycle_status: :active
+        )
+      end
+    end
+  end
+
+  def create_stock_exports
+    puts "Creating stock exports..."
+    @branches.each do |branch|
+      branch_products = @products.select { |p| p.branch_id == branch.id }
+      next if branch_products.empty?
+
+      branch_warehouse = @warehouses.find { |w| w.branch_id == branch.id }
+      branch_products.sample(rand(2..4)).each do |product|
+        Seed::StockExportService.create(
+          company: @company,
+          branch: branch,
+          warehouse: branch_warehouse,
+          product: product,
+          code: "STKEX-#{SecureRandom.hex(4).upcase}",
+          quantity: rand(5..50),
+          business_type: StockExport.business_types.keys.sample,
+          workflow_status: StockExport.workflow_statuses.keys.sample,
+          lifecycle_status: :active
+        )
       end
     end
   end

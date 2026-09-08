@@ -154,6 +154,19 @@ RSpec.describe TableConfig, type: :model do
       expect(with_column(col)).to be_valid
     end
 
+    it "accepts a range filter on numeric standard metric columns" do
+      %w[quantity pending].each do |key|
+        col = { "key" => key, "name" => key.humanize, "visible" => true,
+                "filter" => { "type" => "range", "active" => true, "buckets" => [ [ nil, 100 ], [ 100, nil ] ] } }
+        expect(with_column(col)).to be_valid
+      end
+    end
+
+    it "rejects range filter on a non-numeric standard column" do
+      expect(with_column({ "key" => "workflow_status", "name" => "Status", "visible" => true,
+                           "filter" => { "type" => "range", "active" => true, "buckets" => [ [ nil, 5 ] ] } })).not_to be_valid
+    end
+
     it "rejects range with an empty or malformed buckets array" do
       expect(with_column({ "key" => "property_integer_1", "name" => "Qty", "visible" => true,
                            "filter" => { "type" => "range", "active" => true, "buckets" => [] } })).not_to be_valid

@@ -1,6 +1,6 @@
 # Skycom Meilisearch Integration
 
-> **Status**: Live (2026-08-29). Meilisearch powers backend search for every dynamic-property model. Live consumers since 2026-09-06/07/08: ALL dynamic-table index pages (Products, Customers, Branches, Brands, Departments, Employees, Facilities, Invoices, Orders, Services, Warehouses) run dynamic search/filter (`DynamicSearch::BaseQueryService` subclasses) — per-page rollout recipe: `docs/DYNAMIC_TABLE.md` §8.
+> **Status**: Live (2026-08-29). Meilisearch powers backend search for every dynamic-property model. Live consumers since 2026-09-06/07/08: ALL dynamic-table index pages (Products, Customers, Branches, Brands, Departments, Employees, Facilities, Invoices, Orders, Services, Warehouses) run dynamic search/filter (`DynamicSearch::BaseQueryService` subclasses); Stocks, StockTransfers, StockImports, StockExports joined 2026-09-09 — per-page rollout recipe: `docs/DYNAMIC_TABLE.md` §8.
 
 ---
 
@@ -113,6 +113,28 @@ How it works:
 - `synchronous: false` + the `enqueue:` proc route all indexing through `MeilisearchIndexJob`. This is the gem's documented `enqueue: :trigger_job` pattern.
 - Typed values index natively: integers/decimals stay numeric (range filters like `property_integer_1 >= 30` work), booleans filter, datetimes filter as RFC3339 strings.
 
+### 2.1 Per-model extra filterable columns (`ms_extra_filterable_columns`)
+
+Some models have plain metric columns (not `property_*` slots) that should be range-filterable —
+`Stock#quantity`/`Stock#pending`, and `quantity` on `StockTransfer`/`StockImport`/`StockExport`.
+The concern merges a model-declared hook into `indexed_attributes` + `filterable_attributes`:
+
+```ruby
+# app/models/stock.rb
+def self.ms_extra_filterable_columns = %w[quantity pending]  # MUST precede `include DynamicSearchConcern`
+
+include CategoryConcern
+include PropertyMappingConcern
+include DynamicSearchConcern
+```
+
+The meilisearch settings block runs at **include time**, so the class method must be defined
+**above** the `include` line (a later `def self.` is silently ignored — hence the
+`# rubocop:disable Layout/ClassStructure` marker on those models). The concern intersects the hook
+with `column_names`, so unknown/typo'd columns are dropped safely. These columns become valid
+TableConfig `filter` keys only once paired with `TableConfig::NUMERIC_STANDARD_KEYS` (see
+`docs/DYNAMIC_TABLE.md` §2.5).
+
 ---
 
 ## 3. How Records Stay in Sync
@@ -189,11 +211,11 @@ Meilisearch::Rails.multi_search(
 
 Always pass `filter: "company_id = <id>"` — the indexes are shared across all companies. The `filterable_attributes` set already includes `company_id`, `category_id`, `branch_id`, `workflow_status`, `business_type`.
 
-### Live consumer: dynamic search/filter (all 10 dynamic-table index pages, since 2026-09-06/07)
+### Live consumer: dynamic search/filter (all 15 dynamic-table index pages, since 2026-09-06/07)
 
 `DynamicSearch::BaseQueryService` (`app/services/dynamic_search/base_query_service.rb`) is the request-path
 consumer core; each wired page adds a 3-line subclass (`self.model`, `self.fallback_resource_name`) —
-Products / Customers / Branches / Brands / Departments / Employees / Facilities / Invoices / Orders / Services / Warehouses. Flow:
+Products / Customers / Branches / Brands / Departments / Employees / Facilities / Invoices / Orders / Services / Warehouses / Stocks / StockTransfers / StockImports / StockExports. Flow:
 
 1. Reads the active TableConfig for the requested category and **whitelists** `q` + `filters[key]` params against the columns' `search`/`filter` settings (`docs/DYNAMIC_TABLE.md` §2.5). Disabled filters (`active: false`) never match the whitelist.
 2. Builds the Meilisearch filter string (always `company_id`-scoped; `category_id`/`branch_id` scope clauses only when the model has the column; half-open numeric/year buckets `key >= a AND key < b`, `key = true/false` for booleans, PM option values for enum ints).
@@ -316,6 +338,7 @@ To opt a model **out** of searchable: do not include the concern (or add `meilis
 | `app/services/products/search_query_service.rb` | Products subclass — TableConfig-driven search/filter query translation |
 | `app/services/customers/search_query_service.rb` | Customers subclass (proof of the 3-line rollout) |
 | `app/services/{branches,brands,departments,employees,facilities,invoices,orders,services,warehouses}/search_query_service.rb` | Remaining 9 subclasses — all dynamic-table index pages wired (2026-09-07/08) |
+| `app/services/{stocks,stock_transfers,stock_imports,stock_exports}/search_query_service.rb` | Stock-family subclasses (2026-09-09) — `quantity`/`pending` metrics filterable via `ms_extra_filterable_columns` |
 | `app/services/dynamic_search/base_query_service.rb` | Generic search/filter core (whitelist + filter-string building); pages subclass it — rollout: `docs/DYNAMIC_TABLE.md` §8 |
 | `spec/support/shared_examples/dynamic_search_service.rb` | Shared behavioral contract for every subclass |
 | `spec/support/shared_examples/dynamic_search_index_controller.rb` | Shared request-level contract for every wired index controller |

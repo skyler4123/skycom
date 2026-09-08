@@ -325,53 +325,67 @@ class Seed::RetailInitService
     warehouses: {
       "Distribution Center" => {
         properties: { property_integer_1: "Capacity (sq ft)", property_string_1: "Region Served" },
-        visible_columns: %w[name code property_integer_1 workflow_status]
+        visible_columns: %w[name code property_string_1 property_integer_1 workflow_status]
       },
       "Cold Storage" => {
         properties: { property_integer_1: "Temperature Range (°C)", property_boolean_1: "Humidity Controlled" },
-        visible_columns: %w[name code property_integer_1 workflow_status]
+        visible_columns: %w[name code property_integer_1 property_boolean_1 workflow_status]
       },
       "Fulfillment Hub" => {
         properties: { property_integer_1: "Processing Capacity (orders/day)", property_string_1: "Service Area" },
-        visible_columns: %w[name code property_integer_1 workflow_status]
+        visible_columns: %w[name code property_string_1 property_integer_1 workflow_status]
+      }
+    },
+    stocks: {
+      "Finished Goods" => {
+        properties: { property_string_1: "Location", property_string_2: "Unit", property_integer_1: "Max Capacity", property_boolean_1: "Fragile" },
+        visible_columns: %w[name code product_name category_name warehouse_name quantity pending property_string_1 property_integer_1 workflow_status]
+      },
+      "Raw Materials" => {
+        properties: { property_string_1: "Material", property_string_2: "Origin", property_decimal_1: "Weight (kg)", property_boolean_1: "Refrigerated" },
+        visible_columns: %w[name code product_name category_name warehouse_name quantity property_string_1 property_decimal_1 workflow_status]
+      },
+      "Retail Stock" => {
+        properties: { property_string_1: "Section", property_string_2: "Notes", property_integer_1: "Shelf Number", property_datetime_1: "Best Before" },
+        visible_columns: %w[name code product_name category_name warehouse_name quantity pending property_string_1 property_datetime_1 workflow_status]
       }
     },
     stock_transfers: {
       "Inter-Branch Transfer" => {
         properties: { property_string_1: "Transfer Reason", property_string_2: "Authorized By" },
-        visible_columns: %w[name code workflow_status]
+        visible_columns: %w[name code product_name category_name from_name to_name quantity property_string_1 property_string_2 workflow_status]
       },
       "Emergency Replenishment" => {
         properties: { property_string_1: "Priority Level", property_string_2: "Approval Status" },
-        visible_columns: %w[name code workflow_status]
+        visible_columns: %w[name code product_name category_name from_name to_name quantity property_string_1 property_string_2 workflow_status]
       }
     },
     stock_exports: {
       "Customer Sale" => {
         properties: { property_string_1: "Customer Name", property_string_2: "Invoice Reference" },
-        visible_columns: %w[name code workflow_status]
+        visible_columns: %w[name code product_name category_name from_name to_name quantity property_string_1 property_string_2 workflow_status]
       },
       "Damaged Write-off" => {
         properties: { property_string_1: "Damage Description", property_string_2: "Reported By" },
-        visible_columns: %w[name code workflow_status]
+        visible_columns: %w[name code product_name category_name from_name to_name quantity property_string_1 workflow_status]
       },
       "Expired Disposal" => {
         properties: { property_string_1: "Expiry Date Range", property_string_2: "Disposal Method" },
-        visible_columns: %w[name code workflow_status]
+        visible_columns: %w[name code product_name category_name from_name to_name quantity property_string_1 workflow_status]
       }
     },
     stock_imports: {
       "Supplier Purchase" => {
         properties: { property_string_1: "Supplier Name", property_string_2: "Purchase Order Ref" },
-        visible_columns: %w[name code workflow_status]
+        visible_columns: %w[name code product_name category_name from_name to_name quantity property_string_1 property_string_2 workflow_status]
       },
       "Customer Return" => {
         properties: { property_string_1: "Return Reason", property_string_2: "Return Authorization" },
-        visible_columns: %w[name code workflow_status]
+        visible_columns: %w[name code product_name category_name from_name to_name quantity property_string_1 workflow_status]
       },
       "Transfer In" => {
         properties: { property_string_1: "Source Branch", property_string_2: "Transfer Reference" },
-        visible_columns: %w[name code workflow_status]
+        visible_columns: %w[name code product_name category_name from_name to_name quantity property_string_1 workflow_status]
       }
     },
     orders: {

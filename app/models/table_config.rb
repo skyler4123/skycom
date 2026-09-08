@@ -6,6 +6,10 @@ class TableConfig < ApplicationRecord
   ALLOWED_ALIGNS = %w[left center right].freeze
   # Standard columns eligible for keyword search (property_string_* are also searchable).
   SEARCHABLE_STANDARD_KEYS = %w[name description code].freeze
+  # Standard (non-property) numeric metric columns eligible for range filters.
+  # Must mirror an `ms_extra_filterable_columns` declaration on the indexed model
+  # to actually filter (docs/MEILISEARCH.md §2).
+  NUMERIC_STANDARD_KEYS = %w[quantity pending].freeze
   # Valid strategy types for a column's "filter" setting.
   FILTER_TYPES = %w[range enum boolean date].freeze
   # Allowed keys inside a column "filter" hash (strict shape).
@@ -204,6 +208,7 @@ class TableConfig < ApplicationRecord
     when /\Aproperty_boolean_/     then "boolean"
     when /\Aproperty_datetime_/    then "datetime"
     when *SEARCHABLE_STANDARD_KEYS then "string"
+    when *NUMERIC_STANDARD_KEYS    then "integer"
     end
   end
 end

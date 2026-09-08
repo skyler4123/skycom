@@ -4,6 +4,10 @@ RSpec.feature "Companies::Stocks Management", type: :feature, js: true do
   let(:branch) { create(:branch) }
   let(:company) { branch.company }
   let(:owner) { company.user }
+  # The index defaults to the FIRST stocks category (defaultFilterCategory) —
+  # pin all fixtures there so every scenario sees them without a category switch.
+  # find_or_create_for is idempotent and matches CategoryConcern's fallback row.
+  let(:stock_category) { Seed::CategoryService.find_or_create_for(company: company, resource_name: "stocks") }
 
   let(:warehouse) do
     Seed::WarehouseService.create(
@@ -32,6 +36,7 @@ RSpec.feature "Companies::Stocks Management", type: :feature, js: true do
       product_id: product.id,
       company: company,
       branch: branch,
+      category: stock_category,
       business_type: "inventory",
       workflow_status: "confirmed"
     )
@@ -43,9 +48,29 @@ RSpec.feature "Companies::Stocks Management", type: :feature, js: true do
       product_id: product2.id,
       company: company,
       branch: branch,
+      category: stock_category,
       business_type: "finished_good",
       workflow_status: "confirmed"
     )
+  end
+
+  # The default (uninitialized) stocks category carries a bare name-only TableConfig —
+  # seed the real column set the page renders (docs/DYNAMIC_TABLE.md §6.2).
+  let!(:table_config) do
+    category = stock_category
+    category.default_property_mapping.table_configs.destroy_all
+    TableConfig.create!(company: company, category: category,
+      property_mapping: category.default_property_mapping, resource_name: "stocks",
+      metadata: { "columns" => [
+        { "key" => "name", "name" => "Name", "visible" => true },
+        { "key" => "product_name", "name" => "Product", "visible" => true },
+        { "key" => "category_name", "name" => "Category", "visible" => true },
+        { "key" => "warehouse_name", "name" => "Warehouse", "visible" => true },
+        { "key" => "quantity", "name" => "Quantity", "visible" => true },
+        { "key" => "pending", "name" => "Pending", "visible" => true },
+        { "key" => "business_type", "name" => "Type", "visible" => true },
+        { "key" => "workflow_status", "name" => "Status", "visible" => true }
+      ] })
   end
 
   before do
@@ -79,7 +104,7 @@ RSpec.feature "Companies::Stocks Management", type: :feature, js: true do
 
     expect(page).to have_selector('table', wait: 10)
     expect(page).to have_content("Inventory")
-    expect(page).to have_content("Finished_good")
+    expect(page).to have_content("Finished good")
   end
 
   scenario "display workflow status as badge" do
@@ -119,6 +144,7 @@ RSpec.feature "Companies::Stocks Management", type: :feature, js: true do
         product_id: product3.id,
         company: company,
         branch: branch2,
+        category: stock_category,
         business_type: "inventory",
         workflow_status: "confirmed"
       )
