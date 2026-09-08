@@ -186,6 +186,21 @@ class Company < ApplicationRecord
   def initialize_company
     return unless user
 
+    # Business-type init MUST run before the owner Employee is created:
+    # the owner's category is picked from the seeded employees categories
+    # (Seed::EmployeeService → random_for). Running it later lets
+    # CategoryConcern#ensure_category create a generic, property-less
+    # "Employees" category that outranks the seeded role categories.
+    unless self.class.skip_init
+      if business_type_retail?
+        Seed::RetailInitService.call(company: self)
+      elsif business_type_hospital?
+        Seed::HospitalInitService.call(company: self)
+      end
+
+      setup_payment_method_appointments
+    end
+
     role = Seed::RoleService.create(
       company: self,
       name: OWNER_BUSINESS_TYPE,
@@ -231,16 +246,6 @@ class Company < ApplicationRecord
     create_company_wallet!(walletable: self, main_credit_balance: 0)
 
     create_default_setting
-
-    unless self.class.skip_init
-      if business_type_retail?
-        Seed::RetailInitService.call(company: self)
-      elsif business_type_hospital?
-        Seed::HospitalInitService.call(company: self)
-      end
-
-      setup_payment_method_appointments
-    end
   end
 
   def setup_payment_method_appointments
