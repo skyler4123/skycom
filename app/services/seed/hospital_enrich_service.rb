@@ -58,6 +58,7 @@ class Seed::HospitalEnrichService
     create_stock_imports
     create_stock_exports
     create_appointments
+    create_invoices
     create_shifts
     create_attendance_policies
     create_attendance_event_data
@@ -236,10 +237,12 @@ class Seed::HospitalEnrichService
 
   def create_warehouses_for_branches
     puts "Creating warehouses..."
+    warehouse_categories = Category.where(company: @company, resource_name: "warehouses").order(:id).to_a
     @branches.each_with_index do |branch, i|
       warehouse = Seed::WarehouseService.create(
         company: @company,
         branch: branch,
+        category: round_robin(warehouse_categories, i),
         name: "Warehouse #{i + 1}",
         business_type: :distribution
       )
@@ -249,12 +252,14 @@ class Seed::HospitalEnrichService
 
   def create_stocks_for_products
     puts "Creating stock records..."
+    stock_categories = Category.where(company: @company, resource_name: "stocks").order(:id).to_a
     @warehouses.each do |warehouse|
       warehouse_products = @products.select { |p| p.branch_id == warehouse.branch_id }
-      warehouse_products.each do |product|
+      warehouse_products.each_with_index do |product, i|
         Seed::StockService.create(
           warehouse: warehouse,
           product_id: product.id,
+          category: round_robin(stock_categories, i),
           quantity: rand(20..120),
           pending: 0,
           name: product.name
@@ -265,11 +270,13 @@ class Seed::HospitalEnrichService
 
   def create_stock_transfers
     puts "Creating stock transfers..."
+    transfer_categories = Category.where(company: @company, resource_name: "stock_transfers").order(:id).to_a
     @warehouses.each do |warehouse|
       warehouse_products = @products.select { |p| p.branch_id == warehouse.branch_id }
-      warehouse_products.sample(2).each do |product|
+      warehouse_products.sample(2).each_with_index do |product, i|
         Seed::StockTransferService.create(
           company: @company,
+          category: round_robin(transfer_categories, i),
           branch: warehouse.branch,
           warehouse: warehouse,
           product: product,
@@ -285,14 +292,16 @@ class Seed::HospitalEnrichService
 
   def create_stock_imports
     puts "Creating stock imports..."
+    import_categories = Category.where(company: @company, resource_name: "stock_imports").order(:id).to_a
     @branches.each do |branch|
       branch_products = @products.select { |p| p.branch_id == branch.id }
       next if branch_products.empty?
 
       branch_warehouse = @warehouses.find { |w| w.branch_id == branch.id }
-      branch_products.sample(rand(2..4)).each do |product|
+      branch_products.sample(rand(2..4)).each_with_index do |product, i|
         Seed::StockImportService.create(
           company: @company,
+          category: round_robin(import_categories, i),
           branch: branch,
           warehouse: branch_warehouse,
           product: product,
@@ -308,14 +317,16 @@ class Seed::HospitalEnrichService
 
   def create_stock_exports
     puts "Creating stock exports..."
+    export_categories = Category.where(company: @company, resource_name: "stock_exports").order(:id).to_a
     @branches.each do |branch|
       branch_products = @products.select { |p| p.branch_id == branch.id }
       next if branch_products.empty?
 
       branch_warehouse = @warehouses.find { |w| w.branch_id == branch.id }
-      branch_products.sample(rand(2..4)).each do |product|
+      branch_products.sample(rand(2..4)).each_with_index do |product, i|
         Seed::StockExportService.create(
           company: @company,
+          category: round_robin(export_categories, i),
           branch: branch,
           warehouse: branch_warehouse,
           product: product,
@@ -331,6 +342,7 @@ class Seed::HospitalEnrichService
 
   def create_appointments
     puts "Creating appointments..."
+    order_categories = Category.where(company: @company, resource_name: "orders").order(:id).to_a
     @branches.each do |branch|
       branch_patients = @patients.select { |p| p.branch_id == branch.id }
       next if branch_patients.empty?
@@ -339,6 +351,7 @@ class Seed::HospitalEnrichService
         patient = branch_patients.sample
         order = Seed::OrderService.create(
           company: @company, branch: branch, customer: patient,
+          category: round_robin(order_categories, i),
           name: "Appointment #{i + 1} for #{patient.name}"
         )
         attach_treatments_to_order(branch, order)
@@ -455,6 +468,29 @@ class Seed::HospitalEnrichService
         Rails.logger.warn("Resolution failed for #{emp.id} on #{date}: #{e.message}")
       end
     end
+  end
+
+  def create_invoices
+    puts "Creating invoices for appointments..."
+    invoice_categories = Category.where(company: @company, resource_name: "invoices").order(:id).to_a
+    @branches.each do |branch|
+      branch_orders = Order.where(company: @company, branch: branch)
+      next if branch_orders.empty?
+
+      branch_orders.sample(rand(3..5)).each_with_index do |order, i|
+        Seed::InvoiceService.create(order: order, category: round_robin(invoice_categories, i))
+      end
+    end
+    puts "  -> #{Invoice.where(company: @company).count} invoices created"
+  end
+
+  # Picks a seeded category deterministically so EVERY category of a resource
+  # gets records (including the first one, which every index page defaults to)
+  # — random_for() left sparse resources (warehouses, stock docs, invoices, …)
+  # with empty first categories depending on seed luck.
+  def round_robin(categories, index)
+    return nil if categories.blank?
+    categories[index % categories.length]
   end
 
   def seed_credit_data

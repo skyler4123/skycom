@@ -99,6 +99,22 @@ Use meaningful names wherever the domain is genuinely clear (`"Distribution Cent
 `"Skin Type Suitability"`, `"Supplier Purchase"`); the numbered form is only the
 fallback so seeded data stays honest about what the seeder actually knows.
 
+### Category assignment — round-robin, not random
+
+Enrich services assign record categories with **`categories[i % categories.length]`**
+(`round_robin` helper in `RetailEnrichService` / `HospitalEnrichService`), never
+`random_for` — sparse resources (warehouses, stock transfers/imports/exports,
+invoices, facilities, orders) would otherwise land in a random subset and leave the
+**first** category empty; every index page defaults to that first category
+(`docs/DYNAMIC_TABLE.md` §3), so a seed-lucky empty default shows "no records".
+Round-robin guarantees every category (including the first) gets data whenever the
+resource has at least as many records as categories. Dense resources
+(products/customers/employees/brands) keep `random_for` — with 20+ records they
+cover all categories in practice.
+
+Hospital enrich also creates pharmacy **invoices** (round-robin across the 3
+hospital invoice categories) alongside appointments.
+
 ## Key Benefits
 
 - **Production**: New companies are immediately usable with proper roles, categories, and permissions
