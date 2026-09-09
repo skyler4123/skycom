@@ -62,40 +62,28 @@ RSpec.describe Stock, type: :model do
     end
   end
 
-  describe "category must match product's category" do
+  describe "category taxonomy" do
     let(:company) { create(:company) }
     let(:product) { create(:product, company: company) }
-    let(:category) { product.category }
     let(:warehouse) { create(:warehouse, company: company) }
 
-    it "does not error when category matches product's category" do
+    it "accepts a category independent from the product's category" do
+      stocks_category = Category.create!(
+        company: company, name: "Inventory #{SecureRandom.uuid}", resource_name: "stocks"
+      )
       stock = Stock.new(
         company: company,
         product: product,
         warehouse: warehouse,
-        category: category,
+        category: stocks_category,
+        property_mapping: stocks_category.default_property_mapping,
         quantity: 10,
         pending: 0
       )
-      stock.valid?
-      expect(stock.errors[:category]).to be_blank
+      expect(stock).to be_valid
     end
 
-    it "errors when category differs from product's category" do
-      other_category = create(:category, name: "Other #{SecureRandom.uuid}", company: company)
-      stock = Stock.new(
-        company: company,
-        product: product,
-        warehouse: warehouse,
-        category: other_category,
-        quantity: 10,
-        pending: 0
-      )
-      stock.valid?
-      expect(stock.errors[:category]).to include("must match product's category")
-    end
-
-    it "auto-inherits category from product on create" do
+    it "defaults to a stocks resource category on create" do
       stock = Stock.new(
         company: company,
         product: product,
@@ -104,7 +92,23 @@ RSpec.describe Stock, type: :model do
         pending: 0
       )
       stock.validate
-      expect(stock.category_id).to eq(product.category_id)
+      expect(stock.category&.resource_name).to eq("stocks")
+    end
+
+    it "derives property_mapping from its own category" do
+      stocks_category = Category.create!(
+        company: company, name: "Raw #{SecureRandom.uuid}", resource_name: "stocks"
+      )
+      stock = Stock.new(
+        company: company,
+        product: product,
+        warehouse: warehouse,
+        category: stocks_category,
+        quantity: 10,
+        pending: 0
+      )
+      stock.validate
+      expect(stock.property_mapping_id).to eq(stocks_category.default_property_mapping.id)
     end
   end
 end

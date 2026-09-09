@@ -1,4 +1,13 @@
 class Stock < ApplicationRecord
+  # NOTE: must be declared before `include DynamicSearchConcern` — the meilisearch
+  # settings block runs at include time. See the hook docs in the concern.
+  def self.ms_extra_filterable_columns = %w[quantity pending] # rubocop:disable Layout/ClassStructure
+
+  include CategoryConcern
+  include PropertyMappingConcern
+  include DynamicSearchConcern
+  include TagConcern # rubocop:enable Layout/ClassStructure
+
   attribute :permission_resource_name, :string, default: -> { self.name }
   attribute :quantity, :integer, default: 0
   attribute :pending, :integer, default: 0
@@ -30,19 +39,8 @@ class Stock < ApplicationRecord
   belongs_to :category
   belongs_to :property_mapping
   # --- Validations ---
-  validate :category_must_match_product_category
   validates :quantity, :pending, presence: true, numericality: { only_integer: true }
   validates :warehouse_id, uniqueness: { scope: :product_id, message: "already holds a tracking SKU row mapping for this layout" }
-  # NOTE: before_validation callback is registered before PropertyMappingConcern
-  # to preserve callback order (inherit_category_from_product → ensure_property_mapping).
-  # Moving the include above would flip execution order and break stock creation
-  # without an explicit category. See docs/MODEL_STRUCTURE.md §3.
-  before_validation :inherit_category_from_product, on: :create
-
-  include PropertyMappingConcern # rubocop:disable Layout/ClassStructure
-  include DynamicSearchConcern
-  include TagConcern # rubocop:enable Layout/ClassStructure
-
 
   after_save :sync_available_counter, if: -> { saved_change_to_quantity? || saved_change_to_pending? }
 
@@ -76,19 +74,6 @@ class Stock < ApplicationRecord
   end
 
   private
-
-  def inherit_category_from_product
-    return if category.present?
-    self.category = product.category if product.present?
-  end
-
-  def category_must_match_product_category
-    return unless category.present? && product.present?
-
-    if category_id != product.category_id
-      errors.add(:category, "must match product's category")
-    end
-  end
 
   def sync_available_counter
     target = [ quantity - pending, 0 ].max

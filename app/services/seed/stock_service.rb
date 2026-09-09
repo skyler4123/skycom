@@ -45,8 +45,11 @@ class Seed::StockService
 
   def self.create(...)
     stock = new(...)
-    if stock.category.nil? && stock.product.present?
-      stock.category = stock.product.category
+    if stock.category.nil? && stock.company.present?
+      stock.category = Seed::CategoryService.random_for(
+        company: stock.company,
+        resource_name: Stock.model_name.plural
+      )
     end
     if stock.property_mapping.nil? && stock.category.present?
       stock.property_mapping = stock.category.default_property_mapping

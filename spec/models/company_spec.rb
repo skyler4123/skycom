@@ -229,4 +229,32 @@ RSpec.describe Company, type: :model do
       expect(appt.merchant_id).to be_nil
     end
   end
+
+  describe "initialize_company employee-category assignment (init runs BEFORE owner setup)" do
+    let(:company_user) { create(:user, :company_owner) }
+    let(:company) { Seed::CompanyService.new(user: company_user, country: :us, business_type: :retail).tap(&:save!) }
+
+    around do |example|
+      Company.skip_init = false
+      example.run
+    ensure
+      Company.skip_init = true
+    end
+
+    it "does not create a generic 'Employees' category alongside the seeded role categories" do
+      expect(company.categories.where(resource_name: "employees", name: "Employees")).to be_empty
+      expect(company.categories.where(resource_name: "employees").count).to eq(5)
+    end
+
+    it "assigns the owner employee to a seeded employees category with real properties" do
+      owner = company.employees.find_by(business_type: :owner)
+      expect([ "Management", "Sales Specialist", "Cashier", "Technical Support", "Marketing" ]).to include(owner.category.name)
+      expect(owner.category.default_property_mapping.properties).not_to be_empty
+    end
+
+    it "leaves the first employees category (index default) with a non-bare table config" do
+      first = company.categories.where(resource_name: "employees").order(:id).first
+      expect(first.default_table_config.columns.map { |c| c["key"] }).to include("name", "code", "workflow_status")
+    end
+  end
 end

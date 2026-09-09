@@ -142,8 +142,9 @@ RSpec.shared_examples "dynamic search query service" do
     it "ignores hostile or malformed values" do
       expect(service(filters: { "property_boolean_1" => %(1" OR 1=1 --) }).filter_string).not_to include("OR")
       expect(service(filters: { "property_boolean_1" => %(1" OR 1=1 --) }).active?).to be false
-      expect(service(filters: { "property_integer_1" => "abc:xyz" }).filter_string).not_to include("abc")
-      expect(service(filters: { "property_integer_1" => "abc:xyz" }).active?).to be false
+      # Sentinel values must be non-hex ("abc" could legally appear inside a UUID)
+      expect(service(filters: { "property_integer_1" => "zzz:qqq" }).filter_string).not_to include("zzz")
+      expect(service(filters: { "property_integer_1" => "zzz:qqq" }).active?).to be false
       expect(service(filters: { "property_datetime_1" => "20x4:2025" }).filter_string).not_to include("20x4")
       expect(service(filters: { "property_integer_1" => "nonsense" }).filter_string).not_to include("nonsense")
     end

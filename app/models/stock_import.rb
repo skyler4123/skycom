@@ -1,8 +1,12 @@
 class StockImport < ApplicationRecord
+  # NOTE: must be declared before `include DynamicSearchConcern` — the meilisearch
+  # settings block runs at include time. See the hook docs in the concern.
+  def self.ms_extra_filterable_columns = %w[quantity] # rubocop:disable Layout/ClassStructure
+
   include CategoryConcern
   include PropertyMappingConcern
   include DynamicSearchConcern
-  include TagConcern
+  include TagConcern # rubocop:enable Layout/ClassStructure
   attribute :permission_resource_name, :string, default: -> { self.name }
 
   enum :country, COUNTRY_CODES, prefix: true, default: :us

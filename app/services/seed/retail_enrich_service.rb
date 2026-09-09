@@ -210,6 +210,7 @@ class Seed::RetailEnrichService
   end
 
   def create_facilities_for_branches
+    facility_categories = Category.where(company: @retail, resource_name: "facilities").order(:id).to_a
     @branches.each do |branch|
       facility_count = rand(1..3)
       facility_count.times do |i|
@@ -217,6 +218,7 @@ class Seed::RetailEnrichService
         facility = Seed::FacilityService.create(
           company: @retail,
           branch: branch,
+          category: round_robin(facility_categories, @facility_counter - 1),
           name: "Facility #{@facility_counter}",
           description: "A facility location for #{branch.name}"
         )
@@ -318,6 +320,7 @@ class Seed::RetailEnrichService
   end
 
   def create_inventory
+    service_categories = Category.where(company: @retail, resource_name: "services").order(:id).to_a
     @branches.each do |branch|
       14.times do
         @product_counter += 1
@@ -335,6 +338,7 @@ class Seed::RetailEnrichService
         service = Seed::ServiceService.create(
           company: @retail,
           branch: branch,
+          category: round_robin(service_categories, @service_counter - 1),
           name: "Service #{@service_counter}",
           duration: [ 30, 45, 60, 90 ].sample
         )
@@ -344,10 +348,12 @@ class Seed::RetailEnrichService
   end
 
   def create_warehouses_for_branches
-    @branches.each do |branch|
+    warehouse_categories = Category.where(company: @retail, resource_name: "warehouses").order(:id).to_a
+    @branches.each_with_index do |branch, i|
       warehouse = Seed::WarehouseService.create(
         company: @retail,
         branch: branch,
+        category: round_robin(warehouse_categories, i),
         name: "#{branch.name} Warehouse",
         business_type: :distribution
       )
@@ -358,12 +364,14 @@ class Seed::RetailEnrichService
   end
 
   def create_stocks_for_products
+    stock_categories = Category.where(company: @retail, resource_name: "stocks").order(:id).to_a
     @warehouses.each do |warehouse|
       warehouse_products = @products.select { |p| p.branch_id == warehouse.branch_id }
-      warehouse_products.each do |product|
+      warehouse_products.each_with_index do |product, i|
         Seed::StockService.create(
           warehouse: warehouse,
           product_id: product.id,
+          category: round_robin(stock_categories, i),
           quantity: rand(50..200),
           pending: 0,
           name: product.name
@@ -373,14 +381,16 @@ class Seed::RetailEnrichService
   end
 
   def create_stock_transfers
+    transfer_categories = Category.where(company: @retail, resource_name: "stock_transfers").order(:id).to_a
     @warehouses.each do |warehouse|
       warehouse_products = @products.select { |p| p.branch_id == warehouse.branch_id }
-      warehouse_products.each do |product|
+      warehouse_products.each_with_index do |product, i|
         stock = Stock.find_by(name: product.name, warehouse: warehouse)
         next unless stock
 
         Seed::StockTransferService.create(
           company: @retail,
+          category: round_robin(transfer_categories, i),
           branch: warehouse.branch,
           warehouse: warehouse,
           product: product,
@@ -395,14 +405,16 @@ class Seed::RetailEnrichService
   end
 
   def create_stock_imports
+    import_categories = Category.where(company: @retail, resource_name: "stock_imports").order(:id).to_a
     @branches.each do |branch|
       branch_products = @products.select { |p| p.branch_id == branch.id }
       next if branch_products.empty?
 
       branch_warehouse = @warehouses.find { |w| w.branch_id == branch.id }
-      branch_products.sample(rand(2..4)).each do |product|
+      branch_products.sample(rand(2..4)).each_with_index do |product, i|
         Seed::StockImportService.create(
           company: @retail,
+          category: round_robin(import_categories, i),
           branch: branch,
           warehouse: branch_warehouse,
           product: product,
@@ -417,14 +429,16 @@ class Seed::RetailEnrichService
   end
 
   def create_stock_exports
+    export_categories = Category.where(company: @retail, resource_name: "stock_exports").order(:id).to_a
     @branches.each do |branch|
       branch_products = @products.select { |p| p.branch_id == branch.id }
       next if branch_products.empty?
 
       branch_warehouse = @warehouses.find { |w| w.branch_id == branch.id }
-      branch_products.sample(rand(2..4)).each do |product|
+      branch_products.sample(rand(2..4)).each_with_index do |product, i|
         Seed::StockExportService.create(
           company: @retail,
+          category: round_robin(export_categories, i),
           branch: branch,
           warehouse: branch_warehouse,
           product: product,
@@ -439,6 +453,7 @@ class Seed::RetailEnrichService
   end
 
   def create_customer_orders
+    order_categories = Category.where(company: @retail, resource_name: "orders").order(:id).to_a
     @branches.each do |branch|
       branch_customers = @customers.select { |c| c.branch_id == branch.id }
       next if branch_customers.empty?
@@ -446,7 +461,9 @@ class Seed::RetailEnrichService
       5.times do |i|
         customer = branch_customers.sample
         order = Seed::OrderService.create(
-          company: @retail, branch: branch, customer: customer, name: "Order #{i + 1} for #{customer.name}"
+          company: @retail, branch: branch, customer: customer,
+          category: round_robin(order_categories, i),
+          name: "Order #{i + 1} for #{customer.name}"
         )
         attach_items_to_order(branch, order)
       end
@@ -465,14 +482,24 @@ class Seed::RetailEnrichService
     end
   end
 
+  # Picks a seeded category deterministically so EVERY category of a resource
+  # gets records (including the first one, which every index page defaults to)
+  # — random_for() left sparse resources (warehouses, stock docs, invoices, …)
+  # with empty first categories depending on seed luck.
+  def round_robin(categories, index)
+    return nil if categories.blank?
+    categories[index % categories.length]
+  end
+
   def create_invoices
     puts "Creating invoices for orders..."
+    invoice_categories = Category.where(company: @retail, resource_name: "invoices").order(:id).to_a
     @branches.each do |branch|
       branch_orders = Order.where(company: @retail, branch: branch)
       next if branch_orders.empty?
 
-      branch_orders.sample(rand(3..5)).each do |order|
-        Seed::InvoiceService.create(order: order)
+      branch_orders.sample(rand(3..5)).each_with_index do |order, i|
+        Seed::InvoiceService.create(order: order, category: round_robin(invoice_categories, i))
       end
     end
     puts "  -> #{Invoice.where(company: @retail).count} invoices created"

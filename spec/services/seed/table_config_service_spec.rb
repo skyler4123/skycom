@@ -15,6 +15,13 @@ RSpec.describe Seed::TableConfigService do
       expect(col["filter"]).to eq("type" => "range", "active" => true, "buckets" => [ [ nil, 100 ], [ 100, nil ] ])
     end
 
+    it "enables an active range filter on numeric standard metric columns" do
+      %w[quantity pending].each do |key|
+        col = described_class.field_hash(key)
+        expect(col["filter"]).to eq("type" => "range", "active" => true, "buckets" => [ [ nil, 100 ], [ 100, nil ] ])
+      end
+    end
+
     it "enables an active range filter with decimal buckets on decimal columns" do
       col = described_class.field_hash("property_decimal_1")
       expect(col["filter"]).to eq("type" => "range", "active" => true, "buckets" => [ [ nil, 10.0 ], [ 10.0, nil ] ])

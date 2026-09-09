@@ -11,7 +11,7 @@ class Seed::TableConfigService
     case key.to_s
     when "name", "description", "code", /\Aproperty_string_/
       col["search"] = true
-    when /\Aproperty_integer_/
+    when "quantity", "pending", /\Aproperty_integer_/
       col["filter"] = { "type" => "range", "active" => true, "buckets" => [ [ nil, 100 ], [ 100, nil ] ] }
     when /\Aproperty_decimal_/
       col["filter"] = { "type" => "range", "active" => true, "buckets" => [ [ nil, 10.0 ], [ 10.0, nil ] ] }

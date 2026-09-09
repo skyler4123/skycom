@@ -25,13 +25,13 @@ class StockTransaction < ApplicationRecord
   private
 
   def recalibrate_stock_metrics
+    # Identity = warehouse + product (the stocks uniqueness scope). category_id/
+    # property_mapping_id must NOT be lookup keys: stocks live in their own category
+    # taxonomy, and a ledger row may carry a different document category.
     stock = Stock.find_or_initialize_by(
       company_id: company_id,
-      branch_id: branch_id,
       warehouse_id: warehouse_id,
-      product_id: product_id,
-      category_id: category_id,
-      property_mapping_id: property_mapping_id
+      product_id: product_id
     )
 
     if add?
