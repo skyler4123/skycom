@@ -35,6 +35,10 @@ default: &default
 
 development:
   <<: *default
+  attendance_check_in_simulator:
+    class: Attendance::CheckInSimulatorJob
+    queue: default
+    schedule: every second
 
 test:
   <<: *default
