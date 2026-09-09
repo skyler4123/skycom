@@ -212,7 +212,8 @@ Only Owner (via `owner_role?` bypass) and Admin/Manager roles have access. Other
 
 ## 8. Seeding
 
-Hospital enrich service creates:
+Hospital and retail enrich services create the same shift/attendance data
+(RetailEnrichService mirrors HospitalEnrichService):
 
 | Resource | Count | Details |
 |----------|-------|---------|
