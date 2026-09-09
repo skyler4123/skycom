@@ -292,6 +292,7 @@ Shift seeds include realistic edge cases:
 | `app/models/attendance_policy.rb` | Model |
 | `app/services/attendance/check_in_service.rb` | Service |
 | `app/services/attendance/check_out_service.rb` | Service |
+| `app/jobs/attendance/check_in_simulator_job.rb` | Dev-only simulator: 1 random employee/company/sec via CheckInService (`config/recurring.yml` development) |
 | `app/services/seed/shift_template_service.rb` | Seed service |
 | `app/controllers/companies/shift_templates_controller.rb` | Controller |
 | `app/controllers/companies/schedules_controller.rb` | Controller |
