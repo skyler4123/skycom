@@ -38,15 +38,42 @@ RSpec.describe Attendance::CheckInSimulatorJob do
       }.to change(AttendanceLog, :count).by(1)
     end
 
-    it "skips fail-safe when no employee has a scheduled shift today" do
+    it "ensures today's shift and checks in when no shift exists" do
       company = create(:company)
       branch = create(:branch, company: company)
       create(:employee, company: company, branch: branch)
       create(:attendance_policy, company: company, branch: branch)
+      expect(company.employees.kept.count).to be >= 1
 
       expect {
         described_class.perform_now
-      }.not_to change(AttendanceLog, :count)
+      }.to change(AttendanceLog, :count).by(1)
+
+      log = AttendanceLog.order(created_at: :desc).first
+      expect(log.log_type).to eq("check_in")
+      expect(log.logged_at.to_date).to eq(Date.current)
+      shift = ScheduledShift.find_by(employee: log.employee, work_date: Date.current)
+      expect(shift).to be_status_active
+    end
+
+    it "does not duplicate or touch an already-checked-in shift" do
+      company = create(:company)
+      branch = create(:branch, company: company)
+      employee = create(:employee, company: company, branch: branch)
+      create(:attendance_policy, company: company, branch: branch)
+      company.employees.kept.each do |emp|
+        create(:scheduled_shift, company: company, branch: branch, employee: emp)
+      end
+
+      described_class.perform_now
+      # Whoever was picked is now :active; a second run picks at random again —
+      # assert no duplicate shift rows are ever created for (employee, today).
+      described_class.perform_now
+
+      company.employees.kept.each do |emp|
+        expect(ScheduledShift.where(employee: emp, work_date: Date.current).count).to eq(1)
+      end
+      expect(employee.scheduled_shifts.where(work_date: Date.current).count).to eq(1)
     end
 
     it "skips when the picked employee has no branch and the company has none" do
