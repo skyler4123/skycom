@@ -42,11 +42,21 @@ class Seed::ApplicationService
     end
 
     # Global Data
-    # Identify the platform by a hardcoded CODE, not ID.
-    System.find_or_create_by!(code: "System") do |sa|
-      sa.name = "System"
-      sa.balance_cents = 0
-      sa.currency = :usd
+    # Geographic System records — identify each platform scope by a hardcoded CODE, not ID.
+    # Remove the legacy singleton seed ("System") — System#before_destroy blocks
+    # destroy, so delete_all bypasses the guard for this one-time cleanup.
+    System.where(code: "System").delete_all
+    [
+      { code: "system_global", name: "Global System", country: :global, currency: :usd },
+      { code: "system_us", name: "US System", country: :us, currency: :usd },
+      { code: "system_vn", name: "VN System", country: :vn, currency: :vnd }
+    ].each do |attrs|
+      System.find_or_create_by!(code: attrs[:code]) do |sa|
+        sa.name = attrs[:name]
+        sa.balance_cents = 0
+        sa.country = attrs[:country]
+        sa.currency = attrs[:currency]
+      end
     end
     Seed::PaymentMethodService.create # Ensure global payment methods are seeded first
     Seed::CompanyPaymentMethodService.create # Seed B2B billing payment methods
