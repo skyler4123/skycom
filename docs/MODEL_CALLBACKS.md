@@ -214,7 +214,8 @@ now matches a stock by `company_id + warehouse_id + product_id` only.
 
 | Callback | Line | Method | Description |
 |----------|------|--------|-------------|
-| `before_destroy :prevent_destruction` | 16 | `prevent_destruction` | Blocks deletion of the singleton System record. Adds error and `throw(:abort)`. The System record is permanent. |
+| `validate :prevent_identity_changes, on: :update` | 17 | `prevent_identity_changes` | Blocks changes to `code` and `name` on update. Geographic records (`system_global`, `system_us`, `system_vn`) keep permanent identity. |
+| `before_destroy :prevent_destruction` | 20 | `prevent_destruction` | Blocks deletion of System records. Adds error and `throw(:abort)`. System records are permanent. |
 
 ---
 

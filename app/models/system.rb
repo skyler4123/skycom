@@ -1,32 +1,31 @@
 # app/models/system.rb
 class System < ApplicationRecord
+  # Single-file country enum: adds a non-ISO `global` scope without leaking
+  # into the shared COUNTRY_CODES used by every other model.
+  SYSTEM_COUNTRY_CODES = { global: 0, us: 840, vn: 704 }.freeze
+
   attribute :permission_resource_name, :string, default: -> { self.name }
   attribute :name, :string, default: "System"
   attribute :balance_cents, :integer, default: 0
   attribute :active, :boolean, default: true
 
+  # --- Enums ---
+  enum :country, SYSTEM_COUNTRY_CODES, prefix: true
+  enum :currency, CURRENCIE_CODES, prefix: true
+
   # --- Associations ---
   # --- Validations ---
   validates :code, presence: true, uniqueness: true
 
-  # 1. CREATE Security: Only one System can ever exist
-  validate :ensure_singleton, on: :create
-
-  # 2. UPDATE Security: Critical identity fields cannot be changed
+  # 1. UPDATE Security: Critical identity fields cannot be changed
   validate :prevent_identity_changes, on: :update
 
-  # 3. DESTROY Security: The System record can never be deleted
+  # 2. DESTROY Security: The System record can never be deleted
   before_destroy :prevent_destruction
 
   private
 
   # --- Security Logic ---
-
-  def ensure_singleton
-    if System.exists?
-      errors.add(:base, "There can be only one System.")
-    end
-  end
 
   def prevent_identity_changes
     # If the user tries to change the code, block it.
