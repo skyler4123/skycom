@@ -5189,6 +5189,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_08_18_000108) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["business_type"], name: "index_systems_on_business_type"
+    t.index ["code"], name: "index_systems_on_code", unique: true
     t.index ["discarded_at"], name: "index_systems_on_discarded_at"
     t.index ["lifecycle_status"], name: "index_systems_on_lifecycle_status"
     t.index ["name"], name: "index_systems_on_name", unique: true

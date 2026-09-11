@@ -534,7 +534,7 @@ class Seed::RetailEnrichService
       next unless template
 
       date = Date.current + rand(0..7).days
-      ScheduledShift.create!(
+      Seed::ScheduledShiftService.upsert!(
         company: @retail, branch: employee.branch, employee: employee,
         shift_template: template, work_date: date,
         expected_start_at: date.to_time.change(hour: template.start_time.hour, min: template.start_time.min),
@@ -572,7 +572,7 @@ class Seed::RetailEnrichService
         expected_start = date.to_time.change(hour: template.start_time.hour, min: template.start_time.min)
         expected_end = date.to_time.change(hour: template.end_time.hour, min: template.end_time.min)
 
-        ScheduledShift.create!(
+        Seed::ScheduledShiftService.upsert!(
           company: @retail, branch: employee.branch, employee: employee,
           shift_template: template, work_date: date,
           expected_start_at: expected_start, expected_end_at: expected_end,

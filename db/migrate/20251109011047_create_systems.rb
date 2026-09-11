@@ -25,5 +25,6 @@ class CreateSystems < ActiveRecord::Migration[8.0]
     end
 
     add_index :systems, :name, unique: true
+    add_index :systems, :code, unique: true
   end
 end
