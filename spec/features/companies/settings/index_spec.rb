@@ -74,4 +74,48 @@ RSpec.feature "Companies::Settings Management", type: :feature, js: true do
     products_checkbox = page.find('input[type="checkbox"][data-key="products"]')
     expect(products_checkbox).not_to be_disabled
   end
+
+  scenario "group checkbox locks its items when unchecked" do
+    visit company_settings_path(company)
+
+    expect(page).to have_content("Sidebar Items", wait: 10)
+
+    inventory_group = page.find('input[type="checkbox"][data-group-key="inventory"]')
+    expect(inventory_group).to be_checked
+    inventory_group.click
+
+    stocks_checkbox = page.find('input[type="checkbox"][data-key="stocks"]')
+    expect(stocks_checkbox).to be_disabled
+
+    dashboard_checkbox = page.find('input[type="checkbox"][data-key="dashboard"]')
+    expect(dashboard_checkbox).not_to be_disabled
+  end
+
+  scenario "locks the system group so it cannot be hidden" do
+    visit company_settings_path(company)
+
+    expect(page).to have_content("Sidebar Items", wait: 10)
+
+    system_group = page.find('input[type="checkbox"][data-group-key="system"]')
+    expect(system_group).to be_checked
+    expect(system_group).to be_disabled
+  end
+
+  scenario "saves group visibility and hides the section from the sidebar" do
+    visit company_settings_path(company)
+
+    expect(page).to have_content("Sidebar Items", wait: 10)
+
+    inventory_group = page.find('input[type="checkbox"][data-group-key="inventory"]')
+    inventory_group.click
+
+    click_button "Save Changes"
+    expect(page).to have_current_path(company_settings_path(company), wait: 10)
+
+    within("aside nav") do
+      expect(page).to have_content("Dashboard", wait: 10)
+      expect(page).not_to have_content("Stocks")
+      expect(page).not_to have_content("Warehouses")
+    end
+  end
 end
