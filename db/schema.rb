@@ -5172,6 +5172,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_08_18_000108) do
   end
 
   create_table "systems", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
+    t.uuid "company_id"
     t.string "email"
     t.string "name", null: false
     t.string "code", null: false, comment: "System"
@@ -5190,6 +5191,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_08_18_000108) do
     t.datetime "updated_at", null: false
     t.index ["business_type"], name: "index_systems_on_business_type"
     t.index ["code"], name: "index_systems_on_code", unique: true
+    t.index ["company_id"], name: "index_systems_on_company_id"
     t.index ["discarded_at"], name: "index_systems_on_discarded_at"
     t.index ["lifecycle_status"], name: "index_systems_on_lifecycle_status"
     t.index ["name"], name: "index_systems_on_name", unique: true
@@ -6096,6 +6098,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_08_18_000108) do
   add_foreign_key "subscription_plan_appointments", "subscription_plans"
   add_foreign_key "subscription_plans", "branches"
   add_foreign_key "subscription_plans", "companies"
+  add_foreign_key "systems", "companies"
   add_foreign_key "table_configs", "categories"
   add_foreign_key "table_configs", "companies"
   add_foreign_key "table_configs", "property_mappings"
