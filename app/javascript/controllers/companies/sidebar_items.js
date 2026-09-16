@@ -56,7 +56,8 @@ export const SIDEBAR_ITEMS = [
   { key: "usage", group: "system", icon: "monitoring", label: "Usage", href: (cid) => Helpers.company_usage_path(cid) },
   { key: "top_up", group: "system", icon: "account_balance_wallet", label: "Top Up", href: (cid) => Helpers.new_company_top_up_path(cid) },
   { key: "billing", group: "system", icon: "receipt_long", label: "Billing", href: (cid) => Helpers.company_billing_path(cid) },
-  { key: "settings", group: "system", icon: "settings", label: "Settings", href: (cid) => Helpers.company_settings_path(cid) }
+  { key: "settings", group: "system", icon: "settings", label: "Settings", href: (cid) => Helpers.company_settings_path(cid) },
+  { key: "help_center", group: "system", icon: "help", label: "Help Center", comingSoon: true, href: null }
 ]
 
 // Locked groups (System) can never be hidden via company settings.

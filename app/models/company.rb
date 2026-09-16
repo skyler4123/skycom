@@ -30,7 +30,7 @@ class Company < ApplicationRecord
     attendance_days attendance_policies attendance_logs attendance_months
     warehouses stocks stock_transfers stock_imports stock_exports customers invoices
     policies pages payment_methods permissions analytics facilities
-    usage top_up billing settings
+    usage top_up billing settings help_center
   ].freeze
   # Sidebar group keys — array order is the sidebar render order (locked last).
   # Must stay in sync with `SIDEBAR_GROUPS` in

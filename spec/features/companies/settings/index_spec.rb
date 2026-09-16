@@ -65,7 +65,7 @@ RSpec.feature "Companies::Settings Management", type: :feature, js: true do
 
     expect(page).to have_content("Sidebar Items", wait: 10)
 
-    %w[usage top_up billing settings].each do |key|
+    %w[usage top_up billing settings help_center].each do |key|
       checkbox = page.find("input[type=\"checkbox\"][data-key=\"#{key}\"]")
       expect(checkbox).to be_checked
       expect(checkbox).to be_disabled
