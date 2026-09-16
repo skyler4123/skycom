@@ -42,6 +42,16 @@ RSpec.describe "Companies::SettingsController", type: :request do
       expect(setting.reload.sidebar_items).to eq([ { "key" => "products", "visible" => false } ])
     end
 
+    it "updates sidebar_groups with real booleans" do
+      patch "/companies/#{company.id}/settings/#{setting.id}",
+        params: { setting: { sidebar_groups: [ { key: "inventory", visible: false } ] } },
+        as: :json
+      expect(response).to have_http_status(:ok)
+      body = JSON.parse(response.body)
+      expect(body["setting"]["metadata"]["sidebar_groups"]).to eq([ { "key" => "inventory", "visible" => false } ])
+      expect(setting.reload.sidebar_groups).to eq([ { "key" => "inventory", "visible" => false } ])
+    end
+
     it "returns 404 for a setting in another company" do
       other_company = create(:company)
       other_setting = other_company.settings.first

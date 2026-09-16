@@ -32,6 +32,13 @@ class Company < ApplicationRecord
     policies pages payment_methods permissions analytics facilities
     usage top_up billing settings
   ].freeze
+  # Sidebar group keys — array order is the sidebar render order (locked last).
+  # Must stay in sync with `SIDEBAR_GROUPS` in
+  # app/javascript/controllers/companies/sidebar_items.js.
+  SIDEBAR_GROUP_KEYS = %w[
+    general catalog sales organization platform attendance inventory
+    authorization chat_help_desk email_marketing system
+  ].freeze
   class_attribute :skip_init, default: false
 
   attribute :permission_resource_name, :string, default: -> { self.name }
@@ -276,6 +283,7 @@ class Company < ApplicationRecord
       s.lifecycle_status = :active
       s.workflow_status = :confirmed
       s.business_type = :system
+      s.sidebar_groups = SIDEBAR_GROUP_KEYS.map { |key| { "key" => key, "visible" => true } }
       s.sidebar_items = SIDEBAR_ITEM_KEYS.map { |key| { "key" => key, "visible" => true } }
     end
   end

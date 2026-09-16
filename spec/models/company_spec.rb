@@ -153,6 +153,8 @@ RSpec.describe Company, type: :model do
       expect(setting.code).to eq("SETTINGS-DEFAULT")
       expect(setting.appoint_to).to eq(company)
       expect(setting.sidebar_items).to include({ "key" => "products", "visible" => true })
+      expect(setting.sidebar_groups).to include({ "key" => "general", "visible" => true })
+      expect(setting.sidebar_groups.map { |g| g["key"] }).to contain_exactly(*Company::SIDEBAR_GROUP_KEYS)
     end
 
     it "does not duplicate the default setting on re-init" do
