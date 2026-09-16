@@ -9,7 +9,10 @@ RSpec.feature "Sidebar grouping", type: :feature, js: true do
 
   before do
     sign_in(owner)
+    seed_client_cache!
+  end
 
+  def seed_client_cache!
     page.execute_script("localStorage.clear()")
 
     company_data = JSON.parse(company.to_json).merge(
@@ -34,32 +37,70 @@ RSpec.feature "Sidebar grouping", type: :feature, js: true do
     page.execute_script("document.cookie = 'client_cache_version=forced; path=/'")
   end
 
-  scenario "sidebar separates company items from system items" do
+  scenario "sidebar renders all groups with their items" do
     visit company_dashboards_path(company)
 
     within("aside", visible: :all) do
-      expect(page).to have_selector("p", text: /\Acompany\z/i, visible: :all, wait: 10)
-      expect(page).to have_selector("p", text: /\Asystem\z/i, visible: :all)
+      %w[general catalog sales organization platform attendance inventory authorization system].each do |group|
+        expect(page).to have_selector("p", text: /\A#{group}\z/i, visible: :all, wait: 10)
+      end
     end
 
-    within('[data-sidebar-group="company"]', visible: :all) do
+    within('[data-sidebar-group="general"]', visible: :all) do
       expect(page).to have_link("Dashboard", href: /dashboards/, visible: :all, wait: 10)
-      expect(page).to have_link("Facilities", href: /facilities/, visible: :all)
+      expect(page).to have_link("Analytics", href: /analytics/, visible: :all)
+      expect(page).to have_no_link("Products", visible: :all)
+    end
 
-      expect(page).to have_no_link("Billing", visible: :all)
-      expect(page).to have_no_link("Usage", visible: :all)
-      expect(page).to have_no_link("Top Up", visible: :all)
-      expect(page).to have_no_link("Settings", visible: :all)
+    within('[data-sidebar-group="inventory"]', visible: :all) do
+      expect(page).to have_link("Warehouses", href: /warehouses/, visible: :all, wait: 10)
+      expect(page).to have_link("Stocks", href: /stocks/, visible: :all)
+      expect(page).to have_no_link("Dashboard", visible: :all)
+    end
+
+    within('[data-sidebar-group="authorization"]', visible: :all) do
+      expect(page).to have_link("Policies", href: /policies/, visible: :all, wait: 10)
+      expect(page).to have_link("Permissions", href: /permissions/, visible: :all)
     end
 
     within('[data-sidebar-group="system"]', visible: :all) do
       expect(page).to have_link("Usage", href: /usage/, visible: :all, wait: 10)
       expect(page).to have_link("Top Up", href: /top_ups/, visible: :all)
       expect(page).to have_link("Billing", href: /billing/, visible: :all)
+      expect(page).to have_link("Settings", visible: :all)
+    end
+  end
 
-      settings_link = find_link("Settings", visible: :all)
-      expect(settings_link["aria-disabled"]).to be_nil
-      expect(settings_link[:href]).to end_with("/settings")
+  scenario "hides a whole group when its group visibility is off" do
+    company.settings.company_level.find_by(code: "SETTINGS-DEFAULT").update!(
+      sidebar_groups: Company::SIDEBAR_GROUP_KEYS.map { |key|
+        { "key" => key, "visible" => key != "inventory" }
+      }
+    )
+    seed_client_cache!
+
+    visit company_dashboards_path(company)
+
+    within("aside", visible: :all) do
+      expect(page).to have_selector('[data-sidebar-group="general"]', visible: :all, wait: 10)
+      expect(page).to have_no_selector('[data-sidebar-group="inventory"]', visible: :all)
+    end
+  end
+
+  scenario "does not render an empty group header when all its items are hidden" do
+    attendance_keys = %w[shift_templates scheduled_shifts attendance_days attendance_policies attendance_logs attendance_months]
+    company.settings.company_level.find_by(code: "SETTINGS-DEFAULT").update!(
+      sidebar_items: Company::SIDEBAR_ITEM_KEYS.map { |key|
+        { "key" => key, "visible" => !key.in?(attendance_keys) }
+      }
+    )
+    seed_client_cache!
+
+    visit company_dashboards_path(company)
+
+    within("aside", visible: :all) do
+      expect(page).to have_selector('[data-sidebar-group="general"]', visible: :all, wait: 10)
+      expect(page).to have_no_selector('[data-sidebar-group="attendance"]', visible: :all)
     end
   end
 end
