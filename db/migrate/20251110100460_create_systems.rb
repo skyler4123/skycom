@@ -1,6 +1,7 @@
 class CreateSystems < ActiveRecord::Migration[8.0]
   def change
     create_table :systems, id: :uuid, default: -> { "uuidv7()" } do |t|
+      t.references :company, null: true, foreign_key: true, type: :uuid
       t.string :email
 
       t.string :name, null: false

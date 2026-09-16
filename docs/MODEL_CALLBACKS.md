@@ -48,7 +48,7 @@ Callbacks defined directly in the model file (not inherited from a concern).
 | Callback | Line | Method | Description |
 |----------|------|--------|-------------|
 | `after_create :setup_owner_records` | 104 | `setup_owner_records` | Creates owner infrastructure: (1) Owner `Role` with `business_type: :owner`, (2) "Owner All Access" `Policy` with `resource: "all"` / `action: "all"`, (3) Owner `Employee` linked to the creating user, (4) Both `PolicyAppointment` and `RoleAppointment` with `business_type: :owner`, (5) Sets `user.system_role` to `company_owner` so `accessible_companies` returns the new company. |
-| `after_create :initialize_company` | 126 | `initialize_company` | Also creates the company's `CompanyWallet` (`credit_balance: 0`, `walletable: company`) — unconditional, like the owner records. The wallet is the chain's bottom node: `CompanyTransaction → CompanyInvoice → CompanyOrder → CompanyWallet`. Also seeds the default company-appointed `Setting` (`code: SETTINGS-DEFAULT`) via `create_default_setting` — unconditional, right after the wallet. |
+| `after_create :initialize_company` | 126 | `initialize_company` | Also creates the company's `CompanyWallet` (`credit_balance: 0`, `walletable: company`) — unconditional, like the owner records. The wallet is the chain's bottom node: `CompanyTransaction → CompanyInvoice → CompanyOrder → CompanyWallet`. Also seeds the default company-appointed `Setting` (`code: SETTINGS-DEFAULT`) via `create_default_setting` — unconditional, right after the wallet. When the company is marked `system_owned` (created by `System#ensure_company!`), business-type seeding and payment-method setup are skipped and the owner user's `system_role` is left untouched (owner records, wallet, and default setting still run). |
 
 ---
 
@@ -214,8 +214,11 @@ now matches a stock by `company_id + warehouse_id + product_id` only.
 
 | Callback | Line | Method | Description |
 |----------|------|--------|-------------|
+| `before_create :ensure_company!` | — | `ensure_company!` | Creates (or heals) the dedicated system company: finds-or-creates a `super_admin` user (`<code>@system.com`, random password) and a `Company` (`business_type: :system`, `Company#system_owned = true` → owner records only, no retail/hospital seeding, no owner-role demotion) inside the System's save transaction, then links `systems.company_id`. Idempotent — also used by `Seed::ApplicationService` to repair links after reseeding wipes. |
 | `validate :prevent_identity_changes, on: :update` | 17 | `prevent_identity_changes` | Blocks changes to `code` and `name` on update. Geographic records (`system_global`, `system_us`, `system_vn`) keep permanent identity. |
 | `before_destroy :prevent_destruction` | 20 | `prevent_destruction` | Blocks deletion of System records. Adds error and `throw(:abort)`. System records are permanent. |
+
+*Rationale for the system-company callback: see `docs/SYSTEM_COMPANY.md`.*
 
 ---
 
