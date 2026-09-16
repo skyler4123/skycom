@@ -12,7 +12,7 @@ on:
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
-  
+
 jobs:
   scan_ruby:
     runs-on: ubuntu-latest
@@ -91,7 +91,12 @@ jobs:
 
   rspec-test:
     runs-on: ubuntu-latest
-    # environment: development
+    strategy:
+      fail-fast: false
+      matrix:
+        # Bucket 0: Unit/Fast specs
+        # Buckets 1, 2, 3, 4: Feature specs split 4 ways
+        bucket: [0, 1, 2, 3, 4]
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -104,12 +109,19 @@ jobs:
         with:
           version: latest
 
-      # Run docker compose that shows onlt logs from the web service and fails on test failure
       - name: Run Docker Compose and fail on Rspec test failure
-        # env:
-        #   RAILS_MASTER_KEY: ${{ secrets.RAILS_MASTER_KEY }}
         run: |
-          RAILS_MASTER_KEY=${{ secrets.RAILS_MASTER_KEY }} docker compose -p skycom-rspec-test -f docker-compose.rspec-test.yml up --abort-on-container-exit --exit-code-from web --attach web
+          if [ "${{ matrix.bucket }}" -eq 0 ]; then
+            # Bucket 0 runs all unit and non-feature specs
+            RAILS_MASTER_KEY=${{ secrets.RAILS_MASTER_KEY }} docker compose -p skycom-rspec-test-0 -f docker-compose.rspec-test.yml run --name web_unit web bash -c "sleep 5 && rm -f tmp/pids/server.pid && bundle exec rails db:prepare && bundle exec rspec spec/models spec/requests spec/services spec/jobs spec/gems spec/system"
+          else
+            # Buckets 1, 2, 3, 4 split feature specs across 4 nodes
+            RAILS_MASTER_KEY=${{ secrets.RAILS_MASTER_KEY }} docker compose -p skycom-rspec-test-${{ matrix.bucket }} -f docker-compose.rspec-test.yml run --name web_feat_${{ matrix.bucket }} web bash -c "
+              sleep 5 && rm -f tmp/pids/server.pid && bundle exec rails db:prepare && 
+              FILES=\$(find spec/features -name '*_spec.rb' | sort | awk 'NR % 4 == (${{ matrix.bucket }} - 1)') && 
+              bundle exec rspec \$FILES
+            "
+          fi
 
       - name: Show running containers
         run: docker ps -a
@@ -117,4 +129,4 @@ jobs:
       # Optional: Tear down after test
       - name: Stop and remove containers
         if: always()
-        run: docker compose -p skycom-seed-test -f docker-compose.rspec-test.yml down
+        run: docker compose -p skycom-rspec-test-${{ matrix.bucket }} -f docker-compose.rspec-test.yml down

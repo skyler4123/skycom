@@ -28,6 +28,9 @@ class Companies::SettingsController < Companies::ApplicationController
   private
 
   def setting_params
-    params.require(:setting).permit(sidebar_items: [ :key, :visible ])
+    params.require(:setting).permit(
+      sidebar_items: [ :key, :visible ],
+      sidebar_groups: [ :key, :visible ]
+    )
   end
 end

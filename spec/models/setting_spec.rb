@@ -24,6 +24,17 @@ RSpec.describe Setting, type: :model do
       expect(setting.sidebar_items).to eq([ { "key" => "products", "visible" => true } ])
       expect(setting.metadata).to eq({ "sidebar_items" => [ { "key" => "products", "visible" => true } ] })
     end
+
+    it "exposes sidebar_groups from metadata" do
+      company = create(:company)
+      setting = described_class.new(
+        company: company,
+        appoint_to: company,
+        sidebar_groups: [ { "key" => "inventory", "visible" => false } ]
+      )
+      expect(setting.sidebar_groups).to eq([ { "key" => "inventory", "visible" => false } ])
+      expect(setting.metadata).to eq({ "sidebar_groups" => [ { "key" => "inventory", "visible" => false } ] })
+    end
   end
 
   describe "#derive_company_from_appoint_to" do
