@@ -65,6 +65,17 @@ export default class Companies_LayoutController extends Controller {
 
     const linkHTML = (item) => {
       const cid = currentCompany().id
+      if (item.comingSoon) {
+        return `
+          <span class="flex items-center gap-3 px-3 py-2 rounded-lg cursor-not-allowed"
+            ${tooltip({ html: translate("Coming soon"), position: "right" })}>
+            <span class="material-symbols-outlined">${item.icon}</span>
+            <p class="text-sm font-medium leading-normal flex items-center gap-1">${translate(item.label)}
+              <span class="material-symbols-outlined text-[14px] text-amber-500 dark:text-amber-400">error</span>
+            </p>
+          </span>
+        `
+      }
       return `
         <a
           class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:bg-blue-100 open:text-blue-600"

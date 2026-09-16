@@ -71,6 +71,10 @@ RSpec.feature "Sidebar grouping", type: :feature, js: true do
       expect(page).to have_link("Top Up", href: /top_ups/, visible: :all)
       expect(page).to have_link("Billing", href: /billing/, visible: :all)
       expect(page).to have_link("Settings", visible: :all)
+
+      expect(page).to have_selector("span", text: /Help Center/i, visible: :all, wait: 10)
+      expect(page).to have_no_link("Help Center", visible: :all)
+      expect(page).to have_selector('[data-controller="tooltip"]', visible: :all)
     end
   end
 

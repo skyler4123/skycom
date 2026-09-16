@@ -91,10 +91,13 @@ export default class Companies_Settings_Tabs_SidebarController extends Controlle
     const disabled = locked || this.groupDisabled(item.group)
     const checked = item.visible ? 'checked' : ''
     return `
-      <label class="flex items-center justify-between gap-3 px-4 py-3 rounded-lg border border-slate-200 dark:border-slate-700 ${disabled ? 'bg-slate-50 dark:bg-slate-800/50 cursor-not-allowed' : 'cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800/50'}">
+      <label class="flex items-center justify-between gap-3 px-4 py-3 rounded-lg border border-slate-200 dark:border-slate-700 ${disabled ? 'bg-slate-50 dark:bg-slate-800/50 cursor-not-allowed' : 'cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800/50'}"
+        ${item.comingSoon ? tooltip({ html: translate("Coming soon"), position: "right" }) : ""}>
         <span class="flex items-center gap-3 min-w-0">
           <span class="material-symbols-outlined text-slate-500 dark:text-slate-400 shrink-0">${item.icon}</span>
-          <span class="flex-1 text-sm font-medium text-slate-900 dark:text-white truncate">${translate(item.label)}</span>
+          <span class="flex-1 text-sm font-medium text-slate-900 dark:text-white truncate flex items-center gap-1">${translate(item.label)}
+            ${item.comingSoon ? `<span class="material-symbols-outlined text-[14px] text-amber-500 dark:text-amber-400 shrink-0">error</span>` : ''}
+          </span>
           ${locked ? `<span class="shrink-0 text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">${translate("System")}</span>` : ''}
         </span>
         <input type="checkbox" data-key="${item.key}" ${checked} ${disabled ? 'disabled' : ''} class="h-4 w-4 rounded border-slate-300 text-blue-600 shrink-0 ${disabled ? 'opacity-50' : 'cursor-pointer'}" />
