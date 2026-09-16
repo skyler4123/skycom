@@ -17,6 +17,8 @@ export const SIDEBAR_GROUPS = [
   { key: "attendance", label: "Attendance" },
   { key: "inventory", label: "Inventory" },
   { key: "authorization", label: "Authorization" },
+  { key: "chat_help_desk", label: "Chat & Help Desk", comingSoon: true },
+  { key: "email_marketing", label: "Email Marketing", comingSoon: true },
   { key: "system", label: "System", locked: true }
 ]
 

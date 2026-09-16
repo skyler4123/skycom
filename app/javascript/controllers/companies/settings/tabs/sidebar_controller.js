@@ -66,18 +66,22 @@ export default class Companies_Settings_Tabs_SidebarController extends Controlle
 
     return `
       <div class="mb-4 rounded-xl border border-slate-200 dark:border-slate-700" data-sidebar-section="${groupConfig.key}">
-        <label class="flex items-center justify-between gap-3 px-4 py-3 bg-slate-50 dark:bg-slate-800/50 border-b border-slate-200 dark:border-slate-700 rounded-t-xl ${locked ? 'cursor-not-allowed' : 'cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800'}">
-          <span class="flex items-center gap-3 min-w-0">
+        <label class="flex items-center justify-between gap-3 px-4 py-3 bg-slate-50 dark:bg-slate-800/50 border-b border-slate-200 dark:border-slate-700 rounded-t-xl ${locked ? 'cursor-not-allowed' : 'cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800'}"
+          ${groupConfig.comingSoon ? tooltip({ html: translate("Coming soon"), position: "right" }) : ""}>
+          <span class="flex items-center gap-1 min-w-0">
             <span class="flex-1 text-sm font-bold text-slate-900 dark:text-white truncate">${translate(groupConfig.label)}</span>
+            ${groupConfig.comingSoon ? `<span class="material-symbols-outlined text-[14px] text-amber-500 dark:text-amber-400 shrink-0">error</span>` : ''}
             ${locked ? `<span class="shrink-0 text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">${translate("System")}</span>` : ''}
           </span>
           <input type="checkbox" data-group-key="${groupConfig.key}" ${checked} ${locked ? 'disabled' : ''}
             data-action="change->${this.identifier}#toggleGroup"
             class="h-4 w-4 rounded border-slate-300 text-blue-600 shrink-0 ${locked ? 'opacity-50' : 'cursor-pointer'}" />
         </label>
-        <div class="p-3 grid grid-cols-1 md:grid-cols-2 gap-3" data-sidebar-items>
-          ${items.map(item => this.rowHTML(item)).join('')}
-        </div>
+        ${items.length > 0 ? `
+          <div class="p-3 grid grid-cols-1 md:grid-cols-2 gap-3" data-sidebar-items>
+            ${items.map(item => this.rowHTML(item)).join('')}
+          </div>
+        ` : ""}
       </div>
     `
   }

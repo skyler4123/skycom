@@ -101,6 +101,22 @@ RSpec.feature "Companies::Settings Management", type: :feature, js: true do
     expect(system_group).to be_disabled
   end
 
+  scenario "shows coming soon groups with a warning badge and a normal toggle" do
+    visit company_settings_path(company)
+
+    expect(page).to have_content("Sidebar Items", wait: 10)
+
+    chat_group = page.find('input[type="checkbox"][data-group-key="chat_help_desk"]')
+    expect(chat_group).to be_checked
+    expect(chat_group).not_to be_disabled
+
+    within('[data-sidebar-section="chat_help_desk"]') do
+      expect(page).to have_content("Chat & Help Desk")
+      expect(page).to have_selector(".material-symbols-outlined.text-amber-500")
+      expect(page).to have_no_selector('input[type="checkbox"][data-key]')
+    end
+  end
+
   scenario "saves group visibility and hides the section from the sidebar" do
     visit company_settings_path(company)
 

@@ -37,7 +37,7 @@ class Company < ApplicationRecord
   # app/javascript/controllers/companies/sidebar_items.js.
   SIDEBAR_GROUP_KEYS = %w[
     general catalog sales organization platform attendance inventory
-    authorization system
+    authorization chat_help_desk email_marketing system
   ].freeze
   class_attribute :skip_init, default: false
 

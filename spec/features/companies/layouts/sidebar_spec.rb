@@ -44,6 +44,9 @@ RSpec.feature "Sidebar grouping", type: :feature, js: true do
       %w[general catalog sales organization platform attendance inventory authorization system].each do |group|
         expect(page).to have_selector("p", text: /\A#{group}\z/i, visible: :all, wait: 10)
       end
+
+      expect(page).to have_selector("p", text: /Chat & Help Desk/i, visible: :all, wait: 10)
+      expect(page).to have_selector("p", text: /Email Marketing/i, visible: :all)
     end
 
     within('[data-sidebar-group="general"]', visible: :all) do
@@ -101,6 +104,39 @@ RSpec.feature "Sidebar grouping", type: :feature, js: true do
     within("aside", visible: :all) do
       expect(page).to have_selector('[data-sidebar-group="general"]', visible: :all, wait: 10)
       expect(page).to have_no_selector('[data-sidebar-group="attendance"]', visible: :all)
+    end
+  end
+
+  scenario "renders coming soon groups with a warning badge and tooltip" do
+    visit company_dashboards_path(company)
+
+    within('[data-sidebar-group="chat_help_desk"]', visible: :all) do
+      expect(page).to have_selector("p", text: /\AChat & Help Desk/i, visible: :all, wait: 10)
+      expect(page).to have_selector(".material-symbols-outlined.text-amber-500", visible: :all)
+      expect(page).to have_selector('[data-controller="tooltip"]', visible: :all)
+      expect(page).to have_no_selector("a", visible: :all)
+    end
+
+    within('[data-sidebar-group="email_marketing"]', visible: :all) do
+      expect(page).to have_selector("p", text: /\AEmail Marketing/i, visible: :all, wait: 10)
+      expect(page).to have_selector(".material-symbols-outlined.text-amber-500", visible: :all)
+      expect(page).to have_no_selector("a", visible: :all)
+    end
+  end
+
+  scenario "hides a coming soon group when its group visibility is off" do
+    company.settings.company_level.find_by(code: "SETTINGS-DEFAULT").update!(
+      sidebar_groups: Company::SIDEBAR_GROUP_KEYS.map { |key|
+        { "key" => key, "visible" => key != "email_marketing" }
+      }
+    )
+    seed_client_cache!
+
+    visit company_dashboards_path(company)
+
+    within("aside", visible: :all) do
+      expect(page).to have_selector('[data-sidebar-group="chat_help_desk"]', visible: :all, wait: 10)
+      expect(page).to have_no_selector('[data-sidebar-group="email_marketing"]', visible: :all)
     end
   end
 end

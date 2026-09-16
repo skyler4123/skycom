@@ -46,15 +46,19 @@ export default class Companies_LayoutController extends Controller {
     const { hiddenGroups, hiddenItems } = sidebarVisibility()
     const visible = SIDEBAR_ITEMS.filter(item => !hiddenItems.has(item.key))
 
-    const sectionHeading = (label) => `
-      <p class="px-3 pt-1 pb-2 text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">${label}</p>
+    const sectionHeading = (groupConfig) => `
+      <p class="px-3 pt-1 pb-2 text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 flex items-center gap-1"
+        ${groupConfig.comingSoon ? tooltip({ html: translate("Coming soon"), position: "right" }) : ""}>
+        ${translate(groupConfig.label)}
+        ${groupConfig.comingSoon ? `<span class="material-symbols-outlined text-[14px] text-amber-500 dark:text-amber-400">error</span>` : ""}
+      </p>
     `
 
     const divider = `<div class="my-3 border-t border-gray-200 dark:border-gray-700"></div>`
 
     const group = (groupConfig, items) => `
       <div class="flex flex-col gap-2" data-sidebar-group="${groupConfig.key}">
-        ${sectionHeading(translate(groupConfig.label))}
+        ${sectionHeading(groupConfig)}
         ${items.join("\n")}
       </div>
     `
@@ -74,7 +78,7 @@ export default class Companies_LayoutController extends Controller {
     }
 
     return SIDEBAR_GROUPS
-      .filter(g => !hiddenGroups.has(g.key) && visible.some(item => item.group === g.key))
+      .filter(g => !hiddenGroups.has(g.key) && (g.comingSoon || visible.some(item => item.group === g.key)))
       .map((groupConfig) => {
         const items = visible.filter(item => item.group === groupConfig.key).map(linkHTML)
         const prefix = groupConfig.key === "system" ? divider : ""
