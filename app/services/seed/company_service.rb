@@ -7,7 +7,7 @@ class Seed::CompanyService
     lifecycle_status: :active,
     workflow_status: Company.workflow_statuses.keys.sample,
     ownership_type: Company.ownership_types.keys.sample,
-    business_type: Company.business_types.keys.sample,
+    business_type: (Company.business_types.keys - %w[system]).sample,
     currency: Company.currencies.keys.sample,
     registration_number: Faker::Company.ein,
     vat_id: Faker::Code.npi,

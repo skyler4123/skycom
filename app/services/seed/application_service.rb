@@ -58,6 +58,10 @@ class Seed::ApplicationService
         sa.currency = attrs[:currency]
       end
     end
+    # Systems persist across reseeds while companies/users are wiped — heal
+    # dangling company_id links (idempotent; recreates the dedicated system
+    # user + company when missing).
+    System.find_each(&:ensure_company!)
     Seed::PaymentMethodService.create # Ensure global payment methods are seeded first
     Seed::CompanyPaymentMethodService.create # Seed B2B billing payment methods
     # User
