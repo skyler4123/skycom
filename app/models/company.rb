@@ -40,6 +40,10 @@ class Company < ApplicationRecord
     authorization chat_help_desk email_marketing system
   ].freeze
   class_attribute :skip_init, default: false
+  # Creation-time-only flag: System#ensure_company! marks its auto-created
+  # company so initialize_company runs owner records only (no business-type
+  # seeding, no owner-role demotion). Never persisted.
+  attr_accessor :system_owned
 
   attribute :permission_resource_name, :string, default: -> { self.name }
 
@@ -51,7 +55,8 @@ class Company < ApplicationRecord
     hospital: 2000,
     education: 3000,
     hotel: 4000,
-    fitness: 5000
+    fitness: 5000,
+    system: 9000
   }, prefix: true
   enum :lifecycle_status, {
     active: 0,
@@ -131,6 +136,9 @@ class Company < ApplicationRecord
   has_many :company_monthly_usages, dependent: :destroy
   has_many :company_usage_logs, dependent: :destroy
 
+  # --- Scopes ---
+  scope :system_companies, -> { where(id: System.select(:company_id)) }
+
   # --- Validations ---
   validates :name, presence: true, uniqueness: { scope: :user_id }, length: { maximum: 255 }
   validates :description, length: { maximum: 5000 }, allow_blank: true
@@ -155,6 +163,12 @@ class Company < ApplicationRecord
   # validates :fiscal_year_end_month, presence: true, numericality: { in: 1..12 }
 
   after_create :initialize_company
+
+  # True when a System record points at this company (systems.company_id FK).
+  # Derived from the FK — the single source of truth; no memoization.
+  def system_company?
+    System.where(company_id: id).exists?
+  end
 
   def resource_names
     (metadata || {})["resource_names"] || DEFAULT_RESOURCE_NAMES
@@ -198,7 +212,7 @@ class Company < ApplicationRecord
     # (Seed::EmployeeService → random_for). Running it later lets
     # CategoryConcern#ensure_category create a generic, property-less
     # "Employees" category that outranks the seeded role categories.
-    unless self.class.skip_init
+    unless self.class.skip_init || system_owned
       if business_type_retail?
         Seed::RetailInitService.call(company: self)
       elsif business_type_hospital?
@@ -248,7 +262,7 @@ class Company < ApplicationRecord
       business_type: :owner
     )
 
-    user.update!(system_role: :company_owner)
+    user.update!(system_role: :company_owner) unless system_owned
 
     create_company_wallet!(walletable: self, main_credit_balance: 0)
 

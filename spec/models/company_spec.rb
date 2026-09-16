@@ -259,4 +259,53 @@ RSpec.describe Company, type: :model do
       expect(first.default_table_config.columns.map { |c| c["key"] }).to include("name", "code", "workflow_status")
     end
   end
+
+  describe "system companies" do
+    let(:company_user) { create(:user, :company_owner) }
+
+    around do |example|
+      Company.skip_init = false
+      example.run
+    ensure
+      Company.skip_init = true
+    end
+
+    def build_company(user, **overrides)
+      Company.new({ user: user, name: "System Co #{SecureRandom.hex(4)}",
+        business_type: :retail, country: :us, currency: :usd }.merge(overrides))
+    end
+
+    it "is not a system company for normal companies" do
+      company = build_company(company_user).tap(&:save!)
+      expect(company.system_company?).to be(false)
+      expect(Company.system_companies).not_to include(company)
+    end
+
+    it "skips business-type init when system_owned" do
+      company = build_company(company_user).tap { |c| c.system_owned = true }.tap(&:save!)
+      expect(company.categories.where(resource_name: "products")).to be_empty
+      expect(company.employees.where(business_type: :owner)).to exist
+    end
+
+    it "seeds business-type init for normal companies (control)" do
+      company = build_company(company_user).tap(&:save!)
+      expect(company.categories.where(resource_name: "products")).not_to be_empty
+    end
+
+    it "does not demote the owner user's system_role when system_owned" do
+      company_user.update!(system_role: :super_admin)
+      build_company(company_user).tap { |c| c.system_owned = true }.tap(&:save!)
+      expect(company_user.reload.system_role).to eq("super_admin")
+    end
+
+    it "demotes the owner user to company_owner for normal companies (control)" do
+      company_user.update!(system_role: :super_admin)
+      build_company(company_user).tap(&:save!)
+      expect(company_user.reload.system_role).to eq("company_owner")
+    end
+
+    it "defines the system business type" do
+      expect(Company.new(business_type: :system)).to be_business_type_system
+    end
+  end
 end
