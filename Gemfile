@@ -103,6 +103,8 @@ gem "opentelemetry-instrumentation-logger"
 gem "lograge"
 
 gem "cent"
+# HTTP client for the Chatwoot Platform API (app/services/chatwoot/client.rb)
+gem "faraday"
 gem "mini_magick"
 gem "meilisearch-rails"
 # ----------------------------------------------------------------------------------------------------
