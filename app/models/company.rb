@@ -163,6 +163,7 @@ class Company < ApplicationRecord
   # validates :fiscal_year_end_month, presence: true, numericality: { in: 1..12 }
 
   after_create :initialize_company
+  after_create :setup_chatwoot_account
 
   # True when a System record points at this company (systems.company_id FK).
   # Derived from the FK — the single source of truth; no memoization.
@@ -300,6 +301,16 @@ class Company < ApplicationRecord
       s.sidebar_groups = SIDEBAR_GROUP_KEYS.map { |key| { "key" => key, "visible" => true } }
       s.sidebar_items = SIDEBAR_ITEM_KEYS.map { |key| { "key" => key, "visible" => true } }
     end
+  end
+
+  # Deliberately OUTSIDE the skip_init / system_owned guard in
+  # initialize_company — every company (normal + system) gets a Chatwoot
+  # account. Provisioning failures are logged, never fatal: a down Chatwoot
+  # must not block company creation. See docs/CHATWOOT.md.
+  def setup_chatwoot_account
+    Chatwoot::BaseService.create_account!(company: self)
+  rescue StandardError => e
+    Rails.logger.error("[Chatwoot] Account provisioning failed for company #{id}: #{e.message}")
   end
 
   private

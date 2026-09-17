@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_08_18_000108) do
+ActiveRecord::Schema[8.0].define(version: 2026_09_17_000001) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pgcrypto"
@@ -828,7 +828,9 @@ ActiveRecord::Schema[8.0].define(version: 2026_08_18_000108) do
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.bigint "chatwoot_account_id"
     t.index ["business_type"], name: "index_companies_on_business_type"
+    t.index ["chatwoot_account_id"], name: "index_companies_on_chatwoot_account_id", unique: true
     t.index ["discarded_at"], name: "index_companies_on_discarded_at"
     t.index ["lifecycle_status"], name: "index_companies_on_lifecycle_status"
     t.index ["user_id"], name: "index_companies_on_user_id"

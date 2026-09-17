@@ -308,4 +308,43 @@ RSpec.describe Company, type: :model do
       expect(Company.new(business_type: :system)).to be_business_type_system
     end
   end
+
+  describe "chatwoot account provisioning (after_create)" do
+    let(:company_user) { create(:user, :company_owner) }
+
+    def build_company(user, **overrides)
+      Company.new({ user: user, name: "Chatwoot Co #{SecureRandom.hex(4)}",
+        business_type: :retail, country: :us, currency: :usd }.merge(overrides))
+    end
+
+    before { allow(Chatwoot::BaseService).to receive(:create_account!) }
+
+    it "provisions a chatwoot account for a normal company" do
+      company = build_company(company_user).tap(&:save!)
+
+      expect(Chatwoot::BaseService).to have_received(:create_account!).with(company: company)
+    end
+
+    it "provisions for a system_owned company too" do
+      company = build_company(company_user).tap { |c| c.system_owned = true }.tap(&:save!)
+
+      expect(Chatwoot::BaseService).to have_received(:create_account!).with(company: company)
+    end
+
+    it "does not fail company creation when provisioning raises" do
+      allow(Chatwoot::BaseService).to receive(:create_account!).and_raise(StandardError, "chatwoot down")
+
+      expect { build_company(company_user).tap(&:save!) }.not_to raise_error
+      expect(Company.where("name LIKE ?", "Chatwoot Co %").count).to eq(1)
+    end
+
+    it "leaves the chatwoot account untouched when the company is destroyed" do
+      allow(Chatwoot::Client).to receive(:delete)
+      company = build_company(company_user).tap(&:save!)
+
+      company.destroy # hard destroy is restricted by dependent chains; Chatwoot must stay regardless
+
+      expect(Chatwoot::Client).not_to have_received(:delete)
+    end
+  end
 end

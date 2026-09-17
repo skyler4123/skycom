@@ -12,21 +12,7 @@ class Seed::ApplicationService
     #   3) Cover all models automatically (no manual table list to maintain)
     Rails.application.eager_load!
 
-    # delete_all below bypasses AR callbacks, so the gem's auto-remove-from-index
-    # never fires — stale docs from the previous seed survive. Drop every Meilisearch
-    # index outright, then recreate it empty: the gem's own recreation is a fire-and-
-    # forget task (no awaited primary key), which previously left indexes with a null
-    # primary key and made every document add fail. An empty recreated index is still
-    # "cleared for all"; the gem syncs settings (searchable/filterable) on next write.
-    meili_client = Meilisearch::Rails.client
-    ApplicationRecord.descendants.select { |m| m.respond_to?(:ms_index_uid) }.each do |model|
-      uid = model.ms_index_uid
-      meili_client.delete_index(uid).await
-      meili_client.create_index(uid, { primary_key: "id" }).await
-      model.instance_variable_set(:@ms_indexes, nil) # forget the dropped index so the gem rebuilds it fresh
-    rescue StandardError => e
-      Rails.logger.warn("[Seed] Meilisearch index delete failed for #{model}: #{e.message}")
-    end
+    clear_external_services!
 
     system_tables = %w[
       schema_migrations ar_internal_metadata
@@ -108,6 +94,40 @@ class Seed::ApplicationService
     # Clear cache to force sign in for current sign in account
     Rails.cache.clear
     true
+  end
+
+  # Single entry point for wiping every external service's data before the
+  # database wipe — "clear all db,service before seeding start".
+  def self.clear_external_services!
+    clear_meilisearch!
+    clear_chatwoot!
+  end
+
+  # delete_all below bypasses AR callbacks, so the gem's auto-remove-from-index
+  # never fires — stale docs from the previous seed survive. Drop every Meilisearch
+  # index outright, then recreate it empty: the gem's own recreation is a fire-and-
+  # forget task (no awaited primary key), which previously left indexes with a null
+  # primary key and made every document add fail. An empty recreated index is still
+  # "cleared for all"; the gem syncs settings (searchable/filterable) on next write.
+  def self.clear_meilisearch!
+    meili_client = Meilisearch::Rails.client
+    ApplicationRecord.descendants.select { |m| m.respond_to?(:ms_index_uid) }.each do |model|
+      uid = model.ms_index_uid
+      meili_client.delete_index(uid).await
+      meili_client.create_index(uid, { primary_key: "id" }).await
+      model.instance_variable_set(:@ms_indexes, nil) # forget the dropped index so the gem rebuilds it fresh
+    rescue StandardError => e
+      Rails.logger.warn("[Seed] Meilisearch index delete failed for #{model}: #{e.message}")
+    end
+  end
+
+  # Wipes every Chatwoot account created by previous seed runs (enumerate +
+  # DELETE — Chatwoot v3.12 has no list-accounts API). Never blocks seeding:
+  # failures are logged like the Meilisearch wipe. See docs/CHATWOOT.md.
+  def self.clear_chatwoot!
+    Chatwoot::BaseService.clear_all!
+  rescue StandardError => e
+    Rails.logger.warn("[Seed] Chatwoot clear failed: #{e.message}")
   end
 
   # Prints a cleanly formatted summary of record counts for all models.
