@@ -13,6 +13,7 @@ class Company < ApplicationRecord
     Product Order Customer Employee Branch Department
     PolicyAppointment Invoice Transaction Service Policy
     Category PropertyMapping TableConfig Brand Facility Warehouse
+    Supplier
     Table Reservation Room Guest
     Patient Appointment Course Student Exam
     Membership
@@ -28,7 +29,7 @@ class Company < ApplicationRecord
     dashboard branches departments categories property_mappings table_configs
     products brands services orders employees shift_templates scheduled_shifts
     attendance_days attendance_policies attendance_logs attendance_months
-    warehouses stocks stock_transfers stock_imports stock_exports customers invoices
+    warehouses stocks stock_transfers stock_imports stock_exports suppliers customers invoices
     policies pages payment_methods permissions analytics facilities
     usage top_up billing settings help_center
   ].freeze
@@ -111,6 +112,7 @@ class Company < ApplicationRecord
   has_many :stock_transfers, dependent: :destroy
   has_many :stock_imports, dependent: :destroy
   has_many :stock_exports, dependent: :destroy
+  has_many :suppliers, dependent: :destroy
   has_many :customers, dependent: :destroy
   has_many :customer_groups, dependent: :destroy
   has_many :orders, dependent: :destroy

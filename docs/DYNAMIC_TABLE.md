@@ -145,9 +145,9 @@ parses it back to a hash and merges the checkbox as `active` (checkbox always wi
 without the checkbox key backfill `active: true` — legacy-safe). Invalid JSON stays a string →
 model validation rejects the save → flash alert. API/JSON writes must include `active` explicitly.
 
-**Index page (all 15 dynamic-table pages — Products, Customers, Branches, Brands, Departments,
+**Index page (all 16 dynamic-table pages — Products, Customers, Branches, Brands, Departments,
 Employees, Facilities, Invoices, Orders, Services, Warehouses, Stocks, StockTransfers,
-StockImports, StockExports):** the search input (always the **first** control in the filter
+StockImports, StockExports, Suppliers):** the search input (always the **first** control in the filter
 row, before the Category select) + one `<select>` per filter column render inside
 the existing GET form via the shared helpers `dynamicSearchHTML` / `dynamicFiltersHTML` (`ui_helpers.js`).
 Option values encode buckets as `min:max` (`:100`, `100:500`, `500:`,
@@ -370,7 +370,7 @@ The engine is generic — `DynamicSearch::BaseQueryService` (BE) + `dynamicSearc
 `dynamicFiltersHTML` (FE, `ui_helpers.js`). All dynamic-table pages are wired
 (Products, Customers 2026-09-06; Branches, Brands, Departments, Employees, Facilities,
 Invoices, Orders, Services 2026-09-07; Warehouses 2026-09-08; Stocks, StockTransfers,
-StockImports, StockExports 2026-09-09); a new dynamic-table page adopts in 4 steps (~30 min incl. specs). Design context:
+StockImports, StockExports 2026-09-09; Suppliers 2026-09-17); a new dynamic-table page adopts in 4 steps (~30 min incl. specs). Design context:
 `docs/superpowers/specs/2026-09-06-dynamic-search-filter-design.md`.
 
 **Step 0 — TableConfig: nothing to do.** The editor is resource-agnostic; per category/PM/TableConfig

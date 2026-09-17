@@ -26,6 +26,12 @@ class Seed::RetailEnrichService
     "J.P. Morgan", "Goldman Sachs", "Morgan Stanley", "Netflix", "Spotify"
   ].freeze
 
+  RETAIL_ENRICH_SUPPLIERS = [
+    "Global Textiles Co", "Pacific Packaging", "Nordic Paper Supply", "Summit Metals",
+    "EverBloom Organics", "Vertex Plastics", "Harbor Freight & Supply", "CedarWood Industries",
+    "Blue Ridge Chemicals", "PrimeSource Distributors", "Atlas Machinery Co", "Golden Grain Mills"
+  ].freeze
+
   def initialize(user:, email: Faker::Internet.email, name: nil, company: nil,
                  country: nil, currency: nil, timezone: nil,
                  address_line_1: nil, city: nil, postal_code: nil)
@@ -63,6 +69,7 @@ class Seed::RetailEnrichService
 
     create_retail_company unless @retail
     create_brands
+    create_suppliers
     create_branches
     create_pages
     create_subscription_plans_for_company
@@ -122,6 +129,17 @@ class Seed::RetailEnrichService
   def create_brands
     RETAIL_ENRICH_POPULAR_BRANDS.each do |brand_name|
       Seed::BrandService.create(company: @retail, name: brand_name)
+    end
+  end
+
+  def create_suppliers
+    supplier_categories = Category.where(company: @retail, resource_name: "suppliers").order(:id).to_a
+    RETAIL_ENRICH_SUPPLIERS.each_with_index do |supplier_name, i|
+      Seed::SupplierService.create(
+        company: @retail,
+        name: supplier_name,
+        category: supplier_categories[i % supplier_categories.length]
+      )
     end
   end
 

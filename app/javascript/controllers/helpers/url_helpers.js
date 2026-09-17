@@ -90,6 +90,11 @@ export const create_company_brands_path = (companyId) => `/companies/${companyId
 export const company_brand_path = (companyId, brandId) => `/companies/${companyId}/brands/${brandId}`
 export const new_company_brand_path = (companyId) => `/companies/${companyId}/brands/new`
 export const edit_company_brand_path = (companyId, brandId) => `/companies/${companyId}/brands/${brandId}/edit`
+export const company_suppliers_path = (companyId) => `/companies/${companyId}/suppliers`
+export const create_company_suppliers_path = (companyId) => `/companies/${companyId}/suppliers`
+export const company_supplier_path = (companyId, supplierId) => `/companies/${companyId}/suppliers/${supplierId}`
+export const new_company_supplier_path = (companyId) => `/companies/${companyId}/suppliers/new`
+export const edit_company_supplier_path = (companyId, supplierId) => `/companies/${companyId}/suppliers/${supplierId}/edit`
 export const company_facilities_path = (companyId) => `/companies/${companyId}/facilities`
 export const create_company_facilities_path = (companyId) => `/companies/${companyId}/facilities`
 export const company_facility_path = (companyId, facilityId) => `/companies/${companyId}/facilities/${facilityId}`

@@ -42,6 +42,7 @@ During development seeding, `Seed::RetailEnrichService` adds sample business dat
 | Record | Count (per company) |
 |--------|-------------------|
 | Brands | 50 |
+| Suppliers | 12 (retail) / 8 (hospital enrich) |
 | Branches | 2 |
 | Pages | 4 (2 per branch) |
 | Departments | 4 |

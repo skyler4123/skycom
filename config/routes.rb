@@ -32,6 +32,7 @@ Rails.application.routes.draw do
       resources :categories
       resources :products
       resources :brands
+      resources :suppliers
       resources :services
       resources :orders do
         member do

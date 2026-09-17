@@ -287,7 +287,7 @@ Auto-assigns a default category on create if none is provided. Ensures every res
 |----------|------|--------|-------------|
 | `before_validation :ensure_category, on: :create` | 10 | `ensure_category` | If `category` is nil and `company` is present, finds or creates a default `Category` record using `find_or_create_by!(company:, resource_name:)` with the model's plural name. Uses the same `find_or_create_for` pattern as seed services. |
 
-**Included in (18 models):** `Branch`, `Brand`, `Customer`, `Department`, `Employee`, `EmployeeGroup`, `Facility`, `Invoice`, `Order`, `Product`, `PropertyMapping`, `Service`, `Stock`, `StockExport`, `StockImport`, `StockTransfer`, `TableConfig`, `Warehouse`
+**Included in (19 models):** `Branch`, `Brand`, `Customer`, `Department`, `Employee`, `EmployeeGroup`, `Facility`, `Invoice`, `Order`, `Product`, `PropertyMapping`, `Service`, `Stock`, `StockExport`, `StockImport`, `StockTransfer`, `Supplier`, `TableConfig`, `Warehouse`
 
 ---
 
@@ -299,7 +299,7 @@ Reads `validates` hashes from `property_mapping.property_metadata` and applies t
 |----------|------|--------|-------------|
 | `validate :dynamic_property_validations` | 12 | `dynamic_property_validations` | Iterates `property_mapping.property_metadata`, reads each entry's `validates` hash, and applies matching Rails validation logic to the corresponding `property_*` column. Empty `validates` (`{}`) is skipped. |
 
-**Included in (48 models):** All models including `PropertyMappingConcern` (products, services, branches, employees, customers, etc.)
+**Included in (49 models):** All models including `PropertyMappingConcern` (products, services, branches, employees, customers, etc.)
 
 ---
 
@@ -312,7 +312,7 @@ Includes `Meilisearch::Rails` and declares one `meilisearch` block for every inc
 | `after_commit :ms_perform_index_tasks` (via `Meilisearch::Rails`) | gem-internal | Indexes create/update in Meilisearch (async via `MeilisearchIndexJob` through the `enqueue:` proc). |
 | `after_commit(on: :destroy) :ms_enqueue_remove_from_index!` (via `Meilisearch::Rails`) | gem-internal | Removes the document from the Meilisearch index on destroy (async via `MeilisearchIndexJob`). |
 
-**Included in (46 models):** All models that include `PropertyMappingConcern` (products, services, branches, employees, customers, etc. — see the PropertyMappingConcern list, minus `PropertyMapping` itself).
+**Included in (47 models):** All models that include `PropertyMappingConcern` (products, services, branches, employees, customers, etc. — see the PropertyMappingConcern list, minus `PropertyMapping` itself).
 
 ---
 
@@ -325,7 +325,7 @@ Auto-assigns a default property_mapping on create if none is provided. Derives `
 | `before_validation :ensure_property_mapping, on: :create` | 10 | `ensure_property_mapping` | If `property_mapping` is nil and `category` is present, sets `self.property_mapping = category.default_property_mapping`. Ensures every resource record has a property_mapping for dynamic property resolution. |
 | `validate :category_matches_property_mapping_category` | 11 | `category_matches_property_mapping_category` | Ensures the resource's `category_id` matches the `property_mapping.category_id`. Prevents inconsistency on update or manual assignment. Returns early if either association is blank. |
 
-**Included in (47 models):** All models that include `CategoryConcern` (18 models) plus additional managed resources: `Answer`, `Article`, `ArticleGroup`, `Cart`, `CartGroup`, `CustomerGroup`, `Document`, `DocumentGroup`, `Event`, `EventGroup`, `Exam`, `ExamGroup`, `FacilityGroup`, `Membership`, `Notification`, `NotificationGroup`, `OrderGroup`, `Payment`, `ProductGroup`, `Project`, `ProjectGroup`, `Purchase`, `PurchaseItem`, `Question`, `Reservation`, `ServiceGroup`, `SettingGroup`, `Task`, `TaskGroup`
+**Included in (48 models):** All models that include `CategoryConcern` (19 models) plus additional managed resources: `Answer`, `Article`, `ArticleGroup`, `Cart`, `CartGroup`, `CustomerGroup`, `Document`, `DocumentGroup`, `Event`, `EventGroup`, `Exam`, `ExamGroup`, `FacilityGroup`, `Membership`, `Notification`, `NotificationGroup`, `OrderGroup`, `Payment`, `ProductGroup`, `Project`, `ProjectGroup`, `Purchase`, `PurchaseItem`, `Question`, `Reservation`, `ServiceGroup`, `SettingGroup`, `Task`, `TaskGroup`
 
 ---
 
@@ -354,7 +354,7 @@ Each concern defines the same callback:
 
 | Callback Type | Count | Models with Direct Declarations |
 |--------------|-------|---------------------------------|
-| `before_validation` | 5 | Address, User, (SetDefaultCompanyConcern → 34+ appointment models), (CategoryConcern → 18 models), (PropertyMappingConcern → 47 models) |
+| `before_validation` | 5 | Address, User, (SetDefaultCompanyConcern → 34+ appointment models), (CategoryConcern → 19 models), (PropertyMappingConcern → 48 models) |
 | `after_initialize` | 1 | Branch |
 | `before_create` | 1 | Session |
 | `after_create` | 6 | Category, Company, Branch, PolicyAppointment, PropertyMapping, RoleAppointment |
@@ -365,7 +365,7 @@ Each concern defines the same callback:
 | `before_discard` | 1 | Employee |
 | `after_touch` | 2* | Role (duplicate declaration on lines 30 and 87) |
 | `after_commit` | 2 | (Cache::RecordsConcern → 5 models) |
-| `validate` | 5 | PaymentMethodAppointment, PropertyMapping, (DynamicValidationConcern → 48 models), (PropertyMappingConcern → 48 models), (ImageAttachmentsConcern → 6 models + Product) |
+| `validate` | 5 | PaymentMethodAppointment, PropertyMapping, (DynamicValidationConcern → 49 models), (PropertyMappingConcern → 49 models), (ImageAttachmentsConcern → 6 models + Product) |
 
 **Total unique callback declarations: ~34 directly across 15 model files + 7 concern files propagating to ~63+ models.**
 
