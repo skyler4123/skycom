@@ -72,42 +72,40 @@ Company-scoped business entities. Each table belongs to a `company_id` and repre
 | 26 | `order_appointments` | Sales | Order line items |
 | 27 | `cart_groups` | Sales | Cart grouping |
 | 28 | `carts` | Sales | Shopping cart sessions |
-| 29 | `purchases` | Procurement | Purchase orders to suppliers |
-| 30 | `purchase_items` | Procurement | Purchase order line items |
-| 31 | `invoices` | Billing | Customer invoices |
-| 32 | `payments` | Billing | Payment transactions |
-| 33 | `payment_methods` | Billing | Accepted payment types |
-| 34 | `facility_groups` | Facilities | Facility grouping |
-| 35 | `facilities` | Facilities | Treatment rooms, machines, resources |
-| 36 | `project_groups` | Projects | Project grouping |
-| 37 | `projects` | Projects | Work projects |
-| 38 | `task_groups` | Tasks | Task grouping |
-| 39 | `tasks` | Tasks | Work tasks / appointments |
-| 40 | `notification_groups` | Notifications | Notification grouping |
-| 41 | `notifications` | Notifications | System/user notifications |
-| 42 | `exam_groups` | Education | Exam/test grouping |
-| 43 | `exams` | Education | Exam/test instances |
-| 44 | `questions` | Education | Exam questions |
-| 45 | `answers` | Education | Exam answers |
-| 46 | `event_groups` | Events | Event grouping |
-| 47 | `events` | Events | Calendar events / promotions |
-| 48 | `setting_groups` | Config | Configuration grouping |
-| 49 | `settings` | Config | Application/company settings |
-| 50 | `document_groups` | Content | Document grouping |
-| 51 | `documents` | Content | Business documents |
-| 52 | `article_groups` | Content | Article grouping |
-| 53 | `articles` | Content | Knowledge base / articles |
-| 54 | `subscription_plans` | Subscriptions | Service subscription plan definitions |
-| 55 | `subscription_groups` | Subscriptions | Subscription group instances |
-| 56 | `shifts` | HR | Work shift definitions |
-| 57 | `attendance_logs` | HR | Staff clock-in/out events |
-| 58 | `attendance_days` | HR | Daily attendance summaries |
-| 59 | `attendance_months` | HR | Monthly attendance rollups |
-| 60 | `memberships` | CRM | Customer loyalty/program memberships |
-| 61 | `reservations` | Bookings | Customer service bookings |
-| 62 | `suppliers` | Inventory | Supplier records (procurement-ready master data) |
+| 29 | `invoices` | Billing | Customer invoices |
+| 30 | `payments` | Billing | Payment transactions |
+| 31 | `payment_methods` | Billing | Accepted payment types |
+| 32 | `facility_groups` | Facilities | Facility grouping |
+| 33 | `facilities` | Facilities | Treatment rooms, machines, resources |
+| 34 | `project_groups` | Projects | Project grouping |
+| 35 | `projects` | Projects | Work projects |
+| 36 | `task_groups` | Tasks | Task grouping |
+| 37 | `tasks` | Tasks | Work tasks / appointments |
+| 38 | `notification_groups` | Notifications | Notification grouping |
+| 39 | `notifications` | Notifications | System/user notifications |
+| 40 | `exam_groups` | Education | Exam/test grouping |
+| 41 | `exams` | Education | Exam/test instances |
+| 42 | `questions` | Education | Exam questions |
+| 43 | `answers` | Education | Exam answers |
+| 44 | `event_groups` | Events | Event grouping |
+| 45 | `events` | Events | Calendar events / promotions |
+| 46 | `setting_groups` | Config | Configuration grouping |
+| 47 | `settings` | Config | Application/company settings |
+| 48 | `document_groups` | Content | Document grouping |
+| 49 | `documents` | Content | Business documents |
+| 50 | `article_groups` | Content | Article grouping |
+| 51 | `articles` | Content | Knowledge base / articles |
+| 52 | `subscription_plans` | Subscriptions | Service subscription plan definitions |
+| 53 | `subscription_groups` | Subscriptions | Subscription group instances |
+| 54 | `shifts` | HR | Work shift definitions |
+| 55 | `attendance_logs` | HR | Staff clock-in/out events |
+| 56 | `attendance_days` | HR | Daily attendance summaries |
+| 57 | `attendance_months` | HR | Monthly attendance rollups |
+| 58 | `memberships` | CRM | Customer loyalty/program memberships |
+| 59 | `reservations` | Bookings | Customer service bookings |
+| 60 | `suppliers` | Inventory | Supplier records (procurement-ready master data) |
 
-**Total: 62 tables**
+**Total: 60 tables**
 
 ---
 
@@ -165,9 +163,9 @@ Polymorphic join tables using the `appoint_to` / `appoint_from` / `appoint_for` 
 |----------|-------|
 | Gem Resources | 4 |
 | System Resources | 11 |
-| Managed Resources | 62 |
+| Managed Resources | 60 |
 | Appointment Resources | 39 |
-| **Grand Total** | **116** |
+| **Grand Total** | **114** |
 
 ---
 
