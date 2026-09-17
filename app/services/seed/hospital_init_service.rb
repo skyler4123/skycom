@@ -96,6 +96,20 @@ class Seed::HospitalInitService
       "Customer Return" => { properties: { property_string_1: "Return Reason", property_string_2: "Return Authorization" }, visible_columns: %w[name code product_name category_name from_name to_name quantity property_string_1 workflow_status] },
       "Transfer In" => { properties: { property_string_1: "Source Clinic", property_string_2: "Transfer Reference" }, visible_columns: %w[name code product_name category_name from_name to_name quantity property_string_1 workflow_status] }
     },
+    suppliers: {
+      "Pharmaceutical" => {
+        properties: { property_string_1: "Contact Person", property_integer_1: "Lead Time (days)" },
+        visible_columns: %w[name code property_string_1 property_integer_1 workflow_status]
+      },
+      "Medical Equipment" => {
+        properties: { property_integer_1: "Warranty (months)", property_boolean_1: "Preferred Supplier" },
+        visible_columns: %w[name code property_integer_1 workflow_status]
+      },
+      "Consumables" => {
+        properties: { property_decimal_1: "Minimum Order Value", property_boolean_1: "Preferred Supplier" },
+        visible_columns: %w[name code property_decimal_1 workflow_status]
+      }
+    },
     orders: {
       "In-Clinic Treatment" => { properties: { property_string_1: "Treating Dentist", property_string_2: "Chair Number" }, visible_columns: %w[name code workflow_status] },
       "Online Booking" => { properties: { property_string_1: "Booking Platform", property_string_2: "Insurance Pre-Auth" }, visible_columns: %w[name code workflow_status] },
@@ -269,6 +283,7 @@ class Seed::HospitalInitService
         "PropertyMapping" => { create: true, read: true, update: true, delete: true },
         "TableConfig" => { create: true, read: true, update: true, delete: true },
         "Stock" => { create: true, read: true, update: true, delete: true },
+        "Supplier" => { create: true, read: true, update: true, delete: true },
         "Warehouse" => { create: true, read: true, update: true, delete: true },
         "StockExport" => { create: true, read: true, update: true, delete: true },
         "StockImport" => { create: true, read: true, update: true, delete: true },
@@ -309,6 +324,7 @@ class Seed::HospitalInitService
         "PropertyMapping" => { create: true, read: true, update: true, delete: true },
         "TableConfig" => { create: true, read: true, update: true, delete: true },
         "Stock" => { create: true, read: true, update: true, delete: true },
+        "Supplier" => { create: true, read: true, update: true, delete: true },
         "Warehouse" => { create: true, read: true, update: true, delete: true },
         "StockExport" => { create: true, read: true, update: true, delete: true },
         "StockImport" => { create: true, read: true, update: true, delete: true },

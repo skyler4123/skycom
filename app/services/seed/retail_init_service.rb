@@ -252,6 +252,20 @@ class Seed::RetailInitService
         visible_columns: %w[name code property_string_1 workflow_status]
       }
     },
+    suppliers: {
+      "Materials" => {
+        properties: { property_string_1: "Contact Person", property_integer_1: "Lead Time (days)" },
+        visible_columns: %w[name code property_string_1 property_integer_1 workflow_status]
+      },
+      "Packaging" => {
+        properties: { property_decimal_1: "Minimum Order Value", property_boolean_1: "Preferred Supplier" },
+        visible_columns: %w[name code property_decimal_1 workflow_status]
+      },
+      "Equipment" => {
+        properties: { property_integer_1: "Warranty (months)", property_boolean_1: "Preferred Supplier" },
+        visible_columns: %w[name code property_integer_1 workflow_status]
+      }
+    },
     customers: {
       "Retail VIP" => {
         properties: { property_integer_1: "Loyalty Points", property_decimal_1: "Credit Limit", property_boolean_1: "Premium Member" },
@@ -547,6 +561,7 @@ class Seed::RetailInitService
         "Room" => { create: true, read: true, update: true, delete: true },
         "Service" => { create: true, read: true, update: true, delete: true },
         "Stock" => { create: true, read: true, update: true, delete: true },
+        "Supplier" => { create: true, read: true, update: true, delete: true },
         "Warehouse" => { create: true, read: true, update: true, delete: true },
         "StockExport" => { create: true, read: true, update: true, delete: true },
         "StockImport" => { create: true, read: true, update: true, delete: true },
@@ -587,6 +602,7 @@ class Seed::RetailInitService
         "Room" => { create: true, read: true, update: true, delete: true },
         "Service" => { create: true, read: true, update: true, delete: true },
         "Stock" => { create: true, read: true, update: true, delete: true },
+        "Supplier" => { create: true, read: true, update: true, delete: true },
         "Warehouse" => { create: true, read: true, update: true, delete: true },
         "StockExport" => { create: true, read: true, update: true, delete: true },
         "StockImport" => { create: true, read: true, update: true, delete: true },
@@ -598,13 +614,15 @@ class Seed::RetailInitService
         "Order" => { create: true, read: true, update: true, delete: false },
         "Product" => { create: false, read: true, update: false, delete: false },
         "Customer" => { create: true, read: true, update: false, delete: false },
-        "Brand" => { create: false, read: true, update: false, delete: false }
+        "Brand" => { create: false, read: true, update: false, delete: false },
+        "Supplier" => { create: false, read: true, update: false, delete: false }
       },
       Seller: {
         "Order" => { create: true, read: true, update: false, delete: false },
         "Product" => { create: false, read: true, update: false, delete: false },
         "Customer" => { create: false, read: true, update: false, delete: false },
-        "Brand" => { create: false, read: true, update: false, delete: false }
+        "Brand" => { create: false, read: true, update: false, delete: false },
+        "Supplier" => { create: false, read: true, update: false, delete: false }
       },
       Security: {
         "Product" => { create: false, read: true, update: false, delete: false },
@@ -614,6 +632,7 @@ class Seed::RetailInitService
         "Order" => { read: true, update: true },
         "Service" => { read: true },
         "Brand" => { create: false, read: true, update: false, delete: false },
+        "Supplier" => { create: false, read: true, update: false, delete: false },
         "Facility" => { create: true, read: true, update: true, delete: false }
       },
       Therapist: {
@@ -623,7 +642,8 @@ class Seed::RetailInitService
       Consultant: {
         "Customer" => { create: true, read: true, update: true },
         "Order" => { create: true, read: true },
-        "Brand" => { create: false, read: true, update: false, delete: false }
+        "Brand" => { create: false, read: true, update: false, delete: false },
+        "Supplier" => { create: false, read: true, update: false, delete: false }
       }
     }
 

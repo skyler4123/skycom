@@ -54,7 +54,7 @@ class ClientCacheController < ApplicationController
             category: {
               lifecycle_statuses: LIFECYCLE_STATUS.keys.map { |s| { name: s.to_s.humanize, value: s.to_s } },
               workflow_statuses: WORKFLOW_STATUS.keys.map { |s| { name: s.to_s.humanize, value: s.to_s } },
-              resource_names: [ "products", "employees", "branches", "departments", "brands", "customers", "services", "facilities" ]
+              resource_names: [ "products", "employees", "branches", "departments", "brands", "suppliers", "customers", "services", "facilities" ]
             },
             product: {
               lifecycle_statuses: Product.lifecycle_statuses.keys.map { |s| { name: s.humanize, value: s } },
@@ -105,6 +105,11 @@ class ClientCacheController < ApplicationController
               lifecycle_statuses: StockExport.lifecycle_statuses.keys.map { |s| { name: s.humanize, value: s } },
               workflow_statuses: StockExport.workflow_statuses.keys.map { |s| { name: s.humanize, value: s } },
               business_types: StockExport.business_types.keys.map { |t| { name: t.humanize, value: t } }
+            },
+            supplier: {
+              lifecycle_statuses: Supplier.lifecycle_statuses.keys.map { |s| { name: s.humanize, value: s } },
+              workflow_statuses: Supplier.workflow_statuses.keys.map { |s| { name: s.humanize, value: s } },
+              business_types: Supplier.business_types.keys.map { |t| { name: t.humanize, value: t } }
             }
           },
           employees: current_user.employees

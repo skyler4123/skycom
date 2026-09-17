@@ -119,6 +119,7 @@ DYNAMIC_SEARCH_MODELS = {
   StockExport => ->(company) { create_seed_record(Seed::StockExportService, company, "stock_exports", product: create(:product, company: company), warehouse: create(:warehouse, company: company)) },
   StockImport => ->(company) { create_seed_record(Seed::StockImportService, company, "stock_imports", product: create(:product, company: company), warehouse: create(:warehouse, company: company)) },
   StockTransfer => ->(company) { create_seed_record(Seed::StockTransferService, company, "stock_transfers", product: create(:product, company: company), warehouse: create(:warehouse, company: company)) },
+  Supplier => ->(company) { create(:supplier, company: company) },
   TableConfig => ->(company) {
     category = create(:category, company: company, resource_name: "products")
     create(:table_config, company: company, category: category, property_mapping: category.default_property_mapping)

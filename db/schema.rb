@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_08_18_000108) do
+ActiveRecord::Schema[8.0].define(version: 2026_09_17_195446) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pgcrypto"
@@ -828,7 +828,9 @@ ActiveRecord::Schema[8.0].define(version: 2026_08_18_000108) do
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.bigint "chatwoot_account_id"
     t.index ["business_type"], name: "index_companies_on_business_type"
+    t.index ["chatwoot_account_id"], name: "index_companies_on_chatwoot_account_id", unique: true
     t.index ["discarded_at"], name: "index_companies_on_discarded_at"
     t.index ["lifecycle_status"], name: "index_companies_on_lifecycle_status"
     t.index ["user_id"], name: "index_companies_on_user_id"
@@ -5171,6 +5173,97 @@ ActiveRecord::Schema[8.0].define(version: 2026_08_18_000108) do
     t.index ["workflow_status"], name: "index_subscription_plans_on_workflow_status"
   end
 
+  create_table "suppliers", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
+    t.uuid "company_id", null: false
+    t.uuid "category_id", null: false
+    t.uuid "property_mapping_id", null: false
+    t.string "email"
+    t.string "name"
+    t.text "description"
+    t.string "code"
+    t.string "phone_number"
+    t.integer "currency"
+    t.integer "country"
+    t.integer "timezone"
+    t.integer "lifecycle_status"
+    t.integer "workflow_status"
+    t.integer "business_type"
+    t.datetime "expiration_date"
+    t.jsonb "metadata"
+    t.datetime "discarded_at"
+    t.string "permission_resource_name"
+    t.string "property_string_1"
+    t.string "property_string_2"
+    t.string "property_string_3"
+    t.string "property_string_4"
+    t.string "property_string_5"
+    t.string "property_string_6"
+    t.string "property_string_7"
+    t.string "property_string_8"
+    t.string "property_string_9"
+    t.string "property_string_10"
+    t.integer "property_integer_1"
+    t.integer "property_integer_2"
+    t.integer "property_integer_3"
+    t.integer "property_integer_4"
+    t.integer "property_integer_5"
+    t.integer "property_integer_6"
+    t.integer "property_integer_7"
+    t.integer "property_integer_8"
+    t.integer "property_integer_9"
+    t.integer "property_integer_10"
+    t.integer "property_integer_11"
+    t.integer "property_integer_12"
+    t.integer "property_integer_13"
+    t.integer "property_integer_14"
+    t.integer "property_integer_15"
+    t.integer "property_integer_16"
+    t.integer "property_integer_17"
+    t.integer "property_integer_18"
+    t.integer "property_integer_19"
+    t.integer "property_integer_20"
+    t.decimal "property_decimal_1", precision: 15, scale: 4
+    t.decimal "property_decimal_2", precision: 15, scale: 4
+    t.decimal "property_decimal_3", precision: 15, scale: 4
+    t.decimal "property_decimal_4", precision: 15, scale: 4
+    t.decimal "property_decimal_5", precision: 15, scale: 4
+    t.decimal "property_decimal_6", precision: 15, scale: 4
+    t.decimal "property_decimal_7", precision: 15, scale: 4
+    t.decimal "property_decimal_8", precision: 15, scale: 4
+    t.decimal "property_decimal_9", precision: 15, scale: 4
+    t.decimal "property_decimal_10", precision: 15, scale: 4
+    t.boolean "property_boolean_1"
+    t.boolean "property_boolean_2"
+    t.boolean "property_boolean_3"
+    t.boolean "property_boolean_4"
+    t.boolean "property_boolean_5"
+    t.boolean "property_boolean_6"
+    t.boolean "property_boolean_7"
+    t.boolean "property_boolean_8"
+    t.boolean "property_boolean_9"
+    t.boolean "property_boolean_10"
+    t.datetime "property_datetime_1"
+    t.datetime "property_datetime_2"
+    t.datetime "property_datetime_3"
+    t.datetime "property_datetime_4"
+    t.datetime "property_datetime_5"
+    t.datetime "property_datetime_6"
+    t.datetime "property_datetime_7"
+    t.datetime "property_datetime_8"
+    t.datetime "property_datetime_9"
+    t.datetime "property_datetime_10"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["business_type"], name: "index_suppliers_on_business_type"
+    t.index ["category_id"], name: "index_suppliers_on_category_id"
+    t.index ["code"], name: "index_suppliers_on_code", unique: true
+    t.index ["company_id"], name: "index_suppliers_on_company_id"
+    t.index ["discarded_at"], name: "index_suppliers_on_discarded_at"
+    t.index ["lifecycle_status"], name: "index_suppliers_on_lifecycle_status"
+    t.index ["property_mapping_id"], name: "index_suppliers_on_property_mapping_id"
+    t.index ["workflow_status"], name: "index_suppliers_on_workflow_status"
+  end
+
   create_table "systems", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
     t.uuid "company_id"
     t.string "email"
@@ -6098,6 +6191,9 @@ ActiveRecord::Schema[8.0].define(version: 2026_08_18_000108) do
   add_foreign_key "subscription_plan_appointments", "subscription_plans"
   add_foreign_key "subscription_plans", "branches"
   add_foreign_key "subscription_plans", "companies"
+  add_foreign_key "suppliers", "categories"
+  add_foreign_key "suppliers", "companies"
+  add_foreign_key "suppliers", "property_mappings"
   add_foreign_key "systems", "companies"
   add_foreign_key "table_configs", "categories"
   add_foreign_key "table_configs", "companies"

@@ -105,8 +105,9 @@ Company-scoped business entities. Each table belongs to a `company_id` and repre
 | 59 | `attendance_months` | HR | Monthly attendance rollups |
 | 60 | `memberships` | CRM | Customer loyalty/program memberships |
 | 61 | `reservations` | Bookings | Customer service bookings |
+| 62 | `suppliers` | Inventory | Supplier records (procurement-ready master data) |
 
-**Total: 61 tables**
+**Total: 62 tables**
 
 ---
 
@@ -164,9 +165,9 @@ Polymorphic join tables using the `appoint_to` / `appoint_from` / `appoint_for` 
 |----------|-------|
 | Gem Resources | 4 |
 | System Resources | 11 |
-| Managed Resources | 61 |
+| Managed Resources | 62 |
 | Appointment Resources | 39 |
-| **Grand Total** | **115** |
+| **Grand Total** | **116** |
 
 ---
 

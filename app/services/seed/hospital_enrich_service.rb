@@ -11,6 +11,12 @@ class Seed::HospitalEnrichService
 
   HOSPITAL_ENRICH_CUSTOMER_COUNTS = { Patient: 50 }.freeze
 
+  HOSPITAL_ENRICH_SUPPLIERS = [
+    "MedSupply Co", "PharmaLink Distributors", "Surgical Instruments Ltd",
+    "CleanCare Consumables", "BioLab Reagents", "MediCore Equipment",
+    "VitalPharm Wholesale", "SterileTech Solutions"
+  ].freeze
+
   def initialize(user:, email: Faker::Internet.email, name: nil, company: nil,
                  country: :us, currency: :usd, timezone: :minus_5,
                  address_line_1: nil, city: nil, postal_code: nil)
@@ -44,6 +50,7 @@ class Seed::HospitalEnrichService
     print_header
 
     create_hospital_company unless @company
+    create_suppliers
     create_branches
     create_departments
     create_facilities
@@ -216,6 +223,17 @@ class Seed::HospitalEnrichService
         )
         @services << service
       end
+    end
+  end
+
+  def create_suppliers
+    supplier_categories = Category.where(company: @company, resource_name: "suppliers").order(:id).to_a
+    HOSPITAL_ENRICH_SUPPLIERS.each_with_index do |supplier_name, i|
+      Seed::SupplierService.create(
+        company: @company,
+        name: supplier_name,
+        category: supplier_categories[i % supplier_categories.length]
+      )
     end
   end
 

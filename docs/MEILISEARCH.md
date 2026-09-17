@@ -1,6 +1,6 @@
 # Skycom Meilisearch Integration
 
-> **Status**: Live (2026-08-29). Meilisearch powers backend search for every dynamic-property model. Live consumers since 2026-09-06/07/08: ALL dynamic-table index pages (Products, Customers, Branches, Brands, Departments, Employees, Facilities, Invoices, Orders, Services, Warehouses) run dynamic search/filter (`DynamicSearch::BaseQueryService` subclasses); Stocks, StockTransfers, StockImports, StockExports joined 2026-09-09 — per-page rollout recipe: `docs/DYNAMIC_TABLE.md` §8.
+> **Status**: Live (2026-08-29). Meilisearch powers backend search for every dynamic-property model. Live consumers since 2026-09-06/07/08: ALL dynamic-table index pages (Products, Customers, Branches, Brands, Departments, Employees, Facilities, Invoices, Orders, Services, Warehouses) run dynamic search/filter (`DynamicSearch::BaseQueryService` subclasses); Stocks, StockTransfers, StockImports, StockExports joined 2026-09-09, Suppliers joined 2026-09-17 — per-page rollout recipe: `docs/DYNAMIC_TABLE.md` §8.
 
 ---
 
@@ -34,7 +34,7 @@ One index per model **per environment** (index UID = `ClassName_<env>`, e.g. `Pr
 Product.ms_raw_search("face cream", filter: "company_id = #{company.id}")
 ```
 
-This keeps index count == model count (46) and avoids per-company index management.
+This keeps index count == model count (47) and avoids per-company index management.
 
 ---
 
@@ -215,7 +215,7 @@ Always pass `filter: "company_id = <id>"` — the indexes are shared across all 
 
 `DynamicSearch::BaseQueryService` (`app/services/dynamic_search/base_query_service.rb`) is the request-path
 consumer core; each wired page adds a 3-line subclass (`self.model`, `self.fallback_resource_name`) —
-Products / Customers / Branches / Brands / Departments / Employees / Facilities / Invoices / Orders / Services / Warehouses / Stocks / StockTransfers / StockImports / StockExports. Flow:
+Products / Customers / Branches / Brands / Departments / Employees / Facilities / Invoices / Orders / Services / Warehouses / Stocks / StockTransfers / StockImports / StockExports / Suppliers. Flow:
 
 1. Reads the active TableConfig for the requested category and **whitelists** `q` + `filters[key]` params against the columns' `search`/`filter` settings (`docs/DYNAMIC_TABLE.md` §2.5). Disabled filters (`active: false`) never match the whitelist.
 2. Builds the Meilisearch filter string (always `company_id`-scoped; `category_id`/`branch_id` scope clauses only when the model has the column; half-open numeric/year buckets `key >= a AND key < b`, `key = true/false` for booleans, PM option values for enum ints).
@@ -289,7 +289,7 @@ Key patterns:
 
 - **Explicit indexing** — transactional fixtures suppress `after_commit`, so specs call `record.ms_index!(true)` directly instead of relying on auto-sync.
 - **Index isolation** — `model_class.ms_clear_index!` in before/after hooks (Meilisearch lives outside the DB transaction).
-- **Per-model coverage** — a shared example iterates all 46 dynamic models with a factory builder lambda, asserting: search by a dynamic property term + company-scoped filter isolation, numeric range filter, update-reflects-after-reindex, destroy-removes-document.
+- **Per-model coverage** — a shared example iterates all 47 dynamic models with a factory builder lambda, asserting: search by a dynamic property term + company-scoped filter isolation, numeric range filter, update-reflects-after-reindex, destroy-removes-document.
 - **Jobs** — `MeilisearchIndexJob.perform_now` covers index via the enqueue path, destroyed-record removal, and unknown-model rejection.
 
 ```bash
@@ -332,7 +332,7 @@ To opt a model **out** of searchable: do not include the concern (or add `meilis
 | `app/models/concerns/user/search_concern.rb` | User search — static attributes (email/username/name/first_name/last_name/phone_number searchable; system_role/country/workflow_status/business_type filterable), async via `MeilisearchIndexJob` |
 | `config/initializers/meilisearch.rb` | Client configuration |
 | `docker-compose.yml` (:143) / `docker-compose.rspec-test.yml` (:77) | Meilisearch services |
-| `spec/models/concerns/dynamic_search_concern_spec.rb` | Connection + settings + 46-model search coverage |
+| `spec/models/concerns/dynamic_search_concern_spec.rb` | Connection + settings + 47-model search coverage |
 | `spec/support/shared_examples/dynamic_search.rb` | Shared per-model search examples |
 | `spec/jobs/meilisearch_index_job_spec.rb` | Job behaviors |
 | `app/services/products/search_query_service.rb` | Products subclass — TableConfig-driven search/filter query translation |
