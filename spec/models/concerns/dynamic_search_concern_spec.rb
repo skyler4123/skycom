@@ -105,11 +105,6 @@ DYNAMIC_SEARCH_MODELS = {
     create_searchable_record(Project, company, "projects", project_group: project_group)
   },
   ProjectGroup => ->(company) { create_searchable_record(ProjectGroup, company, "project_groups") },
-  Purchase => ->(company) { create_searchable_record(Purchase, company, "purchases") },
-  PurchaseItem => ->(company) {
-    purchase = create_searchable_record(Purchase, company, "purchases")
-    create_searchable_record(PurchaseItem, company, "purchase_items", purchase: purchase)
-  },
   Question => ->(company) { create_searchable_record(Question, company, "questions") },
   Reservation => ->(company) { create_searchable_record(Reservation, company, "reservations", code: "RES-#{SecureRandom.hex(4)}") },
   Service => ->(company) { create_searchable_record(Service, company, "services") },

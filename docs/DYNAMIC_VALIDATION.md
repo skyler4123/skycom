@@ -45,7 +45,7 @@ The validation rules take effect immediately on all records using that Property 
 
 ## 4. Which Models Are Affected
 
-All models that include `PropertyMappingConcern` (48 models: products, services, branches, employees, customers, etc.) automatically get dynamic validation via `DynamicValidationConcern`.
+All models that include `PropertyMappingConcern` (46 models: products, services, branches, employees, customers, etc.) automatically get dynamic validation via `DynamicValidationConcern`.
 
 ## 5. Seeded Defaults
 

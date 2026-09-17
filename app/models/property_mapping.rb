@@ -105,8 +105,6 @@ class PropertyMapping < ApplicationRecord
   has_many :product_groups, dependent: :restrict_with_error
   has_many :projects, dependent: :restrict_with_error
   has_many :project_groups, dependent: :restrict_with_error
-  has_many :purchases, dependent: :restrict_with_error
-  has_many :purchase_items, dependent: :restrict_with_error
   has_many :questions, dependent: :restrict_with_error
   has_many :reservations, dependent: :restrict_with_error
   has_many :services, dependent: :restrict_with_error
