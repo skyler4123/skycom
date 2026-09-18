@@ -87,6 +87,7 @@ class Seed::RetailEnrichService
     create_stock_exports
     create_customer_orders
     create_invoices
+    create_purchase_data
     create_shifts
     create_attendance_policies
     create_attendance_event_data
@@ -524,6 +525,66 @@ class Seed::RetailEnrichService
       end
     end
     puts "  -> #{Invoice.where(company: @retail).count} invoices created"
+  end
+
+  # Sample purchase requisitions across every workflow phase:
+  # 0 = completed end to end, 1 = rejected by manager, 2 = reworked then completed, 3 = left pending.
+  def create_purchase_data
+    puts "Creating purchases..."
+    purchase_categories = Category.where(company: @retail, resource_name: "purchases").order(:id).to_a
+    item_categories = Category.where(company: @retail, resource_name: "purchase_items").order(:id).to_a
+    workflow = @retail.workflows.default_for(:purchase_process).first
+    return if workflow.nil?
+
+    managers = @employees.select { |e| e.has_role?("Manager") }
+    requesters = @employees
+    suppliers = Supplier.where(company: @retail).to_a
+
+    items = 6.times.map do |i|
+      Seed::PurchaseItemService.create(company: @retail, category: round_robin(item_categories, i))
+    end
+
+    8.times do |i|
+      branch = @branches.sample
+      requester = requesters.sample
+      purchase = Seed::PurchaseService.create(
+        company: @retail, branch: branch, category: round_robin(purchase_categories, i),
+        supplier: suppliers.sample, needed_by: Time.zone.now + rand(3..30).days,
+        created_by_employee: requester,
+        name: "Purchase #{i + 1} for #{branch.name}"
+      )
+      items.sample(rand(1..3)).each do |item|
+        Seed::PurchaseItemAppointmentService.create(company: @retail, purchase: purchase, purchase_item: item)
+      end
+
+      run_purchase_workflow(purchase, requester, managers.sample, i)
+    end
+    puts "  -> #{Purchase.where(company: @retail).count} purchases created"
+  end
+
+  def run_purchase_workflow(purchase, requester, manager, index)
+    case index % 4
+    when 0
+      advance_purchase(purchase, manager, :approved)
+      advance_purchase(purchase, manager, :approved)
+      advance_purchase(purchase, requester, :approved)
+      advance_purchase(purchase, requester, :approved)
+    when 1
+      advance_purchase(purchase, manager, :rejected, note: "Not within budget")
+    when 2
+      step_one = purchase.workflow.workflow_steps.find_by(position: 1)
+      advance_purchase(purchase, manager, :rework, note: "Reduce quantities", target_step: step_one)
+      advance_purchase(purchase, manager, :approved)
+      advance_purchase(purchase, manager, :approved)
+      advance_purchase(purchase, requester, :approved)
+      advance_purchase(purchase, requester, :approved)
+    end
+  end
+
+  def advance_purchase(purchase, employee, outcome, note: nil, target_step: nil)
+    Workflows::AdvanceService.call(
+      subject: purchase, employee: employee, outcome: outcome, note: note, target_step: target_step
+    )
   end
 
   def create_shifts

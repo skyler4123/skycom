@@ -134,6 +134,25 @@ Mirrors the `CompanyTransaction` gating: the invoice's `payment_status` is deriv
 
 ---
 
+### Purchase (`app/models/purchase.rb`)
+
+| Callback | Line | Method | Description |
+|----------|------|--------|-------------|
+| `before_validation :bind_default_workflow, on: :create` | — | `bind_default_workflow` | On create, binds the company's default active `purchase_process` `Workflow` (sets `workflow` + `current_workflow_step` to the first step + `workflow_status: pending`). Skipped when `workflow` is already passed or the transient `skip_default_workflow` flag is set — in both no-bind cases the purchase stays `workflow_status: draft`. |
+| `after_create :record_submission_log` | — | `record_submission_log` | When a workflow was bound, writes the audit `WorkflowStepLog` (`outcome: :submitted`, actor from the transient `created_by_employee` accessor, `metadata.from_step_id` = first step). No log when unbound (draft) or the workflow has no steps. |
+
+> Both callbacks honor the transient `created_by_employee` / `skip_default_workflow` attr accessors — the log row is the permanent record; neither is persisted as a column.
+
+---
+
+### Workflow (`app/models/workflow.rb`)
+
+| Callback | Line | Method | Description |
+|----------|------|--------|-------------|
+| `before_destroy :release_purchase_pointers` | — | `release_purchase_pointers` | Clears `purchases.current_workflow_step_id` for purchases bound to this workflow **before** its steps are destroyed, so `workflow_steps`' `dependent: :destroy` cascade cannot violate the `purchases.current_workflow_step_id` FK. (`purchases.workflow_id` is handled by `dependent: :nullify`.) |
+
+---
+
 ### PaymentMethodAppointment (`app/models/payment_method_appointment.rb`)
 
 | Callback | Line | Method | Description |

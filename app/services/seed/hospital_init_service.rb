@@ -119,6 +119,34 @@ class Seed::HospitalInitService
       "Patient Invoice" => { properties: { property_string_1: "Patient Name", property_boolean_1: "Insurance Claim Filed" }, visible_columns: %w[name code workflow_status] },
       "Insurance Claim" => { properties: { property_string_1: "Insurance Company", property_string_2: "Claim Number" }, visible_columns: %w[name code workflow_status] },
       "Corporate Account" => { properties: { property_string_1: "Company Name", property_decimal_1: "Contract Rate Discount" }, visible_columns: %w[name code workflow_status] }
+    },
+    purchases: {
+      "Medical Supplies" => {
+        properties: { property_string_1: "Requesting Department", property_string_2: "Reason" },
+        visible_columns: %w[name code workflow_status needed_by]
+      },
+      "Pharmacy Procurement" => {
+        properties: { property_string_1: "Drug Category", property_decimal_1: "Budget Cap" },
+        visible_columns: %w[name code workflow_status needed_by]
+      },
+      "Clinic Equipment" => {
+        properties: { property_string_1: "Equipment Category", property_integer_1: "Approval Level" },
+        visible_columns: %w[name code workflow_status needed_by]
+      }
+    },
+    purchase_items: {
+      "Clinical Consumables" => {
+        properties: { property_string_1: "Brand Preference", property_integer_1: "Pack Size" },
+        visible_columns: %w[name code unit estimated_unit_price]
+      },
+      "Pharmacy Items" => {
+        properties: { property_string_1: "Dosage Form", property_boolean_1: "Requires Refrigeration" },
+        visible_columns: %w[name code unit estimated_unit_price]
+      },
+      "Clinic Equipment Items" => {
+        properties: { property_string_1: "Warranty (months)", property_decimal_1: "Unit Cost" },
+        visible_columns: %w[name code unit estimated_unit_price]
+      }
     }
   }.freeze
 
@@ -134,10 +162,33 @@ class Seed::HospitalInitService
     create_roles
     create_categories
     create_table_configs
+    create_default_workflows
     configure_hospital_permissions
   end
 
   private
+
+  # Default purchasing workflow bound to every new Purchase (Purchase#bind_default_workflow).
+  # Transitions are Jira-style (ABAC can?(:update, Purchase) — docs/PURCHASE_WORKFLOW.md);
+  # step names carry the semantics, no per-step role enforcement.
+  def create_default_workflows
+    workflow = Seed::WorkflowService.create(
+      company: @company,
+      name: "Standard Purchase Process",
+      description: "Default purchasing workflow: submit, manager approval, buy, complete.",
+      process_type: :purchase_process,
+      is_default: true
+    )
+
+    [
+      { name: "Submit", position: 1 },
+      { name: "Manager Approval", position: 2 },
+      { name: "Buy", position: 3 },
+      { name: "Complete", position: 4 }
+    ].each do |attrs|
+      Seed::WorkflowStepService.create(company: @company, workflow: workflow, **attrs)
+    end
+  end
 
   def create_roles
     HOSPITAL_INIT_ROLES.each do |role_name|
