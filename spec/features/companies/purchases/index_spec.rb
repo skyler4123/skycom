@@ -5,10 +5,12 @@ RSpec.feature "Companies::Purchases Management", type: :feature, js: true do
   let(:owner) { company.user }
 
   # rails_helper disables company init (Company.skip_init) — seed explicitly.
+  let!(:default_category) { Seed::CategoryService.find_or_create_for(company: company, resource_name: "purchases") }
+
   let!(:workflow) do
     Seed::WorkflowService.create(
-      company: company, name: "Standard Purchase Process",
-      process_type: :purchase_process, is_default: true
+      company: company, category: default_category,
+      name: "Office Supplies Purchase Process", process_type: :purchase_process
     ).tap do |workflow|
       [
         { name: "Submit", position: 1 },
@@ -19,8 +21,7 @@ RSpec.feature "Companies::Purchases Management", type: :feature, js: true do
     end
   end
 
-  let!(:default_category) { Seed::CategoryService.find_or_create_for(company: company, resource_name: "purchases") }
-  let!(:purchase) { create(:purchase, company: company, name: "Pens restock") }
+  let!(:purchase) { create(:purchase, company: company, category: default_category, name: "Pens restock") }
 
   let!(:default_table_config) do
     default_category.default_property_mapping.table_configs.destroy_all

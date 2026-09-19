@@ -3,11 +3,12 @@ require "rails_helper"
 RSpec.feature "Companies::Workflows Management", type: :feature, js: true do
   let(:company) { create(:company) }
   let(:owner) { company.user }
+  let!(:purchase_category) { Seed::CategoryService.find_or_create_for(company: company, resource_name: "purchases") }
 
   let!(:workflow) do
     Seed::WorkflowService.create(
-      company: company, name: "Standard Purchase Process",
-      process_type: :purchase_process, is_default: true
+      company: company, category: purchase_category,
+      name: "Standard Purchase Process", process_type: :purchase_process
     ).tap do |workflow|
       [
         { name: "Submit", position: 1 },
@@ -26,7 +27,7 @@ RSpec.feature "Companies::Workflows Management", type: :feature, js: true do
     company_data = JSON.parse(company.to_json).merge(
       "property_mappings" => [],
       "table_configs" => [],
-      "categories" => [],
+      "categories" => company.categories.reset.map { |c| JSON.parse(c.to_json) },
       "branches" => [],
       "departments" => [],
       "roles" => []
@@ -46,19 +47,19 @@ RSpec.feature "Companies::Workflows Management", type: :feature, js: true do
     expect(page).to have_selector('th', text: 'Name')
     expect(page).to have_selector('th', text: 'Code')
     expect(page).to have_selector('th', text: 'Process')
-    expect(page).to have_selector('th', text: 'Default')
+    expect(page).to have_selector('th', text: 'Category')
     expect(page).to have_selector('th', text: 'Steps')
 
     expect(page).to have_content('Standard Purchase Process')
     expect(page).to have_content('4')
   end
 
-  scenario "default workflow renders Yes badge" do
+  scenario "workflow renders its bound category" do
     visit company_workflows_path(company)
     expect(page).to have_selector('table', wait: 10)
 
     row = find('tr', text: 'Standard Purchase Process')
-    expect(row).to have_content('Yes')
+    expect(row).to have_content(purchase_category.name)
   end
 
   scenario "edit button links to edit page for workflow" do

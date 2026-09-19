@@ -3,6 +3,7 @@ require "rails_helper"
 RSpec.feature "Companies::Workflows New", type: :feature, js: true do
   let(:company) { create(:company) }
   let(:owner) { company.user }
+  let!(:purchase_category) { Seed::CategoryService.find_or_create_for(company: company, resource_name: "purchases") }
 
   before do
     sign_in(owner)
@@ -12,7 +13,7 @@ RSpec.feature "Companies::Workflows New", type: :feature, js: true do
     company_data = JSON.parse(company.to_json).merge(
       "property_mappings" => [],
       "table_configs" => [],
-      "categories" => [],
+      "categories" => company.categories.reset.map { |c| JSON.parse(c.to_json) },
       "branches" => [],
       "departments" => [],
       "roles" => []
@@ -29,7 +30,7 @@ RSpec.feature "Companies::Workflows New", type: :feature, js: true do
 
     expect(page).to have_selector('input[name="workflow[name]"]', wait: 10)
     expect(page).to have_selector('select[name="workflow[process_type]"]', wait: 10)
-    expect(page).to have_selector('input[name="workflow[is_default]"]', wait: 10)
+    expect(page).to have_selector('select[name="workflow[category_id]"]', wait: 10)
     expect(page).to have_selector('textarea[name="workflow[description]"]', wait: 10)
   end
 
@@ -46,11 +47,12 @@ RSpec.feature "Companies::Workflows New", type: :feature, js: true do
     expect(page).to have_selector('input[name="workflow[workflow_steps_attributes][1][name]"]', wait: 10)
   end
 
-  scenario "creates workflow with steps and redirects to show page" do
+  scenario "creates workflow with category and steps, redirects to show page" do
     visit new_company_workflow_path(company)
     expect(page).to have_selector('input[name="workflow[name]"]', wait: 10)
 
     fill_in 'workflow[name]', with: 'Expedited Purchase'
+    select purchase_category.name, from: 'workflow[category_id]'
     click_button "Add Step"
     fill_in 'workflow[workflow_steps_attributes][0][name]', with: 'Submit'
     click_button "Add Step"
@@ -64,6 +66,7 @@ RSpec.feature "Companies::Workflows New", type: :feature, js: true do
     expect(workflow_record).to be_present
     expect(page).to have_content('Expedited Purchase', wait: 10)
 
+    expect(workflow_record.category_id).to eq(purchase_category.id)
     expect(workflow_record.workflow_steps.order(:position).map(&:name)).to eq([ 'Submit', 'Approve' ])
   end
 end

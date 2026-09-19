@@ -5,7 +5,7 @@ class Purchase < ApplicationRecord
   include TagConcern
 
   # Transient creation context — the submission WorkflowStepLog is the permanent record.
-  attr_accessor :created_by_employee, :skip_default_workflow
+  attr_accessor :created_by_employee, :skip_workflow
 
   attribute :permission_resource_name, :string, default: -> { self.name }
 
@@ -22,8 +22,7 @@ class Purchase < ApplicationRecord
   belongs_to :company
   belongs_to :branch, optional: true
   belongs_to :supplier, optional: true
-  belongs_to :workflow, optional: true
-  belongs_to :current_workflow_step, class_name: "WorkflowStep", optional: true
+  belongs_to :workflow_step, class_name: "WorkflowStep", optional: true
   belongs_to :category
   belongs_to :property_mapping
 
@@ -41,7 +40,7 @@ class Purchase < ApplicationRecord
   validates :business_type, presence: true
 
   # --- Callbacks ---
-  before_validation :bind_default_workflow, on: :create
+  before_validation :bind_category_workflow, on: :create
   after_create :record_submission_log
 
   # --- Methods ---
@@ -51,33 +50,33 @@ class Purchase < ApplicationRecord
 
   private
 
-  def bind_default_workflow
-    return if workflow.present?
-    return unless company.present?
+  # Category is the bridge to the Workflow (docs/PURCHASE_WORKFLOW.md): every purchase
+  # in the same category follows that category's workflow. No category workflow → draft.
+  def bind_category_workflow
+    return if workflow_step.present?
+    return unless category.present?
 
-    default = skip_default_workflow ? nil : company.workflows.default_for(:purchase_process).first
-
-    if default.nil?
+    workflow = skip_workflow ? nil : category.default_workflow
+    if workflow.nil? || workflow.workflow_steps.none?
       self.workflow_status = :draft if workflow_status.blank?
       return
     end
 
-    self.workflow = default
-    self.current_workflow_step = default.workflow_steps.order(:position).first
+    self.workflow_step = workflow.workflow_steps.order(:position).first
     self.workflow_status = :pending if workflow_status.blank?
   end
 
   def record_submission_log
-    return if workflow.nil? || current_workflow_step.nil?
+    return if workflow_step.nil?
 
     WorkflowStepLog.create!(
       company: company,
-      workflow: workflow,
-      workflow_step: current_workflow_step,
+      workflow: workflow_step.workflow,
+      workflow_step: workflow_step,
       subject: self,
       employee: created_by_employee,
       outcome: :submitted,
-      metadata: { "from_step_id" => current_workflow_step.id }
+      metadata: { "from_step_id" => workflow_step.id }
     )
   end
 end

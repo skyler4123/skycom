@@ -43,7 +43,28 @@ purchases into `StockImport`s; that is explicitly out of scope.
 The generic engine rule for any future process (e.g. Attendance `leave_process`): *transitioning a
 subject's workflow requires update permission on that subject*.
 
-## 3. Data Model
+## 3. Category Is the Bridge (binding source of truth)
+
+Subjects **never link to a Workflow directly**. The **Category** is the bridge and the single source
+of truth for workflow binding — mirroring how Category already owns the dynamic schema
+(`docs/CATEGORY_DYNAMIC_SCHEMA.md`):
+
+```
+Category ──► PropertyMapping   (what property_* slots mean)
+Category ──► TableConfig       (which columns are visible)
+Category ──► Workflow          (which process the records follow)   ← the new bridge
+```
+
+| Rule | Detail |
+|------|--------|
+| **One workflow per category** | Enforced by a **unique index on `workflows.category_id`** — DB-level, same category ⇒ same workflow, always |
+| **Resolution** | `Category#default_workflow` (first workflow of the category) — mirrors `default_property_mapping` / `default_table_config` |
+| **Purchase carries only the pointer** | `purchases.workflow_step_id` is the subject's current-step pointer — there is **no** `purchases.workflow_id`; the workflow is always derived via the category |
+| **No default flag** | `workflows.is_default` was removed — the category *is* the selector; different categories may follow different processes (e.g. "Office Supplies" → 4-step standard flow) |
+| **Draft fallback** | A purchase whose category has no workflow (or whose workflow has no steps) stays `draft` |
+| **Company consistency** | `Workflow` validates its category belongs to the same company |
+
+## 4. Data Model
 
 All six tables are company-scoped, UUIDv7, and carry the standard System Fields block
 (`docs/ARCHITECTURE_GUIDES.md`).
@@ -60,9 +81,11 @@ All six tables are company-scoped, UUIDv7, and carry the standard System Fields 
 ### Relationships
 
 ```
+Category 1─1 Workflow (unique index on workflows.category_id — the bridge)
 Workflow 1─* WorkflowStep (ordered by position)
 Workflow 1─* WorkflowStepLog
-Purchase ─── workflow_id / current_workflow_step_id ──► Workflow
+Purchase ──► category ──► Workflow   (derived — no direct Purchase↔Workflow FK)
+Purchase ─── workflow_step_id ──► WorkflowStep   (the subject's current-step pointer)
 Purchase 1─* WorkflowStepLog   (polymorphic subject)
 PurchaseItem 1─* PurchaseItemAppointment (anchor — SetDefaultCompanyConcern derives company)
 Purchase 1─* PurchaseItemAppointment      (as: :appoint_to)
@@ -73,14 +96,14 @@ Purchase ──► supplier (optional), branch (optional)
 
 | Model | Key columns |
 |-------|------------|
-| `Purchase` | Order clone **minus** `customer_id`/`email`/`phone_number`; **plus** `supplier_id`, `needed_by`, `workflow_id`, `current_workflow_step_id`; 60 `property_*` slots; `business_type: { office_supply: 0, equipment: 1, service: 2 }` |
+| `Purchase` | Order clone **minus** `customer_id`/`email`/`phone_number`; **plus** `supplier_id`, `needed_by`, `workflow_step_id` (current-step pointer only — no workflow_id); 60 `property_*` slots; `business_type: { office_supply: 0, equipment: 1, service: 2 }` |
 | `PurchaseItem` | `name`, `description`, `code`, `unit` ("piece"/"box"), `estimated_unit_price` (**reference only**), 60 `property_*` slots |
 | `PurchaseItemAppointment` | `purchase_item_id` + polymorphic `appoint_to` (→ Purchase) + `quantity` / `unit_price` / `total_price` |
-| `Workflow` | `name`, `is_default` (one default per `(company, process_type)`), `process_type: { purchase_process: 0, leave_process: 1 }` |
+| `Workflow` | `category_id` (**unique — one workflow per category**), `name`, `process_type: { purchase_process: 0, leave_process: 1 }` — no `is_default` column |
 | `WorkflowStep` | `name`, `position` (unique per workflow) — **no permission columns** |
 | `WorkflowStepLog` | `subject` (polymorphic), `employee_id` (actor), `outcome: { submitted: 0, approved: 1, rejected: 2, rework: 3 }`, `note`, `metadata` (`from_step_id`, `target_step_id`) |
 
-## 4. State Machine — `Workflows::AdvanceService`
+## 5. State Machine — `Workflows::AdvanceService`
 
 The **single write path** for workflow state. One transaction: authorize → write log → move pointer → sync status.
 
@@ -103,20 +126,21 @@ Guards in order: workflow bound → employee present → valid outcome → not c
 
 | Event | Purchase.workflow_status |
 |-------|--------------------------|
-| Created with bound workflow | `pending` |
-| Created with no default workflow (or `skip_default_workflow`) | `draft` |
+| Created with category workflow bound | `pending` |
+| Created with no category workflow (or `skip_workflow`) | `draft` |
 | Any non-final step approved | `confirmed` |
 | Final step approved | `completed` |
 | Any step rejected | `cancelled` |
 
 ### Purchase callbacks (the only new model callbacks — see `docs/MODEL_CALLBACKS.md`)
 
-- `before_validation :bind_default_workflow, on: :create` — binds the company's default active
-  `purchase_process` workflow (first step + `pending`); skipped when a workflow is passed or the
-  transient `skip_default_workflow` flag is set → stays `draft`.
+- `before_validation :bind_category_workflow, on: :create` — binds the **category's** default
+  `purchase_process` workflow (first step + `pending`); skipped when the transient `skip_workflow`
+  flag is set or the category has no workflow (or its workflow has no steps) → stays `draft`.
 - `after_create :record_submission_log` — writes `WorkflowStepLog(outcome: :submitted)` when bound;
   actor comes from the transient `created_by_employee` accessor (the log row is the permanent record).
-- `Workflow#before_destroy :release_purchase_pointers` — FK safety for the step pointer.
+- `Workflow#before_destroy :release_subject_pointers` (**prepend: true** — must run before the
+  `workflow_steps dependent: :destroy` hook) — FK safety for the step pointer.
 
 ### The pen example, end to end
 
@@ -133,7 +157,7 @@ OR approve → rework to "Submit"                           status: pending (rew
 
 `total_price` is always computed live from appointments — `Purchase#total_price` = `purchase_item_appointments.sum(:total_price)`.
 
-## 5. Seeding
+## 6. Seeding
 
 **Init (production — every new retail/hospital company):**
 - Categories: `purchases` ("Office Supplies", "Equipment", "Procurement Services") and
@@ -142,49 +166,55 @@ OR approve → rework to "Submit"                           status: pending (rew
 - `Company::DEFAULT_RESOURCE_NAMES` includes `Purchase` + `PurchaseItem` → auto CRUD policies
   (~8) via `create_all_crud_policies` — this is how `can?(:update, Purchase)` becomes grantable in the
   Permissions UI.
-- `create_default_workflows` (both init services): "Standard Purchase Process"
-  (`process_type: purchase_process`, `is_default: true`) with steps Submit → Manager Approval →
-  Buy → Complete.
+- **Role grants** (both init services): Admin + Manager get full CRUD on Purchase/PurchaseItem;
+  Cashier/Seller (retail) and Receptionist (hospital) get create/read/update on Purchase (+ read on
+  PurchaseItem) as requesters. Other roles stay ungranted — owners extend via the Permissions UI.
+- `create_default_workflows` (both init services): one **"\<Category\> Purchase Process"**
+  (`process_type: purchase_process`) per purchases category — e.g. "Office Supplies Purchase
+  Process" — with steps Submit → Manager Approval → Buy → Complete. Same category ⇒ same workflow.
 
 **Enrich (development only):** `Seed::PurchaseService` / `Seed::PurchaseItemService` /
 `Seed::PurchaseItemAppointmentService` create sample items and purchases across every phase
-(completed / rejected / reworked / pending) with realistic log chains.
+(completed / rejected / reworked / pending) with realistic log chains. Requesters/advancers are
+selected from employees who actually hold `can?(:update, Purchase)` — the seeded demo respects the
+ABAC permission model.
 
-## 6. Extending to Another Process (e.g. Attendance leave_process)
+## 7. Extending to Another Process (e.g. Attendance leave_process)
 
 1. Add the enum value: `Workflow.process_type` += `leave_process: 2` (inline enum — extend in place).
-2. Make the subject model follow the Purchase pattern: `belongs_to :workflow, optional` +
-   `belongs_to :current_workflow_step, optional` + `has_many :workflow_step_logs, as: :subject` +
-   a bind-on-create callback (see `Purchase#bind_default_workflow`).
-3. Seed a default workflow for that process type.
+2. Make the subject model follow the Purchase pattern: `belongs_to :workflow_step, optional` +
+   `has_many :workflow_step_logs, as: :subject` + a bind-on-create callback that resolves the
+   subject's **category's** workflow (see `Purchase#bind_category_workflow`).
+3. Seed a workflow per relevant category for that process type (the category is the bridge).
 4. Transitions work immediately through `Workflows::AdvanceService` — permission stays
    `can?(:update, subject)`, audit stays `WorkflowStepLog`.
 
-## 7. Design Tenets
+## 8. Design Tenets
 
 1. **One permission system.** ABAC `can?` is the only authorization check in the whole flow. Do not reintroduce per-step roles, approval matrices, or parallel ACLs.
 2. **Jira-style simplicity.** Ticket status may be changed by anyone who can update the ticket. Complexity lives in the *workflow template* (steps, order), not in per-step authorization.
 3. **The log is the audit.** `WorkflowStepLog` answers who/what/when/why — `metadata.from_step_id`/`target_step_id` reconstruct the exact transition.
-4. **The appointment is the truth.** Line economics live on `PurchaseItemAppointment`; `PurchaseItem` is a reusable reference (`estimated_unit_price` is advisory).
-5. **No stock impact.** Purchases are administrative documents. A future phase may bridge completed purchases → `StockImport`; it must go through the stock services, never direct writes.
+4. **The category is the binding.** Same category ⇒ same workflow, enforced by a unique index. Subjects carry only the step pointer — never a workflow_id.
+5. **The appointment is the truth.** Line economics live on `PurchaseItemAppointment`; `PurchaseItem` is a reusable reference (`estimated_unit_price` is advisory).
+6. **No stock impact.** Purchases are administrative documents. A future phase may bridge completed purchases → `StockImport`; it must go through the stock services, never direct writes.
 
-## 8. File Reference
+## 9. File Reference
 
 | File | Purpose |
 |------|---------|
-| `app/models/purchase.rb` | Buy ticket — auto-binding callbacks + `total_price` |
+| `app/models/purchase.rb` | Buy ticket — category-workflow binding callbacks + `total_price` |
 | `app/models/purchase_item.rb` | Reference item (dynamic model) |
 | `app/models/purchase_item_appointment.rb` | Line item + company derivation + same-company validation |
-| `app/models/workflow.rb` | Process template — `default_for` scope, single-default validation |
+| `app/models/workflow.rb` | Process template — category binding (unique per category), `release_subject_pointers` |
 | `app/models/workflow_step.rb` | Ordered step — `next_step` / `previous_step` |
 | `app/models/workflow_step_log.rb` | Audit log — `outcome` enum, `store_accessor` metadata |
 | `app/services/workflows/advance_service.rb` | The transition engine (permission rule documented in header) |
 | `app/services/seed/{workflow,workflow_step,purchase,purchase_item,purchase_item_appointment}_service.rb` | Seed services |
-| `app/services/seed/{retail,hospital}_init_service.rb` | `create_default_workflows` + categories |
-| `app/services/seed/{retail,hospital}_enrich_service.rb` | Sample purchases across all phases |
+| `app/services/seed/{retail,hospital}_init_service.rb` | `create_default_workflows` + categories + role grants |
+| `app/services/seed/{retail,hospital}_enrich_service.rb` | Sample purchases across all phases (permission-aware requesters) |
 | `spec/services/workflows/advance_service_spec.rb` | State machine + ABAC authorization coverage |
 | `app/controllers/companies/purchases_controller.rb` | Purchases dashboard API (Shell-First) — dynamic search/filter index, line-item nested attributes, `POST advance` → `Workflows::AdvanceService` |
-| `app/controllers/companies/workflows_controller.rb` | Workflows dashboard API — full REST CRUD, nested steps, single-default demotion |
+| `app/controllers/companies/workflows_controller.rb` | Workflows dashboard API — full REST CRUD, nested steps, category binding (one workflow per category) |
 | `app/policies/companies/{purchases,workflows}_policy.rb` | Pundit policies (auto-derived by `Companies::Authorizable`; `advance?` = update permission) |
 | `app/services/purchases/search_query_service.rb` | Purchases index search/filter (Meilisearch via `DynamicSearch::BaseQueryService`) |
 | `app/javascript/controllers/companies/purchases/{index,new,show,edit}_controller.js` | Purchases dashboards (dynamic table, line-item rows, Jira-style Approve/Reject/Rework) |

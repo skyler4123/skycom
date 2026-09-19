@@ -16,17 +16,15 @@ RSpec.describe "Companies::PurchasesController", type: :request do
     let(:owner) { company.employees.find_by(business_type: "owner") }
     let(:employee) { create(:employee, company: company) }
 
-    around do |example|
-      original = ActionController::Base.allow_forgery_protection
-      ActionController::Base.allow_forgery_protection = false
-      example.run
-      ActionController::Base.allow_forgery_protection = original
-    end
+    # rails_helper disables company init (Company.skip_init) — seed the category
+    # bridge explicitly: the workflow binds to the purchase's category and the
+    # purchase auto-binds via Category#default_workflow at creation.
+    let!(:purchase_category) { Seed::CategoryService.find_or_create_for(company: company, resource_name: "purchases") }
 
     let!(:workflow) do
       Seed::WorkflowService.create(
-        company: company, name: "Standard Purchase Process",
-        process_type: :purchase_process, is_default: true
+        company: company, category: purchase_category,
+        name: "Office Supplies Purchase Process", process_type: :purchase_process
       ).tap do |workflow|
         [
           { name: "Submit", position: 1 },
@@ -35,7 +33,14 @@ RSpec.describe "Companies::PurchasesController", type: :request do
       end
     end
 
-    let!(:purchase) { create(:purchase, company: company, created_by_employee: employee) }
+    let!(:purchase) { create(:purchase, company: company, category: purchase_category, created_by_employee: employee) }
+
+    around do |example|
+      original = ActionController::Base.allow_forgery_protection
+      ActionController::Base.allow_forgery_protection = false
+      example.run
+      ActionController::Base.allow_forgery_protection = original
+    end
 
     before { get sign_in_for_test_path(email: company.user.email) }
 
@@ -45,7 +50,7 @@ RSpec.describe "Companies::PurchasesController", type: :request do
       }.to change(WorkflowStepLog, :count).by(1)
 
       expect(response).to have_http_status(:ok)
-      expect(purchase.reload.current_workflow_step).to eq(workflow.workflow_steps.find_by(position: 2))
+      expect(purchase.reload.workflow_step).to eq(workflow.workflow_steps.find_by(position: 2))
       expect(purchase.reload.workflow_status_confirmed?).to be true
     end
 

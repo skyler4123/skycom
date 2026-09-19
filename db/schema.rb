@@ -828,9 +828,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_09_18_000006) do
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.bigint "chatwoot_account_id"
     t.index ["business_type"], name: "index_companies_on_business_type"
-    t.index ["chatwoot_account_id"], name: "index_companies_on_chatwoot_account_id", unique: true
     t.index ["discarded_at"], name: "index_companies_on_discarded_at"
     t.index ["lifecycle_status"], name: "index_companies_on_lifecycle_status"
     t.index ["user_id"], name: "index_companies_on_user_id"
@@ -3787,8 +3785,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_09_18_000006) do
     t.uuid "company_id", null: false
     t.uuid "branch_id"
     t.uuid "supplier_id"
-    t.uuid "workflow_id"
-    t.uuid "current_workflow_step_id"
+    t.uuid "workflow_step_id"
     t.uuid "category_id", null: false
     t.uuid "property_mapping_id", null: false
     t.string "name"
@@ -3872,13 +3869,12 @@ ActiveRecord::Schema[8.0].define(version: 2026_09_18_000006) do
     t.index ["category_id"], name: "index_purchases_on_category_id"
     t.index ["code"], name: "index_purchases_on_code", unique: true
     t.index ["company_id"], name: "index_purchases_on_company_id"
-    t.index ["current_workflow_step_id"], name: "index_purchases_on_current_workflow_step_id"
     t.index ["discarded_at"], name: "index_purchases_on_discarded_at"
     t.index ["lifecycle_status"], name: "index_purchases_on_lifecycle_status"
     t.index ["property_mapping_id"], name: "index_purchases_on_property_mapping_id"
     t.index ["supplier_id"], name: "index_purchases_on_supplier_id"
-    t.index ["workflow_id"], name: "index_purchases_on_workflow_id"
     t.index ["workflow_status"], name: "index_purchases_on_workflow_status"
+    t.index ["workflow_step_id"], name: "index_purchases_on_workflow_step_id"
   end
 
   create_table "questions", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
@@ -5972,10 +5968,10 @@ ActiveRecord::Schema[8.0].define(version: 2026_09_18_000006) do
 
   create_table "workflows", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
     t.uuid "company_id", null: false
+    t.uuid "category_id", null: false
     t.string "name"
     t.text "description"
     t.string "code"
-    t.boolean "is_default", default: false, null: false
     t.integer "process_type"
     t.integer "lifecycle_status"
     t.integer "workflow_status"
@@ -5987,6 +5983,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_09_18_000006) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["business_type"], name: "index_workflows_on_business_type"
+    t.index ["category_id"], name: "index_workflows_on_category_id", unique: true
     t.index ["code"], name: "index_workflows_on_code", unique: true
     t.index ["company_id", "process_type"], name: "index_workflows_on_company_id_and_process_type"
     t.index ["company_id"], name: "index_workflows_on_company_id"
@@ -6224,8 +6221,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_09_18_000006) do
   add_foreign_key "purchases", "companies"
   add_foreign_key "purchases", "property_mappings"
   add_foreign_key "purchases", "suppliers"
-  add_foreign_key "purchases", "workflow_steps", column: "current_workflow_step_id"
-  add_foreign_key "purchases", "workflows"
+  add_foreign_key "purchases", "workflow_steps"
   add_foreign_key "questions", "branches"
   add_foreign_key "questions", "categories"
   add_foreign_key "questions", "companies"
@@ -6350,5 +6346,6 @@ ActiveRecord::Schema[8.0].define(version: 2026_09_18_000006) do
   add_foreign_key "workflow_step_logs", "workflows"
   add_foreign_key "workflow_steps", "companies"
   add_foreign_key "workflow_steps", "workflows"
+  add_foreign_key "workflows", "categories"
   add_foreign_key "workflows", "companies"
 end

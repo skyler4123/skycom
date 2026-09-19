@@ -5,12 +5,14 @@ RSpec.describe Workflows::AdvanceService do
   let(:company) { create(:company) }
   let(:owner) { company.employees.find_by(business_type: "owner") }
   let(:employee) { create(:employee, company: company) }
+  let(:category) { Seed::CategoryService.find_or_create_for(company: company, resource_name: "purchases") }
 
-  # rails_helper disables company init (Company.skip_init) — seed the default workflow explicitly.
+  # rails_helper disables company init (Company.skip_init) — seed the category's workflow explicitly.
+  # Category is the bridge: the purchase binds its category's default workflow (docs/PURCHASE_WORKFLOW.md).
   let!(:workflow) do
     Seed::WorkflowService.create(
-      company: company, name: "Standard Purchase Process",
-      process_type: :purchase_process, is_default: true
+      company: company, category: category, name: "Standard Purchase Process",
+      process_type: :purchase_process
     ).tap do |workflow|
       [
         { name: "Submit", position: 1 },
@@ -22,7 +24,7 @@ RSpec.describe Workflows::AdvanceService do
   end
 
   let!(:purchase) do
-    create(:purchase, company: company, name: "Pens restock", created_by_employee: employee)
+    create(:purchase, company: company, category: category, name: "Pens restock", created_by_employee: employee)
   end
 
   def advance(outcome:, employee:, note: nil, target_step: nil)
@@ -39,7 +41,7 @@ RSpec.describe Workflows::AdvanceService do
     it "moves the pointer to the next step and marks the subject confirmed" do
       expect(advance(outcome: :approved, employee: owner)).to eq({ success: true })
 
-      expect(purchase.reload.current_workflow_step).to eq(step_at(2))
+      expect(purchase.reload.workflow_step).to eq(step_at(2))
       expect(purchase.workflow_status_confirmed?).to be true
     end
 
@@ -50,7 +52,7 @@ RSpec.describe Workflows::AdvanceService do
 
       expect(advance(outcome: :approved, employee: owner)).to eq({ success: true })
       expect(purchase.reload.workflow_status_completed?).to be true
-      expect(purchase.reload.current_workflow_step).to eq(step_at(4))
+      expect(purchase.reload.workflow_step).to eq(step_at(4))
     end
 
     it "records an approved log with the actor and from-step" do
@@ -69,7 +71,7 @@ RSpec.describe Workflows::AdvanceService do
 
       expect(advance(outcome: :rejected, employee: owner)).to eq({ success: true })
       expect(purchase.reload.workflow_status_cancelled?).to be true
-      expect(purchase.reload.current_workflow_step).to eq(step_at(2))
+      expect(purchase.reload.workflow_step).to eq(step_at(2))
     end
   end
 
@@ -78,7 +80,7 @@ RSpec.describe Workflows::AdvanceService do
       advance(outcome: :approved, employee: owner)
 
       expect(advance(outcome: :rework, employee: owner, target_step: step_at(1))).to eq({ success: true })
-      expect(purchase.reload.current_workflow_step).to eq(step_at(1))
+      expect(purchase.reload.workflow_step).to eq(step_at(1))
       expect(purchase.reload.workflow_status_pending?).to be true
     end
 
@@ -90,7 +92,8 @@ RSpec.describe Workflows::AdvanceService do
     end
 
     it "rejects a target step from another workflow" do
-      other = create(:workflow, company: company, name: "Other flow")
+      other_category = create(:category, company: company, name: "Other supplies", resource_name: "purchase_items")
+      other = create(:workflow, company: company, category: other_category, name: "Other flow")
       foreign_step = create(:workflow_step, workflow: other, name: "Foreign", position: 1)
       advance(outcome: :approved, employee: owner)
 
@@ -108,7 +111,7 @@ RSpec.describe Workflows::AdvanceService do
 
   describe "guards" do
     it "fails for a subject without a bound workflow" do
-      draft = create(:purchase, company: company, name: "Draft buy", skip_default_workflow: true)
+      draft = create(:purchase, company: company, category: category, name: "Draft buy", skip_workflow: true)
 
       result = described_class.call(subject: draft, employee: owner, outcome: :approved)
 
@@ -134,7 +137,7 @@ RSpec.describe Workflows::AdvanceService do
         { success: false, errors: [ "You are not authorized to update this record" ] }
       )
 
-      expect(purchase.reload.current_workflow_step).to eq(step_at(1))
+      expect(purchase.reload.workflow_step).to eq(step_at(1))
       expect(purchase.workflow_step_logs.where(outcome: :approved).count).to eq(0)
     end
 
@@ -175,7 +178,7 @@ RSpec.describe Workflows::AdvanceService do
       expect(member.can?(:update, purchase)).to be true
 
       expect(advance(outcome: :approved, employee: member)).to eq({ success: true })
-      expect(purchase.reload.current_workflow_step).to eq(step_at(2))
+      expect(purchase.reload.workflow_step).to eq(step_at(2))
     end
   end
 end

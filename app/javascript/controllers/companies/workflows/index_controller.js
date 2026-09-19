@@ -7,7 +7,7 @@ export default class Companies_Workflows_IndexController extends Companies_Layou
   // Docs: docs/PURCHASE_WORKFLOW.md
   static targets = ["workflowsList"]
 
-  /** @type {Array<{id: string, name: string, code: string, process_type: string, is_default: boolean, steps: any[]}>} */
+  /** @type {Array<{id: string, name: string, code: string, process_type: string, category: {id: string, name: string}, steps: any[]}>} */
   workflows = []
 
   async connect() {
@@ -45,7 +45,7 @@ export default class Companies_Workflows_IndexController extends Companies_Layou
                   <th class="py-4 px-6 font-medium">${translate("Name")}</th>
                   <th class="py-4 px-6 font-medium">${translate("Code")}</th>
                   <th class="py-4 px-6 font-medium">${translate("Process")}</th>
-                  <th class="py-4 px-6 font-medium">${translate("Default")}</th>
+                  <th class="py-4 px-6 font-medium">${translate("Category")}</th>
                   <th class="py-4 px-6 font-medium">${translate("Steps")}</th>
                   <th class="py-4 px-6 text-right font-medium">${translate("Actions")}</th>
                 </tr>
@@ -63,11 +63,7 @@ export default class Companies_Workflows_IndexController extends Companies_Layou
                       <span class="font-mono text-xs bg-slate-100 dark:bg-slate-800/60 px-2 py-0.5 rounded text-slate-600 dark:text-slate-300 font-medium">${w.code || '—'}</span>
                     </td>
                     <td class="py-4 px-6 text-sm text-slate-600 capitalize">${w.process_type?.replace(/_/g, ' ') || '—'}</td>
-                    <td class="py-4 px-6 text-sm">
-                      ${w.is_default
-                        ? '<span class="inline-flex items-center px-2 py-0.5 text-xs font-medium rounded-md bg-emerald-50 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400">Yes</span>'
-                        : '<span class="inline-flex items-center px-2 py-0.5 text-xs font-medium rounded-md bg-slate-50 text-slate-700 dark:bg-slate-800 dark:text-slate-400">No</span>'}
-                    </td>
+                    <td class="py-4 px-6 text-sm text-slate-600">${w.category?.name || '<span class="text-slate-300 dark:text-slate-700">—</span>'}</td>
                     <td class="py-4 px-6 text-sm text-slate-600">${(w.steps || []).length}</td>
                     <td class="py-4 px-6 text-sm text-right">
                       <a href="${Helpers.edit_company_workflow_path(currentCompany().id, w.id)}"

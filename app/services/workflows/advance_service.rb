@@ -4,7 +4,7 @@
 # Advance a subject (e.g. Purchase) through its bound Workflow. This is the
 # single write path for workflow state: one transaction that authorizes the
 # acting employee, records a WorkflowStepLog (the transition + audit record),
-# moves the subject's current_workflow_step pointer, and syncs the subject's
+# moves the subject's workflow_step pointer, and syncs the subject's
 # workflow_status.
 #
 # == Permission (single system — ABAC):
@@ -13,9 +13,14 @@
 # authorization check. There is NO per-step role mechanism; WorkflowStepLog
 # is the permanent audit of who did what.
 #
+# == Binding (Category is the bridge):
+# Subjects do not link to a Workflow directly. The subject's Category owns
+# the Workflow (Category#default_workflow) — same category, same workflow
+# (docs/PURCHASE_WORKFLOW.md). The subject only carries the workflow_step
+# pointer.
+#
 # Subjects must respond to:
-#   - current_workflow_step  (WorkflowStep or nil)
-#   - workflow               (Workflow or nil)
+#   - workflow_step          (WorkflowStep or nil — the current-step pointer)
 #   - workflow_status=       (enum assignment)
 #   - company
 #   - can? — the subject's class must be ABAC-checkable (instance-level tags)
@@ -58,7 +63,7 @@ class Workflows::AdvanceService
   private
 
   def current_step
-    @current_step ||= @subject.current_workflow_step
+    @current_step ||= @subject.workflow_step
   end
 
   def write_log!
@@ -83,14 +88,14 @@ class Workflows::AdvanceService
     when "approved"
       next_step = current_step.next_step
       if next_step
-        @subject.update!(current_workflow_step: next_step, workflow_status: :confirmed)
+        @subject.update!(workflow_step: next_step, workflow_status: :confirmed)
       else
         @subject.update!(workflow_status: :completed)
       end
     when "rejected"
       @subject.update!(workflow_status: :cancelled)
     when "rework"
-      @subject.update!(current_workflow_step: @target_step, workflow_status: :pending)
+      @subject.update!(workflow_step: @target_step, workflow_status: :pending)
     end
   end
 

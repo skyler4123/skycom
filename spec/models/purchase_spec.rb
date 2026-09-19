@@ -6,8 +6,7 @@ RSpec.describe Purchase, type: :model do
     it { should belong_to(:company) }
     it { should belong_to(:branch).optional }
     it { should belong_to(:supplier).optional }
-    it { should belong_to(:workflow).optional }
-    it { should belong_to(:current_workflow_step).optional }
+    it { should belong_to(:workflow_step).optional }
     it { should belong_to(:category) }
     it { should belong_to(:property_mapping) }
     it { should have_many(:purchase_item_appointments).dependent(:destroy) }
@@ -59,51 +58,54 @@ RSpec.describe Purchase, type: :model do
   end
 
   describe "workflow auto-binding on create" do
-    # rails_helper disables company init (Company.skip_init) — seed the default workflow explicitly.
+    # rails_helper disables company init (Company.skip_init) — seed the category workflow explicitly.
+    # Category is the bridge: the purchase binds its category's default workflow (docs/PURCHASE_WORKFLOW.md).
     let(:company) { create(:company) }
-
-    before do
+    let(:category) { Seed::CategoryService.find_or_create_for(company: company, resource_name: "purchases") }
+    let(:category_workflow) do
       Seed::WorkflowService.create(
-        company: company, name: "Standard Purchase Process",
-        process_type: :purchase_process, is_default: true
-      ).tap do |workflow|
-        Seed::WorkflowStepService.create(company: company, workflow: workflow, name: "Submit", position: 1)
-        Seed::WorkflowStepService.create(company: company, workflow: workflow, name: "Manager Approval", position: 2)
-      end
+        company: company, category: category, name: "Standard Purchase Process",
+        process_type: :purchase_process
+      )
     end
 
-    let(:default_workflow) { company.workflows.default_for(:purchase_process).first }
+    before do
+      category_workflow
+      Seed::WorkflowStepService.create(company: company, workflow: category_workflow, name: "Submit", position: 1)
+      Seed::WorkflowStepService.create(company: company, workflow: category_workflow, name: "Manager Approval", position: 2)
+    end
 
-    it "binds the company's default purchase_process workflow and starts pending" do
-      purchase = create(:purchase, company: company, name: "Pens restock")
+    it "binds the category's workflow and starts pending" do
+      purchase = create(:purchase, company: company, category: category, name: "Pens restock")
 
-      expect(purchase.workflow).to eq(default_workflow)
-      expect(purchase.current_workflow_step).to eq(default_workflow.workflow_steps.order(:position).first)
+      expect(purchase.workflow_step).to eq(category_workflow.workflow_steps.order(:position).first)
+      expect(purchase.workflow_step.workflow).to eq(category_workflow)
       expect(purchase.reload.workflow_status_pending?).to be true
     end
 
     it "writes a submitted WorkflowStepLog for the creator" do
       employee = create(:employee, company: company)
-      purchase = create(:purchase, company: company, name: "Pens restock", created_by_employee: employee)
+      purchase = create(:purchase, company: company, category: category, name: "Pens restock", created_by_employee: employee)
       log = purchase.workflow_step_logs.sole
 
       expect(log.outcome_submitted?).to be true
       expect(log.employee_id).to eq(employee.id)
-      expect(log.workflow_step_id).to eq(purchase.reload.current_workflow_step_id)
+      expect(log.workflow_step_id).to eq(purchase.reload.workflow_step_id)
     end
 
-    it "stays draft when the default workflow binding is skipped" do
-      purchase = create(:purchase, company: company, name: "Pens restock", skip_default_workflow: true)
+    it "stays draft when binding is skipped" do
+      purchase = create(:purchase, company: company, category: category, name: "Pens restock", skip_workflow: true)
 
-      expect(purchase.workflow).to be_nil
+      expect(purchase.workflow_step).to be_nil
       expect(purchase.reload.workflow_status_draft?).to be true
     end
 
-    it "stays draft when the company has no default workflow" do
-      company.workflows.update_all(is_default: false)
-      purchase = create(:purchase, company: company, name: "Pens restock")
+    it "stays draft when the category has no workflow" do
+      category_without_workflow = create(:category, company: company, name: "Misc supplies", resource_name: "purchases")
+      purchase = create(:purchase, company: company, category: category_without_workflow, name: "Pens restock")
 
-      expect(purchase.workflow).to be_nil
+      expect(purchase.category.default_workflow).to be_nil
+      expect(purchase.workflow_step).to be_nil
       expect(purchase.reload.workflow_status_draft?).to be true
       expect(purchase.workflow_step_logs.count).to eq(0)
     end

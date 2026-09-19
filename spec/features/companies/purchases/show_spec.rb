@@ -4,10 +4,12 @@ RSpec.feature "Companies::Purchases Show", type: :feature, js: true do
   let(:company) { create(:company) }
   let(:owner) { company.user }
 
+  let!(:purchase_category) { Seed::CategoryService.find_or_create_for(company: company, resource_name: "purchases") }
+
   let!(:workflow) do
     Seed::WorkflowService.create(
-      company: company, name: "Standard Purchase Process",
-      process_type: :purchase_process, is_default: true
+      company: company, category: purchase_category,
+      name: "Office Supplies Purchase Process", process_type: :purchase_process
     ).tap do |workflow|
       [
         { name: "Submit", position: 1 },
@@ -17,7 +19,7 @@ RSpec.feature "Companies::Purchases Show", type: :feature, js: true do
   end
 
   let!(:purchase_item) { create(:purchase_item, company: company, name: "Ballpoint Pen") }
-  let!(:purchase) { create(:purchase, company: company, name: "Pens restock") }
+  let!(:purchase) { create(:purchase, company: company, category: purchase_category, name: "Pens restock") }
   let!(:appointment) do
     Seed::PurchaseItemAppointmentService.create(
       company: company, purchase: purchase, purchase_item: purchase_item,
@@ -64,7 +66,7 @@ RSpec.feature "Companies::Purchases Show", type: :feature, js: true do
 
     expect(page).to have_content('Manager Approval', wait: 10)
 
-    expect(purchase.reload.current_workflow_step).to eq(workflow.workflow_steps.find_by(position: 2))
+    expect(purchase.reload.workflow_step).to eq(workflow.workflow_steps.find_by(position: 2))
     expect(purchase.reload.workflow_status_confirmed?).to be true
   end
 
@@ -77,6 +79,6 @@ RSpec.feature "Companies::Purchases Show", type: :feature, js: true do
     expect(page).to have_no_button('Approve', wait: 10)
 
     expect(purchase.reload.workflow_status_cancelled?).to be true
-    expect(purchase.reload.current_workflow_step).to eq(workflow.workflow_steps.find_by(position: 1))
+    expect(purchase.reload.workflow_step).to eq(workflow.workflow_steps.find_by(position: 1))
   end
 end

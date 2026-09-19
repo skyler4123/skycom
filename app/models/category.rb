@@ -5,6 +5,7 @@ class Category < ApplicationRecord
 
   has_many :property_mappings, dependent: :destroy
   has_many :table_configs, dependent: :destroy
+  has_many :workflows, dependent: :destroy
 
   has_many :employee_groups, dependent: :nullify
   has_many :employees, dependent: :nullify
@@ -25,6 +26,10 @@ class Category < ApplicationRecord
 
   def default_table_config
     table_configs.first
+  end
+
+  def default_workflow
+    workflows.first
   end
 
   private

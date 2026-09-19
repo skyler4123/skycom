@@ -5,8 +5,9 @@
 # → Meilisearch via Purchases::SearchQueryService; plain DB path otherwise).
 # advance is the single workflow-transition entry point (Workflows::AdvanceService
 # — ABAC can?(:update, subject) enforced there, WorkflowStepLog is the audit).
-# Purchase.workflow_id / current_workflow_step / workflow_status are NEVER
-# permitted through create/update — only the advance endpoint moves them.
+# Purchase.workflow_step / workflow_status are NEVER permitted through
+# create/update — only the advance endpoint moves them. The Workflow itself is
+# resolved through the Category bridge (Category#default_workflow).
 # Serves Stimulus: Companies_Purchases_IndexController (index JSON incl. q/filters passthrough),
 #                  Companies_Purchases_NewController|ShowController|EditController,
 #                  advance endpoint serves the show-page Approve/Reject/Rework buttons
@@ -21,7 +22,7 @@ class Companies::PurchasesController < Companies::ApplicationController
       format.json do
         scope = current_company.purchases.includes(
           :purchase_item_appointments, :purchase_items,
-          :workflow, :current_workflow_step, :supplier, :branch
+          :workflow_step, { workflow_step: { workflow: :workflow_steps } }, :supplier, :branch
         )
         scope = scope.where(category_id: params[:category_id]) if params[:category_id].present?
 
@@ -37,7 +38,7 @@ class Companies::PurchasesController < Companies::ApplicationController
   def show
     purchase = current_company.purchases.includes(
       :purchase_item_appointments, :purchase_items, :supplier, :branch, :category,
-      { workflow: :workflow_steps }
+      { workflow_step: { workflow: :workflow_steps } }
     ).find(params[:id])
 
     respond_to do |format|
@@ -55,7 +56,8 @@ class Companies::PurchasesController < Companies::ApplicationController
 
   def edit
     purchase = current_company.purchases.includes(
-      :purchase_item_appointments, :purchase_items, { workflow: :workflow_steps }
+      :purchase_item_appointments, :purchase_items,
+      { workflow_step: { workflow: :workflow_steps } }
     ).find(params[:id])
 
     respond_to do |format|
@@ -149,8 +151,8 @@ class Companies::PurchasesController < Companies::ApplicationController
       (1..10).map { |i| "property_datetime_#{i}" }
   end
 
-  # workflow_id / current_workflow_step_id / workflow_status deliberately NOT
-  # permitted — the workflow pointer is owned by Workflows::AdvanceService.
+  # workflow_step / workflow_status deliberately NOT permitted — the workflow
+  # pointer is owned by Workflows::AdvanceService.
   def purchase_params
     params.require(:purchase).permit(
       :name, :description, :needed_by, :currency, :business_type,
@@ -168,18 +170,19 @@ class Companies::PurchasesController < Companies::ApplicationController
 
   def format_purchase(purchase, with_workflow_detail: false)
     appointments = purchase.purchase_item_appointments
+    workflow = purchase.workflow_step&.workflow
 
     payload = purchase.as_json(only: [
       :id, :name, :description, :code, :needed_by, :currency, :country,
       :category_id, :branch_id, :supplier_id,
-      :workflow_id, :current_workflow_step_id,
+      :workflow_step_id,
       :lifecycle_status, :workflow_status, :business_type,
       :created_at, :updated_at,
       *property_keys
     ]).merge(
       total_price: appointments.sum { |a| a.total_price.to_f },
-      workflow: purchase.workflow&.as_json(only: [ :id, :name ]),
-      current_workflow_step: purchase.current_workflow_step&.as_json(only: [ :id, :name, :position ]),
+      workflow: workflow&.as_json(only: [ :id, :name ]),
+      current_workflow_step: purchase.workflow_step&.as_json(only: [ :id, :name, :position ]),
       supplier: purchase.supplier&.as_json(only: [ :id, :name ]),
       branch: purchase.branch&.as_json(only: [ :id, :name ]),
       category: purchase.category&.as_json(only: [ :id, :name ]),
@@ -192,7 +195,7 @@ class Companies::PurchasesController < Companies::ApplicationController
     return payload unless with_workflow_detail
 
     payload.merge(
-      workflow_steps: purchase.workflow&.workflow_steps&.sort_by(&:position)&.map { |s| s.as_json(only: [ :id, :name, :position ]) },
+      workflow_steps: workflow&.workflow_steps&.sort_by(&:position)&.map { |s| s.as_json(only: [ :id, :name, :position ]) },
       workflow_step_logs: purchase.workflow_step_logs.order(:created_at).map { |log|
         log.as_json(only: [ :id, :outcome, :note, :created_at ])
           .merge(step_name: log.workflow_step&.name, employee_name: log.employee&.name)

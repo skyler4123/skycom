@@ -2,12 +2,12 @@ class CreateWorkflows < ActiveRecord::Migration[8.0]
   def change
     create_table :workflows, id: :uuid, default: -> { "uuidv7()" } do |t|
       t.references :company, null: false, foreign_key: true, type: :uuid
+      t.references :category, null: false, foreign_key: true, type: :uuid, index: { unique: true }
 
       # --- Identity ---
       t.string :name
       t.text   :description
       t.string :code, index: { unique: true }
-      t.boolean :is_default, default: false, null: false
       t.integer :process_type
 
       # --- System Fields ---

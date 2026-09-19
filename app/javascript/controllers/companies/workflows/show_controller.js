@@ -64,15 +64,17 @@ export default class Companies_Workflows_ShowController extends Companies_Layout
               <div class="mt-2 flex flex-wrap justify-center gap-2 sm:justify-start">
                 <span class="inline-flex items-center rounded-lg bg-blue-100 dark:bg-blue-900/40 px-3 py-1 text-xs font-bold text-blue-700 dark:text-blue-300 uppercase">${w.code || "N/A"}</span>
                 <span class="inline-flex items-center rounded-lg bg-slate-100 dark:bg-slate-800 px-3 py-1 text-xs font-bold text-slate-600 dark:text-slate-300 capitalize">${w.process_type?.replace(/_/g, ' ') || "N/A"}</span>
-                ${w.is_default
-                  ? '<span class="inline-flex items-center rounded-lg bg-emerald-100 dark:bg-emerald-900/40 px-3 py-1 text-xs font-bold text-emerald-700 dark:text-emerald-300 uppercase">Default</span>'
-                  : ''}
                 ${Helpers.statusBadge(w.workflow_status)}
               </div>
             </div>
           </div>
 
           <div class="border-t border-slate-200 dark:border-gray-800 pt-6">
+            <h3 class="text-sm font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-4">${translate("Category")}</h3>
+            <p class="text-sm font-semibold text-slate-900 dark:text-white">${w.category?.name || "N/A"}</p>
+          </div>
+
+          <div class="border-t border-slate-200 dark:border-gray-800 pt-6 mt-6">
             <h3 class="text-sm font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-4">${translate("Steps")}</h3>
             <div>
               ${(w.steps || []).map(s => `

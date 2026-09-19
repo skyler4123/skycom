@@ -3,11 +3,12 @@ require "rails_helper"
 RSpec.feature "Companies::Workflows Show", type: :feature, js: true do
   let(:company) { create(:company) }
   let(:owner) { company.user }
+  let!(:purchase_category) { Seed::CategoryService.find_or_create_for(company: company, resource_name: "purchases") }
 
   let!(:workflow) do
     Seed::WorkflowService.create(
-      company: company, name: "Standard Purchase Process",
-      process_type: :purchase_process, is_default: true
+      company: company, category: purchase_category,
+      name: "Standard Purchase Process", process_type: :purchase_process
     ).tap do |workflow|
       [
         { name: "Submit", position: 1 },
@@ -26,7 +27,7 @@ RSpec.feature "Companies::Workflows Show", type: :feature, js: true do
     company_data = JSON.parse(company.to_json).merge(
       "property_mappings" => [],
       "table_configs" => [],
-      "categories" => [],
+      "categories" => company.categories.reset.map { |c| JSON.parse(c.to_json) },
       "branches" => [],
       "departments" => [],
       "roles" => []
@@ -38,7 +39,7 @@ RSpec.feature "Companies::Workflows Show", type: :feature, js: true do
     page.execute_script("document.cookie = 'client_cache_version=forced; path=/'")
   end
 
-  scenario "shows workflow details with ordered steps" do
+  scenario "shows workflow details with category and ordered steps" do
     visit company_workflow_path(company, workflow)
 
     expect(page).to have_content('Standard Purchase Process', wait: 10)
@@ -46,7 +47,7 @@ RSpec.feature "Companies::Workflows Show", type: :feature, js: true do
     expect(page).to have_content('Manager Approval', wait: 10)
     expect(page).to have_content('Buy', wait: 10)
     expect(page).to have_content('Complete', wait: 10)
-    expect(page).to have_content('Default', wait: 10)
+    expect(page).to have_content(purchase_category.name, wait: 10)
     expect(page).to have_content('purchase process', wait: 10)
   end
 

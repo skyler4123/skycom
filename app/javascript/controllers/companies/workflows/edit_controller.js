@@ -135,6 +135,10 @@ export default class Companies_Workflows_EditController extends Companies_Layout
       { name: "Purchase Process", value: "purchase_process" },
       { name: "Leave Process", value: "leave_process" }
     ]
+    // Purchase-process workflows bind to `purchases` categories — one workflow
+    // per category (unique index), the category is the selector.
+    const categories = currentCategories().filter(c => c.resource_name === "purchases")
+    if (w.category && !categories.some(c => c.id === w.category.id)) categories.push(w.category)
 
     const fields = `
       <div class="space-y-6">
@@ -156,11 +160,12 @@ export default class Companies_Workflows_EditController extends Companies_Layout
             </select>
           </div>
 
-          <div class="flex items-center gap-3 py-2 mt-auto">
-            <input type="hidden" name="workflow[is_default]" value="false">
-            <input type="checkbox" name="workflow[is_default]" value="true" ${w.is_default ? 'checked' : ''}
-              class="h-5 w-5 rounded border-slate-300 text-blue-600 cursor-pointer">
-            <span class="text-sm text-slate-900 dark:text-white">${translate("Default")}</span>
+          <div class="space-y-1">
+            <label class="text-xs font-medium text-slate-500 dark:text-gray-400">${translate("Category")}</label>
+            <select name="workflow[category_id]" required
+              class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-sm">
+              ${selectOptionsHTML(cloneNewKey(categories, "id", "value"), w.category_id || '')}
+            </select>
           </div>
 
           <div class="col-span-2 space-y-1">

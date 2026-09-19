@@ -3,23 +3,12 @@ require "rails_helper"
 RSpec.feature "Companies::Workflows Edit", type: :feature, js: true do
   let(:company) { create(:company) }
   let(:owner) { company.user }
-
-  let!(:default_workflow) do
-    Seed::WorkflowService.create(
-      company: company, name: "Standard Purchase Process",
-      process_type: :purchase_process, is_default: true
-    ).tap do |workflow|
-      [
-        { name: "Submit", position: 1 },
-        { name: "Manager Approval", position: 2 }
-      ].each { |attrs| Seed::WorkflowStepService.create(company: company, workflow: workflow, **attrs) }
-    end
-  end
+  let!(:purchase_category) { Seed::CategoryService.find_or_create_for(company: company, resource_name: "purchases") }
 
   let!(:workflow) do
     Seed::WorkflowService.create(
-      company: company, name: "Custom Purchase Process",
-      process_type: :purchase_process
+      company: company, category: purchase_category,
+      name: "Custom Purchase Process", process_type: :purchase_process
     ).tap do |workflow|
       Seed::WorkflowStepService.create(company: company, workflow: workflow, name: "Submit", position: 1)
     end
@@ -33,7 +22,7 @@ RSpec.feature "Companies::Workflows Edit", type: :feature, js: true do
     company_data = JSON.parse(company.to_json).merge(
       "property_mappings" => [],
       "table_configs" => [],
-      "categories" => [],
+      "categories" => company.categories.reset.map { |c| JSON.parse(c.to_json) },
       "branches" => [],
       "departments" => [],
       "roles" => []
@@ -69,18 +58,5 @@ RSpec.feature "Companies::Workflows Edit", type: :feature, js: true do
 
     expect(workflow.reload.name).to eq('Custom Purchase Process v2')
     expect(workflow.workflow_steps.order(:position).map(&:name)).to eq([ 'Submit Request', 'Approve' ])
-  end
-
-  scenario "making a workflow default demotes the previous default" do
-    visit edit_company_workflow_path(company, workflow)
-    expect(page).to have_selector('input[name="workflow[name]"]', wait: 10)
-
-    find('input[name="workflow[is_default]"]').check
-    click_button "Save Changes"
-
-    expect(page).to have_current_path(company_workflow_path(company, workflow), wait: 10)
-
-    expect(workflow.reload.is_default).to be true
-    expect(default_workflow.reload.is_default).to be false
   end
 end
