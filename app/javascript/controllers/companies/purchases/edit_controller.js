@@ -34,7 +34,7 @@ export default class Companies_Purchases_EditController extends Companies_Layout
     const companyId = pathParts[2]
 
     try {
-      const response = await fetchJson(`${Helpers.company_purchase_path(companyId, recordId)}.json`)
+      const response = await fetchJson(`${Helpers.edit_company_purchase_path(companyId, recordId)}.json`)
       this.purchase = response.purchase
       this.purchaseItems = response.purchase_items || []
       this.suppliers = response.suppliers || []
@@ -140,6 +140,7 @@ export default class Companies_Purchases_EditController extends Companies_Layout
     const index = Number(event.params.index)
     const item = this.purchaseItems.find(i => i.id === event.target.value)
     if (item && this.itemRows[index]) {
+      this.itemRows[index].purchase_item_id = event.target.value
       this.itemRows[index].unit_price = item.estimated_unit_price ?? ""
       this.rerenderItemRows()
     }

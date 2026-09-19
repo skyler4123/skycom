@@ -126,6 +126,7 @@ export default class Companies_Purchases_NewController extends Companies_LayoutC
     const index = Number(event.params.index)
     const item = this.purchaseItems.find(i => i.id === event.target.value)
     if (item && this.itemRows[index]) {
+      this.itemRows[index].purchase_item_id = event.target.value
       this.itemRows[index].unit_price = item.estimated_unit_price ?? ""
       this.rerenderItemRows()
     }

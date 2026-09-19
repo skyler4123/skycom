@@ -116,6 +116,7 @@ class Companies::PurchasesController < Companies::ApplicationController
   private
 
   def save_purchase(purchase)
+    purchase.purchase_item_appointments.each { |appointment| appointment.appoint_to = purchase if appointment.appoint_to.nil? }
     normalize_appointment_totals(purchase.purchase_item_appointments)
     purchase.save
   end
