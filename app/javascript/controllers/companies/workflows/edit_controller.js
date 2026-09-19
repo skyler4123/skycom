@@ -46,11 +46,14 @@ export default class Companies_Workflows_EditController extends Companies_Layout
   }
 
   addStepRow() {
+    this.syncStepRowsFromDOM()
     this.steps.push({ name: "" })
     this.rerenderStepRows()
   }
 
   removeStepRow(event) {
+    this.syncStepRowsFromDOM()
+
     const index = Number(event.params.index)
     const row = this.steps[index]
     if (!row) return
@@ -62,6 +65,15 @@ export default class Companies_Workflows_EditController extends Companies_Layout
 
     this.steps.splice(index, 1)
     this.rerenderStepRows()
+  }
+
+  // Preserve typed step names across re-renders — read them back from the DOM.
+  syncStepRowsFromDOM() {
+    if (!this.hasStepRowsTarget) return
+    this.stepRowsTarget.querySelectorAll('input[name$="][name]"]').forEach((input) => {
+      const index = Number(input.name.match(/workflow_steps_attributes\]\[(\d+)\]\[name\]/)?.[1])
+      if (this.steps[index]) this.steps[index].name = input.value
+    })
   }
 
   stepRowHTML(step, index) {
