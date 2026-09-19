@@ -5,13 +5,15 @@ class Workflow < ApplicationRecord
   enum :process_type, { purchase_process: 0, leave_process: 1 }, prefix: true
   enum :lifecycle_status, LIFECYCLE_STATUS, prefix: true
 
-  accepts_nested_attributes_for :workflow_steps
-
   # --- Associations ---
   belongs_to :company
   has_many :workflow_steps, dependent: :destroy
   has_many :workflow_step_logs, dependent: :destroy
   has_many :purchases, foreign_key: :workflow_id, dependent: :nullify
+
+  # NOTE: must follow the associations — accepts_nested_attributes_for requires
+  # its target association to already exist (docs/MODEL_STRUCTURE.md exception).
+  accepts_nested_attributes_for :workflow_steps
 
   # --- Scopes ---
   scope :default_for, ->(process_type) {

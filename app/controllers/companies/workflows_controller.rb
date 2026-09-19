@@ -48,6 +48,7 @@ class Companies::WorkflowsController < Companies::ApplicationController
 
   def create
     workflow = current_company.workflows.new(workflow_params)
+    normalize_steps_company(workflow)
 
     begin
       ActiveRecord::Base.transaction do
@@ -63,6 +64,7 @@ class Companies::WorkflowsController < Companies::ApplicationController
   def update
     workflow = current_company.workflows.find(params[:id])
     workflow.assign_attributes(workflow_params)
+    normalize_steps_company(workflow)
 
     begin
       ActiveRecord::Base.transaction do
@@ -88,6 +90,12 @@ class Companies::WorkflowsController < Companies::ApplicationController
       :name, :description, :process_type, :is_default,
       workflow_steps_attributes: [ :id, :name, :position ]
     )
+  end
+
+  # Nested WorkflowStep rows do not inherit the parent's company — WorkflowStep
+  # belongs_to :company is a separate association, so stamp it explicitly.
+  def normalize_steps_company(workflow)
+    workflow.workflow_steps.each { |step| step.company = current_company }
   end
 
   # Exactly one default per (company, process_type) — demote the previous
