@@ -14,6 +14,7 @@ class Company < ApplicationRecord
     PolicyAppointment Invoice Transaction Service Policy
     Category PropertyMapping TableConfig Brand Facility Warehouse
     Supplier
+    Purchase PurchaseItem
     Table Reservation Room Guest
     Patient Appointment Course Student Exam
     Membership
@@ -116,6 +117,11 @@ class Company < ApplicationRecord
   has_many :customers, dependent: :destroy
   has_many :customer_groups, dependent: :destroy
   has_many :orders, dependent: :destroy
+  has_many :purchases, dependent: :destroy
+  has_many :purchase_items, dependent: :destroy
+  has_many :workflows, dependent: :destroy
+  has_many :workflow_steps, dependent: :destroy
+  has_many :workflow_step_logs, dependent: :destroy
   has_many :invoices, dependent: :destroy
   has_many :task_groups, dependent: :destroy
   has_many :project_groups, dependent: :destroy

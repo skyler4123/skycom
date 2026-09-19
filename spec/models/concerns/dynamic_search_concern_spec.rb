@@ -100,6 +100,8 @@ DYNAMIC_SEARCH_MODELS = {
   },
   Product => ->(company) { create(:product, company: company) },
   ProductGroup => ->(company) { create_searchable_record(ProductGroup, company, "product_groups") },
+  Purchase => ->(company) { create(:purchase, company: company) },
+  PurchaseItem => ->(company) { create(:purchase_item, company: company) },
   Project => ->(company) {
     project_group = create_searchable_record(ProjectGroup, company, "project_groups")
     create_searchable_record(Project, company, "projects", project_group: project_group)
