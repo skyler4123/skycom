@@ -183,10 +183,19 @@ OR approve → rework to "Submit"                           status: pending (rew
 | `app/services/seed/{retail,hospital}_init_service.rb` | `create_default_workflows` + categories |
 | `app/services/seed/{retail,hospital}_enrich_service.rb` | Sample purchases across all phases |
 | `spec/services/workflows/advance_service_spec.rb` | State machine + ABAC authorization coverage |
+| `app/controllers/companies/purchases_controller.rb` | Purchases dashboard API (Shell-First) — dynamic search/filter index, line-item nested attributes, `POST advance` → `Workflows::AdvanceService` |
+| `app/controllers/companies/workflows_controller.rb` | Workflows dashboard API — full REST CRUD, nested steps, single-default demotion |
+| `app/policies/companies/{purchases,workflows}_policy.rb` | Pundit policies (auto-derived by `Companies::Authorizable`; `advance?` = update permission) |
+| `app/services/purchases/search_query_service.rb` | Purchases index search/filter (Meilisearch via `DynamicSearch::BaseQueryService`) |
+| `app/javascript/controllers/companies/purchases/{index,new,show,edit}_controller.js` | Purchases dashboards (dynamic table, line-item rows, Jira-style Approve/Reject/Rework) |
+| `app/javascript/controllers/companies/workflows/{index,new,show,edit}_controller.js` | Workflows dashboards (static CRUD + step row editor) |
+| `spec/requests/companies/{purchases,workflows}_controller_spec.rb` | Request specs — dynamic search contract, advance endpoint, CRUD + default demotion |
+| `spec/features/companies/purchases/{index,new,show,edit}_spec.rb` | Purchases E2E — dynamic table, line items, advance flows |
+| `spec/features/companies/workflows/{index,new,show,edit}_spec.rb` | Workflows E2E — CRUD + default demotion |
 | `docs/ABAC.md` | The permission engine (`can?`, policies, tag conditions, owner bypass) |
 | `db/migrate/20260918000001..000006` | The 6 migrations |
 
 ---
 
 *See also: `docs/ABAC.md` (permission engine), `docs/MODEL_CALLBACKS.md` (Purchase/Workflow callbacks),
-`docs/ROADMAP.md` (dashboards + advance API as the next iteration).*
+`docs/DYNAMIC_TABLE.md` §2.5 (dynamic search/filter), `docs/ROADMAP.md`.*
