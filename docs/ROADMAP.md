@@ -83,7 +83,7 @@ Skycom is a multi-tenant retail ERP with a **usage-based credit** monetization m
 | Product / Service / Brand / Customer / Invoice / Order dashboards | ✅ | `docs/DASHBOARD_PATTERN.md` |
 | Categories / Dynamic Properties / Dynamic Tables dashboards | ✅ | `docs/DYNAMIC_TABLE.md` |
 | Permissions / Policies dashboards | ✅ | `docs/ABAC.md` |
-| Purchase process + generic Workflow engine (Purchase/PurchaseItem/PurchaseItemAppointment + Workflow/WorkflowStep/WorkflowStepLog, `Workflows::AdvanceService`, default purchase workflow seeded) | ✅ | Backend-first: models/migrations/seed/specs; dashboards + advance API next |
+| Purchase process + generic Workflow engine (Purchase/PurchaseItem/PurchaseItemAppointment + Workflow/WorkflowStep/WorkflowStepLog, `Workflows::AdvanceService`, default purchase workflow seeded) | ✅ | Dashboards + advance API live (`docs/PURCHASE_WORKFLOW.md`) |
 
 ---
 
@@ -209,7 +209,8 @@ Skycom is a multi-tenant retail ERP with a **usage-based credit** monetization m
 | 2026-08-25 | POS pay accepts branch payment methods; merchant identity in QR; `pos_payment_completed` | ✅ | `docs/ORDER_PROCESSING_V1.md` |
 | 2026-08-26 | POS receipt panel; inline QR wait; one-click Mock QR payment | ✅ | |
 | 2026-08-27 | Roadmap rewritten for the credit era; stale billing docs removed | ✅ | This doc |
-| 2026-09-18 | Purchase process + generic Workflow engine (models, migrations, `Workflows::AdvanceService`, seed, specs — backend-first; dashboards/API next) | ✅ | `docs/superpowers/specs/2026-09-18-purchase-workflow-design.md` (gitignored) |
+| 2026-09-18 | Purchase process + generic Workflow engine (models, migrations, `Workflows::AdvanceService`, seed, specs — backend-first) | ✅ | `docs/superpowers/specs/2026-09-18-purchase-workflow-design.md` (gitignored) |
+| 2026-09-19 | Purchase/Workflow dashboards + advance API (FE controllers, policies, dynamic search, feature tests) | ✅ | `docs/PURCHASE_WORKFLOW.md` |
 
 ---
 

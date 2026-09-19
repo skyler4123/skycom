@@ -30,6 +30,10 @@ class Purchase < ApplicationRecord
   has_many :purchase_items, through: :purchase_item_appointments
   has_many :workflow_step_logs, as: :subject, dependent: :destroy
 
+  # NOTE: must follow the associations — accepts_nested_attributes_for requires
+  # its target association to already exist (docs/MODEL_STRUCTURE.md exception).
+  accepts_nested_attributes_for :purchase_item_appointments, allow_destroy: true
+
   # --- Validations ---
   validates :name, presence: true, uniqueness: { scope: :company_id }, length: { maximum: 255 }
   validates :currency, presence: true
