@@ -4,8 +4,7 @@ class CreatePurchases < ActiveRecord::Migration[8.0]
       t.references :company, null: false, foreign_key: true, type: :uuid
       t.references :branch, null: true, foreign_key: true, type: :uuid
       t.references :supplier, null: true, foreign_key: true, type: :uuid
-      t.references :workflow, null: true, foreign_key: true, type: :uuid
-      t.references :current_workflow_step, null: true, foreign_key: { to_table: :workflow_steps }, type: :uuid
+      t.references :workflow_step, null: true, foreign_key: true, type: :uuid
       t.references :category, null: false, foreign_key: true, type: :uuid
       t.references :property_mapping, null: false, foreign_key: true, type: :uuid
 

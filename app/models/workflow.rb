@@ -7,33 +7,29 @@ class Workflow < ApplicationRecord
 
   # --- Associations ---
   belongs_to :company
+  belongs_to :category
   has_many :workflow_steps, dependent: :destroy
   has_many :workflow_step_logs, dependent: :destroy
-  has_many :purchases, foreign_key: :workflow_id, dependent: :nullify
-
-  # --- Scopes ---
-  scope :default_for, ->(process_type) {
-    where(process_type: process_type, is_default: true).lifecycle_status_active.order(:created_at)
-  }
 
   # --- Validations ---
   validates :name, presence: true, uniqueness: { scope: :company_id }, length: { maximum: 255 }
-  validate :only_one_default_per_process, if: :is_default?
+  validate :category_matches_company
 
   # --- Callbacks ---
-  before_destroy :release_purchase_pointers
+  # prepend: true — must run BEFORE the has_many :workflow_steps dependent: :destroy
+  # hook (registered at association declaration), or the purchases.workflow_step_id
+  # FK breaks during the cascade.
+  before_destroy :release_subject_pointers, prepend: true
 
   private
 
-  def only_one_default_per_process
-    duplicate = Workflow.where(company_id: company_id, process_type: process_type, is_default: true)
-      .where.not(id: id).exists?
-    return unless duplicate
+  def category_matches_company
+    return if category.nil? || company_id == category.company_id
 
-    errors.add(:is_default, "already has a default workflow for this process")
+    errors.add(:category, "must belong to the same company")
   end
 
-  def release_purchase_pointers
-    Purchase.where(workflow_id: id).update_all(current_workflow_step_id: nil)
+  def release_subject_pointers
+    Purchase.where(workflow_step_id: workflow_step_ids).update_all(workflow_step_id: nil)
   end
 end

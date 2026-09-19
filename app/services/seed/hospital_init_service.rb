@@ -168,25 +168,28 @@ class Seed::HospitalInitService
 
   private
 
-  # Default purchasing workflow bound to every new Purchase (Purchase#bind_default_workflow).
-  # Transitions are Jira-style (ABAC can?(:update, Purchase) — docs/PURCHASE_WORKFLOW.md);
-  # step names carry the semantics, no per-step role enforcement.
+  # Category is the bridge to workflows (docs/PURCHASE_WORKFLOW.md): every purchases
+  # category gets its own default "Standard Purchase Process" so purchases in the same
+  # category always share one workflow. Transitions are Jira-style (ABAC
+  # can?(:update, Purchase)) — step names carry the semantics, no per-step enforcement.
   def create_default_workflows
-    workflow = Seed::WorkflowService.create(
-      company: @company,
-      name: "Standard Purchase Process",
-      description: "Default purchasing workflow: submit, manager approval, buy, complete.",
-      process_type: :purchase_process,
-      is_default: true
-    )
+    @company.categories.where(resource_name: "purchases").find_each do |category|
+      workflow = Seed::WorkflowService.create(
+        company: @company,
+        category: category,
+        name: "#{category.name} Purchase Process",
+        description: "Default purchasing workflow: submit, manager approval, buy, complete.",
+        process_type: :purchase_process
+      )
 
-    [
-      { name: "Submit", position: 1 },
-      { name: "Manager Approval", position: 2 },
-      { name: "Buy", position: 3 },
-      { name: "Complete", position: 4 }
-    ].each do |attrs|
-      Seed::WorkflowStepService.create(company: @company, workflow: workflow, **attrs)
+      [
+        { name: "Submit", position: 1 },
+        { name: "Manager Approval", position: 2 },
+        { name: "Buy", position: 3 },
+        { name: "Complete", position: 4 }
+      ].each do |attrs|
+        Seed::WorkflowStepService.create(company: @company, workflow: workflow, **attrs)
+      end
     end
   end
 
@@ -275,7 +278,9 @@ class Seed::HospitalInitService
         "Transaction" => { create: true, read: true, update: false, delete: false },
         "Appointment" => { create: true, read: true, update: true, delete: true },
         "Patient" => { create: true, read: true, update: true, delete: false },
-        "Room" => { read: true }
+        "Room" => { read: true },
+        "Purchase" => { create: true, read: true, update: true, delete: false },
+        "PurchaseItem" => { create: false, read: true, update: false, delete: false }
       },
       Dentist: {
         "Customer" => { create: false, read: true, update: true, delete: false },
@@ -338,7 +343,9 @@ class Seed::HospitalInitService
         "Warehouse" => { create: true, read: true, update: true, delete: true },
         "StockExport" => { create: true, read: true, update: true, delete: true },
         "StockImport" => { create: true, read: true, update: true, delete: true },
-        "StockTransfer" => { create: true, read: true, update: true, delete: true }
+        "StockTransfer" => { create: true, read: true, update: true, delete: true },
+        "Purchase" => { create: true, read: true, update: true, delete: true },
+        "PurchaseItem" => { create: true, read: true, update: true, delete: true }
       },
       Admin: {
         "Product" => { create: true, read: true, update: true, delete: true },
@@ -379,7 +386,9 @@ class Seed::HospitalInitService
         "Warehouse" => { create: true, read: true, update: true, delete: true },
         "StockExport" => { create: true, read: true, update: true, delete: true },
         "StockImport" => { create: true, read: true, update: true, delete: true },
-        "StockTransfer" => { create: true, read: true, update: true, delete: true }
+        "StockTransfer" => { create: true, read: true, update: true, delete: true },
+        "Purchase" => { create: true, read: true, update: true, delete: true },
+        "PurchaseItem" => { create: true, read: true, update: true, delete: true }
       }
     }
 

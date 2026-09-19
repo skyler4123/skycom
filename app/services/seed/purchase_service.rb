@@ -13,10 +13,9 @@ class Seed::PurchaseService
     lifecycle_status: :active,
     workflow_status: nil,
     business_type: Purchase.business_types.keys.sample,
-    workflow: nil,
-    current_workflow_step: nil,
+    workflow_step: nil,
     created_by_employee: nil,
-    skip_default_workflow: false,
+    skip_workflow: false,
     discarded_at: nil
   )
     raise "Cannot create purchase: No company provided." if company.nil?
@@ -35,10 +34,9 @@ class Seed::PurchaseService
       lifecycle_status: lifecycle_status,
       workflow_status: workflow_status,
       business_type: business_type,
-      workflow: workflow,
-      current_workflow_step: current_workflow_step,
+      workflow_step: workflow_step,
       created_by_employee: created_by_employee,
-      skip_default_workflow: skip_default_workflow,
+      skip_workflow: skip_workflow,
       discarded_at: discarded_at
     )
   end

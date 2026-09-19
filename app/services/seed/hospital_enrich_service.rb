@@ -509,11 +509,13 @@ class Seed::HospitalEnrichService
     puts "Creating purchases..."
     purchase_categories = Category.where(company: @company, resource_name: "purchases").order(:id).to_a
     item_categories = Category.where(company: @company, resource_name: "purchase_items").order(:id).to_a
-    workflow = @company.workflows.default_for(:purchase_process).first
-    return if workflow.nil?
+    return if purchase_categories.empty?
 
     managers = @employees.select { |e| e.has_role?("Manager") }
-    requesters = @employees
+    # Jira-style: only employees holding update permission on Purchase may transition.
+    requesters = @employees.select { |e| e.can?(:update, Purchase) }
+    return if requesters.empty?
+
     suppliers = Supplier.where(company: @company).to_a
 
     items = 4.times.map do |i|
@@ -539,6 +541,8 @@ class Seed::HospitalEnrichService
   end
 
   def run_purchase_workflow(purchase, requester, manager, index)
+    return if purchase.workflow_step.nil?
+
     case index % 4
     when 0
       advance_purchase(purchase, manager, :approved)
@@ -548,7 +552,7 @@ class Seed::HospitalEnrichService
     when 1
       advance_purchase(purchase, manager, :rejected, note: "Not within budget")
     when 2
-      step_one = purchase.workflow.workflow_steps.find_by(position: 1)
+      step_one = purchase.workflow_step.workflow.workflow_steps.find_by(position: 1)
       advance_purchase(purchase, manager, :rework, note: "Reduce quantities", target_step: step_one)
       advance_purchase(purchase, manager, :approved)
       advance_purchase(purchase, manager, :approved)
