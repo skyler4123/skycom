@@ -99,6 +99,8 @@ export const dictionary = () => {
     "Note (optional)": { vi: "Ghi Chú (Tùy Chọn)" },
     "None": { vi: "Không" },
     "Save Purchase": { vi: "Lưu Phiếu Mua Hàng" },
+    "Unnamed Purchase": { vi: "Phiếu Không Tên" },
+    "Existing steps cannot be removed — they carry the workflow audit history": { vi: "Không thể xóa bước đã tồn tại — bước gắn với lịch sử quy trình" },
     "Save Workflow": { vi: "Lưu Quy Trình" },
     "e.g. Office supplies restock": { vi: "VD: Nhập thêm văn phòng phẩm" },
     "e.g. Manager Approval": { vi: "VD: Phê Duyệt Quản Lý" },
