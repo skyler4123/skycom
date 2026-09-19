@@ -48,6 +48,12 @@ Rails.application.routes.draw do
       resources :stock_exports
       resources :customers
       resources :invoices
+      resources :purchases do
+        member do
+          post :advance
+        end
+      end
+      resources :workflows
       resources :shift_templates
       resources :scheduled_shifts
       resources :attendance_policies

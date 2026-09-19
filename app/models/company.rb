@@ -14,7 +14,7 @@ class Company < ApplicationRecord
     PolicyAppointment Invoice Transaction Service Policy
     Category PropertyMapping TableConfig Brand Facility Warehouse
     Supplier
-    Purchase PurchaseItem
+    Purchase PurchaseItem Workflow
     Table Reservation Room Guest
     Patient Appointment Course Student Exam
     Membership
@@ -27,10 +27,11 @@ class Company < ApplicationRecord
   # app/javascript/controllers/companies/sidebar_items.js.
   DEFAULT_SETTINGS_CODE = "SETTINGS-DEFAULT".freeze
   SIDEBAR_ITEM_KEYS = %w[
-    dashboard branches departments categories property_mappings table_configs
+    dashboard branches departments categories property_mappings table_configs workflows
     products brands services orders employees shift_templates scheduled_shifts
     attendance_days attendance_policies attendance_logs attendance_months
-    warehouses stocks stock_transfers stock_imports stock_exports suppliers customers invoices
+    attendance_days attendance_policies attendance_logs attendance_months
+    warehouses stocks stock_transfers stock_imports stock_exports suppliers customers invoices purchases
     policies pages payment_methods permissions analytics facilities
     usage top_up billing settings help_center
   ].freeze

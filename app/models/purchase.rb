@@ -18,6 +18,8 @@ class Purchase < ApplicationRecord
   enum :currency, CURRENCIE_CODES, prefix: true, default: :usd
   enum :business_type, { office_supply: 0, equipment: 1, service: 2 }
 
+  accepts_nested_attributes_for :purchase_item_appointments, allow_destroy: true
+
   # --- Associations ---
   belongs_to :company
   belongs_to :branch, optional: true
