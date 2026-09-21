@@ -11,6 +11,7 @@ class CreateDiscountGroups < ActiveRecord::Migration[8.0]
 
       # --- Calculation config ---
       t.integer :discount_type, null: false
+      t.integer :currency
       t.integer :amount_cents
       t.decimal :percentage, precision: 15, scale: 4
       t.integer :max_amount_cents

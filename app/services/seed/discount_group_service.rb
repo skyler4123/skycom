@@ -20,7 +20,8 @@ class Seed::DiscountGroupService
     raise "Cannot create discount group: No company provided." if company.nil?
 
     percentage = 10.0 if discount_type.to_s == "percentage" && percentage.nil?
-    amount = 500 if discount_type.to_s == "fixed_amount" && amount_cents.nil?
+    amount = amount_cents
+    amount ||= 500 if discount_type.to_s == "fixed_amount"
 
     DiscountGroup.new(
       company: company,
