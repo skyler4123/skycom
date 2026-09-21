@@ -828,9 +828,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_09_18_000006) do
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.bigint "chatwoot_account_id"
     t.index ["business_type"], name: "index_companies_on_business_type"
-    t.index ["chatwoot_account_id"], name: "index_companies_on_chatwoot_account_id", unique: true
     t.index ["discarded_at"], name: "index_companies_on_discarded_at"
     t.index ["lifecycle_status"], name: "index_companies_on_lifecycle_status"
     t.index ["user_id"], name: "index_companies_on_user_id"

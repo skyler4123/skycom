@@ -110,6 +110,15 @@ class ClientCacheController < ApplicationController
               lifecycle_statuses: Supplier.lifecycle_statuses.keys.map { |s| { name: s.humanize, value: s } },
               workflow_statuses: Supplier.workflow_statuses.keys.map { |s| { name: s.humanize, value: s } },
               business_types: Supplier.business_types.keys.map { |t| { name: t.humanize, value: t } }
+            },
+            purchase: {
+              lifecycle_statuses: Purchase.lifecycle_statuses.keys.map { |s| { name: s.humanize, value: s } },
+              workflow_statuses: Purchase.workflow_statuses.keys.map { |s| { name: s.humanize, value: s } },
+              business_types: Purchase.business_types.keys.map { |t| { name: t.humanize, value: t } },
+              currencies: Purchase.currencies.keys.map { |c| { name: c.humanize, value: c } }
+            },
+            workflow: {
+              process_types: Workflow.process_types.keys.map { |t| { name: t.to_s.humanize, value: t.to_s } }
             }
           },
           employees: current_user.employees

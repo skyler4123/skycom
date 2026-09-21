@@ -202,6 +202,19 @@ export const create_company_invoices_path = (companyId) => `/companies/${company
 export const company_invoice_path = (companyId, invoiceId) => `/companies/${companyId}/invoices/${invoiceId}`
 export const new_company_invoice_path = (companyId) => `/companies/${companyId}/invoices/new`
 export const edit_company_invoice_path = (companyId, invoiceId) => `/companies/${companyId}/invoices/${invoiceId}/edit`
+
+export const company_purchases_path = (companyId) => `/companies/${companyId}/purchases`
+export const create_company_purchases_path = (companyId) => `/companies/${companyId}/purchases`
+export const new_company_purchase_path = (companyId) => `/companies/${companyId}/purchases/new`
+export const company_purchase_path = (companyId, purchaseId) => `/companies/${companyId}/purchases/${purchaseId}`
+export const edit_company_purchase_path = (companyId, purchaseId) => `/companies/${companyId}/purchases/${purchaseId}/edit`
+export const advance_company_purchase_path = (companyId, purchaseId) => `/companies/${companyId}/purchases/${purchaseId}/advance`
+
+export const company_workflows_path = (companyId) => `/companies/${companyId}/workflows`
+export const create_company_workflows_path = (companyId) => `/companies/${companyId}/workflows`
+export const new_company_workflow_path = (companyId) => `/companies/${companyId}/workflows/new`
+export const company_workflow_path = (companyId, workflowId) => `/companies/${companyId}/workflows/${workflowId}`
+export const edit_company_workflow_path = (companyId, workflowId) => `/companies/${companyId}/workflows/${workflowId}/edit`
 export const company_stocks_path = (companyId) => `/companies/${companyId}/stocks`
 export const company_stock_transfers_path = (companyId) => `/companies/${companyId}/stock_transfers`
 export const company_stock_imports_path = (companyId) => `/companies/${companyId}/stock_imports`

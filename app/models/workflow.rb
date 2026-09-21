@@ -11,6 +11,10 @@ class Workflow < ApplicationRecord
   has_many :workflow_steps, dependent: :destroy
   has_many :workflow_step_logs, dependent: :destroy
 
+  # NOTE: must follow the associations — accepts_nested_attributes_for requires
+  # its target association to already exist (docs/MODEL_STRUCTURE.md exception).
+  accepts_nested_attributes_for :workflow_steps
+
   # --- Validations ---
   validates :name, presence: true, uniqueness: { scope: :company_id }, length: { maximum: 255 }
   validate :category_matches_company
