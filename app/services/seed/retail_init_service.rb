@@ -429,6 +429,34 @@ class Seed::RetailInitService
         properties: { property_string_1: "Tax Authority", property_decimal_1: "Refund Amount" },
         visible_columns: %w[name code workflow_status]
       }
+    },
+    purchases: {
+      "Office Supplies" => {
+        properties: { property_string_1: "Requesting Department", property_string_2: "Reason" },
+        visible_columns: %w[name code workflow_status needed_by]
+      },
+      "Equipment" => {
+        properties: { property_string_1: "Equipment Category", property_decimal_1: "Budget Cap" },
+        visible_columns: %w[name code workflow_status needed_by]
+      },
+      "Procurement Services" => {
+        properties: { property_string_1: "Service Scope", property_datetime_1: "Service Start" },
+        visible_columns: %w[name code workflow_status needed_by]
+      }
+    },
+    purchase_items: {
+      "Stationery" => {
+        properties: { property_string_1: "Brand Preference", property_integer_1: "Pack Size" },
+        visible_columns: %w[name code unit estimated_unit_price]
+      },
+      "Equipment Items" => {
+        properties: { property_string_1: "Warranty (months)", property_decimal_1: "Unit Cost" },
+        visible_columns: %w[name code unit estimated_unit_price]
+      },
+      "Consumables" => {
+        properties: { property_string_1: "Usage Type", property_boolean_1: "Hazardous" },
+        visible_columns: %w[name code unit estimated_unit_price]
+      }
     }
   }.freeze
 
@@ -444,6 +472,7 @@ class Seed::RetailInitService
     create_roles
     create_categories
     create_table_configs
+    create_default_workflows
     configure_retail_permissions
   end
 
@@ -495,6 +524,31 @@ class Seed::RetailInitService
 
   def field_hash(key, properties = {})
     Seed::TableConfigService.field_hash(key, properties[key.to_sym])
+  end
+
+  # Category is the bridge to workflows (docs/PURCHASE_WORKFLOW.md): every purchases
+  # category gets its own default "Standard Purchase Process" so purchases in the same
+  # category always share one workflow. Transitions are Jira-style (ABAC
+  # can?(:update, Purchase)) — step names carry the semantics, no per-step enforcement.
+  def create_default_workflows
+    @company.categories.where(resource_name: "purchases").find_each do |category|
+      workflow = Seed::WorkflowService.create(
+        company: @company,
+        category: category,
+        name: "#{category.name} Purchase Process",
+        description: "Default purchasing workflow: submit, manager approval, buy, complete.",
+        process_type: :purchase_process
+      )
+
+      [
+        { name: "Submit", position: 1 },
+        { name: "Manager Approval", position: 2 },
+        { name: "Buy", position: 3 },
+        { name: "Complete", position: 4 }
+      ].each do |attrs|
+        Seed::WorkflowStepService.create(company: @company, workflow: workflow, **attrs)
+      end
+    end
   end
 
   def configure_retail_permissions
@@ -557,6 +611,8 @@ class Seed::RetailInitService
         "Product" => { create: true, read: true, update: true, delete: true },
         "PropertyMapping" => { create: true, read: true, update: true, delete: true },
         "TableConfig" => { create: true, read: true, update: true, delete: true },
+        "Purchase" => { create: true, read: true, update: true, delete: true },
+        "PurchaseItem" => { create: true, read: true, update: true, delete: true },
         "Reservation" => { create: true, read: true, update: true, delete: true },
         "Room" => { create: true, read: true, update: true, delete: true },
         "Service" => { create: true, read: true, update: true, delete: true },
@@ -607,6 +663,8 @@ class Seed::RetailInitService
         "StockExport" => { create: true, read: true, update: true, delete: true },
         "StockImport" => { create: true, read: true, update: true, delete: true },
         "StockTransfer" => { create: true, read: true, update: true, delete: true },
+        "Purchase" => { create: true, read: true, update: true, delete: true },
+        "PurchaseItem" => { create: true, read: true, update: true, delete: true },
         "Student" => { create: true, read: true, update: true, delete: true },
         "Table" => { create: true, read: true, update: true, delete: true }
       },
@@ -615,14 +673,18 @@ class Seed::RetailInitService
         "Product" => { create: false, read: true, update: false, delete: false },
         "Customer" => { create: true, read: true, update: false, delete: false },
         "Brand" => { create: false, read: true, update: false, delete: false },
-        "Supplier" => { create: false, read: true, update: false, delete: false }
+        "Supplier" => { create: false, read: true, update: false, delete: false },
+        "Purchase" => { create: true, read: true, update: true, delete: false },
+        "PurchaseItem" => { create: false, read: true, update: false, delete: false }
       },
       Seller: {
         "Order" => { create: true, read: true, update: false, delete: false },
         "Product" => { create: false, read: true, update: false, delete: false },
         "Customer" => { create: false, read: true, update: false, delete: false },
         "Brand" => { create: false, read: true, update: false, delete: false },
-        "Supplier" => { create: false, read: true, update: false, delete: false }
+        "Supplier" => { create: false, read: true, update: false, delete: false },
+        "Purchase" => { create: true, read: true, update: true, delete: false },
+        "PurchaseItem" => { create: false, read: true, update: false, delete: false }
       },
       Security: {
         "Product" => { create: false, read: true, update: false, delete: false },

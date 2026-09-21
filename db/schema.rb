@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_09_17_195446) do
+ActiveRecord::Schema[8.0].define(version: 2026_09_18_000006) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pgcrypto"
@@ -3657,6 +3657,228 @@ ActiveRecord::Schema[8.0].define(version: 2026_09_17_195446) do
     t.index ["workflow_status"], name: "index_property_mappings_on_workflow_status"
   end
 
+  create_table "purchase_item_appointments", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
+    t.uuid "company_id", null: false
+    t.uuid "purchase_item_id", null: false
+    t.string "appoint_from_type"
+    t.uuid "appoint_from_id"
+    t.string "appoint_to_type", null: false
+    t.uuid "appoint_to_id", null: false
+    t.string "appoint_for_type"
+    t.uuid "appoint_for_id"
+    t.string "appoint_by_type"
+    t.uuid "appoint_by_id"
+    t.integer "quantity"
+    t.decimal "unit_price"
+    t.decimal "total_price"
+    t.string "name"
+    t.string "description"
+    t.string "code"
+    t.integer "lifecycle_status"
+    t.integer "workflow_status"
+    t.integer "business_type"
+    t.datetime "expiration_date"
+    t.jsonb "metadata"
+    t.datetime "discarded_at"
+    t.string "permission_resource_name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["appoint_by_type", "appoint_by_id"], name: "index_purchase_item_appointments_on_appoint_by"
+    t.index ["appoint_for_type", "appoint_for_id"], name: "index_purchase_item_appointments_on_appoint_for"
+    t.index ["appoint_from_type", "appoint_from_id"], name: "index_purchase_item_appointments_on_appoint_from"
+    t.index ["appoint_to_type", "appoint_to_id"], name: "index_purchase_item_appointments_on_appoint_to"
+    t.index ["business_type"], name: "index_purchase_item_appointments_on_business_type"
+    t.index ["company_id"], name: "index_purchase_item_appointments_on_company_id"
+    t.index ["discarded_at"], name: "index_purchase_item_appointments_on_discarded_at"
+    t.index ["lifecycle_status"], name: "index_purchase_item_appointments_on_lifecycle_status"
+    t.index ["purchase_item_id"], name: "index_purchase_item_appointments_on_purchase_item_id"
+    t.index ["workflow_status"], name: "index_purchase_item_appointments_on_workflow_status"
+  end
+
+  create_table "purchase_items", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
+    t.uuid "company_id", null: false
+    t.uuid "category_id", null: false
+    t.uuid "property_mapping_id", null: false
+    t.string "name"
+    t.text "description"
+    t.string "code"
+    t.string "unit"
+    t.decimal "estimated_unit_price"
+    t.integer "lifecycle_status"
+    t.integer "workflow_status"
+    t.integer "business_type"
+    t.datetime "expiration_date"
+    t.jsonb "metadata"
+    t.datetime "discarded_at"
+    t.string "permission_resource_name"
+    t.string "property_string_1"
+    t.string "property_string_2"
+    t.string "property_string_3"
+    t.string "property_string_4"
+    t.string "property_string_5"
+    t.string "property_string_6"
+    t.string "property_string_7"
+    t.string "property_string_8"
+    t.string "property_string_9"
+    t.string "property_string_10"
+    t.integer "property_integer_1"
+    t.integer "property_integer_2"
+    t.integer "property_integer_3"
+    t.integer "property_integer_4"
+    t.integer "property_integer_5"
+    t.integer "property_integer_6"
+    t.integer "property_integer_7"
+    t.integer "property_integer_8"
+    t.integer "property_integer_9"
+    t.integer "property_integer_10"
+    t.integer "property_integer_11"
+    t.integer "property_integer_12"
+    t.integer "property_integer_13"
+    t.integer "property_integer_14"
+    t.integer "property_integer_15"
+    t.integer "property_integer_16"
+    t.integer "property_integer_17"
+    t.integer "property_integer_18"
+    t.integer "property_integer_19"
+    t.integer "property_integer_20"
+    t.decimal "property_decimal_1", precision: 15, scale: 4
+    t.decimal "property_decimal_2", precision: 15, scale: 4
+    t.decimal "property_decimal_3", precision: 15, scale: 4
+    t.decimal "property_decimal_4", precision: 15, scale: 4
+    t.decimal "property_decimal_5", precision: 15, scale: 4
+    t.decimal "property_decimal_6", precision: 15, scale: 4
+    t.decimal "property_decimal_7", precision: 15, scale: 4
+    t.decimal "property_decimal_8", precision: 15, scale: 4
+    t.decimal "property_decimal_9", precision: 15, scale: 4
+    t.decimal "property_decimal_10", precision: 15, scale: 4
+    t.boolean "property_boolean_1"
+    t.boolean "property_boolean_2"
+    t.boolean "property_boolean_3"
+    t.boolean "property_boolean_4"
+    t.boolean "property_boolean_5"
+    t.boolean "property_boolean_6"
+    t.boolean "property_boolean_7"
+    t.boolean "property_boolean_8"
+    t.boolean "property_boolean_9"
+    t.boolean "property_boolean_10"
+    t.datetime "property_datetime_1"
+    t.datetime "property_datetime_2"
+    t.datetime "property_datetime_3"
+    t.datetime "property_datetime_4"
+    t.datetime "property_datetime_5"
+    t.datetime "property_datetime_6"
+    t.datetime "property_datetime_7"
+    t.datetime "property_datetime_8"
+    t.datetime "property_datetime_9"
+    t.datetime "property_datetime_10"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["business_type"], name: "index_purchase_items_on_business_type"
+    t.index ["category_id"], name: "index_purchase_items_on_category_id"
+    t.index ["code"], name: "index_purchase_items_on_code", unique: true
+    t.index ["company_id"], name: "index_purchase_items_on_company_id"
+    t.index ["discarded_at"], name: "index_purchase_items_on_discarded_at"
+    t.index ["lifecycle_status"], name: "index_purchase_items_on_lifecycle_status"
+    t.index ["property_mapping_id"], name: "index_purchase_items_on_property_mapping_id"
+    t.index ["workflow_status"], name: "index_purchase_items_on_workflow_status"
+  end
+
+  create_table "purchases", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
+    t.uuid "company_id", null: false
+    t.uuid "branch_id"
+    t.uuid "supplier_id"
+    t.uuid "workflow_step_id"
+    t.uuid "category_id", null: false
+    t.uuid "property_mapping_id", null: false
+    t.string "name"
+    t.text "description"
+    t.string "code"
+    t.datetime "needed_by"
+    t.integer "currency"
+    t.integer "country"
+    t.integer "timezone"
+    t.integer "lifecycle_status"
+    t.integer "workflow_status"
+    t.integer "business_type"
+    t.datetime "expiration_date"
+    t.jsonb "metadata"
+    t.datetime "discarded_at"
+    t.string "permission_resource_name"
+    t.string "property_string_1"
+    t.string "property_string_2"
+    t.string "property_string_3"
+    t.string "property_string_4"
+    t.string "property_string_5"
+    t.string "property_string_6"
+    t.string "property_string_7"
+    t.string "property_string_8"
+    t.string "property_string_9"
+    t.string "property_string_10"
+    t.integer "property_integer_1"
+    t.integer "property_integer_2"
+    t.integer "property_integer_3"
+    t.integer "property_integer_4"
+    t.integer "property_integer_5"
+    t.integer "property_integer_6"
+    t.integer "property_integer_7"
+    t.integer "property_integer_8"
+    t.integer "property_integer_9"
+    t.integer "property_integer_10"
+    t.integer "property_integer_11"
+    t.integer "property_integer_12"
+    t.integer "property_integer_13"
+    t.integer "property_integer_14"
+    t.integer "property_integer_15"
+    t.integer "property_integer_16"
+    t.integer "property_integer_17"
+    t.integer "property_integer_18"
+    t.integer "property_integer_19"
+    t.integer "property_integer_20"
+    t.decimal "property_decimal_1", precision: 15, scale: 4
+    t.decimal "property_decimal_2", precision: 15, scale: 4
+    t.decimal "property_decimal_3", precision: 15, scale: 4
+    t.decimal "property_decimal_4", precision: 15, scale: 4
+    t.decimal "property_decimal_5", precision: 15, scale: 4
+    t.decimal "property_decimal_6", precision: 15, scale: 4
+    t.decimal "property_decimal_7", precision: 15, scale: 4
+    t.decimal "property_decimal_8", precision: 15, scale: 4
+    t.decimal "property_decimal_9", precision: 15, scale: 4
+    t.decimal "property_decimal_10", precision: 15, scale: 4
+    t.boolean "property_boolean_1"
+    t.boolean "property_boolean_2"
+    t.boolean "property_boolean_3"
+    t.boolean "property_boolean_4"
+    t.boolean "property_boolean_5"
+    t.boolean "property_boolean_6"
+    t.boolean "property_boolean_7"
+    t.boolean "property_boolean_8"
+    t.boolean "property_boolean_9"
+    t.boolean "property_boolean_10"
+    t.datetime "property_datetime_1"
+    t.datetime "property_datetime_2"
+    t.datetime "property_datetime_3"
+    t.datetime "property_datetime_4"
+    t.datetime "property_datetime_5"
+    t.datetime "property_datetime_6"
+    t.datetime "property_datetime_7"
+    t.datetime "property_datetime_8"
+    t.datetime "property_datetime_9"
+    t.datetime "property_datetime_10"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["branch_id"], name: "index_purchases_on_branch_id"
+    t.index ["business_type"], name: "index_purchases_on_business_type"
+    t.index ["category_id"], name: "index_purchases_on_category_id"
+    t.index ["code"], name: "index_purchases_on_code", unique: true
+    t.index ["company_id"], name: "index_purchases_on_company_id"
+    t.index ["discarded_at"], name: "index_purchases_on_discarded_at"
+    t.index ["lifecycle_status"], name: "index_purchases_on_lifecycle_status"
+    t.index ["property_mapping_id"], name: "index_purchases_on_property_mapping_id"
+    t.index ["supplier_id"], name: "index_purchases_on_supplier_id"
+    t.index ["workflow_status"], name: "index_purchases_on_workflow_status"
+    t.index ["workflow_step_id"], name: "index_purchases_on_workflow_step_id"
+  end
+
   create_table "questions", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
     t.uuid "company_id", null: false
     t.uuid "branch_id"
@@ -5689,6 +5911,89 @@ ActiveRecord::Schema[8.0].define(version: 2026_09_17_195446) do
     t.index ["workflow_status"], name: "index_warehouses_on_workflow_status"
   end
 
+  create_table "workflow_step_logs", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
+    t.uuid "company_id", null: false
+    t.uuid "workflow_id", null: false
+    t.uuid "workflow_step_id", null: false
+    t.uuid "employee_id"
+    t.string "subject_type", null: false
+    t.uuid "subject_id", null: false
+    t.integer "outcome"
+    t.text "note"
+    t.integer "lifecycle_status"
+    t.integer "workflow_status"
+    t.integer "business_type"
+    t.datetime "expiration_date"
+    t.jsonb "metadata"
+    t.datetime "discarded_at"
+    t.string "permission_resource_name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["business_type"], name: "index_workflow_step_logs_on_business_type"
+    t.index ["company_id"], name: "index_workflow_step_logs_on_company_id"
+    t.index ["discarded_at"], name: "index_workflow_step_logs_on_discarded_at"
+    t.index ["employee_id"], name: "index_workflow_step_logs_on_employee_id"
+    t.index ["lifecycle_status"], name: "index_workflow_step_logs_on_lifecycle_status"
+    t.index ["subject_type", "subject_id"], name: "index_workflow_step_logs_on_subject"
+    t.index ["workflow_id", "created_at"], name: "index_workflow_step_logs_on_workflow_id_and_created_at"
+    t.index ["workflow_id", "workflow_step_id"], name: "index_workflow_step_logs_on_workflow_id_and_workflow_step_id"
+    t.index ["workflow_id"], name: "index_workflow_step_logs_on_workflow_id"
+    t.index ["workflow_status"], name: "index_workflow_step_logs_on_workflow_status"
+    t.index ["workflow_step_id"], name: "index_workflow_step_logs_on_workflow_step_id"
+  end
+
+  create_table "workflow_steps", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
+    t.uuid "company_id", null: false
+    t.uuid "workflow_id", null: false
+    t.string "name"
+    t.text "description"
+    t.string "code"
+    t.integer "position"
+    t.integer "lifecycle_status"
+    t.integer "workflow_status"
+    t.integer "business_type"
+    t.datetime "expiration_date"
+    t.jsonb "metadata"
+    t.datetime "discarded_at"
+    t.string "permission_resource_name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["business_type"], name: "index_workflow_steps_on_business_type"
+    t.index ["code"], name: "index_workflow_steps_on_code", unique: true
+    t.index ["company_id"], name: "index_workflow_steps_on_company_id"
+    t.index ["discarded_at"], name: "index_workflow_steps_on_discarded_at"
+    t.index ["lifecycle_status"], name: "index_workflow_steps_on_lifecycle_status"
+    t.index ["workflow_id", "position"], name: "index_workflow_steps_on_workflow_id_and_position"
+    t.index ["workflow_id"], name: "index_workflow_steps_on_workflow_id"
+    t.index ["workflow_status"], name: "index_workflow_steps_on_workflow_status"
+  end
+
+  create_table "workflows", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
+    t.uuid "company_id", null: false
+    t.uuid "category_id", null: false
+    t.string "name"
+    t.text "description"
+    t.string "code"
+    t.integer "process_type"
+    t.integer "lifecycle_status"
+    t.integer "workflow_status"
+    t.integer "business_type"
+    t.datetime "expiration_date"
+    t.jsonb "metadata"
+    t.datetime "discarded_at"
+    t.string "permission_resource_name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["business_type"], name: "index_workflows_on_business_type"
+    t.index ["category_id"], name: "index_workflows_on_category_id", unique: true
+    t.index ["code"], name: "index_workflows_on_code", unique: true
+    t.index ["company_id", "process_type"], name: "index_workflows_on_company_id_and_process_type"
+    t.index ["company_id"], name: "index_workflows_on_company_id"
+    t.index ["discarded_at"], name: "index_workflows_on_discarded_at"
+    t.index ["lifecycle_status"], name: "index_workflows_on_lifecycle_status"
+    t.index ["workflow_status"], name: "index_workflows_on_workflow_status"
+  end
+
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
   add_foreign_key "address_appointments", "addresses"
@@ -5908,6 +6213,17 @@ ActiveRecord::Schema[8.0].define(version: 2026_09_17_195446) do
   add_foreign_key "projects", "property_mappings"
   add_foreign_key "property_mappings", "categories"
   add_foreign_key "property_mappings", "companies"
+  add_foreign_key "purchase_item_appointments", "companies"
+  add_foreign_key "purchase_item_appointments", "purchase_items"
+  add_foreign_key "purchase_items", "categories"
+  add_foreign_key "purchase_items", "companies"
+  add_foreign_key "purchase_items", "property_mappings"
+  add_foreign_key "purchases", "branches"
+  add_foreign_key "purchases", "categories"
+  add_foreign_key "purchases", "companies"
+  add_foreign_key "purchases", "property_mappings"
+  add_foreign_key "purchases", "suppliers"
+  add_foreign_key "purchases", "workflow_steps"
   add_foreign_key "questions", "branches"
   add_foreign_key "questions", "categories"
   add_foreign_key "questions", "companies"
@@ -6026,4 +6342,12 @@ ActiveRecord::Schema[8.0].define(version: 2026_09_17_195446) do
   add_foreign_key "warehouses", "categories"
   add_foreign_key "warehouses", "companies"
   add_foreign_key "warehouses", "property_mappings"
+  add_foreign_key "workflow_step_logs", "companies"
+  add_foreign_key "workflow_step_logs", "employees"
+  add_foreign_key "workflow_step_logs", "workflow_steps"
+  add_foreign_key "workflow_step_logs", "workflows"
+  add_foreign_key "workflow_steps", "companies"
+  add_foreign_key "workflow_steps", "workflows"
+  add_foreign_key "workflows", "categories"
+  add_foreign_key "workflows", "companies"
 end
