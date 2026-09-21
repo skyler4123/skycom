@@ -15,6 +15,7 @@ class Company < ApplicationRecord
     Category PropertyMapping TableConfig Brand Facility Warehouse
     Supplier
     Purchase PurchaseItem Workflow
+    DiscountGroup Discount
     Table Reservation Room Guest
     Patient Appointment Course Student Exam
     Membership
@@ -124,6 +125,8 @@ class Company < ApplicationRecord
   has_many :workflow_steps, dependent: :destroy
   has_many :workflow_step_logs, dependent: :destroy
   has_many :invoices, dependent: :destroy
+  has_many :discount_groups, dependent: :destroy
+  has_many :discounts, dependent: :destroy
   has_many :task_groups, dependent: :destroy
   has_many :project_groups, dependent: :destroy
   has_many :cart_groups, dependent: :destroy

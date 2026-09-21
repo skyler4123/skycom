@@ -25,6 +25,7 @@ class Order < ApplicationRecord
   belongs_to :property_mapping
 
   has_many :invoices, dependent: :destroy
+  has_many :discounts, dependent: :destroy
   has_many :order_appointments, dependent: :destroy
   has_many :products, through: :order_appointments, source: :appoint_to, source_type: "Product"
   has_many :services, through: :order_appointments, source: :appoint_to, source_type: "Service"
