@@ -60,6 +60,7 @@ class Companies::OrdersController < Companies::ApplicationController
 
     subtotal = invoice ? invoice.price_cents / 100.0 : items.sum { |i| i[:total_price] }.round(2)
     tax = (subtotal * 0.10).round(2)
+    discount_amount = invoice ? invoice.discounts.where(status: :used).sum(:amount_cents) / 100.0 : 0.0
 
     render json: {
       receipt: {
@@ -69,6 +70,7 @@ class Companies::OrdersController < Companies::ApplicationController
         currency: order.currency,
         items: items,
         subtotal: subtotal.round(2),
+        discount_amount: discount_amount.round(2),
         tax: tax,
         total: (subtotal + tax).round(2),
         payment_method_name: transaction&.payment_method&.name

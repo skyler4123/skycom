@@ -121,6 +121,83 @@ RSpec.describe OrderProcessingV1::InitiatePaymentService do
     end
   end
 
+  describe "with a discount code" do
+    let(:group) do
+      Seed::DiscountGroupService.create(company: company, name: "POS Summer", prefix: "SUM26",
+        discount_type: :percentage, percentage: 10, campaign_status: :active)
+    end
+    let!(:discount) { Seed::DiscountService.create(company: company, discount_group: group, code: "SUM26-POS001") }
+    let(:employee) { create(:employee, company: company) }
+
+    before { order.update!(currency: :usd) }
+
+    it "creates a discounted invoice and consumes the code on the synchronous cash path" do
+      result = described_class.call(order: order, appointment: cash_appts.last,
+        discount_code: "SUM26-POS001", employee: employee)
+
+      aggregate_failures do
+        expect(result.status).to eq("paid")
+        expect(result.discount.amount_cents).to eq(1_000) # 10% of 100.00
+        expect(Invoice.find(result.transaction_id && Transaction.find(result.transaction_id).invoice_id).price_cents)
+          .to eq(9_000)
+        expect(discount.reload).to be_status_used
+        expect(discount.invoice_id).to be_present
+        expect(group.reload.current_spent_cents).to eq(1_000)
+      end
+    end
+
+    it "leaves the code pending on the QR path until the webhook completes it" do
+      allow(Payments::MockQrGateway).to receive(:new).and_return(
+        double(call: { success: true, gateway_reference: "MOCK_QR_1", gateway_payload: { "qr_string" => "QRDATA" } })
+      )
+
+      result = described_class.call(order: order, appointment: qr_appts.last,
+        discount_code: "SUM26-POS001", employee: employee)
+
+      aggregate_failures do
+        expect(result.status).to eq("pending")
+        expect(result.discount).to be_present
+        txn = Transaction.find_by(gateway_reference: result.transaction_token)
+        expect(txn.invoice.price_cents).to eq(9_000)
+        expect(discount.reload).to be_status_pending
+        expect(discount.invoice_id).to be_nil
+        expect(group.reload.current_spent_cents).to eq(0)
+      end
+    end
+
+    it "raises InvalidDiscountError and creates nothing for an unknown code" do
+      expect {
+        described_class.call(order: order, appointment: cash_appts.last, discount_code: "SUM26-NOPE")
+      }.to raise_error(OrderProcessingV1::InvalidDiscountError, /not found or already used/)
+
+      aggregate_failures do
+        expect(Invoice.count).to eq(0)
+        expect(Transaction.count).to eq(0)
+        expect(stock.reload.pending).to eq(0)
+        expect(discount.reload).to be_status_unused
+      end
+    end
+
+    it "releases the reserved code and stock when the gateway fails" do
+      allow(Payments::MockQrGateway).to receive(:new).and_return(
+        double(call: { success: false, error: "bank down" })
+      )
+
+      expect {
+        described_class.call(order: order, appointment: qr_appts.last,
+          discount_code: "SUM26-POS001", employee: employee)
+      }.to raise_error(OrderProcessingV1::InvalidPaymentMethodError, /bank down/)
+
+      aggregate_failures do
+        expect(Invoice.count).to eq(0)
+        expect(stock.reload.pending).to eq(0)
+        expect(stock.available_count).to eq(10)
+        expect(discount.reload).to be_status_unused
+        expect(discount.order_id).to be_nil
+      end
+    end
+  end
+
   describe "validation" do
     it "rejects an inactive appointment" do
       cash_appts.last.update_columns(lifecycle_status: 3)

@@ -33,7 +33,9 @@ class Companies::OrderProcessing::V1Controller < Companies::ApplicationControlle
   # - Validates appointment is branch_level, belongs to order.branch and is active.
   # - Delegates to InitiatePaymentService: cash completes synchronously via CompletePaymentService,
   #   QR calls GATEWAY_STRATEGY_CLASSES with merchant identity and leaves txn pending for webhook.
-  # - Rescues InsufficientStockError / InvalidPaymentMethodError → 422.
+  # - discount_code (optional) reserves a single-use Discount before the invoice is
+  #   created at gross - discount; consumed when the invoice becomes paid.
+  # - Rescues InsufficientStockError / InvalidPaymentMethodError / InvalidDiscountError → 422.
   def pay
     order = current_company.orders.find(params[:order_id])
     # Scoped by company_id (not current_company.payment_method_appointments) to avoid
@@ -41,19 +43,27 @@ class Companies::OrderProcessing::V1Controller < Companies::ApplicationControlle
     appointment = PaymentMethodAppointment.branch_level
       .find_by!(id: params[:payment_method_appointment_id], company_id: current_company.id)
 
-    result = OrderProcessingV1::InitiatePaymentService.call(order: order, appointment: appointment)
+    result = OrderProcessingV1::InitiatePaymentService.call(
+      order: order,
+      appointment: appointment,
+      discount_code: params[:discount_code].presence,
+      employee: current_employee
+    )
 
     # TODO: transaction_token (API) vs gateway_reference (DB) naming mismatch — unify later.
     payload = { status: result.status, order_id: result.order_id }
     payload[:transaction_id] = result.transaction_id if result.transaction_id
     payload[:transaction_token] = result.transaction_token if result.transaction_token
     payload[:qr_string] = result.qr_string if result.qr_string
+    payload[:discount_amount_cents] = result.discount.amount_cents if result.discount
     payload[:message] = result.status == "paid" ? "Payment completed" : "Awaiting QR payment"
 
     render json: payload
   rescue OrderProcessingV1::InsufficientStockError
     render json: { errors: [ "Insufficient stock for payment" ] }, status: :unprocessable_entity
   rescue OrderProcessingV1::InvalidPaymentMethodError => e
+    render json: { errors: [ e.message ] }, status: :unprocessable_entity
+  rescue OrderProcessingV1::InvalidDiscountError => e
     render json: { errors: [ e.message ] }, status: :unprocessable_entity
   end
 

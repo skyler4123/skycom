@@ -1,29 +1,36 @@
 # frozen_string_literal: true
 
-# Starts a POS payment: reserves stock, creates the Invoice + pending
-# Transaction audit row, then either completes synchronously (cash) or hands
-# off to the configured gateway strategy (QR) using the branch appointment's
-# merchant identity. Any post-reservation failure releases the reservation.
+# Starts a POS payment: optionally reserves a single-use discount code,
+# reserves stock, creates the Invoice (gross - discount) + pending Transaction
+# audit row, then either completes synchronously (cash) or hands off to the
+# configured gateway strategy (QR) using the branch appointment's merchant
+# identity. Any failure after the discount reservation releases both the stock
+# reservation and the discount code.
 # TODO: transaction_token (Result/API) vs gateway_reference (Transaction DB column) name mismatch — unify later.
 module OrderProcessingV1
   class InitiatePaymentService
-    Result = Struct.new(:status, :order_id, :transaction_id, :transaction_token, :qr_string, keyword_init: true)
+    Result = Struct.new(:status, :order_id, :transaction_id, :transaction_token,
+      :qr_string, :discount, keyword_init: true)
 
-    def self.call(order:, appointment:)
-      new(order: order, appointment: appointment).call
+    def self.call(order:, appointment:, discount_code: nil, employee: nil)
+      new(order: order, appointment: appointment,
+        discount_code: discount_code, employee: employee).call
     end
 
-    def initialize(order:, appointment:)
+    def initialize(order:, appointment:, discount_code: nil, employee: nil)
       @order = order
       @appointment = appointment
+      @discount_code = discount_code
+      @employee = employee
     end
 
     def call
       validate_appointment!
-
-      reserved = OrderProcessingV1::ReserveStockService.call(items: build_items)[:reserved]
+      discount = apply_discount!
 
       begin
+        reserved = OrderProcessingV1::ReserveStockService.call(items: build_items)[:reserved]
+
         ActiveRecord::Base.transaction do
           invoice = create_invoice
           txn = create_transaction(invoice)
@@ -32,14 +39,17 @@ module OrderProcessingV1
             initiate_gateway(txn, invoice)
             Result.new(status: "pending", order_id: @order.id,
               transaction_token: txn.gateway_reference,
-              qr_string: txn.gateway_payload["qr_string"])
+              qr_string: txn.gateway_payload["qr_string"],
+              discount: discount)
           else
             OrderProcessingV1::CompletePaymentService.call(transaction: txn)
-            Result.new(status: "paid", order_id: @order.id, transaction_id: txn.id)
+            Result.new(status: "paid", order_id: @order.id, transaction_id: txn.id,
+              discount: discount)
           end
         end
       rescue StandardError
-        reserved.each { |r| r[:stock].release_reserved!(r[:qty]) }
+        reserved&.each { |r| r[:stock].release_reserved!(r[:qty]) }
+        discount&.release!
         raise
       end
     end
@@ -53,6 +63,20 @@ module OrderProcessingV1
       raise InvalidPaymentMethodError, "Payment method is not available for this branch" unless valid
     end
 
+    # Reserve the single-use code before any side effects. On success the code
+    # is pending and bound to the order; failures raise (nothing to unwind).
+    def apply_discount!
+      return nil if @discount_code.blank?
+
+      result = Discounts::ApplyService.call(
+        company: @order.company, order: @order,
+        code: @discount_code, employee: @employee
+      )
+      raise InvalidDiscountError, result[:errors].to_sentence unless result[:success]
+
+      @discount = result[:discount]
+    end
+
     def build_items
       @order.order_appointments.map do |oa|
         stock = @order.company.stocks.find_by!(product_id: oa.appoint_to.id)
@@ -61,13 +85,14 @@ module OrderProcessingV1
     end
 
     def create_invoice
+      gross = (@order.order_appointments.sum(:total_price) * 100).to_i
       Invoice.create!(
         company_id: @order.company_id,
         branch_id: @order.branch_id,
         order_id: @order.id,
         name: "Invoice for Order #{@order.id}",
         code: "INV-#{Time.current.to_i}-#{SecureRandom.hex(3).upcase}",
-        price_cents: (@order.order_appointments.sum(:total_price) * 100).to_i,
+        price_cents: [ gross - (@discount&.amount_cents || 0), 0 ].max,
         currency: @order.currency,
         business_type: :sales
       )
