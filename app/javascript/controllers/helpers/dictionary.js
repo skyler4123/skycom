@@ -691,5 +691,10 @@ export const dictionary = () => {
     "Codes generated": { vi: "Đã tạo mã giảm giá" },
     "Quantity must be between 1 and 1000": { vi: "Số lượng phải từ 1 đến 1000" },
     "Campaign updated": { vi: "Đã cập nhật chiến dịch" },
+    "Favourites": { vi: "Yêu Thích" },
+    "Click the star on any item to pin it here": { vi: "Nhấp vào ngôi sao trên bất kỳ mục nào để ghim nó tại đây" },
+    "Click to favourite": { vi: "Nhấp để yêu thích" },
+    "Click to remove from favourites": { vi: "Nhấp để xóa khỏi yêu thích" },
+    "Settings are coming soon": { vi: "Cài đặt sắp ra mắt" },
   }
 }
