@@ -237,17 +237,18 @@ params.permit(:branch_id, :customer_id, items: [ :stock_id, :product_id, :quanti
 
 **Params:**
 ```ruby
-params.permit(:order_id, :payment_method_appointment_id)
+params.permit(:order_id, :payment_method_appointment_id, :discount_code)
 ```
 
 **Flow:**
 1. Loads `current_company.orders.find(params[:order_id])` — returns 404 if not found
 2. Loads the branch-level appointment scoped to `current_company` — 404 if unknown, 422 `{ errors: [...] }` if it belongs to another branch / is inactive
-3. Calls `InitiatePaymentService.call(order:, appointment:)`
-4. Cash → instant completion; QR → gateway call returning `qr_string`; both create Invoice + pending Transaction audit row
-5. Returns `200 OK`:
-   - Cash: `{ status: "paid", order_id, transaction_id, message }`
-   - QR: `{ status: "pending", order_id, transaction_token, qr_string, message }`
+3. Calls `InitiatePaymentService.call(order:, appointment:, discount_code:, employee:)`
+4. `discount_code` (optional) → `Discounts::ApplyService` reserves the single-use code (`unused → pending`) before the invoice is created at `gross - discount.amount_cents` (`docs/DISCOUNTS.md` §6)
+5. Cash → instant completion; QR → gateway call returning `qr_string`; both create Invoice + pending Transaction audit row
+6. Returns `200 OK`:
+   - Cash: `{ status: "paid", order_id, transaction_id, discount_amount_cents?, message }`
+   - QR: `{ status: "pending", order_id, transaction_token, qr_string, discount_amount_cents?, message }`
 
 ### `receipt`
 
@@ -255,7 +256,8 @@ params.permit(:order_id, :payment_method_appointment_id)
 
 POS receipt payload for the post-payment panel: invoice code, issued_at,
 payment_status, item lines (snapshot name/qty/unit/total), subtotal from
-`invoice.price_cents`, cart-mirrored 10% tax, total, and payment method name.
+`invoice.price_cents` (net of any consumed discount), `discount_amount`
+display line, cart-mirrored 10% tax, total, and payment method name.
 404 when the order is unknown or belongs to another company.
 
 ### `pay_cancel`
@@ -273,6 +275,7 @@ Cancels an abandoned QR payment: releases reserved stock and marks the pending T
 | Insufficient stock (checkout) | 422 | `{ error: "Insufficient stock for item ..." }` |
 | Insufficient stock (pay) | 422 | `{ error: "Insufficient stock for payment" }` |
 | Invalid/inactive/foreign-branch payment method | 422 | `{ errors: ["Payment method is not available for this branch"] }` |
+| Invalid discount code (pay) | 422 | `{ errors: ["Discount code not found or already used", ...] }` (`docs/DISCOUNTS.md` §6) |
 | Order or appointment not found (pay) | 404 | Rails default 404 |
 
 ---
@@ -349,21 +352,24 @@ All services live under `OrderProcessingV1` module and use `self.call(...)` — 
 ### 5.4 `InitiatePaymentService`
 
 **File**: `app/services/order_processing_v1/initiate_payment_service.rb`
-**Signature**: `call(order:, appointment:)`
+**Signature**: `call(order:, appointment:, discount_code: nil, employee: nil)`
 
 | Param | Type | Description |
 |-------|------|-------------|
 | `order` | `Order` | The pending Order to pay |
 | `appointment` | `PaymentMethodAppointment` | Branch-level appointment (must match `order.branch`, lifecycle active) |
+| `discount_code` | `String\|nil` | Optional single-use discount code — reserved via `Discounts::ApplyService` before stock; invoice created at `gross - discount.amount_cents` (`docs/DISCOUNTS.md` §6) |
+| `employee` | `Employee\|nil` | Actor recorded on the discount (`Discount#employee_id`) |
 
 **Behavior:**
 - Validates the appointment (branch scope + active) — raises `InvalidPaymentMethodError`
-- Maps line items → stocks, reserves via `ReserveStockService` (releases on any later failure)
-- Creates `Invoice` (unpaid defaults) + `Transaction` (`status: :pending`, `payment_method_id`, `gateway_reference: "POS_<hex16>"`)
-- **Cash mode** → `CompletePaymentService.call` synchronously; returns `{ status: "paid" }`
-- **QR mode** → resolves `GATEWAY_STRATEGY_CLASSES[strategy]`, invokes the gateway with the appointment's merchant identity, stores `qr_string` in `txn.gateway_payload`; returns `{ status: "pending", qr_string, transaction_token }`
+- `discount_code` present → `Discounts::ApplyService` (row-locked reservation); failure raises `InvalidDiscountError` (nothing created yet)
+- Maps line items → stocks, reserves via `ReserveStockService` (releases on any later failure; also releases the reserved discount)
+- Creates `Invoice` (unpaid defaults, `price_cents = gross - discount.amount_cents`) + `Transaction` (`status: :pending`, `payment_method_id`, `gateway_reference: "POS_<hex16>"`)
+- **Cash mode** → `CompletePaymentService.call` synchronously; returns `{ status: "paid" }` — the Invoice payment callback consumes the pending discount
+- **QR mode** → resolves `GATEWAY_STRATEGY_CLASSES[strategy]`, invokes the gateway with the appointment's merchant identity, stores `qr_string` in `txn.gateway_payload`; returns `{ status: "pending", qr_string, transaction_token }` (code stays pending until the webhook)
 
-**Returns:** `InitiatePaymentService::Result` struct (`status, order_id, transaction_id, transaction_token, qr_string`)
+**Returns:** `InitiatePaymentService::Result` struct (`status, order_id, transaction_id, transaction_token, qr_string, discount`)
 
 ### 5.4b `CompletePaymentService`
 

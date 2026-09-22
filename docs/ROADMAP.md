@@ -84,6 +84,7 @@ Skycom is a multi-tenant retail ERP with a **usage-based credit** monetization m
 | Categories / Dynamic Properties / Dynamic Tables dashboards | ✅ | `docs/DYNAMIC_TABLE.md` |
 | Permissions / Policies dashboards | ✅ | `docs/ABAC.md` |
 | Purchase process + generic Workflow engine (Purchase/PurchaseItem/PurchaseItemAppointment + Workflow/WorkflowStep/WorkflowStepLog, `Workflows::AdvanceService`, default purchase workflow seeded) | ✅ | Dashboards + advance API live (`docs/PURCHASE_WORKFLOW.md`) |
+| **Discount engine** (DiscountGroup + single-use Discount codes, batch generation, POS pay apply, invoice-paid consumption, cancel release, refund revert, budget caps) | ✅ BE | FE dashboards pending (`docs/DISCOUNTS.md`) |
 
 ---
 
@@ -189,7 +190,7 @@ Skycom is a multi-tenant retail ERP with a **usage-based credit** monetization m
 
 | Item | Description | Reference |
 |------|-------------|-----------|
-| Dead routes with no controllers | `reports`, `documents`, `announcements`, `discounts`, `events`, `payslips`, `tasks`, `settings`, `subscription_plan_appointments`, `transactions` — either build or remove | `config/routes.rb` |
+| Dead routes with no controllers | `reports`, `documents`, `announcements`, `events`, `payslips`, `tasks`, `settings`, `subscription_plan_appointments`, `transactions` — either build or remove (`discounts` was claimed by the Discount engine, 2026-09-22) | `config/routes.rb` |
 | Dead sidebar `featureKey` param | `link(featureKey, ...)` accepts a key that no longer gates anything | `layout_controller.js:46` |
 | `transaction_token` / `gateway_reference` naming | Unify the seam between the API param and the DB column | `docs/TODO.md` |
 | Payment-method "Configured" heuristic | Decide required merchant fields per payment mode | `docs/TODO.md` |
@@ -211,6 +212,7 @@ Skycom is a multi-tenant retail ERP with a **usage-based credit** monetization m
 | 2026-08-27 | Roadmap rewritten for the credit era; stale billing docs removed | ✅ | This doc |
 | 2026-09-18 | Purchase process + generic Workflow engine (models, migrations, `Workflows::AdvanceService`, seed, specs — backend-first) | ✅ | `docs/superpowers/specs/2026-09-18-purchase-workflow-design.md` (gitignored) |
 | 2026-09-19 | Purchase/Workflow dashboards + advance API (FE controllers, policies, dynamic search, feature tests) | ✅ | `docs/PURCHASE_WORKFLOW.md` |
+| 2026-09-22 | Discount engine (BE): DiscountGroup/Discount, batch codes, POS pay apply, invoice-paid consumption, cancel release, refund revert | ✅ | `docs/DISCOUNTS.md` |
 
 ---
 
