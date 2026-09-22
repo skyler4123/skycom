@@ -371,9 +371,11 @@ The client cache stores: User, Companies, Branches, Departments, Roles, Enums, E
 
 | Key | Description |
 |-----|-------------|
-| `client_cache_data` | JSON blob containing all cached data |
+| `client_cache_data` | JSON blob containing all cached data (user, companies, branches, departments, roles, categories, property_mappings, table_configs, enums, employees — **no** `settings`) |
 | `client_cache_version` | Version string for cache invalidation |
 | `client_cache_sync_count` | Auto-sync counter (max 1, resets on version match) |
+| `sidebar_favourites_<company_id>` | Per-company favourited sidebar item keys (FE-only, `docs/SIDEBAR.md`) |
+| `sidebar_open_groups_<company_id>` | Per-company open sidebar group keys (FE-only, `docs/SIDEBAR.md`) |
 
 ### 6.3 Backend Endpoint
 

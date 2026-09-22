@@ -190,8 +190,7 @@ Skycom is a multi-tenant retail ERP with a **usage-based credit** monetization m
 
 | Item | Description | Reference |
 |------|-------------|-----------|
-| Dead routes with no controllers | `reports`, `documents`, `announcements`, `events`, `payslips`, `tasks`, `settings`, `subscription_plan_appointments`, `transactions` — either build or remove (`discounts` was claimed by the Discount engine, 2026-09-22) | `config/routes.rb` |
-| Dead sidebar `featureKey` param | `link(featureKey, ...)` accepts a key that no longer gates anything | `layout_controller.js:46` |
+| Dead routes with no controllers | `reports`, `documents`, `announcements`, `events`, `payslips`, `tasks`, `subscription_plan_appointments`, `transactions` — either build or remove (`discounts` was claimed by the Discount engine, 2026-09-22; `settings` became a live shell page 2026-09-22) | `config/routes.rb` |
 | `transaction_token` / `gateway_reference` naming | Unify the seam between the API param and the DB column | `docs/TODO.md` |
 | Payment-method "Configured" heuristic | Decide required merchant fields per payment mode | `docs/TODO.md` |
 
