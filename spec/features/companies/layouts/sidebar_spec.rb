@@ -43,7 +43,7 @@ RSpec.feature "Sidebar favourites", type: :feature, js: true do
 
     within("aside", visible: :all) do
       expect(page).to have_selector('[data-sidebar-favourites]', visible: :all, wait: 10)
-      expect(page).to have_content("Click the star on any item to pin it here", visible: :all, wait: 10)
+      expect(page).to have_selector("p", text: "Click the star on any item to pin it here", visible: :all, wait: 10)
 
       %w[general catalog sales organization platform attendance inventory authorization system].each do |group|
         expect(page).to have_selector("details[data-sidebar-group='#{group}']", visible: :all, wait: 10)
@@ -101,7 +101,7 @@ RSpec.feature "Sidebar favourites", type: :feature, js: true do
 
     within("[data-sidebar-favourites]", visible: :all) do
       expect(page).to have_no_link("Products", visible: :all, wait: 10)
-      expect(page).to have_content("Click the star on any item to pin it here", visible: :all, wait: 10)
+      expect(page).to have_selector("p", text: "Click the star on any item to pin it here", visible: :all, wait: 10)
     end
   end
 
@@ -131,7 +131,7 @@ RSpec.feature "Sidebar favourites", type: :feature, js: true do
 
     within("[data-sidebar-favourites]", visible: :all) do
       expect(page).to have_no_link("Products", visible: :all, wait: 10)
-      expect(page).to have_content("Click the star on any item to pin it here", visible: :all, wait: 10)
+      expect(page).to have_selector("p", text: "Click the star on any item to pin it here", visible: :all, wait: 10)
     end
   end
 
