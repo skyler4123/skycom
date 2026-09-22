@@ -2,21 +2,22 @@
 
 require "rails_helper"
 
-RSpec.feature "Sidebar grouping", type: :feature, js: true do
+RSpec.feature "Sidebar favourites", type: :feature, js: true do
   let(:branch) { create(:branch) }
   let(:company) { branch.company }
   let(:owner) { company.user }
+  let(:other_company) { create(:company, user: owner) }
 
   before do
     sign_in(owner)
     seed_client_cache!
+    page.execute_script("localStorage.setItem('open-cache-sidebar', 'sidebar')")
   end
 
   def seed_client_cache!
     page.execute_script("localStorage.clear()")
 
     company_data = JSON.parse(company.to_json).merge(
-      "settings" => company.settings.reset.map { |s| JSON.parse(s.to_json) },
       "property_mappings" => company.property_mappings.reset.map { |pm| JSON.parse(pm.to_json) },
       "table_configs" => company.table_configs.reset.map { |tc| JSON.parse(tc.to_json) },
       "categories" => company.categories.reset.map { |c| JSON.parse(c.to_json) },
@@ -37,110 +38,124 @@ RSpec.feature "Sidebar grouping", type: :feature, js: true do
     page.execute_script("document.cookie = 'client_cache_version=forced; path=/'")
   end
 
-  scenario "sidebar renders all groups with their items" do
+  scenario "renders groups as collapsed details with the favourites hint" do
     visit company_dashboards_path(company)
 
     within("aside", visible: :all) do
+      expect(page).to have_selector('[data-sidebar-favourites]', visible: :all, wait: 10)
+      expect(page).to have_content("Click the star on any item to pin it here", visible: :all, wait: 10)
+
       %w[general catalog sales organization platform attendance inventory authorization system].each do |group|
-        expect(page).to have_selector("p", text: /\A#{group}\z/i, visible: :all, wait: 10)
+        expect(page).to have_selector("details[data-sidebar-group='#{group}']", visible: :all, wait: 10)
+        expect(page).to have_no_selector("details[data-sidebar-group='#{group}'][open]", visible: :all)
       end
-
-      expect(page).to have_selector("p", text: /Chat & Help Desk/i, visible: :all, wait: 10)
-      expect(page).to have_selector("p", text: /Email Marketing/i, visible: :all)
-    end
-
-    within('[data-sidebar-group="general"]', visible: :all) do
-      expect(page).to have_link("Dashboard", href: /dashboards/, visible: :all, wait: 10)
-      expect(page).to have_link("Analytics", href: /analytics/, visible: :all)
-      expect(page).to have_no_link("Products", visible: :all)
-    end
-
-    within('[data-sidebar-group="inventory"]', visible: :all) do
-      expect(page).to have_link("Warehouses", href: /warehouses/, visible: :all, wait: 10)
-      expect(page).to have_link("Stocks", href: /stocks/, visible: :all)
-      expect(page).to have_no_link("Dashboard", visible: :all)
-    end
-
-    within('[data-sidebar-group="authorization"]', visible: :all) do
-      expect(page).to have_link("Policies", href: /policies/, visible: :all, wait: 10)
-      expect(page).to have_link("Permissions", href: /permissions/, visible: :all)
-    end
-
-    within('[data-sidebar-group="system"]', visible: :all) do
-      expect(page).to have_link("Usage", href: /usage/, visible: :all, wait: 10)
-      expect(page).to have_link("Top Up", href: /top_ups/, visible: :all)
-      expect(page).to have_link("Billing", href: /billing/, visible: :all)
-      expect(page).to have_link("Settings", visible: :all)
-
-      expect(page).to have_selector("span", text: /Help Center/i, visible: :all, wait: 10)
-      expect(page).to have_no_link("Help Center", visible: :all)
-      expect(page).to have_selector('[data-controller="tooltip"]', visible: :all)
     end
   end
 
-  scenario "hides a whole group when its group visibility is off" do
-    company.settings.company_level.find_by(code: "SETTINGS-DEFAULT").update!(
-      sidebar_groups: Company::SIDEBAR_GROUP_KEYS.map { |key|
-        { "key" => key, "visible" => key != "inventory" }
-      }
-    )
-    seed_client_cache!
+  scenario "opening a group reveals its items and persists across reload" do
+    visit company_dashboards_path(company)
 
+    find("details[data-sidebar-group='catalog'] summary", visible: :all).click
+    within("details[data-sidebar-group='catalog']", visible: :all) do
+      expect(page).to have_link("Products", href: /products/, visible: :all, wait: 10)
+      expect(page).to have_link("Brands", href: /brands/, visible: :all)
+    end
+
+    page.refresh
+
+    expect(page).to have_selector("details[data-sidebar-group='catalog'][open]", visible: :all, wait: 10)
+    within("details[data-sidebar-group='catalog']", visible: :all) do
+      expect(page).to have_link("Products", href: /products/, visible: :all, wait: 10)
+    end
+  end
+
+  scenario "starring an item adds it to favourites and persists across reload" do
+    visit company_dashboards_path(company)
+
+    find("details[data-sidebar-group='catalog'] summary", visible: :all).click
+    find("button[data-sidebar-star='products']", visible: :all).click
+
+    within("[data-sidebar-favourites]", visible: :all) do
+      expect(page).to have_link("Products", href: /products/, visible: :all, wait: 10)
+    end
+    expect(page).to have_selector("button[data-sidebar-star='products'][data-sidebar-starred='true']", visible: :all, wait: 10)
+
+    page.refresh
+
+    find("details[data-sidebar-group='catalog'] summary", visible: :all).click
+    within("[data-sidebar-favourites]", visible: :all) do
+      expect(page).to have_link("Products", href: /products/, visible: :all, wait: 10)
+    end
+  end
+
+  scenario "un-starring from the favourites section removes the item and restores the hint" do
+    visit company_dashboards_path(company)
+
+    find("details[data-sidebar-group='catalog'] summary", visible: :all).click
+    find("button[data-sidebar-star='products']", visible: :all).click
+    expect(page).to have_selector("[data-sidebar-favourites] a[href*='products']", visible: :all, wait: 10)
+
+    within("[data-sidebar-favourites]", visible: :all) do
+      find("button[data-sidebar-star='products']", visible: :all).click
+    end
+
+    within("[data-sidebar-favourites]", visible: :all) do
+      expect(page).to have_no_link("Products", visible: :all, wait: 10)
+      expect(page).to have_content("Click the star on any item to pin it here", visible: :all, wait: 10)
+    end
+  end
+
+  scenario "favourites are scoped per company" do
+    # Re-seed the cache with both companies
+    page.execute_script("localStorage.clear()")
+    company_data = JSON.parse(company.to_json).merge(
+      "property_mappings" => [], "table_configs" => [], "categories" => [],
+      "branches" => [], "departments" => [], "roles" => []
+    )
+    other_data = JSON.parse(other_company.to_json).merge(
+      "property_mappings" => [], "table_configs" => [], "categories" => [],
+      "branches" => [], "departments" => [], "roles" => []
+    )
+    payload = { user: JSON.parse(owner.to_json), companies: [ company_data, other_data ], enums: {}, employees: [] }
+    page.execute_script("localStorage.setItem('client_cache_data', arguments[0])", payload.to_json)
+    page.execute_script("localStorage.setItem('client_cache_version', 'forced')")
+    page.execute_script("document.cookie = 'client_cache_version=forced; path=/'")
+    page.execute_script("localStorage.setItem('open-cache-sidebar', 'sidebar')")
+
+    visit company_dashboards_path(company)
+    find("details[data-sidebar-group='catalog'] summary", visible: :all).click
+    find("button[data-sidebar-star='products']", visible: :all).click
+    expect(page).to have_selector("[data-sidebar-favourites] a[href*='products']", visible: :all, wait: 10)
+
+    visit company_dashboards_path(other_company)
+
+    within("[data-sidebar-favourites]", visible: :all) do
+      expect(page).to have_no_link("Products", visible: :all, wait: 10)
+      expect(page).to have_content("Click the star on any item to pin it here", visible: :all, wait: 10)
+    end
+  end
+
+  scenario "system and coming-soon items have no star" do
     visit company_dashboards_path(company)
 
     within("aside", visible: :all) do
-      expect(page).to have_selector('[data-sidebar-group="general"]', visible: :all, wait: 10)
-      expect(page).to have_no_selector('[data-sidebar-group="inventory"]', visible: :all)
+      expect(page).to have_no_selector("button[data-sidebar-star='usage']", visible: :all, wait: 10)
+      expect(page).to have_no_selector("button[data-sidebar-star='billing']", visible: :all)
+      expect(page).to have_no_selector("button[data-sidebar-star='settings']", visible: :all)
+      expect(page).to have_no_selector("button[data-sidebar-star='help_center']", visible: :all)
+      expect(page).to have_selector("details[data-sidebar-group='chat_help_desk']", visible: :all, wait: 10)
+      expect(page).to have_no_selector("details[data-sidebar-group='chat_help_desk'] button[data-sidebar-star]", visible: :all)
     end
   end
 
-  scenario "does not render an empty group header when all its items are hidden" do
-    attendance_keys = %w[shift_templates scheduled_shifts attendance_days attendance_policies attendance_logs attendance_months]
-    company.settings.company_level.find_by(code: "SETTINGS-DEFAULT").update!(
-      sidebar_items: Company::SIDEBAR_ITEM_KEYS.map { |key|
-        { "key" => key, "visible" => !key.in?(attendance_keys) }
-      }
-    )
-    seed_client_cache!
+  scenario "the current page link is highlighted after re-render" do
+    visit company_products_path(company)
 
-    visit company_dashboards_path(company)
+    find("details[data-sidebar-group='catalog'] summary", visible: :all).click
+    find("button[data-sidebar-star='products']", visible: :all).click
 
-    within("aside", visible: :all) do
-      expect(page).to have_selector('[data-sidebar-group="general"]', visible: :all, wait: 10)
-      expect(page).to have_no_selector('[data-sidebar-group="attendance"]', visible: :all)
-    end
-  end
-
-  scenario "renders coming soon groups with a warning badge and tooltip" do
-    visit company_dashboards_path(company)
-
-    within('[data-sidebar-group="chat_help_desk"]', visible: :all) do
-      expect(page).to have_selector("p", text: /\AChat & Help Desk/i, visible: :all, wait: 10)
-      expect(page).to have_selector(".material-symbols-outlined.text-amber-500", visible: :all)
-      expect(page).to have_selector('[data-controller="tooltip"]', visible: :all)
-      expect(page).to have_no_selector("a", visible: :all)
-    end
-
-    within('[data-sidebar-group="email_marketing"]', visible: :all) do
-      expect(page).to have_selector("p", text: /\AEmail Marketing/i, visible: :all, wait: 10)
-      expect(page).to have_selector(".material-symbols-outlined.text-amber-500", visible: :all)
-      expect(page).to have_no_selector("a", visible: :all)
-    end
-  end
-
-  scenario "hides a coming soon group when its group visibility is off" do
-    company.settings.company_level.find_by(code: "SETTINGS-DEFAULT").update!(
-      sidebar_groups: Company::SIDEBAR_GROUP_KEYS.map { |key|
-        { "key" => key, "visible" => key != "email_marketing" }
-      }
-    )
-    seed_client_cache!
-
-    visit company_dashboards_path(company)
-
-    within("aside", visible: :all) do
-      expect(page).to have_selector('[data-sidebar-group="chat_help_desk"]', visible: :all, wait: 10)
-      expect(page).to have_no_selector('[data-sidebar-group="email_marketing"]', visible: :all)
+    within("details[data-sidebar-group='catalog']", visible: :all) do
+      expect(page).to have_selector("a[href*='products'][open]", visible: :all, wait: 10)
     end
   end
 end
