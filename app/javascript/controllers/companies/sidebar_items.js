@@ -1,10 +1,6 @@
-// Shared sidebar registry — the single source of truth for both the sidebar
-// renderer (layout_controller.js) and the Settings "Sidebar" tab.
-// Keep `key` values in sync with `SIDEBAR_ITEM_KEYS` and `SIDEBAR_GROUP_KEYS`
-// in app/models/company.rb.
-import { currentSettings } from "controllers/helpers/auth_helpers"
-
-export const DEFAULT_SETTINGS_CODE = "SETTINGS-DEFAULT"
+// Shared sidebar registry — the single source of truth for the sidebar renderer
+// (companies/sidebars/show_controller.js). Sidebar visibility and favourites are
+// FE-only (localStorage, per company) — see docs/SIDEBAR.md.
 
 // Group registry — array order is the sidebar render order.
 // `locked: true` groups can never be hidden via company settings.
@@ -63,37 +59,3 @@ export const SIDEBAR_ITEMS = [
   { key: "settings", group: "system", icon: "settings", label: "Settings", href: (cid) => Helpers.company_settings_path(cid) },
   { key: "help_center", group: "system", icon: "help", label: "Help Center", comingSoon: true, href: null }
 ]
-
-// Locked groups (System) can never be hidden via company settings.
-export const SYSTEM_GROUP_KEYS = new Set(
-  SIDEBAR_GROUPS.filter(g => g.locked).map(g => g.key)
-)
-
-// System sidebar items (Usage, Top Up, Billing, Settings) are platform-managed:
-// they can never be hidden via company settings.
-export const SYSTEM_ITEM_KEYS = new Set(
-  SIDEBAR_ITEMS.filter(i => i.group === "system").map(i => i.key)
-)
-
-/**
- * Returns both hidden sets derived from the default company setting.
- * Absent groups/items default to visible (the seeded default marks everything visible).
- * Locked groups/items are never hidden, even if stale metadata says otherwise.
- * @returns {{ hiddenGroups: Set<string>, hiddenItems: Set<string> }}
- */
-export const sidebarVisibility = () => {
-  const settings = currentSettings() || []
-  const defaultSetting = settings.find(s => s.code === DEFAULT_SETTINGS_CODE) || settings[0]
-
-  const groups = defaultSetting?.metadata?.sidebar_groups || []
-  const hiddenGroups = new Set(
-    groups.filter(g => g.visible === false && !SYSTEM_GROUP_KEYS.has(g.key)).map(g => g.key)
-  )
-
-  const items = defaultSetting?.metadata?.sidebar_items || []
-  const hiddenItems = new Set(
-    items.filter(i => i.visible === false && !SYSTEM_ITEM_KEYS.has(i.key)).map(i => i.key)
-  )
-
-  return { hiddenGroups, hiddenItems }
-}
