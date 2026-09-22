@@ -33,11 +33,6 @@ class Invoice < ApplicationRecord
   has_many :transactions, dependent: :destroy
   has_many :discounts, dependent: :destroy
 
-  # --- Callbacks ---
-  # Discounts follow the invoice payment lifecycle (docs/DISCOUNTS.md) — the
-  # commerce-chain mirror of CompanyInvoice#complete_order_if_paid!.
-  after_update :sync_discount_state, if: :saved_change_to_payment_status?
-
   # --- Validations ---
   validates :name, presence: true, uniqueness: { scope: :company_id }, length: { maximum: 255 }
   validates :currency, presence: true
@@ -45,6 +40,11 @@ class Invoice < ApplicationRecord
   validates :price_cents, presence: true, numericality: { greater_than_or_equal_to: 0 }
 
   validates :business_type, presence: true
+
+  # --- Callbacks ---
+  # Discounts follow the invoice payment lifecycle (docs/DISCOUNTS.md) — the
+  # commerce-chain mirror of CompanyInvoice#complete_order_if_paid!.
+  after_update :sync_discount_state, if: :saved_change_to_payment_status?
 
   def total_price_cents
     price_cents

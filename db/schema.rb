@@ -1443,6 +1443,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_09_22_000002) do
     t.string "code"
     t.string "prefix"
     t.integer "discount_type", null: false
+    t.integer "currency"
     t.integer "amount_cents"
     t.decimal "percentage", precision: 15, scale: 4
     t.integer "max_amount_cents"
