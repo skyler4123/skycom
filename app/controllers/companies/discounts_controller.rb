@@ -4,7 +4,7 @@
 # Codes are created by Discounts::BatchGenerator (via DiscountGroups#generate_codes)
 # and only their state moves through Discounts::ApplyService / Discount#consume! /
 # #release! / #revert! — this controller has no mutations.
-# Serves Stimulus: (future) Companies_Discounts_IndexController|ShowController
+# Serves Stimulus: (embedded ledger in) Companies_DiscountGroups_ShowController
 # Endpoints: GET /companies/:company_id/discounts(.json), GET .../discounts/:id(.json)
 # Docs: docs/DISCOUNTS.md
 class Companies::DiscountsController < Companies::ApplicationController

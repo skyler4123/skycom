@@ -84,7 +84,7 @@ Skycom is a multi-tenant retail ERP with a **usage-based credit** monetization m
 | Categories / Dynamic Properties / Dynamic Tables dashboards | ✅ | `docs/DYNAMIC_TABLE.md` |
 | Permissions / Policies dashboards | ✅ | `docs/ABAC.md` |
 | Purchase process + generic Workflow engine (Purchase/PurchaseItem/PurchaseItemAppointment + Workflow/WorkflowStep/WorkflowStepLog, `Workflows::AdvanceService`, default purchase workflow seeded) | ✅ | Dashboards + advance API live (`docs/PURCHASE_WORKFLOW.md`) |
-| **Discount engine** (DiscountGroup + single-use Discount codes, batch generation, POS pay apply, invoice-paid consumption, cancel release, refund revert, budget caps) | ✅ BE | FE dashboards pending (`docs/DISCOUNTS.md`) |
+| **Discount engine** (DiscountGroup + single-use Discount codes, batch generation, POS pay apply, invoice-paid consumption, cancel release, refund revert, budget caps) | ✅ | BE + FE dashboards (`docs/DISCOUNTS.md`) |
 
 ---
 
