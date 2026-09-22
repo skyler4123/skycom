@@ -613,6 +613,8 @@ class Seed::RetailInitService
         "TableConfig" => { create: true, read: true, update: true, delete: true },
         "Purchase" => { create: true, read: true, update: true, delete: true },
         "PurchaseItem" => { create: true, read: true, update: true, delete: true },
+        "DiscountGroup" => { create: true, read: true, update: true, delete: true },
+        "Discount" => { create: true, read: true, update: true, delete: true },
         "Reservation" => { create: true, read: true, update: true, delete: true },
         "Room" => { create: true, read: true, update: true, delete: true },
         "Service" => { create: true, read: true, update: true, delete: true },
@@ -665,6 +667,8 @@ class Seed::RetailInitService
         "StockTransfer" => { create: true, read: true, update: true, delete: true },
         "Purchase" => { create: true, read: true, update: true, delete: true },
         "PurchaseItem" => { create: true, read: true, update: true, delete: true },
+        "DiscountGroup" => { create: true, read: true, update: true, delete: true },
+        "Discount" => { create: true, read: true, update: true, delete: true },
         "Student" => { create: true, read: true, update: true, delete: true },
         "Table" => { create: true, read: true, update: true, delete: true }
       },

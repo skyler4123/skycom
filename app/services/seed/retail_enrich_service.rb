@@ -88,6 +88,7 @@ class Seed::RetailEnrichService
     create_customer_orders
     create_invoices
     create_purchase_data
+    create_discount_data
     create_shifts
     create_attendance_policies
     create_attendance_event_data
@@ -563,6 +564,23 @@ class Seed::RetailEnrichService
       run_purchase_workflow(purchase, requester, managers.sample, i)
     end
     puts "  -> #{Purchase.where(company: @retail).count} purchases created"
+  end
+
+  def create_discount_data
+    percentage_group = Seed::DiscountGroupService.create(
+      company: @retail, name: "Summer Sale", prefix: "SUMMER26",
+      discount_type: :percentage, percentage: 10, max_amount_cents: 10_000,
+      total_budget_cents: 500_000, campaign_status: :active
+    )
+    Discounts::BatchGenerator.call(discount_group: percentage_group, quantity: 50)
+
+    fixed_group = Seed::DiscountGroupService.create(
+      company: @retail, name: "Walk-in $5", prefix: "WALKIN",
+      discount_type: :fixed_amount, amount_cents: 500, campaign_status: :active
+    )
+    Discounts::BatchGenerator.call(discount_group: fixed_group, quantity: 25)
+
+    puts "  -> #{Discount.where(company: @retail).count} discount codes created (#{DiscountGroup.where(company: @retail).count} groups)"
   end
 
   def run_purchase_workflow(purchase, requester, manager, index)
