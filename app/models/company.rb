@@ -23,26 +23,6 @@ class Company < ApplicationRecord
     AttendancePolicy AttendanceLog AttendanceDay AttendanceMonth
     Stock StockTransfer StockImport StockExport
   ].freeze
-  # Default company-appointed setting code + the canonical sidebar item keys.
-  # Must stay in sync with `SIDEBAR_ITEMS` in
-  # app/javascript/controllers/companies/sidebar_items.js.
-  DEFAULT_SETTINGS_CODE = "SETTINGS-DEFAULT".freeze
-  SIDEBAR_ITEM_KEYS = %w[
-    dashboard branches departments categories property_mappings table_configs workflows
-    products brands services orders employees shift_templates scheduled_shifts
-    attendance_days attendance_policies attendance_logs attendance_months
-    attendance_days attendance_policies attendance_logs attendance_months
-    warehouses stocks stock_transfers stock_imports stock_exports suppliers customers invoices purchases discount_groups
-    policies pages payment_methods permissions analytics facilities
-    usage top_up billing settings help_center
-  ].freeze
-  # Sidebar group keys — array order is the sidebar render order (locked last).
-  # Must stay in sync with `SIDEBAR_GROUPS` in
-  # app/javascript/controllers/companies/sidebar_items.js.
-  SIDEBAR_GROUP_KEYS = %w[
-    general catalog sales organization platform attendance inventory
-    authorization chat_help_desk email_marketing system
-  ].freeze
   class_attribute :skip_init, default: false
   # Creation-time-only flag: System#ensure_company! marks its auto-created
   # company so initialize_company runs owner records only (no business-type
@@ -277,8 +257,6 @@ class Company < ApplicationRecord
     user.update!(system_role: :company_owner) unless system_owned
 
     create_company_wallet!(walletable: self, main_credit_balance: 0)
-
-    create_default_setting
   end
 
   def setup_payment_method_appointments
@@ -299,18 +277,6 @@ class Company < ApplicationRecord
         end
         apply_merchant_identity(a, pm)
       end
-    end
-  end
-
-  def create_default_setting
-    settings.find_or_create_by!(code: DEFAULT_SETTINGS_CODE) do |s|
-      s.name = "Default settings"
-      s.appoint_to = self
-      s.lifecycle_status = :active
-      s.workflow_status = :confirmed
-      s.business_type = :system
-      s.sidebar_groups = SIDEBAR_GROUP_KEYS.map { |key| { "key" => key, "visible" => true } }
-      s.sidebar_items = SIDEBAR_ITEM_KEYS.map { |key| { "key" => key, "visible" => true } }
     end
   end
 

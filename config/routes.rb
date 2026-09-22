@@ -73,7 +73,7 @@ Rails.application.routes.draw do
       resources :payslips
       resources :tasks
       resources :facilities
-      resources :settings
+      resources :settings, only: [ :index ]
       resources :subscription_plan_appointments
       resources :permissions
       resources :payment_method_appointments, only: [ :index, :edit, :update ]

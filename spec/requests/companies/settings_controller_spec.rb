@@ -10,55 +10,24 @@ RSpec.describe "Companies::SettingsController", type: :request do
     get sign_in_for_test_path(email: owner_user.email)
   end
 
-  around do |example|
-    original = ActionController::Base.allow_forgery_protection
-    ActionController::Base.allow_forgery_protection = false
-    example.run
-    ActionController::Base.allow_forgery_protection = original
-  end
-
   describe "GET /companies/:company_id/settings" do
-    it "returns the company-appointed settings as JSON" do
+    it "returns an empty settings list when the company has no settings" do
       get "/companies/#{company.id}/settings", as: :json
       expect(response).to have_http_status(:ok)
       body = JSON.parse(response.body)
-      expect(body["settings"].size).to eq(1)
-      setting = body["settings"].first
-      expect(setting["code"]).to eq("SETTINGS-DEFAULT")
-      expect(setting["metadata"]["sidebar_items"]).to include({ "key" => "products", "visible" => true })
+      expect(body["settings"]).to eq([])
     end
-  end
 
-  describe "PATCH /companies/:company_id/settings/:id" do
-    let(:setting) { company.settings.first }
+    it "returns company-level settings when they exist" do
+      setting = Setting.create!(
+        company: company, appoint_to: company, code: "FUTURE",
+        lifecycle_status: :active, workflow_status: :confirmed, business_type: :system
+      )
 
-    it "updates sidebar_items with real booleans" do
-      patch "/companies/#{company.id}/settings/#{setting.id}",
-        params: { setting: { sidebar_items: [ { key: "products", visible: false } ] } },
-        as: :json
+      get "/companies/#{company.id}/settings", as: :json
       expect(response).to have_http_status(:ok)
       body = JSON.parse(response.body)
-      expect(body["setting"]["metadata"]["sidebar_items"]).to eq([ { "key" => "products", "visible" => false } ])
-      expect(setting.reload.sidebar_items).to eq([ { "key" => "products", "visible" => false } ])
-    end
-
-    it "updates sidebar_groups with real booleans" do
-      patch "/companies/#{company.id}/settings/#{setting.id}",
-        params: { setting: { sidebar_groups: [ { key: "inventory", visible: false } ] } },
-        as: :json
-      expect(response).to have_http_status(:ok)
-      body = JSON.parse(response.body)
-      expect(body["setting"]["metadata"]["sidebar_groups"]).to eq([ { "key" => "inventory", "visible" => false } ])
-      expect(setting.reload.sidebar_groups).to eq([ { "key" => "inventory", "visible" => false } ])
-    end
-
-    it "returns 404 for a setting in another company" do
-      other_company = create(:company)
-      other_setting = other_company.settings.first
-      patch "/companies/#{company.id}/settings/#{other_setting.id}",
-        params: { setting: { sidebar_items: [] } },
-        as: :json
-      expect(response).to have_http_status(:not_found)
+      expect(body["settings"].map { |s| s["id"] }).to eq([ setting.id ])
     end
   end
 end
