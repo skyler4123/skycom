@@ -70,11 +70,20 @@ class Companies::DiscountGroupsController < Companies::ApplicationController
   def update
     group = current_company.discount_groups.find(params[:id])
 
-    if group.update(discount_group_params)
-      redirect_to company_discount_group_path(current_company, group), notice: "Discount group updated successfully."
-    else
-      redirect_to edit_company_discount_group_path(current_company, group),
-        alert: group.errors.full_messages.to_sentence
+    respond_to do |format|
+      if group.update(discount_group_params)
+        format.html do
+          redirect_to company_discount_group_path(current_company, group),
+            notice: "Discount group updated successfully."
+        end
+        format.json { render json: { discount_group: format_group(group) } }
+      else
+        format.html do
+          redirect_to edit_company_discount_group_path(current_company, group),
+            alert: group.errors.full_messages.to_sentence
+        end
+        format.json { render json: { errors: group.errors.full_messages }, status: :unprocessable_entity }
+      end
     end
   end
 

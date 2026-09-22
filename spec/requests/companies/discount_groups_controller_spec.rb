@@ -146,6 +146,16 @@ RSpec.describe "Companies::DiscountGroupsController", type: :request do
       expect(group.reload.name).to eq("Renamed")
       expect(group.reload).to be_campaign_status_paused
     end
+
+    it "returns the updated group as JSON (fetch-driven lifecycle toggle)" do
+      patch company_discount_group_path(company, group),
+        params: { discount_group: { campaign_status: "paused" } }, as: :json
+
+      expect(response).to have_http_status(:ok)
+      body = JSON.parse(response.body)
+      expect(body["discount_group"]["campaign_status"]).to eq("paused")
+      expect(group.reload).to be_campaign_status_paused
+    end
   end
 
   describe "DELETE #destroy" do
