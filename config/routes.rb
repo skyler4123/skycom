@@ -54,6 +54,11 @@ Rails.application.routes.draw do
         end
       end
       resources :workflows
+      resources :discount_groups do
+        member do
+          post :generate_codes
+        end
+      end
       resources :shift_templates
       resources :scheduled_shifts
       resources :attendance_policies

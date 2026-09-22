@@ -16,11 +16,12 @@ class Discounts::BatchGenerator
   def initialize(discount_group:, quantity:, code_length:)
     @group = discount_group
     @quantity = quantity.to_i
-    @code_length = code_length.to_i
+    @code_length = (code_length.presence || DEFAULT_CODE_LENGTH).to_i
   end
 
   def generate
     return failure("Quantity must be between 1 and #{MAX_QUANTITY}") unless quantity_valid?
+    return failure("Code length must be between 4 and 64") unless code_length_valid?
     return failure("Prefix is too long for the requested code length") if prefix_overflows?
 
     now = Time.current
@@ -44,6 +45,10 @@ class Discounts::BatchGenerator
 
   def quantity_valid?
     @quantity.between?(1, MAX_QUANTITY)
+  end
+
+  def code_length_valid?
+    @code_length.between?(4, 64)
   end
 
   def prefix_overflows?

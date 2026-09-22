@@ -60,6 +60,20 @@ RSpec.describe Discounts::BatchGenerator do
       expect(Discount.count).to eq(0)
     end
 
+    it "rejects invalid code lengths (also when nil is passed explicitly)" do
+      [ 0, 3, 65 ].each do |code_length|
+        result = described_class.call(discount_group: group, quantity: 5, code_length: code_length)
+        expect(result).to eq({ success: false, errors: [ "Code length must be between 4 and 64" ] })
+      end
+      expect(Discount.count).to eq(0)
+    end
+
+    it "falls back to the default code length when nil is passed" do
+      result = described_class.call(discount_group: group, quantity: 2, code_length: nil)
+      expect(result[:success]).to be(true)
+      expect(group.discounts.pluck(:code)).to all(match(/\ASUMMER26-[A-Z0-9]{8}\z/))
+    end
+
     it "rejects prefixes too long for the code length" do
       group.update_columns(prefix: "X" * 250) # bypass normalizes to force the overflow case
       result = described_class.call(discount_group: group, quantity: 5)
