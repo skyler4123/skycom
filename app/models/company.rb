@@ -32,7 +32,7 @@ class Company < ApplicationRecord
     products brands services orders employees shift_templates scheduled_shifts
     attendance_days attendance_policies attendance_logs attendance_months
     attendance_days attendance_policies attendance_logs attendance_months
-    warehouses stocks stock_transfers stock_imports stock_exports suppliers customers invoices purchases
+    warehouses stocks stock_transfers stock_imports stock_exports suppliers customers invoices purchases discount_groups
     policies pages payment_methods permissions analytics facilities
     usage top_up billing settings help_center
   ].freeze

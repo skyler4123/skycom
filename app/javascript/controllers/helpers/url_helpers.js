@@ -173,6 +173,13 @@ export const company_documents_path = (companyId) => `/companies/${companyId}/do
 export const company_announcements_path = (companyId) => `/companies/${companyId}/announcements`
 export const company_events_path = (companyId) => `/companies/${companyId}/events`
 export const company_discounts_path = (companyId) => `/companies/${companyId}/discounts`
+// Discount groups (Discount FE — docs/superpowers/specs/2026-09-22-discounts-frontend-design.md)
+export const company_discount_groups_path = (companyId) => `/companies/${companyId}/discount_groups`
+export const create_company_discount_groups_path = (companyId) => `/companies/${companyId}/discount_groups`
+export const new_company_discount_group_path = (companyId) => `/companies/${companyId}/discount_groups/new`
+export const company_discount_group_path = (companyId, discountGroupId) => `/companies/${companyId}/discount_groups/${discountGroupId}`
+export const edit_company_discount_group_path = (companyId, discountGroupId) => `/companies/${companyId}/discount_groups/${discountGroupId}/edit`
+export const generate_codes_company_discount_group_path = (companyId, discountGroupId) => `/companies/${companyId}/discount_groups/${discountGroupId}/generate_codes`
 export const company_subscriptions_path = (companyId) => `/companies/${companyId}/subscriptions`
 export const company_policies_path = (companyId) => `/companies/${companyId}/policies`
 export const company_tasks_path = (companyId) => `/companies/${companyId}/tasks`
