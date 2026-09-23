@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_09_18_000006) do
+ActiveRecord::Schema[8.0].define(version: 2026_09_22_000002) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pgcrypto"
@@ -1434,6 +1434,75 @@ ActiveRecord::Schema[8.0].define(version: 2026_09_18_000006) do
     t.index ["lifecycle_status"], name: "index_departments_on_lifecycle_status"
     t.index ["property_mapping_id"], name: "index_departments_on_property_mapping_id"
     t.index ["workflow_status"], name: "index_departments_on_workflow_status"
+  end
+
+  create_table "discount_groups", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
+    t.uuid "company_id", null: false
+    t.string "name"
+    t.text "description"
+    t.string "code"
+    t.string "prefix"
+    t.integer "discount_type", null: false
+    t.integer "currency"
+    t.integer "amount_cents"
+    t.decimal "percentage", precision: 15, scale: 4
+    t.integer "max_amount_cents"
+    t.integer "total_budget_cents"
+    t.integer "current_spent_cents", default: 0, null: false
+    t.integer "campaign_status", default: 0, null: false
+    t.datetime "start_at"
+    t.datetime "end_at"
+    t.integer "lifecycle_status"
+    t.integer "workflow_status"
+    t.integer "business_type"
+    t.datetime "expiration_date"
+    t.jsonb "metadata"
+    t.datetime "discarded_at"
+    t.string "permission_resource_name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["business_type"], name: "index_discount_groups_on_business_type"
+    t.index ["code"], name: "index_discount_groups_on_code", unique: true
+    t.index ["company_id", "campaign_status"], name: "index_discount_groups_on_company_id_and_campaign_status"
+    t.index ["company_id"], name: "index_discount_groups_on_company_id"
+    t.index ["discarded_at"], name: "index_discount_groups_on_discarded_at"
+    t.index ["lifecycle_status"], name: "index_discount_groups_on_lifecycle_status"
+    t.index ["workflow_status"], name: "index_discount_groups_on_workflow_status"
+  end
+
+  create_table "discounts", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
+    t.uuid "company_id", null: false
+    t.uuid "discount_group_id", null: false
+    t.uuid "order_id"
+    t.uuid "invoice_id"
+    t.uuid "customer_id"
+    t.uuid "employee_id"
+    t.string "code", null: false
+    t.integer "status", default: 0, null: false
+    t.integer "amount_cents"
+    t.datetime "used_at"
+    t.integer "lifecycle_status"
+    t.integer "workflow_status"
+    t.integer "business_type"
+    t.datetime "expiration_date"
+    t.jsonb "metadata"
+    t.datetime "discarded_at"
+    t.string "permission_resource_name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["business_type"], name: "index_discounts_on_business_type"
+    t.index ["company_id", "code"], name: "index_discounts_on_company_id_and_code", unique: true
+    t.index ["company_id"], name: "index_discounts_on_company_id"
+    t.index ["customer_id"], name: "index_discounts_on_customer_id"
+    t.index ["discarded_at"], name: "index_discounts_on_discarded_at"
+    t.index ["discount_group_id", "status"], name: "index_discounts_on_discount_group_id_and_status"
+    t.index ["discount_group_id"], name: "index_discounts_on_discount_group_id"
+    t.index ["employee_id"], name: "index_discounts_on_employee_id"
+    t.index ["invoice_id"], name: "index_discounts_on_invoice_id"
+    t.index ["lifecycle_status"], name: "index_discounts_on_lifecycle_status"
+    t.index ["order_id"], name: "index_discounts_on_order_id"
+    t.index ["status"], name: "index_discounts_on_status"
+    t.index ["workflow_status"], name: "index_discounts_on_workflow_status"
   end
 
   create_table "document_appointments", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
@@ -6075,6 +6144,13 @@ ActiveRecord::Schema[8.0].define(version: 2026_09_18_000006) do
   add_foreign_key "departments", "categories"
   add_foreign_key "departments", "companies"
   add_foreign_key "departments", "property_mappings"
+  add_foreign_key "discount_groups", "companies"
+  add_foreign_key "discounts", "companies"
+  add_foreign_key "discounts", "customers"
+  add_foreign_key "discounts", "discount_groups"
+  add_foreign_key "discounts", "employees"
+  add_foreign_key "discounts", "invoices"
+  add_foreign_key "discounts", "orders"
   add_foreign_key "document_appointments", "companies"
   add_foreign_key "document_appointments", "documents"
   add_foreign_key "document_group_appointments", "companies"

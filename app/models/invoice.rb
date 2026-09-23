@@ -31,6 +31,7 @@ class Invoice < ApplicationRecord
   belongs_to :property_mapping
 
   has_many :transactions, dependent: :destroy
+  has_many :discounts, dependent: :destroy
 
   # --- Validations ---
   validates :name, presence: true, uniqueness: { scope: :company_id }, length: { maximum: 255 }
@@ -40,7 +41,25 @@ class Invoice < ApplicationRecord
 
   validates :business_type, presence: true
 
+  # --- Callbacks ---
+  # Discounts follow the invoice payment lifecycle (docs/DISCOUNTS.md) — the
+  # commerce-chain mirror of CompanyInvoice#complete_order_if_paid!.
+  after_update :sync_discount_state, if: :saved_change_to_payment_status?
+
   def total_price_cents
     price_cents
+  end
+
+  private
+
+  # Became paid → consume the pending code reserved on the order; left paid
+  # (unpaid/voided) → revert used codes and refund the campaign budget
+  # (docs/DISCOUNTS.md §5).
+  def sync_discount_state
+    if paid?
+      order.discounts.status_pending.find_each { |discount| discount.consume!(invoice: self) }
+    else
+      discounts.status_used.find_each(&:revert!)
+    end
   end
 end

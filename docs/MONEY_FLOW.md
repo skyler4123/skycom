@@ -307,10 +307,12 @@ Companies::OrderProcessing::V1Controller#checkout
   ▼
 V1Controller#pay
   ├── PaymentMethodAppointment.branch_level.find_by!(id:, company_id:)
-  └── InitiatePaymentService.call(order:, appointment:)
+  └── InitiatePaymentService.call(order:, appointment:, discount_code?:, employee?:)
         ├── validates appointment (branch scope + active)
+        ├── Discounts::ApplyService (when discount_code present — code unused → pending,
+        │     amount snapshot; any later failure → discount released back to unused)
         ├── ReserveStockService   (atomic DECRBY + DB pending += qty)
-        ├── Invoice.create!       (unpaid)
+        ├── Invoice.create!       (unpaid; price_cents = gross - discount.amount_cents)
         ├── Transaction.create!(status: :pending, payment_method_id, gateway_reference: "POS_<hex16>")
         │
         ├── CASH mode → CompletePaymentService.call (synchronous) → txn completed → invoice paid → order paid
@@ -547,6 +549,7 @@ Owner sees low balance warning on Usage page
 | `app/controllers/webhooks/payments/*` | Mock gateway webhooks (dual lookup: CompanyTransaction then Transaction) |
 | `app/controllers/companies/top_ups_controller.rb` | Top-up page + gateway initiation |
 | `app/jobs/company_usage_sync_job.rb` | Drains Kredis usage delta → Daily/Monthly usage tables |
+| `docs/DISCOUNTS.md` | Single-use discount engine — reserve at pay, consume on invoice paid (the only sanctioned Invoice-level money callback besides the derivation) |
 | `config/initializers/constants.rb` | `CREDIT_RATES`, `CREDIT_USAGE_RATES`, `GATEWAY_STRATEGIES`, `GATEWAY_STRATEGY_CLASSES` |
 
 ---

@@ -83,6 +83,14 @@ Mirrors the `CompanyTransaction` gating: the invoice's `payment_status` is deriv
 
 ---
 
+### Invoice (`app/models/invoice.rb`)
+
+| Callback | Line | Method | Description |
+|----------|------|--------|-------------|
+| `after_update :sync_discount_state, if: :saved_change_to_payment_status?` | — | `sync_discount_state` | Discount lifecycle hook (commerce-chain mirror of `CompanyInvoice#complete_order_if_paid!`): when the invoice **becomes paid**, consumes the pending `Discount` reserved on the order (`consume!` → binds `invoice_id`/`used_at`, increments `discount_group.current_spent_cents`); when the invoice **leaves paid** (transaction destroyed → re-derived `unpaid`/`voided`), reverts used codes (`revert!` → refunds the group budget, may reactivate an exhausted group). See `docs/DISCOUNTS.md` §4. |
+
+---
+
 ### Branch (`app/models/branch.rb`)
 
 | Callback | Line | Method | Description |

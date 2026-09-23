@@ -33,6 +33,21 @@ RSpec.describe OrderProcessingV1::CancelPaymentService do
 
   before { stock.reserve_stock!(2) }
 
+  it "releases the pending discount code reserved on the order" do
+    group = Seed::DiscountGroupService.create(company: company, name: "POS G", prefix: "POS",
+      discount_type: :percentage, percentage: 10, campaign_status: :active)
+    discount = Seed::DiscountService.create(company: company, discount_group: group, code: "POS-TEST01")
+    discount.reserve!(order: order, employee: create(:employee, company: company), amount_cents: 500)
+
+    described_class.call(transaction_token: txn.gateway_reference, company: company)
+
+    aggregate_failures do
+      expect(discount.reload).to be_status_unused
+      expect(discount.order_id).to be_nil
+      expect(group.reload.current_spent_cents).to eq(0)
+    end
+  end
+
   it "fails a pending transaction and releases reserved stock" do
     result = described_class.call(transaction_token: txn.gateway_reference, company: company)
 

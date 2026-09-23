@@ -1,7 +1,8 @@
 # frozen_string_literal: true
 
-# Cancels an abandoned POS payment: releases the stock reservation and marks
-# the pending Transaction failed. Only pending transactions can cancel.
+# Cancels an abandoned POS payment: releases the stock reservation and the
+# pending discount code reserved on the order, then marks the pending
+# Transaction failed. Only pending transactions can cancel.
 module OrderProcessingV1
   class CancelPaymentService
     def self.call(transaction_token:, company:)
@@ -10,6 +11,7 @@ module OrderProcessingV1
       return false unless transaction.pending?
 
       ReleaseReservedStockService.call(order: transaction.invoice.order)
+      Discounts::ReleaseService.call(order: transaction.invoice.order)
       transaction.update!(status: :failed)
       true
     end

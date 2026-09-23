@@ -104,8 +104,10 @@ Company-scoped business entities. Each table belongs to a `company_id` and repre
 | 58 | `memberships` | CRM | Customer loyalty/program memberships |
 | 59 | `reservations` | Bookings | Customer service bookings |
 | 60 | `suppliers` | Inventory | Supplier records (procurement-ready master data) |
+| 61 | `discount_groups` | Sales | Discount campaign groups (type/value, budget, validity, status) |
+| 62 | `discounts` | Sales | Single-use discount codes (unique per company, consumption state, SoT bindings) |
 
-**Total: 60 tables**
+**Total: 62 tables**
 
 ---
 
@@ -163,9 +165,9 @@ Polymorphic join tables using the `appoint_to` / `appoint_from` / `appoint_for` 
 |----------|-------|
 | Gem Resources | 4 |
 | System Resources | 11 |
-| Managed Resources | 60 |
+| Managed Resources | 62 |
 | Appointment Resources | 39 |
-| **Grand Total** | **114** |
+| **Grand Total** | **116** |
 
 ---
 
