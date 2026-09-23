@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_09_23_000006) do
+ActiveRecord::Schema[8.0].define(version: 2026_09_23_000004) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pgcrypto"
@@ -3764,6 +3764,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_09_23_000006) do
 
   create_table "purchase_items", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
     t.uuid "company_id", null: false
+    t.uuid "product_id"
     t.uuid "category_id", null: false
     t.uuid "property_mapping_id", null: false
     t.string "name"
@@ -3840,7 +3841,6 @@ ActiveRecord::Schema[8.0].define(version: 2026_09_23_000006) do
     t.datetime "property_datetime_10"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.uuid "product_id"
     t.index ["business_type"], name: "index_purchase_items_on_business_type"
     t.index ["category_id"], name: "index_purchase_items_on_category_id"
     t.index ["code"], name: "index_purchase_items_on_code", unique: true
@@ -3856,6 +3856,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_09_23_000006) do
     t.uuid "company_id", null: false
     t.uuid "branch_id"
     t.uuid "supplier_id"
+    t.uuid "warehouse_id", null: false
     t.uuid "workflow_step_id"
     t.uuid "category_id", null: false
     t.uuid "property_mapping_id", null: false
@@ -3935,7 +3936,6 @@ ActiveRecord::Schema[8.0].define(version: 2026_09_23_000006) do
     t.datetime "property_datetime_10"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.uuid "warehouse_id", null: false
     t.index ["branch_id"], name: "index_purchases_on_branch_id"
     t.index ["business_type"], name: "index_purchases_on_business_type"
     t.index ["category_id"], name: "index_purchases_on_category_id"
@@ -5044,6 +5044,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_09_23_000006) do
     t.uuid "company_id", null: false
     t.uuid "branch_id"
     t.uuid "warehouse_id", null: false
+    t.uuid "destination_warehouse_id", null: false
     t.uuid "product_id"
     t.string "appoint_from_type"
     t.uuid "appoint_from_id"
@@ -5064,6 +5065,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_09_23_000006) do
     t.integer "country"
     t.integer "timezone"
     t.integer "quantity"
+    t.datetime "initiated_at"
+    t.datetime "received_at"
     t.integer "lifecycle_status"
     t.integer "workflow_status"
     t.integer "business_type"
@@ -5133,9 +5136,6 @@ ActiveRecord::Schema[8.0].define(version: 2026_09_23_000006) do
     t.datetime "property_datetime_10"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.uuid "destination_warehouse_id", null: false
-    t.datetime "initiated_at"
-    t.datetime "received_at"
     t.index ["appoint_by_type", "appoint_by_id"], name: "index_stock_transfers_on_appoint_by"
     t.index ["appoint_for_type", "appoint_for_id"], name: "index_stock_transfers_on_appoint_for"
     t.index ["appoint_from_type", "appoint_from_id"], name: "index_stock_transfers_on_appoint_from"
