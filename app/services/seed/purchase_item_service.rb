@@ -2,6 +2,7 @@ class Seed::PurchaseItemService
   def self.new(
     company:,
     category: nil,
+    product: nil,
     property_mapping: nil,
     name: nil,
     description: nil,
@@ -19,6 +20,7 @@ class Seed::PurchaseItemService
     PurchaseItem.new(
       company: company,
       category: category,
+      product: product,
       property_mapping: property_mapping,
       name: name || "Purchase Item #{Faker::Commerce.product_name}",
       description: description || Faker::Lorem.sentence(word_count: 10),

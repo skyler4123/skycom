@@ -79,9 +79,19 @@ module OrderProcessingV1
 
     def build_items
       @order.order_appointments.map do |oa|
-        stock = @order.company.stocks.find_by!(product_id: oa.appoint_to.id)
+        stock = resolve_stock(oa)
+        oa.update!(stock_id: stock.id) # persist the reserved stock for finalize
         { stock_id: stock.id, quantity: oa.quantity }
       end
+    end
+
+    # Stock belongs to a warehouse (docs/superpowers/specs/2026-09-23-stock-source-of-truth-
+    # design.md): resolve against the order's branch warehouses — never a
+    # company-wide first match.
+    def resolve_stock(oa)
+      @order.company.stocks
+        .joins(:warehouse)
+        .find_by!(product_id: oa.appoint_to.id, warehouses: { branch_id: @order.branch_id })
     end
 
     def create_invoice

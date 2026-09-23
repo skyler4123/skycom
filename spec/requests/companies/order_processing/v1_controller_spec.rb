@@ -8,7 +8,7 @@ RSpec.describe "Companies::OrderProcessing::V1", type: :request do
   let(:owner_user) { company.user }
   let(:branch) { create(:branch, company: company) }
   let(:product) { create(:product, company: company) }
-  let(:warehouse) { create(:warehouse, company: company) }
+  let(:warehouse) { create(:warehouse, company: company, branch: branch) }
   let!(:stock) do
     cat = product.category
     Stock.create!(

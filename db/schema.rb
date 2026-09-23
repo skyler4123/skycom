@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_09_22_000002) do
+ActiveRecord::Schema[8.0].define(version: 2026_09_23_000006) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pgcrypto"
@@ -3840,12 +3840,14 @@ ActiveRecord::Schema[8.0].define(version: 2026_09_22_000002) do
     t.datetime "property_datetime_10"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.uuid "product_id"
     t.index ["business_type"], name: "index_purchase_items_on_business_type"
     t.index ["category_id"], name: "index_purchase_items_on_category_id"
     t.index ["code"], name: "index_purchase_items_on_code", unique: true
     t.index ["company_id"], name: "index_purchase_items_on_company_id"
     t.index ["discarded_at"], name: "index_purchase_items_on_discarded_at"
     t.index ["lifecycle_status"], name: "index_purchase_items_on_lifecycle_status"
+    t.index ["product_id"], name: "index_purchase_items_on_product_id"
     t.index ["property_mapping_id"], name: "index_purchase_items_on_property_mapping_id"
     t.index ["workflow_status"], name: "index_purchase_items_on_workflow_status"
   end
@@ -3933,6 +3935,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_09_22_000002) do
     t.datetime "property_datetime_10"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.uuid "warehouse_id", null: false
     t.index ["branch_id"], name: "index_purchases_on_branch_id"
     t.index ["business_type"], name: "index_purchases_on_business_type"
     t.index ["category_id"], name: "index_purchases_on_category_id"
@@ -3942,6 +3945,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_09_22_000002) do
     t.index ["lifecycle_status"], name: "index_purchases_on_lifecycle_status"
     t.index ["property_mapping_id"], name: "index_purchases_on_property_mapping_id"
     t.index ["supplier_id"], name: "index_purchases_on_supplier_id"
+    t.index ["warehouse_id"], name: "index_purchases_on_warehouse_id"
     t.index ["workflow_status"], name: "index_purchases_on_workflow_status"
     t.index ["workflow_step_id"], name: "index_purchases_on_workflow_step_id"
   end
@@ -4636,11 +4640,49 @@ ActiveRecord::Schema[8.0].define(version: 2026_09_22_000002) do
     t.index ["recorded_at"], name: "index_statistics_on_recorded_at"
   end
 
+  create_table "stock_adjustments", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
+    t.uuid "company_id", null: false
+    t.uuid "branch_id"
+    t.uuid "warehouse_id", null: false
+    t.uuid "category_id", null: false
+    t.uuid "property_mapping_id", null: false
+    t.string "email"
+    t.string "name"
+    t.text "description"
+    t.string "code"
+    t.string "phone_number"
+    t.string "reason"
+    t.integer "direction", null: false
+    t.integer "currency", default: 0
+    t.integer "country", default: 0
+    t.integer "timezone", default: 0
+    t.integer "lifecycle_status"
+    t.integer "workflow_status"
+    t.integer "business_type"
+    t.datetime "expiration_date"
+    t.jsonb "metadata", default: {}
+    t.datetime "discarded_at"
+    t.string "permission_resource_name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["branch_id"], name: "index_stock_adjustments_on_branch_id"
+    t.index ["business_type"], name: "index_stock_adjustments_on_business_type"
+    t.index ["category_id"], name: "index_stock_adjustments_on_category_id"
+    t.index ["code"], name: "index_stock_adjustments_on_code"
+    t.index ["company_id", "workflow_status"], name: "index_stock_adjustments_on_company_id_and_workflow_status"
+    t.index ["company_id"], name: "index_stock_adjustments_on_company_id"
+    t.index ["discarded_at"], name: "index_stock_adjustments_on_discarded_at"
+    t.index ["lifecycle_status"], name: "index_stock_adjustments_on_lifecycle_status"
+    t.index ["property_mapping_id"], name: "index_stock_adjustments_on_property_mapping_id"
+    t.index ["warehouse_id"], name: "index_stock_adjustments_on_warehouse_id"
+    t.index ["workflow_status"], name: "index_stock_adjustments_on_workflow_status"
+  end
+
   create_table "stock_exports", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
     t.uuid "company_id", null: false
     t.uuid "branch_id"
     t.uuid "warehouse_id", null: false
-    t.uuid "product_id", null: false
+    t.uuid "product_id"
     t.string "appoint_from_type"
     t.uuid "appoint_from_id"
     t.string "appoint_to_type"
@@ -4751,7 +4793,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_09_22_000002) do
     t.uuid "company_id", null: false
     t.uuid "branch_id"
     t.uuid "warehouse_id", null: false
-    t.uuid "product_id", null: false
+    t.uuid "product_id"
     t.string "appoint_from_type"
     t.uuid "appoint_from_id"
     t.string "appoint_to_type"
@@ -4856,6 +4898,31 @@ ActiveRecord::Schema[8.0].define(version: 2026_09_22_000002) do
     t.index ["property_mapping_id"], name: "index_stock_imports_on_property_mapping_id"
     t.index ["warehouse_id"], name: "index_stock_imports_on_warehouse_id"
     t.index ["workflow_status"], name: "index_stock_imports_on_workflow_status"
+  end
+
+  create_table "stock_item_appointments", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
+    t.uuid "company_id", null: false
+    t.uuid "stock_id", null: false
+    t.string "appoint_to_type", null: false
+    t.uuid "appoint_to_id", null: false
+    t.integer "quantity", null: false
+    t.integer "lifecycle_status"
+    t.integer "workflow_status"
+    t.integer "business_type"
+    t.datetime "expiration_date"
+    t.jsonb "metadata"
+    t.datetime "discarded_at"
+    t.string "permission_resource_name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["appoint_to_type", "appoint_to_id", "stock_id"], name: "idx_stock_items_on_appoint_to_and_stock"
+    t.index ["appoint_to_type", "appoint_to_id"], name: "index_stock_item_appointments_on_appoint_to"
+    t.index ["business_type"], name: "index_stock_item_appointments_on_business_type"
+    t.index ["company_id"], name: "index_stock_item_appointments_on_company_id"
+    t.index ["discarded_at"], name: "index_stock_item_appointments_on_discarded_at"
+    t.index ["lifecycle_status"], name: "index_stock_item_appointments_on_lifecycle_status"
+    t.index ["stock_id"], name: "index_stock_item_appointments_on_stock_id"
+    t.index ["workflow_status"], name: "index_stock_item_appointments_on_workflow_status"
   end
 
   create_table "stock_transactions", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
@@ -4977,7 +5044,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_09_22_000002) do
     t.uuid "company_id", null: false
     t.uuid "branch_id"
     t.uuid "warehouse_id", null: false
-    t.uuid "product_id", null: false
+    t.uuid "product_id"
     t.string "appoint_from_type"
     t.uuid "appoint_from_id"
     t.string "appoint_to_type"
@@ -5066,6 +5133,9 @@ ActiveRecord::Schema[8.0].define(version: 2026_09_22_000002) do
     t.datetime "property_datetime_10"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.uuid "destination_warehouse_id", null: false
+    t.datetime "initiated_at"
+    t.datetime "received_at"
     t.index ["appoint_by_type", "appoint_by_id"], name: "index_stock_transfers_on_appoint_by"
     t.index ["appoint_for_type", "appoint_for_id"], name: "index_stock_transfers_on_appoint_for"
     t.index ["appoint_from_type", "appoint_from_id"], name: "index_stock_transfers_on_appoint_from"
@@ -5075,6 +5145,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_09_22_000002) do
     t.index ["category_id"], name: "index_stock_transfers_on_category_id"
     t.index ["code"], name: "index_stock_transfers_on_code", unique: true
     t.index ["company_id"], name: "index_stock_transfers_on_company_id"
+    t.index ["destination_warehouse_id"], name: "index_stock_transfers_on_destination_warehouse_id"
     t.index ["discarded_at"], name: "index_stock_transfers_on_discarded_at"
     t.index ["email"], name: "index_stock_transfers_on_email", unique: true
     t.index ["lifecycle_status"], name: "index_stock_transfers_on_lifecycle_status"
@@ -6291,12 +6362,14 @@ ActiveRecord::Schema[8.0].define(version: 2026_09_22_000002) do
   add_foreign_key "purchase_item_appointments", "purchase_items"
   add_foreign_key "purchase_items", "categories"
   add_foreign_key "purchase_items", "companies"
+  add_foreign_key "purchase_items", "products"
   add_foreign_key "purchase_items", "property_mappings"
   add_foreign_key "purchases", "branches"
   add_foreign_key "purchases", "categories"
   add_foreign_key "purchases", "companies"
   add_foreign_key "purchases", "property_mappings"
   add_foreign_key "purchases", "suppliers"
+  add_foreign_key "purchases", "warehouses"
   add_foreign_key "purchases", "workflow_steps"
   add_foreign_key "questions", "branches"
   add_foreign_key "questions", "categories"
@@ -6342,6 +6415,11 @@ ActiveRecord::Schema[8.0].define(version: 2026_09_22_000002) do
   add_foreign_key "shift_templates", "branches"
   add_foreign_key "shift_templates", "companies"
   add_foreign_key "sign_in_tokens", "users"
+  add_foreign_key "stock_adjustments", "branches"
+  add_foreign_key "stock_adjustments", "categories"
+  add_foreign_key "stock_adjustments", "companies"
+  add_foreign_key "stock_adjustments", "property_mappings"
+  add_foreign_key "stock_adjustments", "warehouses"
   add_foreign_key "stock_exports", "branches"
   add_foreign_key "stock_exports", "categories"
   add_foreign_key "stock_exports", "companies"
@@ -6354,6 +6432,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_09_22_000002) do
   add_foreign_key "stock_imports", "products"
   add_foreign_key "stock_imports", "property_mappings"
   add_foreign_key "stock_imports", "warehouses"
+  add_foreign_key "stock_item_appointments", "companies"
+  add_foreign_key "stock_item_appointments", "stocks"
   add_foreign_key "stock_transactions", "branches"
   add_foreign_key "stock_transactions", "categories"
   add_foreign_key "stock_transactions", "companies"
@@ -6366,6 +6446,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_09_22_000002) do
   add_foreign_key "stock_transfers", "products"
   add_foreign_key "stock_transfers", "property_mappings"
   add_foreign_key "stock_transfers", "warehouses"
+  add_foreign_key "stock_transfers", "warehouses", column: "destination_warehouse_id"
   add_foreign_key "stocks", "branches"
   add_foreign_key "stocks", "categories"
   add_foreign_key "stocks", "companies"

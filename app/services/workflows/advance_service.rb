@@ -91,12 +91,27 @@ class Workflows::AdvanceService
         @subject.update!(workflow_step: next_step, workflow_status: :confirmed)
       else
         @subject.update!(workflow_status: :completed)
+        complete_stock_bridge!
       end
     when "rejected"
       @subject.update!(workflow_status: :cancelled)
     when "rework"
       @subject.update!(workflow_step: @target_step, workflow_status: :pending)
     end
+  end
+
+  # Stock bridge (docs/superpowers/specs/2026-09-23-stock-source-of-truth-design.md §4):
+  # a completed Purchase must land its goods. Runs inside the same transaction —
+  # a failure (no warehouse / no line items / resolution error) rolls back the
+  # whole advance: an approval that cannot deliver stock is rejected.
+  def complete_stock_bridge!
+    return unless @subject.is_a?(Purchase)
+
+    result = StockMovementService::Purchases::CompleteService.call(
+      purchase: @subject,
+      employee: @employee
+    )
+    raise StockMovementService::Error, result[:errors].join(", ") if result[:errors].present?
   end
 
   def failure(message)

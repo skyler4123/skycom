@@ -20,6 +20,10 @@ class StockTransaction < ApplicationRecord
   validates :quantity, presence: true, numericality: { only_integer: true, greater_than: 0 }
 
   # --- Automated Stock Recalibration Callback ---
+  # The SINGLE quantity mutator for the stock domain (docs/KREDIS.md,
+  # docs/superpowers/specs/2026-09-23-stock-source-of-truth-design.md).
+  # Raises on floor violation so the caller's transaction rolls back the
+  # ledger row together with any document state.
   after_create :recalibrate_stock_metrics
 
   private
@@ -28,18 +32,20 @@ class StockTransaction < ApplicationRecord
     # Identity = warehouse + product (the stocks uniqueness scope). category_id/
     # property_mapping_id must NOT be lookup keys: stocks live in their own category
     # taxonomy, and a ledger row may carry a different document category.
-    stock = Stock.find_or_initialize_by(
-      company_id: company_id,
-      warehouse_id: warehouse_id,
-      product_id: product_id
-    )
+    # The row must already exist — callers resolve/create it positively; a missing
+    # row is a programming error, never a silent zero-quantity lazy creation.
+    stock = Stock.find_by!(company_id: company_id, warehouse_id: warehouse_id, product_id: product_id)
 
-    if add?
-      stock.quantity += quantity
-    elsif remove?
-      stock.quantity -= quantity
+    stock.with_lock do
+      delta = add? ? quantity : -quantity
+      new_quantity = stock.quantity + delta
+      if new_quantity.negative?
+        raise StockMovementService::Error,
+              "Insufficient stock: quantity #{stock.quantity}, movement #{delta}"
+      end
+
+      stock.quantity = new_quantity
+      stock.save! # after_save syncs the Redis available counter
     end
-
-    stock.save!
   end
 end

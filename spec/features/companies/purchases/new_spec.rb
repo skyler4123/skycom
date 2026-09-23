@@ -3,6 +3,7 @@ require "rails_helper"
 RSpec.feature "Companies::Purchases New", type: :feature, js: true do
   let(:company) { create(:company) }
   let(:owner) { company.user }
+  let!(:warehouse) { create(:warehouse, company: company) }
   let!(:purchase_item) { create(:purchase_item, company: company, name: "Ballpoint Pen", estimated_unit_price: 2.50) }
 
   before do

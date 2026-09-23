@@ -21,7 +21,7 @@ class Company < ApplicationRecord
     Membership
     Page PaymentMethodAppointment ShiftTemplate ScheduledShift
     AttendancePolicy AttendanceLog AttendanceDay AttendanceMonth
-    Stock StockTransfer StockImport StockExport
+    Stock StockTransfer StockImport StockExport StockAdjustment
   ].freeze
   # Default company-appointed setting code + the canonical sidebar item keys.
   # Must stay in sync with `SIDEBAR_ITEMS` in
@@ -32,7 +32,7 @@ class Company < ApplicationRecord
     products brands services orders employees shift_templates scheduled_shifts
     attendance_days attendance_policies attendance_logs attendance_months
     attendance_days attendance_policies attendance_logs attendance_months
-    warehouses stocks stock_transfers stock_imports stock_exports suppliers customers invoices purchases discount_groups
+    warehouses stocks stock_transfers stock_imports stock_exports stock_adjustments suppliers customers invoices purchases discount_groups
     policies pages payment_methods permissions analytics facilities
     usage top_up billing settings help_center
   ].freeze
@@ -115,6 +115,7 @@ class Company < ApplicationRecord
   has_many :stock_transfers, dependent: :destroy
   has_many :stock_imports, dependent: :destroy
   has_many :stock_exports, dependent: :destroy
+  has_many :stock_adjustments, dependent: :destroy
   has_many :suppliers, dependent: :destroy
   has_many :customers, dependent: :destroy
   has_many :customer_groups, dependent: :destroy

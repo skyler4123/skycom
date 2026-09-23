@@ -40,7 +40,10 @@ WORKFLOW_STATUS = {
   paid: 5,
   cancelled: 6,
   refunded: 7,
-  failed: 8
+  failed: 8,
+  initiated: 9,
+  received: 10,
+  shipped: 11
 }
 
 GATEWAY_STRATEGIES = begin
