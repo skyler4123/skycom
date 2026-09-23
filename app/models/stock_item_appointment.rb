@@ -1,3 +1,7 @@
+# StockItemAppointment — Atomic purpose: the movement-document line item
+# (stock + quantity) linking a Stock row to its document (Import/Export/
+# Transfer/Adjustment via appoint_to). Quantity truth lives here, not on the
+# document header.
 class StockItemAppointment < ApplicationRecord
   include SetDefaultCompanyConcern
 

@@ -1,3 +1,7 @@
+# StockAdjustment — Atomic purpose: the stock-take correction document
+# (direction: increase/decrease + reason). Multi-line via StockItemAppointment;
+# each line spawns a StockTransaction (transaction_type: adjustment, add on
+# increase / remove on decrease).
 class StockAdjustment < ApplicationRecord
   include CategoryConcern
   include PropertyMappingConcern

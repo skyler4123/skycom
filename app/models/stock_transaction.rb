@@ -1,3 +1,7 @@
+# StockTransaction — Atomic purpose: the stock ledger row and SINGLE quantity
+# mutator. Its after_create callback (recalibrate_stock_metrics, with_lock +
+# floor check) is the only writer of Stock.quantity; a missing Stock row or
+# negative result raises and rolls back the whole movement.
 class StockTransaction < ApplicationRecord
   enum :country, COUNTRY_CODES, prefix: true, default: :us
   enum :timezone, TIMEZONES, prefix: true, default: :utc

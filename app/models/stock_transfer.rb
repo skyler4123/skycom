@@ -1,3 +1,7 @@
+# StockTransfer — Atomic purpose: the warehouse-to-warehouse movement document
+# (warehouse → destination_warehouse, initiated_at / received_at). Receive writes
+# a paired remove (source) + add (destination) StockTransaction
+# (transaction_type: transfer); destination must differ from source.
 class StockTransfer < ApplicationRecord
   # NOTE: must be declared before `include DynamicSearchConcern` — the meilisearch
   # settings block runs at include time. See the hook docs in the concern.

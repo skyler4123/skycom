@@ -1,3 +1,7 @@
+# StockImport — Atomic purpose: the inbound document (purchase / return /
+# transfer_in / adjustment). Multi-line via StockItemAppointment rows pointing
+# at Stock records; each line spawns an add-direction StockTransaction
+# (transaction_type: import) whose callback applies the quantity.
 class StockImport < ApplicationRecord
   # NOTE: must be declared before `include DynamicSearchConcern` — the meilisearch
   # settings block runs at include time. See the hook docs in the concern.
