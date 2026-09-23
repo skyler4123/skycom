@@ -6,7 +6,7 @@
 # Codes are never created here — generate_codes bulk-inserts single-use codes
 # via Discounts::BatchGenerator. current_spent_cents is service-owned and never
 # permitted through create/update.
-# Serves Stimulus: (future) Companies_DiscountGroups_IndexController|NewController|ShowController|EditController
+# Serves Stimulus: Companies_DiscountGroups_IndexController|NewController|ShowController|EditController
 # Endpoints: GET/POST/PATCH/DELETE /companies/:company_id/discount_groups(.json),
 #            POST /companies/:company_id/discount_groups/:id/generate_codes
 # Docs: docs/DISCOUNTS.md
@@ -50,22 +50,40 @@ class Companies::DiscountGroupsController < Companies::ApplicationController
   def create
     group = current_company.discount_groups.new(discount_group_params)
 
-    if group.save
-      redirect_to company_discount_group_path(current_company, group), notice: "Discount group created successfully"
-    else
-      redirect_to new_company_discount_group_path(current_company),
-        alert: group.errors.full_messages.to_sentence
+    respond_to do |format|
+      if group.save
+        format.html do
+          redirect_to company_discount_group_path(current_company, group),
+            notice: "Discount group created successfully"
+        end
+        format.json { render json: { discount_group: format_group(group) }, status: :created }
+      else
+        format.html do
+          redirect_to new_company_discount_group_path(current_company),
+            alert: group.errors.full_messages.to_sentence
+        end
+        format.json { render json: { errors: group.errors.full_messages }, status: :unprocessable_entity }
+      end
     end
   end
 
   def update
     group = current_company.discount_groups.find(params[:id])
 
-    if group.update(discount_group_params)
-      redirect_to company_discount_group_path(current_company, group), notice: "Discount group updated successfully."
-    else
-      redirect_to edit_company_discount_group_path(current_company, group),
-        alert: group.errors.full_messages.to_sentence
+    respond_to do |format|
+      if group.update(discount_group_params)
+        format.html do
+          redirect_to company_discount_group_path(current_company, group),
+            notice: "Discount group updated successfully."
+        end
+        format.json { render json: { discount_group: format_group(group) } }
+      else
+        format.html do
+          redirect_to edit_company_discount_group_path(current_company, group),
+            alert: group.errors.full_messages.to_sentence
+        end
+        format.json { render json: { errors: group.errors.full_messages }, status: :unprocessable_entity }
+      end
     end
   end
 

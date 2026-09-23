@@ -1,9 +1,9 @@
 # Skycom Discount Engine
 
-> **Status**: Live (2026-09-22) — backend only. Single-use discount codes generated in
+> **Status**: Live (2026-09-22) — backend + FE dashboards. Single-use discount codes generated in
 > bulk under campaign groups, reserved at POS pay, consumed only when the Invoice
 > becomes paid, released on cancel, reverted (with budget refund) on the refund path.
-> FE dashboards and a standalone apply endpoint are future work.
+> A standalone apply endpoint is future work.
 
 ---
 
@@ -199,7 +199,6 @@ spec/requests/companies/discounts_controller_spec.rb spec/requests/companies/ord
 
 | Item | Notes |
 |------|-------|
-| FE dashboards | Stimulus controllers for discount groups (CRUD + code grid) — `Serves Stimulus:` headers already reference the future pairs |
 | Standalone apply endpoint | Dashboard/invoice apply (currently POS pay only) |
 | Auto-expiry sweeper | `expired` enum exists; enforcement today is apply-time window check only |
 | Approval flow | `requires_approval`/threshold was cut from v1 (YAGNI) |
@@ -219,8 +218,9 @@ spec/requests/companies/discounts_controller_spec.rb spec/requests/companies/ord
 | `app/services/order_processing_v1/initiate_payment_service.rb` | Pay-time apply + discounted invoice + failure cleanup |
 | `app/services/order_processing_v1/cancel_payment_service.rb` | Cancel path release |
 | `app/services/order_processing_v1/invalid_discount_error.rb` | POS error class |
-| `app/controllers/companies/discount_groups_controller.rb` | Group CRUD + `generate_codes` |
+| `app/controllers/companies/discount_groups_controller.rb` | Group CRUD + `generate_codes` (`create`/`update` respond JSON for the FE) |
 | `app/controllers/companies/discounts_controller.rb` | Code ledger (read-only) |
+| `app/javascript/controllers/companies/discount_groups/{index,new,show,edit}_controller.js` | Discount FE dashboards — group-centric sidebar page; New page is a rich create → batch-generate flow (`?generate_for=` reuses it for "generate more codes"); show page embeds the codes ledger (status filter, copy, CSV export) |
 | `app/policies/companies/{discount_groups,discounts}_policy.rb` | ABAC policies |
 | `app/services/seed/discount_group_service.rb` / `discount_service.rb` | Seed services |
 | `app/services/seed/retail_init_service.rb` | Role grants |

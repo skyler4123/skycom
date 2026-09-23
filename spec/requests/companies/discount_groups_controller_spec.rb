@@ -88,6 +88,23 @@ RSpec.describe "Companies::DiscountGroupsController", type: :request do
       post company_discount_groups_path(company), params: valid_params, as: :json
       expect(response).to have_http_status(:forbidden)
     end
+
+    it "returns the created group as JSON for the rich create page" do
+      post company_discount_groups_path(company), params: valid_params, as: :json
+
+      expect(response).to have_http_status(:created)
+      body = JSON.parse(response.body)
+      expect(body["discount_group"]["name"]).to eq("Winter Sale")
+      expect(body["discount_group"]["prefix"]).to eq("WIN26")
+    end
+
+    it "returns 422 errors JSON for invalid params" do
+      post company_discount_groups_path(company),
+        params: { discount_group: { name: "", prefix: "X", discount_type: "percentage" } }, as: :json
+
+      expect(response).to have_http_status(:unprocessable_entity)
+      expect(JSON.parse(response.body)["errors"]).to be_present
+    end
   end
 
   describe "POST #generate_codes" do
@@ -127,6 +144,16 @@ RSpec.describe "Companies::DiscountGroupsController", type: :request do
 
       follow_redirect!
       expect(group.reload.name).to eq("Renamed")
+      expect(group.reload).to be_campaign_status_paused
+    end
+
+    it "returns the updated group as JSON (fetch-driven lifecycle toggle)" do
+      patch company_discount_group_path(company, group),
+        params: { discount_group: { campaign_status: "paused" } }, as: :json
+
+      expect(response).to have_http_status(:ok)
+      body = JSON.parse(response.body)
+      expect(body["discount_group"]["campaign_status"]).to eq("paused")
       expect(group.reload).to be_campaign_status_paused
     end
   end

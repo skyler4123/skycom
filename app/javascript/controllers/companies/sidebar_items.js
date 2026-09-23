@@ -32,6 +32,7 @@ export const SIDEBAR_ITEMS = [
   { key: "customers", group: "sales", icon: "person_add", label: "Customers", href: (cid) => Helpers.company_customers_path(cid) },
   { key: "invoices", group: "sales", icon: "receipt_long", label: "Invoices", href: (cid) => Helpers.company_invoices_path(cid) },
   { key: "purchases", group: "sales", icon: "shopping_cart", label: "Purchases", href: (cid) => Helpers.company_purchases_path(cid) },
+  { key: "discount_groups", group: "sales", icon: "sell", label: "Discounts", href: (cid) => Helpers.company_discount_groups_path(cid) },
   { key: "branches", group: "organization", icon: "apartment", label: "Branches", href: (cid) => Helpers.company_branches_path(cid) },
   { key: "departments", group: "organization", icon: "family_group", label: "Departments", href: (cid) => Helpers.company_departments_path(cid) },
   { key: "employees", group: "organization", icon: "groups", label: "Employees", href: (cid) => Helpers.company_employees_path(cid) },
