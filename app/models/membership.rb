@@ -15,7 +15,8 @@ class Membership < ApplicationRecord
   belongs_to :category
   belongs_to :property_mapping
 
-  has_many :membership_appointments, dependent: :destroy
+  has_many :customer_membership_appointments, dependent: :destroy
+  has_many :customers, through: :customer_membership_appointments
 
   validates :code, presence: true, uniqueness: true
 end

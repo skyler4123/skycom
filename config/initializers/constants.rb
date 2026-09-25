@@ -114,7 +114,7 @@ PERMISSIONS_CACHE_EXPIRY = 1.minute
 # Owner Role Constants (ABAC)
 # Magic-string values used across the permission system to identify
 # owner-level access. Owner roles bypass all ABAC permission checks.
-# Referenced in: Company, Employee, PolicyAppointment, RoleAppointment,
+# Referenced in: Company, Employee, PolicyRoleAppointment, EmployeeRoleAppointment,
 # seed services, and permission concerns.
 # =============================================================================
 

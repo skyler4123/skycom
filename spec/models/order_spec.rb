@@ -7,9 +7,16 @@ RSpec.describe Order, type: :model do
     it { should belong_to(:branch).optional }
     it { should belong_to(:customer).optional }
     it { should have_many(:invoices).dependent(:destroy) }
-    it { should have_many(:order_appointments).dependent(:destroy) }
-    it { should have_many(:products).through(:order_appointments) }
-    it { should have_many(:services).through(:order_appointments) }
+    it { should have_many(:order_product_appointments).dependent(:destroy) }
+    it { should have_many(:products).through(:order_product_appointments) }
+    it { should have_many(:order_service_appointments).dependent(:destroy) }
+    it { should have_many(:services).through(:order_service_appointments) }
+    it { should have_many(:order_product_group_appointments).dependent(:destroy) }
+    it { should have_many(:product_groups).through(:order_product_group_appointments) }
+    it { should have_many(:order_service_group_appointments).dependent(:destroy) }
+    it { should have_many(:service_groups).through(:order_service_group_appointments) }
+    it { should have_many(:order_subscription_plan_appointments).dependent(:destroy) }
+    it { should have_many(:subscription_plans).through(:order_subscription_plan_appointments) }
   end
 
   describe "validations" do

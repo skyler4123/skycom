@@ -1,8 +1,8 @@
 module OrderProcessingV1
   class WriteStockLedgerService
     def self.call(order:)
-      rows = order.order_appointments.map do |oa|
-        product = oa.appoint_to
+      rows = order.order_product_appointments.map do |oa|
+        product = oa.product
         stock = Stock.find_by!(company_id: order.company_id, product_id: product.id)
         {
           company_id: order.company_id,

@@ -39,16 +39,17 @@ property_mapping: cat.default_property_mapping).tap { |s| s.send(:sync_available
       payment_mode: :qr, strategy: :mock_qr_gateway)
   end
   let!(:method_appts) do
+    branch # create first: Branch#initialize_payment_methods must see no company rows yet
     [
-      PaymentMethodAppointment.create!(appoint_to: company, company: company, payment_method: cash_pm,
+      CompanyPaymentMethodAppointment.create!(company: company, payment_method: cash_pm,
         name: "Co cash", code: "FE_CO_CASH", business_type: :in_store, lifecycle_status: :active),
-      PaymentMethodAppointment.create!(appoint_to: company, company: company, payment_method: qr_pm,
+      CompanyPaymentMethodAppointment.create!(company: company, payment_method: qr_pm,
         name: "Co qr", code: "FE_CO_MQR", business_type: :in_store, lifecycle_status: :active,
         merchant_number: "5555555555", merchant_name: company.name, merchant_id: "T-FE02"),
-      PaymentMethodAppointment.create!(appoint_to: branch, company: company, payment_method: cash_pm,
+      BranchPaymentMethodAppointment.create!(company: company, branch: branch, payment_method: cash_pm,
         name: "Br cash", code: "FE_BR_CASH", business_type: :in_store, lifecycle_status: :active,
         merchant_number: "4444444444", merchant_name: company.name, merchant_id: "T-FE01"),
-      PaymentMethodAppointment.create!(appoint_to: branch, company: company, payment_method: qr_pm,
+      BranchPaymentMethodAppointment.create!(company: company, branch: branch, payment_method: qr_pm,
         name: "Br qr", code: "FE_BR_MQR", business_type: :in_store, lifecycle_status: :active,
         merchant_number: "5555555555", merchant_name: company.name, merchant_id: "T-FE02")
     ]

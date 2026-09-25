@@ -6,12 +6,24 @@ module RoleConcern
       raise "Model must belong to a company to attach a tag." unless respond_to?(:company) && company
 
       ApplicationRecord.transaction do
-        role = company.roles.find_or_create_by!(name: name)
+        role = company.roles.find_or_create_by!(name: name) do |r|
+          r.business_type ||= Role.business_types.keys.reject { |k| k == OWNER_BUSINESS_TYPE }.sample
+        end
 
-        unless roles.include?(role)
-          role_appointments.create!(
+        # Atomic pairwise table, e.g. Employee => EmployeeRoleAppointment,
+        # Customer => CustomerRoleAppointment (Role sorts last alphabetically).
+        # Query the table directly: `roles` may be memoized and miss just-created rows.
+        appointment_class = "#{self.class.name}RoleAppointment".constantize
+        foreign_key = "#{self.class.name.underscore}_id"
+        exists = appointment_class.exists?(
+          company_id: company.id, role_id: role.id, foreign_key => id
+        )
+
+        unless exists
+          appointment_class.create!(
             company: company,
             role: role,
+            foreign_key => id,
             lifecycle_status: :active
           )
         end

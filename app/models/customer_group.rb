@@ -26,12 +26,13 @@ class CustomerGroup < ApplicationRecord
   belongs_to :category
   belongs_to :property_mapping
 
-  has_many :customer_group_appointments, dependent: :destroy
-  has_many :customers, through: :customer_group_appointments, source: :appoint_to, source_type: "Customer"
-  has_many :services, through: :customer_group_appointments, source: :appoint_to, source_type: "Service"
+  has_many :customer_customer_group_appointments, dependent: :destroy
+  has_many :customers, through: :customer_customer_group_appointments
+  has_many :customer_group_service_appointments, dependent: :destroy
+  has_many :services, through: :customer_group_service_appointments
 
-  has_many :tag_appointments, dependent: :destroy, as: :appoint_to
-  has_many :tags, through: :tag_appointments
+  has_many :customer_group_role_appointments, dependent: :destroy
+  has_many :roles, through: :customer_group_role_appointments
 
   # --- Validations ---
   validates :name, presence: true, uniqueness: { scope: :company_id }, length: { maximum: 255 }

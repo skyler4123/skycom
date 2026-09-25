@@ -33,13 +33,16 @@ class Product < ApplicationRecord
   belongs_to :category
   belongs_to :property_mapping
 
-  # Core Business Orders
-  has_many :order_appointments, as: :appoint_to, dependent: :destroy
-  has_many :orders, through: :order_appointments
+  # Core Business Orders (atomic pairwise)
+  has_many :order_product_appointments, dependent: :destroy
+  has_many :orders, through: :order_product_appointments
 
-  # Groupings Matrix
-  has_many :product_group_appointments, dependent: :destroy, as: :appoint_to
-  has_many :product_groups, through: :product_group_appointments
+  # Groupings Matrix (atomic pairwise)
+  has_many :product_product_group_appointments, dependent: :destroy
+  has_many :product_groups, through: :product_product_group_appointments
+
+  has_many :employee_product_appointments, dependent: :destroy
+  has_many :employees, through: :employee_product_appointments
 
   # --- New Inventory Ledger Associations ---
   has_many :stocks, dependent: :destroy

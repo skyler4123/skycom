@@ -25,8 +25,10 @@ class ServiceGroup < ApplicationRecord
   belongs_to :branch, optional: true
   belongs_to :category
   belongs_to :property_mapping
-  has_many :service_group_appointments, dependent: :destroy
-  has_many :services, through: :service_group_appointments, source: :appoint_to, source_type: "Service"
+  has_many :service_service_group_appointments, dependent: :destroy
+  has_many :services, through: :service_service_group_appointments
+  has_many :order_service_group_appointments, dependent: :destroy
+  has_many :orders, through: :order_service_group_appointments
 
   # --- Validations ---
   validates :name, presence: true, uniqueness: { scope: :company_id }, length: { maximum: 255 }

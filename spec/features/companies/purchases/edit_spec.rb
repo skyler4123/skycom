@@ -8,7 +8,7 @@ RSpec.feature "Companies::Purchases Edit", type: :feature, js: true do
   let!(:other_item) { create(:purchase_item, company: company, name: "Stapler") }
   let!(:purchase) { create(:purchase, company: company, name: "Pens restock") }
   let!(:appointment) do
-    Seed::PurchaseItemAppointmentService.create(
+    Seed::PurchasePurchaseItemAppointmentService.create(
       company: company, purchase: purchase, purchase_item: purchase_item,
       quantity: 5, unit_price: 2.50
     )
@@ -39,7 +39,7 @@ RSpec.feature "Companies::Purchases Edit", type: :feature, js: true do
 
     expect(page).to have_selector('input[name="purchase[name]"]', wait: 10)
     expect(find('input[name="purchase[name]"]').value).to eq('Pens restock')
-    expect(page).to have_selector('select[name="purchase[purchase_item_appointments_attributes][0][purchase_item_id]"]', wait: 10)
+    expect(page).to have_selector('select[name="purchase[purchase_purchase_item_appointments_attributes][0][purchase_item_id]"]', wait: 10)
   end
 
   scenario "renames the purchase and redirects to show page" do
@@ -60,15 +60,15 @@ RSpec.feature "Companies::Purchases Edit", type: :feature, js: true do
     expect(page).to have_selector('input[name="purchase[name]"]', wait: 10)
 
     click_button "Add Item"
-    select 'Stapler', from: 'purchase[purchase_item_appointments_attributes][1][purchase_item_id]'
-    fill_in 'purchase[purchase_item_appointments_attributes][1][quantity]', with: '2'
-    fill_in 'purchase[purchase_item_appointments_attributes][1][unit_price]', with: '10.00'
+    select 'Stapler', from: 'purchase[purchase_purchase_item_appointments_attributes][1][purchase_item_id]'
+    fill_in 'purchase[purchase_purchase_item_appointments_attributes][1][quantity]', with: '2'
+    fill_in 'purchase[purchase_purchase_item_appointments_attributes][1][unit_price]', with: '10.00'
     click_button "Save Changes"
 
     expect(page).to have_current_path(company_purchase_path(company, purchase), wait: 10)
 
-    expect(purchase.reload.purchase_item_appointments.count).to eq(2)
-    new_appointment = purchase.purchase_item_appointments.find_by(purchase_item_id: other_item.id)
+    expect(purchase.reload.purchase_purchase_item_appointments.count).to eq(2)
+    new_appointment = purchase.purchase_purchase_item_appointments.find_by(purchase_item_id: other_item.id)
     expect(new_appointment).to be_present
     expect(new_appointment.total_price.to_f).to eq(20.00)
   end

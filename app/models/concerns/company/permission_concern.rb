@@ -17,7 +17,7 @@ module Company::PermissionConcern
         all_policies = policies.where.not(business_type: :owner).to_a
 
         roles.where.not(business_type: :owner).map do |role|
-          role_policies = role.policy_appointments.includes(:policy).to_a
+          role_policies = role.policy_role_appointments.includes(:policy).to_a
 
           {
             id: role.id,
@@ -46,13 +46,13 @@ module Company::PermissionConcern
       end
     end
 
-    # Only active PolicyAppointments - used for actual permission checks (can?)
+    # Only active PolicyRoleAppointments - used for actual permission checks (can?)
     def permissions_by_role
       cache_key = "#{cache_key_with_version}/permissions_by_role"
 
       Rails.local_cache.fetch(cache_key, expires_in: PERMISSIONS_CACHE_EXPIRY) do
-        roles.includes(:policy_appointments).each_with_object({}) do |role, hash|
-          active_appointments = role.policy_appointments.active.includes(:policy)
+        roles.includes(:policy_role_appointments).each_with_object({}) do |role, hash|
+          active_appointments = role.policy_role_appointments.active.includes(:policy)
 
           hash[role.name] = {
             id: role.id,
@@ -76,8 +76,8 @@ module Company::PermissionConcern
       cache_key = "#{cache_key_with_version}/permissions_by_resource"
 
       Rails.local_cache.fetch(cache_key, expires_in: PERMISSIONS_CACHE_EXPIRY) do
-        roles.includes(:policy_appointments).each_with_object({}) do |role, hash|
-          active_appointments = role.policy_appointments.active.includes(:policy)
+        roles.includes(:policy_role_appointments).each_with_object({}) do |role, hash|
+          active_appointments = role.policy_role_appointments.active.includes(:policy)
           role_permissions = active_appointments.group_by { |a| a.policy.resource }.transform_values do |appointments|
             appointments.map { |a| a.policy.action }
           end

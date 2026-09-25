@@ -10,10 +10,10 @@ RSpec.describe OrderProcessingV1::WriteStockLedgerService do
     let!(:stock) { create(:stock, company: company, product: product, warehouse: warehouse, quantity: 10) }
     let(:order) { create(:order, company: company, branch: branch, customer: customer, workflow_status: :paid) }
     let!(:oa) do
-      OrderAppointment.create!(
+      OrderProductAppointment.create!(
         company: company,
         order: order,
-        appoint_to: product,
+        product: product,
         quantity: 2,
         unit_price: 50,
         total_price: 100

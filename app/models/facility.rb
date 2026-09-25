@@ -19,8 +19,10 @@ class Facility < ApplicationRecord
   belongs_to :branch, optional: true
   belongs_to :category
   belongs_to :property_mapping
-  has_many :facility_group_appointments, as: :appoint_to, dependent: :destroy
-  has_many :facility_groups, through: :facility_group_appointments
+  has_many :facility_facility_group_appointments, dependent: :destroy
+  has_many :facility_groups, through: :facility_facility_group_appointments
+  has_many :employee_facility_appointments, dependent: :destroy
+  has_many :employees, through: :employee_facility_appointments
   has_many :tag_appointments, dependent: :destroy, as: :appoint_to
   has_many :tags, through: :tag_appointments
 

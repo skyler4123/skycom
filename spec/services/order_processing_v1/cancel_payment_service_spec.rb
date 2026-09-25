@@ -16,7 +16,7 @@ RSpec.describe OrderProcessingV1::CancelPaymentService do
       .tap { |s| s.send(:sync_available_counter) }
   end
   let!(:item) do
-    OrderAppointment.create!(order: order, appoint_to: product, company: company,
+    OrderProductAppointment.create!(order: order, product: product, company: company,
       quantity: 2, unit_price: 25.0, total_price: 50.0)
   end
   let!(:invoice) do

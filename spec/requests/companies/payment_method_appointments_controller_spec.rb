@@ -9,7 +9,7 @@ RSpec.describe "Companies::PaymentMethodAppointmentsController", type: :request 
   let!(:pm_cash) { create(:payment_method, name: "Cash", code: "CASH", country: 840, strategy: :cash, payment_mode: :cash) }
 
   let!(:appointment_cash) do
-      PaymentMethodAppointment.create!(
+      CompanyPaymentMethodAppointment.create!(
         company: company, payment_method: pm_cash,
         name: "Cash for #{company.name}",
         code: "CASH-#{SecureRandom.hex(4).upcase}",
@@ -93,7 +93,7 @@ RSpec.describe "Companies::PaymentMethodAppointmentsController", type: :request 
     it "scopes appointments to the current company" do
       other_company = create(:company).tap { |c| c.update!(country: :us) }
       other_pm = create(:payment_method, country: 840, strategy: :cash)
-      PaymentMethodAppointment.create!(
+      CompanyPaymentMethodAppointment.create!(
         company: other_company, payment_method: other_pm,
         name: "Other", code: "OTHER-#{SecureRandom.hex(4).upcase}",
         business_type: :in_store, lifecycle_status: :inactive
@@ -106,7 +106,7 @@ RSpec.describe "Companies::PaymentMethodAppointmentsController", type: :request 
 
     it "excludes branch-level appointments from the index" do
       branch = create(:branch, company: company)
-      branch.payment_method_appointments.find_by!(payment_method: pm_cash)
+      branch.branch_payment_method_appointments.find_by!(payment_method: pm_cash)
 
       get "/companies/#{company.id}/payment_method_appointments", as: :json
       body = JSON.parse(response.body)
@@ -116,7 +116,7 @@ RSpec.describe "Companies::PaymentMethodAppointmentsController", type: :request 
 
     it "returns branch-level appointments when filtered by branch_id" do
       branch = create(:branch, company: company)
-      branch_appointment = branch.payment_method_appointments.find_by!(payment_method: pm_cash)
+      branch_appointment = branch.branch_payment_method_appointments.find_by!(payment_method: pm_cash)
 
       get "/companies/#{company.id}/payment_method_appointments", params: { branch_id: branch.id }, as: :json
       body = JSON.parse(response.body)
@@ -127,8 +127,8 @@ RSpec.describe "Companies::PaymentMethodAppointmentsController", type: :request 
 
     it "reports company_level_active false when the company-level method is inactive" do
       branch = create(:branch, company: company)
-      branch.payment_method_appointments.find_by!(payment_method: pm_cash)
-      appointment_cash.update_column(:lifecycle_status, PaymentMethodAppointment.lifecycle_statuses.fetch("inactive"))
+      branch.branch_payment_method_appointments.find_by!(payment_method: pm_cash)
+      appointment_cash.update_column(:lifecycle_status, CompanyPaymentMethodAppointment.lifecycle_statuses.fetch("inactive"))
 
       get "/companies/#{company.id}/payment_method_appointments", params: { branch_id: branch.id }, as: :json
       body = JSON.parse(response.body)
@@ -138,7 +138,7 @@ RSpec.describe "Companies::PaymentMethodAppointmentsController", type: :request 
 
   describe "branch-level appointment lifecycle" do
     let!(:branch) { create(:branch, company: company) }
-    let!(:branch_appointment) { branch.payment_method_appointments.find_by!(payment_method: pm_cash) }
+    let!(:branch_appointment) { branch.branch_payment_method_appointments.find_by!(payment_method: pm_cash) }
 
     it "returns the branch-level appointment in edit JSON" do
       get "/companies/#{company.id}/payment_method_appointments/#{branch_appointment.id}/edit", as: :json

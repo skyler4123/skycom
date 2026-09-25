@@ -6,10 +6,11 @@ RSpec.describe Product, type: :model do
     it { should belong_to(:company) }
     it { should belong_to(:branch).optional }
     it { should belong_to(:brand).optional }
-    it { should have_many(:order_appointments).dependent(:destroy) }
-    it { should have_many(:orders).through(:order_appointments) }
-    it { should have_many(:product_group_appointments).dependent(:destroy) }
-    it { should have_many(:product_groups).through(:product_group_appointments) }
+    it { should have_many(:order_product_appointments).dependent(:destroy) }
+    it { should have_many(:orders).through(:order_product_appointments) }
+    it { should have_many(:product_product_group_appointments).dependent(:destroy) }
+    it { should have_many(:product_groups).through(:product_product_group_appointments) }
+    it { should have_many(:employee_product_appointments).dependent(:destroy) }
   end
 
   describe "validations" do

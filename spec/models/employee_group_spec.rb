@@ -6,10 +6,10 @@ RSpec.describe EmployeeGroup, type: :model do
     it { should belong_to(:company) }
     it { should belong_to(:branch).optional }
     it { should belong_to(:category) }
-    it { should have_many(:employee_group_appointments).dependent(:destroy) }
-    it { should have_many(:employees).through(:employee_group_appointments) }
-    it { should have_many(:role_appointments).dependent(:destroy) }
-    it { should have_many(:roles).through(:role_appointments) }
+    it { should have_many(:employee_employee_group_appointments).dependent(:destroy) }
+    it { should have_many(:employees).through(:employee_employee_group_appointments) }
+    it { should have_many(:employee_group_role_appointments).dependent(:destroy) }
+    it { should have_many(:roles).through(:employee_group_role_appointments) }
   end
 
   describe "validations" do

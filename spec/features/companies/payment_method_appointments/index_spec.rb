@@ -24,21 +24,21 @@ RSpec.feature "Companies::PaymentMethodAppointments Management", type: :feature,
 
   let!(:admin_employee) do
     create(:employee, company: company, branch: branch, user: admin_user).tap do |e|
-      RoleAppointment.find_or_create_by!(role: admin_role, appoint_to: e, company: company)
+      EmployeeRoleAppointment.find_or_create_by!(role: admin_role, employee: e, company: company)
       company.clear_permissions_cache
     end
   end
 
   let!(:manager_employee) do
     create(:employee, company: company, branch: branch, user: manager_user).tap do |e|
-      RoleAppointment.find_or_create_by!(role: manager_role, appoint_to: e, company: company)
+      EmployeeRoleAppointment.find_or_create_by!(role: manager_role, employee: e, company: company)
       company.clear_permissions_cache
     end
   end
 
   let!(:cashier_employee) do
     create(:employee, company: company, branch: branch, user: cashier_user).tap do |e|
-      RoleAppointment.find_or_create_by!(role: cashier_role, appoint_to: e, company: company)
+      EmployeeRoleAppointment.find_or_create_by!(role: cashier_role, employee: e, company: company)
       company.clear_permissions_cache
     end
   end
@@ -46,28 +46,28 @@ RSpec.feature "Companies::PaymentMethodAppointments Management", type: :feature,
   before do
     policy_read = Seed::PolicyService.create(
       company: company,
-      name: "Can read PaymentMethodAppointment",
-      resource: "PaymentMethodAppointment",
+      name: "Can read CompanyPaymentMethodAppointment",
+      resource: "CompanyPaymentMethodAppointment",
       action: "read"
     )
     policy_update = Seed::PolicyService.create(
       company: company,
-      name: "Can update PaymentMethodAppointment",
-      resource: "PaymentMethodAppointment",
+      name: "Can update CompanyPaymentMethodAppointment",
+      resource: "CompanyPaymentMethodAppointment",
       action: "update"
     )
 
-    PolicyAppointment.find_or_create_by!(policy: policy_read, appoint_to: admin_role, company: company).update!(workflow_status: :active)
-    PolicyAppointment.find_or_create_by!(policy: policy_update, appoint_to: admin_role, company: company).update!(workflow_status: :active)
-    PolicyAppointment.find_or_create_by!(policy: policy_read, appoint_to: manager_role, company: company).update!(workflow_status: :active)
-    PolicyAppointment.find_or_create_by!(policy: policy_update, appoint_to: manager_role, company: company).update!(workflow_status: :active)
+    PolicyRoleAppointment.find_or_create_by!(policy: policy_read, role: admin_role, company: company).update!(workflow_status: :active)
+    PolicyRoleAppointment.find_or_create_by!(policy: policy_update, role: admin_role, company: company).update!(workflow_status: :active)
+    PolicyRoleAppointment.find_or_create_by!(policy: policy_read, role: manager_role, company: company).update!(workflow_status: :active)
+    PolicyRoleAppointment.find_or_create_by!(policy: policy_update, role: manager_role, company: company).update!(workflow_status: :active)
 
     company.clear_permissions_cache
   end
 
   def create_all_appointments
     [ pm_cash, pm_qr, pm_redirect, pm_card, pm_vietqr ].each do |pm|
-      PaymentMethodAppointment.find_or_create_by!(
+      CompanyPaymentMethodAppointment.find_or_create_by!(
         company: company, payment_method: pm
       ) do |a|
         a.name = "#{pm.name} for #{company.name}"
@@ -161,7 +161,7 @@ RSpec.feature "Companies::PaymentMethodAppointments Management", type: :feature,
   describe "edit page" do
     let!(:appointment) do
       pm = pm_cash
-      PaymentMethodAppointment.create!(
+      CompanyPaymentMethodAppointment.create!(
         company: company,
         payment_method: pm,
         name: "#{pm.name} for #{company.name}",
@@ -236,7 +236,7 @@ RSpec.feature "Companies::PaymentMethodAppointments Management", type: :feature,
   describe "edit page - qr payment" do
     let!(:qr_appointment) do
       pm = pm_qr
-      PaymentMethodAppointment.create!(
+      CompanyPaymentMethodAppointment.create!(
         company: company,
         payment_method: pm,
         name: "#{pm.name} for #{company.name}",

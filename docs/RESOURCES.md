@@ -113,49 +113,22 @@ Company-scoped business entities. Each table belongs to a `company_id` and repre
 
 ## 4. Appointment Resources
 
-Polymorphic join tables using the `appoint_to` / `appoint_from` / `appoint_for` / `appoint_by` pattern. All table names end with `_appointments`. These create many-to-many links between any two resource types.
+Atomic pairwise join tables: one table per resource pair, named alphabetically (`A_B_appointments`, e.g., `article_employee_appointments`, `employee_role_appointments`). Each row links exactly two records via concrete FKs plus `company_id` — there is no polymorphic `appoint_to` / `appoint_from` / `appoint_for` / `appoint_by` pattern. All table names end with `_appointments`. Domain extras: `quantity` / `unit_price` / `total_price` (order, purchase line items), `duration` / `start_at` (service bookings).
 
-| # | Table | Links To | Description |
-|---|-------|----------|-------------|
-| 1 | `address_appointments` | Address | Link any resource to an address |
-| 2 | `tag_appointments` | Tag | Link any resource to a tag |
-| 5 | `policy_appointments` | Policy | Assign policy to role (many-to-many) |
-| 6 | `role_appointments` | Role | Assign role to employee |
-| 7 | `department_appointments` | Department | Link employee/entity to a department |
-| 8 | `employee_appointments` | Employee | Link employee to any resource |
-| 9 | `employee_group_appointments` | EmployeeGroup | Link employee group to any resource |
-| 10 | `customer_appointments` | Customer | Link customer to any resource |
-| 11 | `customer_group_appointments` | CustomerGroup | Link customer group to any resource |
-| 12 | `product_appointments` | Product | Link product to any resource |
-| 13 | `product_group_appointments` | ProductGroup | Link product group to any resource |
-| 14 | `service_appointments` | Service | Link service to any resource |
-| 15 | `service_group_appointments` | ServiceGroup | Link service group to any resource |
-| 16 | `order_appointments` | Order | Link order to items (line items with qty/price) |
-| 17 | `order_group_appointments` | OrderGroup | Link order group to any resource |
-| 18 | `cart_appointments` | Cart | Link cart to products/variants |
-| 19 | `payment_method_appointments` | PaymentMethod | Link payment method to branch/company |
-| 20 | `facility_appointments` | Facility | Link facility to any resource |
-| 21 | `facility_group_appointments` | FacilityGroup | Link facility group to any resource |
-| 22 | `project_appointments` | Project | Link project to any resource |
-| 23 | `project_group_appointments` | ProjectGroup | Link project group to any resource |
-| 24 | `task_appointments` | Task | Link task to any resource |
-| 25 | `task_group_appointments` | TaskGroup | Link task group to any resource |
-| 26 | `notification_appointments` | Notification | Link notification to any resource |
-| 27 | `notification_group_appointments` | NotificationGroup | Link notification group to any resource |
-| 28 | `exam_appointments` | Exam | Link exam to any resource |
-| 29 | `event_appointments` | Event | Link event to any resource |
-| 30 | `event_group_appointments` | EventGroup | Link event group to any resource |
-| 31 | `setting_appointments` | Setting | Link setting to any resource |
-| 32 | `setting_group_appointments` | SettingGroup | Link setting group to any resource |
-| 33 | `document_appointments` | Document | Link document to any resource |
-| 34 | `document_group_appointments` | DocumentGroup | Link document group to any resource |
-| 35 | `article_appointments` | Article | Link article to any resource |
-| 36 | `article_group_appointments` | ArticleGroup | Link article group to any resource |
-| 37 | `membership_appointments` | Membership | Link membership to any resource |
-| 38 | `reservation_appointments` | Reservation | Link reservation to any resource |
-| 39 | `subscription_plan_appointments` | SubscriptionPlan | Link subscription plan to groups/resources |
+| # | Group | Tables | Count |
+|---|-------|--------|-------|
+| 1 | Address links | `address_branch`, `address_company`, `address_customer`, `address_customer_group`, `address_department`, `address_employee`, `address_employee_group`, `address_user` | 8 |
+| 2 | Tag links | `answer_tag`, `article_tag`, `article_group_tag`, `branch_tag`, `brand_tag`, `company_tag`, `customer_tag`, `customer_group_tag`, `department_tag`, `document_tag`, `document_group_tag`, `employee_tag`, `employee_group_tag`, `event_tag`, `event_group_tag`, `exam_tag`, `exam_group_tag`, `facility_tag`, `facility_group_tag`, `invoice_tag`, `notification_tag`, `notification_group_tag`, `order_tag`, `order_group_tag`, `product_tag`, `product_group_tag`, `project_tag`, `project_group_tag`, `purchase_tag`, `purchase_item_tag`, `question_tag`, `role_tag`, `service_tag`, `service_group_tag`, `setting_tag`, `setting_group_tag`, `statistic_tag`, `stock_tag`, `stock_export_tag`, `stock_import_tag`, `stock_transfer_tag`, `subscription_group_tag`, `supplier_tag`, `tag_task`, `tag_task_group`, `tag_transaction`, `tag_warehouse` | 47 |
+| 3 | Generic pairwise links | `article_employee`, `article_group_employee`, `cart_employee`, `customer_customer_group`, `customer_employee`, `customer_group_service`, `customer_service` (booking: `duration`, `start_at`), `department_employee`, `document_employee`, `document_group_employee`, `employee_employee` (self-link via `related_employee_id`), `employee_employee_group`, `employee_event`, `employee_event_group`, `employee_exam`, `employee_facility`, `facility_facility_group`, `employee_notification`, `employee_notification_group`, `employee_product`, `product_product_group`, `employee_project`, `employee_project_group`, `service_service_group`, `employee_service` (booking: `duration`, `start_at`), `employee_setting`, `employee_setting_group`, `employee_task`, `employee_task_group` | 29 |
+| 4 | Order line items | `order_product`, `order_product_group`, `order_service`, `order_service_group`, `order_subscription_plan` (each with `quantity` / `unit_price` / `total_price` snapshots) | 5 |
+| 5 | Payment method links | `branch_payment_method`, `company_payment_method` | 2 |
+| 6 | Policy / role assignments | `policy_role`, `customer_role`, `customer_group_role`, `department_role`, `employee_group_role`, `employee_role` | 6 |
+| 7 | Membership / reservation | `customer_membership`, `customer_reservation` | 2 |
+| 8 | Purchase line items | `purchase_purchase_item` (`quantity` / `unit_price` / `total_price`) | 1 |
+| 9 | Subscription links | `branch_subscription_plan`, `subscription_group_subscription_plan` | 2 |
+| 10 | Order-group link | `employee_order_group` (`quantity` / `unit_price` / `total_price`) | 1 |
 
-**Total: 39 tables**
+**Total: 103 tables**
 
 ---
 
@@ -166,9 +139,9 @@ Polymorphic join tables using the `appoint_to` / `appoint_from` / `appoint_for` 
 | Gem Resources | 4 |
 | System Resources | 11 |
 | Managed Resources | 62 |
-| Appointment Resources | 39 |
-| **Grand Total** | **116** |
+| Appointment Resources | 103 |
+| **Grand Total** | **180** |
 
 ---
 
-**Note:** The managed resources count includes `order_appointments` (line items) which, despite the name pattern, functions as a line-item table with quantity/price columns rather than a pure polymorphic join. All appointment-*pattern* tables are consolidated under Appointment Resources.
+**Note:** Former polymorphic tables (`article_appointments`, `role_appointments`, `order_appointments`, etc. using `appoint_to` / `appoint_from`) are dropped and replaced by the atomic pairs above. The managed-resources row for `order_appointments` is kept for history pending the sales-domain update.

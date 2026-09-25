@@ -57,7 +57,7 @@ class Companies::PagesController < Companies::ApplicationController
           { id: s.id, name: s.name, code: s.code, price: 0, currency: "usd", image_url: s.image_attachments.first&.variant(:thumb)&.processed&.url }
         }
 
-        payment_methods = page.branch.payment_method_appointments
+        payment_methods = page.branch.branch_payment_method_appointments
           .includes(:payment_method)
           .where(lifecycle_status: LIFECYCLE_STATUS.fetch(:active))
           .reject { |appointment| appointment.payment_method.redirect? }

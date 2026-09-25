@@ -72,21 +72,21 @@ RSpec.feature "Companies::Invoices Permissions", type: :feature, js: true do
   let!(:reader_user) { create(:user, :company_employee) }
   let!(:reader_employee) do
     emp = create(:employee, company: company, user: reader_user)
-    create(:role_appointment, company: company, appoint_to: emp, role: reader_role)
+    create(:employee_role_appointment, company: company, employee: emp, role: reader_role)
     emp
   end
 
   let!(:creator_user) { create(:user, :company_employee) }
   let!(:creator_employee) do
     emp = create(:employee, company: company, user: creator_user)
-    create(:role_appointment, company: company, appoint_to: emp, role: creator_role)
+    create(:employee_role_appointment, company: company, employee: emp, role: creator_role)
     emp
   end
 
   let!(:editor_user) { create(:user, :company_employee) }
   let!(:editor_employee) do
     emp = create(:employee, company: company, user: editor_user)
-    create(:role_appointment, company: company, appoint_to: emp, role: editor_role)
+    create(:employee_role_appointment, company: company, employee: emp, role: editor_role)
     emp
   end
 
@@ -117,10 +117,10 @@ RSpec.feature "Companies::Invoices Permissions", type: :feature, js: true do
   end
 
   def create_policy_appointment(role:, policy:, workflow_status:)
-    appointment = PolicyAppointment.find_or_create_by!(
+    appointment = PolicyRoleAppointment.find_or_create_by!(
       company: company,
       policy: policy,
-      appoint_to: role
+      role: role
     )
     appointment.update!(workflow_status: workflow_status)
     appointment

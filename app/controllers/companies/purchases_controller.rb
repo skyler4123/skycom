@@ -21,8 +21,9 @@ class Companies::PurchasesController < Companies::ApplicationController
       format.html { render html: "", layout: true }
       format.json do
         scope = current_company.purchases.includes(
-          :purchase_item_appointments, :purchase_items,
-          :workflow_step, { workflow_step: { workflow: :workflow_steps } }, :supplier, :branch
+          :workflow_step, :supplier, :branch,
+          { purchase_purchase_item_appointments: :purchase_item },
+          { workflow_step: { workflow: :workflow_steps } }
         )
         scope = scope.where(category_id: params[:category_id]) if params[:category_id].present?
 
@@ -37,7 +38,8 @@ class Companies::PurchasesController < Companies::ApplicationController
 
   def show
     purchase = current_company.purchases.includes(
-      :purchase_item_appointments, :purchase_items, :supplier, :branch, :category,
+      :supplier, :branch, :category,
+      { purchase_purchase_item_appointments: :purchase_item },
       { workflow_step: { workflow: :workflow_steps } }
     ).find(params[:id])
 
@@ -56,7 +58,7 @@ class Companies::PurchasesController < Companies::ApplicationController
 
   def edit
     purchase = current_company.purchases.includes(
-      :purchase_item_appointments, :purchase_items,
+      { purchase_purchase_item_appointments: :purchase_item },
       { workflow_step: { workflow: :workflow_steps } }
     ).find(params[:id])
 
@@ -118,12 +120,11 @@ class Companies::PurchasesController < Companies::ApplicationController
   private
 
   def save_purchase(purchase)
-    purchase.purchase_item_appointments.each { |appointment| appointment.appoint_to = purchase if appointment.appoint_to.nil? }
-    normalize_appointment_totals(purchase.purchase_item_appointments)
+    normalize_appointment_totals(purchase.purchase_purchase_item_appointments)
     purchase.save
   end
 
-  # PurchaseItemAppointment#total_price is a stored column — derive it from the
+  # PurchasePurchaseItemAppointment#total_price is a stored column — derive it from the
   # submitted quantity × unit_price so FE-created line items stay consistent.
   def normalize_appointment_totals(appointments)
     appointments.each do |appointment|
@@ -158,7 +159,7 @@ class Companies::PurchasesController < Companies::ApplicationController
       :name, :description, :needed_by, :currency, :business_type,
       :category_id, :branch_id, :supplier_id,
       *property_keys,
-      purchase_item_appointments_attributes: [
+      purchase_purchase_item_appointments_attributes: [
         :id, :purchase_item_id, :quantity, :unit_price, :name, :description, :_destroy
       ]
     )
@@ -169,7 +170,7 @@ class Companies::PurchasesController < Companies::ApplicationController
   end
 
   def format_purchase(purchase, with_workflow_detail: false)
-    appointments = purchase.purchase_item_appointments
+    appointments = purchase.purchase_purchase_item_appointments
     workflow = purchase.workflow_step&.workflow
 
     payload = purchase.as_json(only: [
@@ -186,7 +187,7 @@ class Companies::PurchasesController < Companies::ApplicationController
       supplier: purchase.supplier&.as_json(only: [ :id, :name ]),
       branch: purchase.branch&.as_json(only: [ :id, :name ]),
       category: purchase.category&.as_json(only: [ :id, :name ]),
-      purchase_item_appointments: appointments.map { |a|
+      purchase_purchase_item_appointments: appointments.map { |a|
         a.as_json(only: [ :id, :purchase_item_id, :quantity, :unit_price, :total_price ])
           .merge(item_name: a.purchase_item&.name)
       }

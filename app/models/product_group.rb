@@ -24,8 +24,10 @@ class ProductGroup < ApplicationRecord
   belongs_to :branch, optional: true
   belongs_to :category
   belongs_to :property_mapping
-  has_many :product_group_appointments, dependent: :destroy
-  has_many :products, through: :product_group_appointments, source: :appoint_to, source_type: "Product"
+  has_many :product_product_group_appointments, dependent: :destroy
+  has_many :products, through: :product_product_group_appointments
+  has_many :order_product_group_appointments, dependent: :destroy
+  has_many :orders, through: :order_product_group_appointments
 
   # --- Validations ---
   validates :name, presence: true, uniqueness: { scope: :company_id }, length: { maximum: 255 }
