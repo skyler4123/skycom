@@ -2,6 +2,7 @@ class CreatePurchaseItems < ActiveRecord::Migration[8.0]
   def change
     create_table :purchase_items, id: :uuid, default: -> { "uuidv7()" } do |t|
       t.references :company, null: false, foreign_key: true, type: :uuid
+      t.references :product, foreign_key: true, type: :uuid
       t.references :category, null: false, foreign_key: true, type: :uuid
       t.references :property_mapping, null: false, foreign_key: true, type: :uuid
 

@@ -3,6 +3,7 @@ class Seed::StockTransferService
     company:,
     branch: nil,
     warehouse: nil,
+    destination_warehouse: nil,
     product:,
     category: nil,
     property_mapping: nil,
@@ -29,6 +30,10 @@ class Seed::StockTransferService
       company: company,
       branch: branch,
       warehouse: warehouse,
+      # Distinct destination — a self-transfer is meaningless (model-validated).
+      destination_warehouse: destination_warehouse ||
+        company.warehouses.where.not(id: warehouse&.id).first ||
+        Seed::WarehouseService.create(company: company, name: "Transfer Destination #{SecureRandom.hex(2)}"),
       product: product,
       category: category,
       property_mapping: property_mapping,

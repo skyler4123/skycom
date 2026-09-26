@@ -75,6 +75,9 @@ class Companies::PurchasesController < Companies::ApplicationController
     purchase = current_company.purchases.new(purchase_params)
     purchase.code ||= "PUR-#{SecureRandom.hex(4).upcase}"
     purchase.created_by_employee = current_employee
+    # Destination warehouse: FE sends it when the field is wired; default to the
+    # company's first warehouse so existing clients keep working.
+    purchase.warehouse_id ||= current_company.warehouses.order(:created_at).first&.id
 
     if save_purchase(purchase)
       redirect_to company_purchase_path(current_company, purchase), notice: "Purchase created successfully"
@@ -156,7 +159,7 @@ class Companies::PurchasesController < Companies::ApplicationController
   def purchase_params
     params.require(:purchase).permit(
       :name, :description, :needed_by, :currency, :business_type,
-      :category_id, :branch_id, :supplier_id,
+      :category_id, :branch_id, :supplier_id, :warehouse_id,
       *property_keys,
       purchase_item_appointments_attributes: [
         :id, :purchase_item_id, :quantity, :unit_price, :name, :description, :_destroy

@@ -9,7 +9,7 @@ RSpec.describe OrderProcessingV1::InitiatePaymentService do
   let(:customer) { create(:customer, company: company) }
   let(:order) { create(:order, company: company, branch: branch, customer: customer, workflow_status: :pending) }
   let(:product) { create(:product, company: company) }
-  let(:warehouse) { create(:warehouse, company: company) }
+  let(:warehouse) { create(:warehouse, company: company, branch: branch) }
   let!(:stock) do
     cat = product.category
     Stock.create!(company: company, warehouse: warehouse, product: product,

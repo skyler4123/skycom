@@ -103,11 +103,10 @@ pay_cancel()                       PAY CANCEL (abandoned QR)
                                                     │   └── StockExport.exists? for this order?
                                                     │
                                                     ├── WriteStockLedgerService.call(order:)
-                                                    │     └── StockTransaction.insert_all(direction: :remove)
-                                                    │
-                                                    ├── UpdateStockBalancesService.call(order:)
-                                                    │     └── SQL UPDATE quantity -= qty, pending -= qty
-                                                    │         └── triggers Stock#after_save → sync_available_counter
+                                                    │     └── per line: StockMovementService::BaseService
+                                                    │         (consume_hold: true) → StockTransaction created
+                                                    │           └─ hardened callback: quantity -= qty,
+                                                    │              pending hold released, Redis synced
                                                     │
                                                     └── FinalizeOrderService.call(order:)
                                                           └── StockExport.create!(business_type: :sale)
@@ -399,34 +398,22 @@ Cancel: finds the company's Transaction by token (`find_by!` → 404), releases 
 |-------|------|-------------|
 | `order` | `Order` | The paid Order |
 
-**Behavior:**
+**Behavior (2026-09-23 — ledger-driven, docs/superpowers/specs/2026-09-23-stock-source-of-truth-design.md §5):**
 - Iterates `order.order_appointments`
-- Looks up `Stock` record by product for each line item
-- Bulk-inserts `StockTransaction` rows with `direction: :remove`, `transaction_type: :export`, `appoint_for: order`
+- Resolves the Stock row persisted on the line at pay time (`order_appointments.metadata.stock_id` via `store_accessor`); legacy lines fall back to branch-scoped then company-scoped resolution
+- Per line, calls `StockMovementService::BaseService` (`direction: :remove`, `transaction_type: :export`, `appoint_for: order`, `consume_hold: true` when a pay-time hold exists) — the hardened `StockTransaction` callback IS the quantity write; `insert_all!` removed
 
 **Returns:**
 ```ruby
 { count: Integer }  # number of ledger rows inserted
 ```
 
-### 5.6 `UpdateStockBalancesService`
+### 5.6 `UpdateStockBalancesService` — REMOVED (2026-09-23)
 
-**File**: `app/services/order_processing_v1/update_stock_balances_service.rb`
-**Signature**: `call(order:)`
-
-| Param | Type | Description |
-|-------|------|-------------|
-| `order` | `Order` | The paid Order |
-
-**Behavior:**
-- Iterates `order.order_appointments`
-- For each line item, runs direct SQL `UPDATE stocks SET quantity = quantity - qty, pending = pending - qty`
-- Uses `update_all` with array SQL fragment
-
-**Returns:**
-```ruby
-{ updated: Array<Integer> }  # list of affected stock IDs
-```
+The direct-SQL balance writer was deleted. Quantities move ONLY through `StockTransaction`'s
+hardened `recalibrate_stock_metrics` callback (see §5.5); the hold release (`pending -= qty`)
+is handled by `StockMovementService::BaseService` (`consume_hold: true` → `release_reserved!`
+after the ledger row exists).
 
 ### 5.7 `FinalizeOrderService`
 
@@ -467,7 +454,7 @@ Cancel: finds the company's Transaction by token (`find_by!` → 404), releases 
 1. **Idempotency guard 1** — Returns early if `order.workflow_status != "paid"`
 2. **Idempotency guard 2** — Returns early if `StockExport.exists?` for this order
 3. Calls `WriteStockLedgerService.call(order:)` — stock ledger entries
-4. Calls `UpdateStockBalancesService.call(order:)` — decrements DB stock balances
+4. Calls `WriteStockLedgerService.call(order:)` — ledger rows via StockMovementService (callback applies quantity deltas + releases holds)
 5. Calls `FinalizeOrderService.call(order:)` — creates export docs
 
 **Triggered by:** `CompletePaymentService` (cash path synchronously, QR path from the mock-bank webhook).
@@ -610,8 +597,7 @@ export const receipt_company_order_path = (companyId, orderId) =>
 | `spec/services/order_processing_v1/initiate_payment_service_spec.rb` | Cash instant-complete, QR pending + merchant kwargs, rollback, validation | Branch appointments for cash + mock QR |
 | `spec/services/order_processing_v1/complete_payment_service_spec.rb` | Completes txn, derives invoice paid, idempotency, failed no-op | Pending Transaction on unpaid Invoice |
 | `spec/services/order_processing_v1/cancel_payment_service_spec.rb` (+ release spec) | Cancel fails txn + releases stock, non-pending no-op | Reserved stock + pending transaction |
-| `spec/services/order_processing_v1/write_stock_ledger_service_spec.rb` | Creates stock transactions with correct direction/type | Paid order, stock records per product |
-| `spec/services/order_processing_v1/update_stock_balances_service_spec.rb` | Decrements quantity and pending, multiple items | Paid order with order_appointments |
+| `spec/services/order_processing_v1/write_stock_ledger_service_spec.rb` | Ledger rows + callback-driven quantity mutation, hold consumption, stock_id / branch-scoped / legacy fallbacks | Paid order, stock records per product |
 | `spec/services/order_processing_v1/finalize_order_service_spec.rb` | Creates stock exports with sale business_type, links to Order via appoint_for | Paid order with order_appointments |
 | `spec/requests/companies/order_processing/v1_controller_spec.rb` | Checkout success, insufficient stock, missing fields, multiple items, string quantity, non-existent order pay, full checkout+pay flow | Company, branch, products, stock |
 | `spec/features/companies/pages/retail_cashier_spec.rb` | Page load, add/remove cart, ORDER → COMPLETE PAYMENT, Cancel, cart locked, insufficient stock, empty cart guard | Company, branch, products, stock, page record |

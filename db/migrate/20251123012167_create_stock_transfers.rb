@@ -4,7 +4,8 @@ class CreateStockTransfers < ActiveRecord::Migration[8.0]
       t.references :company, null: false, foreign_key: true, type: :uuid
       t.references :branch, null: true, foreign_key: true, type: :uuid
       t.references :warehouse, null: false, foreign_key: true, type: :uuid
-      t.references :product, null: false, foreign_key: true, type: :uuid
+      t.references :destination_warehouse, null: false, foreign_key: { to_table: :warehouses }, type: :uuid
+      t.references :product, null: true, foreign_key: true, type: :uuid
 
       t.references :appoint_from, polymorphic: true, null: true, type: :uuid
       t.references :appoint_to, polymorphic: true, null: true, type: :uuid
@@ -25,6 +26,9 @@ class CreateStockTransfers < ActiveRecord::Migration[8.0]
       t.integer :timezone
 
       t.integer :quantity
+
+      t.datetime :initiated_at
+      t.datetime :received_at
 
       # --- System Fields ---
       t.integer  :lifecycle_status, index: true

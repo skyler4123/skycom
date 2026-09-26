@@ -1,3 +1,7 @@
+# StockImport — Atomic purpose: the inbound document (purchase / return /
+# transfer_in / adjustment). Multi-line via StockItemAppointment rows pointing
+# at Stock records; each line spawns an add-direction StockTransaction
+# (transaction_type: import) whose callback applies the quantity.
 class StockImport < ApplicationRecord
   # NOTE: must be declared before `include DynamicSearchConcern` — the meilisearch
   # settings block runs at include time. See the hook docs in the concern.
@@ -7,6 +11,7 @@ class StockImport < ApplicationRecord
   include PropertyMappingConcern
   include DynamicSearchConcern
   include TagConcern # rubocop:enable Layout/ClassStructure
+  CODE_PREFIX = "STKIM".freeze
   attribute :permission_resource_name, :string, default: -> { self.name }
 
   enum :country, COUNTRY_CODES, prefix: true, default: :us
@@ -24,7 +29,7 @@ class StockImport < ApplicationRecord
   belongs_to :company
   belongs_to :branch, optional: true
   belongs_to :warehouse
-  belongs_to :product
+  belongs_to :product, optional: true
   belongs_to :category
   belongs_to :property_mapping
   belongs_to :appoint_from, polymorphic: true, optional: true
@@ -34,6 +39,9 @@ class StockImport < ApplicationRecord
 
   # Documents connect directly to the logs they spawn via appoint_for anchor context
   has_many :stock_transactions, as: :appoint_for, dependent: :restrict_with_error
+  has_many :stock_item_appointments, as: :appoint_to, dependent: :destroy
+  has_many :stocks, through: :stock_item_appointments
+
 
   validates :code, presence: true, uniqueness: true
 end

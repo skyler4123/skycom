@@ -106,8 +106,9 @@ Company-scoped business entities. Each table belongs to a `company_id` and repre
 | 60 | `suppliers` | Inventory | Supplier records (procurement-ready master data) |
 | 61 | `discount_groups` | Sales | Discount campaign groups (type/value, budget, validity, status) |
 | 62 | `discounts` | Sales | Single-use discount codes (unique per company, consumption state, SoT bindings) |
+| 63 | `stock_adjustments` | Inventory | Stock-take correction documents (direction + reason, line items via StockItemAppointment) |
 
-**Total: 62 tables**
+**Total: 63 tables**
 
 ---
 
@@ -134,6 +135,7 @@ Polymorphic join tables using the `appoint_to` / `appoint_from` / `appoint_for` 
 | 17 | `order_group_appointments` | OrderGroup | Link order group to any resource |
 | 18 | `cart_appointments` | Cart | Link cart to products/variants |
 | 19 | `payment_method_appointments` | PaymentMethod | Link payment method to branch/company |
+| 20 | `stock_item_appointments` | Stock | Movement-document line items (stock_id + quantity) for imports/exports/transfers/adjustments |
 | 20 | `facility_appointments` | Facility | Link facility to any resource |
 | 21 | `facility_group_appointments` | FacilityGroup | Link facility group to any resource |
 | 22 | `project_appointments` | Project | Link project to any resource |
@@ -155,7 +157,7 @@ Polymorphic join tables using the `appoint_to` / `appoint_from` / `appoint_for` 
 | 38 | `reservation_appointments` | Reservation | Link reservation to any resource |
 | 39 | `subscription_plan_appointments` | SubscriptionPlan | Link subscription plan to groups/resources |
 
-**Total: 39 tables**
+**Total: 40 tables**
 
 ---
 
@@ -165,9 +167,9 @@ Polymorphic join tables using the `appoint_to` / `appoint_from` / `appoint_for` 
 |----------|-------|
 | Gem Resources | 4 |
 | System Resources | 11 |
-| Managed Resources | 62 |
-| Appointment Resources | 39 |
-| **Grand Total** | **116** |
+| Managed Resources | 63 |
+| Appointment Resources | 40 |
+| **Grand Total** | **118** |
 
 ---
 

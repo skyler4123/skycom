@@ -1,3 +1,7 @@
+# Warehouse — Atomic purpose: the storage location. A physical/logical holding
+# point that owns Stock rows (one per product) and is referenced by every
+# movement document (imports/exports/transfers/adjustments). Holds no
+# quantities itself.
 class Warehouse < ApplicationRecord
   include CategoryConcern
   include PropertyMappingConcern

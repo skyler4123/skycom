@@ -22,6 +22,7 @@ class Purchase < ApplicationRecord
   belongs_to :company
   belongs_to :branch, optional: true
   belongs_to :supplier, optional: true
+  belongs_to :warehouse
   belongs_to :workflow_step, optional: true
   belongs_to :category
   belongs_to :property_mapping
@@ -29,6 +30,7 @@ class Purchase < ApplicationRecord
   has_many :purchase_item_appointments, as: :appoint_to, dependent: :destroy
   has_many :purchase_items, through: :purchase_item_appointments
   has_many :workflow_step_logs, as: :subject, dependent: :destroy
+  has_many :stock_imports, as: :appoint_from, dependent: :restrict_with_error
 
   # NOTE: must follow the associations — accepts_nested_attributes_for requires
   # its target association to already exist (docs/MODEL_STRUCTURE.md exception).
@@ -38,6 +40,7 @@ class Purchase < ApplicationRecord
   validates :name, presence: true, uniqueness: { scope: :company_id }, length: { maximum: 255 }
   validates :currency, presence: true
   validates :business_type, presence: true
+  validates :warehouse, presence: true
 
   # --- Callbacks ---
   before_validation :bind_category_workflow, on: :create

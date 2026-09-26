@@ -229,6 +229,14 @@ now matches a stock by `company_id + warehouse_id + product_id` only.
 
 ---
 
+### StockTransaction (`app/models/stock_transaction.rb`)
+
+| Callback | Line | Method | Description |
+|----------|------|--------|-------------|
+| `after_create :recalibrate_stock_metrics` | 23 | `recalibrate_stock_metrics` | **The single quantity mutator for the stock domain** (docs/superpowers/specs/2026-09-23-stock-source-of-truth-design.md). Hardened (2026-09-23): resolves the Stock row with `find_by!` (no lazy `find_or_initialize_by` creation — a missing row is a programming error), wraps the mutation in `stock.with_lock` (concurrent movements serialize), raises `StockMovementService::Error` when the delta would push `quantity` negative (whole movement rolls back — document + ledger + quantity), and saves via `stock.save!` so `Stock#after_save :sync_available_counter` keeps the Redis counter in step. All movement paths (`StockMovementService::*`, POS finalize, purchase completion) create ledger rows whose callback applies the quantity delta. |
+
+---
+
 ### TableConfig (`app/models/table_config.rb`)
 
 | Callback | Line | Method | Description |

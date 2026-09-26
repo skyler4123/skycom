@@ -55,6 +55,33 @@ RSpec.describe Workflows::AdvanceService do
       expect(purchase.reload.workflow_step).to eq(step_at(4))
     end
 
+    it "bridges stock on final approval: import + ledger + quantity (purchase with stocked items)" do
+      product = create(:product, company: company)
+      item = Seed::PurchaseItemService.create(company: company, product: product, name: "Pen box")
+      purchase.purchase_item_appointments.create!(
+        company: company, purchase_item: item, quantity: 5, unit_price: 2, total_price: 10
+      )
+
+      3.times { advance(outcome: :approved, employee: owner) }
+
+      expect {
+        advance(outcome: :approved, employee: owner)
+      }.to change(StockTransaction, :count).by(1)
+
+      stock = Stock.find_by!(company: company, warehouse: purchase.reload.warehouse, product: product)
+      expect(stock.quantity).to eq(5)
+      import = StockImport.find_by(appoint_from_type: "Purchase", appoint_from_id: purchase.id)
+      expect(import.workflow_status).to eq("received")
+    end
+
+    it "still completes a bare purchase (no line items) — bridge skips" do
+      3.times { advance(outcome: :approved, employee: owner) }
+
+      expect(advance(outcome: :approved, employee: owner)).to eq({ success: true })
+      expect(purchase.reload.workflow_status_completed?).to be true
+      expect(StockImport.where(appoint_from_type: "Purchase", appoint_from_id: purchase.id)).to be_empty
+    end
+
     it "records an approved log with the actor and from-step" do
       expect { advance(outcome: :approved, employee: owner) }.to change(WorkflowStepLog, :count).by(1)
 

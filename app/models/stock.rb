@@ -1,3 +1,8 @@
+# Stock — Atomic purpose: the tracked SKU row (warehouse + product scope).
+# Stores quantity/pending NUMBERS only. Quantities move exclusively through the
+# StockTransaction callback (recalibrate_stock_metrics); availability flows
+# through the wrappers (available_count / reserve_stock! / release_reserved!) —
+# never direct writes.
 class Stock < ApplicationRecord
   # NOTE: must be declared before `include DynamicSearchConcern` — the meilisearch
   # settings block runs at include time. See the hook docs in the concern.

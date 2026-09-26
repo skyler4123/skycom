@@ -1,3 +1,6 @@
+# StockExport — Atomic purpose: the outbound document (sale / transfer_out /
+# return_to_supplier / damaged / expired). Multi-line via StockItemAppointment;
+# each line spawns a remove-direction StockTransaction (transaction_type: export).
 class StockExport < ApplicationRecord
   # NOTE: must be declared before `include DynamicSearchConcern` — the meilisearch
   # settings block runs at include time. See the hook docs in the concern.
@@ -7,6 +10,7 @@ class StockExport < ApplicationRecord
   include PropertyMappingConcern
   include DynamicSearchConcern
   include TagConcern # rubocop:enable Layout/ClassStructure
+  CODE_PREFIX = "STKEX".freeze
   attribute :permission_resource_name, :string, default: -> { self.name }
 
   enum :country, COUNTRY_CODES, prefix: true, default: :us
@@ -26,7 +30,7 @@ class StockExport < ApplicationRecord
   belongs_to :company
   belongs_to :branch, optional: true
   belongs_to :warehouse
-  belongs_to :product
+  belongs_to :product, optional: true
   belongs_to :category
   belongs_to :property_mapping
   belongs_to :appoint_from, polymorphic: true, optional: true
@@ -35,6 +39,9 @@ class StockExport < ApplicationRecord
   belongs_to :appoint_by, polymorphic: true, optional: true
 
   has_many :stock_transactions, as: :appoint_for, dependent: :restrict_with_error
+  has_many :stock_item_appointments, as: :appoint_to, dependent: :destroy
+  has_many :stocks, through: :stock_item_appointments
+
 
   validates :code, presence: true, uniqueness: true
 end
