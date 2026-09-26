@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_09_23_000004) do
+ActiveRecord::Schema[8.0].define(version: 2026_09_24_000001) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pgcrypto"
@@ -549,6 +549,89 @@ ActiveRecord::Schema[8.0].define(version: 2026_09_23_000004) do
     t.index ["lifecycle_status"], name: "index_brands_on_lifecycle_status"
     t.index ["property_mapping_id"], name: "index_brands_on_property_mapping_id"
     t.index ["workflow_status"], name: "index_brands_on_workflow_status"
+  end
+
+  create_table "calendar_events", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
+    t.uuid "company_id", null: false
+    t.uuid "calendar_integration_id"
+    t.string "schedulable_type"
+    t.uuid "schedulable_id"
+    t.string "title", null: false
+    t.text "description"
+    t.datetime "starts_at", null: false
+    t.datetime "ends_at", null: false
+    t.string "time_zone", default: "UTC"
+    t.integer "status", default: 0, null: false
+    t.integer "lifecycle_status"
+    t.integer "workflow_status"
+    t.integer "business_type"
+    t.datetime "expiration_date"
+    t.jsonb "metadata", default: {}
+    t.datetime "discarded_at"
+    t.string "permission_resource_name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["business_type"], name: "index_calendar_events_on_business_type"
+    t.index ["calendar_integration_id"], name: "index_calendar_events_on_calendar_integration_id"
+    t.index ["company_id"], name: "index_calendar_events_on_company_id"
+    t.index ["discarded_at"], name: "index_calendar_events_on_discarded_at"
+    t.index ["lifecycle_status"], name: "index_calendar_events_on_lifecycle_status"
+    t.index ["schedulable_type", "schedulable_id"], name: "index_calendar_events_on_schedulable"
+    t.index ["starts_at", "ends_at"], name: "index_calendar_events_on_starts_at_and_ends_at"
+    t.index ["workflow_status"], name: "index_calendar_events_on_workflow_status"
+  end
+
+  create_table "calendar_integrations", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
+    t.uuid "company_id", null: false
+    t.string "accountable_type", null: false
+    t.uuid "accountable_id", null: false
+    t.string "provider", default: "cal_com", null: false
+    t.string "external_user_id"
+    t.string "access_token"
+    t.string "refresh_token"
+    t.integer "status", default: 0, null: false
+    t.integer "lifecycle_status"
+    t.integer "workflow_status"
+    t.integer "business_type"
+    t.datetime "expiration_date"
+    t.jsonb "metadata", default: {}
+    t.datetime "discarded_at"
+    t.string "permission_resource_name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["accountable_type", "accountable_id"], name: "index_calendar_integrations_on_accountable"
+    t.index ["business_type"], name: "index_calendar_integrations_on_business_type"
+    t.index ["company_id", "accountable_type", "accountable_id", "provider"], name: "idx_calendar_integrations_unique_provider", unique: true
+    t.index ["company_id"], name: "index_calendar_integrations_on_company_id"
+    t.index ["discarded_at"], name: "index_calendar_integrations_on_discarded_at"
+    t.index ["lifecycle_status"], name: "index_calendar_integrations_on_lifecycle_status"
+    t.index ["workflow_status"], name: "index_calendar_integrations_on_workflow_status"
+  end
+
+  create_table "calendar_sync_mappings", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
+    t.uuid "company_id", null: false
+    t.uuid "calendar_event_id", null: false
+    t.uuid "calendar_integration_id", null: false
+    t.string "external_event_id", null: false
+    t.string "external_booking_uid"
+    t.datetime "last_synced_at"
+    t.integer "lifecycle_status"
+    t.integer "workflow_status"
+    t.integer "business_type"
+    t.datetime "expiration_date"
+    t.jsonb "metadata", default: {}
+    t.datetime "discarded_at"
+    t.string "permission_resource_name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["business_type"], name: "index_calendar_sync_mappings_on_business_type"
+    t.index ["calendar_event_id"], name: "index_calendar_sync_mappings_on_calendar_event_id"
+    t.index ["calendar_integration_id"], name: "index_calendar_sync_mappings_on_calendar_integration_id"
+    t.index ["company_id"], name: "index_calendar_sync_mappings_on_company_id"
+    t.index ["discarded_at"], name: "index_calendar_sync_mappings_on_discarded_at"
+    t.index ["external_event_id", "calendar_integration_id"], name: "idx_sync_mappings_ext_id", unique: true
+    t.index ["lifecycle_status"], name: "index_calendar_sync_mappings_on_lifecycle_status"
+    t.index ["workflow_status"], name: "index_calendar_sync_mappings_on_workflow_status"
   end
 
   create_table "cart_appointments", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
@@ -6170,6 +6253,12 @@ ActiveRecord::Schema[8.0].define(version: 2026_09_23_000004) do
   add_foreign_key "brands", "categories"
   add_foreign_key "brands", "companies"
   add_foreign_key "brands", "property_mappings"
+  add_foreign_key "calendar_events", "calendar_integrations"
+  add_foreign_key "calendar_events", "companies"
+  add_foreign_key "calendar_integrations", "companies"
+  add_foreign_key "calendar_sync_mappings", "calendar_events"
+  add_foreign_key "calendar_sync_mappings", "calendar_integrations"
+  add_foreign_key "calendar_sync_mappings", "companies"
   add_foreign_key "cart_appointments", "carts"
   add_foreign_key "cart_appointments", "companies"
   add_foreign_key "cart_groups", "branches"

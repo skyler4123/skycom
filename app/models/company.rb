@@ -16,6 +16,7 @@ class Company < ApplicationRecord
     Supplier
     Purchase PurchaseItem Workflow
     DiscountGroup Discount
+    CalendarIntegration CalendarEvent CalendarSyncMapping
     Table Reservation Room Guest
     Patient Appointment Course Student Exam
     Membership
@@ -148,6 +149,9 @@ class Company < ApplicationRecord
   has_many :company_daily_usages, dependent: :destroy
   has_many :company_monthly_usages, dependent: :destroy
   has_many :company_usage_logs, dependent: :destroy
+  has_many :calendar_integrations, dependent: :destroy
+  has_many :calendar_events, dependent: :destroy
+  has_many :calendar_sync_mappings, dependent: :destroy
 
   # --- Scopes ---
   scope :system_companies, -> { where(id: System.select(:company_id)) }

@@ -125,6 +125,9 @@ Rails.application.routes.draw do
       post "mock_qr_gateway",       to: "mock_qr_gateway#create"
       post "mock_redirect_gateway", to: "mock_redirect_gateway#create"
     end
+    namespace :calendar do
+      post "cal_com", to: "cal_com#create"
+    end
   end
 
   resources :users do

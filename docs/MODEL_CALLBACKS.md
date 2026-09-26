@@ -210,6 +210,14 @@ Mirrors the `CompanyTransaction` gating: the invoice's `payment_status` is deriv
 
 ---
 
+### CalendarSyncMapping (`app/models/calendar_sync_mapping.rb`)
+
+| Callback | Line | Method | Description |
+|----------|------|--------|-------------|
+| `before_validation :derive_company_from_event_or_integration` | — | `derive_company_from_event_or_integration` | Derives `company_id` from `calendar_event.company_id` (fallback `calendar_integration.company_id`). Only sets when blank. Tenant scope for the calendar dedup table (docs/CALENDAR.md). |
+
+---
+
 ### Setting (`app/models/setting.rb`)
 
 | Callback | Line | Method | Description |

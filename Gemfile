@@ -105,4 +105,5 @@ gem "lograge"
 gem "cent"
 gem "mini_magick"
 gem "meilisearch-rails"
+gem "faraday"
 # ----------------------------------------------------------------------------------------------------

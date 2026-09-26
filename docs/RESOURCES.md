@@ -107,8 +107,11 @@ Company-scoped business entities. Each table belongs to a `company_id` and repre
 | 61 | `discount_groups` | Sales | Discount campaign groups (type/value, budget, validity, status) |
 | 62 | `discounts` | Sales | Single-use discount codes (unique per company, consumption state, SoT bindings) |
 | 63 | `stock_adjustments` | Inventory | Stock-take correction documents (direction + reason, line items via StockItemAppointment) |
+| 64 | `calendar_integrations` | Calendar | Connected Cal.com accounts per company + accountable (tokens via encrypts) |
+| 65 | `calendar_events` | Calendar | Booking source of truth (title/times/status + metadata accessors) |
+| 66 | `calendar_sync_mappings` | Calendar | Cal.com dedup rows (external_event_id unique per integration) |
 
-**Total: 63 tables**
+**Total: 66 tables**
 
 ---
 

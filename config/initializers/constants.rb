@@ -79,6 +79,20 @@ WEBHOOK_BANK_PAYMENT_SECRET = ENV.fetch("WEBHOOK_BANK_PAYMENT_SECRET", "local_se
 WEBHOOK_REDIRECT_PAYMENT_SECRET = ENV.fetch("WEBHOOK_REDIRECT_PAYMENT_SECRET", "local_secure_dev_secret").freeze
 
 # =============================================================================
+# Cal.com Calendar Engine (isolated Docker service)
+# Rails (host, bin/dev) -> Cal.com via localhost:3001 (host port mapping).
+# Cal.com (Docker) -> Rails via the host LAN address (192.168.0.100:3000).
+# See docs/CALENDAR.md for the full networking diagram.
+# =============================================================================
+
+# Base URL for Cal.com API v2 calls from Rails + Solid Queue jobs (host-side).
+CALCOM_API_URL = ENV.fetch("CALCOM_API_URL", "http://localhost:3001/api/v2").freeze
+# Shared secret verifying Cal.com webhooks (X-Cal-Signature-256 header).
+CALCOM_WEBHOOK_SECRET = ENV.fetch("CALCOM_WEBHOOK_SECRET", "local_secure_dev_secret").freeze
+# Public Rails base URL that Cal.com uses to deliver webhooks.
+RAILS_PUBLIC_URL = ENV.fetch("RAILS_PUBLIC_URL", "http://192.168.0.100:3000").freeze
+
+# =============================================================================
 # Image & Avatar Constraints
 # Applied across 7 model concerns (Branch, Brand, Customer, Department,
 # Employee, Product, Service) via their respective ImageConcern modules.

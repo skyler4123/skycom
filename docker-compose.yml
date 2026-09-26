@@ -26,6 +26,7 @@ services:
       - minio
       - websocket
       - meilisearch
+      - calcom
 
   job:
     build: .
@@ -50,7 +51,76 @@ services:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql
- 
+
+  # =========================================================================
+  # 🗓️ CAL.COM ISOLATED INFRASTRUCTURE (CALENDAR ENGINE)
+  # =========================================================================
+  calcom-postgres:
+    image: postgres:15-alpine
+    container_name: skycom_calcom_postgres
+    environment:
+      POSTGRES_USER: calcom
+      POSTGRES_PASSWORD: calcom_secure_password_2026
+      POSTGRES_DB: calcom_db
+    ports:
+      - "5433:5432" # Mở port 5433 để tránh trùng port 5432 của Skycom DB
+    volumes:
+      - calcom_postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U calcom -d calcom_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  calcom-redis:
+    image: valkey/valkey:9.1-alpine
+    container_name: skycom_calcom_redis
+    ports:
+      - "6380:6379" # Mở port 6380 để tránh trùng với Valkey của Skycom
+    volumes:
+      - calcom_redis_data:/data
+    healthcheck:
+      test: ["CMD", "valkey-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  calcom:
+    image: calcom/cal.com:latest
+    container_name: skycom_calcom_app
+    ports:
+      - "3001:3000" # Cal.com sẽ truy cập tại http://localhost:3001
+    environment:
+      # Database & Cache
+      DATABASE_URL: "postgresql://calcom:calcom_secure_password_2026@calcom-postgres:5432/calcom_db"
+      REDIS_URL: "redis://calcom-redis:6379"
+      
+      # App Configuration
+      NEXT_PUBLIC_WEBAPP_URL: "http://localhost:3001"
+      NEXT_PUBLIC_API_V2_URL: "http://localhost:3001/api/v2"
+      CALENDSO_ENCRYPTION_KEY: "skycom_calcom_secret_encryption_key_2026"
+      JWT_SECRET: "skycom_calcom_jwt_secret_key_2026"
+      
+      # Webhook Sync Back to Skycom Rails App
+      # Rails runs on the HOST (bin/dev, :3000) — not in Docker — so Cal.com
+      # must use the host LAN address. http://web:80 only resolves inside Docker.
+      # See docs/CALENDAR.md §2.
+      WEBHOOK_URL: "http://192.168.0.100:3000/webhooks/calendar/cal_com"
+      
+      # Feature Flags & Permissions
+      NEXT_PUBLIC_IS_E2E: "false"
+      ORGANIZATION_ALLOWED: "true"
+    depends_on:
+      calcom-postgres:
+        condition: service_healthy
+      calcom-redis:
+        condition: service_healthy
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+  # =========================================================================
+  # 🗓️ CAL.COM ISOLATED INFRASTRUCTURE (CALENDAR ENGINE)
+  # =========================================================================
+
   # MinIO Service
   minio:
     image: minio/minio:latest
@@ -169,6 +239,8 @@ services:
 
 volumes:
   postgres_data:
+  calcom_postgres_data:
+  calcom_redis_data:
   mongo_data:
   grafana_data:
   minio_data:
