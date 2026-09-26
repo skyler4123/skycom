@@ -53,45 +53,26 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql
  
-  # MinIO Service
-  minio:
-    image: minio/minio:latest
+  # RustFS Service
+  rustfs:
+    image: rustfs/rustfs:latest
     ports:
-      # MinIO API port
+      # RustFS S3 API port
       - "9000:9000" 
-      # MinIO Console/UI port
+      # RustFS Console/UI port
       - "9001:9001" 
     environment:
-      # MinIO root user credentials
-      MINIO_ROOT_USER: minioadmin
-      MINIO_ROOT_PASSWORD: minioadmin
+      # RustFS root user credentials
+      RUSTFS_ROOT_USER: admin
+      RUSTFS_ROOT_PASSWORD: password
     volumes:
       # Data persistence
-      - minio_data:/data 
-    command: server /data --console-address ":9001"
+      - rustfs_data:/data 
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      test: ["CMD", "curl", "-f", "http://localhost:9000/healthz"]
       interval: 30s
       timeout: 20s
       retries: 3
-
-  create_buckets:
-    image: minio/mc
-    depends_on:
-      minio:
-        condition: service_healthy # Wait for MinIO to be fully ready
-    # Wait for the MinIO API to be available and then execute the command
-    entrypoint: >
-      /bin/sh -c "
-      until /usr/bin/mc alias set minio_host http://minio:9000 minioadmin minioadmin; do echo 'Waiting for MinIO...'; sleep 1; done;
-      /usr/bin/mc mb --ignore-existing minio_host/skycom-development;
-      /usr/bin/mc anonymous set download minio_host/skycom-development;
-      /usr/bin/mc mb --ignore-existing minio_host/skycom-production;
-      /usr/bin/mc anonymous set download minio_host/skycom-production;
-      echo 'Buckets created successfully!';
-      "
-    # This service runs once and exits successfully
-    # profiles: ["no-start"] # Optional: Prevents this service from running on 'docker compose up' by default, if you only want it on explicit 'docker compose run'
 
   redis:
     # image: redis:7.2-alpine
@@ -173,7 +154,7 @@ volumes:
   postgres_data:
   mongo_data:
   grafana_data:
-  minio_data:
+  rustfs_data:
   sqlite_storage:
   redis_data:
   openobserve_data:
