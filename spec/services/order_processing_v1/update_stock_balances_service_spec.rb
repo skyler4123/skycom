@@ -10,10 +10,10 @@ RSpec.describe OrderProcessingV1::UpdateStockBalancesService do
     let!(:stock) { create(:stock, company: company, product: product, warehouse: warehouse, quantity: 10, pending: 5) }
     let(:order) { create(:order, company: company, branch: branch, customer: customer, workflow_status: :paid) }
     let!(:oa) do
-      OrderAppointment.create!(
+      OrderProductAppointment.create!(
         company: company,
         order: order,
-        appoint_to: product,
+        product: product,
         quantity: 2,
         unit_price: 50,
         total_price: 100
@@ -36,8 +36,8 @@ RSpec.describe OrderProcessingV1::UpdateStockBalancesService do
       let(:product2) { create(:product, company: company, branch: branch) }
       let!(:stock2) { create(:stock, company:, product: product2, warehouse:, quantity: 20, pending: 5) }
       let!(:oa2) do
-        OrderAppointment.create!(
-          company: company, order: order, appoint_to: product2,
+        OrderProductAppointment.create!(
+          company: company, order: order, product: product2,
           quantity: 3, unit_price: 15, total_price: 45
         )
       end

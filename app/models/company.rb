@@ -11,7 +11,7 @@ class Company < ApplicationRecord
   # (which reads from metadata with this as a fallback).
   DEFAULT_RESOURCE_NAMES = %w[
     Product Order Customer Employee Branch Department
-    PolicyAppointment Invoice Transaction Service Policy
+    PolicyRoleAppointment Invoice Transaction Service Policy
     Category PropertyMapping TableConfig Brand Facility Warehouse
     Supplier
     Purchase PurchaseItem Workflow
@@ -19,7 +19,7 @@ class Company < ApplicationRecord
     Table Reservation Room Guest
     Patient Appointment Course Student Exam
     Membership
-    Page PaymentMethodAppointment ShiftTemplate ScheduledShift
+    Page CompanyPaymentMethodAppointment ShiftTemplate ScheduledShift
     AttendancePolicy AttendanceLog AttendanceDay AttendanceMonth
     Stock StockTransfer StockImport StockExport
   ].freeze
@@ -97,7 +97,7 @@ class Company < ApplicationRecord
   has_many :employees, dependent: :destroy
   has_many :roles, dependent: :destroy
   has_many :policies, dependent: :destroy
-  has_many :policy_appointments, dependent: :destroy
+  has_many :policy_role_appointments, dependent: :destroy
   has_many :shift_templates, dependent: :destroy
   has_many :scheduled_shifts, dependent: :destroy
   has_many :attendance_logs, dependent: :destroy
@@ -131,8 +131,8 @@ class Company < ApplicationRecord
   has_many :project_groups, dependent: :destroy
   has_many :cart_groups, dependent: :destroy
   has_many :notification_groups, dependent: :destroy
-  has_many :payment_method_appointments, as: :appoint_to, dependent: :destroy
-  has_many :payment_methods, through: :payment_method_appointments
+  has_many :company_payment_method_appointments, dependent: :destroy
+  has_many :payment_methods, through: :company_payment_method_appointments
   has_many :statistics, as: :owner
   has_many :categories, dependent: :destroy
   has_many :subscription_plans, dependent: :destroy
@@ -284,8 +284,7 @@ class Company < ApplicationRecord
   def setup_payment_method_appointments
     country_payment_methods = PaymentMethod.where(country: country_before_type_cast)
     country_payment_methods.each do |pm|
-      PaymentMethodAppointment.find_or_create_by!(
-        appoint_to: self,
+      CompanyPaymentMethodAppointment.find_or_create_by!(
         company: self,
         payment_method: pm
       ) do |a|

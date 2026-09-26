@@ -28,9 +28,10 @@ class PaymentMethod < ApplicationRecord
   }
   enum :strategy, GATEWAY_STRATEGIES, prefix: true
   # --- Associations ---
-  has_many :payment_method_appointments, dependent: :destroy
-  has_many :companies, through: :payment_method_appointments, source: :appoint_to, source_type: "Company"
-  has_many :branches, through: :payment_method_appointments, source: :appoint_to, source_type: "Branch"
+  has_many :company_payment_method_appointments, dependent: :destroy
+  has_many :companies, through: :company_payment_method_appointments
+  has_many :branch_payment_method_appointments, dependent: :destroy
+  has_many :branches, through: :branch_payment_method_appointments
 
   has_many :transactions, dependent: :nullify
 

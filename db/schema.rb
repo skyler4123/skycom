@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_09_22_000002) do
+ActiveRecord::Schema[8.0].define(version: 2026_09_25_000001) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pgcrypto"
@@ -43,20 +43,14 @@ ActiveRecord::Schema[8.0].define(version: 2026_09_22_000002) do
     t.index ["blob_id", "variation_digest"], name: "index_active_storage_variant_records_uniqueness", unique: true
   end
 
-  create_table "address_appointments", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
+  create_table "address_branch_appointments", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
+    t.uuid "company_id"
     t.uuid "address_id", null: false
-    t.string "appoint_from_type"
-    t.uuid "appoint_from_id"
-    t.string "appoint_to_type", null: false
-    t.uuid "appoint_to_id", null: false
-    t.string "appoint_for_type"
-    t.uuid "appoint_for_id"
-    t.string "appoint_by_type"
-    t.uuid "appoint_by_id"
+    t.uuid "branch_id", null: false
+    t.string "value"
     t.string "name"
     t.string "description"
     t.string "code"
-    t.string "value"
     t.integer "lifecycle_status"
     t.integer "workflow_status"
     t.integer "business_type"
@@ -66,16 +60,201 @@ ActiveRecord::Schema[8.0].define(version: 2026_09_22_000002) do
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["address_id"], name: "index_address_appointments_on_address_id"
-    t.index ["appoint_by_type", "appoint_by_id"], name: "index_address_appointments_on_appoint_by"
-    t.index ["appoint_for_type", "appoint_for_id"], name: "index_address_appointments_on_appoint_for"
-    t.index ["appoint_from_type", "appoint_from_id"], name: "index_address_appointments_on_appoint_from"
-    t.index ["appoint_to_type", "appoint_to_id"], name: "idx_on_appoint_to_type_appoint_to_id_9dbaa804bc"
-    t.index ["appoint_to_type", "appoint_to_id"], name: "index_address_appointments_on_appoint_to"
-    t.index ["business_type"], name: "index_address_appointments_on_business_type"
-    t.index ["discarded_at"], name: "index_address_appointments_on_discarded_at"
-    t.index ["lifecycle_status"], name: "index_address_appointments_on_lifecycle_status"
-    t.index ["workflow_status"], name: "index_address_appointments_on_workflow_status"
+    t.index ["address_id"], name: "index_address_branch_appointments_on_address_id"
+    t.index ["branch_id"], name: "index_address_branch_appointments_on_branch_id"
+    t.index ["business_type"], name: "index_address_branch_appointments_on_business_type"
+    t.index ["company_id", "address_id", "branch_id"], name: "idx_address_branch_appointments_uniq", unique: true
+    t.index ["company_id"], name: "index_address_branch_appointments_on_company_id"
+    t.index ["discarded_at"], name: "index_address_branch_appointments_on_discarded_at"
+    t.index ["lifecycle_status"], name: "index_address_branch_appointments_on_lifecycle_status"
+    t.index ["workflow_status"], name: "index_address_branch_appointments_on_workflow_status"
+  end
+
+  create_table "address_company_appointments", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
+    t.uuid "address_id", null: false
+    t.uuid "company_id", null: false
+    t.string "value"
+    t.string "name"
+    t.string "description"
+    t.string "code"
+    t.integer "lifecycle_status"
+    t.integer "workflow_status"
+    t.integer "business_type"
+    t.datetime "expiration_date"
+    t.jsonb "metadata"
+    t.datetime "discarded_at"
+    t.string "permission_resource_name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["address_id", "company_id"], name: "idx_address_company_appointments_uniq", unique: true
+    t.index ["address_id"], name: "index_address_company_appointments_on_address_id"
+    t.index ["business_type"], name: "index_address_company_appointments_on_business_type"
+    t.index ["company_id"], name: "index_address_company_appointments_on_company_id"
+    t.index ["discarded_at"], name: "index_address_company_appointments_on_discarded_at"
+    t.index ["lifecycle_status"], name: "index_address_company_appointments_on_lifecycle_status"
+    t.index ["workflow_status"], name: "index_address_company_appointments_on_workflow_status"
+  end
+
+  create_table "address_customer_appointments", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
+    t.uuid "company_id"
+    t.uuid "address_id", null: false
+    t.uuid "customer_id", null: false
+    t.string "value"
+    t.string "name"
+    t.string "description"
+    t.string "code"
+    t.integer "lifecycle_status"
+    t.integer "workflow_status"
+    t.integer "business_type"
+    t.datetime "expiration_date"
+    t.jsonb "metadata"
+    t.datetime "discarded_at"
+    t.string "permission_resource_name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["address_id"], name: "index_address_customer_appointments_on_address_id"
+    t.index ["business_type"], name: "index_address_customer_appointments_on_business_type"
+    t.index ["company_id", "address_id", "customer_id"], name: "idx_address_customer_appointments_uniq", unique: true
+    t.index ["company_id"], name: "index_address_customer_appointments_on_company_id"
+    t.index ["customer_id"], name: "index_address_customer_appointments_on_customer_id"
+    t.index ["discarded_at"], name: "index_address_customer_appointments_on_discarded_at"
+    t.index ["lifecycle_status"], name: "index_address_customer_appointments_on_lifecycle_status"
+    t.index ["workflow_status"], name: "index_address_customer_appointments_on_workflow_status"
+  end
+
+  create_table "address_customer_group_appointments", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
+    t.uuid "company_id"
+    t.uuid "address_id", null: false
+    t.uuid "customer_group_id", null: false
+    t.string "value"
+    t.string "name"
+    t.string "description"
+    t.string "code"
+    t.integer "lifecycle_status"
+    t.integer "workflow_status"
+    t.integer "business_type"
+    t.datetime "expiration_date"
+    t.jsonb "metadata"
+    t.datetime "discarded_at"
+    t.string "permission_resource_name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["address_id"], name: "index_address_customer_group_appointments_on_address_id"
+    t.index ["business_type"], name: "index_address_customer_group_appointments_on_business_type"
+    t.index ["company_id", "address_id", "customer_group_id"], name: "idx_address_customer_group_appointments_uniq", unique: true
+    t.index ["company_id"], name: "index_address_customer_group_appointments_on_company_id"
+    t.index ["customer_group_id"], name: "index_address_customer_group_appointments_on_customer_group_id"
+    t.index ["discarded_at"], name: "index_address_customer_group_appointments_on_discarded_at"
+    t.index ["lifecycle_status"], name: "index_address_customer_group_appointments_on_lifecycle_status"
+    t.index ["workflow_status"], name: "index_address_customer_group_appointments_on_workflow_status"
+  end
+
+  create_table "address_department_appointments", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
+    t.uuid "company_id"
+    t.uuid "address_id", null: false
+    t.uuid "department_id", null: false
+    t.string "value"
+    t.string "name"
+    t.string "description"
+    t.string "code"
+    t.integer "lifecycle_status"
+    t.integer "workflow_status"
+    t.integer "business_type"
+    t.datetime "expiration_date"
+    t.jsonb "metadata"
+    t.datetime "discarded_at"
+    t.string "permission_resource_name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["address_id"], name: "index_address_department_appointments_on_address_id"
+    t.index ["business_type"], name: "index_address_department_appointments_on_business_type"
+    t.index ["company_id", "address_id", "department_id"], name: "idx_address_department_appointments_uniq", unique: true
+    t.index ["company_id"], name: "index_address_department_appointments_on_company_id"
+    t.index ["department_id"], name: "index_address_department_appointments_on_department_id"
+    t.index ["discarded_at"], name: "index_address_department_appointments_on_discarded_at"
+    t.index ["lifecycle_status"], name: "index_address_department_appointments_on_lifecycle_status"
+    t.index ["workflow_status"], name: "index_address_department_appointments_on_workflow_status"
+  end
+
+  create_table "address_employee_appointments", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
+    t.uuid "company_id"
+    t.uuid "address_id", null: false
+    t.uuid "employee_id", null: false
+    t.string "value"
+    t.string "name"
+    t.string "description"
+    t.string "code"
+    t.integer "lifecycle_status"
+    t.integer "workflow_status"
+    t.integer "business_type"
+    t.datetime "expiration_date"
+    t.jsonb "metadata"
+    t.datetime "discarded_at"
+    t.string "permission_resource_name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["address_id"], name: "index_address_employee_appointments_on_address_id"
+    t.index ["business_type"], name: "index_address_employee_appointments_on_business_type"
+    t.index ["company_id", "address_id", "employee_id"], name: "idx_address_employee_appointments_uniq", unique: true
+    t.index ["company_id"], name: "index_address_employee_appointments_on_company_id"
+    t.index ["discarded_at"], name: "index_address_employee_appointments_on_discarded_at"
+    t.index ["employee_id"], name: "index_address_employee_appointments_on_employee_id"
+    t.index ["lifecycle_status"], name: "index_address_employee_appointments_on_lifecycle_status"
+    t.index ["workflow_status"], name: "index_address_employee_appointments_on_workflow_status"
+  end
+
+  create_table "address_employee_group_appointments", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
+    t.uuid "company_id"
+    t.uuid "address_id", null: false
+    t.uuid "employee_group_id", null: false
+    t.string "value"
+    t.string "name"
+    t.string "description"
+    t.string "code"
+    t.integer "lifecycle_status"
+    t.integer "workflow_status"
+    t.integer "business_type"
+    t.datetime "expiration_date"
+    t.jsonb "metadata"
+    t.datetime "discarded_at"
+    t.string "permission_resource_name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["address_id"], name: "index_address_employee_group_appointments_on_address_id"
+    t.index ["business_type"], name: "index_address_employee_group_appointments_on_business_type"
+    t.index ["company_id", "address_id", "employee_group_id"], name: "idx_address_employee_group_appointments_uniq", unique: true
+    t.index ["company_id"], name: "index_address_employee_group_appointments_on_company_id"
+    t.index ["discarded_at"], name: "index_address_employee_group_appointments_on_discarded_at"
+    t.index ["employee_group_id"], name: "index_address_employee_group_appointments_on_employee_group_id"
+    t.index ["lifecycle_status"], name: "index_address_employee_group_appointments_on_lifecycle_status"
+    t.index ["workflow_status"], name: "index_address_employee_group_appointments_on_workflow_status"
+  end
+
+  create_table "address_user_appointments", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
+    t.uuid "company_id"
+    t.uuid "address_id", null: false
+    t.uuid "user_id", null: false
+    t.string "value"
+    t.string "name"
+    t.string "description"
+    t.string "code"
+    t.integer "lifecycle_status"
+    t.integer "workflow_status"
+    t.integer "business_type"
+    t.datetime "expiration_date"
+    t.jsonb "metadata"
+    t.datetime "discarded_at"
+    t.string "permission_resource_name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["address_id"], name: "index_address_user_appointments_on_address_id"
+    t.index ["business_type"], name: "index_address_user_appointments_on_business_type"
+    t.index ["company_id", "address_id", "user_id"], name: "idx_address_user_appointments_uniq", unique: true
+    t.index ["company_id"], name: "index_address_user_appointments_on_company_id"
+    t.index ["discarded_at"], name: "index_address_user_appointments_on_discarded_at"
+    t.index ["lifecycle_status"], name: "index_address_user_appointments_on_lifecycle_status"
+    t.index ["user_id"], name: "index_address_user_appointments_on_user_id"
+    t.index ["workflow_status"], name: "index_address_user_appointments_on_workflow_status"
   end
 
   create_table "addresses", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
@@ -89,6 +268,33 @@ ActiveRecord::Schema[8.0].define(version: 2026_09_22_000002) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["fingerprint"], name: "index_addresses_on_fingerprint", unique: true
+  end
+
+  create_table "answer_tag_appointments", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
+    t.uuid "company_id", null: false
+    t.uuid "answer_id", null: false
+    t.uuid "tag_id", null: false
+    t.string "value"
+    t.string "name"
+    t.string "description"
+    t.string "code"
+    t.integer "lifecycle_status"
+    t.integer "workflow_status"
+    t.integer "business_type"
+    t.datetime "expiration_date"
+    t.jsonb "metadata"
+    t.datetime "discarded_at"
+    t.string "permission_resource_name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["answer_id"], name: "index_answer_tag_appointments_on_answer_id"
+    t.index ["business_type"], name: "index_answer_tag_appointments_on_business_type"
+    t.index ["company_id", "answer_id", "tag_id"], name: "idx_answer_tag_appointments_uniq", unique: true
+    t.index ["company_id"], name: "index_answer_tag_appointments_on_company_id"
+    t.index ["discarded_at"], name: "index_answer_tag_appointments_on_discarded_at"
+    t.index ["lifecycle_status"], name: "index_answer_tag_appointments_on_lifecycle_status"
+    t.index ["tag_id"], name: "index_answer_tag_appointments_on_tag_id"
+    t.index ["workflow_status"], name: "index_answer_tag_appointments_on_workflow_status"
   end
 
   create_table "answers", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
@@ -118,17 +324,10 @@ ActiveRecord::Schema[8.0].define(version: 2026_09_22_000002) do
     t.index ["workflow_status"], name: "index_answers_on_workflow_status"
   end
 
-  create_table "article_appointments", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
+  create_table "article_employee_appointments", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
     t.uuid "company_id", null: false
     t.uuid "article_id", null: false
-    t.string "appoint_from_type"
-    t.uuid "appoint_from_id"
-    t.string "appoint_to_type", null: false
-    t.uuid "appoint_to_id", null: false
-    t.string "appoint_for_type"
-    t.uuid "appoint_for_id"
-    t.string "appoint_by_type"
-    t.uuid "appoint_by_id"
+    t.uuid "employee_id", null: false
     t.string "name"
     t.string "description"
     t.string "code"
@@ -141,30 +340,20 @@ ActiveRecord::Schema[8.0].define(version: 2026_09_22_000002) do
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["appoint_by_type", "appoint_by_id"], name: "index_article_appointments_on_appoint_by"
-    t.index ["appoint_for_type", "appoint_for_id"], name: "index_article_appointments_on_appoint_for"
-    t.index ["appoint_from_type", "appoint_from_id"], name: "index_article_appointments_on_appoint_from"
-    t.index ["appoint_to_type", "appoint_to_id"], name: "idx_on_appoint_to_type_appoint_to_id_aae71362ee"
-    t.index ["appoint_to_type", "appoint_to_id"], name: "index_article_appointments_on_appoint_to"
-    t.index ["article_id"], name: "index_article_appointments_on_article_id"
-    t.index ["business_type"], name: "index_article_appointments_on_business_type"
-    t.index ["company_id"], name: "index_article_appointments_on_company_id"
-    t.index ["discarded_at"], name: "index_article_appointments_on_discarded_at"
-    t.index ["lifecycle_status"], name: "index_article_appointments_on_lifecycle_status"
-    t.index ["workflow_status"], name: "index_article_appointments_on_workflow_status"
+    t.index ["article_id"], name: "index_article_employee_appointments_on_article_id"
+    t.index ["business_type"], name: "index_article_employee_appointments_on_business_type"
+    t.index ["company_id", "article_id", "employee_id"], name: "idx_article_employee_appointments_uniq", unique: true
+    t.index ["company_id"], name: "index_article_employee_appointments_on_company_id"
+    t.index ["discarded_at"], name: "index_article_employee_appointments_on_discarded_at"
+    t.index ["employee_id"], name: "index_article_employee_appointments_on_employee_id"
+    t.index ["lifecycle_status"], name: "index_article_employee_appointments_on_lifecycle_status"
+    t.index ["workflow_status"], name: "index_article_employee_appointments_on_workflow_status"
   end
 
-  create_table "article_group_appointments", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
+  create_table "article_group_employee_appointments", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
     t.uuid "company_id", null: false
     t.uuid "article_group_id", null: false
-    t.string "appoint_from_type"
-    t.uuid "appoint_from_id"
-    t.string "appoint_to_type", null: false
-    t.uuid "appoint_to_id", null: false
-    t.string "appoint_for_type"
-    t.uuid "appoint_for_id"
-    t.string "appoint_by_type"
-    t.uuid "appoint_by_id"
+    t.uuid "employee_id", null: false
     t.string "name"
     t.string "description"
     t.string "code"
@@ -177,17 +366,41 @@ ActiveRecord::Schema[8.0].define(version: 2026_09_22_000002) do
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["appoint_by_type", "appoint_by_id"], name: "index_article_group_appointments_on_appoint_by"
-    t.index ["appoint_for_type", "appoint_for_id"], name: "index_article_group_appointments_on_appoint_for"
-    t.index ["appoint_from_type", "appoint_from_id"], name: "index_article_group_appointments_on_appoint_from"
-    t.index ["appoint_to_type", "appoint_to_id"], name: "idx_on_appoint_to_type_appoint_to_id_3810e29801"
-    t.index ["appoint_to_type", "appoint_to_id"], name: "index_article_group_appointments_on_appoint_to"
-    t.index ["article_group_id"], name: "index_article_group_appointments_on_article_group_id"
-    t.index ["business_type"], name: "index_article_group_appointments_on_business_type"
-    t.index ["company_id"], name: "index_article_group_appointments_on_company_id"
-    t.index ["discarded_at"], name: "index_article_group_appointments_on_discarded_at"
-    t.index ["lifecycle_status"], name: "index_article_group_appointments_on_lifecycle_status"
-    t.index ["workflow_status"], name: "index_article_group_appointments_on_workflow_status"
+    t.index ["article_group_id"], name: "index_article_group_employee_appointments_on_article_group_id"
+    t.index ["business_type"], name: "index_article_group_employee_appointments_on_business_type"
+    t.index ["company_id", "article_group_id", "employee_id"], name: "idx_article_group_employee_appointments_uniq", unique: true
+    t.index ["company_id"], name: "index_article_group_employee_appointments_on_company_id"
+    t.index ["discarded_at"], name: "index_article_group_employee_appointments_on_discarded_at"
+    t.index ["employee_id"], name: "index_article_group_employee_appointments_on_employee_id"
+    t.index ["lifecycle_status"], name: "index_article_group_employee_appointments_on_lifecycle_status"
+    t.index ["workflow_status"], name: "index_article_group_employee_appointments_on_workflow_status"
+  end
+
+  create_table "article_group_tag_appointments", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
+    t.uuid "company_id", null: false
+    t.uuid "article_group_id", null: false
+    t.uuid "tag_id", null: false
+    t.string "value"
+    t.string "name"
+    t.string "description"
+    t.string "code"
+    t.integer "lifecycle_status"
+    t.integer "workflow_status"
+    t.integer "business_type"
+    t.datetime "expiration_date"
+    t.jsonb "metadata"
+    t.datetime "discarded_at"
+    t.string "permission_resource_name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["article_group_id"], name: "index_article_group_tag_appointments_on_article_group_id"
+    t.index ["business_type"], name: "index_article_group_tag_appointments_on_business_type"
+    t.index ["company_id", "article_group_id", "tag_id"], name: "idx_article_group_tag_appointments_uniq", unique: true
+    t.index ["company_id"], name: "index_article_group_tag_appointments_on_company_id"
+    t.index ["discarded_at"], name: "index_article_group_tag_appointments_on_discarded_at"
+    t.index ["lifecycle_status"], name: "index_article_group_tag_appointments_on_lifecycle_status"
+    t.index ["tag_id"], name: "index_article_group_tag_appointments_on_tag_id"
+    t.index ["workflow_status"], name: "index_article_group_tag_appointments_on_workflow_status"
   end
 
   create_table "article_groups", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
@@ -217,6 +430,33 @@ ActiveRecord::Schema[8.0].define(version: 2026_09_22_000002) do
     t.index ["lifecycle_status"], name: "index_article_groups_on_lifecycle_status"
     t.index ["property_mapping_id"], name: "index_article_groups_on_property_mapping_id"
     t.index ["workflow_status"], name: "index_article_groups_on_workflow_status"
+  end
+
+  create_table "article_tag_appointments", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
+    t.uuid "company_id", null: false
+    t.uuid "article_id", null: false
+    t.uuid "tag_id", null: false
+    t.string "value"
+    t.string "name"
+    t.string "description"
+    t.string "code"
+    t.integer "lifecycle_status"
+    t.integer "workflow_status"
+    t.integer "business_type"
+    t.datetime "expiration_date"
+    t.jsonb "metadata"
+    t.datetime "discarded_at"
+    t.string "permission_resource_name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["article_id"], name: "index_article_tag_appointments_on_article_id"
+    t.index ["business_type"], name: "index_article_tag_appointments_on_business_type"
+    t.index ["company_id", "article_id", "tag_id"], name: "idx_article_tag_appointments_uniq", unique: true
+    t.index ["company_id"], name: "index_article_tag_appointments_on_company_id"
+    t.index ["discarded_at"], name: "index_article_tag_appointments_on_discarded_at"
+    t.index ["lifecycle_status"], name: "index_article_tag_appointments_on_lifecycle_status"
+    t.index ["tag_id"], name: "index_article_tag_appointments_on_tag_id"
+    t.index ["workflow_status"], name: "index_article_tag_appointments_on_workflow_status"
   end
 
   create_table "articles", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
@@ -365,6 +605,92 @@ ActiveRecord::Schema[8.0].define(version: 2026_09_22_000002) do
     t.index ["discarded_at"], name: "index_attendance_policies_on_discarded_at"
   end
 
+  create_table "branch_payment_method_appointments", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
+    t.uuid "company_id", null: false
+    t.uuid "branch_id", null: false
+    t.uuid "payment_method_id", null: false
+    t.string "merchant_number"
+    t.string "merchant_name"
+    t.string "merchant_id"
+    t.string "name"
+    t.string "description"
+    t.string "code"
+    t.integer "lifecycle_status"
+    t.integer "workflow_status"
+    t.integer "business_type"
+    t.datetime "expiration_date"
+    t.jsonb "metadata"
+    t.datetime "discarded_at"
+    t.string "permission_resource_name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["branch_id"], name: "index_branch_payment_method_appointments_on_branch_id"
+    t.index ["business_type"], name: "index_branch_payment_method_appointments_on_business_type"
+    t.index ["company_id", "branch_id", "payment_method_id"], name: "idx_branch_payment_method_appointments_uniq", unique: true
+    t.index ["company_id"], name: "index_branch_payment_method_appointments_on_company_id"
+    t.index ["discarded_at"], name: "index_branch_payment_method_appointments_on_discarded_at"
+    t.index ["lifecycle_status"], name: "index_branch_payment_method_appointments_on_lifecycle_status"
+    t.index ["payment_method_id"], name: "index_branch_payment_method_appointments_on_payment_method_id"
+    t.index ["workflow_status"], name: "index_branch_payment_method_appointments_on_workflow_status"
+  end
+
+  create_table "branch_subscription_plan_appointments", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
+    t.uuid "company_id", null: false
+    t.uuid "branch_id", null: false
+    t.uuid "subscription_plan_id", null: false
+    t.integer "price_cents"
+    t.integer "currency"
+    t.integer "country"
+    t.integer "timezone"
+    t.boolean "auto_renew"
+    t.string "name"
+    t.string "description"
+    t.integer "lifecycle_status"
+    t.integer "workflow_status"
+    t.integer "business_type"
+    t.datetime "expiration_date"
+    t.jsonb "metadata"
+    t.datetime "discarded_at"
+    t.string "permission_resource_name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["branch_id"], name: "index_branch_subscription_plan_appointments_on_branch_id"
+    t.index ["business_type"], name: "index_branch_subscription_plan_appointments_on_business_type"
+    t.index ["company_id", "branch_id", "subscription_plan_id"], name: "idx_branch_subscription_plan_appointments_triple"
+    t.index ["company_id"], name: "index_branch_subscription_plan_appointments_on_company_id"
+    t.index ["discarded_at"], name: "index_branch_subscription_plan_appointments_on_discarded_at"
+    t.index ["lifecycle_status"], name: "idx_on_lifecycle_status_6239fe5d2e"
+    t.index ["subscription_plan_id"], name: "idx_on_subscription_plan_id_cac211d7dd"
+    t.index ["workflow_status"], name: "index_branch_subscription_plan_appointments_on_workflow_status"
+  end
+
+  create_table "branch_tag_appointments", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
+    t.uuid "company_id", null: false
+    t.uuid "branch_id", null: false
+    t.uuid "tag_id", null: false
+    t.string "value"
+    t.string "name"
+    t.string "description"
+    t.string "code"
+    t.integer "lifecycle_status"
+    t.integer "workflow_status"
+    t.integer "business_type"
+    t.datetime "expiration_date"
+    t.jsonb "metadata"
+    t.datetime "discarded_at"
+    t.string "permission_resource_name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["branch_id"], name: "index_branch_tag_appointments_on_branch_id"
+    t.index ["business_type"], name: "index_branch_tag_appointments_on_business_type"
+    t.index ["company_id", "branch_id", "tag_id"], name: "idx_branch_tag_appointments_uniq", unique: true
+    t.index ["company_id"], name: "index_branch_tag_appointments_on_company_id"
+    t.index ["discarded_at"], name: "index_branch_tag_appointments_on_discarded_at"
+    t.index ["lifecycle_status"], name: "index_branch_tag_appointments_on_lifecycle_status"
+    t.index ["tag_id"], name: "index_branch_tag_appointments_on_tag_id"
+    t.index ["workflow_status"], name: "index_branch_tag_appointments_on_workflow_status"
+  end
+
   create_table "branches", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
     t.uuid "company_id", null: false
     t.uuid "category_id", null: false
@@ -459,6 +785,33 @@ ActiveRecord::Schema[8.0].define(version: 2026_09_22_000002) do
     t.index ["workflow_status"], name: "index_branches_on_workflow_status"
   end
 
+  create_table "brand_tag_appointments", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
+    t.uuid "company_id", null: false
+    t.uuid "brand_id", null: false
+    t.uuid "tag_id", null: false
+    t.string "value"
+    t.string "name"
+    t.string "description"
+    t.string "code"
+    t.integer "lifecycle_status"
+    t.integer "workflow_status"
+    t.integer "business_type"
+    t.datetime "expiration_date"
+    t.jsonb "metadata"
+    t.datetime "discarded_at"
+    t.string "permission_resource_name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["brand_id"], name: "index_brand_tag_appointments_on_brand_id"
+    t.index ["business_type"], name: "index_brand_tag_appointments_on_business_type"
+    t.index ["company_id", "brand_id", "tag_id"], name: "idx_brand_tag_appointments_uniq", unique: true
+    t.index ["company_id"], name: "index_brand_tag_appointments_on_company_id"
+    t.index ["discarded_at"], name: "index_brand_tag_appointments_on_discarded_at"
+    t.index ["lifecycle_status"], name: "index_brand_tag_appointments_on_lifecycle_status"
+    t.index ["tag_id"], name: "index_brand_tag_appointments_on_tag_id"
+    t.index ["workflow_status"], name: "index_brand_tag_appointments_on_workflow_status"
+  end
+
   create_table "brands", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
     t.uuid "company_id", null: false
     t.uuid "category_id", null: false
@@ -551,17 +904,10 @@ ActiveRecord::Schema[8.0].define(version: 2026_09_22_000002) do
     t.index ["workflow_status"], name: "index_brands_on_workflow_status"
   end
 
-  create_table "cart_appointments", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
+  create_table "cart_employee_appointments", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
     t.uuid "company_id", null: false
     t.uuid "cart_id", null: false
-    t.string "appoint_from_type"
-    t.uuid "appoint_from_id"
-    t.string "appoint_to_type", null: false
-    t.uuid "appoint_to_id", null: false
-    t.string "appoint_for_type"
-    t.uuid "appoint_for_id"
-    t.string "appoint_by_type"
-    t.uuid "appoint_by_id"
+    t.uuid "employee_id", null: false
     t.string "name"
     t.string "description"
     t.string "code"
@@ -574,17 +920,14 @@ ActiveRecord::Schema[8.0].define(version: 2026_09_22_000002) do
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["appoint_by_type", "appoint_by_id"], name: "index_cart_appointments_on_appoint_by"
-    t.index ["appoint_for_type", "appoint_for_id"], name: "index_cart_appointments_on_appoint_for"
-    t.index ["appoint_from_type", "appoint_from_id"], name: "index_cart_appointments_on_appoint_from"
-    t.index ["appoint_to_type", "appoint_to_id"], name: "index_cart_appointments_on_appoint_to"
-    t.index ["appoint_to_type", "appoint_to_id"], name: "index_cart_appointments_on_appoint_to_type_and_appoint_to_id"
-    t.index ["business_type"], name: "index_cart_appointments_on_business_type"
-    t.index ["cart_id"], name: "index_cart_appointments_on_cart_id"
-    t.index ["company_id"], name: "index_cart_appointments_on_company_id"
-    t.index ["discarded_at"], name: "index_cart_appointments_on_discarded_at"
-    t.index ["lifecycle_status"], name: "index_cart_appointments_on_lifecycle_status"
-    t.index ["workflow_status"], name: "index_cart_appointments_on_workflow_status"
+    t.index ["business_type"], name: "index_cart_employee_appointments_on_business_type"
+    t.index ["cart_id"], name: "index_cart_employee_appointments_on_cart_id"
+    t.index ["company_id", "cart_id", "employee_id"], name: "idx_cart_employee_appointments_uniq", unique: true
+    t.index ["company_id"], name: "index_cart_employee_appointments_on_company_id"
+    t.index ["discarded_at"], name: "index_cart_employee_appointments_on_discarded_at"
+    t.index ["employee_id"], name: "index_cart_employee_appointments_on_employee_id"
+    t.index ["lifecycle_status"], name: "index_cart_employee_appointments_on_lifecycle_status"
+    t.index ["workflow_status"], name: "index_cart_employee_appointments_on_workflow_status"
   end
 
   create_table "cart_groups", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
@@ -916,6 +1259,33 @@ ActiveRecord::Schema[8.0].define(version: 2026_09_22_000002) do
     t.index ["user_id"], name: "index_company_orders_on_user_id"
   end
 
+  create_table "company_payment_method_appointments", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
+    t.uuid "company_id", null: false
+    t.uuid "payment_method_id", null: false
+    t.string "merchant_number"
+    t.string "merchant_name"
+    t.string "merchant_id"
+    t.string "name"
+    t.string "description"
+    t.string "code"
+    t.integer "lifecycle_status"
+    t.integer "workflow_status"
+    t.integer "business_type"
+    t.datetime "expiration_date"
+    t.jsonb "metadata"
+    t.datetime "discarded_at"
+    t.string "permission_resource_name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["business_type"], name: "index_company_payment_method_appointments_on_business_type"
+    t.index ["company_id", "payment_method_id"], name: "idx_company_payment_method_appointments_uniq", unique: true
+    t.index ["company_id"], name: "index_company_payment_method_appointments_on_company_id"
+    t.index ["discarded_at"], name: "index_company_payment_method_appointments_on_discarded_at"
+    t.index ["lifecycle_status"], name: "index_company_payment_method_appointments_on_lifecycle_status"
+    t.index ["payment_method_id"], name: "index_company_payment_method_appointments_on_payment_method_id"
+    t.index ["workflow_status"], name: "index_company_payment_method_appointments_on_workflow_status"
+  end
+
   create_table "company_payment_methods", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
     t.string "email"
     t.string "name"
@@ -943,6 +1313,31 @@ ActiveRecord::Schema[8.0].define(version: 2026_09_22_000002) do
     t.index ["lifecycle_status"], name: "index_company_payment_methods_on_lifecycle_status"
     t.index ["payment_mode"], name: "index_company_payment_methods_on_payment_mode"
     t.index ["workflow_status"], name: "index_company_payment_methods_on_workflow_status"
+  end
+
+  create_table "company_tag_appointments", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
+    t.uuid "company_id", null: false
+    t.uuid "tag_id", null: false
+    t.string "value"
+    t.string "name"
+    t.string "description"
+    t.string "code"
+    t.integer "lifecycle_status"
+    t.integer "workflow_status"
+    t.integer "business_type"
+    t.datetime "expiration_date"
+    t.jsonb "metadata"
+    t.datetime "discarded_at"
+    t.string "permission_resource_name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["business_type"], name: "index_company_tag_appointments_on_business_type"
+    t.index ["company_id", "tag_id"], name: "idx_company_tag_appointments_uniq", unique: true
+    t.index ["company_id"], name: "index_company_tag_appointments_on_company_id"
+    t.index ["discarded_at"], name: "index_company_tag_appointments_on_discarded_at"
+    t.index ["lifecycle_status"], name: "index_company_tag_appointments_on_lifecycle_status"
+    t.index ["tag_id"], name: "index_company_tag_appointments_on_tag_id"
+    t.index ["workflow_status"], name: "index_company_tag_appointments_on_workflow_status"
   end
 
   create_table "company_transactions", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
@@ -1046,17 +1441,10 @@ ActiveRecord::Schema[8.0].define(version: 2026_09_22_000002) do
     t.index ["walletable_type", "walletable_id"], name: "index_company_wallets_on_walletable_type_and_walletable_id"
   end
 
-  create_table "customer_appointments", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
+  create_table "customer_customer_group_appointments", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
     t.uuid "company_id", null: false
     t.uuid "customer_id", null: false
-    t.string "appoint_from_type"
-    t.uuid "appoint_from_id"
-    t.string "appoint_to_type", null: false
-    t.uuid "appoint_to_id", null: false
-    t.string "appoint_for_type"
-    t.uuid "appoint_for_id"
-    t.string "appoint_by_type"
-    t.uuid "appoint_by_id"
+    t.uuid "customer_group_id", null: false
     t.string "name"
     t.string "description"
     t.string "code"
@@ -1069,30 +1457,20 @@ ActiveRecord::Schema[8.0].define(version: 2026_09_22_000002) do
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["appoint_by_type", "appoint_by_id"], name: "index_customer_appointments_on_appoint_by"
-    t.index ["appoint_for_type", "appoint_for_id"], name: "index_customer_appointments_on_appoint_for"
-    t.index ["appoint_from_type", "appoint_from_id"], name: "index_customer_appointments_on_appoint_from"
-    t.index ["appoint_to_type", "appoint_to_id"], name: "idx_on_appoint_to_type_appoint_to_id_1b496b2c03"
-    t.index ["appoint_to_type", "appoint_to_id"], name: "index_customer_appointments_on_appoint_to"
-    t.index ["business_type"], name: "index_customer_appointments_on_business_type"
-    t.index ["company_id"], name: "index_customer_appointments_on_company_id"
-    t.index ["customer_id"], name: "index_customer_appointments_on_customer_id"
-    t.index ["discarded_at"], name: "index_customer_appointments_on_discarded_at"
-    t.index ["lifecycle_status"], name: "index_customer_appointments_on_lifecycle_status"
-    t.index ["workflow_status"], name: "index_customer_appointments_on_workflow_status"
+    t.index ["business_type"], name: "index_customer_customer_group_appointments_on_business_type"
+    t.index ["company_id", "customer_id", "customer_group_id"], name: "idx_customer_customer_group_appointments_uniq", unique: true
+    t.index ["company_id"], name: "index_customer_customer_group_appointments_on_company_id"
+    t.index ["customer_group_id"], name: "idx_on_customer_group_id_d7aad9d09e"
+    t.index ["customer_id"], name: "index_customer_customer_group_appointments_on_customer_id"
+    t.index ["discarded_at"], name: "index_customer_customer_group_appointments_on_discarded_at"
+    t.index ["lifecycle_status"], name: "index_customer_customer_group_appointments_on_lifecycle_status"
+    t.index ["workflow_status"], name: "index_customer_customer_group_appointments_on_workflow_status"
   end
 
-  create_table "customer_group_appointments", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
+  create_table "customer_employee_appointments", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
     t.uuid "company_id", null: false
-    t.uuid "customer_group_id", null: false
-    t.string "appoint_from_type"
-    t.uuid "appoint_from_id"
-    t.string "appoint_to_type", null: false
-    t.uuid "appoint_to_id", null: false
-    t.string "appoint_for_type"
-    t.uuid "appoint_for_id"
-    t.string "appoint_by_type"
-    t.uuid "appoint_by_id"
+    t.uuid "customer_id", null: false
+    t.uuid "employee_id", null: false
     t.string "name"
     t.string "description"
     t.string "code"
@@ -1105,17 +1483,93 @@ ActiveRecord::Schema[8.0].define(version: 2026_09_22_000002) do
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["appoint_by_type", "appoint_by_id"], name: "index_customer_group_appointments_on_appoint_by"
-    t.index ["appoint_for_type", "appoint_for_id"], name: "index_customer_group_appointments_on_appoint_for"
-    t.index ["appoint_from_type", "appoint_from_id"], name: "index_customer_group_appointments_on_appoint_from"
-    t.index ["appoint_to_type", "appoint_to_id"], name: "idx_on_appoint_to_type_appoint_to_id_a6c19edb35"
-    t.index ["appoint_to_type", "appoint_to_id"], name: "index_customer_group_appointments_on_appoint_to"
-    t.index ["business_type"], name: "index_customer_group_appointments_on_business_type"
-    t.index ["company_id"], name: "index_customer_group_appointments_on_company_id"
-    t.index ["customer_group_id"], name: "index_customer_group_appointments_on_customer_group_id"
-    t.index ["discarded_at"], name: "index_customer_group_appointments_on_discarded_at"
-    t.index ["lifecycle_status"], name: "index_customer_group_appointments_on_lifecycle_status"
-    t.index ["workflow_status"], name: "index_customer_group_appointments_on_workflow_status"
+    t.index ["business_type"], name: "index_customer_employee_appointments_on_business_type"
+    t.index ["company_id", "customer_id", "employee_id"], name: "idx_customer_employee_appointments_uniq", unique: true
+    t.index ["company_id"], name: "index_customer_employee_appointments_on_company_id"
+    t.index ["customer_id"], name: "index_customer_employee_appointments_on_customer_id"
+    t.index ["discarded_at"], name: "index_customer_employee_appointments_on_discarded_at"
+    t.index ["employee_id"], name: "index_customer_employee_appointments_on_employee_id"
+    t.index ["lifecycle_status"], name: "index_customer_employee_appointments_on_lifecycle_status"
+    t.index ["workflow_status"], name: "index_customer_employee_appointments_on_workflow_status"
+  end
+
+  create_table "customer_group_role_appointments", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
+    t.uuid "company_id", null: false
+    t.uuid "customer_group_id", null: false
+    t.uuid "role_id", null: false
+    t.string "name"
+    t.string "description"
+    t.string "code"
+    t.integer "lifecycle_status"
+    t.integer "workflow_status"
+    t.integer "business_type"
+    t.datetime "expiration_date"
+    t.jsonb "metadata"
+    t.datetime "discarded_at"
+    t.string "permission_resource_name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["business_type"], name: "index_customer_group_role_appointments_on_business_type"
+    t.index ["company_id", "customer_group_id", "role_id"], name: "idx_customer_group_role_appointments_uniq", unique: true
+    t.index ["company_id"], name: "index_customer_group_role_appointments_on_company_id"
+    t.index ["customer_group_id"], name: "index_customer_group_role_appointments_on_customer_group_id"
+    t.index ["discarded_at"], name: "index_customer_group_role_appointments_on_discarded_at"
+    t.index ["lifecycle_status"], name: "index_customer_group_role_appointments_on_lifecycle_status"
+    t.index ["role_id"], name: "index_customer_group_role_appointments_on_role_id"
+    t.index ["workflow_status"], name: "index_customer_group_role_appointments_on_workflow_status"
+  end
+
+  create_table "customer_group_service_appointments", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
+    t.uuid "company_id", null: false
+    t.uuid "customer_group_id", null: false
+    t.uuid "service_id", null: false
+    t.string "name"
+    t.string "description"
+    t.string "code"
+    t.integer "lifecycle_status"
+    t.integer "workflow_status"
+    t.integer "business_type"
+    t.datetime "expiration_date"
+    t.jsonb "metadata"
+    t.datetime "discarded_at"
+    t.string "permission_resource_name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["business_type"], name: "index_customer_group_service_appointments_on_business_type"
+    t.index ["company_id", "customer_group_id", "service_id"], name: "idx_customer_group_service_appointments_uniq", unique: true
+    t.index ["company_id"], name: "index_customer_group_service_appointments_on_company_id"
+    t.index ["customer_group_id"], name: "index_customer_group_service_appointments_on_customer_group_id"
+    t.index ["discarded_at"], name: "index_customer_group_service_appointments_on_discarded_at"
+    t.index ["lifecycle_status"], name: "index_customer_group_service_appointments_on_lifecycle_status"
+    t.index ["service_id"], name: "index_customer_group_service_appointments_on_service_id"
+    t.index ["workflow_status"], name: "index_customer_group_service_appointments_on_workflow_status"
+  end
+
+  create_table "customer_group_tag_appointments", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
+    t.uuid "company_id", null: false
+    t.uuid "customer_group_id", null: false
+    t.uuid "tag_id", null: false
+    t.string "value"
+    t.string "name"
+    t.string "description"
+    t.string "code"
+    t.integer "lifecycle_status"
+    t.integer "workflow_status"
+    t.integer "business_type"
+    t.datetime "expiration_date"
+    t.jsonb "metadata"
+    t.datetime "discarded_at"
+    t.string "permission_resource_name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["business_type"], name: "index_customer_group_tag_appointments_on_business_type"
+    t.index ["company_id", "customer_group_id", "tag_id"], name: "idx_customer_group_tag_appointments_uniq", unique: true
+    t.index ["company_id"], name: "index_customer_group_tag_appointments_on_company_id"
+    t.index ["customer_group_id"], name: "index_customer_group_tag_appointments_on_customer_group_id"
+    t.index ["discarded_at"], name: "index_customer_group_tag_appointments_on_discarded_at"
+    t.index ["lifecycle_status"], name: "index_customer_group_tag_appointments_on_lifecycle_status"
+    t.index ["tag_id"], name: "index_customer_group_tag_appointments_on_tag_id"
+    t.index ["workflow_status"], name: "index_customer_group_tag_appointments_on_workflow_status"
   end
 
   create_table "customer_groups", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
@@ -1210,6 +1664,139 @@ ActiveRecord::Schema[8.0].define(version: 2026_09_22_000002) do
     t.index ["lifecycle_status"], name: "index_customer_groups_on_lifecycle_status"
     t.index ["property_mapping_id"], name: "index_customer_groups_on_property_mapping_id"
     t.index ["workflow_status"], name: "index_customer_groups_on_workflow_status"
+  end
+
+  create_table "customer_membership_appointments", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
+    t.uuid "company_id", null: false
+    t.uuid "customer_id", null: false
+    t.uuid "membership_id", null: false
+    t.string "name"
+    t.string "description"
+    t.string "code"
+    t.integer "lifecycle_status"
+    t.integer "workflow_status"
+    t.integer "business_type"
+    t.datetime "expiration_date"
+    t.jsonb "metadata"
+    t.datetime "discarded_at"
+    t.string "permission_resource_name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["business_type"], name: "index_customer_membership_appointments_on_business_type"
+    t.index ["company_id", "customer_id", "membership_id"], name: "idx_customer_membership_appointments_uniq", unique: true
+    t.index ["company_id"], name: "index_customer_membership_appointments_on_company_id"
+    t.index ["customer_id"], name: "index_customer_membership_appointments_on_customer_id"
+    t.index ["discarded_at"], name: "index_customer_membership_appointments_on_discarded_at"
+    t.index ["lifecycle_status"], name: "index_customer_membership_appointments_on_lifecycle_status"
+    t.index ["membership_id"], name: "index_customer_membership_appointments_on_membership_id"
+    t.index ["workflow_status"], name: "index_customer_membership_appointments_on_workflow_status"
+  end
+
+  create_table "customer_reservation_appointments", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
+    t.uuid "company_id", null: false
+    t.uuid "customer_id", null: false
+    t.uuid "reservation_id", null: false
+    t.string "name"
+    t.string "description"
+    t.string "code"
+    t.integer "lifecycle_status"
+    t.integer "workflow_status"
+    t.integer "business_type"
+    t.datetime "expiration_date"
+    t.jsonb "metadata"
+    t.datetime "discarded_at"
+    t.string "permission_resource_name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["business_type"], name: "index_customer_reservation_appointments_on_business_type"
+    t.index ["company_id", "customer_id", "reservation_id"], name: "idx_customer_reservation_appointments_uniq", unique: true
+    t.index ["company_id"], name: "index_customer_reservation_appointments_on_company_id"
+    t.index ["customer_id"], name: "index_customer_reservation_appointments_on_customer_id"
+    t.index ["discarded_at"], name: "index_customer_reservation_appointments_on_discarded_at"
+    t.index ["lifecycle_status"], name: "index_customer_reservation_appointments_on_lifecycle_status"
+    t.index ["reservation_id"], name: "index_customer_reservation_appointments_on_reservation_id"
+    t.index ["workflow_status"], name: "index_customer_reservation_appointments_on_workflow_status"
+  end
+
+  create_table "customer_role_appointments", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
+    t.uuid "company_id", null: false
+    t.uuid "customer_id", null: false
+    t.uuid "role_id", null: false
+    t.string "name"
+    t.string "description"
+    t.string "code"
+    t.integer "lifecycle_status"
+    t.integer "workflow_status"
+    t.integer "business_type"
+    t.datetime "expiration_date"
+    t.jsonb "metadata"
+    t.datetime "discarded_at"
+    t.string "permission_resource_name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["business_type"], name: "index_customer_role_appointments_on_business_type"
+    t.index ["company_id", "customer_id", "role_id"], name: "idx_customer_role_appointments_uniq", unique: true
+    t.index ["company_id"], name: "index_customer_role_appointments_on_company_id"
+    t.index ["customer_id"], name: "index_customer_role_appointments_on_customer_id"
+    t.index ["discarded_at"], name: "index_customer_role_appointments_on_discarded_at"
+    t.index ["lifecycle_status"], name: "index_customer_role_appointments_on_lifecycle_status"
+    t.index ["role_id"], name: "index_customer_role_appointments_on_role_id"
+    t.index ["workflow_status"], name: "index_customer_role_appointments_on_workflow_status"
+  end
+
+  create_table "customer_service_appointments", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
+    t.uuid "company_id", null: false
+    t.uuid "customer_id", null: false
+    t.uuid "service_id", null: false
+    t.integer "duration"
+    t.datetime "start_at"
+    t.string "name"
+    t.string "description"
+    t.string "code"
+    t.integer "lifecycle_status"
+    t.integer "workflow_status"
+    t.integer "business_type"
+    t.datetime "expiration_date"
+    t.jsonb "metadata"
+    t.datetime "discarded_at"
+    t.string "permission_resource_name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["business_type"], name: "index_customer_service_appointments_on_business_type"
+    t.index ["company_id", "customer_id", "service_id"], name: "idx_customer_service_appointments_uniq", unique: true
+    t.index ["company_id"], name: "index_customer_service_appointments_on_company_id"
+    t.index ["customer_id"], name: "index_customer_service_appointments_on_customer_id"
+    t.index ["discarded_at"], name: "index_customer_service_appointments_on_discarded_at"
+    t.index ["lifecycle_status"], name: "index_customer_service_appointments_on_lifecycle_status"
+    t.index ["service_id"], name: "index_customer_service_appointments_on_service_id"
+    t.index ["workflow_status"], name: "index_customer_service_appointments_on_workflow_status"
+  end
+
+  create_table "customer_tag_appointments", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
+    t.uuid "company_id", null: false
+    t.uuid "customer_id", null: false
+    t.uuid "tag_id", null: false
+    t.string "value"
+    t.string "name"
+    t.string "description"
+    t.string "code"
+    t.integer "lifecycle_status"
+    t.integer "workflow_status"
+    t.integer "business_type"
+    t.datetime "expiration_date"
+    t.jsonb "metadata"
+    t.datetime "discarded_at"
+    t.string "permission_resource_name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["business_type"], name: "index_customer_tag_appointments_on_business_type"
+    t.index ["company_id", "customer_id", "tag_id"], name: "idx_customer_tag_appointments_uniq", unique: true
+    t.index ["company_id"], name: "index_customer_tag_appointments_on_company_id"
+    t.index ["customer_id"], name: "index_customer_tag_appointments_on_customer_id"
+    t.index ["discarded_at"], name: "index_customer_tag_appointments_on_discarded_at"
+    t.index ["lifecycle_status"], name: "index_customer_tag_appointments_on_lifecycle_status"
+    t.index ["tag_id"], name: "index_customer_tag_appointments_on_tag_id"
+    t.index ["workflow_status"], name: "index_customer_tag_appointments_on_workflow_status"
   end
 
   create_table "customers", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
@@ -1308,17 +1895,10 @@ ActiveRecord::Schema[8.0].define(version: 2026_09_22_000002) do
     t.index ["workflow_status"], name: "index_customers_on_workflow_status"
   end
 
-  create_table "department_appointments", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
+  create_table "department_employee_appointments", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
     t.uuid "company_id", null: false
     t.uuid "department_id", null: false
-    t.string "appoint_from_type"
-    t.uuid "appoint_from_id"
-    t.string "appoint_to_type", null: false
-    t.uuid "appoint_to_id", null: false
-    t.string "appoint_for_type"
-    t.uuid "appoint_for_id"
-    t.string "appoint_by_type"
-    t.uuid "appoint_by_id"
+    t.uuid "employee_id", null: false
     t.string "name"
     t.string "description"
     t.string "code"
@@ -1331,17 +1911,67 @@ ActiveRecord::Schema[8.0].define(version: 2026_09_22_000002) do
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["appoint_by_type", "appoint_by_id"], name: "index_department_appointments_on_appoint_by"
-    t.index ["appoint_for_type", "appoint_for_id"], name: "index_department_appointments_on_appoint_for"
-    t.index ["appoint_from_type", "appoint_from_id"], name: "index_department_appointments_on_appoint_from"
-    t.index ["appoint_to_type", "appoint_to_id"], name: "idx_on_appoint_to_type_appoint_to_id_8ea813e354"
-    t.index ["appoint_to_type", "appoint_to_id"], name: "index_department_appointments_on_appoint_to"
-    t.index ["business_type"], name: "index_department_appointments_on_business_type"
-    t.index ["company_id"], name: "index_department_appointments_on_company_id"
-    t.index ["department_id"], name: "index_department_appointments_on_department_id"
-    t.index ["discarded_at"], name: "index_department_appointments_on_discarded_at"
-    t.index ["lifecycle_status"], name: "index_department_appointments_on_lifecycle_status"
-    t.index ["workflow_status"], name: "index_department_appointments_on_workflow_status"
+    t.index ["business_type"], name: "index_department_employee_appointments_on_business_type"
+    t.index ["company_id", "department_id", "employee_id"], name: "idx_department_employee_appointments_uniq", unique: true
+    t.index ["company_id"], name: "index_department_employee_appointments_on_company_id"
+    t.index ["department_id"], name: "index_department_employee_appointments_on_department_id"
+    t.index ["discarded_at"], name: "index_department_employee_appointments_on_discarded_at"
+    t.index ["employee_id"], name: "index_department_employee_appointments_on_employee_id"
+    t.index ["lifecycle_status"], name: "index_department_employee_appointments_on_lifecycle_status"
+    t.index ["workflow_status"], name: "index_department_employee_appointments_on_workflow_status"
+  end
+
+  create_table "department_role_appointments", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
+    t.uuid "company_id", null: false
+    t.uuid "department_id", null: false
+    t.uuid "role_id", null: false
+    t.string "name"
+    t.string "description"
+    t.string "code"
+    t.integer "lifecycle_status"
+    t.integer "workflow_status"
+    t.integer "business_type"
+    t.datetime "expiration_date"
+    t.jsonb "metadata"
+    t.datetime "discarded_at"
+    t.string "permission_resource_name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["business_type"], name: "index_department_role_appointments_on_business_type"
+    t.index ["company_id", "department_id", "role_id"], name: "idx_department_role_appointments_uniq", unique: true
+    t.index ["company_id"], name: "index_department_role_appointments_on_company_id"
+    t.index ["department_id"], name: "index_department_role_appointments_on_department_id"
+    t.index ["discarded_at"], name: "index_department_role_appointments_on_discarded_at"
+    t.index ["lifecycle_status"], name: "index_department_role_appointments_on_lifecycle_status"
+    t.index ["role_id"], name: "index_department_role_appointments_on_role_id"
+    t.index ["workflow_status"], name: "index_department_role_appointments_on_workflow_status"
+  end
+
+  create_table "department_tag_appointments", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
+    t.uuid "company_id", null: false
+    t.uuid "department_id", null: false
+    t.uuid "tag_id", null: false
+    t.string "value"
+    t.string "name"
+    t.string "description"
+    t.string "code"
+    t.integer "lifecycle_status"
+    t.integer "workflow_status"
+    t.integer "business_type"
+    t.datetime "expiration_date"
+    t.jsonb "metadata"
+    t.datetime "discarded_at"
+    t.string "permission_resource_name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["business_type"], name: "index_department_tag_appointments_on_business_type"
+    t.index ["company_id", "department_id", "tag_id"], name: "idx_department_tag_appointments_uniq", unique: true
+    t.index ["company_id"], name: "index_department_tag_appointments_on_company_id"
+    t.index ["department_id"], name: "index_department_tag_appointments_on_department_id"
+    t.index ["discarded_at"], name: "index_department_tag_appointments_on_discarded_at"
+    t.index ["lifecycle_status"], name: "index_department_tag_appointments_on_lifecycle_status"
+    t.index ["tag_id"], name: "index_department_tag_appointments_on_tag_id"
+    t.index ["workflow_status"], name: "index_department_tag_appointments_on_workflow_status"
   end
 
   create_table "departments", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
@@ -1505,17 +2135,10 @@ ActiveRecord::Schema[8.0].define(version: 2026_09_22_000002) do
     t.index ["workflow_status"], name: "index_discounts_on_workflow_status"
   end
 
-  create_table "document_appointments", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
+  create_table "document_employee_appointments", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
     t.uuid "company_id", null: false
     t.uuid "document_id", null: false
-    t.string "appoint_from_type"
-    t.uuid "appoint_from_id"
-    t.string "appoint_to_type", null: false
-    t.uuid "appoint_to_id", null: false
-    t.string "appoint_for_type"
-    t.uuid "appoint_for_id"
-    t.string "appoint_by_type"
-    t.uuid "appoint_by_id"
+    t.uuid "employee_id", null: false
     t.string "name"
     t.string "description"
     t.string "code"
@@ -1528,30 +2151,20 @@ ActiveRecord::Schema[8.0].define(version: 2026_09_22_000002) do
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["appoint_by_type", "appoint_by_id"], name: "index_document_appointments_on_appoint_by"
-    t.index ["appoint_for_type", "appoint_for_id"], name: "index_document_appointments_on_appoint_for"
-    t.index ["appoint_from_type", "appoint_from_id"], name: "index_document_appointments_on_appoint_from"
-    t.index ["appoint_to_type", "appoint_to_id"], name: "idx_on_appoint_to_type_appoint_to_id_fcaa395aab"
-    t.index ["appoint_to_type", "appoint_to_id"], name: "index_document_appointments_on_appoint_to"
-    t.index ["business_type"], name: "index_document_appointments_on_business_type"
-    t.index ["company_id"], name: "index_document_appointments_on_company_id"
-    t.index ["discarded_at"], name: "index_document_appointments_on_discarded_at"
-    t.index ["document_id"], name: "index_document_appointments_on_document_id"
-    t.index ["lifecycle_status"], name: "index_document_appointments_on_lifecycle_status"
-    t.index ["workflow_status"], name: "index_document_appointments_on_workflow_status"
+    t.index ["business_type"], name: "index_document_employee_appointments_on_business_type"
+    t.index ["company_id", "document_id", "employee_id"], name: "idx_document_employee_appointments_uniq", unique: true
+    t.index ["company_id"], name: "index_document_employee_appointments_on_company_id"
+    t.index ["discarded_at"], name: "index_document_employee_appointments_on_discarded_at"
+    t.index ["document_id"], name: "index_document_employee_appointments_on_document_id"
+    t.index ["employee_id"], name: "index_document_employee_appointments_on_employee_id"
+    t.index ["lifecycle_status"], name: "index_document_employee_appointments_on_lifecycle_status"
+    t.index ["workflow_status"], name: "index_document_employee_appointments_on_workflow_status"
   end
 
-  create_table "document_group_appointments", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
+  create_table "document_group_employee_appointments", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
     t.uuid "company_id", null: false
     t.uuid "document_group_id", null: false
-    t.string "appoint_from_type"
-    t.uuid "appoint_from_id"
-    t.string "appoint_to_type", null: false
-    t.uuid "appoint_to_id", null: false
-    t.string "appoint_for_type"
-    t.uuid "appoint_for_id"
-    t.string "appoint_by_type"
-    t.uuid "appoint_by_id"
+    t.uuid "employee_id", null: false
     t.string "name"
     t.string "description"
     t.string "code"
@@ -1564,17 +2177,41 @@ ActiveRecord::Schema[8.0].define(version: 2026_09_22_000002) do
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["appoint_by_type", "appoint_by_id"], name: "index_document_group_appointments_on_appoint_by"
-    t.index ["appoint_for_type", "appoint_for_id"], name: "index_document_group_appointments_on_appoint_for"
-    t.index ["appoint_from_type", "appoint_from_id"], name: "index_document_group_appointments_on_appoint_from"
-    t.index ["appoint_to_type", "appoint_to_id"], name: "idx_on_appoint_to_type_appoint_to_id_a5029e226f"
-    t.index ["appoint_to_type", "appoint_to_id"], name: "index_document_group_appointments_on_appoint_to"
-    t.index ["business_type"], name: "index_document_group_appointments_on_business_type"
-    t.index ["company_id"], name: "index_document_group_appointments_on_company_id"
-    t.index ["discarded_at"], name: "index_document_group_appointments_on_discarded_at"
-    t.index ["document_group_id"], name: "index_document_group_appointments_on_document_group_id"
-    t.index ["lifecycle_status"], name: "index_document_group_appointments_on_lifecycle_status"
-    t.index ["workflow_status"], name: "index_document_group_appointments_on_workflow_status"
+    t.index ["business_type"], name: "index_document_group_employee_appointments_on_business_type"
+    t.index ["company_id", "document_group_id", "employee_id"], name: "idx_document_group_employee_appointments_uniq", unique: true
+    t.index ["company_id"], name: "index_document_group_employee_appointments_on_company_id"
+    t.index ["discarded_at"], name: "index_document_group_employee_appointments_on_discarded_at"
+    t.index ["document_group_id"], name: "idx_on_document_group_id_29a84ce690"
+    t.index ["employee_id"], name: "index_document_group_employee_appointments_on_employee_id"
+    t.index ["lifecycle_status"], name: "index_document_group_employee_appointments_on_lifecycle_status"
+    t.index ["workflow_status"], name: "index_document_group_employee_appointments_on_workflow_status"
+  end
+
+  create_table "document_group_tag_appointments", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
+    t.uuid "company_id", null: false
+    t.uuid "document_group_id", null: false
+    t.uuid "tag_id", null: false
+    t.string "value"
+    t.string "name"
+    t.string "description"
+    t.string "code"
+    t.integer "lifecycle_status"
+    t.integer "workflow_status"
+    t.integer "business_type"
+    t.datetime "expiration_date"
+    t.jsonb "metadata"
+    t.datetime "discarded_at"
+    t.string "permission_resource_name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["business_type"], name: "index_document_group_tag_appointments_on_business_type"
+    t.index ["company_id", "document_group_id", "tag_id"], name: "idx_document_group_tag_appointments_uniq", unique: true
+    t.index ["company_id"], name: "index_document_group_tag_appointments_on_company_id"
+    t.index ["discarded_at"], name: "index_document_group_tag_appointments_on_discarded_at"
+    t.index ["document_group_id"], name: "index_document_group_tag_appointments_on_document_group_id"
+    t.index ["lifecycle_status"], name: "index_document_group_tag_appointments_on_lifecycle_status"
+    t.index ["tag_id"], name: "index_document_group_tag_appointments_on_tag_id"
+    t.index ["workflow_status"], name: "index_document_group_tag_appointments_on_workflow_status"
   end
 
   create_table "document_groups", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
@@ -1604,6 +2241,33 @@ ActiveRecord::Schema[8.0].define(version: 2026_09_22_000002) do
     t.index ["lifecycle_status"], name: "index_document_groups_on_lifecycle_status"
     t.index ["property_mapping_id"], name: "index_document_groups_on_property_mapping_id"
     t.index ["workflow_status"], name: "index_document_groups_on_workflow_status"
+  end
+
+  create_table "document_tag_appointments", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
+    t.uuid "company_id", null: false
+    t.uuid "document_id", null: false
+    t.uuid "tag_id", null: false
+    t.string "value"
+    t.string "name"
+    t.string "description"
+    t.string "code"
+    t.integer "lifecycle_status"
+    t.integer "workflow_status"
+    t.integer "business_type"
+    t.datetime "expiration_date"
+    t.jsonb "metadata"
+    t.datetime "discarded_at"
+    t.string "permission_resource_name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["business_type"], name: "index_document_tag_appointments_on_business_type"
+    t.index ["company_id", "document_id", "tag_id"], name: "idx_document_tag_appointments_uniq", unique: true
+    t.index ["company_id"], name: "index_document_tag_appointments_on_company_id"
+    t.index ["discarded_at"], name: "index_document_tag_appointments_on_discarded_at"
+    t.index ["document_id"], name: "index_document_tag_appointments_on_document_id"
+    t.index ["lifecycle_status"], name: "index_document_tag_appointments_on_lifecycle_status"
+    t.index ["tag_id"], name: "index_document_tag_appointments_on_tag_id"
+    t.index ["workflow_status"], name: "index_document_tag_appointments_on_workflow_status"
   end
 
   create_table "documents", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
@@ -1637,76 +2301,213 @@ ActiveRecord::Schema[8.0].define(version: 2026_09_22_000002) do
     t.index ["workflow_status"], name: "index_documents_on_workflow_status"
   end
 
-  create_table "employee_appointments", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
+  create_table "employee_employee_appointments", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
     t.uuid "company_id", null: false
     t.uuid "employee_id", null: false
-    t.string "appoint_from_type"
-    t.uuid "appoint_from_id"
-    t.string "appoint_to_type", null: false
-    t.uuid "appoint_to_id", null: false
-    t.string "appoint_for_type"
-    t.uuid "appoint_for_id"
-    t.string "appoint_by_type"
-    t.uuid "appoint_by_id"
+    t.uuid "related_employee_id", null: false
     t.string "name"
     t.string "description"
     t.string "code"
-    t.string "permission_resource_name"
     t.integer "lifecycle_status"
     t.integer "workflow_status"
     t.integer "business_type"
     t.datetime "expiration_date"
     t.jsonb "metadata"
     t.datetime "discarded_at"
+    t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["appoint_by_type", "appoint_by_id"], name: "index_employee_appointments_on_appoint_by"
-    t.index ["appoint_for_type", "appoint_for_id"], name: "index_employee_appointments_on_appoint_for"
-    t.index ["appoint_from_type", "appoint_from_id"], name: "index_employee_appointments_on_appoint_from"
-    t.index ["appoint_to_type", "appoint_to_id"], name: "idx_on_appoint_to_type_appoint_to_id_a39c78be55"
-    t.index ["appoint_to_type", "appoint_to_id"], name: "index_employee_appointments_on_appoint_to"
-    t.index ["business_type"], name: "index_employee_appointments_on_business_type"
-    t.index ["company_id"], name: "index_employee_appointments_on_company_id"
-    t.index ["discarded_at"], name: "index_employee_appointments_on_discarded_at"
-    t.index ["employee_id"], name: "index_employee_appointments_on_employee_id"
-    t.index ["lifecycle_status"], name: "index_employee_appointments_on_lifecycle_status"
-    t.index ["workflow_status"], name: "index_employee_appointments_on_workflow_status"
+    t.index ["business_type"], name: "index_employee_employee_appointments_on_business_type"
+    t.index ["company_id"], name: "index_employee_employee_appointments_on_company_id"
+    t.index ["discarded_at"], name: "index_employee_employee_appointments_on_discarded_at"
+    t.index ["employee_id", "related_employee_id"], name: "idx_employee_employee_appointments_uniq", unique: true
+    t.index ["employee_id"], name: "index_employee_employee_appointments_on_employee_id"
+    t.index ["lifecycle_status"], name: "index_employee_employee_appointments_on_lifecycle_status"
+    t.index ["related_employee_id"], name: "index_employee_employee_appointments_on_related_employee_id"
+    t.index ["workflow_status"], name: "index_employee_employee_appointments_on_workflow_status"
   end
 
-  create_table "employee_group_appointments", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
+  create_table "employee_employee_group_appointments", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
     t.uuid "company_id", null: false
+    t.uuid "employee_id", null: false
     t.uuid "employee_group_id", null: false
-    t.string "appoint_from_type"
-    t.uuid "appoint_from_id"
-    t.string "appoint_to_type", null: false
-    t.uuid "appoint_to_id", null: false
-    t.string "appoint_for_type"
-    t.uuid "appoint_for_id"
-    t.string "appoint_by_type"
-    t.uuid "appoint_by_id"
     t.string "name"
     t.string "description"
     t.string "code"
-    t.string "permission_resource_name"
     t.integer "lifecycle_status"
     t.integer "workflow_status"
     t.integer "business_type"
     t.datetime "expiration_date"
     t.jsonb "metadata"
     t.datetime "discarded_at"
+    t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["appoint_by_type", "appoint_by_id"], name: "index_employee_group_appointments_on_appoint_by"
-    t.index ["appoint_for_type", "appoint_for_id"], name: "index_employee_group_appointments_on_appoint_for"
-    t.index ["appoint_from_type", "appoint_from_id"], name: "index_employee_group_appointments_on_appoint_from"
-    t.index ["appoint_to_type", "appoint_to_id"], name: "idx_on_appoint_to_type_appoint_to_id_57b6eaae20"
-    t.index ["appoint_to_type", "appoint_to_id"], name: "index_employee_group_appointments_on_appoint_to"
-    t.index ["business_type"], name: "index_employee_group_appointments_on_business_type"
-    t.index ["company_id"], name: "index_employee_group_appointments_on_company_id"
-    t.index ["discarded_at"], name: "index_employee_group_appointments_on_discarded_at"
-    t.index ["employee_group_id"], name: "index_employee_group_appointments_on_employee_group_id"
-    t.index ["lifecycle_status"], name: "index_employee_group_appointments_on_lifecycle_status"
-    t.index ["workflow_status"], name: "index_employee_group_appointments_on_workflow_status"
+    t.index ["business_type"], name: "index_employee_employee_group_appointments_on_business_type"
+    t.index ["company_id", "employee_id", "employee_group_id"], name: "idx_employee_employee_group_appointments_uniq", unique: true
+    t.index ["company_id"], name: "index_employee_employee_group_appointments_on_company_id"
+    t.index ["discarded_at"], name: "index_employee_employee_group_appointments_on_discarded_at"
+    t.index ["employee_group_id"], name: "idx_on_employee_group_id_cdf25709e0"
+    t.index ["employee_id"], name: "index_employee_employee_group_appointments_on_employee_id"
+    t.index ["lifecycle_status"], name: "index_employee_employee_group_appointments_on_lifecycle_status"
+    t.index ["workflow_status"], name: "index_employee_employee_group_appointments_on_workflow_status"
+  end
+
+  create_table "employee_event_appointments", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
+    t.uuid "company_id", null: false
+    t.uuid "employee_id", null: false
+    t.uuid "event_id", null: false
+    t.string "name"
+    t.string "description"
+    t.string "code"
+    t.integer "lifecycle_status"
+    t.integer "workflow_status"
+    t.integer "business_type"
+    t.datetime "expiration_date"
+    t.jsonb "metadata"
+    t.datetime "discarded_at"
+    t.string "permission_resource_name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["business_type"], name: "index_employee_event_appointments_on_business_type"
+    t.index ["company_id", "employee_id", "event_id"], name: "idx_employee_event_appointments_uniq", unique: true
+    t.index ["company_id"], name: "index_employee_event_appointments_on_company_id"
+    t.index ["discarded_at"], name: "index_employee_event_appointments_on_discarded_at"
+    t.index ["employee_id"], name: "index_employee_event_appointments_on_employee_id"
+    t.index ["event_id"], name: "index_employee_event_appointments_on_event_id"
+    t.index ["lifecycle_status"], name: "index_employee_event_appointments_on_lifecycle_status"
+    t.index ["workflow_status"], name: "index_employee_event_appointments_on_workflow_status"
+  end
+
+  create_table "employee_event_group_appointments", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
+    t.uuid "company_id", null: false
+    t.uuid "employee_id", null: false
+    t.uuid "event_group_id", null: false
+    t.string "name"
+    t.string "description"
+    t.string "code"
+    t.integer "lifecycle_status"
+    t.integer "workflow_status"
+    t.integer "business_type"
+    t.datetime "expiration_date"
+    t.jsonb "metadata"
+    t.datetime "discarded_at"
+    t.string "permission_resource_name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["business_type"], name: "index_employee_event_group_appointments_on_business_type"
+    t.index ["company_id", "employee_id", "event_group_id"], name: "idx_employee_event_group_appointments_uniq", unique: true
+    t.index ["company_id"], name: "index_employee_event_group_appointments_on_company_id"
+    t.index ["discarded_at"], name: "index_employee_event_group_appointments_on_discarded_at"
+    t.index ["employee_id"], name: "index_employee_event_group_appointments_on_employee_id"
+    t.index ["event_group_id"], name: "index_employee_event_group_appointments_on_event_group_id"
+    t.index ["lifecycle_status"], name: "index_employee_event_group_appointments_on_lifecycle_status"
+    t.index ["workflow_status"], name: "index_employee_event_group_appointments_on_workflow_status"
+  end
+
+  create_table "employee_exam_appointments", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
+    t.uuid "company_id", null: false
+    t.uuid "employee_id", null: false
+    t.uuid "exam_id", null: false
+    t.string "name"
+    t.string "description"
+    t.string "code"
+    t.integer "lifecycle_status"
+    t.integer "workflow_status"
+    t.integer "business_type"
+    t.datetime "expiration_date"
+    t.jsonb "metadata"
+    t.datetime "discarded_at"
+    t.string "permission_resource_name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["business_type"], name: "index_employee_exam_appointments_on_business_type"
+    t.index ["company_id", "employee_id", "exam_id"], name: "idx_employee_exam_appointments_uniq", unique: true
+    t.index ["company_id"], name: "index_employee_exam_appointments_on_company_id"
+    t.index ["discarded_at"], name: "index_employee_exam_appointments_on_discarded_at"
+    t.index ["employee_id"], name: "index_employee_exam_appointments_on_employee_id"
+    t.index ["exam_id"], name: "index_employee_exam_appointments_on_exam_id"
+    t.index ["lifecycle_status"], name: "index_employee_exam_appointments_on_lifecycle_status"
+    t.index ["workflow_status"], name: "index_employee_exam_appointments_on_workflow_status"
+  end
+
+  create_table "employee_facility_appointments", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
+    t.uuid "company_id", null: false
+    t.uuid "employee_id", null: false
+    t.uuid "facility_id", null: false
+    t.string "name"
+    t.string "description"
+    t.string "code"
+    t.integer "lifecycle_status"
+    t.integer "workflow_status"
+    t.integer "business_type"
+    t.datetime "expiration_date"
+    t.jsonb "metadata"
+    t.datetime "discarded_at"
+    t.string "permission_resource_name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["business_type"], name: "index_employee_facility_appointments_on_business_type"
+    t.index ["company_id", "employee_id", "facility_id"], name: "idx_employee_facility_appointments_uniq", unique: true
+    t.index ["company_id"], name: "index_employee_facility_appointments_on_company_id"
+    t.index ["discarded_at"], name: "index_employee_facility_appointments_on_discarded_at"
+    t.index ["employee_id"], name: "index_employee_facility_appointments_on_employee_id"
+    t.index ["facility_id"], name: "index_employee_facility_appointments_on_facility_id"
+    t.index ["lifecycle_status"], name: "index_employee_facility_appointments_on_lifecycle_status"
+    t.index ["workflow_status"], name: "index_employee_facility_appointments_on_workflow_status"
+  end
+
+  create_table "employee_group_role_appointments", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
+    t.uuid "company_id", null: false
+    t.uuid "employee_group_id", null: false
+    t.uuid "role_id", null: false
+    t.string "name"
+    t.string "description"
+    t.string "code"
+    t.integer "lifecycle_status"
+    t.integer "workflow_status"
+    t.integer "business_type"
+    t.datetime "expiration_date"
+    t.jsonb "metadata"
+    t.datetime "discarded_at"
+    t.string "permission_resource_name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["business_type"], name: "index_employee_group_role_appointments_on_business_type"
+    t.index ["company_id", "employee_group_id", "role_id"], name: "idx_employee_group_role_appointments_uniq", unique: true
+    t.index ["company_id"], name: "index_employee_group_role_appointments_on_company_id"
+    t.index ["discarded_at"], name: "index_employee_group_role_appointments_on_discarded_at"
+    t.index ["employee_group_id"], name: "index_employee_group_role_appointments_on_employee_group_id"
+    t.index ["lifecycle_status"], name: "index_employee_group_role_appointments_on_lifecycle_status"
+    t.index ["role_id"], name: "index_employee_group_role_appointments_on_role_id"
+    t.index ["workflow_status"], name: "index_employee_group_role_appointments_on_workflow_status"
+  end
+
+  create_table "employee_group_tag_appointments", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
+    t.uuid "company_id", null: false
+    t.uuid "employee_group_id", null: false
+    t.uuid "tag_id", null: false
+    t.string "value"
+    t.string "name"
+    t.string "description"
+    t.string "code"
+    t.integer "lifecycle_status"
+    t.integer "workflow_status"
+    t.integer "business_type"
+    t.datetime "expiration_date"
+    t.jsonb "metadata"
+    t.datetime "discarded_at"
+    t.string "permission_resource_name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["business_type"], name: "index_employee_group_tag_appointments_on_business_type"
+    t.index ["company_id", "employee_group_id", "tag_id"], name: "idx_employee_group_tag_appointments_uniq", unique: true
+    t.index ["company_id"], name: "index_employee_group_tag_appointments_on_company_id"
+    t.index ["discarded_at"], name: "index_employee_group_tag_appointments_on_discarded_at"
+    t.index ["employee_group_id"], name: "index_employee_group_tag_appointments_on_employee_group_id"
+    t.index ["lifecycle_status"], name: "index_employee_group_tag_appointments_on_lifecycle_status"
+    t.index ["tag_id"], name: "index_employee_group_tag_appointments_on_tag_id"
+    t.index ["workflow_status"], name: "index_employee_group_tag_appointments_on_workflow_status"
   end
 
   create_table "employee_groups", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
@@ -1801,6 +2602,350 @@ ActiveRecord::Schema[8.0].define(version: 2026_09_22_000002) do
     t.index ["lifecycle_status"], name: "index_employee_groups_on_lifecycle_status"
     t.index ["property_mapping_id"], name: "index_employee_groups_on_property_mapping_id"
     t.index ["workflow_status"], name: "index_employee_groups_on_workflow_status"
+  end
+
+  create_table "employee_notification_appointments", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
+    t.uuid "company_id", null: false
+    t.uuid "employee_id", null: false
+    t.uuid "notification_id", null: false
+    t.string "name"
+    t.string "description"
+    t.string "code"
+    t.integer "lifecycle_status"
+    t.integer "workflow_status"
+    t.integer "business_type"
+    t.datetime "expiration_date"
+    t.jsonb "metadata"
+    t.datetime "discarded_at"
+    t.string "permission_resource_name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["business_type"], name: "index_employee_notification_appointments_on_business_type"
+    t.index ["company_id", "employee_id", "notification_id"], name: "idx_employee_notification_appointments_uniq", unique: true
+    t.index ["company_id"], name: "index_employee_notification_appointments_on_company_id"
+    t.index ["discarded_at"], name: "index_employee_notification_appointments_on_discarded_at"
+    t.index ["employee_id"], name: "index_employee_notification_appointments_on_employee_id"
+    t.index ["lifecycle_status"], name: "index_employee_notification_appointments_on_lifecycle_status"
+    t.index ["notification_id"], name: "index_employee_notification_appointments_on_notification_id"
+    t.index ["workflow_status"], name: "index_employee_notification_appointments_on_workflow_status"
+  end
+
+  create_table "employee_notification_group_appointments", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
+    t.uuid "company_id", null: false
+    t.uuid "employee_id", null: false
+    t.uuid "notification_group_id", null: false
+    t.string "name"
+    t.string "description"
+    t.string "code"
+    t.integer "lifecycle_status"
+    t.integer "workflow_status"
+    t.integer "business_type"
+    t.datetime "expiration_date"
+    t.jsonb "metadata"
+    t.datetime "discarded_at"
+    t.string "permission_resource_name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["business_type"], name: "idx_on_business_type_968f1ef9bb"
+    t.index ["company_id", "employee_id", "notification_group_id"], name: "idx_employee_notification_group_appointments_uniq", unique: true
+    t.index ["company_id"], name: "index_employee_notification_group_appointments_on_company_id"
+    t.index ["discarded_at"], name: "index_employee_notification_group_appointments_on_discarded_at"
+    t.index ["employee_id"], name: "index_employee_notification_group_appointments_on_employee_id"
+    t.index ["lifecycle_status"], name: "idx_on_lifecycle_status_012914dff9"
+    t.index ["notification_group_id"], name: "idx_on_notification_group_id_d53618e24e"
+    t.index ["workflow_status"], name: "idx_on_workflow_status_1a25612e68"
+  end
+
+  create_table "employee_order_group_appointments", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
+    t.uuid "company_id", null: false
+    t.uuid "employee_id", null: false
+    t.uuid "order_group_id", null: false
+    t.decimal "unit_price"
+    t.integer "quantity"
+    t.decimal "total_price"
+    t.string "name"
+    t.string "description"
+    t.string "code"
+    t.integer "lifecycle_status"
+    t.integer "workflow_status"
+    t.integer "business_type"
+    t.datetime "expiration_date"
+    t.jsonb "metadata"
+    t.datetime "discarded_at"
+    t.string "permission_resource_name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["business_type"], name: "index_employee_order_group_appointments_on_business_type"
+    t.index ["company_id", "employee_id", "order_group_id"], name: "idx_employee_order_group_appointments_triple"
+    t.index ["company_id"], name: "index_employee_order_group_appointments_on_company_id"
+    t.index ["discarded_at"], name: "index_employee_order_group_appointments_on_discarded_at"
+    t.index ["employee_id"], name: "index_employee_order_group_appointments_on_employee_id"
+    t.index ["lifecycle_status"], name: "index_employee_order_group_appointments_on_lifecycle_status"
+    t.index ["order_group_id"], name: "index_employee_order_group_appointments_on_order_group_id"
+    t.index ["workflow_status"], name: "index_employee_order_group_appointments_on_workflow_status"
+  end
+
+  create_table "employee_product_appointments", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
+    t.uuid "company_id", null: false
+    t.uuid "employee_id", null: false
+    t.uuid "product_id", null: false
+    t.string "name"
+    t.string "description"
+    t.string "code"
+    t.integer "lifecycle_status"
+    t.integer "workflow_status"
+    t.integer "business_type"
+    t.datetime "expiration_date"
+    t.jsonb "metadata"
+    t.datetime "discarded_at"
+    t.string "permission_resource_name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["business_type"], name: "index_employee_product_appointments_on_business_type"
+    t.index ["company_id", "employee_id", "product_id"], name: "idx_employee_product_appointments_uniq", unique: true
+    t.index ["company_id"], name: "index_employee_product_appointments_on_company_id"
+    t.index ["discarded_at"], name: "index_employee_product_appointments_on_discarded_at"
+    t.index ["employee_id"], name: "index_employee_product_appointments_on_employee_id"
+    t.index ["lifecycle_status"], name: "index_employee_product_appointments_on_lifecycle_status"
+    t.index ["product_id"], name: "index_employee_product_appointments_on_product_id"
+    t.index ["workflow_status"], name: "index_employee_product_appointments_on_workflow_status"
+  end
+
+  create_table "employee_project_appointments", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
+    t.uuid "company_id", null: false
+    t.uuid "employee_id", null: false
+    t.uuid "project_id", null: false
+    t.string "name"
+    t.string "description"
+    t.string "code"
+    t.integer "lifecycle_status"
+    t.integer "workflow_status"
+    t.integer "business_type"
+    t.datetime "expiration_date"
+    t.jsonb "metadata"
+    t.datetime "discarded_at"
+    t.string "permission_resource_name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["business_type"], name: "index_employee_project_appointments_on_business_type"
+    t.index ["company_id", "employee_id", "project_id"], name: "idx_employee_project_appointments_uniq", unique: true
+    t.index ["company_id"], name: "index_employee_project_appointments_on_company_id"
+    t.index ["discarded_at"], name: "index_employee_project_appointments_on_discarded_at"
+    t.index ["employee_id"], name: "index_employee_project_appointments_on_employee_id"
+    t.index ["lifecycle_status"], name: "index_employee_project_appointments_on_lifecycle_status"
+    t.index ["project_id"], name: "index_employee_project_appointments_on_project_id"
+    t.index ["workflow_status"], name: "index_employee_project_appointments_on_workflow_status"
+  end
+
+  create_table "employee_project_group_appointments", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
+    t.uuid "company_id", null: false
+    t.uuid "employee_id", null: false
+    t.uuid "project_group_id", null: false
+    t.string "name"
+    t.string "description"
+    t.string "code"
+    t.integer "lifecycle_status"
+    t.integer "workflow_status"
+    t.integer "business_type"
+    t.datetime "expiration_date"
+    t.jsonb "metadata"
+    t.datetime "discarded_at"
+    t.string "permission_resource_name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["business_type"], name: "index_employee_project_group_appointments_on_business_type"
+    t.index ["company_id", "employee_id", "project_group_id"], name: "idx_employee_project_group_appointments_uniq", unique: true
+    t.index ["company_id"], name: "index_employee_project_group_appointments_on_company_id"
+    t.index ["discarded_at"], name: "index_employee_project_group_appointments_on_discarded_at"
+    t.index ["employee_id"], name: "index_employee_project_group_appointments_on_employee_id"
+    t.index ["lifecycle_status"], name: "index_employee_project_group_appointments_on_lifecycle_status"
+    t.index ["project_group_id"], name: "index_employee_project_group_appointments_on_project_group_id"
+    t.index ["workflow_status"], name: "index_employee_project_group_appointments_on_workflow_status"
+  end
+
+  create_table "employee_role_appointments", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
+    t.uuid "company_id", null: false
+    t.uuid "employee_id", null: false
+    t.uuid "role_id", null: false
+    t.string "name"
+    t.string "description"
+    t.string "code"
+    t.integer "lifecycle_status"
+    t.integer "workflow_status"
+    t.integer "business_type"
+    t.datetime "expiration_date"
+    t.jsonb "metadata"
+    t.datetime "discarded_at"
+    t.string "permission_resource_name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["business_type"], name: "index_employee_role_appointments_on_business_type"
+    t.index ["company_id", "employee_id", "role_id"], name: "idx_employee_role_appointments_uniq", unique: true
+    t.index ["company_id"], name: "index_employee_role_appointments_on_company_id"
+    t.index ["discarded_at"], name: "index_employee_role_appointments_on_discarded_at"
+    t.index ["employee_id"], name: "index_employee_role_appointments_on_employee_id"
+    t.index ["lifecycle_status"], name: "index_employee_role_appointments_on_lifecycle_status"
+    t.index ["role_id"], name: "index_employee_role_appointments_on_role_id"
+    t.index ["workflow_status"], name: "index_employee_role_appointments_on_workflow_status"
+  end
+
+  create_table "employee_service_appointments", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
+    t.uuid "company_id", null: false
+    t.uuid "employee_id", null: false
+    t.uuid "service_id", null: false
+    t.integer "duration"
+    t.datetime "start_at"
+    t.string "name"
+    t.string "description"
+    t.string "code"
+    t.integer "lifecycle_status"
+    t.integer "workflow_status"
+    t.integer "business_type"
+    t.datetime "expiration_date"
+    t.jsonb "metadata"
+    t.datetime "discarded_at"
+    t.string "permission_resource_name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["business_type"], name: "index_employee_service_appointments_on_business_type"
+    t.index ["company_id", "employee_id", "service_id"], name: "idx_employee_service_appointments_uniq", unique: true
+    t.index ["company_id"], name: "index_employee_service_appointments_on_company_id"
+    t.index ["discarded_at"], name: "index_employee_service_appointments_on_discarded_at"
+    t.index ["employee_id"], name: "index_employee_service_appointments_on_employee_id"
+    t.index ["lifecycle_status"], name: "index_employee_service_appointments_on_lifecycle_status"
+    t.index ["service_id"], name: "index_employee_service_appointments_on_service_id"
+    t.index ["workflow_status"], name: "index_employee_service_appointments_on_workflow_status"
+  end
+
+  create_table "employee_setting_appointments", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
+    t.uuid "company_id", null: false
+    t.uuid "employee_id", null: false
+    t.uuid "setting_id", null: false
+    t.string "name"
+    t.string "description"
+    t.string "code"
+    t.integer "lifecycle_status"
+    t.integer "workflow_status"
+    t.integer "business_type"
+    t.datetime "expiration_date"
+    t.jsonb "metadata"
+    t.datetime "discarded_at"
+    t.string "permission_resource_name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["business_type"], name: "index_employee_setting_appointments_on_business_type"
+    t.index ["company_id", "employee_id", "setting_id"], name: "idx_employee_setting_appointments_uniq", unique: true
+    t.index ["company_id"], name: "index_employee_setting_appointments_on_company_id"
+    t.index ["discarded_at"], name: "index_employee_setting_appointments_on_discarded_at"
+    t.index ["employee_id"], name: "index_employee_setting_appointments_on_employee_id"
+    t.index ["lifecycle_status"], name: "index_employee_setting_appointments_on_lifecycle_status"
+    t.index ["setting_id"], name: "index_employee_setting_appointments_on_setting_id"
+    t.index ["workflow_status"], name: "index_employee_setting_appointments_on_workflow_status"
+  end
+
+  create_table "employee_setting_group_appointments", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
+    t.uuid "company_id", null: false
+    t.uuid "employee_id", null: false
+    t.uuid "setting_group_id", null: false
+    t.string "name"
+    t.string "description"
+    t.string "code"
+    t.integer "lifecycle_status"
+    t.integer "workflow_status"
+    t.integer "business_type"
+    t.datetime "expiration_date"
+    t.jsonb "metadata"
+    t.datetime "discarded_at"
+    t.string "permission_resource_name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["business_type"], name: "index_employee_setting_group_appointments_on_business_type"
+    t.index ["company_id", "employee_id", "setting_group_id"], name: "idx_employee_setting_group_appointments_uniq", unique: true
+    t.index ["company_id"], name: "index_employee_setting_group_appointments_on_company_id"
+    t.index ["discarded_at"], name: "index_employee_setting_group_appointments_on_discarded_at"
+    t.index ["employee_id"], name: "index_employee_setting_group_appointments_on_employee_id"
+    t.index ["lifecycle_status"], name: "index_employee_setting_group_appointments_on_lifecycle_status"
+    t.index ["setting_group_id"], name: "index_employee_setting_group_appointments_on_setting_group_id"
+    t.index ["workflow_status"], name: "index_employee_setting_group_appointments_on_workflow_status"
+  end
+
+  create_table "employee_tag_appointments", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
+    t.uuid "company_id", null: false
+    t.uuid "employee_id", null: false
+    t.uuid "tag_id", null: false
+    t.string "value"
+    t.string "name"
+    t.string "description"
+    t.string "code"
+    t.integer "lifecycle_status"
+    t.integer "workflow_status"
+    t.integer "business_type"
+    t.datetime "expiration_date"
+    t.jsonb "metadata"
+    t.datetime "discarded_at"
+    t.string "permission_resource_name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["business_type"], name: "index_employee_tag_appointments_on_business_type"
+    t.index ["company_id", "employee_id", "tag_id"], name: "idx_employee_tag_appointments_uniq", unique: true
+    t.index ["company_id"], name: "index_employee_tag_appointments_on_company_id"
+    t.index ["discarded_at"], name: "index_employee_tag_appointments_on_discarded_at"
+    t.index ["employee_id"], name: "index_employee_tag_appointments_on_employee_id"
+    t.index ["lifecycle_status"], name: "index_employee_tag_appointments_on_lifecycle_status"
+    t.index ["tag_id"], name: "index_employee_tag_appointments_on_tag_id"
+    t.index ["workflow_status"], name: "index_employee_tag_appointments_on_workflow_status"
+  end
+
+  create_table "employee_task_appointments", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
+    t.uuid "company_id", null: false
+    t.uuid "employee_id", null: false
+    t.uuid "task_id", null: false
+    t.string "name"
+    t.string "description"
+    t.string "code"
+    t.integer "lifecycle_status"
+    t.integer "workflow_status"
+    t.integer "business_type"
+    t.datetime "expiration_date"
+    t.jsonb "metadata"
+    t.datetime "discarded_at"
+    t.string "permission_resource_name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["business_type"], name: "index_employee_task_appointments_on_business_type"
+    t.index ["company_id", "employee_id", "task_id"], name: "idx_employee_task_appointments_uniq", unique: true
+    t.index ["company_id"], name: "index_employee_task_appointments_on_company_id"
+    t.index ["discarded_at"], name: "index_employee_task_appointments_on_discarded_at"
+    t.index ["employee_id"], name: "index_employee_task_appointments_on_employee_id"
+    t.index ["lifecycle_status"], name: "index_employee_task_appointments_on_lifecycle_status"
+    t.index ["task_id"], name: "index_employee_task_appointments_on_task_id"
+    t.index ["workflow_status"], name: "index_employee_task_appointments_on_workflow_status"
+  end
+
+  create_table "employee_task_group_appointments", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
+    t.uuid "company_id", null: false
+    t.uuid "employee_id", null: false
+    t.uuid "task_group_id", null: false
+    t.string "name"
+    t.string "description"
+    t.string "code"
+    t.integer "lifecycle_status"
+    t.integer "workflow_status"
+    t.integer "business_type"
+    t.datetime "expiration_date"
+    t.jsonb "metadata"
+    t.datetime "discarded_at"
+    t.string "permission_resource_name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["business_type"], name: "index_employee_task_group_appointments_on_business_type"
+    t.index ["company_id", "employee_id", "task_group_id"], name: "idx_employee_task_group_appointments_uniq", unique: true
+    t.index ["company_id"], name: "index_employee_task_group_appointments_on_company_id"
+    t.index ["discarded_at"], name: "index_employee_task_group_appointments_on_discarded_at"
+    t.index ["employee_id"], name: "index_employee_task_group_appointments_on_employee_id"
+    t.index ["lifecycle_status"], name: "index_employee_task_group_appointments_on_lifecycle_status"
+    t.index ["task_group_id"], name: "index_employee_task_group_appointments_on_task_group_id"
+    t.index ["workflow_status"], name: "index_employee_task_group_appointments_on_workflow_status"
   end
 
   create_table "employees", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
@@ -1899,53 +3044,11 @@ ActiveRecord::Schema[8.0].define(version: 2026_09_22_000002) do
     t.index ["workflow_status"], name: "index_employees_on_workflow_status"
   end
 
-  create_table "event_appointments", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
-    t.uuid "company_id", null: false
-    t.uuid "event_id", null: false
-    t.string "appoint_from_type"
-    t.uuid "appoint_from_id"
-    t.string "appoint_to_type", null: false
-    t.uuid "appoint_to_id", null: false
-    t.string "appoint_for_type"
-    t.uuid "appoint_for_id"
-    t.string "appoint_by_type"
-    t.uuid "appoint_by_id"
-    t.string "name"
-    t.string "description"
-    t.string "code"
-    t.integer "lifecycle_status"
-    t.integer "workflow_status"
-    t.integer "business_type"
-    t.datetime "expiration_date"
-    t.jsonb "metadata"
-    t.datetime "discarded_at"
-    t.string "permission_resource_name"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.index ["appoint_by_type", "appoint_by_id"], name: "index_event_appointments_on_appoint_by"
-    t.index ["appoint_for_type", "appoint_for_id"], name: "index_event_appointments_on_appoint_for"
-    t.index ["appoint_from_type", "appoint_from_id"], name: "index_event_appointments_on_appoint_from"
-    t.index ["appoint_to_type", "appoint_to_id"], name: "index_event_appointments_on_appoint_to"
-    t.index ["appoint_to_type", "appoint_to_id"], name: "index_event_appointments_on_appoint_to_type_and_appoint_to_id"
-    t.index ["business_type"], name: "index_event_appointments_on_business_type"
-    t.index ["company_id"], name: "index_event_appointments_on_company_id"
-    t.index ["discarded_at"], name: "index_event_appointments_on_discarded_at"
-    t.index ["event_id"], name: "index_event_appointments_on_event_id"
-    t.index ["lifecycle_status"], name: "index_event_appointments_on_lifecycle_status"
-    t.index ["workflow_status"], name: "index_event_appointments_on_workflow_status"
-  end
-
-  create_table "event_group_appointments", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
+  create_table "event_group_tag_appointments", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
     t.uuid "company_id", null: false
     t.uuid "event_group_id", null: false
-    t.string "appoint_from_type"
-    t.uuid "appoint_from_id"
-    t.string "appoint_to_type", null: false
-    t.uuid "appoint_to_id", null: false
-    t.string "appoint_for_type"
-    t.uuid "appoint_for_id"
-    t.string "appoint_by_type"
-    t.uuid "appoint_by_id"
+    t.uuid "tag_id", null: false
+    t.string "value"
     t.string "name"
     t.string "description"
     t.string "code"
@@ -1958,17 +3061,14 @@ ActiveRecord::Schema[8.0].define(version: 2026_09_22_000002) do
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["appoint_by_type", "appoint_by_id"], name: "index_event_group_appointments_on_appoint_by"
-    t.index ["appoint_for_type", "appoint_for_id"], name: "index_event_group_appointments_on_appoint_for"
-    t.index ["appoint_from_type", "appoint_from_id"], name: "index_event_group_appointments_on_appoint_from"
-    t.index ["appoint_to_type", "appoint_to_id"], name: "idx_on_appoint_to_type_appoint_to_id_941fb608a2"
-    t.index ["appoint_to_type", "appoint_to_id"], name: "index_event_group_appointments_on_appoint_to"
-    t.index ["business_type"], name: "index_event_group_appointments_on_business_type"
-    t.index ["company_id"], name: "index_event_group_appointments_on_company_id"
-    t.index ["discarded_at"], name: "index_event_group_appointments_on_discarded_at"
-    t.index ["event_group_id"], name: "index_event_group_appointments_on_event_group_id"
-    t.index ["lifecycle_status"], name: "index_event_group_appointments_on_lifecycle_status"
-    t.index ["workflow_status"], name: "index_event_group_appointments_on_workflow_status"
+    t.index ["business_type"], name: "index_event_group_tag_appointments_on_business_type"
+    t.index ["company_id", "event_group_id", "tag_id"], name: "idx_event_group_tag_appointments_uniq", unique: true
+    t.index ["company_id"], name: "index_event_group_tag_appointments_on_company_id"
+    t.index ["discarded_at"], name: "index_event_group_tag_appointments_on_discarded_at"
+    t.index ["event_group_id"], name: "index_event_group_tag_appointments_on_event_group_id"
+    t.index ["lifecycle_status"], name: "index_event_group_tag_appointments_on_lifecycle_status"
+    t.index ["tag_id"], name: "index_event_group_tag_appointments_on_tag_id"
+    t.index ["workflow_status"], name: "index_event_group_tag_appointments_on_workflow_status"
   end
 
   create_table "event_groups", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
@@ -1996,6 +3096,33 @@ ActiveRecord::Schema[8.0].define(version: 2026_09_22_000002) do
     t.index ["lifecycle_status"], name: "index_event_groups_on_lifecycle_status"
     t.index ["property_mapping_id"], name: "index_event_groups_on_property_mapping_id"
     t.index ["workflow_status"], name: "index_event_groups_on_workflow_status"
+  end
+
+  create_table "event_tag_appointments", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
+    t.uuid "company_id", null: false
+    t.uuid "event_id", null: false
+    t.uuid "tag_id", null: false
+    t.string "value"
+    t.string "name"
+    t.string "description"
+    t.string "code"
+    t.integer "lifecycle_status"
+    t.integer "workflow_status"
+    t.integer "business_type"
+    t.datetime "expiration_date"
+    t.jsonb "metadata"
+    t.datetime "discarded_at"
+    t.string "permission_resource_name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["business_type"], name: "index_event_tag_appointments_on_business_type"
+    t.index ["company_id", "event_id", "tag_id"], name: "idx_event_tag_appointments_uniq", unique: true
+    t.index ["company_id"], name: "index_event_tag_appointments_on_company_id"
+    t.index ["discarded_at"], name: "index_event_tag_appointments_on_discarded_at"
+    t.index ["event_id"], name: "index_event_tag_appointments_on_event_id"
+    t.index ["lifecycle_status"], name: "index_event_tag_appointments_on_lifecycle_status"
+    t.index ["tag_id"], name: "index_event_tag_appointments_on_tag_id"
+    t.index ["workflow_status"], name: "index_event_tag_appointments_on_workflow_status"
   end
 
   create_table "events", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
@@ -2027,17 +3154,11 @@ ActiveRecord::Schema[8.0].define(version: 2026_09_22_000002) do
     t.index ["workflow_status"], name: "index_events_on_workflow_status"
   end
 
-  create_table "exam_appointments", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
+  create_table "exam_group_tag_appointments", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
     t.uuid "company_id", null: false
-    t.uuid "exam_id", null: false
-    t.string "appoint_from_type"
-    t.uuid "appoint_from_id"
-    t.string "appoint_to_type", null: false
-    t.uuid "appoint_to_id", null: false
-    t.string "appoint_for_type"
-    t.uuid "appoint_for_id"
-    t.string "appoint_by_type"
-    t.uuid "appoint_by_id"
+    t.uuid "exam_group_id", null: false
+    t.uuid "tag_id", null: false
+    t.string "value"
     t.string "name"
     t.string "description"
     t.string "code"
@@ -2050,17 +3171,14 @@ ActiveRecord::Schema[8.0].define(version: 2026_09_22_000002) do
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["appoint_by_type", "appoint_by_id"], name: "index_exam_appointments_on_appoint_by"
-    t.index ["appoint_for_type", "appoint_for_id"], name: "index_exam_appointments_on_appoint_for"
-    t.index ["appoint_from_type", "appoint_from_id"], name: "index_exam_appointments_on_appoint_from"
-    t.index ["appoint_to_type", "appoint_to_id"], name: "index_exam_appointments_on_appoint_to"
-    t.index ["appoint_to_type", "appoint_to_id"], name: "index_exam_appointments_on_appoint_to_type_and_appoint_to_id"
-    t.index ["business_type"], name: "index_exam_appointments_on_business_type"
-    t.index ["company_id"], name: "index_exam_appointments_on_company_id"
-    t.index ["discarded_at"], name: "index_exam_appointments_on_discarded_at"
-    t.index ["exam_id"], name: "index_exam_appointments_on_exam_id"
-    t.index ["lifecycle_status"], name: "index_exam_appointments_on_lifecycle_status"
-    t.index ["workflow_status"], name: "index_exam_appointments_on_workflow_status"
+    t.index ["business_type"], name: "index_exam_group_tag_appointments_on_business_type"
+    t.index ["company_id", "exam_group_id", "tag_id"], name: "idx_exam_group_tag_appointments_uniq", unique: true
+    t.index ["company_id"], name: "index_exam_group_tag_appointments_on_company_id"
+    t.index ["discarded_at"], name: "index_exam_group_tag_appointments_on_discarded_at"
+    t.index ["exam_group_id"], name: "index_exam_group_tag_appointments_on_exam_group_id"
+    t.index ["lifecycle_status"], name: "index_exam_group_tag_appointments_on_lifecycle_status"
+    t.index ["tag_id"], name: "index_exam_group_tag_appointments_on_tag_id"
+    t.index ["workflow_status"], name: "index_exam_group_tag_appointments_on_workflow_status"
   end
 
   create_table "exam_groups", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
@@ -2088,6 +3206,33 @@ ActiveRecord::Schema[8.0].define(version: 2026_09_22_000002) do
     t.index ["lifecycle_status"], name: "index_exam_groups_on_lifecycle_status"
     t.index ["property_mapping_id"], name: "index_exam_groups_on_property_mapping_id"
     t.index ["workflow_status"], name: "index_exam_groups_on_workflow_status"
+  end
+
+  create_table "exam_tag_appointments", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
+    t.uuid "company_id", null: false
+    t.uuid "exam_id", null: false
+    t.uuid "tag_id", null: false
+    t.string "value"
+    t.string "name"
+    t.string "description"
+    t.string "code"
+    t.integer "lifecycle_status"
+    t.integer "workflow_status"
+    t.integer "business_type"
+    t.datetime "expiration_date"
+    t.jsonb "metadata"
+    t.datetime "discarded_at"
+    t.string "permission_resource_name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["business_type"], name: "index_exam_tag_appointments_on_business_type"
+    t.index ["company_id", "exam_id", "tag_id"], name: "idx_exam_tag_appointments_uniq", unique: true
+    t.index ["company_id"], name: "index_exam_tag_appointments_on_company_id"
+    t.index ["discarded_at"], name: "index_exam_tag_appointments_on_discarded_at"
+    t.index ["exam_id"], name: "index_exam_tag_appointments_on_exam_id"
+    t.index ["lifecycle_status"], name: "index_exam_tag_appointments_on_lifecycle_status"
+    t.index ["tag_id"], name: "index_exam_tag_appointments_on_tag_id"
+    t.index ["workflow_status"], name: "index_exam_tag_appointments_on_workflow_status"
   end
 
   create_table "exams", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
@@ -2213,17 +3358,10 @@ ActiveRecord::Schema[8.0].define(version: 2026_09_22_000002) do
     t.index ["workflow_status"], name: "index_facilities_on_workflow_status"
   end
 
-  create_table "facility_appointments", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
+  create_table "facility_facility_group_appointments", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
     t.uuid "company_id", null: false
     t.uuid "facility_id", null: false
-    t.string "appoint_from_type"
-    t.uuid "appoint_from_id"
-    t.string "appoint_to_type", null: false
-    t.uuid "appoint_to_id", null: false
-    t.string "appoint_for_type"
-    t.uuid "appoint_for_id"
-    t.string "appoint_by_type"
-    t.uuid "appoint_by_id"
+    t.uuid "facility_group_id", null: false
     t.string "name"
     t.string "description"
     t.string "code"
@@ -2236,30 +3374,21 @@ ActiveRecord::Schema[8.0].define(version: 2026_09_22_000002) do
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["appoint_by_type", "appoint_by_id"], name: "index_facility_appointments_on_appoint_by"
-    t.index ["appoint_for_type", "appoint_for_id"], name: "index_facility_appointments_on_appoint_for"
-    t.index ["appoint_from_type", "appoint_from_id"], name: "index_facility_appointments_on_appoint_from"
-    t.index ["appoint_to_type", "appoint_to_id"], name: "idx_on_appoint_to_type_appoint_to_id_b7dff614b7"
-    t.index ["appoint_to_type", "appoint_to_id"], name: "index_facility_appointments_on_appoint_to"
-    t.index ["business_type"], name: "index_facility_appointments_on_business_type"
-    t.index ["company_id"], name: "index_facility_appointments_on_company_id"
-    t.index ["discarded_at"], name: "index_facility_appointments_on_discarded_at"
-    t.index ["facility_id"], name: "index_facility_appointments_on_facility_id"
-    t.index ["lifecycle_status"], name: "index_facility_appointments_on_lifecycle_status"
-    t.index ["workflow_status"], name: "index_facility_appointments_on_workflow_status"
+    t.index ["business_type"], name: "index_facility_facility_group_appointments_on_business_type"
+    t.index ["company_id", "facility_id", "facility_group_id"], name: "idx_facility_facility_group_appointments_uniq", unique: true
+    t.index ["company_id"], name: "index_facility_facility_group_appointments_on_company_id"
+    t.index ["discarded_at"], name: "index_facility_facility_group_appointments_on_discarded_at"
+    t.index ["facility_group_id"], name: "idx_on_facility_group_id_5bb31414b7"
+    t.index ["facility_id"], name: "index_facility_facility_group_appointments_on_facility_id"
+    t.index ["lifecycle_status"], name: "index_facility_facility_group_appointments_on_lifecycle_status"
+    t.index ["workflow_status"], name: "index_facility_facility_group_appointments_on_workflow_status"
   end
 
-  create_table "facility_group_appointments", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
+  create_table "facility_group_tag_appointments", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
     t.uuid "company_id", null: false
     t.uuid "facility_group_id", null: false
-    t.string "appoint_from_type"
-    t.uuid "appoint_from_id"
-    t.string "appoint_to_type", null: false
-    t.uuid "appoint_to_id", null: false
-    t.string "appoint_for_type"
-    t.uuid "appoint_for_id"
-    t.string "appoint_by_type"
-    t.uuid "appoint_by_id"
+    t.uuid "tag_id", null: false
+    t.string "value"
     t.string "name"
     t.string "description"
     t.string "code"
@@ -2272,17 +3401,14 @@ ActiveRecord::Schema[8.0].define(version: 2026_09_22_000002) do
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["appoint_by_type", "appoint_by_id"], name: "index_facility_group_appointments_on_appoint_by"
-    t.index ["appoint_for_type", "appoint_for_id"], name: "index_facility_group_appointments_on_appoint_for"
-    t.index ["appoint_from_type", "appoint_from_id"], name: "index_facility_group_appointments_on_appoint_from"
-    t.index ["appoint_to_type", "appoint_to_id"], name: "idx_on_appoint_to_type_appoint_to_id_ebef229bea"
-    t.index ["appoint_to_type", "appoint_to_id"], name: "index_facility_group_appointments_on_appoint_to"
-    t.index ["business_type"], name: "index_facility_group_appointments_on_business_type"
-    t.index ["company_id"], name: "index_facility_group_appointments_on_company_id"
-    t.index ["discarded_at"], name: "index_facility_group_appointments_on_discarded_at"
-    t.index ["facility_group_id"], name: "index_facility_group_appointments_on_facility_group_id"
-    t.index ["lifecycle_status"], name: "index_facility_group_appointments_on_lifecycle_status"
-    t.index ["workflow_status"], name: "index_facility_group_appointments_on_workflow_status"
+    t.index ["business_type"], name: "index_facility_group_tag_appointments_on_business_type"
+    t.index ["company_id", "facility_group_id", "tag_id"], name: "idx_facility_group_tag_appointments_uniq", unique: true
+    t.index ["company_id"], name: "index_facility_group_tag_appointments_on_company_id"
+    t.index ["discarded_at"], name: "index_facility_group_tag_appointments_on_discarded_at"
+    t.index ["facility_group_id"], name: "index_facility_group_tag_appointments_on_facility_group_id"
+    t.index ["lifecycle_status"], name: "index_facility_group_tag_appointments_on_lifecycle_status"
+    t.index ["tag_id"], name: "index_facility_group_tag_appointments_on_tag_id"
+    t.index ["workflow_status"], name: "index_facility_group_tag_appointments_on_workflow_status"
   end
 
   create_table "facility_groups", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
@@ -2377,6 +3503,60 @@ ActiveRecord::Schema[8.0].define(version: 2026_09_22_000002) do
     t.index ["lifecycle_status"], name: "index_facility_groups_on_lifecycle_status"
     t.index ["property_mapping_id"], name: "index_facility_groups_on_property_mapping_id"
     t.index ["workflow_status"], name: "index_facility_groups_on_workflow_status"
+  end
+
+  create_table "facility_tag_appointments", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
+    t.uuid "company_id", null: false
+    t.uuid "facility_id", null: false
+    t.uuid "tag_id", null: false
+    t.string "value"
+    t.string "name"
+    t.string "description"
+    t.string "code"
+    t.integer "lifecycle_status"
+    t.integer "workflow_status"
+    t.integer "business_type"
+    t.datetime "expiration_date"
+    t.jsonb "metadata"
+    t.datetime "discarded_at"
+    t.string "permission_resource_name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["business_type"], name: "index_facility_tag_appointments_on_business_type"
+    t.index ["company_id", "facility_id", "tag_id"], name: "idx_facility_tag_appointments_uniq", unique: true
+    t.index ["company_id"], name: "index_facility_tag_appointments_on_company_id"
+    t.index ["discarded_at"], name: "index_facility_tag_appointments_on_discarded_at"
+    t.index ["facility_id"], name: "index_facility_tag_appointments_on_facility_id"
+    t.index ["lifecycle_status"], name: "index_facility_tag_appointments_on_lifecycle_status"
+    t.index ["tag_id"], name: "index_facility_tag_appointments_on_tag_id"
+    t.index ["workflow_status"], name: "index_facility_tag_appointments_on_workflow_status"
+  end
+
+  create_table "invoice_tag_appointments", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
+    t.uuid "company_id", null: false
+    t.uuid "invoice_id", null: false
+    t.uuid "tag_id", null: false
+    t.string "value"
+    t.string "name"
+    t.string "description"
+    t.string "code"
+    t.integer "lifecycle_status"
+    t.integer "workflow_status"
+    t.integer "business_type"
+    t.datetime "expiration_date"
+    t.jsonb "metadata"
+    t.datetime "discarded_at"
+    t.string "permission_resource_name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["business_type"], name: "index_invoice_tag_appointments_on_business_type"
+    t.index ["company_id", "invoice_id", "tag_id"], name: "idx_invoice_tag_appointments_uniq", unique: true
+    t.index ["company_id"], name: "index_invoice_tag_appointments_on_company_id"
+    t.index ["discarded_at"], name: "index_invoice_tag_appointments_on_discarded_at"
+    t.index ["invoice_id"], name: "index_invoice_tag_appointments_on_invoice_id"
+    t.index ["lifecycle_status"], name: "index_invoice_tag_appointments_on_lifecycle_status"
+    t.index ["tag_id"], name: "index_invoice_tag_appointments_on_tag_id"
+    t.index ["workflow_status"], name: "index_invoice_tag_appointments_on_workflow_status"
   end
 
   create_table "invoices", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
@@ -2478,42 +3658,6 @@ ActiveRecord::Schema[8.0].define(version: 2026_09_22_000002) do
     t.index ["workflow_status"], name: "index_invoices_on_workflow_status"
   end
 
-  create_table "membership_appointments", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
-    t.uuid "company_id", null: false
-    t.uuid "membership_id", null: false
-    t.string "appoint_from_type"
-    t.uuid "appoint_from_id"
-    t.string "appoint_to_type", null: false
-    t.uuid "appoint_to_id", null: false
-    t.string "appoint_for_type"
-    t.uuid "appoint_for_id"
-    t.string "appoint_by_type"
-    t.uuid "appoint_by_id"
-    t.string "name"
-    t.string "description"
-    t.string "code"
-    t.integer "lifecycle_status"
-    t.integer "workflow_status"
-    t.integer "business_type"
-    t.datetime "expiration_date"
-    t.jsonb "metadata"
-    t.datetime "discarded_at"
-    t.string "permission_resource_name"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.index ["appoint_by_type", "appoint_by_id"], name: "index_membership_appointments_on_appoint_by"
-    t.index ["appoint_for_type", "appoint_for_id"], name: "index_membership_appointments_on_appoint_for"
-    t.index ["appoint_from_type", "appoint_from_id"], name: "index_membership_appointments_on_appoint_from"
-    t.index ["appoint_to_type", "appoint_to_id"], name: "idx_on_appoint_to_type_appoint_to_id_92c11e8cbf"
-    t.index ["appoint_to_type", "appoint_to_id"], name: "index_membership_appointments_on_appoint_to"
-    t.index ["business_type"], name: "index_membership_appointments_on_business_type"
-    t.index ["company_id"], name: "index_membership_appointments_on_company_id"
-    t.index ["discarded_at"], name: "index_membership_appointments_on_discarded_at"
-    t.index ["lifecycle_status"], name: "index_membership_appointments_on_lifecycle_status"
-    t.index ["membership_id"], name: "index_membership_appointments_on_membership_id"
-    t.index ["workflow_status"], name: "index_membership_appointments_on_workflow_status"
-  end
-
   create_table "memberships", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
     t.uuid "company_id", null: false
     t.uuid "branch_id"
@@ -2608,53 +3752,11 @@ ActiveRecord::Schema[8.0].define(version: 2026_09_22_000002) do
     t.index ["workflow_status"], name: "index_memberships_on_workflow_status"
   end
 
-  create_table "notification_appointments", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
-    t.uuid "company_id", null: false
-    t.uuid "notification_id", null: false
-    t.string "appoint_from_type"
-    t.uuid "appoint_from_id"
-    t.string "appoint_to_type", null: false
-    t.uuid "appoint_to_id", null: false
-    t.string "appoint_for_type"
-    t.uuid "appoint_for_id"
-    t.string "appoint_by_type"
-    t.uuid "appoint_by_id"
-    t.string "name"
-    t.string "description"
-    t.string "code"
-    t.integer "lifecycle_status"
-    t.integer "workflow_status"
-    t.integer "business_type"
-    t.datetime "expiration_date"
-    t.jsonb "metadata"
-    t.datetime "discarded_at"
-    t.string "permission_resource_name"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.index ["appoint_by_type", "appoint_by_id"], name: "index_notification_appointments_on_appoint_by"
-    t.index ["appoint_for_type", "appoint_for_id"], name: "index_notification_appointments_on_appoint_for"
-    t.index ["appoint_from_type", "appoint_from_id"], name: "index_notification_appointments_on_appoint_from"
-    t.index ["appoint_to_type", "appoint_to_id"], name: "idx_on_appoint_to_type_appoint_to_id_26a28b0bfc"
-    t.index ["appoint_to_type", "appoint_to_id"], name: "index_notification_appointments_on_appoint_to"
-    t.index ["business_type"], name: "index_notification_appointments_on_business_type"
-    t.index ["company_id"], name: "index_notification_appointments_on_company_id"
-    t.index ["discarded_at"], name: "index_notification_appointments_on_discarded_at"
-    t.index ["lifecycle_status"], name: "index_notification_appointments_on_lifecycle_status"
-    t.index ["notification_id"], name: "index_notification_appointments_on_notification_id"
-    t.index ["workflow_status"], name: "index_notification_appointments_on_workflow_status"
-  end
-
-  create_table "notification_group_appointments", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
+  create_table "notification_group_tag_appointments", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
     t.uuid "company_id", null: false
     t.uuid "notification_group_id", null: false
-    t.string "appoint_from_type"
-    t.uuid "appoint_from_id"
-    t.string "appoint_to_type", null: false
-    t.uuid "appoint_to_id", null: false
-    t.string "appoint_for_type"
-    t.uuid "appoint_for_id"
-    t.string "appoint_by_type"
-    t.uuid "appoint_by_id"
+    t.uuid "tag_id", null: false
+    t.string "value"
     t.string "name"
     t.string "description"
     t.string "code"
@@ -2667,17 +3769,14 @@ ActiveRecord::Schema[8.0].define(version: 2026_09_22_000002) do
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["appoint_by_type", "appoint_by_id"], name: "index_notification_group_appointments_on_appoint_by"
-    t.index ["appoint_for_type", "appoint_for_id"], name: "index_notification_group_appointments_on_appoint_for"
-    t.index ["appoint_from_type", "appoint_from_id"], name: "index_notification_group_appointments_on_appoint_from"
-    t.index ["appoint_to_type", "appoint_to_id"], name: "idx_on_appoint_to_type_appoint_to_id_8f6e8f37c0"
-    t.index ["appoint_to_type", "appoint_to_id"], name: "index_notification_group_appointments_on_appoint_to"
-    t.index ["business_type"], name: "index_notification_group_appointments_on_business_type"
-    t.index ["company_id"], name: "index_notification_group_appointments_on_company_id"
-    t.index ["discarded_at"], name: "index_notification_group_appointments_on_discarded_at"
-    t.index ["lifecycle_status"], name: "index_notification_group_appointments_on_lifecycle_status"
-    t.index ["notification_group_id"], name: "index_notification_group_appointments_on_notification_group_id"
-    t.index ["workflow_status"], name: "index_notification_group_appointments_on_workflow_status"
+    t.index ["business_type"], name: "index_notification_group_tag_appointments_on_business_type"
+    t.index ["company_id", "notification_group_id", "tag_id"], name: "idx_notification_group_tag_appointments_uniq", unique: true
+    t.index ["company_id"], name: "index_notification_group_tag_appointments_on_company_id"
+    t.index ["discarded_at"], name: "index_notification_group_tag_appointments_on_discarded_at"
+    t.index ["lifecycle_status"], name: "index_notification_group_tag_appointments_on_lifecycle_status"
+    t.index ["notification_group_id"], name: "idx_on_notification_group_id_b8154f78c0"
+    t.index ["tag_id"], name: "index_notification_group_tag_appointments_on_tag_id"
+    t.index ["workflow_status"], name: "index_notification_group_tag_appointments_on_workflow_status"
   end
 
   create_table "notification_groups", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
@@ -2712,6 +3811,33 @@ ActiveRecord::Schema[8.0].define(version: 2026_09_22_000002) do
     t.index ["lifecycle_status"], name: "index_notification_groups_on_lifecycle_status"
     t.index ["property_mapping_id"], name: "index_notification_groups_on_property_mapping_id"
     t.index ["workflow_status"], name: "index_notification_groups_on_workflow_status"
+  end
+
+  create_table "notification_tag_appointments", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
+    t.uuid "company_id", null: false
+    t.uuid "notification_id", null: false
+    t.uuid "tag_id", null: false
+    t.string "value"
+    t.string "name"
+    t.string "description"
+    t.string "code"
+    t.integer "lifecycle_status"
+    t.integer "workflow_status"
+    t.integer "business_type"
+    t.datetime "expiration_date"
+    t.jsonb "metadata"
+    t.datetime "discarded_at"
+    t.string "permission_resource_name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["business_type"], name: "index_notification_tag_appointments_on_business_type"
+    t.index ["company_id", "notification_id", "tag_id"], name: "idx_notification_tag_appointments_uniq", unique: true
+    t.index ["company_id"], name: "index_notification_tag_appointments_on_company_id"
+    t.index ["discarded_at"], name: "index_notification_tag_appointments_on_discarded_at"
+    t.index ["lifecycle_status"], name: "index_notification_tag_appointments_on_lifecycle_status"
+    t.index ["notification_id"], name: "index_notification_tag_appointments_on_notification_id"
+    t.index ["tag_id"], name: "index_notification_tag_appointments_on_tag_id"
+    t.index ["workflow_status"], name: "index_notification_tag_appointments_on_workflow_status"
   end
 
   create_table "notifications", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
@@ -2750,59 +3876,11 @@ ActiveRecord::Schema[8.0].define(version: 2026_09_22_000002) do
     t.index ["workflow_status"], name: "index_notifications_on_workflow_status"
   end
 
-  create_table "order_appointments", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
-    t.uuid "company_id", null: false
-    t.uuid "order_id", null: false
-    t.string "appoint_from_type"
-    t.uuid "appoint_from_id"
-    t.string "appoint_to_type", null: false
-    t.uuid "appoint_to_id", null: false
-    t.string "appoint_for_type"
-    t.uuid "appoint_for_id"
-    t.string "appoint_by_type"
-    t.uuid "appoint_by_id"
-    t.decimal "unit_price"
-    t.integer "quantity"
-    t.decimal "total_price"
-    t.string "name"
-    t.string "description"
-    t.string "code"
-    t.integer "lifecycle_status"
-    t.integer "workflow_status"
-    t.integer "business_type"
-    t.datetime "expiration_date"
-    t.jsonb "metadata"
-    t.datetime "discarded_at"
-    t.string "permission_resource_name"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.index ["appoint_by_type", "appoint_by_id"], name: "index_order_appointments_on_appoint_by"
-    t.index ["appoint_for_type", "appoint_for_id"], name: "index_order_appointments_on_appoint_for"
-    t.index ["appoint_from_type", "appoint_from_id"], name: "index_order_appointments_on_appoint_from"
-    t.index ["appoint_to_type", "appoint_to_id"], name: "index_order_appointments_on_appoint_to"
-    t.index ["appoint_to_type", "appoint_to_id"], name: "index_order_appointments_on_appoint_to_type_and_appoint_to_id"
-    t.index ["business_type"], name: "index_order_appointments_on_business_type"
-    t.index ["company_id"], name: "index_order_appointments_on_company_id"
-    t.index ["discarded_at"], name: "index_order_appointments_on_discarded_at"
-    t.index ["lifecycle_status"], name: "index_order_appointments_on_lifecycle_status"
-    t.index ["order_id"], name: "index_order_appointments_on_order_id"
-    t.index ["workflow_status"], name: "index_order_appointments_on_workflow_status"
-  end
-
-  create_table "order_group_appointments", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
+  create_table "order_group_tag_appointments", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
     t.uuid "company_id", null: false
     t.uuid "order_group_id", null: false
-    t.string "appoint_from_type"
-    t.uuid "appoint_from_id"
-    t.string "appoint_to_type", null: false
-    t.uuid "appoint_to_id", null: false
-    t.string "appoint_for_type"
-    t.uuid "appoint_for_id"
-    t.string "appoint_by_type"
-    t.uuid "appoint_by_id"
-    t.decimal "unit_price"
-    t.integer "quantity"
-    t.decimal "total_price"
+    t.uuid "tag_id", null: false
+    t.string "value"
     t.string "name"
     t.string "description"
     t.string "code"
@@ -2815,17 +3893,14 @@ ActiveRecord::Schema[8.0].define(version: 2026_09_22_000002) do
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["appoint_by_type", "appoint_by_id"], name: "index_order_group_appointments_on_appoint_by"
-    t.index ["appoint_for_type", "appoint_for_id"], name: "index_order_group_appointments_on_appoint_for"
-    t.index ["appoint_from_type", "appoint_from_id"], name: "index_order_group_appointments_on_appoint_from"
-    t.index ["appoint_to_type", "appoint_to_id"], name: "idx_on_appoint_to_type_appoint_to_id_1438b68413"
-    t.index ["appoint_to_type", "appoint_to_id"], name: "index_order_group_appointments_on_appoint_to"
-    t.index ["business_type"], name: "index_order_group_appointments_on_business_type"
-    t.index ["company_id"], name: "index_order_group_appointments_on_company_id"
-    t.index ["discarded_at"], name: "index_order_group_appointments_on_discarded_at"
-    t.index ["lifecycle_status"], name: "index_order_group_appointments_on_lifecycle_status"
-    t.index ["order_group_id"], name: "index_order_group_appointments_on_order_group_id"
-    t.index ["workflow_status"], name: "index_order_group_appointments_on_workflow_status"
+    t.index ["business_type"], name: "index_order_group_tag_appointments_on_business_type"
+    t.index ["company_id", "order_group_id", "tag_id"], name: "idx_order_group_tag_appointments_uniq", unique: true
+    t.index ["company_id"], name: "index_order_group_tag_appointments_on_company_id"
+    t.index ["discarded_at"], name: "index_order_group_tag_appointments_on_discarded_at"
+    t.index ["lifecycle_status"], name: "index_order_group_tag_appointments_on_lifecycle_status"
+    t.index ["order_group_id"], name: "index_order_group_tag_appointments_on_order_group_id"
+    t.index ["tag_id"], name: "index_order_group_tag_appointments_on_tag_id"
+    t.index ["workflow_status"], name: "index_order_group_tag_appointments_on_workflow_status"
   end
 
   create_table "order_groups", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
@@ -2922,6 +3997,178 @@ ActiveRecord::Schema[8.0].define(version: 2026_09_22_000002) do
     t.index ["lifecycle_status"], name: "index_order_groups_on_lifecycle_status"
     t.index ["property_mapping_id"], name: "index_order_groups_on_property_mapping_id"
     t.index ["workflow_status"], name: "index_order_groups_on_workflow_status"
+  end
+
+  create_table "order_product_appointments", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
+    t.uuid "company_id", null: false
+    t.uuid "order_id", null: false
+    t.uuid "product_id", null: false
+    t.decimal "unit_price"
+    t.integer "quantity"
+    t.decimal "total_price"
+    t.string "name"
+    t.string "description"
+    t.string "code"
+    t.integer "lifecycle_status"
+    t.integer "workflow_status"
+    t.integer "business_type"
+    t.datetime "expiration_date"
+    t.jsonb "metadata"
+    t.datetime "discarded_at"
+    t.string "permission_resource_name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["business_type"], name: "index_order_product_appointments_on_business_type"
+    t.index ["company_id", "order_id", "product_id"], name: "idx_order_product_appointments_triple"
+    t.index ["company_id"], name: "index_order_product_appointments_on_company_id"
+    t.index ["discarded_at"], name: "index_order_product_appointments_on_discarded_at"
+    t.index ["lifecycle_status"], name: "index_order_product_appointments_on_lifecycle_status"
+    t.index ["order_id"], name: "index_order_product_appointments_on_order_id"
+    t.index ["product_id"], name: "index_order_product_appointments_on_product_id"
+    t.index ["workflow_status"], name: "index_order_product_appointments_on_workflow_status"
+  end
+
+  create_table "order_product_group_appointments", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
+    t.uuid "company_id", null: false
+    t.uuid "order_id", null: false
+    t.uuid "product_group_id", null: false
+    t.decimal "unit_price"
+    t.integer "quantity"
+    t.decimal "total_price"
+    t.string "name"
+    t.string "description"
+    t.string "code"
+    t.integer "lifecycle_status"
+    t.integer "workflow_status"
+    t.integer "business_type"
+    t.datetime "expiration_date"
+    t.jsonb "metadata"
+    t.datetime "discarded_at"
+    t.string "permission_resource_name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["business_type"], name: "index_order_product_group_appointments_on_business_type"
+    t.index ["company_id", "order_id", "product_group_id"], name: "idx_order_product_group_appointments_triple"
+    t.index ["company_id"], name: "index_order_product_group_appointments_on_company_id"
+    t.index ["discarded_at"], name: "index_order_product_group_appointments_on_discarded_at"
+    t.index ["lifecycle_status"], name: "index_order_product_group_appointments_on_lifecycle_status"
+    t.index ["order_id"], name: "index_order_product_group_appointments_on_order_id"
+    t.index ["product_group_id"], name: "index_order_product_group_appointments_on_product_group_id"
+    t.index ["workflow_status"], name: "index_order_product_group_appointments_on_workflow_status"
+  end
+
+  create_table "order_service_appointments", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
+    t.uuid "company_id", null: false
+    t.uuid "order_id", null: false
+    t.uuid "service_id", null: false
+    t.decimal "unit_price"
+    t.integer "quantity"
+    t.decimal "total_price"
+    t.string "name"
+    t.string "description"
+    t.string "code"
+    t.integer "lifecycle_status"
+    t.integer "workflow_status"
+    t.integer "business_type"
+    t.datetime "expiration_date"
+    t.jsonb "metadata"
+    t.datetime "discarded_at"
+    t.string "permission_resource_name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["business_type"], name: "index_order_service_appointments_on_business_type"
+    t.index ["company_id", "order_id", "service_id"], name: "idx_order_service_appointments_triple"
+    t.index ["company_id"], name: "index_order_service_appointments_on_company_id"
+    t.index ["discarded_at"], name: "index_order_service_appointments_on_discarded_at"
+    t.index ["lifecycle_status"], name: "index_order_service_appointments_on_lifecycle_status"
+    t.index ["order_id"], name: "index_order_service_appointments_on_order_id"
+    t.index ["service_id"], name: "index_order_service_appointments_on_service_id"
+    t.index ["workflow_status"], name: "index_order_service_appointments_on_workflow_status"
+  end
+
+  create_table "order_service_group_appointments", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
+    t.uuid "company_id", null: false
+    t.uuid "order_id", null: false
+    t.uuid "service_group_id", null: false
+    t.decimal "unit_price"
+    t.integer "quantity"
+    t.decimal "total_price"
+    t.string "name"
+    t.string "description"
+    t.string "code"
+    t.integer "lifecycle_status"
+    t.integer "workflow_status"
+    t.integer "business_type"
+    t.datetime "expiration_date"
+    t.jsonb "metadata"
+    t.datetime "discarded_at"
+    t.string "permission_resource_name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["business_type"], name: "index_order_service_group_appointments_on_business_type"
+    t.index ["company_id", "order_id", "service_group_id"], name: "idx_order_service_group_appointments_triple"
+    t.index ["company_id"], name: "index_order_service_group_appointments_on_company_id"
+    t.index ["discarded_at"], name: "index_order_service_group_appointments_on_discarded_at"
+    t.index ["lifecycle_status"], name: "index_order_service_group_appointments_on_lifecycle_status"
+    t.index ["order_id"], name: "index_order_service_group_appointments_on_order_id"
+    t.index ["service_group_id"], name: "index_order_service_group_appointments_on_service_group_id"
+    t.index ["workflow_status"], name: "index_order_service_group_appointments_on_workflow_status"
+  end
+
+  create_table "order_subscription_plan_appointments", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
+    t.uuid "company_id", null: false
+    t.uuid "order_id", null: false
+    t.uuid "subscription_plan_id", null: false
+    t.decimal "unit_price"
+    t.integer "quantity"
+    t.decimal "total_price"
+    t.string "name"
+    t.string "description"
+    t.string "code"
+    t.integer "lifecycle_status"
+    t.integer "workflow_status"
+    t.integer "business_type"
+    t.datetime "expiration_date"
+    t.jsonb "metadata"
+    t.datetime "discarded_at"
+    t.string "permission_resource_name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["business_type"], name: "index_order_subscription_plan_appointments_on_business_type"
+    t.index ["company_id", "order_id", "subscription_plan_id"], name: "idx_order_subscription_plan_appointments_triple"
+    t.index ["company_id"], name: "index_order_subscription_plan_appointments_on_company_id"
+    t.index ["discarded_at"], name: "index_order_subscription_plan_appointments_on_discarded_at"
+    t.index ["lifecycle_status"], name: "index_order_subscription_plan_appointments_on_lifecycle_status"
+    t.index ["order_id"], name: "index_order_subscription_plan_appointments_on_order_id"
+    t.index ["subscription_plan_id"], name: "idx_on_subscription_plan_id_e7356e6fd3"
+    t.index ["workflow_status"], name: "index_order_subscription_plan_appointments_on_workflow_status"
+  end
+
+  create_table "order_tag_appointments", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
+    t.uuid "company_id", null: false
+    t.uuid "order_id", null: false
+    t.uuid "tag_id", null: false
+    t.string "value"
+    t.string "name"
+    t.string "description"
+    t.string "code"
+    t.integer "lifecycle_status"
+    t.integer "workflow_status"
+    t.integer "business_type"
+    t.datetime "expiration_date"
+    t.jsonb "metadata"
+    t.datetime "discarded_at"
+    t.string "permission_resource_name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["business_type"], name: "index_order_tag_appointments_on_business_type"
+    t.index ["company_id", "order_id", "tag_id"], name: "idx_order_tag_appointments_uniq", unique: true
+    t.index ["company_id"], name: "index_order_tag_appointments_on_company_id"
+    t.index ["discarded_at"], name: "index_order_tag_appointments_on_discarded_at"
+    t.index ["lifecycle_status"], name: "index_order_tag_appointments_on_lifecycle_status"
+    t.index ["order_id"], name: "index_order_tag_appointments_on_order_id"
+    t.index ["tag_id"], name: "index_order_tag_appointments_on_tag_id"
+    t.index ["workflow_status"], name: "index_order_tag_appointments_on_workflow_status"
   end
 
   create_table "orders", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
@@ -3055,45 +4302,6 @@ ActiveRecord::Schema[8.0].define(version: 2026_09_22_000002) do
     t.index ["workflow_status"], name: "index_pages_on_workflow_status"
   end
 
-  create_table "payment_method_appointments", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
-    t.uuid "company_id", null: false
-    t.uuid "payment_method_id", null: false
-    t.string "appoint_from_type"
-    t.uuid "appoint_from_id"
-    t.string "appoint_to_type", null: false
-    t.uuid "appoint_to_id", null: false
-    t.string "appoint_for_type"
-    t.uuid "appoint_for_id"
-    t.string "appoint_by_type"
-    t.uuid "appoint_by_id"
-    t.string "name"
-    t.string "description"
-    t.string "code"
-    t.string "merchant_number"
-    t.string "merchant_name"
-    t.string "merchant_id"
-    t.integer "lifecycle_status"
-    t.integer "workflow_status"
-    t.integer "business_type"
-    t.datetime "expiration_date"
-    t.jsonb "metadata"
-    t.datetime "discarded_at"
-    t.string "permission_resource_name"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.index ["appoint_by_type", "appoint_by_id"], name: "index_payment_method_appointments_on_appoint_by"
-    t.index ["appoint_for_type", "appoint_for_id"], name: "index_payment_method_appointments_on_appoint_for"
-    t.index ["appoint_from_type", "appoint_from_id"], name: "index_payment_method_appointments_on_appoint_from"
-    t.index ["appoint_to_type", "appoint_to_id"], name: "index_payment_method_appointments_on_appoint_to"
-    t.index ["business_type"], name: "index_payment_method_appointments_on_business_type"
-    t.index ["company_id"], name: "index_payment_method_appointments_on_company_id"
-    t.index ["discarded_at"], name: "index_payment_method_appointments_on_discarded_at"
-    t.index ["lifecycle_status"], name: "index_payment_method_appointments_on_lifecycle_status"
-    t.index ["payment_method_id", "company_id"], name: "idx_on_payment_method_id_company_id_8ff3d49954"
-    t.index ["payment_method_id"], name: "index_payment_method_appointments_on_payment_method_id"
-    t.index ["workflow_status"], name: "index_payment_method_appointments_on_workflow_status"
-  end
-
   create_table "payment_methods", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
     t.string "email"
     t.string "name"
@@ -3148,11 +4356,10 @@ ActiveRecord::Schema[8.0].define(version: 2026_09_22_000002) do
     t.index ["workflow_status"], name: "index_policies_on_workflow_status"
   end
 
-  create_table "policy_appointments", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
+  create_table "policy_role_appointments", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
     t.uuid "company_id", null: false
     t.uuid "policy_id", null: false
-    t.string "appoint_to_type", null: false
-    t.uuid "appoint_to_id", null: false
+    t.uuid "role_id", null: false
     t.string "name"
     t.string "description"
     t.string "code"
@@ -3165,63 +4372,21 @@ ActiveRecord::Schema[8.0].define(version: 2026_09_22_000002) do
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["appoint_to_type", "appoint_to_id"], name: "index_policy_appointments_on_appoint_to"
-    t.index ["appoint_to_type", "appoint_to_id"], name: "index_policy_appointments_on_appoint_to_type_and_appoint_to_id"
-    t.index ["business_type"], name: "index_policy_appointments_on_business_type"
-    t.index ["company_id"], name: "index_policy_appointments_on_company_id"
-    t.index ["discarded_at"], name: "index_policy_appointments_on_discarded_at"
-    t.index ["lifecycle_status"], name: "index_policy_appointments_on_lifecycle_status"
-    t.index ["policy_id"], name: "index_policy_appointments_on_policy_id"
-    t.index ["workflow_status"], name: "index_policy_appointments_on_workflow_status"
+    t.index ["business_type"], name: "index_policy_role_appointments_on_business_type"
+    t.index ["company_id", "policy_id", "role_id"], name: "idx_policy_role_appointments_uniq", unique: true
+    t.index ["company_id"], name: "index_policy_role_appointments_on_company_id"
+    t.index ["discarded_at"], name: "index_policy_role_appointments_on_discarded_at"
+    t.index ["lifecycle_status"], name: "index_policy_role_appointments_on_lifecycle_status"
+    t.index ["policy_id"], name: "index_policy_role_appointments_on_policy_id"
+    t.index ["role_id"], name: "index_policy_role_appointments_on_role_id"
+    t.index ["workflow_status"], name: "index_policy_role_appointments_on_workflow_status"
   end
 
-  create_table "product_appointments", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
-    t.uuid "company_id", null: false
-    t.uuid "product_id", null: false
-    t.string "appoint_from_type"
-    t.uuid "appoint_from_id"
-    t.string "appoint_to_type", null: false
-    t.uuid "appoint_to_id", null: false
-    t.string "appoint_for_type"
-    t.uuid "appoint_for_id"
-    t.string "appoint_by_type"
-    t.uuid "appoint_by_id"
-    t.string "name"
-    t.string "description"
-    t.string "code"
-    t.integer "lifecycle_status"
-    t.integer "workflow_status"
-    t.integer "business_type"
-    t.datetime "expiration_date"
-    t.jsonb "metadata"
-    t.datetime "discarded_at"
-    t.string "permission_resource_name"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.index ["appoint_by_type", "appoint_by_id"], name: "index_product_appointments_on_appoint_by"
-    t.index ["appoint_for_type", "appoint_for_id"], name: "index_product_appointments_on_appoint_for"
-    t.index ["appoint_from_type", "appoint_from_id"], name: "index_product_appointments_on_appoint_from"
-    t.index ["appoint_to_type", "appoint_to_id"], name: "idx_on_appoint_to_type_appoint_to_id_6dd1b90540"
-    t.index ["appoint_to_type", "appoint_to_id"], name: "index_product_appointments_on_appoint_to"
-    t.index ["business_type"], name: "index_product_appointments_on_business_type"
-    t.index ["company_id"], name: "index_product_appointments_on_company_id"
-    t.index ["discarded_at"], name: "index_product_appointments_on_discarded_at"
-    t.index ["lifecycle_status"], name: "index_product_appointments_on_lifecycle_status"
-    t.index ["product_id"], name: "index_product_appointments_on_product_id"
-    t.index ["workflow_status"], name: "index_product_appointments_on_workflow_status"
-  end
-
-  create_table "product_group_appointments", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
+  create_table "product_group_tag_appointments", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
     t.uuid "company_id", null: false
     t.uuid "product_group_id", null: false
-    t.string "appoint_from_type"
-    t.uuid "appoint_from_id"
-    t.string "appoint_to_type", null: false
-    t.uuid "appoint_to_id", null: false
-    t.string "appoint_for_type"
-    t.uuid "appoint_for_id"
-    t.string "appoint_by_type"
-    t.uuid "appoint_by_id"
+    t.uuid "tag_id", null: false
+    t.string "value"
     t.string "name"
     t.string "description"
     t.string "code"
@@ -3234,17 +4399,14 @@ ActiveRecord::Schema[8.0].define(version: 2026_09_22_000002) do
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["appoint_by_type", "appoint_by_id"], name: "index_product_group_appointments_on_appoint_by"
-    t.index ["appoint_for_type", "appoint_for_id"], name: "index_product_group_appointments_on_appoint_for"
-    t.index ["appoint_from_type", "appoint_from_id"], name: "index_product_group_appointments_on_appoint_from"
-    t.index ["appoint_to_type", "appoint_to_id"], name: "idx_on_appoint_to_type_appoint_to_id_53bf3d5444"
-    t.index ["appoint_to_type", "appoint_to_id"], name: "index_product_group_appointments_on_appoint_to"
-    t.index ["business_type"], name: "index_product_group_appointments_on_business_type"
-    t.index ["company_id"], name: "index_product_group_appointments_on_company_id"
-    t.index ["discarded_at"], name: "index_product_group_appointments_on_discarded_at"
-    t.index ["lifecycle_status"], name: "index_product_group_appointments_on_lifecycle_status"
-    t.index ["product_group_id"], name: "index_product_group_appointments_on_product_group_id"
-    t.index ["workflow_status"], name: "index_product_group_appointments_on_workflow_status"
+    t.index ["business_type"], name: "index_product_group_tag_appointments_on_business_type"
+    t.index ["company_id", "product_group_id", "tag_id"], name: "idx_product_group_tag_appointments_uniq", unique: true
+    t.index ["company_id"], name: "index_product_group_tag_appointments_on_company_id"
+    t.index ["discarded_at"], name: "index_product_group_tag_appointments_on_discarded_at"
+    t.index ["lifecycle_status"], name: "index_product_group_tag_appointments_on_lifecycle_status"
+    t.index ["product_group_id"], name: "index_product_group_tag_appointments_on_product_group_id"
+    t.index ["tag_id"], name: "index_product_group_tag_appointments_on_tag_id"
+    t.index ["workflow_status"], name: "index_product_group_tag_appointments_on_workflow_status"
   end
 
   create_table "product_groups", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
@@ -3339,6 +4501,59 @@ ActiveRecord::Schema[8.0].define(version: 2026_09_22_000002) do
     t.index ["lifecycle_status"], name: "index_product_groups_on_lifecycle_status"
     t.index ["property_mapping_id"], name: "index_product_groups_on_property_mapping_id"
     t.index ["workflow_status"], name: "index_product_groups_on_workflow_status"
+  end
+
+  create_table "product_product_group_appointments", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
+    t.uuid "company_id", null: false
+    t.uuid "product_id", null: false
+    t.uuid "product_group_id", null: false
+    t.string "name"
+    t.string "description"
+    t.string "code"
+    t.integer "lifecycle_status"
+    t.integer "workflow_status"
+    t.integer "business_type"
+    t.datetime "expiration_date"
+    t.jsonb "metadata"
+    t.datetime "discarded_at"
+    t.string "permission_resource_name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["business_type"], name: "index_product_product_group_appointments_on_business_type"
+    t.index ["company_id", "product_id", "product_group_id"], name: "idx_product_product_group_appointments_uniq", unique: true
+    t.index ["company_id"], name: "index_product_product_group_appointments_on_company_id"
+    t.index ["discarded_at"], name: "index_product_product_group_appointments_on_discarded_at"
+    t.index ["lifecycle_status"], name: "index_product_product_group_appointments_on_lifecycle_status"
+    t.index ["product_group_id"], name: "index_product_product_group_appointments_on_product_group_id"
+    t.index ["product_id"], name: "index_product_product_group_appointments_on_product_id"
+    t.index ["workflow_status"], name: "index_product_product_group_appointments_on_workflow_status"
+  end
+
+  create_table "product_tag_appointments", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
+    t.uuid "company_id", null: false
+    t.uuid "product_id", null: false
+    t.uuid "tag_id", null: false
+    t.string "value"
+    t.string "name"
+    t.string "description"
+    t.string "code"
+    t.integer "lifecycle_status"
+    t.integer "workflow_status"
+    t.integer "business_type"
+    t.datetime "expiration_date"
+    t.jsonb "metadata"
+    t.datetime "discarded_at"
+    t.string "permission_resource_name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["business_type"], name: "index_product_tag_appointments_on_business_type"
+    t.index ["company_id", "product_id", "tag_id"], name: "idx_product_tag_appointments_uniq", unique: true
+    t.index ["company_id"], name: "index_product_tag_appointments_on_company_id"
+    t.index ["discarded_at"], name: "index_product_tag_appointments_on_discarded_at"
+    t.index ["lifecycle_status"], name: "index_product_tag_appointments_on_lifecycle_status"
+    t.index ["product_id"], name: "index_product_tag_appointments_on_product_id"
+    t.index ["tag_id"], name: "index_product_tag_appointments_on_tag_id"
+    t.index ["workflow_status"], name: "index_product_tag_appointments_on_workflow_status"
   end
 
   create_table "products", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
@@ -3438,53 +4653,11 @@ ActiveRecord::Schema[8.0].define(version: 2026_09_22_000002) do
     t.index ["workflow_status"], name: "index_products_on_workflow_status"
   end
 
-  create_table "project_appointments", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
-    t.uuid "company_id", null: false
-    t.uuid "project_id", null: false
-    t.string "appoint_from_type"
-    t.uuid "appoint_from_id"
-    t.string "appoint_to_type", null: false
-    t.uuid "appoint_to_id", null: false
-    t.string "appoint_for_type"
-    t.uuid "appoint_for_id"
-    t.string "appoint_by_type"
-    t.uuid "appoint_by_id"
-    t.string "name"
-    t.string "description"
-    t.string "code"
-    t.integer "lifecycle_status"
-    t.integer "workflow_status"
-    t.integer "business_type"
-    t.datetime "expiration_date"
-    t.jsonb "metadata"
-    t.datetime "discarded_at"
-    t.string "permission_resource_name"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.index ["appoint_by_type", "appoint_by_id"], name: "index_project_appointments_on_appoint_by"
-    t.index ["appoint_for_type", "appoint_for_id"], name: "index_project_appointments_on_appoint_for"
-    t.index ["appoint_from_type", "appoint_from_id"], name: "index_project_appointments_on_appoint_from"
-    t.index ["appoint_to_type", "appoint_to_id"], name: "idx_on_appoint_to_type_appoint_to_id_eb5a8d66ff"
-    t.index ["appoint_to_type", "appoint_to_id"], name: "index_project_appointments_on_appoint_to"
-    t.index ["business_type"], name: "index_project_appointments_on_business_type"
-    t.index ["company_id"], name: "index_project_appointments_on_company_id"
-    t.index ["discarded_at"], name: "index_project_appointments_on_discarded_at"
-    t.index ["lifecycle_status"], name: "index_project_appointments_on_lifecycle_status"
-    t.index ["project_id"], name: "index_project_appointments_on_project_id"
-    t.index ["workflow_status"], name: "index_project_appointments_on_workflow_status"
-  end
-
-  create_table "project_group_appointments", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
+  create_table "project_group_tag_appointments", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
     t.uuid "company_id", null: false
     t.uuid "project_group_id", null: false
-    t.string "appoint_from_type"
-    t.uuid "appoint_from_id"
-    t.string "appoint_to_type", null: false
-    t.uuid "appoint_to_id", null: false
-    t.string "appoint_for_type"
-    t.uuid "appoint_for_id"
-    t.string "appoint_by_type"
-    t.uuid "appoint_by_id"
+    t.uuid "tag_id", null: false
+    t.string "value"
     t.string "name"
     t.string "description"
     t.string "code"
@@ -3497,17 +4670,14 @@ ActiveRecord::Schema[8.0].define(version: 2026_09_22_000002) do
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["appoint_by_type", "appoint_by_id"], name: "index_project_group_appointments_on_appoint_by"
-    t.index ["appoint_for_type", "appoint_for_id"], name: "index_project_group_appointments_on_appoint_for"
-    t.index ["appoint_from_type", "appoint_from_id"], name: "index_project_group_appointments_on_appoint_from"
-    t.index ["appoint_to_type", "appoint_to_id"], name: "idx_on_appoint_to_type_appoint_to_id_4c26e2a726"
-    t.index ["appoint_to_type", "appoint_to_id"], name: "index_project_group_appointments_on_appoint_to"
-    t.index ["business_type"], name: "index_project_group_appointments_on_business_type"
-    t.index ["company_id"], name: "index_project_group_appointments_on_company_id"
-    t.index ["discarded_at"], name: "index_project_group_appointments_on_discarded_at"
-    t.index ["lifecycle_status"], name: "index_project_group_appointments_on_lifecycle_status"
-    t.index ["project_group_id"], name: "index_project_group_appointments_on_project_group_id"
-    t.index ["workflow_status"], name: "index_project_group_appointments_on_workflow_status"
+    t.index ["business_type"], name: "index_project_group_tag_appointments_on_business_type"
+    t.index ["company_id", "project_group_id", "tag_id"], name: "idx_project_group_tag_appointments_uniq", unique: true
+    t.index ["company_id"], name: "index_project_group_tag_appointments_on_company_id"
+    t.index ["discarded_at"], name: "index_project_group_tag_appointments_on_discarded_at"
+    t.index ["lifecycle_status"], name: "index_project_group_tag_appointments_on_lifecycle_status"
+    t.index ["project_group_id"], name: "index_project_group_tag_appointments_on_project_group_id"
+    t.index ["tag_id"], name: "index_project_group_tag_appointments_on_tag_id"
+    t.index ["workflow_status"], name: "index_project_group_tag_appointments_on_workflow_status"
   end
 
   create_table "project_groups", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
@@ -3602,6 +4772,33 @@ ActiveRecord::Schema[8.0].define(version: 2026_09_22_000002) do
     t.index ["lifecycle_status"], name: "index_project_groups_on_lifecycle_status"
     t.index ["property_mapping_id"], name: "index_project_groups_on_property_mapping_id"
     t.index ["workflow_status"], name: "index_project_groups_on_workflow_status"
+  end
+
+  create_table "project_tag_appointments", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
+    t.uuid "company_id", null: false
+    t.uuid "project_id", null: false
+    t.uuid "tag_id", null: false
+    t.string "value"
+    t.string "name"
+    t.string "description"
+    t.string "code"
+    t.integer "lifecycle_status"
+    t.integer "workflow_status"
+    t.integer "business_type"
+    t.datetime "expiration_date"
+    t.jsonb "metadata"
+    t.datetime "discarded_at"
+    t.string "permission_resource_name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["business_type"], name: "index_project_tag_appointments_on_business_type"
+    t.index ["company_id", "project_id", "tag_id"], name: "idx_project_tag_appointments_uniq", unique: true
+    t.index ["company_id"], name: "index_project_tag_appointments_on_company_id"
+    t.index ["discarded_at"], name: "index_project_tag_appointments_on_discarded_at"
+    t.index ["lifecycle_status"], name: "index_project_tag_appointments_on_lifecycle_status"
+    t.index ["project_id"], name: "index_project_tag_appointments_on_project_id"
+    t.index ["tag_id"], name: "index_project_tag_appointments_on_tag_id"
+    t.index ["workflow_status"], name: "index_project_tag_appointments_on_workflow_status"
   end
 
   create_table "projects", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
@@ -3724,20 +4921,11 @@ ActiveRecord::Schema[8.0].define(version: 2026_09_22_000002) do
     t.index ["workflow_status"], name: "index_property_mappings_on_workflow_status"
   end
 
-  create_table "purchase_item_appointments", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
+  create_table "purchase_item_tag_appointments", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
     t.uuid "company_id", null: false
     t.uuid "purchase_item_id", null: false
-    t.string "appoint_from_type"
-    t.uuid "appoint_from_id"
-    t.string "appoint_to_type", null: false
-    t.uuid "appoint_to_id", null: false
-    t.string "appoint_for_type"
-    t.uuid "appoint_for_id"
-    t.string "appoint_by_type"
-    t.uuid "appoint_by_id"
-    t.integer "quantity"
-    t.decimal "unit_price"
-    t.decimal "total_price"
+    t.uuid "tag_id", null: false
+    t.string "value"
     t.string "name"
     t.string "description"
     t.string "code"
@@ -3750,16 +4938,14 @@ ActiveRecord::Schema[8.0].define(version: 2026_09_22_000002) do
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["appoint_by_type", "appoint_by_id"], name: "index_purchase_item_appointments_on_appoint_by"
-    t.index ["appoint_for_type", "appoint_for_id"], name: "index_purchase_item_appointments_on_appoint_for"
-    t.index ["appoint_from_type", "appoint_from_id"], name: "index_purchase_item_appointments_on_appoint_from"
-    t.index ["appoint_to_type", "appoint_to_id"], name: "index_purchase_item_appointments_on_appoint_to"
-    t.index ["business_type"], name: "index_purchase_item_appointments_on_business_type"
-    t.index ["company_id"], name: "index_purchase_item_appointments_on_company_id"
-    t.index ["discarded_at"], name: "index_purchase_item_appointments_on_discarded_at"
-    t.index ["lifecycle_status"], name: "index_purchase_item_appointments_on_lifecycle_status"
-    t.index ["purchase_item_id"], name: "index_purchase_item_appointments_on_purchase_item_id"
-    t.index ["workflow_status"], name: "index_purchase_item_appointments_on_workflow_status"
+    t.index ["business_type"], name: "index_purchase_item_tag_appointments_on_business_type"
+    t.index ["company_id", "purchase_item_id", "tag_id"], name: "idx_purchase_item_tag_appointments_uniq", unique: true
+    t.index ["company_id"], name: "index_purchase_item_tag_appointments_on_company_id"
+    t.index ["discarded_at"], name: "index_purchase_item_tag_appointments_on_discarded_at"
+    t.index ["lifecycle_status"], name: "index_purchase_item_tag_appointments_on_lifecycle_status"
+    t.index ["purchase_item_id"], name: "index_purchase_item_tag_appointments_on_purchase_item_id"
+    t.index ["tag_id"], name: "index_purchase_item_tag_appointments_on_tag_id"
+    t.index ["workflow_status"], name: "index_purchase_item_tag_appointments_on_workflow_status"
   end
 
   create_table "purchase_items", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
@@ -3848,6 +5034,62 @@ ActiveRecord::Schema[8.0].define(version: 2026_09_22_000002) do
     t.index ["lifecycle_status"], name: "index_purchase_items_on_lifecycle_status"
     t.index ["property_mapping_id"], name: "index_purchase_items_on_property_mapping_id"
     t.index ["workflow_status"], name: "index_purchase_items_on_workflow_status"
+  end
+
+  create_table "purchase_purchase_item_appointments", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
+    t.uuid "company_id", null: false
+    t.uuid "purchase_id", null: false
+    t.uuid "purchase_item_id", null: false
+    t.integer "quantity"
+    t.decimal "unit_price"
+    t.decimal "total_price"
+    t.string "name"
+    t.string "description"
+    t.string "code"
+    t.integer "lifecycle_status"
+    t.integer "workflow_status"
+    t.integer "business_type"
+    t.datetime "expiration_date"
+    t.jsonb "metadata"
+    t.datetime "discarded_at"
+    t.string "permission_resource_name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["business_type"], name: "index_purchase_purchase_item_appointments_on_business_type"
+    t.index ["company_id", "purchase_id", "purchase_item_id"], name: "idx_purchase_purchase_item_appointments_triple"
+    t.index ["company_id"], name: "index_purchase_purchase_item_appointments_on_company_id"
+    t.index ["discarded_at"], name: "index_purchase_purchase_item_appointments_on_discarded_at"
+    t.index ["lifecycle_status"], name: "index_purchase_purchase_item_appointments_on_lifecycle_status"
+    t.index ["purchase_id"], name: "index_purchase_purchase_item_appointments_on_purchase_id"
+    t.index ["purchase_item_id"], name: "index_purchase_purchase_item_appointments_on_purchase_item_id"
+    t.index ["workflow_status"], name: "index_purchase_purchase_item_appointments_on_workflow_status"
+  end
+
+  create_table "purchase_tag_appointments", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
+    t.uuid "company_id", null: false
+    t.uuid "purchase_id", null: false
+    t.uuid "tag_id", null: false
+    t.string "value"
+    t.string "name"
+    t.string "description"
+    t.string "code"
+    t.integer "lifecycle_status"
+    t.integer "workflow_status"
+    t.integer "business_type"
+    t.datetime "expiration_date"
+    t.jsonb "metadata"
+    t.datetime "discarded_at"
+    t.string "permission_resource_name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["business_type"], name: "index_purchase_tag_appointments_on_business_type"
+    t.index ["company_id", "purchase_id", "tag_id"], name: "idx_purchase_tag_appointments_uniq", unique: true
+    t.index ["company_id"], name: "index_purchase_tag_appointments_on_company_id"
+    t.index ["discarded_at"], name: "index_purchase_tag_appointments_on_discarded_at"
+    t.index ["lifecycle_status"], name: "index_purchase_tag_appointments_on_lifecycle_status"
+    t.index ["purchase_id"], name: "index_purchase_tag_appointments_on_purchase_id"
+    t.index ["tag_id"], name: "index_purchase_tag_appointments_on_tag_id"
+    t.index ["workflow_status"], name: "index_purchase_tag_appointments_on_workflow_status"
   end
 
   create_table "purchases", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
@@ -3946,6 +5188,33 @@ ActiveRecord::Schema[8.0].define(version: 2026_09_22_000002) do
     t.index ["workflow_step_id"], name: "index_purchases_on_workflow_step_id"
   end
 
+  create_table "question_tag_appointments", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
+    t.uuid "company_id", null: false
+    t.uuid "question_id", null: false
+    t.uuid "tag_id", null: false
+    t.string "value"
+    t.string "name"
+    t.string "description"
+    t.string "code"
+    t.integer "lifecycle_status"
+    t.integer "workflow_status"
+    t.integer "business_type"
+    t.datetime "expiration_date"
+    t.jsonb "metadata"
+    t.datetime "discarded_at"
+    t.string "permission_resource_name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["business_type"], name: "index_question_tag_appointments_on_business_type"
+    t.index ["company_id", "question_id", "tag_id"], name: "idx_question_tag_appointments_uniq", unique: true
+    t.index ["company_id"], name: "index_question_tag_appointments_on_company_id"
+    t.index ["discarded_at"], name: "index_question_tag_appointments_on_discarded_at"
+    t.index ["lifecycle_status"], name: "index_question_tag_appointments_on_lifecycle_status"
+    t.index ["question_id"], name: "index_question_tag_appointments_on_question_id"
+    t.index ["tag_id"], name: "index_question_tag_appointments_on_tag_id"
+    t.index ["workflow_status"], name: "index_question_tag_appointments_on_workflow_status"
+  end
+
   create_table "questions", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
     t.uuid "company_id", null: false
     t.uuid "branch_id"
@@ -3971,42 +5240,6 @@ ActiveRecord::Schema[8.0].define(version: 2026_09_22_000002) do
     t.index ["lifecycle_status"], name: "index_questions_on_lifecycle_status"
     t.index ["property_mapping_id"], name: "index_questions_on_property_mapping_id"
     t.index ["workflow_status"], name: "index_questions_on_workflow_status"
-  end
-
-  create_table "reservation_appointments", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
-    t.uuid "company_id", null: false
-    t.uuid "reservation_id", null: false
-    t.string "appoint_from_type"
-    t.uuid "appoint_from_id"
-    t.string "appoint_to_type", null: false
-    t.uuid "appoint_to_id", null: false
-    t.string "appoint_for_type"
-    t.uuid "appoint_for_id"
-    t.string "appoint_by_type"
-    t.uuid "appoint_by_id"
-    t.string "name"
-    t.string "description"
-    t.string "code"
-    t.integer "lifecycle_status"
-    t.integer "workflow_status"
-    t.integer "business_type"
-    t.datetime "expiration_date"
-    t.jsonb "metadata"
-    t.datetime "discarded_at"
-    t.string "permission_resource_name"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.index ["appoint_by_type", "appoint_by_id"], name: "index_reservation_appointments_on_appoint_by"
-    t.index ["appoint_for_type", "appoint_for_id"], name: "index_reservation_appointments_on_appoint_for"
-    t.index ["appoint_from_type", "appoint_from_id"], name: "index_reservation_appointments_on_appoint_from"
-    t.index ["appoint_to_type", "appoint_to_id"], name: "idx_on_appoint_to_type_appoint_to_id_fab15553a8"
-    t.index ["appoint_to_type", "appoint_to_id"], name: "index_reservation_appointments_on_appoint_to"
-    t.index ["business_type"], name: "index_reservation_appointments_on_business_type"
-    t.index ["company_id"], name: "index_reservation_appointments_on_company_id"
-    t.index ["discarded_at"], name: "index_reservation_appointments_on_discarded_at"
-    t.index ["lifecycle_status"], name: "index_reservation_appointments_on_lifecycle_status"
-    t.index ["reservation_id"], name: "index_reservation_appointments_on_reservation_id"
-    t.index ["workflow_status"], name: "index_reservation_appointments_on_workflow_status"
   end
 
   create_table "reservations", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
@@ -4103,11 +5336,11 @@ ActiveRecord::Schema[8.0].define(version: 2026_09_22_000002) do
     t.index ["workflow_status"], name: "index_reservations_on_workflow_status"
   end
 
-  create_table "role_appointments", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
+  create_table "role_tag_appointments", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
     t.uuid "company_id", null: false
     t.uuid "role_id", null: false
-    t.string "appoint_to_type", null: false
-    t.uuid "appoint_to_id", null: false
+    t.uuid "tag_id", null: false
+    t.string "value"
     t.string "name"
     t.string "description"
     t.string "code"
@@ -4120,14 +5353,14 @@ ActiveRecord::Schema[8.0].define(version: 2026_09_22_000002) do
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["appoint_to_type", "appoint_to_id"], name: "index_role_appointments_on_appoint_to"
-    t.index ["appoint_to_type", "appoint_to_id"], name: "index_role_appointments_on_appoint_to_type_and_appoint_to_id"
-    t.index ["business_type"], name: "index_role_appointments_on_business_type"
-    t.index ["company_id"], name: "index_role_appointments_on_company_id"
-    t.index ["discarded_at"], name: "index_role_appointments_on_discarded_at"
-    t.index ["lifecycle_status"], name: "index_role_appointments_on_lifecycle_status"
-    t.index ["role_id"], name: "index_role_appointments_on_role_id"
-    t.index ["workflow_status"], name: "index_role_appointments_on_workflow_status"
+    t.index ["business_type"], name: "index_role_tag_appointments_on_business_type"
+    t.index ["company_id", "role_id", "tag_id"], name: "idx_role_tag_appointments_uniq", unique: true
+    t.index ["company_id"], name: "index_role_tag_appointments_on_company_id"
+    t.index ["discarded_at"], name: "index_role_tag_appointments_on_discarded_at"
+    t.index ["lifecycle_status"], name: "index_role_tag_appointments_on_lifecycle_status"
+    t.index ["role_id"], name: "index_role_tag_appointments_on_role_id"
+    t.index ["tag_id"], name: "index_role_tag_appointments_on_tag_id"
+    t.index ["workflow_status"], name: "index_role_tag_appointments_on_workflow_status"
   end
 
   create_table "roles", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
@@ -4180,60 +5413,14 @@ ActiveRecord::Schema[8.0].define(version: 2026_09_22_000002) do
     t.index ["shift_template_id"], name: "index_scheduled_shifts_on_shift_template_id"
   end
 
-  create_table "service_appointments", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
-    t.uuid "company_id", null: false
-    t.uuid "service_id", null: false
-    t.string "appoint_from_type"
-    t.uuid "appoint_from_id"
-    t.string "appoint_to_type", null: false
-    t.uuid "appoint_to_id", null: false
-    t.string "appoint_for_type"
-    t.uuid "appoint_for_id"
-    t.string "appoint_by_type"
-    t.uuid "appoint_by_id"
-    t.string "name"
-    t.string "description"
-    t.string "code"
-    t.integer "duration"
-    t.datetime "start_at"
-    t.integer "lifecycle_status"
-    t.integer "workflow_status"
-    t.integer "business_type"
-    t.datetime "expiration_date"
-    t.jsonb "metadata"
-    t.datetime "discarded_at"
-    t.string "permission_resource_name"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.index ["appoint_by_type", "appoint_by_id"], name: "index_service_appointments_on_appoint_by"
-    t.index ["appoint_for_type", "appoint_for_id"], name: "index_service_appointments_on_appoint_for"
-    t.index ["appoint_from_type", "appoint_from_id"], name: "index_service_appointments_on_appoint_from"
-    t.index ["appoint_to_type", "appoint_to_id"], name: "idx_on_appoint_to_type_appoint_to_id_25f7912f5f"
-    t.index ["appoint_to_type", "appoint_to_id"], name: "index_service_appointments_on_appoint_to"
-    t.index ["business_type"], name: "index_service_appointments_on_business_type"
-    t.index ["company_id"], name: "index_service_appointments_on_company_id"
-    t.index ["discarded_at"], name: "index_service_appointments_on_discarded_at"
-    t.index ["lifecycle_status"], name: "index_service_appointments_on_lifecycle_status"
-    t.index ["service_id"], name: "index_service_appointments_on_service_id"
-    t.index ["workflow_status"], name: "index_service_appointments_on_workflow_status"
-  end
-
-  create_table "service_group_appointments", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
+  create_table "service_group_tag_appointments", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
     t.uuid "company_id", null: false
     t.uuid "service_group_id", null: false
-    t.string "appoint_from_type"
-    t.uuid "appoint_from_id"
-    t.string "appoint_to_type", null: false
-    t.uuid "appoint_to_id", null: false
-    t.string "appoint_for_type"
-    t.uuid "appoint_for_id"
-    t.string "appoint_by_type"
-    t.uuid "appoint_by_id"
+    t.uuid "tag_id", null: false
+    t.string "value"
     t.string "name"
     t.string "description"
     t.string "code"
-    t.integer "duration"
-    t.datetime "start_at"
     t.integer "lifecycle_status"
     t.integer "workflow_status"
     t.integer "business_type"
@@ -4243,17 +5430,14 @@ ActiveRecord::Schema[8.0].define(version: 2026_09_22_000002) do
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["appoint_by_type", "appoint_by_id"], name: "index_service_group_appointments_on_appoint_by"
-    t.index ["appoint_for_type", "appoint_for_id"], name: "index_service_group_appointments_on_appoint_for"
-    t.index ["appoint_from_type", "appoint_from_id"], name: "index_service_group_appointments_on_appoint_from"
-    t.index ["appoint_to_type", "appoint_to_id"], name: "idx_on_appoint_to_type_appoint_to_id_9e69225799"
-    t.index ["appoint_to_type", "appoint_to_id"], name: "index_service_group_appointments_on_appoint_to"
-    t.index ["business_type"], name: "index_service_group_appointments_on_business_type"
-    t.index ["company_id"], name: "index_service_group_appointments_on_company_id"
-    t.index ["discarded_at"], name: "index_service_group_appointments_on_discarded_at"
-    t.index ["lifecycle_status"], name: "index_service_group_appointments_on_lifecycle_status"
-    t.index ["service_group_id"], name: "index_service_group_appointments_on_service_group_id"
-    t.index ["workflow_status"], name: "index_service_group_appointments_on_workflow_status"
+    t.index ["business_type"], name: "index_service_group_tag_appointments_on_business_type"
+    t.index ["company_id", "service_group_id", "tag_id"], name: "idx_service_group_tag_appointments_uniq", unique: true
+    t.index ["company_id"], name: "index_service_group_tag_appointments_on_company_id"
+    t.index ["discarded_at"], name: "index_service_group_tag_appointments_on_discarded_at"
+    t.index ["lifecycle_status"], name: "index_service_group_tag_appointments_on_lifecycle_status"
+    t.index ["service_group_id"], name: "index_service_group_tag_appointments_on_service_group_id"
+    t.index ["tag_id"], name: "index_service_group_tag_appointments_on_tag_id"
+    t.index ["workflow_status"], name: "index_service_group_tag_appointments_on_workflow_status"
   end
 
   create_table "service_groups", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
@@ -4348,6 +5532,59 @@ ActiveRecord::Schema[8.0].define(version: 2026_09_22_000002) do
     t.index ["lifecycle_status"], name: "index_service_groups_on_lifecycle_status"
     t.index ["property_mapping_id"], name: "index_service_groups_on_property_mapping_id"
     t.index ["workflow_status"], name: "index_service_groups_on_workflow_status"
+  end
+
+  create_table "service_service_group_appointments", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
+    t.uuid "company_id", null: false
+    t.uuid "service_id", null: false
+    t.uuid "service_group_id", null: false
+    t.string "name"
+    t.string "description"
+    t.string "code"
+    t.integer "lifecycle_status"
+    t.integer "workflow_status"
+    t.integer "business_type"
+    t.datetime "expiration_date"
+    t.jsonb "metadata"
+    t.datetime "discarded_at"
+    t.string "permission_resource_name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["business_type"], name: "index_service_service_group_appointments_on_business_type"
+    t.index ["company_id", "service_id", "service_group_id"], name: "idx_service_service_group_appointments_uniq", unique: true
+    t.index ["company_id"], name: "index_service_service_group_appointments_on_company_id"
+    t.index ["discarded_at"], name: "index_service_service_group_appointments_on_discarded_at"
+    t.index ["lifecycle_status"], name: "index_service_service_group_appointments_on_lifecycle_status"
+    t.index ["service_group_id"], name: "index_service_service_group_appointments_on_service_group_id"
+    t.index ["service_id"], name: "index_service_service_group_appointments_on_service_id"
+    t.index ["workflow_status"], name: "index_service_service_group_appointments_on_workflow_status"
+  end
+
+  create_table "service_tag_appointments", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
+    t.uuid "company_id", null: false
+    t.uuid "service_id", null: false
+    t.uuid "tag_id", null: false
+    t.string "value"
+    t.string "name"
+    t.string "description"
+    t.string "code"
+    t.integer "lifecycle_status"
+    t.integer "workflow_status"
+    t.integer "business_type"
+    t.datetime "expiration_date"
+    t.jsonb "metadata"
+    t.datetime "discarded_at"
+    t.string "permission_resource_name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["business_type"], name: "index_service_tag_appointments_on_business_type"
+    t.index ["company_id", "service_id", "tag_id"], name: "idx_service_tag_appointments_uniq", unique: true
+    t.index ["company_id"], name: "index_service_tag_appointments_on_company_id"
+    t.index ["discarded_at"], name: "index_service_tag_appointments_on_discarded_at"
+    t.index ["lifecycle_status"], name: "index_service_tag_appointments_on_lifecycle_status"
+    t.index ["service_id"], name: "index_service_tag_appointments_on_service_id"
+    t.index ["tag_id"], name: "index_service_tag_appointments_on_tag_id"
+    t.index ["workflow_status"], name: "index_service_tag_appointments_on_workflow_status"
   end
 
   create_table "services", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
@@ -4457,53 +5694,11 @@ ActiveRecord::Schema[8.0].define(version: 2026_09_22_000002) do
     t.index ["user_id"], name: "index_sessions_on_user_id"
   end
 
-  create_table "setting_appointments", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
-    t.uuid "company_id", null: false
-    t.uuid "setting_id", null: false
-    t.string "appoint_from_type"
-    t.uuid "appoint_from_id"
-    t.string "appoint_to_type", null: false
-    t.uuid "appoint_to_id", null: false
-    t.string "appoint_for_type"
-    t.uuid "appoint_for_id"
-    t.string "appoint_by_type"
-    t.uuid "appoint_by_id"
-    t.string "name"
-    t.string "description"
-    t.string "code"
-    t.integer "lifecycle_status"
-    t.integer "workflow_status"
-    t.integer "business_type"
-    t.datetime "expiration_date"
-    t.jsonb "metadata"
-    t.datetime "discarded_at"
-    t.string "permission_resource_name"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.index ["appoint_by_type", "appoint_by_id"], name: "index_setting_appointments_on_appoint_by"
-    t.index ["appoint_for_type", "appoint_for_id"], name: "index_setting_appointments_on_appoint_for"
-    t.index ["appoint_from_type", "appoint_from_id"], name: "index_setting_appointments_on_appoint_from"
-    t.index ["appoint_to_type", "appoint_to_id"], name: "idx_on_appoint_to_type_appoint_to_id_2604430405"
-    t.index ["appoint_to_type", "appoint_to_id"], name: "index_setting_appointments_on_appoint_to"
-    t.index ["business_type"], name: "index_setting_appointments_on_business_type"
-    t.index ["company_id"], name: "index_setting_appointments_on_company_id"
-    t.index ["discarded_at"], name: "index_setting_appointments_on_discarded_at"
-    t.index ["lifecycle_status"], name: "index_setting_appointments_on_lifecycle_status"
-    t.index ["setting_id"], name: "index_setting_appointments_on_setting_id"
-    t.index ["workflow_status"], name: "index_setting_appointments_on_workflow_status"
-  end
-
-  create_table "setting_group_appointments", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
+  create_table "setting_group_tag_appointments", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
     t.uuid "company_id", null: false
     t.uuid "setting_group_id", null: false
-    t.string "appoint_from_type"
-    t.uuid "appoint_from_id"
-    t.string "appoint_to_type", null: false
-    t.uuid "appoint_to_id", null: false
-    t.string "appoint_for_type"
-    t.uuid "appoint_for_id"
-    t.string "appoint_by_type"
-    t.uuid "appoint_by_id"
+    t.uuid "tag_id", null: false
+    t.string "value"
     t.string "name"
     t.string "description"
     t.string "code"
@@ -4516,17 +5711,14 @@ ActiveRecord::Schema[8.0].define(version: 2026_09_22_000002) do
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["appoint_by_type", "appoint_by_id"], name: "index_setting_group_appointments_on_appoint_by"
-    t.index ["appoint_for_type", "appoint_for_id"], name: "index_setting_group_appointments_on_appoint_for"
-    t.index ["appoint_from_type", "appoint_from_id"], name: "index_setting_group_appointments_on_appoint_from"
-    t.index ["appoint_to_type", "appoint_to_id"], name: "idx_on_appoint_to_type_appoint_to_id_2769e0ab46"
-    t.index ["appoint_to_type", "appoint_to_id"], name: "index_setting_group_appointments_on_appoint_to"
-    t.index ["business_type"], name: "index_setting_group_appointments_on_business_type"
-    t.index ["company_id"], name: "index_setting_group_appointments_on_company_id"
-    t.index ["discarded_at"], name: "index_setting_group_appointments_on_discarded_at"
-    t.index ["lifecycle_status"], name: "index_setting_group_appointments_on_lifecycle_status"
-    t.index ["setting_group_id"], name: "index_setting_group_appointments_on_setting_group_id"
-    t.index ["workflow_status"], name: "index_setting_group_appointments_on_workflow_status"
+    t.index ["business_type"], name: "index_setting_group_tag_appointments_on_business_type"
+    t.index ["company_id", "setting_group_id", "tag_id"], name: "idx_setting_group_tag_appointments_uniq", unique: true
+    t.index ["company_id"], name: "index_setting_group_tag_appointments_on_company_id"
+    t.index ["discarded_at"], name: "index_setting_group_tag_appointments_on_discarded_at"
+    t.index ["lifecycle_status"], name: "index_setting_group_tag_appointments_on_lifecycle_status"
+    t.index ["setting_group_id"], name: "index_setting_group_tag_appointments_on_setting_group_id"
+    t.index ["tag_id"], name: "index_setting_group_tag_appointments_on_tag_id"
+    t.index ["workflow_status"], name: "index_setting_group_tag_appointments_on_workflow_status"
   end
 
   create_table "setting_groups", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
@@ -4555,6 +5747,33 @@ ActiveRecord::Schema[8.0].define(version: 2026_09_22_000002) do
     t.index ["lifecycle_status"], name: "index_setting_groups_on_lifecycle_status"
     t.index ["property_mapping_id"], name: "index_setting_groups_on_property_mapping_id"
     t.index ["workflow_status"], name: "index_setting_groups_on_workflow_status"
+  end
+
+  create_table "setting_tag_appointments", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
+    t.uuid "company_id", null: false
+    t.uuid "setting_id", null: false
+    t.uuid "tag_id", null: false
+    t.string "value"
+    t.string "name"
+    t.string "description"
+    t.string "code"
+    t.integer "lifecycle_status"
+    t.integer "workflow_status"
+    t.integer "business_type"
+    t.datetime "expiration_date"
+    t.jsonb "metadata"
+    t.datetime "discarded_at"
+    t.string "permission_resource_name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["business_type"], name: "index_setting_tag_appointments_on_business_type"
+    t.index ["company_id", "setting_id", "tag_id"], name: "idx_setting_tag_appointments_uniq", unique: true
+    t.index ["company_id"], name: "index_setting_tag_appointments_on_company_id"
+    t.index ["discarded_at"], name: "index_setting_tag_appointments_on_discarded_at"
+    t.index ["lifecycle_status"], name: "index_setting_tag_appointments_on_lifecycle_status"
+    t.index ["setting_id"], name: "index_setting_tag_appointments_on_setting_id"
+    t.index ["tag_id"], name: "index_setting_tag_appointments_on_tag_id"
+    t.index ["workflow_status"], name: "index_setting_tag_appointments_on_workflow_status"
   end
 
   create_table "settings", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
@@ -4624,6 +5843,33 @@ ActiveRecord::Schema[8.0].define(version: 2026_09_22_000002) do
     t.index ["user_id"], name: "index_sign_in_tokens_on_user_id"
   end
 
+  create_table "statistic_tag_appointments", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
+    t.uuid "company_id", null: false
+    t.uuid "statistic_id", null: false
+    t.uuid "tag_id", null: false
+    t.string "value"
+    t.string "name"
+    t.string "description"
+    t.string "code"
+    t.integer "lifecycle_status"
+    t.integer "workflow_status"
+    t.integer "business_type"
+    t.datetime "expiration_date"
+    t.jsonb "metadata"
+    t.datetime "discarded_at"
+    t.string "permission_resource_name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["business_type"], name: "index_statistic_tag_appointments_on_business_type"
+    t.index ["company_id", "statistic_id", "tag_id"], name: "idx_statistic_tag_appointments_uniq", unique: true
+    t.index ["company_id"], name: "index_statistic_tag_appointments_on_company_id"
+    t.index ["discarded_at"], name: "index_statistic_tag_appointments_on_discarded_at"
+    t.index ["lifecycle_status"], name: "index_statistic_tag_appointments_on_lifecycle_status"
+    t.index ["statistic_id"], name: "index_statistic_tag_appointments_on_statistic_id"
+    t.index ["tag_id"], name: "index_statistic_tag_appointments_on_tag_id"
+    t.index ["workflow_status"], name: "index_statistic_tag_appointments_on_workflow_status"
+  end
+
   create_table "statistics", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
     t.string "owner_type", null: false
     t.uuid "owner_id", null: false
@@ -4634,6 +5880,33 @@ ActiveRecord::Schema[8.0].define(version: 2026_09_22_000002) do
     t.datetime "updated_at", null: false
     t.index ["owner_type", "owner_id"], name: "index_statistics_on_owner"
     t.index ["recorded_at"], name: "index_statistics_on_recorded_at"
+  end
+
+  create_table "stock_export_tag_appointments", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
+    t.uuid "company_id", null: false
+    t.uuid "stock_export_id", null: false
+    t.uuid "tag_id", null: false
+    t.string "value"
+    t.string "name"
+    t.string "description"
+    t.string "code"
+    t.integer "lifecycle_status"
+    t.integer "workflow_status"
+    t.integer "business_type"
+    t.datetime "expiration_date"
+    t.jsonb "metadata"
+    t.datetime "discarded_at"
+    t.string "permission_resource_name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["business_type"], name: "index_stock_export_tag_appointments_on_business_type"
+    t.index ["company_id", "stock_export_id", "tag_id"], name: "idx_stock_export_tag_appointments_uniq", unique: true
+    t.index ["company_id"], name: "index_stock_export_tag_appointments_on_company_id"
+    t.index ["discarded_at"], name: "index_stock_export_tag_appointments_on_discarded_at"
+    t.index ["lifecycle_status"], name: "index_stock_export_tag_appointments_on_lifecycle_status"
+    t.index ["stock_export_id"], name: "index_stock_export_tag_appointments_on_stock_export_id"
+    t.index ["tag_id"], name: "index_stock_export_tag_appointments_on_tag_id"
+    t.index ["workflow_status"], name: "index_stock_export_tag_appointments_on_workflow_status"
   end
 
   create_table "stock_exports", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
@@ -4747,6 +6020,33 @@ ActiveRecord::Schema[8.0].define(version: 2026_09_22_000002) do
     t.index ["workflow_status"], name: "index_stock_exports_on_workflow_status"
   end
 
+  create_table "stock_import_tag_appointments", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
+    t.uuid "company_id", null: false
+    t.uuid "stock_import_id", null: false
+    t.uuid "tag_id", null: false
+    t.string "value"
+    t.string "name"
+    t.string "description"
+    t.string "code"
+    t.integer "lifecycle_status"
+    t.integer "workflow_status"
+    t.integer "business_type"
+    t.datetime "expiration_date"
+    t.jsonb "metadata"
+    t.datetime "discarded_at"
+    t.string "permission_resource_name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["business_type"], name: "index_stock_import_tag_appointments_on_business_type"
+    t.index ["company_id", "stock_import_id", "tag_id"], name: "idx_stock_import_tag_appointments_uniq", unique: true
+    t.index ["company_id"], name: "index_stock_import_tag_appointments_on_company_id"
+    t.index ["discarded_at"], name: "index_stock_import_tag_appointments_on_discarded_at"
+    t.index ["lifecycle_status"], name: "index_stock_import_tag_appointments_on_lifecycle_status"
+    t.index ["stock_import_id"], name: "index_stock_import_tag_appointments_on_stock_import_id"
+    t.index ["tag_id"], name: "index_stock_import_tag_appointments_on_tag_id"
+    t.index ["workflow_status"], name: "index_stock_import_tag_appointments_on_workflow_status"
+  end
+
   create_table "stock_imports", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
     t.uuid "company_id", null: false
     t.uuid "branch_id"
@@ -4856,6 +6156,33 @@ ActiveRecord::Schema[8.0].define(version: 2026_09_22_000002) do
     t.index ["property_mapping_id"], name: "index_stock_imports_on_property_mapping_id"
     t.index ["warehouse_id"], name: "index_stock_imports_on_warehouse_id"
     t.index ["workflow_status"], name: "index_stock_imports_on_workflow_status"
+  end
+
+  create_table "stock_tag_appointments", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
+    t.uuid "company_id", null: false
+    t.uuid "stock_id", null: false
+    t.uuid "tag_id", null: false
+    t.string "value"
+    t.string "name"
+    t.string "description"
+    t.string "code"
+    t.integer "lifecycle_status"
+    t.integer "workflow_status"
+    t.integer "business_type"
+    t.datetime "expiration_date"
+    t.jsonb "metadata"
+    t.datetime "discarded_at"
+    t.string "permission_resource_name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["business_type"], name: "index_stock_tag_appointments_on_business_type"
+    t.index ["company_id", "stock_id", "tag_id"], name: "idx_stock_tag_appointments_uniq", unique: true
+    t.index ["company_id"], name: "index_stock_tag_appointments_on_company_id"
+    t.index ["discarded_at"], name: "index_stock_tag_appointments_on_discarded_at"
+    t.index ["lifecycle_status"], name: "index_stock_tag_appointments_on_lifecycle_status"
+    t.index ["stock_id"], name: "index_stock_tag_appointments_on_stock_id"
+    t.index ["tag_id"], name: "index_stock_tag_appointments_on_tag_id"
+    t.index ["workflow_status"], name: "index_stock_tag_appointments_on_workflow_status"
   end
 
   create_table "stock_transactions", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
@@ -4971,6 +6298,33 @@ ActiveRecord::Schema[8.0].define(version: 2026_09_22_000002) do
     t.index ["transaction_type"], name: "index_stock_transactions_on_transaction_type"
     t.index ["warehouse_id"], name: "index_stock_transactions_on_warehouse_id"
     t.index ["workflow_status"], name: "index_stock_transactions_on_workflow_status"
+  end
+
+  create_table "stock_transfer_tag_appointments", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
+    t.uuid "company_id", null: false
+    t.uuid "stock_transfer_id", null: false
+    t.uuid "tag_id", null: false
+    t.string "value"
+    t.string "name"
+    t.string "description"
+    t.string "code"
+    t.integer "lifecycle_status"
+    t.integer "workflow_status"
+    t.integer "business_type"
+    t.datetime "expiration_date"
+    t.jsonb "metadata"
+    t.datetime "discarded_at"
+    t.string "permission_resource_name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["business_type"], name: "index_stock_transfer_tag_appointments_on_business_type"
+    t.index ["company_id", "stock_transfer_id", "tag_id"], name: "idx_stock_transfer_tag_appointments_uniq", unique: true
+    t.index ["company_id"], name: "index_stock_transfer_tag_appointments_on_company_id"
+    t.index ["discarded_at"], name: "index_stock_transfer_tag_appointments_on_discarded_at"
+    t.index ["lifecycle_status"], name: "index_stock_transfer_tag_appointments_on_lifecycle_status"
+    t.index ["stock_transfer_id"], name: "index_stock_transfer_tag_appointments_on_stock_transfer_id"
+    t.index ["tag_id"], name: "index_stock_transfer_tag_appointments_on_tag_id"
+    t.index ["workflow_status"], name: "index_stock_transfer_tag_appointments_on_workflow_status"
   end
 
   create_table "stock_transfers", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
@@ -5185,6 +6539,63 @@ ActiveRecord::Schema[8.0].define(version: 2026_09_22_000002) do
     t.index ["workflow_status"], name: "index_stocks_on_workflow_status"
   end
 
+  create_table "subscription_group_subscription_plan_appointments", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
+    t.uuid "company_id", null: false
+    t.uuid "subscription_group_id", null: false
+    t.uuid "subscription_plan_id", null: false
+    t.integer "price_cents"
+    t.integer "currency"
+    t.integer "country"
+    t.integer "timezone"
+    t.boolean "auto_renew"
+    t.string "name"
+    t.string "description"
+    t.integer "lifecycle_status"
+    t.integer "workflow_status"
+    t.integer "business_type"
+    t.datetime "expiration_date"
+    t.jsonb "metadata"
+    t.datetime "discarded_at"
+    t.string "permission_resource_name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["business_type"], name: "idx_on_business_type_c7a9e65b95"
+    t.index ["company_id", "subscription_group_id", "subscription_plan_id"], name: "idx_subscription_group_subscription_plan_appointments_triple"
+    t.index ["company_id"], name: "idx_on_company_id_3a831c8ac7"
+    t.index ["discarded_at"], name: "idx_on_discarded_at_330a11e9e0"
+    t.index ["lifecycle_status"], name: "idx_on_lifecycle_status_6cee9c1826"
+    t.index ["subscription_group_id"], name: "idx_on_subscription_group_id_925c1f4dae"
+    t.index ["subscription_plan_id"], name: "idx_on_subscription_plan_id_169e306d7e"
+    t.index ["workflow_status"], name: "idx_on_workflow_status_4739b44ecd"
+  end
+
+  create_table "subscription_group_tag_appointments", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
+    t.uuid "company_id", null: false
+    t.uuid "subscription_group_id", null: false
+    t.uuid "tag_id", null: false
+    t.string "value"
+    t.string "name"
+    t.string "description"
+    t.string "code"
+    t.integer "lifecycle_status"
+    t.integer "workflow_status"
+    t.integer "business_type"
+    t.datetime "expiration_date"
+    t.jsonb "metadata"
+    t.datetime "discarded_at"
+    t.string "permission_resource_name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["business_type"], name: "index_subscription_group_tag_appointments_on_business_type"
+    t.index ["company_id", "subscription_group_id", "tag_id"], name: "idx_subscription_group_tag_appointments_uniq", unique: true
+    t.index ["company_id"], name: "index_subscription_group_tag_appointments_on_company_id"
+    t.index ["discarded_at"], name: "index_subscription_group_tag_appointments_on_discarded_at"
+    t.index ["lifecycle_status"], name: "index_subscription_group_tag_appointments_on_lifecycle_status"
+    t.index ["subscription_group_id"], name: "idx_on_subscription_group_id_41f29c4d0e"
+    t.index ["tag_id"], name: "index_subscription_group_tag_appointments_on_tag_id"
+    t.index ["workflow_status"], name: "index_subscription_group_tag_appointments_on_workflow_status"
+  end
+
   create_table "subscription_groups", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
     t.uuid "company_id", null: false
     t.uuid "branch_id"
@@ -5214,37 +6625,6 @@ ActiveRecord::Schema[8.0].define(version: 2026_09_22_000002) do
     t.index ["workflow_status"], name: "index_subscription_groups_on_workflow_status"
   end
 
-  create_table "subscription_plan_appointments", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
-    t.uuid "company_id", null: false
-    t.uuid "branch_id"
-    t.uuid "subscription_plan_id"
-    t.uuid "subscription_group_id"
-    t.string "name"
-    t.string "description"
-    t.integer "price_cents"
-    t.integer "currency"
-    t.integer "country", null: false
-    t.integer "timezone"
-    t.boolean "auto_renew"
-    t.integer "lifecycle_status"
-    t.integer "workflow_status"
-    t.integer "business_type"
-    t.datetime "expiration_date"
-    t.jsonb "metadata"
-    t.datetime "discarded_at"
-    t.string "permission_resource_name"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.index ["branch_id"], name: "index_subscription_plan_appointments_on_branch_id"
-    t.index ["business_type"], name: "index_subscription_plan_appointments_on_business_type"
-    t.index ["company_id"], name: "index_subscription_plan_appointments_on_company_id"
-    t.index ["discarded_at"], name: "index_subscription_plan_appointments_on_discarded_at"
-    t.index ["lifecycle_status"], name: "index_subscription_plan_appointments_on_lifecycle_status"
-    t.index ["subscription_group_id"], name: "index_subscription_plan_appointments_on_subscription_group_id"
-    t.index ["subscription_plan_id"], name: "index_subscription_plan_appointments_on_subscription_plan_id"
-    t.index ["workflow_status"], name: "index_subscription_plan_appointments_on_workflow_status"
-  end
-
   create_table "subscription_plans", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
     t.uuid "company_id", null: false
     t.uuid "branch_id"
@@ -5270,6 +6650,33 @@ ActiveRecord::Schema[8.0].define(version: 2026_09_22_000002) do
     t.index ["discarded_at"], name: "index_subscription_plans_on_discarded_at"
     t.index ["lifecycle_status"], name: "index_subscription_plans_on_lifecycle_status"
     t.index ["workflow_status"], name: "index_subscription_plans_on_workflow_status"
+  end
+
+  create_table "supplier_tag_appointments", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
+    t.uuid "company_id", null: false
+    t.uuid "supplier_id", null: false
+    t.uuid "tag_id", null: false
+    t.string "value"
+    t.string "name"
+    t.string "description"
+    t.string "code"
+    t.integer "lifecycle_status"
+    t.integer "workflow_status"
+    t.integer "business_type"
+    t.datetime "expiration_date"
+    t.jsonb "metadata"
+    t.datetime "discarded_at"
+    t.string "permission_resource_name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["business_type"], name: "index_supplier_tag_appointments_on_business_type"
+    t.index ["company_id", "supplier_id", "tag_id"], name: "idx_supplier_tag_appointments_uniq", unique: true
+    t.index ["company_id"], name: "index_supplier_tag_appointments_on_company_id"
+    t.index ["discarded_at"], name: "index_supplier_tag_appointments_on_discarded_at"
+    t.index ["lifecycle_status"], name: "index_supplier_tag_appointments_on_lifecycle_status"
+    t.index ["supplier_id"], name: "index_supplier_tag_appointments_on_supplier_id"
+    t.index ["tag_id"], name: "index_supplier_tag_appointments_on_tag_id"
+    t.index ["workflow_status"], name: "index_supplier_tag_appointments_on_workflow_status"
   end
 
   create_table "suppliers", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
@@ -5416,19 +6823,14 @@ ActiveRecord::Schema[8.0].define(version: 2026_09_22_000002) do
     t.index ["workflow_status"], name: "index_table_configs_on_workflow_status"
   end
 
-  create_table "tag_appointments", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
+  create_table "tag_task_appointments", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
     t.uuid "company_id", null: false
     t.uuid "tag_id", null: false
-    t.string "appoint_from_type"
-    t.uuid "appoint_from_id"
-    t.string "appoint_to_type", null: false
-    t.uuid "appoint_to_id", null: false
-    t.string "appoint_for_type"
-    t.uuid "appoint_for_id"
-    t.string "appoint_by_type"
-    t.uuid "appoint_by_id"
+    t.uuid "task_id", null: false
     t.string "value"
+    t.string "name"
     t.string "description"
+    t.string "code"
     t.integer "lifecycle_status"
     t.integer "workflow_status"
     t.integer "business_type"
@@ -5438,17 +6840,95 @@ ActiveRecord::Schema[8.0].define(version: 2026_09_22_000002) do
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["appoint_by_type", "appoint_by_id"], name: "index_tag_appointments_on_appoint_by"
-    t.index ["appoint_for_type", "appoint_for_id"], name: "index_tag_appointments_on_appoint_for"
-    t.index ["appoint_from_type", "appoint_from_id"], name: "index_tag_appointments_on_appoint_from"
-    t.index ["appoint_to_type", "appoint_to_id"], name: "index_tag_appointments_on_appoint_to"
-    t.index ["appoint_to_type", "appoint_to_id"], name: "index_tag_appointments_on_appoint_to_type_and_appoint_to_id"
-    t.index ["business_type"], name: "index_tag_appointments_on_business_type"
-    t.index ["company_id"], name: "index_tag_appointments_on_company_id"
-    t.index ["discarded_at"], name: "index_tag_appointments_on_discarded_at"
-    t.index ["lifecycle_status"], name: "index_tag_appointments_on_lifecycle_status"
-    t.index ["tag_id"], name: "index_tag_appointments_on_tag_id"
-    t.index ["workflow_status"], name: "index_tag_appointments_on_workflow_status"
+    t.index ["business_type"], name: "index_tag_task_appointments_on_business_type"
+    t.index ["company_id", "tag_id", "task_id"], name: "idx_tag_task_appointments_uniq", unique: true
+    t.index ["company_id"], name: "index_tag_task_appointments_on_company_id"
+    t.index ["discarded_at"], name: "index_tag_task_appointments_on_discarded_at"
+    t.index ["lifecycle_status"], name: "index_tag_task_appointments_on_lifecycle_status"
+    t.index ["tag_id"], name: "index_tag_task_appointments_on_tag_id"
+    t.index ["task_id"], name: "index_tag_task_appointments_on_task_id"
+    t.index ["workflow_status"], name: "index_tag_task_appointments_on_workflow_status"
+  end
+
+  create_table "tag_task_group_appointments", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
+    t.uuid "company_id", null: false
+    t.uuid "tag_id", null: false
+    t.uuid "task_group_id", null: false
+    t.string "value"
+    t.string "name"
+    t.string "description"
+    t.string "code"
+    t.integer "lifecycle_status"
+    t.integer "workflow_status"
+    t.integer "business_type"
+    t.datetime "expiration_date"
+    t.jsonb "metadata"
+    t.datetime "discarded_at"
+    t.string "permission_resource_name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["business_type"], name: "index_tag_task_group_appointments_on_business_type"
+    t.index ["company_id", "tag_id", "task_group_id"], name: "idx_tag_task_group_appointments_uniq", unique: true
+    t.index ["company_id"], name: "index_tag_task_group_appointments_on_company_id"
+    t.index ["discarded_at"], name: "index_tag_task_group_appointments_on_discarded_at"
+    t.index ["lifecycle_status"], name: "index_tag_task_group_appointments_on_lifecycle_status"
+    t.index ["tag_id"], name: "index_tag_task_group_appointments_on_tag_id"
+    t.index ["task_group_id"], name: "index_tag_task_group_appointments_on_task_group_id"
+    t.index ["workflow_status"], name: "index_tag_task_group_appointments_on_workflow_status"
+  end
+
+  create_table "tag_transaction_appointments", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
+    t.uuid "company_id", null: false
+    t.uuid "tag_id", null: false
+    t.uuid "transaction_id", null: false
+    t.string "value"
+    t.string "name"
+    t.string "description"
+    t.string "code"
+    t.integer "lifecycle_status"
+    t.integer "workflow_status"
+    t.integer "business_type"
+    t.datetime "expiration_date"
+    t.jsonb "metadata"
+    t.datetime "discarded_at"
+    t.string "permission_resource_name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["business_type"], name: "index_tag_transaction_appointments_on_business_type"
+    t.index ["company_id", "tag_id", "transaction_id"], name: "idx_tag_transaction_appointments_uniq", unique: true
+    t.index ["company_id"], name: "index_tag_transaction_appointments_on_company_id"
+    t.index ["discarded_at"], name: "index_tag_transaction_appointments_on_discarded_at"
+    t.index ["lifecycle_status"], name: "index_tag_transaction_appointments_on_lifecycle_status"
+    t.index ["tag_id"], name: "index_tag_transaction_appointments_on_tag_id"
+    t.index ["transaction_id"], name: "index_tag_transaction_appointments_on_transaction_id"
+    t.index ["workflow_status"], name: "index_tag_transaction_appointments_on_workflow_status"
+  end
+
+  create_table "tag_warehouse_appointments", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
+    t.uuid "company_id", null: false
+    t.uuid "tag_id", null: false
+    t.uuid "warehouse_id", null: false
+    t.string "value"
+    t.string "name"
+    t.string "description"
+    t.string "code"
+    t.integer "lifecycle_status"
+    t.integer "workflow_status"
+    t.integer "business_type"
+    t.datetime "expiration_date"
+    t.jsonb "metadata"
+    t.datetime "discarded_at"
+    t.string "permission_resource_name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["business_type"], name: "index_tag_warehouse_appointments_on_business_type"
+    t.index ["company_id", "tag_id", "warehouse_id"], name: "idx_tag_warehouse_appointments_uniq", unique: true
+    t.index ["company_id"], name: "index_tag_warehouse_appointments_on_company_id"
+    t.index ["discarded_at"], name: "index_tag_warehouse_appointments_on_discarded_at"
+    t.index ["lifecycle_status"], name: "index_tag_warehouse_appointments_on_lifecycle_status"
+    t.index ["tag_id"], name: "index_tag_warehouse_appointments_on_tag_id"
+    t.index ["warehouse_id"], name: "index_tag_warehouse_appointments_on_warehouse_id"
+    t.index ["workflow_status"], name: "index_tag_warehouse_appointments_on_workflow_status"
   end
 
   create_table "tags", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
@@ -5471,78 +6951,6 @@ ActiveRecord::Schema[8.0].define(version: 2026_09_22_000002) do
     t.index ["discarded_at"], name: "index_tags_on_discarded_at"
     t.index ["lifecycle_status"], name: "index_tags_on_lifecycle_status"
     t.index ["workflow_status"], name: "index_tags_on_workflow_status"
-  end
-
-  create_table "task_appointments", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
-    t.uuid "company_id", null: false
-    t.uuid "task_id", null: false
-    t.string "appoint_from_type"
-    t.uuid "appoint_from_id"
-    t.string "appoint_to_type", null: false
-    t.uuid "appoint_to_id", null: false
-    t.string "appoint_for_type"
-    t.uuid "appoint_for_id"
-    t.string "appoint_by_type"
-    t.uuid "appoint_by_id"
-    t.string "name"
-    t.string "description"
-    t.string "code"
-    t.integer "lifecycle_status"
-    t.integer "workflow_status"
-    t.integer "business_type"
-    t.datetime "expiration_date"
-    t.jsonb "metadata"
-    t.datetime "discarded_at"
-    t.string "permission_resource_name"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.index ["appoint_by_type", "appoint_by_id"], name: "index_task_appointments_on_appoint_by"
-    t.index ["appoint_for_type", "appoint_for_id"], name: "index_task_appointments_on_appoint_for"
-    t.index ["appoint_from_type", "appoint_from_id"], name: "index_task_appointments_on_appoint_from"
-    t.index ["appoint_to_type", "appoint_to_id"], name: "index_task_appointments_on_appoint_to"
-    t.index ["appoint_to_type", "appoint_to_id"], name: "index_task_appointments_on_appoint_to_type_and_appoint_to_id"
-    t.index ["business_type"], name: "index_task_appointments_on_business_type"
-    t.index ["company_id"], name: "index_task_appointments_on_company_id"
-    t.index ["discarded_at"], name: "index_task_appointments_on_discarded_at"
-    t.index ["lifecycle_status"], name: "index_task_appointments_on_lifecycle_status"
-    t.index ["task_id"], name: "index_task_appointments_on_task_id"
-    t.index ["workflow_status"], name: "index_task_appointments_on_workflow_status"
-  end
-
-  create_table "task_group_appointments", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
-    t.uuid "company_id", null: false
-    t.uuid "task_group_id", null: false
-    t.string "appoint_from_type"
-    t.uuid "appoint_from_id"
-    t.string "appoint_to_type", null: false
-    t.uuid "appoint_to_id", null: false
-    t.string "appoint_for_type"
-    t.uuid "appoint_for_id"
-    t.string "appoint_by_type"
-    t.uuid "appoint_by_id"
-    t.string "name"
-    t.string "description"
-    t.string "code"
-    t.integer "lifecycle_status"
-    t.integer "workflow_status"
-    t.integer "business_type"
-    t.datetime "expiration_date"
-    t.jsonb "metadata"
-    t.datetime "discarded_at"
-    t.string "permission_resource_name"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.index ["appoint_by_type", "appoint_by_id"], name: "index_task_group_appointments_on_appoint_by"
-    t.index ["appoint_for_type", "appoint_for_id"], name: "index_task_group_appointments_on_appoint_for"
-    t.index ["appoint_from_type", "appoint_from_id"], name: "index_task_group_appointments_on_appoint_from"
-    t.index ["appoint_to_type", "appoint_to_id"], name: "idx_on_appoint_to_type_appoint_to_id_bd79761d5f"
-    t.index ["appoint_to_type", "appoint_to_id"], name: "index_task_group_appointments_on_appoint_to"
-    t.index ["business_type"], name: "index_task_group_appointments_on_business_type"
-    t.index ["company_id"], name: "index_task_group_appointments_on_company_id"
-    t.index ["discarded_at"], name: "index_task_group_appointments_on_discarded_at"
-    t.index ["lifecycle_status"], name: "index_task_group_appointments_on_lifecycle_status"
-    t.index ["task_group_id"], name: "index_task_group_appointments_on_task_group_id"
-    t.index ["workflow_status"], name: "index_task_group_appointments_on_workflow_status"
   end
 
   create_table "task_groups", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
@@ -6063,19 +7471,52 @@ ActiveRecord::Schema[8.0].define(version: 2026_09_22_000002) do
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
-  add_foreign_key "address_appointments", "addresses"
+  add_foreign_key "address_branch_appointments", "addresses"
+  add_foreign_key "address_branch_appointments", "branches"
+  add_foreign_key "address_branch_appointments", "companies"
+  add_foreign_key "address_company_appointments", "addresses"
+  add_foreign_key "address_company_appointments", "companies"
+  add_foreign_key "address_customer_appointments", "addresses"
+  add_foreign_key "address_customer_appointments", "companies"
+  add_foreign_key "address_customer_appointments", "customers"
+  add_foreign_key "address_customer_group_appointments", "addresses"
+  add_foreign_key "address_customer_group_appointments", "companies"
+  add_foreign_key "address_customer_group_appointments", "customer_groups"
+  add_foreign_key "address_department_appointments", "addresses"
+  add_foreign_key "address_department_appointments", "companies"
+  add_foreign_key "address_department_appointments", "departments"
+  add_foreign_key "address_employee_appointments", "addresses"
+  add_foreign_key "address_employee_appointments", "companies"
+  add_foreign_key "address_employee_appointments", "employees"
+  add_foreign_key "address_employee_group_appointments", "addresses"
+  add_foreign_key "address_employee_group_appointments", "companies"
+  add_foreign_key "address_employee_group_appointments", "employee_groups"
+  add_foreign_key "address_user_appointments", "addresses"
+  add_foreign_key "address_user_appointments", "companies"
+  add_foreign_key "address_user_appointments", "users"
+  add_foreign_key "answer_tag_appointments", "answers"
+  add_foreign_key "answer_tag_appointments", "companies"
+  add_foreign_key "answer_tag_appointments", "tags"
   add_foreign_key "answers", "categories"
   add_foreign_key "answers", "companies"
   add_foreign_key "answers", "property_mappings"
   add_foreign_key "answers", "questions"
-  add_foreign_key "article_appointments", "articles"
-  add_foreign_key "article_appointments", "companies"
-  add_foreign_key "article_group_appointments", "article_groups"
-  add_foreign_key "article_group_appointments", "companies"
+  add_foreign_key "article_employee_appointments", "articles"
+  add_foreign_key "article_employee_appointments", "companies"
+  add_foreign_key "article_employee_appointments", "employees"
+  add_foreign_key "article_group_employee_appointments", "article_groups"
+  add_foreign_key "article_group_employee_appointments", "companies"
+  add_foreign_key "article_group_employee_appointments", "employees"
+  add_foreign_key "article_group_tag_appointments", "article_groups"
+  add_foreign_key "article_group_tag_appointments", "companies"
+  add_foreign_key "article_group_tag_appointments", "tags"
   add_foreign_key "article_groups", "branches"
   add_foreign_key "article_groups", "categories"
   add_foreign_key "article_groups", "companies"
   add_foreign_key "article_groups", "property_mappings"
+  add_foreign_key "article_tag_appointments", "articles"
+  add_foreign_key "article_tag_appointments", "companies"
+  add_foreign_key "article_tag_appointments", "tags"
   add_foreign_key "articles", "article_groups"
   add_foreign_key "articles", "branches"
   add_foreign_key "articles", "categories"
@@ -6092,15 +7533,28 @@ ActiveRecord::Schema[8.0].define(version: 2026_09_22_000002) do
   add_foreign_key "attendance_months", "employees"
   add_foreign_key "attendance_policies", "branches"
   add_foreign_key "attendance_policies", "companies"
+  add_foreign_key "branch_payment_method_appointments", "branches"
+  add_foreign_key "branch_payment_method_appointments", "companies"
+  add_foreign_key "branch_payment_method_appointments", "payment_methods"
+  add_foreign_key "branch_subscription_plan_appointments", "branches"
+  add_foreign_key "branch_subscription_plan_appointments", "companies"
+  add_foreign_key "branch_subscription_plan_appointments", "subscription_plans"
+  add_foreign_key "branch_tag_appointments", "branches"
+  add_foreign_key "branch_tag_appointments", "companies"
+  add_foreign_key "branch_tag_appointments", "tags"
   add_foreign_key "branches", "branches", column: "parent_branch_id"
   add_foreign_key "branches", "categories"
   add_foreign_key "branches", "companies"
   add_foreign_key "branches", "property_mappings"
+  add_foreign_key "brand_tag_appointments", "brands"
+  add_foreign_key "brand_tag_appointments", "companies"
+  add_foreign_key "brand_tag_appointments", "tags"
   add_foreign_key "brands", "categories"
   add_foreign_key "brands", "companies"
   add_foreign_key "brands", "property_mappings"
-  add_foreign_key "cart_appointments", "carts"
-  add_foreign_key "cart_appointments", "companies"
+  add_foreign_key "cart_employee_appointments", "carts"
+  add_foreign_key "cart_employee_appointments", "companies"
+  add_foreign_key "cart_employee_appointments", "employees"
   add_foreign_key "cart_groups", "branches"
   add_foreign_key "cart_groups", "categories"
   add_foreign_key "cart_groups", "companies"
@@ -6118,6 +7572,10 @@ ActiveRecord::Schema[8.0].define(version: 2026_09_22_000002) do
   add_foreign_key "company_monthly_usages", "companies"
   add_foreign_key "company_orders", "companies"
   add_foreign_key "company_orders", "users"
+  add_foreign_key "company_payment_method_appointments", "companies"
+  add_foreign_key "company_payment_method_appointments", "payment_methods"
+  add_foreign_key "company_tag_appointments", "companies"
+  add_foreign_key "company_tag_appointments", "tags"
   add_foreign_key "company_transactions", "companies"
   add_foreign_key "company_transactions", "company_invoices"
   add_foreign_key "company_transactions", "company_payment_methods"
@@ -6126,21 +7584,54 @@ ActiveRecord::Schema[8.0].define(version: 2026_09_22_000002) do
   add_foreign_key "company_wallet_logs", "companies"
   add_foreign_key "company_wallet_logs", "company_wallets"
   add_foreign_key "company_wallets", "companies"
-  add_foreign_key "customer_appointments", "companies"
-  add_foreign_key "customer_appointments", "customers"
-  add_foreign_key "customer_group_appointments", "companies"
-  add_foreign_key "customer_group_appointments", "customer_groups"
+  add_foreign_key "customer_customer_group_appointments", "companies"
+  add_foreign_key "customer_customer_group_appointments", "customer_groups"
+  add_foreign_key "customer_customer_group_appointments", "customers"
+  add_foreign_key "customer_employee_appointments", "companies"
+  add_foreign_key "customer_employee_appointments", "customers"
+  add_foreign_key "customer_employee_appointments", "employees"
+  add_foreign_key "customer_group_role_appointments", "companies"
+  add_foreign_key "customer_group_role_appointments", "customer_groups"
+  add_foreign_key "customer_group_role_appointments", "roles"
+  add_foreign_key "customer_group_service_appointments", "companies"
+  add_foreign_key "customer_group_service_appointments", "customer_groups"
+  add_foreign_key "customer_group_service_appointments", "services"
+  add_foreign_key "customer_group_tag_appointments", "companies"
+  add_foreign_key "customer_group_tag_appointments", "customer_groups"
+  add_foreign_key "customer_group_tag_appointments", "tags"
   add_foreign_key "customer_groups", "branches"
   add_foreign_key "customer_groups", "categories"
   add_foreign_key "customer_groups", "companies"
   add_foreign_key "customer_groups", "property_mappings"
+  add_foreign_key "customer_membership_appointments", "companies"
+  add_foreign_key "customer_membership_appointments", "customers"
+  add_foreign_key "customer_membership_appointments", "memberships"
+  add_foreign_key "customer_reservation_appointments", "companies"
+  add_foreign_key "customer_reservation_appointments", "customers"
+  add_foreign_key "customer_reservation_appointments", "reservations"
+  add_foreign_key "customer_role_appointments", "companies"
+  add_foreign_key "customer_role_appointments", "customers"
+  add_foreign_key "customer_role_appointments", "roles"
+  add_foreign_key "customer_service_appointments", "companies"
+  add_foreign_key "customer_service_appointments", "customers"
+  add_foreign_key "customer_service_appointments", "services"
+  add_foreign_key "customer_tag_appointments", "companies"
+  add_foreign_key "customer_tag_appointments", "customers"
+  add_foreign_key "customer_tag_appointments", "tags"
   add_foreign_key "customers", "branches"
   add_foreign_key "customers", "categories"
   add_foreign_key "customers", "companies"
   add_foreign_key "customers", "property_mappings"
   add_foreign_key "customers", "users"
-  add_foreign_key "department_appointments", "companies"
-  add_foreign_key "department_appointments", "departments"
+  add_foreign_key "department_employee_appointments", "companies"
+  add_foreign_key "department_employee_appointments", "departments"
+  add_foreign_key "department_employee_appointments", "employees"
+  add_foreign_key "department_role_appointments", "companies"
+  add_foreign_key "department_role_appointments", "departments"
+  add_foreign_key "department_role_appointments", "roles"
+  add_foreign_key "department_tag_appointments", "companies"
+  add_foreign_key "department_tag_appointments", "departments"
+  add_foreign_key "department_tag_appointments", "tags"
   add_foreign_key "departments", "categories"
   add_foreign_key "departments", "companies"
   add_foreign_key "departments", "property_mappings"
@@ -6151,51 +7642,124 @@ ActiveRecord::Schema[8.0].define(version: 2026_09_22_000002) do
   add_foreign_key "discounts", "employees"
   add_foreign_key "discounts", "invoices"
   add_foreign_key "discounts", "orders"
-  add_foreign_key "document_appointments", "companies"
-  add_foreign_key "document_appointments", "documents"
-  add_foreign_key "document_group_appointments", "companies"
-  add_foreign_key "document_group_appointments", "document_groups"
+  add_foreign_key "document_employee_appointments", "companies"
+  add_foreign_key "document_employee_appointments", "documents"
+  add_foreign_key "document_employee_appointments", "employees"
+  add_foreign_key "document_group_employee_appointments", "companies"
+  add_foreign_key "document_group_employee_appointments", "document_groups"
+  add_foreign_key "document_group_employee_appointments", "employees"
+  add_foreign_key "document_group_tag_appointments", "companies"
+  add_foreign_key "document_group_tag_appointments", "document_groups"
+  add_foreign_key "document_group_tag_appointments", "tags"
   add_foreign_key "document_groups", "branches"
   add_foreign_key "document_groups", "categories"
   add_foreign_key "document_groups", "companies"
   add_foreign_key "document_groups", "property_mappings"
+  add_foreign_key "document_tag_appointments", "companies"
+  add_foreign_key "document_tag_appointments", "documents"
+  add_foreign_key "document_tag_appointments", "tags"
   add_foreign_key "documents", "branches"
   add_foreign_key "documents", "categories"
   add_foreign_key "documents", "companies"
   add_foreign_key "documents", "document_groups"
   add_foreign_key "documents", "property_mappings"
-  add_foreign_key "employee_appointments", "companies"
-  add_foreign_key "employee_appointments", "employees"
-  add_foreign_key "employee_group_appointments", "companies"
-  add_foreign_key "employee_group_appointments", "employee_groups"
+  add_foreign_key "employee_employee_appointments", "companies"
+  add_foreign_key "employee_employee_appointments", "employees"
+  add_foreign_key "employee_employee_appointments", "employees", column: "related_employee_id"
+  add_foreign_key "employee_employee_group_appointments", "companies"
+  add_foreign_key "employee_employee_group_appointments", "employee_groups"
+  add_foreign_key "employee_employee_group_appointments", "employees"
+  add_foreign_key "employee_event_appointments", "companies"
+  add_foreign_key "employee_event_appointments", "employees"
+  add_foreign_key "employee_event_appointments", "events"
+  add_foreign_key "employee_event_group_appointments", "companies"
+  add_foreign_key "employee_event_group_appointments", "employees"
+  add_foreign_key "employee_event_group_appointments", "event_groups"
+  add_foreign_key "employee_exam_appointments", "companies"
+  add_foreign_key "employee_exam_appointments", "employees"
+  add_foreign_key "employee_exam_appointments", "exams"
+  add_foreign_key "employee_facility_appointments", "companies"
+  add_foreign_key "employee_facility_appointments", "employees"
+  add_foreign_key "employee_facility_appointments", "facilities"
+  add_foreign_key "employee_group_role_appointments", "companies"
+  add_foreign_key "employee_group_role_appointments", "employee_groups"
+  add_foreign_key "employee_group_role_appointments", "roles"
+  add_foreign_key "employee_group_tag_appointments", "companies"
+  add_foreign_key "employee_group_tag_appointments", "employee_groups"
+  add_foreign_key "employee_group_tag_appointments", "tags"
   add_foreign_key "employee_groups", "branches"
   add_foreign_key "employee_groups", "categories"
   add_foreign_key "employee_groups", "companies"
   add_foreign_key "employee_groups", "property_mappings"
+  add_foreign_key "employee_notification_appointments", "companies"
+  add_foreign_key "employee_notification_appointments", "employees"
+  add_foreign_key "employee_notification_appointments", "notifications"
+  add_foreign_key "employee_notification_group_appointments", "companies"
+  add_foreign_key "employee_notification_group_appointments", "employees"
+  add_foreign_key "employee_notification_group_appointments", "notification_groups"
+  add_foreign_key "employee_order_group_appointments", "companies"
+  add_foreign_key "employee_order_group_appointments", "employees"
+  add_foreign_key "employee_order_group_appointments", "order_groups"
+  add_foreign_key "employee_product_appointments", "companies"
+  add_foreign_key "employee_product_appointments", "employees"
+  add_foreign_key "employee_product_appointments", "products"
+  add_foreign_key "employee_project_appointments", "companies"
+  add_foreign_key "employee_project_appointments", "employees"
+  add_foreign_key "employee_project_appointments", "projects"
+  add_foreign_key "employee_project_group_appointments", "companies"
+  add_foreign_key "employee_project_group_appointments", "employees"
+  add_foreign_key "employee_project_group_appointments", "project_groups"
+  add_foreign_key "employee_role_appointments", "companies"
+  add_foreign_key "employee_role_appointments", "employees"
+  add_foreign_key "employee_role_appointments", "roles"
+  add_foreign_key "employee_service_appointments", "companies"
+  add_foreign_key "employee_service_appointments", "employees"
+  add_foreign_key "employee_service_appointments", "services"
+  add_foreign_key "employee_setting_appointments", "companies"
+  add_foreign_key "employee_setting_appointments", "employees"
+  add_foreign_key "employee_setting_appointments", "settings"
+  add_foreign_key "employee_setting_group_appointments", "companies"
+  add_foreign_key "employee_setting_group_appointments", "employees"
+  add_foreign_key "employee_setting_group_appointments", "setting_groups"
+  add_foreign_key "employee_tag_appointments", "companies"
+  add_foreign_key "employee_tag_appointments", "employees"
+  add_foreign_key "employee_tag_appointments", "tags"
+  add_foreign_key "employee_task_appointments", "companies"
+  add_foreign_key "employee_task_appointments", "employees"
+  add_foreign_key "employee_task_appointments", "tasks"
+  add_foreign_key "employee_task_group_appointments", "companies"
+  add_foreign_key "employee_task_group_appointments", "employees"
+  add_foreign_key "employee_task_group_appointments", "task_groups"
   add_foreign_key "employees", "branches"
   add_foreign_key "employees", "categories"
   add_foreign_key "employees", "companies"
   add_foreign_key "employees", "property_mappings"
   add_foreign_key "employees", "users"
-  add_foreign_key "event_appointments", "companies"
-  add_foreign_key "event_appointments", "events"
-  add_foreign_key "event_group_appointments", "companies"
-  add_foreign_key "event_group_appointments", "event_groups"
+  add_foreign_key "event_group_tag_appointments", "companies"
+  add_foreign_key "event_group_tag_appointments", "event_groups"
+  add_foreign_key "event_group_tag_appointments", "tags"
   add_foreign_key "event_groups", "branches"
   add_foreign_key "event_groups", "categories"
   add_foreign_key "event_groups", "companies"
   add_foreign_key "event_groups", "property_mappings"
+  add_foreign_key "event_tag_appointments", "companies"
+  add_foreign_key "event_tag_appointments", "events"
+  add_foreign_key "event_tag_appointments", "tags"
   add_foreign_key "events", "branches"
   add_foreign_key "events", "categories"
   add_foreign_key "events", "companies"
   add_foreign_key "events", "event_groups"
   add_foreign_key "events", "property_mappings"
-  add_foreign_key "exam_appointments", "companies"
-  add_foreign_key "exam_appointments", "exams"
+  add_foreign_key "exam_group_tag_appointments", "companies"
+  add_foreign_key "exam_group_tag_appointments", "exam_groups"
+  add_foreign_key "exam_group_tag_appointments", "tags"
   add_foreign_key "exam_groups", "branches"
   add_foreign_key "exam_groups", "categories"
   add_foreign_key "exam_groups", "companies"
   add_foreign_key "exam_groups", "property_mappings"
+  add_foreign_key "exam_tag_appointments", "companies"
+  add_foreign_key "exam_tag_appointments", "exams"
+  add_foreign_key "exam_tag_appointments", "tags"
   add_foreign_key "exams", "branches"
   add_foreign_key "exams", "categories"
   add_foreign_key "exams", "companies"
@@ -6205,47 +7769,72 @@ ActiveRecord::Schema[8.0].define(version: 2026_09_22_000002) do
   add_foreign_key "facilities", "categories"
   add_foreign_key "facilities", "companies"
   add_foreign_key "facilities", "property_mappings"
-  add_foreign_key "facility_appointments", "companies"
-  add_foreign_key "facility_appointments", "facilities"
-  add_foreign_key "facility_group_appointments", "companies"
-  add_foreign_key "facility_group_appointments", "facility_groups"
+  add_foreign_key "facility_facility_group_appointments", "companies"
+  add_foreign_key "facility_facility_group_appointments", "facilities"
+  add_foreign_key "facility_facility_group_appointments", "facility_groups"
+  add_foreign_key "facility_group_tag_appointments", "companies"
+  add_foreign_key "facility_group_tag_appointments", "facility_groups"
+  add_foreign_key "facility_group_tag_appointments", "tags"
   add_foreign_key "facility_groups", "branches"
   add_foreign_key "facility_groups", "categories"
   add_foreign_key "facility_groups", "companies"
   add_foreign_key "facility_groups", "property_mappings"
+  add_foreign_key "facility_tag_appointments", "companies"
+  add_foreign_key "facility_tag_appointments", "facilities"
+  add_foreign_key "facility_tag_appointments", "tags"
+  add_foreign_key "invoice_tag_appointments", "companies"
+  add_foreign_key "invoice_tag_appointments", "invoices"
+  add_foreign_key "invoice_tag_appointments", "tags"
   add_foreign_key "invoices", "branches"
   add_foreign_key "invoices", "categories"
   add_foreign_key "invoices", "companies"
   add_foreign_key "invoices", "orders"
   add_foreign_key "invoices", "property_mappings"
-  add_foreign_key "membership_appointments", "companies"
-  add_foreign_key "membership_appointments", "memberships"
   add_foreign_key "memberships", "branches"
   add_foreign_key "memberships", "categories"
   add_foreign_key "memberships", "companies"
   add_foreign_key "memberships", "property_mappings"
-  add_foreign_key "notification_appointments", "companies"
-  add_foreign_key "notification_appointments", "notifications"
-  add_foreign_key "notification_group_appointments", "companies"
-  add_foreign_key "notification_group_appointments", "notification_groups"
+  add_foreign_key "notification_group_tag_appointments", "companies"
+  add_foreign_key "notification_group_tag_appointments", "notification_groups"
+  add_foreign_key "notification_group_tag_appointments", "tags"
   add_foreign_key "notification_groups", "branches"
   add_foreign_key "notification_groups", "categories"
   add_foreign_key "notification_groups", "companies"
   add_foreign_key "notification_groups", "property_mappings"
+  add_foreign_key "notification_tag_appointments", "companies"
+  add_foreign_key "notification_tag_appointments", "notifications"
+  add_foreign_key "notification_tag_appointments", "tags"
   add_foreign_key "notifications", "branches"
   add_foreign_key "notifications", "categories"
   add_foreign_key "notifications", "companies"
   add_foreign_key "notifications", "notification_groups"
   add_foreign_key "notifications", "property_mappings"
-  add_foreign_key "order_appointments", "companies"
-  add_foreign_key "order_appointments", "orders"
-  add_foreign_key "order_group_appointments", "companies"
-  add_foreign_key "order_group_appointments", "order_groups"
+  add_foreign_key "order_group_tag_appointments", "companies"
+  add_foreign_key "order_group_tag_appointments", "order_groups"
+  add_foreign_key "order_group_tag_appointments", "tags"
   add_foreign_key "order_groups", "branches"
   add_foreign_key "order_groups", "categories"
   add_foreign_key "order_groups", "companies"
   add_foreign_key "order_groups", "customers"
   add_foreign_key "order_groups", "property_mappings"
+  add_foreign_key "order_product_appointments", "companies"
+  add_foreign_key "order_product_appointments", "orders"
+  add_foreign_key "order_product_appointments", "products"
+  add_foreign_key "order_product_group_appointments", "companies"
+  add_foreign_key "order_product_group_appointments", "orders"
+  add_foreign_key "order_product_group_appointments", "product_groups"
+  add_foreign_key "order_service_appointments", "companies"
+  add_foreign_key "order_service_appointments", "orders"
+  add_foreign_key "order_service_appointments", "services"
+  add_foreign_key "order_service_group_appointments", "companies"
+  add_foreign_key "order_service_group_appointments", "orders"
+  add_foreign_key "order_service_group_appointments", "service_groups"
+  add_foreign_key "order_subscription_plan_appointments", "companies"
+  add_foreign_key "order_subscription_plan_appointments", "orders"
+  add_foreign_key "order_subscription_plan_appointments", "subscription_plans"
+  add_foreign_key "order_tag_appointments", "companies"
+  add_foreign_key "order_tag_appointments", "orders"
+  add_foreign_key "order_tag_appointments", "tags"
   add_foreign_key "orders", "branches"
   add_foreign_key "orders", "categories"
   add_foreign_key "orders", "companies"
@@ -6253,33 +7842,39 @@ ActiveRecord::Schema[8.0].define(version: 2026_09_22_000002) do
   add_foreign_key "orders", "property_mappings"
   add_foreign_key "pages", "branches"
   add_foreign_key "pages", "companies"
-  add_foreign_key "payment_method_appointments", "companies"
-  add_foreign_key "payment_method_appointments", "payment_methods"
   add_foreign_key "policies", "branches"
   add_foreign_key "policies", "companies"
-  add_foreign_key "policy_appointments", "companies"
-  add_foreign_key "policy_appointments", "policies"
-  add_foreign_key "product_appointments", "companies"
-  add_foreign_key "product_appointments", "products"
-  add_foreign_key "product_group_appointments", "companies"
-  add_foreign_key "product_group_appointments", "product_groups"
+  add_foreign_key "policy_role_appointments", "companies"
+  add_foreign_key "policy_role_appointments", "policies"
+  add_foreign_key "policy_role_appointments", "roles"
+  add_foreign_key "product_group_tag_appointments", "companies"
+  add_foreign_key "product_group_tag_appointments", "product_groups"
+  add_foreign_key "product_group_tag_appointments", "tags"
   add_foreign_key "product_groups", "branches"
   add_foreign_key "product_groups", "categories"
   add_foreign_key "product_groups", "companies"
   add_foreign_key "product_groups", "property_mappings"
+  add_foreign_key "product_product_group_appointments", "companies"
+  add_foreign_key "product_product_group_appointments", "product_groups"
+  add_foreign_key "product_product_group_appointments", "products"
+  add_foreign_key "product_tag_appointments", "companies"
+  add_foreign_key "product_tag_appointments", "products"
+  add_foreign_key "product_tag_appointments", "tags"
   add_foreign_key "products", "branches"
   add_foreign_key "products", "brands"
   add_foreign_key "products", "categories"
   add_foreign_key "products", "companies"
   add_foreign_key "products", "property_mappings"
-  add_foreign_key "project_appointments", "companies"
-  add_foreign_key "project_appointments", "projects"
-  add_foreign_key "project_group_appointments", "companies"
-  add_foreign_key "project_group_appointments", "project_groups"
+  add_foreign_key "project_group_tag_appointments", "companies"
+  add_foreign_key "project_group_tag_appointments", "project_groups"
+  add_foreign_key "project_group_tag_appointments", "tags"
   add_foreign_key "project_groups", "branches"
   add_foreign_key "project_groups", "categories"
   add_foreign_key "project_groups", "companies"
   add_foreign_key "project_groups", "property_mappings"
+  add_foreign_key "project_tag_appointments", "companies"
+  add_foreign_key "project_tag_appointments", "projects"
+  add_foreign_key "project_tag_appointments", "tags"
   add_foreign_key "projects", "branches"
   add_foreign_key "projects", "categories"
   add_foreign_key "projects", "companies"
@@ -6287,79 +7882,110 @@ ActiveRecord::Schema[8.0].define(version: 2026_09_22_000002) do
   add_foreign_key "projects", "property_mappings"
   add_foreign_key "property_mappings", "categories"
   add_foreign_key "property_mappings", "companies"
-  add_foreign_key "purchase_item_appointments", "companies"
-  add_foreign_key "purchase_item_appointments", "purchase_items"
+  add_foreign_key "purchase_item_tag_appointments", "companies"
+  add_foreign_key "purchase_item_tag_appointments", "purchase_items"
+  add_foreign_key "purchase_item_tag_appointments", "tags"
   add_foreign_key "purchase_items", "categories"
   add_foreign_key "purchase_items", "companies"
   add_foreign_key "purchase_items", "property_mappings"
+  add_foreign_key "purchase_purchase_item_appointments", "companies"
+  add_foreign_key "purchase_purchase_item_appointments", "purchase_items"
+  add_foreign_key "purchase_purchase_item_appointments", "purchases"
+  add_foreign_key "purchase_tag_appointments", "companies"
+  add_foreign_key "purchase_tag_appointments", "purchases"
+  add_foreign_key "purchase_tag_appointments", "tags"
   add_foreign_key "purchases", "branches"
   add_foreign_key "purchases", "categories"
   add_foreign_key "purchases", "companies"
   add_foreign_key "purchases", "property_mappings"
   add_foreign_key "purchases", "suppliers"
   add_foreign_key "purchases", "workflow_steps"
+  add_foreign_key "question_tag_appointments", "companies"
+  add_foreign_key "question_tag_appointments", "questions"
+  add_foreign_key "question_tag_appointments", "tags"
   add_foreign_key "questions", "branches"
   add_foreign_key "questions", "categories"
   add_foreign_key "questions", "companies"
   add_foreign_key "questions", "property_mappings"
-  add_foreign_key "reservation_appointments", "companies"
-  add_foreign_key "reservation_appointments", "reservations"
   add_foreign_key "reservations", "branches"
   add_foreign_key "reservations", "categories"
   add_foreign_key "reservations", "companies"
   add_foreign_key "reservations", "property_mappings"
-  add_foreign_key "role_appointments", "companies"
-  add_foreign_key "role_appointments", "roles"
+  add_foreign_key "role_tag_appointments", "companies"
+  add_foreign_key "role_tag_appointments", "roles"
+  add_foreign_key "role_tag_appointments", "tags"
   add_foreign_key "roles", "branches"
   add_foreign_key "roles", "companies"
   add_foreign_key "scheduled_shifts", "branches"
   add_foreign_key "scheduled_shifts", "companies"
   add_foreign_key "scheduled_shifts", "employees"
   add_foreign_key "scheduled_shifts", "shift_templates"
-  add_foreign_key "service_appointments", "companies"
-  add_foreign_key "service_appointments", "services"
-  add_foreign_key "service_group_appointments", "companies"
-  add_foreign_key "service_group_appointments", "service_groups"
+  add_foreign_key "service_group_tag_appointments", "companies"
+  add_foreign_key "service_group_tag_appointments", "service_groups"
+  add_foreign_key "service_group_tag_appointments", "tags"
   add_foreign_key "service_groups", "branches"
   add_foreign_key "service_groups", "categories"
   add_foreign_key "service_groups", "companies"
   add_foreign_key "service_groups", "property_mappings"
+  add_foreign_key "service_service_group_appointments", "companies"
+  add_foreign_key "service_service_group_appointments", "service_groups"
+  add_foreign_key "service_service_group_appointments", "services"
+  add_foreign_key "service_tag_appointments", "companies"
+  add_foreign_key "service_tag_appointments", "services"
+  add_foreign_key "service_tag_appointments", "tags"
   add_foreign_key "services", "branches"
   add_foreign_key "services", "categories"
   add_foreign_key "services", "companies"
   add_foreign_key "services", "property_mappings"
   add_foreign_key "sessions", "users"
-  add_foreign_key "setting_appointments", "companies"
-  add_foreign_key "setting_appointments", "settings"
-  add_foreign_key "setting_group_appointments", "companies"
-  add_foreign_key "setting_group_appointments", "setting_groups"
+  add_foreign_key "setting_group_tag_appointments", "companies"
+  add_foreign_key "setting_group_tag_appointments", "setting_groups"
+  add_foreign_key "setting_group_tag_appointments", "tags"
   add_foreign_key "setting_groups", "branches"
   add_foreign_key "setting_groups", "categories"
   add_foreign_key "setting_groups", "companies"
   add_foreign_key "setting_groups", "property_mappings"
+  add_foreign_key "setting_tag_appointments", "companies"
+  add_foreign_key "setting_tag_appointments", "settings"
+  add_foreign_key "setting_tag_appointments", "tags"
   add_foreign_key "settings", "companies"
   add_foreign_key "settings", "setting_groups"
   add_foreign_key "shift_templates", "branches"
   add_foreign_key "shift_templates", "companies"
   add_foreign_key "sign_in_tokens", "users"
+  add_foreign_key "statistic_tag_appointments", "companies"
+  add_foreign_key "statistic_tag_appointments", "statistics"
+  add_foreign_key "statistic_tag_appointments", "tags"
+  add_foreign_key "stock_export_tag_appointments", "companies"
+  add_foreign_key "stock_export_tag_appointments", "stock_exports"
+  add_foreign_key "stock_export_tag_appointments", "tags"
   add_foreign_key "stock_exports", "branches"
   add_foreign_key "stock_exports", "categories"
   add_foreign_key "stock_exports", "companies"
   add_foreign_key "stock_exports", "products"
   add_foreign_key "stock_exports", "property_mappings"
   add_foreign_key "stock_exports", "warehouses"
+  add_foreign_key "stock_import_tag_appointments", "companies"
+  add_foreign_key "stock_import_tag_appointments", "stock_imports"
+  add_foreign_key "stock_import_tag_appointments", "tags"
   add_foreign_key "stock_imports", "branches"
   add_foreign_key "stock_imports", "categories"
   add_foreign_key "stock_imports", "companies"
   add_foreign_key "stock_imports", "products"
   add_foreign_key "stock_imports", "property_mappings"
   add_foreign_key "stock_imports", "warehouses"
+  add_foreign_key "stock_tag_appointments", "companies"
+  add_foreign_key "stock_tag_appointments", "stocks"
+  add_foreign_key "stock_tag_appointments", "tags"
   add_foreign_key "stock_transactions", "branches"
   add_foreign_key "stock_transactions", "categories"
   add_foreign_key "stock_transactions", "companies"
   add_foreign_key "stock_transactions", "products"
   add_foreign_key "stock_transactions", "property_mappings"
   add_foreign_key "stock_transactions", "warehouses"
+  add_foreign_key "stock_transfer_tag_appointments", "companies"
+  add_foreign_key "stock_transfer_tag_appointments", "stock_transfers"
+  add_foreign_key "stock_transfer_tag_appointments", "tags"
   add_foreign_key "stock_transfers", "branches"
   add_foreign_key "stock_transfers", "categories"
   add_foreign_key "stock_transfers", "companies"
@@ -6372,16 +7998,21 @@ ActiveRecord::Schema[8.0].define(version: 2026_09_22_000002) do
   add_foreign_key "stocks", "products"
   add_foreign_key "stocks", "property_mappings"
   add_foreign_key "stocks", "warehouses"
+  add_foreign_key "subscription_group_subscription_plan_appointments", "companies"
+  add_foreign_key "subscription_group_subscription_plan_appointments", "subscription_groups"
+  add_foreign_key "subscription_group_subscription_plan_appointments", "subscription_plans"
+  add_foreign_key "subscription_group_tag_appointments", "companies"
+  add_foreign_key "subscription_group_tag_appointments", "subscription_groups"
+  add_foreign_key "subscription_group_tag_appointments", "tags"
   add_foreign_key "subscription_groups", "branches"
   add_foreign_key "subscription_groups", "companies"
   add_foreign_key "subscription_groups", "subscription_groups"
   add_foreign_key "subscription_groups", "subscription_plans"
-  add_foreign_key "subscription_plan_appointments", "branches"
-  add_foreign_key "subscription_plan_appointments", "companies"
-  add_foreign_key "subscription_plan_appointments", "subscription_groups"
-  add_foreign_key "subscription_plan_appointments", "subscription_plans"
   add_foreign_key "subscription_plans", "branches"
   add_foreign_key "subscription_plans", "companies"
+  add_foreign_key "supplier_tag_appointments", "companies"
+  add_foreign_key "supplier_tag_appointments", "suppliers"
+  add_foreign_key "supplier_tag_appointments", "tags"
   add_foreign_key "suppliers", "categories"
   add_foreign_key "suppliers", "companies"
   add_foreign_key "suppliers", "property_mappings"
@@ -6389,13 +8020,19 @@ ActiveRecord::Schema[8.0].define(version: 2026_09_22_000002) do
   add_foreign_key "table_configs", "categories"
   add_foreign_key "table_configs", "companies"
   add_foreign_key "table_configs", "property_mappings"
-  add_foreign_key "tag_appointments", "companies"
-  add_foreign_key "tag_appointments", "tags"
+  add_foreign_key "tag_task_appointments", "companies"
+  add_foreign_key "tag_task_appointments", "tags"
+  add_foreign_key "tag_task_appointments", "tasks"
+  add_foreign_key "tag_task_group_appointments", "companies"
+  add_foreign_key "tag_task_group_appointments", "tags"
+  add_foreign_key "tag_task_group_appointments", "task_groups"
+  add_foreign_key "tag_transaction_appointments", "companies"
+  add_foreign_key "tag_transaction_appointments", "tags"
+  add_foreign_key "tag_transaction_appointments", "transactions"
+  add_foreign_key "tag_warehouse_appointments", "companies"
+  add_foreign_key "tag_warehouse_appointments", "tags"
+  add_foreign_key "tag_warehouse_appointments", "warehouses"
   add_foreign_key "tags", "companies"
-  add_foreign_key "task_appointments", "companies"
-  add_foreign_key "task_appointments", "tasks"
-  add_foreign_key "task_group_appointments", "companies"
-  add_foreign_key "task_group_appointments", "task_groups"
   add_foreign_key "task_groups", "branches"
   add_foreign_key "task_groups", "categories"
   add_foreign_key "task_groups", "companies"

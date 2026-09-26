@@ -17,12 +17,12 @@ RSpec.describe Branch, type: :model do
     it { should have_many(:customers).dependent(:destroy) }
     it { should have_many(:customer_groups).dependent(:destroy) }
     it { should have_many(:orders).dependent(:destroy) }
-    it { should have_many(:payment_method_appointments).dependent(:destroy) }
+    it { should have_many(:branch_payment_method_appointments).dependent(:destroy) }
     it { should have_many(:task_groups).dependent(:destroy) }
     it { should have_many(:project_groups).dependent(:destroy) }
     it { should have_many(:cart_groups).dependent(:destroy) }
     it { should have_many(:notification_groups).dependent(:destroy) }
-    it { should have_many(:payment_methods).through(:payment_method_appointments) }
+    it { should have_many(:payment_methods).through(:branch_payment_method_appointments) }
   end
 
   describe "validations" do
@@ -61,8 +61,8 @@ RSpec.describe Branch, type: :model do
     end
 
     it "copies active company-level payment method appointments to the new branch" do
-      active_appointment = PaymentMethodAppointment.create!(
-        appoint_to: company,
+      active_appointment = CompanyPaymentMethodAppointment.create!(
+        company: company,
         payment_method: payment_method,
         name: "Cash for #{company.name}",
         code: "CSH-#{SecureRandom.hex(4).upcase}",
@@ -72,20 +72,20 @@ RSpec.describe Branch, type: :model do
 
       branch = create(:branch, company: company)
 
-      branch_appointment = branch.payment_method_appointments.find_by(
+      branch_appointment = branch.branch_payment_method_appointments.find_by(
         payment_method_id: active_appointment.payment_method_id
       )
       expect(branch_appointment).to be_present
       expect(branch_appointment.lifecycle_status).to eq("active")
-      expect(branch_appointment.appoint_to).to eq(branch)
+      expect(branch_appointment.branch).to eq(branch)
       expect(branch_appointment.merchant_number).to eq(active_appointment.merchant_number)
       expect(branch_appointment.merchant_name).to eq(active_appointment.merchant_name)
       expect(branch_appointment.merchant_id).to eq(active_appointment.merchant_id)
     end
 
     it "does not copy inactive company-level payment method appointments" do
-      PaymentMethodAppointment.create!(
-        appoint_to: company,
+      CompanyPaymentMethodAppointment.create!(
+        company: company,
         payment_method: payment_method,
         name: "Cash for #{company.name}",
         code: "CSH-#{SecureRandom.hex(4).upcase}",
@@ -95,7 +95,7 @@ RSpec.describe Branch, type: :model do
 
       branch = create(:branch, company: company)
 
-      expect(branch.payment_method_appointments).to be_empty
+      expect(branch.branch_payment_method_appointments).to be_empty
     end
   end
 

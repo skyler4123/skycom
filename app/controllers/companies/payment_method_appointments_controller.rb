@@ -1,5 +1,14 @@
 # frozen_string_literal: true
 
+# Companies::PaymentMethodAppointmentsController — company + branch payment method toggles.
+# Single controller over two atomic tables: without branch_id it serves
+# CompanyPaymentMethodAppointment rows; with branch_id it serves the branch's
+# BranchPaymentMethodAppointment rows plus company_level_active flags.
+# JSON shape ({payment_method_appointments: [...]}) is kept stable so FE is unchanged.
+# Serves Stimulus: Companies_PaymentMethodAppointments_IndexController (index),
+#                  Companies_PaymentMethodAppointments_EditController (edit/update form),
+#                  Companies_Branches_PaymentMethodAppointmentsModalController (branch toggle modal)
+# Endpoints: GET index, GET edit, PATCH update — see Helpers.company_payment_method_appointment*_path
 class Companies::PaymentMethodAppointmentsController < Companies::ApplicationController
   def index
     respond_to do |format|
@@ -7,9 +16,9 @@ class Companies::PaymentMethodAppointmentsController < Companies::ApplicationCon
       format.json do
         if params[:branch_id].present?
           branch = current_company.branches.find(params[:branch_id])
-          appointments = branch.payment_method_appointments.includes(:payment_method)
+          appointments = branch.branch_payment_method_appointments.includes(:payment_method)
 
-          company_level_active_ids = current_company.payment_method_appointments.company_level
+          company_level_active_ids = current_company.company_payment_method_appointments
             .where(lifecycle_status: LIFECYCLE_STATUS.fetch(:active))
             .pluck(:payment_method_id).to_set
 
@@ -19,7 +28,7 @@ class Companies::PaymentMethodAppointmentsController < Companies::ApplicationCon
             }
           }
         else
-          appointments = current_company.payment_method_appointments.company_level.includes(:payment_method)
+          appointments = current_company.company_payment_method_appointments.includes(:payment_method)
 
           render json: {
             payment_method_appointments: appointments.map { |a| format_appointment(a) }
@@ -30,7 +39,7 @@ class Companies::PaymentMethodAppointmentsController < Companies::ApplicationCon
   end
 
   def edit
-    @appointment = PaymentMethodAppointment.where(company_id: current_company.id).includes(:payment_method).find(params[:id])
+    @appointment = find_appointment
 
     respond_to do |format|
       format.html { render html: "", layout: true }
@@ -55,7 +64,7 @@ class Companies::PaymentMethodAppointmentsController < Companies::ApplicationCon
   end
 
   def update
-    appointment = PaymentMethodAppointment.where(company_id: current_company.id).find(params[:id])
+    appointment = find_appointment
 
     if appointment.update(update_params)
       respond_to do |format|
@@ -81,6 +90,14 @@ class Companies::PaymentMethodAppointmentsController < Companies::ApplicationCon
   end
 
   private
+
+  # Company-level rows take precedence on id lookup; branch-level rows are
+  # scoped to the current company. Raises ActiveRecord::RecordNotFound (404)
+  # when the id exists in neither table.
+  def find_appointment
+    CompanyPaymentMethodAppointment.where(company_id: current_company.id).includes(:payment_method).find_by(id: params[:id]) ||
+      BranchPaymentMethodAppointment.where(company_id: current_company.id).includes(:payment_method).find(params[:id])
+  end
 
   def format_appointment(appointment, company_level_active: nil)
     pm = appointment.payment_method

@@ -3,15 +3,22 @@ class Address < ApplicationRecord
   include ImmutableRecordConcern
 
   enum :country, COUNTRY_CODES, prefix: true, default: :us
-  has_many :address_appointments, dependent: :destroy
-  has_many :users, through: :address_appointments, source: :appoint_to, source_type: "User"
-  has_many :companies, through: :address_appointments, source: :appoint_to, source_type: "Company"
-  has_many :branches, through: :address_appointments, source: :appoint_to, source_type: "Company"
-  has_many :employees, through: :address_appointments, source: :appoint_to, source_type: "Employee"
-  has_many :employee_groups, through: :address_appointments, source: :appoint_to, source_type: "EmployeeGroup"
-  has_many :customers, through: :address_appointments, source: :appoint_to, source_type: "Customer"
-  has_many :customer_groups, through: :address_appointments, source: :appoint_to, source_type: "CustomerGroup"
-  has_many :departments, through: :address_appointments, source: :appoint_to, source_type: "Department"
+  has_many :address_branch_appointments, dependent: :destroy
+  has_many :branches, through: :address_branch_appointments
+  has_many :address_company_appointments, dependent: :destroy
+  has_many :companies, through: :address_company_appointments
+  has_many :address_customer_appointments, dependent: :destroy
+  has_many :customers, through: :address_customer_appointments
+  has_many :address_customer_group_appointments, dependent: :destroy
+  has_many :customer_groups, through: :address_customer_group_appointments
+  has_many :address_department_appointments, dependent: :destroy
+  has_many :departments, through: :address_department_appointments
+  has_many :address_employee_appointments, dependent: :destroy
+  has_many :employees, through: :address_employee_appointments
+  has_many :address_employee_group_appointments, dependent: :destroy
+  has_many :employee_groups, through: :address_employee_group_appointments
+  has_many :address_user_appointments, dependent: :destroy
+  has_many :users, through: :address_user_appointments
 
   # 1. Validations
   validates :line_1, :city, :country, presence: true

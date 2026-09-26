@@ -52,14 +52,14 @@ class Branch < ApplicationRecord
   has_many :customers, dependent: :destroy
   has_many :customer_groups, dependent: :destroy
   has_many :orders, dependent: :destroy
-  has_many :payment_method_appointments, as: :appoint_to, dependent: :destroy
+  has_many :branch_payment_method_appointments, dependent: :destroy
   has_many :scheduled_shifts, dependent: :destroy
   has_one :attendance_policy, dependent: :destroy
   has_many :task_groups, dependent: :destroy
   has_many :project_groups, dependent: :destroy
   has_many :cart_groups, dependent: :destroy
   has_many :notification_groups, dependent: :destroy
-  has_many :payment_methods, through: :payment_method_appointments
+  has_many :payment_methods, through: :branch_payment_method_appointments
   has_many :statistics, as: :owner
   has_many :warehouses, dependent: :destroy
   has_many :stocks, dependent: :destroy
@@ -111,9 +111,9 @@ class Branch < ApplicationRecord
   def initialize_payment_methods
     return unless company
 
-    company.payment_method_appointments.company_level.where(lifecycle_status: LIFECYCLE_STATUS.fetch(:active)).find_each do |appointment|
-      PaymentMethodAppointment.find_or_create_by!(
-        appoint_to: self,
+    company.company_payment_method_appointments.where(lifecycle_status: LIFECYCLE_STATUS.fetch(:active)).find_each do |appointment|
+      BranchPaymentMethodAppointment.find_or_create_by!(
+        branch: self,
         payment_method: appointment.payment_method,
         company: company
       ) do |a|

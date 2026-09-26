@@ -2,12 +2,20 @@ class Seed::DepartmentAppointmentService
   def self.new(
     company:,
     department:,
-    appoint_to:
+    appoint_to:,
+    name: nil,
+    description: nil,
+    code: nil,
+    discarded_at: nil
   )
-    DepartmentAppointment.new(
+    Seed::DepartmentEmployeeAppointmentService.new(
       company: company,
       department: department,
-      appoint_to: appoint_to
+      employee: appoint_to,
+      name: name,
+      description: description,
+      code: code,
+      discarded_at: discarded_at
     )
   end
 

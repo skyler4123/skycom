@@ -121,19 +121,20 @@ RSpec.describe "Companies::OrderProcessing::V1", type: :request do
       payment_mode: :qr, strategy: :mock_qr_gateway)
   end
   let!(:cash_appts) do
+    branch # create first: Branch#initialize_payment_methods must see no company rows yet
     [
-      PaymentMethodAppointment.create!(appoint_to: company, company: company, payment_method: cash_pm,
+      CompanyPaymentMethodAppointment.create!(company: company, payment_method: cash_pm,
         name: "Co cash", code: "RQ_CO_CASH", business_type: :in_store, lifecycle_status: :active),
-      PaymentMethodAppointment.create!(appoint_to: branch, company: company, payment_method: cash_pm,
+      BranchPaymentMethodAppointment.create!(company: company, branch: branch, payment_method: cash_pm,
         name: "Br cash", code: "RQ_BR_CASH", business_type: :in_store, lifecycle_status: :active,
         merchant_number: "1111111111", merchant_name: "Req Shop", merchant_id: "T-RQ01")
     ]
   end
   let!(:qr_appts) do
     [
-      PaymentMethodAppointment.create!(appoint_to: company, company: company, payment_method: qr_pm,
+      CompanyPaymentMethodAppointment.create!(company: company, payment_method: qr_pm,
         name: "Co qr", code: "RQ_CO_MQR", business_type: :in_store, lifecycle_status: :active),
-      PaymentMethodAppointment.create!(appoint_to: branch, company: company, payment_method: qr_pm,
+      BranchPaymentMethodAppointment.create!(company: company, branch: branch, payment_method: qr_pm,
         name: "Br qr", code: "RQ_BR_MQR", business_type: :in_store, lifecycle_status: :active,
         merchant_number: "2222222222", merchant_name: "Req Shop", merchant_id: "T-RQ02")
     ]
@@ -203,9 +204,8 @@ RSpec.describe "Companies::OrderProcessing::V1", type: :request do
     it "rejects an appointment from another branch" do
       order_id = checkout_order
       other_branch = create(:branch, company: company)
-      foreign = PaymentMethodAppointment.create!(appoint_to: other_branch, company: company,
-        payment_method: cash_pm, name: "Foreign cash", code: "RQ_FB_CASH",
-        business_type: :in_store, lifecycle_status: :active)
+      # other_branch auto-inherits active company payments via Branch#initialize_payment_methods
+      foreign = other_branch.branch_payment_method_appointments.find_by!(payment_method: cash_pm)
 
       post "/companies/#{company.id}/order_processing/v1/pay",
         params: { order_id: order_id, payment_method_appointment_id: foreign.id }, headers: headers

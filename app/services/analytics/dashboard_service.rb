@@ -54,7 +54,11 @@ module Analytics
 
     def compute_revenue(orders)
       revenue_cents = 0
-      OrderAppointment.where(order_id: orders.select(:id)).find_each do |oa|
+      OrderProductAppointment.where(order_id: orders.select(:id)).find_each do |oa|
+        next unless oa.total_price
+        revenue_cents += (oa.total_price * 100).to_i
+      end
+      OrderServiceAppointment.where(order_id: orders.select(:id)).find_each do |oa|
         next unless oa.total_price
         revenue_cents += (oa.total_price * 100).to_i
       end
@@ -68,8 +72,8 @@ module Analytics
       total_revenue = 0
       total_cost = 0
 
-      OrderAppointment.where(order_id: orders.select(:id))
-        .includes(:appoint_to)
+      OrderProductAppointment.where(order_id: orders.select(:id))
+        .includes(:product)
         .find_each do |oa|
         next unless oa.total_price
 
@@ -80,14 +84,26 @@ module Analytics
         monthly_data[month][:revenue_cents] += revenue
         total_revenue += revenue
 
-        if oa.appoint_to.respond_to?(:metadata)
-          raw = oa.appoint_to.read_attribute_before_type_cast(:metadata)
+        if oa.product.respond_to?(:metadata)
+          raw = oa.product.read_attribute_before_type_cast(:metadata)
           meta = raw.is_a?(::String) ? (JSON.parse(raw) rescue nil) : raw
           cost_price = meta.is_a?(Hash) ? (meta["cost_price_cents"] || 0).to_i : Array(meta).first.to_i
           cost = cost_price * (oa.quantity || 1)
           monthly_data[month][:cost_cents] += cost
           total_cost += cost
         end
+      end
+
+      OrderServiceAppointment.where(order_id: orders.select(:id))
+        .find_each do |oa|
+        next unless oa.total_price
+
+        month = oa.created_at.strftime("%Y-%m")
+        monthly_data[month] ||= { revenue_cents: 0, cost_cents: 0 }
+
+        revenue = (oa.total_price * 100).to_i
+        monthly_data[month][:revenue_cents] += revenue
+        total_revenue += revenue
       end
 
       by_month = monthly_data.sort.map do |month, data|
@@ -156,7 +172,10 @@ module Analytics
 
         spent = 0
         if count.positive?
-          OrderAppointment.where(order_id: paid_orders.select(:id)).find_each do |oa|
+          OrderProductAppointment.where(order_id: paid_orders.select(:id)).find_each do |oa|
+            spent += (oa.total_price * 100).to_i if oa.total_price
+          end
+          OrderServiceAppointment.where(order_id: paid_orders.select(:id)).find_each do |oa|
             spent += (oa.total_price * 100).to_i if oa.total_price
           end
         end

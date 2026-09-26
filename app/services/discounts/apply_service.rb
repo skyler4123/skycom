@@ -42,7 +42,7 @@ class Discounts::ApplyService
   private
 
   def order_subtotal_cents
-    (@order.order_appointments.sum(:total_price) * 100).to_i
+    (@order.line_total * 100).to_i
   end
 
   def failure(message)

@@ -5,8 +5,10 @@ RSpec.describe ServiceGroup, type: :model do
   describe "associations" do
     it { should belong_to(:company) }
     it { should belong_to(:branch).optional }
-    it { should have_many(:service_group_appointments).dependent(:destroy) }
-    it { should have_many(:services).through(:service_group_appointments) }
+    it { should have_many(:service_service_group_appointments).dependent(:destroy) }
+    it { should have_many(:services).through(:service_service_group_appointments) }
+    it { should have_many(:order_service_group_appointments).dependent(:destroy) }
+    it { should have_many(:orders).through(:order_service_group_appointments) }
   end
 
   describe "validations" do

@@ -3,7 +3,7 @@
 # Companies::OrderProcessing::V1Controller — POS checkout → pay JSON API.
 # Shell: docs/ORDER_PROCESSING_V1.md
 # - checkout: CheckAvailabilityService + CreateOrderService (no payment yet)
-# - pay: branch-scoped PaymentMethodAppointment → InitiatePaymentService
+# - pay: branch-scoped BranchPaymentMethodAppointment → InitiatePaymentService
 #        cash → CompletePaymentService synchronously; QR → gateway → webhook → WS pos_payment_completed
 # - pay_cancel: CancelPaymentService (pending → failed + ReleaseReservedStockService)
 # Serves Stimulus: Companies_Pages_RetailCashierController (checkout via initiateOrder, pay, pay_cancel, receipt fetch)
@@ -38,9 +38,7 @@ class Companies::OrderProcessing::V1Controller < Companies::ApplicationControlle
   # - Rescues InsufficientStockError / InvalidPaymentMethodError / InvalidDiscountError → 422.
   def pay
     order = current_company.orders.find(params[:order_id])
-    # Scoped by company_id (not current_company.payment_method_appointments) to avoid
-    # polymorphic has_many ... as: :appoint_to injecting appoint_to_type = 'Company' conflicting with branch_level.
-    appointment = PaymentMethodAppointment.branch_level
+    appointment = BranchPaymentMethodAppointment
       .find_by!(id: params[:payment_method_appointment_id], company_id: current_company.id)
 
     result = OrderProcessingV1::InitiatePaymentService.call(

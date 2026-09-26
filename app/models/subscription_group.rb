@@ -19,7 +19,8 @@ class SubscriptionGroup < ApplicationRecord
   belongs_to :processer, polymorphic: true, optional: true
 
   # A plan has many instances (appointments)
-  has_many :subscription_group_appointments, dependent: :restrict_with_error
+  has_many :subscription_group_subscription_plan_appointments, dependent: :restrict_with_error
+  has_many :subscription_plans, through: :subscription_group_subscription_plan_appointments
 
   # --- Validations ---
   validates :name, presence: true

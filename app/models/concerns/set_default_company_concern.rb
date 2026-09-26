@@ -9,24 +9,22 @@
 # creating an appointment like +RoleAppointment.create!(role: some_role)+ would
 # fail because company_id would be nil.
 #
-# == How It Works:
-# 1. Extracts the resource name from the model class name
-#    - RoleAppointment → "role"
-#    - PolicyAppointment → "policy"
-#    - TagAppointment → "tag"
-#    - ServiceGroupAppointment → "service_group"
-# 2. Calls the corresponding association to get the resource
-# 3. Assigns the resource's company_id to the appointment
-# 4. Only sets company_id if not already present (manual assignment takes precedence)
+# == How It Works (atomic appointments):
+# 1. For atomic A_B_Appointment (e.g. EmployeeRoleAppointment), tries each
+#    belongs_to association (employee, role, company) in order and uses the
+#    first one that responds to company_id.
+# 2. Only sets company_id if not already present.
 #
 # == Usage:
-# Include this concern in any *Appointment model that has a singular resource
-# association (e.g., belongs_to :role, belongs_to :policy, belongs_to :tag)
+# Include this concern in any *_appointment model with two concrete FKs
+# (e.g., belongs_to :employee, belongs_to :role).
 #
 # == Example:
-#   class RoleAppointment < ApplicationRecord
+#   class EmployeeRoleAppointment < ApplicationRecord
 #     include SetDefaultCompanyConcern
-#     belongs_to :role  # Will derive company_id from role.company_id
+#     belongs_to :company
+#     belongs_to :employee
+#     belongs_to :role
 #   end
 #
 module SetDefaultCompanyConcern
@@ -38,37 +36,32 @@ module SetDefaultCompanyConcern
 
   private
 
-  # Sets company_id from the associated resource if not already present.
-  # Guard clauses:
-  #   1. Skip if company association is already loaded/present
-  #   2. Skip if company_id column is already set
-  #   3. Skip if no associated resource exists
-  #   4. Otherwise, assign company_id from the resource
   def set_default_company_from_resource
-    return if company.present?
-    return if company_id.present?
-
+    return if respond_to?(:company) && (company.present? || company_id.present?)
+    # Models without company column (e.g. AddressCompanyAppointment has company as pair side)
+    # still derive from pair sides if possible.
     resource = find_resource_association
     return if resource.blank?
+    return unless resource.respond_to?(:company_id)
+    return unless respond_to?(:company_id=)
 
     self.company_id = resource.company_id
   end
 
-  # Dynamically derives the resource association name from the model class name.
-  # Examples:
-  #   - "RoleAppointment".gsub("Appointment", "").underscore → "role"
-  #   - "PolicyAppointment".gsub("Appointment", "").underscore → "policy"
-  #   - "ServiceGroupAppointment".gsub("Appointment", "").underscore → "service_group"
-  #
-  # Returns nil if:
-  #   - The derived name is blank
-  #   - The model doesn't respond to that association name
+  # Tries all belongs_to associations (except company itself) and returns the
+  # first record that can provide a company_id. Falls back to company pair side.
   def find_resource_association
-    resource_name = self.class.name.gsub("Appointment", "").underscore
-
-    return nil if resource_name.blank?
-    return nil unless respond_to?(resource_name)
-
-    public_send(resource_name)
+    candidates = self.class.reflect_on_all_associations(:belongs_to).map(&:name) - [ :company ]
+    candidates.each do |assoc|
+      next unless respond_to?(assoc)
+      rec = public_send(assoc)
+      next if rec.blank?
+      return rec if rec.respond_to?(:company_id)
+      # Company pair side itself (e.g. AddressCompanyAppointment#company is a Company)
+      return rec if rec.is_a?(Company)
+    end
+    # Fallback: company pair side
+    return company if respond_to?(:company) && company.present?
+    nil
   end
 end

@@ -10,7 +10,7 @@ RSpec.describe "Companies::OrdersController#receipt", type: :request do
   let(:product) { create(:product, company: company, name: "Receipt Widget") }
   let(:order) { create(:order, company: company, branch: branch, customer: customer, workflow_status: :pending) }
   let!(:item) do
-    OrderAppointment.create!(order: order, appoint_to: product, company: company,
+    OrderProductAppointment.create!(order: order, product: product, company: company,
       name: product.name, quantity: 2, unit_price: 50.0, total_price: 100.0)
   end
   let!(:invoice) do

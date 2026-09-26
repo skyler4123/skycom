@@ -178,9 +178,9 @@ RSpec.describe "Toast message responses", type: :request do
       )
     end
     let!(:order_appointment) do
-      order.order_appointments.create!(
+      order.order_product_appointments.create!(
         company: company,
-        appoint_to: product,
+        product: product,
         quantity: 2,
         unit_price: 50,
         total_price: 100
@@ -192,12 +192,19 @@ RSpec.describe "Toast message responses", type: :request do
         payment_mode: :cash, strategy: :cash, country: company.country)
     end
     let!(:cash_appointment) do
-      PaymentMethodAppointment.create!(appoint_to: company, company: company,
+      CompanyPaymentMethodAppointment.create!(company: company,
         payment_method: cash_payment_method, name: "Co cash", code: "TST_CO_CASH",
         business_type: :in_store, lifecycle_status: :active)
-      PaymentMethodAppointment.create!(appoint_to: branch, company: company,
-        payment_method: cash_payment_method, name: "Br cash", code: "TST_BR_CASH",
-        business_type: :in_store, lifecycle_status: :active)
+      # Branch may predate the company row (no auto-copy) or postdate it
+      # (auto-copied) depending on setup order — cover both.
+      BranchPaymentMethodAppointment.find_or_create_by!(
+        company: company, branch: branch, payment_method: cash_payment_method
+      ) do |a|
+        a.name = "Br cash"
+        a.code = "TST_BR_CASH"
+        a.business_type = :in_store
+        a.lifecycle_status = :active
+      end
     end
 
     before do

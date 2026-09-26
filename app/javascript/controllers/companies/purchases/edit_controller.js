@@ -2,7 +2,7 @@ import Companies_LayoutController from "controllers/companies/layout_controller"
 
 export default class Companies_Purchases_EditController extends Companies_LayoutController {
   // Purchase edit form — prefilled fields + line-item rows (existing
-  // PurchaseItemAppointments carry id + _destroy for removal).
+  // PurchasePurchaseItemAppointments carry id + _destroy for removal).
   // Depends on BE: Companies::PurchasesController#edit (record + reference lists) + #update
   // Endpoints: GET edit_company_purchase_path.json, PATCH company_purchase_path
   // Docs: docs/PURCHASE_WORKFLOW.md
@@ -45,7 +45,7 @@ export default class Companies_Purchases_EditController extends Companies_Layout
         this.propertyMetadata = propertyMapping?.metadata?.properties || []
       }
 
-      this.itemRows = (this.purchase?.purchase_item_appointments || []).map(a => ({
+      this.itemRows = (this.purchase?.purchase_purchase_item_appointments || []).map(a => ({
         id: a.id,
         purchase_item_id: a.purchase_item_id,
         quantity: a.quantity ?? 1,
@@ -161,18 +161,18 @@ export default class Companies_Purchases_EditController extends Companies_Layout
     const inputClass = 'w-full px-2 py-1.5 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-sm'
     return `
       <tr ${row._destroy ? 'class="hidden"' : ''}>
-        <input type="hidden" name="purchase[purchase_item_appointments_attributes][${index}][id]" value="${row.id || ''}">
-        <input type="hidden" name="purchase[purchase_item_appointments_attributes][${index}][_destroy]" value="${row._destroy ? '1' : '0'}">
+        <input type="hidden" name="purchase[purchase_purchase_item_appointments_attributes][${index}][id]" value="${row.id || ''}">
+        <input type="hidden" name="purchase[purchase_purchase_item_appointments_attributes][${index}][_destroy]" value="${row._destroy ? '1' : '0'}">
         <td class="py-2 px-2">
-          <select name="purchase[purchase_item_appointments_attributes][${index}][purchase_item_id]" required
+          <select name="purchase[purchase_purchase_item_appointments_attributes][${index}][purchase_item_id]" required
             data-action="change->${this.identifier}#onItemChange" data-${this.identifier}-index-param="${index}"
             class="${inputClass} cursor-pointer">
             <option value="">—</option>
             ${this.itemOptions(row.purchase_item_id)}
           </select>
         </td>
-        <td class="py-2 px-2"><input type="number" min="1" step="1" name="purchase[purchase_item_appointments_attributes][${index}][quantity]" value="${row.quantity}" class="${inputClass}"></td>
-        <td class="py-2 px-2"><input type="number" step="0.01" name="purchase[purchase_item_appointments_attributes][${index}][unit_price]" value="${row.unit_price}" class="${inputClass}"></td>
+        <td class="py-2 px-2"><input type="number" min="1" step="1" name="purchase[purchase_purchase_item_appointments_attributes][${index}][quantity]" value="${row.quantity}" class="${inputClass}"></td>
+        <td class="py-2 px-2"><input type="number" step="0.01" name="purchase[purchase_purchase_item_appointments_attributes][${index}][unit_price]" value="${row.unit_price}" class="${inputClass}"></td>
         <td class="py-2 px-2 text-right">
           <button type="button" data-action="click->${this.identifier}#removeItemRow" data-${this.identifier}-index-param="${index}"
             class="p-1.5 text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-900/30 rounded-lg cursor-pointer">

@@ -13,7 +13,8 @@ class Reservation < ApplicationRecord
   belongs_to :company
   belongs_to :category
   belongs_to :property_mapping
-  has_many :reservation_appointments, dependent: :destroy
+  has_many :customer_reservation_appointments, dependent: :destroy
+  has_many :customers, through: :customer_reservation_appointments
 
   validates :code, presence: true, uniqueness: true
 end

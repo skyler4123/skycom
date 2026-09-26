@@ -21,11 +21,11 @@ RSpec.describe OrderProcessingV1::CreateOrderService do
       expect(Order.last.workflow_status).to eq("pending")
     end
 
-    it "creates OrderAppointments for each item" do
-      expect { result }.to change(OrderAppointment, :count).by(1)
-      oa = OrderAppointment.last
+    it "creates OrderProductAppointments for each item" do
+      expect { result }.to change(OrderProductAppointment, :count).by(1)
+      oa = OrderProductAppointment.last
       expect(oa.quantity).to eq(2)
-      expect(oa.appoint_to).to eq(product)
+      expect(oa.product).to eq(product)
     end
 
     it "returns order_id and total_price" do
@@ -43,8 +43,8 @@ RSpec.describe OrderProcessingV1::CreateOrderService do
         ]
       end
 
-      it "creates OrderAppointments for each item" do
-        expect { result }.to change(OrderAppointment, :count).by(2)
+      it "creates OrderProductAppointments for each item" do
+        expect { result }.to change(OrderProductAppointment, :count).by(2)
       end
 
       it "returns correct total_price" do

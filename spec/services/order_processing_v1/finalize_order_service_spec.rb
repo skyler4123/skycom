@@ -35,10 +35,10 @@ RSpec.describe OrderProcessingV1::FinalizeOrderService do
       )
     end
     let!(:oa) do
-      OrderAppointment.create!(
+      OrderProductAppointment.create!(
         company: company,
         order: order,
-        appoint_to: product,
+        product: product,
         quantity: 2,
         unit_price: 50,
         total_price: 100

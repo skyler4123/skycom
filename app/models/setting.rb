@@ -23,6 +23,8 @@ class Setting < ApplicationRecord
   belongs_to :appoint_from, polymorphic: true, optional: true
   belongs_to :appoint_for, polymorphic: true, optional: true
   belongs_to :appoint_by, polymorphic: true, optional: true
+  has_many :employee_setting_appointments, dependent: :destroy
+  has_many :employees, through: :employee_setting_appointments
 
   # --- Scopes ---
   scope :company_level, -> { where(appoint_to_type: "Company") }

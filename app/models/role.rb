@@ -41,25 +41,26 @@ class Role < ApplicationRecord
     payment_method: 20
   }, prefix: :model_type
   # --- Associations ---
-  # REASON: When a Role's timestamp is updated (either directly or via PolicyAppointment), it touches the Company. This ensures the Company's cache_key changes.
+  # REASON: When a Role's timestamp is updated (either directly or via PolicyRoleAppointment), it touches the Company. This ensures the Company's cache_key changes.
   belongs_to :company, touch: true
   belongs_to :branch, optional: true
 
-  has_many :policy_appointments, dependent: :destroy, as: :appoint_to
-  has_many :policies, through: :policy_appointments
-
-  has_many :tag_appointments, dependent: :destroy, as: :appoint_to
-  has_many :tags, through: :tag_appointments
+  has_many :policy_role_appointments, dependent: :destroy
+  has_many :policies, through: :policy_role_appointments
 
   has_many :employee_group_appointments, dependent: :destroy, as: :appoint_to
   has_many :employee_groups, through: :employee_group_appointments
 
-  has_many :role_appointments, dependent: :destroy
-  has_many :employee_groups, through: :role_appointments, source: :appoint_to, source_type: "EmployeeGroup"
-  has_many :employees, through: :role_appointments, source: :appoint_to, source_type: "Employee"
-  has_many :customer_groups, through: :role_appointments, source: :appoint_to, source_type: "CustomerGroup"
-  has_many :customers, through: :role_appointments, source: :appoint_to, source_type: "Customer"
-  has_many :departments, through: :role_appointments, source: :appoint_to, source_type: "Department"
+  has_many :employee_role_appointments, dependent: :destroy
+  has_many :employees, through: :employee_role_appointments
+  has_many :customer_role_appointments, dependent: :destroy
+  has_many :customers, through: :customer_role_appointments
+  has_many :customer_group_role_appointments, dependent: :destroy
+  has_many :customer_groups, through: :customer_group_role_appointments
+  has_many :department_role_appointments, dependent: :destroy
+  has_many :departments, through: :department_role_appointments
+  has_many :employee_group_role_appointments, dependent: :destroy
+  has_many :employee_groups, through: :employee_group_role_appointments
 
   # --- Validations ---
   validates :name,
@@ -70,7 +71,7 @@ class Role < ApplicationRecord
             message: "A role with this name already exists."
           }
   validates :business_type, presence: true
-  # This fires whenever the Role is touched (e.g., by a PolicyAppointment change)
+  # This fires whenever the Role is touched (e.g., by a PolicyRoleAppointment change)
   after_touch :invalidate_employee_caches
 
   # --- Soft Deletion (Discard) ---
@@ -78,7 +79,7 @@ class Role < ApplicationRecord
   # include Discard::Model
   # default_scope -> { kept }
 
-  # This fires whenever the Role is touched (e.g., by a PolicyAppointment change)
+  # This fires whenever the Role is touched (e.g., by a PolicyRoleAppointment change)
   after_touch :invalidate_employee_caches
 
   def setup_policies_for!(resource_name)
@@ -95,10 +96,10 @@ class Role < ApplicationRecord
         p.branch_id = company.branches.first&.id
       end
 
-      appointment = PolicyAppointment.find_or_create_by!(
+      appointment = PolicyRoleAppointment.find_or_create_by!(
         company: company,
         policy: policy,
-        appoint_to: self
+        role: self
       )
 
       appointment.update!(workflow_status: :inactive) if appointment.new_record?

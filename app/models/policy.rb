@@ -20,11 +20,8 @@ class Policy < ApplicationRecord
 
   belongs_to :branch, optional: true
 
-  has_many :policy_appointments, dependent: :destroy
-  has_many :roles, through: :policy_appointments, source: :appoint_to, source_type: "Role"
-
-  has_many :tag_appointments, dependent: :destroy, as: :appoint_to
-  has_many :tags, through: :tag_appointments
+  has_many :policy_role_appointments, dependent: :destroy
+  has_many :roles, through: :policy_role_appointments
   # --- Soft Deletion (Discard) ---
   # If you are using a gem like 'Discard' or similar for soft deletion:
   # include Discard::Model

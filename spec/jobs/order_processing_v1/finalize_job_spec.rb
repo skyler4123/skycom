@@ -11,9 +11,9 @@ RSpec.describe OrderProcessingV1::FinalizeJob do
     let(:category) { create(:category, company: company, resource_name: "orders") }
     let(:order) { create(:order, company: company, branch: branch, customer: customer, category: category, workflow_status: :paid) }
     let!(:oa) do
-      order.order_appointments.create!(
+      order.order_product_appointments.create!(
         company: company,
-        appoint_to: product,
+        product: product,
         quantity: 2,
         unit_price: 50,
         total_price: 100

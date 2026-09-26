@@ -20,13 +20,12 @@ module OrderProcessingV1
         business_type: :in_store
       )
 
-      order_appointments = items.map do |item|
+      order_product_appointments = items.map do |item|
         product = Product.find(item[:product_id])
         {
           company_id: company.id,
           order_id: order.id,
-          appoint_to_type: "Product",
-          appoint_to_id: item[:product_id],
+          product_id: item[:product_id],
           quantity: item[:quantity],
           unit_price: item[:unit_price],
           total_price: item[:quantity].to_i * item[:unit_price].to_f,
@@ -35,7 +34,7 @@ module OrderProcessingV1
         }
       end
 
-      OrderAppointment.insert_all!(order_appointments)
+      OrderProductAppointment.insert_all!(order_product_appointments)
 
       { order_id: order.id, total_price: total_price }
     end
