@@ -1,7 +1,7 @@
 # StockAdjustment — Atomic purpose: the stock-take correction document
-# (direction: increase/decrease + reason). Multi-line via StockItemAppointment;
-# each line spawns a StockTransaction (transaction_type: adjustment, add on
-# increase / remove on decrease).
+# (direction: increase/decrease + reason). Multi-line via
+# StockAdjustmentStockAppointment; each line spawns a StockTransaction
+# (transaction_type: adjustment, add on increase / remove on decrease).
 class StockAdjustment < ApplicationRecord
   include CategoryConcern
   include PropertyMappingConcern
@@ -26,8 +26,8 @@ class StockAdjustment < ApplicationRecord
   belongs_to :property_mapping
   belongs_to :appoint_by, polymorphic: true, optional: true
 
-  has_many :stock_item_appointments, as: :appoint_to, dependent: :destroy
-  has_many :stocks, through: :stock_item_appointments
+  has_many :stock_adjustment_stock_appointments, dependent: :destroy
+  has_many :stocks, through: :stock_adjustment_stock_appointments
 
 
   validates :code, presence: true, uniqueness: true

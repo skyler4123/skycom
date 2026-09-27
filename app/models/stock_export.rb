@@ -1,6 +1,7 @@
 # StockExport — Atomic purpose: the outbound document (sale / transfer_out /
-# return_to_supplier / damaged / expired). Multi-line via StockItemAppointment;
-# each line spawns a remove-direction StockTransaction (transaction_type: export).
+# return_to_supplier / damaged / expired). Multi-line via
+# StockExportStockAppointment; each line spawns a remove-direction
+# StockTransaction (transaction_type: export).
 class StockExport < ApplicationRecord
   # NOTE: must be declared before `include DynamicSearchConcern` — the meilisearch
   # settings block runs at include time. See the hook docs in the concern.
@@ -39,8 +40,8 @@ class StockExport < ApplicationRecord
   belongs_to :appoint_by, polymorphic: true, optional: true
 
   has_many :stock_transactions, as: :appoint_for, dependent: :restrict_with_error
-  has_many :stock_item_appointments, as: :appoint_to, dependent: :destroy
-  has_many :stocks, through: :stock_item_appointments
+  has_many :stock_export_stock_appointments, dependent: :destroy
+  has_many :stocks, through: :stock_export_stock_appointments
 
 
   validates :code, presence: true, uniqueness: true
