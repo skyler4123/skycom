@@ -139,7 +139,7 @@ through `appoint_to` / `appoint_from` / `appoint_for` / `appoint_by` columns.
 Every join was a polymorphic lookup, mismatched pairs were possible at the
 schema level, and per-domain extras (prices, merchant identity, durations) had
 nowhere typed to live. The refactor
-(`59490bf7`, migration `20260925000001_create_atomic_appointments.rb`)
+(`59490bf7`, split into migrations `20260925000001..20260925000103`, one per atomic table)
 replaced them with 103 single-purpose tables:
 
 - **One table per resource pair, named alphabetically** (`A_B_appointments`).
