@@ -1,10 +1,11 @@
 import Companies_LayoutController from "controllers/companies/layout_controller"
 
 export default class Companies_StockImports_IndexController extends Companies_LayoutController {
-  // StockTransfers dashboard — table hydrates from the index JSON of the current URL.
+  // StockImports dashboard — table hydrates from the index JSON of the current URL.
   // Search/filter controls render from the active TableConfig via the shared helpers
   // (dynamicSearchHTML / dynamicFiltersHTML).
-  // Depends on BE: Companies::StockImportsController#index (list + Meilisearch q / filters[key])
+  // Depends on BE: Companies::StockImportsController#index (list + Meilisearch q / filters[key]),
+  //                #show (lines + ledger), #new (warehouses + stocks), #create
   // Endpoints: GET <pathname>.json?category_id&branch_id&q&filters[key] — traditional GET form, full-page submit
   // Docs: docs/DYNAMIC_TABLE.md §2.5
   static targets = ["importsList"]
@@ -123,6 +124,12 @@ export default class Companies_StockImports_IndexController extends Companies_La
                   </button>
                 </div>
               </div>
+
+              <a href="${Helpers.new_company_stock_import_path(currentCompany().id)}"
+                class="flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors font-medium text-sm whitespace-nowrap cursor-pointer">
+                <span class="material-symbols-outlined text-[20px]">add</span>
+                ${translate("Add")}
+              </a>
             </form>
           </div>
 
@@ -134,7 +141,11 @@ export default class Companies_StockImports_IndexController extends Companies_La
               target: "importsList",
               mappingLookup,
               renderers: {
-                name: (value) => `<p class="font-medium text-slate-900 dark:text-white">${value || translate("Unnamed Stock Import")}</p>`,
+                name: (value, record) => `
+                  <a href="${Helpers.company_stock_import_path(currentCompany().id, record.id)}"
+                    class="font-medium text-slate-900 dark:text-white overflow-visible whitespace-normal hover:text-blue-600 dark:hover:text-blue-400 transition-colors cursor-pointer">
+                    ${value || translate("Unnamed Stock Import")}
+                  </a>`,
                 code: (value) => `<span class="font-mono text-xs bg-slate-100 dark:bg-slate-800/60 px-2 py-0.5 rounded text-slate-600 dark:text-slate-300 font-medium">${value || '—'}</span>`,
                 quantity: (value) => `<span class="font-medium text-slate-900 dark:text-white">${value ?? 0}</span>`,
                 business_type: (value) => `<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900/50 dark:text-blue-300">${Helpers.capitalize((value || 'purchase').replace(/_/g, ' '))}</span>`,
