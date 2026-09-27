@@ -19,7 +19,7 @@ RSpec.describe "Stock source-of-truth consistency", type: :model do
       category: source_stock.category, property_mapping: source_stock.property_mapping,
       code: "STKTR-E2E1", name: "E2E move", business_type: :transfer, workflow_status: :pending
     )
-    transfer.stock_item_appointments.create!(company: company, stock: source_stock, quantity: 6)
+    transfer.stock_transfer_stock_appointments.create!(company: company, stock: source_stock, quantity: 6)
 
     StockMovementService::Transfers::InitiateService.call(transfer: transfer, employee: nil)
 
@@ -55,7 +55,7 @@ RSpec.describe "Stock source-of-truth consistency", type: :model do
     owner = company.employees.find_by(business_type: "owner")
     purchase = create(:purchase, company: company, category: category, created_by_employee: owner)
     item = Seed::PurchaseItemService.create(company: company, product: product, name: "E2E item")
-    purchase.purchase_item_appointments.create!(
+    purchase.purchase_purchase_item_appointments.create!(
       company: company, purchase_item: item, quantity: 7, unit_price: 1, total_price: 7
     )
 
@@ -76,7 +76,7 @@ RSpec.describe "Stock source-of-truth consistency", type: :model do
       category: source_stock.category, property_mapping: source_stock.property_mapping,
       code: "STKTR-E2E2", name: "E2E fail", business_type: :transfer, workflow_status: :pending
     )
-    transfer.stock_item_appointments.create!(company: company, stock: source_stock, quantity: 99)
+    transfer.stock_transfer_stock_appointments.create!(company: company, stock: source_stock, quantity: 99)
 
     expect {
       StockMovementService::Transfers::InitiateService.call(transfer: transfer, employee: nil)

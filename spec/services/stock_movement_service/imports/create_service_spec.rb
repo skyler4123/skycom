@@ -19,7 +19,7 @@ RSpec.describe StockMovementService::Imports::CreateService, type: :model do
       code: "STKIM-#{SecureRandom.hex(4).upcase}", name: "Restock",
       business_type: :purchase, workflow_status: :pending
     )
-    import.stock_item_appointments.build(company: company, stock: stock_ref, quantity: quantity)
+    import.stock_import_stock_appointments.build(company: company, stock: stock_ref, quantity: quantity)
     import
   end
 

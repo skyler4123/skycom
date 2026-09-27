@@ -2,7 +2,7 @@
 #
 # StockAdjustments dashboard API (Shell-First). Stock-take corrections as a
 # dedicated document: direction (increase/decrease) + reason, line items via
-# StockItemAppointment. create runs the movement through
+# StockAdjustmentStockAppointment. create runs the movement through
 # StockMovementService::Adjustments::CreateService — one transaction for
 # document + lines + ledger rows + quantity (remove side is hold-aware floored).
 # Serves Stimulus: (future) Companies_StockAdjustments_IndexController

@@ -11,7 +11,7 @@ class StockMovementService::Transfers::CancelService
     end
 
     ActiveRecord::Base.transaction do
-      transfer.stock_item_appointments.each do |line|
+      transfer.stock_transfer_stock_appointments.each do |line|
         line.stock.reload.release_reserved!(line.quantity)
       end
 

@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
 # Shared create flow for stock movement documents (StockImport / StockExport /
-# StockAdjustment). Builds the document + StockItemAppointment lines from params,
-# then executes the movement through the StockMovementService epic inside ONE
+# StockAdjustment). Builds the document + atomic stock lines from params, then
+# executes the movement through the StockMovementService epic inside ONE
 # transaction: document + lines + ledger rows + quantity changes all-or-nothing
 # (docs/superpowers/specs/2026-09-23-stock-source-of-truth-design.md §2).
 # Failure → 422 { errors: [...] }, nothing persisted (docs/API_ERROR_FORMAT.md).
@@ -17,9 +17,10 @@ module Companies::StockMovementConcern
 
   def create_movement_document(document_class, service_class)
     document = document_class.new(movement_document_params(document_class))
+    lines = document.public_send(line_assoc_for(document_class))
 
     stock_items_params.each do |item|
-      document.stock_item_appointments.build(
+      lines.build(
         company: current_company,
         stock: current_company.stocks.find(item[:stock_id]),
         quantity: item[:quantity]
@@ -28,8 +29,8 @@ module Companies::StockMovementConcern
 
     # Display/filter compat (only on documents that carry the legacy columns):
     # first line's product + total quantity on the document.
-    document.product_id ||= document.stock_item_appointments.first&.stock&.product_id if document.has_attribute?(:product_id)
-    document.quantity = document.stock_item_appointments.sum(&:quantity) if document.has_attribute?(:quantity)
+    document.product_id ||= lines.first&.stock&.product_id if document.has_attribute?(:product_id)
+    document.quantity = lines.sum(&:quantity) if document.has_attribute?(:quantity)
 
     ActiveRecord::Base.transaction do
       document.save!
@@ -61,6 +62,17 @@ module Companies::StockMovementConcern
       h[:company] = current_company
       h[:code] = "#{document_class::CODE_PREFIX}-#{SecureRandom.hex(4).upcase}"
     end
+  end
+
+  # Each document carries its own atomic line table (one table per pair —
+  # docs/RESOURCES.md §4). The concern stays shared by resolving the
+  # association from the document class.
+  def line_assoc_for(document_class)
+    {
+      StockImport => :stock_import_stock_appointments,
+      StockExport => :stock_export_stock_appointments,
+      StockAdjustment => :stock_adjustment_stock_appointments
+    }.fetch(document_class)
   end
 
   def stock_items_params

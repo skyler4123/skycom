@@ -9,7 +9,7 @@
 # OrderProcessingV1::ReserveStockService). The transfer moves to `initiated`.
 class StockMovementService::Transfers::InitiateService
   def self.call(transfer:, employee: nil)
-    raise StockMovementService::Error, "Transfer has no stock lines" if transfer.stock_item_appointments.empty?
+    raise StockMovementService::Error, "Transfer has no stock lines" if transfer.stock_transfer_stock_appointments.empty?
     unless transfer.workflow_status_draft? || transfer.workflow_status_pending?
       raise StockMovementService::Error, "Transfer is already #{transfer.workflow_status}"
     end
@@ -17,7 +17,7 @@ class StockMovementService::Transfers::InitiateService
     reserved = []
 
     ActiveRecord::Base.transaction do
-      transfer.stock_item_appointments.each do |line|
+      transfer.stock_transfer_stock_appointments.each do |line|
         stock = line.stock.reload
         unless stock.reserve_stock!(line.quantity)
           raise StockMovementService::Error,

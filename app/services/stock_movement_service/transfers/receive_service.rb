@@ -13,7 +13,7 @@ class StockMovementService::Transfers::ReceiveService
       raise StockMovementService::Error, "Transfer must be initiated before receiving (current: #{transfer.workflow_status})"
     end
 
-    transfer.stock_item_appointments.each do |line|
+    transfer.stock_transfer_stock_appointments.each do |line|
       StockMovementService::BaseService.call(
         stock: line.stock.reload,
         quantity: line.quantity,

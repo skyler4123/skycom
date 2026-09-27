@@ -5,7 +5,7 @@
 # StockImports::SearchQueryService; plain DB path otherwise). quantity is a
 # filterable metric (StockImport.ms_extra_filterable_columns).
 # create runs the movement through StockMovementService::Imports::CreateService —
-# document + StockItemAppointment lines + ledger rows + quantity in ONE transaction.
+# document + atomic stock lines + ledger rows + quantity in ONE transaction.
 # Serves Stimulus: Companies_StockImports_IndexController (index JSON incl. q/filters passthrough)
 # Endpoints:
 #   GET  /companies/:company_id/stock_imports(.json)                          — index dashboard

@@ -27,15 +27,15 @@ class Companies::StockTransfersController < Companies::ApplicationController
     transfer.workflow_status = :pending # movement starts at initiate
 
     stock_items_params.each do |item|
-      transfer.stock_item_appointments.build(
+      transfer.stock_transfer_stock_appointments.build(
         company: current_company,
         stock: current_company.stocks.find(item[:stock_id]),
         quantity: item[:quantity]
       )
     end
-    transfer.product_id ||= transfer.stock_item_appointments.first&.stock&.product_id
-    transfer.quantity = transfer.stock_item_appointments.sum(&:quantity)
-    transfer.branch ||= transfer.stock_item_appointments.first&.stock&.branch
+    transfer.product_id ||= transfer.stock_transfer_stock_appointments.first&.stock&.product_id
+    transfer.quantity = transfer.stock_transfer_stock_appointments.sum(&:quantity)
+    transfer.branch ||= transfer.stock_transfer_stock_appointments.first&.stock&.branch
 
     ActiveRecord::Base.transaction do
       transfer.save!

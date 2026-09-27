@@ -20,7 +20,7 @@ RSpec.describe StockMovementService::Transfers, type: :model do
       code: "STKTR-#{SecureRandom.hex(4).upcase}", name: "Move units",
       business_type: :transfer, workflow_status: :pending
     )
-    transfer.stock_item_appointments.build(company: company, stock: src, quantity: quantity)
+    transfer.stock_transfer_stock_appointments.build(company: company, stock: src, quantity: quantity)
     transfer.save!
     transfer
   end
@@ -71,9 +71,9 @@ RSpec.describe StockMovementService::Transfers, type: :model do
       scarce_product = create(:product, company: company)
       scarce_stock = Stock.create!(company: company, warehouse: source_warehouse, product: scarce_product, quantity: 1, pending: 0, name: "Scarce", code: "STK-SCR")
       transfer2 = build_transfer(quantity: 1, src: scarce_stock)
-      transfer2.stock_item_appointments.destroy_all
-      transfer2.stock_item_appointments.create!(company: company, stock: source_stock.reload, quantity: 4)
-      transfer2.stock_item_appointments.create!(company: company, stock: scarce_stock, quantity: 5)
+      transfer2.stock_transfer_stock_appointments.destroy_all
+      transfer2.stock_transfer_stock_appointments.create!(company: company, stock: source_stock.reload, quantity: 4)
+      transfer2.stock_transfer_stock_appointments.create!(company: company, stock: scarce_stock, quantity: 5)
 
       expect {
         described_class::InitiateService.call(transfer: transfer2, employee: employee)

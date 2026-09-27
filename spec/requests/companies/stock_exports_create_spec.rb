@@ -45,7 +45,7 @@ RSpec.describe "Companies::StockExportsController#create", type: :request do
 
     expect(response).to have_http_status(:unprocessable_content)
     expect(response.parsed_body["errors"].join).to match(/Insufficient stock: available 6/)
-    expect(StockItemAppointment.count).to eq(0)
+    expect(StockExportStockAppointment.count).to eq(0)
     expect(StockTransaction.count).to eq(0)
     expect(stock.reload.quantity).to eq(10)
   end

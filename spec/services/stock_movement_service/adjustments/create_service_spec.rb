@@ -16,7 +16,7 @@ RSpec.describe StockMovementService::Adjustments::CreateService, type: :model do
       code: "STKAD-#{SecureRandom.hex(4).upcase}", name: "Stock take",
       direction: direction, reason: "Cycle count", workflow_status: :pending
     )
-    adjustment.stock_item_appointments.build(company: company, stock: stock, quantity: quantity)
+    adjustment.stock_adjustment_stock_appointments.build(company: company, stock: stock, quantity: quantity)
     adjustment
   end
 

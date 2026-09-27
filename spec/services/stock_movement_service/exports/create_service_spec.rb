@@ -16,7 +16,7 @@ RSpec.describe StockMovementService::Exports::CreateService, type: :model do
       code: "STKEX-#{SecureRandom.hex(4).upcase}", name: "Write-off",
       business_type: :damaged, workflow_status: :pending
     )
-    export.stock_item_appointments.build(company: company, stock: stock_ref, quantity: quantity)
+    export.stock_export_stock_appointments.build(company: company, stock: stock_ref, quantity: quantity)
     export
   end
 
@@ -44,7 +44,7 @@ RSpec.describe StockMovementService::Exports::CreateService, type: :model do
     }.to raise_error(StockMovementService::Error, /Insufficient stock: available 6/)
 
     expect(StockExport.count).to eq(0)
-    expect(StockItemAppointment.count).to eq(0)
+    expect(StockExportStockAppointment.count).to eq(0)
     expect(StockTransaction.count).to eq(0)
     expect(stock.reload.quantity).to eq(10)
   end

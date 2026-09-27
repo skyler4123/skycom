@@ -20,7 +20,7 @@ RSpec.describe "Companies::StockTransfersController movements", type: :request d
       code: "STKTR-TEST1", name: "Move", business_type: :transfer,
       workflow_status: :pending
     ).tap do |t|
-      t.stock_item_appointments.create!(company: company, stock: stock, quantity: 4)
+      t.stock_transfer_stock_appointments.create!(company: company, stock: stock, quantity: 4)
     end
   end
 
@@ -46,7 +46,7 @@ RSpec.describe "Companies::StockTransfersController movements", type: :request d
     end
 
     it "renders 422 with errors when the hold fails" do
-      transfer.stock_item_appointments.first.update!(quantity: 99)
+      transfer.stock_transfer_stock_appointments.first.update!(quantity: 99)
 
       post initiate_company_stock_transfer_path(company, transfer), as: :json
 
@@ -106,7 +106,7 @@ RSpec.describe "Companies::StockTransfersController movements", type: :request d
       expect(stock.reload.pending).to eq(0)
       created = StockTransfer.order(:created_at).last
       expect(created.workflow_status).to eq("pending")
-      expect(created.stock_item_appointments.count).to eq(1)
+      expect(created.stock_transfer_stock_appointments.count).to eq(1)
       expect(created.destination_warehouse_id).to eq(destination_warehouse.id)
     end
   end
