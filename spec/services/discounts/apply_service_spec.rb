@@ -11,7 +11,7 @@ RSpec.describe Discounts::ApplyService do
   let(:product) { create(:product, company: company) }
   let(:order) do
     Seed::OrderService.create(company: company, customer: customer, currency: :usd).tap do |o|
-      OrderAppointment.create!(company: company, order: o, appoint_to: product,
+      OrderProductAppointment.create!(company: company, order: o, product: product,
         quantity: 2, unit_price: 50.0, total_price: 100.0)
     end
   end
@@ -65,7 +65,7 @@ RSpec.describe Discounts::ApplyService do
 
   it "fails on currency mismatch" do
     euro_order = Seed::OrderService.create(company: company, customer: customer, currency: :vnd)
-    OrderAppointment.create!(company: company, order: euro_order, appoint_to: product,
+    OrderProductAppointment.create!(company: company, order: euro_order, product: product,
       quantity: 2, unit_price: 50.0, total_price: 100.0)
 
     expect(apply(target: euro_order)).to eq({ success: false, errors: [ "Campaign currency does not match the order" ] })

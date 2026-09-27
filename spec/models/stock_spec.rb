@@ -7,8 +7,8 @@ RSpec.describe Stock, type: :model do
     it { should belong_to(:branch).optional }
     it { should belong_to(:warehouse) }
     it { should belong_to(:category) }
-    it { should have_many(:tag_appointments).dependent(:destroy) }
-    it { should have_many(:tags).through(:tag_appointments) }
+    it { should have_many(:stock_tag_appointments).dependent(:destroy) }
+    it { should have_many(:tags).through(:stock_tag_appointments) }
   end
   it_behaves_like "property_mapping concern", Stock
 

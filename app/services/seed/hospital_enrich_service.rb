@@ -180,10 +180,10 @@ class Seed::HospitalEnrichService
 
   def assign_employees_to_departments
     @employees.each do |employee|
-      Seed::DepartmentAppointmentService.create(
+      Seed::DepartmentEmployeeAppointmentService.create(
         company: @company,
         department: @departments.sample,
-        appoint_to: employee
+        employee: employee
       )
     end
   end
@@ -381,8 +381,8 @@ class Seed::HospitalEnrichService
   def attach_treatments_to_order(branch, order)
     branch_services = @services.select { |s| s.branch_id == branch.id }
     branch_services.sample(rand(1..3)).each do |service|
-      OrderAppointment.create!(
-        company: @company, order: order, appoint_to: service,
+      OrderServiceAppointment.create!(
+        company: @company, order: order, service: service,
         quantity: 1, unit_price: rand(50.0..500.0).round(2), total_price: 0
       )
     end
@@ -532,7 +532,7 @@ class Seed::HospitalEnrichService
         name: "Purchase #{i + 1} for #{branch.name}"
       )
       items.sample(rand(1..3)).each do |item|
-        Seed::PurchaseItemAppointmentService.create(company: @company, purchase: purchase, purchase_item: item)
+        Seed::PurchasePurchaseItemAppointmentService.create(company: @company, purchase: purchase, purchase_item: item)
       end
 
       run_purchase_workflow(purchase, requester, managers.sample, i)

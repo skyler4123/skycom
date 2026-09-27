@@ -16,25 +16,49 @@ class Seed::CustomerAppointmentService
   )
     raise "Cannot create appointment: No company or customer provided." if company.nil? || customer.nil?
 
-    should_discard = rand(10) == 0
-    discarded_at ||= should_discard ? Time.zone.now - rand(1..180).days : nil
-    name ||= "#{customer.name} Appointment"
-
-    CustomerAppointment.new(
+    attrs = {
       company: company,
-      customer: customer,
-      appoint_from: appoint_from,
-      appoint_to: appoint_to,
-      appoint_for: appoint_for,
-      appoint_by: appoint_by,
       name: name,
-      description: description || "Customer appointment for #{customer.name}.",
-      code: code || "CUST-APT-#{SecureRandom.hex(4).upcase}",
-      lifecycle_status: lifecycle_status || CustomerAppointment.lifecycle_statuses.keys.sample,
-      workflow_status: workflow_status || CustomerAppointment.workflow_statuses.keys.sample,
-      business_type: business_type || CustomerAppointment.business_types.keys.sample,
+      description: description,
+      code: code,
       discarded_at: discarded_at
-    )
+    }
+    case appoint_to
+    when Employee
+      Seed::CustomerEmployeeAppointmentService.new(**attrs, customer: customer, employee: appoint_to)
+    when Service
+      Seed::CustomerServiceAppointmentService.new(**attrs, customer: customer, service: appoint_to)
+    when CustomerGroup
+      Seed::CustomerCustomerGroupAppointmentService.new(**attrs, customer: customer, customer_group: appoint_to)
+    when Membership
+      CustomerMembershipAppointment.new(
+        company: company,
+        customer: customer,
+        membership: appoint_to,
+        name: attrs[:name] || "#{customer.name} Appointment",
+        description: attrs[:description] || "Customer appointment for #{customer.name}.",
+        code: attrs[:code] || "CUST-MEM-#{SecureRandom.hex(4).upcase}",
+        lifecycle_status: lifecycle_status || :active,
+        workflow_status: workflow_status || :approved,
+        business_type: business_type || :primary,
+        discarded_at: attrs[:discarded_at]
+      )
+    when Reservation
+      CustomerReservationAppointment.new(
+        company: company,
+        customer: customer,
+        reservation: appoint_to,
+        name: attrs[:name] || "#{customer.name} Appointment",
+        description: attrs[:description] || "Customer appointment for #{customer.name}.",
+        code: attrs[:code] || "CUST-RES-#{SecureRandom.hex(4).upcase}",
+        lifecycle_status: lifecycle_status || :active,
+        workflow_status: workflow_status || :draft,
+        business_type: business_type || :primary,
+        discarded_at: attrs[:discarded_at]
+      )
+    else
+      raise "Cannot route CustomerAppointment for #{appoint_to.class.name}: no atomic pair table."
+    end
   end
 
   def self.create(...)

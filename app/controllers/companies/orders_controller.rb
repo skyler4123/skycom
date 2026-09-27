@@ -45,13 +45,20 @@ class Companies::OrdersController < Companies::ApplicationController
   # Totals mirror the cart (subtotal from invoice.price_cents or items sum, 10% tax)
   # so the receipt matches what the cashier displayed. Requires OrdersPolicy#receipt?.
   def receipt
-    order = current_company.orders.includes(order_appointments: { appoint_to: {} }).find(params[:id])
+    order = current_company.orders.includes(
+      { order_product_appointments: :product },
+      { order_service_appointments: :service },
+      { order_product_group_appointments: :product_group },
+      { order_service_group_appointments: :service_group },
+      { order_subscription_plan_appointments: :subscription_plan }
+    ).find(params[:id])
     invoice = order.invoices.order(:created_at).last
     transaction = invoice&.transactions&.order(:created_at)&.last
 
-    items = order.order_appointments.map do |oa|
+    items = order.line_items.map do |oa|
+      item_name = oa.name.presence || line_item_name(oa) || "Item"
       {
-        name: oa.name.presence || oa.appoint_to&.name || "Item",
+        name: item_name,
         quantity: oa.quantity,
         unit_price: oa.unit_price.to_f,
         total_price: oa.total_price.to_f
@@ -154,5 +161,17 @@ class Companies::OrdersController < Companies::ApplicationController
 
   def format_orders(orders)
     orders.map { |order| format_order(order) }
+  end
+
+  def line_item_name(line_item)
+    %i[product service product_group service_group subscription_plan].each do |assoc|
+      next unless line_item.respond_to?(assoc)
+
+      record = line_item.public_send(assoc)
+      return record.name if record.respond_to?(:name)
+    end
+    nil
+  rescue StandardError
+    nil
   end
 end

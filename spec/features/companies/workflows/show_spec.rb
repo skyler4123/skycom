@@ -48,7 +48,7 @@ RSpec.feature "Companies::Workflows Show", type: :feature, js: true do
     expect(page).to have_content('Buy', wait: 10)
     expect(page).to have_content('Complete', wait: 10)
     expect(page).to have_content(purchase_category.name, wait: 10)
-    expect(page).to have_content('purchase process', wait: 10)
+    expect(page).to have_content('Purchase Process', wait: 10)
   end
 
   scenario "edit link points to the edit page" do

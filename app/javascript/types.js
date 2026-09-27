@@ -98,45 +98,49 @@
 /** @typedef {Object} ActiveStorageBlob @property {string} id @property {string} key @property {string} filename @property {string} content_type @property {string} metadata @property {string} service_name @property {number} byte_size @property {string} checksum @property {string} created_at */
 /** @typedef {Object} ActiveStorageVariantRecord @property {string} id @property {string} blob_id @property {string} variation_digest */
 
-// --- 18. APPOINTMENTS (POLYMORPHIC RELATIONS) ---
-/** @typedef {Object} Appointment @property {string} id @property {string} appoint_from_type @property {string} appoint_from_id @property {string} appoint_to_type @property {string} appoint_to_id @property {string} appoint_for_type @property {string} appoint_for_id @property {string} appoint_by_type @property {string} appoint_by_id @property {string} name @property {string} description @property {string} code @property {number} lifecycle_status @property {string} workflow_status @property {string} business_type @property {string} discarded_at @property {string} created_at @property {string} updated_at */
-/** @typedef {Appointment} AddressAppointment */
-/** @typedef {Appointment} ArticleAppointment */
-/** @typedef {Appointment} ArticleGroupAppointment */
-/** @typedef {Appointment} CartAppointment */
-/** @typedef {Appointment} CustomerAppointment */
-/** @typedef {Appointment} CustomerGroupAppointment */
-/** @typedef {Appointment} DepartmentAppointment */
-/** @typedef {Appointment} DocumentAppointment */
-/** @typedef {Appointment} DocumentGroupAppointment */
-/** @typedef {Appointment} EmployeeAppointment */
-/** @typedef {Appointment} EmployeeGroupAppointment */
-/** @typedef {Appointment} EventAppointment */
-/** @typedef {Appointment} EventGroupAppointment */
-/** @typedef {Appointment} ExamAppointment */
-/** @typedef {Appointment} FacilityAppointment */
-/** @typedef {Appointment} FacilityGroupAppointment */
-/** @typedef {Appointment} InventoryItemAppointment */
-/** @typedef {Appointment} InventoryTransactionAppointment */
-/** @typedef {Appointment} NotificationAppointment */
-/** @typedef {Appointment} NotificationGroupAppointment */
-/** @typedef {Appointment} OrderAppointment */
-/** @typedef {Appointment} OrderGroupAppointment */
-/** @typedef {Appointment} PaymentMethodAppointment */
-/** @typedef {Appointment} PeriodAppointment */
-/** @typedef {Appointment} PolicyAppointment */
-/** @typedef {Appointment} PriceAppointment */
-/** @typedef {Appointment} ProductAppointment */
-/** @typedef {Appointment} ProductGroupAppointment */
-/** @typedef {Appointment} ProjectAppointment */
-/** @typedef {Appointment} ProjectGroupAppointment */
-/** @typedef {Appointment} ServiceAppointment */
-/** @typedef {Appointment} ServiceGroupAppointment */
-/** @typedef {Appointment} SettingAppointment */
-/** @typedef {Appointment} SettingGroupAppointment */
-/** @typedef {Appointment} TagAppointment */
-/** @typedef {Appointment} TaskAppointment */
-/** @typedef {Appointment} TaskGroupAppointment */
+// --- 18. APPOINTMENTS (ATOMIC PAIRWISE JOINS) ---
+// Atomic pairwise join tables: one table per resource pair, named alphabetically
+// (A_B_appointments, e.g. article_employee_appointments). Each row links exactly
+// two records via concrete FKs plus company_id — no polymorphic appoint_to/from.
+// Extra columns per domain: quantity/unit_price/total_price (order, purchase),
+// duration/start_at (service bookings).
+/** @typedef {Object} AtomicAppointment @property {string} id @property {string} company_id @property {string} name @property {string} description @property {string} code @property {number} lifecycle_status @property {string} workflow_status @property {string} business_type @property {string} discarded_at @property {string} created_at @property {string} updated_at */
+/** @typedef {AtomicAppointment} ArticleEmployeeAppointment */
+/** @typedef {AtomicAppointment} ArticleGroupEmployeeAppointment */
+/** @typedef {AtomicAppointment} BranchPaymentMethodAppointment */
+/** @typedef {AtomicAppointment} CartEmployeeAppointment */
+/** @typedef {AtomicAppointment} CompanyPaymentMethodAppointment */
+/** @typedef {AtomicAppointment} CustomerCustomerGroupAppointment */
+/** @typedef {AtomicAppointment} CustomerEmployeeAppointment */
+/** @typedef {AtomicAppointment} DepartmentEmployeeAppointment */
+/** @typedef {AtomicAppointment} DocumentEmployeeAppointment */
+/** @typedef {AtomicAppointment} DocumentGroupEmployeeAppointment */
+/** @typedef {AtomicAppointment} EmployeeEmployeeAppointment */
+/** @typedef {AtomicAppointment} EmployeeEmployeeGroupAppointment */
+/** @typedef {AtomicAppointment} EmployeeEventAppointment */
+/** @typedef {AtomicAppointment} EmployeeEventGroupAppointment */
+/** @typedef {AtomicAppointment} EmployeeExamAppointment */
+/** @typedef {AtomicAppointment} EmployeeFacilityAppointment */
+/** @typedef {AtomicAppointment} EmployeeNotificationAppointment */
+/** @typedef {AtomicAppointment} EmployeeNotificationGroupAppointment */
+/** @typedef {AtomicAppointment} EmployeeProductAppointment */
+/** @typedef {AtomicAppointment} EmployeeProjectAppointment */
+/** @typedef {AtomicAppointment} EmployeeProjectGroupAppointment */
+/** @typedef {AtomicAppointment} EmployeeServiceAppointment */
+/** @typedef {AtomicAppointment} EmployeeSettingAppointment */
+/** @typedef {AtomicAppointment} EmployeeSettingGroupAppointment */
+/** @typedef {AtomicAppointment} EmployeeTaskAppointment */
+/** @typedef {AtomicAppointment} EmployeeTaskGroupAppointment */
+/** @typedef {AtomicAppointment} FacilityFacilityGroupAppointment */
+/** @typedef {AtomicAppointment} EmployeeOrderGroupAppointment */
+/** @typedef {AtomicAppointment} OrderProductAppointment */
+/** @typedef {AtomicAppointment} OrderProductGroupAppointment */
+/** @typedef {AtomicAppointment} OrderServiceAppointment */
+/** @typedef {AtomicAppointment} OrderServiceGroupAppointment */
+/** @typedef {AtomicAppointment} OrderSubscriptionPlanAppointment */
+/** @typedef {AtomicAppointment} ProductProductGroupAppointment */
+/** @typedef {AtomicAppointment} PurchasePurchaseItemAppointment */
+/** @typedef {AtomicAppointment} ServiceServiceGroupAppointment */
 
 // --- UI HELPERS ---
 /** @typedef {Object} Pagination @property {number} current_page @property {number} next_page @property {number} prev_page @property {number} total_pages @property {number} total_count */

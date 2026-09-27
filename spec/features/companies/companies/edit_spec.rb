@@ -9,7 +9,7 @@ RSpec.feature "Companies::Companies Edit", type: :feature, js: true do
   let!(:no_perm_user) { create(:user, :company_employee) }
   let!(:no_perm_employee) do
     emp = create(:employee, company: company, branch: branch, user: no_perm_user)
-    create(:role_appointment, company: company, appoint_to: emp, role: no_perm_role)
+    create(:employee_role_appointment, company: company, employee: emp, role: no_perm_role)
     emp
   end
 

@@ -31,7 +31,7 @@ Callbacks defined directly in the model file (not inherited from a concern).
 | Callback | Line | Method | Description |
 |----------|------|--------|-------------|
 | `after_initialize :set_defaults_from_company, if: :new_record?` | 97 | `set_defaults_from_company` | Copies `timezone` and `currency_code` from parent `Company` to new Branch records (only on new record creation, not on find). |
-| `after_create :initialize_payment_methods` | 107 | `initialize_payment_methods` | Auto-creates a **branch-level** `PaymentMethodAppointment` for each **active** company-level appointment (`company.payment_method_appointments.company_level` with `lifecycle_status: :active`). Copies the company appointment's name (suffixed `" for #{branch.name}"`), code (suffixed `-BR-<hex>`), `business_type`, `workflow_status`, and merchant fields; sets `lifecycle_status: :active`. Ensures every new branch inherits the company's payment methods. |
+| `after_create :initialize_payment_methods` | 107 | `initialize_payment_methods` | Auto-creates a `BranchPaymentMethodAppointment` for each **active** `company.company_payment_method_appointments` row (`lifecycle_status: :active`). Copies the company appointment's name (suffixed `" for #{branch.name}"`), code (suffixed `-BR-<hex>`), `business_type`, `workflow_status`, and merchant fields; sets `lifecycle_status: :active`. Ensures every new branch inherits the company's payment methods. |
 
 ---
 
@@ -161,17 +161,24 @@ Mirrors the `CompanyTransaction` gating: the invoice's `payment_status` is deriv
 
 ---
 
-### PaymentMethodAppointment (`app/models/payment_method_appointment.rb`)
+### CompanyPaymentMethodAppointment (`app/models/company_payment_method_appointment.rb`)
 
 | Callback | Line | Method | Description |
 |----------|------|--------|-------------|
-| `before_validation :default_appoint_to_to_company` | 30 | `default_appoint_to_to_company` | Sets `appoint_to` to the appointment's `company` if `appoint_to` is blank. Guarantees every appointment resolves to a polymorphic source type (Company by default, or Branch when passed explicitly). |
-| `after_update :cascade_lifecycle_to_branch_appointments, if: :company_level_lifecycle_change?` | 31 | `cascade_lifecycle_to_branch_appointments` | When a **company-level** appointment's `lifecycle_status` changes, mirrors that status to all **branch-level** appointments for the same company + payment method via `update_all(lifecycle_status:)`. Runs only when `appoint_to_type == "Company"` and `saved_change_to_lifecycle_status?` — branch-level updates never recurse. |
-| `validate :payment_method_must_be_active_in_company` | 32 | `payment_method_must_be_active_in_company` | Only for `appoint_to_type == "Branch"` — requires an active (`lifecycle_status: :active`) **company-level** appointment for the same company + payment method. Adds `appoint_to: "payment method is not active at the company level"` otherwise. |
+| `after_update :cascade_lifecycle_to_branch_appointments, if: :saved_change_to_lifecycle_status?` | 16 | `cascade_lifecycle_to_branch_appointments` | When the company-level row's `lifecycle_status` changes, mirrors that status to all `BranchPaymentMethodAppointment` rows for the same company + payment method via `update_all(lifecycle_status:)`. Branch-level updates never recurse (no callback on the branch model). |
+| `validate :payment_method_country_matches_company` | 14 | `payment_method_country_matches_company` | Requires `payment_method.country` to match `company.country`; adds `payment_method: "country (...) does not match company country (...)"` otherwise. Skipped when either side is nil. |
+
+### BranchPaymentMethodAppointment (`app/models/branch_payment_method_appointment.rb`)
+
+| Callback | Line | Method | Description |
+|----------|------|--------|-------------|
+| `validate :payment_method_country_matches_company` | 15 | `payment_method_country_matches_company` | Same country-match rule as the company-level model. |
+| `validate :payment_method_must_be_active_in_company` | 16 | `payment_method_must_be_active_in_company` | Requires an active (`lifecycle_status: :active`) `CompanyPaymentMethodAppointment` for the same company + payment method. Adds `branch: "payment method is not active at the company level"` otherwise. Skipped when `company_id`/`payment_method_id` are blank (e.g. pre-derivation). |
+| `validate :branch_must_belong_to_company` | 17 | `branch_must_belong_to_company` | Requires `branch.company_id == company_id` (`company_id` itself is derived from `branch` by `SetDefaultCompanyConcern`). Adds `branch: "does not belong to this company"` otherwise. |
 
 ---
 
-### PolicyAppointment (`app/models/policy_appointment.rb`)
+### PolicyRoleAppointment (`app/models/policy_role_appointment.rb`)
 
 | Callback | Line | Method | Description |
 |----------|------|--------|-------------|
@@ -186,19 +193,20 @@ Mirrors the `CompanyTransaction` gating: the invoice's `payment_status` is deriv
 
 | Callback | Line | Method | Description |
 |----------|------|--------|-------------|
-| `after_touch :invalidate_employee_caches` | 30, 87 | `invalidate_employee_caches` | Bulk-updates `updated_at` on all associated employees via `employees.update_all(updated_at: Time.current)` — avoids loading records. Triggered when the Role is touched (e.g., by `Policy#touch_roles` or `PolicyAppointment` `touch: true`). |
+| `after_touch :invalidate_employee_caches` | 30, 87 | `invalidate_employee_caches` | Bulk-updates `updated_at` on all associated employees via `employees.update_all(updated_at: Time.current)` — avoids loading records. Triggered when the Role is touched (e.g., by `Policy#touch_roles` or `PolicyRoleAppointment` `touch: true`). |
 
 > **Note**: Line 87 is a duplicate declaration of the same callback. Both refer to the same private method.
 
 ---
 
-### RoleAppointment (`app/models/role_appointment.rb`)
+### Role appointments (atomic: `EmployeeRoleAppointment`, `CustomerRoleAppointment`, `CustomerGroupRoleAppointment`, `DepartmentRoleAppointment`, `EmployeeGroupRoleAppointment`)
 
 | Callback | Line | Method | Description |
 |----------|------|--------|-------------|
-| `after_create :clear_company_permissions_cache` | 19 | `clear_company_permissions_cache` | Clears company-level permissions cache when a role is assigned to an employee. |
+| `after_create :clear_company_permissions_cache` | 19 | `clear_company_permissions_cache` | Clears company-level permissions cache when a role is assigned. |
 | `before_update :prevent_modification_if_owner` | 20 | `prevent_modification_if_owner` | Raises `ActiveRecord::ReadOnlyRecord` if `business_type == "owner"`. Owner role appointments are immutable. |
 | `before_destroy :prevent_modification_if_owner` | 21 | `prevent_modification_if_owner` | Same guard — blocks deletion of owner role appointments. |
+| `validate :only_one_owner_appointment_per_company, on: :create` | — | `only_one_owner_appointment_per_company` | Only one `owner` appointment per company per table (`EmployeeRoleAppointment` additionally requires the employee to have `owner` business_type). |
 
 ---
 
@@ -296,13 +304,13 @@ Renders records read-only after creation. Prevents both updates and deletion.
 
 ### SetDefaultCompanyConcern (`app/models/concerns/set_default_company_concern.rb`)
 
-Auto-derives `company_id` on Appointment records from the associated polymorphic resource.
+Auto-derives `company_id` on atomic pairwise Appointment records from the associated concrete resource.
 
 | Callback | Line | Method | Description |
 |----------|------|--------|-------------|
-| `before_validation :set_default_company_from_resource` | 36 | `set_default_company_from_resource` | Derives `company_id` from the associated resource (e.g., `role.company_id` for `RoleAppointment`). Only sets if not already present. Uses class name convention: removes `"Appointment"` suffix, underscores, and calls that association. |
+| `before_validation :set_default_company_from_resource` | 34 | `set_default_company_from_resource` | Derives `company_id` from the first associated record that responds to `company_id` (e.g., `employee.company_id` for `EmployeeTaskAppointment`). Only sets if not already present. Iterates all `belongs_to` associations except `company`; falls back to the company pair side (e.g., `AddressCompanyAppointment#company`). |
 
-**Included in (34+ models):** All `*_appointment` models: `RoleAppointment`, `PolicyAppointment`, `TagAppointment`, `DepartmentAppointment`, `EmployeeAppointment`, `EmployeeGroupAppointment`, `CustomerAppointment`, `CustomerGroupAppointment`, `ProductAppointment`, `ProductGroupAppointment`, `ServiceAppointment`, `ServiceGroupAppointment`, `OrderAppointment`, `OrderGroupAppointment`, `CartAppointment`, `PaymentMethodAppointment`, `FacilityAppointment`, `FacilityGroupAppointment`, `ProjectAppointment`, `ProjectGroupAppointment`, `TaskAppointment`, `TaskGroupAppointment`, `NotificationAppointment`, `NotificationGroupAppointment`, `ExamAppointment`, `EventAppointment`, `EventGroupAppointment`, `SettingAppointment`, `SettingGroupAppointment`, `DocumentAppointment`, `DocumentGroupAppointment`, `ArticleAppointment`, `ArticleGroupAppointment`, `ReservationAppointment`, `SubscriptionPlanAppointment`, and others.
+**Included in (103 models):** All atomic `*_appointments` tables, named alphabetically per pair (`A_B_appointments`, e.g., `ArticleEmployeeAppointment`, `DepartmentEmployeeAppointment`, `EmployeeTaskAppointment`, `CustomerCustomerGroupAppointment`, `FacilityFacilityGroupAppointment`, `ProductProductGroupAppointment`, `ServiceServiceGroupAppointment`, `EmployeeServiceAppointment`, `CustomerServiceAppointment`, plus address/tag/order/payment/policy/role/purchase/reservation/subscription pairs owned by their domain docs).
 
 ---
 
@@ -386,13 +394,13 @@ Each concern defines the same callback:
 | `before_create` | 1 | Session |
 | `after_create` | 6 | Category, Company, Branch, PolicyAppointment, PropertyMapping, RoleAppointment |
 | `belongs_to :company, touch: true` | 6 | Branch, Department, Category, PropertyMapping, TableConfig, Role |
-| `after_update` (conditional) | 2 | PaymentMethodAppointment, PolicyAppointment |
+| `after_update` (conditional) | 2 | CompanyPaymentMethodAppointment, PolicyAppointment |
 | `before_update` | 3 | PolicyAppointment, RoleAppointment, (ImmutableRecordConcern → 3 models) |
 | `before_destroy` | 5 | Employee, System, PolicyAppointment, RoleAppointment, (ImmutableRecordConcern → 3 models) |
 | `before_discard` | 1 | Employee |
 | `after_touch` | 2* | Role (duplicate declaration on lines 30 and 87) |
 | `after_commit` | 2 | (Cache::RecordsConcern → 5 models) |
-| `validate` | 5 | PaymentMethodAppointment, PropertyMapping, (DynamicValidationConcern → 49 models), (PropertyMappingConcern → 49 models), (ImageAttachmentsConcern → 6 models + Product) |
+| `validate` | 5 | CompanyPaymentMethodAppointment, BranchPaymentMethodAppointment, PropertyMapping, (DynamicValidationConcern → 49 models), (PropertyMappingConcern → 49 models), (ImageAttachmentsConcern → 6 models + Product) |
 
 **Total unique callback declarations: ~34 directly across 15 model files + 7 concern files propagating to ~63+ models.**
 

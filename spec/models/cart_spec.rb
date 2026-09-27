@@ -6,6 +6,8 @@ RSpec.describe Cart, type: :model do
     it { should belong_to(:company) }
     it { should belong_to(:branch).optional }
     it { should belong_to(:cart_group) }
+    it { should have_many(:cart_employee_appointments).dependent(:destroy) }
+    it { should have_many(:employees).through(:cart_employee_appointments) }
   end
 
   describe "validations" do

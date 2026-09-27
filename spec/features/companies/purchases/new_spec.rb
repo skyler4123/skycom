@@ -41,9 +41,9 @@ RSpec.feature "Companies::Purchases New", type: :feature, js: true do
 
     click_button "Add Item"
 
-    expect(page).to have_selector('select[name="purchase[purchase_item_appointments_attributes][0][purchase_item_id]"]', wait: 10)
-    expect(page).to have_selector('input[name="purchase[purchase_item_appointments_attributes][0][quantity]"]', wait: 10)
-    expect(page).to have_selector('input[name="purchase[purchase_item_appointments_attributes][0][unit_price]"]', wait: 10)
+    expect(page).to have_selector('select[name="purchase[purchase_purchase_item_appointments_attributes][0][purchase_item_id]"]', wait: 10)
+    expect(page).to have_selector('input[name="purchase[purchase_purchase_item_appointments_attributes][0][quantity]"]', wait: 10)
+    expect(page).to have_selector('input[name="purchase[purchase_purchase_item_appointments_attributes][0][unit_price]"]', wait: 10)
   end
 
   scenario "creates purchase with line item and redirects to show page" do
@@ -52,19 +52,19 @@ RSpec.feature "Companies::Purchases New", type: :feature, js: true do
 
     fill_in 'purchase[name]', with: 'Marker pens restock'
     click_button "Add Item"
-    select 'Ballpoint Pen', from: 'purchase[purchase_item_appointments_attributes][0][purchase_item_id]'
-    fill_in 'purchase[purchase_item_appointments_attributes][0][quantity]', with: '5'
-    fill_in 'purchase[purchase_item_appointments_attributes][0][unit_price]', with: '2.50'
+    select 'Ballpoint Pen', from: 'purchase[purchase_purchase_item_appointments_attributes][0][purchase_item_id]'
+    fill_in 'purchase[purchase_purchase_item_appointments_attributes][0][quantity]', with: '5'
+    fill_in 'purchase[purchase_purchase_item_appointments_attributes][0][unit_price]', with: '2.50'
 
     click_button "Save Purchase"
 
+    expect(page).to have_content('Marker pens restock', wait: 10)
     purchase_record = Purchase.find_by(name: "Marker pens restock")
     expect(purchase_record).to be_present
     expect(page).to have_current_path(company_purchase_path(company, purchase_record), wait: 10)
-    expect(page).to have_content('Marker pens restock', wait: 10)
 
-    expect(purchase_record.purchase_item_appointments.count).to eq(1)
-    appointment = purchase_record.purchase_item_appointments.first
+    expect(purchase_record.purchase_purchase_item_appointments.count).to eq(1)
+    appointment = purchase_record.purchase_purchase_item_appointments.first
     expect(appointment.quantity).to eq(5)
     expect(appointment.unit_price.to_f).to eq(2.50)
     expect(appointment.total_price.to_f).to eq(12.50)

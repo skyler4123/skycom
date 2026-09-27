@@ -13,7 +13,7 @@ class Companies::PermissionsController < Companies::ApplicationController
 
   def update
     return render json: { errors: [ "Unauthorized" ] }, status: :forbidden unless can_manage_permissions?
-    appointment = current_company.policy_appointments.find(params[:id])
+    appointment = current_company.policy_role_appointments.find(params[:id])
     policy = appointment.policy
 
     if params.dig(:policy_appointment, :workflow_status).in?([ true, false ])
@@ -48,8 +48,8 @@ class Companies::PermissionsController < Companies::ApplicationController
 
     # Check if resource already has policies for this role
     existing_policies = Policy.where(company: current_company, resource: resource_name)
-                             .joins(:policy_appointments)
-                             .where(policy_appointments: { appoint_to: role })
+                             .joins(:policy_role_appointments)
+                             .where(policy_role_appointments: { role_id: role.id })
                              .exists?
 
     if existing_policies
@@ -69,13 +69,13 @@ class Companies::PermissionsController < Companies::ApplicationController
     # 1. Company owner can always manage
     return true if current_user == current_company.user
 
-    # 2. Employee with PolicyAppointment CRUD permission
+    # 2. Employee with PolicyRoleAppointment CRUD permission
     employee = current_user.employees.find_by(company: current_company)
     return false unless employee
 
-    employee.can?(:create, PolicyAppointment) ||
-    employee.can?(:update, PolicyAppointment) ||
-    employee.can?(:destroy, PolicyAppointment)
+    employee.can?(:create, PolicyRoleAppointment) ||
+    employee.can?(:update, PolicyRoleAppointment) ||
+    employee.can?(:destroy, PolicyRoleAppointment)
   end
 
   def authorize_permission_management

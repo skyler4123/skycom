@@ -5,9 +5,9 @@ RSpec.describe ProjectGroup, type: :model do
   describe "associations" do
     it { should belong_to(:company) }
     it { should belong_to(:branch).optional }
-    it { should have_many(:project_group_appointments).dependent(:destroy) }
-    it { should have_many(:tag_appointments).dependent(:destroy) }
-    it { should have_many(:tags).through(:tag_appointments) }
+    it { should have_many(:employee_project_group_appointments).dependent(:destroy) }
+    it { should have_many(:project_group_tag_appointments).dependent(:destroy) }
+    it { should have_many(:tags).through(:project_group_tag_appointments) }
   end
 
   describe "validations" do

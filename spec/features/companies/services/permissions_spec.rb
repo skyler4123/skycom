@@ -43,28 +43,28 @@ RSpec.feature "Companies::Services Permissions", type: :feature, js: true do
   let!(:reader_user) { create(:user, :company_employee) }
   let!(:reader_employee) do
     emp = create(:employee, company: company, branch: branch, user: reader_user)
-    create(:role_appointment, company: company, appoint_to: emp, role: reader_role)
+    create(:employee_role_appointment, company: company, employee: emp, role: reader_role)
     emp
   end
 
   let!(:creator_user) { create(:user, :company_employee) }
   let!(:creator_employee) do
     emp = create(:employee, company: company, branch: branch, user: creator_user)
-    create(:role_appointment, company: company, appoint_to: emp, role: creator_role)
+    create(:employee_role_appointment, company: company, employee: emp, role: creator_role)
     emp
   end
 
   let!(:editor_user) { create(:user, :company_employee) }
   let!(:editor_employee) do
     emp = create(:employee, company: company, branch: branch, user: editor_user)
-    create(:role_appointment, company: company, appoint_to: emp, role: editor_role)
+    create(:employee_role_appointment, company: company, employee: emp, role: editor_role)
     emp
   end
 
   let!(:no_permission_user) { create(:user, :company_employee) }
   let!(:no_permission_employee) do
     emp = create(:employee, company: company, branch: branch, user: no_permission_user)
-    create(:role_appointment, company: company, appoint_to: emp, role: no_permission_role)
+    create(:employee_role_appointment, company: company, employee: emp, role: no_permission_role)
     emp
   end
 
@@ -91,10 +91,10 @@ RSpec.feature "Companies::Services Permissions", type: :feature, js: true do
   end
 
   def create_policy_appointment(role:, policy:, workflow_status:)
-    appointment = PolicyAppointment.find_or_create_by!(
+    appointment = PolicyRoleAppointment.find_or_create_by!(
       company: company,
       policy: policy,
-      appoint_to: role
+      role: role
     )
     appointment.update!(workflow_status: workflow_status)
     appointment
@@ -314,7 +314,7 @@ RSpec.feature "Companies::Services Permissions", type: :feature, js: true do
     company.clear_permissions_cache
 
     # Remove update permission from editor temporarily
-    appointment = PolicyAppointment.find_by(appoint_to: editor_role, policy: policy_update_service)
+    appointment = PolicyRoleAppointment.find_by(role: editor_role, policy: policy_update_service)
     appointment.update!(workflow_status: :inactive)
     company.clear_permissions_cache
     editor_employee.reload
@@ -379,7 +379,7 @@ RSpec.feature "Companies::Services Permissions", type: :feature, js: true do
     editor_employee.reload
     expect(editor_employee.can?(:update, Service)).to be_truthy
 
-    appointment = PolicyAppointment.find_by(appoint_to: editor_role, policy: policy_update_service)
+    appointment = PolicyRoleAppointment.find_by(role: editor_role, policy: policy_update_service)
     appointment.update!(workflow_status: :inactive)
     company.clear_permissions_cache
 

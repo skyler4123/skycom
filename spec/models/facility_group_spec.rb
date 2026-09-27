@@ -5,8 +5,8 @@ RSpec.describe FacilityGroup, type: :model do
   describe "associations" do
     it { should belong_to(:company) }
     it { should belong_to(:branch).optional }
-    it { should have_many(:facility_group_appointments).dependent(:destroy) }
-    it { should have_many(:facilities).through(:facility_group_appointments) }
+    it { should have_many(:facility_facility_group_appointments).dependent(:destroy) }
+    it { should have_many(:facilities).through(:facility_facility_group_appointments) }
   end
 
   describe "validations" do

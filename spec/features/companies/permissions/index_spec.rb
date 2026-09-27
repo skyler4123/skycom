@@ -60,14 +60,14 @@ RSpec.feature "Companies::Permissions Management", type: :feature, js: true do
   let!(:admin_user) { create(:user, :company_employee) }
   let!(:admin_employee) do
     emp = create(:employee, company: company, branch: branch, user: admin_user)
-    create(:role_appointment, company: company, appoint_to: emp, role: admin_role)
+    create(:employee_role_appointment, company: company, employee: emp, role: admin_role)
     emp
   end
 
   let!(:unauthorized_user) { create(:user, :company_employee) }
   let!(:unauthorized_employee) do
     emp = create(:employee, company: company, branch: branch, user: unauthorized_user)
-    create(:role_appointment, company: company, appoint_to: emp, role: manager_role)
+    create(:employee_role_appointment, company: company, employee: emp, role: manager_role)
     emp
   end
 
@@ -84,10 +84,10 @@ RSpec.feature "Companies::Permissions Management", type: :feature, js: true do
   end
 
   def create_policy_appointment(role:, policy:, workflow_status:, business_type: nil)
-    appointment = PolicyAppointment.find_or_create_by!(
+    appointment = PolicyRoleAppointment.find_or_create_by!(
       company: company,
       policy: policy,
-      appoint_to: role
+      role: role
     )
     appointment.update!(workflow_status: workflow_status)
     appointment.update!(business_type: business_type) if business_type
@@ -299,7 +299,7 @@ RSpec.feature "Companies::Permissions Management", type: :feature, js: true do
 
     expect(owner_employee).to be_present
     expect(owner_employee.business_type).to eq("owner")
-    expect(owner_employee.role_appointments.first.business_type).to eq("owner")
+    expect(owner_employee.employee_role_appointments.first.business_type).to eq("owner")
 
     expect(owner_employee.can?(:create, Product)).to be_truthy
     expect(owner_employee.can?(:read, Product)).to be_truthy

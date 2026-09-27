@@ -297,10 +297,10 @@ class Seed::RetailEnrichService
 
   def assign_employees_to_departments
     @employees.each do |employee|
-      Seed::DepartmentAppointmentService.create(
+      Seed::DepartmentEmployeeAppointmentService.create(
         company: @retail,
         department: @departments.sample,
-        appoint_to: employee
+        employee: employee
       )
     end
   end
@@ -336,7 +336,7 @@ class Seed::RetailEnrichService
 
         branch_customers = @customers.select { |c| c.branch_id == branch.id }
         branch_customers.sample(10).each do |customer|
-          Seed::CustomerGroupAppointmentService.create(company: @retail, customer_group: lp, appoint_to: customer)
+          Seed::CustomerCustomerGroupAppointmentService.create(company: @retail, customer_group: lp, customer: customer)
         end
       end
     end
@@ -496,12 +496,12 @@ class Seed::RetailEnrichService
   def attach_items_to_order(branch, order)
     branch_products = @products.select { |p| p.branch_id == branch.id }
     branch_products.sample(rand(2..3)).each do |product|
-      OrderAppointment.create!(company: @retail, order: order, appoint_to: product, quantity: rand(1..5), unit_price: rand(10.0..100.0).round(2), total_price: 0)
+      OrderProductAppointment.create!(company: @retail, order: order, product: product, quantity: rand(1..5), unit_price: rand(10.0..100.0).round(2), total_price: 0)
     end
 
     branch_services = @services.select { |s| s.branch_id == branch.id }
     branch_services.sample(rand(1..2)).each do |service|
-      OrderAppointment.create!(company: @retail, order: order, appoint_to: service, quantity: 1, unit_price: rand(50.0..200.0).round(2), total_price: 0)
+      OrderServiceAppointment.create!(company: @retail, order: order, service: service, quantity: 1, unit_price: rand(50.0..200.0).round(2), total_price: 0)
     end
   end
 
@@ -558,7 +558,7 @@ class Seed::RetailEnrichService
         name: "Purchase #{i + 1} for #{branch.name}"
       )
       items.sample(rand(1..3)).each do |item|
-        Seed::PurchaseItemAppointmentService.create(company: @retail, purchase: purchase, purchase_item: item)
+        Seed::PurchasePurchaseItemAppointmentService.create(company: @retail, purchase: purchase, purchase_item: item)
       end
 
       run_purchase_workflow(purchase, requester, managers.sample, i)

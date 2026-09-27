@@ -41,7 +41,7 @@ This is a standard Ruby on Rails 8+ application configured as a multi-tenant bus
 
 ### Database & Models
 - **Database Setup**: PostgreSQL (Primary/Solid Queue), SQLite (Solid Cable/Solid Cache).
-- **Associations**: Extensive use of **has_many through** + **polymorphic associations** via appointment-style join tables (e.g., `Employee` belongs to `Department` through `DepartmentAppointment`).
+- **Associations**: Extensive use of **has_many through** via atomic pairwise appointment join tables (e.g., `Employee` belongs to `Department` through `DepartmentEmployeeAppointment`; tables named alphabetically `A_B_appointments`).
 - **N+1 Prevention**: Use `includes`, `eager_load`, or `preload` by default for associated data.
 
 ### Rails Controller Naming Convention

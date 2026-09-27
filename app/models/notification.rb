@@ -22,6 +22,9 @@ class Notification < ApplicationRecord
   belongs_to :category
   belongs_to :property_mapping
 
+  has_many :employee_notification_appointments, dependent: :destroy
+  has_many :employees, through: :employee_notification_appointments
+
   # --- Validations ---
   validates :name, presence: true, length: { maximum: 255 }
 

@@ -9,4 +9,7 @@ class Article < ApplicationRecord
   belongs_to :branch, optional: true
   belongs_to :category
   belongs_to :property_mapping
+
+  has_many :article_employee_appointments, dependent: :destroy
+  has_many :employees, through: :article_employee_appointments
 end

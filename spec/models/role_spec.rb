@@ -5,12 +5,20 @@ RSpec.describe Role, type: :model do
   describe "associations" do
     it { should belong_to(:company).touch(true) }
     it { should belong_to(:branch).optional }
-    it { should have_many(:policy_appointments).dependent(:destroy) }
-    it { should have_many(:policies).through(:policy_appointments) }
-    it { should have_many(:tag_appointments).dependent(:destroy) }
-    it { should have_many(:tags).through(:tag_appointments) }
-    it { should have_many(:role_appointments).dependent(:destroy) }
-    it { should have_many(:employees).through(:role_appointments) }
+    it { should have_many(:policy_role_appointments).dependent(:destroy) }
+    it { should have_many(:policies).through(:policy_role_appointments) }
+    it { should have_many(:role_tag_appointments).dependent(:destroy) }
+    it { should have_many(:tags).through(:role_tag_appointments) }
+    it { should have_many(:employee_role_appointments).dependent(:destroy) }
+    it { should have_many(:employees).through(:employee_role_appointments) }
+    it { should have_many(:customer_role_appointments).dependent(:destroy) }
+    it { should have_many(:customers).through(:customer_role_appointments) }
+    it { should have_many(:customer_group_role_appointments).dependent(:destroy) }
+    it { should have_many(:customer_groups).through(:customer_group_role_appointments) }
+    it { should have_many(:department_role_appointments).dependent(:destroy) }
+    it { should have_many(:departments).through(:department_role_appointments) }
+    it { should have_many(:employee_group_role_appointments).dependent(:destroy) }
+    it { should have_many(:employee_groups).through(:employee_group_role_appointments) }
   end
 
   describe "validations" do

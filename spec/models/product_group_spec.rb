@@ -5,8 +5,10 @@ RSpec.describe ProductGroup, type: :model do
   describe "associations" do
     it { should belong_to(:company) }
     it { should belong_to(:branch).optional }
-    it { should have_many(:product_group_appointments).dependent(:destroy) }
-    it { should have_many(:products).through(:product_group_appointments) }
+    it { should have_many(:product_product_group_appointments).dependent(:destroy) }
+    it { should have_many(:products).through(:product_product_group_appointments) }
+    it { should have_many(:order_product_group_appointments).dependent(:destroy) }
+    it { should have_many(:orders).through(:order_product_group_appointments) }
   end
 
   describe "validations" do

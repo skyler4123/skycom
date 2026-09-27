@@ -9,4 +9,7 @@ class Exam < ApplicationRecord
   belongs_to :branch, optional: true
   belongs_to :category
   belongs_to :property_mapping
+
+  has_many :employee_exam_appointments, dependent: :destroy
+  has_many :employees, through: :employee_exam_appointments
 end

@@ -127,7 +127,7 @@ export default class Companies_Purchases_ShowController extends Companies_Layout
             </tr>
           </thead>
           <tbody class="divide-y divide-slate-200 dark:divide-slate-800">
-            ${(p.purchase_item_appointments || []).map(a => `
+            ${(p.purchase_purchase_item_appointments || []).map(a => `
               <tr>
                 <td class="py-2 px-2 text-sm">${a.item_name || "—"}</td>
                 <td class="py-2 px-2 text-sm">${a.quantity ?? "—"}</td>

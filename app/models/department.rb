@@ -29,9 +29,9 @@ class Department < ApplicationRecord
   belongs_to :category
   belongs_to :property_mapping
 
-  has_many :role_appointments, as: :appoint_to, dependent: :destroy
-  has_many :roles, through: :role_appointments
+  has_many :department_role_appointments, dependent: :destroy
+  has_many :roles, through: :department_role_appointments
 
-  has_many :department_appointments, dependent: :destroy
-  has_many :employees, through: :department_appointments, source: :appoint_to, source_type: "Employee"
+  has_many :department_employee_appointments, dependent: :destroy
+  has_many :employees, through: :department_employee_appointments
 end

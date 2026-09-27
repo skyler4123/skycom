@@ -6,8 +6,8 @@ module OrderProcessingV1
   class ReleaseReservedStockService
     def self.call(order:)
       released = []
-      order.order_appointments.each do |oa|
-        stock = order.company.stocks.find_by(product_id: oa.appoint_to.id)
+      order.order_product_appointments.each do |oa|
+        stock = order.company.stocks.find_by(product_id: oa.product_id)
         next unless stock
 
         stock.release_reserved!(oa.quantity)

@@ -6,8 +6,8 @@ RSpec.describe PurchaseItem, type: :model do
     it { should belong_to(:company) }
     it { should belong_to(:category) }
     it { should belong_to(:property_mapping) }
-    it { should have_many(:purchase_item_appointments).dependent(:destroy) }
-    it { should have_many(:purchases).through(:purchase_item_appointments) }
+    it { should have_many(:purchase_purchase_item_appointments).dependent(:destroy) }
+    it { should have_many(:purchases).through(:purchase_purchase_item_appointments) }
   end
 
   describe "validations" do
@@ -26,7 +26,7 @@ RSpec.describe PurchaseItem, type: :model do
     it "lists purchases that reference the item through appointments" do
       purchase = create(:purchase, name: "Pens restock")
       item = create(:purchase_item, company: purchase.company, name: "Ballpoint pen")
-      create(:purchase_item_appointment, purchase: purchase, purchase_item: item)
+      create(:purchase_purchase_item_appointment, purchase: purchase, purchase_item: item)
 
       expect(item.purchases).to include(purchase)
     end

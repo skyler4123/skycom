@@ -47,10 +47,10 @@ RSpec.describe Analytics::DashboardService do
                workflow_status: :paid)
       end
       let!(:order_appt) do
-        OrderAppointment.create!(
+        OrderProductAppointment.create!(
           company: company,
           order: order,
-          appoint_to: product,
+          product: product,
           unit_price: 10.00,
           quantity: 2,
           total_price: 20.00,

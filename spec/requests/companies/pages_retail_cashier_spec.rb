@@ -25,9 +25,9 @@ RSpec.describe "Companies::PagesController#retail_cashier", type: :request do
   let!(:appts) do
     [ cash_pm, qr_pm, redirect_pm ].flat_map do |pm|
       [
-        PaymentMethodAppointment.create!(appoint_to: company, company: company, payment_method: pm,
+        CompanyPaymentMethodAppointment.create!(company: company, payment_method: pm,
           name: "Co #{pm.code}", code: "PG_CO_#{pm.code}", business_type: :in_store, lifecycle_status: :active),
-        PaymentMethodAppointment.create!(appoint_to: branch, company: company, payment_method: pm,
+        BranchPaymentMethodAppointment.create!(company: company, branch: branch, payment_method: pm,
           name: "Br #{pm.code}", code: "PG_BR_#{pm.code}", business_type: :in_store,
           lifecycle_status: :active,
           merchant_number: pm.qr? ? "3333333333" : nil,
