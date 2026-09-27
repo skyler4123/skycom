@@ -1,4 +1,13 @@
 class PurchasePurchaseItemAppointment < ApplicationRecord
+  # Purchase line item — atomic row binding a Purchase to one PurchaseItem.
+  #
+  # Why it exists: carries the line economics
+  # (quantity/unit_price/total_price); Purchase#total_price is always computed
+  # live from these rows, never stored.
+  # How to use: managed via nested line-item attributes on the Purchases
+  # dashboard; read via `purchase.purchase_purchase_item_appointments`.
+  # How it works: concrete FKs to company/purchase/purchase_item; company_id
+  # derives via SetDefaultCompanyConcern with a same-company validation.
   include SetDefaultCompanyConcern
 
   attribute :permission_resource_name, :string, default: -> { self.name }

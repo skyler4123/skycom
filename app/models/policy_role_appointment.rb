@@ -1,4 +1,13 @@
 class PolicyRoleAppointment < ApplicationRecord
+  # Role assignment — atomic row granting one Policy to one Role.
+  #
+  # Why it exists: roles collect ABAC policies (see docs/ABAC.md); this table is
+  # the many-to-many grant between a policy and the role that carries it.
+  # How to use: managed via the Permissions dashboard (assign/revoke policy to
+  # role); read via the policies/roles has_many/through on either side.
+  # How it works: concrete FKs to company/policy/role (role touched on change so
+  # employee caches invalidate). company_id derives via SetDefaultCompanyConcern.
+  # Rows with business_type :owner are immutable and clear the permissions cache.
   include SetDefaultCompanyConcern
 
   attribute :permission_resource_name, :string, default: -> { self.name }

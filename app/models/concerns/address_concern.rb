@@ -1,4 +1,32 @@
 # app/models/concerns/address_concern.rb
+#
+# == Purpose:
+# Gives any addressable record (Branch, Company, Customer, ...) a versioned
+# link to the shared, immutable Address rows. Each includer owns exactly one
+# atomic table (see ADDRESS_APPOINTMENT_CLASSES), and the concern exposes
+# attach_address as the single write path plus cached readers.
+#
+# == How It Works:
+# 1. At include time the concern looks up the owner's atomic class and declares
+#    has_many :address_appointments (routed class_name, owner FK,
+#    dependent: :destroy), has_many :addresses through it, plus the
+#    current_address_appointment (latest active) / db_address shortcuts.
+# 2. attach_address finds-or-creates the Address by fingerprint fields, archives
+#    same-business_type active rows (history is kept, never deleted), creates
+#    the new row, and touches the owner for client-cache invalidation.
+# 3. The address reader caches via Rails.cache; company_id on new rows derives
+#    from the owner via SetDefaultCompanyConcern.
+#
+# == Usage:
+# Include in any addressable model; call record.attach_address(line_1:, city:,
+# ...) or assign record.address = {...}; read record.address (current) or
+# record.addresses (all). Never create atomic rows directly.
+#
+# == Example:
+#   branch.attach_address(line_1: "123 Le Loi", city: "District 1",
+#                         country_code: :vn, business_type: :office)
+#   branch.address.line_1 # => "123 Le Loi"
+#
 module AddressConcern
   extend ActiveSupport::Concern
 

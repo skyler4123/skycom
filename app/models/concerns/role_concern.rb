@@ -1,3 +1,25 @@
+# == Purpose:
+# Gives any role-holder record (Employee, Customer, Department, ...) a uniform
+# way to receive roles. Each holder owns exactly one atomic table
+# (<Holder>RoleAppointment — Role sorts last alphabetically).
+#
+# == How It Works:
+# 1. attach_role finds-or-creates the company-scoped Role, then checks the
+#    holder's concrete atomic table directly (roles may be memoized and miss
+#    just-created rows) and creates the row with lifecycle_status :active —
+#    all inside one transaction.
+# 2. has_role? is a thin exists? check against the holder's roles association.
+# 3. company_id on new rows derives from the holder via
+#    SetDefaultCompanyConcern; owner rows are immutable (see the atomic model).
+#
+# == Usage:
+# Include in any role-holder model; call record.attach_role("Manager") and
+# record.has_role?("Manager"). Never create atomic rows directly.
+#
+# == Example:
+#   employee.attach_role("Cashier")
+#   employee.has_role?("Cashier") # => true
+#
 module RoleConcern
   extend ActiveSupport::Concern
 

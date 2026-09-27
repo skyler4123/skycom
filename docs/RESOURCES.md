@@ -132,6 +132,58 @@ Atomic pairwise join tables: one table per resource pair, named alphabetically (
 
 ---
 
+## 5. Why Atomic? (Decision Record)
+
+Before this refactor, 38 polymorphic `*_appointments` tables linked records
+through `appoint_to` / `appoint_from` / `appoint_for` / `appoint_by` columns.
+Every join was a polymorphic lookup, mismatched pairs were possible at the
+schema level, and per-domain extras (prices, merchant identity, durations) had
+nowhere typed to live. The refactor
+(`59490bf7`, migration `20260925000001_create_atomic_appointments.rb`)
+replaced them with 103 single-purpose tables:
+
+- **One table per resource pair, named alphabetically** (`A_B_appointments`).
+  Join the two class names, sort, append `Appointment`:
+  `Department + Employee → DepartmentEmployeeAppointment`.
+  Two exceptions sort Tag first: `Tag` beats `Task`/`TaskGroup`/`Transaction`/
+  `Warehouse` (`TagTaskAppointment`), and `Role` sorts last
+  (`EmployeeRoleAppointment`).
+- **Concrete FKs + `company_id` on every row.** No polymorphic columns remain.
+  `company_id` is derived from either side by `SetDefaultCompanyConcern`, so
+  multi-tenant scoping (ABAC, permissions cache) holds without caller effort.
+- **Domain extras live on the pair that needs them** (see §4): price snapshots
+  on order/purchase lines, merchant identity on payment links, `duration` /
+  `start_at` on service bookings — never on a shared polymorphic row.
+- **Writes go through owner-side helpers**, not raw inserts: `attach_tag`
+  (`TagConcern`), `attach_address` (`AddressConcern`), `attach_role`
+  (`RoleConcern`), `attach_membership` / `attach_reservation`
+  (`MembershipConcern` / `ReservationConcern`). `OrderConcern` is a no-op
+  marker; order lines are bulk-inserted by
+  `OrderProcessingV1::CreateOrderService`.
+- Every atomic model carries a why/use/work header comment; every routing
+  concern documents Purpose / How It Works / Usage / Example (see
+  `SetDefaultCompanyConcern` for the template).
+
+## 6. Adding a New Pair (Recipe)
+
+1. **Migration**: `create_table :a_b_appointments, id: :uuid` with
+   `company_id` (NOT NULL), the two concrete FKs, any domain extras, and the
+   standard System Fields block (`docs/ARCHITECTURE_GUIDES.md`).
+2. **Model** `app/models/a_b_appointment.rb`: `include SetDefaultCompanyConcern`,
+   the two `belongs_to`, plus the matching per-family header (why / how to
+   use / how it works).
+3. **Routing**: if the pair belongs to a routed family, register it —
+   `TagConcern` resolves alphabetically with no registry;
+   `AddressConcern::ADDRESS_APPOINTMENT_CLASSES` needs the new entry;
+   `RoleConcern` assumes `<Holder>RoleAppointment`.
+4. **Associations**: `has_many` / `has_many :through` on both sides (or extend
+   the owning concern).
+5. **Seed + factory + spec**: mirror an existing pair's
+   `Seed::*AppointmentService`, factory, and `*_appointment_spec.rb`
+   (associations + company derivation).
+
+---
+
 ## Summary
 
 | Category | Count |

@@ -1,4 +1,13 @@
 class CustomerReservationAppointment < ApplicationRecord
+  # Customer entitlement link — atomic row attaching a Membership/Reservation.
+  #
+  # Why it exists: a customer can hold concurrent entitlements per business_type
+  # (e.g. dining booking AND maintenance visit); this table versions them.
+  # How to use: call `customer.attach_reservation(code, business_type:)`
+  # (see ReservationConcern); read via `customer.reservation` / `reservation_of_type`.
+  # How it works: attaching archives only the active row of the SAME
+  # business_type, leaving other tracks untouched. company_id derives from the
+  # customer via SetDefaultCompanyConcern.
   include SetDefaultCompanyConcern
 
   attribute :permission_resource_name, :string, default: -> { self.name }

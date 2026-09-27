@@ -1,4 +1,37 @@
 # app/models/concerns/reservation_concern.rb
+#
+# == Purpose:
+# Gives a Customer concurrent, versioned links to Reservation rows through the
+# atomic CustomerReservationAppointment table — one active track per
+# business_type (e.g. a dining booking AND a maintenance visit at once).
+#
+# == How It Works:
+# 1. attach_reservation finds the Reservation by code, archives ONLY the active
+#    rows of the SAME business_type (other tracks survive), creates the new row
+#    as :active, and touches the customer for cache invalidation.
+# 2. Readers (reservation, reservation_of_type) resolve through the latest
+#    active appointment and are Rails.cache-cached per customer version.
+# 3. company_id on new rows derives from the customer via
+#    SetDefaultCompanyConcern.
+#
+# == Usage:
+# Include in Customer; call customer.attach_reservation(code, business_type:)
+# or assign customer.reservation = code; read customer.reservation /
+# customer.reservation_of_type(type). Never create atomic rows directly.
+#
+# == Example:
+#   customer = Customer.find(id)
+#   # 1. A Restaurant Branch creates a table booking
+#   customer.attach_reservation("RES-TABLE-101", business_type: :dining)
+#   # 2. A Service Department creates a technician visit
+#   #    (does NOT archive the dining reservation)
+#   customer.attach_reservation("RES-HVAC-99", business_type: :maintenance)
+#   # 3. Retrieve specific context
+#   customer.reservation_of_type(:dining)      # => <Reservation: Table 101>
+#   customer.reservation_of_type(:maintenance) # => <Reservation: HVAC Repair>
+#   # 4. Global view (most recently attached)
+#   customer.reservation # => <Reservation: HVAC Repair>
+#
 module ReservationConcern
   extend ActiveSupport::Concern
 
@@ -71,20 +104,3 @@ module ReservationConcern
     end
   end
 end
-
-
-
-# customer = Customer.find(id)
-
-# # 1. A Restaurant Branch creates a table booking
-# customer.attach_reservation("RES-TABLE-101", business_type: :dining)
-
-# # 2. A Service Department creates a technician visit (Does not archive the dining reservation!)
-# customer.attach_reservation("RES-HVAC-99", business_type: :maintenance)
-
-# # 3. Retrieve specific context
-# customer.reservation_of_type(:dining)      # => <Reservation: Table 101>
-# customer.reservation_of_type(:maintenance) # => <Reservation: HVAC Repair>
-
-# # 4. Global view
-# customer.reservation # => <Reservation: HVAC Repair> (The latest one)

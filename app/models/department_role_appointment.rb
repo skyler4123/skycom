@@ -1,4 +1,14 @@
 class DepartmentRoleAppointment < ApplicationRecord
+  # Role assignment — atomic row granting one Role to its holder record.
+  #
+  # Why it exists: roles collect ABAC policies (see docs/ABAC.md); this table is
+  # the many-to-many grant between a role and exactly one holder type.
+  # How to use: prefer `record.attach_role(name)` (see RoleConcern); read via
+  # the roles has_many/through on the holder.
+  # How it works: Role sorts last alphabetically, so tables are always
+  # <Holder>RoleAppointment with a concrete holder FK. company_id derives from
+  # the holder via SetDefaultCompanyConcern. Rows with business_type :owner are
+  # immutable and clear the permissions cache on change.
   include Cache::RecordsConcern
   include SetDefaultCompanyConcern
 

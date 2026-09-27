@@ -1,4 +1,14 @@
 class AddressCompanyAppointment < ApplicationRecord
+  # Address link — atomic pairwise row binding one Address to its owner record.
+  #
+  # Why it exists: addresses are shared, immutable rows (see Address); this table
+  # records WHICH address an owner uses and in WHAT capacity (business_type),
+  # replacing the old polymorphic address_appointments table.
+  # How to use: never create rows directly — call `record.attach_address(**attrs)`
+  # (see AddressConcern); read via `record.address` (current) / `record.addresses`.
+  # How it works: company_id derives from the owner via SetDefaultCompanyConcern;
+  # re-attaching archives the previous active row instead of deleting it,
+  # preserving address history.
   include SetDefaultCompanyConcern
 
   attribute :permission_resource_name, :string, default: -> { self.name }

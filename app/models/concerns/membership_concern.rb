@@ -1,4 +1,36 @@
 # app/models/concerns/membership_concern.rb
+#
+# == Purpose:
+# Gives a Customer concurrent, versioned links to Membership rows through the
+# atomic CustomerMembershipAppointment table — one active track per
+# business_type (e.g. loyalty Gold AND subscription Pro at once).
+#
+# == How It Works:
+# 1. attach_membership finds the Membership by code, archives ONLY the active
+#    rows of the SAME business_type (other tracks survive), creates the new row
+#    as :active, and touches the customer for cache invalidation.
+# 2. Readers (membership, membership_of_type) resolve through the latest
+#    active appointment and are Rails.cache-cached per customer version.
+# 3. company_id on new rows derives from the customer via
+#    SetDefaultCompanyConcern.
+#
+# == Usage:
+# Include in Customer; call customer.attach_membership(code, business_type:)
+# or assign customer.membership = code; read customer.membership /
+# customer.membership_of_type(type). Never create atomic rows directly.
+#
+# == Example:
+#   customer = Customer.find(id)
+#   # 1. Set Loyalty Tier
+#   customer.attach_membership("gold_tier", business_type: :loyalty)
+#   # 2. Set Subscription Track (does NOT archive the Loyalty Tier)
+#   customer.attach_membership("pro_plan", business_type: :subscription)
+#   # 3. Retrieve specific memberships
+#   customer.membership_of_type(:loyalty)      # => <Membership: Gold>
+#   customer.membership_of_type(:subscription) # => <Membership: Pro>
+#   # 4. Default getter (the most recently attached)
+#   customer.membership # => <Membership: Pro>
+#
 module MembershipConcern
   extend ActiveSupport::Concern
 
@@ -70,19 +102,3 @@ module MembershipConcern
     end
   end
 end
-
-
-# customer = Customer.find(id)
-
-# # 1. Set Loyalty Tier
-# customer.attach_membership("gold_tier", business_type: :loyalty)
-
-# # 2. Set Subscription Track (Doesn't archive the Loyalty Tier!)
-# customer.attach_membership("pro_plan", business_type: :subscription)
-
-# # 3. Retrieve specific memberships
-# customer.membership_of_type(:loyalty)      # => <Membership: Gold>
-# customer.membership_of_type(:subscription) # => <Membership: Pro>
-
-# # 4. Default getter (the most recent one attached)
-# customer.membership # => <Membership: Pro>

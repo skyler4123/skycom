@@ -1,9 +1,35 @@
 # Provides instance methods for attaching and managing Tags on a resource
 # via its atomic pairwise appointment table (AWS-style tagging).
 #
-# Each includer resolves its own table by alphabetical pair order, e.g.
-# Employee => EmployeeTagAppointment, Product => ProductTagAppointment,
-# Task => TagTaskAppointment (Tag sorts before Task/TaskGroup/Transaction/Warehouse).
+# == Purpose:
+# Each includer owns exactly one atomic tag table (e.g. Employee =>
+# EmployeeTagAppointment). The concern resolves that table at include time,
+# declares the has_many/through, and exposes attach_tag as the single write
+# path so tag writes stay transactional and company-scoped.
+#
+# == How It Works:
+# 1. At include time, TagConcern.appointment_class_name_for sorts
+#    [RecordName, "Tag"] alphabetically (Tag-first for Task/TaskGroup/
+#    Transaction/Warehouse, e.g. TagTaskAppointment) and declares
+#    has_many <pair>_appointments with dependent: :destroy plus
+#    has_many :tags through it.
+# 2. A plain tag_appointments reader routes to the concrete association for
+#    backward compatibility (it is a method, not an association).
+# 3. attach_tag finds-or-creates the company-scoped Tag, syncs its value (the
+#    ABAC matcher reads target.tags), then finds-or-initializes the atomic row
+#    and saves it — all inside one transaction.
+#
+# == Usage:
+# Include in any taggable model; call record.attach_tag(key:, value:,
+# description:) and read record.tags. Never create atomic rows directly.
+#
+# == Example:
+#   class Product < ApplicationRecord
+#     include TagConcern
+#   end
+#   product.attach_tag(key: "brand", value: "Apple")
+#   product.tags.map(&:key) # => ["brand"]
+#
 module TagConcern
   extend ActiveSupport::Concern
 

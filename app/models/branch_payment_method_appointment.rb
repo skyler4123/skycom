@@ -1,4 +1,15 @@
 class BranchPaymentMethodAppointment < ApplicationRecord
+  # Payment method link — atomic row binding a global PaymentMethod to a tenant
+  # scope (Company default or Branch). See docs/PAYMENT_METHODS.md.
+  #
+  # Why it exists: connects the global gateway catalog to the company/branch that
+  # offers it, carrying the merchant bank identity (merchant_number/name/id) used
+  # at POS pay time.
+  # How to use: company rows seed on company init; branch rows copy on branch
+  # create; owners edit merchant fields via the Payments dashboard / branch modal.
+  # How it works: a branch row requires an active company-level row for the same
+  # method; company lifecycle flips cascade to branches. company_id derives from
+  # the appoint scope via SetDefaultCompanyConcern.
   include SetDefaultCompanyConcern
 
   attribute :permission_resource_name, :string, default: -> { self.name }
