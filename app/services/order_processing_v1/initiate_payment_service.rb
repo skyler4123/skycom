@@ -79,9 +79,24 @@ module OrderProcessingV1
 
     def build_items
       @order.order_product_appointments.map do |oa|
-        stock = @order.company.stocks.find_by!(product_id: oa.product_id)
+        stock = resolve_stock(oa)
+        oa.update!(stock_id: stock.id) # persist the reserved stock for finalize
         { stock_id: stock.id, quantity: oa.quantity }
       end
+    end
+
+    # Stock belongs to a warehouse (docs/superpowers/specs/2026-09-23-stock-source-of-truth-
+    # design.md): resolve against the order's branch warehouses — never a
+    # company-wide first match. A product stocked only elsewhere is an
+    # availability failure (422), not a routing one: order/appointment lookups
+    # keep their 404s, this lookup maps to InsufficientStockError.
+    def resolve_stock(oa)
+      @order.company.stocks
+        .joins(:warehouse)
+        .find_by!(product_id: oa.product_id, warehouses: { branch_id: @order.branch_id })
+    rescue ActiveRecord::RecordNotFound
+      raise OrderProcessingV1::InsufficientStockError,
+        "Product is not stocked in this branch"
     end
 
     def create_invoice

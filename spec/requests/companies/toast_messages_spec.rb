@@ -156,7 +156,7 @@ RSpec.describe "Toast message responses", type: :request do
     let(:branch) { create(:branch, company: company) }
     let(:product) { create(:product, company: company) }
     let(:customer) { create(:customer, company: company) }
-    let(:warehouse) { create(:warehouse, company: company) }
+    let(:warehouse) { create(:warehouse, company: company, branch: branch) }
     let!(:stock) do
       cat = product.category
       Stock.create!(

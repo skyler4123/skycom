@@ -67,47 +67,48 @@ Company-scoped business entities. Each table belongs to a `company_id` and repre
 | 21 | `stock_transfers` | Inventory | Inter-warehouse stock movement |
 | 22 | `stock_imports` | Inventory | Inbound stock (supplier receipts) |
 | 23 | `stock_exports` | Inventory | Outbound stock (write-offs, damages) |
-| 24 | `order_groups` | Sales | Order grouping (batches/carts) |
-| 25 | `orders` | Sales | Customer orders |
-| 26 | `order_appointments` | Sales | Order line items |
-| 27 | `cart_groups` | Sales | Cart grouping |
-| 28 | `carts` | Sales | Shopping cart sessions |
-| 29 | `invoices` | Billing | Customer invoices |
-| 30 | `payments` | Billing | Payment transactions |
-| 31 | `payment_methods` | Billing | Accepted payment types |
-| 32 | `facility_groups` | Facilities | Facility grouping |
-| 33 | `facilities` | Facilities | Treatment rooms, machines, resources |
-| 34 | `project_groups` | Projects | Project grouping |
-| 35 | `projects` | Projects | Work projects |
-| 36 | `task_groups` | Tasks | Task grouping |
-| 37 | `tasks` | Tasks | Work tasks / appointments |
-| 38 | `notification_groups` | Notifications | Notification grouping |
-| 39 | `notifications` | Notifications | System/user notifications |
-| 40 | `exam_groups` | Education | Exam/test grouping |
-| 41 | `exams` | Education | Exam/test instances |
-| 42 | `questions` | Education | Exam questions |
-| 43 | `answers` | Education | Exam answers |
-| 44 | `event_groups` | Events | Event grouping |
-| 45 | `events` | Events | Calendar events / promotions |
-| 46 | `setting_groups` | Config | Configuration grouping |
-| 47 | `settings` | Config | Application/company settings |
-| 48 | `document_groups` | Content | Document grouping |
-| 49 | `documents` | Content | Business documents |
-| 50 | `article_groups` | Content | Article grouping |
-| 51 | `articles` | Content | Knowledge base / articles |
-| 52 | `subscription_plans` | Subscriptions | Service subscription plan definitions |
-| 53 | `subscription_groups` | Subscriptions | Subscription group instances |
-| 54 | `shifts` | HR | Work shift definitions |
-| 55 | `attendance_logs` | HR | Staff clock-in/out events |
-| 56 | `attendance_days` | HR | Daily attendance summaries |
-| 57 | `attendance_months` | HR | Monthly attendance rollups |
-| 58 | `memberships` | CRM | Customer loyalty/program memberships |
-| 59 | `reservations` | Bookings | Customer service bookings |
-| 60 | `suppliers` | Inventory | Supplier records (procurement-ready master data) |
-| 61 | `discount_groups` | Sales | Discount campaign groups (type/value, budget, validity, status) |
-| 62 | `discounts` | Sales | Single-use discount codes (unique per company, consumption state, SoT bindings) |
+| 24 | `stock_adjustments` | Inventory | Stock-take corrections (direction + reason) |
+| 25 | `order_groups` | Sales | Order grouping (batches/carts) |
+| 26 | `orders` | Sales | Customer orders |
+| 27 | `order_appointments` | Sales | Order line items |
+| 28 | `cart_groups` | Sales | Cart grouping |
+| 29 | `carts` | Sales | Shopping cart sessions |
+| 30 | `invoices` | Billing | Customer invoices |
+| 31 | `payments` | Billing | Payment transactions |
+| 32 | `payment_methods` | Billing | Accepted payment types |
+| 33 | `facility_groups` | Facilities | Facility grouping |
+| 34 | `facilities` | Facilities | Treatment rooms, machines, resources |
+| 35 | `project_groups` | Projects | Project grouping |
+| 36 | `projects` | Projects | Work projects |
+| 37 | `task_groups` | Tasks | Task grouping |
+| 38 | `tasks` | Tasks | Work tasks / appointments |
+| 39 | `notification_groups` | Notifications | Notification grouping |
+| 40 | `notifications` | Notifications | System/user notifications |
+| 41 | `exam_groups` | Education | Exam/test grouping |
+| 42 | `exams` | Education | Exam/test instances |
+| 43 | `questions` | Education | Exam questions |
+| 44 | `answers` | Education | Exam answers |
+| 45 | `event_groups` | Events | Event grouping |
+| 46 | `events` | Events | Calendar events / promotions |
+| 47 | `setting_groups` | Config | Configuration grouping |
+| 48 | `settings` | Config | Application/company settings |
+| 49 | `document_groups` | Content | Document grouping |
+| 50 | `documents` | Content | Business documents |
+| 51 | `article_groups` | Content | Article grouping |
+| 52 | `articles` | Content | Knowledge base / articles |
+| 53 | `subscription_plans` | Subscriptions | Service subscription plan definitions |
+| 54 | `subscription_groups` | Subscriptions | Subscription group instances |
+| 55 | `shifts` | HR | Work shift definitions |
+| 56 | `attendance_logs` | HR | Staff clock-in/out events |
+| 57 | `attendance_days` | HR | Daily attendance summaries |
+| 58 | `attendance_months` | HR | Monthly attendance rollups |
+| 59 | `memberships` | CRM | Customer loyalty/program memberships |
+| 60 | `reservations` | Bookings | Customer service bookings |
+| 61 | `suppliers` | Inventory | Supplier records (procurement-ready master data) |
+| 62 | `discount_groups` | Sales | Discount campaign groups (type/value, budget, validity, status) |
+| 63 | `discounts` | Sales | Single-use discount codes (unique per company, consumption state, SoT bindings) |
 
-**Total: 62 tables**
+**Total: 63 tables**
 
 ---
 
@@ -127,8 +128,9 @@ Atomic pairwise join tables: one table per resource pair, named alphabetically (
 | 8 | Purchase line items | `purchase_purchase_item` (`quantity` / `unit_price` / `total_price`) | 1 |
 | 9 | Subscription links | `branch_subscription_plan`, `subscription_group_subscription_plan` | 2 |
 | 10 | Order-group link | `employee_order_group` (`quantity` / `unit_price` / `total_price`) | 1 |
+| 11 | Stock document lines | `stock_import_stock`, `stock_export_stock`, `stock_transfer_stock`, `stock_adjustment_stock` (each `stock_id` + `quantity`; document lines reference exact Stock rows) | 4 |
 
-**Total: 103 tables**
+**Total: 107 tables**
 
 ---
 
@@ -190,9 +192,9 @@ replaced them with 103 single-purpose tables:
 |----------|-------|
 | Gem Resources | 4 |
 | System Resources | 11 |
-| Managed Resources | 62 |
-| Appointment Resources | 103 |
-| **Grand Total** | **180** |
+| Managed Resources | 63 |
+| Appointment Resources | 107 |
+| **Grand Total** | **185** |
 
 ---
 

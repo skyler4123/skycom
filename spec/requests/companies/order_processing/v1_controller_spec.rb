@@ -8,7 +8,7 @@ RSpec.describe "Companies::OrderProcessing::V1", type: :request do
   let(:owner_user) { company.user }
   let(:branch) { create(:branch, company: company) }
   let(:product) { create(:product, company: company) }
-  let(:warehouse) { create(:warehouse, company: company) }
+  let(:warehouse) { create(:warehouse, company: company, branch: branch) }
   let!(:stock) do
     cat = product.category
     Stock.create!(
@@ -222,6 +222,20 @@ RSpec.describe "Companies::OrderProcessing::V1", type: :request do
         headers: headers
 
       expect(response).to have_http_status(:not_found)
+    end
+
+    it "renders 422 with errors when the product is not stocked in the order branch" do
+      other_branch = create(:branch, company: company)
+      other_warehouse = create(:warehouse, company: company, branch: other_branch)
+      stock.update!(warehouse: other_warehouse)
+      order_id = checkout_order
+
+      post "/companies/#{company.id}/order_processing/v1/pay",
+        params: { order_id: order_id, payment_method_appointment_id: cash_appts.last.id }, headers: headers
+
+      expect(response).to have_http_status(:unprocessable_entity)
+      expect(JSON.parse(response.body)["errors"]).to be_present
+      expect(Order.find(order_id).workflow_status).to eq("pending")
     end
 
     context "with non-existent order_id" do

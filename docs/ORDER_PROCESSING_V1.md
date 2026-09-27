@@ -45,7 +45,7 @@ initiateOrder()                  CHECKOUT
       │
       ├── CreateOrderService.call(company:, branch:, items:, customer:)
       │     ├── Order.create!(workflow_status: :pending)
-      │     ├── OrderAppointment.insert_all!(items)
+      │     ├── OrderProductAppointment.insert_all!(items)
       │     └── creates "Walk-in Customer" if none provided
       │
       └── 201 { order_id, total_price }  ◄── stored in frontend state
@@ -58,11 +58,11 @@ pay()                              PAY
         ▼
     V1Controller#pay
       │
-      ├── PaymentMethodAppointment.branch_level.find_by!(id:, company_id:)   ← branch-scoped
+      ├── BranchPaymentMethodAppointment.find_by!(id:, company_id:)   ← branch-scoped
       │
       └── InitiatePaymentService.call(order:, appointment:)
             │
-            ├── validates: appoint_to == order.branch + lifecycle active
+            ├── validates: appointment.branch == order.branch + lifecycle active
             ├── ReserveStockService.call(items:)  → { reserved: [...] }
             │     └── KRedis DECRBY stock:<id>:available
             ├── Invoice.create! (payment_status: unpaid)
@@ -103,11 +103,10 @@ pay_cancel()                       PAY CANCEL (abandoned QR)
                                                     │   └── StockExport.exists? for this order?
                                                     │
                                                     ├── WriteStockLedgerService.call(order:)
-                                                    │     └── StockTransaction.insert_all(direction: :remove)
-                                                    │
-                                                    ├── UpdateStockBalancesService.call(order:)
-                                                    │     └── SQL UPDATE quantity -= qty, pending -= qty
-                                                    │         └── triggers Stock#after_save → sync_available_counter
+                                                    │     └── per line: StockMovementService::BaseService
+                                                    │         (consume_hold: true) → StockTransaction created
+                                                    │           └─ hardened callback: quantity -= qty,
+                                                    │              pending hold released, Redis synced
                                                     │
                                                     └── FinalizeOrderService.call(order:)
                                                           └── StockExport.create!(business_type: :sale)
@@ -137,8 +136,8 @@ Card (renderProductCard) ── data-action="click->...#addToCart" + params {id,
         ▼ initiateOrder() :125 — only here does the cart flush to DB
         items = activeTab.items.filter(i=>i.stockId).map(i=>({ stock_id, product_id, quantity: i.qty, unit_price: i.price }))
         POST /order_processing/v1/checkout { branch_id, items } → CreateOrderService
-                └── Order.create! + OrderAppointment.insert_all!({ order_id, appoint_to_type:"Product", quantity, unit_price, total_price: qty*unit_price })
-        pay later reads order.order_appointments.sum(:total_price) — never trusts the click params again.
+                └── Order.create! + OrderProductAppointment.insert_all!({ order_id, product_id, quantity, unit_price, total_price: qty*unit_price })
+        pay later reads order.line_total — never trusts the click params again.
 ```
 
 ### State Machine
@@ -341,7 +340,7 @@ All services live under `OrderProcessingV1` module and use `self.call(...)` — 
 - Calculates `total_price = sum(quantity * unit_price)`
 - Creates "Walk-in Customer" if none provided (name: `"Walk-in Customer"`)
 - Creates `Order` with `workflow_status: :pending, currency_code: :usd, business_type: :in_store`
-- Bulk-inserts `OrderAppointment` records via `insert_all!`
+- Bulk-inserts `OrderProductAppointment` records via `insert_all!`
 - String quantity values are converted via `.to_i`
 
 **Returns:**
@@ -399,34 +398,22 @@ Cancel: finds the company's Transaction by token (`find_by!` → 404), releases 
 |-------|------|-------------|
 | `order` | `Order` | The paid Order |
 
-**Behavior:**
-- Iterates `order.order_appointments`
-- Looks up `Stock` record by product for each line item
-- Bulk-inserts `StockTransaction` rows with `direction: :remove`, `transaction_type: :export`, `appoint_for: order`
+**Behavior (2026-09-23 — ledger-driven, docs/superpowers/specs/2026-09-23-stock-source-of-truth-design.md §5):**
+- Iterates `order.order_product_appointments`
+- Resolves the Stock row persisted on the line at pay time (`stock_id` FK); legacy lines fall back to branch-scoped then company-scoped resolution
+- Per line, calls `StockMovementService::BaseService` (`direction: :remove`, `transaction_type: :export`, `appoint_for: order`, `consume_hold: true` when a pay-time hold exists) — the hardened `StockTransaction` callback IS the quantity write; `insert_all!` removed
 
 **Returns:**
 ```ruby
 { count: Integer }  # number of ledger rows inserted
 ```
 
-### 5.6 `UpdateStockBalancesService`
+### 5.6 `UpdateStockBalancesService` — REMOVED (2026-09-23)
 
-**File**: `app/services/order_processing_v1/update_stock_balances_service.rb`
-**Signature**: `call(order:)`
-
-| Param | Type | Description |
-|-------|------|-------------|
-| `order` | `Order` | The paid Order |
-
-**Behavior:**
-- Iterates `order.order_appointments`
-- For each line item, runs direct SQL `UPDATE stocks SET quantity = quantity - qty, pending = pending - qty`
-- Uses `update_all` with array SQL fragment
-
-**Returns:**
-```ruby
-{ updated: Array<Integer> }  # list of affected stock IDs
-```
+The direct-SQL balance writer was deleted. Quantities move ONLY through `StockTransaction`'s
+hardened `recalibrate_stock_metrics` callback (see §5.5); the hold release (`pending -= qty`)
+is handled by `StockMovementService::BaseService` (`consume_hold: true` → `release_reserved!`
+after the ledger row exists).
 
 ### 5.7 `FinalizeOrderService`
 
@@ -438,7 +425,7 @@ Cancel: finds the company's Transaction by token (`find_by!` → 404), releases 
 | `order` | `Order` | The paid Order |
 
 **Behavior:**
-- Iterates `order.order_appointments`
+- Iterates `order.order_product_appointments`
 - For each line item, creates a `StockExport` with:
   - `business_type: :sale`
   - `workflow_status: :completed`
@@ -467,7 +454,7 @@ Cancel: finds the company's Transaction by token (`find_by!` → 404), releases 
 1. **Idempotency guard 1** — Returns early if `order.workflow_status != "paid"`
 2. **Idempotency guard 2** — Returns early if `StockExport.exists?` for this order
 3. Calls `WriteStockLedgerService.call(order:)` — stock ledger entries
-4. Calls `UpdateStockBalancesService.call(order:)` — decrements DB stock balances
+4. Calls `WriteStockLedgerService.call(order:)` — ledger rows via StockMovementService (callback applies quantity deltas + releases holds)
 5. Calls `FinalizeOrderService.call(order:)` — creates export docs
 
 **Triggered by:** `CompletePaymentService` (cash path synchronously, QR path from the mock-bank webhook).
@@ -476,57 +463,22 @@ Cancel: finds the company's Transaction by token (`find_by!` → 404), releases 
 
 ## 7. KRedis Stock Tracking
 
-### `Stock.available_counter`
+Stock availability runs on a Redis hot counter (`stock:<id>:available`)
+mirroring `quantity − pending`, accessed only through the `Stock` wrappers
+(`available_count` / `reserve_stock!` / `release_reserved!` — see
+`docs/KREDIS.md`). Full mechanics — the single write path, healing,
+reservation flow, and counter lifecycle — live in `docs/STOCK.md` (§1–§3).
 
-**File**: `app/models/stock.rb`
-
-```ruby
-kredis_counter :available_counter, key: ->(s) { "stock:#{s.id}:available" }
-```
-
-The counter is synced from the database via (accessed only through model
-wrappers — see `docs/KREDIS.md`):
-
-```ruby
-after_save :sync_available_counter,
-  if: -> { saved_change_to_quantity? || saved_change_to_pending? }
-
-# private
-def sync_available_counter
-  target = [ quantity - pending, 0 ].max
-  delta = target - available_counter.value
-  return if delta.zero?
-
-  delta.positive? ? available_counter.increment(by: delta) : available_counter.decrement(by: -delta)
-end
-```
-
-This keeps the Redis counter consistent with the DB after any stock save.
-`update_all` bypasses callbacks — the order pipeline keeps Redis and DB in step
-explicitly. If a counter key goes missing (Redis restart/flush),
-`Stock#available_count` heals it from `quantity - pending` on first read.
-
-### Atomic Reservation Flow
-
-Reservation lives on the model (`Stock#reserve_stock!`) — an atomic Redis
-decrement that returns false and reverts itself when stock is insufficient:
-
-1. `ReserveStockService` heals missing keys via `available_count`, then calls
-   `reserve_stock!(qty)` per item
-2. On the first `false`, all previously reserved items are rolled back via
-   `release_reserved!(qty)`
-3. `InsufficientStockError` is raised → the pay action returns 422
-
-On success, each `reserve_stock!` also increments the DB `pending` column so
-`quantity - pending` reflects the reservation between pay and finalize.
-
-### Counter Lifecycle
+POS usage:
 
 ```
 Checkout ─► reads availability (Redis counter; heals from DB if missing)
 Pay      ─► reserve_stock!: DECRBY available_counter + DB pending += qty
-Finalize ─► UPDATE DB quantity -= qty, pending -= qty
+Finalize ─► ledger callback writes DB quantity; hold released (pending -= qty)
 ```
+
+On reservation failure (`reserve_stock!` returns `false`), prior holds roll
+back via `release_reserved!` and the pay action returns 422.
 
 ---
 
@@ -535,7 +487,7 @@ Finalize ─► UPDATE DB quantity -= qty, pending -= qty
 | Model | File | Role in Pipeline |
 |-------|------|-----------------|
 | `Order` | `app/models/order.rb` | Pending/paid order record; `workflow_status` tracks state |
-| `OrderAppointment` | `app/models/order_appointment.rb` | Polymorphic line items (Product/Service), stores `quantity`, `unit_price`, `total_price` |
+| `OrderProductAppointment` | `app/models/order_product_appointment.rb` | Atomic line items (Order + Product + optional `stock_id`), stores `quantity`, `unit_price`, `total_price` |
 | `Stock` | `app/models/stock.rb` | Inventory record with `quantity`, `pending`, KRedis `available_counter` |
 | `StockTransaction` | `app/models/stock_transaction.rb` | Ledger entries; `after_create` recalibrates stock metrics |
 | `StockExport` | `app/models/stock_export.rb` | Export documents linked to Order via polymorphic `appoint_for` |
@@ -610,9 +562,8 @@ export const receipt_company_order_path = (companyId, orderId) =>
 | `spec/services/order_processing_v1/initiate_payment_service_spec.rb` | Cash instant-complete, QR pending + merchant kwargs, rollback, validation | Branch appointments for cash + mock QR |
 | `spec/services/order_processing_v1/complete_payment_service_spec.rb` | Completes txn, derives invoice paid, idempotency, failed no-op | Pending Transaction on unpaid Invoice |
 | `spec/services/order_processing_v1/cancel_payment_service_spec.rb` (+ release spec) | Cancel fails txn + releases stock, non-pending no-op | Reserved stock + pending transaction |
-| `spec/services/order_processing_v1/write_stock_ledger_service_spec.rb` | Creates stock transactions with correct direction/type | Paid order, stock records per product |
-| `spec/services/order_processing_v1/update_stock_balances_service_spec.rb` | Decrements quantity and pending, multiple items | Paid order with order_appointments |
-| `spec/services/order_processing_v1/finalize_order_service_spec.rb` | Creates stock exports with sale business_type, links to Order via appoint_for | Paid order with order_appointments |
+| `spec/services/order_processing_v1/write_stock_ledger_service_spec.rb` | Ledger rows + callback-driven quantity mutation, hold consumption, stock_id / branch-scoped / legacy fallbacks | Paid order, stock records per product |
+| `spec/services/order_processing_v1/finalize_order_service_spec.rb` | Creates stock exports with sale business_type, links to Order via appoint_for | Paid order with order_product_appointments |
 | `spec/requests/companies/order_processing/v1_controller_spec.rb` | Checkout success, insufficient stock, missing fields, multiple items, string quantity, non-existent order pay, full checkout+pay flow | Company, branch, products, stock |
 | `spec/features/companies/pages/retail_cashier_spec.rb` | Page load, add/remove cart, ORDER → COMPLETE PAYMENT, Cancel, cart locked, insufficient stock, empty cart guard | Company, branch, products, stock, page record |
 

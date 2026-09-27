@@ -43,9 +43,16 @@ Rails.application.routes.draw do
       resources :employees
       resources :stocks
       resources :warehouses
-      resources :stock_transfers
+      resources :stock_transfers do
+        member do
+          post :initiate
+          post :receive
+          post :cancel
+        end
+      end
       resources :stock_imports
       resources :stock_exports
+      resources :stock_adjustments
       resources :customers
       resources :invoices
       resources :purchases do

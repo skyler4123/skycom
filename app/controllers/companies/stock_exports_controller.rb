@@ -4,10 +4,20 @@
 # dynamic search/filter as Products (?q= / ?filters[key]= → Meilisearch via
 # StockExports::SearchQueryService; plain DB path otherwise). quantity is a
 # filterable metric (StockExport.ms_extra_filterable_columns).
+# create runs the movement through StockMovementService::Exports::CreateService —
+# hold-aware floor enforced; nothing persisted when any line exceeds availability.
 # Serves Stimulus: Companies_StockExports_IndexController (index JSON incl. q/filters passthrough)
-# Endpoints: GET /companies/:company_id/stock_exports(.json) — see config/routes.rb
-# Docs: docs/DYNAMIC_TABLE.md §2.5, docs/MEILISEARCH.md
+# Endpoints:
+#   GET  /companies/:company_id/stock_exports(.json)                          — index dashboard
+#   POST /companies/:company_id/stock_exports(.json) { stock_export: {...}, stock_items: [...] }
+# Docs: docs/superpowers/specs/2026-09-23-stock-source-of-truth-design.md, docs/DYNAMIC_TABLE.md §2.5
 class Companies::StockExportsController < Companies::ApplicationController
+  include Companies::StockMovementConcern
+
+  def create
+    create_movement_document(StockExport, StockMovementService::Exports::CreateService)
+  end
+
   def index
     respond_to do |format|
       format.html { render html: "", layout: true }

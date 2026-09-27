@@ -1,13 +1,15 @@
-# spec/factories/stock_transfers.rb
 FactoryBot.define do
   factory :stock_transfer do
     association :company
     association :product
+    destination_warehouse { nil }
 
     initialize_with do
       Seed::StockTransferService.new(
         company: company,
         product: product,
+        warehouse: warehouse,
+        destination_warehouse: destination_warehouse,
         branch: nil,
         appoint_from: nil,
         appoint_to: nil

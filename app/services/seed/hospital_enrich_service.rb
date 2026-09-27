@@ -527,7 +527,8 @@ class Seed::HospitalEnrichService
       requester = @employees.sample
       purchase = Seed::PurchaseService.create(
         company: @company, branch: branch, category: round_robin(purchase_categories, i),
-        supplier: suppliers.sample, needed_by: Time.zone.now + rand(3..30).days,
+        warehouse: @warehouses.sample, supplier: suppliers.sample,
+        needed_by: Time.zone.now + rand(3..30).days,
         created_by_employee: requester,
         name: "Purchase #{i + 1} for #{branch.name}"
       )

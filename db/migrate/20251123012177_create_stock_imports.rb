@@ -4,7 +4,7 @@ class CreateStockImports < ActiveRecord::Migration[8.0]
       t.references :company, null: false, foreign_key: true, type: :uuid
       t.references :branch, null: true, foreign_key: true, type: :uuid
       t.references :warehouse, null: false, foreign_key: true, type: :uuid
-      t.references :product, null: false, foreign_key: true, type: :uuid
+      t.references :product, null: true, foreign_key: true, type: :uuid
 
       t.references :appoint_from, polymorphic: true, null: true, type: :uuid
       t.references :appoint_to, polymorphic: true, null: true, type: :uuid

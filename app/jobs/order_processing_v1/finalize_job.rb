@@ -12,8 +12,10 @@ module OrderProcessingV1
       ).exists?
 
       ActiveRecord::Base.transaction do
+        # Ledger rows via StockMovementService — the callback IS the quantity
+        # write (docs/superpowers/specs/2026-09-23-stock-source-of-truth-design.md §5).
+        # No separate balance-SQL step: UpdateStockBalancesService was removed.
         WriteStockLedgerService.call(order: order)
-        UpdateStockBalancesService.call(order: order)
         FinalizeOrderService.call(order: order)
       end
     end

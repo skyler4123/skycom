@@ -2,6 +2,7 @@ class Seed::PurchaseService
   def self.new(
     company:,
     branch: nil,
+    warehouse: nil,
     supplier: nil,
     category: nil,
     property_mapping: nil,
@@ -23,6 +24,7 @@ class Seed::PurchaseService
     Purchase.new(
       company: company,
       branch: branch,
+      warehouse: warehouse,
       supplier: supplier,
       category: category,
       property_mapping: property_mapping,

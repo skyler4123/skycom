@@ -26,9 +26,13 @@ Submit (step 1) ── approved ──► Manager Approval (step 2) ── appro
   Total price always computed live from appointments (100 × $1 = 100)
 ```
 
-**No Stock impact anywhere** — purchases never touch stock counters, ledgers, or exports
-(`docs/ORDER_PROCESSING_V1.md` machinery is not involved). A future phase may convert completed
-purchases into `StockImport`s; that is explicitly out of scope.
+**Stock bridge (2026-09-23)** — a completed Purchase lands its goods through the stock services
+(never direct writes): final workflow approval triggers `StockMovementService::Purchases::CompleteService`
+inside the advance transaction → generates a received `StockImport` (lines reference the destination
+warehouse's `Stock` rows via `StockImportStockAppointment`) → `add` `StockTransaction` rows increase quantities
+through the hardened ledger callback. Requires `purchases.warehouse_id` (destination) and
+`purchase_items.product_id` (optional — item-less/product-less lines skip the bridge). See
+`docs/superpowers/specs/2026-09-23-stock-source-of-truth-design.md` §4.
 
 ## 2. The Permission Model (single system — ABAC)
 
@@ -87,8 +91,8 @@ Workflow 1─* WorkflowStepLog
 Purchase ──► category ──► Workflow   (derived — no direct Purchase↔Workflow FK)
 Purchase ─── workflow_step_id ──► WorkflowStep   (the subject's current-step pointer)
 Purchase 1─* WorkflowStepLog   (polymorphic subject)
-PurchaseItem 1─* PurchaseItemAppointment (anchor — SetDefaultCompanyConcern derives company)
-Purchase 1─* PurchaseItemAppointment      (as: :appoint_to)
+PurchaseItem 1─* PurchasePurchaseItemAppointment (atomic — SetDefaultCompanyConcern derives company)
+Purchase 1─* PurchasePurchaseItemAppointment (concrete purchase + purchase_item FKs)
 Purchase ──► supplier (optional), branch (optional)
 ```
 
@@ -98,7 +102,7 @@ Purchase ──► supplier (optional), branch (optional)
 |-------|------------|
 | `Purchase` | Order clone **minus** `customer_id`/`email`/`phone_number`; **plus** `supplier_id`, `needed_by`, `workflow_step_id` (current-step pointer only — no workflow_id); 60 `property_*` slots; `business_type: { office_supply: 0, equipment: 1, service: 2 }` |
 | `PurchaseItem` | `name`, `description`, `code`, `unit` ("piece"/"box"), `estimated_unit_price` (**reference only**), 60 `property_*` slots |
-| `PurchaseItemAppointment` | `purchase_item_id` + polymorphic `appoint_to` (→ Purchase) + `quantity` / `unit_price` / `total_price` |
+| `PurchasePurchaseItemAppointment` | `purchase_id` + `purchase_item_id` (concrete FKs) + `quantity` / `unit_price` / `total_price` |
 | `Workflow` | `category_id` (**unique — one workflow per category**), `name`, `process_type: { purchase_process: 0, leave_process: 1 }` — no `is_default` column |
 | `WorkflowStep` | `name`, `position` (unique per workflow) — **no permission columns** |
 | `WorkflowStepLog` | `subject` (polymorphic), `employee_id` (actor), `outcome: { submitted: 0, approved: 1, rejected: 2, rework: 3 }`, `note`, `metadata` (`from_step_id`, `target_step_id`) |
@@ -196,7 +200,7 @@ ABAC permission model.
 3. **The log is the audit.** `WorkflowStepLog` answers who/what/when/why — `metadata.from_step_id`/`target_step_id` reconstruct the exact transition.
 4. **The category is the binding.** Same category ⇒ same workflow, enforced by a unique index. Subjects carry only the step pointer — never a workflow_id.
 5. **The appointment is the truth.** Line economics live on `PurchaseItemAppointment`; `PurchaseItem` is a reusable reference (`estimated_unit_price` is advisory).
-6. **No stock impact.** Purchases are administrative documents. A future phase may bridge completed purchases → `StockImport`; it must go through the stock services, never direct writes.
+6. **Stock goes through the services.** A completed purchase lands its goods via `StockMovementService::Purchases::CompleteService` (2026-09-23) — `StockImport` + `StockTransaction` ledger rows inside the advance transaction, never direct stock writes.
 
 ## 9. File Reference
 
