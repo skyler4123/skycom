@@ -57,4 +57,20 @@ RSpec.describe "Companies::StockImportsController#create", type: :request do
     expect(response).to have_http_status(:unprocessable_content)
     expect(response.parsed_body["errors"]).to be_present
   end
+
+  it "renders 422 and persists nothing when a line belongs to another warehouse" do
+    other_warehouse = create(:warehouse, company: company)
+    foreign_stock = Stock.create!(company: company, warehouse: other_warehouse, product: product,
+      quantity: 5, pending: 0, name: "Foreign Stock", code: "STK-RQF")
+
+    expect {
+      post company_stock_imports_path(company), params: {
+        stock_import: { warehouse_id: warehouse.id },
+        stock_items: [ { stock_id: foreign_stock.id, quantity: 1 } ]
+      }, as: :json
+    }.not_to change(StockImport, :count)
+
+    expect(response).to have_http_status(:unprocessable_content)
+    expect(response.parsed_body["errors"].join).to match(/warehouse/)
+  end
 end

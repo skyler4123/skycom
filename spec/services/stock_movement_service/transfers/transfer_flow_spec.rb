@@ -58,6 +58,26 @@ RSpec.describe StockMovementService::Transfers, type: :model do
       expect(transfer.received_at).to be_present
     end
 
+    it "receives atomically: a mid-receive failure rolls back all ledger rows and quantities" do
+      described_class::InitiateService.call(transfer: transfer, employee: employee)
+
+      calls = 0
+      allow(StockMovementService::BaseService).to receive(:call).and_wrap_original do |m, **kwargs|
+        calls += 1
+        raise StockMovementService::Error, "mid-receive boom" if calls == 2
+        m.call(**kwargs)
+      end
+
+      expect {
+        described_class::ReceiveService.call(transfer: transfer.reload, employee: employee)
+      }.to raise_error(StockMovementService::Error, "mid-receive boom")
+
+      expect(StockTransaction.where(transaction_type: :transfer).count).to eq(0)
+      expect(source_stock.reload.quantity).to eq(10)
+      expect(source_stock.reload.pending).to eq(4)
+      expect(transfer.reload.workflow_status_initiated?).to be true
+    end
+
     it "cancels: releases the hold and marks cancelled" do
       described_class::InitiateService.call(transfer: transfer, employee: employee)
       described_class::CancelService.call(transfer: transfer.reload, employee: employee)

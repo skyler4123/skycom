@@ -75,6 +75,18 @@ RSpec.describe "Companies::StockTransfersController movements", type: :request d
 
       expect(response).to have_http_status(:unprocessable_content)
     end
+
+    it "renders 422 with errors (not 500) when the destination cannot resolve" do
+      StockMovementService::Transfers::InitiateService.call(transfer: transfer, employee: nil)
+      allow(StockMovementService::StockResolver).to receive(:resolve!)
+        .and_raise(ActiveRecord::RecordInvalid.new(Stock.new))
+
+      post receive_company_stock_transfer_path(company, transfer.reload), as: :json
+
+      expect(response).to have_http_status(:unprocessable_content)
+      expect(response.parsed_body["errors"]).to be_present
+      expect(transfer.reload.workflow_status).to eq("initiated")
+    end
   end
 
   describe "POST cancel" do

@@ -74,6 +74,21 @@ RSpec.describe Workflows::AdvanceService do
       expect(import.workflow_status).to eq("received")
     end
 
+    it "returns failure (never raises) when the stock bridge fails on final approval" do
+      product = create(:product, company: company)
+      item = Seed::PurchaseItemService.create(company: company, product: product, name: "Pen box")
+      purchase.purchase_purchase_item_appointments.create!(
+        company: company, purchase_item: item, quantity: 5, unit_price: 2, total_price: 10
+      )
+      allow(StockMovementService::Purchases::CompleteService).to receive(:call)
+        .and_raise(StockMovementService::Error, "boom")
+
+      3.times { advance(outcome: :approved, employee: owner) }
+
+      expect(advance(outcome: :approved, employee: owner)).to eq({ success: false, errors: [ "boom" ] })
+      expect(purchase.reload.workflow_status_completed?).to be false
+    end
+
     it "still completes a bare purchase (no line items) — bridge skips" do
       3.times { advance(outcome: :approved, employee: owner) }
 

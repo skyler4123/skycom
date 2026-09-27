@@ -29,7 +29,6 @@ class StockAdjustment < ApplicationRecord
   has_many :stock_adjustment_stock_appointments, dependent: :destroy
   has_many :stocks, through: :stock_adjustment_stock_appointments
 
-
   validates :code, presence: true, uniqueness: true
   validates :direction, presence: true
   validates :reason, length: { maximum: 500 }, allow_nil: true

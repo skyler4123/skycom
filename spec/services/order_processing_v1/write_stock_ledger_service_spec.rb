@@ -53,6 +53,7 @@ RSpec.describe OrderProcessingV1::WriteStockLedgerService do
       other_warehouse = create(:warehouse, company: company)
       branch_stock = create(:stock, company: company, product: product, warehouse: other_warehouse, quantity: 50)
       oa.update!(stock_id: branch_stock.id)
+      branch_stock.reserve_stock!(2) # the pay-time reservation for this line
 
       described_class.call(order: order)
 
@@ -70,6 +71,18 @@ RSpec.describe OrderProcessingV1::WriteStockLedgerService do
       expect(branch_stock.reload.quantity).to eq(18)
       expect(branch_stock.reload.pending).to eq(0)
       expect(stock.reload.quantity).to eq(10)
+    end
+
+    it "fails fast for pay-persisted lines whose hold is gone (never eats another hold)" do
+      oa.update!(stock_id: stock.id)
+      # No reservation: pending is 0 — the hold this line claims does not exist.
+
+      expect {
+        described_class.call(order: order)
+      }.to raise_error(StockMovementService::Error, /Insufficient stock/)
+
+      expect(stock.reload.quantity).to eq(10)
+      expect(stock.reload.pending).to eq(0)
     end
   end
 end

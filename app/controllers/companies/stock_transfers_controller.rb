@@ -37,6 +37,15 @@ class Companies::StockTransfersController < Companies::ApplicationController
     transfer.quantity = transfer.stock_transfer_stock_appointments.sum(&:quantity)
     transfer.branch ||= transfer.stock_transfer_stock_appointments.first&.stock&.branch
 
+    if transfer.warehouse_id.present?
+      transfer.stock_transfer_stock_appointments.each do |line|
+        next if line.stock.warehouse_id == transfer.warehouse_id
+
+        raise StockMovementService::Error,
+          "Stock #{line.stock.code} belongs to another warehouse"
+      end
+    end
+
     ActiveRecord::Base.transaction do
       transfer.save!
     end
@@ -98,13 +107,14 @@ class Companies::StockTransfersController < Companies::ApplicationController
   end
 
   # One movement = one DB transaction. Service errors roll back the whole
-  # movement; the rescue renders 422 (docs/API_ERROR_FORMAT.md).
+  # movement; the rescue renders 422 (docs/API_ERROR_FORMAT.md) — mirroring
+  # StockMovementConcern so validation/lookup failures never surface as 500.
   def run_movement
     ActiveRecord::Base.transaction do
       result = yield
       render json: { status: "ok", **result }
     end
-  rescue StockMovementService::Error => e
+  rescue StockMovementService::Error, ActiveRecord::RecordInvalid, ActiveRecord::RecordNotFound => e
     render json: { errors: [ e.message ] }, status: :unprocessable_content
   end
 

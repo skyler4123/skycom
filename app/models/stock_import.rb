@@ -42,6 +42,5 @@ class StockImport < ApplicationRecord
   has_many :stock_import_stock_appointments, dependent: :destroy
   has_many :stocks, through: :stock_import_stock_appointments
 
-
   validates :code, presence: true, uniqueness: true
 end

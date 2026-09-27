@@ -16,9 +16,12 @@ module OrderProcessingV1
         stock = resolve_stock(order, oa)
 
         # Real POS flow: the pay-time reservation holds the units (consume it).
-        # Legacy/seeded paid orders never reserved — fall back to a free-standing
-        # removal guarded by the hold-aware floor.
-        consume_hold = stock.pending >= oa.quantity
+        # A line carrying the pay-persisted stock_id proves its hold — consume
+        # unconditionally so a legacy/unreserved row can never eat another
+        # order's hold. Legacy rows (no stock_id) keep the heuristic: consume
+        # only when a hold is actually outstanding, else free-standing removal
+        # guarded by the hold-aware floor.
+        consume_hold = oa.try(:stock_id).present? || stock.pending >= oa.quantity
 
         StockMovementService::BaseService.call(
           stock: stock.reload,

@@ -42,7 +42,6 @@ class StockTransfer < ApplicationRecord
   has_many :stock_transfer_stock_appointments, dependent: :destroy
   has_many :stocks, through: :stock_transfer_stock_appointments
 
-
   validates :code, presence: true, uniqueness: true
   validates :destination_warehouse, comparison: { other_than: ->(transfer) { transfer.warehouse } },
     if: -> { warehouse.present? && destination_warehouse.present? }

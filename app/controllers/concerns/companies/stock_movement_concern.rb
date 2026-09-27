@@ -32,6 +32,8 @@ module Companies::StockMovementConcern
     document.product_id ||= lines.first&.stock&.product_id if document.has_attribute?(:product_id)
     document.quantity = lines.sum(&:quantity) if document.has_attribute?(:quantity)
 
+    validate_line_warehouses!(document, lines)
+
     ActiveRecord::Base.transaction do
       document.save!
       execute_movement(document, service_class)
@@ -73,6 +75,20 @@ module Companies::StockMovementConcern
       StockExport => :stock_export_stock_appointments,
       StockAdjustment => :stock_adjustment_stock_appointments
     }.fetch(document_class)
+  end
+
+  # Ledger rows inherit the line's stock warehouse — a line from another
+  # warehouse would silently move the wrong shelf while the document names
+  # this one. Reject up front (rescued → 422 { errors: [...] }).
+  def validate_line_warehouses!(document, lines)
+    return if document.warehouse_id.blank?
+
+    lines.each do |line|
+      next if line.stock.warehouse_id == document.warehouse_id
+
+      raise StockMovementService::Error,
+        "Stock #{line.stock.code} belongs to another warehouse"
+    end
   end
 
   def stock_items_params

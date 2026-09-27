@@ -58,6 +58,11 @@ class Workflows::AdvanceService
     end
 
     { success: true }
+  rescue StockMovementService::Error => e
+    # The raise already rolled back the transaction (log + pointer + status +
+    # stock landing all-or-nothing): surface it as a business failure so the
+    # no-raise contract holds and controllers render 422 { errors: [...] }.
+    failure(e.message)
   end
 
   private
