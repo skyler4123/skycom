@@ -72,6 +72,35 @@ RSpec.describe "Stock movement show/new/edit JSON", type: :request do
     expect(StockImport.where(company: company).count).to eq(0)
   end
 
+  it "PATCH stock_transfers/:id preserves original lines when replacement items are invalid" do
+    other_warehouse = create(:warehouse, company: company)
+    other_stock = Stock.create!(company: company, warehouse: other_warehouse, product: product,
+      quantity: 10, name: "Other Stock", code: "STK-OTH2-#{SecureRandom.hex(3).upcase}")
+    dest = create(:warehouse, company: company)
+    transfer = create(:stock_transfer, company: company, warehouse: warehouse, destination_warehouse: dest)
+    transfer.update!(workflow_status: :pending)
+    transfer.stock_transfer_stock_appointments.create!(company: company, stock: stock, quantity: 3)
+    patch "/companies/#{company.id}/stock_transfers/#{transfer.id}.json",
+      params: { stock_transfer: { name: "Renamed" }, stock_items: [ { stock_id: other_stock.id, quantity: 2 } ] }
+    expect(response).to have_http_status(:unprocessable_content)
+    surviving = transfer.reload.stock_transfer_stock_appointments
+    expect(surviving.size).to eq(1)
+    expect(surviving.first.stock_id).to eq(stock.id)
+    expect(surviving.first.quantity).to eq(3)
+  end
+
+  it "POST stock_imports persists category and dynamic property" do
+    category = Seed::CategoryService.find_or_create_for(company: company, resource_name: "stock_imports")
+    post "/companies/#{company.id}/stock_imports.json",
+      params: { stock_import: { warehouse_id: warehouse.id, name: "Labeled", category_id: category.id,
+                                property_string_1: "Fragile" },
+                stock_items: [ { stock_id: stock.id, quantity: 2 } ] }
+    expect(response).to have_http_status(:ok)
+    import = StockImport.find(JSON.parse(response.body)["stock_import"]["id"])
+    expect(import.category_id).to eq(category.id)
+    expect(import.property_string_1).to eq("Fragile")
+  end
+
   it "PATCH stock_transfers/:id refuses an already-initiated transfer" do
     dest = create(:warehouse, company: company)
     transfer = create(:stock_transfer, company: company, warehouse: warehouse, destination_warehouse: dest)
@@ -80,5 +109,14 @@ RSpec.describe "Stock movement show/new/edit JSON", type: :request do
       params: { stock_transfer: { name: "Renamed" } }
     expect(response).to have_http_status(:unprocessable_content)
     expect(JSON.parse(response.body)["errors"].first).to match(/initiated/)
+  end
+
+  it "POST stock_imports with blank quantity 422s and persists nothing (never 500)" do
+    post "/companies/#{company.id}/stock_imports.json",
+      params: { stock_import: { warehouse_id: warehouse.id, name: "Blank qty" },
+                stock_items: [ { stock_id: stock.id, quantity: "" } ] }
+    expect(response).to have_http_status(:unprocessable_content)
+    expect(JSON.parse(response.body)["errors"]).to be_present
+    expect(StockImport.where(company: company).count).to eq(0)
   end
 end

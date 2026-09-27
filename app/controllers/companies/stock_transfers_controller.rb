@@ -34,6 +34,8 @@ class Companies::StockTransfersController < Companies::ApplicationController
     transfer.code = "#{StockTransfer::CODE_PREFIX}-#{SecureRandom.hex(4).upcase}" if transfer.code.blank?
     transfer.workflow_status = :pending # movement starts at initiate
 
+    validate_stock_items!(stock_items_params)
+
     stock_items_params.each do |item|
       transfer.stock_transfer_stock_appointments.build(
         company: current_company,
@@ -114,32 +116,35 @@ class Companies::StockTransfersController < Companies::ApplicationController
     end
 
     transfer.assign_attributes(transfer_params)
-    transfer.stock_transfer_stock_appointments.destroy_all if stock_items_params.any?
-    stock_items_params.each do |item|
-      transfer.stock_transfer_stock_appointments.build(
-        company: current_company,
-        stock: current_company.stocks.find(item[:stock_id]),
-        quantity: item[:quantity]
-      )
-    end
 
-    if transfer.warehouse_id.present?
-      transfer.stock_transfer_stock_appointments.each do |line|
-        next if line.stock.warehouse_id == transfer.warehouse_id
-
-        return render json: { errors: [ "Stock #{line.stock.code} belongs to another warehouse" ] },
-          status: :unprocessable_content
+    # Resolve and validate replacement lines BEFORE touching persisted rows —
+    # a rejected edit must leave the original lines intact.
+    items = stock_items_params
+    validate_stock_items!(items)
+    new_lines = items.map do |item|
+      stock = current_company.stocks.find(item[:stock_id])
+      if transfer.warehouse_id.present? && stock.warehouse_id != transfer.warehouse_id
+        raise StockMovementService::Error,
+          "Stock #{stock.code} belongs to another warehouse"
       end
+      { stock: stock, quantity: item[:quantity] }
     end
-    transfer.product_id ||= transfer.stock_transfer_stock_appointments.first&.stock&.product_id
-    transfer.quantity = transfer.stock_transfer_stock_appointments.sum(&:quantity)
 
-    if transfer.save
-      render json: { stock_transfer: format_stock_transfer(transfer, with_lines: true), status: "ok" }
-    else
-      render json: { errors: transfer.errors.full_messages }, status: :unprocessable_content
+    ActiveRecord::Base.transaction do
+      if new_lines.any?
+        transfer.stock_transfer_stock_appointments.destroy_all
+        new_lines.each do |line|
+          transfer.stock_transfer_stock_appointments.build(company: current_company, **line)
+        end
+      end
+      transfer.product_id ||= transfer.stock_transfer_stock_appointments.first&.stock&.product_id
+      transfer.quantity = transfer.stock_transfer_stock_appointments.sum(&:quantity)
+
+      transfer.save!
     end
-  rescue ActiveRecord::RecordNotFound => e
+
+    render json: { stock_transfer: format_stock_transfer(transfer, with_lines: true), status: "ok" }
+  rescue StockMovementService::Error, ActiveRecord::RecordInvalid, ActiveRecord::RecordNotFound => e
     render json: { errors: [ e.message ] }, status: :unprocessable_content
   end
 
@@ -183,7 +188,8 @@ class Companies::StockTransfersController < Companies::ApplicationController
   end
 
   def transfer_params
-    params.require(:stock_transfer).permit(:warehouse_id, :destination_warehouse_id, :branch_id, :name, :description, :business_type).tap do |h|
+    params.require(:stock_transfer).permit(:warehouse_id, :destination_warehouse_id, :branch_id, :name,
+      :description, :business_type, :category_id, *movement_property_keys).tap do |h|
       h[:company] = current_company
     end
   end

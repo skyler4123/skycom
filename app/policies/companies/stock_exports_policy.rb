@@ -14,4 +14,8 @@ class Companies::StockExportsPolicy < ApplicationPolicy
   def new?
     record.can?(:create, StockExport)
   end
+
+  def edit?
+    record.can?(:update, StockExport)
+  end
 end

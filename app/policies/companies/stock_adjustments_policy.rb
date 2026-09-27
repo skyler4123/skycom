@@ -14,4 +14,8 @@ class Companies::StockAdjustmentsPolicy < ApplicationPolicy
   def new?
     record.can?(:create, StockAdjustment)
   end
+
+  def edit?
+    record.can?(:update, StockAdjustment)
+  end
 end
