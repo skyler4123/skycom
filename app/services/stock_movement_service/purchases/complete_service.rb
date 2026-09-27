@@ -4,10 +4,10 @@
 # §8 tenet 6: purchases reach stock only through the stock services, never
 # direct writes). Called from Workflows::AdvanceService when a Purchase's final
 # step is approved. One transaction (the advance's):
-#   1. Resolve each purchase_item_appointment → the destination warehouse's
-#      Stock row (created positively when the pair has no row yet).
+#   1. Resolve each purchase_purchase_item_appointment → the destination
+#      warehouse's Stock row (created positively when the pair has no row yet).
 #   2. Build a StockImport (business_type: purchase, appoint_from: purchase,
-#      workflow_status: received) with StockItemAppointment lines.
+#      workflow_status: received) with StockImportStockAppointment lines.
 #   3. Write one `add` ledger row per line (transaction_type: import) — the
 #      hardened callback increases Stock.quantity.
 # Idempotent: skips when an import for this purchase already exists. Purchases
@@ -17,7 +17,7 @@ class StockMovementService::Purchases::CompleteService
   def self.call(purchase:, employee: nil)
     return { success: true, skipped: true } if import_exists?(purchase)
 
-    line_items = purchase.purchase_item_appointments.includes(purchase_item: :product)
+    line_items = purchase.purchase_purchase_item_appointments.includes(purchase_item: :product)
     # Nothing to land → nothing to bridge. Completing a bare purchase must not
     # be blocked by the stock layer.
     return { success: true, skipped: true, reason: "no_line_items" } if line_items.empty?
@@ -47,7 +47,7 @@ class StockMovementService::Purchases::CompleteService
         product: product
       )
 
-      import.stock_item_appointments.build(
+      import.stock_import_stock_appointments.build(
         company: purchase.company,
         stock: stock,
         quantity: item.quantity
@@ -56,7 +56,7 @@ class StockMovementService::Purchases::CompleteService
 
     ActiveRecord::Base.transaction do
       import.save!
-      import.stock_item_appointments.each do |line|
+      import.stock_import_stock_appointments.each do |line|
         StockMovementService::BaseService.call(
           stock: line.stock.reload,
           quantity: line.quantity,

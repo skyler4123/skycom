@@ -9,7 +9,7 @@ RSpec.describe StockMovementService::Purchases::CompleteService, type: :model do
   let!(:purchase_item) { create(:purchase_item, company: company, product: product, name: "Ballpoint Pen") }
 
   before do
-    purchase.purchase_item_appointments.create!(
+    purchase.purchase_purchase_item_appointments.create!(
       company: company, purchase_item: purchase_item, quantity: 5,
       unit_price: 2.5, total_price: 12.5
     )
@@ -28,7 +28,7 @@ RSpec.describe StockMovementService::Purchases::CompleteService, type: :model do
     expect(import).to be_present
     expect(import.workflow_status_received?).to be true
     expect(import.purchase?).to be true
-    expect(import.stock_item_appointments.count).to eq(1)
+    expect(import.stock_import_stock_appointments.count).to eq(1)
 
     txn = StockTransaction.find_by(appoint_for_type: "StockImport", appoint_for_id: import.id)
     expect(txn).to be_add

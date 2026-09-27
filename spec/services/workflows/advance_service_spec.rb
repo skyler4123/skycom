@@ -58,7 +58,7 @@ RSpec.describe Workflows::AdvanceService do
     it "bridges stock on final approval: import + ledger + quantity (purchase with stocked items)" do
       product = create(:product, company: company)
       item = Seed::PurchaseItemService.create(company: company, product: product, name: "Pen box")
-      purchase.purchase_item_appointments.create!(
+      purchase.purchase_purchase_item_appointments.create!(
         company: company, purchase_item: item, quantity: 5, unit_price: 2, total_price: 10
       )
 
