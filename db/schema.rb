@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_09_26_000004) do
+ActiveRecord::Schema[8.0].define(version: 2026_09_26_000009) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pgcrypto"
@@ -4018,6 +4018,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_09_26_000004) do
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.uuid "stock_id"
     t.index ["business_type"], name: "index_order_product_appointments_on_business_type"
     t.index ["company_id", "order_id", "product_id"], name: "idx_order_product_appointments_triple"
     t.index ["company_id"], name: "index_order_product_appointments_on_company_id"
@@ -4025,6 +4026,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_09_26_000004) do
     t.index ["lifecycle_status"], name: "index_order_product_appointments_on_lifecycle_status"
     t.index ["order_id"], name: "index_order_product_appointments_on_order_id"
     t.index ["product_id"], name: "index_order_product_appointments_on_product_id"
+    t.index ["stock_id"], name: "index_order_product_appointments_on_stock_id"
     t.index ["workflow_status"], name: "index_order_product_appointments_on_workflow_status"
   end
 
@@ -4047,6 +4049,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_09_26_000004) do
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.uuid "stock_id"
     t.index ["business_type"], name: "index_order_product_group_appointments_on_business_type"
     t.index ["company_id", "order_id", "product_group_id"], name: "idx_order_product_group_appointments_triple"
     t.index ["company_id"], name: "index_order_product_group_appointments_on_company_id"
@@ -4054,6 +4057,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_09_26_000004) do
     t.index ["lifecycle_status"], name: "index_order_product_group_appointments_on_lifecycle_status"
     t.index ["order_id"], name: "index_order_product_group_appointments_on_order_id"
     t.index ["product_group_id"], name: "index_order_product_group_appointments_on_product_group_id"
+    t.index ["stock_id"], name: "index_order_product_group_appointments_on_stock_id"
     t.index ["workflow_status"], name: "index_order_product_group_appointments_on_workflow_status"
   end
 
@@ -4076,6 +4080,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_09_26_000004) do
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.uuid "stock_id"
     t.index ["business_type"], name: "index_order_service_appointments_on_business_type"
     t.index ["company_id", "order_id", "service_id"], name: "idx_order_service_appointments_triple"
     t.index ["company_id"], name: "index_order_service_appointments_on_company_id"
@@ -4083,6 +4088,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_09_26_000004) do
     t.index ["lifecycle_status"], name: "index_order_service_appointments_on_lifecycle_status"
     t.index ["order_id"], name: "index_order_service_appointments_on_order_id"
     t.index ["service_id"], name: "index_order_service_appointments_on_service_id"
+    t.index ["stock_id"], name: "index_order_service_appointments_on_stock_id"
     t.index ["workflow_status"], name: "index_order_service_appointments_on_workflow_status"
   end
 
@@ -4105,6 +4111,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_09_26_000004) do
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.uuid "stock_id"
     t.index ["business_type"], name: "index_order_service_group_appointments_on_business_type"
     t.index ["company_id", "order_id", "service_group_id"], name: "idx_order_service_group_appointments_triple"
     t.index ["company_id"], name: "index_order_service_group_appointments_on_company_id"
@@ -4112,6 +4119,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_09_26_000004) do
     t.index ["lifecycle_status"], name: "index_order_service_group_appointments_on_lifecycle_status"
     t.index ["order_id"], name: "index_order_service_group_appointments_on_order_id"
     t.index ["service_group_id"], name: "index_order_service_group_appointments_on_service_group_id"
+    t.index ["stock_id"], name: "index_order_service_group_appointments_on_stock_id"
     t.index ["workflow_status"], name: "index_order_service_group_appointments_on_workflow_status"
   end
 
@@ -4134,12 +4142,14 @@ ActiveRecord::Schema[8.0].define(version: 2026_09_26_000004) do
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.uuid "stock_id"
     t.index ["business_type"], name: "index_order_subscription_plan_appointments_on_business_type"
     t.index ["company_id", "order_id", "subscription_plan_id"], name: "idx_order_subscription_plan_appointments_triple"
     t.index ["company_id"], name: "index_order_subscription_plan_appointments_on_company_id"
     t.index ["discarded_at"], name: "index_order_subscription_plan_appointments_on_discarded_at"
     t.index ["lifecycle_status"], name: "index_order_subscription_plan_appointments_on_lifecycle_status"
     t.index ["order_id"], name: "index_order_subscription_plan_appointments_on_order_id"
+    t.index ["stock_id"], name: "index_order_subscription_plan_appointments_on_stock_id"
     t.index ["subscription_plan_id"], name: "idx_on_subscription_plan_id_e7356e6fd3"
     t.index ["workflow_status"], name: "index_order_subscription_plan_appointments_on_workflow_status"
   end
@@ -7962,17 +7972,22 @@ ActiveRecord::Schema[8.0].define(version: 2026_09_26_000004) do
   add_foreign_key "order_product_appointments", "companies"
   add_foreign_key "order_product_appointments", "orders"
   add_foreign_key "order_product_appointments", "products"
+  add_foreign_key "order_product_appointments", "stocks"
   add_foreign_key "order_product_group_appointments", "companies"
   add_foreign_key "order_product_group_appointments", "orders"
   add_foreign_key "order_product_group_appointments", "product_groups"
+  add_foreign_key "order_product_group_appointments", "stocks"
   add_foreign_key "order_service_appointments", "companies"
   add_foreign_key "order_service_appointments", "orders"
   add_foreign_key "order_service_appointments", "services"
+  add_foreign_key "order_service_appointments", "stocks"
   add_foreign_key "order_service_group_appointments", "companies"
   add_foreign_key "order_service_group_appointments", "orders"
   add_foreign_key "order_service_group_appointments", "service_groups"
+  add_foreign_key "order_service_group_appointments", "stocks"
   add_foreign_key "order_subscription_plan_appointments", "companies"
   add_foreign_key "order_subscription_plan_appointments", "orders"
+  add_foreign_key "order_subscription_plan_appointments", "stocks"
   add_foreign_key "order_subscription_plan_appointments", "subscription_plans"
   add_foreign_key "order_tag_appointments", "companies"
   add_foreign_key "order_tag_appointments", "orders"

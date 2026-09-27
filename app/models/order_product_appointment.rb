@@ -15,6 +15,7 @@ class OrderProductAppointment < ApplicationRecord
   belongs_to :company
   belongs_to :order
   belongs_to :product
+  belongs_to :stock, optional: true # exact row reserved at POS pay time (warehouse-deterministic finalize)
   validates :quantity, numericality: { only_integer: true, greater_than_or_equal_to: 0 }, allow_nil: true
   validates :unit_price, :total_price, numericality: { greater_than_or_equal_to: 0 }, allow_nil: true
 end
