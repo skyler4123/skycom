@@ -4,7 +4,7 @@ module OrderProcessingV1
       export_ids = []
       order.order_product_appointments.each do |oa|
         product = oa.product
-        stock = Stock.find_by!(company_id: order.company_id, product_id: product.id)
+        stock = WriteStockLedgerService.resolve_stock(order, oa)
 
         export = StockExport.create!(
           company_id: order.company_id,
