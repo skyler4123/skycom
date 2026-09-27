@@ -6,8 +6,8 @@ RSpec.describe Notification, type: :model do
     it { should belong_to(:company) }
     it { should belong_to(:branch).optional }
     it { should belong_to(:notification_group) }
-    it { should have_many(:tag_appointments).dependent(:destroy) }
-    it { should have_many(:tags).through(:tag_appointments) }
+    it { should have_many(:notification_tag_appointments).dependent(:destroy) }
+    it { should have_many(:tags).through(:notification_tag_appointments) }
   end
 
   describe "validations" do

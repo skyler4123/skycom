@@ -9,8 +9,8 @@ RSpec.describe Setting, type: :model do
     it { should belong_to(:appoint_from).optional }
     it { should belong_to(:appoint_for).optional }
     it { should belong_to(:appoint_by).optional }
-    it { should have_many(:tag_appointments).dependent(:destroy) }
-    it { should have_many(:tags).through(:tag_appointments) }
+    it { should have_many(:setting_tag_appointments).dependent(:destroy) }
+    it { should have_many(:tags).through(:setting_tag_appointments) }
   end
 
   describe "store_accessor" do

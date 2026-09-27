@@ -9,8 +9,8 @@ RSpec.describe Facility, type: :model do
     it { should have_many(:facility_groups).through(:facility_facility_group_appointments) }
     it { should have_many(:employee_facility_appointments).dependent(:destroy) }
     it { should have_many(:employees).through(:employee_facility_appointments) }
-    it { should have_many(:tag_appointments).dependent(:destroy) }
-    it { should have_many(:tags).through(:tag_appointments) }
+    it { should have_many(:facility_tag_appointments).dependent(:destroy) }
+    it { should have_many(:tags).through(:facility_tag_appointments) }
   end
 
   describe "validations" do

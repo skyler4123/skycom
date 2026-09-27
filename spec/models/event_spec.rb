@@ -6,8 +6,8 @@ RSpec.describe Event, type: :model do
     it { should belong_to(:event_group) }
     it { should belong_to(:company) }
     it { should belong_to(:branch).optional }
-    it { should have_many(:tag_appointments).dependent(:destroy) }
-    it { should have_many(:tags).through(:tag_appointments) }
+    it { should have_many(:event_tag_appointments).dependent(:destroy) }
+    it { should have_many(:tags).through(:event_tag_appointments) }
   end
 
   describe "validations" do

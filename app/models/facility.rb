@@ -23,8 +23,6 @@ class Facility < ApplicationRecord
   has_many :facility_groups, through: :facility_facility_group_appointments
   has_many :employee_facility_appointments, dependent: :destroy
   has_many :employees, through: :employee_facility_appointments
-  has_many :tag_appointments, dependent: :destroy, as: :appoint_to
-  has_many :tags, through: :tag_appointments
 
   validates :name, presence: true, uniqueness: { scope: :company_id }, length: { maximum: 255 }
   validates :description, length: { maximum: 5000 }, allow_blank: true

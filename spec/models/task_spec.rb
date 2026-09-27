@@ -6,8 +6,8 @@ RSpec.describe Task, type: :model do
     it { should belong_to(:company) }
     it { should belong_to(:branch).optional }
     it { should belong_to(:task_group) }
-    it { should have_many(:tag_appointments).dependent(:destroy) }
-    it { should have_many(:tags).through(:tag_appointments) }
+    it { should have_many(:tag_task_appointments).dependent(:destroy) }
+    it { should have_many(:tags).through(:tag_task_appointments) }
   end
 
   describe "validations" do
