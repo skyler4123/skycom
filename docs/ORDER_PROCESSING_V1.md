@@ -463,57 +463,22 @@ after the ledger row exists).
 
 ## 7. KRedis Stock Tracking
 
-### `Stock.available_counter`
+Stock availability runs on a Redis hot counter (`stock:<id>:available`)
+mirroring `quantity − pending`, accessed only through the `Stock` wrappers
+(`available_count` / `reserve_stock!` / `release_reserved!` — see
+`docs/KREDIS.md`). Full mechanics — the single write path, healing,
+reservation flow, and counter lifecycle — live in `docs/STOCK.md` (§1–§3).
 
-**File**: `app/models/stock.rb`
-
-```ruby
-kredis_counter :available_counter, key: ->(s) { "stock:#{s.id}:available" }
-```
-
-The counter is synced from the database via (accessed only through model
-wrappers — see `docs/KREDIS.md`):
-
-```ruby
-after_save :sync_available_counter,
-  if: -> { saved_change_to_quantity? || saved_change_to_pending? }
-
-# private
-def sync_available_counter
-  target = [ quantity - pending, 0 ].max
-  delta = target - available_counter.value
-  return if delta.zero?
-
-  delta.positive? ? available_counter.increment(by: delta) : available_counter.decrement(by: -delta)
-end
-```
-
-This keeps the Redis counter consistent with the DB after any stock save.
-`update_all` bypasses callbacks — the order pipeline keeps Redis and DB in step
-explicitly. If a counter key goes missing (Redis restart/flush),
-`Stock#available_count` heals it from `quantity - pending` on first read.
-
-### Atomic Reservation Flow
-
-Reservation lives on the model (`Stock#reserve_stock!`) — an atomic Redis
-decrement that returns false and reverts itself when stock is insufficient:
-
-1. `ReserveStockService` heals missing keys via `available_count`, then calls
-   `reserve_stock!(qty)` per item
-2. On the first `false`, all previously reserved items are rolled back via
-   `release_reserved!(qty)`
-3. `InsufficientStockError` is raised → the pay action returns 422
-
-On success, each `reserve_stock!` also increments the DB `pending` column so
-`quantity - pending` reflects the reservation between pay and finalize.
-
-### Counter Lifecycle
+POS usage:
 
 ```
 Checkout ─► reads availability (Redis counter; heals from DB if missing)
 Pay      ─► reserve_stock!: DECRBY available_counter + DB pending += qty
-Finalize ─► UPDATE DB quantity -= qty, pending -= qty
+Finalize ─► ledger callback writes DB quantity; hold released (pending -= qty)
 ```
+
+On reservation failure (`reserve_stock!` returns `false`), prior holds roll
+back via `release_reserved!` and the pay action returns 422.
 
 ---
 
