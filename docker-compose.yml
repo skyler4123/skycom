@@ -1,24 +1,26 @@
 # docker-compose.yml
 
 # docker compose up -d
-# RAILS_MASTER_KEY=$(cat config/master.key) docker compose up -d
-# RAILS_MASTER_KEY=$(cat config/master.key) docker compose -f docker-compose.seed-test.yml up --abort-on-container-exit --exit-code-from web --attach web
-# RAILS_MASTER_KEY=$(cat config/master.key) docker compose -f docker-compose.rspec-test.yml up --abort-on-container-exit --exit-code-from web --attach web
+# RAILS_MASTER_KEY=$(cat config/master.key) docker compose up -d --force-recreate
+# RAILS_MASTER_KEY=$(cat config/master1.key) podman compose up -d --force-recreate
+# RAILS_MASTER_KEY=$(cat config/master.key) docker compose -f docker-compose.seed-test.yml up --force-recreate --abort-on-container-exit --exit-code-from web --attach web
+# RAILS_MASTER_KEY=$(cat config/master.key) docker compose -f docker-compose.rspec-test.yml up --force-recreate --abort-on-container-exit --exit-code-from web --attach web
 
 name: skycom_development
 services:
   web:
     build: .
-    command: bash -c "sleep 30 && rm -f tmp/pids/server.pid && bundle exec rails db:prepare && bundle exec rails assets:precompile && bundle exec thrust bin/rails s"
+    command: bash -c "sleep 30 && rm -f tmp/pids/server.pid && bundle exec rails db:prepare && bundle exec rails s -b 0.0.0.0 -p 3000"
     environment:
       RAILS_ENV: development
       RAILS_MASTER_KEY: ${RAILS_MASTER_KEY}
     volumes:
-      - .:/rails
+      - .:/rails:z
       - sqlite_storage:/rails/storage
     ports:
-      - "80:80"
-      - "443:443"
+      # - "80:80"
+      # - "443:443"
+      - "3000:3000"
     stdin_open: true
     tty: true
     depends_on:
@@ -34,7 +36,7 @@ services:
       RAILS_ENV: development
       RAILS_MASTER_KEY: ${RAILS_MASTER_KEY}
     volumes:
-      - .:/rails
+      - .:/rails:z
       - sqlite_storage:/rails/storage
     depends_on:
       - web
@@ -51,45 +53,26 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql
  
-  # MinIO Service
-  minio:
-    image: minio/minio:latest
+  # RustFS Service
+  rustfs:
+    image: rustfs/rustfs:latest
     ports:
-      # MinIO API port
+      # RustFS S3 API port
       - "9000:9000" 
-      # MinIO Console/UI port
+      # RustFS Console/UI port
       - "9001:9001" 
     environment:
-      # MinIO root user credentials
-      MINIO_ROOT_USER: minioadmin
-      MINIO_ROOT_PASSWORD: minioadmin
+      # RustFS root user credentials
+      RUSTFS_ROOT_USER: admin
+      RUSTFS_ROOT_PASSWORD: password
     volumes:
       # Data persistence
-      - minio_data:/data 
-    command: server /data --console-address ":9001"
+      - rustfs_data:/data 
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      test: ["CMD", "curl", "-f", "http://localhost:9000/healthz"]
       interval: 30s
       timeout: 20s
       retries: 3
-
-  create_buckets:
-    image: minio/mc
-    depends_on:
-      minio:
-        condition: service_healthy # Wait for MinIO to be fully ready
-    # Wait for the MinIO API to be available and then execute the command
-    entrypoint: >
-      /bin/sh -c "
-      /usr/bin/mc alias set minio_host http://minio:9000 minioadmin minioadmin;
-      /usr/bin/mc mb minio_host/skycom-development;
-      /usr/bin/mc policy set download minio_host/skycom-development;
-      /usr/bin/mc mb minio_host/skycom-production;
-      /usr/bin/mc policy set download minio_host/skycom-production;
-      /usr/bin/mc exit
-      "
-    # This service runs once and exits successfully
-    # profiles: ["no-start"] # Optional: Prevents this service from running on 'docker compose up' by default, if you only want it on explicit 'docker compose run'
 
   redis:
     # image: redis:7.2-alpine
@@ -158,7 +141,7 @@ services:
     working_dir: /go/src/app
     # Line A: Mount your local folder inside the container
     volumes:
-      - ./mock_api:/go/src/app
+      - ./mock_api:/go/src/app:z
     # Line B: Execute the file right out of the mounted folder
     command: go run main.go
     ports:
@@ -171,7 +154,7 @@ volumes:
   postgres_data:
   mongo_data:
   grafana_data:
-  minio_data:
+  rustfs_data:
   sqlite_storage:
   redis_data:
   openobserve_data:

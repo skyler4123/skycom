@@ -21,7 +21,7 @@ RSpec.feature "Companies::Purchases Show", type: :feature, js: true do
   let!(:purchase_item) { create(:purchase_item, company: company, name: "Ballpoint Pen") }
   let!(:purchase) { create(:purchase, company: company, category: purchase_category, name: "Pens restock") }
   let!(:appointment) do
-    Seed::PurchaseItemAppointmentService.create(
+    Seed::PurchasePurchaseItemAppointmentService.create(
       company: company, purchase: purchase, purchase_item: purchase_item,
       quantity: 5, unit_price: 2.50
     )

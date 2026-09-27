@@ -12,7 +12,7 @@ module OrderProcessingV1
     def self.call(order:)
       count = 0
 
-      order.order_appointments.each do |oa|
+      order.order_product_appointments.each do |oa|
         stock = resolve_stock(order, oa)
 
         # Real POS flow: the pay-time reservation holds the units (consume it).
@@ -36,11 +36,11 @@ module OrderProcessingV1
     end
 
     def self.resolve_stock(order, oa)
-      return Stock.find(oa.stock_id) if oa.stock_id.present?
+      return Stock.find(oa.stock_id) if oa.try(:stock_id).present?
 
       order.company.stocks.joins(:warehouse).find_by(
-        product_id: oa.appoint_to_id, warehouses: { branch_id: order.branch_id }
-      ) || order.company.stocks.find_by!(product_id: oa.appoint_to_id)
+        product_id: oa.product_id, warehouses: { branch_id: order.branch_id }
+      ) || order.company.stocks.find_by!(product_id: oa.product_id)
     end
   end
 end

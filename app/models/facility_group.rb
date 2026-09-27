@@ -23,8 +23,8 @@ class FacilityGroup < ApplicationRecord
   belongs_to :branch, optional: true
   belongs_to :category
   belongs_to :property_mapping
-  has_many :facility_group_appointments, dependent: :destroy
-  has_many :facilities, through: :facility_group_appointments, source: :appoint_to, source_type: "Facility"
+  has_many :facility_facility_group_appointments, dependent: :destroy
+  has_many :facilities, through: :facility_facility_group_appointments
 
   # --- Validations ---
   validates :name, presence: true, uniqueness: { scope: :company_id }, length: { maximum: 255 }

@@ -2,8 +2,8 @@ module OrderProcessingV1
   class FinalizeOrderService
     def self.call(order:)
       export_ids = []
-      order.order_appointments.each do |oa|
-        product = oa.appoint_to
+      order.order_product_appointments.each do |oa|
+        product = oa.product
         stock = Stock.find_by!(company_id: order.company_id, product_id: product.id)
 
         export = StockExport.create!(

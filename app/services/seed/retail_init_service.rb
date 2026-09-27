@@ -607,7 +607,7 @@ class Seed::RetailInitService
         "Patient" => { create: true, read: true, update: true, delete: true },
         "Transaction" => { create: true, read: true, update: true, delete: true },
         "Policy" => { read: true },
-        "PaymentMethodAppointment" => { read: true, update: true },
+        "CompanyPaymentMethodAppointment" => { read: true, update: true },
         "Product" => { create: true, read: true, update: true, delete: true },
         "PropertyMapping" => { create: true, read: true, update: true, delete: true },
         "TableConfig" => { create: true, read: true, update: true, delete: true },
@@ -652,7 +652,7 @@ class Seed::RetailInitService
         "Patient" => { create: true, read: true, update: true, delete: true },
         "Transaction" => { create: true, read: true, update: true, delete: true },
         "Policy" => { read: true },
-        "PaymentMethodAppointment" => { read: true, update: true },
+        "CompanyPaymentMethodAppointment" => { read: true, update: true },
         "Product" => { create: true, read: true, update: true, delete: true },
         "PropertyMapping" => { create: true, read: true, update: true, delete: true },
         "TableConfig" => { create: true, read: true, update: true, delete: true },
@@ -721,10 +721,10 @@ class Seed::RetailInitService
         %w[create read update delete].each do |action|
           is_active = actions_hash[action.to_sym]
           policy = Policy.find_by!(company: @company, resource: resource_name, action: action)
-          appointment = PolicyAppointment.find_or_create_by!(
+          appointment = PolicyRoleAppointment.find_or_create_by!(
             company: @company,
             policy: policy,
-            appoint_to: role
+            role: role
           )
           appointment.update!(workflow_status: is_active ? :active : :inactive)
         end

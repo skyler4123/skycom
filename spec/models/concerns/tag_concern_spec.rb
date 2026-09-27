@@ -4,7 +4,7 @@ require 'rails_helper'
 RSpec.describe TagConcern do
   describe "when included in an ActiveRecord model" do
     it "adds tag_appointments association to Branch" do
-      expect(Branch.reflect_on_association(:tag_appointments)).to be_a(ActiveRecord::Reflection::HasManyReflection)
+      expect(Branch.reflect_on_association(:branch_tag_appointments)).to be_a(ActiveRecord::Reflection::HasManyReflection)
     end
 
     it "adds tags association through tag_appointments to Branch" do

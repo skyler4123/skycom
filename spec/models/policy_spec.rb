@@ -5,10 +5,8 @@ RSpec.describe Policy, type: :model do
   describe "associations" do
     it { should belong_to(:company).touch(true) }
     it { should belong_to(:branch).optional }
-    it { should have_many(:policy_appointments).dependent(:destroy) }
-    it { should have_many(:roles).through(:policy_appointments) }
-    it { should have_many(:tag_appointments).dependent(:destroy) }
-    it { should have_many(:tags).through(:tag_appointments) }
+    it { should have_many(:policy_role_appointments).dependent(:destroy) }
+    it { should have_many(:roles).through(:policy_role_appointments) }
   end
 
   describe "validations" do

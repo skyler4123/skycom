@@ -6,16 +6,16 @@ RSpec.describe Employee, type: :model do
     it { should belong_to(:company) }
     it { should belong_to(:branch).optional }
     it { should belong_to(:user).optional }
-    it { should have_many(:role_appointments).dependent(:destroy) }
-    it { should have_many(:roles).through(:role_appointments) }
-    it { should have_many(:service_appointments).dependent(:destroy) }
-    it { should have_many(:services).through(:service_appointments) }
-    it { should have_many(:employee_group_appointments).dependent(:destroy) }
-    it { should have_many(:employee_groups).through(:employee_group_appointments) }
-    it { should have_many(:department_appointments).dependent(:destroy) }
-    it { should have_many(:departments).through(:department_appointments) }
-    it { should have_many(:tag_appointments).dependent(:destroy) }
-    it { should have_many(:tags).through(:tag_appointments) }
+    it { should have_many(:employee_role_appointments).dependent(:destroy) }
+    it { should have_many(:roles).through(:employee_role_appointments) }
+    it { should have_many(:employee_service_appointments).dependent(:destroy) }
+    it { should have_many(:services).through(:employee_service_appointments) }
+    it { should have_many(:employee_employee_group_appointments).dependent(:destroy) }
+    it { should have_many(:employee_groups).through(:employee_employee_group_appointments) }
+    it { should have_many(:department_employee_appointments).dependent(:destroy) }
+    it { should have_many(:departments).through(:department_employee_appointments) }
+    it { should have_many(:employee_tag_appointments).dependent(:destroy) }
+    it { should have_many(:tags).through(:employee_tag_appointments) }
   end
 
   describe "validations" do

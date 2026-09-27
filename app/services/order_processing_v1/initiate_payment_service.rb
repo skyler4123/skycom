@@ -57,8 +57,8 @@ module OrderProcessingV1
     private
 
     def validate_appointment!
-      valid = @appointment.appoint_to_type == "Branch" &&
-        @appointment.appoint_to_id == @order.branch_id &&
+      valid = @appointment.is_a?(BranchPaymentMethodAppointment) &&
+        @appointment.branch_id == @order.branch_id &&
         @appointment.lifecycle_status == "active"
       raise InvalidPaymentMethodError, "Payment method is not available for this branch" unless valid
     end
@@ -78,7 +78,7 @@ module OrderProcessingV1
     end
 
     def build_items
-      @order.order_appointments.map do |oa|
+      @order.order_product_appointments.map do |oa|
         stock = resolve_stock(oa)
         oa.update!(stock_id: stock.id) # persist the reserved stock for finalize
         { stock_id: stock.id, quantity: oa.quantity }
@@ -91,11 +91,11 @@ module OrderProcessingV1
     def resolve_stock(oa)
       @order.company.stocks
         .joins(:warehouse)
-        .find_by!(product_id: oa.appoint_to.id, warehouses: { branch_id: @order.branch_id })
+        .find_by!(product_id: oa.product_id, warehouses: { branch_id: @order.branch_id })
     end
 
     def create_invoice
-      gross = (@order.order_appointments.sum(:total_price) * 100).to_i
+      gross = (@order.line_total * 100).to_i
       Invoice.create!(
         company_id: @order.company_id,
         branch_id: @order.branch_id,

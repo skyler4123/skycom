@@ -24,6 +24,9 @@ class Cart < ApplicationRecord
   belongs_to :category
   belongs_to :property_mapping
 
+  has_many :cart_employee_appointments, dependent: :destroy
+  has_many :employees, through: :cart_employee_appointments
+
   # --- Validations ---
   validates :name, presence: true, uniqueness: { scope: :company_id }, length: { maximum: 255 }
 

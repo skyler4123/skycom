@@ -25,6 +25,9 @@ class Task < ApplicationRecord
   belongs_to :category
   belongs_to :property_mapping
 
+  has_many :employee_task_appointments, dependent: :destroy
+  has_many :employees, through: :employee_task_appointments
+
   # --- Validations ---
   validates :name, presence: true, uniqueness: { scope: :company_id }, length: { maximum: 255 }
 

@@ -2,7 +2,7 @@ import { Controller } from "@hotwired/stimulus"
 
 export default class Companies_Pages_RetailCashierController extends Controller {
   // Retail Cashier POS — Cart (tabs[].items[] in memory) → ORDER → pay → receipt.
-  // Click card → addToCart mutates local cart only; ORDER flushes to Order+OrderAppointment; pay reads DB snapshots.
+  // Click card → addToCart mutates local cart only; ORDER flushes to Order+OrderProductAppointment; pay reads DB snapshots.
   // Depends on BE: Companies::PagesController#retail_cashier (hydrate products/services/payment_methods),
   //               Companies::OrderProcessing::V1Controller#checkout|pay|pay_cancel,
   //               Companies::OrdersController#receipt,

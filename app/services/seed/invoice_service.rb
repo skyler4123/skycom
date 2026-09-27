@@ -20,7 +20,7 @@ class Seed::InvoiceService
     company ||= order.company
     branch ||= order.branch
 
-    calculated_total_cents = (order.order_appointments.sum(:total_price) * 100).to_i
+    calculated_total_cents = (order.line_total * 100).to_i
     price_cents ||= (calculated_total_cents > 0 ? calculated_total_cents : Faker::Commerce.price(range: 50..2000.0) * 100).to_i
 
     should_discard = rand(10) == 0

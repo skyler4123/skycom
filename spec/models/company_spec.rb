@@ -19,12 +19,12 @@ RSpec.describe Company, type: :model do
     it { should have_many(:customers).dependent(:destroy) }
     it { should have_many(:customer_groups).dependent(:destroy) }
     it { should have_many(:orders).dependent(:destroy) }
-    it { should have_many(:payment_method_appointments).dependent(:destroy) }
+    it { should have_many(:company_payment_method_appointments).dependent(:destroy) }
     it { should have_many(:task_groups).dependent(:destroy) }
     it { should have_many(:project_groups).dependent(:destroy) }
     it { should have_many(:cart_groups).dependent(:destroy) }
     it { should have_many(:notification_groups).dependent(:destroy) }
-    it { should have_many(:payment_methods).through(:payment_method_appointments) }
+    it { should have_many(:payment_methods).through(:company_payment_method_appointments) }
     it { should have_many(:categories).dependent(:destroy) }
     it { should have_many(:subscription_plans).dependent(:destroy) }
     it { should have_many(:departments).dependent(:destroy) }
@@ -103,36 +103,36 @@ RSpec.describe Company, type: :model do
 
     it "creates appointments for all PaymentMethods matching the company's country" do
       expect { company.setup_payment_method_appointments }
-        .to change(PaymentMethodAppointment, :count).by(2)
+        .to change(CompanyPaymentMethodAppointment, :count).by(2)
     end
 
     it "creates appointments with lifecycle_status: :active for cash strategies" do
       company.setup_payment_method_appointments
-      cash_appt = company.payment_method_appointments.joins(:payment_method).find_by(payment_method: { strategy: :cash })
+      cash_appt = company.company_payment_method_appointments.joins(:payment_method).find_by(payment_method: { strategy: :cash })
       expect(cash_appt.lifecycle_status).to eq("active")
     end
 
     it "creates appointments with lifecycle_status: :inactive for non-cash strategies" do
       company.setup_payment_method_appointments
-      stripe_appt = company.payment_method_appointments.joins(:payment_method).find_by(payment_method: { strategy: :stripe_gateway })
+      stripe_appt = company.company_payment_method_appointments.joins(:payment_method).find_by(payment_method: { strategy: :stripe_gateway })
       expect(stripe_appt.lifecycle_status).to eq("inactive")
     end
 
     it "creates appointments with business_type: :in_store" do
       company.setup_payment_method_appointments
-      expect(company.payment_method_appointments).to all(have_attributes(business_type: "in_store"))
+      expect(company.company_payment_method_appointments).to all(have_attributes(business_type: "in_store"))
     end
 
     it "is idempotent on re-run" do
       company.setup_payment_method_appointments
       expect { company.setup_payment_method_appointments }
-        .not_to change(PaymentMethodAppointment, :count)
+        .not_to change(CompanyPaymentMethodAppointment, :count)
     end
 
     it "does not create appointments for non-matching countries" do
       company.setup_payment_method_appointments
       vn_pm = PaymentMethod.find_by(code: "CASH_VN")
-      expect(company.payment_method_appointments.where(payment_method: vn_pm)).to be_empty
+      expect(company.company_payment_method_appointments.where(payment_method: vn_pm)).to be_empty
     end
   end
 
@@ -211,21 +211,21 @@ RSpec.describe Company, type: :model do
     end
 
     it "fills merchant account, name and terminal id for qr-mode appointments" do
-      appt = company.payment_method_appointments.find_by(payment_method: pm_qr)
+      appt = company.company_payment_method_appointments.find_by(payment_method: pm_qr)
       expect(appt.merchant_number).to match(/\A\d{10}\z/)
       expect(appt.merchant_name).to eq(company.name)
       expect(appt.merchant_id).to start_with("T-")
     end
 
     it "fills only a terminal id for redirect-mode appointments" do
-      appt = company.payment_method_appointments.find_by(payment_method: pm_redirect)
+      appt = company.company_payment_method_appointments.find_by(payment_method: pm_redirect)
       expect(appt.merchant_id).to start_with("MID-")
       expect(appt.merchant_number).to be_nil
       expect(appt.merchant_name).to be_nil
     end
 
     it "leaves cash appointments without merchant data" do
-      appt = company.payment_method_appointments.find_by(payment_method: pm_cash)
+      appt = company.company_payment_method_appointments.find_by(payment_method: pm_cash)
       expect(appt.merchant_number).to be_nil
       expect(appt.merchant_name).to be_nil
       expect(appt.merchant_id).to be_nil

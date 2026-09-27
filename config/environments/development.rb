@@ -78,7 +78,7 @@ Rails.application.configure do
   config.cache_store = :solid_cache_store
 
   # Store uploaded files on the local file system (see config/storage.yml for options).
-  config.active_storage.service = :minio
+  config.active_storage.service = :amazon
 
   # Replace the default in-process and non-durable queuing backend for Active Job.
   config.active_job.queue_adapter = :solid_queue

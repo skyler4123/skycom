@@ -12,15 +12,15 @@ RSpec.feature "Companies::Employees Management", type: :feature, js: true do
 
   let!(:employee) do
     emp = create(:employee, company: company, branch: branch, business_type: "full_time")
-    create(:department_appointment, company: company, appoint_to: emp, department: department)
-    create(:role_appointment, company: company, appoint_to: emp, role: role)
+    create(:department_employee_appointment, company: company, employee: emp, department: department)
+    create(:employee_role_appointment, company: company, employee: emp, role: role)
     emp
   end
 
   let!(:employee2) do
     emp = create(:employee, company: company, branch: branch, business_type: "part_time")
-    create(:department_appointment, company: company, appoint_to: emp, department: department2)
-    create(:role_appointment, company: company, appoint_to: emp, role: role2)
+    create(:department_employee_appointment, company: company, employee: emp, department: department2)
+    create(:employee_role_appointment, company: company, employee: emp, role: role2)
     emp
   end
 

@@ -16,7 +16,7 @@ RSpec.describe OrderProcessingV1::ReleaseReservedStockService do
   let(:customer) { create(:customer, company: company) }
   let(:order) { create(:order, company: company, branch: branch, customer: customer) }
   let!(:item) do
-    OrderAppointment.create!(order: order, appoint_to: product, company: company,
+    OrderProductAppointment.create!(order: order, product: product, company: company,
       quantity: 3, unit_price: 10.0, total_price: 30.0)
   end
 

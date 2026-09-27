@@ -9,8 +9,8 @@ RSpec.describe Purchase, type: :model do
     it { should belong_to(:workflow_step).optional }
     it { should belong_to(:category) }
     it { should belong_to(:property_mapping) }
-    it { should have_many(:purchase_item_appointments).dependent(:destroy) }
-    it { should have_many(:purchase_items).through(:purchase_item_appointments) }
+    it { should have_many(:purchase_purchase_item_appointments).dependent(:destroy) }
+    it { should have_many(:purchase_items).through(:purchase_purchase_item_appointments) }
     it { should have_many(:workflow_step_logs).dependent(:destroy) }
   end
 
@@ -44,9 +44,9 @@ RSpec.describe Purchase, type: :model do
     it "sums the total_price of all purchase item appointments" do
       purchase = create(:purchase, name: "Pens restock")
       item = create(:purchase_item, company: purchase.company, name: "Pen")
-      create(:purchase_item_appointment, purchase: purchase, purchase_item: item,
+      create(:purchase_purchase_item_appointment, purchase: purchase, purchase_item: item,
         quantity: 100, unit_price: 1.0, total_price: 100.0)
-      create(:purchase_item_appointment, purchase: purchase, purchase_item: item,
+      create(:purchase_purchase_item_appointment, purchase: purchase, purchase_item: item,
         quantity: 5, unit_price: 2.0, total_price: 10.0)
 
       expect(purchase.total_price).to eq(110.0)

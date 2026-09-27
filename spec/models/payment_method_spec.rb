@@ -3,9 +3,10 @@ require 'rails_helper'
 
 RSpec.describe PaymentMethod, type: :model do
   describe "associations" do
-    it { should have_many(:payment_method_appointments).dependent(:destroy) }
-    it { should have_many(:branches).through(:payment_method_appointments) }
-    it { should have_many(:companies).through(:payment_method_appointments) }
+    it { should have_many(:company_payment_method_appointments).dependent(:destroy) }
+    it { should have_many(:branches).through(:branch_payment_method_appointments) }
+    it { should have_many(:companies).through(:company_payment_method_appointments) }
+    it { should have_many(:branch_payment_method_appointments).dependent(:destroy) }
   end
 
   describe "validations" do

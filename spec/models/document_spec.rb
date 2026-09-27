@@ -6,8 +6,8 @@ RSpec.describe Document, type: :model do
     it { should belong_to(:document_group) }
     it { should belong_to(:company) }
     it { should belong_to(:branch).optional }
-    it { should have_many(:tag_appointments).dependent(:destroy) }
-    it { should have_many(:tags).through(:tag_appointments) }
+    it { should have_many(:document_tag_appointments).dependent(:destroy) }
+    it { should have_many(:tags).through(:document_tag_appointments) }
   end
   it_behaves_like "property_mapping concern", Document
 end

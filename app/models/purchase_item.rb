@@ -18,8 +18,8 @@ class PurchaseItem < ApplicationRecord
   # Purchases::CompleteService). Nil for non-stocked purchases.
   belongs_to :product, optional: true
 
-  has_many :purchase_item_appointments, dependent: :destroy
-  has_many :purchases, through: :purchase_item_appointments, source: :appoint_to, source_type: "Purchase"
+  has_many :purchase_purchase_item_appointments, dependent: :destroy
+  has_many :purchases, through: :purchase_purchase_item_appointments
 
   # --- Validations ---
   validates :name, presence: true, uniqueness: { scope: :company_id }, length: { maximum: 255 }

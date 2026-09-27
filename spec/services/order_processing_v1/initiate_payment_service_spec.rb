@@ -17,7 +17,7 @@ RSpec.describe OrderProcessingV1::InitiatePaymentService do
       .tap { |s| s.send(:sync_available_counter) }
   end
   let!(:line_item) do
-    OrderAppointment.create!(order: order, appoint_to: product, company: company,
+    OrderProductAppointment.create!(order: order, product: product, company: company,
       quantity: 2, unit_price: 50.0, total_price: 100.0)
   end
 
@@ -31,19 +31,20 @@ RSpec.describe OrderProcessingV1::InitiatePaymentService do
   end
 
   let!(:cash_appts) do
+    branch # create first: Branch#initialize_payment_methods must see no company rows yet
     [
-      PaymentMethodAppointment.create!(appoint_to: company, company: company, payment_method: cash_pm,
+      CompanyPaymentMethodAppointment.create!(company: company, payment_method: cash_pm,
         name: "Co cash", code: "CO_IPS_CASH", business_type: :in_store, lifecycle_status: :active),
-      PaymentMethodAppointment.create!(appoint_to: branch, company: company, payment_method: cash_pm,
+      BranchPaymentMethodAppointment.create!(company: company, branch: branch, payment_method: cash_pm,
         name: "Br cash", code: "BR_IPS_CASH", business_type: :in_store, lifecycle_status: :active,
         merchant_number: "1234567890", merchant_name: company.name, merchant_id: "T-AAAA")
     ]
   end
   let!(:qr_appts) do
     [
-      PaymentMethodAppointment.create!(appoint_to: company, company: company, payment_method: qr_pm,
+      CompanyPaymentMethodAppointment.create!(company: company, payment_method: qr_pm,
         name: "Co qr", code: "CO_IPS_MQR", business_type: :in_store, lifecycle_status: :active),
-      PaymentMethodAppointment.create!(appoint_to: branch, company: company, payment_method: qr_pm,
+      BranchPaymentMethodAppointment.create!(company: company, branch: branch, payment_method: qr_pm,
         name: "Br qr", code: "BR_IPS_MQR", business_type: :in_store, lifecycle_status: :active,
         merchant_number: "0987654321", merchant_name: company.name, merchant_id: "T-BBBB")
     ]
@@ -209,9 +210,8 @@ RSpec.describe OrderProcessingV1::InitiatePaymentService do
 
     it "rejects an appointment from another branch" do
       other_branch = create(:branch, company: company)
-      other_appt = PaymentMethodAppointment.create!(appoint_to: other_branch, company: company,
-        payment_method: cash_pm, name: "Other br cash", code: "OB_IPS_CASH",
-        business_type: :in_store, lifecycle_status: :active)
+      # other_branch auto-inherits active company payments via Branch#initialize_payment_methods
+      other_appt = other_branch.branch_payment_method_appointments.find_by!(payment_method: cash_pm)
 
       expect {
         described_class.call(order: order, appointment: other_appt)

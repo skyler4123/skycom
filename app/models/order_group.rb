@@ -15,4 +15,7 @@ class OrderGroup < ApplicationRecord
   belongs_to :customer
   belongs_to :category
   belongs_to :property_mapping
+
+  has_many :employee_order_group_appointments, dependent: :destroy
+  has_many :employees, through: :employee_order_group_appointments
 end

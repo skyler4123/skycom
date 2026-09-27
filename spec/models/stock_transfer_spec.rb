@@ -11,8 +11,8 @@ RSpec.describe StockTransfer, type: :model do
     it { should belong_to(:appoint_to).optional }
     it { should belong_to(:appoint_for).optional }
     it { should belong_to(:appoint_by).optional }
-    it { should have_many(:tag_appointments).dependent(:destroy) }
-    it { should have_many(:tags).through(:tag_appointments) }
+    it { should have_many(:stock_transfer_tag_appointments).dependent(:destroy) }
+    it { should have_many(:tags).through(:stock_transfer_tag_appointments) }
   end
   it_behaves_like "property_mapping concern", StockTransfer
 end
