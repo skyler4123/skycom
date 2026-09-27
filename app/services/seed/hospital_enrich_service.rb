@@ -64,6 +64,7 @@ class Seed::HospitalEnrichService
     create_stock_transfers
     create_stock_imports
     create_stock_exports
+    create_stock_adjustments
     create_appointments
     create_invoices
     create_purchase_data
@@ -293,7 +294,8 @@ class Seed::HospitalEnrichService
     @warehouses.each do |warehouse|
       warehouse_products = @products.select { |p| p.branch_id == warehouse.branch_id }
       warehouse_products.sample(2).each_with_index do |product, i|
-        Seed::StockTransferService.create(
+        qty = rand(1..50)
+        transfer = Seed::StockTransferService.create(
           company: @company,
           category: round_robin(transfer_categories, i),
           branch: warehouse.branch,
@@ -301,12 +303,33 @@ class Seed::HospitalEnrichService
           product: product,
           appoint_from: warehouse,
           appoint_to: warehouse.branch,
-          quantity: rand(1..50),
+          quantity: qty,
           workflow_status: :completed,
           lifecycle_status: :active
         )
+        attach_movement_lines(document: transfer, warehouse: warehouse, product: product,
+          quantity: qty, index: i) if Stock.find_by(company: @company, warehouse: warehouse, product: product)
       end
     end
+  end
+
+  # Seeded show pages render line rows; seeded quantities were written
+  # directly by Seed::StockService, so lines attach WITHOUT ledger rows
+  # (ledger callbacks would double-count). Every 3rd doc splits into 2 lines
+  # to demo multi-line documents.
+  def attach_movement_lines(document:, warehouse:, product:, quantity:, index:)
+    company = document.company
+    if index % 3 == 2
+      other = Stock.where(company: company, warehouse: warehouse).where.not(product_id: product.id).first
+      if other && quantity.to_i >= 2
+        first_qty = quantity.to_i / 2
+        Seed::StockLineService.attach!(document: document, company: company, warehouse: warehouse,
+          lines: [ [ product, first_qty ], [ other.product, quantity.to_i - first_qty ] ])
+        return
+      end
+    end
+    Seed::StockLineService.attach!(document: document, company: company, warehouse: warehouse,
+      lines: [ [ product, quantity ] ])
   end
 
   def create_stock_imports
@@ -318,18 +341,23 @@ class Seed::HospitalEnrichService
 
       branch_warehouse = @warehouses.find { |w| w.branch_id == branch.id }
       branch_products.sample(rand(2..4)).each_with_index do |product, i|
-        Seed::StockImportService.create(
+        next unless Stock.find_by(company: @company, warehouse: branch_warehouse, product: product)
+
+        qty = rand(10..100)
+        import = Seed::StockImportService.create(
           company: @company,
           category: round_robin(import_categories, i),
           branch: branch,
           warehouse: branch_warehouse,
           product: product,
           code: "STKIM-#{SecureRandom.hex(4).upcase}",
-          quantity: rand(10..100),
+          quantity: qty,
           business_type: StockImport.business_types.keys.sample,
           workflow_status: StockImport.workflow_statuses.keys.sample,
           lifecycle_status: :active
         )
+        attach_movement_lines(document: import, warehouse: branch_warehouse, product: product,
+          quantity: qty, index: i)
       end
     end
   end
@@ -343,19 +371,62 @@ class Seed::HospitalEnrichService
 
       branch_warehouse = @warehouses.find { |w| w.branch_id == branch.id }
       branch_products.sample(rand(2..4)).each_with_index do |product, i|
-        Seed::StockExportService.create(
+        next unless Stock.find_by(company: @company, warehouse: branch_warehouse, product: product)
+
+        qty = rand(5..50)
+        export = Seed::StockExportService.create(
           company: @company,
           category: round_robin(export_categories, i),
           branch: branch,
           warehouse: branch_warehouse,
           product: product,
           code: "STKEX-#{SecureRandom.hex(4).upcase}",
-          quantity: rand(5..50),
+          quantity: qty,
           business_type: StockExport.business_types.keys.sample,
           workflow_status: StockExport.workflow_statuses.keys.sample,
           lifecycle_status: :active
         )
+        attach_movement_lines(document: export, warehouse: branch_warehouse, product: product,
+          quantity: qty, index: i)
       end
+    end
+  end
+
+  def create_stock_adjustments
+    puts "Creating stock adjustments..."
+    adjustment_categories = Category.where(company: @company, resource_name: "stock_adjustments").order(:id).to_a
+    return if adjustment_categories.empty?
+
+    candidates = @warehouses.flat_map do |warehouse|
+      Stock.where(company: @company, warehouse: warehouse).includes(:product).first(2).map do |stock|
+        [ warehouse, stock ]
+      end
+    end.first(3)
+    return if candidates.empty?
+
+    specs = [
+      { direction: :increase, reason: "Stock-take correction" },
+      { direction: :decrease, reason: "Damaged in handling" },
+      { direction: :decrease, reason: "Expired units write-off" }
+    ]
+    candidates.each_with_index do |(warehouse, stock), i|
+      spec = specs[i % specs.length]
+      qty = [ rand(1..10), stock.quantity ].min
+      next if qty < 1
+
+      adjustment = Seed::StockAdjustmentService.create(
+        company: @company,
+        category: round_robin(adjustment_categories, i),
+        branch: warehouse.branch,
+        warehouse: warehouse,
+        code: "STKAD-#{SecureRandom.hex(4).upcase}",
+        direction: spec[:direction],
+        reason: spec[:reason],
+        workflow_status: :completed,
+        lifecycle_status: :active
+      )
+      attach_movement_lines(document: adjustment, warehouse: warehouse, product: stock.product,
+        quantity: qty, index: i)
     end
   end
 

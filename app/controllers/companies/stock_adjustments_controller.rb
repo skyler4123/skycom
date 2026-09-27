@@ -59,8 +59,10 @@ class Companies::StockAdjustmentsController < Companies::ApplicationController
   private
 
   def format_stock_adjustment(adjustment, with_lines: false)
+    # NOTE: stock_adjustments has no quantity column — lines are the only
+    # quantity truth, so the total is computed for the show payload.
     payload = adjustment.as_json(only: [
-      :id, :name, :code, :category_id, :quantity, :direction, :reason,
+      :id, :name, :code, :category_id, :direction, :reason,
       :business_type, :lifecycle_status, :workflow_status,
       :created_at, :updated_at
     ] + property_columns).merge(
@@ -71,13 +73,15 @@ class Companies::StockAdjustmentsController < Companies::ApplicationController
     )
     return payload unless with_lines
 
+    line_rows = adjustment.stock_adjustment_stock_appointments.map { |l|
+      l.as_json(only: [ :id, :stock_id, :quantity ]).merge(
+        product_name: l.stock.product&.name,
+        warehouse_name: l.stock.warehouse&.name
+      )
+    }
     payload.merge(
-      lines: adjustment.stock_adjustment_stock_appointments.map { |l|
-        l.as_json(only: [ :id, :stock_id, :quantity ]).merge(
-          product_name: l.stock.product&.name,
-          warehouse_name: l.stock.warehouse&.name
-        )
-      },
+      quantity: line_rows.sum { |l| l["quantity"].to_i },
+      lines: line_rows,
       ledger: adjustment.stock_transactions.order(:created_at).map { |t|
         t.as_json(only: [ :id, :direction, :transaction_type, :quantity, :warehouse_id, :product_id, :created_at ])
       }
