@@ -10,4 +10,8 @@ class Companies::StockAdjustmentsPolicy < ApplicationPolicy
   def show?
     record.can?(:read, StockAdjustment)
   end
+
+  def new?
+    record.can?(:create, StockAdjustment)
+  end
 end
