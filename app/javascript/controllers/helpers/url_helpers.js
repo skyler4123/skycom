@@ -226,5 +226,22 @@ export const company_stocks_path = (companyId) => `/companies/${companyId}/stock
 export const company_stock_transfers_path = (companyId) => `/companies/${companyId}/stock_transfers`
 export const company_stock_imports_path = (companyId) => `/companies/${companyId}/stock_imports`
 export const company_stock_exports_path = (companyId) => `/companies/${companyId}/stock_exports`
+export const create_company_stock_imports_path = (companyId) => `/companies/${companyId}/stock_imports`
+export const new_company_stock_import_path = (companyId) => `/companies/${companyId}/stock_imports/new`
+export const company_stock_import_path = (companyId, id) => `/companies/${companyId}/stock_imports/${id}`
+export const create_company_stock_exports_path = (companyId) => `/companies/${companyId}/stock_exports`
+export const new_company_stock_export_path = (companyId) => `/companies/${companyId}/stock_exports/new`
+export const company_stock_export_path = (companyId, id) => `/companies/${companyId}/stock_exports/${id}`
+export const company_stock_adjustments_path = (companyId) => `/companies/${companyId}/stock_adjustments`
+export const create_company_stock_adjustments_path = (companyId) => `/companies/${companyId}/stock_adjustments`
+export const new_company_stock_adjustment_path = (companyId) => `/companies/${companyId}/stock_adjustments/new`
+export const company_stock_adjustment_path = (companyId, id) => `/companies/${companyId}/stock_adjustments/${id}`
+export const create_company_stock_transfers_path = (companyId) => `/companies/${companyId}/stock_transfers`
+export const new_company_stock_transfer_path = (companyId) => `/companies/${companyId}/stock_transfers/new`
+export const company_stock_transfer_path = (companyId, id) => `/companies/${companyId}/stock_transfers/${id}`
+export const edit_company_stock_transfer_path = (companyId, id) => `/companies/${companyId}/stock_transfers/${id}/edit`
+export const initiate_company_stock_transfer_path = (companyId, id) => `/companies/${companyId}/stock_transfers/${id}/initiate`
+export const receive_company_stock_transfer_path = (companyId, id) => `/companies/${companyId}/stock_transfers/${id}/receive`
+export const cancel_company_stock_transfer_path = (companyId, id) => `/companies/${companyId}/stock_transfers/${id}/cancel`
 
 export const company_analytics_path = (companyId) => `/companies/${companyId}/analytics`

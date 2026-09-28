@@ -19,6 +19,8 @@ module Companies::StockMovementConcern
     document = document_class.new(movement_document_params(document_class))
     lines = document.public_send(line_assoc_for(document_class))
 
+    validate_stock_items!(stock_items_params)
+
     stock_items_params.each do |item|
       lines.build(
         company: current_company,
@@ -57,7 +59,8 @@ module Companies::StockMovementConcern
   end
 
   def movement_document_params(document_class)
-    permitted = [ :warehouse_id, :branch_id, :name, :description, :business_type ]
+    permitted = [ :warehouse_id, :branch_id, :name, :description, :business_type, :category_id,
+      *movement_property_keys ]
     permitted += [ :direction, :reason ] if document_class == StockAdjustment
 
     params.require(document_class.model_name.singular).permit(*permitted).tap do |h|
@@ -93,5 +96,31 @@ module Companies::StockMovementConcern
 
   def stock_items_params
     params.permit(stock_items: [ :stock_id, :quantity ]).to_h[:stock_items] || []
+  end
+
+  # Rejects blank/non-numeric/zero quantities up front with a 422 business
+  # error. Without this, "" casts to nil on the integer column and
+  # `lines.sum(&:quantity)` raises TypeError (500). Mirrors the line-model
+  # `greater_than: 0` rule so API and UI agree. Normalizes numeric strings
+  # in place so downstream sums never see a String.
+  def validate_stock_items!(items)
+    items.each do |item|
+      quantity = item[:quantity]
+      quantity = quantity.to_i if quantity.is_a?(String)
+      unless quantity.is_a?(Integer) && quantity.positive?
+        raise StockMovementService::Error, "Quantity must be a positive integer"
+      end
+      item[:quantity] = quantity
+    end
+  end
+
+  # Dynamic-schema columns shared by all movement documents (mirrors
+  # Companies::PurchasesController#property_keys).
+  def movement_property_keys
+    (1..10).map { |i| "property_string_#{i}" } +
+      (1..20).map { |i| "property_integer_#{i}" } +
+      (1..10).map { |i| "property_decimal_#{i}" } +
+      (1..10).map { |i| "property_boolean_#{i}" } +
+      (1..10).map { |i| "property_datetime_#{i}" }
   end
 end
