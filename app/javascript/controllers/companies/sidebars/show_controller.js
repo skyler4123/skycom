@@ -137,17 +137,25 @@ export default class Companies_Sidebars_ShowController extends Controller {
       </button>
     ` : ""
 
+    // Row wrapper: the star button is a sibling of the link — a <button> must
+    // not be nested inside an <a> (starring would also navigate). The row
+    // highlight follows the link's `open` attribute (set by markCurrentPath()
+    // and the open controller's openByPathname targets).
     return `
-      <a
-        class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:bg-blue-100 open:text-blue-600"
-        href="${item.href(cid)}"
-        data-sidebar-link
-        ${openByPathname()}
+      <div
+        class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 has-[a[open]]:bg-blue-100 has-[a[open]]:text-blue-600"
       >
-        <span class="material-symbols-outlined">${item.icon}</span>
-        <p class="text-sm font-medium leading-normal min-w-0 truncate">${translate(item.label)}</p>
+        <a
+          class="flex min-w-0 flex-1 items-center gap-3"
+          href="${item.href(cid)}"
+          data-sidebar-link
+          ${openByPathname()}
+        >
+          <span class="material-symbols-outlined">${item.icon}</span>
+          <p class="text-sm font-medium leading-normal min-w-0 flex-1 truncate">${translate(item.label)}</p>
+        </a>
         ${star}
-      </a>
+      </div>
     `
   }
 }
