@@ -2,9 +2,6 @@
 class Setting < ApplicationRecord
   include TagConcern
 
-  store_accessor :metadata, :sidebar_items
-  store_accessor :metadata, :sidebar_groups
-
   # --- Enums ---
   enum :lifecycle_status, LIFECYCLE_STATUS, prefix: true
   enum :workflow_status, WORKFLOW_STATUS, prefix: true

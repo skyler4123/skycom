@@ -98,7 +98,8 @@ existing guards (`unless self.class.skip_init || system_owned`):
 | Owner Role / Policy / Employee / RoleAppointment | ✅ created |
 | `user.system_role` demotion to `company_owner` | ❌ skipped (owner stays `super_admin`) |
 | Wallet (`main_credit_balance: 0`) | ✅ created |
-| Default Setting (sidebar config) | ✅ created |
+
+(Sidebar config seeding was removed 2026-09-22 — sidebar control is FE-only, `docs/SIDEBAR.md`.)
 
 The dedicated owner user keeps `system_role: :super_admin` (platform staff —
 `accessible_companies` returns all companies, which fits a future support

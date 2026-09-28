@@ -1,7 +1,6 @@
 //  https://fonts.google.com/icons
 
 import { Controller } from "@hotwired/stimulus"
-import { SIDEBAR_ITEMS, SIDEBAR_GROUPS, sidebarVisibility } from "controllers/companies/sidebar_items"
 
 export default class Companies_LayoutController extends Controller {
   static targets = ["content", "profileDropdown"]
@@ -40,62 +39,6 @@ export default class Companies_LayoutController extends Controller {
 
   currentTableConfig() {
     return currentTableConfigs().find(config => config.id === this.tableConfigIdValue)
-  }
-
-  sidebarItems() {
-    const { hiddenGroups, hiddenItems } = sidebarVisibility()
-    const visible = SIDEBAR_ITEMS.filter(item => !hiddenItems.has(item.key))
-
-    const sectionHeading = (groupConfig) => `
-      <p class="px-3 pt-1 pb-2 text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 flex items-center gap-1"
-        ${groupConfig.comingSoon ? tooltip({ html: translate("Coming soon"), position: "right" }) : ""}>
-        ${translate(groupConfig.label)}
-        ${groupConfig.comingSoon ? `<span class="material-symbols-outlined text-[14px] text-amber-500 dark:text-amber-400">error</span>` : ""}
-      </p>
-    `
-
-    const divider = `<div class="my-3 border-t border-gray-200 dark:border-gray-700"></div>`
-
-    const group = (groupConfig, items) => `
-      <div class="flex flex-col gap-2" data-sidebar-group="${groupConfig.key}">
-        ${sectionHeading(groupConfig)}
-        ${items.join("\n")}
-      </div>
-    `
-
-    const linkHTML = (item) => {
-      const cid = currentCompany().id
-      if (item.comingSoon) {
-        return `
-          <span class="flex items-center gap-3 px-3 py-2 rounded-lg cursor-not-allowed"
-            ${tooltip({ html: translate("Coming soon"), position: "right" })}>
-            <span class="material-symbols-outlined">${item.icon}</span>
-            <p class="text-sm font-medium leading-normal flex items-center gap-1">${translate(item.label)}
-              <span class="material-symbols-outlined text-[14px] text-amber-500 dark:text-amber-400">error</span>
-            </p>
-          </span>
-        `
-      }
-      return `
-        <a
-          class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 open:bg-blue-100 open:text-blue-600"
-          href="${item.href(cid)}"
-          ${openByPathname()}
-        >
-          <span class="material-symbols-outlined">${item.icon}</span>
-          <p class="text-sm font-medium leading-normal">${translate(item.label)}</p>
-        </a>
-      `
-    }
-
-    return SIDEBAR_GROUPS
-      .filter(g => !hiddenGroups.has(g.key) && (g.comingSoon || visible.some(item => item.group === g.key)))
-      .map((groupConfig) => {
-        const items = visible.filter(item => item.group === groupConfig.key).map(linkHTML)
-        const prefix = groupConfig.key === "system" ? divider : ""
-        return `${prefix}${group(groupConfig, items)}`
-      })
-      .join("\n")
   }
 
   renderTableTitle() {
@@ -150,11 +93,9 @@ export default class Companies_LayoutController extends Controller {
             class="w-64 hidden open:flex flex-col shrink-0 bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800"
             ${addOpenListener({group: "sidebar", key: "sidebar", cache: true})}
           >
-            <!-- Sidebar Navigation Links -->
+            <!-- Sidebar Navigation (dedicated controller: favourites + details groups) -->
             <nav class="w-full p-4">
-              <div role="navigation" class="flex flex-col gap-2">
-                ${this.sidebarItems()}
-              </div>
+              <div role="navigation" class="flex flex-col gap-2" data-controller="companies--sidebars--show"></div>
             </nav>
 
           </aside>
