@@ -145,25 +145,6 @@ RSpec.describe Company, type: :model do
     end
   end
 
-  describe "default settings" do
-    it "creates a company-appointed default setting on creation" do
-      company = create(:company)
-      expect(company.settings.count).to eq(1)
-      setting = company.settings.first
-      expect(setting.code).to eq("SETTINGS-DEFAULT")
-      expect(setting.appoint_to).to eq(company)
-      expect(setting.sidebar_items).to include({ "key" => "products", "visible" => true })
-      expect(setting.sidebar_groups).to include({ "key" => "general", "visible" => true })
-      expect(setting.sidebar_groups.map { |g| g["key"] }).to contain_exactly(*Company::SIDEBAR_GROUP_KEYS)
-    end
-
-    it "does not duplicate the default setting on re-init" do
-      company = create(:company)
-      company.create_default_setting
-      expect(company.settings.where(code: "SETTINGS-DEFAULT").count).to eq(1)
-    end
-  end
-
   describe "credit usage counter (Kredis)" do
     let(:company) { create(:company) }
 

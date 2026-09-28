@@ -1058,14 +1058,9 @@ end
 
 ### Step 6: Add Sidebar Link
 
-```javascript
-// app/javascript/controllers/companies/layout_controller.js
-${sidebarItem({
-  icon: "inventory_2",
-  label: translate("My Resources"),
-  href: Helpers.company_my_new_resources_path(currentCompany().id)
-})}
-```
+Add an entry to `SIDEBAR_ITEMS` in
+`app/javascript/controllers/companies/sidebar_items.js` (group, icon, label, href helper)
+— see `docs/SIDEBAR.md` §4. No other registration needed.
 
 ### Step 7: Create Test Fixtures
 
