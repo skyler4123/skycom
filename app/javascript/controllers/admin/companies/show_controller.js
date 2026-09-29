@@ -60,7 +60,7 @@ export default class Admin_Companies_ShowController extends Admin_LayoutControll
       <div class="p-6">
         <a href="/admin/companies"
           class="inline-flex items-center gap-1 text-sm text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 mb-6 cursor-pointer">
-          <span class="material-symbols-outlined text-[18px]">arrow_back</span>
+          <span class="material-symbols-outlined text-[18px]!">arrow_back</span>
           Back to Companies
         </a>
 

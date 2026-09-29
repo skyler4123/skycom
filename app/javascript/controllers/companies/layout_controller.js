@@ -61,7 +61,7 @@ export default class Companies_LayoutController extends Controller {
           class="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-slate-600 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition-colors cursor-pointer"
           ${tooltip(translate("Edit table configuration"))}
         >
-          <span class="material-symbols-outlined text-[18px]">edit</span>
+          <span class="material-symbols-outlined text-[18px]!">edit</span>
           ${translate("Edit")}
         </a>
       </div>

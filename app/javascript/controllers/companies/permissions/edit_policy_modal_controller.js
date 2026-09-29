@@ -44,7 +44,7 @@ export default class Companies_Permissions_EditPolicyModalController extends Con
       <input type="text" data-tag-key placeholder="${translate("Key")}" class="flex-1 min-w-0 px-3 py-2 text-sm border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 placeholder-slate-400">
       <input type="text" data-tag-value placeholder="${translate("Value")}" class="flex-1 min-w-0 px-3 py-2 text-sm border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 placeholder-slate-400">
       <button type="button" data-action="click->${this.identifier}#removeTagRow" class="p-2 text-slate-400 hover:text-red-500 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20 cursor-pointer">
-        <span class="material-symbols-outlined text-[18px]">close</span>
+        <span class="material-symbols-outlined text-[18px]!">close</span>
       </button>
     `
     container.appendChild(row)
@@ -91,7 +91,7 @@ export default class Companies_Permissions_EditPolicyModalController extends Con
           <input type="text" data-tag-key placeholder="${translate("Key")}" class="flex-1 min-w-0 px-3 py-2 text-sm border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 placeholder-slate-400">
           <input type="text" data-tag-value placeholder="${translate("Value")}" class="flex-1 min-w-0 px-3 py-2 text-sm border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 placeholder-slate-400">
           <button type="button" data-action="click->${this.identifier}#removeTagRow" class="p-2 text-slate-400 hover:text-red-500 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20 cursor-pointer">
-            <span class="material-symbols-outlined text-[18px]">close</span>
+            <span class="material-symbols-outlined text-[18px]!">close</span>
           </button>
         </div>
       `
@@ -101,7 +101,7 @@ export default class Companies_Permissions_EditPolicyModalController extends Con
         <input type="text" data-tag-key value="${key}" placeholder="${translate("Key")}" class="flex-1 min-w-0 px-3 py-2 text-sm border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 placeholder-slate-400">
         <input type="text" data-tag-value value="${value ?? ''}" placeholder="${translate("Value")}" class="flex-1 min-w-0 px-3 py-2 text-sm border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 placeholder-slate-400">
         <button type="button" data-action="click->${this.identifier}#removeTagRow" class="p-2 text-slate-400 hover:text-red-500 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20 cursor-pointer">
-          <span class="material-symbols-outlined text-[18px]">close</span>
+          <span class="material-symbols-outlined text-[18px]!">close</span>
         </button>
       </div>
     `).join('')
@@ -137,7 +137,7 @@ export default class Companies_Permissions_EditPolicyModalController extends Con
                 data-action="click->${this.identifier}#addTagRow"
                 class="flex items-center gap-1 px-3 py-1.5 text-xs font-medium text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg cursor-pointer"
               >
-                <span class="material-symbols-outlined text-[14px]">add</span>
+                <span class="material-symbols-outlined text-[14px]!">add</span>
                 ${translate("Add Condition")}
               </button>
             </div>

@@ -91,7 +91,7 @@ export default class Companies_TableConfigs_EditController extends Companies_Lay
                   class="inline-flex items-center gap-1 px-3 py-2 text-sm font-medium text-blue-600 hover:text-blue-700 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition-colors cursor-pointer whitespace-nowrap"
                   ${tooltip(translate("Manage property fields: show/hide columns, add constraints or validation rules"))}
                 >
-                  <span class="material-symbols-outlined text-[18px]">open_in_new</span>
+                  <span class="material-symbols-outlined text-[18px]!">open_in_new</span>
                   ${translate("Edit")}
                 </a>
               ` : ''}

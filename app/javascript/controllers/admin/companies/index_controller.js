@@ -57,7 +57,7 @@ export default class Admin_Companies_IndexController extends Admin_LayoutControl
                 name: (value, record) => `
                   <div class="flex items-center gap-3">
                     <div class="w-8 h-8 rounded-lg bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center shrink-0">
-                      <span class="material-symbols-outlined text-emerald-600 dark:text-emerald-400 text-[18px]">business</span>
+                      <span class="material-symbols-outlined text-emerald-600 dark:text-emerald-400 text-[18px]!">business</span>
                     </div>
                     <a href="${Helpers.admin_company_path(record.id)}"
                       class="font-medium text-slate-900 dark:text-white hover:text-blue-600 dark:hover:text-blue-400 transition-colors cursor-pointer">

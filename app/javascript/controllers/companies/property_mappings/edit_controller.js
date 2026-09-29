@@ -64,7 +64,7 @@ export default class Companies_PropertyMappings_EditController extends Companies
         <td class="py-3 px-4 text-right">
           <button type="button" data-action="click->${this.identifier}#removeProperty" data-index="${index}"
             class="inline-flex items-center justify-center p-1.5 text-red-500 hover:text-red-700 hover:bg-red-50 rounded-lg cursor-pointer">
-            <span class="material-symbols-outlined text-[18px]">delete</span>
+            <span class="material-symbols-outlined text-[18px]!">delete</span>
           </button>
         </td>
       </tr>
@@ -213,7 +213,7 @@ export default class Companies_PropertyMappings_EditController extends Companies
         <td class="py-3 px-4 text-right">
           <button type="button" data-action="click->${this.identifier}#removeProperty" data-index="${index}"
             class="inline-flex items-center justify-center p-1.5 text-red-500 hover:text-red-700 hover:bg-red-50 rounded-lg cursor-pointer">
-            <span class="material-symbols-outlined text-[18px]">delete</span>
+            <span class="material-symbols-outlined text-[18px]!">delete</span>
           </button>
         </td>
       </tr>

@@ -153,7 +153,7 @@ export default class Companies_TopUps_NewController extends Companies_LayoutCont
         <div class="mx-auto p-6 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800">
           <a href="${Helpers.company_billing_path(cid)}"
             class="inline-flex items-center gap-1 text-sm text-slate-500 hover:text-slate-700 mb-6 cursor-pointer">
-            <span class="material-symbols-outlined text-[18px]">arrow_back</span>
+            <span class="material-symbols-outlined text-[18px]!">arrow_back</span>
             ${translate("Back to Billing")}
           </a>
 
@@ -239,7 +239,7 @@ export default class Companies_TopUps_NewController extends Companies_LayoutCont
           <div class="w-64 h-64 bg-white rounded-xl p-4 border border-slate-200 dark:border-slate-700 flex items-center justify-center" id="qr-container"></div>
         </div>
         <div class="flex items-center justify-center gap-2 text-sm text-amber-600">
-          <span class="material-symbols-outlined text-[18px] animate-pulse">hourglass_top</span>
+          <span class="material-symbols-outlined text-[18px]! animate-pulse">hourglass_top</span>
           ${translate("Waiting for payment confirmation...")}
         </div>
         <button type="button" data-action="click->${this.identifier}#cancelWait"

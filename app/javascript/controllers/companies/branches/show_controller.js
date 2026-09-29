@@ -116,7 +116,7 @@ export default class Companies_Branches_ShowController extends Companies_LayoutC
       <div class="p-4 overflow-y-auto">
         <div class="p-6 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800">
           <a href="${Helpers.company_branches_path(companyId)}" class="inline-flex items-center gap-1 text-sm text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 mb-6">
-            <span class="material-symbols-outlined text-[18px]">arrow_back</span>
+            <span class="material-symbols-outlined text-[18px]!">arrow_back</span>
             ${translate("Back to Branches")}
           </a>
 
@@ -195,7 +195,7 @@ export default class Companies_Branches_ShowController extends Companies_LayoutC
               data-action="click->${this.identifier}#openPaymentMethodsModal"
               class="inline-flex items-center justify-center px-6 py-2 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-lg font-medium text-sm transition-colors cursor-pointer"
             >
-              <span class="material-symbols-outlined text-[18px] mr-2">payments</span>
+              <span class="material-symbols-outlined text-[18px]! mr-2">payments</span>
               ${translate("Payment Methods")}
             </button>
             <a href="${Helpers.edit_company_branch_path(companyId, b.id)}"

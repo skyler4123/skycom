@@ -180,7 +180,7 @@ export default class Companies_Dashboards_IndexController extends Companies_Layo
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-6 pt-6 border-t border-slate-200 dark:border-slate-700">
               <div class="flex items-center gap-3">
                 <div class="size-9 rounded-lg bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-500">
-                  <span class="material-symbols-outlined text-[18px]">location_on</span>
+                  <span class="material-symbols-outlined text-[18px]!">location_on</span>
                 </div>
                 <div class="min-w-0">
                   <p class="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase">${translate("Address")}</p>
@@ -189,7 +189,7 @@ export default class Companies_Dashboards_IndexController extends Companies_Layo
               </div>
               <div class="flex items-center gap-3">
                 <div class="size-9 rounded-lg bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-500">
-                  <span class="material-symbols-outlined text-[18px]">call</span>
+                  <span class="material-symbols-outlined text-[18px]!">call</span>
                 </div>
                 <div class="min-w-0">
                   <p class="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase">${translate("Phone")}</p>
@@ -198,7 +198,7 @@ export default class Companies_Dashboards_IndexController extends Companies_Layo
               </div>
               <div class="flex items-center gap-3">
                 <div class="size-9 rounded-lg bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-500">
-                  <span class="material-symbols-outlined text-[18px]">mail</span>
+                  <span class="material-symbols-outlined text-[18px]!">mail</span>
                 </div>
                 <div class="min-w-0">
                   <p class="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase">${translate("Email")}</p>
@@ -207,7 +207,7 @@ export default class Companies_Dashboards_IndexController extends Companies_Layo
               </div>
               <div class="flex items-center gap-3">
                 <div class="size-9 rounded-lg bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-500">
-                  <span class="material-symbols-outlined text-[18px]">language</span>
+                  <span class="material-symbols-outlined text-[18px]!">language</span>
                 </div>
                 <div class="min-w-0">
                   <p class="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase">${translate("Website")}</p>
@@ -216,7 +216,7 @@ export default class Companies_Dashboards_IndexController extends Companies_Layo
               </div>
               <div class="flex items-center gap-3">
                 <div class="size-9 rounded-lg bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-500">
-                  <span class="material-symbols-outlined text-[18px]">currency_exchange</span>
+                  <span class="material-symbols-outlined text-[18px]!">currency_exchange</span>
                 </div>
                 <div class="min-w-0">
                   <p class="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase">${translate("Currency")}</p>
@@ -225,7 +225,7 @@ export default class Companies_Dashboards_IndexController extends Companies_Layo
               </div>
               <div class="flex items-center gap-3">
                 <div class="size-9 rounded-lg bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-500">
-                  <span class="material-symbols-outlined text-[18px]">schedule</span>
+                  <span class="material-symbols-outlined text-[18px]!">schedule</span>
                 </div>
                 <div class="min-w-0">
                   <p class="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase">${translate("Timezone")}</p>
@@ -234,7 +234,7 @@ export default class Companies_Dashboards_IndexController extends Companies_Layo
               </div>
               <div class="flex items-center gap-3">
                 <div class="size-9 rounded-lg bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-500">
-                  <span class="material-symbols-outlined text-[18px]">person</span>
+                  <span class="material-symbols-outlined text-[18px]!">person</span>
                 </div>
                 <div class="min-w-0">
                   <p class="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase">${translate("Owner")}</p>
@@ -243,7 +243,7 @@ export default class Companies_Dashboards_IndexController extends Companies_Layo
               </div>
               <div class="flex items-center gap-3">
                 <div class="size-9 rounded-lg bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-500">
-                  <span class="material-symbols-outlined text-[18px]">calendar_today</span>
+                  <span class="material-symbols-outlined text-[18px]!">calendar_today</span>
                 </div>
                 <div class="min-w-0">
                   <p class="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase">${translate("Created")}</p>

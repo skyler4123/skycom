@@ -460,7 +460,7 @@ export default class Companies_Pages_RetailCashierController extends Controller 
               ${this.tabs.length > 1 ? `
                 <button data-action="click->${this.identifier}#closeTab" data-${this.identifier}-index-param="${i}"
                   class="ml-1 text-gray-400 hover:text-red-500 cursor-pointer">
-                  <span class="material-symbols-outlined text-[14px]">close</span>
+                  <span class="material-symbols-outlined text-[14px]!">close</span>
                 </button>
               ` : ''}
             </div>
@@ -582,7 +582,7 @@ export default class Companies_Pages_RetailCashierController extends Controller 
               <div id="cashier-qr-container" data-transaction-token="${this.awaitingToken}" class="w-56 h-56 bg-white rounded-xl p-3 border border-gray-200 flex items-center justify-center"></div>
             </div>
             <div class="flex items-center justify-center gap-2 text-sm text-amber-600">
-              <span class="material-symbols-outlined text-[18px] animate-pulse">hourglass_top</span>
+              <span class="material-symbols-outlined text-[18px]! animate-pulse">hourglass_top</span>
               ${translate("Waiting for payment confirmation...")}
             </div>
             <button data-action="click->${this.identifier}#cancelAwaitingPayment"

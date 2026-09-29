@@ -87,7 +87,7 @@ export default class Companies_PropertyMappings_ShowController extends Companies
         <div class="p-6 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800">
           <a href="${Helpers.company_property_mappings_path(companyId)}"
             class="inline-flex items-center gap-1 text-sm text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 mb-6">
-            <span class="material-symbols-outlined text-[18px]">arrow_back</span>
+            <span class="material-symbols-outlined text-[18px]!">arrow_back</span>
             ${translate("Back to Dynamic Properties")}
           </a>
 

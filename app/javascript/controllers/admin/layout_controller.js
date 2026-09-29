@@ -69,7 +69,7 @@ export default class Admin_LayoutController extends Controller {
             </div>
             <a href="/sign_out"
               class="mt-3 flex items-center gap-2 px-3 py-2 text-sm text-slate-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors cursor-pointer">
-              <span class="material-symbols-outlined text-[18px]">logout</span>
+              <span class="material-symbols-outlined text-[18px]!">logout</span>
               Sign out
             </a>
           </div>

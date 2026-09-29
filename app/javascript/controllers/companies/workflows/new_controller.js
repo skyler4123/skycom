@@ -63,7 +63,7 @@ export default class Companies_Workflows_NewController extends Companies_LayoutC
         <td class="py-2 px-2 text-right">
           <button type="button" data-action="click->${this.identifier}#removeStepRow" data-${this.identifier}-index-param="${index}"
             class="p-1.5 text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-900/30 rounded-lg cursor-pointer">
-            <span class="material-symbols-outlined text-[18px]">delete</span>
+            <span class="material-symbols-outlined text-[18px]!">delete</span>
           </button>
         </td>
       </tr>`
@@ -80,7 +80,7 @@ export default class Companies_Workflows_NewController extends Companies_LayoutC
           <h3 class="text-sm font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">${translate("Steps")}</h3>
           <button type="button" data-action="click->${this.identifier}#addStepRow"
             class="inline-flex items-center gap-2 px-3 py-1.5 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 rounded-lg text-sm font-medium cursor-pointer">
-            <span class="material-symbols-outlined text-[18px]">add</span>${translate("Add Step")}
+            <span class="material-symbols-outlined text-[18px]!">add</span>${translate("Add Step")}
           </button>
         </div>
         <table class="w-full text-left border-collapse">
