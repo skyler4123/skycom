@@ -117,7 +117,7 @@ export default class Companies_Services_IndexController extends Companies_Layout
                 ${filtersHTML}
                 <div class="flex gap-2 mt-auto">
                   <button type="submit" class="h-[38px] px-6 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors font-medium text-sm flex items-center gap-2">
-                    <span class="material-symbols-outlined text-[18px]">search</span>
+                    <span class="material-symbols-outlined text-[18px]!">search</span>
                     ${translate("Search")}
                   </button>
                 </div>
@@ -142,7 +142,7 @@ export default class Companies_Services_IndexController extends Companies_Layout
                 name: (value, record) => `
                   <div class="flex items-center gap-4">
                     <div class="w-8 h-8 rounded-lg bg-sky-100 dark:bg-sky-900/30 flex items-center justify-center shrink-0">
-                      <span class="material-symbols-outlined text-sky-600 dark:text-sky-400 text-[18px]">medical_services</span>
+                      <span class="material-symbols-outlined text-sky-600 dark:text-sky-400 text-[18px]!">medical_services</span>
                     </div>
                     <a href="${Helpers.company_service_path(currentCompany().id, record.id)}"
                       class="font-medium text-slate-900 dark:text-white overflow-visible whitespace-normal hover:text-sky-600 dark:hover:text-sky-400 transition-colors cursor-pointer">

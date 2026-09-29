@@ -95,7 +95,7 @@ export default class Companies_Orders_ShowController extends Companies_LayoutCon
         <div class="p-6 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800">
           <a href="${Helpers.company_orders_path(companyId)}"
             class="inline-flex items-center gap-1 text-sm text-slate-500 hover:text-slate-700 mb-6">
-            <span class="material-symbols-outlined text-[18px]">arrow_back</span>
+            <span class="material-symbols-outlined text-[18px]!">arrow_back</span>
             ${translate("Back to Orders")}
           </a>
 

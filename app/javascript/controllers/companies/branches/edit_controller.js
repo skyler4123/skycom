@@ -159,7 +159,7 @@ export default class Companies_Branches_EditController extends Companies_LayoutC
           </a>
           <button type="button" data-action="click->${this.identifier}#openPaymentMethodsModal"
             class="inline-flex items-center justify-center px-4 py-2 text-sm font-medium bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-lg transition-colors cursor-pointer">
-            <span class="material-symbols-outlined text-[18px] mr-2">payments</span>
+            <span class="material-symbols-outlined text-[18px]! mr-2">payments</span>
             ${translate("Payment Methods")}
           </button>
           <button type="submit"

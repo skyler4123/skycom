@@ -193,7 +193,7 @@ export default class Companies_DiscountGroups_ShowController extends Companies_L
           <button type="button" data-action="click->${this.identifier}#copyCode" data-${this.identifier}-code-param="${d.code}"
             ${tooltip(translate("Copy Code"))}
             class="inline-flex items-center justify-center p-2 text-slate-500 hover:text-blue-600 hover:bg-blue-50 rounded-lg cursor-pointer">
-            <span class="material-symbols-outlined text-[18px]">content_copy</span>
+            <span class="material-symbols-outlined text-[18px]!">content_copy</span>
           </button>
         </td>
       </tr>`).join('')
@@ -208,7 +208,7 @@ export default class Companies_DiscountGroups_ShowController extends Companies_L
             </select>
             <button type="button" data-action="click->${this.identifier}#exportCsv"
               class="inline-flex items-center gap-2 px-3 py-2 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 rounded-lg text-sm font-medium cursor-pointer">
-              <span class="material-symbols-outlined text-[18px]">download</span>${translate("Export CSV")}
+              <span class="material-symbols-outlined text-[18px]!">download</span>${translate("Export CSV")}
             </button>
           </div>
         </div>
@@ -249,7 +249,7 @@ export default class Companies_DiscountGroups_ShowController extends Companies_L
       <div class="p-4 overflow-y-auto">
         <div class="p-6 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800">
           <a href="${Helpers.company_discount_groups_path(this.companyId)}" class="inline-flex items-center gap-1 text-sm text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 mb-6">
-            <span class="material-symbols-outlined text-[18px]">arrow_back</span>
+            <span class="material-symbols-outlined text-[18px]!">arrow_back</span>
             ${translate("Back to Discounts")}
           </a>
 
@@ -284,7 +284,7 @@ export default class Companies_DiscountGroups_ShowController extends Companies_L
           <div class="mt-8 flex flex-wrap justify-end gap-3 pt-6 border-t border-slate-200 dark:border-gray-800">
             <a href="${Helpers.new_company_discount_group_path(this.companyId)}?generate_for=${g.id}"
               class="inline-flex items-center gap-2 px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium text-sm transition-colors cursor-pointer">
-              <span class="material-symbols-outlined text-[18px]">add</span>
+              <span class="material-symbols-outlined text-[18px]!">add</span>
               ${translate("Generate More Codes")}
             </a>
             <a href="${Helpers.edit_company_discount_group_path(this.companyId, g.id)}"

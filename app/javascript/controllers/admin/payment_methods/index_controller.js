@@ -44,7 +44,7 @@ export default class Admin_PaymentMethods_IndexController extends Admin_LayoutCo
             <h2 class="text-base font-bold text-slate-900 dark:text-white">Payment Methods</h2>
             <a href="${Helpers.new_admin_payment_method_path()}"
               class="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium text-sm cursor-pointer">
-              <span class="material-symbols-outlined text-[18px]">add</span>
+              <span class="material-symbols-outlined text-[18px]!">add</span>
               Add Payment Method
             </a>
           </div>
@@ -59,7 +59,7 @@ export default class Admin_PaymentMethods_IndexController extends Admin_LayoutCo
                 name: (value, record) => `
                   <div class="flex items-center gap-3">
                     <div class="w-8 h-8 rounded-lg bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center shrink-0">
-                      <span class="material-symbols-outlined text-emerald-600 dark:text-emerald-400 text-[18px]">payments</span>
+                      <span class="material-symbols-outlined text-emerald-600 dark:text-emerald-400 text-[18px]!">payments</span>
                     </div>
                     <a href="${Helpers.edit_admin_payment_method_path(record.id)}"
                       class="font-medium text-slate-900 dark:text-white hover:text-blue-600 dark:hover:text-blue-400 transition-colors cursor-pointer">

@@ -120,7 +120,7 @@ export default class Companies_Orders_IndexController extends Companies_LayoutCo
                 ${filtersHTML}
                 <div class="flex gap-2 mt-auto">
                   <button type="submit" class="h-[38px] px-6 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium text-sm flex items-center gap-2">
-                    <span class="material-symbols-outlined text-[18px]">search</span>
+                    <span class="material-symbols-outlined text-[18px]!">search</span>
                     ${translate("Search")}
                   </button>
                 </div>
@@ -145,7 +145,7 @@ export default class Companies_Orders_IndexController extends Companies_LayoutCo
                 name: (value, record) => `
                   <div class="flex items-center gap-4">
                     <div class="w-8 h-8 rounded-lg bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center shrink-0">
-                      <span class="material-symbols-outlined text-amber-600 dark:text-amber-400 text-[18px]">receipt_long</span>
+                      <span class="material-symbols-outlined text-amber-600 dark:text-amber-400 text-[18px]!">receipt_long</span>
                     </div>
                     <a href="${Helpers.company_order_path(currentCompany().id, record.id)}"
                       class="font-medium text-slate-900 dark:text-white overflow-visible whitespace-normal hover:text-blue-600 dark:hover:text-blue-400 transition-colors cursor-pointer">

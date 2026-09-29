@@ -4,6 +4,7 @@ class CreateOrderSubscriptionPlanAppointments < ActiveRecord::Migration[8.0]
       t.references :company, null: false, foreign_key: true, type: :uuid
       t.references :order, null: false, foreign_key: { to_table: :orders }, type: :uuid
       t.references :subscription_plan, null: false, foreign_key: { to_table: :subscription_plans }, type: :uuid
+      t.references :stock, null: true, foreign_key: true, type: :uuid
       t.decimal :unit_price
       t.integer :quantity
       t.decimal :total_price

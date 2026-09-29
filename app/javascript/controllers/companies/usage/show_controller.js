@@ -214,7 +214,7 @@ export default class Companies_Usage_ShowController extends Companies_LayoutCont
                     <p class="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase truncate">${card.label}</p>
                     <span
                       ${tooltip(card.hint)}
-                      class="material-symbols-outlined text-[14px] text-slate-300 dark:text-slate-600 hover:text-slate-400 dark:hover:text-slate-500 cursor-pointer shrink-0"
+                      class="material-symbols-outlined text-[14px]! text-slate-300 dark:text-slate-600 hover:text-slate-400 dark:hover:text-slate-500 cursor-pointer shrink-0"
                     >info</span>
                   </div>
                   <p class="text-xl font-black text-slate-900 dark:text-white">${card.value}</p>
@@ -255,7 +255,7 @@ export default class Companies_Usage_ShowController extends Companies_LayoutCont
                 ${tooltip(translate("Refresh"))}
                 class="inline-flex items-center justify-center p-2 text-slate-500 hover:text-blue-600 hover:bg-blue-50 rounded-lg cursor-pointer dark:text-slate-400 dark:hover:text-blue-400"
               >
-                <span class="material-symbols-outlined text-[18px]">refresh</span>
+                <span class="material-symbols-outlined text-[18px]!">refresh</span>
               </button>
               ${this.toggleButtonHTML()}
             </div>

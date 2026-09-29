@@ -29,7 +29,7 @@ export default class Companies_ShiftTemplates_ShowController extends Companies_L
         <div class="p-6 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800">
           <a href="${Helpers.company_shift_templates_path(currentCompany().id)}"
             class="inline-flex items-center gap-1 text-sm text-slate-500 hover:text-slate-700 mb-6 cursor-pointer">
-            <span class="material-symbols-outlined text-[18px]">arrow_back</span>
+            <span class="material-symbols-outlined text-[18px]!">arrow_back</span>
             ${translate("Back")}
           </a>
           <h2 class="text-2xl font-black text-slate-900 dark:text-white mb-6">${st.name}</h2>
