@@ -88,8 +88,6 @@ class PropertyMapping < ApplicationRecord
   has_many :document_groups, dependent: :restrict_with_error
   has_many :employees, dependent: :restrict_with_error
   has_many :employee_groups, dependent: :restrict_with_error
-  has_many :events, dependent: :restrict_with_error
-  has_many :event_groups, dependent: :restrict_with_error
   has_many :exams, dependent: :restrict_with_error
   has_many :exam_groups, dependent: :restrict_with_error
   has_many :facilities, dependent: :restrict_with_error

@@ -88,27 +88,25 @@ Company-scoped business entities. Each table belongs to a `company_id` and repre
 | 42 | `exams` | Education | Exam/test instances |
 | 43 | `questions` | Education | Exam questions |
 | 44 | `answers` | Education | Exam answers |
-| 45 | `event_groups` | Events | Event grouping |
-| 46 | `events` | Events | Calendar events / promotions |
-| 47 | `setting_groups` | Config | Configuration grouping |
-| 48 | `settings` | Config | Application/company settings |
-| 49 | `document_groups` | Content | Document grouping |
-| 50 | `documents` | Content | Business documents |
-| 51 | `article_groups` | Content | Article grouping |
-| 52 | `articles` | Content | Knowledge base / articles |
-| 53 | `subscription_plans` | Subscriptions | Service subscription plan definitions |
-| 54 | `subscription_groups` | Subscriptions | Subscription group instances |
-| 55 | `shifts` | HR | Work shift definitions |
-| 56 | `attendance_logs` | HR | Staff clock-in/out events |
-| 57 | `attendance_days` | HR | Daily attendance summaries |
-| 58 | `attendance_months` | HR | Monthly attendance rollups |
-| 59 | `memberships` | CRM | Customer loyalty/program memberships |
-| 60 | `reservations` | Bookings | Customer service bookings |
-| 61 | `suppliers` | Inventory | Supplier records (procurement-ready master data) |
-| 62 | `discount_groups` | Sales | Discount campaign groups (type/value, budget, validity, status) |
-| 63 | `discounts` | Sales | Single-use discount codes (unique per company, consumption state, SoT bindings) |
+| 45 | `setting_groups` | Config | Configuration grouping |
+| 46 | `settings` | Config | Application/company settings |
+| 47 | `document_groups` | Content | Document grouping |
+| 48 | `documents` | Content | Business documents |
+| 49 | `article_groups` | Content | Article grouping |
+| 50 | `articles` | Content | Knowledge base / articles |
+| 51 | `subscription_plans` | Subscriptions | Service subscription plan definitions |
+| 52 | `subscription_groups` | Subscriptions | Subscription group instances |
+| 53 | `shifts` | HR | Work shift definitions |
+| 54 | `attendance_logs` | HR | Staff clock-in/out events |
+| 55 | `attendance_days` | HR | Daily attendance summaries |
+| 56 | `attendance_months` | HR | Monthly attendance rollups |
+| 57 | `memberships` | CRM | Customer loyalty/program memberships |
+| 58 | `reservations` | Bookings | Customer service bookings |
+| 59 | `suppliers` | Inventory | Supplier records (procurement-ready master data) |
+| 60 | `discount_groups` | Sales | Discount campaign groups (type/value, budget, validity, status) |
+| 61 | `discounts` | Sales | Single-use discount codes (unique per company, consumption state, SoT bindings) |
 
-**Total: 63 tables**
+**Total: 61 tables**
 
 ---
 
@@ -119,8 +117,8 @@ Atomic pairwise join tables: one table per resource pair, named alphabetically (
 | # | Group | Tables | Count |
 |---|-------|--------|-------|
 | 1 | Address links | `address_branch`, `address_company`, `address_customer`, `address_customer_group`, `address_department`, `address_employee`, `address_employee_group`, `address_user` | 8 |
-| 2 | Tag links | `answer_tag`, `article_tag`, `article_group_tag`, `branch_tag`, `brand_tag`, `company_tag`, `customer_tag`, `customer_group_tag`, `department_tag`, `document_tag`, `document_group_tag`, `employee_tag`, `employee_group_tag`, `event_tag`, `event_group_tag`, `exam_tag`, `exam_group_tag`, `facility_tag`, `facility_group_tag`, `invoice_tag`, `notification_tag`, `notification_group_tag`, `order_tag`, `order_group_tag`, `product_tag`, `product_group_tag`, `project_tag`, `project_group_tag`, `purchase_tag`, `purchase_item_tag`, `question_tag`, `role_tag`, `service_tag`, `service_group_tag`, `setting_tag`, `setting_group_tag`, `statistic_tag`, `stock_tag`, `stock_export_tag`, `stock_import_tag`, `stock_transfer_tag`, `subscription_group_tag`, `supplier_tag`, `tag_task`, `tag_task_group`, `tag_transaction`, `tag_warehouse` | 47 |
-| 3 | Generic pairwise links | `article_employee`, `article_group_employee`, `cart_employee`, `customer_customer_group`, `customer_employee`, `customer_group_service`, `customer_service` (booking: `duration`, `start_at`), `department_employee`, `document_employee`, `document_group_employee`, `employee_employee` (self-link via `related_employee_id`), `employee_employee_group`, `employee_event`, `employee_event_group`, `employee_exam`, `employee_facility`, `facility_facility_group`, `employee_notification`, `employee_notification_group`, `employee_product`, `product_product_group`, `employee_project`, `employee_project_group`, `service_service_group`, `employee_service` (booking: `duration`, `start_at`), `employee_setting`, `employee_setting_group`, `employee_task`, `employee_task_group` | 29 |
+| 2 | Tag links | `answer_tag`, `article_tag`, `article_group_tag`, `branch_tag`, `brand_tag`, `company_tag`, `customer_tag`, `customer_group_tag`, `department_tag`, `document_tag`, `document_group_tag`, `employee_tag`, `employee_group_tag`, `exam_tag`, `exam_group_tag`, `facility_tag`, `facility_group_tag`, `invoice_tag`, `notification_tag`, `notification_group_tag`, `order_tag`, `order_group_tag`, `product_tag`, `product_group_tag`, `project_tag`, `project_group_tag`, `purchase_tag`, `purchase_item_tag`, `question_tag`, `role_tag`, `service_tag`, `service_group_tag`, `setting_tag`, `setting_group_tag`, `statistic_tag`, `stock_tag`, `stock_export_tag`, `stock_import_tag`, `stock_transfer_tag`, `subscription_group_tag`, `supplier_tag`, `tag_task`, `tag_task_group`, `tag_transaction`, `tag_warehouse` | 45 |
+| 3 | Generic pairwise links | `article_employee`, `article_group_employee`, `cart_employee`, `customer_customer_group`, `customer_employee`, `customer_group_service`, `customer_service` (booking: `duration`, `start_at`), `department_employee`, `document_employee`, `document_group_employee`, `employee_employee` (self-link via `related_employee_id`), `employee_employee_group`, `employee_exam`, `employee_facility`, `facility_facility_group`, `employee_notification`, `employee_notification_group`, `employee_product`, `product_product_group`, `employee_project`, `employee_project_group`, `service_service_group`, `employee_service` (booking: `duration`, `start_at`), `employee_setting`, `employee_setting_group`, `employee_task`, `employee_task_group` | 27 |
 | 4 | Order line items | `order_product`, `order_product_group`, `order_service`, `order_service_group`, `order_subscription_plan` (each with `quantity` / `unit_price` / `total_price` snapshots) | 5 |
 | 5 | Payment method links | `branch_payment_method`, `company_payment_method` | 2 |
 | 6 | Policy / role assignments | `policy_role`, `customer_role`, `customer_group_role`, `department_role`, `employee_group_role`, `employee_role` | 6 |
@@ -192,9 +190,9 @@ replaced them with 103 single-purpose tables:
 |----------|-------|
 | Gem Resources | 4 |
 | System Resources | 11 |
-| Managed Resources | 63 |
-| Appointment Resources | 107 |
-| **Grand Total** | **185** |
+| Managed Resources | 61 |
+| Appointment Resources | 103 |
+| **Grand Total** | **179** |
 
 ---
 

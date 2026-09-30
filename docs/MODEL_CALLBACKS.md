@@ -368,7 +368,7 @@ Auto-assigns a default property_mapping on create if none is provided. Derives `
 | `before_validation :ensure_property_mapping, on: :create` | 10 | `ensure_property_mapping` | If `property_mapping` is nil and `category` is present, sets `self.property_mapping = category.default_property_mapping`. Ensures every resource record has a property_mapping for dynamic property resolution. |
 | `validate :category_matches_property_mapping_category` | 11 | `category_matches_property_mapping_category` | Ensures the resource's `category_id` matches the `property_mapping.category_id`. Prevents inconsistency on update or manual assignment. Returns early if either association is blank. |
 
-**Included in (46 models):** All models that include `CategoryConcern` (19 models) plus additional managed resources: `Answer`, `Article`, `ArticleGroup`, `Cart`, `CartGroup`, `CustomerGroup`, `Document`, `DocumentGroup`, `Event`, `EventGroup`, `Exam`, `ExamGroup`, `FacilityGroup`, `Membership`, `Notification`, `NotificationGroup`, `OrderGroup`, `Payment`, `ProductGroup`, `Project`, `ProjectGroup`, `Question`, `Reservation`, `ServiceGroup`, `SettingGroup`, `Task`, `TaskGroup`
+**Included in (44 models):** All models that include `CategoryConcern` (19 models) plus additional managed resources: `Answer`, `Article`, `ArticleGroup`, `Cart`, `CartGroup`, `CustomerGroup`, `Document`, `DocumentGroup`, `Exam`, `ExamGroup`, `FacilityGroup`, `Membership`, `Notification`, `NotificationGroup`, `OrderGroup`, `Payment`, `ProductGroup`, `Project`, `ProjectGroup`, `Question`, `Reservation`, `ServiceGroup`, `SettingGroup`, `Task`, `TaskGroup`
 
 ---
 
@@ -393,6 +393,14 @@ Each concern defines the same callback:
 
 ---
 
+### CalendarEvent (`app/models/calendar_event.rb`)
+
+| Callback | Line | Method | Description |
+|----------|------|--------|-------------|
+| `after_update :stamp_cancellation, if: :saved_change_to_status?` | 78 | `stamp_cancellation` | When a booking transitions **into** `cancelled` and `cancelled_at` is still nil, stamps `cancelled_at` with the current time. `update_column` skips validations, so it neither recurses nor re-triggers the conflict validation. `CalendarEvent#cancel!` normally sets the timestamp itself; this covers a direct `update!(status: :cancelled)`. |
+
+---
+
 ## 3. Summary Table
 
 | Callback Type | Count | Models with Direct Declarations |
@@ -402,7 +410,7 @@ Each concern defines the same callback:
 | `before_create` | 1 | Session |
 | `after_create` | 6 | Category, Company, Branch, PolicyAppointment, PropertyMapping, RoleAppointment |
 | `belongs_to :company, touch: true` | 6 | Branch, Department, Category, PropertyMapping, TableConfig, Role |
-| `after_update` (conditional) | 2 | CompanyPaymentMethodAppointment, PolicyAppointment |
+| `after_update` (conditional) | 3 | CompanyPaymentMethodAppointment, PolicyAppointment, CalendarEvent |
 | `before_update` | 3 | PolicyAppointment, RoleAppointment, (ImmutableRecordConcern → 3 models) |
 | `before_destroy` | 5 | Employee, System, PolicyAppointment, RoleAppointment, (ImmutableRecordConcern → 3 models) |
 | `before_discard` | 1 | Employee |

@@ -67,11 +67,6 @@ DYNAMIC_SEARCH_MODELS = {
   DocumentGroup => ->(company) { create_searchable_record(DocumentGroup, company, "document_groups") },
   Employee => ->(company) { create(:employee, company: company, user: create(:user), branch: create(:branch, company: company)) },
   EmployeeGroup => ->(company) { create(:employee_group, company: company) },
-  Event => ->(company) {
-    event_group = create_searchable_record(EventGroup, company, "event_groups")
-    create_searchable_record(Event, company, "events", event_group: event_group)
-  },
-  EventGroup => ->(company) { create_searchable_record(EventGroup, company, "event_groups") },
   Exam => ->(company) {
     exam_group = create_searchable_record(ExamGroup, company, "exam_groups")
     create_searchable_record(Exam, company, "exams", exam_group: exam_group)

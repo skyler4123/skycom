@@ -1,4 +1,20 @@
 // app/javascript/controllers/calendar_controller.js
+//
+// Reusable month / week / day / year calendar grid.
+//
+// The endpoint is supplied by the consumer via `data-calendar-*-api-url-value`;
+// there is NO default, so a page must always point this at its own data source.
+// Two consumers today:
+//   * Companies_Calendars_IndexController — the Calendar/Schedule board, pointed
+//     at GET /companies/:id/calendars/events (returns { events: [...] })
+//   * app/views/demo/index.html.erb      — the /demo mock (returns a bare array)
+//
+// Both payload shapes are accepted (see #normalizeEvents). Field names are
+// FullCalendar-compatible: id / title / start / end / allDay / backgroundColor /
+// extendedProps.
+//
+// Depends on BE: the `apiUrl` value's endpoint (no hard-coded backend here).
+// Docs: docs/CALENDAR.md
 import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
@@ -11,7 +27,8 @@ export default class extends Controller {
     dragging:   { type: Boolean, default: false },
     dragStart:  String,
     dragEnd:    String,
-    apiUrl:     { type: String, default: "/demo/calendar_events" }
+    // No default on purpose — see the file header.
+    apiUrl:     String
   }
 
   connect() {
@@ -22,18 +39,20 @@ export default class extends Controller {
     this.fetchEvents()
   }
 
-  // ... (Data fetching and Navigation logic remains unchanged)
   async fetchEvents() {
     if (this.isLoading) return
+    if (!this.apiUrlValue) {
+      console.error("calendar#fetchEvents: no api-url value provided")
+      this.events = []
+      return
+    }
     this.isLoading = true
     this.renderAll()
 
     try {
       const range = this.getCurrentRange()
-      const url = `${this.apiUrlValue}?start=${range.start}&end=${range.end}`
-      const response = await fetch(url, { headers: { "Accept": "application/json" } })
-      if (!response.ok) throw new Error(`HTTP ${response.status}`)
-      this.events = await response.json() || []
+      const payload = await fetchJson(this.apiUrlValue, { params: { start: range.start, end: range.end } })
+      this.events = this.normalizeEvents(payload)
     } catch (error) {
       console.error("Failed to load calendar events:", error)
       this.events = []
@@ -41,6 +60,13 @@ export default class extends Controller {
       this.isLoading = false
       this.renderAll()
     }
+  }
+
+  // Accepts either a bare array (the /demo mock) or a { events: [...] }
+  // envelope (the Calendar/Schedule board).
+  normalizeEvents(payload) {
+    if (Array.isArray(payload)) return payload
+    return payload?.events || []
   }
 
   getCurrentRange() {

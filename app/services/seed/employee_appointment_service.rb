@@ -8,8 +8,6 @@ class Seed::EmployeeAppointmentService
     "DocumentGroup" => [ "DocumentGroupEmployeeAppointmentService", :document_group ],
     "Employee" => [ "EmployeeEmployeeAppointmentService", :related_employee ],
     "EmployeeGroup" => [ "EmployeeEmployeeGroupAppointmentService", :employee_group ],
-    "Event" => [ "EmployeeEventAppointmentService", :event ],
-    "EventGroup" => [ "EmployeeEventGroupAppointmentService", :event_group ],
     "Exam" => [ "EmployeeExamAppointmentService", :exam ],
     "Facility" => [ "EmployeeFacilityAppointmentService", :facility ],
     "Notification" => [ "EmployeeNotificationAppointmentService", :notification ],

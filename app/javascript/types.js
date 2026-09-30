@@ -51,8 +51,6 @@
 /** @typedef {Object} ServiceGroup @property {string} id @property {string} company_id @property {string} branch_id @property {string} category_id @property {string} name @property {string} description @property {string} code @property {number} lifecycle_status @property {string} workflow_status @property {string} duration @property {string} start_at @property {number} business_type @property {string} discarded_at @property {Metadata} metadata */
 
 // --- 8. EVENTS ---
-/** @typedef {Object} Event @property {string} id @property {string} event_group_id @property {string} company_id @property {string} branch_id @property {string} category_id @property {string} name @property {string} description @property {string} code @property {number} lifecycle_status @property {string} workflow_status @property {string} business_type @property {string} discarded_at @property {Metadata} metadata */
-/** @typedef {Object} EventGroup @property {string} id @property {string} company_id @property {string} branch_id @property {string} category_id @property {string} name @property {string} description @property {string} code @property {number} lifecycle_status @property {string} workflow_status @property {string} business_type @property {string} discarded_at @property {Metadata} metadata */
 /** @typedef {Object} Exam @property {string} id @property {string} exam_group_id @property {string} company_id @property {string} branch_id @property {string} category_id @property {string} name @property {string} description @property {string} code @property {number} lifecycle_status @property {string} workflow_status @property {string} business_type @property {string} discarded_at @property {Metadata} metadata */
 /** @typedef {Object} ExamGroup @property {string} id @property {string} company_id @property {string} branch_id @property {string} category_id @property {string} name @property {string} description @property {string} code @property {number} lifecycle_status @property {string} workflow_status @property {string} business_type @property {string} discarded_at @property {Metadata} metadata */
 
@@ -115,8 +113,6 @@
 /** @typedef {AtomicAppointment} DocumentGroupEmployeeAppointment */
 /** @typedef {AtomicAppointment} EmployeeEmployeeAppointment */
 /** @typedef {AtomicAppointment} EmployeeEmployeeGroupAppointment */
-/** @typedef {AtomicAppointment} EmployeeEventAppointment */
-/** @typedef {AtomicAppointment} EmployeeEventGroupAppointment */
 /** @typedef {AtomicAppointment} EmployeeExamAppointment */
 /** @typedef {AtomicAppointment} EmployeeFacilityAppointment */
 /** @typedef {AtomicAppointment} EmployeeNotificationAppointment */

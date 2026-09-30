@@ -167,3 +167,69 @@ CREDIT_USAGE_RATES = {
   access_dashboard: 2,
   create_customer: 7
 }.freeze
+
+# =============================================================================
+# Calendar / Schedule Module
+# Isolated island: calendar_* tables never reference core ERP models directly.
+# They bridge through a polymorphic source_type / source_id pair instead.
+# See docs/CALENDAR.md.
+# =============================================================================
+
+# CalendarEvent.status — the booking lifecycle.
+CALENDAR_EVENT_STATUSES = {
+  pending: 0,
+  confirmed: 1,
+  in_progress: 2,
+  completed: 3,
+  cancelled: 4,
+  no_show: 5
+}.freeze
+
+# Sync status shared by every calendar_* table (via Calendar::SyncableConcern).
+# `pending` is the default for locally created records that a provider has yet
+# to acknowledge; `disabled` means the company has no provider connection.
+CALENDAR_SYNC_STATUSES = {
+  pending: 0,
+  synced: 1,
+  error: 2,
+  disabled: 3
+}.freeze
+
+# CalendarSyncLog.direction — which way a sync attempt travelled.
+CALENDAR_SYNC_DIRECTIONS = {
+  push: 0,
+  pull: 1,
+  bidirectional: 2
+}.freeze
+
+# CalendarSyncLog.status — outcome of a single sync attempt.
+CALENDAR_SYNC_LOG_STATUSES = {
+  success: 0,
+  error: 1,
+  partial: 2
+}.freeze
+
+# External providers this module is designed to talk to. Nothing is wired up
+# yet — Calendar::AdapterFactory has no registered implementation, so calling it
+# raises until the first adapter lands. See docs/CALENDAR.md §7.
+CALENDAR_SYNC_PROVIDERS = %w[calcom google outlook].freeze
+
+# Roles an event assignment can take. Validated per join table (the sets differ
+# by resource type), so these are plain strings rather than enums.
+CALENDAR_PRACTITIONER_ROLES = %w[lead assistant observer].freeze
+CALENDAR_LOCATION_ROLES     = %w[primary secondary].freeze
+CALENDAR_EQUIPMENT_ROLES    = %w[primary secondary].freeze
+CALENDAR_PARTICIPANT_ROLES  = %w[primary secondary observer].freeze
+
+# ISO weekday numbers 1 (Monday) .. 7 (Sunday), matching Date#wday.
+# Used by CalendarAvailabilityRule#days_of_week and the future free-slot search.
+CALENDAR_WEEKDAYS = (1..7).freeze
+
+# Format for CalendarAvailabilityRule#start_time / #end_time ("HH:MM", 24h).
+# v1 does not support overnight spans; the DB CHECK constraint enforces
+# end_time > start_time within a single day.
+CALENDAR_TIME_FORMAT = /\A([01]\d|2[0-3]):([0-5]\d)\z/
+
+# Default event colour when a procedure or event does not set one.
+CALENDAR_DEFAULT_COLOR = "#6366f1"
+.freeze

@@ -68,14 +68,14 @@ class Employee < ApplicationRecord
   has_many :document_group_employee_appointments, dependent: :destroy
   has_many :document_groups, through: :document_group_employee_appointments
 
-  has_many :employee_event_appointments, dependent: :destroy
-  has_many :events, through: :employee_event_appointments
-
-  has_many :employee_event_group_appointments, dependent: :destroy
-  has_many :event_groups, through: :employee_event_group_appointments
-
   has_many :employee_exam_appointments, dependent: :destroy
   has_many :exams, through: :employee_exam_appointments
+
+  # Calendar module reaches employees only through the polymorphic source pair
+  # on CalendarPractitioner — there is no join table here by design. See
+  # docs/CALENDAR.md §2.
+  has_many :calendar_practitioners, -> { where(source_type: "Employee") },
+    foreign_key: :source_id, inverse_of: :source, dependent: :destroy
 
   has_many :employee_facility_appointments, dependent: :destroy
   has_many :facilities, through: :employee_facility_appointments

@@ -171,7 +171,6 @@ export const create_company_shift_templates_path = (companyId) => `/companies/${
 export const company_reports_path = (companyId) => `/companies/${companyId}/reports`
 export const company_documents_path = (companyId) => `/companies/${companyId}/documents`
 export const company_announcements_path = (companyId) => `/companies/${companyId}/announcements`
-export const company_events_path = (companyId) => `/companies/${companyId}/events`
 export const company_discounts_path = (companyId) => `/companies/${companyId}/discounts`
 // Discount groups (Discount FE — docs/superpowers/specs/2026-09-22-discounts-frontend-design.md)
 export const company_discount_groups_path = (companyId) => `/companies/${companyId}/discount_groups`
@@ -245,3 +244,60 @@ export const receive_company_stock_transfer_path = (companyId, id) => `/companie
 export const cancel_company_stock_transfer_path = (companyId, id) => `/companies/${companyId}/stock_transfers/${id}/cancel`
 
 export const company_analytics_path = (companyId) => `/companies/${companyId}/analytics`
+// --- Calendar / Schedule (isolated calendar_* module — docs/CALENDAR.md) ---
+export const company_calendars_path = (companyId) => `/companies/${companyId}/calendars`
+export const events_company_calendars_path = (companyId) => `/companies/${companyId}/calendars/events`
+
+export const company_calendar_events_path = (companyId) => `/companies/${companyId}/calendar_events`
+export const create_company_calendar_events_path = (companyId) => `/companies/${companyId}/calendar_events`
+export const new_company_calendar_event_path = (companyId) => `/companies/${companyId}/calendar_events/new`
+export const company_calendar_event_path = (companyId, id) => `/companies/${companyId}/calendar_events/${id}`
+export const edit_company_calendar_event_path = (companyId, id) => `/companies/${companyId}/calendar_events/${id}/edit`
+export const conflicts_company_calendar_events_path = (companyId) => `/companies/${companyId}/calendar_events/conflicts`
+export const confirm_company_calendar_event_path = (companyId, id) => `/companies/${companyId}/calendar_events/${id}/confirm`
+export const cancel_company_calendar_event_path = (companyId, id) => `/companies/${companyId}/calendar_events/${id}/cancel`
+export const complete_company_calendar_event_path = (companyId, id) => `/companies/${companyId}/calendar_events/${id}/complete`
+
+export const company_calendar_procedures_path = (companyId) => `/companies/${companyId}/calendar_procedures`
+export const create_company_calendar_procedures_path = (companyId) => `/companies/${companyId}/calendar_procedures`
+export const new_company_calendar_procedure_path = (companyId) => `/companies/${companyId}/calendar_procedures/new`
+export const company_calendar_procedure_path = (companyId, id) => `/companies/${companyId}/calendar_procedures/${id}`
+export const edit_company_calendar_procedure_path = (companyId, id) => `/companies/${companyId}/calendar_procedures/${id}/edit`
+
+export const company_calendar_positions_path = (companyId) => `/companies/${companyId}/calendar_positions`
+export const create_company_calendar_positions_path = (companyId) => `/companies/${companyId}/calendar_positions`
+export const new_company_calendar_position_path = (companyId) => `/companies/${companyId}/calendar_positions/new`
+export const company_calendar_position_path = (companyId, id) => `/companies/${companyId}/calendar_positions/${id}`
+export const edit_company_calendar_position_path = (companyId, id) => `/companies/${companyId}/calendar_positions/${id}/edit`
+
+export const company_calendar_practitioners_path = (companyId) => `/companies/${companyId}/calendar_practitioners`
+export const create_company_calendar_practitioners_path = (companyId) => `/companies/${companyId}/calendar_practitioners`
+export const new_company_calendar_practitioner_path = (companyId) => `/companies/${companyId}/calendar_practitioners/new`
+export const company_calendar_practitioner_path = (companyId, id) => `/companies/${companyId}/calendar_practitioners/${id}`
+export const edit_company_calendar_practitioner_path = (companyId, id) => `/companies/${companyId}/calendar_practitioners/${id}/edit`
+
+export const company_calendar_locations_path = (companyId) => `/companies/${companyId}/calendar_locations`
+export const create_company_calendar_locations_path = (companyId) => `/companies/${companyId}/calendar_locations`
+export const new_company_calendar_location_path = (companyId) => `/companies/${companyId}/calendar_locations/new`
+export const company_calendar_location_path = (companyId, id) => `/companies/${companyId}/calendar_locations/${id}`
+export const edit_company_calendar_location_path = (companyId, id) => `/companies/${companyId}/calendar_locations/${id}/edit`
+
+export const company_calendar_equipments_path = (companyId) => `/companies/${companyId}/calendar_equipments`
+export const create_company_calendar_equipments_path = (companyId) => `/companies/${companyId}/calendar_equipments`
+export const new_company_calendar_equipment_path = (companyId) => `/companies/${companyId}/calendar_equipments/new`
+export const company_calendar_equipment_path = (companyId, id) => `/companies/${companyId}/calendar_equipments/${id}`
+export const edit_company_calendar_equipment_path = (companyId, id) => `/companies/${companyId}/calendar_equipments/${id}/edit`
+
+export const company_calendar_participants_path = (companyId) => `/companies/${companyId}/calendar_participants`
+export const create_company_calendar_participants_path = (companyId) => `/companies/${companyId}/calendar_participants`
+export const new_company_calendar_participant_path = (companyId) => `/companies/${companyId}/calendar_participants/new`
+export const company_calendar_participant_path = (companyId, id) => `/companies/${companyId}/calendar_participants/${id}`
+export const edit_company_calendar_participant_path = (companyId, id) => `/companies/${companyId}/calendar_participants/${id}/edit`
+
+export const company_calendar_availability_rules_path = (companyId) => `/companies/${companyId}/calendar_availability_rules`
+export const create_company_calendar_availability_rules_path = (companyId) => `/companies/${companyId}/calendar_availability_rules`
+export const new_company_calendar_availability_rule_path = (companyId) => `/companies/${companyId}/calendar_availability_rules/new`
+export const company_calendar_availability_rule_path = (companyId, id) => `/companies/${companyId}/calendar_availability_rules/${id}`
+export const edit_company_calendar_availability_rule_path = (companyId, id) => `/companies/${companyId}/calendar_availability_rules/${id}/edit`
+
+export const company_calendar_syncs_path = (companyId) => `/companies/${companyId}/calendar_syncs`

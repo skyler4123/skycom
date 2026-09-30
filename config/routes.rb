@@ -72,11 +72,34 @@ Rails.application.routes.draw do
       resources :attendance_logs
       resources :attendance_days
       resources :attendance_months
+      # Calendar / Schedule module — isolated calendar_* island, see docs/CALENDAR.md
+      resources :calendars, only: [ :index ] do
+        collection do
+          get :events
+        end
+      end
+      resources :calendar_events do
+        collection do
+          post :conflicts
+        end
+        member do
+          post :confirm
+          post :cancel
+          post :complete
+        end
+      end
+      resources :calendar_procedures
+      resources :calendar_positions
+      resources :calendar_practitioners
+      resources :calendar_locations
+      resources :calendar_equipments
+      resources :calendar_participants
+      resources :calendar_availability_rules
+      resources :calendar_syncs, only: [ :index ]
       resources :reports
       resources :documents
       resources :announcements
       resources :discounts
-      resources :events
       resources :payslips
       resources :tasks
       resources :facilities

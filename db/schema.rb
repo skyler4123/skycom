@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_09_26_000004) do
+ActiveRecord::Schema[8.0].define(version: 2026_09_26_000018) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pgcrypto"
@@ -902,6 +902,427 @@ ActiveRecord::Schema[8.0].define(version: 2026_09_26_000004) do
     t.index ["lifecycle_status"], name: "index_brands_on_lifecycle_status"
     t.index ["property_mapping_id"], name: "index_brands_on_property_mapping_id"
     t.index ["workflow_status"], name: "index_brands_on_workflow_status"
+  end
+
+  create_table "calendar_availability_rules", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
+    t.uuid "company_id", null: false
+    t.uuid "calendar_practitioner_id"
+    t.uuid "calendar_location_id"
+    t.string "name"
+    t.string "timezone", default: "UTC", null: false
+    t.integer "days_of_week", default: [], null: false, array: true
+    t.string "start_time", null: false
+    t.string "end_time", null: false
+    t.date "effective_from"
+    t.date "effective_to"
+    t.integer "priority", default: 0, null: false
+    t.boolean "is_unavailable", default: false, null: false
+    t.string "external_provider"
+    t.string "external_id"
+    t.string "external_etag"
+    t.integer "sync_status", default: 0, null: false
+    t.datetime "last_synced_at"
+    t.text "last_sync_error"
+    t.integer "lifecycle_status"
+    t.integer "workflow_status"
+    t.integer "business_type"
+    t.datetime "expiration_date"
+    t.jsonb "metadata", default: {}
+    t.datetime "discarded_at"
+    t.string "permission_resource_name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["business_type"], name: "index_calendar_availability_rules_on_business_type"
+    t.index ["calendar_location_id"], name: "index_calendar_availability_rules_on_calendar_location_id"
+    t.index ["calendar_practitioner_id"], name: "index_calendar_availability_rules_on_calendar_practitioner_id"
+    t.index ["company_id", "calendar_location_id"], name: "idx_calendar_availability_rules_location"
+    t.index ["company_id", "calendar_practitioner_id"], name: "idx_calendar_availability_rules_practitioner"
+    t.index ["company_id"], name: "index_calendar_availability_rules_on_company_id"
+    t.index ["discarded_at"], name: "index_calendar_availability_rules_on_discarded_at"
+    t.index ["lifecycle_status"], name: "index_calendar_availability_rules_on_lifecycle_status"
+    t.index ["workflow_status"], name: "index_calendar_availability_rules_on_workflow_status"
+    t.check_constraint "end_time::text > start_time::text", name: "chk_calendar_availability_rules_time_order"
+    t.check_constraint "num_nonnulls(calendar_practitioner_id, calendar_location_id) = 1", name: "chk_calendar_availability_rules_single_owner"
+  end
+
+  create_table "calendar_equipments", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
+    t.uuid "company_id", null: false
+    t.uuid "branch_id"
+    t.string "source_type"
+    t.uuid "source_id"
+    t.string "name", null: false
+    t.string "code"
+    t.text "description"
+    t.integer "quantity", default: 1, null: false
+    t.string "color", default: "#f59e0b", null: false
+    t.boolean "bookable", default: true, null: false
+    t.string "external_provider"
+    t.string "external_id"
+    t.string "external_etag"
+    t.integer "sync_status", default: 0, null: false
+    t.datetime "last_synced_at"
+    t.text "last_sync_error"
+    t.integer "lifecycle_status"
+    t.integer "workflow_status"
+    t.integer "business_type"
+    t.datetime "expiration_date"
+    t.jsonb "metadata", default: {}
+    t.datetime "discarded_at"
+    t.string "permission_resource_name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["branch_id"], name: "index_calendar_equipments_on_branch_id"
+    t.index ["business_type"], name: "index_calendar_equipments_on_business_type"
+    t.index ["company_id", "name"], name: "index_calendar_equipments_on_company_id_and_name", unique: true
+    t.index ["company_id"], name: "index_calendar_equipments_on_company_id"
+    t.index ["discarded_at"], name: "index_calendar_equipments_on_discarded_at"
+    t.index ["external_provider", "external_id"], name: "index_calendar_equipments_on_external_provider_and_external_id"
+    t.index ["lifecycle_status"], name: "index_calendar_equipments_on_lifecycle_status"
+    t.index ["source_type", "source_id"], name: "index_calendar_equipments_on_source_type_and_source_id"
+    t.index ["workflow_status"], name: "index_calendar_equipments_on_workflow_status"
+  end
+
+  create_table "calendar_event_equipments", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
+    t.uuid "company_id", null: false
+    t.uuid "calendar_event_id", null: false
+    t.uuid "calendar_equipment_id", null: false
+    t.string "role", default: "primary", null: false
+    t.boolean "required", default: true, null: false
+    t.jsonb "metadata", default: {}
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["calendar_equipment_id"], name: "index_calendar_event_equipments_on_calendar_equipment_id"
+    t.index ["calendar_event_id", "calendar_equipment_id"], name: "idx_calendar_event_equipment_uniq", unique: true
+    t.index ["calendar_event_id"], name: "index_calendar_event_equipments_on_calendar_event_id"
+    t.index ["company_id", "calendar_equipment_id"], name: "idx_calendar_event_equipment_resource"
+    t.index ["company_id"], name: "index_calendar_event_equipments_on_company_id"
+  end
+
+  create_table "calendar_event_locations", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
+    t.uuid "company_id", null: false
+    t.uuid "calendar_event_id", null: false
+    t.uuid "calendar_location_id", null: false
+    t.string "role", default: "primary", null: false
+    t.boolean "required", default: true, null: false
+    t.jsonb "metadata", default: {}
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["calendar_event_id", "calendar_location_id"], name: "idx_calendar_event_locations_uniq", unique: true
+    t.index ["calendar_event_id"], name: "index_calendar_event_locations_on_calendar_event_id"
+    t.index ["calendar_location_id"], name: "index_calendar_event_locations_on_calendar_location_id"
+    t.index ["company_id", "calendar_location_id"], name: "idx_calendar_event_locations_resource"
+    t.index ["company_id"], name: "index_calendar_event_locations_on_company_id"
+  end
+
+  create_table "calendar_event_participants", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
+    t.uuid "company_id", null: false
+    t.uuid "calendar_event_id", null: false
+    t.uuid "calendar_participant_id", null: false
+    t.string "role", default: "primary", null: false
+    t.boolean "required", default: true, null: false
+    t.jsonb "metadata", default: {}
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["calendar_event_id", "calendar_participant_id"], name: "idx_calendar_event_participants_uniq", unique: true
+    t.index ["calendar_event_id"], name: "index_calendar_event_participants_on_calendar_event_id"
+    t.index ["calendar_participant_id"], name: "index_calendar_event_participants_on_calendar_participant_id"
+    t.index ["company_id", "calendar_participant_id"], name: "idx_calendar_event_participants_resource"
+    t.index ["company_id"], name: "index_calendar_event_participants_on_company_id"
+  end
+
+  create_table "calendar_event_practitioners", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
+    t.uuid "company_id", null: false
+    t.uuid "calendar_event_id", null: false
+    t.uuid "calendar_practitioner_id", null: false
+    t.string "role", default: "lead", null: false
+    t.boolean "required", default: true, null: false
+    t.jsonb "metadata", default: {}
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["calendar_event_id", "calendar_practitioner_id"], name: "idx_calendar_event_practitioners_uniq", unique: true
+    t.index ["calendar_event_id"], name: "index_calendar_event_practitioners_on_calendar_event_id"
+    t.index ["calendar_practitioner_id"], name: "index_calendar_event_practitioners_on_calendar_practitioner_id"
+    t.index ["company_id", "calendar_practitioner_id"], name: "idx_calendar_event_practitioners_resource"
+    t.index ["company_id"], name: "index_calendar_event_practitioners_on_company_id"
+  end
+
+  create_table "calendar_events", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
+    t.uuid "company_id", null: false
+    t.uuid "calendar_procedure_id", null: false
+    t.uuid "branch_id"
+    t.string "source_type"
+    t.uuid "source_id"
+    t.string "title"
+    t.text "description"
+    t.text "notes"
+    t.string "location_note"
+    t.datetime "starts_at", null: false
+    t.datetime "ends_at", null: false
+    t.string "timezone", default: "UTC", null: false
+    t.boolean "all_day", default: false, null: false
+    t.integer "status", default: 0, null: false
+    t.datetime "confirmed_at"
+    t.datetime "cancelled_at"
+    t.string "cancellation_reason"
+    t.string "external_provider"
+    t.string "external_id"
+    t.string "external_etag"
+    t.integer "sync_status", default: 0, null: false
+    t.datetime "last_synced_at"
+    t.text "last_sync_error"
+    t.integer "lifecycle_status"
+    t.integer "workflow_status"
+    t.integer "business_type"
+    t.datetime "expiration_date"
+    t.jsonb "metadata", default: {}
+    t.datetime "discarded_at"
+    t.string "permission_resource_name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["branch_id"], name: "index_calendar_events_on_branch_id"
+    t.index ["business_type"], name: "index_calendar_events_on_business_type"
+    t.index ["calendar_procedure_id", "starts_at"], name: "index_calendar_events_on_calendar_procedure_id_and_starts_at"
+    t.index ["calendar_procedure_id"], name: "index_calendar_events_on_calendar_procedure_id"
+    t.index ["company_id", "starts_at", "ends_at"], name: "idx_calendar_events_company_window"
+    t.index ["company_id", "status"], name: "index_calendar_events_on_company_id_and_status"
+    t.index ["company_id"], name: "index_calendar_events_on_company_id"
+    t.index ["discarded_at"], name: "index_calendar_events_on_discarded_at"
+    t.index ["external_provider", "external_id"], name: "index_calendar_events_on_external_provider_and_external_id"
+    t.index ["lifecycle_status"], name: "index_calendar_events_on_lifecycle_status"
+    t.index ["source_type", "source_id"], name: "index_calendar_events_on_source_type_and_source_id"
+    t.index ["workflow_status"], name: "index_calendar_events_on_workflow_status"
+  end
+
+  create_table "calendar_locations", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
+    t.uuid "company_id", null: false
+    t.uuid "branch_id"
+    t.string "source_type"
+    t.uuid "source_id"
+    t.string "name", null: false
+    t.string "code"
+    t.text "description"
+    t.integer "capacity", default: 1, null: false
+    t.string "color", default: "#0ea5e9", null: false
+    t.boolean "bookable", default: true, null: false
+    t.string "external_provider"
+    t.string "external_id"
+    t.string "external_etag"
+    t.integer "sync_status", default: 0, null: false
+    t.datetime "last_synced_at"
+    t.text "last_sync_error"
+    t.integer "lifecycle_status"
+    t.integer "workflow_status"
+    t.integer "business_type"
+    t.datetime "expiration_date"
+    t.jsonb "metadata", default: {}
+    t.datetime "discarded_at"
+    t.string "permission_resource_name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["branch_id"], name: "index_calendar_locations_on_branch_id"
+    t.index ["business_type"], name: "index_calendar_locations_on_business_type"
+    t.index ["company_id", "name"], name: "index_calendar_locations_on_company_id_and_name", unique: true
+    t.index ["company_id"], name: "index_calendar_locations_on_company_id"
+    t.index ["discarded_at"], name: "index_calendar_locations_on_discarded_at"
+    t.index ["external_provider", "external_id"], name: "index_calendar_locations_on_external_provider_and_external_id"
+    t.index ["lifecycle_status"], name: "index_calendar_locations_on_lifecycle_status"
+    t.index ["source_type", "source_id"], name: "index_calendar_locations_on_source_type_and_source_id"
+    t.index ["workflow_status"], name: "index_calendar_locations_on_workflow_status"
+  end
+
+  create_table "calendar_participants", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
+    t.uuid "company_id", null: false
+    t.string "source_type"
+    t.uuid "source_id"
+    t.string "name", null: false
+    t.string "code"
+    t.string "email"
+    t.string "phone_number"
+    t.text "notes"
+    t.string "external_provider"
+    t.string "external_id"
+    t.string "external_etag"
+    t.integer "sync_status", default: 0, null: false
+    t.datetime "last_synced_at"
+    t.text "last_sync_error"
+    t.integer "lifecycle_status"
+    t.integer "workflow_status"
+    t.integer "business_type"
+    t.datetime "expiration_date"
+    t.jsonb "metadata", default: {}
+    t.datetime "discarded_at"
+    t.string "permission_resource_name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["business_type"], name: "index_calendar_participants_on_business_type"
+    t.index ["company_id", "name"], name: "index_calendar_participants_on_company_id_and_name"
+    t.index ["company_id"], name: "index_calendar_participants_on_company_id"
+    t.index ["discarded_at"], name: "index_calendar_participants_on_discarded_at"
+    t.index ["external_provider", "external_id"], name: "idx_on_external_provider_external_id_431f179d7c"
+    t.index ["lifecycle_status"], name: "index_calendar_participants_on_lifecycle_status"
+    t.index ["source_type", "source_id"], name: "index_calendar_participants_on_source_type_and_source_id"
+    t.index ["workflow_status"], name: "index_calendar_participants_on_workflow_status"
+  end
+
+  create_table "calendar_positions", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
+    t.uuid "company_id", null: false
+    t.string "name", null: false
+    t.string "code"
+    t.text "description"
+    t.string "color", default: "#6366f1", null: false
+    t.integer "default_duration_minutes", default: 30, null: false
+    t.integer "sort_order", default: 0, null: false
+    t.string "external_provider"
+    t.string "external_id"
+    t.string "external_etag"
+    t.integer "sync_status", default: 0, null: false
+    t.datetime "last_synced_at"
+    t.text "last_sync_error"
+    t.integer "lifecycle_status"
+    t.integer "workflow_status"
+    t.integer "business_type"
+    t.datetime "expiration_date"
+    t.jsonb "metadata", default: {}
+    t.datetime "discarded_at"
+    t.string "permission_resource_name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["business_type"], name: "index_calendar_positions_on_business_type"
+    t.index ["company_id", "name"], name: "index_calendar_positions_on_company_id_and_name", unique: true
+    t.index ["company_id"], name: "index_calendar_positions_on_company_id"
+    t.index ["discarded_at"], name: "index_calendar_positions_on_discarded_at"
+    t.index ["external_provider", "external_id"], name: "index_calendar_positions_on_external_provider_and_external_id"
+    t.index ["lifecycle_status"], name: "index_calendar_positions_on_lifecycle_status"
+    t.index ["workflow_status"], name: "index_calendar_positions_on_workflow_status"
+  end
+
+  create_table "calendar_practitioners", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
+    t.uuid "company_id", null: false
+    t.uuid "calendar_position_id", null: false
+    t.uuid "branch_id"
+    t.string "source_type", null: false
+    t.uuid "source_id", null: false
+    t.string "name", null: false
+    t.string "color"
+    t.boolean "bookable", default: true, null: false
+    t.string "external_provider"
+    t.string "external_id"
+    t.string "external_etag"
+    t.integer "sync_status", default: 0, null: false
+    t.datetime "last_synced_at"
+    t.text "last_sync_error"
+    t.integer "lifecycle_status"
+    t.integer "workflow_status"
+    t.integer "business_type"
+    t.datetime "expiration_date"
+    t.jsonb "metadata", default: {}
+    t.datetime "discarded_at"
+    t.string "permission_resource_name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["branch_id"], name: "index_calendar_practitioners_on_branch_id"
+    t.index ["business_type"], name: "index_calendar_practitioners_on_business_type"
+    t.index ["calendar_position_id", "company_id"], name: "idx_on_calendar_position_id_company_id_e0b823d0d6"
+    t.index ["calendar_position_id"], name: "index_calendar_practitioners_on_calendar_position_id"
+    t.index ["company_id", "source_type", "source_id"], name: "idx_calendar_practitioners_source", unique: true
+    t.index ["company_id"], name: "index_calendar_practitioners_on_company_id"
+    t.index ["discarded_at"], name: "index_calendar_practitioners_on_discarded_at"
+    t.index ["external_provider", "external_id"], name: "idx_on_external_provider_external_id_8b841aa65d"
+    t.index ["lifecycle_status"], name: "index_calendar_practitioners_on_lifecycle_status"
+    t.index ["workflow_status"], name: "index_calendar_practitioners_on_workflow_status"
+  end
+
+  create_table "calendar_procedures", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
+    t.uuid "company_id", null: false
+    t.uuid "calendar_position_id", null: false
+    t.uuid "branch_id"
+    t.string "source_type"
+    t.uuid "source_id"
+    t.string "name", null: false
+    t.string "code"
+    t.string "slug", null: false
+    t.text "description"
+    t.integer "duration_minutes", default: 30, null: false
+    t.integer "buffer_before_minutes", default: 0, null: false
+    t.integer "buffer_after_minutes", default: 0, null: false
+    t.integer "min_lead_minutes", default: 0, null: false
+    t.string "color", default: "#6366f1", null: false
+    t.boolean "requires_location", default: false, null: false
+    t.boolean "requires_equipment", default: false, null: false
+    t.integer "requires_practitioners", default: 1, null: false
+    t.string "external_provider"
+    t.string "external_id"
+    t.string "external_etag"
+    t.integer "sync_status", default: 0, null: false
+    t.datetime "last_synced_at"
+    t.text "last_sync_error"
+    t.integer "lifecycle_status"
+    t.integer "workflow_status"
+    t.integer "business_type"
+    t.datetime "expiration_date"
+    t.jsonb "metadata", default: {}
+    t.datetime "discarded_at"
+    t.string "permission_resource_name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["branch_id"], name: "index_calendar_procedures_on_branch_id"
+    t.index ["business_type"], name: "index_calendar_procedures_on_business_type"
+    t.index ["calendar_position_id"], name: "index_calendar_procedures_on_calendar_position_id"
+    t.index ["company_id", "name"], name: "index_calendar_procedures_on_company_id_and_name", unique: true
+    t.index ["company_id", "slug"], name: "index_calendar_procedures_on_company_id_and_slug", unique: true
+    t.index ["company_id"], name: "index_calendar_procedures_on_company_id"
+    t.index ["discarded_at"], name: "index_calendar_procedures_on_discarded_at"
+    t.index ["external_provider", "external_id"], name: "index_calendar_procedures_on_external_provider_and_external_id"
+    t.index ["lifecycle_status"], name: "index_calendar_procedures_on_lifecycle_status"
+    t.index ["source_type", "source_id"], name: "index_calendar_procedures_on_source_type_and_source_id"
+    t.index ["workflow_status"], name: "index_calendar_procedures_on_workflow_status"
+  end
+
+  create_table "calendar_sync_connections", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
+    t.uuid "company_id", null: false
+    t.string "provider", null: false
+    t.integer "status", default: 0, null: false
+    t.string "external_organization_id"
+    t.string "base_url"
+    t.jsonb "credentials", default: {}
+    t.datetime "last_synced_at"
+    t.text "last_sync_error"
+    t.integer "lifecycle_status"
+    t.integer "workflow_status"
+    t.integer "business_type"
+    t.datetime "expiration_date"
+    t.jsonb "metadata", default: {}
+    t.datetime "discarded_at"
+    t.string "permission_resource_name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["business_type"], name: "index_calendar_sync_connections_on_business_type"
+    t.index ["company_id", "provider"], name: "index_calendar_sync_connections_on_company_id_and_provider", unique: true
+    t.index ["company_id"], name: "index_calendar_sync_connections_on_company_id"
+    t.index ["discarded_at"], name: "index_calendar_sync_connections_on_discarded_at"
+    t.index ["lifecycle_status"], name: "index_calendar_sync_connections_on_lifecycle_status"
+    t.index ["workflow_status"], name: "index_calendar_sync_connections_on_workflow_status"
+  end
+
+  create_table "calendar_sync_logs", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
+    t.uuid "company_id", null: false
+    t.uuid "calendar_sync_connection_id"
+    t.string "provider", null: false
+    t.integer "direction", default: 0, null: false
+    t.string "entity_type"
+    t.uuid "entity_id"
+    t.string "external_id"
+    t.integer "status", default: 0, null: false
+    t.jsonb "request_payload", default: {}
+    t.jsonb "response_payload", default: {}
+    t.text "error_message"
+    t.integer "duration_ms"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["calendar_sync_connection_id"], name: "index_calendar_sync_logs_on_calendar_sync_connection_id"
+    t.index ["company_id", "provider", "created_at"], name: "idx_calendar_sync_logs_company_provider"
+    t.index ["company_id"], name: "index_calendar_sync_logs_on_company_id"
+    t.index ["entity_type", "entity_id"], name: "idx_calendar_sync_logs_entity"
   end
 
   create_table "cart_employee_appointments", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
@@ -2353,58 +2774,6 @@ ActiveRecord::Schema[8.0].define(version: 2026_09_26_000004) do
     t.index ["workflow_status"], name: "index_employee_employee_group_appointments_on_workflow_status"
   end
 
-  create_table "employee_event_appointments", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
-    t.uuid "company_id", null: false
-    t.uuid "employee_id", null: false
-    t.uuid "event_id", null: false
-    t.string "name"
-    t.string "description"
-    t.string "code"
-    t.integer "lifecycle_status"
-    t.integer "workflow_status"
-    t.integer "business_type"
-    t.datetime "expiration_date"
-    t.jsonb "metadata"
-    t.datetime "discarded_at"
-    t.string "permission_resource_name"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.index ["business_type"], name: "index_employee_event_appointments_on_business_type"
-    t.index ["company_id", "employee_id", "event_id"], name: "idx_employee_event_appointments_uniq", unique: true
-    t.index ["company_id"], name: "index_employee_event_appointments_on_company_id"
-    t.index ["discarded_at"], name: "index_employee_event_appointments_on_discarded_at"
-    t.index ["employee_id"], name: "index_employee_event_appointments_on_employee_id"
-    t.index ["event_id"], name: "index_employee_event_appointments_on_event_id"
-    t.index ["lifecycle_status"], name: "index_employee_event_appointments_on_lifecycle_status"
-    t.index ["workflow_status"], name: "index_employee_event_appointments_on_workflow_status"
-  end
-
-  create_table "employee_event_group_appointments", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
-    t.uuid "company_id", null: false
-    t.uuid "employee_id", null: false
-    t.uuid "event_group_id", null: false
-    t.string "name"
-    t.string "description"
-    t.string "code"
-    t.integer "lifecycle_status"
-    t.integer "workflow_status"
-    t.integer "business_type"
-    t.datetime "expiration_date"
-    t.jsonb "metadata"
-    t.datetime "discarded_at"
-    t.string "permission_resource_name"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.index ["business_type"], name: "index_employee_event_group_appointments_on_business_type"
-    t.index ["company_id", "employee_id", "event_group_id"], name: "idx_employee_event_group_appointments_uniq", unique: true
-    t.index ["company_id"], name: "index_employee_event_group_appointments_on_company_id"
-    t.index ["discarded_at"], name: "index_employee_event_group_appointments_on_discarded_at"
-    t.index ["employee_id"], name: "index_employee_event_group_appointments_on_employee_id"
-    t.index ["event_group_id"], name: "index_employee_event_group_appointments_on_event_group_id"
-    t.index ["lifecycle_status"], name: "index_employee_event_group_appointments_on_lifecycle_status"
-    t.index ["workflow_status"], name: "index_employee_event_group_appointments_on_workflow_status"
-  end
-
   create_table "employee_exam_appointments", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
     t.uuid "company_id", null: false
     t.uuid "employee_id", null: false
@@ -3042,116 +3411,6 @@ ActiveRecord::Schema[8.0].define(version: 2026_09_26_000004) do
     t.index ["property_mapping_id"], name: "index_employees_on_property_mapping_id"
     t.index ["user_id"], name: "index_employees_on_user_id"
     t.index ["workflow_status"], name: "index_employees_on_workflow_status"
-  end
-
-  create_table "event_group_tag_appointments", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
-    t.uuid "company_id", null: false
-    t.uuid "event_group_id", null: false
-    t.uuid "tag_id", null: false
-    t.string "value"
-    t.string "name"
-    t.string "description"
-    t.string "code"
-    t.integer "lifecycle_status"
-    t.integer "workflow_status"
-    t.integer "business_type"
-    t.datetime "expiration_date"
-    t.jsonb "metadata"
-    t.datetime "discarded_at"
-    t.string "permission_resource_name"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.index ["business_type"], name: "index_event_group_tag_appointments_on_business_type"
-    t.index ["company_id", "event_group_id", "tag_id"], name: "idx_event_group_tag_appointments_uniq", unique: true
-    t.index ["company_id"], name: "index_event_group_tag_appointments_on_company_id"
-    t.index ["discarded_at"], name: "index_event_group_tag_appointments_on_discarded_at"
-    t.index ["event_group_id"], name: "index_event_group_tag_appointments_on_event_group_id"
-    t.index ["lifecycle_status"], name: "index_event_group_tag_appointments_on_lifecycle_status"
-    t.index ["tag_id"], name: "index_event_group_tag_appointments_on_tag_id"
-    t.index ["workflow_status"], name: "index_event_group_tag_appointments_on_workflow_status"
-  end
-
-  create_table "event_groups", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
-    t.uuid "company_id", null: false
-    t.uuid "branch_id"
-    t.uuid "category_id", null: false
-    t.uuid "property_mapping_id", null: false
-    t.string "name"
-    t.string "description"
-    t.string "code"
-    t.integer "lifecycle_status"
-    t.integer "workflow_status"
-    t.integer "business_type"
-    t.datetime "expiration_date"
-    t.jsonb "metadata"
-    t.datetime "discarded_at"
-    t.string "permission_resource_name"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.index ["branch_id"], name: "index_event_groups_on_branch_id"
-    t.index ["business_type"], name: "index_event_groups_on_business_type"
-    t.index ["category_id"], name: "index_event_groups_on_category_id"
-    t.index ["company_id"], name: "index_event_groups_on_company_id"
-    t.index ["discarded_at"], name: "index_event_groups_on_discarded_at"
-    t.index ["lifecycle_status"], name: "index_event_groups_on_lifecycle_status"
-    t.index ["property_mapping_id"], name: "index_event_groups_on_property_mapping_id"
-    t.index ["workflow_status"], name: "index_event_groups_on_workflow_status"
-  end
-
-  create_table "event_tag_appointments", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
-    t.uuid "company_id", null: false
-    t.uuid "event_id", null: false
-    t.uuid "tag_id", null: false
-    t.string "value"
-    t.string "name"
-    t.string "description"
-    t.string "code"
-    t.integer "lifecycle_status"
-    t.integer "workflow_status"
-    t.integer "business_type"
-    t.datetime "expiration_date"
-    t.jsonb "metadata"
-    t.datetime "discarded_at"
-    t.string "permission_resource_name"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.index ["business_type"], name: "index_event_tag_appointments_on_business_type"
-    t.index ["company_id", "event_id", "tag_id"], name: "idx_event_tag_appointments_uniq", unique: true
-    t.index ["company_id"], name: "index_event_tag_appointments_on_company_id"
-    t.index ["discarded_at"], name: "index_event_tag_appointments_on_discarded_at"
-    t.index ["event_id"], name: "index_event_tag_appointments_on_event_id"
-    t.index ["lifecycle_status"], name: "index_event_tag_appointments_on_lifecycle_status"
-    t.index ["tag_id"], name: "index_event_tag_appointments_on_tag_id"
-    t.index ["workflow_status"], name: "index_event_tag_appointments_on_workflow_status"
-  end
-
-  create_table "events", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
-    t.uuid "event_group_id", null: false
-    t.uuid "company_id", null: false
-    t.uuid "branch_id"
-    t.uuid "category_id", null: false
-    t.uuid "property_mapping_id", null: false
-    t.string "name"
-    t.string "description"
-    t.string "code"
-    t.integer "lifecycle_status"
-    t.integer "workflow_status"
-    t.integer "business_type"
-    t.datetime "expiration_date"
-    t.jsonb "metadata"
-    t.datetime "discarded_at"
-    t.string "permission_resource_name"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.index ["branch_id"], name: "index_events_on_branch_id"
-    t.index ["business_type"], name: "index_events_on_business_type"
-    t.index ["category_id"], name: "index_events_on_category_id"
-    t.index ["company_id"], name: "index_events_on_company_id"
-    t.index ["discarded_at"], name: "index_events_on_discarded_at"
-    t.index ["event_group_id"], name: "index_events_on_event_group_id"
-    t.index ["lifecycle_status"], name: "index_events_on_lifecycle_status"
-    t.index ["property_mapping_id"], name: "index_events_on_property_mapping_id"
-    t.index ["workflow_status"], name: "index_events_on_workflow_status"
   end
 
   create_table "exam_group_tag_appointments", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
@@ -4003,6 +4262,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_09_26_000004) do
     t.uuid "company_id", null: false
     t.uuid "order_id", null: false
     t.uuid "product_id", null: false
+    t.uuid "stock_id"
     t.decimal "unit_price"
     t.integer "quantity"
     t.decimal "total_price"
@@ -4018,7 +4278,6 @@ ActiveRecord::Schema[8.0].define(version: 2026_09_26_000004) do
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.uuid "stock_id"
     t.index ["business_type"], name: "index_order_product_appointments_on_business_type"
     t.index ["company_id", "order_id", "product_id"], name: "idx_order_product_appointments_triple"
     t.index ["company_id"], name: "index_order_product_appointments_on_company_id"
@@ -4034,6 +4293,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_09_26_000004) do
     t.uuid "company_id", null: false
     t.uuid "order_id", null: false
     t.uuid "product_group_id", null: false
+    t.uuid "stock_id"
     t.decimal "unit_price"
     t.integer "quantity"
     t.decimal "total_price"
@@ -4049,7 +4309,6 @@ ActiveRecord::Schema[8.0].define(version: 2026_09_26_000004) do
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.uuid "stock_id"
     t.index ["business_type"], name: "index_order_product_group_appointments_on_business_type"
     t.index ["company_id", "order_id", "product_group_id"], name: "idx_order_product_group_appointments_triple"
     t.index ["company_id"], name: "index_order_product_group_appointments_on_company_id"
@@ -4065,6 +4324,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_09_26_000004) do
     t.uuid "company_id", null: false
     t.uuid "order_id", null: false
     t.uuid "service_id", null: false
+    t.uuid "stock_id"
     t.decimal "unit_price"
     t.integer "quantity"
     t.decimal "total_price"
@@ -4080,7 +4340,6 @@ ActiveRecord::Schema[8.0].define(version: 2026_09_26_000004) do
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.uuid "stock_id"
     t.index ["business_type"], name: "index_order_service_appointments_on_business_type"
     t.index ["company_id", "order_id", "service_id"], name: "idx_order_service_appointments_triple"
     t.index ["company_id"], name: "index_order_service_appointments_on_company_id"
@@ -4096,6 +4355,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_09_26_000004) do
     t.uuid "company_id", null: false
     t.uuid "order_id", null: false
     t.uuid "service_group_id", null: false
+    t.uuid "stock_id"
     t.decimal "unit_price"
     t.integer "quantity"
     t.decimal "total_price"
@@ -4111,7 +4371,6 @@ ActiveRecord::Schema[8.0].define(version: 2026_09_26_000004) do
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.uuid "stock_id"
     t.index ["business_type"], name: "index_order_service_group_appointments_on_business_type"
     t.index ["company_id", "order_id", "service_group_id"], name: "idx_order_service_group_appointments_triple"
     t.index ["company_id"], name: "index_order_service_group_appointments_on_company_id"
@@ -4127,6 +4386,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_09_26_000004) do
     t.uuid "company_id", null: false
     t.uuid "order_id", null: false
     t.uuid "subscription_plan_id", null: false
+    t.uuid "stock_id"
     t.decimal "unit_price"
     t.integer "quantity"
     t.decimal "total_price"
@@ -4142,7 +4402,6 @@ ActiveRecord::Schema[8.0].define(version: 2026_09_26_000004) do
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.uuid "stock_id"
     t.index ["business_type"], name: "index_order_subscription_plan_appointments_on_business_type"
     t.index ["company_id", "order_id", "subscription_plan_id"], name: "idx_order_subscription_plan_appointments_triple"
     t.index ["company_id"], name: "index_order_subscription_plan_appointments_on_company_id"
@@ -7704,6 +7963,39 @@ ActiveRecord::Schema[8.0].define(version: 2026_09_26_000004) do
   add_foreign_key "brands", "categories"
   add_foreign_key "brands", "companies"
   add_foreign_key "brands", "property_mappings"
+  add_foreign_key "calendar_availability_rules", "calendar_locations"
+  add_foreign_key "calendar_availability_rules", "calendar_practitioners"
+  add_foreign_key "calendar_availability_rules", "companies"
+  add_foreign_key "calendar_equipments", "branches"
+  add_foreign_key "calendar_equipments", "companies"
+  add_foreign_key "calendar_event_equipments", "calendar_equipments"
+  add_foreign_key "calendar_event_equipments", "calendar_events"
+  add_foreign_key "calendar_event_equipments", "companies"
+  add_foreign_key "calendar_event_locations", "calendar_events"
+  add_foreign_key "calendar_event_locations", "calendar_locations"
+  add_foreign_key "calendar_event_locations", "companies"
+  add_foreign_key "calendar_event_participants", "calendar_events"
+  add_foreign_key "calendar_event_participants", "calendar_participants"
+  add_foreign_key "calendar_event_participants", "companies"
+  add_foreign_key "calendar_event_practitioners", "calendar_events"
+  add_foreign_key "calendar_event_practitioners", "calendar_practitioners"
+  add_foreign_key "calendar_event_practitioners", "companies"
+  add_foreign_key "calendar_events", "branches"
+  add_foreign_key "calendar_events", "calendar_procedures"
+  add_foreign_key "calendar_events", "companies"
+  add_foreign_key "calendar_locations", "branches"
+  add_foreign_key "calendar_locations", "companies"
+  add_foreign_key "calendar_participants", "companies"
+  add_foreign_key "calendar_positions", "companies"
+  add_foreign_key "calendar_practitioners", "branches"
+  add_foreign_key "calendar_practitioners", "calendar_positions"
+  add_foreign_key "calendar_practitioners", "companies"
+  add_foreign_key "calendar_procedures", "branches"
+  add_foreign_key "calendar_procedures", "calendar_positions"
+  add_foreign_key "calendar_procedures", "companies"
+  add_foreign_key "calendar_sync_connections", "companies"
+  add_foreign_key "calendar_sync_logs", "calendar_sync_connections"
+  add_foreign_key "calendar_sync_logs", "companies"
   add_foreign_key "cart_employee_appointments", "carts"
   add_foreign_key "cart_employee_appointments", "companies"
   add_foreign_key "cart_employee_appointments", "employees"
@@ -7821,12 +8113,6 @@ ActiveRecord::Schema[8.0].define(version: 2026_09_26_000004) do
   add_foreign_key "employee_employee_group_appointments", "companies"
   add_foreign_key "employee_employee_group_appointments", "employee_groups"
   add_foreign_key "employee_employee_group_appointments", "employees"
-  add_foreign_key "employee_event_appointments", "companies"
-  add_foreign_key "employee_event_appointments", "employees"
-  add_foreign_key "employee_event_appointments", "events"
-  add_foreign_key "employee_event_group_appointments", "companies"
-  add_foreign_key "employee_event_group_appointments", "employees"
-  add_foreign_key "employee_event_group_appointments", "event_groups"
   add_foreign_key "employee_exam_appointments", "companies"
   add_foreign_key "employee_exam_appointments", "employees"
   add_foreign_key "employee_exam_appointments", "exams"
@@ -7887,21 +8173,6 @@ ActiveRecord::Schema[8.0].define(version: 2026_09_26_000004) do
   add_foreign_key "employees", "companies"
   add_foreign_key "employees", "property_mappings"
   add_foreign_key "employees", "users"
-  add_foreign_key "event_group_tag_appointments", "companies"
-  add_foreign_key "event_group_tag_appointments", "event_groups"
-  add_foreign_key "event_group_tag_appointments", "tags"
-  add_foreign_key "event_groups", "branches"
-  add_foreign_key "event_groups", "categories"
-  add_foreign_key "event_groups", "companies"
-  add_foreign_key "event_groups", "property_mappings"
-  add_foreign_key "event_tag_appointments", "companies"
-  add_foreign_key "event_tag_appointments", "events"
-  add_foreign_key "event_tag_appointments", "tags"
-  add_foreign_key "events", "branches"
-  add_foreign_key "events", "categories"
-  add_foreign_key "events", "companies"
-  add_foreign_key "events", "event_groups"
-  add_foreign_key "events", "property_mappings"
   add_foreign_key "exam_group_tag_appointments", "companies"
   add_foreign_key "exam_group_tag_appointments", "exam_groups"
   add_foreign_key "exam_group_tag_appointments", "tags"

@@ -30,10 +30,6 @@ RSpec.describe Tag, type: :model do
     it { should have_many(:employees).through(:employee_tag_appointments) }
     it { should have_many(:employee_group_tag_appointments).dependent(:destroy) }
     it { should have_many(:employee_groups).through(:employee_group_tag_appointments) }
-    it { should have_many(:event_tag_appointments).dependent(:destroy) }
-    it { should have_many(:events).through(:event_tag_appointments) }
-    it { should have_many(:event_group_tag_appointments).dependent(:destroy) }
-    it { should have_many(:event_groups).through(:event_group_tag_appointments) }
     it { should have_many(:exam_tag_appointments).dependent(:destroy) }
     it { should have_many(:exams).through(:exam_tag_appointments) }
     it { should have_many(:exam_group_tag_appointments).dependent(:destroy) }

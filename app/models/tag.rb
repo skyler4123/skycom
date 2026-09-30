@@ -29,10 +29,6 @@ class Tag < ApplicationRecord
   has_many :employees, through: :employee_tag_appointments
   has_many :employee_group_tag_appointments, dependent: :destroy
   has_many :employee_groups, through: :employee_group_tag_appointments
-  has_many :event_tag_appointments, dependent: :destroy
-  has_many :events, through: :event_tag_appointments
-  has_many :event_group_tag_appointments, dependent: :destroy
-  has_many :event_groups, through: :event_group_tag_appointments
   has_many :exam_tag_appointments, dependent: :destroy
   has_many :exams, through: :exam_tag_appointments
   has_many :exam_group_tag_appointments, dependent: :destroy

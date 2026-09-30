@@ -2,5 +2,12 @@
   <h1 class="font-bold text-4xl">Demo#index</h1>
   <p>Find me in app/views/demo/index.html.erb</p>
   <!-- app/views/some_page.html.erb -->
-  <div data-controller="calendar" class="min-h-screen bg-gray-50 py-8"></div>
+  <!--
+    The calendar widget requires an api-url value (no default). The /demo mock
+    returns a bare array; the Calendar/Schedule board returns { events: [...] }.
+    See docs/CALENDAR.md.
+  -->
+  <div data-controller="calendar"
+       data-calendar-api-url-value="/demo/calendar_events"
+       class="min-h-screen bg-gray-50 py-8"></div>
 </div>

@@ -71,6 +71,7 @@ class Seed::HospitalEnrichService
     create_shifts
     create_attendance_policies
     create_attendance_event_data
+    seed_calendar_data
     seed_credit_data
 
     print_footer
@@ -646,6 +647,19 @@ class Seed::HospitalEnrichService
   def round_robin(categories, index)
     return nil if categories.blank?
     categories[index % categories.length]
+  end
+
+  # Calendar/Schedule module — the dental booking scenario (docs/CALENDAR.md §9).
+  # Runs after facilities/employees/patients/stocks exist because the calendar
+  # bridges to all of them.
+  def seed_calendar_data
+    Seed::CalendarEnrichService.new(
+      company: @company,
+      employees: @employees,
+      patients: @patients,
+      facilities: @facilities,
+      stocks: @company.stocks.limit(4).to_a
+    )
   end
 
   def seed_credit_data

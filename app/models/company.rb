@@ -22,6 +22,8 @@ class Company < ApplicationRecord
     Page CompanyPaymentMethodAppointment ShiftTemplate ScheduledShift
     AttendancePolicy AttendanceLog AttendanceDay AttendanceMonth
     Stock StockTransfer StockImport StockExport StockAdjustment
+    CalendarPosition CalendarPractitioner CalendarLocation CalendarEquipment
+    CalendarParticipant CalendarProcedure CalendarEvent CalendarAvailabilityRule
   ].freeze
   class_attribute :skip_init, default: false
   # Creation-time-only flag: System#ensure_company! marks its auto-created
@@ -84,6 +86,23 @@ class Company < ApplicationRecord
   has_many :attendance_days, dependent: :destroy
   has_many :attendance_months, dependent: :destroy
   has_many :attendance_policies, dependent: :destroy
+
+  # --- Calendar / Schedule (isolated module — see docs/CALENDAR.md) ---
+  has_many :calendar_positions, dependent: :destroy
+  has_many :calendar_practitioners, dependent: :destroy
+  has_many :calendar_locations, dependent: :destroy
+  has_many :calendar_equipments, dependent: :destroy
+  has_many :calendar_participants, dependent: :destroy
+  has_many :calendar_procedures, dependent: :destroy
+  has_many :calendar_events, dependent: :destroy
+  has_many :calendar_event_practitioners, dependent: :destroy
+  has_many :calendar_event_locations, dependent: :destroy
+  has_many :calendar_event_equipment, dependent: :destroy
+  has_many :calendar_event_participants, dependent: :destroy
+  has_many :calendar_availability_rules, dependent: :destroy
+  has_many :calendar_sync_connections, dependent: :destroy
+  has_many :calendar_sync_logs, dependent: :destroy
+
   has_many :facility_groups, dependent: :destroy
   has_many :facilities, dependent: :destroy
   has_many :service_groups, dependent: :destroy
