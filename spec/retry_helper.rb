@@ -1,26 +1,29 @@
 # spec/spec_helper.rb
 require 'rspec/retry'
 
-RSpec.configure do |config|
-  # show retry status in spec process
-  config.verbose_retry = true
-  # show exception that triggers a retry if verbose_retry is set to true
-  config.display_try_failure_messages = true
+# Only enable retries when running under parallel_tests worker processes
+if ENV['TEST_ENV_NUMBER'].present?
+  RSpec.configure do |config|
+    # show retry status in spec process
+    # config.verbose_retry = true
+    # show exception that triggers a retry if verbose_retry is set to true
+    # config.display_try_failure_messages = true
 
-  # Retry failed examples
-  config.default_retry_count = 3
+    # Retry failed examples
+    config.default_retry_count = 5
 
-  # run retry only on features
-  config.around :each, :js do |ex|
-    ex.run_with_retry retry: 3
-  end
+    # run retry only on features
+    # config.around :each, :js do |ex|
+    #   ex.run_with_retry retry: 5
+    # end
 
-  # callback to be run between retries
-  config.retry_callback = proc do |ex|
-    # run some additional clean up task - can be filtered by example metadata
-    if ex.metadata[:js]
-      Capybara.reset!
-      Faker::UniqueGenerator.clear
+    # callback to be run between retries
+    config.retry_callback = proc do |ex|
+      # run some additional clean up task - can be filtered by example metadata
+      if ex.metadata[:js]
+        Capybara.reset!
+        Faker::UniqueGenerator.clear
+      end
     end
   end
 end

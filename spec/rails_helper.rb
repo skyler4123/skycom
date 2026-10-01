@@ -1,3 +1,5 @@
+# spec/rails_helper.rb
+
 # This file is copied to spec/ when you run 'rails generate rspec:install'
 require 'spec_helper'
 ENV['RAILS_ENV'] ||= 'test'
@@ -80,7 +82,7 @@ require "before_helper"
 require "cache_helper"
 require "factory_bot_rails_helper"
 require "shoulda_matchers_helper"
-# require "retry_helper"
+require "retry_helper"
 require "selenium_helper"
 require "sign_in_helper"
 require "simplecov_helper"

@@ -535,6 +535,8 @@ GEM
       activerecord (>= 7.1)
       request_store (~> 1.4)
     parallel (2.1.0)
+    parallel_tests (5.8.0)
+      parallel
     parser (3.3.12.0)
       ast (~> 2.4.1)
       racc
@@ -800,6 +802,7 @@ DEPENDENCIES
   opentelemetry-sdk
   pagy
   paper_trail
+  parallel_tests
   pg (~> 1.1)
   propshaft
   puma (>= 5.0)

@@ -5,6 +5,7 @@
 - `bin/rubocop` - Lint Ruby code
 - `bin/brakeman` - Security scan
 - `bin/rails` - Standard Rails commands
+- `bundle exec parallel_rspec -n 10 [paths]` - Run tests (parallel, 10 workers). See `docs/PARALLEL_TESTS.md`.
 
 ## Pre-Commit Checklist
 - **Update** `docs/MODEL_CALLBACKS.md` if model/concern callbacks were added or modified
@@ -39,6 +40,11 @@
 ## Database
 - Check `db/schema.rb` first for columns/indexes
 - Use `includes`/`eager_load`/`preload` to prevent N+1
+
+## Testing
+- **ALWAYS** `bundle exec parallel_rspec -n 10 [paths]` — never bare `parallel_rspec` (raises errors), never `bundle exec rspec` for verification (single process), never `docker exec ... rspec` (compose runs services only, web/job via `bin/dev`). See `docs/PARALLEL_TESTS.md`.
+- Docs keep `bundle exec rspec ...` as source of truth (runner-swappable) — that does not change what the agent runs.
+- Parallel DBs are already set up locally. Only if worker DBs are missing, run once: `RAILS_ENV=test bundle exec rake "parallel:create[10]"` then `RAILS_ENV=test bundle exec rake "parallel:load_schema[10]"`.
 
 ## Model Structure
 - All `app/models/*.rb` follow the canonical order in `docs/MODEL_STRUCTURE.md` (concerns → constants → attributes → enums → macros → associations → scopes → validations → callbacks → methods). Run `bin/rubocop` to verify.
