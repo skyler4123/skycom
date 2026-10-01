@@ -425,28 +425,27 @@ class Seed::RetailEnrichService
           lifecycle_status: :active
         )
         attach_movement_lines(document: transfer, warehouse: warehouse, product: product,
-          quantity: transfer.quantity, index: i)
+          quantity: transfer.quantity)
       end
     end
   end
 
   # Seeded show pages render line rows; seeded quantities were written
   # directly by Seed::StockService, so lines attach WITHOUT ledger rows
-  # (ledger callbacks would double-count). Every 3rd doc splits into 2 lines
-  # to demo multi-line documents.
-  def attach_movement_lines(document:, warehouse:, product:, quantity:, index:)
+  # (ledger callbacks would double-count). Every doc carries up to 3 lines
+  # so multi-line show pages always have something to display; fewer when
+  # the warehouse holds fewer stocks or the quantity is tiny.
+  def attach_movement_lines(document:, warehouse:, product:, quantity:)
     company = document.company
-    if index % 3 == 2
-      other = Stock.where(company: company, warehouse: warehouse).where.not(product_id: product.id).first
-      if other && quantity.to_i >= 2
-        first_qty = quantity.to_i / 2
-        Seed::StockLineService.attach!(document: document, company: company, warehouse: warehouse,
-          lines: [ [ product, first_qty ], [ other.product, quantity.to_i - first_qty ] ])
-        return
-      end
-    end
+    total = quantity.to_i
+    others = Stock.where(company: company, warehouse: warehouse)
+      .where.not(product_id: product.id).order(:id).limit(2).to_a
+    line_count = [ 1 + others.size, total ].min
+    line_count = 1 if line_count < 1
+    quantities = Seed::StockLineService.split_quantity(total, line_count)
+    products = ([ product ] + others.map(&:product)).first(line_count)
     Seed::StockLineService.attach!(document: document, company: company, warehouse: warehouse,
-      lines: [ [ product, quantity ] ])
+      lines: products.zip(quantities))
   end
 
   def create_stock_imports
@@ -473,7 +472,7 @@ class Seed::RetailEnrichService
           lifecycle_status: :active
         )
         attach_movement_lines(document: import, warehouse: branch_warehouse, product: product,
-          quantity: qty, index: i)
+          quantity: qty)
       end
     end
   end
@@ -502,7 +501,7 @@ class Seed::RetailEnrichService
           lifecycle_status: :active
         )
         attach_movement_lines(document: export, warehouse: branch_warehouse, product: product,
-          quantity: qty, index: i)
+          quantity: qty)
       end
     end
   end
@@ -540,7 +539,7 @@ class Seed::RetailEnrichService
         lifecycle_status: :active
       )
       attach_movement_lines(document: adjustment, warehouse: warehouse, product: stock.product,
-        quantity: qty, index: i)
+        quantity: qty)
     end
   end
 

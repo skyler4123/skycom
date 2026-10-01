@@ -54,7 +54,7 @@ RSpec.describe "Stock movement enrich seeding" do
       assert_lines_sum_to_header(StockExport.where(company: company), :stock_export_stock_appointments)
     end
 
-    it "splits every third document into two lines" do
+    it "seeds up to 3 lines per transfer so show pages always have items" do
       company, user, branch, warehouse, products = build_universe
       service = Seed::RetailEnrichService.allocate
       service.instance_variable_set(:@retail, company)
@@ -64,10 +64,11 @@ RSpec.describe "Stock movement enrich seeding" do
 
       service.send(:create_stock_transfers)
 
-      multi = StockTransfer.where(company: company).select do |t|
-        t.stock_transfer_stock_appointments.size == 2
+      docs = StockTransfer.where(company: company)
+      expect(docs).not_to be_empty
+      docs.each do |t|
+        expect(t.stock_transfer_stock_appointments.size).to be_between(2, 3)
       end
-      expect(multi).not_to be_empty
     end
 
     it "seeds adjustments with lines and leaves quantities untouched" do

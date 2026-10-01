@@ -51,7 +51,7 @@ During development seeding, `Seed::RetailEnrichService` adds sample business dat
 | Products | 28 (14 per branch) |
 | Services | 10 (5 per branch) |
 | Stocks | ~28 |
-| Stock Transfers/Imports/Exports | ~48 (each with line rows summing to the header; every 3rd doc splits into 2 lines) |
+| Stock Transfers/Imports/Exports | ~48 (each with up to 3 line rows summing to the header) |
 | Stock Adjustments | ≤3 (increase + decreases, with line rows; lines only, no ledger — seeded quantities were written directly) |
 | Orders + OrderAppointments | ~10 + ~30 |
 | Invoices | ~10 |

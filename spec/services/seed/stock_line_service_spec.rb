@@ -41,7 +41,25 @@ RSpec.describe Seed::StockLineService do
       expect(line.stock_id).to eq(stock_a.id)
       expect(line.quantity).to eq(4)
     end
+  end
 
+  describe ".split_quantity" do
+    it "splits evenly with remainder spread over leading parts" do
+      expect(described_class.split_quantity(10, 3)).to eq([ 4, 3, 3 ])
+    end
+
+    it "returns singletons and preserves the total" do
+      expect(described_class.split_quantity(1, 1)).to eq([ 1 ])
+      [ 7, 60, 101 ].each do |total|
+        parts = described_class.split_quantity(total, 3)
+        expect(parts.size).to eq(3)
+        expect(parts.sum).to eq(total)
+        expect(parts).to all(be >= 1)
+      end
+    end
+  end
+
+  describe "missing stock" do
     it "raises a naming error when a product has no stock row in the warehouse" do
       other_product = create(:product, company: company, name: "Ghost #{SecureRandom.hex(4)}")
       export = Seed::StockExportService.create(company: company, warehouse: warehouse, product: product_a)
