@@ -77,6 +77,7 @@ group :test do
   gem "rack-test"
   gem "vcr"
   gem "rspec-retry"
+  gem "parallel_tests"
 end
 gem "authentication-zero"
 # Use OmniAuth to support multi-provider authentication [https://github.com/omniauth/omniauth]

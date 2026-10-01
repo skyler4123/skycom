@@ -141,16 +141,16 @@ development:
 test:
   primary:
     <<: *postgresql
-    database: skycom_test
+    database: skycom_test<%= ENV['TEST_ENV_NUMBER'] %>
   queue:
     <<: *queue
-    database: queue_test
+    database: queue_test<%= ENV['TEST_ENV_NUMBER'] %>
   cable:
     <<: *cable
-    database: storage/test_cable.sqlite3
+    database: storage/test_cable<%= ENV['TEST_ENV_NUMBER'] %>.sqlite3
   cache:
     <<: *cache
-    database: storage/test_cache.sqlite3
+    database: storage/test_cache<%= ENV['TEST_ENV_NUMBER'] %>.sqlite3
 
 production:
   primary:

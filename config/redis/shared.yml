@@ -14,6 +14,12 @@ development: &development
   # db: <%= ENV.fetch("REDIS_SHARED_DB", "11") %>
 
 test:
-  url: <%= Rails.application.credentials.dig(:redis_url_test) || "redis://127.0.0.1:6379/0" %>
+  url: <%= 
+    base_url = Rails.application.credentials.dig(:redis_url_test) || "redis://127.0.0.1:6379/0"
+    worker_id = (ENV['TEST_ENV_NUMBER'].presence || 1).to_i
+    uri = URI.parse(base_url)
+    uri.path = "/#{worker_id}"
+    uri.to_s
+  %>
   timeout: 1
 
