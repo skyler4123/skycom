@@ -243,5 +243,12 @@ export const edit_company_stock_transfer_path = (companyId, id) => `/companies/$
 export const initiate_company_stock_transfer_path = (companyId, id) => `/companies/${companyId}/stock_transfers/${id}/initiate`
 export const receive_company_stock_transfer_path = (companyId, id) => `/companies/${companyId}/stock_transfers/${id}/receive`
 export const cancel_company_stock_transfer_path = (companyId, id) => `/companies/${companyId}/stock_transfers/${id}/cancel`
+export const company_stock_pendings_path = (companyId) => `/companies/${companyId}/stock_pendings`
+export const create_company_stock_pendings_path = (companyId) => `/companies/${companyId}/stock_pendings`
+export const new_company_stock_pending_path = (companyId) => `/companies/${companyId}/stock_pendings/new`
+export const company_stock_pending_path = (companyId, id) => `/companies/${companyId}/stock_pendings/${id}`
+export const edit_company_stock_pending_path = (companyId, id) => `/companies/${companyId}/stock_pendings/${id}/edit`
+export const release_company_stock_pending_path = (companyId, id) => `/companies/${companyId}/stock_pendings/${id}/release`
+export const cancel_company_stock_pending_path = (companyId, id) => `/companies/${companyId}/stock_pendings/${id}/cancel`
 
 export const company_analytics_path = (companyId) => `/companies/${companyId}/analytics`

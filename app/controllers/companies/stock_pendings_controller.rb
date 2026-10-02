@@ -35,6 +35,7 @@ class Companies::StockPendingsController < Companies::ApplicationController
 
         render json: {
           stock_pendings: format_stock_pendings(@pendings_results),
+          warehouses: current_company.warehouses.order(:name).map { |w| w.as_json(only: [ :id, :name ]) },
           pagination: @pagy.data_hash
         }
       end

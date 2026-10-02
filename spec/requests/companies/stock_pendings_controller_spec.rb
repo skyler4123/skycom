@@ -40,6 +40,7 @@ RSpec.describe "Companies::StockPendingsController", type: :request do
       expect(body["stock_pendings"].size).to eq(1)
       expect(body["stock_pendings"].first["quantity"]).to eq(3)
       expect(body).to have_key("pagination")
+      expect(body["warehouses"].map { |w| w["id"] }).to include(warehouse.id)
     end
 
     it "scopes to the current company" do
