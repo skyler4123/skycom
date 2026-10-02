@@ -61,6 +61,7 @@ class Seed::HospitalEnrichService
     create_pharmacy_products
     create_warehouses_for_branches
     create_stocks_for_products
+    create_stock_pendings
     create_stock_transfers
     create_stock_imports
     create_stock_exports
@@ -283,6 +284,35 @@ class Seed::HospitalEnrichService
           quantity: rand(20..120),
           pending: 0,
           name: product.name
+        )
+      end
+    end
+  end
+
+  # One holding + one released pending per warehouse (round-robin stocks —
+  # never random-first — so every warehouse shows both states). Holds go
+  # through HoldService, so seeded `pending` numbers are real.
+  def create_stock_pendings
+    puts "Creating stock pendings..."
+    @warehouses.each do |warehouse|
+      stocks = Stock.where(company: @company, warehouse: warehouse).order(:id).to_a
+      next if stocks.empty?
+
+      holding_stock = stocks.first
+      if holding_stock.available_count >= 1
+        Seed::StockPendingService.create(
+          company: @company, warehouse: warehouse, stock: holding_stock,
+          quantity: [ rand(1..3), holding_stock.available_count ].min,
+          business_type: :manual, reason: "Cycle count hold"
+        )
+      end
+
+      released_stock = stocks.second || stocks.first
+      if released_stock.available_count >= 1
+        Seed::StockPendingService.create(
+          company: @company, warehouse: warehouse, stock: released_stock,
+          quantity: [ rand(1..3), released_stock.available_count ].min,
+          business_type: :event, reason: "Clinic event hold", release: true
         )
       end
     end

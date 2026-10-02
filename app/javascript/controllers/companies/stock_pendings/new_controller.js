@@ -41,11 +41,23 @@ export default class Companies_StockPendings_NewController extends Companies_Lay
   onWarehouseChange(event) {
     this.warehouseId = event.target.value || null
     this.stockId = null
-    this.renderContent()
+    const stockSelect = this.element.querySelector("#pending-stock-select")
+    if (stockSelect) stockSelect.innerHTML = this.stockOptions()
+    const hint = this.element.querySelector("#pending-available-hint")
+    if (hint) hint.innerHTML = ""
   }
 
   onStockChange(event) {
     this.stockId = event.target.value || null
+    const hint = this.element.querySelector("#pending-available-hint")
+    const selected = this.selectedStock()
+    if (hint) hint.innerHTML = selected ? `${translate("Available")}: ${selected.available}` : ""
+  }
+
+  stockOptions() {
+    return `<option value="">—</option>` + this.warehouseStocks().map(s =>
+      `<option value="${s.id}" ${s.id === this.stockId ? "selected" : ""}>${s.product_name} (${translate("Available")}: ${s.available})</option>`
+    ).join("")
   }
 
   warehouseStocks() {
@@ -96,16 +108,15 @@ export default class Companies_StockPendings_NewController extends Companies_Lay
           <div class="grid grid-cols-2 gap-4">
             <div class="space-y-1">
               <label class="${labelClass}">${translate("Warehouse")}</label>
-              <select data-action="change->${this.identifier}#onWarehouseChange" class="${inputClass} cursor-pointer">
+              <select name="warehouse_id" data-action="change->${this.identifier}#onWarehouseChange" class="${inputClass} cursor-pointer">
                 <option value="">—</option>
                 ${this.warehouses.map(w => `<option value="${w.id}" ${w.id === this.warehouseId ? "selected" : ""}>${w.name}</option>`).join("")}
               </select>
             </div>
             <div class="space-y-1">
               <label class="${labelClass}">${translate("Stock")}</label>
-              <select name="stock_pending[stock_id]" data-action="change->${this.identifier}#onStockChange" class="${inputClass} cursor-pointer">
-                <option value="">—</option>
-                ${this.warehouseStocks().map(s => `<option value="${s.id}" ${s.id === this.stockId ? "selected" : ""}>${s.product_name} (${translate("Available")}: ${s.available})</option>`).join("")}
+              <select id="pending-stock-select" name="stock_pending[stock_id]" data-action="change->${this.identifier}#onStockChange" class="${inputClass} cursor-pointer">
+                ${this.stockOptions()}
               </select>
             </div>
             <div class="space-y-1">
@@ -129,7 +140,7 @@ export default class Companies_StockPendings_NewController extends Companies_Lay
             </div>
           </div>
 
-          ${selected ? `<p class="text-sm text-slate-500 dark:text-slate-400">${translate("Available")}: ${selected.available}</p>` : ""}
+          <p id="pending-available-hint" class="text-sm text-slate-500 dark:text-slate-400">${selected ? `${translate("Available")}: ${selected.available}` : ""}</p>
 
           <div class="flex justify-end gap-3 pt-2">
             <a href="${Helpers.company_stock_pendings_path(currentCompany().id)}" class="px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-100 rounded-lg cursor-pointer">${translate("Cancel")}</a>
