@@ -464,21 +464,24 @@ after the ledger row exists).
 ## 7. KRedis Stock Tracking
 
 Stock availability runs on a Redis hot counter (`stock:<id>:available`)
-mirroring `quantity − pending`, accessed only through the `Stock` wrappers
-(`available_count` / `reserve_stock!` / `release_reserved!` — see
-`docs/KREDIS.md`). Full mechanics — the single write path, healing,
-reservation flow, and counter lifecycle — live in `docs/STOCK.md` (§1–§3).
+mirroring `quantity − pending`, read through `available_count` (see
+`docs/KREDIS.md`). Holds live behind `StockPending` rows — one `pos` hold per
+pay line via `StockPendings::HoldService`, each with its own anchored `hold`
+ledger row whose callback moves `pending`. Full mechanics — the single write
+path, healing, reservation flow, and counter lifecycle — live in `docs/STOCK.md`
+(§1–§3).
 
 POS usage:
 
 ```
 Checkout ─► reads availability (Redis counter; heals from DB if missing)
-Pay      ─► reserve_stock!: DECRBY available_counter + DB pending += qty
-Finalize ─► ledger callback writes DB quantity; hold released (pending -= qty)
+Pay      ─► HoldService per line: StockPending + hold ledger (pending += qty)
+Finalize ─► TWO ledger rows per line: pending release + quantity remove
+Cancel   ─► ReleaseService per line (pending -= qty, row → completed/cancelled)
 ```
 
-On reservation failure (`reserve_stock!` returns `false`), prior holds roll
-back via `release_reserved!` and the pay action returns 422.
+On reservation failure (any line's hold rejected), prior holds release via
+`ReleaseService` and the pay action returns 422.
 
 ---
 
