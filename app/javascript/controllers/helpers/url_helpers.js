@@ -172,6 +172,16 @@ export const company_reports_path = (companyId) => `/companies/${companyId}/repo
 export const company_documents_path = (companyId) => `/companies/${companyId}/documents`
 export const company_announcements_path = (companyId) => `/companies/${companyId}/announcements`
 export const company_events_path = (companyId) => `/companies/${companyId}/events`
+export const new_company_event_path = (companyId) => `/companies/${companyId}/events/new`
+export const create_company_events_path = (companyId) => `/companies/${companyId}/events`
+export const company_event_path = (companyId, eventId) => `/companies/${companyId}/events/${eventId}`
+export const edit_company_event_path = (companyId, eventId) => `/companies/${companyId}/events/${eventId}/edit`
+export const company_event_configs_path = (companyId) => `/companies/${companyId}/event_configs`
+export const new_company_event_config_path = (companyId) => `/companies/${companyId}/event_configs/new`
+export const create_company_event_configs_path = (companyId) => `/companies/${companyId}/event_configs`
+export const company_event_config_path = (companyId, configId) => `/companies/${companyId}/event_configs/${configId}`
+export const edit_company_event_config_path = (companyId, configId) => `/companies/${companyId}/event_configs/${configId}/edit`
+export const company_calendar_path = (companyId) => `/companies/${companyId}/calendar`
 export const company_discounts_path = (companyId) => `/companies/${companyId}/discounts`
 // Discount groups (Discount FE — docs/superpowers/specs/2026-09-22-discounts-frontend-design.md)
 export const company_discount_groups_path = (companyId) => `/companies/${companyId}/discount_groups`

@@ -22,6 +22,7 @@ class Company < ApplicationRecord
     Page CompanyPaymentMethodAppointment ShiftTemplate ScheduledShift
     AttendancePolicy AttendanceLog AttendanceDay AttendanceMonth
     Stock StockTransfer StockImport StockExport StockAdjustment StockPending
+    Event EventGroup EventConfig
   ].freeze
   class_attribute :skip_init, default: false
   # Creation-time-only flag: System#ensure_company! marks its auto-created
@@ -109,6 +110,9 @@ class Company < ApplicationRecord
   has_many :invoices, dependent: :destroy
   has_many :discount_groups, dependent: :destroy
   has_many :discounts, dependent: :destroy
+  has_many :events, dependent: :destroy
+  has_many :event_groups, dependent: :destroy
+  has_many :event_configs, dependent: :destroy
   has_many :task_groups, dependent: :destroy
   has_many :project_groups, dependent: :destroy
   has_many :cart_groups, dependent: :destroy

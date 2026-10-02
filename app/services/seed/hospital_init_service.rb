@@ -147,6 +147,20 @@ class Seed::HospitalInitService
         properties: { property_string_1: "Warranty (months)", property_decimal_1: "Unit Cost" },
         visible_columns: %w[name code unit estimated_unit_price]
       }
+    },
+    events: {
+      "Procedure Booking" => {
+        properties: { property_string_1: "Procedure Type", property_integer_1: "Duration (minutes)" },
+        visible_columns: %w[name code property_string_1 property_integer_1 workflow_status]
+      },
+      "Ward Stay" => {
+        properties: { property_string_1: "Ward Number", property_datetime_1: "Admission Time" },
+        visible_columns: %w[name code property_string_1 workflow_status]
+      },
+      "Consultation" => {
+        properties: { property_string_1: "Specialty", property_integer_1: "Duration (minutes)" },
+        visible_columns: %w[name code property_string_1 workflow_status]
+      }
     }
   }.freeze
 
@@ -163,6 +177,7 @@ class Seed::HospitalInitService
     create_categories
     create_table_configs
     create_default_workflows
+    create_default_event_configs
     configure_hospital_permissions
   end
 
@@ -244,6 +259,25 @@ class Seed::HospitalInitService
   def configure_hospital_permissions
     create_all_crud_policies
     assign_policies_to_roles
+  end
+
+  # One EventConfig per events category (docs/EVENTS.md): bookings that need
+  # goods hold stock and bill an order; plain visits opt out.
+  EVENT_CONFIG_DEFAULTS = {
+    "Procedure Booking" => { create_stock_pending: true, create_order_on_complete: true },
+    "Ward Stay" => { create_stock_pending: true, create_order_on_complete: true },
+    "Consultation" => { create_stock_pending: false, create_order_on_complete: true }
+  }.freeze
+
+  def create_default_event_configs
+    @company.categories.where(resource_name: "events").find_each do |category|
+      flags = EVENT_CONFIG_DEFAULTS.fetch(category.name,
+        { create_stock_pending: false, create_order_on_complete: false })
+      EventConfig.find_or_create_by!(company: @company, category: category) do |config|
+        config.create_stock_pending = flags[:create_stock_pending]
+        config.create_order_on_complete = flags[:create_order_on_complete]
+      end
+    end
   end
 
   def create_all_crud_policies
@@ -345,6 +379,8 @@ class Seed::HospitalInitService
         "StockImport" => { create: true, read: true, update: true, delete: true },
         "StockTransfer" => { create: true, read: true, update: true, delete: true },
         "StockPending" => { create: true, read: true, update: true, delete: true },
+        "Event" => { create: true, read: true, update: true, delete: true },
+        "EventConfig" => { create: true, read: true, update: true, delete: true },
         "Purchase" => { create: true, read: true, update: true, delete: true },
         "PurchaseItem" => { create: true, read: true, update: true, delete: true }
       },
@@ -389,6 +425,8 @@ class Seed::HospitalInitService
         "StockImport" => { create: true, read: true, update: true, delete: true },
         "StockTransfer" => { create: true, read: true, update: true, delete: true },
         "StockPending" => { create: true, read: true, update: true, delete: true },
+        "Event" => { create: true, read: true, update: true, delete: true },
+        "EventConfig" => { create: true, read: true, update: true, delete: true },
         "Purchase" => { create: true, read: true, update: true, delete: true },
         "PurchaseItem" => { create: true, read: true, update: true, delete: true }
       }

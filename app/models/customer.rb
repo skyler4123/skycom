@@ -42,6 +42,9 @@ class Customer < ApplicationRecord
   has_many :customer_employee_appointments, dependent: :destroy
   has_many :employees, through: :customer_employee_appointments
 
+  has_many :customer_event_appointments, dependent: :destroy
+  has_many :events, through: :customer_event_appointments
+
   # --- Validations ---
   validates :name, presence: true, uniqueness: { scope: :company_id }, length: { maximum: 255 }
 

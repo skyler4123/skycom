@@ -83,6 +83,8 @@ Rails.application.routes.draw do
       resources :announcements
       resources :discounts
       resources :events
+      resources :event_configs
+      get "calendar", to: "calendars#index"
       resources :payslips
       resources :tasks
       resources :facilities

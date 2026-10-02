@@ -44,6 +44,8 @@ class Stock < ApplicationRecord
   belongs_to :category
   belongs_to :property_mapping
   has_many :stock_pendings, dependent: :restrict_with_error
+  has_many :event_stock_appointments, dependent: :destroy
+  has_many :events, through: :event_stock_appointments
   # --- Validations ---
   validates :quantity, :pending, presence: true, numericality: { only_integer: true }
   validates :warehouse_id, uniqueness: { scope: :product_id, message: "already holds a tracking SKU row mapping for this layout" }

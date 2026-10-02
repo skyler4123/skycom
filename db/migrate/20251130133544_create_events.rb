@@ -1,7 +1,7 @@
 class CreateEvents < ActiveRecord::Migration[8.0]
   def change
     create_table :events, id: :uuid, default: -> { "uuidv7()" } do |t|
-      t.references :event_group, null: false, foreign_key: true, type: :uuid
+      t.references :event_group, null: true, foreign_key: true, type: :uuid
       t.references :company, null: false, foreign_key: true, type: :uuid
       t.references :branch, null: true, foreign_key: true, type: :uuid
       t.references :category, null: false, foreign_key: true, type: :uuid
@@ -10,6 +10,8 @@ class CreateEvents < ActiveRecord::Migration[8.0]
       t.string :name
       t.string :description
       t.string :code
+      t.datetime :start_at
+      t.datetime :end_at
 
       # --- System Fields ---
       t.integer  :lifecycle_status, index: true
@@ -19,6 +21,13 @@ class CreateEvents < ActiveRecord::Migration[8.0]
       t.jsonb    :metadata
       t.datetime :discarded_at,   index: true
       t.string   :permission_resource_name
+
+      # --- Dynamic Fields ---
+      1.upto(10) { |i| t.string "property_string_#{i}" }
+      1.upto(20) { |i| t.integer "property_integer_#{i}" }
+      1.upto(10)  { |i| t.decimal "property_decimal_#{i}", precision: 15, scale: 4 }
+      1.upto(10)  { |i| t.boolean "property_boolean_#{i}" }
+      1.upto(10)  { |i| t.datetime "property_datetime_#{i}" }
 
       t.timestamps
     end
