@@ -7,6 +7,7 @@
 # ledger rows (see StockTransaction); this model never writes Stock columns.
 class StockPending < ApplicationRecord
   HOLDING_STATUSES = %w[pending in_progress initiated].freeze
+  CODE_PREFIX = "STKPD".freeze
 
   attribute :permission_resource_name, :string, default: -> { self.name }
 
