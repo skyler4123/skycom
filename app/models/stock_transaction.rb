@@ -8,7 +8,7 @@ class StockTransaction < ApplicationRecord
   enum :currency, CURRENCIE_CODES, prefix: true, default: :usd
 
   enum :direction, { add: 0, remove: 1 }
-  enum :transaction_type, { import: 0, export: 1, transfer: 2, adjustment: 3 }
+  enum :transaction_type, { import: 0, export: 1, transfer: 2, adjustment: 3, hold: 4, release: 5 }
   belongs_to :company
   belongs_to :branch, optional: true
   belongs_to :warehouse
@@ -41,15 +41,43 @@ class StockTransaction < ApplicationRecord
     stock = Stock.find_by!(company_id: company_id, warehouse_id: warehouse_id, product_id: product_id)
 
     stock.with_lock do
-      delta = add? ? quantity : -quantity
-      new_quantity = stock.quantity + delta
-      if new_quantity.negative?
-        raise StockMovementService::Error,
-              "Insufficient stock: quantity #{stock.quantity}, movement #{delta}"
+      if hold? || release?
+        recalibrate_pending_metrics(stock)
+      else
+        recalibrate_quantity_metrics(stock)
       end
-
-      stock.quantity = new_quantity
       stock.save! # after_save syncs the Redis available counter
     end
+  end
+
+  # Pending branch (StockPending holds): moves `pending` only, never `quantity`.
+  # Hold requires sellable availability (quantity - pending >= qty); release is
+  # strict (pending >= qty) — over-release fails fast, never silent-floored.
+  def recalibrate_pending_metrics(stock)
+    if hold?
+      available = stock.quantity - stock.pending
+      if available < quantity
+        raise StockMovementService::Error,
+              "Insufficient stock to hold: available #{available}, need #{quantity}"
+      end
+      stock.pending += quantity
+    else
+      if stock.pending < quantity
+        raise StockMovementService::Error,
+              "Insufficient stock to release: pending #{stock.pending}, need #{quantity}"
+      end
+      stock.pending -= quantity
+    end
+  end
+
+  def recalibrate_quantity_metrics(stock)
+    delta = add? ? quantity : -quantity
+    new_quantity = stock.quantity + delta
+    if new_quantity.negative?
+      raise StockMovementService::Error,
+            "Insufficient stock: quantity #{stock.quantity}, movement #{delta}"
+    end
+
+    stock.quantity = new_quantity
   end
 end

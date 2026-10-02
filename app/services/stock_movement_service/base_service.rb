@@ -9,8 +9,8 @@
 #
 # == The write-path rule:
 # Stock.quantity is mutated ONLY by StockTransaction#recalibrate_stock_metrics.
-# Stock.pending (the promise/hold counter) is mutated only through the Stock
-# wrapper methods (reserve_stock! / release_reserved! — docs/KREDIS.md).
+# Stock.pending is mutated only by the same callback's hold/release branch
+# (StockPending holds) — never by wrappers or direct writes (docs/KREDIS.md).
 # This service never writes either column directly.
 #
 # == Failure semantics:
@@ -76,6 +76,15 @@ class StockMovementService::BaseService
     if @transaction_type == "export" && @direction != "remove"
       raise StockMovementService::Error, "Export transactions must be remove direction"
     end
+    # Pending branch (StockPending holds): fixed direction pairing — hold
+    # occupies availability (remove-like), release frees it (add-like). The
+    # callback moves `pending` only; direction is a ledger convention.
+    if @transaction_type == "hold" && @direction != "remove"
+      raise StockMovementService::Error, "Hold transactions must be remove direction"
+    end
+    if @transaction_type == "release" && @direction != "add"
+      raise StockMovementService::Error, "Release transactions must be add direction"
+    end
     if @consume_hold && @direction != "remove"
       raise StockMovementService::Error, "consume_hold is only valid for remove direction"
     end
@@ -83,6 +92,19 @@ class StockMovementService::BaseService
 
   def apply_floor_rule!
     stock.reload
+    if @transaction_type == "hold"
+      available = stock.quantity - stock.pending
+      return if available >= @quantity
+
+      raise StockMovementService::Error,
+            "Insufficient stock to hold: available #{available}, need #{@quantity}"
+    end
+    if @transaction_type == "release"
+      return if stock.pending >= @quantity
+
+      raise StockMovementService::Error,
+            "Insufficient stock to release: pending #{stock.pending}, need #{@quantity}"
+    end
     if @direction == "remove"
       if @consume_hold
         return if stock.quantity >= @quantity && stock.pending >= @quantity
