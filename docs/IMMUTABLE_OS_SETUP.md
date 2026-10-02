@@ -173,6 +173,46 @@ gem install bundler foreman
 
 `foreman` is required by `bin/dev` (`Procfile.dev`: web + css + job).
 
+### 3.3b Box-native Ruby for non-root shells
+
+`distrobox enter --root dev` runs as root, so §3.3 installs rbenv into container-local `/root/.rbenv` — compiled against the box's glibc 2.35 / OpenSSL 3.0, and working. But Distrobox shares `$HOME`, so any **non-root** shell in the same box (a second terminal, an agent session) resolves the **host-compiled** `~/.rbenv/versions/3.4.3` instead. That binary's `openssl.so` requires `GLIBC_2.38` + `OPENSSL_3.4.0`, which Ubuntu 22.04 does not have.
+
+Symptom: `ruby -v` prints fine, but any `bundle exec` that loads openssl (e.g. `parallel_rspec`, via `parallel/serializer`) dies with:
+
+```
+.../openssl.so: /lib/x86_64-linux-gnu/libc.so.6: version `GLIBC_2.38' not found
+```
+
+Same box, same repo — different user, different Ruby. Diagnose with:
+
+```bash
+rbenv root   # shared ~/.rbenv (host build) vs container-local /root/.rbenv (box build)
+ruby -ropenssl -e 'puts OpenSSL::VERSION'   # fails on the host-compiled build
+```
+
+Fix — install a box-native Ruby under a **separate** `RBENV_ROOT` (never reinstall over the shared `~/.rbenv`; that would break host-side runs):
+
+```bash
+export BOX_RBENV="$HOME/<separate-rbenv-root>"   # any path outside ~/.rbenv
+mkdir -p "$BOX_RBENV/versions"
+"$HOME/.rbenv/plugins/ruby-build/bin/ruby-build" 3.4.3 "$BOX_RBENV/versions/3.4.3"
+export PATH="$BOX_RBENV/versions/3.4.3/bin:$PATH"
+gem install bundler --no-document
+cd ~/Documents/skycom && bundle install
+```
+
+Notes:
+
+- Call the `ruby-build` binary directly — a fresh `RBENV_ROOT` carries no plugins, so plain `rbenv install` fails with `rbenv: no such command 'install'`.
+- Keep the `PATH` export per-command (or in a box-only snippet) — never append it to the shared `~/.bashrc`, or host shells will pick up the box build and break the other way around.
+
+Verify:
+
+```bash
+ruby -ropenssl -e 'puts OpenSSL::VERSION'   # loads, no missing libs
+bundle exec parallel_rspec -n 10 spec/models/stock_spec.rb
+```
+
 ### 3.4 Bundle install
 
 ```bash
@@ -276,6 +316,8 @@ bin/dev
 | `tmp/pids/server.pid` stale | Normally auto-removed by the compose `web` command; else `rm -f tmp/pids/server.pid`. |
 | SELinux denials on volumes | Ensure `:z` flags intact in `docker-compose.yml`; never remove them on Atomic hosts. |
 | RSpec suite DB | Use `docker-compose.rspec-test.yml` per `COMMANDS.md:10`, not the dev compose file. |
+| `openssl.so: ... version 'GLIBC_2.38' not found` (or `OPENSSL_3.4.0 not found`) on any `bundle exec` | Host-compiled `~/.rbenv` Ruby leaking into a non-root box shell via shared `$HOME` → install a box-native Ruby under a separate `RBENV_ROOT` (§3.3b). |
+| `rbenv: no such command 'install'` | Fresh `RBENV_ROOT` carries no plugins → call the `ruby-build` binary directly (§3.3b). |
 | Seed run | Use `docker-compose.seed-test.yml` per `COMMANDS.md:8`. |
 
 ## 7. File Reference
