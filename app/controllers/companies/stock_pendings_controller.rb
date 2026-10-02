@@ -68,12 +68,22 @@ class Companies::StockPendingsController < Companies::ApplicationController
     end
   end
 
+  # Only manual/event holds come from the UI — pos/transfer rows are minted
+  # by their own services so the audit trail stays trustworthy.
+  UI_BUSINESS_TYPES = %w[manual event].freeze
+
   def create
     stock = current_company.stocks.find(pending_params[:stock_id])
+
+    unless UI_BUSINESS_TYPES.include?(pending_params[:business_type].to_s)
+      return render json: { errors: [ "Business type must be manual or event" ] },
+        status: :unprocessable_content
+    end
+
     result = StockPendings::HoldService.call(
       company: current_company, warehouse: stock.warehouse, stock: stock,
       quantity: pending_params[:quantity],
-      business_type: pending_params[:business_type] || :manual,
+      business_type: pending_params[:business_type],
       name: pending_params[:name], reason: pending_params[:reason]
     )
 
@@ -160,9 +170,11 @@ class Companies::StockPendingsController < Companies::ApplicationController
   end
 
   def form_reference_data
+    stocks = current_company.stocks.includes(:product, :warehouse)
+    stocks = stocks.where(warehouse_id: params[:warehouse_id]) if params[:warehouse_id].present?
     {
       warehouses: current_company.warehouses.order(:name).map { |w| w.as_json(only: [ :id, :name ]) },
-      stocks: current_company.stocks.includes(:product, :warehouse).map { |s|
+      stocks: stocks.map { |s|
         s.as_json(only: [ :id, :product_id, :warehouse_id, :quantity, :pending ]).merge(
           product_name: s.product&.name,
           warehouse_name: s.warehouse&.name,

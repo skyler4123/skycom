@@ -16,11 +16,11 @@ module OrderProcessingV1
         end
         next unless stock
 
-        StockPendings::ReleaseService.call(
+        result = StockPendings::ReleaseService.call(
           company: order.company, warehouse: stock.warehouse,
-          stock: stock, quantity: oa.quantity
+          stock: stock, quantity: oa.quantity, business_type: :pos
         )
-        released << stock.id
+        released << stock.id if result[:success]
       end
       { released: released }
     end

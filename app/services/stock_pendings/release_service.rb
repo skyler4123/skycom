@@ -10,15 +10,15 @@
 module StockPendings
   class ReleaseService
     def self.call(stock_pending: nil, stock_pending_id: nil, company: nil, warehouse: nil,
-                  stock: nil, quantity: nil, target: :release)
+                  stock: nil, quantity: nil, target: :release, business_type: nil)
       new(
         stock_pending: stock_pending, stock_pending_id: stock_pending_id,
         company: company, warehouse: warehouse, stock: stock,
-        quantity: quantity, target: target
+        quantity: quantity, target: target, business_type: business_type
       ).call
     end
 
-    def initialize(stock_pending:, stock_pending_id:, company:, warehouse:, stock:, quantity:, target:)
+    def initialize(stock_pending:, stock_pending_id:, company:, warehouse:, stock:, quantity:, target:, business_type:)
       @stock_pending = stock_pending
       @stock_pending_id = stock_pending_id
       @company = company
@@ -26,6 +26,7 @@ module StockPendings
       @stock = stock
       @quantity = quantity&.to_i
       @target = target.to_s
+      @business_type = business_type
     end
 
     def call
@@ -59,19 +60,29 @@ module StockPendings
       { success: false, errors: [ e.message ], released: released }
     end
 
+    # Same-business_type rows first (a transfer receive should consume transfer
+    # holds, not an older manual hold), then oldest-first. Whole rows only.
     def holdings
-      StockPending.where(
+      scope = StockPending.where(
         company_id: @company.id, warehouse_id: @warehouse.id, stock_id: @stock.id,
         workflow_status: StockPending::HOLDING_STATUSES
-      ).order(:created_at)
+      )
+      return scope.order(:created_at) if @business_type.blank?
+
+      preferred = StockPending.business_types[@business_type.to_s]
+      scope.order(
+        Arel.sql("CASE WHEN business_type = #{scope.connection.quote(preferred)} THEN 0 ELSE 1 END"),
+        :created_at
+      )
     end
 
     def release_row!(pending)
-      unless pending.holding?
-        raise StockMovementService::Error, "Stock pending is already #{pending.workflow_status}"
-      end
+      pending.with_lock do
+        pending.reload
+        unless pending.holding?
+          raise StockMovementService::Error, "Stock pending is already #{pending.workflow_status}"
+        end
 
-      ActiveRecord::Base.transaction do
         StockMovementService::BaseService.call(
           stock: pending.stock.reload, quantity: pending.quantity,
           direction: :add, transaction_type: :release, document: pending

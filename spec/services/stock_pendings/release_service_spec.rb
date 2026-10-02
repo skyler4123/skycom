@@ -61,4 +61,30 @@ RSpec.describe StockPendings::ReleaseService do
     expect(first.reload.workflow_status).to eq("completed")
     expect(stock.reload.pending).to eq(0)
   end
+
+  it "prefers same-business_type rows in scope mode" do
+    manual = hold(4, business_type: :manual)
+    pos = hold(4, business_type: :pos)
+
+    result = described_class.call(
+      company: company, warehouse: warehouse, stock: stock,
+      quantity: 4, business_type: :pos
+    )
+
+    expect(result[:success]).to be(true)
+    expect(pos.reload.workflow_status).to eq("completed")
+    expect(manual.reload.workflow_status).to eq("pending")
+  end
+
+  it "rejects a release through a stale holding object" do
+    pending = hold(8)
+    stale = StockPending.find(pending.id)
+    described_class.call(stock_pending: pending)
+
+    result = described_class.call(stock_pending: stale)
+
+    expect(result[:success]).to be(false)
+    expect(StockTransaction.where(transaction_type: :release).count).to eq(1)
+    expect(stock.reload.pending).to eq(0)
+  end
 end

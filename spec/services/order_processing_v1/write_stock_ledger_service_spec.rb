@@ -99,6 +99,20 @@ RSpec.describe OrderProcessingV1::WriteStockLedgerService do
       expect(stock.reload.quantity).to eq(10)
     end
 
+    it "never consumes an unrelated hold on legacy lines" do
+      pay_hold(stock, 3)
+      other_hold = StockPendings::HoldService.call(
+        company: company, warehouse: stock.warehouse, stock: stock,
+        quantity: 3, business_type: :manual
+      )[:stock_pending]
+
+      described_class.call(order: order)
+
+      expect(stock.reload.quantity).to eq(8)
+      expect(stock.reload.pending).to eq(3)
+      expect(other_hold.reload.workflow_status).to eq("pending")
+    end
+
     it "fails fast for pay-persisted lines whose hold is gone (never eats another hold)" do
       oa.update!(stock_id: stock.id)
       # No reservation: pending is 0 — the hold this line claims does not exist.

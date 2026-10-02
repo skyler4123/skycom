@@ -35,4 +35,13 @@ RSpec.describe OrderProcessingV1::ReleaseReservedStockService do
     expect(stock.available_count).to eq(10)
     expect(StockPending.last.workflow_status).to eq("completed")
   end
+
+  it "does not claim a release that failed" do
+    allow(StockPendings::ReleaseService).to receive(:call)
+      .and_return({ success: false, errors: [ "boom" ] })
+
+    result = described_class.call(order: order)
+
+    expect(result[:released]).to be_empty
+  end
 end

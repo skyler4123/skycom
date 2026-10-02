@@ -86,6 +86,22 @@ RSpec.describe StockMovementService::Transfers, type: :model do
       expect(transfer.reload.workflow_status_initiated?).to be true
     end
 
+    it "receives without consuming a concurrent unrelated hold" do
+      StockPendings::HoldService.call(
+        company: company, warehouse: source_warehouse, stock: source_stock,
+        quantity: 4, business_type: :manual, name: "Unrelated hold"
+      )
+      described_class::InitiateService.call(transfer: transfer, employee: employee)
+
+      described_class::ReceiveService.call(transfer: transfer.reload, employee: employee)
+
+      expect(source_stock.reload.quantity).to eq(6)
+      expect(source_stock.reload.pending).to eq(4)
+      other = StockPending.where(business_type: :manual).first
+      expect(other.workflow_status).to eq("pending")
+      expect(StockTransaction.where(transaction_type: :release).count).to eq(1)
+    end
+
     it "cancels: releases the hold and marks cancelled" do
       described_class::InitiateService.call(transfer: transfer, employee: employee)
       described_class::CancelService.call(transfer: transfer.reload, employee: employee)

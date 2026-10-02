@@ -16,7 +16,7 @@ class StockMovementService::Transfers::CancelService
         stock = line.stock.reload
         result = StockPendings::ReleaseService.call(
           company: transfer.company, warehouse: stock.warehouse, stock: stock,
-          quantity: line.quantity, target: :cancel
+          quantity: line.quantity, target: :cancel, business_type: :transfer
         )
         raise StockMovementService::Error, result[:errors].to_sentence unless result[:success]
 

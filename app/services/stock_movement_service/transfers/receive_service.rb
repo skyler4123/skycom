@@ -20,12 +20,15 @@ class StockMovementService::Transfers::ReceiveService
         stock = line.stock.reload
         result = StockPendings::ReleaseService.call(
           company: transfer.company, warehouse: stock.warehouse, stock: stock,
-          quantity: line.quantity
+          quantity: line.quantity, business_type: :transfer
         )
         raise StockMovementService::Error, result[:errors].to_sentence unless result[:success]
 
+        # Only a pre-migration raw residual (pending beyond row-backed holdings)
+        # may be consumed — never another row's hold.
         stock.reload
-        consume_hold = stock.pending >= line.quantity
+        row_backed = stock.stock_pendings.where(workflow_status: StockPending::HOLDING_STATUSES).sum(:quantity)
+        consume_hold = (stock.pending - row_backed) >= line.quantity
 
         StockMovementService::BaseService.call(
           stock: stock,

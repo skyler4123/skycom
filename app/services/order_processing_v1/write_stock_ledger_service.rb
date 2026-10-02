@@ -39,7 +39,7 @@ module OrderProcessingV1
     def self.release_line_hold(order, oa, stock)
       result = StockPendings::ReleaseService.call(
         company: order.company, warehouse: stock.warehouse,
-        stock: stock, quantity: oa.quantity
+        stock: stock, quantity: oa.quantity, business_type: :pos
       )
       raise StockMovementService::Error, result[:errors].to_sentence unless result[:success]
 
@@ -52,7 +52,11 @@ module OrderProcessingV1
         return false
       end
 
-      stock.reload.pending >= oa.quantity.to_i
+      # Legacy lines only: consume a pre-migration raw residual, never
+      # another row's hold.
+      stock.reload
+      row_backed = stock.stock_pendings.where(workflow_status: StockPending::HOLDING_STATUSES).sum(:quantity)
+      (stock.pending - row_backed) >= oa.quantity.to_i
     end
 
     def self.resolve_stock(order, oa)

@@ -76,6 +76,20 @@ RSpec.describe "Companies::StockPendingsController", type: :request do
       expect(response.parsed_body).to have_key("warehouses")
       expect(response.parsed_body).to have_key("stocks")
     end
+
+    it "scopes stocks to the requested warehouse" do
+      other_warehouse = create(:warehouse, company: company)
+
+      get new_company_stock_pending_path(company), params: { warehouse_id: other_warehouse.id }, as: :json
+
+      expect(response.parsed_body["stocks"]).to be_empty
+    end
+  end
+
+  it "has no destroy route" do
+    delete company_stock_pending_path(company, SecureRandom.uuid), as: :json
+
+    expect(response).to have_http_status(:not_found)
   end
 
   describe "POST #create" do
@@ -94,6 +108,14 @@ RSpec.describe "Companies::StockPendingsController", type: :request do
       expect(response.parsed_body["errors"]).to be_present
       expect(StockPending.count).to eq(0)
       expect(stock.reload.pending).to eq(0)
+    end
+
+    it "rejects system business types from the UI API" do
+      post company_stock_pendings_path(company),
+        params: { stock_pending: { stock_id: stock.id, quantity: 1, business_type: "pos" } }, as: :json
+
+      expect(response).to have_http_status(:unprocessable_content)
+      expect(StockPending.count).to eq(0)
     end
 
     it "renders 404 for a foreign stock" do

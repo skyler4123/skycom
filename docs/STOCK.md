@@ -169,6 +169,14 @@ every hold is created with its consumer (finalize/receive) or its releaser
 `hold` ledger row on reserve, one `release` ledger row on consume/release),
 so `pending` is always traceable to its rows.
 
+**Fungibility (accepted):** holds are anonymous — scope release frees
+same-`business_type` rows first (POS consumes `pos`, transfers consume
+`transfer`), then oldest-first, whole rows only. A finalize can therefore
+complete another domain's row when its own rows are gone; numbers stay
+consistent, but the row's owner sees it as released. Rollback of a failed
+multi-line hold likewise leaves `completed` (not deleted) rows — the audit
+trail, not a leak.
+
 ### 4.6 Document ↔ line-table map (atomic pairs)
 
 | Document | Line table | Ledger |
@@ -191,6 +199,12 @@ order/purchase lines are atomic (see `docs/RESOURCES.md` §4).
 1. **Single mutator.** `Stock.quantity` AND `Stock.pending` are written only
    by `StockTransaction#recalibrate_stock_metrics` (quantity branch vs
    `hold`/`release` branch). No service, controller, or job assigns either.
+   Grandfathered exceptions (pre-row legacy paths only, both no-ops when no
+   raw residual exists): `BaseService` `consume_hold` removals and
+   `Transfers::CancelService#release_raw_residual!` still call
+   `release_reserved!` — a `GREATEST(pending - qty, 0)` write with no ledger
+   row. Do not add new wrapper call sites; route new holds through
+   `StockPendings::HoldService` / `ReleaseService`.
 2. **Wrappers only.** Business code reads/reserves/releases through
    `available_count` / `reserve_stock!` / `release_reserved!` — never the
    Kredis proxy, never raw `update_all` on stock columns. New hold paths go
