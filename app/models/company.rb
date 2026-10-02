@@ -21,7 +21,7 @@ class Company < ApplicationRecord
     Membership
     Page CompanyPaymentMethodAppointment ShiftTemplate ScheduledShift
     AttendancePolicy AttendanceLog AttendanceDay AttendanceMonth
-    Stock StockTransfer StockImport StockExport StockAdjustment
+    Stock StockTransfer StockImport StockExport StockAdjustment StockPending
   ].freeze
   class_attribute :skip_init, default: false
   # Creation-time-only flag: System#ensure_company! marks its auto-created
@@ -96,6 +96,7 @@ class Company < ApplicationRecord
   has_many :stock_imports, dependent: :destroy
   has_many :stock_exports, dependent: :destroy
   has_many :stock_adjustments, dependent: :destroy
+  has_many :stock_pendings, dependent: :destroy
   has_many :suppliers, dependent: :destroy
   has_many :customers, dependent: :destroy
   has_many :customer_groups, dependent: :destroy

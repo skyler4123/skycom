@@ -53,6 +53,12 @@ Rails.application.routes.draw do
       resources :stock_imports
       resources :stock_exports
       resources :stock_adjustments
+      resources :stock_pendings do
+        member do
+          post :release
+          post :cancel
+        end
+      end
       resources :customers
       resources :invoices
       resources :purchases do
