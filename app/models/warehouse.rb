@@ -27,4 +27,5 @@ class Warehouse < ApplicationRecord
   belongs_to :property_mapping
   belongs_to :address, optional: true
   has_many :stocks, dependent: :destroy
+  has_many :stock_pendings, dependent: :restrict_with_error
 end
