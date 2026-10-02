@@ -31,7 +31,12 @@ RSpec.describe OrderProcessingV1::CancelPaymentService do
       gateway_reference: "POS_#{SecureRandom.hex(8)}")
   end
 
-  before { stock.reserve_stock!(2) }
+  before do
+    StockPendings::HoldService.call(
+      company: company, warehouse: warehouse, stock: stock,
+      quantity: 2, business_type: :pos
+    )
+  end
 
   it "releases the pending discount code reserved on the order" do
     group = Seed::DiscountGroupService.create(company: company, name: "POS G", prefix: "POS",

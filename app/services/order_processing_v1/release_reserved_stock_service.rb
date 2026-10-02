@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
-# Rolls back a POS reservation: restores Redis availability and consumes the
-# DB pending promise for every stock-tracked line item on the order.
+# Rolls back a POS reservation: releases the `pos` StockPending holds (FIFO
+# scope per line) for every stock-tracked line item on the order.
 module OrderProcessingV1
   class ReleaseReservedStockService
     def self.call(order:)
@@ -16,7 +16,10 @@ module OrderProcessingV1
         end
         next unless stock
 
-        stock.release_reserved!(oa.quantity)
+        StockPendings::ReleaseService.call(
+          company: order.company, warehouse: stock.warehouse,
+          stock: stock, quantity: oa.quantity
+        )
         released << stock.id
       end
       { released: released }

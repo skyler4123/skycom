@@ -20,21 +20,44 @@ RSpec.describe OrderProcessingV1::WriteStockLedgerService do
       )
     end
 
+    def pay_hold(target_stock, qty)
+      StockPendings::HoldService.call(
+        company: company, warehouse: target_stock.warehouse, stock: target_stock,
+        quantity: qty, business_type: :pos
+      )
+    end
+
     it "creates StockTransaction records" do
-      expect { described_class.call(order: order) }.to change(StockTransaction, :count).by(1)
-      trx = StockTransaction.last
+      pay_hold(stock, 2)
+      oa.update!(stock_id: stock.id)
+
+      expect { described_class.call(order: order) }.to change(StockTransaction, :count).by(2)
+      trx = StockTransaction.where(transaction_type: :export).last
       expect(trx.direction).to eq("remove")
-      expect(trx.transaction_type).to eq("export")
       expect(trx.quantity).to eq(2)
     end
 
-    it "returns count of transactions created" do
+    it "writes exactly two ledger rows per line (quantity remove + pending release)" do
+      pay_hold(stock, 2)
+      oa.update!(stock_id: stock.id)
+
+      described_class.call(order: order)
+
+      expect(StockTransaction.where(transaction_type: :export).count).to eq(1)
+      expect(StockTransaction.where(transaction_type: :release).count).to eq(1)
+    end
+
+    it "returns count of lines finalized" do
+      pay_hold(stock, 2)
+      oa.update!(stock_id: stock.id)
+
       result = described_class.call(order: order)
       expect(result[:count]).to eq(1)
     end
 
     it "mutates quantity through the ledger callback and consumes the pay-time hold" do
-      stock.reserve_stock!(2) # the pay-time reservation
+      pay_hold(stock, 2) # the pay-time reservation
+      oa.update!(stock_id: stock.id)
 
       described_class.call(order: order)
 
@@ -44,16 +67,19 @@ RSpec.describe OrderProcessingV1::WriteStockLedgerService do
     end
 
     it "anchors the ledger row on the order" do
+      pay_hold(stock, 2)
+      oa.update!(stock_id: stock.id)
+
       described_class.call(order: order)
 
-      expect(StockTransaction.last.appoint_for).to eq(order)
+      expect(StockTransaction.where(transaction_type: :export).last.appoint_for).to eq(order)
     end
 
     it "uses the stock persisted on the order appointment when present" do
       other_warehouse = create(:warehouse, company: company)
       branch_stock = create(:stock, company: company, product: product, warehouse: other_warehouse, quantity: 50)
       oa.update!(stock_id: branch_stock.id)
-      branch_stock.reserve_stock!(2) # the pay-time reservation for this line
+      pay_hold(branch_stock, 2) # the pay-time reservation for this line
 
       described_class.call(order: order)
 
@@ -64,7 +90,7 @@ RSpec.describe OrderProcessingV1::WriteStockLedgerService do
     it "falls back to branch-scoped resolution for legacy lines without stock_id" do
       branch_warehouse = create(:warehouse, company: company, branch: branch)
       branch_stock = create(:stock, company: company, product: product, warehouse: branch_warehouse, quantity: 20)
-      branch_stock.reserve_stock!(2)
+      pay_hold(branch_stock, 2)
 
       described_class.call(order: order)
 

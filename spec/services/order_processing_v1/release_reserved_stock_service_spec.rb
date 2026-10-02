@@ -20,7 +20,12 @@ RSpec.describe OrderProcessingV1::ReleaseReservedStockService do
       quantity: 3, unit_price: 10.0, total_price: 30.0)
   end
 
-  before { stock.reserve_stock!(3) }
+  before do
+    StockPendings::HoldService.call(
+      company: company, warehouse: warehouse, stock: stock,
+      quantity: 3, business_type: :pos
+    )
+  end
 
   it "releases reservations for the order's line items" do
     result = described_class.call(order: order)
@@ -28,5 +33,6 @@ RSpec.describe OrderProcessingV1::ReleaseReservedStockService do
     expect(result[:released]).to contain_exactly(stock.id)
     expect(stock.reload.pending).to eq(0)
     expect(stock.available_count).to eq(10)
+    expect(StockPending.last.workflow_status).to eq("completed")
   end
 end

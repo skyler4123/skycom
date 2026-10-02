@@ -37,6 +37,19 @@ RSpec.describe OrderProcessingV1::ReserveStockService do
         expect(result[:reserved].length).to eq(1)
         expect(result[:reserved].first[:qty]).to eq(2)
         expect(result[:reserved].first[:stock].id).to eq(stock.id)
+        expect(result[:reserved].first[:stock_pending]).to be_a(StockPending)
+      end
+
+      it "creates one pos StockPending per item with an anchored hold ledger" do
+        described_class.call(items: items)
+
+        pending = StockPending.last
+        expect(pending.business_type).to eq("pos")
+        expect(pending.quantity).to eq(2)
+        expect(pending.workflow_status).to eq("pending")
+        hold = StockTransaction.where(transaction_type: :hold)
+        expect(hold.count).to eq(1)
+        expect(hold.first.appoint_for).to eq(pending)
       end
 
       it "promises the units in DB by incrementing pending" do
@@ -61,6 +74,20 @@ RSpec.describe OrderProcessingV1::ReserveStockService do
         expect { described_class.call(items: items) }
           .to raise_error(OrderProcessingV1::InsufficientStockError)
         expect(stock.available_counter.value).to eq(5)
+        expect(StockPending.count).to eq(0)
+      end
+
+      context "with a prior successful line" do
+        let(:items) { [ { stock_id: stock.id, quantity: 2 }, { stock_id: stock.id, quantity: 10 } ] }
+
+        it "releases prior holds leaving no holding rows" do
+          expect { described_class.call(items: items) }
+            .to raise_error(OrderProcessingV1::InsufficientStockError)
+          expect(stock.reload.pending).to eq(0)
+          expect(stock.available_counter.value).to eq(5)
+          expect(StockPending.where(workflow_status: StockPending::HOLDING_STATUSES).count).to eq(0)
+          expect(StockPending.where(workflow_status: :completed).count).to eq(1)
+        end
       end
     end
 

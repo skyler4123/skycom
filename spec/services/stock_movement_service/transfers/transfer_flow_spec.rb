@@ -26,7 +26,7 @@ RSpec.describe StockMovementService::Transfers, type: :model do
   end
 
   describe "two-phase movement" do
-    it "initiates: holds source units without touching quantity or writing ledger rows" do
+    it "initiates: holds source units via a transfer StockPending plus one anchored hold ledger" do
       result = described_class::InitiateService.call(transfer: transfer, employee: employee)
 
       expect(result[:success]).to be true
@@ -35,15 +35,22 @@ RSpec.describe StockMovementService::Transfers, type: :model do
       expect(source_stock.available_count).to eq(6)
       expect(transfer.reload.workflow_status_initiated?).to be true
       expect(transfer.initiated_at).to be_present
-      expect(StockTransaction.count).to eq(0)
+
+      pendings = StockPending.where(workflow_status: StockPending::HOLDING_STATUSES)
+      expect(pendings.count).to eq(1)
+      expect(pendings.first.business_type).to eq("transfer")
+      holds = StockTransaction.where(transaction_type: :hold)
+      expect(holds.count).to eq(1)
+      expect(holds.first.appoint_for).to eq(pendings.first)
     end
 
-    it "receives: two ledger rows (remove@source consuming hold + add@dest), quantities applied" do
+    it "receives: paired transfer ledger rows plus the pending release, quantities applied" do
       described_class::InitiateService.call(transfer: transfer, employee: employee)
       described_class::ReceiveService.call(transfer: transfer.reload, employee: employee)
 
       expect(source_stock.reload.quantity).to eq(6)
       expect(source_stock.reload.pending).to eq(0)
+      expect(StockPending.where(workflow_status: StockPending::HOLDING_STATUSES).count).to eq(0)
 
       dest_stock = Stock.find_by!(company: company, warehouse: destination_warehouse, product: product)
       expect(dest_stock.quantity).to eq(4)
@@ -54,6 +61,7 @@ RSpec.describe StockMovementService::Transfers, type: :model do
       expect(txns.where(direction: :add).count).to eq(1)
       expect(txns.where(direction: :remove).first.appoint_from).to eq(transfer)
       expect(txns.where(direction: :add).first.appoint_to).to eq(transfer)
+      expect(StockTransaction.where(transaction_type: :release).count).to eq(1)
       expect(transfer.reload.workflow_status_received?).to be true
       expect(transfer.received_at).to be_present
     end
