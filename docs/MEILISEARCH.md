@@ -281,7 +281,7 @@ DYNAMIC_SEARCH_MODELS.each { |klass| klass.ms_reindex! }
 
 ## 6. Testing
 
-**Files**: `spec/models/concerns/dynamic_search_concern_spec.rb` (connection + settings only) + `spec/models/concerns/dynamic_search_models_01_spec.rb` … `_10_spec.rb` (per-model coverage, split so parallel_rspec distributes the 47 models across workers) + `spec/support/dynamic_search_models.rb` (the `DYNAMIC_SEARCH_MODELS` builder hash) + `spec/support/shared_examples/dynamic_search.rb` + `spec/jobs/meilisearch_index_job_spec.rb`
+**File**: `spec/models/concerns/dynamic_search_concern_spec.rb` (+ `spec/support/shared_examples/dynamic_search.rb`, `spec/jobs/meilisearch_index_job_spec.rb`)
 
 The suite requires a **running Meilisearch** (docker compose dev + CI both provide it). A `before(:all)` health check raises if the server is unreachable.
 
@@ -289,11 +289,11 @@ Key patterns:
 
 - **Explicit indexing** — transactional fixtures suppress `after_commit`, so specs call `record.ms_index!(true)` directly instead of relying on auto-sync.
 - **Index isolation** — `model_class.ms_clear_index!` in before/after hooks (Meilisearch lives outside the DB transaction).
-- **Per-model coverage** — a shared example iterates all 47 dynamic models with a factory builder lambda, asserting: search by a dynamic property term + company-scoped filter isolation, numeric range filter, update-reflects-after-reindex, destroy-removes-document.
+- **Per-model coverage** — a shared example iterates all 45 dynamic models with a factory builder lambda, asserting: search by a dynamic property term + company-scoped filter isolation, numeric range filter, update-reflects-after-reindex, destroy-removes-document.
 - **Jobs** — `MeilisearchIndexJob.perform_now` covers index via the enqueue path, destroyed-record removal, and unknown-model rejection.
 
 ```bash
-bundle exec rspec spec/models/concerns/dynamic_search_concern_spec.rb spec/models/concerns/dynamic_search_models_01_spec.rb spec/jobs/meilisearch_index_job_spec.rb
+bundle exec rspec spec/models/concerns/dynamic_search_concern_spec.rb spec/jobs/meilisearch_index_job_spec.rb
 ```
 
 ---
@@ -302,7 +302,7 @@ bundle exec rspec spec/models/concerns/dynamic_search_concern_spec.rb spec/model
 
 1. The model must include `PropertyMappingConcern` (all dynamic models do). If it's a new model, add `include PropertyMappingConcern` **and** `include DynamicSearchConcern` (order: CategoryConcern → PropertyMappingConcern → DynamicSearchConcern).
 2. That's it — settings, auto-sync, and job wiring come from the concern.
-3. Add the model to `DYNAMIC_SEARCH_MODELS` in `spec/support/dynamic_search_models.rb` with a record builder, and to the `slice(...)` list of one `dynamic_search_models_*_spec.rb` file (keep chunks at ~4–5 models).
+3. Add the model to `DYNAMIC_SEARCH_MODELS` in the spec with a record builder.
 4. Reindex existing rows: `bin/rails meilisearch:reindex[NewModel]`.
 
 To opt a model **out** of searchable: do not include the concern (or add `meilisearch auto_index: false, auto_remove: false` in the model's own block).
@@ -332,9 +332,7 @@ To opt a model **out** of searchable: do not include the concern (or add `meilis
 | `app/models/concerns/user/search_concern.rb` | User search — static attributes (email/username/name/first_name/last_name/phone_number searchable; system_role/country/workflow_status/business_type filterable), async via `MeilisearchIndexJob` |
 | `config/initializers/meilisearch.rb` | Client configuration |
 | `docker-compose.yml` (:143) / `docker-compose.rspec-test.yml` (:77) | Meilisearch services |
-| `spec/models/concerns/dynamic_search_concern_spec.rb` | Connection + settings only (per-model coverage moved out — see next row) |
-| `spec/models/concerns/dynamic_search_models_01_spec.rb` … `_10_spec.rb` | Per-model search coverage, ~4–5 models each (parallel distribution) |
-| `spec/support/dynamic_search_models.rb` | `DYNAMIC_SEARCH_MODELS` builder hash + `DynamicSearchModelBuilders` helpers |
+| `spec/models/concerns/dynamic_search_concern_spec.rb` | Connection + settings + 45-model search coverage |
 | `spec/support/shared_examples/dynamic_search.rb` | Shared per-model search examples |
 | `spec/jobs/meilisearch_index_job_spec.rb` | Job behaviors |
 | `app/services/products/search_query_service.rb` | Products subclass — TableConfig-driven search/filter query translation |
