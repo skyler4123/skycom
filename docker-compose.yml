@@ -1,5 +1,11 @@
 # docker-compose.yml
-
+#
+# DEV WORKFLOW (services only): web + job run locally via `bin/dev` for fast
+# iteration — do NOT start the `web`/`job` containers in dev. Start infra only:
+#   docker compose up -d postgres redis stograge websocket meilisearch mock-api openobserve
+#   bin/dev
+# Full-stack compose (web/job containers) is for seed-test / rspec-test files only.
+#
 # docker compose up -d
 # RAILS_MASTER_KEY=$(cat config/master.key) docker compose up -d --force-recreate
 # RAILS_MASTER_KEY=$(cat config/master1.key) podman compose up -d --force-recreate
@@ -25,7 +31,7 @@ services:
     tty: true
     depends_on:
       - postgres
-      - minio
+      - stograge
       - websocket
       - meilisearch
 
@@ -54,7 +60,7 @@ services:
       - postgres_data:/var/lib/postgresql
  
   # RustFS Service
-  rustfs:
+  stograge:
     image: rustfs/rustfs:latest
     ports:
       # RustFS S3 API port
@@ -106,7 +112,11 @@ services:
     command: centrifugo --client_insecure=false --api_insecure=false
     environment:
       # 🚀 Include "null" to allow SharedWorker Data URLs
-      CENTRIFUGO_ALLOWED_ORIGINS: "http://localhost:3000 http://127.0.0.1:3000 null"
+      # localhost/127.0.0.1 = host-native dev. 10.88.0.2 = current Distrobox
+      # container IP — needed only when developing inside distrobox (host browser
+      # reaches services via the container IP). Container IPs change per box;
+      # run `ip addr` inside the box and update this line if yours differs.
+      CENTRIFUGO_ALLOWED_ORIGINS: "http://localhost:3000 http://127.0.0.1:3000 http://10.88.0.2:3000 null"
       # Administrative Backend API Token (Matches Rails CENTRIFUGO_API_KEY)
       CENTRIFUGO_API_KEY: "skycom_super_secret_api_key_2026"
       # Secure Verification Engine Token (Matches Rails CENTRIFUGO_TOKEN_HMAC_SECRET_KEY)

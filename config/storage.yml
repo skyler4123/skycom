@@ -39,5 +39,10 @@ amazon:
   secret_access_key: <%= Rails.application.credentials.dig(:aws_secret_access_key) || "password" %>
   region: us-east-1
   bucket: skycom-<%= Rails.env %>
-  endpoint: <%= Rails.application.credentials.dig(:aws_endpoint) || "http://localhost:9000" %> # Internal endpoint for Rails to connect to Storage
+  # Internal endpoint for Rails to connect to Storage.
+  # Use http://localhost:9000 for host-native dev, http://10.88.0.2:9000 when
+  # developing inside Distrobox (10.88.0.2 = current container IP; container IPs
+  # change per box — run `ip addr` inside the box and update if yours differs).
+  # endpoint: <%= Rails.application.credentials.dig(:aws_endpoint) || "http://localhost:9000" %>
+  endpoint: <%= Rails.application.credentials.dig(:aws_endpoint) || "http://10.88.0.2:9000" %>
   force_path_style: true

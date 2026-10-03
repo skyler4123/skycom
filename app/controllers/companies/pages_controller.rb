@@ -43,10 +43,22 @@ class Companies::PagesController < Companies::ApplicationController
   # (POS can't handle hosted redirects); serialized as {id} + payment_method.slice.
   def retail_cashier
     page = current_company.pages.includes(:branch).find(params[:id])
-
+  rescue ActiveRecord::RecordNotFound
     respond_to do |format|
       format.html { render html: "", layout: true }
       format.json do
+        render json: { errors: [ "Cashier page not found for this company" ] }, status: :not_found
+      end
+    end
+  else
+    respond_to do |format|
+      format.html { render html: "", layout: true }
+      format.json do
+        if page.branch.nil?
+          render json: { errors: [ "Cashier page has no branch assigned" ] }, status: :unprocessable_entity
+          next
+        end
+
         warehouse_ids = page.branch.warehouse_ids
         products = current_company.products.where(branch_id: page.branch_id).limit(50).map { |p|
           price = p.price
