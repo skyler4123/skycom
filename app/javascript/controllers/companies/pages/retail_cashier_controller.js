@@ -39,16 +39,7 @@ export default class Companies_Pages_RetailCashierController extends Controller 
 
       this.addTab()
     } catch (error) {
-      const status = error.status || translate("unknown")
-      const reason = error.errors?.join(", ") || error.message || translate("Failed to load cashier page.")
-      this.element.innerHTML = `
-        <div class="flex items-center justify-center h-screen p-8">
-          <div class="max-w-lg w-full bg-white dark:bg-slate-900 border border-red-200 dark:border-red-900 rounded-xl p-6 space-y-3">
-            <h2 class="text-lg font-bold text-red-600">${translate("Cashier page failed to load")} (${translate("status")} ${status})</h2>
-            <p class="text-sm text-slate-700 dark:text-slate-300"><span class="font-semibold">${translate("Reason")}:</span> ${reason}</p>
-            <p class="text-sm text-slate-500 dark:text-slate-400">${translate("Please check the page exists, its branch is assigned, branch payment methods are active, and you are signed in, then retry.")}</p>
-          </div>
-        </div>`
+      this.element.innerHTML = `<div class="flex items-center justify-center h-screen text-red-600 text-lg font-semibold">${translate("Failed to load cashier page.")}</div>`
     }
   }
 
