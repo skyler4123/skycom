@@ -351,7 +351,7 @@ class Seed::HospitalInitService
         "Policy" => { read: true },
         "CompanyPaymentMethodAppointment" => { read: true, update: true },
         "Membership" => { create: true, read: true, update: true, delete: true },
-        "Reservation" => { create: true, read: true, update: true, delete: true },
+
         "Room" => { create: true, read: true, update: true, delete: true },
         "Guest" => { create: true, read: true, update: true, delete: true },
         "Course" => { create: true, read: true, update: true, delete: true },
@@ -397,7 +397,7 @@ class Seed::HospitalInitService
         "Policy" => { read: true },
         "CompanyPaymentMethodAppointment" => { read: true, update: true },
         "Membership" => { create: true, read: true, update: true, delete: true },
-        "Reservation" => { create: true, read: true, update: true, delete: true },
+
         "Room" => { create: true, read: true, update: true, delete: true },
         "Guest" => { create: true, read: true, update: true, delete: true },
         "Course" => { create: true, read: true, update: true, delete: true },
