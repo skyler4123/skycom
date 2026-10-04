@@ -1,10 +1,25 @@
 import Companies_LayoutController from "controllers/companies/layout_controller"
 import Companies_Events_NewModalController from "controllers/companies/events/new_modal_controller"
 
+// Workflow → Tailwind mapping (FE-owned, aligned with Helpers.statusBadge).
+// Full literal class strings so Tailwind JIT can compile them — never interpolate.
+const WORKFLOW_STYLES = {
+  draft: { bg: "bg-slate-400", text: "text-slate-500" },
+  pending: { bg: "bg-yellow-500", text: "text-yellow-600" },
+  confirmed: { bg: "bg-green-500", text: "text-green-600" },
+  in_progress: { bg: "bg-blue-500", text: "text-blue-600" },
+  completed: { bg: "bg-emerald-600", text: "text-emerald-600" },
+  cancelled: { bg: "bg-red-500", text: "text-red-500" }
+}
+
+const workflowStatusOf = (ev) => ev.workflow_status || ev.extendedProps?.workflow_status || "pending"
+const workflowBg = (status) => (WORKFLOW_STYLES[status] || WORKFLOW_STYLES.pending).bg
+const workflowText = (status) => (WORKFLOW_STYLES[status] || WORKFLOW_STYLES.pending).text
+
 export default class Companies_Calendars_IndexController extends Companies_LayoutController {
   // Calendar board — day/week/month views over real Events. Clicking a time
   // slot opens the full-detail create modal prefilled with that slot.
-  // Depends on BE: Companies::CalendarsController#index (.json board feed),
+  // Depends on BE: Companies::CalendarsController#index (.json board feed: id/title/start/end/workflow_status),
   //                  Companies::EventsController#create (JSON, via the modal)
   // Endpoints: GET /companies/:id/calendar.json?start=&end=[&branch_id][&category_id]
   // Docs: docs/EVENTS.md
@@ -186,7 +201,7 @@ export default class Companies_Calendars_IndexController extends Companies_Layou
   dayCellHTML(dateStr, dayNumber) {
     const isToday = dateStr === this.today
     const dayEvents = this.events.filter(ev => ev.start?.split("T")[0] === dateStr)
-    const eventItems = dayEvents.slice(0, 3).map(ev => `<div class="text-xs truncate px-1.5 py-0.5 leading-tight" style="color: ${ev.backgroundColor || '#6366f1'};"><span class="font-medium">${ev.title}</span></div>`).join("")
+    const eventItems = dayEvents.slice(0, 3).map(ev => `<div class="text-xs truncate px-1.5 py-0.5 leading-tight ${workflowText(workflowStatusOf(ev))}"><span class="font-medium">${ev.title}</span></div>`).join("")
 
     return `
       <div class="h-32 bg-white dark:bg-slate-900 hover:bg-indigo-50/60 dark:hover:bg-indigo-900/30 border border-slate-200 dark:border-slate-700 relative overflow-hidden rounded-lg transition flex flex-col items-start justify-start pt-1.5 text-base cursor-pointer select-none"
@@ -233,7 +248,7 @@ export default class Companies_Calendars_IndexController extends Companies_Layou
           data-action="click->${this.identifier}#openCreateModal"
           data-${this.identifier}-date-param="${day.dateStr}"
           data-${this.identifier}-hour-param="${hour}">
-          ${overlapping.map(ev => `<div class="absolute inset-x-1 top-0 rounded-md shadow-sm p-1 text-xs text-white overflow-hidden" style="background: ${ev.backgroundColor || '#6366f1'}; height: ${Math.min((new Date(ev.end) - new Date(ev.start)) / 600, 100)}%; min-height: 40px;"><div class="font-medium truncate">${ev.title}</div></div>`).join('')}
+          ${overlapping.map(ev => `<div class="absolute inset-x-1 top-0 rounded-md shadow-sm p-1 text-xs text-white overflow-hidden ${workflowBg(workflowStatusOf(ev))}" style="height: ${Math.min((new Date(ev.end) - new Date(ev.start)) / 600, 100)}%; min-height: 40px;"><div class="font-medium truncate">${ev.title}</div></div>`).join('')}
         </div>`
       })
       timeSlots.push(`<div class="grid grid-cols-8 gap-0">${rowHtml}</div>`)
@@ -263,7 +278,7 @@ export default class Companies_Calendars_IndexController extends Companies_Layou
             data-action="click->${this.identifier}#openCreateModal"
             data-${this.identifier}-date-param="${dateStr}"
             data-${this.identifier}-hour-param="${hour}">
-            ${overlapping.map(ev => `<div class="absolute inset-x-2 top-0 rounded-lg shadow-md p-2 text-sm text-white overflow-hidden" style="background: ${ev.backgroundColor || '#6366f1'}; height: ${Math.min((new Date(ev.end) - new Date(ev.start)) / 600, 100)}%; min-height: 50px;"><div class="font-semibold truncate">${ev.title}</div></div>`).join('')}
+            ${overlapping.map(ev => `<div class="absolute inset-x-2 top-0 rounded-lg shadow-md p-2 text-sm text-white overflow-hidden ${workflowBg(workflowStatusOf(ev))}" style="height: ${Math.min((new Date(ev.end) - new Date(ev.start)) / 600, 100)}%; min-height: 50px;"><div class="font-semibold truncate">${ev.title}</div></div>`).join('')}
           </div>
         </div>`)
     }

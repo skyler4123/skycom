@@ -27,7 +27,9 @@ RSpec.describe "Companies::CalendarsController", type: :request do
     expect(response).to have_http_status(:ok)
     items = JSON.parse(response.body)["events"]
     expect(items.map { |i| i["title"] }).to contain_exactly("Inside")
-    expect(items.first).to include("id", "start", "end", "backgroundColor", "allDay")
+    expect(items.first).to include("id", "start", "end", "workflow_status", "allDay")
+    expect(items.first).not_to have_key("backgroundColor")
+    expect(items.first["extendedProps"]).to include("workflow_status")
     expect(inside.reload).to be_present
   end
 

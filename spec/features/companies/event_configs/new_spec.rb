@@ -26,13 +26,14 @@ RSpec.feature "Companies::EventConfigs New", type: :feature, js: true do
     visit new_company_event_config_path(company)
 
     expect(page).to have_selector('select[name="event_config[category_id]"]', wait: 10)
-    page.execute_script(
-      "document.querySelector('select[name=\"event_config[category_id]\"]').value = '#{other_category.id}'"
-    )
+    expect(page).to have_selector("select[name=\"event_config[category_id]\"] option[value=\"#{other_category.id}\"]", wait: 10)
+    select other_category.name, from: "event_config[category_id]"
     click_button "Save Event Config"
 
+    expect(page).to have_content("Event Config", wait: 10)
+
     record = EventConfig.find_by(company: company, category: other_category)
-    expect(page).to have_current_path(company_event_config_path(company, record), wait: 10)
     expect(record).to be_present
+    expect(page).to have_current_path(company_event_config_path(company, record), wait: 10)
   end
 end
