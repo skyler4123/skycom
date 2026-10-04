@@ -16,7 +16,6 @@ class Company < ApplicationRecord
     Supplier
     Purchase PurchaseItem Workflow
     DiscountGroup Discount
-    Table Reservation Room Guest
     Patient Appointment Course Student Exam
     Membership
     Page CompanyPaymentMethodAppointment ShiftTemplate ScheduledShift

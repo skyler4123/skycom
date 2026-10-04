@@ -15,8 +15,6 @@ RSpec.describe Customer, type: :model do
     it { should have_many(:services).through(:customer_service_appointments) }
     it { should have_many(:customer_membership_appointments).dependent(:destroy) }
     it { should have_many(:memberships).through(:customer_membership_appointments) }
-    it { should have_many(:customer_reservation_appointments).dependent(:destroy) }
-    it { should have_many(:reservations).through(:customer_reservation_appointments) }
   end
 
   describe "validations" do

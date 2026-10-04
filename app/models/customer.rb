@@ -6,7 +6,6 @@ class Customer < ApplicationRecord
   include AddressConcern
   include TagConcern
   include MembershipConcern
-  include ReservationConcern
   include Customer::ImageConcern
   attribute :permission_resource_name, :string, default: -> { self.name }
 

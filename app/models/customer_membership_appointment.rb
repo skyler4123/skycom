@@ -1,5 +1,5 @@
 class CustomerMembershipAppointment < ApplicationRecord
-  # Customer entitlement link — atomic row attaching a Membership/Reservation.
+  # Customer entitlement link — atomic row attaching a Membership.
   #
   # Why it exists: a customer can hold concurrent entitlements per business_type
   # (e.g. loyalty Gold AND subscription Pro); this table versions them.

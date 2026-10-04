@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_10_03_000007) do
+ActiveRecord::Schema[8.0].define(version: 2026_10_04_000000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pgcrypto"
@@ -1744,32 +1744,6 @@ ActiveRecord::Schema[8.0].define(version: 2026_10_03_000007) do
     t.index ["lifecycle_status"], name: "index_customer_membership_appointments_on_lifecycle_status"
     t.index ["membership_id"], name: "index_customer_membership_appointments_on_membership_id"
     t.index ["workflow_status"], name: "index_customer_membership_appointments_on_workflow_status"
-  end
-
-  create_table "customer_reservation_appointments", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
-    t.uuid "company_id", null: false
-    t.uuid "customer_id", null: false
-    t.uuid "reservation_id", null: false
-    t.string "name"
-    t.string "description"
-    t.string "code"
-    t.integer "lifecycle_status"
-    t.integer "workflow_status"
-    t.integer "business_type"
-    t.datetime "expiration_date"
-    t.jsonb "metadata"
-    t.datetime "discarded_at"
-    t.string "permission_resource_name"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.index ["business_type"], name: "index_customer_reservation_appointments_on_business_type"
-    t.index ["company_id", "customer_id", "reservation_id"], name: "idx_customer_reservation_appointments_uniq", unique: true
-    t.index ["company_id"], name: "index_customer_reservation_appointments_on_company_id"
-    t.index ["customer_id"], name: "index_customer_reservation_appointments_on_customer_id"
-    t.index ["discarded_at"], name: "index_customer_reservation_appointments_on_discarded_at"
-    t.index ["lifecycle_status"], name: "index_customer_reservation_appointments_on_lifecycle_status"
-    t.index ["reservation_id"], name: "index_customer_reservation_appointments_on_reservation_id"
-    t.index ["workflow_status"], name: "index_customer_reservation_appointments_on_workflow_status"
   end
 
   create_table "customer_role_appointments", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
@@ -5508,100 +5482,6 @@ ActiveRecord::Schema[8.0].define(version: 2026_10_03_000007) do
     t.index ["workflow_status"], name: "index_questions_on_workflow_status"
   end
 
-  create_table "reservations", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
-    t.uuid "company_id", null: false
-    t.uuid "branch_id"
-    t.uuid "category_id", null: false
-    t.uuid "property_mapping_id", null: false
-    t.string "email"
-    t.string "name"
-    t.text "description"
-    t.string "code"
-    t.string "phone_number"
-    t.integer "currency"
-    t.integer "country"
-    t.integer "timezone"
-    t.integer "lifecycle_status"
-    t.integer "workflow_status"
-    t.integer "business_type"
-    t.datetime "expiration_date"
-    t.jsonb "metadata"
-    t.datetime "discarded_at"
-    t.string "permission_resource_name"
-    t.string "property_string_1"
-    t.string "property_string_2"
-    t.string "property_string_3"
-    t.string "property_string_4"
-    t.string "property_string_5"
-    t.string "property_string_6"
-    t.string "property_string_7"
-    t.string "property_string_8"
-    t.string "property_string_9"
-    t.string "property_string_10"
-    t.integer "property_integer_1"
-    t.integer "property_integer_2"
-    t.integer "property_integer_3"
-    t.integer "property_integer_4"
-    t.integer "property_integer_5"
-    t.integer "property_integer_6"
-    t.integer "property_integer_7"
-    t.integer "property_integer_8"
-    t.integer "property_integer_9"
-    t.integer "property_integer_10"
-    t.integer "property_integer_11"
-    t.integer "property_integer_12"
-    t.integer "property_integer_13"
-    t.integer "property_integer_14"
-    t.integer "property_integer_15"
-    t.integer "property_integer_16"
-    t.integer "property_integer_17"
-    t.integer "property_integer_18"
-    t.integer "property_integer_19"
-    t.integer "property_integer_20"
-    t.decimal "property_decimal_1", precision: 15, scale: 4
-    t.decimal "property_decimal_2", precision: 15, scale: 4
-    t.decimal "property_decimal_3", precision: 15, scale: 4
-    t.decimal "property_decimal_4", precision: 15, scale: 4
-    t.decimal "property_decimal_5", precision: 15, scale: 4
-    t.decimal "property_decimal_6", precision: 15, scale: 4
-    t.decimal "property_decimal_7", precision: 15, scale: 4
-    t.decimal "property_decimal_8", precision: 15, scale: 4
-    t.decimal "property_decimal_9", precision: 15, scale: 4
-    t.decimal "property_decimal_10", precision: 15, scale: 4
-    t.boolean "property_boolean_1"
-    t.boolean "property_boolean_2"
-    t.boolean "property_boolean_3"
-    t.boolean "property_boolean_4"
-    t.boolean "property_boolean_5"
-    t.boolean "property_boolean_6"
-    t.boolean "property_boolean_7"
-    t.boolean "property_boolean_8"
-    t.boolean "property_boolean_9"
-    t.boolean "property_boolean_10"
-    t.datetime "property_datetime_1"
-    t.datetime "property_datetime_2"
-    t.datetime "property_datetime_3"
-    t.datetime "property_datetime_4"
-    t.datetime "property_datetime_5"
-    t.datetime "property_datetime_6"
-    t.datetime "property_datetime_7"
-    t.datetime "property_datetime_8"
-    t.datetime "property_datetime_9"
-    t.datetime "property_datetime_10"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.index ["branch_id"], name: "index_reservations_on_branch_id"
-    t.index ["business_type"], name: "index_reservations_on_business_type"
-    t.index ["category_id"], name: "index_reservations_on_category_id"
-    t.index ["code"], name: "index_reservations_on_code", unique: true
-    t.index ["company_id"], name: "index_reservations_on_company_id"
-    t.index ["discarded_at"], name: "index_reservations_on_discarded_at"
-    t.index ["email"], name: "index_reservations_on_email", unique: true
-    t.index ["lifecycle_status"], name: "index_reservations_on_lifecycle_status"
-    t.index ["property_mapping_id"], name: "index_reservations_on_property_mapping_id"
-    t.index ["workflow_status"], name: "index_reservations_on_workflow_status"
-  end
-
   create_table "role_tag_appointments", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
     t.uuid "company_id", null: false
     t.uuid "role_id", null: false
@@ -8050,9 +7930,6 @@ ActiveRecord::Schema[8.0].define(version: 2026_10_03_000007) do
   add_foreign_key "customer_membership_appointments", "companies"
   add_foreign_key "customer_membership_appointments", "customers"
   add_foreign_key "customer_membership_appointments", "memberships"
-  add_foreign_key "customer_reservation_appointments", "companies"
-  add_foreign_key "customer_reservation_appointments", "customers"
-  add_foreign_key "customer_reservation_appointments", "reservations"
   add_foreign_key "customer_role_appointments", "companies"
   add_foreign_key "customer_role_appointments", "customers"
   add_foreign_key "customer_role_appointments", "roles"
@@ -8372,10 +8249,6 @@ ActiveRecord::Schema[8.0].define(version: 2026_10_03_000007) do
   add_foreign_key "questions", "categories"
   add_foreign_key "questions", "companies"
   add_foreign_key "questions", "property_mappings"
-  add_foreign_key "reservations", "branches"
-  add_foreign_key "reservations", "categories"
-  add_foreign_key "reservations", "companies"
-  add_foreign_key "reservations", "property_mappings"
   add_foreign_key "role_tag_appointments", "companies"
   add_foreign_key "role_tag_appointments", "roles"
   add_foreign_key "role_tag_appointments", "tags"

@@ -634,7 +634,6 @@ class Seed::RetailInitService
         "Employee" => { create: false, read: true, update: false, delete: true },
         "Exam" => { create: true, read: true, update: true, delete: true },
         "Facility" => { create: true, read: true, update: true, delete: true },
-        "Guest" => { create: true, read: true, update: true, delete: true },
         "Invoice" => { create: true, read: true, update: true, delete: true },
         "Membership" => { create: true, read: true, update: true, delete: true },
         "Order" => { create: true, read: true, update: true, delete: true },
@@ -651,8 +650,7 @@ class Seed::RetailInitService
         "Discount" => { create: true, read: true, update: true, delete: true },
         "Event" => { create: true, read: true, update: true, delete: true },
         "EventConfig" => { create: true, read: true, update: true, delete: true },
-        "Reservation" => { create: true, read: true, update: true, delete: true },
-        "Room" => { create: true, read: true, update: true, delete: true },
+
         "Service" => { create: true, read: true, update: true, delete: true },
         "Stock" => { create: true, read: true, update: true, delete: true },
         "Supplier" => { create: true, read: true, update: true, delete: true },
@@ -661,8 +659,7 @@ class Seed::RetailInitService
         "StockImport" => { create: true, read: true, update: true, delete: true },
         "StockTransfer" => { create: true, read: true, update: true, delete: true },
         "StockPending" => { create: true, read: true, update: true, delete: true },
-        "Student" => { create: true, read: true, update: true, delete: true },
-        "Table" => { create: true, read: true, update: true, delete: true }
+        "Student" => { create: true, read: true, update: true, delete: true }
       },
       Manager: {
         "Appointment" => { create: true, read: true, update: true, delete: true },
@@ -682,7 +679,6 @@ class Seed::RetailInitService
         "Employee" => { create: false, read: true, update: false, delete: true },
         "Exam" => { create: true, read: true, update: true, delete: true },
         "Facility" => { create: true, read: true, update: true, delete: true },
-        "Guest" => { create: true, read: true, update: true, delete: true },
         "Invoice" => { create: true, read: true, update: true, delete: true },
         "Membership" => { create: true, read: true, update: true, delete: true },
         "Order" => { create: true, read: true, update: true, delete: true },
@@ -693,8 +689,6 @@ class Seed::RetailInitService
         "Product" => { create: true, read: true, update: true, delete: true },
         "PropertyMapping" => { create: true, read: true, update: true, delete: true },
         "TableConfig" => { create: true, read: true, update: true, delete: true },
-        "Reservation" => { create: true, read: true, update: true, delete: true },
-        "Room" => { create: true, read: true, update: true, delete: true },
         "Service" => { create: true, read: true, update: true, delete: true },
         "Stock" => { create: true, read: true, update: true, delete: true },
         "Supplier" => { create: true, read: true, update: true, delete: true },
@@ -709,8 +703,7 @@ class Seed::RetailInitService
         "Discount" => { create: true, read: true, update: true, delete: true },
         "Event" => { create: true, read: true, update: true, delete: true },
         "EventConfig" => { create: true, read: true, update: true, delete: true },
-        "Student" => { create: true, read: true, update: true, delete: true },
-        "Table" => { create: true, read: true, update: true, delete: true }
+        "Student" => { create: true, read: true, update: true, delete: true }
       },
       Cashier: {
         "Order" => { create: true, read: true, update: true, delete: false },
