@@ -51,6 +51,7 @@ export const SIDEBAR_ITEMS = [
   { key: "stock_imports", group: "inventory", icon: "download", label: "Stock Imports", href: (cid) => Helpers.company_stock_imports_path(cid) },
   { key: "stock_exports", group: "inventory", icon: "upload", label: "Stock Exports", href: (cid) => Helpers.company_stock_exports_path(cid) },
   { key: "stock_adjustments", group: "inventory", icon: "tune", label: "Stock Adjustments", href: (cid) => Helpers.company_stock_adjustments_path(cid) },
+  { key: "stock_pendings", group: "inventory", icon: "schedule", label: "Stock Pendings", href: (cid) => Helpers.company_stock_pendings_path(cid) },
   { key: "suppliers", group: "inventory", icon: "local_shipping", label: "Suppliers", href: (cid) => Helpers.company_suppliers_path(cid) },
   { key: "policies", group: "authorization", icon: "security", label: "Policies", href: (cid) => Helpers.company_policies_path(cid) },
   { key: "permissions", group: "authorization", icon: "shield", label: "Permissions", href: (cid) => Helpers.company_permissions_path(cid) },

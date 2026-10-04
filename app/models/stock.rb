@@ -43,6 +43,7 @@ class Stock < ApplicationRecord
   belongs_to :warehouse
   belongs_to :category
   belongs_to :property_mapping
+  has_many :stock_pendings, dependent: :restrict_with_error
   # --- Validations ---
   validates :quantity, :pending, presence: true, numericality: { only_integer: true }
   validates :warehouse_id, uniqueness: { scope: :product_id, message: "already holds a tracking SKU row mapping for this layout" }

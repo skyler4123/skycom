@@ -241,7 +241,18 @@ now matches a stock by `company_id + warehouse_id + product_id` only.
 
 | Callback | Line | Method | Description |
 |----------|------|--------|-------------|
-| `after_create :recalibrate_stock_metrics` | 23 | `recalibrate_stock_metrics` | **The single quantity mutator for the stock domain** (docs/superpowers/specs/2026-09-23-stock-source-of-truth-design.md). Hardened (2026-09-23): resolves the Stock row with `find_by!` (no lazy `find_or_initialize_by` creation — a missing row is a programming error), wraps the mutation in `stock.with_lock` (concurrent movements serialize), raises `StockMovementService::Error` when the delta would push `quantity` negative (whole movement rolls back — document + ledger + quantity), and saves via `stock.save!` so `Stock#after_save :sync_available_counter` keeps the Redis counter in step. All movement paths (`StockMovementService::*`, POS finalize, purchase completion) create ledger rows whose callback applies the quantity delta. |
+| `after_create :recalibrate_stock_metrics` | 23 | `recalibrate_stock_metrics` | **The single quantity AND pending mutator for the stock domain** (docs/superpowers/specs/2026-09-23-stock-source-of-truth-design.md; pending branch added 2026-10-02, docs/superpowers/specs/2026-10-02-stock-pending-design.md). Hardened (2026-09-23): resolves the Stock row with `find_by!` (no lazy `find_or_initialize_by` creation — a missing row is a programming error), wraps the mutation in `stock.with_lock` (concurrent movements serialize), raises `StockMovementService::Error` when the delta would push `quantity` negative (whole movement rolls back — document + ledger + quantity), and saves via `stock.save!` so `Stock#after_save :sync_available_counter` keeps the Redis counter in step. All movement paths (`StockMovementService::*`, POS finalize, purchase completion) create ledger rows whose callback applies the quantity delta. `hold`/`release` rows (transaction_type 4/5) instead move `pending` only: hold requires `quantity − pending >= qty`, release requires `pending >= qty` (strict — over-release fails fast, never silent-floored). |
+
+---
+
+### StockPending (`app/models/stock_pending.rb`)
+
+| Callback | Line | Method | Description |
+|----------|------|--------|-------------|
+| `before_validation :stamp_status_changed_at, on: :create` | — | `stamp_status_changed_at` | Stamps `status_changed_at` on creation (default `Time.current` when blank). Every `release!`/`cancel!` transition re-stamps it alongside `released_at`. |
+| `before_destroy :prevent_destroy_if_holding` | — | `prevent_destroy_if_holding` | Blocks destroy while the row is in the holding set (`pending`/`in_progress`/`initiated`). Adds error and `throw(:abort)` — open holds must be released/cancelled first so `pending` never leaks. |
+
+> Holding lifecycle runs on `workflow_status` (holding set → released set); `release!` maps to `completed`, `cancel!` to `cancelled`. The rows never write `Stock` columns directly — `pending` moves only through the `hold`/`release` ledger rows created by `StockPendings::HoldService` / `ReleaseService`.
 
 ---
 

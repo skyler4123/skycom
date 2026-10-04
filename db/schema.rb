@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_09_26_000004) do
+ActiveRecord::Schema[8.0].define(version: 2026_10_02_000001) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pgcrypto"
@@ -6282,6 +6282,40 @@ ActiveRecord::Schema[8.0].define(version: 2026_09_26_000004) do
     t.index ["workflow_status"], name: "index_stock_imports_on_workflow_status"
   end
 
+  create_table "stock_pendings", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
+    t.uuid "company_id", null: false
+    t.uuid "warehouse_id", null: false
+    t.uuid "stock_id", null: false
+    t.uuid "product_id", null: false
+    t.string "name"
+    t.text "reason"
+    t.string "code"
+    t.integer "quantity", null: false
+    t.datetime "status_changed_at"
+    t.datetime "released_at"
+    t.integer "lifecycle_status"
+    t.integer "workflow_status"
+    t.integer "business_type"
+    t.datetime "expiration_date"
+    t.jsonb "metadata", default: {}
+    t.datetime "discarded_at"
+    t.string "permission_resource_name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["business_type"], name: "index_stock_pendings_on_business_type"
+    t.index ["code"], name: "index_stock_pendings_on_code", unique: true
+    t.index ["company_id", "workflow_status"], name: "index_stock_pendings_on_company_id_and_workflow_status"
+    t.index ["company_id"], name: "index_stock_pendings_on_company_id"
+    t.index ["discarded_at"], name: "index_stock_pendings_on_discarded_at"
+    t.index ["lifecycle_status"], name: "index_stock_pendings_on_lifecycle_status"
+    t.index ["product_id"], name: "index_stock_pendings_on_product_id"
+    t.index ["stock_id", "workflow_status"], name: "index_stock_pendings_on_stock_id_and_workflow_status"
+    t.index ["stock_id"], name: "index_stock_pendings_on_stock_id"
+    t.index ["warehouse_id", "workflow_status"], name: "index_stock_pendings_on_warehouse_id_and_workflow_status"
+    t.index ["warehouse_id"], name: "index_stock_pendings_on_warehouse_id"
+    t.index ["workflow_status"], name: "index_stock_pendings_on_workflow_status"
+  end
+
   create_table "stock_tag_appointments", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
     t.uuid "company_id", null: false
     t.uuid "stock_id", null: false
@@ -8150,6 +8184,10 @@ ActiveRecord::Schema[8.0].define(version: 2026_09_26_000004) do
   add_foreign_key "stock_tag_appointments", "companies"
   add_foreign_key "stock_tag_appointments", "stocks"
   add_foreign_key "stock_tag_appointments", "tags"
+  add_foreign_key "stock_pendings", "companies"
+  add_foreign_key "stock_pendings", "products"
+  add_foreign_key "stock_pendings", "stocks"
+  add_foreign_key "stock_pendings", "warehouses"
   add_foreign_key "stock_transactions", "branches"
   add_foreign_key "stock_transactions", "categories"
   add_foreign_key "stock_transactions", "companies"

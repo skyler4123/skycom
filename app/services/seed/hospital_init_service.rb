@@ -344,6 +344,7 @@ class Seed::HospitalInitService
         "StockExport" => { create: true, read: true, update: true, delete: true },
         "StockImport" => { create: true, read: true, update: true, delete: true },
         "StockTransfer" => { create: true, read: true, update: true, delete: true },
+        "StockPending" => { create: true, read: true, update: true, delete: true },
         "Purchase" => { create: true, read: true, update: true, delete: true },
         "PurchaseItem" => { create: true, read: true, update: true, delete: true }
       },
@@ -387,6 +388,7 @@ class Seed::HospitalInitService
         "StockExport" => { create: true, read: true, update: true, delete: true },
         "StockImport" => { create: true, read: true, update: true, delete: true },
         "StockTransfer" => { create: true, read: true, update: true, delete: true },
+        "StockPending" => { create: true, read: true, update: true, delete: true },
         "Purchase" => { create: true, read: true, update: true, delete: true },
         "PurchaseItem" => { create: true, read: true, update: true, delete: true }
       }

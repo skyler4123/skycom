@@ -624,6 +624,7 @@ class Seed::RetailInitService
         "StockExport" => { create: true, read: true, update: true, delete: true },
         "StockImport" => { create: true, read: true, update: true, delete: true },
         "StockTransfer" => { create: true, read: true, update: true, delete: true },
+        "StockPending" => { create: true, read: true, update: true, delete: true },
         "Student" => { create: true, read: true, update: true, delete: true },
         "Table" => { create: true, read: true, update: true, delete: true }
       },
@@ -665,6 +666,7 @@ class Seed::RetailInitService
         "StockExport" => { create: true, read: true, update: true, delete: true },
         "StockImport" => { create: true, read: true, update: true, delete: true },
         "StockTransfer" => { create: true, read: true, update: true, delete: true },
+        "StockPending" => { create: true, read: true, update: true, delete: true },
         "Purchase" => { create: true, read: true, update: true, delete: true },
         "PurchaseItem" => { create: true, read: true, update: true, delete: true },
         "DiscountGroup" => { create: true, read: true, update: true, delete: true },

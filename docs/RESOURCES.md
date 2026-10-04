@@ -107,8 +107,9 @@ Company-scoped business entities. Each table belongs to a `company_id` and repre
 | 61 | `suppliers` | Inventory | Supplier records (procurement-ready master data) |
 | 62 | `discount_groups` | Sales | Discount campaign groups (type/value, budget, validity, status) |
 | 63 | `discounts` | Sales | Single-use discount codes (unique per company, consumption state, SoT bindings) |
+| 64 | `stock_pendings` | Inventory | Owner-less pending-hold records (one hold ledger row on reserve, one release row on consume/release) |
 
-**Total: 63 tables**
+**Total: 64 tables**
 
 ---
 
@@ -192,9 +193,9 @@ replaced them with 103 single-purpose tables:
 |----------|-------|
 | Gem Resources | 4 |
 | System Resources | 11 |
-| Managed Resources | 63 |
+| Managed Resources | 64 |
 | Appointment Resources | 107 |
-| **Grand Total** | **185** |
+| **Grand Total** | **186** |
 
 ---
 

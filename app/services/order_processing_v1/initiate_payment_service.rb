@@ -48,7 +48,9 @@ module OrderProcessingV1
           end
         end
       rescue StandardError
-        reserved&.each { |r| r[:stock].release_reserved!(r[:qty]) }
+        reserved&.each do |r|
+          StockPendings::ReleaseService.call(stock_pending: r[:stock_pending]) if r[:stock_pending]
+        end
         discount&.release!
         raise
       end

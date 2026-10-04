@@ -2,8 +2,10 @@
 
 > **Status**: Live. Stock is the heart of Skycom ERP: every unit on every shelf
 > is tracked here, and every movement in the platform lands here. One tenet
-> governs it all: **`Stock.quantity` is mutated ONLY by `StockTransaction`'s
-> hardened callback** — no direct writes, no background jobs, no exceptions.
+> governs it all: **`Stock.quantity` AND `Stock.pending` are mutated ONLY by
+> `StockTransaction`'s hardened callback** — no direct writes, no background
+> jobs, no exceptions. Holds live behind owner-less `StockPending` rows
+> (2026-10-02, `docs/superpowers/specs/2026-10-02-stock-pending-design.md`).
 
 ---
 
@@ -61,9 +63,15 @@ Rules:
   `quantity − pending >= qty`; hold consumption (`consume_hold: true`)
   requires `quantity >= qty` **and** `pending >= qty`.
 - **`consume_hold` ownership**: a line carrying the pay-persisted `stock_id`
-  proves its hold — consume unconditionally (a missing hold fails fast
-  instead of silently overselling). Legacy lines without `stock_id` keep the
-  `pending >= qty` heuristic, else free-standing removal under the floor.
+  proves its hold — its `StockPending` rows must release at least the line
+  quantity (a missing hold fails fast instead of silently overselling).
+  Legacy lines without `stock_id` keep the `pending >= qty` heuristic
+  (pre-migration raw residual), else free-standing removal under the floor.
+- **Holds are rows, not counters**: `StockPendings::HoldService` creates one
+  holding `StockPending` + one anchored `hold` ledger row per hold; the
+  `hold`/`release` branch of the callback is the only `pending` writer.
+  `ReleaseService` releases whole rows FIFO (exact-ID when the caller holds
+  it) with one `release` ledger row per row.
 - **Document lines reference exact rows**: each movement line table carries a
   concrete `stock_id` + `quantity` — warehouse ambiguity is impossible.
 
@@ -82,9 +90,10 @@ All stock availability flows through three model wrappers
 | `release_reserved!(qty)` | Redis increment + DB `pending -= qty` (floored at 0) |
 
 Callers: `CheckAvailabilityService` reads via `available_count`;
-`ReserveStockService` heals then reserves per item (first `false` rolls back
-prior holds, raises `InsufficientStockError` → 422);
-`ReleaseReservedStockService` releases per line (exact `stock_id` first,
+`ReserveStockService` heals then holds per item via `StockPendings::HoldService`
+(first failure releases prior holds, raises `InsufficientStockError` → 422);
+`ReleaseReservedStockService` releases holds per line via
+`StockPendings::ReleaseService` (exact `stock_id` first,
 branch-then-company fallback, tolerates missing rows).
 
 ---
@@ -95,10 +104,12 @@ branch-then-company fallback, tolerates missing rows).
 
 ```
 Checkout ─► reads availability (Redis counter; heals from DB if missing)
-Pay      ─► reserve_stock!: DECRBY available_counter + DB pending += qty;
+Pay      ─► HoldService per line: StockPending + hold ledger (pending += qty);
              persist exact stock_id on the atomic order line
-Finalize ─► remove ledger row per line (consume_hold) + StockExport doc
-Cancel   ─► release_reserved! + mark transaction failed
+Finalize ─► TWO ledger rows per line: pending release + quantity remove
+             (+ StockExport doc)
+Cancel   ─► ReleaseService per line (pending -= qty, row → completed/cancelled)
+             + mark transaction failed
 ```
 
 - Pay resolves stock against the order's **branch warehouses only** — never a
@@ -154,7 +165,17 @@ reserve (pay, transfer-initiate) → consume (finalize, transfer-receive)
 `pending` moves only through `reserve_stock!` / `release_reserved!` /
 hold-consuming ledger rows. Orphan holds are impossible by construction:
 every hold is created with its consumer (finalize/receive) or its releaser
-(cancel) on a defined path.
+(cancel) on a defined path. Every hold is a `StockPending` row (one
+`hold` ledger row on reserve, one `release` ledger row on consume/release),
+so `pending` is always traceable to its rows.
+
+**Fungibility (accepted):** holds are anonymous — scope release frees
+same-`business_type` rows first (POS consumes `pos`, transfers consume
+`transfer`), then oldest-first, whole rows only. A finalize can therefore
+complete another domain's row when its own rows are gone; numbers stay
+consistent, but the row's owner sees it as released. Rollback of a failed
+multi-line hold likewise leaves `completed` (not deleted) rows — the audit
+trail, not a leak.
 
 ### 4.6 Document ↔ line-table map (atomic pairs)
 
@@ -175,12 +196,20 @@ order/purchase lines are atomic (see `docs/RESOURCES.md` §4).
 
 ## 5. Tenets (Immutable)
 
-1. **Single mutator.** `Stock.quantity` is written only by
-   `StockTransaction#recalibrate_stock_metrics`. No service, controller, or
-   job assigns it.
+1. **Single mutator.** `Stock.quantity` AND `Stock.pending` are written only
+   by `StockTransaction#recalibrate_stock_metrics` (quantity branch vs
+   `hold`/`release` branch). No service, controller, or job assigns either.
+   Grandfathered exceptions (pre-row legacy paths only, both no-ops when no
+   raw residual exists): `BaseService` `consume_hold` removals and
+   `Transfers::CancelService#release_raw_residual!` still call
+   `release_reserved!` — a `GREATEST(pending - qty, 0)` write with no ledger
+   row. Do not add new wrapper call sites; route new holds through
+   `StockPendings::HoldService` / `ReleaseService`.
 2. **Wrappers only.** Business code reads/reserves/releases through
    `available_count` / `reserve_stock!` / `release_reserved!` — never the
-   Kredis proxy, never raw `update_all` on stock columns.
+   Kredis proxy, never raw `update_all` on stock columns. New hold paths go
+   through `StockPendings::HoldService` / `ReleaseService`, which write the
+   ledger rows whose callback moves `pending`.
 3. **DB leads, Redis follows.** On any disagreement, the DB value wins; Redis
    heals from it.
 4. **Exact rows, never guessed warehouses.** Lines carry concrete `stock_id`;
@@ -211,6 +240,9 @@ order/purchase lines are atomic (see `docs/RESOURCES.md` §4).
 |------|---------|
 | `app/models/stock.rb` | SKU row (`quantity`/`pending`), `available_counter`, the three wrappers, `sync_available_counter` |
 | `app/models/stock_transaction.rb` | Ledger row + the single quantity mutator (`recalibrate_stock_metrics`) |
+| `app/models/stock_pending.rb` | Owner-less hold record (`quantity`, holding/released `workflow_status`, `released_at`) |
+| `app/services/stock_pendings/{hold,release}_service.rb` | Hold/release services (one ledger row per transition, FIFO scope release) |
+| `app/controllers/companies/stock_pendings_controller.rb` | Hold dashboards (index/new/show/edit + release/cancel members) |
 | `app/models/stock_{import,export,transfer,adjustment}.rb` | Movement documents |
 | `app/models/stock_{import,export,transfer,adjustment}_stock_appointment.rb` | Atomic document lines (exact `stock_id` + `quantity`) |
 | `app/services/stock_movement_service/base_service.rb` | The epic: lock → floor → ledger → hold release |

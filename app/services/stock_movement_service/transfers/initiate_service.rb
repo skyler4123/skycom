@@ -2,11 +2,11 @@
 
 # Initiates a StockTransfer (two-phase, docs/superpowers/specs/
 # 2026-09-23-stock-source-of-truth-design.md §3.5):
-# Phase 1 — holds the source units: each line's source Stock row gets
-# `pending += qty` via Stock#reserve_stock! (no ledger rows, no quantity change;
-# the units stay on the shelf but disappear from POS availability). Any
-# insufficient line rolls back ALL prior holds (same pattern as
-# OrderProcessingV1::ReserveStockService). The transfer moves to `initiated`.
+# Phase 1 — holds the source units behind one `transfer` StockPending per
+# line (each with its own anchored `hold` ledger row; the units stay on the
+# shelf but disappear from POS availability). Any insufficient line releases
+# ALL prior holds (healing Redis) and raises — the transfer stays uninitiated
+# with no pending rows left behind. The transfer moves to `initiated`.
 class StockMovementService::Transfers::InitiateService
   def self.call(transfer:, employee: nil)
     raise StockMovementService::Error, "Transfer has no stock lines" if transfer.stock_transfer_stock_appointments.empty?
@@ -19,12 +19,16 @@ class StockMovementService::Transfers::InitiateService
     ActiveRecord::Base.transaction do
       transfer.stock_transfer_stock_appointments.each do |line|
         stock = line.stock.reload
-        unless stock.reserve_stock!(line.quantity)
+        result = StockPendings::HoldService.call(
+          company: transfer.company, warehouse: stock.warehouse, stock: stock,
+          quantity: line.quantity, business_type: :transfer, name: transfer.code
+        )
+        unless result[:success]
           raise StockMovementService::Error,
                 "Insufficient stock to initiate transfer for #{stock.product.name}"
         end
 
-        reserved << [ stock, line.quantity ]
+        reserved << result[:stock_pending]
       end
 
       transfer.update!(
@@ -32,7 +36,7 @@ class StockMovementService::Transfers::InitiateService
         initiated_at: Time.current
       )
     rescue StockMovementService::Error
-      reserved.each { |stock, qty| stock.release_reserved!(qty) }
+      reserved.each { |pending| StockPendings::ReleaseService.call(stock_pending: pending) }
       raise
     end
 

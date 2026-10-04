@@ -21,7 +21,7 @@ RSpec.describe StockTransaction, type: :model do
 
   describe "enums" do
     it { should define_enum_for(:direction).with_values(add: 0, remove: 1) }
-    it { should define_enum_for(:transaction_type).with_values(import: 0, export: 1, transfer: 2, adjustment: 3) }
+    it { should define_enum_for(:transaction_type).with_values(import: 0, export: 1, transfer: 2, adjustment: 3, hold: 4, release: 5) }
   end
 
   describe "#recalibrate_stock_metrics (hardened single quantity mutator)" do
