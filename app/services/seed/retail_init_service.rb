@@ -266,6 +266,20 @@ class Seed::RetailInitService
         visible_columns: %w[name code property_integer_1 workflow_status]
       }
     },
+    events: {
+      "Procedure Booking" => {
+        properties: { property_string_1: "Procedure Type", property_integer_1: "Duration (minutes)" },
+        visible_columns: %w[name code property_string_1 property_integer_1 workflow_status]
+      },
+      "Room Stay" => {
+        properties: { property_string_1: "Room Number", property_datetime_1: "Check-in Time" },
+        visible_columns: %w[name code property_string_1 workflow_status]
+      },
+      "Table Reservation" => {
+        properties: { property_string_1: "Table Number", property_integer_1: "Party Size" },
+        visible_columns: %w[name code property_string_1 property_integer_1 workflow_status]
+      }
+    },
     customers: {
       "Retail VIP" => {
         properties: { property_integer_1: "Loyalty Points", property_decimal_1: "Credit Limit", property_boolean_1: "Premium Member" },
@@ -473,6 +487,7 @@ class Seed::RetailInitService
     create_categories
     create_table_configs
     create_default_workflows
+    create_default_event_configs
     configure_retail_permissions
   end
 
@@ -556,6 +571,25 @@ class Seed::RetailInitService
     assign_policies_to_roles
   end
 
+  # One EventConfig per events category (docs/EVENTS.md): bookings that need
+  # goods hold stock and bill an order; plain meetings would opt out.
+  EVENT_CONFIG_DEFAULTS = {
+    "Procedure Booking" => { create_stock_pending: true, create_order_on_complete: true },
+    "Room Stay" => { create_stock_pending: true, create_order_on_complete: true },
+    "Table Reservation" => { create_stock_pending: true, create_order_on_complete: true }
+  }.freeze
+
+  def create_default_event_configs
+    @company.categories.where(resource_name: "events").find_each do |category|
+      flags = EVENT_CONFIG_DEFAULTS.fetch(category.name,
+        { create_stock_pending: false, create_order_on_complete: false })
+      EventConfig.find_or_create_by!(company: @company, category: category) do |config|
+        config.create_stock_pending = flags[:create_stock_pending]
+        config.create_order_on_complete = flags[:create_order_on_complete]
+      end
+    end
+  end
+
   def create_all_crud_policies
     crud_actions = %w[create read update delete]
 
@@ -615,6 +649,8 @@ class Seed::RetailInitService
         "PurchaseItem" => { create: true, read: true, update: true, delete: true },
         "DiscountGroup" => { create: true, read: true, update: true, delete: true },
         "Discount" => { create: true, read: true, update: true, delete: true },
+        "Event" => { create: true, read: true, update: true, delete: true },
+        "EventConfig" => { create: true, read: true, update: true, delete: true },
         "Reservation" => { create: true, read: true, update: true, delete: true },
         "Room" => { create: true, read: true, update: true, delete: true },
         "Service" => { create: true, read: true, update: true, delete: true },
@@ -671,6 +707,8 @@ class Seed::RetailInitService
         "PurchaseItem" => { create: true, read: true, update: true, delete: true },
         "DiscountGroup" => { create: true, read: true, update: true, delete: true },
         "Discount" => { create: true, read: true, update: true, delete: true },
+        "Event" => { create: true, read: true, update: true, delete: true },
+        "EventConfig" => { create: true, read: true, update: true, delete: true },
         "Student" => { create: true, read: true, update: true, delete: true },
         "Table" => { create: true, read: true, update: true, delete: true }
       },

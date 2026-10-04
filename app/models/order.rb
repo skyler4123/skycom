@@ -36,6 +36,8 @@ class Order < ApplicationRecord
   has_many :service_groups, through: :order_service_group_appointments
   has_many :order_subscription_plan_appointments, dependent: :destroy
   has_many :subscription_plans, through: :order_subscription_plan_appointments
+  has_many :event_order_appointments, dependent: :destroy
+  has_many :events, through: :event_order_appointments
 
   # --- Validations ---
   validates :name, presence: true, uniqueness: { scope: :company_id }, length: { maximum: 255 }

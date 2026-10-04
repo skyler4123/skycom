@@ -23,6 +23,8 @@ class Facility < ApplicationRecord
   has_many :facility_groups, through: :facility_facility_group_appointments
   has_many :employee_facility_appointments, dependent: :destroy
   has_many :employees, through: :employee_facility_appointments
+  has_many :event_facility_appointments, dependent: :destroy
+  has_many :events, through: :event_facility_appointments
 
   validates :name, presence: true, uniqueness: { scope: :company_id }, length: { maximum: 255 }
   validates :description, length: { maximum: 5000 }, allow_blank: true
