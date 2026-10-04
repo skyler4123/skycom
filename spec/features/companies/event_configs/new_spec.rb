@@ -14,25 +14,27 @@ RSpec.feature "Companies::EventConfigs New", type: :feature, js: true do
     seed_event_client_cache(company: company, owner: owner)
   end
 
-  scenario "renders new config form with rule toggles" do
+  scenario "renders new config form with rule toggles and no category dropdown" do
     visit new_company_event_config_path(company)
 
-    expect(page).to have_selector('select[name="event_config[category_id]"]', wait: 10)
+    expect(page).to have_no_selector('select[name="event_config[category_id]"]', wait: 10)
+    expect(page).to have_selector('input[name="event_config[category_id]"]', visible: :all, wait: 10)
     expect(page).to have_selector('input[name="event_config[create_stock_pending]"]', wait: 10)
     expect(page).to have_selector('input[name="event_config[create_order_on_complete]"]', wait: 10)
+    expect(page).to have_selector('[data-controller="tooltip"]', minimum: 5, wait: 10)
   end
 
   scenario "creates config and redirects to show page" do
     visit new_company_event_config_path(company)
 
-    expect(page).to have_selector('select[name="event_config[category_id]"]', wait: 10)
-    expect(page).to have_selector("select[name=\"event_config[category_id]\"] option[value=\"#{other_category.id}\"]", wait: 10)
-    select other_category.name, from: "event_config[category_id]"
+    expect(page).to have_selector('input[name="event_config[category_id]"]', visible: :all, wait: 10)
+    category_id = find('input[name="event_config[category_id]"]', visible: :all).value
+    expect(category_id).to be_present
     click_button "Save Event Config"
 
     expect(page).to have_content("Event Config", wait: 10)
 
-    record = EventConfig.find_by(company: company, category: other_category)
+    record = EventConfig.find_by(company: company, category_id: category_id)
     expect(record).to be_present
     expect(page).to have_current_path(company_event_config_path(company, record), wait: 10)
   end
