@@ -643,7 +643,7 @@ class Seed::RetailEnrichService
       branch_stocks = Stock.joins(:warehouse).where(company: @retail, warehouses: { branch_id: branch.id })
       next if branch_customers.empty? || branch_employees.empty?
 
-      2.times do |i|
+      4.times do |i|
         category = round_robin(event_categories, bi + i)
         start_at = Faker::Time.forward(days: 7)
         event = Seed::EventService.create(

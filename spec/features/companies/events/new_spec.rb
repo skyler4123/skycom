@@ -26,13 +26,14 @@ RSpec.feature "Companies::Events New", type: :feature, js: true do
     visit new_company_event_path(company)
 
     fill_in 'event[name]', with: 'New Test Event'
-    page.execute_script("document.querySelector('select[name=\"event[business_type]\"]').value = 'procedure'")
+    select 'Procedure', from: 'event[business_type]'
 
     click_button "Save Event"
 
-    expect(page).to have_current_path(company_event_path(company, Event.find_by(name: "New Test Event")), wait: 10)
     expect(page).to have_content('New Test Event', wait: 10)
 
-    expect(Event.find_by(name: "New Test Event")).to be_present
+    record = Event.find_by(name: "New Test Event")
+    expect(record).to be_present
+    expect(page).to have_current_path(company_event_path(company, record), wait: 10)
   end
 end

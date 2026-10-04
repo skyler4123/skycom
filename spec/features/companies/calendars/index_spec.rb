@@ -9,9 +9,14 @@ RSpec.feature "Companies::Calendar Board", type: :feature, js: true do
   end
 
   let!(:event) do
+    # Today is always inside both the month range and the current-week range,
+    # so the chip survives the month → week switch every weekday (a relative
+    # +2.days date crosses into next week on Sat/Sun and the week view
+    # correctly hides it — that was the failure).
+    today_start = Time.current.change(hour: 10)
     create(:event, company: company, category: default_category,
       name: "Board Event #{SecureRandom.hex(4)}",
-      start_at: 2.days.from_now.change(hour: 10), end_at: 2.days.from_now.change(hour: 11))
+      start_at: today_start, end_at: today_start + 1.hour)
   end
 
   before do

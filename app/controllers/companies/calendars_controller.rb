@@ -9,15 +9,6 @@
 # Endpoints: GET /companies/:company_id/calendar(.json?start=&end=) — see config/routes.rb
 # Docs: docs/EVENTS.md
 class Companies::CalendarsController < Companies::ApplicationController
-  WORKFLOW_COLORS = {
-    "draft" => "#94a3b8",
-    "pending" => "#6366f1",
-    "confirmed" => "#3b82f6",
-    "in_progress" => "#f59e0b",
-    "completed" => "#10b981",
-    "cancelled" => "#ef4444"
-  }.freeze
-
   def index
     respond_to do |format|
       format.html { render html: "", layout: true }
@@ -48,7 +39,7 @@ class Companies::CalendarsController < Companies::ApplicationController
       title: event.name,
       start: event.start_at&.iso8601,
       end: event.end_at&.iso8601,
-      backgroundColor: WORKFLOW_COLORS.fetch(event.workflow_status, "#6366f1"),
+      workflow_status: event.workflow_status,
       allDay: false,
       extendedProps: {
         workflow_status: event.workflow_status,

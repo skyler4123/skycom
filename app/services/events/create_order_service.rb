@@ -2,6 +2,9 @@
 
 # Bridges a completed Event to a payable Order (result-hash contract).
 #
+# NOTE (decoupled): not called by Events::AfterSaveService for now — events stay
+# independent until reconnected. Kept intact so the reconnect is a one-line revert.
+#
 # The Event tracks the occasion; the Order processes its money. On success
 # the order is a normal pending in_store order with price snapshots taken
 # from the catalog at completion time — it then flows through the standard

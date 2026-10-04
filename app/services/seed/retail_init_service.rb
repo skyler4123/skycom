@@ -572,11 +572,11 @@ class Seed::RetailInitService
   end
 
   # One EventConfig per events category (docs/EVENTS.md): bookings that need
-  # goods hold stock and bill an order; plain meetings would opt out.
+  # goods hold stock; order billing is decoupled for now (all false).
   EVENT_CONFIG_DEFAULTS = {
-    "Procedure Booking" => { create_stock_pending: true, create_order_on_complete: true },
-    "Room Stay" => { create_stock_pending: true, create_order_on_complete: true },
-    "Table Reservation" => { create_stock_pending: true, create_order_on_complete: true }
+    "Procedure Booking" => { create_stock_pending: true, create_order_on_complete: false },
+    "Room Stay" => { create_stock_pending: true, create_order_on_complete: false },
+    "Table Reservation" => { create_stock_pending: true, create_order_on_complete: false }
   }.freeze
 
   def create_default_event_configs
