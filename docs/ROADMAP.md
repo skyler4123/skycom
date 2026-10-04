@@ -181,7 +181,7 @@ Skycom is a multi-tenant retail ERP with a **usage-based credit** monetization m
 | Restaurant | `Seed::Restaurant*Service` (future) | cashier, waiter, kitchen staff |
 | Hospital | `Seed::Hospital*Service` (partial) | receptionist, doctor, nurse |
 | Education | `Seed::Education*Service` (partial) | — |
-| Hotel | `Seed::Hotel*Service` (partial) | — |
+| Hotel | `Seed::HotelInitService` / `Seed::HotelEnrichService` ✅ | Bookings (`events` "Booking"), accommodation + amenity services, stay orders + folios |
 | Fitness | `Seed::FitnessService` (partial) | — |
 
 ---

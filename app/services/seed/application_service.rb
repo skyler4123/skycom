@@ -95,10 +95,17 @@ class Seed::ApplicationService
       business_type: :hospital,
       country: :vn, currency: :vnd, timezone: :plus_7
     )
+    company_4 = Seed::CompanyService.create(
+      user: user_2, name: "Sunrise Hotel", email: "hotel@company4.com",
+      description: "A lakeside hotel group",
+      business_type: :hotel,
+      country: :vn, currency: :vnd, timezone: :plus_7
+    )
 
     Seed::RetailEnrichService.new(company: company_1, user: user_1, email: "retail_us@company1.com")
     Seed::RetailEnrichService.new(company: company_2, user: user_2, email: "retail_vn@company2.com")
     Seed::HospitalEnrichService.new(company: company_3, user: user_2, email: "hospital@company3.com")
+    Seed::HotelEnrichService.new(company: company_4, user: user_2, email: "hotel@company4.com")
 
     self.puts_count
 
