@@ -103,14 +103,13 @@ Company-scoped business entities. Each table belongs to a `company_id` and repre
 | 57 | `attendance_days` | HR | Daily attendance summaries |
 | 58 | `attendance_months` | HR | Monthly attendance rollups |
 | 59 | `memberships` | CRM | Customer loyalty/program memberships |
-| 60 | `reservations` | Bookings | Customer service bookings |
-| 61 | `suppliers` | Inventory | Supplier records (procurement-ready master data) |
-| 62 | `discount_groups` | Sales | Discount campaign groups (type/value, budget, validity, status) |
-| 63 | `discounts` | Sales | Single-use discount codes (unique per company, consumption state, SoT bindings) |
-| 64 | `stock_pendings` | Inventory | Owner-less pending-hold records (one hold ledger row on reserve, one release row on consume/release) |
-| 65 | `event_configs` | Events | Per-category event rules (stock holds, order bridge, overlap warnings) |
+| 60 | `suppliers` | Inventory | Supplier records (procurement-ready master data) |
+| 61 | `discount_groups` | Sales | Discount campaign groups (type/value, budget, validity, status) |
+| 62 | `discounts` | Sales | Single-use discount codes (unique per company, consumption state, SoT bindings) |
+| 63 | `stock_pendings` | Inventory | Owner-less pending-hold records (one hold ledger row on reserve, one release row on consume/release) |
+| 64 | `event_configs` | Events | Per-category event rules (stock holds, order bridge, overlap warnings) |
 
-**Total: 65 tables**
+**Total: 64 tables**
 
 ---
 
@@ -126,13 +125,13 @@ Atomic pairwise join tables: one table per resource pair, named alphabetically (
 | 4 | Order line items | `order_product`, `order_product_group`, `order_service`, `order_service_group`, `order_subscription_plan` (each with `quantity` / `unit_price` / `total_price` snapshots) | 5 |
 | 5 | Payment method links | `branch_payment_method`, `company_payment_method` | 2 |
 | 6 | Policy / role assignments | `policy_role`, `customer_role`, `customer_group_role`, `department_role`, `employee_group_role`, `employee_role` | 6 |
-| 7 | Membership / reservation | `customer_membership`, `customer_reservation` | 2 |
+| 7 | Membership | `customer_membership` | 1 |
 | 8 | Purchase line items | `purchase_purchase_item` (`quantity` / `unit_price` / `total_price`) | 1 |
 | 9 | Subscription links | `branch_subscription_plan`, `subscription_group_subscription_plan` | 2 |
 | 10 | Order-group link | `employee_order_group` (`quantity` / `unit_price` / `total_price`) | 1 |
 | 11 | Stock document lines | `stock_import_stock`, `stock_export_stock`, `stock_transfer_stock`, `stock_adjustment_stock` (each `stock_id` + `quantity`; document lines reference exact Stock rows) | 4 |
 
-**Total: 113 tables**
+**Total: 112 tables**
 
 ---
 
@@ -160,8 +159,8 @@ replaced them with 103 single-purpose tables:
   `start_at` on service bookings — never on a shared polymorphic row.
 - **Writes go through owner-side helpers**, not raw inserts: `attach_tag`
   (`TagConcern`), `attach_address` (`AddressConcern`), `attach_role`
-  (`RoleConcern`), `attach_membership` / `attach_reservation`
-  (`MembershipConcern` / `ReservationConcern`). `OrderConcern` is a no-op
+  (`RoleConcern`), `attach_membership`
+  (`MembershipConcern`). `OrderConcern` is a no-op
   marker; order lines are bulk-inserted by
   `OrderProcessingV1::CreateOrderService`.
 - Every atomic model carries a why/use/work header comment; every routing
@@ -194,9 +193,9 @@ replaced them with 103 single-purpose tables:
 |----------|-------|
 | Gem Resources | 4 |
 | System Resources | 11 |
-| Managed Resources | 65 |
-| Appointment Resources | 113 |
-| **Grand Total** | **193** |
+| Managed Resources | 64 |
+| Appointment Resources | 112 |
+| **Grand Total** | **191** |
 
 ---
 
