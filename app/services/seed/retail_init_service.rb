@@ -651,7 +651,6 @@ class Seed::RetailInitService
         "Discount" => { create: true, read: true, update: true, delete: true },
         "Event" => { create: true, read: true, update: true, delete: true },
         "EventConfig" => { create: true, read: true, update: true, delete: true },
-
         "Room" => { create: true, read: true, update: true, delete: true },
         "Service" => { create: true, read: true, update: true, delete: true },
         "Stock" => { create: true, read: true, update: true, delete: true },
