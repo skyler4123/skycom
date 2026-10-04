@@ -41,6 +41,8 @@ class Service < ApplicationRecord
   has_many :customers, through: :customer_service_appointments
   has_many :employee_service_appointments, dependent: :destroy
   has_many :employees, through: :employee_service_appointments
+  has_many :event_service_appointments, dependent: :destroy
+  has_many :events, through: :event_service_appointments
 
   # --- Validations ---
   validates :name, presence: true, uniqueness: { scope: :company_id }, length: { maximum: 255 }

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_10_02_000001) do
+ActiveRecord::Schema[8.0].define(version: 2026_10_03_000007) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pgcrypto"
@@ -603,6 +603,33 @@ ActiveRecord::Schema[8.0].define(version: 2026_10_02_000001) do
     t.index ["branch_id"], name: "index_attendance_policies_on_branch_id", unique: true
     t.index ["company_id"], name: "index_attendance_policies_on_company_id"
     t.index ["discarded_at"], name: "index_attendance_policies_on_discarded_at"
+  end
+
+  create_table "branch_event_appointments", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
+    t.uuid "company_id", null: false
+    t.uuid "branch_id", null: false
+    t.uuid "event_id", null: false
+    t.string "role"
+    t.string "name"
+    t.string "description"
+    t.string "code"
+    t.integer "lifecycle_status"
+    t.integer "workflow_status"
+    t.integer "business_type"
+    t.datetime "expiration_date"
+    t.jsonb "metadata"
+    t.datetime "discarded_at"
+    t.string "permission_resource_name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["branch_id"], name: "index_branch_event_appointments_on_branch_id"
+    t.index ["business_type"], name: "index_branch_event_appointments_on_business_type"
+    t.index ["company_id", "branch_id", "event_id"], name: "idx_branch_event_appointments_uniq", unique: true
+    t.index ["company_id"], name: "index_branch_event_appointments_on_company_id"
+    t.index ["discarded_at"], name: "index_branch_event_appointments_on_discarded_at"
+    t.index ["event_id"], name: "index_branch_event_appointments_on_event_id"
+    t.index ["lifecycle_status"], name: "index_branch_event_appointments_on_lifecycle_status"
+    t.index ["workflow_status"], name: "index_branch_event_appointments_on_workflow_status"
   end
 
   create_table "branch_payment_method_appointments", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
@@ -1491,6 +1518,33 @@ ActiveRecord::Schema[8.0].define(version: 2026_10_02_000001) do
     t.index ["employee_id"], name: "index_customer_employee_appointments_on_employee_id"
     t.index ["lifecycle_status"], name: "index_customer_employee_appointments_on_lifecycle_status"
     t.index ["workflow_status"], name: "index_customer_employee_appointments_on_workflow_status"
+  end
+
+  create_table "customer_event_appointments", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
+    t.uuid "company_id", null: false
+    t.uuid "customer_id", null: false
+    t.uuid "event_id", null: false
+    t.string "role"
+    t.string "name"
+    t.string "description"
+    t.string "code"
+    t.integer "lifecycle_status"
+    t.integer "workflow_status"
+    t.integer "business_type"
+    t.datetime "expiration_date"
+    t.jsonb "metadata"
+    t.datetime "discarded_at"
+    t.string "permission_resource_name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["business_type"], name: "index_customer_event_appointments_on_business_type"
+    t.index ["company_id", "customer_id", "event_id"], name: "idx_customer_event_appointments_uniq", unique: true
+    t.index ["company_id"], name: "index_customer_event_appointments_on_company_id"
+    t.index ["customer_id"], name: "index_customer_event_appointments_on_customer_id"
+    t.index ["discarded_at"], name: "index_customer_event_appointments_on_discarded_at"
+    t.index ["event_id"], name: "index_customer_event_appointments_on_event_id"
+    t.index ["lifecycle_status"], name: "index_customer_event_appointments_on_lifecycle_status"
+    t.index ["workflow_status"], name: "index_customer_event_appointments_on_workflow_status"
   end
 
   create_table "customer_group_role_appointments", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
@@ -3044,6 +3098,62 @@ ActiveRecord::Schema[8.0].define(version: 2026_10_02_000001) do
     t.index ["workflow_status"], name: "index_employees_on_workflow_status"
   end
 
+  create_table "event_configs", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
+    t.uuid "company_id", null: false
+    t.uuid "category_id", null: false
+    t.boolean "create_stock_pending", default: false, null: false
+    t.boolean "strict_stock_hold", default: false, null: false
+    t.boolean "create_order_on_complete", default: false, null: false
+    t.boolean "warn_on_facility_overlap", default: true, null: false
+    t.boolean "warn_on_host_overlap", default: true, null: false
+    t.string "name"
+    t.string "description"
+    t.string "code"
+    t.integer "lifecycle_status"
+    t.integer "workflow_status"
+    t.integer "business_type"
+    t.datetime "expiration_date"
+    t.jsonb "metadata"
+    t.datetime "discarded_at"
+    t.string "permission_resource_name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["business_type"], name: "index_event_configs_on_business_type"
+    t.index ["category_id"], name: "index_event_configs_on_category_id"
+    t.index ["company_id", "category_id"], name: "idx_event_configs_company_category_uniq", unique: true
+    t.index ["company_id"], name: "index_event_configs_on_company_id"
+    t.index ["discarded_at"], name: "index_event_configs_on_discarded_at"
+    t.index ["lifecycle_status"], name: "index_event_configs_on_lifecycle_status"
+    t.index ["workflow_status"], name: "index_event_configs_on_workflow_status"
+  end
+
+  create_table "event_facility_appointments", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
+    t.uuid "company_id", null: false
+    t.uuid "event_id", null: false
+    t.uuid "facility_id", null: false
+    t.string "role"
+    t.string "name"
+    t.string "description"
+    t.string "code"
+    t.integer "lifecycle_status"
+    t.integer "workflow_status"
+    t.integer "business_type"
+    t.datetime "expiration_date"
+    t.jsonb "metadata"
+    t.datetime "discarded_at"
+    t.string "permission_resource_name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["business_type"], name: "index_event_facility_appointments_on_business_type"
+    t.index ["company_id", "event_id", "facility_id"], name: "idx_event_facility_appointments_uniq", unique: true
+    t.index ["company_id"], name: "index_event_facility_appointments_on_company_id"
+    t.index ["discarded_at"], name: "index_event_facility_appointments_on_discarded_at"
+    t.index ["event_id"], name: "index_event_facility_appointments_on_event_id"
+    t.index ["facility_id"], name: "index_event_facility_appointments_on_facility_id"
+    t.index ["lifecycle_status"], name: "index_event_facility_appointments_on_lifecycle_status"
+    t.index ["workflow_status"], name: "index_event_facility_appointments_on_workflow_status"
+  end
+
   create_table "event_group_tag_appointments", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
     t.uuid "company_id", null: false
     t.uuid "event_group_id", null: false
@@ -3098,6 +3208,86 @@ ActiveRecord::Schema[8.0].define(version: 2026_10_02_000001) do
     t.index ["workflow_status"], name: "index_event_groups_on_workflow_status"
   end
 
+  create_table "event_order_appointments", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
+    t.uuid "company_id", null: false
+    t.uuid "event_id", null: false
+    t.uuid "order_id", null: false
+    t.string "name"
+    t.string "description"
+    t.string "code"
+    t.integer "lifecycle_status"
+    t.integer "workflow_status"
+    t.integer "business_type"
+    t.datetime "expiration_date"
+    t.jsonb "metadata"
+    t.datetime "discarded_at"
+    t.string "permission_resource_name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["business_type"], name: "index_event_order_appointments_on_business_type"
+    t.index ["company_id", "event_id", "order_id"], name: "idx_event_order_appointments_uniq", unique: true
+    t.index ["company_id"], name: "index_event_order_appointments_on_company_id"
+    t.index ["discarded_at"], name: "index_event_order_appointments_on_discarded_at"
+    t.index ["event_id"], name: "index_event_order_appointments_on_event_id"
+    t.index ["lifecycle_status"], name: "index_event_order_appointments_on_lifecycle_status"
+    t.index ["order_id"], name: "index_event_order_appointments_on_order_id"
+    t.index ["workflow_status"], name: "index_event_order_appointments_on_workflow_status"
+  end
+
+  create_table "event_service_appointments", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
+    t.uuid "company_id", null: false
+    t.uuid "event_id", null: false
+    t.uuid "service_id", null: false
+    t.string "role"
+    t.string "name"
+    t.string "description"
+    t.string "code"
+    t.integer "lifecycle_status"
+    t.integer "workflow_status"
+    t.integer "business_type"
+    t.datetime "expiration_date"
+    t.jsonb "metadata"
+    t.datetime "discarded_at"
+    t.string "permission_resource_name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["business_type"], name: "index_event_service_appointments_on_business_type"
+    t.index ["company_id", "event_id", "service_id"], name: "idx_event_service_appointments_uniq", unique: true
+    t.index ["company_id"], name: "index_event_service_appointments_on_company_id"
+    t.index ["discarded_at"], name: "index_event_service_appointments_on_discarded_at"
+    t.index ["event_id"], name: "index_event_service_appointments_on_event_id"
+    t.index ["lifecycle_status"], name: "index_event_service_appointments_on_lifecycle_status"
+    t.index ["service_id"], name: "index_event_service_appointments_on_service_id"
+    t.index ["workflow_status"], name: "index_event_service_appointments_on_workflow_status"
+  end
+
+  create_table "event_stock_appointments", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
+    t.uuid "company_id", null: false
+    t.uuid "event_id", null: false
+    t.uuid "stock_id", null: false
+    t.integer "quantity", default: 1, null: false
+    t.string "name"
+    t.string "description"
+    t.string "code"
+    t.integer "lifecycle_status"
+    t.integer "workflow_status"
+    t.integer "business_type"
+    t.datetime "expiration_date"
+    t.jsonb "metadata"
+    t.datetime "discarded_at"
+    t.string "permission_resource_name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["business_type"], name: "index_event_stock_appointments_on_business_type"
+    t.index ["company_id", "event_id", "stock_id"], name: "idx_event_stock_appointments_uniq", unique: true
+    t.index ["company_id"], name: "index_event_stock_appointments_on_company_id"
+    t.index ["discarded_at"], name: "index_event_stock_appointments_on_discarded_at"
+    t.index ["event_id"], name: "index_event_stock_appointments_on_event_id"
+    t.index ["lifecycle_status"], name: "index_event_stock_appointments_on_lifecycle_status"
+    t.index ["stock_id"], name: "index_event_stock_appointments_on_stock_id"
+    t.index ["workflow_status"], name: "index_event_stock_appointments_on_workflow_status"
+  end
+
   create_table "event_tag_appointments", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
     t.uuid "company_id", null: false
     t.uuid "event_id", null: false
@@ -3126,7 +3316,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_10_02_000001) do
   end
 
   create_table "events", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
-    t.uuid "event_group_id", null: false
+    t.uuid "event_group_id"
     t.uuid "company_id", null: false
     t.uuid "branch_id"
     t.uuid "category_id", null: false
@@ -3134,6 +3324,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_10_02_000001) do
     t.string "name"
     t.string "description"
     t.string "code"
+    t.datetime "start_at"
+    t.datetime "end_at"
     t.integer "lifecycle_status"
     t.integer "workflow_status"
     t.integer "business_type"
@@ -3141,6 +3333,66 @@ ActiveRecord::Schema[8.0].define(version: 2026_10_02_000001) do
     t.jsonb "metadata"
     t.datetime "discarded_at"
     t.string "permission_resource_name"
+    t.string "property_string_1"
+    t.string "property_string_2"
+    t.string "property_string_3"
+    t.string "property_string_4"
+    t.string "property_string_5"
+    t.string "property_string_6"
+    t.string "property_string_7"
+    t.string "property_string_8"
+    t.string "property_string_9"
+    t.string "property_string_10"
+    t.integer "property_integer_1"
+    t.integer "property_integer_2"
+    t.integer "property_integer_3"
+    t.integer "property_integer_4"
+    t.integer "property_integer_5"
+    t.integer "property_integer_6"
+    t.integer "property_integer_7"
+    t.integer "property_integer_8"
+    t.integer "property_integer_9"
+    t.integer "property_integer_10"
+    t.integer "property_integer_11"
+    t.integer "property_integer_12"
+    t.integer "property_integer_13"
+    t.integer "property_integer_14"
+    t.integer "property_integer_15"
+    t.integer "property_integer_16"
+    t.integer "property_integer_17"
+    t.integer "property_integer_18"
+    t.integer "property_integer_19"
+    t.integer "property_integer_20"
+    t.decimal "property_decimal_1", precision: 15, scale: 4
+    t.decimal "property_decimal_2", precision: 15, scale: 4
+    t.decimal "property_decimal_3", precision: 15, scale: 4
+    t.decimal "property_decimal_4", precision: 15, scale: 4
+    t.decimal "property_decimal_5", precision: 15, scale: 4
+    t.decimal "property_decimal_6", precision: 15, scale: 4
+    t.decimal "property_decimal_7", precision: 15, scale: 4
+    t.decimal "property_decimal_8", precision: 15, scale: 4
+    t.decimal "property_decimal_9", precision: 15, scale: 4
+    t.decimal "property_decimal_10", precision: 15, scale: 4
+    t.boolean "property_boolean_1"
+    t.boolean "property_boolean_2"
+    t.boolean "property_boolean_3"
+    t.boolean "property_boolean_4"
+    t.boolean "property_boolean_5"
+    t.boolean "property_boolean_6"
+    t.boolean "property_boolean_7"
+    t.boolean "property_boolean_8"
+    t.boolean "property_boolean_9"
+    t.boolean "property_boolean_10"
+    t.datetime "property_datetime_1"
+    t.datetime "property_datetime_2"
+    t.datetime "property_datetime_3"
+    t.datetime "property_datetime_4"
+    t.datetime "property_datetime_5"
+    t.datetime "property_datetime_6"
+    t.datetime "property_datetime_7"
+    t.datetime "property_datetime_8"
+    t.datetime "property_datetime_9"
+    t.datetime "property_datetime_10"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["branch_id"], name: "index_events_on_branch_id"
@@ -4003,6 +4255,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_10_02_000001) do
     t.uuid "company_id", null: false
     t.uuid "order_id", null: false
     t.uuid "product_id", null: false
+    t.uuid "stock_id"
     t.decimal "unit_price"
     t.integer "quantity"
     t.decimal "total_price"
@@ -4018,7 +4271,6 @@ ActiveRecord::Schema[8.0].define(version: 2026_10_02_000001) do
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.uuid "stock_id"
     t.index ["business_type"], name: "index_order_product_appointments_on_business_type"
     t.index ["company_id", "order_id", "product_id"], name: "idx_order_product_appointments_triple"
     t.index ["company_id"], name: "index_order_product_appointments_on_company_id"
@@ -4034,6 +4286,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_10_02_000001) do
     t.uuid "company_id", null: false
     t.uuid "order_id", null: false
     t.uuid "product_group_id", null: false
+    t.uuid "stock_id"
     t.decimal "unit_price"
     t.integer "quantity"
     t.decimal "total_price"
@@ -4049,7 +4302,6 @@ ActiveRecord::Schema[8.0].define(version: 2026_10_02_000001) do
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.uuid "stock_id"
     t.index ["business_type"], name: "index_order_product_group_appointments_on_business_type"
     t.index ["company_id", "order_id", "product_group_id"], name: "idx_order_product_group_appointments_triple"
     t.index ["company_id"], name: "index_order_product_group_appointments_on_company_id"
@@ -4065,6 +4317,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_10_02_000001) do
     t.uuid "company_id", null: false
     t.uuid "order_id", null: false
     t.uuid "service_id", null: false
+    t.uuid "stock_id"
     t.decimal "unit_price"
     t.integer "quantity"
     t.decimal "total_price"
@@ -4080,7 +4333,6 @@ ActiveRecord::Schema[8.0].define(version: 2026_10_02_000001) do
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.uuid "stock_id"
     t.index ["business_type"], name: "index_order_service_appointments_on_business_type"
     t.index ["company_id", "order_id", "service_id"], name: "idx_order_service_appointments_triple"
     t.index ["company_id"], name: "index_order_service_appointments_on_company_id"
@@ -4096,6 +4348,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_10_02_000001) do
     t.uuid "company_id", null: false
     t.uuid "order_id", null: false
     t.uuid "service_group_id", null: false
+    t.uuid "stock_id"
     t.decimal "unit_price"
     t.integer "quantity"
     t.decimal "total_price"
@@ -4111,7 +4364,6 @@ ActiveRecord::Schema[8.0].define(version: 2026_10_02_000001) do
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.uuid "stock_id"
     t.index ["business_type"], name: "index_order_service_group_appointments_on_business_type"
     t.index ["company_id", "order_id", "service_group_id"], name: "idx_order_service_group_appointments_triple"
     t.index ["company_id"], name: "index_order_service_group_appointments_on_company_id"
@@ -4127,6 +4379,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_10_02_000001) do
     t.uuid "company_id", null: false
     t.uuid "order_id", null: false
     t.uuid "subscription_plan_id", null: false
+    t.uuid "stock_id"
     t.decimal "unit_price"
     t.integer "quantity"
     t.decimal "total_price"
@@ -4142,7 +4395,6 @@ ActiveRecord::Schema[8.0].define(version: 2026_10_02_000001) do
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.uuid "stock_id"
     t.index ["business_type"], name: "index_order_subscription_plan_appointments_on_business_type"
     t.index ["company_id", "order_id", "subscription_plan_id"], name: "idx_order_subscription_plan_appointments_triple"
     t.index ["company_id"], name: "index_order_subscription_plan_appointments_on_company_id"
@@ -7719,6 +7971,9 @@ ActiveRecord::Schema[8.0].define(version: 2026_10_02_000001) do
   add_foreign_key "attendance_months", "employees"
   add_foreign_key "attendance_policies", "branches"
   add_foreign_key "attendance_policies", "companies"
+  add_foreign_key "branch_event_appointments", "branches"
+  add_foreign_key "branch_event_appointments", "companies"
+  add_foreign_key "branch_event_appointments", "events"
   add_foreign_key "branch_payment_method_appointments", "branches"
   add_foreign_key "branch_payment_method_appointments", "companies"
   add_foreign_key "branch_payment_method_appointments", "payment_methods"
@@ -7776,6 +8031,9 @@ ActiveRecord::Schema[8.0].define(version: 2026_10_02_000001) do
   add_foreign_key "customer_employee_appointments", "companies"
   add_foreign_key "customer_employee_appointments", "customers"
   add_foreign_key "customer_employee_appointments", "employees"
+  add_foreign_key "customer_event_appointments", "companies"
+  add_foreign_key "customer_event_appointments", "customers"
+  add_foreign_key "customer_event_appointments", "events"
   add_foreign_key "customer_group_role_appointments", "companies"
   add_foreign_key "customer_group_role_appointments", "customer_groups"
   add_foreign_key "customer_group_role_appointments", "roles"
@@ -7921,6 +8179,11 @@ ActiveRecord::Schema[8.0].define(version: 2026_10_02_000001) do
   add_foreign_key "employees", "companies"
   add_foreign_key "employees", "property_mappings"
   add_foreign_key "employees", "users"
+  add_foreign_key "event_configs", "categories"
+  add_foreign_key "event_configs", "companies"
+  add_foreign_key "event_facility_appointments", "companies"
+  add_foreign_key "event_facility_appointments", "events"
+  add_foreign_key "event_facility_appointments", "facilities"
   add_foreign_key "event_group_tag_appointments", "companies"
   add_foreign_key "event_group_tag_appointments", "event_groups"
   add_foreign_key "event_group_tag_appointments", "tags"
@@ -7928,6 +8191,15 @@ ActiveRecord::Schema[8.0].define(version: 2026_10_02_000001) do
   add_foreign_key "event_groups", "categories"
   add_foreign_key "event_groups", "companies"
   add_foreign_key "event_groups", "property_mappings"
+  add_foreign_key "event_order_appointments", "companies"
+  add_foreign_key "event_order_appointments", "events"
+  add_foreign_key "event_order_appointments", "orders"
+  add_foreign_key "event_service_appointments", "companies"
+  add_foreign_key "event_service_appointments", "events"
+  add_foreign_key "event_service_appointments", "services"
+  add_foreign_key "event_stock_appointments", "companies"
+  add_foreign_key "event_stock_appointments", "events"
+  add_foreign_key "event_stock_appointments", "stocks"
   add_foreign_key "event_tag_appointments", "companies"
   add_foreign_key "event_tag_appointments", "events"
   add_foreign_key "event_tag_appointments", "tags"
@@ -8181,13 +8453,13 @@ ActiveRecord::Schema[8.0].define(version: 2026_10_02_000001) do
   add_foreign_key "stock_imports", "products"
   add_foreign_key "stock_imports", "property_mappings"
   add_foreign_key "stock_imports", "warehouses"
-  add_foreign_key "stock_tag_appointments", "companies"
-  add_foreign_key "stock_tag_appointments", "stocks"
-  add_foreign_key "stock_tag_appointments", "tags"
   add_foreign_key "stock_pendings", "companies"
   add_foreign_key "stock_pendings", "products"
   add_foreign_key "stock_pendings", "stocks"
   add_foreign_key "stock_pendings", "warehouses"
+  add_foreign_key "stock_tag_appointments", "companies"
+  add_foreign_key "stock_tag_appointments", "stocks"
+  add_foreign_key "stock_tag_appointments", "tags"
   add_foreign_key "stock_transactions", "branches"
   add_foreign_key "stock_transactions", "categories"
   add_foreign_key "stock_transactions", "companies"
