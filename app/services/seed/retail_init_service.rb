@@ -634,7 +634,6 @@ class Seed::RetailInitService
         "Employee" => { create: false, read: true, update: false, delete: true },
         "Exam" => { create: true, read: true, update: true, delete: true },
         "Facility" => { create: true, read: true, update: true, delete: true },
-
         "Invoice" => { create: true, read: true, update: true, delete: true },
         "Membership" => { create: true, read: true, update: true, delete: true },
         "Order" => { create: true, read: true, update: true, delete: true },
@@ -680,7 +679,6 @@ class Seed::RetailInitService
         "Employee" => { create: false, read: true, update: false, delete: true },
         "Exam" => { create: true, read: true, update: true, delete: true },
         "Facility" => { create: true, read: true, update: true, delete: true },
-
         "Invoice" => { create: true, read: true, update: true, delete: true },
         "Membership" => { create: true, read: true, update: true, delete: true },
         "Order" => { create: true, read: true, update: true, delete: true },

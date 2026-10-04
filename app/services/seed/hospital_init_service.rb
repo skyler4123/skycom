@@ -312,7 +312,6 @@ class Seed::HospitalInitService
         "Transaction" => { create: true, read: true, update: false, delete: false },
         "Appointment" => { create: true, read: true, update: true, delete: true },
         "Patient" => { create: true, read: true, update: true, delete: false },
-
         "Purchase" => { create: true, read: true, update: true, delete: false },
         "PurchaseItem" => { create: false, read: true, update: false, delete: false }
       },

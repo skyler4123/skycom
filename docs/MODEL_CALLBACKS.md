@@ -329,7 +329,7 @@ Auto-derives `company_id` on atomic pairwise Appointment records from the associ
 |----------|------|--------|-------------|
 | `before_validation :set_default_company_from_resource` | 34 | `set_default_company_from_resource` | Derives `company_id` from the first associated record that responds to `company_id` (e.g., `employee.company_id` for `EmployeeTaskAppointment`). Only sets if not already present. Iterates all `belongs_to` associations except `company`; falls back to the company pair side (e.g., `AddressCompanyAppointment#company`). |
 
-**Included in (108 models):** All atomic `*_appointments` tables, named alphabetically per pair (`A_B_appointments`, e.g., `ArticleEmployeeAppointment`, `DepartmentEmployeeAppointment`, `EmployeeTaskAppointment`, `CustomerCustomerGroupAppointment`, `FacilityFacilityGroupAppointment`, `ProductProductGroupAppointment`, `ServiceServiceGroupAppointment`, `EmployeeServiceAppointment`, `CustomerServiceAppointment`, plus address/tag/order/payment/policy/role/purchase/subscription pairs owned by their domain docs).
+**Included in (112 models):** All atomic `*_appointments` tables, named alphabetically per pair (`A_B_appointments`, e.g., `ArticleEmployeeAppointment`, `DepartmentEmployeeAppointment`, `EmployeeTaskAppointment`, `CustomerCustomerGroupAppointment`, `FacilityFacilityGroupAppointment`, `ProductProductGroupAppointment`, `ServiceServiceGroupAppointment`, `EmployeeServiceAppointment`, `CustomerServiceAppointment`, plus address/tag/order/payment/policy/role/purchase/subscription pairs owned by their domain docs).
 
 ---
 
@@ -353,7 +353,7 @@ Reads `validates` hashes from `property_mapping.property_metadata` and applies t
 |----------|------|--------|-------------|
 | `validate :dynamic_property_validations` | 12 | `dynamic_property_validations` | Iterates `property_mapping.property_metadata`, reads each entry's `validates` hash, and applies matching Rails validation logic to the corresponding `property_*` column. Empty `validates` (`{}`) is skipped. |
 
-**Included in (48 models):** All models including `PropertyMappingConcern` (products, services, branches, employees, customers, etc.)
+**Included in (47 models):** All models including `PropertyMappingConcern` (products, services, branches, employees, customers, etc.)
 
 ---
 
@@ -366,7 +366,7 @@ Includes `Meilisearch::Rails` and declares one `meilisearch` block for every inc
 | `after_commit :ms_perform_index_tasks` (via `Meilisearch::Rails`) | gem-internal | Indexes create/update in Meilisearch (async via `MeilisearchIndexJob` through the `enqueue:` proc). |
 | `after_commit(on: :destroy) :ms_enqueue_remove_from_index!` (via `Meilisearch::Rails`) | gem-internal | Removes the document from the Meilisearch index on destroy (async via `MeilisearchIndexJob`). |
 
-**Included in (44 models):** All models that include `PropertyMappingConcern` (products, services, branches, employees, customers, etc. — see the PropertyMappingConcern list, minus `PropertyMapping` itself).
+**Included in (47 models):** All models that include `PropertyMappingConcern` (products, services, branches, employees, customers, etc.).
 
 ---
 
@@ -419,7 +419,7 @@ Each concern defines the same callback:
 | `before_discard` | 1 | Employee |
 | `after_touch` | 2* | Role (duplicate declaration on lines 30 and 87) |
 | `after_commit` | 2 | (Cache::RecordsConcern → 5 models) |
-| `validate` | 5 | CompanyPaymentMethodAppointment, BranchPaymentMethodAppointment, PropertyMapping, (DynamicValidationConcern → 48 models), (PropertyMappingConcern → 48 models), (ImageAttachmentsConcern → 6 models + Product) |
+| `validate` | 5 | CompanyPaymentMethodAppointment, BranchPaymentMethodAppointment, PropertyMapping, (DynamicValidationConcern → 47 models), (PropertyMappingConcern → 47 models), (ImageAttachmentsConcern → 6 models + Product) |
 
 **Total unique callback declarations: ~34 directly across 15 model files + 7 concern files propagating to ~63+ models.**
 
