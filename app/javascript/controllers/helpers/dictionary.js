@@ -636,6 +636,7 @@ export const dictionary = () => {
     "Authorization": { vi: "Phân quyền" },
     "Chat & Help Desk": { vi: "Chat & Hỗ trợ" },
     "Email Marketing": { vi: "Email Marketing" },
+    "AI Assistant": { vi: "Trợ lý AI" },
     "Coming soon": { vi: "Sắp ra mắt" },
     "Help Center": { vi: "Trung tâm hỗ trợ" },
     "Choose which navigation groups and items appear in the sidebar": { vi: "Chọn nhóm và mục điều hướng hiển thị trên thanh bên" },

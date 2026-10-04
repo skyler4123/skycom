@@ -16,6 +16,7 @@ export const SIDEBAR_GROUPS = [
   { key: "authorization", label: "Authorization" },
   { key: "chat_help_desk", label: "Chat & Help Desk", comingSoon: true },
   { key: "email_marketing", label: "Email Marketing", comingSoon: true },
+  { key: "ai_assistant", label: "AI Assistant", comingSoon: true },
   { key: "system", label: "System", locked: true }
 ]
 
