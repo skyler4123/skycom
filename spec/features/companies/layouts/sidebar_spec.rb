@@ -45,7 +45,7 @@ RSpec.feature "Sidebar favourites", type: :feature, js: true do
       expect(page).to have_selector('[data-sidebar-favourites]', visible: :all, wait: 10)
       expect(page).to have_selector("p", text: "Click the star on any item to pin it here", visible: :all, wait: 10)
 
-      %w[general catalog sales organization platform attendance inventory authorization system].each do |group|
+      %w[general catalog sales organization platform attendance inventory authorization chat_help_desk email_marketing ai_assistant system].each do |group|
         expect(page).to have_selector("details[data-sidebar-group='#{group}']", visible: :all, wait: 10)
         expect(page).to have_no_selector("details[data-sidebar-group='#{group}'][open]", visible: :all)
       end
@@ -155,6 +155,8 @@ RSpec.feature "Sidebar favourites", type: :feature, js: true do
       expect(page).to have_no_selector("button[data-sidebar-star='help_center']", visible: :all)
       expect(page).to have_selector("details[data-sidebar-group='chat_help_desk']", visible: :all, wait: 10)
       expect(page).to have_no_selector("details[data-sidebar-group='chat_help_desk'] button[data-sidebar-star]", visible: :all)
+      expect(page).to have_selector("details[data-sidebar-group='ai_assistant']", visible: :all, wait: 10)
+      expect(page).to have_no_selector("details[data-sidebar-group='ai_assistant'] button[data-sidebar-star]", visible: :all)
     end
   end
 
