@@ -43,19 +43,6 @@ class Seed::CustomerAppointmentService
         business_type: business_type || :primary,
         discarded_at: attrs[:discarded_at]
       )
-    when Reservation
-      CustomerReservationAppointment.new(
-        company: company,
-        customer: customer,
-        reservation: appoint_to,
-        name: attrs[:name] || "#{customer.name} Appointment",
-        description: attrs[:description] || "Customer appointment for #{customer.name}.",
-        code: attrs[:code] || "CUST-RES-#{SecureRandom.hex(4).upcase}",
-        lifecycle_status: lifecycle_status || :active,
-        workflow_status: workflow_status || :draft,
-        business_type: business_type || :primary,
-        discarded_at: attrs[:discarded_at]
-      )
     else
       raise "Cannot route CustomerAppointment for #{appoint_to.class.name}: no atomic pair table."
     end
