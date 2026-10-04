@@ -41,13 +41,17 @@ export default class Companies_EventConfigs_EditController extends Companies_Lay
     }
   }
 
-  toggleField(name, label, checked) {
+  toggleField(name, label, checked, hint) {
     return `
       <div class="flex items-center gap-3 py-2">
         <input type="hidden" name="event_config[${name}]" value="false">
         <input type="checkbox" name="event_config[${name}]" value="true" ${checked ? 'checked' : ''}
           class="h-5 w-5 rounded border-slate-300 text-blue-600 cursor-pointer">
-        <span class="text-sm text-slate-900 dark:text-white">${label}</span>
+        <span class="flex items-center gap-1 text-sm text-slate-900 dark:text-white">${label}
+          <span ${tooltip(translate(hint))} class="inline-flex cursor-pointer text-slate-400 hover:text-slate-600 dark:text-slate-500 dark:hover:text-slate-300">
+            <span class="material-symbols-outlined text-[16px]!">info</span>
+          </span>
+        </span>
       </div>
     `
   }
@@ -57,27 +61,20 @@ export default class Companies_EventConfigs_EditController extends Companies_Lay
     if (!c) return `<div class="p-8 text-center">${translate("Event Config not found.")}</div>`
 
     const companyId = window.location.pathname.split("/")[2]
+    const categoryName = c.category?.name || ""
+    const title = categoryName ? `${translate("Edit Event Config")} — ${categoryName}` : translate("Edit Event Config")
 
     const fields = `
       <div class="space-y-6">
-        <h2 class="text-xl font-bold text-slate-900 dark:text-white">${translate("Edit Event Config")}</h2>
-
-        <div class="space-y-1">
-          <label class="text-[10px] font-bold text-slate-400 dark:text-slate-300 uppercase tracking-wider">${translate("Category")}</label>
-          <select
-            name="event_config[category_id]"
-            class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-sm text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none"
-          >
-            ${selectOptionsHTML(cloneNewKey(this.categories, "id", "value"), c.category_id)}
-          </select>
-        </div>
+        <h2 class="text-xl font-bold text-slate-900 dark:text-white">${title}</h2>
+        <p class="text-sm text-slate-500 dark:text-slate-400">${translate("This config applies to all events in this category.")} <span class="inline-flex items-center px-2 py-0.5 text-xs font-medium rounded-md bg-indigo-50 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-400">${categoryName}</span></p>
 
         <div class="grid grid-cols-2 gap-4">
-          ${this.toggleField("create_stock_pending", translate("Hold Stock"), c.create_stock_pending)}
-          ${this.toggleField("strict_stock_hold", translate("Strict Hold"), c.strict_stock_hold)}
-          ${this.toggleField("create_order_on_complete", translate("Create Order"), c.create_order_on_complete)}
-          ${this.toggleField("warn_on_facility_overlap", translate("Facility Check"), c.warn_on_facility_overlap)}
-          ${this.toggleField("warn_on_host_overlap", translate("Host Check"), c.warn_on_host_overlap)}
+          ${this.toggleField("create_stock_pending", translate("Hold Stock"), c.create_stock_pending, "ON reserves required stock as event holds on save. OFF creates no hold.")}
+          ${this.toggleField("strict_stock_hold", translate("Strict Hold"), c.strict_stock_hold, "ON blocks the save when a hold fails. OFF saves with a warning.")}
+          ${this.toggleField("create_order_on_complete", translate("Create Order"), c.create_order_on_complete, "ON builds a pending order when the event completes. OFF builds nothing.")}
+          ${this.toggleField("warn_on_facility_overlap", translate("Facility Check"), c.warn_on_facility_overlap, "ON warns on double-booked facilities without blocking. OFF stays silent.")}
+          ${this.toggleField("warn_on_host_overlap", translate("Host Check"), c.warn_on_host_overlap, "ON warns on double-booked hosts without blocking. OFF stays silent.")}
         </div>
 
         <div class="flex justify-end gap-3 pt-6 border-t border-slate-200 dark:border-slate-700">
