@@ -107,6 +107,13 @@ export default class Companies_LayoutController extends Controller {
               class="shrink-0 flex flex-wrap items-center justify-between gap-4 border-b border-gray-200 dark:border-gray-800 px-4 md:px-8 py-4 bg-white dark:bg-gray-900">
               <!-- Header Left: Company Name, Toggle, Search -->
               <div class="flex flex-wrap items-center gap-3 md:gap-6">
+                <button
+                  class="flex cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 w-10 hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-600 dark:text-gray-300" id="sidebar-toggle"
+                  ${addOpenTrigger({group: "sidebar", key: "sidebar", toggle: true, cache: true})}
+                >
+                  <span class="material-symbols-outlined">menu</span>
+                </button>
+
                 <div class="flex items-center gap-3 dark:border-gray-800">
                   <div class="bg-primary/20 text-primary p-2 rounded-lg">
                     <span class="material-symbols-outlined">storefront</span>
@@ -138,13 +145,6 @@ export default class Companies_LayoutController extends Controller {
                     </h1>
                   </div>
                 </div>
-
-                <button
-                  class="flex cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 w-10 hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-600 dark:text-gray-300" id="sidebar-toggle"
-                  ${addOpenTrigger({group: "sidebar", key: "sidebar", toggle: true, cache: true})}
-                >
-                  <span class="material-symbols-outlined">menu</span>
-                </button>
                 
                 <label class="flex flex-col min-w-40 h-10! w-full md:w-80">
                   <div class="flex w-full flex-1 items-stretch rounded-lg h-full">

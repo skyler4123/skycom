@@ -85,7 +85,8 @@ RSpec.describe Events::AfterSaveService do
   end
 
   describe "done transition" do
-    it "releases holds on completed and builds the order when asked" do
+    # Decoupled: completing an event releases holds but never builds an order.
+    it "releases holds on completed without building an order" do
       create(:event_config, company: company, category: category,
         create_stock_pending: true, create_order_on_complete: true)
       stock = stock_with_units(10)
@@ -98,7 +99,7 @@ RSpec.describe Events::AfterSaveService do
 
       expect(result[:warnings]).to eq([])
       expect(stock.reload.pending).to eq(0)
-      expect(EventOrderAppointment.where(event: event).count).to eq(1)
+      expect(EventOrderAppointment.where(event: event).count).to eq(0)
     end
 
     it "releases holds on cancelled without building an order" do

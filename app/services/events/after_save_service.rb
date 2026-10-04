@@ -97,13 +97,11 @@ module Events
       @warnings << message
     end
 
+    # NOTE (decoupled): Event ↔ Order bridge is temporarily disabled — events
+    # stay independent until reconnected. Keep the service + table for the
+    # later reconnect; do not delete. Re-enable by restoring the body below.
     def bridge_order
-      return unless config&.create_order_on_complete?
-      return if EventOrderAppointment.exists?(company_id: @event.company_id, event_id: @event.id)
-      return if current_stock_map.empty? && @event.event_service_appointments.empty?
-
-      result = Events::CreateOrderService.call(event: @event)
-      @warnings.concat(result[:errors]) unless result[:success]
+      nil
     end
   end
 end

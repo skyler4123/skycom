@@ -19,6 +19,7 @@ export const dictionary = () => {
     "Policies": { vi: "Chính sách" },
     "Pages": { vi: "Trang" },
     "Calendar": { vi: "Lịch" },
+    "Schedule": { vi: "Lịch trình" },
     "Month": { vi: "Tháng" },
     "Week": { vi: "Tuần" },
     "Day": { vi: "Ngày" },

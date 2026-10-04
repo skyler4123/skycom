@@ -94,7 +94,11 @@ One transaction-safe entry point; the controller passes the pre-save
 - Holds move `pending` only through `hold`/`release` ledger rows
   (`StockPendings::HoldService` / `ReleaseService`); `quantity` is never touched.
 
-### Order bridge (`Events::CreateOrderService`)
+### Order bridge (`Events::CreateOrderService`) — DECOUPLED (dormant)
+
+> Events stay independent until reconnected. `Events::AfterSaveService#bridge_order`
+> early-returns, so completing an event releases holds but never builds an order.
+> The service, table, and associations are kept intact for a one-line reconnect.
 
 Fires on `completed` when the flag is on and lines exist (idempotent — one
 order per event): customer = first linked customer else Walk-in; product

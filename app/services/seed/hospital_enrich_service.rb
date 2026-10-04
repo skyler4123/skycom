@@ -68,6 +68,7 @@ class Seed::HospitalEnrichService
     create_stock_adjustments
     create_appointments
     create_invoices
+    create_events
     create_purchase_data
     create_shifts
     create_attendance_policies
@@ -602,6 +603,46 @@ class Seed::HospitalEnrichService
       end
     end
     puts "  -> #{Invoice.where(company: @company).count} invoices created"
+  end
+
+  # Sample events across every events category (round-robin): each links a
+  # patient, an employee host, a service, a facility, and a stock need.
+  # Rows are planning records only — no holds, no orders (docs/EVENTS.md).
+  def create_events
+    puts "Creating events..."
+    event_categories = Category.where(company: @company, resource_name: "events").order(:id).to_a
+    return if event_categories.empty?
+
+    @branches.each_with_index do |branch, bi|
+      branch_customers = @patients.select { |c| c.branch_id == branch.id }.presence || @patients
+      branch_employees = @employees.select { |e| e.branch_id == branch.id }.presence || @employees
+      branch_services = @services.select { |s| s.branch_id == branch.id }.presence || @services
+      branch_facilities = @facilities.select { |f| f.branch_id == branch.id }.presence || @facilities
+      branch_stocks = Stock.joins(:warehouse).where(company: @company, warehouses: { branch_id: branch.id })
+      next if branch_customers.empty? || branch_employees.empty?
+
+      4.times do |i|
+        category = round_robin(event_categories, bi + i)
+        start_at = Faker::Time.forward(days: 7)
+        event = Seed::EventService.create(
+          company: @company, branch: branch, category: category,
+          name: "Event #{bi + 1}-#{i + 1} #{category.name}",
+          start_at: start_at, end_at: start_at + 1.hour,
+          workflow_status: :confirmed
+        )
+        customer = branch_customers.sample
+        CustomerEventAppointment.create!(company: @company, event: event, customer: customer)
+        host = branch_employees.sample
+        EmployeeEventAppointment.create!(company: @company, event: event, employee: host)
+        service = branch_services.sample
+        EventServiceAppointment.create!(company: @company, event: event, service: service) if service
+        facility = branch_facilities.sample
+        EventFacilityAppointment.create!(company: @company, event: event, facility: facility) if facility
+        stock = branch_stocks.sample
+        EventStockAppointment.create!(company: @company, event: event, stock: stock, quantity: 1) if stock
+      end
+    end
+    puts "  -> #{Event.where(company: @company).count} events created"
   end
 
   # Sample purchase requisitions across every workflow phase:

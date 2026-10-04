@@ -10,7 +10,7 @@ export const SIDEBAR_GROUPS = [
   { key: "sales", label: "Sales" },
   { key: "organization", label: "Organization" },
   { key: "platform", label: "Platform" },
-  { key: "calendar", label: "Calendar/Schedule" },
+  { key: "calendar", label: "Schedule" },
   { key: "attendance", label: "Attendance" },
   { key: "inventory", label: "Inventory" },
   { key: "authorization", label: "Authorization" },
