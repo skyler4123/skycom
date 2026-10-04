@@ -68,18 +68,26 @@ Seed::ApplicationService.run
   |   +- Company.create! -> after_create -> RetailInitService -> roles, categories, etc.
   |- Init Company 2 (Grocery VN)
   |   +- Company.create! -> after_create -> RetailInitService -> roles, categories, etc.
-  |- Init Company 3
-  |   +- Company.create! -> after_create -> RetailInitService -> roles, categories, etc.
-  |
-  |- Enrich Company 1 (RetailEnrichService)
-  |   +- Brands, branches, employees, products, stocks, orders...
-  |- Enrich Company 2 (RetailEnrichService)
-  |   +- Brands, branches, employees, products, stocks, orders...
-  |
-  +- Enrich Company 3 (HospitalEnrichService)
-      +- Branches, departments, facilities, employees, patients, services,
-         pharmacy products, warehouses, stocks, transfers/imports/exports,
-         shifts + attendance, credit data
+   |- Init Company 3 (Smile Dental Center)
+   |   +- Company.create! -> after_create -> HospitalInitService -> roles, categories, etc.
+   |- Init Company 4 (Sunrise Hotel)
+   |   +- Company.create! -> after_create -> HotelInitService -> roles, categories, etc.
+   |
+   |- Enrich Company 1 (RetailEnrichService)
+   |   +- Brands, branches, employees, products, stocks, orders...
+   |- Enrich Company 2 (RetailEnrichService)
+   |   +- Brands, branches, employees, products, stocks, orders...
+   |
+   +- Enrich Company 3 (HospitalEnrichService)
+       +- Branches, departments, facilities, employees, patients, services,
+          pharmacy products, warehouses, stocks, transfers/imports/exports,
+          shifts + attendance, credit data
+   |
+   +- Enrich Company 4 (HotelEnrichService)
+       +- Branches, departments, facilities, employees, guests, accommodation
+          services, minibar products, warehouses, stocks, transfers/imports/exports,
+          stay orders + folios, bookings, purchases, discounts, shifts + attendance,
+          credit data
 ```
 
 Future business types (Restaurant, Education) will follow the same pattern

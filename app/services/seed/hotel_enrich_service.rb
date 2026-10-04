@@ -1,0 +1,766 @@
+class Seed::HotelEnrichService
+  HOTEL_INIT_COMPANY_GROUP_BUSINESS_TYPE = :hotel
+
+  HOTEL_ENRICH_EMPLOYEE_COUNTS = {
+    Receptionist: 5,
+    Housekeeper: 8,
+    Concierge: 3,
+    Chef: 3,
+    Manager: 1,
+    Admin: 1
+  }.freeze
+
+  HOTEL_ENRICH_CUSTOMER_COUNTS = { Guest: 50 }.freeze
+
+  HOTEL_ENRICH_SUPPLIERS = [
+    "FreshFood Distributors", "LinenCare Wholesale", "Beverage Supply Co",
+    "Amenity Essentials Ltd", "CleanStay Consumables", "Gourmet Imports",
+    "PoolCare Equipment", "Bakery Fresh Daily"
+  ].freeze
+
+  HOTEL_ENRICH_PRODUCT_NAMES = [
+    "Mineral Water", "Burger Combo", "Chocolate Bar", "Orange Juice",
+    "Club Sandwich", "Potato Chips", "Green Tea", "Cheese Platter"
+  ].freeze
+
+  def initialize(user:, email: Faker::Internet.email, name: nil, company: nil,
+                 country: :us, currency: :usd, timezone: :minus_5,
+                 address_line_1: nil, city: nil, postal_code: nil)
+    @multi_company_owner = user
+    @name = name || company&.name
+    @country = country || company&.country || :us
+    @currency = currency || company&.currency || :usd
+    @timezone = timezone || company&.timezone || :minus_5
+    @address_line_1 = address_line_1
+    @city = city
+    @postal_code = postal_code
+    @company = company
+    @branches = []
+    @departments = []
+    @employees = []
+    @guests = []
+    @services = []
+    @facilities = []
+    @products = []
+    @warehouses = []
+    @employee_counter = 0
+    @guest_counter = 0
+    @facility_counter = 0
+    @product_counter = 0
+    @email = email
+    @email_domain = EmailService.new(email).full_domain
+    seeding
+  end
+
+  def seeding
+    print_header
+
+    create_hotel_company unless @company
+    create_suppliers
+    create_branches
+    create_departments
+    create_facilities
+    create_employees
+    assign_employees_to_departments
+    create_guests
+    create_services
+    create_minibar_products
+    create_warehouses_for_branches
+    create_stocks_for_products
+    create_stock_pendings
+    create_stock_transfers
+    create_stock_imports
+    create_stock_exports
+    create_stock_adjustments
+    create_stay_orders
+    create_invoices
+    create_bookings
+    create_purchase_data
+    create_discount_data
+    create_shifts
+    create_attendance_policies
+    create_attendance_event_data
+    seed_credit_data
+
+    print_footer
+    true
+  end
+
+  private
+
+  def print_header
+    puts "\n\n🏨 Starting Hotel Company Seeding..."
+    puts "========================================================="
+  end
+
+  def print_footer
+    puts "\n========================================================="
+    puts "🏨 Hotel Company Seeding Complete!"
+    puts "========================================================="
+  end
+
+  def create_hotel_company
+    @company = Seed::CompanyService.create(
+      user: @multi_company_owner,
+      name: @name || "Company #{Company.count + 1}",
+      email: @email,
+      description: "A lakeside hotel group",
+      business_type: HOTEL_INIT_COMPANY_GROUP_BUSINESS_TYPE,
+      country: @country,
+      currency: @currency,
+      timezone: @timezone,
+      address_line_1: @address_line_1,
+      city: @city,
+      postal_code: @postal_code
+    )
+  end
+
+  def create_branches(count: 2)
+    puts "Creating #{count} hotel branches..."
+    branch_categories = Category.where(company: @company, resource_name: "branches").to_a
+    count.times do |i|
+      branch = Seed::BranchService.create(
+        name: "Hotel Branch #{i + 1}",
+        description: "Description for Hotel Branch #{i + 1}",
+        company: @company,
+        category: branch_categories[i % branch_categories.length]
+      )
+      branch.address = Seed::AddressService.create(country: @country)
+      branch.save!
+      @branches << branch
+    end
+  end
+
+  def create_departments
+    puts "Creating hotel departments..."
+    dept_categories = Category.where(company: @company, resource_name: "departments").to_a
+    [ "Front Office", "Housekeeping", "Food & Beverage", "Spa & Wellness", "Maintenance" ].each_with_index do |dept_name, i|
+      department = Seed::DepartmentService.create(
+        company: @company,
+        name: dept_name,
+        description: "Department: #{dept_name}",
+        category: dept_categories[i % dept_categories.length]
+      )
+      department.save!
+      @departments << department
+    end
+  end
+
+  def create_facilities
+    puts "Creating hotel facilities..."
+    @branches.each do |branch|
+      facility_categories = Category.where(company: @company, resource_name: "facilities").to_a
+      [ "Guest Room", "Swimming Pool", "Gym Hall", "Spa Room", "Restaurant Hall", "Conference Hall" ].each_with_index do |name, i|
+        @facility_counter += 1
+        facility = Seed::FacilityService.create(
+          company: @company,
+          branch: branch,
+          name: "#{name} #{@facility_counter}",
+          category: facility_categories[i % facility_categories.length]
+        )
+        @facilities << facility
+      end
+    end
+  end
+
+  def create_employees
+    puts "Creating employees..."
+    @branches.each_with_index do |branch, index|
+      HOTEL_ENRICH_EMPLOYEE_COUNTS.each do |role_name, count|
+        count.times do |i|
+          email = "#{role_name}_#{i + 1}_hotel_#{index + 1}@#{@email_domain}"
+          next if User.exists?(email: email)
+          user = Seed::UserService.create(
+            parent_user: @multi_company_owner,
+            email: email,
+            system_role: :company_employee
+          )
+          @employee_counter += 1
+          employee = Seed::EmployeeService.create(
+            user: user, company: @company, branch: branch,
+            name: "Employee #{@employee_counter}"
+          )
+          employee.attach_role(role_name)
+          employee.save!
+          @employees << employee
+        end
+      end
+    end
+  end
+
+  def assign_employees_to_departments
+    @employees.each do |employee|
+      Seed::DepartmentEmployeeAppointmentService.create(
+        company: @company,
+        department: @departments.sample,
+        employee: employee
+      )
+    end
+  end
+
+  def create_guests
+    puts "Creating guests..."
+    @branches.each do |branch|
+      HOTEL_ENRICH_CUSTOMER_COUNTS.each do |_, count|
+        count.times do |i|
+          email = "guest_#{i + 1}_#{branch.id}@example.com"
+          next if User.exists?(email: email)
+          user = Seed::UserService.create(
+            parent_user: @multi_company_owner,
+            email: email,
+            system_role: :company_customer
+          )
+          @guest_counter += 1
+          guest = Seed::CustomerService.create(
+            user: user, company: @company, branch: branch, name: "Guest #{@guest_counter}"
+          )
+          @guests << guest
+        end
+      end
+    end
+  end
+
+  def create_services
+    puts "Creating accommodation and amenity services..."
+    service_categories = Category.where(company: @company, resource_name: "services").to_a
+    [ "Deluxe Room Night", "Suite Night", "Spa Treatment", "Gym Session", "Restaurant Dining", "Laundry Service" ].each_with_index do |svc_name, i|
+      @branches.each do |branch|
+        service = Seed::ServiceService.create(
+          company: @company,
+          branch: branch,
+          name: "#{svc_name} - #{branch.name}",
+          duration: [ 30, 45, 60, 90 ].sample,
+          category: service_categories[i % service_categories.length]
+        )
+        @services << service
+      end
+    end
+  end
+
+  def create_suppliers
+    supplier_categories = Category.where(company: @company, resource_name: "suppliers").order(:id).to_a
+    HOTEL_ENRICH_SUPPLIERS.each_with_index do |supplier_name, i|
+      Seed::SupplierService.create(
+        company: @company,
+        name: supplier_name,
+        category: supplier_categories[i % supplier_categories.length]
+      )
+    end
+  end
+
+  def create_minibar_products
+    puts "Creating minibar products..."
+    product_categories = Category.where(company: @company, resource_name: "products").order(:id).to_a
+    @branches.each do |branch|
+      5.times do
+        @product_counter += 1
+        product = Seed::ProductService.create(
+          company: @company,
+          branch: branch,
+          category: round_robin(product_categories, @product_counter - 1),
+          name: "#{HOTEL_ENRICH_PRODUCT_NAMES[(@product_counter - 1) % HOTEL_ENRICH_PRODUCT_NAMES.length]} #{@product_counter}",
+          description: "Minibar item for #{branch.name}"
+        )
+        @products << product
+      end
+    end
+  end
+
+  def create_warehouses_for_branches
+    puts "Creating warehouses..."
+    warehouse_categories = Category.where(company: @company, resource_name: "warehouses").order(:id).to_a
+    @branches.each_with_index do |branch, i|
+      warehouse = Seed::WarehouseService.create(
+        company: @company,
+        branch: branch,
+        category: round_robin(warehouse_categories, i),
+        name: "Warehouse #{i + 1}",
+        business_type: :distribution
+      )
+      @warehouses << warehouse
+    end
+  end
+
+  def create_stocks_for_products
+    puts "Creating stock records..."
+    stock_categories = Category.where(company: @company, resource_name: "stocks").order(:id).to_a
+    @warehouses.each do |warehouse|
+      warehouse_products = @products.select { |p| p.branch_id == warehouse.branch_id }
+      warehouse_products.each_with_index do |product, i|
+        Seed::StockService.create(
+          warehouse: warehouse,
+          product_id: product.id,
+          category: round_robin(stock_categories, i),
+          quantity: rand(20..120),
+          pending: 0,
+          name: product.name
+        )
+      end
+    end
+  end
+
+  # One holding + one released pending per warehouse (round-robin stocks —
+  # never random-first — so every warehouse shows both states). Holds go
+  # through HoldService, so seeded `pending` numbers are real.
+  def create_stock_pendings
+    puts "Creating stock pendings..."
+    @warehouses.each do |warehouse|
+      stocks = Stock.where(company: @company, warehouse: warehouse).order(:id).to_a
+      next if stocks.empty?
+
+      holding_stock = stocks.first
+      if holding_stock.available_count >= 1
+        Seed::StockPendingService.create(
+          company: @company, warehouse: warehouse, stock: holding_stock,
+          quantity: [ rand(1..3), holding_stock.available_count ].min,
+          business_type: :manual, reason: "Cycle count hold"
+        )
+      end
+
+      released_stock = stocks.second || stocks.first
+      if released_stock.available_count >= 1
+        Seed::StockPendingService.create(
+          company: @company, warehouse: warehouse, stock: released_stock,
+          quantity: [ rand(1..3), released_stock.available_count ].min,
+          business_type: :event, reason: "Booking hold", release: true
+        )
+      end
+    end
+  end
+
+  def create_stock_transfers
+    puts "Creating stock transfers..."
+    transfer_categories = Category.where(company: @company, resource_name: "stock_transfers").order(:id).to_a
+    @warehouses.each do |warehouse|
+      warehouse_products = @products.select { |p| p.branch_id == warehouse.branch_id }
+      warehouse_products.sample(2).each_with_index do |product, i|
+        qty = rand(1..50)
+        transfer = Seed::StockTransferService.create(
+          company: @company,
+          category: round_robin(transfer_categories, i),
+          branch: warehouse.branch,
+          warehouse: warehouse,
+          product: product,
+          appoint_from: warehouse,
+          appoint_to: warehouse.branch,
+          quantity: qty,
+          workflow_status: :completed,
+          lifecycle_status: :active
+        )
+        attach_movement_lines(document: transfer, warehouse: warehouse, product: product,
+          quantity: qty, index: i) if Stock.find_by(company: @company, warehouse: warehouse, product: product)
+      end
+    end
+  end
+
+  # Seeded show pages render line rows; seeded quantities were written
+  # directly by Seed::StockService, so lines attach WITHOUT ledger rows
+  # (ledger callbacks would double-count). Every 3rd doc splits into 2 lines
+  # to demo multi-line documents.
+  def attach_movement_lines(document:, warehouse:, product:, quantity:, index:)
+    company = document.company
+    if index % 3 == 2
+      other = Stock.where(company: company, warehouse: warehouse).where.not(product_id: product.id).first
+      if other && quantity.to_i >= 2
+        first_qty = quantity.to_i / 2
+        Seed::StockLineService.attach!(document: document, company: company, warehouse: warehouse,
+          lines: [ [ product, first_qty ], [ other.product, quantity.to_i - first_qty ] ])
+        return
+      end
+    end
+    Seed::StockLineService.attach!(document: document, company: company, warehouse: warehouse,
+      lines: [ [ product, quantity ] ])
+  end
+
+  def create_stock_imports
+    puts "Creating stock imports..."
+    import_categories = Category.where(company: @company, resource_name: "stock_imports").order(:id).to_a
+    @branches.each do |branch|
+      branch_products = @products.select { |p| p.branch_id == branch.id }
+      next if branch_products.empty?
+
+      branch_warehouse = @warehouses.find { |w| w.branch_id == branch.id }
+      branch_products.sample(rand(2..4)).each_with_index do |product, i|
+        next unless Stock.find_by(company: @company, warehouse: branch_warehouse, product: product)
+
+        qty = rand(10..100)
+        import = Seed::StockImportService.create(
+          company: @company,
+          category: round_robin(import_categories, i),
+          branch: branch,
+          warehouse: branch_warehouse,
+          product: product,
+          code: "STKIM-#{SecureRandom.hex(4).upcase}",
+          quantity: qty,
+          business_type: StockImport.business_types.keys.sample,
+          workflow_status: StockImport.workflow_statuses.keys.sample,
+          lifecycle_status: :active
+        )
+        attach_movement_lines(document: import, warehouse: branch_warehouse, product: product,
+          quantity: qty, index: i)
+      end
+    end
+  end
+
+  def create_stock_exports
+    puts "Creating stock exports..."
+    export_categories = Category.where(company: @company, resource_name: "stock_exports").order(:id).to_a
+    @branches.each do |branch|
+      branch_products = @products.select { |p| p.branch_id == branch.id }
+      next if branch_products.empty?
+
+      branch_warehouse = @warehouses.find { |w| w.branch_id == branch.id }
+      branch_products.sample(rand(2..4)).each_with_index do |product, i|
+        next unless Stock.find_by(company: @company, warehouse: branch_warehouse, product: product)
+
+        qty = rand(5..50)
+        export = Seed::StockExportService.create(
+          company: @company,
+          category: round_robin(export_categories, i),
+          branch: branch,
+          warehouse: branch_warehouse,
+          product: product,
+          code: "STKEX-#{SecureRandom.hex(4).upcase}",
+          quantity: qty,
+          business_type: StockExport.business_types.keys.sample,
+          workflow_status: StockExport.workflow_statuses.keys.sample,
+          lifecycle_status: :active
+        )
+        attach_movement_lines(document: export, warehouse: branch_warehouse, product: product,
+          quantity: qty, index: i)
+      end
+    end
+  end
+
+  def create_stock_adjustments
+    puts "Creating stock adjustments..."
+    adjustment_categories = Category.where(company: @company, resource_name: "stock_adjustments").order(:id).to_a
+    return if adjustment_categories.empty?
+
+    candidates = @warehouses.flat_map do |warehouse|
+      Stock.where(company: @company, warehouse: warehouse).includes(:product).first(2).map do |stock|
+        [ warehouse, stock ]
+      end
+    end.first(3)
+    return if candidates.empty?
+
+    specs = [
+      { direction: :increase, reason: "Stock-take correction" },
+      { direction: :decrease, reason: "Damaged in handling" },
+      { direction: :decrease, reason: "Expired units write-off" }
+    ]
+    candidates.each_with_index do |(warehouse, stock), i|
+      spec = specs[i % specs.length]
+      qty = [ rand(1..10), stock.quantity ].min
+      next if qty < 1
+
+      adjustment = Seed::StockAdjustmentService.create(
+        company: @company,
+        category: round_robin(adjustment_categories, i),
+        branch: warehouse.branch,
+        warehouse: warehouse,
+        code: "STKAD-#{SecureRandom.hex(4).upcase}",
+        direction: spec[:direction],
+        reason: spec[:reason],
+        workflow_status: :completed,
+        lifecycle_status: :active
+      )
+      attach_movement_lines(document: adjustment, warehouse: warehouse, product: stock.product,
+        quantity: qty, index: i)
+    end
+  end
+
+  def create_stay_orders
+    puts "Creating stay orders..."
+    order_categories = Category.where(company: @company, resource_name: "orders").order(:id).to_a
+    @branches.each do |branch|
+      branch_guests = @guests.select { |g| g.branch_id == branch.id }
+      next if branch_guests.empty?
+
+      5.times do |i|
+        guest = branch_guests.sample
+        order = Seed::OrderService.create(
+          company: @company, branch: branch, customer: guest,
+          category: round_robin(order_categories, i),
+          name: "Stay Order #{i + 1} for #{guest.name}"
+        )
+        attach_stay_items_to_order(branch, order)
+      end
+    end
+  end
+
+  def attach_stay_items_to_order(branch, order)
+    branch_products = @products.select { |p| p.branch_id == branch.id }
+    branch_products.sample(rand(2..3)).each do |product|
+      OrderProductAppointment.create!(company: @company, order: order, product: product, quantity: rand(1..5), unit_price: rand(10.0..100.0).round(2), total_price: 0)
+    end
+
+    branch_services = @services.select { |s| s.branch_id == branch.id }
+    branch_services.sample(rand(1..2)).each do |service|
+      OrderServiceAppointment.create!(
+        company: @company, order: order, service: service,
+        quantity: 1, unit_price: rand(50.0..500.0).round(2), total_price: 0
+      )
+    end
+  end
+
+  def create_shifts
+    puts "Creating shift templates and schedules..."
+    templates = []
+    @branches.each do |branch|
+      [ { name: "Morning",   start: "07:00", end: "15:00" },
+        { name: "Afternoon", start: "15:00", end: "23:00" },
+        { name: "Night",     start: "23:00", end: "07:00" }
+      ].each do |shift_data|
+        template = Seed::ShiftTemplateService.create(
+          company: @company, branch: branch,
+          name: shift_data[:name],
+          start_time: shift_data[:start],
+          end_time: shift_data[:end],
+          policy_type: "fixed",
+          full_day_minutes: 480
+        )
+        templates << template
+      end
+    end
+
+    # Create scheduled shifts for employees
+    @employees.each do |employee|
+      template = templates.select { |t| t.branch_id == employee.branch_id }.sample
+      next unless template
+
+      date = Date.current + rand(0..7).days
+      Seed::ScheduledShiftService.upsert!(
+        company: @company, branch: employee.branch, employee: employee,
+        shift_template: template, work_date: date,
+        expected_start_at: date.to_time.change(hour: template.start_time.hour, min: template.start_time.min),
+        expected_end_at: date.to_time.change(hour: template.end_time.hour, min: template.end_time.min),
+        status: :scheduled
+      )
+    end
+  end
+
+  def create_attendance_policies
+    puts "Creating attendance policies..."
+    @branches.each do |branch|
+      AttendancePolicy.create!(
+        company: @company, branch: branch,
+        latitude: 10.773, longitude: 106.694,
+        allowed_radius_meters: 100
+      )
+    end
+  end
+
+  def create_attendance_event_data
+    puts "Creating attendance event data..."
+
+    @employees.each do |employee|
+      next unless employee.branch
+
+      template = ShiftTemplate.where(company: @company, branch: employee.branch).sample
+      next unless template
+
+      # Create past shifts for the last 14 days
+      (1..14).each do |day_offset|
+        date = Date.current - day_offset.days
+        next if date.saturday? || date.sunday? # Skip weekends
+
+        expected_start = date.to_time.change(hour: template.start_time.hour, min: template.start_time.min)
+        expected_end = date.to_time.change(hour: template.end_time.hour, min: template.end_time.min)
+
+        Seed::ScheduledShiftService.upsert!(
+          company: @company, branch: employee.branch, employee: employee,
+          shift_template: template, work_date: date,
+          expected_start_at: expected_start, expected_end_at: expected_end,
+          status: :completed
+        )
+
+        # Simulate check-in (5-15 min early)
+        grace = rand(5..15)
+        check_in = expected_start - grace.minutes
+
+        # Simulate check-out (on time or slightly late)
+        check_out = expected_end + rand(0..10).minutes
+
+        AttendanceLog.create!(
+          company: @company, branch: employee.branch, employee: employee,
+          log_type: "check_in", logged_at: check_in
+        )
+        AttendanceLog.create!(
+          company: @company, branch: employee.branch, employee: employee,
+          log_type: "check_out", logged_at: check_out
+        )
+      end
+    end
+
+    # Run resolution engine
+    puts "  -> Running daily resolution..."
+    resolved_dates = (1..14).map { |i| Date.current - i.days }.reject { |d| d.saturday? || d.sunday? }
+    @employees.each do |emp|
+      resolved_dates.each do |date|
+        Attendance::DailyResolutionService.new.call(employee: emp, date: date)
+      rescue => e
+        Rails.logger.warn("Resolution failed for #{emp.id} on #{date}: #{e.message}")
+      end
+    end
+  end
+
+  def create_invoices
+    puts "Creating guest folios for stay orders..."
+    invoice_categories = Category.where(company: @company, resource_name: "invoices").order(:id).to_a
+    @branches.each do |branch|
+      branch_orders = Order.where(company: @company, branch: branch)
+      next if branch_orders.empty?
+
+      branch_orders.sample(rand(3..5)).each_with_index do |order, i|
+        Seed::InvoiceService.create(order: order, category: round_robin(invoice_categories, i))
+      end
+    end
+    puts "  -> #{Invoice.where(company: @company).count} invoices created"
+  end
+
+  # Sample bookings across every events category (round-robin): each links a
+  # guest, an employee host, an accommodation service, a guest room, and a
+  # minibar stock need. Multi-night stays (1-3 days). Rows are planning
+  # records only — no holds, no orders (docs/EVENTS.md).
+  def create_bookings
+    puts "Creating bookings..."
+    event_categories = Category.where(company: @company, resource_name: "events").order(:id).to_a
+    return if event_categories.empty?
+
+    accommodation_category = Category.find_by(company: @company, resource_name: "services", name: "Accommodation")
+    guest_room_category = Category.find_by(company: @company, resource_name: "facilities", name: "Guest Room")
+
+    @branches.each_with_index do |branch, bi|
+      branch_guests = @guests.select { |g| g.branch_id == branch.id }.presence || @guests
+      branch_employees = @employees.select { |e| e.branch_id == branch.id }.presence || @employees
+      branch_services = @services.select { |s| s.branch_id == branch.id }.presence || @services
+      branch_facilities = @facilities.select { |f| f.branch_id == branch.id }.presence || @facilities
+      branch_stocks = Stock.joins(:warehouse).where(company: @company, warehouses: { branch_id: branch.id })
+      next if branch_guests.empty? || branch_employees.empty?
+
+      accommodation_services = accommodation_category ? branch_services.select { |s| s.category_id == accommodation_category.id } : []
+      guest_rooms = guest_room_category ? branch_facilities.select { |f| f.category_id == guest_room_category.id } : []
+
+      4.times do |i|
+        category = round_robin(event_categories, bi + i)
+        start_at = Faker::Time.forward(days: 7)
+        event = Seed::EventService.create(
+          company: @company, branch: branch, category: category,
+          name: "Booking #{bi + 1}-#{i + 1} #{category.name}",
+          start_at: start_at, end_at: start_at + rand(1..3).days,
+          business_type: :reservation,
+          workflow_status: :confirmed
+        )
+        guest = branch_guests.sample
+        CustomerEventAppointment.create!(company: @company, event: event, customer: guest)
+        host = branch_employees.sample
+        EmployeeEventAppointment.create!(company: @company, event: event, employee: host)
+        service = accommodation_services.sample || branch_services.sample
+        EventServiceAppointment.create!(company: @company, event: event, service: service) if service
+        facility = guest_rooms.sample || branch_facilities.sample
+        EventFacilityAppointment.create!(company: @company, event: event, facility: facility) if facility
+        stock = branch_stocks.sample
+        EventStockAppointment.create!(company: @company, event: event, stock: stock, quantity: 1) if stock
+      end
+    end
+    puts "  -> #{Event.where(company: @company).count} events created"
+  end
+
+  # Sample purchase requisitions across every workflow phase:
+  # 0 = completed end to end, 1 = rejected by manager, 2 = reworked then completed, 3 = left pending.
+  def create_purchase_data
+    puts "Creating purchases..."
+    purchase_categories = Category.where(company: @company, resource_name: "purchases").order(:id).to_a
+    item_categories = Category.where(company: @company, resource_name: "purchase_items").order(:id).to_a
+    return if purchase_categories.empty?
+
+    managers = @employees.select { |e| e.has_role?("Manager") }
+    # Jira-style: only employees holding update permission on Purchase may transition.
+    requesters = @employees.select { |e| e.can?(:update, Purchase) }
+    return if requesters.empty?
+
+    suppliers = Supplier.where(company: @company).to_a
+
+    items = 4.times.map do |i|
+      Seed::PurchaseItemService.create(company: @company, category: round_robin(item_categories, i))
+    end
+
+    6.times do |i|
+      branch = @branches.sample
+      requester = requesters.sample
+      category = round_robin(purchase_categories, i)
+      purchase = Seed::PurchaseService.create(
+        company: @company, branch: branch, category: category,
+        warehouse: @warehouses.sample, supplier: suppliers.sample,
+        needed_by: Time.zone.now + rand(3..30).days,
+        created_by_employee: requester,
+        name: "Purchase #{i + 1} for #{branch.name}"
+      )
+      items.sample(rand(1..3)).each do |item|
+        Seed::PurchasePurchaseItemAppointmentService.create(company: @company, purchase: purchase, purchase_item: item)
+      end
+
+      run_purchase_workflow(purchase, requester, managers.sample, i)
+    end
+    puts "  -> #{Purchase.where(company: @company).count} purchases created"
+  end
+
+  def create_discount_data
+    early_bird_group = Seed::DiscountGroupService.create(
+      company: @company, name: "Early Bird", prefix: "EARLY26",
+      discount_type: :percentage, percentage: 10, max_amount_cents: 10_000,
+      total_budget_cents: 500_000, campaign_status: :active
+    )
+    Discounts::BatchGenerator.call(discount_group: early_bird_group, quantity: 50)
+
+    walkin_group = Seed::DiscountGroupService.create(
+      company: @company, name: "Walk-in $5", prefix: "STAYIN",
+      discount_type: :fixed_amount, amount_cents: 500, campaign_status: :active
+    )
+    Discounts::BatchGenerator.call(discount_group: walkin_group, quantity: 25)
+
+    puts "  -> #{Discount.where(company: @company).count} discount codes created (#{DiscountGroup.where(company: @company).count} groups)"
+  end
+
+  def run_purchase_workflow(purchase, requester, manager, index)
+    return if purchase.workflow_step.nil?
+
+    case index % 4
+    when 0
+      advance_purchase(purchase, manager, :approved)
+      advance_purchase(purchase, manager, :approved)
+      advance_purchase(purchase, requester, :approved)
+      advance_purchase(purchase, requester, :approved)
+    when 1
+      advance_purchase(purchase, manager, :rejected, note: "Not within budget")
+    when 2
+      step_one = purchase.workflow_step.workflow.workflow_steps.find_by(position: 1)
+      advance_purchase(purchase, manager, :rework, note: "Reduce quantities", target_step: step_one)
+      advance_purchase(purchase, manager, :approved)
+      advance_purchase(purchase, manager, :approved)
+      advance_purchase(purchase, requester, :approved)
+      advance_purchase(purchase, requester, :approved)
+    end
+  end
+
+  def advance_purchase(purchase, employee, outcome, note: nil, target_step: nil)
+    Workflows::AdvanceService.call(
+      subject: purchase, employee: employee, outcome: outcome, note: note, target_step: target_step
+    )
+  end
+
+  # Picks a seeded category deterministically so EVERY category of a resource
+  # gets records (including the first one, which every index page defaults to)
+  # — random_for() left sparse resources (warehouses, stock docs, invoices, …)
+  # with empty first categories depending on seed luck.
+  def round_robin(categories, index)
+    return nil if categories.blank?
+    categories[index % categories.length]
+  end
+
+  def seed_credit_data
+    puts "Seeding credit data..."
+    Seed::CreditDataService.create(company: @company)
+  end
+end

@@ -214,6 +214,8 @@ class Company < ApplicationRecord
         Seed::RetailInitService.call(company: self)
       elsif business_type_hospital?
         Seed::HospitalInitService.call(company: self)
+      elsif business_type_hotel?
+        Seed::HotelInitService.call(company: self)
       end
 
       setup_payment_method_appointments
