@@ -44,7 +44,7 @@
 ## Testing
 - **ALWAYS** `bundle exec parallel_rspec -n 10 [paths]` — never bare `parallel_rspec` (raises errors), never `bundle exec rspec` for verification (single process), never `docker exec ... rspec` (compose runs services only, web/job via `bin/dev`). See `docs/PARALLEL_TESTS.md`.
 - Docs keep `bundle exec rspec ...` as source of truth (runner-swappable) — that does not change what the agent runs.
-- Parallel DBs are already set up locally. Only if worker DBs are missing, run once: `RAILS_ENV=test bundle exec rake "parallel:create[10]"` then `RAILS_ENV=test bundle exec rake "parallel:load_schema[10]"`.
+- Parallel DBs are already set up locally. Only if worker DBs are missing, run once: `RAILS_ENV=test bundle exec rake "parallel:create[10]"` then `RAILS_ENV=test bundle exec rake "parallel:load_schema[10]"`. If `parallel_rspec` fails on migration, see `docs/PARALLEL_TESTS.md` §3.2 for the `drop[10]` → `create[10]` → `load_schema[10]` reset.
 
 ## Model Structure
 - All `app/models/*.rb` follow the canonical order in `docs/MODEL_STRUCTURE.md` (concerns → constants → attributes → enums → macros → associations → scopes → validations → callbacks → methods). Run `bin/rubocop` to verify.
