@@ -23,7 +23,7 @@ The system supports multiple business types (retail, hospital) through the same 
 | 3 | `attendance_logs` | Immutable raw audit trail | employee_id, log_type, logged_at, latitude, longitude, wifi_ssid, device_fingerprint |
 | 4 | `attendance_days` | Employee-facing daily view | employee_id, attendance_date, check_in, check_out, total_seconds_* |
 | 5 | `attendance_months` | Payroll-ready monthly rollup | employee_id, month, total_work_minutes, total_late_minutes, total_overtime_minutes, total_present_days, total_absent_days |
-| 6 | `attendance_policies` | Per-branch geofence + resolution config | branch_id, latitude, longitude, allowed_radius_meters, resolution_strategy |
+| 6 | `attendance_configs` | Per-branch geofence + resolution config | branch_id, latitude, longitude, allowed_radius_meters, resolution_strategy |
 
 All tables include the standard System Fields Block (lifecycle_status, workflow_status, business_type, metadata, discarded_at, permission_resource_name).
 
@@ -71,7 +71,7 @@ Attendance::CheckInService.new(
 Returns `Result.success(scheduled_shift)` or `Result.failure("error message")`.
 
 Steps:
-1. Load branch's `AttendancePolicy` → validate GPS distance or WiFi SSID
+1. Load branch's `AttendanceConfig` → validate GPS distance or WiFi SSID
 2. Find today's `ScheduledShift` for the employee
 3. Create `AttendanceLog` (immutable audit)
 4. Update `ScheduledShift.status` → `:active`
@@ -98,7 +98,7 @@ Phase 1 (AttendanceLogs) collects raw timestamps. Phase 2 resolves them into dai
 
 ```
 AttendanceLogs (raw sequential timestamps)
-  → ResolutionStrategy (configured per branch via AttendancePolicy)
+  → ResolutionStrategy (configured per branch via AttendanceConfig)
     → Segment Fusion (pair In/Out into work segments)
       → Break Deduction (fixed lunch, multi-punch, or auto-deduct)
         → Policy Match (compare net minutes against shift template)
@@ -107,7 +107,7 @@ AttendanceLogs (raw sequential timestamps)
 
 ### Strategy Architecture
 
-Each branch's `AttendancePolicy` has a `resolution_strategy` enum that determines how logs are resolved:
+Each branch's `AttendanceConfig` has a `resolution_strategy` enum that determines how logs are resolved:
 
 | Enum | Strategy Class | Behavior |
 |------|---------------|----------|
@@ -123,7 +123,7 @@ STRATEGIES = {
 }.freeze
 ```
 
-To add a new resolution strategy, create a class under `Strategies::` that implements `call(logs, employee, date, shift_template)` returning `{ status:, net_minutes:, segments:, late_minutes:, early_leave_minutes:, overtime_minutes: }`, register it in `STRATEGIES`, and add the enum value to `AttendancePolicy`.
+To add a new resolution strategy, create a class under `Strategies::` that implements `call(logs, employee, date, shift_template)` returning `{ status:, net_minutes:, segments:, late_minutes:, early_leave_minutes:, overtime_minutes: }`, register it in `STRATEGIES`, and add the enum value to `AttendanceConfig`.
 
 ### Step 1: Segment Fusion
 
@@ -283,13 +283,13 @@ Shift seeds include realistic edge cases:
 | `db/migrate/*create_attendance_logs.rb` | Migration (redesigned) |
 | `db/migrate/*create_attendance_days.rb` | Migration (redesigned) |
 | `db/migrate/*create_attendance_months.rb` | Migration (redesigned) |
-| `db/migrate/*create_attendance_policies.rb` | Migration |
+| `db/migrate/*create_attendance_configs.rb` | Migration |
 | `app/models/shift_template.rb` | Model |
 | `app/models/scheduled_shift.rb` | Model |
 | `app/models/attendance_log.rb` | Model (redesigned) |
 | `app/models/attendance_day.rb` | Model (redesigned) |
 | `app/models/attendance_month.rb` | Model (redesigned) |
-| `app/models/attendance_policy.rb` | Model |
+| `app/models/attendance_config.rb` | Model |
 | `app/services/attendance/check_in_service.rb` | Service |
 | `app/services/attendance/check_out_service.rb` | Service |
 | `app/jobs/attendance/check_in_simulator_job.rb` | Dev-only simulator: 1 random employee/company/sec via CheckInService (`config/recurring.yml` development) |

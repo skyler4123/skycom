@@ -316,7 +316,7 @@ This is **required** for all controllers that extend `Companies_LayoutController
 
 ### 8. Stale DOM / Navigation Race After Form Submit (PATCH Redirect)
 
-**Problem**: `spec/features/companies/attendance_policies/edit_spec.rb:43` fails intermittently with Selenium `UnknownError: Node with given id does not belong to the document` on `have_content` right after `click_button "Save Changes"`.
+**Problem**: `spec/features/companies/attendance_configs/edit_spec.rb:43` fails intermittently with Selenium `UnknownError: Node with given id does not belong to the document` on `have_content` right after `click_button "Save Changes"`.
 
 **Stack trace excerpt**:
 ```
@@ -346,11 +346,11 @@ Swap order so Capybara waits for the new document before querying content:
 # ❌ Flaky — content queried on old DOM
 click_button "Save Changes"
 expect(page).to have_content("11.0", wait: 10)
-expect(page).to have_current_path(company_attendance_policy_path(company, attendance_policy), wait: 10)
+expect(page).to have_current_path(company_attendance_config_path(company, attendance_config), wait: 10)
 
 # ✅ Stable — wait for new document, then query content
 click_button "Save Changes"
-expect(page).to have_current_path(company_attendance_policy_path(company, attendance_policy), wait: 10)
+expect(page).to have_current_path(company_attendance_config_path(company, attendance_config), wait: 10)
 expect(page).to have_content("11.0", wait: 10)  # now queries show page after Stimulus fetch
 ```
 
