@@ -41,6 +41,14 @@ services:
     ports:
       - "5432:5432"
 
+  chat-postgres:
+    image: postgres:18.3
+    environment:
+      POSTGRES_USERNAME: postgres
+      POSTGRES_PASSWORD: password
+    ports:
+      - "5433:5432"
+
   redis:
     # image: redis:7.2-alpine
     image: valkey/valkey:9.1-alpine
