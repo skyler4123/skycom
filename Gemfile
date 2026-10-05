@@ -106,4 +106,7 @@ gem "lograge"
 gem "cent"
 gem "mini_magick"
 gem "meilisearch-rails"
+
+# Pin gems to resolve bundle update, can remove later
+gem "json", "2.21.2"
 # ----------------------------------------------------------------------------------------------------
