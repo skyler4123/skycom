@@ -29,7 +29,7 @@ module Attendance
 
       ensure_today_shift(employee, branch)
 
-      policy = branch.attendance_policy
+      policy = branch.attendance_config
       result = Attendance::CheckInService.new(
         employee: employee,
         branch: branch,

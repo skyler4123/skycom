@@ -56,7 +56,7 @@ class Branch < ApplicationRecord
   has_many :branch_event_appointments, dependent: :destroy
   has_many :events, through: :branch_event_appointments
   has_many :scheduled_shifts, dependent: :destroy
-  has_one :attendance_policy, dependent: :destroy
+  has_one :attendance_config, dependent: :destroy
   has_many :task_groups, dependent: :destroy
   has_many :project_groups, dependent: :destroy
   has_many :cart_groups, dependent: :destroy

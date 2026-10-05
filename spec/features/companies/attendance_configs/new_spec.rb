@@ -1,6 +1,6 @@
 require "rails_helper"
 
-RSpec.feature "Companies::AttendancePolicies New", type: :feature, js: true do
+RSpec.feature "Companies::AttendanceConfigs New", type: :feature, js: true do
   let(:company) { create(:company) }
   let(:owner) { company.user }
   let(:branch) { create(:branch, company: company) }
@@ -32,27 +32,27 @@ RSpec.feature "Companies::AttendancePolicies New", type: :feature, js: true do
   end
 
   scenario "creates attendance policy and redirects to show page" do
-    visit new_company_attendance_policy_path(company)
-    expect(page).to have_selector("input[name='attendance_policy[branch_id]']", wait: 10)
+    visit new_company_attendance_config_path(company)
+    expect(page).to have_selector("input[name='attendance_config[branch_id]']", wait: 10)
 
-    fill_in "attendance_policy[branch_id]", with: branch.id
-    fill_in "attendance_policy[latitude]", with: "10.5"
-    fill_in "attendance_policy[longitude]", with: "106.5"
+    fill_in "attendance_config[branch_id]", with: branch.id
+    fill_in "attendance_config[latitude]", with: "10.5"
+    fill_in "attendance_config[longitude]", with: "106.5"
     click_button "Save"
 
-    expect(page).to have_content("Attendance Policy", wait: 10)
-    record = AttendancePolicy.find_by(latitude: 10.5)
+    expect(page).to have_content("Attendance Config", wait: 10)
+    record = AttendanceConfig.find_by(latitude: 10.5)
     expect(record).to be_present
-    expect(page).to have_current_path(/\/attendance_policies\//, wait: 10)
+    expect(page).to have_current_path(/\/attendance_configs\//, wait: 10)
   end
 
   scenario "handles validation error" do
-    visit new_company_attendance_policy_path(company)
-    expect(page).to have_selector("input[name='attendance_policy[branch_id]']", wait: 10)
+    visit new_company_attendance_config_path(company)
+    expect(page).to have_selector("input[name='attendance_config[branch_id]']", wait: 10)
 
-    fill_in "attendance_policy[branch_id]", with: ""
+    fill_in "attendance_config[branch_id]", with: ""
     click_button "Save"
 
-    expect(page).to have_current_path(new_company_attendance_policy_path(company), wait: 10)
+    expect(page).to have_current_path(new_company_attendance_config_path(company), wait: 10)
   end
 end

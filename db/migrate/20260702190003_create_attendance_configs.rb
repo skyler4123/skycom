@@ -1,6 +1,6 @@
-class CreateAttendancePolicies < ActiveRecord::Migration[8.0]
+class CreateAttendanceConfigs < ActiveRecord::Migration[8.0]
   def change
-    create_table :attendance_policies, id: :uuid, default: -> { "uuidv7()" } do |t|
+    create_table :attendance_configs, id: :uuid, default: -> { "uuidv7()" } do |t|
       t.references :company, null: false, foreign_key: true, type: :uuid
       t.references :branch, null: false, foreign_key: true, type: :uuid, index: { unique: true }
       t.decimal :latitude, precision: 10, scale: 6, null: false

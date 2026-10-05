@@ -1,11 +1,11 @@
 require "rails_helper"
 
-RSpec.feature "Companies::AttendancePolicies Management", type: :feature, js: true do
+RSpec.feature "Companies::AttendanceConfigs Management", type: :feature, js: true do
   let(:company) { create(:company) }
   let(:owner) { company.user }
   let(:branch) { create(:branch, company: company) }
 
-  let!(:attendance_policy) { create(:attendance_policy, company: company, branch: branch) }
+  let!(:attendance_config) { create(:attendance_config, company: company, branch: branch) }
 
   before do
     sign_in(owner)
@@ -34,28 +34,28 @@ RSpec.feature "Companies::AttendancePolicies Management", type: :feature, js: tr
   end
 
   scenario "index page loads and displays attendance policies table" do
-    visit company_attendance_policies_path(company)
+    visit company_attendance_configs_path(company)
     expect(page).to have_selector("table", wait: 10)
     expect(page).to have_selector("th", text: "Branch")
     expect(page).to have_selector("tbody tr")
   end
 
   scenario "branch name links to show page" do
-    visit company_attendance_policies_path(company)
+    visit company_attendance_configs_path(company)
     expect(page).to have_selector("table", wait: 10)
-    link = find("a[href*='/attendance_policies/#{attendance_policy.id}']", match: :first)
+    link = find("a[href*='/attendance_configs/#{attendance_config.id}']", match: :first)
     expect(link).to be_present
   end
 
   scenario "edit button links to edit page" do
-    visit company_attendance_policies_path(company)
+    visit company_attendance_configs_path(company)
     expect(page).to have_selector("table", wait: 10)
-    edit_link = find("a[href*='/attendance_policies/#{attendance_policy.id}/edit']", match: :first)
+    edit_link = find("a[href*='/attendance_configs/#{attendance_config.id}/edit']", match: :first)
     expect(edit_link).to be_present
   end
 
   scenario "add button links to new page" do
-    visit company_attendance_policies_path(company)
-    expect(page).to have_link(href: new_company_attendance_policy_path(company), wait: 10)
+    visit company_attendance_configs_path(company)
+    expect(page).to have_link(href: new_company_attendance_config_path(company), wait: 10)
   end
 end

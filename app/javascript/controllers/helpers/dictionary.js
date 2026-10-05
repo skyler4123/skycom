@@ -597,7 +597,7 @@ export const dictionary = () => {
     "Shift Templates": { vi: "Mẫu ca làm việc" },
     "Shifts": { vi: "Ca làm việc" },
     "Attendance Days": { vi: "Chấm công ngày" },
-    "Attendance Policies": { vi: "Chính sách chấm công" },
+    "Attendance Configs": { vi: "Cấu hình chấm công" },
     "Attendance Logs": { vi: "Nhật ký chấm công" },
     "Attendance Months": { vi: "Chấm công tháng" },
 

@@ -148,11 +148,11 @@ export const company_scheduled_shift_path = (companyId, id) => `/companies/${com
 export const edit_company_scheduled_shift_path = (companyId, id) => `/companies/${companyId}/scheduled_shifts/${id}/edit`
 export const create_company_scheduled_shifts_path = (companyId) => `/companies/${companyId}/scheduled_shifts`
 
-export const company_attendance_policies_path = (companyId) => `/companies/${companyId}/attendance_policies`
-export const new_company_attendance_policy_path = (companyId) => `/companies/${companyId}/attendance_policies/new`
-export const company_attendance_policy_path = (companyId, id) => `/companies/${companyId}/attendance_policies/${id}`
-export const edit_company_attendance_policy_path = (companyId, id) => `/companies/${companyId}/attendance_policies/${id}/edit`
-export const create_company_attendance_policies_path = (companyId) => `/companies/${companyId}/attendance_policies`
+export const company_attendance_configs_path = (companyId) => `/companies/${companyId}/attendance_configs`
+export const new_company_attendance_config_path = (companyId) => `/companies/${companyId}/attendance_configs/new`
+export const company_attendance_config_path = (companyId, id) => `/companies/${companyId}/attendance_configs/${id}`
+export const edit_company_attendance_config_path = (companyId, id) => `/companies/${companyId}/attendance_configs/${id}/edit`
+export const create_company_attendance_configs_path = (companyId) => `/companies/${companyId}/attendance_configs`
 
 export const company_attendance_logs_path = (companyId) => `/companies/${companyId}/attendance_logs`
 export const company_attendance_log_path = (companyId, id) => `/companies/${companyId}/attendance_logs/${id}`

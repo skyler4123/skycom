@@ -1,5 +1,5 @@
 # Handles employee check-in at a branch location.
-# Validates geofence against attendance_policy, finds today's scheduled shift,
+# Validates geofence against attendance_config, finds today's scheduled shift,
 # creates an immutable AttendanceLog, and marks the shift as active.
 # Returns Result.success or Result.failure.
 module Attendance
@@ -29,7 +29,7 @@ module Attendance
     end
 
     def call
-      policy = @branch.attendance_policy
+      policy = @branch.attendance_config
       return Result.failure("Outside allowed area") if policy && !inside_geofence?(policy)
 
       shift = ScheduledShift.find_by(employee: @employee, work_date: @time.to_date, status: :scheduled)

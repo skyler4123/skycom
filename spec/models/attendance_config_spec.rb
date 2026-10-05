@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe AttendancePolicy, type: :model do
+RSpec.describe AttendanceConfig, type: :model do
   describe "associations" do
     it { should belong_to(:company) }
     it { should belong_to(:branch) }

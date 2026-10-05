@@ -71,7 +71,7 @@ class Seed::HospitalEnrichService
     create_events
     create_purchase_data
     create_shifts
-    create_attendance_policies
+    create_attendance_configs
     create_attendance_event_data
     seed_credit_data
 
@@ -526,10 +526,10 @@ class Seed::HospitalEnrichService
     end
   end
 
-  def create_attendance_policies
-    puts "Creating attendance policies..."
+  def create_attendance_configs
+    puts "Creating attendance configs..."
     @branches.each do |branch|
-      AttendancePolicy.create!(
+      AttendanceConfig.create!(
         company: @company, branch: branch,
         latitude: 10.773, longitude: 106.694,
         allowed_radius_meters: 100

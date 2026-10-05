@@ -1,11 +1,11 @@
 require "rails_helper"
 
-RSpec.feature "Companies::AttendancePolicies Show", type: :feature, js: true do
+RSpec.feature "Companies::AttendanceConfigs Show", type: :feature, js: true do
   let(:company) { create(:company) }
   let(:owner) { company.user }
   let(:branch) { create(:branch, company: company) }
 
-  let!(:attendance_policy) { create(:attendance_policy, company: company, branch: branch) }
+  let!(:attendance_config) { create(:attendance_config, company: company, branch: branch) }
 
   before do
     sign_in(owner)
@@ -34,21 +34,21 @@ RSpec.feature "Companies::AttendancePolicies Show", type: :feature, js: true do
   end
 
   scenario "displays attendance policy details" do
-    visit company_attendance_policy_path(company, attendance_policy)
+    visit company_attendance_config_path(company, attendance_config)
     expect(page).to have_content(branch.name, wait: 10)
-    expect(page).to have_content(attendance_policy.latitude.to_s, wait: 10)
-    expect(page).to have_content(attendance_policy.longitude.to_s)
+    expect(page).to have_content(attendance_config.latitude.to_s, wait: 10)
+    expect(page).to have_content(attendance_config.longitude.to_s)
   end
 
   scenario "has edit button linking to edit page" do
-    visit company_attendance_policy_path(company, attendance_policy)
-    edit_link = find("a[href*='/attendance_policies/#{attendance_policy.id}/edit']", match: :first)
+    visit company_attendance_config_path(company, attendance_config)
+    edit_link = find("a[href*='/attendance_configs/#{attendance_config.id}/edit']", match: :first)
     expect(edit_link).to be_present
   end
 
   scenario "has back link to index page" do
-    visit company_attendance_policy_path(company, attendance_policy)
-    back_link = find("a[href*='/attendance_policies']", match: :first)
+    visit company_attendance_config_path(company, attendance_config)
+    back_link = find("a[href*='/attendance_configs']", match: :first)
     expect(back_link).to be_present
   end
 end

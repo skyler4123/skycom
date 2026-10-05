@@ -74,7 +74,7 @@ Rails.application.routes.draw do
       end
       resources :shift_templates
       resources :scheduled_shifts
-      resources :attendance_policies
+      resources :attendance_configs
       resources :attendance_logs
       resources :attendance_days
       resources :attendance_months

@@ -42,7 +42,7 @@ module Attendance
     private
 
     def resolve_strategy(employee)
-      policy = employee.branch&.attendance_policy
+      policy = employee.branch&.attendance_config
       key = policy&.resolution_strategy || "paired"
       STRATEGIES[key] || Strategies::PairedStrategy
     end
