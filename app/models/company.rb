@@ -19,7 +19,7 @@ class Company < ApplicationRecord
     Patient Appointment Course Student Exam
     Membership
     Page CompanyPaymentMethodAppointment ShiftTemplate ScheduledShift
-    AttendancePolicy AttendanceLog AttendanceDay AttendanceMonth
+    AttendanceConfig AttendanceLog AttendanceDay AttendanceMonth
     Stock StockTransfer StockImport StockExport StockAdjustment StockPending
     Event EventGroup EventConfig
   ].freeze
@@ -83,7 +83,7 @@ class Company < ApplicationRecord
   has_many :attendance_logs, dependent: :destroy
   has_many :attendance_days, dependent: :destroy
   has_many :attendance_months, dependent: :destroy
-  has_many :attendance_policies, dependent: :destroy
+  has_many :attendance_configs, dependent: :destroy
   has_many :facility_groups, dependent: :destroy
   has_many :facilities, dependent: :destroy
   has_many :service_groups, dependent: :destroy

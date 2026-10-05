@@ -1,4 +1,5 @@
-class AttendancePolicy < ApplicationRecord
+class AttendanceConfig < ApplicationRecord
+  attribute :permission_resource_name, :string, default: -> { self.name }
   attribute :allowed_radius_meters, :integer, default: 100
   attribute :require_photo, :boolean, default: false
 
