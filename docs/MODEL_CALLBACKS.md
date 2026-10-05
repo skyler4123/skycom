@@ -393,7 +393,7 @@ Each concern defines the same callback:
 |----------|--------|-------------|
 | `validate :acceptable_image_attachments` | `acceptable_image_attachments` | Validates each attached image: max 3 images total, max 1MB per file, only JPEG/PNG/GIF types allowed. |
 
-**Included in (6 models + Product):**
+**Included in (6 models + Product + ChatMessage):**
 - `Branch::ImageConcern` → `Branch`
 - `Brand::ImageConcern` → `Brand`
 - `Customer::ImageConcern` → `Customer`
@@ -401,6 +401,7 @@ Each concern defines the same callback:
 - `Employee::ImageConcern` → `Employee`
 - `Service::ImageConcern` → `Service`
 - `Product::ImageConcern` → `Product` (pre-existing)
+- `ChatMessage::ImageConcern` → `ChatMessage` (chat DB; `image_attachments` on the message)
 
 ---
 
@@ -419,11 +420,11 @@ Each concern defines the same callback:
 | `before_discard` | 1 | Employee |
 | `after_touch` | 2* | Role (duplicate declaration on lines 30 and 87) |
 | `after_commit` | 2 | (Cache::RecordsConcern → 5 models) |
-| `validate` | 5 | CompanyPaymentMethodAppointment, BranchPaymentMethodAppointment, PropertyMapping, (DynamicValidationConcern → 47 models), (PropertyMappingConcern → 47 models), (ImageAttachmentsConcern → 6 models + Product) |
+| `validate` | 5 | CompanyPaymentMethodAppointment, BranchPaymentMethodAppointment, PropertyMapping, (DynamicValidationConcern → 47 models), (PropertyMappingConcern → 47 models), (ImageAttachmentsConcern → 6 models + Product + ChatMessage) |
 
 **Total unique callback declarations: ~34 directly across 15 model files + 7 concern files propagating to ~63+ models.**
 
-> **Note:** `ImageAttachmentsConcern` in the validate row covers the 6 per-model ImageConcern files (Branch, Brand, Customer, Department, Employee, Service) + the pre-existing `Product::ImageConcern`, all of which define the same `validate :acceptable_image_attachments` callback.
+> **Note:** `ImageAttachmentsConcern` in the validate row covers the 6 per-model ImageConcern files (Branch, Brand, Customer, Department, Employee, Service) + the pre-existing `Product::ImageConcern` + `ChatMessage::ImageConcern`, all of which define the same `validate :acceptable_image_attachments` callback.
 
 ---
 

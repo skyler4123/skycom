@@ -41,6 +41,13 @@ class Seed::ApplicationService
       end
     end
 
+    Chat.connection.disable_referential_integrity do
+      Chat.descendants.each do |model|
+        next if model.abstract_class?
+        model.unscoped.delete_all
+      end
+    end
+
     # Global Data
     # Geographic System records — identify each platform scope by a hardcoded CODE, not ID.
     # Remove the legacy singleton seed ("System") — System#before_destroy blocks
@@ -110,6 +117,21 @@ class Seed::ApplicationService
     # Audit-trail demo rows for the read-only config log pages (2 per config).
     [ company_1, company_2, company_3, company_4 ].each do |company|
       Seed::ConfigLogService.seed_for(company: company)
+    end
+
+    # Chat seeding (own database — never blocks ERP seed on failure).
+    begin
+      chat_seed_users = User.where(email: %w[
+        super_admin_1@system.com super_admin_2@system.com
+        admin_1@system.com admin_2@system.com
+        user_1@company1.com user_1@company2.com
+      ])
+      chat_users = Seed::ChatUserService.mirror_subset!(users: chat_seed_users)
+      Seed::ChatConversationService.create_groups!(chat_users: chat_users).each do |conversation|
+        Seed::ChatMessageService.populate!(conversation: conversation)
+      end
+    rescue StandardError => e
+      Rails.logger.warn("[Seed] Chat seeding failed: #{e.message}")
     end
 
     self.puts_count
