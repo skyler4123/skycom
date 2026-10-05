@@ -270,7 +270,7 @@ Shift seeds include realistic edge cases:
 | **Midnight crossover** | Handle shifts crossing midnight (e.g., 23:00-07:00) in scheduled_shift association |
 | **Payroll integration** | Link attendance_months to payroll/commission engine |
 | **Employee self-service** | Employee-facing dashboard to view their own attendance_days and flag issues |
-| **Attendance policies UI** | CRUD dashboard for per-branch geofence configuration |
+| **Attendance configs UI** | CRUD dashboard for per-branch geofence configuration |
 
 ---
 
