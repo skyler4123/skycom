@@ -112,6 +112,15 @@ postgresql: &postgresql
   host: <%= Rails.application.credentials.dig(:postgres_host) || "localhost" %>
   port: <%= Rails.application.credentials.dig(:postgres_port) || "5432" %>
 
+chat_postgresql: &chat_postgresql
+  adapter: postgresql
+  encoding: unicode
+  pool: 5
+  username: <%= Rails.application.credentials.dig(:postgres_username) || "postgres" %>
+  password: <%= Rails.application.credentials.dig(:postgres_password) || "password" %>
+  host: <%= Rails.application.credentials.dig(:postgres_host) || "localhost" %>
+  port: <%= Rails.application.credentials.dig(:postgres_port) || "5433" %>
+
 queue: &queue
   <<: *postgresql
   migrations_paths: db/queue_migrate
@@ -128,6 +137,10 @@ development:
   primary:
     <<: *postgresql
     database: skycom_development
+  chat:
+    <<: *chat_postgresql
+    database: chat_development
+    migrations_paths: db/chat_migrate
   queue:
     <<: *queue
     database: queue_development
@@ -142,6 +155,10 @@ test:
   primary:
     <<: *postgresql
     database: skycom_test<%= ENV['TEST_ENV_NUMBER'] %>
+  chat:
+    <<: *chat_postgresql
+    database: chat_test<%= ENV['TEST_ENV_NUMBER'] %>
+    migrations_paths: db/chat_migrate
   queue:
     <<: *queue
     database: queue_test<%= ENV['TEST_ENV_NUMBER'] %>
@@ -156,6 +173,10 @@ production:
   primary:
     <<: *postgresql
     database: skycom_production
+  chat:
+    <<: *chat_postgresql
+    database: chat_production
+    migrations_paths: db/chat_migrate
   queue:
     <<: *queue
     database: queue_production

@@ -2,7 +2,7 @@
 #
 # DEV WORKFLOW (services only): web + job run locally via `bin/dev` for fast
 # iteration — do NOT start the `web`/`job` containers in dev. Start infra only:
-#   docker compose up -d postgres redis stograge websocket meilisearch mock-api openobserve
+#   docker compose up -d postgres chat-postgres redis stograge websocket meilisearch mock-api openobserve
 #   bin/dev
 # Full-stack compose (web/job containers) is for seed-test / rspec-test files only.
 #
@@ -31,6 +31,7 @@ services:
     tty: true
     depends_on:
       - postgres
+      - chat-postgres
       - stograge
       - websocket
       - meilisearch
@@ -59,6 +60,15 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql
  
+  chat-postgres:
+    image: postgres:18.3
+    environment:
+      POSTGRES_USERNAME: postgres
+      POSTGRES_PASSWORD: password
+    ports:
+      - "5433:5432"
+    volumes:
+      - chat_postgres_data:/var/lib/postgresql
   # RustFS Service
   stograge:
     image: rustfs/rustfs:latest
@@ -162,6 +172,7 @@ services:
 
 volumes:
   postgres_data:
+  chat_postgres_data:
   mongo_data:
   grafana_data:
   rustfs_data:
