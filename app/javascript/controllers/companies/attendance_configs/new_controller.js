@@ -1,6 +1,10 @@
 import Companies_LayoutController from "controllers/companies/layout_controller"
 
-export default class Companies_AttendancePolicies_NewController extends Companies_LayoutController {
+export default class Companies_AttendanceConfigs_NewController extends Companies_LayoutController {
+  // New Attendance Config form — branch geofence + resolution strategy.
+  // Depends on BE: Companies::AttendanceConfigsController#create
+  // Endpoints: POST /companies/:company_id/attendance_configs
+  // Docs: docs/HR.md
   connect() {
     super.connect()
     poll(() => {
@@ -12,50 +16,50 @@ export default class Companies_AttendancePolicies_NewController extends Companie
   contentHTML() {
     const fields = `
       <div class="space-y-6">
-        <h2 class="text-xl font-bold text-slate-900 dark:text-white">${translate("New Attendance Policy")}</h2>
+        <h2 class="text-xl font-bold text-slate-900 dark:text-white">${translate("New Attendance Config")}</h2>
         <div class="grid grid-cols-2 gap-4">
           <div class="col-span-2 space-y-1">
             <label class="text-[10px] font-bold text-slate-400 uppercase">${translate("Branch ID")}</label>
-            <input type="text" name="attendance_policy[branch_id]" required placeholder="e.g. uuid"
+            <input type="text" name="attendance_config[branch_id]" required placeholder="e.g. uuid"
               class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-sm">
           </div>
           <div class="space-y-1">
             <label class="text-[10px] font-bold text-slate-400 uppercase">${translate("Latitude")}</label>
-            <input type="number" step="0.000001" name="attendance_policy[latitude]" required placeholder="e.g. 10.773"
+            <input type="number" step="0.000001" name="attendance_config[latitude]" required placeholder="e.g. 10.773"
               class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-sm">
           </div>
           <div class="space-y-1">
             <label class="text-[10px] font-bold text-slate-400 uppercase">${translate("Longitude")}</label>
-            <input type="number" step="0.000001" name="attendance_policy[longitude]" required placeholder="e.g. 106.694"
+            <input type="number" step="0.000001" name="attendance_config[longitude]" required placeholder="e.g. 106.694"
               class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-sm">
           </div>
           <div class="space-y-1">
             <label class="text-[10px] font-bold text-slate-400 uppercase">${translate("Allowed Radius (m)")}</label>
-            <input type="number" name="attendance_policy[allowed_radius_meters]" value="100"
+            <input type="number" name="attendance_config[allowed_radius_meters]" value="100"
               class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-sm">
           </div>
           <div class="space-y-1">
             <label class="text-[10px] font-bold text-slate-400 uppercase">${translate("WiFi SSID")}</label>
-            <input type="text" name="attendance_policy[allowed_wifi_ssid]" placeholder="e.g. Clinic_WiFi"
+            <input type="text" name="attendance_config[allowed_wifi_ssid]" placeholder="e.g. Clinic_WiFi"
               class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-sm">
           </div>
           <div class="space-y-1">
             <label class="text-[10px] font-bold text-slate-400 uppercase">${translate("Resolution Strategy")}</label>
-            <select name="attendance_policy[resolution_strategy]"
+            <select name="attendance_config[resolution_strategy]"
               class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-sm">
               <option value="paired">Paired (check in/out)</option>
               <option value="check_in_only">Check In Only</option>
             </select>
           </div>
           <div class="flex items-center gap-3 py-2">
-            <input type="hidden" name="attendance_policy[require_photo]" value="false">
-            <input type="checkbox" name="attendance_policy[require_photo]" value="true"
+            <input type="hidden" name="attendance_config[require_photo]" value="false">
+            <input type="checkbox" name="attendance_config[require_photo]" value="true"
               class="h-5 w-5 rounded border-slate-300 text-blue-600 cursor-pointer">
             <span class="text-sm text-slate-900 dark:text-white">${translate("Require Photo")}</span>
           </div>
         </div>
         <div class="flex justify-end gap-3 pt-2">
-          <a href="${Helpers.company_attendance_policies_path(currentCompany().id)}"
+          <a href="${Helpers.company_attendance_configs_path(currentCompany().id)}"
             class="px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-100 rounded-lg cursor-pointer">
             ${translate("Cancel")}
           </a>
@@ -70,7 +74,7 @@ export default class Companies_AttendancePolicies_NewController extends Companie
     return `
       <div class="p-4 overflow-y-auto">
         ${form({
-          action: Helpers.create_company_attendance_policies_path(currentCompany().id),
+          action: Helpers.create_company_attendance_configs_path(currentCompany().id),
           method: "POST",
           attributes: `class="p-6 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800" data-turbo="false"`,
           html: fields
