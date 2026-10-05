@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_10_04_000000) do
+ActiveRecord::Schema[8.0].define(version: 2026_10_05_000003) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pgcrypto"
@@ -488,6 +488,36 @@ ActiveRecord::Schema[8.0].define(version: 2026_10_04_000000) do
     t.index ["lifecycle_status"], name: "index_articles_on_lifecycle_status"
     t.index ["property_mapping_id"], name: "index_articles_on_property_mapping_id"
     t.index ["workflow_status"], name: "index_articles_on_workflow_status"
+  end
+
+  create_table "attendance_config_logs", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
+    t.uuid "company_id", null: false
+    t.uuid "attendance_config_id"
+    t.uuid "branch_id"
+    t.uuid "employee_id"
+    t.integer "action", null: false
+    t.string "employee_name"
+    t.string "branch_name"
+    t.decimal "latitude", precision: 10, scale: 6
+    t.decimal "longitude", precision: 10, scale: 6
+    t.integer "allowed_radius_meters"
+    t.string "allowed_wifi_ssid"
+    t.boolean "require_photo"
+    t.integer "resolution_strategy"
+    t.integer "lifecycle_status"
+    t.integer "workflow_status"
+    t.integer "business_type"
+    t.datetime "expiration_date"
+    t.jsonb "metadata"
+    t.datetime "discarded_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["attendance_config_id"], name: "index_attendance_config_logs_on_attendance_config_id"
+    t.index ["branch_id"], name: "index_attendance_config_logs_on_branch_id"
+    t.index ["company_id", "attendance_config_id", "created_at"], name: "idx_attendance_config_logs_on_config_time"
+    t.index ["company_id", "created_at"], name: "idx_attendance_config_logs_on_company_time"
+    t.index ["company_id"], name: "index_attendance_config_logs_on_company_id"
+    t.index ["employee_id"], name: "index_attendance_config_logs_on_employee_id"
   end
 
   create_table "attendance_configs", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
@@ -3070,6 +3100,38 @@ ActiveRecord::Schema[8.0].define(version: 2026_10_04_000000) do
     t.index ["property_mapping_id"], name: "index_employees_on_property_mapping_id"
     t.index ["user_id"], name: "index_employees_on_user_id"
     t.index ["workflow_status"], name: "index_employees_on_workflow_status"
+  end
+
+  create_table "event_config_logs", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
+    t.uuid "company_id", null: false
+    t.uuid "event_config_id"
+    t.uuid "category_id"
+    t.uuid "employee_id"
+    t.integer "action", null: false
+    t.string "employee_name"
+    t.string "category_name"
+    t.boolean "create_stock_pending"
+    t.boolean "strict_stock_hold"
+    t.boolean "create_order_on_complete"
+    t.boolean "warn_on_facility_overlap"
+    t.boolean "warn_on_host_overlap"
+    t.string "name"
+    t.string "description"
+    t.string "code"
+    t.integer "lifecycle_status"
+    t.integer "workflow_status"
+    t.integer "business_type"
+    t.datetime "expiration_date"
+    t.jsonb "metadata"
+    t.datetime "discarded_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["category_id"], name: "index_event_config_logs_on_category_id"
+    t.index ["company_id", "created_at"], name: "idx_event_config_logs_on_company_time"
+    t.index ["company_id", "event_config_id", "created_at"], name: "idx_event_config_logs_on_config_time"
+    t.index ["company_id"], name: "index_event_config_logs_on_company_id"
+    t.index ["employee_id"], name: "index_event_config_logs_on_employee_id"
+    t.index ["event_config_id"], name: "index_event_config_logs_on_event_config_id"
   end
 
   create_table "event_configs", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
@@ -7115,6 +7177,36 @@ ActiveRecord::Schema[8.0].define(version: 2026_10_04_000000) do
     t.index ["workflow_status"], name: "index_systems_on_workflow_status"
   end
 
+  create_table "table_config_logs", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
+    t.uuid "company_id", null: false
+    t.uuid "table_config_id"
+    t.uuid "category_id"
+    t.uuid "property_mapping_id"
+    t.uuid "employee_id"
+    t.integer "action", null: false
+    t.string "employee_name"
+    t.string "category_name"
+    t.string "property_mapping_name"
+    t.string "name"
+    t.string "description"
+    t.string "resource_name"
+    t.integer "lifecycle_status"
+    t.integer "workflow_status"
+    t.integer "business_type"
+    t.datetime "expiration_date"
+    t.jsonb "metadata"
+    t.datetime "discarded_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["category_id"], name: "index_table_config_logs_on_category_id"
+    t.index ["company_id", "created_at"], name: "idx_table_config_logs_on_company_time"
+    t.index ["company_id", "table_config_id", "created_at"], name: "idx_table_config_logs_on_config_time"
+    t.index ["company_id"], name: "index_table_config_logs_on_company_id"
+    t.index ["employee_id"], name: "index_table_config_logs_on_employee_id"
+    t.index ["property_mapping_id"], name: "index_table_config_logs_on_property_mapping_id"
+    t.index ["table_config_id"], name: "index_table_config_logs_on_table_config_id"
+  end
+
   create_table "table_configs", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
     t.uuid "company_id", null: false
     t.uuid "category_id", null: false
@@ -7840,6 +7932,10 @@ ActiveRecord::Schema[8.0].define(version: 2026_10_04_000000) do
   add_foreign_key "articles", "categories"
   add_foreign_key "articles", "companies"
   add_foreign_key "articles", "property_mappings"
+  add_foreign_key "attendance_config_logs", "attendance_configs"
+  add_foreign_key "attendance_config_logs", "branches"
+  add_foreign_key "attendance_config_logs", "companies"
+  add_foreign_key "attendance_config_logs", "employees"
   add_foreign_key "attendance_configs", "branches"
   add_foreign_key "attendance_configs", "companies"
   add_foreign_key "attendance_days", "branches"
@@ -8056,6 +8152,10 @@ ActiveRecord::Schema[8.0].define(version: 2026_10_04_000000) do
   add_foreign_key "employees", "companies"
   add_foreign_key "employees", "property_mappings"
   add_foreign_key "employees", "users"
+  add_foreign_key "event_config_logs", "categories"
+  add_foreign_key "event_config_logs", "companies"
+  add_foreign_key "event_config_logs", "employees"
+  add_foreign_key "event_config_logs", "event_configs"
   add_foreign_key "event_configs", "categories"
   add_foreign_key "event_configs", "companies"
   add_foreign_key "event_facility_appointments", "companies"
@@ -8377,6 +8477,11 @@ ActiveRecord::Schema[8.0].define(version: 2026_10_04_000000) do
   add_foreign_key "suppliers", "companies"
   add_foreign_key "suppliers", "property_mappings"
   add_foreign_key "systems", "companies"
+  add_foreign_key "table_config_logs", "categories"
+  add_foreign_key "table_config_logs", "companies"
+  add_foreign_key "table_config_logs", "employees"
+  add_foreign_key "table_config_logs", "property_mappings"
+  add_foreign_key "table_config_logs", "table_configs"
   add_foreign_key "table_configs", "categories"
   add_foreign_key "table_configs", "companies"
   add_foreign_key "table_configs", "property_mappings"

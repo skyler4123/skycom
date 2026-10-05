@@ -7,5 +7,7 @@ class AttendanceConfig < ApplicationRecord
   belongs_to :company
   belongs_to :branch
 
+  has_many :attendance_config_logs, dependent: :nullify
+
   validates :latitude, :longitude, presence: true
 end

@@ -75,6 +75,7 @@ Rails.application.routes.draw do
       resources :shift_templates
       resources :scheduled_shifts
       resources :attendance_configs
+      resources :attendance_config_logs, only: [ :index, :show ]
       resources :attendance_logs
       resources :attendance_days
       resources :attendance_months
@@ -84,6 +85,7 @@ Rails.application.routes.draw do
       resources :discounts
       resources :events
       resources :event_configs
+      resources :event_config_logs, only: [ :index, :show ]
       get "calendar", to: "calendars#index"
       resources :payslips
       resources :tasks
@@ -96,6 +98,7 @@ Rails.application.routes.draw do
       resources :policy_appointments
       resources :property_mappings
       resources :table_configs
+      resources :table_config_logs, only: [ :index, :show ]
       resources :pages do
         member do
           get :retail_cashier

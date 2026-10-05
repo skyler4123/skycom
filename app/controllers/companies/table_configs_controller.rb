@@ -5,6 +5,7 @@
 #         `filter` (range/enum/boolean/date hash; submitted as raw JSON text, parsed in
 #         normalize_column_types, shape-validated in TableConfig).
 # Serves Stimulus: Companies_TableConfigs_IndexController|ShowController|NewController|EditController
+# Writes audit: Companies::TableConfigLogsController (explicit log on create/update)
 # Endpoints: GET/POST/PATCH /companies/:company_id/table_configs... — see config/routes.rb
 # Docs: docs/DYNAMIC_TABLE.md (column pattern), docs/MEILISEARCH.md (consumers of search/filter config)
 class Companies::TableConfigsController < Companies::ApplicationController
@@ -62,6 +63,7 @@ class Companies::TableConfigsController < Companies::ApplicationController
     config = current_company.table_configs.new(normalize_metadata(table_config_params))
 
     if config.save
+      log_config_change(config, :created)
       redirect_to company_table_config_path(current_company, config), notice: "Table config created successfully."
     else
       redirect_to new_company_table_config_path(current_company),
@@ -75,6 +77,7 @@ class Companies::TableConfigsController < Companies::ApplicationController
     p_params = normalize_metadata(table_config_params)
 
     if config.update(p_params)
+      log_config_change(config, :updated)
       redirect_to company_table_config_path(current_company, config), notice: "Table config updated successfully."
     else
       redirect_to edit_company_table_config_path(current_company, config),
@@ -85,6 +88,31 @@ class Companies::TableConfigsController < Companies::ApplicationController
   end
 
   private
+
+  # Immutable audit row — plain snapshot, never blocks the config save.
+  def log_config_change(config, action)
+    current_company.table_config_logs.create!(
+      table_config: config,
+      category: config.category,
+      property_mapping: config.property_mapping,
+      employee: current_employee,
+      employee_name: current_employee&.name,
+      action: action,
+      category_name: config.category&.name,
+      property_mapping_name: config.property_mapping&.name,
+      name: config.name,
+      description: config.description,
+      resource_name: config.resource_name,
+      lifecycle_status: config.lifecycle_status,
+      workflow_status: config.workflow_status,
+      business_type: config.business_type,
+      expiration_date: config.expiration_date,
+      metadata: config.metadata,
+      discarded_at: config.discarded_at
+    )
+  rescue => e
+    Rails.logger.error("[TableConfigLog] #{e.message}")
+  end
 
   # Shared by create/update: converts the metadata[columns] hash-of-indexes form payload
   # into an array and type-normalizes each column (see normalize_column_types).

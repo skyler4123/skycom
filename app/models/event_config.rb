@@ -12,5 +12,7 @@ class EventConfig < ApplicationRecord
   belongs_to :company
   belongs_to :category
 
+  has_many :event_config_logs, dependent: :nullify
+
   validates :category_id, uniqueness: { scope: :company_id }
 end
