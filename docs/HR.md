@@ -222,7 +222,7 @@ Hospital and retail enrich services create the same shift/attendance data
 | Attendance Logs | ~800 | 2 per shift (check_in + check_out) |
 | Attendance Days | ~400 | Aggregated per employee per date |
 | Attendance Months | ~80 | Monthly payroll rollups |
-| Attendance Policies | 2 | 1 per clinic (GPS: 10.773, 106.694 / 100m radius) |
+| Attendance Configs | 2 | 1 per clinic (GPS: 10.773, 106.694 / 100m radius) |
 
 Shift seeds include realistic edge cases:
 - Employees checking in 5-15 minutes early
