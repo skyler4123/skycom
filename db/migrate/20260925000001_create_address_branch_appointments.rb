@@ -17,6 +17,6 @@ class CreateAddressBranchAppointments < ActiveRecord::Migration[8.0]
       t.string :permission_resource_name
       t.timestamps
     end
-    add_index :address_branch_appointments, [:company_id, :address_id, :branch_id], unique: true, name: "idx_address_branch_appointments_uniq"
+    add_index :address_branch_appointments, [ :company_id, :address_id, :branch_id ], unique: true, name: "idx_address_branch_appointments_uniq"
   end
 end

@@ -20,6 +20,6 @@ class CreateBranchSubscriptionPlanAppointments < ActiveRecord::Migration[8.0]
       t.string :permission_resource_name
       t.timestamps
     end
-    add_index :branch_subscription_plan_appointments, [:company_id, :branch_id, :subscription_plan_id], name: "idx_branch_subscription_plan_appointments_triple"
+    add_index :branch_subscription_plan_appointments, [ :company_id, :branch_id, :subscription_plan_id ], name: "idx_branch_subscription_plan_appointments_triple"
   end
 end

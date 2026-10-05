@@ -17,6 +17,6 @@ class CreateTagTransactionAppointments < ActiveRecord::Migration[8.0]
       t.string :permission_resource_name
       t.timestamps
     end
-    add_index :tag_transaction_appointments, [:company_id, :tag_id, :transaction_id], unique: true, name: "idx_tag_transaction_appointments_uniq"
+    add_index :tag_transaction_appointments, [ :company_id, :tag_id, :transaction_id ], unique: true, name: "idx_tag_transaction_appointments_uniq"
   end
 end

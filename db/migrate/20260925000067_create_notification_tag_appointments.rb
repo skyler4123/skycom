@@ -17,6 +17,6 @@ class CreateNotificationTagAppointments < ActiveRecord::Migration[8.0]
       t.string :permission_resource_name
       t.timestamps
     end
-    add_index :notification_tag_appointments, [:company_id, :notification_id, :tag_id], unique: true, name: "idx_notification_tag_appointments_uniq"
+    add_index :notification_tag_appointments, [ :company_id, :notification_id, :tag_id ], unique: true, name: "idx_notification_tag_appointments_uniq"
   end
 end

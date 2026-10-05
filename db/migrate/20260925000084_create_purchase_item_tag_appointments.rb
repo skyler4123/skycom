@@ -17,6 +17,6 @@ class CreatePurchaseItemTagAppointments < ActiveRecord::Migration[8.0]
       t.string :permission_resource_name
       t.timestamps
     end
-    add_index :purchase_item_tag_appointments, [:company_id, :purchase_item_id, :tag_id], unique: true, name: "idx_purchase_item_tag_appointments_uniq"
+    add_index :purchase_item_tag_appointments, [ :company_id, :purchase_item_id, :tag_id ], unique: true, name: "idx_purchase_item_tag_appointments_uniq"
   end
 end

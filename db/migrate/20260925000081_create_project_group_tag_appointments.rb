@@ -17,6 +17,6 @@ class CreateProjectGroupTagAppointments < ActiveRecord::Migration[8.0]
       t.string :permission_resource_name
       t.timestamps
     end
-    add_index :project_group_tag_appointments, [:company_id, :project_group_id, :tag_id], unique: true, name: "idx_project_group_tag_appointments_uniq"
+    add_index :project_group_tag_appointments, [ :company_id, :project_group_id, :tag_id ], unique: true, name: "idx_project_group_tag_appointments_uniq"
   end
 end

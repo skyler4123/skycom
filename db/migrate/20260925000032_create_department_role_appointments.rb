@@ -16,6 +16,6 @@ class CreateDepartmentRoleAppointments < ActiveRecord::Migration[8.0]
       t.string :permission_resource_name
       t.timestamps
     end
-    add_index :department_role_appointments, [:company_id, :department_id, :role_id], unique: true, name: "idx_department_role_appointments_uniq"
+    add_index :department_role_appointments, [ :company_id, :department_id, :role_id ], unique: true, name: "idx_department_role_appointments_uniq"
   end
 end

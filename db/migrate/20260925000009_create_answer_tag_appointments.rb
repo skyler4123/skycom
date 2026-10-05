@@ -17,6 +17,6 @@ class CreateAnswerTagAppointments < ActiveRecord::Migration[8.0]
       t.string :permission_resource_name
       t.timestamps
     end
-    add_index :answer_tag_appointments, [:company_id, :answer_id, :tag_id], unique: true, name: "idx_answer_tag_appointments_uniq"
+    add_index :answer_tag_appointments, [ :company_id, :answer_id, :tag_id ], unique: true, name: "idx_answer_tag_appointments_uniq"
   end
 end

@@ -17,6 +17,6 @@ class CreateArticleTagAppointments < ActiveRecord::Migration[8.0]
       t.string :permission_resource_name
       t.timestamps
     end
-    add_index :article_tag_appointments, [:company_id, :article_id, :tag_id], unique: true, name: "idx_article_tag_appointments_uniq"
+    add_index :article_tag_appointments, [ :company_id, :article_id, :tag_id ], unique: true, name: "idx_article_tag_appointments_uniq"
   end
 end

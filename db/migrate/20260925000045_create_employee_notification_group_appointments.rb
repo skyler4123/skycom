@@ -16,6 +16,6 @@ class CreateEmployeeNotificationGroupAppointments < ActiveRecord::Migration[8.0]
       t.string :permission_resource_name
       t.timestamps
     end
-    add_index :employee_notification_group_appointments, [:company_id, :employee_id, :notification_group_id], unique: true, name: "idx_employee_notification_group_appointments_uniq"
+    add_index :employee_notification_group_appointments, [ :company_id, :employee_id, :notification_group_id ], unique: true, name: "idx_employee_notification_group_appointments_uniq"
   end
 end

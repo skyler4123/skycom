@@ -18,6 +18,6 @@ class CreateCustomerServiceAppointments < ActiveRecord::Migration[8.0]
       t.string :permission_resource_name
       t.timestamps
     end
-    add_index :customer_service_appointments, [:company_id, :customer_id, :service_id], unique: true, name: "idx_customer_service_appointments_uniq"
+    add_index :customer_service_appointments, [ :company_id, :customer_id, :service_id ], unique: true, name: "idx_customer_service_appointments_uniq"
   end
 end

@@ -16,6 +16,6 @@ class CreateCartEmployeeAppointments < ActiveRecord::Migration[8.0]
       t.string :permission_resource_name
       t.timestamps
     end
-    add_index :cart_employee_appointments, [:company_id, :cart_id, :employee_id], unique: true, name: "idx_cart_employee_appointments_uniq"
+    add_index :cart_employee_appointments, [ :company_id, :cart_id, :employee_id ], unique: true, name: "idx_cart_employee_appointments_uniq"
   end
 end

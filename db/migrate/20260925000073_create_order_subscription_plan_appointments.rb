@@ -20,6 +20,6 @@ class CreateOrderSubscriptionPlanAppointments < ActiveRecord::Migration[8.0]
       t.string :permission_resource_name
       t.timestamps
     end
-    add_index :order_subscription_plan_appointments, [:company_id, :order_id, :subscription_plan_id], name: "idx_order_subscription_plan_appointments_triple"
+    add_index :order_subscription_plan_appointments, [ :company_id, :order_id, :subscription_plan_id ], name: "idx_order_subscription_plan_appointments_triple"
   end
 end
