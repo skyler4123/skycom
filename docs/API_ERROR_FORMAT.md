@@ -6,10 +6,10 @@ All backend error responses **MUST** use `errors` (plural array), never `error` 
 
 ```ruby
 # ✅ CORRECT — frontend toast displays "Insufficient stock"
-render json: { errors: ["Insufficient stock"] }, status: :unprocessable_entity
+render json: { errors: ["Insufficient stock"] }, status: :unprocessable_content
 
 # ❌ WRONG — frontend toast shows generic "Failed to..." fallback
-render json: { error: "Insufficient stock" }, status: :unprocessable_entity
+render json: { error: "Insufficient stock" }, status: :unprocessable_content
 ```
 
 ## Why
@@ -38,7 +38,7 @@ render json: { errors: ["Unauthorized"] }, status: :forbidden
 render json: { errors: ["Role not found"] }, status: :not_found
 
 # With additional context
-render json: { errors: ["Insufficient stock"], failed_item: result[:failed_item] }, status: :unprocessable_entity
+render json: { errors: ["Insufficient stock"], failed_item: result[:failed_item] }, status: :unprocessable_content
 ```
 
 ## Status Code Conventions

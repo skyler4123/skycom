@@ -80,7 +80,7 @@ class Companies::BrandsController < Companies::ApplicationController
         if brand.update(brand_params)
           render json: { brand: format_brand(brand), message: "Brand updated successfully" }, status: :ok
         else
-          render json: { errors: brand.errors.full_messages }, status: :unprocessable_entity
+          render json: { errors: brand.errors.full_messages }, status: :unprocessable_content
         end
       end
     end

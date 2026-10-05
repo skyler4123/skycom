@@ -102,7 +102,7 @@ RSpec.describe "Companies::DiscountGroupsController", type: :request do
       post company_discount_groups_path(company),
         params: { discount_group: { name: "", prefix: "X", discount_type: "percentage" } }, as: :json
 
-      expect(response).to have_http_status(:unprocessable_entity)
+      expect(response).to have_http_status(:unprocessable_content)
       expect(JSON.parse(response.body)["errors"]).to be_present
     end
   end
@@ -125,7 +125,7 @@ RSpec.describe "Companies::DiscountGroupsController", type: :request do
     it "returns 422 with errors for an invalid quantity" do
       post generate_codes_company_discount_group_path(company, group), params: { quantity: 0 }
 
-      expect(response).to have_http_status(:unprocessable_entity)
+      expect(response).to have_http_status(:unprocessable_content)
       expect(JSON.parse(response.body)["errors"]).to eq([ "Quantity must be between 1 and 1000" ])
     end
 

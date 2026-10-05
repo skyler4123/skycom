@@ -116,7 +116,7 @@ class Companies::PurchasesController < Companies::ApplicationController
     if result[:success]
       render json: { message: "Purchase #{params[:outcome]}", purchase: format_purchase(purchase.reload) }
     else
-      render json: { errors: result[:errors] }, status: :unprocessable_entity
+      render json: { errors: result[:errors] }, status: :unprocessable_content
     end
   end
 

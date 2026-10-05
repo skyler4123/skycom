@@ -210,7 +210,7 @@ RSpec.describe "Companies::OrderProcessing::V1", type: :request do
       post "/companies/#{company.id}/order_processing/v1/pay",
         params: { order_id: order_id, payment_method_appointment_id: foreign.id }, headers: headers
 
-      expect(response).to have_http_status(:unprocessable_entity)
+      expect(response).to have_http_status(:unprocessable_content)
       expect(JSON.parse(response.body)["errors"]).to be_present
     end
 
@@ -233,7 +233,7 @@ RSpec.describe "Companies::OrderProcessing::V1", type: :request do
       post "/companies/#{company.id}/order_processing/v1/pay",
         params: { order_id: order_id, payment_method_appointment_id: cash_appts.last.id }, headers: headers
 
-      expect(response).to have_http_status(:unprocessable_entity)
+      expect(response).to have_http_status(:unprocessable_content)
       expect(JSON.parse(response.body)["errors"]).to be_present
       expect(Order.find(order_id).workflow_status).to eq("pending")
     end

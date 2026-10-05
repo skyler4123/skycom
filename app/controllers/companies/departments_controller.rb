@@ -80,7 +80,7 @@ class Companies::DepartmentsController < Companies::ApplicationController
         if department.update(department_params)
           render json: { department: format_department(department), message: "Department updated successfully" }, status: :ok
         else
-          render json: { errors: department.errors.full_messages }, status: :unprocessable_entity
+          render json: { errors: department.errors.full_messages }, status: :unprocessable_content
         end
       end
     end

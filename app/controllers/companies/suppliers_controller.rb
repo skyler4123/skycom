@@ -80,7 +80,7 @@ class Companies::SuppliersController < Companies::ApplicationController
         if supplier.update(supplier_params)
           render json: { supplier: format_supplier(supplier), message: "Supplier updated successfully" }, status: :ok
         else
-          render json: { errors: supplier.errors.full_messages }, status: :unprocessable_entity
+          render json: { errors: supplier.errors.full_messages }, status: :unprocessable_content
         end
       end
     end

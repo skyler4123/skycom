@@ -424,7 +424,7 @@ class Seed::HospitalEnrichService
   end
 
   def create_stock_adjustments
-    puts "Creating stock adjustments..."
+    # puts "Creating stock adjustments..."
     adjustment_categories = Category.where(company: @company, resource_name: "stock_adjustments").order(:id).to_a
     return if adjustment_categories.empty?
 

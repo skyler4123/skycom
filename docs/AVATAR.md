@@ -188,7 +188,7 @@ def update_avatar
       message: "Avatar updated!" 
     }
   else
-    render json: { errors: current_user.errors.full_messages }, status: :unprocessable_entity
+    render json: { errors: current_user.errors.full_messages }, status: :unprocessable_content
   end
 end
 ```

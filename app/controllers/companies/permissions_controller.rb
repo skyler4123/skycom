@@ -43,7 +43,7 @@ class Companies::PermissionsController < Companies::ApplicationController
 
     # Validate resource_name is in company's resource_names
     unless current_company.resource_names.include?(resource_name)
-      return render json: { errors: [ "Invalid resource name" ] }, status: :unprocessable_entity
+      return render json: { errors: [ "Invalid resource name" ] }, status: :unprocessable_content
     end
 
     # Check if resource already has policies for this role
@@ -53,7 +53,7 @@ class Companies::PermissionsController < Companies::ApplicationController
                              .exists?
 
     if existing_policies
-      return render json: { errors: [ "Resource already assigned to this role" ] }, status: :unprocessable_entity
+      return render json: { errors: [ "Resource already assigned to this role" ] }, status: :unprocessable_content
     end
 
     # Create policies for the role
