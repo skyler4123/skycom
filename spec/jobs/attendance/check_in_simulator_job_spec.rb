@@ -12,7 +12,7 @@ RSpec.describe Attendance::CheckInSimulatorJob do
     branch = create(:branch, company: company)
     employee = create(:employee, company: company, branch: branch)
     create(:scheduled_shift, company: company, branch: branch, employee: employee)
-    create(:attendance_policy, company: company, branch: branch)
+    create(:attendance_config, company: company, branch: branch)
 
     expect {
       described_class.perform_now
@@ -26,7 +26,7 @@ RSpec.describe Attendance::CheckInSimulatorJob do
       company = create(:company)
       branch = create(:branch, company: company)
       create(:employee, company: company, branch: branch)
-      create(:attendance_policy, company: company, branch: branch)
+      create(:attendance_config, company: company, branch: branch)
       # The random pick may hit any employee (incl. the auto-created owner),
       # so give every employee a scheduled shift to keep the pick deterministic.
       company.employees.kept.each do |emp|
@@ -42,7 +42,7 @@ RSpec.describe Attendance::CheckInSimulatorJob do
       company = create(:company)
       branch = create(:branch, company: company)
       create(:employee, company: company, branch: branch)
-      create(:attendance_policy, company: company, branch: branch)
+      create(:attendance_config, company: company, branch: branch)
       expect(company.employees.kept.count).to be >= 1
 
       expect {
@@ -60,7 +60,7 @@ RSpec.describe Attendance::CheckInSimulatorJob do
       company = create(:company)
       branch = create(:branch, company: company)
       employee = create(:employee, company: company, branch: branch)
-      create(:attendance_policy, company: company, branch: branch)
+      create(:attendance_config, company: company, branch: branch)
       company.employees.kept.each do |emp|
         create(:scheduled_shift, company: company, branch: branch, employee: emp)
       end

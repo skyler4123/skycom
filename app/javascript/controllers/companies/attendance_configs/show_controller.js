@@ -26,7 +26,7 @@ export default class Companies_AttendanceConfigs_ShowController extends Companie
 
   contentHTML() {
     const ac = this.attendanceConfig
-    if (!ap) return '<div class="p-8 text-center">Not found.</div>'
+    if (!ac) return '<div class="p-8 text-center">Not found.</div>'
 
     return `
       <div class="p-4 overflow-y-auto">
