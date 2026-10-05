@@ -20,6 +20,6 @@ class CreateSubscriptionGroupSubscriptionPlanAppointments < ActiveRecord::Migrat
       t.string :permission_resource_name
       t.timestamps
     end
-    add_index :subscription_group_subscription_plan_appointments, [:company_id, :subscription_group_id, :subscription_plan_id], name: "idx_subscription_group_subscription_plan_appointments_triple"
+    add_index :subscription_group_subscription_plan_appointments, [ :company_id, :subscription_group_id, :subscription_plan_id ], name: "idx_subscription_group_subscription_plan_appointments_triple"
   end
 end

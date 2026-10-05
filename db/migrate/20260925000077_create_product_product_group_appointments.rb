@@ -16,6 +16,6 @@ class CreateProductProductGroupAppointments < ActiveRecord::Migration[8.0]
       t.string :permission_resource_name
       t.timestamps
     end
-    add_index :product_product_group_appointments, [:company_id, :product_id, :product_group_id], unique: true, name: "idx_product_product_group_appointments_uniq"
+    add_index :product_product_group_appointments, [ :company_id, :product_id, :product_group_id ], unique: true, name: "idx_product_product_group_appointments_uniq"
   end
 end

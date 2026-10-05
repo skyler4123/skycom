@@ -82,7 +82,7 @@ class Companies::ProductsController < Companies::ApplicationController
         if product.update(product_params)
           render json: { product: format_product(product), message: "Product updated successfully" }, status: :ok
         else
-          render json: { errors: product.errors.full_messages }, status: :unprocessable_entity
+          render json: { errors: product.errors.full_messages }, status: :unprocessable_content
         end
       end
     end

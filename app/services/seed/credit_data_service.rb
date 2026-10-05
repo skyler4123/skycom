@@ -27,15 +27,15 @@ module Seed
     end
 
     def create
-      puts "Seeding credit data for #{company.name}..."
+      # puts "Seeding credit data for #{company.name}..."
       seed_wallet_purchases
       seed_daily_usage_history
       seed_monthly_usage_history
       seed_live_delta
-      puts "  -> Wallet: #{company.company_wallet.reload.main_credit_balance} credits | " \
-           "DailyUsage: #{CompanyDailyUsage.where(company: company).count} | " \
-           "MonthlyUsage: #{CompanyMonthlyUsage.where(company: company).count} | " \
-           "WalletLogs: #{CompanyWalletLog.where(company: company).count}"
+      # puts "  -> Wallet: #{company.company_wallet.reload.main_credit_balance} credits | " \
+      #      "DailyUsage: #{CompanyDailyUsage.where(company: company).count} | " \
+      #      "MonthlyUsage: #{CompanyMonthlyUsage.where(company: company).count} | " \
+      #      "WalletLogs: #{CompanyWalletLog.where(company: company).count}"
     end
 
     private

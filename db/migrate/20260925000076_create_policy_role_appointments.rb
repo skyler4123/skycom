@@ -16,6 +16,6 @@ class CreatePolicyRoleAppointments < ActiveRecord::Migration[8.0]
       t.string :permission_resource_name
       t.timestamps
     end
-    add_index :policy_role_appointments, [:company_id, :policy_id, :role_id], unique: true, name: "idx_policy_role_appointments_uniq"
+    add_index :policy_role_appointments, [ :company_id, :policy_id, :role_id ], unique: true, name: "idx_policy_role_appointments_uniq"
   end
 end

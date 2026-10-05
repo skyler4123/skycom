@@ -88,7 +88,7 @@ class Companies::EventsController < Companies::ApplicationController
           render json: { event: format_event(event.reload), warnings: warnings,
             message: "Event created successfully" }, status: :created
         rescue Events::StrictHoldError, ActiveRecord::RecordInvalid => e
-          render json: { errors: error_messages(e, event) }, status: :unprocessable_entity
+          render json: { errors: error_messages(e, event) }, status: :unprocessable_content
         end
       end
     end
@@ -121,7 +121,7 @@ class Companies::EventsController < Companies::ApplicationController
           render json: { event: format_event(event.reload), warnings: warnings,
             message: "Event updated successfully" }, status: :ok
         rescue Events::StrictHoldError, ActiveRecord::RecordInvalid => e
-          render json: { errors: error_messages(e, event) }, status: :unprocessable_entity
+          render json: { errors: error_messages(e, event) }, status: :unprocessable_content
         end
       end
     end

@@ -19,6 +19,6 @@ class CreateEmployeeOrderGroupAppointments < ActiveRecord::Migration[8.0]
       t.string :permission_resource_name
       t.timestamps
     end
-    add_index :employee_order_group_appointments, [:company_id, :employee_id, :order_group_id], name: "idx_employee_order_group_appointments_triple"
+    add_index :employee_order_group_appointments, [ :company_id, :employee_id, :order_group_id ], name: "idx_employee_order_group_appointments_triple"
   end
 end

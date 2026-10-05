@@ -17,6 +17,6 @@ class CreateStockImportTagAppointments < ActiveRecord::Migration[8.0]
       t.string :permission_resource_name
       t.timestamps
     end
-    add_index :stock_import_tag_appointments, [:company_id, :stock_import_id, :tag_id], unique: true, name: "idx_stock_import_tag_appointments_uniq"
+    add_index :stock_import_tag_appointments, [ :company_id, :stock_import_id, :tag_id ], unique: true, name: "idx_stock_import_tag_appointments_uniq"
   end
 end

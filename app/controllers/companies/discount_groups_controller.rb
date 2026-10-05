@@ -62,7 +62,7 @@ class Companies::DiscountGroupsController < Companies::ApplicationController
           redirect_to new_company_discount_group_path(current_company),
             alert: group.errors.full_messages.to_sentence
         end
-        format.json { render json: { errors: group.errors.full_messages }, status: :unprocessable_entity }
+        format.json { render json: { errors: group.errors.full_messages }, status: :unprocessable_content }
       end
     end
   end
@@ -82,7 +82,7 @@ class Companies::DiscountGroupsController < Companies::ApplicationController
           redirect_to edit_company_discount_group_path(current_company, group),
             alert: group.errors.full_messages.to_sentence
         end
-        format.json { render json: { errors: group.errors.full_messages }, status: :unprocessable_entity }
+        format.json { render json: { errors: group.errors.full_messages }, status: :unprocessable_content }
       end
     end
   end
@@ -105,7 +105,7 @@ class Companies::DiscountGroupsController < Companies::ApplicationController
     if result[:success]
       render json: { message: "#{result[:generated]} discount codes generated", group: format_group(group.reload) }
     else
-      render json: { errors: result[:errors] }, status: :unprocessable_entity
+      render json: { errors: result[:errors] }, status: :unprocessable_content
     end
   end
 

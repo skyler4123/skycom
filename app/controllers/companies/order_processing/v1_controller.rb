@@ -15,7 +15,7 @@ class Companies::OrderProcessing::V1Controller < Companies::ApplicationControlle
     result = OrderProcessingV1::CheckAvailabilityService.call(items: checkout_params[:items])
 
     unless result[:available]
-      render json: { errors: [ "Insufficient stock" ], failed_item: result[:failed_item] }, status: :unprocessable_entity
+      render json: { errors: [ "Insufficient stock" ], failed_item: result[:failed_item] }, status: :unprocessable_content
       return
     end
 
@@ -58,11 +58,11 @@ class Companies::OrderProcessing::V1Controller < Companies::ApplicationControlle
 
     render json: payload
   rescue OrderProcessingV1::InsufficientStockError
-    render json: { errors: [ "Insufficient stock for payment" ] }, status: :unprocessable_entity
+    render json: { errors: [ "Insufficient stock for payment" ] }, status: :unprocessable_content
   rescue OrderProcessingV1::InvalidPaymentMethodError => e
-    render json: { errors: [ e.message ] }, status: :unprocessable_entity
+    render json: { errors: [ e.message ] }, status: :unprocessable_content
   rescue OrderProcessingV1::InvalidDiscountError => e
-    render json: { errors: [ e.message ] }, status: :unprocessable_entity
+    render json: { errors: [ e.message ] }, status: :unprocessable_content
   end
 
   # Cancels an abandoned QR payment. Only a pending Transaction can be cancelled:

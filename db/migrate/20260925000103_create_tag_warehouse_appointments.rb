@@ -17,6 +17,6 @@ class CreateTagWarehouseAppointments < ActiveRecord::Migration[8.0]
       t.string :permission_resource_name
       t.timestamps
     end
-    add_index :tag_warehouse_appointments, [:company_id, :tag_id, :warehouse_id], unique: true, name: "idx_tag_warehouse_appointments_uniq"
+    add_index :tag_warehouse_appointments, [ :company_id, :tag_id, :warehouse_id ], unique: true, name: "idx_tag_warehouse_appointments_uniq"
   end
 end

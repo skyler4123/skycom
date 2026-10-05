@@ -17,6 +17,6 @@ class CreateExamGroupTagAppointments < ActiveRecord::Migration[8.0]
       t.string :permission_resource_name
       t.timestamps
     end
-    add_index :exam_group_tag_appointments, [:company_id, :exam_group_id, :tag_id], unique: true, name: "idx_exam_group_tag_appointments_uniq"
+    add_index :exam_group_tag_appointments, [ :company_id, :exam_group_id, :tag_id ], unique: true, name: "idx_exam_group_tag_appointments_uniq"
   end
 end

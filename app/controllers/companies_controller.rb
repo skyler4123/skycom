@@ -11,7 +11,7 @@ class CompaniesController < ApplicationController
     else
       respond_to do |format|
         format.html { redirect_to root_path, alert: company.errors.full_messages.to_sentence }
-        format.json { render json: { errors: company.errors.full_messages }, status: :unprocessable_entity }
+        format.json { render json: { errors: company.errors.full_messages }, status: :unprocessable_content }
       end
     end
   end

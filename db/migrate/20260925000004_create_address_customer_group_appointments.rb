@@ -17,6 +17,6 @@ class CreateAddressCustomerGroupAppointments < ActiveRecord::Migration[8.0]
       t.string :permission_resource_name
       t.timestamps
     end
-    add_index :address_customer_group_appointments, [:company_id, :address_id, :customer_group_id], unique: true, name: "idx_address_customer_group_appointments_uniq"
+    add_index :address_customer_group_appointments, [ :company_id, :address_id, :customer_group_id ], unique: true, name: "idx_address_customer_group_appointments_uniq"
   end
 end

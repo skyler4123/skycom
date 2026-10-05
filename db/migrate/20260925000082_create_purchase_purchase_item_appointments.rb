@@ -19,6 +19,6 @@ class CreatePurchasePurchaseItemAppointments < ActiveRecord::Migration[8.0]
       t.string :permission_resource_name
       t.timestamps
     end
-    add_index :purchase_purchase_item_appointments, [:company_id, :purchase_id, :purchase_item_id], name: "idx_purchase_purchase_item_appointments_triple"
+    add_index :purchase_purchase_item_appointments, [ :company_id, :purchase_id, :purchase_item_id ], name: "idx_purchase_purchase_item_appointments_triple"
   end
 end

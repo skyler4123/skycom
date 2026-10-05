@@ -17,6 +17,6 @@ class CreateAddressEmployeeAppointments < ActiveRecord::Migration[8.0]
       t.string :permission_resource_name
       t.timestamps
     end
-    add_index :address_employee_appointments, [:company_id, :address_id, :employee_id], unique: true, name: "idx_address_employee_appointments_uniq"
+    add_index :address_employee_appointments, [ :company_id, :address_id, :employee_id ], unique: true, name: "idx_address_employee_appointments_uniq"
   end
 end

@@ -16,6 +16,6 @@ class CreateDocumentGroupEmployeeAppointments < ActiveRecord::Migration[8.0]
       t.string :permission_resource_name
       t.timestamps
     end
-    add_index :document_group_employee_appointments, [:company_id, :document_group_id, :employee_id], unique: true, name: "idx_document_group_employee_appointments_uniq"
+    add_index :document_group_employee_appointments, [ :company_id, :document_group_id, :employee_id ], unique: true, name: "idx_document_group_employee_appointments_uniq"
   end
 end

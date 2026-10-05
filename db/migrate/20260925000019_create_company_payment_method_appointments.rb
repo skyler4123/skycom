@@ -18,6 +18,6 @@ class CreateCompanyPaymentMethodAppointments < ActiveRecord::Migration[8.0]
       t.string :permission_resource_name
       t.timestamps
     end
-    add_index :company_payment_method_appointments, [:company_id, :payment_method_id], unique: true, name: "idx_company_payment_method_appointments_uniq"
+    add_index :company_payment_method_appointments, [ :company_id, :payment_method_id ], unique: true, name: "idx_company_payment_method_appointments_uniq"
   end
 end

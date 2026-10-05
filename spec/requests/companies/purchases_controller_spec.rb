@@ -57,7 +57,7 @@ RSpec.describe "Companies::PurchasesController", type: :request do
     it "returns 422 with errors for an invalid outcome" do
       post advance_company_purchase_path(company, purchase), params: { outcome: "hijack" }
 
-      expect(response).to have_http_status(:unprocessable_entity)
+      expect(response).to have_http_status(:unprocessable_content)
       expect(JSON.parse(response.body)["errors"]).to be_present
     end
 

@@ -16,6 +16,6 @@ class CreateEmployeeGroupRoleAppointments < ActiveRecord::Migration[8.0]
       t.string :permission_resource_name
       t.timestamps
     end
-    add_index :employee_group_role_appointments, [:company_id, :employee_group_id, :role_id], unique: true, name: "idx_employee_group_role_appointments_uniq"
+    add_index :employee_group_role_appointments, [ :company_id, :employee_group_id, :role_id ], unique: true, name: "idx_employee_group_role_appointments_uniq"
   end
 end

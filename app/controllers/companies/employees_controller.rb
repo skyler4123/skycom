@@ -85,14 +85,14 @@ class Companies::EmployeesController < Companies::ApplicationController
         if employee.discard!
           render json: { message: "Employee deleted successfully!" }
         else
-          render json: { errors: employee.errors.full_messages }, status: :unprocessable_entity
+          render json: { errors: employee.errors.full_messages }, status: :unprocessable_content
         end
       end
     end
   rescue ActiveRecord::RecordNotFound
     render json: { status: "error", message: "Employee not found" }, status: :not_found
   rescue Discard::RecordNotDiscarded => e
-    render json: { errors: [ e.message ] }, status: :unprocessable_entity
+    render json: { errors: [ e.message ] }, status: :unprocessable_content
   end
 
   private
