@@ -490,6 +490,29 @@ ActiveRecord::Schema[8.0].define(version: 2026_10_04_000000) do
     t.index ["workflow_status"], name: "index_articles_on_workflow_status"
   end
 
+  create_table "attendance_configs", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
+    t.uuid "company_id", null: false
+    t.uuid "branch_id", null: false
+    t.decimal "latitude", precision: 10, scale: 6, null: false
+    t.decimal "longitude", precision: 10, scale: 6, null: false
+    t.integer "allowed_radius_meters", null: false
+    t.string "allowed_wifi_ssid"
+    t.boolean "require_photo", null: false
+    t.integer "resolution_strategy", null: false
+    t.integer "lifecycle_status"
+    t.integer "workflow_status"
+    t.integer "business_type"
+    t.datetime "expiration_date"
+    t.jsonb "metadata"
+    t.datetime "discarded_at"
+    t.string "permission_resource_name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["branch_id"], name: "index_attendance_configs_on_branch_id", unique: true
+    t.index ["company_id"], name: "index_attendance_configs_on_company_id"
+    t.index ["discarded_at"], name: "index_attendance_configs_on_discarded_at"
+  end
+
   create_table "attendance_days", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
     t.uuid "company_id", null: false
     t.uuid "branch_id"
@@ -580,29 +603,6 @@ ActiveRecord::Schema[8.0].define(version: 2026_10_04_000000) do
     t.index ["discarded_at"], name: "index_attendance_months_on_discarded_at"
     t.index ["employee_id", "month"], name: "index_attendance_months_on_employee_id_and_month", unique: true
     t.index ["employee_id"], name: "index_attendance_months_on_employee_id"
-  end
-
-  create_table "attendance_policies", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
-    t.uuid "company_id", null: false
-    t.uuid "branch_id", null: false
-    t.decimal "latitude", precision: 10, scale: 6, null: false
-    t.decimal "longitude", precision: 10, scale: 6, null: false
-    t.integer "allowed_radius_meters", null: false
-    t.string "allowed_wifi_ssid"
-    t.boolean "require_photo", null: false
-    t.integer "resolution_strategy", null: false
-    t.integer "lifecycle_status"
-    t.integer "workflow_status"
-    t.integer "business_type"
-    t.datetime "expiration_date"
-    t.jsonb "metadata"
-    t.datetime "discarded_at"
-    t.string "permission_resource_name"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.index ["branch_id"], name: "index_attendance_policies_on_branch_id", unique: true
-    t.index ["company_id"], name: "index_attendance_policies_on_company_id"
-    t.index ["discarded_at"], name: "index_attendance_policies_on_discarded_at"
   end
 
   create_table "branch_event_appointments", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
@@ -7840,6 +7840,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_10_04_000000) do
   add_foreign_key "articles", "categories"
   add_foreign_key "articles", "companies"
   add_foreign_key "articles", "property_mappings"
+  add_foreign_key "attendance_configs", "branches"
+  add_foreign_key "attendance_configs", "companies"
   add_foreign_key "attendance_days", "branches"
   add_foreign_key "attendance_days", "companies"
   add_foreign_key "attendance_days", "employees"
@@ -7849,8 +7851,6 @@ ActiveRecord::Schema[8.0].define(version: 2026_10_04_000000) do
   add_foreign_key "attendance_months", "branches"
   add_foreign_key "attendance_months", "companies"
   add_foreign_key "attendance_months", "employees"
-  add_foreign_key "attendance_policies", "branches"
-  add_foreign_key "attendance_policies", "companies"
   add_foreign_key "branch_event_appointments", "branches"
   add_foreign_key "branch_event_appointments", "companies"
   add_foreign_key "branch_event_appointments", "events"
