@@ -20,6 +20,7 @@ class Company < ApplicationRecord
     Membership
     Page CompanyPaymentMethodAppointment ShiftTemplate ScheduledShift
     AttendanceConfig AttendanceLog AttendanceDay AttendanceMonth
+    EventConfigLog AttendanceConfigLog TableConfigLog
     Stock StockTransfer StockImport StockExport StockAdjustment StockPending
     Event EventGroup EventConfig
   ].freeze
@@ -70,6 +71,7 @@ class Company < ApplicationRecord
 
   has_many :property_mappings, dependent: :destroy
   has_many :table_configs, dependent: :destroy
+  has_many :table_config_logs, dependent: :destroy
   has_many :brands, dependent: :destroy
   has_many :branches, dependent: :destroy
   has_many :tags, dependent: :destroy
@@ -84,6 +86,7 @@ class Company < ApplicationRecord
   has_many :attendance_days, dependent: :destroy
   has_many :attendance_months, dependent: :destroy
   has_many :attendance_configs, dependent: :destroy
+  has_many :attendance_config_logs, dependent: :destroy
   has_many :facility_groups, dependent: :destroy
   has_many :facilities, dependent: :destroy
   has_many :service_groups, dependent: :destroy
@@ -112,6 +115,7 @@ class Company < ApplicationRecord
   has_many :events, dependent: :destroy
   has_many :event_groups, dependent: :destroy
   has_many :event_configs, dependent: :destroy
+  has_many :event_config_logs, dependent: :destroy
   has_many :task_groups, dependent: :destroy
   has_many :project_groups, dependent: :destroy
   has_many :cart_groups, dependent: :destroy

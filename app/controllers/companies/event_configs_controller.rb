@@ -5,6 +5,7 @@
 # completion, and warn on double-booked facilities/hosts.
 # Serves Stimulus: Companies_EventConfigs_IndexController,
 #                  Companies_EventConfigs_NewController|ShowController|EditController
+# Writes audit: Companies::EventConfigLogsController (explicit log on create/update)
 # Endpoints: GET /companies/:company_id/event_configs(.json) + nested CRUD — see config/routes.rb
 # Docs: docs/EVENTS.md
 class Companies::EventConfigsController < Companies::ApplicationController
@@ -65,6 +66,7 @@ class Companies::EventConfigsController < Companies::ApplicationController
     config = current_company.event_configs.new(config_params)
 
     if config.save
+      log_config_change(config, :created)
       redirect_to company_event_config_path(current_company, config), notice: "Event config created successfully"
     else
       redirect_to new_company_event_config_path(current_company),
@@ -76,6 +78,7 @@ class Companies::EventConfigsController < Companies::ApplicationController
     config = current_company.event_configs.find(params[:id])
 
     if config.update(config_params)
+      log_config_change(config, :updated)
       redirect_to company_event_config_path(current_company, config), notice: "Event config updated successfully."
     else
       redirect_to edit_company_event_config_path(current_company, config),
@@ -84,6 +87,31 @@ class Companies::EventConfigsController < Companies::ApplicationController
   end
 
   private
+
+  # Immutable audit row — plain snapshot, never blocks the config save.
+  def log_config_change(config, action)
+    current_company.event_config_logs.create!(
+      event_config: config,
+      category: config.category,
+      employee: current_employee,
+      employee_name: current_employee&.name,
+      action: action,
+      category_name: config.category&.name,
+      create_stock_pending: config.create_stock_pending,
+      strict_stock_hold: config.strict_stock_hold,
+      create_order_on_complete: config.create_order_on_complete,
+      warn_on_facility_overlap: config.warn_on_facility_overlap,
+      warn_on_host_overlap: config.warn_on_host_overlap,
+      lifecycle_status: config.lifecycle_status,
+      workflow_status: config.workflow_status,
+      business_type: config.business_type,
+      expiration_date: config.expiration_date,
+      metadata: config.metadata,
+      discarded_at: config.discarded_at
+    )
+  rescue => e
+    Rails.logger.error("[EventConfigLog] #{e.message}")
+  end
 
   def config_params
     params.require(:event_config).permit(

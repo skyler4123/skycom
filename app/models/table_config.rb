@@ -21,6 +21,8 @@ class TableConfig < ApplicationRecord
   belongs_to :category
   belongs_to :property_mapping
 
+  has_many :table_config_logs, dependent: :nullify
+
   # TableConfig layout configuration for the Cashier/Accountant Grid View
   # [
   #   {

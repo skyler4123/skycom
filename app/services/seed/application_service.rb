@@ -107,6 +107,11 @@ class Seed::ApplicationService
     Seed::HospitalEnrichService.new(company: company_3, user: user_2, email: "hospital@company3.com")
     Seed::HotelEnrichService.new(company: company_4, user: user_2, email: "hotel@company4.com")
 
+    # Audit-trail demo rows for the read-only config log pages (2 per config).
+    [ company_1, company_2, company_3, company_4 ].each do |company|
+      Seed::ConfigLogService.seed_for(company: company)
+    end
+
     self.puts_count
 
     puts "\n========================================================="

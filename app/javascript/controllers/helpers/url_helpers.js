@@ -69,6 +69,8 @@ export const new_company_table_config_path = (companyId) => `/companies/${compan
 export const create_company_table_configs_path = (companyId) => `/companies/${companyId}/table_configs`
 export const company_table_config_path = (companyId, configId) => `/companies/${companyId}/table_configs/${configId}`
 export const edit_company_table_config_path = (companyId, configId) => `/companies/${companyId}/table_configs/${configId}/edit`
+export const company_table_config_logs_path = (companyId) => `/companies/${companyId}/table_config_logs`
+export const company_table_config_log_path = (companyId, id) => `/companies/${companyId}/table_config_logs/${id}`
 
 export const company_products_path = (companyId) => `/companies/${companyId}/products`
 export const new_company_product_path = (companyId) => `/companies/${companyId}/products/new`
@@ -156,6 +158,8 @@ export const create_company_attendance_configs_path = (companyId) => `/companies
 
 export const company_attendance_logs_path = (companyId) => `/companies/${companyId}/attendance_logs`
 export const company_attendance_log_path = (companyId, id) => `/companies/${companyId}/attendance_logs/${id}`
+export const company_attendance_config_logs_path = (companyId) => `/companies/${companyId}/attendance_config_logs`
+export const company_attendance_config_log_path = (companyId, id) => `/companies/${companyId}/attendance_config_logs/${id}`
 
 export const company_attendance_days_path = (companyId) => `/companies/${companyId}/attendance_days`
 export const company_attendance_day_path = (companyId, id) => `/companies/${companyId}/attendance_days/${id}`
@@ -181,6 +185,8 @@ export const new_company_event_config_path = (companyId) => `/companies/${compan
 export const create_company_event_configs_path = (companyId) => `/companies/${companyId}/event_configs`
 export const company_event_config_path = (companyId, configId) => `/companies/${companyId}/event_configs/${configId}`
 export const edit_company_event_config_path = (companyId, configId) => `/companies/${companyId}/event_configs/${configId}/edit`
+export const company_event_config_logs_path = (companyId) => `/companies/${companyId}/event_config_logs`
+export const company_event_config_log_path = (companyId, id) => `/companies/${companyId}/event_config_logs/${id}`
 export const company_calendar_path = (companyId) => `/companies/${companyId}/calendar`
 export const company_discounts_path = (companyId) => `/companies/${companyId}/discounts`
 // Discount groups (Discount FE — docs/superpowers/specs/2026-09-22-discounts-frontend-design.md)
