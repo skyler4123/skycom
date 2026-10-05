@@ -72,8 +72,8 @@ the per-worker SQLite cable/cache files.
 ### 3.3 Secondary schemas are off-limits
 
 AI is blocked from editing `db/queue_schema.rb`, `db/cable_schema.rb`,
-`db/cache_schema.rb`, and `db/rails_pulse_schema.rb` — they are gem-owned
-(Solid Queue / Cable / Cache / Rails Pulse). If a migration run reports an
+and `db/cache_schema.rb` — they are gem-owned
+(Solid Queue / Cable / Cache). If a migration run reports an
 error relating to those files, it is OK to ignore: only `db/schema.rb` +
 `db/migrate/*` matter for the recovery in §3.2. Never hand-edit a secondary
 schema to "fix" a parallel failure.
@@ -108,7 +108,7 @@ CI is out of scope: CI stays single-process (`bundle exec rspec` in
 |---------|-------------|
 | `relation does not exist` on worker N | Worker DB not migrated → run the two setup lines in §3 |
 | `PendingMigrationError` / schema mismatch after a new migration | Worker DBs drifted → full reset per §3.2 (`drop[10]` → `create[10]` → `load_schema[10]`, or `migrate[10]` to verify the migration replays) |
-| Migration error mentions `queue/cable/cache/rails_pulse_schema.rb` | Secondary schemas are gem-owned and off-limits (§3.3) → OK to ignore; only `db/schema.rb` + `db/migrate/*` matter |
+| Migration error mentions `queue/cable/cache_schema.rb` | Secondary schemas are gem-owned and off-limits (§3.3) → OK to ignore; only `db/schema.rb` + `db/migrate/*` matter |
 | Bare `parallel_rspec` raises load error | Missing `bundle exec` prefix → always `bundle exec parallel_rspec` |
 | Flaky feature passes alone, fails in suite | Retries only run under parallel — repro must also use `bundle exec parallel_rspec -n 10`, never bare `rspec` (see `docs/FLAKY_TESTS.md`) |
 | Stale Meilisearch hits across workers | Index suffix missing → check `TEST_ENV_NUMBER` is passed through (see `config/initializers/meilisearch.rb`) |
