@@ -2,7 +2,7 @@
 #
 # DEV WORKFLOW (services only): web + job run locally via `bin/dev` for fast
 # iteration — do NOT start the `web`/`job` containers in dev. Start infra only:
-#   docker compose up -d postgres redis stograge websocket meilisearch mock-api openobserve
+#   docker compose up -d postgres redis stograge websocket meilisearch mock-api openobserve vocechat
 #   bin/dev
 # Full-stack compose (web/job containers) is for seed-test / rspec-test files only.
 #
@@ -146,6 +146,14 @@ services:
       timeout: 5s
       retries: 3
 
+  # VoceChat Service
+  vocechat:
+    image: privoce/vocechat-server:v0.5.36
+    ports:
+      - "3001:3000"
+    volumes:
+      - vocechat_data:/home/vocechat-server/data
+
   mock-api:
     image: golang:1.22-alpine
     working_dir: /go/src/app
@@ -170,3 +178,4 @@ volumes:
   openobserve_data:
   websocket_data:
   meilisearch_data:
+  vocechat_data:

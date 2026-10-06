@@ -1,6 +1,41 @@
-<div>
-  <h1 class="font-bold text-4xl">Demo#index</h1>
-  <p>Find me in app/views/demo/index.html.erb</p>
-  <!-- app/views/some_page.html.erb -->
-  <div data-controller="calendar" class="min-h-screen bg-gray-50 py-8"></div>
-</div>
+<!-- put this code snippet into your html file -->
+<script 
+  data-host-id="1" 
+  data-auto-reg="true" 
+  data-login-token="" 
+  data-title="" 
+  data-logo="" 
+  data-theme-color="#1fe1f9" 
+  data-close-width="48" 
+  data-close-height="48" 
+  data-open-width="380" 
+  data-open-height="680" 
+  data-welcome="Your custom welcome text" 
+  data-popup-title="Need help?" 
+  data-popup-subtitle="Our staff are always ready to help!" 
+  data-popup-image="" 
+  data-popup-closable="true" 
+  src="http://10.88.0.2:3001/widget.js" 
+  async 
+></script>
+
+<style>
+  #VOCECHAT_WIDGET {
+    left:10px  /* left position */
+    bottom: 5px /* bottom position */
+  }
+</style>
+
+<!-- Open widget with a button -->
+<button onclick="VoceChatWidget.open()">Contact Support</button>
+
+<!-- Custom styled button -->
+<button
+  onclick="VoceChatWidget.open()"
+  style="background: #1fe1f9; color: white; padding: 12px 24px; border: none; border-radius: 8px; cursor: pointer; font-size: 16px;"
+>
+  💬 Chat with us
+</button>
+
+<!-- Toggle widget open/close -->
+<button onclick="VoceChatWidget.toggle()">Toggle Chat</button>
