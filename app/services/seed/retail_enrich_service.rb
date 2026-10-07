@@ -92,6 +92,7 @@ class Seed::RetailEnrichService
     create_events
     create_purchase_data
     create_discount_data
+    create_notification_data
     create_shifts
     create_attendance_configs
     create_attendance_event_data
@@ -721,6 +722,24 @@ class Seed::RetailEnrichService
     Discounts::BatchGenerator.call(discount_group: fixed_group, quantity: 25)
 
     puts "  -> #{Discount.where(company: @retail).count} discount codes created (#{DiscountGroup.where(company: @retail).count} groups)"
+  end
+
+  def create_notification_data
+    ops = NotificationTag.find_or_create_by!(company: @retail, name: "ops")
+    announcements = NotificationTag.find_or_create_by!(company: @retail, name: "announcements")
+
+    @retail.employees.find_each do |employee|
+      EmployeeNotificationTagAppointment.find_or_create_by!(employee: employee, notification_tag: ops)
+    end
+
+    Notifications::CreateService.call(company: @retail, title: "Welcome to notifications",
+      body: "System broadcasts will appear here.", tag_ids: [ announcements.id ])
+    Notifications::CreateService.call(company: @retail, title: "Inventory sync completed",
+      tag_ids: [ ops.id ])
+    Notifications::CreateService.call(company: @retail, title: "Low stock alert",
+      body: "Some SKUs are running low.", severity: :warning, tag_ids: [ ops.id ])
+
+    puts "  -> #{Notification.where(company: @retail).count} notifications created"
   end
 
   def run_purchase_workflow(purchase, requester, manager, index)
