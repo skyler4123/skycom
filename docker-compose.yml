@@ -2,7 +2,7 @@
 #
 # DEV WORKFLOW (services only): web + job run locally via `bin/dev` for fast
 # iteration — do NOT start the `web`/`job` containers in dev. Start infra only:
-#   docker compose up -d postgres redis stograge websocket meilisearch mock-api openobserve vocechat
+#   docker compose up -d postgres redis stograge websocket meilisearch mock-api openobserve vocechat vocechat-init
 #   bin/dev
 # Full-stack compose (web/job containers) is for seed-test / rspec-test files only.
 #
@@ -153,6 +153,49 @@ services:
       - "3001:3000"
     volumes:
       - vocechat_data:/home/vocechat-server/data
+    # optional but useful for invite links / frontend URL
+    command:
+      - --network.frontend_url
+      - "http://localhost:3001"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/api/admin/system/version"]
+      interval: 5s
+      timeout: 3s
+      retries: 30
+      start_period: 10s
+
+  vocechat-init:
+    image: curlimages/curl:8.5.0
+    depends_on:
+      vocechat:
+        condition: service_healthy
+    environment:
+      VOCECHAT_URL: http://vocechat:3000
+      ADMIN_EMAIL: admin@example.com          # change these
+      ADMIN_NAME: Admin
+      ADMIN_PASSWORD: Password@123
+    restart: "no"
+    entrypoint: ["/bin/sh", "-c"]
+    command:
+      - |
+        set -e
+        echo "Waiting for VoceChat to become ready..."
+        until curl -sf "$${VOCECHAT_URL}/api/admin/system/version" >/dev/null; do
+          sleep 2
+        done
+
+        INIT=$(curl -sf "$${VOCECHAT_URL}/api/admin/system/initialized" || echo "false")
+        if [ "$$INIT" = "true" ]; then
+          echo "VoceChat already initialized – skipping."
+          exit 0
+        fi
+
+        echo "Creating first admin..."
+        curl -sf -X POST "$${VOCECHAT_URL}/api/admin/system/create_admin" \
+          -H "Content-Type: application/json" \
+          -d "{\"email\":\"$${ADMIN_EMAIL}\",\"name\":\"$${ADMIN_NAME}\",\"password\":\"$${ADMIN_PASSWORD}\",\"gender\":0}"
+
+        echo "Admin created successfully."
 
   mock-api:
     image: golang:1.22-alpine
