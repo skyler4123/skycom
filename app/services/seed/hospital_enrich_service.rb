@@ -70,6 +70,7 @@ class Seed::HospitalEnrichService
     create_invoices
     create_events
     create_purchase_data
+    create_support_ticket_data
     create_shifts
     create_attendance_configs
     create_attendance_event_data
@@ -647,6 +648,25 @@ class Seed::HospitalEnrichService
 
   # Sample purchase requisitions across every workflow phase:
   # 0 = completed end to end, 1 = rejected by manager, 2 = reworked then completed, 3 = left pending.
+  def create_support_ticket_data
+    employees = @company.employees.where.not(business_type: :owner).limit(4).to_a
+    return if employees.empty?
+
+    staff = User.find_by(system_role: :super_admin) ||
+      User.find_by(system_role: :admin) ||
+      Seed::UserService.create(system_role: :admin)
+
+    4.times do |i|
+      Seed::CompanyTicketService.create_sample_thread(
+        company: @company,
+        employee: employees[i % employees.length],
+        staff: staff,
+        index: i
+      )
+    end
+    puts "  -> #{CompanyTicket.where(company: @company).count} support tickets created"
+  end
+
   def create_purchase_data
     puts "Creating purchases..."
     purchase_categories = Category.where(company: @company, resource_name: "purchases").order(:id).to_a
