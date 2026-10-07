@@ -89,12 +89,13 @@ class Admin::CompanyTicketsController < Admin::ApplicationController
       return render json: { errors: e.record.errors.full_messages }, status: :unprocessable_content
     end
 
+    full_comment = format_comment(comment)
     WEBSOCKET.publish_event(
       channel: WEBSOCKET.channel_name(:company, ticket.company_id),
       event_key: :company_ticket_commented,
-      data: { id: ticket.id, message_preview: comment.message.to_s.truncate(120), author_type: "User" }
+      data: { id: ticket.id, comment: full_comment, first_responded_at: ticket.reload.first_responded_at }
     )
-    render json: { company_ticket_comment: { id: comment.id, message: comment.message } },
+    render json: { company_ticket_comment: full_comment },
       status: :created
   end
 

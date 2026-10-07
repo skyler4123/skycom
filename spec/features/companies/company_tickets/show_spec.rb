@@ -53,19 +53,31 @@ RSpec.feature "Companies::CompanyTickets Show", type: :feature, js: true do
     expect(page).to have_content("Any update on this?", wait: 10)
   end
 
-  scenario "image attachment renders an image, doc renders an icon" do
+  scenario "image attachment renders an image" do
     png = png_file
+
+    visit company_company_ticket_path(company, ticket)
+    expect(page).to have_content("VPN broken", wait: 10)
+
+    fill_in "company_ticket_comment[message]", with: "Screen attached"
+    attach_file "company_ticket_comment[file_attachments][]", png.path
+    click_button "Post Comment"
+
+    expect(page).to have_content("Screen attached", wait: 10)
+    expect(page).to have_selector('img[src*="shot"]', wait: 10)
+  end
+
+  scenario "doc attachment renders an icon" do
     pdf = pdf_file
 
     visit company_company_ticket_path(company, ticket)
     expect(page).to have_content("VPN broken", wait: 10)
 
-    fill_in "company_ticket_comment[message]", with: "Screens attached"
-    attach_file "company_ticket_comment[file_attachments][]", [ png.path, pdf.path ]
+    fill_in "company_ticket_comment[message]", with: "Manual attached"
+    attach_file "company_ticket_comment[file_attachments][]", pdf.path
     click_button "Post Comment"
 
-    expect(page).to have_content("Screens attached", wait: 10)
-    expect(page).to have_selector('img[src*="shot"]', wait: 10)
+    expect(page).to have_content("Manual attached", wait: 10)
     expect(page).to have_content("manual")
   end
 

@@ -22,9 +22,45 @@ class CompanyTicketComment < ApplicationRecord
 
   def self.create_for!(ticket:, author:, message:, files: [])
     comment = new(company: ticket.company, company_ticket: ticket, author: author, message: message)
-    Array(files).each { |f| comment.file_attachments.attach(f) } if files.present?
+    Array(files).reject(&:blank?).each { |f| comment.file_attachments.attach(prepared_upload(f)) } if files.present?
     comment.save!
     comment
+  end
+
+  # Downscale oversized comment images BEFORE attach so the 2MB original is
+  # never persisted — blobs on a new record have no service file yet, so this
+  # must run here (not in a validation callback). Fail-open: anything we cannot
+  # read or resize is returned untouched and the size validation still caps it.
+  def self.prepared_upload(file)
+    filename = file.try(:original_filename) || (file.respond_to?(:path) ? File.basename(file.path) : "upload")
+    source_path = (file.respond_to?(:path) && file.path.present? && File.exist?(file.path) ? file.path : nil)
+    content_type = file.try(:content_type) ||
+      (source_path ? Marcel::MimeType.for(Pathname.new(source_path)) : nil)
+    return file unless content_type.to_s.start_with?("image/")
+    return file unless ACCEPTABLE_TICKET_FILE_TYPES.include?(content_type)
+
+    limit_w, limit_h = TICKET_COMMENT_IMAGE_DIMENSIONS
+    tmp_in = nil
+    unless source_path
+      tmp_in = Tempfile.new([ "comment-in", File.extname(filename.to_s) ])
+      tmp_in.binmode
+      io = file.respond_to?(:read) ? file : file.open
+      io.rewind if io.respond_to?(:rewind)
+      tmp_in.write(io.read)
+      tmp_in.flush
+      source_path = tmp_in.path
+    end
+
+    image = MiniMagick::Image.open(source_path)
+    return file if image.width <= limit_w && image.height <= limit_h
+
+    processed = ImageProcessing::MiniMagick.source(source_path).resize_to_limit(limit_w, limit_h).call
+    { io: File.open(processed.path, "rb"), filename: filename, content_type: content_type }
+  rescue => e
+    Rails.logger.warn("[TicketComment] downscale skipped: #{e.message}")
+    file
+  ensure
+    tmp_in&.close!
   end
 
   private

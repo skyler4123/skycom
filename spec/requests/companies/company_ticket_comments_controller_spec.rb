@@ -33,8 +33,14 @@ RSpec.describe "Companies::CompanyTicketCommentsController", type: :request do
       expect(WEBSOCKET).to have_received(:publish_event).with(
         channel: WEBSOCKET.channel_name(:company, company.id),
         event_key: :company_ticket_commented,
-        data: hash_including(author_type: "Employee")
+        data: hash_including(comment: hash_including("message" => "any update?", "author_type" => "Employee", "attachments" => []))
       )
+      body = JSON.parse(response.body)["company_ticket_comment"]
+      expect(body["message"]).to eq("any update?")
+      expect(body["author_type"]).to eq("Employee")
+      expect(body).to have_key("author_name")
+      expect(body).to have_key("created_at")
+      expect(body["attachments"]).to eq([])
     end
 
     it "rejects blank messages with 422 errors" do

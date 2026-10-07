@@ -2,6 +2,8 @@ import Admin_LayoutController from "controllers/admin/layout_controller"
 
 // Admin ticket detail — handle, comment, resolve/close/reopen.
 // Subscribes to the ticket's company channel for live customer replies.
+// Comment events carry the full comment payload and are injected into the
+// thread (no re-fetch); status events still refresh.
 // (List page stays socket-free; only the open detail subscribes once.)
 // Depends on BE: Admin::CompanyTicketsController#show|assign|resolve|close|reopen|comment
 // Endpoints: GET /admin/company_tickets/:id.json; POST .../:id/assign|resolve|close|reopen|comment
@@ -9,6 +11,7 @@ import Admin_LayoutController from "controllers/admin/layout_controller"
 export default class Admin_CompanyTickets_ShowController extends Admin_LayoutController {
   /** @type {any | null} */
   ticket = null
+  _ownIds = new Set()
 
   async connect() {
     super.connect()
@@ -27,11 +30,27 @@ export default class Admin_CompanyTickets_ShowController extends Admin_LayoutCon
       try {
         const channel = WEBSOCKET.channelName("company", this.ticket.company.id)
         if (channel) {
-          WEBSOCKET.subscribe(channel, "company_ticket_commented", () => this.refresh())
+          WEBSOCKET.subscribe(channel, "company_ticket_commented", (data) => this.handleSocketComment(data))
           WEBSOCKET.subscribe(channel, "company_ticket_status_changed", () => this.refresh())
         }
       } catch (e) { /* socket unavailable — Refresh button covers it */ }
     }
+  }
+
+  handleSocketComment(data) {
+    if (!this.ticket || data?.id !== this.ticket.id) return
+    const c = data.payload?.comment
+    if (!c?.id) return
+    if ((this.ticket.comments || []).some((x) => x.id === c.id)) return
+    if (data.payload?.first_responded_at) this.ticket.first_responded_at = data.payload.first_responded_at
+    this.appendComment(c, { silent: this._ownIds.has(c.id) })
+  }
+
+  appendComment(c, { silent = false } = {}) {
+    this.ticket.comments = [...(this.ticket.comments || []), c].sort((a, b) =>
+      new Date(a.created_at) - new Date(b.created_at))
+    if (this.hasContentTarget) this.renderContent()
+    if (!silent) toast({ type: "info", message: "New comment" })
   }
 
   ticketId() {
@@ -83,13 +102,25 @@ export default class Admin_CompanyTickets_ShowController extends Admin_LayoutCon
   async handleCommentSubmit(event) {
     event.preventDefault()
     const formEl = event.target
+    const picked = formEl.querySelector('input[type="file"]')?.files?.[0]
+    if (picked) {
+      const max = picked.type.startsWith("image/") ? 2 * 1024 * 1024 : 1 * 1024 * 1024
+      if (picked.size > max) {
+        toast({ type: "error", message: "File is too big (images up to 2MB, other files up to 1MB)" })
+        return
+      }
+    }
     try {
-      await fetchJson(Helpers.comment_admin_company_ticket_path(this.ticket.id), {
+      const response = await fetchJson(Helpers.comment_admin_company_ticket_path(this.ticket.id), {
         method: "POST",
         body: new FormData(formEl)
       })
+      const c = response.company_ticket_comment
+      if (c?.id) {
+        this._ownIds.add(c.id)
+        this.appendComment(c, { silent: true })
+      }
       formEl.reset()
-      await this.refresh()
       toast({ type: "success", message: "Comment posted" })
     } catch (error) {
       toast({ type: "error", message: error.errors?.join(", ") || "Failed to post comment" })
@@ -187,8 +218,12 @@ export default class Admin_CompanyTickets_ShowController extends Admin_LayoutCon
             <textarea name="company_ticket_comment[message]" rows="3" required placeholder="Reply as Skycom support"
               class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-sm text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none placeholder:text-slate-400 dark:placeholder:text-slate-500"></textarea>
             <div class="flex items-center justify-between gap-3">
-              <input type="file" name="company_ticket_comment[file_attachments][]" multiple
-                class="text-sm text-slate-500 dark:text-slate-400 cursor-pointer">
+              <div class="flex flex-col gap-1">
+                <input type="file" name="company_ticket_comment[file_attachments][]"
+                  accept="image/*,.pdf,.txt,.doc,.docx,.xls,.xlsx"
+                  class="text-sm text-slate-500 dark:text-slate-400 cursor-pointer">
+                <span class="text-xs text-slate-400">1 file only — images up to 2MB (auto-resized), other files up to 1MB</span>
+              </div>
               <button type="submit" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium text-sm cursor-pointer">Post Comment</button>
             </div>
           </form>

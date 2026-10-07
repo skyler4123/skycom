@@ -101,6 +101,52 @@ RSpec.describe CompanyTicketComment do
       expect(comment).not_to be_valid
     end
 
+    it "rejects a second attachment (max 1 per comment)" do
+      comment = CompanyTicketComment.new(company: company, company_ticket: ticket,
+        author: employee, message: "two files")
+      comment.file_attachments.attach(
+        io: StringIO.new("one"), filename: "a.txt", content_type: "text/plain"
+      )
+      comment.file_attachments.attach(
+        io: StringIO.new("two"), filename: "b.txt", content_type: "text/plain"
+      )
+      expect(comment).not_to be_valid
+      expect(comment.errors[:file_attachments].join).to match(/more than 1/)
+    end
+
+    it "rejects non-image files over 1MB" do
+      comment = CompanyTicketComment.new(company: company, company_ticket: ticket,
+        author: employee, message: "heavy pdf")
+      comment.file_attachments.attach(
+        io: StringIO.new("x" * (1.megabyte + 1)),
+        filename: "heavy.pdf",
+        content_type: "application/pdf"
+      )
+      expect(comment).not_to be_valid
+    end
+
+    it "accepts non-image files up to 1MB" do
+      comment = CompanyTicketComment.new(company: company, company_ticket: ticket,
+        author: employee, message: "ok pdf")
+      comment.file_attachments.attach(
+        io: StringIO.new("x" * 1.megabyte),
+        filename: "ok.pdf",
+        content_type: "application/pdf"
+      )
+      expect(comment).to be_valid
+    end
+
+    it "rejects images over 2MB" do
+      comment = CompanyTicketComment.new(company: company, company_ticket: ticket,
+        author: employee, message: "huge shot")
+      comment.file_attachments.attach(
+        io: StringIO.new("x" * (2.megabytes + 1)),
+        filename: "huge.png",
+        content_type: "image/png"
+      )
+      expect(comment).not_to be_valid
+    end
+
     it "accepts images, pdf, text and office docs" do
       comment = CompanyTicketComment.new(company: company, company_ticket: ticket,
         author: employee, message: "docs")
@@ -110,6 +156,30 @@ RSpec.describe CompanyTicketComment do
         content_type: "image/png"
       )
       expect(comment).to be_valid
+    end
+
+    it "downscales oversized images to 800px before store" do
+      path = Rails.root.join("faker/images/randoms/567-500x1000.jpg")
+      comment = CompanyTicketComment.create_for!(
+        ticket: ticket, author: employee, message: "big screenshot",
+        files: [ File.open(path) ]
+      )
+
+      blob = comment.file_attachments.first.blob
+      image = MiniMagick::Image.open(ActiveStorage::Blob.service.path_for(blob.key))
+      expect(image.width).to be <= 800
+      expect(image.height).to be <= 800
+      expect(blob.byte_size).to be < File.size(path)
+    end
+
+    it "leaves small images untouched" do
+      path = Rails.root.join("faker/images/randoms/580-200x300.jpg")
+      comment = CompanyTicketComment.create_for!(
+        ticket: ticket, author: employee, message: "small shot",
+        files: [ File.open(path) ]
+      )
+
+      expect(comment.file_attachments.first.blob.byte_size).to eq(File.size(path))
     end
 
     it "leaves no orphan blobs when validation fails" do

@@ -48,4 +48,22 @@ RSpec.feature "Companies::CompanyTickets Live Updates", type: :feature, js: true
     # No reload — the socket publication must trigger refresh().
     expect(page).to have_content(message, wait: 15)
   end
+
+  scenario "comment events for other tickets are ignored on the open detail" do
+    other = CompanyTicket.create!(company: company, employee: owner_employee, name: "Other issue")
+    visit company_company_ticket_path(company, ticket)
+    expect(page).to have_content("VPN broken", wait: 10)
+
+    page.execute_script(
+      "window.WEBSOCKET.handleIncomingPublication(" \
+      "Object.keys(window.WEBSOCKET.listeners)[0], " \
+      "{ event: 'company_ticket_commented', id: arguments[0], " \
+      "payload: { comment: { id: 'ghost', message: 'Ghost msg', author_type: 'User', " \
+      "author_name: 'Ghost', created_at: new Date().toISOString(), attachments: [] } } })",
+      other.id.to_s
+    )
+
+    expect(page).not_to have_content("Ghost msg")
+    expect(page).not_to have_content("Ghost", wait: 3)
+  end
 end
