@@ -105,15 +105,15 @@ export default class Admin_CompanyTickets_IndexController extends Admin_LayoutCo
               identifier: this.identifier,
               target: "ticketsList",
               renderers: {
-                company: (value) => `<span class="text-sm text-slate-600 dark:text-slate-300">${value?.name || "—"}</span>`,
+                company: (value) => `<span class="text-sm text-slate-600 dark:text-slate-300">${escapeHtml(value?.name) || "—"}</span>`,
                 name: (value, record) => `
                   <a href="${Helpers.admin_company_ticket_path(record.id)}"
                     class="font-medium text-slate-900 dark:text-white hover:text-blue-600 dark:hover:text-blue-400 transition-colors cursor-pointer">
-                    ${value || "Untitled ticket"}
+                    ${escapeHtml(value) || "Untitled ticket"}
                   </a>`,
                 priority: (value) => `${Helpers.statusBadge(value || "medium")}`,
                 status: (value) => `${Helpers.statusBadge(value || "open")}`,
-                assigned_user: (value) => `<span class="text-sm text-slate-600 dark:text-slate-300">${value?.name || value?.email || "—"}</span>`,
+                assigned_user: (value) => `<span class="text-sm text-slate-600 dark:text-slate-300">${escapeHtml(value?.name || value?.email) || "—"}</span>`,
                 updated_at: (value) => `<span class="text-xs text-slate-500 dark:text-slate-400">${value ? new Date(value).toLocaleString() : "—"}</span>`,
                 actions: (value, record) => record.assigned_user
                   ? ""

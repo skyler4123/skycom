@@ -87,4 +87,15 @@ RSpec.feature "Companies::CompanyTickets Show", type: :feature, js: true do
 
     expect(page).not_to have_button("Rate")
   end
+
+  scenario "renders user input as text, never as markup" do
+    ticket.update!(name: '<img src=x onerror="window.__xss=1">')
+    CompanyTicketComment.create_for!(ticket: ticket, author: owner_employee,
+      message: '<script>window.__xss=2</script>')
+
+    visit company_company_ticket_path(company, ticket)
+    expect(page).to have_content("Back to Support Tickets", wait: 10)
+
+    expect(page.evaluate_script("window.__xss")).to be_nil
+  end
 end

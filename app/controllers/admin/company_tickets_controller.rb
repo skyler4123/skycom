@@ -157,12 +157,19 @@ class Admin::CompanyTicketsController < Admin::ApplicationController
   end
 
   def format_log(log)
-    log.as_json(only: [ :id, :action, :from_status, :to_status, :note, :created_at ])
+    log.as_json(only: [ :id, :action, :from_status, :to_status, :note, :created_at ]).merge(
+      "actor_name" => log.actor.respond_to?(:name) && log.actor.name.present? ?
+        log.actor.name : log.actor.try(:email)
+    )
   end
 
   def format_attachment(attachment)
     {
-      "url" => Rails.application.routes.url_helpers.rails_blob_path(attachment, only_path: true),
+      # disposition: attachment forces download instead of inline render —
+      # a spoofed content-type can never execute in the viewer's browser.
+      "url" => Rails.application.routes.url_helpers.rails_blob_path(
+        attachment, only_path: true, disposition: "attachment"
+      ),
       "filename" => attachment.filename.to_s,
       "content_type" => attachment.content_type,
       "byte_size" => attachment.byte_size,

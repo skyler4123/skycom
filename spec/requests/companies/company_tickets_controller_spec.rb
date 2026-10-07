@@ -113,6 +113,7 @@ RSpec.describe "Companies::CompanyTicketsController", type: :request do
       attachments = JSON.parse(response.body)["company_ticket"]["comments"].first["attachments"]
       expect(attachments.first["image"]).to be(false)
       expect(attachments.first["content_type"]).to eq("application/pdf")
+      expect(attachments.first["url"]).to include("disposition=attachment")
     end
 
     it "returns 404 for a foreign ticket" do

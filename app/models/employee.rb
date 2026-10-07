@@ -114,8 +114,10 @@ class Employee < ApplicationRecord
            source: :notification_tag
   has_many :employee_notification_reads, dependent: :destroy
   has_one :notification_config, dependent: :destroy
-  has_many :company_tickets, dependent: :destroy
-  has_many :company_ticket_comments, as: :author, dependent: :destroy
+  # restrict: support history must survive ex-employee cleanup (audit trail
+  # for the company + admin pool). Soft-delete (discard) is unaffected.
+  has_many :company_tickets, dependent: :restrict_with_error
+  has_many :company_ticket_comments, as: :author, dependent: :restrict_with_error
 
   # --- Validations ---
   validates :name, presence: true, uniqueness: { scope: :company_id }

@@ -180,7 +180,11 @@ class Companies::CompanyTicketsController < Companies::ApplicationController
 
   def format_attachment(attachment)
     {
-      "url" => Rails.application.routes.url_helpers.rails_blob_path(attachment, only_path: true),
+      # disposition: attachment forces download instead of inline render —
+      # a spoofed content-type can never execute in the viewer's browser.
+      "url" => Rails.application.routes.url_helpers.rails_blob_path(
+        attachment, only_path: true, disposition: "attachment"
+      ),
       "filename" => attachment.filename.to_s,
       "content_type" => attachment.content_type,
       "byte_size" => attachment.byte_size,

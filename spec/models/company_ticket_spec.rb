@@ -141,4 +141,14 @@ RSpec.describe CompanyTicket do
       expect(CompanyTicket.admin_open_count_key).to eq("company_tickets/admin/open_count")
     end
   end
+
+  describe "creator deletion" do
+    it "blocks hard-deleting the creator while tickets exist" do
+      ticket = build_ticket
+      ticket.save!
+
+      expect(employee.destroy).to be(false)
+      expect(CompanyTicket.exists?(ticket.id)).to be(true)
+    end
+  end
 end

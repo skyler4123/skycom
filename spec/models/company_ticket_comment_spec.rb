@@ -39,6 +39,22 @@ RSpec.describe CompanyTicketComment do
     end
   end
 
+  describe "author deletion" do
+    it "blocks hard-deleting an employee author while comments exist" do
+      CompanyTicketComment.create_for!(ticket: ticket, author: employee, message: "hi")
+
+      expect(employee.destroy).to be(false)
+      expect(CompanyTicketComment.count).to eq(1)
+    end
+
+    it "blocks hard-deleting a staff author while comments exist" do
+      CompanyTicketComment.create_for!(ticket: ticket, author: admin_user, message: "hi")
+
+      expect(admin_user.destroy).to be(false)
+      expect(CompanyTicketComment.count).to eq(1)
+    end
+  end
+
   describe ".create_for!" do
     it "derives company from the ticket and logs the comment" do
       comment = CompanyTicketComment.create_for!(ticket: ticket, author: employee, message: "any update?")
@@ -94,6 +110,20 @@ RSpec.describe CompanyTicketComment do
         content_type: "image/png"
       )
       expect(comment).to be_valid
+    end
+
+    it "leaves no orphan blobs when validation fails" do
+      ticket # warm up lazy factories — their seed blobs must not pollute the count
+      expect {
+        comment = CompanyTicketComment.new(company: company, company_ticket: ticket,
+          author: employee, message: "x")
+        comment.file_attachments.attach(
+          io: StringIO.new("MZ fake binary"),
+          filename: "run.exe",
+          content_type: "application/x-msdownload"
+        )
+        comment.save
+      }.not_to change(ActiveStorage::Blob, :count)
     end
   end
 end

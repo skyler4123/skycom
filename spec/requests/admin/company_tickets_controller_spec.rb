@@ -57,6 +57,22 @@ RSpec.describe "Admin::CompanyTicketsController", type: :request do
     end
   end
 
+  describe "GET #show" do
+    it "returns the ticket with actor names on logs and forced-download attachments" do
+      comment = CompanyTicketComment.create_for!(ticket: ticket,
+        author: owner_employee, message: "with file")
+      comment.file_attachments.attach(io: StringIO.new("%PDF"), filename: "a.pdf",
+        content_type: "application/pdf")
+
+      get admin_company_ticket_path(ticket), as: :json
+
+      expect(response).to have_http_status(:ok)
+      body = JSON.parse(response.body)["company_ticket"]
+      expect(body["logs"].first["actor_name"]).to be_present
+      expect(body["comments"].first["attachments"].first["url"]).to include("disposition=attachment")
+    end
+  end
+
   describe "POST #assign" do
     it "assigns the ticket to the current admin and publishes" do
       post assign_admin_company_ticket_path(ticket), as: :json

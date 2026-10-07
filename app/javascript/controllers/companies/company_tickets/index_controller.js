@@ -117,12 +117,12 @@ export default class Companies_CompanyTickets_IndexController extends Companies_
                 name: (value, record) => `
                   <a href="${Helpers.company_company_ticket_path(currentCompany().id, record.id)}"
                     class="font-medium text-slate-900 dark:text-white hover:text-blue-600 dark:hover:text-blue-400 transition-colors cursor-pointer">
-                    ${value || translate("Untitled ticket")}
+                    ${escapeHtml(value) || translate("Untitled ticket")}
                   </a>`,
                 ticket_category: (value) => `<span class="text-sm text-slate-600 dark:text-slate-300">${value ? this.humanize(value) : "—"}</span>`,
                 priority: (value) => `${Helpers.statusBadge(value || "medium")}`,
                 status: (value) => `${Helpers.statusBadge(value || "open")}`,
-                assigned_user: (value) => `<span class="text-sm text-slate-600 dark:text-slate-300">${value?.name || value?.email || "—"}</span>`,
+                assigned_user: (value) => `<span class="text-sm text-slate-600 dark:text-slate-300">${escapeHtml(value?.name || value?.email) || "—"}</span>`,
                 updated_at: (value) => `<span class="text-xs text-slate-500 dark:text-slate-400">${value ? new Date(value).toLocaleString() : "—"}</span>`
               }
             })}

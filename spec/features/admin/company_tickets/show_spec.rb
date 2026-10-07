@@ -26,4 +26,12 @@ RSpec.feature "Admin::CompanyTickets Detail", type: :feature, js: true do
     click_button "Resolve"
     expect(page).to have_content("Resolved", wait: 10)
   end
+
+  scenario "refresh button re-renders the detail" do
+    visit admin_company_ticket_path(ticket)
+    expect(page).to have_content("VPN broken", wait: 10)
+
+    click_button "Refresh"
+    expect(page).to have_content("VPN broken", wait: 10)
+  end
 end

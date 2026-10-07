@@ -24,11 +24,13 @@ export default class Admin_CompanyTickets_ShowController extends Admin_LayoutCon
     })
 
     if (this.ticket?.company?.id && window.WEBSOCKET) {
-      const channel = WEBSOCKET.companyChannel(this.ticket.company.id)
-      if (channel) {
-        WEBSOCKET.subscribe(channel, "company_ticket_commented", () => this.refresh())
-        WEBSOCKET.subscribe(channel, "company_ticket_status_changed", () => this.refresh())
-      }
+      try {
+        const channel = WEBSOCKET.companyChannel(this.ticket.company.id)
+        if (channel) {
+          WEBSOCKET.subscribe(channel, "company_ticket_commented", () => this.refresh())
+          WEBSOCKET.subscribe(channel, "company_ticket_status_changed", () => this.refresh())
+        }
+      } catch (e) { /* socket unavailable — Refresh button covers it */ }
     }
   }
 
@@ -73,6 +75,11 @@ export default class Admin_CompanyTickets_ShowController extends Admin_LayoutCon
     return this.runMemberAction(event, Helpers.reopen_admin_company_ticket_path, "Ticket reopened")
   }
 
+  refreshView(event) {
+    event.preventDefault()
+    return this.refresh()
+  }
+
   async handleCommentSubmit(event) {
     event.preventDefault()
     const formEl = event.target
@@ -95,17 +102,18 @@ export default class Admin_CompanyTickets_ShowController extends Admin_LayoutCon
   }
 
   attachmentHTML(a) {
+    const filename = escapeHtml(a.filename)
     if (a.image) {
       return `
         <a href="${a.url}" target="_blank" class="block shrink-0 cursor-pointer">
-          <img src="${a.url}" alt="${a.filename}" class="w-24 h-24 object-cover rounded-lg border border-slate-200 dark:border-slate-700">
+          <img src="${a.url}" alt="${filename}" class="w-24 h-24 object-cover rounded-lg border border-slate-200 dark:border-slate-700">
         </a>`
     }
     return `
       <a href="${a.url}" target="_blank"
         class="flex items-center gap-2 px-3 py-2 border border-slate-200 dark:border-slate-700 rounded-lg text-sm text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 cursor-pointer shrink-0">
         <span class="material-symbols-outlined text-[20px]">description</span>
-        <span class="max-w-[160px] truncate">${a.filename}</span>
+        <span class="max-w-[160px] truncate">${filename}</span>
       </a>`
   }
 
@@ -129,11 +137,11 @@ export default class Admin_CompanyTickets_ShowController extends Admin_LayoutCon
     const comments = (t.comments || []).map((c) => `
       <div class="flex flex-col gap-1 py-4 border-b border-slate-100 dark:border-slate-800 last:border-0">
         <div class="flex items-center gap-2">
-          <span class="text-sm font-bold text-slate-900 dark:text-white">${c.author_name || this.humanize(c.author_type)}</span>
+          <span class="text-sm font-bold text-slate-900 dark:text-white">${escapeHtml(c.author_name) || this.humanize(c.author_type)}</span>
           ${c.author_type === "User" ? `<span class="inline-flex items-center px-2 py-0.5 text-xs font-medium rounded-md bg-violet-50 text-violet-700 dark:bg-violet-900/30 dark:text-violet-300">Skycom Support</span>` : ""}
           <span class="text-xs text-slate-400">${c.created_at ? new Date(c.created_at).toLocaleString() : ""}</span>
         </div>
-        <p class="text-sm text-slate-700 dark:text-slate-300 whitespace-pre-line">${c.message}</p>
+        <p class="text-sm text-slate-700 dark:text-slate-300 whitespace-pre-line">${escapeHtml(c.message)}</p>
         ${(c.attachments || []).length > 0 ? `<div class="flex flex-wrap gap-2 mt-2">${c.attachments.map((a) => this.attachmentHTML(a)).join("")}</div>` : ""}
       </div>`).join("")
 
@@ -151,19 +159,23 @@ export default class Admin_CompanyTickets_ShowController extends Admin_LayoutCon
             ${Helpers.statusBadge(t.priority || "medium")}
             <span class="font-mono text-xs bg-slate-100 dark:bg-slate-800/60 px-2 py-0.5 rounded text-slate-600 dark:text-slate-300 font-medium">${this.humanize(t.ticket_category)}</span>
           </div>
-          <h2 class="text-2xl font-black text-slate-900 dark:text-white">${t.name}</h2>
-          <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">${t.company?.name || ""}</p>
-          <p class="text-sm text-slate-700 dark:text-slate-300 mt-4 whitespace-pre-line">${t.description || ""}</p>
+          <h2 class="text-2xl font-black text-slate-900 dark:text-white">${escapeHtml(t.name)}</h2>
+          <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">${escapeHtml(t.company?.name) || ""}</p>
+          <p class="text-sm text-slate-700 dark:text-slate-300 mt-4 whitespace-pre-line">${escapeHtml(t.description)}</p>
 
           <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 mt-6 pt-6 border-t border-slate-200 dark:border-slate-700 text-sm">
-            <div><p class="text-xs font-medium text-slate-500">Assignee</p><p class="font-semibold text-slate-900 dark:text-white">${t.assigned_user?.name || t.assigned_user?.email || "—"}</p></div>
-            <div><p class="text-xs font-medium text-slate-500">Raised by</p><p class="font-semibold text-slate-900 dark:text-white">${t.employee?.name || "—"}</p></div>
+            <div><p class="text-xs font-medium text-slate-500">Assignee</p><p class="font-semibold text-slate-900 dark:text-white">${escapeHtml(t.assigned_user?.name || t.assigned_user?.email) || "—"}</p></div>
+            <div><p class="text-xs font-medium text-slate-500">Raised by</p><p class="font-semibold text-slate-900 dark:text-white">${escapeHtml(t.employee?.name) || "—"}</p></div>
             <div><p class="text-xs font-medium text-slate-500">First response</p><p class="font-semibold text-slate-900 dark:text-white">${t.first_responded_at ? new Date(t.first_responded_at).toLocaleString() : "—"}</p></div>
             <div><p class="text-xs font-medium text-slate-500">Rating</p><p class="font-semibold text-slate-900 dark:text-white">${t.rate ? `${t.rate} / 5` : "—"}</p></div>
           </div>
 
           <div class="flex gap-2 mt-6">
             ${this.actionButtons()}
+            <button type="button" data-action="click->${this.identifier}#refreshView"
+              class="px-4 py-2 rounded-lg font-medium text-sm cursor-pointer text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800">
+              Refresh
+            </button>
           </div>
 
           <div class="mt-6 pt-6 border-t border-slate-200 dark:border-slate-700">
