@@ -196,6 +196,14 @@ export const new_company_discount_group_path = (companyId) => `/companies/${comp
 export const company_discount_group_path = (companyId, discountGroupId) => `/companies/${companyId}/discount_groups/${discountGroupId}`
 export const edit_company_discount_group_path = (companyId, discountGroupId) => `/companies/${companyId}/discount_groups/${discountGroupId}/edit`
 export const generate_codes_company_discount_group_path = (companyId, discountGroupId) => `/companies/${companyId}/discount_groups/${discountGroupId}/generate_codes`
+// Company support tickets (docs/superpowers/plans/2026-10-07-company-support-center.md)
+export const company_company_tickets_path = (companyId) => `/companies/${companyId}/company_tickets`
+export const new_company_company_ticket_path = (companyId) => `/companies/${companyId}/company_tickets/new`
+export const company_company_ticket_path = (companyId, ticketId) => `/companies/${companyId}/company_tickets/${ticketId}`
+export const rate_company_company_ticket_path = (companyId, ticketId) => `/companies/${companyId}/company_tickets/${ticketId}/rate`
+export const company_company_ticket_comments_path = (companyId) => `/companies/${companyId}/company_ticket_comments`
+export const company_company_ticket_logs_path = (companyId) => `/companies/${companyId}/company_ticket_logs`
+export const company_company_ticket_log_path = (companyId, logId) => `/companies/${companyId}/company_ticket_logs/${logId}`
 // Notifications (docs/superpowers/plans/2026-10-07-notification.md)
 export const company_notifications_path = (companyId) => `/companies/${companyId}/notifications`
 export const company_notification_path = (companyId, notificationId) => `/companies/${companyId}/notifications/${notificationId}`

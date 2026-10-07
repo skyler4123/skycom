@@ -83,6 +83,13 @@ Rails.application.routes.draw do
       resources :documents
       resources :announcements
       resources :discounts
+      resources :company_tickets do
+        member do
+          post :rate
+        end
+      end
+      resources :company_ticket_comments, only: [ :create ]
+      resources :company_ticket_logs, only: [ :index, :show ]
       resources :notifications, only: [ :index, :show ] do
         member do
           post :mark_read
