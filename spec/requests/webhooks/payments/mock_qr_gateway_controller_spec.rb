@@ -70,7 +70,7 @@ RSpec.describe "Webhooks::Payments::MockQrGatewayController", type: :request do
       post_webhook(valid_payload)
 
       expect(WEBSOCKET).to have_received(:publish_event).with(
-        channel: WEBSOCKET.company_channel(company.id),
+        channel: WEBSOCKET.channel_name(:company, company.id),
         event_key: :top_up_completed,
         data: { amount_cents: 500, transaction_id: txn.id }
       )
@@ -126,7 +126,7 @@ RSpec.describe "Webhooks::Payments::MockQrGatewayController", type: :request do
       post_webhook(pos_payload)
 
       expect(WEBSOCKET).to have_received(:publish_event).with(
-        channel: WEBSOCKET.company_channel(company.id),
+        channel: WEBSOCKET.channel_name(:company, company.id),
         event_key: :pos_payment_completed,
         data: hash_including(transaction_token: pos_txn.gateway_reference, order_id: pos_order.id)
       )

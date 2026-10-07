@@ -257,8 +257,8 @@ export default class Companies_TopUps_NewController extends Companies_LayoutCont
     }, 50)
 
     const ws = window.WEBSOCKET
-    if (ws?.companyChannel && ws?.subscribe) {
-      const channel = ws.companyChannel(currentCompany()?.id)
+    if (ws?.channelName && ws?.subscribe) {
+      const channel = ws.channelName("company", currentCompany()?.id)
       ws.subscribe(channel, "top_up_completed", () => {
         toast({ type: "success", message: translate("Top-up successful! Redirecting...") })
         setTimeout(() => {

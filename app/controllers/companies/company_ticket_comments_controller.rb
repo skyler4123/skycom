@@ -17,7 +17,7 @@ class Companies::CompanyTicketCommentsController < Companies::ApplicationControl
     )
 
     WEBSOCKET.publish_event(
-      channel: WEBSOCKET.company_channel(current_company.id),
+      channel: WEBSOCKET.channel_name(:company, current_company.id),
       event_key: :company_ticket_commented,
       data: { id: ticket.id, message_preview: comment.message.to_s.truncate(120), author_type: "Employee" }
     )

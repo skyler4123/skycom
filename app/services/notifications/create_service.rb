@@ -89,7 +89,7 @@ module Notifications
 
     def publish_event(notification)
       WEBSOCKET.publish_event(
-        channel: WEBSOCKET.company_channel(@company&.id),
+        channel: WEBSOCKET.channel_name(:company, @company&.id),
         event_key: :notification_created,
         data: { id: notification.id, tag_ids: @tag_ids }
       )

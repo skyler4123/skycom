@@ -85,7 +85,7 @@ class Companies::CompanyTicketsController < Companies::ApplicationController
       format.json do
         if ticket.save
           WEBSOCKET.publish_event(
-            channel: WEBSOCKET.company_channel(current_company.id),
+            channel: WEBSOCKET.channel_name(:company, current_company.id),
             event_key: :company_ticket_created,
             data: { id: ticket.id, name: ticket.name, priority: ticket.priority }
           )
@@ -116,7 +116,7 @@ class Companies::CompanyTicketsController < Companies::ApplicationController
     end
 
     WEBSOCKET.publish_event(
-      channel: WEBSOCKET.company_channel(current_company.id),
+      channel: WEBSOCKET.channel_name(:company, current_company.id),
       event_key: :company_ticket_status_changed,
       data: { id: ticket.id, from_status: ticket.status, to_status: "rated" }
     )

@@ -153,13 +153,9 @@ export default class WebsocketController extends Controller {
         company_ticket_status_changed: "company_ticket_status_changed"
       },
 
-      // 2. Channel Generators
-      companyChannel(companyId) {
-        return companyId ? `${companyId}` : null
-      },
-
-      userChannel(userId) {
-        return userId ? `${userId}` : null
+      // 2. Channel Generator — format "<model>_<id>" e.g. "company_<uuid>", "user_<uuid>".
+      channelName(modelName, id) {
+        return modelName && id ? `${String(modelName).toLowerCase()}_${id}` : null
       },
 
       // 3. Local tab listener registry
@@ -210,6 +206,6 @@ export default class WebsocketController extends Controller {
 
 // How to use:
 
-// window.WEBSOCKET.subscribe(window.WEBSOCKET.companyChannel(currentCompany().id), "test", (data) => {
+// window.WEBSOCKET.subscribe(window.WEBSOCKET.channelName("company", currentCompany().id), "test", (data) => {
 //   console.log(data)
 // })

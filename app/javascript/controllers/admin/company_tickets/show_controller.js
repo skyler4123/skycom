@@ -25,7 +25,7 @@ export default class Admin_CompanyTickets_ShowController extends Admin_LayoutCon
 
     if (this.ticket?.company?.id && window.WEBSOCKET) {
       try {
-        const channel = WEBSOCKET.companyChannel(this.ticket.company.id)
+        const channel = WEBSOCKET.channelName("company", this.ticket.company.id)
         if (channel) {
           WEBSOCKET.subscribe(channel, "company_ticket_commented", () => this.refresh())
           WEBSOCKET.subscribe(channel, "company_ticket_status_changed", () => this.refresh())

@@ -40,7 +40,7 @@ module Webhooks
         txn.update!(status: :completed)
 
         WEBSOCKET.publish_event(
-          channel: WEBSOCKET.company_channel(txn.company_id),
+          channel: WEBSOCKET.channel_name(:company, txn.company_id),
           event_key: :top_up_completed,
           data: {
             amount_cents: settlement_amount,

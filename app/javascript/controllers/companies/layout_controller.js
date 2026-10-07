@@ -91,7 +91,7 @@ export default class Companies_LayoutController extends Controller {
     if (!this.bellSubscribed && window.WEBSOCKET) {
       this.bellSubscribed = true;
       try {
-        const channel = WEBSOCKET.companyChannel(currentCompany()?.id);
+        const channel = WEBSOCKET.channelName("company", currentCompany()?.id);
         if (channel) WEBSOCKET.subscribe(channel, "notification_created", () => this.refreshBell());
       } catch (error) {
         this.bellSubscribed = false;

@@ -31,7 +31,7 @@ RSpec.describe "Companies::CompanyTicketCommentsController", type: :request do
 
       expect(response).to have_http_status(:created)
       expect(WEBSOCKET).to have_received(:publish_event).with(
-        channel: WEBSOCKET.company_channel(company.id),
+        channel: WEBSOCKET.channel_name(:company, company.id),
         event_key: :company_ticket_commented,
         data: hash_including(author_type: "Employee")
       )

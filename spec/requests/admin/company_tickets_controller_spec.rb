@@ -80,7 +80,7 @@ RSpec.describe "Admin::CompanyTicketsController", type: :request do
       expect(response).to have_http_status(:ok)
       expect(ticket.reload.assigned_user).to eq(admin)
       expect(WEBSOCKET).to have_received(:publish_event).with(
-        channel: WEBSOCKET.company_channel(company.id),
+        channel: WEBSOCKET.channel_name(:company, company.id),
         event_key: :company_ticket_status_changed,
         data: hash_including(to_status: "assigned")
       )
@@ -107,7 +107,7 @@ RSpec.describe "Admin::CompanyTicketsController", type: :request do
       expect(response).to have_http_status(:created)
       expect(ticket.reload.first_responded_at).to be_present
       expect(WEBSOCKET).to have_received(:publish_event).with(
-        channel: WEBSOCKET.company_channel(company.id),
+        channel: WEBSOCKET.channel_name(:company, company.id),
         event_key: :company_ticket_commented,
         data: hash_including(author_type: "User")
       )

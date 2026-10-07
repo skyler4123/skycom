@@ -27,7 +27,7 @@ export default class Companies_CompanyTickets_ShowController extends Companies_L
       return false
     })
 
-    const channel = window.WEBSOCKET && WEBSOCKET.companyChannel(currentCompany().id)
+    const channel = window.WEBSOCKET && WEBSOCKET.channelName("company", currentCompany().id)
     if (channel) {
       try {
         WEBSOCKET.subscribe(channel, "company_ticket_commented", () => this.refresh())

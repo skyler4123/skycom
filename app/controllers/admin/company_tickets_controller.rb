@@ -90,7 +90,7 @@ class Admin::CompanyTicketsController < Admin::ApplicationController
     end
 
     WEBSOCKET.publish_event(
-      channel: WEBSOCKET.company_channel(ticket.company_id),
+      channel: WEBSOCKET.channel_name(:company, ticket.company_id),
       event_key: :company_ticket_commented,
       data: { id: ticket.id, message_preview: comment.message.to_s.truncate(120), author_type: "User" }
     )
@@ -112,7 +112,7 @@ class Admin::CompanyTicketsController < Admin::ApplicationController
 
   def publish_status(ticket, from_status:, to_status:)
     WEBSOCKET.publish_event(
-      channel: WEBSOCKET.company_channel(ticket.company_id),
+      channel: WEBSOCKET.channel_name(:company, ticket.company_id),
       event_key: :company_ticket_status_changed,
       data: { id: ticket.id, from_status: from_status, to_status: to_status }
     )

@@ -141,7 +141,7 @@ RSpec.describe "Companies::CompanyTicketsController", type: :request do
       expect(created.employee).to eq(owner_employee)
       expect(created).to be_status_open
       expect(WEBSOCKET).to have_received(:publish_event).with(
-        channel: WEBSOCKET.company_channel(company.id),
+        channel: WEBSOCKET.channel_name(:company, company.id),
         event_key: :company_ticket_created,
         data: hash_including(name: "WiFi down")
       )
@@ -176,7 +176,7 @@ RSpec.describe "Companies::CompanyTicketsController", type: :request do
       expect(response).to have_http_status(:ok)
       expect(ticket.reload.rate).to eq(5)
       expect(WEBSOCKET).to have_received(:publish_event).with(
-        channel: WEBSOCKET.company_channel(company.id),
+        channel: WEBSOCKET.channel_name(:company, company.id),
         event_key: :company_ticket_status_changed,
         data: hash_including(to_status: "rated")
       )

@@ -56,7 +56,7 @@ RSpec.describe "Webhooks::Payments::MockRedirectGatewayController", type: :reque
       post_webhook(valid_payload)
 
       expect(WEBSOCKET).to have_received(:publish_event).with(
-        channel: WEBSOCKET.company_channel(company.id),
+        channel: WEBSOCKET.channel_name(:company, company.id),
         event_key: :top_up_completed,
         data: { amount_cents: 1_000, transaction_id: txn.id }
       )
