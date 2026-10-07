@@ -72,15 +72,28 @@ class Companies::CompanyTicketsController < Companies::ApplicationController
   def create
     ticket = current_company.company_tickets.new(ticket_params.merge(employee: current_employee))
 
-    if ticket.save
-      WEBSOCKET.publish_event(
-        channel: WEBSOCKET.company_channel(current_company.id),
-        event_key: :company_ticket_created,
-        data: { id: ticket.id, name: ticket.name, priority: ticket.priority }
-      )
-      render json: { company_ticket: format_ticket_detail(ticket) }, status: :created
-    else
-      render json: { errors: ticket.errors.full_messages }, status: :unprocessable_content
+    respond_to do |format|
+      format.html do
+        if ticket.save
+          redirect_to company_company_ticket_path(current_company, ticket),
+            notice: "Support ticket created successfully"
+        else
+          redirect_to new_company_company_ticket_path(current_company),
+            alert: ticket.errors.full_messages.to_sentence
+        end
+      end
+      format.json do
+        if ticket.save
+          WEBSOCKET.publish_event(
+            channel: WEBSOCKET.company_channel(current_company.id),
+            event_key: :company_ticket_created,
+            data: { id: ticket.id, name: ticket.name, priority: ticket.priority }
+          )
+          render json: { company_ticket: format_ticket_detail(ticket) }, status: :created
+        else
+          render json: { errors: ticket.errors.full_messages }, status: :unprocessable_content
+        end
+      end
     end
   end
 
@@ -144,6 +157,8 @@ class Companies::CompanyTicketsController < Companies::ApplicationController
   def format_ticket_detail(ticket)
     format_ticket(ticket).merge(
       "description" => ticket.description,
+      "can_rate" => ticket.employee_id == current_employee.id &&
+        (ticket.status_resolved? || ticket.status_closed?),
       "comments" => ticket.ticket_comments.sort_by(&:created_at).map { |c| format_comment(c) },
       "logs" => ticket.ticket_logs.sort_by(&:created_at).map { |l| format_log(l) },
       "attachments" => ticket.file_attachments.map { |a| format_attachment(a) }
