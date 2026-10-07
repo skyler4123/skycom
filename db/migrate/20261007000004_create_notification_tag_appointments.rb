@@ -1,4 +1,4 @@
-class CreateNotificationTagAppointmentsV2 < ActiveRecord::Migration[8.0]
+class CreateNotificationTagAppointments < ActiveRecord::Migration[8.0]
   def change
     create_table :notification_tag_appointments, id: :uuid, default: -> { "uuidv7()" } do |t|
       t.references :company, null: false, foreign_key: true, type: :uuid
