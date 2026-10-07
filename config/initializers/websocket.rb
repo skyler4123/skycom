@@ -18,7 +18,10 @@ class WEBSOCKET
     test: "test",
     top_up_completed: "top_up_completed",
     pos_payment_completed: "pos_payment_completed",
-    notification_created: "notification_created"
+    notification_created: "notification_created",
+    company_ticket_created: "company_ticket_created",
+    company_ticket_commented: "company_ticket_commented",
+    company_ticket_status_changed: "company_ticket_status_changed"
   }.freeze
 
   class << self

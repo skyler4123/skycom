@@ -778,6 +778,13 @@ export const dictionary = () => {
     "Failed to mark all as read": { vi: "Không thể đánh dấu tất cả đã đọc" },
     "Failed to mark as read": { vi: "Không thể đánh dấu đã đọc" },
     "Back to Notifications": { vi: "Về Thông Báo" },
+    // === Support Tickets ===
+    "Support Tickets": { vi: "Phiếu Hỗ Trợ" },
+    "New Ticket": { vi: "Tạo Phiếu Mới" },
+    "Ticket Details": { vi: "Chi Tiết Phiếu" },
+    "Back to Support Tickets": { vi: "Về Phiếu Hỗ Trợ" },
+    "Ticket not found.": { vi: "Không tìm thấy phiếu hỗ trợ." },
+    "Failed to load tickets": { vi: "Không thể tải phiếu hỗ trợ" },
     "Open linked record": { vi: "Mở bản ghi liên quan" },
     "Preferences": { vi: "Tùy Chọn" },
     "Notification Preferences": { vi: "Tùy Chọn Thông Báo" },

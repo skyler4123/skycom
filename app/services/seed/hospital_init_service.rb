@@ -308,6 +308,9 @@ class Seed::HospitalInitService
       Receptionist: {
         "Notification" => { read: true },
         "NotificationTag" => { read: true },
+        "CompanyTicket" => { create: true, read: true, update: true, delete: false },
+        "CompanyTicketComment" => { create: true, read: true, update: false, delete: false },
+        "CompanyTicketLog" => { read: true },
         "Customer" => { create: true, read: true, update: true, delete: false },
         "Order" => { create: true, read: true, update: false, delete: false },
         "Invoice" => { create: true, read: true, update: false, delete: false },
@@ -320,6 +323,9 @@ class Seed::HospitalInitService
       Dentist: {
         "Notification" => { read: true },
         "NotificationTag" => { read: true },
+        "CompanyTicket" => { create: true, read: true, update: true, delete: false },
+        "CompanyTicketComment" => { create: true, read: true, update: false, delete: false },
+        "CompanyTicketLog" => { read: true },
         "Customer" => { create: false, read: true, update: true, delete: false },
         "Patient" => { create: false, read: true, update: true, delete: false },
         "Order" => { create: true, read: true, update: true, delete: false },
@@ -331,6 +337,9 @@ class Seed::HospitalInitService
       DentalAssistant: {
         "Notification" => { read: true },
         "NotificationTag" => { read: true },
+        "CompanyTicket" => { create: true, read: true, update: true, delete: false },
+        "CompanyTicketComment" => { create: true, read: true, update: false, delete: false },
+        "CompanyTicketLog" => { read: true },
         "Customer" => { read: true, update: true },
         "Patient" => { read: true, update: true },
         "Facility" => { read: true, update: true },
@@ -340,6 +349,9 @@ class Seed::HospitalInitService
       Hygienist: {
         "Notification" => { read: true },
         "NotificationTag" => { read: true },
+        "CompanyTicket" => { create: true, read: true, update: true, delete: false },
+        "CompanyTicketComment" => { create: true, read: true, update: false, delete: false },
+        "CompanyTicketLog" => { read: true },
         "Customer" => { read: true },
         "Patient" => { read: true },
         "Service" => { read: true },
@@ -390,7 +402,10 @@ class Seed::HospitalInitService
         "Notification" => { create: true, read: true, update: true, delete: true },
         "NotificationTag" => { create: true, read: true, update: true, delete: true },
         "Purchase" => { create: true, read: true, update: true, delete: true },
-        "PurchaseItem" => { create: true, read: true, update: true, delete: true }
+        "PurchaseItem" => { create: true, read: true, update: true, delete: true },
+        "CompanyTicket" => { create: true, read: true, update: true, delete: true },
+        "CompanyTicketComment" => { create: true, read: true, update: true, delete: true },
+        "CompanyTicketLog" => { create: true, read: true, update: true, delete: true }
       },
       Admin: {
         "Product" => { create: true, read: true, update: true, delete: true },
@@ -437,7 +452,10 @@ class Seed::HospitalInitService
         "Notification" => { create: true, read: true, update: true, delete: true },
         "NotificationTag" => { create: true, read: true, update: true, delete: true },
         "Purchase" => { create: true, read: true, update: true, delete: true },
-        "PurchaseItem" => { create: true, read: true, update: true, delete: true }
+        "PurchaseItem" => { create: true, read: true, update: true, delete: true },
+        "CompanyTicket" => { create: true, read: true, update: true, delete: true },
+        "CompanyTicketComment" => { create: true, read: true, update: true, delete: true },
+        "CompanyTicketLog" => { create: true, read: true, update: true, delete: true }
       }
     }
 
