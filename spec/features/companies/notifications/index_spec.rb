@@ -34,7 +34,7 @@ RSpec.feature "Companies::Notifications Index", type: :feature, js: true do
 
     expect(page).to have_selector("[data-bell-badge]", text: "1", wait: 10)
     click_button "Mark all as read"
-    expect(page).to have_selector("[data-bell-badge]", text: "0", wait: 10)
+    expect(page).to have_selector("[data-bell-badge].hidden", visible: :hidden, wait: 10)
   end
 
   scenario "index lists notification rows" do
