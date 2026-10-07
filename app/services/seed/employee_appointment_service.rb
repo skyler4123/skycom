@@ -12,8 +12,6 @@ class Seed::EmployeeAppointmentService
     "EventGroup" => [ "EmployeeEventGroupAppointmentService", :event_group ],
     "Exam" => [ "EmployeeExamAppointmentService", :exam ],
     "Facility" => [ "EmployeeFacilityAppointmentService", :facility ],
-    "Notification" => [ "EmployeeNotificationAppointmentService", :notification ],
-    "NotificationGroup" => [ "EmployeeNotificationGroupAppointmentService", :notification_group ],
     "OrderGroup" => [ "EmployeeOrderGroupAppointmentService", :order_group ],
     "Product" => [ "EmployeeProductAppointmentService", :product ],
     "Project" => [ "EmployeeProjectAppointmentService", :project ],

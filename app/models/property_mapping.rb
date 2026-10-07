@@ -96,8 +96,6 @@ class PropertyMapping < ApplicationRecord
   has_many :facility_groups, dependent: :restrict_with_error
   has_many :invoices, dependent: :restrict_with_error
   has_many :memberships, dependent: :restrict_with_error
-  has_many :notifications, dependent: :restrict_with_error
-  has_many :notification_groups, dependent: :restrict_with_error
   has_many :orders, dependent: :restrict_with_error
   has_many :order_groups, dependent: :restrict_with_error
   has_many :payments, dependent: :restrict_with_error

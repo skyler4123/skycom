@@ -43,10 +43,6 @@ class Tag < ApplicationRecord
   has_many :facility_groups, through: :facility_group_tag_appointments
   has_many :invoice_tag_appointments, dependent: :destroy
   has_many :invoices, through: :invoice_tag_appointments
-  has_many :notification_tag_appointments, dependent: :destroy
-  has_many :notifications, through: :notification_tag_appointments
-  has_many :notification_group_tag_appointments, dependent: :destroy
-  has_many :notification_groups, through: :notification_group_tag_appointments
   has_many :order_tag_appointments, dependent: :destroy
   has_many :orders, through: :order_tag_appointments
   has_many :order_group_tag_appointments, dependent: :destroy

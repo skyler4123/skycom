@@ -37,7 +37,6 @@ class Role < ApplicationRecord
     task_group: 16,
     project_group: 17,
     cart_group: 18,
-    notification_group: 19,
     payment_method: 20
   }, prefix: :model_type
   # --- Associations ---
