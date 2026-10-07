@@ -31,6 +31,12 @@ class CompanyTicketComment < ApplicationRecord
   # never persisted — blobs on a new record have no service file yet, so this
   # must run here (not in a validation callback). Fail-open: anything we cannot
   # read or resize is returned untouched and the size validation still caps it.
+  # NOTE: deliberately NOT using Rails built-in `has_many_attached ... do |attachable|
+  #   attachable.variant ...`. Variants only register lazily-generated derivatives —
+  # the original 2MB blob is still uploaded and stored permanently, with the resized
+  # file kept *in addition*. Since comments must never store the 2MB original, we
+  # resize eagerly with ImageProcessing (the same MiniMagick engine Active Storage
+  # variants use) BEFORE attach, so the small file is the only thing persisted.
   def self.prepared_upload(file)
     filename = file.try(:original_filename) || (file.respond_to?(:path) ? File.basename(file.path) : "upload")
     source_path = (file.respond_to?(:path) && file.path.present? && File.exist?(file.path) ? file.path : nil)
