@@ -80,12 +80,6 @@ class Employee < ApplicationRecord
   has_many :employee_facility_appointments, dependent: :destroy
   has_many :facilities, through: :employee_facility_appointments
 
-  has_many :employee_notification_appointments, dependent: :destroy
-  has_many :notifications, through: :employee_notification_appointments
-
-  has_many :employee_notification_group_appointments, dependent: :destroy
-  has_many :notification_groups, through: :employee_notification_group_appointments
-
   has_many :employee_order_group_appointments, dependent: :destroy
   has_many :order_groups, through: :employee_order_group_appointments
 

@@ -44,10 +44,6 @@ RSpec.describe Tag, type: :model do
     it { should have_many(:facility_groups).through(:facility_group_tag_appointments) }
     it { should have_many(:invoice_tag_appointments).dependent(:destroy) }
     it { should have_many(:invoices).through(:invoice_tag_appointments) }
-    it { should have_many(:notification_tag_appointments).dependent(:destroy) }
-    it { should have_many(:notifications).through(:notification_tag_appointments) }
-    it { should have_many(:notification_group_tag_appointments).dependent(:destroy) }
-    it { should have_many(:notification_groups).through(:notification_group_tag_appointments) }
     it { should have_many(:order_tag_appointments).dependent(:destroy) }
     it { should have_many(:orders).through(:order_tag_appointments) }
     it { should have_many(:order_group_tag_appointments).dependent(:destroy) }

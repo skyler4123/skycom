@@ -119,7 +119,6 @@ class Company < ApplicationRecord
   has_many :task_groups, dependent: :destroy
   has_many :project_groups, dependent: :destroy
   has_many :cart_groups, dependent: :destroy
-  has_many :notification_groups, dependent: :destroy
   has_many :company_payment_method_appointments, dependent: :destroy
   has_many :payment_methods, through: :company_payment_method_appointments
   has_many :statistics, as: :owner

@@ -23,7 +23,6 @@ RSpec.describe Company, type: :model do
     it { should have_many(:task_groups).dependent(:destroy) }
     it { should have_many(:project_groups).dependent(:destroy) }
     it { should have_many(:cart_groups).dependent(:destroy) }
-    it { should have_many(:notification_groups).dependent(:destroy) }
     it { should have_many(:payment_methods).through(:company_payment_method_appointments) }
     it { should have_many(:categories).dependent(:destroy) }
     it { should have_many(:subscription_plans).dependent(:destroy) }

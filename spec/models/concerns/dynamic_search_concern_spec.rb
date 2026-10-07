@@ -85,11 +85,6 @@ DYNAMIC_SEARCH_MODELS = {
     create(:invoice, order: order)
   },
   Membership => ->(company) { create_searchable_record(Membership, company, "memberships", code: "MEM-#{SecureRandom.hex(4)}", name: "UniqueSearchTerm#{SecureRandom.hex(4)}") },
-  Notification => ->(company) {
-    notification_group = create_searchable_record(NotificationGroup, company, "notification_groups")
-    create_searchable_record(Notification, company, "notifications", notification_group: notification_group)
-  },
-  NotificationGroup => ->(company) { create_searchable_record(NotificationGroup, company, "notification_groups") },
   Order => ->(company) {
     customer = create(:customer, company: company)
     create(:order, company: company, customer: customer)

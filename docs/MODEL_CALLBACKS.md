@@ -329,7 +329,7 @@ Auto-derives `company_id` on atomic pairwise Appointment records from the associ
 |----------|------|--------|-------------|
 | `before_validation :set_default_company_from_resource` | 34 | `set_default_company_from_resource` | Derives `company_id` from the first associated record that responds to `company_id` (e.g., `employee.company_id` for `EmployeeTaskAppointment`). Only sets if not already present. Iterates all `belongs_to` associations except `company`; falls back to the company pair side (e.g., `AddressCompanyAppointment#company`). |
 
-**Included in (112 models):** All atomic `*_appointments` tables, named alphabetically per pair (`A_B_appointments`, e.g., `ArticleEmployeeAppointment`, `DepartmentEmployeeAppointment`, `EmployeeTaskAppointment`, `CustomerCustomerGroupAppointment`, `FacilityFacilityGroupAppointment`, `ProductProductGroupAppointment`, `ServiceServiceGroupAppointment`, `EmployeeServiceAppointment`, `CustomerServiceAppointment`, plus address/tag/order/payment/policy/role/purchase/subscription pairs owned by their domain docs).
+**Included in (108 models):** All atomic `*_appointments` tables, named alphabetically per pair (`A_B_appointments`, e.g., `ArticleEmployeeAppointment`, `DepartmentEmployeeAppointment`, `EmployeeTaskAppointment`, `CustomerCustomerGroupAppointment`, `FacilityFacilityGroupAppointment`, `ProductProductGroupAppointment`, `ServiceServiceGroupAppointment`, `EmployeeServiceAppointment`, `CustomerServiceAppointment`, plus address/tag/order/payment/policy/role/purchase/subscription pairs owned by their domain docs).
 
 ---
 
@@ -353,7 +353,7 @@ Reads `validates` hashes from `property_mapping.property_metadata` and applies t
 |----------|------|--------|-------------|
 | `validate :dynamic_property_validations` | 12 | `dynamic_property_validations` | Iterates `property_mapping.property_metadata`, reads each entry's `validates` hash, and applies matching Rails validation logic to the corresponding `property_*` column. Empty `validates` (`{}`) is skipped. |
 
-**Included in (47 models):** All models including `PropertyMappingConcern` (products, services, branches, employees, customers, etc.)
+**Included in (45 models):** All models including `PropertyMappingConcern` (products, services, branches, employees, customers, etc.)
 
 ---
 
@@ -366,7 +366,7 @@ Includes `Meilisearch::Rails` and declares one `meilisearch` block for every inc
 | `after_commit :ms_perform_index_tasks` (via `Meilisearch::Rails`) | gem-internal | Indexes create/update in Meilisearch (async via `MeilisearchIndexJob` through the `enqueue:` proc). |
 | `after_commit(on: :destroy) :ms_enqueue_remove_from_index!` (via `Meilisearch::Rails`) | gem-internal | Removes the document from the Meilisearch index on destroy (async via `MeilisearchIndexJob`). |
 
-**Included in (47 models):** All models that include `PropertyMappingConcern` (products, services, branches, employees, customers, etc.).
+**Included in (45 models):** All models that include `PropertyMappingConcern` (products, services, branches, employees, customers, etc.).
 
 ---
 
@@ -379,7 +379,7 @@ Auto-assigns a default property_mapping on create if none is provided. Derives `
 | `before_validation :ensure_property_mapping, on: :create` | 10 | `ensure_property_mapping` | If `property_mapping` is nil and `category` is present, sets `self.property_mapping = category.default_property_mapping`. Ensures every resource record has a property_mapping for dynamic property resolution. |
 | `validate :category_matches_property_mapping_category` | 11 | `category_matches_property_mapping_category` | Ensures the resource's `category_id` matches the `property_mapping.category_id`. Prevents inconsistency on update or manual assignment. Returns early if either association is blank. |
 
-**Included in (45 models):** All models that include `CategoryConcern` (19 models) plus additional managed resources: `Answer`, `Article`, `ArticleGroup`, `Cart`, `CartGroup`, `CustomerGroup`, `Document`, `DocumentGroup`, `Event`, `EventGroup`, `Exam`, `ExamGroup`, `FacilityGroup`, `Membership`, `Notification`, `NotificationGroup`, `OrderGroup`, `Payment`, `ProductGroup`, `Project`, `ProjectGroup`, `Question`, `ServiceGroup`, `SettingGroup`, `Task`, `TaskGroup`
+**Included in (43 models):** All models that include `CategoryConcern` (19 models) plus additional managed resources: `Answer`, `Article`, `ArticleGroup`, `Cart`, `CartGroup`, `CustomerGroup`, `Document`, `DocumentGroup`, `Event`, `EventGroup`, `Exam`, `ExamGroup`, `FacilityGroup`, `Membership`, `OrderGroup`, `Payment`, `ProductGroup`, `Project`, `ProjectGroup`, `Question`, `ServiceGroup`, `SettingGroup`, `Task`, `TaskGroup`
 
 ---
 
@@ -408,7 +408,7 @@ Each concern defines the same callback:
 
 | Callback Type | Count | Models with Direct Declarations |
 |--------------|-------|---------------------------------|
-| `before_validation` | 5 | Address, User, (SetDefaultCompanyConcern → 34+ appointment models), (CategoryConcern → 19 models), (PropertyMappingConcern → 45 models) |
+| `before_validation` | 5 | Address, User, (SetDefaultCompanyConcern → 34+ appointment models), (CategoryConcern → 19 models), (PropertyMappingConcern → 43 models) |
 | `after_initialize` | 1 | Branch |
 | `before_create` | 1 | Session |
 | `after_create` | 6 | Category, Company, Branch, PolicyAppointment, PropertyMapping, RoleAppointment |
@@ -419,7 +419,7 @@ Each concern defines the same callback:
 | `before_discard` | 1 | Employee |
 | `after_touch` | 2* | Role (duplicate declaration on lines 30 and 87) |
 | `after_commit` | 2 | (Cache::RecordsConcern → 5 models) |
-| `validate` | 5 | CompanyPaymentMethodAppointment, BranchPaymentMethodAppointment, PropertyMapping, (DynamicValidationConcern → 47 models), (PropertyMappingConcern → 47 models), (ImageAttachmentsConcern → 6 models + Product) |
+| `validate` | 5 | CompanyPaymentMethodAppointment, BranchPaymentMethodAppointment, PropertyMapping, (DynamicValidationConcern → 45 models), (PropertyMappingConcern → 45 models), (ImageAttachmentsConcern → 6 models + Product) |
 
 **Total unique callback declarations: ~34 directly across 15 model files + 7 concern files propagating to ~63+ models.**
 

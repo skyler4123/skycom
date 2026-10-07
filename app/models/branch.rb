@@ -60,7 +60,6 @@ class Branch < ApplicationRecord
   has_many :task_groups, dependent: :destroy
   has_many :project_groups, dependent: :destroy
   has_many :cart_groups, dependent: :destroy
-  has_many :notification_groups, dependent: :destroy
   has_many :payment_methods, through: :branch_payment_method_appointments
   has_many :statistics, as: :owner
   has_many :warehouses, dependent: :destroy

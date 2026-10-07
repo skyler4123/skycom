@@ -67,10 +67,6 @@
 /** @typedef {Object} Document @property {string} id @property {string} document_group_id @property {string} company_id @property {string} branch_id @property {string} category_id @property {string} title @property {Object} content @property {string} name @property {string} description @property {string} code @property {number} lifecycle_status @property {string} workflow_status @property {string} business_type @property {string} discarded_at @property {Metadata} metadata */
 /** @typedef {Object} DocumentGroup @property {string} id @property {string} company_id @property {string} branch_id @property {string} category_id @property {string} title @property {Object} content @property {string} name @property {string} description @property {string} code @property {number} lifecycle_status @property {string} workflow_status @property {string} business_type @property {string} discarded_at @property {Metadata} metadata */
 
-// --- 11. COMMUNICATION & NOTIFICATIONS ---
-/** @typedef {Object} Notification @property {string} id @property {string} notification_group_id @property {string} company_id @property {string} branch_id @property {string} category_id @property {string} name @property {string} description @property {string} code @property {number} lifecycle_status @property {string} workflow_status @property {string} business_type @property {string} discarded_at @property {Metadata} metadata */
-/** @typedef {Object} NotificationGroup @property {string} id @property {string} company_id @property {string} branch_id @property {string} category_id @property {string} name @property {string} description @property {string} code @property {number} lifecycle_status @property {string} workflow_status @property {string} business_type @property {string} discarded_at @property {Metadata} metadata */
-
 // --- 12. SUBSCRIPTIONS & PLANS ---
 /** @typedef {Object} Subscription @property {string} id @property {string} company_id @property {string} branch_id @property {string} subscription_plan_id @property {string} subscription_group_id @property {string} seller_type @property {string} seller_id @property {string} buyer_type @property {string} buyer_id @property {string} resource_type @property {string} resource_id @property {string} processer_type @property {string} processer_id @property {string} name @property {string} description @property {number} country @property {number} timezone @property {number} lifecycle_status @property {string} workflow_status @property {string} business_type @property {boolean} auto_renew @property {string} discarded_at @property {Metadata} metadata */
 /** @typedef {Object} SubscriptionGroup @property {string} id @property {string} company_id @property {string} branch_id @property {string} subscription_plan_id @property {string} subscription_group_id @property {string} seller_type @property {string} seller_id @property {string} buyer_type @property {string} buyer_id @property {string} resource_type @property {string} resource_id @property {string} processer_type @property {string} processer_id @property {string} name @property {string} description @property {number} country @property {number} timezone @property {number} lifecycle_status @property {string} workflow_status @property {string} business_type @property {boolean} auto_renew @property {string} discarded_at @property {Metadata} metadata */
@@ -119,8 +115,6 @@
 /** @typedef {AtomicAppointment} EmployeeEventGroupAppointment */
 /** @typedef {AtomicAppointment} EmployeeExamAppointment */
 /** @typedef {AtomicAppointment} EmployeeFacilityAppointment */
-/** @typedef {AtomicAppointment} EmployeeNotificationAppointment */
-/** @typedef {AtomicAppointment} EmployeeNotificationGroupAppointment */
 /** @typedef {AtomicAppointment} EmployeeProductAppointment */
 /** @typedef {AtomicAppointment} EmployeeProjectAppointment */
 /** @typedef {AtomicAppointment} EmployeeProjectGroupAppointment */
