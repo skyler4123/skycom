@@ -653,6 +653,8 @@ class Seed::RetailInitService
         "Discount" => { create: true, read: true, update: true, delete: true },
         "Event" => { create: true, read: true, update: true, delete: true },
         "EventConfig" => { create: true, read: true, update: true, delete: true },
+        "Notification" => { create: true, read: true, update: true, delete: true },
+        "NotificationTag" => { create: true, read: true, update: true, delete: true },
 
         "Service" => { create: true, read: true, update: true, delete: true },
         "Stock" => { create: true, read: true, update: true, delete: true },
@@ -709,6 +711,8 @@ class Seed::RetailInitService
         "Discount" => { create: true, read: true, update: true, delete: true },
         "Event" => { create: true, read: true, update: true, delete: true },
         "EventConfig" => { create: true, read: true, update: true, delete: true },
+        "Notification" => { create: true, read: true, update: true, delete: true },
+        "NotificationTag" => { create: true, read: true, update: true, delete: true },
         "Student" => { create: true, read: true, update: true, delete: true }
       },
       Cashier: {

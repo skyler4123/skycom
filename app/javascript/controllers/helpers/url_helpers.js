@@ -196,6 +196,13 @@ export const new_company_discount_group_path = (companyId) => `/companies/${comp
 export const company_discount_group_path = (companyId, discountGroupId) => `/companies/${companyId}/discount_groups/${discountGroupId}`
 export const edit_company_discount_group_path = (companyId, discountGroupId) => `/companies/${companyId}/discount_groups/${discountGroupId}/edit`
 export const generate_codes_company_discount_group_path = (companyId, discountGroupId) => `/companies/${companyId}/discount_groups/${discountGroupId}/generate_codes`
+// Notifications (docs/superpowers/plans/2026-10-07-notification.md)
+export const company_notifications_path = (companyId) => `/companies/${companyId}/notifications`
+export const company_notification_path = (companyId, notificationId) => `/companies/${companyId}/notifications/${notificationId}`
+export const mark_read_company_notification_path = (companyId, notificationId) => `/companies/${companyId}/notifications/${notificationId}/mark_read`
+export const mark_all_read_company_notifications_path = (companyId) => `/companies/${companyId}/notifications/mark_all_read`
+export const unread_count_company_notifications_path = (companyId) => `/companies/${companyId}/notifications/unread_count`
+export const company_notification_config_path = (companyId) => `/companies/${companyId}/notification_config`
 export const company_subscriptions_path = (companyId) => `/companies/${companyId}/subscriptions`
 export const company_policies_path = (companyId) => `/companies/${companyId}/policies`
 export const company_tasks_path = (companyId) => `/companies/${companyId}/tasks`

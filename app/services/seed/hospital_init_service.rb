@@ -379,6 +379,8 @@ class Seed::HospitalInitService
         "StockPending" => { create: true, read: true, update: true, delete: true },
         "Event" => { create: true, read: true, update: true, delete: true },
         "EventConfig" => { create: true, read: true, update: true, delete: true },
+        "Notification" => { create: true, read: true, update: true, delete: true },
+        "NotificationTag" => { create: true, read: true, update: true, delete: true },
         "Purchase" => { create: true, read: true, update: true, delete: true },
         "PurchaseItem" => { create: true, read: true, update: true, delete: true }
       },
@@ -424,6 +426,8 @@ class Seed::HospitalInitService
         "StockPending" => { create: true, read: true, update: true, delete: true },
         "Event" => { create: true, read: true, update: true, delete: true },
         "EventConfig" => { create: true, read: true, update: true, delete: true },
+        "Notification" => { create: true, read: true, update: true, delete: true },
+        "NotificationTag" => { create: true, read: true, update: true, delete: true },
         "Purchase" => { create: true, read: true, update: true, delete: true },
         "PurchaseItem" => { create: true, read: true, update: true, delete: true }
       }
