@@ -146,7 +146,8 @@ export default class WebsocketController extends Controller {
       EVENTS: {
         test: "test",
         top_up_completed: "top_up_completed",
-        pos_payment_completed: "pos_payment_completed"
+        pos_payment_completed: "pos_payment_completed",
+        notification_created: "notification_created"
       },
 
       // 2. Channel Generators
