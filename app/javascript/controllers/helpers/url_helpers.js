@@ -29,6 +29,14 @@ export const new_admin_payment_method_path = () => `/admin/payment_methods/new`
 export const admin_payment_method_path = (id) => `/admin/payment_methods/${id}`
 export const edit_admin_payment_method_path = (id) => `/admin/payment_methods/${id}/edit`
 export const create_admin_payment_methods_path = () => `/admin/payment_methods`
+// Company support tickets pool (docs/superpowers/plans/2026-10-07-company-support-center.md)
+export const admin_company_tickets_path = () => `/admin/company_tickets`
+export const admin_company_ticket_path = (id) => `/admin/company_tickets/${id}`
+export const assign_admin_company_ticket_path = (id) => `/admin/company_tickets/${id}/assign`
+export const resolve_admin_company_ticket_path = (id) => `/admin/company_tickets/${id}/resolve`
+export const close_admin_company_ticket_path = (id) => `/admin/company_tickets/${id}/close`
+export const reopen_admin_company_ticket_path = (id) => `/admin/company_tickets/${id}/reopen`
+export const comment_admin_company_ticket_path = (id) => `/admin/company_tickets/${id}/comment`
 
 export const users_path = () => `/users`
 export const users_update_avatar_path = () => `/users/update_avatar`

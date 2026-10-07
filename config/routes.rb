@@ -12,6 +12,15 @@ Rails.application.routes.draw do
   namespace :admin do
     resources :companies
     resources :payment_methods
+    resources :company_tickets, only: [ :index, :show ] do
+      member do
+        post :assign
+        post :resolve
+        post :close
+        post :reopen
+        post :comment
+      end
+    end
   end
   resources :client_cache, only: [ :index ]
   resources :redirect do
