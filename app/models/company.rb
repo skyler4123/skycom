@@ -23,6 +23,7 @@ class Company < ApplicationRecord
     EventConfigLog AttendanceConfigLog TableConfigLog
     Stock StockTransfer StockImport StockExport StockAdjustment StockPending
     Event EventGroup EventConfig
+    Notification NotificationTag
   ].freeze
   class_attribute :skip_init, default: false
   # Creation-time-only flag: System#ensure_company! marks its auto-created

@@ -109,6 +109,12 @@ class Employee < ApplicationRecord
   has_many :inverse_employee_employee_appointments, class_name: "EmployeeEmployeeAppointment",
            foreign_key: :related_employee_id, dependent: :destroy
 
+  has_many :employee_notification_tag_appointments, dependent: :destroy
+  has_many :subscribed_notification_tags, through: :employee_notification_tag_appointments,
+           source: :notification_tag
+  has_many :employee_notification_reads, dependent: :destroy
+  has_one :notification_config, dependent: :destroy
+
   # --- Validations ---
   validates :name, presence: true, uniqueness: { scope: :company_id }
   validates :business_type, presence: true
@@ -116,6 +122,10 @@ class Employee < ApplicationRecord
 
   before_discard :prevent_discard_if_owner
   before_destroy :prevent_destroy_if_owner
+
+  def subscribed_notification_tag_ids
+    employee_notification_tag_appointments.pluck(:notification_tag_id)
+  end
 
   private
 
