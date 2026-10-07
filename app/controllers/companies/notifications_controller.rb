@@ -15,21 +15,29 @@ class Companies::NotificationsController < Companies::ApplicationController
     respond_to do |format|
       format.html { render html: "", layout: true }
       format.json do
-        scope = Notification.subscribed_for(current_employee).order(created_at: :desc)
-        scope = scope.joins(:notification_tag_appointments)
-          .where(notification_tag_appointments: { notification_tag_id: params[:tag_id] }) if params[:tag_id].present?
+        # Materialize distinct ids first: DISTINCT + ORDER BY in one query is
+        # rejected by Postgres and breaks pagy counting.
+        ids = Notification.subscribed_for(current_employee, current_company).pluck(:id)
+        scope = Notification.where(id: ids).includes(:notification_tags).order(created_at: :desc)
+        if params[:tag_id].present?
+          tag = current_company.notification_tags.find(params[:tag_id])
+          scope = scope.joins(:notification_tag_appointments)
+            .where(notification_tag_appointments: { notification_tag_id: tag.id })
+        end
         if params[:unread] == "true"
           scope = Notifications::UnreadQuery.new(company: current_company, employee: current_employee)
             .scope.where(id: scope.select(:id))
         end
         @pagy, @results = pagy(:offset, scope, jsonapi: true)
+        @read_ids = EmployeeNotificationRead.where(employee: current_employee, notification: @results)
+          .pluck(:notification_id).to_set
         render json: { notifications: @results.map { |n| format_notification(n) }, pagination: @pagy.data_hash }
       end
     end
   end
 
   def show
-    notification = Notification.subscribed_for(current_employee).find(params[:id])
+    notification = Notification.subscribed_for(current_employee, current_company).find(params[:id])
 
     respond_to do |format|
       format.html { render html: "", layout: true }
@@ -41,7 +49,7 @@ class Companies::NotificationsController < Companies::ApplicationController
   end
 
   def mark_read
-    notification = Notification.subscribed_for(current_employee).find(params[:id])
+    notification = Notification.subscribed_for(current_employee, current_company).find(params[:id])
     result = Notifications::MarkReadService.call(employee: current_employee, notification: notification)
 
     if result[:success]
@@ -69,7 +77,7 @@ class Companies::NotificationsController < Companies::ApplicationController
   private
 
   def format_notification(notification)
-    read = EmployeeNotificationRead.exists?(employee: current_employee, notification: notification)
+    read = @read_ids.include?(notification.id)
     notification.as_json(only: [ :id, :title, :body, :severity, :url, :created_at ]).merge(
       "tags" => notification.notification_tags.map { |t| t.as_json(only: [ :id, :name ]) },
       "read" => read

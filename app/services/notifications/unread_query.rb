@@ -20,12 +20,11 @@ module Notifications
       tag_ids = @employee.subscribed_notification_tag_ids
       return Notification.none if tag_ids.empty?
 
-      config = NotificationConfig.for_employee!(@employee)
       Notification
         .joins(:notification_tag_appointments)
         .where(company: @company)
         .where(notification_tag_appointments: { notification_tag_id: tag_ids })
-        .where("notifications.created_at > ?", config.last_read_all_at || @employee.created_at)
+        .where("notifications.created_at > ?", last_read_all_at)
         .where.not(id: read_ids)
         .distinct
     end
@@ -41,6 +40,12 @@ module Notifications
     end
 
     private
+
+    # Read-path must never write: fall back to employee creation time when the
+    # employee has never opened the config page (no row yet).
+    def last_read_all_at
+      NotificationConfig.where(employee: @employee).pick(:last_read_all_at) || @employee.created_at
+    end
 
     def read_ids
       EmployeeNotificationRead.where(employee: @employee).select(:notification_id)

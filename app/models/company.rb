@@ -116,6 +116,8 @@ class Company < ApplicationRecord
   has_many :events, dependent: :destroy
   has_many :event_groups, dependent: :destroy
   has_many :event_configs, dependent: :destroy
+  has_many :notifications, dependent: :destroy
+  has_many :notification_tags, dependent: :destroy
   has_many :event_config_logs, dependent: :destroy
   has_many :task_groups, dependent: :destroy
   has_many :project_groups, dependent: :destroy

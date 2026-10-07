@@ -13,11 +13,12 @@ class Notification < ApplicationRecord
   has_many :employee_notification_reads, dependent: :destroy
 
   # --- Scopes ---
-  scope :subscribed_for, ->(employee) {
+  scope :subscribed_for, ->(employee, company) {
     tag_ids = employee.subscribed_notification_tag_ids
     return none if tag_ids.empty?
 
     joins(:notification_tag_appointments)
+      .where(company: company)
       .where(notification_tag_appointments: { notification_tag_id: tag_ids })
       .distinct
   }

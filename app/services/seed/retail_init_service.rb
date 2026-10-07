@@ -716,6 +716,8 @@ class Seed::RetailInitService
         "Student" => { create: true, read: true, update: true, delete: true }
       },
       Cashier: {
+        "Notification" => { read: true },
+        "NotificationTag" => { read: true },
         "Order" => { create: true, read: true, update: true, delete: false },
         "Product" => { create: false, read: true, update: false, delete: false },
         "Customer" => { create: true, read: true, update: false, delete: false },
@@ -725,6 +727,8 @@ class Seed::RetailInitService
         "PurchaseItem" => { create: false, read: true, update: false, delete: false }
       },
       Seller: {
+        "Notification" => { read: true },
+        "NotificationTag" => { read: true },
         "Order" => { create: true, read: true, update: false, delete: false },
         "Product" => { create: false, read: true, update: false, delete: false },
         "Customer" => { create: false, read: true, update: false, delete: false },
@@ -734,10 +738,14 @@ class Seed::RetailInitService
         "PurchaseItem" => { create: false, read: true, update: false, delete: false }
       },
       Security: {
+        "Notification" => { read: true },
+        "NotificationTag" => { read: true },
         "Product" => { create: false, read: true, update: false, delete: false },
         "Order" => { create: false, read: true, update: false, delete: false }
       },
       Doctor: {
+        "Notification" => { read: true },
+        "NotificationTag" => { read: true },
         "Order" => { read: true, update: true },
         "Service" => { read: true },
         "Brand" => { create: false, read: true, update: false, delete: false },
@@ -745,10 +753,14 @@ class Seed::RetailInitService
         "Facility" => { create: true, read: true, update: true, delete: false }
       },
       Therapist: {
+        "Notification" => { read: true },
+        "NotificationTag" => { read: true },
         "Order" => { read: true },
         "Facility" => { create: false, read: true, update: false, delete: false }
       },
       Consultant: {
+        "Notification" => { read: true },
+        "NotificationTag" => { read: true },
         "Customer" => { create: true, read: true, update: true },
         "Order" => { create: true, read: true },
         "Brand" => { create: false, read: true, update: false, delete: false },

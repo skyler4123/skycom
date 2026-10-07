@@ -21,8 +21,10 @@ class NotificationConfig < ApplicationRecord
   validates :employee_id, uniqueness: { scope: :company_id }
 
   def self.for_employee!(employee)
-    find_or_create_by!(company: employee.company, employee: employee) do |config|
-      config.last_read_all_at = employee.created_at
+    find_by(employee: employee) || begin
+      create!(company: employee.company, employee: employee, last_read_all_at: employee.created_at)
+    rescue ActiveRecord::RecordNotUnique
+      find_by!(employee: employee)
     end
   end
 end

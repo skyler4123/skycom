@@ -10,6 +10,12 @@ RSpec.describe Notifications::CreateService do
     expect(res[:notification].notification_tags.map(&:id)).to include(tag.id)
   end
 
+  it "rejects tags from another company" do
+    foreign_tag = NotificationTag.create!(company: create(:company), name: "ops")
+    res = described_class.call(company: company, title: "x", tag_ids: [ foreign_tag.id ])
+    expect(res[:success]).to be(false)
+  end
+
   it "throttles duplicate tag events" do
     described_class.call(company: company, title: "t", tag_ids: [ tag.id ],
       throttle_key: "stock:1", throttle_window: 1.hour)
@@ -40,6 +46,15 @@ RSpec.describe Notifications::UnreadQuery do
     new_hire = create(:employee, company: company, business_type: :full_time)
     EmployeeNotificationTagAppointment.create!(employee: new_hire, notification_tag: tag)
     expect(described_class.new(company: company, employee: new_hire).count).to eq(0)
+  end
+
+  it "does not create a config row on read paths" do
+    Notifications::CreateService.call(company: company, title: "a", tag_ids: [ tag.id ])
+
+    expect {
+      described_class.new(company: company, employee: employee).count
+      described_class.new(company: company, employee: employee).scope.to_a
+    }.not_to change(NotificationConfig, :count)
   end
 end
 

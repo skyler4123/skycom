@@ -33,20 +33,28 @@ module Notifications
     def call
       return failure("Title is required") if @title.to_s.strip.empty?
       return failure("At least one tag is required") if @tag_ids.empty?
-      return failure("Throttled duplicate notification") if throttled?
+
+      tags = NotificationTag.where(company: @company, id: @tag_ids)
+      return failure("Unknown notification tags") if tags.size != @tag_ids.uniq.size
 
       notification = nil
-      ActiveRecord::Base.transaction do
-        notification = Notification.create!(
-          company: @company, title: @title, body: @body, severity: @severity, url: @url,
-          metadata: @throttle_key.present? ? { "throttle_key" => @throttle_key } : {}
-        )
-        rows = @tag_ids.map do |tag_id|
-          { company_id: @company.id,
-            notification_id: notification.id, notification_tag_id: tag_id,
-            created_at: Time.current, updated_at: Time.current }
+      # Serialize per company so concurrent throttled bursts cannot slip
+      # multiple rows through the check-then-insert window.
+      @company.with_lock do
+        return failure("Throttled duplicate notification") if throttled?
+
+        ActiveRecord::Base.transaction(requires_new: true) do
+          notification = Notification.create!(
+            company: @company, title: @title, body: @body, severity: @severity, url: @url,
+            metadata: @throttle_key.present? ? { "throttle_key" => @throttle_key } : {}
+          )
+          rows = @tag_ids.map do |tag_id|
+            { company_id: @company.id,
+              notification_id: notification.id, notification_tag_id: tag_id,
+              created_at: Time.current, updated_at: Time.current }
+          end
+          NotificationTagAppointment.insert_all!(rows)
         end
-        NotificationTagAppointment.insert_all!(rows)
       end
 
       invalidate_subscriber_caches!
