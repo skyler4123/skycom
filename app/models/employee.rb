@@ -114,6 +114,8 @@ class Employee < ApplicationRecord
            source: :notification_tag
   has_many :employee_notification_reads, dependent: :destroy
   has_one :notification_config, dependent: :destroy
+  has_many :company_tickets, dependent: :destroy
+  has_many :company_ticket_comments, as: :author, dependent: :destroy
 
   # --- Validations ---
   validates :name, presence: true, uniqueness: { scope: :company_id }

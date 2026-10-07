@@ -161,6 +161,25 @@ Mirrors the `CompanyTransaction` gating: the invoice's `payment_status` is deriv
 
 ---
 
+### CompanyTicket (`app/models/company_ticket.rb`)
+
+| Callback | Line | Method | Description |
+|----------|------|--------|-------------|
+| `before_validation :mirror_workflow_status` | — | `mirror_workflow_status` | Mirrors the dedicated ticket `status` into generic `workflow_status` (`open→pending`, `in_progress→in_progress`, `waiting_customer→confirmed`, `resolved`/`closed→completed`, `cancelled→cancelled`). The ticket `status` is the source of truth; `workflow_status` exists only for the System Fields convention. |
+| `before_update :stamp_sla_timestamps` | — | `stamp_sla_timestamps` | Sets `resolved_at` (once, `||=`) when `status` becomes `resolved`/`closed`; clears it when the ticket leaves those states (reopen). `first_responded_at` is never touched here — only `CompanyTicketComment` stamps it. |
+| `after_create :log_created` | — | `log_created` | Writes the audit `CompanyTicketLog` (`action: :created`, actor = creator employee). |
+| `after_create :invalidate_count_caches` | — | `invalidate_count_caches` | Deletes the `open_count_key` / `admin_open_count_key` sync-cache aggregates (DB stays the source of truth). Also called by `assign_to!` / `transition_to!` / `rate!`. |
+
+---
+
+### CompanyTicketComment (`app/models/company_ticket_comment.rb`)
+
+| Callback | Line | Method | Description |
+|----------|------|--------|-------------|
+| `after_create :stamp_first_response_and_log` | — | `stamp_first_response_and_log` | When the author is a `User` (Skycom staff) and the ticket has no `first_responded_at`, stamps it; employee comments never stamp. Always writes the audit `CompanyTicketLog` (`action: :commented`, actor = comment author). |
+
+---
+
 ### CompanyPaymentMethodAppointment (`app/models/company_payment_method_appointment.rb`)
 
 | Callback | Line | Method | Description |
