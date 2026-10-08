@@ -17,6 +17,9 @@
     <%= button_to "Check In", mobile_attendances_path, method: :post,
           class: "w-full rounded-lg bg-blue-600 px-4 py-3 text-base font-semibold text-white hover:bg-blue-700 cursor-pointer mb-4" %>
 
+    <%= link_to "Request Attendance", new_mobile_attendance_request_path,
+          class: "block w-full rounded-lg bg-orange-600 px-4 py-3 text-base font-semibold text-white hover:bg-orange-700 cursor-pointer mb-4 text-center" %>
+
     <%= button_to "Sign Out", mobile_sign_out_path, method: :delete,
           class: "w-full rounded-lg bg-red-600 px-4 py-3 text-base font-semibold text-white hover:bg-red-700 cursor-pointer" %>
   </div>

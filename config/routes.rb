@@ -8,6 +8,7 @@ Rails.application.routes.draw do
     get "home", to: "home#index"
     get "employee", to: "employees#show"
     post "attendances", to: "attendances#create"
+    resources :attendance_requests, only: %i[new create]
   end
   namespace :admin do
     resources :companies
