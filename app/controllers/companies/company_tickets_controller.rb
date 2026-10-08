@@ -2,7 +2,7 @@
 #
 # Help Center B2B API (Shell-First). Company employees raise support tickets
 # to Skycom; Skycom staff handle them from the Admin pool.
-# Index supports enum filters (?status= / ?priority= / ?ticket_category=).
+# Index supports enum filters (?status= / ?priority= / ?ticket_category=) + ?mine=1 (only current employee tickets).
 # NOTE: ticket taxonomy is the inline `ticket_category` enum — NOT the
 # Category/PropertyMapping system, so there is no `category_id` filter here.
 # Status moves ONLY via CompanyTicket#transition_to! (Admin side) — `status`,
@@ -12,7 +12,7 @@
 #                  Companies_CompanyTickets_NewController (new reference data),
 #                  Companies_CompanyTickets_ShowController (show JSON + comments + logs),
 #                  rate endpoint serves the show-page rating widget
-# Endpoints: GET /companies/:company_id/company_tickets(.json),
+# Endpoints: GET /companies/:company_id/company_tickets(.json?status=&priority=&ticket_category=&mine=1),
 #            GET /companies/:company_id/company_tickets/new(.json),
 #            GET /companies/:company_id/company_tickets/:id(.json),
 #            POST /companies/:company_id/company_tickets(.json),
@@ -30,6 +30,7 @@ class Companies::CompanyTicketsController < Companies::ApplicationController
         scope = scope.where(status: params[:status]) if params[:status].present?
         scope = scope.where(priority: params[:priority]) if params[:priority].present?
         scope = scope.where(ticket_category: params[:ticket_category]) if params[:ticket_category].present?
+        scope = scope.where(employee: current_employee) if params[:mine].to_s == "1" && current_employee.present?
 
         @pagy, @results = pagy(:offset, scope, jsonapi: true)
         open_count = Rails.sync_cache.fetch(

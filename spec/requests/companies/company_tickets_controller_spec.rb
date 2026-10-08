@@ -83,6 +83,30 @@ RSpec.describe "Companies::CompanyTicketsController", type: :request do
       expect(response).to have_http_status(:forbidden)
       expect(JSON.parse(response.body)).to have_key("errors")
     end
+
+    it "filters to only the current employee tickets with mine=1" do
+      other = create(:employee, company: company)
+      CompanyTicket.create!(company: company, employee: other,
+        name: "Other printer", ticket_category: :technical)
+
+      get company_company_tickets_path(company), params: { mine: "1" }, as: :json
+
+      expect(response).to have_http_status(:ok)
+      names = JSON.parse(response.body)["company_tickets"].map { |t| t["name"] }
+      expect(names).to include("Printer is down")
+      expect(names).not_to include("Other printer")
+    end
+
+    it "returns all tickets without mine param" do
+      other = create(:employee, company: company)
+      CompanyTicket.create!(company: company, employee: other,
+        name: "Other printer", ticket_category: :technical)
+
+      get company_company_tickets_path(company), as: :json
+
+      names = JSON.parse(response.body)["company_tickets"].map { |t| t["name"] }
+      expect(names).to include("Printer is down", "Other printer")
+    end
   end
 
   describe "GET #show" do

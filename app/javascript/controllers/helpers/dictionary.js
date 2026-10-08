@@ -793,6 +793,7 @@ export const dictionary = () => {
     "Priority": { vi: "Ưu tiên" },
     "Assignee": { vi: "Người xử lý" },
     "Raised by": { vi: "Người tạo" },
+    "Mine only": { vi: "Chỉ của tôi" },
     "Updated": { vi: "Cập nhật" },
     "Created": { vi: "Đã tạo" },
     "First response": { vi: "Phản hồi đầu" },

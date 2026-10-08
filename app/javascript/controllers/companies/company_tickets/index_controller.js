@@ -4,7 +4,7 @@ import Companies_LayoutController from "controllers/companies/layout_controller"
 // Ticket taxonomy is the inline `ticket_category` enum, NOT the
 // Category/PropertyMapping system, so there is no `category_id` filter here.
 // Depends on BE: Companies::CompanyTicketsController#index
-// Endpoints: GET <pathname>.json?status=&priority=&ticket_category= (open_count included)
+// Endpoints: GET <pathname>.json?status=&priority=&ticket_category=&mine=1 (open_count included)
 // Docs: docs/superpowers/plans/2026-10-07-company-support-center.md
 export default class Companies_CompanyTickets_IndexController extends Companies_LayoutController {
   static targets = ["ticketsList"]
@@ -62,6 +62,7 @@ export default class Companies_CompanyTickets_IndexController extends Companies_
       { key: "ticket_category", name: translate("Category") },
       { key: "priority", name: translate("Priority") },
       { key: "status", name: translate("Status") },
+      { key: "employee", name: translate("Raised by") },
       { key: "assigned_user", name: translate("Assignee") },
       { key: "updated_at", name: translate("Updated") }
     ]
@@ -101,6 +102,10 @@ export default class Companies_CompanyTickets_IndexController extends Companies_
                 ${selectOptionsHTML(this.categoryOptions(), urlParams.get("ticket_category"), translate("All"))}
               </select>
             </div>
+            <label class="flex items-center gap-2 h-[38px] px-3 py-2 text-sm border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 cursor-pointer">
+              <input type="checkbox" name="mine" value="1" ${urlParams.get("mine") === "1" ? "checked" : ""} class="h-4 w-4 rounded border-slate-300 text-blue-600 cursor-pointer">
+              ${translate("Mine only")}
+            </label>
             <button type="submit" class="h-[38px] px-6 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium text-sm flex items-center gap-2 cursor-pointer">
               <span class="material-symbols-outlined text-[18px]!">search</span>
               ${translate("Search")}
@@ -122,6 +127,7 @@ export default class Companies_CompanyTickets_IndexController extends Companies_
                 ticket_category: (value) => `<span class="text-sm text-slate-600 dark:text-slate-300">${value ? this.humanize(value) : "—"}</span>`,
                 priority: (value) => `${Helpers.statusBadge(value || "medium")}`,
                 status: (value) => `${Helpers.statusBadge(value || "open")}`,
+                employee: (value) => `<span class="text-sm text-slate-600 dark:text-slate-300">${escapeHtml(value?.name) || "—"}</span>`,
                 assigned_user: (value) => `<span class="text-sm text-slate-600 dark:text-slate-300">${escapeHtml(value?.name || value?.email) || "—"}</span>`,
                 updated_at: (value) => `<span class="text-xs text-slate-500 dark:text-slate-400">${value ? new Date(value).toLocaleString() : "—"}</span>`
               }
