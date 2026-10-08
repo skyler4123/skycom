@@ -40,7 +40,7 @@ class Companies::DocumentsController < Companies::ApplicationController
   def new
     respond_to do |format|
       format.html { render html: "", layout: true }
-      format.json { render json: {} }
+      format.json { render json: { document_groups: format_document_groups } }
     end
   end
 
@@ -49,7 +49,7 @@ class Companies::DocumentsController < Companies::ApplicationController
 
     respond_to do |format|
       format.html { render html: "", layout: true }
-      format.json { render json: { document: format_document(document) } }
+      format.json { render json: { document: format_document(document), document_groups: format_document_groups } }
     end
   end
 
@@ -144,5 +144,9 @@ class Companies::DocumentsController < Companies::ApplicationController
 
   def format_documents(documents)
     documents.map { |document| format_document(document) }
+  end
+
+  def format_document_groups
+    current_company.document_groups.order(:name).as_json(only: [ :id, :name ])
   end
 end

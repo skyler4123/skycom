@@ -60,8 +60,9 @@ RSpec.describe "Companies::DocumentsController", type: :request do
       get "/companies/#{company.id}/documents/#{document.id}.json"
       expect(JSON.parse(response.body)["document"]["id"]).to eq(document.id)
 
-      get "/companies/#{company.id}/documents/new"
-      expect(response).to have_http_status(:ok)
+      get "/companies/#{company.id}/documents/new.json"
+      expect(JSON.parse(response.body)["document_groups"].map { |g| g["id"] })
+        .to include(document_group.id)
 
       get "/companies/#{company.id}/documents/#{document.id}/edit"
       expect(response).to have_http_status(:ok)
