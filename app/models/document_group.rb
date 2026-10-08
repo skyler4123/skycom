@@ -4,6 +4,16 @@ class DocumentGroup < ApplicationRecord
   include DynamicSearchConcern
   include TagConcern
 
+  # --- Enums ---
+  enum :lifecycle_status, LIFECYCLE_STATUS, prefix: true
+  enum :workflow_status, WORKFLOW_STATUS, prefix: true
+  enum :business_type, {
+    general: 0,
+    policies: 1,
+    benefits: 2,
+    development: 3
+  }, prefix: true
+
   belongs_to :company
   belongs_to :branch, optional: true
   belongs_to :category

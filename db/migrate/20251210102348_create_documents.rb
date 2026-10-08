@@ -9,6 +9,7 @@ class CreateDocuments < ActiveRecord::Migration[8.0]
 
       t.string :title
       t.json :content
+      t.text :body_markdown
       t.string :name
       t.string :description
       t.string :code

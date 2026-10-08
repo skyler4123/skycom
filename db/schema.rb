@@ -2453,6 +2453,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_08_000005) do
     t.uuid "property_mapping_id", null: false
     t.string "title"
     t.json "content"
+    t.text "body_markdown"
     t.string "name"
     t.string "description"
     t.string "code"
