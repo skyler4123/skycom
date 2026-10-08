@@ -143,6 +143,8 @@ export const receipt_company_order_path = (companyId, orderId) => `/companies/${
 
 export const company_permissions_path = (companyId) => `/companies/${companyId}/permissions`
 export const edit_company_permission_path = (companyId, permissionId) => `/companies/${companyId}/permissions/${permissionId}`
+export const company_permission_logs_path = (companyId) => `/companies/${companyId}/permission_logs`
+export const company_permission_log_path = (companyId, id) => `/companies/${companyId}/permission_logs/${id}`
 
 export const company_roles_path = (companyId) => `/companies/${companyId}/roles`
 export const company_settings_path = (companyId, settingId) => settingId ? `/companies/${companyId}/settings/${settingId}` : `/companies/${companyId}/settings`

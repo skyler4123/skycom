@@ -22,6 +22,7 @@ class Policy < ApplicationRecord
 
   has_many :policy_role_appointments, dependent: :destroy
   has_many :roles, through: :policy_role_appointments
+  has_many :permission_logs, dependent: :nullify
   # --- Soft Deletion (Discard) ---
   # If you are using a gem like 'Discard' or similar for soft deletion:
   # include Discard::Model

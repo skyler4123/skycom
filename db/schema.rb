@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_10_08_000003) do
+ActiveRecord::Schema[8.1].define(version: 2026_10_08_000004) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pgcrypto"
@@ -4678,6 +4678,43 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_08_000003) do
     t.index ["workflow_status"], name: "index_payment_methods_on_workflow_status"
   end
 
+  create_table "permission_logs", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
+    t.uuid "company_id", null: false
+    t.uuid "policy_id"
+    t.uuid "role_id"
+    t.uuid "policy_role_appointment_id"
+    t.uuid "employee_id"
+    t.integer "action", null: false
+    t.string "employee_name"
+    t.string "role_name"
+    t.string "policy_name"
+    t.string "resource_name"
+    t.string "policy_action"
+    t.integer "from_workflow_status"
+    t.integer "to_workflow_status"
+    t.integer "lifecycle_status"
+    t.integer "workflow_status"
+    t.integer "business_type"
+    t.datetime "expiration_date"
+    t.jsonb "metadata"
+    t.datetime "discarded_at"
+    t.string "permission_resource_name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["business_type"], name: "index_permission_logs_on_business_type"
+    t.index ["company_id", "created_at"], name: "index_permission_logs_on_company_id_and_created_at"
+    t.index ["company_id", "policy_id", "created_at"], name: "idx_permission_logs_on_company_policy_time"
+    t.index ["company_id", "role_id", "created_at"], name: "idx_permission_logs_on_company_role_time"
+    t.index ["company_id"], name: "index_permission_logs_on_company_id"
+    t.index ["discarded_at"], name: "index_permission_logs_on_discarded_at"
+    t.index ["employee_id"], name: "index_permission_logs_on_employee_id"
+    t.index ["lifecycle_status"], name: "index_permission_logs_on_lifecycle_status"
+    t.index ["policy_id"], name: "index_permission_logs_on_policy_id"
+    t.index ["policy_role_appointment_id"], name: "index_permission_logs_on_policy_role_appointment_id"
+    t.index ["role_id"], name: "index_permission_logs_on_role_id"
+    t.index ["workflow_status"], name: "index_permission_logs_on_workflow_status"
+  end
+
   create_table "policies", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
     t.uuid "company_id", null: false
     t.uuid "branch_id"
@@ -8330,6 +8367,11 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_08_000003) do
   add_foreign_key "orders", "property_mappings"
   add_foreign_key "pages", "branches"
   add_foreign_key "pages", "companies"
+  add_foreign_key "permission_logs", "companies"
+  add_foreign_key "permission_logs", "employees"
+  add_foreign_key "permission_logs", "policies"
+  add_foreign_key "permission_logs", "policy_role_appointments"
+  add_foreign_key "permission_logs", "roles"
   add_foreign_key "policies", "branches"
   add_foreign_key "policies", "companies"
   add_foreign_key "policy_role_appointments", "companies"

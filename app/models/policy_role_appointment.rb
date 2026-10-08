@@ -17,6 +17,7 @@ class PolicyRoleAppointment < ApplicationRecord
   belongs_to :company
   belongs_to :policy
   belongs_to :role, touch: true
+  has_many :permission_logs, dependent: :nullify
 
   validate :only_one_owner_appointment_per_company, on: :create
 

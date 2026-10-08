@@ -119,6 +119,7 @@ Rails.application.routes.draw do
       resources :settings, only: [ :index ]
       resources :subscription_plan_appointments
       resources :permissions
+      resources :permission_logs, only: [ :index, :show ]
       resources :payment_method_appointments, only: [ :index, :edit, :update ]
       resources :policies
       resources :policy_appointments

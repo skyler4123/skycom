@@ -20,7 +20,7 @@ class Company < ApplicationRecord
     Membership
     Page CompanyPaymentMethodAppointment ShiftTemplate ScheduledShift
     AttendanceConfig AttendanceLog AttendanceDay AttendanceMonth
-    EventConfigLog AttendanceConfigLog TableConfigLog
+    EventConfigLog AttendanceConfigLog TableConfigLog PermissionLog
     Stock StockTransfer StockImport StockExport StockAdjustment StockPending
     Event EventGroup EventConfig
     Notification NotificationTag
@@ -142,6 +142,7 @@ class Company < ApplicationRecord
   has_many :company_tickets, dependent: :destroy
   has_many :company_ticket_comments, dependent: :destroy
   has_many :company_ticket_logs, dependent: :destroy
+  has_many :permission_logs, dependent: :destroy
 
   # --- Scopes ---
   scope :system_companies, -> { where(id: System.select(:company_id)) }
