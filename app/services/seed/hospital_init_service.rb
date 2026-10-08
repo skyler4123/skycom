@@ -318,7 +318,8 @@ class Seed::HospitalInitService
         "Appointment" => { create: true, read: true, update: true, delete: true },
         "Patient" => { create: true, read: true, update: true, delete: false },
         "Purchase" => { create: true, read: true, update: true, delete: false },
-        "PurchaseItem" => { create: false, read: true, update: false, delete: false }
+        "PurchaseItem" => { create: false, read: true, update: false, delete: false },
+        "AttendanceRequest" => { create: true, read: true, update: false, delete: false }
       },
       Dentist: {
         "Notification" => { read: true },
@@ -369,6 +370,7 @@ class Seed::HospitalInitService
         "TableConfigLog" => { read: true },
         "PermissionLog" => { read: true },
         "AttendanceDay" => { read: true },
+        "AttendanceRequest" => { create: true, read: true, update: true, delete: true },
         "AttendanceMonth" => { read: true },
         "Brand" => { create: true, read: true, update: true, delete: true },
         "Policy" => { read: true },
@@ -420,6 +422,7 @@ class Seed::HospitalInitService
         "TableConfigLog" => { read: true },
         "PermissionLog" => { read: true },
         "AttendanceDay" => { read: true },
+        "AttendanceRequest" => { create: true, read: true, update: true, delete: true },
         "AttendanceMonth" => { read: true },
         "Brand" => { create: true, read: true, update: true, delete: true },
         "Policy" => { read: true },

@@ -86,6 +86,7 @@ class Company < ApplicationRecord
   has_many :scheduled_shifts, dependent: :destroy
   has_many :attendance_logs, dependent: :destroy
   has_many :attendance_days, dependent: :destroy
+  has_many :attendance_requests, dependent: :destroy
   has_many :attendance_months, dependent: :destroy
   has_many :attendance_configs, dependent: :destroy
   has_many :attendance_config_logs, dependent: :destroy

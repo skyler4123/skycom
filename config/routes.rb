@@ -87,6 +87,12 @@ Rails.application.routes.draw do
       resources :attendance_config_logs, only: [ :index, :show ]
       resources :attendance_logs
       resources :attendance_days
+      resources :attendance_requests do
+        member do
+          post :approve
+          post :reject
+        end
+      end
       resources :attendance_months
       resources :reports
       resources :documents

@@ -327,7 +327,8 @@ class Seed::HotelInitService
         "Service" => { read: true },
         "Facility" => { read: true },
         "Purchase" => { create: true, read: true, update: true, delete: false },
-        "PurchaseItem" => { create: false, read: true, update: false, delete: false }
+        "PurchaseItem" => { create: false, read: true, update: false, delete: false },
+        "AttendanceRequest" => { create: true, read: true, update: false, delete: false }
       },
       Housekeeper: {
         "Notification" => { read: true },
@@ -366,6 +367,7 @@ class Seed::HotelInitService
         "TableConfigLog" => { read: true },
         "PermissionLog" => { read: true },
         "AttendanceDay" => { read: true },
+        "AttendanceRequest" => { create: true, read: true, update: true, delete: true },
         "AttendanceMonth" => { read: true },
         "Brand" => full_crud,
         "Policy" => { read: true },
@@ -410,6 +412,7 @@ class Seed::HotelInitService
         "TableConfigLog" => { read: true },
         "PermissionLog" => { read: true },
         "AttendanceDay" => { read: true },
+        "AttendanceRequest" => { create: true, read: true, update: true, delete: true },
         "AttendanceMonth" => { read: true },
         "Brand" => full_crud,
         "Policy" => { read: true },
