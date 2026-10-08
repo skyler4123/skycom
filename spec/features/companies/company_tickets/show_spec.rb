@@ -36,9 +36,9 @@ RSpec.feature "Companies::CompanyTickets Show", type: :feature, js: true do
     file
   end
 
-  def pdf_file
-    file = Tempfile.new([ "manual", ".pdf" ])
-    file.write("%PDF-1.4 fake")
+  def xlsx_file
+    file = Tempfile.new([ "report", ".xlsx" ])
+    file.write("fake-xlsx-bytes")
     file.rewind
     file
   end
@@ -67,18 +67,18 @@ RSpec.feature "Companies::CompanyTickets Show", type: :feature, js: true do
     expect(page).to have_selector('img[src*="shot"]', wait: 10)
   end
 
-  scenario "doc attachment renders an icon" do
-    pdf = pdf_file
+  scenario "excel attachment renders an icon" do
+    xlsx = xlsx_file
 
     visit company_company_ticket_path(company, ticket)
     expect(page).to have_content("VPN broken", wait: 10)
 
-    fill_in "company_ticket_comment[message]", with: "Manual attached"
-    attach_file "company_ticket_comment[file_attachments][]", pdf.path
+    fill_in "company_ticket_comment[message]", with: "Report attached"
+    attach_file "company_ticket_comment[file_attachments][]", xlsx.path
     click_button "Post Comment"
 
-    expect(page).to have_content("Manual attached", wait: 10)
-    expect(page).to have_content("manual")
+    expect(page).to have_content("Report attached", wait: 10)
+    expect(page).to have_content("report")
   end
 
   scenario "rates a resolved ticket" do

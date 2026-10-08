@@ -78,79 +78,19 @@ RSpec.describe CompanyTicketComment do
     end
   end
 
-  describe "file attachments" do
-    it "rejects executable content types" do
-      comment = CompanyTicketComment.new(company: company, company_ticket: ticket,
-        author: employee, message: "see attached")
-      comment.file_attachments.attach(
-        io: StringIO.new("MZ fake binary"),
-        filename: "run.exe",
-        content_type: "application/x-msdownload"
-      )
-      expect(comment).not_to be_valid
+  describe "attachments" do
+    def build_comment(message: "see attached")
+      CompanyTicketComment.new(company: company, company_ticket: ticket,
+        author: employee, message: message)
     end
 
-    it "rejects oversized files" do
-      comment = CompanyTicketComment.new(company: company, company_ticket: ticket,
-        author: employee, message: "big file")
-      comment.file_attachments.attach(
-        io: StringIO.new("x" * (6 * 1024 * 1024)),
-        filename: "big.pdf",
-        content_type: "application/pdf"
-      )
-      expect(comment).not_to be_valid
+    it "is valid with no attachments" do
+      expect(build_comment).to be_valid
     end
 
-    it "rejects a second attachment (max 1 per comment)" do
-      comment = CompanyTicketComment.new(company: company, company_ticket: ticket,
-        author: employee, message: "two files")
-      comment.file_attachments.attach(
-        io: StringIO.new("one"), filename: "a.txt", content_type: "text/plain"
-      )
-      comment.file_attachments.attach(
-        io: StringIO.new("two"), filename: "b.txt", content_type: "text/plain"
-      )
-      expect(comment).not_to be_valid
-      expect(comment.errors[:file_attachments].join).to match(/more than 1/)
-    end
-
-    it "rejects non-image files over 1MB" do
-      comment = CompanyTicketComment.new(company: company, company_ticket: ticket,
-        author: employee, message: "heavy pdf")
-      comment.file_attachments.attach(
-        io: StringIO.new("x" * (1.megabyte + 1)),
-        filename: "heavy.pdf",
-        content_type: "application/pdf"
-      )
-      expect(comment).not_to be_valid
-    end
-
-    it "accepts non-image files up to 1MB" do
-      comment = CompanyTicketComment.new(company: company, company_ticket: ticket,
-        author: employee, message: "ok pdf")
-      comment.file_attachments.attach(
-        io: StringIO.new("x" * 1.megabyte),
-        filename: "ok.pdf",
-        content_type: "application/pdf"
-      )
-      expect(comment).to be_valid
-    end
-
-    it "rejects images over 2MB" do
-      comment = CompanyTicketComment.new(company: company, company_ticket: ticket,
-        author: employee, message: "huge shot")
-      comment.file_attachments.attach(
-        io: StringIO.new("x" * (2.megabytes + 1)),
-        filename: "huge.png",
-        content_type: "image/png"
-      )
-      expect(comment).not_to be_valid
-    end
-
-    it "accepts images, pdf, text and office docs" do
-      comment = CompanyTicketComment.new(company: company, company_ticket: ticket,
-        author: employee, message: "docs")
-      comment.file_attachments.attach(
+    it "accepts a png image up to 2MB" do
+      comment = build_comment
+      comment.image_attachment.attach(
         io: StringIO.new("fake png"),
         filename: "shot.png",
         content_type: "image/png"
@@ -158,36 +98,124 @@ RSpec.describe CompanyTicketComment do
       expect(comment).to be_valid
     end
 
-    it "downscales oversized images to 800px before store" do
+    it "accepts a jpeg image" do
+      comment = build_comment
+      comment.image_attachment.attach(
+        io: StringIO.new("fake jpeg"),
+        filename: "shot.jpg",
+        content_type: "image/jpeg"
+      )
+      expect(comment).to be_valid
+    end
+
+    it "rejects non-png/jpeg images" do
+      comment = build_comment
+      comment.image_attachment.attach(
+        io: StringIO.new("fake gif"),
+        filename: "anim.gif",
+        content_type: "image/gif"
+      )
+      expect(comment).not_to be_valid
+    end
+
+    it "rejects images over 2MB" do
+      comment = build_comment(message: "huge shot")
+      comment.image_attachment.attach(
+        io: StringIO.new("x" * (2.megabytes + 1)),
+        filename: "huge.png",
+        content_type: "image/png"
+      )
+      expect(comment).not_to be_valid
+    end
+
+    it "accepts an excel file up to 1MB" do
+      comment = build_comment
+      comment.file_attachment.attach(
+        io: StringIO.new("x" * 1.megabyte),
+        filename: "report.xlsx",
+        content_type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+      )
+      expect(comment).to be_valid
+    end
+
+    it "rejects non-excel files" do
+      comment = build_comment
+      comment.file_attachment.attach(
+        io: StringIO.new("%PDF"),
+        filename: "doc.pdf",
+        content_type: "application/pdf"
+      )
+      expect(comment).not_to be_valid
+    end
+
+    it "rejects excel files over 1MB" do
+      comment = build_comment(message: "heavy sheet")
+      comment.file_attachment.attach(
+        io: StringIO.new("x" * (1.megabyte + 1)),
+        filename: "heavy.xlsx",
+        content_type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+      )
+      expect(comment).not_to be_valid
+    end
+
+    it "rejects executable content types" do
+      comment = build_comment
+      comment.file_attachment.attach(
+        io: StringIO.new("MZ fake binary"),
+        filename: "run.exe",
+        content_type: "application/x-msdownload"
+      )
+      expect(comment).not_to be_valid
+    end
+
+    it "rejects having both an image and a file" do
+      comment = build_comment(message: "both")
+      comment.image_attachment.attach(
+        io: StringIO.new("fake png"), filename: "shot.png", content_type: "image/png"
+      )
+      comment.file_attachment.attach(
+        io: StringIO.new("x"), filename: "r.xlsx",
+        content_type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+      )
+      expect(comment).not_to be_valid
+      expect(comment.errors[:base].join).to match(/either.*or/i)
+    end
+
+    it "routes create_for! files by content type" do
+      image = CompanyTicketComment.create_for!(
+        ticket: ticket, author: employee, message: "shot",
+        files: [ { io: StringIO.new("fake png"), filename: "shot.png", content_type: "image/png" } ]
+      )
+      expect(image.image_attachment).to be_attached
+      expect(image.file_attachment).not_to be_attached
+
+      sheet = CompanyTicketComment.create_for!(
+        ticket: ticket, author: employee, message: "sheet",
+        files: [ { io: StringIO.new("x"), filename: "r.xlsx",
+          content_type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" } ]
+      )
+      expect(sheet.file_attachment).to be_attached
+      expect(sheet.image_attachment).not_to be_attached
+    end
+
+    it "serves a display variant capped at 800px for large images" do
       path = Rails.root.join("faker/images/randoms/567-500x1000.jpg")
       comment = CompanyTicketComment.create_for!(
         ticket: ticket, author: employee, message: "big screenshot",
         files: [ File.open(path) ]
       )
 
-      blob = comment.file_attachments.first.blob
-      image = MiniMagick::Image.open(ActiveStorage::Blob.service.path_for(blob.key))
+      variant = comment.image_attachment.variant(:display).processed
+      image = MiniMagick::Image.open(ActiveStorage::Blob.service.path_for(variant.key))
       expect(image.width).to be <= 800
       expect(image.height).to be <= 800
-      expect(blob.byte_size).to be < File.size(path)
-    end
-
-    it "leaves small images untouched" do
-      path = Rails.root.join("faker/images/randoms/580-200x300.jpg")
-      comment = CompanyTicketComment.create_for!(
-        ticket: ticket, author: employee, message: "small shot",
-        files: [ File.open(path) ]
-      )
-
-      expect(comment.file_attachments.first.blob.byte_size).to eq(File.size(path))
     end
 
     it "leaves no orphan blobs when validation fails" do
       ticket # warm up lazy factories — their seed blobs must not pollute the count
       expect {
-        comment = CompanyTicketComment.new(company: company, company_ticket: ticket,
-          author: employee, message: "x")
-        comment.file_attachments.attach(
+        comment = build_comment(message: "x")
+        comment.file_attachment.attach(
           io: StringIO.new("MZ fake binary"),
           filename: "run.exe",
           content_type: "application/x-msdownload"

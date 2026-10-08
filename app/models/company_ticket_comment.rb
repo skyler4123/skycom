@@ -1,11 +1,17 @@
 class CompanyTicketComment < ApplicationRecord
-  include CompanyTicket::FileAttachmentConcern
-
   attribute :permission_resource_name, :string, default: -> { self.name }
 
   # --- Enums ---
   enum :lifecycle_status, LIFECYCLE_STATUS, prefix: true
   enum :workflow_status, WORKFLOW_STATUS, prefix: true
+
+  # NOTE: built-in Active Storage slots (not the shared FileAttachmentConcern —
+  # comments take at most ONE image XOR ONE file, so the ticket's has_many
+  # contract does not apply). Images are served via the :display variant.
+  has_one_attached :image_attachment, dependent: :purge_later do |attachable|
+    attachable.variant :display, resize_to_limit: TICKET_COMMENT_IMAGE_DIMENSIONS
+  end
+  has_one_attached :file_attachment, dependent: :purge_later
 
   # --- Associations ---
   belongs_to :company
@@ -17,59 +23,81 @@ class CompanyTicketComment < ApplicationRecord
   validate :author_must_be_employee_or_user
   validate :author_in_ticket_company
   validate :ticket_same_company
+  validate :acceptable_image_attachment
+  validate :acceptable_file_attachment
+  validate :only_one_attachment
 
   after_create :stamp_first_response_and_log
 
   def self.create_for!(ticket:, author:, message:, files: [])
     comment = new(company: ticket.company, company_ticket: ticket, author: author, message: message)
-    Array(files).reject(&:blank?).each { |f| comment.file_attachments.attach(prepared_upload(f)) } if files.present?
+    Array(files).reject(&:blank?).each { |f| comment.attach_routed(f) } if files.present?
     comment.save!
     comment
   end
 
-  # Downscale oversized comment images BEFORE attach so the 2MB original is
-  # never persisted — blobs on a new record have no service file yet, so this
-  # must run here (not in a validation callback). Fail-open: anything we cannot
-  # read or resize is returned untouched and the size validation still caps it.
-  # NOTE: deliberately NOT using Rails built-in `has_many_attached ... do |attachable|
-  #   attachable.variant ...`. Variants only register lazily-generated derivatives —
-  # the original 2MB blob is still uploaded and stored permanently, with the resized
-  # file kept *in addition*. Since comments must never store the 2MB original, we
-  # resize eagerly with ImageProcessing (the same MiniMagick engine Active Storage
-  # variants use) BEFORE attach, so the small file is the only thing persisted.
-  def self.prepared_upload(file)
-    filename = file.try(:original_filename) || (file.respond_to?(:path) ? File.basename(file.path) : "upload")
-    source_path = (file.respond_to?(:path) && file.path.present? && File.exist?(file.path) ? file.path : nil)
-    content_type = file.try(:content_type) ||
-      (source_path ? Marcel::MimeType.for(Pathname.new(source_path)) : nil)
-    return file unless content_type.to_s.start_with?("image/")
-    return file unless ACCEPTABLE_TICKET_FILE_TYPES.include?(content_type)
-
-    limit_w, limit_h = TICKET_COMMENT_IMAGE_DIMENSIONS
-    tmp_in = nil
-    unless source_path
-      tmp_in = Tempfile.new([ "comment-in", File.extname(filename.to_s) ])
-      tmp_in.binmode
-      io = file.respond_to?(:read) ? file : file.open
-      io.rewind if io.respond_to?(:rewind)
-      tmp_in.write(io.read)
-      tmp_in.flush
-      source_path = tmp_in.path
+  # Single upload entry point shared by create_for!: routes each file to its
+  # slot by MIME. Unknown types land in file_attachment so the type validation
+  # rejects them with a clear message. has_one replaces silently, so filling
+  # an occupied slot (or a second file) raises instead — the 422 contract holds.
+  def attach_routed(file)
+    content_type = routed_content_type(file)
+    if content_type.to_s.start_with?("image/")
+      raise ActiveRecord::RecordInvalid.new(self), "Cannot attach both an image and a file" if file_attachment.attached? || image_attachment.attached?
+      image_attachment.attach(file)
+    else
+      raise ActiveRecord::RecordInvalid.new(self), "Cannot attach both an image and a file" if file_attachment.attached? || image_attachment.attached?
+      file_attachment.attach(file)
     end
+  end
 
-    image = MiniMagick::Image.open(source_path)
-    return file if image.width <= limit_w && image.height <= limit_h
-
-    processed = ImageProcessing::MiniMagick.source(source_path).resize_to_limit(limit_w, limit_h).call
-    { io: File.open(processed.path, "rb"), filename: filename, content_type: content_type }
-  rescue => e
-    Rails.logger.warn("[TicketComment] downscale skipped: #{e.message}")
-    file
-  ensure
-    tmp_in&.close!
+  def display_attachments
+    [ image_attachment, file_attachment ].select(&:attached?)
   end
 
   private
+
+  def routed_content_type(file)
+    return file[:content_type] || file["content_type"] if file.is_a?(Hash)
+
+    file.try(:content_type) || infer_content_type(file)
+  end
+
+  def infer_content_type(file)
+    return unless file.respond_to?(:path) && file.path.present? && File.exist?(file.path)
+
+    Marcel::MimeType.for(Pathname.new(file.path))
+  end
+
+  def acceptable_image_attachment
+    return unless image_attachment.attached?
+
+    unless ACCEPTABLE_TICKET_COMMENT_IMAGE_TYPES.include?(image_attachment.blob.content_type)
+      errors.add(:image_attachment, "must be a PNG or JPEG image")
+    end
+
+    unless image_attachment.blob.byte_size <= MAX_TICKET_COMMENT_IMAGE_SIZE
+      errors.add(:image_attachment, "is too big (max #{MAX_TICKET_COMMENT_IMAGE_SIZE / 1.megabyte}MB)")
+    end
+  end
+
+  def acceptable_file_attachment
+    return unless file_attachment.attached?
+
+    unless ACCEPTABLE_TICKET_COMMENT_FILE_TYPES.include?(file_attachment.blob.content_type)
+      errors.add(:file_attachment, "must be an Excel file")
+    end
+
+    unless file_attachment.blob.byte_size <= MAX_TICKET_COMMENT_FILE_SIZE
+      errors.add(:file_attachment, "is too big (max #{MAX_TICKET_COMMENT_FILE_SIZE / 1.megabyte}MB)")
+    end
+  end
+
+  def only_one_attachment
+    if image_attachment.attached? && file_attachment.attached?
+      errors.add(:base, "Attach either an image or a file, not both")
+    end
+  end
 
   def stamp_first_response_and_log
     if author_type == "User" && company_ticket.first_responded_at.nil?

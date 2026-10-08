@@ -17,25 +17,21 @@ Every item has the same four lines:
 
 ---
 
-## 1. Comment image processing → async variants
+## 1. Comment image variants → async preprocessing
 
-- **Trigger**: p95 `POST /companies/:id/company_ticket_comments` / admin
-  `POST .../comment` latency degrades, or concurrent-upload MiniMagick CPU
-  saturates web workers.
-- **Current cost**: `CompanyTicketComment.prepared_upload`
-  (`app/models/company_ticket_comment.rb`, see the `NOTE` there) shell-outs
-  to MiniMagick **synchronously inside the request** (~0.5–2s per 2MB photo).
-  Eager by design — variants would store the 2MB original permanently.
-- **Switch to**: Rails built-in
-  `has_many_attached ... attachable.variant :display, resize_to_limit: TICKET_COMMENT_IMAGE_DIMENSIONS`
-  + a Solid Queue job calling `.preprocessed` on create;
-  `format_attachment` (both `Companies::CompanyTicketCommentsController` and
-  `Admin::CompanyTicketsController`) emits
-  `rails_representation_url(...variant...)` instead of `rails_blob_path`.
-- **Cost of switching**: original 2MB blobs get stored permanently; socket
-  payload shape changes (representation URLs in `comment.attachments`);
-  needs a one-off backfill job to preprocess existing attachments; adds a
-  job + queue to monitor.
+- **Trigger**: first view of a comment image stalls (variant is processed
+  **synchronously on first request** today), or concurrent first-views
+  saturate web workers with MiniMagick.
+- **Current cost**: `image_attachment`'s `:display` variant
+  (`app/models/company_ticket_comment.rb`) is built lazily — whoever first
+  opens the thread (or receives the socket payload URL) pays the resize.
+  Eager upload-time processing was deliberately rejected (see git history:
+  variants were chosen over `prepared_upload` so no custom image code ships).
+- **Switch to**: a Solid Queue job calling
+  `comment.image_attachment.variant(:display).preprocessed` on create, so
+  the variant exists before anyone views it.
+- **Cost of switching**: adds a job + queue to monitor; socket payload URLs
+  stay valid (same representation URL, just pre-generated).
 
 ## 2. Comment thread pagination
 

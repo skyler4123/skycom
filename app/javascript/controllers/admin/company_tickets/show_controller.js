@@ -99,17 +99,29 @@ export default class Admin_CompanyTickets_ShowController extends Admin_LayoutCon
     return this.refresh()
   }
 
+  acceptablePickedFile(picked) {
+    const isImage = ["image/png", "image/jpeg"].includes(picked.type)
+    const isExcel = [
+      "application/vnd.ms-excel",
+      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    ].includes(picked.type)
+    if (!isImage && !isExcel) {
+      toast({ type: "error", message: "Only PNG/JPEG images or Excel files are allowed" })
+      return false
+    }
+    const max = isImage ? 2 * 1024 * 1024 : 1 * 1024 * 1024
+    if (picked.size > max) {
+      toast({ type: "error", message: "File is too big (images up to 2MB, Excel up to 1MB)" })
+      return false
+    }
+    return true
+  }
+
   async handleCommentSubmit(event) {
     event.preventDefault()
     const formEl = event.target
     const picked = formEl.querySelector('input[type="file"]')?.files?.[0]
-    if (picked) {
-      const max = picked.type.startsWith("image/") ? 2 * 1024 * 1024 : 1 * 1024 * 1024
-      if (picked.size > max) {
-        toast({ type: "error", message: "File is too big (images up to 2MB, other files up to 1MB)" })
-        return
-      }
-    }
+    if (picked && !this.acceptablePickedFile(picked)) return
     try {
       const response = await fetchJson(Helpers.comment_admin_company_ticket_path(this.ticket.id), {
         method: "POST",
@@ -220,9 +232,9 @@ export default class Admin_CompanyTickets_ShowController extends Admin_LayoutCon
             <div class="flex items-center justify-between gap-3">
               <div class="flex flex-col gap-1">
                 <input type="file" name="company_ticket_comment[file_attachments][]"
-                  accept="image/*,.pdf,.txt,.doc,.docx,.xls,.xlsx"
+                  accept="image/png,image/jpeg,.xls,.xlsx"
                   class="text-sm text-slate-500 dark:text-slate-400 cursor-pointer">
-                <span class="text-xs text-slate-400">1 file only — images up to 2MB (auto-resized), other files up to 1MB</span>
+                <span class="text-xs text-slate-400">1 image (PNG/JPEG, up to 2MB) or 1 Excel file (up to 1MB)</span>
               </div>
               <button type="submit" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium text-sm cursor-pointer">Post Comment</button>
             </div>

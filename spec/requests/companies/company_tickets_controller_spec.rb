@@ -89,7 +89,7 @@ RSpec.describe "Companies::CompanyTicketsController", type: :request do
     it "returns the ticket with comments, logs and attachment flags" do
       comment = CompanyTicketComment.create_for!(ticket: ticket,
         author: owner_employee, message: "looking")
-      comment.file_attachments.attach(io: StringIO.new("fake png"), filename: "shot.png",
+      comment.image_attachment.attach(io: StringIO.new("fake png"), filename: "shot.png",
         content_type: "image/png")
 
       get company_company_ticket_path(company, ticket), as: :json
@@ -102,17 +102,17 @@ RSpec.describe "Companies::CompanyTicketsController", type: :request do
       expect(body["logs"].map { |l| l["action"] }).to include("created", "commented")
     end
 
-    it "renders non-image attachments with image false" do
+    it "renders excel attachments with image false" do
       comment = CompanyTicketComment.create_for!(ticket: ticket,
         author: owner_employee, message: "doc")
-      comment.file_attachments.attach(io: StringIO.new("%PDF"), filename: "a.pdf",
-        content_type: "application/pdf")
+      comment.file_attachment.attach(io: StringIO.new("fake-xlsx"), filename: "a.xlsx",
+        content_type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
 
       get company_company_ticket_path(company, ticket), as: :json
 
       attachments = JSON.parse(response.body)["company_ticket"]["comments"].first["attachments"]
       expect(attachments.first["image"]).to be(false)
-      expect(attachments.first["content_type"]).to eq("application/pdf")
+      expect(attachments.first["content_type"]).to eq("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
       expect(attachments.first["url"]).to include("disposition=attachment")
     end
 

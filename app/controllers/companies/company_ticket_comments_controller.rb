@@ -39,19 +39,33 @@ class Companies::CompanyTicketCommentsController < Companies::ApplicationControl
   def format_comment(comment)
     comment.as_json(only: [ :id, :message, :author_type, :author_id, :created_at ]).merge(
       "author_name" => comment.author.respond_to?(:name) ? comment.author.name : comment.author.try(:email),
-      "attachments" => comment.file_attachments.map { |a| format_attachment(a) }
+      "attachments" => comment.display_attachments.map { |a| format_attachment(a) }
     )
   end
 
   def format_attachment(attachment)
     {
-      "url" => Rails.application.routes.url_helpers.rails_blob_path(
-        attachment, only_path: true, disposition: "attachment"
-      ),
+      "url" => attachment_url(attachment),
       "filename" => attachment.filename.to_s,
       "content_type" => attachment.content_type,
       "byte_size" => attachment.byte_size,
       "image" => attachment.content_type.to_s.start_with?("image/")
     }
+  end
+
+  def attachment_url(attachment)
+    if attachment.content_type.to_s.start_with?("image/")
+      Rails.application.routes.url_helpers.rails_representation_url(
+        attachment.variant(:display).processed, only_path: true
+      )
+    else
+      Rails.application.routes.url_helpers.rails_blob_path(
+        attachment, only_path: true, disposition: "attachment"
+      )
+    end
+  rescue
+    Rails.application.routes.url_helpers.rails_blob_path(
+      attachment, only_path: true, disposition: "attachment"
+    )
   end
 end
