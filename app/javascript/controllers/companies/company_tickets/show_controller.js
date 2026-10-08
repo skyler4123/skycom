@@ -207,6 +207,11 @@ export default class Companies_CompanyTickets_ShowController extends Companies_L
             </div>` : ""}
 
           <div class="mt-6 pt-6 border-t border-slate-200 dark:border-slate-700">
+            <h3 class="text-sm font-bold text-slate-500 dark:text-slate-400 uppercase mb-2">${translate("Activity")}</h3>
+            ${logs}
+          </div>
+
+          <div class="mt-6 pt-6 border-t border-slate-200 dark:border-slate-700">
             <h3 class="text-sm font-bold text-slate-500 dark:text-slate-400 uppercase mb-2">${translate("Comments")}</h3>
             ${comments || `<p class="text-sm text-slate-400">${translate("No comments yet")}</p>`}
           </div>
@@ -225,11 +230,6 @@ export default class Companies_CompanyTickets_ShowController extends Companies_L
               <button type="submit" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium text-sm cursor-pointer">${translate("Post Comment")}</button>
             </div>
           </form>
-
-          <div class="mt-6 pt-6 border-t border-slate-200 dark:border-slate-700">
-            <h3 class="text-sm font-bold text-slate-500 dark:text-slate-400 uppercase mb-2">${translate("Activity")}</h3>
-            ${logs}
-          </div>
 
           ${ratingBlock}
         </div>

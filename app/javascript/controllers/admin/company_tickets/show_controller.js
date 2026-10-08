@@ -188,6 +188,14 @@ export default class Admin_CompanyTickets_ShowController extends Admin_LayoutCon
         ${(c.attachments || []).length > 0 ? `<div class="flex flex-wrap gap-2 mt-2">${c.attachments.map((a) => this.attachmentHTML(a)).join("")}</div>` : ""}
       </div>`).join("")
 
+    const logs = (t.logs || []).map((l) => `
+      <div class="flex items-center gap-2 py-1.5 text-xs text-slate-500 dark:text-slate-400">
+        <span class="material-symbols-outlined text-[16px]">history</span>
+        <span>${this.humanize(l.action)}${l.from_status ? ` (${l.from_status} → ${l.to_status})` : ""}</span>
+        ${l.note ? `<span class="truncate">— ${escapeHtml(l.note)}</span>` : ""}
+        <span class="ml-auto shrink-0">${l.created_at ? new Date(l.created_at).toLocaleString() : ""}</span>
+      </div>`).join("")
+
     return `
       <div class="p-4 overflow-y-auto">
         <div class="p-6 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800">
@@ -219,6 +227,11 @@ export default class Admin_CompanyTickets_ShowController extends Admin_LayoutCon
               class="px-4 py-2 rounded-lg font-medium text-sm cursor-pointer text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800">
               Refresh
             </button>
+          </div>
+
+          <div class="mt-6 pt-6 border-t border-slate-200 dark:border-slate-700">
+            <h3 class="text-sm font-bold text-slate-500 dark:text-slate-400 uppercase mb-2">Activity</h3>
+            ${logs}
           </div>
 
           <div class="mt-6 pt-6 border-t border-slate-200 dark:border-slate-700">
