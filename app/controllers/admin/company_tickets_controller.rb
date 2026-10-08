@@ -89,12 +89,13 @@ class Admin::CompanyTicketsController < Admin::ApplicationController
       return render json: { errors: e.record.errors.full_messages }, status: :unprocessable_content
     end
 
+    full_comment = format_comment(comment)
     WEBSOCKET.publish_event(
-      channel: WEBSOCKET.company_channel(ticket.company_id),
+      channel: WEBSOCKET.channel_name(:company, ticket.company_id),
       event_key: :company_ticket_commented,
-      data: { id: ticket.id, message_preview: comment.message.to_s.truncate(120), author_type: "User" }
+      data: { id: ticket.id, comment: full_comment, first_responded_at: ticket.reload.first_responded_at }
     )
-    render json: { company_ticket_comment: { id: comment.id, message: comment.message } },
+    render json: { company_ticket_comment: full_comment },
       status: :created
   end
 
@@ -112,7 +113,7 @@ class Admin::CompanyTicketsController < Admin::ApplicationController
 
   def publish_status(ticket, from_status:, to_status:)
     WEBSOCKET.publish_event(
-      channel: WEBSOCKET.company_channel(ticket.company_id),
+      channel: WEBSOCKET.channel_name(:company, ticket.company_id),
       event_key: :company_ticket_status_changed,
       data: { id: ticket.id, from_status: from_status, to_status: to_status }
     )
@@ -152,7 +153,7 @@ class Admin::CompanyTicketsController < Admin::ApplicationController
     comment.as_json(only: [ :id, :message, :author_type, :author_id, :created_at ]).merge(
       "author_name" => comment.author.respond_to?(:name) && comment.author.name.present? ?
         comment.author.name : comment.author.try(:email),
-      "attachments" => comment.file_attachments.map { |a| format_attachment(a) }
+      "attachments" => comment.display_attachments.map { |a| format_attachment(a) }
     )
   end
 
@@ -167,13 +168,28 @@ class Admin::CompanyTicketsController < Admin::ApplicationController
     {
       # disposition: attachment forces download instead of inline render —
       # a spoofed content-type can never execute in the viewer's browser.
-      "url" => Rails.application.routes.url_helpers.rails_blob_path(
-        attachment, only_path: true, disposition: "attachment"
-      ),
+      # Images serve the :display variant (falls back to the blob on failure).
+      "url" => attachment_url(attachment),
       "filename" => attachment.filename.to_s,
       "content_type" => attachment.content_type,
       "byte_size" => attachment.byte_size,
       "image" => attachment.content_type.to_s.start_with?("image/")
     }
+  end
+
+  def attachment_url(attachment)
+    if attachment.content_type.to_s.start_with?("image/")
+      Rails.application.routes.url_helpers.rails_representation_url(
+        attachment.variant(:display).processed, only_path: true
+      )
+    else
+      Rails.application.routes.url_helpers.rails_blob_path(
+        attachment, only_path: true, disposition: "attachment"
+      )
+    end
+  rescue
+    Rails.application.routes.url_helpers.rails_blob_path(
+      attachment, only_path: true, disposition: "attachment"
+    )
   end
 end

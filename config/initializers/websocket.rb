@@ -25,15 +25,11 @@ class WEBSOCKET
   }.freeze
 
   class << self
-    # --- Channel Generators (Source of Truth) ---
-    def company_channel(company_id)
-      return nil unless company_id
-      "#{company_id}"
-    end
-
-    def user_channel(user_id)
-      return nil unless user_id
-      "#{user_id}"
+    # --- Channel Generator (Source of Truth) ---
+    # Format: "<model_name>_<id>" e.g. "company_<uuid>", "user_<uuid>".
+    def channel_name(model_name, id)
+      return nil unless model_name && id
+      "#{model_name.to_s.downcase}_#{id}"
     end
 
     # --- Secure Publishing with Envelope Verification ---
@@ -64,12 +60,12 @@ class WEBSOCKET
     end
 
     # Test WEBSOCKET, make sure use the valid and same channel. FE must run this code to subscribe
-    # window.WEBSOCKET.subscribe(window.WEBSOCKET.companyChannel(currentCompany().id), "test", (data) => {
+    # window.WEBSOCKET.subscribe(window.WEBSOCKET.channelName("company", currentCompany().id), "test", (data) => {
     #   console.log(data)
     # })
-    def test(channel)
+    def test(model_name, id)
       publish_event(
-        channel: WEBSOCKET.company_channel(channel),
+        channel: WEBSOCKET.channel_name(model_name, id),
         event_key: :test,
         data: {
           project: "Skycom",

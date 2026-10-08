@@ -83,13 +83,37 @@ RSpec.describe "Companies::CompanyTicketsController", type: :request do
       expect(response).to have_http_status(:forbidden)
       expect(JSON.parse(response.body)).to have_key("errors")
     end
+
+    it "filters to only the current employee tickets with mine=1" do
+      other = create(:employee, company: company)
+      CompanyTicket.create!(company: company, employee: other,
+        name: "Other printer", ticket_category: :technical)
+
+      get company_company_tickets_path(company), params: { mine: "1" }, as: :json
+
+      expect(response).to have_http_status(:ok)
+      names = JSON.parse(response.body)["company_tickets"].map { |t| t["name"] }
+      expect(names).to include("Printer is down")
+      expect(names).not_to include("Other printer")
+    end
+
+    it "returns all tickets without mine param" do
+      other = create(:employee, company: company)
+      CompanyTicket.create!(company: company, employee: other,
+        name: "Other printer", ticket_category: :technical)
+
+      get company_company_tickets_path(company), as: :json
+
+      names = JSON.parse(response.body)["company_tickets"].map { |t| t["name"] }
+      expect(names).to include("Printer is down", "Other printer")
+    end
   end
 
   describe "GET #show" do
     it "returns the ticket with comments, logs and attachment flags" do
       comment = CompanyTicketComment.create_for!(ticket: ticket,
         author: owner_employee, message: "looking")
-      comment.file_attachments.attach(io: StringIO.new("fake png"), filename: "shot.png",
+      comment.image_attachment.attach(io: StringIO.new("fake png"), filename: "shot.png",
         content_type: "image/png")
 
       get company_company_ticket_path(company, ticket), as: :json
@@ -102,17 +126,17 @@ RSpec.describe "Companies::CompanyTicketsController", type: :request do
       expect(body["logs"].map { |l| l["action"] }).to include("created", "commented")
     end
 
-    it "renders non-image attachments with image false" do
+    it "renders excel attachments with image false" do
       comment = CompanyTicketComment.create_for!(ticket: ticket,
         author: owner_employee, message: "doc")
-      comment.file_attachments.attach(io: StringIO.new("%PDF"), filename: "a.pdf",
-        content_type: "application/pdf")
+      comment.file_attachment.attach(io: StringIO.new("fake-xlsx"), filename: "a.xlsx",
+        content_type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
 
       get company_company_ticket_path(company, ticket), as: :json
 
       attachments = JSON.parse(response.body)["company_ticket"]["comments"].first["attachments"]
       expect(attachments.first["image"]).to be(false)
-      expect(attachments.first["content_type"]).to eq("application/pdf")
+      expect(attachments.first["content_type"]).to eq("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
       expect(attachments.first["url"]).to include("disposition=attachment")
     end
 
@@ -141,7 +165,7 @@ RSpec.describe "Companies::CompanyTicketsController", type: :request do
       expect(created.employee).to eq(owner_employee)
       expect(created).to be_status_open
       expect(WEBSOCKET).to have_received(:publish_event).with(
-        channel: WEBSOCKET.company_channel(company.id),
+        channel: WEBSOCKET.channel_name(:company, company.id),
         event_key: :company_ticket_created,
         data: hash_including(name: "WiFi down")
       )
@@ -176,7 +200,7 @@ RSpec.describe "Companies::CompanyTicketsController", type: :request do
       expect(response).to have_http_status(:ok)
       expect(ticket.reload.rate).to eq(5)
       expect(WEBSOCKET).to have_received(:publish_event).with(
-        channel: WEBSOCKET.company_channel(company.id),
+        channel: WEBSOCKET.channel_name(:company, company.id),
         event_key: :company_ticket_status_changed,
         data: hash_including(to_status: "rated")
       )

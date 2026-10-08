@@ -2,7 +2,7 @@
 #
 # Help Center B2B API (Shell-First). Company employees raise support tickets
 # to Skycom; Skycom staff handle them from the Admin pool.
-# Index supports enum filters (?status= / ?priority= / ?ticket_category=).
+# Index supports enum filters (?status= / ?priority= / ?ticket_category=) + ?mine=1 (only current employee tickets).
 # NOTE: ticket taxonomy is the inline `ticket_category` enum — NOT the
 # Category/PropertyMapping system, so there is no `category_id` filter here.
 # Status moves ONLY via CompanyTicket#transition_to! (Admin side) — `status`,
@@ -12,7 +12,7 @@
 #                  Companies_CompanyTickets_NewController (new reference data),
 #                  Companies_CompanyTickets_ShowController (show JSON + comments + logs),
 #                  rate endpoint serves the show-page rating widget
-# Endpoints: GET /companies/:company_id/company_tickets(.json),
+# Endpoints: GET /companies/:company_id/company_tickets(.json?status=&priority=&ticket_category=&mine=1),
 #            GET /companies/:company_id/company_tickets/new(.json),
 #            GET /companies/:company_id/company_tickets/:id(.json),
 #            POST /companies/:company_id/company_tickets(.json),
@@ -30,6 +30,7 @@ class Companies::CompanyTicketsController < Companies::ApplicationController
         scope = scope.where(status: params[:status]) if params[:status].present?
         scope = scope.where(priority: params[:priority]) if params[:priority].present?
         scope = scope.where(ticket_category: params[:ticket_category]) if params[:ticket_category].present?
+        scope = scope.where(employee: current_employee) if params[:mine].to_s == "1" && current_employee.present?
 
         @pagy, @results = pagy(:offset, scope, jsonapi: true)
         open_count = Rails.sync_cache.fetch(
@@ -85,7 +86,7 @@ class Companies::CompanyTicketsController < Companies::ApplicationController
       format.json do
         if ticket.save
           WEBSOCKET.publish_event(
-            channel: WEBSOCKET.company_channel(current_company.id),
+            channel: WEBSOCKET.channel_name(:company, current_company.id),
             event_key: :company_ticket_created,
             data: { id: ticket.id, name: ticket.name, priority: ticket.priority }
           )
@@ -116,7 +117,7 @@ class Companies::CompanyTicketsController < Companies::ApplicationController
     end
 
     WEBSOCKET.publish_event(
-      channel: WEBSOCKET.company_channel(current_company.id),
+      channel: WEBSOCKET.channel_name(:company, current_company.id),
       event_key: :company_ticket_status_changed,
       data: { id: ticket.id, from_status: ticket.status, to_status: "rated" }
     )
@@ -168,7 +169,7 @@ class Companies::CompanyTicketsController < Companies::ApplicationController
   def format_comment(comment)
     comment.as_json(only: [ :id, :message, :author_type, :author_id, :created_at ]).merge(
       "author_name" => comment_author_name(comment),
-      "attachments" => comment.file_attachments.map { |a| format_attachment(a) }
+      "attachments" => comment.display_attachments.map { |a| format_attachment(a) }
     )
   end
 
@@ -182,14 +183,30 @@ class Companies::CompanyTicketsController < Companies::ApplicationController
     {
       # disposition: attachment forces download instead of inline render —
       # a spoofed content-type can never execute in the viewer's browser.
-      "url" => Rails.application.routes.url_helpers.rails_blob_path(
-        attachment, only_path: true, disposition: "attachment"
-      ),
+      # Comment images serve the :display variant (ticket attachments keep
+      # the blob path); falls back to the blob on processing failure.
+      "url" => attachment_url(attachment),
       "filename" => attachment.filename.to_s,
       "content_type" => attachment.content_type,
       "byte_size" => attachment.byte_size,
       "image" => attachment.content_type.to_s.start_with?("image/")
     }
+  end
+
+  def attachment_url(attachment)
+    if attachment.record_type == "CompanyTicketComment" && attachment.content_type.to_s.start_with?("image/")
+      Rails.application.routes.url_helpers.rails_representation_url(
+        attachment.variant(:display).processed, only_path: true
+      )
+    else
+      Rails.application.routes.url_helpers.rails_blob_path(
+        attachment, only_path: true, disposition: "attachment"
+      )
+    end
+  rescue
+    Rails.application.routes.url_helpers.rails_blob_path(
+      attachment, only_path: true, disposition: "attachment"
+    )
   end
 
   def comment_author_name(comment)

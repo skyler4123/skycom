@@ -50,6 +50,11 @@ export default class Admin_LayoutController extends Controller {
               <span class="material-symbols-outlined text-[20px]">payments</span>
               Payment Methods
             </a>
+            <a href="/admin/company_tickets"
+              class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors cursor-pointer ${isActive('/admin/company_tickets')}">
+              <span class="material-symbols-outlined text-[20px]">support_agent</span>
+              Company Tickets
+            </a>
             <a href="#"
               class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-slate-400 cursor-not-allowed">
               <span class="material-symbols-outlined text-[20px]">group</span>

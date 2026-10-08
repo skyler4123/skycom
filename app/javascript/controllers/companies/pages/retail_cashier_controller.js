@@ -214,8 +214,8 @@ export default class Companies_Pages_RetailCashierController extends Controller 
 
   subscribePaymentCompleted() {
     const ws = window.WEBSOCKET
-    if (!ws?.companyChannel || !ws?.subscribe) return
-    const channel = ws.companyChannel(this.getCompanyId())
+    if (!ws?.channelName || !ws?.subscribe) return
+    const channel = ws.channelName("company", this.getCompanyId())
     ws.subscribe(channel, 'pos_payment_completed', (data) => {
       if (data?.payload?.transaction_token !== this.awaitingToken) return
       toast({ type: 'success', message: translate('Payment completed') })

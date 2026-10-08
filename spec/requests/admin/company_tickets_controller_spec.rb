@@ -23,6 +23,14 @@ RSpec.describe "Admin::CompanyTicketsController", type: :request do
     ActionController::Base.allow_forgery_protection = original
   end
 
+  def xlsx_file
+    Tempfile.new([ "report", ".xlsx" ]).tap do |file|
+      file.binmode
+      file.write("fake-xlsx-bytes")
+      file.rewind
+    end
+  end
+
   describe "access control" do
     it "redirects non-admin users" do
       get sign_in_for_test_path(email: company.user.email)
@@ -61,8 +69,9 @@ RSpec.describe "Admin::CompanyTicketsController", type: :request do
     it "returns the ticket with actor names on logs and forced-download attachments" do
       comment = CompanyTicketComment.create_for!(ticket: ticket,
         author: owner_employee, message: "with file")
-      comment.file_attachments.attach(io: StringIO.new("%PDF"), filename: "a.pdf",
-        content_type: "application/pdf")
+      comment.file_attachment.attach(io: StringIO.new("fake-xlsx"),
+        filename: "a.xlsx",
+        content_type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
 
       get admin_company_ticket_path(ticket), as: :json
 
@@ -80,7 +89,7 @@ RSpec.describe "Admin::CompanyTicketsController", type: :request do
       expect(response).to have_http_status(:ok)
       expect(ticket.reload.assigned_user).to eq(admin)
       expect(WEBSOCKET).to have_received(:publish_event).with(
-        channel: WEBSOCKET.company_channel(company.id),
+        channel: WEBSOCKET.channel_name(:company, company.id),
         event_key: :company_ticket_status_changed,
         data: hash_including(to_status: "assigned")
       )
@@ -107,10 +116,51 @@ RSpec.describe "Admin::CompanyTicketsController", type: :request do
       expect(response).to have_http_status(:created)
       expect(ticket.reload.first_responded_at).to be_present
       expect(WEBSOCKET).to have_received(:publish_event).with(
-        channel: WEBSOCKET.company_channel(company.id),
+        channel: WEBSOCKET.channel_name(:company, company.id),
         event_key: :company_ticket_commented,
-        data: hash_including(author_type: "User")
+        data: hash_including(comment: hash_including("message" => "On it", "author_type" => "User", "attachments" => []))
       )
+      body = JSON.parse(response.body)["company_ticket_comment"]
+      expect(body["message"]).to eq("On it")
+      expect(body["author_type"]).to eq("User")
+      expect(body).to have_key("author_name")
+      expect(body).to have_key("created_at")
+      expect(body["attachments"]).to eq([])
+    end
+
+    it "routes an excel upload to file_attachment and exposes it in the payload" do
+      post comment_admin_company_ticket_path(ticket), params: {
+        company_ticket_comment: {
+          message: "sheet",
+          file_attachments: [ Rack::Test::UploadedFile.new(xlsx_file,
+            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet") ]
+        }
+      }
+
+      expect(response).to have_http_status(:created)
+      comment = CompanyTicketComment.last
+      expect(comment.file_attachment).to be_attached
+      expect(comment.image_attachment).not_to be_attached
+      attachments = JSON.parse(response.body)["company_ticket_comment"]["attachments"]
+      expect(attachments.size).to eq(1)
+      expect(attachments.first["image"]).to be(false)
+    end
+
+    it "rejects an image plus a file with 422 errors" do
+      post comment_admin_company_ticket_path(ticket), params: {
+        company_ticket_comment: {
+          message: "both",
+          file_attachments: [
+            Rack::Test::UploadedFile.new(
+              Rails.root.join("faker/images/randoms/580-200x300.jpg"), "image/jpeg"),
+            Rack::Test::UploadedFile.new(xlsx_file,
+              "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+          ]
+        }
+      }
+
+      expect(response).to have_http_status(:unprocessable_content)
+      expect(JSON.parse(response.body)).to have_key("errors")
     end
   end
 

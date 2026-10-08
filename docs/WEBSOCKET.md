@@ -51,8 +51,8 @@ HTTP Request
     ▼
 WebsocketConcern#set_websocket_channels  (before_action)
     │
-    ├── WEBSOCKET.company_channel(current_company&.id)  → "<company_uuid>"
-    └── WEBSOCKET.user_channel(current_user&.id)         → "<user_uuid>"
+    ├── WEBSOCKET.channel_name(:company, current_company&.id)  → "company_<uuid>"
+    └── WEBSOCKET.channel_name(:user, current_user&.id)         → "user_<uuid>"
     │
     ▼
 application.html.erb layout
@@ -78,8 +78,8 @@ WebsocketController#connect()
 def set_websocket_channels
   return unless is_signed_in? && @current_company
   @channels = []
-  @channels << WEBSOCKET.company_channel(current_company&.id) if current_company
-  @channels << WEBSOCKET.user_channel(current_user&.id)       if current_user
+  @channels << WEBSOCKET.channel_name(:company, current_company&.id) if current_company
+  @channels << WEBSOCKET.channel_name(:user, current_user&.id)       if current_user
   @channels.compact!
 end
 ```
@@ -123,39 +123,39 @@ No other controller creates its own Centrifuge connection. All share the one fro
 
 ## 4. Channel Naming
 
-All channel names are **raw UUID strings** because all Skycom entity IDs are UUIDs. Channel generators enforce nil-safety and are symmetric between BE and FE.
+All channel names carry their model prefix — `"<model>_<id>"` (e.g. `"company_<uuid>"`, `"user_<uuid>"`) — so the wire name tells which record it belongs to. Both generators enforce nil-safety and are symmetric between BE and FE.
 
 ### Backend (Ruby)
 
 ```ruby
-WEBSOCKET.company_channel(company_id)  # => "<company_id>" or nil
-WEBSOCKET.user_channel(user_id)        # => "<user_id>" or nil
+WEBSOCKET.channel_name(:company, company_id)  # => "company_<id>" or nil
+WEBSOCKET.channel_name(:user, user_id)        # => "user_<id>" or nil
 ```
 
-Both accept **only IDs** (never objects). Callers must extract `.id` before calling:
+The model name is a symbol/string (`:company`, `:user`); the id is the record id:
 
 ```ruby
 # ✅ Correct
-WEBSOCKET.company_channel(current_company&.id)
-WEBSOCKET.user_channel(current_user&.id)
+WEBSOCKET.channel_name(:company, current_company&.id)
+WEBSOCKET.channel_name(:user, current_user&.id)
 
 # ❌ Wrong
-WEBSOCKET.company_channel(current_company)
+WEBSOCKET.channel_name(current_company)
 ```
 
 ### Frontend (JavaScript)
 
 ```javascript
-WEBSOCKET.companyChannel(companyId)  // => "<companyId>" or null
-WEBSOCKET.userChannel(userId)        // => "<userId>" or null
+WEBSOCKET.channelName("company", companyId)  // => "company_<id>" or null
+WEBSOCKET.channelName("user", userId)        // => "user_<id>" or null
 ```
 
 ### Channel Reference
 
 | Channel | Pattern | Example | Purpose |
 |---------|---------|---------|---------|
-| **Company** | `"<company_id>"` | `"a1b2c3d4-..."` | Company-wide events (top-ups, invoices, alerts) |
-| **User** | `"<user_id>"` | `"e5f6g7h8-..."` | User-specific events (not yet used) |
+| **Company** | `"company_<id>"` | `"company_a1b2c3d4-..."` | Company-wide events (top-ups, invoices, alerts) |
+| **User** | `"user_<id>"` | `"user_e5f6g7h8-..."` | User-specific events (not yet used) |
 
 ---
 
@@ -232,7 +232,7 @@ Use `WEBSOCKET.publish_event` from any controller, job, or service:
 
 ```ruby
 WEBSOCKET.publish_event(
-  channel: WEBSOCKET.company_channel(company&.id),
+  channel: WEBSOCKET.channel_name(:company, company&.id),
   event_key: :top_up_completed,
   data: {
     amount_cents: 10_000,
@@ -249,7 +249,7 @@ def self.publish_event(channel:, event_key:, data: {})
 
 | Param | Type | Description |
 |-------|------|-------------|
-| `channel` | String | The target channel (use `company_channel` or `user_channel` helpers) |
+| `channel` | String | The target channel (use the `channel_name` helper) |
 | `event_key` | Symbol | Key into `EVENTS` hash — raises if unregistered |
 | `data` | Hash | Payload. If `data[:id]` is present, it becomes the top-level `id` field; the rest goes into `payload` |
 
@@ -266,7 +266,7 @@ def self.publish_event(channel:, event_key:, data: {})
 Use `window.WEBSOCKET.subscribe()` from any Stimulus controller:
 
 ```javascript
-const channel = WEBSOCKET.companyChannel(currentCompany().id)
+const channel = WEBSOCKET.channelName("company", currentCompany().id)
 WEBSOCKET.subscribe(channel, "top_up_completed", (data) => {
   toast({ type: "success", message: "Top-up successful!" })
   window.location.href = Helpers.company_billing_path(companyId)
@@ -281,7 +281,7 @@ subscribe(channelName, eventKey, callback)
 
 | Param | Type | Description |
 |-------|------|-------------|
-| `channelName` | String | Target channel (use `companyChannel` or `userChannel` helpers) |
+| `channelName` | String | Target channel (use the `channelName` helper) |
 | `eventKey` | String | Key into `EVENTS` — rejected if unregistered |
 | `callback` | Function | `(data) => {}` — called with the full envelope `{ event, id, payload }` when an event matches |
 
@@ -342,7 +342,7 @@ EVENTS: {
 ```ruby
 # In a controller, job, or service:
 WEBSOCKET.publish_event(
-  channel: WEBSOCKET.company_channel(company&.id),
+  channel: WEBSOCKET.channel_name(:company, company&.id),
   event_key: :stock_low,
   data: {
     id: stock.id,
@@ -356,7 +356,7 @@ WEBSOCKET.publish_event(
 
 ```javascript
 // In any Stimulus controller:
-const channel = WEBSOCKET.companyChannel(currentCompany().id)
+const channel = WEBSOCKET.channelName("company", currentCompany().id)
 WEBSOCKET.subscribe(channel, "stock_low", (data) => {
   toast({
     type: "warning",
@@ -387,7 +387,7 @@ class Webhooks::BankPaymentController < ActionController::Base
 
     # ── Broadcast to all connected clients for this company ──
     WEBSOCKET.publish_event(
-      channel: WEBSOCKET.company_channel(company&.id),
+      channel: WEBSOCKET.channel_name(:company, company&.id),
       event_key: :top_up_completed,
       data: {
         amount_cents: amount,
@@ -408,7 +408,7 @@ renderQRWait(response, amountCents, companyId) {
   // ... render QR code for user to scan ...
 
   // ── Subscribe to the company channel ──
-  const channel = WEBSOCKET.companyChannel(currentCompany().id)
+  const channel = WEBSOCKET.channelName("company", currentCompany().id)
   WEBSOCKET.subscribe(channel, "top_up_completed", (data) => {
     toast({ type: "success", message: translate("Top-up successful! Redirecting...") })
     setTimeout(() => {
@@ -446,7 +446,7 @@ Bank Webhook (BE)                  Centrifugo                   Browser (FE)
 
 | File | Role |
 |------|------|
-| `config/initializers/websocket.rb` | `WEBSOCKET` Ruby class — `CLIENT`, `NOTARY`, `EVENTS`, `publish_event`, `token`, `company_channel`, `user_channel` |
+| `config/initializers/websocket.rb` | `WEBSOCKET` Ruby class — `CLIENT`, `NOTARY`, `EVENTS`, `publish_event`, `token`, `channel_name` |
 | `app/controllers/concerns/application_controller/websocket_concern.rb` | `set_websocket_channels` before_action — builds `@channels` list per request |
 | `app/views/layouts/application.html.erb` | Injects `data-websocket-url-value` and `data-websocket-token-value` onto `<body>` |
 | `app/javascript/controllers/websocket_controller.js` | Stimulus controller — establishes single Centrifuge connection, exposes `window.WEBSOCKET.subscribe()` API |

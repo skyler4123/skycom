@@ -7,7 +7,7 @@
 # controller never touches balances directly.
 # Serves Stimulus: Companies_TopUps_NewController (top_up_completed),
 #                  Companies_Pages_RetailCashierController (pos_payment_completed)
-# Subscribed via: window.WEBSOCKET.subscribe(companyChannel, eventKey, (data) => ...)
+# Subscribed via: window.WEBSOCKET.subscribe(channelName, eventKey, (data) => ...)
 # Docs: docs/WEBSOCKET.md, docs/ORDER_PROCESSING_V1.md
 module Webhooks
   module Payments
@@ -52,7 +52,7 @@ module Webhooks
         txn.update!(status: :completed)
 
         WEBSOCKET.publish_event(
-          channel: WEBSOCKET.company_channel(txn.company_id),
+          channel: WEBSOCKET.channel_name(:company, txn.company_id),
           event_key: :top_up_completed,
           data: {
             amount_cents: amount,
@@ -75,7 +75,7 @@ module Webhooks
         OrderProcessingV1::CompletePaymentService.call(transaction: txn)
 
         WEBSOCKET.publish_event(
-          channel: WEBSOCKET.company_channel(txn.company_id),
+          channel: WEBSOCKET.channel_name(:company, txn.company_id),
           event_key: :pos_payment_completed,
           data: {
             id: txn.id,

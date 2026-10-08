@@ -4,7 +4,8 @@ import Companies_LayoutController from "controllers/companies/layout_controller"
 // Comment/rate forms POST JSON via fetchJson submit handlers (notifications
 // mark-read precedent) because the endpoints are JSON-only; the page refreshes
 // its own state instead of navigating. Subscribes to the company channel for
-// live staff replies.
+// live staff replies — comment events carry the full comment payload and are
+// injected into the thread (no re-fetch); status events still refresh.
 // Depends on BE: Companies::CompanyTicketsController#show|rate,
 //               Companies::CompanyTicketCommentsController#create
 // Endpoints: GET <pathname>.json — ticket + comments + logs + attachments;
@@ -13,6 +14,7 @@ import Companies_LayoutController from "controllers/companies/layout_controller"
 export default class Companies_CompanyTickets_ShowController extends Companies_LayoutController {
   /** @type {any | null} */
   ticket = null
+  _ownIds = new Set()
 
   async connect() {
     super.connect()
@@ -27,13 +29,47 @@ export default class Companies_CompanyTickets_ShowController extends Companies_L
       return false
     })
 
-    const channel = window.WEBSOCKET && WEBSOCKET.companyChannel(currentCompany().id)
+    const channel = window.WEBSOCKET && WEBSOCKET.channelName("company", currentCompany().id)
     if (channel) {
       try {
-        WEBSOCKET.subscribe(channel, "company_ticket_commented", () => this.refresh())
+        WEBSOCKET.subscribe(channel, "company_ticket_commented", (data) => this.handleSocketComment(data))
         WEBSOCKET.subscribe(channel, "company_ticket_status_changed", () => this.refresh())
       } catch (e) { /* socket unavailable — page works via action refreshes */ }
     }
+  }
+
+  handleSocketComment(data) {
+    if (!this.ticket || data?.id !== this.ticket.id) return
+    const c = data.payload?.comment
+    if (!c?.id) return
+    if ((this.ticket.comments || []).some((x) => x.id === c.id)) return
+    if (data.payload?.first_responded_at) this.ticket.first_responded_at = data.payload.first_responded_at
+    this.appendComment(c, { silent: this._ownIds.has(c.id) })
+  }
+
+  appendComment(c, { silent = false } = {}) {
+    this.ticket.comments = [...(this.ticket.comments || []), c].sort((a, b) =>
+      new Date(a.created_at) - new Date(b.created_at))
+    if (this.hasContentTarget) this.renderContent()
+    if (!silent) toast({ type: "info", message: translate("New comment") })
+  }
+
+  acceptablePickedFile(picked) {
+    const isImage = ["image/png", "image/jpeg"].includes(picked.type)
+    const isExcel = [
+      "application/vnd.ms-excel",
+      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    ].includes(picked.type)
+    if (!isImage && !isExcel) {
+      toast({ type: "error", message: translate("Only PNG/JPEG images or Excel files are allowed") })
+      return false
+    }
+    const max = isImage ? 2 * 1024 * 1024 : 1 * 1024 * 1024
+    if (picked.size > max) {
+      toast({ type: "error", message: translate("File is too big (images up to 2MB, Excel up to 1MB)") })
+      return false
+    }
+    return true
   }
 
   async refresh() {
@@ -49,13 +85,19 @@ export default class Companies_CompanyTickets_ShowController extends Companies_L
   async handleCommentSubmit(event) {
     event.preventDefault()
     const formEl = event.target
+    const picked = formEl.querySelector('input[type="file"]')?.files?.[0]
+    if (picked && !this.acceptablePickedFile(picked)) return
     try {
-      await fetchJson(Helpers.company_company_ticket_comments_path(currentCompany().id), {
+      const response = await fetchJson(Helpers.company_company_ticket_comments_path(currentCompany().id), {
         method: "POST",
         body: new FormData(formEl)
       })
+      const c = response.company_ticket_comment
+      if (c?.id) {
+        this._ownIds.add(c.id)
+        this.appendComment(c, { silent: true })
+      }
       formEl.reset()
-      await this.refresh()
       toast({ type: "success", message: translate("Comment posted") })
     } catch (error) {
       toast({ type: "error", message: error.errors?.join(", ") || translate("Failed to post comment") })
@@ -165,6 +207,11 @@ export default class Companies_CompanyTickets_ShowController extends Companies_L
             </div>` : ""}
 
           <div class="mt-6 pt-6 border-t border-slate-200 dark:border-slate-700">
+            <h3 class="text-sm font-bold text-slate-500 dark:text-slate-400 uppercase mb-2">${translate("Activity")}</h3>
+            ${logs}
+          </div>
+
+          <div class="mt-6 pt-6 border-t border-slate-200 dark:border-slate-700">
             <h3 class="text-sm font-bold text-slate-500 dark:text-slate-400 uppercase mb-2">${translate("Comments")}</h3>
             ${comments || `<p class="text-sm text-slate-400">${translate("No comments yet")}</p>`}
           </div>
@@ -174,16 +221,15 @@ export default class Companies_CompanyTickets_ShowController extends Companies_L
             <textarea name="company_ticket_comment[message]" rows="3" required placeholder="${translate("Add a comment")}"
               class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-sm text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none placeholder:text-slate-400 dark:placeholder:text-slate-500"></textarea>
             <div class="flex items-center justify-between gap-3">
-              <input type="file" name="company_ticket_comment[file_attachments][]" multiple
-                class="text-sm text-slate-500 dark:text-slate-400 cursor-pointer">
+              <div class="flex flex-col gap-1">
+                <input type="file" name="company_ticket_comment[file_attachments][]"
+                  accept="image/png,image/jpeg,.xls,.xlsx"
+                  class="text-sm text-slate-500 dark:text-slate-400 cursor-pointer">
+                <span class="text-xs text-slate-400">${translate("1 image (PNG/JPEG, up to 2MB) or 1 Excel file (up to 1MB)")}</span>
+              </div>
               <button type="submit" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium text-sm cursor-pointer">${translate("Post Comment")}</button>
             </div>
           </form>
-
-          <div class="mt-6 pt-6 border-t border-slate-200 dark:border-slate-700">
-            <h3 class="text-sm font-bold text-slate-500 dark:text-slate-400 uppercase mb-2">${translate("Activity")}</h3>
-            ${logs}
-          </div>
 
           ${ratingBlock}
         </div>

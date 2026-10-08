@@ -170,15 +170,33 @@ CREDIT_USAGE_RATES = {
 
 # =============================================================================
 # Company Support Tickets (B2B — company → Skycom)
-# Multi-file: used by CompanyTicket::FileAttachmentConcern on both
-# CompanyTicket and CompanyTicketComment.
+# Ticket-level: used by CompanyTicket::FileAttachmentConcern (CompanyTicket).
+# Comment-level: used by CompanyTicketComment (one image XOR one file).
 # =============================================================================
 
-# Max number of file attachments per ticket / comment.
+# Max number of file attachments per ticket.
 MAX_TICKET_ATTACHMENTS = 5
 
 # Max file size per support ticket attachment.
 MAX_TICKET_FILE_SIZE = 5.megabytes
+
+# Max image size per ticket comment image_attachment.
+MAX_TICKET_COMMENT_IMAGE_SIZE = 2.megabytes
+
+# Max file size per ticket comment file_attachment (Excel only).
+MAX_TICKET_COMMENT_FILE_SIZE = 1.megabyte
+
+# Display variant target for ticket comment images (resize_to_limit).
+TICKET_COMMENT_IMAGE_DIMENSIONS = [ 800, 800 ].freeze
+
+# Allowed image types for ticket comment image_attachment (PNG, JPEG only).
+ACCEPTABLE_TICKET_COMMENT_IMAGE_TYPES = %w[image/jpeg image/png].freeze
+
+# Allowed file types for ticket comment file_attachment (Excel only, for now).
+ACCEPTABLE_TICKET_COMMENT_FILE_TYPES = %w[
+  application/vnd.ms-excel
+  application/vnd.openxmlformats-officedocument.spreadsheetml.sheet
+].freeze
 
 # Allowed MIME types for support ticket attachments:
 # images, plain text, PDF, Word and Excel.

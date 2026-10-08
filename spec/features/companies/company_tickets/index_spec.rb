@@ -48,4 +48,29 @@ RSpec.feature "Companies::CompanyTickets Index", type: :feature, js: true do
     expect(page).to have_current_path(/status=resolved/, wait: 10)
     expect(page).not_to have_content("Printer is down")
   end
+
+  scenario "shows Mine only filter and Raised by column" do
+    visit company_company_tickets_path(company)
+    expect(page).to have_content("Printer is down", wait: 10)
+
+    expect(page).to have_unchecked_field("Mine only")
+    expect(page).to have_content("Raised by")
+  end
+
+  scenario "filters to only the current employee tickets with Mine only" do
+    other = create(:employee, company: company)
+    CompanyTicket.create!(company: company, employee: other,
+      name: "Other printer", ticket_category: :technical)
+
+    visit company_company_tickets_path(company)
+    expect(page).to have_content("Printer is down", wait: 10)
+    expect(page).to have_content("Other printer", wait: 10)
+
+    check "Mine only"
+    click_button "Search"
+
+    expect(page).to have_current_path(/mine=1/, wait: 10)
+    expect(page).to have_content("Printer is down", wait: 10)
+    expect(page).not_to have_content("Other printer")
+  end
 end
