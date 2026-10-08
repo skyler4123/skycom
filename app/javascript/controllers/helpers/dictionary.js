@@ -118,6 +118,18 @@ export const dictionary = () => {
     "Failed to load purchase form data": { vi: "Không thể tải dữ liệu biểu mẫu" },
     "Failed to load purchase.": { vi: "Không thể tải phiếu mua hàng." },
     "Failed to load workflow.": { vi: "Không thể tải quy trình." },
+    "Documents": { vi: "Tài liệu" },
+    "Document Title": { vi: "Tiêu đề tài liệu" },
+    "Body": { vi: "Nội dung" },
+    "Preview": { vi: "Xem trước" },
+    "Images": { vi: "Hình ảnh" },
+    "Files": { vi: "Tệp đính kèm" },
+    "Attachments": { vi: "Đính kèm" },
+    "Document Group": { vi: "Nhóm tài liệu" },
+    "Draft — not visible to readers": { vi: "Bản nháp — độc giả chưa thấy" },
+    "Failed to load documents": { vi: "Không thể tải tài liệu" },
+    "Failed to load document.": { vi: "Không thể tải tài liệu." },
+    "Document not found.": { vi: "Không tìm thấy tài liệu." },
     "Purchase not found.": { vi: "Không tìm thấy phiếu mua hàng." },
     "Workflow not found.": { vi: "Không tìm thấy quy trình." },
     "Amount": { vi: "Số tiền" },
@@ -208,6 +220,8 @@ export const dictionary = () => {
     "New Employee": { vi: "Nhân viên mới" },
     "New Category": { vi: "Danh mục mới" },
     "New Page": { vi: "Trang mới" },
+    "New Document": { vi: "Tài liệu mới" },
+    "Edit Document": { vi: "Sửa tài liệu" },
     "Edit Branch": { vi: "Sửa chi nhánh" },
     "Edit Department": { vi: "Sửa phòng ban" },
     "Edit Product": { vi: "Sửa sản phẩm" },
@@ -234,6 +248,7 @@ export const dictionary = () => {
     "Back to Employees": { vi: "Quay lại Nhân viên" },
     "Back to Categories": { vi: "Quay lại Danh mục" },
     "Back to Pages": { vi: "Quay lại Trang" },
+    "Back to Documents": { vi: "Quay lại Tài liệu" },
 
     // === Save Buttons ===
     "Save Branch": { vi: "Lưu chi nhánh" },
@@ -248,6 +263,7 @@ export const dictionary = () => {
     "Save Employee": { vi: "Lưu nhân viên" },
     "Save Category": { vi: "Lưu danh mục" },
     "Save Page": { vi: "Lưu trang" },
+    "Save Document": { vi: "Lưu tài liệu" },
 
     // === Edit Buttons ===
     "Edit Branch": { vi: "Sửa chi nhánh" },
@@ -262,6 +278,7 @@ export const dictionary = () => {
     "Edit Employee": { vi: "Sửa nhân viên" },
     "Edit Category": { vi: "Sửa danh mục" },
     "Edit Page": { vi: "Sửa trang" },
+    "Edit Document": { vi: "Sửa tài liệu" },
 
     // === States / Statuses ===
     "Active": { vi: "Hoạt động" },

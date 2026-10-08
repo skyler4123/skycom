@@ -62,6 +62,7 @@ window.addOpenListener = Helpers.addOpenListener
 window.reloadThenToast = Helpers.reloadThenToast
 window.reloadThenToasts = Helpers.reloadThenToasts
 window.renderQrCode = Helpers.renderQrCode
+window.renderMarkdown = Helpers.renderMarkdown
 window.clearClientCache = Helpers.clearClientCache
 window.clearClientCacheAndReload = Helpers.clearClientCacheAndReload
 window.getImportMapPath = Helpers.getImportMapPath
