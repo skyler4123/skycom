@@ -19,7 +19,7 @@ class Company < ApplicationRecord
     Patient Appointment Course Student Exam
     Membership
     Page CompanyPaymentMethodAppointment ShiftTemplate ScheduledShift
-    AttendanceConfig AttendanceLog AttendanceDay AttendanceMonth
+    AttendanceConfig AttendanceLog AttendanceDay AttendanceMonth AttendanceRequest
     EventConfigLog AttendanceConfigLog TableConfigLog PermissionLog
     Stock StockTransfer StockImport StockExport StockAdjustment StockPending
     Event EventGroup EventConfig

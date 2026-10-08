@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_10_08_000004) do
+ActiveRecord::Schema[8.1].define(version: 2026_10_08_000005) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pgcrypto"
@@ -633,6 +633,36 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_08_000004) do
     t.index ["discarded_at"], name: "index_attendance_months_on_discarded_at"
     t.index ["employee_id", "month"], name: "index_attendance_months_on_employee_id_and_month", unique: true
     t.index ["employee_id"], name: "index_attendance_months_on_employee_id"
+  end
+
+  create_table "attendance_requests", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
+    t.uuid "company_id", null: false
+    t.uuid "branch_id"
+    t.uuid "employee_id", null: false
+    t.date "attendance_date", null: false
+    t.datetime "check_in", null: false
+    t.datetime "check_out"
+    t.text "reason", null: false
+    t.integer "status", default: 0, null: false
+    t.uuid "decided_by_id"
+    t.datetime "decided_at"
+    t.text "decision_note"
+    t.integer "lifecycle_status"
+    t.integer "workflow_status"
+    t.integer "business_type"
+    t.datetime "expiration_date"
+    t.jsonb "metadata", default: {}
+    t.datetime "discarded_at"
+    t.string "permission_resource_name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["branch_id"], name: "index_attendance_requests_on_branch_id"
+    t.index ["company_id", "employee_id", "attendance_date"], name: "idx_attendance_requests_on_company_employee_date", unique: true, where: "(discarded_at IS NULL)"
+    t.index ["company_id"], name: "index_attendance_requests_on_company_id"
+    t.index ["decided_by_id"], name: "index_attendance_requests_on_decided_by_id"
+    t.index ["discarded_at"], name: "index_attendance_requests_on_discarded_at"
+    t.index ["employee_id"], name: "index_attendance_requests_on_employee_id"
+    t.index ["status"], name: "index_attendance_requests_on_status"
   end
 
   create_table "branch_event_appointments", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
@@ -8033,6 +8063,10 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_08_000004) do
   add_foreign_key "attendance_months", "branches"
   add_foreign_key "attendance_months", "companies"
   add_foreign_key "attendance_months", "employees"
+  add_foreign_key "attendance_requests", "branches"
+  add_foreign_key "attendance_requests", "companies"
+  add_foreign_key "attendance_requests", "employees"
+  add_foreign_key "attendance_requests", "employees", column: "decided_by_id"
   add_foreign_key "branch_event_appointments", "branches"
   add_foreign_key "branch_event_appointments", "companies"
   add_foreign_key "branch_event_appointments", "events"
