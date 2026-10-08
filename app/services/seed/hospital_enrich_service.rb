@@ -74,6 +74,7 @@ class Seed::HospitalEnrichService
     create_shifts
     create_attendance_configs
     create_attendance_event_data
+    create_attendance_request_samples
     seed_credit_data
 
     print_footer
@@ -590,6 +591,12 @@ class Seed::HospitalEnrichService
         Rails.logger.warn("Resolution failed for #{emp.id} on #{date}: #{e.message}")
       end
     end
+  end
+
+  def create_attendance_request_samples
+    puts "Creating attendance request samples..."
+    count = Seed::AttendanceRequestService.create_samples(company: @company, employees: @employees)
+    puts "  -> #{count} attendance requests created"
   end
 
   def create_invoices
