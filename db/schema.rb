@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_10_07_000001) do
+ActiveRecord::Schema[8.1].define(version: 2026_10_07_000007) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pgcrypto"
@@ -2662,6 +2662,54 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_07_000001) do
     t.index ["workflow_status"], name: "index_employee_groups_on_workflow_status"
   end
 
+  create_table "employee_notification_reads", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
+    t.uuid "company_id", null: false
+    t.uuid "employee_id", null: false
+    t.uuid "notification_id", null: false
+    t.datetime "read_at", default: -> { "CURRENT_TIMESTAMP" }, null: false
+    t.integer "lifecycle_status"
+    t.integer "workflow_status"
+    t.integer "business_type"
+    t.datetime "expiration_date"
+    t.jsonb "metadata"
+    t.datetime "discarded_at"
+    t.string "permission_resource_name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["business_type"], name: "index_employee_notification_reads_on_business_type"
+    t.index ["company_id", "employee_id"], name: "idx_emp_notif_reads_on_company_emp"
+    t.index ["company_id"], name: "index_employee_notification_reads_on_company_id"
+    t.index ["discarded_at"], name: "index_employee_notification_reads_on_discarded_at"
+    t.index ["employee_id", "notification_id"], name: "idx_emp_notif_reads_on_emp_notif", unique: true
+    t.index ["employee_id"], name: "index_employee_notification_reads_on_employee_id"
+    t.index ["lifecycle_status"], name: "index_employee_notification_reads_on_lifecycle_status"
+    t.index ["notification_id"], name: "index_employee_notification_reads_on_notification_id"
+    t.index ["workflow_status"], name: "index_employee_notification_reads_on_workflow_status"
+  end
+
+  create_table "employee_notification_tag_appointments", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
+    t.uuid "company_id", null: false
+    t.uuid "employee_id", null: false
+    t.uuid "notification_tag_id", null: false
+    t.integer "lifecycle_status"
+    t.integer "workflow_status"
+    t.integer "business_type"
+    t.datetime "expiration_date"
+    t.jsonb "metadata"
+    t.datetime "discarded_at"
+    t.string "permission_resource_name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["business_type"], name: "index_employee_notification_tag_appointments_on_business_type"
+    t.index ["company_id", "employee_id", "notification_tag_id"], name: "idx_emp_notif_tag_appt_on_company_emp_tag", unique: true
+    t.index ["company_id"], name: "index_employee_notification_tag_appointments_on_company_id"
+    t.index ["discarded_at"], name: "index_employee_notification_tag_appointments_on_discarded_at"
+    t.index ["employee_id"], name: "index_employee_notification_tag_appointments_on_employee_id"
+    t.index ["lifecycle_status"], name: "idx_on_lifecycle_status_dfd29cf6d8"
+    t.index ["notification_tag_id"], name: "idx_on_notification_tag_id_b5ef3943e8"
+    t.index ["workflow_status"], name: "idx_on_workflow_status_1588449805"
+  end
+
   create_table "employee_order_group_appointments", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
     t.uuid "company_id", null: false
     t.uuid "employee_id", null: false
@@ -3986,6 +4034,96 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_07_000001) do
     t.index ["lifecycle_status"], name: "index_memberships_on_lifecycle_status"
     t.index ["property_mapping_id"], name: "index_memberships_on_property_mapping_id"
     t.index ["workflow_status"], name: "index_memberships_on_workflow_status"
+  end
+
+  create_table "notification_configs", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
+    t.uuid "company_id", null: false
+    t.uuid "employee_id", null: false
+    t.datetime "last_read_all_at"
+    t.jsonb "preferences", default: {}
+    t.integer "lifecycle_status"
+    t.integer "workflow_status"
+    t.integer "business_type"
+    t.datetime "expiration_date"
+    t.jsonb "metadata"
+    t.datetime "discarded_at"
+    t.string "permission_resource_name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["business_type"], name: "index_notification_configs_on_business_type"
+    t.index ["company_id", "employee_id"], name: "idx_notif_configs_on_company_emp", unique: true
+    t.index ["company_id"], name: "index_notification_configs_on_company_id"
+    t.index ["discarded_at"], name: "index_notification_configs_on_discarded_at"
+    t.index ["employee_id"], name: "index_notification_configs_on_employee_id"
+    t.index ["lifecycle_status"], name: "index_notification_configs_on_lifecycle_status"
+    t.index ["workflow_status"], name: "index_notification_configs_on_workflow_status"
+  end
+
+  create_table "notification_tag_appointments", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
+    t.uuid "company_id", null: false
+    t.uuid "notification_id", null: false
+    t.uuid "notification_tag_id", null: false
+    t.integer "lifecycle_status"
+    t.integer "workflow_status"
+    t.integer "business_type"
+    t.datetime "expiration_date"
+    t.jsonb "metadata"
+    t.datetime "discarded_at"
+    t.string "permission_resource_name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["business_type"], name: "index_notification_tag_appointments_on_business_type"
+    t.index ["company_id", "notification_id", "notification_tag_id"], name: "idx_notif_tag_appt_on_company_notif_tag", unique: true
+    t.index ["company_id"], name: "index_notification_tag_appointments_on_company_id"
+    t.index ["discarded_at"], name: "index_notification_tag_appointments_on_discarded_at"
+    t.index ["lifecycle_status"], name: "index_notification_tag_appointments_on_lifecycle_status"
+    t.index ["notification_id"], name: "index_notification_tag_appointments_on_notification_id"
+    t.index ["notification_tag_id"], name: "index_notification_tag_appointments_on_notification_tag_id"
+    t.index ["workflow_status"], name: "index_notification_tag_appointments_on_workflow_status"
+  end
+
+  create_table "notification_tags", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
+    t.uuid "company_id", null: false
+    t.string "name", null: false
+    t.text "description"
+    t.integer "lifecycle_status"
+    t.integer "workflow_status"
+    t.integer "business_type"
+    t.datetime "expiration_date"
+    t.jsonb "metadata"
+    t.datetime "discarded_at"
+    t.string "permission_resource_name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["business_type"], name: "index_notification_tags_on_business_type"
+    t.index ["company_id", "name"], name: "index_notification_tags_on_company_id_and_name", unique: true
+    t.index ["company_id"], name: "index_notification_tags_on_company_id"
+    t.index ["discarded_at"], name: "index_notification_tags_on_discarded_at"
+    t.index ["lifecycle_status"], name: "index_notification_tags_on_lifecycle_status"
+    t.index ["workflow_status"], name: "index_notification_tags_on_workflow_status"
+  end
+
+  create_table "notifications", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
+    t.uuid "company_id", null: false
+    t.string "title", null: false
+    t.text "body"
+    t.integer "severity", default: 0, null: false
+    t.string "url"
+    t.integer "lifecycle_status"
+    t.integer "workflow_status"
+    t.integer "business_type"
+    t.datetime "expiration_date"
+    t.jsonb "metadata"
+    t.datetime "discarded_at"
+    t.string "permission_resource_name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["business_type"], name: "index_notifications_on_business_type"
+    t.index ["company_id", "created_at"], name: "index_notifications_on_company_id_and_created_at"
+    t.index ["company_id"], name: "index_notifications_on_company_id"
+    t.index ["discarded_at"], name: "index_notifications_on_discarded_at"
+    t.index ["lifecycle_status"], name: "index_notifications_on_lifecycle_status"
+    t.index ["workflow_status"], name: "index_notifications_on_workflow_status"
   end
 
   create_table "order_group_tag_appointments", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
@@ -7932,6 +8070,12 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_07_000001) do
   add_foreign_key "employee_groups", "categories"
   add_foreign_key "employee_groups", "companies"
   add_foreign_key "employee_groups", "property_mappings"
+  add_foreign_key "employee_notification_reads", "companies"
+  add_foreign_key "employee_notification_reads", "employees"
+  add_foreign_key "employee_notification_reads", "notifications"
+  add_foreign_key "employee_notification_tag_appointments", "companies"
+  add_foreign_key "employee_notification_tag_appointments", "employees"
+  add_foreign_key "employee_notification_tag_appointments", "notification_tags"
   add_foreign_key "employee_order_group_appointments", "companies"
   add_foreign_key "employee_order_group_appointments", "employees"
   add_foreign_key "employee_order_group_appointments", "order_groups"
@@ -8047,6 +8191,13 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_07_000001) do
   add_foreign_key "memberships", "categories"
   add_foreign_key "memberships", "companies"
   add_foreign_key "memberships", "property_mappings"
+  add_foreign_key "notification_configs", "companies"
+  add_foreign_key "notification_configs", "employees"
+  add_foreign_key "notification_tag_appointments", "companies"
+  add_foreign_key "notification_tag_appointments", "notification_tags"
+  add_foreign_key "notification_tag_appointments", "notifications"
+  add_foreign_key "notification_tags", "companies"
+  add_foreign_key "notifications", "companies"
   add_foreign_key "order_group_tag_appointments", "companies"
   add_foreign_key "order_group_tag_appointments", "order_groups"
   add_foreign_key "order_group_tag_appointments", "tags"

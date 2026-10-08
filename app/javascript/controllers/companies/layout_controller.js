@@ -71,6 +71,32 @@ export default class Companies_LayoutController extends Controller {
   renderLayout() {
     this.element.className = 'min-h-screen flex flex-col';
     this.element.innerHTML = this.layoutHTML();
+    this.refreshBell();
+  }
+
+  async refreshBell() {
+    try {
+      const company = currentCompany();
+      if (!company) return;
+      const response = await fetchJson(`${Helpers.unread_count_company_notifications_path(company.id)}.json`);
+      const count = response.unread_count || 0;
+      this.element.querySelectorAll("[data-bell-badge]").forEach((badge) => {
+        badge.textContent = count > 99 ? "99+" : `${count}`;
+        badge.classList.toggle("hidden", count === 0);
+      });
+    } catch (error) {
+      // Bell is best-effort — never break the layout when the count endpoint fails.
+    }
+
+    if (!this.bellSubscribed && window.WEBSOCKET) {
+      this.bellSubscribed = true;
+      try {
+        const channel = WEBSOCKET.companyChannel(currentCompany()?.id);
+        if (channel) WEBSOCKET.subscribe(channel, "notification_created", () => this.refreshBell());
+      } catch (error) {
+        this.bellSubscribed = false;
+      }
+    }
   }
 
   renderContent() {
@@ -195,10 +221,11 @@ export default class Companies_LayoutController extends Controller {
                 >
                   <span>${(localStorage.getItem("languageCode") || "en").toUpperCase()}</span>
                 </button>
-                <button
-                  class="hidden md:flex cursor-pointer items-center justify-center overflow-hidden rounded-full h-10 w-10 hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-600 dark:text-gray-300">
+                <a href="${Helpers.company_notifications_path(currentCompany().id)}"
+                  class="relative hidden md:flex cursor-pointer items-center justify-center overflow-hidden rounded-full h-10 w-10 hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-600 dark:text-gray-300">
                   <span class="material-symbols-outlined">notifications</span>
-                </button>
+                  <span data-bell-badge class="hidden absolute top-0 right-0 min-w-[18px] h-[18px] px-1 rounded-full bg-rose-600 text-white text-[10px] font-bold flex items-center justify-center">0</span>
+                </a>
                 <button
                   class="hidden md:flex cursor-pointer items-center justify-center overflow-hidden rounded-full h-10 w-10 hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-600 dark:text-gray-300">
                   <span class="material-symbols-outlined">settings</span>

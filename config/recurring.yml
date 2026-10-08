@@ -31,6 +31,10 @@ default: &default
     class: CompanyUsageSyncJob
     queue: default
     schedule: every 1 hours
+  notifications_prune_job:
+    class: Notifications::PruneJob
+    queue: default
+    schedule: every day at 3am
 
 
 development:

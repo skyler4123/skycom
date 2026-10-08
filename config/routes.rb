@@ -83,6 +83,16 @@ Rails.application.routes.draw do
       resources :documents
       resources :announcements
       resources :discounts
+      resources :notifications, only: [ :index, :show ] do
+        member do
+          post :mark_read
+        end
+        collection do
+          post :mark_all_read
+          get :unread_count
+        end
+      end
+      resource :notification_config, only: [ :show, :update ]
       resources :events
       resources :event_configs
       resources :event_config_logs, only: [ :index, :show ]
