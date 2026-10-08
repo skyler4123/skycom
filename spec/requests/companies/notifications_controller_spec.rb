@@ -101,6 +101,18 @@ RSpec.describe "Companies::NotificationsController", type: :request do
   end
 
   describe "GET #show" do
+    it "returns the subscribed notification marked read" do
+      notif = Notifications::CreateService.call(company: company, title: "hello", tag_ids: [ tag.id ])[:notification]
+
+      get company_notification_path(company, notif), as: :json
+
+      expect(response).to have_http_status(:ok)
+      body = JSON.parse(response.body)
+      expect(body["notification"]["title"]).to eq("hello")
+      expect(body["notification"]["read"]).to be(true)
+      expect(body["notification"]["tags"].map { |t| t["name"] }).to include("ops")
+    end
+
     it "404s a notification from another company" do
       other = create(:company)
       foreign = Notification.create!(company: other, title: "foreign")

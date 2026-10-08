@@ -43,6 +43,7 @@ class Companies::NotificationsController < Companies::ApplicationController
       format.html { render html: "", layout: true }
       format.json do
         Notifications::MarkReadService.call(employee: current_employee, notification: notification)
+        @read_ids = [ notification.id ].to_set
         render json: { notification: format_notification(notification) }
       end
     end
