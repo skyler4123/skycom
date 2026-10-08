@@ -24,6 +24,7 @@ class Company < ApplicationRecord
     Stock StockTransfer StockImport StockExport StockAdjustment StockPending
     Event EventGroup EventConfig
     Notification NotificationTag
+    CompanyTicket CompanyTicketComment CompanyTicketLog
   ].freeze
   class_attribute :skip_init, default: false
   # Creation-time-only flag: System#ensure_company! marks its auto-created
@@ -138,6 +139,9 @@ class Company < ApplicationRecord
   has_many :company_daily_usages, dependent: :destroy
   has_many :company_monthly_usages, dependent: :destroy
   has_many :company_usage_logs, dependent: :destroy
+  has_many :company_tickets, dependent: :destroy
+  has_many :company_ticket_comments, dependent: :destroy
+  has_many :company_ticket_logs, dependent: :destroy
 
   # --- Scopes ---
   scope :system_companies, -> { where(id: System.select(:company_id)) }

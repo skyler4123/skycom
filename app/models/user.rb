@@ -42,6 +42,11 @@ class User < ApplicationRecord
   has_many :customers, dependent: :destroy
   belongs_to :parent_user, class_name: "User", optional: true
   has_many :child_users, class_name: "User", foreign_key: "parent_user_id", dependent: :destroy
+  has_many :assigned_company_tickets, class_name: "CompanyTicket",
+           foreign_key: :assigned_user_id, dependent: :nullify
+  # restrict: staff replies must survive staff cleanup (first_responded_at
+  # points at them). Soft flows are unaffected.
+  has_many :company_ticket_comments, as: :author, dependent: :restrict_with_error
   validates :email, presence: true, uniqueness: true, format: { with: URI::MailTo::EMAIL_REGEXP }
   validates :password, allow_nil: true, length: { minimum: 12 }
 

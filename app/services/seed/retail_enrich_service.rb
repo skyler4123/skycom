@@ -92,6 +92,7 @@ class Seed::RetailEnrichService
     create_events
     create_purchase_data
     create_discount_data
+    create_support_ticket_data
     create_notification_data
     create_shifts
     create_attendance_configs
@@ -722,6 +723,25 @@ class Seed::RetailEnrichService
     Discounts::BatchGenerator.call(discount_group: fixed_group, quantity: 25)
 
     puts "  -> #{Discount.where(company: @retail).count} discount codes created (#{DiscountGroup.where(company: @retail).count} groups)"
+  end
+
+  def create_support_ticket_data
+    employees = @retail.employees.where.not(business_type: :owner).limit(6).to_a
+    return if employees.empty?
+
+    staff = User.find_by(system_role: :super_admin) ||
+      User.find_by(system_role: :admin) ||
+      Seed::UserService.create(system_role: :admin)
+
+    6.times do |i|
+      Seed::CompanyTicketService.create_sample_thread(
+        company: @retail,
+        employee: employees[i % employees.length],
+        staff: staff,
+        index: i
+      )
+    end
+    puts "  -> #{CompanyTicket.where(company: @retail).count} support tickets created"
   end
 
   def create_notification_data

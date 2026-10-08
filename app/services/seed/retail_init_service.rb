@@ -655,6 +655,9 @@ class Seed::RetailInitService
         "EventConfig" => { create: true, read: true, update: true, delete: true },
         "Notification" => { create: true, read: true, update: true, delete: true },
         "NotificationTag" => { create: true, read: true, update: true, delete: true },
+        "CompanyTicket" => { create: true, read: true, update: true, delete: true },
+        "CompanyTicketComment" => { create: true, read: true, update: true, delete: true },
+        "CompanyTicketLog" => { create: true, read: true, update: true, delete: true },
 
         "Service" => { create: true, read: true, update: true, delete: true },
         "Stock" => { create: true, read: true, update: true, delete: true },
@@ -713,11 +716,17 @@ class Seed::RetailInitService
         "EventConfig" => { create: true, read: true, update: true, delete: true },
         "Notification" => { create: true, read: true, update: true, delete: true },
         "NotificationTag" => { create: true, read: true, update: true, delete: true },
+        "CompanyTicket" => { create: true, read: true, update: true, delete: true },
+        "CompanyTicketComment" => { create: true, read: true, update: true, delete: true },
+        "CompanyTicketLog" => { create: true, read: true, update: true, delete: true },
         "Student" => { create: true, read: true, update: true, delete: true }
       },
       Cashier: {
         "Notification" => { read: true },
         "NotificationTag" => { read: true },
+        "CompanyTicket" => { create: true, read: true, update: true, delete: false },
+        "CompanyTicketComment" => { create: true, read: true, update: false, delete: false },
+        "CompanyTicketLog" => { read: true },
         "Order" => { create: true, read: true, update: true, delete: false },
         "Product" => { create: false, read: true, update: false, delete: false },
         "Customer" => { create: true, read: true, update: false, delete: false },
@@ -729,6 +738,9 @@ class Seed::RetailInitService
       Seller: {
         "Notification" => { read: true },
         "NotificationTag" => { read: true },
+        "CompanyTicket" => { create: true, read: true, update: true, delete: false },
+        "CompanyTicketComment" => { create: true, read: true, update: false, delete: false },
+        "CompanyTicketLog" => { read: true },
         "Order" => { create: true, read: true, update: false, delete: false },
         "Product" => { create: false, read: true, update: false, delete: false },
         "Customer" => { create: false, read: true, update: false, delete: false },
@@ -740,12 +752,18 @@ class Seed::RetailInitService
       Security: {
         "Notification" => { read: true },
         "NotificationTag" => { read: true },
+        "CompanyTicket" => { create: true, read: true, update: true, delete: false },
+        "CompanyTicketComment" => { create: true, read: true, update: false, delete: false },
+        "CompanyTicketLog" => { read: true },
         "Product" => { create: false, read: true, update: false, delete: false },
         "Order" => { create: false, read: true, update: false, delete: false }
       },
       Doctor: {
         "Notification" => { read: true },
         "NotificationTag" => { read: true },
+        "CompanyTicket" => { create: true, read: true, update: true, delete: false },
+        "CompanyTicketComment" => { create: true, read: true, update: false, delete: false },
+        "CompanyTicketLog" => { read: true },
         "Order" => { read: true, update: true },
         "Service" => { read: true },
         "Brand" => { create: false, read: true, update: false, delete: false },
@@ -755,12 +773,18 @@ class Seed::RetailInitService
       Therapist: {
         "Notification" => { read: true },
         "NotificationTag" => { read: true },
+        "CompanyTicket" => { create: true, read: true, update: true, delete: false },
+        "CompanyTicketComment" => { create: true, read: true, update: false, delete: false },
+        "CompanyTicketLog" => { read: true },
         "Order" => { read: true },
         "Facility" => { create: false, read: true, update: false, delete: false }
       },
       Consultant: {
         "Notification" => { read: true },
         "NotificationTag" => { read: true },
+        "CompanyTicket" => { create: true, read: true, update: true, delete: false },
+        "CompanyTicketComment" => { create: true, read: true, update: false, delete: false },
+        "CompanyTicketLog" => { read: true },
         "Customer" => { create: true, read: true, update: true },
         "Order" => { create: true, read: true },
         "Brand" => { create: false, read: true, update: false, delete: false },

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_10_07_000007) do
+ActiveRecord::Schema[8.1].define(version: 2026_10_08_000003) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pgcrypto"
@@ -1395,6 +1395,93 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_07_000007) do
     t.index ["lifecycle_status"], name: "index_company_tag_appointments_on_lifecycle_status"
     t.index ["tag_id"], name: "index_company_tag_appointments_on_tag_id"
     t.index ["workflow_status"], name: "index_company_tag_appointments_on_workflow_status"
+  end
+
+  create_table "company_ticket_comments", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
+    t.uuid "company_id", null: false
+    t.uuid "company_ticket_id", null: false
+    t.string "author_type", null: false
+    t.uuid "author_id", null: false
+    t.text "message", null: false
+    t.integer "lifecycle_status"
+    t.integer "workflow_status"
+    t.integer "business_type"
+    t.datetime "expiration_date"
+    t.jsonb "metadata"
+    t.datetime "discarded_at"
+    t.string "permission_resource_name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["author_type", "author_id"], name: "index_company_ticket_comments_on_author"
+    t.index ["business_type"], name: "index_company_ticket_comments_on_business_type"
+    t.index ["company_id", "created_at"], name: "index_company_ticket_comments_on_company_id_and_created_at"
+    t.index ["company_id"], name: "index_company_ticket_comments_on_company_id"
+    t.index ["company_ticket_id", "created_at"], name: "idx_on_company_ticket_id_created_at_33559addf0"
+    t.index ["company_ticket_id"], name: "index_company_ticket_comments_on_company_ticket_id"
+    t.index ["discarded_at"], name: "index_company_ticket_comments_on_discarded_at"
+    t.index ["lifecycle_status"], name: "index_company_ticket_comments_on_lifecycle_status"
+    t.index ["workflow_status"], name: "index_company_ticket_comments_on_workflow_status"
+  end
+
+  create_table "company_ticket_logs", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
+    t.uuid "company_id", null: false
+    t.uuid "company_ticket_id", null: false
+    t.string "actor_type"
+    t.uuid "actor_id"
+    t.integer "action", null: false
+    t.string "from_status"
+    t.string "to_status"
+    t.text "note"
+    t.integer "lifecycle_status"
+    t.integer "workflow_status"
+    t.integer "business_type"
+    t.datetime "expiration_date"
+    t.jsonb "metadata"
+    t.datetime "discarded_at"
+    t.string "permission_resource_name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["actor_type", "actor_id"], name: "index_company_ticket_logs_on_actor"
+    t.index ["business_type"], name: "index_company_ticket_logs_on_business_type"
+    t.index ["company_id"], name: "index_company_ticket_logs_on_company_id"
+    t.index ["company_ticket_id", "created_at"], name: "index_company_ticket_logs_on_company_ticket_id_and_created_at"
+    t.index ["company_ticket_id"], name: "index_company_ticket_logs_on_company_ticket_id"
+    t.index ["discarded_at"], name: "index_company_ticket_logs_on_discarded_at"
+    t.index ["lifecycle_status"], name: "index_company_ticket_logs_on_lifecycle_status"
+    t.index ["workflow_status"], name: "index_company_ticket_logs_on_workflow_status"
+  end
+
+  create_table "company_tickets", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
+    t.uuid "company_id", null: false
+    t.uuid "employee_id", null: false
+    t.uuid "assigned_user_id"
+    t.string "name", null: false
+    t.text "description"
+    t.integer "ticket_category", default: 0, null: false
+    t.integer "priority", default: 1, null: false
+    t.integer "status", default: 0, null: false
+    t.integer "rate"
+    t.datetime "first_responded_at"
+    t.datetime "resolved_at"
+    t.integer "lifecycle_status"
+    t.integer "workflow_status"
+    t.integer "business_type"
+    t.datetime "expiration_date"
+    t.jsonb "metadata"
+    t.datetime "discarded_at"
+    t.string "permission_resource_name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["assigned_user_id"], name: "index_company_tickets_on_assigned_user_id"
+    t.index ["business_type"], name: "index_company_tickets_on_business_type"
+    t.index ["company_id", "assigned_user_id"], name: "index_company_tickets_on_company_id_and_assigned_user_id"
+    t.index ["company_id", "status"], name: "index_company_tickets_on_company_id_and_status"
+    t.index ["company_id", "updated_at"], name: "index_company_tickets_on_company_id_and_updated_at"
+    t.index ["company_id"], name: "index_company_tickets_on_company_id"
+    t.index ["discarded_at"], name: "index_company_tickets_on_discarded_at"
+    t.index ["employee_id"], name: "index_company_tickets_on_employee_id"
+    t.index ["lifecycle_status"], name: "index_company_tickets_on_lifecycle_status"
+    t.index ["workflow_status"], name: "index_company_tickets_on_workflow_status"
   end
 
   create_table "company_transactions", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
@@ -7955,6 +8042,13 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_07_000007) do
   add_foreign_key "company_payment_method_appointments", "payment_methods"
   add_foreign_key "company_tag_appointments", "companies"
   add_foreign_key "company_tag_appointments", "tags"
+  add_foreign_key "company_ticket_comments", "companies"
+  add_foreign_key "company_ticket_comments", "company_tickets"
+  add_foreign_key "company_ticket_logs", "companies"
+  add_foreign_key "company_ticket_logs", "company_tickets"
+  add_foreign_key "company_tickets", "companies"
+  add_foreign_key "company_tickets", "employees"
+  add_foreign_key "company_tickets", "users", column: "assigned_user_id"
   add_foreign_key "company_transactions", "companies"
   add_foreign_key "company_transactions", "company_invoices"
   add_foreign_key "company_transactions", "company_payment_methods"

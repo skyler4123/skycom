@@ -56,6 +56,7 @@ window.popover = Helpers.popover
 window.picture = Helpers.picture
 window.dictionary = Helpers.dictionary
 window.translate = Helpers.translate
+window.escapeHtml = Helpers.escapeHtml
 window.addOpenTrigger = Helpers.addOpenTrigger
 window.addOpenListener = Helpers.addOpenListener
 window.reloadThenToast = Helpers.reloadThenToast

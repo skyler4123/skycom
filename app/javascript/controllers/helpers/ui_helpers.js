@@ -279,6 +279,19 @@ export const translate = (key) => {
 };
 
 /**
+ * Escapes user-controlled strings for safe innerHTML interpolation.
+ * Use at every `${...}` site that renders record attributes, names,
+ * messages, filenames or notes — never trust server data in templates.
+ * @param {any} value - Raw value (nil-safe).
+ * @returns {string} HTML-escaped string.
+ */
+export const escapeHtml = (value) => {
+  return String(value ?? "").replace(/[&<>"']/g, (ch) => ({
+    "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
+  }[ch]));
+};
+
+/**
  * Returns the data-language-target attribute string for the language dropdown trigger.
  * @returns {string} `data-language-target="triggerDropdown"`
  */
