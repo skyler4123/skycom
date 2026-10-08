@@ -13,7 +13,8 @@ class Seed::DocumentService
     lifecycle_status: nil,
     workflow_status: nil,
     business_type: nil,
-    discarded_at: nil
+    discarded_at: nil,
+    **attrs
   )
     document_group ||= DocumentGroup.create!(company: company, branch: branch) if company
     branch ||= document_group.branch if document_group
@@ -33,7 +34,8 @@ class Seed::DocumentService
       lifecycle_status: lifecycle_status || Document.lifecycle_statuses.keys.sample,
       workflow_status: workflow_status || Document.workflow_statuses.keys.sample,
       business_type: business_type || Document.business_types.keys.sample,
-      discarded_at: discarded_at
+      discarded_at: discarded_at,
+      **attrs
     )
   end
 

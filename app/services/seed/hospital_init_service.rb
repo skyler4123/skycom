@@ -148,6 +148,24 @@ class Seed::HospitalInitService
         visible_columns: %w[name code unit estimated_unit_price]
       }
     },
+    documents: {
+      "Clinical Protocol" => {
+        properties: { property_string_1: "Department", property_string_2: "Applies To" },
+        visible_columns: %w[name title code workflow_status]
+      },
+      "Staff Benefits" => {
+        properties: { property_string_1: "Benefit Type", property_string_2: "Eligibility" },
+        visible_columns: %w[name title code workflow_status]
+      },
+      "Career & Promotion" => {
+        properties: { property_string_1: "Level", property_string_2: "Review Cycle" },
+        visible_columns: %w[name title code workflow_status]
+      },
+      "How-To Guides" => {
+        properties: { property_string_1: "Topic", property_string_2: "Audience" },
+        visible_columns: %w[name title code workflow_status]
+      }
+    },
     events: {
       "Procedure Booking" => {
         properties: { property_string_1: "Procedure Type", property_integer_1: "Duration (minutes)" },
@@ -408,7 +426,9 @@ class Seed::HospitalInitService
         "PurchaseItem" => { create: true, read: true, update: true, delete: true },
         "CompanyTicket" => { create: true, read: true, update: true, delete: true },
         "CompanyTicketComment" => { create: true, read: true, update: true, delete: true },
-        "CompanyTicketLog" => { create: true, read: true, update: true, delete: true }
+        "CompanyTicketLog" => { create: true, read: true, update: true, delete: true },
+        "Document" => { create: true, read: true, update: true, delete: true },
+        "DocumentGroup" => { create: true, read: true, update: true, delete: true }
       },
       Admin: {
         "Product" => { create: true, read: true, update: true, delete: true },
@@ -460,7 +480,9 @@ class Seed::HospitalInitService
         "PurchaseItem" => { create: true, read: true, update: true, delete: true },
         "CompanyTicket" => { create: true, read: true, update: true, delete: true },
         "CompanyTicketComment" => { create: true, read: true, update: true, delete: true },
-        "CompanyTicketLog" => { create: true, read: true, update: true, delete: true }
+        "CompanyTicketLog" => { create: true, read: true, update: true, delete: true },
+        "Document" => { create: true, read: true, update: true, delete: true },
+        "DocumentGroup" => { create: true, read: true, update: true, delete: true }
       }
     }
 
