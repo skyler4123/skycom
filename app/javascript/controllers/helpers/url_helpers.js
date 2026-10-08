@@ -174,6 +174,13 @@ export const company_attendance_config_log_path = (companyId, id) => `/companies
 export const company_attendance_days_path = (companyId) => `/companies/${companyId}/attendance_days`
 export const company_attendance_day_path = (companyId, id) => `/companies/${companyId}/attendance_days/${id}`
 
+export const company_attendance_requests_path = (companyId) => `/companies/${companyId}/attendance_requests`
+export const new_company_attendance_request_path = (companyId) => `/companies/${companyId}/attendance_requests/new`
+export const company_attendance_request_path = (companyId, id) => `/companies/${companyId}/attendance_requests/${id}`
+export const create_company_attendance_requests_path = (companyId) => `/companies/${companyId}/attendance_requests`
+export const approve_company_attendance_request_path = (companyId, id) => `/companies/${companyId}/attendance_requests/${id}/approve`
+export const reject_company_attendance_request_path = (companyId, id) => `/companies/${companyId}/attendance_requests/${id}/reject`
+
 export const company_attendance_months_path = (companyId) => `/companies/${companyId}/attendance_months`
 export const company_attendance_month_path = (companyId, id) => `/companies/${companyId}/attendance_months/${id}`
 

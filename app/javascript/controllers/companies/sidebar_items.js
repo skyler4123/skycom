@@ -48,6 +48,7 @@ export const SIDEBAR_ITEMS = [
   { key: "shift_templates", group: "attendance", icon: "schedule", label: "Shift Templates", href: (cid) => Helpers.company_shift_templates_path(cid) },
   { key: "scheduled_shifts", group: "attendance", icon: "calendar_month", label: "Shifts", href: (cid) => Helpers.company_scheduled_shifts_path(cid) },
   { key: "attendance_days", group: "attendance", icon: "badge", label: "Attendance Days", href: (cid) => Helpers.company_attendance_days_path(cid) },
+  { key: "attendance_requests", group: "attendance", icon: "approval", label: "Attendance Requests", href: (cid) => Helpers.company_attendance_requests_path(cid) },
   { key: "attendance_configs", group: "attendance", icon: "gps_fixed", label: "Attendance Configs", href: (cid) => Helpers.company_attendance_configs_path(cid) },
   { key: "attendance_config_logs", group: "attendance", icon: "history", label: "Attendance Config Logs", href: (cid) => Helpers.company_attendance_config_logs_path(cid) },
   { key: "attendance_logs", group: "attendance", icon: "receipt_long", label: "Attendance Logs", href: (cid) => Helpers.company_attendance_logs_path(cid) },
