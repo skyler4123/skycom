@@ -62,6 +62,7 @@ export const SIDEBAR_ITEMS = [
   { key: "suppliers", group: "inventory", icon: "local_shipping", label: "Suppliers", href: (cid) => Helpers.company_suppliers_path(cid) },
   { key: "policies", group: "authorization", icon: "security", label: "Policies", href: (cid) => Helpers.company_policies_path(cid) },
   { key: "permissions", group: "authorization", icon: "shield", label: "Permissions", href: (cid) => Helpers.company_permissions_path(cid) },
+  { key: "permission_logs", group: "authorization", icon: "history", label: "Permission Logs", href: (cid) => Helpers.company_permission_logs_path(cid) },
   { key: "usage", group: "system", icon: "monitoring", label: "Usage", href: (cid) => Helpers.company_usage_path(cid) },
   { key: "top_up", group: "system", icon: "account_balance_wallet", label: "Top Up", href: (cid) => Helpers.new_company_top_up_path(cid) },
   { key: "billing", group: "system", icon: "receipt_long", label: "Billing", href: (cid) => Helpers.company_billing_path(cid) },

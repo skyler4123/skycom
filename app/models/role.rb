@@ -46,6 +46,7 @@ class Role < ApplicationRecord
 
   has_many :policy_role_appointments, dependent: :destroy
   has_many :policies, through: :policy_role_appointments
+  has_many :permission_logs, dependent: :nullify
 
   has_many :employee_group_appointments, dependent: :destroy, as: :appoint_to
   has_many :employee_groups, through: :employee_group_appointments

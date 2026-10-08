@@ -356,6 +356,11 @@ export const dictionary = () => {
     "Electronics": { vi: "Điện tử" },
 
     // === Permissions ===
+    "Permission Logs": { vi: "Nhật ký quyền" },
+    "Permission Log": { vi: "Nhật ký quyền" },
+    "Failed to load permission logs": { vi: "Không tải được nhật ký quyền" },
+    "Failed to load permission log": { vi: "Không tải được nhật ký quyền" },
+    "Changed By": { vi: "Người thay đổi" },
     "Manage role-based permissions by toggling policies": { vi: "Quản lý quyền dựa trên vai trò bằng cách bật/tắt chính sách" },
     "Add Resource": { vi: "Thêm tài nguyên" },
     "Configure permission and tag conditions": { vi: "Cấu hình quyền và điều kiện thẻ" },

@@ -1,3 +1,7 @@
+# app/controllers/companies/policies_controller.rb
+#
+# Policies dashboard API (read-only index today). Future create/update/delete
+# writes MUST log via PermissionLogs::WriteService (see Companies::PermissionsController).
 class Companies::PoliciesController < Companies::ApplicationController
   def index
     respond_to do |format|

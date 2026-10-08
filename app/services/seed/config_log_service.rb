@@ -8,6 +8,7 @@ class Seed::ConfigLogService
     seed_event_config_logs(company, employees)
     seed_attendance_config_logs(company, employees)
     seed_table_config_logs(company, employees)
+    seed_permission_logs(company, employees)
   end
 
   def self.seed_event_config_logs(company, employees)
@@ -70,6 +71,40 @@ class Seed::ConfigLogService
         created_at: 2.days.ago, updated_at: 2.days.ago
       )
     end
+  end
+
+  def self.seed_permission_logs(company, employees)
+    appointments = company.policy_role_appointments.includes(:role, :policy).limit(3).to_a
+    return if appointments.empty?
+
+    appointments.each_with_index do |appointment, i|
+      actor = employees.sample
+      role = appointment.role
+      policy = appointment.policy
+      PermissionLogs::WriteService.call(
+        company: company,
+        action: i.even? ? :granted : :revoked,
+        actor: actor,
+        role: role,
+        policy: policy,
+        appointment: appointment,
+        from_workflow_status: i.even? ? "inactive" : "active",
+        to_workflow_status: i.even? ? "active" : "inactive"
+      )
+    end
+
+    first = appointments.first
+    updater = employees.sample
+    PermissionLogs::WriteService.call(
+      company: company,
+      action: :conditions_changed,
+      actor: updater,
+      role: first.role,
+      policy: first.policy,
+      appointment: first,
+      tag_conditions_before: {},
+      tag_conditions_after: { "brand" => "Apple" }
+    )
   end
 
   def self.seed_table_config_logs(company, employees)
