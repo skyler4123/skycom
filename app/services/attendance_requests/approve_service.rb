@@ -16,20 +16,28 @@ class AttendanceRequests::ApproveService
   end
 
   def call
-    return failure("Request is not pending") unless @request.status_pending?
     return failure("Approver is required") if @approver.nil?
     unless @approver.can?(:update, @request)
       return failure("You are not authorized to update this record")
     end
-    return failure("Attendance already recorded for this date") if day_exists?
 
-    day = nil
+    # Row-locked re-check: concurrent approvers serialize here, so exactly one
+    # of them creates the day and the loser sees "already decided".
+    result = nil
     ActiveRecord::Base.transaction do
-      day = create_day!
-      @request.update!(status: :approved, decided_by: @approver, decided_at: Time.current)
+      @request.with_lock do
+        if !@request.status_pending?
+          result = failure("Request already decided")
+        elsif day_exists?
+          result = failure("Attendance already recorded for this date")
+        else
+          day = create_day!
+          @request.update!(status: :approved, decided_by: @approver, decided_at: Time.current)
+          result = { success: true, attendance_day: day }
+        end
+      end
     end
-
-    { success: true, attendance_day: day }
+    result
   end
 
   private

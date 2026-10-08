@@ -14,20 +14,28 @@ class AttendanceRequests::RejectService
   end
 
   def call
-    return failure("Request is not pending") unless @request.status_pending?
     return failure("Approver is required") if @approver.nil?
     unless @approver.can?(:update, @request)
       return failure("You are not authorized to update this record")
     end
 
-    @request.update!(
-      status: :rejected,
-      decided_by: @approver,
-      decided_at: Time.current,
-      decision_note: @note
-    )
-
-    { success: true }
+    result = nil
+    ActiveRecord::Base.transaction do
+      @request.with_lock do
+        if !@request.status_pending?
+          result = failure("Request already decided")
+        else
+          @request.update!(
+            status: :rejected,
+            decided_by: @approver,
+            decided_at: Time.current,
+            decision_note: @note
+          )
+          result = { success: true }
+        end
+      end
+    end
+    result
   end
 
   private

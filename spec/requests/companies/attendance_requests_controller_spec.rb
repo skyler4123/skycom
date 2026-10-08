@@ -27,6 +27,15 @@ RSpec.describe "Companies::AttendanceRequestsController", type: :request do
 
   before { get sign_in_for_test_path(email: company.user.email) }
 
+  it "ignores bogus filter params instead of 500ing" do
+    get company_attendance_requests_path(company, format: :json),
+      params: { status: "hijack", from: "not-a-date", to: "%%%" }
+
+    expect(response).to have_http_status(:ok)
+    ids = JSON.parse(response.body)["attendance_requests"].map { |r| r["id"] }
+    expect(ids).to include(attendance_request.id)
+  end
+
   it "ignores employee_id/status params on create" do
     post company_attendance_requests_path(company), params: {
       attendance_request: {

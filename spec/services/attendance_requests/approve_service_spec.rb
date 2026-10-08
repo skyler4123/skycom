@@ -62,12 +62,11 @@ RSpec.describe AttendanceRequests::ApproveService do
     expect(request.reload).to be_status_pending
   end
 
-  it "fails on a second decide (terminal state)" do
+  it "reports already decided on a second decide" do
     expect(described_class.call(request: request, approver: owner)[:success]).to be true
 
     second = described_class.call(request: request, approver: owner)
-    expect(second[:success]).to be false
-    expect(AttendanceDay.where(company: company, employee: employee, attendance_date: request.attendance_date).count).to eq(1)
+    expect(second[:errors]).to eq([ "Request already decided" ])
   end
 
   it "fails when approver lacks update permission" do

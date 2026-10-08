@@ -20,9 +20,11 @@ class Companies::AttendanceRequestsController < Companies::ApplicationController
       format.json do
         scope = current_company.attendance_requests.includes(:employee).order(attendance_date: :desc)
         scope = scope.where(employee_id: params[:employee_id]) if params[:employee_id].present?
-        scope = scope.where(status: params[:status]) if params[:status].present?
-        scope = scope.where("attendance_date >= ?", params[:from]) if params[:from].present?
-        scope = scope.where("attendance_date <= ?", params[:to]) if params[:to].present?
+        scope = scope.where(status: params[:status]) if AttendanceRequest.statuses.key?(params[:status].to_s)
+        from = parse_filter_date(params[:from])
+        scope = scope.where("attendance_date >= ?", from) if from
+        to = parse_filter_date(params[:to])
+        scope = scope.where("attendance_date <= ?", to) if to
         @pagy, @results = pagy(:offset, scope, jsonapi: true)
         render json: { attendance_requests: @results.map { |r| format_request(r) }, pagination: @pagy.data_hash }
       end
@@ -98,6 +100,12 @@ class Companies::AttendanceRequestsController < Companies::ApplicationController
     params.require(:attendance_request).permit(
       :attendance_date, :check_in, :check_out, :reason, :business_type, :branch_id
     )
+  end
+
+  def parse_filter_date(value)
+    Date.parse(value.to_s)
+  rescue ArgumentError, TypeError, Date::Error
+    nil
   end
 
   def format_request(r)

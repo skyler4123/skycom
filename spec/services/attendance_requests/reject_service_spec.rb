@@ -27,11 +27,12 @@ RSpec.describe AttendanceRequests::RejectService do
     expect(request.decided_at).to be_present
   end
 
-  it "fails on a second decide" do
+  it "reports already decided on a second decide" do
     expect(described_class.call(request: request, approver: owner)[:success]).to be true
 
     second = described_class.call(request: request, approver: owner)
     expect(second[:success]).to be false
+    expect(second[:errors]).to eq([ "Request already decided" ])
   end
 
   it "fails when approver lacks update permission" do

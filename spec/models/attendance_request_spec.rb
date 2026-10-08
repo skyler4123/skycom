@@ -15,6 +15,10 @@ RSpec.describe AttendanceRequest, type: :model do
   end
 
   describe "guards" do
+    it "factory creates a valid record out of the box" do
+      expect(create(:attendance_request)).to be_persisted
+    end
+
     let(:company) { create(:company) }
     let(:employee) { create(:employee, company: company) }
 
@@ -36,6 +40,13 @@ RSpec.describe AttendanceRequest, type: :model do
       create(:attendance_request, company: company, employee: employee, attendance_date: Date.yesterday)
       dup = build(:attendance_request, company: company, employee: employee, attendance_date: Date.yesterday)
       expect(dup).not_to be_valid
+    end
+
+    it "rejects a branch from another company" do
+      other_branch = create(:branch, company: create(:company))
+      req = build(:attendance_request, company: company, employee: employee, branch: other_branch)
+      expect(req).not_to be_valid
+      expect(req.errors[:branch]).to be_present
     end
 
     it "allows decided_by to be blank on pending" do

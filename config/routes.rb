@@ -88,7 +88,7 @@ Rails.application.routes.draw do
       resources :attendance_config_logs, only: [ :index, :show ]
       resources :attendance_logs
       resources :attendance_days
-      resources :attendance_requests do
+      resources :attendance_requests, only: %i[index show new create] do
         member do
           post :approve
           post :reject

@@ -10,6 +10,10 @@ class Mobile::AttendanceRequestsController < Mobile::BaseController
       redirect_to mobile_home_path, alert: "No employee record found" and return
     end
 
+    unless employee.can?(:create, AttendanceRequest)
+      redirect_to mobile_home_path, alert: "You are not authorized to create attendance requests" and return
+    end
+
     attendance_request = AttendanceRequest.new(request_params)
     attendance_request.company = employee.company
     attendance_request.branch ||= employee.branch

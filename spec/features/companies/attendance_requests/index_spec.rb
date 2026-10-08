@@ -48,6 +48,28 @@ RSpec.feature "Companies::AttendanceRequests Management", type: :feature, js: tr
     expect(page).to have_content("Field work - no GPS")
   end
 
+  scenario "filters the queue by status" do
+    AttendanceRequest.create!(
+      company: company, employee: employee,
+      attendance_date: Date.yesterday - 2.days,
+      check_in: Time.zone.parse("#{Date.yesterday - 2.days} 09:00"),
+      check_out: Time.zone.parse("#{Date.yesterday - 2.days} 17:00"),
+      reason: "Remote work audit visit"
+    ).update!(status: :approved)
+
+    visit company_attendance_requests_path(company)
+    expect(page).to have_selector("table", wait: 10)
+    expect(page).to have_content("Field work - no GPS")
+    expect(page).to have_content("Remote work audit visit")
+
+    select "Pending", from: "status"
+    click_button "Search"
+
+    expect(page).to have_current_path(/status=pending/, wait: 10)
+    expect(page).to have_content("Field work - no GPS")
+    expect(page).not_to have_content("Remote work audit visit")
+  end
+
   scenario "manager approves a pending request and day appears" do
     visit company_attendance_requests_path(company)
     expect(page).to have_selector("table", wait: 10)

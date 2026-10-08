@@ -36,6 +36,25 @@ RSpec.describe "Mobile::AttendanceRequestsController", type: :request do
     expect(response).to have_http_status(:found)
   end
 
+  it "redirects with alert when the employee lacks create permission" do
+    other_user = create(:user)
+    create(:employee, user: other_user, company: company)
+    get sign_in_for_test_path(email: other_user.email)
+
+    expect {
+      post mobile_attendance_requests_path, params: {
+        attendance_request: {
+          attendance_date: Date.yesterday,
+          check_in: Time.zone.parse("#{Date.yesterday} 09:00"),
+          reason: "Remote work"
+        }
+      }
+    }.not_to change(AttendanceRequest, :count)
+
+    expect(response).to redirect_to(mobile_home_path)
+    expect(flash[:alert]).to be_present
+  end
+
   it "redirects with alert when the user has no employee record" do
     stranger = create(:user)
     get sign_in_for_test_path(email: stranger.email)

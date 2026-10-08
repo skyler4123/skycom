@@ -75,6 +75,11 @@ export default class Companies_AttendanceRequests_IndexController extends Compan
   }
 
   contentHTML() {
+    const urlParams = new URLSearchParams(window.location.search)
+    const statusValue = urlParams.get('status') || ''
+    const statusOptions = [ 'pending', 'approved', 'rejected' ]
+      .map(s => `<option value="${s}" ${s === statusValue ? 'selected' : ''}>${Helpers.capitalize(s)}</option>`).join('')
+
     return `
       <div class="p-4 overflow-y-auto">
         <div class="p-4 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 flex flex-col">
@@ -86,6 +91,29 @@ export default class Companies_AttendanceRequests_IndexController extends Compan
               ${translate("Add")}
             </a>
           </div>
+          <form
+            method="get"
+            action="${pathname()}"
+            class="flex flex-wrap items-end gap-3 mb-6"
+          >
+            <div class="flex flex-col gap-1">
+              <label class="text-[10px] font-bold text-slate-400 uppercase ml-1">${translate("Status")}</label>
+              <select
+                name="status"
+                class="pl-3 pr-10 py-2 text-sm border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300"
+              >
+                <option value="">${translate("All")}</option>
+                ${statusOptions}
+              </select>
+            </div>
+            <button
+              type="submit"
+              class="h-[38px] px-6 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium text-sm flex items-center gap-2 cursor-pointer"
+            >
+              <span class="material-symbols-outlined text-[18px]!">search</span>
+              ${translate("Search")}
+            </button>
+          </form>
           <div class="overflow-x-auto">
             <table class="w-full text-left border-collapse">
               <thead>

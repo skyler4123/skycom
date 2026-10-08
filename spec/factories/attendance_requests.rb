@@ -2,7 +2,7 @@
 FactoryBot.define do
   factory :attendance_request do
     association :company
-    association :employee
+    employee { association :employee, company: company }
     attendance_date { Date.yesterday }
     check_in { Time.zone.parse("#{Date.yesterday} 09:00") }
     check_out { Time.zone.parse("#{Date.yesterday} 17:00") }

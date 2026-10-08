@@ -19,6 +19,7 @@ class AttendanceRequest < ApplicationRecord
   validate :check_out_after_check_in
   validate :only_one_live_request_per_employee_date, on: :create
   validate :employee_belongs_to_company
+  validate :branch_belongs_to_company
 
   # The AttendanceDay created on approval (nil until approved).
   def attendance_day
@@ -48,6 +49,13 @@ class AttendanceRequest < ApplicationRecord
       company_id: company_id, employee_id: employee_id, attendance_date: attendance_date, discarded_at: nil
     ).where.not(id: id).exists?
     errors.add(:attendance_date, "already has a request for this employee and date") if exists
+  end
+
+  def branch_belongs_to_company
+    return if branch.blank? || company_id.blank?
+    return if branch.company_id == company_id
+
+    errors.add(:branch, "must belong to the same company")
   end
 
   def employee_belongs_to_company
