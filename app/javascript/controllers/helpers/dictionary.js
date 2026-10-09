@@ -286,6 +286,7 @@ export const dictionary = () => {
     "Active": { vi: "Hoạt động" },
     "Inactive": { vi: "Không hoạt động" },
     "Draft": { vi: "Bản nháp" },
+    "Published": { vi: "Đã xuất bản" },
     "Pending": { vi: "Đang chờ" },
     "Approved": { vi: "Đã duyệt" },
     "Deployed": { vi: "Đã triển khai" },
