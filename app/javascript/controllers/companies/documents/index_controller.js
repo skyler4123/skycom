@@ -9,7 +9,7 @@ export default class Companies_Documents_IndexController extends Companies_Layou
   // Docs: docs/DYNAMIC_TABLE.md §2.5
   static targets = ["documentsList"]
 
-  /** @type {(Document & { title: string })[]} */
+  /** @type {(Document & { name: string })[]} */
   documents = []
 
   async connect() {
@@ -59,7 +59,7 @@ export default class Companies_Documents_IndexController extends Companies_Layou
     const propertyMapping = this.currentPropertyMapping()
 
     const fallbackColumns = [
-      { key: "title", name: translate("Document Title") },
+      { key: "name", name: translate("Document Name") },
       { key: "code", name: translate("Code") },
       { key: "workflow_status", name: translate("Status") }
     ]
@@ -68,7 +68,7 @@ export default class Companies_Documents_IndexController extends Companies_Layou
     const visibleColumns = rawColumns.filter(col => col.visible !== false)
 
     if (!visibleColumns.some(c => c.key === "category")) {
-      const nameIdx = visibleColumns.findIndex(c => c.key === "title")
+      const nameIdx = visibleColumns.findIndex(c => c.key === "name")
       if (nameIdx >= 0) visibleColumns.splice(nameIdx + 1, 0, { key: "category", name: translate("Category") })
     }
 
@@ -129,7 +129,7 @@ export default class Companies_Documents_IndexController extends Companies_Layou
               target: "documentsList",
               mappingLookup,
               renderers: {
-                title: (value, record) => `
+                name: (value, record) => `
                   <div class="flex items-center gap-4">
                     <div class="w-8 h-8 rounded-lg bg-sky-100 dark:bg-sky-900/30 flex items-center justify-center shrink-0">
                       <span class="material-symbols-outlined text-sky-600 dark:text-sky-400 text-[18px]!">article</span>

@@ -4,11 +4,10 @@ RSpec.feature "Companies::Documents Show", type: :feature, js: true do
   let(:company) { create(:company) }
   let(:owner) { company.user }
   let(:category) { Seed::CategoryService.find_or_create_for(company: company, resource_name: "documents") }
-  let(:document_group) { Seed::DocumentGroupService.create(company: company) }
 
   let!(:document) do
     Seed::DocumentService.create(company: company, category: category,
-      document_group: document_group, title: "Onboarding Guide",
+      name: "Onboarding Guide",
       body_markdown: "# Welcome\n\nDo *this* first.",
       workflow_status: "completed")
   end
@@ -55,8 +54,8 @@ RSpec.feature "Companies::Documents Show", type: :feature, js: true do
     expect(page).to have_content("Draft", wait: 10)
   end
 
-  scenario "escapes hostile titles and filenames (XSS-safe)" do
-    document.update!(title: '"><img src=x onerror=alert(1)>')
+  scenario "escapes hostile names and filenames (XSS-safe)" do
+    document.update!(name: '"><img src=x onerror=alert(1)>')
 
     visit company_document_path(company, document)
 

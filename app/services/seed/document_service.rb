@@ -11,13 +11,10 @@ class Seed::DocumentService
   def self.new(
     company:,
     branch: nil,
-    document_group: nil,
     category: nil,
     property_mapping: nil,
-    title: nil,
     name: nil,
     description: nil,
-    content: nil,
     body_markdown: nil,
     code: nil,
     lifecycle_status: nil,
@@ -26,20 +23,13 @@ class Seed::DocumentService
     discarded_at: nil,
     **attrs
   )
-    document_group ||= Seed::DocumentGroupService.create(company: company, branch: branch) if company
-    branch ||= document_group.branch if document_group
-    company ||= document_group.company if document_group
-
     Document.new(
       company: company,
       branch: branch,
-      document_group: document_group,
       category: category,
       property_mapping: property_mapping,
-      title: title || Faker::Lorem.sentence(word_count: 4),
       name: name || "Document #{Faker::Lorem.sentence(word_count: 3)}",
       description: description || Faker::Lorem.sentence(word_count: 10),
-      content: content || { "body" => Faker::Lorem.paragraph(sentence_count: 3) },
       body_markdown: body_markdown,
       code: code || "DOC-#{SecureRandom.hex(4).upcase}",
       lifecycle_status: lifecycle_status || Document.lifecycle_statuses.keys.sample,

@@ -669,31 +669,21 @@ class Seed::RetailEnrichService
     end
   end
 
-  # Sample documents across every documents category (round-robin): 2 groups,
-  # 3 docs per group. Groups use document_groups categories; docs use documents
-  # categories so the first category always has data (docs/INIT_AND_ENRICH.md).
+  # Sample documents across every documents category (round-robin, standalone —
+  # no groups) so the first category always has data (docs/INIT_AND_ENRICH.md).
   def create_documents
     puts "Creating documents..."
-    group_categories = Category.where(company: @retail, resource_name: "document_groups").order(:id).to_a
     doc_categories = Category.where(company: @retail, resource_name: "documents").order(:id).to_a
     return if doc_categories.empty?
 
-    2.times do |gi|
-      branch = @branches[gi % @branches.length] if @branches.present?
-      group = Seed::DocumentGroupService.create(
+    6.times do |di|
+      branch = @branches[di % @branches.length] if @branches.present?
+      Seed::DocumentService.create(
         company: @retail,
         branch: branch,
-        category: round_robin(group_categories, gi)
+        category: round_robin(doc_categories, di),
+        body_markdown: Seed::DocumentService::RICH_BODY_MARKDOWN_VARIANTS[di % Seed::DocumentService::RICH_BODY_MARKDOWN_VARIANTS.length]
       )
-      3.times do |di|
-        Seed::DocumentService.create(
-          company: @retail,
-          branch: group.branch,
-          document_group: group,
-          category: round_robin(doc_categories, gi * 3 + di),
-          body_markdown: Seed::DocumentService::RICH_BODY_MARKDOWN_VARIANTS[(gi * 3 + di) % Seed::DocumentService::RICH_BODY_MARKDOWN_VARIANTS.length]
-        )
-      end
     end
   end
 

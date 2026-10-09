@@ -4,7 +4,6 @@ RSpec.feature "Companies::Documents New", type: :feature, js: true do
   let(:company) { create(:company) }
   let(:owner) { company.user }
   let(:category) { Seed::CategoryService.find_or_create_for(company: company, resource_name: "documents") }
-  let!(:document_group) { Seed::DocumentGroupService.create(company: company, name: "Policies") }
 
   before do
     sign_in(owner)
@@ -37,19 +36,18 @@ RSpec.feature "Companies::Documents New", type: :feature, js: true do
     page.execute_script("document.cookie = 'client_cache_version=forced; path=/'")
   end
 
-  scenario "renders title, body, preview and group fields" do
+  scenario "renders name, body, preview fields" do
     visit new_company_document_path(company)
 
-    expect(page).to have_selector('input[name="document[title]"]', wait: 10)
+    expect(page).to have_selector('input[name="document[name]"]', wait: 10)
     expect(page).to have_selector('textarea[name="document[body_markdown]"]', wait: 10)
     expect(page).to have_selector('[data-preview="markdown"]', wait: 10)
-    expect(page).to have_select('document[document_group_id]', wait: 10)
   end
 
   scenario "live preview renders markdown while typing" do
     visit new_company_document_path(company)
 
-    fill_in 'document[title]', with: 'Preview Doc'
+    fill_in 'document[name]', with: 'Preview Doc'
     fill_in 'document[body_markdown]', with: '# Welcome'
 
     preview = find('[data-preview="markdown"]', wait: 10)
@@ -59,13 +57,12 @@ RSpec.feature "Companies::Documents New", type: :feature, js: true do
   scenario "creates document and redirects to show page" do
     visit new_company_document_path(company)
 
-    fill_in 'document[title]', with: 'Leave Policy'
+    fill_in 'document[name]', with: 'Leave Policy'
     fill_in 'document[body_markdown]', with: "# Leave\n\nTake **days** off."
-    select 'Policies', from: 'document[document_group_id]'
 
     click_button "Save Document"
 
-    created = Document.find_by(title: "Leave Policy")
+    created = Document.find_by(name: "Leave Policy")
     expect(created).to be_present
     expect(page).to have_current_path(company_document_path(company, created), wait: 10)
     expect(page).to have_content('Leave Policy', wait: 10)

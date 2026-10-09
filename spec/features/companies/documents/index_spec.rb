@@ -10,22 +10,19 @@ RSpec.feature "Companies::Documents Index", type: :feature, js: true do
       property_mapping: cat.default_property_mapping, resource_name: "documents",
       metadata: { "columns" => [
         { "key" => "name", "name" => "Name", "visible" => true, "search" => true },
-        { "key" => "title", "name" => "Title", "visible" => true },
         { "key" => "code", "name" => "Code", "visible" => true },
         { "key" => "workflow_status", "name" => "Status", "visible" => true }
       ] })
     cat
   end
-  let(:document_group) { Seed::DocumentGroupService.create(company: company) }
-
   let!(:policy_doc) do
     Seed::DocumentService.create(company: company, category: category,
-      document_group: document_group, title: "Leave Policy",
+      name: "Leave Policy",
       body_markdown: "# Leave", workflow_status: "completed")
   end
   let!(:guide_doc) do
     Seed::DocumentService.create(company: company, category: category,
-      document_group: document_group, title: "Onboarding Guide",
+      name: "Onboarding Guide",
       body_markdown: "# Onboarding", workflow_status: "draft")
   end
 

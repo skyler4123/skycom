@@ -160,29 +160,19 @@ class Seed::HotelInitService
     documents: {
       "Hotel Policy" => {
         properties: { property_string_1: "Policy Owner", property_string_2: "Applies To" },
-        visible_columns: %w[name title code workflow_status]
+        visible_columns: %w[name code workflow_status]
       },
       "Staff Benefits" => {
         properties: { property_string_1: "Benefit Type", property_string_2: "Eligibility" },
-        visible_columns: %w[name title code workflow_status]
+        visible_columns: %w[name code workflow_status]
       },
       "Career & Promotion" => {
         properties: { property_string_1: "Level", property_string_2: "Review Cycle" },
-        visible_columns: %w[name title code workflow_status]
+        visible_columns: %w[name code workflow_status]
       },
       "How-To Guides" => {
         properties: { property_string_1: "Topic", property_string_2: "Audience" },
-        visible_columns: %w[name title code workflow_status]
-      }
-    },
-    document_groups: {
-      "Policy Groups" => {
-        properties: { property_string_1: "Group Owner", property_string_2: "Applies To" },
-        visible_columns: %w[name title code workflow_status]
-      },
-      "Guide Groups" => {
-        properties: { property_string_1: "Topic", property_string_2: "Audience" },
-        visible_columns: %w[name title code workflow_status]
+        visible_columns: %w[name code workflow_status]
       }
     },
     events: {
@@ -427,8 +417,7 @@ class Seed::HotelInitService
         "PurchaseItem" => full_crud,
         "DiscountGroup" => full_crud,
         "Discount" => full_crud,
-        "Document" => full_crud,
-        "DocumentGroup" => full_crud
+        "Document" => full_crud
       },
       Admin: {
         "Product" => full_crud,
@@ -474,8 +463,7 @@ class Seed::HotelInitService
         "PurchaseItem" => full_crud,
         "DiscountGroup" => full_crud,
         "Discount" => full_crud,
-        "Document" => full_crud,
-        "DocumentGroup" => full_crud
+        "Document" => full_crud
       }
     }
 

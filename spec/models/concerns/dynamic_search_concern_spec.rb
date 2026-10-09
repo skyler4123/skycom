@@ -45,11 +45,6 @@ DYNAMIC_SEARCH_MODELS = {
     question = create_searchable_record(Question, company, "questions")
     create_searchable_record(Answer, company, "answers", question: question)
   },
-  Article => ->(company) {
-    article_group = create_searchable_record(ArticleGroup, company, "article_groups")
-    create_searchable_record(Article, company, "articles", article_group: article_group)
-  },
-  ArticleGroup => ->(company) { create_searchable_record(ArticleGroup, company, "article_groups") },
   Branch => ->(company) { create(:branch, company: company) },
   Brand => ->(company) { create(:brand, company: company) },
   Cart => ->(company) {
@@ -61,10 +56,8 @@ DYNAMIC_SEARCH_MODELS = {
   CustomerGroup => ->(company) { create_searchable_record(CustomerGroup, company, "customer_groups") },
   Department => ->(company) { create(:department, company: company) },
   Document => ->(company) {
-    document_group = create_searchable_record(DocumentGroup, company, "document_groups")
-    create_searchable_record(Document, company, "documents", document_group: document_group)
+    create_searchable_record(Document, company, "documents")
   },
-  DocumentGroup => ->(company) { create_searchable_record(DocumentGroup, company, "document_groups") },
   Employee => ->(company) { create(:employee, company: company, user: create(:user), branch: create(:branch, company: company)) },
   EmployeeGroup => ->(company) { create(:employee_group, company: company) },
   Event => ->(company) {

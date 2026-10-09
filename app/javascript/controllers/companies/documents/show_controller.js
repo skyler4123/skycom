@@ -140,7 +140,7 @@ export default class Companies_Documents_ShowController extends Companies_Layout
               <span class="material-symbols-outlined text-4xl text-sky-600 dark:text-sky-400">article</span>
             </div>
             <div class="flex flex-1 flex-col text-center sm:text-left">
-              <h2 class="text-2xl font-black text-slate-900 dark:text-white">${escapeHtml(d.title)}</h2>
+              <h2 class="text-2xl font-black text-slate-900 dark:text-white">${escapeHtml(d.name)}</h2>
               <p class="font-semibold text-sky-600 dark:text-sky-400">${escapeHtml(d.description) || ''}</p>
               <div class="mt-4 flex flex-wrap justify-center gap-2 sm:justify-start">
                 <span class="inline-flex items-center rounded-lg bg-sky-100 dark:bg-sky-900/40 px-3 py-1 text-xs font-bold text-sky-700 dark:text-sky-300 uppercase">${escapeHtml(d.code) || translate("N/A")}</span>
@@ -149,7 +149,7 @@ export default class Companies_Documents_ShowController extends Companies_Layout
             </div>
           </div>
 
-          <div class="grid grid-cols-1 gap-6 border-t border-slate-200 dark:border-gray-800 pt-6 sm:grid-cols-2">
+          <div class="grid grid-cols-1 gap-6 border-t border-slate-200 dark:border-gray-800 pt-6">
             <div class="flex items-center gap-3">
               <div class="flex size-10 items-center justify-center rounded-lg bg-slate-100 dark:bg-gray-800 text-sky-600 dark:text-sky-400">
                 <span class="material-symbols-outlined">folder</span>
@@ -157,16 +157,6 @@ export default class Companies_Documents_ShowController extends Companies_Layout
               <div>
                 <p class="text-xs font-medium text-slate-500 dark:text-gray-400">${translate("Category")}</p>
                 <p class="text-sm font-semibold text-slate-900 dark:text-white">${escapeHtml(category?.name || d.category?.name) || translate("N/A")}</p>
-              </div>
-            </div>
-
-            <div class="flex items-center gap-3">
-              <div class="flex size-10 items-center justify-center rounded-lg bg-slate-100 dark:bg-gray-800 text-sky-600 dark:text-sky-400">
-                <span class="material-symbols-outlined">topic</span>
-              </div>
-              <div>
-                <p class="text-xs font-medium text-slate-500 dark:text-gray-400">${translate("Document Group")}</p>
-                <p class="text-sm font-semibold text-slate-900 dark:text-white">${escapeHtml(d.document_group?.name) || translate("N/A")}</p>
               </div>
             </div>
           </div>

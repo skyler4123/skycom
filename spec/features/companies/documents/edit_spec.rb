@@ -4,11 +4,10 @@ RSpec.feature "Companies::Documents Edit", type: :feature, js: true do
   let(:company) { create(:company) }
   let(:owner) { company.user }
   let(:category) { Seed::CategoryService.find_or_create_for(company: company, resource_name: "documents") }
-  let(:document_group) { Seed::DocumentGroupService.create(company: company) }
 
   let!(:document) do
     Seed::DocumentService.create(company: company, category: category,
-      document_group: document_group, title: "Old Title",
+      name: "Old Name",
       body_markdown: "# Old", workflow_status: "draft")
   end
 
@@ -43,23 +42,23 @@ RSpec.feature "Companies::Documents Edit", type: :feature, js: true do
     page.execute_script("document.cookie = 'client_cache_version=forced; path=/'")
   end
 
-  scenario "prefills title and body" do
+  scenario "prefills name and body" do
     visit edit_company_document_path(company, document)
 
-    expect(page).to have_field('document[title]', with: 'Old Title', wait: 10)
+    expect(page).to have_field('document[name]', with: 'Old Name', wait: 10)
     expect(page).to have_field('document[body_markdown]', with: '# Old', wait: 10)
   end
 
   scenario "updates body and redirects to show page" do
     visit edit_company_document_path(company, document)
 
-    fill_in 'document[title]', with: 'New Title'
+    fill_in 'document[name]', with: 'New Name'
     fill_in 'document[body_markdown]', with: '## New body'
 
     click_button "Save Document"
 
     expect(page).to have_current_path(company_document_path(company, document), wait: 10)
-    expect(page).to have_content('New Title', wait: 10)
+    expect(page).to have_content('New Name', wait: 10)
     expect(document.reload.body_markdown).to eq('## New body')
   end
 end

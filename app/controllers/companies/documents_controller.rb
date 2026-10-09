@@ -40,7 +40,7 @@ class Companies::DocumentsController < Companies::ApplicationController
   def new
     respond_to do |format|
       format.html { render html: "", layout: true }
-      format.json { render json: { document_groups: format_document_groups } }
+      format.json { render json: {} }
     end
   end
 
@@ -49,7 +49,7 @@ class Companies::DocumentsController < Companies::ApplicationController
 
     respond_to do |format|
       format.html { render html: "", layout: true }
-      format.json { render json: { document: format_document(document), document_groups: format_document_groups } }
+      format.json { render json: { document: format_document(document) } }
     end
   end
 
@@ -100,15 +100,13 @@ class Companies::DocumentsController < Companies::ApplicationController
 
   def document_params
     params.require(:document).permit(
-      :title,
-      :body_markdown,
       :name,
+      :body_markdown,
       :description,
       :code,
       :business_type,
       :workflow_status,
       :category_id,
-      :document_group_id,
       :branch_id,
       *property_keys,
       image_attachments: [],
@@ -118,8 +116,8 @@ class Companies::DocumentsController < Companies::ApplicationController
 
   def format_document(document)
     document.as_json(only: [
-      :id, :title, :body_markdown, :name, :description, :code,
-      :category_id, :document_group_id, :branch_id,
+      :id, :name, :body_markdown, :description, :code,
+      :category_id, :branch_id,
       :business_type, :lifecycle_status, :workflow_status,
       :created_at, :updated_at,
       :property_string_1, :property_string_2, :property_string_3, :property_string_4, :property_string_5,
@@ -136,7 +134,6 @@ class Companies::DocumentsController < Companies::ApplicationController
       :property_datetime_6, :property_datetime_7, :property_datetime_8, :property_datetime_9, :property_datetime_10
     ]).merge(
       category: document.category&.as_json(only: [ :id, :name ]),
-      document_group: document.document_group&.as_json(only: [ :id, :name ]),
       image_urls: document.image_urls,
       file_urls: document.file_urls
     )
@@ -150,9 +147,5 @@ class Companies::DocumentsController < Companies::ApplicationController
   # table never renders them (show/edit carry the full format_document).
   def format_document_list(documents)
     documents.map { |document| format_document(document).except(:image_urls, :file_urls) }
-  end
-
-  def format_document_groups
-    current_company.document_groups.order(:name).as_json(only: [ :id, :name ])
   end
 end

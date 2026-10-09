@@ -56,17 +56,8 @@ class Employee < ApplicationRecord
   has_many :customer_employee_appointments, dependent: :destroy
   has_many :customers, through: :customer_employee_appointments
 
-  has_many :article_employee_appointments, dependent: :destroy
-  has_many :articles, through: :article_employee_appointments
-
-  has_many :article_group_employee_appointments, dependent: :destroy
-  has_many :article_groups, through: :article_group_employee_appointments
-
   has_many :document_employee_appointments, dependent: :destroy
   has_many :documents, through: :document_employee_appointments
-
-  has_many :document_group_employee_appointments, dependent: :destroy
-  has_many :document_groups, through: :document_group_employee_appointments
 
   has_many :employee_event_appointments, dependent: :destroy
   has_many :events, through: :employee_event_appointments

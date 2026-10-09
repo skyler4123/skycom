@@ -6,7 +6,6 @@ RSpec.feature "Companies::Documents dynamic search/filter", type: :feature, js: 
   let(:company) { create(:company) }
   let(:owner) { company.user }
   let(:category) { Seed::CategoryService.find_or_create_for(company: company, resource_name: "documents") }
-  let(:document_group) { Seed::DocumentGroupService.create(company: company) }
 
   let!(:table_config) do
     category.default_property_mapping.table_configs.destroy_all
@@ -21,12 +20,12 @@ RSpec.feature "Companies::Documents dynamic search/filter", type: :feature, js: 
 
   let!(:small) do
     Seed::DocumentService.create(company: company, category: category,
-      document_group: document_group, name: "Crimson Small", title: "Crimson Small",
+      name: "Crimson Small",
       property_integer_1: 50)
   end
   let!(:large) do
     Seed::DocumentService.create(company: company, category: category,
-      document_group: document_group, name: "Azure Large", title: "Azure Large",
+      name: "Azure Large",
       property_integer_1: 250)
   end
 

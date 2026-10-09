@@ -4,11 +4,10 @@ RSpec.feature "Companies::Documents Marked", type: :feature, js: true do
   let(:company) { create(:company) }
   let(:owner) { company.user }
   let(:category) { Seed::CategoryService.find_or_create_for(company: company, resource_name: "documents") }
-  let(:document_group) { Seed::DocumentGroupService.create(company: company) }
 
   let!(:document) do
     Seed::DocumentService.create(company: company, category: category,
-      document_group: document_group, title: "Marked Doc",
+      name: "Marked Doc",
       body_markdown: "| Name | Qty |\n| --- | --- |\n| Pen | 2 |\n\n~~gone~~\n\n- [ ] todo task",
       workflow_status: "completed")
   end

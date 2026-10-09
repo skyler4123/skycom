@@ -25,7 +25,7 @@ class Company < ApplicationRecord
     Event EventGroup EventConfig
     Notification NotificationTag
     CompanyTicket CompanyTicketComment CompanyTicketLog
-    Document DocumentGroup
+    Document
   ].freeze
   class_attribute :skip_init, default: false
   # Creation-time-only flag: System#ensure_company! marks its auto-created
@@ -145,7 +145,6 @@ class Company < ApplicationRecord
   has_many :company_ticket_comments, dependent: :destroy
   has_many :company_ticket_logs, dependent: :destroy
   has_many :documents, dependent: :destroy
-  has_many :document_groups, dependent: :destroy
   has_many :permission_logs, dependent: :destroy
 
   # --- Scopes ---

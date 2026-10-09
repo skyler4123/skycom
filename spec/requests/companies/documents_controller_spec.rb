@@ -5,7 +5,6 @@ require "rails_helper"
 RSpec.describe "Companies::DocumentsController", type: :request do
   let(:company) { create(:company) }
   let(:category) { Seed::CategoryService.find_or_create_for(company: company, resource_name: "documents") }
-  let(:document_group) { Seed::DocumentGroupService.create(company: company) }
 
   before do
     get sign_in_for_test_path(email: company.user.email)
@@ -40,7 +39,7 @@ RSpec.describe "Companies::DocumentsController", type: :request do
   end
 
   describe "GET #index / #show / #new / #edit shells" do
-    let!(:document) { Seed::DocumentService.create(company: company, category: category, document_group: document_group) }
+    let!(:document) { Seed::DocumentService.create(company: company, category: category) }
 
     it "renders shells and JSON payloads" do
       get "/companies/#{company.id}/documents"
@@ -63,8 +62,7 @@ RSpec.describe "Companies::DocumentsController", type: :request do
       expect(JSON.parse(response.body)["document"]["id"]).to eq(document.id)
 
       get "/companies/#{company.id}/documents/new.json"
-      expect(JSON.parse(response.body)["document_groups"].map { |g| g["id"] })
-        .to include(document_group.id)
+      expect(JSON.parse(response.body)).to eq({})
 
       get "/companies/#{company.id}/documents/#{document.id}/edit"
       expect(response).to have_http_status(:ok)
@@ -72,14 +70,13 @@ RSpec.describe "Companies::DocumentsController", type: :request do
   end
 
   describe "POST #create" do
-    it "creates with markdown and attachments, then redirects to show" do
+    it "creates with name and markdown, then redirects to show" do
       expect {
         post "/companies/#{company.id}/documents", params: {
           document: {
-            title: "Onboarding Guide",
+            name: "Onboarding Guide",
             body_markdown: "# Welcome\n\nDo **this** first.",
             category_id: category.id,
-            document_group_id: document_group.id,
             workflow_status: "draft",
             image_attachments: [ image_upload ],
             file_attachments: [ pdf_upload ]
@@ -95,10 +92,10 @@ RSpec.describe "Companies::DocumentsController", type: :request do
       expect(response.location).to include("/documents/#{created.id}")
     end
 
-    it "redirects without creating when title is blank" do
+    it "redirects without creating when name is blank" do
       expect {
         post "/companies/#{company.id}/documents", params: {
-          document: { title: "", category_id: category.id, document_group_id: document_group.id }
+          document: { name: "", category_id: category.id }
         }
       }.not_to change(Document, :count)
 
@@ -107,7 +104,7 @@ RSpec.describe "Companies::DocumentsController", type: :request do
   end
 
   describe "PATCH #update" do
-    let!(:document) { Seed::DocumentService.create(company: company, category: category, document_group: document_group) }
+    let!(:document) { Seed::DocumentService.create(company: company, category: category) }
 
     it "updates via JSON and keeps existing attachments" do
       document.image_attachments.attach(
@@ -115,19 +112,19 @@ RSpec.describe "Companies::DocumentsController", type: :request do
       document.save!
 
       patch "/companies/#{company.id}/documents/#{document.id}.json", params: {
-        document: { title: "Renamed", body_markdown: "## New body" }
+        document: { name: "Renamed", body_markdown: "## New body" }
       }, as: :json
 
       expect(response).to have_http_status(:ok)
       body = JSON.parse(response.body)["document"]
-      expect(body["title"]).to eq("Renamed")
+      expect(body["name"]).to eq("Renamed")
       expect(body["body_markdown"]).to eq("## New body")
       expect(document.reload.image_attachments).to be_attached
     end
 
     it "returns 422 errors for invalid JSON updates" do
       patch "/companies/#{company.id}/documents/#{document.id}.json", params: {
-        document: { title: "" }
+        document: { name: "" }
       }, as: :json
 
       expect(response).to have_http_status(:unprocessable_content)
@@ -135,17 +132,17 @@ RSpec.describe "Companies::DocumentsController", type: :request do
     end
   end
 
-  describe "title keyword search" do
+  describe "name keyword search" do
     let!(:search_table_config) do
       category.default_property_mapping.table_configs.destroy_all
       TableConfig.create!(company: company, category: category,
         property_mapping: category.default_property_mapping, resource_name: "documents",
         metadata: { "columns" => [
-          { "key" => "title", "name" => "Title", "visible" => true, "search" => true }
+          { "key" => "name", "name" => "Name", "visible" => true, "search" => true }
         ] })
     end
 
-    it "finds documents by title keyword only" do
+    it "finds documents by name keyword only" do
       raise "Meilisearch not reachable. Run `docker compose up -d meilisearch`." unless
         begin
           Meilisearch::Rails.client.health["status"] == "available"
@@ -155,9 +152,9 @@ RSpec.describe "Companies::DocumentsController", type: :request do
       Document.ms_clear_index!
 
       match = Seed::DocumentService.create(company: company, category: category,
-        document_group: document_group, name: "Plain Name", title: "Crimson Handbook")
+        name: "Crimson Handbook")
       other = Seed::DocumentService.create(company: company, category: category,
-        document_group: document_group, name: "Azure Other", title: "Azure Other")
+        name: "Azure Other")
       [ match, other ].each { |d| d.ms_index!(true) }
 
       get "/companies/#{company.id}/documents.json", params: { category_id: category.id, q: "Crimson" }
@@ -172,8 +169,7 @@ RSpec.describe "Companies::DocumentsController", type: :request do
   describe "cross-company scoping" do
     it "returns 404 for a foreign document" do
       other = create(:company)
-      other_group = Seed::DocumentGroupService.create(company: other)
-      foreign = Seed::DocumentService.create(company: other, document_group: other_group)
+      foreign = Seed::DocumentService.create(company: other)
 
       get "/companies/#{company.id}/documents/#{foreign.id}.json"
 
@@ -182,11 +178,10 @@ RSpec.describe "Companies::DocumentsController", type: :request do
 
     it "returns 404 errors for a foreign document update" do
       other = create(:company)
-      other_group = Seed::DocumentGroupService.create(company: other)
-      foreign = Seed::DocumentService.create(company: other, document_group: other_group)
+      foreign = Seed::DocumentService.create(company: other)
 
       patch "/companies/#{company.id}/documents/#{foreign.id}.json", params: {
-        document: { title: "Hijacked" }
+        document: { name: "Hijacked" }
       }, as: :json
 
       expect(response).to have_http_status(:not_found)

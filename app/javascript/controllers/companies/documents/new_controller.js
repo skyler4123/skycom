@@ -5,16 +5,13 @@ import DOMPurify from "dompurify"
 const renderBody = (source = "") => DOMPurify.sanitize(marked.parse(String(source ?? "")))
 
 export default class Companies_Documents_NewController extends Companies_LayoutController {
-  // Depends on BE: Companies::DocumentsController#new (document_groups JSON) + #create (multipart POST)
-  // Endpoints: GET <pathname>.json → { document_groups }, POST /companies/:id/documents
+  // Depends on BE: Companies::DocumentsController#create (multipart POST)
+  // Endpoints: POST /companies/:id/documents
   /** @type {string | null} */
   categoryId = null
 
   /** @type {Array<{key: string, label: string, type: string}>} */
   propertyMetadata = []
-
-  /** @type {Array<{id: string, name: string}>} */
-  documentGroups = []
 
   connect() {
     super.connect()
@@ -24,23 +21,12 @@ export default class Companies_Documents_NewController extends Companies_LayoutC
     const propertyMapping = currentPropertyMappings().find(m => m.category_id === this.categoryId)
     this.propertyMetadata = propertyMapping?.metadata?.properties || []
 
-    fetchJson(`${pathname()}.json`).then((response) => {
-      this.documentGroups = response.document_groups || []
-      poll(() => {
-        if (this.hasContentTarget) {
-          this.renderContent()
-          return true
-        }
-        return false
-      })
-    }).catch(() => {
-      poll(() => {
-        if (this.hasContentTarget) {
-          this.renderContent()
-          return true
-        }
-        return false
-      })
+    poll(() => {
+      if (this.hasContentTarget) {
+        this.renderContent()
+        return true
+      }
+      return false
     })
   }
 
@@ -172,17 +158,9 @@ export default class Companies_Documents_NewController extends Companies_LayoutC
 
         <div class="grid grid-cols-2 gap-4">
           <div class="col-span-2 space-y-1">
-            <label class="text-[10px] font-bold text-slate-400 dark:text-slate-300 uppercase tracking-wider">${translate("Document Title")}</label>
-            <input type="text" name="document[title]" required placeholder="${translate("e.g. Leave Policy")}"
+            <label class="text-[10px] font-bold text-slate-400 dark:text-slate-300 uppercase tracking-wider">${translate("Name")}</label>
+            <input type="text" name="document[name]" required placeholder="${translate("e.g. Leave Policy")}"
               class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-sm text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none placeholder:text-slate-400 dark:placeholder:text-slate-500">
-          </div>
-
-          <div class="space-y-1">
-            <label class="text-[10px] font-bold text-slate-400 dark:text-slate-300 uppercase tracking-wider">${translate("Document Group")}</label>
-            <select name="document[document_group_id]"
-              class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-sm text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none">
-              ${selectOptionsHTML(cloneNewKey(this.documentGroups, "id", "value"), null)}
-            </select>
           </div>
 
           <div class="space-y-1">

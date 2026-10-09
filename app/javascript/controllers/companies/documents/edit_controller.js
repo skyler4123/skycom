@@ -5,16 +5,13 @@ import DOMPurify from "dompurify"
 const renderBody = (source = "") => DOMPurify.sanitize(marked.parse(String(source ?? "")))
 
 export default class Companies_Documents_EditController extends Companies_LayoutController {
-  // Depends on BE: Companies::DocumentsController#edit (document + groups JSON) + #update (multipart PATCH)
-  // Endpoints: GET <pathname>.json → { document, document_groups }, PATCH /companies/:id/documents/:id
+  // Depends on BE: Companies::DocumentsController#edit (document JSON) + #update (multipart PATCH)
+  // Endpoints: GET <pathname>.json → { document }, PATCH /companies/:id/documents/:id
   /** @type {Document | null} */
   document = null
 
   /** @type {Array<{key: string, label: string, type: string}>} */
   propertyMetadata = []
-
-  /** @type {Array<{id: string, name: string}>} */
-  documentGroups = []
 
   async connect() {
     super.connect()
@@ -26,7 +23,6 @@ export default class Companies_Documents_EditController extends Companies_Layout
     try {
       const response = await fetchJson(`${Helpers.company_document_path(companyId, recordId)}.json`)
       this.document = response.document
-      this.documentGroups = response.document_groups || []
 
       if (this.document?.category_id) {
         const propertyMapping = currentPropertyMappings().find(m => m.category_id === this.document.category_id)
@@ -137,21 +133,13 @@ export default class Companies_Documents_EditController extends Companies_Layout
     const fields = `
       <div class="space-y-6">
         <h2 class="text-xl font-bold text-slate-900 dark:text-white">${translate("Edit Document")}</h2>
-        <p class="text-sm text-slate-500">${escapeHtml(d.title)}</p>
+        <p class="text-sm text-slate-500">${escapeHtml(d.name)}</p>
 
         <div class="grid grid-cols-2 gap-4">
           <div class="col-span-2 space-y-1">
-            <label class="text-xs font-medium text-slate-500 dark:text-gray-400">${translate("Document Title")}</label>
-            <input type="text" name="document[title]" value="${escapeHtml(d.title) || ''}" required
+            <label class="text-xs font-medium text-slate-500 dark:text-gray-400">${translate("Name")}</label>
+            <input type="text" name="document[name]" value="${escapeHtml(d.name) || ''}" required
               class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-sm">
-          </div>
-
-          <div class="space-y-1">
-            <label class="text-xs font-medium text-slate-500 dark:text-gray-400">${translate("Document Group")}</label>
-            <select name="document[document_group_id]"
-              class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-sm">
-              ${selectOptionsHTML(cloneNewKey(this.documentGroups, "id", "value"), d.document_group_id)}
-            </select>
           </div>
 
           <div class="space-y-1">

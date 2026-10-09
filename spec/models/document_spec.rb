@@ -3,13 +3,11 @@ require "rails_helper"
 
 RSpec.describe Document, type: :model do
   let!(:company) { create(:company) }
-  let!(:document_group) { Seed::DocumentGroupService.create(company: company) }
 
   def build_doc(**attrs)
     Seed::DocumentService.new(
       company: company,
-      document_group: document_group,
-      title: "How to do something",
+      name: "How to do something",
       **attrs
     )
   end
@@ -23,10 +21,26 @@ RSpec.describe Document, type: :model do
   end
 
   describe "validations" do
-    it "requires a title" do
+    it "requires a name" do
       doc = build_doc
-      doc.title = nil
+      doc.name = nil
       expect(doc).not_to be_valid
+    end
+
+    it "rejects a duplicate name within the same company" do
+      build_doc.save!
+      dup = build_doc
+      expect(dup).not_to be_valid
+    end
+
+    it "allows the same name in another company" do
+      build_doc.save!
+      other = Seed::DocumentService.new(company: create(:company), name: "How to do something")
+      expect(other).to be_valid
+    end
+
+    it "rejects a name over 255 characters" do
+      expect(build_doc(name: "a" * 256)).not_to be_valid
     end
 
     it "allows blank body_markdown" do

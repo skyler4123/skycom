@@ -15,7 +15,6 @@ class Document < ApplicationRecord
     announcement: 3
   }, prefix: true
 
-  belongs_to :document_group
   belongs_to :company
   belongs_to :branch, optional: true
   belongs_to :category
@@ -25,6 +24,6 @@ class Document < ApplicationRecord
   has_many :employees, through: :document_employee_appointments
 
   # --- Validations ---
-  validates :title, presence: true
+  validates :name, presence: true, uniqueness: { scope: :company_id }, length: { maximum: 255 }
   validates :body_markdown, length: { maximum: 100_000 }, allow_blank: true
 end
