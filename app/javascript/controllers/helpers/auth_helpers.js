@@ -118,6 +118,10 @@ export const currentTableConfigs = () => {
   return currentCompany()?.table_configs || []
 }
 
+export const currentSettings = () => {
+  return currentCompany()?.settings || []
+}
+
 // Helper method inside your controller or JS file
 export const getImportMapPath = (moduleName) => {
   const importMapScript = document.querySelector('script[type="importmap"]')

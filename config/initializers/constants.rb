@@ -209,3 +209,12 @@ ACCEPTABLE_TICKET_FILE_TYPES = %w[
   application/vnd.ms-excel
   application/vnd.openxmlformats-officedocument.spreadsheetml.sheet
 ].freeze
+
+# =============================================================================
+# Dynamic Sidebar (company-level custom groups + items)
+# One Setting per company (code below, appoint_to = Company) holds all custom
+# groups in metadata["sidebar_groups"]. See docs/SIDEBAR.md.
+# =============================================================================
+
+# Code identifying the company's dynamic sidebar Setting record.
+DYNAMIC_SIDEBAR_CODE = "DYNAMIC_SIDEBAR".freeze

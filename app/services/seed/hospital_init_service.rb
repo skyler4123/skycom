@@ -196,6 +196,7 @@ class Seed::HospitalInitService
     create_table_configs
     create_default_workflows
     create_default_event_configs
+    create_default_dynamic_sidebar
     configure_hospital_permissions
   end
 
@@ -295,6 +296,19 @@ class Seed::HospitalInitService
         config.create_stock_pending = flags[:create_stock_pending]
         config.create_order_on_complete = flags[:create_order_on_complete]
       end
+    end
+  end
+
+  # One dynamic sidebar record per company (docs/SIDEBAR.md): the company-level
+  # Setting holding all custom sidebar groups in metadata["sidebar_groups"].
+  # Groups start empty — owners build them on the Settings page.
+  def create_default_dynamic_sidebar
+    Setting.find_or_create_by!(company: @company, appoint_to: @company, code: DYNAMIC_SIDEBAR_CODE) do |setting|
+      setting.name = "Dynamic sidebar"
+      setting.business_type = :company
+      setting.lifecycle_status = :active
+      setting.workflow_status = :confirmed
+      setting.metadata = { "sidebar_groups" => [] }
     end
   end
 
@@ -427,7 +441,8 @@ class Seed::HospitalInitService
         "CompanyTicket" => { create: true, read: true, update: true, delete: true },
         "CompanyTicketComment" => { create: true, read: true, update: true, delete: true },
         "CompanyTicketLog" => { create: true, read: true, update: true, delete: true },
-        "Document" => { create: true, read: true, update: true, delete: true }
+        "Document" => { create: true, read: true, update: true, delete: true },
+        "Setting" => { create: true, read: true, update: true, delete: true }
       },
       Admin: {
         "Product" => { create: true, read: true, update: true, delete: true },
@@ -480,7 +495,8 @@ class Seed::HospitalInitService
         "CompanyTicket" => { create: true, read: true, update: true, delete: true },
         "CompanyTicketComment" => { create: true, read: true, update: true, delete: true },
         "CompanyTicketLog" => { create: true, read: true, update: true, delete: true },
-        "Document" => { create: true, read: true, update: true, delete: true }
+        "Document" => { create: true, read: true, update: true, delete: true },
+        "Setting" => { create: true, read: true, update: true, delete: true }
       }
     }
 

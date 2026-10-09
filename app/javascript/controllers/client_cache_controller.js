@@ -1,4 +1,6 @@
 // app/javascript/controllers/client_cache_controller.js
+// Depends on BE: ClientCacheController#index (GET /client_cache.json — user, companies[]
+// with settings for the dynamic sidebar, enums, employees[]). See docs/CACHE.md.
 import { Controller } from "@hotwired/stimulus"
 
 const SYNC_COUNT_KEY = "client_cache_sync_count"

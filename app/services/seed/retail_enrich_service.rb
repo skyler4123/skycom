@@ -93,6 +93,7 @@ class Seed::RetailEnrichService
     create_documents
     create_purchase_data
     create_discount_data
+    create_dynamic_sidebar_samples
     create_support_ticket_data
     create_notification_data
     create_shifts
@@ -738,11 +739,36 @@ class Seed::RetailEnrichService
       discount_type: :fixed_amount, amount_cents: 500, campaign_status: :active
     )
     Discounts::BatchGenerator.call(discount_group: fixed_group, quantity: 25)
-
   end
 
-  def create_support_ticket_data
-    employees = @retail.employees.where.not(business_type: :owner).limit(6).to_a
+  # Sample dynamic sidebar shortcuts for development (docs/SIDEBAR.md).
+  # Only fills the init record when it is still empty — never clobbers edits.
+  def create_dynamic_sidebar_samples
+    record = Setting.find_or_create_by!(company: @retail, appoint_to: @retail, code: DYNAMIC_SIDEBAR_CODE) do |setting|
+      setting.name = "Dynamic sidebar"
+      setting.business_type = :company
+      setting.lifecycle_status = :active
+      setting.workflow_status = :confirmed
+      setting.metadata = { "sidebar_groups" => [] }
+    end
+    return if record.sidebar_groups.present?
+
+    record.update!(
+      sidebar_groups: [
+        {
+          "key" => "quick-links", "name" => "Quick Links",
+          "items" => [
+            { "key" => "pending-orders", "name" => "Pending Orders",
+              "url" => "/companies/#{@retail.id}/orders?workflow_status=pending" },
+            { "key" => "all-stocks", "name" => "All Stocks",
+              "url" => "/companies/#{@retail.id}/stocks" }
+          ]
+        }
+      ]
+    )
+  end
+
+  def create_support_ticket_data(employees = @retail.employees.where.not(business_type: :owner).limit(6).to_a)
     return if employees.empty?
 
     staff = User.find_by(system_role: :super_admin) ||
@@ -773,7 +799,6 @@ class Seed::RetailEnrichService
       tag_ids: [ ops.id ])
     Notifications::CreateService.call(company: @retail, title: "Low stock alert",
       body: "Some SKUs are running low.", severity: :warning, tag_ids: [ ops.id ])
-
   end
 
   def run_purchase_workflow(purchase, requester, manager, index)

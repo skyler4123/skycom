@@ -1,9 +1,12 @@
 // Slack-style sidebar renderer: a Favourites section (star toggles) + collapsible
-// <details> groups. Structural data comes from controllers/companies/sidebar_items;
-// per-company favourites + open-group state live in controllers/companies/sidebar_storage.
-// FE-only — no server calls, no client-cache coupling (docs/SIDEBAR.md).
+// <details> groups. Static structure comes from controllers/companies/sidebar_items;
+// custom (dynamic sidebar) groups come from controllers/companies/sidebar_custom
+// (company Setting in the client cache) and render ABOVE the static groups.
+// Per-company favourites + open-group state live in controllers/companies/sidebar_storage.
+// FE-only — no server calls (docs/SIDEBAR.md).
 import { Controller } from "@hotwired/stimulus"
 import { SIDEBAR_ITEMS, SIDEBAR_GROUPS } from "controllers/companies/sidebar_items"
+import { customSidebarGroups, customSidebarItems } from "controllers/companies/sidebar_custom"
 import {
   favourites, isFavourite, toggleFavourite, isGroupOpen, setGroupOpen
 } from "controllers/companies/sidebar_storage"
@@ -19,6 +22,7 @@ export default class Companies_Sidebars_ShowController extends Controller {
 
   groupConfig(groupKey) {
     return SIDEBAR_GROUPS.find(g => g.key === groupKey)
+      || customSidebarGroups().find(g => g.key === groupKey)
   }
 
   // Regular items are starable: not coming-soon and not in a locked (System) group.
@@ -58,14 +62,20 @@ export default class Companies_Sidebars_ShowController extends Controller {
   sidebarHTML() {
     return `
       ${this.favouritesHTML()}
+      ${customSidebarGroups().map(g => this.groupHTML(g)).join("\n")}
       ${SIDEBAR_GROUPS.map(g => this.groupHTML(g)).join("\n")}
     `
+  }
+
+  findItem(key) {
+    return SIDEBAR_ITEMS.find(i => i.key === key)
+      || customSidebarItems().find(i => i.key === key)
   }
 
   favouritesHTML() {
     const cid = this.companyId()
     const favItems = favourites(cid)
-      .map(key => SIDEBAR_ITEMS.find(i => i.key === key))
+      .map(key => this.findItem(key))
       .filter(Boolean)
 
     const body = favItems.length > 0
@@ -84,7 +94,10 @@ export default class Companies_Sidebars_ShowController extends Controller {
   }
 
   groupHTML(groupConfig) {
-    const items = SIDEBAR_ITEMS.filter(i => i.group === groupConfig.key)
+    const items = [
+      ...SIDEBAR_ITEMS.filter(i => i.group === groupConfig.key),
+      ...customSidebarItems().filter(i => i.group === groupConfig.key)
+    ]
     const isOpen = isGroupOpen(this.companyId(), groupConfig.key)
 
     return `
@@ -111,6 +124,10 @@ export default class Companies_Sidebars_ShowController extends Controller {
 
   itemHTML(item) {
     const cid = this.companyId()
+    // Custom (dynamic sidebar) labels + urls are user-controlled — escape them.
+    // Static labels go through translate() (trusted dictionary strings).
+    const labelHTML = item.custom ? escapeHtml(item.label) : translate(item.label)
+    const href = item.custom ? escapeHtml(item.href(cid)) : item.href(cid)
     if (item.comingSoon) {
       return `
         <span class="flex items-center gap-3 px-3 py-2 rounded-lg cursor-not-allowed"
@@ -147,12 +164,12 @@ export default class Companies_Sidebars_ShowController extends Controller {
       >
         <a
           class="flex min-w-0 flex-1 items-center gap-3"
-          href="${item.href(cid)}"
+          href="${href}"
           data-sidebar-link
           ${openByPathname()}
         >
           <span class="material-symbols-outlined">${item.icon}</span>
-          <p class="text-sm font-medium leading-normal min-w-0 flex-1 truncate">${translate(item.label)}</p>
+          <p class="text-sm font-medium leading-normal min-w-0 flex-1 truncate">${labelHTML}</p>
         </a>
         ${star}
       </div>

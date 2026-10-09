@@ -2,6 +2,8 @@
 class Setting < ApplicationRecord
   include TagConcern
 
+  store_accessor :metadata, :sidebar_groups
+
   # --- Enums ---
   enum :lifecycle_status, LIFECYCLE_STATUS, prefix: true
   enum :workflow_status, WORKFLOW_STATUS, prefix: true
@@ -25,11 +27,61 @@ class Setting < ApplicationRecord
 
   # --- Scopes ---
   scope :company_level, -> { where(appoint_to_type: "Company") }
+  scope :dynamic_sidebar, -> { where(code: DYNAMIC_SIDEBAR_CODE) }
+
+  # --- Validations ---
+  validates :code, uniqueness: { scope: :company_id }, allow_nil: true
+  validate :sidebar_groups_shape
 
   # --- Callbacks ---
   before_validation :derive_company_from_appoint_to
 
+  def sidebar_groups
+    super || []
+  end
+
   private
+
+  def sidebar_groups_shape
+    groups = metadata.is_a?(Hash) ? metadata["sidebar_groups"] : nil
+    groups = [] if groups.nil?
+    unless groups.is_a?(Array)
+      errors.add(:sidebar_groups, "must be an array")
+      return
+    end
+
+    groups.each_with_index do |group, gi|
+      unless group.is_a?(Hash)
+        errors.add(:sidebar_groups, "group #{gi + 1} must be an object")
+        next
+      end
+      name = group["name"] || group[:name]
+      if name.to_s.strip.empty?
+        errors.add(:sidebar_groups, "group #{gi + 1} must have a name")
+      end
+      items = group["items"] || group[:items] || []
+      unless items.is_a?(Array)
+        errors.add(:sidebar_groups, "group '#{name}' items must be an array")
+        next
+      end
+      items.each_with_index do |item, ii|
+        unless item.is_a?(Hash)
+          errors.add(:sidebar_groups, "group '#{name}' item #{ii + 1} must be an object")
+          next
+        end
+        item_name = item["name"] || item[:name]
+        item_url = item["url"] || item[:url]
+        if item_name.to_s.strip.empty?
+          errors.add(:sidebar_groups, "group '#{name}' item #{ii + 1} must have a name")
+        end
+        if item_url.to_s.strip.empty?
+          errors.add(:sidebar_groups, "group '#{name}' item #{ii + 1} must have a url")
+        elsif item_url.to_s.strip.downcase.start_with?("javascript:")
+          errors.add(:sidebar_groups, "group '#{name}' item #{ii + 1} url is not allowed")
+        end
+      end
+    end
+  end
 
   def derive_company_from_appoint_to
     return if company_id.present?
