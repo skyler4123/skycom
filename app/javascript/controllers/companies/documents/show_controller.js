@@ -74,7 +74,7 @@ export default class Companies_Documents_ShowController extends Companies_Layout
 
     const companyId = window.location.pathname.split("/")[2]
     const category = currentCategories().find(c => c.id === d.category_id)
-    const isDraft = d.workflow_status !== 'completed'
+    const isDraft = d.workflow_status === 'draft'
 
     const dynamicFields = this.propertyMetadata.length > 0 ? `
       <div class="border-t border-slate-200 dark:border-gray-800 pt-6 mt-6">

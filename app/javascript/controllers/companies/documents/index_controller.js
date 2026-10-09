@@ -4,8 +4,8 @@ export default class Companies_Documents_IndexController extends Companies_Layou
   // Documents dashboard — table hydrates from the index JSON of the current URL.
   // Search/filter controls render from the active TableConfig via the shared helpers
   // (dynamicSearchHTML / dynamicFiltersHTML).
-  // Depends on BE: Companies::DocumentsController#index (list + Meilisearch q / filters[key])
-  // Endpoints: GET <pathname>.json?category_id&q&filters[key] — traditional GET form, full-page submit
+  // Depends on BE: Companies::DocumentsController#index (list + Meilisearch q / filters[key] + workflow_status scope)
+  // Endpoints: GET <pathname>.json?category_id&workflow_status&q&filters[key] — traditional GET form, full-page submit
   // Docs: docs/DYNAMIC_TABLE.md §2.5
   static targets = ["documentsList"]
 
@@ -26,6 +26,7 @@ export default class Companies_Documents_IndexController extends Companies_Layou
     try {
       const urlParams = new URLSearchParams(window.location.search)
       if (!urlParams.get('category_id') && this.categoryIdValue) urlParams.set('category_id', this.categoryIdValue)
+      if (!urlParams.get('workflow_status')) urlParams.set('workflow_status', 'published')
       const response = await fetchJson(`${pathname()}.json?${urlParams.toString()}`)
       this.documents = response.documents || []
       this.pagination = response.pagination || {}
@@ -78,6 +79,12 @@ export default class Companies_Documents_IndexController extends Companies_Layou
     }, {})
 
     const urlParams = new URLSearchParams(window.location.search)
+    const statusValue = urlParams.get('workflow_status') || 'published'
+    const statusOptions = [
+      { name: translate("Draft"), value: "draft" },
+      { name: translate("Published"), value: "published" },
+      { name: translate("Archived"), value: "archived" }
+    ]
     const searchHTML = dynamicSearchHTML({ searchCols: rawColumns.filter(c => c.search === true), urlParams })
     const filtersHTML = dynamicFiltersHTML({
       filterCols: rawColumns.filter(c => c.filter && typeof c.filter === "object" && c.filter.type && c.filter.active !== false),
@@ -102,6 +109,15 @@ export default class Companies_Documents_IndexController extends Companies_Layou
                     class="pl-3 pr-10 py-2 text-sm border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300"
                   >
                     ${selectOptionsHTML(cloneNewKey(categoryFilter, "id", "value"), categoryValue)}
+                  </select>
+                </div>
+                <div class="flex flex-col gap-1">
+                  <label class="text-[10px] font-bold text-slate-400 uppercase ml-1">${translate("Status")}</label>
+                  <select
+                    name="workflow_status"
+                    class="pl-3 pr-10 py-2 text-sm border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300"
+                  >
+                    ${selectOptionsHTML(statusOptions, statusValue)}
                   </select>
                 </div>
                 ${filtersHTML}

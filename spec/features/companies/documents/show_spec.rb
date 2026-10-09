@@ -9,7 +9,7 @@ RSpec.feature "Companies::Documents Show", type: :feature, js: true do
     Seed::DocumentService.create(company: company, category: category,
       name: "Onboarding Guide",
       body_markdown: "# Welcome\n\nDo *this* first.",
-      workflow_status: "completed")
+      workflow_status: "published")
   end
 
   before do

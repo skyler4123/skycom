@@ -36,6 +36,15 @@ RSpec.feature "Companies::Documents New", type: :feature, js: true do
     page.execute_script("document.cookie = 'client_cache_version=forced; path=/'")
   end
 
+  scenario "status dropdown offers only draft, published and archived" do
+    visit new_company_document_path(company)
+
+    status_select = find('select[name="document[workflow_status]"]', wait: 10)
+    options = status_select.all("option").map { |o| o.value }
+    expect(options).to contain_exactly("draft", "published", "archived")
+    expect(status_select.value).to eq("draft")
+  end
+
   scenario "renders name, body, preview fields" do
     visit new_company_document_path(company)
 
@@ -62,6 +71,7 @@ RSpec.feature "Companies::Documents New", type: :feature, js: true do
 
     click_button "Save Document"
 
+    expect(page).to have_content("Leave Policy", wait: 10)
     created = Document.find_by(name: "Leave Policy")
     expect(created).to be_present
     expect(page).to have_current_path(company_document_path(company, created), wait: 10)

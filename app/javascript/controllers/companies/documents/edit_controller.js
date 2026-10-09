@@ -59,17 +59,8 @@ export default class Companies_Documents_EditController extends Companies_Layout
   documentWorkflowStatuses() {
     return Enums()?.document?.workflow_statuses || [
       { name: "Draft", value: "draft" },
-      { name: "Pending", value: "pending" },
-      { name: "Confirmed", value: "confirmed" },
-      { name: "In Progress", value: "in_progress" },
-      { name: "Completed", value: "completed" },
-      { name: "Paid", value: "paid" },
-      { name: "Cancelled", value: "cancelled" },
-      { name: "Refunded", value: "refunded" },
-      { name: "Failed", value: "failed" },
-      { name: "Initiated", value: "initiated" },
-      { name: "Received", value: "received" },
-      { name: "Shipped", value: "shipped" }
+      { name: "Published", value: "published" },
+      { name: "Archived", value: "archived" }
     ]
   }
 

@@ -18,7 +18,7 @@ RSpec.feature "Companies::Documents Index", type: :feature, js: true do
   let!(:policy_doc) do
     Seed::DocumentService.create(company: company, category: category,
       name: "Leave Policy",
-      body_markdown: "# Leave", workflow_status: "completed")
+      body_markdown: "# Leave", workflow_status: "published")
   end
   let!(:guide_doc) do
     Seed::DocumentService.create(company: company, category: category,
@@ -52,11 +52,29 @@ RSpec.feature "Companies::Documents Index", type: :feature, js: true do
     page.execute_script("document.cookie = 'client_cache_version=forced; path=/'")
   end
 
-  scenario "lists documents with titles and status" do
+  scenario "defaults to published documents with a status selector" do
     visit company_documents_path(company)
 
     expect(page).to have_content("Leave Policy", wait: 10)
+    expect(page).not_to have_content("Onboarding Guide")
+
+    status_select = find('select[name="workflow_status"]', wait: 10)
+    expect(status_select).to have_selector("option[value='draft']")
+    expect(status_select).to have_selector("option[value='published']")
+    expect(status_select).to have_selector("option[value='archived']")
+    expect(status_select.value).to eq("published")
+  end
+
+  scenario "status selector switches to drafts" do
+    visit company_documents_path(company)
+    expect(page).to have_content("Leave Policy", wait: 10)
+
+    find('select[name="workflow_status"]').find("option[value='draft']").select_option
+    click_button "Search"
+
     expect(page).to have_content("Onboarding Guide", wait: 10)
+    expect(page).not_to have_content("Leave Policy")
+    expect(page).to have_current_path(/workflow_status=draft/, wait: 10)
   end
 
   scenario "title links to the show page" do

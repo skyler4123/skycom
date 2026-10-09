@@ -9,7 +9,7 @@ RSpec.feature "Companies::Documents Marked", type: :feature, js: true do
     Seed::DocumentService.create(company: company, category: category,
       name: "Marked Doc",
       body_markdown: "| Name | Qty |\n| --- | --- |\n| Pen | 2 |\n\n~~gone~~\n\n- [ ] todo task",
-      workflow_status: "completed")
+      workflow_status: "published")
   end
 
   before do
