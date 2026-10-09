@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require "rails_helper"
+require_relative "../../../db/migrate/20261009000002_remove_title_columns_from_documents_table_configs"
 
 RSpec.describe "Companies::DocumentsController", type: :request do
   let(:company) { create(:company) }
@@ -156,6 +157,40 @@ RSpec.describe "Companies::DocumentsController", type: :request do
       other = Seed::DocumentService.create(company: company, category: category,
         name: "Azure Other")
       [ match, other ].each { |d| d.ms_index!(true) }
+
+      get "/companies/#{company.id}/documents.json", params: { category_id: category.id, q: "Crimson" }
+
+      expect(response).to have_http_status(:ok)
+      expect(JSON.parse(response.body)["documents"].map { |d| d["id"] }).to contain_exactly(match.id)
+
+      Document.ms_clear_index!
+    end
+  end
+
+  describe "stale title column cleanup" do
+    it "strips title columns from documents table configs without breaking search" do
+      raise "Meilisearch not reachable. Run `docker compose up -d meilisearch`." unless
+        begin
+          Meilisearch::Rails.client.health["status"] == "available"
+        rescue StandardError
+          false
+        end
+      Document.ms_clear_index!
+
+      category.default_property_mapping.table_configs.destroy_all
+      TableConfig.create!(company: company, category: category,
+        property_mapping: category.default_property_mapping, resource_name: "documents",
+        metadata: { "columns" => [
+          { "key" => "name", "name" => "Name", "visible" => true, "search" => true },
+          { "key" => "title", "name" => "Title", "visible" => true, "search" => true }
+        ] })
+
+      match = Seed::DocumentService.create(company: company, category: category, name: "Crimson Handbook")
+      other = Seed::DocumentService.create(company: company, category: category, name: "Azure Other")
+      [ match, other ].each { |d| d.ms_index!(true) }
+
+      RemoveTitleColumnsFromDocumentsTableConfigs.new.migrate(:up)
+      category.default_property_mapping.table_configs.reset
 
       get "/companies/#{company.id}/documents.json", params: { category_id: category.id, q: "Crimson" }
 
