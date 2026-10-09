@@ -21,11 +21,13 @@ RSpec.feature "Companies::Documents dynamic search/filter", type: :feature, js: 
   let!(:small) do
     Seed::DocumentService.create(company: company, category: category,
       name: "Crimson Small",
+      workflow_status: "published",
       property_integer_1: 50)
   end
   let!(:large) do
     Seed::DocumentService.create(company: company, category: category,
       name: "Azure Large",
+      workflow_status: "published",
       property_integer_1: 250)
   end
 
