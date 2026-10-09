@@ -102,20 +102,20 @@ export default class Companies_Documents_EditController extends Companies_Layout
                     class="rounded border-slate-300 dark:border-slate-600 text-blue-600 cursor-pointer">`
                 break
               case 'integer':
-                inputHTML = `<input type="number" step="1" name="document[${field.key}]" value="${value ?? ''}" class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-sm">`
+                inputHTML = `<input type="number" step="1" name="document[${field.key}]" value="${escapeHtml(value) ?? ''}" class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-sm">`
                 break
               case 'decimal':
-                inputHTML = `<input type="number" step="0.01" name="document[${field.key}]" value="${value ?? ''}" class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-sm">`
+                inputHTML = `<input type="number" step="0.01" name="document[${field.key}]" value="${escapeHtml(value) ?? ''}" class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-sm">`
                 break
               case 'datetime':
-                inputHTML = `<input type="datetime-local" name="document[${field.key}]" value="${value ?? ''}" class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-sm">`
+                inputHTML = `<input type="datetime-local" name="document[${field.key}]" value="${escapeHtml(value) ?? ''}" class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-sm">`
                 break
               default:
-                inputHTML = `<input type="text" name="document[${field.key}]" value="${value ?? ''}" class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-sm">`
+                inputHTML = `<input type="text" name="document[${field.key}]" value="${escapeHtml(value) ?? ''}" class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-sm">`
             }
             return `
               <div>
-                <label class="text-xs font-medium text-slate-500 dark:text-gray-400">${field.name}</label>
+                <label class="text-xs font-medium text-slate-500 dark:text-gray-400">${escapeHtml(field.name)}</label>
                 ${inputHTML}
               </div>`
           }).join('')}
@@ -124,21 +124,21 @@ export default class Companies_Documents_EditController extends Companies_Layout
     ` : ''
 
     const existingImages = (d.image_urls || []).map(a => `
-      <span class="inline-flex items-center gap-1 px-2 py-0.5 text-xs bg-slate-100 dark:bg-slate-800 rounded">${a.filename}</span>
+      <span class="inline-flex items-center gap-1 px-2 py-0.5 text-xs bg-slate-100 dark:bg-slate-800 rounded">${escapeHtml(a.filename)}</span>
     `).join('')
     const existingFiles = (d.file_urls || []).map(a => `
-      <span class="inline-flex items-center gap-1 px-2 py-0.5 text-xs bg-slate-100 dark:bg-slate-800 rounded">${a.filename}</span>
+      <span class="inline-flex items-center gap-1 px-2 py-0.5 text-xs bg-slate-100 dark:bg-slate-800 rounded">${escapeHtml(a.filename)}</span>
     `).join('')
 
     const fields = `
       <div class="space-y-6">
         <h2 class="text-xl font-bold text-slate-900 dark:text-white">${translate("Edit Document")}</h2>
-        <p class="text-sm text-slate-500">${d.title}</p>
+        <p class="text-sm text-slate-500">${escapeHtml(d.title)}</p>
 
         <div class="grid grid-cols-2 gap-4">
           <div class="col-span-2 space-y-1">
             <label class="text-xs font-medium text-slate-500 dark:text-gray-400">${translate("Document Title")}</label>
-            <input type="text" name="document[title]" value="${d.title || ''}" required
+            <input type="text" name="document[title]" value="${escapeHtml(d.title) || ''}" required
               class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-sm">
           </div>
 
@@ -168,7 +168,7 @@ export default class Companies_Documents_EditController extends Companies_Layout
 
           <div class="space-y-1">
             <label class="text-xs font-medium text-slate-500 dark:text-gray-400">${translate("Category")}</label>
-            <input type="text" value="${currentCategories().find(c => c.id === d.category_id)?.name || ''}" disabled
+            <input type="text" value="${escapeHtml(currentCategories().find(c => c.id === d.category_id)?.name) || ''}" disabled
               class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-slate-50 dark:bg-slate-700 text-sm text-slate-400">
             <input type="hidden" name="document[category_id]" value="${d.category_id}">
           </div>
@@ -176,7 +176,7 @@ export default class Companies_Documents_EditController extends Companies_Layout
           <div class="col-span-2 space-y-1">
             <label class="text-xs font-medium text-slate-500 dark:text-gray-400">${translate("Description")}</label>
             <textarea name="document[description]" rows="2"
-              class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-sm">${d.description || ''}</textarea>
+              class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-sm">${escapeHtml(d.description) || ''}</textarea>
           </div>
         </div>
 
@@ -185,7 +185,7 @@ export default class Companies_Documents_EditController extends Companies_Layout
             <label class="text-xs font-medium text-slate-500 dark:text-gray-400">${translate("Body")} (Markdown)</label>
             <textarea name="document[body_markdown]" rows="12"
               data-action="input->${this.identifier}#updatePreview"
-              class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-sm font-mono">${d.body_markdown || ''}</textarea>
+              class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-sm font-mono">${escapeHtml(d.body_markdown) || ''}</textarea>
           </div>
           <div class="space-y-1">
             <label class="text-xs font-medium text-slate-500 dark:text-gray-400">${translate("Preview")}</label>

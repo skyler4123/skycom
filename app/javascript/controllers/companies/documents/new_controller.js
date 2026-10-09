@@ -84,22 +84,22 @@ export default class Companies_Documents_NewController extends Companies_LayoutC
             <input type="hidden" name="document[${key}]" value="false">
             <input type="checkbox" name="document[${key}]" value="true"
               class="h-5 w-5 rounded border-slate-300 text-blue-600 cursor-pointer">
-            <span class="text-sm text-slate-900 dark:text-white">${label}</span>
+            <span class="text-sm text-slate-900 dark:text-white">${escapeHtml(label)}</span>
           </div>
         `
       case 'integer':
       case 'decimal':
         return `
           <div class="space-y-1">
-            <label class="text-[10px] font-bold text-slate-400 dark:text-slate-300 uppercase tracking-wider">${label}</label>
-            <input type="number" name="document[${key}]" step="${type === 'decimal' ? '0.01' : '1'}" placeholder="${label}"
+            <label class="text-[10px] font-bold text-slate-400 dark:text-slate-300 uppercase tracking-wider">${escapeHtml(label)}</label>
+            <input type="number" name="document[${key}]" step="${type === 'decimal' ? '0.01' : '1'}" placeholder="${escapeHtml(label)}"
               class="${baseClass}">
           </div>
         `
       case 'datetime':
         return `
           <div class="space-y-1">
-            <label class="text-[10px] font-bold text-slate-400 dark:text-slate-300 uppercase tracking-wider">${label}</label>
+            <label class="text-[10px] font-bold text-slate-400 dark:text-slate-300 uppercase tracking-wider">${escapeHtml(label)}</label>
             <input type="datetime-local" name="document[${key}]"
               class="${baseClass}">
           </div>
@@ -107,8 +107,8 @@ export default class Companies_Documents_NewController extends Companies_LayoutC
       default:
         return `
           <div class="space-y-1">
-            <label class="text-[10px] font-bold text-slate-400 dark:text-slate-300 uppercase tracking-wider">${label}</label>
-            <input type="text" name="document[${key}]" placeholder="${label}"
+            <label class="text-[10px] font-bold text-slate-400 dark:text-slate-300 uppercase tracking-wider">${escapeHtml(label)}</label>
+            <input type="text" name="document[${key}]" placeholder="${escapeHtml(label)}"
               class="${baseClass}">
           </div>
         `

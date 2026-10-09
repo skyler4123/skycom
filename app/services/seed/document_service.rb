@@ -4,6 +4,7 @@ class Seed::DocumentService
     branch: nil,
     document_group: nil,
     category: nil,
+    property_mapping: nil,
     title: nil,
     name: nil,
     description: nil,
@@ -16,7 +17,7 @@ class Seed::DocumentService
     discarded_at: nil,
     **attrs
   )
-    document_group ||= DocumentGroup.create!(company: company, branch: branch) if company
+    document_group ||= Seed::DocumentGroupService.create(company: company, branch: branch) if company
     branch ||= document_group.branch if document_group
     company ||= document_group.company if document_group
 
@@ -25,10 +26,11 @@ class Seed::DocumentService
       branch: branch,
       document_group: document_group,
       category: category,
+      property_mapping: property_mapping,
       title: title || Faker::Lorem.sentence(word_count: 4),
       name: name || "Document #{Faker::Lorem.sentence(word_count: 3)}",
       description: description || Faker::Lorem.sentence(word_count: 10),
-      content: content || Faker::Lorem.paragraph(sentence_count: 3),
+      content: content || { "body" => Faker::Lorem.paragraph(sentence_count: 3) },
       body_markdown: body_markdown,
       code: code || "DOC-#{SecureRandom.hex(4).upcase}",
       lifecycle_status: lifecycle_status || Document.lifecycle_statuses.keys.sample,
@@ -41,6 +43,16 @@ class Seed::DocumentService
 
   def self.create(...)
     document = new(...)
+    if document.category.nil? && document.company.present?
+      document.category = Seed::CategoryService.random_for(
+        company: document.company,
+        resource_name: Document.model_name.plural
+      )
+    end
+    if document.property_mapping.nil? && document.category.present?
+      document.property_mapping = document.category.default_property_mapping
+    end
+    Seed::PropertyPopulator.populate(document)
     document.save!
     document
   end

@@ -55,6 +55,15 @@ RSpec.feature "Companies::Documents Show", type: :feature, js: true do
     expect(page).to have_content("Draft", wait: 10)
   end
 
+  scenario "escapes hostile titles and filenames (XSS-safe)" do
+    document.update!(title: '"><img src=x onerror=alert(1)>')
+
+    visit company_document_path(company, document)
+
+    html = find("h2", wait: 10).native.attribute("innerHTML")
+    expect(html).not_to include("<img")
+  end
+
   scenario "escapes raw HTML in the body (XSS-safe)" do
     document.update!(body_markdown: "<script>alert(1)</script>")
 

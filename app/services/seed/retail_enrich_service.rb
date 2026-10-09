@@ -90,6 +90,7 @@ class Seed::RetailEnrichService
     create_customer_orders
     create_invoices
     create_events
+    create_documents
     create_purchase_data
     create_discount_data
     create_support_ticket_data
@@ -668,6 +669,34 @@ class Seed::RetailEnrichService
       end
     end
     puts "  -> #{Event.where(company: @retail).count} events created"
+  end
+
+  # Sample documents across every documents category (round-robin): 2 groups,
+  # 3 docs per group. Groups use document_groups categories; docs use documents
+  # categories so the first category always has data (docs/INIT_AND_ENRICH.md).
+  def create_documents
+    puts "Creating documents..."
+    group_categories = Category.where(company: @retail, resource_name: "document_groups").order(:id).to_a
+    doc_categories = Category.where(company: @retail, resource_name: "documents").order(:id).to_a
+    return if doc_categories.empty?
+
+    2.times do |gi|
+      branch = @branches[gi % @branches.length] if @branches.present?
+      group = Seed::DocumentGroupService.create(
+        company: @retail,
+        branch: branch,
+        category: round_robin(group_categories, gi)
+      )
+      3.times do |di|
+        Seed::DocumentService.create(
+          company: @retail,
+          branch: group.branch,
+          document_group: group,
+          category: round_robin(doc_categories, gi * 3 + di)
+        )
+      end
+    end
+    puts "  -> #{DocumentGroup.where(company: @retail).count} document groups, #{Document.where(company: @retail).count} documents created"
   end
 
   # Sample purchase requisitions across every workflow phase:

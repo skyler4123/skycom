@@ -140,6 +140,9 @@ RSpec.describe "dynamic meilisearch models" do
     if model_class.column_names.include?("code") && !extra.key?(:code)
       attrs[:code] = "#{model_class.name[0, 3].upcase}-#{SecureRandom.hex(4).upcase}"
     end
+    if model_class.column_names.include?("title") && !extra.key?(:title)
+      attrs[:title] = "#{model_class.name} Title #{SecureRandom.hex(4)}"
+    end
     %i[business_type workflow_status lifecycle_status].each do |enum_name|
       plural = enum_name.to_s.pluralize
       if model_class.respond_to?(plural) && model_class.column_names.include?(enum_name.to_s) && !extra.key?(enum_name)

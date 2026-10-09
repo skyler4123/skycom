@@ -60,7 +60,7 @@ export default class Companies_Documents_ShowController extends Companies_Layout
         return `<span class="text-sm text-slate-900 dark:text-white">${d.toLocaleString()}</span>`
       }
       default:
-        return `<span class="text-sm text-slate-900 dark:text-white">${value}</span>`
+        return `<span class="text-sm text-slate-900 dark:text-white">${escapeHtml(value)}</span>`
     }
   }
 
@@ -82,7 +82,7 @@ export default class Companies_Documents_ShowController extends Companies_Layout
                 <span class="material-symbols-outlined text-[20px]">${field.type === 'boolean' ? 'check_circle' : field.type === 'datetime' ? 'calendar_month' : 'text_fields'}</span>
               </div>
               <div class="min-w-0 flex-1">
-                <p class="text-xs font-medium text-slate-500 dark:text-gray-400">${field.name}</p>
+                <p class="text-xs font-medium text-slate-500 dark:text-gray-400">${escapeHtml(field.name)}</p>
                 <p class="text-sm font-semibold text-slate-900 dark:text-white">${this.formatDisplayValue(d[field.key], field.type)}</p>
               </div>
             </div>
@@ -93,8 +93,8 @@ export default class Companies_Documents_ShowController extends Companies_Layout
 
     const images = (d.image_urls || []).map(a => `
       <a href="${a.url}" target="_blank" rel="noopener noreferrer" class="block overflow-hidden rounded-lg border border-slate-200 dark:border-slate-700 cursor-pointer">
-        <img src="${a.thumb_url || a.url}" alt="${a.filename}" class="w-full h-32 object-cover">
-        <p class="px-2 py-1 text-xs text-slate-500 truncate">${a.filename}</p>
+        <img src="${a.thumb_url || a.url}" alt="${escapeHtml(a.filename)}" class="w-full h-32 object-cover">
+        <p class="px-2 py-1 text-xs text-slate-500 truncate">${escapeHtml(a.filename)}</p>
       </a>
     `).join('')
 
@@ -102,8 +102,8 @@ export default class Companies_Documents_ShowController extends Companies_Layout
       <a href="${a.url}" target="_blank" rel="noopener noreferrer" class="flex items-center gap-3 px-3 py-2 rounded-lg border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 cursor-pointer">
         <span class="material-symbols-outlined text-slate-400">description</span>
         <span class="min-w-0 flex-1">
-          <span class="block text-sm font-medium text-slate-900 dark:text-white truncate">${a.filename}</span>
-          <span class="block text-xs text-slate-400">${a.content_type || ''}</span>
+          <span class="block text-sm font-medium text-slate-900 dark:text-white truncate">${escapeHtml(a.filename)}</span>
+          <span class="block text-xs text-slate-400">${escapeHtml(a.content_type) || ''}</span>
         </span>
       </a>
     `).join('')
@@ -136,10 +136,10 @@ export default class Companies_Documents_ShowController extends Companies_Layout
               <span class="material-symbols-outlined text-4xl text-sky-600 dark:text-sky-400">article</span>
             </div>
             <div class="flex flex-1 flex-col text-center sm:text-left">
-              <h2 class="text-2xl font-black text-slate-900 dark:text-white">${d.title}</h2>
-              <p class="font-semibold text-sky-600 dark:text-sky-400">${d.description || ''}</p>
+              <h2 class="text-2xl font-black text-slate-900 dark:text-white">${escapeHtml(d.title)}</h2>
+              <p class="font-semibold text-sky-600 dark:text-sky-400">${escapeHtml(d.description) || ''}</p>
               <div class="mt-4 flex flex-wrap justify-center gap-2 sm:justify-start">
-                <span class="inline-flex items-center rounded-lg bg-sky-100 dark:bg-sky-900/40 px-3 py-1 text-xs font-bold text-sky-700 dark:text-sky-300 uppercase">${d.code || translate("N/A")}</span>
+                <span class="inline-flex items-center rounded-lg bg-sky-100 dark:bg-sky-900/40 px-3 py-1 text-xs font-bold text-sky-700 dark:text-sky-300 uppercase">${escapeHtml(d.code) || translate("N/A")}</span>
                 ${Helpers.statusBadge(d.workflow_status)}
               </div>
             </div>
@@ -152,7 +152,7 @@ export default class Companies_Documents_ShowController extends Companies_Layout
               </div>
               <div>
                 <p class="text-xs font-medium text-slate-500 dark:text-gray-400">${translate("Category")}</p>
-                <p class="text-sm font-semibold text-slate-900 dark:text-white">${category?.name || d.category?.name || translate("N/A")}</p>
+                <p class="text-sm font-semibold text-slate-900 dark:text-white">${escapeHtml(category?.name || d.category?.name) || translate("N/A")}</p>
               </div>
             </div>
 
@@ -162,7 +162,7 @@ export default class Companies_Documents_ShowController extends Companies_Layout
               </div>
               <div>
                 <p class="text-xs font-medium text-slate-500 dark:text-gray-400">${translate("Document Group")}</p>
-                <p class="text-sm font-semibold text-slate-900 dark:text-white">${d.document_group?.name || translate("N/A")}</p>
+                <p class="text-sm font-semibold text-slate-900 dark:text-white">${escapeHtml(d.document_group?.name) || translate("N/A")}</p>
               </div>
             </div>
           </div>

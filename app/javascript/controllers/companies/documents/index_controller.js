@@ -136,13 +136,13 @@ export default class Companies_Documents_IndexController extends Companies_Layou
                     </div>
                     <a href="${Helpers.company_document_path(currentCompany().id, record.id)}"
                       class="font-medium text-slate-900 dark:text-white overflow-visible whitespace-normal hover:text-sky-600 dark:hover:text-sky-400 transition-colors cursor-pointer">
-                      ${value || translate("Untitled Document")}
+                      ${escapeHtml(value) || translate("Untitled Document")}
                     </a>
                   </div>
                 `,
-                code: (value) => `<span class="font-mono text-xs bg-slate-100 dark:bg-slate-800/60 px-2 py-0.5 rounded text-slate-600 dark:text-slate-300 font-medium">${value || '—'}</span>`,
+                code: (value) => `<span class="font-mono text-xs bg-slate-100 dark:bg-slate-800/60 px-2 py-0.5 rounded text-slate-600 dark:text-slate-300 font-medium">${escapeHtml(value) || '—'}</span>`,
                 workflow_status: (value) => `${Helpers.statusBadge(value)}`,
-                category: (value, record) => record.category?.name || '<span class="text-slate-300 dark:text-slate-700">—</span>',
+                category: (value, record) => escapeHtml(record.category?.name) || '<span class="text-slate-300 dark:text-slate-700">—</span>',
               },
               renderActions: (record) => `
                 <td class="py-4 px-6 text-sm text-right whitespace-nowrap">

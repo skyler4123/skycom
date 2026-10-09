@@ -489,6 +489,16 @@ class Seed::RetailInitService
         properties: { property_string_1: "Topic", property_string_2: "Audience" },
         visible_columns: %w[name title code workflow_status]
       }
+    },
+    document_groups: {
+      "Policy Groups" => {
+        properties: { property_string_1: "Group Owner", property_string_2: "Applies To" },
+        visible_columns: %w[name title code workflow_status]
+      },
+      "Guide Groups" => {
+        properties: { property_string_1: "Topic", property_string_2: "Audience" },
+        visible_columns: %w[name title code workflow_status]
+      }
     }
   }.freeze
 

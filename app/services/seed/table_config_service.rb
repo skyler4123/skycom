@@ -9,7 +9,7 @@ class Seed::TableConfigService
             "visible" => true, "align" => "left", "width" => nil }
 
     case key.to_s
-    when "name", "description", "code", /\Aproperty_string_/
+    when "name", "description", "code", "title", /\Aproperty_string_/
       col["search"] = true
     when "quantity", "pending", /\Aproperty_integer_/
       col["filter"] = { "type" => "range", "active" => true, "buckets" => [ [ nil, 100 ], [ 100, nil ] ] }

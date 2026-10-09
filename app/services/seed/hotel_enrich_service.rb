@@ -75,6 +75,7 @@ class Seed::HotelEnrichService
     create_stay_orders
     create_invoices
     create_bookings
+    create_documents
     create_purchase_data
     create_discount_data
     create_shifts
@@ -665,6 +666,33 @@ class Seed::HotelEnrichService
       end
     end
     puts "  -> #{Event.where(company: @company).count} events created"
+  end
+
+  # Sample documents across every documents category (round-robin): 2 groups,
+  # 3 docs per group (docs/INIT_AND_ENRICH.md).
+  def create_documents
+    puts "Creating documents..."
+    group_categories = Category.where(company: @company, resource_name: "document_groups").order(:id).to_a
+    doc_categories = Category.where(company: @company, resource_name: "documents").order(:id).to_a
+    return if doc_categories.empty?
+
+    2.times do |gi|
+      branch = @branches[gi % @branches.length] if @branches.present?
+      group = Seed::DocumentGroupService.create(
+        company: @company,
+        branch: branch,
+        category: round_robin(group_categories, gi)
+      )
+      3.times do |di|
+        Seed::DocumentService.create(
+          company: @company,
+          branch: group.branch,
+          document_group: group,
+          category: round_robin(doc_categories, gi * 3 + di)
+        )
+      end
+    end
+    puts "  -> #{DocumentGroup.where(company: @company).count} document groups, #{Document.where(company: @company).count} documents created"
   end
 
   # Sample purchase requisitions across every workflow phase:

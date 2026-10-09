@@ -52,7 +52,9 @@ RSpec.describe "Companies::DocumentsController", type: :request do
       expect(body["documents"].map { |d| d["id"] }).to include(document.id)
       expect(body).to have_key("pagination")
       entry = body["documents"].find { |d| d["id"] == document.id }
-      expect(entry).to include("body_markdown", "image_urls", "file_urls")
+      expect(entry).to include("body_markdown")
+      expect(entry).not_to have_key("image_urls")
+      expect(entry).not_to have_key("file_urls")
 
       get "/companies/#{company.id}/documents/#{document.id}"
       expect(response).to have_http_status(:ok)
@@ -133,6 +135,40 @@ RSpec.describe "Companies::DocumentsController", type: :request do
     end
   end
 
+  describe "title keyword search" do
+    let!(:search_table_config) do
+      category.default_property_mapping.table_configs.destroy_all
+      TableConfig.create!(company: company, category: category,
+        property_mapping: category.default_property_mapping, resource_name: "documents",
+        metadata: { "columns" => [
+          { "key" => "title", "name" => "Title", "visible" => true, "search" => true }
+        ] })
+    end
+
+    it "finds documents by title keyword only" do
+      raise "Meilisearch not reachable. Run `docker compose up -d meilisearch`." unless
+        begin
+          Meilisearch::Rails.client.health["status"] == "available"
+        rescue StandardError
+          false
+        end
+      Document.ms_clear_index!
+
+      match = Seed::DocumentService.create(company: company, category: category,
+        document_group: document_group, name: "Plain Name", title: "Crimson Handbook")
+      other = Seed::DocumentService.create(company: company, category: category,
+        document_group: document_group, name: "Azure Other", title: "Azure Other")
+      [ match, other ].each { |d| d.ms_index!(true) }
+
+      get "/companies/#{company.id}/documents.json", params: { category_id: category.id, q: "Crimson" }
+
+      expect(response).to have_http_status(:ok)
+      expect(JSON.parse(response.body)["documents"].map { |d| d["id"] }).to contain_exactly(match.id)
+
+      Document.ms_clear_index!
+    end
+  end
+
   describe "cross-company scoping" do
     it "returns 404 for a foreign document" do
       other = create(:company)
@@ -142,6 +178,19 @@ RSpec.describe "Companies::DocumentsController", type: :request do
       get "/companies/#{company.id}/documents/#{foreign.id}.json"
 
       expect(response).to have_http_status(:not_found)
+    end
+
+    it "returns 404 errors for a foreign document update" do
+      other = create(:company)
+      other_group = Seed::DocumentGroupService.create(company: other)
+      foreign = Seed::DocumentService.create(company: other, document_group: other_group)
+
+      patch "/companies/#{company.id}/documents/#{foreign.id}.json", params: {
+        document: { title: "Hijacked" }
+      }, as: :json
+
+      expect(response).to have_http_status(:not_found)
+      expect(JSON.parse(response.body)).to have_key("errors")
     end
   end
 end

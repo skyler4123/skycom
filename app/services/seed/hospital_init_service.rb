@@ -166,6 +166,16 @@ class Seed::HospitalInitService
         visible_columns: %w[name title code workflow_status]
       }
     },
+    document_groups: {
+      "Protocol Groups" => {
+        properties: { property_string_1: "Department", property_string_2: "Applies To" },
+        visible_columns: %w[name title code workflow_status]
+      },
+      "Guide Groups" => {
+        properties: { property_string_1: "Topic", property_string_2: "Audience" },
+        visible_columns: %w[name title code workflow_status]
+      }
+    },
     events: {
       "Procedure Booking" => {
         properties: { property_string_1: "Procedure Type", property_integer_1: "Duration (minutes)" },

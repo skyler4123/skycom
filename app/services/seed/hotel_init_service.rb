@@ -175,6 +175,16 @@ class Seed::HotelInitService
         visible_columns: %w[name title code workflow_status]
       }
     },
+    document_groups: {
+      "Policy Groups" => {
+        properties: { property_string_1: "Group Owner", property_string_2: "Applies To" },
+        visible_columns: %w[name title code workflow_status]
+      },
+      "Guide Groups" => {
+        properties: { property_string_1: "Topic", property_string_2: "Audience" },
+        visible_columns: %w[name title code workflow_status]
+      }
+    },
     events: {
       "Booking" => {
         properties: { property_string_1: "Room Number", property_datetime_1: "Check-in Time", property_datetime_2: "Check-out Time", property_integer_1: "Guest Count" },

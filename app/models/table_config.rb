@@ -5,7 +5,7 @@ class TableConfig < ApplicationRecord
   # Valid values for column alignment.
   ALLOWED_ALIGNS = %w[left center right].freeze
   # Standard columns eligible for keyword search (property_string_* are also searchable).
-  SEARCHABLE_STANDARD_KEYS = %w[name description code].freeze
+  SEARCHABLE_STANDARD_KEYS = %w[name description code title].freeze
   # Standard (non-property) numeric metric columns eligible for range filters.
   # Must mirror an `ms_extra_filterable_columns` declaration on the indexed model
   # to actually filter (docs/MEILISEARCH.md §2).

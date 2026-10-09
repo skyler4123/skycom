@@ -10,7 +10,7 @@ module DynamicSearchConcern
   PROPERTY_COLUMNS = (PROPERTY_STRING_COLUMNS + PROPERTY_INTEGER_COLUMNS +
     PROPERTY_DECIMAL_COLUMNS + PROPERTY_BOOLEAN_COLUMNS + PROPERTY_DATETIME_COLUMNS).freeze
 
-  STANDARD_COLUMNS = %w[id company_id category_id branch_id name description code workflow_status business_type].freeze
+  STANDARD_COLUMNS = %w[id company_id category_id branch_id name description code title workflow_status business_type].freeze
 
   # Per-model hook: models that need plain metric columns (e.g. Stock quantity/pending)
   # filterable in Meilisearch declare `def self.ms_extra_filterable_columns` BEFORE
@@ -27,7 +27,7 @@ module DynamicSearchConcern
     extra_filterable  = respond_to?(:ms_extra_filterable_columns) ? Array(ms_extra_filterable_columns) & column_names : []
 
     indexed_attributes = standard_columns + string_columns + number_columns + boolean_columns + datetime_columns + extra_filterable
-    searchable_columns = (standard_columns & %w[name description code]) + string_columns + number_columns
+    searchable_columns = (standard_columns & %w[name description code title]) + string_columns + number_columns
     filterable_columns = (standard_columns & %w[company_id category_id branch_id workflow_status business_type]) +
       number_columns + boolean_columns + datetime_columns + extra_filterable
 

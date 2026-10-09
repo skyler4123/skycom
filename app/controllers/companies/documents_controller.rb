@@ -21,7 +21,7 @@ class Companies::DocumentsController < Companies::ApplicationController
         @pagy, @documents_results = pagy(:offset, scope, jsonapi: true)
 
         render json: {
-          documents: format_documents(@documents_results),
+          documents: format_document_list(@documents_results),
           pagination: @pagy.data_hash
         }
       end
@@ -85,7 +85,7 @@ class Companies::DocumentsController < Companies::ApplicationController
       end
     end
   rescue ActiveRecord::RecordNotFound
-    render json: { status: "error", message: "Document not found" }, status: :not_found
+    render json: { errors: [ "Document not found" ] }, status: :not_found
   end
 
   private
@@ -144,6 +144,12 @@ class Companies::DocumentsController < Companies::ApplicationController
 
   def format_documents(documents)
     documents.map { |document| format_document(document) }
+  end
+
+  # Index payload: scalars only — attachment urls would N+1 per row and the
+  # table never renders them (show/edit carry the full format_document).
+  def format_document_list(documents)
+    documents.map { |document| format_document(document).except(:image_urls, :file_urls) }
   end
 
   def format_document_groups
