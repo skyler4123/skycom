@@ -19,12 +19,13 @@ class Company < ApplicationRecord
     Patient Appointment Course Student Exam
     Membership
     Page CompanyPaymentMethodAppointment ShiftTemplate ScheduledShift
-    AttendanceConfig AttendanceLog AttendanceDay AttendanceMonth
+    AttendanceConfig AttendanceLog AttendanceDay AttendanceMonth AttendanceRequest
     EventConfigLog AttendanceConfigLog TableConfigLog PermissionLog
     Stock StockTransfer StockImport StockExport StockAdjustment StockPending
     Event EventGroup EventConfig
     Notification NotificationTag
     CompanyTicket CompanyTicketComment CompanyTicketLog
+    Document
   ].freeze
   class_attribute :skip_init, default: false
   # Creation-time-only flag: System#ensure_company! marks its auto-created
@@ -86,6 +87,7 @@ class Company < ApplicationRecord
   has_many :scheduled_shifts, dependent: :destroy
   has_many :attendance_logs, dependent: :destroy
   has_many :attendance_days, dependent: :destroy
+  has_many :attendance_requests, dependent: :destroy
   has_many :attendance_months, dependent: :destroy
   has_many :attendance_configs, dependent: :destroy
   has_many :attendance_config_logs, dependent: :destroy
@@ -142,6 +144,7 @@ class Company < ApplicationRecord
   has_many :company_tickets, dependent: :destroy
   has_many :company_ticket_comments, dependent: :destroy
   has_many :company_ticket_logs, dependent: :destroy
+  has_many :documents, dependent: :destroy
   has_many :permission_logs, dependent: :destroy
 
   # --- Scopes ---

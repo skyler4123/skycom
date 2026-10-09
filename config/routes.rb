@@ -8,6 +8,7 @@ Rails.application.routes.draw do
     get "home", to: "home#index"
     get "employee", to: "employees#show"
     post "attendances", to: "attendances#create"
+    resources :attendance_requests, only: %i[new create]
   end
   namespace :admin do
     resources :companies
@@ -87,6 +88,12 @@ Rails.application.routes.draw do
       resources :attendance_config_logs, only: [ :index, :show ]
       resources :attendance_logs
       resources :attendance_days
+      resources :attendance_requests, only: %i[index show new create] do
+        member do
+          post :approve
+          post :reject
+        end
+      end
       resources :attendance_months
       resources :reports
       resources :documents

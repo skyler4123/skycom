@@ -153,6 +153,14 @@ Mirrors the `CompanyTransaction` gating: the invoice's `payment_status` is deriv
 
 ---
 
+### AttendanceRequest (`app/models/attendance_request.rb`)
+
+_No callbacks._ State moves only through `AttendanceRequests::ApproveService` /
+`RejectService` (approve creates the `AttendanceDay` in the same transaction) —
+never through model callbacks, mirroring the no-callback rule for direct day writes.
+
+---
+
 ### Workflow (`app/models/workflow.rb`)
 
 | Callback | Line | Method | Description |

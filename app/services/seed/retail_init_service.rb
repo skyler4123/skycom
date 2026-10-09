@@ -471,6 +471,24 @@ class Seed::RetailInitService
         properties: { property_string_1: "Usage Type", property_boolean_1: "Hazardous" },
         visible_columns: %w[name code unit estimated_unit_price]
       }
+    },
+    documents: {
+      "Company Policy" => {
+        properties: { property_string_1: "Policy Owner", property_string_2: "Applies To" },
+        visible_columns: %w[name code workflow_status]
+      },
+      "Employee Benefits" => {
+        properties: { property_string_1: "Benefit Type", property_string_2: "Eligibility" },
+        visible_columns: %w[name code workflow_status]
+      },
+      "Career & Promotion" => {
+        properties: { property_string_1: "Level", property_string_2: "Review Cycle" },
+        visible_columns: %w[name code workflow_status]
+      },
+      "How-To Guides" => {
+        properties: { property_string_1: "Topic", property_string_2: "Audience" },
+        visible_columns: %w[name code workflow_status]
+      }
     }
   }.freeze
 
@@ -629,6 +647,7 @@ class Seed::RetailInitService
         "TableConfigLog" => { read: true },
         "PermissionLog" => { read: true },
         "AttendanceDay" => { read: true },
+        "AttendanceRequest" => { create: true, read: true, update: true, delete: true },
         "AttendanceMonth" => { read: true },
         "Branch" => { create: true, read: true, update: true, delete: true },
         "Category" => { create: true, read: true, update: true, delete: true },
@@ -659,6 +678,7 @@ class Seed::RetailInitService
         "CompanyTicket" => { create: true, read: true, update: true, delete: true },
         "CompanyTicketComment" => { create: true, read: true, update: true, delete: true },
         "CompanyTicketLog" => { create: true, read: true, update: true, delete: true },
+        "Document" => { create: true, read: true, update: true, delete: true },
 
         "Service" => { create: true, read: true, update: true, delete: true },
         "Stock" => { create: true, read: true, update: true, delete: true },
@@ -683,6 +703,7 @@ class Seed::RetailInitService
         "TableConfigLog" => { read: true },
         "PermissionLog" => { read: true },
         "AttendanceDay" => { read: true },
+        "AttendanceRequest" => { create: true, read: true, update: true, delete: true },
         "AttendanceMonth" => { read: true },
         "Branch" => { create: true, read: true, update: true, delete: true },
         "Category" => { create: true, read: true, update: true, delete: true },
@@ -721,6 +742,7 @@ class Seed::RetailInitService
         "CompanyTicket" => { create: true, read: true, update: true, delete: true },
         "CompanyTicketComment" => { create: true, read: true, update: true, delete: true },
         "CompanyTicketLog" => { create: true, read: true, update: true, delete: true },
+        "Document" => { create: true, read: true, update: true, delete: true },
         "Student" => { create: true, read: true, update: true, delete: true }
       },
       Cashier: {
@@ -735,7 +757,8 @@ class Seed::RetailInitService
         "Brand" => { create: false, read: true, update: false, delete: false },
         "Supplier" => { create: false, read: true, update: false, delete: false },
         "Purchase" => { create: true, read: true, update: true, delete: false },
-        "PurchaseItem" => { create: false, read: true, update: false, delete: false }
+        "PurchaseItem" => { create: false, read: true, update: false, delete: false },
+        "AttendanceRequest" => { create: true, read: true, update: false, delete: false }
       },
       Seller: {
         "Notification" => { read: true },
@@ -749,7 +772,8 @@ class Seed::RetailInitService
         "Brand" => { create: false, read: true, update: false, delete: false },
         "Supplier" => { create: false, read: true, update: false, delete: false },
         "Purchase" => { create: true, read: true, update: true, delete: false },
-        "PurchaseItem" => { create: false, read: true, update: false, delete: false }
+        "PurchaseItem" => { create: false, read: true, update: false, delete: false },
+        "AttendanceRequest" => { create: true, read: true, update: false, delete: false }
       },
       Security: {
         "Notification" => { read: true },

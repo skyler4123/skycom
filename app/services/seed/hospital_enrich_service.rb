@@ -69,11 +69,13 @@ class Seed::HospitalEnrichService
     create_appointments
     create_invoices
     create_events
+    create_documents
     create_purchase_data
     create_support_ticket_data
     create_shifts
     create_attendance_configs
     create_attendance_event_data
+    create_attendance_request_samples
     seed_credit_data
 
     print_footer
@@ -581,7 +583,6 @@ class Seed::HospitalEnrichService
     end
 
     # Run resolution engine
-    puts "  -> Running daily resolution..."
     resolved_dates = (1..14).map { |i| Date.current - i.days }.reject { |d| d.saturday? || d.sunday? }
     @employees.each do |emp|
       resolved_dates.each do |date|
@@ -590,6 +591,11 @@ class Seed::HospitalEnrichService
         Rails.logger.warn("Resolution failed for #{emp.id} on #{date}: #{e.message}")
       end
     end
+  end
+
+  def create_attendance_request_samples
+    puts "Creating attendance request samples..."
+    count = Seed::AttendanceRequestService.create_samples(company: @company, employees: @employees)
   end
 
   def create_invoices
@@ -603,7 +609,6 @@ class Seed::HospitalEnrichService
         Seed::InvoiceService.create(order: order, category: round_robin(invoice_categories, i))
       end
     end
-    puts "  -> #{Invoice.where(company: @company).count} invoices created"
   end
 
   # Sample events across every events category (round-robin): each links a
@@ -643,7 +648,24 @@ class Seed::HospitalEnrichService
         EventStockAppointment.create!(company: @company, event: event, stock: stock, quantity: 1) if stock
       end
     end
-    puts "  -> #{Event.where(company: @company).count} events created"
+  end
+
+  # Sample documents across every documents category (round-robin, standalone —
+  # no groups) (docs/INIT_AND_ENRICH.md).
+  def create_documents
+    puts "Creating documents..."
+    doc_categories = Category.where(company: @company, resource_name: "documents").order(:id).to_a
+    return if doc_categories.empty?
+
+    6.times do |di|
+      branch = @branches[di % @branches.length] if @branches.present?
+      Seed::DocumentService.create(
+        company: @company,
+        branch: branch,
+        category: round_robin(doc_categories, di),
+        body_markdown: Seed::DocumentService::RICH_BODY_MARKDOWN_VARIANTS[di % Seed::DocumentService::RICH_BODY_MARKDOWN_VARIANTS.length]
+      )
+    end
   end
 
   # Sample purchase requisitions across every workflow phase:
@@ -664,7 +686,6 @@ class Seed::HospitalEnrichService
         index: i
       )
     end
-    puts "  -> #{CompanyTicket.where(company: @company).count} support tickets created"
   end
 
   def create_purchase_data
@@ -700,7 +721,6 @@ class Seed::HospitalEnrichService
 
       run_purchase_workflow(purchase, requester, managers.sample, i)
     end
-    puts "  -> #{Purchase.where(company: @company).count} purchases created"
   end
 
   def run_purchase_workflow(purchase, requester, manager, index)

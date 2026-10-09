@@ -22,6 +22,7 @@ The system supports multiple business types (retail, hospital) through the same 
 | 2 | `scheduled_shifts` | Employee roster (who works when) | employee_id, work_date, expected_start_at, expected_end_at, status |
 | 3 | `attendance_logs` | Immutable raw audit trail | employee_id, log_type, logged_at, latitude, longitude, wifi_ssid, device_fingerprint |
 | 4 | `attendance_days` | Employee-facing daily view | employee_id, attendance_date, check_in, check_out, total_seconds_* |
+| 4b | `attendance_requests` | Manual attendance tickets (approve → creates day) | employee_id, attendance_date, check_in, check_out, reason, status |
 | 5 | `attendance_months` | Payroll-ready monthly rollup | employee_id, month, total_work_minutes, total_late_minutes, total_overtime_minutes, total_present_days, total_absent_days |
 | 6 | `attendance_configs` | Per-branch geofence + resolution config | branch_id, latitude, longitude, allowed_radius_meters, resolution_strategy |
 
@@ -242,6 +243,7 @@ Shift seeds include realistic edge cases:
 | Model specs (35 examples) | Done |
 | CheckInService | Done |
 | CheckOutService | Done |
+| AttendanceRequest + Approve/Reject services (mobile filing + dashboard approval → AttendanceDay) | Done |
 | DailyResolutionService with Strategy classes (PairedStrategy, CheckInOnlyStrategy) | Done |
 | Check-in only device support (virtual segments) | Done |
 | Shift Templates dashboard (CRUD) | Done |

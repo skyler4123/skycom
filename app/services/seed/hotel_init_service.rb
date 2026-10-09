@@ -157,6 +157,24 @@ class Seed::HotelInitService
         visible_columns: %w[name code unit estimated_unit_price]
       }
     },
+    documents: {
+      "Hotel Policy" => {
+        properties: { property_string_1: "Policy Owner", property_string_2: "Applies To" },
+        visible_columns: %w[name code workflow_status]
+      },
+      "Staff Benefits" => {
+        properties: { property_string_1: "Benefit Type", property_string_2: "Eligibility" },
+        visible_columns: %w[name code workflow_status]
+      },
+      "Career & Promotion" => {
+        properties: { property_string_1: "Level", property_string_2: "Review Cycle" },
+        visible_columns: %w[name code workflow_status]
+      },
+      "How-To Guides" => {
+        properties: { property_string_1: "Topic", property_string_2: "Audience" },
+        visible_columns: %w[name code workflow_status]
+      }
+    },
     events: {
       "Booking" => {
         properties: { property_string_1: "Room Number", property_datetime_1: "Check-in Time", property_datetime_2: "Check-out Time", property_integer_1: "Guest Count" },
@@ -327,7 +345,8 @@ class Seed::HotelInitService
         "Service" => { read: true },
         "Facility" => { read: true },
         "Purchase" => { create: true, read: true, update: true, delete: false },
-        "PurchaseItem" => { create: false, read: true, update: false, delete: false }
+        "PurchaseItem" => { create: false, read: true, update: false, delete: false },
+        "AttendanceRequest" => { create: true, read: true, update: false, delete: false }
       },
       Housekeeper: {
         "Notification" => { read: true },
@@ -366,6 +385,7 @@ class Seed::HotelInitService
         "TableConfigLog" => { read: true },
         "PermissionLog" => { read: true },
         "AttendanceDay" => { read: true },
+        "AttendanceRequest" => { create: true, read: true, update: true, delete: true },
         "AttendanceMonth" => { read: true },
         "Brand" => full_crud,
         "Policy" => { read: true },
@@ -396,7 +416,8 @@ class Seed::HotelInitService
         "Purchase" => full_crud,
         "PurchaseItem" => full_crud,
         "DiscountGroup" => full_crud,
-        "Discount" => full_crud
+        "Discount" => full_crud,
+        "Document" => full_crud
       },
       Admin: {
         "Product" => full_crud,
@@ -410,6 +431,7 @@ class Seed::HotelInitService
         "TableConfigLog" => { read: true },
         "PermissionLog" => { read: true },
         "AttendanceDay" => { read: true },
+        "AttendanceRequest" => { create: true, read: true, update: true, delete: true },
         "AttendanceMonth" => { read: true },
         "Brand" => full_crud,
         "Policy" => { read: true },
@@ -440,7 +462,8 @@ class Seed::HotelInitService
         "Purchase" => full_crud,
         "PurchaseItem" => full_crud,
         "DiscountGroup" => full_crud,
-        "Discount" => full_crud
+        "Discount" => full_crud,
+        "Document" => full_crud
       }
     }
 
