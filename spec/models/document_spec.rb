@@ -56,6 +56,17 @@ RSpec.describe Document, type: :model do
     end
   end
 
+  describe "workflow_status" do
+    it "exposes only draft/published/archived statuses" do
+      expect(Document.workflow_statuses.keys).to contain_exactly("draft", "published", "archived")
+      expect(Document.workflow_statuses).to eq({ "draft" => 0, "published" => 1, "archived" => 2 })
+    end
+
+    it "defaults new records to draft" do
+      expect(Document.new.workflow_status).to eq("draft")
+    end
+  end
+
   describe "image attachments" do
     it "accepts up to 10 images" do
       doc = build_doc

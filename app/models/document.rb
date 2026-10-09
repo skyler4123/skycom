@@ -7,7 +7,7 @@ class Document < ApplicationRecord
 
   # --- Enums ---
   enum :lifecycle_status, LIFECYCLE_STATUS, prefix: true
-  enum :workflow_status, WORKFLOW_STATUS, prefix: true
+  enum :workflow_status, { draft: 0, published: 1, archived: 2 }, prefix: true, default: :draft
   enum :business_type, {
     general: 0,
     policy: 1,
