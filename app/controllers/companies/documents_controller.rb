@@ -2,7 +2,9 @@
 #
 # Documents dashboard API (Shell-First). index supports the same TableConfig-driven
 # dynamic search/filter as Brands (?q= / ?filters[key]= → Meilisearch via
-# Documents::SearchQueryService; plain DB path otherwise).
+# Documents::SearchQueryService; plain DB path otherwise) plus an optional
+# ?workflow_status= scope (draft/published/archived, no default — the FE index
+# injects workflow_status=published unless overridden).
 # Serves Stimulus: Companies_Documents_IndexController (index JSON incl. q/filters passthrough),
 #                  Companies_Documents_NewController|ShowController|EditController
 # Endpoints: GET /companies/:company_id/documents(.json) + nested CRUD — see config/routes.rb
@@ -14,6 +16,7 @@ class Companies::DocumentsController < Companies::ApplicationController
       format.json do
         scope = current_company.documents
         scope = scope.where(category_id: params[:category_id]) if params[:category_id].present?
+        scope = scope.where(workflow_status: params[:workflow_status]) if params[:workflow_status].present?
 
         search = Documents::SearchQueryService.new(company: current_company, params: params)
         scope = scope.where(id: search.record_ids).in_order_of(:id, search.record_ids) if search.active?

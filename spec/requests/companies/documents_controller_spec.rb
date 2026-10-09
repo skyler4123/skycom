@@ -70,6 +70,25 @@ RSpec.describe "Companies::DocumentsController", type: :request do
     end
   end
 
+  describe "GET #index workflow_status filter" do
+    let!(:published_doc) { Seed::DocumentService.create(company: company, category: category, workflow_status: "published") }
+    let!(:draft_doc) { Seed::DocumentService.create(company: company, category: category, workflow_status: "draft") }
+
+    it "filters index by workflow_status when given" do
+      get "/companies/#{company.id}/documents.json", params: { category_id: category.id, workflow_status: "published" }
+
+      expect(response).to have_http_status(:ok)
+      expect(JSON.parse(response.body)["documents"].map { |d| d["id"] }).to contain_exactly(published_doc.id)
+    end
+
+    it "returns all statuses when workflow_status is absent (no BE default)" do
+      get "/companies/#{company.id}/documents.json", params: { category_id: category.id }
+
+      expect(response).to have_http_status(:ok)
+      expect(JSON.parse(response.body)["documents"].map { |d| d["id"] }).to contain_exactly(published_doc.id, draft_doc.id)
+    end
+  end
+
   describe "POST #create" do
     it "creates with name and markdown, then redirects to show" do
       expect {
