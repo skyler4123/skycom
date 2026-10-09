@@ -628,7 +628,6 @@ class Seed::RetailEnrichService
         Seed::InvoiceService.create(order: order, category: round_robin(invoice_categories, i))
       end
     end
-    puts "  -> #{Invoice.where(company: @retail).count} invoices created"
   end
 
   # Sample events across every events category (round-robin): each links a
@@ -668,7 +667,6 @@ class Seed::RetailEnrichService
         EventStockAppointment.create!(company: @retail, event: event, stock: stock, quantity: 1) if stock
       end
     end
-    puts "  -> #{Event.where(company: @retail).count} events created"
   end
 
   # Sample documents across every documents category (round-robin): 2 groups,
@@ -697,7 +695,6 @@ class Seed::RetailEnrichService
         )
       end
     end
-    puts "  -> #{DocumentGroup.where(company: @retail).count} document groups, #{Document.where(company: @retail).count} documents created"
   end
 
   # Sample purchase requisitions across every workflow phase:
@@ -736,7 +733,6 @@ class Seed::RetailEnrichService
 
       run_purchase_workflow(purchase, requester, managers.sample, i)
     end
-    puts "  -> #{Purchase.where(company: @retail).count} purchases created"
   end
 
   def create_discount_data
@@ -753,7 +749,6 @@ class Seed::RetailEnrichService
     )
     Discounts::BatchGenerator.call(discount_group: fixed_group, quantity: 25)
 
-    puts "  -> #{Discount.where(company: @retail).count} discount codes created (#{DiscountGroup.where(company: @retail).count} groups)"
   end
 
   def create_support_ticket_data
@@ -772,7 +767,6 @@ class Seed::RetailEnrichService
         index: i
       )
     end
-    puts "  -> #{CompanyTicket.where(company: @retail).count} support tickets created"
   end
 
   def create_notification_data
@@ -790,7 +784,6 @@ class Seed::RetailEnrichService
     Notifications::CreateService.call(company: @retail, title: "Low stock alert",
       body: "Some SKUs are running low.", severity: :warning, tag_ids: [ ops.id ])
 
-    puts "  -> #{Notification.where(company: @retail).count} notifications created"
   end
 
   def run_purchase_workflow(purchase, requester, manager, index)
@@ -910,7 +903,6 @@ class Seed::RetailEnrichService
     end
 
     # Run resolution engine
-    puts "  -> Running daily resolution..."
     resolved_dates = (1..14).map { |i| Date.current - i.days }.reject { |d| d.saturday? || d.sunday? }
     @employees.each do |emp|
       resolved_dates.each do |date|
@@ -924,7 +916,6 @@ class Seed::RetailEnrichService
   def create_attendance_request_samples
     puts "Creating attendance request samples..."
     count = Seed::AttendanceRequestService.create_samples(company: @retail, employees: @employees)
-    puts "  -> #{count} attendance requests created"
   end
 
   def seed_credit_data

@@ -583,7 +583,6 @@ class Seed::HospitalEnrichService
     end
 
     # Run resolution engine
-    puts "  -> Running daily resolution..."
     resolved_dates = (1..14).map { |i| Date.current - i.days }.reject { |d| d.saturday? || d.sunday? }
     @employees.each do |emp|
       resolved_dates.each do |date|
@@ -597,7 +596,6 @@ class Seed::HospitalEnrichService
   def create_attendance_request_samples
     puts "Creating attendance request samples..."
     count = Seed::AttendanceRequestService.create_samples(company: @company, employees: @employees)
-    puts "  -> #{count} attendance requests created"
   end
 
   def create_invoices
@@ -611,7 +609,6 @@ class Seed::HospitalEnrichService
         Seed::InvoiceService.create(order: order, category: round_robin(invoice_categories, i))
       end
     end
-    puts "  -> #{Invoice.where(company: @company).count} invoices created"
   end
 
   # Sample events across every events category (round-robin): each links a
@@ -651,7 +648,6 @@ class Seed::HospitalEnrichService
         EventStockAppointment.create!(company: @company, event: event, stock: stock, quantity: 1) if stock
       end
     end
-    puts "  -> #{Event.where(company: @company).count} events created"
   end
 
   # Sample documents across every documents category (round-robin): 2 groups,
@@ -679,7 +675,6 @@ class Seed::HospitalEnrichService
         )
       end
     end
-    puts "  -> #{DocumentGroup.where(company: @company).count} document groups, #{Document.where(company: @company).count} documents created"
   end
 
   # Sample purchase requisitions across every workflow phase:
@@ -700,7 +695,6 @@ class Seed::HospitalEnrichService
         index: i
       )
     end
-    puts "  -> #{CompanyTicket.where(company: @company).count} support tickets created"
   end
 
   def create_purchase_data
@@ -736,7 +730,6 @@ class Seed::HospitalEnrichService
 
       run_purchase_workflow(purchase, requester, managers.sample, i)
     end
-    puts "  -> #{Purchase.where(company: @company).count} purchases created"
   end
 
   def run_purchase_workflow(purchase, requester, manager, index)
