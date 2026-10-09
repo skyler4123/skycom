@@ -688,7 +688,8 @@ class Seed::HotelEnrichService
           company: @company,
           branch: group.branch,
           document_group: group,
-          category: round_robin(doc_categories, gi * 3 + di)
+          category: round_robin(doc_categories, gi * 3 + di),
+          body_markdown: Seed::DocumentService::RICH_BODY_MARKDOWN_VARIANTS[(gi * 3 + di) % Seed::DocumentService::RICH_BODY_MARKDOWN_VARIANTS.length]
         )
       end
     end

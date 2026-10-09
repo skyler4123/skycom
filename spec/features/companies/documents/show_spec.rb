@@ -64,15 +64,15 @@ RSpec.feature "Companies::Documents Show", type: :feature, js: true do
     expect(html).not_to include("<img")
   end
 
-  scenario "escapes raw HTML in the body (XSS-safe)" do
+  scenario "sanitizes raw HTML in the body (XSS-safe, marked+DOMPurify)" do
     document.update!(body_markdown: "<script>alert(1)</script>")
 
     visit company_document_path(company, document)
 
     article = find("article", wait: 10)
     html = article.native.attribute("innerHTML")
-    expect(html).to include("&lt;script&gt;")
-    expect(html).not_to include("<script>alert")
+    expect(html).not_to include("<script")
+    expect(html).not_to include("alert(1)")
   end
 
   scenario "lists attached images and files" do

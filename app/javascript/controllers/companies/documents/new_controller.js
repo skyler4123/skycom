@@ -1,4 +1,8 @@
 import Companies_LayoutController from "controllers/companies/layout_controller"
+import { marked } from "marked"
+import DOMPurify from "dompurify"
+
+const renderBody = (source = "") => DOMPurify.sanitize(marked.parse(String(source ?? "")))
 
 export default class Companies_Documents_NewController extends Companies_LayoutController {
   // Depends on BE: Companies::DocumentsController#new (document_groups JSON) + #create (multipart POST)
@@ -143,7 +147,7 @@ export default class Companies_Documents_NewController extends Companies_LayoutC
   updatePreview(event) {
     const preview = this.element.querySelector('#markdown-preview')
     if (preview) {
-      const rendered = renderMarkdown(event.target.value || '')
+      const rendered = renderBody(event.target.value || '')
       preview.innerHTML = rendered || `<p class="text-sm text-slate-400">${translate("Nothing to preview yet.")}</p>`
     }
   }

@@ -1,4 +1,13 @@
 class Seed::DocumentService
+  # Rich GFM samples (headings, tables, code, strikethrough, task lists, links)
+  # used by enrich services so seeded docs showcase the marked renderer.
+  # Seed/fixture data stays local per docs/CONSTANTS.md.
+  RICH_BODY_MARKDOWN_VARIANTS = [
+    "# Leave Policy\n\nTake **days** off with *pay*.\n\n| Type | Days |\n| --- | --- |\n| Annual | 12 |\n| Sick | 6 |\n\n- [ ] Submit request\n- [x] Manager approval\n\nSee [policy](https://example.com/policy).",
+    "## Onboarding Guide\n\nDo **this** first, then `run setup`.\n\n```ruby\nputs \"hello\"\n```\n\n| Step | Owner |\n| --- | --- |\n| 1. Laptop | IT |\n| 2. Accounts | HR |\n\n~~Old step~~ is gone.",
+    "### Safety Rules\n\n> Follow these every shift.\n\n- Wear gear\n- Report issues\n\n| Item | Qty |\n| --- | --- |\n| Gloves | 2 |\n| Helmet | 1 |\n\n- [ ] Read handbook at [link](https://example.com/handbook)"
+  ].freeze
+
   def self.new(
     company:,
     branch: nil,

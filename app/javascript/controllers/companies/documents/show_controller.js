@@ -1,4 +1,8 @@
 import Companies_LayoutController from "controllers/companies/layout_controller"
+import { marked } from "marked"
+import DOMPurify from "dompurify"
+
+const renderBody = (source = "") => DOMPurify.sanitize(marked.parse(String(source ?? "")))
 
 export default class Companies_Documents_ShowController extends Companies_LayoutController {
   // Depends on BE: Companies::DocumentsController#show (document JSON with body_markdown + urls)
@@ -168,7 +172,7 @@ export default class Companies_Documents_ShowController extends Companies_Layout
           </div>
 
           <article class="mt-6 border-t border-slate-200 dark:border-gray-800 pt-6 max-w-none">
-            ${d.body_markdown ? renderMarkdown(d.body_markdown) : `<p class="text-sm text-slate-400">${translate("No content yet.")}</p>`}
+            ${d.body_markdown ? renderBody(d.body_markdown) : `<p class="text-sm text-slate-400">${translate("No content yet.")}</p>`}
           </article>
 
           ${attachmentsHTML}
