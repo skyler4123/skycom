@@ -6,10 +6,6 @@ RSpec.describe Tag, type: :model do
     it { should belong_to(:company) }
     it { should have_many(:answer_tag_appointments).dependent(:destroy) }
     it { should have_many(:answers).through(:answer_tag_appointments) }
-    it { should have_many(:article_tag_appointments).dependent(:destroy) }
-    it { should have_many(:articles).through(:article_tag_appointments) }
-    it { should have_many(:article_group_tag_appointments).dependent(:destroy) }
-    it { should have_many(:article_groups).through(:article_group_tag_appointments) }
     it { should have_many(:branch_tag_appointments).dependent(:destroy) }
     it { should have_many(:branches).through(:branch_tag_appointments) }
     it { should have_many(:brand_tag_appointments).dependent(:destroy) }
@@ -24,8 +20,6 @@ RSpec.describe Tag, type: :model do
     it { should have_many(:departments).through(:department_tag_appointments) }
     it { should have_many(:document_tag_appointments).dependent(:destroy) }
     it { should have_many(:documents).through(:document_tag_appointments) }
-    it { should have_many(:document_group_tag_appointments).dependent(:destroy) }
-    it { should have_many(:document_groups).through(:document_group_tag_appointments) }
     it { should have_many(:employee_tag_appointments).dependent(:destroy) }
     it { should have_many(:employees).through(:employee_tag_appointments) }
     it { should have_many(:employee_group_tag_appointments).dependent(:destroy) }

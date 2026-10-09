@@ -1,11 +1,8 @@
 class Seed::EmployeeAppointmentService
   ROUTES = {
-    "Article" => [ "ArticleEmployeeAppointmentService", :article ],
-    "ArticleGroup" => [ "ArticleGroupEmployeeAppointmentService", :article_group ],
     "Customer" => [ "CustomerEmployeeAppointmentService", :customer ],
     "Department" => [ "DepartmentEmployeeAppointmentService", :department ],
     "Document" => [ "DocumentEmployeeAppointmentService", :document ],
-    "DocumentGroup" => [ "DocumentGroupEmployeeAppointmentService", :document_group ],
     "Employee" => [ "EmployeeEmployeeAppointmentService", :related_employee ],
     "EmployeeGroup" => [ "EmployeeEmployeeGroupAppointmentService", :employee_group ],
     "Event" => [ "EmployeeEventAppointmentService", :event ],

@@ -62,10 +62,7 @@
 /** @typedef {Object} Address @property {string} id @property {string} line_1 @property {string} line_2 @property {string} city @property {string} state_or_province @property {string} postal_code @property {number} country @property {string} fingerprint */
 
 // --- 10. CMS & DOCUMENTS ---
-/** @typedef {Object} Article @property {string} id @property {string} article_group_id @property {string} company_id @property {string} branch_id @property {string} category_id @property {string} title @property {Object} content @property {string} name @property {string} description @property {string} code @property {number} lifecycle_status @property {string} workflow_status @property {string} business_type @property {string} discarded_at @property {Metadata} metadata */
-/** @typedef {Object} ArticleGroup @property {string} id @property {string} company_id @property {string} branch_id @property {string} category_id @property {string} title @property {Object} content @property {string} name @property {string} description @property {string} code @property {number} lifecycle_status @property {string} workflow_status @property {string} business_type @property {string} discarded_at @property {Metadata} metadata */
-/** @typedef {Object} Document @property {string} id @property {string} document_group_id @property {string} company_id @property {string} branch_id @property {string} category_id @property {string} title @property {Object} content @property {string} name @property {string} description @property {string} code @property {number} lifecycle_status @property {string} workflow_status @property {string} business_type @property {string} discarded_at @property {Metadata} metadata */
-/** @typedef {Object} DocumentGroup @property {string} id @property {string} company_id @property {string} branch_id @property {string} category_id @property {string} title @property {Object} content @property {string} name @property {string} description @property {string} code @property {number} lifecycle_status @property {string} workflow_status @property {string} business_type @property {string} discarded_at @property {Metadata} metadata */
+/** @typedef {Object} Document @property {string} id @property {string} company_id @property {string} branch_id @property {string} category_id @property {string} body_markdown @property {string} name @property {string} description @property {string} code @property {number} lifecycle_status @property {string} workflow_status @property {string} business_type @property {string} discarded_at @property {Metadata} metadata @property {Array} image_urls @property {Array} file_urls */
 
 // --- 12. SUBSCRIPTIONS & PLANS ---
 /** @typedef {Object} Subscription @property {string} id @property {string} company_id @property {string} branch_id @property {string} subscription_plan_id @property {string} subscription_group_id @property {string} seller_type @property {string} seller_id @property {string} buyer_type @property {string} buyer_id @property {string} resource_type @property {string} resource_id @property {string} processer_type @property {string} processer_id @property {string} name @property {string} description @property {number} country @property {number} timezone @property {number} lifecycle_status @property {string} workflow_status @property {string} business_type @property {boolean} auto_renew @property {string} discarded_at @property {Metadata} metadata */
@@ -94,13 +91,11 @@
 
 // --- 18. APPOINTMENTS (ATOMIC PAIRWISE JOINS) ---
 // Atomic pairwise join tables: one table per resource pair, named alphabetically
-// (A_B_appointments, e.g. article_employee_appointments). Each row links exactly
+// (A_B_appointments, e.g. document_employee_appointments). Each row links exactly
 // two records via concrete FKs plus company_id — no polymorphic appoint_to/from.
 // Extra columns per domain: quantity/unit_price/total_price (order, purchase),
 // duration/start_at (service bookings).
 /** @typedef {Object} AtomicAppointment @property {string} id @property {string} company_id @property {string} name @property {string} description @property {string} code @property {number} lifecycle_status @property {string} workflow_status @property {string} business_type @property {string} discarded_at @property {string} created_at @property {string} updated_at */
-/** @typedef {AtomicAppointment} ArticleEmployeeAppointment */
-/** @typedef {AtomicAppointment} ArticleGroupEmployeeAppointment */
 /** @typedef {AtomicAppointment} BranchPaymentMethodAppointment */
 /** @typedef {AtomicAppointment} CartEmployeeAppointment */
 /** @typedef {AtomicAppointment} CompanyPaymentMethodAppointment */
@@ -108,7 +103,6 @@
 /** @typedef {AtomicAppointment} CustomerEmployeeAppointment */
 /** @typedef {AtomicAppointment} DepartmentEmployeeAppointment */
 /** @typedef {AtomicAppointment} DocumentEmployeeAppointment */
-/** @typedef {AtomicAppointment} DocumentGroupEmployeeAppointment */
 /** @typedef {AtomicAppointment} EmployeeEmployeeAppointment */
 /** @typedef {AtomicAppointment} EmployeeEmployeeGroupAppointment */
 /** @typedef {AtomicAppointment} EmployeeEventAppointment */

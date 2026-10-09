@@ -191,6 +191,10 @@ export const edit_company_shift_template_path = (companyId, id) => `/companies/$
 export const create_company_shift_templates_path = (companyId) => `/companies/${companyId}/shift_templates`
 export const company_reports_path = (companyId) => `/companies/${companyId}/reports`
 export const company_documents_path = (companyId) => `/companies/${companyId}/documents`
+export const create_company_documents_path = (companyId) => `/companies/${companyId}/documents`
+export const new_company_document_path = (companyId) => `/companies/${companyId}/documents/new`
+export const company_document_path = (companyId, documentId) => `/companies/${companyId}/documents/${documentId}`
+export const edit_company_document_path = (companyId, documentId) => `/companies/${companyId}/documents/${documentId}/edit`
 export const company_announcements_path = (companyId) => `/companies/${companyId}/announcements`
 export const company_events_path = (companyId) => `/companies/${companyId}/events`
 export const new_company_event_path = (companyId) => `/companies/${companyId}/events/new`

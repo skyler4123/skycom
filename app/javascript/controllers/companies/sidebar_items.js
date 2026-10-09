@@ -42,6 +42,7 @@ export const SIDEBAR_ITEMS = [
   { key: "table_config_logs", group: "platform", icon: "history", label: "Table Config Logs", href: (cid) => Helpers.company_table_config_logs_path(cid) },
   { key: "workflows", group: "platform", icon: "account_tree", label: "Workflows", href: (cid) => Helpers.company_workflows_path(cid) },
   { key: "pages", group: "platform", icon: "description", label: "Pages", href: (cid) => Helpers.company_pages_path(cid) },
+  { key: "documents", group: "platform", icon: "article", label: "Documents", href: (cid) => Helpers.company_documents_path(cid) },
   { key: "calendar", group: "calendar", icon: "calendar_month", label: "Calendar", href: (cid) => Helpers.company_calendar_path(cid) },
   { key: "events", group: "calendar", icon: "event", label: "Events", href: (cid) => Helpers.company_events_path(cid) },
   { key: "event_configs", group: "calendar", icon: "tune", label: "Event Configs", href: (cid) => Helpers.company_event_configs_path(cid) },  { key: "event_config_logs", group: "calendar", icon: "history", label: "Event Config Logs", href: (cid) => Helpers.company_event_config_logs_path(cid) },  { key: "payment_methods", group: "platform", icon: "payments", label: "Payment Methods", href: (cid) => Helpers.company_payment_method_appointments_path(cid) },

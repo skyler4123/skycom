@@ -13,3 +13,5 @@ pin "swiper" # @12.1.3
 pin "toastify-js" # @1.12.0
 pin "centrifuge" # @5.7.0
 pin "qrcode" # @5.39.0
+pin "marked" # @18.1.0
+pin "dompurify" # @3.4.16

@@ -75,8 +75,6 @@ class PropertyMapping < ApplicationRecord
 
   has_many :table_configs, dependent: :destroy
   has_many :answers, dependent: :restrict_with_error
-  has_many :articles, dependent: :restrict_with_error
-  has_many :article_groups, dependent: :restrict_with_error
   has_many :brands, dependent: :restrict_with_error
   has_many :branches, dependent: :restrict_with_error
   has_many :carts, dependent: :restrict_with_error
@@ -85,7 +83,6 @@ class PropertyMapping < ApplicationRecord
   has_many :customer_groups, dependent: :restrict_with_error
   has_many :departments, dependent: :restrict_with_error
   has_many :documents, dependent: :restrict_with_error
-  has_many :document_groups, dependent: :restrict_with_error
   has_many :employees, dependent: :restrict_with_error
   has_many :employee_groups, dependent: :restrict_with_error
   has_many :events, dependent: :restrict_with_error
