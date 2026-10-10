@@ -5,6 +5,15 @@
 <!DOCTYPE html>
 <html>
   <head>
+    <script>
+      // Pre-apply persisted dark mode before first paint (no FOUC, no Stimulus dependency).
+      // Source of truth: localStorage["darkmode"] === "true" (see darkmode_controller.js).
+      try {
+        if (localStorage.getItem("darkmode") === "true") {
+          document.documentElement.classList.add("dark");
+        }
+      } catch (e) {}
+    </script>
     <title><%= content_for(:title) || "Skycom" %></title>
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <meta name="apple-mobile-web-app-capable" content="yes">

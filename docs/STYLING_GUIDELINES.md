@@ -69,6 +69,31 @@ Always include both light mode and `dark:` variant for every element that needs 
 </button>
 ```
 
+### 4.1 How dark mode works (read before debugging "dark doesn't stick")
+
+Tailwind v4 class strategy — `app/assets/tailwind/application.css`:
+
+```css
+@custom-variant dark (&:where(.dark, .dark *));
+```
+
+Every `dark:` class activates only when an ancestor (here `<html>`) carries
+class `dark`. There is no `tailwind.config.*` and no media-query fallback.
+
+| Piece | File | Role |
+|-------|------|------|
+| Source of truth | `localStorage["darkmode"]` (`"true"` / `"false"`) | Persisted preference |
+| Pre-paint apply | Inline `<script>` in `app/views/layouts/application.html.erb` + `admin.html.erb` `<head>` | Adds `dark` to `<html>` before first paint (no FOUC, no Stimulus dependency) |
+| Toggle + re-apply | `app/javascript/controllers/darkmode_controller.js` | Header button (`Helpers.darkmodeTrigger()` in `layout_controller.js`) toggles via the `darkmode` value; `initialize()`/`connect()` re-apply stored theme on every boot/Turbo navigation; `triggerTargetConnected()` re-injects icons whenever the layout re-renders the header |
+| Icons | Same controller (`triggerHTML()`) | Moon (`flex dark:hidden`) / sun (`hidden dark:flex`) — pure CSS swap, no JS state |
+
+Rules:
+
+- **Never gate theme application on the header trigger existing.** The layout renders the trigger asynchronously (after the client cache resolves); the old code waited for it and dropped the theme on slow pages.
+- **Toggle through the `darkmode` value** (`toggleDarkmode()` sets the value; `darkmodeValueChanged()` writes DOM + storage). Bypassing the value leaves DOM/value/storage diverged.
+- **Keep the head pre-apply script in sync** with the storage key if either ever changes.
+- Regression coverage: `spec/features/companies/layouts/darkmode_spec.rb` (toggle, reload persistence, Turbo sidebar navigation, all sidebar index pages).
+
 ---
 
 ## 5. Single Line Classes
