@@ -78,6 +78,7 @@ class Seed::HotelEnrichService
     create_documents
     create_purchase_data
     create_discount_data
+    create_dynamic_sidebar_samples
     create_shifts
     create_attendance_configs
     create_attendance_event_data
@@ -734,7 +735,34 @@ class Seed::HotelEnrichService
       discount_type: :fixed_amount, amount_cents: 500, campaign_status: :active
     )
     Discounts::BatchGenerator.call(discount_group: walkin_group, quantity: 25)
+  end
 
+  # Sample dynamic sidebar shortcuts for development (docs/SIDEBAR.md).
+  # Same pattern as the retail enricher — only fills the init record when it
+  # is still empty, never clobbers edits.
+  def create_dynamic_sidebar_samples
+    record = Setting.find_or_create_by!(company: @company, appoint_to: @company, code: DYNAMIC_SIDEBAR_CODE) do |setting|
+      setting.name = "Dynamic sidebar"
+      setting.business_type = :company
+      setting.lifecycle_status = :active
+      setting.workflow_status = :confirmed
+      setting.metadata = { "sidebar_groups" => [] }
+    end
+    return if record.sidebar_groups.present?
+
+    record.update!(
+      sidebar_groups: [
+        {
+          "key" => "quick-links", "name" => "Quick Links",
+          "items" => [
+            { "key" => "pending-orders", "name" => "Pending Orders",
+              "url" => "/companies/#{@company.id}/orders?workflow_status=pending" },
+            { "key" => "all-stocks", "name" => "All Stocks",
+              "url" => "/companies/#{@company.id}/stocks" }
+          ]
+        }
+      ]
+    )
   end
 
   def run_purchase_workflow(purchase, requester, manager, index)
