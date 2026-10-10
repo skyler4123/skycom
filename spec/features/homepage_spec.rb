@@ -2,11 +2,11 @@ require 'rails_helper'
 
 RSpec.feature "Homepage", type: :feature, js: true do
   describe "Guest (not signed in)" do
-    it "shows Sign In and Sign Up buttons" do
+    it "shows Sign In and Claim Free Starter Credits buttons" do
       visit root_path
 
       expect(page).to have_selector('[role="sign-in-button"]', text: "Sign In")
-      expect(page).to have_selector('[role="sign-up-button"]', text: "Sign Up")
+      expect(page).to have_selector('[role="sign-up-button"]', text: "Claim Free Starter Credits")
     end
 
     it "does not show Sign Out button" do
@@ -22,6 +22,32 @@ RSpec.feature "Homepage", type: :feature, js: true do
 
       expect(page).to have_content("Email")
     end
+
+    it "clicking Claim Free Starter Credits opens signup modal" do
+      visit root_path
+
+      click_button "Claim Free Starter Credits", match: :first
+
+      expect(page).to have_content("Create your account")
+    end
+
+    it "renders live demo console with chart and auto-increasing numbers" do
+      visit root_path
+
+      expect(page).to have_selector('[data-home--index-target="velocityChart"]')
+      sales = find('[data-live="sales"]').text
+      expect(sales).to match(/\$\d[\d,]*\.\d{2}/)
+      # Numbers tick live — the initial value disappears without sleep (Capybara waiting)
+      expect(page).to have_no_text(sales, wait: 8)
+    end
+
+    it "switching tenant tab updates console title" do
+      visit root_path
+
+      click_button "Grand Azalea Hotel PMS"
+
+      expect(page).to have_selector("#tenant-title", text: "Grand Azalea Hotel")
+    end
   end
 
   describe "Signed in user" do
@@ -31,10 +57,10 @@ RSpec.feature "Homepage", type: :feature, js: true do
       sign_in(user)
     end
 
-    it "My Companies, and New Company buttons" do
+    it "Go to Dashboard, and New Company buttons" do
       visit root_path
 
-      expect(page).to have_link("My Companies")
+      expect(page).to have_link("Go to Dashboard")
       expect(page).to have_button("New Company")
     end
 
@@ -54,12 +80,12 @@ RSpec.feature "Homepage", type: :feature, js: true do
       expect(page).to have_selector('[role="sign-in-button"]', text: "Sign In")
     end
 
-    it "clicking My Companies navigates to companies page" do
+    it "clicking Go to Dashboard navigates to companies page" do
       create(:company, user: user)
 
       visit root_path
 
-      click_link "My Companies"
+      click_link "Go to Dashboard"
 
       expect(page).to have_current_path(%r{/companies/[^/]+/dashboards})
     end

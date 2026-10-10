@@ -1,171 +1,1023 @@
 <div class="bg-gray-50 dark:bg-gray-950">
-  <div class="relative flex h-auto min-h-screen w-full flex-col group/design-root overflow-x-hidden">
-    <div class="layout-container flex h-full grow flex-col">
-      <div class="flex flex-1 justify-center">
-        <div class="flex flex-col max-w-[960px] h-screen justify-between">
-          <header class="flex items-center justify-between whitespace-nowrap px-10 py-3">
-            <div class="flex items-center gap-4 text-slate-900 dark:text-slate-100">
-              <img src="/icon.svg" alt="Skycom Logo" class="h-8 w-8">
-              <h2 class="text-slate-900 dark:text-slate-100 text-lg font-bold leading-tight tracking-[-0.015em]">
-                Skycom
-              </h2>
-            </div>
-
-            <nav class="flex flex-1 justify-evenly items-center px-4">
-              <a class="text-sm font-medium text-slate-700 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-600 transition-colors"
-                href="/redirect/companies">My Companies
-              </a>
-
-              <button
-                class="text-sm font-medium text-slate-700 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-600 transition-colors cursor-pointer"
-                data-action="click->home--index#openNewCompanyModal"
-              >
-                New Company
-              </button>
-            </nav>
-
-            <div class="flex justify-end gap-2 items-center" data-controller="home--header--authentication"></div>
-
-          </header>
-          <main class="w-full h-full">
-            <div class="">
-              <div class="flex flex-row gap-6 px-4 py-16">
-                <div class="flex flex-col gap-6 w-1/2">
-                  <div class="flex flex-col gap-2 text-left">
-                    <h1 class="text-slate-900 dark:text-slate-100 text-4xl font-black leading-tight tracking-[-0.033em] @[480px]:text-5xl @[480px]:font-black @[480px]:leading-tight @[480px]:tracking-[-0.033em]">
-                      One Platform, Limitless Potential</h1>
-                    <h2 class="text-slate-600 dark:text-slate-400 text-xl font-normal leading-normal">
-                      Skycom is a flexible multi-vertical business management platform. From retail
-                      and education to
-                      healthcare and fitness, our adaptable system streamlines your operations.
-                    </h2>
-                  </div>
-                  <div class="flex-wrap gap-3 flex">
-                    <button class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-4 @[480px]:h-12 @[480px]:px-5 bg-indigo-600 text-white text-sm font-bold leading-normal tracking-[0.015em] @[480px]:text-base @[480px]:font-bold @[480px]:leading-normal @[480px]:tracking-[0.015em]">
-                      <span class="truncate">Get Started for Free</span>
-                    </button>
-                  </div>
-                </div>
-                <div class="w-1/2 bg-center bg-no-repeat aspect-video bg-cover rounded-lg @[480px]:h-auto @[480px]:min-w-[400px] @[864px]:w-full" data-alt="Abstract blue and white geometric shapes" style='background-image: url("https://plus.unsplash.com/premium_vector-1732570528832-68eaef3f17ed?q=80&w=1702&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D");'>
-                </div>
-              </div>
-            </div>
-            <div class="text-center px-4 pb-3 pt-5">
-              <h2 class="text-slate-900 dark:text-slate-100 text-[22px] font-bold leading-tight tracking-[-0.015em]">
-                Create a Tailored Experience for Your Business</h2>
-              <p class="text-slate-600 dark:text-slate-400 text-base mt-1">Select your business type to
-                begin your
-                journey with a system configured for your needs.</p>
-            </div>
-            
-            <div class="grid grid-cols-2 gap-4 p-4">
-              <div class="flex flex-col gap-3 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-gray-950 overflow-hidden hover:border-indigo-600 hover:shadow-lg transition-all cursor-pointer">
-                <a href="/home/retail">
-                  <img alt="Retail store interior" class="h-48 w-full object-cover" src="https://images.unsplash.com/photo-1556740738-b6a63e27c4df?q=80&w=1470&auto=format&fit=crop" />
-                  <div class="flex flex-col gap-1 p-4">
-                    <h2 class="text-slate-900 dark:text-slate-100 text-base font-bold leading-tight">Retail</h2>
-                    <p class="text-slate-600 dark:text-slate-400 text-sm font-normal leading-normal">
-                      Master your supply chain with real-time stock mirroring across multiple branches and automated reordering.
-                    </p>
-                  </div>
-                </a>
-              </div>
-
-              <div class="flex flex-col gap-3 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-gray-950 overflow-hidden hover:border-indigo-600 hover:shadow-lg transition-all cursor-pointer">
-                <a href="/home/education">
-                  <img alt="Classroom with students" class="h-48 w-full object-cover" src="https://images.unsplash.com/photo-1588075592446-265fd1e6e76f?q=80&w=1472&auto=format&fit=crop" />
-                  <div class="flex flex-col gap-1 p-4">
-                    <h2 class="text-slate-900 dark:text-slate-100 text-base font-bold leading-tight">Education</h2>
-                    <p class="text-slate-600 dark:text-slate-400 text-sm font-normal leading-normal">
-                      Coordinate student enrollments, faculty scheduling, and parent-teacher communication in one unified portal.
-                    </p>
-                  </div>
-                </a>
-              </div>
-
-              <div class="flex flex-col gap-3 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-gray-950 overflow-hidden hover:border-indigo-600 hover:shadow-lg transition-all cursor-pointer">
-                <a href="/home/hospital">
-                  <img alt="Hospital hallway" class="h-48 w-full object-cover" src="https://plus.unsplash.com/premium_photo-1681995277879-42e0d91897e0?q=80&w=1470&auto=format&fit=crop" />
-                  <div class="flex flex-col gap-1 p-4">
-                    <h2 class="text-slate-900 dark:text-slate-100 text-base font-bold leading-tight">Healthcare</h2>
-                    <p class="text-slate-600 dark:text-slate-400 text-sm font-normal leading-normal">
-                      Optimize patient appointments with specialized role-based staff assignments and secure treatment records.
-                    </p>
-                  </div>
-                </a>
-              </div>
-
-              <div class="flex flex-col gap-3 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-gray-950 overflow-hidden hover:border-indigo-600 hover:shadow-lg transition-all cursor-pointer">
-                <a href="/home/restaurant">
-                  <img alt="Modern restaurant interior" class="h-48 w-full object-cover" src="https://images.unsplash.com/photo-1414235077428-338989a2e8c0?q=80&w=1470&auto=format&fit=crop" />
-                  <div class="flex flex-col gap-1 p-4">
-                    <h2 class="text-slate-900 dark:text-slate-100 text-base font-bold leading-tight">Restaurant</h2>
-                    <p class="text-slate-600 dark:text-slate-400 text-sm font-normal leading-normal">
-                      Manage floor plans, digital table orders, and kitchen workflows while syncing ingredients to inventory.
-                    </p>
-                  </div>
-                </a>
-              </div>
-
-              <div class="flex flex-col gap-3 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-gray-950 overflow-hidden hover:border-indigo-600 hover:shadow-lg transition-all cursor-pointer">
-                <a href="/home/hotel">
-                  <img alt="Clerk assisting newlywed at hotel counter" class="h-48 w-full object-cover" src="https://images.unsplash.com/photo-1564501049412-61c2a3083791?q=80&w=1470&auto=format&fit=crop" />
-                  <div class="flex flex-col gap-1 p-4">
-                    <h2 class="text-slate-900 dark:text-slate-100 text-base font-bold leading-tight">Hotel</h2>
-                    <p class="text-slate-600 dark:text-slate-400 text-sm font-normal leading-normal">
-                      Streamline front-desk check-ins, room housekeeping status, and multi-tenant property management.
-                    </p>
-                  </div>
-                </a>
-              </div>
-
-              <div class="flex flex-col gap-3 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-gray-950 overflow-hidden hover:border-indigo-600 hover:shadow-lg transition-all cursor-pointer">
-                <a href="/home/fitness">
-                  <img alt="Gym with fitness equipment" class="h-48 w-full object-cover" src="https://images.unsplash.com/photo-1518611012118-696072aa579a?q=80&w=1470&auto=format&fit=crop" />
-                  <div class="flex flex-col gap-1 p-4">
-                    <h2 class="text-slate-900 dark:text-slate-100 text-base font-bold leading-tight">Sport & Fitness</h2>
-                    <p class="text-slate-600 dark:text-slate-400 text-sm font-normal leading-normal">
-                      Automate membership billing, class capacity limits, and facility resource scheduling for trainers.
-                    </p>
-                  </div>
-                </a>
-              </div>
-            </div>
-
-          </main>
-          <footer class="flex flex-col gap-6 px-5 py-10 text-center @container mt-16">
-            <div class="flex flex-wrap items-center justify-center gap-6 @[480px]:flex-row @[480px]:justify-around">
-              <a class="text-slate-600 dark:text-slate-400 text-base font-normal leading-normal min-w-40" href="#">About
-                Us</a>
-              <a class="text-slate-600 dark:text-slate-400 text-base font-normal leading-normal min-w-40" href="#">Contact</a>
-              <a class="text-slate-600 dark:text-slate-400 text-base font-normal leading-normal min-w-40" href="#">Privacy Policy</a>
-            </div>
-            <div class="flex flex-wrap justify-center gap-4">
-              <a href="#">
-                <svg class="text-slate-600 dark:text-slate-400" fill="none" height="24" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path>
-                </svg>
-              </a>
-              <a href="#">
-                <svg class="text-slate-600 dark:text-slate-400" fill="none" height="24" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M22 4s-.7 2.1-2 3.4c1.6 1.4 3.3 4.9 3.3 4.9-6.1-1.4-6.1-1.4-6.1-1.4-.4 5.4-1.3 6.6-1.3 6.6s-1.3-.8-3.1-2.8c-2.8-3.1-8.3-4-8.3-4s.9 2.1 2.8 3.7c-2.5-.9-5.1-3.1-5.1-3.1s2.1.8 4.2 2.2c-1.4-.5-2.8-1.5-2.8-1.5s4.1 4.2 7.7 4.6c-1.3-1.3-1.3-3.3-1.3-3.3s-3.1-.1-4.9-2.5c2.3.1 4.2.8 4.2.8s-.9-1.9-2.8-3.7c2.5.5 4.9 1.4 4.9 1.4s-.5-2.1-2.8-4.2c2.3.5 4.2 1.4 4.2 1.4s-.8-2.5-3.1-4.2c2.5.8 4.9 1.4 4.9 1.4s-.9-2.8-3.7-4.9c2.5.8 4.9 1.9 4.9 1.9s-.9-2.8-3.7-4.9c2.5.8 4.9 1.9 4.9 1.9s-1-2.8-3.7-4.9c2.5.8 4.9 1.9 4.9 1.9z">
-                  </path>
-                </svg>
-              </a>
-              <a href="#">
-                <svg class="text-slate-600 dark:text-slate-400" fill="none" height="24" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path>
-                  <rect height="12" width="4" x="2" y="9"></rect>
-                  <circle cx="4" cy="4" r="2"></circle>
-                </svg>
-              </a>
-            </div>
-            <p class="text-slate-600 dark:text-slate-400 text-base font-normal leading-normal">© 2024
-              Skycom, Inc. All
-              rights reserved.</p>
-          </footer>
+  <div class="relative flex min-h-screen w-full flex-col overflow-x-hidden">
+    <header class="fixed left-0 right-0 top-0 z-50 border-b border-slate-200 bg-white/85 backdrop-blur-xl dark:border-slate-800 dark:bg-gray-950/85">
+      <div class="mx-auto flex h-16 max-w-7xl items-center justify-between gap-4 px-4 md:px-8">
+        <a
+          class="flex items-center gap-2 cursor-pointer"
+          href="/"
+        >
+          <img alt="Skycom ERP Logo" class="h-8 w-auto object-contain" src="/icon.svg">
+          <span class="text-lg font-bold tracking-tight text-slate-900 dark:text-white">Skycom <span class="text-indigo-600 dark:text-indigo-400">ERP</span></span>
+        </a>
+        <nav class="hidden items-center gap-6 lg:flex">
+          <a class="text-sm font-semibold text-slate-600 transition-colors hover:text-slate-900 dark:text-slate-300 dark:hover:text-white" href="#solutions">Solutions</a>
+          <a class="text-sm font-semibold text-slate-600 transition-colors hover:text-slate-900 dark:text-slate-300 dark:hover:text-white" href="#pricing">Pricing</a>
+          <a class="text-sm font-semibold text-slate-600 transition-colors hover:text-slate-900 dark:text-slate-300 dark:hover:text-white" href="#platform">Docs</a>
+        </nav>
+        <div class="flex items-center gap-2">
+          <% if is_signed_in? %>
+            <a class="inline-flex rounded-lg px-4 py-2 text-sm font-semibold text-slate-600 transition-all hover:bg-slate-100 hover:text-slate-900 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-white" href="/redirect/companies">Go to Dashboard</a>
+            <button
+              class="inline-flex rounded-lg px-4 py-2 text-sm font-semibold text-slate-600 transition-all hover:bg-slate-100 hover:text-slate-900 cursor-pointer dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-white"
+              data-action="click->home--index#openNewCompanyModal"
+              type="button"
+            >
+              New Company
+            </button>
+            <div class="flex items-center" data-controller="home--header--authentication"></div>
+          <% else %>
+            <button
+              class="inline-flex rounded-lg px-4 py-2 text-sm font-semibold text-slate-600 transition-all hover:bg-slate-100 hover:text-slate-900 cursor-pointer dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-white"
+              data-action="click->home--index#openSigninModal"
+              role="sign-in-button"
+              type="button"
+            >
+              Sign In
+            </button>
+            <button
+              class="inline-flex items-center justify-center rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition-all hover:bg-indigo-700 cursor-pointer"
+              data-action="click->home--index#openSignupModal"
+              role="sign-up-button"
+              type="button"
+            >
+              Claim Free Starter Credits
+            </button>
+          <% end %>
         </div>
       </div>
-    </div>
+    </header>
+    <main class="w-full pt-16">
+      <!-- HERO SECTION -->
+      <section class="relative overflow-hidden px-4 pb-16 pt-10 md:px-8 md:pt-16">
+        <div class="pointer-events-none absolute -top-32 left-1/2 h-96 w-full max-w-4xl -translate-x-1/2 rounded-full bg-gradient-to-tr from-indigo-200/50 via-slate-200/60 to-emerald-100/50 blur-3xl dark:from-indigo-950/60 dark:via-slate-900/60 dark:to-emerald-950/40"></div>
+        <div class="relative mx-auto flex max-w-7xl flex-col items-center text-center">
+          <div class="mb-6 inline-flex items-center gap-2 rounded-full bg-white px-4 py-1.5 shadow-sm dark:bg-slate-900">
+            <span class="relative flex h-2 w-2">
+              <span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-500 opacity-75"></span>
+              <span class="relative inline-flex h-2 w-2 rounded-full bg-emerald-600"></span>
+            </span>
+            <span class="text-xs font-bold text-emerald-700 dark:text-emerald-300">One Master Account • Infinite Multi-Tenant Businesses</span>
+            <span class="text-slate-300 dark:text-slate-600">•</span>
+            <button
+              class="flex items-center gap-1 text-xs font-semibold text-indigo-600 cursor-pointer dark:text-indigo-400"
+              data-action="click->home--index#openSignupModal"
+              type="button"
+            >
+              <span class="material-symbols-outlined text-base">bolt</span> $0 Base Fee
+            </button>
+          </div>
+          <h1 class="max-w-5xl text-4xl font-black leading-tight tracking-tight text-slate-900 md:text-5xl dark:text-white">One Account. Infinite Multi-Tenant Businesses. <span class="mt-1 block text-indigo-600 dark:text-indigo-400">Run All Your Ventures Under One Unified Platform.</span></h1>
+          <p class="mb-8 mt-4 max-w-3xl text-lg leading-relaxed text-slate-600 dark:text-slate-400">Entrepreneurs, holding groups, and franchise operators can now spin up and manage entirely distinct businesses in seconds — a fashion boutique today, a hotel tomorrow, a bistro or dental clinic next. All managed under <strong>one single account</strong> with instant business switching, zero per-business base fees, and an action-based credit pool that shares or caps spend across your entire portfolio.</p>
+          <div class="flex w-full max-w-md flex-wrap items-center justify-center gap-3">
+            <button
+              class="inline-flex h-12 flex-1 items-center justify-center gap-2 rounded-lg bg-indigo-600 px-6 text-base font-bold text-white shadow-md transition-all hover:bg-indigo-700 cursor-pointer sm:flex-none"
+              data-action="click->home--index#openSignupModal"
+              type="button"
+            >
+              <span>Claim Free Starter Credits</span>
+              <span class="material-symbols-outlined text-lg">arrow_forward</span>
+            </button>
+            <a class="inline-flex h-12 flex-1 items-center justify-center gap-2 rounded-lg bg-white px-6 text-base font-bold text-slate-900 shadow-sm transition-all hover:bg-slate-100 sm:flex-none dark:bg-slate-900 dark:text-white dark:hover:bg-slate-800" href="#interactive-preview">
+              <span class="material-symbols-outlined text-lg text-indigo-600 dark:text-indigo-400">play_circle</span>
+              <span>Explore Interactive Demo</span>
+            </a>
+          </div>
+          <div class="mt-4 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-sm text-slate-600 dark:text-slate-400">
+            <span class="flex items-center gap-1"><span class="material-symbols-outlined text-base text-emerald-600 dark:text-emerald-400">card_giftcard</span> Free Refill Credits Every Month</span>
+            <span class="flex items-center gap-1"><span class="material-symbols-outlined text-base text-emerald-600 dark:text-emerald-400">timelapse</span> Pay-As-You-Go Overages</span>
+            <span class="flex items-center gap-1"><span class="material-symbols-outlined text-base text-emerald-600 dark:text-emerald-400">block</span> No Fixed Monthly Subscriptions</span>
+          </div>
+          <!-- Live Dynamic Enterprise Console Mockup -->
+          <div class="mt-10 w-full max-w-6xl scroll-mt-24 rounded-2xl bg-white p-2 text-left shadow-xl dark:bg-slate-900" id="interactive-preview">
+            <div class="flex flex-col gap-3 rounded-xl bg-slate-100 p-4 dark:bg-slate-800">
+              <div class="flex flex-wrap items-center justify-between gap-3 border-b border-slate-200 pb-3 dark:border-slate-700">
+                <div class="flex items-center gap-2.5">
+                  <div class="flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-600 text-white shadow-sm">
+                    <span class="material-symbols-outlined text-lg">account_tree</span>
+                  </div>
+                  <div class="text-left">
+                    <div class="flex items-center gap-2">
+                      <span class="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Master Account</span>
+                      <span class="inline-flex items-center gap-1 rounded-full bg-emerald-100 px-2 py-0.5 text-xs font-semibold text-emerald-700 dark:bg-emerald-900/50 dark:text-emerald-300"><span class="h-1.5 w-1.5 rounded-full bg-emerald-600"></span> 3 Isolated Tenants</span>
+                    </div>
+                    <p class="text-sm font-bold leading-tight text-slate-900 dark:text-white">Apex Multi-Venture Group Holdings</p>
+                  </div>
+                </div>
+                <div class="flex items-center gap-3">
+                  <div class="flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-left shadow-sm dark:border-slate-700 dark:bg-slate-900">
+                    <span class="material-symbols-outlined text-xl text-indigo-600 dark:text-indigo-400">account_balance_wallet</span>
+                    <div>
+                      <p class="text-xs font-semibold uppercase leading-none text-slate-500 dark:text-slate-400">Master Credit Pool</p>
+                      <p class="text-sm font-bold leading-tight text-slate-900 dark:text-white"><span data-live="pool">9,420</span> <span class="text-xs font-normal text-slate-500 dark:text-slate-400">/ 10,000 Credits</span></p>
+                    </div>
+                  </div>
+                  <div class="inline-flex items-center gap-1.5 rounded-lg border border-emerald-300 bg-emerald-50 px-2.5 py-1.5 text-sm font-semibold text-emerald-700 dark:border-emerald-800 dark:bg-emerald-950/40 dark:text-emerald-300">
+                    <span class="material-symbols-outlined text-base text-emerald-600 dark:text-emerald-400">autorenew</span>
+                    <span>Refill in 18d</span>
+                  </div>
+                </div>
+              </div>
+              <div class="flex flex-wrap items-center justify-between gap-2 pt-0.5">
+                <div class="flex flex-wrap items-center gap-2">
+                  <span class="mr-1 text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">Active Space:</span>
+                  <button
+                    aria-pressed="true"
+                    class="flex items-center gap-2 rounded-lg px-3 py-1.5 text-sm font-bold text-slate-600 transition-colors aria-pressed:bg-white aria-pressed:text-indigo-600 aria-pressed:shadow-sm hover:text-slate-900 cursor-pointer dark:text-slate-300 dark:aria-pressed:bg-slate-900 dark:aria-pressed:text-indigo-300 dark:hover:text-white"
+                    data-action="click->home--index#switchTenant"
+                    data-home--index-tenant-name-param="Apex Retail Flagship"
+                    data-home--index-base-sales-param="18450"
+                    data-home--index-base-txns-param="248"
+                    data-home--index-base-credits-param="34.2"
+                    data-tenant-tab="true"
+                    type="button"
+                  >
+                    <span class="material-symbols-outlined text-lg">storefront</span>
+                    <span>Apex Retail Flagship POS</span>
+                    <span class="rounded bg-indigo-600 px-1.5 py-0.5 text-xs font-bold text-white">Active Space</span>
+                  </button>
+                  <button
+                    aria-pressed="false"
+                    class="flex items-center gap-2 rounded-lg px-3 py-1.5 text-sm font-semibold text-slate-600 transition-colors aria-pressed:bg-white aria-pressed:text-indigo-600 aria-pressed:shadow-sm hover:text-slate-900 cursor-pointer dark:text-slate-300 dark:aria-pressed:bg-slate-900 dark:aria-pressed:text-indigo-300 dark:hover:text-white"
+                    data-action="click->home--index#switchTenant"
+                    data-home--index-tenant-name-param="Grand Azalea Hotel"
+                    data-home--index-base-sales-param="9650"
+                    data-home--index-base-txns-param="96"
+                    data-home--index-base-credits-param="18.7"
+                    data-tenant-tab="true"
+                    type="button"
+                  >
+                    <span class="material-symbols-outlined text-lg">hotel</span>
+                    <span>Grand Azalea Hotel PMS</span>
+                    <span class="rounded bg-slate-200 px-1.5 py-0.5 text-xs text-slate-600 dark:bg-slate-700 dark:text-slate-300">Isolated</span>
+                  </button>
+                  <button
+                    aria-pressed="false"
+                    class="flex items-center gap-2 rounded-lg px-3 py-1.5 text-sm font-semibold text-slate-600 transition-colors aria-pressed:bg-white aria-pressed:text-indigo-600 aria-pressed:shadow-sm hover:text-slate-900 cursor-pointer dark:text-slate-300 dark:aria-pressed:bg-slate-900 dark:aria-pressed:text-indigo-300 dark:hover:text-white"
+                    data-action="click->home--index#switchTenant"
+                    data-home--index-tenant-name-param="Bistro 88 Bar & Grill"
+                    data-home--index-base-sales-param="5230"
+                    data-home--index-base-txns-param="142"
+                    data-home--index-base-credits-param="12.4"
+                    data-tenant-tab="true"
+                    type="button"
+                  >
+                    <span class="material-symbols-outlined text-lg">restaurant</span>
+                    <span>Bistro 88 Bar &amp; Grill</span>
+                    <span class="rounded bg-slate-200 px-1.5 py-0.5 text-xs text-slate-600 dark:bg-slate-700 dark:text-slate-300">Isolated</span>
+                  </button>
+                </div>
+                <button
+                  class="flex items-center gap-1.5 rounded-lg border border-emerald-300 bg-white px-3 py-1.5 text-sm font-semibold text-emerald-700 shadow-sm transition-colors hover:bg-emerald-600 hover:text-white cursor-pointer dark:border-emerald-800 dark:bg-slate-900 dark:text-emerald-300 dark:hover:bg-emerald-600 dark:hover:text-white"
+                  data-action="click->home--index#openSignupModal"
+                  type="button"
+                >
+                  <span class="material-symbols-outlined text-base">add_business</span>
+                  <span>+ Spin Up New Tenant</span>
+                </button>
+              </div>
+            </div>
+            <div class="grid grid-cols-1 gap-4 p-4 text-left md:grid-cols-3 md:p-6">
+              <div class="rounded-xl border border-slate-200 bg-gray-50 p-4 transition-colors hover:border-slate-300 dark:border-slate-700 dark:bg-slate-800">
+                <div class="flex items-start justify-between">
+                  <div>
+                    <span class="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">Today's Gross Sales</span>
+                    <p class="mt-1 text-2xl font-bold tracking-tight text-slate-900 dark:text-white" data-live="sales">$18,450.00</p>
+                  </div>
+                  <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-indigo-100 text-indigo-600 dark:bg-indigo-900/50 dark:text-indigo-300">
+                    <span class="material-symbols-outlined text-xl">point_of_sale</span>
+                  </div>
+                </div>
+                <div class="mt-2.5 flex items-center justify-between border-t border-slate-200 pt-2 text-xs text-slate-500 dark:border-slate-700 dark:text-slate-400">
+                  <span class="flex items-center gap-1 font-semibold text-emerald-600 dark:text-emerald-400"><span class="material-symbols-outlined text-base">trending_up</span> <span data-live="txns">248 transactions</span></span>
+                  <span>Across 3 active registers</span>
+                </div>
+              </div>
+              <div class="rounded-xl border border-slate-200 bg-gray-50 p-4 transition-colors hover:border-slate-300 dark:border-slate-700 dark:bg-slate-800">
+                <div class="flex items-start justify-between">
+                  <div>
+                    <span class="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">Live Inventory Sync</span>
+                    <p class="mt-1 text-2xl font-bold tracking-tight text-slate-900 dark:text-white">194,204 SKUs</p>
+                  </div>
+                  <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-emerald-100 text-emerald-700 dark:bg-emerald-900/50 dark:text-emerald-300">
+                    <span class="material-symbols-outlined text-xl">sync_alt</span>
+                  </div>
+                </div>
+                <div class="mt-2.5 flex items-center justify-between border-t border-slate-200 pt-2 text-xs text-slate-500 dark:border-slate-700 dark:text-slate-400">
+                  <span class="flex items-center gap-1 font-semibold text-emerald-600 dark:text-emerald-400"><span class="material-symbols-outlined text-base">verified</span> Real-time barcode &amp; POS sync</span>
+                  <span>0 sync lag</span>
+                </div>
+              </div>
+              <div class="rounded-xl border border-slate-200 bg-gray-50 p-4 transition-colors hover:border-slate-300 dark:border-slate-700 dark:bg-slate-800">
+                <div class="flex items-start justify-between">
+                  <div>
+                    <span class="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">Today's Action Cost</span>
+                    <p class="mt-1 text-2xl font-bold tracking-tight text-slate-900 dark:text-white"><span data-live="credits">34.2</span> <span class="text-base font-normal text-slate-500 dark:text-slate-400">Credits</span></p>
+                  </div>
+                  <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-amber-100 text-amber-700 dark:bg-amber-900/50 dark:text-amber-300">
+                    <span class="material-symbols-outlined text-xl">toll</span>
+                  </div>
+                </div>
+                <div class="mt-2.5 flex items-center justify-between border-t border-slate-200 pt-2 text-xs text-slate-500 dark:border-slate-700 dark:text-slate-400">
+                  <span class="flex items-center gap-1 font-semibold text-indigo-600 dark:text-indigo-400"><span class="material-symbols-outlined text-base">hub</span> From 10,000 pooled pool</span>
+                  <button
+                    class="font-bold text-emerald-600 cursor-pointer dark:text-emerald-400"
+                    data-action="click->home--index#openSignupModal"
+                    type="button"
+                  >
+                    $0 base fee
+                  </button>
+                </div>
+              </div>
+            </div>
+            <div class="grid grid-cols-1 gap-4 px-4 pb-4 text-left md:p-6 lg:grid-cols-12">
+              <div class="flex flex-col justify-between rounded-xl border border-slate-200 bg-gray-50 p-4 lg:col-span-7 dark:border-slate-700 dark:bg-slate-800">
+                <div>
+                  <div class="mb-2 flex flex-wrap items-center justify-between gap-2">
+                    <div>
+                      <div class="flex items-center gap-2">
+                        <h3 class="text-base font-bold text-slate-900 dark:text-white" id="tenant-title">Apex Retail Flagship</h3>
+                        <span class="rounded bg-indigo-100 px-2 py-0.5 text-xs font-bold text-indigo-700 dark:bg-indigo-900/50 dark:text-indigo-300">POS Operational View</span>
+                      </div>
+                      <p class="mt-0.5 text-sm text-slate-600 dark:text-slate-400">Hourly transaction velocity &amp; register throughput (08:00 - 20:00)</p>
+                    </div>
+                    <div class="flex items-center gap-1.5 rounded-md border border-slate-200 bg-white px-2.5 py-1 text-sm font-semibold text-slate-900 shadow-sm dark:border-slate-700 dark:bg-slate-900 dark:text-white">
+                      <span class="h-2 w-2 animate-pulse rounded-full bg-emerald-600"></span>
+                      <span>Online High-Availability Sync</span>
+                    </div>
+                  </div>
+                  <div class="my-3 grid grid-cols-3 gap-2">
+                    <div class="rounded-lg border border-slate-200 bg-white p-2 text-center dark:border-slate-700 dark:bg-slate-900">
+                      <p class="text-xs font-semibold uppercase text-slate-500 dark:text-slate-400">Peak Hourly Pace</p>
+                      <p class="text-sm font-bold text-indigo-600 dark:text-indigo-400">42 tx/hr (14:00)</p>
+                    </div>
+                    <div class="rounded-lg border border-slate-200 bg-white p-2 text-center dark:border-slate-700 dark:bg-slate-900">
+                      <p class="text-xs font-semibold uppercase text-slate-500 dark:text-slate-400">Average Basket</p>
+                      <p class="text-sm font-bold text-slate-900 dark:text-white">$74.40</p>
+                    </div>
+                    <div class="rounded-lg border border-slate-200 bg-white p-2 text-center dark:border-slate-700 dark:bg-slate-900">
+                      <p class="text-xs font-semibold uppercase text-slate-500 dark:text-slate-400">Cloud Scan Latency</p>
+                      <p class="text-sm font-bold text-emerald-600 dark:text-emerald-400" data-live="latency">110ms</p>
+                    </div>
+                  </div>
+                </div>
+                <div class="pt-3">
+                  <div data-home--index-target="velocityChart" class="h-44"></div>
+                  <div class="flex items-center justify-between border-t border-slate-200 pt-2 text-xs text-slate-500 dark:border-slate-700 dark:text-slate-400">
+                    <span class="flex items-center gap-1"><span class="h-2 w-2 rounded bg-indigo-600"></span> Peak Traffic: 14:00 - 15:30</span>
+                    <span class="font-semibold text-emerald-600 dark:text-emerald-400">100% Real-Time Cloud Audit Stream</span>
+                  </div>
+                </div>
+              </div>
+              <div class="flex flex-col justify-between rounded-xl border border-slate-200 bg-gray-50 p-4 lg:col-span-5 dark:border-slate-700 dark:bg-slate-800">
+                <div>
+                  <div class="mb-3 flex items-center justify-between">
+                    <h3 class="text-base font-bold text-slate-900 dark:text-white">Active Tenant Action Ledger</h3>
+                    <span class="rounded-full bg-emerald-100 px-2.5 py-0.5 text-xs font-bold text-emerald-700 dark:bg-emerald-900/50 dark:text-emerald-300">Action Micropayments</span>
+                  </div>
+                  <p class="mb-3 text-xs text-slate-600 dark:text-slate-400">Live fractional credit burn for the active tenant space only.</p>
+                  <div class="space-y-2.5">
+                    <div class="flex items-center justify-between gap-2.5 rounded-lg border border-slate-200 bg-white p-2.5 dark:border-slate-700 dark:bg-slate-900">
+                      <div class="flex min-w-0 items-center gap-2.5">
+                        <span class="flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-emerald-100 text-emerald-700 dark:bg-emerald-900/50 dark:text-emerald-300"><span class="material-symbols-outlined text-base">receipt</span></span>
+                        <div class="min-w-0">
+                          <p class="truncate text-sm font-bold leading-tight text-slate-900 dark:text-white">Retail Checkout #1042</p>
+                          <p class="truncate text-xs text-slate-500 dark:text-slate-400">Register 02 • $142.50 order</p>
+                        </div>
+                      </div>
+                      <span class="whitespace-nowrap rounded bg-emerald-100 px-2 py-0.5 text-xs font-bold text-emerald-700 dark:bg-emerald-900/50 dark:text-emerald-300">-0.10 Credits</span>
+                    </div>
+                    <div class="flex items-center justify-between gap-2.5 rounded-lg border border-slate-200 bg-white p-2.5 dark:border-slate-700 dark:bg-slate-900">
+                      <div class="flex min-w-0 items-center gap-2.5">
+                        <span class="flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-indigo-100 text-indigo-600 dark:bg-indigo-900/50 dark:text-indigo-300"><span class="material-symbols-outlined text-base">local_shipping</span></span>
+                        <div class="min-w-0">
+                          <p class="truncate text-sm font-bold leading-tight text-slate-900 dark:text-white">Auto-PO Vendor Dispatch</p>
+                          <p class="truncate text-xs text-slate-500 dark:text-slate-400">Safety stock replenishment trigger</p>
+                        </div>
+                      </div>
+                      <span class="whitespace-nowrap rounded bg-indigo-100 px-2 py-0.5 text-xs font-bold text-indigo-700 dark:bg-indigo-900/50 dark:text-indigo-300">-0.05 Credits</span>
+                    </div>
+                    <div class="flex items-center justify-between gap-2.5 rounded-lg border border-slate-200 bg-white p-2.5 dark:border-slate-700 dark:bg-slate-900">
+                      <div class="flex min-w-0 items-center gap-2.5">
+                        <span class="flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-slate-200 text-slate-600 dark:bg-slate-700 dark:text-slate-300"><span class="material-symbols-outlined text-base">sms</span></span>
+                        <div class="min-w-0">
+                          <p class="truncate text-sm font-bold leading-tight text-slate-900 dark:text-white">Customer SMS Receipt Sync</p>
+                          <p class="truncate text-xs text-slate-500 dark:text-slate-400">Direct carrier gateway delivery</p>
+                        </div>
+                      </div>
+                      <span class="whitespace-nowrap rounded bg-slate-200 px-2 py-0.5 text-xs font-bold text-slate-600 dark:bg-slate-700 dark:text-slate-300">-0.02 Credits</span>
+                    </div>
+                    <div class="flex items-center justify-between gap-2.5 rounded-lg border border-slate-200 bg-white p-2.5 dark:border-slate-700 dark:bg-slate-900">
+                      <div class="flex min-w-0 items-center gap-2.5">
+                        <span class="flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-amber-100 text-amber-700 dark:bg-amber-900/50 dark:text-amber-300"><span class="material-symbols-outlined text-base">swap_horiz</span></span>
+                        <div class="min-w-0">
+                          <p class="truncate text-sm font-bold leading-tight text-slate-900 dark:text-white">Inter-Store Stock Transfer</p>
+                          <p class="truncate text-xs text-slate-500 dark:text-slate-400">To Westside Mall Hub • 24 items</p>
+                        </div>
+                      </div>
+                      <span class="whitespace-nowrap rounded bg-amber-100 px-2 py-0.5 text-xs font-bold text-amber-700 dark:bg-amber-900/50 dark:text-amber-300">-0.10 Credits</span>
+                    </div>
+                  </div>
+                </div>
+                <div class="-mx-4 -mb-4 mt-3 flex flex-col items-start justify-between gap-1 rounded-b-xl border-t border-slate-200 bg-slate-100 p-4 sm:flex-row sm:items-center dark:border-slate-700 dark:bg-slate-900/60">
+                  <span class="text-xs text-slate-500 dark:text-slate-400">Tenant Burn: <strong class="text-slate-900 dark:text-white" data-live="burn">34.2 cr today</strong></span>
+                  <span class="flex items-center gap-1 text-xs font-bold text-emerald-600 dark:text-emerald-400"><span class="material-symbols-outlined text-base">verified_user</span> <span data-live="pool2">Master Balance: 9,420 / 10,000 cr remaining</span></span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+      <!-- VERTICAL-SPECIFIC SOLUTIONS -->
+      <section class="scroll-mt-20 bg-slate-100 px-4 py-16 dark:bg-slate-900/40 md:px-8 md:py-24" id="solutions">
+        <div class="mx-auto max-w-7xl">
+          <div class="mb-10 flex flex-col justify-between gap-4 md:flex-row md:items-end">
+            <div>
+              <span class="text-sm font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400">One universal platform core • Infinite industry adaptations</span>
+              <h2 class="mt-1 text-3xl font-bold text-slate-900 md:text-4xl dark:text-white">Any Domain, Any Workflow. One Universal Platform Core.</h2>
+              <p class="mt-1 max-w-2xl text-base text-slate-600 dark:text-slate-400">Why pay for 4 different platforms with 4 different logins? A single Skycom account lets you launch and operate completely distinct industry ventures — Retail POS, Hotel PMS, Restaurant KDS, and Dental Clinic — running on one atomic platform engine with unified credentials and shared credit billing.</p>
+            </div>
+            <div class="inline-flex items-center gap-2 self-start rounded-xl bg-white px-4 py-2 shadow-sm md:self-auto dark:bg-slate-900">
+              <span class="material-symbols-outlined text-xl text-emerald-600 dark:text-emerald-400">token</span>
+              <span class="text-sm font-semibold text-slate-900 dark:text-white">Universal Atomic Engine • Instant UI Schemas for Any Industry</span>
+            </div>
+          </div>
+          <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
+            <div class="group flex flex-col overflow-hidden rounded-2xl bg-white shadow-sm transition-all hover:shadow-md dark:bg-slate-900">
+              <div class="relative h-64 overflow-hidden">
+                <img alt="A modern high-tech retail boutique interior" class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" loading="lazy" src="https://images.unsplash.com/photo-1556740738-b6a63e27c4df?q=80&w=1470&auto=format&fit=crop">
+                <div class="absolute left-4 top-4 flex items-center gap-1.5 rounded-full bg-white/90 px-3 py-1 shadow-sm backdrop-blur-md dark:bg-slate-900/90">
+                  <span class="h-2 w-2 rounded-full bg-emerald-600"></span>
+                  <span class="text-sm font-bold text-emerald-700 dark:text-emerald-300">Retail &amp; Omnichannel</span>
+                </div>
+              </div>
+              <div class="flex flex-1 flex-col justify-between p-6">
+                <div>
+                  <h3 class="text-xl font-bold text-slate-900 dark:text-white">End-to-End Multi-Store Retail Engine</h3>
+                  <p class="mt-2 text-base text-slate-600 dark:text-slate-400">Unify high-speed cloud-connected POS checkouts, matrix variant tracking (size/color/batch), and inter-branch inventory transfers with real-time auto re-ordering.</p>
+                  <div class="mt-4 grid grid-cols-2 gap-2">
+                    <div class="rounded-lg bg-gray-50 p-2.5 dark:bg-slate-800">
+                      <p class="text-sm font-semibold text-slate-900 dark:text-white">Matrix Variant SKUs</p>
+                      <p class="text-xs text-slate-600 dark:text-slate-400">Automated barcode generator</p>
+                    </div>
+                    <div class="rounded-lg bg-gray-50 p-2.5 dark:bg-slate-800">
+                      <p class="text-sm font-semibold text-slate-900 dark:text-white">Inter-Branch Transit</p>
+                      <p class="text-xs text-slate-600 dark:text-slate-400">Live stock requisition slips</p>
+                    </div>
+                    <div class="rounded-lg bg-gray-50 p-2.5 dark:bg-slate-800">
+                      <p class="text-sm font-semibold text-slate-900 dark:text-white">Omnichannel Sync</p>
+                      <p class="text-xs text-slate-600 dark:text-slate-400">Shopify, WooCommerce, Amazon</p>
+                    </div>
+                    <div class="rounded-lg bg-gray-50 p-2.5 dark:bg-slate-800">
+                      <p class="text-sm font-semibold text-slate-900 dark:text-white">Loss Prevention</p>
+                      <p class="text-xs text-slate-600 dark:text-slate-400">Blind count cycle audits</p>
+                    </div>
+                  </div>
+                </div>
+                <div class="mt-6 flex items-center justify-between pt-4">
+                  <a class="inline-flex items-center gap-1 text-sm font-bold text-indigo-600 hover:gap-2 dark:text-indigo-400" href="#">View Retail POS Specifications <span class="material-symbols-outlined text-base">arrow_forward</span></a>
+                  <span class="text-sm text-slate-500 dark:text-slate-400">0% Gateway Commission</span>
+                </div>
+              </div>
+            </div>
+            <div class="group flex flex-col overflow-hidden rounded-2xl bg-white shadow-sm transition-all hover:shadow-md dark:bg-slate-900">
+              <div class="relative h-64 overflow-hidden">
+                <img alt="A modern dental clinic operatory room" class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" loading="lazy" src="https://images.unsplash.com/photo-1588776814546-1ffcf47267a5?q=80&w=1470&auto=format&fit=crop">
+                <div class="absolute left-4 top-4 flex items-center gap-1.5 rounded-full bg-white/90 px-3 py-1 shadow-sm backdrop-blur-md dark:bg-slate-900/90">
+                  <span class="h-2 w-2 rounded-full bg-indigo-600"></span>
+                  <span class="text-sm font-bold text-indigo-600 dark:text-indigo-400">Dental &amp; Clinics</span>
+                </div>
+              </div>
+              <div class="flex flex-1 flex-col justify-between p-6">
+                <div>
+                  <h3 class="text-xl font-bold text-slate-900 dark:text-white">Clinical Care &amp; Operatory Orchestration</h3>
+                  <p class="mt-2 text-base text-slate-600 dark:text-slate-400">Designed alongside dentists and clinic managers. Visual odontograms, multi-chair operatory calendars, digital treatment estimate signatures, and HIPAA-compliant charting.</p>
+                  <div class="mt-4 grid grid-cols-2 gap-2">
+                    <div class="rounded-lg bg-gray-50 p-2.5 dark:bg-slate-800">
+                      <p class="text-sm font-semibold text-slate-900 dark:text-white">Visual Odontogram</p>
+                      <p class="text-xs text-slate-600 dark:text-slate-400">Adult &amp; child interactive tooth chart</p>
+                    </div>
+                    <div class="rounded-lg bg-gray-50 p-2.5 dark:bg-slate-800">
+                      <p class="text-sm font-semibold text-slate-900 dark:text-white">Multi-Chair Calendar</p>
+                      <p class="text-xs text-slate-600 dark:text-slate-400">Color-coded doctor &amp; room slots</p>
+                    </div>
+                    <div class="rounded-lg bg-gray-50 p-2.5 dark:bg-slate-800">
+                      <p class="text-sm font-semibold text-slate-900 dark:text-white">Insurance &amp; Pre-Auth</p>
+                      <p class="text-xs text-slate-600 dark:text-slate-400">Automated co-pay breakdowns</p>
+                    </div>
+                    <div class="rounded-lg bg-gray-50 p-2.5 dark:bg-slate-800">
+                      <p class="text-sm font-semibold text-slate-900 dark:text-white">Patient Portal</p>
+                      <p class="text-xs text-slate-600 dark:text-slate-400">SMS/WhatsApp appointment booking</p>
+                    </div>
+                  </div>
+                </div>
+                <div class="mt-6 flex items-center justify-between pt-4">
+                  <a class="inline-flex items-center gap-1 text-sm font-bold text-indigo-600 hover:gap-2 dark:text-indigo-400" href="#">Explore Dental Practice Suite <span class="material-symbols-outlined text-base">arrow_forward</span></a>
+                  <span class="text-sm text-slate-500 dark:text-slate-400">HIPAA Architecture</span>
+                </div>
+              </div>
+            </div>
+            <div class="group flex flex-col overflow-hidden rounded-2xl bg-white shadow-sm transition-all hover:shadow-md dark:bg-slate-900">
+              <div class="relative h-64 overflow-hidden">
+                <img alt="A luxury boutique hotel reception and lobby lounge" class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" loading="lazy" src="https://images.unsplash.com/photo-1564501049412-61c2a3083791?q=80&w=1470&auto=format&fit=crop">
+                <div class="absolute left-4 top-4 flex items-center gap-1.5 rounded-full bg-white/90 px-3 py-1 shadow-sm backdrop-blur-md dark:bg-slate-900/90">
+                  <span class="h-2 w-2 rounded-full bg-amber-600"></span>
+                  <span class="text-sm font-bold text-amber-700 dark:text-amber-300">Hotels &amp; Hospitality</span>
+                </div>
+              </div>
+              <div class="flex flex-1 flex-col justify-between p-6">
+                <div>
+                  <h3 class="text-xl font-bold text-slate-900 dark:text-white">Property Management &amp; Front Desk Engine</h3>
+                  <p class="mt-2 text-base text-slate-600 dark:text-slate-400">Unified reservation tape chart, mobile housekeeping dispatch, automated keycard encoding, split folios, and direct 2-way OTA synchronization.</p>
+                  <div class="mt-4 grid grid-cols-2 gap-2">
+                    <div class="rounded-lg bg-gray-50 p-2.5 dark:bg-slate-800">
+                      <p class="text-sm font-semibold text-slate-900 dark:text-white">Interactive Tape Chart</p>
+                      <p class="text-xs text-slate-600 dark:text-slate-400">Drag-and-drop room assignments</p>
+                    </div>
+                    <div class="rounded-lg bg-gray-50 p-2.5 dark:bg-slate-800">
+                      <p class="text-sm font-semibold text-slate-900 dark:text-white">Live Housekeeping</p>
+                      <p class="text-xs text-slate-600 dark:text-slate-400">Real-time dirty / inspected status</p>
+                    </div>
+                    <div class="rounded-lg bg-gray-50 p-2.5 dark:bg-slate-800">
+                      <p class="text-sm font-semibold text-slate-900 dark:text-white">Channel Manager</p>
+                      <p class="text-xs text-slate-600 dark:text-slate-400">Booking.com, Airbnb, Expedia sync</p>
+                    </div>
+                    <div class="rounded-lg bg-gray-50 p-2.5 dark:bg-slate-800">
+                      <p class="text-sm font-semibold text-slate-900 dark:text-white">Multi-Folio Invoicing</p>
+                      <p class="text-xs text-slate-600 dark:text-slate-400">Split personal vs corporate bills</p>
+                    </div>
+                  </div>
+                </div>
+                <div class="mt-6 flex items-center justify-between pt-4">
+                  <a class="inline-flex items-center gap-1 text-sm font-bold text-indigo-600 hover:gap-2 dark:text-indigo-400" href="#">View Hospitality PMS Features <span class="material-symbols-outlined text-base">arrow_forward</span></a>
+                  <span class="text-sm text-slate-500 dark:text-slate-400">Zero Booking Cut</span>
+                </div>
+              </div>
+            </div>
+            <div class="group flex flex-col overflow-hidden rounded-2xl bg-white shadow-sm transition-all hover:shadow-md dark:bg-slate-900">
+              <div class="relative h-64 overflow-hidden">
+                <img alt="A bustling upscale restaurant kitchen and dining hall" class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" loading="lazy" src="https://images.unsplash.com/photo-1414235077428-338989a2e8c0?q=80&w=1470&auto=format&fit=crop">
+                <div class="absolute left-4 top-4 flex items-center gap-1.5 rounded-full bg-white/90 px-3 py-1 shadow-sm backdrop-blur-md dark:bg-slate-900/90">
+                  <span class="h-2 w-2 rounded-full bg-rose-600"></span>
+                  <span class="text-sm font-bold text-rose-600 dark:text-rose-400">Restaurants &amp; Cafes</span>
+                </div>
+              </div>
+              <div class="flex flex-1 flex-col justify-between p-6">
+                <div>
+                  <h3 class="text-xl font-bold text-slate-900 dark:text-white">Table Management &amp; Kitchen Display (KDS)</h3>
+                  <p class="mt-2 text-base text-slate-600 dark:text-slate-400">Sub-second table ordering, visual floorplan layout, ingredient-level recipe costing, automated modifier flows, and split-ticket routing directly to prep stations.</p>
+                  <div class="mt-4 grid grid-cols-2 gap-2">
+                    <div class="rounded-lg bg-gray-50 p-2.5 dark:bg-slate-800">
+                      <p class="text-sm font-semibold text-slate-900 dark:text-white">Digital Floorplan Editor</p>
+                      <p class="text-xs text-slate-600 dark:text-slate-400">Live table timer &amp; section turnover</p>
+                    </div>
+                    <div class="rounded-lg bg-gray-50 p-2.5 dark:bg-slate-800">
+                      <p class="text-sm font-semibold text-slate-900 dark:text-white">Station-Routing KDS</p>
+                      <p class="text-xs text-slate-600 dark:text-slate-400">Hot line, cold bar, expeditor tickets</p>
+                    </div>
+                    <div class="rounded-lg bg-gray-50 p-2.5 dark:bg-slate-800">
+                      <p class="text-sm font-semibold text-slate-900 dark:text-white">Gram-Level Recipe Costing</p>
+                      <p class="text-xs text-slate-600 dark:text-slate-400">Auto ingredient inventory deduction</p>
+                    </div>
+                    <div class="rounded-lg bg-gray-50 p-2.5 dark:bg-slate-800">
+                      <p class="text-sm font-semibold text-slate-900 dark:text-white">Tableside Mobile QR</p>
+                      <p class="text-xs text-slate-600 dark:text-slate-400">Instant ordering and split payments</p>
+                    </div>
+                  </div>
+                </div>
+                <div class="mt-6 flex items-center justify-between pt-4">
+                  <a class="inline-flex items-center gap-1 text-sm font-bold text-indigo-600 hover:gap-2 dark:text-indigo-400" href="#">View F&amp;B Restaurant Tools <span class="material-symbols-outlined text-base">arrow_forward</span></a>
+                  <span class="text-sm text-slate-500 dark:text-slate-400">Sub-Second Kitchen Sync</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="mt-6 border-t border-slate-200 pt-6 dark:border-slate-700">
+            <div class="mb-4 flex flex-wrap items-center justify-between gap-2">
+              <span class="text-sm font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">Ready Out-of-the-Box &amp; Generatable for Any Industry:</span>
+              <span class="flex items-center gap-1 text-xs font-bold text-emerald-600 dark:text-emerald-400"><span class="material-symbols-outlined text-base">auto_awesome</span> Dynamic Schema Generator</span>
+            </div>
+            <div class="flex flex-wrap gap-2">
+              <span class="inline-flex items-center gap-1.5 rounded-lg bg-white px-3 py-1.5 text-sm font-semibold text-slate-900 shadow-sm dark:bg-slate-900 dark:text-white"><span class="material-symbols-outlined text-base text-indigo-600 dark:text-indigo-400">fitness_center</span> Gyms &amp; Fitness Studios</span>
+              <span class="inline-flex items-center gap-1.5 rounded-lg bg-white px-3 py-1.5 text-sm font-semibold text-slate-900 shadow-sm dark:bg-slate-900 dark:text-white"><span class="material-symbols-outlined text-base text-emerald-600 dark:text-emerald-400">car_repair</span> Automotive &amp; Fleet Repair</span>
+              <span class="inline-flex items-center gap-1.5 rounded-lg bg-white px-3 py-1.5 text-sm font-semibold text-slate-900 shadow-sm dark:bg-slate-900 dark:text-white"><span class="material-symbols-outlined text-base text-amber-600 dark:text-amber-400">school</span> Education &amp; Academies</span>
+              <span class="inline-flex items-center gap-1.5 rounded-lg bg-white px-3 py-1.5 text-sm font-semibold text-slate-900 shadow-sm dark:bg-slate-900 dark:text-white"><span class="material-symbols-outlined text-base text-indigo-600 dark:text-indigo-400">local_shipping</span> Logistics &amp; Field Services</span>
+              <span class="inline-flex items-center gap-1.5 rounded-lg bg-white px-3 py-1.5 text-sm font-semibold text-slate-900 shadow-sm dark:bg-slate-900 dark:text-white"><span class="material-symbols-outlined text-base text-emerald-600 dark:text-emerald-400">gavel</span> Professional &amp; Legal Services</span>
+              <button
+                class="inline-flex items-center gap-1.5 rounded-lg bg-indigo-600 px-3 py-1.5 text-sm font-semibold text-white shadow-sm cursor-pointer"
+                data-action="click->home--index#openSignupModal"
+                type="button"
+              >
+                <span class="material-symbols-outlined text-base">add_circle</span> + Build Custom Domain UI in Minutes
+              </button>
+            </div>
+            <div class="mt-4 flex flex-col items-center justify-between gap-4 rounded-xl border-l-2 border-emerald-500 bg-white p-4 shadow-sm sm:flex-row dark:bg-slate-900">
+              <div class="flex items-center gap-3">
+                <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-emerald-100 text-emerald-700 dark:bg-emerald-900/50 dark:text-emerald-300">
+                  <span class="material-symbols-outlined text-xl">schema</span>
+                </div>
+                <div>
+                  <p class="text-base font-bold text-slate-900 dark:text-white">Need a custom industry UI or proprietary operational layout?</p>
+                  <p class="text-sm text-slate-600 dark:text-slate-400">The universal schema engine creates tailored odontograms, booking matrices, flight bays, dispatch boards, or KDS workflows without touching complex setup or code.</p>
+                </div>
+              </div>
+              <a class="inline-flex items-center gap-1.5 whitespace-nowrap rounded-lg bg-slate-100 px-4 py-2 text-sm font-semibold text-indigo-600 transition-all hover:bg-slate-200 dark:bg-slate-800 dark:text-indigo-300 dark:hover:bg-slate-700" href="#">Explore Schema Engine <span class="material-symbols-outlined text-base">arrow_forward</span></a>
+            </div>
+          </div>
+        </div>
+      </section>
+      <!-- UNIFIED MULTI-TENANT CORE -->
+      <section class="border-y border-slate-200 bg-indigo-50/60 px-4 py-16 dark:border-slate-800 dark:bg-indigo-950/20 md:px-8 md:py-20">
+        <div class="mx-auto max-w-7xl">
+          <div class="mb-10 flex flex-col justify-between gap-4 md:flex-row md:items-end">
+            <div>
+              <span class="flex items-center gap-1.5 text-sm font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400"><span class="material-symbols-outlined text-lg">domain_add</span> One Login, Unlimited Distinct Ventures</span>
+              <h2 class="mt-1 text-3xl font-bold text-slate-900 md:text-4xl dark:text-white">Single Master Account. Infinite Multi-Tenant Businesses.</h2>
+              <p class="mt-1 max-w-2xl text-base text-slate-600 dark:text-slate-400">Designed for serial entrepreneurs, family holding offices, hotel-and-restaurant operators, and franchise owners. Stop wrestling with fragmented accounts, passwords, and duplicate monthly base retainers.</p>
+            </div>
+            <div class="flex items-center gap-2">
+              <button
+                class="flex items-center gap-1.5 rounded-xl bg-indigo-600 px-3.5 py-2 text-sm font-semibold text-white shadow-sm cursor-pointer"
+                data-action="click->home--index#openSignupModal"
+                type="button"
+              >
+                <span class="material-symbols-outlined text-lg">verified</span> $0 Base Fee Per Tenant
+              </button>
+            </div>
+          </div>
+          <div class="grid grid-cols-1 gap-6 md:grid-cols-3">
+            <div class="flex flex-col justify-between rounded-2xl border border-slate-200 bg-white p-6 shadow-sm transition-all hover:shadow-md dark:border-slate-700 dark:bg-slate-900">
+              <div>
+                <div class="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-indigo-100 text-indigo-600 dark:bg-indigo-900/50 dark:text-indigo-300">
+                  <span class="material-symbols-outlined text-2xl">switch_account</span>
+                </div>
+                <h3 class="text-xl font-bold text-slate-900 dark:text-white">One Master Login, Diverse Holdings</h3>
+                <p class="mt-2 text-sm text-slate-600 dark:text-slate-400">Run an apparel boutique, an 80-room resort, and a craft cocktail kitchen from the same master dashboard. Seamlessly switch contexts with one click — no logging out, no multiple tabs, no separate apps.</p>
+                <ul class="mt-4 space-y-2 text-sm text-slate-900 dark:text-white">
+                  <li class="flex items-center gap-2"><span class="material-symbols-outlined text-lg text-emerald-600 dark:text-emerald-400">check</span> Complete tenant isolation &amp; separate branch ledgers</li>
+                  <li class="flex items-center gap-2"><span class="material-symbols-outlined text-lg text-emerald-600 dark:text-emerald-400">check</span> Granular staff permissions scoped per business</li>
+                  <li class="flex items-center gap-2"><span class="material-symbols-outlined text-lg text-emerald-600 dark:text-emerald-400">check</span> Consolidated multi-business executive rollups</li>
+                </ul>
+              </div>
+              <div class="mt-6 flex items-center justify-between border-t border-slate-200 pt-3 dark:border-slate-700">
+                <span class="text-sm font-semibold text-indigo-600 dark:text-indigo-400">1-Click Business Switcher</span>
+                <span class="rounded bg-emerald-100 px-2 py-0.5 text-xs font-bold text-emerald-700 dark:bg-emerald-900/50 dark:text-emerald-300">Zero Context Switch Lag</span>
+              </div>
+            </div>
+            <div class="flex flex-col justify-between rounded-2xl border border-slate-200 bg-white p-6 shadow-sm transition-all hover:shadow-md dark:border-slate-700 dark:bg-slate-900">
+              <div>
+                <div class="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-emerald-100 text-emerald-700 dark:bg-emerald-900/50 dark:text-emerald-300">
+                  <span class="material-symbols-outlined text-2xl">account_balance_wallet</span>
+                </div>
+                <h3 class="text-xl font-bold text-slate-900 dark:text-white">Unified Credit Pool or Dedicated Caps</h3>
+                <p class="mt-2 text-sm text-slate-600 dark:text-slate-400">Your complimentary monthly refill credits are pooled across all your businesses, or you can assign individual hard spend limits per tenant to keep subsidiaries strictly accountable.</p>
+                <ul class="mt-4 space-y-2 text-sm text-slate-900 dark:text-white">
+                  <li class="flex items-center gap-2"><span class="material-symbols-outlined text-lg text-emerald-600 dark:text-emerald-400">check</span> Shared wallet eliminates wasted orphan credits</li>
+                  <li class="flex items-center gap-2"><span class="material-symbols-outlined text-lg text-emerald-600 dark:text-emerald-400">check</span> Configurable hard spend caps ($0 to unlimited) per store</li>
+                  <li class="flex items-center gap-2"><span class="material-symbols-outlined text-lg text-emerald-600 dark:text-emerald-400">check</span> One consolidated credit statement for your accountant</li>
+                </ul>
+              </div>
+              <div class="mt-6 flex items-center justify-between border-t border-slate-200 pt-3 dark:border-slate-700">
+                <span class="text-sm font-semibold text-emerald-600 dark:text-emerald-400">Flexible Tenant Spend Guard</span>
+                <span class="rounded bg-indigo-100 px-2 py-0.5 text-xs font-bold text-indigo-700 dark:bg-indigo-900/50 dark:text-indigo-300">No Surprise Bills</span>
+              </div>
+            </div>
+            <div class="flex flex-col justify-between rounded-2xl border border-slate-200 bg-white p-6 shadow-sm transition-all hover:shadow-md dark:border-slate-700 dark:bg-slate-900">
+              <div>
+                <div class="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-amber-100 text-amber-700 dark:bg-amber-900/50 dark:text-amber-300">
+                  <span class="material-symbols-outlined text-2xl">bolt</span>
+                </div>
+                <h3 class="text-xl font-bold text-slate-900 dark:text-white">Instant Multi-Domain Provisioning</h3>
+                <p class="mt-2 text-sm text-slate-600 dark:text-slate-400">Launching a new concept or opening a pop-up branch? Spin up an industry-tailored tenant in under 60 seconds with pre-baked schemas for POS, tables, folios, or medical charts.</p>
+                <ul class="mt-4 space-y-2 text-sm text-slate-900 dark:text-white">
+                  <li class="flex items-center gap-2"><span class="material-symbols-outlined text-lg text-emerald-600 dark:text-emerald-400">check</span> Instant schema templates: Retail, Dining, Hotel, Clinic</li>
+                  <li class="flex items-center gap-2"><span class="material-symbols-outlined text-lg text-emerald-600 dark:text-emerald-400">check</span> Zero setup fees and zero idle monthly tenant tax</li>
+                  <li class="flex items-center gap-2"><span class="material-symbols-outlined text-lg text-emerald-600 dark:text-emerald-400">check</span> Clone product catalogs or keep branches fully distinct</li>
+                </ul>
+              </div>
+              <div class="mt-6 flex items-center justify-between border-t border-slate-200 pt-3 dark:border-slate-700">
+                <span class="text-sm font-semibold text-amber-700 dark:text-amber-300">&lt; 60 Sec Provisioning</span>
+                <span class="rounded bg-slate-200 px-2 py-0.5 text-xs text-slate-600 dark:bg-slate-700 dark:text-slate-300">Instant Onboarding</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+      <!-- CORE OPERATIONAL PILLARS -->
+      <section class="scroll-mt-20 px-4 py-16 md:px-8 md:py-24" id="platform">
+        <div class="mx-auto max-w-7xl">
+          <div class="mx-auto mb-10 max-w-3xl text-center">
+            <span class="text-sm font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400">The Core Platform</span>
+            <h2 class="mt-1 text-3xl font-bold text-slate-900 md:text-4xl dark:text-white">Core Operational Pillars Built For Scale</h2>
+            <p class="mt-2 text-base text-slate-600 dark:text-slate-400">Dozens of built-in atomic operational primitives. Whether you're running a boutique store, dental clinic, luxury hotel, flight academy, or automotive repair chain — every tenant operates on the same rock-solid platform primitives.</p>
+          </div>
+          <div class="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+            <div class="flex flex-col justify-between rounded-2xl bg-white p-6 shadow-sm transition-all hover:shadow-md dark:bg-slate-900">
+              <div>
+                <div class="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-indigo-100 text-indigo-600 dark:bg-indigo-900/50 dark:text-indigo-300">
+                  <span class="material-symbols-outlined text-2xl">cloud_done</span>
+                </div>
+                <h3 class="text-xl font-bold text-slate-900 dark:text-white">Cloud-Native Real-Time POS</h3>
+                <p class="mt-2 text-sm text-slate-600 dark:text-slate-400">Pure cloud architecture with sub-second real-time sync, instant WebSocket updates across all registers, and zero local software maintenance. Currently online-only for high-availability cloud tenants.</p>
+                <ul class="mt-4 space-y-2 text-sm text-slate-900 dark:text-white">
+                  <li class="flex items-center gap-2"><span class="material-symbols-outlined text-lg text-emerald-600 dark:text-emerald-400">check</span> Sub-second barcode scanner cloud response</li>
+                  <li class="flex items-center gap-2"><span class="material-symbols-outlined text-lg text-emerald-600 dark:text-emerald-400">check</span> Split payments (Cash, Card, QR, Gift vouchers)</li>
+                  <li class="flex items-center gap-2"><span class="material-symbols-outlined text-lg text-emerald-600 dark:text-emerald-400">check</span> Cloud-connected thermal and network receipt printers</li>
+                </ul>
+              </div>
+              <div class="mt-6 flex items-center justify-between rounded-b-2xl bg-gray-50 p-4 dark:bg-slate-800">
+                <span class="text-sm font-bold text-indigo-600 dark:text-indigo-400">0.12s Cloud WebSocket Sync</span>
+                <span class="rounded bg-slate-200 px-2 py-0.5 text-xs text-slate-600 dark:bg-slate-700 dark:text-slate-300">Online-Only</span>
+              </div>
+            </div>
+            <div class="flex flex-col justify-between rounded-2xl bg-white p-6 shadow-sm transition-all hover:shadow-md dark:bg-slate-900">
+              <div>
+                <div class="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-emerald-100 text-emerald-700 dark:bg-emerald-900/50 dark:text-emerald-300">
+                  <span class="material-symbols-outlined text-2xl">inventory_2</span>
+                </div>
+                <h3 class="text-xl font-bold text-slate-900 dark:text-white">Multi-Warehouse Inventory</h3>
+                <p class="mt-2 text-sm text-slate-600 dark:text-slate-400">Full lot, batch, and expiry tracking across multiple branches, regional hubs, and mobile truck storage with automated replenishment points.</p>
+                <ul class="mt-4 space-y-2 text-sm text-slate-900 dark:text-white">
+                  <li class="flex items-center gap-2"><span class="material-symbols-outlined text-lg text-emerald-600 dark:text-emerald-400">check</span> Automated PO creation on safety-stock trigger</li>
+                  <li class="flex items-center gap-2"><span class="material-symbols-outlined text-lg text-emerald-600 dark:text-emerald-400">check</span> FIFO, LIFO &amp; Weighted Average valuation</li>
+                  <li class="flex items-center gap-2"><span class="material-symbols-outlined text-lg text-emerald-600 dark:text-emerald-400">check</span> Stock variance reconciliation &amp; loss logs</li>
+                </ul>
+              </div>
+              <div class="mt-6 rounded-b-2xl bg-gray-50 p-4 dark:bg-slate-800">
+                <span class="text-sm font-bold text-emerald-600 dark:text-emerald-400">Automated Re-order Algorithms</span>
+              </div>
+            </div>
+            <div class="flex flex-col justify-between rounded-2xl bg-white p-6 shadow-sm transition-all hover:shadow-md dark:bg-slate-900">
+              <div>
+                <div class="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-amber-100 text-amber-700 dark:bg-amber-900/50 dark:text-amber-300">
+                  <span class="material-symbols-outlined text-2xl">groups</span>
+                </div>
+                <h3 class="text-xl font-bold text-slate-900 dark:text-white">HR &amp; Automated Payroll</h3>
+                <p class="mt-2 text-sm text-slate-600 dark:text-slate-400">Complete workforce lifecycle orchestration: multi-state tax withholding, automated overtime calculations, commission models, and direct PDF pay slips.</p>
+                <ul class="mt-4 space-y-2 text-sm text-slate-900 dark:text-white">
+                  <li class="flex items-center gap-2"><span class="material-symbols-outlined text-lg text-emerald-600 dark:text-emerald-400">check</span> Multi-tier role permissions and salary ladders</li>
+                  <li class="flex items-center gap-2"><span class="material-symbols-outlined text-lg text-emerald-600 dark:text-emerald-400">check</span> Digital employee document vault &amp; contracts</li>
+                  <li class="flex items-center gap-2"><span class="material-symbols-outlined text-lg text-emerald-600 dark:text-emerald-400">check</span> One-click direct bank disbursement files</li>
+                </ul>
+              </div>
+              <div class="mt-6 rounded-b-2xl bg-gray-50 p-4 dark:bg-slate-800">
+                <span class="text-sm font-bold text-amber-700 dark:text-amber-300">Tax Compliance Built-In</span>
+              </div>
+            </div>
+            <div class="flex flex-col justify-between rounded-2xl bg-white p-6 shadow-sm transition-all hover:shadow-md dark:bg-slate-900">
+              <div>
+                <div class="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-indigo-100 text-indigo-600 dark:bg-indigo-900/50 dark:text-indigo-300">
+                  <span class="material-symbols-outlined text-2xl">location_on</span>
+                </div>
+                <h3 class="text-xl font-bold text-slate-900 dark:text-white">Geofenced Attendance</h3>
+                <p class="mt-2 text-sm text-slate-600 dark:text-slate-400">Eliminate buddy punching and time theft. Enforce check-ins only when staff are physically located within geofenced branch boundaries or on local Wi-Fi.</p>
+                <ul class="mt-4 space-y-2 text-sm text-slate-900 dark:text-white">
+                  <li class="flex items-center gap-2"><span class="material-symbols-outlined text-lg text-emerald-600 dark:text-emerald-400">check</span> GPS radius boundary verification (50m precision)</li>
+                  <li class="flex items-center gap-2"><span class="material-symbols-outlined text-lg text-emerald-600 dark:text-emerald-400">check</span> Biometric facial selfie verification trigger</li>
+                  <li class="flex items-center gap-2"><span class="material-symbols-outlined text-lg text-emerald-600 dark:text-emerald-400">check</span> Self-service shift swapping and manager sign-off</li>
+                </ul>
+              </div>
+              <div class="mt-6 rounded-b-2xl bg-gray-50 p-4 dark:bg-slate-800">
+                <span class="text-sm font-bold text-indigo-600 dark:text-indigo-400">GPS &amp; Face Audit Trail</span>
+              </div>
+            </div>
+            <div class="flex flex-col justify-between rounded-2xl bg-white p-6 shadow-sm transition-all hover:shadow-md dark:bg-slate-900">
+              <div>
+                <div class="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-emerald-100 text-emerald-700 dark:bg-emerald-900/50 dark:text-emerald-300">
+                  <span class="material-symbols-outlined text-2xl">calendar_month</span>
+                </div>
+                <h3 class="text-xl font-bold text-slate-900 dark:text-white">Operations Calendar</h3>
+                <p class="mt-2 text-sm text-slate-600 dark:text-slate-400">One central cockpit uniting doctor appointments, hotel banquet room bookings, restaurant party reservations, and recurring employee rosters.</p>
+                <ul class="mt-4 space-y-2 text-sm text-slate-900 dark:text-white">
+                  <li class="flex items-center gap-2"><span class="material-symbols-outlined text-lg text-emerald-600 dark:text-emerald-400">check</span> Automated WhatsApp &amp; SMS 24hr reminders</li>
+                  <li class="flex items-center gap-2"><span class="material-symbols-outlined text-lg text-emerald-600 dark:text-emerald-400">check</span> Multi-resource blocking (Staff + Operatory/Room)</li>
+                  <li class="flex items-center gap-2"><span class="material-symbols-outlined text-lg text-emerald-600 dark:text-emerald-400">check</span> Google Calendar &amp; Apple iCal bi-directional sync</li>
+                </ul>
+              </div>
+              <div class="mt-6 rounded-b-2xl bg-gray-50 p-4 dark:bg-slate-800">
+                <span class="text-sm font-bold text-emerald-600 dark:text-emerald-400">Zero Double-Booking Guarantee</span>
+              </div>
+            </div>
+            <div class="flex flex-col justify-between rounded-2xl bg-white p-6 shadow-sm transition-all hover:shadow-md dark:bg-slate-900">
+              <div>
+                <div class="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-indigo-100 text-indigo-600 dark:bg-indigo-900/50 dark:text-indigo-300">
+                  <span class="material-symbols-outlined text-2xl">receipt_long</span>
+                </div>
+                <h3 class="text-xl font-bold text-slate-900 dark:text-white">Consolidated Billing Hub</h3>
+                <p class="mt-2 text-sm text-slate-600 dark:text-slate-400">Issue compliant tax invoices per individual branch tax IDs while rolling up executive consolidated P&amp;L statements to headquarters effortlessly.</p>
+                <ul class="mt-4 space-y-2 text-sm text-slate-900 dark:text-white">
+                  <li class="flex items-center gap-2"><span class="material-symbols-outlined text-lg text-emerald-600 dark:text-emerald-400">check</span> Multi-currency conversion with live ECB rates</li>
+                  <li class="flex items-center gap-2"><span class="material-symbols-outlined text-lg text-emerald-600 dark:text-emerald-400">check</span> Automated recurring SaaS/Retainer invoices</li>
+                  <li class="flex items-center gap-2"><span class="material-symbols-outlined text-lg text-emerald-600 dark:text-emerald-400">check</span> Custom legal numbering sequences per store</li>
+                </ul>
+              </div>
+              <div class="mt-6 rounded-b-2xl bg-gray-50 p-4 dark:bg-slate-800">
+                <span class="text-sm font-bold text-indigo-600 dark:text-indigo-400">Audit-Ready Tax Engines</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+      <!-- PRICING TRANSPARENCY BANNER -->
+      <section class="scroll-mt-20 bg-slate-100 px-4 py-16 dark:bg-slate-900/40 md:px-8 md:py-20" id="pricing">
+        <div class="mx-auto max-w-7xl rounded-3xl bg-white p-6 shadow-lg md:p-10 dark:bg-slate-900">
+          <div class="grid grid-cols-1 items-center gap-10 lg:grid-cols-12">
+            <div class="lg:col-span-7">
+              <div class="mb-4 inline-flex items-center gap-2 rounded-full bg-emerald-100 px-3 py-1 text-sm text-emerald-700 dark:bg-emerald-900/50 dark:text-emerald-300">
+                <span class="material-symbols-outlined text-base">toll</span> Pure Action-Based Pricing: You Grow, We Grow
+              </div>
+              <h2 class="text-3xl font-extrabold leading-tight text-slate-900 md:text-4xl dark:text-white">Why Credits &amp; Pay-As-You-Go Beat Bloated ERP Subscriptions</h2>
+              <p class="mt-4 text-base text-slate-600 dark:text-slate-400">No per-seat fees, no per-tenant base subscriptions, and zero charge for idle businesses. A single account can hold 1, 5, or 20 distinct businesses across retail, lodging, and dining. When an idle store or seasonal hotel has 0 transactions or bookings, it costs exactly $0. Credits only deduct when real transactions occur across your entire portfolio.</p>
+              <div class="mt-6 space-y-3 text-base text-slate-900 dark:text-white">
+                <div class="flex items-start gap-3">
+                  <span class="material-symbols-outlined mt-0.5 text-emerald-600 dark:text-emerald-400">card_giftcard</span>
+                  <p><strong>When You're Small, It's Free:</strong> Monthly free refill covers boutique shops, solo dentists, independent cafes, and small hotels with $0 spend. Zero credit card needed.</p>
+                </div>
+                <div class="flex items-start gap-3">
+                  <span class="material-symbols-outlined mt-0.5 text-emerald-600 dark:text-emerald-400">receipt_long</span>
+                  <p><strong>Action-Based Deductions (No Idle Tax):</strong> Never pay $150/user for employees who log in twice a week. Only pay fractional credits per checkout, reservation, or dispatch.</p>
+                </div>
+                <div class="flex items-start gap-3">
+                  <span class="material-symbols-outlined mt-0.5 text-emerald-600 dark:text-emerald-400">trending_up</span>
+                  <p><strong>Aligned Incentives (You Grow, We Grow):</strong> We only earn when your business thrives and processes high transaction volume — pure alignment with your bottom line.</p>
+                </div>
+                <div class="flex items-start gap-3">
+                  <span class="material-symbols-outlined mt-0.5 text-emerald-600 dark:text-emerald-400">shield</span>
+                  <p><strong>Configurable Hard Limits: You're Never Overcharged:</strong> Set exact monthly spending caps down to a $0 hard stop. Receive proactive threshold alerts at 80% and 95%, with absolute zero risk of runaway invoices or unexpected bills.</p>
+                </div>
+              </div>
+              <div class="mt-8 flex flex-wrap items-center gap-4">
+                <button
+                  class="inline-flex items-center gap-2 rounded-lg bg-indigo-600 px-6 py-3 text-base font-bold text-white shadow-md transition-all hover:bg-indigo-700 cursor-pointer"
+                  data-action="click->home--index#openSignupModal"
+                  type="button"
+                >
+                  <span>Get Started with Free Credits</span>
+                  <span class="material-symbols-outlined text-lg">launch</span>
+                </button>
+                <a class="text-sm text-slate-600 underline transition-colors hover:text-slate-900 dark:text-slate-400 dark:hover:text-white" href="#">View Detailed Credit Consumption Calculator</a>
+              </div>
+            </div>
+            <div class="rounded-2xl bg-gray-50 p-6 lg:col-span-5 dark:bg-slate-800">
+              <div class="flex items-center justify-between pb-4">
+                <div class="text-left">
+                  <h4 class="text-base font-bold text-slate-900 dark:text-white">Monthly Free Credit Tier</h4>
+                  <p class="text-xs text-slate-600 dark:text-slate-400">Complimentary credits refreshed each month</p>
+                </div>
+                <span class="text-xl font-extrabold text-emerald-600 dark:text-emerald-400">$0 / mo</span>
+              </div>
+              <div class="space-y-3 text-sm text-slate-600 dark:text-slate-400">
+                <div class="flex items-center justify-between rounded-lg bg-white px-3 py-1.5 dark:bg-slate-900">
+                  <span>Multi-Tenant Account Base</span>
+                  <button
+                    class="font-bold text-emerald-600 cursor-pointer dark:text-emerald-400"
+                    data-action="click->home--index#openSignupModal"
+                    type="button"
+                  >
+                    Unlimited Businesses ($0 Base)
+                  </button>
+                </div>
+                <div class="flex items-center justify-between rounded-lg bg-white px-3 py-1.5 dark:bg-slate-900">
+                  <span>Pay-As-You-Go Extra Rate</span>
+                  <span class="font-bold text-slate-900 dark:text-white">$0.012 per credit</span>
+                </div>
+                <div class="flex items-center justify-between rounded-lg border-l-2 border-emerald-500 bg-white px-3 py-1.5 dark:bg-slate-900">
+                  <span class="flex items-center gap-1 text-xs"><span class="material-symbols-outlined text-base text-emerald-600 dark:text-emerald-400">lock</span> Spend Cap &amp; Overcharge Guard</span>
+                  <span class="text-xs font-bold text-emerald-600 dark:text-emerald-400">Configurable Hard Stop</span>
+                </div>
+                <div class="rounded-lg bg-white p-3 dark:bg-slate-900">
+                  <span class="material-symbols-outlined mt-0.5 text-emerald-600 dark:text-emerald-400">lock_open</span>
+                  <p><strong>Unused Credits Never Lock Your Data:</strong> Even if credits reach zero, your tenant remains 100% accessible via cloud login with read-only record retrieval. Online-only architecture ensures your data is always backed up.</p>
+                </div>
+                <div class="flex items-center justify-between rounded-lg bg-white px-3 py-1 dark:bg-slate-900">
+                  <span>Data Retention</span>
+                  <span class="font-bold text-slate-900 dark:text-white">Infinite History</span>
+                </div>
+              </div>
+              <div class="mt-6 border-t border-slate-200 pt-4 text-center dark:border-slate-700">
+                <div class="inline-flex items-center gap-1.5 text-sm font-semibold text-emerald-600 dark:text-emerald-400">
+                  <span class="material-symbols-outlined text-base">verified</span> Auto-refills each calendar month • No credit card required
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+      <!-- ENTERPRISE SCALING -->
+      <section class="px-4 py-16 md:px-8 md:py-24">
+        <div class="mx-auto max-w-7xl">
+          <div class="mb-10 max-w-3xl">
+            <span class="text-sm font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400">Architected for Massive Scale</span>
+            <h2 class="mt-1 text-3xl font-bold text-slate-900 md:text-4xl dark:text-white">Built to Handle What Traditional Software Breaks On</h2>
+            <p class="mt-2 text-base text-slate-600 dark:text-slate-400">Single Unified Platform, Tailored Business Experiences. Engineered for international holdings, multi-franchise groups, and regulated health institutions — eliminating software sprawl with dynamic tenant-level UI schemas and zero data contamination.</p>
+          </div>
+          <div class="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+            <div class="rounded-2xl bg-white p-6 shadow-sm dark:bg-slate-900">
+              <div class="mb-3 flex h-10 w-10 items-center justify-center rounded-lg bg-indigo-100 text-indigo-600 dark:bg-indigo-900/50 dark:text-indigo-300">
+                <span class="material-symbols-outlined text-xl">hub</span>
+              </div>
+              <h3 class="text-base font-bold text-slate-900 dark:text-white">Single Unified Platform, Specialized UIs</h3>
+              <p class="mt-2 text-sm text-slate-600 dark:text-slate-400">No fragmented software or separate subscriptions. One unified platform powers tailored workflows across every business you run.</p>
+            </div>
+            <div class="rounded-2xl bg-white p-6 shadow-sm dark:bg-slate-900">
+              <div class="mb-3 flex h-10 w-10 items-center justify-center rounded-lg bg-emerald-100 text-emerald-700 dark:bg-emerald-900/50 dark:text-emerald-300">
+                <span class="material-symbols-outlined text-xl">dashboard_customize</span>
+              </div>
+              <h3 class="text-base font-bold text-slate-900 dark:text-white">Dynamic Tenant-Level UI Schemas</h3>
+              <p class="mt-2 text-sm text-slate-600 dark:text-slate-400">Workspaces dynamically render odontograms, room tape charts, or kitchen display lines on demand while retaining strict SOC2-compliant schema-level isolation.</p>
+            </div>
+            <div class="rounded-2xl bg-white p-6 shadow-sm dark:bg-slate-900">
+              <div class="mb-3 flex h-10 w-10 items-center justify-center rounded-lg bg-amber-100 text-amber-700 dark:bg-amber-900/50 dark:text-amber-300">
+                <span class="material-symbols-outlined text-xl">device_hub</span>
+              </div>
+              <h3 class="text-base font-bold text-slate-900 dark:text-white">Zero Software Sprawl</h3>
+              <p class="mt-2 text-sm text-slate-600 dark:text-slate-400">Say goodbye to multi-app synchronization headaches. One unified platform handles multi-branch inventory, consolidated P&amp;L, and cross-venture automated workflows.</p>
+            </div>
+            <div class="rounded-2xl bg-white p-6 shadow-sm dark:bg-slate-900">
+              <div class="mb-3 flex h-10 w-10 items-center justify-center rounded-lg bg-indigo-100 text-indigo-600 dark:bg-indigo-900/50 dark:text-indigo-300">
+                <span class="material-symbols-outlined text-xl">fingerprint</span>
+              </div>
+              <h3 class="text-base font-bold text-slate-900 dark:text-white">Granular RBAC &amp; Tamper-Proof Logs</h3>
+              <p class="mt-2 text-sm text-slate-600 dark:text-slate-400">Assign field-level viewing permissions. Every receipt void, patient record access, or price override is indelibly timestamped with IP and user ID.</p>
+            </div>
+            <div class="rounded-2xl bg-white p-6 shadow-sm dark:bg-slate-900">
+              <div class="mb-3 flex h-10 w-10 items-center justify-center rounded-lg bg-emerald-100 text-emerald-700 dark:bg-emerald-900/50 dark:text-emerald-300">
+                <span class="material-symbols-outlined text-xl">api</span>
+              </div>
+              <h3 class="text-base font-bold text-slate-900 dark:text-white">Open REST/GraphQL &amp; Webhooks</h3>
+              <p class="mt-2 text-sm text-slate-600 dark:text-slate-400">Full programmatic access directly to unified platform data. Connect custom apps, BI dashboards, or logistics networks without paying API toll gates.</p>
+            </div>
+            <div class="rounded-2xl bg-white p-6 shadow-sm dark:bg-slate-900">
+              <div class="mb-3 flex h-10 w-10 items-center justify-center rounded-lg bg-indigo-100 text-indigo-600 dark:bg-indigo-900/50 dark:text-indigo-300">
+                <span class="material-symbols-outlined text-xl">health_and_safety</span>
+              </div>
+              <h3 class="text-base font-bold text-slate-900 dark:text-white">99.99% Global High-Availability SLA</h3>
+              <p class="mt-2 text-sm text-slate-600 dark:text-slate-400">Multi-region active-active database clusters with real-time replication. Automatic instant failover guarantees cash registers and clinic portals never stall.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+      <!-- SOCIAL PROOF & STATS BANNER -->
+      <section class="bg-slate-100 px-4 py-16 dark:bg-slate-900/40 md:px-8 md:py-20">
+        <div class="mx-auto max-w-7xl">
+          <div class="grid grid-cols-2 gap-6 pb-10 text-center lg:grid-cols-4">
+            <div>
+              <p class="text-4xl font-extrabold leading-none text-indigo-600 dark:text-indigo-400">$1.4B+</p>
+              <p class="mt-2 text-sm font-semibold uppercase text-slate-500 dark:text-slate-400">Annual GMV Processed</p>
+            </div>
+            <div>
+              <p class="text-4xl font-extrabold leading-none text-emerald-600 dark:text-emerald-400">99.99%</p>
+              <p class="mt-2 text-sm font-semibold uppercase text-slate-500 dark:text-slate-400">Multi-Region Uptime</p>
+            </div>
+            <div>
+              <p class="text-4xl font-extrabold leading-none text-indigo-600 dark:text-indigo-400">45%</p>
+              <p class="mt-2 text-sm font-semibold uppercase text-slate-500 dark:text-slate-400">Admin Time Saved</p>
+            </div>
+            <div>
+              <p class="text-4xl font-extrabold leading-none text-amber-600 dark:text-amber-400">&lt;15 Min</p>
+              <p class="mt-2 text-sm font-semibold uppercase text-slate-500 dark:text-slate-400">Average Store Setup</p>
+            </div>
+          </div>
+          <div class="grid grid-cols-1 gap-4 pt-6 md:grid-cols-2 lg:grid-cols-4">
+            <div class="flex flex-col justify-between rounded-xl bg-white p-4 shadow-sm dark:bg-slate-900">
+              <p class="text-sm italic text-slate-900 dark:text-white">"We run 8 boutique apparel shops across 3 states. Moving from legacy software saved us $1,800/month in licensing fees, and inter-store stock transfers are now instant."</p>
+              <div class="mt-4 flex items-center gap-3 pt-3">
+                <div class="flex h-9 w-9 items-center justify-center rounded-full bg-emerald-100 text-sm font-bold text-emerald-700 dark:bg-emerald-900/50 dark:text-emerald-300">ML</div>
+                <div>
+                  <p class="text-sm font-bold leading-tight text-slate-900 dark:text-white">Maria Lopez</p>
+                  <p class="text-xs text-slate-500 dark:text-slate-400">Founder, Vela Clothiers</p>
+                </div>
+              </div>
+            </div>
+            <div class="flex flex-col justify-between rounded-xl bg-white p-4 shadow-sm dark:bg-slate-900">
+              <p class="text-sm italic text-slate-900 dark:text-white">"Our 6-chair dental clinic replaced two separate softwares for patient charting and billing with Skycom. The visual tooth chart and automated SMS reminders cut no-shows by 38%."</p>
+              <div class="mt-4 flex items-center gap-3 pt-3">
+                <div class="flex h-9 w-9 items-center justify-center rounded-full bg-indigo-100 text-sm font-bold text-indigo-600 dark:bg-indigo-900/50 dark:text-indigo-300">Dr</div>
+                <div>
+                  <p class="text-sm font-bold leading-tight text-slate-900 dark:text-white">Dr. Julian Scott, DDS</p>
+                  <p class="text-xs text-slate-500 dark:text-slate-400">Scott Family Dental Care</p>
+                </div>
+              </div>
+            </div>
+            <div class="flex flex-col justify-between rounded-xl bg-white p-4 shadow-sm dark:bg-slate-900">
+              <p class="text-sm italic text-slate-900 dark:text-white">"The tape chart calendar is snappy and housekeeping dispatch works seamlessly on maids' phones. Skycom didn't take a single dollar from our direct web reservations."</p>
+              <div class="mt-4 flex items-center gap-3 pt-3">
+                <div class="flex h-9 w-9 items-center justify-center rounded-full bg-amber-100 text-sm font-bold text-amber-700 dark:bg-amber-900/50 dark:text-amber-300">EK</div>
+                <div>
+                  <p class="text-sm font-bold leading-tight text-slate-900 dark:text-white">Elena Koslov</p>
+                  <p class="text-xs text-slate-500 dark:text-slate-400">GM, The Grand Aspen Suites</p>
+                </div>
+              </div>
+            </div>
+            <div class="flex flex-col justify-between rounded-xl bg-white p-4 shadow-sm dark:bg-slate-900">
+              <p class="text-sm italic text-slate-900 dark:text-white">"During Friday night rushes, zero latency on table ordering and kitchen display routing is everything. We track our steak cuts down to the ounce. Best ERP on the market."</p>
+              <div class="mt-4 flex items-center gap-3 pt-3">
+                <div class="flex h-9 w-9 items-center justify-center rounded-full bg-rose-100 text-sm font-bold text-rose-600 dark:bg-rose-900/50 dark:text-rose-300">AC</div>
+                <div>
+                  <p class="text-sm font-bold leading-tight text-slate-900 dark:text-white">Chef Antoine Chen</p>
+                  <p class="text-xs text-slate-500 dark:text-slate-400">Owner, Bistro Moderne Group</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+      <!-- FINAL CTA / ONBOARDING BANNER -->
+      <section class="px-4 py-16 md:px-8 md:py-24">
+        <div class="relative mx-auto max-w-5xl overflow-hidden rounded-3xl bg-indigo-600 p-6 text-center text-white shadow-xl md:p-10">
+          <div class="pointer-events-none absolute -left-24 -top-24 h-80 w-80 rounded-full bg-indigo-500 opacity-50 blur-3xl"></div>
+          <div class="pointer-events-none absolute -bottom-24 -right-24 h-80 w-80 rounded-full bg-emerald-500 opacity-40 blur-3xl"></div>
+          <div class="relative z-10">
+            <span class="mb-4 inline-block rounded-full bg-white/10 px-4 py-1.5 text-sm uppercase tracking-wider text-emerald-200 backdrop-blur-md font-bold">Zero Barriers • Zero Credit Card • Custom Spend Limits &amp; Zero Overcharge Protection</span>
+            <h2 class="mx-auto max-w-2xl text-3xl font-extrabold leading-tight md:text-4xl">When You're Small, We're Free. When You Grow, We Grow Together.</h2>
+            <p class="mx-auto mb-8 mt-3 max-w-xl text-lg text-indigo-200">No credit cards, zero seat fees. Get your monthly free refill credits and only pay tiny micropayments as your transaction volume soars.</p>
+            <form
+              class="mx-auto flex max-w-xl flex-col gap-2.5 sm:flex-row"
+              data-action="submit->home--index#openSignupFromCta"
+            >
+              <input
+                class="h-12 flex-1 rounded-xl bg-white px-4 text-base text-slate-900 shadow-sm outline-none placeholder:text-slate-400"
+                name="cta-email"
+                placeholder="Enter your business email"
+                required=""
+                type="email"
+              >
+              <button
+                class="flex h-12 items-center justify-center gap-2 whitespace-nowrap rounded-xl bg-emerald-600 px-6 text-base font-bold text-white shadow-md transition-all hover:bg-emerald-500 cursor-pointer"
+                type="submit"
+              >
+                <span>Claim Free Monthly Credits</span>
+                <span class="material-symbols-outlined text-xl">bolt</span>
+              </button>
+            </form>
+            <p class="mt-4 text-xs text-indigo-200/80">Compliant with SOC2 Type II, HIPAA and GDPR regulations. Automated daily encrypted backups included.</p>
+          </div>
+        </div>
+      </section>
+    </main>
+    <footer class="w-full bg-slate-100 dark:bg-slate-900/60">
+      <div class="mx-auto max-w-7xl px-4 py-10 md:px-8">
+        <div class="grid grid-cols-1 gap-10 pb-10 md:grid-cols-2 lg:grid-cols-5">
+          <div class="lg:col-span-1">
+            <div class="mb-4 flex items-center gap-2">
+              <img alt="Skycom ERP Logo" class="h-7 w-auto object-contain" src="/icon.svg">
+              <span class="text-base font-bold text-slate-900 dark:text-white">Skycom ERP</span>
+            </div>
+            <p class="mb-4 text-sm text-slate-600 dark:text-slate-400">Unified multi-tenant enterprise orchestration for retail, clinical healthcare, hospitality, and dining chains.</p>
+            <div class="inline-flex items-center gap-2 rounded-full bg-white px-3 py-1 dark:bg-slate-900">
+              <span class="h-2 w-2 rounded-full bg-emerald-600"></span>
+              <span class="text-sm text-slate-900 dark:text-white">Global SLA: 99.99% Uptime</span>
+            </div>
+          </div>
+          <div>
+            <h4 class="mb-4 text-base font-bold text-slate-900 dark:text-white">Solutions</h4>
+            <ul class="space-y-2">
+              <li class="flex items-center gap-1.5"><span class="h-1.5 w-1.5 rounded-full bg-emerald-600"></span><a class="text-sm text-slate-600 transition-colors hover:text-slate-900 dark:text-slate-400 dark:hover:text-white" href="#solutions">Retail &amp; Multi-store</a></li>
+              <li class="flex items-center gap-1.5"><span class="h-1.5 w-1.5 rounded-full bg-emerald-400"></span><a class="text-sm text-slate-600 transition-colors hover:text-slate-900 dark:text-slate-400 dark:hover:text-white" href="#solutions">Dental &amp; Clinics</a></li>
+              <li class="flex items-center gap-1.5"><span class="h-1.5 w-1.5 rounded-full bg-amber-500"></span><a class="text-sm text-slate-600 transition-colors hover:text-slate-900 dark:text-slate-400 dark:hover:text-white" href="#solutions">Hotels &amp; Hospitality</a></li>
+              <li class="flex items-center gap-1.5"><span class="h-1.5 w-1.5 rounded-full bg-rose-300"></span><a class="text-sm text-slate-600 transition-colors hover:text-slate-900 dark:text-slate-400 dark:hover:text-white" href="#solutions">Restaurants &amp; Cafes</a></li>
+            </ul>
+          </div>
+          <div>
+            <h4 class="mb-4 text-base font-bold text-slate-900 dark:text-white">Platform Features</h4>
+            <ul class="space-y-2">
+              <li><a class="text-sm text-slate-600 transition-colors hover:text-slate-900 dark:text-slate-400 dark:hover:text-white" href="#platform">POS Engine</a></li>
+              <li><a class="text-sm text-slate-600 transition-colors hover:text-slate-900 dark:text-slate-400 dark:hover:text-white" href="#platform">Inventory Engine</a></li>
+              <li><a class="text-sm text-slate-600 transition-colors hover:text-slate-900 dark:text-slate-400 dark:hover:text-white" href="#platform">Automated Attendance</a></li>
+              <li><a class="text-sm text-slate-600 transition-colors hover:text-slate-900 dark:text-slate-400 dark:hover:text-white" href="#platform">HR &amp; Payroll</a></li>
+              <li><a class="text-sm text-slate-600 transition-colors hover:text-slate-900 dark:text-slate-400 dark:hover:text-white" href="#platform">Smart Calendar</a></li>
+              <li><a class="text-sm text-slate-600 transition-colors hover:text-slate-900 dark:text-slate-400 dark:hover:text-white" href="#platform">Multi-Branch Billing</a></li>
+            </ul>
+          </div>
+          <div>
+            <h4 class="mb-4 text-base font-bold text-slate-900 dark:text-white">Security &amp; Trust</h4>
+            <ul class="space-y-2">
+              <li><a class="text-sm text-slate-600 transition-colors hover:text-slate-900 dark:text-slate-400 dark:hover:text-white" href="#">Tenant Data Isolation</a></li>
+              <li><a class="text-sm text-slate-600 transition-colors hover:text-slate-900 dark:text-slate-400 dark:hover:text-white" href="#">SOC2 Type II</a></li>
+              <li><a class="text-sm text-slate-600 transition-colors hover:text-slate-900 dark:text-slate-400 dark:hover:text-white" href="#">HIPAA-Ready Arch</a></li>
+              <li><a class="text-sm text-slate-600 transition-colors hover:text-slate-900 dark:text-slate-400 dark:hover:text-white" href="#">GDPR Compliance</a></li>
+              <li><a class="text-sm text-slate-600 transition-colors hover:text-slate-900 dark:text-slate-400 dark:hover:text-white" href="#">99.99% Enterprise SLA</a></li>
+            </ul>
+          </div>
+          <div>
+            <h4 class="mb-4 text-base font-bold text-slate-900 dark:text-white">Resources</h4>
+            <ul class="space-y-2">
+              <li><a class="text-sm text-slate-600 transition-colors hover:text-slate-900 dark:text-slate-400 dark:hover:text-white" href="#platform">Documentation &amp; APIs</a></li>
+              <li><a class="text-sm text-slate-600 transition-colors hover:text-slate-900 dark:text-slate-400 dark:hover:text-white" href="#platform">Enterprise Scaling</a></li>
+              <li><a class="text-sm text-slate-600 transition-colors hover:text-slate-900 dark:text-slate-400 dark:hover:text-white" href="#">System Status</a></li>
+              <li><a class="text-sm text-slate-600 transition-colors hover:text-slate-900 dark:text-slate-400 dark:hover:text-white" href="#">24/7 Priority Support</a></li>
+              <li><a class="text-sm text-slate-600 transition-colors hover:text-slate-900 dark:text-slate-400 dark:hover:text-white" href="#">Terms &amp; Master Agreement</a></li>
+            </ul>
+          </div>
+        </div>
+        <div class="flex flex-col items-center justify-between gap-4 pt-6 md:flex-row">
+          <p class="text-sm text-slate-600 dark:text-slate-400">© 2025 Skycom ERP Technologies Inc. All rights reserved.</p>
+          <div class="flex items-center gap-4">
+            <a class="text-sm text-slate-600 transition-colors hover:text-slate-900 dark:text-slate-400 dark:hover:text-white" href="#">Privacy Policy</a>
+            <a class="text-sm text-slate-600 transition-colors hover:text-slate-900 dark:text-slate-400 dark:hover:text-white" href="#">Security Center</a>
+            <a class="text-sm text-slate-600 transition-colors hover:text-slate-900 dark:text-slate-400 dark:hover:text-white" href="#">Trust Center</a>
+          </div>
+        </div>
+      </div>
+    </footer>
   </div>
 </div>
