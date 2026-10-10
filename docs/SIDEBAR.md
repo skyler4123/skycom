@@ -1,19 +1,20 @@
 # Skycom Sidebar System
 
-> **Status**: Live (2026-09-22). Sidebar control is **FE-only** — per-company favourites and
+> **Status**: Live (2026-09-22). Sidebar control is **FE-only** — per-employee favourites and
 > group open-state live in the browser's localStorage. Static structure lives in
 > `sidebar_items.js`; company-level **custom groups** (dynamic sidebar) live in a
-> company `Setting` and render from the client cache (§7).
+> company `Setting` and render from the client cache (§7). Employee-level
+> **personal groups** (`PERSONAL_SIDEBAR_CODE`) render between shared and static.
 
 ## 1. Architecture
 
 | File | Responsibility |
 |------|----------------|
 | `app/javascript/controllers/companies/sidebar_items.js` | Registry — `SIDEBAR_GROUPS` + `SIDEBAR_ITEMS` are the static structural source of truth (render order, icons, hrefs, `comingSoon`/`locked` flags) |
-| `app/javascript/controllers/companies/sidebar_custom.js` | Reader — custom groups from the client-cache `Setting` (`DYNAMIC_SIDEBAR_CODE`), key namespacing (`custom_` / `custom_item_`), `javascript:` URL rejection |
-| `app/javascript/controllers/companies/sidebar_storage.js` | localStorage helpers — favourites + open-group state, per company |
-| `app/javascript/controllers/companies/sidebars/show_controller.js` | Renderer — Favourites section + custom groups (above static) + collapsible `<details>` static groups + star toggles (`Companies_Sidebars_ShowController`, identifier `companies--sidebars--show`) |
-| `app/javascript/controllers/companies/settings/index_controller.js` | Editor — Dynamic Sidebar group/item CRUD on the Settings page (PATCH `Setting` metadata) |
+| `app/javascript/controllers/companies/sidebar_custom.js` | Reader — shared groups from the client-cache company `Setting` (`DYNAMIC_SIDEBAR_CODE`) + personal groups from `personal_settings` (`PERSONAL_SIDEBAR_CODE`), key namespacing (`custom_` / `custom_item_` + `personal_` / `personal_item_`), `javascript:` URL rejection |
+| `app/javascript/controllers/companies/sidebar_storage.js` | localStorage helpers — favourites + open-group state, per employee (company + user) |
+| `app/javascript/controllers/companies/sidebars/show_controller.js` | Renderer — Favourites section + shared groups + personal groups (above static) + collapsible `<details>` static groups + star toggles (`Companies_Sidebars_ShowController`, identifier `companies--sidebars--show`) |
+| `app/javascript/controllers/companies/settings/index_controller.js` | Editor — Dynamic Sidebar group/item CRUD (company form → PATCH `Setting`, personal form → PATCH `personal`) on the Settings page |
 | `app/javascript/controllers/companies/layout_controller.js` | Mounts the sidebar controller inside the `<aside>`; owns the header |
 
 ## 2. Slack-style UX
@@ -25,7 +26,7 @@
   (`font-variation-settings: 'FILL' 1`) when favourited, grey outline otherwise.
   Regular = not `comingSoon` and not in a `locked` (System) group.
 - **Groups** — every group renders as `<details>/<summary>` (label + item count),
-  collapsed by default; open state persists per company.
+  collapsed by default; open state persists per employee.
 - **Coming-soon** groups/items keep the amber badge + tooltip; no star.
 - **System group** — `locked: true`; no stars; still collapsible.
 
@@ -33,9 +34,11 @@
 
 | Key | Content |
 |-----|---------|
-| `sidebar_favourites_<company_id>` | JSON array of item keys, e.g. `["products","orders"]` |
-| `sidebar_open_groups_<company_id>` | JSON array of open group keys, e.g. `["catalog"]` |
+| `sidebar_favourites_<company_id>_<user_id>` | JSON array of item keys, e.g. `["products","orders"]` |
+| `sidebar_open_groups_<company_id>_<user_id>` | JSON array of open group keys, e.g. `["catalog"]` |
 
+- Legacy per-company keys (`sidebar_favourites_<company_id>`) are migrated once
+  on first read when the per-employee key is empty.
 - Plain flat keys (same pattern as `open-cache-sidebar` / `languageCode`) — never inside
   `client_cache_data`, so `ClientCacheController.sync()` cannot clobber them.
 - **Browser-level by design**: a new browser/laptop starts with empty favourites.
@@ -74,7 +77,7 @@ was removed with the BE config.
 | `app/controllers/companies/settings_controller.rb` | Index (Shell-First JSON) + update (dynamic sidebar metadata JSON) |
 | `app/controllers/client_cache_controller.rb` | Includes `settings` in the company payload |
 | `config/initializers/constants.rb` | `DYNAMIC_SIDEBAR_CODE` |
-| `spec/features/companies/layouts/sidebar_spec.rb` | E2E (favourites, groups, persistence, per-company scoping) |
+| `spec/features/companies/layouts/sidebar_spec.rb` | E2E (favourites, groups, persistence, per-employee scoping) |
 | `spec/features/companies/layouts/dynamic_sidebar_spec.rb` | E2E (custom groups above static, pasted URLs, custom stars) |
 | `spec/features/companies/settings/dynamic_sidebar_editor_spec.rb` | E2E (editor CRUD → sidebar reflects) |
 | `spec/services/seed/dynamic_sidebar_init_spec.rb` | Init record + Admin/Manager grants (retail/hospital/hotel) |
@@ -109,11 +112,13 @@ One `Setting` per company (`appoint_to` = Company, `business_type: :company`,
 
 ### Render
 
-`sidebar_custom.js` reads the record from `currentSettings()` (client cache),
-filters invalid entries, and maps them to the static item shape
-(`{ key, group, icon: "link", label, href: (cid) => url, custom: true }`):
+`sidebar_custom.js` reads the shared record from `currentSettings()` plus the
+personal record from `currentPersonalSetting()` (top-level `personal_settings`
+client-cache payload), filters invalid entries, and maps them to the static
+item shape (`{ key, group, icon: "link", label, href: (cid) => url, custom: true }`):
 
-- Group keys are namespaced `custom_<slug>`, item keys `custom_item_<slug>` —
+- Group keys are namespaced `custom_<slug>` (shared) / `personal_<slug>`
+  (personal), item keys `custom_item_<slug>` / `personal_item_<slug>` —
   favourites + open-group localStorage entries can never collide with static
   keys, so custom items star/unstar exactly like normal items (same
   `data-sidebar-star` button, same Favourites section).
@@ -130,6 +135,18 @@ with `PATCH Setting` (`FormData` with indexed
 the TableConfig JSONB pattern) → `clearClientCacheAndReload()` with the
 server's message. `Setting touch: true` bumps `company.updated_at`, so the
 version cookie resyncs the cache on reload.
+
+### Personal Quick Links
+
+One `Setting` per employee (`appoint_to` = Employee, `business_type: :employee`,
+`code = PERSONAL_SIDEBAR_CODE`, uniqueness scoped to
+`[company_id, appoint_to_type, appoint_to_id]`): same `sidebar_groups` shape as
+shared, rendered between shared groups and static groups. Created lazily via
+`GET/PATCH /companies/:id/settings/personal` (`Companies::SettingsController#personal` /
+`#update_personal`, self-service `personal?` policy — no `Setting` grant needed);
+exposed to FE as top-level `personal_settings[]` (own records only) in
+`ClientCacheController`. Personal saves also `touch` the company, so the version
+cookie resyncs like shared saves.
 
 ---
 

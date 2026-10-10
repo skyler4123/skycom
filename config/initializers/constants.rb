@@ -218,3 +218,8 @@ ACCEPTABLE_TICKET_FILE_TYPES = %w[
 
 # Code identifying the company's dynamic sidebar Setting record.
 DYNAMIC_SIDEBAR_CODE = "DYNAMIC_SIDEBAR".freeze
+
+# Code identifying an employee's personal sidebar Setting record
+# (appoint_to = Employee, business_type = :employee). One per employee per
+# company; renders below the shared company groups. See docs/SIDEBAR.md.
+PERSONAL_SIDEBAR_CODE = "PERSONAL_SIDEBAR".freeze

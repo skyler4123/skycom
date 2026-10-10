@@ -1,7 +1,10 @@
 # app/controllers/companies/settings_controller.rb
 # Serves Stimulus: companies/settings/index_controller.js
-#   (GET /companies/:id/settings, PATCH /companies/:id/settings/:id for the dynamic sidebar)
-# Endpoints: index (Shell-First JSON), update (dynamic sidebar metadata JSON).
+#   (GET /companies/:id/settings, PATCH /companies/:id/settings/:id for the dynamic sidebar,
+#    GET /companies/:id/settings/personal + PATCH /companies/:id/settings/personal for the
+#    employee personal sidebar)
+# Endpoints: index (Shell-First JSON), update (dynamic sidebar metadata JSON),
+#   personal (personal sidebar JSON, find-or-create), update_personal (personal metadata JSON).
 #   Shell for company settings — the dynamic sidebar editor lives on the index page.
 # Docs: docs/SIDEBAR.md
 class Companies::SettingsController < Companies::ApplicationController
@@ -39,7 +42,52 @@ class Companies::SettingsController < Companies::ApplicationController
     end
   end
 
+  def personal
+    setting = find_or_create_personal_setting
+
+    respond_to do |format|
+      format.html { render html: "", layout: true }
+      format.json { render json: { setting: setting.as_json } }
+    end
+  end
+
+  def update_personal
+    setting = find_or_create_personal_setting
+
+    respond_to do |format|
+      if setting.update(sidebar_groups: normalize_sidebar_groups)
+        format.html do
+          redirect_to company_settings_path(current_company),
+            notice: "Personal sidebar updated successfully"
+        end
+        format.json do
+          render json: { setting: setting.as_json, message: "Personal sidebar updated successfully" }
+        end
+      else
+        format.html do
+          redirect_to company_settings_path(current_company),
+            alert: setting.errors.full_messages.to_sentence
+        end
+        format.json do
+          render json: { errors: setting.errors.full_messages }, status: :unprocessable_content
+        end
+      end
+    end
+  end
+
   private
+
+  def find_or_create_personal_setting
+    Setting.find_or_create_by!(
+      company: current_company, appoint_to: current_employee, code: PERSONAL_SIDEBAR_CODE
+    ) do |setting|
+      setting.name = "Personal sidebar"
+      setting.business_type = :employee
+      setting.lifecycle_status = :active
+      setting.workflow_status = :confirmed
+      setting.metadata = { "sidebar_groups" => [] }
+    end
+  end
 
   # Whitelist name/key/url only; HTML forms send the groups array as a
   # {"0" => {...}} hash (see docs/DASHBOARD_PATTERN.md JSONB array pattern).

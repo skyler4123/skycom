@@ -120,5 +120,55 @@ RSpec.describe Setting, type: :model do
       expect(duplicate).not_to be_valid
       expect(duplicate.errors[:code]).not_to be_empty
     end
+
+    it "defines the PERSONAL_SIDEBAR_CODE constant" do
+      expect(defined?(PERSONAL_SIDEBAR_CODE)).to eq("constant")
+      expect(PERSONAL_SIDEBAR_CODE).to be_a(String)
+      expect(PERSONAL_SIDEBAR_CODE).not_to eq(DYNAMIC_SIDEBAR_CODE)
+    end
+
+    it "allows one personal sidebar per employee in the same company" do
+      company = create(:company)
+      employee_a = create(:employee, company: company)
+      employee_b = create(:employee, company: company)
+      described_class.create!(
+        company: company, appoint_to: employee_a, code: PERSONAL_SIDEBAR_CODE,
+        lifecycle_status: :active, workflow_status: :confirmed, business_type: :employee,
+        sidebar_groups: []
+      )
+      second = described_class.new(
+        company: company, appoint_to: employee_b, code: PERSONAL_SIDEBAR_CODE,
+        lifecycle_status: :active, workflow_status: :confirmed, business_type: :employee
+      )
+      expect(second).to be_valid
+    end
+
+    it "rejects a duplicate personal sidebar for the same employee" do
+      company = create(:company)
+      employee = create(:employee, company: company)
+      described_class.create!(
+        company: company, appoint_to: employee, code: PERSONAL_SIDEBAR_CODE,
+        lifecycle_status: :active, workflow_status: :confirmed, business_type: :employee,
+        sidebar_groups: []
+      )
+      duplicate = described_class.new(
+        company: company, appoint_to: employee, code: PERSONAL_SIDEBAR_CODE,
+        lifecycle_status: :active, workflow_status: :confirmed, business_type: :employee
+      )
+      expect(duplicate).not_to be_valid
+      expect(duplicate.errors[:code]).not_to be_empty
+    end
+
+    it "exposes employee_level and personal_sidebar scopes" do
+      company = create(:company)
+      employee = create(:employee, company: company)
+      personal = described_class.create!(
+        company: company, appoint_to: employee, code: PERSONAL_SIDEBAR_CODE,
+        lifecycle_status: :active, workflow_status: :confirmed, business_type: :employee,
+        sidebar_groups: []
+      )
+      expect(described_class.employee_level).to include(personal)
+      expect(described_class.personal_sidebar).to include(personal)
+    end
   end
 end

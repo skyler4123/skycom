@@ -122,6 +122,31 @@ export const currentSettings = () => {
   return currentCompany()?.settings || []
 }
 
+export const currentEmployees = () => {
+  return getCache().employees || []
+}
+
+export const currentEmployee = () => {
+  const company = currentCompany()
+  const user = currentUser()
+  if (!company || !user) return null
+  return currentEmployees().find((e) => String(e.company_id) === String(company.id) && String(e.user_id) === String(user.id)) || null
+}
+
+export const currentEmployeeId = () => {
+  return currentEmployee()?.id || null
+}
+
+export const currentPersonalSettings = () => {
+  return getCache().personal_settings || []
+}
+
+export const currentPersonalSetting = () => {
+  const employeeId = currentEmployeeId()
+  if (!employeeId) return null
+  return currentPersonalSettings().find((s) => String(s.appoint_to_id) === String(employeeId)) || null
+}
+
 // Helper method inside your controller or JS file
 export const getImportMapPath = (moduleName) => {
   const importMapScript = document.querySelector('script[type="importmap"]')

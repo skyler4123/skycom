@@ -48,16 +48,17 @@ RSpec.feature "Dynamic sidebar editor", type: :feature, js: true do
   scenario "owner creates a custom group with an item and it appears in the sidebar" do
     visit company_settings_path(company)
 
-    expect(page).to have_content("Dynamic Sidebar", wait: 10)
+    expect(page).to have_content("Company Quick Links", wait: 10)
+    expect(page).to have_content("My Quick Links", wait: 10)
 
-    click_button "Add Group"
-    fill_in "Group name", with: "My Links"
+    click_button "Add Group", match: :first
+    fill_in "Group name", match: :first, with: "My Links"
 
-    click_button "Add Sidebar Item"
-    fill_in "Item name", with: "Pending Orders"
-    fill_in "Item URL", with: "/pending?workflow_status=pending"
+    click_button "Add Sidebar Item", match: :first
+    fill_in "Item name", match: :first, with: "Pending Orders"
+    fill_in "Item URL", match: :first, with: "/pending?workflow_status=pending"
 
-    click_button "Save Changes"
+    click_button "Save Changes", match: :first
 
     expect(page).to have_content("Dynamic sidebar updated successfully", wait: 10)
     within("aside", visible: :all) do
@@ -65,5 +66,26 @@ RSpec.feature "Dynamic sidebar editor", type: :feature, js: true do
       expect(page).to have_link("Pending Orders", href: "/pending?workflow_status=pending", visible: :all, wait: 10)
     end
     expect(dynamic_setting.reload.sidebar_groups.first["name"]).to eq("My Links")
+  end
+
+  scenario "employee creates a personal link visible only to themselves" do
+    visit company_settings_path(company)
+
+    expect(page).to have_content("My Quick Links", wait: 10)
+
+    # Each step re-queries the form: Add Group re-renders contentHTML and would
+    # stale any held Capybara scope element.
+    within(all("form").last) { click_button "Add Group" }
+    within(all("form").last) { fill_in "Group name", with: "Mine" }
+    within(all("form").last) { click_button "Add Sidebar Item" }
+    within(all("form").last) { fill_in "Item name", with: "My Stocks" }
+    within(all("form").last) { fill_in "Item URL", with: "/my-stocks" }
+    within(all("form").last) { click_button "Save Changes" }
+
+    expect(page).to have_content("Personal sidebar updated successfully", wait: 10)
+    within("aside", visible: :all) do
+      expect(page).to have_selector("details[data-sidebar-group^='personal_']", visible: :all, wait: 10)
+      expect(page).to have_link("My Stocks", href: "/my-stocks", visible: :all, wait: 10)
+    end
   end
 end
