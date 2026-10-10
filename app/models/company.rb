@@ -25,7 +25,7 @@ class Company < ApplicationRecord
     Event EventGroup EventConfig
     Notification NotificationTag
     CompanyTicket CompanyTicketComment CompanyTicketLog
-    Document
+    Document Setting
   ].freeze
   class_attribute :skip_init, default: false
   # Creation-time-only flag: System#ensure_company! marks its auto-created

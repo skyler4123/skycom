@@ -365,13 +365,13 @@ Skycom also caches company data in the browser's `localStorage` for fast fronten
 
 ### 6.1 What Gets Cached
 
-The client cache stores: User, Companies, Branches, Departments, Roles, Enums, Employees, and Billing Contract Summary (enabled features for frontend gating).
+The client cache stores: User, Companies, Branches, Departments, Roles, Enums, Employees, Settings (company-level, incl. the dynamic sidebar record), and Billing Contract Summary (enabled features for frontend gating).
 
 ### 6.2 Storage Keys
 
 | Key | Description |
 |-----|-------------|
-| `client_cache_data` | JSON blob containing all cached data (user, companies, branches, departments, roles, categories, property_mappings, table_configs, enums, employees — **no** `settings`) |
+| `client_cache_data` | JSON blob containing all cached data (user, companies, branches, departments, roles, categories, property_mappings, table_configs, enums, employees, settings) |
 | `client_cache_version` | Version string for cache invalidation |
 | `client_cache_sync_count` | Auto-sync counter (max 1, resets on version match) |
 | `sidebar_favourites_<company_id>` | Per-company favourited sidebar item keys (FE-only, `docs/SIDEBAR.md`) |
@@ -400,6 +400,8 @@ On page load:
 | `currentCompany()` | Active company or null |
 | `currentBranches()` | Branches of current company |
 | `currentRoles()` | Roles of current company |
+| `currentCategories()` | Categories of current company |
+| `currentSettings()` | Company-level settings of current company (dynamic sidebar record) |
 | `Enums()` | All enum definitions |
 | `featureEnabled(key)` | Checks if a feature is in `enabled_features` |
 | `clearClientCache()` | Clears localStorage cache |
@@ -433,7 +435,7 @@ PropertyMapping.create/update/destroy
           → re-fetches /client_cache → localStorage refreshed → page reloaded
 ```
 
-Models with `belongs_to :company, touch: true`: Branch, Department, Category, PropertyMapping, TableConfig, Role.
+Models with `belongs_to :company, touch: true`: Branch, Department, Category, PropertyMapping, TableConfig, Role, Setting.
 
 ---
 

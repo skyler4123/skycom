@@ -869,5 +869,18 @@ export const dictionary = () => {
     "Enable email notifications": { vi: "Bật thông báo email" },
     "Failed to load notification preferences": { vi: "Không thể tải tùy chọn thông báo" },
     "Notification preferences are under development and don't affect delivery yet.": { vi: "Tùy chọn thông báo đang phát triển và chưa ảnh hưởng đến việc gửi." },
+    "Dynamic Sidebar": { vi: "Thanh Bên Tùy Chỉnh" },
+    "Custom groups appear above the built-in sidebar": { vi: "Nhóm tùy chỉnh hiển thị phía trên thanh bên mặc định" },
+    "Add Group": { vi: "Thêm Nhóm" },
+    "Add Sidebar Item": { vi: "Thêm Mục" },
+    "Group name": { vi: "Tên nhóm" },
+    "Item name": { vi: "Tên mục" },
+    "Item URL": { vi: "Đường dẫn" },
+    "Delete group": { vi: "Xóa nhóm" },
+    "Delete item": { vi: "Xóa mục" },
+    "No custom groups yet": { vi: "Chưa có nhóm tùy chỉnh" },
+    "Dynamic sidebar is not configured for this company yet.": { vi: "Thanh bên tùy chỉnh chưa được cấu hình cho công ty này." },
+    "Failed to load settings": { vi: "Không thể tải cài đặt" },
+    "Failed to update dynamic sidebar": { vi: "Không thể cập nhật thanh bên tùy chỉnh" },
   }
 }

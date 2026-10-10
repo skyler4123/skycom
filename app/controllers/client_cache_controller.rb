@@ -1,6 +1,10 @@
 # app/controllers/client_cache_controller.rb
 
-# Give the latest cache for client
+# Give the latest cache for client.
+# Serves Stimulus: client_cache_controller (sync: version-cookie compare → GET index JSON → localStorage)
+# Endpoints: GET /client_cache(.json) — { user, companies[] (with branches, departments,
+#   roles, categories, property_mappings, table_configs, settings), enums, employees[] }
+# Docs: docs/CACHE.md (client cache incl. dynamic sidebar settings), docs/SIDEBAR.md
 class ClientCacheController < ApplicationController
   def index
     respond_to do |format|
@@ -15,7 +19,8 @@ class ClientCacheController < ApplicationController
               roles:             {},
               categories:        {},
               property_mappings: {},
-              table_configs:     {}
+              table_configs:     {},
+              settings:          {}
             },
             methods: [ :resource_names ]
           ),
