@@ -365,23 +365,23 @@ Skycom also caches company data in the browser's `localStorage` for fast fronten
 
 ### 6.1 What Gets Cached
 
-The client cache stores: User, Companies, Branches, Departments, Roles, Enums, Employees, Settings (company-level, incl. the dynamic sidebar record), and Billing Contract Summary (enabled features for frontend gating).
+The client cache stores: User, Companies, Branches, Departments, Roles, Enums, Employees, Settings (company-level, incl. the dynamic sidebar record), Personal Settings (own `PERSONAL_SIDEBAR` records), and Billing Contract Summary (enabled features for frontend gating).
 
 ### 6.2 Storage Keys
 
 | Key | Description |
 |-----|-------------|
-| `client_cache_data` | JSON blob containing all cached data (user, companies, branches, departments, roles, categories, property_mappings, table_configs, enums, employees, settings) |
+| `client_cache_data` | JSON blob containing all cached data (user, companies, branches, departments, roles, categories, property_mappings, table_configs, enums, employees, settings, personal_settings) |
 | `client_cache_version` | Version string for cache invalidation |
 | `client_cache_sync_count` | Auto-sync counter (max 1, resets on version match) |
-| `sidebar_favourites_<company_id>` | Per-company favourited sidebar item keys (FE-only, `docs/SIDEBAR.md`) |
-| `sidebar_open_groups_<company_id>` | Per-company open sidebar group keys (FE-only, `docs/SIDEBAR.md`) |
+| `sidebar_favourites_<company_id>_<user_id>` | Per-employee favourited sidebar item keys (FE-only, `docs/SIDEBAR.md`) |
+| `sidebar_open_groups_<company_id>_<user_id>` | Per-employee open sidebar group keys (FE-only, `docs/SIDEBAR.md`) |
 
 ### 6.3 Backend Endpoint
 
 **Route**: `GET /client_cache`
 
-Returns `{ user, companies[], enums, employees[] }` and sets a `client_cache_version` cookie.
+Returns `{ user, companies[], enums, employees[], personal_settings[] }` and sets a `client_cache_version` cookie.
 
 ### 6.4 Frontend Controller
 
@@ -402,6 +402,8 @@ On page load:
 | `currentRoles()` | Roles of current company |
 | `currentCategories()` | Categories of current company |
 | `currentSettings()` | Company-level settings of current company (dynamic sidebar record) |
+| `currentPersonalSetting()` | Own personal sidebar setting for the current employee (`personal_settings`) |
+| `currentEmployee()` | Current employee (company + user match) or null |
 | `Enums()` | All enum definitions |
 | `featureEnabled(key)` | Checks if a feature is in `enabled_features` |
 | `clearClientCache()` | Clears localStorage cache |

@@ -123,7 +123,12 @@ Rails.application.routes.draw do
       resources :payslips
       resources :tasks
       resources :facilities
-      resources :settings, only: [ :index, :update ]
+      resources :settings, only: [ :index, :update ] do
+        collection do
+          get :personal
+          patch :personal, action: :update_personal
+        end
+      end
       resources :subscription_plan_appointments
       resources :permissions
       resources :permission_logs, only: [ :index, :show ]

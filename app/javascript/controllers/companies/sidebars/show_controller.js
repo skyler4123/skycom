@@ -2,11 +2,11 @@
 // <details> groups. Static structure comes from controllers/companies/sidebar_items;
 // custom (dynamic sidebar) groups come from controllers/companies/sidebar_custom
 // (company Setting in the client cache) and render ABOVE the static groups.
-// Per-company favourites + open-group state live in controllers/companies/sidebar_storage.
+// Per-employee favourites + open-group state live in controllers/companies/sidebar_storage.
 // FE-only — no server calls (docs/SIDEBAR.md).
 import { Controller } from "@hotwired/stimulus"
 import { SIDEBAR_ITEMS, SIDEBAR_GROUPS } from "controllers/companies/sidebar_items"
-import { customSidebarGroups, customSidebarItems } from "controllers/companies/sidebar_custom"
+import { customSidebarGroups, customSidebarItems, personalSidebarGroups, personalSidebarItems } from "controllers/companies/sidebar_custom"
 import {
   favourites, isFavourite, toggleFavourite, isGroupOpen, setGroupOpen
 } from "controllers/companies/sidebar_storage"
@@ -20,9 +20,14 @@ export default class Companies_Sidebars_ShowController extends Controller {
     return currentCompany()?.id
   }
 
+  userId() {
+    return (typeof currentUser === "function" ? currentUser()?.id : null) || null
+  }
+
   groupConfig(groupKey) {
     return SIDEBAR_GROUPS.find(g => g.key === groupKey)
       || customSidebarGroups().find(g => g.key === groupKey)
+      || personalSidebarGroups().find(g => g.key === groupKey)
   }
 
   // Regular items are starable: not coming-soon and not in a locked (System) group.
@@ -32,13 +37,13 @@ export default class Companies_Sidebars_ShowController extends Controller {
 
   toggleStar(event) {
     const key = event.currentTarget.dataset.sidebarStar
-    toggleFavourite(this.companyId(), key)
+    toggleFavourite(this.companyId(), key, this.userId())
     this.render()
   }
 
   groupToggled(event) {
     const key = event.currentTarget.dataset.sidebarGroup
-    setGroupOpen(this.companyId(), key, event.currentTarget.open)
+    setGroupOpen(this.companyId(), key, event.currentTarget.open, this.userId())
   }
 
   render() {
@@ -63,6 +68,7 @@ export default class Companies_Sidebars_ShowController extends Controller {
     return `
       ${this.favouritesHTML()}
       ${customSidebarGroups().map(g => this.groupHTML(g)).join("\n")}
+      ${personalSidebarGroups().map(g => this.groupHTML(g)).join("\n")}
       ${SIDEBAR_GROUPS.map(g => this.groupHTML(g)).join("\n")}
     `
   }
@@ -70,11 +76,13 @@ export default class Companies_Sidebars_ShowController extends Controller {
   findItem(key) {
     return SIDEBAR_ITEMS.find(i => i.key === key)
       || customSidebarItems().find(i => i.key === key)
+      || personalSidebarItems().find(i => i.key === key)
   }
 
   favouritesHTML() {
     const cid = this.companyId()
-    const favItems = favourites(cid)
+    const uid = this.userId()
+    const favItems = favourites(cid, uid)
       .map(key => this.findItem(key))
       .filter(Boolean)
 
@@ -96,9 +104,10 @@ export default class Companies_Sidebars_ShowController extends Controller {
   groupHTML(groupConfig) {
     const items = [
       ...SIDEBAR_ITEMS.filter(i => i.group === groupConfig.key),
-      ...customSidebarItems().filter(i => i.group === groupConfig.key)
+      ...customSidebarItems().filter(i => i.group === groupConfig.key),
+      ...personalSidebarItems().filter(i => i.group === groupConfig.key)
     ]
-    const isOpen = isGroupOpen(this.companyId(), groupConfig.key)
+    const isOpen = isGroupOpen(this.companyId(), groupConfig.key, this.userId())
 
     return `
       <details
@@ -140,7 +149,7 @@ export default class Companies_Sidebars_ShowController extends Controller {
       `
     }
 
-    const starred = isFavourite(cid, item.key)
+    const starred = isFavourite(cid, item.key, this.userId())
     const star = this.starable(item) ? `
       <button
         type="button"

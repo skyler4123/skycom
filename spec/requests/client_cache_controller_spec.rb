@@ -31,5 +31,30 @@ RSpec.describe "ClientCacheController", type: :request do
       record = payload_company["settings"].find { |s| s["id"] == setting.id }
       expect(record["metadata"]["sidebar_groups"].first["name"]).to eq("My Links")
     end
+
+    it "includes own personal sidebar settings and excludes other employees" do
+      owner_employee = Employee.cached_where(user: owner_user, company: company).first
+      other_employee = create(:employee, company: company)
+      mine = Setting.create!(
+        company: company, appoint_to: owner_employee, code: PERSONAL_SIDEBAR_CODE,
+        lifecycle_status: :active, workflow_status: :confirmed, business_type: :employee,
+        sidebar_groups: [
+          { "key" => "mine", "name" => "My Links",
+            "items" => [ { "key" => "stocks", "name" => "Stocks", "url" => "/stocks" } ] }
+        ]
+      )
+      Setting.create!(
+        company: company, appoint_to: other_employee, code: PERSONAL_SIDEBAR_CODE,
+        lifecycle_status: :active, workflow_status: :confirmed, business_type: :employee,
+        sidebar_groups: []
+      )
+
+      get "/client_cache", as: :json
+      expect(response).to have_http_status(:ok)
+      body = JSON.parse(response.body)
+      ids = (body["personal_settings"] || []).map { |s| s["id"] }
+      expect(ids).to include(mine.id)
+      expect(body["personal_settings"].size).to eq(1)
+    end
   end
 end

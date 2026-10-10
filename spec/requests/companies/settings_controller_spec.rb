@@ -92,4 +92,76 @@ RSpec.describe "Companies::SettingsController", type: :request do
       expect(response).to have_http_status(:forbidden)
     end
   end
+
+  describe "GET /companies/:company_id/settings/personal" do
+    it "creates and returns the employee personal sidebar setting" do
+      employee = create(:employee, company: company)
+      company.clear_permissions_cache
+      get sign_in_for_test_path(email: employee.user.email)
+
+      get "/companies/#{company.id}/settings/personal", as: :json
+      expect(response).to have_http_status(:ok)
+      body = JSON.parse(response.body)
+      expect(body["setting"]["code"]).to eq(PERSONAL_SIDEBAR_CODE)
+      expect(body["setting"]["appoint_to_id"]).to eq(employee.id)
+      expect(body["setting"]["appoint_to_type"]).to eq("Employee")
+    end
+
+    it "returns the same record on repeat visits" do
+      employee = create(:employee, company: company)
+      company.clear_permissions_cache
+      get sign_in_for_test_path(email: employee.user.email)
+
+      get "/companies/#{company.id}/settings/personal", as: :json
+      first_id = JSON.parse(response.body)["setting"]["id"]
+      get "/companies/#{company.id}/settings/personal", as: :json
+      expect(JSON.parse(response.body)["setting"]["id"]).to eq(first_id)
+    end
+
+    it "isolates personal settings between employees" do
+      employee_a = create(:employee, company: company)
+      employee_b = create(:employee, company: company)
+      company.clear_permissions_cache
+      get sign_in_for_test_path(email: employee_a.user.email)
+      get "/companies/#{company.id}/settings/personal", as: :json
+      id_a = JSON.parse(response.body)["setting"]["id"]
+
+      get sign_in_for_test_path(email: employee_b.user.email)
+      get "/companies/#{company.id}/settings/personal", as: :json
+      id_b = JSON.parse(response.body)["setting"]["id"]
+
+      expect(id_b).not_to eq(id_a)
+    end
+  end
+
+  describe "PATCH /companies/:company_id/settings/personal" do
+    it "updates own sidebar_groups without Setting update permission" do
+      employee = create(:employee, company: company)
+      company.clear_permissions_cache
+      get sign_in_for_test_path(email: employee.user.email)
+      groups = [
+        { "key" => "mine", "name" => "My Links",
+          "items" => [ { "key" => "stocks", "name" => "Stocks", "url" => "/stocks" } ] }
+      ]
+
+      patch "/companies/#{company.id}/settings/personal",
+        params: { setting: { metadata: { sidebar_groups: groups } } }, as: :json
+
+      expect(response).to have_http_status(:ok)
+      body = JSON.parse(response.body)
+      expect(body["setting"]["metadata"]["sidebar_groups"]).to eq(groups)
+    end
+
+    it "returns 422 with errors for invalid sidebar_groups" do
+      employee = create(:employee, company: company)
+      company.clear_permissions_cache
+      get sign_in_for_test_path(email: employee.user.email)
+
+      patch "/companies/#{company.id}/settings/personal",
+        params: { setting: { metadata: { sidebar_groups: [ { "key" => "g1" } ] } } }, as: :json
+
+      expect(response).to have_http_status(:unprocessable_content)
+      expect(JSON.parse(response.body)["errors"]).to be_present
+    end
+  end
 end

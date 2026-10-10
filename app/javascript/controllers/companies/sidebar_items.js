@@ -1,6 +1,6 @@
 // Shared sidebar registry — the single source of truth for the sidebar renderer
 // (companies/sidebars/show_controller.js). Sidebar visibility and favourites are
-// FE-only (localStorage, per company) — see docs/SIDEBAR.md.
+// FE-only (localStorage, per employee) — see docs/SIDEBAR.md.
 
 // Group registry — array order is the sidebar render order.
 // `locked: true` groups can never be hidden via company settings.

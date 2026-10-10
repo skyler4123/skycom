@@ -3,7 +3,8 @@
 # Give the latest cache for client.
 # Serves Stimulus: client_cache_controller (sync: version-cookie compare → GET index JSON → localStorage)
 # Endpoints: GET /client_cache(.json) — { user, companies[] (with branches, departments,
-#   roles, categories, property_mappings, table_configs, settings), enums, employees[] }
+#   roles, categories, property_mappings, table_configs, settings), enums, employees[],
+#   personal_settings[] (own PERSONAL_SIDEBAR records for sidebar_custom) }
 # Docs: docs/CACHE.md (client cache incl. dynamic sidebar settings), docs/SIDEBAR.md
 class ClientCacheController < ApplicationController
   def index
@@ -130,7 +131,12 @@ class ClientCacheController < ApplicationController
               process_types: Workflow.process_types.keys.map { |t| { name: t.to_s.humanize, value: t.to_s } }
             }
           },
-          employees: current_user.employees
+          employees: current_user.employees,
+          personal_settings: Setting.where(
+            code: PERSONAL_SIDEBAR_CODE,
+            appoint_to_type: "Employee",
+            appoint_to_id: current_user.employees.select(:id)
+          ).map(&:as_json)
         }
       end
     end

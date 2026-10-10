@@ -27,10 +27,12 @@ class Setting < ApplicationRecord
 
   # --- Scopes ---
   scope :company_level, -> { where(appoint_to_type: "Company") }
+  scope :employee_level, -> { where(appoint_to_type: "Employee") }
   scope :dynamic_sidebar, -> { where(code: DYNAMIC_SIDEBAR_CODE) }
+  scope :personal_sidebar, -> { where(code: PERSONAL_SIDEBAR_CODE) }
 
   # --- Validations ---
-  validates :code, uniqueness: { scope: :company_id }, allow_nil: true
+  validates :code, uniqueness: { scope: [ :company_id, :appoint_to_type, :appoint_to_id ] }, allow_nil: true
   validate :sidebar_groups_shape
 
   # --- Callbacks ---
