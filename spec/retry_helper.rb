@@ -12,6 +12,9 @@ if ENV['TEST_ENV_NUMBER'].present?
     # Retry failed examples
     config.default_retry_count = 5
 
+    # Wait 1 second before each retry attempt
+    config.default_sleep_interval = 1
+
     # run retry only on features
     # config.around :each, :js do |ex|
     #   ex.run_with_retry retry: 5
