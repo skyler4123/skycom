@@ -1,4 +1,13 @@
 class CompaniesController < ApplicationController
+  # Serves Stimulus: companies--new (company creation page renders its form client-side)
+  # Endpoints: GET /companies/new (new) — Shell-First shell; POST /companies (create)
+  def new
+    respond_to do |format|
+      format.html { render html: "", layout: true }
+      format.json { render json: {} }
+    end
+  end
+
   def create
     company = current_user.companies.build(company_params)
 

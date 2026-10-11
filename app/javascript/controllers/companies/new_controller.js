@@ -1,15 +1,11 @@
-// app/javascript/controllers/companies/new_modal_controller.js
-
 import { Controller } from "@hotwired/stimulus"
 
-export default class Companies_NewModalController extends Controller {
+// Depends on BE: CompaniesController#new (GET /companies/new shell) + #create (POST /companies).
+// Company creation page — renders its form client-side (Shell-First), ported
+// from the former new-company modal so the homepage can stay fully static HTML.
+export default class Companies_NewController extends Controller {
   connect() {
-    this.element.innerHTML = this.modalHTML()
-  }
-
-  closeModal(event) {
-    event.preventDefault()
-    window.closeModal()
+    this.element.innerHTML = this.pageHTML()
   }
 
   handleSubmit() {
@@ -20,7 +16,7 @@ export default class Companies_NewModalController extends Controller {
     })
   }
 
-  modalHTML() {
+  pageHTML() {
     const businessTypes = [
       { value: "retail", label: translate("Retail") },
       { value: "education", label: translate("Education") },
@@ -36,11 +32,9 @@ export default class Companies_NewModalController extends Controller {
 
     const fields = `
       <div class="space-y-6">
-        <div class="flex items-center justify-between border-b border-slate-200 dark:border-gray-800 px-6 py-4">
-          <h2 class="text-xl font-bold text-slate-900 dark:text-white">${translate("New Company")}</h2>
-          <button data-action="click->${this.identifier}#closeModal" class="rounded-full p-2 text-slate-500 hover:text-slate-700 dark:hover:text-slate-200">
-            <span class="material-symbols-outlined">close</span>
-          </button>
+        <div class="border-b border-slate-200 dark:border-gray-800 px-6 py-4">
+          <h1 class="text-xl font-bold text-slate-900 dark:text-white">${translate("New Company")}</h1>
+          <p class="mt-1 text-sm text-slate-600 dark:text-slate-400">${translate("Set up a new business under your master account.")}</p>
         </div>
 
         <div class="px-6 space-y-4">
@@ -61,27 +55,39 @@ export default class Companies_NewModalController extends Controller {
         </div>
 
         <div class="flex justify-end gap-3 px-6 py-4 border-t border-slate-200 dark:border-gray-800">
-          <button type="button" data-action="click->${this.identifier}#closeModal"
-            class="px-4 py-2 text-sm font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors">
+          <a href="/"
+            class="px-4 py-2 text-sm font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors cursor-pointer">
             ${translate("Cancel")}
-          </button>
+          </a>
           <button type="submit"
-            class="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-bold text-sm transition-all shadow-lg shadow-blue-500/30">
+            class="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-bold text-sm transition-all shadow-lg shadow-blue-500/30 cursor-pointer">
             ${translate("Create Company")}
           </button>
         </div>
       </div>
     `
 
-    return form({
-      action: Helpers.create_companies_path(),
-      attributes: `
-        class="bg-white dark:bg-slate-900 rounded-2xl w-[480px] shadow-2xl border border-slate-100 dark:border-slate-800 overflow-hidden"
-        data-${this.identifier}-target="form"
-        data-action="submit->${this.identifier}#handleSubmit"
-        data-turbo="false"
-      `,
-      html: fields
-    })
+    return `
+      <div class="min-h-screen bg-gray-50 py-12 dark:bg-gray-950">
+        <div class="mx-auto w-full max-w-[520px] px-4">
+          <a
+            class="mb-8 flex items-center justify-center gap-2 cursor-pointer"
+            href="/"
+          >
+            <img alt="Skycom Logo" class="h-8 w-auto object-contain" src="/icon.svg">
+            <span class="text-lg font-bold tracking-tight text-slate-900 dark:text-white">Skycom</span>
+          </a>
+          ${form({
+            action: Helpers.create_companies_path(),
+            attributes: `
+              class="bg-white dark:bg-slate-900 rounded-2xl shadow-2xl border border-slate-100 dark:border-slate-800 overflow-hidden"
+              data-action="submit->${this.identifier}#handleSubmit"
+              data-turbo="false"
+            `,
+            html: fields
+          })}
+        </div>
+      </div>
+    `
   }
 }

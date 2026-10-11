@@ -92,7 +92,7 @@ export default class Companies_Sidebars_ShowController extends Controller {
 
     return `
       <div class="flex flex-col gap-1 pb-2 mb-2 border-b border-gray-200 dark:border-gray-700" data-sidebar-favourites>
-        <p class="px-3 pt-1 pb-1 text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 flex items-center gap-1">
+        <p class="px-3 pt-1 pb-1 text-sm font-medium leading-normal text-gray-900 dark:text-white flex items-center gap-1">
           <span class="material-symbols-outlined text-[14px]! text-amber-500" style="font-variation-settings: 'FILL' 1">star</span>
           ${translate("Favourites")}
         </p>
@@ -117,12 +117,12 @@ export default class Companies_Sidebars_ShowController extends Controller {
         data-action="toggle->${this.identifier}#groupToggled"
       >
         <summary class="flex items-center justify-between gap-2 px-3 py-2 rounded-lg cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800 select-none list-none [&::-webkit-details-marker]:hidden">
-          <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 flex items-center gap-1"
+          <span class="text-sm font-medium leading-normal text-gray-900 dark:text-white flex items-center gap-1"
             ${groupConfig.comingSoon ? tooltip({ html: translate("Coming soon"), position: "right" }) : ""}>
             ${translate(groupConfig.label)}
             ${groupConfig.comingSoon ? `<span class="material-symbols-outlined text-[14px]! text-amber-500 dark:text-amber-400">error</span>` : ""}
           </span>
-          <span class="text-[10px] text-slate-400 dark:text-slate-500">${items.length}</span>
+          <span class="text-xs text-slate-500 dark:text-slate-400">${items.length}</span>
         </summary>
         <div class="flex flex-col gap-1 pt-1">
           ${items.map(item => this.itemHTML(item)).join("\n")}

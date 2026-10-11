@@ -22,10 +22,7 @@ RSpec.feature "OmniAuth Google Sign-In", type: :feature, js: true do
   end
 
   scenario "user signs in with Google OAuth for the first time" do
-    visit root_path
-
-    expect(page).to have_selector('button[role="sign-in-button"]', wait: 10)
-    find('button[role="sign-in-button"]', wait: 10).click
+    visit sign_in_path
 
     click_button "Sign in with Google"
 
@@ -40,10 +37,7 @@ RSpec.feature "OmniAuth Google Sign-In", type: :feature, js: true do
       system_role: :company_employee
     )
 
-    visit root_path
-
-    expect(page).to have_selector('button[role="sign-in-button"]', wait: 10)
-    find('button[role="sign-in-button"]', wait: 10).click
+    visit sign_in_path
 
     click_button "Sign in with Google"
 

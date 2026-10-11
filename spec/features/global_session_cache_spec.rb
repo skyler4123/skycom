@@ -11,9 +11,8 @@ RSpec.describe "Global Session Cache", type: :feature, js: true do
     it "caches session in sync_cache on sign-in and evicts on destroy" do
       expect(user.sessions.count).to eq(0)
 
-      visit root_path
-      expect(page).to have_selector('button[role="sign-in-button"]', wait: 10)
-      find('button[role="sign-in-button"]', wait: 10).click
+      visit sign_in_path
+      expect(page).to have_selector('form[role="sign-in-form"]', wait: 10)
 
       within 'form[role="sign-in-form"]', wait: 10 do
         find('input[name="email"]', wait: 5).set(user.email)
@@ -31,9 +30,8 @@ RSpec.describe "Global Session Cache", type: :feature, js: true do
     end
 
     it "rejects requests when session is destroyed" do
-      visit root_path
-      expect(page).to have_selector('button[role="sign-in-button"]', wait: 10)
-      find('button[role="sign-in-button"]', wait: 10).click
+      visit sign_in_path
+      expect(page).to have_selector('form[role="sign-in-form"]', wait: 10)
       within 'form[role="sign-in-form"]', wait: 10 do
         find('input[name="email"]', wait: 5).set(user.email)
         find('input[name="password"]', wait: 5).set(user.password)

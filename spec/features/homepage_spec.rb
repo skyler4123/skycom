@@ -2,11 +2,11 @@ require 'rails_helper'
 
 RSpec.feature "Homepage", type: :feature, js: true do
   describe "Guest (not signed in)" do
-    it "shows Sign In and Sign Up buttons" do
+    it "shows static Sign In and Claim Free Starter Credits links" do
       visit root_path
 
       expect(page).to have_selector('[role="sign-in-button"]', text: "Sign In")
-      expect(page).to have_selector('[role="sign-up-button"]', text: "Sign Up")
+      expect(page).to have_selector('[role="sign-up-button"]', text: "Claim Free Starter Credits")
     end
 
     it "does not show Sign Out button" do
@@ -15,12 +15,40 @@ RSpec.feature "Homepage", type: :feature, js: true do
       expect(page).not_to have_selector('[role="sign-out-button"]')
     end
 
-    it "clicking Sign In opens modal" do
+    it "clicking Sign In goes to the sign-in page" do
       visit root_path
 
-      click_button "Sign In"
+      click_link "Sign In"
 
-      expect(page).to have_content("Email")
+      expect(page).to have_current_path(sign_in_path, wait: 10)
+      expect(page).to have_selector('form[role="sign-in-form"]', wait: 10)
+    end
+
+    it "clicking Claim Free Starter Credits goes to the sign-up page" do
+      visit root_path
+
+      click_link "Claim Free Starter Credits", match: :first
+
+      expect(page).to have_current_path(sign_up_path, wait: 10)
+      expect(page).to have_selector('form[role="sign-up-form"]', wait: 10)
+    end
+
+    it "renders live demo console with chart and auto-increasing numbers" do
+      visit root_path
+
+      expect(page).to have_selector('[data-home--index-target="velocityChart"]')
+      sales = find('[data-live="sales"]').text
+      expect(sales).to match(/\$\d[\d,]*\.\d{2}/)
+      # Numbers tick live — the initial value disappears without sleep (Capybara waiting)
+      expect(page).to have_no_text(sales, wait: 8)
+    end
+
+    it "switching tenant tab updates console title" do
+      visit root_path
+
+      click_button "Grand Azalea Hotel PMS"
+
+      expect(page).to have_selector("#tenant-title", text: "Grand Azalea Hotel")
     end
   end
 
@@ -31,11 +59,18 @@ RSpec.feature "Homepage", type: :feature, js: true do
       sign_in(user)
     end
 
-    it "My Companies, and New Company buttons" do
+    it "Go to Dashboard, and New Company buttons" do
       visit root_path
 
-      expect(page).to have_link("My Companies")
-      expect(page).to have_button("New Company")
+      expect(page).to have_link("Go to Dashboard")
+      expect(page).to have_link("New Company")
+    end
+
+    it "swaps to the signed-in header from the session cookie" do
+      visit root_path
+
+      expect(page).to have_link("Go to Dashboard")
+      expect(page).not_to have_selector('#header-guest [role="sign-in-button"]')
     end
 
     it "Avatar" do
@@ -54,51 +89,36 @@ RSpec.feature "Homepage", type: :feature, js: true do
       expect(page).to have_selector('[role="sign-in-button"]', text: "Sign In")
     end
 
-    it "clicking My Companies navigates to companies page" do
+    it "clicking Go to Dashboard navigates to companies page" do
       create(:company, user: user)
 
       visit root_path
 
-      click_link "My Companies"
+      click_link "Go to Dashboard"
 
       expect(page).to have_current_path(%r{/companies/[^/]+/dashboards})
     end
 
-    it "clicking New Company opens modal with form" do
+    it "clicking New Company goes to the new company page" do
       visit root_path
 
-      click_button "New Company"
+      click_link "New Company"
 
+      expect(page).to have_current_path(new_company_path, wait: 10)
       expect(page).to have_selector('input[name="company[name]"]', wait: 10)
       expect(page).to have_selector('select[name="company[business_type]"]')
     end
 
-    it "closes New Company modal via X button" do
-      visit root_path
+    it "cancel returns to the homepage" do
+      visit new_company_path
 
-      click_button "New Company"
-      expect(page).to have_selector('input[name="company[name]"]', wait: 10)
+      click_link "Cancel"
 
-      find('[data-action*="closeModal"]', match: :first).click
-
-      expect(page).not_to have_selector('input[name="company[name]"]', wait: 5)
+      expect(page).to have_current_path(root_path, wait: 10)
     end
 
-    it "closes New Company modal via Cancel button" do
-      visit root_path
-
-      click_button "New Company"
-      expect(page).to have_selector('input[name="company[name]"]', wait: 10)
-
-      click_button "Cancel"
-
-      expect(page).not_to have_selector('input[name="company[name]"]', wait: 5)
-    end
-
-    it "can create a new company via modal form" do
-      visit root_path
-
-      click_button "New Company"
+    it "can create a new company via the new company page" do
+      visit new_company_path
 
       expect(page).to have_selector('input[name="company[name]"]', wait: 10)
       fill_in "company[name]", with: "Test New Company"
@@ -117,9 +137,7 @@ RSpec.feature "Homepage", type: :feature, js: true do
     it "shows error when company name is duplicate" do
       create(:company, user: user, name: "Test Company")
 
-      visit root_path
-
-      click_button "New Company"
+      visit new_company_path
 
       expect(page).to have_selector('input[name="company[name]"]', wait: 10)
       fill_in "company[name]", with: "Test Company"
