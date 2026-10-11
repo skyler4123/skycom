@@ -2,6 +2,20 @@ class HomeController < ApplicationController
   skip_before_action :authenticate, only: [ :index ]
 
   def index
+    # The homepage is fully static HTML (signed-out state ships for everyone;
+    # signed-in users re-render the header client-side from the client cache),
+    # so browsers may cache it. It must stay browser-private: the layout embeds
+    # a per-session CSRF token that modal forms submit, and a shared copy would
+    # serve one user's token to everyone (mass 422s). Vary: Cookie keeps the
+    # entry correct across sign-in/sign-out. Flash messages are per-user too —
+    # never cache a response carrying one.
+    if flash.any?
+      expires_now
+    else
+      expires_in 1.hour, public: false
+      response.headers["Vary"] = "Cookie"
+    end
+
     respond_to do |format|
       format.html do
         if !current_session

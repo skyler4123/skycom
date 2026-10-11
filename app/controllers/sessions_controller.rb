@@ -1,13 +1,23 @@
 # app/controllers/sessions_controller.rb
+# Serves Stimulus: sessions--new (sign-in page renders its form client-side)
+# Endpoints: GET /sign_in (new) — Shell-First shell; POST /sign_in (create)
 
 class SessionsController < ApplicationController
   include SessionsController::OmniauthConcern
 
   skip_before_action :set_current_request_details, only: [ :sign_out ]
   skip_before_action :set_current_session, only: [ :sign_out ]
-  skip_before_action :authenticate, only: %i[ create sign_out sign_in_for_test create_from_omniauth auth_failure ]
+  skip_before_action :authenticate, only: %i[ new create sign_out sign_in_for_test create_from_omniauth auth_failure ]
   skip_before_action :sync_client_cache_version, only: [ :sign_out ]
   before_action :set_session, only: :destroy
+  before_action :redirect_if_signed_in, only: :new
+
+  def new
+    respond_to do |format|
+      format.html { render html: "", layout: true }
+      format.json { render json: {} }
+    end
+  end
 
   def index
     @sessions = current_user.sessions.order(created_at: :desc)
@@ -25,7 +35,7 @@ class SessionsController < ApplicationController
 
       redirect_to root_path, notice: "Signed in successfully"
     else
-      redirect_to root_path, alert: "That email or password is incorrect"
+      redirect_to sign_in_path, alert: "That email or password is incorrect"
     end
   end
 
@@ -63,6 +73,10 @@ class SessionsController < ApplicationController
   end
 
   private
+    def redirect_if_signed_in
+      redirect_to root_path if is_signed_in?
+    end
+
     def set_session
       @session = current_user.sessions.find(params[:id])
     end

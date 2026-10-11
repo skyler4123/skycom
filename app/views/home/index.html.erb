@@ -1,3 +1,11 @@
+<% content_for :title, "Skycom - Unified Enterprise Multi-Tenant Platform" %>
+<% content_for :head do %>
+  <meta name="description" content="Skycom lets entrepreneurs run infinite multi-tenant businesses — retail, dental clinics, hotels, restaurants — under one master account with pay-as-you-go credits and zero base fees.">
+  <link rel="canonical" href="<%= root_url %>">
+  <meta property="og:title" content="Skycom - Unified Enterprise Multi-Tenant Platform">
+  <meta property="og:description" content="One account. Infinite multi-tenant businesses. Run all your ventures under one unified platform.">
+  <meta property="og:type" content="website">
+<% end %>
 <div class="bg-gray-50 dark:bg-gray-950">
   <div class="relative flex min-h-screen w-full flex-col overflow-x-hidden">
     <header class="fixed left-0 right-0 top-0 z-50 border-b border-slate-200 bg-white/85 backdrop-blur-xl dark:border-slate-800 dark:bg-gray-950/85">
@@ -6,43 +14,39 @@
           class="flex items-center gap-2 cursor-pointer"
           href="/"
         >
-          <img alt="Skycom ERP Logo" class="h-8 w-auto object-contain" src="/icon.svg">
-          <span class="text-lg font-bold tracking-tight text-slate-900 dark:text-white">Skycom <span class="text-indigo-600 dark:text-indigo-400">ERP</span></span>
+          <img alt="Skycom Logo" class="h-8 w-auto object-contain" src="/icon.svg">
+          <span class="text-lg font-bold tracking-tight text-slate-900 dark:text-white">Skycom</span>
         </a>
         <nav class="hidden items-center gap-6 lg:flex">
           <a class="text-sm font-semibold text-slate-600 transition-colors hover:text-slate-900 dark:text-slate-300 dark:hover:text-white" href="#solutions">Solutions</a>
           <a class="text-sm font-semibold text-slate-600 transition-colors hover:text-slate-900 dark:text-slate-300 dark:hover:text-white" href="#pricing">Pricing</a>
           <a class="text-sm font-semibold text-slate-600 transition-colors hover:text-slate-900 dark:text-slate-300 dark:hover:text-white" href="#platform">Docs</a>
         </nav>
-        <div class="flex items-center gap-2">
-          <% if is_signed_in? %>
-            <a class="inline-flex rounded-lg px-4 py-2 text-sm font-semibold text-slate-600 transition-all hover:bg-slate-100 hover:text-slate-900 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-white" href="/redirect/companies">Go to Dashboard</a>
-            <button
-              class="inline-flex rounded-lg px-4 py-2 text-sm font-semibold text-slate-600 transition-all hover:bg-slate-100 hover:text-slate-900 cursor-pointer dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-white"
-              data-action="click->home--index#openNewCompanyModal"
-              type="button"
-            >
-              New Company
-            </button>
-            <div class="flex items-center" data-controller="home--header--authentication"></div>
-          <% else %>
-            <button
-              class="inline-flex rounded-lg px-4 py-2 text-sm font-semibold text-slate-600 transition-all hover:bg-slate-100 hover:text-slate-900 cursor-pointer dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-white"
-              data-action="click->home--index#openSigninModal"
-              role="sign-in-button"
-              type="button"
-            >
-              Sign In
-            </button>
-            <button
-              class="inline-flex items-center justify-center rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition-all hover:bg-indigo-700 cursor-pointer"
-              data-action="click->home--index#openSignupModal"
-              role="sign-up-button"
-              type="button"
-            >
-              Claim Free Starter Credits
-            </button>
-          <% end %>
+        <div class="flex items-center gap-2" id="header-guest">
+          <a
+            class="inline-flex rounded-lg px-4 py-2 text-sm font-semibold text-slate-600 transition-all hover:bg-slate-100 hover:text-slate-900 cursor-pointer dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-white"
+            href="/sign_in"
+            role="sign-in-button"
+          >
+            Sign In
+          </a>
+          <a
+            class="inline-flex items-center justify-center rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition-all hover:bg-indigo-700 cursor-pointer"
+            href="/sign_up"
+            role="sign-up-button"
+          >
+            Claim Free Starter Credits
+          </a>
+        </div>
+        <div class="hidden items-center gap-2" id="header-signedin">
+          <a class="inline-flex rounded-lg px-4 py-2 text-sm font-semibold text-slate-600 transition-all hover:bg-slate-100 hover:text-slate-900 cursor-pointer dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-white" href="/redirect/companies">Go to Dashboard</a>
+          <a
+            class="inline-flex rounded-lg px-4 py-2 text-sm font-semibold text-slate-600 transition-all hover:bg-slate-100 hover:text-slate-900 cursor-pointer dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-white"
+            href="/companies/new"
+          >
+            New Company
+          </a>
+          <div class="flex items-center" data-controller="home--header--authentication"></div>
         </div>
       </div>
     </header>
@@ -58,25 +62,23 @@
             </span>
             <span class="text-xs font-bold text-emerald-700 dark:text-emerald-300">One Master Account • Infinite Multi-Tenant Businesses</span>
             <span class="text-slate-300 dark:text-slate-600">•</span>
-            <button
+            <a
               class="flex items-center gap-1 text-xs font-semibold text-indigo-600 cursor-pointer dark:text-indigo-400"
-              data-action="click->home--index#openSignupModal"
-              type="button"
+              href="/sign_up"
             >
               <span class="material-symbols-outlined text-base">bolt</span> $0 Base Fee
-            </button>
+            </a>
           </div>
           <h1 class="max-w-5xl text-4xl font-black leading-tight tracking-tight text-slate-900 md:text-5xl dark:text-white">One Account. Infinite Multi-Tenant Businesses. <span class="mt-1 block text-indigo-600 dark:text-indigo-400">Run All Your Ventures Under One Unified Platform.</span></h1>
           <p class="mb-8 mt-4 max-w-3xl text-lg leading-relaxed text-slate-600 dark:text-slate-400">Entrepreneurs, holding groups, and franchise operators can now spin up and manage entirely distinct businesses in seconds — a fashion boutique today, a hotel tomorrow, a bistro or dental clinic next. All managed under <strong>one single account</strong> with instant business switching, zero per-business base fees, and an action-based credit pool that shares or caps spend across your entire portfolio.</p>
           <div class="flex w-full max-w-md flex-wrap items-center justify-center gap-3">
-            <button
+            <a
               class="inline-flex h-12 flex-1 items-center justify-center gap-2 rounded-lg bg-indigo-600 px-6 text-base font-bold text-white shadow-md transition-all hover:bg-indigo-700 cursor-pointer sm:flex-none"
-              data-action="click->home--index#openSignupModal"
-              type="button"
+              href="/sign_up"
             >
               <span>Claim Free Starter Credits</span>
               <span class="material-symbols-outlined text-lg">arrow_forward</span>
-            </button>
+            </a>
             <a class="inline-flex h-12 flex-1 items-center justify-center gap-2 rounded-lg bg-white px-6 text-base font-bold text-slate-900 shadow-sm transition-all hover:bg-slate-100 sm:flex-none dark:bg-slate-900 dark:text-white dark:hover:bg-slate-800" href="#interactive-preview">
               <span class="material-symbols-outlined text-lg text-indigo-600 dark:text-indigo-400">play_circle</span>
               <span>Explore Interactive Demo</span>
@@ -166,14 +168,13 @@
                     <span class="rounded bg-slate-200 px-1.5 py-0.5 text-xs text-slate-600 dark:bg-slate-700 dark:text-slate-300">Isolated</span>
                   </button>
                 </div>
-                <button
+                <a
                   class="flex items-center gap-1.5 rounded-lg border border-emerald-300 bg-white px-3 py-1.5 text-sm font-semibold text-emerald-700 shadow-sm transition-colors hover:bg-emerald-600 hover:text-white cursor-pointer dark:border-emerald-800 dark:bg-slate-900 dark:text-emerald-300 dark:hover:bg-emerald-600 dark:hover:text-white"
-                  data-action="click->home--index#openSignupModal"
-                  type="button"
+                  href="/sign_up"
                 >
                   <span class="material-symbols-outlined text-base">add_business</span>
                   <span>+ Spin Up New Tenant</span>
-                </button>
+                </a>
               </div>
             </div>
             <div class="grid grid-cols-1 gap-4 p-4 text-left md:grid-cols-3 md:p-6">
@@ -219,13 +220,12 @@
                 </div>
                 <div class="mt-2.5 flex items-center justify-between border-t border-slate-200 pt-2 text-xs text-slate-500 dark:border-slate-700 dark:text-slate-400">
                   <span class="flex items-center gap-1 font-semibold text-indigo-600 dark:text-indigo-400"><span class="material-symbols-outlined text-base">hub</span> From 10,000 pooled pool</span>
-                  <button
+                  <a
                     class="font-bold text-emerald-600 cursor-pointer dark:text-emerald-400"
-                    data-action="click->home--index#openSignupModal"
-                    type="button"
+                    href="/sign_up"
                   >
                     $0 base fee
-                  </button>
+                  </a>
                 </div>
               </div>
             </div>
@@ -502,13 +502,12 @@
               <span class="inline-flex items-center gap-1.5 rounded-lg bg-white px-3 py-1.5 text-sm font-semibold text-slate-900 shadow-sm dark:bg-slate-900 dark:text-white"><span class="material-symbols-outlined text-base text-amber-600 dark:text-amber-400">school</span> Education &amp; Academies</span>
               <span class="inline-flex items-center gap-1.5 rounded-lg bg-white px-3 py-1.5 text-sm font-semibold text-slate-900 shadow-sm dark:bg-slate-900 dark:text-white"><span class="material-symbols-outlined text-base text-indigo-600 dark:text-indigo-400">local_shipping</span> Logistics &amp; Field Services</span>
               <span class="inline-flex items-center gap-1.5 rounded-lg bg-white px-3 py-1.5 text-sm font-semibold text-slate-900 shadow-sm dark:bg-slate-900 dark:text-white"><span class="material-symbols-outlined text-base text-emerald-600 dark:text-emerald-400">gavel</span> Professional &amp; Legal Services</span>
-              <button
+              <a
                 class="inline-flex items-center gap-1.5 rounded-lg bg-indigo-600 px-3 py-1.5 text-sm font-semibold text-white shadow-sm cursor-pointer"
-                data-action="click->home--index#openSignupModal"
-                type="button"
+                href="/sign_up"
               >
                 <span class="material-symbols-outlined text-base">add_circle</span> + Build Custom Domain UI in Minutes
-              </button>
+              </a>
             </div>
             <div class="mt-4 flex flex-col items-center justify-between gap-4 rounded-xl border-l-2 border-emerald-500 bg-white p-4 shadow-sm sm:flex-row dark:bg-slate-900">
               <div class="flex items-center gap-3">
@@ -535,13 +534,12 @@
               <p class="mt-1 max-w-2xl text-base text-slate-600 dark:text-slate-400">Designed for serial entrepreneurs, family holding offices, hotel-and-restaurant operators, and franchise owners. Stop wrestling with fragmented accounts, passwords, and duplicate monthly base retainers.</p>
             </div>
             <div class="flex items-center gap-2">
-              <button
+              <a
                 class="flex items-center gap-1.5 rounded-xl bg-indigo-600 px-3.5 py-2 text-sm font-semibold text-white shadow-sm cursor-pointer"
-                data-action="click->home--index#openSignupModal"
-                type="button"
+                href="/sign_up"
               >
                 <span class="material-symbols-outlined text-lg">verified</span> $0 Base Fee Per Tenant
-              </button>
+              </a>
             </div>
           </div>
           <div class="grid grid-cols-1 gap-6 md:grid-cols-3">
@@ -746,14 +744,13 @@
                 </div>
               </div>
               <div class="mt-8 flex flex-wrap items-center gap-4">
-                <button
+                <a
                   class="inline-flex items-center gap-2 rounded-lg bg-indigo-600 px-6 py-3 text-base font-bold text-white shadow-md transition-all hover:bg-indigo-700 cursor-pointer"
-                  data-action="click->home--index#openSignupModal"
-                  type="button"
+                  href="/sign_up"
                 >
                   <span>Get Started with Free Credits</span>
                   <span class="material-symbols-outlined text-lg">launch</span>
-                </button>
+                </a>
                 <a class="text-sm text-slate-600 underline transition-colors hover:text-slate-900 dark:text-slate-400 dark:hover:text-white" href="#">View Detailed Credit Consumption Calculator</a>
               </div>
             </div>
@@ -768,13 +765,12 @@
               <div class="space-y-3 text-sm text-slate-600 dark:text-slate-400">
                 <div class="flex items-center justify-between rounded-lg bg-white px-3 py-1.5 dark:bg-slate-900">
                   <span>Multi-Tenant Account Base</span>
-                  <button
+                  <a
                     class="font-bold text-emerald-600 cursor-pointer dark:text-emerald-400"
-                    data-action="click->home--index#openSignupModal"
-                    type="button"
+                    href="/sign_up"
                   >
                     Unlimited Businesses ($0 Base)
-                  </button>
+                  </a>
                 </div>
                 <div class="flex items-center justify-between rounded-lg bg-white px-3 py-1.5 dark:bg-slate-900">
                   <span>Pay-As-You-Go Extra Rate</span>
@@ -931,12 +927,14 @@
             <h2 class="mx-auto max-w-2xl text-3xl font-extrabold leading-tight md:text-4xl">When You're Small, We're Free. When You Grow, We Grow Together.</h2>
             <p class="mx-auto mb-8 mt-3 max-w-xl text-lg text-indigo-200">No credit cards, zero seat fees. Get your monthly free refill credits and only pay tiny micropayments as your transaction volume soars.</p>
             <form
+              action="/sign_up"
               class="mx-auto flex max-w-xl flex-col gap-2.5 sm:flex-row"
-              data-action="submit->home--index#openSignupFromCta"
+              data-turbo="false"
+              method="get"
             >
               <input
                 class="h-12 flex-1 rounded-xl bg-white px-4 text-base text-slate-900 shadow-sm outline-none placeholder:text-slate-400"
-                name="cta-email"
+                name="email"
                 placeholder="Enter your business email"
                 required=""
                 type="email"
@@ -959,8 +957,8 @@
         <div class="grid grid-cols-1 gap-10 pb-10 md:grid-cols-2 lg:grid-cols-5">
           <div class="lg:col-span-1">
             <div class="mb-4 flex items-center gap-2">
-              <img alt="Skycom ERP Logo" class="h-7 w-auto object-contain" src="/icon.svg">
-              <span class="text-base font-bold text-slate-900 dark:text-white">Skycom ERP</span>
+              <img alt="Skycom Logo" class="h-7 w-auto object-contain" src="/icon.svg">
+              <span class="text-base font-bold text-slate-900 dark:text-white">Skycom</span>
             </div>
             <p class="mb-4 text-sm text-slate-600 dark:text-slate-400">Unified multi-tenant enterprise orchestration for retail, clinical healthcare, hospitality, and dining chains.</p>
             <div class="inline-flex items-center gap-2 rounded-full bg-white px-3 py-1 dark:bg-slate-900">
@@ -1010,7 +1008,7 @@
           </div>
         </div>
         <div class="flex flex-col items-center justify-between gap-4 pt-6 md:flex-row">
-          <p class="text-sm text-slate-600 dark:text-slate-400">© 2025 Skycom ERP Technologies Inc. All rights reserved.</p>
+          <p class="text-sm text-slate-600 dark:text-slate-400">© 2025 Skycom Technologies Inc. All rights reserved.</p>
           <div class="flex items-center gap-4">
             <a class="text-sm text-slate-600 transition-colors hover:text-slate-900 dark:text-slate-400 dark:hover:text-white" href="#">Privacy Policy</a>
             <a class="text-sm text-slate-600 transition-colors hover:text-slate-900 dark:text-slate-400 dark:hover:text-white" href="#">Security Center</a>

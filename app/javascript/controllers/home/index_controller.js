@@ -1,8 +1,5 @@
 import { Controller } from "@hotwired/stimulus"
 import ApexCharts from "apexcharts"
-import Companies_NewModalController from "controllers/companies/new_modal_controller"
-import Home_SigninModalController from "controllers/home/signin_modal_controller"
-import Home_SignupModalController from "controllers/home/signup_modal_controller"
 
 const TICK_MS = 2000
 const POOL_CAP = 10000
@@ -17,6 +14,7 @@ export default class Home_IndexController extends Controller {
   /** @type {number[]} */ hourly = [920, 1680, 2840, 3920, 2650, 3420, 1890]
 
   connect() {
+    this.renderSignedInHeader()
     if (this.hasVelocityChartTarget) this.renderChart()
     this.paintNumbers()
     this.startTicker()
@@ -30,31 +28,20 @@ export default class Home_IndexController extends Controller {
     }
   }
 
-  openNewCompanyModal() {
-    openModal({
-      html: `<div data-controller="${identifier(Companies_NewModalController)}"></div>`
-    })
-  }
-
-  openSigninModal(event) {
-    event?.preventDefault?.()
-    openModal({
-      html: `<div data-controller="${identifier(Home_SigninModalController)}"></div>`,
-      backdrop: false
-    })
-  }
-
-  openSignupModal(event) {
-    event?.preventDefault?.()
-    openModal({
-      html: `<div data-controller="${identifier(Home_SignupModalController)}"></div>`,
-      backdrop: false
-    })
-  }
-
-  openSignupFromCta(event) {
-    event.preventDefault()
-    this.openSignupModal(event)
+  // Static HTML ships the signed-out header for SEO/cacheability. When the
+  // browser holds a session (is_signed_in cookie), swap to the signed-in
+  // header without a server round-trip. Cookie-only and synchronous, so the
+  // swap is deterministic; the avatar paints a placeholder until the client
+  // cache arrives, matching every other page.
+  renderSignedInHeader() {
+    if (!Helpers.isSignedIn()) return
+    const guest = this.element.querySelector("#header-guest")
+    const signedin = this.element.querySelector("#header-signedin")
+    if (guest) guest.classList.add("hidden")
+    if (signedin) {
+      signedin.classList.remove("hidden")
+      signedin.classList.add("flex")
+    }
   }
 
   switchTenant(event) {
