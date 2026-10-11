@@ -46,7 +46,6 @@ class Seed::PaymentMethodService
   end
 
   def self.create(company: nil)
-    puts "Seeding PaymentMethod records..."
 
     COUNTRY_CODES.keys.each do |country_code|
       ALL_PAYMENT_METHODS.each do |attrs|
@@ -65,6 +64,5 @@ class Seed::PaymentMethodService
       end
     end
 
-    puts "Successfully created #{PaymentMethod.count} PaymentMethod records."
   end
 end

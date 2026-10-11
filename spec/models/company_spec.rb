@@ -32,6 +32,16 @@ RSpec.describe Company, type: :model do
   describe "validations" do
     it { should validate_presence_of(:name) }
     it { should validate_presence_of(:business_type) }
+
+    it "requires country" do
+      company = Seed::CompanyService.new(
+        user: create(:user, :company_owner),
+        country: nil,
+        business_type: :retail
+      )
+      expect(company).not_to be_valid
+      expect(company.errors[:country]).to be_present
+    end
     it { should validate_length_of(:name).is_at_most(255) }
     it { should validate_length_of(:description).is_at_most(5000) }
 
@@ -58,6 +68,34 @@ RSpec.describe Company, type: :model do
 
     context "employee_count" do
       it { should validate_numericality_of(:employee_count).is_greater_than_or_equal_to(0) }
+    end
+  end
+
+  describe "country" do
+    it "has no default so country must be chosen explicitly" do
+      expect(Company.new.country).to be_nil
+    end
+
+    it "maps us country to usd currency on create" do
+      company = Seed::CompanyService.new(
+        user: create(:user, :company_owner),
+        country: :us,
+        currency: :usd,
+        business_type: :retail
+      ).tap(&:save!)
+      expect(company.country).to eq("us")
+      expect(company.currency).to eq("usd")
+    end
+
+    it "maps vn country to vnd currency on create even when usd is given" do
+      company = Seed::CompanyService.new(
+        user: create(:user, :company_owner),
+        country: :vn,
+        currency: :usd,
+        business_type: :retail
+      ).tap(&:save!)
+      expect(company.country).to eq("vn")
+      expect(company.currency).to eq("vnd")
     end
   end
 
