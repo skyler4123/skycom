@@ -30,6 +30,13 @@ export default class Companies_NewController extends Controller {
       `<option value="${type.value}">${type.label}</option>`
     ).join('')
 
+    const countryOptions = [
+      { value: "us", label: translate("United States") },
+      { value: "vn", label: translate("Vietnam") },
+    ].map(type =>
+      `<option value="${type.value}">${type.label}</option>`
+    ).join('')
+
     const fields = `
       <div class="space-y-6">
         <div class="border-b border-slate-200 dark:border-gray-800 px-6 py-4">
@@ -50,6 +57,15 @@ export default class Companies_NewController extends Controller {
               class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-sm text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none">
               <option value="">${translate("Select a business type")}</option>
               ${businessTypeOptions}
+            </select>
+          </div>
+
+          <div class="space-y-1">
+            <label class="text-[10px] font-bold text-slate-400 dark:text-slate-300 uppercase tracking-wider">${translate("Country")}</label>
+            <select name="company[country]" required
+              class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-sm text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none">
+              <option value="">${translate("Select a country")}</option>
+              ${countryOptions}
             </select>
           </div>
         </div>

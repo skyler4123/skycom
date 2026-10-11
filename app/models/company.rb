@@ -7,6 +7,9 @@ class Company < ApplicationRecord
   include Company::PermissionConcern
   OWNER_POLICY_RESOURCE = "all".freeze
   OWNER_POLICY_ACTION = "all".freeze
+  # Single-file map: country (enum key) → currency (enum key). Used only here
+  # to keep currency in step with the user-chosen country on create/update.
+  COUNTRY_CURRENCY_MAP = { "us" => :usd, "vn" => :vnd }.freeze
   # Default resource names for new companies. Used by #resource_names
   # (which reads from metadata with this as a fallback).
   DEFAULT_RESOURCE_NAMES = %w[
@@ -36,7 +39,7 @@ class Company < ApplicationRecord
   attribute :permission_resource_name, :string, default: -> { self.name }
 
   # --- Enums ---
-  enum :country, COUNTRY_CODES, prefix: true, default: :us
+  enum :country, COUNTRY_CODES, prefix: true
   enum :business_type, {
     retail: 0,
     restaurant: 1000,
@@ -155,6 +158,7 @@ class Company < ApplicationRecord
   validates :description, length: { maximum: 5000 }, allow_blank: true
 
   validates :business_type, presence: true
+  validates :country, presence: true
   # validates :ownership_type, presence: true
   # validates :status, presence: true
 
@@ -172,6 +176,8 @@ class Company < ApplicationRecord
 
   # Validation for operational fields
   # validates :fiscal_year_end_month, presence: true, numericality: { in: 1..12 }
+
+  before_validation :assign_currency_from_country
 
   after_create :initialize_company
 
@@ -301,6 +307,11 @@ class Company < ApplicationRecord
   end
 
   private
+
+  def assign_currency_from_country
+    mapped = COUNTRY_CURRENCY_MAP[country]
+    self.currency = mapped if mapped.present?
+  end
 
   def apply_merchant_identity(appointment, payment_method)
     case payment_method.payment_mode

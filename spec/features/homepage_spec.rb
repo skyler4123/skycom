@@ -107,6 +107,7 @@ RSpec.feature "Homepage", type: :feature, js: true do
       expect(page).to have_current_path(new_company_path, wait: 10)
       expect(page).to have_selector('input[name="company[name]"]', wait: 10)
       expect(page).to have_selector('select[name="company[business_type]"]')
+      expect(page).to have_selector('select[name="company[country]"]')
     end
 
     it "cancel returns to the homepage" do
@@ -123,6 +124,7 @@ RSpec.feature "Homepage", type: :feature, js: true do
       expect(page).to have_selector('input[name="company[name]"]', wait: 10)
       fill_in "company[name]", with: "Test New Company"
       select "Retail", from: "company[business_type]"
+      select "United States", from: "company[country]"
 
       click_button "Create Company"
 
@@ -142,6 +144,7 @@ RSpec.feature "Homepage", type: :feature, js: true do
       expect(page).to have_selector('input[name="company[name]"]', wait: 10)
       fill_in "company[name]", with: "Test Company"
       select "Retail", from: "company[business_type]"
+      select "United States", from: "company[country]"
 
       click_button "Create Company"
 

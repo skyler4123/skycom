@@ -52,8 +52,8 @@ class System < ApplicationRecord
       business_type: :system,
       lifecycle_status: :active,
       workflow_status: :confirmed,
-      country: SYSTEM_COMPANY_COUNTRIES[country],
-      currency: SYSTEM_COMPANY_CURRENCIES[currency]
+      country: SYSTEM_COMPANY_COUNTRIES[country] || :us,
+      currency: SYSTEM_COMPANY_CURRENCIES[currency] || :usd
     ).tap { |c| c.system_owned = true }
     company.save!
     # Assign AFTER the save — assigning an unsaved belongs_to target would
