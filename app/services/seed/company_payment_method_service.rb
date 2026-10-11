@@ -14,7 +14,6 @@ class Seed::CompanyPaymentMethodService
   ALL_RECORDS = (RECORDS + (Rails.env.production? ? [] : MOCK_RECORDS)).freeze
 
   def self.create
-    puts "Seeding CompanyPaymentMethod records..."
 
     ALL_RECORDS.each do |attrs|
       CompanyPaymentMethod.find_or_create_by!(code: attrs[:code]) do |bpm|
@@ -27,6 +26,5 @@ class Seed::CompanyPaymentMethodService
       end
     end
 
-    puts "Successfully created #{CompanyPaymentMethod.count} CompanyPaymentMethod records."
   end
 end
