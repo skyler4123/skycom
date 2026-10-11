@@ -88,4 +88,26 @@ RSpec.describe "Companies::WarehousesController CRUD", type: :request do
     expect(body["property_string_1"]).to eq("Region North")
     expect(body["category"]["id"]).to eq(category.id)
   end
+
+  it "embeds stocks belonging to this warehouse in the show JSON" do
+    product_a = create(:product, company: company)
+    product_b = create(:product, company: company)
+    stock_a = Stock.create!(company: company, warehouse: warehouse, product: product_a, quantity: 10, pending: 2, name: "WH Stock A", code: "STK-WH-A-#{SecureRandom.hex(2).upcase}")
+    stock_b = Stock.create!(company: company, warehouse: warehouse, product: product_b, quantity: 5, pending: 0, name: "WH Stock B", code: "STK-WH-B-#{SecureRandom.hex(2).upcase}")
+    other_warehouse = create(:warehouse, company: company)
+    other_stock = Stock.create!(company: company, warehouse: other_warehouse, product: product_a, quantity: 7, pending: 0, name: "Other WH Stock", code: "STK-WH-O-#{SecureRandom.hex(2).upcase}")
+
+    get "/companies/#{company.id}/warehouses/#{warehouse.id}.json"
+
+    expect(response).to have_http_status(:ok)
+    body = JSON.parse(response.body)
+    stock_ids = body["stocks"].map { |s| s["id"] }
+    expect(stock_ids).to contain_exactly(stock_a.id, stock_b.id)
+    expect(stock_ids).not_to include(other_stock.id)
+    row_a = body["stocks"].find { |s| s["id"] == stock_a.id }
+    expect(row_a["quantity"]).to eq(10)
+    expect(row_a["pending"]).to eq(2)
+    expect(row_a["available"]).to eq(8)
+    expect(row_a["product"]["id"]).to eq(product_a.id)
+  end
 end

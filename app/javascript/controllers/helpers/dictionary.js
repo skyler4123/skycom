@@ -11,6 +11,10 @@ export const dictionary = () => {
     "Orders": { vi: "Đơn hàng" },
     "Employees": { vi: "Nhân viên" },
     "Stocks": { vi: "Tồn kho" },
+    "Stocks in this warehouse": { vi: "Tồn kho trong kho này" },
+    "Stocks of this product": { vi: "Tồn kho của sản phẩm này" },
+    "No stock yet.": { vi: "Chưa có tồn kho." },
+    "View all stocks": { vi: "Xem tất cả tồn kho" },
     "Stock Transfers": { vi: "Chuyển kho" },
     "Stock Imports": { vi: "Nhập kho" },
     "Stock Exports": { vi: "Xuất kho" },
@@ -648,6 +652,9 @@ export const dictionary = () => {
     "Attendance request rejected": { vi: "Đã từ chối yêu cầu chấm công" },
     "Failed to approve request": { vi: "Không thể duyệt yêu cầu" },
     "Failed to reject request": { vi: "Không thể từ chối yêu cầu" },
+    "Daily Breakdown": { vi: "Chi tiết từng ngày" },
+    "No daily records for this month yet.": { vi: "Chưa có bản ghi ngày nào trong tháng này." },
+    "Worked": { vi: "Đã làm việc" },
 
     // === Payment Methods ===
     "Payment Methods": { vi: "Phương thức thanh toán" },

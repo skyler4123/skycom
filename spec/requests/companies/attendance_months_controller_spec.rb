@@ -69,4 +69,22 @@ RSpec.describe "Companies::AttendanceMonthsController", type: :request do
     get company_attendance_months_path(company, format: :json), params: { employee_name: "alice" }
     expect(month_ids(response.body)).not_to include(foreign.id)
   end
+
+  describe "GET show" do
+    it "includes same-employee in-month days ordered asc, excluding others" do
+      day1 = AttendanceDay.create!(company: company, employee: alice, attendance_date: Date.parse("2026-08-10"), attendance_status: :present, total_seconds_worked: 28_800)
+      day2 = AttendanceDay.create!(company: company, employee: alice, attendance_date: Date.parse("2026-08-05"), attendance_status: :late, total_seconds_worked: 27_000)
+      other_month_day = AttendanceDay.create!(company: company, employee: alice, attendance_date: Date.parse("2026-09-05"), attendance_status: :present, total_seconds_worked: 28_800)
+      other_employee_day = AttendanceDay.create!(company: company, employee: bob, attendance_date: Date.parse("2026-08-06"), attendance_status: :present, total_seconds_worked: 28_800)
+
+      get company_attendance_month_path(company, alice_month, format: :json)
+
+      expect(response).to have_http_status(:ok)
+      body = JSON.parse(response.body)
+      expect(body["attendance_month"]["id"]).to eq(alice_month.id)
+      day_ids = body["attendance_days"].map { |d| d["id"] }
+      expect(day_ids).to eq([ day2.id, day1.id ])
+      expect(day_ids).not_to include(other_month_day.id, other_employee_day.id)
+    end
+  end
 end

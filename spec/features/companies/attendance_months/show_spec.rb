@@ -46,4 +46,16 @@ RSpec.feature "Companies::AttendanceMonths Show", type: :feature, js: true do
     back_link = find("a[href*='/attendance_months']", match: :first)
     expect(back_link).to be_present
   end
+
+  scenario "displays daily breakdown for the month" do
+    month_start = attendance_month.month.to_date.beginning_of_month
+    day_one = AttendanceDay.create!(company: company, employee: employee, attendance_date: month_start + 4.days, attendance_status: :present, total_seconds_worked: 28_800)
+    day_two = AttendanceDay.create!(company: company, employee: employee, attendance_date: month_start + 9.days, attendance_status: :late, total_seconds_worked: 27_000)
+
+    visit company_attendance_month_path(company, attendance_month)
+    expect(page).to have_content("Daily Breakdown", wait: 10)
+    expect(page).to have_selector("tbody tr", minimum: 2, wait: 10)
+    expect(page).to have_content(day_one.attendance_date.day.to_s, wait: 10)
+    expect(page).to have_link(href: company_attendance_day_path(company, day_two))
+  end
 end

@@ -96,3 +96,35 @@ RSpec.describe "Companies::ProductsController search/filter", type: :request do
     end
   end
 end
+
+RSpec.describe "Companies::ProductsController show", type: :request do
+  let(:company) { create(:company) }
+  let(:product) { create(:product, company: company) }
+
+  before do
+    get sign_in_for_test_path(email: company.user.email)
+  end
+
+  it "embeds stocks of this product in the show JSON" do
+    warehouse_a = create(:warehouse, company: company)
+    warehouse_b = create(:warehouse, company: company)
+    stock_a = Stock.create!(company: company, warehouse: warehouse_a, product: product, quantity: 12, pending: 3, name: "PRD Stock A", code: "STK-PRD-A-#{SecureRandom.hex(2).upcase}")
+    stock_b = Stock.create!(company: company, warehouse: warehouse_b, product: product, quantity: 4, pending: 0, name: "PRD Stock B", code: "STK-PRD-B-#{SecureRandom.hex(2).upcase}")
+    other_product = create(:product, company: company)
+    other_stock = Stock.create!(company: company, warehouse: warehouse_a, product: other_product, quantity: 9, pending: 0, name: "Other PRD Stock", code: "STK-PRD-O-#{SecureRandom.hex(2).upcase}")
+
+    get "/companies/#{company.id}/products/#{product.id}.json"
+
+    expect(response).to have_http_status(:ok)
+    body = JSON.parse(response.body)
+    expect(body["product"]["id"]).to eq(product.id)
+    stock_ids = body["stocks"].map { |s| s["id"] }
+    expect(stock_ids).to contain_exactly(stock_a.id, stock_b.id)
+    expect(stock_ids).not_to include(other_stock.id)
+    row_a = body["stocks"].find { |s| s["id"] == stock_a.id }
+    expect(row_a["quantity"]).to eq(12)
+    expect(row_a["pending"]).to eq(3)
+    expect(row_a["available"]).to eq(9)
+    expect(row_a["warehouse"]["id"]).to eq(warehouse_a.id)
+  end
+end

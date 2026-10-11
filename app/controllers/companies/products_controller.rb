@@ -6,7 +6,7 @@
 #        (whitelist + query building live in Products::SearchQueryService).
 # Serves Stimulus: Companies_Products_IndexController (index JSON incl. q/filters passthrough),
 #                  Companies_Products_NewController|ShowController|EditController (record JSON + form mutations)
-# Endpoints: GET /companies/:company_id/products(.json) + nested CRUD — see config/routes.rb
+# Endpoints: GET /companies/:company_id/products(.json), GET /companies/:company_id/products/:id(.json with stocks) + nested CRUD — see config/routes.rb
 # Docs: docs/DYNAMIC_TABLE.md, docs/MEILISEARCH.md
 
 class Companies::ProductsController < Companies::ApplicationController
@@ -36,7 +36,7 @@ class Companies::ProductsController < Companies::ApplicationController
 
     respond_to do |format|
       format.html { render html: "", layout: true }
-      format.json { render json: { product: format_product(product) } }
+      format.json { render json: { product: format_product(product), stocks: product_stocks(product).map { |s| format_stock(s) } } }
     end
   end
 
@@ -131,5 +131,19 @@ class Companies::ProductsController < Companies::ApplicationController
 
   def format_products(products)
     products.map { |product| format_product(product) }
+  end
+
+  def product_stocks(product)
+    current_company.stocks.includes(:product, :warehouse)
+      .where(product_id: product.id)
+      .joins(:warehouse).order("warehouses.name ASC")
+  end
+
+  def format_stock(stock)
+    stock.as_json(only: %i[id quantity pending]).merge(
+      available: [ stock.quantity.to_i - stock.pending.to_i, 0 ].max,
+      product: stock.product&.as_json(only: %i[id name]),
+      warehouse: stock.warehouse&.as_json(only: %i[id name])
+    )
   end
 end

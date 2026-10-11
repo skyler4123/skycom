@@ -2,7 +2,7 @@
 #
 # Attendance month dashboard API (Shell-First).
 # Serves Stimulus: Companies_AttendanceMonths_IndexController, Companies_AttendanceMonths_ShowController
-# Endpoints: GET /companies/:company_id/attendance_months(.json?employee_name&from&to&min_absent_days&min_deficit_minutes)
+# Endpoints: GET /companies/:company_id/attendance_months(.json?employee_name&from&to&min_absent_days&min_deficit_minutes), GET /companies/:company_id/attendance_months/:id(.json with attendance_days)
 # Docs: docs/HR.md
 class Companies::AttendanceMonthsController < Companies::ApplicationController
   def index
@@ -30,7 +30,7 @@ class Companies::AttendanceMonthsController < Companies::ApplicationController
     m = current_company.attendance_months.find(params[:id])
     respond_to do |format|
       format.html { render html: "", layout: true }
-      format.json { render json: { attendance_month: format_month(m) } }
+      format.json { render json: { attendance_month: format_month(m), attendance_days: month_days(m).map { |d| format_day(d) } } }
     end
   end
 
@@ -53,6 +53,21 @@ class Companies::AttendanceMonthsController < Companies::ApplicationController
   def format_month(m)
     m.as_json(only: %i[id month total_work_minutes total_late_minutes total_early_leave_minutes total_overtime_minutes total_absent_days total_present_days total_deficit_minutes created_at]).merge(
       employee: m.employee.as_json(only: %i[id name])
+    )
+  end
+
+  def month_days(m)
+    return AttendanceDay.none if m.month.blank?
+
+    month_date = m.month.to_date
+    current_company.attendance_days.includes(:employee)
+      .where(employee_id: m.employee_id, attendance_date: month_date.beginning_of_month..month_date.end_of_month)
+      .order(attendance_date: :asc)
+  end
+
+  def format_day(d)
+    d.as_json(only: %i[id attendance_date check_in check_out total_seconds_worked attendance_status]).merge(
+      employee: d.employee.as_json(only: %i[id name])
     )
   end
 end
