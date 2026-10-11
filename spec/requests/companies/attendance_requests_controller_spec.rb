@@ -90,4 +90,57 @@ RSpec.describe "Companies::AttendanceRequestsController", type: :request do
 
     expect(response).to have_http_status(:forbidden)
   end
+
+  describe "GET #index filters" do
+    let!(:alice_employee) { create(:employee, company: company).tap { |e| e.update!(name: "Alice Wonderland") } }
+    let!(:bob_employee) { create(:employee, company: company).tap { |e| e.update!(name: "Bob Builder") } }
+    let!(:alice_request) do
+      AttendanceRequest.create!(
+        company: company, employee: alice_employee,
+        attendance_date: Date.parse("2026-09-10"),
+        check_in: Time.zone.parse("2026-09-10 09:00"),
+        check_out: Time.zone.parse("2026-09-10 17:00"),
+        reason: "Alice field work", business_type: :field_work
+      )
+    end
+    let!(:bob_request) do
+      AttendanceRequest.create!(
+        company: company, employee: bob_employee,
+        attendance_date: Date.parse("2026-09-12"),
+        check_in: Time.zone.parse("2026-09-12 09:00"),
+        reason: "Bob remote work", business_type: :remote_work
+      )
+    end
+
+    def request_ids(body)
+      JSON.parse(body)["attendance_requests"].map { |r| r["id"] }
+    end
+
+    it "filters by employee_name (partial, case-insensitive)" do
+      get company_attendance_requests_path(company, format: :json), params: { employee_name: "alice" }
+      ids = request_ids(response.body)
+      expect(ids).to include(alice_request.id)
+      expect(ids).not_to include(bob_request.id)
+    end
+
+    it "filters by business_type" do
+      get company_attendance_requests_path(company, format: :json), params: { business_type: "remote_work" }
+      ids = request_ids(response.body)
+      expect(ids).to include(bob_request.id)
+      expect(ids).not_to include(alice_request.id)
+    end
+
+    it "filters by from/to range on attendance_date" do
+      get company_attendance_requests_path(company, format: :json), params: { from: "2026-09-11", to: "2026-09-13" }
+      ids = request_ids(response.body)
+      expect(ids).to include(bob_request.id)
+      expect(ids).not_to include(alice_request.id)
+    end
+
+    it "ignores bogus business_type instead of 500ing" do
+      get company_attendance_requests_path(company, format: :json), params: { business_type: "hijack" }
+      expect(response).to have_http_status(:ok)
+      expect(request_ids(response.body)).to include(alice_request.id, bob_request.id)
+    end
+  end
 end

@@ -78,4 +78,37 @@ RSpec.feature "Companies::AttendanceRequests Management", type: :feature, js: tr
     expect(page).to have_content("Approved", wait: 10)
     expect(AttendanceDay.find_by(company: company, employee: employee, attendance_date: Date.yesterday)).to be_present
   end
+
+  scenario "filters by employee name, business type and date range" do
+    alice = create(:employee, company: company).tap { |e| e.update!(name: "Alice Wonderland") }
+    bob = create(:employee, company: company).tap { |e| e.update!(name: "Bob Builder") }
+    AttendanceRequest.create!(
+      company: company, employee: alice,
+      attendance_date: Date.parse("2026-09-10"),
+      check_in: Time.zone.parse("2026-09-10 09:00"),
+      check_out: Time.zone.parse("2026-09-10 17:00"),
+      reason: "Alice field work", business_type: :field_work
+    )
+    AttendanceRequest.create!(
+      company: company, employee: bob,
+      attendance_date: Date.parse("2026-09-12"),
+      check_in: Time.zone.parse("2026-09-12 09:00"),
+      reason: "Bob remote work", business_type: :remote_work
+    )
+
+    visit company_attendance_requests_path(company)
+    expect(page).to have_selector("table", wait: 10)
+    expect(page).to have_content("Alice field work")
+    expect(page).to have_content("Bob remote work")
+
+    fill_in "employee_name", with: "bob"
+    select "Remote work", from: "business_type"
+    page.execute_script("document.querySelector(\"input[name='from']\").value = '2026-09-11'")
+    page.execute_script("document.querySelector(\"input[name='to']\").value = '2026-09-13'")
+    click_button "Search"
+
+    expect(page).to have_current_path(/employee_name=bob/, wait: 10)
+    expect(page).to have_content("Bob remote work")
+    expect(page).not_to have_content("Alice field work")
+  end
 end

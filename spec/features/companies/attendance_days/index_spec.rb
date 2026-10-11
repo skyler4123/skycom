@@ -49,4 +49,40 @@ RSpec.feature "Companies::AttendanceDays Management", type: :feature, js: true d
     link = find("a[href*='/attendance_days/#{attendance_day.id}']", match: :first)
     expect(link).to be_present
   end
+
+  scenario "filters by employee name" do
+    alice = create(:employee, company: company).tap { |e| e.update!(name: "Alice Wonderland") }
+    bob = create(:employee, company: company).tap { |e| e.update!(name: "Bob Builder") }
+    AttendanceDay.create!(company: company, employee: alice, attendance_date: Date.parse("2026-09-10"), attendance_status: :present, total_seconds_worked: 28_800)
+    AttendanceDay.create!(company: company, employee: bob, attendance_date: Date.parse("2026-09-10"), attendance_status: :present, total_seconds_worked: 28_800)
+
+    visit company_attendance_days_path(company)
+    expect(page).to have_selector("table", wait: 10)
+    expect(page).to have_content("Alice Wonderland")
+    expect(page).to have_content("Bob Builder")
+
+    fill_in "employee_name", with: "bob"
+    click_button "Search"
+
+    expect(page).to have_current_path(/employee_name=bob/, wait: 10)
+    expect(page).to have_content("Bob Builder")
+    expect(page).not_to have_content("Alice Wonderland")
+  end
+
+  scenario "filters by status and date range" do
+    alice = create(:employee, company: company).tap { |e| e.update!(name: "Alice Wonderland") }
+    AttendanceDay.create!(company: company, employee: alice, attendance_date: Date.parse("2026-09-10"), attendance_status: :present, total_seconds_worked: 28_800)
+    AttendanceDay.create!(company: company, employee: alice, attendance_date: Date.parse("2026-09-12"), attendance_status: :late, total_seconds_worked: 27_000)
+
+    visit company_attendance_days_path(company)
+    expect(page).to have_selector("table", wait: 10)
+
+    select "Late", from: "attendance_status"
+    page.execute_script("document.querySelector(\"input[name='from']\").value = '2026-09-11'")
+    page.execute_script("document.querySelector(\"input[name='to']\").value = '2026-09-13'")
+    click_button "Search"
+
+    expect(page).to have_current_path(/attendance_status=late/, wait: 10)
+    expect(page).to have_selector("tbody tr", count: 1, wait: 10)
+  end
 end

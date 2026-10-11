@@ -1,15 +1,20 @@
 import Companies_LayoutController from "controllers/companies/layout_controller"
 
 export default class Companies_ScheduledShifts_IndexController extends Companies_LayoutController {
+  // Scheduled shifts dashboard with employee-name search, status + work-date range filters.
+  // Depends on BE: Companies::ScheduledShiftsController#index (JSON)
+  // Endpoints: GET <pathname>.json?employee_name&status&from&to — traditional GET form, full-page submit
+  // Docs: docs/HR.md
   static targets = ["scheduledShiftsList"]
 
-  /** @type {Array<{id: string, employee_name: string, shift_template_name: string, work_date: string, expected_start_at: string, expected_end_at: string, status: string}>} */
+  /** @type {Array<{id: string, employee: {name: string}, shift_template: {name: string}, work_date: string, expected_start_at: string, expected_end_at: string, status: string}>} */
   scheduledShifts = []
 
   async connect() {
     super.connect()
     try {
-      const response = await fetchJson()
+      const urlParams = new URLSearchParams(window.location.search)
+      const response = await fetchJson(`${pathname()}.json?${urlParams.toString()}`)
       this.scheduledShifts = response.scheduled_shifts || []
       this.pagination = response.pagination || {}
     } catch (error) {
@@ -45,6 +50,14 @@ export default class Companies_ScheduledShifts_IndexController extends Companies
   }
 
   contentHTML() {
+    const urlParams = new URLSearchParams(window.location.search)
+    const employeeNameValue = urlParams.get('employee_name') || ''
+    const statusValue = urlParams.get('status') || ''
+    const fromValue = urlParams.get('from') || ''
+    const toValue = urlParams.get('to') || ''
+    const statusOptions = [ 'scheduled', 'active', 'completed' ]
+      .map(s => `<option value="${s}" ${s === statusValue ? 'selected' : ''}>${Helpers.capitalize(s)}</option>`).join('')
+
     return `
       <div class="p-4 overflow-y-auto">
         <div class="p-4 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 flex flex-col">
@@ -56,6 +69,35 @@ export default class Companies_ScheduledShifts_IndexController extends Companies
               ${translate("Add Shift")}
             </a>
           </div>
+          <form method="get" action="${pathname()}" class="flex flex-col lg:flex-row items-end gap-4 mb-6 w-full">
+            <div class="flex flex-wrap items-end gap-3 w-full lg:w-auto">
+              <div class="flex flex-col gap-1">
+                <label class="text-[10px] font-bold text-slate-400 uppercase ml-1">${translate("Employee Name")}</label>
+                <input type="text" name="employee_name" value="${employeeNameValue.replace(/"/g, '&quot;')}" placeholder="${translate("e.g. John Doe")}" class="px-3 py-2 text-sm border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300" />
+              </div>
+              <div class="flex flex-col gap-1">
+                <label class="text-[10px] font-bold text-slate-400 uppercase ml-1">${translate("Status")}</label>
+                <select name="status" class="pl-3 pr-10 py-2 text-sm border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300">
+                  <option value="">${translate("All")}</option>
+                  ${statusOptions}
+                </select>
+              </div>
+              <div class="flex flex-col gap-1">
+                <label class="text-[10px] font-bold text-slate-400 uppercase ml-1">${translate("From")}</label>
+                <input type="date" name="from" value="${fromValue}" class="px-3 py-2 text-sm border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300" />
+              </div>
+              <div class="flex flex-col gap-1">
+                <label class="text-[10px] font-bold text-slate-400 uppercase ml-1">${translate("To")}</label>
+                <input type="date" name="to" value="${toValue}" class="px-3 py-2 text-sm border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300" />
+              </div>
+              <div class="flex gap-2 mt-auto">
+                <button type="submit" class="h-[38px] px-6 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors font-medium text-sm flex items-center gap-2 cursor-pointer">
+                  <span class="material-symbols-outlined text-[18px]!">search</span>
+                  ${translate("Search")}
+                </button>
+              </div>
+            </div>
+          </form>
           <div class="overflow-x-auto">
             <table class="w-full text-left border-collapse">
               <thead>
@@ -75,11 +117,11 @@ export default class Companies_ScheduledShifts_IndexController extends Companies
                     <td class="py-4 px-6 text-sm font-medium">
                       <a href="${Helpers.company_scheduled_shift_path(currentCompany().id, s.id)}"
                         class="text-slate-900 dark:text-white hover:text-blue-600 dark:hover:text-blue-400 cursor-pointer">
-                        ${s.employee_name || '—'}
+                        ${s.employee?.name || '—'}
                       </a>
                     </td>
                     <td class="py-4 px-6 text-sm text-slate-600">${this.formatDate(s.work_date)}</td>
-                    <td class="py-4 px-6 text-sm text-slate-600">${s.shift_template_name || '—'}</td>
+                    <td class="py-4 px-6 text-sm text-slate-600">${s.shift_template?.name || '—'}</td>
                     <td class="py-4 px-6 text-sm text-slate-600">${this.formatTime(s.expected_start_at)}</td>
                     <td class="py-4 px-6 text-sm text-slate-600">${this.formatTime(s.expected_end_at)}</td>
                     <td class="py-4 px-6 text-sm">${this.statusBadge(s.status)}</td>

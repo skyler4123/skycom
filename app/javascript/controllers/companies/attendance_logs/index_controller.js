@@ -1,6 +1,10 @@
 import Companies_LayoutController from "controllers/companies/layout_controller"
 
 export default class Companies_AttendanceLogs_IndexController extends Companies_LayoutController {
+  // Attendance logs dashboard with employee-name search, type + date-range filters.
+  // Depends on BE: Companies::AttendanceLogsController#index (JSON)
+  // Endpoints: GET <pathname>.json?employee_name&log_type&from&to — traditional GET form, full-page submit
+  // Docs: docs/HR.md
   static targets = ["attendanceLogsList"]
 
   /** @type {Array} */
@@ -9,7 +13,8 @@ export default class Companies_AttendanceLogs_IndexController extends Companies_
   async connect() {
     super.connect()
     try {
-      const response = await fetchJson()
+      const urlParams = new URLSearchParams(window.location.search)
+      const response = await fetchJson(`${pathname()}.json?${urlParams.toString()}`)
       this.attendanceLogs = response.attendance_logs || []
       this.pagination = response.pagination || {}
     } catch (error) {
@@ -42,10 +47,47 @@ export default class Companies_AttendanceLogs_IndexController extends Companies_
   }
 
   contentHTML() {
+    const urlParams = new URLSearchParams(window.location.search)
+    const employeeNameValue = urlParams.get('employee_name') || ''
+    const logTypeValue = urlParams.get('log_type') || ''
+    const fromValue = urlParams.get('from') || ''
+    const toValue = urlParams.get('to') || ''
+    const logTypeOptions = [ 'check_in', 'check_out' ]
+      .map(t => `<option value="${t}" ${t === logTypeValue ? 'selected' : ''}>${Helpers.capitalize(t.replace('_', ' '))}</option>`).join('')
+
     return `
       <div class="p-4 overflow-y-auto">
         <div class="p-4 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 flex flex-col">
           <h2 class="text-xl font-bold text-slate-900 dark:text-white mb-6">${translate("Attendance Logs")}</h2>
+          <form method="get" action="${pathname()}" class="flex flex-col lg:flex-row items-end gap-4 mb-6 w-full">
+            <div class="flex flex-wrap items-end gap-3 w-full lg:w-auto">
+              <div class="flex flex-col gap-1">
+                <label class="text-[10px] font-bold text-slate-400 uppercase ml-1">${translate("Employee Name")}</label>
+                <input type="text" name="employee_name" value="${employeeNameValue.replace(/"/g, '&quot;')}" placeholder="${translate("e.g. John Doe")}" class="px-3 py-2 text-sm border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300" />
+              </div>
+              <div class="flex flex-col gap-1">
+                <label class="text-[10px] font-bold text-slate-400 uppercase ml-1">${translate("Log Type")}</label>
+                <select name="log_type" class="pl-3 pr-10 py-2 text-sm border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300">
+                  <option value="">${translate("All")}</option>
+                  ${logTypeOptions}
+                </select>
+              </div>
+              <div class="flex flex-col gap-1">
+                <label class="text-[10px] font-bold text-slate-400 uppercase ml-1">${translate("From")}</label>
+                <input type="date" name="from" value="${fromValue}" class="px-3 py-2 text-sm border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300" />
+              </div>
+              <div class="flex flex-col gap-1">
+                <label class="text-[10px] font-bold text-slate-400 uppercase ml-1">${translate("To")}</label>
+                <input type="date" name="to" value="${toValue}" class="px-3 py-2 text-sm border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300" />
+              </div>
+              <div class="flex gap-2 mt-auto">
+                <button type="submit" class="h-[38px] px-6 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors font-medium text-sm flex items-center gap-2 cursor-pointer">
+                  <span class="material-symbols-outlined text-[18px]!">search</span>
+                  ${translate("Search")}
+                </button>
+              </div>
+            </div>
+          </form>
           <div class="overflow-x-auto">
             <table class="w-full text-left border-collapse">
               <thead>
