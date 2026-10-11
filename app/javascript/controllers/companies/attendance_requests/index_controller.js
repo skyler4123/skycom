@@ -3,7 +3,7 @@ import Companies_LayoutController from "controllers/companies/layout_controller"
 export default class Companies_AttendanceRequests_IndexController extends Companies_LayoutController {
   // Attendance request queue — pending requests get Approve/Reject controls.
   // Depends on BE: Companies::AttendanceRequestsController#index (JSON), #approve, #reject
-  // Endpoints: GET <pathname>.json, POST .../attendance_requests/:id/approve, POST .../:id/reject
+  // Endpoints: GET <pathname>.json?employee_name&status&business_type&from&to, POST .../attendance_requests/:id/approve, POST .../:id/reject
   // Docs: docs/superpowers/specs/2026-10-08-attendance-request-design.md, docs/HR.md
   static targets = ["requestsList"]
 
@@ -13,7 +13,8 @@ export default class Companies_AttendanceRequests_IndexController extends Compan
   async connect() {
     super.connect()
     try {
-      const response = await fetchJson()
+      const urlParams = new URLSearchParams(window.location.search)
+      const response = await fetchJson(`${pathname()}.json?${urlParams.toString()}`)
       this.attendanceRequests = response.attendance_requests || []
       this.pagination = response.pagination || {}
     } catch (error) {
@@ -76,9 +77,15 @@ export default class Companies_AttendanceRequests_IndexController extends Compan
 
   contentHTML() {
     const urlParams = new URLSearchParams(window.location.search)
+    const employeeNameValue = urlParams.get('employee_name') || ''
     const statusValue = urlParams.get('status') || ''
+    const businessTypeValue = urlParams.get('business_type') || ''
+    const fromValue = urlParams.get('from') || ''
+    const toValue = urlParams.get('to') || ''
     const statusOptions = [ 'pending', 'approved', 'rejected' ]
       .map(s => `<option value="${s}" ${s === statusValue ? 'selected' : ''}>${Helpers.capitalize(s)}</option>`).join('')
+    const businessTypeOptions = [ 'onsite_miss', 'remote_work', 'field_work' ]
+      .map(t => `<option value="${t}" ${t === businessTypeValue ? 'selected' : ''}>${Helpers.capitalize(t.replace('_', ' '))}</option>`).join('')
 
     return `
       <div class="p-4 overflow-y-auto">
@@ -94,8 +101,13 @@ export default class Companies_AttendanceRequests_IndexController extends Compan
           <form
             method="get"
             action="${pathname()}"
-            class="flex flex-wrap items-end gap-3 mb-6"
+            class="flex flex-col lg:flex-row items-end gap-4 mb-6 w-full"
           >
+            <div class="flex flex-wrap items-end gap-3 w-full lg:w-auto">
+            <div class="flex flex-col gap-1">
+              <label class="text-[10px] font-bold text-slate-400 uppercase ml-1">${translate("Employee Name")}</label>
+              <input type="text" name="employee_name" value="${employeeNameValue.replace(/"/g, '&quot;')}" placeholder="${translate("e.g. John Doe")}" class="px-3 py-2 text-sm border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300" />
+            </div>
             <div class="flex flex-col gap-1">
               <label class="text-[10px] font-bold text-slate-400 uppercase ml-1">${translate("Status")}</label>
               <select
@@ -106,6 +118,25 @@ export default class Companies_AttendanceRequests_IndexController extends Compan
                 ${statusOptions}
               </select>
             </div>
+            <div class="flex flex-col gap-1">
+              <label class="text-[10px] font-bold text-slate-400 uppercase ml-1">${translate("Business Type")}</label>
+              <select
+                name="business_type"
+                class="pl-3 pr-10 py-2 text-sm border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300"
+              >
+                <option value="">${translate("All")}</option>
+                ${businessTypeOptions}
+              </select>
+            </div>
+            <div class="flex flex-col gap-1">
+              <label class="text-[10px] font-bold text-slate-400 uppercase ml-1">${translate("From")}</label>
+              <input type="date" name="from" value="${fromValue}" class="px-3 py-2 text-sm border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300" />
+            </div>
+            <div class="flex flex-col gap-1">
+              <label class="text-[10px] font-bold text-slate-400 uppercase ml-1">${translate("To")}</label>
+              <input type="date" name="to" value="${toValue}" class="px-3 py-2 text-sm border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300" />
+            </div>
+            <div class="flex gap-2 mt-auto">
             <button
               type="submit"
               class="h-[38px] px-6 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium text-sm flex items-center gap-2 cursor-pointer"
@@ -113,6 +144,8 @@ export default class Companies_AttendanceRequests_IndexController extends Compan
               <span class="material-symbols-outlined text-[18px]!">search</span>
               ${translate("Search")}
             </button>
+            </div>
+            </div>
           </form>
           <div class="overflow-x-auto">
             <table class="w-full text-left border-collapse">

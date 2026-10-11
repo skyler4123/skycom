@@ -1,3 +1,10 @@
+# app/controllers/companies/scheduled_shifts_controller.rb
+#
+# Scheduled shift dashboard API (Shell-First).
+# Serves Stimulus: Companies_ScheduledShifts_IndexController, Companies_ScheduledShifts_ShowController,
+#                  Companies_ScheduledShifts_NewController, Companies_ScheduledShifts_EditController
+# Endpoints: GET /companies/:company_id/scheduled_shifts(.json?employee_name&status&from&to)
+# Docs: docs/HR.md
 class Companies::ScheduledShiftsController < Companies::ApplicationController
   def index
     respond_to do |format|
@@ -5,9 +12,12 @@ class Companies::ScheduledShiftsController < Companies::ApplicationController
       format.json do
         scope = current_company.scheduled_shifts.includes(:employee, :shift_template)
         scope = scope.where(employee_id: params[:employee_id]) if params[:employee_id].present?
-        scope = scope.where("work_date >= ?", params[:from]) if params[:from].present?
-        scope = scope.where("work_date <= ?", params[:to]) if params[:to].present?
-        scope = scope.where(status: params[:status]) if params[:status].present?
+        scope = scope.joins(:employee).where("employees.name ILIKE ?", "%#{ActiveRecord::Base.sanitize_sql_like(params[:employee_name].strip)}%") if params[:employee_name].present?
+        from = parse_filter_date(params[:from])
+        scope = scope.where("work_date >= ?", from) if from
+        to = parse_filter_date(params[:to])
+        scope = scope.where("work_date <= ?", to) if to
+        scope = scope.where(status: params[:status]) if ScheduledShift.statuses.key?(params[:status].to_s)
         @pagy, @results = pagy(:offset, scope.order(work_date: :asc, expected_start_at: :asc), jsonapi: true)
         render json: { scheduled_shifts: @results.map { |s| format_shift(s) }, pagination: @pagy.data_hash }
       end
@@ -50,6 +60,12 @@ class Companies::ScheduledShiftsController < Companies::ApplicationController
   end
 
   private
+
+  def parse_filter_date(value)
+    Date.parse(value.to_s)
+  rescue ArgumentError, TypeError, Date::Error
+    nil
+  end
 
   def ss_params
     params.require(:scheduled_shift).permit(:employee_id, :shift_template_id, :branch_id, :work_date, :expected_start_at, :expected_end_at, :status)

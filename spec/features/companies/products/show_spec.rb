@@ -95,4 +95,19 @@ RSpec.feature "Companies::Products Show", type: :feature, js: true do
     expect(page).to have_content('Volume (ml)', wait: 10)
     expect(page).to have_content('Organic Certified', wait: 10)
   end
+
+  scenario "displays stocks of this product" do
+    warehouse_a = create(:warehouse, company: company, name: "PRD Show WH A #{SecureRandom.hex(3)}")
+    warehouse_b = create(:warehouse, company: company, name: "PRD Show WH B #{SecureRandom.hex(3)}")
+    Stock.create!(company: company, warehouse: warehouse_a, product: product, quantity: 12, pending: 3, name: "PRD Show SA", code: "STK-PRDS-A-#{SecureRandom.hex(2).upcase}")
+    Stock.create!(company: company, warehouse: warehouse_b, product: product, quantity: 4, pending: 0, name: "PRD Show SB", code: "STK-PRDS-B-#{SecureRandom.hex(2).upcase}")
+    other_product = create(:product, company: company, name: "Other Shown Product #{SecureRandom.hex(3)}")
+    Stock.create!(company: company, warehouse: warehouse_a, product: other_product, quantity: 99, pending: 0, name: "PRD Show Other", code: "STK-PRDS-O-#{SecureRandom.hex(2).upcase}")
+
+    visit company_product_path(company, product)
+
+    expect(page).to have_content("Stocks of this product", wait: 10)
+    expect(page).to have_content(warehouse_a.name, wait: 10)
+    expect(page).to have_content(warehouse_b.name, wait: 10)
+  end
 end

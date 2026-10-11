@@ -8,7 +8,7 @@
 # Serves Stimulus: Companies_AttendanceRequests_IndexController (index JSON),
 #                  Companies_AttendanceRequests_ShowController,
 #                  Companies_AttendanceRequests_NewController
-# Endpoints: GET /companies/:company_id/attendance_requests(.json),
+# Endpoints: GET /companies/:company_id/attendance_requests(.json?employee_name&status&business_type&from&to),
 #            POST /companies/:company_id/attendance_requests/:id/approve,
 #            POST /companies/:company_id/attendance_requests/:id/reject
 # Docs: docs/superpowers/specs/2026-10-08-attendance-request-design.md, docs/HR.md
@@ -20,7 +20,9 @@ class Companies::AttendanceRequestsController < Companies::ApplicationController
       format.json do
         scope = current_company.attendance_requests.includes(:employee).order(attendance_date: :desc)
         scope = scope.where(employee_id: params[:employee_id]) if params[:employee_id].present?
+        scope = scope.joins(:employee).where("employees.name ILIKE ?", "%#{ActiveRecord::Base.sanitize_sql_like(params[:employee_name].strip)}%") if params[:employee_name].present?
         scope = scope.where(status: params[:status]) if AttendanceRequest.statuses.key?(params[:status].to_s)
+        scope = scope.where(business_type: params[:business_type]) if AttendanceRequest.business_types.key?(params[:business_type].to_s)
         from = parse_filter_date(params[:from])
         scope = scope.where("attendance_date >= ?", from) if from
         to = parse_filter_date(params[:to])

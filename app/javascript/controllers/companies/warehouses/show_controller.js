@@ -1,8 +1,13 @@
 import Companies_LayoutController from "controllers/companies/layout_controller"
 
+// Depends on BE: Companies::WarehousesController#show (JSON with warehouse + stocks)
+// Docs: docs/STOCK.md
 export default class Companies_Warehouses_ShowController extends Companies_LayoutController {
   /** @type {Warehouse | null} */
   warehouse = null
+
+  /** @type {Array} */
+  stocks = []
 
   /** @type {Array<{key: string, label: string, type: string}>} */
   propertyMetadata = []
@@ -16,6 +21,7 @@ export default class Companies_Warehouses_ShowController extends Companies_Layou
     try {
       const response = await fetchJson(`${Helpers.company_warehouse_path(companyId, recordId)}.json`)
       this.warehouse = response.warehouse
+      this.stocks = response.stocks || []
 
       if (this.warehouse?.category_id) {
         const propertyMapping = currentPropertyMappings().find(m => m.category_id === this.warehouse.category_id)
@@ -173,6 +179,37 @@ export default class Companies_Warehouses_ShowController extends Companies_Layou
           </div>
 
           ${dynamicFields}
+
+          <div class="mt-8 border-t border-slate-200 dark:border-gray-800 pt-6">
+            <div class="flex items-center justify-between mb-4">
+              <h3 class="text-lg font-bold text-slate-900 dark:text-white">${translate("Stocks in this warehouse")}</h3>
+              <a href="${Helpers.company_stocks_path(companyId)}" class="text-sm font-medium text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 cursor-pointer">${translate("View all stocks")}</a>
+            </div>
+            ${this.stocks.length === 0 ? `<p class="text-sm text-slate-500 dark:text-slate-400">${translate("No stock yet.")}</p>` : `
+              <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse">
+                  <thead>
+                    <tr class="text-sm text-slate-500 border-b border-slate-200 dark:border-slate-700">
+                      <th class="py-4 px-6 font-medium">${translate("Product")}</th>
+                      <th class="py-4 px-6 font-medium">${translate("Quantity")}</th>
+                      <th class="py-4 px-6 font-medium">${translate("Pending")}</th>
+                      <th class="py-4 px-6 font-medium">${translate("Available")}</th>
+                    </tr>
+                  </thead>
+                  <tbody class="divide-y divide-slate-200 dark:divide-slate-800">
+                    ${this.stocks.map(s => `
+                      <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/50">
+                        <td class="py-4 px-6 text-sm font-medium text-slate-900 dark:text-white">${s.product?.name || '—'}</td>
+                        <td class="py-4 px-6 text-sm text-slate-900 dark:text-white font-medium">${s.quantity ?? 0}</td>
+                        <td class="py-4 px-6 text-sm text-slate-600 dark:text-slate-300">${s.pending ?? 0}</td>
+                        <td class="py-4 px-6 text-sm text-slate-900 dark:text-white font-medium">${s.available ?? 0}</td>
+                      </tr>
+                    `).join('')}
+                  </tbody>
+                </table>
+              </div>
+            `}
+          </div>
 
           <div class="mt-8 flex justify-end gap-3 pt-6 border-t border-slate-200 dark:border-gray-800">
             <a href="${Helpers.edit_company_warehouse_path(companyId, f.id)}"
