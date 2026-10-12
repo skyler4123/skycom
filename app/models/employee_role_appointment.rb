@@ -22,6 +22,7 @@ class EmployeeRoleAppointment < ApplicationRecord
   validate :only_one_owner_appointment_per_company, on: :create
 
   after_create :clear_company_permissions_cache
+  after_create :subscribe_employee_to_notification_tags
   before_update :prevent_modification_if_owner
   before_destroy :prevent_modification_if_owner
 
@@ -29,6 +30,16 @@ class EmployeeRoleAppointment < ApplicationRecord
 
   def clear_company_permissions_cache
     company&.clear_permissions_cache
+  end
+
+  def subscribe_employee_to_notification_tags
+    return unless employee && role
+
+    NotificationTag.where(company_id: company_id, name: [ "All Company", "All #{role.name}" ]).find_each do |tag|
+      EmployeeNotificationTagAppointment.find_or_create_by!(employee: employee, notification_tag: tag)
+    end
+  rescue ActiveRecord::RecordNotUnique
+    nil
   end
 
   def prevent_modification_if_owner
