@@ -45,6 +45,16 @@ export default class Admin_LayoutController extends Controller {
               <span class="material-symbols-outlined text-[20px]">business</span>
               Companies
             </a>
+            <a href="/admin/company_credits"
+              class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors cursor-pointer ${isActive('/admin/company_credits')}">
+              <span class="material-symbols-outlined text-[20px]">card_giftcard</span>
+              Company Credits
+            </a>
+            <a href="/admin/promo_campaigns"
+              class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors cursor-pointer ${isActive('/admin/promo_campaigns')}">
+              <span class="material-symbols-outlined text-[20px]">campaign</span>
+              Promotions
+            </a>
             <a href="/admin/payment_methods"
               class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors cursor-pointer ${isActive('/admin/payment_methods')}">
               <span class="material-symbols-outlined text-[20px]">payments</span>

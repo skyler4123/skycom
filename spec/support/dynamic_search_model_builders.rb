@@ -1,44 +1,44 @@
-require "rails_helper"
+# frozen_string_literal: true
 
-RSpec.describe "DynamicSearchConcern" do
-  before(:all) do
-    @meili_available = begin
-      Meilisearch::Rails.client.health["status"] == "available"
-    rescue StandardError
-      false
+# Shared builders + record helpers for dynamic Meilisearch model specs.
+# Extracted from spec/models/concerns/dynamic_search_concern_spec.rb so the
+# per-model loop can be split across multiple files for parallel_rspec.
+module DynamicSearchModelHelpers
+  def create_searchable_record(model_class, company, resource_name, **extra)
+    category = Seed::CategoryService.find_or_create_for(company: company, resource_name: resource_name)
+    attrs = { company: company, category: category, property_mapping: category.default_property_mapping }
+
+    if model_class.column_names.include?("name") && !extra.key?(:name)
+      attrs[:name] = "#{model_class.name} #{SecureRandom.hex(4)}"
     end
-    unless @meili_available
-      raise "Meilisearch not reachable at #{Meilisearch::Rails.configuration[:meilisearch_url]}. Run `docker compose up -d meilisearch`."
+    if model_class.column_names.include?("code") && !extra.key?(:code)
+      attrs[:code] = "#{model_class.name[0, 3].upcase}-#{SecureRandom.hex(4).upcase}"
     end
+    if model_class.column_names.include?("title") && !extra.key?(:title)
+      attrs[:title] = "#{model_class.name} Title #{SecureRandom.hex(4)}"
+    end
+    %i[business_type workflow_status lifecycle_status].each do |enum_name|
+      plural = enum_name.to_s.pluralize
+      if model_class.respond_to?(plural) && model_class.column_names.include?(enum_name.to_s) && !extra.key?(enum_name)
+        attrs[enum_name] = model_class.public_send(plural).keys.sample
+      end
+    end
+
+    model_class.create!(attrs.merge(extra))
   end
 
-  describe "connection to Meilisearch" do
-    it "returns a healthy status" do
-      expect(Meilisearch::Rails.client.health).to eq("status" => "available")
-    end
-  end
-
-  describe "index settings" do
-    it "applies searchable + filterable attributes for a dynamic model" do
-      settings = Product.ms_index.settings
-      expect(settings["searchableAttributes"]).to include("name", "description", "code", "property_string_1", "property_integer_1")
-      expect(settings["filterableAttributes"]).to include("company_id", "property_integer_1", "property_boolean_1")
-    end
-
-    it "merges model-declared extra filterable metrics into the index settings" do
-      filterable = Stock.meilisearch_settings.get_setting(:filterable_attributes)
-      attributes = Stock.meilisearch_settings.get_setting(:attributes).keys.map(&:to_s)
-      expect(filterable).to include("quantity", "pending")
-      expect(attributes).to include("quantity", "pending")
-    end
-
-    it "keeps models without extra metrics free of them" do
-      expect(Product.meilisearch_settings.get_setting(:filterable_attributes)).not_to include("quantity")
+  def create_seed_record(service_class, company, resource_name, **kwargs)
+    service_class.new(company: company, **kwargs).tap do |record|
+      if record.category.nil? && record.company.present?
+        record.category = Seed::CategoryService.find_or_create_for(company: record.company, resource_name: resource_name)
+      end
+      if record.property_mapping.nil? && record.category.present?
+        record.property_mapping = record.category.default_property_mapping
+      end
+      record.save!
     end
   end
 end
-
-require_relative "../../support/shared_examples/dynamic_search"
 
 DYNAMIC_SEARCH_MODELS = {
   Answer => ->(company) {
@@ -121,44 +121,3 @@ DYNAMIC_SEARCH_MODELS = {
   },
   Warehouse => ->(company) { create(:warehouse, company: company) }
 }.freeze
-
-RSpec.describe "dynamic meilisearch models" do
-  def create_searchable_record(model_class, company, resource_name, **extra)
-    category = Seed::CategoryService.find_or_create_for(company: company, resource_name: resource_name)
-    attrs = { company: company, category: category, property_mapping: category.default_property_mapping }
-
-    if model_class.column_names.include?("name") && !extra.key?(:name)
-      attrs[:name] = "#{model_class.name} #{SecureRandom.hex(4)}"
-    end
-    if model_class.column_names.include?("code") && !extra.key?(:code)
-      attrs[:code] = "#{model_class.name[0, 3].upcase}-#{SecureRandom.hex(4).upcase}"
-    end
-    if model_class.column_names.include?("title") && !extra.key?(:title)
-      attrs[:title] = "#{model_class.name} Title #{SecureRandom.hex(4)}"
-    end
-    %i[business_type workflow_status lifecycle_status].each do |enum_name|
-      plural = enum_name.to_s.pluralize
-      if model_class.respond_to?(plural) && model_class.column_names.include?(enum_name.to_s) && !extra.key?(enum_name)
-        attrs[enum_name] = model_class.public_send(plural).keys.sample
-      end
-    end
-
-    model_class.create!(attrs.merge(extra))
-  end
-
-  def create_seed_record(service_class, company, resource_name, **kwargs)
-    service_class.new(company: company, **kwargs).tap do |record|
-      if record.category.nil? && record.company.present?
-        record.category = Seed::CategoryService.find_or_create_for(company: record.company, resource_name: resource_name)
-      end
-      if record.property_mapping.nil? && record.category.present?
-        record.property_mapping = record.category.default_property_mapping
-      end
-      record.save!
-    end
-  end
-
-  DYNAMIC_SEARCH_MODELS.each do |model_class, builder|
-    it_behaves_like "dynamic meilisearch model", model_class, builder
-  end
-end

@@ -4,6 +4,7 @@ class NotificationTag < ApplicationRecord
   # --- Enums ---
   enum :lifecycle_status, LIFECYCLE_STATUS, prefix: true
   enum :workflow_status, WORKFLOW_STATUS, prefix: true
+  enum :business_type, { system: 0, custom: 1 }
 
   # --- Associations ---
   belongs_to :company
@@ -13,4 +14,13 @@ class NotificationTag < ApplicationRecord
 
   # --- Validations ---
   validates :name, presence: true, uniqueness: { scope: :company_id }
+
+  before_destroy :prevent_destroy_if_system
+
+  private
+
+  def prevent_destroy_if_system
+    return unless system?
+    raise ActiveRecord::ReadOnlyRecord, "System notification tags cannot be deleted."
+  end
 end

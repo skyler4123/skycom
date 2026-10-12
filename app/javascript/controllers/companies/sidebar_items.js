@@ -23,6 +23,7 @@ export const SIDEBAR_GROUPS = [
 export const SIDEBAR_ITEMS = [
   { key: "dashboard", group: "general", icon: "dashboard", label: "Dashboard", href: (cid) => Helpers.company_dashboards_path(cid) },
   { key: "notifications", group: "general", icon: "notifications", label: "Notifications", href: (cid) => Helpers.company_notifications_path(cid) },
+  { key: "notification_tags", group: "general", icon: "sell", label: "Notification Tags", href: (cid) => Helpers.company_notification_tags_path(cid) },
   { key: "analytics", group: "general", icon: "insights", label: "Analytics", href: (cid) => Helpers.company_analytics_path(cid) },
   { key: "products", group: "catalog", icon: "inventory_2", label: "Products", href: (cid) => Helpers.company_products_path(cid) },
   { key: "brands", group: "catalog", icon: "diamond", label: "Brands", href: (cid) => Helpers.company_brands_path(cid) },
