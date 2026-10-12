@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_10_08_000005) do
+ActiveRecord::Schema[8.1].define(version: 2026_10_12_000002) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pgcrypto"
@@ -5120,6 +5120,57 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_08_000005) do
     t.index ["workflow_status"], name: "index_projects_on_workflow_status"
   end
 
+  create_table "promo_campaigns", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
+    t.string "name", null: false
+    t.text "description"
+    t.bigint "amount", null: false
+    t.bigint "max_cap", null: false
+    t.jsonb "conditions", default: {}, null: false
+    t.datetime "scheduled_at", null: false
+    t.integer "status", default: 0, null: false
+    t.datetime "processed_at"
+    t.jsonb "stats", default: {}, null: false
+    t.integer "lifecycle_status"
+    t.integer "workflow_status"
+    t.integer "business_type"
+    t.datetime "expiration_date"
+    t.jsonb "metadata"
+    t.datetime "discarded_at"
+    t.string "permission_resource_name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["business_type"], name: "index_promo_campaigns_on_business_type"
+    t.index ["discarded_at"], name: "index_promo_campaigns_on_discarded_at"
+    t.index ["lifecycle_status"], name: "index_promo_campaigns_on_lifecycle_status"
+    t.index ["scheduled_at"], name: "index_promo_campaigns_on_scheduled_at"
+    t.index ["status"], name: "index_promo_campaigns_on_status"
+    t.index ["workflow_status"], name: "index_promo_campaigns_on_workflow_status"
+  end
+
+  create_table "promo_grants", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
+    t.uuid "promo_campaign_id", null: false
+    t.uuid "company_id", null: false
+    t.bigint "granted_amount", null: false
+    t.bigint "promo_before", null: false
+    t.bigint "promo_after", null: false
+    t.integer "lifecycle_status"
+    t.integer "workflow_status"
+    t.integer "business_type"
+    t.datetime "expiration_date"
+    t.jsonb "metadata"
+    t.datetime "discarded_at"
+    t.string "permission_resource_name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["business_type"], name: "index_promo_grants_on_business_type"
+    t.index ["company_id"], name: "index_promo_grants_on_company_id"
+    t.index ["discarded_at"], name: "index_promo_grants_on_discarded_at"
+    t.index ["lifecycle_status"], name: "index_promo_grants_on_lifecycle_status"
+    t.index ["promo_campaign_id", "company_id"], name: "index_promo_grants_on_promo_campaign_id_and_company_id", unique: true
+    t.index ["promo_campaign_id"], name: "index_promo_grants_on_promo_campaign_id"
+    t.index ["workflow_status"], name: "index_promo_grants_on_workflow_status"
+  end
+
   create_table "property_mappings", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
     t.uuid "company_id", null: false
     t.uuid "category_id", null: false
@@ -8221,6 +8272,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_08_000005) do
   add_foreign_key "projects", "companies"
   add_foreign_key "projects", "project_groups"
   add_foreign_key "projects", "property_mappings"
+  add_foreign_key "promo_grants", "companies"
+  add_foreign_key "promo_grants", "promo_campaigns"
   add_foreign_key "property_mappings", "categories"
   add_foreign_key "property_mappings", "companies"
   add_foreign_key "purchase_item_tag_appointments", "companies"

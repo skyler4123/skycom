@@ -13,6 +13,13 @@ Rails.application.routes.draw do
   namespace :admin do
     resources :companies
     resources :payment_methods
+    resources :company_credits, only: %i[index]
+    resources :promo_campaigns do
+      member do
+        post :run_now
+        post :cancel
+      end
+    end
     resources :company_tickets, only: [ :index, :show ] do
       member do
         post :assign
