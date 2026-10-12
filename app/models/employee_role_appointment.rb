@@ -35,7 +35,7 @@ class EmployeeRoleAppointment < ApplicationRecord
   def subscribe_employee_to_notification_tags
     return unless employee && role
 
-    NotificationTag.where(company_id: company_id, name: [ "All Company", "All #{role.name}" ]).find_each do |tag|
+    NotificationTag.where(company_id: company_id, name: [ "All Company", role.paired_tag_name ]).find_each do |tag|
       EmployeeNotificationTagAppointment.find_or_create_by!(employee: employee, notification_tag: tag)
     end
   rescue ActiveRecord::RecordNotUnique

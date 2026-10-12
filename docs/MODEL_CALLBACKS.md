@@ -223,6 +223,9 @@ never through model callbacks, mirroring the no-callback rule for direct day wri
 | Callback | Line | Method | Description |
 |----------|------|--------|-------------|
 | `after_touch :invalidate_employee_caches` | 30, 87 | `invalidate_employee_caches` | Bulk-updates `updated_at` on all associated employees via `employees.update_all(updated_at: Time.current)` — avoids loading records. Triggered when the Role is touched (e.g., by `Policy#touch_roles` or `PolicyRoleAppointment` `touch: true`). |
+| `after_create :ensure_paired_notification_tag` | — | `ensure_paired_notification_tag` | Creates the role's `All <Role>` system `NotificationTag` (`find_or_create_by!`, rescues `RecordNotUnique`). Skipped for the `owner` role. See `Role#paired_tag_name`. |
+| `after_update :rename_paired_notification_tag, if: :saved_change_to_name?` | — | `rename_paired_notification_tag` | Renames the paired tag found by the old name (`saved_change_to_name.first`); recreates it when missing; destroys the old tag when renamed to `owner`. Collision (`RecordInvalid`) is swallowed (tag keeps its name). |
+| `before_destroy :destroy_paired_notification_tag` | — | `destroy_paired_notification_tag` | Destroys the paired tag via `NotificationTag#destroy_paired_for_role!` (bypasses the system-tag guard, cascades run). Skipped for the `owner` role. |
 
 > **Note**: Line 87 is a duplicate declaration of the same callback. Both refer to the same private method.
 
@@ -260,7 +263,7 @@ never through model callbacks, mirroring the no-callback rule for direct day wri
 
 | Callback | Line | Method | Description |
 |----------|------|--------|-------------|
-| `before_destroy :prevent_destroy_if_system` | — | `prevent_destroy_if_system` | Raises `ActiveRecord::ReadOnlyRecord` if `business_type == "system"`. System tags (seeded at company init: `All Company`, `Promotion`, `All <Role>`) cannot be deleted; custom tags are unaffected. See `Seed::NotificationTagService`. |
+| `before_destroy :prevent_destroy_if_system` | — | `prevent_destroy_if_system` | Raises `ActiveRecord::ReadOnlyRecord` if `business_type == "system"`. System tags (seeded at company init: `All Company`, `Promotion`, `All <Role>`) cannot be deleted; custom tags are unaffected. See `Seed::NotificationTagService`. Skipped when `destroying_paired_for_role` is set by `destroy_paired_for_role!` (the paired-tag removal owned by `Role#destroy_paired_notification_tag`). |
 
 ---
 

@@ -48,9 +48,6 @@ class Role < ApplicationRecord
   has_many :policies, through: :policy_role_appointments
   has_many :permission_logs, dependent: :nullify
 
-  has_many :employee_group_appointments, dependent: :destroy, as: :appoint_to
-  has_many :employee_groups, through: :employee_group_appointments
-
   has_many :employee_role_appointments, dependent: :destroy
   has_many :employees, through: :employee_role_appointments
   has_many :customer_role_appointments, dependent: :destroy
@@ -82,6 +79,10 @@ class Role < ApplicationRecord
   # This fires whenever the Role is touched (e.g., by a PolicyRoleAppointment change)
   after_touch :invalidate_employee_caches
 
+  after_create :ensure_paired_notification_tag
+  after_update :rename_paired_notification_tag, if: :saved_change_to_name?
+  before_destroy :destroy_paired_notification_tag
+
   def setup_policies_for!(resource_name)
     CRUD_ACTIONS.each do |action|
       policy = Policy.find_or_create_by!(
@@ -106,7 +107,53 @@ class Role < ApplicationRecord
     end
   end
 
+  def paired_tag_name
+    "All #{name}"
+  end
+
   private
+
+  def skip_paired_tag?
+    name == OWNER_BUSINESS_TYPE
+  end
+
+  def ensure_paired_notification_tag
+    return if skip_paired_tag?
+
+    NotificationTag.find_or_create_by!(company: company, name: paired_tag_name) do |tag|
+      tag.description = "Broadcasts to all employees with the #{name} role."
+      tag.business_type = :system
+    end
+  rescue ActiveRecord::RecordNotUnique
+    nil
+  end
+
+  def rename_paired_notification_tag
+    old_name = saved_change_to_name.first
+    old_paired = "All #{old_name}"
+
+    if skip_paired_tag?
+      NotificationTag.find_by(company: company, name: old_paired)&.destroy_paired_for_role!
+      return
+    end
+
+    return if old_paired == paired_tag_name
+
+    tag = NotificationTag.find_by(company: company, name: old_paired)
+    if tag
+      tag.update!(name: paired_tag_name)
+    else
+      ensure_paired_notification_tag
+    end
+  rescue ActiveRecord::RecordInvalid, ActiveRecord::RecordNotUnique
+    nil
+  end
+
+  def destroy_paired_notification_tag
+    return if skip_paired_tag?
+
+    NotificationTag.find_by(company: company, name: paired_tag_name)&.destroy_paired_for_role!
+  end
 
   def invalidate_employee_caches
     # Efficiently update the timestamp of all associated employees
