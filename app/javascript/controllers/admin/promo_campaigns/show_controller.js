@@ -57,15 +57,6 @@ export default class Admin_PromoCampaigns_ShowController extends Admin_LayoutCon
     const c = this.promoCampaign
     if (!c) return '<div class="p-8 text-center">Campaign not found.</div>'
 
-    const fmtLocalWithOffset = (v) => {
-      const d = new Date(v)
-      if (isNaN(d)) return "—"
-      const pad = (n) => String(n).padStart(2, "0")
-      const off = -d.getTimezoneOffset()
-      const sign = off >= 0 ? "+" : "-"
-      return `${d.toLocaleString()} (${sign}${pad(Math.floor(Math.abs(off) / 60))}:${pad(Math.abs(off) % 60)})`
-    }
-
     const stats = c.stats || {}
     const canAct = c.status === "draft" || c.status === "scheduled"
     const grantColumns = [
@@ -121,8 +112,8 @@ export default class Admin_PromoCampaigns_ShowController extends Admin_LayoutCon
               <p class="text-lg font-bold font-mono text-slate-900 dark:text-white">${Number(c.max_cap || 0).toLocaleString()}</p>
             </div>
             <div>
-              <p class="text-xs font-medium text-slate-500 dark:text-slate-400">${translate("Scheduled At")} (local)</p>
-              <p class="text-sm font-semibold text-slate-900 dark:text-white">${c.scheduled_at ? fmtLocalWithOffset(c.scheduled_at) : "—"}</p>
+              <p class="text-xs font-medium text-slate-500 dark:text-slate-400">${translate("Scheduled At")} (UTC)</p>
+              <p class="text-sm font-semibold text-slate-900 dark:text-white">${c.scheduled_at ? Helpers.timeFormat(c.scheduled_at) : "—"}</p>
             </div>
             <div>
               <p class="text-xs font-medium text-slate-500 dark:text-slate-400">Matched / Granted / Skipped</p>

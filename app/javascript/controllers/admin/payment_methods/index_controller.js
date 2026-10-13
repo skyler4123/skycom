@@ -34,7 +34,7 @@ export default class Admin_PaymentMethods_IndexController extends Admin_LayoutCo
       { key: "business_type", name: "Type" },
       { key: "country", name: "Country" },
       { key: "lifecycle_status", name: "Status" },
-      { key: "created_at", name: "Created" }
+      { key: "created_at", name: "Created (UTC)" }
     ]
 
     return `
@@ -81,7 +81,7 @@ export default class Admin_PaymentMethods_IndexController extends Admin_LayoutCo
                   return `<span class="text-sm text-slate-600 dark:text-slate-400">${names[value] || value || '—'}</span>`
                 },
                 lifecycle_status: (value) => `${Helpers.statusBadge(value)}`,
-                created_at: (value) => value ? `<span class="text-sm text-slate-500 dark:text-slate-400">${new Date(value).toLocaleDateString()}</span>` : '—'
+                created_at: (value) => value ? `<span class="text-sm text-slate-500 dark:text-slate-400">${Helpers.timeFormat(value)}</span>` : '—'
               },
               renderActions: (record) => `
                 <td class="py-4 px-6 text-sm text-right whitespace-nowrap">

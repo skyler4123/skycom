@@ -67,7 +67,7 @@ export default class Admin_CompanyTickets_IndexController extends Admin_LayoutCo
       { key: "priority", name: "Priority" },
       { key: "status", name: "Status" },
       { key: "assigned_user", name: "Assignee" },
-      { key: "updated_at", name: "Updated" },
+      { key: "updated_at", name: "Updated (UTC)" },
       { key: "actions", name: "" }
     ]
 
@@ -114,7 +114,7 @@ export default class Admin_CompanyTickets_IndexController extends Admin_LayoutCo
                 priority: (value) => `${Helpers.statusBadge(value || "medium")}`,
                 status: (value) => `${Helpers.statusBadge(value || "open")}`,
                 assigned_user: (value) => `<span class="text-sm text-slate-600 dark:text-slate-300">${escapeHtml(value?.name || value?.email) || "—"}</span>`,
-                updated_at: (value) => `<span class="text-xs text-slate-500 dark:text-slate-400">${value ? new Date(value).toLocaleString() : "—"}</span>`,
+                updated_at: (value) => `<span class="text-xs text-slate-500 dark:text-slate-400">${value ? Helpers.timeFormat(value) : "—"}</span>`,
                 actions: (value, record) => record.assigned_user
                   ? ""
                   : `<button type="button" data-action="click->${this.identifier}#pickUp" data-${this.identifier}-ticket-id-param="${record.id}" class="px-3 py-1 text-xs font-medium text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg cursor-pointer">Pick Up</button>`

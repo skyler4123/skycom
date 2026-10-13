@@ -28,21 +28,13 @@ export default class Admin_PromoCampaigns_IndexController extends Admin_LayoutCo
   }
 
   contentHTML() {
-    const fmtLocalWithOffset = (v) => {
-      const d = new Date(v)
-      if (isNaN(d)) return "—"
-      const pad = (n) => String(n).padStart(2, "0")
-      const off = -d.getTimezoneOffset()
-      const sign = off >= 0 ? "+" : "-"
-      return `${d.toLocaleString()} (${sign}${pad(Math.floor(Math.abs(off) / 60))}:${pad(Math.abs(off) % 60)})`
-    }
     const columns = [
       { key: "name", name: translate("Promotion Campaign") },
       { key: "amount", name: translate("Amount") },
       { key: "max_cap", name: translate("Max Cap") },
       { key: "status", name: "Status" },
-      { key: "scheduled_at", name: `${translate("Scheduled At")} (local)` },
-      { key: "created_at", name: "Created" }
+      { key: "scheduled_at", name: `${translate("Scheduled At")} (UTC)` },
+      { key: "created_at", name: "Created (UTC)" }
     ]
 
     return `
@@ -72,8 +64,8 @@ export default class Admin_PromoCampaigns_IndexController extends Admin_LayoutCo
                 amount: (value) => `<span class="font-mono text-sm font-medium text-emerald-600 dark:text-emerald-400">${Number(value || 0).toLocaleString()}</span>`,
                 max_cap: (value) => `<span class="font-mono text-sm text-slate-600 dark:text-slate-400">${Number(value || 0).toLocaleString()}</span>`,
                 status: (value) => `${Helpers.statusBadge(value)}`,
-                scheduled_at: (value) => value ? `<span class="text-sm text-slate-500 dark:text-slate-400" title="Local time with UTC offset">${fmtLocalWithOffset(value)}</span>` : "—",
-                created_at: (value) => value ? `<span class="text-sm text-slate-500 dark:text-slate-400">${new Date(value).toLocaleDateString()}</span>` : "—"
+                scheduled_at: (value) => value ? `<span class="text-sm text-slate-500 dark:text-slate-400" title="UTC time">${Helpers.timeFormat(value)}</span>` : "—",
+                created_at: (value) => value ? `<span class="text-sm text-slate-500 dark:text-slate-400">${Helpers.timeFormat(value)}</span>` : "—"
               },
               renderActions: (record) => `
                 <td class="py-4 px-6 text-sm text-right whitespace-nowrap">

@@ -15,3 +15,5 @@ pin "centrifuge" # @5.7.0
 pin "qrcode" # @5.39.0
 pin "marked" # @18.1.0
 pin "dompurify" # @3.4.16
+pin "dayjs/plugin/timezone", to: "dayjs--plugin--timezone.js" # @1.11.19
+pin "dayjs/plugin/utc", to: "dayjs--plugin--utc.js" # @1.11.19

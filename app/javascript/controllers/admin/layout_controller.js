@@ -33,7 +33,7 @@ export default class Admin_LayoutController extends Controller {
       : 'text-slate-600 hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-slate-800'
 
     return `
-      <div class="flex h-screen overflow-hidden">
+      <div class="flex h-screen overflow-hidden text-gray-800 dark:text-gray-200">
         <!-- Sidebar -->
         <aside class="w-64 bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 flex flex-col shrink-0">
           <div class="h-16 flex items-center px-6 border-b border-slate-200 dark:border-slate-800">

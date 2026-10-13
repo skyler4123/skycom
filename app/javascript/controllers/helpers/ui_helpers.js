@@ -1,8 +1,13 @@
 import Swal from 'sweetalert2';
 import dayjs from 'dayjs';
+import utc from 'dayjs/plugin/utc';
+import timezone from 'dayjs/plugin/timezone';
 import Toastify from 'toastify-js';
 import { capitalize, isDefined } from "controllers/helpers/data_helpers" 
 import qrcode from "qrcode"
+
+dayjs.extend(utc)
+dayjs.extend(timezone)
 
 /**
  * Fetches JSON data from a URL with built-in support for query params, CSRF tokens, and JSON bodies.
@@ -123,13 +128,18 @@ export const href = () => window.location.href
 export const origin = () => window.location.origin
 
 /**
- * Formats a given time using dayjs.
+ * Formats a given time using dayjs in the requested timezone (UTC by default).
  * @param {string | number | Date | dayjs.Dayjs} time - The time to format.
- * @param {string} [format="DD/MM/YYYY"] - The format string for dayjs.
- * @returns {string} The formatted time string.
+ * @param {string} [format="YYYY-MM-DDTHH:mm:ss[Z]"] - The format string for dayjs (ISO 8601 UTC by default).
+ * @param {string | number} [timezone="UTC"] - "UTC", an IANA timezone name, or a numeric hour offset (e.g. 7).
+ * @returns {string} The formatted time string, or "—" when the value is blank or invalid.
  */
-export const timeFormat = (time, format = "DD/MM/YYYY") => {
-  return dayjs(time).format(format)
+export const timeFormat = (time, format = "YYYY-MM-DDTHH:mm:ss[Z]", timezone = "UTC") => {
+  if (time === null || time === undefined || time === "") return "—"
+  const d = dayjs(time)
+  if (!d.isValid()) return "—"
+  if (typeof timezone === "number") return d.utc().utcOffset(timezone * 60).format(format)
+  return d.tz(timezone).format(format)
 }
 
 /**
