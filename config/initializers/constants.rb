@@ -223,3 +223,22 @@ DYNAMIC_SIDEBAR_CODE = "DYNAMIC_SIDEBAR".freeze
 # (appoint_to = Employee, business_type = :employee). One per employee per
 # company; renders below the shared company groups. See docs/SIDEBAR.md.
 PERSONAL_SIDEBAR_CODE = "PERSONAL_SIDEBAR".freeze
+
+# =============================================================================
+# Welcome Notification (new-company onboarding)
+# Country-versioned copy for the delayed welcome job
+# (Companies::WelcomeNotificationJob). Business-domain agnostic — keyed by
+# country only. See docs/MODEL_CALLBACKS.md (Company#initialize_company).
+# =============================================================================
+
+# Country → welcome title/body. Fallback is :us when the country is unknown.
+WELCOME_NOTIFICATION_CONTENT = {
+  us: {
+    title: "Welcome to Skycom!",
+    body: "Your company is ready. Explore your dashboard, invite your team, and start selling — we're here if you need help."
+  },
+  vn: {
+    title: "Chào mừng bạn đến với Skycom!",
+    body: "Công ty của bạn đã sẵn sàng. Hãy khám phá bảng điều khiển, mời đội ngũ của bạn và bắt đầu bán hàng — chúng tôi luôn sẵn sàng hỗ trợ."
+  }
+}.freeze

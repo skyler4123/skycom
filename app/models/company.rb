@@ -30,6 +30,10 @@ class Company < ApplicationRecord
     CompanyTicket CompanyTicketComment CompanyTicketLog
     Document Setting
   ].freeze
+  # Delay before the welcome notification job runs. Single-file: only used
+  # by #initialize_company — long enough for seeding to settle, short enough
+  # to still feel like onboarding. The job no-ops if the company is gone.
+  WELCOME_NOTIFICATION_DELAY = 10.minutes
   class_attribute :skip_init, default: false
   # Creation-time-only flag: System#ensure_company! marks its auto-created
   # company so initialize_company runs owner records only (no business-type
@@ -284,6 +288,8 @@ class Company < ApplicationRecord
     user.update!(system_role: :company_owner) unless system_owned
 
     create_company_wallet!(walletable: self, main_credit_balance: 0)
+
+    Companies::WelcomeNotificationJob.set(wait: WELCOME_NOTIFICATION_DELAY).perform_later(id)
   end
 
   def setup_payment_method_appointments
