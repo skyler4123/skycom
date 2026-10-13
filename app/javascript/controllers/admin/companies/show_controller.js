@@ -28,7 +28,7 @@ export default class Admin_Companies_ShowController extends Admin_LayoutControll
 
   contentHTML() {
     const c = this.company
-    if (!c) return '<div class="p-8 text-center text-slate-500">Company not found.</div>'
+    if (!c) return '<div class="p-8 text-center text-slate-500 dark:text-slate-400">Company not found.</div>'
 
     const businessTypeColors = {
       retail: 'bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400',
@@ -40,7 +40,7 @@ export default class Admin_Companies_ShowController extends Admin_LayoutControll
     }
 
     const detailFields = [
-      { label: "Business Type", value: c.business_type, type: "badge", badgeClass: businessTypeColors[c.business_type] || 'bg-slate-50 text-slate-700' },
+      { label: "Business Type", value: c.business_type, type: "badge", badgeClass: businessTypeColors[c.business_type] || 'bg-slate-50 text-slate-700 dark:bg-slate-800 dark:text-slate-300' },
       { label: "Email", value: c.email, type: "link", href: `mailto:${c.email}` },
       { label: "Phone", value: c.phone_number, type: "link", href: `tel:${c.phone_number}` },
       { label: "Website", value: c.website, type: "link", href: c.website },
@@ -75,7 +75,7 @@ export default class Admin_Companies_ShowController extends Admin_LayoutControll
                 <div>
                   <h2 class="text-xl font-bold text-slate-900 dark:text-white">${c.name || 'Unnamed Company'}</h2>
                   <div class="flex items-center gap-2 mt-1">
-                    ${c.code ? `<span class="font-mono text-xs bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded text-slate-500">${c.code}</span>` : ''}
+                    ${c.code ? `<span class="font-mono text-xs bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded text-slate-500 dark:text-slate-400">${c.code}</span>` : ''}
                     ${Helpers.statusBadge(c.workflow_status)}
                   </div>
                 </div>
@@ -133,7 +133,7 @@ export default class Admin_Companies_ShowController extends Admin_LayoutControll
                 </div>
                 <div>
                   <p class="text-sm font-medium text-slate-900 dark:text-white">${c.user.name || 'Unknown'}</p>
-                  <p class="text-sm text-slate-500">${c.user.email || ''}</p>
+                  <p class="text-sm text-slate-500 dark:text-slate-400">${c.user.email || ''}</p>
                 </div>
               </div>
             </div>

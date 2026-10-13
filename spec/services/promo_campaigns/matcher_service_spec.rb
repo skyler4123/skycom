@@ -45,4 +45,13 @@ RSpec.describe PromoCampaigns::MatcherService, type: :model do
     ids = described_class.call(campaign: campaign).pluck(:id)
     expect(ids).to include(retail_us.id, retail_vn.id)
   end
+
+  it "explicit company_ids override all other conditions" do
+    campaign = create(:promo_campaign, conditions: {
+      "country" => [ "vn" ],
+      "company_ids" => [ retail_us.id ]
+    })
+    ids = described_class.call(campaign: campaign).pluck(:id)
+    expect(ids).to contain_exactly(retail_us.id)
+  end
 end

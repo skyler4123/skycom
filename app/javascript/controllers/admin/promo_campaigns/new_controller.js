@@ -22,31 +22,31 @@ export default class Admin_PromoCampaigns_NewController extends Admin_LayoutCont
           <div class="col-span-2 space-y-1">
             <label class="text-[10px] font-bold text-slate-400 uppercase">Name</label>
             <input type="text" name="promo_campaign[name]" required placeholder="e.g. Holiday Bonus"
-              class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-sm">
+              class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-slate-900 dark:text-white text-sm">
           </div>
 
           <div class="col-span-2 space-y-1">
             <label class="text-[10px] font-bold text-slate-400 uppercase">Description</label>
             <textarea name="promo_campaign[description]" rows="2"
-              class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-sm"></textarea>
+              class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-slate-900 dark:text-white text-sm"></textarea>
           </div>
 
           <div class="space-y-1">
             <label class="text-[10px] font-bold text-slate-400 uppercase">${translate("Amount")}</label>
             <input type="number" step="1" min="1" name="promo_campaign[amount]" required placeholder="300"
-              class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-sm">
+              class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-slate-900 dark:text-white text-sm">
           </div>
 
           <div class="space-y-1">
             <label class="text-[10px] font-bold text-slate-400 uppercase">${translate("Max Cap")}</label>
             <input type="number" step="1" min="1" name="promo_campaign[max_cap]" required placeholder="1000"
-              class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-sm">
+              class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-slate-900 dark:text-white text-sm">
           </div>
 
           <div class="col-span-2 space-y-1">
-            <label class="text-[10px] font-bold text-slate-400 uppercase">${translate("Scheduled At")}</label>
+            <label class="text-[10px] font-bold text-slate-400 uppercase">${translate("Scheduled At")} (local)</label>
             <input type="datetime-local" name="promo_campaign[scheduled_at]" required
-              class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-sm">
+              class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-slate-900 dark:text-white text-sm">
           </div>
         </div>
 
@@ -56,7 +56,7 @@ export default class Admin_PromoCampaigns_NewController extends Admin_LayoutCont
             <div class="space-y-1">
               <label class="text-[10px] font-bold text-slate-400 uppercase">Country</label>
               <select name="promo_campaign[conditions][country][]"
-                class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-sm">
+                class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-slate-900 dark:text-white text-sm">
                 <option value="">All countries</option>
                 <option value="us">US</option>
                 <option value="vn">VN</option>
@@ -66,7 +66,7 @@ export default class Admin_PromoCampaigns_NewController extends Admin_LayoutCont
             <div class="space-y-1">
               <label class="text-[10px] font-bold text-slate-400 uppercase">Business Type</label>
               <select name="promo_campaign[conditions][business_type][]"
-                class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-sm">
+                class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-slate-900 dark:text-white text-sm">
                 <option value="">All types</option>
                 <option value="retail">Retail</option>
                 <option value="restaurant">Restaurant</option>
@@ -80,25 +80,31 @@ export default class Admin_PromoCampaigns_NewController extends Admin_LayoutCont
             <div class="space-y-1">
               <label class="text-[10px] font-bold text-slate-400 uppercase">Employee Count Min</label>
               <input type="number" step="1" min="0" name="promo_campaign[conditions][employee_count_min]"
-                class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-sm">
+                class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-slate-900 dark:text-white text-sm">
             </div>
 
             <div class="space-y-1">
               <label class="text-[10px] font-bold text-slate-400 uppercase">Employee Count Max</label>
               <input type="number" step="1" min="0" name="promo_campaign[conditions][employee_count_max]"
-                class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-sm">
+                class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-slate-900 dark:text-white text-sm">
             </div>
 
             <div class="space-y-1">
               <label class="text-[10px] font-bold text-slate-400 uppercase">${translate("Promo Balance")} Min</label>
               <input type="number" step="1" min="0" name="promo_campaign[conditions][promo_balance_min]"
-                class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-sm">
+                class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-slate-900 dark:text-white text-sm">
             </div>
 
             <div class="space-y-1">
               <label class="text-[10px] font-bold text-slate-400 uppercase">${translate("Promo Balance")} Max</label>
               <input type="number" step="1" min="0" name="promo_campaign[conditions][promo_balance_max]"
-                class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-sm">
+                class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-slate-900 dark:text-white text-sm">
+            </div>
+
+            <div class="col-span-2 space-y-1">
+              <label class="text-[10px] font-bold text-slate-400 uppercase">Company IDs (override other conditions)</label>
+              <textarea name="promo_campaign[conditions][company_ids]" rows="2" placeholder="Paste company UUIDs, comma or newline separated (blank = all)"
+                class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-slate-900 dark:text-white text-sm font-mono"></textarea>
             </div>
           </div>
         </div>

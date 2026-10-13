@@ -31,8 +31,8 @@ module Companies
       content = WELCOME_NOTIFICATION_CONTENT[company.country&.to_sym] || WELCOME_NOTIFICATION_CONTENT[:us]
       result = Notifications::CreateService.call(
         company: company,
-        title: content[:title],
-        body: content[:body],
+        name: content[:name],
+        description: content[:description],
         tag_ids: [ tag.id ],
         severity: :info,
         throttle_key: "welcome:#{company.id}",

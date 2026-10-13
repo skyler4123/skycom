@@ -79,11 +79,11 @@ export default class Admin_LayoutController extends Controller {
               </div>
               <div class="min-w-0 flex-1">
                 <p class="text-sm font-medium text-slate-900 dark:text-white truncate">${user?.name || 'Admin'}</p>
-                <p class="text-xs text-slate-500 truncate">${user?.email || ''}</p>
+                <p class="text-xs text-slate-500 dark:text-slate-400 truncate">${user?.email || ''}</p>
               </div>
             </div>
             <a href="/sign_out"
-              class="mt-3 flex items-center gap-2 px-3 py-2 text-sm text-slate-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors cursor-pointer">
+              class="mt-3 flex items-center gap-2 px-3 py-2 text-sm text-slate-500 dark:text-slate-400 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors cursor-pointer">
               <span class="material-symbols-outlined text-[18px]!">logout</span>
               Sign out
             </a>

@@ -42,6 +42,11 @@ export default class Home_IndexController extends Controller {
       signedin.classList.remove("hidden")
       signedin.classList.add("flex")
     }
+    const role = currentUser()?.system_role
+    if (role === "super_admin" || role === "admin") {
+      const adminLink = this.element.querySelector("#header-admin-link")
+      if (adminLink) adminLink.classList.remove("hidden")
+    }
   }
 
   switchTenant(event) {

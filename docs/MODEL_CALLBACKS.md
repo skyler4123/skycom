@@ -122,7 +122,7 @@ Mirrors the `CompanyTransaction` gating: the invoice's `payment_status` is deriv
 |----------|------|--------|-------------|
 | `before_discard :prevent_discard_if_owner` | 54 | `prevent_discard_if_owner` | Blocks soft-delete (Discard) if `business_type == "owner"`. Adds error and `throw(:abort)`. Owner employees cannot be discarded to prevent orphaned companies. |
 | `before_destroy :prevent_destroy_if_owner` | 55 | `prevent_destroy_if_owner` | Blocks hard-delete if `business_type == "owner"`. Adds error and `throw(:abort)`. Owner employees cannot be destroyed. |
-| `after_create :subscribe_to_all_company_tag` | — | `subscribe_to_all_company_tag` | Subscribes the new employee to the company's `All Company` system `NotificationTag` (no-op when the tag is missing, e.g. legacy companies). Idempotent via `find_or_create_by!`; rescues `RecordNotUnique`. |
+| `after_create :subscribe_to_all_employees_tag` | — | `subscribe_to_all_employees_tag` | Subscribes the new employee to the company's `All Employees` system `NotificationTag` (no-op when the tag is missing, e.g. legacy companies). Idempotent via `find_or_create_by!`; rescues `RecordNotUnique`. |
 
 ---
 
@@ -236,7 +236,7 @@ never through model callbacks, mirroring the no-callback rule for direct day wri
 | Callback | Line | Method | Description |
 |----------|------|--------|-------------|
 | `after_create :clear_company_permissions_cache` | 19 | `clear_company_permissions_cache` | Clears company-level permissions cache when a role is assigned. |
-| `after_create :subscribe_employee_to_notification_tags` (`EmployeeRoleAppointment` only) | — | `subscribe_employee_to_notification_tags` | Subscribes the employee to `All Company` + `All <Role>` system `NotificationTag`s (no-op when a tag is missing, e.g. legacy companies). Idempotent via `find_or_create_by!`; rescues `RecordNotUnique`. |
+| `after_create :subscribe_employee_to_notification_tags` (`EmployeeRoleAppointment` only) | — | `subscribe_employee_to_notification_tags` | Subscribes the employee to `All Employees` + `All <Role>` system `NotificationTag`s (plus `Owner` when the employee is the owner). No-op when a tag is missing, e.g. legacy companies. Idempotent via `find_or_create_by!`; rescues `RecordNotUnique`. |
 | `before_update :prevent_modification_if_owner` | 20 | `prevent_modification_if_owner` | Raises `ActiveRecord::ReadOnlyRecord` if `business_type == "owner"`. Owner role appointments are immutable. |
 | `before_destroy :prevent_modification_if_owner` | 21 | `prevent_modification_if_owner` | Same guard — blocks deletion of owner role appointments. |
 | `validate :only_one_owner_appointment_per_company, on: :create` | — | `only_one_owner_appointment_per_company` | Only one `owner` appointment per company per table (`EmployeeRoleAppointment` additionally requires the employee to have `owner` business_type). |
@@ -263,7 +263,7 @@ never through model callbacks, mirroring the no-callback rule for direct day wri
 
 | Callback | Line | Method | Description |
 |----------|------|--------|-------------|
-| `before_destroy :prevent_destroy_if_system` | — | `prevent_destroy_if_system` | Raises `ActiveRecord::ReadOnlyRecord` if `business_type == "system"`. System tags (seeded at company init: `All Company`, `Promotion`, `All <Role>`) cannot be deleted; custom tags are unaffected. See `Seed::NotificationTagService`. Skipped when `destroying_paired_for_role` is set by `destroy_paired_for_role!` (the paired-tag removal owned by `Role#destroy_paired_notification_tag`). |
+| `before_destroy :prevent_destroy_if_system` | — | `prevent_destroy_if_system` | Raises `ActiveRecord::ReadOnlyRecord` if `business_type == "system"`. System tags (seeded at company init: `Owner`, `All Employees`, `All <Role>`) cannot be deleted; custom tags are unaffected. See `Seed::NotificationTagService`. Skipped when `destroying_paired_for_role` is set by `destroy_paired_for_role!` (the paired-tag removal owned by `Role#destroy_paired_notification_tag`). |
 
 ---
 

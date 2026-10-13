@@ -120,16 +120,8 @@ class Companies::PermissionsController < Companies::ApplicationController
   end
 
   def can_manage_permissions?
-    # 1. Company owner can always manage
-    return true if current_user == current_company.user
-
-    # 2. Employee with PolicyRoleAppointment CRUD permission
-    employee = current_user.employees.find_by(company: current_company)
-    return false unless employee
-
-    employee.can?(:create, PolicyRoleAppointment) ||
-    employee.can?(:update, PolicyRoleAppointment) ||
-    employee.can?(:destroy, PolicyRoleAppointment)
+    # Owner-only: ABAC grants are ignored (mirrors RolesPolicy).
+    current_employee&.owner_role? == true
   end
 
   def authorize_permission_management

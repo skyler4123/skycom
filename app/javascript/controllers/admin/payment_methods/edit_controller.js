@@ -41,25 +41,25 @@ export default class Admin_PaymentMethods_EditController extends Admin_LayoutCon
     const fields = `
       <div class="space-y-6">
         <h2 class="text-xl font-bold text-slate-900 dark:text-white">Edit Payment Method</h2>
-        <p class="text-sm text-slate-500">${pm.code}</p>
+        <p class="text-sm text-slate-500 dark:text-slate-400">${pm.code}</p>
 
         <div class="grid grid-cols-2 gap-4">
           <div class="col-span-2 space-y-1">
             <label class="text-[10px] font-bold text-slate-400 dark:text-slate-300 uppercase">Name</label>
             <input type="text" name="payment_method[name]" value="${pm.name || ''}" required
-              class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-sm">
+              class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-slate-900 dark:text-white text-sm">
           </div>
 
           <div class="space-y-1">
             <label class="text-[10px] font-bold text-slate-400 dark:text-slate-300 uppercase">Code</label>
             <input type="text" name="payment_method[code]" value="${pm.code || ''}" required
-              class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-sm font-mono">
+              class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-slate-900 dark:text-white text-sm font-mono">
           </div>
 
           <div class="space-y-1">
             <label class="text-[10px] font-bold text-slate-400 dark:text-slate-300 uppercase">Business Type</label>
             <select name="payment_method[business_type]" required
-              class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-sm">
+              class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-slate-900 dark:text-white text-sm">
               <option value="b2c" ${pm.business_type === 'b2c' ? 'selected' : ''}>B2C</option>
               <option value="b2b" ${pm.business_type === 'b2b' ? 'selected' : ''}>B2B</option>
             </select>
@@ -68,7 +68,7 @@ export default class Admin_PaymentMethods_EditController extends Admin_LayoutCon
           <div class="space-y-1">
             <label class="text-[10px] font-bold text-slate-400 dark:text-slate-300 uppercase">Payment Mode</label>
             <select name="payment_method[payment_mode]" required
-              class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-sm">
+              class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-slate-900 dark:text-white text-sm">
               <option value="qr" ${pm.payment_mode === 'qr' ? 'selected' : ''}>QR Code</option>
               <option value="redirect" ${pm.payment_mode === 'redirect' ? 'selected' : ''}>Redirect</option>
               <option value="cash" ${pm.payment_mode === 'cash' ? 'selected' : ''}>Cash</option>
@@ -78,7 +78,7 @@ export default class Admin_PaymentMethods_EditController extends Admin_LayoutCon
           <div class="space-y-1">
             <label class="text-[10px] font-bold text-slate-400 dark:text-slate-300 uppercase">Country</label>
             <select name="payment_method[country]" required
-              class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-sm">
+              class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-slate-900 dark:text-white text-sm">
               <option value="us" ${pm.country === 'us' ? 'selected' : ''}>US</option>
               <option value="vn" ${pm.country === 'vn' ? 'selected' : ''}>VN</option>
             </select>
@@ -87,7 +87,7 @@ export default class Admin_PaymentMethods_EditController extends Admin_LayoutCon
           <div class="space-y-1">
             <label class="text-[10px] font-bold text-slate-400 dark:text-slate-300 uppercase">Strategy</label>
             <select name="payment_method[strategy]" required
-              class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-sm">
+              class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-slate-900 dark:text-white text-sm">
               <option value="cash" ${pm.strategy === 'cash' ? 'selected' : ''}>Cash</option>
               <option value="wallet_auto_debit" ${pm.strategy === 'wallet_auto_debit' ? 'selected' : ''}>Wallet Auto-Debit</option>
               <option value="mock_qr_gateway" ${pm.strategy === 'mock_qr_gateway' ? 'selected' : ''}>Mock QR Gateway</option>
@@ -100,7 +100,7 @@ export default class Admin_PaymentMethods_EditController extends Admin_LayoutCon
           <div class="space-y-1">
             <label class="text-[10px] font-bold text-slate-400 dark:text-slate-300 uppercase">Status</label>
             <select name="payment_method[lifecycle_status]"
-              class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-sm">
+              class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-slate-900 dark:text-white text-sm">
               <option value="active" ${pm.lifecycle_status === 'active' ? 'selected' : ''}>Active</option>
               <option value="inactive" ${pm.lifecycle_status === 'inactive' ? 'selected' : ''}>Inactive</option>
               <option value="archived" ${pm.lifecycle_status === 'archived' ? 'selected' : ''}>Archived</option>
@@ -111,7 +111,7 @@ export default class Admin_PaymentMethods_EditController extends Admin_LayoutCon
         <div class="col-span-2 space-y-1">
           <label class="text-[10px] font-bold text-slate-400 dark:text-slate-300 uppercase">Description</label>
           <textarea name="payment_method[description]" rows="3"
-            class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-sm">${pm.description || ''}</textarea>
+            class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-slate-900 dark:text-white text-sm">${pm.description || ''}</textarea>
         </div>
 
         <div class="flex justify-end gap-3 pt-2">

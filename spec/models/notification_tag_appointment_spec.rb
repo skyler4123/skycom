@@ -2,7 +2,7 @@ require "rails_helper"
 
 RSpec.describe NotificationTagAppointment, type: :model do
   let(:company) { create(:company) }
-  let(:notif) { Notification.create!(company: company, title: "t") }
+  let(:notif) { Notification.create!(company: company, name: "t") }
   let(:tag) { NotificationTag.create!(company: company, name: "ops") }
 
   describe "associations" do

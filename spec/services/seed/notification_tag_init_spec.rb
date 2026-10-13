@@ -11,17 +11,17 @@ RSpec.describe "init seeds system notification tags" do
   shared_examples "a notification tag init" do |business_type, init_roles|
     let(:company) { create(:company, business_type: business_type) }
 
-    it "creates fixed All Company and Promotion system tags with descriptions" do
-      all_company = NotificationTag.find_by(company: company, name: "All Company")
-      promotion = NotificationTag.find_by(company: company, name: "Promotion")
+    it "creates fixed Owner and All Employees system tags with descriptions" do
+      owner = NotificationTag.find_by(company: company, name: "Owner")
+      all_employees = NotificationTag.find_by(company: company, name: "All Employees")
 
-      expect(all_company).to be_present
-      expect(all_company.system?).to be(true)
-      expect(all_company.description).to be_present
+      expect(owner).to be_present
+      expect(owner.system?).to be(true)
+      expect(owner.description).to be_present
 
-      expect(promotion).to be_present
-      expect(promotion.system?).to be(true)
-      expect(promotion.description).to be_present
+      expect(all_employees).to be_present
+      expect(all_employees.system?).to be(true)
+      expect(all_employees.description).to be_present
     end
 
     it "creates one system tag per init role with description" do

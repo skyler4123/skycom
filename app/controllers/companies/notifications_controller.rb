@@ -79,7 +79,7 @@ class Companies::NotificationsController < Companies::ApplicationController
 
   def format_notification(notification)
     read = @read_ids.include?(notification.id)
-    notification.as_json(only: [ :id, :title, :body, :severity, :url, :created_at ]).merge(
+    notification.as_json(only: [ :id, :name, :description, :severity, :url, :created_at ]).merge(
       "tags" => notification.notification_tags.map { |t| t.as_json(only: [ :id, :name ]) },
       "read" => read
     )

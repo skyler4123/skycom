@@ -81,7 +81,7 @@ RSpec.describe "Companies::NotificationTagsController", type: :request do
     end
 
     it "refuses to destroy a system tag and keeps the row" do
-      tag = NotificationTag.create!(company: company, name: "All Company", business_type: :system)
+      tag = NotificationTag.create!(company: company, name: "All Employees", business_type: :system)
 
       expect {
         delete company_notification_tag_path(company, tag)

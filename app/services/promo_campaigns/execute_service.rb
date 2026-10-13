@@ -99,8 +99,8 @@ module PromoCampaigns
       )
       Notifications::CreateService.call(
         company: company,
-        title: "Skycom gave you #{amount} credits!",
-        body: "Promo '#{@campaign.name}' added #{amount} promo credits (cap #{@campaign.max_cap}). Skycom is so good!",
+        name: "Skycom gave you #{amount} credits!",
+        description: "Promo '#{@campaign.name}' added #{amount} promo credits (cap #{@campaign.max_cap}). Thank you for using Skycom! Here is our help to grow your business.",
         tag_ids: [ tag.id ],
         severity: :info,
         throttle_key: "promo:#{@campaign.id}",

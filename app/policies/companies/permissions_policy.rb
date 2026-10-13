@@ -1,17 +1,15 @@
 # app/policies/companies/permissions_policy.rb
 class Companies::PermissionsPolicy < ApplicationPolicy
   def index?
-    # 'record' is the current_employee passed from the controller
-    record.can?(:read, PolicyRoleAppointment)
+    # Owner-only: no role grants can open Permissions (mirrors RolesPolicy).
+    record.owner_role?
   end
 
   def create?
-    record.can?(:create, PolicyRoleAppointment)
+    record.owner_role?
   end
 
   def update?
-    # For instance-level checks (tags), you'd pass the actual object
-    # but for general creation/index, checking the employee works perfectly.
-    record.can?(:update, PolicyRoleAppointment)
+    record.owner_role?
   end
 end

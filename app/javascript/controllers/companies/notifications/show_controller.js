@@ -50,9 +50,9 @@ export default class Companies_Notifications_ShowController extends Companies_La
             ${Helpers.statusBadge(n.severity || "info")}
             ${(n.tags || []).map((t) => `<span class="font-mono text-xs bg-slate-100 dark:bg-slate-800/60 px-2 py-0.5 rounded text-slate-600 dark:text-slate-300 font-medium">${t.name}</span>`).join("")}
           </div>
-          <h2 class="text-2xl font-black text-slate-900 dark:text-white">${n.title || translate("Untitled notification")}</h2>
+          <h2 class="text-2xl font-black text-slate-900 dark:text-white">${n.name || translate("Untitled notification")}</h2>
           <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">${n.created_at ? new Date(n.created_at).toLocaleString() : ""}</p>
-          <p class="text-sm text-slate-700 dark:text-slate-300 mt-4 whitespace-pre-line">${n.body || ""}</p>
+          <p class="text-sm text-slate-700 dark:text-slate-300 mt-4 whitespace-pre-line">${n.description || ""}</p>
           ${n.url ? `<a href="${n.url}" class="inline-flex items-center gap-1 mt-4 text-sm text-blue-600 hover:text-blue-700 cursor-pointer">${translate("Open linked record")}<span class="material-symbols-outlined text-[18px]!">open_in_new</span></a>` : ""}
         </div>
       </div>`

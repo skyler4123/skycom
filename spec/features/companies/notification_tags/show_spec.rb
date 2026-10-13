@@ -4,7 +4,7 @@ RSpec.feature "Companies::NotificationTags Show", type: :feature, js: true do
   let(:company) { create(:company) }
   let(:owner) { company.user }
   let!(:custom_tag) { NotificationTag.create!(company: company, name: "ops", description: "Ops broadcasts", business_type: :custom) }
-  let!(:system_tag) { NotificationTag.create!(company: company, name: "All Company", description: "Broadcasts to everyone", business_type: :system) }
+  let!(:system_tag) { NotificationTag.create!(company: company, name: "All Employees", description: "Broadcasts to everyone", business_type: :system) }
 
   before do
     sign_in(owner)
@@ -39,7 +39,7 @@ RSpec.feature "Companies::NotificationTags Show", type: :feature, js: true do
   scenario "system tag shows no edit or delete actions" do
     visit company_notification_tag_path(company, system_tag)
 
-    expect(page).to have_content("All Company", wait: 10)
+    expect(page).to have_content("All Employees", wait: 10)
 
     expect(page).to have_no_link("Edit Tag")
     expect(page).to have_no_button("Delete")

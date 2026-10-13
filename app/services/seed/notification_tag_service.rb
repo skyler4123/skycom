@@ -1,8 +1,8 @@
 class Seed::NotificationTagService
   # Single-file constant: only used here (see docs/CONSTANTS.md).
   FIXED_TAGS = {
-    "All Company" => "Broadcasts to every employee in the company.",
-    "Promotion" => "Marketing and promotion campaigns."
+    "Owner" => "Messages for the company owner.",
+    "All Employees" => "Broadcasts to every employee in the company."
   }.freeze
 
   def self.create_defaults!(company:)

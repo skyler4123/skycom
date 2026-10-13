@@ -3,6 +3,9 @@
 module Employee::PermissionConcern
   extend ActiveSupport::Concern
 
+  # Single-file constant: only used here (see docs/CONSTANTS.md).
+  OWNER_ROLE_CACHE_EXPIRY = 1.day
+
   included do
     # =========================================================================
     # PERMISSIONS (ABAC) - Tag-Supported Structure
@@ -36,9 +39,13 @@ module Employee::PermissionConcern
     end
 
     # Check if employee has owner role (business_type = :owner)
+    # Cached 1 day in local_cache: owner assignment is immutable
+    # (creation-time only, update/destroy blocked) so it never changes;
+    # employee touch (role assignment) bumps cache_key_with_version anyway.
     def owner_role?
-      # role_appointments.any? { |ra| ra.business_type == "owner" }
-      EmployeeRoleAppointment.cached_where(employee_id: id).any? { |ra| ra.business_type == OWNER_BUSINESS_TYPE }
+      Rails.local_cache.fetch("#{cache_key_with_version}/owner_role", expires_in: OWNER_ROLE_CACHE_EXPIRY) do
+        EmployeeRoleAppointment.cached_where(employee_id: id).any? { |ra| ra.business_type == OWNER_BUSINESS_TYPE }
+      end
     end
 
     # 2. The ABAC Engine
@@ -135,6 +142,7 @@ module Employee::PermissionConcern
     def clear_permissions_cache
       Rails.local_cache.delete("#{cache_key_with_version}/permissions")
       Rails.local_cache.delete("#{cache_key_with_version}/permissions_by_role")
+      Rails.local_cache.delete("#{cache_key_with_version}/owner_role")
       touch
     end
   end

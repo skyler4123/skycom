@@ -175,7 +175,7 @@ export default class Admin_CompanyTickets_ShowController extends Admin_LayoutCon
 
   contentHTML() {
     const t = this.ticket
-    if (!t) return `<div class="p-8 text-center text-slate-500">Ticket not found.</div>`
+    if (!t) return `<div class="p-8 text-center text-slate-500 dark:text-slate-400">Ticket not found.</div>`
 
     const comments = (t.comments || []).map((c) => `
       <div class="flex flex-col gap-1 py-4 border-b border-slate-100 dark:border-slate-800 last:border-0">
@@ -215,10 +215,10 @@ export default class Admin_CompanyTickets_ShowController extends Admin_LayoutCon
           <p class="text-sm text-slate-700 dark:text-slate-300 mt-4 whitespace-pre-line">${escapeHtml(t.description)}</p>
 
           <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 mt-6 pt-6 border-t border-slate-200 dark:border-slate-700 text-sm">
-            <div><p class="text-xs font-medium text-slate-500">Assignee</p><p class="font-semibold text-slate-900 dark:text-white">${escapeHtml(t.assigned_user?.name || t.assigned_user?.email) || "—"}</p></div>
-            <div><p class="text-xs font-medium text-slate-500">Raised by</p><p class="font-semibold text-slate-900 dark:text-white">${escapeHtml(t.employee?.name) || "—"}</p></div>
-            <div><p class="text-xs font-medium text-slate-500">First response</p><p class="font-semibold text-slate-900 dark:text-white">${t.first_responded_at ? new Date(t.first_responded_at).toLocaleString() : "—"}</p></div>
-            <div><p class="text-xs font-medium text-slate-500">Rating</p><p class="font-semibold text-slate-900 dark:text-white">${t.rate ? `${t.rate} / 5` : "—"}</p></div>
+            <div><p class="text-xs font-medium text-slate-500 dark:text-slate-400">Assignee</p><p class="font-semibold text-slate-900 dark:text-white">${escapeHtml(t.assigned_user?.name || t.assigned_user?.email) || "—"}</p></div>
+            <div><p class="text-xs font-medium text-slate-500 dark:text-slate-400">Raised by</p><p class="font-semibold text-slate-900 dark:text-white">${escapeHtml(t.employee?.name) || "—"}</p></div>
+            <div><p class="text-xs font-medium text-slate-500 dark:text-slate-400">First response</p><p class="font-semibold text-slate-900 dark:text-white">${t.first_responded_at ? new Date(t.first_responded_at).toLocaleString() : "—"}</p></div>
+            <div><p class="text-xs font-medium text-slate-500 dark:text-slate-400">Rating</p><p class="font-semibold text-slate-900 dark:text-white">${t.rate ? `${t.rate} / 5` : "—"}</p></div>
           </div>
 
           <div class="flex gap-2 mt-6">
