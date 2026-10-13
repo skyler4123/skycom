@@ -113,6 +113,7 @@ The following are available globally via the `Helpers` object:
 - **Navigation/URL**: `pathname()`, `href()`, `pagination(data)`.
 - **UI**: `openModal(html)`, `closeModal()`, `openPopover()`, `toast(message, type)`.
 - **Data Handling**: `isPresent(val)`, `isEmpty(val)`, `each(collection, callback)`, `map()`, `sort()`.
+- **Time**: `timeFormat(time, format, timezone)` — dayjs format; defaults to ISO 8601 UTC (`YYYY-MM-DDTHH:mm:ss[Z]` → `2026-10-13T14:30:45Z`); `timezone` defaults to `"UTC"` (also accepts an IANA name or a numeric hour offset); returns `"—"` when blank/invalid. Admin pages display UTC.
 - **Storage**: `Cookie.set(name, value)`, `Cookie.get(name)`.
 
 ### Development Principles

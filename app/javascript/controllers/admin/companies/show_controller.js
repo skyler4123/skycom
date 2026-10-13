@@ -81,8 +81,8 @@ export default class Admin_Companies_ShowController extends Admin_LayoutControll
                 </div>
               </div>
               <div class="text-right text-xs text-slate-400">
-                <div>Created ${c.created_at ? new Date(c.created_at).toLocaleDateString() : '—'}</div>
-                <div class="mt-0.5">Updated ${c.updated_at ? new Date(c.updated_at).toLocaleDateString() : '—'}</div>
+                <div>Created (UTC) ${c.created_at ? Helpers.timeFormat(c.created_at) : '—'}</div>
+                <div class="mt-0.5">Updated (UTC) ${c.updated_at ? Helpers.timeFormat(c.updated_at) : '—'}</div>
               </div>
             </div>
           </div>

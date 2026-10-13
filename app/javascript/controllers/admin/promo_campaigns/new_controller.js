@@ -44,7 +44,7 @@ export default class Admin_PromoCampaigns_NewController extends Admin_LayoutCont
           </div>
 
           <div class="col-span-2 space-y-1">
-            <label class="text-[10px] font-bold text-slate-400 uppercase">${translate("Scheduled At")} (local)</label>
+            <label class="text-[10px] font-bold text-slate-400 uppercase">${translate("Scheduled At")} (UTC)</label>
             <input type="datetime-local" name="promo_campaign[scheduled_at]" required
               class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-slate-900 dark:text-white text-sm">
           </div>
