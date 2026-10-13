@@ -192,6 +192,7 @@ class Seed::HospitalInitService
 
   def call
     create_roles
+    create_default_notification_tags
     create_categories
     create_table_configs
     create_default_workflows
@@ -235,6 +236,10 @@ class Seed::HospitalInitService
         description: "#{role_name} role for #{@company.name}"
       )
     end
+  end
+
+  def create_default_notification_tags
+    Seed::NotificationTagService.create_defaults!(company: @company)
   end
 
   def create_categories

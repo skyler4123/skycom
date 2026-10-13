@@ -117,12 +117,22 @@ class Employee < ApplicationRecord
 
   before_discard :prevent_discard_if_owner
   before_destroy :prevent_destroy_if_owner
+  after_create :subscribe_to_all_company_tag
 
   def subscribed_notification_tag_ids
     employee_notification_tag_appointments.pluck(:notification_tag_id)
   end
 
   private
+
+  def subscribe_to_all_company_tag
+    tag = NotificationTag.find_by(company_id: company_id, name: "All Company")
+    return if tag.nil?
+
+    EmployeeNotificationTagAppointment.find_or_create_by!(employee: self, notification_tag: tag)
+  rescue ActiveRecord::RecordNotUnique
+    nil
+  end
 
   def only_one_owner_per_company
     return unless business_type.to_s == OWNER_BUSINESS_TYPE && company_id.present?
