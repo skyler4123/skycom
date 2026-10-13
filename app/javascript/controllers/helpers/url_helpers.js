@@ -243,6 +243,11 @@ export const mark_read_company_notification_path = (companyId, notificationId) =
 export const mark_all_read_company_notifications_path = (companyId) => `/companies/${companyId}/notifications/mark_all_read`
 export const unread_count_company_notifications_path = (companyId) => `/companies/${companyId}/notifications/unread_count`
 export const company_notification_config_path = (companyId) => `/companies/${companyId}/notification_config`
+export const company_notification_tags_path = (companyId) => `/companies/${companyId}/notification_tags`
+export const create_company_notification_tags_path = (companyId) => `/companies/${companyId}/notification_tags`
+export const new_company_notification_tag_path = (companyId) => `/companies/${companyId}/notification_tags/new`
+export const company_notification_tag_path = (companyId, tagId) => `/companies/${companyId}/notification_tags/${tagId}`
+export const edit_company_notification_tag_path = (companyId, tagId) => `/companies/${companyId}/notification_tags/${tagId}/edit`
 export const company_subscriptions_path = (companyId) => `/companies/${companyId}/subscriptions`
 export const company_policies_path = (companyId) => `/companies/${companyId}/policies`
 export const company_tasks_path = (companyId) => `/companies/${companyId}/tasks`

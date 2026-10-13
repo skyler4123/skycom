@@ -123,6 +123,7 @@ Rails.application.routes.draw do
         end
       end
       resource :notification_config, only: [ :show, :update ]
+      resources :notification_tags
       resources :events
       resources :event_configs
       resources :event_config_logs, only: [ :index, :show ]
