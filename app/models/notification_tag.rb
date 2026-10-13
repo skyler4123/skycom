@@ -1,4 +1,6 @@
 class NotificationTag < ApplicationRecord
+  attr_accessor :destroying_paired_for_role
+
   attribute :permission_resource_name, :string, default: -> { self.name }
 
   # --- Enums ---
@@ -17,9 +19,17 @@ class NotificationTag < ApplicationRecord
 
   before_destroy :prevent_destroy_if_system
 
+  def destroy_paired_for_role!
+    self.destroying_paired_for_role = true
+    destroy!
+  ensure
+    self.destroying_paired_for_role = false
+  end
+
   private
 
   def prevent_destroy_if_system
+    return if destroying_paired_for_role
     return unless system?
     raise ActiveRecord::ReadOnlyRecord, "System notification tags cannot be deleted."
   end

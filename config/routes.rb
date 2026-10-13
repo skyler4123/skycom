@@ -139,6 +139,7 @@ Rails.application.routes.draw do
       end
       resources :subscription_plan_appointments
       resources :permissions
+      resources :roles
       resources :permission_logs, only: [ :index, :show ]
       resources :payment_method_appointments, only: [ :index, :edit, :update ]
       resources :policies
