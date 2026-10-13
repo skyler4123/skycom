@@ -44,7 +44,7 @@ export default class Admin_Companies_IndexController extends Admin_LayoutControl
         <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800">
           <div class="flex items-center justify-between px-6 py-4 border-b border-slate-200 dark:border-slate-800">
             <h2 class="text-base font-bold text-slate-900 dark:text-white">All Companies</h2>
-            <span class="text-sm text-slate-500">${this.companies.length} total</span>
+            <span class="text-sm text-slate-500 dark:text-slate-400">${this.companies.length} total</span>
           </div>
           <div class="overflow-x-auto">
             ${table({
@@ -82,12 +82,12 @@ export default class Admin_Companies_IndexController extends Admin_LayoutControl
                 phone_number: (value) => value ? `<span class="text-sm text-slate-600 dark:text-slate-400">${value}</span>` : '<span class="text-slate-300 dark:text-slate-700">—</span>',
                 owner: (value, record) => record.user?.name || '<span class="text-slate-300 dark:text-slate-700">—</span>',
                 workflow_status: (value) => `${Helpers.statusBadge(value)}`,
-                created_at: (value) => value ? `<span class="text-sm text-slate-500">${new Date(value).toLocaleDateString()}</span>` : '—'
+                created_at: (value) => value ? `<span class="text-sm text-slate-500 dark:text-slate-400">${new Date(value).toLocaleDateString()}</span>` : '—'
               },
               renderActions: (record) => `
                 <td class="py-4 px-6 text-sm text-right whitespace-nowrap">
                   <a href="${Helpers.admin_company_path(record.id)}"
-                    class="inline-flex items-center justify-center p-2 text-slate-500 hover:text-blue-600 hover:bg-blue-50 rounded-lg cursor-pointer">
+                    class="inline-flex items-center justify-center p-2 text-slate-500 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg cursor-pointer">
                     <span class="material-symbols-outlined text-[20px]">visibility</span>
                   </a>
                 </td>`

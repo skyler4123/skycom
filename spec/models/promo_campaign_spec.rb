@@ -47,4 +47,15 @@ RSpec.describe PromoCampaign, type: :model do
     })
     expect(c).to be_valid
   end
+
+  it "accepts explicit company_ids" do
+    c = build(:promo_campaign, conditions: { "company_ids" => [ SecureRandom.uuid ] })
+    expect(c).to be_valid
+  end
+
+  it "rejects invalid company_ids" do
+    c = build(:promo_campaign, conditions: { "company_ids" => [ "not-a-uuid" ] })
+    expect(c).not_to be_valid
+    expect(c.errors[:conditions]).to be_present
+  end
 end

@@ -73,7 +73,7 @@ export default class Admin_PaymentMethods_IndexController extends Admin_LayoutCo
                     b2c: 'bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400',
                     b2b: 'bg-purple-50 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400'
                   }
-                  const colorClass = colors[value] || 'bg-slate-50 text-slate-700'
+                  const colorClass = colors[value] || 'bg-slate-50 text-slate-700 dark:bg-slate-800 dark:text-slate-300'
                   return `<span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium capitalize ${colorClass}">${value?.toUpperCase() || '—'}</span>`
                 },
                 country: (value) => {
@@ -81,12 +81,12 @@ export default class Admin_PaymentMethods_IndexController extends Admin_LayoutCo
                   return `<span class="text-sm text-slate-600 dark:text-slate-400">${names[value] || value || '—'}</span>`
                 },
                 lifecycle_status: (value) => `${Helpers.statusBadge(value)}`,
-                created_at: (value) => value ? `<span class="text-sm text-slate-500">${new Date(value).toLocaleDateString()}</span>` : '—'
+                created_at: (value) => value ? `<span class="text-sm text-slate-500 dark:text-slate-400">${new Date(value).toLocaleDateString()}</span>` : '—'
               },
               renderActions: (record) => `
                 <td class="py-4 px-6 text-sm text-right whitespace-nowrap">
                   <a href="${Helpers.edit_admin_payment_method_path(record.id)}"
-                    class="inline-flex items-center justify-center p-2 text-slate-500 hover:text-blue-600 hover:bg-blue-50 rounded-lg cursor-pointer">
+                    class="inline-flex items-center justify-center p-2 text-slate-500 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg cursor-pointer">
                     <span class="material-symbols-outlined text-[20px]">edit</span>
                   </a>
                 </td>`

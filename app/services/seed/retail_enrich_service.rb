@@ -793,12 +793,12 @@ class Seed::RetailEnrichService
       EmployeeNotificationTagAppointment.find_or_create_by!(employee: employee, notification_tag: ops)
     end
 
-    Notifications::CreateService.call(company: @retail, title: "Welcome to notifications",
-      body: "System broadcasts will appear here.", tag_ids: [ announcements.id ])
-    Notifications::CreateService.call(company: @retail, title: "Inventory sync completed",
+    Notifications::CreateService.call(company: @retail, name: "Welcome to notifications",
+      description: "System broadcasts will appear here.", tag_ids: [ announcements.id ])
+    Notifications::CreateService.call(company: @retail, name: "Inventory sync completed",
       tag_ids: [ ops.id ])
-    Notifications::CreateService.call(company: @retail, title: "Low stock alert",
-      body: "Some SKUs are running low.", severity: :warning, tag_ids: [ ops.id ])
+    Notifications::CreateService.call(company: @retail, name: "Low stock alert",
+      description: "Some SKUs are running low.", severity: :warning, tag_ids: [ ops.id ])
   end
 
   def run_purchase_workflow(purchase, requester, manager, index)

@@ -1,6 +1,10 @@
 class NotificationTag < ApplicationRecord
   attr_accessor :destroying_paired_for_role
 
+  # Canonical system tag names (single source of truth — see Seed::NotificationTagService::FIXED_TAGS).
+  OWNER_TAG_NAME = "Owner".freeze
+  ALL_EMPLOYEES_TAG_NAME = "All Employees".freeze
+
   attribute :permission_resource_name, :string, default: -> { self.name }
 
   # --- Enums ---

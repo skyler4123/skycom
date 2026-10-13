@@ -87,7 +87,7 @@ export default class Admin_CompanyCredits_IndexController extends Admin_LayoutCo
                 code: (value) => `<span class="font-mono text-xs bg-slate-100 dark:bg-slate-800/60 px-2 py-0.5 rounded text-slate-600 dark:text-slate-300 font-medium">${value || "—"}</span>`,
                 main_credit_balance: (value) => `<span class="font-mono text-sm text-slate-900 dark:text-white">${Number(value || 0).toLocaleString()}</span>`,
                 promo_credit_balance: (value) => `<span class="font-mono text-sm font-medium text-emerald-600 dark:text-emerald-400">${Number(value || 0).toLocaleString()}</span>`,
-                debt_credit_balance: (value) => `<span class="font-mono text-sm text-slate-500">${Number(value || 0).toLocaleString()}</span>`,
+                debt_credit_balance: (value) => `<span class="font-mono text-sm text-slate-500 dark:text-slate-400">${Number(value || 0).toLocaleString()}</span>`,
                 total_credit_balance: (value) => `<span class="font-mono text-sm font-bold text-slate-900 dark:text-white">${Number(value || 0).toLocaleString()}</span>`,
                 owner_name: (value) => value ? `<span class="text-sm text-slate-600 dark:text-slate-400">${value}</span>` : '<span class="text-slate-300 dark:text-slate-700">—</span>'
               }

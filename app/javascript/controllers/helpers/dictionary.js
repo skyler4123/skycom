@@ -439,6 +439,7 @@ export const dictionary = () => {
     "Failed to load roles": { vi: "Không tải được danh sách vai trò" },
     "Failed to load role.": { vi: "Không tải được vai trò." },
     "Notification Tag": { vi: "Thẻ thông báo" },
+    "Notification": { vi: "Thông báo" },
     "Delete role": { vi: "Xóa vai trò" },
     "Its notification tag will be removed also — subscribers will stop receiving role broadcasts!": { vi: "Thẻ thông báo của vai trò này cũng sẽ bị xóa — người đăng ký sẽ ngừng nhận thông báo!" },
     "e.g. Cashier": { vi: "VD: Thu ngân" },

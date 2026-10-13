@@ -15,6 +15,12 @@ module PromoCampaigns
 
     def call
       scope = Company.where.not(business_type: :system)
+      if @conds["company_ids"].present?
+        ids = Array(@conds["company_ids"]).map(&:to_s).select { |v|
+          v.match?(/\A[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\z/i)
+        }
+        return scope.where(id: ids)
+      end
       scope = scope.where(country: Array(@conds["country"])) if @conds["country"].present?
       scope = scope.where(business_type: Array(@conds["business_type"])) if @conds["business_type"].present?
       scope = scope.where("employee_count >= ?", @conds["employee_count_min"].to_i) if @conds["employee_count_min"].present?

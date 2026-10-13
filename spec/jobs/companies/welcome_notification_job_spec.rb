@@ -24,8 +24,8 @@ RSpec.describe Companies::WelcomeNotificationJob, type: :job do
     described_class.perform_now(company.id)
 
     notification = Notification.where(company: company).order(:created_at).last
-    expect(notification.title).to eq(WELCOME_NOTIFICATION_CONTENT[:us][:title])
-    expect(notification.body).to eq(WELCOME_NOTIFICATION_CONTENT[:us][:body])
+    expect(notification.name).to eq(WELCOME_NOTIFICATION_CONTENT[:us][:name])
+    expect(notification.description).to eq(WELCOME_NOTIFICATION_CONTENT[:us][:description])
     expect(Notifications::UnreadQuery.new(company: company, employee: owner.reload).count).to eq(1)
     expect(Notifications::UnreadQuery.new(company: company, employee: teammate.reload).count).to eq(0)
   end
@@ -39,10 +39,10 @@ RSpec.describe Companies::WelcomeNotificationJob, type: :job do
     described_class.perform_now(hotel.id)
     described_class.perform_now(retail.id)
 
-    expect(Notification.where(company: hotel).order(:created_at).last.title)
-      .to eq(WELCOME_NOTIFICATION_CONTENT[:vn][:title])
-    expect(Notification.where(company: retail).order(:created_at).last.body)
-      .to eq(WELCOME_NOTIFICATION_CONTENT[:vn][:body])
+    expect(Notification.where(company: hotel).order(:created_at).last.name)
+      .to eq(WELCOME_NOTIFICATION_CONTENT[:vn][:name])
+    expect(Notification.where(company: retail).order(:created_at).last.description)
+      .to eq(WELCOME_NOTIFICATION_CONTENT[:vn][:description])
   end
 
   it "is idempotent on retry" do

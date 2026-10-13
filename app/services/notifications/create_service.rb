@@ -12,17 +12,17 @@
 # (e.g. stock-low firing 20x/min creates 1 row, not 20).
 module Notifications
   class CreateService
-    def self.call(company:, title:, tag_ids:, body: nil, severity: :info, url: nil,
+    def self.call(company:, name:, tag_ids:, description: nil, severity: :info, url: nil,
       throttle_key: nil, throttle_window: nil)
-      new(company: company, title: title, body: body, severity: severity, url: url,
+      new(company: company, name: name, description: description, severity: severity, url: url,
         tag_ids: tag_ids, throttle_key: throttle_key,
         throttle_window: throttle_window).call
     end
 
-    def initialize(company:, title:, tag_ids:, body:, severity:, url:, throttle_key:, throttle_window:)
+    def initialize(company:, name:, tag_ids:, description:, severity:, url:, throttle_key:, throttle_window:)
       @company = company
-      @title = title
-      @body = body
+      @name = name
+      @description = description
       @severity = severity
       @url = url
       @tag_ids = Array(tag_ids)
@@ -31,7 +31,7 @@ module Notifications
     end
 
     def call
-      return failure("Title is required") if @title.to_s.strip.empty?
+      return failure("Name is required") if @name.to_s.strip.empty?
       return failure("At least one tag is required") if @tag_ids.empty?
 
       tags = NotificationTag.where(company: @company, id: @tag_ids)
@@ -45,7 +45,7 @@ module Notifications
 
         ActiveRecord::Base.transaction(requires_new: true) do
           notification = Notification.create!(
-            company: @company, title: @title, body: @body, severity: @severity, url: @url,
+            company: @company, name: @name, description: @description, severity: @severity, url: @url,
             metadata: @throttle_key.present? ? { "throttle_key" => @throttle_key } : {}
           )
           rows = @tag_ids.map do |tag_id|

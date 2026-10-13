@@ -61,7 +61,7 @@ export default class Companies_Notifications_IndexController extends Companies_L
 
   contentHTML() {
     const columns = [
-      { key: "title", name: translate("Title") },
+      { key: "name", name: translate("Name") },
       { key: "severity", name: translate("Severity") },
       { key: "tags", name: translate("Tags") },
       { key: "created_at", name: translate("Received") },
@@ -98,7 +98,7 @@ export default class Companies_Notifications_IndexController extends Companies_L
               identifier: this.identifier,
               target: "notificationsList",
               renderers: {
-                title: (value, record) => `
+                name: (value, record) => `
                   <a href="${Helpers.company_notification_path(currentCompany().id, record.id)}"
                     class="font-medium ${record.read ? "text-slate-500 dark:text-slate-400" : "text-slate-900 dark:text-white"} hover:text-blue-600 dark:hover:text-blue-400 transition-colors cursor-pointer">
                     ${value || translate("Untitled notification")}

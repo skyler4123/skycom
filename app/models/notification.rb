@@ -24,5 +24,5 @@ class Notification < ApplicationRecord
   }
 
   # --- Validations ---
-  validates :title, presence: true
+  validates :name, presence: true
 end

@@ -3,7 +3,7 @@ require "rails_helper"
 RSpec.describe EmployeeNotificationRead, type: :model do
   let(:company) { create(:company) }
   let(:employee) { create(:employee, company: company, business_type: :full_time) }
-  let(:notif) { Notification.create!(company: company, title: "t") }
+  let(:notif) { Notification.create!(company: company, name: "t") }
 
   describe "associations" do
     it { should belong_to(:company) }

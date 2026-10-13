@@ -42,6 +42,23 @@ export default class Home_IndexController extends Controller {
       signedin.classList.remove("hidden")
       signedin.classList.add("flex")
     }
+    this.revealAdminLink()
+  }
+
+  // Role needs the client cache, which arrives after connect — poll for it.
+  revealAdminLink() {
+    poll(() => {
+      const role = currentUser()?.system_role
+      if (!role) return false
+      if (role === "super_admin" || role === "admin") {
+        const adminLink = this.element.querySelector("#header-admin-link")
+        if (adminLink) {
+          adminLink.classList.remove("hidden")
+          adminLink.classList.add("inline-flex")
+        }
+      }
+      return true
+    })
   }
 
   switchTenant(event) {

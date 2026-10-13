@@ -8,7 +8,7 @@ RSpec.feature "Companies::Notifications Index", type: :feature, js: true do
 
   before do
     EmployeeNotificationTagAppointment.create!(employee: owner_employee, notification_tag: tag)
-    Notifications::CreateService.call(company: company, title: "Server rebooted", tag_ids: [ tag.id ])
+    Notifications::CreateService.call(company: company, name: "Server rebooted", tag_ids: [ tag.id ])
 
     sign_in(owner)
 

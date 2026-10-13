@@ -117,7 +117,7 @@ class Employee < ApplicationRecord
 
   before_discard :prevent_discard_if_owner
   before_destroy :prevent_destroy_if_owner
-  after_create :subscribe_to_all_company_tag
+  after_create :subscribe_to_all_employees_tag
 
   def subscribed_notification_tag_ids
     employee_notification_tag_appointments.pluck(:notification_tag_id)
@@ -125,8 +125,8 @@ class Employee < ApplicationRecord
 
   private
 
-  def subscribe_to_all_company_tag
-    tag = NotificationTag.find_by(company_id: company_id, name: "All Company")
+  def subscribe_to_all_employees_tag
+    tag = NotificationTag.find_by(company_id: company_id, name: NotificationTag::ALL_EMPLOYEES_TAG_NAME)
     return if tag.nil?
 
     EmployeeNotificationTagAppointment.find_or_create_by!(employee: self, notification_tag: tag)

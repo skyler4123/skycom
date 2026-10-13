@@ -223,7 +223,7 @@ RSpec.describe "Toast message responses", type: :request do
   describe "CompaniesController#create" do
     it "returns message in JSON success response" do
       post "/companies",
-        params: { company: { name: "New Co", business_type: "retail" } }, headers: headers
+        params: { company: { name: "New Co", business_type: "retail", country: "us" } }, headers: headers
       expect(response).to have_http_status(:created)
       body = JSON.parse(response.body)
       expect(body["message"]).to eq("Company created successfully")

@@ -5,9 +5,9 @@ RSpec.describe Notifications::PruneJob, type: :job do
   let(:tag) { NotificationTag.create!(company: company, name: "ops") }
 
   it "prunes notifications older than retention" do
-    old = Notifications::CreateService.call(company: company, title: "old", tag_ids: [ tag.id ])[:notification]
+    old = Notifications::CreateService.call(company: company, name: "old", tag_ids: [ tag.id ])[:notification]
     old.update_column(:created_at, 100.days.ago)
-    fresh = Notifications::CreateService.call(company: company, title: "fresh", tag_ids: [ tag.id ])[:notification]
+    fresh = Notifications::CreateService.call(company: company, name: "fresh", tag_ids: [ tag.id ])[:notification]
 
     described_class.perform_now
 
@@ -19,7 +19,7 @@ RSpec.describe Notifications::PruneJob, type: :job do
     employee = create(:employee, company: company, business_type: :full_time)
     tag = NotificationTag.create!(company: company, name: "ops")
     EmployeeNotificationTagAppointment.create!(employee: employee, notification_tag: tag)
-    old = Notifications::CreateService.call(company: company, title: "old", tag_ids: [ tag.id ])[:notification]
+    old = Notifications::CreateService.call(company: company, name: "old", tag_ids: [ tag.id ])[:notification]
     old.update_column(:created_at, 100.days.ago)
     NotificationConfig.for_employee!(employee).update!(last_read_all_at: 101.days.ago)
 

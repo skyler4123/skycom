@@ -9,7 +9,7 @@ RSpec.describe "Notifications::CreateService concurrency" do
     threads = 5.times.map do
       Thread.new do
         ActiveRecord::Base.connection_pool.with_connection do
-          results << Notifications::CreateService.call(company: company, title: "burst",
+          results << Notifications::CreateService.call(company: company, name: "burst",
             tag_ids: [ tag.id ], throttle_key: "burst:1", throttle_window: 1.hour)
         end
       end

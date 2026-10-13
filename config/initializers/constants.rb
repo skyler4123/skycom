@@ -231,14 +231,14 @@ PERSONAL_SIDEBAR_CODE = "PERSONAL_SIDEBAR".freeze
 # country only. See docs/MODEL_CALLBACKS.md (Company#initialize_company).
 # =============================================================================
 
-# Country → welcome title/body. Fallback is :us when the country is unknown.
+# Country → welcome name/description. Fallback is :us when the country is unknown.
 WELCOME_NOTIFICATION_CONTENT = {
   us: {
-    title: "Welcome to Skycom!",
-    body: "Your company is ready. Explore your dashboard, invite your team, and start selling — we're here if you need help."
+    name: "Welcome to Skycom!",
+    description: "Your company is ready. Explore your dashboard, invite your team, and start selling — we're here if you need help."
   },
   vn: {
-    title: "Chào mừng bạn đến với Skycom!",
-    body: "Công ty của bạn đã sẵn sàng. Hãy khám phá bảng điều khiển, mời đội ngũ của bạn và bắt đầu bán hàng — chúng tôi luôn sẵn sàng hỗ trợ."
+    name: "Chào mừng bạn đến với Skycom!",
+    description: "Công ty của bạn đã sẵn sàng. Hãy khám phá bảng điều khiển, mời đội ngũ của bạn và bắt đầu bán hàng — chúng tôi luôn sẵn sàng hỗ trợ."
   }
 }.freeze

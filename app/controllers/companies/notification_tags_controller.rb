@@ -1,7 +1,7 @@
 # app/controllers/companies/notification_tags_controller.rb
 #
 # NotificationTag dashboard API (Shell-First). User-managed broadcast tags:
-# custom tags are fully CRUD-able, system tags (All Company, Promotion,
+# custom tags are fully CRUD-able, system tags (Owner, All Employees,
 # All <Role>) are read-only in the UI and destroy-blocked at the model.
 # Serves Stimulus: Companies_NotificationTags_IndexController,
 #                  Companies_NotificationTags_NewController|ShowController|EditController

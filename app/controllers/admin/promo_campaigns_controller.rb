@@ -154,6 +154,9 @@ class Admin::PromoCampaignsController < Admin::ApplicationController
         out[key.to_s] = value.to_i if value.present?
       when "created_after", "created_before"
         out[key.to_s] = value.to_s if value.present?
+      when "company_ids"
+        list = Array(value).flat_map { |v| v.to_s.split(/[\s,]+/) }.map(&:strip).reject(&:blank?)
+        out["company_ids"] = list if list.any?
       else
         out[key.to_s] = value
       end

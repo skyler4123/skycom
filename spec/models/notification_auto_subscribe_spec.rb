@@ -2,23 +2,23 @@ require "rails_helper"
 
 RSpec.describe "notification auto-subscribe" do
   let(:company) { create(:company) }
-  let!(:all_company) do
-    NotificationTag.create!(company: company, name: "All Company", business_type: :system)
+  let!(:all_employees) do
+    NotificationTag.create!(company: company, name: "All Employees", business_type: :system)
   end
   let!(:all_cashier) do
     NotificationTag.create!(company: company, name: "All Cashier", business_type: :system)
   end
 
-  it "subscribes a new employee to All Company" do
+  it "subscribes a new employee to All Employees" do
     employee = create(:employee, company: company, business_type: :full_time)
-    expect(employee.subscribed_notification_tags).to include(all_company)
+    expect(employee.subscribed_notification_tags).to include(all_employees)
   end
 
   it "subscribes an employee to their role tag on role assignment" do
     role = Seed::RoleService.create(company: company, name: "Cashier")
     employee = create(:employee, company: company, business_type: :full_time)
     employee.attach_role(role.name)
-    expect(employee.reload.subscribed_notification_tags).to include(all_cashier, all_company)
+    expect(employee.reload.subscribed_notification_tags).to include(all_cashier, all_employees)
   end
 
   it "does nothing when tags do not exist (legacy company)" do

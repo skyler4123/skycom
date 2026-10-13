@@ -10,6 +10,7 @@ class PromoCampaign < ApplicationRecord
     employee_count_min employee_count_max
     created_after created_before
     promo_balance_min promo_balance_max
+    company_ids
   ].freeze
 
   attribute :permission_resource_name, :string, default: -> { self.name }
@@ -71,6 +72,12 @@ class PromoCampaign < ApplicationRecord
       rescue ArgumentError
         errors.add(:conditions, "#{key} must be a valid date")
       end
+    end
+
+    if conds["company_ids"].present?
+      ids = Array(conds["company_ids"]).map(&:to_s).reject(&:blank?)
+      bad = ids.reject { |v| v.match?(/\A[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\z/i) }
+      errors.add(:conditions, "company_ids must be valid UUIDs") if bad.any?
     end
   end
 end

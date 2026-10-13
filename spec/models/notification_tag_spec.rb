@@ -9,12 +9,12 @@ RSpec.describe NotificationTag, type: :model do
   end
 
   it "marks system tags with business_type system" do
-    tag = NotificationTag.create!(company: company, name: "All Company", business_type: :system)
+    tag = NotificationTag.create!(company: company, name: "All Employees", business_type: :system)
     expect(tag.system?).to be(true)
   end
 
   it "prevents deletion of system tags" do
-    tag = NotificationTag.create!(company: company, name: "All Company", business_type: :system)
+    tag = NotificationTag.create!(company: company, name: "All Employees", business_type: :system)
     expect { tag.destroy! }.to raise_error(ActiveRecord::ReadOnlyRecord, "System notification tags cannot be deleted.")
   end
 
