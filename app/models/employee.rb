@@ -126,7 +126,7 @@ class Employee < ApplicationRecord
   private
 
   def subscribe_to_all_employees_tag
-    tag = NotificationTag.find_by(company_id: company_id, name: "All Employees")
+    tag = NotificationTag.find_by(company_id: company_id, name: NotificationTag::ALL_EMPLOYEES_TAG_NAME)
     return if tag.nil?
 
     EmployeeNotificationTagAppointment.find_or_create_by!(employee: self, notification_tag: tag)

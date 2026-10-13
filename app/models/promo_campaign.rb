@@ -76,7 +76,7 @@ class PromoCampaign < ApplicationRecord
 
     if conds["company_ids"].present?
       ids = Array(conds["company_ids"]).map(&:to_s).reject(&:blank?)
-      bad = ids.reject { |v| v.match?(/\A[0-9a-fA-F-]{36}\z/) }
+      bad = ids.reject { |v| v.match?(/\A[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\z/i) }
       errors.add(:conditions, "company_ids must be valid UUIDs") if bad.any?
     end
   end

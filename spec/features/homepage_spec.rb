@@ -155,5 +155,26 @@ RSpec.feature "Homepage", type: :feature, js: true do
       # Verify no duplicate was created
       expect(Company.where(name: "Test Company").count).to eq(1)
     end
+
+    it "hides the admin dashboard link from non-admin owners" do
+      visit root_path
+
+      expect(page).to have_link("Go to Dashboard")
+      expect(page).to have_selector("#header-admin-link.hidden", visible: :hidden)
+    end
+  end
+
+  describe "Signed in admin" do
+    let(:admin) { create(:user, :admin, password: "Password@1234", password_confirmation: "Password@1234") }
+
+    before do
+      sign_in(admin)
+    end
+
+    it "reveals the admin dashboard link" do
+      visit root_path
+
+      expect(page).to have_link("Admin Dashboard", href: "/admin/companies", wait: 10)
+    end
   end
 end

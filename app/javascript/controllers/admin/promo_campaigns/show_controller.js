@@ -59,6 +59,7 @@ export default class Admin_PromoCampaigns_ShowController extends Admin_LayoutCon
 
     const fmtLocalWithOffset = (v) => {
       const d = new Date(v)
+      if (isNaN(d)) return "—"
       const pad = (n) => String(n).padStart(2, "0")
       const off = -d.getTimezoneOffset()
       const sign = off >= 0 ? "+" : "-"

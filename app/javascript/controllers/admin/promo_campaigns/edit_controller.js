@@ -111,7 +111,7 @@ export default class Admin_PromoCampaigns_EditController extends Admin_LayoutCon
             <div class="col-span-2 space-y-1">
               <label class="text-[10px] font-bold text-slate-400 uppercase">Company IDs (override other conditions)</label>
               <textarea name="promo_campaign[conditions][company_ids]" rows="2" placeholder="Paste company UUIDs, comma or newline separated (blank = all)"
-                class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-slate-900 dark:text-white text-sm font-mono">${(conds.company_ids || []).join(", ")}</textarea>
+                class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-slate-900 dark:text-white text-sm font-mono">${Array(conds.company_ids || []).join(", ")}</textarea>
             </div>
           </div>
         </div>

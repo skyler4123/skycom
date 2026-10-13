@@ -16,7 +16,9 @@ module PromoCampaigns
     def call
       scope = Company.where.not(business_type: :system)
       if @conds["company_ids"].present?
-        ids = Array(@conds["company_ids"]).map(&:to_s).reject(&:blank?)
+        ids = Array(@conds["company_ids"]).map(&:to_s).select { |v|
+          v.match?(/\A[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\z/i)
+        }
         return scope.where(id: ids)
       end
       scope = scope.where(country: Array(@conds["country"])) if @conds["country"].present?

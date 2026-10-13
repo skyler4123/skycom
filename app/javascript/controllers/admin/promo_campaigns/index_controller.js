@@ -30,6 +30,7 @@ export default class Admin_PromoCampaigns_IndexController extends Admin_LayoutCo
   contentHTML() {
     const fmtLocalWithOffset = (v) => {
       const d = new Date(v)
+      if (isNaN(d)) return "—"
       const pad = (n) => String(n).padStart(2, "0")
       const off = -d.getTimezoneOffset()
       const sign = off >= 0 ? "+" : "-"
@@ -40,7 +41,7 @@ export default class Admin_PromoCampaigns_IndexController extends Admin_LayoutCo
       { key: "amount", name: translate("Amount") },
       { key: "max_cap", name: translate("Max Cap") },
       { key: "status", name: "Status" },
-      { key: "scheduled_at", name: translate("Scheduled At") },
+      { key: "scheduled_at", name: `${translate("Scheduled At")} (local)` },
       { key: "created_at", name: "Created" }
     ]
 

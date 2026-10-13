@@ -35,8 +35,8 @@ class EmployeeRoleAppointment < ApplicationRecord
   def subscribe_employee_to_notification_tags
     return unless employee && role
 
-    names = [ "All Employees", role.paired_tag_name ]
-    names << "Owner" if employee.business_type.to_s == OWNER_BUSINESS_TYPE
+    names = [ NotificationTag::ALL_EMPLOYEES_TAG_NAME, role.paired_tag_name ]
+    names << NotificationTag::OWNER_TAG_NAME if employee.business_type.to_s == OWNER_BUSINESS_TYPE
     NotificationTag.where(company_id: company_id, name: names).find_each do |tag|
       EmployeeNotificationTagAppointment.find_or_create_by!(employee: employee, notification_tag: tag)
     end
