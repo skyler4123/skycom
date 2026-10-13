@@ -94,6 +94,9 @@ export default class Admin_LayoutController extends Controller {
         <div class="flex-1 flex flex-col overflow-hidden">
           <header class="h-16 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between px-6 shrink-0">
             <h1 class="text-lg font-bold text-slate-900 dark:text-white"></h1>
+            <div class="flex items-center gap-2">
+              <button class="flex cursor-pointer items-center justify-center overflow-hidden rounded-full h-10 w-10 p-2 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300" ${Helpers.darkmodeTrigger()}></button>
+            </div>
           </header>
           <main class="flex-1 overflow-y-auto" data-${this.identifier}-target="content"></main>
         </div>
