@@ -35,6 +35,10 @@ default: &default
     class: Notifications::PruneJob
     queue: default
     schedule: every day at 3am
+  promo_campaign_due_sweeper:
+    class: PromoCampaigns::DueSweeperJob
+    queue: default
+    schedule: every 5 minutes
 
 
 development:

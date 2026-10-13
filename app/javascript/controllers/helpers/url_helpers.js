@@ -24,6 +24,16 @@ export const auth_google_oauth2_path = () => `/auth/google_oauth2`
 export const admin_companies_path = () => `/admin/companies`
 export const admin_company_path = (companyId) => `/admin/companies/${companyId}`
 
+export const admin_company_credits_path = () => `/admin/company_credits`
+
+export const admin_promo_campaigns_path = () => `/admin/promo_campaigns`
+export const new_admin_promo_campaign_path = () => `/admin/promo_campaigns/new`
+export const admin_promo_campaign_path = (id) => `/admin/promo_campaigns/${id}`
+export const edit_admin_promo_campaign_path = (id) => `/admin/promo_campaigns/${id}/edit`
+export const create_admin_promo_campaigns_path = () => `/admin/promo_campaigns`
+export const run_now_admin_promo_campaign_path = (id) => `/admin/promo_campaigns/${id}/run_now`
+export const cancel_admin_promo_campaign_path = (id) => `/admin/promo_campaigns/${id}/cancel`
+
 export const admin_payment_methods_path = () => `/admin/payment_methods`
 export const new_admin_payment_method_path = () => `/admin/payment_methods/new`
 export const admin_payment_method_path = (id) => `/admin/payment_methods/${id}`
