@@ -58,6 +58,11 @@ Rails.application.routes.draw do
       end
       resources :transactions
       resources :employees
+      resources :employee_profiles
+      resources :employee_subprofiles
+      resources :customers
+      resources :customer_profiles
+      resources :customer_subprofiles
       resources :stocks
       resources :warehouses
       resources :stock_transfers do

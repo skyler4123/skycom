@@ -87,6 +87,8 @@ class Company < ApplicationRecord
   has_many :tags, dependent: :destroy
   has_many :employee_groups, dependent: :destroy
   has_many :employees, dependent: :destroy
+  has_many :employee_profiles, dependent: :destroy
+  has_many :employee_subprofiles, dependent: :destroy
   has_many :roles, dependent: :destroy
   has_many :policies, dependent: :destroy
   has_many :policy_role_appointments, dependent: :destroy
@@ -113,6 +115,8 @@ class Company < ApplicationRecord
   has_many :stock_pendings, dependent: :destroy
   has_many :suppliers, dependent: :destroy
   has_many :customers, dependent: :destroy
+  has_many :customer_profiles, dependent: :destroy
+  has_many :customer_subprofiles, dependent: :destroy
   has_many :customer_groups, dependent: :destroy
   has_many :orders, dependent: :destroy
   has_many :purchases, dependent: :destroy
