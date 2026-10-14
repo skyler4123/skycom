@@ -22,4 +22,8 @@ class Companies::EmployeeSubprofilesPolicy < ApplicationPolicy
   def update?
     record.can?(:update, EmployeeSubprofile)
   end
+
+  def destroy?
+    record.can?(:delete, EmployeeSubprofile)
+  end
 end

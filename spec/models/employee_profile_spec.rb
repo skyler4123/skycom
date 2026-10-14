@@ -36,6 +36,21 @@ RSpec.describe EmployeeProfile, type: :model do
       expect(profile).not_to be_valid
       expect(profile.errors[:name]).to be_present
     end
+
+    it "fails when employee belongs to another company" do
+      other = create(:company)
+      foreign_employee = create(:employee, company: other)
+      profile = EmployeeProfile.new(company: company, employee: foreign_employee, category: category, name: "Profile 1", business_type: :general)
+      expect(profile).not_to be_valid
+      expect(profile.errors[:employee]).to be_present
+    end
+
+    it "discarding cascades to subprofiles" do
+      profile = Seed::EmployeeProfileService.create(company: company, employee: employee, category: category, name: "Profile 1")
+      sub = Seed::EmployeeSubprofileService.create(company: company, employee: employee, employee_profile: profile, name: "Subprofile 11")
+      profile.discard!
+      expect(sub.reload.discarded?).to be_truthy
+    end
   end
   it_behaves_like "property_mapping concern", EmployeeProfile
 end

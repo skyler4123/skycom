@@ -65,4 +65,21 @@ RSpec.describe "Companies::CustomerSubprofilesController CRUD", type: :request d
       }.not_to change(CustomerSubprofile, :count)
     end
   end
+
+  describe "DELETE destroy" do
+    let(:d_customer) { create(:customer, company: company) }
+    let(:d_profile) { Seed::CustomerProfileService.create(company: company, customer: d_customer, category: profile_category, name: "DProf #{SecureRandom.hex(4)}") }
+    let!(:destroy_record) { Seed::CustomerSubprofileService.create(company: company, customer: d_customer, customer_profile: d_profile, category: category, name: "Doomed #{SecureRandom.hex(4)}") }
+
+    it "discards the record" do
+      delete "/companies/#{company.id}/customer_subprofiles/#{destroy_record.id}.json"
+      expect(response).to have_http_status(:ok)
+      expect(destroy_record.reload.discarded?).to be_truthy
+    end
+
+    it "returns not_found for missing id" do
+      delete "/companies/#{company.id}/customer_subprofiles/nonexistent-id.json"
+      expect(response).to have_http_status(:not_found)
+    end
+  end
 end

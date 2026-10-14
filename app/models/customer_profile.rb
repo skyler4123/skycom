@@ -34,4 +34,21 @@ class CustomerProfile < ApplicationRecord
   validates :description, length: { maximum: 5000 }, allow_blank: true
 
   validates :business_type, presence: true
+  validate :customer_belongs_to_company
+
+  before_discard :discard_subprofiles
+
+  private
+
+  def customer_belongs_to_company
+    return if customer.nil? || company_id.blank?
+
+    if customer.company_id != company_id
+      errors.add(:customer, "must belong to the same company")
+    end
+  end
+
+  def discard_subprofiles
+    customer_subprofiles.kept.find_each(&:discard!)
+  end
 end

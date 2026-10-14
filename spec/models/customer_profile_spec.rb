@@ -36,6 +36,21 @@ RSpec.describe CustomerProfile, type: :model do
       expect(profile).not_to be_valid
       expect(profile.errors[:name]).to be_present
     end
+
+    it "fails when customer belongs to another company" do
+      other = create(:company)
+      foreign_customer = create(:customer, company: other)
+      profile = CustomerProfile.new(company: company, customer: foreign_customer, category: category, name: "Profile 1", business_type: :general)
+      expect(profile).not_to be_valid
+      expect(profile.errors[:customer]).to be_present
+    end
+
+    it "discarding cascades to subprofiles" do
+      profile = Seed::CustomerProfileService.create(company: company, customer: customer, category: category, name: "Profile 1")
+      sub = Seed::CustomerSubprofileService.create(company: company, customer: customer, customer_profile: profile, name: "Subprofile 11")
+      profile.discard!
+      expect(sub.reload.discarded?).to be_truthy
+    end
   end
   it_behaves_like "property_mapping concern", CustomerProfile
 end

@@ -60,7 +60,6 @@ Rails.application.routes.draw do
       resources :employees
       resources :employee_profiles
       resources :employee_subprofiles
-      resources :customers
       resources :customer_profiles
       resources :customer_subprofiles
       resources :stocks

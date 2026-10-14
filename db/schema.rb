@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_10_14_000004) do
+ActiveRecord::Schema[8.1].define(version: 2026_10_14_000005) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pgcrypto"
@@ -1816,6 +1816,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_14_000004) do
     t.index ["code"], name: "index_customer_profiles_on_code", unique: true
     t.index ["company_id", "customer_id"], name: "index_customer_profiles_on_company_id_and_customer_id"
     t.index ["company_id"], name: "index_customer_profiles_on_company_id"
+    t.index ["customer_id", "name"], name: "idx_customer_profiles_on_customer_and_name", unique: true
     t.index ["customer_id"], name: "index_customer_profiles_on_customer_id"
     t.index ["discarded_at"], name: "index_customer_profiles_on_discarded_at"
     t.index ["email"], name: "index_customer_profiles_on_email", unique: true
@@ -1970,6 +1971,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_14_000004) do
     t.index ["company_id"], name: "index_customer_subprofiles_on_company_id"
     t.index ["customer_id"], name: "index_customer_subprofiles_on_customer_id"
     t.index ["customer_profile_id", "customer_id"], name: "idx_customer_subprofiles_on_profile_and_customer"
+    t.index ["customer_profile_id", "name"], name: "idx_customer_subprofiles_on_profile_and_name", unique: true
     t.index ["customer_profile_id"], name: "index_customer_subprofiles_on_customer_profile_id"
     t.index ["discarded_at"], name: "index_customer_subprofiles_on_discarded_at"
     t.index ["email"], name: "index_customer_subprofiles_on_email", unique: true
@@ -2979,6 +2981,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_14_000004) do
     t.index ["company_id"], name: "index_employee_profiles_on_company_id"
     t.index ["discarded_at"], name: "index_employee_profiles_on_discarded_at"
     t.index ["email"], name: "index_employee_profiles_on_email", unique: true
+    t.index ["employee_id", "name"], name: "idx_employee_profiles_on_employee_and_name", unique: true
     t.index ["employee_id"], name: "index_employee_profiles_on_employee_id"
     t.index ["lifecycle_status"], name: "index_employee_profiles_on_lifecycle_status"
     t.index ["property_mapping_id"], name: "index_employee_profiles_on_property_mapping_id"
@@ -3237,6 +3240,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_14_000004) do
     t.index ["email"], name: "index_employee_subprofiles_on_email", unique: true
     t.index ["employee_id"], name: "index_employee_subprofiles_on_employee_id"
     t.index ["employee_profile_id", "employee_id"], name: "idx_employee_subprofiles_on_profile_and_employee"
+    t.index ["employee_profile_id", "name"], name: "idx_employee_subprofiles_on_profile_and_name", unique: true
     t.index ["employee_profile_id"], name: "index_employee_subprofiles_on_employee_profile_id"
     t.index ["lifecycle_status"], name: "index_employee_subprofiles_on_lifecycle_status"
     t.index ["property_mapping_id"], name: "index_employee_subprofiles_on_property_mapping_id"

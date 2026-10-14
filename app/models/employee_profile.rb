@@ -34,4 +34,21 @@ class EmployeeProfile < ApplicationRecord
   validates :description, length: { maximum: 5000 }, allow_blank: true
 
   validates :business_type, presence: true
+  validate :employee_belongs_to_company
+
+  before_discard :discard_subprofiles
+
+  private
+
+  def employee_belongs_to_company
+    return if employee.nil? || company_id.blank?
+
+    if employee.company_id != company_id
+      errors.add(:employee, "must belong to the same company")
+    end
+  end
+
+  def discard_subprofiles
+    employee_subprofiles.kept.find_each(&:discard!)
+  end
 end

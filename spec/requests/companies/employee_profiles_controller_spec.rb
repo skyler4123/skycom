@@ -89,4 +89,20 @@ RSpec.describe "Companies::EmployeeProfilesController CRUD", type: :request do
       expect(JSON.parse(response.body)["errors"]).to be_present
     end
   end
+
+  describe "DELETE destroy" do
+    let(:destroy_employee) { create(:employee, company: company) }
+    let!(:destroy_record) { Seed::EmployeeProfileService.create(company: company, employee: destroy_employee, category: category, name: "Doomed #{SecureRandom.hex(4)}") }
+
+    it "discards the record" do
+      delete "/companies/#{company.id}/employee_profiles/#{destroy_record.id}.json"
+      expect(response).to have_http_status(:ok)
+      expect(destroy_record.reload.discarded?).to be_truthy
+    end
+
+    it "returns not_found for missing id" do
+      delete "/companies/#{company.id}/employee_profiles/nonexistent-id.json"
+      expect(response).to have_http_status(:not_found)
+    end
+  end
 end

@@ -2,14 +2,20 @@
 FactoryBot.define do
   factory :employee_profile do
     association :company
-    association :employee
-    association :category
-    name { "Profile #{SecureRandom.hex(4)}" }
-    description { Faker::Lorem.sentence(word_count: 10) }
-    code { "EP-#{SecureRandom.hex(4).upcase}" }
-    lifecycle_status { EmployeeProfile.lifecycle_statuses.keys.sample }
-    workflow_status { EmployeeProfile.workflow_statuses.keys.sample }
-    business_type { EmployeeProfile.business_types.keys.sample }
-    discarded_at { nil }
+    employee { association :employee, company: company }
+
+    initialize_with do
+      Seed::EmployeeProfileService.new(company: company, employee: employee).tap do |record|
+        if record.category.nil? && record.company.present?
+          record.category = Seed::CategoryService.find_or_create_for(
+            company: record.company,
+            resource_name: record.class.model_name.plural
+          )
+        end
+        if record.property_mapping.nil? && record.category.present?
+          record.property_mapping = record.category.default_property_mapping
+        end
+      end
+    end
   end
 end
