@@ -38,12 +38,14 @@ module Employee::PermissionConcern
       matching_policies.any? { |policy| evaluate_tag_conditions(target, policy[:tag_conditions]) }
     end
 
-    # Check if employee has owner role (business_type = :owner)
-    # Cached 1 day in local_cache: owner assignment is immutable
-    # (creation-time only, update/destroy blocked) so it never changes;
-    # employee touch (role assignment) bumps cache_key_with_version anyway.
+    # Check if employee has owner role (business_type = :owner).
+    # Cached 1 day in ram_cache: boolean is tiny (bytes), read on every
+    # can? check (hot path), and owner assignment is immutable
+    # (creation-time only, update/destroy blocked) so per-worker isolation
+    # is harmless; employee touch (role assignment) bumps
+    # cache_key_with_version anyway.
     def owner_role?
-      Rails.local_cache.fetch("#{cache_key_with_version}/owner_role", expires_in: OWNER_ROLE_CACHE_EXPIRY) do
+      Rails.ram_cache.fetch("#{cache_key_with_version}/owner_role", expires_in: OWNER_ROLE_CACHE_EXPIRY) do
         EmployeeRoleAppointment.cached_where(employee_id: id).any? { |ra| ra.business_type == OWNER_BUSINESS_TYPE }
       end
     end
@@ -140,6 +142,7 @@ module Employee::PermissionConcern
     end
 
     def clear_permissions_cache
+      Rails.ram_cache.delete("#{cache_key_with_version}/owner_role")
       Rails.local_cache.delete("#{cache_key_with_version}/permissions")
       Rails.local_cache.delete("#{cache_key_with_version}/permissions_by_role")
       Rails.local_cache.delete("#{cache_key_with_version}/owner_role")

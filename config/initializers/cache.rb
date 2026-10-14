@@ -5,7 +5,26 @@ module Rails
     # Used by sync_cache to broadcast write/delete events to all instances.
     SYNC_CACHE_CHANNEL = "sync_cache:invalidation".freeze
 
+    # Pure process-level RAM cache (Fastest, volatile, per-worker memory).
+    # Backend: Ruby heap via ActiveSupport::Cache::MemoryStore (64 MB cap).
+    # Speed: nanoseconds/microseconds — no SQLite I/O, no network.
+    # Persistence: wiped on restart/deploy. Scope: isolated per Puma worker
+    # (workers do NOT share entries). Risk: high RAM / OOM if large values
+    # are stored — keep values tiny.
+    # Best for: tiny hot-keys, app configs, feature flags, high-frequency
+    # boolean checks such as Employee#owner_role? (1.day TTL). Booleans are
+    # ideal: bytes per entry, immutable owner assignment means per-worker
+    # divergence is harmless.
+    def ram_cache
+      @ram_cache ||= ActiveSupport::Cache.lookup_store(:memory_store, size: 64.megabytes)
+    end
+
     # Per-server Solid Cache (SQLite). Fast local reads, no network cost.
+    # Backend: local SQLite file (storage/*_cache.sqlite3). Speed:
+    # milliseconds (disk I/O). Persistence: survives restarts/deploys.
+    # Scope: shared across workers on the same host. Risk: disk usage.
+    # Best for: larger query results, generated fragments, items that
+    # shouldn't vanish on deploy.
     # Used directly by AnalyticsController and PermissionConcern
     # for cached data that doesn't need cross-instance synchronization.
     def local_cache
@@ -37,6 +56,10 @@ end
 # Reads hit the per-server SQLite cache directly (fast, no network).
 # Mutations also publish to a shared Redis channel so all server instances
 # can evict the stale key from their own local_cache.
+# NOTE: Rails.ram_cache is deliberately NOT wrapped here — call it directly
+# for tiny per-worker hot-keys (e.g. Employee#owner_role? boolean). The
+# invalidation listener below still evicts ram_cache keys as best-effort
+# so a broadcast delete clears both stores.
 class SyncCache
   CHANNEL = "sync_cache:invalidation".freeze
 
@@ -66,12 +89,15 @@ class SyncCache
   end
 
   # Called by the background listener when an invalidation message arrives
-  # from another instance. Evicts the stale key from local_cache.
+  # from another instance. Evicts the stale key from ram_cache (best-effort,
+  # per-worker) and local_cache.
   def handle_invalidation(payload)
     data = JSON.parse(payload) rescue nil
     return unless data && data["key"]
 
-    Rails.local_cache.delete(data["key"])
+    key = data["key"]
+    Rails.ram_cache.delete(key)
+    Rails.local_cache.delete(key)
   rescue => e
     Rails.logger.error("[SyncCache] Invalidation handling error: #{e.message}")
   end
