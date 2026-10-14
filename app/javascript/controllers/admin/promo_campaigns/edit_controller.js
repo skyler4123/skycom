@@ -50,6 +50,18 @@ export default class Admin_PromoCampaigns_EditController extends Admin_LayoutCon
               class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-slate-900 dark:text-white text-sm">${c.description || ""}</textarea>
           </div>
 
+          <div class="col-span-2 space-y-1">
+            <label class="text-[10px] font-bold text-slate-400 uppercase">${translate("Notification Title")}</label>
+            <input type="text" name="promo_campaign[title]" value="${c.title || ""}" required placeholder="e.g. Skycom gave you 300 credits!"
+              class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-slate-900 dark:text-white text-sm">
+          </div>
+
+          <div class="col-span-2 space-y-1">
+            <label class="text-[10px] font-bold text-slate-400 uppercase">${translate("Notification Body")}</label>
+            <textarea name="promo_campaign[body]" rows="2" required placeholder="e.g. Promo 'Holiday Bonus' added 300 promo credits (cap 1000). Thank you for using Skycom! Here is our help to grow your business."
+              class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-slate-900 dark:text-white text-sm">${c.body || ""}</textarea>
+          </div>
+
           <div class="space-y-1">
             <label class="text-[10px] font-bold text-slate-400 uppercase">${translate("Amount")}</label>
             <input type="number" step="1" min="1" name="promo_campaign[amount]" value="${c.amount ?? ""}" required
