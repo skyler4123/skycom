@@ -32,6 +32,28 @@ RSpec.describe PromoCampaigns::ExecuteService, type: :model do
       .where(company: company, notification_tag_appointments: { notification_tag_id: tag_ids }).count).to be >= 1
   end
 
+  it "notifies with campaign title/body" do
+    campaign = campaign_for(amount: 300, max_cap: 1000)
+    campaign.update!(title: "Custom title 300", body: "Custom body cap 1000")
+
+    described_class.call(campaign: campaign)
+
+    n = Notification.where(company: company).order(created_at: :desc).first
+    expect(n.name).to eq("Custom title 300")
+    expect(n.description).to eq("Custom body cap 1000")
+  end
+
+  it "falls back to defaults when title/body blank (legacy)" do
+    campaign = campaign_for(amount: 300, max_cap: 1000)
+    campaign.update_columns(title: "", body: "")
+
+    described_class.call(campaign: campaign.reload)
+
+    n = Notification.where(company: company).order(created_at: :desc).first
+    expect(n.name).to include("300")
+    expect(n.description).to include(campaign.name)
+  end
+
   it "grants partial amount at the cap (900 + 300 cap 1000 → +100)" do
     company.company_wallet.add_to!(balance: :promo, amount: 900)
     campaign = campaign_for(amount: 300, max_cap: 1000)
