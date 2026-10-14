@@ -323,4 +323,25 @@ export const edit_company_stock_pending_path = (companyId, id) => `/companies/${
 export const release_company_stock_pending_path = (companyId, id) => `/companies/${companyId}/stock_pendings/${id}/release`
 export const cancel_company_stock_pending_path = (companyId, id) => `/companies/${companyId}/stock_pendings/${id}/cancel`
 
+export const company_employee_profiles_path = (companyId) => `/companies/${companyId}/employee_profiles`
+export const create_company_employee_profiles_path = (companyId) => `/companies/${companyId}/employee_profiles`
+export const new_company_employee_profile_path = (companyId) => `/companies/${companyId}/employee_profiles/new`
+export const company_employee_profile_path = (companyId, id) => `/companies/${companyId}/employee_profiles/${id}`
+export const edit_company_employee_profile_path = (companyId, id) => `/companies/${companyId}/employee_profiles/${id}/edit`
+export const company_employee_subprofiles_path = (companyId) => `/companies/${companyId}/employee_subprofiles`
+export const create_company_employee_subprofiles_path = (companyId) => `/companies/${companyId}/employee_subprofiles`
+export const new_company_employee_subprofile_path = (companyId) => `/companies/${companyId}/employee_subprofiles/new`
+export const company_employee_subprofile_path = (companyId, id) => `/companies/${companyId}/employee_subprofiles/${id}`
+export const edit_company_employee_subprofile_path = (companyId, id) => `/companies/${companyId}/employee_subprofiles/${id}/edit`
+export const company_customer_profiles_path = (companyId) => `/companies/${companyId}/customer_profiles`
+export const create_company_customer_profiles_path = (companyId) => `/companies/${companyId}/customer_profiles`
+export const new_company_customer_profile_path = (companyId) => `/companies/${companyId}/customer_profiles/new`
+export const company_customer_profile_path = (companyId, id) => `/companies/${companyId}/customer_profiles/${id}`
+export const edit_company_customer_profile_path = (companyId, id) => `/companies/${companyId}/customer_profiles/${id}/edit`
+export const company_customer_subprofiles_path = (companyId) => `/companies/${companyId}/customer_subprofiles`
+export const create_company_customer_subprofiles_path = (companyId) => `/companies/${companyId}/customer_subprofiles`
+export const new_company_customer_subprofile_path = (companyId) => `/companies/${companyId}/customer_subprofiles/new`
+export const company_customer_subprofile_path = (companyId, id) => `/companies/${companyId}/customer_subprofiles/${id}`
+export const edit_company_customer_subprofile_path = (companyId, id) => `/companies/${companyId}/customer_subprofiles/${id}/edit`
+
 export const company_analytics_path = (companyId) => `/companies/${companyId}/analytics`
