@@ -176,5 +176,13 @@ RSpec.feature "Homepage", type: :feature, js: true do
 
       expect(page).to have_link("Admin Dashboard", href: "/admin/companies", wait: 10)
     end
+
+    it "hides Go to Dashboard and New Company for admins" do
+      visit root_path
+
+      expect(page).to have_link("Admin Dashboard", href: "/admin/companies", wait: 10)
+      expect(page).not_to have_link("Go to Dashboard")
+      expect(page).not_to have_link("New Company")
+    end
   end
 end

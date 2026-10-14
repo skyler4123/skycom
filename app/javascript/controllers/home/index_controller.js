@@ -46,6 +46,8 @@ export default class Home_IndexController extends Controller {
   }
 
   // Role needs the client cache, which arrives after connect — poll for it.
+  // Admins see only Admin Dashboard; Go to Dashboard + New Company are
+  // owner flows and stay visible for non-admins (shipped visible in ERB).
   revealAdminLink() {
     poll(() => {
       const role = currentUser()?.system_role
@@ -55,6 +57,13 @@ export default class Home_IndexController extends Controller {
         if (adminLink) {
           adminLink.classList.remove("hidden")
           adminLink.classList.add("inline-flex")
+        }
+        for (const id of ["#header-dashboard-link", "#header-new-company-link"]) {
+          const el = this.element.querySelector(id)
+          if (el) {
+            el.classList.add("hidden")
+            el.classList.remove("inline-flex")
+          }
         }
       }
       return true
