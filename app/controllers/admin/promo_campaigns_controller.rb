@@ -124,13 +124,13 @@ class Admin::PromoCampaignsController < Admin::ApplicationController
 
   def format_campaign(campaign)
     campaign.as_json(only: [
-      :id, :name, :description, :amount, :max_cap, :conditions,
+      :id, :name, :description, :title, :body, :amount, :max_cap, :conditions,
       :scheduled_at, :status, :processed_at, :stats, :created_at, :updated_at
     ])
   end
 
   def campaign_params
-    base = params.require(:promo_campaign).permit(:name, :description, :amount, :max_cap, :scheduled_at)
+    base = params.require(:promo_campaign).permit(:name, :description, :title, :body, :amount, :max_cap, :scheduled_at)
     base[:conditions] = normalize_conditions(params[:promo_campaign][:conditions])
     base
   end
