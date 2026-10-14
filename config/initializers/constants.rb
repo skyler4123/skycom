@@ -242,3 +242,17 @@ WELCOME_NOTIFICATION_CONTENT = {
     description: "Công ty của bạn đã sẵn sàng. Hãy khám phá bảng điều khiển, mời đội ngũ của bạn và bắt đầu bán hàng — chúng tôi luôn sẵn sàng hỗ trợ."
   }
 }.freeze
+
+# =============================================================================
+# Promo Campaign Notification (admin promo-credit giveaway)
+# Customer-facing defaults for PromoCampaign#title/#body, used by
+# PromoCampaigns::ExecuteService#notify_owner as fallback when title/body
+# blank (legacy rows) and as UI placeholders in admin forms.
+# Interpolation keys: %{amount}, %{name}, %{max_cap}.
+# =============================================================================
+
+# Default notification title. Example: "Skycom gave you 300 credits!"
+PROMO_DEFAULT_TITLE = "Skycom gave you %{amount} credits!".freeze
+
+# Default notification body. Example: "Promo 'Holiday Bonus' added 300 promo credits (cap 1000). ..."
+PROMO_DEFAULT_BODY = "Promo '%{name}' added %{amount} promo credits (cap %{max_cap}). Thank you for using Skycom! Here is our help to grow your business.".freeze
