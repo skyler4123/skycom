@@ -54,6 +54,18 @@ RSpec.describe PromoCampaigns::ExecuteService, type: :model do
     expect(n.description).to include(campaign.name)
   end
 
+  it "keeps literal copy containing % and still notifies" do
+    campaign = campaign_for(amount: 300, max_cap: 1000)
+    campaign.update!(title: "50% off deal", body: "Save now %{amount} credits")
+
+    result = described_class.call(campaign: campaign)
+
+    expect(result[:success]).to be true
+    n = Notification.where(company: company).order(created_at: :desc).first
+    expect(n.name).to eq("50% off deal")
+    expect(n.description).to eq("Save now 300 credits")
+  end
+
   it "grants partial amount at the cap (900 + 300 cap 1000 → +100)" do
     company.company_wallet.add_to!(balance: :promo, amount: 900)
     campaign = campaign_for(amount: 300, max_cap: 1000)

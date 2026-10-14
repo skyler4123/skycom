@@ -126,7 +126,7 @@ module PromoCampaigns
 
     def interpolate(template, amount)
       format(template, amount: amount, name: @campaign.name, max_cap: @campaign.max_cap)
-    rescue KeyError, ArgumentError
+    rescue StandardError
       template
     end
   end
