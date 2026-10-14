@@ -41,7 +41,7 @@ Rails.application.routes.draw do
       get :calendar_events
     end
   end
-  resources :companies do
+  resources :companies, only: %i[new create show edit update] do
     scope module: :companies do
       resources :dashboards
       resources :branches
@@ -156,8 +156,6 @@ Rails.application.routes.draw do
           get :retail_cashier
         end
       end
-
-      resources :companies, only: [ :edit, :update ]
 
       get "analytics", to: "analytics#index"
 

@@ -931,6 +931,7 @@ export const dictionary = () => {
     "Failed to load settings": { vi: "Không thể tải cài đặt" },
     "Failed to update dynamic sidebar": { vi: "Không thể cập nhật thanh bên tùy chỉnh" },
     "Company Quick Links": { vi: "Liên Kết Nhanh Công Ty" },
+    "Quick Links": { vi: "Liên Kết Nhanh" },
     "Shared with everyone in this company": { vi: "Chia sẻ với mọi người trong công ty này" },
     "My Quick Links": { vi: "Liên Kết Nhanh Của Tôi" },
     "Only you see these links": { vi: "Chỉ bạn thấy các liên kết này" },

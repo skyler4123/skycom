@@ -1,6 +1,6 @@
 require "rails_helper"
 
-RSpec.feature "Companies::Companies Edit", type: :feature, js: true do
+RSpec.feature "Company pages (Settings group)", type: :feature, js: true do
   let(:company) { create(:company) }
   let(:branch) { create(:branch, company: company) }
   let(:owner) { company.user }
@@ -17,9 +17,17 @@ RSpec.feature "Companies::Companies Edit", type: :feature, js: true do
     company.clear_permissions_cache
   end
 
+  scenario "owner can visit company show page with edit link" do
+    sign_in(owner)
+    visit company_path(company)
+
+    expect(page).to have_content(company.name, wait: 10)
+    expect(page).to have_link("Edit Company", href: edit_company_path(company))
+  end
+
   scenario "owner can visit edit company page" do
     sign_in(owner)
-    visit edit_company_company_path(company, company)
+    visit edit_company_path(company)
 
     expect(page).to have_selector('input[name="company[name]"]', wait: 10)
     expect(page).to have_selector('select[name="company[timezone]"]', wait: 5)
@@ -28,7 +36,7 @@ RSpec.feature "Companies::Companies Edit", type: :feature, js: true do
 
   scenario "owner can update company name" do
     sign_in(owner)
-    visit edit_company_company_path(company, company)
+    visit edit_company_path(company)
 
     expect(page).to have_selector('input[name="company[name]"]', wait: 10)
     fill_in "company[name]", with: "Updated Company Name"
@@ -36,7 +44,7 @@ RSpec.feature "Companies::Companies Edit", type: :feature, js: true do
     click_button "Save Changes"
 
     expect(page).to have_content("Company updated successfully", wait: 10)
-    expect(page).to have_current_path(company_dashboards_path(company))
+    expect(page).to have_current_path(company_path(company))
 
     company.reload
     expect(company.name).to eq("Updated Company Name")
@@ -44,7 +52,7 @@ RSpec.feature "Companies::Companies Edit", type: :feature, js: true do
 
   scenario "owner sees validation error when submitting empty name" do
     sign_in(owner)
-    visit edit_company_company_path(company, company)
+    visit edit_company_path(company)
 
     expect(page).to have_selector('input[name="company[name]"]', wait: 10)
     fill_in "company[name]", with: ""
@@ -52,32 +60,13 @@ RSpec.feature "Companies::Companies Edit", type: :feature, js: true do
     click_button "Save Changes"
 
     expect(page).to have_content("Name can", wait: 10)
-    expect(page).to have_current_path(edit_company_company_path(company, company))
+    expect(page).to have_current_path(edit_company_path(company))
   end
 
-  scenario "employee without company update permission cannot access edit page" do
-    company.clear_permissions_cache
-    no_perm_employee.clear_permissions_cache
-    no_perm_employee.reload
-
-    expect(no_perm_employee.can?(:update, Company)).to be_falsey
-
+  scenario "employee without owner role cannot access company pages" do
     sign_in(no_perm_user)
-    visit edit_company_company_path(company, company)
+    visit company_path(company)
 
     expect(page).to have_content("You are not authorized to perform this action.", wait: 10)
-  end
-
-  scenario "employee without permission cannot? returns false for company update" do
-    company.clear_permissions_cache
-    no_perm_employee.clear_permissions_cache
-    no_perm_employee.reload
-
-    expect(no_perm_employee.can?(:update, Company)).to be_falsey
-  end
-
-  scenario "owner can? returns true for company update" do
-    owner_employee = company.employees.find_by(user: owner)
-    expect(owner_employee.can?(:update, Company)).to be_truthy
   end
 end

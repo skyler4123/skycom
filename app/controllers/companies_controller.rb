@@ -1,6 +1,10 @@
 class CompaniesController < ApplicationController
-  # Serves Stimulus: companies--new (company creation page renders its form client-side)
-  # Endpoints: GET /companies/new (new) — Shell-First shell; POST /companies (create)
+  # Serves Stimulus: companies--new (company creation page renders its form client-side),
+  #   companies--show, companies--edit (Company pages under Settings group render client-side)
+  # Endpoints: GET /companies/new (new) — Shell-First shell; POST /companies (create);
+  #   GET /companies/:id (show) + GET /companies/:id/edit (edit) + PATCH /companies/:id (update) — Owner-only
+  before_action :authorize_company_owner!, only: %i[show edit update]
+
   def new
     respond_to do |format|
       format.html { render html: "", layout: true }
@@ -25,9 +29,64 @@ class CompaniesController < ApplicationController
     end
   end
 
+  def show
+    respond_to do |format|
+      format.html { render html: "", layout: true }
+      format.json { render json: { company: format_company(@company) } }
+    end
+  end
+
+  def edit
+    respond_to do |format|
+      format.html { render html: "", layout: true }
+      format.json { render json: { company: format_company(@company) } }
+    end
+  end
+
+  def update
+    if @company.update(company_update_params)
+      respond_to do |format|
+        format.html { redirect_to company_path(@company), notice: "Company updated successfully." }
+        format.json { render json: { company: format_company(@company), message: "Company updated successfully." }, status: :ok }
+      end
+    else
+      respond_to do |format|
+        format.html { redirect_to edit_company_path(@company), alert: @company.errors.full_messages.to_sentence }
+        format.json { render json: { errors: @company.errors.full_messages }, status: :unprocessable_content }
+      end
+    end
+  end
+
   private
+
+  def authorize_company_owner!
+    @company = Company.find(params[:id])
+    employee = Employee.cached_where(user: current_user, company: @company).first
+    return if employee&.owner_role?
+
+    respond_to do |format|
+      format.html do
+        flash[:alert] = "You are not authorized to perform this action."
+        redirect_to(request.referrer || root_path)
+      end
+      format.json do
+        render json: { errors: [ "You are not authorized to perform this action." ] }, status: :forbidden
+      end
+    end
+  end
+
+  def format_company(company)
+    company.as_json(only: [
+      :id, :name, :description, :email, :phone_number, :website,
+      :timezone, :currency, :business_type, :country
+    ])
+  end
 
   def company_params
     params.require(:company).permit(:name, :business_type, :country)
+  end
+
+  def company_update_params
+    params.require(:company).permit(:name, :description, :email, :phone_number, :website, :timezone, :currency)
   end
 end
