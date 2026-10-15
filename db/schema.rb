@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_10_13_000001) do
+ActiveRecord::Schema[8.1].define(version: 2026_10_14_000006) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pgcrypto"
@@ -1727,6 +1727,104 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_13_000001) do
     t.index ["workflow_status"], name: "index_customer_membership_appointments_on_workflow_status"
   end
 
+  create_table "customer_profiles", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
+    t.uuid "company_id", null: false
+    t.uuid "branch_id"
+    t.uuid "customer_id", null: false
+    t.uuid "category_id", null: false
+    t.uuid "property_mapping_id", null: false
+    t.string "email"
+    t.string "name"
+    t.text "description"
+    t.string "code"
+    t.string "phone_number"
+    t.integer "currency"
+    t.integer "country"
+    t.integer "timezone"
+    t.integer "lifecycle_status"
+    t.integer "workflow_status"
+    t.integer "business_type"
+    t.datetime "expiration_date"
+    t.jsonb "metadata"
+    t.datetime "discarded_at"
+    t.string "permission_resource_name"
+    t.string "property_string_1"
+    t.string "property_string_2"
+    t.string "property_string_3"
+    t.string "property_string_4"
+    t.string "property_string_5"
+    t.string "property_string_6"
+    t.string "property_string_7"
+    t.string "property_string_8"
+    t.string "property_string_9"
+    t.string "property_string_10"
+    t.integer "property_integer_1"
+    t.integer "property_integer_2"
+    t.integer "property_integer_3"
+    t.integer "property_integer_4"
+    t.integer "property_integer_5"
+    t.integer "property_integer_6"
+    t.integer "property_integer_7"
+    t.integer "property_integer_8"
+    t.integer "property_integer_9"
+    t.integer "property_integer_10"
+    t.integer "property_integer_11"
+    t.integer "property_integer_12"
+    t.integer "property_integer_13"
+    t.integer "property_integer_14"
+    t.integer "property_integer_15"
+    t.integer "property_integer_16"
+    t.integer "property_integer_17"
+    t.integer "property_integer_18"
+    t.integer "property_integer_19"
+    t.integer "property_integer_20"
+    t.decimal "property_decimal_1", precision: 15, scale: 4
+    t.decimal "property_decimal_2", precision: 15, scale: 4
+    t.decimal "property_decimal_3", precision: 15, scale: 4
+    t.decimal "property_decimal_4", precision: 15, scale: 4
+    t.decimal "property_decimal_5", precision: 15, scale: 4
+    t.decimal "property_decimal_6", precision: 15, scale: 4
+    t.decimal "property_decimal_7", precision: 15, scale: 4
+    t.decimal "property_decimal_8", precision: 15, scale: 4
+    t.decimal "property_decimal_9", precision: 15, scale: 4
+    t.decimal "property_decimal_10", precision: 15, scale: 4
+    t.boolean "property_boolean_1"
+    t.boolean "property_boolean_2"
+    t.boolean "property_boolean_3"
+    t.boolean "property_boolean_4"
+    t.boolean "property_boolean_5"
+    t.boolean "property_boolean_6"
+    t.boolean "property_boolean_7"
+    t.boolean "property_boolean_8"
+    t.boolean "property_boolean_9"
+    t.boolean "property_boolean_10"
+    t.datetime "property_datetime_1"
+    t.datetime "property_datetime_2"
+    t.datetime "property_datetime_3"
+    t.datetime "property_datetime_4"
+    t.datetime "property_datetime_5"
+    t.datetime "property_datetime_6"
+    t.datetime "property_datetime_7"
+    t.datetime "property_datetime_8"
+    t.datetime "property_datetime_9"
+    t.datetime "property_datetime_10"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["branch_id"], name: "index_customer_profiles_on_branch_id"
+    t.index ["business_type"], name: "index_customer_profiles_on_business_type"
+    t.index ["category_id"], name: "index_customer_profiles_on_category_id"
+    t.index ["code"], name: "index_customer_profiles_on_code", unique: true
+    t.index ["company_id", "customer_id"], name: "index_customer_profiles_on_company_id_and_customer_id"
+    t.index ["company_id"], name: "index_customer_profiles_on_company_id"
+    t.index ["customer_id", "name"], name: "idx_customer_profiles_on_customer_and_name", unique: true
+    t.index ["customer_id"], name: "index_customer_profiles_on_customer_id"
+    t.index ["discarded_at"], name: "index_customer_profiles_on_discarded_at"
+    t.index ["email"], name: "index_customer_profiles_on_email", unique: true
+    t.index ["lifecycle_status"], name: "index_customer_profiles_on_lifecycle_status"
+    t.index ["property_mapping_id"], name: "index_customer_profiles_on_property_mapping_id"
+    t.index ["workflow_status"], name: "index_customer_profiles_on_workflow_status"
+  end
+
   create_table "customer_role_appointments", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
     t.uuid "company_id", null: false
     t.uuid "customer_id", null: false
@@ -1779,6 +1877,107 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_13_000001) do
     t.index ["lifecycle_status"], name: "index_customer_service_appointments_on_lifecycle_status"
     t.index ["service_id"], name: "index_customer_service_appointments_on_service_id"
     t.index ["workflow_status"], name: "index_customer_service_appointments_on_workflow_status"
+  end
+
+  create_table "customer_subprofiles", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
+    t.uuid "company_id", null: false
+    t.uuid "branch_id"
+    t.uuid "customer_id", null: false
+    t.uuid "customer_profile_id", null: false
+    t.uuid "category_id", null: false
+    t.uuid "property_mapping_id", null: false
+    t.string "email"
+    t.string "name"
+    t.text "description"
+    t.string "code"
+    t.string "phone_number"
+    t.integer "currency"
+    t.integer "country"
+    t.integer "timezone"
+    t.integer "lifecycle_status"
+    t.integer "workflow_status"
+    t.integer "business_type"
+    t.datetime "expiration_date"
+    t.jsonb "metadata"
+    t.datetime "discarded_at"
+    t.string "permission_resource_name"
+    t.string "property_string_1"
+    t.string "property_string_2"
+    t.string "property_string_3"
+    t.string "property_string_4"
+    t.string "property_string_5"
+    t.string "property_string_6"
+    t.string "property_string_7"
+    t.string "property_string_8"
+    t.string "property_string_9"
+    t.string "property_string_10"
+    t.integer "property_integer_1"
+    t.integer "property_integer_2"
+    t.integer "property_integer_3"
+    t.integer "property_integer_4"
+    t.integer "property_integer_5"
+    t.integer "property_integer_6"
+    t.integer "property_integer_7"
+    t.integer "property_integer_8"
+    t.integer "property_integer_9"
+    t.integer "property_integer_10"
+    t.integer "property_integer_11"
+    t.integer "property_integer_12"
+    t.integer "property_integer_13"
+    t.integer "property_integer_14"
+    t.integer "property_integer_15"
+    t.integer "property_integer_16"
+    t.integer "property_integer_17"
+    t.integer "property_integer_18"
+    t.integer "property_integer_19"
+    t.integer "property_integer_20"
+    t.decimal "property_decimal_1", precision: 15, scale: 4
+    t.decimal "property_decimal_2", precision: 15, scale: 4
+    t.decimal "property_decimal_3", precision: 15, scale: 4
+    t.decimal "property_decimal_4", precision: 15, scale: 4
+    t.decimal "property_decimal_5", precision: 15, scale: 4
+    t.decimal "property_decimal_6", precision: 15, scale: 4
+    t.decimal "property_decimal_7", precision: 15, scale: 4
+    t.decimal "property_decimal_8", precision: 15, scale: 4
+    t.decimal "property_decimal_9", precision: 15, scale: 4
+    t.decimal "property_decimal_10", precision: 15, scale: 4
+    t.boolean "property_boolean_1"
+    t.boolean "property_boolean_2"
+    t.boolean "property_boolean_3"
+    t.boolean "property_boolean_4"
+    t.boolean "property_boolean_5"
+    t.boolean "property_boolean_6"
+    t.boolean "property_boolean_7"
+    t.boolean "property_boolean_8"
+    t.boolean "property_boolean_9"
+    t.boolean "property_boolean_10"
+    t.datetime "property_datetime_1"
+    t.datetime "property_datetime_2"
+    t.datetime "property_datetime_3"
+    t.datetime "property_datetime_4"
+    t.datetime "property_datetime_5"
+    t.datetime "property_datetime_6"
+    t.datetime "property_datetime_7"
+    t.datetime "property_datetime_8"
+    t.datetime "property_datetime_9"
+    t.datetime "property_datetime_10"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["branch_id"], name: "index_customer_subprofiles_on_branch_id"
+    t.index ["business_type"], name: "index_customer_subprofiles_on_business_type"
+    t.index ["category_id"], name: "index_customer_subprofiles_on_category_id"
+    t.index ["code"], name: "index_customer_subprofiles_on_code", unique: true
+    t.index ["company_id", "customer_id"], name: "index_customer_subprofiles_on_company_id_and_customer_id"
+    t.index ["company_id"], name: "index_customer_subprofiles_on_company_id"
+    t.index ["customer_id"], name: "index_customer_subprofiles_on_customer_id"
+    t.index ["customer_profile_id", "customer_id"], name: "idx_customer_subprofiles_on_profile_and_customer"
+    t.index ["customer_profile_id", "name"], name: "idx_customer_subprofiles_on_profile_and_name", unique: true
+    t.index ["customer_profile_id"], name: "index_customer_subprofiles_on_customer_profile_id"
+    t.index ["discarded_at"], name: "index_customer_subprofiles_on_discarded_at"
+    t.index ["email"], name: "index_customer_subprofiles_on_email", unique: true
+    t.index ["lifecycle_status"], name: "index_customer_subprofiles_on_lifecycle_status"
+    t.index ["property_mapping_id"], name: "index_customer_subprofiles_on_property_mapping_id"
+    t.index ["workflow_status"], name: "index_customer_subprofiles_on_workflow_status"
   end
 
   create_table "customer_tag_appointments", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
@@ -2691,6 +2890,104 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_13_000001) do
     t.index ["workflow_status"], name: "index_employee_product_appointments_on_workflow_status"
   end
 
+  create_table "employee_profiles", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
+    t.uuid "company_id", null: false
+    t.uuid "branch_id"
+    t.uuid "employee_id", null: false
+    t.uuid "category_id", null: false
+    t.uuid "property_mapping_id", null: false
+    t.string "email"
+    t.string "name"
+    t.text "description"
+    t.string "code"
+    t.string "phone_number"
+    t.integer "currency"
+    t.integer "country"
+    t.integer "timezone"
+    t.integer "lifecycle_status"
+    t.integer "workflow_status"
+    t.integer "business_type"
+    t.datetime "expiration_date"
+    t.jsonb "metadata"
+    t.datetime "discarded_at"
+    t.string "permission_resource_name"
+    t.string "property_string_1"
+    t.string "property_string_2"
+    t.string "property_string_3"
+    t.string "property_string_4"
+    t.string "property_string_5"
+    t.string "property_string_6"
+    t.string "property_string_7"
+    t.string "property_string_8"
+    t.string "property_string_9"
+    t.string "property_string_10"
+    t.integer "property_integer_1"
+    t.integer "property_integer_2"
+    t.integer "property_integer_3"
+    t.integer "property_integer_4"
+    t.integer "property_integer_5"
+    t.integer "property_integer_6"
+    t.integer "property_integer_7"
+    t.integer "property_integer_8"
+    t.integer "property_integer_9"
+    t.integer "property_integer_10"
+    t.integer "property_integer_11"
+    t.integer "property_integer_12"
+    t.integer "property_integer_13"
+    t.integer "property_integer_14"
+    t.integer "property_integer_15"
+    t.integer "property_integer_16"
+    t.integer "property_integer_17"
+    t.integer "property_integer_18"
+    t.integer "property_integer_19"
+    t.integer "property_integer_20"
+    t.decimal "property_decimal_1", precision: 15, scale: 4
+    t.decimal "property_decimal_2", precision: 15, scale: 4
+    t.decimal "property_decimal_3", precision: 15, scale: 4
+    t.decimal "property_decimal_4", precision: 15, scale: 4
+    t.decimal "property_decimal_5", precision: 15, scale: 4
+    t.decimal "property_decimal_6", precision: 15, scale: 4
+    t.decimal "property_decimal_7", precision: 15, scale: 4
+    t.decimal "property_decimal_8", precision: 15, scale: 4
+    t.decimal "property_decimal_9", precision: 15, scale: 4
+    t.decimal "property_decimal_10", precision: 15, scale: 4
+    t.boolean "property_boolean_1"
+    t.boolean "property_boolean_2"
+    t.boolean "property_boolean_3"
+    t.boolean "property_boolean_4"
+    t.boolean "property_boolean_5"
+    t.boolean "property_boolean_6"
+    t.boolean "property_boolean_7"
+    t.boolean "property_boolean_8"
+    t.boolean "property_boolean_9"
+    t.boolean "property_boolean_10"
+    t.datetime "property_datetime_1"
+    t.datetime "property_datetime_2"
+    t.datetime "property_datetime_3"
+    t.datetime "property_datetime_4"
+    t.datetime "property_datetime_5"
+    t.datetime "property_datetime_6"
+    t.datetime "property_datetime_7"
+    t.datetime "property_datetime_8"
+    t.datetime "property_datetime_9"
+    t.datetime "property_datetime_10"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["branch_id"], name: "index_employee_profiles_on_branch_id"
+    t.index ["business_type"], name: "index_employee_profiles_on_business_type"
+    t.index ["category_id"], name: "index_employee_profiles_on_category_id"
+    t.index ["code"], name: "index_employee_profiles_on_code", unique: true
+    t.index ["company_id", "employee_id"], name: "index_employee_profiles_on_company_id_and_employee_id"
+    t.index ["company_id"], name: "index_employee_profiles_on_company_id"
+    t.index ["discarded_at"], name: "index_employee_profiles_on_discarded_at"
+    t.index ["email"], name: "index_employee_profiles_on_email", unique: true
+    t.index ["employee_id", "name"], name: "idx_employee_profiles_on_employee_and_name", unique: true
+    t.index ["employee_id"], name: "index_employee_profiles_on_employee_id"
+    t.index ["lifecycle_status"], name: "index_employee_profiles_on_lifecycle_status"
+    t.index ["property_mapping_id"], name: "index_employee_profiles_on_property_mapping_id"
+    t.index ["workflow_status"], name: "index_employee_profiles_on_workflow_status"
+  end
+
   create_table "employee_project_appointments", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
     t.uuid "company_id", null: false
     t.uuid "employee_id", null: false
@@ -2847,6 +3144,107 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_13_000001) do
     t.index ["lifecycle_status"], name: "index_employee_setting_group_appointments_on_lifecycle_status"
     t.index ["setting_group_id"], name: "index_employee_setting_group_appointments_on_setting_group_id"
     t.index ["workflow_status"], name: "index_employee_setting_group_appointments_on_workflow_status"
+  end
+
+  create_table "employee_subprofiles", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
+    t.uuid "company_id", null: false
+    t.uuid "branch_id"
+    t.uuid "employee_id", null: false
+    t.uuid "employee_profile_id", null: false
+    t.uuid "category_id", null: false
+    t.uuid "property_mapping_id", null: false
+    t.string "email"
+    t.string "name"
+    t.text "description"
+    t.string "code"
+    t.string "phone_number"
+    t.integer "currency"
+    t.integer "country"
+    t.integer "timezone"
+    t.integer "lifecycle_status"
+    t.integer "workflow_status"
+    t.integer "business_type"
+    t.datetime "expiration_date"
+    t.jsonb "metadata"
+    t.datetime "discarded_at"
+    t.string "permission_resource_name"
+    t.string "property_string_1"
+    t.string "property_string_2"
+    t.string "property_string_3"
+    t.string "property_string_4"
+    t.string "property_string_5"
+    t.string "property_string_6"
+    t.string "property_string_7"
+    t.string "property_string_8"
+    t.string "property_string_9"
+    t.string "property_string_10"
+    t.integer "property_integer_1"
+    t.integer "property_integer_2"
+    t.integer "property_integer_3"
+    t.integer "property_integer_4"
+    t.integer "property_integer_5"
+    t.integer "property_integer_6"
+    t.integer "property_integer_7"
+    t.integer "property_integer_8"
+    t.integer "property_integer_9"
+    t.integer "property_integer_10"
+    t.integer "property_integer_11"
+    t.integer "property_integer_12"
+    t.integer "property_integer_13"
+    t.integer "property_integer_14"
+    t.integer "property_integer_15"
+    t.integer "property_integer_16"
+    t.integer "property_integer_17"
+    t.integer "property_integer_18"
+    t.integer "property_integer_19"
+    t.integer "property_integer_20"
+    t.decimal "property_decimal_1", precision: 15, scale: 4
+    t.decimal "property_decimal_2", precision: 15, scale: 4
+    t.decimal "property_decimal_3", precision: 15, scale: 4
+    t.decimal "property_decimal_4", precision: 15, scale: 4
+    t.decimal "property_decimal_5", precision: 15, scale: 4
+    t.decimal "property_decimal_6", precision: 15, scale: 4
+    t.decimal "property_decimal_7", precision: 15, scale: 4
+    t.decimal "property_decimal_8", precision: 15, scale: 4
+    t.decimal "property_decimal_9", precision: 15, scale: 4
+    t.decimal "property_decimal_10", precision: 15, scale: 4
+    t.boolean "property_boolean_1"
+    t.boolean "property_boolean_2"
+    t.boolean "property_boolean_3"
+    t.boolean "property_boolean_4"
+    t.boolean "property_boolean_5"
+    t.boolean "property_boolean_6"
+    t.boolean "property_boolean_7"
+    t.boolean "property_boolean_8"
+    t.boolean "property_boolean_9"
+    t.boolean "property_boolean_10"
+    t.datetime "property_datetime_1"
+    t.datetime "property_datetime_2"
+    t.datetime "property_datetime_3"
+    t.datetime "property_datetime_4"
+    t.datetime "property_datetime_5"
+    t.datetime "property_datetime_6"
+    t.datetime "property_datetime_7"
+    t.datetime "property_datetime_8"
+    t.datetime "property_datetime_9"
+    t.datetime "property_datetime_10"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["branch_id"], name: "index_employee_subprofiles_on_branch_id"
+    t.index ["business_type"], name: "index_employee_subprofiles_on_business_type"
+    t.index ["category_id"], name: "index_employee_subprofiles_on_category_id"
+    t.index ["code"], name: "index_employee_subprofiles_on_code", unique: true
+    t.index ["company_id", "employee_id"], name: "index_employee_subprofiles_on_company_id_and_employee_id"
+    t.index ["company_id"], name: "index_employee_subprofiles_on_company_id"
+    t.index ["discarded_at"], name: "index_employee_subprofiles_on_discarded_at"
+    t.index ["email"], name: "index_employee_subprofiles_on_email", unique: true
+    t.index ["employee_id"], name: "index_employee_subprofiles_on_employee_id"
+    t.index ["employee_profile_id", "employee_id"], name: "idx_employee_subprofiles_on_profile_and_employee"
+    t.index ["employee_profile_id", "name"], name: "idx_employee_subprofiles_on_profile_and_name", unique: true
+    t.index ["employee_profile_id"], name: "index_employee_subprofiles_on_employee_profile_id"
+    t.index ["lifecycle_status"], name: "index_employee_subprofiles_on_lifecycle_status"
+    t.index ["property_mapping_id"], name: "index_employee_subprofiles_on_property_mapping_id"
+    t.index ["workflow_status"], name: "index_employee_subprofiles_on_workflow_status"
   end
 
   create_table "employee_tag_appointments", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
@@ -5139,6 +5537,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_13_000001) do
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "title", null: false
+    t.text "body", null: false
     t.index ["business_type"], name: "index_promo_campaigns_on_business_type"
     t.index ["discarded_at"], name: "index_promo_campaigns_on_discarded_at"
     t.index ["lifecycle_status"], name: "index_promo_campaigns_on_lifecycle_status"
@@ -7992,12 +8392,23 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_13_000001) do
   add_foreign_key "customer_membership_appointments", "companies"
   add_foreign_key "customer_membership_appointments", "customers"
   add_foreign_key "customer_membership_appointments", "memberships"
+  add_foreign_key "customer_profiles", "branches"
+  add_foreign_key "customer_profiles", "categories"
+  add_foreign_key "customer_profiles", "companies"
+  add_foreign_key "customer_profiles", "customers"
+  add_foreign_key "customer_profiles", "property_mappings"
   add_foreign_key "customer_role_appointments", "companies"
   add_foreign_key "customer_role_appointments", "customers"
   add_foreign_key "customer_role_appointments", "roles"
   add_foreign_key "customer_service_appointments", "companies"
   add_foreign_key "customer_service_appointments", "customers"
   add_foreign_key "customer_service_appointments", "services"
+  add_foreign_key "customer_subprofiles", "branches"
+  add_foreign_key "customer_subprofiles", "categories"
+  add_foreign_key "customer_subprofiles", "companies"
+  add_foreign_key "customer_subprofiles", "customer_profiles"
+  add_foreign_key "customer_subprofiles", "customers"
+  add_foreign_key "customer_subprofiles", "property_mappings"
   add_foreign_key "customer_tag_appointments", "companies"
   add_foreign_key "customer_tag_appointments", "customers"
   add_foreign_key "customer_tag_appointments", "tags"
@@ -8075,6 +8486,11 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_13_000001) do
   add_foreign_key "employee_product_appointments", "companies"
   add_foreign_key "employee_product_appointments", "employees"
   add_foreign_key "employee_product_appointments", "products"
+  add_foreign_key "employee_profiles", "branches"
+  add_foreign_key "employee_profiles", "categories"
+  add_foreign_key "employee_profiles", "companies"
+  add_foreign_key "employee_profiles", "employees"
+  add_foreign_key "employee_profiles", "property_mappings"
   add_foreign_key "employee_project_appointments", "companies"
   add_foreign_key "employee_project_appointments", "employees"
   add_foreign_key "employee_project_appointments", "projects"
@@ -8093,6 +8509,12 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_13_000001) do
   add_foreign_key "employee_setting_group_appointments", "companies"
   add_foreign_key "employee_setting_group_appointments", "employees"
   add_foreign_key "employee_setting_group_appointments", "setting_groups"
+  add_foreign_key "employee_subprofiles", "branches"
+  add_foreign_key "employee_subprofiles", "categories"
+  add_foreign_key "employee_subprofiles", "companies"
+  add_foreign_key "employee_subprofiles", "employee_profiles"
+  add_foreign_key "employee_subprofiles", "employees"
+  add_foreign_key "employee_subprofiles", "property_mappings"
   add_foreign_key "employee_tag_appointments", "companies"
   add_foreign_key "employee_tag_appointments", "employees"
   add_foreign_key "employee_tag_appointments", "tags"

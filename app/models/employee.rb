@@ -105,6 +105,8 @@ class Employee < ApplicationRecord
            source: :notification_tag
   has_many :employee_notification_reads, dependent: :destroy
   has_one :notification_config, dependent: :destroy
+  has_many :employee_profiles, dependent: :destroy
+  has_many :employee_subprofiles, dependent: :destroy
   # restrict: support history must survive ex-employee cleanup (audit trail
   # for the company + admin pool). Soft-delete (discard) is unaffected.
   has_many :company_tickets, dependent: :restrict_with_error

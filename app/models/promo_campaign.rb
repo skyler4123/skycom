@@ -25,6 +25,8 @@ class PromoCampaign < ApplicationRecord
 
   # --- Validations ---
   validates :name, presence: true
+  validates :title, presence: true
+  validates :body, presence: true
   validates :amount, presence: true, numericality: { only_integer: true, greater_than: 0 }
   validates :max_cap, presence: true, numericality: { only_integer: true, greater_than: 0 }
   validates :scheduled_at, presence: true

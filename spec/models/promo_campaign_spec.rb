@@ -13,6 +13,18 @@ RSpec.describe PromoCampaign, type: :model do
     expect(c.errors[:max_cap]).to be_present
   end
 
+  it "rejects blank title" do
+    c = build(:promo_campaign, title: "")
+    expect(c).not_to be_valid
+    expect(c.errors[:title]).to be_present
+  end
+
+  it "rejects blank body" do
+    c = build(:promo_campaign, body: nil)
+    expect(c).not_to be_valid
+    expect(c.errors[:body]).to be_present
+  end
+
   it "rejects unknown condition key" do
     c = build(:promo_campaign, conditions: { "foo" => 1 })
     expect(c).not_to be_valid

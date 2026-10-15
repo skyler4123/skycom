@@ -2,15 +2,25 @@
 
 ## 1. Overview
 
-Skycom uses a **3-tier server-side caching strategy** plus a **browser client cache** for frontend performance. The key architectural shift is that cross-instance cache consistency is achieved via **local reads + Redis pub/sub invalidation**, not per-request global reads.
+Skycom uses a **4-tier server-side caching strategy** plus a **browser client cache** for frontend performance. The key architectural shift is that cross-instance cache consistency is achieved via **local reads + Redis pub/sub invalidation**, not per-request global reads.
 
 ### Server Cache Tiers
 
 | Tier | Store | Backend | Scope | Consistency |
 |------|-------|---------|-------|-------------|
+| **RAM Cache** | `Rails.ram_cache` | MemoryStore (Ruby heap, 64 MB) | Per-worker | No sync (volatile) |
 | **Local Cache** | `Rails.local_cache` | Solid Cache (SQLite) | Per-server | No sync |
 | **Sync Cache** | `Rails.sync_cache` | Solid Cache + Redis pub/sub | Cross-cluster | Reads: local; writes/delete: pub/sub invalidation |
 | **Global Cache** | `Rails.global_cache` | Redis | Cross-cluster | Always consistent (centralized) |
+
+| Feature | `Rails.ram_cache` (MemoryStore) | `Rails.local_cache` (Solid Cache) |
+|---------|---------------------------------|-----------------------------------|
+| Backend | Ruby heap / RAM | Local SQLite file |
+| Speed | Nanoseconds / microseconds | Milliseconds |
+| Persistence | Wiped on restart | Persists across restarts |
+| Multi-worker scope | Isolated per worker process | Shared across workers on same host |
+| Risk | High RAM consumption / OOM risk | Disk space usage |
+| Best used for | Tiny hot-keys, app configs, feature flags, high-frequency boolean checks (e.g. `Employee#owner_role?`, 1.day TTL) | Larger query results, generated fragments, items that shouldn't vanish on deploy |
 
 ### Client Cache
 

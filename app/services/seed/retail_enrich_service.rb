@@ -332,6 +332,40 @@ class Seed::RetailEnrichService
         end
       end
     end
+    create_profiles_for_parents
+  end
+
+  # Generic Profile/SubProfile samples (docs/PROFILE_SUBPROFILE.md).
+  # Every employee/customer gets "Profile 1/2", each with "Subprofile 11/12/21/22".
+  def create_profiles_for_parents
+    @employees.each do |employee|
+      2.times do |pi|
+        profile = Seed::EmployeeProfileService.create(
+          company: @retail, employee: employee, branch: employee.branch,
+          name: "Profile #{pi + 1}"
+        )
+        2.times do |si|
+          Seed::EmployeeSubprofileService.create(
+            company: @retail, employee: employee, employee_profile: profile,
+            branch: employee.branch, name: "Subprofile #{pi + 1}#{si + 1}"
+          )
+        end
+      end
+    end
+    @customers.each do |customer|
+      2.times do |pi|
+        profile = Seed::CustomerProfileService.create(
+          company: @retail, customer: customer, branch: customer.branch,
+          name: "Profile #{pi + 1}"
+        )
+        2.times do |si|
+          Seed::CustomerSubprofileService.create(
+            company: @retail, customer: customer, customer_profile: profile,
+            branch: customer.branch, name: "Subprofile #{pi + 1}#{si + 1}"
+          )
+        end
+      end
+    end
   end
 
   def setup_loyalty_programs

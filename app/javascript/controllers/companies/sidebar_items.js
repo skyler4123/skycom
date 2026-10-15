@@ -18,6 +18,7 @@ export const SIDEBAR_GROUPS = [
   { key: "chat_help_desk", label: "Chat & Help Desk", comingSoon: true },
   { key: "email_marketing", label: "Email Marketing", comingSoon: true },
   { key: "ai_assistant", label: "AI Assistant", comingSoon: true },
+  { key: "settings", label: "Settings" },
   { key: "system", label: "System", locked: true }
 ]
 
@@ -31,12 +32,16 @@ export const SIDEBAR_ITEMS = [
   { key: "services", group: "catalog", icon: "concierge", label: "Services", href: (cid) => Helpers.company_services_path(cid) },
   { key: "orders", group: "sales", icon: "order_approve", label: "Orders", href: (cid) => Helpers.company_orders_path(cid) },
   { key: "customers", group: "sales", icon: "person_add", label: "Customers", href: (cid) => Helpers.company_customers_path(cid) },
+  { key: "customer_profiles", group: "sales", icon: "badge", label: "Customer Profiles", href: (cid) => Helpers.company_customer_profiles_path(cid) },
+  { key: "customer_subprofiles", group: "sales", icon: "cards", label: "Customer Subprofiles", href: (cid) => Helpers.company_customer_subprofiles_path(cid) },
   { key: "invoices", group: "sales", icon: "receipt_long", label: "Invoices", href: (cid) => Helpers.company_invoices_path(cid) },
   { key: "purchases", group: "sales", icon: "shopping_cart", label: "Purchases", href: (cid) => Helpers.company_purchases_path(cid) },
   { key: "discount_groups", group: "sales", icon: "sell", label: "Discounts", href: (cid) => Helpers.company_discount_groups_path(cid) },
   { key: "branches", group: "organization", icon: "apartment", label: "Branches", href: (cid) => Helpers.company_branches_path(cid) },
   { key: "departments", group: "organization", icon: "family_group", label: "Departments", href: (cid) => Helpers.company_departments_path(cid) },
   { key: "employees", group: "organization", icon: "groups", label: "Employees", href: (cid) => Helpers.company_employees_path(cid) },
+  { key: "employee_profiles", group: "organization", icon: "badge", label: "Employee Profiles", href: (cid) => Helpers.company_employee_profiles_path(cid) },
+  { key: "employee_subprofiles", group: "organization", icon: "cards", label: "Employee Subprofiles", href: (cid) => Helpers.company_employee_subprofiles_path(cid) },
   { key: "facilities", group: "organization", icon: "meeting_room", label: "Facilities", href: (cid) => Helpers.company_facilities_path(cid) },
   { key: "categories", group: "platform", icon: "category", label: "Categories", href: (cid) => Helpers.company_categories_path(cid) },
   { key: "property_mappings", group: "platform", icon: "settings_applications", label: "Dynamic Properties", href: (cid) => Helpers.company_property_mappings_path(cid) },
@@ -68,9 +73,10 @@ export const SIDEBAR_ITEMS = [
   { key: "policies", group: "authorization", icon: "security", label: "Policies", href: (cid) => Helpers.company_policies_path(cid) },
   { key: "permissions", group: "authorization", icon: "shield", label: "Permissions", href: (cid) => Helpers.company_permissions_path(cid) },
   { key: "permission_logs", group: "authorization", icon: "history", label: "Permission Logs", href: (cid) => Helpers.company_permission_logs_path(cid) },
+  { key: "company", group: "settings", icon: "storefront", label: "Company", href: (cid) => Helpers.company_path(cid) },
+  { key: "quick_links", group: "settings", icon: "link", label: "Quick Links", href: (cid) => Helpers.company_settings_path(cid) },
   { key: "usage", group: "system", icon: "monitoring", label: "Usage", href: (cid) => Helpers.company_usage_path(cid) },
   { key: "top_up", group: "system", icon: "account_balance_wallet", label: "Top Up", href: (cid) => Helpers.new_company_top_up_path(cid) },
   { key: "billing", group: "system", icon: "receipt_long", label: "Billing", href: (cid) => Helpers.company_billing_path(cid) },
-  { key: "settings", group: "system", icon: "settings", label: "Settings", href: (cid) => Helpers.company_settings_path(cid) },
   { key: "help_center", group: "system", icon: "help", label: "Help Center", href: (cid) => Helpers.company_company_tickets_path(cid) }
 ]
