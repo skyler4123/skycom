@@ -68,4 +68,4 @@ grep -rEn "(available_counter|credit_usage)\.(value|increment|decrement|set|get)
 ---
 
 *See also: `docs/ATOMIC_PURPOSE.md` § Hot Path Rule (usage-counter drain pattern),
-`docs/CACHE.md` §4 (when Redis global state is appropriate), `docs/ORDER_PROCESSING_V1.md` §7.*
+`docs/CACHE.md` §5 (when Redis global state is appropriate), `docs/ORDER_PROCESSING_V1.md` §7.*

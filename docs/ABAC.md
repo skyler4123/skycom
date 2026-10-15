@@ -287,7 +287,7 @@ This project follows a **Shell First** rendering approach for SPA-like experienc
 | **Show data** (index, show) | Shell First | `respond_to do \|format\| format.html { render html: "", layout: true }` |
 | **Support actions** (create, update, destroy, show) | JSON only | Return JSON, let frontend handle UI refresh |
 
-> **Note:** Even `show` action is used to support `index` action - e.g., fetching single record details for modals, inline editing, etc.
+> **Note:** Even `show` action is used to support `index` action - e.g., fetching single record details for modals, detail pages, etc.
 
 ### Controller Example
 

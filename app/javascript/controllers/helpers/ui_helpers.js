@@ -491,58 +491,6 @@ export const selectOptionsHTML = (options = [], selectedValue, defaultText) => {
 }
 
 /**
- * Generates the HTML wrapper for the Stimulus Editable Controller.
- * @param {Object} options
- * @param {string} options.resource - The model name (e.g., 'employee')
- * @param {string} options.name - The field name (e.g., 'name' or 'email')
- * @param {string|number} options.id - The record ID
- * @param {string} options.value - The current value to display
- * @param {string} options.url - The PATCH endpoint
- * @param {string} [options.html] - Optional custom internal HTML (defaults to span)
- * @param {string} [options.dispatch] - Custom dispatch event name
- * @param {boolean} [options.confirm=true] - Whether to show a confirmation dialog
- * @param {string} [options.type='text'] - Input type (text, select, etc.)
- * @param {Array} [options.options=[]] - Options for select type [{ name: "Label", value: "id" }]
- * @param {string} [options.className=''] - Additional CSS classes for the input/select element
- * @param {boolean} [options.multiple=false] - Enable multi-select
- */
-export const editable = ({ 
-  resource, name, id, value, url, 
-  html, // This can now be `<h1 class="...">...</h1>` or `<p>...</p>`
-  dispatch = "updated", 
-  confirm = true,
-  type = "text",
-  options = [],
-  className = "",
-  multiple = false,
-  successMessage,
-  errorMessage,
-  confirmMessage
-}) => {
-  return `
-    <div 
-      data-controller="editable"
-      data-editable-resource-value="${resource}"
-      data-editable-name-value="${name}"
-      data-editable-id-value="${id}"
-      data-editable-value-value="${JSON.stringify(value).replace(/"/g, '&quot;')}"
-      data-editable-url-value="${url}"
-      data-editable-dispatch-value="${dispatch}"
-      data-editable-confirm-value="${confirm}"
-      data-editable-type-value="${type}"
-      data-editable-options-value="${JSON.stringify(options).replace(/"/g, '&quot;')}"
-      data-editable-class-name-value="${className}"
-      data-editable-multiple-value="${multiple}"
-      ${successMessage ? `data-editable-success-message-value="${successMessage}"` : ''}
-      ${errorMessage ? `data-editable-error-message-value="${errorMessage}"` : ''}
-      ${confirmMessage ? `data-editable-confirm-message-value="${confirmMessage}"` : ''}
-    >
-      ${html}
-    </div>
-  `.trim()
-}
-
-/**
  * Wraps content with the Stimulus Tooltip Controller.
  * @param {Object} options
  * @param {string} options.html - Text or HTML content for the tooltip.

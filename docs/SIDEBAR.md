@@ -81,7 +81,7 @@ was removed with the BE config.
 | `spec/features/companies/layouts/dynamic_sidebar_spec.rb` | E2E (custom groups above static, pasted URLs, custom stars) |
 | `spec/features/companies/settings/dynamic_sidebar_editor_spec.rb` | E2E (editor CRUD → sidebar reflects) |
 | `spec/services/seed/dynamic_sidebar_init_spec.rb` | Init record + Admin/Manager grants (retail/hospital/hotel) |
-| `docs/CACHE.md` §6 | localStorage key inventory + client-cache payload |
+| `docs/CACHE.md` §7 | localStorage key inventory + client-cache payload |
 
 ## 7. Dynamic Sidebar (custom groups)
 

@@ -16,7 +16,6 @@ Before suggesting any JavaScript code, helpers, or UI components, the AI Agent *
 - `app/javascript/controllers/helpers.js`: Main helper registry (AJAX, Cookies, UI).
 - `app/javascript/controllers/helpers/*`: specialized helper modules (Formatters, DOM, etc.).
 - `app/javascript/controllers/tooltip_controller.js`: The positioning engine.
-- `app/javascript/controllers/editable_controller.js`: The inline-editing engine.
 
 **Rule**: If a task can be accomplished using an existing helper in these files, the AI **MUST** use that helper instead of writing raw JavaScript or importing external libraries.
 
@@ -149,65 +148,11 @@ To maintain a "Desktop-App" feel with high reliability, Skycom uses **JSDoc** fo
 - **Null-Safety**: Initialize object properties as `null` rather than `{}`.
 - **Optional Chaining**: Use `?.` when accessing associations (e.g., `this.employee?.branch?.name`) to prevent UI crashes if data is missing or eager loading failed.
 
-# 5. Reactive UI & Inline Editing Pattern
-
-Skycom utilizes a **State-to-Template** reactivity model. Instead of manual DOM manipulation (finding IDs and updating innerText), we update the local instance state and trigger a re-render of the component. This provides a React-like experience while staying within the Stimulus/Rails ecosystem.
-
-### 5.1 The `editable` Helper
-To maintain clean templates, use the `editable` helper. This helper is **tag-agnostic** and wraps any HTML element in a Stimulus `editable` controller. It ensures that typography and styling are preserved when switching between view and edit modes.
-
-**Implementation Example:**
-```javascript
-${Helpers.editable({
-  resource: "employee",
-  name: "name",
-  id: employee.id,
-  value: employee.name,
-  url: Helpers.edit_company_employee_path(currentCompany().id, employee.id),
-  dispatch: "updateEmployee",
-  html: `<span class="text-xl font-bold text-slate-900">${employee.name}</span>`
-})}
-```
-### 5.2 Event-Driven Synchronization
-When an update is successful, the `editable` controller dispatches a custom event. The parent controller (e.g., an Index or Table controller) must listen for this event to update its local data store.
-
-**Global Event Protocol:**
-* **Event Name:** `editable:[dispatchName]` (e.g., `editable:updateEmployee`).
-* **Payload (`event.detail`):**
-    * `resource`: The name of the resource (e.g., "employee").
-    * `data`: The full JSON response from the server (Source of Truth).
-    * `value`: The new value updated.
-    * `previousValue`: The value before the edit (useful for rollbacks).
-
-### 5.3 Data Merging & Re-rendering
-Parent controllers must use the `mergeObjectArrays` helper to synchronize local state. This ensures that nested data (like roles or departments) is updated automatically in the UI without a full page refresh.
-
-**Standard Update Handler:**
-```javascript
-handleUpdate(event) {
-  const { resource, data } = event.detail
-  const newObject = data[resource] || data // Source of Truth
-
-  if (!newObject) return
-
-  // 1. Merge into the local collection (replaces item with same ID)
-  this.employees = mergeObjectArrays(this.employees, [newObject], "id")
-
-  // 2. Refresh the UI via the Shell-First render pattern
-  this.renderContent()
-}
-```
-### 5.4 Design Principles for Inline Editing
-1.  **Tag Agnosticism**: The controller does not hardcode `<span>` or `<div>`. It targets the `firstElementChild` of the wrapper to preserve the developer's intended HTML structure.
-2.  **Typography Inheritance**: The generated `input` or `select` element must inherit the CSS classes from the original display element (e.g., `text-2xl`, `font-black`) to prevent layout "jumps" during editing.
-3.  **Explicit Resource Mapping**: Always pass the `resource` name via the helper to ensure the event payload is correctly mapped to the parent's data arrays.
-4.  **Optimistic Logic**: While the UI updates after the server response, the `previousValue` is maintained in the event detail to allow for audit logging or error recovery.
-
-# 6. Tooltip System (Zero-Dependency)
+# 5. Tooltip System (Zero-Dependency)
 
 Skycom uses a custom, lightweight Stimulus controller for tooltips to avoid the overhead and dependency issues of external libraries like Tippy.js. It supports smart positioning, collision detection (auto-flipping), and rich HTML content.
 
-### 6.1 The `tooltip` Helper
+### 5.1 The `tooltip` Helper
 The `tooltip` helper is a **Polymorphic Attribute Generator**. It does not wrap HTML; instead, it returns a string of `data-` attributes to be spread directly onto an existing element.
 
 **Usage Patterns:**
@@ -216,7 +161,7 @@ The `tooltip` helper is a **Polymorphic Attribute Generator**. It does not wrap 
 2.  **Advanced (Object)**: `${tooltip({ message: "HTML String", position: "right", delay: 500 })}`
     - Use this for custom positioning, styling, or timing.
 
-### 6.2 Implementation in Templates
+### 5.2 Implementation in Templates
 Always inject the helper directly inside the opening tag of the trigger element.
 
 ```javascript
@@ -234,7 +179,7 @@ Always inject the helper directly inside the opening tag of the trigger element.
   Delete
 </button>
 ```
-### 6.3 Technical Specifications
+### 5.3 Technical Specifications
 - **Controller**: `tooltip_controller.js`
 - **Smart Positioning**: Uses native `getBoundingClientRect()` for collision detection. If a tooltip is set to `top` but hits the top of the browser window, it automatically flips to `bottom`.
 - **HTML Support**: The `message` value is injected via `.innerHTML`. The helper uses `.replace(/"/g, '&quot;')` to ensure HTML strings don't break the data-attribute structure.
@@ -243,7 +188,7 @@ Always inject the helper directly inside the opening tag of the trigger element.
     - **Custom**: Use the `classes` value to pass Tailwind overrides (e.g., `!bg-rose-600` for destructive actions).
 - **Lifecycle**: Tooltips are created dynamically on `mouseenter` and destroyed on `mouseleave` or `disconnect()`.
 
-### 6.4 Best Practices
+### 5.4 Best Practices
 - **Icon-Only Buttons**: Always provide a tooltip for icons that don't have accompanying text labels.
 - **Polymorphic Usage**:
     - Use `tooltip("Simple Text")` for 90% of cases.
@@ -251,11 +196,11 @@ Always inject the helper directly inside the opening tag of the trigger element.
 - **Z-Index**: The controller uses `z-[9999]` by default. Ensure your Modals or Overlays do not exceed this value, or adjust the controller accordingly.
 - **Delay**: The default `200ms` delay is intentional to prevent "UI flickering" when a user moves the cursor across a list of items.
 
-# 7. Global Form Engine
+# 6. Global Form Engine
 
 Skycom uses a centralized Form Engine to handle AJAX submissions for all business modules. This system replicates the behavior of Rails `form_with` while allowing for fully dynamic, JSON-based SPA interactions.
 
-### 7.1 The `form` Helper
+### 6.1 The `form` Helper
 Instead of writing raw `<form>` tags, always use the `form()` helper. This ensures that security headers, Rails method spoofing (PATCH/DELETE), and Stimulus hooks are applied consistently.
 
 **Key Features:**
@@ -263,7 +208,7 @@ Instead of writing raw `<form>` tags, always use the `form()` helper. This ensur
 - **CSRF Protection**: Injects required security tokens via `formPostSecurityTags()`.
 - **Stimulus Integration**: No forced controller. `form()` returns a plain `<form>` — wire submission in the owning controller via `data-action="submit-><identifier>#handleSubmit"` passed in `attributes`.
 
-### 7.2 The `handleSubmit` Pattern (controller-owned submission)
+### 6.2 The `handleSubmit` Pattern (controller-owned submission)
 There is no central form controller. Each Stimulus controller owns a `handleSubmit(event)` method, wired via `data-action="submit-><identifier>#handleSubmit"` on the `form()` output.
 
 **1. Reading Input**:
@@ -279,7 +224,7 @@ Use `FormData` against the submitted form and read bracket-notation names direct
     - For modals: `closeModal()` on update-style flows, `reloadThenToast()` on create-style flows so the new record appears.
 - **Error Handling**: Catches 422/500 errors and displays `error.errors?.join(", ")` in an "Error" `toast` (see `docs/API_ERROR_FORMAT.md`).
 
-### 7.3 Usage Example
+### 6.3 Usage Example
 
 ```javascript
 // Inside a Modal or Page Template
@@ -296,13 +241,13 @@ return form({
   html: fields
 });
 ```
-### 7.4 Implementation Rules
+### 6.4 Implementation Rules
 - **Naming Convention**: Always use bracket notation for inputs (e.g., `resource[attribute]`). The names already carry the nesting Rails Strong Params needs — no client-side transformation exists.
 - **Triggering Success**: After a successful submission, either `reloadThenToast()` (full reload so new records appear) or dispatch a custom event the parent listens for (e.g. `window.dispatchEvent(new CustomEvent("calendar:refresh"))`). There is no `form:success` event — submission lives in the owning controller's `handleSubmit`.
 - **Button Types**: Ensure the primary action button is explicitly `type="submit"`. The controller intercepts the `submit` event of the form, not the `click` event of a button.
 - **Manual Overrides**: All handling already lives in the owning controller's `handleSubmit` — keep custom flows (e.g. multi-step wizards) as state and methods on that controller.
 
-### 7.5 Security & Method Spoofing
+### 6.5 Security & Method Spoofing
 Since standard HTML forms only support `GET` and `POST`, the `form()` helper automatically handles Rails-specific requirements:
 - **PATCH/DELETE**: Injects a hidden `<input name="_method">` tag.
 - **CSRF**: Injects the authenticity token required by Rails to prevent `InvalidAuthenticityToken` errors.

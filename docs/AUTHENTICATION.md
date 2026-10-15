@@ -230,7 +230,7 @@ When sync_cache was introduced, existing session cache entries in `Rails.local_c
 
 ## 8. See Also
 
-- `docs/CACHE.md` — Complete cache documentation (local_cache, sync_cache, global_cache, client cache)
+- `docs/CACHE.md` — Complete cache documentation (ram_cache, local_cache, sync_cache, global_cache, client cache)
 - `docs/MODEL_CALLBACKS.md` — Cache::RecordsConcern callback reference
 - `docs/ABAC.md` — Permission-based authorization (Pundit on top of auth)
 - `config/initializers/cache.rb` — Cache store definitions
