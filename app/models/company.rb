@@ -13,7 +13,7 @@ class Company < ApplicationRecord
   # Default resource names for new companies. Used by #resource_names
   # (which reads from metadata with this as a fallback).
   DEFAULT_RESOURCE_NAMES = %w[
-    Product Order Customer Employee Branch Department
+    Product Order Customer CustomerProfile CustomerSubprofile Employee EmployeeProfile EmployeeSubprofile Branch Department
     PolicyRoleAppointment Invoice Transaction Service Policy
     Category PropertyMapping TableConfig Brand Facility Warehouse
     Supplier
@@ -87,6 +87,8 @@ class Company < ApplicationRecord
   has_many :tags, dependent: :destroy
   has_many :employee_groups, dependent: :destroy
   has_many :employees, dependent: :destroy
+  has_many :employee_profiles, dependent: :destroy
+  has_many :employee_subprofiles, dependent: :destroy
   has_many :roles, dependent: :destroy
   has_many :policies, dependent: :destroy
   has_many :policy_role_appointments, dependent: :destroy
@@ -113,6 +115,8 @@ class Company < ApplicationRecord
   has_many :stock_pendings, dependent: :destroy
   has_many :suppliers, dependent: :destroy
   has_many :customers, dependent: :destroy
+  has_many :customer_profiles, dependent: :destroy
+  has_many :customer_subprofiles, dependent: :destroy
   has_many :customer_groups, dependent: :destroy
   has_many :orders, dependent: :destroy
   has_many :purchases, dependent: :destroy
