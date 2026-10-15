@@ -33,7 +33,7 @@ RSpec.describe "Admin::PromoCampaigns", type: :request do
     it "creates a campaign and enqueues the job" do
       expect {
         post "/admin/promo_campaigns",
-          params: { promo_campaign: { name: "Launch Gift", amount: 300, max_cap: 1000,
+          params: { promo_campaign: { name: "Launch Gift", title: "Gift!", body: "Enjoy", amount: 300, max_cap: 1000,
             scheduled_at: 1.hour.from_now.iso8601, conditions: { country: [ "us" ] } } },
           headers: json_headers
       }.to change { PromoCampaign.count }.by(1)
@@ -41,7 +41,19 @@ RSpec.describe "Admin::PromoCampaigns", type: :request do
       expect(response).to have_http_status(:created)
       body = JSON.parse(response.body)
       expect(body["promo_campaign"]["status"]).to eq("scheduled")
+      expect(body["promo_campaign"]["title"]).to eq("Gift!")
+      expect(body["promo_campaign"]["body"]).to eq("Enjoy")
       expect(SolidQueue::Job.where(class_name: "PromoCampaignJob").count).to be >= 1
+    end
+
+    it "rejects missing title with plural errors" do
+      post "/admin/promo_campaigns",
+        params: { promo_campaign: { name: "Bad", amount: 300, max_cap: 1000, scheduled_at: Time.current.iso8601 } },
+        headers: json_headers
+
+      expect(response).to have_http_status(:unprocessable_content)
+      expect(JSON.parse(response.body)["errors"]).to be_an(Array)
+      expect(PromoCampaign.where(name: "Bad").count).to eq(0)
     end
 
     it "rejects invalid params with plural errors key" do

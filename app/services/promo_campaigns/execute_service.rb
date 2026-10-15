@@ -27,7 +27,10 @@ module PromoCampaigns
           return { success: false, errors: [ "Campaign already processed" ] }
         end
 
-        @campaign.update!(status: :processing)
+        # System transition: skip copy validations so legacy/defensive
+        # blank title/body still executes using PROMO_DEFAULT_* fallback.
+        @campaign.status = :processing
+        @campaign.save!(validate: false)
       end
 
       matched = 0
@@ -43,14 +46,19 @@ module PromoCampaigns
         failed += 1 if outcome == :failed
       end
 
-      @campaign.update!(
-        status: :completed,
-        processed_at: Time.current,
-        stats: { "matched" => matched, "granted" => granted, "skipped" => skipped, "failed" => failed }
-      )
+      @campaign.status = :completed
+      @campaign.processed_at = Time.current
+      @campaign.stats = { "matched" => matched, "granted" => granted, "skipped" => skipped, "failed" => failed }
+      @campaign.save!(validate: false)
       { success: true, matched: matched, granted: granted, skipped: skipped, failed: failed }
     rescue StandardError => e
-      @campaign.update!(status: :failed, stats: { "error" => e.message }) rescue nil
+      begin
+        @campaign.status = :failed
+        @campaign.stats = { "error" => e.message }
+        @campaign.save!(validate: false)
+      rescue StandardError
+        nil
+      end
       { success: false, errors: [ e.message ] }
     end
 
@@ -99,13 +107,27 @@ module PromoCampaigns
       )
       Notifications::CreateService.call(
         company: company,
-        name: "Skycom gave you #{amount} credits!",
-        description: "Promo '#{@campaign.name}' added #{amount} promo credits (cap #{@campaign.max_cap}). Thank you for using Skycom! Here is our help to grow your business.",
+        name: resolve_title(amount),
+        description: resolve_body(amount),
         tag_ids: [ tag.id ],
         severity: :info,
         throttle_key: "promo:#{@campaign.id}",
         throttle_window: 1.hour
       )
+    end
+
+    def resolve_title(amount)
+      interpolate(@campaign.title.presence || PROMO_DEFAULT_TITLE, amount)
+    end
+
+    def resolve_body(amount)
+      interpolate(@campaign.body.presence || PROMO_DEFAULT_BODY, amount)
+    end
+
+    def interpolate(template, amount)
+      format(template, amount: amount, name: @campaign.name, max_cap: @campaign.max_cap)
+    rescue StandardError
+      template
     end
   end
 end

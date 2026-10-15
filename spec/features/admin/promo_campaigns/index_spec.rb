@@ -41,6 +41,8 @@ RSpec.feature "Admin::PromoCampaigns", type: :feature, js: true do
 
     expect(page).to have_content("Launch Gift", wait: 10)
     expect(page).to have_content("300")
+    expect(page).to have_content(campaign.title)
+    expect(page).to have_content("PREVIEW")
   end
 
   scenario "admin can create a campaign from new page" do
@@ -49,6 +51,8 @@ RSpec.feature "Admin::PromoCampaigns", type: :feature, js: true do
 
     expect(page).to have_content("New Promotion Campaign", wait: 15)
     fill_in "promo_campaign[name]", with: "Holiday Bonus"
+    fill_in "promo_campaign[title]", with: "Holiday gift!"
+    fill_in "promo_campaign[body]", with: "Enjoy credits"
     fill_in "promo_campaign[amount]", with: "300"
     fill_in "promo_campaign[max_cap]", with: "1000"
     page.execute_script("document.querySelector('input[name=\"promo_campaign[scheduled_at]\"]').value = '2026-12-01T10:00'")
