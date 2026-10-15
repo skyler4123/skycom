@@ -232,4 +232,4 @@ ABAC permission model.
 ---
 
 *See also: `docs/ABAC.md` (permission engine), `docs/MODEL_CALLBACKS.md` (Purchase/Workflow callbacks),
-`docs/DYNAMIC_TABLE.md` §2.5 (dynamic search/filter), `docs/ROADMAP.md`.*
+`docs/DYNAMIC_TABLE.md` §2.5 (dynamic search/filter).*

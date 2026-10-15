@@ -1,7 +1,6 @@
 # Skycom Performance Backlog
 
-> **Status**: Backlog — not scheduled work. Same standing as the housekeeping
-> items in `docs/TODO.md` and `docs/ROADMAP.md`. An item leaves this doc only
+> **Status**: Backlog — not scheduled work. An item leaves this doc only
 > when its trigger is hit and the switch is implemented.
 
 ## Convention
@@ -92,5 +91,4 @@ Every item has the same four lines:
 
 ---
 
-*See also: `docs/TODO.md` (undecided/future work), `docs/ROADMAP.md`
-(phases), `docs/WEBSOCKET.md` (channels/events), `docs/CACHE.md` (tiers).*
+*See also: `docs/WEBSOCKET.md` (channels/events), `docs/CACHE.md` (tiers).*

@@ -203,14 +203,14 @@ ${policy.workflow_status === 'active' ? 'checked' : ''}
 ```
 
 ### Form Submission
-Use `Helpers.form()` for toggle actions:
+Use the `form()` wrapper for toggle actions, with submission wired to the owning controller's `handleSubmit`:
 
 ```javascript
 // Toggle ON (create appointment)
 Helpers.form({
   action: Helpers.company_permissions_path(companyId),
   method: 'POST',
-  dataAction: 'create',
+  attributes: `data-action="submit->${this.identifier}#handleSubmit"`,
   html: `
     <input type="hidden" name="policy_appointment[policy_id]" value="${policyId}" />
     <input type="hidden" name="policy_appointment[role_id]" value="${roleId}" />
@@ -220,14 +220,15 @@ Helpers.form({
 // Toggle OFF (destroy appointment)
 Helpers.form({
   action: Helpers.company_permissions_path(companyId, appointmentId),
-  method: 'DELETE'
+  method: 'DELETE',
+  attributes: `data-action="submit->${this.identifier}#handleSubmit"`
 })
 ```
 
 ### Success Handling
-- Listen for `form:success` event
-- Dispatch `refresh` event to reload the permissions page
-- Show success toast notification
+- `handleSubmit` sends the payload via `fetchJson`
+- On success show a toast with the server's message, then `reloadThenToast()` so the permissions page reflects the change
+- On failure show `error.errors?.join(", ")` in an error toast (see `docs/API_ERROR_FORMAT.md`)
 
 ---
 
@@ -352,11 +353,11 @@ This connects the action to the current controller instance's method.
 
 ---
 
-## 12. Frontend Data Fetching: form vs fetchJson
+## 12. Frontend Data Fetching: form() wrapper vs fetchJson
 
 This project has two patterns for handling API calls in Stimulus controllers:
 
-### Pattern 1: Helpers.form() (Preferred for User Actions)
+### Pattern 1: form() Wrapper + handleSubmit (Preferred for User Actions)
 
 Used when there are HTML form elements that trigger actions:
 
@@ -364,22 +365,22 @@ Used when there are HTML form elements that trigger actions:
 |----------|---------|
 | Form submissions | Creating, updating, deleting records |
 | Button clicks | Toggle switches, checkboxes |
-| Any action with UI feedback | FormController handles toast automatically |
+| Any action with UI feedback | Owning controller's `handleSubmit` shows the toast |
 
 **Benefits:**
 - Auto injects CSRF token
 - Auto handles method spoofing (PATCH, DELETE)
-- Auto shows toast on success/error
-- Event-driven: `form:success` and `form:error` events
+- Owning controller shows the toast explicitly (`response.message` / `error.errors?.join(", ")`), then `closeModal()` or `reloadThenToast()`
+- Submission is wired per controller — `data-action="submit->${this.identifier}#handleSubmit"` in the form's `attributes`. There is no central form controller and no `form:success` event
 
 **Example:**
 ```javascript
-// Checkbox wrapped in form
+// Submit handled by the owning controller
 ${Helpers.form({
   action: url,
   method: 'PATCH',
-  dataAction: 'refresh',
-  html: `<input type="checkbox" data-action="change->form#submit" />`
+  attributes: `data-action="submit->${this.identifier}#handleSubmit"`,
+  html: `<input type="checkbox" name="policy[active]" />`
 })}
 ```
 
@@ -409,12 +410,13 @@ async connect() {
 
 ```
 Is there an HTML element triggering the action?
-├── YES → Use Helpers.form()
-│   ├── FormController handles:
+├── YES → Use Helpers.form() wrapper + handleSubmit
+│   ├── form() provides:
 │   │   ├── CSRF injection
-│   │   ├── Method spoofing
-│   │   ├── Toast notifications
-│   │   └── Success/error events
+│   │   └── Method spoofing
+│   ├── Owning controller's handleSubmit provides:
+│   │   ├── Toast notifications (response.message / error.errors)
+│   │   └── closeModal() or reloadThenToast() on success
 │
 └── NO → Use fetchJson()
     ├── For connect() initial data loading
