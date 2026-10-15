@@ -163,13 +163,17 @@ end
 ## 9. Header Swap Mechanics
 
 Static ERB ships `#header-guest` (visible) + `#header-signedin` (`hidden`,
-containing Go to Dashboard, New Company, and the
-`home--header--authentication` avatar mount). On connect,
+containing Go to Dashboard (`#header-dashboard-link`), New Company
+(`#header-new-company-link`), Admin Dashboard (`#header-admin-link`,
+`hidden`), and the `home--header--authentication` avatar mount). On connect,
 `home/index_controller.js#renderSignedInHeader` checks the synchronous
 `Helpers.isSignedIn()` cookie — if set, it hides guest and shows signed-in.
 No waiting on the client cache (an earlier version gated on `currentUser()`
 arrival and flaked on sync timing); the avatar helper renders a placeholder
-until the cache arrives, matching every other page.
+until the cache arrives, matching every other page. `revealAdminLink()`
+polls `currentUser()?.system_role`: `admin` / `super_admin` reveals the
+admin link and hides dashboard + new-company links (owner flows);
+non-admins keep dashboard + new-company and never see the admin link.
 
 ---
 

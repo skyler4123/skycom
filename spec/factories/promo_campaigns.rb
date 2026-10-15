@@ -3,6 +3,8 @@ FactoryBot.define do
   factory :promo_campaign do
     name { "Promo #{SecureRandom.hex(4)}" }
     description { "Test promo campaign" }
+    title { "Skycom gave you 300 credits!" }
+    body { "Test promo notification body" }
     amount { 300 }
     max_cap { 1000 }
     conditions { {} }

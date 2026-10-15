@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_10_14_000005) do
+ActiveRecord::Schema[8.1].define(version: 2026_10_14_000006) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pgcrypto"
@@ -5537,6 +5537,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_14_000005) do
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "title", null: false
+    t.text "body", null: false
     t.index ["business_type"], name: "index_promo_campaigns_on_business_type"
     t.index ["discarded_at"], name: "index_promo_campaigns_on_discarded_at"
     t.index ["lifecycle_status"], name: "index_promo_campaigns_on_lifecycle_status"

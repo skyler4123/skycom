@@ -102,7 +102,15 @@ export default class Admin_PromoCampaigns_ShowController extends Admin_LayoutCon
             </div>
           </div>
 
-          <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 border-t border-slate-200 dark:border-slate-800 pt-6">
+          <div class="border-t border-slate-200 dark:border-slate-800 pt-6 mt-6">
+            <h3 class="text-sm font-bold text-slate-500 dark:text-slate-400 uppercase mb-4">${translate("Notification Preview")}</h3>
+            <div class="p-4 bg-slate-50 dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700">
+              <p class="text-sm font-bold text-slate-900 dark:text-white">${c.title || "—"}</p>
+              <p class="text-sm text-slate-500 dark:text-slate-400 mt-1">${c.body || "—"}</p>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 border-t border-slate-200 dark:border-slate-800 pt-6 mt-6">
             <div>
               <p class="text-xs font-medium text-slate-500 dark:text-slate-400">Amount</p>
               <p class="text-lg font-bold font-mono text-emerald-600 dark:text-emerald-400">${Number(c.amount || 0).toLocaleString()}</p>
