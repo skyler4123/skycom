@@ -57,12 +57,13 @@ This file and `README.md` are always in context. Everything in `docs/` is on-dem
 | Category-bound dynamic properties | `docs/CATEGORY_DYNAMIC_SCHEMA.md` — three-table runtime merge |
 | Addresses | `docs/ADDRESS.md` — fingerprint dedup + immutable record pattern |
 | HR module (tables, resolution engine, permission matrix) | `docs/HR.md` |
+| Per-domain details on Employee/Customer (profiles, personas, histories) | `docs/PROFILE_SUBPROFILE.md` — Profile/SubProfile buckets (full-dynamic resources), not new base-table columns |
 
 ### Platform
 
 | When your task involves… | Read first |
 |---|---|
-| Server- or browser-side caching | `docs/CACHE.md` — `local_cache` / `sync_cache` / `global_cache` tiers + client cache |
+| Server- or browser-side caching | `docs/CACHE.md` — `ram_cache` / `local_cache` / `sync_cache` / `global_cache` tiers + client cache |
 | Realtime updates | `docs/WEBSOCKET.md` — channel naming + event protocol + add-new-event recipe |
 | Search | `docs/MEILISEARCH.md` — sync architecture + making a model searchable |
 | External API integration (dev/test) | `docs/MOCK_API.md` — mock server routes + add-new-API template |
