@@ -13,7 +13,8 @@ Before suggesting any JavaScript code, helpers, or UI components, the AI Agent *
 - `app/javascript/controllers/helpers/*`: specialized helper modules (Formatters, DOM, etc.).
 
 ### Component Specifications
-- `app/javascript/controllers/form_controller.js`: The submission engine.
+- `app/javascript/controllers/helpers.js`: Main helper registry (AJAX, Cookies, UI).
+- `app/javascript/controllers/helpers/*`: specialized helper modules (Formatters, DOM, etc.).
 - `app/javascript/controllers/tooltip_controller.js`: The positioning engine.
 - `app/javascript/controllers/editable_controller.js`: The inline-editing engine.
 
@@ -260,25 +261,23 @@ Instead of writing raw `<form>` tags, always use the `form()` helper. This ensur
 **Key Features:**
 - **Method Spoofing**: Automatically injects hidden `_method` tags for `PATCH` and `DELETE` requests.
 - **CSRF Protection**: Injects required security tokens via `formPostSecurityTags()`.
-- **Stimulus Integration**: Defaults to `data-controller="form"`, which intercepts the native submit event.
+- **Stimulus Integration**: No forced controller. `form()` returns a plain `<form>` — wire submission in the owning controller via `data-action="submit-><identifier>#handleSubmit"` passed in `attributes`.
 
-### 7.2 The `form_controller.js` Logic
-This controller acts as the "Submission Pipeline" for the entire platform.
+### 7.2 The `handleSubmit` Pattern (controller-owned submission)
+There is no central form controller. Each Stimulus controller owns a `handleSubmit(event)` method, wired via `data-action="submit-><identifier>#handleSubmit"` on the `form()` output.
 
-**1. Rails-Compatible Nesting**: 
-Standard `FormData` produces a flat list of keys. The controller uses a `nestFormData` logic to convert bracket-notation names into nested objects.
+**1. Reading Input**:
+Use `FormData` against the submitted form and read bracket-notation names directly. The input names already carry the nesting Rails Strong Params needs — no client-side transformation step exists.
 - *Input*: `name="employee[email]"` with value `"skyler@example.com"`
-- *Output*: `{ employee: { email: "skyler@example.com" } }`
-- *Why*: This allows Rails **Strong Params** to work out-of-the-box without manual mapping in the backend.
+- *Read*: `new FormData(event.target).get("employee[email]")`
 
-**2. The Submission Lifecycle**:
+**2. The Submission Lifecycle** (inside `handleSubmit`):
 - **Intercept**: `event.preventDefault()` stops the page from reloading.
-- **Request**: Uses the global `fetchJson` helper to send the nested object to the server.
-- **Success Handling**: 
-    - Displays a "Success" `toast`.
-    - Closes active modals via `closeModal()`.
-    - **Dispatch**: Fires a `success` event. This is critical for refreshing parent UI components (like tables or stat cards) without a full page refresh.
-- **Error Handling**: Catches 422/500 errors and displays the server's error message in a "Warning" or "Error" `toast`.
+- **Request**: Uses the global `fetchJson` helper to send the payload to the server.
+- **Success Handling**:
+    - Displays a "Success" `toast` with the server's `response.message`.
+    - For modals: `closeModal()` on update-style flows, `reloadThenToast()` on create-style flows so the new record appears.
+- **Error Handling**: Catches 422/500 errors and displays `error.errors?.join(", ")` in an "Error" `toast` (see `docs/API_ERROR_FORMAT.md`).
 
 ### 7.3 Usage Example
 
@@ -298,11 +297,10 @@ return form({
 });
 ```
 ### 7.4 Implementation Rules
-- **Naming Convention**: Always use bracket notation for inputs (e.g., `resource[attribute]`). This is mandatory for the `nestFormData` logic to map values to Rails Strong Params correctly.
-- **Triggering Success**: If a parent Index Controller needs to refresh after a form submission, listen for the dispatch event on the form element: 
-    - `data-action="form:success->index#refresh"`
+- **Naming Convention**: Always use bracket notation for inputs (e.g., `resource[attribute]`). The names already carry the nesting Rails Strong Params needs — no client-side transformation exists.
+- **Triggering Success**: After a successful submission, either `reloadThenToast()` (full reload so new records appear) or dispatch a custom event the parent listens for (e.g. `window.dispatchEvent(new CustomEvent("calendar:refresh"))`). There is no `form:success` event — submission lives in the owning controller's `handleSubmit`.
 - **Button Types**: Ensure the primary action button is explicitly `type="submit"`. The controller intercepts the `submit` event of the form, not the `click` event of a button.
-- **Manual Overrides**: If a specific form requires custom handling (e.g., a multi-step wizard), set `data-controller` to your custom controller name in the `form()` helper options.
+- **Manual Overrides**: All handling already lives in the owning controller's `handleSubmit` — keep custom flows (e.g. multi-step wizards) as state and methods on that controller.
 
 ### 7.5 Security & Method Spoofing
 Since standard HTML forms only support `GET` and `POST`, the `form()` helper automatically handles Rails-specific requirements:

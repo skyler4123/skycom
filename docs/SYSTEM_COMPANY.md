@@ -159,6 +159,4 @@ ABAC like any tenant.
 
 ---
 
-*See also: `docs/MODEL_CALLBACKS.md` (callback reference), `docs/ROADMAP.md`
-(Chat & Help Desk — future work that will host its accounts on the system
-company).*
+*See also: `docs/MODEL_CALLBACKS.md` (callback reference).*

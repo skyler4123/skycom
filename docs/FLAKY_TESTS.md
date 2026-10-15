@@ -56,7 +56,7 @@ end
 
 ### 3. Confirm Dialogs Blocking
 
-**Problem**: `form_controller.js` has a default confirm dialog that blocks in headless browsers.
+**Problem**: A native `confirm()` dialog (e.g. in `checkbox_controller.js`, the roles controllers, or `editable_controller.js`) blocks in headless browsers.
 
 **Solution**: Use `click_button` which triggers native form submit:
 ```ruby
