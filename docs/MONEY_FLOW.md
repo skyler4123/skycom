@@ -481,7 +481,7 @@ expect(invoice.transactions.sum(:price_cents)).to be >= invoice.price_cents
 | **POS Order Processing V1** (checkout → pay → finalize, cash + Mock QR) | ✅ Complete | `docs/ORDER_PROCESSING_V1.md` |
 | **PaymentMethod / PaymentMethodAppointment** (global catalog + merchant identity) | ✅ Complete | `docs/PAYMENT_METHODS.md` |
 | **Commerce Invoice/Transaction derivation** | ✅ Complete | `Transaction` `status` enum + completion-gated `sync_invoice_payment_status` |
-| **Debt enforcement** (what happens when `debt_credit_balance > 0`) | ⬜ TBD | Tracked in `docs/ROADMAP.md` Phase 1.3 |
+| **Debt enforcement** (what happens when `debt_credit_balance > 0`) | ⬜ TBD | Not yet scheduled |
 | **Real gateways** (MoMo / ZaloPay / VNPay / Stripe) | ⬜ Future | Mock strategies (`mock_qr_gateway`, `mock_redirect_gateway`) stand in |
 
 ---
