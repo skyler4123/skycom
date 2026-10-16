@@ -614,16 +614,14 @@ class Seed::RetailInitService
     end
   end
 
-  # One dynamic sidebar record per company (docs/SIDEBAR.md): the company-level
-  # Setting holding all custom sidebar groups in metadata["sidebar_groups"].
-  # Groups start empty — owners build them on the Settings page; the retail
-  # enricher adds sample shortcuts for development.
+  # One active sidebar CompanySetting per company (docs/SIDEBAR.md): the
+  # company-level record holding all custom sidebar groups in
+  # metadata["sidebar_groups"]. Groups start empty — owners build them on
+  # the Settings page; the retail enricher adds sample shortcuts.
   def create_default_dynamic_sidebar
-    Setting.find_or_create_by!(company: @company, appoint_to: @company, code: DYNAMIC_SIDEBAR_CODE) do |setting|
-      setting.name = "Dynamic sidebar"
-      setting.business_type = :company
-      setting.lifecycle_status = :active
-      setting.workflow_status = :confirmed
+    CompanySetting.find_or_create_by!(company: @company, name: "Company Quick Links") do |setting|
+      setting.business_type = :sidebar_groups
+      setting.workflow_status = :active
       setting.metadata = { "sidebar_groups" => [] }
     end
   end
@@ -699,7 +697,7 @@ class Seed::RetailInitService
         "CompanyTicketComment" => { create: true, read: true, update: true, delete: true },
         "CompanyTicketLog" => { create: true, read: true, update: true, delete: true },
         "Document" => { create: true, read: true, update: true, delete: true },
-        "Setting" => { create: true, read: true, update: true, delete: true },
+        "CompanySetting" => { create: true, read: true, update: true, delete: true },
 
         "Service" => { create: true, read: true, update: true, delete: true },
         "Stock" => { create: true, read: true, update: true, delete: true },
@@ -764,7 +762,7 @@ class Seed::RetailInitService
         "CompanyTicketComment" => { create: true, read: true, update: true, delete: true },
         "CompanyTicketLog" => { create: true, read: true, update: true, delete: true },
         "Document" => { create: true, read: true, update: true, delete: true },
-        "Setting" => { create: true, read: true, update: true, delete: true },
+        "CompanySetting" => { create: true, read: true, update: true, delete: true },
         "Student" => { create: true, read: true, update: true, delete: true }
       },
       Cashier: {

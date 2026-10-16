@@ -211,18 +211,11 @@ ACCEPTABLE_TICKET_FILE_TYPES = %w[
 ].freeze
 
 # =============================================================================
-# Dynamic Sidebar (company-level custom groups + items)
-# One Setting per company (code below, appoint_to = Company) holds all custom
+# Company Settings (company-level config incl. custom sidebar groups)
+# One CompanySetting per company per business_type is active at a time
+# (see CompanySetting). The active sidebar_groups record holds all custom
 # groups in metadata["sidebar_groups"]. See docs/SIDEBAR.md.
 # =============================================================================
-
-# Code identifying the company's dynamic sidebar Setting record.
-DYNAMIC_SIDEBAR_CODE = "DYNAMIC_SIDEBAR".freeze
-
-# Code identifying an employee's personal sidebar Setting record
-# (appoint_to = Employee, business_type = :employee). One per employee per
-# company; renders below the shared company groups. See docs/SIDEBAR.md.
-PERSONAL_SIDEBAR_CODE = "PERSONAL_SIDEBAR".freeze
 
 # =============================================================================
 # Welcome Notification (new-company onboarding)

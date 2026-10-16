@@ -775,14 +775,12 @@ class Seed::RetailEnrichService
     Discounts::BatchGenerator.call(discount_group: fixed_group, quantity: 25)
   end
 
-  # Sample dynamic sidebar shortcuts for development (docs/SIDEBAR.md).
+  # Sample sidebar shortcuts for development (docs/SIDEBAR.md).
   # Only fills the init record when it is still empty — never clobbers edits.
   def create_dynamic_sidebar_samples
-    record = Setting.find_or_create_by!(company: @retail, appoint_to: @retail, code: DYNAMIC_SIDEBAR_CODE) do |setting|
-      setting.name = "Dynamic sidebar"
-      setting.business_type = :company
-      setting.lifecycle_status = :active
-      setting.workflow_status = :confirmed
+    record = CompanySetting.find_or_create_by!(company: @retail, name: "Company Quick Links") do |setting|
+      setting.business_type = :sidebar_groups
+      setting.workflow_status = :active
       setting.metadata = { "sidebar_groups" => [] }
     end
     return if record.sidebar_groups.present?

@@ -119,7 +119,8 @@ export const currentTableConfigs = () => {
 }
 
 export const currentSettings = () => {
-  return currentCompany()?.settings || []
+  const company = currentCompany()
+  return company?.company_settings || company?.settings || []
 }
 
 export const currentEmployees = () => {
@@ -135,16 +136,6 @@ export const currentEmployee = () => {
 
 export const currentEmployeeId = () => {
   return currentEmployee()?.id || null
-}
-
-export const currentPersonalSettings = () => {
-  return getCache().personal_settings || []
-}
-
-export const currentPersonalSetting = () => {
-  const employeeId = currentEmployeeId()
-  if (!employeeId) return null
-  return currentPersonalSettings().find((s) => String(s.appoint_to_id) === String(employeeId)) || null
 }
 
 // Helper method inside your controller or JS file

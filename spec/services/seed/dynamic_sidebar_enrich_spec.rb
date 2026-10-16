@@ -19,11 +19,11 @@ RSpec.describe "enrich seeds demo Quick Links for every company" do
     let(:company) { create(:company, business_type: :hospital) }
 
     it "fills the empty init record with demo Quick Links" do
-      expect(Setting.find_by(company: company, code: DYNAMIC_SIDEBAR_CODE).sidebar_groups).to eq([])
+      expect(CompanySetting.find_by(company: company, business_type: :sidebar_groups, workflow_status: :active).sidebar_groups).to eq([])
 
       run_sidebar_samples(Seed::HospitalEnrichService, company)
 
-      groups = Setting.find_by(company: company, code: DYNAMIC_SIDEBAR_CODE).reload.sidebar_groups
+      groups = CompanySetting.find_by(company: company, business_type: :sidebar_groups, workflow_status: :active).reload.sidebar_groups
       expect(groups.size).to eq(1)
       expect(groups.first["name"]).to eq("Quick Links")
       names = groups.first["items"].map { |i| i["name"] }
@@ -33,7 +33,7 @@ RSpec.describe "enrich seeds demo Quick Links for every company" do
     end
 
     it "never clobbers existing groups" do
-      record = Setting.find_by(company: company, code: DYNAMIC_SIDEBAR_CODE)
+      record = CompanySetting.find_by(company: company, business_type: :sidebar_groups, workflow_status: :active)
       record.update!(sidebar_groups: [ { "key" => "kept", "name" => "Kept", "items" => [] } ])
 
       run_sidebar_samples(Seed::HospitalEnrichService, company)
@@ -46,11 +46,11 @@ RSpec.describe "enrich seeds demo Quick Links for every company" do
     let(:company) { create(:company, business_type: :hotel) }
 
     it "fills the empty init record with demo Quick Links" do
-      expect(Setting.find_by(company: company, code: DYNAMIC_SIDEBAR_CODE).sidebar_groups).to eq([])
+      expect(CompanySetting.find_by(company: company, business_type: :sidebar_groups, workflow_status: :active).sidebar_groups).to eq([])
 
       run_sidebar_samples(Seed::HotelEnrichService, company)
 
-      groups = Setting.find_by(company: company, code: DYNAMIC_SIDEBAR_CODE).reload.sidebar_groups
+      groups = CompanySetting.find_by(company: company, business_type: :sidebar_groups, workflow_status: :active).reload.sidebar_groups
       expect(groups.size).to eq(1)
       expect(groups.first["name"]).to eq("Quick Links")
       names = groups.first["items"].map { |i| i["name"] }
@@ -58,7 +58,7 @@ RSpec.describe "enrich seeds demo Quick Links for every company" do
     end
 
     it "never clobbers existing groups" do
-      record = Setting.find_by(company: company, code: DYNAMIC_SIDEBAR_CODE)
+      record = CompanySetting.find_by(company: company, business_type: :sidebar_groups, workflow_status: :active)
       record.update!(sidebar_groups: [ { "key" => "kept", "name" => "Kept", "items" => [] } ])
 
       run_sidebar_samples(Seed::HotelEnrichService, company)

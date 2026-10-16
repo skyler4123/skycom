@@ -251,14 +251,6 @@ never through model callbacks, mirroring the no-callback rule for direct day wri
 
 ---
 
-### Setting (`app/models/setting.rb`)
-
-| Callback | Line | Method | Description |
-|----------|------|--------|-------------|
-| `before_validation :derive_company_from_appoint_to` | — | `derive_company_from_appoint_to` | Derives `company_id` from the polymorphic `appoint_to`: Company → `appoint_to.id`, otherwise `appoint_to.company_id`. Only sets when `company_id` is blank. |
-
----
-
 ### NotificationTag (`app/models/notification_tag.rb`)
 
 | Callback | Line | Method | Description |
@@ -420,7 +412,7 @@ Auto-assigns a default property_mapping on create if none is provided. Derives `
 | `before_validation :ensure_property_mapping, on: :create` | 10 | `ensure_property_mapping` | If `property_mapping` is nil and `category` is present, sets `self.property_mapping = category.default_property_mapping`. Ensures every resource record has a property_mapping for dynamic property resolution. |
 | `validate :category_matches_property_mapping_category` | 11 | `category_matches_property_mapping_category` | Ensures the resource's `category_id` matches the `property_mapping.category_id`. Prevents inconsistency on update or manual assignment. Returns early if either association is blank. |
 
-**Included in (43 models):** All models that include `CategoryConcern` (19 models) plus additional managed resources: `Answer`, `Article`, `ArticleGroup`, `Cart`, `CartGroup`, `CustomerGroup`, `Document`, `DocumentGroup`, `Event`, `EventGroup`, `Exam`, `ExamGroup`, `FacilityGroup`, `Membership`, `OrderGroup`, `Payment`, `ProductGroup`, `Project`, `ProjectGroup`, `Question`, `ServiceGroup`, `SettingGroup`, `Task`, `TaskGroup`
+**Included in (42 models):** All models that include `CategoryConcern` (19 models) plus additional managed resources: `Answer`, `Article`, `ArticleGroup`, `Cart`, `CartGroup`, `CustomerGroup`, `Document`, `DocumentGroup`, `Event`, `EventGroup`, `Exam`, `ExamGroup`, `FacilityGroup`, `Membership`, `OrderGroup`, `Payment`, `ProductGroup`, `Project`, `ProjectGroup`, `Question`, `ServiceGroup`, `Task`, `TaskGroup`
 
 ---
 

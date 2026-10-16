@@ -103,8 +103,6 @@ class PropertyMapping < ApplicationRecord
   has_many :questions, dependent: :restrict_with_error
   has_many :services, dependent: :restrict_with_error
   has_many :service_groups, dependent: :restrict_with_error
-  has_many :settings, dependent: :restrict_with_error
-  has_many :setting_groups, dependent: :restrict_with_error
   has_many :stocks, dependent: :restrict_with_error
   has_many :stock_exports, dependent: :restrict_with_error
   has_many :stock_imports, dependent: :restrict_with_error

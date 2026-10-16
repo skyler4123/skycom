@@ -1,43 +1,21 @@
-// Dynamic sidebar (custom groups) reader — company-setting level + personal level.
+// Dynamic sidebar (custom groups) reader — company level only.
 //
-// Source records:
-// - Shared: the company-level Setting with code DYNAMIC_SIDEBAR_CODE
-//   (BE constant in config/initializers/constants.rb, value "DYNAMIC_SIDEBAR").
-//   Its metadata.sidebar_groups = [{ key, name, items: [{ key, name, url }] }].
-// - Personal: the employee-level Setting with code PERSONAL_SIDEBAR_CODE
-//   (value "PERSONAL_SIDEBAR", appoint_to = current employee), read from the
-//   top-level personal_settings client-cache payload. Same shape.
-// Shared groups render first, then personal, then static SIDEBAR_GROUPS in
+// Source record: the company's ACTIVE CompanySetting with
+// business_type "sidebar_groups" (BE: app/models/company_setting.rb),
+// read from currentSettings() (the company_settings client-cache payload).
+// Its metadata.sidebar_groups = [{ key, name, items: [{ key, name, url }] }].
+// The record renders above the static SIDEBAR_GROUPS in
 // companies/sidebars/show_controller.js (see docs/SIDEBAR.md).
 //
-// Key namespacing: shared group keys are `custom_<slug>`, personal group keys
-// are `personal_<slug>` (items `custom_item_` / `personal_item_`), so
-// favourites + open-group localStorage entries can never collide with static
-// SIDEBAR_ITEMS keys or with each other.
-
-// Mirrors the BE DYNAMIC_SIDEBAR_CODE / PERSONAL_SIDEBAR_CODE values (see comment above).
-export const DYNAMIC_SIDEBAR_CODE = "DYNAMIC_SIDEBAR"
-export const PERSONAL_SIDEBAR_CODE = "PERSONAL_SIDEBAR"
+// Key namespacing: group keys are `custom_<slug>` (items `custom_item_<slug>`),
+// so favourites + open-group localStorage entries can never collide with static
+// SIDEBAR_ITEMS keys.
 
 export const customSidebarRecord = () => {
   const settings = (typeof currentSettings === "function" ? currentSettings() : []) || []
-  return settings.find((s) => s.code === DYNAMIC_SIDEBAR_CODE) || null
-}
-
-export const personalSidebarRecord = () => {
-  if (typeof currentPersonalSetting === "function") {
-    const direct = currentPersonalSetting()
-    if (direct) return direct
-  }
-  const all = (typeof currentPersonalSettings === "function" ? currentPersonalSettings() : null)
-    ?? (typeof getCache === "function" ? (getCache().personal_settings || []) : [])
-  if (!Array.isArray(all)) return null
-  const employeeId = (typeof currentEmployeeId === "function" ? currentEmployeeId() : null)
-    || (typeof currentUser === "function" ? null : null)
-  if (employeeId) {
-    return all.find((s) => s.code === PERSONAL_SIDEBAR_CODE && String(s.appoint_to_id) === String(employeeId)) || null
-  }
-  return all.find((s) => s.code === PERSONAL_SIDEBAR_CODE) || null
+  const sidebar = settings.filter((s) => s.business_type === "sidebar_groups" || s.business_type === 0)
+  return sidebar.find((s) => s.workflow_status === "active" || s.workflow_status === 1)
+    || sidebar[0] || null
 }
 
 const slugify = (value, fallback) => {
@@ -54,10 +32,6 @@ const isSafeUrl = (url) => {
 export const customSidebarGroups = () => groupsFromRecord(customSidebarRecord(), "custom", "custom_item")
 
 export const customSidebarItems = () => customSidebarGroups().flatMap((g) => g.items)
-
-export const personalSidebarGroups = () => groupsFromRecord(personalSidebarRecord(), "personal", "personal_item")
-
-export const personalSidebarItems = () => personalSidebarGroups().flatMap((g) => g.items)
 
 const groupsFromRecord = (record, groupPrefix, itemPrefix) => {
   const raw = record?.metadata?.sidebar_groups || record?.sidebar_groups || []

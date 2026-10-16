@@ -11,10 +11,10 @@ RSpec.describe "ClientCacheController", type: :request do
   end
 
   describe "GET /client_cache" do
-    it "includes company-level settings so the dynamic sidebar can render from cache" do
-      setting = Setting.create!(
-        company: company, appoint_to: company, code: DYNAMIC_SIDEBAR_CODE,
-        lifecycle_status: :active, workflow_status: :confirmed, business_type: :company,
+    it "includes company settings so the sidebar can render from cache" do
+      record = CompanySetting.create!(
+        company: company, name: "Company Quick Links", business_type: :sidebar_groups,
+        workflow_status: :active,
         sidebar_groups: [
           { "key" => "my-links", "name" => "My Links",
             "items" => [ { "key" => "pending", "name" => "Pending", "url" => "/orders?workflow_status=pending" } ] }
@@ -25,36 +25,18 @@ RSpec.describe "ClientCacheController", type: :request do
       expect(response).to have_http_status(:ok)
       body = JSON.parse(response.body)
       payload_company = body["companies"].find { |c| c["id"] == company.id }
-      expect(payload_company["settings"]).not_to be_nil
-      ids = payload_company["settings"].map { |s| s["id"] }
-      expect(ids).to include(setting.id)
-      record = payload_company["settings"].find { |s| s["id"] == setting.id }
-      expect(record["metadata"]["sidebar_groups"].first["name"]).to eq("My Links")
+      expect(payload_company["company_settings"]).not_to be_nil
+      ids = payload_company["company_settings"].map { |s| s["id"] }
+      expect(ids).to include(record.id)
+      found = payload_company["company_settings"].find { |s| s["id"] == record.id }
+      expect(found["metadata"]["sidebar_groups"].first["name"]).to eq("My Links")
     end
 
-    it "includes own personal sidebar settings and excludes other employees" do
-      owner_employee = Employee.cached_where(user: owner_user, company: company).first
-      other_employee = create(:employee, company: company)
-      mine = Setting.create!(
-        company: company, appoint_to: owner_employee, code: PERSONAL_SIDEBAR_CODE,
-        lifecycle_status: :active, workflow_status: :confirmed, business_type: :employee,
-        sidebar_groups: [
-          { "key" => "mine", "name" => "My Links",
-            "items" => [ { "key" => "stocks", "name" => "Stocks", "url" => "/stocks" } ] }
-        ]
-      )
-      Setting.create!(
-        company: company, appoint_to: other_employee, code: PERSONAL_SIDEBAR_CODE,
-        lifecycle_status: :active, workflow_status: :confirmed, business_type: :employee,
-        sidebar_groups: []
-      )
-
+    it "exposes no personal sidebar payload" do
       get "/client_cache", as: :json
       expect(response).to have_http_status(:ok)
       body = JSON.parse(response.body)
-      ids = (body["personal_settings"] || []).map { |s| s["id"] }
-      expect(ids).to include(mine.id)
-      expect(body["personal_settings"].size).to eq(1)
+      expect(body).not_to have_key("personal_settings")
     end
   end
 end

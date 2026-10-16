@@ -1,29 +1,20 @@
-// Settings page — Dynamic Sidebar editor (company-setting level + personal level).
+// Settings page — CompanySetting sidebar editor (company level only).
 //
-// Depends on BE: Companies::SettingsController#index (GET list, find the
-// DYNAMIC_SIDEBAR record) + #update (PATCH sidebar_groups metadata) +
-// #personal (GET own PERSONAL_SIDEBAR record) + #update_personal
-// (PATCH own sidebar_groups metadata).
+// Depends on BE: Companies::CompanySettingsController#index (GET list, find the
+// active sidebar_groups record) + #update (PATCH sidebar_groups metadata).
 // Custom groups render above the built-in sidebar via
 // companies/sidebars/show_controller.js (see docs/SIDEBAR.md).
 import Companies_LayoutController from "controllers/companies/layout_controller"
-import { DYNAMIC_SIDEBAR_CODE } from "controllers/companies/sidebar_custom"
 
-export default class Companies_Settings_IndexController extends Companies_LayoutController {
+export default class Companies_CompanySettings_IndexController extends Companies_LayoutController {
   /** @type {string | null} */
   settingId = null
 
   /** @type {Array<{key: string, name: string, items: Array<{key: string, name: string, url: string}>}>} */
   groups = []
 
-  /** @type {Array<{key: string, name: string, items: Array<{key: string, name: string, url: string}>}>} */
-  personalGroups = []
-
   /** @type {boolean} */
   loaded = false
-
-  /** @type {boolean} */
-  personalLoaded = false
 
   normalizeGroups(raw) {
     if (!Array.isArray(raw)) return []
@@ -43,7 +34,9 @@ export default class Companies_Settings_IndexController extends Companies_Layout
 
     try {
       const response = await fetchJson(`${pathname()}.json`)
-      const record = (response.settings || []).find((s) => s.code === DYNAMIC_SIDEBAR_CODE) || null
+      const list = response.company_settings || response.settings || []
+      const record = list.find((s) => s.business_type === "sidebar_groups" && (s.workflow_status === "active" || s.workflow_status === 1))
+        || list.find((s) => s.business_type === "sidebar_groups" || s.business_type === 0) || null
       if (record) {
         this.settingId = record.id
         const raw = record.metadata?.sidebar_groups || record.sidebar_groups || []
@@ -53,17 +46,7 @@ export default class Companies_Settings_IndexController extends Companies_Layout
       toast({ type: "error", message: error.errors?.join(", ") || translate("Failed to load settings") })
     }
 
-    try {
-      const personalResponse = await fetchJson(`${Helpers.personal_company_settings_path(this.companyId())}.json`)
-      const personalRaw = personalResponse.setting?.metadata?.sidebar_groups
-        ?? personalResponse.setting?.sidebar_groups ?? []
-      this.personalGroups = this.normalizeGroups(personalRaw)
-    } catch (error) {
-      this.personalGroups = []
-    }
-
     this.loaded = true
-    this.personalLoaded = true
     poll(() => {
       if (this.hasContentTarget) {
         this.renderContent()
@@ -81,67 +64,43 @@ export default class Companies_Settings_IndexController extends Companies_Layout
     return Helpers.company_settings_path(this.companyId(), this.settingId)
   }
 
-  personalUpdateUrl() {
-    return Helpers.personal_company_settings_path(this.companyId())
-  }
-
   newKey(prefix) {
     return `${prefix}-${Date.now().toString(36)}${Math.floor(Math.random() * 1e4).toString(36)}`
   }
 
-  groupsFor(scope) {
-    return scope === "personal" ? this.personalGroups : this.groups
-  }
-
-  setGroupsFor(scope, next) {
-    if (scope === "personal") {
-      this.personalGroups = next
-    } else {
-      this.groups = next
-    }
-  }
-
-  addGroup(event) {
-    const scope = event?.params?.scope || "company"
-    this.setGroupsFor(scope, [...this.groupsFor(scope), { key: this.newKey("group"), name: "", items: [] }])
+  addGroup() {
+    this.groups = [...this.groups, { key: this.newKey("group"), name: "", items: [] }]
     this.renderContent()
   }
 
   removeGroup(event) {
-    const { groupKey, scope } = event.params
-    const target = scope || "company"
-    this.setGroupsFor(target, this.groupsFor(target).filter((g) => g.key !== groupKey))
+    const { groupKey } = event.params
+    this.groups = this.groups.filter((g) => g.key !== groupKey)
     this.renderContent()
   }
 
   addItem(event) {
-    const { groupKey, scope } = event.params
-    const target = scope || "company"
-    const list = this.groupsFor(target).map((g) => {
+    const { groupKey } = event.params
+    this.groups = this.groups.map((g) => {
       if (g.key !== groupKey) return g
       return { ...g, items: [...g.items, { key: this.newKey("item"), name: "", url: "" }] }
     })
-    this.setGroupsFor(target, list)
     this.renderContent()
   }
 
   removeItem(event) {
-    const { groupKey, itemKey, scope } = event.params
-    const target = scope || "company"
-    const list = this.groupsFor(target).map((g) => {
+    const { groupKey, itemKey } = event.params
+    this.groups = this.groups.map((g) => {
       if (g.key !== groupKey) return g
       return { ...g, items: g.items.filter((i) => i.key !== itemKey) }
     })
-    this.setGroupsFor(target, list)
     this.renderContent()
   }
 
   // Keep state in sync while typing (structural re-renders would drop focus).
   syncField(event) {
-    const { groupKey, itemKey, field, scope } = event.params
-    const target = scope || "company"
-    const list = this.groupsFor(target)
-    const group = list.find((g) => g.key === groupKey)
+    const { groupKey, itemKey, field } = event.params
+    const group = this.groups.find((g) => g.key === groupKey)
     if (!group) return
     if (itemKey) {
       const item = group.items.find((i) => i.key === itemKey)
@@ -165,36 +124,20 @@ export default class Companies_Settings_IndexController extends Companies_Layout
     }
   }
 
-  async savePersonal(event) {
-    event.preventDefault()
-
-    try {
-      const response = await fetchJson(this.personalUpdateUrl(), {
-        method: "PATCH",
-        body: new FormData(event.target)
-      })
-      clearClientCacheAndReload({ type: "success", message: response.message })
-    } catch (error) {
-      toast({ type: "error", message: error.errors?.join(", ") || translate("Failed to update personal sidebar") })
-    }
-  }
-
-  groupFieldsHTML(group, gi, scope = "company") {
-    const scopeParam = `data-${this.identifier}-scope-param="${scope}"`
+  groupFieldsHTML(group, gi) {
     const itemsHTML = group.items.map((item, ii) => `
       <div class="flex flex-col sm:flex-row gap-2">
         <label class="flex-1 space-y-1">
           <span class="text-[10px] font-bold text-slate-400 dark:text-slate-300 uppercase">${translate("Item name")}</span>
           <input
             type="text"
-            name="setting[metadata][sidebar_groups][${gi}][items][${ii}][name]"
+            name="company_setting[metadata][sidebar_groups][${gi}][items][${ii}][name]"
             value="${escapeHtml(item.name)}"
             placeholder="${translate("Item name")}"
             data-action="input->${this.identifier}#syncField"
             data-${this.identifier}-group-key-param="${escapeHtml(group.key)}"
             data-${this.identifier}-item-key-param="${escapeHtml(item.key)}"
             data-${this.identifier}-field-param="name"
-            ${scopeParam}
             class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-sm"
           >
         </label>
@@ -202,24 +145,22 @@ export default class Companies_Settings_IndexController extends Companies_Layout
           <span class="text-[10px] font-bold text-slate-400 dark:text-slate-300 uppercase">${translate("Item URL")}</span>
           <input
             type="text"
-            name="setting[metadata][sidebar_groups][${gi}][items][${ii}][url]"
+            name="company_setting[metadata][sidebar_groups][${gi}][items][${ii}][url]"
             value="${escapeHtml(item.url)}"
             placeholder="/companies/:id/orders?workflow_status=pending"
             data-action="input->${this.identifier}#syncField"
             data-${this.identifier}-group-key-param="${escapeHtml(group.key)}"
             data-${this.identifier}-item-key-param="${escapeHtml(item.key)}"
             data-${this.identifier}-field-param="url"
-            ${scopeParam}
             class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-sm font-mono"
           >
         </label>
-        <input type="hidden" name="setting[metadata][sidebar_groups][${gi}][items][${ii}][key]" value="${escapeHtml(item.key)}">
+        <input type="hidden" name="company_setting[metadata][sidebar_groups][${gi}][items][${ii}][key]" value="${escapeHtml(item.key)}">
         <button
           type="button"
           data-action="click->${this.identifier}#removeItem"
           data-${this.identifier}-group-key-param="${escapeHtml(group.key)}"
           data-${this.identifier}-item-key-param="${escapeHtml(item.key)}"
-          ${scopeParam}
           title="${translate("Delete item")}"
           class="mt-auto p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg cursor-pointer"
         >
@@ -235,22 +176,20 @@ export default class Companies_Settings_IndexController extends Companies_Layout
             <span class="text-[10px] font-bold text-slate-400 dark:text-slate-300 uppercase">${translate("Group name")}</span>
             <input
               type="text"
-              name="setting[metadata][sidebar_groups][${gi}][name]"
+              name="company_setting[metadata][sidebar_groups][${gi}][name]"
               value="${escapeHtml(group.name)}"
               placeholder="${translate("Group name")}"
               data-action="input->${this.identifier}#syncField"
               data-${this.identifier}-group-key-param="${escapeHtml(group.key)}"
               data-${this.identifier}-field-param="name"
-              ${scopeParam}
               class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-sm font-medium"
             >
           </label>
-          <input type="hidden" name="setting[metadata][sidebar_groups][${gi}][key]" value="${escapeHtml(group.key)}">
+          <input type="hidden" name="company_setting[metadata][sidebar_groups][${gi}][key]" value="${escapeHtml(group.key)}">
           <button
             type="button"
             data-action="click->${this.identifier}#removeGroup"
             data-${this.identifier}-group-key-param="${escapeHtml(group.key)}"
-            ${scopeParam}
             title="${translate("Delete group")}"
             class="mt-auto p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg cursor-pointer"
           >
@@ -262,7 +201,6 @@ export default class Companies_Settings_IndexController extends Companies_Layout
           type="button"
           data-action="click->${this.identifier}#addItem"
           data-${this.identifier}-group-key-param="${escapeHtml(group.key)}"
-          ${scopeParam}
           class="inline-flex items-center gap-1 px-3 py-1.5 text-sm text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg cursor-pointer"
         >
           <span class="material-symbols-outlined text-[18px]">add</span>
@@ -290,12 +228,11 @@ export default class Companies_Settings_IndexController extends Companies_Layout
             <h2 class="text-xl font-bold text-slate-900 dark:text-white">${translate("Company Quick Links")}</h2>
             <p class="mt-1 text-sm text-slate-500 dark:text-slate-400">${translate("Shared with everyone in this company")}</p>
           </div>
-          ${this.groups.length > 0 ? this.groups.map((g, gi) => this.groupFieldsHTML(g, gi, "company")).join("") : `<p class="text-sm text-slate-400 dark:text-slate-500">${translate("No custom groups yet")}</p>`}
+          ${this.groups.length > 0 ? this.groups.map((g, gi) => this.groupFieldsHTML(g, gi)).join("") : `<p class="text-sm text-slate-400 dark:text-slate-500">${translate("No custom groups yet")}</p>`}
           <div class="flex items-center justify-between pt-2">
             <button
               type="button"
               data-action="click->${this.identifier}#addGroup"
-              data-${this.identifier}-scope-param="company"
               class="inline-flex items-center gap-2 px-4 py-2 border border-slate-200 dark:border-slate-700 rounded-lg font-medium text-sm text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800 cursor-pointer"
             >
               <span class="material-symbols-outlined text-[20px]">add</span>
@@ -319,44 +256,9 @@ export default class Companies_Settings_IndexController extends Companies_Layout
       })
     })()
 
-    const personalFields = `
-      <div class="space-y-6">
-        <div>
-          <h2 class="text-xl font-bold text-slate-900 dark:text-white">${translate("My Quick Links")}</h2>
-          <p class="mt-1 text-sm text-slate-500 dark:text-slate-400">${translate("Only you see these links")}</p>
-        </div>
-        ${this.personalGroups.length > 0 ? this.personalGroups.map((g, gi) => this.groupFieldsHTML(g, gi, "personal")).join("") : `<p class="text-sm text-slate-400 dark:text-slate-500">${translate("No personal links yet")}</p>`}
-        <div class="flex items-center justify-between pt-2">
-          <button
-            type="button"
-            data-action="click->${this.identifier}#addGroup"
-            data-${this.identifier}-scope-param="personal"
-            class="inline-flex items-center gap-2 px-4 py-2 border border-slate-200 dark:border-slate-700 rounded-lg font-medium text-sm text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800 cursor-pointer"
-          >
-            <span class="material-symbols-outlined text-[20px]">add</span>
-            ${translate("Add Group")}
-          </button>
-          <button
-            type="submit"
-            class="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-bold text-sm cursor-pointer"
-          >
-            ${translate("Save Changes")}
-          </button>
-        </div>
-      </div>
-    `
-
-    const personalForm = form({
-      action: this.personalUpdateUrl(),
-      method: "PATCH",
-      attributes: `class="p-6 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800" data-action="submit->${this.identifier}#savePersonal"`,
-      html: personalFields
-    })
-
     return `
       <div class="p-4 overflow-y-auto space-y-4">
         ${companyForm}
-        ${personalForm}
       </div>
     `
   }

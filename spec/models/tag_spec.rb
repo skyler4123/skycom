@@ -62,10 +62,6 @@ RSpec.describe Tag, type: :model do
     it { should have_many(:services).through(:service_tag_appointments) }
     it { should have_many(:service_group_tag_appointments).dependent(:destroy) }
     it { should have_many(:service_groups).through(:service_group_tag_appointments) }
-    it { should have_many(:setting_tag_appointments).dependent(:destroy) }
-    it { should have_many(:settings).through(:setting_tag_appointments) }
-    it { should have_many(:setting_group_tag_appointments).dependent(:destroy) }
-    it { should have_many(:setting_groups).through(:setting_group_tag_appointments) }
     it { should have_many(:statistic_tag_appointments).dependent(:destroy) }
     it { should have_many(:statistics).through(:statistic_tag_appointments) }
     it { should have_many(:stock_tag_appointments).dependent(:destroy) }
