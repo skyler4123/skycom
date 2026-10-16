@@ -13,11 +13,14 @@
   machine handles 10 workers.
 - **NEVER** bare `parallel_rspec` without `bundle exec` — it can raise errors.
 - **NEVER** `bundle exec rspec` for verification (suites, subsets, single files)
-  — single process is too slow. `rspec` appears in docs only as spec identity.
+  — single process is too slow. `rspec` appears in docs only as spec identity,
+  except for the §7 allowlist (known parallel-incompatible specs).
 - **NEVER** `docker exec ... rspec` — in dev, compose provides services only;
   `web` + `job` run locally via `bin/dev`. Run from the repo root directly.
 - **NEVER** re-run parallel DB setup except for the §3 cases — missing
   worker DBs (§3.1) or migration failure (§3.2).
+- **NEVER** re-run parallel to "double-check" a §7 allowlist failure —
+  verify once with single-process `rspec`, then move on.
 
 ## 2. Commands
 
@@ -29,7 +32,8 @@
 
 Always keep `-n 10` and the `bundle exec` prefix. Single files also go through
 parallel — worker isolation (`TEST_ENV_NUMBER`) and retries (§5) only activate
-under parallel.
+under parallel. Exception: §7 allowlist files verify with single-process
+`bundle exec rspec <file>` instead.
 
 ## 3. Setup & migration recovery
 
@@ -110,8 +114,34 @@ CI is out of scope: CI stays single-process (`bundle exec rspec` in
 | `PendingMigrationError` / schema mismatch after a new migration | Worker DBs drifted → full reset per §3.2 (`drop[10]` → `create[10]` → `load_schema[10]`, or `migrate[10]` to verify the migration replays) |
 | Migration error mentions `queue/cable/cache_schema.rb` | Secondary schemas are gem-owned and off-limits (§3.3) → OK to ignore; only `db/schema.rb` + `db/migrate/*` matter |
 | Bare `parallel_rspec` raises load error | Missing `bundle exec` prefix → always `bundle exec parallel_rspec` |
-| Flaky feature passes alone, fails in suite | Retries only run under parallel — repro must also use `bundle exec parallel_rspec -n 10`, never bare `rspec` (see `docs/FLAKY_TESTS.md`) |
+| Flaky feature passes alone, fails in suite | Retries only run under parallel — repro must also use `bundle exec parallel_rspec -n 10`, never bare `rspec` (see `docs/FLAKY_TESTS.md`). Exception: §7 allowlist — repro with `bundle exec rspec <file>` instead |
 | Stale Meilisearch hits across workers | Index suffix missing → check `TEST_ENV_NUMBER` is passed through (see `config/initializers/meilisearch.rb`) |
+| §7 allowlist file fails under parallel | Known parallel-incompatible — do NOT treat as regression, do NOT re-run parallel. Verify once with `bundle exec rspec <file>`; if green, move on |
+
+## 7. Known parallel-incompatible specs (allowlist)
+
+These files pass with single-process `rspec` but fail under
+`bundle exec parallel_rspec -n 10`. The failure under parallel is expected
+and does not block. Do NOT ignore the files — still verify them — but a
+parallel-only failure is OK.
+
+| File | Verify with |
+|------|-------------|
+| `spec/features/companies/pages/retail_cashier_spec.rb` | `bundle exec rspec spec/features/companies/pages/retail_cashier_spec.rb` |
+| `spec/features/companies/company_tickets/websocket_spec.rb` | `bundle exec rspec spec/features/companies/company_tickets/websocket_spec.rb` |
+
+Rules for allowlist files:
+
+- **ALWAYS** verify with single-process `bundle exec rspec <file>`. If green,
+  treat as pass even when the same file fails under parallel.
+- **NEVER** re-run `parallel_rspec` on these files to "double-check" —
+  one parallel failure is enough signal; repeated parallel runs waste time
+  and stay flaky.
+- **NEVER** "fix" these specs to force parallel-green without a proven root
+  cause (websocket timing / multi-worker resource contention). Report the
+  parallel failure as known, note the single-process pass, and move on.
+- When running the full suite with `parallel_rspec`, a failure limited to
+  these two files is OK to set aside after the single-process check passes.
 
 ---
 
