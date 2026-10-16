@@ -446,7 +446,7 @@ class Seed::HospitalInitService
         "CompanyTicketComment" => { create: true, read: true, update: true, delete: true },
         "CompanyTicketLog" => { create: true, read: true, update: true, delete: true },
         "Document" => { create: true, read: true, update: true, delete: true },
-        "CompanySetting" => { create: true, read: true, update: true, delete: true }
+        "CompanySetting" => { create: true, read: true, update: false, delete: true } # owner-only update (see CompanySettingsPolicy)
       },
       Admin: {
         "Product" => { create: true, read: true, update: true, delete: true },
@@ -500,7 +500,7 @@ class Seed::HospitalInitService
         "CompanyTicketComment" => { create: true, read: true, update: true, delete: true },
         "CompanyTicketLog" => { create: true, read: true, update: true, delete: true },
         "Document" => { create: true, read: true, update: true, delete: true },
-        "CompanySetting" => { create: true, read: true, update: true, delete: true }
+        "CompanySetting" => { create: true, read: true, update: false, delete: true } # owner-only update (see CompanySettingsPolicy)
       }
     }
 

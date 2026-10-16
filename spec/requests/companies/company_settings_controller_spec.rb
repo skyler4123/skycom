@@ -99,6 +99,41 @@ RSpec.describe "Companies::CompanySettingsController", type: :request do
       patch "/companies/#{company.id}/company_settings/#{record.id}",
         params: { company_setting: { metadata: { sidebar_groups: [] } } }, as: :json
       expect(response).to have_http_status(:forbidden)
+      expect(JSON.parse(response.body)["errors"]).to be_present
+    end
+
+    it "returns 403 on update even with update grant (owner-only)" do
+      branch = create(:branch, company: company)
+      manager_role = Seed::RoleService.create(company: company, name: "SettingsManager#{SecureRandom.hex(3)}")
+      manager_user = create(:user)
+      manager_employee = create(:employee, company: company, branch: branch, user: manager_user)
+      create(:employee_role_appointment, company: company, employee: manager_employee, role: manager_role)
+
+      %w[create read update delete].each do |action|
+        policy = Seed::PolicyService.create(
+          company: company, name: "Can #{action} CompanySetting",
+          resource: "CompanySetting", action: action,
+          business_type: :operational, lifecycle_status: :active
+        )
+        PolicyRoleAppointment.create!(company: company, policy: policy,
+          role: manager_role, workflow_status: :active)
+      end
+      manager_employee.clear_permissions_cache
+      company.clear_permissions_cache
+      manager_employee.reload
+
+      get sign_in_for_test_path(email: manager_user.email)
+
+      groups = [
+        { "key" => "my-links", "name" => "My Links",
+          "items" => [ { "key" => "pending", "name" => "Pending Orders", "url" => "/orders" } ] }
+      ]
+      patch "/companies/#{company.id}/company_settings/#{record.id}",
+        params: { company_setting: { metadata: { sidebar_groups: groups } } }, as: :json
+
+      expect(response).to have_http_status(:forbidden)
+      expect(JSON.parse(response.body)["errors"]).to be_present
+      expect(record.reload.sidebar_groups).to eq([])
     end
   end
 end

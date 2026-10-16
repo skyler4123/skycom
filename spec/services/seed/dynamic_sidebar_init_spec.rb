@@ -18,14 +18,18 @@ RSpec.describe "init seeds the sidebar CompanySetting" do
       expect(record.sidebar_groups).to eq([])
     end
 
-    it "grants Admin and Manager full CompanySetting permissions" do
+    it "grants Admin and Manager read but not update on CompanySetting (owner-only update)" do
       %w[Admin Manager].each do |role_name|
         role = Role.find_by!(name: role_name, company: company)
-        %w[create read update delete].each do |action|
+        %w[create read delete].each do |action|
           policy = Policy.find_by!(company: company, resource: "CompanySetting", action: action)
           appointment = PolicyRoleAppointment.find_by!(company: company, policy: policy, role: role)
           expect(appointment.workflow_status).to eq("active"), "expected #{role_name} #{action} CompanySetting active"
         end
+
+        policy = Policy.find_by!(company: company, resource: "CompanySetting", action: "update")
+        appointment = PolicyRoleAppointment.find_by!(company: company, policy: policy, role: role)
+        expect(appointment.workflow_status).to eq("inactive"), "expected #{role_name} update CompanySetting inactive (owner-only)"
       end
     end
   end
