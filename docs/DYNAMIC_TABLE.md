@@ -2,7 +2,7 @@
 
 > **Prerequisites**: Read `CATEGORY_DYNAMIC_SCHEMA.md` for the PropertyMapping/TableConfig data model. Read `DASHBOARD_PATTERN.md` for the base dashboard architecture.
 >
-> This document covers only the dynamic column system — how `property_*` columns get their display names, how tables render them, and how modals generate form fields.
+> This document covers only the dynamic column system — how `property_*` columns get their display names, how tables render them, and how the new/show/edit pages generate and display them.
 
 ---
 
@@ -193,16 +193,16 @@ const categoryValue = this.categoryIdValue || this.defaultFilterCategory()?.id
 
 ---
 
-## 4. New Modal — Dynamic Property Fields
+## 4. New / Edit Pages — Dynamic Property Fields
 
-The `NewModalController` reads `PropertyMapping.property_metadata` and renders form fields per type:
+The `NewController` and `EditController` read `PropertyMapping.property_metadata` and render form fields per type. On the new page, `onCategoryChange` re-resolves the PropertyMapping and re-renders `#dynamic-fields` when the Category select changes:
 
 ```javascript
-renderField({ key, name, type }) {
+renderField({ key, label, type }) {
   switch (type) {
     case 'boolean':
-      return `<input type="checkbox" name="product[${key}]" value="true">
-              <input type="hidden" name="product[${key}]" value="false">`
+      return `<input type="hidden" name="product[${key}]" value="false">
+              <input type="checkbox" name="product[${key}]" value="true">`
     case 'integer':
     case 'decimal':
       return `<input type="number" name="product[${key}]" step="${type === 'decimal' ? '0.01' : '1'}">`
@@ -216,41 +216,26 @@ renderField({ key, name, type }) {
 
 **Input naming**: Always `product[property_string_1]` (bracket notation for Rails Strong Params).
 
-**Hidden category_id**: `<input type="hidden" name="product[category_id]" value="${this.categoryId}">` ensures the new product is assigned to the current category.
+**Category coupling**: the Category select (`product[category_id]`) determines which PropertyMapping applies — the new page re-renders the fields on change; the edit page resolves the mapping from the record's `category_id`.
 
 ---
 
-## 5. Show Modal — Dynamic Editable Properties
+## 5. Show Page — Dynamic Property Display
 
-The `ShowModalController` renders dynamic property fields using `Helpers.editable()`:
+The `ShowController` renders the dynamic properties **read-only** using `formatDisplayValue(value, type)` (the same predicate the index cells use). Editing is not inline — the footer links to the Edit page:
 
 ```javascript
-this.propertyMetadata.map(field => {
-  const inputType = field.type === 'integer' || field.type === 'decimal' ? 'number'
-    : field.type === 'datetime' ? 'datetime-local'
-    : field.type === 'boolean' ? 'checkbox'
-    : 'text'
-
-  return Helpers.editable({
-    dispatch: "updateProduct",
-    resource: "product",
-    name: field.key,
-    id: p.id,
-    value: p[field.key],
-    url: Helpers.edit_company_product_path(currentCompany().id, p.id),
-    type: inputType,
-    html: this.formatDisplayValue(p[field.key], field.type),
-    confirmMessage: `Change ${field.name} to '{{value}}'?`,
-    successMessage: `${field.name} updated!`,
-  })
-})
+this.propertyMetadata.map(field => `
+  <p class="...">${field.name}</p>
+  <p class="...">${this.formatDisplayValue(p[field.key], field.type)}</p>
+`)
 ```
 
 **`formatDisplayValue(value, type)` renders the display-state based on type:**
 
 | Type | Display |
 |------|---------|
-| `boolean` | Yes/No badge |
+| `boolean` | `True` / `False` badge |
 | `integer` | `Number(value).toLocaleString()` |
 | `decimal` | `Number(value).toFixed(2)` |
 | `datetime` | `new Date(value).toLocaleString()` |
@@ -344,13 +329,14 @@ end
    - Category filter via `<form method="get">` + Search button (page navigation)
    - `productsCategories()` / `defaultFilterCategory()` helpers
 
-2. **NewModalController** — `extends Controller`, implement:
-   - `renderField({ key, name, type })` for all 5 types
+2. **NewController / EditController** — `extends Companies_LayoutController`, implement:
+   - `renderField({ key, label, type })` for all 5 types
    - `handleSubmit()` with `fetchJson` + `reloadThenToast`
+   - (New page only) re-render `#dynamic-fields` when the Category select changes
 
-3. **ShowModalController** — `extends Controller`, implement:
+3. **ShowController** — `extends Companies_LayoutController`, implement:
    - `formatDisplayValue(value, type)` for all 5 types
-   - Dynamic `Helpers.editable()` fields from `propertyMetadata`
+   - Read-only dynamic property display from `propertyMetadata` (edits go through the Edit page)
 
 4. **LayoutController** — register in sidebar navigation.
 
@@ -439,8 +425,9 @@ after_commit auto-sync) and `Model.ms_clear_index!` before/after — see `docs/M
 | File | Purpose |
 |------|---------|
 | `app/javascript/controllers/companies/products/index_controller.js` | Main dynamic table controller |
-| `app/javascript/controllers/companies/products/new_modal_controller.js` | Dynamic form fields |
-| `app/javascript/controllers/companies/products/show_modal_controller.js` | Dynamic editable fields |
+| `app/javascript/controllers/companies/products/new_controller.js` | Dynamic form fields (new page) |
+| `app/javascript/controllers/companies/products/edit_controller.js` | Dynamic form fields (edit page) |
+| `app/javascript/controllers/companies/products/show_controller.js` | Read-only dynamic property display |
  | `app/controllers/companies/products_controller.rb` | JSON API with all `property_*` columns |
  | `app/services/products/search_query_service.rb` | TableConfig → Meilisearch search/filter query translation |
  | `app/services/{branches,brands,departments,employees,facilities,invoices,orders,services,warehouses}/search_query_service.rb` | One 3-line subclass per wired index page |

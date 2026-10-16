@@ -40,7 +40,7 @@ This file and `README.md` are always in context. Everything in `docs/` is on-dem
 | Permissions, roles, policies | `docs/ABAC.md` — matcher logic + backend implementation requirements |
 | System companies / multi-tenancy | `docs/SYSTEM_COMPANY.md` — why they exist + security model |
 
-### Frontend (README §§0–7 are always loaded; these cover one system each)
+### Frontend (README §§0–6 are always loaded; these cover one system each)
 
 | When your task involves… | Read first |
 |---|---|
@@ -132,7 +132,6 @@ This file and `README.md` are always in context. Everything in `docs/` is on-dem
 ## Full Guidelines
 `README.md` is auto-loaded into every session alongside this file (via `.opencode/plugins/skycom-context.js`, since OpenCode V2 ignores the `instructions` field in `opencode.json`). It covers:
 - Stimulus naming conventions & inheritance
-- Global Helpers (fetchJson, form, openModal, toast, editable, tooltip)
+- Global Helpers (fetchJson, form, openModal, toast, tooltip)
 - Type definitions (JSDoc patterns)
-- Reactive UI & inline editing patterns
 - Form engine lifecycle

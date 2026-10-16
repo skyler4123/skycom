@@ -56,7 +56,7 @@ end
 
 ### 3. Confirm Dialogs Blocking
 
-**Problem**: A native `confirm()` dialog (e.g. in `checkbox_controller.js`, the roles controllers, or `editable_controller.js`) blocks in headless browsers.
+**Problem**: A native `confirm()` dialog (e.g. in `checkbox_controller.js` or the roles controllers) blocks in headless browsers.
 
 **Solution**: Use `click_button` which triggers native form submit:
 ```ruby
@@ -128,16 +128,16 @@ find('[data-action*="openNewModal"]').click
 
 ### Scope Searches to Parent Element
 
-When interacting with one of multiple similar elements (like editable fields in a modal), scope subsequent searches to the specific element:
+When interacting with one of multiple similar elements (like an action link inside a table row), scope subsequent searches to the specific element:
 
 ```ruby
 # BAD: Global search finds ALL matching elements
-editable_field = find('[data-controller="editable"]', match: :first)
-find('.editable-input').fill_in(with: 'value')  # Ambiguous!
+row = find('tr', text: order.name)
+find("a[href*='/edit']").click  # Ambiguous — matches every row!
 
 # GOOD: Scope to the specific element
-editable_field = find('[data-controller="editable"]', match: :first)
-editable_field.find('.editable-input').fill_in(with: 'value')
+row = find('tr', text: order.name)
+row.find("a[href*='/edit']").click
 ```
 
 ---

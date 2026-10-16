@@ -265,5 +265,5 @@ order/purchase lines are atomic (see `docs/RESOURCES.md` §4).
 ---
 
 *See also: `docs/MONEY_FLOW.md` §4 (payment derivation that triggers finalize),
-`docs/ATOMIC_PURPOSE.md` (one-purpose models), `docs/CACHE.md` §4 (global
+`docs/ATOMIC_PURPOSE.md` (one-purpose models), `docs/CACHE.md` §5 (global
 cache tier), `docs/DYNAMIC_TABLE.md` §2.5 (stock metric filters).*

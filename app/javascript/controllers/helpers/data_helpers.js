@@ -91,22 +91,6 @@ export const randomId = () => {
 
 // --- Array / Object Manipulation ---
 /**
- * Merges two arrays of objects based on a unique key.
- * Items in arrayB will overwrite items in arrayA if they share the same key.
- * @param {Array<object>} arrayA - The base array.
- * @param {Array<object>} arrayB - The array to merge in.
- * @param {string} [key="id"] - The property key to determine uniqueness.
- * @returns {Array<object>} The merged array.
- */
-export const mergeObjectArrays = (arrayA, arrayB, key = "id") => {
-  const mapA = new Map(arrayA.map(item => [item[key], item]));
-  arrayB.forEach(itemB => {
-    mapA.set(itemB[key], itemB);
-  });
-  return Array.from(mapA.values());
-}
-
-/**
  * Merges two arrays of primitives, removing duplicates.
  * @param {Array} arrayA - The first array.
  * @param {Array} arrayB - The second array.

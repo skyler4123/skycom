@@ -31,21 +31,22 @@ Skycom uses a **4-tier server-side caching strategy** plus a **browser client ca
 ### Architecture Diagram
 
 ```
-┌────────────────────────────────────────────────────────────┐
-│                      Application                            │
-│                                                             │
-│  local_cache (SQLite)    sync_cache (SQLite+Redis)  global_cache (Redis)
-│  ┌──────────────────┐   ┌──────────────────────┐   ┌──────────────┐
-│  │  Solid Cache      │   │  Solid Cache (read)   │   │  Redis        │
-│  │  (no sync)        │   │  + Redis pub/sub      │   │  (counters,   │
-│  │                   │   │  (write/delete sync)  │   │   locks,      │
-│  └──────────────────┘   └──────────────────────┘   │   limits)      │
-│                                                     └──────────────┘
-│         │                        │                        │
-│         ▼                        ▼                        ▼
-│  Per-server only          Cross-cluster via        Cross-cluster
-│                           invalidation channel     (always Redis)
-└────────────────────────────────────────────────────────────┘
+┌─────────────────────────────────────────────────────────────────────────────────────────┐
+│                                       Application                                       │
+│                                                                                         │
+│     ram_cache             local_cache             sync_cache            global_cache    │
+│┌──────────────────┐   ┌──────────────────┐   ┌──────────────────┐   ┌──────────────────┐│
+││   MemoryStore    │   │   Solid Cache    │   │   Solid Cache    │   │      Redis       ││
+││    per-worker    │   │    per-server    │   │ + Redis pub/sub  │   │ counters, locks, ││
+││     volatile     │   │     no sync      │   │   invalidation   │   │      limits      ││
+││  tiny hot-keys   │   │                  │   │                  │   │                  ││
+│└──────────────────┘   └──────────────────┘   └──────────────────┘   └──────────────────┘│
+│         │                      │                      │                      │          │
+│         ▼                      ▼                      ▼                      ▼          │
+│  Per-worker only        Per-server only       Cross-cluster via        Cross-cluster    │
+│ (wiped on restart)                               invalidation          (always Redis)   │
+│                                                    channel                              │
+└─────────────────────────────────────────────────────────────────────────────────────────┘
                               │
                    Redis PUBLISH "sync_cache:invalidation"
                               │
@@ -59,7 +60,7 @@ Skycom uses a **4-tier server-side caching strategy** plus a **browser client ca
 
 ### The Core Principle
 
-**All reads hit local SQLite cache — no per-request Redis calls.** When a write or delete occurs, `sync_cache` broadcasts a lightweight invalidation message to a shared Redis pub/sub channel. All subscribed server instances evict the stale key from their local cache. This means:
+**All `sync_cache` reads hit the local SQLite cache — no per-request Redis calls.** When a write or delete occurs, `sync_cache` broadcasts a lightweight invalidation message to a shared Redis pub/sub channel. All subscribed server instances evict the stale key from their local cache. This means:
 
 - Every authenticated request does **zero** Redis calls for cache reads
 - Cross-instance consistency is maintained via pub/sub, not polling
@@ -68,7 +69,58 @@ Skycom uses a **4-tier server-side caching strategy** plus a **browser client ca
 
 ---
 
-## 2. Tier 1: `Rails.local_cache`
+## 2. Tier 1: `Rails.ram_cache`
+
+**Backend**: `ActiveSupport::Cache::MemoryStore` (Ruby heap, 64 MB cap) — defined in `config/initializers/cache.rb`.
+
+**Purpose**: The fastest tier — a pure process-level cache for **tiny hot-keys** read on high-frequency paths. No SQLite I/O, no network.
+
+| Property | Value |
+|----------|-------|
+| Speed | Nanoseconds / microseconds (heap access) |
+| Scope | Per Puma worker — workers do **not** share entries |
+| Persistence | Wiped on restart / deploy |
+| Risk | High RAM consumption — 64 MB cap; keep values tiny |
+
+**When to use**: booleans, feature flags, small configs — any scalar read on every request where per-worker divergence is harmless. Store the *result* of hot computations (bytes), never collections of records.
+
+**When NOT to use**: anything larger than a few KB, or state that must agree across workers/instances — use `local_cache` (Tier 2) or `sync_cache` (Tier 3) instead.
+
+### 2.1 Not wrapped by `sync_cache` — call it directly
+
+`Rails.ram_cache` is deliberately **not** wrapped by `SyncCache` (`config/initializers/cache.rb`): per-worker isolation is acceptable for tiny immutable-ish values, and a pub/sub round-trip on every read would defeat the point. Call `Rails.ram_cache.fetch(...)` / `.delete(...)` directly.
+
+### 2.2 Invalidation model
+
+- **Local eviction**: the code that owns the value deletes its key when the source of truth changes (e.g., `Employee#clear_permissions_cache`).
+- **Best-effort cross-worker eviction**: the `sync_cache` pub/sub listener (`SyncCache#handle_invalidation`) also deletes the key from `Rails.ram_cache` — a broadcast `delete` clears the key from both `ram_cache` and `local_cache` on every subscribed instance.
+- **TTL backstop**: every entry has an `expires_in`; stale entries die on their own. Restarts/deploys wipe the whole store — safe, because entries rebuild lazily from the block.
+
+### 2.3 Canonical example: `Employee#owner_role?`
+
+**File**: `app/models/concerns/employee/permission_concern.rb`
+
+```ruby
+OWNER_ROLE_CACHE_EXPIRY = 1.day
+
+def owner_role?
+  Rails.ram_cache.fetch("#{cache_key_with_version}/owner_role", expires_in: OWNER_ROLE_CACHE_EXPIRY) do
+    EmployeeRoleAppointment.cached_where(employee_id: id).any? { |ra| ra.business_type == OWNER_BUSINESS_TYPE }
+  end
+end
+```
+
+- Read on **every** `can?` permission check → hot path.
+- The value is a single boolean (bytes).
+- Owner assignment is immutable after creation, so per-worker divergence is harmless.
+- `cache_key_with_version` includes `updated_at` — any `touch` (e.g., role assignment) produces a new key; the old entry ages out via TTL.
+- Explicit eviction: `clear_permissions_cache` deletes the key (plus the `local_cache` permission keys) and touches the record.
+
+**API**: standard `ActiveSupport::Cache::Store` interface — `read`, `write`, `delete`, `fetch`, `exist?`, `clear`.
+
+---
+
+## 3. Tier 2: `Rails.local_cache`
 
 **Backend**: Solid Cache (SQLite) — per-server, durable on disk.
 
@@ -85,19 +137,19 @@ Solid Cache database files per environment:
 - Test: `storage/test_cache.sqlite3`
 - Production: `storage/production_cache.sqlite3`
 
-**When to use**: Only when you are certain the cached data does not need to be consistent across server instances. Most application code should prefer `Rails.sync_cache`.
+**When to use**: Only when you are certain the cached data does not need to be consistent across server instances. Tiny hot booleans belong in `Rails.ram_cache` (Tier 1). Most application code should prefer `Rails.sync_cache`.
 
 **API**: Standard `ActiveSupport::Cache::Store` interface — `read`, `write`, `delete`, `fetch`, `exist?`, `clear`.
 
 ---
 
-## 3. Tier 2: `Rails.sync_cache` (The Core Pattern)
+## 4. Tier 3: `Rails.sync_cache` (The Core Pattern)
 
 **Backend**: Solid Cache (SQLite) for reads + Redis pub/sub for write/delete invalidation.
 
 **Purpose**: The default server-side cache. Records cached by `Cache::RecordsConcern` (Session, User, Company, Employee, RoleAppointment) use this tier, as do permissions hashes and billing dashboard data.
 
-### 3.1 The SyncCache Class
+### 4.1 The SyncCache Class
 
 **File**: `config/initializers/cache.rb`
 
@@ -105,61 +157,89 @@ Solid Cache database files per environment:
 class SyncCache
   CHANNEL = "sync_cache:invalidation".freeze
 
-  # Reads from local_cache only. No Redis call.
-  def read(key)
-    Rails.local_cache.read(key)
-  end
-
   # Fetches from local_cache, caching the block result. No Redis call.
   def fetch(key, expires_in: nil, &block)
     Rails.local_cache.fetch(key, expires_in: expires_in, &block)
   end
 
-  # Writes to local_cache and publishes invalidation (unless sync: false).
+  # Direct local_cache read. No Redis call.
+  def read(key)
+    Rails.local_cache.read(key)
+  end
+
+  # Writes to local_cache and, when sync: true (default), publishes
+  # an invalidation message so other instances evict their stale copy.
   def write(key, value, expires_in: nil, sync: true)
     Rails.local_cache.write(key, value, expires_in: expires_in)
     publish_invalidation("write", key) if sync
   end
 
-  # Deletes from local_cache and publishes invalidation (unless sync: false).
+  # Deletes from local_cache and, when sync: true (default), publishes
+  # an invalidation message so other instances do the same.
   def delete(key, sync: true)
     Rails.local_cache.delete(key)
     publish_invalidation("delete", key) if sync
   end
 
-  # Called by background listener when another instance publishes.
+  # Called by the background listener when an invalidation message arrives
+  # from another instance. Evicts the stale key from ram_cache (best-effort,
+  # per-worker) and local_cache.
   def handle_invalidation(payload)
     data = JSON.parse(payload) rescue nil
     return unless data && data["key"]
-    Rails.local_cache.delete(data["key"])
+
+    key = data["key"]
+    Rails.ram_cache.delete(key)
+    Rails.local_cache.delete(key)
+  rescue => e
+    Rails.logger.error("[SyncCache] Invalidation handling error: #{e.message}")
   end
 
   private
 
+  # Publishes a write/delete event to the shared Redis channel.
   def publish_invalidation(action, key)
     payload = { action: action, key: key }.to_json
     Kredis.redis.publish(CHANNEL, payload)
+  rescue => e
+    Rails.logger.error("[SyncCache] Failed to publish invalidation: #{e.message}")
   end
 end
 ```
 
-### 3.2 Pub/Sub Background Listener
+> **Note**: `Rails.ram_cache` is deliberately **not** wrapped by `SyncCache` — call it directly for tiny per-worker hot-keys (Tier 1). The invalidation listener still evicts ram_cache keys best-effort, so a broadcast `delete` clears both stores.
 
-A background thread subscribes to the Redis invalidation channel and runs on Puma server processes (skipped in tests and rake tasks):
+### 4.2 Pub/Sub Background Listener
+
+A background thread subscribes to the Redis invalidation channel in web-server processes only (Puma — skipped for tests, console, and rake tasks), using a **dedicated** Redis connection so pub/sub never hijacks the shared app pool:
 
 ```ruby
-if (defined?(Rails::Server) || defined?(Puma)) && !Rails.env.test?
-  Thread.new do
-    Rails.application.config.after_initialize do
-      Kredis.redis.subscribe(SyncCache::CHANNEL) do |on|
-        on.message do |_channel, message|
-          Rails.sync_cache.handle_invalidation(message)
+Rails.application.config.after_initialize do
+  # Only in web server processes — bypassed for CLI tasks (rake, console, rspec).
+  is_server = defined?(Rails::Server) ||
+              $PROGRAM_NAME.include?("puma") ||
+              $PROGRAM_NAME.include?("bin/rails server")
+
+  is_cli_or_test = Rails.env.test? ||
+                   defined?(Rails::Console) ||
+                   File.basename($PROGRAM_NAME) == "rake"
+
+  if is_server && !is_cli_or_test
+    Thread.new do
+      # CRITICAL: dedicated connection — reusing Kredis.redis would hijack
+      # the shared app connection pool.
+      redis_sub = Kredis.redis.dup
+
+      loop do
+        redis_sub.subscribe(SyncCache::CHANNEL) do |on|
+          on.message do |_channel, message|
+            Rails.sync_cache.handle_invalidation(message)
+          end
         end
+      rescue => e
+        Rails.logger.error("[SyncCache Listener] Connection lost: #{e.message}")
+        sleep 5
       end
-    rescue => e
-      Rails.logger.error("[SyncCache Listener] Connection lost: #{e.message}")
-      sleep 5
-      retry
     end
   end
 end
@@ -167,11 +247,11 @@ end
 
 The listener is resilient — if the Redis connection drops, it logs the error, sleeps 5 seconds, and retries.
 
-### 3.3 The `sync:` Parameter
+### 4.3 The `sync:` Parameter
 
 Both `write` and `delete` accept a `sync:` keyword argument (default: `true`). Set `sync: false` to suppress pub/sub for local-only operations (e.g., bulk cache clearing during maintenance).
 
-### 3.4 Cache::RecordsConcern Integration
+### 4.4 Cache::RecordsConcern Integration
 
 **File**: `app/models/concerns/cache/records_concern.rb`
 
@@ -224,7 +304,7 @@ When a model record is **destroyed**, the `after_commit` callback calls `Rails.s
 
 Other instances receive the invalidation message and evict only the stale key from their local cache. When they next read it, they fetch from the database and repopulate.
 
-### 3.5 Session Authentication Flow
+### 4.5 Session Authentication Flow
 
 The old pattern required a Redis `exist?` check on every request. The new pattern reads only from `sync_cache`:
 
@@ -247,7 +327,7 @@ end
 
 **Authentication requires zero Redis calls per request.** If the session was destroyed on another instance, the invalidation message already evicted it from this instance's local cache.
 
-### 3.6 Cross-Instance Invalidation Scenarios
+### 4.6 Cross-Instance Invalidation Scenarios
 
 #### Scenario: User signs out on Instance A
 
@@ -306,7 +386,7 @@ session.create
 
 The write-side invalidation ensures Instance B evicts any stale (pre-creation) value. If Instance B never had the key, the eviction is a no-op — no harm done.
 
-### 3.7 Session Lifecycle
+### 4.7 Session Lifecycle
 
 | Event | What Happens | Cache Effect |
 |-------|-------------|--------------|
@@ -317,7 +397,7 @@ The write-side invalidation ensures Instance B evicts any stale (pre-creation) v
 
 ---
 
-## 4. Tier 3: `Rails.global_cache`
+## 5. Tier 4: `Rails.global_cache`
 
 **Backend**: Redis (in-memory, cross-cluster).
 
@@ -356,7 +436,7 @@ When Redis is down, order processing stock reservations fail safely (no incorrec
 
 ---
 
-## 5. Cache Constants
+## 6. Cache Constants
 
 Per the `docs/CONSTANTS.md` convention, single-file constants live at their usage site. Only multi-file constants remain in `config/initializers/constants.rb`.
 
@@ -365,19 +445,20 @@ Per the `docs/CONSTANTS.md` convention, single-file constants live at their usag
 | `DEFAULT_CACHE_EXPIRY` | 5 minutes | `app/models/concerns/cache/records_concern.rb` | Default TTL for `cached_find` / `cached_where` |
 | `SESSION_CACHE_EXPIRY` | 1 hour | `app/controllers/concerns/application_controller/authentication_concern.rb` | Session record cache TTL (longer — sessions rarely change) |
 | `PERMISSIONS_CACHE_EXPIRY` | 1 minute | `config/initializers/constants.rb` | Permissions hash cache TTL (used by both permission concerns) |
+| `OWNER_ROLE_CACHE_EXPIRY` | 1 day | `app/models/concerns/employee/permission_concern.rb` | `ram_cache` TTL for the `Employee#owner_role?` hot boolean |
 | `COOKIE_EXPIRY` | 1 day | `app/controllers/concerns/application_controller/cookie_concern.rb` | Session and client cache cookie lifetime |
 
 ---
 
-## 6. Client Cache (Browser)
+## 7. Client Cache (Browser)
 
 Skycom also caches company data in the browser's `localStorage` for fast frontend access across all Stimulus controllers. This avoids repeated API calls for commonly used data.
 
-### 6.1 What Gets Cached
+### 7.1 What Gets Cached
 
 The client cache stores: User, Companies, Branches, Departments, Roles, Enums, Employees, Settings (company-level, incl. the dynamic sidebar record), Personal Settings (own `PERSONAL_SIDEBAR` records), and Billing Contract Summary (enabled features for frontend gating).
 
-### 6.2 Storage Keys
+### 7.2 Storage Keys
 
 | Key | Description |
 |-----|-------------|
@@ -387,13 +468,13 @@ The client cache stores: User, Companies, Branches, Departments, Roles, Enums, E
 | `sidebar_favourites_<company_id>_<user_id>` | Per-employee favourited sidebar item keys (FE-only, `docs/SIDEBAR.md`) |
 | `sidebar_open_groups_<company_id>_<user_id>` | Per-employee open sidebar group keys (FE-only, `docs/SIDEBAR.md`) |
 
-### 6.3 Backend Endpoint
+### 7.3 Backend Endpoint
 
 **Route**: `GET /client_cache`
 
 Returns `{ user, companies[], enums, employees[], personal_settings[] }` and sets a `client_cache_version` cookie.
 
-### 6.4 Frontend Controller
+### 7.4 Frontend Controller
 
 **File**: `app/javascript/controllers/client_cache_controller.js`
 
@@ -402,7 +483,7 @@ On page load:
 2. If mismatch or no cache → fetches `/client_cache`, stores in localStorage, reloads page
 3. Max 1 auto-sync per page session (prevents loops)
 
-### 6.5 Cache Helpers (`auth_helpers.js`)
+### 7.5 Cache Helpers (`auth_helpers.js`)
 
 | Helper | Description |
 |--------|-------------|
@@ -418,13 +499,13 @@ On page load:
 | `featureEnabled(key)` | Checks if a feature is in `enabled_features` |
 | `clearClientCache()` | Clears localStorage cache |
 
-### 6.6 Manual Invalidation
+### 7.6 Manual Invalidation
 
 **Frontend**: `clearClientCacheAndReload({ type: "success", message: "..." })` — clears cache and reloads page. Use after mutations that affect cached data (branch create, role change, feature toggle, etc.).
 
 **Backend**: `company.invalidate_client_cache!` — bumps `company.updated_at`, changes the `client_cache_version` cookie, triggering a frontend re-sync on next page load.
 
-### 6.7 Cookie Expiration
+### 7.7 Cookie Expiration
 
 All cookies use 1-day expiration (`COOKIE_EXPIRY`):
 
@@ -436,7 +517,7 @@ All cookies use 1-day expiration (`COOKIE_EXPIRY`):
 
 When cookies expire, the user must sign in again, which creates fresh cookies and a fresh cache.
 
-### 6.8 How Model Changes Propagate to Client
+### 7.8 How Model Changes Propagate to Client
 
 ```
 PropertyMapping.create/update/destroy
@@ -451,15 +532,15 @@ Models with `belongs_to :company, touch: true`: Branch, Department, Category, Pr
 
 ---
 
-## 7. Configuration
+## 8. Configuration
 
-### 7.1 Initializer
+### 8.1 Initializer
 
 **File**: `config/initializers/cache.rb`
 
-Defines `Rails.local_cache`, `Rails.sync_cache`, and `Rails.global_cache`. Also starts the background pub/sub listener thread.
+Defines `Rails.ram_cache`, `Rails.local_cache`, `Rails.sync_cache`, and `Rails.global_cache`. Also starts the background pub/sub listener thread.
 
-### 7.2 Redis Configuration
+### 8.2 Redis Configuration
 
 **File**: `config/redis/shared.yml`
 
@@ -479,10 +560,12 @@ test:
 
 ---
 
-## 8. Comparison: When to Use Which
+## 9. Comparison: When to Use Which
 
 | Use Case | Cache Tier | Reason |
 |----------|-----------|--------|
+| `Employee#owner_role?` hot boolean (read on every permission check) | `ram_cache` | Tiny per-worker value; TTL + best-effort pub/sub eviction |
+| Tiny hot scalars (flags, configs, booleans) | `ram_cache` | Nanosecond reads; per-worker isolation harmless |
 | ActiveRecord record caching (Session, User, Company, Employee) | `sync_cache` | Local reads, pub/sub on mutation |
 | Permissions hashes | `sync_cache` | Cross-instance consistency needed |
 | Billing dashboard JSON | `sync_cache` | Avoids stale per-server caches |
@@ -495,9 +578,9 @@ test:
 
 ---
 
-## 9. Testing
+## 10. Testing
 
-### 9.1 sync_cache Spec
+### 10.1 sync_cache Spec
 
 **File**: `spec/system/sync_cache_spec.rb`
 
@@ -507,21 +590,24 @@ Tests cover:
 - Incoming invalidation handling
 - `Cache::RecordsConcern` integration (cached_find, auto-update, auto-evict)
 
-### 9.2 Cache Helper
+ram_cache coverage: `spec/models/employee_owner_role_spec.rb` — caches `true`/`false` values and evicts on `clear_permissions_cache`.
+
+### 10.2 Cache Helper
 
 **File**: `spec/cache_helper.rb`
 
 Clears all cache stores before each test:
 
 ```ruby
-Rails.cache.clear
-Rails.local_cache.clear
-Rails.global_cache.clear
+Rails.cache.clear              rescue nil
+Rails.ram_cache.clear          rescue nil
+Rails.local_cache.clear        rescue nil
+Rails.global_cache.clear       rescue nil
 ```
 
 ---
 
-## 10. Error Handling
+## 11. Error Handling
 
 | Scenario | Effect | Mitigation |
 |----------|--------|------------|
@@ -529,21 +615,26 @@ Rails.global_cache.clear
 | Redis pub/sub connection lost (listener) | Background thread rescues, sleeps 5s, retries | Local reads unaffected; invalidation messages may be missed during window |
 | Redis unavailable for `global_cache` | `Redis::BaseConnectionError` raised | Handle explicitly in calling code; stock reservation fails safely |
 | Local cache (SQLite) unavailable | Solid Cache raises | Rare — indicates disk or database corruption |
+| `ram_cache` wiped on restart/deploy | All per-worker entries lost together | By design — entries rebuild lazily from the block on next read (TTL backstop) |
+| Large values stored in `ram_cache` | High Ruby heap usage → OOM risk (64 MB cap) | Keep values tiny (booleans/scalars); use `local_cache` for larger payloads |
 
 ### Redis Down — Safe Failure
 
 - **Authentication continues** to work because session reads are local SQLite only
 - **Cache writes** still succeed locally even if pub/sub broadcast fails
+- **ram_cache reads** are pure local heap access — unaffected by Redis availability
 - **Stock reservations** fail safely (returns error, no incorrect decrements)
 - **Invalidation** is best-effort — stale local entries eventually expire via TTL
 
 ---
 
-## 11. File Reference
+## 12. File Reference
 
 | File | Purpose |
 |------|---------|
-| `config/initializers/cache.rb` | `Rails.local_cache`, `Rails.sync_cache`, `Rails.global_cache` definitions + SyncCache class + pub/sub listener |
+| `config/initializers/cache.rb` | `Rails.ram_cache`, `Rails.local_cache`, `Rails.sync_cache`, `Rails.global_cache` definitions + SyncCache class + pub/sub listener |
+| `app/models/concerns/employee/permission_concern.rb` | `Employee#owner_role?` ram_cache usage + `OWNER_ROLE_CACHE_EXPIRY` + `clear_permissions_cache` eviction |
+| `spec/models/employee_owner_role_spec.rb` | ram_cache caching + eviction specs |
 | `config/initializers/constants.rb` | `PERMISSIONS_CACHE_EXPIRY` |
 | `config/redis/shared.yml` | Redis connection configuration per environment |
 | `app/models/concerns/cache/records_concern.rb` | `cached_find` / `cached_where` + auto-sync callbacks + `DEFAULT_CACHE_EXPIRY` |
