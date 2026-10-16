@@ -1,5 +1,5 @@
 # app/controllers/companies/company_settings_controller.rb
-# Serves Stimulus: companies/settings/index_controller.js
+# Serves Stimulus: companies/company_settings/index_controller.js
 #   (GET /companies/:id/company_settings, PATCH /companies/:id/company_settings/:id
 #    for the company sidebar editor)
 # Endpoints: index (Shell-First JSON), update (company setting JSON).

@@ -6,7 +6,7 @@
 // companies/sidebars/show_controller.js (see docs/SIDEBAR.md).
 import Companies_LayoutController from "controllers/companies/layout_controller"
 
-export default class Companies_Settings_IndexController extends Companies_LayoutController {
+export default class Companies_CompanySettings_IndexController extends Companies_LayoutController {
   /** @type {string | null} */
   settingId = null
 

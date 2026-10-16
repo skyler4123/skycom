@@ -56,7 +56,7 @@ No backend changes, no routes, no policies — rendering and visibility are FE-o
 ## 5. Settings Page
 
 `/companies/:id/company_settings` hosts the **sidebar editor**
-(`Companies_Settings_IndexController`): group add/rename/delete, item
+(`Companies_CompanySettings_IndexController`): group add/rename/delete, item
 name + URL add/edit/delete, one Save → `PATCH /companies/:id/company_settings/:id`
 (`Companies::CompanySettingsController#update`) → `clearClientCacheAndReload()` so
 the sidebar re-renders from the fresh client cache.
