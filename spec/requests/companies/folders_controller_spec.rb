@@ -87,6 +87,13 @@ RSpec.describe "Companies::FoldersController", type: :request do
       expect(response).to have_http_status(:unprocessable_content)
       expect(JSON.parse(response.body)).to have_key("errors")
     end
+
+    it "returns 422 errors when folder param is missing" do
+      post "/companies/#{company.id}/folders.json", params: {}, as: :json
+
+      expect(response).to have_http_status(:unprocessable_content)
+      expect(JSON.parse(response.body)).to have_key("errors")
+    end
   end
 
   describe "DELETE #destroy" do

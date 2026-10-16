@@ -51,6 +51,8 @@ class Companies::FoldersController < Companies::ApplicationController
     else
       render json: { errors: folder.errors.full_messages }, status: :unprocessable_content
     end
+  rescue ActionController::ParameterMissing
+    render json: { errors: [ "Folder name is required" ] }, status: :unprocessable_content
   end
 
   def update
@@ -61,6 +63,8 @@ class Companies::FoldersController < Companies::ApplicationController
     else
       render json: { errors: folder.errors.full_messages }, status: :unprocessable_content
     end
+  rescue ActionController::ParameterMissing
+    render json: { errors: [ "Folder name is required" ] }, status: :unprocessable_content
   rescue ActiveRecord::RecordNotFound
     render json: { errors: [ "Folder not found" ] }, status: :not_found
   end

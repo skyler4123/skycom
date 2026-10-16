@@ -14,12 +14,12 @@ export default class Companies_Folders_NewModalController extends Controller {
     try {
       const response = await fetchJson(Helpers.create_company_folders_path(currentCompany().id), {
         method: "POST",
-        body: JSON.stringify({
+        body: {
           folder: {
             name: new FormData(event.target).get("folder[name]"),
             parent_id: new FormData(event.target).get("folder[parent_id]") || null
           }
-        })
+        }
       })
       reloadThenToast({ type: "success", message: response.message })
     } catch (error) {
