@@ -3,7 +3,8 @@
 # Storage buckets API (Shell-First). Roots act as buckets; files live only
 # inside folders. Show returns subfolders + files + breadcrumbs for the
 # S3-like browser.
-# Serves Stimulus: Companies_Folders_IndexController (index/show JSON),
+# Serves Stimulus: Companies_Folders_IndexController (roots),
+#                  Companies_Folders_ShowController (detail + browser + upload + delete),
 #                  Companies_Folders_NewModalController (create)
 # Endpoints: GET /companies/:company_id/folders(.json) + CRUD — see config/routes.rb
 # Docs: docs/STORAGE.md

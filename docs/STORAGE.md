@@ -37,8 +37,9 @@ Routes (`config/routes.rb` under `companies`):
 
 Controllers (Shell-First, `errors` plural):
 
-- `Companies::FoldersController` — index `?parent_id=` roots/children +
-  breadcrumbs, show subfolders + files, create/update/destroy JSON.
+- `Companies::FoldersController` — index roots (plus `?parent_id=` children
+  listing kept for API/deep-link use) + breadcrumbs, show subfolders + files,
+  create/update/destroy JSON.
 - `Companies::StoredFilesController` — index `?folder_id=`, create multipart
   `{ stored_file: { folder_id, name?, file, attachable_type/id? } }`,
   download redirects to `rails_blob_path`, destroy purges via
@@ -50,11 +51,15 @@ Controllers (Shell-First, `errors` plural):
 
 - Sidebar group `storage` + item `folders` (`sidebar_items.js`), labels in
   `dictionary.js`, paths in `url_helpers.js`, JSDoc in `types.js`.
-- `Companies_Folders_IndexController` — breadcrumb, New Folder modal,
-  multipart upload zone (only inside a folder), grid folders-first,
-  download links, blocked-delete toast.
+- `Companies_Folders_IndexController` — roots grid (navigation only) + New Folder modal.
+- `Companies_Folders_ShowController` — folder detail, breadcrumb, children/files
+  browser, upload zone, and the single guarded Delete button (`confirm()`;
+  success redirects to parent/roots, blocked delete toasts and stays).
+- `Companies_StoredFiles_ShowController` — file metadata, Download link, and
+  the single guarded Delete button (`confirm()`, redirects to parent folder).
 - `Companies_Folders_NewModalController` — `form()` + `handleSubmit` →
-  `reloadThenToast()` on success, `error.errors` toast on failure.
+  `reloadThenToast()` on success, `error.errors` toast on failure; parent
+  preset via `window.pendingFolderParentId` (set by index/show before open).
 
 ## 5. Testing
 

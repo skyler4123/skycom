@@ -1,7 +1,9 @@
 import { Controller } from "@hotwired/stimulus"
 
 export default class Companies_Folders_NewModalController extends Controller {
-  // Create folder modal — parent defaults to ?parent_id= so children land in place.
+  // Create folder modal — parent preset by the opener via
+  // window.pendingFolderParentId (index sets null for roots, show sets its
+  // own id for children). Falls back to ?parent_id= for deep links.
   // Depends on BE: Companies::FoldersController#create
   // Endpoints: POST /companies/:id/folders.json
 
@@ -28,7 +30,9 @@ export default class Companies_Folders_NewModalController extends Controller {
   }
 
   modalHTML() {
-    const rawParentId = new URLSearchParams(window.location.search).get("parent_id") || ""
+    const rawParentId = window.pendingFolderParentId
+      || new URLSearchParams(window.location.search).get("parent_id") || ""
+    window.pendingFolderParentId = null
     const parentId = escapeHtml(rawParentId)
     const fields = `
       <div class="space-y-6">
