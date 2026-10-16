@@ -108,6 +108,12 @@ Rails.application.routes.draw do
       resources :attendance_months
       resources :reports
       resources :documents
+      resources :folders, only: [ :index, :show, :create, :update, :destroy ]
+      resources :stored_files, only: [ :index, :show, :create, :destroy ] do
+        member do
+          get :download
+        end
+      end
       resources :announcements
       resources :discounts
       resources :company_tickets do

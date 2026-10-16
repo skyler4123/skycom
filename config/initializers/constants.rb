@@ -211,6 +211,36 @@ ACCEPTABLE_TICKET_FILE_TYPES = %w[
 ].freeze
 
 # =============================================================================
+# Company Storage (Folder + StoredFile — S3-like browser, metering-ready)
+# Folder roots act as buckets; files live only inside folders. StoredFile wraps
+# one Active Storage blob with audit columns for future per-GB charging.
+# See docs/STORAGE.md.
+# =============================================================================
+
+# Allowed MIME types for StoredFile uploads:
+# images, text/csv, PDF, Word/Excel, zip/rar.
+ACCEPTABLE_STORED_FILE_TYPES = %w[
+  image/jpeg image/png image/gif
+  text/plain text/csv
+  application/pdf
+  application/msword
+  application/vnd.openxmlformats-officedocument.wordprocessingml.document
+  application/vnd.ms-excel
+  application/vnd.openxmlformats-officedocument.spreadsheetml.sheet
+  application/zip application/x-zip-compressed
+  application/x-rar-compressed application/vnd.rar
+].freeze
+
+# Per-category max upload size for StoredFile (category derived from MIME).
+STORED_FILE_MAX_SIZES_BY_TYPE = {
+  image: 10.megabytes,
+  pdf: 20.megabytes,
+  office: 20.megabytes,
+  text: 5.megabytes,
+  archive: 50.megabytes
+}.freeze
+
+# =============================================================================
 # Company Settings (company-level config incl. custom sidebar groups)
 # One CompanySetting per company per business_type is active at a time
 # (see CompanySetting). The active sidebar_groups record holds all custom
