@@ -160,8 +160,7 @@ export const new_company_role_path = (companyId) => `/companies/${companyId}/rol
 export const company_role_path = (companyId, roleId) => `/companies/${companyId}/roles/${roleId}`
 export const edit_company_role_path = (companyId, roleId) => `/companies/${companyId}/roles/${roleId}/edit`
 export const create_company_roles_path = (companyId) => `/companies/${companyId}/roles`
-export const company_settings_path = (companyId, settingId) => settingId ? `/companies/${companyId}/settings/${settingId}` : `/companies/${companyId}/settings`
-export const personal_company_settings_path = (companyId) => `/companies/${companyId}/settings/personal`
+export const company_settings_path = (companyId, settingId) => settingId ? `/companies/${companyId}/company_settings/${settingId}` : `/companies/${companyId}/company_settings`
 export const company_users_path = (companyId) => `/companies/${companyId}/users`
 export const company_transactions_path = (companyId) => `/companies/${companyId}/transactions`
 export const new_company_transaction_path = (companyId) => `/companies/${companyId}/transactions/new`

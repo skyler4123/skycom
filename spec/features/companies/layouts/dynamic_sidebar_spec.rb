@@ -7,9 +7,9 @@ RSpec.feature "Dynamic sidebar", type: :feature, js: true do
   let(:company) { branch.company }
   let(:owner) { company.user }
   let!(:dynamic_setting) do
-    Setting.create!(
-      company: company, appoint_to: company, code: DYNAMIC_SIDEBAR_CODE,
-      lifecycle_status: :active, workflow_status: :confirmed, business_type: :company,
+    CompanySetting.create!(
+      company: company, name: "Company Quick Links", business_type: :sidebar_groups,
+      workflow_status: :active,
       sidebar_groups: [
         { "key" => "my-links", "name" => "My Links",
           "items" => [ { "key" => "pending-orders", "name" => "Pending Orders", "url" => "/pending?workflow_status=pending" } ] }
@@ -30,7 +30,7 @@ RSpec.feature "Dynamic sidebar", type: :feature, js: true do
       "property_mappings" => company.property_mappings.reset.map { |pm| JSON.parse(pm.to_json) },
       "table_configs" => company.table_configs.reset.map { |tc| JSON.parse(tc.to_json) },
       "categories" => company.categories.reset.map { |c| JSON.parse(c.to_json) },
-      "settings" => company.settings.reset.map { |s| JSON.parse(s.to_json) },
+      "company_settings" => company.company_settings.reset.map { |s| JSON.parse(s.to_json) },
       "branches" => [],
       "departments" => [],
       "roles" => []

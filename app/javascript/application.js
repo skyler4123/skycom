@@ -80,5 +80,3 @@ window.currentCategories = Helpers.currentCategories
 window.currentPropertyMappings = Helpers.currentPropertyMappings
 window.currentTableConfigs = Helpers.currentTableConfigs
 window.currentSettings = Helpers.currentSettings
-window.currentPersonalSetting = Helpers.currentPersonalSetting
-window.currentPersonalSettings = Helpers.currentPersonalSettings

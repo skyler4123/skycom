@@ -135,7 +135,7 @@ RSpec.feature "Darkmode across sidebar pages", type: :feature, js: true do
       company_suppliers_path(company),
       company_policies_path(company),
       company_permissions_path(company),
-      company_settings_path(company)
+      company_company_settings_path(company)
     ]
 
     paths.each do |path|

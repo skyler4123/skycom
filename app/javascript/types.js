@@ -84,8 +84,7 @@
 /** @typedef {Object} Answer @property {string} id @property {string} question_id @property {string} category_id @property {string} name @property {string} description @property {string} code @property {number} lifecycle_status @property {string} workflow_status @property {string} business_type @property {string} discarded_at @property {Metadata} metadata */
 
 // --- 15. SETTINGS & STATS ---
-/** @typedef {Object} Setting @property {string} id @property {string} setting_group_id @property {string} company_id @property {string} appoint_to_type @property {string} appoint_to_id @property {string} appoint_from_type @property {string} appoint_from_id @property {string} appoint_for_type @property {string} appoint_for_id @property {string} appoint_by_type @property {string} appoint_by_id @property {string} name @property {string} description @property {string} code @property {number} lifecycle_status @property {string} workflow_status @property {string} business_type @property {string} discarded_at @property {Object} metadata @property {string} created_at @property {string} updated_at */
-/** @typedef {Object} SettingGroup @property {string} id @property {string} company_id @property {string} branch_id @property {string} category_id @property {Object} content @property {string} name @property {string} description @property {string} code @property {number} lifecycle_status @property {string} workflow_status @property {string} business_type @property {string} discarded_at @property {Metadata} metadata */
+/** @typedef {Object} CompanySetting @property {string} id @property {string} company_id @property {string} name @property {string} description @property {string} code @property {number} lifecycle_status @property {string} workflow_status @property {string} business_type @property {string} discarded_at @property {Object} metadata @property {string} created_at @property {string} updated_at */
 /** @typedef {Object} Statistic @property {string} id @property {string} owner_type @property {string} owner_id @property {Object} data @property {string} recorded_at @property {Metadata} metadata */
 
 // --- 16. STORAGE (ACTIVE STORAGE) ---
@@ -117,8 +116,6 @@
 /** @typedef {AtomicAppointment} EmployeeProjectAppointment */
 /** @typedef {AtomicAppointment} EmployeeProjectGroupAppointment */
 /** @typedef {AtomicAppointment} EmployeeServiceAppointment */
-/** @typedef {AtomicAppointment} EmployeeSettingAppointment */
-/** @typedef {AtomicAppointment} EmployeeSettingGroupAppointment */
 /** @typedef {AtomicAppointment} EmployeeTaskAppointment */
 /** @typedef {AtomicAppointment} EmployeeTaskGroupAppointment */
 /** @typedef {AtomicAppointment} FacilityFacilityGroupAppointment */

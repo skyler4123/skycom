@@ -83,12 +83,6 @@ class Employee < ApplicationRecord
   has_many :employee_project_group_appointments, dependent: :destroy
   has_many :project_groups, through: :employee_project_group_appointments
 
-  has_many :employee_setting_appointments, dependent: :destroy
-  has_many :settings, through: :employee_setting_appointments
-
-  has_many :employee_setting_group_appointments, dependent: :destroy
-  has_many :setting_groups, through: :employee_setting_group_appointments
-
   has_many :employee_task_appointments, dependent: :destroy
   has_many :tasks, through: :employee_task_appointments
 

@@ -61,10 +61,6 @@ class Tag < ApplicationRecord
   has_many :services, through: :service_tag_appointments
   has_many :service_group_tag_appointments, dependent: :destroy
   has_many :service_groups, through: :service_group_tag_appointments
-  has_many :setting_tag_appointments, dependent: :destroy
-  has_many :settings, through: :setting_tag_appointments
-  has_many :setting_group_tag_appointments, dependent: :destroy
-  has_many :setting_groups, through: :setting_group_tag_appointments
   has_many :statistic_tag_appointments, dependent: :destroy
   has_many :statistics, through: :statistic_tag_appointments
   has_many :stock_tag_appointments, dependent: :destroy

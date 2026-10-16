@@ -14,8 +14,6 @@ class Seed::EmployeeAppointmentService
     "Project" => [ "EmployeeProjectAppointmentService", :project ],
     "ProjectGroup" => [ "EmployeeProjectGroupAppointmentService", :project_group ],
     "Service" => [ "EmployeeServiceAppointmentService", :service ],
-    "Setting" => [ "EmployeeSettingAppointmentService", :setting ],
-    "SettingGroup" => [ "EmployeeSettingGroupAppointmentService", :setting_group ],
     "Task" => [ "EmployeeTaskAppointmentService", :task ],
     "TaskGroup" => [ "EmployeeTaskGroupAppointmentService", :task_group ]
   }.freeze

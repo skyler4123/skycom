@@ -88,8 +88,7 @@ Company-scoped business entities. Each table belongs to a `company_id` and repre
 | 42 | `answers` | Education | Exam answers |
 | 43 | `event_groups` | Events | Event grouping |
 | 44 | `events` | Events | Calendar events / promotions |
-| 45 | `setting_groups` | Config | Configuration grouping |
-| 46 | `settings` | Config | Application/company settings |
+| 46 | `company_settings` | Config | Company-level settings (sidebar groups, storage credentials) |
 | 47 | `document_groups` | Content | Document grouping |
 | 48 | `documents` | Content | Business documents |
 | 49 | `article_groups` | Content | Article grouping |
@@ -107,7 +106,7 @@ Company-scoped business entities. Each table belongs to a `company_id` and repre
 | 61 | `stock_pendings` | Inventory | Owner-less pending-hold records (one hold ledger row on reserve, one release row on consume/release) |
 | 62 | `event_configs` | Events | Per-category event rules (stock holds, order bridge, overlap warnings) |
 
-**Total: 62 tables**
+**Total: 61 tables**
 
 ---
 
@@ -118,8 +117,8 @@ Atomic pairwise join tables: one table per resource pair, named alphabetically (
 | # | Group | Tables | Count |
 |---|-------|--------|-------|
 | 1 | Address links | `address_branch`, `address_company`, `address_customer`, `address_customer_group`, `address_department`, `address_employee`, `address_employee_group`, `address_user` | 8 |
-| 2 | Tag links | `answer_tag`, `article_tag`, `article_group_tag`, `branch_tag`, `brand_tag`, `company_tag`, `customer_tag`, `customer_group_tag`, `department_tag`, `document_tag`, `document_group_tag`, `employee_tag`, `employee_group_tag`, `event_tag`, `event_group_tag`, `exam_tag`, `exam_group_tag`, `facility_tag`, `facility_group_tag`, `invoice_tag`, `order_tag`, `order_group_tag`, `product_tag`, `product_group_tag`, `project_tag`, `project_group_tag`, `purchase_tag`, `purchase_item_tag`, `question_tag`, `role_tag`, `service_tag`, `service_group_tag`, `setting_tag`, `setting_group_tag`, `statistic_tag`, `stock_tag`, `stock_export_tag`, `stock_import_tag`, `stock_transfer_tag`, `subscription_group_tag`, `supplier_tag`, `tag_task`, `tag_task_group`, `tag_transaction`, `tag_warehouse` | 45 |
-| 3 | Generic pairwise links | `article_employee`, `article_group_employee`, `branch_event`, `cart_employee`, `customer_customer_group`, `customer_employee`, `customer_event`, `customer_group_service`, `customer_service` (booking: `duration`, `start_at`), `department_employee`, `document_employee`, `document_group_employee`, `employee_employee` (self-link via `related_employee_id`), `employee_employee_group`, `employee_event`, `employee_event_group`, `employee_exam`, `employee_facility`, `event_facility`, `event_order`, `event_service`, `event_stock` (requirement: `quantity`, no role), `facility_facility_group`, `employee_product`, `product_product_group`, `employee_project`, `employee_project_group`, `service_service_group`, `employee_service` (booking: `duration`, `start_at`), `employee_setting`, `employee_setting_group`, `employee_task`, `employee_task_group` | 33 |
+| 2 | Tag links | `answer_tag`, `article_tag`, `article_group_tag`, `branch_tag`, `brand_tag`, `company_tag`, `customer_tag`, `customer_group_tag`, `department_tag`, `document_tag`, `document_group_tag`, `employee_tag`, `employee_group_tag`, `event_tag`, `event_group_tag`, `exam_tag`, `exam_group_tag`, `facility_tag`, `facility_group_tag`, `invoice_tag`, `order_tag`, `order_group_tag`, `product_tag`, `product_group_tag`, `project_tag`, `project_group_tag`, `purchase_tag`, `purchase_item_tag`, `question_tag`, `role_tag`, `service_tag`, `service_group_tag`, `statistic_tag`, `stock_tag`, `stock_export_tag`, `stock_import_tag`, `stock_transfer_tag`, `subscription_group_tag`, `supplier_tag`, `tag_task`, `tag_task_group`, `tag_transaction`, `tag_warehouse` | 43 |
+| 3 | Generic pairwise links | `article_employee`, `article_group_employee`, `branch_event`, `cart_employee`, `customer_customer_group`, `customer_employee`, `customer_event`, `customer_group_service`, `customer_service` (booking: `duration`, `start_at`), `department_employee`, `document_employee`, `document_group_employee`, `employee_employee` (self-link via `related_employee_id`), `employee_employee_group`, `employee_event`, `employee_event_group`, `employee_exam`, `employee_facility`, `event_facility`, `event_order`, `event_service`, `event_stock` (requirement: `quantity`, no role), `facility_facility_group`, `employee_product`, `product_product_group`, `employee_project`, `employee_project_group`, `service_service_group`, `employee_service` (booking: `duration`, `start_at`), `employee_task`, `employee_task_group` | 31 |
 | 4 | Order line items | `order_product`, `order_product_group`, `order_service`, `order_service_group`, `order_subscription_plan` (each with `quantity` / `unit_price` / `total_price` snapshots) | 5 |
 | 5 | Payment method links | `branch_payment_method`, `company_payment_method` | 2 |
 | 6 | Policy / role assignments | `policy_role`, `customer_role`, `customer_group_role`, `department_role`, `employee_group_role`, `employee_role` | 6 |
@@ -129,7 +128,7 @@ Atomic pairwise join tables: one table per resource pair, named alphabetically (
 | 10 | Order-group link | `employee_order_group` (`quantity` / `unit_price` / `total_price`) | 1 |
 | 11 | Stock document lines | `stock_import_stock`, `stock_export_stock`, `stock_transfer_stock`, `stock_adjustment_stock` (each `stock_id` + `quantity`; document lines reference exact Stock rows) | 4 |
 
-**Total: 108 tables**
+**Total: 104 tables**
 
 ---
 

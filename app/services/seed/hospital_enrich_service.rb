@@ -673,11 +673,9 @@ class Seed::HospitalEnrichService
   # Same pattern as the retail enricher — only fills the init record when it
   # is still empty, never clobbers edits.
   def create_dynamic_sidebar_samples
-    record = Setting.find_or_create_by!(company: @company, appoint_to: @company, code: DYNAMIC_SIDEBAR_CODE) do |setting|
-      setting.name = "Dynamic sidebar"
-      setting.business_type = :company
-      setting.lifecycle_status = :active
-      setting.workflow_status = :confirmed
+    record = CompanySetting.find_or_create_by!(company: @company, name: "Company Quick Links") do |setting|
+      setting.business_type = :sidebar_groups
+      setting.workflow_status = :active
       setting.metadata = { "sidebar_groups" => [] }
     end
     return if record.sidebar_groups.present?

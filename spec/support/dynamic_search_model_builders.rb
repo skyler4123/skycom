@@ -98,7 +98,6 @@ DYNAMIC_SEARCH_MODELS = {
   Question => ->(company) { create_searchable_record(Question, company, "questions") },
   Service => ->(company) { create_searchable_record(Service, company, "services") },
   ServiceGroup => ->(company) { create_searchable_record(ServiceGroup, company, "service_groups") },
-  SettingGroup => ->(company) { create_searchable_record(SettingGroup, company, "setting_groups") },
   Stock => ->(company) { create(:stock, warehouse: create(:warehouse, company: company), product: create(:product, company: company)) },
   StockExport => ->(company) { create_seed_record(Seed::StockExportService, company, "stock_exports", product: create(:product, company: company), warehouse: create(:warehouse, company: company)) },
   StockImport => ->(company) { create_seed_record(Seed::StockImportService, company, "stock_imports", product: create(:product, company: company), warehouse: create(:warehouse, company: company)) },
