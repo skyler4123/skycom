@@ -105,8 +105,10 @@ single-active enforced by model validation + partial unique index):
   `javascript:` URLs rejected).
 - Created empty by every init service (`create_default_dynamic_sidebar`);
   the retail enricher fills one sample group for development. Owners edit it
-  on the Settings page; `CompanySetting` CRUD policies + Admin/Manager grants ship
-  with `Company::DEFAULT_RESOURCE_NAMES`. A company may hold several sidebar
+  on the Settings page; `CompanySetting` CRUD policies ship
+  with `Company::DEFAULT_RESOURCE_NAMES`, but `update` is owner-only
+  (`CompanySettingsPolicy#update?` → `owner_role?`; Admin/Manager `update`
+  grants are `inactive`). A company may hold several sidebar
   records (e.g. drafts) but only the `active` one renders.
 
 ### Render

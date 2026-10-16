@@ -20,7 +20,7 @@ RSpec.feature "Dynamic sidebar editor", type: :feature, js: true do
     page.execute_script("localStorage.setItem('open-cache-sidebar', 'sidebar')")
   end
 
-  def seed_client_cache!
+  def seed_client_cache!(cache_user = owner)
     page.execute_script("localStorage.clear()")
 
     company_data = JSON.parse(company.to_json).merge(
@@ -34,7 +34,7 @@ RSpec.feature "Dynamic sidebar editor", type: :feature, js: true do
     )
 
     payload = {
-      user: JSON.parse(owner.to_json),
+      user: JSON.parse(cache_user.to_json),
       companies: [ company_data ],
       enums: {},
       employees: []
@@ -65,5 +65,45 @@ RSpec.feature "Dynamic sidebar editor", type: :feature, js: true do
       expect(page).to have_link("Pending Orders", href: "/pending?workflow_status=pending", visible: :all, wait: 10)
     end
     expect(dynamic_setting.reload.sidebar_groups.first["name"]).to eq("My Links")
+  end
+
+  scenario "non-owner with update grant cannot update Quick Links" do
+    manager_role = Seed::RoleService.create(company: company, name: "SettingsManager#{SecureRandom.hex(3)}")
+    manager_user = create(:user)
+    manager_employee = create(:employee, company: company, branch: branch, user: manager_user)
+    create(:employee_role_appointment, company: company, employee: manager_employee, role: manager_role)
+
+    %w[read update].each do |action|
+      policy = Seed::PolicyService.create(
+        company: company, name: "Can #{action} CompanySetting",
+        resource: "CompanySetting", action: action,
+        business_type: :operational, lifecycle_status: :active
+      )
+      PolicyRoleAppointment.create!(company: company, policy: policy,
+        role: manager_role, workflow_status: :active)
+    end
+    manager_employee.clear_permissions_cache
+    company.clear_permissions_cache
+    manager_employee.reload
+
+    sign_in(manager_user)
+    seed_client_cache!(manager_user)
+    page.execute_script("localStorage.setItem('open-cache-sidebar', 'sidebar')")
+
+    visit company_company_settings_path(company)
+
+    expect(page).to have_content("Company Quick Links", wait: 10)
+
+    click_button "Add Group", match: :first
+    fill_in "Group name", match: :first, with: "Hacked Links"
+
+    click_button "Add Sidebar Item", match: :first
+    fill_in "Item name", match: :first, with: "Hacked Item"
+    fill_in "Item URL", match: :first, with: "/hacked"
+
+    click_button "Save Changes", match: :first
+
+    expect(page).to have_content("You are not authorized to perform this action.", wait: 10)
+    expect(dynamic_setting.reload.sidebar_groups).to eq([])
   end
 end
