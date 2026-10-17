@@ -6,6 +6,7 @@ class CreateCompanyDailyUsages < ActiveRecord::Migration[8.0]
       t.references :company, null: false, foreign_key: true, type: :uuid
       t.date :usage_date, null: false
 
+      t.string :external_id, index: true
       t.integer :lifecycle_status
       t.integer :workflow_status
       t.integer :business_type

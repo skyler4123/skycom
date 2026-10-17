@@ -10,6 +10,8 @@ class CreateEventGroups < ActiveRecord::Migration[8.0]
       t.string :description
       t.string :code
 
+      t.string :external_id, index: true
+
       # --- System Fields ---
       t.integer  :lifecycle_status, index: true
       t.integer  :workflow_status, index: true

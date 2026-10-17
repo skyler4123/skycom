@@ -7,6 +7,8 @@ class CreateSessions < ActiveRecord::Migration[8.0]
       t.string :single_access_token
       t.jsonb :metadata
 
+      t.string :external_id, index: true
+
       t.timestamps
     end
     add_index :sessions, :single_access_token, unique: true

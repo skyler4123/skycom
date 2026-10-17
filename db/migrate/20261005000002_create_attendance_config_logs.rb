@@ -14,6 +14,7 @@ class CreateAttendanceConfigLogs < ActiveRecord::Migration[8.0]
       t.string :allowed_wifi_ssid
       t.boolean :require_photo
       t.integer :resolution_strategy
+      t.string :external_id, index: true
       t.integer :lifecycle_status
       t.integer :workflow_status
       t.integer :business_type

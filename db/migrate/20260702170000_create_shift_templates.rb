@@ -15,6 +15,7 @@ class CreateShiftTemplates < ActiveRecord::Migration[8.0]
       t.time :core_start_time
       t.time :core_end_time
 
+      t.string :external_id, index: true
       t.integer :lifecycle_status
       t.integer :workflow_status
       t.integer :business_type

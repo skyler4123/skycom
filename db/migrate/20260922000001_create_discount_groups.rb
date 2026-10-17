@@ -23,6 +23,8 @@ class CreateDiscountGroups < ActiveRecord::Migration[8.0]
       t.datetime :start_at
       t.datetime :end_at
 
+      t.string :external_id, index: true
+
       # --- System Fields ---
       t.integer  :lifecycle_status, index: true
       t.integer  :workflow_status, index: true

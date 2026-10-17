@@ -14,6 +14,7 @@ class CreateCompanyWalletLogs < ActiveRecord::Migration[8.0]
       t.text :description
       t.integer :balance_type
 
+      t.string :external_id, index: true
       t.integer :lifecycle_status
       t.integer :workflow_status
       t.integer :business_type

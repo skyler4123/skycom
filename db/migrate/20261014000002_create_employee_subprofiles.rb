@@ -18,6 +18,8 @@ class CreateEmployeeSubprofiles < ActiveRecord::Migration[8.0]
       t.integer :country
       t.integer :timezone
 
+      t.string :external_id, index: true
+
       # --- System Fields ---
       t.integer :lifecycle_status, index: true
       t.integer :workflow_status, index: true
@@ -39,5 +41,6 @@ class CreateEmployeeSubprofiles < ActiveRecord::Migration[8.0]
 
     add_index :employee_subprofiles, [ :company_id, :employee_id ]
     add_index :employee_subprofiles, [ :employee_profile_id, :employee_id ], name: "idx_employee_subprofiles_on_profile_and_employee"
+    add_index :employee_subprofiles, [ :employee_profile_id, :name ], unique: true, name: "idx_employee_subprofiles_on_profile_and_name"
   end
 end

@@ -6,6 +6,8 @@ class CreateStatistics < ActiveRecord::Migration[8.0]
       t.datetime :recorded_at
       t.jsonb :metadata
 
+      t.string :external_id, index: true
+
       t.timestamps
     end
     add_index :statistics, :recorded_at

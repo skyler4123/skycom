@@ -15,7 +15,9 @@ class CreateCustomers < ActiveRecord::Migration[8.0]
       t.string :phone_number
       t.integer :currency
       t.integer :country
-      t.integer  :timezone
+      t.integer :timezone
+
+      t.string :external_id, index: true
 
       # --- System Fields ---
       t.integer  :lifecycle_status, index: true

@@ -10,6 +10,7 @@ class CreateAttendanceConfigs < ActiveRecord::Migration[8.0]
       t.boolean :require_photo, null: false
       t.integer :resolution_strategy, null: false
 
+      t.string :external_id, index: true
       t.integer :lifecycle_status
       t.integer :workflow_status
       t.integer :business_type

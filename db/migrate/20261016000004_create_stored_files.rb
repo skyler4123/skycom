@@ -13,6 +13,8 @@ class CreateStoredFiles < ActiveRecord::Migration[8.0]
       t.string :attachable_type
       t.uuid :attachable_id
 
+      t.string :external_id, index: true
+
       # --- System Fields ---
       t.integer :lifecycle_status
       t.integer :workflow_status

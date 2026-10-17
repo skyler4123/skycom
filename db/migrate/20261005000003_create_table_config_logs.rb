@@ -13,6 +13,7 @@ class CreateTableConfigLogs < ActiveRecord::Migration[8.0]
       t.string :name
       t.string :description
       t.string :resource_name
+      t.string :external_id, index: true
       t.integer :lifecycle_status
       t.integer :workflow_status
       t.integer :business_type
