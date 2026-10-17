@@ -211,6 +211,7 @@ export const company_stored_files_path = (companyId) => `/companies/${companyId}
 export const create_company_stored_files_path = (companyId) => `/companies/${companyId}/stored_files`
 export const company_stored_file_path = (companyId, fileId) => `/companies/${companyId}/stored_files/${fileId}`
 export const download_company_stored_file_path = (companyId, fileId) => `/companies/${companyId}/stored_files/${fileId}/download`
+export const company_storage_statistics_path = (companyId) => `/companies/${companyId}/storage_statistics`
 export const create_company_documents_path = (companyId) => `/companies/${companyId}/documents`
 export const new_company_document_path = (companyId) => `/companies/${companyId}/documents/new`
 export const company_document_path = (companyId, documentId) => `/companies/${companyId}/documents/${documentId}`
