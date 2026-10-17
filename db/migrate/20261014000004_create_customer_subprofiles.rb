@@ -18,6 +18,8 @@ class CreateCustomerSubprofiles < ActiveRecord::Migration[8.0]
       t.integer :country
       t.integer :timezone
 
+      t.string :external_id, index: true
+
       # --- System Fields ---
       t.integer :lifecycle_status, index: true
       t.integer :workflow_status, index: true
@@ -39,5 +41,6 @@ class CreateCustomerSubprofiles < ActiveRecord::Migration[8.0]
 
     add_index :customer_subprofiles, [ :company_id, :customer_id ]
     add_index :customer_subprofiles, [ :customer_profile_id, :customer_id ], name: "idx_customer_subprofiles_on_profile_and_customer"
+    add_index :customer_subprofiles, [ :customer_profile_id, :name ], unique: true, name: "idx_customer_subprofiles_on_profile_and_name"
   end
 end

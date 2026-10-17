@@ -57,4 +57,39 @@ describe "name uniqueness" do
       expect(user.employee_users).to eq(user.child_users)
     end
   end
+
+  describe "#can_create_company?" do
+    let(:owner_user) { create(:user, :company_owner) }
+    let(:company) { create(:company, user: owner_user) }
+
+    it "returns true for a company owner" do
+      expect(owner_user.can_create_company?).to be true
+    end
+
+    it "returns true for an account that does not belong to any company yet" do
+      fresh_user = create(:user)
+
+      expect(fresh_user.can_create_company?).to be true
+    end
+
+    it "returns false for a platform admin" do
+      admin = create(:user, :admin)
+
+      expect(admin.can_create_company?).to be false
+    end
+
+    it "returns false for an employee of a company" do
+      employee_user = create(:user)
+      create(:employee, company: company, user: employee_user)
+
+      expect(employee_user.can_create_company?).to be false
+    end
+
+    it "returns false for a customer of a company" do
+      customer_user = Seed::UserService.create(system_role: :company_customer)
+      Seed::CustomerService.create(company: company, user: customer_user)
+
+      expect(customer_user.can_create_company?).to be false
+    end
+  end
 end

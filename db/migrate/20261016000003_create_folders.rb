@@ -5,6 +5,8 @@ class CreateFolders < ActiveRecord::Migration[8.0]
       t.uuid :parent_id
       t.string :name, null: false
 
+      t.string :external_id, index: true
+
       # --- System Fields ---
       t.integer :lifecycle_status
       t.integer :workflow_status

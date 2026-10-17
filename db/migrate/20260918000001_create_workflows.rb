@@ -10,6 +10,8 @@ class CreateWorkflows < ActiveRecord::Migration[8.0]
       t.string :code, index: { unique: true }
       t.integer :process_type
 
+      t.string :external_id, index: true
+
       # --- System Fields ---
       t.integer  :lifecycle_status, index: true
       t.integer  :workflow_status, index: true

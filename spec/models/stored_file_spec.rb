@@ -91,4 +91,31 @@ RSpec.describe StoredFile, type: :model do
       expect(sf).not_to be_valid
     end
   end
+
+  describe ".file_category" do
+    it "maps image content types to :image" do
+      expect(described_class.file_category("image/png")).to eq(:image)
+      expect(described_class.file_category("image/jpeg")).to eq(:image)
+    end
+
+    it "maps application/pdf to :pdf" do
+      expect(described_class.file_category("application/pdf")).to eq(:pdf)
+    end
+
+    it "maps text/plain and text/csv to :text" do
+      expect(described_class.file_category("text/plain")).to eq(:text)
+      expect(described_class.file_category("text/csv")).to eq(:text)
+    end
+
+    it "maps zip/rar content types to :archive" do
+      expect(described_class.file_category("application/zip")).to eq(:archive)
+      expect(described_class.file_category("application/x-rar-compressed")).to eq(:archive)
+    end
+
+    it "maps office types, unknown, and nil content types to :office" do
+      expect(described_class.file_category("application/msword")).to eq(:office)
+      expect(described_class.file_category("application/octet-stream")).to eq(:office)
+      expect(described_class.file_category(nil)).to eq(:office)
+    end
+  end
 end

@@ -13,6 +13,8 @@ class CreatePurchaseItems < ActiveRecord::Migration[8.0]
       t.string :unit
       t.decimal :estimated_unit_price
 
+      t.string :external_id, index: true
+
       # --- System Fields ---
       t.integer  :lifecycle_status, index: true
       t.integer  :workflow_status, index: true

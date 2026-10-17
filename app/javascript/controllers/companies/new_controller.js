@@ -1,6 +1,7 @@
 import { Controller } from "@hotwired/stimulus"
 
 // Depends on BE: CompaniesController#new (GET /companies/new shell) + #create (POST /companies).
+// Owner-only: both endpoints enforce User#can_create_company? (docs/HOMEPAGE.md §6).
 // Company creation page — renders its form client-side (Shell-First), ported
 // from the former new-company modal so the homepage can stay fully static HTML.
 export default class Companies_NewController extends Controller {

@@ -13,6 +13,8 @@ class CreatePaymentMethods < ActiveRecord::Migration[8.0]
       t.integer :timezone
       t.integer :payment_mode, index: true
 
+      t.string :external_id, index: true
+
       # --- System Fields ---
       t.integer  :lifecycle_status, index: true
       t.integer  :workflow_status, index: true

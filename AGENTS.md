@@ -1,5 +1,11 @@
 # Skycom Agent Guidelines
 
+## Working Mode (mandatory — overrides conflicting skill/workflow guidance)
+
+- **Work on the current branch, in the current working directory.** Never create a new branch or worktree, and never move the session elsewhere, unless the user explicitly asks for it.
+- **Default to native (inline) execution.** Never dispatch subagents — for implementation, review, or anything else — unless the user explicitly asks for subagent mode.
+- These rules take precedence over any installed skill/workflow guidance (e.g. superpowers) that says otherwise.
+
 ## Doc Map — read before you code (mandatory)
 
 This file and `README.md` are always in context. Everything in `docs/` is on-demand: when your task matches a row, **read the doc before writing code**. The one-line "why" is usable alone; the doc has the exact contract.
@@ -15,7 +21,7 @@ This file and `README.md` are always in context. Everything in `docs/` is on-dem
 | Creating or restructuring `app/models/*.rb` | `docs/MODEL_STRUCTURE.md` — canonical section order |
 | Adding or modifying model/concern callbacks | `docs/MODEL_CALLBACKS.md` — callback reference |
 | Conflicting migrations after a merge | `docs/MERGE_MIGRATIONS.md` — merge-migration procedure |
-| Writing or running any spec | `docs/PARALLEL_TESTS.md` — always `bundle exec parallel_rspec -n 10 [paths]`; feature specs also need `docs/FLAKY_TESTS.md` (never `sleep`) |
+| Writing or running any spec | `docs/PARALLEL_TESTS.md` — always `bundle exec parallel_rspec -n 14 [paths]`; feature specs also need `docs/FLAKY_TESTS.md` (never `sleep`) |
 
 ### Money, stock, orders (absolute rules)
 
@@ -78,7 +84,7 @@ This file and `README.md` are always in context. Everything in `docs/` is on-dem
 - `bin/rubocop` - Lint Ruby code
 - `bin/brakeman` - Security scan
 - `bin/rails` - Standard Rails commands
-- `bundle exec parallel_rspec -n 10 [paths]` - Run tests (parallel, 10 workers). See `docs/PARALLEL_TESTS.md`.
+- `bundle exec parallel_rspec -n 14 [paths]` - Run tests (parallel, 14 workers). See `docs/PARALLEL_TESTS.md`.
 
 ## Pre-Commit Checklist
 - **Update** `docs/MODEL_CALLBACKS.md` if model/concern callbacks were added or modified
@@ -115,9 +121,9 @@ This file and `README.md` are always in context. Everything in `docs/` is on-dem
 - Use `includes`/`eager_load`/`preload` to prevent N+1
 
 ## Testing
-- **ALWAYS** `bundle exec parallel_rspec -n 10 [paths]` — never bare `parallel_rspec` (raises errors), never `bundle exec rspec` for verification (single process), never `docker exec ... rspec` (compose runs services only, web/job via `bin/dev`). See `docs/PARALLEL_TESTS.md`.
+- **ALWAYS** `bundle exec parallel_rspec -n 14 [paths]` — never bare `parallel_rspec` (raises errors), never `bundle exec rspec` for verification (single process), never `docker exec ... rspec` (compose runs services only, web/job via `bin/dev`). See `docs/PARALLEL_TESTS.md`.
 - Docs keep `bundle exec rspec ...` as source of truth (runner-swappable) — that does not change what the agent runs.
-- Parallel DBs are already set up locally. Only if worker DBs are missing, run once: `RAILS_ENV=test bundle exec rake "parallel:create[10]"` then `RAILS_ENV=test bundle exec rake "parallel:load_schema[10]"`. If `parallel_rspec` fails on migration, see `docs/PARALLEL_TESTS.md` §3.2 for the `drop[10]` → `create[10]` → `load_schema[10]` reset.
+- Parallel DBs are already set up locally. Only if worker DBs are missing, run once: `RAILS_ENV=test bundle exec rake "parallel:create"` then `RAILS_ENV=test bundle exec rake "parallel:load_schema"` then `RAILS_ENV=test bundle exec rake "parallel:migrate"`. If `parallel_rspec` fails on migration, see `docs/PARALLEL_TESTS.md` §3.2 for the `drop[14]` → `create[14]` → `load_schema[14]` reset.
 - **Paired success + failure cases** — Write specs as normal, but prefer paired `it` blocks per behavior where a failure branch exists: one success `it` asserting the expected data, one failure `it` asserting the failure contract (`{ success: false, errors: [...] }` / `not_to be_valid` / non-2xx + `errors` key) plus no unwanted side-effect. Canonical example: `spec/services/discounts/apply_service_spec.rb` (1 success `reserves...` + 7 `fails...` its). Skip the failure `it` only when no failure branch exists — don't invent artificial failures.
 
 ## Model Structure

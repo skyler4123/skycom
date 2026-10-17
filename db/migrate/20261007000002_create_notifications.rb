@@ -3,10 +3,12 @@ class CreateNotifications < ActiveRecord::Migration[8.0]
     create_table :notifications, id: :uuid, default: -> { "uuidv7()" } do |t|
       t.references :company, null: false, foreign_key: true, type: :uuid
 
-      t.string :title, null: false
-      t.text :body
+      t.string :name, null: false
+      t.text :description
       t.integer :severity, default: 0, null: false
       t.string :url
+
+      t.string :external_id, index: true
 
       # --- System Fields ---
       t.integer  :lifecycle_status, index: true

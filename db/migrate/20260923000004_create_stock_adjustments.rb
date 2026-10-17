@@ -18,6 +18,8 @@ class CreateStockAdjustments < ActiveRecord::Migration[8.0]
       t.integer :country, default: 0
       t.integer :timezone, default: 0
 
+      t.string :external_id, index: true
+
       # --- System Fields ---
       t.integer  :lifecycle_status, index: true
       t.integer  :workflow_status, index: true

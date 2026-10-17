@@ -8,9 +8,9 @@
 
 ## 1. Rule
 
-- **ALWAYS** run tests locally with `bundle exec parallel_rspec -n 10 [paths]`.
-  Full suite ~5m vs ~20m single-process. `-n 10` is the default — the dev
-  machine handles 10 workers.
+- **ALWAYS** run tests locally with `bundle exec parallel_rspec -n 14 [paths]`.
+  Full suite ~5m vs ~20m single-process. `-n 14` is the default — the dev
+  machine handles 14 workers.
 - **NEVER** bare `parallel_rspec` without `bundle exec` — it can raise errors.
 - **NEVER** `bundle exec rspec` for verification (suites, subsets, single files)
   — single process is too slow. `rspec` appears in docs only as spec identity,
@@ -26,11 +26,11 @@
 
 | Scope | Command |
 |-------|---------|
-| Full suite | `bundle exec parallel_rspec -n 10` |
-| Subset | `bundle exec parallel_rspec -n 10 spec/features/admin spec/features/mobile` |
-| Single file / line | `bundle exec parallel_rspec -n 10 spec/models/company_spec.rb` |
+| Full suite | `bundle exec parallel_rspec -n 14` |
+| Subset | `bundle exec parallel_rspec -n 14 spec/features/admin spec/features/mobile` |
+| Single file / line | `bundle exec parallel_rspec -n 14 spec/models/company_spec.rb` |
 
-Always keep `-n 10` and the `bundle exec` prefix. Single files also go through
+Always keep `-n 14` and the `bundle exec` prefix. Single files also go through
 parallel — worker isolation (`TEST_ENV_NUMBER`) and retries (§5) only activate
 under parallel. Exception: §7 allowlist files verify with single-process
 `bundle exec rspec <file>` instead.
@@ -42,23 +42,24 @@ under parallel. Exception: §7 allowlist files verify with single-process
 Only when worker DBs are missing (e.g. `skycom_test2` does not exist):
 
 ```bash
-RAILS_ENV=test bundle exec rake "parallel:create[10]"
-RAILS_ENV=test bundle exec rake "parallel:load_schema[10]"
+RAILS_ENV=test bundle exec rake "parallel:create"
+RAILS_ENV=test bundle exec rake "parallel:load_schema"
+RAILS_ENV=test bundle exec rake "parallel:migrate"
 ```
 
-These create/load `skycom_test`, `skycom_test2` … `skycom_test10` (+ `queue_test*`,
-per-worker SQLite cable/cache). If the DBs already exist, skip both lines.
+These create/load `skycom_test`, `skycom_test2` … `skycom_test14` (+ `queue_test*`,
+per-worker SQLite cable/cache). If the DBs already exist, skip these lines.
 
 ### 3.2 Migration recovery (parallel_rspec fails on migration)
 
-When `bundle exec parallel_rspec -n 10` fails with `PendingMigrationError`,
+When `bundle exec parallel_rspec -n 14` fails with `PendingMigrationError`,
 `relation does not exist`, or a schema mismatch right after a new migration,
 do a full reset — drop everything, then recreate from the current schema:
 
 ```bash
-RAILS_ENV=test bundle exec rake "parallel:drop[10]"
-RAILS_ENV=test bundle exec rake "parallel:create[10]"
-RAILS_ENV=test bundle exec rake "parallel:load_schema[10]"
+RAILS_ENV=test bundle exec rake "parallel:drop"
+RAILS_ENV=test bundle exec rake "parallel:create"
+RAILS_ENV=test bundle exec rake "parallel:load_schema"
 ```
 
 `load_schema` is the default (fast, deterministic from `db/schema.rb`). When
@@ -66,11 +67,11 @@ verifying the migration itself replays cleanly, use `migrate` instead of the
 last line:
 
 ```bash
-RAILS_ENV=test bundle exec rake "parallel:migrate[10]"
+RAILS_ENV=test bundle exec rake "parallel:migrate"
 ```
 
-Always keep the `RAILS_ENV=test` prefix and `[10]` (10 workers, matches
-`-n 10`). All four commands fan out to `skycom_test*` + `queue_test*` plus
+Always keep the `RAILS_ENV=test` prefix and `[14]` (14 workers, matches
+`-n 14`). All four commands fan out to `skycom_test*` + `queue_test*` plus
 the per-worker SQLite cable/cache files.
 
 ### 3.3 Secondary schemas are off-limits
@@ -81,6 +82,13 @@ and `db/cache_schema.rb` — they are gem-owned
 error relating to those files, it is OK to ignore: only `db/schema.rb` +
 `db/migrate/*` matter for the recovery in §3.2. Never hand-edit a secondary
 schema to "fix" a parallel failure.
+
+The three files are **owner read-only by design** — a guard so coding
+agents cannot edit them. Any `EACCES`/permission error naming them during
+a migration or schema task is expected: `db/schema.rb` is dumped first,
+so the message means the primary schema is already done — good news,
+ignore it. Never chmod/chown them. Per-command semantics:
+`docs/MERGE_MIGRATIONS.md` §5.
 
 ## 4. Prerequisites
 
@@ -95,7 +103,7 @@ compose services.
 CI is out of scope: CI stays single-process (`bundle exec rspec` in
 `docker-compose.rspec-test.yml`) because GitHub buckets parallelize there.
 
-## 5. Isolation mechanics (why `-n 10` is safe)
+## 5. Isolation mechanics (why `-n 14` is safe)
 
 | Layer | Mechanism | File |
 |-------|-----------|------|
@@ -110,24 +118,23 @@ CI is out of scope: CI stays single-process (`bundle exec rspec` in
 
 | Symptom | Cause / Fix |
 |---------|-------------|
-| `relation does not exist` on worker N | Worker DB not migrated → run the two setup lines in §3 |
-| `PendingMigrationError` / schema mismatch after a new migration | Worker DBs drifted → full reset per §3.2 (`drop[10]` → `create[10]` → `load_schema[10]`, or `migrate[10]` to verify the migration replays) |
-| Migration error mentions `queue/cable/cache_schema.rb` | Secondary schemas are gem-owned and off-limits (§3.3) → OK to ignore; only `db/schema.rb` + `db/migrate/*` matter |
+| `relation does not exist` on worker N | Worker DB not migrated → run the setup lines in §3 |
+| `PendingMigrationError` / schema mismatch after a new migration | Worker DBs drifted → full reset per §3.2 (`drop[14]` → `create[14]` → `load_schema[14]`, or `migrate[14]` to verify the migration replays) |
+| Migration error mentions `queue/cable/cache_schema.rb` | Expected: those files are owner read-only by design (agent guard) and `db/schema.rb` is dumped before them → the error means the primary schema is done; OK to ignore (§3.3, `MERGE_MIGRATIONS.md` §5) |
 | Bare `parallel_rspec` raises load error | Missing `bundle exec` prefix → always `bundle exec parallel_rspec` |
-| Flaky feature passes alone, fails in suite | Retries only run under parallel — repro must also use `bundle exec parallel_rspec -n 10`, never bare `rspec` (see `docs/FLAKY_TESTS.md`). Exception: §7 allowlist — repro with `bundle exec rspec <file>` instead |
+| Flaky feature passes alone, fails in suite | Retries only run under parallel — repro must also use `bundle exec parallel_rspec -n 14`, never bare `rspec` (see `docs/FLAKY_TESTS.md`). Exception: §7 allowlist — repro with `bundle exec rspec <file>` instead |
 | Stale Meilisearch hits across workers | Index suffix missing → check `TEST_ENV_NUMBER` is passed through (see `config/initializers/meilisearch.rb`) |
 | §7 allowlist file fails under parallel | Known parallel-incompatible — do NOT treat as regression, do NOT re-run parallel. Verify once with `bundle exec rspec <file>`; if green, move on |
 
 ## 7. Known parallel-incompatible specs (allowlist)
 
 These files pass with single-process `rspec` but fail under
-`bundle exec parallel_rspec -n 10`. The failure under parallel is expected
+`bundle exec parallel_rspec -n 14`. The failure under parallel is expected
 and does not block. Do NOT ignore the files — still verify them — but a
 parallel-only failure is OK.
 
 | File | Verify with |
 |------|-------------|
-| `spec/features/companies/pages/retail_cashier_spec.rb` | `bundle exec rspec spec/features/companies/pages/retail_cashier_spec.rb` |
 | `spec/features/companies/company_tickets/websocket_spec.rb` | `bundle exec rspec spec/features/companies/company_tickets/websocket_spec.rb` |
 
 Rules for allowlist files:
@@ -141,7 +148,7 @@ Rules for allowlist files:
   cause (websocket timing / multi-worker resource contention). Report the
   parallel failure as known, note the single-process pass, and move on.
 - When running the full suite with `parallel_rspec`, a failure limited to
-  these two files is OK to set aside after the single-process check passes.
+  an allowlisted file is OK to set aside after the single-process check passes.
 
 ---
 

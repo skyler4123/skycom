@@ -210,7 +210,7 @@ Verify:
 
 ```bash
 ruby -ropenssl -e 'puts OpenSSL::VERSION'   # loads, no missing libs
-bundle exec parallel_rspec -n 10 spec/models/stock_spec.rb
+bundle exec parallel_rspec -n 14 spec/models/stock_spec.rb
 ```
 
 ### 3.4 Bundle install

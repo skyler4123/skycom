@@ -17,6 +17,8 @@ class CreateDocuments < ActiveRecord::Migration[8.0]
       1.upto(10)  { |i| t.boolean "property_boolean_#{i}" }
       1.upto(10)  { |i| t.datetime "property_datetime_#{i}" }
 
+      t.string :external_id, index: true
+
       # --- System Fields ---
       t.integer  :lifecycle_status, index: true
       t.integer  :workflow_status, index: true

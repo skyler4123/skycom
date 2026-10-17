@@ -7,6 +7,8 @@ class CreatePromoGrants < ActiveRecord::Migration[8.0]
       t.bigint :promo_before, null: false
       t.bigint :promo_after, null: false
 
+      t.string :external_id, index: true
+
       # --- System Fields ---
       t.integer  :lifecycle_status, index: true
       t.integer  :workflow_status, index: true

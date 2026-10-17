@@ -12,6 +12,8 @@ class CreateCompanySettings < ActiveRecord::Migration[8.0]
       t.text :credential_2
       t.text :credential_3
 
+      t.string :external_id, index: true
+
       # --- System Fields ---
       t.integer :lifecycle_status
       t.integer :workflow_status, default: 0, null: false

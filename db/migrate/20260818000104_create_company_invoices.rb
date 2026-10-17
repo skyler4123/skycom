@@ -11,6 +11,7 @@ class CreateCompanyInvoices < ActiveRecord::Migration[8.0]
       t.integer :currency, null: false
       t.integer :payment_status, null: false, default: 0
 
+      t.string :external_id, index: true
       t.integer :lifecycle_status
       t.integer :workflow_status
       t.integer :business_type

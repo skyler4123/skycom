@@ -2,8 +2,8 @@
 #
 # Metered file API (Shell-First). Files live only inside folders; each row
 # wraps one Active Storage blob with audit columns for future charging.
-# Serves Stimulus: Companies_Folders_IndexController (create/download/destroy),
-#                  Companies_StoredFiles_NewModalController (create)
+# Serves Stimulus: Companies_Folders_ShowController (upload zone),
+#                  Companies_StoredFiles_ShowController (detail + download + delete)
 # Endpoints: POST /companies/:company_id/stored_files + download/destroy — see config/routes.rb
 # Docs: docs/STORAGE.md
 class Companies::StoredFilesController < Companies::ApplicationController
