@@ -188,7 +188,7 @@ non-admins keep dashboard + new-company and never see the admin link.
 | `spec/requests/home_spec.rb` | `private` + `max-age=3600` + `Vary: Cookie` on clean GET, static-markup anchors, non-cacheable flash response (POSTs use the forgery-disable wrapper — CSRF is on in test env) |
 | `spec/requests/companies_controller_spec.rb` | `GET /companies/new` 200 shell when signed in, redirect for guests |
 
-House patterns this page depends on: `bundle exec parallel_rspec -n 10`
+House patterns this page depends on: `bundle exec parallel_rspec -n 14`
 (never bare `rspec` for verification), navigation-before-content assertions
 (`FLAKY_TESTS.md` §8), `assets:clobber` → `tailwindcss:build` after
 controller deletion (§6).

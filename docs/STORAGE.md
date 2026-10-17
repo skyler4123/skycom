@@ -72,7 +72,7 @@ Controllers (Shell-First, `errors` plural):
 - Requests: `spec/requests/companies/folders_controller_spec.rb`,
   `stored_files_controller_spec.rb` — paired success + `errors`-key failures,
   download redirect, foreign-record 404s.
-- Run: `bundle exec parallel_rspec -n 10 spec/models/folder_spec.rb spec/models/stored_file_spec.rb spec/requests/companies/folders_controller_spec.rb spec/requests/companies/stored_files_controller_spec.rb`
+- Run: `bundle exec parallel_rspec -n 14 spec/models/folder_spec.rb spec/models/stored_file_spec.rb spec/requests/companies/folders_controller_spec.rb spec/requests/companies/stored_files_controller_spec.rb`
 
 ## 6. Storage Statistics page
 

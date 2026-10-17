@@ -140,6 +140,17 @@ services:
       - meilisearch_data:/meili_data
     environment:
       MEILI_MASTER_KEY: "skycom_master_key_password_2026"
+    deploy:
+      resources:
+        limits:
+          # Restrict or allow maximum CPU usage (e.g., up to 4 full cores)
+          cpus: '4.0'
+          # Limit maximum memory (e.g., 6 GB). Adjust based on your total laptop RAM.
+          memory: 6G
+        reservations:
+          # Guarantee a baseline of resources so it's always responsive
+          cpus: '2.0'
+          memory: 2G
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:7700/health"]
       interval: 10s
