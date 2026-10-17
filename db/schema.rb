@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_10_16_000004) do
+ActiveRecord::Schema[8.1].define(version: 2026_10_17_000001) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pgcrypto"
@@ -60,12 +60,14 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_000004) do
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "external_id"
     t.index ["address_id"], name: "index_address_branch_appointments_on_address_id"
     t.index ["branch_id"], name: "index_address_branch_appointments_on_branch_id"
     t.index ["business_type"], name: "index_address_branch_appointments_on_business_type"
     t.index ["company_id", "address_id", "branch_id"], name: "idx_address_branch_appointments_uniq", unique: true
     t.index ["company_id"], name: "index_address_branch_appointments_on_company_id"
     t.index ["discarded_at"], name: "index_address_branch_appointments_on_discarded_at"
+    t.index ["external_id"], name: "index_address_branch_appointments_on_external_id"
     t.index ["lifecycle_status"], name: "index_address_branch_appointments_on_lifecycle_status"
     t.index ["workflow_status"], name: "index_address_branch_appointments_on_workflow_status"
   end
@@ -86,11 +88,13 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_000004) do
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "external_id"
     t.index ["address_id", "company_id"], name: "idx_address_company_appointments_uniq", unique: true
     t.index ["address_id"], name: "index_address_company_appointments_on_address_id"
     t.index ["business_type"], name: "index_address_company_appointments_on_business_type"
     t.index ["company_id"], name: "index_address_company_appointments_on_company_id"
     t.index ["discarded_at"], name: "index_address_company_appointments_on_discarded_at"
+    t.index ["external_id"], name: "index_address_company_appointments_on_external_id"
     t.index ["lifecycle_status"], name: "index_address_company_appointments_on_lifecycle_status"
     t.index ["workflow_status"], name: "index_address_company_appointments_on_workflow_status"
   end
@@ -112,12 +116,14 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_000004) do
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "external_id"
     t.index ["address_id"], name: "index_address_customer_appointments_on_address_id"
     t.index ["business_type"], name: "index_address_customer_appointments_on_business_type"
     t.index ["company_id", "address_id", "customer_id"], name: "idx_address_customer_appointments_uniq", unique: true
     t.index ["company_id"], name: "index_address_customer_appointments_on_company_id"
     t.index ["customer_id"], name: "index_address_customer_appointments_on_customer_id"
     t.index ["discarded_at"], name: "index_address_customer_appointments_on_discarded_at"
+    t.index ["external_id"], name: "index_address_customer_appointments_on_external_id"
     t.index ["lifecycle_status"], name: "index_address_customer_appointments_on_lifecycle_status"
     t.index ["workflow_status"], name: "index_address_customer_appointments_on_workflow_status"
   end
@@ -139,12 +145,14 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_000004) do
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "external_id"
     t.index ["address_id"], name: "index_address_customer_group_appointments_on_address_id"
     t.index ["business_type"], name: "index_address_customer_group_appointments_on_business_type"
     t.index ["company_id", "address_id", "customer_group_id"], name: "idx_address_customer_group_appointments_uniq", unique: true
     t.index ["company_id"], name: "index_address_customer_group_appointments_on_company_id"
     t.index ["customer_group_id"], name: "index_address_customer_group_appointments_on_customer_group_id"
     t.index ["discarded_at"], name: "index_address_customer_group_appointments_on_discarded_at"
+    t.index ["external_id"], name: "index_address_customer_group_appointments_on_external_id"
     t.index ["lifecycle_status"], name: "index_address_customer_group_appointments_on_lifecycle_status"
     t.index ["workflow_status"], name: "index_address_customer_group_appointments_on_workflow_status"
   end
@@ -166,12 +174,14 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_000004) do
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "external_id"
     t.index ["address_id"], name: "index_address_department_appointments_on_address_id"
     t.index ["business_type"], name: "index_address_department_appointments_on_business_type"
     t.index ["company_id", "address_id", "department_id"], name: "idx_address_department_appointments_uniq", unique: true
     t.index ["company_id"], name: "index_address_department_appointments_on_company_id"
     t.index ["department_id"], name: "index_address_department_appointments_on_department_id"
     t.index ["discarded_at"], name: "index_address_department_appointments_on_discarded_at"
+    t.index ["external_id"], name: "index_address_department_appointments_on_external_id"
     t.index ["lifecycle_status"], name: "index_address_department_appointments_on_lifecycle_status"
     t.index ["workflow_status"], name: "index_address_department_appointments_on_workflow_status"
   end
@@ -193,12 +203,14 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_000004) do
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "external_id"
     t.index ["address_id"], name: "index_address_employee_appointments_on_address_id"
     t.index ["business_type"], name: "index_address_employee_appointments_on_business_type"
     t.index ["company_id", "address_id", "employee_id"], name: "idx_address_employee_appointments_uniq", unique: true
     t.index ["company_id"], name: "index_address_employee_appointments_on_company_id"
     t.index ["discarded_at"], name: "index_address_employee_appointments_on_discarded_at"
     t.index ["employee_id"], name: "index_address_employee_appointments_on_employee_id"
+    t.index ["external_id"], name: "index_address_employee_appointments_on_external_id"
     t.index ["lifecycle_status"], name: "index_address_employee_appointments_on_lifecycle_status"
     t.index ["workflow_status"], name: "index_address_employee_appointments_on_workflow_status"
   end
@@ -220,12 +232,14 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_000004) do
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "external_id"
     t.index ["address_id"], name: "index_address_employee_group_appointments_on_address_id"
     t.index ["business_type"], name: "index_address_employee_group_appointments_on_business_type"
     t.index ["company_id", "address_id", "employee_group_id"], name: "idx_address_employee_group_appointments_uniq", unique: true
     t.index ["company_id"], name: "index_address_employee_group_appointments_on_company_id"
     t.index ["discarded_at"], name: "index_address_employee_group_appointments_on_discarded_at"
     t.index ["employee_group_id"], name: "index_address_employee_group_appointments_on_employee_group_id"
+    t.index ["external_id"], name: "index_address_employee_group_appointments_on_external_id"
     t.index ["lifecycle_status"], name: "index_address_employee_group_appointments_on_lifecycle_status"
     t.index ["workflow_status"], name: "index_address_employee_group_appointments_on_workflow_status"
   end
@@ -247,11 +261,13 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_000004) do
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "external_id"
     t.index ["address_id"], name: "index_address_user_appointments_on_address_id"
     t.index ["business_type"], name: "index_address_user_appointments_on_business_type"
     t.index ["company_id", "address_id", "user_id"], name: "idx_address_user_appointments_uniq", unique: true
     t.index ["company_id"], name: "index_address_user_appointments_on_company_id"
     t.index ["discarded_at"], name: "index_address_user_appointments_on_discarded_at"
+    t.index ["external_id"], name: "index_address_user_appointments_on_external_id"
     t.index ["lifecycle_status"], name: "index_address_user_appointments_on_lifecycle_status"
     t.index ["user_id"], name: "index_address_user_appointments_on_user_id"
     t.index ["workflow_status"], name: "index_address_user_appointments_on_workflow_status"
@@ -267,6 +283,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_000004) do
     t.string "fingerprint", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "external_id"
+    t.index ["external_id"], name: "index_addresses_on_external_id"
     t.index ["fingerprint"], name: "index_addresses_on_fingerprint", unique: true
   end
 
@@ -287,11 +305,13 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_000004) do
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "external_id"
     t.index ["answer_id"], name: "index_answer_tag_appointments_on_answer_id"
     t.index ["business_type"], name: "index_answer_tag_appointments_on_business_type"
     t.index ["company_id", "answer_id", "tag_id"], name: "idx_answer_tag_appointments_uniq", unique: true
     t.index ["company_id"], name: "index_answer_tag_appointments_on_company_id"
     t.index ["discarded_at"], name: "index_answer_tag_appointments_on_discarded_at"
+    t.index ["external_id"], name: "index_answer_tag_appointments_on_external_id"
     t.index ["lifecycle_status"], name: "index_answer_tag_appointments_on_lifecycle_status"
     t.index ["tag_id"], name: "index_answer_tag_appointments_on_tag_id"
     t.index ["workflow_status"], name: "index_answer_tag_appointments_on_workflow_status"
@@ -314,10 +334,12 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_000004) do
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "external_id"
     t.index ["business_type"], name: "index_answers_on_business_type"
     t.index ["category_id"], name: "index_answers_on_category_id"
     t.index ["company_id"], name: "index_answers_on_company_id"
     t.index ["discarded_at"], name: "index_answers_on_discarded_at"
+    t.index ["external_id"], name: "index_answers_on_external_id"
     t.index ["lifecycle_status"], name: "index_answers_on_lifecycle_status"
     t.index ["property_mapping_id"], name: "index_answers_on_property_mapping_id"
     t.index ["question_id"], name: "index_answers_on_question_id"
@@ -346,12 +368,14 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_000004) do
     t.datetime "discarded_at"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "external_id"
     t.index ["attendance_config_id"], name: "index_attendance_config_logs_on_attendance_config_id"
     t.index ["branch_id"], name: "index_attendance_config_logs_on_branch_id"
     t.index ["company_id", "attendance_config_id", "created_at"], name: "idx_attendance_config_logs_on_config_time"
     t.index ["company_id", "created_at"], name: "idx_attendance_config_logs_on_company_time"
     t.index ["company_id"], name: "index_attendance_config_logs_on_company_id"
     t.index ["employee_id"], name: "index_attendance_config_logs_on_employee_id"
+    t.index ["external_id"], name: "index_attendance_config_logs_on_external_id"
   end
 
   create_table "attendance_configs", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
@@ -372,9 +396,11 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_000004) do
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "external_id"
     t.index ["branch_id"], name: "index_attendance_configs_on_branch_id", unique: true
     t.index ["company_id"], name: "index_attendance_configs_on_company_id"
     t.index ["discarded_at"], name: "index_attendance_configs_on_discarded_at"
+    t.index ["external_id"], name: "index_attendance_configs_on_external_id"
   end
 
   create_table "attendance_days", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
@@ -408,10 +434,12 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_000004) do
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "external_id"
     t.index ["branch_id"], name: "index_attendance_days_on_branch_id"
     t.index ["company_id"], name: "index_attendance_days_on_company_id"
     t.index ["discarded_at"], name: "index_attendance_days_on_discarded_at"
     t.index ["employee_id"], name: "index_attendance_days_on_employee_id"
+    t.index ["external_id"], name: "index_attendance_days_on_external_id"
   end
 
   create_table "attendance_logs", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
@@ -434,10 +462,12 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_000004) do
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "external_id"
     t.index ["branch_id"], name: "index_attendance_logs_on_branch_id"
     t.index ["company_id"], name: "index_attendance_logs_on_company_id"
     t.index ["discarded_at"], name: "index_attendance_logs_on_discarded_at"
     t.index ["employee_id"], name: "index_attendance_logs_on_employee_id"
+    t.index ["external_id"], name: "index_attendance_logs_on_external_id"
   end
 
   create_table "attendance_months", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
@@ -462,11 +492,13 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_000004) do
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "external_id"
     t.index ["branch_id"], name: "index_attendance_months_on_branch_id"
     t.index ["company_id"], name: "index_attendance_months_on_company_id"
     t.index ["discarded_at"], name: "index_attendance_months_on_discarded_at"
     t.index ["employee_id", "month"], name: "index_attendance_months_on_employee_id_and_month", unique: true
     t.index ["employee_id"], name: "index_attendance_months_on_employee_id"
+    t.index ["external_id"], name: "index_attendance_months_on_external_id"
   end
 
   create_table "attendance_requests", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
@@ -490,12 +522,14 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_000004) do
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "external_id"
     t.index ["branch_id"], name: "index_attendance_requests_on_branch_id"
     t.index ["company_id", "employee_id", "attendance_date"], name: "idx_attendance_requests_on_company_employee_date", unique: true, where: "(discarded_at IS NULL)"
     t.index ["company_id"], name: "index_attendance_requests_on_company_id"
     t.index ["decided_by_id"], name: "index_attendance_requests_on_decided_by_id"
     t.index ["discarded_at"], name: "index_attendance_requests_on_discarded_at"
     t.index ["employee_id"], name: "index_attendance_requests_on_employee_id"
+    t.index ["external_id"], name: "index_attendance_requests_on_external_id"
     t.index ["status"], name: "index_attendance_requests_on_status"
   end
 
@@ -516,12 +550,14 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_000004) do
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "external_id"
     t.index ["branch_id"], name: "index_branch_event_appointments_on_branch_id"
     t.index ["business_type"], name: "index_branch_event_appointments_on_business_type"
     t.index ["company_id", "branch_id", "event_id"], name: "idx_branch_event_appointments_uniq", unique: true
     t.index ["company_id"], name: "index_branch_event_appointments_on_company_id"
     t.index ["discarded_at"], name: "index_branch_event_appointments_on_discarded_at"
     t.index ["event_id"], name: "index_branch_event_appointments_on_event_id"
+    t.index ["external_id"], name: "index_branch_event_appointments_on_external_id"
     t.index ["lifecycle_status"], name: "index_branch_event_appointments_on_lifecycle_status"
     t.index ["workflow_status"], name: "index_branch_event_appointments_on_workflow_status"
   end
@@ -545,11 +581,13 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_000004) do
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "external_id"
     t.index ["branch_id"], name: "index_branch_payment_method_appointments_on_branch_id"
     t.index ["business_type"], name: "index_branch_payment_method_appointments_on_business_type"
     t.index ["company_id", "branch_id", "payment_method_id"], name: "idx_branch_payment_method_appointments_uniq", unique: true
     t.index ["company_id"], name: "index_branch_payment_method_appointments_on_company_id"
     t.index ["discarded_at"], name: "index_branch_payment_method_appointments_on_discarded_at"
+    t.index ["external_id"], name: "index_branch_payment_method_appointments_on_external_id"
     t.index ["lifecycle_status"], name: "index_branch_payment_method_appointments_on_lifecycle_status"
     t.index ["payment_method_id"], name: "index_branch_payment_method_appointments_on_payment_method_id"
     t.index ["workflow_status"], name: "index_branch_payment_method_appointments_on_workflow_status"
@@ -575,11 +613,13 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_000004) do
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "external_id"
     t.index ["branch_id"], name: "index_branch_subscription_plan_appointments_on_branch_id"
     t.index ["business_type"], name: "index_branch_subscription_plan_appointments_on_business_type"
     t.index ["company_id", "branch_id", "subscription_plan_id"], name: "idx_branch_subscription_plan_appointments_triple"
     t.index ["company_id"], name: "index_branch_subscription_plan_appointments_on_company_id"
     t.index ["discarded_at"], name: "index_branch_subscription_plan_appointments_on_discarded_at"
+    t.index ["external_id"], name: "index_branch_subscription_plan_appointments_on_external_id"
     t.index ["lifecycle_status"], name: "idx_on_lifecycle_status_6239fe5d2e"
     t.index ["subscription_plan_id"], name: "idx_on_subscription_plan_id_cac211d7dd"
     t.index ["workflow_status"], name: "index_branch_subscription_plan_appointments_on_workflow_status"
@@ -602,11 +642,13 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_000004) do
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "external_id"
     t.index ["branch_id"], name: "index_branch_tag_appointments_on_branch_id"
     t.index ["business_type"], name: "index_branch_tag_appointments_on_business_type"
     t.index ["company_id", "branch_id", "tag_id"], name: "idx_branch_tag_appointments_uniq", unique: true
     t.index ["company_id"], name: "index_branch_tag_appointments_on_company_id"
     t.index ["discarded_at"], name: "index_branch_tag_appointments_on_discarded_at"
+    t.index ["external_id"], name: "index_branch_tag_appointments_on_external_id"
     t.index ["lifecycle_status"], name: "index_branch_tag_appointments_on_lifecycle_status"
     t.index ["tag_id"], name: "index_branch_tag_appointments_on_tag_id"
     t.index ["workflow_status"], name: "index_branch_tag_appointments_on_workflow_status"
@@ -694,12 +736,14 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_000004) do
     t.datetime "property_datetime_10"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "external_id"
     t.index ["business_type"], name: "index_branches_on_business_type"
     t.index ["category_id"], name: "index_branches_on_category_id"
     t.index ["code"], name: "index_branches_on_code", unique: true
     t.index ["company_id"], name: "index_branches_on_company_id"
     t.index ["discarded_at"], name: "index_branches_on_discarded_at"
     t.index ["email"], name: "index_branches_on_email", unique: true
+    t.index ["external_id"], name: "index_branches_on_external_id"
     t.index ["lifecycle_status"], name: "index_branches_on_lifecycle_status"
     t.index ["parent_branch_id"], name: "index_branches_on_parent_branch_id"
     t.index ["property_mapping_id"], name: "index_branches_on_property_mapping_id"
@@ -723,11 +767,13 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_000004) do
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "external_id"
     t.index ["brand_id"], name: "index_brand_tag_appointments_on_brand_id"
     t.index ["business_type"], name: "index_brand_tag_appointments_on_business_type"
     t.index ["company_id", "brand_id", "tag_id"], name: "idx_brand_tag_appointments_uniq", unique: true
     t.index ["company_id"], name: "index_brand_tag_appointments_on_company_id"
     t.index ["discarded_at"], name: "index_brand_tag_appointments_on_discarded_at"
+    t.index ["external_id"], name: "index_brand_tag_appointments_on_external_id"
     t.index ["lifecycle_status"], name: "index_brand_tag_appointments_on_lifecycle_status"
     t.index ["tag_id"], name: "index_brand_tag_appointments_on_tag_id"
     t.index ["workflow_status"], name: "index_brand_tag_appointments_on_workflow_status"
@@ -814,12 +860,14 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_000004) do
     t.datetime "property_datetime_10"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "external_id"
     t.index ["business_type"], name: "index_brands_on_business_type"
     t.index ["category_id"], name: "index_brands_on_category_id"
     t.index ["code"], name: "index_brands_on_code", unique: true
     t.index ["company_id"], name: "index_brands_on_company_id"
     t.index ["discarded_at"], name: "index_brands_on_discarded_at"
     t.index ["email"], name: "index_brands_on_email", unique: true
+    t.index ["external_id"], name: "index_brands_on_external_id"
     t.index ["lifecycle_status"], name: "index_brands_on_lifecycle_status"
     t.index ["property_mapping_id"], name: "index_brands_on_property_mapping_id"
     t.index ["workflow_status"], name: "index_brands_on_workflow_status"
@@ -841,12 +889,14 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_000004) do
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "external_id"
     t.index ["business_type"], name: "index_cart_employee_appointments_on_business_type"
     t.index ["cart_id"], name: "index_cart_employee_appointments_on_cart_id"
     t.index ["company_id", "cart_id", "employee_id"], name: "idx_cart_employee_appointments_uniq", unique: true
     t.index ["company_id"], name: "index_cart_employee_appointments_on_company_id"
     t.index ["discarded_at"], name: "index_cart_employee_appointments_on_discarded_at"
     t.index ["employee_id"], name: "index_cart_employee_appointments_on_employee_id"
+    t.index ["external_id"], name: "index_cart_employee_appointments_on_external_id"
     t.index ["lifecycle_status"], name: "index_cart_employee_appointments_on_lifecycle_status"
     t.index ["workflow_status"], name: "index_cart_employee_appointments_on_workflow_status"
   end
@@ -933,6 +983,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_000004) do
     t.datetime "property_datetime_10"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "external_id"
     t.index ["branch_id"], name: "index_cart_groups_on_branch_id"
     t.index ["business_type"], name: "index_cart_groups_on_business_type"
     t.index ["category_id"], name: "index_cart_groups_on_category_id"
@@ -940,6 +991,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_000004) do
     t.index ["company_id"], name: "index_cart_groups_on_company_id"
     t.index ["discarded_at"], name: "index_cart_groups_on_discarded_at"
     t.index ["email"], name: "index_cart_groups_on_email", unique: true
+    t.index ["external_id"], name: "index_cart_groups_on_external_id"
     t.index ["lifecycle_status"], name: "index_cart_groups_on_lifecycle_status"
     t.index ["property_mapping_id"], name: "index_cart_groups_on_property_mapping_id"
     t.index ["workflow_status"], name: "index_cart_groups_on_workflow_status"
@@ -1028,6 +1080,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_000004) do
     t.datetime "property_datetime_10"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "external_id"
     t.index ["branch_id"], name: "index_carts_on_branch_id"
     t.index ["business_type"], name: "index_carts_on_business_type"
     t.index ["cart_group_id"], name: "index_carts_on_cart_group_id"
@@ -1036,6 +1089,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_000004) do
     t.index ["company_id"], name: "index_carts_on_company_id"
     t.index ["discarded_at"], name: "index_carts_on_discarded_at"
     t.index ["email"], name: "index_carts_on_email", unique: true
+    t.index ["external_id"], name: "index_carts_on_external_id"
     t.index ["lifecycle_status"], name: "index_carts_on_lifecycle_status"
     t.index ["property_mapping_id"], name: "index_carts_on_property_mapping_id"
     t.index ["workflow_status"], name: "index_carts_on_workflow_status"
@@ -1055,10 +1109,12 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_000004) do
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "external_id"
     t.index ["business_type"], name: "index_categories_on_business_type"
     t.index ["company_id", "name"], name: "index_categories_on_company_id_and_name"
     t.index ["company_id"], name: "index_categories_on_company_id"
     t.index ["discarded_at"], name: "index_categories_on_discarded_at"
+    t.index ["external_id"], name: "index_categories_on_external_id"
     t.index ["lifecycle_status"], name: "index_categories_on_lifecycle_status"
     t.index ["workflow_status"], name: "index_categories_on_workflow_status"
   end
@@ -1092,8 +1148,10 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_000004) do
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "external_id"
     t.index ["business_type"], name: "index_companies_on_business_type"
     t.index ["discarded_at"], name: "index_companies_on_discarded_at"
+    t.index ["external_id"], name: "index_companies_on_external_id"
     t.index ["lifecycle_status"], name: "index_companies_on_lifecycle_status"
     t.index ["user_id"], name: "index_companies_on_user_id"
     t.index ["workflow_status"], name: "index_companies_on_workflow_status"
@@ -1112,9 +1170,11 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_000004) do
     t.bigint "total_credits", default: 0, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "external_id"
     t.index ["company_id", "usage_date"], name: "index_company_daily_usages_on_company_id_and_usage_date", unique: true
     t.index ["company_id"], name: "index_company_daily_usages_on_company_id"
     t.index ["discarded_at"], name: "index_company_daily_usages_on_discarded_at"
+    t.index ["external_id"], name: "index_company_daily_usages_on_external_id"
   end
 
   create_table "company_invoices", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
@@ -1134,10 +1194,12 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_000004) do
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "external_id"
     t.index ["company_id", "created_at"], name: "index_company_invoices_on_company_id_and_created_at"
     t.index ["company_id"], name: "index_company_invoices_on_company_id"
     t.index ["company_order_id"], name: "index_company_invoices_on_company_order_id", unique: true
     t.index ["discarded_at"], name: "index_company_invoices_on_discarded_at"
+    t.index ["external_id"], name: "index_company_invoices_on_external_id"
     t.index ["invoice_number"], name: "index_company_invoices_on_invoice_number", unique: true
   end
 
@@ -1154,9 +1216,11 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_000004) do
     t.bigint "total_credits", default: 0, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "external_id"
     t.index ["company_id", "usage_month"], name: "index_company_monthly_usages_on_company_id_and_usage_month", unique: true
     t.index ["company_id"], name: "index_company_monthly_usages_on_company_id"
     t.index ["discarded_at"], name: "index_company_monthly_usages_on_discarded_at"
+    t.index ["external_id"], name: "index_company_monthly_usages_on_external_id"
   end
 
   create_table "company_orders", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
@@ -1174,9 +1238,11 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_000004) do
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "external_id"
     t.index ["company_id", "created_at"], name: "index_company_orders_on_company_id_and_created_at"
     t.index ["company_id"], name: "index_company_orders_on_company_id"
     t.index ["discarded_at"], name: "index_company_orders_on_discarded_at"
+    t.index ["external_id"], name: "index_company_orders_on_external_id"
     t.index ["user_id"], name: "index_company_orders_on_user_id"
   end
 
@@ -1198,10 +1264,12 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_000004) do
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "external_id"
     t.index ["business_type"], name: "index_company_payment_method_appointments_on_business_type"
     t.index ["company_id", "payment_method_id"], name: "idx_company_payment_method_appointments_uniq", unique: true
     t.index ["company_id"], name: "index_company_payment_method_appointments_on_company_id"
     t.index ["discarded_at"], name: "index_company_payment_method_appointments_on_discarded_at"
+    t.index ["external_id"], name: "index_company_payment_method_appointments_on_external_id"
     t.index ["lifecycle_status"], name: "index_company_payment_method_appointments_on_lifecycle_status"
     t.index ["payment_method_id"], name: "index_company_payment_method_appointments_on_payment_method_id"
     t.index ["workflow_status"], name: "index_company_payment_method_appointments_on_workflow_status"
@@ -1227,10 +1295,12 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_000004) do
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "external_id"
     t.index ["business_type"], name: "index_company_payment_methods_on_business_type"
     t.index ["code"], name: "index_company_payment_methods_on_code", unique: true
     t.index ["discarded_at"], name: "index_company_payment_methods_on_discarded_at"
     t.index ["email"], name: "index_company_payment_methods_on_email", unique: true
+    t.index ["external_id"], name: "index_company_payment_methods_on_external_id"
     t.index ["lifecycle_status"], name: "index_company_payment_methods_on_lifecycle_status"
     t.index ["payment_mode"], name: "index_company_payment_methods_on_payment_mode"
     t.index ["workflow_status"], name: "index_company_payment_methods_on_workflow_status"
@@ -1253,11 +1323,13 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_000004) do
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "external_id"
     t.index ["company_id", "business_type"], name: "idx_company_settings_single_active", unique: true, where: "((workflow_status = 1) AND (discarded_at IS NULL))"
     t.index ["company_id", "business_type"], name: "index_company_settings_on_company_id_and_business_type"
     t.index ["company_id", "name"], name: "idx_company_settings_name_uniq", unique: true
     t.index ["company_id"], name: "index_company_settings_on_company_id"
     t.index ["discarded_at"], name: "index_company_settings_on_discarded_at"
+    t.index ["external_id"], name: "index_company_settings_on_external_id"
   end
 
   create_table "company_tag_appointments", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
@@ -1276,10 +1348,12 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_000004) do
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "external_id"
     t.index ["business_type"], name: "index_company_tag_appointments_on_business_type"
     t.index ["company_id", "tag_id"], name: "idx_company_tag_appointments_uniq", unique: true
     t.index ["company_id"], name: "index_company_tag_appointments_on_company_id"
     t.index ["discarded_at"], name: "index_company_tag_appointments_on_discarded_at"
+    t.index ["external_id"], name: "index_company_tag_appointments_on_external_id"
     t.index ["lifecycle_status"], name: "index_company_tag_appointments_on_lifecycle_status"
     t.index ["tag_id"], name: "index_company_tag_appointments_on_tag_id"
     t.index ["workflow_status"], name: "index_company_tag_appointments_on_workflow_status"
@@ -1300,6 +1374,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_000004) do
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "external_id"
     t.index ["author_type", "author_id"], name: "index_company_ticket_comments_on_author"
     t.index ["business_type"], name: "index_company_ticket_comments_on_business_type"
     t.index ["company_id", "created_at"], name: "index_company_ticket_comments_on_company_id_and_created_at"
@@ -1307,6 +1382,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_000004) do
     t.index ["company_ticket_id", "created_at"], name: "idx_on_company_ticket_id_created_at_33559addf0"
     t.index ["company_ticket_id"], name: "index_company_ticket_comments_on_company_ticket_id"
     t.index ["discarded_at"], name: "index_company_ticket_comments_on_discarded_at"
+    t.index ["external_id"], name: "index_company_ticket_comments_on_external_id"
     t.index ["lifecycle_status"], name: "index_company_ticket_comments_on_lifecycle_status"
     t.index ["workflow_status"], name: "index_company_ticket_comments_on_workflow_status"
   end
@@ -1329,12 +1405,14 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_000004) do
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "external_id"
     t.index ["actor_type", "actor_id"], name: "index_company_ticket_logs_on_actor"
     t.index ["business_type"], name: "index_company_ticket_logs_on_business_type"
     t.index ["company_id"], name: "index_company_ticket_logs_on_company_id"
     t.index ["company_ticket_id", "created_at"], name: "index_company_ticket_logs_on_company_ticket_id_and_created_at"
     t.index ["company_ticket_id"], name: "index_company_ticket_logs_on_company_ticket_id"
     t.index ["discarded_at"], name: "index_company_ticket_logs_on_discarded_at"
+    t.index ["external_id"], name: "index_company_ticket_logs_on_external_id"
     t.index ["lifecycle_status"], name: "index_company_ticket_logs_on_lifecycle_status"
     t.index ["workflow_status"], name: "index_company_ticket_logs_on_workflow_status"
   end
@@ -1360,6 +1438,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_000004) do
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "external_id"
     t.index ["assigned_user_id"], name: "index_company_tickets_on_assigned_user_id"
     t.index ["business_type"], name: "index_company_tickets_on_business_type"
     t.index ["company_id", "assigned_user_id"], name: "index_company_tickets_on_company_id_and_assigned_user_id"
@@ -1368,6 +1447,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_000004) do
     t.index ["company_id"], name: "index_company_tickets_on_company_id"
     t.index ["discarded_at"], name: "index_company_tickets_on_discarded_at"
     t.index ["employee_id"], name: "index_company_tickets_on_employee_id"
+    t.index ["external_id"], name: "index_company_tickets_on_external_id"
     t.index ["lifecycle_status"], name: "index_company_tickets_on_lifecycle_status"
     t.index ["workflow_status"], name: "index_company_tickets_on_workflow_status"
   end
@@ -1390,11 +1470,13 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_000004) do
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "external_id"
     t.index ["company_id", "created_at"], name: "index_company_transactions_on_company_id_and_created_at"
     t.index ["company_id"], name: "index_company_transactions_on_company_id"
     t.index ["company_invoice_id"], name: "index_company_transactions_on_company_invoice_id"
     t.index ["company_payment_method_id"], name: "index_company_transactions_on_company_payment_method_id"
     t.index ["discarded_at"], name: "index_company_transactions_on_discarded_at"
+    t.index ["external_id"], name: "index_company_transactions_on_external_id"
     t.index ["gateway_reference"], name: "index_company_transactions_on_gateway_reference", unique: true
   end
 
@@ -1416,11 +1498,13 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_000004) do
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "external_id"
     t.index ["action_type"], name: "index_company_usage_logs_on_action_type"
     t.index ["company_id"], name: "index_company_usage_logs_on_company_id"
     t.index ["company_wallet_id", "created_at"], name: "index_company_usage_logs_on_company_wallet_id_and_created_at"
     t.index ["company_wallet_id"], name: "index_company_usage_logs_on_company_wallet_id"
     t.index ["discarded_at"], name: "index_company_usage_logs_on_discarded_at"
+    t.index ["external_id"], name: "index_company_usage_logs_on_external_id"
     t.index ["source_type", "source_id"], name: "index_company_usage_logs_on_source_type_and_source_id"
   end
 
@@ -1444,10 +1528,12 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_000004) do
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "external_id"
     t.index ["company_id"], name: "index_company_wallet_logs_on_company_id"
     t.index ["company_wallet_id", "created_at"], name: "index_company_wallet_logs_on_company_wallet_id_and_created_at"
     t.index ["company_wallet_id"], name: "index_company_wallet_logs_on_company_wallet_id"
     t.index ["discarded_at"], name: "index_company_wallet_logs_on_discarded_at"
+    t.index ["external_id"], name: "index_company_wallet_logs_on_external_id"
     t.index ["source_type", "source_id"], name: "index_company_wallet_logs_on_source_type_and_source_id"
   end
 
@@ -1468,8 +1554,10 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_000004) do
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "external_id"
     t.index ["company_id"], name: "index_company_wallets_on_company_id", unique: true
     t.index ["discarded_at"], name: "index_company_wallets_on_discarded_at"
+    t.index ["external_id"], name: "index_company_wallets_on_external_id"
     t.index ["walletable_type", "walletable_id"], name: "index_company_wallets_on_walletable_type_and_walletable_id"
   end
 
@@ -1489,12 +1577,14 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_000004) do
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "external_id"
     t.index ["business_type"], name: "index_customer_customer_group_appointments_on_business_type"
     t.index ["company_id", "customer_id", "customer_group_id"], name: "idx_customer_customer_group_appointments_uniq", unique: true
     t.index ["company_id"], name: "index_customer_customer_group_appointments_on_company_id"
     t.index ["customer_group_id"], name: "idx_on_customer_group_id_d7aad9d09e"
     t.index ["customer_id"], name: "index_customer_customer_group_appointments_on_customer_id"
     t.index ["discarded_at"], name: "index_customer_customer_group_appointments_on_discarded_at"
+    t.index ["external_id"], name: "index_customer_customer_group_appointments_on_external_id"
     t.index ["lifecycle_status"], name: "index_customer_customer_group_appointments_on_lifecycle_status"
     t.index ["workflow_status"], name: "index_customer_customer_group_appointments_on_workflow_status"
   end
@@ -1515,12 +1605,14 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_000004) do
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "external_id"
     t.index ["business_type"], name: "index_customer_employee_appointments_on_business_type"
     t.index ["company_id", "customer_id", "employee_id"], name: "idx_customer_employee_appointments_uniq", unique: true
     t.index ["company_id"], name: "index_customer_employee_appointments_on_company_id"
     t.index ["customer_id"], name: "index_customer_employee_appointments_on_customer_id"
     t.index ["discarded_at"], name: "index_customer_employee_appointments_on_discarded_at"
     t.index ["employee_id"], name: "index_customer_employee_appointments_on_employee_id"
+    t.index ["external_id"], name: "index_customer_employee_appointments_on_external_id"
     t.index ["lifecycle_status"], name: "index_customer_employee_appointments_on_lifecycle_status"
     t.index ["workflow_status"], name: "index_customer_employee_appointments_on_workflow_status"
   end
@@ -1542,12 +1634,14 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_000004) do
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "external_id"
     t.index ["business_type"], name: "index_customer_event_appointments_on_business_type"
     t.index ["company_id", "customer_id", "event_id"], name: "idx_customer_event_appointments_uniq", unique: true
     t.index ["company_id"], name: "index_customer_event_appointments_on_company_id"
     t.index ["customer_id"], name: "index_customer_event_appointments_on_customer_id"
     t.index ["discarded_at"], name: "index_customer_event_appointments_on_discarded_at"
     t.index ["event_id"], name: "index_customer_event_appointments_on_event_id"
+    t.index ["external_id"], name: "index_customer_event_appointments_on_external_id"
     t.index ["lifecycle_status"], name: "index_customer_event_appointments_on_lifecycle_status"
     t.index ["workflow_status"], name: "index_customer_event_appointments_on_workflow_status"
   end
@@ -1568,11 +1662,13 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_000004) do
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "external_id"
     t.index ["business_type"], name: "index_customer_group_role_appointments_on_business_type"
     t.index ["company_id", "customer_group_id", "role_id"], name: "idx_customer_group_role_appointments_uniq", unique: true
     t.index ["company_id"], name: "index_customer_group_role_appointments_on_company_id"
     t.index ["customer_group_id"], name: "index_customer_group_role_appointments_on_customer_group_id"
     t.index ["discarded_at"], name: "index_customer_group_role_appointments_on_discarded_at"
+    t.index ["external_id"], name: "index_customer_group_role_appointments_on_external_id"
     t.index ["lifecycle_status"], name: "index_customer_group_role_appointments_on_lifecycle_status"
     t.index ["role_id"], name: "index_customer_group_role_appointments_on_role_id"
     t.index ["workflow_status"], name: "index_customer_group_role_appointments_on_workflow_status"
@@ -1594,11 +1690,13 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_000004) do
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "external_id"
     t.index ["business_type"], name: "index_customer_group_service_appointments_on_business_type"
     t.index ["company_id", "customer_group_id", "service_id"], name: "idx_customer_group_service_appointments_uniq", unique: true
     t.index ["company_id"], name: "index_customer_group_service_appointments_on_company_id"
     t.index ["customer_group_id"], name: "index_customer_group_service_appointments_on_customer_group_id"
     t.index ["discarded_at"], name: "index_customer_group_service_appointments_on_discarded_at"
+    t.index ["external_id"], name: "index_customer_group_service_appointments_on_external_id"
     t.index ["lifecycle_status"], name: "index_customer_group_service_appointments_on_lifecycle_status"
     t.index ["service_id"], name: "index_customer_group_service_appointments_on_service_id"
     t.index ["workflow_status"], name: "index_customer_group_service_appointments_on_workflow_status"
@@ -1621,11 +1719,13 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_000004) do
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "external_id"
     t.index ["business_type"], name: "index_customer_group_tag_appointments_on_business_type"
     t.index ["company_id", "customer_group_id", "tag_id"], name: "idx_customer_group_tag_appointments_uniq", unique: true
     t.index ["company_id"], name: "index_customer_group_tag_appointments_on_company_id"
     t.index ["customer_group_id"], name: "index_customer_group_tag_appointments_on_customer_group_id"
     t.index ["discarded_at"], name: "index_customer_group_tag_appointments_on_discarded_at"
+    t.index ["external_id"], name: "index_customer_group_tag_appointments_on_external_id"
     t.index ["lifecycle_status"], name: "index_customer_group_tag_appointments_on_lifecycle_status"
     t.index ["tag_id"], name: "index_customer_group_tag_appointments_on_tag_id"
     t.index ["workflow_status"], name: "index_customer_group_tag_appointments_on_workflow_status"
@@ -1713,6 +1813,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_000004) do
     t.datetime "property_datetime_10"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "external_id"
     t.index ["branch_id"], name: "index_customer_groups_on_branch_id"
     t.index ["business_type"], name: "index_customer_groups_on_business_type"
     t.index ["category_id"], name: "index_customer_groups_on_category_id"
@@ -1720,6 +1821,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_000004) do
     t.index ["company_id"], name: "index_customer_groups_on_company_id"
     t.index ["discarded_at"], name: "index_customer_groups_on_discarded_at"
     t.index ["email"], name: "index_customer_groups_on_email", unique: true
+    t.index ["external_id"], name: "index_customer_groups_on_external_id"
     t.index ["lifecycle_status"], name: "index_customer_groups_on_lifecycle_status"
     t.index ["property_mapping_id"], name: "index_customer_groups_on_property_mapping_id"
     t.index ["workflow_status"], name: "index_customer_groups_on_workflow_status"
@@ -1741,11 +1843,13 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_000004) do
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "external_id"
     t.index ["business_type"], name: "index_customer_membership_appointments_on_business_type"
     t.index ["company_id", "customer_id", "membership_id"], name: "idx_customer_membership_appointments_uniq", unique: true
     t.index ["company_id"], name: "index_customer_membership_appointments_on_company_id"
     t.index ["customer_id"], name: "index_customer_membership_appointments_on_customer_id"
     t.index ["discarded_at"], name: "index_customer_membership_appointments_on_discarded_at"
+    t.index ["external_id"], name: "index_customer_membership_appointments_on_external_id"
     t.index ["lifecycle_status"], name: "index_customer_membership_appointments_on_lifecycle_status"
     t.index ["membership_id"], name: "index_customer_membership_appointments_on_membership_id"
     t.index ["workflow_status"], name: "index_customer_membership_appointments_on_workflow_status"
@@ -1834,6 +1938,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_000004) do
     t.datetime "property_datetime_10"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "external_id"
     t.index ["branch_id"], name: "index_customer_profiles_on_branch_id"
     t.index ["business_type"], name: "index_customer_profiles_on_business_type"
     t.index ["category_id"], name: "index_customer_profiles_on_category_id"
@@ -1844,6 +1949,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_000004) do
     t.index ["customer_id"], name: "index_customer_profiles_on_customer_id"
     t.index ["discarded_at"], name: "index_customer_profiles_on_discarded_at"
     t.index ["email"], name: "index_customer_profiles_on_email", unique: true
+    t.index ["external_id"], name: "index_customer_profiles_on_external_id"
     t.index ["lifecycle_status"], name: "index_customer_profiles_on_lifecycle_status"
     t.index ["property_mapping_id"], name: "index_customer_profiles_on_property_mapping_id"
     t.index ["workflow_status"], name: "index_customer_profiles_on_workflow_status"
@@ -1865,11 +1971,13 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_000004) do
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "external_id"
     t.index ["business_type"], name: "index_customer_role_appointments_on_business_type"
     t.index ["company_id", "customer_id", "role_id"], name: "idx_customer_role_appointments_uniq", unique: true
     t.index ["company_id"], name: "index_customer_role_appointments_on_company_id"
     t.index ["customer_id"], name: "index_customer_role_appointments_on_customer_id"
     t.index ["discarded_at"], name: "index_customer_role_appointments_on_discarded_at"
+    t.index ["external_id"], name: "index_customer_role_appointments_on_external_id"
     t.index ["lifecycle_status"], name: "index_customer_role_appointments_on_lifecycle_status"
     t.index ["role_id"], name: "index_customer_role_appointments_on_role_id"
     t.index ["workflow_status"], name: "index_customer_role_appointments_on_workflow_status"
@@ -1893,11 +2001,13 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_000004) do
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "external_id"
     t.index ["business_type"], name: "index_customer_service_appointments_on_business_type"
     t.index ["company_id", "customer_id", "service_id"], name: "idx_customer_service_appointments_uniq", unique: true
     t.index ["company_id"], name: "index_customer_service_appointments_on_company_id"
     t.index ["customer_id"], name: "index_customer_service_appointments_on_customer_id"
     t.index ["discarded_at"], name: "index_customer_service_appointments_on_discarded_at"
+    t.index ["external_id"], name: "index_customer_service_appointments_on_external_id"
     t.index ["lifecycle_status"], name: "index_customer_service_appointments_on_lifecycle_status"
     t.index ["service_id"], name: "index_customer_service_appointments_on_service_id"
     t.index ["workflow_status"], name: "index_customer_service_appointments_on_workflow_status"
@@ -1987,6 +2097,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_000004) do
     t.datetime "property_datetime_10"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "external_id"
     t.index ["branch_id"], name: "index_customer_subprofiles_on_branch_id"
     t.index ["business_type"], name: "index_customer_subprofiles_on_business_type"
     t.index ["category_id"], name: "index_customer_subprofiles_on_category_id"
@@ -1999,6 +2110,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_000004) do
     t.index ["customer_profile_id"], name: "index_customer_subprofiles_on_customer_profile_id"
     t.index ["discarded_at"], name: "index_customer_subprofiles_on_discarded_at"
     t.index ["email"], name: "index_customer_subprofiles_on_email", unique: true
+    t.index ["external_id"], name: "index_customer_subprofiles_on_external_id"
     t.index ["lifecycle_status"], name: "index_customer_subprofiles_on_lifecycle_status"
     t.index ["property_mapping_id"], name: "index_customer_subprofiles_on_property_mapping_id"
     t.index ["workflow_status"], name: "index_customer_subprofiles_on_workflow_status"
@@ -2021,11 +2133,13 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_000004) do
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "external_id"
     t.index ["business_type"], name: "index_customer_tag_appointments_on_business_type"
     t.index ["company_id", "customer_id", "tag_id"], name: "idx_customer_tag_appointments_uniq", unique: true
     t.index ["company_id"], name: "index_customer_tag_appointments_on_company_id"
     t.index ["customer_id"], name: "index_customer_tag_appointments_on_customer_id"
     t.index ["discarded_at"], name: "index_customer_tag_appointments_on_discarded_at"
+    t.index ["external_id"], name: "index_customer_tag_appointments_on_external_id"
     t.index ["lifecycle_status"], name: "index_customer_tag_appointments_on_lifecycle_status"
     t.index ["tag_id"], name: "index_customer_tag_appointments_on_tag_id"
     t.index ["workflow_status"], name: "index_customer_tag_appointments_on_workflow_status"
@@ -2114,6 +2228,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_000004) do
     t.datetime "property_datetime_10"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "external_id"
     t.index ["branch_id"], name: "index_customers_on_branch_id"
     t.index ["business_type"], name: "index_customers_on_business_type"
     t.index ["category_id"], name: "index_customers_on_category_id"
@@ -2121,6 +2236,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_000004) do
     t.index ["company_id"], name: "index_customers_on_company_id"
     t.index ["discarded_at"], name: "index_customers_on_discarded_at"
     t.index ["email"], name: "index_customers_on_email", unique: true
+    t.index ["external_id"], name: "index_customers_on_external_id"
     t.index ["lifecycle_status"], name: "index_customers_on_lifecycle_status"
     t.index ["property_mapping_id"], name: "index_customers_on_property_mapping_id"
     t.index ["user_id"], name: "index_customers_on_user_id"
@@ -2143,12 +2259,14 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_000004) do
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "external_id"
     t.index ["business_type"], name: "index_department_employee_appointments_on_business_type"
     t.index ["company_id", "department_id", "employee_id"], name: "idx_department_employee_appointments_uniq", unique: true
     t.index ["company_id"], name: "index_department_employee_appointments_on_company_id"
     t.index ["department_id"], name: "index_department_employee_appointments_on_department_id"
     t.index ["discarded_at"], name: "index_department_employee_appointments_on_discarded_at"
     t.index ["employee_id"], name: "index_department_employee_appointments_on_employee_id"
+    t.index ["external_id"], name: "index_department_employee_appointments_on_external_id"
     t.index ["lifecycle_status"], name: "index_department_employee_appointments_on_lifecycle_status"
     t.index ["workflow_status"], name: "index_department_employee_appointments_on_workflow_status"
   end
@@ -2169,11 +2287,13 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_000004) do
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "external_id"
     t.index ["business_type"], name: "index_department_role_appointments_on_business_type"
     t.index ["company_id", "department_id", "role_id"], name: "idx_department_role_appointments_uniq", unique: true
     t.index ["company_id"], name: "index_department_role_appointments_on_company_id"
     t.index ["department_id"], name: "index_department_role_appointments_on_department_id"
     t.index ["discarded_at"], name: "index_department_role_appointments_on_discarded_at"
+    t.index ["external_id"], name: "index_department_role_appointments_on_external_id"
     t.index ["lifecycle_status"], name: "index_department_role_appointments_on_lifecycle_status"
     t.index ["role_id"], name: "index_department_role_appointments_on_role_id"
     t.index ["workflow_status"], name: "index_department_role_appointments_on_workflow_status"
@@ -2196,11 +2316,13 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_000004) do
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "external_id"
     t.index ["business_type"], name: "index_department_tag_appointments_on_business_type"
     t.index ["company_id", "department_id", "tag_id"], name: "idx_department_tag_appointments_uniq", unique: true
     t.index ["company_id"], name: "index_department_tag_appointments_on_company_id"
     t.index ["department_id"], name: "index_department_tag_appointments_on_department_id"
     t.index ["discarded_at"], name: "index_department_tag_appointments_on_discarded_at"
+    t.index ["external_id"], name: "index_department_tag_appointments_on_external_id"
     t.index ["lifecycle_status"], name: "index_department_tag_appointments_on_lifecycle_status"
     t.index ["tag_id"], name: "index_department_tag_appointments_on_tag_id"
     t.index ["workflow_status"], name: "index_department_tag_appointments_on_workflow_status"
@@ -2287,12 +2409,14 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_000004) do
     t.datetime "property_datetime_10"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "external_id"
     t.index ["business_type"], name: "index_departments_on_business_type"
     t.index ["category_id"], name: "index_departments_on_category_id"
     t.index ["code"], name: "index_departments_on_code", unique: true
     t.index ["company_id"], name: "index_departments_on_company_id"
     t.index ["discarded_at"], name: "index_departments_on_discarded_at"
     t.index ["email"], name: "index_departments_on_email", unique: true
+    t.index ["external_id"], name: "index_departments_on_external_id"
     t.index ["lifecycle_status"], name: "index_departments_on_lifecycle_status"
     t.index ["property_mapping_id"], name: "index_departments_on_property_mapping_id"
     t.index ["workflow_status"], name: "index_departments_on_workflow_status"
@@ -2323,11 +2447,13 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_000004) do
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "external_id"
     t.index ["business_type"], name: "index_discount_groups_on_business_type"
     t.index ["code"], name: "index_discount_groups_on_code", unique: true
     t.index ["company_id", "campaign_status"], name: "index_discount_groups_on_company_id_and_campaign_status"
     t.index ["company_id"], name: "index_discount_groups_on_company_id"
     t.index ["discarded_at"], name: "index_discount_groups_on_discarded_at"
+    t.index ["external_id"], name: "index_discount_groups_on_external_id"
     t.index ["lifecycle_status"], name: "index_discount_groups_on_lifecycle_status"
     t.index ["workflow_status"], name: "index_discount_groups_on_workflow_status"
   end
@@ -2352,6 +2478,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_000004) do
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "external_id"
     t.index ["business_type"], name: "index_discounts_on_business_type"
     t.index ["company_id", "code"], name: "index_discounts_on_company_id_and_code", unique: true
     t.index ["company_id"], name: "index_discounts_on_company_id"
@@ -2360,6 +2487,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_000004) do
     t.index ["discount_group_id", "status"], name: "index_discounts_on_discount_group_id_and_status"
     t.index ["discount_group_id"], name: "index_discounts_on_discount_group_id"
     t.index ["employee_id"], name: "index_discounts_on_employee_id"
+    t.index ["external_id"], name: "index_discounts_on_external_id"
     t.index ["invoice_id"], name: "index_discounts_on_invoice_id"
     t.index ["lifecycle_status"], name: "index_discounts_on_lifecycle_status"
     t.index ["order_id"], name: "index_discounts_on_order_id"
@@ -2383,12 +2511,14 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_000004) do
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "external_id"
     t.index ["business_type"], name: "index_document_employee_appointments_on_business_type"
     t.index ["company_id", "document_id", "employee_id"], name: "idx_document_employee_appointments_uniq", unique: true
     t.index ["company_id"], name: "index_document_employee_appointments_on_company_id"
     t.index ["discarded_at"], name: "index_document_employee_appointments_on_discarded_at"
     t.index ["document_id"], name: "index_document_employee_appointments_on_document_id"
     t.index ["employee_id"], name: "index_document_employee_appointments_on_employee_id"
+    t.index ["external_id"], name: "index_document_employee_appointments_on_external_id"
     t.index ["lifecycle_status"], name: "index_document_employee_appointments_on_lifecycle_status"
     t.index ["workflow_status"], name: "index_document_employee_appointments_on_workflow_status"
   end
@@ -2410,11 +2540,13 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_000004) do
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "external_id"
     t.index ["business_type"], name: "index_document_tag_appointments_on_business_type"
     t.index ["company_id", "document_id", "tag_id"], name: "idx_document_tag_appointments_uniq", unique: true
     t.index ["company_id"], name: "index_document_tag_appointments_on_company_id"
     t.index ["discarded_at"], name: "index_document_tag_appointments_on_discarded_at"
     t.index ["document_id"], name: "index_document_tag_appointments_on_document_id"
+    t.index ["external_id"], name: "index_document_tag_appointments_on_external_id"
     t.index ["lifecycle_status"], name: "index_document_tag_appointments_on_lifecycle_status"
     t.index ["tag_id"], name: "index_document_tag_appointments_on_tag_id"
     t.index ["workflow_status"], name: "index_document_tag_appointments_on_workflow_status"
@@ -2498,11 +2630,13 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_000004) do
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "external_id"
     t.index ["branch_id"], name: "index_documents_on_branch_id"
     t.index ["business_type"], name: "index_documents_on_business_type"
     t.index ["category_id"], name: "index_documents_on_category_id"
     t.index ["company_id"], name: "index_documents_on_company_id"
     t.index ["discarded_at"], name: "index_documents_on_discarded_at"
+    t.index ["external_id"], name: "index_documents_on_external_id"
     t.index ["lifecycle_status"], name: "index_documents_on_lifecycle_status"
     t.index ["property_mapping_id"], name: "index_documents_on_property_mapping_id"
     t.index ["workflow_status"], name: "index_documents_on_workflow_status"
@@ -2524,11 +2658,13 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_000004) do
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "external_id"
     t.index ["business_type"], name: "index_employee_employee_appointments_on_business_type"
     t.index ["company_id"], name: "index_employee_employee_appointments_on_company_id"
     t.index ["discarded_at"], name: "index_employee_employee_appointments_on_discarded_at"
     t.index ["employee_id", "related_employee_id"], name: "idx_employee_employee_appointments_uniq", unique: true
     t.index ["employee_id"], name: "index_employee_employee_appointments_on_employee_id"
+    t.index ["external_id"], name: "index_employee_employee_appointments_on_external_id"
     t.index ["lifecycle_status"], name: "index_employee_employee_appointments_on_lifecycle_status"
     t.index ["related_employee_id"], name: "index_employee_employee_appointments_on_related_employee_id"
     t.index ["workflow_status"], name: "index_employee_employee_appointments_on_workflow_status"
@@ -2550,12 +2686,14 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_000004) do
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "external_id"
     t.index ["business_type"], name: "index_employee_employee_group_appointments_on_business_type"
     t.index ["company_id", "employee_id", "employee_group_id"], name: "idx_employee_employee_group_appointments_uniq", unique: true
     t.index ["company_id"], name: "index_employee_employee_group_appointments_on_company_id"
     t.index ["discarded_at"], name: "index_employee_employee_group_appointments_on_discarded_at"
     t.index ["employee_group_id"], name: "idx_on_employee_group_id_cdf25709e0"
     t.index ["employee_id"], name: "index_employee_employee_group_appointments_on_employee_id"
+    t.index ["external_id"], name: "index_employee_employee_group_appointments_on_external_id"
     t.index ["lifecycle_status"], name: "index_employee_employee_group_appointments_on_lifecycle_status"
     t.index ["workflow_status"], name: "index_employee_employee_group_appointments_on_workflow_status"
   end
@@ -2576,12 +2714,14 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_000004) do
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "external_id"
     t.index ["business_type"], name: "index_employee_event_appointments_on_business_type"
     t.index ["company_id", "employee_id", "event_id"], name: "idx_employee_event_appointments_uniq", unique: true
     t.index ["company_id"], name: "index_employee_event_appointments_on_company_id"
     t.index ["discarded_at"], name: "index_employee_event_appointments_on_discarded_at"
     t.index ["employee_id"], name: "index_employee_event_appointments_on_employee_id"
     t.index ["event_id"], name: "index_employee_event_appointments_on_event_id"
+    t.index ["external_id"], name: "index_employee_event_appointments_on_external_id"
     t.index ["lifecycle_status"], name: "index_employee_event_appointments_on_lifecycle_status"
     t.index ["workflow_status"], name: "index_employee_event_appointments_on_workflow_status"
   end
@@ -2602,12 +2742,14 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_000004) do
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "external_id"
     t.index ["business_type"], name: "index_employee_event_group_appointments_on_business_type"
     t.index ["company_id", "employee_id", "event_group_id"], name: "idx_employee_event_group_appointments_uniq", unique: true
     t.index ["company_id"], name: "index_employee_event_group_appointments_on_company_id"
     t.index ["discarded_at"], name: "index_employee_event_group_appointments_on_discarded_at"
     t.index ["employee_id"], name: "index_employee_event_group_appointments_on_employee_id"
     t.index ["event_group_id"], name: "index_employee_event_group_appointments_on_event_group_id"
+    t.index ["external_id"], name: "index_employee_event_group_appointments_on_external_id"
     t.index ["lifecycle_status"], name: "index_employee_event_group_appointments_on_lifecycle_status"
     t.index ["workflow_status"], name: "index_employee_event_group_appointments_on_workflow_status"
   end
@@ -2628,12 +2770,14 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_000004) do
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "external_id"
     t.index ["business_type"], name: "index_employee_exam_appointments_on_business_type"
     t.index ["company_id", "employee_id", "exam_id"], name: "idx_employee_exam_appointments_uniq", unique: true
     t.index ["company_id"], name: "index_employee_exam_appointments_on_company_id"
     t.index ["discarded_at"], name: "index_employee_exam_appointments_on_discarded_at"
     t.index ["employee_id"], name: "index_employee_exam_appointments_on_employee_id"
     t.index ["exam_id"], name: "index_employee_exam_appointments_on_exam_id"
+    t.index ["external_id"], name: "index_employee_exam_appointments_on_external_id"
     t.index ["lifecycle_status"], name: "index_employee_exam_appointments_on_lifecycle_status"
     t.index ["workflow_status"], name: "index_employee_exam_appointments_on_workflow_status"
   end
@@ -2654,11 +2798,13 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_000004) do
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "external_id"
     t.index ["business_type"], name: "index_employee_facility_appointments_on_business_type"
     t.index ["company_id", "employee_id", "facility_id"], name: "idx_employee_facility_appointments_uniq", unique: true
     t.index ["company_id"], name: "index_employee_facility_appointments_on_company_id"
     t.index ["discarded_at"], name: "index_employee_facility_appointments_on_discarded_at"
     t.index ["employee_id"], name: "index_employee_facility_appointments_on_employee_id"
+    t.index ["external_id"], name: "index_employee_facility_appointments_on_external_id"
     t.index ["facility_id"], name: "index_employee_facility_appointments_on_facility_id"
     t.index ["lifecycle_status"], name: "index_employee_facility_appointments_on_lifecycle_status"
     t.index ["workflow_status"], name: "index_employee_facility_appointments_on_workflow_status"
@@ -2680,11 +2826,13 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_000004) do
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "external_id"
     t.index ["business_type"], name: "index_employee_group_role_appointments_on_business_type"
     t.index ["company_id", "employee_group_id", "role_id"], name: "idx_employee_group_role_appointments_uniq", unique: true
     t.index ["company_id"], name: "index_employee_group_role_appointments_on_company_id"
     t.index ["discarded_at"], name: "index_employee_group_role_appointments_on_discarded_at"
     t.index ["employee_group_id"], name: "index_employee_group_role_appointments_on_employee_group_id"
+    t.index ["external_id"], name: "index_employee_group_role_appointments_on_external_id"
     t.index ["lifecycle_status"], name: "index_employee_group_role_appointments_on_lifecycle_status"
     t.index ["role_id"], name: "index_employee_group_role_appointments_on_role_id"
     t.index ["workflow_status"], name: "index_employee_group_role_appointments_on_workflow_status"
@@ -2707,11 +2855,13 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_000004) do
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "external_id"
     t.index ["business_type"], name: "index_employee_group_tag_appointments_on_business_type"
     t.index ["company_id", "employee_group_id", "tag_id"], name: "idx_employee_group_tag_appointments_uniq", unique: true
     t.index ["company_id"], name: "index_employee_group_tag_appointments_on_company_id"
     t.index ["discarded_at"], name: "index_employee_group_tag_appointments_on_discarded_at"
     t.index ["employee_group_id"], name: "index_employee_group_tag_appointments_on_employee_group_id"
+    t.index ["external_id"], name: "index_employee_group_tag_appointments_on_external_id"
     t.index ["lifecycle_status"], name: "index_employee_group_tag_appointments_on_lifecycle_status"
     t.index ["tag_id"], name: "index_employee_group_tag_appointments_on_tag_id"
     t.index ["workflow_status"], name: "index_employee_group_tag_appointments_on_workflow_status"
@@ -2799,6 +2949,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_000004) do
     t.datetime "property_datetime_10"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "external_id"
     t.index ["branch_id"], name: "index_employee_groups_on_branch_id"
     t.index ["business_type"], name: "index_employee_groups_on_business_type"
     t.index ["category_id"], name: "index_employee_groups_on_category_id"
@@ -2806,6 +2957,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_000004) do
     t.index ["company_id"], name: "index_employee_groups_on_company_id"
     t.index ["discarded_at"], name: "index_employee_groups_on_discarded_at"
     t.index ["email"], name: "index_employee_groups_on_email", unique: true
+    t.index ["external_id"], name: "index_employee_groups_on_external_id"
     t.index ["lifecycle_status"], name: "index_employee_groups_on_lifecycle_status"
     t.index ["property_mapping_id"], name: "index_employee_groups_on_property_mapping_id"
     t.index ["workflow_status"], name: "index_employee_groups_on_workflow_status"
@@ -2825,12 +2977,14 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_000004) do
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "external_id"
     t.index ["business_type"], name: "index_employee_notification_reads_on_business_type"
     t.index ["company_id", "employee_id"], name: "idx_emp_notif_reads_on_company_emp"
     t.index ["company_id"], name: "index_employee_notification_reads_on_company_id"
     t.index ["discarded_at"], name: "index_employee_notification_reads_on_discarded_at"
     t.index ["employee_id", "notification_id"], name: "idx_emp_notif_reads_on_emp_notif", unique: true
     t.index ["employee_id"], name: "index_employee_notification_reads_on_employee_id"
+    t.index ["external_id"], name: "index_employee_notification_reads_on_external_id"
     t.index ["lifecycle_status"], name: "index_employee_notification_reads_on_lifecycle_status"
     t.index ["notification_id"], name: "index_employee_notification_reads_on_notification_id"
     t.index ["workflow_status"], name: "index_employee_notification_reads_on_workflow_status"
@@ -2849,11 +3003,13 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_000004) do
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "external_id"
     t.index ["business_type"], name: "index_employee_notification_tag_appointments_on_business_type"
     t.index ["company_id", "employee_id", "notification_tag_id"], name: "idx_emp_notif_tag_appt_on_company_emp_tag", unique: true
     t.index ["company_id"], name: "index_employee_notification_tag_appointments_on_company_id"
     t.index ["discarded_at"], name: "index_employee_notification_tag_appointments_on_discarded_at"
     t.index ["employee_id"], name: "index_employee_notification_tag_appointments_on_employee_id"
+    t.index ["external_id"], name: "index_employee_notification_tag_appointments_on_external_id"
     t.index ["lifecycle_status"], name: "idx_on_lifecycle_status_dfd29cf6d8"
     t.index ["notification_tag_id"], name: "idx_on_notification_tag_id_b5ef3943e8"
     t.index ["workflow_status"], name: "idx_on_workflow_status_1588449805"
@@ -2878,11 +3034,13 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_000004) do
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "external_id"
     t.index ["business_type"], name: "index_employee_order_group_appointments_on_business_type"
     t.index ["company_id", "employee_id", "order_group_id"], name: "idx_employee_order_group_appointments_triple"
     t.index ["company_id"], name: "index_employee_order_group_appointments_on_company_id"
     t.index ["discarded_at"], name: "index_employee_order_group_appointments_on_discarded_at"
     t.index ["employee_id"], name: "index_employee_order_group_appointments_on_employee_id"
+    t.index ["external_id"], name: "index_employee_order_group_appointments_on_external_id"
     t.index ["lifecycle_status"], name: "index_employee_order_group_appointments_on_lifecycle_status"
     t.index ["order_group_id"], name: "index_employee_order_group_appointments_on_order_group_id"
     t.index ["workflow_status"], name: "index_employee_order_group_appointments_on_workflow_status"
@@ -2904,11 +3062,13 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_000004) do
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "external_id"
     t.index ["business_type"], name: "index_employee_product_appointments_on_business_type"
     t.index ["company_id", "employee_id", "product_id"], name: "idx_employee_product_appointments_uniq", unique: true
     t.index ["company_id"], name: "index_employee_product_appointments_on_company_id"
     t.index ["discarded_at"], name: "index_employee_product_appointments_on_discarded_at"
     t.index ["employee_id"], name: "index_employee_product_appointments_on_employee_id"
+    t.index ["external_id"], name: "index_employee_product_appointments_on_external_id"
     t.index ["lifecycle_status"], name: "index_employee_product_appointments_on_lifecycle_status"
     t.index ["product_id"], name: "index_employee_product_appointments_on_product_id"
     t.index ["workflow_status"], name: "index_employee_product_appointments_on_workflow_status"
@@ -2997,6 +3157,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_000004) do
     t.datetime "property_datetime_10"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "external_id"
     t.index ["branch_id"], name: "index_employee_profiles_on_branch_id"
     t.index ["business_type"], name: "index_employee_profiles_on_business_type"
     t.index ["category_id"], name: "index_employee_profiles_on_category_id"
@@ -3007,6 +3168,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_000004) do
     t.index ["email"], name: "index_employee_profiles_on_email", unique: true
     t.index ["employee_id", "name"], name: "idx_employee_profiles_on_employee_and_name", unique: true
     t.index ["employee_id"], name: "index_employee_profiles_on_employee_id"
+    t.index ["external_id"], name: "index_employee_profiles_on_external_id"
     t.index ["lifecycle_status"], name: "index_employee_profiles_on_lifecycle_status"
     t.index ["property_mapping_id"], name: "index_employee_profiles_on_property_mapping_id"
     t.index ["workflow_status"], name: "index_employee_profiles_on_workflow_status"
@@ -3028,11 +3190,13 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_000004) do
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "external_id"
     t.index ["business_type"], name: "index_employee_project_appointments_on_business_type"
     t.index ["company_id", "employee_id", "project_id"], name: "idx_employee_project_appointments_uniq", unique: true
     t.index ["company_id"], name: "index_employee_project_appointments_on_company_id"
     t.index ["discarded_at"], name: "index_employee_project_appointments_on_discarded_at"
     t.index ["employee_id"], name: "index_employee_project_appointments_on_employee_id"
+    t.index ["external_id"], name: "index_employee_project_appointments_on_external_id"
     t.index ["lifecycle_status"], name: "index_employee_project_appointments_on_lifecycle_status"
     t.index ["project_id"], name: "index_employee_project_appointments_on_project_id"
     t.index ["workflow_status"], name: "index_employee_project_appointments_on_workflow_status"
@@ -3054,11 +3218,13 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_000004) do
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "external_id"
     t.index ["business_type"], name: "index_employee_project_group_appointments_on_business_type"
     t.index ["company_id", "employee_id", "project_group_id"], name: "idx_employee_project_group_appointments_uniq", unique: true
     t.index ["company_id"], name: "index_employee_project_group_appointments_on_company_id"
     t.index ["discarded_at"], name: "index_employee_project_group_appointments_on_discarded_at"
     t.index ["employee_id"], name: "index_employee_project_group_appointments_on_employee_id"
+    t.index ["external_id"], name: "index_employee_project_group_appointments_on_external_id"
     t.index ["lifecycle_status"], name: "index_employee_project_group_appointments_on_lifecycle_status"
     t.index ["project_group_id"], name: "index_employee_project_group_appointments_on_project_group_id"
     t.index ["workflow_status"], name: "index_employee_project_group_appointments_on_workflow_status"
@@ -3080,11 +3246,13 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_000004) do
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "external_id"
     t.index ["business_type"], name: "index_employee_role_appointments_on_business_type"
     t.index ["company_id", "employee_id", "role_id"], name: "idx_employee_role_appointments_uniq", unique: true
     t.index ["company_id"], name: "index_employee_role_appointments_on_company_id"
     t.index ["discarded_at"], name: "index_employee_role_appointments_on_discarded_at"
     t.index ["employee_id"], name: "index_employee_role_appointments_on_employee_id"
+    t.index ["external_id"], name: "index_employee_role_appointments_on_external_id"
     t.index ["lifecycle_status"], name: "index_employee_role_appointments_on_lifecycle_status"
     t.index ["role_id"], name: "index_employee_role_appointments_on_role_id"
     t.index ["workflow_status"], name: "index_employee_role_appointments_on_workflow_status"
@@ -3108,11 +3276,13 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_000004) do
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "external_id"
     t.index ["business_type"], name: "index_employee_service_appointments_on_business_type"
     t.index ["company_id", "employee_id", "service_id"], name: "idx_employee_service_appointments_uniq", unique: true
     t.index ["company_id"], name: "index_employee_service_appointments_on_company_id"
     t.index ["discarded_at"], name: "index_employee_service_appointments_on_discarded_at"
     t.index ["employee_id"], name: "index_employee_service_appointments_on_employee_id"
+    t.index ["external_id"], name: "index_employee_service_appointments_on_external_id"
     t.index ["lifecycle_status"], name: "index_employee_service_appointments_on_lifecycle_status"
     t.index ["service_id"], name: "index_employee_service_appointments_on_service_id"
     t.index ["workflow_status"], name: "index_employee_service_appointments_on_workflow_status"
@@ -3202,6 +3372,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_000004) do
     t.datetime "property_datetime_10"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "external_id"
     t.index ["branch_id"], name: "index_employee_subprofiles_on_branch_id"
     t.index ["business_type"], name: "index_employee_subprofiles_on_business_type"
     t.index ["category_id"], name: "index_employee_subprofiles_on_category_id"
@@ -3214,6 +3385,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_000004) do
     t.index ["employee_profile_id", "employee_id"], name: "idx_employee_subprofiles_on_profile_and_employee"
     t.index ["employee_profile_id", "name"], name: "idx_employee_subprofiles_on_profile_and_name", unique: true
     t.index ["employee_profile_id"], name: "index_employee_subprofiles_on_employee_profile_id"
+    t.index ["external_id"], name: "index_employee_subprofiles_on_external_id"
     t.index ["lifecycle_status"], name: "index_employee_subprofiles_on_lifecycle_status"
     t.index ["property_mapping_id"], name: "index_employee_subprofiles_on_property_mapping_id"
     t.index ["workflow_status"], name: "index_employee_subprofiles_on_workflow_status"
@@ -3236,11 +3408,13 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_000004) do
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "external_id"
     t.index ["business_type"], name: "index_employee_tag_appointments_on_business_type"
     t.index ["company_id", "employee_id", "tag_id"], name: "idx_employee_tag_appointments_uniq", unique: true
     t.index ["company_id"], name: "index_employee_tag_appointments_on_company_id"
     t.index ["discarded_at"], name: "index_employee_tag_appointments_on_discarded_at"
     t.index ["employee_id"], name: "index_employee_tag_appointments_on_employee_id"
+    t.index ["external_id"], name: "index_employee_tag_appointments_on_external_id"
     t.index ["lifecycle_status"], name: "index_employee_tag_appointments_on_lifecycle_status"
     t.index ["tag_id"], name: "index_employee_tag_appointments_on_tag_id"
     t.index ["workflow_status"], name: "index_employee_tag_appointments_on_workflow_status"
@@ -3262,11 +3436,13 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_000004) do
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "external_id"
     t.index ["business_type"], name: "index_employee_task_appointments_on_business_type"
     t.index ["company_id", "employee_id", "task_id"], name: "idx_employee_task_appointments_uniq", unique: true
     t.index ["company_id"], name: "index_employee_task_appointments_on_company_id"
     t.index ["discarded_at"], name: "index_employee_task_appointments_on_discarded_at"
     t.index ["employee_id"], name: "index_employee_task_appointments_on_employee_id"
+    t.index ["external_id"], name: "index_employee_task_appointments_on_external_id"
     t.index ["lifecycle_status"], name: "index_employee_task_appointments_on_lifecycle_status"
     t.index ["task_id"], name: "index_employee_task_appointments_on_task_id"
     t.index ["workflow_status"], name: "index_employee_task_appointments_on_workflow_status"
@@ -3288,11 +3464,13 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_000004) do
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "external_id"
     t.index ["business_type"], name: "index_employee_task_group_appointments_on_business_type"
     t.index ["company_id", "employee_id", "task_group_id"], name: "idx_employee_task_group_appointments_uniq", unique: true
     t.index ["company_id"], name: "index_employee_task_group_appointments_on_company_id"
     t.index ["discarded_at"], name: "index_employee_task_group_appointments_on_discarded_at"
     t.index ["employee_id"], name: "index_employee_task_group_appointments_on_employee_id"
+    t.index ["external_id"], name: "index_employee_task_group_appointments_on_external_id"
     t.index ["lifecycle_status"], name: "index_employee_task_group_appointments_on_lifecycle_status"
     t.index ["task_group_id"], name: "index_employee_task_group_appointments_on_task_group_id"
     t.index ["workflow_status"], name: "index_employee_task_group_appointments_on_workflow_status"
@@ -3381,6 +3559,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_000004) do
     t.datetime "property_datetime_10"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "external_id"
     t.index ["branch_id"], name: "index_employees_on_branch_id"
     t.index ["business_type"], name: "index_employees_on_business_type"
     t.index ["category_id"], name: "index_employees_on_category_id"
@@ -3388,6 +3567,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_000004) do
     t.index ["company_id"], name: "index_employees_on_company_id"
     t.index ["discarded_at"], name: "index_employees_on_discarded_at"
     t.index ["email"], name: "index_employees_on_email", unique: true
+    t.index ["external_id"], name: "index_employees_on_external_id"
     t.index ["lifecycle_status"], name: "index_employees_on_lifecycle_status"
     t.index ["property_mapping_id"], name: "index_employees_on_property_mapping_id"
     t.index ["user_id"], name: "index_employees_on_user_id"
@@ -3418,12 +3598,14 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_000004) do
     t.datetime "discarded_at"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "external_id"
     t.index ["category_id"], name: "index_event_config_logs_on_category_id"
     t.index ["company_id", "created_at"], name: "idx_event_config_logs_on_company_time"
     t.index ["company_id", "event_config_id", "created_at"], name: "idx_event_config_logs_on_config_time"
     t.index ["company_id"], name: "index_event_config_logs_on_company_id"
     t.index ["employee_id"], name: "index_event_config_logs_on_employee_id"
     t.index ["event_config_id"], name: "index_event_config_logs_on_event_config_id"
+    t.index ["external_id"], name: "index_event_config_logs_on_external_id"
   end
 
   create_table "event_configs", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
@@ -3446,11 +3628,13 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_000004) do
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "external_id"
     t.index ["business_type"], name: "index_event_configs_on_business_type"
     t.index ["category_id"], name: "index_event_configs_on_category_id"
     t.index ["company_id", "category_id"], name: "idx_event_configs_company_category_uniq", unique: true
     t.index ["company_id"], name: "index_event_configs_on_company_id"
     t.index ["discarded_at"], name: "index_event_configs_on_discarded_at"
+    t.index ["external_id"], name: "index_event_configs_on_external_id"
     t.index ["lifecycle_status"], name: "index_event_configs_on_lifecycle_status"
     t.index ["workflow_status"], name: "index_event_configs_on_workflow_status"
   end
@@ -3472,11 +3656,13 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_000004) do
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "external_id"
     t.index ["business_type"], name: "index_event_facility_appointments_on_business_type"
     t.index ["company_id", "event_id", "facility_id"], name: "idx_event_facility_appointments_uniq", unique: true
     t.index ["company_id"], name: "index_event_facility_appointments_on_company_id"
     t.index ["discarded_at"], name: "index_event_facility_appointments_on_discarded_at"
     t.index ["event_id"], name: "index_event_facility_appointments_on_event_id"
+    t.index ["external_id"], name: "index_event_facility_appointments_on_external_id"
     t.index ["facility_id"], name: "index_event_facility_appointments_on_facility_id"
     t.index ["lifecycle_status"], name: "index_event_facility_appointments_on_lifecycle_status"
     t.index ["workflow_status"], name: "index_event_facility_appointments_on_workflow_status"
@@ -3499,11 +3685,13 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_000004) do
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "external_id"
     t.index ["business_type"], name: "index_event_group_tag_appointments_on_business_type"
     t.index ["company_id", "event_group_id", "tag_id"], name: "idx_event_group_tag_appointments_uniq", unique: true
     t.index ["company_id"], name: "index_event_group_tag_appointments_on_company_id"
     t.index ["discarded_at"], name: "index_event_group_tag_appointments_on_discarded_at"
     t.index ["event_group_id"], name: "index_event_group_tag_appointments_on_event_group_id"
+    t.index ["external_id"], name: "index_event_group_tag_appointments_on_external_id"
     t.index ["lifecycle_status"], name: "index_event_group_tag_appointments_on_lifecycle_status"
     t.index ["tag_id"], name: "index_event_group_tag_appointments_on_tag_id"
     t.index ["workflow_status"], name: "index_event_group_tag_appointments_on_workflow_status"
@@ -3526,11 +3714,13 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_000004) do
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "external_id"
     t.index ["branch_id"], name: "index_event_groups_on_branch_id"
     t.index ["business_type"], name: "index_event_groups_on_business_type"
     t.index ["category_id"], name: "index_event_groups_on_category_id"
     t.index ["company_id"], name: "index_event_groups_on_company_id"
     t.index ["discarded_at"], name: "index_event_groups_on_discarded_at"
+    t.index ["external_id"], name: "index_event_groups_on_external_id"
     t.index ["lifecycle_status"], name: "index_event_groups_on_lifecycle_status"
     t.index ["property_mapping_id"], name: "index_event_groups_on_property_mapping_id"
     t.index ["workflow_status"], name: "index_event_groups_on_workflow_status"
@@ -3552,11 +3742,13 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_000004) do
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "external_id"
     t.index ["business_type"], name: "index_event_order_appointments_on_business_type"
     t.index ["company_id", "event_id", "order_id"], name: "idx_event_order_appointments_uniq", unique: true
     t.index ["company_id"], name: "index_event_order_appointments_on_company_id"
     t.index ["discarded_at"], name: "index_event_order_appointments_on_discarded_at"
     t.index ["event_id"], name: "index_event_order_appointments_on_event_id"
+    t.index ["external_id"], name: "index_event_order_appointments_on_external_id"
     t.index ["lifecycle_status"], name: "index_event_order_appointments_on_lifecycle_status"
     t.index ["order_id"], name: "index_event_order_appointments_on_order_id"
     t.index ["workflow_status"], name: "index_event_order_appointments_on_workflow_status"
@@ -3579,11 +3771,13 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_000004) do
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "external_id"
     t.index ["business_type"], name: "index_event_service_appointments_on_business_type"
     t.index ["company_id", "event_id", "service_id"], name: "idx_event_service_appointments_uniq", unique: true
     t.index ["company_id"], name: "index_event_service_appointments_on_company_id"
     t.index ["discarded_at"], name: "index_event_service_appointments_on_discarded_at"
     t.index ["event_id"], name: "index_event_service_appointments_on_event_id"
+    t.index ["external_id"], name: "index_event_service_appointments_on_external_id"
     t.index ["lifecycle_status"], name: "index_event_service_appointments_on_lifecycle_status"
     t.index ["service_id"], name: "index_event_service_appointments_on_service_id"
     t.index ["workflow_status"], name: "index_event_service_appointments_on_workflow_status"
@@ -3606,11 +3800,13 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_000004) do
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "external_id"
     t.index ["business_type"], name: "index_event_stock_appointments_on_business_type"
     t.index ["company_id", "event_id", "stock_id"], name: "idx_event_stock_appointments_uniq", unique: true
     t.index ["company_id"], name: "index_event_stock_appointments_on_company_id"
     t.index ["discarded_at"], name: "index_event_stock_appointments_on_discarded_at"
     t.index ["event_id"], name: "index_event_stock_appointments_on_event_id"
+    t.index ["external_id"], name: "index_event_stock_appointments_on_external_id"
     t.index ["lifecycle_status"], name: "index_event_stock_appointments_on_lifecycle_status"
     t.index ["stock_id"], name: "index_event_stock_appointments_on_stock_id"
     t.index ["workflow_status"], name: "index_event_stock_appointments_on_workflow_status"
@@ -3633,11 +3829,13 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_000004) do
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "external_id"
     t.index ["business_type"], name: "index_event_tag_appointments_on_business_type"
     t.index ["company_id", "event_id", "tag_id"], name: "idx_event_tag_appointments_uniq", unique: true
     t.index ["company_id"], name: "index_event_tag_appointments_on_company_id"
     t.index ["discarded_at"], name: "index_event_tag_appointments_on_discarded_at"
     t.index ["event_id"], name: "index_event_tag_appointments_on_event_id"
+    t.index ["external_id"], name: "index_event_tag_appointments_on_external_id"
     t.index ["lifecycle_status"], name: "index_event_tag_appointments_on_lifecycle_status"
     t.index ["tag_id"], name: "index_event_tag_appointments_on_tag_id"
     t.index ["workflow_status"], name: "index_event_tag_appointments_on_workflow_status"
@@ -3723,12 +3921,14 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_000004) do
     t.datetime "property_datetime_10"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "external_id"
     t.index ["branch_id"], name: "index_events_on_branch_id"
     t.index ["business_type"], name: "index_events_on_business_type"
     t.index ["category_id"], name: "index_events_on_category_id"
     t.index ["company_id"], name: "index_events_on_company_id"
     t.index ["discarded_at"], name: "index_events_on_discarded_at"
     t.index ["event_group_id"], name: "index_events_on_event_group_id"
+    t.index ["external_id"], name: "index_events_on_external_id"
     t.index ["lifecycle_status"], name: "index_events_on_lifecycle_status"
     t.index ["property_mapping_id"], name: "index_events_on_property_mapping_id"
     t.index ["workflow_status"], name: "index_events_on_workflow_status"
@@ -3751,11 +3951,13 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_000004) do
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "external_id"
     t.index ["business_type"], name: "index_exam_group_tag_appointments_on_business_type"
     t.index ["company_id", "exam_group_id", "tag_id"], name: "idx_exam_group_tag_appointments_uniq", unique: true
     t.index ["company_id"], name: "index_exam_group_tag_appointments_on_company_id"
     t.index ["discarded_at"], name: "index_exam_group_tag_appointments_on_discarded_at"
     t.index ["exam_group_id"], name: "index_exam_group_tag_appointments_on_exam_group_id"
+    t.index ["external_id"], name: "index_exam_group_tag_appointments_on_external_id"
     t.index ["lifecycle_status"], name: "index_exam_group_tag_appointments_on_lifecycle_status"
     t.index ["tag_id"], name: "index_exam_group_tag_appointments_on_tag_id"
     t.index ["workflow_status"], name: "index_exam_group_tag_appointments_on_workflow_status"
@@ -3778,11 +3980,13 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_000004) do
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "external_id"
     t.index ["branch_id"], name: "index_exam_groups_on_branch_id"
     t.index ["business_type"], name: "index_exam_groups_on_business_type"
     t.index ["category_id"], name: "index_exam_groups_on_category_id"
     t.index ["company_id"], name: "index_exam_groups_on_company_id"
     t.index ["discarded_at"], name: "index_exam_groups_on_discarded_at"
+    t.index ["external_id"], name: "index_exam_groups_on_external_id"
     t.index ["lifecycle_status"], name: "index_exam_groups_on_lifecycle_status"
     t.index ["property_mapping_id"], name: "index_exam_groups_on_property_mapping_id"
     t.index ["workflow_status"], name: "index_exam_groups_on_workflow_status"
@@ -3805,11 +4009,13 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_000004) do
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "external_id"
     t.index ["business_type"], name: "index_exam_tag_appointments_on_business_type"
     t.index ["company_id", "exam_id", "tag_id"], name: "idx_exam_tag_appointments_uniq", unique: true
     t.index ["company_id"], name: "index_exam_tag_appointments_on_company_id"
     t.index ["discarded_at"], name: "index_exam_tag_appointments_on_discarded_at"
     t.index ["exam_id"], name: "index_exam_tag_appointments_on_exam_id"
+    t.index ["external_id"], name: "index_exam_tag_appointments_on_external_id"
     t.index ["lifecycle_status"], name: "index_exam_tag_appointments_on_lifecycle_status"
     t.index ["tag_id"], name: "index_exam_tag_appointments_on_tag_id"
     t.index ["workflow_status"], name: "index_exam_tag_appointments_on_workflow_status"
@@ -3833,12 +4039,14 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_000004) do
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "external_id"
     t.index ["branch_id"], name: "index_exams_on_branch_id"
     t.index ["business_type"], name: "index_exams_on_business_type"
     t.index ["category_id"], name: "index_exams_on_category_id"
     t.index ["company_id"], name: "index_exams_on_company_id"
     t.index ["discarded_at"], name: "index_exams_on_discarded_at"
     t.index ["exam_group_id"], name: "index_exams_on_exam_group_id"
+    t.index ["external_id"], name: "index_exams_on_external_id"
     t.index ["lifecycle_status"], name: "index_exams_on_lifecycle_status"
     t.index ["property_mapping_id"], name: "index_exams_on_property_mapping_id"
     t.index ["workflow_status"], name: "index_exams_on_workflow_status"
@@ -3926,6 +4134,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_000004) do
     t.datetime "property_datetime_10"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "external_id"
     t.index ["branch_id"], name: "index_facilities_on_branch_id"
     t.index ["business_type"], name: "index_facilities_on_business_type"
     t.index ["category_id"], name: "index_facilities_on_category_id"
@@ -3933,6 +4142,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_000004) do
     t.index ["company_id"], name: "index_facilities_on_company_id"
     t.index ["discarded_at"], name: "index_facilities_on_discarded_at"
     t.index ["email"], name: "index_facilities_on_email", unique: true
+    t.index ["external_id"], name: "index_facilities_on_external_id"
     t.index ["lifecycle_status"], name: "index_facilities_on_lifecycle_status"
     t.index ["property_mapping_id"], name: "index_facilities_on_property_mapping_id"
     t.index ["workflow_status"], name: "index_facilities_on_workflow_status"
@@ -3954,10 +4164,12 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_000004) do
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "external_id"
     t.index ["business_type"], name: "index_facility_facility_group_appointments_on_business_type"
     t.index ["company_id", "facility_id", "facility_group_id"], name: "idx_facility_facility_group_appointments_uniq", unique: true
     t.index ["company_id"], name: "index_facility_facility_group_appointments_on_company_id"
     t.index ["discarded_at"], name: "index_facility_facility_group_appointments_on_discarded_at"
+    t.index ["external_id"], name: "index_facility_facility_group_appointments_on_external_id"
     t.index ["facility_group_id"], name: "idx_on_facility_group_id_5bb31414b7"
     t.index ["facility_id"], name: "index_facility_facility_group_appointments_on_facility_id"
     t.index ["lifecycle_status"], name: "index_facility_facility_group_appointments_on_lifecycle_status"
@@ -3981,10 +4193,12 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_000004) do
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "external_id"
     t.index ["business_type"], name: "index_facility_group_tag_appointments_on_business_type"
     t.index ["company_id", "facility_group_id", "tag_id"], name: "idx_facility_group_tag_appointments_uniq", unique: true
     t.index ["company_id"], name: "index_facility_group_tag_appointments_on_company_id"
     t.index ["discarded_at"], name: "index_facility_group_tag_appointments_on_discarded_at"
+    t.index ["external_id"], name: "index_facility_group_tag_appointments_on_external_id"
     t.index ["facility_group_id"], name: "index_facility_group_tag_appointments_on_facility_group_id"
     t.index ["lifecycle_status"], name: "index_facility_group_tag_appointments_on_lifecycle_status"
     t.index ["tag_id"], name: "index_facility_group_tag_appointments_on_tag_id"
@@ -4073,6 +4287,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_000004) do
     t.datetime "property_datetime_10"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "external_id"
     t.index ["branch_id"], name: "index_facility_groups_on_branch_id"
     t.index ["business_type"], name: "index_facility_groups_on_business_type"
     t.index ["category_id"], name: "index_facility_groups_on_category_id"
@@ -4080,6 +4295,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_000004) do
     t.index ["company_id"], name: "index_facility_groups_on_company_id"
     t.index ["discarded_at"], name: "index_facility_groups_on_discarded_at"
     t.index ["email"], name: "index_facility_groups_on_email", unique: true
+    t.index ["external_id"], name: "index_facility_groups_on_external_id"
     t.index ["lifecycle_status"], name: "index_facility_groups_on_lifecycle_status"
     t.index ["property_mapping_id"], name: "index_facility_groups_on_property_mapping_id"
     t.index ["workflow_status"], name: "index_facility_groups_on_workflow_status"
@@ -4102,10 +4318,12 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_000004) do
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "external_id"
     t.index ["business_type"], name: "index_facility_tag_appointments_on_business_type"
     t.index ["company_id", "facility_id", "tag_id"], name: "idx_facility_tag_appointments_uniq", unique: true
     t.index ["company_id"], name: "index_facility_tag_appointments_on_company_id"
     t.index ["discarded_at"], name: "index_facility_tag_appointments_on_discarded_at"
+    t.index ["external_id"], name: "index_facility_tag_appointments_on_external_id"
     t.index ["facility_id"], name: "index_facility_tag_appointments_on_facility_id"
     t.index ["lifecycle_status"], name: "index_facility_tag_appointments_on_lifecycle_status"
     t.index ["tag_id"], name: "index_facility_tag_appointments_on_tag_id"
@@ -4125,10 +4343,12 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_000004) do
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "external_id"
     t.index ["company_id", "parent_id", "name"], name: "idx_folders_parent_name_uniq", unique: true
     t.index ["company_id", "parent_id"], name: "index_folders_on_company_id_and_parent_id"
     t.index ["company_id"], name: "index_folders_on_company_id"
     t.index ["discarded_at"], name: "index_folders_on_discarded_at"
+    t.index ["external_id"], name: "index_folders_on_external_id"
     t.index ["parent_id"], name: "index_folders_on_parent_id"
   end
 
@@ -4149,10 +4369,12 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_000004) do
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "external_id"
     t.index ["business_type"], name: "index_invoice_tag_appointments_on_business_type"
     t.index ["company_id", "invoice_id", "tag_id"], name: "idx_invoice_tag_appointments_uniq", unique: true
     t.index ["company_id"], name: "index_invoice_tag_appointments_on_company_id"
     t.index ["discarded_at"], name: "index_invoice_tag_appointments_on_discarded_at"
+    t.index ["external_id"], name: "index_invoice_tag_appointments_on_external_id"
     t.index ["invoice_id"], name: "index_invoice_tag_appointments_on_invoice_id"
     t.index ["lifecycle_status"], name: "index_invoice_tag_appointments_on_lifecycle_status"
     t.index ["tag_id"], name: "index_invoice_tag_appointments_on_tag_id"
@@ -4245,6 +4467,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_000004) do
     t.datetime "property_datetime_10"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "external_id"
     t.index ["branch_id"], name: "index_invoices_on_branch_id"
     t.index ["business_type"], name: "index_invoices_on_business_type"
     t.index ["category_id"], name: "index_invoices_on_category_id"
@@ -4252,6 +4475,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_000004) do
     t.index ["company_id"], name: "index_invoices_on_company_id"
     t.index ["discarded_at"], name: "index_invoices_on_discarded_at"
     t.index ["email"], name: "index_invoices_on_email", unique: true
+    t.index ["external_id"], name: "index_invoices_on_external_id"
     t.index ["lifecycle_status"], name: "index_invoices_on_lifecycle_status"
     t.index ["order_id"], name: "index_invoices_on_order_id"
     t.index ["property_mapping_id"], name: "index_invoices_on_property_mapping_id"
@@ -4340,6 +4564,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_000004) do
     t.datetime "property_datetime_10"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "external_id"
     t.index ["branch_id"], name: "index_memberships_on_branch_id"
     t.index ["business_type"], name: "index_memberships_on_business_type"
     t.index ["category_id"], name: "index_memberships_on_category_id"
@@ -4347,6 +4572,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_000004) do
     t.index ["company_id"], name: "index_memberships_on_company_id"
     t.index ["discarded_at"], name: "index_memberships_on_discarded_at"
     t.index ["email"], name: "index_memberships_on_email", unique: true
+    t.index ["external_id"], name: "index_memberships_on_external_id"
     t.index ["lifecycle_status"], name: "index_memberships_on_lifecycle_status"
     t.index ["property_mapping_id"], name: "index_memberships_on_property_mapping_id"
     t.index ["workflow_status"], name: "index_memberships_on_workflow_status"
@@ -4366,11 +4592,13 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_000004) do
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "external_id"
     t.index ["business_type"], name: "index_notification_configs_on_business_type"
     t.index ["company_id", "employee_id"], name: "idx_notif_configs_on_company_emp", unique: true
     t.index ["company_id"], name: "index_notification_configs_on_company_id"
     t.index ["discarded_at"], name: "index_notification_configs_on_discarded_at"
     t.index ["employee_id"], name: "index_notification_configs_on_employee_id"
+    t.index ["external_id"], name: "index_notification_configs_on_external_id"
     t.index ["lifecycle_status"], name: "index_notification_configs_on_lifecycle_status"
     t.index ["workflow_status"], name: "index_notification_configs_on_workflow_status"
   end
@@ -4388,10 +4616,12 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_000004) do
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "external_id"
     t.index ["business_type"], name: "index_notification_tag_appointments_on_business_type"
     t.index ["company_id", "notification_id", "notification_tag_id"], name: "idx_notif_tag_appt_on_company_notif_tag", unique: true
     t.index ["company_id"], name: "index_notification_tag_appointments_on_company_id"
     t.index ["discarded_at"], name: "index_notification_tag_appointments_on_discarded_at"
+    t.index ["external_id"], name: "index_notification_tag_appointments_on_external_id"
     t.index ["lifecycle_status"], name: "index_notification_tag_appointments_on_lifecycle_status"
     t.index ["notification_id"], name: "index_notification_tag_appointments_on_notification_id"
     t.index ["notification_tag_id"], name: "index_notification_tag_appointments_on_notification_tag_id"
@@ -4411,10 +4641,12 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_000004) do
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "external_id"
     t.index ["business_type"], name: "index_notification_tags_on_business_type"
     t.index ["company_id", "name"], name: "index_notification_tags_on_company_id_and_name", unique: true
     t.index ["company_id"], name: "index_notification_tags_on_company_id"
     t.index ["discarded_at"], name: "index_notification_tags_on_discarded_at"
+    t.index ["external_id"], name: "index_notification_tags_on_external_id"
     t.index ["lifecycle_status"], name: "index_notification_tags_on_lifecycle_status"
     t.index ["workflow_status"], name: "index_notification_tags_on_workflow_status"
   end
@@ -4434,10 +4666,12 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_000004) do
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "external_id"
     t.index ["business_type"], name: "index_notifications_on_business_type"
     t.index ["company_id", "created_at"], name: "index_notifications_on_company_id_and_created_at"
     t.index ["company_id"], name: "index_notifications_on_company_id"
     t.index ["discarded_at"], name: "index_notifications_on_discarded_at"
+    t.index ["external_id"], name: "index_notifications_on_external_id"
     t.index ["lifecycle_status"], name: "index_notifications_on_lifecycle_status"
     t.index ["workflow_status"], name: "index_notifications_on_workflow_status"
   end
@@ -4459,10 +4693,12 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_000004) do
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "external_id"
     t.index ["business_type"], name: "index_order_group_tag_appointments_on_business_type"
     t.index ["company_id", "order_group_id", "tag_id"], name: "idx_order_group_tag_appointments_uniq", unique: true
     t.index ["company_id"], name: "index_order_group_tag_appointments_on_company_id"
     t.index ["discarded_at"], name: "index_order_group_tag_appointments_on_discarded_at"
+    t.index ["external_id"], name: "index_order_group_tag_appointments_on_external_id"
     t.index ["lifecycle_status"], name: "index_order_group_tag_appointments_on_lifecycle_status"
     t.index ["order_group_id"], name: "index_order_group_tag_appointments_on_order_group_id"
     t.index ["tag_id"], name: "index_order_group_tag_appointments_on_tag_id"
@@ -4552,6 +4788,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_000004) do
     t.datetime "property_datetime_10"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "external_id"
     t.index ["branch_id"], name: "index_order_groups_on_branch_id"
     t.index ["business_type"], name: "index_order_groups_on_business_type"
     t.index ["category_id"], name: "index_order_groups_on_category_id"
@@ -4560,6 +4797,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_000004) do
     t.index ["customer_id"], name: "index_order_groups_on_customer_id"
     t.index ["discarded_at"], name: "index_order_groups_on_discarded_at"
     t.index ["email"], name: "index_order_groups_on_email", unique: true
+    t.index ["external_id"], name: "index_order_groups_on_external_id"
     t.index ["lifecycle_status"], name: "index_order_groups_on_lifecycle_status"
     t.index ["property_mapping_id"], name: "index_order_groups_on_property_mapping_id"
     t.index ["workflow_status"], name: "index_order_groups_on_workflow_status"
@@ -4585,10 +4823,12 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_000004) do
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "external_id"
     t.index ["business_type"], name: "index_order_product_appointments_on_business_type"
     t.index ["company_id", "order_id", "product_id"], name: "idx_order_product_appointments_triple"
     t.index ["company_id"], name: "index_order_product_appointments_on_company_id"
     t.index ["discarded_at"], name: "index_order_product_appointments_on_discarded_at"
+    t.index ["external_id"], name: "index_order_product_appointments_on_external_id"
     t.index ["lifecycle_status"], name: "index_order_product_appointments_on_lifecycle_status"
     t.index ["order_id"], name: "index_order_product_appointments_on_order_id"
     t.index ["product_id"], name: "index_order_product_appointments_on_product_id"
@@ -4616,10 +4856,12 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_000004) do
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "external_id"
     t.index ["business_type"], name: "index_order_product_group_appointments_on_business_type"
     t.index ["company_id", "order_id", "product_group_id"], name: "idx_order_product_group_appointments_triple"
     t.index ["company_id"], name: "index_order_product_group_appointments_on_company_id"
     t.index ["discarded_at"], name: "index_order_product_group_appointments_on_discarded_at"
+    t.index ["external_id"], name: "index_order_product_group_appointments_on_external_id"
     t.index ["lifecycle_status"], name: "index_order_product_group_appointments_on_lifecycle_status"
     t.index ["order_id"], name: "index_order_product_group_appointments_on_order_id"
     t.index ["product_group_id"], name: "index_order_product_group_appointments_on_product_group_id"
@@ -4647,10 +4889,12 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_000004) do
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "external_id"
     t.index ["business_type"], name: "index_order_service_appointments_on_business_type"
     t.index ["company_id", "order_id", "service_id"], name: "idx_order_service_appointments_triple"
     t.index ["company_id"], name: "index_order_service_appointments_on_company_id"
     t.index ["discarded_at"], name: "index_order_service_appointments_on_discarded_at"
+    t.index ["external_id"], name: "index_order_service_appointments_on_external_id"
     t.index ["lifecycle_status"], name: "index_order_service_appointments_on_lifecycle_status"
     t.index ["order_id"], name: "index_order_service_appointments_on_order_id"
     t.index ["service_id"], name: "index_order_service_appointments_on_service_id"
@@ -4678,10 +4922,12 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_000004) do
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "external_id"
     t.index ["business_type"], name: "index_order_service_group_appointments_on_business_type"
     t.index ["company_id", "order_id", "service_group_id"], name: "idx_order_service_group_appointments_triple"
     t.index ["company_id"], name: "index_order_service_group_appointments_on_company_id"
     t.index ["discarded_at"], name: "index_order_service_group_appointments_on_discarded_at"
+    t.index ["external_id"], name: "index_order_service_group_appointments_on_external_id"
     t.index ["lifecycle_status"], name: "index_order_service_group_appointments_on_lifecycle_status"
     t.index ["order_id"], name: "index_order_service_group_appointments_on_order_id"
     t.index ["service_group_id"], name: "index_order_service_group_appointments_on_service_group_id"
@@ -4709,10 +4955,12 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_000004) do
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "external_id"
     t.index ["business_type"], name: "index_order_subscription_plan_appointments_on_business_type"
     t.index ["company_id", "order_id", "subscription_plan_id"], name: "idx_order_subscription_plan_appointments_triple"
     t.index ["company_id"], name: "index_order_subscription_plan_appointments_on_company_id"
     t.index ["discarded_at"], name: "index_order_subscription_plan_appointments_on_discarded_at"
+    t.index ["external_id"], name: "index_order_subscription_plan_appointments_on_external_id"
     t.index ["lifecycle_status"], name: "index_order_subscription_plan_appointments_on_lifecycle_status"
     t.index ["order_id"], name: "index_order_subscription_plan_appointments_on_order_id"
     t.index ["stock_id"], name: "index_order_subscription_plan_appointments_on_stock_id"
@@ -4737,10 +4985,12 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_000004) do
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "external_id"
     t.index ["business_type"], name: "index_order_tag_appointments_on_business_type"
     t.index ["company_id", "order_id", "tag_id"], name: "idx_order_tag_appointments_uniq", unique: true
     t.index ["company_id"], name: "index_order_tag_appointments_on_company_id"
     t.index ["discarded_at"], name: "index_order_tag_appointments_on_discarded_at"
+    t.index ["external_id"], name: "index_order_tag_appointments_on_external_id"
     t.index ["lifecycle_status"], name: "index_order_tag_appointments_on_lifecycle_status"
     t.index ["order_id"], name: "index_order_tag_appointments_on_order_id"
     t.index ["tag_id"], name: "index_order_tag_appointments_on_tag_id"
@@ -4830,6 +5080,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_000004) do
     t.datetime "property_datetime_10"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "external_id"
     t.index ["branch_id"], name: "index_orders_on_branch_id"
     t.index ["business_type"], name: "index_orders_on_business_type"
     t.index ["category_id"], name: "index_orders_on_category_id"
@@ -4838,6 +5089,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_000004) do
     t.index ["customer_id"], name: "index_orders_on_customer_id"
     t.index ["discarded_at"], name: "index_orders_on_discarded_at"
     t.index ["email"], name: "index_orders_on_email", unique: true
+    t.index ["external_id"], name: "index_orders_on_external_id"
     t.index ["lifecycle_status"], name: "index_orders_on_lifecycle_status"
     t.index ["property_mapping_id"], name: "index_orders_on_property_mapping_id"
     t.index ["workflow_status"], name: "index_orders_on_workflow_status"
@@ -4865,6 +5117,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_000004) do
     t.datetime "discarded_at"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "external_id"
     t.index ["branch_id", "target_role", "target_resolution", "code"], name: "idx_on_branch_id_target_role_target_resolution_code_6c16dc00fe", unique: true
     t.index ["branch_id"], name: "index_pages_on_branch_id"
     t.index ["business_type"], name: "index_pages_on_business_type"
@@ -4872,6 +5125,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_000004) do
     t.index ["company_id"], name: "index_pages_on_company_id"
     t.index ["discarded_at"], name: "index_pages_on_discarded_at"
     t.index ["email"], name: "index_pages_on_email", unique: true
+    t.index ["external_id"], name: "index_pages_on_external_id"
     t.index ["lifecycle_status"], name: "index_pages_on_lifecycle_status"
     t.index ["target_resolution"], name: "index_pages_on_target_resolution"
     t.index ["target_role"], name: "index_pages_on_target_role"
@@ -4898,10 +5152,12 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_000004) do
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "external_id"
     t.index ["business_type"], name: "index_payment_methods_on_business_type"
     t.index ["code"], name: "index_payment_methods_on_code", unique: true
     t.index ["discarded_at"], name: "index_payment_methods_on_discarded_at"
     t.index ["email"], name: "index_payment_methods_on_email", unique: true
+    t.index ["external_id"], name: "index_payment_methods_on_external_id"
     t.index ["lifecycle_status"], name: "index_payment_methods_on_lifecycle_status"
     t.index ["payment_mode"], name: "index_payment_methods_on_payment_mode"
     t.index ["workflow_status"], name: "index_payment_methods_on_workflow_status"
@@ -4930,6 +5186,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_000004) do
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "external_id"
     t.index ["business_type"], name: "index_permission_logs_on_business_type"
     t.index ["company_id", "created_at"], name: "index_permission_logs_on_company_id_and_created_at"
     t.index ["company_id", "policy_id", "created_at"], name: "idx_permission_logs_on_company_policy_time"
@@ -4937,6 +5194,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_000004) do
     t.index ["company_id"], name: "index_permission_logs_on_company_id"
     t.index ["discarded_at"], name: "index_permission_logs_on_discarded_at"
     t.index ["employee_id"], name: "index_permission_logs_on_employee_id"
+    t.index ["external_id"], name: "index_permission_logs_on_external_id"
     t.index ["lifecycle_status"], name: "index_permission_logs_on_lifecycle_status"
     t.index ["policy_id"], name: "index_permission_logs_on_policy_id"
     t.index ["policy_role_appointment_id"], name: "index_permission_logs_on_policy_role_appointment_id"
@@ -4961,10 +5219,12 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_000004) do
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "external_id"
     t.index ["branch_id"], name: "index_policies_on_branch_id"
     t.index ["business_type"], name: "index_policies_on_business_type"
     t.index ["company_id"], name: "index_policies_on_company_id"
     t.index ["discarded_at"], name: "index_policies_on_discarded_at"
+    t.index ["external_id"], name: "index_policies_on_external_id"
     t.index ["lifecycle_status"], name: "index_policies_on_lifecycle_status"
     t.index ["workflow_status"], name: "index_policies_on_workflow_status"
   end
@@ -4985,10 +5245,12 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_000004) do
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "external_id"
     t.index ["business_type"], name: "index_policy_role_appointments_on_business_type"
     t.index ["company_id", "policy_id", "role_id"], name: "idx_policy_role_appointments_uniq", unique: true
     t.index ["company_id"], name: "index_policy_role_appointments_on_company_id"
     t.index ["discarded_at"], name: "index_policy_role_appointments_on_discarded_at"
+    t.index ["external_id"], name: "index_policy_role_appointments_on_external_id"
     t.index ["lifecycle_status"], name: "index_policy_role_appointments_on_lifecycle_status"
     t.index ["policy_id"], name: "index_policy_role_appointments_on_policy_id"
     t.index ["role_id"], name: "index_policy_role_appointments_on_role_id"
@@ -5012,10 +5274,12 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_000004) do
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "external_id"
     t.index ["business_type"], name: "index_product_group_tag_appointments_on_business_type"
     t.index ["company_id", "product_group_id", "tag_id"], name: "idx_product_group_tag_appointments_uniq", unique: true
     t.index ["company_id"], name: "index_product_group_tag_appointments_on_company_id"
     t.index ["discarded_at"], name: "index_product_group_tag_appointments_on_discarded_at"
+    t.index ["external_id"], name: "index_product_group_tag_appointments_on_external_id"
     t.index ["lifecycle_status"], name: "index_product_group_tag_appointments_on_lifecycle_status"
     t.index ["product_group_id"], name: "index_product_group_tag_appointments_on_product_group_id"
     t.index ["tag_id"], name: "index_product_group_tag_appointments_on_tag_id"
@@ -5104,6 +5368,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_000004) do
     t.datetime "property_datetime_10"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "external_id"
     t.index ["branch_id"], name: "index_product_groups_on_branch_id"
     t.index ["business_type"], name: "index_product_groups_on_business_type"
     t.index ["category_id"], name: "index_product_groups_on_category_id"
@@ -5111,6 +5376,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_000004) do
     t.index ["company_id"], name: "index_product_groups_on_company_id"
     t.index ["discarded_at"], name: "index_product_groups_on_discarded_at"
     t.index ["email"], name: "index_product_groups_on_email", unique: true
+    t.index ["external_id"], name: "index_product_groups_on_external_id"
     t.index ["lifecycle_status"], name: "index_product_groups_on_lifecycle_status"
     t.index ["property_mapping_id"], name: "index_product_groups_on_property_mapping_id"
     t.index ["workflow_status"], name: "index_product_groups_on_workflow_status"
@@ -5132,10 +5398,12 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_000004) do
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "external_id"
     t.index ["business_type"], name: "index_product_product_group_appointments_on_business_type"
     t.index ["company_id", "product_id", "product_group_id"], name: "idx_product_product_group_appointments_uniq", unique: true
     t.index ["company_id"], name: "index_product_product_group_appointments_on_company_id"
     t.index ["discarded_at"], name: "index_product_product_group_appointments_on_discarded_at"
+    t.index ["external_id"], name: "index_product_product_group_appointments_on_external_id"
     t.index ["lifecycle_status"], name: "index_product_product_group_appointments_on_lifecycle_status"
     t.index ["product_group_id"], name: "index_product_product_group_appointments_on_product_group_id"
     t.index ["product_id"], name: "index_product_product_group_appointments_on_product_id"
@@ -5159,10 +5427,12 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_000004) do
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "external_id"
     t.index ["business_type"], name: "index_product_tag_appointments_on_business_type"
     t.index ["company_id", "product_id", "tag_id"], name: "idx_product_tag_appointments_uniq", unique: true
     t.index ["company_id"], name: "index_product_tag_appointments_on_company_id"
     t.index ["discarded_at"], name: "index_product_tag_appointments_on_discarded_at"
+    t.index ["external_id"], name: "index_product_tag_appointments_on_external_id"
     t.index ["lifecycle_status"], name: "index_product_tag_appointments_on_lifecycle_status"
     t.index ["product_id"], name: "index_product_tag_appointments_on_product_id"
     t.index ["tag_id"], name: "index_product_tag_appointments_on_tag_id"
@@ -5253,6 +5523,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_000004) do
     t.datetime "property_datetime_10"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "external_id"
     t.index ["branch_id"], name: "index_products_on_branch_id"
     t.index ["brand_id"], name: "index_products_on_brand_id"
     t.index ["business_type"], name: "index_products_on_business_type"
@@ -5261,6 +5532,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_000004) do
     t.index ["company_id"], name: "index_products_on_company_id"
     t.index ["discarded_at"], name: "index_products_on_discarded_at"
     t.index ["email"], name: "index_products_on_email", unique: true
+    t.index ["external_id"], name: "index_products_on_external_id"
     t.index ["lifecycle_status"], name: "index_products_on_lifecycle_status"
     t.index ["property_mapping_id"], name: "index_products_on_property_mapping_id"
     t.index ["workflow_status"], name: "index_products_on_workflow_status"
@@ -5283,10 +5555,12 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_000004) do
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "external_id"
     t.index ["business_type"], name: "index_project_group_tag_appointments_on_business_type"
     t.index ["company_id", "project_group_id", "tag_id"], name: "idx_project_group_tag_appointments_uniq", unique: true
     t.index ["company_id"], name: "index_project_group_tag_appointments_on_company_id"
     t.index ["discarded_at"], name: "index_project_group_tag_appointments_on_discarded_at"
+    t.index ["external_id"], name: "index_project_group_tag_appointments_on_external_id"
     t.index ["lifecycle_status"], name: "index_project_group_tag_appointments_on_lifecycle_status"
     t.index ["project_group_id"], name: "index_project_group_tag_appointments_on_project_group_id"
     t.index ["tag_id"], name: "index_project_group_tag_appointments_on_tag_id"
@@ -5375,6 +5649,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_000004) do
     t.datetime "property_datetime_10"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "external_id"
     t.index ["branch_id"], name: "index_project_groups_on_branch_id"
     t.index ["business_type"], name: "index_project_groups_on_business_type"
     t.index ["category_id"], name: "index_project_groups_on_category_id"
@@ -5382,6 +5657,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_000004) do
     t.index ["company_id"], name: "index_project_groups_on_company_id"
     t.index ["discarded_at"], name: "index_project_groups_on_discarded_at"
     t.index ["email"], name: "index_project_groups_on_email", unique: true
+    t.index ["external_id"], name: "index_project_groups_on_external_id"
     t.index ["lifecycle_status"], name: "index_project_groups_on_lifecycle_status"
     t.index ["property_mapping_id"], name: "index_project_groups_on_property_mapping_id"
     t.index ["workflow_status"], name: "index_project_groups_on_workflow_status"
@@ -5404,10 +5680,12 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_000004) do
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "external_id"
     t.index ["business_type"], name: "index_project_tag_appointments_on_business_type"
     t.index ["company_id", "project_id", "tag_id"], name: "idx_project_tag_appointments_uniq", unique: true
     t.index ["company_id"], name: "index_project_tag_appointments_on_company_id"
     t.index ["discarded_at"], name: "index_project_tag_appointments_on_discarded_at"
+    t.index ["external_id"], name: "index_project_tag_appointments_on_external_id"
     t.index ["lifecycle_status"], name: "index_project_tag_appointments_on_lifecycle_status"
     t.index ["project_id"], name: "index_project_tag_appointments_on_project_id"
     t.index ["tag_id"], name: "index_project_tag_appointments_on_tag_id"
@@ -5497,6 +5775,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_000004) do
     t.datetime "property_datetime_10"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "external_id"
     t.index ["branch_id"], name: "index_projects_on_branch_id"
     t.index ["business_type"], name: "index_projects_on_business_type"
     t.index ["category_id"], name: "index_projects_on_category_id"
@@ -5504,6 +5783,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_000004) do
     t.index ["company_id"], name: "index_projects_on_company_id"
     t.index ["discarded_at"], name: "index_projects_on_discarded_at"
     t.index ["email"], name: "index_projects_on_email", unique: true
+    t.index ["external_id"], name: "index_projects_on_external_id"
     t.index ["lifecycle_status"], name: "index_projects_on_lifecycle_status"
     t.index ["project_group_id"], name: "index_projects_on_project_group_id"
     t.index ["property_mapping_id"], name: "index_projects_on_property_mapping_id"
@@ -5531,8 +5811,10 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_000004) do
     t.datetime "updated_at", null: false
     t.string "title", null: false
     t.text "body", null: false
+    t.string "external_id"
     t.index ["business_type"], name: "index_promo_campaigns_on_business_type"
     t.index ["discarded_at"], name: "index_promo_campaigns_on_discarded_at"
+    t.index ["external_id"], name: "index_promo_campaigns_on_external_id"
     t.index ["lifecycle_status"], name: "index_promo_campaigns_on_lifecycle_status"
     t.index ["scheduled_at"], name: "index_promo_campaigns_on_scheduled_at"
     t.index ["status"], name: "index_promo_campaigns_on_status"
@@ -5554,9 +5836,11 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_000004) do
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "external_id"
     t.index ["business_type"], name: "index_promo_grants_on_business_type"
     t.index ["company_id"], name: "index_promo_grants_on_company_id"
     t.index ["discarded_at"], name: "index_promo_grants_on_discarded_at"
+    t.index ["external_id"], name: "index_promo_grants_on_external_id"
     t.index ["lifecycle_status"], name: "index_promo_grants_on_lifecycle_status"
     t.index ["promo_campaign_id", "company_id"], name: "index_promo_grants_on_promo_campaign_id_and_company_id", unique: true
     t.index ["promo_campaign_id"], name: "index_promo_grants_on_promo_campaign_id"
@@ -5578,11 +5862,13 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_000004) do
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "external_id"
     t.index ["business_type"], name: "index_property_mappings_on_business_type"
     t.index ["category_id"], name: "index_property_mappings_on_category_id"
     t.index ["company_id", "category_id"], name: "index_property_mappings_on_company_id_and_category_id"
     t.index ["company_id"], name: "index_property_mappings_on_company_id"
     t.index ["discarded_at"], name: "index_property_mappings_on_discarded_at"
+    t.index ["external_id"], name: "index_property_mappings_on_external_id"
     t.index ["lifecycle_status"], name: "index_property_mappings_on_lifecycle_status"
     t.index ["workflow_status"], name: "index_property_mappings_on_workflow_status"
   end
@@ -5604,10 +5890,12 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_000004) do
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "external_id"
     t.index ["business_type"], name: "index_purchase_item_tag_appointments_on_business_type"
     t.index ["company_id", "purchase_item_id", "tag_id"], name: "idx_purchase_item_tag_appointments_uniq", unique: true
     t.index ["company_id"], name: "index_purchase_item_tag_appointments_on_company_id"
     t.index ["discarded_at"], name: "index_purchase_item_tag_appointments_on_discarded_at"
+    t.index ["external_id"], name: "index_purchase_item_tag_appointments_on_external_id"
     t.index ["lifecycle_status"], name: "index_purchase_item_tag_appointments_on_lifecycle_status"
     t.index ["purchase_item_id"], name: "index_purchase_item_tag_appointments_on_purchase_item_id"
     t.index ["tag_id"], name: "index_purchase_item_tag_appointments_on_tag_id"
@@ -5693,11 +5981,13 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_000004) do
     t.datetime "property_datetime_10"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "external_id"
     t.index ["business_type"], name: "index_purchase_items_on_business_type"
     t.index ["category_id"], name: "index_purchase_items_on_category_id"
     t.index ["code"], name: "index_purchase_items_on_code", unique: true
     t.index ["company_id"], name: "index_purchase_items_on_company_id"
     t.index ["discarded_at"], name: "index_purchase_items_on_discarded_at"
+    t.index ["external_id"], name: "index_purchase_items_on_external_id"
     t.index ["lifecycle_status"], name: "index_purchase_items_on_lifecycle_status"
     t.index ["product_id"], name: "index_purchase_items_on_product_id"
     t.index ["property_mapping_id"], name: "index_purchase_items_on_property_mapping_id"
@@ -5723,10 +6013,12 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_000004) do
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "external_id"
     t.index ["business_type"], name: "index_purchase_purchase_item_appointments_on_business_type"
     t.index ["company_id", "purchase_id", "purchase_item_id"], name: "idx_purchase_purchase_item_appointments_triple"
     t.index ["company_id"], name: "index_purchase_purchase_item_appointments_on_company_id"
     t.index ["discarded_at"], name: "index_purchase_purchase_item_appointments_on_discarded_at"
+    t.index ["external_id"], name: "index_purchase_purchase_item_appointments_on_external_id"
     t.index ["lifecycle_status"], name: "index_purchase_purchase_item_appointments_on_lifecycle_status"
     t.index ["purchase_id"], name: "index_purchase_purchase_item_appointments_on_purchase_id"
     t.index ["purchase_item_id"], name: "index_purchase_purchase_item_appointments_on_purchase_item_id"
@@ -5750,10 +6042,12 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_000004) do
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "external_id"
     t.index ["business_type"], name: "index_purchase_tag_appointments_on_business_type"
     t.index ["company_id", "purchase_id", "tag_id"], name: "idx_purchase_tag_appointments_uniq", unique: true
     t.index ["company_id"], name: "index_purchase_tag_appointments_on_company_id"
     t.index ["discarded_at"], name: "index_purchase_tag_appointments_on_discarded_at"
+    t.index ["external_id"], name: "index_purchase_tag_appointments_on_external_id"
     t.index ["lifecycle_status"], name: "index_purchase_tag_appointments_on_lifecycle_status"
     t.index ["purchase_id"], name: "index_purchase_tag_appointments_on_purchase_id"
     t.index ["tag_id"], name: "index_purchase_tag_appointments_on_tag_id"
@@ -5844,12 +6138,14 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_000004) do
     t.datetime "property_datetime_10"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "external_id"
     t.index ["branch_id"], name: "index_purchases_on_branch_id"
     t.index ["business_type"], name: "index_purchases_on_business_type"
     t.index ["category_id"], name: "index_purchases_on_category_id"
     t.index ["code"], name: "index_purchases_on_code", unique: true
     t.index ["company_id"], name: "index_purchases_on_company_id"
     t.index ["discarded_at"], name: "index_purchases_on_discarded_at"
+    t.index ["external_id"], name: "index_purchases_on_external_id"
     t.index ["lifecycle_status"], name: "index_purchases_on_lifecycle_status"
     t.index ["property_mapping_id"], name: "index_purchases_on_property_mapping_id"
     t.index ["supplier_id"], name: "index_purchases_on_supplier_id"
@@ -5875,10 +6171,12 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_000004) do
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "external_id"
     t.index ["business_type"], name: "index_question_tag_appointments_on_business_type"
     t.index ["company_id", "question_id", "tag_id"], name: "idx_question_tag_appointments_uniq", unique: true
     t.index ["company_id"], name: "index_question_tag_appointments_on_company_id"
     t.index ["discarded_at"], name: "index_question_tag_appointments_on_discarded_at"
+    t.index ["external_id"], name: "index_question_tag_appointments_on_external_id"
     t.index ["lifecycle_status"], name: "index_question_tag_appointments_on_lifecycle_status"
     t.index ["question_id"], name: "index_question_tag_appointments_on_question_id"
     t.index ["tag_id"], name: "index_question_tag_appointments_on_tag_id"
@@ -5902,11 +6200,13 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_000004) do
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "external_id"
     t.index ["branch_id"], name: "index_questions_on_branch_id"
     t.index ["business_type"], name: "index_questions_on_business_type"
     t.index ["category_id"], name: "index_questions_on_category_id"
     t.index ["company_id"], name: "index_questions_on_company_id"
     t.index ["discarded_at"], name: "index_questions_on_discarded_at"
+    t.index ["external_id"], name: "index_questions_on_external_id"
     t.index ["lifecycle_status"], name: "index_questions_on_lifecycle_status"
     t.index ["property_mapping_id"], name: "index_questions_on_property_mapping_id"
     t.index ["workflow_status"], name: "index_questions_on_workflow_status"
@@ -5929,10 +6229,12 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_000004) do
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "external_id"
     t.index ["business_type"], name: "index_role_tag_appointments_on_business_type"
     t.index ["company_id", "role_id", "tag_id"], name: "idx_role_tag_appointments_uniq", unique: true
     t.index ["company_id"], name: "index_role_tag_appointments_on_company_id"
     t.index ["discarded_at"], name: "index_role_tag_appointments_on_discarded_at"
+    t.index ["external_id"], name: "index_role_tag_appointments_on_external_id"
     t.index ["lifecycle_status"], name: "index_role_tag_appointments_on_lifecycle_status"
     t.index ["role_id"], name: "index_role_tag_appointments_on_role_id"
     t.index ["tag_id"], name: "index_role_tag_appointments_on_tag_id"
@@ -5955,10 +6257,12 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_000004) do
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "external_id"
     t.index ["branch_id"], name: "index_roles_on_branch_id"
     t.index ["business_type"], name: "index_roles_on_business_type"
     t.index ["company_id"], name: "index_roles_on_company_id"
     t.index ["discarded_at"], name: "index_roles_on_discarded_at"
+    t.index ["external_id"], name: "index_roles_on_external_id"
     t.index ["lifecycle_status"], name: "index_roles_on_lifecycle_status"
     t.index ["workflow_status"], name: "index_roles_on_workflow_status"
   end
@@ -5981,11 +6285,13 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_000004) do
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "external_id"
     t.index ["branch_id"], name: "index_scheduled_shifts_on_branch_id"
     t.index ["company_id"], name: "index_scheduled_shifts_on_company_id"
     t.index ["discarded_at"], name: "index_scheduled_shifts_on_discarded_at"
     t.index ["employee_id", "work_date"], name: "index_scheduled_shifts_on_employee_id_and_work_date", unique: true
     t.index ["employee_id"], name: "index_scheduled_shifts_on_employee_id"
+    t.index ["external_id"], name: "index_scheduled_shifts_on_external_id"
     t.index ["shift_template_id"], name: "index_scheduled_shifts_on_shift_template_id"
   end
 
@@ -6006,10 +6312,12 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_000004) do
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "external_id"
     t.index ["business_type"], name: "index_service_group_tag_appointments_on_business_type"
     t.index ["company_id", "service_group_id", "tag_id"], name: "idx_service_group_tag_appointments_uniq", unique: true
     t.index ["company_id"], name: "index_service_group_tag_appointments_on_company_id"
     t.index ["discarded_at"], name: "index_service_group_tag_appointments_on_discarded_at"
+    t.index ["external_id"], name: "index_service_group_tag_appointments_on_external_id"
     t.index ["lifecycle_status"], name: "index_service_group_tag_appointments_on_lifecycle_status"
     t.index ["service_group_id"], name: "index_service_group_tag_appointments_on_service_group_id"
     t.index ["tag_id"], name: "index_service_group_tag_appointments_on_tag_id"
@@ -6098,6 +6406,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_000004) do
     t.datetime "property_datetime_10"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "external_id"
     t.index ["branch_id"], name: "index_service_groups_on_branch_id"
     t.index ["business_type"], name: "index_service_groups_on_business_type"
     t.index ["category_id"], name: "index_service_groups_on_category_id"
@@ -6105,6 +6414,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_000004) do
     t.index ["company_id"], name: "index_service_groups_on_company_id"
     t.index ["discarded_at"], name: "index_service_groups_on_discarded_at"
     t.index ["email"], name: "index_service_groups_on_email", unique: true
+    t.index ["external_id"], name: "index_service_groups_on_external_id"
     t.index ["lifecycle_status"], name: "index_service_groups_on_lifecycle_status"
     t.index ["property_mapping_id"], name: "index_service_groups_on_property_mapping_id"
     t.index ["workflow_status"], name: "index_service_groups_on_workflow_status"
@@ -6126,10 +6436,12 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_000004) do
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "external_id"
     t.index ["business_type"], name: "index_service_service_group_appointments_on_business_type"
     t.index ["company_id", "service_id", "service_group_id"], name: "idx_service_service_group_appointments_uniq", unique: true
     t.index ["company_id"], name: "index_service_service_group_appointments_on_company_id"
     t.index ["discarded_at"], name: "index_service_service_group_appointments_on_discarded_at"
+    t.index ["external_id"], name: "index_service_service_group_appointments_on_external_id"
     t.index ["lifecycle_status"], name: "index_service_service_group_appointments_on_lifecycle_status"
     t.index ["service_group_id"], name: "index_service_service_group_appointments_on_service_group_id"
     t.index ["service_id"], name: "index_service_service_group_appointments_on_service_id"
@@ -6153,10 +6465,12 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_000004) do
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "external_id"
     t.index ["business_type"], name: "index_service_tag_appointments_on_business_type"
     t.index ["company_id", "service_id", "tag_id"], name: "idx_service_tag_appointments_uniq", unique: true
     t.index ["company_id"], name: "index_service_tag_appointments_on_company_id"
     t.index ["discarded_at"], name: "index_service_tag_appointments_on_discarded_at"
+    t.index ["external_id"], name: "index_service_tag_appointments_on_external_id"
     t.index ["lifecycle_status"], name: "index_service_tag_appointments_on_lifecycle_status"
     t.index ["service_id"], name: "index_service_tag_appointments_on_service_id"
     t.index ["tag_id"], name: "index_service_tag_appointments_on_tag_id"
@@ -6246,6 +6560,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_000004) do
     t.datetime "property_datetime_10"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "external_id"
     t.index ["branch_id"], name: "index_services_on_branch_id"
     t.index ["business_type"], name: "index_services_on_business_type"
     t.index ["category_id"], name: "index_services_on_category_id"
@@ -6253,6 +6568,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_000004) do
     t.index ["company_id"], name: "index_services_on_company_id"
     t.index ["discarded_at"], name: "index_services_on_discarded_at"
     t.index ["email"], name: "index_services_on_email", unique: true
+    t.index ["external_id"], name: "index_services_on_external_id"
     t.index ["lifecycle_status"], name: "index_services_on_lifecycle_status"
     t.index ["property_mapping_id"], name: "index_services_on_property_mapping_id"
     t.index ["workflow_status"], name: "index_services_on_workflow_status"
@@ -6266,6 +6582,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_000004) do
     t.jsonb "metadata"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "external_id"
+    t.index ["external_id"], name: "index_sessions_on_external_id"
     t.index ["single_access_token"], name: "index_sessions_on_single_access_token", unique: true
     t.index ["user_id"], name: "index_sessions_on_user_id"
   end
@@ -6292,13 +6610,17 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_000004) do
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "external_id"
     t.index ["branch_id"], name: "index_shift_templates_on_branch_id"
     t.index ["company_id"], name: "index_shift_templates_on_company_id"
     t.index ["discarded_at"], name: "index_shift_templates_on_discarded_at"
+    t.index ["external_id"], name: "index_shift_templates_on_external_id"
   end
 
   create_table "sign_in_tokens", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
     t.uuid "user_id", null: false
+    t.string "external_id"
+    t.index ["external_id"], name: "index_sign_in_tokens_on_external_id"
     t.index ["user_id"], name: "index_sign_in_tokens_on_user_id"
   end
 
@@ -6319,10 +6641,12 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_000004) do
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "external_id"
     t.index ["business_type"], name: "index_statistic_tag_appointments_on_business_type"
     t.index ["company_id", "statistic_id", "tag_id"], name: "idx_statistic_tag_appointments_uniq", unique: true
     t.index ["company_id"], name: "index_statistic_tag_appointments_on_company_id"
     t.index ["discarded_at"], name: "index_statistic_tag_appointments_on_discarded_at"
+    t.index ["external_id"], name: "index_statistic_tag_appointments_on_external_id"
     t.index ["lifecycle_status"], name: "index_statistic_tag_appointments_on_lifecycle_status"
     t.index ["statistic_id"], name: "index_statistic_tag_appointments_on_statistic_id"
     t.index ["tag_id"], name: "index_statistic_tag_appointments_on_tag_id"
@@ -6337,6 +6661,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_000004) do
     t.jsonb "metadata"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "external_id"
+    t.index ["external_id"], name: "index_statistics_on_external_id"
     t.index ["owner_type", "owner_id"], name: "index_statistics_on_owner"
     t.index ["recorded_at"], name: "index_statistics_on_recorded_at"
   end
@@ -6355,10 +6681,12 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_000004) do
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "external_id"
     t.index ["business_type"], name: "index_stock_adjustment_stock_appointments_on_business_type"
     t.index ["company_id", "stock_adjustment_id", "stock_id"], name: "idx_adjustment_stock_triple"
     t.index ["company_id"], name: "index_stock_adjustment_stock_appointments_on_company_id"
     t.index ["discarded_at"], name: "index_stock_adjustment_stock_appointments_on_discarded_at"
+    t.index ["external_id"], name: "index_stock_adjustment_stock_appointments_on_external_id"
     t.index ["lifecycle_status"], name: "index_stock_adjustment_stock_appointments_on_lifecycle_status"
     t.index ["stock_adjustment_id"], name: "idx_on_stock_adjustment_id_bc65c15a3f"
     t.index ["stock_id"], name: "index_stock_adjustment_stock_appointments_on_stock_id"
@@ -6390,6 +6718,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_000004) do
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "external_id"
     t.index ["branch_id"], name: "index_stock_adjustments_on_branch_id"
     t.index ["business_type"], name: "index_stock_adjustments_on_business_type"
     t.index ["category_id"], name: "index_stock_adjustments_on_category_id"
@@ -6397,6 +6726,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_000004) do
     t.index ["company_id", "workflow_status"], name: "index_stock_adjustments_on_company_id_and_workflow_status"
     t.index ["company_id"], name: "index_stock_adjustments_on_company_id"
     t.index ["discarded_at"], name: "index_stock_adjustments_on_discarded_at"
+    t.index ["external_id"], name: "index_stock_adjustments_on_external_id"
     t.index ["lifecycle_status"], name: "index_stock_adjustments_on_lifecycle_status"
     t.index ["property_mapping_id"], name: "index_stock_adjustments_on_property_mapping_id"
     t.index ["warehouse_id"], name: "index_stock_adjustments_on_warehouse_id"
@@ -6417,10 +6747,12 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_000004) do
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "external_id"
     t.index ["business_type"], name: "index_stock_export_stock_appointments_on_business_type"
     t.index ["company_id", "stock_export_id", "stock_id"], name: "idx_export_stock_triple"
     t.index ["company_id"], name: "index_stock_export_stock_appointments_on_company_id"
     t.index ["discarded_at"], name: "index_stock_export_stock_appointments_on_discarded_at"
+    t.index ["external_id"], name: "index_stock_export_stock_appointments_on_external_id"
     t.index ["lifecycle_status"], name: "index_stock_export_stock_appointments_on_lifecycle_status"
     t.index ["stock_export_id"], name: "index_stock_export_stock_appointments_on_stock_export_id"
     t.index ["stock_id"], name: "index_stock_export_stock_appointments_on_stock_id"
@@ -6444,10 +6776,12 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_000004) do
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "external_id"
     t.index ["business_type"], name: "index_stock_export_tag_appointments_on_business_type"
     t.index ["company_id", "stock_export_id", "tag_id"], name: "idx_stock_export_tag_appointments_uniq", unique: true
     t.index ["company_id"], name: "index_stock_export_tag_appointments_on_company_id"
     t.index ["discarded_at"], name: "index_stock_export_tag_appointments_on_discarded_at"
+    t.index ["external_id"], name: "index_stock_export_tag_appointments_on_external_id"
     t.index ["lifecycle_status"], name: "index_stock_export_tag_appointments_on_lifecycle_status"
     t.index ["stock_export_id"], name: "index_stock_export_tag_appointments_on_stock_export_id"
     t.index ["tag_id"], name: "index_stock_export_tag_appointments_on_tag_id"
@@ -6547,6 +6881,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_000004) do
     t.datetime "property_datetime_10"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "external_id"
     t.index ["appoint_by_type", "appoint_by_id"], name: "index_stock_exports_on_appoint_by"
     t.index ["appoint_for_type", "appoint_for_id"], name: "index_stock_exports_on_appoint_for"
     t.index ["appoint_from_type", "appoint_from_id"], name: "index_stock_exports_on_appoint_from"
@@ -6558,6 +6893,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_000004) do
     t.index ["company_id"], name: "index_stock_exports_on_company_id"
     t.index ["discarded_at"], name: "index_stock_exports_on_discarded_at"
     t.index ["email"], name: "index_stock_exports_on_email", unique: true
+    t.index ["external_id"], name: "index_stock_exports_on_external_id"
     t.index ["lifecycle_status"], name: "index_stock_exports_on_lifecycle_status"
     t.index ["product_id"], name: "index_stock_exports_on_product_id"
     t.index ["property_mapping_id"], name: "index_stock_exports_on_property_mapping_id"
@@ -6579,10 +6915,12 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_000004) do
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "external_id"
     t.index ["business_type"], name: "index_stock_import_stock_appointments_on_business_type"
     t.index ["company_id", "stock_import_id", "stock_id"], name: "idx_import_stock_triple"
     t.index ["company_id"], name: "index_stock_import_stock_appointments_on_company_id"
     t.index ["discarded_at"], name: "index_stock_import_stock_appointments_on_discarded_at"
+    t.index ["external_id"], name: "index_stock_import_stock_appointments_on_external_id"
     t.index ["lifecycle_status"], name: "index_stock_import_stock_appointments_on_lifecycle_status"
     t.index ["stock_id"], name: "index_stock_import_stock_appointments_on_stock_id"
     t.index ["stock_import_id"], name: "index_stock_import_stock_appointments_on_stock_import_id"
@@ -6606,10 +6944,12 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_000004) do
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "external_id"
     t.index ["business_type"], name: "index_stock_import_tag_appointments_on_business_type"
     t.index ["company_id", "stock_import_id", "tag_id"], name: "idx_stock_import_tag_appointments_uniq", unique: true
     t.index ["company_id"], name: "index_stock_import_tag_appointments_on_company_id"
     t.index ["discarded_at"], name: "index_stock_import_tag_appointments_on_discarded_at"
+    t.index ["external_id"], name: "index_stock_import_tag_appointments_on_external_id"
     t.index ["lifecycle_status"], name: "index_stock_import_tag_appointments_on_lifecycle_status"
     t.index ["stock_import_id"], name: "index_stock_import_tag_appointments_on_stock_import_id"
     t.index ["tag_id"], name: "index_stock_import_tag_appointments_on_tag_id"
@@ -6709,6 +7049,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_000004) do
     t.datetime "property_datetime_10"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "external_id"
     t.index ["appoint_by_type", "appoint_by_id"], name: "index_stock_imports_on_appoint_by"
     t.index ["appoint_for_type", "appoint_for_id"], name: "index_stock_imports_on_appoint_for"
     t.index ["appoint_from_type", "appoint_from_id"], name: "index_stock_imports_on_appoint_from"
@@ -6720,6 +7061,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_000004) do
     t.index ["company_id"], name: "index_stock_imports_on_company_id"
     t.index ["discarded_at"], name: "index_stock_imports_on_discarded_at"
     t.index ["email"], name: "index_stock_imports_on_email", unique: true
+    t.index ["external_id"], name: "index_stock_imports_on_external_id"
     t.index ["lifecycle_status"], name: "index_stock_imports_on_lifecycle_status"
     t.index ["product_id"], name: "index_stock_imports_on_product_id"
     t.index ["property_mapping_id"], name: "index_stock_imports_on_property_mapping_id"
@@ -6747,11 +7089,13 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_000004) do
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "external_id"
     t.index ["business_type"], name: "index_stock_pendings_on_business_type"
     t.index ["code"], name: "index_stock_pendings_on_code", unique: true
     t.index ["company_id", "workflow_status"], name: "index_stock_pendings_on_company_id_and_workflow_status"
     t.index ["company_id"], name: "index_stock_pendings_on_company_id"
     t.index ["discarded_at"], name: "index_stock_pendings_on_discarded_at"
+    t.index ["external_id"], name: "index_stock_pendings_on_external_id"
     t.index ["lifecycle_status"], name: "index_stock_pendings_on_lifecycle_status"
     t.index ["product_id"], name: "index_stock_pendings_on_product_id"
     t.index ["stock_id", "workflow_status"], name: "index_stock_pendings_on_stock_id_and_workflow_status"
@@ -6778,10 +7122,12 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_000004) do
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "external_id"
     t.index ["business_type"], name: "index_stock_tag_appointments_on_business_type"
     t.index ["company_id", "stock_id", "tag_id"], name: "idx_stock_tag_appointments_uniq", unique: true
     t.index ["company_id"], name: "index_stock_tag_appointments_on_company_id"
     t.index ["discarded_at"], name: "index_stock_tag_appointments_on_discarded_at"
+    t.index ["external_id"], name: "index_stock_tag_appointments_on_external_id"
     t.index ["lifecycle_status"], name: "index_stock_tag_appointments_on_lifecycle_status"
     t.index ["stock_id"], name: "index_stock_tag_appointments_on_stock_id"
     t.index ["tag_id"], name: "index_stock_tag_appointments_on_tag_id"
@@ -6883,6 +7229,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_000004) do
     t.datetime "property_datetime_10"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "external_id"
     t.index ["appoint_by_type", "appoint_by_id"], name: "index_stock_transactions_on_appoint_by"
     t.index ["appoint_for_type", "appoint_for_id"], name: "index_stock_transactions_on_appoint_for"
     t.index ["appoint_from_type", "appoint_from_id"], name: "index_stock_transactions_on_appoint_from"
@@ -6895,6 +7242,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_000004) do
     t.index ["direction"], name: "index_stock_transactions_on_direction"
     t.index ["discarded_at"], name: "index_stock_transactions_on_discarded_at"
     t.index ["email"], name: "index_stock_transactions_on_email", unique: true
+    t.index ["external_id"], name: "index_stock_transactions_on_external_id"
     t.index ["lifecycle_status"], name: "index_stock_transactions_on_lifecycle_status"
     t.index ["product_id"], name: "index_stock_transactions_on_product_id"
     t.index ["property_mapping_id"], name: "index_stock_transactions_on_property_mapping_id"
@@ -6917,10 +7265,12 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_000004) do
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "external_id"
     t.index ["business_type"], name: "index_stock_transfer_stock_appointments_on_business_type"
     t.index ["company_id", "stock_transfer_id", "stock_id"], name: "idx_transfer_stock_triple"
     t.index ["company_id"], name: "index_stock_transfer_stock_appointments_on_company_id"
     t.index ["discarded_at"], name: "index_stock_transfer_stock_appointments_on_discarded_at"
+    t.index ["external_id"], name: "index_stock_transfer_stock_appointments_on_external_id"
     t.index ["lifecycle_status"], name: "index_stock_transfer_stock_appointments_on_lifecycle_status"
     t.index ["stock_id"], name: "index_stock_transfer_stock_appointments_on_stock_id"
     t.index ["stock_transfer_id"], name: "index_stock_transfer_stock_appointments_on_stock_transfer_id"
@@ -6944,10 +7294,12 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_000004) do
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "external_id"
     t.index ["business_type"], name: "index_stock_transfer_tag_appointments_on_business_type"
     t.index ["company_id", "stock_transfer_id", "tag_id"], name: "idx_stock_transfer_tag_appointments_uniq", unique: true
     t.index ["company_id"], name: "index_stock_transfer_tag_appointments_on_company_id"
     t.index ["discarded_at"], name: "index_stock_transfer_tag_appointments_on_discarded_at"
+    t.index ["external_id"], name: "index_stock_transfer_tag_appointments_on_external_id"
     t.index ["lifecycle_status"], name: "index_stock_transfer_tag_appointments_on_lifecycle_status"
     t.index ["stock_transfer_id"], name: "index_stock_transfer_tag_appointments_on_stock_transfer_id"
     t.index ["tag_id"], name: "index_stock_transfer_tag_appointments_on_tag_id"
@@ -7050,6 +7402,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_000004) do
     t.datetime "property_datetime_10"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "external_id"
     t.index ["appoint_by_type", "appoint_by_id"], name: "index_stock_transfers_on_appoint_by"
     t.index ["appoint_for_type", "appoint_for_id"], name: "index_stock_transfers_on_appoint_for"
     t.index ["appoint_from_type", "appoint_from_id"], name: "index_stock_transfers_on_appoint_from"
@@ -7062,6 +7415,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_000004) do
     t.index ["destination_warehouse_id"], name: "index_stock_transfers_on_destination_warehouse_id"
     t.index ["discarded_at"], name: "index_stock_transfers_on_discarded_at"
     t.index ["email"], name: "index_stock_transfers_on_email", unique: true
+    t.index ["external_id"], name: "index_stock_transfers_on_external_id"
     t.index ["lifecycle_status"], name: "index_stock_transfers_on_lifecycle_status"
     t.index ["product_id"], name: "index_stock_transfers_on_product_id"
     t.index ["property_mapping_id"], name: "index_stock_transfers_on_property_mapping_id"
@@ -7156,6 +7510,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_000004) do
     t.datetime "property_datetime_10"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "external_id"
     t.index ["branch_id"], name: "index_stocks_on_branch_id"
     t.index ["business_type"], name: "index_stocks_on_business_type"
     t.index ["category_id"], name: "index_stocks_on_category_id"
@@ -7163,6 +7518,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_000004) do
     t.index ["company_id"], name: "index_stocks_on_company_id"
     t.index ["discarded_at"], name: "index_stocks_on_discarded_at"
     t.index ["email"], name: "index_stocks_on_email", unique: true
+    t.index ["external_id"], name: "index_stocks_on_external_id"
     t.index ["lifecycle_status"], name: "index_stocks_on_lifecycle_status"
     t.index ["product_id"], name: "index_stocks_on_product_id"
     t.index ["property_mapping_id"], name: "index_stocks_on_property_mapping_id"
@@ -7188,10 +7544,12 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_000004) do
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "external_id"
     t.index ["attachable_type", "attachable_id"], name: "index_stored_files_on_attachable_type_and_attachable_id"
     t.index ["company_id", "folder_id"], name: "index_stored_files_on_company_id_and_folder_id"
     t.index ["company_id"], name: "index_stored_files_on_company_id"
     t.index ["discarded_at"], name: "index_stored_files_on_discarded_at"
+    t.index ["external_id"], name: "index_stored_files_on_external_id"
     t.index ["folder_id"], name: "index_stored_files_on_folder_id"
   end
 
@@ -7215,10 +7573,12 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_000004) do
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "external_id"
     t.index ["business_type"], name: "idx_on_business_type_c7a9e65b95"
     t.index ["company_id", "subscription_group_id", "subscription_plan_id"], name: "idx_subscription_group_subscription_plan_appointments_triple"
     t.index ["company_id"], name: "idx_on_company_id_3a831c8ac7"
     t.index ["discarded_at"], name: "idx_on_discarded_at_330a11e9e0"
+    t.index ["external_id"], name: "index_subscription_group_sub_plan_appts_on_external_id"
     t.index ["lifecycle_status"], name: "idx_on_lifecycle_status_6cee9c1826"
     t.index ["subscription_group_id"], name: "idx_on_subscription_group_id_925c1f4dae"
     t.index ["subscription_plan_id"], name: "idx_on_subscription_plan_id_169e306d7e"
@@ -7242,10 +7602,12 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_000004) do
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "external_id"
     t.index ["business_type"], name: "index_subscription_group_tag_appointments_on_business_type"
     t.index ["company_id", "subscription_group_id", "tag_id"], name: "idx_subscription_group_tag_appointments_uniq", unique: true
     t.index ["company_id"], name: "index_subscription_group_tag_appointments_on_company_id"
     t.index ["discarded_at"], name: "index_subscription_group_tag_appointments_on_discarded_at"
+    t.index ["external_id"], name: "index_subscription_group_tag_appointments_on_external_id"
     t.index ["lifecycle_status"], name: "index_subscription_group_tag_appointments_on_lifecycle_status"
     t.index ["subscription_group_id"], name: "idx_on_subscription_group_id_41f29c4d0e"
     t.index ["tag_id"], name: "index_subscription_group_tag_appointments_on_tag_id"
@@ -7271,10 +7633,12 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_000004) do
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "external_id"
     t.index ["branch_id"], name: "index_subscription_groups_on_branch_id"
     t.index ["business_type"], name: "index_subscription_groups_on_business_type"
     t.index ["company_id"], name: "index_subscription_groups_on_company_id"
     t.index ["discarded_at"], name: "index_subscription_groups_on_discarded_at"
+    t.index ["external_id"], name: "index_subscription_groups_on_external_id"
     t.index ["lifecycle_status"], name: "index_subscription_groups_on_lifecycle_status"
     t.index ["subscription_group_id"], name: "index_subscription_groups_on_subscription_group_id"
     t.index ["subscription_plan_id"], name: "index_subscription_groups_on_subscription_plan_id"
@@ -7300,10 +7664,12 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_000004) do
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "external_id"
     t.index ["branch_id"], name: "index_subscription_plans_on_branch_id"
     t.index ["business_type"], name: "index_subscription_plans_on_business_type"
     t.index ["company_id"], name: "index_subscription_plans_on_company_id"
     t.index ["discarded_at"], name: "index_subscription_plans_on_discarded_at"
+    t.index ["external_id"], name: "index_subscription_plans_on_external_id"
     t.index ["lifecycle_status"], name: "index_subscription_plans_on_lifecycle_status"
     t.index ["workflow_status"], name: "index_subscription_plans_on_workflow_status"
   end
@@ -7325,10 +7691,12 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_000004) do
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "external_id"
     t.index ["business_type"], name: "index_supplier_tag_appointments_on_business_type"
     t.index ["company_id", "supplier_id", "tag_id"], name: "idx_supplier_tag_appointments_uniq", unique: true
     t.index ["company_id"], name: "index_supplier_tag_appointments_on_company_id"
     t.index ["discarded_at"], name: "index_supplier_tag_appointments_on_discarded_at"
+    t.index ["external_id"], name: "index_supplier_tag_appointments_on_external_id"
     t.index ["lifecycle_status"], name: "index_supplier_tag_appointments_on_lifecycle_status"
     t.index ["supplier_id"], name: "index_supplier_tag_appointments_on_supplier_id"
     t.index ["tag_id"], name: "index_supplier_tag_appointments_on_tag_id"
@@ -7416,11 +7784,13 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_000004) do
     t.datetime "property_datetime_10"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "external_id"
     t.index ["business_type"], name: "index_suppliers_on_business_type"
     t.index ["category_id"], name: "index_suppliers_on_category_id"
     t.index ["code"], name: "index_suppliers_on_code", unique: true
     t.index ["company_id"], name: "index_suppliers_on_company_id"
     t.index ["discarded_at"], name: "index_suppliers_on_discarded_at"
+    t.index ["external_id"], name: "index_suppliers_on_external_id"
     t.index ["lifecycle_status"], name: "index_suppliers_on_lifecycle_status"
     t.index ["property_mapping_id"], name: "index_suppliers_on_property_mapping_id"
     t.index ["workflow_status"], name: "index_suppliers_on_workflow_status"
@@ -7444,10 +7814,12 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_000004) do
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "external_id"
     t.index ["business_type"], name: "index_systems_on_business_type"
     t.index ["code"], name: "index_systems_on_code", unique: true
     t.index ["company_id"], name: "index_systems_on_company_id"
     t.index ["discarded_at"], name: "index_systems_on_discarded_at"
+    t.index ["external_id"], name: "index_systems_on_external_id"
     t.index ["lifecycle_status"], name: "index_systems_on_lifecycle_status"
     t.index ["name"], name: "index_systems_on_name", unique: true
     t.index ["workflow_status"], name: "index_systems_on_workflow_status"
@@ -7474,11 +7846,13 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_000004) do
     t.datetime "discarded_at"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "external_id"
     t.index ["category_id"], name: "index_table_config_logs_on_category_id"
     t.index ["company_id", "created_at"], name: "idx_table_config_logs_on_company_time"
     t.index ["company_id", "table_config_id", "created_at"], name: "idx_table_config_logs_on_config_time"
     t.index ["company_id"], name: "index_table_config_logs_on_company_id"
     t.index ["employee_id"], name: "index_table_config_logs_on_employee_id"
+    t.index ["external_id"], name: "index_table_config_logs_on_external_id"
     t.index ["property_mapping_id"], name: "index_table_config_logs_on_property_mapping_id"
     t.index ["table_config_id"], name: "index_table_config_logs_on_table_config_id"
   end
@@ -7499,11 +7873,13 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_000004) do
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "external_id"
     t.index ["business_type"], name: "index_table_configs_on_business_type"
     t.index ["category_id"], name: "index_table_configs_on_category_id"
     t.index ["company_id", "resource_name", "category_id"], name: "idx_on_company_id_resource_name_category_id_66b8ad4700"
     t.index ["company_id"], name: "index_table_configs_on_company_id"
     t.index ["discarded_at"], name: "index_table_configs_on_discarded_at"
+    t.index ["external_id"], name: "index_table_configs_on_external_id"
     t.index ["lifecycle_status"], name: "index_table_configs_on_lifecycle_status"
     t.index ["property_mapping_id"], name: "index_table_configs_on_property_mapping_id"
     t.index ["workflow_status"], name: "index_table_configs_on_workflow_status"
@@ -7526,10 +7902,12 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_000004) do
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "external_id"
     t.index ["business_type"], name: "index_tag_task_appointments_on_business_type"
     t.index ["company_id", "tag_id", "task_id"], name: "idx_tag_task_appointments_uniq", unique: true
     t.index ["company_id"], name: "index_tag_task_appointments_on_company_id"
     t.index ["discarded_at"], name: "index_tag_task_appointments_on_discarded_at"
+    t.index ["external_id"], name: "index_tag_task_appointments_on_external_id"
     t.index ["lifecycle_status"], name: "index_tag_task_appointments_on_lifecycle_status"
     t.index ["tag_id"], name: "index_tag_task_appointments_on_tag_id"
     t.index ["task_id"], name: "index_tag_task_appointments_on_task_id"
@@ -7553,10 +7931,12 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_000004) do
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "external_id"
     t.index ["business_type"], name: "index_tag_task_group_appointments_on_business_type"
     t.index ["company_id", "tag_id", "task_group_id"], name: "idx_tag_task_group_appointments_uniq", unique: true
     t.index ["company_id"], name: "index_tag_task_group_appointments_on_company_id"
     t.index ["discarded_at"], name: "index_tag_task_group_appointments_on_discarded_at"
+    t.index ["external_id"], name: "index_tag_task_group_appointments_on_external_id"
     t.index ["lifecycle_status"], name: "index_tag_task_group_appointments_on_lifecycle_status"
     t.index ["tag_id"], name: "index_tag_task_group_appointments_on_tag_id"
     t.index ["task_group_id"], name: "index_tag_task_group_appointments_on_task_group_id"
@@ -7580,10 +7960,12 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_000004) do
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "external_id"
     t.index ["business_type"], name: "index_tag_transaction_appointments_on_business_type"
     t.index ["company_id", "tag_id", "transaction_id"], name: "idx_tag_transaction_appointments_uniq", unique: true
     t.index ["company_id"], name: "index_tag_transaction_appointments_on_company_id"
     t.index ["discarded_at"], name: "index_tag_transaction_appointments_on_discarded_at"
+    t.index ["external_id"], name: "index_tag_transaction_appointments_on_external_id"
     t.index ["lifecycle_status"], name: "index_tag_transaction_appointments_on_lifecycle_status"
     t.index ["tag_id"], name: "index_tag_transaction_appointments_on_tag_id"
     t.index ["transaction_id"], name: "index_tag_transaction_appointments_on_transaction_id"
@@ -7607,10 +7989,12 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_000004) do
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "external_id"
     t.index ["business_type"], name: "index_tag_warehouse_appointments_on_business_type"
     t.index ["company_id", "tag_id", "warehouse_id"], name: "idx_tag_warehouse_appointments_uniq", unique: true
     t.index ["company_id"], name: "index_tag_warehouse_appointments_on_company_id"
     t.index ["discarded_at"], name: "index_tag_warehouse_appointments_on_discarded_at"
+    t.index ["external_id"], name: "index_tag_warehouse_appointments_on_external_id"
     t.index ["lifecycle_status"], name: "index_tag_warehouse_appointments_on_lifecycle_status"
     t.index ["tag_id"], name: "index_tag_warehouse_appointments_on_tag_id"
     t.index ["warehouse_id"], name: "index_tag_warehouse_appointments_on_warehouse_id"
@@ -7632,9 +8016,11 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_000004) do
     t.datetime "discarded_at"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "external_id"
     t.index ["business_type"], name: "index_tags_on_business_type"
     t.index ["company_id"], name: "index_tags_on_company_id"
     t.index ["discarded_at"], name: "index_tags_on_discarded_at"
+    t.index ["external_id"], name: "index_tags_on_external_id"
     t.index ["lifecycle_status"], name: "index_tags_on_lifecycle_status"
     t.index ["workflow_status"], name: "index_tags_on_workflow_status"
   end
@@ -7721,6 +8107,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_000004) do
     t.datetime "property_datetime_10"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "external_id"
     t.index ["branch_id"], name: "index_task_groups_on_branch_id"
     t.index ["business_type"], name: "index_task_groups_on_business_type"
     t.index ["category_id"], name: "index_task_groups_on_category_id"
@@ -7728,6 +8115,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_000004) do
     t.index ["company_id"], name: "index_task_groups_on_company_id"
     t.index ["discarded_at"], name: "index_task_groups_on_discarded_at"
     t.index ["email"], name: "index_task_groups_on_email", unique: true
+    t.index ["external_id"], name: "index_task_groups_on_external_id"
     t.index ["lifecycle_status"], name: "index_task_groups_on_lifecycle_status"
     t.index ["property_mapping_id"], name: "index_task_groups_on_property_mapping_id"
     t.index ["workflow_status"], name: "index_task_groups_on_workflow_status"
@@ -7816,6 +8204,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_000004) do
     t.datetime "property_datetime_10"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "external_id"
     t.index ["branch_id"], name: "index_tasks_on_branch_id"
     t.index ["business_type"], name: "index_tasks_on_business_type"
     t.index ["category_id"], name: "index_tasks_on_category_id"
@@ -7823,6 +8212,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_000004) do
     t.index ["company_id"], name: "index_tasks_on_company_id"
     t.index ["discarded_at"], name: "index_tasks_on_discarded_at"
     t.index ["email"], name: "index_tasks_on_email", unique: true
+    t.index ["external_id"], name: "index_tasks_on_external_id"
     t.index ["lifecycle_status"], name: "index_tasks_on_lifecycle_status"
     t.index ["property_mapping_id"], name: "index_tasks_on_property_mapping_id"
     t.index ["task_group_id"], name: "index_tasks_on_task_group_id"
@@ -7917,6 +8307,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_000004) do
     t.datetime "property_datetime_10"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "external_id"
     t.index ["branch_id"], name: "index_transactions_on_branch_id"
     t.index ["business_type"], name: "index_transactions_on_business_type"
     t.index ["category_id"], name: "index_transactions_on_category_id"
@@ -7924,6 +8315,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_000004) do
     t.index ["company_id"], name: "index_transactions_on_company_id"
     t.index ["discarded_at"], name: "index_transactions_on_discarded_at"
     t.index ["email"], name: "index_transactions_on_email", unique: true
+    t.index ["external_id"], name: "index_transactions_on_external_id"
     t.index ["invoice_id"], name: "index_transactions_on_invoice_id"
     t.index ["lifecycle_status"], name: "index_transactions_on_lifecycle_status"
     t.index ["payment_method_id"], name: "index_transactions_on_payment_method_id"
@@ -7956,9 +8348,11 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_000004) do
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "external_id"
     t.index ["business_type"], name: "index_users_on_business_type"
     t.index ["discarded_at"], name: "index_users_on_discarded_at"
     t.index ["email"], name: "index_users_on_email", unique: true
+    t.index ["external_id"], name: "index_users_on_external_id"
     t.index ["lifecycle_status"], name: "index_users_on_lifecycle_status"
     t.index ["parent_user_id"], name: "index_users_on_parent_user_id"
     t.index ["single_access_token"], name: "index_users_on_single_access_token", unique: true
@@ -8060,6 +8454,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_000004) do
     t.datetime "property_datetime_10"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "external_id"
     t.index ["branch_id"], name: "index_warehouses_on_branch_id"
     t.index ["business_type"], name: "index_warehouses_on_business_type"
     t.index ["category_id"], name: "index_warehouses_on_category_id"
@@ -8067,6 +8462,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_000004) do
     t.index ["company_id"], name: "index_warehouses_on_company_id"
     t.index ["discarded_at"], name: "index_warehouses_on_discarded_at"
     t.index ["email"], name: "index_warehouses_on_email", unique: true
+    t.index ["external_id"], name: "index_warehouses_on_external_id"
     t.index ["lifecycle_status"], name: "index_warehouses_on_lifecycle_status"
     t.index ["property_mapping_id"], name: "index_warehouses_on_property_mapping_id"
     t.index ["workflow_status"], name: "index_warehouses_on_workflow_status"
@@ -8090,10 +8486,12 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_000004) do
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "external_id"
     t.index ["business_type"], name: "index_workflow_step_logs_on_business_type"
     t.index ["company_id"], name: "index_workflow_step_logs_on_company_id"
     t.index ["discarded_at"], name: "index_workflow_step_logs_on_discarded_at"
     t.index ["employee_id"], name: "index_workflow_step_logs_on_employee_id"
+    t.index ["external_id"], name: "index_workflow_step_logs_on_external_id"
     t.index ["lifecycle_status"], name: "index_workflow_step_logs_on_lifecycle_status"
     t.index ["subject_type", "subject_id"], name: "index_workflow_step_logs_on_subject"
     t.index ["workflow_id", "created_at"], name: "index_workflow_step_logs_on_workflow_id_and_created_at"
@@ -8119,10 +8517,12 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_000004) do
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "external_id"
     t.index ["business_type"], name: "index_workflow_steps_on_business_type"
     t.index ["code"], name: "index_workflow_steps_on_code", unique: true
     t.index ["company_id"], name: "index_workflow_steps_on_company_id"
     t.index ["discarded_at"], name: "index_workflow_steps_on_discarded_at"
+    t.index ["external_id"], name: "index_workflow_steps_on_external_id"
     t.index ["lifecycle_status"], name: "index_workflow_steps_on_lifecycle_status"
     t.index ["workflow_id", "position"], name: "index_workflow_steps_on_workflow_id_and_position"
     t.index ["workflow_id"], name: "index_workflow_steps_on_workflow_id"
@@ -8145,12 +8545,14 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_000004) do
     t.string "permission_resource_name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "external_id"
     t.index ["business_type"], name: "index_workflows_on_business_type"
     t.index ["category_id"], name: "index_workflows_on_category_id", unique: true
     t.index ["code"], name: "index_workflows_on_code", unique: true
     t.index ["company_id", "process_type"], name: "index_workflows_on_company_id_and_process_type"
     t.index ["company_id"], name: "index_workflows_on_company_id"
     t.index ["discarded_at"], name: "index_workflows_on_discarded_at"
+    t.index ["external_id"], name: "index_workflows_on_external_id"
     t.index ["lifecycle_status"], name: "index_workflows_on_lifecycle_status"
     t.index ["workflow_status"], name: "index_workflows_on_workflow_status"
   end
