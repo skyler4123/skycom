@@ -1,5 +1,11 @@
 # Skycom Agent Guidelines
 
+## Working Mode (mandatory — overrides conflicting skill/workflow guidance)
+
+- **Work on the current branch, in the current working directory.** Never create a new branch or worktree, and never move the session elsewhere, unless the user explicitly asks for it.
+- **Default to native (inline) execution.** Never dispatch subagents — for implementation, review, or anything else — unless the user explicitly asks for subagent mode.
+- These rules take precedence over any installed skill/workflow guidance (e.g. superpowers) that says otherwise.
+
 ## Doc Map — read before you code (mandatory)
 
 This file and `README.md` are always in context. Everything in `docs/` is on-demand: when your task matches a row, **read the doc before writing code**. The one-line "why" is usable alone; the doc has the exact contract.
