@@ -30,6 +30,7 @@ export default class Companies_Folders_ShowController extends Companies_LayoutCo
 
     poll(() => {
       if (this.hasContentTarget) {
+        this.contentTarget.classList.add("flex", "flex-col", "flex-1")
         this.renderContent()
         return true
       }
@@ -50,6 +51,7 @@ export default class Companies_Folders_ShowController extends Companies_LayoutCo
     }
     const input = event.target.querySelector('input[type="file"]')
     if (!input?.files || input.files.length === 0) return
+    let uploaded = 0
 
     for (const file of input.files) {
       const data = new FormData()
@@ -61,12 +63,13 @@ export default class Companies_Folders_ShowController extends Companies_LayoutCo
           method: "POST",
           body: data
         })
+        uploaded += 1
         toast({ type: "success", message: response.message })
       } catch (error) {
         toast({ type: "error", message: error.errors?.join(", ") || translate("Failed to upload file") })
       }
     }
-    reloadThenToast({ type: "success", message: translate("Upload Files") })
+    if (uploaded > 0) reloadThenToast({ type: "success", message: translate("Upload Files") })
   }
 
   async deleteFolder(event) {
@@ -101,8 +104,8 @@ export default class Companies_Folders_ShowController extends Companies_LayoutCo
     const f = this.folder
 
     return `
-      <div class="p-4 overflow-y-auto">
-        <div class="p-4 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800">
+      <div class="p-4 flex-1 flex flex-col">
+        <div class="p-4 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 flex-1" data-storage-panel>
           <div class="flex items-center justify-between mb-4">
             <div class="flex items-center gap-3 min-w-0">
               <span class="material-symbols-outlined text-amber-500 text-[28px]">folder</span>

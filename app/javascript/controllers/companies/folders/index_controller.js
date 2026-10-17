@@ -23,6 +23,7 @@ export default class Companies_Folders_IndexController extends Companies_LayoutC
 
     poll(() => {
       if (this.hasContentTarget) {
+        this.contentTarget.classList.add("flex", "flex-col", "flex-1")
         this.renderContent()
         return true
       }
@@ -37,8 +38,8 @@ export default class Companies_Folders_IndexController extends Companies_LayoutC
 
   contentHTML() {
     return `
-      <div class="p-4 overflow-y-auto">
-        <div class="p-4 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800">
+      <div class="p-4 flex-1 flex flex-col">
+        <div class="p-4 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 flex-1" data-storage-panel>
           <div class="flex items-center justify-between mb-4">
             <h2 class="text-lg font-bold text-slate-900 dark:text-white">${translate("Folders")}</h2>
             <button type="button" data-action="click->${this.identifier}#openNewModal"

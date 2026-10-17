@@ -21,6 +21,7 @@ export default class Companies_StoredFiles_ShowController extends Companies_Layo
 
     poll(() => {
       if (this.hasContentTarget) {
+        this.contentTarget.classList.add("flex", "flex-col", "flex-1")
         this.renderContent()
         return true
       }
@@ -50,8 +51,8 @@ export default class Companies_StoredFiles_ShowController extends Companies_Layo
       </div>`
 
     return `
-      <div class="p-4 overflow-y-auto">
-        <div class="p-6 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 max-w-2xl">
+      <div class="p-4 flex-1 flex flex-col">
+        <div class="p-6 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 flex-1" data-storage-panel>
           <div class="flex items-center gap-3 mb-2">
             <span class="material-symbols-outlined text-blue-500 text-[32px]">description</span>
             <h2 class="text-lg font-bold text-slate-900 dark:text-white break-all">${escapeHtml(sf.name)}</h2>

@@ -14,14 +14,18 @@ export default class Companies_Folders_NewModalController extends Controller {
   async handleSubmit(event) {
     event.preventDefault()
     try {
+      // NOTE: pass an object — fetchJson stringifies it AND sets
+      // Content-Type: application/json. Pre-stringifying skips the header
+      // and Rails raises ParameterMissing (400) for params[:folder].
+      const formData = new FormData(event.target)
       const response = await fetchJson(Helpers.create_company_folders_path(currentCompany().id), {
         method: "POST",
-        body: JSON.stringify({
+        body: {
           folder: {
-            name: new FormData(event.target).get("folder[name]"),
-            parent_id: new FormData(event.target).get("folder[parent_id]") || null
+            name: formData.get("folder[name]"),
+            parent_id: formData.get("folder[parent_id]") || null
           }
-        })
+        }
       })
       reloadThenToast({ type: "success", message: response.message })
     } catch (error) {

@@ -73,4 +73,17 @@ RSpec.feature "Companies::StoredFiles Show", type: :feature, js: true do
     expect(page).to have_current_path(company_stored_file_path(company, sf), wait: 10)
     expect(page).to have_content(sf.name, wait: 10)
   end
+
+  scenario "file panel fills the remaining page area" do
+    sf = create_file
+
+    visit company_stored_file_path(company, sf)
+    expect(page).to have_selector("[data-storage-panel]", wait: 10)
+
+    metrics = panel_metrics
+    expect(metrics["found"]).to be true
+    expect(metrics["widthCoverage"]).to be > 0.9
+    expect(metrics["wrapperBottomGap"]).to be <= 40
+    expect(metrics["panelBottomGap"]).to be <= 24
+  end
 end

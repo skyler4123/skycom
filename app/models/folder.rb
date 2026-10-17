@@ -9,8 +9,11 @@ class Folder < ApplicationRecord
   # --- Associations ---
   belongs_to :company, touch: true
   belongs_to :parent, class_name: "Folder", optional: true, foreign_key: :parent_id, inverse_of: :children
-  has_many :children, class_name: "Folder", foreign_key: :parent_id, dependent: :restrict_with_error, inverse_of: :parent
-  has_many :stored_files, dependent: :restrict_with_error
+  # NOTE: no dependent option — the before_destroy guard below is the single
+  # gate so the 422 carries one friendly message (restrict_with_error would
+  # halt first with Rails' generic text and hide it).
+  has_many :children, class_name: "Folder", foreign_key: :parent_id, inverse_of: :parent
+  has_many :stored_files
 
   # --- Validations ---
   validates :name, presence: true, uniqueness: { scope: [ :company_id, :parent_id ] }, length: { maximum: 255 }
