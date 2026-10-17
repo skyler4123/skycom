@@ -10,6 +10,7 @@ class CreateScheduledShifts < ActiveRecord::Migration[8.0]
       t.datetime :expected_end_at, null: false
       t.integer :status, null: false
 
+      t.string :external_id, index: true
       t.integer :lifecycle_status
       t.integer :workflow_status
       t.integer :business_type

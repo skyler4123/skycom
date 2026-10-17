@@ -29,6 +29,8 @@ class CreateStockTransactions < ActiveRecord::Migration[8.0]
       t.integer :direction, null: false, index: true        # 0: add, 1: remove
       t.integer :transaction_type, null: false, index: true  # e.g., import, export, transfer, adjustment
 
+      t.string :external_id, index: true
+
       # --- System Fields ---
       t.integer  :lifecycle_status, index: true
       t.integer  :workflow_status, index: true

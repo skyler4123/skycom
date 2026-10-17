@@ -13,6 +13,8 @@ class CreateAddresses < ActiveRecord::Migration[8.0]
       # Stores a hash (SHA256) of the fields above
       t.string :fingerprint, null: false
 
+      t.string :external_id, index: true
+
       t.timestamps
     end
 

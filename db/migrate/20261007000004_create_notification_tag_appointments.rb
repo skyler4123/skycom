@@ -5,6 +5,8 @@ class CreateNotificationTagAppointments < ActiveRecord::Migration[8.0]
       t.references :notification, null: false, foreign_key: true, type: :uuid
       t.references :notification_tag, null: false, foreign_key: true, type: :uuid
 
+      t.string :external_id, index: true
+
       # --- System Fields ---
       t.integer  :lifecycle_status, index: true
       t.integer  :workflow_status, index: true

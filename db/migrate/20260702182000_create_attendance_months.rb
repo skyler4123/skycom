@@ -14,6 +14,7 @@ class CreateAttendanceMonths < ActiveRecord::Migration[8.0]
       t.integer :total_records
       t.integer :total_deficit_minutes
 
+      t.string :external_id, index: true
       t.integer :lifecycle_status
       t.integer :workflow_status
       t.integer :business_type

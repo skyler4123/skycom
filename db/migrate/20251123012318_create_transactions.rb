@@ -22,6 +22,8 @@ class CreateTransactions < ActiveRecord::Migration[8.0]
       t.integer :status, default: 0, null: false
       t.string :gateway_reference
 
+      t.string :external_id, index: true
+
       # --- System Fields ---
       t.integer  :lifecycle_status, index: true
       t.integer  :workflow_status, index: true

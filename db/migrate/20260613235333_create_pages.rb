@@ -19,6 +19,7 @@ class CreatePages < ActiveRecord::Migration[8.0]
       t.integer :business_type,      null: false, index: true
       t.integer :target_role,        null: false, index: true
       t.integer :target_resolution,  null: false, index: true
+      t.string :external_id, index: true
       t.integer :lifecycle_status,   null: false, index: true
       t.integer :workflow_status,    null: false, index: true
 

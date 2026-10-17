@@ -6,6 +6,8 @@ class CreateStockImportStockAppointments < ActiveRecord::Migration[8.0]
       t.references :stock, null: false, foreign_key: true, type: :uuid
       t.integer :quantity, null: false
 
+      t.string :external_id, index: true
+
       # --- System Fields ---
       t.integer  :lifecycle_status, index: true
       t.integer  :workflow_status, index: true

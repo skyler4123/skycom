@@ -30,6 +30,8 @@ class CreateStockTransfers < ActiveRecord::Migration[8.0]
       t.datetime :initiated_at
       t.datetime :received_at
 
+      t.string :external_id, index: true
+
       # --- System Fields ---
       t.integer  :lifecycle_status, index: true
       t.integer  :workflow_status, index: true

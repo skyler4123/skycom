@@ -15,7 +15,9 @@ class CreateServices < ActiveRecord::Migration[8.0]
       t.integer :price_cents
       t.integer :currency
       t.integer :country
-      t.integer  :timezone
+      t.integer :timezone
+
+      t.string :external_id, index: true
 
       # --- System Fields ---
       t.integer  :lifecycle_status, index: true
