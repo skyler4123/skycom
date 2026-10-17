@@ -204,6 +204,13 @@ export const edit_company_shift_template_path = (companyId, id) => `/companies/$
 export const create_company_shift_templates_path = (companyId) => `/companies/${companyId}/shift_templates`
 export const company_reports_path = (companyId) => `/companies/${companyId}/reports`
 export const company_documents_path = (companyId) => `/companies/${companyId}/documents`
+export const company_folders_path = (companyId) => `/companies/${companyId}/folders`
+export const create_company_folders_path = (companyId) => `/companies/${companyId}/folders`
+export const company_folder_path = (companyId, folderId) => `/companies/${companyId}/folders/${folderId}`
+export const company_stored_files_path = (companyId) => `/companies/${companyId}/stored_files`
+export const create_company_stored_files_path = (companyId) => `/companies/${companyId}/stored_files`
+export const company_stored_file_path = (companyId, fileId) => `/companies/${companyId}/stored_files/${fileId}`
+export const download_company_stored_file_path = (companyId, fileId) => `/companies/${companyId}/stored_files/${fileId}/download`
 export const create_company_documents_path = (companyId) => `/companies/${companyId}/documents`
 export const new_company_document_path = (companyId) => `/companies/${companyId}/documents/new`
 export const company_document_path = (companyId, documentId) => `/companies/${companyId}/documents/${documentId}`

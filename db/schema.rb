@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_10_16_000002) do
+ActiveRecord::Schema[8.1].define(version: 2026_10_16_000004) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pgcrypto"
@@ -4112,6 +4112,26 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_000002) do
     t.index ["workflow_status"], name: "index_facility_tag_appointments_on_workflow_status"
   end
 
+  create_table "folders", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
+    t.uuid "company_id", null: false
+    t.uuid "parent_id"
+    t.string "name", null: false
+    t.integer "lifecycle_status"
+    t.integer "workflow_status"
+    t.integer "business_type"
+    t.datetime "expiration_date"
+    t.jsonb "metadata", default: {}
+    t.datetime "discarded_at"
+    t.string "permission_resource_name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["company_id", "parent_id", "name"], name: "idx_folders_parent_name_uniq", unique: true
+    t.index ["company_id", "parent_id"], name: "index_folders_on_company_id_and_parent_id"
+    t.index ["company_id"], name: "index_folders_on_company_id"
+    t.index ["discarded_at"], name: "index_folders_on_discarded_at"
+    t.index ["parent_id"], name: "index_folders_on_parent_id"
+  end
+
   create_table "invoice_tag_appointments", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
     t.uuid "company_id", null: false
     t.uuid "invoice_id", null: false
@@ -7150,6 +7170,31 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_000002) do
     t.index ["workflow_status"], name: "index_stocks_on_workflow_status"
   end
 
+  create_table "stored_files", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
+    t.uuid "company_id", null: false
+    t.uuid "folder_id", null: false
+    t.string "name", null: false
+    t.bigint "file_size", default: 0
+    t.string "extension"
+    t.string "content_type"
+    t.string "attachable_type"
+    t.uuid "attachable_id"
+    t.integer "lifecycle_status"
+    t.integer "workflow_status"
+    t.integer "business_type"
+    t.datetime "expiration_date"
+    t.jsonb "metadata", default: {}
+    t.datetime "discarded_at"
+    t.string "permission_resource_name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["attachable_type", "attachable_id"], name: "index_stored_files_on_attachable_type_and_attachable_id"
+    t.index ["company_id", "folder_id"], name: "index_stored_files_on_company_id_and_folder_id"
+    t.index ["company_id"], name: "index_stored_files_on_company_id"
+    t.index ["discarded_at"], name: "index_stored_files_on_discarded_at"
+    t.index ["folder_id"], name: "index_stored_files_on_folder_id"
+  end
+
   create_table "subscription_group_subscription_plan_appointments", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
     t.uuid "company_id", null: false
     t.uuid "subscription_group_id", null: false
@@ -8444,6 +8489,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_000002) do
   add_foreign_key "facility_tag_appointments", "companies"
   add_foreign_key "facility_tag_appointments", "facilities"
   add_foreign_key "facility_tag_appointments", "tags"
+  add_foreign_key "folders", "companies"
   add_foreign_key "invoice_tag_appointments", "companies"
   add_foreign_key "invoice_tag_appointments", "invoices"
   add_foreign_key "invoice_tag_appointments", "tags"
@@ -8672,6 +8718,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_000002) do
   add_foreign_key "stocks", "products"
   add_foreign_key "stocks", "property_mappings"
   add_foreign_key "stocks", "warehouses"
+  add_foreign_key "stored_files", "companies"
+  add_foreign_key "stored_files", "folders"
   add_foreign_key "subscription_group_subscription_plan_appointments", "companies"
   add_foreign_key "subscription_group_subscription_plan_appointments", "subscription_groups"
   add_foreign_key "subscription_group_subscription_plan_appointments", "subscription_plans"
