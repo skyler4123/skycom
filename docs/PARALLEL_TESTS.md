@@ -57,9 +57,9 @@ When `bundle exec parallel_rspec -n 14` fails with `PendingMigrationError`,
 do a full reset — drop everything, then recreate from the current schema:
 
 ```bash
-RAILS_ENV=test bundle exec rake "parallel:drop[14]"
-RAILS_ENV=test bundle exec rake "parallel:create[14]"
-RAILS_ENV=test bundle exec rake "parallel:load_schema[14]"
+RAILS_ENV=test bundle exec rake "parallel:drop"
+RAILS_ENV=test bundle exec rake "parallel:create"
+RAILS_ENV=test bundle exec rake "parallel:load_schema"
 ```
 
 `load_schema` is the default (fast, deterministic from `db/schema.rb`). When
@@ -67,7 +67,7 @@ verifying the migration itself replays cleanly, use `migrate` instead of the
 last line:
 
 ```bash
-RAILS_ENV=test bundle exec rake "parallel:migrate[14]"
+RAILS_ENV=test bundle exec rake "parallel:migrate"
 ```
 
 Always keep the `RAILS_ENV=test` prefix and `[14]` (14 workers, matches
