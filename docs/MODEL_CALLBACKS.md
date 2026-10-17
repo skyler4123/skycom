@@ -289,6 +289,24 @@ now matches a stock by `company_id + warehouse_id + product_id` only.
 
 ---
 
+### Folder (`app/models/folder.rb`)
+
+| Callback | Line | Method | Description |
+|----------|------|--------|-------------|
+| `belongs_to :company, touch: true` | — | ActiveRecord `touch` | Touches the parent `Company` on create, update, and destroy. Invalidates the client cache. |
+| `before_destroy :prevent_destroy_if_not_empty` | — | `prevent_destroy_if_not_empty` | Blocks destroy when `children` or `stored_files` exist. Adds base error and `throw(:abort)` — non-empty folders must be emptied first so metering stays honest (docs/STORAGE.md). |
+
+---
+
+### StoredFile (`app/models/stored_file.rb`)
+
+| Callback | Line | Method | Description |
+|----------|------|--------|-------------|
+| `belongs_to :company, touch: true` | — | ActiveRecord `touch` | Touches the parent `Company` on create, update, and destroy. Invalidates the client cache. |
+| `before_save :sync_file_metadata` | — | `sync_file_metadata` | Copies `file.blob` audit columns (`file_size`, `content_type`, `extension` from filename) so billing can sum without touching blobs. Fills `name` from blob filename when blank. |
+
+---
+
 ### TableConfig (`app/models/table_config.rb`)
 
 | Callback | Line | Method | Description |
