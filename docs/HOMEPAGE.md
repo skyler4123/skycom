@@ -69,7 +69,7 @@ Rules:
 
 Header nav links: Solutions → `#solutions`, Pricing → `#pricing`,
 Docs → `#platform`. Sections carrying anchors use `scroll-mt-*` for the
-fixed header offset.
+sticky header offset.
 
 ---
 
@@ -183,11 +183,12 @@ the admin link); members of existing companies (`company_employee` /
 `company_customer`) keep only Go to Dashboard. The endpoint enforces the
 same rule via `User#can_create_company?` (§6).
 
-The layout's shared flash bar (`#notice` / `#alert`) is a fixed top overlay
-(`top-0`, `z-[60]` — above every page header, which tops out at `z-50`), so
-a flash is always pinned to the very top of the viewport — including over
-the homepage's fixed header, which would otherwise paint straight over an
-in-flow bar.
+The layout's shared flash bar (`#notice` / `#alert`) renders in normal flow
+at the top of `<body>`, so it pushes the page down instead of overlaying it.
+The homepage header is `sticky top-0` — it starts below the flash and pins
+to the viewport top once the flash scrolls away — and its wrapper uses
+`overflow-x-clip` (`overflow-x-hidden` would make the wrapper a scroll
+container and break `position: sticky`).
 
 ---
 
@@ -195,7 +196,7 @@ in-flow bar.
 
 | Spec | Coverage |
 |------|----------|
-| `spec/features/homepage_spec.rb` | Static header links + `href`s, swap to signed-in header, avatar, sign-out, dashboard nav, company page flows (owner reveal + manager-employee gating; flash pinned to the viewport top), live-tick (Capybara-waited, never `sleep`), tenant switch |
+| `spec/features/homepage_spec.rb` | Static header links + `href`s, swap to signed-in header, avatar, sign-out, dashboard nav, company page flows (owner reveal + manager-employee gating; flash pushes the header down, header stays pinned on scroll), live-tick (Capybara-waited, never `sleep`), tenant switch |
 | `spec/features/authentication_spec.rb` | Signup/signin submit via pages, email prefill, signed-in redirects away |
 | `spec/features/sign_in_flash_spec.rb` / `sign_up_flash_spec.rb` | Success flashes, failure stays on auth page with alert, session persists across reload |
 | `spec/features/global_session_cache_spec.rb` / `omniauth_spec.rb` | Session lifecycle + Google OAuth, starting at `/sign_in` |

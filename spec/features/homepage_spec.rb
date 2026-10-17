@@ -50,6 +50,16 @@ RSpec.feature "Homepage", type: :feature, js: true do
 
       expect(page).to have_selector("#tenant-title", text: "Grand Azalea Hotel")
     end
+
+    it "keeps the header pinned to the top when scrolling" do
+      visit root_path
+      expect(page).to have_selector("header", wait: 10)
+
+      page.execute_script("window.scrollTo(0, 800)")
+      header_top = page.evaluate_script("document.querySelector('header').getBoundingClientRect().top")
+
+      expect(header_top).to be_within(1).of(0)
+    end
   end
 
   describe "Signed in user" do
@@ -182,26 +192,24 @@ RSpec.feature "Homepage", type: :feature, js: true do
       expect(page).to have_no_link("New Company")
     end
 
-    it "bounces a direct visit and shows the alert at the very top" do
+    it "bounces a direct visit and shows the alert above the header, pushing it down" do
       visit new_company_path
 
       expect(page).to have_current_path(root_path, wait: 10)
       expect(page).to have_selector("#alert", text: "You are not authorized to perform this action.", wait: 10)
 
-      # The flash bar is a fixed top overlay: pinned to the viewport top (y = 0)
-      # and painting above the homepage's fixed header.
-      alert_top = page.evaluate_script("document.querySelector('#alert').getBoundingClientRect().top")
-      expect(alert_top).to be <= 1
-
-      topmost = page.evaluate_script(<<~JS)
+      # The flash bar sits at the very top in normal flow and pushes the header
+      # (and page) down — it must not overlay other elements.
+      rects = page.evaluate_script(<<~JS)
         (() => {
-          const el = document.querySelector('#alert')
-          const rect = el.getBoundingClientRect()
-          const hit = document.elementFromPoint(rect.left + rect.width / 2, rect.top + rect.height / 2)
-          return !!hit && !!hit.closest('#alert')
+          const alert = document.querySelector('#alert').getBoundingClientRect()
+          const header = document.querySelector('header').getBoundingClientRect()
+          return { alertTop: alert.top, alertBottom: alert.bottom, headerTop: header.top }
         })()
       JS
-      expect(topmost).to be(true)
+
+      expect(rects["alertTop"]).to be <= 1
+      expect(rects["alertBottom"]).to be <= (rects["headerTop"] + 1)
     end
   end
 

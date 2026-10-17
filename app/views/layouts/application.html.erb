@@ -48,7 +48,7 @@
       data-websocket-token-value="<%= WEBSOCKET.token(sub: current_user.id.to_s, channels: @channels) %>"
     <% end %>
   >
-    <div class="fixed inset-x-0 top-0 z-[60] flex justify-center items-center">
+    <div class="w-full flex justify-center items-center">
       <% if notice.present? %>
         <p class="w-full text-center py-2 px-3 bg-green-50 text-green-500 font-medium rounded-md inline-block" id="notice"><%= notice %></p>
       <% end %>
