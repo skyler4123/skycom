@@ -30,6 +30,21 @@ class StoredFile < ApplicationRecord
     Rails.application.routes.url_helpers.rails_blob_path(file, only_path: true, disposition: "attachment")
   end
 
+  # Coarse upload category for a MIME type. Single source of truth for both
+  # #max_size_for and Storage::StatisticsService (stats buckets).
+  def self.file_category(content_type)
+    ct = content_type.to_s
+    return :image if ct.start_with?("image/")
+    return :pdf if ct == "application/pdf"
+    return :text if %w[text/plain text/csv].include?(ct)
+    return :archive if %w[
+      application/zip application/x-zip-compressed
+      application/x-rar-compressed application/vnd.rar
+    ].include?(ct)
+
+    :office
+  end
+
   private
 
   def folder_same_company
@@ -67,14 +82,7 @@ class StoredFile < ApplicationRecord
   end
 
   def max_size_for(content_type)
-    case content_type
-    when /\Aimage\// then STORED_FILE_MAX_SIZES_BY_TYPE[:image]
-    when "application/pdf" then STORED_FILE_MAX_SIZES_BY_TYPE[:pdf]
-    when "text/plain", "text/csv" then STORED_FILE_MAX_SIZES_BY_TYPE[:text]
-    when "application/zip", "application/x-zip-compressed",
-      "application/x-rar-compressed", "application/vnd.rar" then STORED_FILE_MAX_SIZES_BY_TYPE[:archive]
-    else STORED_FILE_MAX_SIZES_BY_TYPE[:office]
-    end
+    STORED_FILE_MAX_SIZES_BY_TYPE[self.class.file_category(content_type)]
   end
 
   def sync_file_metadata
