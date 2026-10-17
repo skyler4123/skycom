@@ -9,6 +9,8 @@ export default class Companies_Folders_ShowController extends Companies_LayoutCo
   // Endpoints: GET <pathname>.json, DELETE <pathname>.json, POST /stored_files
   // Docs: docs/STORAGE.md
 
+  static targets = ["fileInput"]
+
   /** @type {Folder | null} */ folder = null
   /** @type {Folder[]} */ subfolders = []
   /** @type {StoredFile[]} */ files = []
@@ -43,14 +45,19 @@ export default class Companies_Folders_ShowController extends Companies_LayoutCo
     openModal({ html: `<div data-controller="${identifier(Companies_Folders_NewModalController)}"></div>` })
   }
 
-  async handleUpload(event) {
-    event.preventDefault()
+  browse(event) {
+    // Programmatic input.click() bubbles back to the zone handler — ignore it.
+    if (!this.hasFileInputTarget || event.target === this.fileInputTarget) return
+    this.fileInputTarget.click()
+  }
+
+  async handleUpload() {
     if (!this.folder) {
       toast({ type: "error", message: translate("Select a folder before uploading") })
       return
     }
-    const input = event.target.querySelector('input[type="file"]')
-    if (!input?.files || input.files.length === 0) return
+    const input = this.fileInputTarget
+    if (!input.files || input.files.length === 0) return
     let uploaded = 0
 
     for (const file of input.files) {
@@ -69,6 +76,7 @@ export default class Companies_Folders_ShowController extends Companies_LayoutCo
         toast({ type: "error", message: error.errors?.join(", ") || translate("Failed to upload file") })
       }
     }
+    input.value = "" // allow re-picking the same file after a failure
     if (uploaded > 0) reloadThenToast({ type: "success", message: translate("Upload Files") })
   }
 
@@ -130,13 +138,16 @@ export default class Companies_Folders_ShowController extends Companies_LayoutCo
 
           ${this.breadcrumbHTML()}
 
-          <form data-action="submit->${this.identifier}#handleUpload" class="mb-6 border-2 border-dashed border-slate-200 dark:border-slate-700 rounded-xl p-6 text-center">
-            <input type="file" name="file" multiple class="block w-full text-sm text-slate-500 mb-3" />
-            <button type="submit" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-medium cursor-pointer">
+          <div data-action="click->${this.identifier}#browse"
+            class="mb-6 border-2 border-dashed border-slate-200 dark:border-slate-700 rounded-xl p-6 text-center cursor-pointer">
+            <input type="file" name="file" multiple class="sr-only"
+              data-${this.identifier}-target="fileInput"
+              data-action="change->${this.identifier}#handleUpload" />
+            <button type="button" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-medium cursor-pointer">
               ${translate("Upload Files")}
             </button>
             <p class="mt-2 text-xs text-slate-400">${translate("Drop files here or click to upload")}</p>
-          </form>
+          </div>
 
           <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
             ${this.subfolders.map((sf) => `
