@@ -53,8 +53,10 @@ Controllers (Shell-First, `errors` plural):
   `dictionary.js`, paths in `url_helpers.js`, JSDoc in `types.js`.
 - `Companies_Folders_IndexController` — roots grid (navigation only) + New Folder modal.
 - `Companies_Folders_ShowController` — folder detail, breadcrumb, children/files
-  browser, upload zone, and the single guarded Delete button (`confirm()`;
-  success redirects to parent/roots, blocked delete toasts and stays).
+  browser, click-to-upload zone (clicking the zone or the Upload Files button
+  opens the file picker; picked files upload immediately), and the single
+  guarded Delete button (`confirm()`; success redirects to parent/roots,
+  blocked delete toasts and stays).
 - `Companies_StoredFiles_ShowController` — file metadata, Download link, and
   the single guarded Delete button (`confirm()`, redirects to parent folder).
 - `Companies_Folders_NewModalController` — `form()` + `handleSubmit` →

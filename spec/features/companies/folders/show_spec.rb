@@ -52,12 +52,30 @@ RSpec.feature "Companies::Folders Show", type: :feature, js: true do
     expect(page).to have_content(parent.name, wait: 10)
 
     attach_file "file", Rails.root.join("faker/files/Untitled document.txt")
-    click_button "Upload Files"
 
     expect(page).to have_content("Untitled document.txt", wait: 10)
     created = StoredFile.find_by(folder: parent, name: "Untitled document.txt")
     expect(created).to be_present
     expect(created.file_size).to be > 0
+  end
+
+  scenario "Upload Files button opens the file picker" do
+    parent = Folder.create!(company: company, name: "Picker-#{SecureRandom.hex(3)}")
+
+    visit company_folder_path(company, parent)
+    expect(page).to have_selector('input[type="file"]', wait: 10)
+
+    page.execute_script(<<~JS)
+      window.__storagePickerOpened = false
+      const zone = document.querySelector('[data-action*="companies--folders--show#browse"]')
+      zone.querySelector('input[type="file"]').addEventListener("click", () => {
+        window.__storagePickerOpened = true
+      })
+    JS
+
+    click_button "Upload Files"
+
+    expect(page.evaluate_script("window.__storagePickerOpened")).to be true
   end
 
   scenario "deletes an empty folder and returns to the index" do
@@ -126,7 +144,6 @@ RSpec.feature "Companies::Folders Show", type: :feature, js: true do
 
     expect {
       attach_file "file", txt_path
-      click_button "Upload Files"
       expect(page).to have_content("too big", wait: 10)
       expect(page).to have_content(parent.name)
     }.not_to change(StoredFile, :count)
@@ -149,7 +166,6 @@ RSpec.feature "Companies::Folders Show", type: :feature, js: true do
 
     expect {
       attach_file "file", sh_bin
-      click_button "Upload Files"
       expect(page).to have_content("is not allowed", wait: 10)
       expect(page).to have_content(parent.name)
     }.not_to change(StoredFile, :count)
