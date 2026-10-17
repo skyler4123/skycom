@@ -63,7 +63,7 @@ RSpec.feature "Homepage", type: :feature, js: true do
       visit root_path
 
       expect(page).to have_link("Go to Dashboard")
-      expect(page).to have_link("New Company")
+      expect(page).to have_link("New Company", wait: 10)
     end
 
     it "swaps to the signed-in header from the session cookie" do
@@ -102,6 +102,7 @@ RSpec.feature "Homepage", type: :feature, js: true do
     it "clicking New Company goes to the new company page" do
       visit root_path
 
+      expect(page).to have_link("New Company", wait: 10)
       click_link "New Company"
 
       expect(page).to have_current_path(new_company_path, wait: 10)
@@ -161,6 +162,46 @@ RSpec.feature "Homepage", type: :feature, js: true do
 
       expect(page).to have_link("Go to Dashboard")
       expect(page).to have_selector("#header-admin-link.hidden", visible: :hidden)
+    end
+  end
+
+  describe "Signed in manager employee" do
+    let(:owner_user) { create(:user, :company_owner) }
+    let!(:company) { create(:company, user: owner_user) }
+    let(:manager_user) { create(:user) }
+    let!(:employee) { create(:employee, company: company, user: manager_user) }
+
+    before do
+      sign_in(manager_user)
+    end
+
+    it "keeps Go to Dashboard but never shows New Company" do
+      visit root_path
+
+      expect(page).to have_link("Go to Dashboard", wait: 10)
+      expect(page).to have_no_link("New Company")
+    end
+
+    it "bounces a direct visit and shows the alert at the very top" do
+      visit new_company_path
+
+      expect(page).to have_current_path(root_path, wait: 10)
+      expect(page).to have_selector("#alert", text: "You are not authorized to perform this action.", wait: 10)
+
+      # The flash bar is a fixed top overlay: pinned to the viewport top (y = 0)
+      # and painting above the homepage's fixed header.
+      alert_top = page.evaluate_script("document.querySelector('#alert').getBoundingClientRect().top")
+      expect(alert_top).to be <= 1
+
+      topmost = page.evaluate_script(<<~JS)
+        (() => {
+          const el = document.querySelector('#alert')
+          const rect = el.getBoundingClientRect()
+          const hit = document.elementFromPoint(rect.left + rect.width / 2, rect.top + rect.height / 2)
+          return !!hit && !!hit.closest('#alert')
+        })()
+      JS
+      expect(topmost).to be(true)
     end
   end
 

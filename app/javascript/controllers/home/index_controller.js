@@ -42,16 +42,20 @@ export default class Home_IndexController extends Controller {
       signedin.classList.remove("hidden")
       signedin.classList.add("flex")
     }
-    this.revealAdminLink()
+    this.syncRoleLinks()
   }
 
   // Role needs the client cache, which arrives after connect — poll for it.
-  // Admins see only Admin Dashboard; Go to Dashboard + New Company are
-  // owner flows and stay visible for non-admins (shipped visible in ERB).
-  revealAdminLink() {
+  // Admins see only Admin Dashboard. New Company is a master-account (owner)
+  // flow (User#can_create_company?): revealed for company owners and accounts
+  // that belong to no company yet (fresh signups creating their first
+  // business); members of existing companies only ever see Go to Dashboard.
+  // The link ships hidden in the ERB, like the admin link.
+  syncRoleLinks() {
     poll(() => {
-      const role = currentUser()?.system_role
-      if (!role) return false
+      const user = currentUser()
+      if (!user) return false
+      const role = user.system_role
       if (role === "super_admin" || role === "admin") {
         const adminLink = this.element.querySelector("#header-admin-link")
         if (adminLink) {
@@ -64,6 +68,12 @@ export default class Home_IndexController extends Controller {
             el.classList.add("hidden")
             el.classList.remove("inline-flex")
           }
+        }
+      } else if (role === "company_owner" || currentCompanies().length === 0) {
+        const newCompanyLink = this.element.querySelector("#header-new-company-link")
+        if (newCompanyLink) {
+          newCompanyLink.classList.remove("hidden")
+          newCompanyLink.classList.add("inline-flex")
         }
       }
       return true

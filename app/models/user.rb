@@ -110,5 +110,17 @@ class User < ApplicationRecord
       {}
     end
   end
+
+  # New Company is a master-account (owner) flow: company owners can always
+  # create more companies, and accounts that do not belong to any company yet
+  # create their first one (fresh signups — including Google, which start as
+  # :company_employee). Platform admins use the admin dashboard, and members of
+  # existing companies (company_employee / company_customer) must not — company
+  # creation promotes the creator to :company_owner (Company#initialize_company).
+  def can_create_company?
+    return false if system_role_admin? || system_role_super_admin?
+
+    system_role_company_owner? || accessible_companies.empty?
+  end
   # ----------------------------------------------------------------------------------------------------
 end
