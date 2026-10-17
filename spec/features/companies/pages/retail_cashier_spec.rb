@@ -209,8 +209,12 @@ property_mapping: cat.default_property_mapping).tap { |s| s.send(:sync_available
     expect(Transaction.last.reload.status).to eq("completed")
     expect(Order.last.reload.workflow_status).to eq("paid")
 
+    # Simulated Centrifugo push — the channel argument must match the subscription
+    # key registered by subscribePaymentCompleted() ("company_<id>", channelName contract).
     page.execute_script(
-      "window.WEBSOCKET.handleIncomingPublication(window.location.pathname.split('/')[2], { event: 'pos_payment_completed', id: 'sim', payload: { transaction_token: arguments[0] } })",
+      "window.WEBSOCKET.handleIncomingPublication(" \
+      "window.WEBSOCKET.channelName('company', window.location.pathname.split('/')[2]), " \
+      "{ event: 'pos_payment_completed', id: 'sim', payload: { transaction_token: arguments[0] } })",
       token
     )
 

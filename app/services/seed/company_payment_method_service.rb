@@ -14,7 +14,6 @@ class Seed::CompanyPaymentMethodService
   ALL_RECORDS = (RECORDS + (Rails.env.production? ? [] : MOCK_RECORDS)).freeze
 
   def self.create
-
     ALL_RECORDS.each do |attrs|
       CompanyPaymentMethod.find_or_create_by!(code: attrs[:code]) do |bpm|
         bpm.name = attrs[:name]
@@ -25,6 +24,5 @@ class Seed::CompanyPaymentMethodService
         bpm.lifecycle_status = attrs[:lifecycle_status] || :draft
       end
     end
-
   end
 end

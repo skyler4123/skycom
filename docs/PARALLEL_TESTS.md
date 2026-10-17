@@ -127,7 +127,6 @@ parallel-only failure is OK.
 
 | File | Verify with |
 |------|-------------|
-| `spec/features/companies/pages/retail_cashier_spec.rb` | `bundle exec rspec spec/features/companies/pages/retail_cashier_spec.rb` |
 | `spec/features/companies/company_tickets/websocket_spec.rb` | `bundle exec rspec spec/features/companies/company_tickets/websocket_spec.rb` |
 
 Rules for allowlist files:
@@ -141,7 +140,7 @@ Rules for allowlist files:
   cause (websocket timing / multi-worker resource contention). Report the
   parallel failure as known, note the single-process pass, and move on.
 - When running the full suite with `parallel_rspec`, a failure limited to
-  these two files is OK to set aside after the single-process check passes.
+  an allowlisted file is OK to set aside after the single-process check passes.
 
 ---
 

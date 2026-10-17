@@ -114,6 +114,7 @@ Rails.application.routes.draw do
           get :download
         end
       end
+      get "storage_statistics", to: "storage_statistics#index"
       resources :announcements
       resources :discounts
       resources :company_tickets do
