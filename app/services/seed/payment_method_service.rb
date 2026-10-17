@@ -46,7 +46,6 @@ class Seed::PaymentMethodService
   end
 
   def self.create(company: nil)
-
     COUNTRY_CODES.keys.each do |country_code|
       ALL_PAYMENT_METHODS.each do |attrs|
         suffix = country_code.to_s.upcase
@@ -63,6 +62,5 @@ class Seed::PaymentMethodService
         end
       end
     end
-
   end
 end
