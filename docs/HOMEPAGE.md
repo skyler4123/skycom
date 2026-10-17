@@ -69,7 +69,7 @@ Rules:
 
 Header nav links: Solutions → `#solutions`, Pricing → `#pricing`,
 Docs → `#platform`. Sections carrying anchors use `scroll-mt-*` for the
-fixed header offset.
+sticky header offset.
 
 ---
 
@@ -117,7 +117,11 @@ whole: `companies/new_modal_controller.js` **deleted**,
 `companies/new_controller.js` (`Companies_NewController`) renders the same
 form as a centered page card (same fields, same `translate()` keys, same
 `POST /companies` endpoint and redirects; Cancel is a back-to-`/` link).
-Homepage "New Company" is a plain `<a href="/companies/new">`.
+Homepage "New Company" is a plain `<a href="/companies/new">`, shipped
+`hidden` and revealed client-side only for accounts allowed to create
+companies (`User#can_create_company?` — §9); `CompaniesController#new` /
+`#create` enforce the same rule server-side (members of existing companies
+are redirected back with an alert).
 
 > After deleting any Stimulus controller file, run `bin/rails assets:clobber`
 > **then** `bin/rails tailwindcss:build` — clobber wipes the Tailwind build
@@ -170,10 +174,21 @@ containing Go to Dashboard (`#header-dashboard-link`), New Company
 `Helpers.isSignedIn()` cookie — if set, it hides guest and shows signed-in.
 No waiting on the client cache (an earlier version gated on `currentUser()`
 arrival and flaked on sync timing); the avatar helper renders a placeholder
-until the cache arrives, matching every other page. `revealAdminLink()`
-polls `currentUser()?.system_role`: `admin` / `super_admin` reveals the
-admin link and hides dashboard + new-company links (owner flows);
-non-admins keep dashboard + new-company and never see the admin link.
+until the cache arrives, matching every other page. `syncRoleLinks()`
+polls `currentUser()` once the cache arrives: `admin` / `super_admin`
+reveals the admin link and hides dashboard + new-company; `company_owner` —
+or any account that belongs to no company yet (`currentCompanies()` empty,
+e.g. fresh signups) — reveals New Company (shipped `hidden` in the ERB, like
+the admin link); members of existing companies (`company_employee` /
+`company_customer`) keep only Go to Dashboard. The endpoint enforces the
+same rule via `User#can_create_company?` (§6).
+
+The layout's shared flash bar (`#notice` / `#alert`) renders in normal flow
+at the top of `<body>`, so it pushes the page down instead of overlaying it.
+The homepage header is `sticky top-0` — it starts below the flash and pins
+to the viewport top once the flash scrolls away — and its wrapper uses
+`overflow-x-clip` (`overflow-x-hidden` would make the wrapper a scroll
+container and break `position: sticky`).
 
 ---
 
@@ -181,14 +196,14 @@ non-admins keep dashboard + new-company and never see the admin link.
 
 | Spec | Coverage |
 |------|----------|
-| `spec/features/homepage_spec.rb` | Static header links + `href`s, swap to signed-in header, avatar, sign-out, dashboard nav, company page flows, live-tick (Capybara-waited, never `sleep`), tenant switch |
+| `spec/features/homepage_spec.rb` | Static header links + `href`s, swap to signed-in header, avatar, sign-out, dashboard nav, company page flows (owner reveal + manager-employee gating; flash pushes the header down, header stays pinned on scroll), live-tick (Capybara-waited, never `sleep`), tenant switch |
 | `spec/features/authentication_spec.rb` | Signup/signin submit via pages, email prefill, signed-in redirects away |
 | `spec/features/sign_in_flash_spec.rb` / `sign_up_flash_spec.rb` | Success flashes, failure stays on auth page with alert, session persists across reload |
 | `spec/features/global_session_cache_spec.rb` / `omniauth_spec.rb` | Session lifecycle + Google OAuth, starting at `/sign_in` |
 | `spec/requests/home_spec.rb` | `private` + `max-age=3600` + `Vary: Cookie` on clean GET, static-markup anchors, non-cacheable flash response (POSTs use the forgery-disable wrapper — CSRF is on in test env) |
-| `spec/requests/companies_controller_spec.rb` | `GET /companies/new` 200 shell when signed in, redirect for guests |
+| `spec/requests/companies_controller_spec.rb` | `GET /companies/new` shell for owners/new accounts, redirect + JSON 403 for company members, redirect for guests; `POST /companies` guard blocks members (no self-promotion) |
 
-House patterns this page depends on: `bundle exec parallel_rspec -n 10`
+House patterns this page depends on: `bundle exec parallel_rspec -n 14`
 (never bare `rspec` for verification), navigation-before-content assertions
 (`FLAKY_TESTS.md` §8), `assets:clobber` → `tailwindcss:build` after
 controller deletion (§6).
@@ -201,14 +216,14 @@ controller deletion (§6).
 |------|---------|
 | `app/controllers/home_controller.rb` | `index` — static render + cache headers + flash guard |
 | `app/views/home/index.html.erb` | Entire page: head tags, dual header, all 11 sections, footer |
-| `app/javascript/controllers/home/index_controller.js` | Header swap, ApexCharts chart, 2s ticker, tenant switch |
+| `app/javascript/controllers/home/index_controller.js` | Header swap, role-gated header links, ApexCharts chart, 2s ticker, tenant switch |
 | `app/javascript/controllers/home/header/authentication_controller.js` | Avatar-only slot inside `#header-signedin` |
 | `app/javascript/controllers/sessions/new_controller.js` | Sign-in page form |
 | `app/javascript/controllers/registrations/new_controller.js` | Sign-up page form (+ `?email=` prefill) |
 | `app/javascript/controllers/companies/new_controller.js` | Company creation page form |
 | `app/controllers/sessions_controller.rb` | `new` shell + `create` (failures → `sign_in_path`) |
 | `app/controllers/registrations_controller.rb` | `new` shell + `create` (failures → `sign_up_path`) |
-| `app/controllers/companies_controller.rb` | `new` shell + `create` (unchanged endpoints) |
+| `app/controllers/companies_controller.rb` | `new` shell + `create` (owner/master-account guarded via `User#can_create_company?`) |
 | `app/controllers/concerns/sessions_controller/omniauth_concern.rb` | Auth filter — `new` must stay skipped |
 | `config/routes.rb` | `GET /sign_in`, `GET /sign_up` (helpers shared with POSTs) |
 | `config/importmap.rb` | `apexcharts` pin (@5.3.6); controllers auto-registered via `pin_all_from` |

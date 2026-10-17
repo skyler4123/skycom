@@ -145,7 +145,7 @@ planning rows only, no holds, no orders.
 | `spec/requests/companies/{events,calendars}_controller_spec.rb` | search contract, JSON create/update + warnings, board range + scoping |
 | `spec/features/companies/{events,event_configs,calendars}/*_spec.rb` | index/new/show/edit E2E, config CRUD, board views + click-to-create modal |
 
-Run: `bundle exec parallel_rspec -n 10 spec/models/event* spec/services/events \
+Run: `bundle exec parallel_rspec -n 14 spec/models/event* spec/services/events \
 spec/services/seed/retail_init_event_spec.rb spec/requests/companies/events_controller_spec.rb \
 spec/requests/companies/calendars_controller_spec.rb spec/features/companies/events \
 spec/features/companies/event_configs spec/features/companies/calendars`

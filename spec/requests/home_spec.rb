@@ -36,6 +36,13 @@ RSpec.describe "Homepage caching and auth pages", type: :request do
       expect(response.body).to include("/admin/companies")
     end
 
+    it "ships the New Company link hidden (revealed client-side for owners)" do
+      get root_path
+
+      expect(response.body).to include('id="header-new-company-link"')
+      expect(response.body).to match(/class="hidden [^"]*"\s+href="\/companies\/new"/)
+    end
+
     it "is not cacheable when a flash is present" do
       post sign_in_path, params: { email: "nobody@example.com", password: "wrong" }
       follow_redirect!

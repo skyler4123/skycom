@@ -1,9 +1,11 @@
 class CompaniesController < ApplicationController
   # Serves Stimulus: companies--new (company creation page renders its form client-side),
   #   companies--show, companies--edit (Company pages under Settings group render client-side)
-  # Endpoints: GET /companies/new (new) — Shell-First shell; POST /companies (create);
-  #   GET /companies/:id (show) + GET /companies/:id/edit (edit) + PATCH /companies/:id (update) — Owner-only
+  # Endpoints: GET /companies/new (new) — Shell-First shell; POST /companies (create) — master-account
+  #   (User#can_create_company?) only; GET /companies/:id (show) + GET /companies/:id/edit (edit) +
+  #   PATCH /companies/:id (update) — company owner only
   before_action :authorize_company_owner!, only: %i[show edit update]
+  before_action :authorize_company_creator!, only: %i[new create]
 
   def new
     respond_to do |format|
@@ -63,6 +65,21 @@ class CompaniesController < ApplicationController
     @company = Company.find(params[:id])
     employee = Employee.cached_where(user: current_user, company: @company).first
     return if employee&.owner_role?
+
+    respond_to do |format|
+      format.html do
+        flash[:alert] = "You are not authorized to perform this action."
+        redirect_to(request.referrer || root_path)
+      end
+      format.json do
+        render json: { errors: [ "You are not authorized to perform this action." ] }, status: :forbidden
+      end
+    end
+  end
+
+  # New Company is a master-account (owner) flow — see User#can_create_company?.
+  def authorize_company_creator!
+    return if current_user.can_create_company?
 
     respond_to do |format|
       format.html do
