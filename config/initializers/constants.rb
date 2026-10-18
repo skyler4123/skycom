@@ -241,6 +241,33 @@ STORED_FILE_MAX_SIZES_BY_TYPE = {
 }.freeze
 
 # =============================================================================
+# Data Import (CompanyMigration) — config-driven CSV ingestion
+# =============================================================================
+
+# Max bytes per uploaded CSV chunk. Must stay under
+# STORED_FILE_MAX_SIZES_BY_TYPE[:text] (5MB) so each chunk is a valid StoredFile.
+MIGRATION_CHUNK_MAX_BYTES = 4.megabytes
+
+# Data rows shown in the raw preview and validated by a dry run.
+MIGRATION_PREVIEW_ROW_LIMIT = 10
+
+# Rows persisted per batch during import/rollback.
+MIGRATION_IMPORT_BATCH_SIZE = 500
+
+# Per-run cap on stored error samples (details page).
+MIGRATION_ERROR_SAMPLES_LIMIT = 20
+
+# System notification tag owner notifications for a migration carry.
+MIGRATION_NOTIFICATION_TAG = "Data Import"
+
+# Models a config may never target (permission/auth machinery).
+MIGRATION_IMPORT_EXCLUDED_RESOURCES = %w[
+  Role Policy PermissionLog PolicyRoleAppointment RoleTagAppointment
+  CustomerRoleAppointment CustomerGroupRoleAppointment DepartmentRoleAppointment
+  EmployeeRoleAppointment EmployeeGroupRoleAppointment User Session
+].freeze
+
+# =============================================================================
 # Company Settings (company-level config incl. custom sidebar groups)
 # One CompanySetting per company per business_type is active at a time
 # (see CompanySetting). The active sidebar_groups record holds all custom

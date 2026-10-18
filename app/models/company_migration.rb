@@ -24,6 +24,13 @@ class CompanyMigration < ApplicationRecord
   # --- Validations ---
   validates :name, presence: true, length: { maximum: 255 }
 
+  # Parsed view of migration_mapping_config — the document that tells the
+  # import engine what to write and where. Memoized per instance; reload (or
+  # a fresh find) after saving a new config.
+  def config
+    @config ||= CompanyMigrations::Config.new(migration_mapping_config)
+  end
+
   # Chunks in playback order (upload order is the source of truth for the import).
   def ordered_chunks
     stored_files.to_a.sort_by { |chunk| chunk.chunk_index.to_i }

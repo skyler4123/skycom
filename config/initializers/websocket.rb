@@ -21,7 +21,9 @@ class WEBSOCKET
     notification_created: "notification_created",
     company_ticket_created: "company_ticket_created",
     company_ticket_commented: "company_ticket_commented",
-    company_ticket_status_changed: "company_ticket_status_changed"
+    company_ticket_status_changed: "company_ticket_status_changed",
+    company_migration_progress: "company_migration_progress",
+    company_migration_finished: "company_migration_finished"
   }.freeze
 
   class << self
