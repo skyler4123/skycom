@@ -158,6 +158,7 @@ class Company < ApplicationRecord
   has_many :documents, dependent: :destroy
   has_many :folders, dependent: :destroy
   has_many :stored_files, dependent: :destroy
+  has_many :company_migrations, dependent: :destroy
   has_many :permission_logs, dependent: :destroy
 
   # --- Scopes ---
