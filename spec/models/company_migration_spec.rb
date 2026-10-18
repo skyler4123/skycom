@@ -77,6 +77,52 @@ RSpec.describe CompanyMigration, type: :model do
     end
   end
 
+  describe "#dry_run_passed_for_current_config?" do
+    it "only counts a pass for the exact config it validated" do
+      migration = create(:company_migration, company: company)
+      migration.update!(migration_mapping_config: customers_migration_config)
+      migration.update!(dry_run_result: { "passed" => true, "config_digest" => migration.config.digest })
+
+      expect(migration.dry_run_passed_for_current_config?).to be(true)
+
+      edited = customers_migration_config
+      edited["targets"][0]["columns"]["Last Name"] = { "target" => "description" }
+      migration.update!(migration_mapping_config: edited)
+
+      expect(migration.dry_run_passed_for_current_config?).to be(false)
+    end
+  end
+
+  describe "#approvable?" do
+    it "requires chunks, a valid config, and a passing dry run" do
+      migration = create(:company_migration, company: company)
+      migration.update!(migration_mapping_config: customers_migration_config)
+      migration.update!(dry_run_result: { "passed" => true, "config_digest" => migration.config.digest })
+
+      expect(migration.approvable?).to be(false)
+
+      migration.update!(total_chunks: 1)
+
+      expect(migration.approvable?).to be(true)
+    end
+  end
+
+  describe "#rollbackable?" do
+    it "is allowed only for the latest completed migration" do
+      earlier = create(:company_migration, company: company, workflow_status: :completed, completed_at: 1.hour.ago)
+      later = create(:company_migration, company: company, workflow_status: :completed, completed_at: 1.minute.ago)
+
+      expect(later.rollbackable?).to be(true)
+      expect(earlier.rollbackable?).to be(false)
+    end
+
+    it "is false unless completed" do
+      migration = create(:company_migration, company: company)
+
+      expect(migration.rollbackable?).to be(false)
+    end
+  end
+
   describe "associations" do
     it "destroys its logs with the migration" do
       migration = create(:company_migration)

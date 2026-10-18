@@ -25,10 +25,28 @@ class CompanyMigration < ApplicationRecord
   validates :name, presence: true, length: { maximum: 255 }
 
   # Parsed view of migration_mapping_config — the document that tells the
-  # import engine what to write and where. Memoized per instance; reload (or
-  # a fresh find) after saving a new config.
+  # import engine what to write and where. Rebuilt per call (a memo would let
+  # a stale digest pass the approve guard right after a config edit).
   def config
-    @config ||= CompanyMigrations::Config.new(migration_mapping_config)
+    CompanyMigrations::Config.new(migration_mapping_config)
+  end
+
+  # A passing dry run only counts for the exact config it validated: any
+  # config edit changes the digest and disables approve again.
+  def dry_run_passed_for_current_config?
+    dry_run_result.is_a?(Hash) && dry_run_result["passed"] == true && dry_run_result["config_digest"] == config.digest
+  end
+
+  # Approve is allowed from draft/failed once at least one chunk is uploaded
+  # and the current config passed its dry run.
+  def approvable?
+    (workflow_status_draft? || workflow_status_failed?) && total_chunks.positive? && config.valid? && dry_run_passed_for_current_config?
+  end
+
+  # Rails-style: only the company's latest completed migration can be rolled
+  # back — a later import may reference (or have modified) its records.
+  def rollbackable?
+    workflow_status_completed? && company.company_migrations.where(workflow_status: :completed).where("completed_at > ?", completed_at).none?
   end
 
   # Chunks in playback order (upload order is the source of truth for the import).
