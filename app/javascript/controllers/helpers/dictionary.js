@@ -1012,6 +1012,8 @@ export const dictionary = () => {
     "The file is empty": { vi: "Tệp trống" },
     "Upload complete": { vi: "Tải lên hoàn tất" },
     "Import updated": { vi: "Lượt nhập đã cập nhật" },
+    "Could not load this import": { vi: "Không tải được lượt nhập này" },
+    "Back to Data Import": { vi: "Quay lại Nhập dữ liệu" },
     "All chunks are already uploaded — re-pick the source file to continue": { vi: "Tất cả các phần đã được tải lên — chọn lại tệp nguồn để tiếp tục" }
   }
 }

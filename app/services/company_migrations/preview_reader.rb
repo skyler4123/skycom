@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require "csv"
+
 # Raw preview of chunk 0 for the show page: BOM-stripped headers plus the
 # first MIGRATION_PREVIEW_ROW_LIMIT data rows, exactly as they appear in the
 # uploaded file.

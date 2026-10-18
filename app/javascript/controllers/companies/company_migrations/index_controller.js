@@ -30,7 +30,7 @@ export default class Companies_CompanyMigrations_IndexController extends Compani
         return true
       }
       return false
-    })
+    }, { maxAttempts: 500 })
   }
 
   openNewModal() {

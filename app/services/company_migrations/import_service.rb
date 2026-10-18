@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require "csv"
+
 # Streams every not-yet-completed chunk through the row mapper + model and
 # persists valid rows with a batched upsert, writing one audit log per
 # created/changed record so RollbackService can revert the run. Chunk-level

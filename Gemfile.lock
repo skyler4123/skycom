@@ -787,6 +787,7 @@ DEPENDENCIES
   brakeman
   capybara
   cent
+  csv
   debug
   discard
   factory_bot_rails

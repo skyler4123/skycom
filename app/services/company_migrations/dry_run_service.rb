@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require "csv"
+
 # No-write rehearsal of an import: runs the first MIGRATION_PREVIEW_ROW_LIMIT
 # data rows of chunk 0 through the real mapper + model (dynamic property
 # validations included) and records the outcome — plus the config digest it

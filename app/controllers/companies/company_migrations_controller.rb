@@ -1,3 +1,7 @@
+# frozen_string_literal: true
+
+require "csv"
+
 # app/controllers/companies/company_migrations_controller.rb
 #
 # Owner-only, config-driven CSV ingestion (Shell-First). One migration holds
@@ -11,7 +15,11 @@
 # Docs: docs/DATA_IMPORT.md
 class Companies::CompanyMigrationsController < Companies::ApplicationController
   rescue_from ActiveRecord::RecordNotFound do
-    render json: { errors: [ "Import not found" ] }, status: :not_found
+    respond_to do |format|
+      # Shell-First: the FE renders the error card from the .json 404.
+      format.html { render html: "", layout: true, status: :not_found }
+      format.json { render json: { errors: [ "Import not found" ] }, status: :not_found }
+    end
   end
 
   def index

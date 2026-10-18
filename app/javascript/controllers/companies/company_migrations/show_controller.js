@@ -13,6 +13,7 @@ export default class Companies_CompanyMigrations_ShowController extends Companie
 
   /** @type {CompanyMigration|null} */ migration = null
   /** @type {Object|null} */ liveProgress = null
+  /** @type {string} */ loadError = ""
   uploadState = { active: false, uploaded: 0, total: 0 }
 
   async connect() {
@@ -23,7 +24,8 @@ export default class Companies_CompanyMigrations_ShowController extends Companie
       const response = await fetchJson(`${pathname()}.json`)
       this.migration = response.company_migration
     } catch (error) {
-      toast({ type: "error", message: `${translate("Failed to load import")}: ${error.errors?.join(", ") || error.message}` })
+      this.loadError = error.errors?.join(", ") || error.message || ""
+      toast({ type: "error", message: `${translate("Failed to load import")}: ${this.loadError}` })
     }
 
     this.subscribeToProgress()
@@ -35,7 +37,7 @@ export default class Companies_CompanyMigrations_ShowController extends Companie
         return true
       }
       return false
-    })
+    }, { maxAttempts: 500 })
   }
 
   subscribeToProgress() {
@@ -420,7 +422,20 @@ export default class Companies_CompanyMigrations_ShowController extends Companie
   }
 
   contentHTML() {
-    if (!this.migration) return `<div class="p-4 flex-1 flex flex-col"></div>`
+    if (!this.migration) {
+      return `
+        <div class="p-4 flex-1 flex flex-col">
+          <div class="p-4 bg-white dark:bg-slate-900 rounded-xl border border-rose-200 dark:border-rose-900/40">
+            <h2 class="text-lg font-bold text-rose-600 dark:text-rose-400">${translate("Could not load this import")}</h2>
+            <p class="mt-1 text-sm text-slate-500">${escapeHtml(this.loadError)}</p>
+            <a href="${Helpers.company_company_migrations_path(currentCompany()?.id)}"
+              class="mt-3 inline-block text-sm text-blue-600 dark:text-blue-400 hover:underline">
+              ${translate("Back to Data Import")}
+            </a>
+          </div>
+        </div>
+      `
+    }
 
     return `
       <div class="p-4 flex-1 flex flex-col">

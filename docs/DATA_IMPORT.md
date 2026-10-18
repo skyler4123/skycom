@@ -147,11 +147,13 @@ Frontend (Shell-First; all strings via `translate()`):
 | `spec/services/company_migrations/notify_owner_service_spec.rb`, `spec/jobs/company_migrations/*` | status transitions, notifications, rescuers |
 | `spec/policies/companies/company_migrations_policy_spec.rb`, `spec/requests/companies/company_migrations_controller_spec.rb` | owner-only policy; every endpoint's success + `errors` failure |
 | `spec/features/companies/company_migrations/{index,show}_spec.rb` | real-browser E2E: modal create, BOM upload, 32 KB chunk split of customers-1000, dry run → approve → completed counters, rollback |
+| `spec/features/companies/company_migrations/full_journey_spec.rb` | the perfect-case journey end-to-end: index → create → upload → preview → config → dry run → approve → import → Customers dashboard → rollback, UI + DB at every step |
+| `spec/smoke/app_requires_spec.rb` | bundled-gem guard: every `app/**/*.rb` that uses `CSV.` must `require "csv"` (the suite preloads csv, so only this catches a dev/prod NameError) |
 
 Run (parallel runner, see `docs/PARALLEL_TESTS.md`):
 
 ```
-bundle exec parallel_rspec -n 14 spec/models/company_migration* spec/services/company_migrations \
+bundle exec parallel_rspec -n 14 spec/smoke spec/models/company_migration* spec/services/company_migrations \
   spec/jobs/company_migrations spec/policies/companies/company_migrations_policy_spec.rb \
   spec/requests/companies/company_migrations_controller_spec.rb spec/features/companies/company_migrations
 ```
