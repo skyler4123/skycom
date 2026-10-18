@@ -17,6 +17,8 @@ class CreateEmployeeProfiles < ActiveRecord::Migration[8.0]
       t.integer :country
       t.integer :timezone
 
+      t.string :external_id, index: true
+
       # --- System Fields ---
       t.integer :lifecycle_status, index: true
       t.integer :workflow_status, index: true
@@ -37,5 +39,6 @@ class CreateEmployeeProfiles < ActiveRecord::Migration[8.0]
     end
 
     add_index :employee_profiles, [ :company_id, :employee_id ]
+    add_index :employee_profiles, [ :employee_id, :name ], unique: true, name: "idx_employee_profiles_on_employee_and_name"
   end
 end

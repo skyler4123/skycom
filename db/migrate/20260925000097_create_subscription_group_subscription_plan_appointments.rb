@@ -11,6 +11,9 @@ class CreateSubscriptionGroupSubscriptionPlanAppointments < ActiveRecord::Migrat
       t.boolean :auto_renew
       t.string :name
       t.string :description
+      # Postgres truncates identifiers over 63 chars; the default index name for this
+      # table is 70 chars, so pin an explicit shorter one.
+      t.string :external_id, index: { name: "index_subscription_group_sub_plan_appts_on_external_id" }
       t.integer :lifecycle_status, index: true
       t.integer :workflow_status, index: true
       t.integer :business_type, index: true

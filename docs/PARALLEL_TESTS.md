@@ -83,6 +83,13 @@ error relating to those files, it is OK to ignore: only `db/schema.rb` +
 `db/migrate/*` matter for the recovery in §3.2. Never hand-edit a secondary
 schema to "fix" a parallel failure.
 
+The three files are **owner read-only by design** — a guard so coding
+agents cannot edit them. Any `EACCES`/permission error naming them during
+a migration or schema task is expected: `db/schema.rb` is dumped first,
+so the message means the primary schema is already done — good news,
+ignore it. Never chmod/chown them. Per-command semantics:
+`docs/MERGE_MIGRATIONS.md` §5.
+
 ## 4. Prerequisites
 
 ```bash
@@ -113,7 +120,7 @@ CI is out of scope: CI stays single-process (`bundle exec rspec` in
 |---------|-------------|
 | `relation does not exist` on worker N | Worker DB not migrated → run the setup lines in §3 |
 | `PendingMigrationError` / schema mismatch after a new migration | Worker DBs drifted → full reset per §3.2 (`drop[14]` → `create[14]` → `load_schema[14]`, or `migrate[14]` to verify the migration replays) |
-| Migration error mentions `queue/cable/cache_schema.rb` | Secondary schemas are gem-owned and off-limits (§3.3) → OK to ignore; only `db/schema.rb` + `db/migrate/*` matter |
+| Migration error mentions `queue/cable/cache_schema.rb` | Expected: those files are owner read-only by design (agent guard) and `db/schema.rb` is dumped before them → the error means the primary schema is done; OK to ignore (§3.3, `MERGE_MIGRATIONS.md` §5) |
 | Bare `parallel_rspec` raises load error | Missing `bundle exec` prefix → always `bundle exec parallel_rspec` |
 | Flaky feature passes alone, fails in suite | Retries only run under parallel — repro must also use `bundle exec parallel_rspec -n 14`, never bare `rspec` (see `docs/FLAKY_TESTS.md`). Exception: §7 allowlist — repro with `bundle exec rspec <file>` instead |
 | Stale Meilisearch hits across workers | Index suffix missing → check `TEST_ENV_NUMBER` is passed through (see `config/initializers/meilisearch.rb`) |

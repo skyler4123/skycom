@@ -21,6 +21,8 @@ class CreateCompanies < ActiveRecord::Migration[8.0]
       t.integer :employee_count
       t.integer :fiscal_year_end_month
 
+      t.string :external_id, index: true
+
       # --- System Fields ---
       t.integer  :lifecycle_status, index: true
       t.integer  :workflow_status, index: true

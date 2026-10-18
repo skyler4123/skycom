@@ -17,6 +17,8 @@ class CreateCustomerProfiles < ActiveRecord::Migration[8.0]
       t.integer :country
       t.integer :timezone
 
+      t.string :external_id, index: true
+
       # --- System Fields ---
       t.integer :lifecycle_status, index: true
       t.integer :workflow_status, index: true
@@ -37,5 +39,6 @@ class CreateCustomerProfiles < ActiveRecord::Migration[8.0]
     end
 
     add_index :customer_profiles, [ :company_id, :customer_id ]
+    add_index :customer_profiles, [ :customer_id, :name ], unique: true, name: "idx_customer_profiles_on_customer_and_name"
   end
 end

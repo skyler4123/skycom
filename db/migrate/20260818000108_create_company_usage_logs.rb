@@ -12,6 +12,7 @@ class CreateCompanyUsageLogs < ActiveRecord::Migration[8.0]
       t.bigint :balance_after, null: false
       t.text :description
 
+      t.string :external_id, index: true
       t.integer :lifecycle_status
       t.integer :workflow_status
       t.integer :business_type

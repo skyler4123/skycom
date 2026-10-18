@@ -16,7 +16,9 @@ class CreatePurchases < ActiveRecord::Migration[8.0]
       t.datetime :needed_by
       t.integer :currency
       t.integer :country
-      t.integer  :timezone
+      t.integer :timezone
+
+      t.string :external_id, index: true
 
       # --- System Fields ---
       t.integer  :lifecycle_status, index: true

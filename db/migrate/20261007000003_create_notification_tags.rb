@@ -6,6 +6,8 @@ class CreateNotificationTags < ActiveRecord::Migration[8.0]
       t.string :name, null: false
       t.text :description
 
+      t.string :external_id, index: true
+
       # --- System Fields ---
       t.integer  :lifecycle_status, index: true
       t.integer  :workflow_status, index: true

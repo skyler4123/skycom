@@ -13,6 +13,8 @@ class CreateStockPendings < ActiveRecord::Migration[8.0]
       t.datetime :status_changed_at
       t.datetime :released_at
 
+      t.string :external_id, index: true
+
       # --- System Fields ---
       t.integer  :lifecycle_status, index: true
       t.integer  :workflow_status, index: true

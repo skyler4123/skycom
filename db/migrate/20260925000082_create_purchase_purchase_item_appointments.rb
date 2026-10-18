@@ -10,6 +10,7 @@ class CreatePurchasePurchaseItemAppointments < ActiveRecord::Migration[8.0]
       t.string :name
       t.string :description
       t.string :code
+      t.string :external_id, index: true
       t.integer :lifecycle_status, index: true
       t.integer :workflow_status, index: true
       t.integer :business_type, index: true

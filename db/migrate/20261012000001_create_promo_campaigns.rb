@@ -3,6 +3,8 @@ class CreatePromoCampaigns < ActiveRecord::Migration[8.0]
     create_table :promo_campaigns, id: :uuid, default: -> { "uuidv7()" } do |t|
       t.string :name, null: false
       t.text :description
+      t.string :title, null: false
+      t.text :body, null: false
       t.bigint :amount, null: false
       t.bigint :max_cap, null: false
       t.jsonb :conditions, default: {}, null: false
@@ -10,6 +12,8 @@ class CreatePromoCampaigns < ActiveRecord::Migration[8.0]
       t.integer :status, default: 0, null: false
       t.datetime :processed_at
       t.jsonb :stats, default: {}, null: false
+
+      t.string :external_id, index: true
 
       # --- System Fields ---
       t.integer  :lifecycle_status, index: true

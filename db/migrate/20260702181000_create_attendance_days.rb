@@ -23,6 +23,7 @@ class CreateAttendanceDays < ActiveRecord::Migration[8.0]
       t.uuid :edited_by_id
       t.datetime :edited_at
 
+      t.string :external_id, index: true
       t.integer :lifecycle_status
       t.integer :workflow_status
       t.integer :business_type

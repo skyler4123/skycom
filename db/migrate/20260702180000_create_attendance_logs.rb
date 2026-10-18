@@ -12,6 +12,7 @@ class CreateAttendanceLogs < ActiveRecord::Migration[8.0]
       t.string :device_fingerprint
       t.string :photo_url
 
+      t.string :external_id, index: true
       t.integer :lifecycle_status
       t.integer :workflow_status
       t.integer :business_type

@@ -12,7 +12,7 @@ A **merge migration** is *not* a Rails feature. It is a manual housekeeping comm
 2. **Deletes** the now-redundant incremental migration file(s).
 3. **Rewinds** `db/schema.rb`'s `define(version:)` to the newest *surviving* migration timestamp.
 
-Result: the table's full definition lives in **one place**, not scattered across `create_*` + several `add_*` patches. `db/migrate` stays lean (currently 120 files) and readable.
+Result: the table's full definition lives in **one place**, not scattered across `create_*` + several `add_*` patches. `db/migrate` stays lean (currently 204 files) and readable.
 
 | Before merge | After merge |
 |---|---|
@@ -26,7 +26,7 @@ Result: the table's full definition lives in **one place**, not scattered across
 
 | Rule | Detail |
 |---|---|
-| **Allowed** | Pre-release only — while every environment (local dev, CI, staging) can be rebuilt from scratch (`db:migrate:reset` / `db:schema:load`). |
+| **Allowed** | Pre-release only — while every environment (local dev, CI, staging) can be rebuilt from scratch (`db:schema:load` / the per-database reset in §3 Step 6). |
 | **Forbidden** | After first production release — any DB that already ran the deleted migration would have a stale row in `schema_migrations` and drift from `schema.rb`. Past that point, use normal additive migrations only. |
 | **Safe targets** | `add_column`, `add_index`, `change_column`, `remove_column` (when reverting a mistaken add) that belong to a table created in the same development cycle. |
 | **Not for** | Data migrations, backfills, `app/models` logic dependencies, or any migration already applied on a DB you cannot reset. |
@@ -116,28 +116,38 @@ Do not hand-edit anything else in `schema.rb` — it is regenerated in the next 
 
 ### Step 6 — Reset and regenerate
 
+`db:migrate:reset` **cannot be used in this repo**: it dumps all four schemas right after `db:create`, hits the read-only guard on the secondary `*_schema.rb` files, and aborts **before** migrating (§5). Reset per database instead:
+
 ```bash
-bin/rails db:migrate:reset   # drops, recreates, re-runs all surviving migrations, regenerates schema.rb
-# or, for a faster check without dropping:
-bin/rails db:migrate
+bin/rails db:drop db:create   # drops/recreates all configured DBs (dev + test) — expected
+bin/rails db:migrate:primary  # replays surviving migrations; dumps db/schema.rb only
+bin/rails db:schema:load:queue db:schema:load:cable db:schema:load:cache
+# ↑ repopulates the auxiliary DBs by READING their read-only schema files — never writes to them
 ```
 
-`db:migrate:reset` updates `schema_migrations` (removed rows disappear) and rewrites `db/schema.rb` from the folded migrations. The resulting `schema.rb` diff should show **zero unexpected changes** beyond the version line and the intended column placements.
+`db:migrate:primary` updates `schema_migrations` (removed rows disappear) and rewrites `db/schema.rb` from the folded migrations. The resulting `schema.rb` diff should show **zero unexpected changes** beyond the version line and the intended column placements.
 
 Verify:
 
 ```bash
-git diff db/schema.rb   # only version line + folded columns in their table should differ
-bin/rails db:schema:dump  # no-op if reset already dumped
+git diff db/schema.rb             # only version line + folded columns in their table should differ
+bin/rails db:schema:dump:primary  # no-op if the reset already dumped
 ```
 
 ### Step 7 — Notify teammates and CI
 
-Every checkout that already ran the deleted migration(s) must reset:
+Every checkout that already ran the deleted migration(s) must reset (per-database sequence, §5 guard):
 
 ```bash
-bin/rails db:migrate:reset RAILS_ENV=test
-bin/rails db:migrate:reset RAILS_ENV=development
+# development
+bin/rails db:drop db:create
+bin/rails db:migrate:primary
+bin/rails db:schema:load:queue db:schema:load:cable db:schema:load:cache
+
+# test (parallel workers) — see docs/PARALLEL_TESTS.md §3.2
+RAILS_ENV=test bundle exec rake "parallel:drop"
+RAILS_ENV=test bundle exec rake "parallel:create"
+RAILS_ENV=test bundle exec rake "parallel:load_schema"
 ```
 
 In CI, clear the DB cache or force `db:schema:load` so `schema_migrations` matches.
@@ -151,19 +161,32 @@ In CI, clear the DB cache or force `db:schema:load` so `schema_migrations` match
 | `c8555d93` (2026-07-05) | `add_deficit_to_attendance_months` (`total_deficit_minutes`) + `add_resolution_strategy_to_attendance_policies` (`resolution_strategy`) | Folded into `create_attendance_months.rb` (+ `total_deficit_minutes` before System Fields) and `create_attendance_policies.rb` (`resolution_strategy` with `default: 0, null: false`). Both `add_*` files deleted. |
 | `b8ac8f8e` (2026-07-05) | 5 HR migrations — shift templates, scheduled shifts, attendance logs/days/months | Renamed into clean sequential range `20260702170000..20260702182000`; no columns changed, only filenames. |
 | `6e567cd4` (2026-07-13) | `add_billing_enums_to_invoices` (`movement_type`, `target_balance`, `created_by` + indexes) | Folded into `create_billing_invoices.rb` above System Fields; `add_*` deleted, `schema.rb` version rewound `2026_07_12_101603` → `2026_07_02_190003`. |
+| `05e8c0e2` (2026-10-17) | `add_external_id_to_all_tables` (201 tables) + `add_profile_name_uniqueness` + `add_title_body_to_promo_campaigns` + `rename_notification_title_body` + dead settings migrations | `external_id` folded into every app `create_*` (pinned short index name kept for `subscription_group_subscription_plan_appointments`); profile/subprofile unique indexes, promo `title`/`body` and notifications `name`/`description` folded into their creates; dead settings creates + drop migration removed; `schema.rb` version rewound `2026_10_17_000001` → `2026_10_16_000004`; reset via `db:migrate:primary` + `db:schema:load:{queue,cable,cache}` (read-only guard, §5). |
 
 ---
 
 ## 5. Gotchas & Verification
 
+### Protected secondary schema files (read-only guard)
+
+`db/queue_schema.rb`, `db/cable_schema.rb`, and `db/cache_schema.rb` are intentionally **owner read-only** — a guard so coding agents cannot edit gem-owned schemas. Consequences for schema-dumping tasks:
+
+- `db:migrate` / `db:schema:dump` write `db/schema.rb` **first** (config order: primary → queue → cable → cache), then fail with `EACCES: Permission denied ... queue_schema.rb`.
+- That error is **expected — ignore it.** Seeing it means the main `db/schema.rb` dump already succeeded: **good news.** Verify `git diff db/schema.rb` and `schema_migrations`, then move on.
+- `db:migrate:reset` fails this way **before** migrating — never use it (use the Step 6 sequence).
+- `db:migrate:primary` and `db:schema:load:<name>` never trigger it.
+- Never chmod/chown these three files, and never "fix" the error.
+
 | Pitfall | How to avoid |
 |---------|-------------|
-| Stale `schema_migrations` rows | Any DB that ran a deleted migration **must** `db:migrate:reset` (not just `db:migrate`). Otherwise `SELECT * FROM schema_migrations` still lists the deleted version and future `db:migrate` will skip needed ordering. |
+| Stale `schema_migrations` rows | Any DB that ran a deleted migration **must** be reset per database (§3 Step 6) — plain `db:migrate` alone leaves the deleted versions listed, and future `db:migrate` ordering can drift. |
 | Version not equal to max surviving file | After merging, `grep "define(version" db/schema.rb` must equal `ls db/migrate | sort -r | head -1` converted to `YYYY_MM_DD_HHMMSS`. If not, CI may think migrations are pending. |
 | Column placement drift | Folded columns must sit in the "business columns" area (before System Fields). Placing them after System Fields or inside the wrong table breaks the `ARCHITECTURE_GUIDES.md` convention and makes future merges harder. |
 | Index style mismatch | Prefer `t.string :col, index: true` inline when the original was a simple index. For unique/compound indexes (`add_index ..., unique: true`), keep the `add_index` line after `create_table` — `schema.rb` renders it as `t.index` outside the block. |
 | Seed / factory drift | Seeds that reference the folded column must still pass after reset. No seed change is needed if the column existed logically before — just verify `bin/rails db:seed` or the relevant enricher still runs. |
 | CI cache | If CI caches `db/schema.rb` or the test DB, bust the cache after a merge commit. |
+| `EACCES: Permission denied ... db/queue_schema.rb` (or cable/cache) during `db:migrate` / `db:schema:dump` | **Expected — ignore.** The three secondary schema files are owner read-only by design (agent guard) and `db/schema.rb` is dumped before them, so the message means the main schema dump is already done (good news). Verify `git diff db/schema.rb` + `schema_migrations`; never chmod the files. |
+| `db:migrate:reset` aborts with the EACCES above before migrating | It dumps all schemas right after `db:create`; the guard stops it pre-migration. Use the per-database sequence in §3 Step 6. |
 
 ---
 
@@ -174,7 +197,7 @@ In CI, clear the DB cache or force `db:schema:load` so `schema_migrations` match
 - [ ] Deleted redundant `add_*` migration file(s)
 - [ ] (If needed) Renamed feature block into sequential timestamp range
 - [ ] `db/schema.rb` version = newest surviving migration timestamp
-- [ ] `bin/rails db:migrate:reset` (dev + test) passes; `git diff db/schema.rb` shows only expected changes
+- [ ] Reset via per-database tasks passes — dev: `db:migrate:primary` + `db:schema:load:{queue,cable,cache}`; test: `parallel:drop`/`create`/`load_schema`; `git diff db/schema.rb` shows only expected changes
 - [ ] Teammates notified to reset their DBs
 - [ ] Commit message is `merge migrations`
 ```
@@ -188,7 +211,7 @@ In CI, clear the DB cache or force `db:schema:load` so `schema_migrations` match
 | `db/migrate/` | Migration files — the merge source (`create_*`) and deleted targets (`add_*`) |
 | `db/schema.rb` | Auto-generated schema — version line `define(version:)` must be rewound after a merge |
 | `db/schema_migrations` (table) | Tracks which versions have run — reset removes rows for deleted files |
-| `config/database.yml` | DB config for `db:migrate:reset` targets |
+| `config/database.yml` | DB config for the per-database reset tasks (§3 Step 6) |
 
 ---
 

@@ -9,6 +9,7 @@ class CreateCompanyOrders < ActiveRecord::Migration[8.0]
       t.bigint :credit_amount, null: false
       t.integer :currency, null: false
 
+      t.string :external_id, index: true
       t.integer :lifecycle_status
       t.integer :workflow_status
       t.integer :business_type

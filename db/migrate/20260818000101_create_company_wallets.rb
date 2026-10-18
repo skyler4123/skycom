@@ -11,6 +11,7 @@ class CreateCompanyWallets < ActiveRecord::Migration[8.0]
       t.bigint :debt_credit_balance, null: false, default: 0
       t.datetime :usage_logging_until
 
+      t.string :external_id, index: true
       t.integer :lifecycle_status
       t.integer :workflow_status
       t.integer :business_type

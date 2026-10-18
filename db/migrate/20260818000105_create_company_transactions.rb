@@ -12,6 +12,7 @@ class CreateCompanyTransactions < ActiveRecord::Migration[8.0]
       t.integer :status, null: false, default: 0
       t.string :gateway_reference
 
+      t.string :external_id, index: true
       t.integer :lifecycle_status
       t.integer :workflow_status
       t.integer :business_type

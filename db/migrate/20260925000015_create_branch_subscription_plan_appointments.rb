@@ -11,6 +11,7 @@ class CreateBranchSubscriptionPlanAppointments < ActiveRecord::Migration[8.0]
       t.boolean :auto_renew
       t.string :name
       t.string :description
+      t.string :external_id, index: true
       t.integer :lifecycle_status, index: true
       t.integer :workflow_status, index: true
       t.integer :business_type, index: true
