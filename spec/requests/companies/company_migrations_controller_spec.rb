@@ -195,6 +195,17 @@ RSpec.describe "Companies::CompanyMigrationsController", type: :request do
       expect(response).to have_http_status(:unprocessable_content)
       expect(JSON.parse(response.body)["errors"].join).to match(/not editable/)
     end
+
+    it "returns 422 for a chunk that is not parseable CSV" do
+      migration = create(:company_migration, company: company)
+
+      post "#{base_path}/#{migration.id}/chunks",
+           params: { file: upload_for("Index,\"Unclosed\n1,2\n"), chunk_index: 0 }
+
+      expect(response).to have_http_status(:unprocessable_content)
+      expect(JSON.parse(response.body)["errors"].join).to match(/valid CSV/)
+      expect(migration.reload.total_chunks).to eq(0)
+    end
   end
 
   describe "POST #dry_run" do

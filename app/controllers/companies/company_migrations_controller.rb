@@ -53,13 +53,18 @@ class Companies::CompanyMigrationsController < Companies::ApplicationController
 
     content = params[:file].read.force_encoding(Encoding::UTF_8)
     clean = content.sub(/\A\uFEFF/, "")
-    header = CSV.parse_line(clean.lines.first)
 
-    if migration.source_header.present? && header.to_json != migration.source_header
-      return render_errors([ "chunk header does not match the first chunk" ])
+    begin
+      header = CSV.parse_line(clean.lines.first)
+
+      if migration.source_header.present? && header.to_json != migration.source_header
+        return render_errors([ "chunk header does not match the first chunk" ])
+      end
+
+      rows = CSV.parse(clean, headers: true).size
+    rescue CSV::MalformedCSVError
+      return render_errors([ "file is not valid CSV" ])
     end
-
-    rows = CSV.parse(clean, headers: true).size
     stored_file = nil
 
     CompanyMigration.transaction do
