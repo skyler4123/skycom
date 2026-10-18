@@ -212,6 +212,13 @@ export const create_company_stored_files_path = (companyId) => `/companies/${com
 export const company_stored_file_path = (companyId, fileId) => `/companies/${companyId}/stored_files/${fileId}`
 export const download_company_stored_file_path = (companyId, fileId) => `/companies/${companyId}/stored_files/${fileId}/download`
 export const company_storage_statistics_path = (companyId) => `/companies/${companyId}/storage_statistics`
+export const company_company_migrations_path = (companyId) => `/companies/${companyId}/company_migrations`
+export const company_company_migration_path = (companyId, migrationId) => `/companies/${companyId}/company_migrations/${migrationId}`
+export const chunks_company_company_migration_path = (companyId, migrationId) => `/companies/${companyId}/company_migrations/${migrationId}/chunks`
+export const update_config_company_company_migration_path = (companyId, migrationId) => `/companies/${companyId}/company_migrations/${migrationId}/update_config`
+export const dry_run_company_company_migration_path = (companyId, migrationId) => `/companies/${companyId}/company_migrations/${migrationId}/dry_run`
+export const approve_company_company_migration_path = (companyId, migrationId) => `/companies/${companyId}/company_migrations/${migrationId}/approve`
+export const rollback_company_company_migration_path = (companyId, migrationId) => `/companies/${companyId}/company_migrations/${migrationId}/rollback`
 export const create_company_documents_path = (companyId) => `/companies/${companyId}/documents`
 export const new_company_document_path = (companyId) => `/companies/${companyId}/documents/new`
 export const company_document_path = (companyId, documentId) => `/companies/${companyId}/documents/${documentId}`

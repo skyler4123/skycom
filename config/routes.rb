@@ -114,6 +114,15 @@ Rails.application.routes.draw do
           get :download
         end
       end
+      resources :company_migrations do
+        member do
+          post :chunks
+          patch :update_config
+          post :dry_run
+          post :approve
+          post :rollback
+        end
+      end
       get "storage_statistics", to: "storage_statistics#index"
       resources :announcements
       resources :discounts

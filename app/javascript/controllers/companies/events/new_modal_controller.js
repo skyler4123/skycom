@@ -121,7 +121,7 @@ export default class Companies_Events_NewModalController extends Controller {
     try {
       const response = await fetchJson(Helpers.create_company_events_path(companyId), {
         method: "POST",
-        body: JSON.stringify({ event: payload })
+        body: { event: payload }
       })
       const created = response.event
       const warnings = response.warnings || []

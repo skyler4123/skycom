@@ -150,7 +150,9 @@ export default class WebsocketController extends Controller {
         notification_created: "notification_created",
         company_ticket_created: "company_ticket_created",
         company_ticket_commented: "company_ticket_commented",
-        company_ticket_status_changed: "company_ticket_status_changed"
+        company_ticket_status_changed: "company_ticket_status_changed",
+        company_migration_progress: "company_migration_progress",
+        company_migration_finished: "company_migration_finished"
       },
 
       // 2. Channel Generator — format "<model>_<id>" e.g. "company_<uuid>", "user_<uuid>".

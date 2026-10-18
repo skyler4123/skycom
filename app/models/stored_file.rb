@@ -1,5 +1,7 @@
 class StoredFile < ApplicationRecord
   attribute :permission_resource_name, :string, default: -> { self.name }
+  store_accessor :metadata, :chunk_index, :row_count, :import_status,
+                 :processed_rows, :created_rows, :updated_rows, :failed_rows
 
   # --- Enums ---
   enum :lifecycle_status, LIFECYCLE_STATUS, prefix: true

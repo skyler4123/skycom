@@ -19,6 +19,10 @@ gem "tailwindcss-rails"
 # Build JSON APIs with ease [https://github.com/rails/jbuilder]
 gem "jbuilder"
 
+# CSV parsing — bundled gem since Ruby 3.4; must be declared (and required
+# where used) because Ruby 3.5 removes it from the default gems.
+gem "csv"
+
 # Use Active Model has_secure_password [https://guides.rubyonrails.org/active_model_basics.html#securepassword]
 gem "bcrypt", "~> 3.1.7"
 

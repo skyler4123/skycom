@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_10_16_000004) do
+ActiveRecord::Schema[8.1].define(version: 2026_10_18_000003) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pgcrypto"
@@ -1203,6 +1203,64 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_000004) do
     t.index ["invoice_number"], name: "index_company_invoices_on_invoice_number", unique: true
   end
 
+  create_table "company_migration_logs", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
+    t.uuid "company_migration_id", null: false
+    t.uuid "company_id", null: false
+    t.string "record_type"
+    t.uuid "record_id"
+    t.integer "action"
+    t.jsonb "previous_state", default: {}
+    t.string "resource"
+    t.integer "source_row"
+    t.integer "lifecycle_status"
+    t.integer "workflow_status"
+    t.integer "business_type"
+    t.datetime "expiration_date"
+    t.jsonb "metadata", default: {}
+    t.datetime "discarded_at"
+    t.string "permission_resource_name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["company_id"], name: "index_company_migration_logs_on_company_id"
+    t.index ["company_migration_id", "record_type", "record_id"], name: "idx_company_migration_logs_unique_record", unique: true
+    t.index ["discarded_at"], name: "index_company_migration_logs_on_discarded_at"
+    t.index ["record_type", "record_id"], name: "index_company_migration_logs_on_record_type_and_record_id"
+  end
+
+  create_table "company_migrations", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
+    t.uuid "company_id", null: false
+    t.uuid "folder_id", null: false
+    t.string "name", null: false
+    t.string "target_resource"
+    t.string "source_filename"
+    t.bigint "source_file_size"
+    t.jsonb "migration_mapping_config", default: {}
+    t.jsonb "dry_run_result"
+    t.integer "total_chunks", default: 0
+    t.bigint "total_rows", default: 0
+    t.bigint "processed_rows", default: 0
+    t.bigint "created_rows", default: 0
+    t.bigint "updated_rows", default: 0
+    t.bigint "failed_rows", default: 0
+    t.datetime "approved_at"
+    t.datetime "completed_at"
+    t.datetime "rolled_back_at"
+    t.string "external_id"
+    t.integer "lifecycle_status"
+    t.integer "workflow_status"
+    t.integer "business_type"
+    t.datetime "expiration_date"
+    t.jsonb "metadata", default: {}
+    t.datetime "discarded_at"
+    t.string "permission_resource_name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["company_id"], name: "index_company_migrations_on_company_id"
+    t.index ["discarded_at"], name: "index_company_migrations_on_discarded_at"
+    t.index ["external_id"], name: "index_company_migrations_on_external_id"
+    t.index ["folder_id"], name: "index_company_migrations_on_folder_id"
+  end
+
   create_table "company_monthly_usages", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
     t.uuid "company_id", null: false
     t.date "usage_month", null: false
@@ -2233,6 +2291,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_000004) do
     t.index ["business_type"], name: "index_customers_on_business_type"
     t.index ["category_id"], name: "index_customers_on_category_id"
     t.index ["code"], name: "index_customers_on_code", unique: true
+    t.index ["company_id", "external_id"], name: "idx_customers_company_external_id_uniq", unique: true
     t.index ["company_id"], name: "index_customers_on_company_id"
     t.index ["discarded_at"], name: "index_customers_on_discarded_at"
     t.index ["email"], name: "index_customers_on_email", unique: true
@@ -8647,6 +8706,10 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_16_000004) do
   add_foreign_key "company_daily_usages", "companies"
   add_foreign_key "company_invoices", "companies"
   add_foreign_key "company_invoices", "company_orders"
+  add_foreign_key "company_migration_logs", "companies"
+  add_foreign_key "company_migration_logs", "company_migrations"
+  add_foreign_key "company_migrations", "companies"
+  add_foreign_key "company_migrations", "folders"
   add_foreign_key "company_monthly_usages", "companies"
   add_foreign_key "company_orders", "companies"
   add_foreign_key "company_orders", "users"
