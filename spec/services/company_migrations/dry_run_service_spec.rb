@@ -108,5 +108,19 @@ RSpec.describe CompanyMigrations::DryRunService do
       expect(result[:result]["rows"].first["errors"].join).to match(/property_integer_1: cannot parse/)
       expect(result[:result]["passed"]).to be(false)
     end
+
+    it "fails the dry run for a multi-target config" do
+      config = customers_migration_config
+      config["targets"] << config["targets"].first.merge(
+        "category" => { "mode" => "create_or_reuse", "name" => "Second Customers" }
+      )
+      migration = create_migration_with_chunks(company: company, chunks: [ fixture ], config: config)
+
+      result = dry_run(migration)
+
+      expect(result[:success]).to be(false)
+      expect(result[:errors].join).to match(/multiple targets/)
+      expect(result[:result]["passed"]).to be(false)
+    end
   end
 end

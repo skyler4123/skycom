@@ -1,8 +1,9 @@
 # frozen_string_literal: true
 
 # Validates that a CompanyMigration is ready to be dry-run/imported: chunks
-# exist, the config parses, and the target table carries the unique
-# [company_id, external_id] index the upsert write path depends on.
+# exist, the config parses, exactly one target is present (v1), and the target
+# table carries the unique [company_id, external_id] index the upsert write
+# path depends on.
 module CompanyMigrations
   class Preflight
     IDENTITY_INDEX_COLUMNS = %w[company_id external_id].freeze
@@ -27,6 +28,7 @@ module CompanyMigrations
       end
 
       errors.concat(@config.errors) unless @config.valid?
+      errors << "multiple targets are not supported yet" if @config.targets.size > 1
       return failure(errors) if errors.any?
 
       target = @config.targets.first

@@ -91,6 +91,13 @@ RSpec.describe CompanyMigrations::RowMapper do
       expect(result[:attrs]["property_decimal_1"]).to eq(BigDecimal("12.5"))
     end
 
+    it "returns an error for a text value mapped to an enum-backed column" do
+      result = build_mapper(columns: { "Country" => { "target" => "country" } }).map({ "Country" => "us" })
+
+      expect(result[:errors]).to include("country: cannot parse 'us'")
+      expect(result[:attrs]).not_to have_key("country")
+    end
+
     it "returns an error for an unparseable integer" do
       result = build_mapper(columns: { "Index" => { "target" => "property_integer_1" } }).map({ "Index" => "abc" })
 

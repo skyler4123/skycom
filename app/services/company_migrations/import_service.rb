@@ -15,8 +15,8 @@ require "csv"
 # - Upsert conflicts on [company_id, external_id] (unique_by index name);
 #   logs dedupe on [migration, record_type, record_id] keeping the earliest.
 #
-# v1 is single-target (customers proven end-to-end); a config with more than
-# one target fails loudly instead of silently importing only the first.
+# v1 is single-target (customers proven end-to-end) — Preflight refuses
+# configs with more than one target before any work happens.
 module CompanyMigrations
   class ImportService
     LOG_UNIQUE_INDEX = "idx_company_migration_logs_unique_record"
@@ -36,8 +36,6 @@ module CompanyMigrations
     def call
       preflight = Preflight.call(company_migration: @migration)
       return { success: false, errors: preflight[:errors] } unless preflight[:success]
-
-      return { success: false, errors: [ "multiple targets are not supported yet" ] } if @config.targets.size > 1
 
       target = preflight[:target]
       category_result = CategoryResolver.call(
