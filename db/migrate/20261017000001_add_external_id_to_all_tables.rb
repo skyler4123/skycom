@@ -1,0 +1,235 @@
+# frozen_string_literal: true
+
+# Adds `external_id` to every app-owned table — a nullable string with a plain
+# (non-unique) index. `external_id` stores a record's ID in a client's previous
+# database: the lookup handle used when importing a legacy client DB into Skycom
+# and re-linking records on re-runs.
+#
+# Framework/gem-owned tables are deliberately excluded:
+#   ActiveStorage — active_storage_attachments, active_storage_blobs, active_storage_variant_records
+#   paper_trail   — versions
+# The Solid Queue/Cable/Cache tables live in their own gem-owned schemas and stay untouched.
+class AddExternalIdToAllTables < ActiveRecord::Migration[8.0]
+  TABLES = %w[
+    address_branch_appointments
+    address_company_appointments
+    address_customer_appointments
+    address_customer_group_appointments
+    address_department_appointments
+    address_employee_appointments
+    address_employee_group_appointments
+    addresses
+    address_user_appointments
+    answers
+    answer_tag_appointments
+    attendance_config_logs
+    attendance_configs
+    attendance_days
+    attendance_logs
+    attendance_months
+    attendance_requests
+    branches
+    branch_event_appointments
+    branch_payment_method_appointments
+    branch_subscription_plan_appointments
+    branch_tag_appointments
+    brands
+    brand_tag_appointments
+    cart_employee_appointments
+    cart_groups
+    carts
+    categories
+    companies
+    company_daily_usages
+    company_invoices
+    company_monthly_usages
+    company_orders
+    company_payment_method_appointments
+    company_payment_methods
+    company_settings
+    company_tag_appointments
+    company_ticket_comments
+    company_ticket_logs
+    company_tickets
+    company_transactions
+    company_usage_logs
+    company_wallet_logs
+    company_wallets
+    customer_customer_group_appointments
+    customer_employee_appointments
+    customer_event_appointments
+    customer_group_role_appointments
+    customer_groups
+    customer_group_service_appointments
+    customer_group_tag_appointments
+    customer_membership_appointments
+    customer_profiles
+    customer_role_appointments
+    customers
+    customer_service_appointments
+    customer_subprofiles
+    customer_tag_appointments
+    department_employee_appointments
+    department_role_appointments
+    departments
+    department_tag_appointments
+    discount_groups
+    discounts
+    document_employee_appointments
+    documents
+    document_tag_appointments
+    employee_employee_appointments
+    employee_employee_group_appointments
+    employee_event_appointments
+    employee_event_group_appointments
+    employee_exam_appointments
+    employee_facility_appointments
+    employee_group_role_appointments
+    employee_groups
+    employee_group_tag_appointments
+    employee_notification_reads
+    employee_notification_tag_appointments
+    employee_order_group_appointments
+    employee_product_appointments
+    employee_profiles
+    employee_project_appointments
+    employee_project_group_appointments
+    employee_role_appointments
+    employees
+    employee_service_appointments
+    employee_subprofiles
+    employee_tag_appointments
+    employee_task_appointments
+    employee_task_group_appointments
+    event_config_logs
+    event_configs
+    event_facility_appointments
+    event_groups
+    event_group_tag_appointments
+    event_order_appointments
+    events
+    event_service_appointments
+    event_stock_appointments
+    event_tag_appointments
+    exam_groups
+    exam_group_tag_appointments
+    exams
+    exam_tag_appointments
+    facilities
+    facility_facility_group_appointments
+    facility_groups
+    facility_group_tag_appointments
+    facility_tag_appointments
+    folders
+    invoices
+    invoice_tag_appointments
+    memberships
+    notification_configs
+    notifications
+    notification_tag_appointments
+    notification_tags
+    order_groups
+    order_group_tag_appointments
+    order_product_appointments
+    order_product_group_appointments
+    orders
+    order_service_appointments
+    order_service_group_appointments
+    order_subscription_plan_appointments
+    order_tag_appointments
+    pages
+    payment_methods
+    permission_logs
+    policies
+    policy_role_appointments
+    product_groups
+    product_group_tag_appointments
+    product_product_group_appointments
+    products
+    product_tag_appointments
+    project_groups
+    project_group_tag_appointments
+    projects
+    project_tag_appointments
+    promo_campaigns
+    promo_grants
+    property_mappings
+    purchase_items
+    purchase_item_tag_appointments
+    purchase_purchase_item_appointments
+    purchases
+    purchase_tag_appointments
+    questions
+    question_tag_appointments
+    roles
+    role_tag_appointments
+    scheduled_shifts
+    service_groups
+    service_group_tag_appointments
+    services
+    service_service_group_appointments
+    service_tag_appointments
+    sessions
+    shift_templates
+    sign_in_tokens
+    statistics
+    statistic_tag_appointments
+    stock_adjustments
+    stock_adjustment_stock_appointments
+    stock_exports
+    stock_export_stock_appointments
+    stock_export_tag_appointments
+    stock_imports
+    stock_import_stock_appointments
+    stock_import_tag_appointments
+    stock_pendings
+    stocks
+    stock_tag_appointments
+    stock_transactions
+    stock_transfers
+    stock_transfer_stock_appointments
+    stock_transfer_tag_appointments
+    stored_files
+    subscription_groups
+    subscription_group_subscription_plan_appointments
+    subscription_group_tag_appointments
+    subscription_plans
+    suppliers
+    supplier_tag_appointments
+    systems
+    table_config_logs
+    table_configs
+    tags
+    tag_task_appointments
+    tag_task_group_appointments
+    tag_transaction_appointments
+    tag_warehouse_appointments
+    task_groups
+    tasks
+    transactions
+    users
+    warehouses
+    workflows
+    workflow_step_logs
+    workflow_steps
+  ].freeze
+
+  # Postgres truncates identifiers over 63 chars. The default index name for this table
+  # (index_subscription_group_subscription_plan_appointments_on_external_id) is 70 chars
+  # and would be silently cut, so pin an explicit shorter one.
+  CUSTOM_INDEX_NAMES = {
+    "subscription_group_subscription_plan_appointments" => "index_subscription_group_sub_plan_appts_on_external_id"
+  }.freeze
+
+  def change
+    TABLES.each do |table|
+      add_column table, :external_id, :string
+
+      if CUSTOM_INDEX_NAMES.key?(table)
+        add_index table, :external_id, name: CUSTOM_INDEX_NAMES[table]
+      else
+        add_index table, :external_id
+      end
+    end
+  end
+end
