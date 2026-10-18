@@ -968,5 +968,23 @@ export const dictionary = () => {
     "Company Quick Links": { vi: "Liên Kết Nhanh Công Ty" },
     "Quick Links": { vi: "Liên Kết Nhanh" },
     "Shared with everyone in this company": { vi: "Chia sẻ với mọi người trong công ty này" },
+
+    // === Data Import (CompanyMigration) ===
+    "Data Import": { vi: "Nhập dữ liệu" },
+    "New Import": { vi: "Nhập dữ liệu mới" },
+    "Import Name": { vi: "Tên lượt nhập" },
+    "Save Import": { vi: "Lưu lượt nhập" },
+    "No imports yet": { vi: "Chưa có lượt nhập nào" },
+    "Target": { vi: "Đích" },
+    "Rows": { vi: "Số dòng" },
+    "Completed": { vi: "Hoàn tất" },
+    "Failed": { vi: "Thất bại" },
+    "Processing": { vi: "Đang xử lý" },
+    "Rolling back": { vi: "Đang hoàn tác" },
+    "Rolled back": { vi: "Đã hoàn tác" },
+    "Failed to load imports": { vi: "Không tải được danh sách nhập dữ liệu" },
+    "Failed to create import": { vi: "Không tạo được lượt nhập" },
+    "Failed to delete import": { vi: "Không xóa được lượt nhập" },
+    "Delete this import and its uploaded chunks?": { vi: "Xóa lượt nhập này và các tệp đã tải lên?" }
   }
 }
