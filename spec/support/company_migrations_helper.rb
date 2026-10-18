@@ -40,6 +40,7 @@ module CompanyMigrationsHelper
       company: company,
       folder: Folder.create!(company: company, name: "Import #{SecureRandom.hex(3)}"),
       name: name || "Import #{SecureRandom.hex(4)}",
+      workflow_status: :draft,
       migration_mapping_config: config
     )
 
