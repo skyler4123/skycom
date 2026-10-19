@@ -21,7 +21,7 @@ This file and `README.md` are always in context. Everything in `docs/` is on-dem
 | Creating or restructuring `app/models/*.rb` | `docs/MODEL_STRUCTURE.md` — canonical section order |
 | Adding or modifying model/concern callbacks | `docs/MODEL_CALLBACKS.md` — callback reference |
 | Conflicting migrations after a merge | `docs/MERGE_MIGRATIONS.md` — merge-migration procedure |
-| Writing or running any spec | `docs/PARALLEL_TESTS.md` — always `bundle exec parallel_rspec -n 14 [paths]`; feature specs also need `docs/FLAKY_TESTS.md` (never `sleep`) |
+| Writing or running any spec | `docs/PARALLEL_TESTS.md` (runner) + `docs/TEST_PRIORITY.md` (priority: feature > model > request) — always `bundle exec parallel_rspec -n 14 [paths]`; feature specs also need `docs/FLAKY_TESTS.md` (never `sleep`) |
 
 ### Money, stock, orders (absolute rules)
 
@@ -92,6 +92,7 @@ This file and `README.md` are always in context. Everything in `docs/` is on-dem
 - **Constants** — All app-wide constants must be in `config/initializers/constants.rb`, never hardcoded inline. See `docs/CONSTANTS.md`.
 - **Client cache** — If any mutation affects data stored in `currentCompany()` (branches, roles, categories, permissions, features, etc.), call `clearClientCacheAndReload()` after the server confirms the change, OR call `clearClientCache()` followed by a page reload.
 - **BE↔FE link** — When you add, remove, or change an endpoint, update the file-header link comments in **both** the BE controller (`Serves Stimulus:`) and the FE Stimulus controller (`Depends on BE:` / `Endpoints:`). See the template in `V1Controller`, `OrdersController`, `PagesController`, `MockQrGatewayController`, `RetailCashierController`. Links are living — remove stale pairs, add new ones per feature.
+- **Test priority** — Verify feature tests for the touched area are green before declaring work complete; request/model specs alone are insufficient. See `docs/TEST_PRIORITY.md`.
 
 ## Architecture
 - **Type**: Rails 8+ multi-tenant platform with Hybrid SPA (Stimulus + Tailwind)
@@ -126,6 +127,7 @@ This file and `README.md` are always in context. Everything in `docs/` is on-dem
 - Docs keep `bundle exec rspec ...` as source of truth (runner-swappable) — that does not change what the agent runs.
 - Parallel DBs are already set up locally. Only if worker DBs are missing, run once: `RAILS_ENV=test bundle exec rake "parallel:create"` then `RAILS_ENV=test bundle exec rake "parallel:load_schema"` then `RAILS_ENV=test bundle exec rake "parallel:migrate"`. If `parallel_rspec` fails on migration, see `docs/PARALLEL_TESTS.md` §3.2 for the `drop[14]` → `create[14]` → `load_schema[14]` reset.
 - **Paired success + failure cases** — Write specs as normal, but prefer paired `it` blocks per behavior where a failure branch exists: one success `it` asserting the expected data, one failure `it` asserting the failure contract (`{ success: false, errors: [...] }` / `not_to be_valid` / non-2xx + `errors` key) plus no unwanted side-effect. Canonical example: `spec/services/discounts/apply_service_spec.rb` (1 success `reserves...` + 7 `fails...` its). Skip the failure `it` only when no failure branch exists — don't invent artificial failures.
+- **Test priority (absolute)** — Feature (system) tests are the most important; model tests are second; request specs are least. A passing request spec does NOT count as proof: if a request spec passes but the corresponding feature test fails, the work is NOT done. Write/update the feature test first (or alongside), model tests second, request specs only for uncovered edge cases. Never declare complete on request/model specs alone when a feature test exists or is expected. Run verification in priority order (feature → model → request) and stop on first failure. See `docs/TEST_PRIORITY.md`.
 
 ## Model Structure
 - All `app/models/*.rb` follow the canonical order in `docs/MODEL_STRUCTURE.md` (concerns → constants → attributes → enums → macros → associations → scopes → validations → callbacks → methods). Run `bin/rubocop` to verify.
