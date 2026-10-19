@@ -107,6 +107,7 @@ Rails.application.routes.draw do
       end
       resources :attendance_months do
         collection do
+          get :my
           post :collect
         end
       end
@@ -183,6 +184,7 @@ Rails.application.routes.draw do
 
       resource :payroll_config, only: %i[show update], controller: :payroll_configs
       get "payroll", to: "payrolls#index"
+      get "payroll/my", to: "payrolls#my"
       get "payroll/summary", to: "payrolls#summary"
       get "payroll/payrolls", to: "payrolls#payrolls"
       get "payroll/payrolls/:id", to: "payrolls#show", as: :payroll_payroll

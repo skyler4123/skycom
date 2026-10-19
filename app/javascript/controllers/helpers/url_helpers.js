@@ -197,6 +197,7 @@ export const reject_company_attendance_request_path = (companyId, id) => `/compa
 export const company_attendance_months_path = (companyId) => `/companies/${companyId}/attendance_months`
 export const company_attendance_month_path = (companyId, id) => `/companies/${companyId}/attendance_months/${id}`
 export const company_attendance_months_collect_path = (companyId) => `/companies/${companyId}/attendance_months/collect`
+export const company_attendance_months_my_path = (companyId, month = null) => month ? `/companies/${companyId}/attendance_months/my?month=${month}` : `/companies/${companyId}/attendance_months/my`
 
 export const company_shift_templates_path = (companyId) => `/companies/${companyId}/shift_templates`
 export const new_company_shift_template_path = (companyId) => `/companies/${companyId}/shift_templates/new`
@@ -372,3 +373,4 @@ export const company_payroll_payrolls_path = (companyId) => `/companies/${compan
 export const company_payroll_payroll_path = (companyId, id) => `/companies/${companyId}/payroll/payrolls/${id}`
 export const company_payroll_generate_path = (companyId) => `/companies/${companyId}/payroll/generate`
 export const company_payroll_config_path = (companyId) => `/companies/${companyId}/payroll_config`
+export const company_payroll_my_path = (companyId, month = null) => month ? `/companies/${companyId}/payroll/my?month=${month}` : `/companies/${companyId}/payroll/my`

@@ -5,6 +5,7 @@
 // Group registry — array order is the sidebar render order.
 // `locked: true` groups can never be hidden via company settings.
 export const SIDEBAR_GROUPS = [
+  { key: "my_profile", label: "My Profile" },
   { key: "general", label: "General" },
   { key: "notification", label: "Notification" },
   { key: "catalog", label: "Catalog" },
@@ -26,6 +27,9 @@ export const SIDEBAR_GROUPS = [
 ]
 
 export const SIDEBAR_ITEMS = [
+  { key: "my_profile_employee", group: "my_profile", icon: "person", label: "Employee", href: (cid) => { const e = currentEmployee(); return e ? Helpers.company_employee_path(cid, e.id) : Helpers.company_employees_path(cid) } },
+  { key: "my_profile_attendance", group: "my_profile", icon: "calendar_view_month", label: "Attendance", href: (cid) => Helpers.company_attendance_months_my_path(cid) },
+  { key: "my_profile_payroll", group: "my_profile", icon: "payments", label: "Payroll", href: (cid) => Helpers.company_payroll_my_path(cid) },
   { key: "dashboard", group: "general", icon: "dashboard", label: "Dashboard", href: (cid) => Helpers.company_dashboards_path(cid) },
   { key: "notifications", group: "notification", icon: "notifications", label: "Notifications", href: (cid) => Helpers.company_notifications_path(cid) },
   { key: "notification_tags", group: "notification", icon: "sell", label: "Notification Tags", href: (cid) => Helpers.company_notification_tags_path(cid) },

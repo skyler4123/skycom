@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 # Companies::PayrollsController — payroll review + persisted payroll runs.
-# Serves Stimulus: Companies_Payrolls_IndexController, Companies_Payrolls_ShowController
+# Serves Stimulus: Companies_Payrolls_IndexController, Companies_Payrolls_ShowController, Companies_Payrolls_MyController
 # Endpoints: GET /companies/:company_id/payroll(.json) + summary/payrolls/generate
 class Companies::PayrollsController < Companies::ApplicationController
   def index
@@ -52,6 +52,26 @@ class Companies::PayrollsController < Companies::ApplicationController
           payroll: format_payroll(payroll),
           attendance_month: payroll.attendance_month ? format_attendance_month(payroll.attendance_month) : nil,
           attendance_days: payroll.attendance_month ? attendance_days_for(payroll.attendance_month).map { |d| format_day(d) } : []
+        }
+      end
+    end
+  end
+
+  def my
+    employee = current_employee
+    month = parse_month(params[:month]) || Date.current.beginning_of_month
+    payroll = employee ? current_company.payrolls.where(employee: employee).where(month: month.beginning_of_month..month.end_of_month).first : nil
+    payrolls = employee ? current_company.payrolls.where(employee: employee).order(month: :desc) : []
+    respond_to do |format|
+      format.html { render html: "", layout: true }
+      format.json do
+        render json: {
+          employee: employee&.as_json(only: %i[id name]),
+          month: month.to_s,
+          payroll: payroll ? format_payroll(payroll) : nil,
+          attendance_month: payroll&.attendance_month ? format_attendance_month(payroll.attendance_month) : nil,
+          attendance_days: payroll&.attendance_month ? attendance_days_for(payroll.attendance_month).map { |d| format_day(d) } : [],
+          months: payrolls.map { |p| { id: p.id, month: p.month } }
         }
       end
     end
