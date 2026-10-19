@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_10_18_000003) do
+ActiveRecord::Schema[8.1].define(version: 2026_10_19_000001) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pgcrypto"
@@ -8278,6 +8278,14 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_18_000003) do
     t.index ["workflow_status"], name: "index_tasks_on_workflow_status"
   end
 
+  create_table "tax_configs", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
+    t.uuid "company_id", null: false
+    t.jsonb "metadata", default: {}, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["company_id"], name: "index_tax_configs_on_company_id", unique: true
+  end
+
   create_table "transactions", id: :uuid, default: -> { "uuidv7()" }, force: :cascade do |t|
     t.uuid "company_id", null: false
     t.uuid "branch_id"
@@ -9234,6 +9242,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_18_000003) do
   add_foreign_key "tasks", "companies"
   add_foreign_key "tasks", "property_mappings"
   add_foreign_key "tasks", "task_groups"
+  add_foreign_key "tax_configs", "companies"
   add_foreign_key "transactions", "branches"
   add_foreign_key "transactions", "categories"
   add_foreign_key "transactions", "companies"

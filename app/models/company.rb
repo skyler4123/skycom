@@ -113,6 +113,7 @@ class Company < ApplicationRecord
   has_many :stock_exports, dependent: :destroy
   has_many :stock_adjustments, dependent: :destroy
   has_many :stock_pendings, dependent: :destroy
+  has_many :tax_configs, dependent: :destroy
   has_many :suppliers, dependent: :destroy
   has_many :customers, dependent: :destroy
   has_many :customer_profiles, dependent: :destroy
