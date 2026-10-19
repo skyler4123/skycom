@@ -364,3 +364,10 @@ export const company_tax_invoices_path = (companyId) => `/companies/${companyId}
 export const company_tax_purchases_path = (companyId) => `/companies/${companyId}/tax/purchases`
 export const company_tax_stock_exports_path = (companyId) => `/companies/${companyId}/tax/stock_exports`
 export const company_tax_config_path = (companyId) => `/companies/${companyId}/tax_config`
+
+export const company_payroll_path = (companyId) => `/companies/${companyId}/payroll`
+export const company_payroll_summary_path = (companyId) => `/companies/${companyId}/payroll/summary`
+export const company_payroll_payrolls_path = (companyId) => `/companies/${companyId}/payroll/payrolls`
+export const company_payroll_payroll_path = (companyId, id) => `/companies/${companyId}/payroll/payrolls/${id}`
+export const company_payroll_generate_path = (companyId) => `/companies/${companyId}/payroll/generate`
+export const company_payroll_config_path = (companyId) => `/companies/${companyId}/payroll_config`

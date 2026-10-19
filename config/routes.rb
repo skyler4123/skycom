@@ -177,6 +177,14 @@ Rails.application.routes.draw do
       get "tax/purchases", to: "taxes#purchases"
       get "tax/stock_exports", to: "taxes#stock_exports"
 
+      resource :payroll_config, only: %i[show update], controller: :payroll_configs
+      get "payroll", to: "payrolls#index"
+      get "payroll/summary", to: "payrolls#summary"
+      get "payroll/payrolls", to: "payrolls#payrolls"
+      get "payroll/payrolls/:id", to: "payrolls#show", as: :payroll_payroll
+      post "payroll/generate", to: "payrolls#generate"
+      patch "payroll/payrolls/:id", to: "payrolls#update", as: :payroll_payroll_update
+
       # PLACEHOLDER routes — future Token implementation. Actions exist but
       # contain no logic yet (see Companies::TopUpsController).
       resources :top_ups, only: %i[new] do
