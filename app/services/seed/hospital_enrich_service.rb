@@ -556,7 +556,7 @@ class Seed::HospitalEnrichService
         next if date.saturday? || date.sunday? # Skip weekends
 
         expected_start = date.to_time.change(hour: template.start_time.hour, min: template.start_time.min)
-        expected_end = date.to_time.change(hour: template.end_time.hour, min: template.end_time.min)
+        expected_end = expected_start + 9.hours
 
         shift = Seed::ScheduledShiftService.upsert!(
           company: @company, branch: employee.branch, employee: employee,
@@ -565,17 +565,22 @@ class Seed::HospitalEnrichService
           status: :completed
         )
 
-        # Simulate an 8-hour worked day
-        check_in = expected_start
-        check_out = expected_end
-
+        # Simulate an 8-hour worked day with a 1-hour lunch break (multi-punch)
         AttendanceLog.create!(
           company: @company, branch: employee.branch, employee: employee,
-          log_type: "check_in", logged_at: check_in
+          log_type: "check_in", logged_at: expected_start
         )
         AttendanceLog.create!(
           company: @company, branch: employee.branch, employee: employee,
-          log_type: "check_out", logged_at: check_out
+          log_type: "check_out", logged_at: expected_start + 4.hours
+        )
+        AttendanceLog.create!(
+          company: @company, branch: employee.branch, employee: employee,
+          log_type: "check_in", logged_at: expected_start + 5.hours
+        )
+        AttendanceLog.create!(
+          company: @company, branch: employee.branch, employee: employee,
+          log_type: "check_out", logged_at: expected_end
         )
       end
     end
