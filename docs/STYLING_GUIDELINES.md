@@ -96,6 +96,30 @@ Rules:
 
 ---
 
+## 5. Grouping & Borders (mandatory)
+
+Every logical UI group (title+value pair, card, dropdown, table, section, panel) must be visually separated in **both** light and dark mode using one of:
+- a distinct background color (`bg-white dark:bg-slate-900`, `bg-slate-50 dark:bg-slate-800`, ...), or
+- a border (`border border-slate-200 dark:border-slate-700`, `border border-slate-200 dark:border-slate-600`, ...).
+
+Never leave a group with no visual separation, and never apply separation only in light mode. Check existing pages (e.g. `companies/employees/show_controller.js`, `companies/attendance_months/show_controller.js`) as references.
+
+```javascript
+// ✅ CORRECT - bordered, dark-aware stat card
+<div class="p-3 border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-900">
+  <p class="text-xs font-medium text-slate-500 dark:text-slate-400">Month</p>
+  <p class="text-sm font-semibold text-slate-900 dark:text-white">October 2026</p>
+</div>
+
+// ❌ WRONG - no border, light-only text
+<div>
+  <p class="text-xs font-medium text-slate-500">Month</p>
+  <p class="text-sm font-semibold text-slate-900">October 2026</p>
+</div>
+```
+
+---
+
 ## 5. Single Line Classes
 
 Never split Tailwind classes across multiple lines. Keep all classes on a single line even if very long.

@@ -91,6 +91,7 @@ This file and `README.md` are always in context. Everything in `docs/` is on-dem
 - **Update** `docs/MODEL_CALLBACKS.md` if model/concern callbacks were added or modified
 - **Constants** — All app-wide constants must be in `config/initializers/constants.rb`, never hardcoded inline. See `docs/CONSTANTS.md`.
 - **Client cache** — If any mutation affects data stored in `currentCompany()` (branches, roles, categories, permissions, features, etc.), call `clearClientCacheAndReload()` after the server confirms the change, OR call `clearClientCache()` followed by a page reload.
+- **Dark mode & grouping** — Every text must include `dark:` color variants; every UI group (title+value, card, dropdown, table, section) must have a border or distinct background in both light and dark modes. See `docs/STYLING_GUIDELINES.md` §4 and §5.
 - **BE↔FE link** — When you add, remove, or change an endpoint, update the file-header link comments in **both** the BE controller (`Serves Stimulus:`) and the FE Stimulus controller (`Depends on BE:` / `Endpoints:`). See the template in `V1Controller`, `OrdersController`, `PagesController`, `MockQrGatewayController`, `RetailCashierController`. Links are living — remove stale pairs, add new ones per feature.
 - **Test priority** — Verify feature tests for the touched area are green before declaring work complete; request/model specs alone are insufficient. See `docs/TEST_PRIORITY.md`.
 

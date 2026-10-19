@@ -64,7 +64,7 @@ export default class Companies_Payrolls_MyController extends Companies_LayoutCon
       return `<option value="${String(x.month).slice(0, 7)}" ${selected}>${this.formatDate(String(x.month).slice(0, 10))}</option>`
     }).join('')
     const dropdown = months.length > 0
-      ? `<select onchange="window.location.href='/companies/${cid}/payroll/my?month='+this.value" class="input-primary">${options}</select>`
+      ? `<select onchange="window.location.href='/companies/${cid}/payroll/my?month='+this.value" class="w-full px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-slate-900 dark:text-white text-sm">${options}</select>`
       : ''
 
     if (!payroll) {
@@ -73,7 +73,7 @@ export default class Companies_Payrolls_MyController extends Companies_LayoutCon
           <div class="p-6 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800">
             <h2 class="text-2xl font-black text-slate-900 dark:text-white mb-6">${translate("Payroll")}</h2>
             ${dropdown}
-            <p class="text-sm text-slate-500 mt-4">${translate("No payroll data for this month.")}</p>
+            <p class="text-sm text-slate-500 dark:text-slate-400 mt-4">${translate("No payroll data for this month.")}</p>
           </div>
         </div>
       `
@@ -84,18 +84,18 @@ export default class Companies_Payrolls_MyController extends Companies_LayoutCon
         <div class="p-6 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800">
           <h2 class="text-2xl font-black text-slate-900 dark:text-white mb-6">${translate("Payroll")}</h2>
           ${dropdown}
-          <div class="grid grid-cols-2 gap-6 mt-6">
-            <div>
-              <p class="text-xs font-medium text-slate-500">${translate("Employee")}</p>
-              <p class="text-sm font-semibold text-slate-900">${payroll.employee?.name || this.employee?.name || '—'}</p>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-6">
+            <div class="p-3 border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-900">
+              <p class="text-xs font-medium text-slate-500 dark:text-slate-400">${translate("Employee")}</p>
+              <p class="text-sm font-semibold text-slate-900 dark:text-white">${payroll.employee?.name || this.employee?.name || '—'}</p>
             </div>
-            <div>
-              <p class="text-xs font-medium text-slate-500">${translate("Month")}</p>
-              <p class="text-sm font-semibold text-slate-900">${this.formatDate(payroll.month)}</p>
+            <div class="p-3 border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-900">
+              <p class="text-xs font-medium text-slate-500 dark:text-slate-400">${translate("Month")}</p>
+              <p class="text-sm font-semibold text-slate-900 dark:text-white">${this.formatDate(payroll.month)}</p>
             </div>
-            <div>
-              <p class="text-xs font-medium text-slate-500">${translate("Status")}</p>
-              <p class="text-sm font-semibold text-slate-900">${payroll.status || '—'}</p>
+            <div class="p-3 border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-900">
+              <p class="text-xs font-medium text-slate-500 dark:text-slate-400">${translate("Status")}</p>
+              <p class="text-sm font-semibold text-slate-900 dark:text-white">${payroll.status || '—'}</p>
             </div>
           </div>
         </div>
