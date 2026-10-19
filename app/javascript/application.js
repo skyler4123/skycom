@@ -80,3 +80,7 @@ window.currentCategories = Helpers.currentCategories
 window.currentPropertyMappings = Helpers.currentPropertyMappings
 window.currentTableConfigs = Helpers.currentTableConfigs
 window.currentSettings = Helpers.currentSettings
+window.exportPages = Helpers.exportPages
+window.exportEnabled = Helpers.exportEnabled
+window.downloadCSV = Helpers.downloadCSV
+window.csvEscape = Helpers.csvEscape

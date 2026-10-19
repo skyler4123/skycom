@@ -275,6 +275,28 @@ MIGRATION_IMPORT_EXCLUDED_RESOURCES = %w[
 # =============================================================================
 
 # =============================================================================
+# Export (index pages → CSV). Skycom-level toggle: applies to every company.
+# Resource keys (URL/controller name) listed here have the "Export" button on
+# their index page and accept `?export=1` to return the full filtered record set.
+# Add/remove a key to enable/disable export for that page globally.
+# =============================================================================
+EXPORT_ENABLED_RESOURCES = %w[
+  analytics attendance_config_logs attendance_configs attendance_days
+  attendance_logs attendance_months attendance_requests branches brands
+  calendars categories company_ticket_logs company_tickets customer_profiles
+  customers customer_subprofiles departments discount_groups discounts
+  documents employee_profiles employees employee_subprofiles event_configs
+  events facilities folders invoices notifications notification_tags orders
+  pages permission_logs permissions policies products property_mappings
+  purchases roles scheduled_shifts services shift_templates stock_adjustments
+  stock_exports stock_imports stock_pendings stocks stock_transfers storage_statistics
+  suppliers table_config_logs table_configs warehouses workflows
+].freeze
+
+# Safety cap for a single export request (records).
+EXPORT_MAX_RECORDS = 10_000
+
+# =============================================================================
 # Welcome Notification (new-company onboarding)
 # Country-versioned copy for the delayed welcome job
 # (Companies::WelcomeNotificationJob). Business-domain agnostic — keyed by
