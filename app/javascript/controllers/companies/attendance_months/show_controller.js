@@ -1,6 +1,6 @@
 import Companies_LayoutController from "controllers/companies/layout_controller"
 
-// Depends on BE: Companies::AttendanceMonthsController#show (JSON with attendance_month + attendance_days)
+// Depends on BE: Companies::AttendanceMonthsController#show (JSON with attendance_month + attendance_days), #collect
 // Docs: docs/HR.md
 export default class Companies_AttendanceMonths_ShowController extends Companies_LayoutController {
   /** @type {Object|null} */
@@ -54,6 +54,19 @@ export default class Companies_AttendanceMonths_ShowController extends Companies
     return `<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${color}">${Helpers.capitalize(status?.replace('_', ' ') || '')}</span>`
   }
 
+  async collect() {
+    const companyId = currentCompany().id
+    try {
+      const response = await fetchJson(`${Helpers.company_attendance_months_collect_path(companyId)}`, {
+        method: "POST"
+      })
+      toast({ type: "success", message: response.message || "Attendance data collected" })
+      window.location.reload()
+    } catch (error) {
+      toast({ type: "error", message: error.errors?.join(", ") || "Failed to collect attendance data" })
+    }
+  }
+
   contentHTML() {
     const m = this.attendanceMonth
     if (!m) return '<div class="p-8 text-center">Not found.</div>'
@@ -61,11 +74,17 @@ export default class Companies_AttendanceMonths_ShowController extends Companies
     return `
       <div class="p-4 overflow-y-auto">
         <div class="p-6 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800">
-          <a href="${Helpers.company_attendance_months_path(currentCompany().id)}"
-            class="inline-flex items-center gap-1 text-sm text-slate-500 hover:text-slate-700 mb-6 cursor-pointer">
-            <span class="material-symbols-outlined text-[18px]!">arrow_back</span>
-            ${translate("Back")}
-          </a>
+          <div class="flex items-center justify-between mb-6">
+            <a href="${Helpers.company_attendance_months_path(currentCompany().id)}"
+              class="inline-flex items-center gap-1 text-sm text-slate-500 hover:text-slate-700 cursor-pointer">
+              <span class="material-symbols-outlined text-[18px]!">arrow_back</span>
+              ${translate("Back")}
+            </a>
+            <button type="button" data-action="click->${this.identifier}#collect" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg transition-colors font-medium text-sm flex items-center gap-2 cursor-pointer">
+              <span class="material-symbols-outlined text-[18px]!">sync</span>
+              ${translate("Collect Data")}
+            </button>
+          </div>
           <h2 class="text-2xl font-black text-slate-900 dark:text-white mb-6">${translate("Attendance Month")}</h2>
           <div class="grid grid-cols-2 gap-6">
             <div>

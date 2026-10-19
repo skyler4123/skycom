@@ -73,7 +73,8 @@ export default class Companies_Payrolls_IndexController extends Companies_Layout
   }
 
   viewDetail(event) {
-    const id = event?.target?.dataset?.id || event?.params?.id
+    const row = event?.currentTarget || event?.target?.closest?.("tr")
+    const id = row?.dataset?.id || event?.target?.dataset?.id || event?.params?.id
     const companyId = window.location.pathname.split("/")[2]
     window.location.href = `${Helpers.company_payroll_payroll_path(companyId, id)}`
   }

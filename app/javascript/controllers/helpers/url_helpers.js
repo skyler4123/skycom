@@ -196,6 +196,7 @@ export const reject_company_attendance_request_path = (companyId, id) => `/compa
 
 export const company_attendance_months_path = (companyId) => `/companies/${companyId}/attendance_months`
 export const company_attendance_month_path = (companyId, id) => `/companies/${companyId}/attendance_months/${id}`
+export const company_attendance_months_collect_path = (companyId) => `/companies/${companyId}/attendance_months/collect`
 
 export const company_shift_templates_path = (companyId) => `/companies/${companyId}/shift_templates`
 export const new_company_shift_template_path = (companyId) => `/companies/${companyId}/shift_templates/new`

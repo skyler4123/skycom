@@ -550,13 +550,13 @@ class Seed::HospitalEnrichService
       template = ShiftTemplate.where(company: @company, branch: employee.branch).sample
       next unless template
 
-      # Create past shifts for the last 14 days
-      (1..14).each do |day_offset|
+      # Create past shifts for the last 35 days
+      (1..35).each do |day_offset|
         date = Date.current - day_offset.days
         next if date.saturday? || date.sunday? # Skip weekends
 
         expected_start = date.to_time.change(hour: template.start_time.hour, min: template.start_time.min)
-        expected_end = date.to_time.change(hour: template.end_time.hour, min: template.end_time.min)
+        expected_end = expected_start + 9.hours
 
         shift = Seed::ScheduledShiftService.upsert!(
           company: @company, branch: employee.branch, employee: employee,
@@ -565,32 +565,40 @@ class Seed::HospitalEnrichService
           status: :completed
         )
 
-        # Simulate check-in (5-15 min early)
-        grace = rand(5..15)
-        check_in = expected_start - grace.minutes
-
-        # Simulate check-out (on time or slightly late)
-        check_out = expected_end + rand(0..10).minutes
-
+        # Simulate an 8-hour worked day with a 1-hour lunch break (multi-punch)
         AttendanceLog.create!(
           company: @company, branch: employee.branch, employee: employee,
-          log_type: "check_in", logged_at: check_in
+          log_type: "check_in", logged_at: expected_start
         )
         AttendanceLog.create!(
           company: @company, branch: employee.branch, employee: employee,
-          log_type: "check_out", logged_at: check_out
+          log_type: "check_out", logged_at: expected_start + 4.hours
+        )
+        AttendanceLog.create!(
+          company: @company, branch: employee.branch, employee: employee,
+          log_type: "check_in", logged_at: expected_start + 5.hours
+        )
+        AttendanceLog.create!(
+          company: @company, branch: employee.branch, employee: employee,
+          log_type: "check_out", logged_at: expected_end
         )
       end
     end
 
     # Run resolution engine
-    resolved_dates = (1..14).map { |i| Date.current - i.days }.reject { |d| d.saturday? || d.sunday? }
+    resolved_dates = (1..35).map { |i| Date.current - i.days }.reject { |d| d.saturday? || d.sunday? }
     @employees.each do |emp|
       resolved_dates.each do |date|
         Attendance::DailyResolutionService.new.call(employee: emp, date: date)
       rescue => e
         Rails.logger.warn("Resolution failed for #{emp.id} on #{date}: #{e.message}")
       end
+    end
+
+    [ Date.current.beginning_of_month, (Date.current - 1.month).beginning_of_month ].each do |m|
+      Payrolls::GenerateService.new(company: @company, month: m).call
+    rescue => e
+      Rails.logger.warn("Payroll generation failed for #{@company.id} on #{m}: #{e.message}")
     end
   end
 

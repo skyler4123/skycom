@@ -105,7 +105,11 @@ Rails.application.routes.draw do
           post :reject
         end
       end
-      resources :attendance_months
+      resources :attendance_months do
+        collection do
+          post :collect
+        end
+      end
       resources :reports
       resources :documents
       resources :folders, only: [ :index, :show, :create, :update, :destroy ]

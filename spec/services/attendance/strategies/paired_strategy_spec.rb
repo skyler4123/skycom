@@ -18,7 +18,7 @@ RSpec.describe Attendance::Strategies::PairedStrategy do
     allow(ScheduledShift).to receive(:find_by).and_return(shift)
     result = described_class.new.call(logs, Employee.new, date, template)
     expect(result[:status]).to eq(:present)
-    expect(result[:net_minutes]).to eq(0) # Will be computed by resolution service
+    expect(result[:net_minutes]).to eq(490)
   end
 
   it "multi-punch with lunch break produces 2 segments" do
