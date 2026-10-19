@@ -43,6 +43,7 @@ class Employee < ApplicationRecord
   has_many :attendance_logs, dependent: :destroy
   has_many :attendance_days, dependent: :destroy
   has_many :attendance_months, dependent: :destroy
+  has_many :payrolls, dependent: :destroy
 
   has_many :employee_employee_group_appointments, dependent: :destroy
   has_many :employee_groups, through: :employee_employee_group_appointments
