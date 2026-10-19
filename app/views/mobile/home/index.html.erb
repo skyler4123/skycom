@@ -14,6 +14,12 @@
     <%= link_to "Employee Info", mobile_employee_path,
           class: "block w-full rounded-lg bg-green-600 px-4 py-3 text-base font-semibold text-white hover:bg-green-700 cursor-pointer mb-4" %>
 
+    <%= link_to "Attendance Month", mobile_attendance_month_path,
+          class: "block w-full rounded-lg bg-purple-600 px-4 py-3 text-base font-semibold text-white hover:bg-purple-700 cursor-pointer mb-4" %>
+
+    <%= link_to "Payroll", mobile_payroll_path,
+          class: "block w-full rounded-lg bg-indigo-600 px-4 py-3 text-base font-semibold text-white hover:bg-indigo-700 cursor-pointer mb-4" %>
+
     <%= button_to "Check In", mobile_attendances_path, method: :post,
           class: "w-full rounded-lg bg-blue-600 px-4 py-3 text-base font-semibold text-white hover:bg-blue-700 cursor-pointer mb-4" %>
 

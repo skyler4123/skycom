@@ -7,6 +7,8 @@ Rails.application.routes.draw do
     delete "sign_out", to: "sessions#destroy"
     get "home", to: "home#index"
     get "employee", to: "employees#show"
+    get "attendance_month", to: "attendance_months#show"
+    get "payroll", to: "payrolls#show"
     post "attendances", to: "attendances#create"
     resources :attendance_requests, only: %i[new create]
   end
