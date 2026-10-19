@@ -36,10 +36,11 @@ module CompanyMigrationsHelper
 
   # chunks: array of CSV strings or Pathnames (a file path is read as-is).
   def create_migration_with_chunks(company:, chunks:, config:, name: nil)
+    migration_name = name || "Import #{SecureRandom.hex(4)}"
     migration = CompanyMigration.create!(
       company: company,
-      folder: Folder.create!(company: company, name: "Import #{SecureRandom.hex(3)}"),
-      name: name || "Import #{SecureRandom.hex(4)}",
+      folder: Folder.create!(company: company, name: migration_name),
+      name: migration_name,
       workflow_status: :draft,
       migration_mapping_config: config
     )
