@@ -25,7 +25,7 @@ module CompanyMigrations
 
     def call
       root = @company.folders.find_or_create_by!(parent_id: nil, name: ROOT_FOLDER_NAME)
-      folder = root.children.create!(company: @company, name: "Import #{SecureRandom.hex(4)}")
+      folder = root.children.create!(company: @company, name: @name.presence || "Import #{SecureRandom.hex(4)}")
 
       @company.company_migrations.create!(
         name: @name,

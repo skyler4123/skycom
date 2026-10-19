@@ -9,7 +9,7 @@ RSpec.describe CompanyMigration, type: :model do
     CompanyMigration.new(
       {
         company: company,
-        folder: Folder.create!(company: company, name: "Import #{SecureRandom.hex(3)}"),
+        folder: Folder.create!(company: company, name: "Customers import"),
         name: "Customers import"
       }.merge(attrs)
     )
