@@ -170,6 +170,13 @@ Rails.application.routes.draw do
 
       get "analytics", to: "analytics#index"
 
+      resource :tax_config, only: %i[show update], controller: :tax_configs
+      get "tax", to: "taxes#index"
+      get "tax/summary", to: "taxes#summary"
+      get "tax/invoices", to: "taxes#invoices"
+      get "tax/purchases", to: "taxes#purchases"
+      get "tax/stock_exports", to: "taxes#stock_exports"
+
       # PLACEHOLDER routes — future Token implementation. Actions exist but
       # contain no logic yet (see Companies::TopUpsController).
       resources :top_ups, only: %i[new] do
