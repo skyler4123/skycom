@@ -23,6 +23,7 @@ class Company < ApplicationRecord
     Membership
     Page CompanyPaymentMethodAppointment ShiftTemplate ScheduledShift
     AttendanceConfig AttendanceLog AttendanceDay AttendanceMonth AttendanceRequest
+    Payroll
     EventConfigLog AttendanceConfigLog TableConfigLog PermissionLog
     Stock StockTransfer StockImport StockExport StockAdjustment StockPending
     Event EventGroup EventConfig
