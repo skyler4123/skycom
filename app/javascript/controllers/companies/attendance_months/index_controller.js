@@ -2,7 +2,7 @@ import Companies_LayoutController from "controllers/companies/layout_controller"
 
 export default class Companies_AttendanceMonths_IndexController extends Companies_LayoutController {
   // Attendance months dashboard with employee-name search, month range + absence/deficit thresholds.
-  // Depends on BE: Companies::AttendanceMonthsController#index (JSON)
+  // Depends on BE: Companies::AttendanceMonthsController#index (JSON), #collect
   // Endpoints: GET <pathname>.json?employee_name&from&to&min_absent_days&min_deficit_minutes — traditional GET form, full-page submit
   // Docs: docs/HR.md
   static targets = ["attendanceMonthsList"]
@@ -31,6 +31,19 @@ export default class Companies_AttendanceMonths_IndexController extends Companie
     if (!dateStr) return '—'
     const d = new Date(dateStr + 'T00:00:00')
     return d.toLocaleDateString('en-GB', { month: 'long', year: 'numeric' })
+  }
+
+  async collect() {
+    const companyId = currentCompany().id
+    try {
+      const response = await fetchJson(`${Helpers.company_attendance_months_collect_path(companyId)}`, {
+        method: "POST"
+      })
+      toast({ type: "success", message: response.message || "Attendance data collected" })
+      window.location.reload()
+    } catch (error) {
+      toast({ type: "error", message: error.errors?.join(", ") || "Failed to collect attendance data" })
+    }
   }
 
   contentHTML() {
@@ -75,6 +88,12 @@ export default class Companies_AttendanceMonths_IndexController extends Companie
               </div>
             </div>
           </form>
+          <div class="flex justify-end mb-4">
+            <button type="button" data-action="click->${this.identifier}#collect" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg transition-colors font-medium text-sm flex items-center gap-2 cursor-pointer">
+              <span class="material-symbols-outlined text-[18px]!">sync</span>
+              ${translate("Collect Data")}
+            </button>
+          </div>
           <div class="overflow-x-auto">
             <table class="w-full text-left border-collapse">
               <thead>

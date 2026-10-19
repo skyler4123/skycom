@@ -2,7 +2,7 @@
 #
 # Attendance month dashboard API (Shell-First).
 # Serves Stimulus: Companies_AttendanceMonths_IndexController, Companies_AttendanceMonths_ShowController
-# Endpoints: GET /companies/:company_id/attendance_months(.json?employee_name&from&to&min_absent_days&min_deficit_minutes), GET /companies/:company_id/attendance_months/:id(.json with attendance_days)
+# Endpoints: GET /companies/:company_id/attendance_months(.json?employee_name&from&to&min_absent_days&min_deficit_minutes), GET /companies/:company_id/attendance_months/:id(.json with attendance_days), POST /companies/:company_id/attendance_months/collect
 # Docs: docs/HR.md
 class Companies::AttendanceMonthsController < Companies::ApplicationController
   def index
@@ -24,6 +24,13 @@ class Companies::AttendanceMonthsController < Companies::ApplicationController
         render json: { attendance_months: @results.map { |m| format_month(m) }, pagination: @pagy.data_hash }
       end
     end
+  end
+
+  def collect
+    Attendance::CollectDataJob.perform_now(current_company.id)
+    render json: { message: "Attendance data collected" }
+  rescue StandardError => e
+    render json: { errors: [ e.message ] }, status: :unprocessable_content
   end
 
   def show

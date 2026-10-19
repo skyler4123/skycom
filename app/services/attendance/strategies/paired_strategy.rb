@@ -10,7 +10,7 @@ module Attendance
         segments = fuse_paired(sorted)
 
         if segments.empty? || segments.none? { |s| s[:has_check_out] }
-          return absent_result
+          return absent_result(segments)
         end
 
         gross = segments.select { |s| s[:has_check_out] }.sum { |s| s[:duration_minutes] }
@@ -58,19 +58,19 @@ module Attendance
       def match_policy(net, segments, template, employee, date)
         full_day = template&.full_day_minutes || 480
         case template&.policy_type
-        when "pure_flexible" then flexible_match(net, full_day)
+        when "pure_flexible" then flexible_match(net, full_day, segments)
         when "core_hours_flexible" then core_hours_match(net, segments, template, date, full_day)
         else fixed_match(net, segments, template, employee, date, full_day)
         end
       end
 
-      def flexible_match(net, full_day)
+      def flexible_match(net, full_day, segments)
         if net >= full_day
-          success_result(net - full_day)
+          success_result(net - full_day, net, segments)
         elsif net >= full_day / 2
-          half_day_result
+          half_day_result(net, segments)
         else
-          absent_result
+          absent_result(segments)
         end
       end
 
@@ -87,14 +87,14 @@ module Attendance
 
         if net >= full_day
           if late > 0
-            { status: :late, late_minutes: late, early_leave_minutes: 0, overtime_minutes: [ net - full_day, 0 ].max }
+            { status: :late, late_minutes: late, early_leave_minutes: 0, overtime_minutes: [ net - full_day, 0 ].max, net_minutes: net, segments: segments }
           else
-            success_result(net - full_day)
+            success_result(net - full_day, net, segments)
           end
         elsif net >= full_day / 2
-          half_day_result
+          half_day_result(net, segments)
         else
-          absent_result
+          absent_result(segments)
         end
       end
 
@@ -108,27 +108,27 @@ module Attendance
 
         if net >= full_day
           if covers_core
-            success_result(net - full_day)
+            success_result(net - full_day, net, segments)
           else
-            { status: :present, late_minutes: 0, early_leave_minutes: 0, overtime_minutes: 0, policy_violation: "missed_core_hours" }
+            { status: :present, late_minutes: 0, early_leave_minutes: 0, overtime_minutes: 0, net_minutes: net, segments: segments, policy_violation: "missed_core_hours" }
           end
         elsif net >= full_day / 2
-          half_day_result
+          half_day_result(net, segments)
         else
-          absent_result
+          absent_result(segments)
         end
       end
 
-      def success_result(overtime)
-        { status: :present, late_minutes: 0, early_leave_minutes: 0, overtime_minutes: overtime, net_minutes: 0, segments: [] }
+      def success_result(overtime, net, segs)
+        { status: :present, late_minutes: 0, early_leave_minutes: 0, overtime_minutes: overtime, net_minutes: net, segments: segs }
       end
 
-      def half_day_result
-        { status: :half_day, late_minutes: 0, early_leave_minutes: 0, overtime_minutes: 0, net_minutes: 0, segments: [] }
+      def half_day_result(net, segs)
+        { status: :half_day, late_minutes: 0, early_leave_minutes: 0, overtime_minutes: 0, net_minutes: net, segments: segs }
       end
 
-      def absent_result
-        { status: :absent, late_minutes: 0, early_leave_minutes: 0, overtime_minutes: 0, net_minutes: 0, segments: [] }
+      def absent_result(segs = [])
+        { status: :absent, late_minutes: 0, early_leave_minutes: 0, overtime_minutes: 0, net_minutes: 0, segments: segs }
       end
     end
   end

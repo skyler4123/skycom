@@ -916,8 +916,8 @@ class Seed::RetailEnrichService
       template = ShiftTemplate.where(company: @retail, branch: employee.branch).sample
       next unless template
 
-      # Create past shifts for the last 14 days
-      (1..14).each do |day_offset|
+      # Create past shifts for the last 35 days
+      (1..35).each do |day_offset|
         date = Date.current - day_offset.days
         next if date.saturday? || date.sunday? # Skip weekends
 
@@ -931,12 +931,9 @@ class Seed::RetailEnrichService
           status: :completed
         )
 
-        # Simulate check-in (5-15 min early)
-        grace = rand(5..15)
-        check_in = expected_start - grace.minutes
-
-        # Simulate check-out (on time or slightly late)
-        check_out = expected_end + rand(0..10).minutes
+        # Simulate an 8-hour worked day
+        check_in = expected_start
+        check_out = expected_end
 
         AttendanceLog.create!(
           company: @retail, branch: employee.branch, employee: employee,
@@ -950,13 +947,20 @@ class Seed::RetailEnrichService
     end
 
     # Run resolution engine
-    resolved_dates = (1..14).map { |i| Date.current - i.days }.reject { |d| d.saturday? || d.sunday? }
+    resolved_dates = (1..35).map { |i| Date.current - i.days }.reject { |d| d.saturday? || d.sunday? }
     @employees.each do |emp|
       resolved_dates.each do |date|
         Attendance::DailyResolutionService.new.call(employee: emp, date: date)
       rescue => e
         Rails.logger.warn("Resolution failed for #{emp.id} on #{date}: #{e.message}")
       end
+    end
+
+    # Generate payroll drafts so Payroll Data page has data
+    [ Date.current.beginning_of_month, (Date.current - 1.month).beginning_of_month ].each do |m|
+      Payrolls::GenerateService.new(company: @retail, month: m).call
+    rescue => e
+      Rails.logger.warn("Payroll generation failed for #{@retail.id} on #{m}: #{e.message}")
     end
   end
 
