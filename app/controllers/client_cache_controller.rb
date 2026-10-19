@@ -130,7 +130,8 @@ class ClientCacheController < ApplicationController
               process_types: Workflow.process_types.keys.map { |t| { name: t.to_s.humanize, value: t.to_s } }
             }
           },
-          employees: current_user.employees
+          employees: current_user.employees,
+          export_pages: EXPORT_ENABLED_RESOURCES
         }
       end
     end

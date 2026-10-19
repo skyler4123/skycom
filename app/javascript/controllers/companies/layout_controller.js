@@ -41,6 +41,56 @@ export default class Companies_LayoutController extends Controller {
     return currentTableConfigs().find(config => config.id === this.tableConfigIdValue)
   }
 
+  async exportCSV() {
+    try {
+      const parts = pathname().split("/").filter(Boolean)
+      const isIndex = parts.length === 3 && parts[0] === "companies"
+      const resource = isIndex ? parts[2] : (parts[parts.length - 1] || "export")
+
+      if (!exportEnabled(resource)) {
+        toast({ type: "error", message: translate("Export is not enabled for this page") })
+        return
+      }
+
+      const baseParams = new URLSearchParams(window.location.search)
+      baseParams.set("export", "1")
+
+      let all = []
+      const first = await fetchJson(`${pathname()}.json?${baseParams.toString()}`)
+      const key = Object.keys(first).find(k => Array.isArray(first[k]))
+      const records = key ? (first[key] || []) : []
+
+      if (!first.pagination || !first.pagination.next) {
+        all = records
+      } else {
+        all = [...records]
+        let next = first.pagination.next
+        while (next) {
+          const p = new URLSearchParams(baseParams)
+          p.set("page[page]", next)
+          const r = await fetchJson(`${pathname()}.json?${p.toString()}`)
+          const k2 = Object.keys(r).find(k => Array.isArray(r[k]))
+          all = all.concat(k2 ? (r[k2] || []) : [])
+          next = r.pagination?.next || null
+          if (all.length > 100000) break
+        }
+      }
+
+      let columns = null
+      const tc = (typeof this.currentTableConfig === "function") ? this.currentTableConfig() : null
+      if (tc?.columns_metadata) {
+        columns = tc.columns_metadata
+          .filter(c => c.visible !== false)
+          .map(c => ({ key: c.key, label: c.name || c.label || c.key }))
+      }
+
+      const filename = `${resource}-${new Date().toISOString().slice(0, 10)}.csv`
+      downloadCSV(all, columns, filename)
+    } catch (error) {
+      toast({ type: "error", message: error.errors?.join(", ") || translate("Export failed") })
+    }
+  }
+
   renderTableTitle() {
     const config = this.currentTableConfig()
     const category = this.currentCategory()
@@ -108,7 +158,12 @@ export default class Companies_LayoutController extends Controller {
   layoutHTML() {
     // If retail isn't loaded yet, return an empty string or a loader
     if (!currentCompany()) return `<div class="p-4">Loading...</div>`;
-    
+
+    const _pathParts = pathname().split("/").filter(Boolean)
+    const _isIndexPage = _pathParts.length === 3 && _pathParts[0] === "companies"
+    const _resourceKey = _isIndexPage ? _pathParts[2] : null
+    const _showExport = _isIndexPage && exportEnabled(_resourceKey)
+
     return `
       <!-- Layout Wrapper: Font, Background, Colors -->
       <div class="min-w-0 flex flex-1 font-display bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200">
@@ -221,6 +276,14 @@ export default class Companies_LayoutController extends Controller {
                   <span class="material-symbols-outlined">notifications</span>
                   <span data-bell-badge class="hidden absolute top-0 right-0 min-w-[18px] h-[18px] px-1 rounded-full bg-rose-600 text-white text-[10px] font-bold flex items-center justify-center">0</span>
                 </a>
+                ${_showExport ? `
+                  <button type="button" data-action="click->${this.identifier}#exportCSV"
+                    class="hidden md:inline-flex items-center gap-2 px-3 py-2 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 rounded-lg text-sm font-medium cursor-pointer hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors"
+                    ${tooltip(translate("Export"))}>
+                    <span class="material-symbols-outlined text-[18px]!">download</span>
+                    ${translate("Export")}
+                  </button>
+                ` : ""}
                 <button
                   class="hidden md:flex cursor-pointer items-center justify-center overflow-hidden rounded-full h-10 w-10 hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-600 dark:text-gray-300">
                   <span class="material-symbols-outlined">settings</span>

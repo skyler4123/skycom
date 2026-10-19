@@ -962,3 +962,33 @@ export const renderQrCode = (element, text = "https://skycom.vn") => {
     console.error("🚨 QR Responsive Engine compilation exception caught:", error);
   }
 };
+
+// --- CSV Export (client-side) ---
+export const csvEscape = (value) => {
+  const s = value === null || value === undefined ? "" : String(value)
+  return /[",\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s
+}
+
+export const downloadCSV = (records, columns, filename) => {
+  if (!records || records.length === 0) {
+    toast({ type: "error", message: translate("No records to export") })
+    return
+  }
+  const cols = (columns && columns.length)
+    ? columns
+    : Object.keys(records[0]).map(k => ({ key: k, label: k }))
+
+  const header = cols.map(c => csvEscape(c.label || c.key)).join(",")
+  const rows = records.map(r => cols.map(c => {
+    let v = r[c.key]
+    if (v && typeof v === "object") v = v.name ?? v.id ?? JSON.stringify(v)
+    return csvEscape(v)
+  }).join(",")).join("\n")
+
+  const blob = new Blob([header + "\n" + rows], { type: "text/csv;charset=utf-8;" })
+  const link = document.createElement("a")
+  link.href = URL.createObjectURL(blob)
+  link.download = filename || "export.csv"
+  link.click()
+  URL.revokeObjectURL(link.href)
+}

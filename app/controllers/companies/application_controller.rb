@@ -9,6 +9,11 @@ class Companies::ApplicationController < ApplicationController
 
   before_action :set_websocket_channels
 
+  # Export guard: only pages listed in EXPORT_ENABLED_RESOURCES may serve an
+  # export request (`?export=1`). Centralized so individual controllers need
+  # no per-page check. Docs: docs/EXPORT.md
+  before_action :ensure_export_enabled, if: -> { params[:export].present? }
+
   # Dynamic search/filter services (DynamicSearch::BaseQueryService subclasses) raise
   # Meilisearch::Error when the search backend is down — surface it as a JSON 503,
   # never silent unfiltered results (docs/DYNAMIC_TABLE.md §2.5).
@@ -20,6 +25,11 @@ class Companies::ApplicationController < ApplicationController
 
   private
 
+  def ensure_export_enabled
+    unless EXPORT_ENABLED_RESOURCES.include?(controller_name)
+      render json: { errors: [ "Export is not enabled for this page" ] }, status: :unprocessable_content
+    end
+  end
   def set_company
     company_id = params[:company_id]
     # @current_company ||= Company.find(company_id) if company_id.present?

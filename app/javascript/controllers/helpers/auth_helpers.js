@@ -138,6 +138,14 @@ export const currentEmployeeId = () => {
   return currentEmployee()?.id || null
 }
 
+export const exportPages = () => {
+  return getCache().export_pages || []
+}
+
+export const exportEnabled = (resource) => {
+  return exportPages().includes(resource)
+}
+
 // Helper method inside your controller or JS file
 export const getImportMapPath = (moduleName) => {
   const importMapScript = document.querySelector('script[type="importmap"]')

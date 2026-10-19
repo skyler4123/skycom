@@ -4,7 +4,7 @@
 # index: plain DB list, OR Meilisearch-backed when ?q= / ?filters[key]= params are
 #        present AND the category's TableConfig enables search/filter per column
 #        (whitelist + query building live in Products::SearchQueryService).
-# Serves Stimulus: Companies_Products_IndexController (index JSON incl. q/filters passthrough),
+# Serves Stimulus: Companies_Products_IndexController (index JSON incl. q/filters/export passthrough),
 #                  Companies_Products_NewController|ShowController|EditController (record JSON + form mutations)
 # Endpoints: GET /companies/:company_id/products(.json), GET /companies/:company_id/products/:id(.json with stocks) + nested CRUD — see config/routes.rb
 # Docs: docs/DYNAMIC_TABLE.md, docs/MEILISEARCH.md
@@ -20,6 +20,14 @@ class Companies::ProductsController < Companies::ApplicationController
 
         search = Products::SearchQueryService.new(company: current_company, params: params)
         scope = scope.where(id: search.record_ids).in_order_of(:id, search.record_ids) if search.active?
+
+        if params[:export].present?
+          results = scope.to_a
+          if results.size > EXPORT_MAX_RECORDS
+            render json: { errors: [ "Export exceeds maximum of #{EXPORT_MAX_RECORDS} records" ] }, status: :unprocessable_content and return
+          end
+          render json: { products: format_products(results) } and return
+        end
 
         @pagy, @products_results = pagy(:offset, scope, jsonapi: true)
 
