@@ -255,6 +255,18 @@ export const rate_company_company_ticket_path = (companyId, ticketId) => `/compa
 export const company_company_ticket_comments_path = (companyId) => `/companies/${companyId}/company_ticket_comments`
 export const company_company_ticket_logs_path = (companyId) => `/companies/${companyId}/company_ticket_logs`
 export const company_company_ticket_log_path = (companyId, logId) => `/companies/${companyId}/company_ticket_logs/${logId}`
+
+// Tickets (docs/TICKET.md)
+export const company_tickets_path = (companyId) => `/companies/${companyId}/tickets`
+export const create_company_tickets_path = (companyId) => `/companies/${companyId}/tickets`
+export const new_company_ticket_path = (companyId) => `/companies/${companyId}/tickets/new`
+export const company_ticket_path = (companyId, ticketId) => `/companies/${companyId}/tickets/${ticketId}`
+export const edit_company_ticket_path = (companyId, ticketId) => `/companies/${companyId}/tickets/${ticketId}/edit`
+export const advance_company_ticket_path = (companyId, ticketId) => `/companies/${companyId}/tickets/${ticketId}/advance`
+export const assign_company_ticket_path = (companyId, ticketId) => `/companies/${companyId}/tickets/${ticketId}/assign`
+export const company_ticket_comments_path = (companyId) => `/companies/${companyId}/ticket_comments`
+export const company_ticket_logs_path = (companyId) => `/companies/${companyId}/ticket_logs`
+export const company_ticket_log_path = (companyId, logId) => `/companies/${companyId}/ticket_logs/${logId}`
 // Notifications (docs/superpowers/plans/2026-10-07-notification.md)
 export const company_notifications_path = (companyId) => `/companies/${companyId}/notifications`
 export const company_notification_path = (companyId, notificationId) => `/companies/${companyId}/notifications/${notificationId}`

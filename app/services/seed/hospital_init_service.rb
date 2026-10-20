@@ -134,6 +134,16 @@ class Seed::HospitalInitService
         visible_columns: %w[name code workflow_status needed_by]
       }
     },
+    tickets: {
+      "Clinical Issue" => {
+        properties: { property_string_1: "Department", property_string_2: "Reported By" },
+        visible_columns: %w[name priority workflow_status assigned_employee_id]
+      },
+      "IT Support" => {
+        properties: { property_string_1: "System", property_string_2: "Urgency" },
+        visible_columns: %w[name priority workflow_status assigned_employee_id]
+      }
+    },
     purchase_items: {
       "Clinical Consumables" => {
         properties: { property_string_1: "Brand Preference", property_integer_1: "Pack Size" },
@@ -347,6 +357,9 @@ class Seed::HospitalInitService
         "CompanyTicket" => { create: true, read: true, update: true, delete: false },
         "CompanyTicketComment" => { create: true, read: true, update: false, delete: false },
         "CompanyTicketLog" => { read: true },
+        "Ticket" => { create: true, read: true, update: true, delete: false },
+        "TicketComment" => { create: true, read: true, update: false, delete: false },
+        "TicketLog" => { read: true },
         "Customer" => { create: true, read: true, update: true, delete: false },
         "Order" => { create: true, read: true, update: false, delete: false },
         "Invoice" => { create: true, read: true, update: false, delete: false },
@@ -363,6 +376,9 @@ class Seed::HospitalInitService
         "CompanyTicket" => { create: true, read: true, update: true, delete: false },
         "CompanyTicketComment" => { create: true, read: true, update: false, delete: false },
         "CompanyTicketLog" => { read: true },
+        "Ticket" => { create: true, read: true, update: true, delete: false },
+        "TicketComment" => { create: true, read: true, update: false, delete: false },
+        "TicketLog" => { read: true },
         "Customer" => { create: false, read: true, update: true, delete: false },
         "Patient" => { create: false, read: true, update: true, delete: false },
         "Order" => { create: true, read: true, update: true, delete: false },
@@ -377,6 +393,9 @@ class Seed::HospitalInitService
         "CompanyTicket" => { create: true, read: true, update: true, delete: false },
         "CompanyTicketComment" => { create: true, read: true, update: false, delete: false },
         "CompanyTicketLog" => { read: true },
+        "Ticket" => { create: true, read: true, update: true, delete: false },
+        "TicketComment" => { create: true, read: true, update: false, delete: false },
+        "TicketLog" => { read: true },
         "Customer" => { read: true, update: true },
         "Patient" => { read: true, update: true },
         "Facility" => { read: true, update: true },
@@ -389,6 +408,9 @@ class Seed::HospitalInitService
         "CompanyTicket" => { create: true, read: true, update: true, delete: false },
         "CompanyTicketComment" => { create: true, read: true, update: false, delete: false },
         "CompanyTicketLog" => { read: true },
+        "Ticket" => { create: true, read: true, update: true, delete: false },
+        "TicketComment" => { create: true, read: true, update: false, delete: false },
+        "TicketLog" => { read: true },
         "Customer" => { read: true },
         "Patient" => { read: true },
         "Service" => { read: true },
@@ -446,6 +468,9 @@ class Seed::HospitalInitService
         "CompanyTicket" => { create: true, read: true, update: true, delete: true },
         "CompanyTicketComment" => { create: true, read: true, update: true, delete: true },
         "CompanyTicketLog" => { create: true, read: true, update: true, delete: true },
+        "Ticket" => { create: true, read: true, update: true, delete: true },
+        "TicketComment" => { create: true, read: true, update: true, delete: true },
+        "TicketLog" => { create: true, read: true, update: true, delete: true },
         "Document" => { create: true, read: true, update: true, delete: true },
         "CompanySetting" => { create: true, read: true, update: false, delete: true } # owner-only update (see CompanySettingsPolicy)
       },
@@ -501,6 +526,9 @@ class Seed::HospitalInitService
         "CompanyTicket" => { create: true, read: true, update: true, delete: true },
         "CompanyTicketComment" => { create: true, read: true, update: true, delete: true },
         "CompanyTicketLog" => { create: true, read: true, update: true, delete: true },
+        "Ticket" => { create: true, read: true, update: true, delete: true },
+        "TicketComment" => { create: true, read: true, update: true, delete: true },
+        "TicketLog" => { create: true, read: true, update: true, delete: true },
         "Document" => { create: true, read: true, update: true, delete: true },
         "CompanySetting" => { create: true, read: true, update: false, delete: true } # owner-only update (see CompanySettingsPolicy)
       }

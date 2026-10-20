@@ -22,6 +22,10 @@ class WEBSOCKET
     company_ticket_created: "company_ticket_created",
     company_ticket_commented: "company_ticket_commented",
     company_ticket_status_changed: "company_ticket_status_changed",
+    ticket_created: "ticket_created",
+    ticket_commented: "ticket_commented",
+    ticket_workflow_step_changed: "ticket_workflow_step_changed",
+    ticket_assigned: "ticket_assigned",
     company_migration_progress: "company_migration_progress",
     company_migration_finished: "company_migration_finished"
   }.freeze
